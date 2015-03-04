@@ -52,18 +52,6 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
         double currentLogLikelihood = model.calculateLogLiklihoodPerGene(gene, i, parameter, false);
         double proposedLogLikelihood = model.calculateLogLiklihoodPerGene(gene, i, parameter, true);
 
-        if(currentLogLikelihood != currentLogLikelihood)
-        {
-            double bla = 0.0;
-        }
-        if(proposedLogLikelihood != proposedLogLikelihood)
-        {
-            double blub = 0.0;
-        }
-        // TODO move next line into parameter object
-        //double curr = parameter.getExpression(i, false);
-        //double propo = parameter.getExpression(i, true);
-        //double logImportanceRatio = curr - propo; // we need that if we do a change of variables from phi to log(phi). ONLY IF: log(phi)~N(m,s)... NOT IF phi~logN(m,s)
         // accept/reject proposed phi values
         if( ( (double)std::rand() / (double)RAND_MAX ) < std::exp(proposedLogLikelihood - currentLogLikelihood) )
         {
@@ -81,10 +69,6 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
         }
 
     }
-    if(logLikelihood != logLikelihood)
-    {
-        double foo = 0.0;
-    }
     return logLikelihood;
 }
 
@@ -98,14 +82,10 @@ void MCMCAlgorithm::acceptRejectHyperParameter(int numGenes, ROCParameter& param
     double proposedSphi = parameter.getSphi(true);
     double proposedMPhi = -(proposedSphi * proposedSphi) / 2;
 
-    //double logImportanceRatio = currentSphi - proposedSphi; Sphi is proposed using a logN dist. So thi line is not necessary!!
-
     for(int i = 0; i < numGenes; i++)
     {
         double phi = parameter.getExpression(i, false);
-        double a = std::log(ROCParameter::densityLogNorm(phi, proposedMPhi, proposedSphi));
-        double b = std::log(ROCParameter::densityLogNorm(phi, currentMPhi, currentSphi));
-        logProbabilityRatio += (a - b);
+        logProbabilityRatio += std::log(ROCParameter::densityLogNorm(phi, proposedMPhi, proposedSphi)) - std::log(ROCParameter::densityLogNorm(phi, currentMPhi, currentSphi));
     }
     if( -ROCParameter::randExp(1) < logProbabilityRatio )
     {
@@ -129,9 +109,7 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
     int maximumIterations = samples * thining;
     // initialize everything
     parameter.initAllTraces(samples, genome.getGenomeSize());
-    //parameter.initExpressionTrace(samples, genome.getGenomeSize()); // not necessary if initAllTraces is implemented!
 
-    //double likelihoodTrace[maximumIterations];
     // starting the MCMC
     std::cout << "entering MCMC loop" << std::endl;
     for(int iteration = 0; iteration < maximumIterations; iteration++)
@@ -150,9 +128,7 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
         {
             parameter.proposeSPhi();
             acceptRejectHyperParameter(genome.getGenomeSize(), parameter, model, iteration);
-            // TODO here goes the estimation of S_phi and so on...
         }
-
         // update expression level values
         if(estimateExpression)
         {
@@ -168,6 +144,7 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
     } // end MCMC loop
     std::cout << "leaving MCMC loop" << std::endl;
 
+    // development output
     std::ofstream likout("/home/clandere/CodonUsageBias/organisms/yeast/results/test.lik");
     std::ofstream sphiout("/home/clandere/CodonUsageBias/organisms/yeast/results/test.sphi");
     std::vector<double> sphiTrace = parameter.getSPhiTrace();

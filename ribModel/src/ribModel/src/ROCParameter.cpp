@@ -302,6 +302,10 @@ double ROCParameter::getSphiPosteriorMean(int samples)
             posteriorMean += sPhiTrace[i];
         }
     }
+    else{
+        throw std::string("ROCParameter::getSphiPosteriorMean throws: Number of anticipated samples (") +
+            std::to_string(samples) + std::string(") is greater than the length of the available trace(") + std::to_string(traceLength) + std::string(").\n");
+    }
     return posteriorMean / (double)samples;
 }
 
@@ -399,14 +403,19 @@ double ROCParameter::densityNorm(double x, double mean, double sd)
 
 double ROCParameter::densityLogNorm(double x, double mean, double sd)
 {
-    const double inv_sqrt_2pi = 0.3989422804014327;
-    double a = (std::log(x) - mean) / sd;
-    // if (a != a) == true => x = 0 and log(x) = nan. Thus the probability for observing phi = 0 is 0!
-    return ( (x <= 0.0) ? 0.0 : ( (inv_sqrt_2pi / (x * sd)) * std::exp(-0.5 * a * a) ) );
+    double returnValue = 0.0
+    // logN is only defined for x > 0 => all values less or equal to zero have probability 0
+    if(x > 0.0)
+    {
+        const double inv_sqrt_2pi = 0.3989422804014327;
+        double a = (std::log(x) - mean) / sd;
+        returnValue = (inv_sqrt_2pi / (x * sd)) * std::exp(-0.5 * a * a);
+    }
+    return returnValue;
 }
 
 // sort array interval from first (included) to last (excluded)!!
-// quick sort, sorting arrays a and b by a.
+// qui  ck sort, sorting arrays a and b by a.
 // Elements in b corespond to a, a will be sorted and it will be assured that b will be sorted by a
 void ROCParameter::quickSortPair(double a[], int b[], int first, int last)
 {
