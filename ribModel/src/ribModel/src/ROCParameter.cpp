@@ -1,0 +1,486 @@
+#include "../include/ROCParameter.h"
+
+#include <math.h>
+#include <ctime>
+
+ROCParameter::ROCParameter()
+{
+    ROCParameter(1, 1, 100, 2);
+}
+
+ROCParameter::ROCParameter(unsigned numMutationCategories, unsigned numSelectionCategories, unsigned numGenes, double sphi)
+{
+    Sphi = sphi;
+    Sphi_proposed = sphi;
+    bias_sphi = 0;
+    std_sphi = 1;
+
+    // proposal bias and std for phi values
+    bias_phi = 0;
+    std_phi = 1;
+
+    // proposal bias and std for codon specific parameter
+    bias_csp = 0;
+    std_csp = 1;
+
+    priorA = 0;
+    priorB = 1;
+
+    currentMutationParameter.resize(numMutationCategories);
+    proposedMutationParameter.resize(numMutationCategories);
+
+    currentSelectionParameter.resize(numSelectionCategories);
+    proposedSelectionParameter.resize(numSelectionCategories);
+
+    for(unsigned i = 0; i < numMutationCategories; i++)
+    {
+        std::vector<double> tempMut(numParam, 0.0);
+        tempMut[0] = -0.351;
+        tempMut[1] = 0.378;
+        tempMut[2] = 0.482;
+        tempMut[3] = 0.002;
+        tempMut[4] = 0.587;
+        tempMut[5] = -0.420;
+        tempMut[6] = 0.678;
+        tempMut[7] = -0.088;
+        tempMut[8] = 0.112;
+        tempMut[9] = 0.308;
+        tempMut[10] = 0.412;
+        tempMut[11] = -0.179;
+        tempMut[12] = 0.374;
+        tempMut[13] = -0.594;
+        tempMut[14] = 0.388;
+        tempMut[15] = 0.853;
+        tempMut[16] = 0.340;
+        tempMut[17] = 0.463;
+        tempMut[18] = 0.019;
+        tempMut[19] = 0.355;
+        tempMut[20] = -0.044;
+        tempMut[21] = 0.292;
+        tempMut[22] = 0.359;
+        tempMut[23] = -0.173;
+        tempMut[24] = -0.882;
+        tempMut[25] = -0.699;
+        tempMut[26] = -0.196;
+        tempMut[27] = 0.396;
+        tempMut[28] = 0.197;
+        tempMut[29] = 0.023;
+        tempMut[30] = 0.518;
+        tempMut[31] = 0.360;
+        tempMut[32] = -0.333;
+        tempMut[33] = 0.286;
+        tempMut[34] = 0.318;
+        tempMut[35] = 0.009;
+        tempMut[36] = 0.568;
+        tempMut[37] = 0.197;
+        tempMut[38] = 0.164;
+        tempMut[39] = 0.183;
+
+
+        currentMutationParameter[i] = tempMut;
+        proposedMutationParameter[i] = tempMut;
+    }
+    for(unsigned i = 0; i < numSelectionCategories; i++)
+    {
+        std::vector<double> tempSel(numParam, 0.0);
+        tempSel[0] = 0.683;
+        tempSel[1] = 0.026;
+        tempSel[2] = 0.991;
+        tempSel[3] = 0.509;
+        tempSel[4] = -0.216;
+        tempSel[5] = -0.279;
+        tempSel[6] = -0.360;
+        tempSel[7] = 1.246;
+        tempSel[8] = 0.544;
+        tempSel[9] = 1.311;
+        tempSel[10] = -0.253;
+        tempSel[11] = 1.360;
+        tempSel[12] = -0.146;
+        tempSel[13] = 0.496;
+        tempSel[14] = 0.416;
+        tempSel[15] = 1.250;
+        tempSel[16] = 0.697;
+        tempSel[17] = 0.872;
+        tempSel[18] = 0.547;
+        tempSel[19] = -0.563;
+        tempSel[20] = -0.442;
+        tempSel[21] = 0.561;
+        tempSel[22] = 0.564;
+        tempSel[23] = -0.447;
+        tempSel[24] = -0.009;
+        tempSel[25] = 0.627;
+        tempSel[26] = 2.549;
+        tempSel[27] = 0.619;
+        tempSel[28] = 1.829;
+        tempSel[29] = 0.803;
+        tempSel[30] = -0.001;
+        tempSel[31] = 0.902;
+        tempSel[32] = 0.747;
+        tempSel[33] = -0.069;
+        tempSel[34] = 0.87;
+        tempSel[35] = 1.030;
+        tempSel[36] = -0.051;
+        tempSel[37] = 0.679;
+        tempSel[38] = -0.394;
+        tempSel[39] = 0.031;
+
+        currentSelectionParameter[i] = tempSel;
+        proposedSelectionParameter[i] = tempSel;
+    }
+
+    currentExpressionLevel.resize(numGenes);
+    proposedExpressionLevel.resize(numGenes);
+
+}
+
+ROCParameter::~ROCParameter()
+{
+    //dtor
+}
+
+//ROCParameter::ROCParameter(const ROCParameter& other)
+//{
+//    //copy ctor
+//}
+
+void ROCParameter::initAllTraces(int samples, int num_genes)
+{
+    initExpressionTrace(samples, num_genes);
+    initSphiTrace(samples);
+}
+void ROCParameter::initExpressionTrace(int samples, int num_genes)
+{
+    expressionTrace.resize(samples);
+    for(unsigned i = 0; i < samples; i++)
+    {
+        std::vector<double> tempExpr(num_genes, 0.0);
+        expressionTrace[i] = tempExpr;
+    }
+}
+
+
+// calculate SCUO values according to
+// Wan et al. CodonO: a new informatics method for measuring synonymous codon usage bias within and across genomes
+// International Journal of General Systems, Vol. 35, No. 1, February 2006, 109–125
+// http://www.tandfonline.com/doi/pdf/10.1080/03081070500502967
+double ROCParameter::calculateSCUO(Gene& gene)
+{
+    SequenceSummary seqsum = gene.getSequenceSummary();
+
+    double totalDegenerateAACount = 0.0;
+    for(int i = 0; i < 22; i++)
+    {
+        if(i == 10 || i == 19 || i == 20) continue;
+        totalDegenerateAACount += (double)seqsum.getAAcountForAA(i);
+    }
+
+    double scuoValue = 0.0;
+    for(int i = 0; i < 22; i++)
+    {
+        // skip amino acids M, W, and Stop
+        if(i == 10 || i == 19 || i == 20) continue;
+        double numDegenerateCodons = SequenceSummary::GetNumCodonsForAA(SequenceSummary::IndexToAA(i));
+
+        double aaCount = (double)seqsum.getAAcountForAA(i);
+        if(aaCount == 0) continue;
+
+        unsigned* codonRange = SequenceSummary::AAindexToCodonRange(i);
+
+        // calculate -sum(pij log(pij))
+        double aaEntropy = 0.0;
+        unsigned start = codonRange[0];
+        unsigned endd = codonRange[1];
+        for(unsigned k = start; k < endd; k++)
+        {
+            int currCodonCount = seqsum.getCodonCountForCodon(k);
+            if(currCodonCount == 0) continue;
+            double codonProportion = (double)currCodonCount / aaCount;
+            aaEntropy += codonProportion*std::log(codonProportion);
+        }
+        aaEntropy = -aaEntropy;
+        // calculate max entropy -log(1/n_i)
+        double maxEntropyForAA = -std::log(1.0 / numDegenerateCodons);
+        // get normalized difference in entropy O_i
+        double normalizedEntropyDiff = (maxEntropyForAA - aaEntropy) / maxEntropyForAA;
+
+        // calculate the composition ratio F_i
+        double compositionRatio = aaCount / totalDegenerateAACount;
+        // SCUO is the sum(F_i * O_i) over all aa
+        scuoValue += compositionRatio * normalizedEntropyDiff;
+    }
+    return scuoValue;
+}
+
+void ROCParameter::InitializeExpression(Genome& genome, double sd_phi)
+{
+    unsigned genomeSize = genome.getGenomeSize();
+    double scuoValues[genomeSize];
+    double expression[genomeSize];
+    int index[genomeSize];
+    for(unsigned i = 0; i < genomeSize; i++)
+    {
+        index[i] = i;
+        scuoValues[i] = calculateSCUO( genome.getGene(i) );
+        expression[i] = ROCParameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
+    }
+    quickSortPair(scuoValues, index, 0, genomeSize);
+    quickSort(expression, 0, genomeSize);
+    for(unsigned j = 0; j < genomeSize; j++)
+    {
+        currentExpressionLevel[j] = expression[index[j]];
+    }
+}
+void ROCParameter::InitializeExpression(double sd_phi)
+{
+    int numGenes = currentExpressionLevel.size();
+    for(int i = 0; i < numGenes; i++)
+    {
+        currentExpressionLevel[i] = ROCParameter::randLogNorm(-(Sphi * Sphi) / 2, Sphi);
+    }
+}
+void ROCParameter::InitializeExpression(double* expression)
+{
+    int numGenes = currentExpressionLevel.size();
+    for(int i = 0; i < numGenes; i++)
+    {
+        currentExpressionLevel[i] = expression[i];
+    }
+}
+
+void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType, char aa, bool proposal, double* returnSet)
+{
+
+    std::vector<double> tempSet;
+    if(paramType == ROCParameter::dM)
+    {
+        tempSet = proposal ? proposedMutationParameter[category] : currentMutationParameter[category];
+    }
+    else if(paramType == ROCParameter::dEta)
+    {
+        tempSet = proposal ? proposedSelectionParameter[category] : currentSelectionParameter[category];
+    }
+    else throw "Unkown parameter type: " + paramType;
+
+    unsigned* aaRange = SequenceSummary::AAToCodonRange(aa, true);
+
+    unsigned j = 0u;
+    for(unsigned i = aaRange[0]; i < aaRange[1]; i++, j++)
+    {
+        returnSet[j] = tempSet[i];
+    }
+}
+
+double ROCParameter::getExpressionPosteriorMean(int samples, int geneIndex)
+{
+    double posteriorMean = 0.0;
+    unsigned traceLength = expressionTrace.size();
+    if(samples <= traceLength)
+    {
+        unsigned start = traceLength - samples;
+
+        for(unsigned i = start; i < traceLength; i++)
+        {
+            posteriorMean += expressionTrace[i][geneIndex];
+        }
+    }
+    else{
+        throw std::string("ROCParameter::getExpressionPosteriorMean throws: Number of anticipated samples (") +
+            std::to_string(samples) + std::string(") is greater than the length of the available trace(") + std::to_string(traceLength) + std::string(").\n");
+    }
+    return posteriorMean / (double)samples;
+}
+double ROCParameter::getSphiPosteriorMean(int samples)
+{
+    double posteriorMean = 0.0;
+    unsigned traceLength = sPhiTrace.size();
+    if(samples <= traceLength)
+    {
+        unsigned start = traceLength - samples;
+
+        for(unsigned i = start; i < traceLength; i++)
+        {
+            posteriorMean += sPhiTrace[i];
+        }
+    }
+    return posteriorMean / (double)samples;
+}
+
+
+
+void ROCParameter::proposeSPhi()
+{
+    Sphi_proposed = ROCParameter::randLogNorm(Sphi + bias_sphi, Sphi);
+}
+void ROCParameter::proposeExpressionLevels()
+{
+    proposedExpressionLevel = propose(currentExpressionLevel, ROCParameter::randLogNorm, bias_phi, std_phi);
+}
+void ROCParameter::proposeCodonSpecificParameter()
+{
+    unsigned numMutatationCategories = currentMutationParameter.size();
+    for(unsigned i = 0; i < numMutatationCategories; i++)
+    {
+        proposedMutationParameter[i] = propose(currentMutationParameter[i], ROCParameter::randNorm, bias_csp, std_csp);
+    }
+    unsigned numSelectionCategories = currentSelectionParameter.size();
+    for(unsigned i = 0; i < numSelectionCategories; i++)
+    {
+        proposedSelectionParameter[i] = propose(currentSelectionParameter[i], ROCParameter::randNorm, bias_csp, std_csp);
+    }
+}
+std::vector<double> ROCParameter::propose(std::vector<double> currentParam, double (*proposal)(double a, double b), double A, double B)
+{
+    unsigned numParam = currentParam.size();
+    std::vector<double> proposedParam(numParam, 0.0);
+    for(unsigned i = 0; i < numParam; i++)
+    {
+        proposedParam[i] = (*proposal)(A + currentParam[i], B);
+    }
+    return proposedParam;
+}
+
+/*)
+void ROCParameter::updateCodonSpecificParameter(std::vector<double>& currentParamVector, std::vector<double> proposedParam,
+        double (&prior)(double x, double a, double b), double logLikeImportanceRatio)
+{
+        // calculate log prior ratio
+        double lprior = 0.0;
+        for(unsigned i = 0; i < numParam; i++)
+        {
+            lprior += std::log( (*prior)(currentParamVector[i], priorA, priorB) ) - std::log( (*prior)(proposedParam[i], priorA, priorB) );
+        }
+
+        double logAcceptProb = logLikeImportanceRatio - lprior;
+
+        // decide acceptance
+        std::exponential_distribution<double> exponential(1);
+        double propability = -exponential(generator);
+        if(propability < logAcceptProb)
+        {
+            currentParamVector = proposedParam;
+        }
+
+*/
+
+
+/*
+* STATIC FUNCTIONS
+*/
+
+const unsigned ROCParameter::dM = 0;
+const unsigned ROCParameter::dEta = 1;
+std::default_random_engine ROCParameter::generator(time(0));
+double ROCParameter::randNorm(double mean, double sd)
+{
+    std::normal_distribution<double> distribution(mean, sd);
+    return distribution(generator);
+}
+
+double ROCParameter::randLogNorm(double m, double s)
+{
+    std::lognormal_distribution<double> distribution(m, s);
+    return distribution(generator);
+}
+double ROCParameter::randExp(double r)
+{
+    std::exponential_distribution<double> distribution(r);
+    return distribution(generator);
+}
+
+
+double ROCParameter::densityNorm(double x, double mean, double sd)
+{
+    const double inv_sqrt_2pi = 0.3989422804014327;
+    double a = (x - mean) / sd;
+
+    return (inv_sqrt_2pi / sd) * std::exp(-0.5 * a * a);
+}
+
+
+double ROCParameter::densityLogNorm(double x, double mean, double sd)
+{
+    const double inv_sqrt_2pi = 0.3989422804014327;
+    double a = (std::log(x) - mean) / sd;
+    // if (a != a) == true => x = 0 and log(x) = nan. Thus the probability for observing phi = 0 is 0!
+    return ( (x <= 0.0) ? 0.0 : ( (inv_sqrt_2pi / (x * sd)) * std::exp(-0.5 * a * a) ) );
+}
+
+// sort array interval from first (included) to last (excluded)!!
+// quick sort, sorting arrays a and b by a.
+// Elements in b corespond to a, a will be sorted and it will be assured that b will be sorted by a
+void ROCParameter::quickSortPair(double a[], int b[], int first, int last)
+{
+    int pivotElement;
+
+    if(first < last)
+    {
+        pivotElement = pivotPair(a, b, first, last);
+        quickSortPair(a, b, first, pivotElement - 1);
+        quickSortPair(a, b, pivotElement + 1, last);
+    }
+}
+// sort array interval from first (included) to last (excluded)!!
+void ROCParameter::quickSort(double a[], int first, int last)
+{
+    int pivotElement;
+
+    if(first < last)
+    {
+        pivotElement = pivot(a, first, last);
+        quickSort(a, first, pivotElement - 1);
+        quickSort(a, pivotElement + 1, last);
+    }
+}
+int ROCParameter::pivot(double a[], int first, int last)
+{
+    int p = first;
+    double pivotElement = a[first];
+
+    for(int i = (first + 1) ; i < last ; i++)
+    {
+        /* If you want to sort the list in the other order, change "<=" to ">" */
+        if(a[i] <= pivotElement)
+        {
+            p++;
+            swap(a[i], a[p]);
+        }
+    }
+    swap(a[p], a[first]);
+
+    return p;
+}
+int ROCParameter::pivotPair(double a[], int b[], int first, int last)
+{
+    int p = first;
+    double pivotElement = a[first];
+
+    for(int i = (first + 1) ; i < last ; i++)
+    {
+        /* If you want to sort the list in the other order, change "<=" to ">" */
+        if(a[i] <= pivotElement)
+        {
+            p++;
+            swap(a[i], a[p]);
+            swap(b[i], b[p]);
+        }
+    }
+    swap(a[p], a[first]);
+    swap(b[p], b[first]);
+
+    return p;
+}
+void ROCParameter::swap(double& a, double& b)
+{
+    double temp = a;
+    a = b;
+    b = temp;
+}
+void ROCParameter::swap(int& a, int& b)
+{
+    double temp = a;
+    a = b;
+    b = temp;
+}
+
+
+
