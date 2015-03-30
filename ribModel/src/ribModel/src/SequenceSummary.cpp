@@ -57,15 +57,18 @@ void SequenceSummary::processSequence(const std::string& sequence)
 /*
 * STATIC FUNCTIONS
 */
-const char SequenceSummary::AminoAcidArray[] = {'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', SequenceSummary::Ser2, 'S', 'T', 'V', 'W', 'X', 'Y'};
-const std::string SequenceSummary::codonArray[] = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG", "TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT",
-    "ATA", "ATC", "ATT", "AAA", "AAG", "CTA", "CTC", "CTG", "CTT", "TTA", "TTG", "ATG", "AAC", "AAT", "CCA", "CCC", "CCG", "CCT", "CAA", "CAG",
-    "AGA", "AGG", "CGA", "CGC", "CGG", "CGT", "AGC", "AGT", "TCA", "TCC", "TCG", "TCT", "ACA", "ACC", "ACG", "ACT", "GTA", "GTC", "GTG", "GTT", "TGG",
-    "TAA", "TAG", "TGA", "TAC", "TAT"};
+const char SequenceSummary::AminoAcidArray[] = {'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y', SequenceSummary::Ser2, 'X'};
+const std::string SequenceSummary::codonArray[] = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
+                                                    "TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT", "ATA", "ATC",
+                                                    "ATT", "AAA", "AAG", "CTA", "CTC", "CTG", "CTT", "TTA", "TTG", "ATG",
+                                                    "AAC", "AAT", "CCA", "CCC", "CCG", "CCT", "CAA", "CAG", "AGA", "AGG",
+                                                    "CGA", "CGC", "CGG", "CGT", "TCA", "TCC", "TCG", "TCT", "ACA", "ACC",
+                                                    "ACG", "ACT", "GTA", "GTC", "GTG", "GTT", "TGG", "TAC", "TAT", "AGT",
+                                                    "AGC", "TAA", "TAG", "TGA"};
 
 const std::map<char, int> SequenceSummary::aaToIndex = {{'A', 0}, {'C', 1}, {'D', 2}, {'E', 3}, {'F', 4}, {'G', 5}, {'H', 6}, {'I', 7},
-    {'K', 8}, {'L', 9}, {'M', 10}, {'N', 11}, {'P', 12}, {'Q', 13}, {'R', 14}, {SequenceSummary::Ser2, 15},
-    {'S', 16}, {'T', 17}, {'V', 18}, {'W', 19}, {'X', 20}, {'Y', 21}};
+    {'K', 8}, {'L', 9}, {'M', 10}, {'N', 11}, {'P', 12}, {'Q', 13}, {'R', 14},
+    {'S', 15}, {'T', 16}, {'V', 17}, {'W', 18}, {'Y', 19}, {SequenceSummary::Ser2, 20}, {'X', 21}};
 
 unsigned* SequenceSummary::AAindexToCodonRange(unsigned aaIndex, bool forParamVector)
 {
@@ -104,7 +107,6 @@ unsigned SequenceSummary::CodonToAAIndex(std::string& codon)
 {
     char aa = SequenceSummary::CodonToAA(codon);
     return SequenceSummary::aaToIndex.find(aa)->second;
-    //return std::distance(SequenceSummary::AminoAcidArray, std::find(SequenceSummary::AminoAcidArray, SequenceSummary::AminoAcidArray + 22, aa));
 }
 
 unsigned SequenceSummary::CodonToIndex(std::string& codon)

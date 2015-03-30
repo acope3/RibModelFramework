@@ -21,13 +21,18 @@ class ROCParameter
         double Aphi_proposed;
         std::vector<double> sPhiTrace;
         std::vector<double> aPhiTrace;
+        unsigned numAcceptForSphi;
+
+        double phiEpsilon;
+        double phiEpsilon_proposed;
+
         // proposal bias and std for phi values
         double bias_sphi;
         double std_sphi;
 
         // proposal bias and std for phi values
         double bias_phi;
-        double std_phi;
+        std::vector<double> std_phi;
 
         // proposal bias and std for codon specific parameter
         double bias_csp;
@@ -39,6 +44,7 @@ class ROCParameter
         std::vector<double> currentExpressionLevel;
         std::vector<double> proposedExpressionLevel;
         std::vector<std::vector<double>> expressionTrace;
+        std::vector<unsigned> numAcceptForExpression;
 
         std::vector<std::vector<double>> currentMutationParameter;
         std::vector<std::vector<double>> proposedMutationParameter;
@@ -52,8 +58,9 @@ class ROCParameter
 
         // functions
         std::vector<double> propose(std::vector<double> currentParam, double (*proposal)(double a, double b), double A, double B);
-        double calculateSCUO(Gene& gene);
 
+
+        // sorting functions
         static void quickSortPair(double a[], int b[], int first, int last);
         static void quickSort(double a[], int first, int last);
         static int pivotPair(double a[], int b[], int first, int last);
@@ -67,41 +74,66 @@ class ROCParameter
         static const unsigned dEta;
         static std::default_random_engine generator; // static to make sure that the same generator is during the runtime.
 
+
         explicit ROCParameter();
         ROCParameter(unsigned numMutationCategories, unsigned numSelectionCategories, unsigned numGenes, double sphi);
         virtual ~ROCParameter();
-        //ROCParameter(const ROCParameter& other);
+        ROCParameter(const ROCParameter& other);
+        ROCParameter& operator=(const ROCParameter& rhs);
 
+        // Phi epsilon functions
+        double getPhiEpsilon() {return phiEpsilon;}
+
+        // functions to manage adaptive step
+        void adaptSphiProposalWidth(unsigned adaptationWidth);
+        void adaptExpressionProposalWidth(unsigned adaptationWidth);
+        void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth);
+
+        // functions to manage Expression
         double getExpression(int geneIndex, bool proposed = false) {return (proposed ? proposedExpressionLevel[geneIndex] : currentExpressionLevel[geneIndex]);}
         void setExpression(double phi, int geneIndex) {currentExpressionLevel[geneIndex] = phi;}
-        void updateExpression(int geneIndex) {currentExpressionLevel[geneIndex] = proposedExpressionLevel[geneIndex];}
-
-        double getSphi(bool proposed = false) {return (proposed ? Sphi_proposed : Sphi);}
-        double setSphi(double sPhi) {Sphi = sPhi;}
-        double updateSphi() {Sphi = Sphi_proposed;}
-        std::vector<double> getSPhiTrace() {return sPhiTrace;}
-
-        void proposeSPhi();
-        void proposeExpressionLevels();
-        void proposeCodonSpecificParameter();
-
+        void updateExpression(int geneIndex) {currentExpressionLevel[geneIndex] = proposedExpressionLevel[geneIndex]; numAcceptForExpression[geneIndex]++;}
+        std::vector<std::vector<double>> getExpressionTrace() {return expressionTrace;}
         void InitializeExpression(Genome& genome, double sd_phi);
         void InitializeExpression(double sd_phi);
         void InitializeExpression(double* expression);
 
-        void getParameterForCategory(unsigned category, unsigned parameter, char aa, bool proposal, double* returnValue);
+        // functions to manage codon specific parameter
+        void updateCodonSpecificParameter(unsigned category, unsigned paramType, char aa);
 
+        // functions to manage Sphi
+        double getSphi(bool proposed = false) {return (proposed ? Sphi_proposed : Sphi);}
+        double setSphi(double sPhi) {Sphi = sPhi;}
+        double updateSphi() {Sphi = Sphi_proposed; numAcceptForSphi++;}
+        std::vector<double> getSPhiTrace() {return sPhiTrace;}
+        double getSphiProposalWidth() {return std_sphi;}
+
+        // poposal functions
+        void proposeSPhi();
+        void proposeExpressionLevels();
+        void proposeCodonSpecificParameter();
+
+        void getParameterForCategory(unsigned category, unsigned parameter, char aa, bool proposal, double* returnValue);
+        unsigned getNumMutationCategories() {return currentMutationParameter.size();}
+        unsigned getNumSelectionCategories() {return currentSelectionParameter.size();}
+
+        // functions to manage traces
         void initAllTraces(int samples, int num_genes);
         void initExpressionTrace(int samples, int num_genes);
         void initSphiTrace(int sample) {sPhiTrace.resize(sample);}
         void updateExpressionTrace(int sample, int geneIndex) {expressionTrace[sample][geneIndex] = currentExpressionLevel[geneIndex];}
         void updateSphiTrace(int sample) {sPhiTrace[sample] = Sphi;}
 
+        // functions to return estimates
         double getExpressionPosteriorMean(int samples, int geneIndex);
         double getSphiPosteriorMean(int samples);
 
 
-        //static functions
+        // static functions
+        static double calculateSCUO(Gene& gene);
+
+        static double* drawIidRandomVector(unsigned draws, double mean, double sd, double (*proposal)(double a, double b));
+        static double* drawIidRandomVector(unsigned draws, double r, double (*proposal)(double r));
         static double randNorm(double mean, double sd);
         static double randLogNorm(double m, double s);
         static double randExp(double r);

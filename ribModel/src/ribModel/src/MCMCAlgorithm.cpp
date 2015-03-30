@@ -15,6 +15,7 @@
 MCMCAlgorithm::MCMCAlgorithm()
 {
     MCMCAlgorithm(1000, 1, true, true, true);
+    adaptiveWidth = 100;
 }
 
 MCMCAlgorithm::MCMCAlgorithm(int _samples, int _thining, bool _estimateExpression, bool _estimateCodonSpecificParameter, bool _estimateHyperParameter)
@@ -22,6 +23,7 @@ MCMCAlgorithm::MCMCAlgorithm(int _samples, int _thining, bool _estimateExpressio
         estimateHyperParameter(_estimateHyperParameter)
 {
     likelihoodTrace.resize(samples + 1);
+    adaptiveWidth = 100;
 }
 
 MCMCAlgorithm::~MCMCAlgorithm()
@@ -31,7 +33,15 @@ MCMCAlgorithm::~MCMCAlgorithm()
 
 MCMCAlgorithm::MCMCAlgorithm(const MCMCAlgorithm& other)
 {
-    //copy ctor
+        samples = other.samples;
+        thining = other.thining;
+        adaptiveWidth = other.adaptiveWidth;
+
+        estimateExpression = other.estimateExpression;
+        estimateCodonSpecificParameter = other.estimateCodonSpecificParameter;
+        estimateHyperParameter = other.estimateHyperParameter;
+
+        likelihoodTrace = other.likelihoodTrace;
 }
 
 double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROCParameter& parameter, ROCModel& model, int iteration)
@@ -44,24 +54,23 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
     // just for testing
     //unsigned concurentThreadsSupported = std::thread::hardware_concurrency();
     //omp_set_num_threads(concurentThreadsSupported);
-    //#pragma omp parallel for shared(parameter)
+    //#pragma omp parallel for //shared(parameter)
     // testing end
     for(int i = 0; i < numGenes; i++)
     {
         Gene gene = genome.getGene(i);
-        double currentLogLikelihood = model.calculateLogLiklihoodPerGene(gene, i, parameter, false);
-        double proposedLogLikelihood = model.calculateLogLiklihoodPerGene(gene, i, parameter, true);
-
+        double* logProbabilityRatio = model.calculateLogLiklihoodRatioPerGene(gene, i, parameter);
         // accept/reject proposed phi values
-        if( ( (double)std::rand() / (double)RAND_MAX ) < std::exp(proposedLogLikelihood - currentLogLikelihood) )
+        if( ( (double)std::rand() / (double)RAND_MAX ) < std::exp(logProbabilityRatio[0]) )
         {
             // moves proposed phi to current phi
+            //std::cout << "Update expression for Gene i = " << i << " in iteration " << iteration << std::endl;
             parameter.updateExpression(i);
             //#pragma omp atomic
-            logLikelihood += proposedLogLikelihood;
+            logLikelihood += logProbabilityRatio[2];
         }else{
             //#pragma omp atomic
-            logLikelihood += currentLogLikelihood;
+            logLikelihood += logProbabilityRatio[1];
         }
         if((iteration % thining) == 0)
         {
@@ -87,6 +96,10 @@ void MCMCAlgorithm::acceptRejectHyperParameter(int numGenes, ROCParameter& param
         double phi = parameter.getExpression(i, false);
         logProbabilityRatio += std::log(ROCParameter::densityLogNorm(phi, proposedMPhi, proposedSphi)) - std::log(ROCParameter::densityLogNorm(phi, currentMPhi, currentSphi));
     }
+
+    logProbabilityRatio -= (std::log(currentSphi) - std::log(proposedSphi));
+
+
     if( -ROCParameter::randExp(1) < logProbabilityRatio )
     {
         // moves proposed Sphi to current Sphi
@@ -100,8 +113,44 @@ void MCMCAlgorithm::acceptRejectHyperParameter(int numGenes, ROCParameter& param
 
 void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, ROCParameter& parameter, ROCModel& model, int iteration)
 {
+    unsigned numMutationCategories = parameter.getNumMutationCategories();
+    unsigned numSelectionCategories = parameter.getNumSelectionCategories();
+    unsigned totalNumCategories = numMutationCategories + numSelectionCategories;
+    double logAcceptanceRatioPerCategory[totalNumCategories];
 
+    for(int i = 0; i < 22; i++)
+    {
+        char curAA = SequenceSummary::AminoAcidArray[i];
+        // skip amino acids with only one codon or stop codons
+        if(curAA == 'X' || curAA == 'M' || curAA == 'W') continue;
+        // calculate likelihood ratio for every Category for current AA
+        model.calculateLogLikelihoodRatioPerAAPerCategory(curAA, genome, parameter, logAcceptanceRatioPerCategory);
 
+        for(int i = 0; i <  numMutationCategories; i++)
+        {
+            if( -ROCParameter::randExp(1) < logAcceptanceRatioPerCategory[i] )
+            {
+                // moves proposed Sphi to current Sphi
+                parameter.updateCodonSpecificParameter(i, ROCParameter::dM, curAA);
+            }
+            if((iteration % thining) == 0)
+            {
+                //parameter.updateSphiTrace(iteration/thining);
+            }
+        }
+        for(int i = numMutationCategories; i <  totalNumCategories; i++)
+        {
+            if( -ROCParameter::randExp(1) < logAcceptanceRatioPerCategory[i] )
+            {
+                // moves proposed Sphi to current Sphi
+                parameter.updateCodonSpecificParameter(i - numMutationCategories, ROCParameter::dEta, curAA);
+            }
+            if((iteration % thining) == 0)
+            {
+                //parameter.updateSphiTrace(iteration/thining);
+            }
+        }
+    }
 }
 
 void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter)
@@ -120,14 +169,18 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
         // update codon specific parameter
         if(estimateCodonSpecificParameter)
         {
-            //parameter.proposeCodonSpecificParameter();
-            //acceptRejectCodonSpecificParameter(genome, parameter, model);
+            parameter.proposeCodonSpecificParameter();
+            acceptRejectCodonSpecificParameter(genome, parameter, model, iteration);
         }
         // update hyper parameter
         if(estimateHyperParameter)
         {
             parameter.proposeSPhi();
             acceptRejectHyperParameter(genome.getGenomeSize(), parameter, model, iteration);
+            if( ( (iteration + 1) % adaptiveWidth) == 0)
+            {
+               parameter.adaptSphiProposalWidth(adaptiveWidth);
+            }
         }
         // update expression level values
         if(estimateExpression)
@@ -138,7 +191,10 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
             {
                 likelihoodTrace[iteration/thining] = logLike;
             }
-
+            if((iteration % adaptiveWidth) == 0)
+            {
+               //parameter.adaptExpressionProposalWidth(adaptiveWidth);
+            }
         }
 
     } // end MCMC loop
@@ -147,12 +203,23 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
     // development output
     std::ofstream likout("/home/clandere/CodonUsageBias/organisms/yeast/results/test.lik");
     std::ofstream sphiout("/home/clandere/CodonUsageBias/organisms/yeast/results/test.sphi");
+    std::ofstream phitraceout("/home/clandere/CodonUsageBias/organisms/yeast/results/test.phiTrace");
     std::vector<double> sphiTrace = parameter.getSPhiTrace();
+    std::vector<std::vector<double>> expressionTrace = parameter.getExpressionTrace();
     for(int iteration = 0; iteration < samples; iteration++)
     {
         likout << likelihoodTrace[iteration] << std::endl;
         sphiout << sphiTrace[iteration] << std::endl;
+        for(int i = 0; i < genome.getGenomeSize(); i++)
+        {
+            phitraceout << expressionTrace[iteration][i] << ",";
+        }
+        phitraceout << std::endl;
     }
+    likout.close();
+    sphiout.close();
+    phitraceout.close();
+
 
 
 }

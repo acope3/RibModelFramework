@@ -13,11 +13,11 @@ ROCParameter::ROCParameter(unsigned numMutationCategories, unsigned numSelection
     Sphi = sphi;
     Sphi_proposed = sphi;
     bias_sphi = 0;
-    std_sphi = 1;
+    std_sphi = 0.1;
 
+    numAcceptForSphi = 0u;
     // proposal bias and std for phi values
     bias_phi = 0;
-    std_phi = 1;
 
     // proposal bias and std for codon specific parameter
     bias_csp = 0;
@@ -130,7 +130,8 @@ ROCParameter::ROCParameter(unsigned numMutationCategories, unsigned numSelection
 
     currentExpressionLevel.resize(numGenes);
     proposedExpressionLevel.resize(numGenes);
-
+    std_phi.resize(numGenes);
+    numAcceptForExpression.resize(numGenes);
 }
 
 ROCParameter::~ROCParameter()
@@ -138,10 +139,84 @@ ROCParameter::~ROCParameter()
     //dtor
 }
 
-//ROCParameter::ROCParameter(const ROCParameter& other)
-//{
-//    //copy ctor
-//}
+ROCParameter::ROCParameter(const ROCParameter& other)
+{
+    numParam = other.numParam;
+
+    Sphi = other.Sphi;
+    Aphi = other.Aphi;
+    Sphi_proposed = other.Sphi_proposed;
+    Aphi_proposed = other.Aphi_proposed;
+    sPhiTrace = other.sPhiTrace;
+    aPhiTrace = other.aPhiTrace;
+    numAcceptForSphi = other.numAcceptForSphi;
+
+    // proposal bias and std for phi values
+    bias_sphi = other.bias_sphi;
+    std_sphi = other.std_sphi;
+
+    // proposal bias and std for phi values
+    bias_phi = other.bias_phi;
+    std_phi = other.std_phi;
+
+    // proposal bias and std for codon specific parameter
+    bias_csp = other.bias_csp;
+    std_csp = other.std_csp;
+
+    priorA = other.priorA;
+    priorB = other.priorB;
+
+    currentExpressionLevel = other.currentExpressionLevel;
+    proposedExpressionLevel = other.proposedExpressionLevel;
+    expressionTrace = other.expressionTrace;
+    numAcceptForExpression = other.numAcceptForExpression;
+
+    currentMutationParameter = other.currentMutationParameter;
+    proposedMutationParameter = other.proposedMutationParameter;
+
+    currentSelectionParameter = other.currentSelectionParameter;
+    proposedSelectionParameter = other.proposedSelectionParameter;
+}
+ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
+{
+    if (this == &rhs) return *this; // handle self assignment
+    numParam = rhs.numParam;
+
+    Sphi = rhs.Sphi;
+    Aphi = rhs.Aphi;
+    Sphi_proposed = rhs.Sphi_proposed;
+    Aphi_proposed = rhs.Aphi_proposed;
+    sPhiTrace = rhs.sPhiTrace;
+    aPhiTrace = rhs.aPhiTrace;
+    numAcceptForSphi = rhs.numAcceptForSphi;
+
+    // proposal bias and std for phi values
+    bias_sphi = rhs.bias_sphi;
+    std_sphi = rhs.std_sphi;
+
+    // proposal bias and std for phi values
+    bias_phi = rhs.bias_phi;
+    std_phi = rhs.std_phi;
+
+    // proposal bias and std for codon specific parameter
+    bias_csp = rhs.bias_csp;
+    std_csp = rhs.std_csp;
+
+    priorA = rhs.priorA;
+    priorB = rhs.priorB;
+
+    currentExpressionLevel = rhs.currentExpressionLevel;
+    proposedExpressionLevel = rhs.proposedExpressionLevel;
+    expressionTrace = rhs.expressionTrace;
+    numAcceptForExpression = rhs.numAcceptForExpression;
+
+    currentMutationParameter = rhs.currentMutationParameter;
+    proposedMutationParameter = rhs.proposedMutationParameter;
+
+    currentSelectionParameter = rhs.currentSelectionParameter;
+    proposedSelectionParameter = rhs.proposedSelectionParameter;
+    return *this;
+}
 
 void ROCParameter::initAllTraces(int samples, int num_genes)
 {
@@ -170,16 +245,19 @@ double ROCParameter::calculateSCUO(Gene& gene)
     double totalDegenerateAACount = 0.0;
     for(int i = 0; i < 22; i++)
     {
-        if(i == 10 || i == 19 || i == 20) continue;
+        char curAA = seqsum.AminoAcidArray[i];
+        // skip amino acids with only one codon or stop codons
+        if(curAA == 'X' || curAA == 'M' || curAA == 'W') continue;
         totalDegenerateAACount += (double)seqsum.getAAcountForAA(i);
     }
 
     double scuoValue = 0.0;
     for(int i = 0; i < 22; i++)
     {
-        // skip amino acids M, W, and Stop
-        if(i == 10 || i == 19 || i == 20) continue;
-        double numDegenerateCodons = SequenceSummary::GetNumCodonsForAA(SequenceSummary::IndexToAA(i));
+        char curAA = seqsum.AminoAcidArray[i];
+        // skip amino acids with only one codon or stop codons
+        if(curAA == 'X' || curAA == 'M' || curAA == 'W') continue;
+        double numDegenerateCodons = SequenceSummary::GetNumCodonsForAA(curAA);
 
         double aaCount = (double)seqsum.getAAcountForAA(i);
         if(aaCount == 0) continue;
@@ -228,6 +306,8 @@ void ROCParameter::InitializeExpression(Genome& genome, double sd_phi)
     for(unsigned j = 0; j < genomeSize; j++)
     {
         currentExpressionLevel[j] = expression[index[j]];
+        std_phi[j] = 1;
+        numAcceptForExpression[j] = 0u;
     }
 }
 void ROCParameter::InitializeExpression(double sd_phi)
@@ -235,7 +315,9 @@ void ROCParameter::InitializeExpression(double sd_phi)
     int numGenes = currentExpressionLevel.size();
     for(int i = 0; i < numGenes; i++)
     {
-        currentExpressionLevel[i] = ROCParameter::randLogNorm(-(Sphi * Sphi) / 2, Sphi);
+        currentExpressionLevel[i] = ROCParameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
+        std_phi[i] = 1;
+        numAcceptForExpression[i] = 0u;
     }
 }
 void ROCParameter::InitializeExpression(double* expression)
@@ -244,6 +326,8 @@ void ROCParameter::InitializeExpression(double* expression)
     for(int i = 0; i < numGenes; i++)
     {
         currentExpressionLevel[i] = expression[i];
+        std_phi[i] = 1;
+        numAcceptForExpression[i] = 0u;
     }
 }
 
@@ -310,14 +394,58 @@ double ROCParameter::getSphiPosteriorMean(int samples)
 }
 
 
+void ROCParameter::adaptSphiProposalWidth(unsigned adaptationWidth)
+{
+    double acceptanceLevel = (double)numAcceptForSphi / (double)adaptationWidth;
+    if(acceptanceLevel < 0.2)
+    {
+        std_sphi = std::max(0.01, std_sphi * 0.8);
+    }
+    if(acceptanceLevel > 0.3)
+    {
+        std_sphi = std::min(100.0, std_sphi * 1.2);
+    }
+    numAcceptForSphi = 0u;
+}
+void ROCParameter::adaptExpressionProposalWidth(unsigned adaptationWidth)
+{
+    unsigned numExpressionLevels = numAcceptForExpression.size();
+    for(unsigned i = 0; i < numExpressionLevels; i++)
+    {
+        double acceptanceLevel = (double)numAcceptForExpression[i] / (double)adaptationWidth;
+        if(acceptanceLevel < 0.2)
+        {
+            std_phi[i] = std::max(0.01, std_phi[i] * 0.8);
+        }
+        if(acceptanceLevel > 0.3)
+        {
+            std_phi[i] = std::min(100.0, std_phi[i] * 1.2);
+        }
+        numAcceptForExpression[i] = 0u;
+    }
 
+}
+
+// Cedric: I decided to use a normal distribution to propose Sphi and phi instead of a lognormal because:
+// 1. It is a symmetric distribution and you therefore do not have to account for the unsymmetry in jump probabilities
+// 2. The one log and exp operation that have to be performed per parameter are cheaper than the operations necessary to draw from a lognormal
+// 3. phi has to be on a non log scale for the likelihood evaluation thus it does not help to keep phi on th elog scale all the time
+// 4. the adjusment of the likelihood by the jacobian that arises from this transformation is cheap and by grouping everything in one class it takes place more or less at the same place
 void ROCParameter::proposeSPhi()
 {
-    Sphi_proposed = ROCParameter::randLogNorm(Sphi + bias_sphi, Sphi);
+    //Sphi_proposed = randLogNorm(Sphi, std_sphi);
+    // avoid adjusting probabilities for asymmetry of distribution
+    Sphi_proposed = std::exp(randNorm(std::log(Sphi), std_sphi));
 }
 void ROCParameter::proposeExpressionLevels()
 {
-    proposedExpressionLevel = propose(currentExpressionLevel, ROCParameter::randLogNorm, bias_phi, std_phi);
+    unsigned numExpressionLevels = currentExpressionLevel.size();
+    for(unsigned i = 0; i < numExpressionLevels; i++)
+    {
+        //proposedExpressionLevel[i] = randLogNorm(currentExpressionLevel[i], std_phi[i]);
+        // avoid adjusting probabilities for asymmetry of distribution
+        proposedExpressionLevel[i] = std::exp( randNorm( std::log(currentExpressionLevel[i]) , std_phi[i]) );
+    }
 }
 void ROCParameter::proposeCodonSpecificParameter()
 {
@@ -343,6 +471,27 @@ std::vector<double> ROCParameter::propose(std::vector<double> currentParam, doub
     return proposedParam;
 }
 
+
+void ROCParameter::updateCodonSpecificParameter(unsigned category, unsigned paramType, char aa)
+{
+    // TODO: add acceptance counter
+
+    unsigned* aaRange = SequenceSummary::AAToCodonRange(aa, true);
+
+    unsigned j = 0u;
+    for(unsigned i = aaRange[0]; i < aaRange[1]; i++, j++)
+    {
+        if(paramType == ROCParameter::dM)
+        {
+            currentMutationParameter[category][i] = proposedMutationParameter[category][i];
+        }
+        else if(paramType == ROCParameter::dEta)
+        {
+            currentSelectionParameter[category][i] = proposedSelectionParameter[category][i];
+        }
+        else throw "Unkown parameter type: " + paramType;
+    }
+}
 /*)
 void ROCParameter::updateCodonSpecificParameter(std::vector<double>& currentParamVector, std::vector<double> proposedParam,
         double (&prior)(double x, double a, double b), double logLikeImportanceRatio)
@@ -374,12 +523,30 @@ void ROCParameter::updateCodonSpecificParameter(std::vector<double>& currentPara
 const unsigned ROCParameter::dM = 0;
 const unsigned ROCParameter::dEta = 1;
 std::default_random_engine ROCParameter::generator(time(0));
+
+double* ROCParameter::drawIidRandomVector(unsigned draws, double mean, double sd, double (*proposal)(double a, double b))
+{
+    double randomNumbers[draws];
+    for(unsigned i = 0; i < draws; i++)
+    {
+        randomNumbers[i] = (*proposal)(mean, sd);
+    }
+    return randomNumbers;
+}
+double* ROCParameter::drawIidRandomVector(unsigned draws, double r, double (*proposal)(double r))
+{
+    double randomNumbers[draws];
+    for(unsigned i = 0; i < draws; i++)
+    {
+        randomNumbers[i] = (*proposal)(r);
+    }
+    return randomNumbers;
+}
 double ROCParameter::randNorm(double mean, double sd)
 {
     std::normal_distribution<double> distribution(mean, sd);
     return distribution(generator);
 }
-
 double ROCParameter::randLogNorm(double m, double s)
 {
     std::lognormal_distribution<double> distribution(m, s);
@@ -399,11 +566,9 @@ double ROCParameter::densityNorm(double x, double mean, double sd)
 
     return (inv_sqrt_2pi / sd) * std::exp(-0.5 * a * a);
 }
-
-
 double ROCParameter::densityLogNorm(double x, double mean, double sd)
 {
-    double returnValue = 0.0
+    double returnValue = 0.0;
     // logN is only defined for x > 0 => all values less or equal to zero have probability 0
     if(x > 0.0)
     {

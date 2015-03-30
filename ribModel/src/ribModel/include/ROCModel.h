@@ -11,12 +11,21 @@ class ROCModel
 
 
         void calculateCodonProbabilityVector(unsigned numCodons, double* mutation, double* selection, double phi, double* codonProb);
+        void obtainCodonCount(SequenceSummary& seqsum, char curAA, int codonCount[]);
+        double calculateLogLikelihoodPerAAPerGene(int numCodons, int codonCount[], SequenceSummary& seqsum, double mutation[], double selection[], double phiValue);
+
     public:
         explicit ROCModel();
         virtual ~ROCModel();
         ROCModel(const ROCModel& other);
 
+        // Likelihood functions
         double calculateLogLiklihoodPerGene(Gene& gene, int geneIndex, ROCParameter& parameter, bool proposed);
+
+        // Likelihood ratio functions
+        double* calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCParameter& parameter);
+        void calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& genome, ROCParameter& parameter, double* logAcceptanceRatioPerCategory);
+//        void calculateLogLikelihoodRatioPerCategory(Genome& genome, ROCParameter& parameter, double* logAcceptanceRatioPerCategory);
 
         //double calculateLikelihoodPerAA(char aa, Genome& genome, ROCParameter& parameter, bool pdM, bool pdEta);
         //double calculateLikelihoodPerGene(Gene gene, ROCParameter parameter, bool proposed);

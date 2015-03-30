@@ -36,6 +36,7 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="include/CovarianceMatrix.h" />
 		<Unit filename="include/Gene.h" />
 		<Unit filename="include/Genome.h" />
 		<Unit filename="include/MCMCAlgorithm.h" />
@@ -43,6 +44,7 @@
 		<Unit filename="include/ROCParameter.h" />
 		<Unit filename="include/SequenceSummary.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="src/CovarianceMatrix.cpp" />
 		<Unit filename="src/Gene.cpp" />
 		<Unit filename="src/Genome.cpp" />
 		<Unit filename="src/MCMCAlgorithm.cpp" />

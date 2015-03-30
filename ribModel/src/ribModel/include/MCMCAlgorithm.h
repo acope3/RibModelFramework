@@ -10,8 +10,9 @@
 class MCMCAlgorithm
 {
     private:
-        int samples;
-        int thining;
+        unsigned samples;
+        unsigned thining;
+        unsigned adaptiveWidth;
 
         bool estimateExpression;
         bool estimateCodonSpecificParameter;
