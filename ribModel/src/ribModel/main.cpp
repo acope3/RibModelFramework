@@ -95,7 +95,7 @@ int main()
     std::cout << "reading fasta file" << std::endl;
     Genome genome;
     //genome.readFasta("../../inst/testGenome.fasta");
-    genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/Skluyveri_chromosomeA.fasta");
+    genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/ChromosomeSplit/Skluyveri_chromosomeA.fasta");
     //genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/Skluyveri.fasta");
     //genome.writeFasta("../../inst/resGenome.fasta
     bool testing = false;

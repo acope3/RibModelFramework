@@ -118,7 +118,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, ROCParame
     unsigned totalNumCategories = numMutationCategories + numSelectionCategories;
     double logAcceptanceRatioPerCategory[totalNumCategories];
 
-    for(int i = 0; i < 22; i++)
+    for(unsigned i = 0; i < 22; i++)
     {
         char curAA = SequenceSummary::AminoAcidArray[i];
         // skip amino acids with only one codon or stop codons
@@ -126,7 +126,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, ROCParame
         // calculate likelihood ratio for every Category for current AA
         model.calculateLogLikelihoodRatioPerAAPerCategory(curAA, genome, parameter, logAcceptanceRatioPerCategory);
 
-        for(int i = 0; i <  numMutationCategories; i++)
+        for(unsigned i = 0; i <  numMutationCategories; i++)
         {
             if( -ROCParameter::randExp(1) < logAcceptanceRatioPerCategory[i] )
             {
@@ -138,7 +138,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, ROCParame
                 //parameter.updateSphiTrace(iteration/thining);
             }
         }
-        for(int i = numMutationCategories; i <  totalNumCategories; i++)
+        for(unsigned i = numMutationCategories; i < totalNumCategories; i++)
         {
             if( -ROCParameter::randExp(1) < logAcceptanceRatioPerCategory[i] )
             {
@@ -155,13 +155,13 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, ROCParame
 
 void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter)
 {
-    int maximumIterations = samples * thining;
+    unsigned maximumIterations = samples * thining;
     // initialize everything
     parameter.initAllTraces(samples, genome.getGenomeSize());
 
     // starting the MCMC
     std::cout << "entering MCMC loop" << std::endl;
-    for(int iteration = 0; iteration < maximumIterations; iteration++)
+    for(unsigned iteration = 0; iteration < maximumIterations; iteration++)
     {
 
         if(iteration % 100 == 0) {std::cout << iteration << std::endl;}
@@ -206,7 +206,7 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
     std::ofstream phitraceout("/home/clandere/CodonUsageBias/organisms/yeast/results/test.phiTrace");
     std::vector<double> sphiTrace = parameter.getSPhiTrace();
     std::vector<std::vector<double>> expressionTrace = parameter.getExpressionTrace();
-    for(int iteration = 0; iteration < samples; iteration++)
+    for(unsigned iteration = 0; iteration < samples; iteration++)
     {
         likout << likelihoodTrace[iteration] << std::endl;
         sphiout << sphiTrace[iteration] << std::endl;

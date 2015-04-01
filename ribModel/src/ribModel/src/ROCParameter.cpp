@@ -218,12 +218,12 @@ ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
     return *this;
 }
 
-void ROCParameter::initAllTraces(int samples, int num_genes)
+void ROCParameter::initAllTraces(unsigned samples, unsigned num_genes)
 {
     initExpressionTrace(samples, num_genes);
     initSphiTrace(samples);
 }
-void ROCParameter::initExpressionTrace(int samples, int num_genes)
+void ROCParameter::initExpressionTrace(unsigned samples, unsigned num_genes)
 {
     expressionTrace.resize(samples);
     for(unsigned i = 0; i < samples; i++)
@@ -354,7 +354,7 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
     }
 }
 
-double ROCParameter::getExpressionPosteriorMean(int samples, int geneIndex)
+double ROCParameter::getExpressionPosteriorMean(unsigned samples, unsigned geneIndex)
 {
     double posteriorMean = 0.0;
     unsigned traceLength = expressionTrace.size();
@@ -373,7 +373,7 @@ double ROCParameter::getExpressionPosteriorMean(int samples, int geneIndex)
     }
     return posteriorMean / (double)samples;
 }
-double ROCParameter::getSphiPosteriorMean(int samples)
+double ROCParameter::getSphiPosteriorMean(unsigned samples)
 {
     double posteriorMean = 0.0;
     unsigned traceLength = sPhiTrace.size();

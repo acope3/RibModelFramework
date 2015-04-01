@@ -103,8 +103,8 @@ class ROCParameter
 
         // functions to manage Sphi
         double getSphi(bool proposed = false) {return (proposed ? Sphi_proposed : Sphi);}
-        double setSphi(double sPhi) {Sphi = sPhi;}
-        double updateSphi() {Sphi = Sphi_proposed; numAcceptForSphi++;}
+        void setSphi(double sPhi) {Sphi = sPhi;}
+        void updateSphi() {Sphi = Sphi_proposed; numAcceptForSphi++;}
         std::vector<double> getSPhiTrace() {return sPhiTrace;}
         double getSphiProposalWidth() {return std_sphi;}
 
@@ -118,15 +118,15 @@ class ROCParameter
         unsigned getNumSelectionCategories() {return currentSelectionParameter.size();}
 
         // functions to manage traces
-        void initAllTraces(int samples, int num_genes);
-        void initExpressionTrace(int samples, int num_genes);
-        void initSphiTrace(int sample) {sPhiTrace.resize(sample);}
-        void updateExpressionTrace(int sample, int geneIndex) {expressionTrace[sample][geneIndex] = currentExpressionLevel[geneIndex];}
-        void updateSphiTrace(int sample) {sPhiTrace[sample] = Sphi;}
+        void initAllTraces(unsigned samples, unsigned num_genes);
+        void initExpressionTrace(unsigned samples, unsigned num_genes);
+        void initSphiTrace(unsigned sample) {sPhiTrace.resize(sample);}
+        void updateExpressionTrace(unsigned sample, unsigned geneIndex) {expressionTrace[sample][geneIndex] = currentExpressionLevel[geneIndex];}
+        void updateSphiTrace(unsigned sample) {sPhiTrace[sample] = Sphi;}
 
         // functions to return estimates
-        double getExpressionPosteriorMean(int samples, int geneIndex);
-        double getSphiPosteriorMean(int samples);
+        double getExpressionPosteriorMean(unsigned samples, unsigned geneIndex);
+        double getSphiPosteriorMean(unsigned samples);
 
 
         // static functions
