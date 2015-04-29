@@ -6,14 +6,34 @@
 			<Cursor1 position="1066" topLine="39" />
 		</Cursor>
 	</File>
+	<File name="src/ROCParameter.cpp" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="11041" topLine="340" />
+		</Cursor>
+	</File>
+	<File name="src/SequenceSummary.cpp" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="619" topLine="9" />
+		</Cursor>
+	</File>
+	<File name="src/ROCModel.cpp" open="1" top="1" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="7762" topLine="164" />
+		</Cursor>
+	</File>
+	<File name="src/Genome.cpp" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4492" topLine="132" />
+		</Cursor>
+	</File>
 	<File name="include/Genome.h" open="0" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="565" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="src/ROCModel.cpp" open="1" top="1" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="include/ROCModel.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="5986" topLine="129" />
+			<Cursor1 position="447" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="include/CovarianceMatrix.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -21,9 +41,9 @@
 			<Cursor1 position="819" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="src/Gene.cpp" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="include/MCMCAlgorithm.h" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="940" topLine="12" />
+			<Cursor1 position="221" topLine="9" />
 		</Cursor>
 	</File>
 	<File name="src/CovarianceMatrix.cpp" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -33,12 +53,7 @@
 	</File>
 	<File name="main.cpp" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="3090" topLine="78" />
-		</Cursor>
-	</File>
-	<File name="include/ROCParameter.h" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2574" topLine="60" />
+			<Cursor1 position="4917" topLine="115" />
 		</Cursor>
 	</File>
 	<File name="include/SequenceSummary.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -46,34 +61,19 @@
 			<Cursor1 position="590" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="src/SequenceSummary.cpp" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src/Gene.cpp" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="619" topLine="9" />
+			<Cursor1 position="940" topLine="12" />
 		</Cursor>
 	</File>
-	<File name="src/Genome.cpp" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="include/ROCParameter.h" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="4492" topLine="132" />
+			<Cursor1 position="4114" topLine="96" />
 		</Cursor>
 	</File>
-	<File name="src/MCMCAlgorithm.cpp" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src/MCMCAlgorithm.cpp" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="4791" topLine="117" />
-		</Cursor>
-	</File>
-	<File name="include/MCMCAlgorithm.h" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="131" topLine="9" />
-		</Cursor>
-	</File>
-	<File name="src/ROCParameter.cpp" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="16186" topLine="460" />
-		</Cursor>
-	</File>
-	<File name="include/ROCModel.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="624" topLine="0" />
+			<Cursor1 position="4591" topLine="108" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>
