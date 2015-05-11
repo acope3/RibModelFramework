@@ -56,27 +56,65 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
     //omp_set_num_threads(concurentThreadsSupported);
     //#pragma omp parallel for //shared(parameter)
     // testing end
+    unsigned numMixtures = parameter.getNumMixtureElements();
+
     for(int i = 0; i < numGenes; i++)
     {
         Gene gene = genome.getGene(i);
-        double* logProbabilityRatio = model.calculateLogLiklihoodRatioPerGene(gene, i, parameter);
+        double currLike = 0.0;
+        double propLike = 0.0;
+
+        double probabilities[numMixtures];
+        for(unsigned k = 0; k < numMixtures; k++)
+        {
+            double* logProbabilityRatio = model.calculateLogLiklihoodRatioPerGene(gene, i, parameter, k);
+            probabilities[k] = parameter.getCategoryProbability(k, i) * std::exp(logProbabilityRatio[1]);
+            currLike += probabilities[k];
+            propLike += parameter.getCategoryProbability(k, i) * std::exp(logProbabilityRatio[2]);
+        }
+
+        /*
+            BEGIN Gibbs sampling step for mixture parameters p_i
+        */
+        // Get category in which the gene is placed in.
+        // If we use multiple sequence observrvation (like different mutatnts) randMultinom needs an parameter N to place N observations in numMixture buckets
+        unsigned categoryOfGene[numMixtures];
+        ROCParameter::randMultinom(probabilities, numMixtures, categoryOfGene);
+
+        // calculate parameters for the Dirichlet distribution n_j+p_j
+        double dirichletParameters[numMixtures];
+        for(unsigned k = 0; k < numMixtures; k++)
+        {
+            dirichletParameters[k] = categoryOfGene[k] + 1;//probabilities[k];
+        }
+        // draw new mixture probabilities
+        double newMixtureProbabilities[numMixtures];
+        ROCParameter::randDirichlet(dirichletParameters, numMixtures, newMixtureProbabilities);
+
+        for(unsigned k = 0u; k < numMixtures; k++)
+        {
+            parameter.setCategoryProbability(k, i, newMixtureProbabilities[k]);
+        }
+        /*
+            END Gibbs sampling step for mixture parameters p_i
+        */
+
         // accept/reject proposed phi values
-        if( ( (double)std::rand() / (double)RAND_MAX ) < std::exp(logProbabilityRatio[0]) )
+        if( ( (double)std::rand() / (double)RAND_MAX ) < (propLike / currLike) )
         {
             // moves proposed phi to current phi
             //std::cout << "Update expression for Gene i = " << i << " in iteration " << iteration << std::endl;
             parameter.updateExpression(i);
             //#pragma omp atomic
-            logLikelihood += logProbabilityRatio[2];
+            logLikelihood += propLike;
         }else{
             //#pragma omp atomic
-            logLikelihood += logProbabilityRatio[1];
+            logLikelihood += currLike;
         }
         if((iteration % thining) == 0)
         {
             parameter.updateExpressionTrace(iteration/thining, i);
         }
-
     }
     return logLikelihood;
 }
@@ -124,7 +162,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, ROCParame
         // skip amino acids with only one codon or stop codons
         if(curAA == 'X' || curAA == 'M' || curAA == 'W') continue;
         // calculate likelihood ratio for every Category for current AA
-        model.calculateLogLikelihoodRatioPerAAPerCategory(curAA, genome, parameter, logAcceptanceRatioPerCategory);
+        model.calculateLogLikelihoodRatioPerAAPerCategory(curAA, genome, parameter, 1, logAcceptanceRatioPerCategory);
 
         for(unsigned i = 0; i <  numMutationCategories; i++)
         {
@@ -205,23 +243,25 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
     std::ofstream sphiout("/home/clandere/CodonUsageBias/organisms/yeast/results/test.sphi");
     std::ofstream phitraceout("/home/clandere/CodonUsageBias/organisms/yeast/results/test.phiTrace");
     std::vector<double> sphiTrace = parameter.getSPhiTrace();
-    std::vector<std::vector<double>> expressionTrace = parameter.getExpressionTrace();
+    std::vector<std::vector<std::vector<double>>> expressionTrace = parameter.getExpressionTrace();
     for(unsigned iteration = 0; iteration < samples; iteration++)
     {
         likout << likelihoodTrace[iteration] << std::endl;
         sphiout << sphiTrace[iteration] << std::endl;
         for(int i = 0; i < genome.getGenomeSize(); i++)
         {
-            phitraceout << expressionTrace[iteration][i] << ",";
+            phitraceout << expressionTrace[1][iteration][i] << ",";
         }
         phitraceout << std::endl;
     }
     likout.close();
     sphiout.close();
     phitraceout.close();
-
-
-
 }
+
+
+
+
+
 
 

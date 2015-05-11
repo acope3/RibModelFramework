@@ -115,9 +115,9 @@ int main()
         int useSamples = 150;
 
         ROCModel model = ROCModel();
-        ROCParameter parameter = ROCParameter(1, 1, genome.getGenomeSize(), 2);
+        ROCParameter parameter = ROCParameter(1, 1, genome.getGenomeSize(), 2, 1);
         parameter.InitializeExpression(genome, 2);
-        MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, true, true, true);
+        MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, true, false, false);
 
         std::ofstream scuoout("/home/clandere/CodonUsageBias/organisms/yeast/results/test.scuo");
         for(int n = 0; n < genome.getGenomeSize(); n++)
@@ -137,7 +137,7 @@ int main()
         std::ofstream phiout("/home/clandere/CodonUsageBias/organisms/yeast/results/test.phi");
         for(int n = 0; n < genome.getGenomeSize(); n++)
         {
-            phiout << genome.getGene(n).getId() << "," << parameter.getExpressionPosteriorMean(useSamples, n) << std::endl;
+            phiout << genome.getGene(n).getId() << "," << parameter.getExpressionPosteriorMean(useSamples, n, 1) << std::endl;
         }
         phiout.close();
     }

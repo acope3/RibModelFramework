@@ -57,15 +57,23 @@ double ROCModel::calculateLogLiklihoodPerGene(Gene& gene, int geneIndex, ROCPara
     return logLikelihood + std::log(ROCParameter::densityLogNorm(phiValue, (-(sPhi * sPhi) / 2), sPhi)); // + std::log(ROCParameter::densityLogNorm(phiObserved, std::log(phiValue), parameter.getPhiEpsilon() ) )
 }
 
-// for proposinng phi values
-double* ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCParameter& parameter)
+
+double* ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCParameter& parameter, unsigned k)
 {
     double logLikelihood = 0.0;
     double logLikelihood_proposed = 0.0;
-    double phiValue = parameter.getExpression(geneIndex, false);
-    double phiValue_proposed = parameter.getExpression(geneIndex, true);
 
     SequenceSummary seqsum = gene.getSequenceSummary();
+
+    // get correct index for everything
+    unsigned mutationCategory = parameter.getMutationCategory(k);
+    unsigned selectionCategory = parameter.getSelectionCategory(k);
+    unsigned expressionCategory = parameter.getExpressionCategory(k);
+
+    double phiValue = parameter.getExpression(geneIndex, expressionCategory, false);
+    double phiValue_proposed = parameter.getExpression(geneIndex, expressionCategory, true);
+
+    //#pragma omp parallel for
     for(int i = 0; i < 22; i++)
     {
         char curAA = seqsum.AminoAcidArray[i];
@@ -78,17 +86,21 @@ double* ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, R
         int numCodons = seqsum.GetNumCodonsForAA(curAA);
         // get mutation and selection parameter for gene
         double mutation[numCodons - 1];
-        parameter.getParameterForCategory(gene.getMutationCategory(), ROCParameter::dM, curAA, false, mutation);
+        parameter.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
         double selection[numCodons - 1];
-        parameter.getParameterForCategory(gene.getDeltaEtaCategory(), ROCParameter::dEta, curAA, false, selection);
+        parameter.getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
 
         // prepare array for codon counts for AA
         int codonCount[numCodons];
         obtainCodonCount(seqsum, curAA, codonCount);
 
-        logLikelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation, selection, phiValue);
-        logLikelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation, selection, phiValue_proposed);
+        //#pragma omp parallel
+        {
+            logLikelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation, selection, phiValue);
+            logLikelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation, selection, phiValue_proposed);
+        }
     }
+
     double sPhi = parameter.getSphi(false);
     double logPhiProbability = std::log(ROCParameter::densityLogNorm(phiValue, (-(sPhi * sPhi) / 2), sPhi));
     double logPhiProbability_proposed = std::log(ROCParameter::densityLogNorm(phiValue_proposed, (-(sPhi * sPhi) / 2), sPhi));
@@ -97,9 +109,9 @@ double* ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, R
     double proposedLogLikelihood = (logLikelihood_proposed + logPhiProbability_proposed);
 
     double returnArray[3];
-    returnArray[0] = proposedLogLikelihood - currentLogLikelihood - (std::log(phiValue) - std::log(phiValue_proposed));
-    returnArray[1] = currentLogLikelihood;
-    returnArray[2] = proposedLogLikelihood;
+    returnArray[0] = (proposedLogLikelihood - currentLogLikelihood) - (std::log(phiValue) - std::log(phiValue_proposed));
+    returnArray[1] = currentLogLikelihood - std::log(phiValue_proposed);
+    returnArray[2] = proposedLogLikelihood - std::log(phiValue);
     return returnArray;
     //return logLikelihood + a;
 }
@@ -134,7 +146,9 @@ double ROCModel::calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codo
     return logLikelihood;
 }
 
-void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& genome, ROCParameter& parameter, double* logAcceptanceRatioPerCategory)
+
+
+void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& genome, ROCParameter& parameter, unsigned group, double* logAcceptanceRatioPerCategory)
 {
     //std::cout << "=======================================" << std::endl;
     //std::cout << "mutation: " << logAcceptanceRatioPerCategory[0] << "\t selection: " << logAcceptanceRatioPerCategory[1] << std::endl;
@@ -147,6 +161,13 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
     double logLikelihoodSelectionProposed[numSelectionCat];
     int numGenes = genome.getGenomeSize();
 
+
+    // get correct index for everything
+    unsigned mutationCategory = parameter.getMutationCategory(group);
+    unsigned selectionCategory = parameter.getSelectionCategory(group);
+    unsigned expressionCategory = parameter.getExpressionCategory(group);
+
+
     for(int i = 0; i < numGenes; i++)
     {
         Gene gene = genome.getGene(i);
@@ -158,31 +179,34 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
         int codonCount[numCodons];
         obtainCodonCount(seqsum, curAA, codonCount);
 
-        unsigned mutCat = gene.getMutationCategory();
-        unsigned selCat = gene.getDeltaEtaCategory();
+        double phiValue = parameter.getExpression(i, expressionCategory, false);
 
-        // get mutation and selection parameter for gene
-        double mutation[numCodons - 1];
-        double selection[numCodons - 1];
-        double phiValue = parameter.getExpression(i, false);
-        // calculate current likelihood
-        parameter.getParameterForCategory(mutCat, ROCParameter::dM, curAA, false, mutation);
-        parameter.getParameterForCategory(selCat, ROCParameter::dEta, curAA, false, selection);
-        double logLikelihood = calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation, selection, phiValue);
-        logLikelihoodMutationCurrent[mutCat] += logLikelihood;
-        logLikelihoodSelectionCurrent[selCat] += logLikelihood;
 
-        // calculate proposed mutation likelihood
-        parameter.getParameterForCategory(mutCat, ROCParameter::dM, curAA, true, mutation);
-        parameter.getParameterForCategory(selCat, ROCParameter::dEta, curAA, false, selection);
-        logLikelihood = calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation, selection, phiValue);
-        logLikelihoodMutationProposed[mutCat] += logLikelihood;
-
-        // calculate proposed selection likelihood
-        parameter.getParameterForCategory(mutCat, ROCParameter::dM, curAA, false, mutation);
-        parameter.getParameterForCategory(selCat, ROCParameter::dEta, curAA, true, selection);
-        logLikelihood = calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation, selection, phiValue);
-        logLikelihoodSelectionProposed[selCat] += logLikelihood;
+//        unsigned mutCat = gene.getMutationCategory();
+//        unsigned selCat = gene.getDeltaEtaCategory();
+//
+//        // get mutation and selection parameter for gene
+//        double mutation[numCodons - 1];
+//        double selection[numCodons - 1];
+//        double phiValue = parameter.getExpression(i, false);
+//        // calculate current likelihood
+//        parameter.getParameterForCategory(mutCat, ROCParameter::dM, curAA, false, mutation);
+//        parameter.getParameterForCategory(selCat, ROCParameter::dEta, curAA, false, selection);
+//        double logLikelihood = calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation, selection, phiValue);
+//        logLikelihoodMutationCurrent[mutCat] += logLikelihood;
+//        logLikelihoodSelectionCurrent[selCat] += logLikelihood;
+//
+//        // calculate proposed mutation likelihood
+//        parameter.getParameterForCategory(mutCat, ROCParameter::dM, curAA, true, mutation);
+//        parameter.getParameterForCategory(selCat, ROCParameter::dEta, curAA, false, selection);
+//        logLikelihood = calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation, selection, phiValue);
+//        logLikelihoodMutationProposed[mutCat] += logLikelihood;
+//
+//        // calculate proposed selection likelihood
+//        parameter.getParameterForCategory(mutCat, ROCParameter::dM, curAA, false, mutation);
+//        parameter.getParameterForCategory(selCat, ROCParameter::dEta, curAA, true, selection);
+//        logLikelihood = calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation, selection, phiValue);
+//        logLikelihoodSelectionProposed[selCat] += logLikelihood;
     }
 
 

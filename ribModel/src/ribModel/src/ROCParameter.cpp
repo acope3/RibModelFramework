@@ -5,10 +5,10 @@
 
 ROCParameter::ROCParameter()
 {
-    ROCParameter(1, 1, 100, 2);
+    ROCParameter(1, 1, 100, 2, 1);
 }
 
-ROCParameter::ROCParameter(unsigned numMutationCategories, unsigned numSelectionCategories, unsigned numGenes, double sphi)
+ROCParameter::ROCParameter(unsigned numMutationCategories, unsigned numSelectionCategories, unsigned numGenes, double sphi, unsigned _numMixtures)
 {
     Sphi = sphi;
     Sphi_proposed = sphi;
@@ -25,6 +25,8 @@ ROCParameter::ROCParameter(unsigned numMutationCategories, unsigned numSelection
 
     priorA = 0;
     priorB = 1;
+
+    numMixtures = _numMixtures;
 
     currentMutationParameter.resize(numMutationCategories);
     proposedMutationParameter.resize(numMutationCategories);
@@ -128,8 +130,15 @@ ROCParameter::ROCParameter(unsigned numMutationCategories, unsigned numSelection
         proposedSelectionParameter[i] = tempSel;
     }
 
-    currentExpressionLevel.resize(numGenes);
-    proposedExpressionLevel.resize(numGenes);
+    currentExpressionLevel.resize(numMixtures);
+    proposedExpressionLevel.resize(numMixtures);
+    for(unsigned i = 0; i < numMixtures; i++)
+    {
+        std::vector<double> tempExpr(numGenes, 0.0);
+        currentExpressionLevel[i] = tempExpr;
+        proposedExpressionLevel[i] = tempExpr;
+    }
+
     std_phi.resize(numGenes);
     numAcceptForExpression.resize(numGenes);
 }
@@ -225,11 +234,15 @@ void ROCParameter::initAllTraces(unsigned samples, unsigned num_genes)
 }
 void ROCParameter::initExpressionTrace(unsigned samples, unsigned num_genes)
 {
-    expressionTrace.resize(samples);
-    for(unsigned i = 0; i < samples; i++)
+    for(unsigned category = 0; category < numMixtures; category++)
     {
-        std::vector<double> tempExpr(num_genes, 0.0);
-        expressionTrace[i] = tempExpr;
+        expressionTrace[category].resize(samples);
+        for(unsigned i = 0; i < samples; i++)
+        {
+            expressionTrace[category].resize(num_genes);
+            std::vector<double> tempExpr(num_genes, 0.0);
+            expressionTrace[category][i] = tempExpr;
+        }
     }
 }
 
@@ -303,31 +316,41 @@ void ROCParameter::InitializeExpression(Genome& genome, double sd_phi)
     }
     quickSortPair(scuoValues, index, 0, genomeSize);
     quickSort(expression, 0, genomeSize);
-    for(unsigned j = 0; j < genomeSize; j++)
+
+    for(unsigned category = 0; category < numMixtures; category++)
     {
-        currentExpressionLevel[j] = expression[index[j]];
-        std_phi[j] = 1;
-        numAcceptForExpression[j] = 0u;
+        for(unsigned j = 0; j < genomeSize; j++)
+        {
+            currentExpressionLevel[category][j] = expression[index[j]];
+            std_phi[j] = 1;
+            numAcceptForExpression[j] = 0u;
+        }
     }
 }
 void ROCParameter::InitializeExpression(double sd_phi)
 {
-    int numGenes = currentExpressionLevel.size();
-    for(int i = 0; i < numGenes; i++)
+    int numGenes = currentExpressionLevel[1].size();
+    for(unsigned category = 0; category < numMixtures; category++)
     {
-        currentExpressionLevel[i] = ROCParameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
-        std_phi[i] = 1;
-        numAcceptForExpression[i] = 0u;
+        for(int i = 0; i < numGenes; i++)
+        {
+            currentExpressionLevel[category][i] = ROCParameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
+            std_phi[i] = 1;
+            numAcceptForExpression[i] = 0u;
+        }
     }
 }
 void ROCParameter::InitializeExpression(double* expression)
 {
-    int numGenes = currentExpressionLevel.size();
-    for(int i = 0; i < numGenes; i++)
+    int numGenes = currentExpressionLevel[1].size();
+    for(unsigned category = 0; category < numMixtures; category++)
     {
-        currentExpressionLevel[i] = expression[i];
-        std_phi[i] = 1;
-        numAcceptForExpression[i] = 0u;
+        for(int i = 0; i < numGenes; i++)
+        {
+            currentExpressionLevel[category][i] = expression[i];
+            std_phi[i] = 1;
+            numAcceptForExpression[i] = 0u;
+        }
     }
 }
 
@@ -354,7 +377,7 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
     }
 }
 
-double ROCParameter::getExpressionPosteriorMean(unsigned samples, unsigned geneIndex)
+double ROCParameter::getExpressionPosteriorMean(unsigned samples, unsigned geneIndex, unsigned category)
 {
     double posteriorMean = 0.0;
     unsigned traceLength = expressionTrace.size();
@@ -364,12 +387,12 @@ double ROCParameter::getExpressionPosteriorMean(unsigned samples, unsigned geneI
 
         for(unsigned i = start; i < traceLength; i++)
         {
-            posteriorMean += expressionTrace[i][geneIndex];
+            posteriorMean += expressionTrace[category][i][geneIndex];
         }
     }
     else{
         throw std::string("ROCParameter::getExpressionPosteriorMean throws: Number of anticipated samples (") +
-            std::to_string(samples) + std::string(") is greater than the length of the available trace(") + std::to_string(traceLength) + std::string(").\n");
+            std::to_string(samples) + std::string(") is greater than the length of the available trace (") + std::to_string(traceLength) + std::string(").\n");
     }
     return posteriorMean / (double)samples;
 }
@@ -439,12 +462,15 @@ void ROCParameter::proposeSPhi()
 }
 void ROCParameter::proposeExpressionLevels()
 {
-    unsigned numExpressionLevels = currentExpressionLevel.size();
-    for(unsigned i = 0; i < numExpressionLevels; i++)
+    unsigned numExpressionLevels = currentExpressionLevel[1].size();
+    for(unsigned category = 0; category < numMixtures; category++)
     {
-        //proposedExpressionLevel[i] = randLogNorm(currentExpressionLevel[i], std_phi[i]);
-        // avoid adjusting probabilities for asymmetry of distribution
-        proposedExpressionLevel[i] = std::exp( randNorm( std::log(currentExpressionLevel[i]) , std_phi[i]) );
+        for(unsigned i = 0; i < numExpressionLevels; i++)
+        {
+            // proposedExpressionLevel[i] = randLogNorm(currentExpressionLevel[i], std_phi[i]);
+            // avoid adjusting probabilities for asymmetry of distribution
+            proposedExpressionLevel[category][i] = std::exp( randNorm( std::log(currentExpressionLevel[category][i]) , std_phi[i]) );
+        }
     }
 }
 void ROCParameter::proposeCodonSpecificParameter()
@@ -558,6 +584,50 @@ double ROCParameter::randExp(double r)
     return distribution(generator);
 }
 
+void ROCParameter::randDirichlet(double* input, unsigned numElements, double* output)
+{
+    // draw y_i from Gamma(a_i, 1)
+    // normalize y_i such that x_i = y_i / sum(y_i)
+
+    double sumTotal = 0.0;
+    for(unsigned i = 0; i < numElements; i++)
+    {
+        std::gamma_distribution<double> distribution(input[i], 1);
+        output[i] = distribution(generator);
+        sumTotal += output[i];
+    }
+    for(unsigned i = 0; i < numElements; i++)
+    {
+        output[i] = output[i] / sumTotal;
+    }
+}
+
+ void ROCParameter::randMultinom(double* probabilities, unsigned groups, unsigned* output)
+ {
+    // sort probabilities
+    ROCParameter::quickSort(probabilities, 0, groups);
+
+    // calculate cummulative sum to determine group boundaries
+    double cumsum[groups];
+    cumsum[0] = probabilities[0];
+    for(unsigned i = 1u; i < groups; i++)
+    {
+        cumsum[i] = cumsum[i-1u] + probabilities[i];
+        output[i] = 0u;
+    }
+    // draw random number from U(0,1)
+    double referenceValue = ( (double)std::rand() / (double)RAND_MAX );
+
+    // check in which category the element falls
+    unsigned returnValue = 0u;
+    unsigned element = 0u;
+    while(referenceValue <= cumsum[element])
+    {
+        returnValue = element;
+        element++;
+    }
+    output[returnValue] = 1;
+ }
 
 double ROCParameter::densityNorm(double x, double mean, double sd)
 {

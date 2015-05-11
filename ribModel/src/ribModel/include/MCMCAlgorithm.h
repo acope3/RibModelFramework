@@ -41,6 +41,7 @@ class MCMCAlgorithm
         void setEstimateHyperParameter(bool in) {estimateHyperParameter = in;}
 
 
+
     protected:
 };
 

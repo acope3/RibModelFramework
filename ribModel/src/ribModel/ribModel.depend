@@ -108,17 +108,18 @@
 	<string>
 	"../include/Gene.h"
 
-1426955199 source:/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/src/ribModel/src/ROCModel.cpp
+1430857743 source:/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/src/ribModel/src/ROCModel.cpp
 	"../include/ROCModel.h"
 	<vector>
 	<math.h>
+	<iostream>
 
-1426955205 /home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/src/ribModel/include/ROCModel.h
+1430857918 /home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/src/ribModel/include/ROCModel.h
 	"../include/Gene.h"
 	"../include/Genome.h"
 	"../include/ROCParameter.h"
 
-1427069961 /home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/src/ribModel/include/ROCParameter.h
+1430864641 /home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/src/ribModel/include/ROCParameter.h
 	<vector>
 	<random>
 	<string>
@@ -130,7 +131,7 @@
 	<ctype.h>
 	<algorithm>
 
-1426955188 source:/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/src/ribModel/main.cpp
+1430858019 source:/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/src/ribModel/main.cpp
 	<iostream>
 	<time.h>
 	<fstream>
@@ -142,13 +143,13 @@
 	"../include/MCMCAlgorithm.h"
 	"../include/CovarianceMatrix.h"
 
-1425564930 /home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/src/ribModel/include/MCMCAlgorithm.h
+1430839106 /home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/src/ribModel/include/MCMCAlgorithm.h
 	<vector>
 	"../include/Genome.h"
 	"../include/ROCModel.h"
 	"../include/ROCParameter.h"
 
-1426955168 source:/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/src/ribModel/src/MCMCAlgorithm.cpp
+1430857950 source:/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/src/ribModel/src/MCMCAlgorithm.cpp
 	"../include/MCMCAlgorithm.h"
 	<random>
 	<cstdlib>
@@ -157,7 +158,7 @@
 	<fstream>
 	<omp.h>
 
-1426813805 source:/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/src/ribModel/src/ROCParameter.cpp
+1430864636 source:/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/src/ribModel/src/ROCParameter.cpp
 	"../include/ROCParameter.h"
 	<math.h>
 	<ctime>
