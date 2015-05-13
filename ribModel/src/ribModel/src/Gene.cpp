@@ -2,7 +2,7 @@
 #include "../include/SequenceSummary.h"
 
 #include <algorithm>
-
+#include <iostream>
 Gene::Gene() : seq(""), id(""), description(""), deltaM(0u), deltaEta(0u), deltaOmega(0u)
 {
     //geneData = SequenceSummary();
@@ -27,6 +27,7 @@ Gene::Gene(const Gene& other)
 
 Gene& Gene::operator=(const Gene& rhs)
 {
+	std::cout <<"called\n";
     if (this == &rhs) return *this; // handle self assignment
     seq = rhs.seq;
     id = rhs.id;

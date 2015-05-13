@@ -4,7 +4,7 @@
 #include <vector>
 #include <random>
 #include <string>
-
+#include <iostream>
 
 #include "../include/SequenceSummary.h"
 #include "../include/Genome.h"
@@ -12,8 +12,14 @@
 class ROCParameter
 {
     private:
+
+				struct thetaK
+				{
+					unsigned delM;
+					unsigned delEta;
+				};
         //members
-        unsigned numParam = 40;
+        unsigned int numParam;
 
         double Sphi;
         double Aphi;
@@ -54,7 +60,7 @@ class ROCParameter
 
 
         unsigned numMixtures;
-        std::vector<unsigned[2]> categories;
+        std::vector<thetaK> categories;
         std::vector<std::vector<double>> categoryProbabilities;
         //static members
 
@@ -80,15 +86,17 @@ class ROCParameter
 
 
         explicit ROCParameter();
-        ROCParameter(unsigned numMutationCategories, unsigned numSelectionCategories, unsigned numGenes, double sphi, unsigned _numMixtures);
+        ROCParameter(unsigned numMutationCategories, unsigned numSelectionCategories, unsigned numGenes, double sphi, unsigned _numMixtures, bool splitSer);
         virtual ~ROCParameter();
         ROCParameter(const ROCParameter& other);
         ROCParameter& operator=(const ROCParameter& rhs);
 
+				void resizeCategoryProbabilites(int samples);
+				void initThetaK();
         unsigned getNumMixtureElements() {return numMixtures;}
-        unsigned getMutationCategory(unsigned group) {return categories[group][0];}
-        unsigned getSelectionCategory(unsigned group) {return categories[group][1];}
-        unsigned getExpressionCategory(unsigned group) {return categories[group][1];}
+        unsigned getMutationCategory(unsigned group) {return categories[group].delM;}
+        unsigned getSelectionCategory(unsigned group) {return categories[group].delEta;}
+        unsigned getExpressionCategory(unsigned group) {return categories[group].delEta;}
         double getCategoryProbability(unsigned group, unsigned gene) {return categoryProbabilities[group][gene];}
         void setCategoryProbability(unsigned group, unsigned gene, double value) {categoryProbabilities[group][gene] = value;}
 
@@ -164,7 +172,7 @@ class ROCParameter
         static double randLogNorm(double m, double s);
         static double randExp(double r);
         static void randDirichlet(double* input, unsigned numElements, double* output);
-        static void randMultinom(double* probabilities, unsigned groups, unsigned* output);
+        static unsigned randMultinom(double* probabilities, unsigned groups);
 
         static double densityNorm(double x, double mean, double sd);
         static double densityLogNorm(double x, double mean, double sd);

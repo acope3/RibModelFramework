@@ -57,6 +57,7 @@ void SequenceSummary::processSequence(const std::string& sequence)
 /*
 * STATIC FUNCTIONS
 */
+const char SequenceSummary::Ser2 = 'Z';
 const char SequenceSummary::AminoAcidArray[] = {'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y', SequenceSummary::Ser2, 'X'};
 const std::string SequenceSummary::codonArray[] = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
                                                     "TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT", "ATA", "ATC",
