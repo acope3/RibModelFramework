@@ -71,29 +71,23 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
         double propLike = 0.0;
 
         double probabilities[numMixtures];
-        
-				for(unsigned k = 0; k < numMixtures; k++)
+
+        for(unsigned k = 0; k < numMixtures; k++)
         {
             double* logProbabilityRatio = model.calculateLogLiklihoodRatioPerGene(gene, i, parameter, k);
-						//double check probabilites
-						probabilities[k] = parameter.getCategoryProbability(k, iteration/thining) * std::exp(logProbabilityRatio[1]);
+            //double check probabilites
+            probabilities[k] = parameter.getCategoryProbability(k, iteration/thining) * std::exp(logProbabilityRatio[1]);
             currLike += probabilities[k];
             propLike += parameter.getCategoryProbability(k, i) * std::exp(logProbabilityRatio[2]);
         }
 
-			//	std::cout <<"out of initial for loop in acceptRejectExpressionLevelForAllGenes\n";
-        /*
-            BEGIN Gibbs sampling step for mixture parameters p_i
-        */
+        //	std::cout <<"out of initial for loop in acceptRejectExpressionLevelForAllGenes\n";
+
         // Get category in which the gene is placed in.
         // If we use multiple sequence observrvation (like different mutatnts) randMultinom needs an parameter N to place N observations in numMixture buckets
-        unsigned categoryOfGene;
-        categoryOfGene = ROCParameter::randMultinom(probabilities, numMixtures);
-				dirichletParameters[categoryOfGene] += 1;
-
-        /*
-            END Gibbs sampling step for mixture parameters p_i
-        */
+        unsigned categoryOfGene = ROCParameter::randMultinom(probabilities, numMixtures);
+        parameter.setMixtureAssignment(i, categoryOfGene);
+        dirichletParameters[categoryOfGene] += 1;
 
         // accept/reject proposed phi values
         if( ( (double)std::rand() / (double)RAND_MAX ) < (propLike / currLike) )
@@ -255,7 +249,7 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
     std::ofstream phitraceout("../results/test.phiTrace", std::ofstream::out);
     std::vector<double> sphiTrace = parameter.getSPhiTrace();
     std::vector<std::vector<std::vector<double>>> expressionTrace = parameter.getExpressionTrace();
-    
+
 		for(unsigned iteration = 0; iteration < samples; iteration++)
     {
         likout << likelihoodTrace[iteration] << std::endl;

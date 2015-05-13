@@ -10,7 +10,10 @@ ROCParameter::ROCParameter()
 
 ROCParameter::ROCParameter(unsigned numMutationCategories, unsigned numSelectionCategories, unsigned numGenes, double sphi, unsigned _numMixtures, bool splitSer)
 {
-		numParam = ((splitSer) ? 41 : 40);
+
+    mixtureAssignment.resize(numGenes);
+
+    numParam = ((splitSer) ? 41 : 40);
     Sphi = sphi;
     Sphi_proposed = sphi;
     bias_sphi = 0;
@@ -29,7 +32,7 @@ ROCParameter::ROCParameter(unsigned numMutationCategories, unsigned numSelection
 
     numMixtures = _numMixtures;
 
-		initThetaK();
+    initThetaK();
     currentMutationParameter.resize(numMutationCategories);
     proposedMutationParameter.resize(numMutationCategories);
 
@@ -426,7 +429,7 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
 
 double ROCParameter::getExpressionPosteriorMean(unsigned samples, unsigned geneIndex, unsigned category)
 {
-		
+
     double posteriorMean = 0.0;
     unsigned traceLength = expressionTrace[0].size();
 		if(samples <= traceLength)
@@ -664,7 +667,7 @@ void ROCParameter::randDirichlet(double* input, unsigned numElements, double* ou
  {
     // sort probabilities
     ROCParameter::quickSort(probabilities, 0, groups);
-		
+
 		std::cout << probabilities[0] <<"\n";
     // calculate cummulative sum to determine group boundaries
     double cumsum[groups];
@@ -684,7 +687,7 @@ void ROCParameter::randDirichlet(double* input, unsigned numElements, double* ou
         returnValue = element;
         element++;
     }
-	return returnValue; 
+	return returnValue;
 }
 
 double ROCParameter::densityNorm(double x, double mean, double sd)

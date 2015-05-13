@@ -61,6 +61,7 @@ class ROCParameter
 
         unsigned numMixtures;
         std::vector<thetaK> categories;
+        std::vector<unsigned> mixtureAssignment;
         std::vector<std::vector<double>> categoryProbabilities;
         //static members
 
@@ -91,14 +92,16 @@ class ROCParameter
         ROCParameter(const ROCParameter& other);
         ROCParameter& operator=(const ROCParameter& rhs);
 
-				void resizeCategoryProbabilites(int samples);
-				void initThetaK();
+        void resizeCategoryProbabilites(int samples);
+        void initThetaK();
         unsigned getNumMixtureElements() {return numMixtures;}
         unsigned getMutationCategory(unsigned group) {return categories[group].delM;}
         unsigned getSelectionCategory(unsigned group) {return categories[group].delEta;}
         unsigned getExpressionCategory(unsigned group) {return categories[group].delEta;}
         double getCategoryProbability(unsigned group, unsigned gene) {return categoryProbabilities[group][gene];}
         void setCategoryProbability(unsigned group, unsigned gene, double value) {categoryProbabilities[group][gene] = value;}
+        void setMixtureAssignment(unsigned gene, unsigned value) {mixtureAssignment[gene] = value;}
+        unsigned getMixtureAssignment(unsigned value) {return mixtureAssignment[gene];}
 
         // Phi epsilon functions
         double getPhiEpsilon() {return phiEpsilon;}

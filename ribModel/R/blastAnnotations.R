@@ -5,14 +5,23 @@ library(annotate)
 
 
 genome <- seqinr::read.fasta("~/CodonUsageBias/organisms/bos_taurus/data/bt_mgc_cds_nt.fasta")
+estm.phi <- read.csv("~/CodonUsageBias/organisms/bos_taurus/results/Btaurus_thin50_use500/without_xobs_singlechain.phi", as.is=T)
+phi.name <- estm.phi[, 1]
+estm.phi <- estm.phi[, 2]
+names(estm.phi) <- phi.name
+estm.phi <- sort(estm.phi, decreasing = T)
+phi.name <- names(estm.phi)
+numGenes <- round(length(estm.phi)*0.01)
+
 
 blastset <- vector("character", length=5)
-i <- 1
-for(j in 10:15)
+for(j in 1:numGenes)
 {
-  blastset[i] <- paste(seqinr::getSequence.SeqFastadna(genome[[j]]), collapse = '')
-  i <- i + 1
+  seq <- seqinr::getSequence.SeqFastadna(genome[[ phi.name[j] ]])
+  blastset[j] <- paste(seq, collapse = '')
 }
+
+geneDescriptions <- getGeneAnnotationUsingBLAST(blastset, timeout=100)
 
 getGeneAnnotationUsingBLAST <- function(blastset, hitlist=10, timeout=50)
 {
