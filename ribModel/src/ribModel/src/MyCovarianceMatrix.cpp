@@ -1,18 +1,40 @@
-#include "../include/CovarianceMatrix.h"
+#include "../include/MyCovarianceMatrix.h"
 
 #include <iostream>
 #include <cmath>
 
-/*
-    !!!!IMPORTANT NOTE AT THE BOTTOM OF FILE!!!!
-*/
 
-template<unsigned _numVariates>
-CovarianceMatrix<_numVariates>::CovarianceMatrix()
+CovarianceMatrix::CovarianceMatrix()
 {
 		std::cout <<"0 arg constructor called\n";
+		numVariates = 2;
+		covMatrix.resize(numVariates);
+		choleskiMatrix.resize(numVariates);
+
     for(int i = 0; i < numVariates; i++)
     {
+				covMatrix[i].resize(numVariates);
+				choleskiMatrix[i].resize(numVariates);
+        for(int j = 0; j < numVariates; j++)
+        {
+            covMatrix[i][j] = (i == j ? 1.0 : 0.0);
+            choleskiMatrix[i][j] = 0.0;
+				}
+		}
+}
+
+CovarianceMatrix::CovarianceMatrix(int _numVariates)
+{
+
+		std::cout <<"1 arg constructor called\n";
+		numVariates = _numVariates;
+		covMatrix.resize(numVariates);
+		choleskiMatrix.resize(numVariates);
+
+    for(int i = 0; i < numVariates; i++)
+    {
+				covMatrix[i].resize(numVariates);
+				choleskiMatrix[i].resize(numVariates);
         for(int j = 0; j < numVariates; j++)
         {
             covMatrix[i][j] = (i == j ? 1.0 : 0.0);
@@ -21,12 +43,17 @@ CovarianceMatrix<_numVariates>::CovarianceMatrix()
     }
 }
 
-template<unsigned _numVariates>
-CovarianceMatrix<_numVariates>::CovarianceMatrix(double (&matrix)[_numVariates][_numVariates])
+CovarianceMatrix::CovarianceMatrix(std::vector <std::vector <double>> &matrix)
 {
-		std::cout <<"1 arg constructor called\n";
-    for(int i = 0; i < numVariates; i++)
+		std::cout <<"Matrix constructor called\n";
+		numVariates = matrix.size();   
+		covMatrix.resize(numVariates);
+		choleskiMatrix.resize(numVariates);
+		
+		for(int i = 0; i < numVariates; i++)
     {
+				covMatrix[i].resize(numVariates);
+				choleskiMatrix[i].resize(numVariates);
         for(int j = 0; j < numVariates; j++)
         {
             covMatrix[i][j] = matrix[i][j];
@@ -35,34 +62,25 @@ CovarianceMatrix<_numVariates>::CovarianceMatrix(double (&matrix)[_numVariates][
     }
 }
 
-template<unsigned _numVariates>
-CovarianceMatrix<_numVariates>::~CovarianceMatrix()
+CovarianceMatrix::~CovarianceMatrix()
 {
     //dtor
 }
 
-template<unsigned _numVariates>
-CovarianceMatrix<_numVariates>::CovarianceMatrix(const CovarianceMatrix& other)
+CovarianceMatrix::CovarianceMatrix(const CovarianceMatrix& other)
 {
 		std::cout <<"copy constructor called\n";
-    covMatrix[other.numVariates][other.numVariates];
-//    numVariates = other.numVariates;
-    for(int i = 0; i < other.numVariates; i++)
-    {
-        for(int j = 0; j < other.numVariates; j++)
-        {
-            covMatrix[i][j] = other.covMatrix[i][j];
-        }
-    }
+    numVariates = other.numVariates;
+		covMatrix = other.covMatrix;
+		choleskiMatrix = other.choleskiMatrix;
 }
-
-template<unsigned L> template<unsigned R>
-CovarianceMatrix<L>& CovarianceMatrix<L>::operator=(const CovarianceMatrix<R>& rhs)
+/*
+CovarianceMatrix& CovarianceMatrix::operator=(const CovarianceMatrix& rhs)
 {
 		std::cout <<"op over constructor called\n";
     if (this == &rhs) return *this; // handle self assignment
     covMatrix[rhs.numVariates][rhs.numVariates];
-  //  numVariates = rhs.numVariates;
+    numVariates = rhs.numVariates;
     for(int i = 0; i < rhs.numVariates; i++)
     {
         for(int j = 0; j < rhs.numVariates; j++)
@@ -72,11 +90,10 @@ CovarianceMatrix<L>& CovarianceMatrix<L>::operator=(const CovarianceMatrix<R>& r
     }
     return *this;
 }
-
+*/
 // addaptatoin of http://en.wikipedia.org/wiki/Cholesky_decomposition
 // http://rosettacode.org/wiki/Cholesky_decomposition#C
-template<unsigned _numVariates>
-void CovarianceMatrix<_numVariates>::choleskiDecomposition()
+void CovarianceMatrix::choleskiDecomposition()
 {
 		std::cout <<"choleskiDecomposition called\n";
     for(int i = 0; i < numVariates; i++)
@@ -97,8 +114,7 @@ void CovarianceMatrix<_numVariates>::choleskiDecomposition()
     }
 }
 
-template<unsigned _numVariates>
-void CovarianceMatrix<_numVariates>::transformIidNumersIntoCovaryingNumbers(double* iidnumbers, double* covnumbers)
+void CovarianceMatrix::transformIidNumersIntoCovaryingNumbers(double* iidnumbers, double* covnumbers)
 {
     //double covnumbers[numVariates];
     for(int i = 0; i < numVariates; i++)
@@ -114,8 +130,7 @@ void CovarianceMatrix<_numVariates>::transformIidNumersIntoCovaryingNumbers(doub
     //return covnumbers;
 }
 
-template<unsigned _numVariates>
-void CovarianceMatrix<_numVariates>::printCovarianceMatrix()
+void CovarianceMatrix::printCovarianceMatrix()
 {
     for(int i = 0; i < numVariates; i++)
     {
@@ -126,8 +141,7 @@ void CovarianceMatrix<_numVariates>::printCovarianceMatrix()
         std::cout << std::endl;
     }
 }
-template<unsigned _numVariates>
-void CovarianceMatrix<_numVariates>::printCholeskiMatrix()
+void CovarianceMatrix::printCholeskiMatrix()
 {
     for(int i = 0; i < numVariates; i++)
     {
@@ -138,13 +152,4 @@ void CovarianceMatrix<_numVariates>::printCholeskiMatrix()
         std::cout << std::endl;
     }
 }
-
-// To avoid this you can move all the code in this CPP file (exluding the next few template lines) into the header file
-// I do this to keep the header file readable and since I know I only need covariance matrices of size 2,3,4,5 for the codons
-// http://stackoverflow.com/questions/8752837/undefined-reference-to-template-class-constructor
-template class CovarianceMatrix<2>;
-template class CovarianceMatrix<3>;
-template class CovarianceMatrix<4>;
-template class CovarianceMatrix<5>;
-
 

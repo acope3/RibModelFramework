@@ -58,6 +58,12 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
     // testing end
     unsigned numMixtures = parameter.getNumMixtureElements();
 
+		//std::cout <<"Entered acceptRejectExpressionLevelForAllGenes\n";
+		//std::cout <<"numGenes = " << numGenes <<"\n";
+		//std::cout <<"numMixtures = " << numMixtures <<"\n";
+
+    double dirichletParameters[numMixtures];
+		//initialize parameter's size
     for(int i = 0; i < numGenes; i++)
     {
         Gene gene = genome.getGene(i);
@@ -65,36 +71,26 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
         double propLike = 0.0;
 
         double probabilities[numMixtures];
-        for(unsigned k = 0; k < numMixtures; k++)
+        
+				for(unsigned k = 0; k < numMixtures; k++)
         {
             double* logProbabilityRatio = model.calculateLogLiklihoodRatioPerGene(gene, i, parameter, k);
-            probabilities[k] = parameter.getCategoryProbability(k, i) * std::exp(logProbabilityRatio[1]);
+						//double check probabilites
+						probabilities[k] = parameter.getCategoryProbability(k, iteration/thining) * std::exp(logProbabilityRatio[1]);
             currLike += probabilities[k];
             propLike += parameter.getCategoryProbability(k, i) * std::exp(logProbabilityRatio[2]);
         }
 
+			//	std::cout <<"out of initial for loop in acceptRejectExpressionLevelForAllGenes\n";
         /*
             BEGIN Gibbs sampling step for mixture parameters p_i
         */
         // Get category in which the gene is placed in.
         // If we use multiple sequence observrvation (like different mutatnts) randMultinom needs an parameter N to place N observations in numMixture buckets
-        unsigned categoryOfGene[numMixtures];
-        ROCParameter::randMultinom(probabilities, numMixtures, categoryOfGene);
+        unsigned categoryOfGene;
+        categoryOfGene = ROCParameter::randMultinom(probabilities, numMixtures);
+				dirichletParameters[categoryOfGene] += 1;
 
-        // calculate parameters for the Dirichlet distribution n_j+p_j
-        double dirichletParameters[numMixtures];
-        for(unsigned k = 0; k < numMixtures; k++)
-        {
-            dirichletParameters[k] = categoryOfGene[k] + 1;//probabilities[k];
-        }
-        // draw new mixture probabilities
-        double newMixtureProbabilities[numMixtures];
-        ROCParameter::randDirichlet(dirichletParameters, numMixtures, newMixtureProbabilities);
-
-        for(unsigned k = 0u; k < numMixtures; k++)
-        {
-            parameter.setCategoryProbability(k, i, newMixtureProbabilities[k]);
-        }
         /*
             END Gibbs sampling step for mixture parameters p_i
         */
@@ -115,6 +111,12 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
         {
             parameter.updateExpressionTrace(iteration/thining, i);
         }
+    }
+    double newMixtureProbabilities[numMixtures];
+    ROCParameter::randDirichlet(dirichletParameters, numMixtures, newMixtureProbabilities);
+    for(unsigned k = 0u; k < numMixtures; k++)
+    {
+      parameter.setCategoryProbability(k, iteration/thining, newMixtureProbabilities[k]);
     }
     return logLikelihood;
 }
@@ -195,24 +197,29 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
 {
     unsigned maximumIterations = samples * thining;
     // initialize everything
+
     parameter.initAllTraces(samples, genome.getGenomeSize());
+		parameter.resizeCategoryProbabilites(samples);
 
     // starting the MCMC
     std::cout << "entering MCMC loop" << std::endl;
+		std::cout <<maximumIterations <<"\n";
     for(unsigned iteration = 0; iteration < maximumIterations; iteration++)
     {
 
         if(iteration % 100 == 0) {std::cout << iteration << std::endl;}
-        std::cout << ".";
+        //std::cout << ".";
         // update codon specific parameter
-        if(estimateCodonSpecificParameter)
+        if(estimateCodonSpecificParameter) //should the "is" functions be used here instead?
         {
+					//	std::cout <<"Doing codon specific parameter update\n";
             parameter.proposeCodonSpecificParameter();
             acceptRejectCodonSpecificParameter(genome, parameter, model, iteration);
         }
         // update hyper parameter
         if(estimateHyperParameter)
         {
+						//std::cout <<"Doing hyper parameter update\n";
             parameter.proposeSPhi();
             acceptRejectHyperParameter(genome.getGenomeSize(), parameter, model, iteration);
             if( ( (iteration + 1) % adaptiveWidth) == 0)
@@ -223,34 +230,39 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
         // update expression level values
         if(estimateExpression)
         {
+						//std::cout <<"Doing expression level update\n";
             parameter.proposeExpressionLevels();
             double logLike = acceptRejectExpressionLevelForAllGenes(genome, parameter, model, iteration);
             if((iteration % thining) == 0)
             {
+							//	std::cout <<"Thining\n";
                 likelihoodTrace[iteration/thining] = logLike;
             }
             if((iteration % adaptiveWidth) == 0)
             {
+								//std::cout <<"would call adaptExpressionPro.....\n";
                //parameter.adaptExpressionProposalWidth(adaptiveWidth);
             }
+						//std::cout <<"finished expression level update\n";
         }
-
     } // end MCMC loop
     std::cout << "leaving MCMC loop" << std::endl;
 
     // development output
-    std::ofstream likout("/home/clandere/CodonUsageBias/organisms/yeast/results/test.lik");
-    std::ofstream sphiout("/home/clandere/CodonUsageBias/organisms/yeast/results/test.sphi");
-    std::ofstream phitraceout("/home/clandere/CodonUsageBias/organisms/yeast/results/test.phiTrace");
+    std::ofstream likout("../results/test.lik", std::ofstream::out);
+    likout.close();
+    std::ofstream sphiout("../results/test.sphi", std::ofstream::out);
+    std::ofstream phitraceout("../results/test.phiTrace", std::ofstream::out);
     std::vector<double> sphiTrace = parameter.getSPhiTrace();
     std::vector<std::vector<std::vector<double>>> expressionTrace = parameter.getExpressionTrace();
-    for(unsigned iteration = 0; iteration < samples; iteration++)
+    
+		for(unsigned iteration = 0; iteration < samples; iteration++)
     {
         likout << likelihoodTrace[iteration] << std::endl;
         sphiout << sphiTrace[iteration] << std::endl;
         for(int i = 0; i < genome.getGenomeSize(); i++)
         {
-            phitraceout << expressionTrace[1][iteration][i] << ",";
+            phitraceout << expressionTrace[0][iteration][i] << ",";
         }
         phitraceout << std::endl;
     }
@@ -258,10 +270,4 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
     sphiout.close();
     phitraceout.close();
 }
-
-
-
-
-
-
 

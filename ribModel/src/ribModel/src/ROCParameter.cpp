@@ -2,14 +2,15 @@
 
 #include <math.h>
 #include <ctime>
-
+#include <iostream>
 ROCParameter::ROCParameter()
 {
-    ROCParameter(1, 1, 100, 2, 1);
+    ROCParameter(1, 1, 100, 2, 1, true);
 }
 
-ROCParameter::ROCParameter(unsigned numMutationCategories, unsigned numSelectionCategories, unsigned numGenes, double sphi, unsigned _numMixtures)
+ROCParameter::ROCParameter(unsigned numMutationCategories, unsigned numSelectionCategories, unsigned numGenes, double sphi, unsigned _numMixtures, bool splitSer)
 {
+		numParam = ((splitSer) ? 41 : 40);
     Sphi = sphi;
     Sphi_proposed = sphi;
     bias_sphi = 0;
@@ -28,6 +29,7 @@ ROCParameter::ROCParameter(unsigned numMutationCategories, unsigned numSelection
 
     numMixtures = _numMixtures;
 
+		initThetaK();
     currentMutationParameter.resize(numMutationCategories);
     proposedMutationParameter.resize(numMutationCategories);
 
@@ -159,6 +161,7 @@ ROCParameter::ROCParameter(const ROCParameter& other)
     sPhiTrace = other.sPhiTrace;
     aPhiTrace = other.aPhiTrace;
     numAcceptForSphi = other.numAcceptForSphi;
+		categories = other.categories;
 
     // proposal bias and std for phi values
     bias_sphi = other.bias_sphi;
@@ -198,6 +201,7 @@ ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
     sPhiTrace = rhs.sPhiTrace;
     aPhiTrace = rhs.aPhiTrace;
     numAcceptForSphi = rhs.numAcceptForSphi;
+		categories = rhs.categories;
 
     // proposal bias and std for phi values
     bias_sphi = rhs.bias_sphi;
@@ -227,25 +231,68 @@ ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
     return *this;
 }
 
+void ROCParameter::initThetaK()
+{
+	for (unsigned i = 0; i < numMixtures; i++)
+	{
+		categories.push_back(thetaK()); //push a blank thetaK on the vector, then alter.
+		categories[i].delM = 0;
+		categories[i].delEta = 0;
+	}
+
+}
+
 void ROCParameter::initAllTraces(unsigned samples, unsigned num_genes)
 {
+		std::cout <<"calling initExpressionTrace()\n";
     initExpressionTrace(samples, num_genes);
+		std::cout <<"returned initExpressionTrace()\n";
+		std::cout <<"calling initSphiTrace()\n";
     initSphiTrace(samples);
 }
 void ROCParameter::initExpressionTrace(unsigned samples, unsigned num_genes)
 {
+	/*
+		std::cout <<"Starting initExpressionTrace\n";
+		std::cout <<"Testing variables...\n";
+		std::cout <<"numMixtures = " << numMixtures <<"\n";
+		std::cout <<"samples = " << samples <<"\n";
+		std::cout <<"num_genes = " << num_genes <<"\n";
+		std::cout <<"expressionTrace size = " << expressionTrace.size() <<"\n";
+		*/
+		expressionTrace.resize(numMixtures);
     for(unsigned category = 0; category < numMixtures; category++)
     {
+	//			std::cout <<"\n\n\nresizing expressionTrace\n";
         expressionTrace[category].resize(samples);
+	//			std::cout <<"Going to loop through samples\n";
         for(unsigned i = 0; i < samples; i++)
         {
-            expressionTrace[category].resize(num_genes);
+            expressionTrace[category][i].resize(num_genes);
             std::vector<double> tempExpr(num_genes, 0.0);
             expressionTrace[category][i] = tempExpr;
         }
     }
+		/*
+		std::cout <<"Final checks....\n";
+		std::cout <<"expressionTrace size = " <<expressionTrace.size() <<"\n";
+		std::cout <<"expressionTrace[0] size = " <<expressionTrace[0].size() <<"\n";
+		std::cout <<"expressionTrace[0][0] size = " <<expressionTrace[0][0].size() <<"\n";
+		std::cout <<"expressionTrace[0][0][0] = " <<expressionTrace[0][299][447] <<"\n";
+		*/
 }
 
+
+void ROCParameter::resizeCategoryProbabilites(int samples)
+{
+	categoryProbabilities.resize(numMixtures);
+	for (int i = 0; i < numMixtures; i++)
+	{
+		categoryProbabilities[i].resize(samples, 0.0);
+		categoryProbabilities[i][0] = (1.0/numMixtures);
+	}
+
+}
 
 // calculate SCUO values according to
 // Wan et al. CodonO: a new informatics method for measuring synonymous codon usage bias within and across genomes
@@ -379,19 +426,19 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
 
 double ROCParameter::getExpressionPosteriorMean(unsigned samples, unsigned geneIndex, unsigned category)
 {
+		
     double posteriorMean = 0.0;
-    unsigned traceLength = expressionTrace.size();
-    if(samples <= traceLength)
+    unsigned traceLength = expressionTrace[0].size();
+		if(samples <= traceLength)
     {
         unsigned start = traceLength - samples;
-
         for(unsigned i = start; i < traceLength; i++)
         {
             posteriorMean += expressionTrace[category][i][geneIndex];
         }
     }
     else{
-        throw std::string("ROCParameter::getExpressionPosteriorMean throws: Number of anticipated samples (") +
+			std::cout << std::string("ROCParameter::getExpressionPosteriorMean throws: Number of anticipated samples (") +
             std::to_string(samples) + std::string(") is greater than the length of the available trace (") + std::to_string(traceLength) + std::string(").\n");
     }
     return posteriorMean / (double)samples;
@@ -462,19 +509,29 @@ void ROCParameter::proposeSPhi()
 }
 void ROCParameter::proposeExpressionLevels()
 {
-    unsigned numExpressionLevels = currentExpressionLevel[1].size();
-    for(unsigned category = 0; category < numMixtures; category++)
+    unsigned numExpressionLevels = currentExpressionLevel[0].size();
+		/*std::cout <<"Entering proposeExpressionLevels\n";
+		std::cout <<"numMixtures = " <<numMixtures <<"\n";
+		std::cout <<"numExpressionLevels = " <<numExpressionLevels <<"\n";
+		std::cout <<"size of proposedExpressionLevel = " <<proposedExpressionLevel.size() <<"\n";
+		std::cout <<"size of proposedExpressionLevel[0] = " <<proposedExpressionLevel[0].size() <<"\n";
+		std::cout <<"size of currentExpressionLevel = " <<currentExpressionLevel.size() <<"\n";
+		std::cout <<"size of currentExpressionLevel[0] = " <<currentExpressionLevel[0].size() <<"\n";
+*/
+		for(unsigned category = 0; category < numMixtures; category++)
     {
         for(unsigned i = 0; i < numExpressionLevels; i++)
         {
             // proposedExpressionLevel[i] = randLogNorm(currentExpressionLevel[i], std_phi[i]);
             // avoid adjusting probabilities for asymmetry of distribution
-            proposedExpressionLevel[category][i] = std::exp( randNorm( std::log(currentExpressionLevel[category][i]) , std_phi[i]) );
+						proposedExpressionLevel[category][i] = std::exp( randNorm( std::log(currentExpressionLevel[category][i]) , std_phi[i]) );
         }
     }
+	//	std::cout <<"Exiting proposeExpressionLevels\n";
 }
 void ROCParameter::proposeCodonSpecificParameter()
 {
+		std::cout <<"Entering proposeCodonSpecificParameter\n";
     unsigned numMutatationCategories = currentMutationParameter.size();
     for(unsigned i = 0; i < numMutatationCategories; i++)
     {
@@ -485,6 +542,7 @@ void ROCParameter::proposeCodonSpecificParameter()
     {
         proposedSelectionParameter[i] = propose(currentSelectionParameter[i], ROCParameter::randNorm, bias_csp, std_csp);
     }
+		std::cout <<"Exiting proposeCodonSpecificParameter\n";
 }
 std::vector<double> ROCParameter::propose(std::vector<double> currentParam, double (*proposal)(double a, double b), double A, double B)
 {
@@ -602,18 +660,18 @@ void ROCParameter::randDirichlet(double* input, unsigned numElements, double* ou
     }
 }
 
- void ROCParameter::randMultinom(double* probabilities, unsigned groups, unsigned* output)
+ unsigned ROCParameter::randMultinom(double* probabilities, unsigned groups)
  {
     // sort probabilities
     ROCParameter::quickSort(probabilities, 0, groups);
-
+		
+		std::cout << probabilities[0] <<"\n";
     // calculate cummulative sum to determine group boundaries
     double cumsum[groups];
     cumsum[0] = probabilities[0];
     for(unsigned i = 1u; i < groups; i++)
     {
         cumsum[i] = cumsum[i-1u] + probabilities[i];
-        output[i] = 0u;
     }
     // draw random number from U(0,1)
     double referenceValue = ( (double)std::rand() / (double)RAND_MAX );
@@ -626,8 +684,8 @@ void ROCParameter::randDirichlet(double* input, unsigned numElements, double* ou
         returnValue = element;
         element++;
     }
-    output[returnValue] = 1;
- }
+	return returnValue; 
+}
 
 double ROCParameter::densityNorm(double x, double mean, double sd)
 {

@@ -2,13 +2,13 @@
 #include <time.h>
 #include <fstream>
 
-#include "../include/Genome.h"
-#include "../include/Gene.h"
-#include "../include/SequenceSummary.h"
-#include "../include/ROCParameter.h"
-#include "../include/ROCModel.h"
-#include "../include/MCMCAlgorithm.h"
-#include "../include/CovarianceMatrix.h"
+#include "include/Genome.h"
+#include "include/Gene.h"
+#include "include/SequenceSummary.h"
+#include "include/ROCParameter.h"
+#include "include/ROCModel.h"
+#include "include/MCMCAlgorithm.h"
+#include "include/CovarianceMatrix.h"
 
 using namespace std;
 
@@ -63,6 +63,8 @@ void testCovarianceMatrix()
     //double arr[3][3] { {4,2,5}, {2,2,3}, {5,3,9} };
     double arr[3][3] { {25,15,-5}, {15,18,0}, {-5,0,11} };
     CovarianceMatrix<3> covMat = arr;
+    std::cout << "Choleski Matrix pre decomposition" << std::endl;
+    covMat.printCholeskiMatrix();
     covMat.choleskiDecomposition();
     std::cout << "Covariance Matrix" << std::endl;
     covMat.printCovarianceMatrix();
@@ -86,6 +88,31 @@ void testCovarianceMatrix()
 
 }
 
+void testRandMultiNom(unsigned numCat)
+{
+	int i, t;
+	double fakeDir[numCat];
+	double fakeDir2[numCat];
+	double prob[numCat];
+	unsigned tmp;
+	std::cout << "------------------ TEST RANDMULTINOMIAL ------------------" << std::endl;
+	for (t = 0; t < 50; t++)
+	{
+		for (i = 0; i < numCat; i++)
+		{
+			prob[i] = i;
+		}
+		tmp = ROCParameter::randMultinom(prob, numCat);
+		fakeDir[tmp] += 1;
+	}
+	for (i = 0; i < numCat; i++)
+	{
+		std::cout << fakeDir[i] <<"\n";
+
+	}
+	std::cout << "------------------ TEST RANDMULTINOMIAL ------------------" << std::endl;
+
+}//In progress
 
 int main()
 {
@@ -95,19 +122,21 @@ int main()
     std::cout << "reading fasta file" << std::endl;
     Genome genome;
     //genome.readFasta("../../inst/testGenome.fasta");
-    genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/ChromosomeSplit/Skluyveri_chromosomeA.fasta");
+    genome.readFasta("../Skluyveri_chromosomeA.fasta");
     //genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/Skluyveri.fasta");
     //genome.writeFasta("../../inst/resGenome.fasta
     bool testing = false;
 
     if(testing)
     {
+			/*
         testNumCodonsPerAA();
         testCodonRangePerAA(false);
         testCodonRangePerAA(true);
         testLogNormDensity();
         testSCUO(genome);
-        testCovarianceMatrix();
+        testCovarianceMatrix();*/
+				testRandMultiNom(3);
 
     }else{
         int samples = 300;
@@ -115,11 +144,11 @@ int main()
         int useSamples = 150;
 
         ROCModel model = ROCModel();
-        ROCParameter parameter = ROCParameter(1, 1, genome.getGenomeSize(), 2, 1);
+        ROCParameter parameter = ROCParameter(1, 1, genome.getGenomeSize(), 2, 1, false);
         parameter.InitializeExpression(genome, 2);
         MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, true, false, false);
 
-        std::ofstream scuoout("/home/clandere/CodonUsageBias/organisms/yeast/results/test.scuo");
+        std::ofstream scuoout("/results/test.scuo");
         for(int n = 0; n < genome.getGenomeSize(); n++)
         {
             scuoout << genome.getGene(n).getId() << "," << parameter.calculateSCUO(genome.getGene(n)) << std::endl;
@@ -134,10 +163,10 @@ int main()
         std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
         std::cout << "Sphi proposal width: " << parameter.getSphiProposalWidth() << std::endl;
 
-        std::ofstream phiout("/home/clandere/CodonUsageBias/organisms/yeast/results/test.phi");
+        std::ofstream phiout("/results/test.phi");
         for(int n = 0; n < genome.getGenomeSize(); n++)
         {
-            phiout << genome.getGene(n).getId() << "," << parameter.getExpressionPosteriorMean(useSamples, n, 1) << std::endl;
+            phiout << genome.getGene(n).getId() << "," << parameter.getExpressionPosteriorMean(useSamples, n, 0) << std::endl;
         }
         phiout.close();
     }

@@ -11,7 +11,7 @@ class CovarianceMatrix
     //std::vector<std::vector<double>> choleskiMatrix;
     double covMatrix[_numVariates][_numVariates];
     double choleskiMatrix[_numVariates][_numVariates];
-    int numVariates = _numVariates;
+    static const int numVariates = _numVariates;
 
 
     public:

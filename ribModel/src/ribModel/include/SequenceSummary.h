@@ -14,7 +14,7 @@ class SequenceSummary
     public:
 
         //static member variables
-        static const char Ser2 = 'Z';
+        static const char Ser2;
         static const char AminoAcidArray[];
         static const std::string codonArray[];
         static const std::map<char, int> aaToIndex;
