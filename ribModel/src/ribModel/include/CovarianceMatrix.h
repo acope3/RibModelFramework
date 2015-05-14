@@ -3,26 +3,24 @@
 
 #include <vector>
 
-template<unsigned _numVariates>
 class CovarianceMatrix
 {
     private:
-    //std::vector<std::vector<double>> covMatrix;
-    //std::vector<std::vector<double>> choleskiMatrix;
-    double covMatrix[_numVariates][_numVariates];
-    double choleskiMatrix[_numVariates][_numVariates];
-    static const int numVariates = _numVariates;
+    std::vector<double> covMatrix;
+    std::vector<double> choleskiMatrix;
+    int numVariates; //make static const again
 
 
     public:
         CovarianceMatrix();
-        CovarianceMatrix(double (&covMatrix)[_numVariates][_numVariates]);
+        CovarianceMatrix(int _numVariates);
+				CovarianceMatrix(std::vector <double> &matrix);
         virtual ~CovarianceMatrix();
         CovarianceMatrix(const CovarianceMatrix& other);
-        template<unsigned R> CovarianceMatrix<_numVariates>& operator=(const CovarianceMatrix<R>& other);
-
+        //CovarianceMatrix& operator=(const CovarianceMatrix& other);
         void choleskiDecomposition();
-        void printCovarianceMatrix();
+        void calculateCovarianceMatrixFromTraces(std::vector <std::vector <double>> trace);
+				void printCovarianceMatrix();
         void printCholeskiMatrix();
         void transformIidNumersIntoCovaryingNumbers(double* iidnumbers, double* covnumbers);
 

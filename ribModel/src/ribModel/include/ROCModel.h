@@ -21,9 +21,8 @@ class ROCModel
 
         // Likelihood functions
         double calculateLogLiklihoodPerGene(Gene& gene, int geneIndex, ROCParameter& parameter, bool proposed);
-
         // Likelihood ratio functions
-        double* calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCParameter& parameter, unsigned k);
+				void calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCParameter& parameter, unsigned k, double* logProbabilityRatio);
         void calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& genome, ROCParameter& parameter, unsigned group, double* logAcceptanceRatioPerCategory);
 //        void calculateLogLikelihoodRatioPerCategory(Genome& genome, ROCParameter& parameter, double* logAcceptanceRatioPerCategory);
 

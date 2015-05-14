@@ -10,7 +10,10 @@ ROCParameter::ROCParameter()
 
 ROCParameter::ROCParameter(unsigned numMutationCategories, unsigned numSelectionCategories, unsigned numGenes, double sphi, unsigned _numMixtures, bool splitSer)
 {
-		numParam = ((splitSer) ? 41 : 40);
+
+    mixtureAssignment.resize(numGenes);
+
+    numParam = ((splitSer) ? 41 : 40);
     Sphi = sphi;
     Sphi_proposed = sphi;
     bias_sphi = 0;
@@ -28,13 +31,13 @@ ROCParameter::ROCParameter(unsigned numMutationCategories, unsigned numSelection
     priorB = 1;
 
     numMixtures = _numMixtures;
-
-		initThetaK();
+    initThetaK();
     currentMutationParameter.resize(numMutationCategories);
     proposedMutationParameter.resize(numMutationCategories);
 
     currentSelectionParameter.resize(numSelectionCategories);
     proposedSelectionParameter.resize(numSelectionCategories);
+		categoryProbabilities.resize(1.0/numMixtures);
 
     for(unsigned i = 0; i < numMutationCategories; i++)
     {
@@ -244,11 +247,10 @@ void ROCParameter::initThetaK()
 
 void ROCParameter::initAllTraces(unsigned samples, unsigned num_genes)
 {
-		std::cout <<"calling initExpressionTrace()\n";
     initExpressionTrace(samples, num_genes);
-		std::cout <<"returned initExpressionTrace()\n";
-		std::cout <<"calling initSphiTrace()\n";
-    initSphiTrace(samples);
+    initMixtureAssignmentTrace(samples, num_genes);
+		initSphiTrace(samples);
+		initCategoryProbabilitesTrace(samples);
 }
 void ROCParameter::initExpressionTrace(unsigned samples, unsigned num_genes)
 {
@@ -282,14 +284,22 @@ void ROCParameter::initExpressionTrace(unsigned samples, unsigned num_genes)
 		*/
 }
 
-
-void ROCParameter::resizeCategoryProbabilites(int samples)
+void ROCParameter::initMixtureAssignmentTrace(unsigned samples, unsigned num_genes)
 {
-	categoryProbabilities.resize(numMixtures);
+	mixtureAssignmentTrace.resize(samples);
+	for (int i = 0; i < samples; i ++)
+	{
+		mixtureAssignmentTrace[i].resize(num_genes);
+	}
+}
+
+
+void ROCParameter::initCategoryProbabilitesTrace(int samples)
+{
+	categoryProbabilitiesTrace.resize(numMixtures);
 	for (int i = 0; i < numMixtures; i++)
 	{
-		categoryProbabilities[i].resize(samples, 0.0);
-		categoryProbabilities[i][0] = (1.0/numMixtures);
+		categoryProbabilitiesTrace[i].resize(samples, 0.0);
 	}
 
 }
@@ -426,7 +436,7 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
 
 double ROCParameter::getExpressionPosteriorMean(unsigned samples, unsigned geneIndex, unsigned category)
 {
-		
+
     double posteriorMean = 0.0;
     unsigned traceLength = expressionTrace[0].size();
 		if(samples <= traceLength)
@@ -606,8 +616,8 @@ void ROCParameter::updateCodonSpecificParameter(std::vector<double>& currentPara
 
 const unsigned ROCParameter::dM = 0;
 const unsigned ROCParameter::dEta = 1;
-std::default_random_engine ROCParameter::generator(time(0));
-
+std::default_random_engine ROCParameter::generator(time(NULL));
+//std::srand(time(NULL));
 double* ROCParameter::drawIidRandomVector(unsigned draws, double mean, double sd, double (*proposal)(double a, double b))
 {
     double randomNumbers[draws];
@@ -662,29 +672,34 @@ void ROCParameter::randDirichlet(double* input, unsigned numElements, double* ou
 
  unsigned ROCParameter::randMultinom(double* probabilities, unsigned groups)
  {
-    // sort probabilities
-    ROCParameter::quickSort(probabilities, 0, groups);
-		
-		std::cout << probabilities[0] <<"\n";
+    // sort probabilitiesi
+    //ROCParameter::quickSort(probabilities, 0, groups);
     // calculate cummulative sum to determine group boundaries
     double cumsum[groups];
     cumsum[0] = probabilities[0];
+		//std::cout << cumsum[0] <<"  ";
+		
     for(unsigned i = 1u; i < groups; i++)
     {
         cumsum[i] = cumsum[i-1u] + probabilities[i];
+		//		std::cout << cumsum[i] <<"  ";
     }
+		//std::cout <<"\n";
     // draw random number from U(0,1)
-    double referenceValue = ( (double)std::rand() / (double)RAND_MAX );
-
-    // check in which category the element falls
+		std::uniform_real_distribution<double> distribution(0, 1);
+    double referenceValue = distribution(generator);
+		// check in which category the element falls
     unsigned returnValue = 0u;
-    unsigned element = 0u;
-    while(referenceValue <= cumsum[element])
-    {
-        returnValue = element;
-        element++;
-    }
-	return returnValue; 
+		for (int i = 0; i < groups; i++)
+		{
+			if (referenceValue <= cumsum[i]) 
+			{
+				returnValue = i;
+				break;	
+			}
+		}
+
+	return returnValue;
 }
 
 double ROCParameter::densityNorm(double x, double mean, double sd)
