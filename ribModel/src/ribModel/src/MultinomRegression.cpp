@@ -1,10 +1,10 @@
-#include "MultinomRegression.h"
-#include <RInside.h>
+#include "../include/MultinomRegression.h"
+//#include <RInside.h>
 
 
 MultinomRegression::MultinomRegression()
 {
-    //ctor
+
 }
 
 MultinomRegression::~MultinomRegression()

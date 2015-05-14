@@ -197,7 +197,7 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
 
     // starting the MCMC
     std::cout << "entering MCMC loop" << std::endl;
-		std::cout <<maximumIterations <<"\n";
+    std::cout <<maximumIterations <<"\n";
     for(unsigned iteration = 0; iteration < maximumIterations; iteration++)
     {
 

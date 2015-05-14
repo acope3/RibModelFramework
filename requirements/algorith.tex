@@ -32,6 +32,8 @@
 	      model.calculateLogLiklihoodRatioPerGene(gene, i, 
 		parameter, k);
             //double check probabilites
+            
+            // p_i * f(X | Theta, Phi)
             probabilities[k] = 
 	      parameter.getCategoryProbability(k, iteration/thining) * 
 		std::exp(logLikRatio_current);
@@ -65,6 +67,8 @@
             parameter.updateExpressionTrace(iteration/thining, i);
         }
     }
+    
+    // get new mixture probabilites (gamma = 0)
     double newMixtureProbabilities[numMixtures];
     ROCParameter::randDirichlet(dirichletParameters, 
       numMixtures, newMixtureProbabilities);

@@ -666,9 +666,7 @@ void ROCParameter::randDirichlet(double* input, unsigned numElements, double* ou
  unsigned ROCParameter::randMultinom(double* probabilities, unsigned groups)
  {
     // sort probabilities
-    ROCParameter::quickSort(probabilities, 0, groups);
-
-		std::cout << probabilities[0] <<"\n";
+    //ROCParameter::quickSort(probabilities, 0, groups);
     // calculate cummulative sum to determine group boundaries
     double cumsum[groups];
     cumsum[0] = probabilities[0];

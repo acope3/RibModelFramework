@@ -101,7 +101,7 @@ class ROCParameter
         double getCategoryProbability(unsigned group, unsigned gene) {return categoryProbabilities[group][gene];}
         void setCategoryProbability(unsigned group, unsigned gene, double value) {categoryProbabilities[group][gene] = value;}
         void setMixtureAssignment(unsigned gene, unsigned value) {mixtureAssignment[gene] = value;}
-        unsigned getMixtureAssignment(unsigned value) {return mixtureAssignment[gene];}
+        unsigned getMixtureAssignment(unsigned gene) {return mixtureAssignment[gene];}
 
         // Phi epsilon functions
         double getPhiEpsilon() {return phiEpsilon;}

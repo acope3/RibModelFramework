@@ -73,7 +73,7 @@ double* ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, R
     double phiValue = parameter.getExpression(geneIndex, expressionCategory, false);
     double phiValue_proposed = parameter.getExpression(geneIndex, expressionCategory, true);
 
-		
+
 		//#pragma omp parallel for
     for(int i = 0; i < 22; i++)
     {

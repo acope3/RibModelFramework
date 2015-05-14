@@ -88,6 +88,20 @@ void testCovarianceMatrix()
 
 }
 
+void testGetCountsForAA(Genome genome)
+{
+
+    unsigned codonCounts[genome.getGenomeSize()][5];
+    genome.getCountsForAA('A', codonCounts);
+
+    for(unsigned i = 0u; 0 < genome.getGenomeSize(); i++)
+    {
+        Gene gene = genome.getGene(i);
+        std::cout << i << "| " << gene.getId() << ": " << codonCounts[i][0] << " " << codonCounts[i][1] << " " << codonCounts[i][2] << " " << codonCounts[i][3] << "\n";
+    }
+}
+
+
 void testRandMultiNom(unsigned numCat)
 {
 	int i, t;
@@ -122,22 +136,24 @@ int main()
     std::cout << "reading fasta file" << std::endl;
     Genome genome;
     //genome.readFasta("../../inst/testGenome.fasta");
-    genome.readFasta("../Skluyveri_chromosomeA.fasta");
-    //genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/Skluyveri.fasta");
+    //genome.readFasta("../Skluyveri_chromosomeA.fasta");
+    genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/ChromosomeSplit/Skluyveri_chromosomeA.fasta");
     //genome.writeFasta("../../inst/resGenome.fasta
-    bool testing = false;
+    std::cout << "finished reading fasta file" << std::endl;
+    bool testing = true;
 
     if(testing)
     {
-			/*
+        /*
         testNumCodonsPerAA();
         testCodonRangePerAA(false);
         testCodonRangePerAA(true);
         testLogNormDensity();
         testSCUO(genome);
-        testCovarianceMatrix();*/
-				testRandMultiNom(3);
-
+        testCovarianceMatrix();
+        testRandMultiNom(3);
+        */
+        testGetCountsForAA(genome);
     }else{
         int samples = 300;
         int thining = 10;
