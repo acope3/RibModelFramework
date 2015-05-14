@@ -58,7 +58,7 @@ double ROCModel::calculateLogLiklihoodPerGene(Gene& gene, int geneIndex, ROCPara
 }
 
 
-double* ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCParameter& parameter, unsigned k)
+void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCParameter& parameter, unsigned k, double* logProbabilityRatio)
 {
     double logLikelihood = 0.0;
     double logLikelihood_proposed = 0.0;
@@ -72,8 +72,18 @@ double* ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, R
 
     double phiValue = parameter.getExpression(geneIndex, expressionCategory, false);
     double phiValue_proposed = parameter.getExpression(geneIndex, expressionCategory, true);
+<<<<<<< HEAD
 
-		
+
+=======
+/*
+		std::cout <<"mutationCategory: " << mutationCategory <<"\n";
+		std::cout <<"selectionCategory: " << selectionCategory <<"\n";
+		std::cout <<"expressionCategory: " << expressionCategory <<"\n";
+		std::cout <<"phiValue: " << phiValue <<"\n";
+		std::cout <<"phiValue_proposed: " << phiValue_proposed <<"\n";
+	*/	
+>>>>>>> e44e754e0028b9530c242739ad64aeece6bd4142
 		//#pragma omp parallel for
     for(int i = 0; i < 22; i++)
     {
@@ -99,7 +109,9 @@ double* ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, R
         {
             logLikelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation, selection, phiValue);
             logLikelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation, selection, phiValue_proposed);
-        }
+//						std::cout <<"LL: " << logLikelihood <<"\n";
+//						std::cout <<"LLP: " << logLikelihood_proposed <<"\n";
+				}
     }
 
     double sPhi = parameter.getSphi(false);
@@ -108,12 +120,16 @@ double* ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, R
 
     double currentLogLikelihood = (logLikelihood + logPhiProbability);
     double proposedLogLikelihood = (logLikelihood_proposed + logPhiProbability_proposed);
-
-    double returnArray[3];
-    returnArray[0] = (proposedLogLikelihood - currentLogLikelihood) - (std::log(phiValue) - std::log(phiValue_proposed));
-    returnArray[1] = currentLogLikelihood - std::log(phiValue_proposed);
-    returnArray[2] = proposedLogLikelihood - std::log(phiValue);
-    return returnArray;
+		/*std::cout <<"sPhi: " << sPhi <<"\n";
+		std::cout <<"logPhiProbability: " << logPhiProbability <<"\n";
+		std::cout <<"logPhiProbability_proposed: " << logPhiProbability_proposed <<"\n";
+		std::cout <<"currentLogLikelihood: " << currentLogLikelihood <<"\n";
+		std::cout <<"proposedLogLikelihood: " << proposedLogLikelihood <<"\n";
+*/
+    logProbabilityRatio[0] = (proposedLogLikelihood - currentLogLikelihood) - (std::log(phiValue) - std::log(phiValue_proposed));
+    logProbabilityRatio[1] = currentLogLikelihood - std::log(phiValue_proposed);
+    logProbabilityRatio[2] = proposedLogLikelihood - std::log(phiValue);
+    
     //return logLikelihood + a;
 }
 

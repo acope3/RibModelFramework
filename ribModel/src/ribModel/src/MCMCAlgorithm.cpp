@@ -6,7 +6,7 @@
 
 #include <iostream>
 #include <fstream>
-
+#include <stdlib.h> //can be removed later
 
 #include <omp.h>
 
@@ -71,6 +71,7 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
         double propLike = 0.0;
 
         double probabilities[numMixtures];
+<<<<<<< HEAD
 
         for(unsigned k = 0; k < numMixtures; k++)
         {
@@ -83,6 +84,54 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
 
         //	std::cout <<"out of initial for loop in acceptRejectExpressionLevelForAllGenes\n";
 
+=======
+				double sumprob = 0.0;
+        for(unsigned k = 0; k < numMixtures; k++)
+        {
+						double logProbabilityRatio[3];
+            model.calculateLogLiklihoodRatioPerGene(gene, i, parameter, k, logProbabilityRatio);
+            //double check probabilites
+            probabilities[k] = parameter.getCategoryProbability(k) * std::exp(logProbabilityRatio[1]);
+           /* 
+						std::cout <<"prob[k] = " << probabilities[k] <<"\n";
+						std::cout <<"getCategoryProbability(k) = " << parameter.getCategoryProbability(k) <<"\n";
+						std::cout <<"std::exp(logProbabilityRatio[1]) = " << std::exp(logProbabilityRatio[1]) <<"\n";
+						std::cout <<"logProbabilityRatio[1] = " << logProbabilityRatio[1] <<"\n";
+*/
+						currLike += probabilities[k];
+            propLike += parameter.getCategoryProbability(k) * std::exp(logProbabilityRatio[2]);
+					/*	std::cout <<"CHECKING [2] - [1] = [0]: ";
+						if (logProbabilityRatio[2] - logProbabilityRatio[1] == logProbabilityRatio[0]) std::cout <<"TRUE\n";
+						else{
+							std::cout <<"FALSE\n";
+							std::cout << logProbabilityRatio[2] <<" - " << logProbabilityRatio[1] <<" != " << logProbabilityRatio[0] <<"\n";	
+							std::cout << logProbabilityRatio[2] - logProbabilityRatio[1] <<" = logProbabilityRatio[2] - logProbabilityRatio[1]\n";
+						}
+						double tmp = 0.0;
+						std::cout <<"CHECKING probabilities TOTAL 1: ";
+						for (int a = 0; a < numMixtures; a++)
+						{
+							tmp += probabilities[a];
+						}
+						std::cout << tmp <<"\n";*/
+					sumprob += probabilities[k];
+				
+				}
+				for (int k = 0; k < numMixtures; k++)
+				{
+					if (probabilities[k] != 0)
+					{
+						probabilities[k] /= sumprob;
+					}
+					else
+					{
+						probabilities[k] = 1;
+					}
+					//	std::cout <<probabilities[k] <<"\n";
+				}
+
+
+>>>>>>> e44e754e0028b9530c242739ad64aeece6bd4142
         // Get category in which the gene is placed in.
         // If we use multiple sequence observrvation (like different mutatnts) randMultinom needs an parameter N to place N observations in numMixture buckets
         unsigned categoryOfGene = ROCParameter::randMultinom(probabilities, numMixtures);
@@ -104,15 +153,22 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
         if((iteration % thining) == 0)
         {
             parameter.updateExpressionTrace(iteration/thining, i);
+						parameter.updateMixtureAssignmentTrace(iteration/thining, i);
         }
     }
+		//for (int a = 0; a < numMixtures; a++)
+		//	 if (dirichletParameters[a] != 448) std::cout <<"ERROR\n";
     double newMixtureProbabilities[numMixtures];
     ROCParameter::randDirichlet(dirichletParameters, numMixtures, newMixtureProbabilities);
     for(unsigned k = 0u; k < numMixtures; k++)
     {
-      parameter.setCategoryProbability(k, iteration/thining, newMixtureProbabilities[k]);
+      parameter.setCategoryProbability(k, newMixtureProbabilities[k]);
     }
-    return logLikelihood;
+    if((iteration % thining) == 0)
+		{
+			parameter.updateCategoryProbabilitiesTrace(iteration/thining);
+		}
+		return logLikelihood;
 }
 
 void MCMCAlgorithm::acceptRejectHyperParameter(int numGenes, ROCParameter& parameter, ROCModel& model, int iteration)
@@ -127,7 +183,8 @@ void MCMCAlgorithm::acceptRejectHyperParameter(int numGenes, ROCParameter& param
 
     for(int i = 0; i < numGenes; i++)
     {
-        double phi = parameter.getExpression(i, false);
+				unsigned mixture = parameter.getMixtureAssignment(i);
+        double phi = parameter.getExpression(i, mixture, false);
         logProbabilityRatio += std::log(ROCParameter::densityLogNorm(phi, proposedMPhi, proposedSphi)) - std::log(ROCParameter::densityLogNorm(phi, currentMPhi, currentSphi));
     }
 
@@ -193,11 +250,10 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
     // initialize everything
 
     parameter.initAllTraces(samples, genome.getGenomeSize());
-		parameter.resizeCategoryProbabilites(samples);
 
     // starting the MCMC
     std::cout << "entering MCMC loop" << std::endl;
-		std::cout <<maximumIterations <<"\n";
+    std::cout <<maximumIterations <<"\n";
     for(unsigned iteration = 0; iteration < maximumIterations; iteration++)
     {
 

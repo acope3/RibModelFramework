@@ -31,8 +31,16 @@ getGeneAnnotationUsingBLAST <- function(blastset, hitlist=10, timeout=50)
   {
     cat("blasting sequence ", k, " of ", length(blastset), "\n")
     resultSet <- NA
+<<<<<<< HEAD
+    try(
+      resultSet <- blastSequences(x = seq, hitListSize=hitlist, timeout = timeout, as = "data.frame"),
+      returnSet[[k]] <- as.character(resultSet$Hit_def)
+      )
+    
+=======
     try(resultSet <- blastSequences(x = seq, hitListSize=hitlist, timeout = timeout, as = "data.frame"))
     returnSet[[k]] <- as.character(resultSet$Hit_def)
+>>>>>>> e44e754e0028b9530c242739ad64aeece6bd4142
     k <- k + 1
   }
   return(returnSet)

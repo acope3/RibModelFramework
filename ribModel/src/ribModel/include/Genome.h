@@ -22,6 +22,7 @@ class Genome
         void readFasta(char* filename);
         void writeFasta(char* filename);
         void addGene(const Gene& gene);
+        void getCountsForAA(char aa, unsigned codonCounts[][5]);
 
         Gene& getGene(int index);
         Gene& getGene(std::string id);

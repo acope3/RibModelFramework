@@ -35,15 +35,35 @@ void Genome::addGene(const Gene& gene)
 }
 
 
+void Genome::getCountsForAA(char aa, unsigned codonCounts[][5])
+{
+
+    unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa);
+    for(int i = 0; i < genes.size(); i++)
+    {
+        Gene gene = genes[i];
+        SequenceSummary seqsum = gene.getSequenceSummary();
+        unsigned* codonRange = SequenceSummary::AAToCodonRange(aa);
+        // get codon counts for AA
+        unsigned j = 0u;
+        for(unsigned k = codonRange[0]; k < codonRange[1]; k++, j++)
+        {
+            codonCounts[i][j] = seqsum.getCodonCountForCodon(k);
+        }
+    }
+}
+
 void Genome::writeFasta ( char* filename )
 {
     try {
         std::ofstream Fout(filename);
         if(!Fout) throw strcat("Cannot open output Fasta file ", filename);
 
-        for(int i = 0; i < genes.size(); i++) {
+        for(int i = 0; i < genes.size(); i++)
+        {
             Fout << ">" << genes[i].getDescription() << std::endl;
-            for(int j = 0; j < genes[i].length(); j++) {
+            for(int j = 0; j < genes[i].length(); j++)
+            {
                 Fout << genes[i].getNucleotideAt(j);
                 if((j + 1) % 60 == 0) Fout << std::endl;
             }

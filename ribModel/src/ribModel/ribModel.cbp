@@ -40,6 +40,7 @@
 		<Unit filename="include/Gene.h" />
 		<Unit filename="include/Genome.h" />
 		<Unit filename="include/MCMCAlgorithm.h" />
+		<Unit filename="include/MultinomRegression.h" />
 		<Unit filename="include/ROCModel.h" />
 		<Unit filename="include/ROCParameter.h" />
 		<Unit filename="include/SequenceSummary.h" />
@@ -48,6 +49,7 @@
 		<Unit filename="src/Gene.cpp" />
 		<Unit filename="src/Genome.cpp" />
 		<Unit filename="src/MCMCAlgorithm.cpp" />
+		<Unit filename="src/MultinomRegression.cpp" />
 		<Unit filename="src/ROCModel.cpp" />
 		<Unit filename="src/ROCParameter.cpp" />
 		<Unit filename="src/SequenceSummary.cpp" />
