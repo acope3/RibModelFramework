@@ -106,19 +106,19 @@ void testGetCountsForAA(Genome genome)
 void testRandMultiNom(unsigned numCat)
 {
 	std::cout << "------------------ TEST RANDMULTINOMIAL ------------------" << std::endl;
-	double dirichletParameters[3] = {0, 0, 0};
+	double assignmentCounts[3] = {0, 0, 0};
 	double probabilities[3] = {0.5, 0.2, 0.3};
 	unsigned tmp;
 	for (int i = 0; i < 50; i++)
 	{
 		tmp = ROCParameter::randMultinom(probabilities, numCat);
-		dirichletParameters[tmp] += 1;
+		assignmentCounts[tmp] += 1;
 	}
 	std::cout <<"Printing dirichlet numbers:\n";
 	for (int i = 0; i < numCat; i++)
 	{
-		std::cout <<"  " << i <<": " << dirichletParameters[i] <<"\n";
-		std::cout <<"  " << i <<"/50: " << dirichletParameters[i]/50 <<"\n\n";
+		std::cout <<"  " << i <<": " << assignmentCounts[i] <<"\n";
+		std::cout <<"  " << i <<"/50: " << assignmentCounts[i]/50 <<"\n\n";
 	}
 
 	std::cout << "------------------ TEST RANDMULTINOMIAL ------------------" << std::endl;
@@ -129,12 +129,11 @@ int main()
 {
 	std::cout << "Hello world!" << std::endl << std::endl;
 
-
 	Genome genome;
 	std::cout << "reading fasta file" << std::endl;
 	//genome.readFasta("../../inst/testGenome.fasta");
-	//genome.readFasta("../Skluyveri_chromosomeA.fasta");
-	genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/Skluyveri.fasta");
+	genome.readFasta("Skluyveri_chromosomeA.fasta");
+	//genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/Skluyveri.fasta");
 	//genome.writeFasta("../../inst/resGenome.fasta
 	bool testing = false;
 
@@ -174,7 +173,7 @@ int main()
 		std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
 		std::cout << "Sphi proposal width: " << parameter.getSphiProposalWidth() << std::endl;
 
-		std::ofstream phiout("../results/test.phi");
+		std::ofstream phiout("results/test.phi");
 		for(int n = 0; n < genome.getGenomeSize(); n++)
 		{
 			phiout << genome.getGene(n).getId() << "," << parameter.getExpressionPosteriorMean(useSamples, n, 0) << std::endl;

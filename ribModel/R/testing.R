@@ -1,18 +1,18 @@
-test.phi <- read.table("/home/clandere/CodonUsageBias/organisms/yeast/results/test.phi", sep=",")[,2]
-test.phi.names <- as.character(read.table("/home/clandere/CodonUsageBias/organisms/yeast/results/test.phi", sep=",")[,1])
+test.phi <- read.table("../results/test.phi", sep=",")[,2]
+test.phi.names <- as.character(read.table("../results/test.phi", sep=",")[,1])
 
-kluyveri.phi <- read.table("/home/clandere/CodonUsageBias/organisms/yeast/results/Skluyvery_study/Skluyveri_chromosomeA/without_xobs_singlechain_main.phi", sep=",", header=T)[, 2]
-test.scuo <- read.table("/home/clandere/CodonUsageBias/organisms/yeast/results/test.scuo", sep=",")[,2]
+kluyveri.phi <- read.table("../results/Skluyveri_ChrA_phi_est.csv", sep=",", header=T)[, 2]
+test.scuo <- read.table("../results/test.scuo", sep=",")[,2]
 
-test.phiTrace <- read.table("/home/clandere/CodonUsageBias/organisms/yeast/results/test.phiTrace", sep=",")
+test.phiTrace <- read.table("../results/test.phiTrace", sep=",")
 
 
 
-plot(test.phiTrace[, 5], type = "l")
+plot(test.phiTrace[, 347], type = "l")
 #bla <- colMeans(test.phiTrace[500:1000, 1:448])
 
-test.lik <- as.numeric(scan("/home/clandere/CodonUsageBias/organisms/yeast/results/test.lik"))
-test.sphi <- as.numeric(scan("/home/clandere/CodonUsageBias/organisms/yeast/results/test.sphi"))
+test.lik <- as.numeric(scan("../results/test.lik"))
+test.sphi <- as.numeric(scan("../results/test.sphi"))
 #plot(test.lik[10:90], type="l")
 plot(test.lik, type="l")
 plot(50:300, test.lik[50:300], type="l")

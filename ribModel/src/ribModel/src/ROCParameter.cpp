@@ -38,7 +38,7 @@ ROCParameter::ROCParameter(unsigned numMutationCategories, unsigned numSelection
 
     currentSelectionParameter.resize(numSelectionCategories);
     proposedSelectionParameter.resize(numSelectionCategories);
-		categoryProbabilities.resize(1.0/numMixtures);
+    categoryProbabilities.resize(numMixtures, 1.0/(double)numMixtures);
 
     for(unsigned i = 0; i < numMutationCategories; i++)
     {
