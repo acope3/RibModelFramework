@@ -127,93 +127,32 @@ void testRandMultiNom(unsigned numCat)
 
 int main()
 {
-<<<<<<< HEAD
-    std::cout << "Hello world!" << std::endl << std::endl;
-
-
-    std::cout << "reading fasta file" << std::endl;
-    Genome genome;
-    //genome.readFasta("../../inst/testGenome.fasta");
-    //genome.readFasta("../Skluyveri_chromosomeA.fasta");
-    genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/ChromosomeSplit/Skluyveri_chromosomeA.fasta");
-    //genome.writeFasta("../../inst/resGenome.fasta
-    std::cout << "finished reading fasta file" << std::endl;
-    bool testing = true;
-
-    if(testing)
-    {
-        /*
-        testNumCodonsPerAA();
-        testCodonRangePerAA(false);
-        testCodonRangePerAA(true);
-        testLogNormDensity();
-        testSCUO(genome);
-        testCovarianceMatrix();
-        testRandMultiNom(3);
-        */
-        testGetCountsForAA(genome);
-    }else{
-        int samples = 300;
-        int thining = 10;
-        int useSamples = 150;
-
-        ROCModel model = ROCModel();
-        ROCParameter parameter = ROCParameter(1, 1, genome.getGenomeSize(), 2, 1, false);
-        parameter.InitializeExpression(genome, 2);
-        MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, true, false, false);
-
-        std::ofstream scuoout("/results/test.scuo");
-        for(int n = 0; n < genome.getGenomeSize(); n++)
-        {
-            scuoout << genome.getGene(n).getId() << "," << parameter.calculateSCUO(genome.getGene(n)) << std::endl;
-        }
-        scuoout.close();
-
-        std::cout << "starting MCMC" << std::endl;
-        mcmc.run(genome, model, parameter);
-        std::cout << std::endl << "Finish MCMC" << std::endl;
-
-
-        std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
-        std::cout << "Sphi proposal width: " << parameter.getSphiProposalWidth() << std::endl;
-
-        std::ofstream phiout("/results/test.phi");
-        for(int n = 0; n < genome.getGenomeSize(); n++)
-        {
-            phiout << genome.getGene(n).getId() << "," << parameter.getExpressionPosteriorMean(useSamples, n, 0) << std::endl;
-        }
-        phiout.close();
-    }
-
-
-    return 0;
-=======
 	std::cout << "Hello world!" << std::endl << std::endl;
 
 
 	Genome genome;
 	std::cout << "reading fasta file" << std::endl;
 	//genome.readFasta("../../inst/testGenome.fasta");
-	genome.readFasta("../Skluyveri_chromosomeA.fasta");
-	//genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/Skluyveri.fasta");
+	//genome.readFasta("../Skluyveri_chromosomeA.fasta");
+	genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/Skluyveri.fasta");
 	//genome.writeFasta("../../inst/resGenome.fasta
 	bool testing = false;
 
 	if(testing)
 	{
 		/*
-			 testNumCodonsPerAA();
-			 testCodonRangePerAA(false);
-			 testCodonRangePerAA(true);
-			 testLogNormDensity();
-			 testSCUO(genome);
-			 testCovarianceMatrix();*/
+         testNumCodonsPerAA();
+         testCodonRangePerAA(false);
+         testCodonRangePerAA(true);
+         testLogNormDensity();
+         testSCUO(genome);
+         testCovarianceMatrix();*/
 		testRandMultiNom(3);
 
 	}else{
-		int samples = 1000;
+		int samples = 100;
 		int thining = 10;
-		int useSamples = 150;
+		int useSamples = 50;
 
 		ROCModel model = ROCModel();
 		ROCParameter parameter = ROCParameter(1, 1, genome.getGenomeSize(), .8, 1, false);
@@ -245,7 +184,6 @@ int main()
 
 
 	return 0;
->>>>>>> e44e754e0028b9530c242739ad64aeece6bd4142
 }
 
 

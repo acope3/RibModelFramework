@@ -31,10 +31,7 @@ ROCParameter::ROCParameter(unsigned numMutationCategories, unsigned numSelection
     priorB = 1;
 
     numMixtures = _numMixtures;
-<<<<<<< HEAD
 
-=======
->>>>>>> e44e754e0028b9530c242739ad64aeece6bd4142
     initThetaK();
     currentMutationParameter.resize(numMutationCategories);
     proposedMutationParameter.resize(numMutationCategories);
@@ -676,17 +673,13 @@ void ROCParameter::randDirichlet(double* input, unsigned numElements, double* ou
 
  unsigned ROCParameter::randMultinom(double* probabilities, unsigned groups)
  {
-<<<<<<< HEAD
     // sort probabilities
-=======
-    // sort probabilitiesi
->>>>>>> e44e754e0028b9530c242739ad64aeece6bd4142
     //ROCParameter::quickSort(probabilities, 0, groups);
     // calculate cummulative sum to determine group boundaries
     double cumsum[groups];
     cumsum[0] = probabilities[0];
 		//std::cout << cumsum[0] <<"  ";
-		
+
     for(unsigned i = 1u; i < groups; i++)
     {
         cumsum[i] = cumsum[i-1u] + probabilities[i];
@@ -698,24 +691,14 @@ void ROCParameter::randDirichlet(double* input, unsigned numElements, double* ou
     double referenceValue = distribution(generator);
 		// check in which category the element falls
     unsigned returnValue = 0u;
-<<<<<<< HEAD
-    unsigned element = 0u;
-    while(referenceValue <= cumsum[element])
+    for (int i = 0; i < groups; i++)
     {
-        returnValue = element;
-        element++;
+        if (referenceValue <= cumsum[i])
+        {
+            returnValue = i;
+            break;
+        }
     }
-=======
-		for (int i = 0; i < groups; i++)
-		{
-			if (referenceValue <= cumsum[i]) 
-			{
-				returnValue = i;
-				break;	
-			}
-		}
-
->>>>>>> e44e754e0028b9530c242739ad64aeece6bd4142
 	return returnValue;
 }
 

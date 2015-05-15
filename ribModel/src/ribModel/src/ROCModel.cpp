@@ -72,19 +72,7 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCP
 
     double phiValue = parameter.getExpression(geneIndex, expressionCategory, false);
     double phiValue_proposed = parameter.getExpression(geneIndex, expressionCategory, true);
-<<<<<<< HEAD
-
-
-=======
-/*
-		std::cout <<"mutationCategory: " << mutationCategory <<"\n";
-		std::cout <<"selectionCategory: " << selectionCategory <<"\n";
-		std::cout <<"expressionCategory: " << expressionCategory <<"\n";
-		std::cout <<"phiValue: " << phiValue <<"\n";
-		std::cout <<"phiValue_proposed: " << phiValue_proposed <<"\n";
-	*/	
->>>>>>> e44e754e0028b9530c242739ad64aeece6bd4142
-		//#pragma omp parallel for
+	//#pragma omp parallel for
     for(int i = 0; i < 22; i++)
     {
         char curAA = seqsum.AminoAcidArray[i];
@@ -129,7 +117,7 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCP
     logProbabilityRatio[0] = (proposedLogLikelihood - currentLogLikelihood) - (std::log(phiValue) - std::log(phiValue_proposed));
     logProbabilityRatio[1] = currentLogLikelihood - std::log(phiValue_proposed);
     logProbabilityRatio[2] = proposedLogLikelihood - std::log(phiValue);
-    
+
     //return logLikelihood + a;
 }
 

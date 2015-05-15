@@ -71,28 +71,14 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
         double propLike = 0.0;
 
         double probabilities[numMixtures];
-<<<<<<< HEAD
-
-        for(unsigned k = 0; k < numMixtures; k++)
-        {
-            double* logProbabilityRatio = model.calculateLogLiklihoodRatioPerGene(gene, i, parameter, k);
-            //double check probabilites
-            probabilities[k] = parameter.getCategoryProbability(k, iteration/thining) * std::exp(logProbabilityRatio[1]);
-            currLike += probabilities[k];
-            propLike += parameter.getCategoryProbability(k, i) * std::exp(logProbabilityRatio[2]);
-        }
-
-        //	std::cout <<"out of initial for loop in acceptRejectExpressionLevelForAllGenes\n";
-
-=======
-				double sumprob = 0.0;
+        double sumprob = 0.0;
         for(unsigned k = 0; k < numMixtures; k++)
         {
 						double logProbabilityRatio[3];
             model.calculateLogLiklihoodRatioPerGene(gene, i, parameter, k, logProbabilityRatio);
             //double check probabilites
             probabilities[k] = parameter.getCategoryProbability(k) * std::exp(logProbabilityRatio[1]);
-           /* 
+           /*
 						std::cout <<"prob[k] = " << probabilities[k] <<"\n";
 						std::cout <<"getCategoryProbability(k) = " << parameter.getCategoryProbability(k) <<"\n";
 						std::cout <<"std::exp(logProbabilityRatio[1]) = " << std::exp(logProbabilityRatio[1]) <<"\n";
@@ -104,7 +90,7 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
 						if (logProbabilityRatio[2] - logProbabilityRatio[1] == logProbabilityRatio[0]) std::cout <<"TRUE\n";
 						else{
 							std::cout <<"FALSE\n";
-							std::cout << logProbabilityRatio[2] <<" - " << logProbabilityRatio[1] <<" != " << logProbabilityRatio[0] <<"\n";	
+							std::cout << logProbabilityRatio[2] <<" - " << logProbabilityRatio[1] <<" != " << logProbabilityRatio[0] <<"\n";
 							std::cout << logProbabilityRatio[2] - logProbabilityRatio[1] <<" = logProbabilityRatio[2] - logProbabilityRatio[1]\n";
 						}
 						double tmp = 0.0;
@@ -115,7 +101,7 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
 						}
 						std::cout << tmp <<"\n";*/
 					sumprob += probabilities[k];
-				
+
 				}
 				for (int k = 0; k < numMixtures; k++)
 				{
@@ -129,9 +115,6 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
 					}
 					//	std::cout <<probabilities[k] <<"\n";
 				}
-
-
->>>>>>> e44e754e0028b9530c242739ad64aeece6bd4142
         // Get category in which the gene is placed in.
         // If we use multiple sequence observrvation (like different mutatnts) randMultinom needs an parameter N to place N observations in numMixture buckets
         unsigned categoryOfGene = ROCParameter::randMultinom(probabilities, numMixtures);

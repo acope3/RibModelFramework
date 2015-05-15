@@ -13,11 +13,11 @@ class ROCParameter
 {
     private:
 
-				struct thetaK
-				{
-					unsigned delM;
-					unsigned delEta;
-				};
+        struct thetaK
+        {
+            unsigned delM;
+            unsigned delEta;
+        };
         //members
         unsigned int numParam;
 
@@ -62,13 +62,10 @@ class ROCParameter
         unsigned numMixtures;
         std::vector<thetaK> categories;
         std::vector<unsigned> mixtureAssignment;
-<<<<<<< HEAD
-        std::vector<std::vector<double>> categoryProbabilities;
-=======
-				std::vector<std::vector<unsigned>> mixtureAssignmentTrace;
-				std::vector<double> categoryProbabilities;
-				std::vector<std::vector<double>> categoryProbabilitiesTrace;
->>>>>>> e44e754e0028b9530c242739ad64aeece6bd4142
+
+        std::vector<std::vector<unsigned>> mixtureAssignmentTrace;
+        std::vector<double> categoryProbabilities;
+        std::vector<std::vector<double>> categoryProbabilitiesTrace;
         //static members
 
 
@@ -98,22 +95,9 @@ class ROCParameter
         ROCParameter(const ROCParameter& other);
         ROCParameter& operator=(const ROCParameter& rhs);
 
-<<<<<<< HEAD
-        void resizeCategoryProbabilites(int samples);
         void initThetaK();
-        unsigned getNumMixtureElements() {return numMixtures;}
-        unsigned getMutationCategory(unsigned group) {return categories[group].delM;}
-        unsigned getSelectionCategory(unsigned group) {return categories[group].delEta;}
-        unsigned getExpressionCategory(unsigned group) {return categories[group].delEta;}
-        double getCategoryProbability(unsigned group, unsigned gene) {return categoryProbabilities[group][gene];}
-        void setCategoryProbability(unsigned group, unsigned gene, double value) {categoryProbabilities[group][gene] = value;}
-        void setMixtureAssignment(unsigned gene, unsigned value) {mixtureAssignment[gene] = value;}
-        unsigned getMixtureAssignment(unsigned gene) {return mixtureAssignment[gene];}
 
-=======
-        void initThetaK();
-        
-				unsigned getNumMixtureElements() {return numMixtures;}
+        unsigned getNumMixtureElements() {return numMixtures;}
         unsigned getMutationCategory(unsigned group) {return categories[group].delM;}
         unsigned getSelectionCategory(unsigned group) {return categories[group].delEta;}
         unsigned getExpressionCategory(unsigned group) {return categories[group].delEta;}
@@ -121,15 +105,14 @@ class ROCParameter
         void setCategoryProbability(unsigned group, double value) {categoryProbabilities[group]= value;}
         void setMixtureAssignment(unsigned gene, unsigned value) {mixtureAssignment[gene] = value;}
         unsigned getMixtureAssignment(unsigned value) {return mixtureAssignment[value];}
-				void updateCategoryProbabilitiesTrace(int samples)
+        void updateCategoryProbabilitiesTrace(int samples)
         {
             for(unsigned category = 0; category < numMixtures; category++)
             {
                 categoryProbabilitiesTrace[category][samples] = categoryProbabilities[category];
             }
         }
-				
->>>>>>> e44e754e0028b9530c242739ad64aeece6bd4142
+
         // Phi epsilon functions
         double getPhiEpsilon() {return phiEpsilon;}
 
@@ -189,11 +172,11 @@ class ROCParameter
             }
         }
         void updateSphiTrace(unsigned sample) {sPhiTrace[sample] = Sphi;}
-				void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex) 
+				void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex)
 				{mixtureAssignmentTrace[sample][geneIndex] = mixtureAssignment[geneIndex];}
 				std::vector<double> getAPhiTrace() {return aPhiTrace;}
 				std::vector<std::vector <unsigned>> getMixtureAssignmentTrace() {return mixtureAssignmentTrace;}
-				
+
 				// functions to return estimates
         double getExpressionPosteriorMean(unsigned samples, unsigned geneIndex, unsigned category);
         double getSphiPosteriorMean(unsigned samples);
