@@ -154,7 +154,7 @@ int main()
 		int useSamples = 50;
 
 		ROCModel model = ROCModel();
-		ROCParameter parameter = ROCParameter(1, 1, genome.getGenomeSize(), 2, 1, false);
+		ROCParameter parameter = ROCParameter(genome.getGenomeSize(), 2, 1, nullptr, true);
 		parameter.InitializeExpression(genome, 2);
 		MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, true, true, true);
 
