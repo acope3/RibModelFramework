@@ -8,10 +8,24 @@ ROCParameter::ROCParameter()
     ROCParameter(1, 1, 100, 2, 1, true);
 }
 
-ROCParameter::ROCParameter(unsigned numMutationCategories, unsigned numSelectionCategories, unsigned numGenes, double sphi, unsigned _numMixtures, bool splitSer)
+ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures, double* geneAssignment, bool splitSer)
 {
 
-    mixtureAssignment.resize(numGenes);
+    numMutationCategories = 1;
+    numSelectionCategories = 1;
+
+    // assign genes to mixture element
+    mixtureAssignment.resize(numGenes, 0);
+    if(geneAssignment)
+    {
+        for(unsigned i = 0u; i < numGenes; i++)
+        {
+            mixtureAssignment[i] = geneAssignment[i]
+        }
+    }
+
+
+    numAcceptForMutationAndSelection.resize(22, 0u);
 
     numParam = ((splitSer) ? 41 : 40);
     Sphi = sphi;
@@ -32,7 +46,9 @@ ROCParameter::ROCParameter(unsigned numMutationCategories, unsigned numSelection
 
     numMixtures = _numMixtures;
 
-    initThetaK();
+    initCategoryDefinitions();
+
+
     currentMutationParameter.resize(numMutationCategories);
     proposedMutationParameter.resize(numMutationCategories);
 
@@ -40,101 +56,107 @@ ROCParameter::ROCParameter(unsigned numMutationCategories, unsigned numSelection
     proposedSelectionParameter.resize(numSelectionCategories);
     categoryProbabilities.resize(numMixtures, 1.0/(double)numMixtures);
 
-    for(unsigned i = 0; i < numMutationCategories; i++)
+    std::vector<double> tempMut(numParam, 0.0);
+    tempMut[0] = -0.351;
+    tempMut[1] = 0.378;
+    tempMut[2] = 0.482;
+    tempMut[3] = 0.002;
+    tempMut[4] = 0.587;
+    tempMut[5] = -0.420;
+    tempMut[6] = 0.678;
+    tempMut[7] = -0.088;
+    tempMut[8] = 0.112;
+    tempMut[9] = 0.308;
+    tempMut[10] = 0.412;
+    tempMut[11] = -0.179;
+    tempMut[12] = 0.374;
+    tempMut[13] = -0.594;
+    tempMut[14] = 0.388;
+    tempMut[15] = 0.853;
+    tempMut[16] = 0.340;
+    tempMut[17] = 0.463;
+    tempMut[18] = 0.019;
+    tempMut[19] = 0.355;
+    tempMut[20] = -0.044;
+    tempMut[21] = 0.292;
+    tempMut[22] = 0.359;
+    tempMut[23] = -0.173;
+    tempMut[24] = -0.882;
+    tempMut[25] = -0.699;
+    tempMut[26] = -0.196;
+    tempMut[27] = 0.396;
+    tempMut[28] = 0.197;
+    tempMut[29] = 0.023;
+    tempMut[30] = 0.518;
+    tempMut[31] = 0.360;
+    tempMut[32] = -0.333;
+    tempMut[33] = 0.286;
+    tempMut[34] = 0.318;
+    tempMut[35] = 0.009;
+    tempMut[36] = 0.568;
+    tempMut[37] = 0.197;
+    tempMut[38] = 0.164;
+    tempMut[39] = 0.183;
+
+    for(unsigned k = 0; k < 40; k++)
     {
-        std::vector<double> tempMut(numParam, 0.0);
-        tempMut[0] = -0.351;
-        tempMut[1] = 0.378;
-        tempMut[2] = 0.482;
-        tempMut[3] = 0.002;
-        tempMut[4] = 0.587;
-        tempMut[5] = -0.420;
-        tempMut[6] = 0.678;
-        tempMut[7] = -0.088;
-        tempMut[8] = 0.112;
-        tempMut[9] = 0.308;
-        tempMut[10] = 0.412;
-        tempMut[11] = -0.179;
-        tempMut[12] = 0.374;
-        tempMut[13] = -0.594;
-        tempMut[14] = 0.388;
-        tempMut[15] = 0.853;
-        tempMut[16] = 0.340;
-        tempMut[17] = 0.463;
-        tempMut[18] = 0.019;
-        tempMut[19] = 0.355;
-        tempMut[20] = -0.044;
-        tempMut[21] = 0.292;
-        tempMut[22] = 0.359;
-        tempMut[23] = -0.173;
-        tempMut[24] = -0.882;
-        tempMut[25] = -0.699;
-        tempMut[26] = -0.196;
-        tempMut[27] = 0.396;
-        tempMut[28] = 0.197;
-        tempMut[29] = 0.023;
-        tempMut[30] = 0.518;
-        tempMut[31] = 0.360;
-        tempMut[32] = -0.333;
-        tempMut[33] = 0.286;
-        tempMut[34] = 0.318;
-        tempMut[35] = 0.009;
-        tempMut[36] = 0.568;
-        tempMut[37] = 0.197;
-        tempMut[38] = 0.164;
-        tempMut[39] = 0.183;
-
-
-        currentMutationParameter[i] = tempMut;
-        proposedMutationParameter[i] = tempMut;
+        tempMut[k] = ROCParameter::randNorm(tempMut[k], 0.1);
     }
-    for(unsigned i = 0; i < numSelectionCategories; i++)
+
+    currentMutationParameter[0] = tempMut;
+    proposedMutationParameter[0] = tempMut;
+
+
+    std::vector<double> tempSel(numParam, 0.0);
+    tempSel[0] = 0.683;
+    tempSel[1] = 0.026;
+    tempSel[2] = 0.991;
+    tempSel[3] = 0.509;
+    tempSel[4] = -0.216;
+    tempSel[5] = -0.279;
+    tempSel[6] = -0.360;
+    tempSel[7] = 1.246;
+    tempSel[8] = 0.544;
+    tempSel[9] = 1.311;
+    tempSel[10] = -0.253;
+    tempSel[11] = 1.360;
+    tempSel[12] = -0.146;
+    tempSel[13] = 0.496;
+    tempSel[14] = 0.416;
+    tempSel[15] = 1.250;
+    tempSel[16] = 0.697;
+    tempSel[17] = 0.872;
+    tempSel[18] = 0.547;
+    tempSel[19] = -0.563;
+    tempSel[20] = -0.442;
+    tempSel[21] = 0.561;
+    tempSel[22] = 0.564;
+    tempSel[23] = -0.447;
+    tempSel[24] = -0.009;
+    tempSel[25] = 0.627;
+    tempSel[26] = 2.549;
+    tempSel[27] = 0.619;
+    tempSel[28] = 1.829;
+    tempSel[29] = 0.803;
+    tempSel[30] = -0.001;
+    tempSel[31] = 0.902;
+    tempSel[32] = 0.747;
+    tempSel[33] = -0.069;
+    tempSel[34] = 0.87;
+    tempSel[35] = 1.030;
+    tempSel[36] = -0.051;
+    tempSel[37] = 0.679;
+    tempSel[38] = -0.394;
+    tempSel[39] = 0.031;
+
+    for(unsigned k = 0; k < 40; k++)
     {
-        std::vector<double> tempSel(numParam, 0.0);
-        tempSel[0] = 0.683;
-        tempSel[1] = 0.026;
-        tempSel[2] = 0.991;
-        tempSel[3] = 0.509;
-        tempSel[4] = -0.216;
-        tempSel[5] = -0.279;
-        tempSel[6] = -0.360;
-        tempSel[7] = 1.246;
-        tempSel[8] = 0.544;
-        tempSel[9] = 1.311;
-        tempSel[10] = -0.253;
-        tempSel[11] = 1.360;
-        tempSel[12] = -0.146;
-        tempSel[13] = 0.496;
-        tempSel[14] = 0.416;
-        tempSel[15] = 1.250;
-        tempSel[16] = 0.697;
-        tempSel[17] = 0.872;
-        tempSel[18] = 0.547;
-        tempSel[19] = -0.563;
-        tempSel[20] = -0.442;
-        tempSel[21] = 0.561;
-        tempSel[22] = 0.564;
-        tempSel[23] = -0.447;
-        tempSel[24] = -0.009;
-        tempSel[25] = 0.627;
-        tempSel[26] = 2.549;
-        tempSel[27] = 0.619;
-        tempSel[28] = 1.829;
-        tempSel[29] = 0.803;
-        tempSel[30] = -0.001;
-        tempSel[31] = 0.902;
-        tempSel[32] = 0.747;
-        tempSel[33] = -0.069;
-        tempSel[34] = 0.87;
-        tempSel[35] = 1.030;
-        tempSel[36] = -0.051;
-        tempSel[37] = 0.679;
-        tempSel[38] = -0.394;
-        tempSel[39] = 0.031;
-
-        currentSelectionParameter[i] = tempSel;
-        proposedSelectionParameter[i] = tempSel;
+        tempSel[k] = ROCParameter::randNorm(tempSel[k], 0.1);
     }
+
+    currentSelectionParameter[0] = tempSel;
+    proposedSelectionParameter[0] = tempSel;
+
 
     currentExpressionLevel.resize(numMixtures);
     proposedExpressionLevel.resize(numMixtures);
@@ -165,7 +187,7 @@ ROCParameter::ROCParameter(const ROCParameter& other)
     sPhiTrace = other.sPhiTrace;
     aPhiTrace = other.aPhiTrace;
     numAcceptForSphi = other.numAcceptForSphi;
-		categories = other.categories;
+    categories = other.categories;
 
     // proposal bias and std for phi values
     bias_sphi = other.bias_sphi;
@@ -235,13 +257,13 @@ ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
     return *this;
 }
 
-void ROCParameter::initThetaK()
+void ROCParameter::initCategoryDefinitions()
 {
 	for (unsigned i = 0; i < numMixtures; i++)
 	{
 		categories.push_back(thetaK()); //push a blank thetaK on the vector, then alter.
-		categories[i].delM = 0;
-		categories[i].delEta = 0;
+		categories[i].delM = i;
+		categories[i].delEta = i;
 	}
 
 }
@@ -440,36 +462,39 @@ double ROCParameter::getExpressionPosteriorMean(unsigned samples, unsigned geneI
 
     double posteriorMean = 0.0;
     unsigned traceLength = expressionTrace[0].size();
-		if(samples <= traceLength)
+
+
+    if(samples > traceLength)
     {
-        unsigned start = traceLength - samples;
-        for(unsigned i = start; i < traceLength; i++)
-        {
-            posteriorMean += expressionTrace[category][i][geneIndex];
-        }
+        std::cout << std::string("ROCParameter::getExpressionPosteriorMean throws: Number of anticipated samples (") +
+            std::to_string(samples) + std::string(") is greater than the length of the available trace (") + std::to_string(traceLength) + std::string(").") +
+            std::string("Whole trace is used for posterior estimate! \n");
+        samples = traceLength;
     }
-    else{
-			std::cout << std::string("ROCParameter::getExpressionPosteriorMean throws: Number of anticipated samples (") +
-            std::to_string(samples) + std::string(") is greater than the length of the available trace (") + std::to_string(traceLength) + std::string(").\n");
+    unsigned start = traceLength - samples;
+    for(unsigned i = start; i < traceLength; i++)
+    {
+        posteriorMean += expressionTrace[category][i][geneIndex];
     }
+
     return posteriorMean / (double)samples;
 }
 double ROCParameter::getSphiPosteriorMean(unsigned samples)
 {
     double posteriorMean = 0.0;
     unsigned traceLength = sPhiTrace.size();
-    if(samples <= traceLength)
-    {
-        unsigned start = traceLength - samples;
 
-        for(unsigned i = start; i < traceLength; i++)
-        {
-            posteriorMean += sPhiTrace[i];
-        }
+    if(samples > traceLength)
+    {
+        std::cout << std::string("ROCParameter::getSphiPosteriorMean throws: Number of anticipated samples (") +
+            std::to_string(samples) + std::string(") is greater than the length of the available trace(") + std::to_string(traceLength) + std::string(").") +
+            std::string("Whole trace is used for posterior estimate! \n");
+        samples = traceLength;
     }
-    else{
-        throw std::string("ROCParameter::getSphiPosteriorMean throws: Number of anticipated samples (") +
-            std::to_string(samples) + std::string(") is greater than the length of the available trace(") + std::to_string(traceLength) + std::string(").\n");
+    unsigned start = traceLength - samples;
+    for(unsigned i = start; i < traceLength; i++)
+    {
+        posteriorMean += sPhiTrace[i];
     }
     return posteriorMean / (double)samples;
 }
@@ -521,39 +546,24 @@ void ROCParameter::proposeSPhi()
 void ROCParameter::proposeExpressionLevels()
 {
     unsigned numExpressionLevels = currentExpressionLevel[0].size();
-		/*std::cout <<"Entering proposeExpressionLevels\n";
-		std::cout <<"numMixtures = " <<numMixtures <<"\n";
-		std::cout <<"numExpressionLevels = " <<numExpressionLevels <<"\n";
-		std::cout <<"size of proposedExpressionLevel = " <<proposedExpressionLevel.size() <<"\n";
-		std::cout <<"size of proposedExpressionLevel[0] = " <<proposedExpressionLevel[0].size() <<"\n";
-		std::cout <<"size of currentExpressionLevel = " <<currentExpressionLevel.size() <<"\n";
-		std::cout <<"size of currentExpressionLevel[0] = " <<currentExpressionLevel[0].size() <<"\n";
-*/
-		for(unsigned category = 0; category < numMixtures; category++)
+    for(unsigned category = 0; category < numMixtures; category++)
     {
         for(unsigned i = 0; i < numExpressionLevels; i++)
         {
             // proposedExpressionLevel[i] = randLogNorm(currentExpressionLevel[i], std_phi[i]);
             // avoid adjusting probabilities for asymmetry of distribution
-						proposedExpressionLevel[category][i] = std::exp( randNorm( std::log(currentExpressionLevel[category][i]) , std_phi[i]) );
+            proposedExpressionLevel[category][i] = std::exp( randNorm( std::log(currentExpressionLevel[category][i]) , std_phi[i]) );
         }
     }
 	//	std::cout <<"Exiting proposeExpressionLevels\n";
 }
 void ROCParameter::proposeCodonSpecificParameter()
 {
-		std::cout <<"Entering proposeCodonSpecificParameter\n";
-    unsigned numMutatationCategories = currentMutationParameter.size();
-    for(unsigned i = 0; i < numMutatationCategories; i++)
+    for(unsigned i = 0; i < numMixtures; i++)
     {
         proposedMutationParameter[i] = propose(currentMutationParameter[i], ROCParameter::randNorm, bias_csp, std_csp);
-    }
-    unsigned numSelectionCategories = currentSelectionParameter.size();
-    for(unsigned i = 0; i < numSelectionCategories; i++)
-    {
         proposedSelectionParameter[i] = propose(currentSelectionParameter[i], ROCParameter::randNorm, bias_csp, std_csp);
     }
-		std::cout <<"Exiting proposeCodonSpecificParameter\n";
 }
 std::vector<double> ROCParameter::propose(std::vector<double> currentParam, double (*proposal)(double a, double b), double A, double B)
 {
@@ -567,24 +577,20 @@ std::vector<double> ROCParameter::propose(std::vector<double> currentParam, doub
 }
 
 
-void ROCParameter::updateCodonSpecificParameter(unsigned category, unsigned paramType, char aa)
+void ROCParameter::updateCodonSpecificParameter(char aa)
 {
     // TODO: add acceptance counter
 
     unsigned* aaRange = SequenceSummary::AAToCodonRange(aa, true);
-
-    unsigned j = 0u;
-    for(unsigned i = aaRange[0]; i < aaRange[1]; i++, j++)
+    unsigned aaIndex = SequenceSummary::aaToIndex.find(aa)->second;
+    numAcceptForMutationAndSelection[aaIndex]++;
+    for(unsigned k = 0u; k < numMixtures; k++)
     {
-        if(paramType == ROCParameter::dM)
+        for(unsigned i = aaRange[0]; i < aaRange[1]; i++)
         {
-            currentMutationParameter[category][i] = proposedMutationParameter[category][i];
+            currentMutationParameter[k][i] = proposedMutationParameter[k][i];
+            currentSelectionParameter[k][i] = proposedSelectionParameter[k][i];
         }
-        else if(paramType == ROCParameter::dEta)
-        {
-            currentSelectionParameter[category][i] = proposedSelectionParameter[category][i];
-        }
-        else throw "Unkown parameter type: " + paramType;
     }
 }
 /*)

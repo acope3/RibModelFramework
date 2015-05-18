@@ -2,7 +2,7 @@
 library(Biostrings)
 library(annotate)
 
-getGeneAnnotationUsingBLAST <- function(blastset, cut.to=NULL ,hitlist=10, timeout=50)
+getGeneAnnotationUsingBLAST <- function(blastset, cut.to=NULL, hitlist=10, timeout=50)
 {
   returnSet <- vector("list", length = length(blastset))
   k <- 1
@@ -14,7 +14,7 @@ getGeneAnnotationUsingBLAST <- function(blastset, cut.to=NULL ,hitlist=10, timeo
     {
       if(nchar(seq) > cut.to) seq <- substr(seq, start = 1, stop = cut.to)
     }
-    try(resultSet <- blastSequences(x = seq, hitListSize=hitlist, timeout = timeout, as = "data.frame"))
+    try(resultSet <- blastSequences(x = seq, hitListSize=hitlist, timeout = timeout, as = "data.frame"), program = "megablast")
     try(returnSet[[k]] <- as.character(resultSet$Hit_def))
     
     k <- k + 1

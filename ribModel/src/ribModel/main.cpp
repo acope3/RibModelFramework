@@ -154,9 +154,9 @@ int main()
 		int useSamples = 50;
 
 		ROCModel model = ROCModel();
-		ROCParameter parameter = ROCParameter(1, 1, genome.getGenomeSize(), .8, 1, false);
-		parameter.InitializeExpression(genome, .8);
-		MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, true, false, true);
+		ROCParameter parameter = ROCParameter(1, 1, genome.getGenomeSize(), 2, 1, false);
+		parameter.InitializeExpression(genome, 2);
+		MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, true, true, true);
 
 		std::ofstream scuoout("/results/test.scuo");
 		for(int n = 0; n < genome.getGenomeSize(); n++)

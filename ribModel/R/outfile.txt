@@ -1,0 +1,628 @@
+BC118093 
+PREDICTED: Ovis aries musimon F-box/LRR-repeat protein 14 (LOC105609995), transcript variant X3, mRNA 
+PREDICTED: Ovis aries musimon F-box/LRR-repeat protein 14 (LOC105609995), transcript variant X2, mRNA 
+PREDICTED: Ovis aries musimon F-box/LRR-repeat protein 14 (LOC105609995), transcript variant X1, mRNA 
+PREDICTED: Bos taurus F-box and leucine-rich repeat protein 14 (FBXL14), transcript variant X7, mRNA 
+PREDICTED: Bos taurus F-box and leucine-rich repeat protein 14 (FBXL14), transcript variant X4, mRNA 
+PREDICTED: Bos taurus F-box and leucine-rich repeat protein 14 (FBXL14), transcript variant X3, mRNA 
+PREDICTED: Bos taurus F-box and leucine-rich repeat protein 14 (FBXL14), transcript variant X2, misc_RNA 
+PREDICTED: Bos taurus F-box and leucine-rich repeat protein 14 (FBXL14), transcript variant X1, mRNA 
+Bos taurus F-box and leucine-rich repeat protein 14 (FBXL14), mRNA >gi|109659304|gb|BC118093.1| Bos taurus F-box and leucine-rich repeat protein 14, mRNA (cDNA clone MGC:137762 IMAGE:8082742), complete cds 
+PREDICTED: Lipotes vexillifer F-box and leucine-rich repeat protein 14 (FBXL14), mRNA 
+
+BC108154 
+ 
+ 
+
+BC153217 
+Bos taurus exosome component 6 (EXOSC6), mRNA >gi|157743162|gb|BC153217.1| Bos taurus exosome component 6, mRNA (cDNA clone MGC:148939 IMAGE:8253519), complete cds 
+PREDICTED: Ovis aries musimon exosome component 6 (EXOSC6), transcript variant X2, mRNA 
+PREDICTED: Canis lupus familiaris exosome component 6 (EXOSC6), mRNA 
+PREDICTED: Lipotes vexillifer exosome component 6 (EXOSC6), mRNA 
+PREDICTED: Dasypus novemcinctus exosome component 6 (EXOSC6), mRNA 
+PREDICTED: Odobenus rosmarus divergens exosome component 6 (EXOSC6), mRNA 
+PREDICTED: Peromyscus maniculatus bairdii exosome component 6 (Exosc6), mRNA 
+PREDICTED: Sus scrofa exosome component 6 (EXOSC6), mRNA 
+PREDICTED: Ceratotherium simum simum exosome component 6 (EXOSC6), mRNA 
+PREDICTED: Orcinus orca exosome component 6 (EXOSC6), mRNA 
+
+BC148870 
+PREDICTED: Bos taurus galactosylceramide sulfotransferase-like (LOC100852110), transcript variant X9, mRNA 
+PREDICTED: Bos taurus galactosylceramide sulfotransferase-like (LOC100852110), transcript variant X8, mRNA 
+Bos taurus galactose-3-O-sulfotransferase 1 (GAL3ST1), mRNA >gi|151553574|gb|BC148870.1| Bos taurus galactose-3-O-sulfotransferase 1, mRNA (cDNA clone MGC:140153 IMAGE:8166201), complete cds 
+PREDICTED: Bison bison bison galactose-3-O-sulfotransferase 1 (GAL3ST1), mRNA 
+PREDICTED: Bos taurus galactosylceramide sulfotransferase-like (LOC100852110), transcript variant X7, mRNA 
+PREDICTED: Bos taurus galactosylceramide sulfotransferase-like (LOC100852110), transcript variant X6, mRNA 
+PREDICTED: Bos taurus galactosylceramide sulfotransferase-like (LOC100852110), transcript variant X5, mRNA 
+PREDICTED: Bos taurus galactosylceramide sulfotransferase-like (LOC100852110), transcript variant X4, mRNA 
+PREDICTED: Bos taurus galactosylceramide sulfotransferase-like (LOC100852110), transcript variant X3, mRNA 
+PREDICTED: Bos taurus galactosylceramide sulfotransferase-like (LOC100852110), transcript variant X2, mRNA 
+
+BC102398 
+Bos taurus CLDN3 mRNA for claudin 3, complete cds, tissue_type: duodenum 
+Bos taurus claudin 3 (CLDN3), mRNA >gi|74354602|gb|BC102398.1| Bos taurus claudin 3, mRNA (cDNA clone MGC:127558 IMAGE:7947983), complete cds 
+PREDICTED: Bubalus bubalis claudin 3 (CLDN3), mRNA 
+PREDICTED: Capra hircus claudin 3 (CLDN3), mRNA 
+PREDICTED: Ovis aries musimon claudin 3 (CLDN3), transcript variant X2, mRNA 
+PREDICTED: Ovis aries claudin 3 (CLDN3), transcript variant X1, mRNA 
+PREDICTED: Balaenoptera acutorostrata scammoni claudin 3 (CLDN3), mRNA 
+PREDICTED: Bison bison bison claudin 3 (CLDN3), mRNA 
+Canis lupus familiaris claudin 3 (CLDN3), mRNA >gi|13991614|gb|AF358908.1|AF358908 Canis familiaris integral membrane protein claudin-3 mRNA, complete cds 
+PREDICTED: Physeter catodon claudin 3 (CLDN3), mRNA 
+
+BC142474 
+Bos taurus ADP-ribosylation factor-like 4C (ARL4C), mRNA >gi|148744244|gb|BC142474.1| Bos taurus ADP-ribosylation factor-like 4C, mRNA (cDNA clone MGC:160059 IMAGE:8511600), complete cds 
+PREDICTED: Bison bison bison ADP-ribosylation factor-like 4C (ARL4C), mRNA 
+PREDICTED: Bubalus bubalis ADP-ribosylation factor-like 4C (ARL4C), mRNA 
+PREDICTED: Bos mutus ADP-ribosylation factor-like protein 4C-like (LOC102278873), mRNA 
+Bos taurus ADP-ribosylation factor-like 4C, mRNA (cDNA clone MGC:152553 IMAGE:8429416), complete cds 
+PREDICTED: Pantholops hodgsonii ADP-ribosylation factor-like 4C (ARL4C), mRNA 
+Ovis aries ADP-ribosylation factor-like 4C (ARL4C), mRNA >gi|238799795|gb|FJ969415.1| Ovis aries ADP-ribosylation factor-like 4C (ARL4C) mRNA, complete cds 
+PREDICTED: Equus przewalskii ADP-ribosylation factor-like 4C (ARL4C), mRNA 
+PREDICTED: Tarsius syrichta ADP-ribosylation factor-like 4C (ARL4C), mRNA 
+PREDICTED: Oryctolagus cuniculus ADP-ribosylation factor-like 4C (ARL4C), mRNA 
+
+BC102066 
+PREDICTED: Bubalus bubalis macrophage migration inhibitory factor (glycosylation-inhibiting factor) (MIF), mRNA 
+Bos taurus macrophage migration inhibitory factor (glycosylation-inhibiting factor) (MIF), mRNA >gi|74353846|gb|BC102066.1| Bos taurus macrophage migration inhibitory factor (glycosylation-inhibiting factor), mRNA (cDNA clone MGC:127044 IMAGE:7942208), complete cds 
+Ovis aries macrophage migration inhibitory factor (glycosylation-inhibiting factor) (MIF), mRNA >gi|89279395|gb|DQ414692.1| Ovis aries macrophage migration inhibitory factor (MIF) mRNA, complete cds 
+Ovis aries macrophage migration inhibitory factor (MIF) mRNA, partial cds 
+PREDICTED: Dasypus novemcinctus macrophage migration inhibitory factor-like (LOC101445827), transcript variant 2, mRNA 
+PREDICTED: Eptesicus fuscus macrophage migration inhibitory factor (glycosylation-inhibiting factor) (MIF), mRNA 
+PREDICTED: Camelus bactrianus macrophage migration inhibitory factor (glycosylation-inhibiting factor) (MIF), mRNA 
+PREDICTED: Camelus ferus macrophage migration inhibitory factor (glycosylation-inhibiting factor) (MIF), mRNA 
+PREDICTED: Orcinus orca macrophage migration inhibitory factor (glycosylation-inhibiting factor) (MIF), mRNA 
+Vicugna pacos macrophage migration inhibitory factor (glycosylation-inhibiting factor) (MIF), mRNA 
+
+BC147893 
+ 
+ 
+
+BC120329 
+ 
+ 
+
+BC148145 
+ 
+ 
+
+BC147888 
+PREDICTED: Bos mutus apelin receptor (APLNR), mRNA 
+Bos taurus apelin receptor (APLNR), mRNA 
+Bos taurus apelin receptor, mRNA (cDNA clone MGC:152407 IMAGE:8416503), complete cds 
+PREDICTED: Bubalus bubalis apelin receptor (APLNR), mRNA 
+PREDICTED: Ovis aries musimon apelin receptor-like (LOC105613330), mRNA 
+PREDICTED: Tursiops truncatus apelin receptor (APLNR), mRNA 
+Pseudorca crassidens DNA, BAC clone: QGB1-201G08, complete sequence 
+PREDICTED: Ochotona princeps apelin receptor (APLNR), mRNA 
+PREDICTED: Orcinus orca apelin receptor (APLNR), mRNA 
+PREDICTED: Galeopterus variegatus apelin receptor (APLNR), mRNA 
+
+BC113349 
+PREDICTED: Bos mutus claudin 5 (CLDN5), mRNA 
+Bos taurus claudin 5 (CLDN5), mRNA >gi|87578218|gb|BC113349.1| Bos taurus claudin 5, mRNA (cDNA clone MGC:138054 IMAGE:8088061), complete cds 
+PREDICTED: Bubalus bubalis claudin 5 (CLDN5), mRNA 
+PREDICTED: Ovis aries musimon claudin-5 (LOC101115864), transcript variant X2, mRNA 
+PREDICTED: Canis lupus familiaris claudin 5 (CLDN5), mRNA 
+PREDICTED: Camelus dromedarius claudin 5 (CLDN5), mRNA 
+PREDICTED: Camelus bactrianus claudin 5 (CLDN5), mRNA 
+PREDICTED: Mustela putorius furo claudin 5 (CLDN5), mRNA 
+PREDICTED: Mustela putorius furo claudin 5 (CLDN5), mRNA 
+PREDICTED: Ovis aries claudin-5 (LOC101115864), transcript variant X1, mRNA 
+
+BC120379 
+Bos taurus keratin associated protein-like (LOC777598), mRNA >gi|111305324|gb|BC120379.1| Bos taurus keratin associated protein-like, mRNA (cDNA clone MGC:143210 IMAGE:8236968), complete cds 
+PREDICTED: Bison bison bison keratin-associated protein 2-1-like (LOC104990484), mRNA 
+PREDICTED: Bison bison bison keratin, high-sulfur matrix protein, IIIA3 (LOC104990482), mRNA 
+Bos taurus keratin associated protein-like (LOC618938), mRNA >gi|148745581|gb|BC142130.1| Bos taurus similar to Keratin associated protein-like, mRNA (cDNA clone MGC:159960 IMAGE:8472007), complete cds 
+PREDICTED: Bos taurus keratin, high-sulfur matrix protein, IIIA3 (LOC100295015), mRNA 
+PREDICTED: Bos taurus keratin, high-sulfur matrix protein, IIIA3 (LOC100295015), mRNA 
+PREDICTED: Bos mutus keratin, high-sulfur matrix protein, IIIA3-like (LOC102265335), mRNA 
+PREDICTED: Bos mutus keratin, high-sulfur matrix protein, IIIA3-like (LOC102285173), mRNA 
+PREDICTED: Bos mutus keratin, high-sulfur matrix protein, IIIA3-like (LOC102284895), mRNA 
+PREDICTED: Pantholops hodgsonii keratin, high-sulfur matrix protein, IIIA3-like (LOC102321229), mRNA 
+
+BC142130 
+PREDICTED: Bison bison bison keratin, high-sulfur matrix protein, IIIA3 (LOC104990482), mRNA 
+Bos taurus keratin associated protein-like (LOC618938), mRNA >gi|148745581|gb|BC142130.1| Bos taurus similar to Keratin associated protein-like, mRNA (cDNA clone MGC:159960 IMAGE:8472007), complete cds 
+PREDICTED: Bos taurus keratin, high-sulfur matrix protein, IIIA3 (LOC100295015), mRNA 
+PREDICTED: Bos taurus keratin, high-sulfur matrix protein, IIIA3 (LOC100295015), mRNA 
+PREDICTED: Bison bison bison keratin-associated protein 2-1-like (LOC104990484), mRNA 
+PREDICTED: Bos mutus keratin, high-sulfur matrix protein, IIIA3-like (LOC102265335), mRNA 
+PREDICTED: Bos mutus keratin, high-sulfur matrix protein, IIIA3-like (LOC102285173), mRNA 
+PREDICTED: Bos mutus keratin, high-sulfur matrix protein, IIIA3-like (LOC102284895), mRNA 
+Bos taurus keratin associated protein-like (LOC777598), mRNA >gi|111305324|gb|BC120379.1| Bos taurus keratin associated protein-like, mRNA (cDNA clone MGC:143210 IMAGE:8236968), complete cds 
+Bos taurus keratin associated protein-like (LOC787225), mRNA >gi|148744886|gb|BC142135.1| Bos taurus similar to Keratin associated protein-like, mRNA (cDNA clone MGC:159984 IMAGE:8482585), complete cds 
+
+BC110002 
+ 
+ 
+
+BC133460 
+ 
+ 
+
+BC140470 
+ 
+ 
+
+BC142135 
+Bos taurus keratin associated protein-like (LOC787225), mRNA >gi|148744886|gb|BC142135.1| Bos taurus similar to Keratin associated protein-like, mRNA (cDNA clone MGC:159984 IMAGE:8482585), complete cds 
+PREDICTED: Bison bison bison keratin-associated protein 2-1-like (LOC104990484), mRNA 
+PREDICTED: Bison bison bison keratin, high-sulfur matrix protein, IIIA3 (LOC104990482), mRNA 
+PREDICTED: Bos mutus keratin, high-sulfur matrix protein, IIIA3-like (LOC102265335), mRNA 
+PREDICTED: Bos mutus keratin, high-sulfur matrix protein, IIIA3-like (LOC102285173), mRNA 
+PREDICTED: Bos mutus keratin, high-sulfur matrix protein, IIIA3-like (LOC102284895), mRNA 
+Bos taurus keratin associated protein-like (LOC618938), mRNA >gi|148745581|gb|BC142130.1| Bos taurus similar to Keratin associated protein-like, mRNA (cDNA clone MGC:159960 IMAGE:8472007), complete cds 
+PREDICTED: Bos taurus keratin, high-sulfur matrix protein, IIIA3 (LOC100295015), mRNA 
+PREDICTED: Bos taurus keratin, high-sulfur matrix protein, IIIA3 (LOC100295015), mRNA 
+Bos taurus keratin associated protein-like (LOC777598), mRNA >gi|111305324|gb|BC120379.1| Bos taurus keratin associated protein-like, mRNA (cDNA clone MGC:143210 IMAGE:8236968), complete cds 
+
+BC134662 
+PREDICTED: Bison bison bison twist family bHLH transcription factor 2 (TWIST2), mRNA 
+Bos taurus twist family bHLH transcription factor 2 (TWIST2), mRNA >gi|134024751|gb|BC134662.1| Bos taurus twist homolog 2 (Drosophila), mRNA (cDNA clone MGC:151849 IMAGE:8474040), complete cds 
+PREDICTED: Bubalus bubalis twist family bHLH transcription factor 2 (TWIST2), mRNA 
+PREDICTED: Ovis aries musimon twist family bHLH transcription factor 2 (TWIST2), transcript variant X2, mRNA 
+PREDICTED: Ovis aries twist family bHLH transcription factor 2 (TWIST2), transcript variant X1, mRNA 
+PREDICTED: Eptesicus fuscus twist family bHLH transcription factor 2 (TWIST2), mRNA 
+PREDICTED: Lipotes vexillifer twist family bHLH transcription factor 2 (TWIST2), mRNA 
+PREDICTED: Myotis lucifugus twist family bHLH transcription factor 2 (TWIST2), mRNA 
+PREDICTED: Balaenoptera acutorostrata scammoni twist family bHLH transcription factor 2 (TWIST2), transcript variant X2, mRNA 
+PREDICTED: Balaenoptera acutorostrata scammoni twist family bHLH transcription factor 2 (TWIST2), transcript variant X1, mRNA 
+
+BC134569 
+ 
+ 
+
+BC122753 
+ 
+ 
+
+BC146088 
+ 
+ 
+
+BC123432 
+ 
+ 
+
+BC122779 
+ 
+ 
+
+BC123770 
+Bos taurus phosphatidic acid phosphatase type 2 domain containing 3 (PPAPDC3), mRNA >gi|115305209|gb|BC123770.1| Bos taurus phosphatidic acid phosphatase type 2 domain containing 3, mRNA (cDNA clone MGC:143389 IMAGE:8141929), complete cds 
+PREDICTED: Bos mutus phosphatidic acid phosphatase type 2 domain containing 3 (PPAPDC3), mRNA 
+PREDICTED: Bison bison bison phosphatidic acid phosphatase type 2 domain containing 3 (PPAPDC3), mRNA 
+PREDICTED: Bubalus bubalis phosphatidic acid phosphatase type 2 domain containing 3 (PPAPDC3), transcript variant X5, misc_RNA 
+PREDICTED: Bubalus bubalis phosphatidic acid phosphatase type 2 domain containing 3 (PPAPDC3), transcript variant X4, mRNA 
+PREDICTED: Bubalus bubalis phosphatidic acid phosphatase type 2 domain containing 3 (PPAPDC3), transcript variant X3, mRNA 
+PREDICTED: Bubalus bubalis phosphatidic acid phosphatase type 2 domain containing 3 (PPAPDC3), transcript variant X2, mRNA 
+PREDICTED: Bubalus bubalis phosphatidic acid phosphatase type 2 domain containing 3 (PPAPDC3), transcript variant X1, mRNA 
+PREDICTED: Pantholops hodgsonii phosphatidic acid phosphatase type 2 domain containing 3 (PPAPDC3), mRNA 
+PREDICTED: Ovis aries musimon phosphatidic acid phosphatase type 2 domain containing 3 (PPAPDC3), transcript variant X2, mRNA 
+
+BC126618 
+PREDICTED: Ovis aries musimon transmembrane protein 229B (TMEM229B), transcript variant X22, mRNA 
+PREDICTED: Ovis aries musimon transmembrane protein 229B (TMEM229B), transcript variant X21, mRNA 
+PREDICTED: Ovis aries musimon transmembrane protein 229B (TMEM229B), transcript variant X20, mRNA 
+PREDICTED: Ovis aries musimon transmembrane protein 229B (TMEM229B), transcript variant X19, mRNA 
+PREDICTED: Ovis aries musimon transmembrane protein 229B (TMEM229B), transcript variant X18, mRNA 
+PREDICTED: Ovis aries musimon transmembrane protein 229B (TMEM229B), transcript variant X17, mRNA 
+PREDICTED: Ovis aries musimon transmembrane protein 229B (TMEM229B), transcript variant X16, mRNA 
+PREDICTED: Ovis aries musimon transmembrane protein 229B (TMEM229B), transcript variant X15, mRNA 
+PREDICTED: Ovis aries musimon transmembrane protein 229B (TMEM229B), transcript variant X14, mRNA 
+PREDICTED: Ovis aries musimon transmembrane protein 229B (TMEM229B), transcript variant X13, mRNA 
+
+BC142331 
+PREDICTED: Bos taurus tumor necrosis factor, alpha-induced protein 8-like 1 (TNFAIP8L1), transcript variant X1, mRNA 
+Bos taurus tumor necrosis factor, alpha-induced protein 8-like 1 (TNFAIP8L1), mRNA 
+Bos taurus tumor necrosis factor, alpha-induced protein 8-like 1, mRNA (cDNA clone MGC:157211 IMAGE:8451456), complete cds 
+PREDICTED: Bison bison bison tumor necrosis factor, alpha-induced protein 8-like 1 (TNFAIP8L1), mRNA 
+PREDICTED: Bubalus bubalis tumor necrosis factor, alpha-induced protein 8-like 1 (TNFAIP8L1), mRNA 
+PREDICTED: Ovis aries musimon tumor necrosis factor, alpha-induced protein 8-like 1 (TNFAIP8L1), transcript variant X6, mRNA 
+PREDICTED: Ovis aries musimon tumor necrosis factor, alpha-induced protein 8-like 1 (TNFAIP8L1), transcript variant X5, mRNA 
+PREDICTED: Ovis aries musimon tumor necrosis factor, alpha-induced protein 8-like 1 (TNFAIP8L1), transcript variant X4, mRNA 
+PREDICTED: Orcinus orca tumor necrosis factor, alpha-induced protein 8-like 1 (TNFAIP8L1), mRNA 
+PREDICTED: Tursiops truncatus tumor necrosis factor, alpha-induced protein 8-like 1 (TNFAIP8L1), mRNA 
+
+BC151584 
+ 
+ 
+
+BC142500 
+ 
+ 
+
+BC112702 
+ 
+ 
+
+BC151561 
+ 
+ 
+
+BC114174 
+Bos taurus family with sequence similarity 46, member B (FAM46B), mRNA >gi|88954356|gb|BC114174.1| Bos taurus family with sequence similarity 46, member B, mRNA (cDNA clone MGC:137624 IMAGE:8180983), complete cds 
+PREDICTED: Bubalus bubalis family with sequence similarity 46, member B (FAM46B), mRNA 
+PREDICTED: Bos mutus family with sequence similarity 46, member B (FAM46B), mRNA 
+PREDICTED: Ovis aries musimon family with sequence similarity 46, member B (FAM46B), mRNA 
+PREDICTED: Ovis aries family with sequence similarity 46, member B (FAM46B), mRNA 
+PREDICTED: Bison bison bison family with sequence similarity 46, member B (FAM46B), mRNA 
+PREDICTED: Macaca nemestrina family with sequence similarity 46, member B (FAM46B), mRNA 
+PREDICTED: Cercocebus atys family with sequence similarity 46, member B (FAM46B), mRNA 
+PREDICTED: Papio anubis family with sequence similarity 46, member B (FAM46B), mRNA 
+PREDICTED: Macaca fascicularis family with sequence similarity 46, member B (FAM46B), transcript variant X2, mRNA 
+
+BC103067 
+ 
+ 
+
+BC134708 
+ 
+ 
+
+BC141997 
+Bos taurus oxytocin, prepropeptide, mRNA (cDNA clone MGC:159461 IMAGE:8389386), complete cds 
+Bos taurus oxytocin/neurophysin I prepropeptide (OXT), mRNA >gi|163464|gb|M25648.1|BOVOTC Bovine oxytocin mRNA, complete cds 
+PREDICTED: Bubalus bubalis oxytocin/neurophysin I prepropeptide (OXT), mRNA 
+Ovis aries oxytocin/neurophysin I prepropeptide (OXT), mRNA 
+Ovine OT-NPI mRNA for oxytocin-Neurophysin I precursor 
+Bos taurus oxytocin-neurophysin I precursor mRNA fragment 
+PREDICTED: Orcinus orca oxytocin/neurophysin I prepropeptide (OXT), mRNA 
+Bovine mRNA for oxytocin precursor and neurophysin I 
+PREDICTED: Tursiops truncatus oxytocin/neurophysin I prepropeptide (OXT), mRNA 
+PREDICTED: Lipotes vexillifer oxytocin/neurophysin I prepropeptide (OXT), mRNA 
+
+BC146266 
+Bos taurus insulinoma-associated 1 (INSM1), mRNA >gi|148878133|gb|BC146266.1| Bos taurus insulinoma-associated 1, mRNA (cDNA clone MGC:148636 IMAGE:8117266), complete cds 
+Bos taurus insulinoma-associated 1 (INSM1), mRNA >gi|148878133|gb|BC146266.1| Bos taurus insulinoma-associated 1, mRNA (cDNA clone MGC:148636 IMAGE:8117266), complete cds 
+PREDICTED: Ovis aries musimon insulinoma-associated protein 1 (LOC105609016), mRNA 
+PREDICTED: Ovis aries musimon insulinoma-associated protein 1 (LOC105609016), mRNA 
+PREDICTED: Leptonychotes weddellii insulinoma-associated 1 (INSM1), mRNA 
+PREDICTED: Odobenus rosmarus divergens insulinoma-associated 1 (INSM1), mRNA 
+PREDICTED: Odobenus rosmarus divergens insulinoma-associated 1 (INSM1), mRNA 
+PREDICTED: Spermophilus tridecemlineatus insulinoma-associated 1 (Insm1), mRNA 
+PREDICTED: Tursiops truncatus insulinoma-associated 1 (INSM1), mRNA 
+PREDICTED: Tursiops truncatus insulinoma-associated 1 (INSM1), mRNA 
+PREDICTED: Orcinus orca insulinoma-associated 1 (INSM1), mRNA 
+PREDICTED: Orcinus orca insulinoma-associated 1 (INSM1), mRNA 
+PREDICTED: Pan troglodytes insulinoma-associated 1 (INSM1), mRNA 
+PREDICTED: Pan troglodytes insulinoma-associated 1 (INSM1), mRNA 
+PREDICTED: Pongo abelii insulinoma-associated 1 (INSM1), mRNA 
+PREDICTED: Pongo abelii insulinoma-associated 1 (INSM1), mRNA 
+Homo sapiens insulinoma-associated 1 (INSM1), mRNA 
+Homo sapiens insulinoma-associated 1 (INSM1), mRNA 
+
+BC103083 
+ 
+ 
+
+BC142034 
+Bos taurus proinsulin mRNA, partial cds 
+Bos taurus insulin (INS), transcript variant 2, mRNA 
+Bos taurus insulin (INS), transcript variant 1, mRNA 
+Bos taurus insulin, mRNA (cDNA clone MGC:159719 IMAGE:8631936), complete cds 
+Bovine preproinsulin mRNA, complete cds 
+Bubalus bubalis bpi mRNA for proinsulin, partial cds 
+PREDICTED: Bubalus bubalis insulin (INS), transcript variant X2, mRNA 
+PREDICTED: Bubalus bubalis insulin (INS), transcript variant X1, mRNA 
+PREDICTED: Ovis aries musimon insulin (LOC105613195), transcript variant X2, mRNA 
+PREDICTED: Ovis aries musimon insulin (LOC105613195), transcript variant X1, mRNA 
+
+BC123709 
+ 
+ 
+
+BC133376 
+ 
+ 
+
+BC105534 
+PREDICTED: Bos mutus claudin 4 (CLDN4), mRNA 
+Bos taurus CLDN4 mRNA for claudin-4, complete cds 
+Bos taurus claudin 4 (CLDN4), mRNA >gi|86821965|gb|BC105534.1| Bos taurus claudin 4, mRNA (cDNA clone MGC:128914 IMAGE:8120306), complete cds 
+Bos taurus CLDN4 mRNA for claudin 4, partial cds 
+PREDICTED: Bison bison bison claudin 4 (CLDN4), mRNA 
+PREDICTED: Bubalus bubalis claudin 4 (CLDN4), mRNA 
+Ovis aries claudin 4 (CLDN4), mRNA >gi|295916840|gb|HM117763.1| Ovis aries claudin-4 mRNA, complete cds 
+PREDICTED: Pantholops hodgsonii claudin 4 (CLDN4), mRNA 
+PREDICTED: Leptonychotes weddellii claudin 4 (CLDN4), mRNA 
+Sus scrofa clone RP44-290D23, complete sequence 
+Sus scrofa clone RP44-290D23, complete sequence 
+
+BC133581 
+ 
+ 
+
+BC149972 
+ 
+ 
+
+BC153298 
+ 
+ 
+
+BC151267 
+ 
+ 
+
+BC107546 
+ 
+ 
+
+BC150034 
+Bos taurus solute carrier family 25 (mitochondrial carrier; adenine nucleotide translocator), member 6 (SLC25A6), mRNA 
+Bos taurus solute carrier family 25 (mitochondrial carrier; adenine nucleotide translocator), member 6, mRNA (cDNA clone MGC:166054 IMAGE:8634856), complete cds 
+Bos taurus solute carrier family 25 (mitochondrial carrier; adenine nucleotide translocator), member 6 (SLC25A6), mRNA, complete cds 
+Bovine ADP/ATP translocase T2 mRNA, complete cds 
+Bos mutus ADP/ATP translocase 3 (SLC25A6) mRNA, complete cds 
+Ovis aries solute carrier family 25 (mitochondrial carrier; adenine nucleotide translocator), member 6 (SLC25A6), mRNA >gi|186886457|gb|EU626209.1| Ovis aries SLC25A6 mRNA, complete cds 
+PREDICTED: Bubalus bubalis solute carrier family 25 (mitochondrial carrier; adenine nucleotide translocator), member 6 (SLC25A6), mRNA 
+PREDICTED: Pteropus vampyrus solute carrier family 25 (mitochondrial carrier; adenine nucleotide translocator), member 6 (SLC25A6), mRNA 
+PREDICTED: Saimiri boliviensis boliviensis solute carrier family 25 (mitochondrial carrier; adenine nucleotide translocator), member 6 (SLC25A6), mRNA 
+PREDICTED: Pteropus alecto solute carrier family 25 (mitochondrial carrier; adenine nucleotide translocator), member 6 (SLC25A6), mRNA 
+
+BC122675 
+Bos taurus KCNE1-like (KCNE1L), mRNA >gi|113911869|gb|BC122675.1| Bos taurus KCNE1-like, mRNA (cDNA clone MGC:143375 IMAGE:8140335), complete cds 
+PREDICTED: Ovis aries musimon potassium voltage-gated channel subfamily E member 1-like protein (LOC105613236), mRNA 
+PREDICTED: Ovis aries potassium channel, voltage gated subfamily E regulatory beta subunit 5 (KCNE5), mRNA 
+PREDICTED: Bubalus bubalis KCNE1-like (KCNE1L), mRNA 
+PREDICTED: Lipotes vexillifer KCNE1-like (KCNE1L), mRNA 
+PREDICTED: Physeter catodon KCNE1-like (KCNE1L), mRNA 
+PREDICTED: Sus scrofa KCNE1-like (KCNE1L), mRNA 
+PREDICTED: Orcinus orca KCNE1-like (KCNE1L), mRNA 
+Pig DNA sequence from clone CH242-17O13 on chromosome X, complete sequence 
+PREDICTED: Ceratotherium simum simum KCNE1-like (KCNE1L), mRNA 
+
+BC142101 
+Bos taurus MOB kinase activator 2 (MOB2), mRNA >gi|148744003|gb|BC142101.1| Bos taurus HCCA2 protein, mRNA (cDNA clone MGC:152563 IMAGE:8430183), complete cds 
+PREDICTED: Bos taurus MOB kinase activator 2 (MOB2), transcript variant X2, mRNA 
+PREDICTED: Bos taurus MOB kinase activator 2 (MOB2), transcript variant X1, mRNA 
+PREDICTED: Bison bison bison MOB kinase activator 2 (MOB2), transcript variant X3, mRNA 
+PREDICTED: Bison bison bison MOB kinase activator 2 (MOB2), transcript variant X2, mRNA 
+PREDICTED: Bison bison bison MOB kinase activator 2 (MOB2), transcript variant X1, mRNA 
+PREDICTED: Bos mutus MOB kinase activator 2 (MOB2), mRNA 
+PREDICTED: Ovis aries musimon MOB kinase activator 2 (LOC105613477), transcript variant X3, mRNA 
+PREDICTED: Bubalus bubalis MOB kinase activator 2 (MOB2), mRNA 
+PREDICTED: Pantholops hodgsonii MOB kinase activator 2 (MOB2), mRNA 
+
+BC122776 
+ 
+ 
+
+BC118142 
+PREDICTED: Bison bison bison ceroid-lipofuscinosis, neuronal 8 (epilepsy, progressive with mental retardation) (CLN8), transcript variant X7, mRNA 
+PREDICTED: Bison bison bison ceroid-lipofuscinosis, neuronal 8 (epilepsy, progressive with mental retardation) (CLN8), transcript variant X6, mRNA 
+PREDICTED: Bison bison bison ceroid-lipofuscinosis, neuronal 8 (epilepsy, progressive with mental retardation) (CLN8), transcript variant X5, mRNA 
+PREDICTED: Bison bison bison ceroid-lipofuscinosis, neuronal 8 (epilepsy, progressive with mental retardation) (CLN8), transcript variant X4, mRNA 
+PREDICTED: Bison bison bison ceroid-lipofuscinosis, neuronal 8 (epilepsy, progressive with mental retardation) (CLN8), transcript variant X3, mRNA 
+PREDICTED: Bison bison bison ceroid-lipofuscinosis, neuronal 8 (epilepsy, progressive with mental retardation) (CLN8), transcript variant X2, mRNA 
+PREDICTED: Bison bison bison ceroid-lipofuscinosis, neuronal 8 (epilepsy, progressive with mental retardation) (CLN8), transcript variant X1, mRNA 
+Bos taurus ceroid-lipofuscinosis, neuronal 8 (epilepsy, progressive with mental retardation) (CLN8), mRNA 
+Bos taurus ceroid-lipofuscinosis, neuronal 8 (epilepsy, progressive with mental retardation), mRNA (cDNA clone MGC:139174 IMAGE:8089733), complete cds 
+PREDICTED: Bos mutus ceroid-lipofuscinosis, neuronal 8 (epilepsy, progressive with mental retardation) (CLN8), mRNA 
+
+BC133366 
+PREDICTED: Bos taurus SAM pointed domain containing ETS transcription factor (SPDEF), transcript variant X1, mRNA 
+Bos taurus SAM pointed domain containing ETS transcription factor (SPDEF), mRNA >gi|124829215|gb|BC133366.1| Bos taurus SAM pointed domain containing ets transcription factor, mRNA (cDNA clone MGC:154962 IMAGE:8088762), complete cds 
+PREDICTED: Bubalus bubalis SAM pointed domain containing ETS transcription factor (SPDEF), transcript variant X2, mRNA 
+PREDICTED: Bubalus bubalis SAM pointed domain containing ETS transcription factor (SPDEF), transcript variant X1, mRNA 
+PREDICTED: Ovis aries musimon SAM pointed domain containing ETS transcription factor (SPDEF), transcript variant X2, mRNA 
+PREDICTED: Bos mutus SAM pointed domain containing ETS transcription factor (SPDEF), transcript variant X2, mRNA 
+PREDICTED: Bos mutus SAM pointed domain containing ETS transcription factor (SPDEF), transcript variant X1, mRNA 
+PREDICTED: Ovis aries SAM pointed domain containing ETS transcription factor (SPDEF), transcript variant X1, mRNA 
+PREDICTED: Pantholops hodgsonii SAM pointed domain containing ETS transcription factor (SPDEF), mRNA 
+PREDICTED: Mustela putorius furo SAM pointed domain containing ets transcription factor (SPDEF), transcript variant X5, mRNA 
+
+BC150089 
+PREDICTED: Bos taurus pannexin 2 (PANX2), transcript variant X1, mRNA 
+Bos taurus pannexin 2 (PANX2), mRNA >gi|151554715|gb|BC150089.1| Bos taurus pannexin 2, mRNA (cDNA clone MGC:166287 IMAGE:8311985), complete cds 
+PREDICTED: Bison bison bison pannexin 2 (PANX2), mRNA 
+PREDICTED: Bubalus bubalis pannexin 2 (PANX2), transcript variant X4, mRNA 
+PREDICTED: Bubalus bubalis pannexin 2 (PANX2), transcript variant X3, mRNA 
+PREDICTED: Bubalus bubalis pannexin 2 (PANX2), transcript variant X2, mRNA 
+PREDICTED: Bubalus bubalis pannexin 2 (PANX2), transcript variant X1, mRNA 
+PREDICTED: Ovis aries musimon pannexin 2 (PANX2), transcript variant X4, mRNA 
+PREDICTED: Ovis aries musimon pannexin 2 (PANX2), transcript variant X3, mRNA 
+PREDICTED: Ovis aries musimon pannexin 2 (PANX2), transcript variant X2, mRNA 
+
+BC102768 
+ 
+ 
+
+BC149069 
+ 
+ 
+
+BC150136 
+ 
+ 
+
+BC111232 
+ 
+ 
+
+BC114727 
+PREDICTED: Bos mutus protein reprimo-like (LOC102282346), mRNA 
+Bos taurus reprimo, TP53 dependent G2 arrest mediator candidate (RPRM), mRNA >gi|92096655|gb|BC114727.1| Bos taurus reprimo, TP53 dependent G2 arrest mediator candidate, mRNA (cDNA clone MGC:138015 IMAGE:8083333), complete cds 
+PREDICTED: Bison bison bison reprimo, TP53 dependent G2 arrest mediator candidate (RPRM), mRNA 
+PREDICTED: Ovis aries musimon protein reprimo (LOC105613709), mRNA 
+PREDICTED: Bubalus bubalis reprimo, TP53 dependent G2 arrest mediator candidate (RPRM), mRNA 
+PREDICTED: Capra hircus reprimo, TP53 dependent G2 arrest mediator candidate (RPRM), mRNA 
+PREDICTED: Pantholops hodgsonii reprimo, TP53 dependent G2 arrest mediator candidate (RPRM), mRNA 
+PREDICTED: Loxodonta africana reprimo, TP53 dependent G2 arrest mediator candidate (RPRM), mRNA 
+PREDICTED: Galeopterus variegatus reprimo, TP53 dependent G2 arrest mediator candidate (RPRM), mRNA 
+PREDICTED: Tarsius syrichta reprimo, TP53 dependent G2 arrest mediator candidate (RPRM), mRNA 
+
+BC123695 
+ 
+ 
+
+BC149006 
+ 
+ 
+
+BC149421 
+Bos taurus transmembrane and coiled-coil domain family 2, mRNA (cDNA clone MGC:157256 IMAGE:8199482), complete cds 
+PREDICTED: Ovis aries musimon transmembrane and coiled-coil domain family 2 (TMCC2), transcript variant X6, mRNA 
+PREDICTED: Pantholops hodgsonii transmembrane and coiled-coil domain family 2 (TMCC2), mRNA 
+Bos taurus transmembrane and coiled-coil domain family 2 (TMCC2), mRNA >gi|115304758|gb|BC123417.1| Bos taurus transmembrane and coiled-coil domain family 2, mRNA (cDNA clone MGC:139674 IMAGE:8211749), complete cds 
+PREDICTED: Bison bison bison transmembrane and coiled-coil domain family 2 (TMCC2), mRNA 
+PREDICTED: Bubalus bubalis transmembrane and coiled-coil domain family 2 (TMCC2), transcript variant X2, mRNA 
+PREDICTED: Bubalus bubalis transmembrane and coiled-coil domain family 2 (TMCC2), transcript variant X1, mRNA 
+PREDICTED: Ovis aries musimon transmembrane and coiled-coil domain family 2 (TMCC2), transcript variant X7, mRNA 
+PREDICTED: Ovis aries musimon transmembrane and coiled-coil domain family 2 (TMCC2), transcript variant X7, mRNA 
+PREDICTED: Ovis aries musimon transmembrane and coiled-coil domain family 2 (TMCC2), transcript variant X5, mRNA 
+PREDICTED: Ovis aries musimon transmembrane and coiled-coil domain family 2 (TMCC2), transcript variant X4, mRNA 
+
+BC105199 
+ 
+ 
+
+BC147960 
+PREDICTED: Bos taurus TAF2 RNA polymerase II, TATA box binding protein (TBP)-associated factor, 150kDa (TAF2), transcript variant X3, mRNA 
+PREDICTED: Bos taurus TAF2 RNA polymerase II, TATA box binding protein (TBP)-associated factor, 150kDa (TAF2), transcript variant X3, mRNA 
+PREDICTED: Bos taurus TAF2 RNA polymerase II, TATA box binding protein (TBP)-associated factor, 150kDa (TAF2), transcript variant X2, mRNA 
+PREDICTED: Bos taurus TAF2 RNA polymerase II, TATA box binding protein (TBP)-associated factor, 150kDa (TAF2), transcript variant X2, mRNA 
+Bos taurus TAF2 RNA polymerase II, TATA box binding protein (TBP)-associated factor, 150kDa (TAF2), mRNA 
+Bos taurus TAF2 RNA polymerase II, TATA box binding protein (TBP)-associated factor, 150kDa (TAF2), mRNA 
+Bos taurus TAF2 RNA polymerase II, TATA box binding protein (TBP)-associated factor, 150kDa, mRNA (cDNA clone MGC:166014 IMAGE:8273329), complete cds 
+Bos taurus TAF2 RNA polymerase II, TATA box binding protein (TBP)-associated factor, 150kDa, mRNA (cDNA clone MGC:166014 IMAGE:8273329), complete cds 
+PREDICTED: Bison bison bison TAF2 RNA polymerase II, TATA box binding protein (TBP)-associated factor, 150kDa (TAF2), transcript variant X5, mRNA 
+PREDICTED: Bison bison bison TAF2 RNA polymerase II, TATA box binding protein (TBP)-associated factor, 150kDa (TAF2), transcript variant X5, mRNA 
+PREDICTED: Bison bison bison TAF2 RNA polymerase II, TATA box binding protein (TBP)-associated factor, 150kDa (TAF2), transcript variant X4, mRNA 
+PREDICTED: Bison bison bison TAF2 RNA polymerase II, TATA box binding protein (TBP)-associated factor, 150kDa (TAF2), transcript variant X4, mRNA 
+PREDICTED: Bison bison bison TAF2 RNA polymerase II, TATA box binding protein (TBP)-associated factor, 150kDa (TAF2), transcript variant X2, mRNA 
+PREDICTED: Bison bison bison TAF2 RNA polymerase II, TATA box binding protein (TBP)-associated factor, 150kDa (TAF2), transcript variant X2, mRNA 
+PREDICTED: Bison bison bison TAF2 RNA polymerase II, TATA box binding protein (TBP)-associated factor, 150kDa (TAF2), transcript variant X1, mRNA 
+PREDICTED: Bison bison bison TAF2 RNA polymerase II, TATA box binding protein (TBP)-associated factor, 150kDa (TAF2), transcript variant X1, mRNA 
+PREDICTED: Bos mutus TAF2 RNA polymerase II, TATA box binding protein (TBP)-associated factor, 150kDa (TAF2), mRNA 
+PREDICTED: Bos mutus TAF2 RNA polymerase II, TATA box binding protein (TBP)-associated factor, 150kDa (TAF2), mRNA 
+PREDICTED: Ovis aries musimon TAF2 RNA polymerase II, TATA box binding protein (TBP)-associated factor, 150kDa (TAF2), transcript variant X7, mRNA 
+PREDICTED: Ovis aries musimon TAF2 RNA polymerase II, TATA box binding protein (TBP)-associated factor, 150kDa (TAF2), transcript variant X7, mRNA 
+
+BC149414 
+Bos taurus serpin peptidase inhibitor, clade D (heparin cofactor), member 1 (SERPIND1), mRNA 
+Bos taurus serpin peptidase inhibitor, clade D (heparin cofactor), member 1, mRNA (cDNA clone MGC:157268 IMAGE:7989226), complete cds 
+PREDICTED: Bos taurus serpin peptidase inhibitor, clade D (heparin cofactor), member 1 (SERPIND1), transcript variant X1, mRNA 
+PREDICTED: Bos mutus serpin peptidase inhibitor, clade D (heparin cofactor), member 1 (SERPIND1), mRNA 
+PREDICTED: Bubalus bubalis serpin peptidase inhibitor, clade D (heparin cofactor), member 1 (SERPIND1), transcript variant X3, mRNA 
+PREDICTED: Bubalus bubalis serpin peptidase inhibitor, clade D (heparin cofactor), member 1 (SERPIND1), transcript variant X2, mRNA 
+PREDICTED: Bubalus bubalis serpin peptidase inhibitor, clade D (heparin cofactor), member 1 (SERPIND1), transcript variant X1, mRNA 
+PREDICTED: Ovis aries musimon serpin peptidase inhibitor, clade D (heparin cofactor), member 1 (SERPIND1), transcript variant X3, mRNA 
+PREDICTED: Ovis aries musimon serpin peptidase inhibitor, clade D (heparin cofactor), member 1 (SERPIND1), transcript variant X2, mRNA 
+PREDICTED: Ovis aries serpin peptidase inhibitor, clade D (heparin cofactor), member 1 (SERPIND1), transcript variant X1, mRNA 
+
+BC118296 
+PREDICTED: Bos mutus MAS-related GPR, member F (MRGPRF), mRNA 
+Bos taurus MAS-related GPR, member F (MRGPRF), mRNA 
+Bos taurus MAS-related GPR, member F, mRNA (cDNA clone MGC:140049 IMAGE:8286904), complete cds 
+PREDICTED: Bison bison bison MAS-related GPR, member F (MRGPRF), mRNA 
+PREDICTED: Bubalus bubalis MAS-related GPR, member F (MRGPRF), mRNA 
+PREDICTED: Capra hircus MAS-related GPR, member F (MRGPRF), mRNA 
+PREDICTED: Ovis aries musimon MAS-related GPR, member F (MRGPRF), transcript variant X2, mRNA 
+PREDICTED: Pantholops hodgsonii MAS-related GPR, member F (MRGPRF), mRNA 
+PREDICTED: Camelus dromedarius MAS-related GPR, member F (MRGPRF), transcript variant X1, mRNA 
+PREDICTED: Ovis aries MAS-related GPR, member F (MRGPRF), transcript variant X1, mRNA 
+
+BC133343 
+Bos taurus tubulin polymerization promoting protein (TPPP), mRNA >gi|124829213|gb|BC133343.1| Bos taurus tubulin polymerization promoting protein, mRNA (cDNA clone MGC:152126 IMAGE:8396907), complete cds 
+B.taurus mRNA for 25kDa brain-specific protein 
+PREDICTED: Ovis aries musimon tubulin polymerization promoting protein (TPPP), transcript variant X4, mRNA 
+PREDICTED: Ovis aries musimon tubulin polymerization promoting protein (TPPP), transcript variant X3, mRNA 
+PREDICTED: Ovis aries musimon tubulin polymerization promoting protein (TPPP), transcript variant X2, mRNA 
+PREDICTED: Bubalus bubalis tubulin polymerization promoting protein (TPPP), mRNA 
+PREDICTED: Balaenoptera acutorostrata scammoni tubulin polymerization promoting protein (TPPP), mRNA 
+PREDICTED: Physeter catodon tubulin polymerization-promoting protein-like (LOC102973387), mRNA 
+PREDICTED: Lipotes vexillifer tubulin polymerization promoting protein (TPPP), mRNA 
+Sus scrofa tubulin polymerization promoting protein (TPPP), mRNA >gi|170178279|gb|EU522721.1| Sus scrofa tubulin polymerization promoting protein p25 alpha (TPPP) mRNA, complete cds 
+
+BC108219 
+ 
+ 
+
+BC105536 
+ 
+ 
+
+BC103329 
+ 
+ 
+
+BC102996 
+ 
+ 
+
+BC133603 
+ 
+ 
+
+BC118418 
+ 
+ 
+
+BC151312 
+ 
+ 
+
+BC134433 
+ 
+ 
+
+BC123647 
+ 
+ 
+
+BC153214 
+ 
+ 
+
+BC150101 
+ 
+ 
+
+BC111118 
+ 
+ 
+
+BC123800 
+ 
+ 
+
+BC153279 
+ 
+ 
+
+BC102897 
+Bos taurus arginine vasopressin (AVP), mRNA 
+Bos taurus arginine vasopressin, mRNA (cDNA clone MGC:128184 IMAGE:7984370), complete cds 
+Bovine vasopressin mRNA, complete cds 
+Bos taurus mRNA of vasopressin neurophysin II precursor 
+PREDICTED: Bubalus bubalis arginine vasopressin (AVP), mRNA 
+Ovis aries arginine vasopressin (AVP), mRNA >gi|158021638|gb|EU045357.1| Ovis aries vasopressin/neurophysin II precursor protein mRNA, complete cds 
+PREDICTED: Orcinus orca arginine vasopressin (AVP), mRNA 
+PREDICTED: Lipotes vexillifer arginine vasopressin (AVP), mRNA 
+PREDICTED: Ceratotherium simum simum arginine vasopressin (AVP), partial mRNA 
+PREDICTED: Equus caballus oxytocin/neurophysin I prepropeptide (OXT), mRNA 
+
+BC134453 
+ 
+ 
+
+BC153219 
+ 
+ 
+
+BC105496 
+ 
+ 
+
+BC140595 
+ 
+ 
+
+BC111132 
+ 
+ 
+

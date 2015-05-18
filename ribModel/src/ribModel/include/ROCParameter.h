@@ -57,7 +57,7 @@ class ROCParameter
 
         std::vector<std::vector<double>> currentSelectionParameter;
         std::vector<std::vector<double>> proposedSelectionParameter;
-
+        std::vector<unsigned> numAcceptForMutationAndSelection;
 
         unsigned numMixtures;
         std::vector<thetaK> categories;
@@ -88,14 +88,13 @@ class ROCParameter
         static const unsigned dEta;
         static std::default_random_engine generator; // static to make sure that the same generator is during the runtime.
 
-
         explicit ROCParameter();
-        ROCParameter(unsigned numMutationCategories, unsigned numSelectionCategories, unsigned numGenes, double sphi, unsigned _numMixtures, bool splitSer);
+        ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures, double* geneAssignment = nullptr, bool splitSer = true);
         virtual ~ROCParameter();
         ROCParameter(const ROCParameter& other);
         ROCParameter& operator=(const ROCParameter& rhs);
 
-        void initThetaK();
+        void initCategoryDefinitions();
 
         unsigned getNumMixtureElements() {return numMixtures;}
         unsigned getMutationCategory(unsigned group) {return categories[group].delM;}
@@ -104,7 +103,7 @@ class ROCParameter
         double getCategoryProbability(unsigned group) {return categoryProbabilities[group];}
         void setCategoryProbability(unsigned group, double value) {categoryProbabilities[group]= value;}
         void setMixtureAssignment(unsigned gene, unsigned value) {mixtureAssignment[gene] = value;}
-        unsigned getMixtureAssignment(unsigned value) {return mixtureAssignment[value];}
+        unsigned getMixtureAssignment(unsigned gene) {return mixtureAssignment[gene];}
         void updateCategoryProbabilitiesTrace(int samples)
         {
             for(unsigned category = 0; category < numMixtures; category++)
@@ -129,6 +128,7 @@ class ROCParameter
         void setExpression(double phi, unsigned geneIndex, unsigned category) {currentExpressionLevel[category][geneIndex] = phi;}
         void updateExpression(unsigned geneIndex)
         {
+            numAcceptForExpression[geneIndex]++;
             for(unsigned category = 0; category < numMixtures; category++)
             {
                 currentExpressionLevel[category][geneIndex] = proposedExpressionLevel[category][geneIndex]; numAcceptForExpression[geneIndex]++;
@@ -140,7 +140,7 @@ class ROCParameter
         void InitializeExpression(double* expression);
 
         // functions to manage codon specific parameter
-        void updateCodonSpecificParameter(unsigned category, unsigned paramType, char aa);
+        void updateCodonSpecificParameter(char aa);
 
         // functions to manage Sphi
         double getSphi(bool proposed = false) {return (proposed ? Sphi_proposed : Sphi);}
@@ -164,7 +164,7 @@ class ROCParameter
         void initSphiTrace(unsigned sample) {sPhiTrace.resize(sample);}
         void initMixtureAssignmentTrace(unsigned samples, unsigned num_genes);
         void initCategoryProbabilitesTrace(int samples);
-				void updateExpressionTrace(unsigned sample, unsigned geneIndex)
+        void updateExpressionTrace(unsigned sample, unsigned geneIndex)
         {
             for(unsigned category = 0; category < numMixtures; category++)
             {
@@ -172,10 +172,9 @@ class ROCParameter
             }
         }
         void updateSphiTrace(unsigned sample) {sPhiTrace[sample] = Sphi;}
-				void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex)
-				{mixtureAssignmentTrace[sample][geneIndex] = mixtureAssignment[geneIndex];}
-				std::vector<double> getAPhiTrace() {return aPhiTrace;}
-				std::vector<std::vector <unsigned>> getMixtureAssignmentTrace() {return mixtureAssignmentTrace;}
+        void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex) {mixtureAssignmentTrace[sample][geneIndex] = mixtureAssignment[geneIndex];}
+        std::vector<double> getAPhiTrace() {return aPhiTrace;}
+        std::vector<std::vector <unsigned>> getMixtureAssignmentTrace() {return mixtureAssignmentTrace;}
 
 				// functions to return estimates
         double getExpressionPosteriorMean(unsigned samples, unsigned geneIndex, unsigned category);
