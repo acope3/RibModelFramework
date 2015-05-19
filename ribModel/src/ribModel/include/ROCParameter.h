@@ -96,12 +96,13 @@ class ROCParameter
         static std::default_random_engine generator; // static to make sure that the same generator is during the runtime.
 
         explicit ROCParameter();
-				ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures, double* geneAssignment = nullptr, bool splitSer = true, std::string mutationSelectionState = "allUnique", unsigned thetaKMatrix[][2] = nullptr);
+				ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures, double* geneAssignment = nullptr, bool splitSer = true, std::string mutationSelectionState = "allUnique", unsigned thetaKMatrix[][2] = nullptr, std::string files[] = nullptr);
         virtual ~ROCParameter();
         ROCParameter(const ROCParameter& other);
         ROCParameter& operator=(const ROCParameter& rhs);
 
         void initCategoryDefinitions(std::string mutationSelectionState, unsigned thetaKMatrix[][2]);
+				void initMutationSelectionCategories(std::string files[], int numCategories, unsigned paramType);
 				void printThetaKMatrix()
 				{
 					for (int i = 0; i < numMixtures; i++)

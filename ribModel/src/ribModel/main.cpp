@@ -148,7 +148,7 @@ int main()
 	genome.readFasta("Skluyveri_chromosomeA.fasta");
 	//genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/Skluyveri.fasta");
 	//genome.writeFasta("../../inst/resGenome.fasta
-	bool testing = true;
+	bool testing = false;
 
 	if(testing)
 	{
