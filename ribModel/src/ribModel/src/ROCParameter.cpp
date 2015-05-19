@@ -3,16 +3,16 @@
 #include <math.h>
 #include <ctime>
 #include <iostream>
+#include <set>
+#include <fstream>
 ROCParameter::ROCParameter()
 {
-    ROCParameter(100, 2, 1, nullptr, true);
+    ROCParameter(100, 2, 1, nullptr, true, "allUnique", nullptr);
 }
 
-ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures, double* geneAssignment, bool splitSer)
+ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures, double* geneAssignment, bool splitSer, std::string mutationSelectionState,
+	unsigned thetaKMatrix[][2], std::string files[])
 {
-
-    unsigned numMutationCategories = 1;
-    unsigned numSelectionCategories = 1;
 
     // assign genes to mixture element
     mixtureAssignment.resize(numGenes, 0);
@@ -46,120 +46,38 @@ ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures
 
     numMixtures = _numMixtures;
 
-    initCategoryDefinitions();
-
+    initCategoryDefinitions(mutationSelectionState, thetaKMatrix);
 
     currentMutationParameter.resize(numMutationCategories);
     proposedMutationParameter.resize(numMutationCategories);
+		
+		for (int i = 0; i < numMutationCategories; i++)
+		{
+			std::vector<double> tmp(numParam, 0.0);
+			currentMutationParameter[i] = tmp;
+			proposedMutationParameter[i] = tmp;
+		}
 
     currentSelectionParameter.resize(numSelectionCategories);
     proposedSelectionParameter.resize(numSelectionCategories);
     categoryProbabilities.resize(numMixtures, 1.0/(double)numMixtures);
 
-    std::vector<double> tempMut(numParam, 0.0);
-    tempMut[0] = -0.351;
-    tempMut[1] = 0.378;
-    tempMut[2] = 0.482;
-    tempMut[3] = 0.002;
-    tempMut[4] = 0.587;
-    tempMut[5] = -0.420;
-    tempMut[6] = 0.678;
-    tempMut[7] = -0.088;
-    tempMut[8] = 0.112;
-    tempMut[9] = 0.308;
-    tempMut[10] = 0.412;
-    tempMut[11] = -0.179;
-    tempMut[12] = 0.374;
-    tempMut[13] = -0.594;
-    tempMut[14] = 0.388;
-    tempMut[15] = 0.853;
-    tempMut[16] = 0.340;
-    tempMut[17] = 0.463;
-    tempMut[18] = 0.019;
-    tempMut[19] = 0.355;
-    tempMut[20] = -0.044;
-    tempMut[21] = 0.292;
-    tempMut[22] = 0.359;
-    tempMut[23] = -0.173;
-    tempMut[24] = -0.882;
-    tempMut[25] = -0.699;
-    tempMut[26] = -0.196;
-    tempMut[27] = 0.396;
-    tempMut[28] = 0.197;
-    tempMut[29] = 0.023;
-    tempMut[30] = 0.518;
-    tempMut[31] = 0.360;
-    tempMut[32] = -0.333;
-    tempMut[33] = 0.286;
-    tempMut[34] = 0.318;
-    tempMut[35] = 0.009;
-    tempMut[36] = 0.568;
-    tempMut[37] = 0.197;
-    tempMut[38] = 0.164;
-    tempMut[39] = 0.183;
+		for (int i = 0; i < numSelectionCategories; i++)
+		{
+			std::vector<double> tmp(numParam, 0.0);
+			proposedSelectionParameter[i] = tmp;
+			currentSelectionParameter[i] = tmp;
+		}
+		
+		//init stuff here
+		initMutationSelectionCategories(files, numMutationCategories, ROCParameter::dM);
+		initMutationSelectionCategories(files, numSelectionCategories, ROCParameter::dEta);
 
-    for(unsigned k = 0; k < 40; k++)
-    {
-        tempMut[k] = ROCParameter::randNorm(tempMut[k], 0.1);
-    }
-
-    currentMutationParameter[0] = tempMut;
-    proposedMutationParameter[0] = tempMut;
-
-
-    std::vector<double> tempSel(numParam, 0.0);
-    tempSel[0] = 0.683;
-    tempSel[1] = 0.026;
-    tempSel[2] = 0.991;
-    tempSel[3] = 0.509;
-    tempSel[4] = -0.216;
-    tempSel[5] = -0.279;
-    tempSel[6] = -0.360;
-    tempSel[7] = 1.246;
-    tempSel[8] = 0.544;
-    tempSel[9] = 1.311;
-    tempSel[10] = -0.253;
-    tempSel[11] = 1.360;
-    tempSel[12] = -0.146;
-    tempSel[13] = 0.496;
-    tempSel[14] = 0.416;
-    tempSel[15] = 1.250;
-    tempSel[16] = 0.697;
-    tempSel[17] = 0.872;
-    tempSel[18] = 0.547;
-    tempSel[19] = -0.563;
-    tempSel[20] = -0.442;
-    tempSel[21] = 0.561;
-    tempSel[22] = 0.564;
-    tempSel[23] = -0.447;
-    tempSel[24] = -0.009;
-    tempSel[25] = 0.627;
-    tempSel[26] = 2.549;
-    tempSel[27] = 0.619;
-    tempSel[28] = 1.829;
-    tempSel[29] = 0.803;
-    tempSel[30] = -0.001;
-    tempSel[31] = 0.902;
-    tempSel[32] = 0.747;
-    tempSel[33] = -0.069;
-    tempSel[34] = 0.87;
-    tempSel[35] = 1.030;
-    tempSel[36] = -0.051;
-    tempSel[37] = 0.679;
-    tempSel[38] = -0.394;
-    tempSel[39] = 0.031;
-
-    for(unsigned k = 0; k < 40; k++)
-    {
-        tempSel[k] = ROCParameter::randNorm(tempSel[k], 0.1);
-    }
-
-    currentSelectionParameter[0] = tempSel;
-    proposedSelectionParameter[0] = tempSel;
 
 
     currentExpressionLevel.resize(numMixtures);
     proposedExpressionLevel.resize(numMixtures);
+
     for(unsigned i = 0; i < numMixtures; i++)
     {
         std::vector<double> tempExpr(numGenes, 0.0);
@@ -257,15 +175,105 @@ ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
     return *this;
 }
 
-void ROCParameter::initCategoryDefinitions()
+
+void ROCParameter::initMutationSelectionCategories(std::string files[], int numCategories, unsigned paramType)
 {
+	int i, j;
+	std::size_t pos, pos2;
+
+	std::vector<double> temp(numParam, 0.0);
+	std::ifstream currentFile;
+	std::string tmpString;
+	std::string type;
+
+	if (paramType == ROCParameter::dM) type = "mu";
+	else type = "eta";
+
+	for (i = 0; i < numCategories; i++)
+	{
+		temp.clear();
+		temp.resize(numParam, 0.0);
+    
+
+		//open the file, make sure it opens
+    currentFile.open(files[i].c_str());
+    if (currentFile.fail())
+    {
+      std::cerr <<"Error opening file " << i <<" in the file array.\n";
+      std::exit(1);
+    }
+    currentFile >> tmpString; //trash the first line, no info given.
+		
+
+		j = 0;
+		while (currentFile >> tmpString)
+		{
+      pos = tmpString.find(",");
+      pos2 = tmpString.find(",", pos + 1);
+      if (pos != std::string::npos & pos2 != std::string::npos)
+      {
+        std::string val = tmpString.substr(pos + 1, pos2 - (pos + 1));
+				if (tmpString.find(type) != std::string::npos) //mu or eta was found, depending on category
+				{
+					temp[j] = std::stod(val);
+					j++;
+					if (j == numParam) break;
+				}
+			}
+		}
+	
+		if (paramType == ROCParameter::dM)
+		{
+			currentMutationParameter[i] = temp;
+    	proposedMutationParameter[i] = temp;
+		}
+		else 
+		{
+    	currentSelectionParameter[i] = temp;
+    	proposedSelectionParameter[i] = temp;
+		}
+
+		currentFile.close();
+	}
+}
+
+
+void ROCParameter::initCategoryDefinitions(std::string mutationSelectionState, unsigned thetaKMatrix[][2])
+{
+	std::set<unsigned> delMCounter;
+	std::set<unsigned> delEtaCounter;
+
 	for (unsigned i = 0; i < numMixtures; i++)
 	{
 		categories.push_back(thetaK()); //push a blank thetaK on the vector, then alter.
-		categories[i].delM = i;
-		categories[i].delEta = i;
+		if (thetaKMatrix != nullptr)
+		{
+			categories[i].delM = thetaKMatrix[i][0] - 1;
+			categories[i].delEta = thetaKMatrix[i][1] - 1; //need check for negative and consecutive checks
+		}
+		else if (mutationSelectionState == selectionShared)
+		{
+			categories[i].delM = i;
+			categories[i].delEta = 0;
+		}
+		else if (mutationSelectionState == mutationShared)
+		{
+			categories[i].delM = 0;
+			categories[i].delEta = i;
+		}
+		else //assuming the default of allUnique
+		{
+			categories[i].delEta = i;
+			categories[i].delM = i;
+		}
+		delMCounter.insert(categories[i].delM);
+		delEtaCounter.insert(categories[i].delEta);
 	}
-
+	numMutationCategories = delMCounter.size();
+	numSelectionCategories = delEtaCounter.size();	
+	//sets allow only the unique numbers to be added.
+	//at the end, the size of the set is equal to the number
+	//of unique categories.
 }
 
 void ROCParameter::initAllTraces(unsigned samples, unsigned num_genes)
@@ -623,6 +631,9 @@ void ROCParameter::updateCodonSpecificParameter(std::vector<double>& currentPara
 
 const unsigned ROCParameter::dM = 0;
 const unsigned ROCParameter::dEta = 1;
+const std::string ROCParameter::allUnique = "allUnique";
+const std::string ROCParameter::selectionShared = "selectionShared";
+const std::string ROCParameter::mutationShared = "mutationShared";
 std::default_random_engine ROCParameter::generator(time(NULL));
 //std::srand(time(NULL));
 double* ROCParameter::drawIidRandomVector(unsigned draws, double mean, double sd, double (*proposal)(double a, double b))

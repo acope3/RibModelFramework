@@ -123,7 +123,20 @@ void testRandMultiNom(unsigned numCat)
 
 	std::cout << "------------------ TEST RANDMULTINOMIAL ------------------" << std::endl;
 
-}//In progress
+}
+
+void testThetaKMatrix()
+{
+//	unsigned matrix[3][2] = { {0,1}, {3,2}, {0,0} };
+	std::cout << "------------------ TEST THETAKMATRIX ------------------" << std::endl;
+	ROCParameter R(100, 2, 3, nullptr, true, "mutationShared", nullptr);
+
+	R.printThetaKMatrix();
+	std::cout <<"numMutationCategories: " << R.getNumMutationCategoriesVar() <<"\n";
+	std::cout <<"numSelectionCategories: " << R.getNumSelectionCategoriesVar() <<"\n";
+	std::cout << "------------------ TEST THETAKMATRIX ------------------" << std::endl;
+
+}
 
 int main()
 {
@@ -145,8 +158,10 @@ int main()
          testCodonRangePerAA(true);
          testLogNormDensity();
          testSCUO(genome);
-         testCovarianceMatrix();*/
-		testRandMultiNom(3);
+         testCovarianceMatrix();
+				 testRandMultiNom(3);
+		*/
+		testThetaKMatrix();
 
 	}else{
 		int samples = 100;
