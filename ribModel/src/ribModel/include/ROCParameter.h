@@ -20,7 +20,7 @@ class ROCParameter
         };
         //members
         unsigned int numParam;
-
+				
         double Sphi;
         double Aphi;
         double Sphi_proposed;
@@ -31,6 +31,11 @@ class ROCParameter
 
         double phiEpsilon;
         double phiEpsilon_proposed;
+
+				//Keywords
+				static const std::string allUnique;
+				static const std::string selectionShared;
+				static const std::string mutationShared;
 
         // proposal bias and std for phi values
         double bias_sphi;
@@ -60,6 +65,8 @@ class ROCParameter
         std::vector<unsigned> numAcceptForMutationAndSelection;
 
         unsigned numMixtures;
+				unsigned numMutationCategories;
+				unsigned numSelectionCategories;
         std::vector<thetaK> categories;
         std::vector<unsigned> mixtureAssignment;
 
@@ -89,15 +96,24 @@ class ROCParameter
         static std::default_random_engine generator; // static to make sure that the same generator is during the runtime.
 
         explicit ROCParameter();
-        ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures, double* geneAssignment = nullptr, bool splitSer = true);
+				ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures, double* geneAssignment = nullptr, bool splitSer = true, std::string mutationSelectionState = "allUnique", unsigned thetaKMatrix[][2] = nullptr);
         virtual ~ROCParameter();
         ROCParameter(const ROCParameter& other);
         ROCParameter& operator=(const ROCParameter& rhs);
 
-        void initCategoryDefinitions();
+        void initCategoryDefinitions(std::string mutationSelectionState, unsigned thetaKMatrix[][2]);
+				void printThetaKMatrix()
+				{
+					for (int i = 0; i < numMixtures; i++)
+					{
+						std::cout << categories[i].delM <<"\t" << categories[i].delEta <<"\n";
+					}
+				}
 
         unsigned getNumMixtureElements() {return numMixtures;}
-        unsigned getMutationCategory(unsigned group) {return categories[group].delM;}
+        unsigned getNumMutationCategoriesVar() {return numMutationCategories;}
+				unsigned getNumSelectionCategoriesVar() {return numSelectionCategories;}
+				unsigned getMutationCategory(unsigned group) {return categories[group].delM;}
         unsigned getSelectionCategory(unsigned group) {return categories[group].delEta;}
         unsigned getExpressionCategory(unsigned group) {return categories[group].delEta;}
         double getCategoryProbability(unsigned group) {return categoryProbabilities[group];}

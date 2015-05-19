@@ -3,16 +3,14 @@
 #include <math.h>
 #include <ctime>
 #include <iostream>
+#include <set>
 ROCParameter::ROCParameter()
 {
-    ROCParameter(100, 2, 1, nullptr, true);
+    ROCParameter(100, 2, 1, nullptr, true, "allUnique", nullptr);
 }
 
-ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures, double* geneAssignment, bool splitSer)
+ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures, double* geneAssignment, bool splitSer, std::string mutationSelectionState, unsigned thetaKMatrix[][2])
 {
-
-    unsigned numMutationCategories = 1;
-    unsigned numSelectionCategories = 1;
 
     // assign genes to mixture element
     mixtureAssignment.resize(numGenes, 0);
@@ -46,8 +44,7 @@ ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures
 
     numMixtures = _numMixtures;
 
-    initCategoryDefinitions();
-
+    initCategoryDefinitions(mutationSelectionState, thetaKMatrix);
 
     currentMutationParameter.resize(numMutationCategories);
     proposedMutationParameter.resize(numMutationCategories);
@@ -257,15 +254,39 @@ ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
     return *this;
 }
 
-void ROCParameter::initCategoryDefinitions()
+void ROCParameter::initCategoryDefinitions(std::string mutationSelectionState, unsigned thetaKMatrix[][2])
 {
+	std::set<unsigned> delMCounter;
+	std::set<unsigned> delEtaCounter;
+
 	for (unsigned i = 0; i < numMixtures; i++)
 	{
 		categories.push_back(thetaK()); //push a blank thetaK on the vector, then alter.
-		categories[i].delM = i;
-		categories[i].delEta = i;
+		if (thetaKMatrix != nullptr)
+		{
+			categories[i].delM = thetaKMatrix[i][0] - 1;
+			categories[i].delEta = thetaKMatrix[i][1] - 1; //need check for negative and consecutive checks
+		}
+		else if (mutationSelectionState == selectionShared)
+		{
+			categories[i].delM = i;
+			categories[i].delEta = 0;
+		}
+		else if (mutationSelectionState == mutationShared)
+		{
+			categories[i].delM = 0;
+			categories[i].delEta = i;
+		}
+		else //assuming the default of allUnique
+		{
+			categories[i].delEta = i;
+			categories[i].delM = i;
+		}
+		delMCounter.insert(categories[i].delM);
+		delEtaCounter.insert(categories[i].delEta);
 	}
-
+	numMutationCategories = delMCounter.size();
+	numSelectionCategories = delEtaCounter.size();	
 }
 
 void ROCParameter::initAllTraces(unsigned samples, unsigned num_genes)
@@ -623,6 +644,9 @@ void ROCParameter::updateCodonSpecificParameter(std::vector<double>& currentPara
 
 const unsigned ROCParameter::dM = 0;
 const unsigned ROCParameter::dEta = 1;
+const std::string ROCParameter::allUnique = "allUnique";
+const std::string ROCParameter::selectionShared = "selectionShared";
+const std::string ROCParameter::mutationShared = "mutationShared";
 std::default_random_engine ROCParameter::generator(time(NULL));
 //std::srand(time(NULL));
 double* ROCParameter::drawIidRandomVector(unsigned draws, double mean, double sd, double (*proposal)(double a, double b))
