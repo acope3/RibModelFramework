@@ -120,7 +120,7 @@
 	"../include/Genome.h"
 	"../include/ROCParameter.h"
 
-1431973114 /home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/src/ribModel/include/ROCParameter.h
+1431983111 /home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/src/ribModel/include/ROCParameter.h
 	<vector>
 	<random>
 	<string>
@@ -133,7 +133,7 @@
 	<ctype.h>
 	<algorithm>
 
-1431977773 source:/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/src/ribModel/main.cpp
+1431983507 source:/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/src/ribModel/main.cpp
 	<iostream>
 	<time.h>
 	<fstream>

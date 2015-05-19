@@ -5,14 +5,14 @@
 #include <iostream>
 ROCParameter::ROCParameter()
 {
-    ROCParameter(1, 1, 100, 2, 1, true);
+    ROCParameter(100, 2, 1, nullptr, true);
 }
 
 ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures, double* geneAssignment, bool splitSer)
 {
 
-    numMutationCategories = 1;
-    numSelectionCategories = 1;
+    unsigned numMutationCategories = 1;
+    unsigned numSelectionCategories = 1;
 
     // assign genes to mixture element
     mixtureAssignment.resize(numGenes, 0);
@@ -20,7 +20,7 @@ ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures
     {
         for(unsigned i = 0u; i < numGenes; i++)
         {
-            mixtureAssignment[i] = geneAssignment[i]
+            mixtureAssignment[i] = geneAssignment[i];
         }
     }
 
