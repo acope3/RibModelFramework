@@ -166,6 +166,7 @@ class ROCParameter
         void initCategoryProbabilitesTrace(int samples);
         void updateExpressionTrace(unsigned sample, unsigned geneIndex)
         {
+            // TODO use numSelectionCategories instead of numMixtures????
             for(unsigned category = 0; category < numMixtures; category++)
             {
                 expressionTrace[category][sample][geneIndex] = currentExpressionLevel[category][geneIndex];

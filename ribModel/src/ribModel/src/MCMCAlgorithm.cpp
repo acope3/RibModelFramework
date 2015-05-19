@@ -1,8 +1,10 @@
 #include "../include/MCMCAlgorithm.h"
+#include "../include/CovarianceMatrix.h"
 
 #include <random>
 #include <cstdlib>
 #include <thread>
+#include <sstream>
 
 #include <iostream>
 #include <fstream>
@@ -222,7 +224,7 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
     // initialize everything
 
     parameter.initAllTraces(samples, genome.getGenomeSize());
-
+    CovarianceMatrix covmat = CovarianceMatrix(2);
     // starting the MCMC
     std::cout << "entering MCMC loop" << std::endl;
     std::cout << "Starting MCMC with " << maximumIterations << " iterations\n";
@@ -234,6 +236,16 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
         {
             parameter.proposeCodonSpecificParameter();
             acceptRejectCodonSpecificParameter(genome, parameter, model, iteration);
+            if(iteration % adaptiveWidth == 0)
+            {
+                std::cout << "\n ================ \n";
+                covmat.printCovarianceMatrix();
+                std::cout << " ---------------- \n";
+                covmat.calculateCovarianceMatrixFromTraces(parameter.getExpressionTrace(), 0, adaptiveWidth);
+                covmat.printCovarianceMatrix();
+                std::cout << " ================ \n";
+            }
+
         }
         // update hyper parameter
         if(estimateHyperParameter)
@@ -256,7 +268,7 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
             }
             if((iteration % adaptiveWidth) == 0)
             {
-								//std::cout <<"would call adaptExpressionPro.....\n";
+                //std::cout <<"would call adaptExpressionPro.....\n";
                //parameter.adaptExpressionProposalWidth(adaptiveWidth);
             }
         }
@@ -264,25 +276,33 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
     std::cout << "leaving MCMC loop" << std::endl;
 
     // development output
-    std::ofstream likout("results/test.lik", std::ofstream::out);
-    likout.close();
-    std::ofstream sphiout("results/test.sphi", std::ofstream::out);
-    std::ofstream phitraceout("results/test.phiTrace", std::ofstream::out);
-    std::vector<double> sphiTrace = parameter.getSPhiTrace();
     std::vector<std::vector<std::vector<double>>> expressionTrace = parameter.getExpressionTrace();
 
+    for(int nm = 0u; nm < parameter.getNumMixtureElements(); nm++)
+    {
+        std::stringstream oss;
+        oss << "results/phiTrace_nmix_" << nm << ".csv";
+        std::ofstream phitraceout(oss.str(), std::ofstream::out);
+        for(unsigned iteration = 0; iteration < samples; iteration++)
+        {
+            for(int i = 0; i < genome.getGenomeSize(); i++)
+            {
+                phitraceout << expressionTrace[0][iteration][i] << ",";
+            }
+            phitraceout << std::endl;
+        }
+        phitraceout.close();
+    }
+
+    std::ofstream likout("results/test.lik", std::ofstream::out);
+    std::ofstream sphiout("results/test.sphi", std::ofstream::out);
+    std::vector<double> sphiTrace = parameter.getSPhiTrace();
     for(unsigned iteration = 0; iteration < samples; iteration++)
     {
         likout << likelihoodTrace[iteration] << std::endl;
         sphiout << sphiTrace[iteration] << std::endl;
-        for(int i = 0; i < genome.getGenomeSize(); i++)
-        {
-            phitraceout << expressionTrace[0][iteration][i] << ",";
-        }
-        phitraceout << std::endl;
     }
     likout.close();
     sphiout.close();
-    phitraceout.close();
 }
 

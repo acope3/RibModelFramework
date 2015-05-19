@@ -5,40 +5,43 @@
 
 CovarianceMatrix::CovarianceMatrix()
 {
-		std::cout <<"0 arg constructor called\n";
-		numVariates = 4; //Square 2x2 matrix
-		covMatrix.resize(numVariates * numVariates);
-		choleskiMatrix.resize(numVariates * numVariates);
+    std::cout <<"0 arg constructor called\n";
+    numVariates = 2; //Square 2x2 matrix
+    unsigned vectorLength = numVariates * numVariates;
+    covMatrix.resize(vectorLength);
+    choleskiMatrix.resize(vectorLength);
 
-    for(int i = 0; i < numVariates * numVariates; i++)
+    for(int i = 0; i < vectorLength; i++)
     {
-            covMatrix[i] = (i % (numVariates + 1) ? 0.0 : 1.0);
-            choleskiMatrix[i] = 0.0;
-		}
+        covMatrix[i] = (i % (numVariates + 1) ? 0.0 : 1.0);
+        choleskiMatrix[i] = 0.0;
+    }
 
 }
 CovarianceMatrix::CovarianceMatrix(int _numVariates)
 {
 
-		std::cout <<"1 arg constructor called\n";
-		numVariates = _numVariates; 
-		covMatrix.resize(numVariates * numVariates);
-		choleskiMatrix.resize(numVariates * numVariates);
+    std::cout <<"1 arg constructor called\n";
+    numVariates = _numVariates;
+    unsigned vectorLength = numVariates * numVariates;
+    covMatrix.resize(vectorLength);
+    choleskiMatrix.resize(vectorLength);
 
-    for(int i = 0; i < numVariates * numVariates; i++)
+    for(int i = 0; i < vectorLength; i++)
     {
-            covMatrix[i] = (i % (numVariates + 1) ? 0.0 : 1.0);
-            choleskiMatrix[i] = 0.0;
-		}
+        covMatrix[i] = (i % (numVariates + 1) ? 0.0 : 1.0);
+        //covMatrix[i] = ((i % (numVariates + 1)) == 0 ? 1.0 : 0.0);
+        choleskiMatrix[i] = 0.0;
+    }
 
 }
 
 CovarianceMatrix::CovarianceMatrix(std::vector <double> &matrix)
 {
-		std::cout <<"Matrix constructor called\n";
-		numVariates = std::sqrt(matrix.size());   
-		covMatrix = matrix;
-		choleskiMatrix.resize(matrix.size(), 0.0);
+    std::cout <<"Matrix constructor called\n";
+    numVariates = std::sqrt(matrix.size());
+    covMatrix = matrix;
+    choleskiMatrix.resize(matrix.size(), 0.0);
 }
 
 CovarianceMatrix::~CovarianceMatrix()
@@ -48,10 +51,10 @@ CovarianceMatrix::~CovarianceMatrix()
 
 CovarianceMatrix::CovarianceMatrix(const CovarianceMatrix& other)
 {
-		std::cout <<"copy constructor called\n";
+    std::cout <<"copy constructor called\n";
     numVariates = other.numVariates;
-		covMatrix = other.covMatrix;
-		choleskiMatrix = other.choleskiMatrix;
+    covMatrix = other.covMatrix;
+    choleskiMatrix = other.choleskiMatrix;
 }
 /*
 CovarianceMatrix& CovarianceMatrix::operator=(const CovarianceMatrix& rhs)
@@ -74,7 +77,7 @@ CovarianceMatrix& CovarianceMatrix::operator=(const CovarianceMatrix& rhs)
 // http://rosettacode.org/wiki/Cholesky_decomposition#C
 void CovarianceMatrix::choleskiDecomposition()
 {
-		std::cout <<"choleskiDecomposition called\n";
+    std::cout <<"choleskiDecomposition called\n";
     for(int i = 0; i < numVariates; i++)
     {
         for(int j = 0; j < (i + 1); j++)
@@ -91,8 +94,37 @@ void CovarianceMatrix::choleskiDecomposition()
 }
 
 
-void CovarianceMatrix::calculateCovarianceMatrixFromTraces(std::vector <std::vector<double>> trace)
+void CovarianceMatrix::calculateCovarianceMatrixFromTraces(std::vector<std::vector <std::vector<double>>> trace, unsigned geneIndex, unsigned adaptiveWidth)
 {
+    // calculate all means
+    unsigned numVariates = trace.size(); // <- number of mixture elements or number of selection categories
+    double means[numVariates];
+    unsigned currentTraceLength = trace[0].size();
+    unsigned start = currentTraceLength - adaptiveWidth;
+    // calculate all means from trace
+    for(unsigned i = 0u; i < numVariates; i++)
+    {
+        for(unsigned j = start; j < currentTraceLength; j++)
+        {
+            means[i] += trace[i][j][geneIndex];
+        }
+        means[i] /= adaptiveWidth;
+    }
+
+
+    for(int i = 0; i < numVariates; i++)
+    {
+        for (int k = 0; k < numVariates; k++)
+        {
+            double nonNormalizedCovariance = 0.0; // missing term 1/(n-1)
+            for(unsigned j = start; j < currentTraceLength; j++)
+            {
+                nonNormalizedCovariance += (trace[i][j][geneIndex] - means[i]) * (trace[k][j][geneIndex] - means[k]);
+            }
+            covMatrix[i * numVariates + k] = (1/(adaptiveWidth - 1)) * nonNormalizedCovariance;
+        }
+
+    }
 
 
 
@@ -120,7 +152,7 @@ void CovarianceMatrix::printCovarianceMatrix()
         if (i % numVariates == 0 && i != 0) { std::cout << std::endl; }
         std::cout << covMatrix[i]<< "\t";
     }
-		std::cout <<"\n";
+    std::cout <<"\n";
 
 
 }
@@ -131,6 +163,6 @@ void CovarianceMatrix::printCholeskiMatrix()
         if (i % numVariates == 0 && i != 0) { std::cout << std::endl; }
         std::cout << choleskiMatrix[i]<< "\t";
     }
-		std::cout <<"\n";
+    std::cout <<"\n";
 }
 

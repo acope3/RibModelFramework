@@ -19,7 +19,7 @@ class CovarianceMatrix
         CovarianceMatrix(const CovarianceMatrix& other);
         //CovarianceMatrix& operator=(const CovarianceMatrix& other);
         void choleskiDecomposition();
-        void calculateCovarianceMatrixFromTraces(std::vector <std::vector <double>> trace);
+        void calculateCovarianceMatrixFromTraces(std::vector<std::vector <std::vector<double>>> trace, unsigned geneIndex, unsigned adaptiveWidte);
 				void printCovarianceMatrix();
         void printCholeskiMatrix();
         void transformIidNumersIntoCovaryingNumbers(double* iidnumbers, double* covnumbers);
