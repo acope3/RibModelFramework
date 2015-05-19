@@ -8,7 +8,7 @@
 #include <fstream>
 #include <stdlib.h> //can be removed later
 
-#include <omp.h>
+//#include <omp.h>
 
 
 
