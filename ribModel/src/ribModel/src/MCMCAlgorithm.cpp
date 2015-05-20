@@ -243,18 +243,6 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
         {
             parameter.proposeCodonSpecificParameter();
             acceptRejectCodonSpecificParameter(genome, parameter, model, iteration);
-            if(iteration % adaptiveWidth == 0 && iteration != 0)
-            {
-<<<<<<< HEAD
-                std::cout << "\n ================ \n";
-                covmat.printCovarianceMatrix();
-                std::cout << " ---------------- \n";
-                covmat.calculateCovarianceMatrixFromTraces(parameter.getExpressionTrace(), 0, iteration/thining, adaptiveWidth/thining);
-                covmat.printCovarianceMatrix();
-                std::cout << " ================ \n";
-=======
->>>>>>> 95ad9cc9b48b66939c6f20881332edd848af1598
-            }
 
         }
         // update hyper parameter

@@ -205,10 +205,19 @@ class ROCParameter
 			//std::cout <<mutationParameterTrace[0][sample][0] <<"\n";
 			for(unsigned category = 0; category < numMutationCategories; category++)
 			{
-				unsigned* aaRange = SequenceSummary::AAToCodonRange(aa, true);
+				unsigned aaRange[2];
+				SequenceSummary::AAToCodonRange(aa, true, aaRange);
 				for (unsigned i = aaRange[0]; i < aaRange[1]; i++)
 				{
 					mutationParameterTrace[category][sample][i] = currentMutationParameter[category][i];
+				}
+			}	
+			for(unsigned category = 0; category < numSelectionCategories; category++)
+			{
+				unsigned aaRange[2];
+				SequenceSummary::AAToCodonRange(aa, true, aaRange);
+				for (unsigned i = aaRange[0]; i < aaRange[1]; i++)
+				{
 					selectionParameterTrace[category][sample][i] = currentSelectionParameter[category][i];
 				}
 			}	

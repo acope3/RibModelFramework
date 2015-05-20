@@ -71,7 +71,7 @@ const std::map<char, int> SequenceSummary::aaToIndex = {{'A', 0}, {'C', 1}, {'D'
     {'K', 8}, {'L', 9}, {'M', 10}, {'N', 11}, {'P', 12}, {'Q', 13}, {'R', 14},
     {'S', 15}, {'T', 16}, {'V', 17}, {'W', 18}, {'Y', 19}, {SequenceSummary::Ser2, 20}, {'X', 21}};
 
-unsigned* SequenceSummary::AAindexToCodonRange(unsigned aaIndex, bool forParamVector)
+void SequenceSummary::AAindexToCodonRange(unsigned aaIndex, bool forParamVector, unsigned aaRange[])
 {
     unsigned startAAIndex = 0;
     unsigned numCodons = 4;
@@ -87,16 +87,14 @@ unsigned* SequenceSummary::AAindexToCodonRange(unsigned aaIndex, bool forParamVe
     }
     unsigned endAAIndex = numCodons + startAAIndex;
 
-		//static stops the memory from being trashed upon return.
-    static unsigned ret[2];
-    ret[0] = startAAIndex;
-    ret[1] = endAAIndex;
-    return ret;
+    aaRange[0] = startAAIndex;
+    aaRange[1] = endAAIndex;
 }
-unsigned* SequenceSummary::AAToCodonRange(char aa, bool forParamVector)
+
+void SequenceSummary::AAToCodonRange(char aa, bool forParamVector, unsigned aaRange[])
 {
     unsigned aaIndex = aaToIndex.find(aa)->second;
-    return AAindexToCodonRange(aaIndex, forParamVector);
+    AAindexToCodonRange(aaIndex, forParamVector, aaRange);
 }
 
 char SequenceSummary::IndexToAA(int aa)
