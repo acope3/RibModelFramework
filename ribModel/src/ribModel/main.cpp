@@ -31,7 +31,8 @@ void testCodonRangePerAA(bool forParamVector)
 	for(int i = 0; i < 22; i++)
 	{
 		char aa = SequenceSummary::AminoAcidArray[i];
-		unsigned* codonRange = SequenceSummary::AAToCodonRange(aa, forParamVector);
+		unsigned codonRange[2];
+		SequenceSummary::AAToCodonRange(aa, forParamVector, codonRange);
 		std::cout << "codon range for " << aa << "\t" << codonRange[0] << " - " << codonRange[1] << std::endl;
 	}
 	std::cout << "------------------ CODON RANGE PER AA ------------------" << std::endl;

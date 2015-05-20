@@ -43,7 +43,8 @@ void Genome::getCountsForAA(char aa, unsigned codonCounts[][5])
     {
         Gene gene = genes[i];
         SequenceSummary seqsum = gene.getSequenceSummary();
-        unsigned* codonRange = SequenceSummary::AAToCodonRange(aa);
+        unsigned codonRange[2];
+				SequenceSummary::AAToCodonRange(aa, false, codonRange);
         // get codon counts for AA
         unsigned j = 0u;
         for(unsigned k = codonRange[0]; k < codonRange[1]; k++, j++)

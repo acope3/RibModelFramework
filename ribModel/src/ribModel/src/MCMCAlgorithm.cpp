@@ -244,6 +244,10 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
         {
             parameter.proposeCodonSpecificParameter();
             acceptRejectCodonSpecificParameter(genome, parameter, model, iteration);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4967685b9126fbe02bfe388936a533475441c87c
         }
         // update hyper parameter
         if(estimateHyperParameter)

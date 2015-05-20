@@ -43,7 +43,8 @@ double ROCModel::calculateLogLiklihoodPerGene(Gene& gene, int geneIndex, ROCPara
 
         int codonCount[numCodons];
         // prepare array for codon counts for AA
-        unsigned* codonRange = SequenceSummary::AAToCodonRange(curAA);
+        unsigned codonRange[2];
+ 				SequenceSummary::AAToCodonRange(curAA, false, codonRange);
         // get codon counts for AA
         unsigned j = 0u;
         for(unsigned i = codonRange[0]; i < codonRange[1]; i++, j++)
@@ -203,7 +204,8 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
 
 void ROCModel::obtainCodonCount(SequenceSummary& seqsum, char curAA, int codonCount[])
 {
-    unsigned* codonRange = SequenceSummary::AAToCodonRange(curAA);
+    unsigned codonRange[2];
+		SequenceSummary::AAToCodonRange(curAA, false, codonRange);
     // get codon counts for AA
     unsigned j = 0u;
     for(unsigned i = codonRange[0]; i < codonRange[1]; i++, j++)

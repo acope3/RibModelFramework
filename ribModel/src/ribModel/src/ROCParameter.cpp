@@ -395,7 +395,8 @@ double ROCParameter::calculateSCUO(Gene& gene)
 		double aaCount = (double)seqsum.getAAcountForAA(i);
 		if(aaCount == 0) continue;
 
-		unsigned* codonRange = SequenceSummary::AAindexToCodonRange(i);
+		unsigned codonRange[2];
+		SequenceSummary::AAindexToCodonRange(i, false, codonRange);
 
 		// calculate -sum(pij log(pij))
 		double aaEntropy = 0.0;
@@ -487,8 +488,8 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
 		tempSet = proposal ? proposedSelectionParameter[category] : currentSelectionParameter[category];
 	}
 	else throw "Unkown parameter type: " + paramType;
-
-	unsigned* aaRange = SequenceSummary::AAToCodonRange(aa, true);
+	unsigned aaRange[2];
+	SequenceSummary::AAToCodonRange(aa, true, aaRange);
 
 	unsigned j = 0u;
 	for(unsigned i = aaRange[0]; i < aaRange[1]; i++, j++)
@@ -642,8 +643,8 @@ std::vector<double> ROCParameter::propose(std::vector<double> currentParam, doub
 
 void ROCParameter::updateCodonSpecificParameter(char aa)
 {
-
-	unsigned* aaRange = SequenceSummary::AAToCodonRange(aa, true);
+	unsigned aaRange[2];
+	SequenceSummary::AAToCodonRange(aa, true, aaRange);
 	unsigned aaIndex = SequenceSummary::aaToIndex.find(aa)->second;
 	numAcceptForMutationAndSelection[aaIndex]++;
 

@@ -43,8 +43,8 @@ class SequenceSummary
         static std::string IndexToCodon(unsigned i);
         static unsigned CodonToAAIndex(std::string& codon);
         static char IndexToAA(int aa);
-        static unsigned* AAindexToCodonRange(unsigned aaIndex, bool forParamVector = false);
-        static unsigned* AAToCodonRange(char aa, bool forParamVector = false);
+        static void AAindexToCodonRange(unsigned aaIndex, bool forParamVector = false, unsigned aaRange[] = nullptr);
+        static void AAToCodonRange(char aa, bool forParamVector = false, unsigned aaRange[] = nullptr);
 
 
     protected:
