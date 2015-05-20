@@ -24,6 +24,7 @@ MCMCAlgorithm::MCMCAlgorithm(int _samples, int _thining, bool _estimateExpressio
     : samples(_samples), thining(_thining), estimateExpression(_estimateExpression), estimateCodonSpecificParameter(_estimateCodonSpecificParameter),
         estimateHyperParameter(_estimateHyperParameter)
 {
+    // TODO add adaptiveWidth to constructor
     likelihoodTrace.resize(samples + 1);
     adaptiveWidth = 100;
 }
@@ -71,7 +72,6 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
 
         double unscaledLogProb_curr[numMixtures];
         double unscaledLogProb_prop[numMixtures];
-        double avgValue = 0.0;
 
 
         /*
@@ -85,6 +85,7 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
                 => ln(P) = ln(P') - ln(c)
             Note that we use invere sign because our values of ln(f) and ln(f') are negative.
         */
+        double maxValue = -1000000;
         for(unsigned k = 0; k < numMixtures; k++)
         {
             // logProbabilityRatio contains the logProbabilityRatio in element 0,
@@ -95,17 +96,16 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
             unscaledLogProb_curr[k] = logProbabilityRatio[1];
             unscaledLogProb_prop[k] = logProbabilityRatio[2];
             // get average value of all return values which is used as constant c
-            avgValue += logProbabilityRatio[1];
-            avgValue += logProbabilityRatio[2];
+            maxValue = logProbabilityRatio[1] > maxValue ? logProbabilityRatio[1] : maxValue;
+            maxValue = logProbabilityRatio[2] > maxValue ? logProbabilityRatio[2] : maxValue;
         }
-        avgValue /= 2*numMixtures; // average of logProbabilities
 
         // adjust the the unscaled probabilities by the constant c
         // ln(f') = ln(c) + ln(f)
         for(unsigned k = 0; k < numMixtures; k++)
         {
-            unscaledLogProb_curr[k] -= avgValue;
-            unscaledLogProb_prop[k] -= avgValue;
+            unscaledLogProb_curr[k] -= maxValue;
+            unscaledLogProb_prop[k] -= maxValue;
         }
 
         double normalizingProbabilityConstant = 0.0;
@@ -115,12 +115,12 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
         {
             // log(SUM) vs SUM(log) ??? second one works, but seems wrong. first one does not, why?
             probabilities[k] = parameter.getCategoryProbability(k) * std::exp(unscaledLogProb_curr[k]);
-            currLogLike += std::log( probabilities[k] );
-            propLogLike += std::log( parameter.getCategoryProbability(k) * std::exp(unscaledLogProb_prop[k]) );
+            currLogLike += probabilities[k];
+            propLogLike += parameter.getCategoryProbability(k) * std::exp(unscaledLogProb_prop[k]);
             normalizingProbabilityConstant += probabilities[k];
         }
-        //currLogLike = std::log(currLogLike);
-        //propLogLike = std::log(propLogLike);
+        currLogLike = std::log(currLogLike);
+        propLogLike = std::log(propLogLike);
         // normalize probabilities
         for (int k = 0; k < numMixtures; k++)
         {
@@ -242,12 +242,12 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
         {
             parameter.proposeCodonSpecificParameter();
             acceptRejectCodonSpecificParameter(genome, parameter, model, iteration);
-            if(iteration % adaptiveWidth == 0)
+            if(iteration % adaptiveWidth == 0 && iteration != 0)
             {
                 std::cout << "\n ================ \n";
                 covmat.printCovarianceMatrix();
                 std::cout << " ---------------- \n";
-                covmat.calculateCovarianceMatrixFromTraces(parameter.getExpressionTrace(), 0, adaptiveWidth);
+                covmat.calculateCovarianceMatrixFromTraces(parameter.getExpressionTrace(), 0, iteration/thining, adaptiveWidth/thining);
                 covmat.printCovarianceMatrix();
                 std::cout << " ================ \n";
             }

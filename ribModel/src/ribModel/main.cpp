@@ -165,9 +165,9 @@ int main()
 		testThetaKMatrix();
 
 	}else{
-		int samples = 10000;
+		int samples = 1000;
 		int thining = 10;
-		int useSamples = 5000;
+		int useSamples = 500;
 
 		ROCModel model = ROCModel();
 		unsigned geneAssignment[genome.getGenomeSize()];

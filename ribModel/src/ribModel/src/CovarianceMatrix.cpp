@@ -94,17 +94,16 @@ void CovarianceMatrix::choleskiDecomposition()
 }
 
 
-void CovarianceMatrix::calculateCovarianceMatrixFromTraces(std::vector<std::vector <std::vector<double>>> trace, unsigned geneIndex, unsigned adaptiveWidth)
+void CovarianceMatrix::calculateCovarianceMatrixFromTraces(std::vector<std::vector <std::vector<double>>> trace, unsigned geneIndex, unsigned curSample, unsigned adaptiveWidth)
 {
     // calculate all means
     unsigned numVariates = trace.size(); // <- number of mixture elements or number of selection categories
     double means[numVariates];
-    unsigned currentTraceLength = trace[0].size();
-    unsigned start = currentTraceLength - adaptiveWidth;
+    unsigned start = curSample - adaptiveWidth;
     // calculate all means from trace
     for(unsigned i = 0u; i < numVariates; i++)
     {
-        for(unsigned j = start; j < currentTraceLength; j++)
+        for(unsigned j = start; j < curSample; j++)
         {
             means[i] += trace[i][j][geneIndex];
         }
@@ -117,17 +116,14 @@ void CovarianceMatrix::calculateCovarianceMatrixFromTraces(std::vector<std::vect
         for (int k = 0; k < numVariates; k++)
         {
             double nonNormalizedCovariance = 0.0; // missing term 1/(n-1)
-            for(unsigned j = start; j < currentTraceLength; j++)
+            for(unsigned j = start; j < curSample; j++)
             {
                 nonNormalizedCovariance += (trace[i][j][geneIndex] - means[i]) * (trace[k][j][geneIndex] - means[k]);
             }
-            covMatrix[i * numVariates + k] = (1/(adaptiveWidth - 1)) * nonNormalizedCovariance;
+            covMatrix[i * numVariates + k] = (1.0/(adaptiveWidth - 1.0)) * nonNormalizedCovariance;
         }
 
     }
-
-
-
 }
 void CovarianceMatrix::transformIidNumersIntoCovaryingNumbers(double* iidnumbers, double* covnumbers)
 {
