@@ -22,3 +22,7 @@ points(log10(emp[idx]), log10(test.phi[idx]), col="red")
 cor(log10(emp[!idx]), log10(test.phi[!idx]))^2
 cor(log10(emp[idx]), log10(test.phi[idx]))^2
 
+test.phiTrace <- read.table("phiTrace_nmix_0.csv", sep=",")
+which(log(test.phi) < -50)
+plot(log(test.phiTrace[, 272]), type = "l")
+

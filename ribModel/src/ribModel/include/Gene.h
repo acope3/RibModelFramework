@@ -16,10 +16,6 @@ class Gene
         std::string id;
         std::string description;
 
-        unsigned deltaM;
-        unsigned deltaEta;
-        unsigned deltaOmega;
-
         //double currentPhiValue;
         //double currentLikelihood;
 
@@ -49,20 +45,9 @@ class Gene
         std::string getSequence() {return seq;}
         char getNucleotideAt(int i) {return seq[i];}
 
-        //double getExpression() {return currentPhiValue;}
-        unsigned getMutationCategory() { return deltaM; }
-        unsigned getDeltaEtaCategory() { return deltaEta; }
-        unsigned getDeltaOmegaCategory() { return deltaOmega; }
-        //double getLikelihood() {return currentLikelihood;}
-
         void setId(std::string _id) { id = _id;}
         void setDescription(std::string _desc) {description = _desc;}
         void setSequence(std::string _seq);
-        void setMutationCategory(unsigned dM) { deltaM = dM; }
-        void setDeltaEtaCategory(unsigned dE) { deltaEta = dE; }
-        void setDeltaOmegaCategory(unsigned dO) { deltaOmega = dO; }
-        //void setExpression(double _phi) {currentPhiValue = _phi;}
-        //void setLikelihood(double _lik) {currentLikelihood = _lik;}
         SequenceSummary& getSequenceSummary() {return geneData;}
 
 

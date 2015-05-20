@@ -19,17 +19,10 @@ class ROCModel
         virtual ~ROCModel();
         ROCModel(const ROCModel& other);
 
-        // Likelihood functions
-        double calculateLogLiklihoodPerGene(Gene& gene, int geneIndex, ROCParameter& parameter, bool proposed);
         // Likelihood ratio functions
         void calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCParameter& parameter, unsigned k, double* logProbabilityRatio);
         void calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& genome, ROCParameter& parameter, double& logAcceptanceRatioForAllMixtures);
-//        void calculateLogLikelihoodRatioPerCategory(Genome& genome, ROCParameter& parameter, double* logAcceptanceRatioPerCategory);
-
-        //double calculateLikelihoodPerAA(char aa, Genome& genome, ROCParameter& parameter, bool pdM, bool pdEta);
-        //double calculateLikelihoodPerGene(Gene gene, ROCParameter parameter, bool proposed);
-        //double calculateLogLikelihood(Genome genome, ROCParameter parameter, unsigned category, unsigned paramType, bool proposed);
-        //double calculateLogLikRatioPerGene(Gene gene, ROCParameter parameter);
+        void calculateLogLikelihoodRatioPerAAPerCategory2(char curAA, Genome& genome, ROCParameter& parameter, double& logAcceptanceRatioForAllMixtures);
 
     protected:
 };

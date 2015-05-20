@@ -3,12 +3,12 @@
 
 #include <algorithm>
 #include <iostream>
-Gene::Gene() : seq(""), id(""), description(""), deltaM(0u), deltaEta(0u), deltaOmega(0u)
+Gene::Gene() : seq(""), id(""), description("")
 {
     //geneData = SequenceSummary();
 }
 
-Gene::Gene(std::string _seq, std::string _id, std::string _desc) : seq(_seq), id(_id), description(_desc), deltaM(0u), deltaEta(0u), deltaOmega(0u)
+Gene::Gene(std::string _seq, std::string _id, std::string _desc) : seq(_seq), id(_id), description(_desc)
 {
     cleanSeq();
     geneData.processSequence(seq);
@@ -20,9 +20,6 @@ Gene::Gene(const Gene& other)
     id = other.id;
     description = other.description;
     geneData = other.geneData;
-    deltaM = other.deltaM;
-    deltaEta = other.deltaEta;
-    deltaOmega = other.deltaOmega;
 }
 
 Gene& Gene::operator=(const Gene& rhs)
@@ -33,9 +30,6 @@ Gene& Gene::operator=(const Gene& rhs)
     id = rhs.id;
     description = rhs.description;
     geneData = rhs.geneData;
-    deltaM = rhs.deltaM;
-    deltaEta = rhs.deltaEta;
-    deltaOmega = rhs.deltaOmega;
     //assignment operator
     return *this;
 }

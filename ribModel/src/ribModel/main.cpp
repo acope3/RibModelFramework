@@ -208,11 +208,11 @@ int main()
 			else geneAssignment[i] = 1u;
 		}
 		std::cout << "initialize ROCParameter object" << std::endl;
-		ROCParameter parameter = ROCParameter(genome.getGenomeSize(), 2, 2, geneAssignment, true);
+		ROCParameter parameter = ROCParameter(genome.getGenomeSize(), 1, 2, geneAssignment, true);
 		std::string files[] = {std::string("Skluyveri_CSP_ChrA.csv"), std::string("Skluyveri_CSP_ChrCleft.csv")};
 		parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
 		parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
-		parameter.InitializeExpression(genome, 2);
+		parameter.InitializeExpression(genome, 1);
 		std::cout << "done initialize ROCParameter object" << std::endl;
 
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
@@ -238,10 +238,11 @@ int main()
 		std::ofstream mixAssignment("results/mixAssignment.csv");
 		for(int n = 0; n < genome.getGenomeSize(); n++)
 		{
-			unsigned mixtureElement = parameter.getMixtureAssignment(n);
+            double mixtureAssignmentPosteriorMean = parameter.getMixtureAssignmentPosteriorMean(useSamples, n);
+			unsigned mixtureElement = std::round( mixtureAssignmentPosteriorMean );
 			unsigned expressionCategory = parameter.getExpressionCategory(mixtureElement);
 			phiout << genome.getGene(n).getId() << "," << parameter.getExpressionPosteriorMean(useSamples, n, expressionCategory) << std::endl;
-			mixAssignment << genome.getGene(n).getId() << "," << parameter.getMixtureAssignmentPosteriorMean(useSamples, n) << std::endl;
+			mixAssignment << genome.getGene(n).getId() << "," << mixtureAssignmentPosteriorMean << std::endl;
 		}
 		phiout.close();
 		mixAssignment.close();
