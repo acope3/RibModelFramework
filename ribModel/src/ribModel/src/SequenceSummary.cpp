@@ -87,7 +87,8 @@ unsigned* SequenceSummary::AAindexToCodonRange(unsigned aaIndex, bool forParamVe
     }
     unsigned endAAIndex = numCodons + startAAIndex;
 
-    unsigned ret[2];
+		//static stops the memory from being trashed upon return.
+    static unsigned ret[2];
     ret[0] = startAAIndex;
     ret[1] = endAAIndex;
     return ret;
