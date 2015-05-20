@@ -20,7 +20,7 @@ class ROCParameter
         };
         //members
         unsigned int numParam;
-				
+
         double Sphi;
         double Aphi;
         double Sphi_proposed;
@@ -32,10 +32,10 @@ class ROCParameter
         double phiEpsilon;
         double phiEpsilon_proposed;
 
-				//Keywords
-				static const std::string allUnique;
-				static const std::string selectionShared;
-				static const std::string mutationShared;
+        //Keywords
+        static const std::string allUnique;
+        static const std::string selectionShared;
+        static const std::string mutationShared;
 
         // proposal bias and std for phi values
         double bias_sphi;
@@ -65,8 +65,8 @@ class ROCParameter
         std::vector<unsigned> numAcceptForMutationAndSelection;
 
         unsigned numMixtures;
-				unsigned numMutationCategories;
-				unsigned numSelectionCategories;
+        unsigned numMutationCategories;
+        unsigned numSelectionCategories;
         std::vector<thetaK> categories;
         std::vector<unsigned> mixtureAssignment;
 
@@ -96,25 +96,26 @@ class ROCParameter
         static std::default_random_engine generator; // static to make sure that the same generator is during the runtime.
 
         explicit ROCParameter();
-				ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures, double* geneAssignment = nullptr, bool splitSer = true, std::string mutationSelectionState = "allUnique", unsigned thetaKMatrix[][2] = nullptr, std::string files[] = nullptr);
+        ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures, unsigned* geneAssignment = nullptr, bool splitSer = true,
+            std::string mutationSelectionState = "allUnique", unsigned thetaKMatrix[][2] = nullptr);
         virtual ~ROCParameter();
         ROCParameter(const ROCParameter& other);
         ROCParameter& operator=(const ROCParameter& rhs);
 
         void initCategoryDefinitions(std::string mutationSelectionState, unsigned thetaKMatrix[][2]);
-				void initMutationSelectionCategories(std::string files[], int numCategories, unsigned paramType);
-				void printThetaKMatrix()
-				{
-					for (int i = 0; i < numMixtures; i++)
-					{
-						std::cout << categories[i].delM <<"\t" << categories[i].delEta <<"\n";
-					}
-				}
+        void initMutationSelectionCategories(std::string files[], int numCategories, unsigned paramType);
+        void printThetaKMatrix()
+        {
+            for (int i = 0; i < numMixtures; i++)
+            {
+                std::cout << categories[i].delM <<"\t" << categories[i].delEta <<"\n";
+            }
+        }
 
         unsigned getNumMixtureElements() {return numMixtures;}
-        unsigned getNumMutationCategoriesVar() {return numMutationCategories;}
-				unsigned getNumSelectionCategoriesVar() {return numSelectionCategories;}
-				unsigned getMutationCategory(unsigned group) {return categories[group].delM;}
+        //unsigned getNumMutationCategoriesVar() {return numMutationCategories;}
+        //unsigned getNumSelectionCategoriesVar() {return numSelectionCategories;}
+        unsigned getMutationCategory(unsigned group) {return categories[group].delM;}
         unsigned getSelectionCategory(unsigned group) {return categories[group].delEta;}
         unsigned getExpressionCategory(unsigned group) {return categories[group].delEta;}
         double getCategoryProbability(unsigned group) {return categoryProbabilities[group];}
@@ -172,8 +173,8 @@ class ROCParameter
         void proposeCodonSpecificParameter();
 
         void getParameterForCategory(unsigned category, unsigned parameter, char aa, bool proposal, double* returnValue);
-        unsigned getNumMutationCategories() {return currentMutationParameter.size();}
-        unsigned getNumSelectionCategories() {return currentSelectionParameter.size();}
+        unsigned getNumMutationCategories() {return numMutationCategories;}
+        unsigned getNumSelectionCategories() {return numSelectionCategories;}
 
         // functions to manage traces
         void initAllTraces(unsigned samples, unsigned num_genes);
@@ -197,6 +198,7 @@ class ROCParameter
 				// functions to return estimates
         double getExpressionPosteriorMean(unsigned samples, unsigned geneIndex, unsigned category);
         double getSphiPosteriorMean(unsigned samples);
+        double getMixtureAssignmentPosteriorMean(unsigned samples, unsigned geneIndex);
 
 
         // static functions

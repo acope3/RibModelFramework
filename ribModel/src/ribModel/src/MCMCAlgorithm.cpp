@@ -107,22 +107,24 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
             unscaledLogProb_curr[k] -= avgValue;
             unscaledLogProb_prop[k] -= avgValue;
         }
-        double logProbabilities[numMixtures];
-        double normalizingProbabilityConstant = 0.0;
 
+        double normalizingProbabilityConstant = 0.0;
+        double probabilities[numMixtures];
         // calculate ln(P) = ln( Sum(p_i*f'(...)) ) and obtain normalizing constant for new p_i
         for(unsigned k = 0; k < numMixtures; k++)
         {
-            logProbabilities[k] = std::log( parameter.getCategoryProbability(k) * std::exp(unscaledLogProb_curr[k]) );
-            currLogLike += logProbabilities[k];
+            // log(SUM) vs SUM(log) ??? second one works, but seems wrong. first one does not, why?
+            probabilities[k] = parameter.getCategoryProbability(k) * std::exp(unscaledLogProb_curr[k]);
+            currLogLike += std::log( probabilities[k] );
             propLogLike += std::log( parameter.getCategoryProbability(k) * std::exp(unscaledLogProb_prop[k]) );
-            normalizingProbabilityConstant += std::exp(logProbabilities[k]);
+            normalizingProbabilityConstant += probabilities[k];
         }
+        //currLogLike = std::log(currLogLike);
+        //propLogLike = std::log(propLogLike);
         // normalize probabilities
-        double probabilities[numMixtures];
         for (int k = 0; k < numMixtures; k++)
         {
-            probabilities[k] = std::exp(logProbabilities[k]) / normalizingProbabilityConstant;
+            probabilities[k] = probabilities[k] / normalizingProbabilityConstant;
         }
         // Get category in which the gene is placed in.
         // If we use multiple sequence observrvation (like different mutatnts) randMultinom needs an parameter N to place N observations in numMixture buckets
@@ -130,17 +132,21 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
         parameter.setMixtureAssignment(i, categoryOfGene);
         dirichletParameters[categoryOfGene] += 1;
 
+
+        //std::cout << i << " " << gene.getId() << " proposedLogLik: " << propLogLike << " currentLogLik: " << currLogLike;
         // accept/reject proposed phi values
         if( ( (double)std::rand() / (double)RAND_MAX ) < (std::exp(propLogLike) / std::exp(currLogLike)) )
         {
+            //std::cout << " accepted \n";
             // moves proposed phi to current phi
             //std::cout << "Update expression for Gene i = " << i << " in iteration " << iteration << std::endl;
             parameter.updateExpression(i);
             //#pragma omp atomic
-            logLikelihood += propLogLike;
+            logLikelihood += std::isfinite(propLogLike) ? propLogLike : 0.0;
         }else{
             //#pragma omp atomic
-            logLikelihood += currLogLike;
+            //std::cout << " rejected \n";
+            logLikelihood += std::isfinite(currLogLike) ? currLogLike : 0.0;
         }
         if((iteration % thining) == 0)
         {
@@ -287,7 +293,7 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
         {
             for(int i = 0; i < genome.getGenomeSize(); i++)
             {
-                phitraceout << expressionTrace[0][iteration][i] << ",";
+                phitraceout << expressionTrace[nm][iteration][i] << ",";
             }
             phitraceout << std::endl;
         }

@@ -4,11 +4,11 @@ test.phi.names <- as.character(read.table("../results/test.phi", sep=",")[,1])
 kluyveri.phi <- read.table("../results/Skluyveri_ChrA_phi_est.csv", sep=",", header=T)[, 2]
 test.scuo <- read.table("../results/test.scuo", sep=",")[,2]
 
-test.phiTrace <- read.table("../results/test.phiTrace", sep=",")
+test.phiTrace <- read.table("../results/phiTrace_nmix_1.csv", sep=",")
+which(log(test.phi) < -50)
 
 
-
-plot(test.phiTrace[, 347], type = "l")
+plot(log(test.phiTrace[, 572]), type = "l")
 #bla <- colMeans(test.phiTrace[500:1000, 1:448])
 
 test.lik <- as.numeric(scan("../results/test.lik"))

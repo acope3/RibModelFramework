@@ -10,8 +10,8 @@ ROCParameter::ROCParameter()
     ROCParameter(100, 2, 1, nullptr, true, "allUnique", nullptr);
 }
 
-ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures, double* geneAssignment, bool splitSer, std::string mutationSelectionState,
-	unsigned thetaKMatrix[][2], std::string files[])
+ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures, unsigned* geneAssignment, bool splitSer, std::string mutationSelectionState,
+	unsigned thetaKMatrix[][2])
 {
 
     // assign genes to mixture element
@@ -27,7 +27,7 @@ ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures
 
     numAcceptForMutationAndSelection.resize(22, 0u);
 
-    numParam = ((splitSer) ? 41 : 40);
+    numParam = ((splitSer) ? 40 : 41);
     Sphi = sphi;
     Sphi_proposed = sphi;
     bias_sphi = 0;
@@ -50,29 +50,24 @@ ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures
 
     currentMutationParameter.resize(numMutationCategories);
     proposedMutationParameter.resize(numMutationCategories);
-		
-		for (int i = 0; i < numMutationCategories; i++)
-		{
-			std::vector<double> tmp(numParam, 0.0);
-			currentMutationParameter[i] = tmp;
-			proposedMutationParameter[i] = tmp;
-		}
+
+    for (int i = 0; i < numMutationCategories; i++)
+    {
+        std::vector<double> tmp(numParam, 0.0);
+        currentMutationParameter[i] = tmp;
+        proposedMutationParameter[i] = tmp;
+    }
 
     currentSelectionParameter.resize(numSelectionCategories);
     proposedSelectionParameter.resize(numSelectionCategories);
     categoryProbabilities.resize(numMixtures, 1.0/(double)numMixtures);
 
-		for (int i = 0; i < numSelectionCategories; i++)
-		{
-			std::vector<double> tmp(numParam, 0.0);
-			proposedSelectionParameter[i] = tmp;
-			currentSelectionParameter[i] = tmp;
-		}
-		
-		//init stuff here
-		initMutationSelectionCategories(files, numMutationCategories, ROCParameter::dM);
-		initMutationSelectionCategories(files, numSelectionCategories, ROCParameter::dEta);
-
+    for (int i = 0; i < numSelectionCategories; i++)
+    {
+        std::vector<double> tmp(numParam, 0.0);
+        proposedSelectionParameter[i] = tmp;
+        currentSelectionParameter[i] = tmp;
+    }
 
 
     currentExpressionLevel.resize(numMixtures);
@@ -181,7 +176,6 @@ void ROCParameter::initMutationSelectionCategories(std::string files[], int numC
 	int i, j;
 	std::size_t pos, pos2;
 
-	std::vector<double> temp(numParam, 0.0);
 	std::ifstream currentFile;
 	std::string tmpString;
 	std::string type;
@@ -191,46 +185,46 @@ void ROCParameter::initMutationSelectionCategories(std::string files[], int numC
 
 	for (i = 0; i < numCategories; i++)
 	{
-		temp.clear();
-		temp.resize(numParam, 0.0);
-    
+        std::vector<double> temp(numParam, 0.0);
+		//temp.clear();
+		//temp.resize(numParam, 0.0);
 
 		//open the file, make sure it opens
-    currentFile.open(files[i].c_str());
-    if (currentFile.fail())
-    {
-      std::cerr <<"Error opening file " << i <<" in the file array.\n";
-      std::exit(1);
-    }
-    currentFile >> tmpString; //trash the first line, no info given.
-		
+        currentFile.open(files[i].c_str());
+        if (currentFile.fail())
+        {
+            std::cerr <<"Error opening file " << i <<" in the file array.\n";
+            std::exit(1);
+        }
+        currentFile >> tmpString; //trash the first line, no info given.
+
 
 		j = 0;
 		while (currentFile >> tmpString)
 		{
-      pos = tmpString.find(",");
-      pos2 = tmpString.find(",", pos + 1);
-      if (pos != std::string::npos & pos2 != std::string::npos)
-      {
-        std::string val = tmpString.substr(pos + 1, pos2 - (pos + 1));
-				if (tmpString.find(type) != std::string::npos) //mu or eta was found, depending on category
-				{
-					temp[j] = std::stod(val);
-					j++;
-					if (j == numParam) break;
-				}
-			}
+            pos = tmpString.find(",");
+            pos2 = tmpString.find(",", pos + 1);
+            if (pos != std::string::npos & pos2 != std::string::npos)
+            {
+                std::string val = tmpString.substr(pos + 1, pos2 - (pos + 1));
+                if (tmpString.find(type) != std::string::npos) //mu or eta was found, depending on category
+                {
+                    temp[j] = std::stod(val);
+                    j++;
+                    if (j == numParam) break;
+                }
+            }
 		}
-	
+
 		if (paramType == ROCParameter::dM)
 		{
 			currentMutationParameter[i] = temp;
-    	proposedMutationParameter[i] = temp;
+            proposedMutationParameter[i] = temp;
 		}
-		else 
+		else
 		{
-    	currentSelectionParameter[i] = temp;
-    	proposedSelectionParameter[i] = temp;
+            currentSelectionParameter[i] = temp;
+            proposedSelectionParameter[i] = temp;
 		}
 
 		currentFile.close();
@@ -270,7 +264,7 @@ void ROCParameter::initCategoryDefinitions(std::string mutationSelectionState, u
 		delEtaCounter.insert(categories[i].delEta);
 	}
 	numMutationCategories = delMCounter.size();
-	numSelectionCategories = delEtaCounter.size();	
+	numSelectionCategories = delEtaCounter.size();
 	//sets allow only the unique numbers to be added.
 	//at the end, the size of the set is equal to the number
 	//of unique categories.
@@ -280,8 +274,8 @@ void ROCParameter::initAllTraces(unsigned samples, unsigned num_genes)
 {
     initExpressionTrace(samples, num_genes);
     initMixtureAssignmentTrace(samples, num_genes);
-		initSphiTrace(samples);
-		initCategoryProbabilitesTrace(samples);
+    initSphiTrace(samples);
+    initCategoryProbabilitesTrace(samples);
 }
 void ROCParameter::initExpressionTrace(unsigned samples, unsigned num_genes)
 {
@@ -465,6 +459,29 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
     }
 }
 
+double ROCParameter::getMixtureAssignmentPosteriorMean(unsigned samples, unsigned geneIndex)
+{
+
+    double posteriorMean = 0.0;
+    unsigned traceLength = mixtureAssignmentTrace.size();
+
+
+    if(samples > traceLength)
+    {
+        std::cout << std::string("ROCParameter::getMixtureAssignmentPosteriorMean throws: Number of anticipated samples (") +
+            std::to_string(samples) + std::string(") is greater than the length of the available trace (") + std::to_string(traceLength) + std::string(").") +
+            std::string("Whole trace is used for posterior estimate! \n");
+        samples = traceLength;
+    }
+    unsigned start = traceLength - samples;
+    for(unsigned i = start; i < traceLength; i++)
+    {
+        posteriorMean += mixtureAssignmentTrace[i][geneIndex];
+    }
+
+    return posteriorMean / (double)samples;
+}
+
 double ROCParameter::getExpressionPosteriorMean(unsigned samples, unsigned geneIndex, unsigned category)
 {
 
@@ -601,29 +618,6 @@ void ROCParameter::updateCodonSpecificParameter(char aa)
         }
     }
 }
-/*)
-void ROCParameter::updateCodonSpecificParameter(std::vector<double>& currentParamVector, std::vector<double> proposedParam,
-        double (&prior)(double x, double a, double b), double logLikeImportanceRatio)
-{
-        // calculate log prior ratio
-        double lprior = 0.0;
-        for(unsigned i = 0; i < numParam; i++)
-        {
-            lprior += std::log( (*prior)(currentParamVector[i], priorA, priorB) ) - std::log( (*prior)(proposedParam[i], priorA, priorB) );
-        }
-
-        double logAcceptProb = logLikeImportanceRatio - lprior;
-
-        // decide acceptance
-        std::exponential_distribution<double> exponential(1);
-        double propability = -exponential(generator);
-        if(propability < logAcceptProb)
-        {
-            currentParamVector = proposedParam;
-        }
-
-*/
-
 
 /*
 * STATIC FUNCTIONS

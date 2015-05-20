@@ -132,8 +132,8 @@ void testThetaKMatrix()
 	ROCParameter R(100, 2, 3, nullptr, true, "mutationShared", nullptr);
 
 	R.printThetaKMatrix();
-	std::cout <<"numMutationCategories: " << R.getNumMutationCategoriesVar() <<"\n";
-	std::cout <<"numSelectionCategories: " << R.getNumSelectionCategoriesVar() <<"\n";
+	std::cout <<"numMutationCategories: " << R.getNumMutationCategories() <<"\n";
+	std::cout <<"numSelectionCategories: " << R.getNumSelectionCategories() <<"\n";
 	std::cout << "------------------ TEST THETAKMATRIX ------------------" << std::endl;
 
 }
@@ -145,9 +145,10 @@ int main()
 	Genome genome;
 	std::cout << "reading fasta file" << std::endl;
 	//genome.readFasta("../../inst/testGenome.fasta");
-	genome.readFasta("Skluyveri_chromosomeA.fasta");
+	genome.readFasta("Skluyveri_A_andCleft.fasta");
 	//genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/Skluyveri.fasta");
 	//genome.writeFasta("../../inst/resGenome.fasta
+	std::cout << "done reading fasta file" << std::endl;
 	bool testing = false;
 
 	if(testing)
@@ -159,19 +160,33 @@ int main()
          testLogNormDensity();
          testSCUO(genome);
          testCovarianceMatrix();
-				 testRandMultiNom(3);
+         testRandMultiNom(3);
 		*/
 		testThetaKMatrix();
 
 	}else{
-		int samples = 100;
+		int samples = 10000;
 		int thining = 10;
-		int useSamples = 50;
+		int useSamples = 5000;
 
 		ROCModel model = ROCModel();
-		ROCParameter parameter = ROCParameter(genome.getGenomeSize(), 2, 1, nullptr, true);
+		unsigned geneAssignment[genome.getGenomeSize()];
+		for(int i = 0; i < genome.getGenomeSize(); i++)
+		{
+            if(i < 448) geneAssignment[i] = 0u;
+            else geneAssignment[i] = 1u;
+		}
+        std::cout << "initialize ROCParameter object" << std::endl;
+		ROCParameter parameter = ROCParameter(genome.getGenomeSize(), 2, 2, geneAssignment, true);
+		std::string files[] = {std::string("Skluyveri_CSP_ChrA.csv"), std::string("Skluyveri_CSP_ChrCleft.csv")};
+        parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
+		parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
 		parameter.InitializeExpression(genome, 2);
+		std::cout << "done initialize ROCParameter object" << std::endl;
+
+		std::cout << "initialize MCMCAlgorithm object" << std::endl;
 		MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, true, true, true);
+		std::cout << "done initialize MCMCAlgorithm object" << std::endl;
 
 		std::ofstream scuoout("/results/test.scuo");
 		for(int n = 0; n < genome.getGenomeSize(); n++)
@@ -189,11 +204,16 @@ int main()
 		std::cout << "Sphi proposal width: " << parameter.getSphiProposalWidth() << std::endl;
 
 		std::ofstream phiout("results/test.phi");
+		std::ofstream mixAssignment("results/mixAssignment.csv");
 		for(int n = 0; n < genome.getGenomeSize(); n++)
 		{
-			phiout << genome.getGene(n).getId() << "," << parameter.getExpressionPosteriorMean(useSamples, n, 0) << std::endl;
+            unsigned mixtureElement = parameter.getMixtureAssignment(n);
+            unsigned expressionCategory = parameter.getExpressionCategory(mixtureElement);
+			phiout << genome.getGene(n).getId() << "," << parameter.getExpressionPosteriorMean(useSamples, n, expressionCategory) << std::endl;
+			mixAssignment << genome.getGene(n).getId() << "," << parameter.getMixtureAssignmentPosteriorMean(useSamples, n) << std::endl;
 		}
 		phiout.close();
+		mixAssignment.close();
 	}
 
 
