@@ -162,11 +162,12 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
 
         // which mixture element does this gene belong to
         unsigned mixtureElement = parameter.getMixtureAssignment(i);
+        //std::cout << "Gene " << i << ": mixtureElement = " << mixtureElement << "\n";
         // how is the mixture element defined. Which categories make it up
         unsigned mutationCategory = parameter.getMutationCategory(mixtureElement);
         unsigned selectionCategory = parameter.getSelectionCategory(mixtureElement);
         unsigned expressionCategory = parameter.getExpressionCategory(mixtureElement);
-
+        //std::cout << "Gene " << i << ": mutCat = " << mutationCategory << ", selCat = " << selectionCategory << ", exprCat = " << expressionCategory << "\n";
         // get phi value, calculate likelihood conditional on phi
         double phiValue = parameter.getExpression(i, expressionCategory, false);
 
@@ -175,6 +176,7 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
         parameter.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
         double selection[numCodons - 1];
         parameter.getParameterForCategory(mutationCategory, ROCParameter::dEta, curAA, false, selection);
+
         // get proposed mutation and selection parameter
         double mutation_proposed[numCodons - 1];
         parameter.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, true, mutation_proposed);
@@ -186,12 +188,16 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
 
         // get probability of current mixture assignment, calculate likelihood conditional on current mixture assignment
         double mixtureElementProbability = parameter.getCategoryProbability(mixtureElement);
+        //std::cout << "Gene " << i << ": mixtureElement = " << mixtureElement << "\t mixtureElementProbability = " << mixtureElementProbability << "\n";
         double a = calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation, selection, phiValue);
         double b = calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation_proposed, selection_proposed, phiValue);
-        likelihood += mixtureElementProbability * std::exp( calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation, selection, phiValue) );
-        likelihood_proposed += mixtureElementProbability * std::exp( calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation_proposed, selection_proposed, phiValue) );
+        //std::cout << "curLogLike: " << a << "\t propLogLike: " << b << "\n";
+        likelihood += mixtureElementProbability * std::exp(a); //std::exp( calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation, selection, phiValue) );
+        likelihood_proposed += mixtureElementProbability * std::exp(b); //std::exp( calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation_proposed, selection_proposed, phiValue) );
+        //std::cout << "curMixedLike: " << likelihood << "\t propMixedLike: " << likelihood_proposed << "\n";
     }
-
+    std::cout << "std::log( likelihood_proposed / likelihood ) = " << std::log( likelihood_proposed / likelihood ) << "\n";
+    exit(1);
     logAcceptanceRatioForAllMixtures = std::log( likelihood_proposed / likelihood );
 }
 

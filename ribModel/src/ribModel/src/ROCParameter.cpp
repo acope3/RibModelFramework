@@ -646,8 +646,8 @@ void ROCParameter::updateCodonSpecificParameter(char aa)
 	unsigned* aaRange = SequenceSummary::AAToCodonRange(aa, true);
 	unsigned aaIndex = SequenceSummary::aaToIndex.find(aa)->second;
 	numAcceptForMutationAndSelection[aaIndex]++;
-	
-	//std::cout << aaRange[0] <<" & " << aaRange[1] <<"  " << aa <<"\n";
+
+	//std::cout << aaRange[0] << " & " << aaRange[1] << "  " << aa <<"\n";
 	for(unsigned k = 0u; k < numMixtures; k++)
 	{
 		for(unsigned i = aaRange[0]; i < aaRange[1]; i++)

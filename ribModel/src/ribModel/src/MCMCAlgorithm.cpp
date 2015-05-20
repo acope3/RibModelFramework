@@ -211,15 +211,16 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, ROCParame
         if(curAA == 'X' || curAA == 'M' || curAA == 'W') continue;
         // calculate likelihood ratio for every Category for current AA
         model.calculateLogLikelihoodRatioPerAAPerCategory(curAA, genome, parameter, logAcceptanceRatioForAllMixtures);
+
         //std::cout << "logAcceptanceRatioForAllMixtures: " << logAcceptanceRatioForAllMixtures << "\n";
         if( -ROCParameter::randExp(1) < logAcceptanceRatioForAllMixtures )
         {
             // moves proposed codon specific parameters to current codon specific parameters
-						parameter.updateCodonSpecificParameter(curAA);
+            parameter.updateCodonSpecificParameter(curAA);
         }
         if((iteration % thining) == 0)
         {
-						parameter.updateCodonSpecificParameterTrace(iteration/thining, curAA);
+            parameter.updateCodonSpecificParameterTrace(iteration/thining, curAA);
             //parameter.updateSphiTrace(iteration/thining);
         }
     }
@@ -243,19 +244,6 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
         {
             parameter.proposeCodonSpecificParameter();
             acceptRejectCodonSpecificParameter(genome, parameter, model, iteration);
-            if(iteration % adaptiveWidth == 0 && iteration != 0)
-            {
-<<<<<<< HEAD
-                std::cout << "\n ================ \n";
-                covmat.printCovarianceMatrix();
-                std::cout << " ---------------- \n";
-                covmat.calculateCovarianceMatrixFromTraces(parameter.getExpressionTrace(), 0, iteration/thining, adaptiveWidth/thining);
-                covmat.printCovarianceMatrix();
-                std::cout << " ================ \n";
-=======
->>>>>>> 95ad9cc9b48b66939c6f20881332edd848af1598
-            }
-
         }
         // update hyper parameter
         if(estimateHyperParameter)
@@ -276,7 +264,7 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
             {
                 likelihoodTrace[iteration/thining] = logLike;
             }
-            if((iteration % adaptiveWidth) == 0)
+            if((iteration % adaptiveWidth) == 0 && iteration != 0)
             {
                 //std::cout <<"would call adaptExpressionPro.....\n";
                //parameter.adaptExpressionProposalWidth(adaptiveWidth);
