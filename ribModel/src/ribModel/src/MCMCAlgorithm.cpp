@@ -215,10 +215,11 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, ROCParame
         if( -ROCParameter::randExp(1) < logAcceptanceRatioForAllMixtures )
         {
             // moves proposed codon specific parameters to current codon specific parameters
-            parameter.updateCodonSpecificParameter(curAA);
+						parameter.updateCodonSpecificParameter(curAA);
         }
         if((iteration % thining) == 0)
         {
+						parameter.updateCodonSpecificParameterTrace(iteration/thining, curAA);
             //parameter.updateSphiTrace(iteration/thining);
         }
     }
@@ -244,12 +245,6 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
             acceptRejectCodonSpecificParameter(genome, parameter, model, iteration);
             if(iteration % adaptiveWidth == 0)
             {
-                std::cout << "\n ================ \n";
-                covmat.printCovarianceMatrix();
-                std::cout << " ---------------- \n";
-                covmat.calculateCovarianceMatrixFromTraces(parameter.getExpressionTrace(), 0, adaptiveWidth);
-                covmat.printCovarianceMatrix();
-                std::cout << " ================ \n";
             }
 
         }
@@ -276,6 +271,13 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
             {
                 //std::cout <<"would call adaptExpressionPro.....\n";
                //parameter.adaptExpressionProposalWidth(adaptiveWidth);
+            /*    std::cout << "\n ================ \n";
+                covmat.printCovarianceMatrix();
+                std::cout << " ---------------- \n";
+                covmat.calculateCovarianceMatrixFromTraces(parameter.getExpressionTrace(), 0, adaptiveWidth);
+                covmat.printCovarianceMatrix();
+                std::cout << " ================ \n";
+						*/
             }
         }
     } // end MCMC loop
@@ -283,12 +285,16 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
 
     // development output
     std::vector<std::vector<std::vector<double>>> expressionTrace = parameter.getExpressionTrace();
-
-    for(int nm = 0u; nm < parameter.getNumMixtureElements(); nm++)
+		unsigned int numParam = parameter.getNumParam();
+    for(int nm = 0u; nm < parameter.getNumSelectionCategories(); nm++)
     {
+				std::vector<std::vector<std::vector<double>>> selectionParameterTrace = parameter.getSelectionParameterTrace();
         std::stringstream oss;
+				std::stringstream oss2;
+				oss2 << "results/selectionParamTrace_" << nm<< ".csv";
         oss << "results/phiTrace_nmix_" << nm << ".csv";
         std::ofstream phitraceout(oss.str(), std::ofstream::out);
+				std::ofstream selectTraceOut(oss2.str(), std::ofstream::out);
         for(unsigned iteration = 0; iteration < samples; iteration++)
         {
             for(int i = 0; i < genome.getGenomeSize(); i++)
@@ -296,10 +302,32 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
                 phitraceout << expressionTrace[nm][iteration][i] << ",";
             }
             phitraceout << std::endl;
+						for(int i = 0; i < numParam; i++)
+						{
+							selectTraceOut << selectionParameterTrace[nm][iteration][i] <<",";
+						}
+						selectTraceOut << std::endl;
         }
         phitraceout.close();
-    }
+    		selectTraceOut.close();
+		}
 
+		for (int nm = 0u; nm < parameter.getNumMutationCategories(); nm++)
+		{
+				std::vector<std::vector<std::vector<double>>> mutationParameterTrace = parameter.getMutationParameterTrace();
+				std::stringstream oss;
+				oss << "results/mutationParamTrace_" << nm << ".csv";
+				std::ofstream mutateTraceOut(oss.str(), std::ofstream::out);
+        for(unsigned iteration = 0; iteration < samples; iteration++)
+				{
+						for(int i = 0; i < numParam; i++)
+						{
+							mutateTraceOut << mutationParameterTrace[nm][iteration][i] <<",";
+						}
+						mutateTraceOut << std::endl;
+				}
+				mutateTraceOut.close();
+		}
     std::ofstream likout("results/test.lik", std::ofstream::out);
     std::ofstream sphiout("results/test.sphi", std::ofstream::out);
     std::vector<double> sphiTrace = parameter.getSPhiTrace();

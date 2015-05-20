@@ -92,14 +92,14 @@ void testCovarianceMatrix()
 void testGetCountsForAA(Genome genome)
 {
 
-    unsigned codonCounts[genome.getGenomeSize()][5];
-    genome.getCountsForAA('A', codonCounts);
+	unsigned codonCounts[genome.getGenomeSize()][5];
+	genome.getCountsForAA('A', codonCounts);
 
-    for(unsigned i = 0u; 0 < genome.getGenomeSize(); i++)
-    {
-        Gene gene = genome.getGene(i);
-        std::cout << i << "| " << gene.getId() << ": " << codonCounts[i][0] << " " << codonCounts[i][1] << " " << codonCounts[i][2] << " " << codonCounts[i][3] << "\n";
-    }
+	for(unsigned i = 0u; 0 < genome.getGenomeSize(); i++)
+	{
+		Gene gene = genome.getGene(i);
+		std::cout << i << "| " << gene.getId() << ": " << codonCounts[i][0] << " " << codonCounts[i][1] << " " << codonCounts[i][2] << " " << codonCounts[i][3] << "\n";
+	}
 }
 
 
@@ -127,13 +127,43 @@ void testRandMultiNom(unsigned numCat)
 
 void testThetaKMatrix()
 {
-//	unsigned matrix[3][2] = { {0,1}, {3,2}, {0,0} };
+	unsigned matrix[2][2] = { {2,1}, {1,1} };
 	std::cout << "------------------ TEST THETAKMATRIX ------------------" << std::endl;
-	ROCParameter R(100, 2, 3, nullptr, true, "mutationShared", nullptr);
+	ROCParameter R(100, 2, 2, nullptr, true, "selectionShared", matrix);
 
 	R.printThetaKMatrix();
 	std::cout <<"numMutationCategories: " << R.getNumMutationCategories() <<"\n";
 	std::cout <<"numSelectionCategories: " << R.getNumSelectionCategories() <<"\n";
+	std::string files[] = {std::string("Skluyveri_CSP_ChrA.csv"), std::string("Skluyveri_CSP_ChrCleft.csv")};
+	std::cout <<"files array good to go\n";
+	R.initMutationSelectionCategories(files, R.getNumMutationCategories(), ROCParameter::dM);
+	R.initMutationSelectionCategories(files, R.getNumSelectionCategories(), ROCParameter::dEta);
+
+
+	std::cout <<"looping through all mutation params:\n";
+	std::vector<std::vector <double>> temp;
+	temp = R.getCurrentMutationParameter();
+	for (int i = 0; i < temp.size(); i++)
+	{
+		std::cout <<"Mutation param " << i <<":\n";
+		for (int j = 0; j < temp[i].size(); j++)
+		{
+			std::cout << temp[i][j] <<"\n";
+		}
+		std::cout <<"\n\n";
+	}
+	
+	std::cout <<"looping through all selection params:\n";
+	temp = R.getCurrentSelectionParameter();
+	for (int i = 0; i < temp.size(); i++)
+	{
+		std::cout <<"Selection param " << i <<":\n";
+		for (int j = 0; j < temp[i].size(); j++)
+		{
+			std::cout << temp[i][j] <<"\n";
+		}
+		std::cout <<"\n\n";
+	}
 	std::cout << "------------------ TEST THETAKMATRIX ------------------" << std::endl;
 
 }
@@ -154,32 +184,32 @@ int main()
 	if(testing)
 	{
 		/*
-         testNumCodonsPerAA();
-         testCodonRangePerAA(false);
-         testCodonRangePerAA(true);
-         testLogNormDensity();
-         testSCUO(genome);
-         testCovarianceMatrix();
-         testRandMultiNom(3);
-		*/
+			 testNumCodonsPerAA();
+			 testCodonRangePerAA(false);
+			 testCodonRangePerAA(true);
+			 testLogNormDensity();
+			 testSCUO(genome);
+			 testCovarianceMatrix();
+			 testRandMultiNom(3);
+		 */
 		testThetaKMatrix();
 
 	}else{
-		int samples = 10000;
+		int samples = 100;
 		int thining = 10;
-		int useSamples = 5000;
+		int useSamples = 50;
 
 		ROCModel model = ROCModel();
 		unsigned geneAssignment[genome.getGenomeSize()];
 		for(int i = 0; i < genome.getGenomeSize(); i++)
 		{
-            if(i < 448) geneAssignment[i] = 0u;
-            else geneAssignment[i] = 1u;
+			if(i < 448) geneAssignment[i] = 0u;
+			else geneAssignment[i] = 1u;
 		}
-        std::cout << "initialize ROCParameter object" << std::endl;
+		std::cout << "initialize ROCParameter object" << std::endl;
 		ROCParameter parameter = ROCParameter(genome.getGenomeSize(), 2, 2, geneAssignment, true);
 		std::string files[] = {std::string("Skluyveri_CSP_ChrA.csv"), std::string("Skluyveri_CSP_ChrCleft.csv")};
-        parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
+		parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
 		parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
 		parameter.InitializeExpression(genome, 2);
 		std::cout << "done initialize ROCParameter object" << std::endl;
@@ -207,8 +237,8 @@ int main()
 		std::ofstream mixAssignment("results/mixAssignment.csv");
 		for(int n = 0; n < genome.getGenomeSize(); n++)
 		{
-            unsigned mixtureElement = parameter.getMixtureAssignment(n);
-            unsigned expressionCategory = parameter.getExpressionCategory(mixtureElement);
+			unsigned mixtureElement = parameter.getMixtureAssignment(n);
+			unsigned expressionCategory = parameter.getExpressionCategory(mixtureElement);
 			phiout << genome.getGene(n).getId() << "," << parameter.getExpressionPosteriorMean(useSamples, n, expressionCategory) << std::endl;
 			mixAssignment << genome.getGene(n).getId() << "," << parameter.getMixtureAssignmentPosteriorMean(useSamples, n) << std::endl;
 		}

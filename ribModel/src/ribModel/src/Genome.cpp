@@ -53,11 +53,16 @@ void Genome::getCountsForAA(char aa, unsigned codonCounts[][5])
     }
 }
 
-void Genome::writeFasta ( char* filename )
+void Genome::writeFasta (char* filename )
 {
     try {
-        std::ofstream Fout(filename);
-        if(!Fout) throw strcat("Cannot open output Fasta file ", filename);
+        std::ofstream Fout;
+				Fout.open(filename);
+				if (Fout.fail())
+				{
+					std::cerr <<"Cannot open output Fasta file " << filename <<"\n";
+					exit(1);
+				}
 
         for(int i = 0; i < genes.size(); i++)
         {
