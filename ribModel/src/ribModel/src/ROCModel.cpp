@@ -141,7 +141,7 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
         double selection_proposed[numCodons - 1];
         parameter.getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, true, selection_proposed);
 
-        if(i == 0)
+/*        if(i == 0)
         {
 //            std::cout << curAA << " selection array: ";
 //            for(int k = 0; k < numCodons - 1; k++){std::cout << selection[k] << " ";}
@@ -157,7 +157,7 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
 //            for(int k = 0; k < numCodons - 1; k++){std::cout << mutation_proposed[k] << " ";}
 //            std::cout << "\n";
         }
-
+*/
         int codonCount[numCodons];
         obtainCodonCount(seqsum, curAA, codonCount);
 
@@ -167,12 +167,12 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
         double a = calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
         double b = calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation_proposed, selection_proposed, phiValue);
         //std::cout << "curLogLike: " << a << "\t propLogLike: " << b << "\n";
-        likelihood += mixtureElementProbability * std::exp(a); //std::exp( calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation, selection, phiValue) );
-        likelihood_proposed += mixtureElementProbability * std::exp(b); //std::exp( calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation_proposed, selection_proposed, phiValue) );
+        likelihood += a; //std::exp( calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation, selection, phiValue) );
+        likelihood_proposed += b; //std::exp( calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation_proposed, selection_proposed, phiValue) );
         //std::cout << "curMixedLike: " << likelihood << "\t propMixedLike: " << likelihood_proposed << "\n";
     }
     //std::cout << "( likelihood_proposed / likelihood ) = " << likelihood_proposed / likelihood  << "\n";
-    logAcceptanceRatioForAllMixtures = likelihood_proposed / likelihood;
+    logAcceptanceRatioForAllMixtures = likelihood_proposed - likelihood;
 }
 
 void ROCModel::obtainCodonCount(SequenceSummary& seqsum, char curAA, int codonCount[])

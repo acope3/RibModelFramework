@@ -463,7 +463,7 @@ void ROCParameter::InitializeExpression(double sd_phi)
 }
 void ROCParameter::InitializeExpression(double* expression)
 {
-	int numGenes = currentExpressionLevel[1].size();
+	int numGenes = currentExpressionLevel[0].size();
 	for(unsigned category = 0; category < numMixtures; category++)
 	{
 		for(int i = 0; i < numGenes; i++)
@@ -473,6 +473,7 @@ void ROCParameter::InitializeExpression(double* expression)
 			numAcceptForExpression[i] = 0u;
 		}
 	}
+
 }
 
 void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType, char aa, bool proposal, double* returnSet)
@@ -656,6 +657,39 @@ void ROCParameter::updateCodonSpecificParameter(char aa)
 			currentSelectionParameter[k][i] = proposedSelectionParameter[k][i];
 		}
 	}
+}
+
+void ROCParameter::readStaticPhiValues(char *filename, double temp[])
+{
+
+	int j;
+	std::size_t pos, pos2;
+	std::ifstream currentFile;
+	std::string tmpString;
+    currentFile.open(filename);
+    if (currentFile.fail())
+    {
+      std::cerr <<"Error opening file\n";
+      std::exit(1);
+		}
+	
+	currentFile >> tmpString; //trash the first line, no info given.
+
+
+	j = 0;
+	while (currentFile >> tmpString)
+	{
+		pos = tmpString.find(",");
+		pos2 = tmpString.find(",", pos + 1);
+		if (pos != std::string::npos && pos2 != std::string::npos)
+		{
+			std::string val = tmpString.substr(pos + 1, pos2 - (pos + 1));
+			temp[j] = std::stod(val);
+			j++;
+		}
+	}
+//	for (int i = 0; i < j; i++)
+//		std::cout << temp[i] <<"\n";
 }
 
 /*

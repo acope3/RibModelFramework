@@ -176,7 +176,7 @@ int main()
 	Genome genome;
 	std::cout << "reading fasta file" << std::endl;
 	//genome.readFasta("../../inst/testGenome.fasta");
-	genome.readFasta("Skluyveri_chromosomeA.fasta");
+	genome.readFasta("Skluyveri_A_andCleft.fasta");
 	//genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/Skluyveri.fasta");
 	//genome.writeFasta("../../inst/resGenome.fasta
 	std::cout << "done reading fasta file" << std::endl;
@@ -196,9 +196,9 @@ int main()
 		testThetaKMatrix();
 
 	}else{
-		int samples = 1000;
-		int thining = 1;
-		int useSamples = 50;
+		int samples = 500;
+		int thining = 10;
+		int useSamples = 150;
 
 		ROCModel model = ROCModel();
 		unsigned geneAssignment[genome.getGenomeSize()];
@@ -208,20 +208,24 @@ int main()
 			else geneAssignment[i] = 1u;
 		}
 		std::cout << "initialize ROCParameter object" << std::endl;
-		ROCParameter parameter = ROCParameter(genome.getGenomeSize(), 0.79, 1, geneAssignment, true);
+		ROCParameter parameter = ROCParameter(genome.getGenomeSize(), 2, 2, geneAssignment, true);
 		std::string files[] = {std::string("Skluyveri_CSP_ChrA.csv"), std::string("Skluyveri_CSP_ChrCleft.csv")};
 		parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
 		parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
 
 
-		parameter.InitializeExpression(genome, 0.79);
+		parameter.InitializeExpression(genome, 2);
 		std::cout << "done initialize ROCParameter object" << std::endl;
+		//double phiVals[genome.getGenomeSize()];
+		//parameter.readStaticPhiValues("Skluyveri_ChrA_phi_est.csv", phiVals);
+
+		//std::cout <<"End of phi Vals\n";
+		//parameter.InitializeExpression(phiVals);
 
 
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
 		MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, true, false, true);
 		std::cout << "done initialize MCMCAlgorithm object" << std::endl;
-
 		std::ofstream scuoout("results/scuo.csv");
 		for(int n = 0; n < genome.getGenomeSize(); n++)
 		{

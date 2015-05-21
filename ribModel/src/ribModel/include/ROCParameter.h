@@ -104,6 +104,7 @@ class ROCParameter
 		ROCParameter(const ROCParameter& other);
 		ROCParameter& operator=(const ROCParameter& rhs);
 
+		void readStaticPhiValues(char *filename, double temp[]);
 		void initCategoryDefinitions(std::string mutationSelectionState, unsigned thetaKMatrix[][2]);
 		void initMutationSelectionCategories(std::string files[], int numCategories, unsigned paramType);
 		void printThetaKMatrix()
