@@ -135,12 +135,13 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
 
         //std::cout << i << " " << gene.getId() << " proposedLogLik: " << propLogLike << " currentLogLik: " << currLogLike;
         // accept/reject proposed phi values
-        if( ROCParameter::randUnif(0, 1) < (std::exp(propLogLike) / std::exp(currLogLike)) )
+        std::cout <<"propLoglIke: " << (std::exp(propLogLike) / std::exp(currLogLike)) <<"\n"; 
+				if( ROCParameter::randUnif(0, 1) < (std::exp(propLogLike) / std::exp(currLogLike)) )
         {
             //std::cout << " accepted \n";
             // moves proposed phi to current phi
             //std::cout << "Update expression for Gene i = " << i << " in iteration " << iteration << std::endl;
-            //parameter.updateExpression(i);
+            parameter.updateExpression(i);
             //#pragma omp atomic
             logLikelihood += std::isfinite(propLogLike) ? propLogLike : 0.0;
         }else{
@@ -198,12 +199,12 @@ void MCMCAlgorithm::acceptRejectHyperParameter(int numGenes, ROCParameter& param
     {
         parameter.updateSphiTrace(iteration/thining);
     }
+//		std::cout <<"logProbabilityRatio: " << logProbabilityRatio <<"\n";
 }
 
 void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, ROCParameter& parameter, ROCModel& model, int iteration)
 {
     double acceptanceRatioForAllMixtures = 0.0;
-    std::cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
     for(unsigned i = 0; i < 22; i++)
     {
         char curAA = SequenceSummary::AminoAcidArray[i];
@@ -213,13 +214,14 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, ROCParame
         model.calculateLogLikelihoodRatioPerAAPerCategory(curAA, genome, parameter, acceptanceRatioForAllMixtures);
 
         //std::cout << "logAcceptanceRatioForAllMixtures: " << logAcceptanceRatioForAllMixtures << "\n";
-        if( ROCParameter::randUnif(0, 1) < acceptanceRatioForAllMixtures )
+        if( -ROCParameter::randExp(1) < acceptanceRatioForAllMixtures )
         {
+						std::cout <<"AcceptanceRatio: " << acceptanceRatioForAllMixtures <<"\n";
             // moves proposed codon specific parameters to current codon specific parameters
             parameter.updateCodonSpecificParameter(curAA);
-            std::cout << "ACCEPTED\n";
-        }else{std::cout << "REJECTED\n"; }
-        if((iteration % thining) == 0)
+            //std::cout << "ACCEPTED\n";
+        }
+				if((iteration % thining) == 0)
         {
             parameter.updateCodonSpecificParameterTrace(iteration/thining, curAA);
             //parameter.updateSphiTrace(iteration/thining);

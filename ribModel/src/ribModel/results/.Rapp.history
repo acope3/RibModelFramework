@@ -1,0 +1,41 @@
+test.phi <- read.table("test.phi", sep=",")[,2]
+test.phi <- read.table("phiPosterior.csv", sep=",")[,2]
+test.phi.names <- as.character(read.table("phiPosterior.csv", sep=",")[,1])
+kluyveri.phi <- read.table("../Skluyveri_ChrA_ChrCleft_phi_est.csv", sep=",", header=T)[, 2]
+plot(log10(kluyveri.phi), log10(test.phi))
+kluyveri.phi <- read.table("../Skluyveri_CSP_ChrA.csv", sep=",", header=T)[, 2]
+plot(log10(kluyveri.phi), log10(test.phi))
+kluyveri.phi <- read.table("../Skluyveri_CSP_ChrA.csv", sep=",", header=T)[, 2]
+plot(log10(kluyveri.phi), log10(test.phi))
+kluyveri.phi
+kluyveri.phi <- read.table("../Skluyveri_ChrA_phi_est.csv", sep=",", header=T)[, 2]
+plot(log10(kluyveri.phi), log10(test.phi))
+test.phi <- read.table("phiPosterior.csv", sep=",")[,2]
+test.phi <- read.table("phiPosterior.csv", sep=",")[,2]
+test.phi.names <- as.character(read.table("phiPosterior.csv", sep=",")[,1])
+kluyveri.phi <- read.table("../Skluyveri_ChrA_phi_est.csv", sep=",", header=T)[, 2]
+plot(log10(kluyveri.phi), log10(test.phi))
+cor(log10(kluyveri.phi), log10(test.phi))
+test.phiTrace <- read.table("phiTrace_nmix_0.csv", sep=",")
+plot(log(test.phiTrace[, 272]), type = "l")
+plot(log(test.phiTrace[, 22]), type = "l")
+plot(log(test.phiTrace[, 422]), type = "l")
+test.phi <- read.table("phiPosterior.csv", sep=",")[,2]
+test.phi.names <- as.character(read.table("phiPosterior.csv", sep=",")[,1])
+kluyveri.phi <- read.table("../Skluyveri_ChrA_phi_est.csv", sep=",", header=T)[, 2]
+plot(log10(kluyveri.phi), log10(test.phi))
+test.phi <- read.table("phiPosterior.csv", sep=",")[,2]#
+test.phi.names <- as.character(read.table("phiPosterior.csv", sep=",")[,1])#
+kluyveri.phi <- read.table("../Skluyveri_ChrA_phi_est.csv", sep=",", header=T)[, 2]#
+plot(log10(kluyveri.phi), log10(test.phi))#
+cor(log10(kluyveri.phi), log10(test.phi))
+test.phi <- read.table("phiPosterior.csv", sep=",")[,2]#
+test.phi.names <- as.character(read.table("phiPosterior.csv", sep=",")[,1])#
+kluyveri.phi <- read.table("../Skluyveri_ChrA_phi_est.csv", sep=",", header=T)[, 2]#
+plot(log10(kluyveri.phi), log10(test.phi))#
+cor(log10(kluyveri.phi), log10(test.phi))
+test.phi <- read.table("phiPosterior.csv", sep=",")[,2]#
+test.phi.names <- as.character(read.table("phiPosterior.csv", sep=",")[,1])#
+kluyveri.phi <- read.table("../Skluyveri_ChrA_phi_est.csv", sep=",", header=T)[, 2]#
+plot(log10(kluyveri.phi), log10(test.phi))#
+cor(log10(kluyveri.phi), log10(test.phi))
