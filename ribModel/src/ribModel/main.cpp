@@ -176,7 +176,7 @@ int main()
 	Genome genome;
 	std::cout << "reading fasta file" << std::endl;
 	//genome.readFasta("../../inst/testGenome.fasta");
-	genome.readFasta("Skluyveri_A_andCleft.fasta");
+	genome.readFasta("Skluyveri_chromosomeA.fasta");
 	//genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/Skluyveri.fasta");
 	//genome.writeFasta("../../inst/resGenome.fasta
 	std::cout << "done reading fasta file" << std::endl;
@@ -208,7 +208,7 @@ int main()
 			else geneAssignment[i] = 1u;
 		}
 		std::cout << "initialize ROCParameter object" << std::endl;
-		ROCParameter parameter = ROCParameter(genome.getGenomeSize(), 1, 2, geneAssignment, true);
+		ROCParameter parameter = ROCParameter(genome.getGenomeSize(), 1, 1, geneAssignment, true);
 		std::string files[] = {std::string("Skluyveri_CSP_ChrA.csv"), std::string("Skluyveri_CSP_ChrCleft.csv")};
 		parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
 		parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
@@ -219,7 +219,7 @@ int main()
 		MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, true, true, true);
 		std::cout << "done initialize MCMCAlgorithm object" << std::endl;
 
-		std::ofstream scuoout("/results/test.scuo");
+		std::ofstream scuoout("/results/scuo.csv");
 		for(int n = 0; n < genome.getGenomeSize(); n++)
 		{
 			scuoout << genome.getGene(n).getId() << "," << parameter.calculateSCUO(genome.getGene(n)) << std::endl;
@@ -234,7 +234,7 @@ int main()
 		std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
 		std::cout << "Sphi proposal width: " << parameter.getSphiProposalWidth() << std::endl;
 
-		std::ofstream phiout("results/test.phi");
+		std::ofstream phiout("results/phiPosterior.csv");
 		std::ofstream mixAssignment("results/mixAssignment.csv");
 		for(int n = 0; n < genome.getGenomeSize(); n++)
 		{
