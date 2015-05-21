@@ -196,9 +196,9 @@ int main()
 		testThetaKMatrix();
 
 	}else{
-		int samples = 500;
+		int samples = 100;
 		int thining = 10;
-		int useSamples = 150;
+		int useSamples = 50;
 
 		ROCModel model = ROCModel();
 		unsigned geneAssignment[genome.getGenomeSize()];
@@ -208,7 +208,7 @@ int main()
 			else geneAssignment[i] = 1u;
 		}
 		std::cout << "initialize ROCParameter object" << std::endl;
-		ROCParameter parameter = ROCParameter(genome.getGenomeSize(), 2, 2, geneAssignment, true);
+		ROCParameter parameter = ROCParameter(genome.getGenomeSize(), 2, 2, geneAssignment, true, ROCParameter::selectionShared);
 		std::string files[] = {std::string("Skluyveri_CSP_ChrA.csv"), std::string("Skluyveri_CSP_ChrCleft.csv")};
 		parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
 		parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
@@ -240,14 +240,18 @@ int main()
 
 		std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
 		std::cout << "Sphi proposal width: " << parameter.getSphiProposalWidth() << std::endl;
-
+        std::cout << "CSP proposal width: \n";
+        for(unsigned n = 0; n < 22; n++)
+        {
+            std::cout << SequenceSummary::AminoAcidArray[n] << ": " << parameter.getCodonSpecificProposalWidth(n) << "\n";
+        }
 
 		std::ofstream phiout("results/phiPosterior.csv");
 		std::ofstream mixAssignment("results/mixAssignment.csv");
-		std::cout << "Phi proposal width: \n";
+		//std::cout << "Phi proposal width: \n";
 		for(int n = 0; n < genome.getGenomeSize(); n++)
 		{
-            std::cout << parameter.getExpressionProposalWidth(n) << std::endl;
+            //std::cout << parameter.getExpressionProposalWidth(n) << std::endl;
             double mixtureAssignmentPosteriorMean = parameter.getMixtureAssignmentPosteriorMean(useSamples, n);
 			unsigned mixtureElement = std::round( mixtureAssignmentPosteriorMean );
 			unsigned expressionCategory = parameter.getExpressionCategory(mixtureElement);

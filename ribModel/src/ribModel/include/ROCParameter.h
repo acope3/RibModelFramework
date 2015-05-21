@@ -32,11 +32,6 @@ class ROCParameter
 		double phiEpsilon;
 		double phiEpsilon_proposed;
 
-		//Keywords
-		static const std::string allUnique;
-		static const std::string selectionShared;
-		static const std::string mutationShared;
-
 		// proposal bias and std for phi values
 		double bias_sphi;
 		double std_sphi;
@@ -47,7 +42,7 @@ class ROCParameter
 
 		// proposal bias and std for codon specific parameter
 		double bias_csp;
-		double std_csp;
+		std::vector<double> std_csp;
 
 		double priorA;
 		double priorB;
@@ -80,7 +75,7 @@ class ROCParameter
 
 
 		// functions
-		std::vector<double> propose(std::vector<double> currentParam, double (*proposal)(double a, double b), double A, double B);
+		std::vector<double> propose(std::vector<double> currentParam, double (*proposal)(double a, double b), double A, std::vector<double> B);
 
 
 		// sorting functions
@@ -95,6 +90,11 @@ class ROCParameter
 		//static const members
 		static const unsigned dM;
 		static const unsigned dEta;
+		//Keywords
+		static const std::string allUnique;
+		static const std::string selectionShared;
+		static const std::string mutationShared;
+
 		static std::default_random_engine generator; // static to make sure that the same generator is during the runtime.
 
 		explicit ROCParameter();
@@ -168,6 +168,7 @@ class ROCParameter
 
 		// functions to manage codon specific parameter
 		void updateCodonSpecificParameter(char aa);
+		double getCodonSpecificProposalWidth(unsigned aa) {return std_csp[aa];}
 
 		// functions to manage Sphi
 		double getSphi(bool proposed = false) {return (proposed ? Sphi_proposed : Sphi);}

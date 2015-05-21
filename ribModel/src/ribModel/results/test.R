@@ -1,8 +1,13 @@
 test.phi <- read.table("phiPosterior.csv", sep=",")[,2]
 test.phi.names <- as.character(read.table("phiPosterior.csv", sep=",")[,1])
 kluyveri.phi <- read.table("../Skluyveri_ChrA_phi_est.csv", sep=",", header=T)[, 2]
-plot(log10(kluyveri.phi), log10(test.phi))
+
+idx <- grepl(pattern = "^SAKL0C", x = test.phi.names)
+plot(log10(kluyveri.phi[!idx]), log10(test.phi[!idx]))
+points(log10(kluyveri.phi[idx]), log10(test.phi[idx]), col = "red")
 cor(log10(kluyveri.phi), log10(test.phi))
+
+
 
 test.phi.names[log(test.phi) > 4]
 which(log(test.phi) > 4)

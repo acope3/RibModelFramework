@@ -39,7 +39,7 @@ ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures
 
 	// proposal bias and std for codon specific parameter
 	bias_csp = 0;
-	std_csp = 0.1;
+	std_csp.resize(22, 0.1);
 
 	priorA = 0;
 	priorB = 1;
@@ -596,6 +596,26 @@ void ROCParameter::adaptExpressionProposalWidth(unsigned adaptationWidth)
 	}
 
 }
+void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
+{
+    unsigned numCSPsets = numAcceptForMutationAndSelection.size();
+    for(unsigned i = 0; i < numCSPsets; i++)
+	{
+        double acceptanceLevel = (double)numAcceptForMutationAndSelection[i] / (double)adaptationWidth;
+        std::cout << SequenceSummary::AminoAcidArray[i] << " acceptance level: " << acceptanceLevel << "\n";
+		if(acceptanceLevel < 0.2)
+		{
+			std_csp[i] = std::max(0.01, std_csp[i] * 0.8);
+			std::cout << SequenceSummary::AminoAcidArray[i] << ": " << "acceptance rate to low\n";
+		}
+		if(acceptanceLevel > 0.3)
+		{
+			std_csp[i] = std::min(10.0, std_csp[i] * 1.2);
+			std::cout << SequenceSummary::AminoAcidArray[i] << ": " << "acceptance rate to high\n";
+		}
+		numAcceptForMutationAndSelection[i] = 0u;
+	}
+}
 
 // Cedric: I decided to use a normal distribution to propose Sphi and phi instead of a lognormal because:
 // 1. It is a symmetric distribution and you therefore do not have to account for the unsymmetry in jump probabilities
@@ -629,13 +649,13 @@ void ROCParameter::proposeCodonSpecificParameter()
 		proposedSelectionParameter[i] = propose(currentSelectionParameter[i], ROCParameter::randNorm, bias_csp, std_csp);
 	}
 }
-std::vector<double> ROCParameter::propose(std::vector<double> currentParam, double (*proposal)(double a, double b), double A, double B)
+std::vector<double> ROCParameter::propose(std::vector<double> currentParam, double (*proposal)(double a, double b), double A, std::vector<double> B)
 {
 	unsigned numParam = currentParam.size();
 	std::vector<double> proposedParam(numParam, 0.0);
 	for(unsigned i = 0; i < numParam; i++)
 	{
-		proposedParam[i] = (*proposal)(A + currentParam[i], B);
+		proposedParam[i] = (*proposal)(A + currentParam[i], B[i]);
 	}
 	return proposedParam;
 }
@@ -672,7 +692,7 @@ void ROCParameter::readStaticPhiValues(char *filename, double temp[])
       std::cerr <<"Error opening file\n";
       std::exit(1);
 		}
-	
+
 	currentFile >> tmpString; //trash the first line, no info given.
 
 
