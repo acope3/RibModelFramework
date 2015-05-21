@@ -292,7 +292,19 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
         oss << "results/phiTrace_nmix_" << nm << ".csv";
         std::ofstream phitraceout(oss.str(), std::ofstream::out);
 				std::ofstream selectTraceOut(oss2.str(), std::ofstream::out);
-        for(unsigned iteration = 0; iteration < samples; iteration++)
+        for (int i = 0; i < 22; i++)
+				{
+					char aa = SequenceSummary::AminoAcidArray[i];
+					if (aa == 'X' || aa == 'W' || aa == 'M') continue;
+					unsigned aaRange[2];
+					SequenceSummary::AAToCodonRange(aa, false, aaRange);
+					for (int j = aaRange[0]; j < aaRange[1] - 1; j++)
+					{
+						selectTraceOut << aa <<"." << SequenceSummary::codonArray[j] <<",";
+					}
+				}
+				selectTraceOut <<"\n";
+				for(unsigned iteration = 0; iteration < samples; iteration++)
         {
             for(int i = 0; i < genome.getGenomeSize(); i++)
             {
@@ -315,6 +327,18 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
 				std::stringstream oss;
 				oss << "results/mutationParamTrace_" << nm << ".csv";
 				std::ofstream mutateTraceOut(oss.str(), std::ofstream::out);
+        for (int i = 0; i < 22; i++)
+				{
+					char aa = SequenceSummary::AminoAcidArray[i];
+					if (aa == 'X' || aa == 'W' || aa == 'M') continue;
+					unsigned aaRange[2];
+					SequenceSummary::AAToCodonRange(aa, false, aaRange);
+					for (int j = aaRange[0]; j < aaRange[1] - 1; j++)
+					{
+						mutateTraceOut << aa <<"." << SequenceSummary::codonArray[j] <<",";
+					}
+				}
+				mutateTraceOut <<"\n";
         for(unsigned iteration = 0; iteration < samples; iteration++)
 				{
 						for(int i = 0; i < numParam; i++)
@@ -325,8 +349,8 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
 				}
 				mutateTraceOut.close();
 		}
-    std::ofstream likout("results/test.lik", std::ofstream::out);
-    std::ofstream sphiout("results/test.sphi", std::ofstream::out);
+    std::ofstream likout("results/liklihoodTrace.csv", std::ofstream::out);
+    std::ofstream sphiout("results/sphiTrace.csv", std::ofstream::out);
     std::vector<double> sphiTrace = parameter.getSPhiTrace();
     for(unsigned iteration = 0; iteration < samples; iteration++)
     {

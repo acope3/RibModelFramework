@@ -37,7 +37,6 @@ void Genome::addGene(const Gene& gene)
 
 void Genome::getCountsForAA(char aa, unsigned codonCounts[][5])
 {
-
     unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa);
     for(int i = 0; i < genes.size(); i++)
     {
@@ -84,8 +83,13 @@ void Genome::readFasta(char* filename) // read Fasta format sequences
 {
     try
     {
-        std::ifstream Fin(filename);
-        if(!Fin) throw strcat("Genome::readFasta throws: Cannot open input Fasta file ", filename);
+        std::ifstream Fin;
+				Fin.open(filename);
+				if (Fin.fail())
+				{
+					std::cerr <<"Genome::readFasta throws: Cannot open input Fasta file " << filename <<"\n";
+					std::exit(1);
+				}
 
         bool fastaFormat = false;
         std::string buf;
@@ -94,7 +98,7 @@ void Genome::readFasta(char* filename) // read Fasta format sequences
 
         Gene tmpGene;
         std::string tempSeq = "";
-        for(;;)
+        while (1)
         {
             // read a new line in every cycle
             std::getline(Fin, buf);
@@ -136,7 +140,7 @@ void Genome::readFasta(char* filename) // read Fasta format sequences
                     tempSeq = "";
                 }
                 tmpGene.setDescription( buf.substr(1,buf.size()-1) );
-                int pos = buf.find(" ");
+								int pos = buf.find(" ");
                 tmpGene.setId( buf.substr(1,pos) );
             }
 
