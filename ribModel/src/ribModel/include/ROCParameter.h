@@ -59,10 +59,8 @@ class ROCParameter
 		std::vector<std::vector<std::vector<double>>> selectionParameterTrace;
 		std::vector<unsigned> numAcceptForExpression;
 
-		std::vector<std::vector<double>> currentMutationParameter;
 		std::vector<std::vector<double>> proposedMutationParameter;
 
-		std::vector<std::vector<double>> currentSelectionParameter;
 		std::vector<std::vector<double>> proposedSelectionParameter;
 		std::vector<unsigned> numAcceptForMutationAndSelection;
 
@@ -92,6 +90,8 @@ class ROCParameter
 		static void swap(int& a, int& b);
 
 	public:
+		std::vector<std::vector<double>> currentSelectionParameter;
+		std::vector<std::vector<double>> currentMutationParameter;
 		//static const members
 		static const unsigned dM;
 		static const unsigned dEta;
@@ -211,7 +211,7 @@ class ROCParameter
 				{
 					mutationParameterTrace[category][sample][i] = currentMutationParameter[category][i];
 				}
-			}	
+			}
 			for(unsigned category = 0; category < numSelectionCategories; category++)
 			{
 				unsigned aaRange[2];
@@ -220,7 +220,7 @@ class ROCParameter
 				{
 					selectionParameterTrace[category][sample][i] = currentSelectionParameter[category][i];
 				}
-			}	
+			}
 		}
 		void updateSphiTrace(unsigned sample) {sPhiTrace[sample] = Sphi;}
 		void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex) {mixtureAssignmentTrace[sample][geneIndex] = mixtureAssignment[geneIndex];}
@@ -242,6 +242,7 @@ class ROCParameter
 		static double randLogNorm(double m, double s);
 		static double randExp(double r);
 		static void randDirichlet(double* input, unsigned numElements, double* output);
+		static double randUnif(double minVal, double maxVal);
 		static unsigned randMultinom(double* probabilities, unsigned groups);
 
 		static double densityNorm(double x, double mean, double sd);

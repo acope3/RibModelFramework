@@ -722,6 +722,12 @@ void ROCParameter::randDirichlet(double* input, unsigned numElements, double* ou
 	}
 }
 
+double ROCParameter::randUnif(double minVal, double maxVal)
+{
+	std::uniform_real_distribution<double> distribution(minVal, maxVal);
+	return distribution(generator);
+}
+
 unsigned ROCParameter::randMultinom(double* probabilities, unsigned groups)
 {
 	// sort probabilities

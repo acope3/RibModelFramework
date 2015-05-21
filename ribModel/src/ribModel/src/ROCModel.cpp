@@ -55,8 +55,8 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCP
 
         //#pragma omp parallel
         {
-            logLikelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation, selection, phiValue);
-            logLikelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation, selection, phiValue_proposed);
+            logLikelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
+            logLikelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue_proposed);
         }
     }
 
@@ -89,7 +89,7 @@ void ROCModel::calculateCodonProbabilityVector(unsigned numCodons, double mutati
     for(unsigned i = 0; i < numCodons; i++) { codonProb[i] = codonProb[i] / denominator;}
 }
 
-double ROCModel::calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codonCount[], SequenceSummary& seqsum, double mutation[], double selection[], double phiValue)
+double ROCModel::calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codonCount[], double mutation[], double selection[], double phiValue)
 {
     double logLikelihood = 0.0;
     // calculate codon probabilities
@@ -102,54 +102,6 @@ double ROCModel::calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codo
         logLikelihood += std::log(codonProbabilities[i]) * codonCount[i];
     }
     return logLikelihood;
-}
-
-void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory2(char curAA, Genome& genome, ROCParameter& parameter, double& logAcceptanceRatioForAllMixtures)
-{
-    int numGenes = genome.getGenomeSize();
-    double likelihood = 0.0;
-    double likelihood_proposed = 0.0;
-    unsigned numMixtures = parameter.getNumMixtureElements();
-    int numCodons = SequenceSummary::GetNumCodonsForAA(curAA);
-    for(unsigned k = 0u; k < numMixtures; k++)
-    {
-        unsigned mutationCategory = parameter.getMutationCategory(k);
-        unsigned selectionCategory = parameter.getSelectionCategory(k);
-        unsigned expressionCategory = parameter.getExpressionCategory(k);
-        double mutation[numCodons - 1];
-        parameter.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
-        double selection[numCodons - 1];
-        parameter.getParameterForCategory(mutationCategory, ROCParameter::dEta, curAA, false, selection);
-
-        // get proposed mutation and selection parameter
-        double mutation_proposed[numCodons - 1];
-        parameter.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, true, mutation_proposed);
-        double selection_proposed[numCodons - 1];
-        parameter.getParameterForCategory(mutationCategory, ROCParameter::dEta, curAA, true, selection_proposed);
-
-        double mixtureElementProbability = parameter.getCategoryProbability(k);
-
-        double likelihood_permix = 0.0;
-        double likelihood_proposed_permix = 0.0;
-        for(int i = 0; i < numGenes; i++)
-        {
-            Gene gene = genome.getGene(i);
-            SequenceSummary seqsum = gene.getSequenceSummary();
-            if(seqsum.getAAcountForAA(curAA) == 0) continue;
-
-            double phiValue = parameter.getExpression(i, expressionCategory, false);
-            int codonCount[numCodons];
-            obtainCodonCount(seqsum, curAA, codonCount);
-
-            double a = calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation, selection, phiValue);
-            double b = calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation_proposed, selection_proposed, phiValue);
-            likelihood_permix += std::exp(a);
-            likelihood_proposed_permix += std::exp(b);
-        }
-        likelihood += mixtureElementProbability * likelihood_permix;
-        likelihood_proposed += mixtureElementProbability * likelihood_proposed_permix;
-    }
-    logAcceptanceRatioForAllMixtures = std::log( likelihood_proposed / likelihood );
 }
 
 void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& genome, ROCParameter& parameter, double& logAcceptanceRatioForAllMixtures)
@@ -181,13 +133,30 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
         double mutation[numCodons - 1];
         parameter.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
         double selection[numCodons - 1];
-        parameter.getParameterForCategory(mutationCategory, ROCParameter::dEta, curAA, false, selection);
+        parameter.getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
 
         // get proposed mutation and selection parameter
         double mutation_proposed[numCodons - 1];
         parameter.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, true, mutation_proposed);
         double selection_proposed[numCodons - 1];
-        parameter.getParameterForCategory(mutationCategory, ROCParameter::dEta, curAA, true, selection_proposed);
+        parameter.getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, true, selection_proposed);
+
+        if(i == 0)
+        {
+            std::cout << curAA << " selection array: ";
+            for(int k = 0; k < numCodons - 1; k++){std::cout << selection[k] << " ";}
+            std::cout << "\n";
+            std::cout << curAA << " selection proposed array: ";
+            for(int k = 0; k < numCodons - 1; k++){std::cout << selection_proposed[k] << " ";}
+            std::cout << "\n";
+
+            std::cout << curAA << " mutation array: ";
+            for(int k = 0; k < numCodons - 1; k++){std::cout << mutation[k] << " ";}
+            std::cout << "\n";
+            std::cout << curAA << " mutation proposed array: ";
+            for(int k = 0; k < numCodons - 1; k++){std::cout << mutation_proposed[k] << " ";}
+            std::cout << "\n";
+        }
 
         int codonCount[numCodons];
         obtainCodonCount(seqsum, curAA, codonCount);
@@ -195,15 +164,15 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
         // get probability of current mixture assignment, calculate likelihood conditional on current mixture assignment
         double mixtureElementProbability = parameter.getCategoryProbability(mixtureElement);
         //std::cout << "Gene " << i << ": mixtureElement = " << mixtureElement << "\t mixtureElementProbability = " << mixtureElementProbability << "\n";
-        double a = calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation, selection, phiValue);
-        double b = calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation_proposed, selection_proposed, phiValue);
+        double a = calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
+        double b = calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation_proposed, selection_proposed, phiValue);
         //std::cout << "curLogLike: " << a << "\t propLogLike: " << b << "\n";
         likelihood += mixtureElementProbability * std::exp(a); //std::exp( calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation, selection, phiValue) );
         likelihood_proposed += mixtureElementProbability * std::exp(b); //std::exp( calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation_proposed, selection_proposed, phiValue) );
         //std::cout << "curMixedLike: " << likelihood << "\t propMixedLike: " << likelihood_proposed << "\n";
     }
-    //std::cout << "std::log( likelihood_proposed / likelihood ) = " << std::log( likelihood_proposed / likelihood ) << "\n";
-    logAcceptanceRatioForAllMixtures = std::log( likelihood_proposed / likelihood );
+    std::cout << "( likelihood_proposed / likelihood ) = " << likelihood_proposed / likelihood  << "\n";
+    logAcceptanceRatioForAllMixtures = likelihood_proposed / likelihood;
 }
 
 void ROCModel::obtainCodonCount(SequenceSummary& seqsum, char curAA, int codonCount[])

@@ -130,7 +130,7 @@ void testThetaKMatrix()
 {
 	unsigned matrix[2][2] = { {2,1}, {1,1} };
 	std::cout << "------------------ TEST THETAKMATRIX ------------------" << std::endl;
-	ROCParameter R(100, 2, 2, nullptr, true, "selectionShared", matrix);
+	ROCParameter R(100, 2, 2, nullptr, true, "allUnique");
 
 	R.printThetaKMatrix();
 	std::cout <<"numMutationCategories: " << R.getNumMutationCategories() <<"\n";
@@ -180,7 +180,7 @@ int main()
 	//genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/Skluyveri.fasta");
 	//genome.writeFasta("../../inst/resGenome.fasta
 	std::cout << "done reading fasta file" << std::endl;
-	bool testing = false;
+	bool testing =  false;
 
 	if(testing)
 	{
@@ -212,8 +212,11 @@ int main()
 		std::string files[] = {std::string("Skluyveri_CSP_ChrA.csv"), std::string("Skluyveri_CSP_ChrCleft.csv")};
 		parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
 		parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
+
+
 		parameter.InitializeExpression(genome, 1);
 		std::cout << "done initialize ROCParameter object" << std::endl;
+
 
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
 		MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, true, true, true);
@@ -247,7 +250,6 @@ int main()
 		phiout.close();
 		mixAssignment.close();
 	}
-
 
 	return 0;
 }
