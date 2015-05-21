@@ -80,8 +80,8 @@ ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures
 		proposedExpressionLevel[i] = tempExpr;
 	}
 
-	std_phi.resize(numGenes);
-	numAcceptForExpression.resize(numGenes);
+	std_phi.resize(numGenes, 0.1);
+	numAcceptForExpression.resize(numGenes, 0);
 }
 
 ROCParameter::~ROCParameter()
@@ -443,7 +443,7 @@ void ROCParameter::InitializeExpression(Genome& genome, double sd_phi)
 		for(unsigned j = 0; j < genomeSize; j++)
 		{
 			currentExpressionLevel[category][j] = expression[index[j]];
-			std_phi[j] = 1;
+			std_phi[j] = 0.1;
 			numAcceptForExpression[j] = 0u;
 		}
 	}
@@ -456,7 +456,7 @@ void ROCParameter::InitializeExpression(double sd_phi)
 		for(int i = 0; i < numGenes; i++)
 		{
 			currentExpressionLevel[category][i] = ROCParameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
-			std_phi[i] = 1;
+			std_phi[i] = 0.1;
 			numAcceptForExpression[i] = 0u;
 		}
 	}
@@ -469,7 +469,7 @@ void ROCParameter::InitializeExpression(double* expression)
 		for(int i = 0; i < numGenes; i++)
 		{
 			currentExpressionLevel[category][i] = expression[i];
-			std_phi[i] = 1;
+			std_phi[i] = 0.1;
 			numAcceptForExpression[i] = 0u;
 		}
 	}
@@ -589,7 +589,7 @@ void ROCParameter::adaptExpressionProposalWidth(unsigned adaptationWidth)
 		}
 		if(acceptanceLevel > 0.3)
 		{
-			std_phi[i] = std::min(100.0, std_phi[i] * 1.2);
+			std_phi[i] = std::min(10.0, std_phi[i] * 1.2);
 		}
 		numAcceptForExpression[i] = 0u;
 	}
@@ -614,7 +614,6 @@ void ROCParameter::proposeExpressionLevels()
 	{
 		for(unsigned i = 0; i < numExpressionLevels; i++)
 		{
-			// proposedExpressionLevel[i] = randLogNorm(currentExpressionLevel[i], std_phi[i]);
 			// avoid adjusting probabilities for asymmetry of distribution
 			proposedExpressionLevel[category][i] = std::exp( randNorm( std::log(currentExpressionLevel[category][i]) , std_phi[i]) );
 		}

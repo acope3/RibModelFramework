@@ -196,8 +196,8 @@ int main()
 		testThetaKMatrix();
 
 	}else{
-		int samples = 100;
-		int thining = 10;
+		int samples = 1000;
+		int thining = 1;
 		int useSamples = 50;
 
 		ROCModel model = ROCModel();
@@ -208,21 +208,21 @@ int main()
 			else geneAssignment[i] = 1u;
 		}
 		std::cout << "initialize ROCParameter object" << std::endl;
-		ROCParameter parameter = ROCParameter(genome.getGenomeSize(), 1, 1, geneAssignment, true);
+		ROCParameter parameter = ROCParameter(genome.getGenomeSize(), 0.79, 1, geneAssignment, true);
 		std::string files[] = {std::string("Skluyveri_CSP_ChrA.csv"), std::string("Skluyveri_CSP_ChrCleft.csv")};
 		parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
 		parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
 
 
-		parameter.InitializeExpression(genome, 1);
+		parameter.InitializeExpression(genome, 0.79);
 		std::cout << "done initialize ROCParameter object" << std::endl;
 
 
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
-		MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, true, true, true);
+		MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, true, false, true);
 		std::cout << "done initialize MCMCAlgorithm object" << std::endl;
 
-		std::ofstream scuoout("/results/scuo.csv");
+		std::ofstream scuoout("results/scuo.csv");
 		for(int n = 0; n < genome.getGenomeSize(); n++)
 		{
 			scuoout << genome.getGene(n).getId() << "," << parameter.calculateSCUO(genome.getGene(n)) << std::endl;
@@ -237,10 +237,13 @@ int main()
 		std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
 		std::cout << "Sphi proposal width: " << parameter.getSphiProposalWidth() << std::endl;
 
+
 		std::ofstream phiout("results/phiPosterior.csv");
 		std::ofstream mixAssignment("results/mixAssignment.csv");
+		std::cout << "Phi proposal width: \n";
 		for(int n = 0; n < genome.getGenomeSize(); n++)
 		{
+            std::cout << parameter.getExpressionProposalWidth(n) << std::endl;
             double mixtureAssignmentPosteriorMean = parameter.getMixtureAssignmentPosteriorMean(useSamples, n);
 			unsigned mixtureElement = std::round( mixtureAssignmentPosteriorMean );
 			unsigned expressionCategory = parameter.getExpressionCategory(mixtureElement);

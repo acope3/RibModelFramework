@@ -135,18 +135,18 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
 
         //std::cout << i << " " << gene.getId() << " proposedLogLik: " << propLogLike << " currentLogLik: " << currLogLike;
         // accept/reject proposed phi values
-        if( ROCParameter::randUnif(0, 1) < (std::exp(propLogLike) / std::exp(currLogLike)) )
+        if( -ROCParameter::randExp(1) < (propLogLike - currLogLike) )
         {
             //std::cout << " accepted \n";
             // moves proposed phi to current phi
             //std::cout << "Update expression for Gene i = " << i << " in iteration " << iteration << std::endl;
-            //parameter.updateExpression(i);
+            parameter.updateExpression(i);
             //#pragma omp atomic
-            logLikelihood += std::isfinite(propLogLike) ? propLogLike : 0.0;
+            logLikelihood += propLogLike; //std::isfinite(propLogLike) ? propLogLike : 0.0;
         }else{
             //#pragma omp atomic
             //std::cout << " rejected \n";
-            logLikelihood += std::isfinite(currLogLike) ? currLogLike : 0.0;
+            logLikelihood += currLogLike; //std::isfinite(currLogLike) ? currLogLike : 0.0;
         }
         if((iteration % thining) == 0)
         {
@@ -203,7 +203,7 @@ void MCMCAlgorithm::acceptRejectHyperParameter(int numGenes, ROCParameter& param
 void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, ROCParameter& parameter, ROCModel& model, int iteration)
 {
     double acceptanceRatioForAllMixtures = 0.0;
-    std::cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
+    //std::cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
     for(unsigned i = 0; i < 22; i++)
     {
         char curAA = SequenceSummary::AminoAcidArray[i];
@@ -213,7 +213,9 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, ROCParame
         model.calculateLogLikelihoodRatioPerAAPerCategory(curAA, genome, parameter, acceptanceRatioForAllMixtures);
 
         //std::cout << "logAcceptanceRatioForAllMixtures: " << logAcceptanceRatioForAllMixtures << "\n";
-        if( ROCParameter::randUnif(0, 1) < acceptanceRatioForAllMixtures )
+        double a = ROCParameter::randUnif(0, 1);
+        std::cout << "rand: " << a << " accRatio: " << acceptanceRatioForAllMixtures << " ";
+        if( a < acceptanceRatioForAllMixtures )
         {
             // moves proposed codon specific parameters to current codon specific parameters
             parameter.updateCodonSpecificParameter(curAA);
@@ -266,10 +268,10 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
             {
                 likelihoodTrace[iteration/thining] = logLike;
             }
-            if((iteration % adaptiveWidth) == 0 && iteration != 0)
+            if( ( (iteration + 1) % adaptiveWidth) == 0)
             {
                 //std::cout <<"would call adaptExpressionPro.....\n";
-               //parameter.adaptExpressionProposalWidth(adaptiveWidth);
+               parameter.adaptExpressionProposalWidth(adaptiveWidth);
             /*    std::cout << "\n ================ \n";
                 covmat.printCovarianceMatrix();
                 std::cout << " ---------------- \n";

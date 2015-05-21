@@ -143,19 +143,19 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
 
         if(i == 0)
         {
-            std::cout << curAA << " selection array: ";
-            for(int k = 0; k < numCodons - 1; k++){std::cout << selection[k] << " ";}
-            std::cout << "\n";
-            std::cout << curAA << " selection proposed array: ";
-            for(int k = 0; k < numCodons - 1; k++){std::cout << selection_proposed[k] << " ";}
-            std::cout << "\n";
-
-            std::cout << curAA << " mutation array: ";
-            for(int k = 0; k < numCodons - 1; k++){std::cout << mutation[k] << " ";}
-            std::cout << "\n";
-            std::cout << curAA << " mutation proposed array: ";
-            for(int k = 0; k < numCodons - 1; k++){std::cout << mutation_proposed[k] << " ";}
-            std::cout << "\n";
+//            std::cout << curAA << " selection array: ";
+//            for(int k = 0; k < numCodons - 1; k++){std::cout << selection[k] << " ";}
+//            std::cout << "\n";
+//            std::cout << curAA << " selection proposed array: ";
+//            for(int k = 0; k < numCodons - 1; k++){std::cout << selection_proposed[k] << " ";}
+//            std::cout << "\n";
+//
+//            std::cout << curAA << " mutation array: ";
+//            for(int k = 0; k < numCodons - 1; k++){std::cout << mutation[k] << " ";}
+//            std::cout << "\n";
+//            std::cout << curAA << " mutation proposed array: ";
+//            for(int k = 0; k < numCodons - 1; k++){std::cout << mutation_proposed[k] << " ";}
+//            std::cout << "\n";
         }
 
         int codonCount[numCodons];
@@ -171,7 +171,7 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
         likelihood_proposed += mixtureElementProbability * std::exp(b); //std::exp( calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, seqsum, mutation_proposed, selection_proposed, phiValue) );
         //std::cout << "curMixedLike: " << likelihood << "\t propMixedLike: " << likelihood_proposed << "\n";
     }
-    std::cout << "( likelihood_proposed / likelihood ) = " << likelihood_proposed / likelihood  << "\n";
+    //std::cout << "( likelihood_proposed / likelihood ) = " << likelihood_proposed / likelihood  << "\n";
     logAcceptanceRatioForAllMixtures = likelihood_proposed / likelihood;
 }
 
@@ -181,6 +181,7 @@ void ROCModel::obtainCodonCount(SequenceSummary& seqsum, char curAA, int codonCo
     SequenceSummary::AAToCodonRange(curAA, false, codonRange);
     // get codon counts for AA
     unsigned j = 0u;
+    //std::cout << curAA << " " << codonRange[0] << " to " << codonRange[1] << "\n";
     for(unsigned i = codonRange[0]; i < codonRange[1]; i++, j++)
     {
         codonCount[j] = seqsum.getCodonCountForCodon(i);

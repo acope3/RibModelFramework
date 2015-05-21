@@ -59,8 +59,10 @@ class ROCParameter
 		std::vector<std::vector<std::vector<double>>> selectionParameterTrace;
 		std::vector<unsigned> numAcceptForExpression;
 
+		std::vector<std::vector<double>> currentMutationParameter;
 		std::vector<std::vector<double>> proposedMutationParameter;
 
+		std::vector<std::vector<double>> currentSelectionParameter;
 		std::vector<std::vector<double>> proposedSelectionParameter;
 		std::vector<unsigned> numAcceptForMutationAndSelection;
 
@@ -90,8 +92,6 @@ class ROCParameter
 		static void swap(int& a, int& b);
 
 	public:
-		std::vector<std::vector<double>> currentSelectionParameter;
-		std::vector<std::vector<double>> currentMutationParameter;
 		//static const members
 		static const unsigned dM;
 		static const unsigned dEta;
@@ -149,6 +149,7 @@ class ROCParameter
 			return (proposed ? proposedExpressionLevel[category][geneIndex] : currentExpressionLevel[category][geneIndex]);
 		}
 		void setExpression(double phi, unsigned geneIndex, unsigned category) {currentExpressionLevel[category][geneIndex] = phi;}
+		double getExpressionProposalWidth(unsigned geneIndex) {return std_phi[geneIndex];}
 		void updateExpression(unsigned geneIndex)
 		{
 			numAcceptForExpression[geneIndex]++;
