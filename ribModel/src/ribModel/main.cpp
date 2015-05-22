@@ -196,9 +196,6 @@ int main()
 		testThetaKMatrix();
 
 	}else{
-		int samples = 100;
-		int thining = 10;
-		int useSamples = 50;
 
 		ROCModel model = ROCModel();
 		unsigned geneAssignment[genome.getGenomeSize()];
@@ -208,13 +205,17 @@ int main()
 			else geneAssignment[i] = 1u;
 		}
 		std::cout << "initialize ROCParameter object" << std::endl;
-		ROCParameter parameter = ROCParameter(genome.getGenomeSize(), 2, 2, geneAssignment, true, ROCParameter::selectionShared);
+		double sphi_init = 2;
+		double numMixtures = 2;
+		std::string mixDef = ROCParameter::allUnique;
+		std::cout << "\tSphi init: " << sphi_init << "\n";
+		std::cout << "\t# mixtures: " << numMixtures << "\n";
+		std::cout << "\tmixture definition: " << mixDef << "\n";
+		ROCParameter parameter = ROCParameter(genome.getGenomeSize(), sphi_init, numMixtures, geneAssignment, true, mixDef);
 		std::string files[] = {std::string("Skluyveri_CSP_ChrA.csv"), std::string("Skluyveri_CSP_ChrCleft.csv")};
 		parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
 		parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
-
-
-		parameter.InitializeExpression(genome, 2);
+		parameter.InitializeExpression(genome, sphi_init);
 		std::cout << "done initialize ROCParameter object" << std::endl;
 		//double phiVals[genome.getGenomeSize()];
 		//parameter.readStaticPhiValues("Skluyveri_ChrA_phi_est.csv", phiVals);
@@ -224,8 +225,16 @@ int main()
 
 
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
-		MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, true, false, true);
+        int samples = 1000;
+		int thining = 10;
+		int useSamples = 250;
+		std::cout << "\t# samples: " << samples << "\n";
+		std::cout << "\t thining: " << thining << "\n";
+		std::cout << "\t # samples used: " << useSamples << "\n";
+		MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, true, true, true);
 		std::cout << "done initialize MCMCAlgorithm object" << std::endl;
+
+
 		std::ofstream scuoout("results/scuo.csv");
 		for(int n = 0; n < genome.getGenomeSize(); n++)
 		{

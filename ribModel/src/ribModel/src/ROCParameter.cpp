@@ -602,16 +602,16 @@ void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
     for(unsigned i = 0; i < numCSPsets; i++)
 	{
         double acceptanceLevel = (double)numAcceptForMutationAndSelection[i] / (double)adaptationWidth;
-        std::cout << SequenceSummary::AminoAcidArray[i] << " acceptance level: " << acceptanceLevel << "\n";
+        //std::cout << SequenceSummary::AminoAcidArray[i] << " acceptance level: " << acceptanceLevel << "\n";
 		if(acceptanceLevel < 0.2)
 		{
 			std_csp[i] = std::max(0.01, std_csp[i] * 0.8);
-			std::cout << SequenceSummary::AminoAcidArray[i] << ": " << "acceptance rate to low\n";
+			//std::cout << SequenceSummary::AminoAcidArray[i] << ": " << "acceptance rate to low\n";
 		}
 		if(acceptanceLevel > 0.3)
 		{
 			std_csp[i] = std::min(10.0, std_csp[i] * 1.2);
-			std::cout << SequenceSummary::AminoAcidArray[i] << ": " << "acceptance rate to high\n";
+			//std::cout << SequenceSummary::AminoAcidArray[i] << ": " << "acceptance rate to high\n";
 		}
 		numAcceptForMutationAndSelection[i] = 0u;
 	}
@@ -643,11 +643,14 @@ void ROCParameter::proposeExpressionLevels()
 }
 void ROCParameter::proposeCodonSpecificParameter()
 {
-	for(unsigned i = 0; i < numMixtures; i++)
+	for(unsigned i = 0; i < numMutationCategories; i++)
 	{
 		proposedMutationParameter[i] = propose(currentMutationParameter[i], ROCParameter::randNorm, bias_csp, std_csp);
-		proposedSelectionParameter[i] = propose(currentSelectionParameter[i], ROCParameter::randNorm, bias_csp, std_csp);
 	}
+    for(unsigned i = 0; i < numSelectionCategories; i++)
+	{
+		proposedSelectionParameter[i] = propose(currentSelectionParameter[i], ROCParameter::randNorm, bias_csp, std_csp);
+    }
 }
 std::vector<double> ROCParameter::propose(std::vector<double> currentParam, double (*proposal)(double a, double b), double A, std::vector<double> B)
 {
@@ -669,11 +672,17 @@ void ROCParameter::updateCodonSpecificParameter(char aa)
 	numAcceptForMutationAndSelection[aaIndex]++;
 
 	//std::cout << aaRange[0] << " & " << aaRange[1] << "  " << aa <<"\n";
-	for(unsigned k = 0u; k < numMixtures; k++)
+	for(unsigned k = 0u; k < numMutationCategories; k++)
 	{
 		for(unsigned i = aaRange[0]; i < aaRange[1]; i++)
 		{
 			currentMutationParameter[k][i] = proposedMutationParameter[k][i];
+		}
+	}
+	for(unsigned k = 0u; k < numSelectionCategories; k++)
+	{
+		for(unsigned i = aaRange[0]; i < aaRange[1]; i++)
+		{
 			currentSelectionParameter[k][i] = proposedSelectionParameter[k][i];
 		}
 	}

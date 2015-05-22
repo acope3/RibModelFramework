@@ -238,6 +238,12 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
     parameter.initAllTraces(samples, genome.getGenomeSize());
     CovarianceMatrix covmat = CovarianceMatrix(2);
     // starting the MCMC
+
+    std::cout << "Estimate Codon Specific Parameters? " << (estimateCodonSpecificParameter ? "TRUE" : "FALSE") << std::endl;
+    std::cout << "Estimate Hyper Parameters? " << (estimateHyperParameter ? "TRUE" : "FALSE") << std::endl;
+    std::cout << "Estimate Expression Parameters? " << (estimateExpression ? "TRUE" : "FALSE") << std::endl;
+
+
     std::cout << "entering MCMC loop" << std::endl;
     std::cout << "Starting MCMC with " << maximumIterations << " iterations\n";
     for(unsigned iteration = 0; iteration < maximumIterations; iteration++)
