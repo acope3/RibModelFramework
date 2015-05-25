@@ -202,29 +202,7 @@ class ROCParameter
 				expressionTrace[category][sample][geneIndex] = currentExpressionLevel[category][geneIndex];
 			}
 		}
-		void updateCodonSpecificParameterTrace(unsigned sample, char aa)
-		{
-			//std::cout <<"mutationParameterTrace[category][sample][i] = mutationParameterTrace[0][" << sample <<"][0] = ";
-			//std::cout <<mutationParameterTrace[0][sample][0] <<"\n";
-			for(unsigned category = 0; category < numMutationCategories; category++)
-			{
-				unsigned aaRange[2];
-				SequenceSummary::AAToCodonRange(aa, true, aaRange);
-				for (unsigned i = aaRange[0]; i < aaRange[1]; i++)
-				{
-					mutationParameterTrace[category][sample][i] = currentMutationParameter[category][i];
-				}
-			}
-			for(unsigned category = 0; category < numSelectionCategories; category++)
-			{
-				unsigned aaRange[2];
-				SequenceSummary::AAToCodonRange(aa, true, aaRange);
-				for (unsigned i = aaRange[0]; i < aaRange[1]; i++)
-				{
-					selectionParameterTrace[category][sample][i] = currentSelectionParameter[category][i];
-				}
-			}
-		}
+		void updateCodonSpecificParameterTrace(unsigned sample, char aa);
 		void updateSphiTrace(unsigned sample) {sPhiTrace[sample] = Sphi;}
 		void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex) {mixtureAssignmentTrace[sample][geneIndex] = mixtureAssignment[geneIndex];}
 		std::vector<double> getAPhiTrace() {return aPhiTrace;}
@@ -234,7 +212,8 @@ class ROCParameter
 		double getExpressionPosteriorMean(unsigned samples, unsigned geneIndex, unsigned category);
 		double getSphiPosteriorMean(unsigned samples);
 		double getMixtureAssignmentPosteriorMean(unsigned samples, unsigned geneIndex);
-
+        double getMutationPosteriorMean(unsigned category, unsigned samples, unsigned paramIndex);
+        double getSelectionPosteriorMean(unsigned category, unsigned samples, unsigned paramIndex);
 
 		// static functions
 		static double calculateSCUO(Gene& gene);

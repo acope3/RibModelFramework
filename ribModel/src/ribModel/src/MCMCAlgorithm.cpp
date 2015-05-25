@@ -143,11 +143,11 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
             //std::cout << "Update expression for Gene i = " << i << " in iteration " << iteration << std::endl;
             parameter.updateExpression(i);
             //#pragma omp atomic
-            logLikelihood += propLogLike; //std::isfinite(propLogLike) ? propLogLike : 0.0;
+            logLikelihood += std::isfinite(propLogLike) ? propLogLike : 0.0;
         }else{
             //#pragma omp atomic
             //std::cout << " rejected \n";
-            logLikelihood += currLogLike; //std::isfinite(currLogLike) ? currLogLike : 0.0;
+            logLikelihood += std::isfinite(currLogLike) ? currLogLike : 0.0;
         }
         if((iteration % thining) == 0)
         {
@@ -239,13 +239,13 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
     CovarianceMatrix covmat = CovarianceMatrix(2);
     // starting the MCMC
 
-    std::cout << "Estimate Codon Specific Parameters? " << (estimateCodonSpecificParameter ? "TRUE" : "FALSE") << std::endl;
-    std::cout << "Estimate Hyper Parameters? " << (estimateHyperParameter ? "TRUE" : "FALSE") << std::endl;
-    std::cout << "Estimate Expression Parameters? " << (estimateExpression ? "TRUE" : "FALSE") << std::endl;
-
-
     std::cout << "entering MCMC loop" << std::endl;
-    std::cout << "Starting MCMC with " << maximumIterations << " iterations\n";
+    std::cout << "\tEstimate Codon Specific Parameters? " << (estimateCodonSpecificParameter ? "TRUE" : "FALSE") << std::endl;
+    std::cout << "\tEstimate Hyper Parameters? " << (estimateHyperParameter ? "TRUE" : "FALSE") << std::endl;
+    std::cout << "\tEstimate Expression Parameters? " << (estimateExpression ? "TRUE" : "FALSE") << std::endl;
+
+
+    std::cout << "\tStarting MCMC with " << maximumIterations << " iterations\n";
     for(unsigned iteration = 0; iteration < maximumIterations; iteration++)
     {
 
