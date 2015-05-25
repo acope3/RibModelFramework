@@ -7,11 +7,20 @@
 //#include <Rcpp.h>
 
 #include "../include/Gene.h"
+
+
+//IMPORTANT NOTE: forward declarations used. Includes are in genome.cpp. 
+//Used to solve circular dependices. See http://www.cplusplus.com/forum/general/125/
+//for more information.
+class ROCParameter;
+class ROCModel;
+
+
 class Genome
 {
     private:
         std::vector<Gene> genes;
-
+				std::vector<Gene> simulatedGenes;
     public:
         //constructor/destructor
         explicit Genome();
@@ -20,13 +29,14 @@ class Genome
         Genome& operator=(const Genome& other);
 
         void readFasta(char* filename);
-        void writeFasta(char* filename);
+        void writeFasta(char* filename, bool simulated = false);
         void addGene(const Gene& gene);
         void getCountsForAA(char aa, unsigned codonCounts[][5]);
-
+				std::vector <Gene> getGenes() {return genes;}
+				std::vector <Gene> getSimulatedGenes() {return simulatedGenes;}
         Gene& getGene(int index);
         Gene& getGene(std::string id);
-
+				void simulateGenome(ROCParameter& parameter, ROCModel& model);
         int getGenomeSize() {return genes.size();}
 
     protected:

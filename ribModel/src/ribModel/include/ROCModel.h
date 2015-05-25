@@ -10,7 +10,6 @@ class ROCModel
     private:
 
 
-        void calculateCodonProbabilityVector(unsigned numCodons, double* mutation, double* selection, double phi, double* codonProb);
         void obtainCodonCount(SequenceSummary& seqsum, char curAA, int codonCount[]);
         double calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codonCount[], double mutation[], double selection[], double phiValue);
 
@@ -19,6 +18,7 @@ class ROCModel
         virtual ~ROCModel();
         ROCModel(const ROCModel& other);
 
+        void calculateCodonProbabilityVector(unsigned numCodons, double* mutation, double* selection, double phi, double* codonProb);
         // Likelihood ratio functions
         void calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCParameter& parameter, unsigned k, double* logProbabilityRatio);
         void calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& genome, ROCParameter& parameter, double& logAcceptanceRatioForAllMixtures);
