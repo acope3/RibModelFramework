@@ -521,9 +521,11 @@ double ROCParameter::getExpressionPosteriorMean(unsigned samples, unsigned geneI
 		samples = traceLength;
 	}
 	unsigned start = traceLength - samples;
+	unsigned category = 0u;
 	for(unsigned i = start; i < traceLength; i++)
 	{
-        unsigned category = mixtureAssignmentTrace[i][geneIndex];
+        category = mixtureAssignmentTrace[i][geneIndex];
+        category = getExpressionCategory(category);
 		posteriorMean += expressionTrace[category][i][geneIndex];
 	}
 
@@ -603,9 +605,10 @@ double ROCParameter::getSelectionVariance(unsigned category, unsigned samples, u
     double posteriorVariance = 0.0;
 
     unsigned start = traceLength - samples;
+    double difference = 0.0;
 	for(unsigned i = start; i < traceLength; i++)
 	{
-        double difference = selectionParameterTrace[category][i][paramIndex] - posteriorMean;
+        difference = selectionParameterTrace[category][i][paramIndex] - posteriorMean;
 		posteriorVariance += difference * difference;
 	}
 	double normalizationTerm = unbiased ? (1/((double)samples-1.0)) : (1/(double)samples);
@@ -628,9 +631,10 @@ double ROCParameter::getMutationVariance(unsigned category, unsigned samples, un
     double posteriorVariance = 0.0;
 
     unsigned start = traceLength - samples;
+    double difference = 0.0;
 	for(unsigned i = start; i < traceLength; i++)
 	{
-        double difference = mutationParameterTrace[category][i][paramIndex] - posteriorMean;
+        difference = mutationParameterTrace[category][i][paramIndex] - posteriorMean;
 		posteriorVariance += difference * difference;
 	}
 	double normalizationTerm = unbiased ? (1/((double)samples-1.0)) : (1/(double)samples);
@@ -652,10 +656,13 @@ double ROCParameter::getExpressionVariance(unsigned samples, unsigned geneIndex,
     double posteriorVariance = 0.0;
 
 	unsigned start = traceLength - samples;
+	unsigned category = 0u;
+	double difference = 0.0;
 	for(unsigned i = start; i < traceLength; i++)
 	{
-        unsigned category = mixtureAssignmentTrace[i][geneIndex];
-        double difference = expressionTrace[category][i][geneIndex] - posteriorMean;
+        category = mixtureAssignmentTrace[i][geneIndex];
+        category = getExpressionCategory(category);
+        difference = expressionTrace[category][i][geneIndex] - posteriorMean;
 		posteriorVariance += difference * difference;
 	}
     double normalizationTerm = unbiased ? (1/((double)samples-1.0)) : (1/(double)samples);
