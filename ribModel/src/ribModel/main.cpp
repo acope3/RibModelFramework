@@ -313,13 +313,9 @@ int main()
 
 
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
-<<<<<<< HEAD
     int samples = 100;
-=======
-        int samples = 300;
->>>>>>> upstream/master
-		int thining = 10;
-		int useSamples = 150;
+		int thining = 1;
+		int useSamples = 50;
 		std::cout << "\t# samples: " << samples << "\n";
 		std::cout << "\t thining: " << thining << "\n";
 		std::cout << "\t # samples used: " << useSamples << "\n";
@@ -359,6 +355,7 @@ int main()
 			{
 				unsigned aaRange[2];
 				char aa = SequenceSummary::AminoAcidArray[n];
+				if (aa == 'X' || aa == 'M' || aa == 'W') continue;
 				SequenceSummary::AAToCodonRange(aa, true, aaRange);
 				for (int a = aaRange[0]; a < aaRange[1]; a++)
 				{
@@ -380,6 +377,7 @@ int main()
 			{
 				unsigned aaRange[2];
 				char aa = SequenceSummary::AminoAcidArray[n];
+				if (aa == 'X' || aa == 'M' || aa == 'W') continue;
 				SequenceSummary::AAToCodonRange(aa, true, aaRange);
 				for (int a = aaRange[0]; a < aaRange[1]; a++)
 				{
