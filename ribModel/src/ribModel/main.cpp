@@ -191,10 +191,10 @@ void testSimulateGenome(Genome& genome)
 	std::string files[] = {std::string("Skluyveri_CSP_ChrA.csv"), std::string("Skluyveri_CSP_ChrCleft.csv")};
 	parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
 	parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
-	parameter.InitializeExpression(genome, sphi_init);
-	double phiVals[genome.getGenomeSize()];
-	parameter.readStaticPhiValues("Skluyveri_ChrA_phi_est.csv", phiVals);
 
+	//parameter.InitializeExpression(genome, sphi_init);
+	double phiVals[genome.getGenomeSize()];
+	parameter.readStaticPhiValues("Skluyveri_ChrA_ChrCleft_phi_est.csv", phiVals);
 	parameter.InitializeExpression(phiVals);
 	std::cout << "done initialize ROCParameter object" << std::endl;
 
@@ -240,7 +240,7 @@ void testSimulateGenome(Genome& genome)
 			{
 				counts[a] = simSeqSum.getCodonCountForCodon(k);
 				sum += counts[a];
-				a++;	
+				a++;
 			}
 			int aaCount = simSeqSum.getAAcountForAA(j);
 			std::cout <<"amino acid " << curAA <<": " << aaCount <<"\n";
@@ -263,7 +263,7 @@ int main()
 	Genome genome;
 	std::cout << "reading fasta file" << std::endl;
 	//genome.readFasta("../../inst/testGenome.fasta");
-	genome.readFasta("Skluyveri_chromosomeA.fasta");
+	genome.readFasta("Skluyveri_A_andCleft.fasta");
 	//genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/Skluyveri.fasta");
 	//genome.writeFasta("../../inst/resGenome.fasta
 	//genome.readFasta("testchromosome.fasta");
@@ -313,11 +313,7 @@ int main()
 
 
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
-<<<<<<< HEAD
         int samples = 400;
-=======
-		int samples = 1000;
->>>>>>> aed63ab0153639373c69a65e92198bdaae8fa104
 		int thining = 10;
 		int useSamples = 150;
 		std::cout << "\t# samples: " << samples << "\n";
