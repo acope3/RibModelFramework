@@ -263,6 +263,7 @@ int main()
 	Genome genome;
 	std::cout << "reading fasta file" << std::endl;
 	//genome.readFasta("../../inst/testGenome.fasta");
+	//genome.readFasta("Skluyveri_chromosomeA_simulated.fasta");
 	genome.readFasta("Skluyveri_A_andCleft_simulated.fasta");
 	//genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/Skluyveri.fasta");
 	//genome.writeFasta("../../inst/resGenome.fasta
@@ -313,8 +314,8 @@ int main()
 
 
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
-        int samples = 200;
-		int thining = 10;
+        int samples = 100;
+		int thining = 1;
 		int useSamples = 50;
 
 		std::cout << "\t# samples: " << samples << "\n";
@@ -358,10 +359,15 @@ int main()
 				char aa = SequenceSummary::AminoAcidArray[n];
 				if (aa == 'X' || aa == 'M' || aa == 'W') continue;
 				SequenceSummary::AAToCodonRange(aa, true, aaRange);
-				for (int a = aaRange[0]; a < aaRange[1]; a++)
+				for (int a = aaRange[0]; a <= aaRange[1]; a++)
 				{
-					double estimate = parameter.getMutationPosteriorMean(i, useSamples, a);
-					double variance = parameter.getMutationVariance(i, useSamples, a);
+					double estimate = 0.0;
+					double variance = 0.0;
+					if (a != aaRange[1])
+					{
+						estimate = parameter.getMutationPosteriorMean(i, useSamples, a);
+						variance = parameter.getMutationVariance(i, useSamples, a);
+					}
 					std::string codon = SequenceSummary::IndexToCodon(a);
 					mutout << aa <<"." << codon <<".deltaM," << estimate <<"," << variance <<"\n";
 				}
@@ -380,12 +386,17 @@ int main()
 				char aa = SequenceSummary::AminoAcidArray[n];
 				if (aa == 'X' || aa == 'M' || aa == 'W') continue;
 				SequenceSummary::AAToCodonRange(aa, true, aaRange);
-				for (int a = aaRange[0]; a < aaRange[1]; a++)
+				for (int a = aaRange[0]; a <= aaRange[1]; a++)
 				{
-					double estimate = parameter.getSelectionPosteriorMean(i, useSamples, n);
-					double variance = parameter.getSelectionVariance(i, useSamples, n);
-					std::string codon = SequenceSummary::IndexToCodon(n);
-					selectout << aa <<"." << codon <<".deltaEta," << estimate <<"\n";
+					std::string codon = SequenceSummary::IndexToCodon(a);
+					double estimate = 0.0;
+					double variance = 0.0;
+					if (a != aaRange[1])
+					{
+						estimate = parameter.getSelectionPosteriorMean(i, useSamples, a);
+						variance = parameter.getSelectionVariance(i, useSamples, a);
+					}
+					selectout << aa <<"." << codon <<".deltaEta," << estimate <<"," << variance <<"\n";
 				}
 			}
 			selectout.close();
