@@ -586,6 +586,104 @@ double ROCParameter::getSelectionPosteriorMean(unsigned category, unsigned sampl
 	return posteriorMean / (double)samples;
 }
 
+double ROCParameter::getSelectionVariance(unsigned category, unsigned samples, unsigned paramIndex, bool unbiased)
+{
+	if(samples > traceLength)
+	{
+		std::cout << std::string("ROCParameter::getSelectionVariance throws: Number of anticipated samples (") +
+			std::to_string(samples) + std::string(") is greater than the length of the available trace(") + std::to_string(traceLength) + std::string(").") +
+			std::string("Whole trace is used for posterior estimate! \n");
+		samples = traceLength;
+	}
+
+	double posteriorMean = getSelectionPosteriorMean(category, samples, paramIndex)
+	unsigned traceLength = selectionParameterTrace[category].size();
+
+    double posteriorVariance = 0.0;
+
+    unsigned start = traceLength - samples;
+	for(unsigned i = start; i < traceLength; i++)
+	{
+        double difference = selectionParameterTrace[category][i][paramIndex] - posteriorMean;
+		posteriorVariance += difference * difference;
+	}
+	double normalizationTerm = unbiased ? (1/((double)samples-1.0)) : (1/(double)samples);
+	return normalizationTerm * posteriorVariance;
+}
+
+double ROCParameter::getMutationVariance(unsigned category, unsigned samples, unsigned paramIndex, bool unbiased)
+{
+	if(samples > traceLength)
+	{
+		std::cout << std::string("ROCParameter::getMutationVariance throws: Number of anticipated samples (") +
+			std::to_string(samples) + std::string(") is greater than the length of the available trace(") + std::to_string(traceLength) + std::string(").") +
+			std::string("Whole trace is used for posterior estimate! \n");
+		samples = traceLength;
+	}
+
+	double posteriorMean = getMutationPosteriorMean(category, samples, paramIndex)
+	unsigned traceLength = mutationParameterTrace[category].size();
+
+    double posteriorVariance = 0.0;
+
+    unsigned start = traceLength - samples;
+	for(unsigned i = start; i < traceLength; i++)
+	{
+        double difference = mutationParameterTrace[category][i][paramIndex] - posteriorMean;
+		posteriorVariance += difference * difference;
+	}
+	double normalizationTerm = unbiased ? (1/((double)samples-1.0)) : (1/(double)samples);
+	return normalizationTerm * posteriorVariance;
+}
+double ROCParameter::getExpressionVariance(unsigned samples, unsigned geneIndex, unsigned category, bool unbiased)
+{
+	if(samples > traceLength)
+	{
+		std::cout << std::string("ROCParameter::getExpressionVariance throws: Number of anticipated samples (") +
+			std::to_string(samples) + std::string(") is greater than the length of the available trace (") + std::to_string(traceLength) + std::string(").") +
+			std::string("Whole trace is used for posterior estimate! \n");
+		samples = traceLength;
+	}
+
+	double posteriorMean = getExpressionPosteriorMean(samples, geneIndex, category);
+	unsigned traceLength = expressionTrace[0].size();
+
+    double posteriorVariance = 0.0;
+
+	unsigned start = traceLength - samples;
+	for(unsigned i = start; i < traceLength; i++)
+	{
+        double difference = expressionTrace[category][i][geneIndex] - posteriorMean;
+		posteriorVariance += difference * difference;
+	}
+    double normalizationTerm = unbiased ? (1/((double)samples-1.0)) : (1/(double)samples);
+	return normalizationTerm * posteriorVariance;
+}
+double ROCParameter::getSphiVariance(unsigned samples, bool unbiased)
+{
+	if(samples > traceLength)
+	{
+		std::cout << std::string("ROCParameter::getSphiVariance throws: Number of anticipated samples (") +
+			std::to_string(samples) + std::string(") is greater than the length of the available trace(") + std::to_string(traceLength) + std::string(").") +
+			std::string("Whole trace is used for posterior estimate! \n");
+		samples = traceLength;
+	}
+	double posteriorMean = getSphiPosteriorMean(samples);
+	unsigned traceLength = sPhiTrace.size();
+
+    double posteriorVariance = 0.0;
+
+	unsigned start = traceLength - samples;
+	for(unsigned i = start; i < traceLength; i++)
+	{
+        double difference = sPhiTrace[i] - posteriorMean;
+		posteriorVariance += difference * difference;
+	}
+    double normalizationTerm = unbiased ? (1/((double)samples-1.0)) : (1/(double)samples);
+	return normalizationTerm * posteriorVariance;
+}
+
+
 
 void ROCParameter::adaptSphiProposalWidth(unsigned adaptationWidth)
 {

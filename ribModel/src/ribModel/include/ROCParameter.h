@@ -211,9 +211,13 @@ class ROCParameter
 		// functions to return estimates
 		double getExpressionPosteriorMean(unsigned samples, unsigned geneIndex, unsigned category);
 		double getSphiPosteriorMean(unsigned samples);
-		double getMixtureAssignmentPosteriorMean(unsigned samples, unsigned geneIndex);
+		double getMixtureAssignmentPosteriorMean(unsigned samples, unsigned geneIndex); // TODO: implement variance function, fix Mean function (won't work with 3 groups)
         double getMutationPosteriorMean(unsigned category, unsigned samples, unsigned paramIndex);
         double getSelectionPosteriorMean(unsigned category, unsigned samples, unsigned paramIndex);
+        double getMutationVariance(unsigned category, unsigned samples, unsigned paramIndex, bool unbiased = true);
+        double getSelectionVariance(unsigned category, unsigned samples, unsigned paramIndex, bool unbiased = true);
+        double getSphiVariance(unsigned samples, bool unbiased = true);
+        double getExpressionVariance(unsigned samples, unsigned geneIndex, unsigned category, bool unbiased = true);
 
 		// static functions
 		static double calculateSCUO(Gene& gene);

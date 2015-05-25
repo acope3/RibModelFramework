@@ -263,12 +263,12 @@ int main()
 	Genome genome;
 	std::cout << "reading fasta file" << std::endl;
 	//genome.readFasta("../../inst/testGenome.fasta");
-	genome.readFasta("Skluyveri_A_andCleft.fasta");
+	genome.readFasta("Skluyveri_A_andCleft_simulated.fasta");
 	//genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/Skluyveri.fasta");
 	//genome.writeFasta("../../inst/resGenome.fasta
 	//genome.readFasta("testchromosome.fasta");
 	std::cout << "done reading fasta file" << std::endl;
-	bool testing =  true;
+	bool testing =  false;
 
 	if(testing)
 	{
@@ -294,7 +294,7 @@ int main()
 		}
 		std::cout << "initialize ROCParameter object" << std::endl;
 		double sphi_init = 2;
-		double numMixtures = 1;
+		double numMixtures = 2;
 		std::string mixDef = ROCParameter::allUnique;
 		std::cout << "\tSphi init: " << sphi_init << "\n";
 		std::cout << "\t# mixtures: " << numMixtures << "\n";
@@ -313,7 +313,7 @@ int main()
 
 
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
-        int samples = 400;
+        int samples = 600;
 		int thining = 10;
 		int useSamples = 150;
 		std::cout << "\t# samples: " << samples << "\n";

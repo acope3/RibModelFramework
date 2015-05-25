@@ -221,7 +221,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, ROCParame
             parameter.updateCodonSpecificParameter(curAA);
             //std::cout << "ACCEPTED\n";
         }
-				if((iteration % thining) == 0)
+        if((iteration % thining) == 0)
         {
             parameter.updateCodonSpecificParameterTrace(iteration/thining, curAA);
             //parameter.updateSphiTrace(iteration/thining);

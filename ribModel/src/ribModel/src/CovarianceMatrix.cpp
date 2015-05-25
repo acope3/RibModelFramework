@@ -5,7 +5,6 @@
 
 CovarianceMatrix::CovarianceMatrix()
 {
-    std::cout <<"0 arg constructor called\n";
     numVariates = 2; //Square 2x2 matrix
     unsigned vectorLength = numVariates * numVariates;
     covMatrix.resize(vectorLength);
@@ -20,8 +19,6 @@ CovarianceMatrix::CovarianceMatrix()
 }
 CovarianceMatrix::CovarianceMatrix(int _numVariates)
 {
-
-    std::cout <<"1 arg constructor called\n";
     numVariates = _numVariates;
     unsigned vectorLength = numVariates * numVariates;
     covMatrix.resize(vectorLength);
@@ -38,7 +35,6 @@ CovarianceMatrix::CovarianceMatrix(int _numVariates)
 
 CovarianceMatrix::CovarianceMatrix(std::vector <double> &matrix)
 {
-    std::cout <<"Matrix constructor called\n";
     numVariates = std::sqrt(matrix.size());
     covMatrix = matrix;
     choleskiMatrix.resize(matrix.size(), 0.0);

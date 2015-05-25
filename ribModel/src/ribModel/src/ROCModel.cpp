@@ -53,7 +53,7 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCP
         int codonCount[numCodons];
         obtainCodonCount(seqsum, curAA, codonCount);
 
-        //#pragma omp parallel
+        //#pragma omp parallel num_threads(2)
         {
             logLikelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
             logLikelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue_proposed);
