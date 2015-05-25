@@ -263,12 +263,13 @@ int main()
 	Genome genome;
 	std::cout << "reading fasta file" << std::endl;
 	//genome.readFasta("../../inst/testGenome.fasta");
-	genome.readFasta("Skluyveri_A_andCleft.fasta");
+	//genome.readFasta("Skluyveri_A_andCleft.fasta");
+	genome.readFasta("Skluyveri_A_andCleft_simulated.fasta");
 	//genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/Skluyveri.fasta");
 	//genome.writeFasta("../../inst/resGenome.fasta
 	//genome.readFasta("testchromosome.fasta");
 	std::cout << "done reading fasta file" << std::endl;
-	bool testing =  true;
+	bool testing =  false;
 
 	if(testing)
 	{
@@ -294,7 +295,7 @@ int main()
 		}
 		std::cout << "initialize ROCParameter object" << std::endl;
 		double sphi_init = 2;
-		double numMixtures = 1;
+		double numMixtures = 2;
 		std::string mixDef = ROCParameter::allUnique;
 		std::cout << "\tSphi init: " << sphi_init << "\n";
 		std::cout << "\t# mixtures: " << numMixtures << "\n";
@@ -341,6 +342,39 @@ int main()
 		for(unsigned n = 0; n < 22; n++)
 		{
 			std::cout << SequenceSummary::AminoAcidArray[n] << ": " << parameter.getCodonSpecificProposalWidth(n) << "\n";
+		}
+
+		//Get posterior estimates for mutation & selection
+		int numMutationCategories = parameter.getNumMutationCategories();
+		int numSelectionCategories = parameter.getNumSelectionCategories();
+		int numParam = parameter.getNumParam();
+		for (int i = 0; i < numMutationCategories; i++)
+		{
+			std::string file = "results/mutationPosterior_Cat" + std::to_string(i) + ".csv";
+			std::ofstream mutout(file);
+			for (int n = 0; n < numParam; n++)
+			{
+				double estimate = parameter.getMutationPosteriorMean(i, useSamples, n);
+				std::string codon = SequenceSummary::IndexToCodon(n);
+				char aa = SequenceSummary::CodonToAAIndex(codon);
+				mutout << aa <<"." << codon <<".log.mu," << estimate <<"\n";
+			}
+			mutout.close();
+		}
+
+
+		for (int i = 0; i < numSelectionCategories; i++)
+		{
+			std::string file = "results/selectionPosterior_Cat" + std::to_string(i) + ".csv";
+			std::ofstream selectout(file);
+			for (int n = 0; n < numParam; n++)
+			{
+				double estimate = parameter.getSelectionPosteriorMean(i, useSamples, n);
+				std::string codon = SequenceSummary::IndexToCodon(n);
+				char aa = SequenceSummary::CodonToAAIndex(codon);
+				selectout << aa <<"." << codon <<".log.eta," << estimate <<"\n";
+			}
+			selectout.close();
 		}
 
 		std::ofstream phiout("results/phiPosterior.csv");

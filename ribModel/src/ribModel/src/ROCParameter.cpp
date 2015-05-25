@@ -472,7 +472,7 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
 	{
 		tempSet = proposal ? proposedSelectionParameter[category] : currentSelectionParameter[category];
 	}
-	else throw "Unkown parameter type: " + paramType;
+	else throw "Unkown parameter type: " + std::to_string(paramType);
 	unsigned aaRange[2];
 	SequenceSummary::AAToCodonRange(aa, true, aaRange);
 
