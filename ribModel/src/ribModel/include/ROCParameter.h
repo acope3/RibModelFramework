@@ -160,6 +160,7 @@ class ROCParameter
 			}
 		}
 		std::vector<std::vector<std::vector<double>>> getExpressionTrace() {return expressionTrace;}
+		std::vector<double> getExpressionTrace(unsigned geneIndex);
 		std::vector<std::vector<std::vector<double>>> getMutationParameterTrace() {return mutationParameterTrace;}
 		std::vector<std::vector<std::vector<double>>> getSelectionParameterTrace() {return selectionParameterTrace;}
 		void InitializeExpression(Genome& genome, double sd_phi);
@@ -196,7 +197,6 @@ class ROCParameter
 		void initCategoryProbabilitesTrace(int samples);
 		void updateExpressionTrace(unsigned sample, unsigned geneIndex)
 		{
-			// TODO use numSelectionCategories instead of numMixtures????
 			for(unsigned category = 0; category < numSelectionCategories; category++)
 			{
 				expressionTrace[category][sample][geneIndex] = currentExpressionLevel[category][geneIndex];
@@ -209,7 +209,7 @@ class ROCParameter
 		std::vector<std::vector <unsigned>> getMixtureAssignmentTrace() {return mixtureAssignmentTrace;}
 
 		// functions to return estimates
-		double getExpressionPosteriorMean(unsigned samples, unsigned geneIndex, unsigned category);
+		double getExpressionPosteriorMean(unsigned samples, unsigned geneIndex);
 		double getSphiPosteriorMean(unsigned samples);
 		double getMixtureAssignmentPosteriorMean(unsigned samples, unsigned geneIndex); // TODO: implement variance function, fix Mean function (won't work with 3 groups)
         double getMutationPosteriorMean(unsigned category, unsigned samples, unsigned paramIndex);
@@ -217,7 +217,7 @@ class ROCParameter
         double getMutationVariance(unsigned category, unsigned samples, unsigned paramIndex, bool unbiased = true);
         double getSelectionVariance(unsigned category, unsigned samples, unsigned paramIndex, bool unbiased = true);
         double getSphiVariance(unsigned samples, bool unbiased = true);
-        double getExpressionVariance(unsigned samples, unsigned geneIndex, unsigned category, bool unbiased = true);
+        double getExpressionVariance(unsigned samples, unsigned geneIndex, bool unbiased = true);
 
 		// static functions
 		static double calculateSCUO(Gene& gene);

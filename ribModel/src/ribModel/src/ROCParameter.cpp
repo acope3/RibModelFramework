@@ -506,7 +506,7 @@ double ROCParameter::getMixtureAssignmentPosteriorMean(unsigned samples, unsigne
 	return posteriorMean / (double)samples;
 }
 
-double ROCParameter::getExpressionPosteriorMean(unsigned samples, unsigned geneIndex, unsigned category)
+double ROCParameter::getExpressionPosteriorMean(unsigned samples, unsigned geneIndex)
 {
 
 	double posteriorMean = 0.0;
@@ -523,6 +523,7 @@ double ROCParameter::getExpressionPosteriorMean(unsigned samples, unsigned geneI
 	unsigned start = traceLength - samples;
 	for(unsigned i = start; i < traceLength; i++)
 	{
+        unsigned category = mixtureAssignmentTrace[i][geneIndex];
 		posteriorMean += expressionTrace[category][i][geneIndex];
 	}
 
@@ -635,7 +636,7 @@ double ROCParameter::getMutationVariance(unsigned category, unsigned samples, un
 	double normalizationTerm = unbiased ? (1/((double)samples-1.0)) : (1/(double)samples);
 	return normalizationTerm * posteriorVariance;
 }
-double ROCParameter::getExpressionVariance(unsigned samples, unsigned geneIndex, unsigned category, bool unbiased)
+double ROCParameter::getExpressionVariance(unsigned samples, unsigned geneIndex, bool unbiased)
 {
 	unsigned traceLength = expressionTrace[0].size();
 	if(samples > traceLength)
@@ -646,13 +647,14 @@ double ROCParameter::getExpressionVariance(unsigned samples, unsigned geneIndex,
 		samples = traceLength;
 	}
 
-	double posteriorMean = getExpressionPosteriorMean(samples, geneIndex, category);
+	double posteriorMean = getExpressionPosteriorMean(samples, geneIndex);
 
     double posteriorVariance = 0.0;
 
 	unsigned start = traceLength - samples;
 	for(unsigned i = start; i < traceLength; i++)
 	{
+        unsigned category = mixtureAssignmentTrace[i][geneIndex];
         double difference = expressionTrace[category][i][geneIndex] - posteriorMean;
 		posteriorVariance += difference * difference;
 	}
@@ -736,6 +738,20 @@ void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 		numAcceptForMutationAndSelection[i] = 0u;
 	}
 }
+
+std::vector<double> ROCParameter::getExpressionTrace(unsigned geneIndex)
+{
+    unsigned traceLength = expressionTrace[0].size();
+
+    std::vector<double> returnVector(traceLength, 0.0);
+    for(unsigned i = 0u; i < traceLength; i++)
+    {
+        unsigned category = mixtureAssignmentTrace[i][geneIndex];
+        returnVector[i] =  expressionTrace[category][i][geneIndex];
+    }
+    return returnVector;
+}
+
 
 // Cedric: I decided to use a normal distribution to propose Sphi and phi instead of a lognormal because:
 // 1. It is a symmetric distribution and you therefore do not have to account for the unsymmetry in jump probabilities

@@ -263,7 +263,7 @@ int main()
 	Genome genome;
 	std::cout << "reading fasta file" << std::endl;
 	//genome.readFasta("../../inst/testGenome.fasta");
-	genome.readFasta("Skluyveri_chromosomeA_simulated.fasta");
+	genome.readFasta("Skluyveri_A_andCleft_simulated.fasta");
 	//genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/Skluyveri.fasta");
 	//genome.writeFasta("../../inst/resGenome.fasta
 	//genome.readFasta("testchromosome.fasta");
@@ -294,7 +294,7 @@ int main()
 		}
 		std::cout << "initialize ROCParameter object" << std::endl;
 		double sphi_init = 2;
-		double numMixtures = 1;
+		double numMixtures = 2;
 		std::string mixDef = ROCParameter::allUnique;
 		std::cout << "\tSphi init: " << sphi_init << "\n";
 		std::cout << "\t# mixtures: " << numMixtures << "\n";
@@ -313,9 +313,9 @@ int main()
 
 
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
-        int samples = 1500;
+        int samples = 200;
 		int thining = 10;
-		int useSamples = 500;
+		int useSamples = 50;
 
 		std::cout << "\t# samples: " << samples << "\n";
 		std::cout << "\t thining: " << thining << "\n";
@@ -398,9 +398,7 @@ int main()
 		{
 			//std::cout << parameter.getExpressionProposalWidth(n) << std::endl;
 			double mixtureAssignmentPosteriorMean = parameter.getMixtureAssignmentPosteriorMean(useSamples, n);
-			unsigned mixtureElement = std::round( mixtureAssignmentPosteriorMean );
-			unsigned expressionCategory = parameter.getExpressionCategory(mixtureElement);
-			phiout << genome.getGene(n).getId() << "," << parameter.getExpressionPosteriorMean(useSamples, n, expressionCategory) << std::endl;
+			phiout << genome.getGene(n).getId() << "," << parameter.getExpressionPosteriorMean(useSamples, n) << std::endl;
 			mixAssignment << genome.getGene(n).getId() << "," << mixtureAssignmentPosteriorMean << std::endl;
 		}
 		phiout.close();

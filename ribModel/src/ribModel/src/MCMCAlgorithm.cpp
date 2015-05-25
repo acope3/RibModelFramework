@@ -143,11 +143,11 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
             //std::cout << "Update expression for Gene i = " << i << " in iteration " << iteration << std::endl;
             parameter.updateExpression(i);
             //#pragma omp atomic
-            logLikelihood += std::isfinite(propLogLike) ? propLogLike : 0.0;
+            logLikelihood += propLogLike; //std::isfinite(propLogLike) ? propLogLike : 0.0;
         }else{
             //#pragma omp atomic
             //std::cout << " rejected \n";
-            logLikelihood += std::isfinite(currLogLike) ? currLogLike : 0.0;
+            logLikelihood += currLogLike; //std::isfinite(currLogLike) ? currLogLike : 0.0;
         }
         if((iteration % thining) == 0)
         {
@@ -305,7 +305,7 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
         oss2 << "results/selectionParamTrace_" << nm<< ".csv";
         oss << "results/phiTrace_nmix_" << nm << ".csv";
         std::ofstream phitraceout(oss.str(), std::ofstream::out);
-				std::ofstream selectTraceOut(oss2.str(), std::ofstream::out);
+        std::ofstream selectTraceOut(oss2.str(), std::ofstream::out);
         for (int i = 0; i < 22; i++)
         {
             char aa = SequenceSummary::AminoAcidArray[i];
@@ -373,5 +373,22 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
     }
     likout.close();
     sphiout.close();
+
+
+    std::vector<std::vector<double>> phiTraces(genome.getGenomeSize());
+    for(int i = 0; i < genome.getGenomeSize(); i++)
+    {
+        phiTraces[i] = parameter.getExpressionTrace(i);
+    }
+    std::ofstream phitraceout("results/expressionLevelTrace.csv", std::ofstream::out);
+    for(unsigned iteration = 0; iteration < samples; iteration++)
+    {
+        for(int i = 0; i < genome.getGenomeSize(); i++)
+        {
+            phitraceout << phiTraces[i][iteration] << ",";
+        }
+        phitraceout << std::endl;
+    }
+
 }
 
