@@ -351,12 +351,18 @@ int main()
 		{
 			std::string file = "results/mutationPosterior_Cat" + std::to_string(i) + ".csv";
 			std::ofstream mutout(file);
-			for (int n = 0; n < numParam; n++)
+			for (int n = 0; n < 22; n++) //going over the amino acids
 			{
-				double estimate = parameter.getMutationPosteriorMean(i, useSamples, n);
-				std::string codon = SequenceSummary::IndexToCodon(n);
-				char aa = SequenceSummary::CodonToAAIndex(codon);
-				mutout << aa <<"." << codon <<".log.mu," << estimate <<"\n";
+				unsigned aaRange[2];
+				char aa = SequenceSummary::AminoAcidArray[n];
+				SequenceSummary::AAToCodonRange(aa, true, aaRange);
+				for (int a = aaRange[0]; a < aaRange[1]; a++)
+				{
+					double estimate = parameter.getMutationPosteriorMean(i, useSamples, a);
+					double variance = parameter.getMutationVariance(i, useSamples, a);
+					std::string codon = SequenceSummary::IndexToCodon(a);
+					mutout << aa <<"." << codon <<".deltaM," << estimate <<"," << variance <<"\n";
+				}
 			}
 			mutout.close();
 		}
@@ -366,12 +372,18 @@ int main()
 		{
 			std::string file = "results/selectionPosterior_Cat" + std::to_string(i) + ".csv";
 			std::ofstream selectout(file);
-			for (int n = 0; n < numParam; n++)
+			for (int n = 0; n < 22; n++)
 			{
-				double estimate = parameter.getSelectionPosteriorMean(i, useSamples, n);
-				std::string codon = SequenceSummary::IndexToCodon(n);
-				char aa = SequenceSummary::CodonToAAIndex(codon);
-				selectout << aa <<"." << codon <<".log.eta," << estimate <<"\n";
+				unsigned aaRange[2];
+				char aa = SequenceSummary::AminoAcidArray[n];
+				SequenceSummary::AAToCodonRange(aa, true, aaRange);
+				for (int a = aaRange[0]; a < aaRange[1]; a++)
+				{
+					double estimate = parameter.getSelectionPosteriorMean(i, useSamples, n);
+					double variance = parameter.getSelectionVariance(i, useSamples, n);
+					std::string codon = SequenceSummary::IndexToCodon(n);
+					selectout << aa <<"." << codon <<".deltaEta," << estimate <<"\n";
+				}
 			}
 			selectout.close();
 		}

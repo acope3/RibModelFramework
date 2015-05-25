@@ -11,7 +11,6 @@ kluyveri.phi
 kluyveri.phi <- read.table("../Skluyveri_ChrA_phi_est.csv", sep=",", header=T)[, 2]
 plot(log10(kluyveri.phi), log10(test.phi))
 test.phi <- read.table("phiPosterior.csv", sep=",")[,2]
-test.phi <- read.table("phiPosterior.csv", sep=",")[,2]
 test.phi.names <- as.character(read.table("phiPosterior.csv", sep=",")[,1])
 kluyveri.phi <- read.table("../Skluyveri_ChrA_phi_est.csv", sep=",", header=T)[, 2]
 plot(log10(kluyveri.phi), log10(test.phi))
@@ -31,11 +30,14 @@ plot(log10(kluyveri.phi), log10(test.phi))#
 cor(log10(kluyveri.phi), log10(test.phi))
 test.phi <- read.table("phiPosterior.csv", sep=",")[,2]#
 test.phi.names <- as.character(read.table("phiPosterior.csv", sep=",")[,1])#
-kluyveri.phi <- read.table("../Skluyveri_ChrA_phi_est.csv", sep=",", header=T)[, 2]#
-plot(log10(kluyveri.phi), log10(test.phi))#
+kluyveri.phi <- read.table("../Skluyveri_ChrA_ChrCleft_phi_est.csv", sep=",", header=T)[, 2]#
+#
+idx <- grepl(pattern = "^SAKL0C", x = test.phi.names)#
+plot(log10(kluyveri.phi[!idx]), log10(test.phi[!idx]))#
+points(log10(kluyveri.phi[idx]), log10(test.phi[idx]), col = "red")#
+abline(0,1, col="blue", lwd=2)#
 cor(log10(kluyveri.phi), log10(test.phi))
-test.phi <- read.table("phiPosterior.csv", sep=",")[,2]#
-test.phi.names <- as.character(read.table("phiPosterior.csv", sep=",")[,1])#
-kluyveri.phi <- read.table("../Skluyveri_ChrA_phi_est.csv", sep=",", header=T)[, 2]#
-plot(log10(kluyveri.phi), log10(test.phi))#
-cor(log10(kluyveri.phi), log10(test.phi))
+likTrace <- unlist(c(read.table("liklihoodTrace.csv", sep=",")))#
+plot(likTrace, type = "l")
+mixAssignment <- read.table("mixAssignment.csv", sep=",")[,2]
+round(mixAssignment)
