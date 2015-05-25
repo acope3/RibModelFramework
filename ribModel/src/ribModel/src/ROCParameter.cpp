@@ -588,6 +588,7 @@ double ROCParameter::getSelectionPosteriorMean(unsigned category, unsigned sampl
 
 double ROCParameter::getSelectionVariance(unsigned category, unsigned samples, unsigned paramIndex, bool unbiased)
 {
+	unsigned traceLength = selectionParameterTrace[category].size();
 	if(samples > traceLength)
 	{
 		std::cout << std::string("ROCParameter::getSelectionVariance throws: Number of anticipated samples (") +
@@ -596,8 +597,7 @@ double ROCParameter::getSelectionVariance(unsigned category, unsigned samples, u
 		samples = traceLength;
 	}
 
-	double posteriorMean = getSelectionPosteriorMean(category, samples, paramIndex)
-	unsigned traceLength = selectionParameterTrace[category].size();
+	double posteriorMean = getSelectionPosteriorMean(category, samples, paramIndex);
 
     double posteriorVariance = 0.0;
 
@@ -613,6 +613,7 @@ double ROCParameter::getSelectionVariance(unsigned category, unsigned samples, u
 
 double ROCParameter::getMutationVariance(unsigned category, unsigned samples, unsigned paramIndex, bool unbiased)
 {
+	unsigned traceLength = mutationParameterTrace[category].size();
 	if(samples > traceLength)
 	{
 		std::cout << std::string("ROCParameter::getMutationVariance throws: Number of anticipated samples (") +
@@ -621,8 +622,7 @@ double ROCParameter::getMutationVariance(unsigned category, unsigned samples, un
 		samples = traceLength;
 	}
 
-	double posteriorMean = getMutationPosteriorMean(category, samples, paramIndex)
-	unsigned traceLength = mutationParameterTrace[category].size();
+	double posteriorMean = getMutationPosteriorMean(category, samples, paramIndex);
 
     double posteriorVariance = 0.0;
 
@@ -637,6 +637,7 @@ double ROCParameter::getMutationVariance(unsigned category, unsigned samples, un
 }
 double ROCParameter::getExpressionVariance(unsigned samples, unsigned geneIndex, unsigned category, bool unbiased)
 {
+	unsigned traceLength = expressionTrace[0].size();
 	if(samples > traceLength)
 	{
 		std::cout << std::string("ROCParameter::getExpressionVariance throws: Number of anticipated samples (") +
@@ -646,7 +647,6 @@ double ROCParameter::getExpressionVariance(unsigned samples, unsigned geneIndex,
 	}
 
 	double posteriorMean = getExpressionPosteriorMean(samples, geneIndex, category);
-	unsigned traceLength = expressionTrace[0].size();
 
     double posteriorVariance = 0.0;
 
@@ -661,6 +661,7 @@ double ROCParameter::getExpressionVariance(unsigned samples, unsigned geneIndex,
 }
 double ROCParameter::getSphiVariance(unsigned samples, bool unbiased)
 {
+	unsigned traceLength = sPhiTrace.size();
 	if(samples > traceLength)
 	{
 		std::cout << std::string("ROCParameter::getSphiVariance throws: Number of anticipated samples (") +
@@ -669,7 +670,6 @@ double ROCParameter::getSphiVariance(unsigned samples, bool unbiased)
 		samples = traceLength;
 	}
 	double posteriorMean = getSphiPosteriorMean(samples);
-	unsigned traceLength = sPhiTrace.size();
 
     double posteriorVariance = 0.0;
 
