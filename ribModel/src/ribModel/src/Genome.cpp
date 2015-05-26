@@ -1,7 +1,7 @@
 #include "../include/Genome.h"
 #include "../include/ROCParameter.h"//these two files must be included here to get at the implimentation
 #include "../include/ROCModel.h" 		//for simulateGenome. They cannot be included in the header file. See genome.h for 
-//more information on circular dependices/forward declarations
+																		//more information on circular dependices/forward declarations
 #include <iostream>     // std::cout
 #include <cstring>
 #include <fstream>

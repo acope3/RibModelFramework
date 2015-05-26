@@ -1,0 +1,48 @@
+------------------ CODON RANGE PER AA ------------------
+codon range for A	0 - 4
+codon range for C	4 - 6
+codon range for D	6 - 8
+codon range for E	8 - 10
+codon range for F	10 - 12
+codon range for G	12 - 16
+codon range for H	16 - 18
+codon range for I	18 - 21
+codon range for K	21 - 23
+codon range for L	23 - 29
+codon range for M	29 - 30
+codon range for N	30 - 32
+codon range for P	32 - 36
+codon range for Q	36 - 38
+codon range for R	38 - 44
+codon range for S	44 - 48
+codon range for T	48 - 52
+codon range for V	52 - 56
+codon range for W	56 - 57
+codon range for Y	57 - 59
+codon range for Z	59 - 61
+codon range for X	61 - 64
+------------------ CODON RANGE PER AA ------------------
+------------------ CODON RANGE PER AA ------------------
+codon range for A	0 - 3
+codon range for C	3 - 4
+codon range for D	4 - 5
+codon range for E	5 - 6
+codon range for F	6 - 7
+codon range for G	7 - 10
+codon range for H	10 - 11
+codon range for I	11 - 13
+codon range for K	13 - 14
+codon range for L	14 - 19
+codon range for M	19 - 19
+codon range for N	19 - 20
+codon range for P	20 - 23
+codon range for Q	23 - 24
+codon range for R	24 - 29
+codon range for S	29 - 32
+codon range for T	32 - 35
+codon range for V	35 - 38
+codon range for W	38 - 38
+codon range for Y	38 - 39
+codon range for Z	39 - 40
+codon range for X	40 - 42
+------------------ CODON RANGE PER AA ------------------

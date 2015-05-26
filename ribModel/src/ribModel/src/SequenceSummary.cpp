@@ -38,17 +38,23 @@ SequenceSummary& SequenceSummary::operator=(const SequenceSummary& rhs)
 void SequenceSummary::clear()
 {
     // Why is "ncodons[64] = {};" not working?
-    for(int k = 0; k < 64; k++) { ncodons[k] = 0; }
-    for(int k = 0; k < 22; k++) { naa[k] = 0; }
+		int k;
+
+    for(k = 0; k < 64; k++) { ncodons[k] = 0; }
+    for(k = 0; k < 22; k++) { naa[k] = 0; }
 }
 
 void SequenceSummary::processSequence(const std::string& sequence)
 {
+		int codonID;
+		int aaID;
+		std::string codon;
+		
     for(int i = 0; i < sequence.length(); i+=3)
     {
-        std::string codon = sequence.substr(i, 3);
-        int codonID = SequenceSummary::CodonToIndex( codon );
-        int aaID = SequenceSummary::CodonToAAIndex( codon );
+        codon = sequence.substr(i, 3);
+        codonID = SequenceSummary::CodonToIndex( codon );
+        aaID = SequenceSummary::CodonToAAIndex( codon );
         ncodons[codonID]++;
         naa[aaID]++;
     }
@@ -73,19 +79,120 @@ const std::map<char, int> SequenceSummary::aaToIndex = {{'A', 0}, {'C', 1}, {'D'
 
 void SequenceSummary::AAindexToCodonRange(unsigned aaIndex, bool forParamVector, unsigned aaRange[])
 {
-    unsigned startAAIndex = 0;
-    unsigned numCodons = 4;
+    unsigned startAAIndex;
+    unsigned endAAIndex;
+    char aa = AminoAcidArray[aaIndex];
 
-    for(unsigned i = 0; i <= aaIndex; i++)
-    {
-        char aa = AminoAcidArray[i];
-        numCodons = GetNumCodonsForAA(aa, forParamVector);
-        if(i != aaIndex)
-        {
-            startAAIndex += numCodons;
-        }
-    }
-    unsigned endAAIndex = numCodons + startAAIndex;
+		if (aa == 'A') 
+		{
+			if (!forParamVector) {startAAIndex = 0; endAAIndex = 4;}
+			else { startAAIndex = 0; endAAIndex = 3;} 
+		}
+		else if (aa == 'C') 
+		{
+			if (!forParamVector) {startAAIndex = 4; endAAIndex = 6;}
+			else { startAAIndex = 3; endAAIndex = 4;} 
+		}
+		else if (aa == 'D') 
+		{
+			if (!forParamVector) {startAAIndex = 6; endAAIndex = 8;}
+			else { startAAIndex = 4; endAAIndex = 5;} 
+		}
+		else if (aa == 'E') 
+		{
+			if (!forParamVector) {startAAIndex = 8; endAAIndex = 10;}
+			else { startAAIndex = 5; endAAIndex = 6;} 
+		}
+		else if (aa == 'F') 
+		{
+			if (!forParamVector) {startAAIndex = 10; endAAIndex = 12;}
+			else { startAAIndex = 6; endAAIndex = 7;} 
+		}
+		else if (aa == 'G') 
+		{
+			if (!forParamVector) {startAAIndex = 12; endAAIndex = 16;}
+			else { startAAIndex = 7; endAAIndex = 10;} 
+		}
+		else if (aa == 'H') 
+		{
+			if (!forParamVector) {startAAIndex = 16; endAAIndex = 18;}
+			else { startAAIndex = 10; endAAIndex = 11;} 
+		}
+		else if (aa == 'I') 
+		{
+			if (!forParamVector) {startAAIndex = 18; endAAIndex = 21;}
+			else { startAAIndex = 11; endAAIndex = 13;} 
+		}
+		else if (aa == 'K') 
+		{
+			if (!forParamVector) {startAAIndex = 21; endAAIndex = 23;}
+			else { startAAIndex = 13; endAAIndex = 14;} 
+		}
+		else if (aa == 'L') 
+		{
+			if (!forParamVector) {startAAIndex = 23; endAAIndex = 29;}
+			else { startAAIndex = 14; endAAIndex = 19;} 
+		}
+		else if (aa == 'M') 
+		{
+			if (!forParamVector) {startAAIndex = 29; endAAIndex = 30;}
+			else { startAAIndex = 19; endAAIndex = 19;} 
+		}
+		else if (aa == 'N') 
+		{
+			if (!forParamVector) {startAAIndex = 30; endAAIndex = 32;}
+			else { startAAIndex = 19; endAAIndex = 20;} 
+		}
+		else if (aa == 'P') 
+		{
+			if (!forParamVector) {startAAIndex = 32; endAAIndex = 36;}
+			else { startAAIndex = 20; endAAIndex = 23;} 
+		}
+		else if (aa == 'Q') 
+		{
+			if (!forParamVector) {startAAIndex = 36; endAAIndex = 38;}
+			else { startAAIndex = 23; endAAIndex = 24;} 
+		}
+		else if (aa == 'R') 
+		{
+			if (!forParamVector) {startAAIndex = 38; endAAIndex = 44;}
+			else { startAAIndex = 24; endAAIndex = 29;} 
+		}
+		else if (aa == 'S') 
+		{
+			if (!forParamVector) {startAAIndex = 44; endAAIndex = 48;}
+			else { startAAIndex = 29; endAAIndex = 32;} 
+		}
+		else if (aa == 'T') 
+		{
+			if (!forParamVector) {startAAIndex = 48; endAAIndex = 52;}
+			else { startAAIndex = 32; endAAIndex = 35;} 
+		}
+		else if (aa == 'V') 
+		{
+			if (!forParamVector) {startAAIndex = 52; endAAIndex = 56;}
+			else { startAAIndex = 35; endAAIndex = 38;} 
+		}
+		else if (aa == 'W') 
+		{
+			if (!forParamVector) {startAAIndex = 56; endAAIndex = 57;}
+			else { startAAIndex = 38; endAAIndex = 38;} 
+		}
+		else if (aa == 'Y') 
+		{
+			if (!forParamVector) {startAAIndex = 57; endAAIndex = 59;}
+			else { startAAIndex = 38; endAAIndex = 39;} 
+		}
+		else if (aa == 'Z') 
+		{
+			if (!forParamVector) {startAAIndex = 59; endAAIndex = 61;}
+			else { startAAIndex = 39; endAAIndex = 40;} 
+		}
+		else if (aa == 'X') 
+		{
+			if (!forParamVector) {startAAIndex = 61; endAAIndex = 64;}
+			else { startAAIndex = 40; endAAIndex = 42;} 
+		}
 
     aaRange[0] = startAAIndex;
     aaRange[1] = endAAIndex;
@@ -93,7 +200,7 @@ void SequenceSummary::AAindexToCodonRange(unsigned aaIndex, bool forParamVector,
 
 void SequenceSummary::AAToCodonRange(char aa, bool forParamVector, unsigned aaRange[])
 {
-    unsigned aaIndex = aaToIndex.find(aa)->second;
+    unsigned aaIndex = aaToIndex.find(aa) -> second; 
     AAindexToCodonRange(aaIndex, forParamVector, aaRange);
 }
 
@@ -106,17 +213,13 @@ char SequenceSummary::IndexToAA(int aa)
 unsigned SequenceSummary::CodonToAAIndex(std::string& codon)
 {
     char aa = SequenceSummary::CodonToAA(codon);
-    return SequenceSummary::aaToIndex.find(aa)->second;
+    return SequenceSummary::aaToIndex.find(aa) -> second;
 }
 
 unsigned SequenceSummary::CodonToIndex(std::string& codon)
 {
     //std::transform(codon.begin(), codon.end(), codon.begin(), ::toupper);
-    int i = 0;
-    for(; i < 64; i++)
-    {
-        if(!codon.compare(SequenceSummary::codonArray[i])) break;
-    }
+    int i = std::distance(codonArray, std::find(codonArray, codonArray + 64, codon));
     return i;
 }
 std::string SequenceSummary::IndexToCodon(unsigned i)
@@ -127,7 +230,6 @@ std::string SequenceSummary::IndexToCodon(unsigned i)
 
 unsigned SequenceSummary::GetNumCodonsForAA(const char& aa, bool forParamVector)
 {
-    std::toupper(aa);
     unsigned ncodon = -1;
     if(aa == 'M' || aa == 'W') ncodon = 1;
     else if(aa == 'C' || aa == 'D' || aa == 'E' || aa == 'F' || aa == 'H' || aa == 'K' || aa == 'N' || aa == 'Q' || aa == Ser2 || aa == 'Y') ncodon = 2;

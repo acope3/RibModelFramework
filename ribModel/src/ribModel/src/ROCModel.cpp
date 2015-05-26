@@ -108,12 +108,17 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
 {
 
     int numGenes = genome.getGenomeSize();
+    int numCodons = SequenceSummary::GetNumCodonsForAA(curAA);
     double likelihood = 0.0;
     double likelihood_proposed = 0.0;
-    int numCodons = SequenceSummary::GetNumCodonsForAA(curAA);
 
     for(int i = 0; i < numGenes; i++)
     {
+    		int codonCount[numCodons];
+    		double mutation[numCodons - 1];
+    		double selection[numCodons - 1];
+    		double mutation_proposed[numCodons - 1];
+    		double selection_proposed[numCodons - 1];
         Gene gene = genome.getGene(i);
         SequenceSummary seqsum = gene.getSequenceSummary();
         if(seqsum.getAAcountForAA(curAA) == 0) continue;
@@ -130,15 +135,11 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
         double phiValue = parameter.getExpression(i, expressionCategory, false);
 
         // get current mutation and selection parameter
-        double mutation[numCodons - 1];
         parameter.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
-        double selection[numCodons - 1];
         parameter.getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
 
         // get proposed mutation and selection parameter
-        double mutation_proposed[numCodons - 1];
         parameter.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, true, mutation_proposed);
-        double selection_proposed[numCodons - 1];
         parameter.getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, true, selection_proposed);
 
 /*        if(i == 0)
@@ -158,7 +159,6 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
 //            std::cout << "\n";
         }
 */
-        int codonCount[numCodons];
         obtainCodonCount(seqsum, curAA, codonCount);
 
         // get probability of current mixture assignment, calculate likelihood conditional on current mixture assignment
