@@ -273,17 +273,15 @@ int main()
 
 	if(testing)
 	{
-		/*
-			 testNumCodonsPerAA();
+			 //testNumCodonsPerAA();
 			 testCodonRangePerAA(false);
 			 testCodonRangePerAA(true);
-			 testLogNormDensity();
+			 /*testLogNormDensity();
 			 testSCUO(genome);
 			 testCovarianceMatrix();
 			 testRandMultiNom(3);
 			 testThetaKMatrix();
-		 */
-		testSimulateGenome(genome);
+		testSimulateGenome(genome);*/
 	}else{
 
 		ROCModel model = ROCModel();
@@ -314,8 +312,8 @@ int main()
 
 
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
-        int samples = 1000;
-		int thining = 10;
+    int samples = 100;
+		int thining = 1;
 		int useSamples = 50;
 
 		std::cout << "\t# samples: " << samples << "\n";
