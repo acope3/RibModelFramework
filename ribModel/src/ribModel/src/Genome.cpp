@@ -230,7 +230,7 @@ void Genome::simulateGenome(ROCParameter& parameter, ROCModel& model)
 	char curAA;
 	std::string tmpID;
 	std::string tmpDesc;
-
+	int numParam = parameter.getNumParam();
 
 	std::srand(std::time(0));
 	simulatedGenes.resize(genes.size());
@@ -271,7 +271,7 @@ void Genome::simulateGenome(ROCParameter& parameter, ROCModel& model)
 			{
 				parameter.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
 				parameter.getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
-				model.calculateCodonProbabilityVector(numCodons, mutation, selection, phi, codonProb);
+				model.calculateCodonProbabilityVector(numCodons, mutation, selection, phi, codonProb, numParam);
 			}
 			for (k = 0; k < aaCount; k++)
 			{

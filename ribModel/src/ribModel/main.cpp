@@ -188,6 +188,7 @@ void testSimulateGenome(Genome& genome)
 	std::cout << "\t# mixtures: " << numMixtures << "\n";
 	std::cout << "\tmixture definition: " << mixDef << "\n";
 	ROCParameter parameter = ROCParameter(genome.getGenomeSize(), sphi_init, numMixtures, geneAssignment, true, mixDef);
+		int numParam = parameter.getNumParam();
 	std::string files[] = {std::string("Skluyveri_CSP_ChrA.csv"), std::string("Skluyveri_CSP_ChrCleft.csv")};
 	parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
 	parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
@@ -232,7 +233,7 @@ void testSimulateGenome(Genome& genome)
 			double selection[numCodons - 1];
 			parameter.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
 			parameter.getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
-			model.calculateCodonProbabilityVector(numCodons, mutation, selection, phi, codonProb);
+			model.calculateCodonProbabilityVector(numCodons, mutation, selection, phi, codonProb, numParam);
 			std::vector <double> counts(numCodons, 0.0);
 			double sum = 0;
 			int a = 0;
@@ -312,9 +313,9 @@ int main()
 
 
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
-        int samples = 200;
+    int samples = 200;
 		int thining = 10;
-		int useSamples = 50;
+		int useSamples = 150;
 
 		std::cout << "\t# samples: " << samples << "\n";
 		std::cout << "\t thining: " << thining << "\n";
