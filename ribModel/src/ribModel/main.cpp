@@ -183,7 +183,7 @@ void testSimulateGenome(Genome& genome)
 	std::cout << "initialize ROCParameter object" << std::endl;
 	double sphi_init = 2;
 	double numMixtures = 2;
-	std::string mixDef = ROCParameter::allUnique;
+	std::string mixDef = ROCParameter::mutationShared;
 	std::cout << "\tSphi init: " << sphi_init << "\n";
 	std::cout << "\t# mixtures: " << numMixtures << "\n";
 	std::cout << "\tmixture definition: " << mixDef << "\n";
@@ -264,7 +264,7 @@ int main()
 	std::cout << "reading fasta file" << std::endl;
 	//genome.readFasta("../../inst/testGenome.fasta");
 	//genome.readFasta("Skluyveri_chromosomeA_simulated.fasta");
-	genome.readFasta("Skluyveri_A_andCleft_simulated.fasta");
+	genome.readFasta("SimulatedGenome_selectionShared.fasta");
 	//genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/Skluyveri.fasta");
 	//genome.writeFasta("../../inst/resGenome.fasta
 	//genome.readFasta("testchromosome.fasta");
@@ -288,7 +288,7 @@ int main()
 		unsigned geneAssignment[genome.getGenomeSize()];
 		for(int i = 0; i < genome.getGenomeSize(); i++)
 		{
-			if(i < 448) geneAssignment[i] = 0u;
+			if(i < 500) geneAssignment[i] = 0u;
 			else geneAssignment[i] = 1u;
 		}
 		std::cout << "initialize ROCParameter object" << std::endl;
@@ -299,21 +299,26 @@ int main()
 		std::cout << "\t# mixtures: " << numMixtures << "\n";
 		std::cout << "\tmixture definition: " << mixDef << "\n";
 		ROCParameter parameter = ROCParameter(genome.getGenomeSize(), sphi_init, numMixtures, geneAssignment, true, mixDef);
-		std::string files[] = {std::string("Skluyveri_CSP_ChrA.csv"), std::string("Skluyveri_CSP_ChrCleft.csv")};
+		std::string files[] = {std::string("SimulatedGenome_CSP0.csv"), std::string("SimulatedGenome_CSP1.csv")};
 		parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
 		parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
 		parameter.InitializeExpression(genome, sphi_init);
 		std::cout << "done initialize ROCParameter object" << std::endl;
 		//double phiVals[genome.getGenomeSize()];
-		//parameter.readStaticPhiValues("Skluyveri_ChrA_phi_est.csv", phiVals);
+		//parameter.readStaticPhiValues("Skluyveri_ChrA_ChrCleft_phi_est.csv", phiVals);
 
 		//std::cout <<"End of phi Vals\n";
 		//parameter.InitializeExpression(phiVals);
 
 
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
+<<<<<<< HEAD
     int samples = 200;
 		int thining = 10;
+=======
+        int samples = 100;
+		int thining = 1;
+>>>>>>> upstream/master
 		int useSamples = 50;
 
 		std::cout << "\t# samples: " << samples << "\n";

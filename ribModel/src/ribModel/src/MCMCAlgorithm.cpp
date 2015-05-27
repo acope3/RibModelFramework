@@ -143,11 +143,11 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
             //std::cout << "Update expression for Gene i = " << i << " in iteration " << iteration << std::endl;
             parameter.updateExpression(i);
             //#pragma omp atomic
-            logLikelihood += propLogLike; //std::isfinite(propLogLike) ? propLogLike : 0.0;
+            logLikelihood += std::isfinite(propLogLike) ? propLogLike : 0.0;
         }else{
             //#pragma omp atomic
             //std::cout << " rejected \n";
-            logLikelihood += currLogLike; //std::isfinite(currLogLike) ? currLogLike : 0.0;
+            logLikelihood += std::isfinite(currLogLike) ? currLogLike : 0.0;
         }
         if((iteration % thining) == 0)
         {

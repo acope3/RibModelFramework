@@ -70,3 +70,12 @@ which(log10(test.phi) < -2.5)
 test.phiTrace <- read.table("phiTrace_nmix_0.csv", sep=",")
 plot(log(test.phiTrace[,10]), type = "l")
 plot(log(test.phiTrace[,196]), type = "l")
+test.phi <- read.table("phiPosterior.csv", sep=",")[,2]#
+test.phi.names <- as.character(read.table("phiPosterior.csv", sep=",")[,1])#
+kluyveri.phi <- read.table("../Skluyveri_ChrA_ChrCleft_phi_est.csv", sep=",", header=T)[, 2]#
+#
+idx <- grepl(pattern = "^SAKL0C", x = test.phi.names)#
+plot(log10(kluyveri.phi[!idx]), log10(test.phi[!idx]), xlim = range(log10(kluyveri.phi)), ylim = range(log10(test.phi)))#
+points(log10(kluyveri.phi[idx]), log10(test.phi[idx]), col = "red")#
+abline(0,1, col="blue", lwd=2)#
+cor(log10(kluyveri.phi), log10(test.phi))
