@@ -463,14 +463,16 @@ void ROCParameter::InitializeExpression(double* expression)
 void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType, char aa, bool proposal, double* returnSet)
 {
 
-	std::vector<double> *tempSet;
+	std::vector<double> tempSet;
 	if(paramType == ROCParameter::dM)
 	{
-		tempSet = (proposal ? &proposedMutationParameter[category] : &currentMutationParameter[category]);
+		tempSet = proposal ? proposedMutationParameter[category] : currentMutationParameter[category];
+		//tempSet = (proposal ? &proposedMutationParameter[category] : &currentMutationParameter[category]);
 	}
 	else if(paramType == ROCParameter::dEta)
 	{
-		tempSet = (proposal ? &proposedSelectionParameter[category] : &currentSelectionParameter[category]);
+		tempSet = proposal ? proposedSelectionParameter[category] : currentSelectionParameter[category];
+		//tempSet = (proposal ? &proposedSelectionParameter[category] : &currentSelectionParameter[category]);
 	}
 	else throw "Unkown parameter type: " + std::to_string(paramType);
 	unsigned aaRange[2];
@@ -479,8 +481,11 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
 	unsigned j = 0u;
 	for(unsigned i = aaRange[0]; i < aaRange[1]; i++, j++)
 	{
-		returnSet[j] = tempSet -> at(j);
+		returnSet[j] = tempSet[i];
+		//returnSet[j] = tempSet -> at(j);
+		//std::cout << returnSet[j] <<"\n";
 	}
+	//std::exit(1);
 }
 
 double ROCParameter::getMixtureAssignmentPosteriorMean(unsigned samples, unsigned geneIndex)
