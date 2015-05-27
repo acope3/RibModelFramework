@@ -462,7 +462,6 @@ void ROCParameter::InitializeExpression(double* expression)
 
 void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType, char aa, bool proposal, double* returnSet)
 {
-
 	std::vector<double>* tempSet;
 	if(paramType == ROCParameter::dM)
 	{
