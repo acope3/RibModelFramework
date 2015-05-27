@@ -95,7 +95,13 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
             // store values so they can be processed
             unscaledLogProb_curr[k] = logProbabilityRatio[1];
             unscaledLogProb_prop[k] = logProbabilityRatio[2];
-            // get average value of all return values which is used as constant c
+        /*    if (!std::isfinite(unscaledLogProb_prop[k]))
+						{
+							std::cout <<" unscaledLogProb_prop[k]: " << unscaledLogProb_prop[k] <<"\n";
+							std::cout <<" k: " << k <<"\n";
+							std::cout <<" logProbabilityRatio[2]: " << logProbabilityRatio[2] <<"\n\n";
+						}
+					*/	// get average value of all return values which is used as constant c
             maxValue = logProbabilityRatio[1] > maxValue ? logProbabilityRatio[1] : maxValue;
             maxValue = logProbabilityRatio[2] > maxValue ? logProbabilityRatio[2] : maxValue;
         }
@@ -106,7 +112,12 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
         {
             unscaledLogProb_curr[k] -= maxValue;
             unscaledLogProb_prop[k] -= maxValue;
-        }
+    /*        if (!std::isfinite(unscaledLogProb_prop[k]))
+						{
+							std::cout <<" Second unscaledLogProb_prop[k]: " << unscaledLogProb_prop[k] <<"\n";
+							std::cout <<" Second k: " << k <<"\n\n";
+						}
+      */  }
 
         double normalizingProbabilityConstant = 0.0;
         double probabilities[numMixtures];
@@ -117,12 +128,21 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
             probabilities[k] = parameter.getCategoryProbability(k) * std::exp(unscaledLogProb_curr[k]);
             currLogLike += probabilities[k];
             propLogLike += parameter.getCategoryProbability(k) * std::exp(unscaledLogProb_prop[k]);
-            normalizingProbabilityConstant += probabilities[k];
+  /*          if (!std::isfinite(propLogLike))
+						{
+							std::cout <<"Problem at first assignment (line 120): " << propLogLike <<"\n";
+							std::cout <<"parameter.getCategoryProbability(k): " << parameter.getCategoryProbability(k) <<"\n";
+							std::cout <<"std::exp(unscaledLogProb_prop[k]): " << std::exp(unscaledLogProb_prop[k]) <<"\n";
+							std::cout <<"unscaledLogProb_prop[k]: " << unscaledLogProb_prop[k] <<"\n\n";
+						}
+*/
+						normalizingProbabilityConstant += probabilities[k];
         }
         currLogLike = std::log(currLogLike);
         propLogLike = std::log(propLogLike);
+  //      if (!std::isfinite(propLogLike)) std::cout <<"Problem at second assignment (line 125): " << propLogLike <<"\n";
         // normalize probabilities
-        for (int k = 0; k < numMixtures; k++)
+        for (unsigned k = 0u; k < numMixtures; k++)
         {
             probabilities[k] = probabilities[k] / normalizingProbabilityConstant;
         }
@@ -136,17 +156,35 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
         //std::cout << i << " " << gene.getId() << " proposedLogLik: " << propLogLike << " currentLogLik: " << currLogLike;
         // accept/reject proposed phi values
         //std::cout <<"propLoglIke: " << (propLogLike - currLogLike) <<"\n";
-        if( -ROCParameter::randExp(1) < (propLogLike - currLogLike) )
+
+				if (std::isnan(propLogLike)) std::cout <<"Should not be nan\n";
+			/*	bool printstuff = false;
+				if (i == 12)
+				{
+					if (!std::isfinite(propLogLike) || !std::isfinite(currLogLike))
+					{
+						std::cout << "iteration: " << iteration <<"\n";
+						std::cout << "propLogLike: " << propLogLike <<"\n";
+						std::cout << "currLogLike: " << currLogLike <<"\n";
+        		std::cout <<"LoglIkeRatio: " << (propLogLike - currLogLike) <<"\n";
+						printstuff = true;
+					}
+				}
+*/
+				if( -ROCParameter::randExp(1) < (propLogLike - currLogLike) )
         {
+						//if (printstuff) std::cout <<" using propLoglike\n\n";
             //std::cout << " accepted \n";
             // moves proposed phi to current phi
             //std::cout << "Update expression for Gene i = " << i << " in iteration " << iteration << std::endl;
             parameter.updateExpression(i);
             //#pragma omp atomic
+
             logLikelihood += std::isfinite(propLogLike) ? propLogLike : 0.0;
         }else{
             //#pragma omp atomic
             //std::cout << " rejected \n";
+						//if (printstuff) std::cout <<" using currLoglike\n\n";
             logLikelihood += std::isfinite(currLogLike) ? currLogLike : 0.0;
         }
         if((iteration % thining) == 0)
@@ -294,8 +332,8 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
 
     // development output
     std::vector<std::vector<std::vector<double>>> expressionTrace = parameter.getExpressionTrace();
-    unsigned int numParam = parameter.getNumParam();
-    for(int nm = 0u; nm < parameter.getNumSelectionCategories(); nm++)
+    unsigned numParam = parameter.getNumParam();
+    for(unsigned nm = 0u; nm < parameter.getNumSelectionCategories(); nm++)
     {
         std::vector<std::vector<std::vector<double>>> selectionParameterTrace = parameter.getSelectionParameterTrace();
         std::stringstream oss;
@@ -310,7 +348,7 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
             if (aa == 'X' || aa == 'W' || aa == 'M') continue;
             unsigned aaRange[2];
             SequenceSummary::AAToCodonRange(aa, false, aaRange);
-            for (int j = aaRange[0]; j < aaRange[1] - 1; j++)
+            for (unsigned j = aaRange[0]; j < aaRange[1] - 1; j++)
             {
                 selectTraceOut << aa <<"." << SequenceSummary::codonArray[j] <<",";
             }
@@ -318,12 +356,12 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
         selectTraceOut <<"\n";
         for(unsigned iteration = 0; iteration < samples; iteration++)
         {
-            for(int i = 0; i < genome.getGenomeSize(); i++)
+            for(unsigned i = 0u; i < genome.getGenomeSize(); i++)
             {
                 phitraceout << expressionTrace[nm][iteration][i] << ",";
             }
             phitraceout << std::endl;
-            for(int i = 0; i < numParam; i++)
+            for(unsigned i = 0; i < numParam; i++)
             {
                 selectTraceOut << selectionParameterTrace[nm][iteration][i] <<",";
             }
@@ -333,7 +371,7 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
         selectTraceOut.close();
     }
 
-    for (int nm = 0u; nm < parameter.getNumMutationCategories(); nm++)
+    for (unsigned nm = 0u; nm < parameter.getNumMutationCategories(); nm++)
     {
         std::vector<std::vector<std::vector<double>>> mutationParameterTrace = parameter.getMutationParameterTrace();
         std::stringstream oss;
@@ -345,7 +383,7 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
             if (aa == 'X' || aa == 'W' || aa == 'M') continue;
             unsigned aaRange[2];
             SequenceSummary::AAToCodonRange(aa, false, aaRange);
-            for (int j = aaRange[0]; j < aaRange[1] - 1; j++)
+            for (unsigned j = aaRange[0]; j < aaRange[1] - 1; j++)
             {
                 mutateTraceOut << aa <<"." << SequenceSummary::codonArray[j] <<",";
             }
@@ -353,7 +391,7 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
         mutateTraceOut <<"\n";
         for(unsigned iteration = 0; iteration < samples; iteration++)
         {
-            for(int i = 0; i < numParam; i++)
+            for(unsigned i = 0u; i < numParam; i++)
             {
                 mutateTraceOut << mutationParameterTrace[nm][iteration][i] <<",";
             }

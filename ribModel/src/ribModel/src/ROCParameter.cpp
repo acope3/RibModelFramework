@@ -171,9 +171,9 @@ ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
 }
 
 
-void ROCParameter::initMutationSelectionCategories(std::string files[], int numCategories, unsigned paramType)
+void ROCParameter::initMutationSelectionCategories(std::string files[], unsigned numCategories, unsigned paramType)
 {
-	int i, j;
+	unsigned i, j;
 	std::size_t pos, pos2;
 
 	std::ifstream currentFile;
@@ -334,7 +334,7 @@ void ROCParameter::initSelectionParameterTrace(unsigned samples)
 void ROCParameter::initMixtureAssignmentTrace(unsigned samples, unsigned num_genes)
 {
 	mixtureAssignmentTrace.resize(samples);
-	for (int i = 0; i < samples; i ++)
+	for (unsigned i = 0u; i < samples; i ++)
 	{
 		mixtureAssignmentTrace[i].resize(num_genes);
 	}
@@ -344,7 +344,7 @@ void ROCParameter::initMixtureAssignmentTrace(unsigned samples, unsigned num_gen
 void ROCParameter::initCategoryProbabilitesTrace(int samples)
 {
 	categoryProbabilitiesTrace.resize(numMixtures);
-	for (int i = 0; i < numMixtures; i++)
+	for (unsigned i = 0u; i < numMixtures; i++)
 	{
 		categoryProbabilitiesTrace[i].resize(samples, 0.0);
 	}
@@ -912,6 +912,8 @@ const std::string ROCParameter::selectionShared = "selectionShared";
 const std::string ROCParameter::mutationShared = "mutationShared";
 std::default_random_engine ROCParameter::generator(time(NULL));
 //std::srand(time(NULL));
+
+// TODO return array as reference and not as return
 double* ROCParameter::drawIidRandomVector(unsigned draws, double mean, double sd, double (*proposal)(double a, double b))
 {
 	double randomNumbers[draws];

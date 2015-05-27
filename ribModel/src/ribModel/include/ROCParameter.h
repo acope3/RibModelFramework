@@ -106,10 +106,10 @@ class ROCParameter
 
 		void readStaticPhiValues(char *filename, double temp[]);
 		void initCategoryDefinitions(std::string mutationSelectionState, unsigned thetaKMatrix[][2]);
-		void initMutationSelectionCategories(std::string files[], int numCategories, unsigned paramType);
+		void initMutationSelectionCategories(std::string files[], unsigned numCategories, unsigned paramType);
 		void printThetaKMatrix()
 		{
-			for (int i = 0; i < numMixtures; i++)
+			for (unsigned i = 0u; i < numMixtures; i++)
 			{
 				std::cout << categories[i].delM <<"\t" << categories[i].delEta <<"\n";
 			}
@@ -119,8 +119,6 @@ class ROCParameter
 		unsigned int getNumParam() {return numParam;}
 		std::vector<std::vector<double>> getCurrentMutationParameter() {return currentMutationParameter;}
 		std::vector<std::vector<double>> getCurrentSelectionParameter() {return currentSelectionParameter;}
-		//unsigned getNumMutationCategoriesVar() {return numMutationCategories;}
-		//unsigned getNumSelectionCategoriesVar() {return numSelectionCategories;}
 		unsigned getMutationCategory(unsigned group) {return categories[group].delM;}
 		unsigned getSelectionCategory(unsigned group) {return categories[group].delEta;}
 		unsigned getExpressionCategory(unsigned group) {return categories[group].delEta;}
