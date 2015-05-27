@@ -264,7 +264,7 @@ int main()
 	std::cout << "reading fasta file" << std::endl;
 	//genome.readFasta("../../inst/testGenome.fasta");
 	//genome.readFasta("Skluyveri_chromosomeA_simulated.fasta");
-	genome.readFasta("SimulatedGenome_selectionShared.fasta");
+	genome.readFasta("SimulatedGenome_allUnique.fasta");
 	//genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/Skluyveri.fasta");
 	//genome.writeFasta("../../inst/resGenome.fasta
 	//genome.readFasta("testchromosome.fasta");
@@ -288,8 +288,8 @@ int main()
 		unsigned geneAssignment[genome.getGenomeSize()];
 		for(int i = 0; i < genome.getGenomeSize(); i++)
 		{
-			if(i < 500) geneAssignment[i] = 0u;
-			else geneAssignment[i] = 1u;
+			if(i < 500) geneAssignment[i] = 1u;
+			else geneAssignment[i] = 0u;
 		}
 		std::cout << "initialize ROCParameter object" << std::endl;
 		double sphi_init = 2;
@@ -312,8 +312,8 @@ int main()
 
 
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
-        int samples = 100;
-		int thining = 1;
+        int samples = 200;
+		int thining = 10;
 		int useSamples = 50;
 
 		std::cout << "\t# samples: " << samples << "\n";

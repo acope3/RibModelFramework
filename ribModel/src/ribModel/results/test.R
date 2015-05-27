@@ -1,6 +1,6 @@
 test.phi <- read.table("phiPosterior.csv", sep=",")[,2]
 test.phi.names <- as.character(read.table("phiPosterior.csv", sep=",")[,1])
-true.phi <- read.table("../SimulatedGenome_mutationShared_phi.csv", sep=",", header=T)[, 2]
+true.phi <- read.table("../SimulatedGenome_allUnique_phi.csv", sep=",", header=T)[, 2]
 
 
 idx <- 1:500
@@ -12,7 +12,7 @@ cor(log10(true.phi), log10(test.phi))
 
 mutation <- read.table("mutationPosterior_Cat0.csv", sep=",")[,2]
 mutation <- mutation[mutation != 0]
-selection <- read.table("selectionPosterior_Cat1.csv", sep=",")[,2]
+selection <- read.table("selectionPosterior_Cat0.csv", sep=",")[,2]
 selection <- selection[selection != 0]
 trueCSP <- read.table("../SimulatedGenome_CSP1.csv", sep=",", header=T)
 dm.idx <- grepl(pattern = "^[A-Z].[ACGT]{3}.log", x = trueCSP[,1])
