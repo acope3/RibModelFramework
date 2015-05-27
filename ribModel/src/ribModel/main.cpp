@@ -264,7 +264,7 @@ int main()
 	std::cout << "reading fasta file" << std::endl;
 	//genome.readFasta("../../inst/testGenome.fasta");
 	//genome.readFasta("Skluyveri_chromosomeA_simulated.fasta");
-	genome.readFasta("SimulatedGenome_allUnique.fasta");
+	genome.readFasta("SimulatedGenome_mutationShared.fasta");
 	//genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/Skluyveri.fasta");
 	//genome.writeFasta("../../inst/resGenome.fasta
 	//genome.readFasta("testchromosome.fasta");
@@ -294,7 +294,7 @@ int main()
 		std::cout << "initialize ROCParameter object" << std::endl;
 		double sphi_init = 2;
 		double numMixtures = 2;
-		std::string mixDef = ROCParameter::allUnique;
+		std::string mixDef = ROCParameter::mutationShared;
 		std::cout << "\tSphi init: " << sphi_init << "\n";
 		std::cout << "\t# mixtures: " << numMixtures << "\n";
 		std::cout << "\tmixture definition: " << mixDef << "\n";
