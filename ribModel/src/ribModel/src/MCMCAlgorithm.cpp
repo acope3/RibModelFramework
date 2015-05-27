@@ -212,7 +212,6 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, ROCParame
         if(curAA == 'X' || curAA == 'M' || curAA == 'W') continue;
         // calculate likelihood ratio for every Category for current AA
         model.calculateLogLikelihoodRatioPerAAPerCategory(curAA, genome, parameter, acceptanceRatioForAllMixtures);
-
         //std::cout << "logAcceptanceRatioForAllMixtures: " << logAcceptanceRatioForAllMixtures << "\n";
         if( -ROCParameter::randExp(1) < acceptanceRatioForAllMixtures )
         {
@@ -227,7 +226,6 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, ROCParame
             //parameter.updateSphiTrace(iteration/thining);
         }
     }
-
 }
 
 void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter)

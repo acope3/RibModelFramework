@@ -1,6 +1,6 @@
 test.phi <- read.table("phiPosterior.csv", sep=",")[,2]
 test.phi.names <- as.character(read.table("phiPosterior.csv", sep=",")[,1])
-true.phi <- read.table("../SimulatedGenome_allUnique_phi.csv", sep=",", header=T)[, 2]
+true.phi <- read.table("../SimulatedGenome_selectionShared_phi.csv", sep=",", header=T)[, 2]
 
 
 idx <- 1:500
@@ -28,8 +28,8 @@ cor(trueSelection, selection)
 likTrace <- unlist(c(read.table("liklihoodTrace.csv", sep=",")))
 plot(likTrace, type = "l")
 
-which(log10(test.phi) > 0.5)
-gene <- 303
+which(log10(test.phi) > 2)
+gene <- 932
 expressionTrace <- read.table("expressionLevelTrace.csv", sep=",")
 plot(log10(expressionTrace[, gene]), type = "l")
 test.phiTrace0 <- read.table("phiTrace_nmix_0.csv", sep=",")
@@ -42,5 +42,6 @@ mixAssignment <- read.table("mixAssignment.csv", sep=",")[,2]
 idx <- round(mixAssignment) == 1
 
 test.scuo <- read.table("scuo.csv", sep=",")[,2]
-plot(log10(test.scuo), log10(true.phi))
+plot(log10(true.phi), log10(test.scuo))
+cor(log10(true.phi), log10(test.scuo))
 

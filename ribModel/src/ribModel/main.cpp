@@ -312,7 +312,7 @@ int main()
 
 
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
-        int samples = 200;
+        int samples = 600;
 		int thining = 10;
 		int useSamples = 50;
 
@@ -340,9 +340,11 @@ int main()
 		std::cout << "CSP proposal width: \n";
 		for(unsigned n = 0; n < 22; n++)
 		{
+            if(n == 21 || n == 10 || n == 18) continue;
 			std::cout << SequenceSummary::AminoAcidArray[n] << ": " << parameter.getCodonSpecificProposalWidth(n) << "\n";
 		}
 
+        std::cout << "writing mutation posterior file" << "\n";
 		//Get posterior estimates for mutation & selection
 		int numMutationCategories = parameter.getNumMutationCategories();
 		int numSelectionCategories = parameter.getNumSelectionCategories();
@@ -372,8 +374,8 @@ int main()
 			}
 			mutout.close();
 		}
-
-
+        std::cout << "finished writing mutation posterior file" << "\n";
+        std::cout << "writing selection posterior file" << "\n";
 		for (int i = 0; i < numSelectionCategories; i++)
 		{
 			std::string file = "results/selectionPosterior_Cat" + std::to_string(i) + ".csv";
@@ -399,6 +401,7 @@ int main()
 			}
 			selectout.close();
 		}
+        std::cout << "finished writing selection posterior file" << "\n";
 
 		std::ofstream phiout("results/phiPosterior.csv");
 		std::ofstream mixAssignment("results/mixAssignment.csv");
@@ -406,12 +409,15 @@ int main()
 		for(int n = 0; n < genome.getGenomeSize(); n++)
 		{
 			//std::cout << parameter.getExpressionProposalWidth(n) << std::endl;
+			//std::cout << n << "\n";
 			double mixtureAssignmentPosteriorMean = parameter.getMixtureAssignmentPosteriorMean(useSamples, n);
 			phiout << genome.getGene(n).getId() << "," << parameter.getExpressionPosteriorMean(useSamples, n) << std::endl;
 			mixAssignment << genome.getGene(n).getId() << "," << mixtureAssignmentPosteriorMean << std::endl;
 		}
 		phiout.close();
+		std::cout << "closed phiout\n";
 		mixAssignment.close();
+		std::cout << "closed mixAssignment\n";
 	}
 
 	return 0;

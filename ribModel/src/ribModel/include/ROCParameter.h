@@ -169,7 +169,12 @@ class ROCParameter
 
 		// functions to manage codon specific parameter
 		void updateCodonSpecificParameter(char aa);
-		double getCodonSpecificProposalWidth(unsigned aa) {return std_csp[aa];}
+		double getCodonSpecificProposalWidth(unsigned aa)
+		{
+		    unsigned codonRange[2];
+            SequenceSummary::AAindexToCodonRange(aa, true, codonRange);
+            return std_csp[codonRange[0]];
+        }
 
 		// functions to manage Sphi
 		double getSphi(bool proposed = false) {return (proposed ? Sphi_proposed : Sphi);}

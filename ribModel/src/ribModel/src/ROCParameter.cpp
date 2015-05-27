@@ -39,7 +39,7 @@ ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures
 
 	// proposal bias and std for codon specific parameter
 	bias_csp = 0;
-	std_csp.resize(22, 0.1);
+	std_csp.resize(numParam, 0.1);
 
 	priorA = 0;
 	priorB = 1;
@@ -481,7 +481,6 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
 	for(unsigned i = aaRange[0]; i < aaRange[1]; i++, j++)
 	{
 		returnSet[j] = tempSet -> at(i);
-		//returnSet[j] = tempSet[i];
 	}
 }
 
@@ -732,18 +731,25 @@ void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
     unsigned numCSPsets = numAcceptForMutationAndSelection.size();
     for(unsigned i = 0; i < numCSPsets; i++)
 	{
+        if(i == 21 || i == 10 || i == 18) continue;
         double acceptanceLevel = (double)numAcceptForMutationAndSelection[i] / (double)adaptationWidth;
         //std::cout << SequenceSummary::AminoAcidArray[i] << " acceptance level: " << acceptanceLevel << "\n";
-		if(acceptanceLevel < 0.2)
-		{
-			std_csp[i] = std::max(0.01, std_csp[i] * 0.8);
-			//std::cout << SequenceSummary::AminoAcidArray[i] << ": " << "acceptance rate to low\n";
-		}
-		if(acceptanceLevel > 0.3)
-		{
-			std_csp[i] = std::min(10.0, std_csp[i] * 1.2);
-			//std::cout << SequenceSummary::AminoAcidArray[i] << ": " << "acceptance rate to high\n";
-		}
+        unsigned codonRange[2];
+        SequenceSummary::AAindexToCodonRange(i, true, codonRange);
+        //std::cout << curAA << " " << codonRange[0] << " to " << codonRange[1] << "\n";
+        for(unsigned k = codonRange[0]; k < codonRange[1]; k++)
+        {
+            if(acceptanceLevel < 0.2)
+            {
+                std_csp[k] = std::max(0.01, std_csp[k] * 0.8);
+                //std::cout << SequenceSummary::AminoAcidArray[i] << ": " << "acceptance rate to low\n";
+            }
+            if(acceptanceLevel > 0.3)
+            {
+                std_csp[k] = std::min(10.0, std_csp[k] * 1.2);
+                //std::cout << SequenceSummary::AminoAcidArray[i] << ": " << "acceptance rate to high\n";
+            }
+        }
 		numAcceptForMutationAndSelection[i] = 0u;
 	}
 }
@@ -791,6 +797,13 @@ void ROCParameter::proposeCodonSpecificParameter()
 	for(unsigned i = 0; i < numMutationCategories; i++)
 	{
 		proposedMutationParameter[i] = propose(currentMutationParameter[i], ROCParameter::randNorm, bias_csp, std_csp);
+//		std::cout << "mutation Category " << i << "\n";
+//		std::cout << "current" << "\n";
+//        for(int k = 0; k < 40; k++){std::cout << currentMutationParameter[i][k] << " ";}
+//        std::cout << "\n";
+//        std::cout << "proposed" << "\n";
+//        for(int k = 0; k < 40; k++){std::cout << proposedMutationParameter[i][k] << " ";}
+//        std::cout << "\n";
 	}
     for(unsigned i = 0; i < numSelectionCategories; i++)
 	{

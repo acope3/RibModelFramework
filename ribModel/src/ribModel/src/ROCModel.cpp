@@ -114,23 +114,21 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
 
     for(int i = 0; i < numGenes; i++)
     {
-    		int codonCount[numCodons];
-    		double mutation[numCodons - 1];
-    		double selection[numCodons - 1];
-    		double mutation_proposed[numCodons - 1];
-    		double selection_proposed[numCodons - 1];
+        int codonCount[numCodons];
+        double mutation[numCodons - 1];
+        double selection[numCodons - 1];
+        double mutation_proposed[numCodons - 1];
+        double selection_proposed[numCodons - 1];
         Gene gene = genome.getGene(i);
         SequenceSummary seqsum = gene.getSequenceSummary();
         if(seqsum.getAAcountForAA(curAA) == 0) continue;
 
         // which mixture element does this gene belong to
         unsigned mixtureElement = parameter.getMixtureAssignment(i);
-        //std::cout << "Gene " << i << ": mixtureElement = " << mixtureElement << "\n";
         // how is the mixture element defined. Which categories make it up
         unsigned mutationCategory = parameter.getMutationCategory(mixtureElement);
         unsigned selectionCategory = parameter.getSelectionCategory(mixtureElement);
         unsigned expressionCategory = parameter.getExpressionCategory(mixtureElement);
-        //std::cout << "Gene " << i << ": mutCat = " << mutationCategory << ", selCat = " << selectionCategory << ", exprCat = " << expressionCategory << "\n";
         // get phi value, calculate likelihood conditional on phi
         double phiValue = parameter.getExpression(i, expressionCategory, false);
 
@@ -142,23 +140,25 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
         parameter.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, true, mutation_proposed);
         parameter.getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, true, selection_proposed);
 
-/*        if(i == 0)
-        {
+//        if(i == 100 || i == 600)
+//        {
+//            std::cout << "Gene " << i << ": mixtureElement = " << mixtureElement << "\n";
+//            std::cout << "Gene " << i << ": mutCat = " << mutationCategory << ", selCat = " << selectionCategory << ", exprCat = " << expressionCategory << "\n";
 //            std::cout << curAA << " selection array: ";
 //            for(int k = 0; k < numCodons - 1; k++){std::cout << selection[k] << " ";}
 //            std::cout << "\n";
 //            std::cout << curAA << " selection proposed array: ";
 //            for(int k = 0; k < numCodons - 1; k++){std::cout << selection_proposed[k] << " ";}
-//            std::cout << "\n";
+//            std::cout << "\n\n";
 //
 //            std::cout << curAA << " mutation array: ";
 //            for(int k = 0; k < numCodons - 1; k++){std::cout << mutation[k] << " ";}
 //            std::cout << "\n";
 //            std::cout << curAA << " mutation proposed array: ";
 //            for(int k = 0; k < numCodons - 1; k++){std::cout << mutation_proposed[k] << " ";}
-//            std::cout << "\n";
-        }
-*/
+//            std::cout << "\n\n\n\n";
+//        }
+
         obtainCodonCount(seqsum, curAA, codonCount);
 
         // get probability of current mixture assignment, calculate likelihood conditional on current mixture assignment
