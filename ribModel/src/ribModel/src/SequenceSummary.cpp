@@ -191,7 +191,7 @@ void SequenceSummary::AAindexToCodonRange(unsigned aaIndex, bool forParamVector,
 		else if (aa == 'X') 
 		{
 			if (!forParamVector) {startAAIndex = 61; endAAIndex = 64;}
-			else { startAAIndex = 40; endAAIndex = 42;} 
+			else { startAAIndex = 40; endAAIndex = 40;} 
 		}
 
     aaRange[0] = startAAIndex;

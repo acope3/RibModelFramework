@@ -217,17 +217,11 @@ void Genome::simulateGenome(ROCParameter& parameter, ROCModel& model)
 	int i, j, k;
 	int aaCount;
 	int numCodons;
-	double phi;
-	unsigned mixtureElement;
-	unsigned mutationCategory;
-	unsigned selectionCategory;
-	unsigned expressionCategory;
 	unsigned codonIndex;
 	unsigned aaRange[2];
 	std::string tmpSeq;
 	std::string codon;
 	char curAA;
-	std::string tmpID;
 	std::string tmpDesc;
 	int numParam = parameter.getNumParam();
 
@@ -244,12 +238,13 @@ void Genome::simulateGenome(ROCParameter& parameter, ROCModel& model)
 		tmpSeq += "ATG"; //Always will have the start amino acid
 
 
-		mixtureElement = parameter.getMixtureAssignment(i);
-		mutationCategory = parameter.getMutationCategory(mixtureElement);
-		selectionCategory = parameter.getSelectionCategory(mixtureElement);
-		expressionCategory = parameter.getExpressionCategory(mixtureElement);
-		phi= parameter.getExpression(i, expressionCategory, false);
-		tmpID = gene.getId() + "_MixtureElement" + std::to_string(mixtureElement);
+		unsigned mixtureElement = parameter.getMixtureAssignment(i);
+		unsigned mutationCategory = parameter.getMutationCategory(mixtureElement);
+		unsigned selectionCategory = parameter.getSelectionCategory(mixtureElement);
+		unsigned expressionCategory = parameter.getExpressionCategory(mixtureElement);
+		double phi = parameter.getExpression(i, expressionCategory, false);
+		
+		std::string tmpID = gene.getId() + "_MixtureElement" + std::to_string(mixtureElement);
 		for (j = 0; j < 22; j++) //loop over each amino acid, naa[]
 		{
 			aaCount = seqSum.getAAcountForAA(j);

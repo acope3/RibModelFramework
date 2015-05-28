@@ -172,6 +172,8 @@ void testThetaKMatrix()
 void testSimulateGenome(Genome& genome)
 {
 	std::cout << "------------------ TEST SIMULATEGENOME ------------------" << std::endl;
+	
+
 	ROCModel model;
 	unsigned geneAssignment[genome.getGenomeSize()];
 	for(unsigned i = 0u; i < genome.getGenomeSize(); i++)
@@ -179,6 +181,8 @@ void testSimulateGenome(Genome& genome)
 		if(i < 448) geneAssignment[i] = 0u;
 		else geneAssignment[i] = 1u;
 	}
+
+	
 
 	std::cout << "initialize ROCParameter object" << std::endl;
 	double sphi_init = 2;
@@ -188,49 +192,49 @@ void testSimulateGenome(Genome& genome)
 	std::cout << "\t# mixtures: " << numMixtures << "\n";
 	std::cout << "\tmixture definition: " << mixDef << "\n";
 	ROCParameter parameter = ROCParameter(genome.getGenomeSize(), sphi_init, numMixtures, geneAssignment, true, mixDef);
-		int numParam = parameter.getNumParam();
+	int numParam = parameter.getNumParam();
 	std::string files[] = {std::string("Skluyveri_CSP_ChrA.csv"), std::string("Skluyveri_CSP_ChrCleft.csv")};
 	parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
 	parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
+
+	
 
 	//parameter.InitializeExpression(genome, sphi_init);
 	double phiVals[genome.getGenomeSize()];
 	parameter.readPhiValues("Skluyveri_ChrA_ChrCleft_phi_est.csv", phiVals);
 	parameter.InitializeExpression(phiVals);
+	
 	std::cout << "done initialize ROCParameter object" << std::endl;
 
 	genome.simulateGenome(parameter, model);
-
 	std::vector <Gene> simGenes = genome.getSimulatedGenes();
 	unsigned aaRange[2];
-
 	std::cout <<"FREQUENCIES:\n";
-	double phi;
-	unsigned mixtureElement;
-	unsigned mutationCategory;
-	unsigned selectionCategory;
-	unsigned expressionCategory;
 
 
 	for (unsigned i = 0u; i < simGenes.size(); i++)
 	{
-		mixtureElement = parameter.getMixtureAssignment(i);
-		mutationCategory = parameter.getMutationCategory(mixtureElement);
-		selectionCategory = parameter.getSelectionCategory(mixtureElement);
-		expressionCategory = parameter.getExpressionCategory(mixtureElement);
-		phi= parameter.getExpression(i, expressionCategory, false);
+		unsigned mixtureElement = parameter.getMixtureAssignment(i);
+		unsigned mutationCategory = parameter.getMutationCategory(mixtureElement);
+		unsigned selectionCategory = parameter.getSelectionCategory(mixtureElement);
+		unsigned expressionCategory = parameter.getExpressionCategory(mixtureElement);
+		double phi= parameter.getExpression(i, expressionCategory, false);
 
 		std::cout <<"phi = " << phi <<"\n";
 		Gene gene = simGenes[i];
 		SequenceSummary simSeqSum = gene.geneData;
+		
+
 		for (int j = 0; j < 22; j++)
 		{
+			std::cout <<"here\n";
 			SequenceSummary::AAindexToCodonRange(j, false, aaRange);
 			char curAA = SequenceSummary::IndexToAA(j);
 			unsigned numCodons = simSeqSum.GetNumCodonsForAA(curAA);
 			double codonProb[numCodons];
 			double mutation[numCodons - 1];
 			double selection[numCodons - 1];
+			if (curAA == 'X') std::cout << numCodons <<"\n";
 			parameter.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
 			parameter.getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
 			model.calculateCodonProbabilityVector(numCodons, mutation, selection, phi, codonProb, numParam);
@@ -243,6 +247,7 @@ void testSimulateGenome(Genome& genome)
 				sum += counts[a];
 				a++;
 			}
+			std::cout <<"size of counts: " << counts.size() <<"\n";
 			int aaCount = simSeqSum.getAAcountForAA(j);
 			std::cout <<"amino acid " << curAA <<": " << aaCount <<"\n";
 			for (unsigned k = 0u; k < counts.size(); k++)
@@ -253,7 +258,8 @@ void testSimulateGenome(Genome& genome)
 		}
 
 	}
-	genome.writeFasta("fastaTest.fasta", true);
+	std::cout <<"Writing new fasta file\n";
+	genome.writeFasta("ourMutationSkluyveri_A_andCleft.fasta", true);
 	std::cout << "------------------ TEST SIMULATEGENOME ------------------" << std::endl;
 }
 
@@ -265,42 +271,41 @@ int main()
 	std::cout << "reading fasta file" << std::endl;
 	//genome.readFasta("../../inst/testGenome.fasta");
 	//genome.readFasta("Skluyveri_chromosomeA_simulated.fasta");
-	genome.readFasta("SimulatedGenome_allUnique.fasta");
+	genome.readFasta("ourMutationSkluyveri_A_andCleft.fasta");
 	//genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/Skluyveri.fasta");
 	//genome.writeFasta("../../inst/resGenome.fasta
-	//genome.readFasta("testchromosome.fasta");
 	std::cout << "done reading fasta file" << std::endl;
 	bool testing =  false;
 
 	if(testing)
 	{
 			 //testNumCodonsPerAA();
-			 testCodonRangePerAA(false);
-			 testCodonRangePerAA(true);
+			 //testCodonRangePerAA(false);
+			 //testCodonRangePerAA(true);
 			 /*testLogNormDensity();
 			 testSCUO(genome);
 			 testCovarianceMatrix();
 			 testRandMultiNom(3);
-			 testThetaKMatrix();
-		testSimulateGenome(genome);*/
+			 testThetaKMatrix();*/
+		testSimulateGenome(genome);
 	}else{
 
 		ROCModel model = ROCModel();
 		unsigned geneAssignment[genome.getGenomeSize()];
 		for(unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
-			if(i < 500) geneAssignment[i] = 1u;
-			else geneAssignment[i] = 0u;
+			if(i < 448) geneAssignment[i] = 0u;
+			else geneAssignment[i] = 1u;
 		}
 		std::cout << "initialize ROCParameter object" << std::endl;
 		double sphi_init = 2;
 		double numMixtures = 2;
-		std::string mixDef = ROCParameter::allUnique;
+		std::string mixDef = ROCParameter::mutationShared;
 		std::cout << "\tSphi init: " << sphi_init << "\n";
 		std::cout << "\t# mixtures: " << numMixtures << "\n";
 		std::cout << "\tmixture definition: " << mixDef << "\n";
 		ROCParameter parameter = ROCParameter(genome.getGenomeSize(), sphi_init, numMixtures, geneAssignment, true, mixDef);
-		std::string files[] = {std::string("SimulatedGenome_CSP0.csv"), std::string("SimulatedGenome_CSP1.csv")};
+		std::string files[] = {std::string("Skluyveri_CSP_ChrA.csv"), std::string("Skluyveri_CSP_ChrCleft.csv")};
 		parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
 		parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
 		parameter.InitializeExpression(genome, sphi_init);
@@ -313,7 +318,7 @@ int main()
 
 
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
-        int samples = 200;
+        int samples = 1000;
 		int thining = 10;
 		int useSamples = 50;
 
