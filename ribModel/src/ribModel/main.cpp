@@ -274,23 +274,23 @@ int main()
 
 	if(testing)
 	{
-			 //testNumCodonsPerAA();
-			 testCodonRangePerAA(false);
-			 testCodonRangePerAA(true);
-			 /*testLogNormDensity();
-			 testSCUO(genome);
-			 testCovarianceMatrix();
-			 testRandMultiNom(3);
-			 testThetaKMatrix();
-		testSimulateGenome(genome);*/
+         //testNumCodonsPerAA();
+         testCodonRangePerAA(false);
+         testCodonRangePerAA(true);
+         /*testLogNormDensity();
+         testSCUO(genome);
+         testCovarianceMatrix();
+         testRandMultiNom(3);
+         testThetaKMatrix();
+            testSimulateGenome(genome);*/
 	}else{
 
 		ROCModel model = ROCModel();
 		unsigned geneAssignment[genome.getGenomeSize()];
 		for(unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
-			if(i < 500) geneAssignment[i] = 1u;
-			else geneAssignment[i] = 0u;
+			if(i < 500) geneAssignment[i] = 0u;
+			else geneAssignment[i] = 1u;
 		}
 		std::cout << "initialize ROCParameter object" << std::endl;
 		double sphi_init = 2;
@@ -313,9 +313,9 @@ int main()
 
 
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
-        int samples = 300;
+        int samples = 600;
 		int thining = 10;
-		int useSamples = 50;
+		int useSamples = 100;
 
 		std::cout << "\t# samples: " << samples << "\n";
 		std::cout << "\t thining: " << thining << "\n";

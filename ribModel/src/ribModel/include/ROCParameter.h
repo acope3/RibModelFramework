@@ -154,8 +154,15 @@ class ROCParameter
 			numAcceptForExpression[geneIndex]++;
 			for(unsigned category = 0; category < numSelectionCategories; category++)
 			{
-				currentExpressionLevel[category][geneIndex] = proposedExpressionLevel[category][geneIndex]; numAcceptForExpression[geneIndex]++;
+				currentExpressionLevel[category][geneIndex] = proposedExpressionLevel[category][geneIndex];
 			}
+		}
+		void updateExpression(unsigned geneIndex, unsigned category)
+		{
+            // TODO: numAcceptForExpression is counted up for each category, -> make it a 2d vector such that each expression category has its own counter
+            // CAREFUL: that might cause us to have a different std_phi for each expression category -> 2d as well
+			numAcceptForExpression[geneIndex]++;
+			currentExpressionLevel[category][geneIndex] = proposedExpressionLevel[category][geneIndex];
 		}
 		std::vector<std::vector<std::vector<double>>> getExpressionTrace() {return expressionTrace;}
 		std::vector<double> getExpressionTrace(unsigned geneIndex);

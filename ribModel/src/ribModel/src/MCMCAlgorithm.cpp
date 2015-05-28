@@ -66,12 +66,6 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
     for(int i = 0; i < numGenes; i++)
     {
         Gene gene = genome.getGene(i);
-        double currLogLike = 0.0;
-        double propLogLike = 0.0;
-
-
-        double unscaledLogProb_curr[numMixtures];
-        double unscaledLogProb_prop[numMixtures];
         /*
             Since some values returned by calculateLogLiklihoodRatioPerGene are veyr small (~ -1100), exponantiation leads to 0.
             To solve this problem, we adjust the value by a constant c. I choose to use the average value across all mixtures.
@@ -83,6 +77,8 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
                 => ln(P) = ln(P') - ln(c)
             Note that we use invere sign because our values of ln(f) and ln(f') are negative.
         */
+        double unscaledLogProb_curr[numMixtures];
+        double unscaledLogProb_prop[numMixtures];
         double maxValue = -1000000;
         for(unsigned k = 0; k < numMixtures; k++)
         {
@@ -110,43 +106,36 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
         // calculate ln(P) = ln( Sum(p_i*f'(...)) ) and obtain normalizing constant for new p_i
         for(unsigned k = 0; k < numMixtures; k++)
         {
-            probabilities[k] = parameter.getCategoryProbability(k) * std::exp(unscaledLogProb_curr[k]);
-            currLogLike += probabilities[k];
-            propLogLike += parameter.getCategoryProbability(k) * std::exp(unscaledLogProb_prop[k]);
-            normalizingProbabilityConstant += probabilities[k];
+            probabilities[k] = std::log(parameter.getCategoryProbability(k)) + unscaledLogProb_curr[k];
+            double currLogLike = probabilities[k];
+            double propLogLike = std::log(parameter.getCategoryProbability(k)) + unscaledLogProb_prop[k];
+            normalizingProbabilityConstant += std::exp(probabilities[k]);
+            //probabilities[k] = parameter.getCategoryProbability(k) * std::exp(unscaledLogProb_curr[k]);
+            //double currLogLike = std::log(probabilities[k]);
+            //double propLogLike = std::log( parameter.getCategoryProbability(k) * std::exp(unscaledLogProb_prop[k]) );
+            //normalizingProbabilityConstant += probabilities[k];
+            if( -ROCParameter::randExp(1) < (propLogLike - currLogLike) )
+            {
+                parameter.updateExpression(i, k);
+                //#pragma omp atomic
+                logLikelihood += propLogLike;
+            }else{
+                //#pragma omp atomic
+                logLikelihood += currLogLike;
+            }
         }
-        currLogLike = std::log(currLogLike);
-        propLogLike = std::log(propLogLike);
+
         // normalize probabilities
         for (unsigned k = 0u; k < numMixtures; k++)
         {
-            probabilities[k] = probabilities[k] / normalizingProbabilityConstant;
+            probabilities[k] = std::exp(probabilities[k]) / normalizingProbabilityConstant;
+            //probabilities[k] = probabilities[k] / normalizingProbabilityConstant;
         }
         // Get category in which the gene is placed in.
         // If we use multiple sequence observrvation (like different mutatnts) randMultinom needs an parameter N to place N observations in numMixture buckets
         unsigned categoryOfGene = ROCParameter::randMultinom(probabilities, numMixtures);
         parameter.setMixtureAssignment(i, categoryOfGene);
         dirichletParameters[categoryOfGene] += 1;
-        if( -ROCParameter::randExp(1) < (propLogLike - currLogLike) )
-        {
-            // moves proposed phi to current phi
-//            std::cout << "=======================================\n";
-//            std::cout << "prop loglik: " << propLogLike << "\n";
-//            std::cout << "curr loglik: " << currLogLike << "\n";
-//            std::cout << "prop phi 0: " << parameter.getExpression(i, 0, true) << "\n";
-//            std::cout << "cur phi 0: " << parameter.getExpression(i, 0, false) << "\n";
-//            std::cout << "prop phi 1: " << parameter.getExpression(i, 1, true) << "\n";
-//            std::cout << "cur phi 1: " << parameter.getExpression(i, 1, false) << "\n";
-//            std::cout << "Mixture Assignment: " << parameter.getMixtureAssignment(i) << "\n";
-//            std::cout << "=======================================\n";
-            parameter.updateExpression(i);
-            //#pragma omp atomic
-
-            logLikelihood += propLogLike;
-        }else{
-            //#pragma omp atomic
-            logLikelihood += currLogLike;
-        }
         if((iteration % thining) == 0)
         {
             parameter.updateExpressionTrace(iteration/thining, i);

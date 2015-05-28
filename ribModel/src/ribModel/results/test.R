@@ -31,13 +31,14 @@ plot(likTrace, type = "l")
 
 expressionTrace <- read.table("expressionLevelTrace.csv", sep=",")
 which(log10(test.phi) > 2)
-gene <- 36
+gene <- 996
 plot(log10(expressionTrace[, gene]), type = "l")
 test.phiTrace0 <- read.table("phiTrace_nmix_0.csv", sep=",")
 test.phiTrace1 <- read.table("phiTrace_nmix_1.csv", sep=",")
-plot(log10(test.phiTrace1[, gene]), type = "l")
-plot(log10(test.phiTrace0[, gene]), type = "l")
-
+ylim <- range(c(log10(test.phiTrace1[, gene]), log10(test.phiTrace0[, gene])))
+plot(log10(test.phiTrace0[, gene]), type = "l", ylim = ylim, xlab = "estm. phi", ylab="sample")
+lines(log10(test.phiTrace1[, gene]), type = "l", col="red")
+lines(log10(expressionTrace[, gene]), type = "l", col="blue")
 
 mixAssignment <- read.table("mixAssignment.csv", sep=",")[,2]
 idx <- round(mixAssignment) == 1
