@@ -149,10 +149,11 @@ void ROCModel::calculateCodonProbabilityVector(unsigned numCodons, double mutati
 					std::cout <<"phi : " << phi <<"\n";
 				}
 		}
-	//	if (std::isinf(denominator)) std::cout <<"At infinity\n";
+
     // alphabetically last codon is reference codon!
     codonProb[numCodons - 1] = std::exp(mutation[minIndexVal] + selection[minIndexVal] * phi);
     denominator += codonProb[numCodons - 1];
+		if (std::isinf(denominator)) std::cout <<"infinity\n";
 		//oldProb[numCodons - 1] = 1.0;
 
 		// normalize codon probabilities
