@@ -152,7 +152,7 @@ class ROCParameter
 		void updateExpression(unsigned geneIndex)
 		{
 			numAcceptForExpression[geneIndex]++;
-			for(unsigned category = 0; category < numMixtures; category++)
+			for(unsigned category = 0; category < numSelectionCategories; category++)
 			{
 				currentExpressionLevel[category][geneIndex] = proposedExpressionLevel[category][geneIndex]; numAcceptForExpression[geneIndex]++;
 			}

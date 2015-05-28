@@ -774,7 +774,7 @@ void ROCParameter::proposeSPhi()
 void ROCParameter::proposeExpressionLevels()
 {
 	unsigned numExpressionLevels = currentExpressionLevel[0].size();
-	for(unsigned category = 0; category < numMixtures; category++)
+	for(unsigned category = 0; category < numSelectionCategories; category++)
 	{
 		for(unsigned i = 0; i < numExpressionLevels; i++)
 		{

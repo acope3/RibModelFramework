@@ -72,8 +72,6 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
 
         double unscaledLogProb_curr[numMixtures];
         double unscaledLogProb_prop[numMixtures];
-
-
         /*
             Since some values returned by calculateLogLiklihoodRatioPerGene are veyr small (~ -1100), exponantiation leads to 0.
             To solve this problem, we adjust the value by a constant c. I choose to use the average value across all mixtures.
@@ -95,13 +93,6 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
             // store values so they can be processed
             unscaledLogProb_curr[k] = logProbabilityRatio[1];
             unscaledLogProb_prop[k] = logProbabilityRatio[2];
-        /*    if (!std::isfinite(unscaledLogProb_prop[k]))
-						{
-							std::cout <<" unscaledLogProb_prop[k]: " << unscaledLogProb_prop[k] <<"\n";
-							std::cout <<" k: " << k <<"\n";
-							std::cout <<" logProbabilityRatio[2]: " << logProbabilityRatio[2] <<"\n\n";
-						}
-					*/	// get average value of all return values which is used as constant c
             maxValue = logProbabilityRatio[1] > maxValue ? logProbabilityRatio[1] : maxValue;
             maxValue = logProbabilityRatio[2] > maxValue ? logProbabilityRatio[2] : maxValue;
         }
@@ -112,35 +103,20 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
         {
             unscaledLogProb_curr[k] -= maxValue;
             unscaledLogProb_prop[k] -= maxValue;
-    /*        if (!std::isfinite(unscaledLogProb_prop[k]))
-						{
-							std::cout <<" Second unscaledLogProb_prop[k]: " << unscaledLogProb_prop[k] <<"\n";
-							std::cout <<" Second k: " << k <<"\n\n";
-						}
-      */  }
+        }
 
         double normalizingProbabilityConstant = 0.0;
         double probabilities[numMixtures];
         // calculate ln(P) = ln( Sum(p_i*f'(...)) ) and obtain normalizing constant for new p_i
         for(unsigned k = 0; k < numMixtures; k++)
         {
-            // log(SUM) vs SUM(log) ??? second one works, but seems wrong. first one does not, why?
             probabilities[k] = parameter.getCategoryProbability(k) * std::exp(unscaledLogProb_curr[k]);
             currLogLike += probabilities[k];
             propLogLike += parameter.getCategoryProbability(k) * std::exp(unscaledLogProb_prop[k]);
-  /*          if (!std::isfinite(propLogLike))
-						{
-							std::cout <<"Problem at first assignment (line 120): " << propLogLike <<"\n";
-							std::cout <<"parameter.getCategoryProbability(k): " << parameter.getCategoryProbability(k) <<"\n";
-							std::cout <<"std::exp(unscaledLogProb_prop[k]): " << std::exp(unscaledLogProb_prop[k]) <<"\n";
-							std::cout <<"unscaledLogProb_prop[k]: " << unscaledLogProb_prop[k] <<"\n\n";
-						}
-*/
             normalizingProbabilityConstant += probabilities[k];
         }
         currLogLike = std::log(currLogLike);
         propLogLike = std::log(propLogLike);
-  //      if (!std::isfinite(propLogLike)) std::cout <<"Problem at second assignment (line 125): " << propLogLike <<"\n";
         // normalize probabilities
         for (unsigned k = 0u; k < numMixtures; k++)
         {
@@ -151,39 +127,24 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
         unsigned categoryOfGene = ROCParameter::randMultinom(probabilities, numMixtures);
         parameter.setMixtureAssignment(i, categoryOfGene);
         dirichletParameters[categoryOfGene] += 1;
-
-
-        //std::cout << i << " " << gene.getId() << " proposedLogLik: " << propLogLike << " currentLogLik: " << currLogLike;
-        // accept/reject proposed phi values
-        //std::cout <<"propLoglIke: " << (propLogLike - currLogLike) <<"\n";
-
-		/*	bool printstuff = false;
-				if (i == 12)
-				{
-					if (!std::isfinite(propLogLike) || !std::isfinite(currLogLike))
-					{
-						std::cout << "iteration: " << iteration <<"\n";
-						std::cout << "propLogLike: " << propLogLike <<"\n";
-						std::cout << "currLogLike: " << currLogLike <<"\n";
-        		std::cout <<"LoglIkeRatio: " << (propLogLike - currLogLike) <<"\n";
-						printstuff = true;
-					}
-				}
-*/
         if( -ROCParameter::randExp(1) < (propLogLike - currLogLike) )
         {
-						//if (printstuff) std::cout <<" using propLoglike\n\n";
-            //std::cout << " accepted \n";
             // moves proposed phi to current phi
-            //std::cout << "Update expression for Gene i = " << i << " in iteration " << iteration << std::endl;
+//            std::cout << "=======================================\n";
+//            std::cout << "prop loglik: " << propLogLike << "\n";
+//            std::cout << "curr loglik: " << currLogLike << "\n";
+//            std::cout << "prop phi 0: " << parameter.getExpression(i, 0, true) << "\n";
+//            std::cout << "cur phi 0: " << parameter.getExpression(i, 0, false) << "\n";
+//            std::cout << "prop phi 1: " << parameter.getExpression(i, 1, true) << "\n";
+//            std::cout << "cur phi 1: " << parameter.getExpression(i, 1, false) << "\n";
+//            std::cout << "Mixture Assignment: " << parameter.getMixtureAssignment(i) << "\n";
+//            std::cout << "=======================================\n";
             parameter.updateExpression(i);
             //#pragma omp atomic
 
             logLikelihood += propLogLike;
         }else{
             //#pragma omp atomic
-            //std::cout << " rejected \n";
-						//if (printstuff) std::cout <<" using currLoglike\n\n";
             logLikelihood += currLogLike;
         }
         if((iteration % thining) == 0)
@@ -192,8 +153,7 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
             parameter.updateMixtureAssignmentTrace(iteration/thining, i);
         }
     }
-    //for (int a = 0; a < numMixtures; a++)
-    //	 if (dirichletParameters[a] != 448) std::cout <<"ERROR\n";
+
     double newMixtureProbabilities[numMixtures];
     ROCParameter::randDirichlet(dirichletParameters, numMixtures, newMixtureProbabilities);
     for(unsigned k = 0u; k < numMixtures; k++)
@@ -236,7 +196,6 @@ void MCMCAlgorithm::acceptRejectHyperParameter(int numGenes, ROCParameter& param
     {
         parameter.updateSphiTrace(iteration/thining);
     }
-//		std::cout <<"logProbabilityRatio: " << logProbabilityRatio <<"\n";
 }
 
 void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, ROCParameter& parameter, ROCModel& model, int iteration)
@@ -249,13 +208,10 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, ROCParame
         if(curAA == 'X' || curAA == 'M' || curAA == 'W') continue;
         // calculate likelihood ratio for every Category for current AA
         model.calculateLogLikelihoodRatioPerAAPerCategory(curAA, genome, parameter, acceptanceRatioForAllMixtures);
-        //std::cout << "logAcceptanceRatioForAllMixtures: " << logAcceptanceRatioForAllMixtures << "\n";
         if( -ROCParameter::randExp(1) < acceptanceRatioForAllMixtures )
         {
-            //std::cout <<"AcceptanceRatio: " << acceptanceRatioForAllMixtures <<"\n";
             // moves proposed codon specific parameters to current codon specific parameters
             parameter.updateCodonSpecificParameter(curAA);
-            //std::cout << "ACCEPTED\n";
         }
         if((iteration % thining) == 0)
         {
@@ -315,15 +271,7 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
             }
             if( ( (iteration + 1) % adaptiveWidth) == 0)
             {
-                //std::cout <<"would call adaptExpressionPro.....\n";
                parameter.adaptExpressionProposalWidth(adaptiveWidth);
-            /*    std::cout << "\n ================ \n";
-                covmat.printCovarianceMatrix();
-                std::cout << " ---------------- \n";
-                covmat.calculateCovarianceMatrixFromTraces(parameter.getExpressionTrace(), 0, adaptiveWidth);
-                covmat.printCovarianceMatrix();
-                std::cout << " ================ \n";
-						*/
             }
         }
     } // end MCMC loop

@@ -10,11 +10,11 @@ legend("topleft", legend = c("Category 0", "Category 1"), col = c("black", "red"
 abline(0,1, col="blue", lwd=2)
 cor(log10(true.phi), log10(test.phi))
 
-mutation <- read.table("mutationPosterior_Cat1.csv", sep=",")[,2]
+mutation <- read.table("mutationPosterior_Cat0.csv", sep=",")[,2]
 mutation <- mutation[mutation != 0]
-selection <- read.table("selectionPosterior_Cat1.csv", sep=",")[,2]
+selection <- read.table("selectionPosterior_Cat0.csv", sep=",")[,2]
 selection <- selection[selection != 0]
-trueCSP <- read.table("../SimulatedGenome_CSP1.csv", sep=",", header=T)
+trueCSP <- read.table("../SimulatedGenome_CSP0.csv", sep=",", header=T)
 dm.idx <- grepl(pattern = "^[A-Z].[ACGT]{3}.log", x = trueCSP[,1])
 trueMutation <- trueCSP[dm.idx, 2]
 trueSelection <- trueCSP[!dm.idx, 2]
