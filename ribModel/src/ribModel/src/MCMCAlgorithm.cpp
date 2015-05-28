@@ -136,7 +136,7 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
 							std::cout <<"unscaledLogProb_prop[k]: " << unscaledLogProb_prop[k] <<"\n\n";
 						}
 */
-						normalizingProbabilityConstant += probabilities[k];
+            normalizingProbabilityConstant += probabilities[k];
         }
         currLogLike = std::log(currLogLike);
         propLogLike = std::log(propLogLike);
@@ -157,8 +157,7 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
         // accept/reject proposed phi values
         //std::cout <<"propLoglIke: " << (propLogLike - currLogLike) <<"\n";
 
-				if (std::isnan(propLogLike)) std::cout <<"Should not be nan\n";
-			/*	bool printstuff = false;
+		/*	bool printstuff = false;
 				if (i == 12)
 				{
 					if (!std::isfinite(propLogLike) || !std::isfinite(currLogLike))
@@ -171,7 +170,7 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
 					}
 				}
 */
-				if( -ROCParameter::randExp(1) < (propLogLike - currLogLike) )
+        if( -ROCParameter::randExp(1) < (propLogLike - currLogLike) )
         {
 						//if (printstuff) std::cout <<" using propLoglike\n\n";
             //std::cout << " accepted \n";
@@ -180,12 +179,12 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
             parameter.updateExpression(i);
             //#pragma omp atomic
 
-            logLikelihood += std::isfinite(propLogLike) ? propLogLike : 0.0;
+            logLikelihood += propLogLike;
         }else{
             //#pragma omp atomic
             //std::cout << " rejected \n";
 						//if (printstuff) std::cout <<" using currLoglike\n\n";
-            logLikelihood += std::isfinite(currLogLike) ? currLogLike : 0.0;
+            logLikelihood += currLogLike;
         }
         if((iteration % thining) == 0)
         {

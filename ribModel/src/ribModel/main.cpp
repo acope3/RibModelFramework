@@ -52,7 +52,7 @@ void testLogNormDensity()
 void testSCUO(Genome& genome)
 {
 	std::cout << "------------------ SCUO VALUES ------------------" << std::endl;
-	for(int n = 0; n < genome.getGenomeSize(); n++)
+	for(unsigned n = 0u; n < genome.getGenomeSize(); n++)
 	{
 		std::cout << genome.getGene(n).getId() << "\t" << ROCParameter::calculateSCUO(genome.getGene(n)) << std::endl;
 	}
@@ -116,7 +116,7 @@ void testRandMultiNom(unsigned numCat)
 		assignmentCounts[tmp] += 1;
 	}
 	std::cout <<"Printing dirichlet numbers:\n";
-	for (int i = 0; i < numCat; i++)
+	for (unsigned i = 0u; i < numCat; i++)
 	{
 		std::cout <<"  " << i <<": " << assignmentCounts[i] <<"\n";
 		std::cout <<"  " << i <<"/50: " << assignmentCounts[i]/50 <<"\n\n";
@@ -144,10 +144,10 @@ void testThetaKMatrix()
 	std::cout <<"looping through all mutation params:\n";
 	std::vector<std::vector <double>> temp;
 	temp = R.getCurrentMutationParameter();
-	for (int i = 0; i < temp.size(); i++)
+	for (unsigned i = 0u; i < temp.size(); i++)
 	{
 		std::cout <<"Mutation param " << i <<":\n";
-		for (int j = 0; j < temp[i].size(); j++)
+		for (unsigned j = 0u; j < temp[i].size(); j++)
 		{
 			std::cout << temp[i][j] <<"\n";
 		}
@@ -156,10 +156,10 @@ void testThetaKMatrix()
 
 	std::cout <<"looping through all selection params:\n";
 	temp = R.getCurrentSelectionParameter();
-	for (int i = 0; i < temp.size(); i++)
+	for (unsigned i = 0u; i < temp.size(); i++)
 	{
 		std::cout <<"Selection param " << i <<":\n";
-		for (int j = 0; j < temp[i].size(); j++)
+		for (unsigned j = 0u; j < temp[i].size(); j++)
 		{
 			std::cout << temp[i][j] <<"\n";
 		}
@@ -174,7 +174,7 @@ void testSimulateGenome(Genome& genome)
 	std::cout << "------------------ TEST SIMULATEGENOME ------------------" << std::endl;
 	ROCModel model;
 	unsigned geneAssignment[genome.getGenomeSize()];
-	for(int i = 0; i < genome.getGenomeSize(); i++)
+	for(unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{
 		if(i < 448) geneAssignment[i] = 0u;
 		else geneAssignment[i] = 1u;
@@ -195,7 +195,7 @@ void testSimulateGenome(Genome& genome)
 
 	//parameter.InitializeExpression(genome, sphi_init);
 	double phiVals[genome.getGenomeSize()];
-	parameter.readStaticPhiValues("Skluyveri_ChrA_ChrCleft_phi_est.csv", phiVals);
+	parameter.readPhiValues("Skluyveri_ChrA_ChrCleft_phi_est.csv", phiVals);
 	parameter.InitializeExpression(phiVals);
 	std::cout << "done initialize ROCParameter object" << std::endl;
 
@@ -212,7 +212,7 @@ void testSimulateGenome(Genome& genome)
 	unsigned expressionCategory;
 
 
-	for (int i = 0; i < simGenes.size(); i++)
+	for (unsigned i = 0u; i < simGenes.size(); i++)
 	{
 		mixtureElement = parameter.getMixtureAssignment(i);
 		mutationCategory = parameter.getMutationCategory(mixtureElement);
@@ -237,7 +237,7 @@ void testSimulateGenome(Genome& genome)
 			std::vector <double> counts(numCodons, 0.0);
 			double sum = 0;
 			int a = 0;
-			for (int k = aaRange[0]; k < aaRange[1]; k++)
+			for (unsigned k = aaRange[0]; k < aaRange[1]; k++)
 			{
 				counts[a] = simSeqSum.getCodonCountForCodon(k);
 				sum += counts[a];
@@ -245,7 +245,7 @@ void testSimulateGenome(Genome& genome)
 			}
 			int aaCount = simSeqSum.getAAcountForAA(j);
 			std::cout <<"amino acid " << curAA <<": " << aaCount <<"\n";
-			for (int k = 0; k < counts.size(); k++)
+			for (unsigned k = 0u; k < counts.size(); k++)
 			{
 				std::cout <<"\tval: " << counts[k]/sum <<" VS " << codonProb[k] <<" with count of " << counts[k] <<"\n";
 			}
@@ -265,7 +265,7 @@ int main()
 	std::cout << "reading fasta file" << std::endl;
 	//genome.readFasta("../../inst/testGenome.fasta");
 	//genome.readFasta("Skluyveri_chromosomeA_simulated.fasta");
-	genome.readFasta("SimulatedGenome_mutationShared.fasta");
+	genome.readFasta("SimulatedGenome_allUnique.fasta");
 	//genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/Skluyveri.fasta");
 	//genome.writeFasta("../../inst/resGenome.fasta
 	//genome.readFasta("testchromosome.fasta");
@@ -287,7 +287,7 @@ int main()
 
 		ROCModel model = ROCModel();
 		unsigned geneAssignment[genome.getGenomeSize()];
-		for(int i = 0; i < genome.getGenomeSize(); i++)
+		for(unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
 			if(i < 500) geneAssignment[i] = 1u;
 			else geneAssignment[i] = 0u;
@@ -295,7 +295,7 @@ int main()
 		std::cout << "initialize ROCParameter object" << std::endl;
 		double sphi_init = 2;
 		double numMixtures = 2;
-		std::string mixDef = ROCParameter::mutationShared;
+		std::string mixDef = ROCParameter::allUnique;
 		std::cout << "\tSphi init: " << sphi_init << "\n";
 		std::cout << "\t# mixtures: " << numMixtures << "\n";
 		std::cout << "\tmixture definition: " << mixDef << "\n";
@@ -313,9 +313,9 @@ int main()
 
 
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
-        int samples = 100;
+        int samples = 200;
 		int thining = 10;
-		int useSamples = 150;
+		int useSamples = 50;
 
 		std::cout << "\t# samples: " << samples << "\n";
 		std::cout << "\t thining: " << thining << "\n";
@@ -325,7 +325,7 @@ int main()
 
 
 		std::ofstream scuoout("results/scuo.csv");
-		for(int n = 0; n < genome.getGenomeSize(); n++)
+		for(unsigned n = 0u; n < genome.getGenomeSize(); n++)
 		{
 			scuoout << genome.getGene(n).getId() << "," << parameter.calculateSCUO(genome.getGene(n)) << std::endl;
 		}
@@ -349,7 +349,6 @@ int main()
 		//Get posterior estimates for mutation & selection
 		int numMutationCategories = parameter.getNumMutationCategories();
 		int numSelectionCategories = parameter.getNumSelectionCategories();
-		int numParam = parameter.getNumParam();
 		for (int i = 0; i < numMutationCategories; i++)
 		{
 			std::string file = "results/mutationPosterior_Cat" + std::to_string(i) + ".csv";
@@ -360,7 +359,7 @@ int main()
 				char aa = SequenceSummary::AminoAcidArray[n];
 				if (aa == 'X' || aa == 'M' || aa == 'W') continue;
 				SequenceSummary::AAToCodonRange(aa, true, aaRange);
-				for (int a = aaRange[0]; a <= aaRange[1]; a++)
+				for (unsigned a = aaRange[0]; a <= aaRange[1]; a++)
 				{
 					double estimate = 0.0;
 					double variance = 0.0;
@@ -387,7 +386,7 @@ int main()
 				char aa = SequenceSummary::AminoAcidArray[n];
 				if (aa == 'X' || aa == 'M' || aa == 'W') continue;
 				SequenceSummary::AAToCodonRange(aa, true, aaRange);
-				for (int a = aaRange[0]; a <= aaRange[1]; a++)
+				for (unsigned a = aaRange[0]; a <= aaRange[1]; a++)
 				{
 					std::string codon = SequenceSummary::IndexToCodon(a);
 					double estimate = 0.0;
@@ -406,19 +405,14 @@ int main()
 
 		std::ofstream phiout("results/phiPosterior.csv");
 		std::ofstream mixAssignment("results/mixAssignment.csv");
-		//std::cout << "Phi proposal width: \n";
-		for(int n = 0; n < genome.getGenomeSize(); n++)
+		for(unsigned n = 0u; n < genome.getGenomeSize(); n++)
 		{
-			//std::cout << parameter.getExpressionProposalWidth(n) << std::endl;
-			//std::cout << n << "\n";
 			double mixtureAssignmentPosteriorMean = parameter.getMixtureAssignmentPosteriorMean(useSamples, n);
 			phiout << genome.getGene(n).getId() << "," << parameter.getExpressionPosteriorMean(useSamples, n) << std::endl;
 			mixAssignment << genome.getGene(n).getId() << "," << mixtureAssignmentPosteriorMean << std::endl;
 		}
 		phiout.close();
-		std::cout << "closed phiout\n";
 		mixAssignment.close();
-		std::cout << "closed mixAssignment\n";
 	}
 
 	return 0;

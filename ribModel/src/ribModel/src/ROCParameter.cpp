@@ -51,7 +51,7 @@ ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures
 	currentMutationParameter.resize(numMutationCategories);
 	proposedMutationParameter.resize(numMutationCategories);
 
-	for (int i = 0; i < numMutationCategories; i++)
+	for (unsigned i = 0u; i < numMutationCategories; i++)
 	{
 		std::vector<double> tmp(numParam, 0.0);
 		currentMutationParameter[i] = tmp;
@@ -62,7 +62,7 @@ ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures
 	proposedSelectionParameter.resize(numSelectionCategories);
 	categoryProbabilities.resize(numMixtures, 1.0/(double)numMixtures);
 
-	for (int i = 0; i < numSelectionCategories; i++)
+	for (unsigned i = 0u; i < numSelectionCategories; i++)
 	{
 		std::vector<double> tmp(numParam, 0.0);
 		proposedSelectionParameter[i] = tmp;
@@ -208,13 +208,13 @@ void ROCParameter::initMutationSelectionCategories(std::string files[], unsigned
 				if (tmpString.find(type) != std::string::npos) //mu or eta was found, depending on category
 				{
 					temp[j] = std::stod(val);
-					//temp[j] = randNorm(temp[j], 0.1);
+					temp[j] = randNorm(temp[j], 0.3);
 					j++;
 					if (j == numParam) break;
 				}
 			}
 		}
-		int altered = 0;
+		unsigned altered = 0u;
 		for (j = 0; j < categories.size(); j++)
 		{
 			if (paramType == ROCParameter::dM && categories[j].delM == i)
@@ -288,9 +288,7 @@ void ROCParameter::initExpressionTrace(unsigned samples, unsigned num_genes)
 	expressionTrace.resize(numMixtures);
 	for(unsigned category = 0; category < numMixtures; category++)
 	{
-		//			std::cout <<"\n\n\nresizing expressionTrace\n";
 		expressionTrace[category].resize(samples);
-		//			std::cout <<"Going to loop through samples\n";
 		for(unsigned i = 0; i < samples; i++)
 		{
 			expressionTrace[category][i].resize(num_genes);
@@ -466,12 +464,10 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
 	if(paramType == ROCParameter::dM)
 	{
 		tempSet = (proposal ? &proposedMutationParameter[category] : &currentMutationParameter[category]);
-		//tempSet = (proposal ? proposedMutationParameter[category] : currentMutationParameter[category]);
 	}
 	else if(paramType == ROCParameter::dEta)
 	{
 		tempSet = (proposal ? &proposedSelectionParameter[category] : &currentSelectionParameter[category]);
-		//tempSet = (proposal ? proposedSelectionParameter[category] : currentSelectionParameter[category]);
 	}
 	else throw "Unkown parameter type: " + std::to_string(paramType);
 	unsigned aaRange[2];
@@ -733,21 +729,17 @@ void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 	{
         if(i == 21 || i == 10 || i == 18) continue;
         double acceptanceLevel = (double)numAcceptForMutationAndSelection[i] / (double)adaptationWidth;
-        //std::cout << SequenceSummary::AminoAcidArray[i] << " acceptance level: " << acceptanceLevel << "\n";
         unsigned codonRange[2];
         SequenceSummary::AAindexToCodonRange(i, true, codonRange);
-        //std::cout << curAA << " " << codonRange[0] << " to " << codonRange[1] << "\n";
         for(unsigned k = codonRange[0]; k < codonRange[1]; k++)
         {
             if(acceptanceLevel < 0.2)
             {
                 std_csp[k] = std::max(0.01, std_csp[k] * 0.8);
-                //std::cout << SequenceSummary::AminoAcidArray[i] << ": " << "acceptance rate to low\n";
             }
             if(acceptanceLevel > 0.3)
             {
                 std_csp[k] = std::min(10.0, std_csp[k] * 1.2);
-                //std::cout << SequenceSummary::AminoAcidArray[i] << ": " << "acceptance rate to high\n";
             }
         }
 		numAcceptForMutationAndSelection[i] = 0u;
@@ -790,20 +782,12 @@ void ROCParameter::proposeExpressionLevels()
 			proposedExpressionLevel[category][i] = std::exp( randNorm( std::log(currentExpressionLevel[category][i]) , std_phi[i]) );
 		}
 	}
-	//	std::cout <<"Exiting proposeExpressionLevels\n";
 }
 void ROCParameter::proposeCodonSpecificParameter()
 {
 	for(unsigned i = 0; i < numMutationCategories; i++)
 	{
 		proposedMutationParameter[i] = propose(currentMutationParameter[i], ROCParameter::randNorm, bias_csp, std_csp);
-//		std::cout << "mutation Category " << i << "\n";
-//		std::cout << "current" << "\n";
-//        for(int k = 0; k < 40; k++){std::cout << currentMutationParameter[i][k] << " ";}
-//        std::cout << "\n";
-//        std::cout << "proposed" << "\n";
-//        for(int k = 0; k < 40; k++){std::cout << proposedMutationParameter[i][k] << " ";}
-//        std::cout << "\n";
 	}
     for(unsigned i = 0; i < numSelectionCategories; i++)
 	{
@@ -851,7 +835,6 @@ void ROCParameter::updateCodonSpecificParameter(char aa)
 	unsigned aaIndex = SequenceSummary::aaToIndex.find(aa)->second;
 	numAcceptForMutationAndSelection[aaIndex]++;
 
-	//std::cout << aaRange[0] << " & " << aaRange[1] << "  " << aa <<"\n";
 	for(unsigned k = 0u; k < numMutationCategories; k++)
 	{
 		for(unsigned i = aaRange[0]; i < aaRange[1]; i++)
@@ -868,7 +851,7 @@ void ROCParameter::updateCodonSpecificParameter(char aa)
 	}
 }
 
-void ROCParameter::readStaticPhiValues(char *filename, double temp[])
+void ROCParameter::readPhiValues(char *filename, double temp[])
 {
 
 	int j;
@@ -897,8 +880,6 @@ void ROCParameter::readStaticPhiValues(char *filename, double temp[])
 			j++;
 		}
 	}
-//	for (int i = 0; i < j; i++)
-//		std::cout << temp[i] <<"\n";
 }
 
 /*
@@ -911,7 +892,6 @@ const std::string ROCParameter::allUnique = "allUnique";
 const std::string ROCParameter::selectionShared = "selectionShared";
 const std::string ROCParameter::mutationShared = "mutationShared";
 std::default_random_engine ROCParameter::generator(time(NULL));
-//std::srand(time(NULL));
 
 // TODO return array as reference and not as return
 double* ROCParameter::drawIidRandomVector(unsigned draws, double mean, double sd, double (*proposal)(double a, double b))
@@ -974,25 +954,20 @@ double ROCParameter::randUnif(double minVal, double maxVal)
 
 unsigned ROCParameter::randMultinom(double* probabilities, unsigned groups)
 {
-	// sort probabilities
-	//ROCParameter::quickSort(probabilities, 0, groups);
 	// calculate cummulative sum to determine group boundaries
 	double cumsum[groups];
 	cumsum[0] = probabilities[0];
-	//std::cout << cumsum[0] <<"  ";
 
 	for(unsigned i = 1u; i < groups; i++)
 	{
 		cumsum[i] = cumsum[i-1u] + probabilities[i];
-		//		std::cout << cumsum[i] <<"  ";
 	}
-	//std::cout <<"\n";
 	// draw random number from U(0,1)
 	std::uniform_real_distribution<double> distribution(0, 1);
 	double referenceValue = distribution(generator);
 	// check in which category the element falls
 	unsigned returnValue = 0u;
-	for (int i = 0; i < groups; i++)
+	for (unsigned i = 0u; i < groups; i++)
 	{
 		if (referenceValue <= cumsum[i])
 		{
@@ -1024,7 +999,7 @@ double ROCParameter::densityLogNorm(double x, double mean, double sd)
 }
 
 // sort array interval from first (included) to last (excluded)!!
-// qui  ck sort, sorting arrays a and b by a.
+// quick sort, sorting arrays a and b by a.
 // Elements in b corespond to a, a will be sorted and it will be assured that b will be sorted by a
 void ROCParameter::quickSortPair(double a[], int b[], int first, int last)
 {

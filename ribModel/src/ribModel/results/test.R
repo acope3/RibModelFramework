@@ -1,6 +1,6 @@
 test.phi <- read.table("phiPosterior.csv", sep=",")[,2]
 test.phi.names <- as.character(read.table("phiPosterior.csv", sep=",")[,1])
-true.phi <- read.table("../SimulatedGenome_selectionShared_phi.csv", sep=",", header=T)[, 2]
+true.phi <- read.table("../SimulatedGenome_allUnique_phi.csv", sep=",", header=T)[, 2]
 
 
 idx <- 1:500
@@ -10,16 +10,17 @@ legend("topleft", legend = c("Category 0", "Category 1"), col = c("black", "red"
 abline(0,1, col="blue", lwd=2)
 cor(log10(true.phi), log10(test.phi))
 
-mutation <- read.table("mutationPosterior_Cat0.csv", sep=",")[,2]
+mutation <- read.table("mutationPosterior_Cat1.csv", sep=",")[,2]
 mutation <- mutation[mutation != 0]
-selection <- read.table("selectionPosterior_Cat0.csv", sep=",")[,2]
+selection <- read.table("selectionPosterior_Cat1.csv", sep=",")[,2]
 selection <- selection[selection != 0]
 trueCSP <- read.table("../SimulatedGenome_CSP1.csv", sep=",", header=T)
 dm.idx <- grepl(pattern = "^[A-Z].[ACGT]{3}.log", x = trueCSP[,1])
 trueMutation <- trueCSP[dm.idx, 2]
 trueSelection <- trueCSP[!dm.idx, 2]
 
-plot(trueMutation, mutation)
+plot(trueMutation, mutation, xlab = "TRUE VALUES", ylab = "ESTM. VALUES", xlim = range(c(trueMutation, trueSelection)), 
+     ylim = range(c(mutation, selection)) )
 points(trueSelection, selection, col="red")
 abline(0, 1, col="blue", lwd=2)
 cor(trueMutation, mutation)
@@ -28,9 +29,9 @@ cor(trueSelection, selection)
 likTrace <- unlist(c(read.table("liklihoodTrace.csv", sep=",")))
 plot(likTrace, type = "l")
 
-which(log10(test.phi) > 2)
-gene <- 932
 expressionTrace <- read.table("expressionLevelTrace.csv", sep=",")
+which(log10(test.phi) > 2)
+gene <- 36
 plot(log10(expressionTrace[, gene]), type = "l")
 test.phiTrace0 <- read.table("phiTrace_nmix_0.csv", sep=",")
 test.phiTrace1 <- read.table("phiTrace_nmix_1.csv", sep=",")
