@@ -142,3 +142,12 @@ test.phiTrace1[, gene]
 true.phi[-idx]
 true.phi)
 true.phi[idx]
+test.phi <- read.table("phiPosterior.csv", sep=",")[,2]#
+test.phi.names <- as.character(read.table("phiPosterior.csv", sep=",")[,1])#
+true.phi <- read.table("../SimulatedGenome_allUnique_phi.csv", sep=",", header=T)[, 2]#
+idx <- 1:500#
+plot(log10(true.phi[idx]), log10(test.phi[idx]), xlim = range(log10(true.phi)), ylim = range(log10(test.phi)))#
+points(log10(true.phi[-idx]), log10(test.phi[-idx]), col = "red")#
+legend("topleft", legend = c("Category 0", "Category 1"), col = c("black", "red"), pch = c(1,1))#
+abline(0,1, col="blue", lwd=2)#
+cor(log10(true.phi), log10(test.phi))

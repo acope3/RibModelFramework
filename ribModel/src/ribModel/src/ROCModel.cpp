@@ -111,7 +111,6 @@ void ROCModel::calculateCodonProbabilityVector(unsigned numCodons, double mutati
         // alphabetically last codon is reference codon!
         codonProb[numCodons - 1] = 1.0;
     }
-
     // normalize codon probabilities
     for(unsigned i = 0; i < numCodons; i++)
     {
