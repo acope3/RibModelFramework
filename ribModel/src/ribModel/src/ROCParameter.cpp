@@ -208,7 +208,7 @@ void ROCParameter::initMutationSelectionCategories(std::string files[], unsigned
 				if (tmpString.find(type) != std::string::npos) //mu or eta was found, depending on category
 				{
 					temp[j] = std::stod(val);
-					temp[j] = randNorm(temp[j], 0.3);
+//					temp[j] = randNorm(temp[j], 0.3);
 					j++;
 					if (j == numParam) break;
 				}
@@ -460,7 +460,7 @@ void ROCParameter::InitializeExpression(double* expression)
 
 void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType, char aa, bool proposal, double* returnSet)
 {
-	std::vector<double>* tempSet;
+	std::vector<double> *tempSet;
 	if(paramType == ROCParameter::dM)
 	{
 		tempSet = (proposal ? &proposedMutationParameter[category] : &currentMutationParameter[category]);
@@ -476,6 +476,8 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
 	unsigned j = 0u;
 	for(unsigned i = aaRange[0]; i < aaRange[1]; i++, j++)
 	{
+		if (aa =='X') 
+			std::cout <<"aaRange[0]: " << aaRange[0] <<" & aaRange[1]: " << aaRange[1] <<"\n";
 		returnSet[j] = tempSet -> at(i);
 	}
 }

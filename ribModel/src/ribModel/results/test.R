@@ -1,6 +1,6 @@
 test.phi <- read.table("phiPosterior.csv", sep=",")[,2]
 test.phi.names <- as.character(read.table("phiPosterior.csv", sep=",")[,1])
-true.phi <- read.table("../SimulatedGenome_allUnique_phi.csv", sep=",", header=T)[, 2]
+true.phi <- read.table("../SimulatedGenome_selectionShared_phi.csv", sep=",", header=T)[, 2]
 
 
 idx <- 1:500
@@ -31,7 +31,7 @@ plot(likTrace, type = "l")
 
 expressionTrace <- read.table("expressionLevelTrace.csv", sep=",")
 which(log10(test.phi) > 2)
-gene <- 996
+gene <- 1000
 plot(log10(expressionTrace[, gene]), type = "l")
 test.phiTrace0 <- read.table("phiTrace_nmix_0.csv", sep=",")
 test.phiTrace1 <- read.table("phiTrace_nmix_1.csv", sep=",")
