@@ -59,8 +59,9 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
     //omp_set_num_threads(concurentThreadsSupported);
     //#pragma omp parallel for //shared(parameter)
     // testing end
-    unsigned numMixtures = parameter.getNumMixtureElements();
 
+    unsigned numExpressionCategories = parameter.getNumExpressionCategories();
+    unsigned numMixtures = parameter.getNumMixtureElements();
     double dirichletParameters[numMixtures];
 		//initialize parameter's size
     for(int i = 0; i < numGenes; i++)
@@ -77,43 +78,43 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
                 => ln(P) = ln(P') - ln(c)
             Note that we use invere sign because our values of ln(f) and ln(f') are negative.
         */
-        double unscaledLogProb_curr[numMixtures];
-        double unscaledLogProb_prop[numMixtures];
+        double unscaledLogProb_curr[numExpressionCategories];
+        double unscaledLogProb_prop[numExpressionCategories];
+
+        double unscaledLogProb_curr_singleMixture[numMixtures];
         double maxValue = -1000000;
-        for(unsigned k = 0; k < numMixtures; k++)
+        unsigned mixtureIndex = 0u;
+        for(unsigned k = 0u; k < numExpressionCategories; k++)
         {
             // logProbabilityRatio contains the logProbabilityRatio in element 0,
             // the current unscaled probability in elemen 1 and the proposed unscaled probability in element 2
-            double logProbabilityRatio[3];
-            model.calculateLogLiklihoodRatioPerGene(gene, i, parameter, k, logProbabilityRatio);
-            // store values so they can be processed
-            unscaledLogProb_curr[k] = logProbabilityRatio[1];
-            unscaledLogProb_prop[k] = logProbabilityRatio[2];
-            maxValue = logProbabilityRatio[1] > maxValue ? logProbabilityRatio[1] : maxValue;
-            maxValue = logProbabilityRatio[2] > maxValue ? logProbabilityRatio[2] : maxValue;
-        }
+            std::vector<unsigned> mixtureElements = parameter.getMixtureElementsOfSelectionCategory(k);
+            for(unsigned n = 0u; n < mixtureElements.size(); n++)
+            {
+                unsigned mixtureElement = mixtureElements[n];
+                double logProbabilityRatio[3];
+                model.calculateLogLiklihoodRatioPerGene(gene, i, parameter, mixtureElement, logProbabilityRatio);
 
+                // store values so they can be processed
+                unscaledLogProb_curr[k] += logProbabilityRatio[1];
+                unscaledLogProb_prop[k] += logProbabilityRatio[2];
+
+                unscaledLogProb_curr_singleMixture[mixtureIndex] = logProbabilityRatio[1];
+                maxValue = unscaledLogProb_curr_singleMixture[mixtureIndex] > maxValue ? unscaledLogProb_curr_singleMixture[mixtureIndex] : maxValue;
+                mixtureIndex++;
+            }
+            //maxValue = unscaledLogProb_curr[k] > maxValue ? unscaledLogProb_curr[k] : maxValue;
+            //maxValue = unscaledLogProb_prop[k] > maxValue ? unscaledLogProb_prop[k] : maxValue;
+        }
         // adjust the the unscaled probabilities by the constant c
         // ln(f') = ln(c) + ln(f)
-        for(unsigned k = 0; k < numMixtures; k++)
-        {
-            unscaledLogProb_curr[k] -= maxValue;
-            unscaledLogProb_prop[k] -= maxValue;
-        }
 
-        double normalizingProbabilityConstant = 0.0;
-        double probabilities[numMixtures];
         // calculate ln(P) = ln( Sum(p_i*f'(...)) ) and obtain normalizing constant for new p_i
-        for(unsigned k = 0; k < numMixtures; k++)
+        for(unsigned k = 0; k < numExpressionCategories; k++)
         {
-            probabilities[k] = std::log(parameter.getCategoryProbability(k)) + unscaledLogProb_curr[k];
-            double currLogLike = probabilities[k];
-            double propLogLike = std::log(parameter.getCategoryProbability(k)) + unscaledLogProb_prop[k];
-            normalizingProbabilityConstant += std::exp(probabilities[k]);
-            //probabilities[k] = parameter.getCategoryProbability(k) * std::exp(unscaledLogProb_curr[k]);
-            //double currLogLike = std::log(probabilities[k]);
-            //double propLogLike = std::log( parameter.getCategoryProbability(k) * std::exp(unscaledLogProb_prop[k]) );
-            //normalizingProbabilityConstant += probabilities[k];
+            // We do not need to add std::log(parameter.getCategoryProbability(k)) since it will cancel in the ratio!
+            double currLogLike = unscaledLogProb_curr[k];
+            double propLogLike = unscaledLogProb_prop[k];
             if( -ROCParameter::randExp(1) < (propLogLike - currLogLike) )
             {
                 parameter.updateExpression(i, k);
@@ -125,14 +126,23 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
             }
         }
 
+        double normalizingProbabilityConstant = 0.0;
+        double probabilities[numMixtures];
+        for(unsigned k = 0u; k < numMixtures; k++)
+        {
+            unscaledLogProb_curr_singleMixture[k] -= maxValue;
+            //TODO compare log vs non log calculation!
+            probabilities[k] = std::log(parameter.getCategoryProbability(k)) + unscaledLogProb_curr_singleMixture[k];
+            probabilities[k] = std::exp(probabilities[k]);
+            normalizingProbabilityConstant += probabilities[k];
+        }
         // normalize probabilities
         for (unsigned k = 0u; k < numMixtures; k++)
         {
-            probabilities[k] = std::exp(probabilities[k]) / normalizingProbabilityConstant;
-            //probabilities[k] = probabilities[k] / normalizingProbabilityConstant;
+            probabilities[k] = probabilities[k] / normalizingProbabilityConstant;
         }
         // Get category in which the gene is placed in.
-        // If we use multiple sequence observrvation (like different mutatnts) randMultinom needs an parameter N to place N observations in numMixture buckets
+        // If we use multiple sequence observation (like different mutatnts) randMultinom needs an parameter N to place N observations in numMixture buckets
         unsigned categoryOfGene = ROCParameter::randMultinom(probabilities, numMixtures);
         parameter.setMixtureAssignment(i, categoryOfGene);
         dirichletParameters[categoryOfGene] += 1;
@@ -169,6 +179,7 @@ void MCMCAlgorithm::acceptRejectHyperParameter(int numGenes, ROCParameter& param
     for(int i = 0; i < numGenes; i++)
     {
         unsigned mixture = parameter.getMixtureAssignment(i);
+        mixture = parameter.getExpressionCategory(mixture);
         double phi = parameter.getExpression(i, mixture, false);
         logProbabilityRatio += std::log(ROCParameter::densityLogNorm(phi, proposedMPhi, proposedSphi)) - std::log(ROCParameter::densityLogNorm(phi, currentMPhi, currentSphi));
     }
@@ -229,7 +240,18 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
     for(unsigned iteration = 0; iteration < maximumIterations; iteration++)
     {
 
-        if(iteration % 100 == 0) {std::cout << iteration << std::endl;}
+        if( (iteration + 1) % 100 == 0)
+        {
+            std::cout << (iteration+1) << std::endl;
+            std::cout << "\t current logLikelihood: " << likelihoodTrace[iteration/thining] << std::endl;
+            std::cout << "\t current Sphi estimate: " << parameter.getSphi() << std::endl;
+            std::cout << "\t current Sphi proposal width: " << parameter.getSphiProposalWidth() << std::endl;
+            for(unsigned i = 0u; i < parameter.getNumMixtureElements(); i++)
+            {
+                std::cout << "\t current Mixture element probability for element " << i << ": " << parameter.getCategoryProbability(i) << std::endl;
+            }
+
+        }
         if(estimateCodonSpecificParameter) //should the "is" functions be used here instead?
         {
             parameter.proposeCodonSpecificParameter();
@@ -338,7 +360,7 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
     std::ofstream likout("results/liklihoodTrace.csv", std::ofstream::out);
     std::ofstream sphiout("results/sphiTrace.csv", std::ofstream::out);
     std::vector<double> sphiTrace = parameter.getSPhiTrace();
-    for(unsigned iteration = 0; iteration < samples; iteration++)
+    for(unsigned iteration = 0u; iteration < samples; iteration++)
     {
         likout << likelihoodTrace[iteration] << std::endl;
         sphiout << sphiTrace[iteration] << std::endl;
@@ -348,14 +370,14 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
 
 
     std::vector<std::vector<double>> phiTraces(genome.getGenomeSize());
-    for(int i = 0; i < genome.getGenomeSize(); i++)
+    for(unsigned i = 0u; i < genome.getGenomeSize(); i++)
     {
         phiTraces[i] = parameter.getExpressionTrace(i);
     }
     std::ofstream phitraceout("results/expressionLevelTrace.csv", std::ofstream::out);
-    for(unsigned iteration = 0; iteration < samples; iteration++)
+    for(unsigned iteration = 0u; iteration < samples; iteration++)
     {
-        for(int i = 0; i < genome.getGenomeSize(); i++)
+        for(unsigned i = 0u; i < genome.getGenomeSize(); i++)
         {
             phitraceout << phiTraces[i][iteration] << ",";
         }

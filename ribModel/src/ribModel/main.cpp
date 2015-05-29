@@ -271,7 +271,7 @@ int main()
 	std::cout << "reading fasta file" << std::endl;
 	//genome.readFasta("../../inst/testGenome.fasta");
 	//genome.readFasta("Skluyveri_chromosomeA_simulated.fasta");
-	genome.readFasta("ourMutationSkluyveri_A_andCleft.fasta");
+	genome.readFasta("SimulatedGenome_allUnique.fasta");
 	//genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/Skluyveri.fasta");
 	//genome.writeFasta("../../inst/resGenome.fasta
 	std::cout << "done reading fasta file" << std::endl;
@@ -294,31 +294,29 @@ int main()
 		unsigned geneAssignment[genome.getGenomeSize()];
 		for(unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
-			if(i < 500) geneAssignment[i] = 0u;
-			else geneAssignment[i] = 1u;
+			if(i < 500) geneAssignment[i] = 1u;
+			else geneAssignment[i] = 0u;
 		}
 		std::cout << "initialize ROCParameter object" << std::endl;
-		double sphi_init = 2;
+		double sphi_init = 1;
 		double numMixtures = 2;
-		std::string mixDef = ROCParameter::mutationShared;
+		std::string mixDef = ROCParameter::allUnique;
 		std::cout << "\tSphi init: " << sphi_init << "\n";
 		std::cout << "\t# mixtures: " << numMixtures << "\n";
 		std::cout << "\tmixture definition: " << mixDef << "\n";
 		ROCParameter parameter = ROCParameter(genome.getGenomeSize(), sphi_init, numMixtures, geneAssignment, true, mixDef);
-		std::string files[] = {std::string("Skluyveri_CSP_ChrA.csv"), std::string("Skluyveri_CSP_ChrCleft.csv")};
+		std::string files[] = {std::string("SimulatedGenome_CSP0.csv"), std::string("SimulatedGenome_CSP1.csv")};
 		parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
 		parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
-		parameter.InitializeExpression(genome, sphi_init);
+		//parameter.InitializeExpression(genome, sphi_init);
+		double phiVals[genome.getGenomeSize()];
+		parameter.readPhiValues("SimulatedGenome_allUnique_phi.csv", phiVals);
+		parameter.InitializeExpression(phiVals);
 		std::cout << "done initialize ROCParameter object" << std::endl;
-		//double phiVals[genome.getGenomeSize()];
-		//parameter.readStaticPhiValues("Skluyveri_ChrA_ChrCleft_phi_est.csv", phiVals);
-
-		//std::cout <<"End of phi Vals\n";
-		//parameter.InitializeExpression(phiVals);
 
 
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
-        int samples = 600;
+        int samples = 1000;
 		int thining = 10;
 		int useSamples = 100;
 
@@ -340,9 +338,8 @@ int main()
 		mcmc.run(genome, model, parameter);
 		std::cout << std::endl << "Finish MCMC" << std::endl;
 
-
-		std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
-		std::cout << "Sphi proposal width: " << parameter.getSphiProposalWidth() << std::endl;
+        std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
+        std::cout << "Sphi proposal width: " << parameter.getSphiProposalWidth() << std::endl;
 		std::cout << "CSP proposal width: \n";
 		for(unsigned n = 0; n < 22; n++)
 		{
@@ -401,22 +398,32 @@ int main()
 						estimate = parameter.getSelectionPosteriorMean(i, useSamples, a);
 						variance = parameter.getSelectionVariance(i, useSamples, a);
 					}
-					selectout << aa <<"." << codon <<".deltaEta," << estimate <<"," << variance <<"\n";
+					selectout << aa << "." << codon <<".deltaEta," << estimate <<"," << variance <<"\n";
 				}
 			}
 			selectout.close();
 		}
         std::cout << "finished writing selection posterior file" << "\n";
 
-		std::ofstream phiout("results/phiPosterior.csv");
+
+
+        for(unsigned k = 0u; k < parameter.getNumExpressionCategories(); k++)
+        {
+            std::string file = "results/expressionPosterior_Cat" + std::to_string(k) + ".csv";
+            std::ofstream phiout(file);
+            for(unsigned n = 0u; n < genome.getGenomeSize(); n++)
+            {
+                phiout << genome.getGene(n).getId() << "," << parameter.getExpressionPosteriorMean(useSamples, n, k) << "," << parameter.getExpressionVariance(useSamples, n, k) << std::endl;
+            }
+            phiout.close();
+        }
+
 		std::ofstream mixAssignment("results/mixAssignment.csv");
 		for(unsigned n = 0u; n < genome.getGenomeSize(); n++)
 		{
 			double mixtureAssignmentPosteriorMean = parameter.getMixtureAssignmentPosteriorMean(useSamples, n);
-			phiout << genome.getGene(n).getId() << "," << parameter.getExpressionPosteriorMean(useSamples, n) << std::endl;
 			mixAssignment << genome.getGene(n).getId() << "," << mixtureAssignmentPosteriorMean << std::endl;
 		}
-		phiout.close();
 		mixAssignment.close();
 	}
 

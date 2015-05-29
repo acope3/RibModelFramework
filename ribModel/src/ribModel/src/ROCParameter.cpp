@@ -10,7 +10,7 @@ ROCParameter::ROCParameter()
 	ROCParameter(100, 2, 1, nullptr, true, "allUnique", nullptr);
 }
 
-ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures, unsigned* geneAssignment, bool splitSer, std::string mutationSelectionState,
+ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures, unsigned* geneAssignment, bool splitSer, std::string _mutationSelectionState,
 		unsigned thetaKMatrix[][2])
 {
 
@@ -24,7 +24,7 @@ ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures
 		}
 	}
 
-
+    mutationSelectionState = _mutationSelectionState;
 	numAcceptForMutationAndSelection.resize(22, 0u);
 
 	numParam = ((splitSer) ? 40 : 41);
@@ -45,8 +45,12 @@ ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures
 	priorB = 1;
 
 	numMixtures = _numMixtures;
+    setNumMutationSelectionValues(_mutationSelectionState, thetaKMatrix);
+    mutationIsInMixture.resize(numMutationCategories);
+    selectionIsInMixture.resize(numSelectionCategories);
+	initCategoryDefinitions(_mutationSelectionState, thetaKMatrix);
 
-	initCategoryDefinitions(mutationSelectionState, thetaKMatrix);
+
 
 	currentMutationParameter.resize(numMutationCategories);
 	proposedMutationParameter.resize(numMutationCategories);
@@ -58,30 +62,32 @@ ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures
 		proposedMutationParameter[i] = tmp;
 	}
 
+
 	currentSelectionParameter.resize(numSelectionCategories);
 	proposedSelectionParameter.resize(numSelectionCategories);
 	categoryProbabilities.resize(numMixtures, 1.0/(double)numMixtures);
 
+	currentExpressionLevel.resize(numSelectionCategories);
+	proposedExpressionLevel.resize(numSelectionCategories);
+
+	numAcceptForExpression.resize(numSelectionCategories);
+	std_phi.resize(numSelectionCategories);
 	for (unsigned i = 0u; i < numSelectionCategories; i++)
 	{
 		std::vector<double> tmp(numParam, 0.0);
 		proposedSelectionParameter[i] = tmp;
 		currentSelectionParameter[i] = tmp;
-	}
 
-
-	currentExpressionLevel.resize(numMixtures);
-	proposedExpressionLevel.resize(numMixtures);
-
-	for(unsigned i = 0; i < numMixtures; i++)
-	{
 		std::vector<double> tempExpr(numGenes, 0.0);
 		currentExpressionLevel[i] = tempExpr;
 		proposedExpressionLevel[i] = tempExpr;
-	}
 
-	std_phi.resize(numGenes, 0.1);
-	numAcceptForExpression.resize(numGenes, 0);
+		std::vector<unsigned> tempAccExpr(numGenes, 0u);
+		numAcceptForExpression[i] = tempAccExpr;
+
+		std::vector<double> tempStdPhi(numGenes, 0.1);
+		std_phi[i] = tempStdPhi;
+	}
 }
 
 ROCParameter::~ROCParameter()
@@ -235,6 +241,40 @@ void ROCParameter::initMutationSelectionCategories(std::string files[], unsigned
 	}
 }
 
+void ROCParameter::setNumMutationSelectionValues(std::string mutationSelectionState, unsigned thetaKMatrix[][2])
+{
+    if (thetaKMatrix != nullptr)
+    {
+        //sets allow only the unique numbers to be added.
+        //at the end, the size of the set is equal to the number
+        //of unique categories.
+        std::set<unsigned> delMCounter;
+        std::set<unsigned> delEtaCounter;
+
+        for (unsigned i = 0u; i < numMixtures; i++)
+        {
+            delMCounter.insert(thetaKMatrix[i][0] - 1);
+            delEtaCounter.insert(thetaKMatrix[i][1] - 1);
+        }
+        numMutationCategories = delMCounter.size();
+        numSelectionCategories = delEtaCounter.size();
+    }
+    else if (mutationSelectionState == selectionShared)
+    {
+        numMutationCategories = numMixtures;
+        numSelectionCategories = 1u;
+    }
+    else if (mutationSelectionState == mutationShared)
+    {
+        numMutationCategories = 1u;
+        numSelectionCategories = numMixtures;
+    }
+    else //assuming the default of allUnique
+    {
+        numMutationCategories = numMixtures;
+        numSelectionCategories = numMixtures;
+    }
+}
 
 void ROCParameter::initCategoryDefinitions(std::string mutationSelectionState, unsigned thetaKMatrix[][2])
 {
@@ -248,27 +288,35 @@ void ROCParameter::initCategoryDefinitions(std::string mutationSelectionState, u
 		{
 			categories[i].delM = thetaKMatrix[i][0] - 1;
 			categories[i].delEta = thetaKMatrix[i][1] - 1; //need check for negative and consecutive checks
+			mutationIsInMixture[thetaKMatrix[i][1] - 1].push_back(i);
+			selectionIsInMixture[thetaKMatrix[i][0] - 1].push_back(i);
 		}
 		else if (mutationSelectionState == selectionShared)
 		{
 			categories[i].delM = i;
 			categories[i].delEta = 0;
+			mutationIsInMixture[i].push_back(i);
+			selectionIsInMixture[0].push_back(i);
 		}
 		else if (mutationSelectionState == mutationShared)
 		{
 			categories[i].delM = 0;
 			categories[i].delEta = i;
+			mutationIsInMixture[0].push_back(i);
+			selectionIsInMixture[i].push_back(i);
 		}
 		else //assuming the default of allUnique
 		{
-			categories[i].delEta = i;
 			categories[i].delM = i;
+			categories[i].delEta = i;
+			mutationIsInMixture[i].push_back(i);
+			selectionIsInMixture[i].push_back(i);
 		}
 		delMCounter.insert(categories[i].delM);
 		delEtaCounter.insert(categories[i].delEta);
 	}
-	numMutationCategories = delMCounter.size();
-	numSelectionCategories = delEtaCounter.size();
+//	numMutationCategories = delMCounter.size();
+//	numSelectionCategories = delEtaCounter.size();
 	//sets allow only the unique numbers to be added.
 	//at the end, the size of the set is equal to the number
 	//of unique categories.
@@ -411,7 +459,7 @@ void ROCParameter::InitializeExpression(Genome& genome, double sd_phi)
 	double scuoValues[genomeSize];
 	double expression[genomeSize];
 	int index[genomeSize];
-	for(unsigned i = 0; i < genomeSize; i++)
+	for(unsigned i = 0u; i < genomeSize; i++)
 	{
 		index[i] = i;
 		scuoValues[i] = calculateSCUO( genome.getGene(i) );
@@ -420,39 +468,39 @@ void ROCParameter::InitializeExpression(Genome& genome, double sd_phi)
 	quickSortPair(scuoValues, index, 0, genomeSize);
 	quickSort(expression, 0, genomeSize);
 
-	for(unsigned category = 0; category < numMixtures; category++)
+	for(unsigned category = 0u; category < numSelectionCategories; category++)
 	{
-		for(unsigned j = 0; j < genomeSize; j++)
+		for(unsigned j = 0u; j < genomeSize; j++)
 		{
 			currentExpressionLevel[category][j] = expression[index[j]];
-			std_phi[j] = 0.1;
-			numAcceptForExpression[j] = 0u;
+			std_phi[category][j] = 0.1;
+			numAcceptForExpression[category][j] = 0u;
 		}
 	}
 }
 void ROCParameter::InitializeExpression(double sd_phi)
 {
-	int numGenes = currentExpressionLevel[1].size();
-	for(unsigned category = 0; category < numMixtures; category++)
+	unsigned numGenes = currentExpressionLevel[1].size();
+	for(unsigned category = 0u; category < numSelectionCategories; category++)
 	{
-		for(int i = 0; i < numGenes; i++)
+		for(unsigned i = 0u; i < numGenes; i++)
 		{
 			currentExpressionLevel[category][i] = ROCParameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
-			std_phi[i] = 0.1;
-			numAcceptForExpression[i] = 0u;
+			std_phi[category][i] = 0.1;
+			numAcceptForExpression[category][i] = 0u;
 		}
 	}
 }
 void ROCParameter::InitializeExpression(double* expression)
 {
-	int numGenes = currentExpressionLevel[0].size();
-	for(unsigned category = 0; category < numMixtures; category++)
+	unsigned numGenes = currentExpressionLevel[0].size();
+	for(unsigned category = 0u; category < numSelectionCategories; category++)
 	{
-		for(int i = 0; i < numGenes; i++)
+		for(unsigned i = 0u; i < numGenes; i++)
 		{
 			currentExpressionLevel[category][i] = expression[i];
-			std_phi[i] = 0.1;
-			numAcceptForExpression[i] = 0u;
+			std_phi[category][i] = 0.1;
+			numAcceptForExpression[category][i] = 0u;
 		}
 	}
 
@@ -476,7 +524,7 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
 	unsigned j = 0u;
 	for(unsigned i = aaRange[0]; i < aaRange[1]; i++, j++)
 	{
-		if (aa =='X') 
+		if (aa =='X')
 			std::cout <<"aaRange[0]: " << aaRange[0] <<" & aaRange[1]: " << aaRange[1] <<"\n";
 		returnSet[j] = tempSet -> at(i);
 	}
@@ -505,7 +553,7 @@ double ROCParameter::getMixtureAssignmentPosteriorMean(unsigned samples, unsigne
 	return posteriorMean / (double)samples;
 }
 
-double ROCParameter::getExpressionPosteriorMean(unsigned samples, unsigned geneIndex)
+double ROCParameter::getExpressionPosteriorMean(unsigned samples, unsigned geneIndex, unsigned expressionCategory)
 {
 
 	double posteriorMean = 0.0;
@@ -521,14 +569,19 @@ double ROCParameter::getExpressionPosteriorMean(unsigned samples, unsigned geneI
 	}
 	unsigned start = traceLength - samples;
 	unsigned category = 0u;
+	unsigned usedSamples = 0u;
 	for(unsigned i = start; i < traceLength; i++)
 	{
         category = mixtureAssignmentTrace[i][geneIndex];
         category = getExpressionCategory(category);
-		posteriorMean += expressionTrace[category][i][geneIndex];
+        if(category == expressionCategory)
+        {
+            posteriorMean += expressionTrace[category][i][geneIndex];
+            usedSamples++;
+        }
 	}
-
-	return posteriorMean / (double)samples;
+	// Can return NaN if gene was never in category! But that is Ok.
+	return posteriorMean / (double)usedSamples;
 }
 double ROCParameter::getSphiPosteriorMean(unsigned samples)
 {
@@ -639,7 +692,7 @@ double ROCParameter::getMutationVariance(unsigned category, unsigned samples, un
 	double normalizationTerm = unbiased ? (1/((double)samples-1.0)) : (1/(double)samples);
 	return normalizationTerm * posteriorVariance;
 }
-double ROCParameter::getExpressionVariance(unsigned samples, unsigned geneIndex, bool unbiased)
+double ROCParameter::getExpressionVariance(unsigned samples, unsigned geneIndex, unsigned expressionCategory, bool unbiased)
 {
 	unsigned traceLength = expressionTrace[0].size();
 	if(samples > traceLength)
@@ -650,20 +703,22 @@ double ROCParameter::getExpressionVariance(unsigned samples, unsigned geneIndex,
 		samples = traceLength;
 	}
 
-	double posteriorMean = getExpressionPosteriorMean(samples, geneIndex);
+	double posteriorMean = getExpressionPosteriorMean(samples, geneIndex, expressionCategory);
 
     double posteriorVariance = 0.0;
-
-	unsigned start = traceLength - samples;
-	unsigned category = 0u;
-	double difference = 0.0;
-	for(unsigned i = start; i < traceLength; i++)
-	{
-        category = mixtureAssignmentTrace[i][geneIndex];
-        category = getExpressionCategory(category);
-        difference = expressionTrace[category][i][geneIndex] - posteriorMean;
-		posteriorVariance += difference * difference;
-	}
+    if(!std::isnan(posteriorMean))
+    {
+        unsigned start = traceLength - samples;
+        unsigned category = 0u;
+        double difference = 0.0;
+        for(unsigned i = start; i < traceLength; i++)
+        {
+            category = mixtureAssignmentTrace[i][geneIndex];
+            category = getExpressionCategory(category);
+            difference = expressionTrace[category][i][geneIndex] - posteriorMean;
+            posteriorVariance += difference * difference;
+        }
+    }
     double normalizationTerm = unbiased ? (1/((double)samples-1.0)) : (1/(double)samples);
 	return normalizationTerm * posteriorVariance;
 }
@@ -708,21 +763,23 @@ void ROCParameter::adaptSphiProposalWidth(unsigned adaptationWidth)
 }
 void ROCParameter::adaptExpressionProposalWidth(unsigned adaptationWidth)
 {
-	unsigned numExpressionLevels = numAcceptForExpression.size();
-	for(unsigned i = 0; i < numExpressionLevels; i++)
+	for(unsigned cat = 0u; cat < numSelectionCategories; cat ++)
 	{
-		double acceptanceLevel = (double)numAcceptForExpression[i] / (double)adaptationWidth;
-		if(acceptanceLevel < 0.2)
-		{
-			std_phi[i] = std::max(0.01, std_phi[i] * 0.8);
-		}
-		if(acceptanceLevel > 0.3)
-		{
-			std_phi[i] = std::min(10.0, std_phi[i] * 1.2);
-		}
-		numAcceptForExpression[i] = 0u;
+        unsigned numExpressionLevels = numAcceptForExpression[cat].size();
+        for(unsigned i = 0; i < numExpressionLevels; i++)
+        {
+            double acceptanceLevel = (double)numAcceptForExpression[cat][i] / (double)adaptationWidth;
+            if(acceptanceLevel < 0.2)
+            {
+                std_phi[cat][i] = std::max(0.01, std_phi[cat][i] * 0.8);
+            }
+            if(acceptanceLevel > 0.3)
+            {
+                std_phi[cat][i] = std::min(10.0, std_phi[cat][i] * 1.2);
+            }
+            numAcceptForExpression[cat][i] = 0u;
+        }
 	}
-
 }
 void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
 {
@@ -778,10 +835,10 @@ void ROCParameter::proposeExpressionLevels()
 	unsigned numExpressionLevels = currentExpressionLevel[0].size();
 	for(unsigned category = 0; category < numSelectionCategories; category++)
 	{
-		for(unsigned i = 0; i < numExpressionLevels; i++)
+		for(unsigned i = 0u; i < numExpressionLevels; i++)
 		{
 			// avoid adjusting probabilities for asymmetry of distribution
-			proposedExpressionLevel[category][i] = std::exp( randNorm( std::log(currentExpressionLevel[category][i]) , std_phi[i]) );
+			proposedExpressionLevel[category][i] = std::exp( randNorm( std::log(currentExpressionLevel[category][i]) , std_phi[category][i]) );
 		}
 	}
 }

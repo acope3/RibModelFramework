@@ -38,7 +38,7 @@ class ROCParameter
 
 		// proposal bias and std for phi values
 		double bias_phi;
-		std::vector<double> std_phi;
+		std::vector<std::vector<double>> std_phi;
 
 		// proposal bias and std for codon specific parameter
 		double bias_csp;
@@ -52,7 +52,7 @@ class ROCParameter
 		std::vector<std::vector<std::vector<double>>> expressionTrace;
 		std::vector<std::vector<std::vector<double>>> mutationParameterTrace;
 		std::vector<std::vector<std::vector<double>>> selectionParameterTrace;
-		std::vector<unsigned> numAcceptForExpression;
+		std::vector<std::vector<unsigned>> numAcceptForExpression;
 
 		std::vector<std::vector<double>> currentMutationParameter;
 		std::vector<std::vector<double>> proposedMutationParameter;
@@ -61,11 +61,14 @@ class ROCParameter
 		std::vector<std::vector<double>> proposedSelectionParameter;
 		std::vector<unsigned> numAcceptForMutationAndSelection;
 
+        std::string mutationSelectionState;
 		unsigned numMixtures;
 		unsigned numMutationCategories;
 		unsigned numSelectionCategories;
 		std::vector<thetaK> categories;
 		std::vector<unsigned> mixtureAssignment;
+        std::vector<std::vector<unsigned>> selectionIsInMixture;
+        std::vector<std::vector<unsigned>> mutationIsInMixture;
 
 		std::vector<std::vector<unsigned>> mixtureAssignmentTrace;
 		std::vector<double> categoryProbabilities;
@@ -105,6 +108,7 @@ class ROCParameter
 		ROCParameter& operator=(const ROCParameter& rhs);
 
 		void readPhiValues(char *filename, double temp[]);
+		void setNumMutationSelectionValues(std::string mutationSelectionState, unsigned thetaKMatrix[][2]);
 		void initCategoryDefinitions(std::string mutationSelectionState, unsigned thetaKMatrix[][2]);
 		void initMutationSelectionCategories(std::string files[], unsigned numCategories, unsigned paramType);
 		void printThetaKMatrix()
@@ -116,6 +120,13 @@ class ROCParameter
 		}
 
 		unsigned getNumMixtureElements() {return numMixtures;}
+        unsigned getNumMutationCategories() {return numMutationCategories;}
+		unsigned getNumSelectionCategories() {return numSelectionCategories;}
+		unsigned getNumExpressionCategories() {return numSelectionCategories;}
+		std::vector<unsigned> getMixtureElementsOfMutationCategory(unsigned category) {return mutationIsInMixture[category];}
+		std::vector<unsigned> getMixtureElementsOfSelectionCategory(unsigned category) {return selectionIsInMixture[category];}
+		std::string getMutationSelectionState() {return mutationSelectionState;}
+
 		unsigned int getNumParam() {return numParam;}
 		std::vector<std::vector<double>> getCurrentMutationParameter() {return currentMutationParameter;}
 		std::vector<std::vector<double>> getCurrentSelectionParameter() {return currentSelectionParameter;}
@@ -148,12 +159,12 @@ class ROCParameter
 			return (proposed ? proposedExpressionLevel[category][geneIndex] : currentExpressionLevel[category][geneIndex]);
 		}
 		void setExpression(double phi, unsigned geneIndex, unsigned category) {currentExpressionLevel[category][geneIndex] = phi;}
-		double getExpressionProposalWidth(unsigned geneIndex) {return std_phi[geneIndex];}
+		double getExpressionProposalWidth(unsigned geneIndex, unsigned category) {return std_phi[category][geneIndex];}
 		void updateExpression(unsigned geneIndex)
 		{
-			numAcceptForExpression[geneIndex]++;
 			for(unsigned category = 0; category < numSelectionCategories; category++)
 			{
+                numAcceptForExpression[category][geneIndex]++;
 				currentExpressionLevel[category][geneIndex] = proposedExpressionLevel[category][geneIndex];
 			}
 		}
@@ -161,7 +172,7 @@ class ROCParameter
 		{
             // TODO: numAcceptForExpression is counted up for each category, -> make it a 2d vector such that each expression category has its own counter
             // CAREFUL: that might cause us to have a different std_phi for each expression category -> 2d as well
-			numAcceptForExpression[geneIndex]++;
+			numAcceptForExpression[category][geneIndex]++;
 			currentExpressionLevel[category][geneIndex] = proposedExpressionLevel[category][geneIndex];
 		}
 		std::vector<std::vector<std::vector<double>>> getExpressionTrace() {return expressionTrace;}
@@ -194,8 +205,6 @@ class ROCParameter
 		void proposeCodonSpecificParameter();
 
 		void getParameterForCategory(unsigned category, unsigned parameter, char aa, bool proposal, double* returnValue);
-		unsigned getNumMutationCategories() {return numMutationCategories;}
-		unsigned getNumSelectionCategories() {return numSelectionCategories;}
 
 		// functions to manage traces
 		void initAllTraces(unsigned samples, unsigned num_genes);
@@ -219,7 +228,7 @@ class ROCParameter
 		std::vector<std::vector <unsigned>> getMixtureAssignmentTrace() {return mixtureAssignmentTrace;}
 
 		// functions to return estimates
-		double getExpressionPosteriorMean(unsigned samples, unsigned geneIndex);
+		double getExpressionPosteriorMean(unsigned samples, unsigned geneIndex, unsigned expressionCategory);
 		double getSphiPosteriorMean(unsigned samples);
 		double getMixtureAssignmentPosteriorMean(unsigned samples, unsigned geneIndex); // TODO: implement variance function, fix Mean function (won't work with 3 groups)
         double getMutationPosteriorMean(unsigned category, unsigned samples, unsigned paramIndex);
@@ -227,7 +236,7 @@ class ROCParameter
         double getMutationVariance(unsigned category, unsigned samples, unsigned paramIndex, bool unbiased = true);
         double getSelectionVariance(unsigned category, unsigned samples, unsigned paramIndex, bool unbiased = true);
         double getSphiVariance(unsigned samples, bool unbiased = true);
-        double getExpressionVariance(unsigned samples, unsigned geneIndex, bool unbiased = true);
+        double getExpressionVariance(unsigned samples, unsigned geneIndex, unsigned expressionCategory, bool unbiased = true);
 
 		// static functions
 		static double calculateSCUO(Gene& gene);
