@@ -1,6 +1,6 @@
-#include "../include/Genome.h"
-#include "../include/ROCParameter.h"//these two files must be included here to get at the implimentation
-#include "../include/ROCModel.h" 		//for simulateGenome. They cannot be included in the header file. See genome.h for
+#include "include/Genome.h"
+#include "include/ROCParameter.h"//these two files must be included here to get at the implimentation
+#include "include/ROCModel.h" 		//for simulateGenome. They cannot be included in the header file. See genome.h for
 																		//more information on circular dependices/forward declarations
 #include <iostream>     // std::cout
 #include <cstring>
@@ -225,7 +225,7 @@ void Genome::simulateGenome(ROCParameter& parameter, ROCModel& model)
 	std::string tmpDesc;
 	int numParam = parameter.getNumParam();
 
-	std::srand(std::time(0));
+	//std::srand(std::time(0));
 	simulatedGenes.resize(genes.size());
 	tmpDesc = "Simulated Gene";
 

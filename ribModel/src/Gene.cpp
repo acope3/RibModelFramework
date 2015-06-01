@@ -1,5 +1,5 @@
-#include "../include/Gene.h"
-#include "../include/SequenceSummary.h"
+#include "include/Gene.h"
+#include "include/SequenceSummary.h"
 
 #include <algorithm>
 #include <iostream>

@@ -1,7 +1,7 @@
 test.phi0 <- read.table("expressionPosterior_Cat0.csv", sep=",")[,2]
-test.phi1 <- read.table("expressionPosterior_Cat0.csv", sep=",")[,2]
+test.phi1 <- read.table("expressionPosterior_Cat1.csv", sep=",")[,2]
 test.phi.names <- as.character(read.table("expressionPosterior_Cat0.csv", sep=",")[,1])
-true.phi <- read.table("../SimulatedGenome_selectionShared_phi.csv", sep=",", header=T)[, 2]
+true.phi <- read.table("../SimulatedGenome_allUnique_phi.csv", sep=",", header=T)[, 2]
 
 
 idx <- c(rep(TRUE, times = 500), rep(FALSE, times = 500))
@@ -15,11 +15,11 @@ abline(0,1, col="blue", lwd=2)
 cor(c(log10(true.phi[!idx]), log10(true.phi[idx])), c(log10(test.phi0[!idx]), log10(test.phi1[idx])))
 
 
-mutation <- read.table("mutationPosterior_Cat1.csv", sep=",")[,2]
+mutation <- read.table("mutationPosterior_Cat0.csv", sep=",")[,2]
 mutation <- mutation[mutation != 0]
-selection <- read.table("selectionPosterior_Cat0.csv", sep=",")[,2]
+selection <- read.table("selectionPosterior_Cat1.csv", sep=",")[,2]
 selection <- selection[selection != 0]
-trueCSP <- read.table("../SimulatedGenome_CSP1.csv", sep=",", header=T)
+trueCSP <- read.table("../SimulatedGenome_CSP0.csv", sep=",", header=T)
 dm.idx <- grepl(pattern = "^[A-Z].[ACGT]{3}.log", x = trueCSP[,1])
 trueMutation <- trueCSP[dm.idx, 2]
 trueSelection <- trueCSP[!dm.idx, 2]
@@ -62,4 +62,5 @@ lines(selectincat1[,1], type = "l", col="red")
 test.scuo <- read.table("scuo.csv", sep=",")[,2]
 plot(log10(true.phi), log10(test.scuo))
 cor(log10(true.phi), log10(test.scuo))
+
 

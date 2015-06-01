@@ -1,5 +1,5 @@
-#include "../include/MCMCAlgorithm.h"
-#include "../include/CovarianceMatrix.h"
+#include "include/MCMCAlgorithm.h"
+#include "include/CovarianceMatrix.h"
 
 #include <random>
 #include <cstdlib>
@@ -82,7 +82,7 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
         double unscaledLogProb_prop[numExpressionCategories];
 
         double unscaledLogProb_curr_singleMixture[numMixtures];
-        double maxValue = -1000000;
+        double maxValue = -1000000.0;
         unsigned mixtureIndex = 0u;
         for(unsigned k = 0u; k < numExpressionCategories; k++)
         {
@@ -103,14 +103,9 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
                 maxValue = unscaledLogProb_curr_singleMixture[mixtureIndex] > maxValue ? unscaledLogProb_curr_singleMixture[mixtureIndex] : maxValue;
                 mixtureIndex++;
             }
-            //maxValue = unscaledLogProb_curr[k] > maxValue ? unscaledLogProb_curr[k] : maxValue;
-            //maxValue = unscaledLogProb_prop[k] > maxValue ? unscaledLogProb_prop[k] : maxValue;
         }
-        // adjust the the unscaled probabilities by the constant c
-        // ln(f') = ln(c) + ln(f)
-
-        // calculate ln(P) = ln( Sum(p_i*f'(...)) ) and obtain normalizing constant for new p_i
-        for(unsigned k = 0; k < numExpressionCategories; k++)
+        unsigned mixtureAssignmentOfGene = parameter.getMixtureAssignment(i);
+        for(unsigned k = 0u; k < numExpressionCategories; k++)
         {
             // We do not need to add std::log(parameter.getCategoryProbability(k)) since it will cancel in the ratio!
             double currLogLike = unscaledLogProb_curr[k];
@@ -119,13 +114,18 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
             {
                 parameter.updateExpression(i, k);
                 //#pragma omp atomic
-                logLikelihood += propLogLike;
+                // only count each gene once, not numExpressionCategories times
+                if(mixtureAssignmentOfGene == k) logLikelihood += propLogLike;
             }else{
                 //#pragma omp atomic
-                logLikelihood += currLogLike;
+            	// only count each gene once, not numExpressionCategories times
+            	if(mixtureAssignmentOfGene == k) logLikelihood += currLogLike;
             }
         }
 
+        // adjust the the unscaled probabilities by the constant c
+        // ln(f') = ln(c) + ln(f)
+        // calculate ln(P) = ln( Sum(p_i*f'(...)) ) and obtain normalizing constant for new p_i
         double normalizingProbabilityConstant = 0.0;
         double probabilities[numMixtures];
         for(unsigned k = 0u; k < numMixtures; k++)

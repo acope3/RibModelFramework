@@ -11,7 +11,6 @@
 #include "include/MCMCAlgorithm.h"
 #include "include/CovarianceMatrix.h"
 
-using namespace std;
 
 void testNumCodonsPerAA()
 {
@@ -271,7 +270,7 @@ int main()
 	std::cout << "reading fasta file" << std::endl;
 	//genome.readFasta("../../inst/testGenome.fasta");
 	//genome.readFasta("Skluyveri_chromosomeA_simulated.fasta");
-	genome.readFasta("SimulatedGenome_allUnique.fasta");
+	genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_A_andCleft.fasta");
 	//genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/Skluyveri.fasta");
 	//genome.writeFasta("../../inst/resGenome.fasta
 	std::cout << "done reading fasta file" << std::endl;
@@ -305,18 +304,19 @@ int main()
 		std::cout << "\t# mixtures: " << numMixtures << "\n";
 		std::cout << "\tmixture definition: " << mixDef << "\n";
 		ROCParameter parameter = ROCParameter(genome.getGenomeSize(), sphi_init, numMixtures, geneAssignment, true, mixDef);
-		std::string files[] = {std::string("SimulatedGenome_CSP0.csv"), std::string("SimulatedGenome_CSP1.csv")};
+		std::string files[] = {std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv"),
+				std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv")};
 		parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
 		parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
-		//parameter.InitializeExpression(genome, sphi_init);
-		double phiVals[genome.getGenomeSize()];
-		parameter.readPhiValues("SimulatedGenome_allUnique_phi.csv", phiVals);
-		parameter.InitializeExpression(phiVals);
+		parameter.InitializeExpression(genome, sphi_init);
+		//double phiVals[genome.getGenomeSize()];
+		//parameter.readPhiValues("SimulatedGenome_allUnique_phi.csv", phiVals);
+		//parameter.InitializeExpression(phiVals);
 		std::cout << "done initialize ROCParameter object" << std::endl;
 
 
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
-        int samples = 1000;
+        int samples = 2000;
 		int thining = 10;
 		int useSamples = 100;
 
@@ -325,7 +325,6 @@ int main()
 		std::cout << "\t # samples used: " << useSamples << "\n";
 		MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, true, true, true);
 		std::cout << "done initialize MCMCAlgorithm object" << std::endl;
-
 
 		std::ofstream scuoout("results/scuo.csv");
 		for(unsigned n = 0u; n < genome.getGenomeSize(); n++)

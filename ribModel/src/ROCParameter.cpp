@@ -1,4 +1,4 @@
-#include "../include/ROCParameter.h"
+#include "include/ROCParameter.h"
 
 #include <math.h>
 #include <ctime>

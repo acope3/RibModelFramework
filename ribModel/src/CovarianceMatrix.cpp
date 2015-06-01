@@ -1,4 +1,4 @@
-#include "../include/CovarianceMatrix.h"
+#include "include/CovarianceMatrix.h"
 #include <iostream>
 #include <cmath>
 
