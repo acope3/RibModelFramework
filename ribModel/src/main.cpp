@@ -226,7 +226,6 @@ void testSimulateGenome(Genome& genome)
 
 		for (int j = 0; j < 22; j++)
 		{
-			std::cout <<"here\n";
 			SequenceSummary::AAindexToCodonRange(j, false, aaRange);
 			char curAA = SequenceSummary::IndexToAA(j);
 			unsigned numCodons = simSeqSum.GetNumCodonsForAA(curAA);
@@ -258,21 +257,22 @@ void testSimulateGenome(Genome& genome)
 
 	}
 	std::cout <<"Writing new fasta file\n";
-	genome.writeFasta("ourMutationSkluyveri_A_andCleft.fasta", true);
+	genome.writeFasta("SIMULATED_MUTATION_SHARED_Skluyveri_A_andCleft.fasta", true);
 	std::cout << "------------------ TEST SIMULATEGENOME ------------------" << std::endl;
 }
 
 int main()
 {
+	bool cedric = true;
 	std::cout << "Hello world!" << std::endl << std::endl;
 
 	Genome genome;
 	std::cout << "reading fasta file" << std::endl;
-	//genome.readFasta("../../inst/testGenome.fasta");
-	//genome.readFasta("Skluyveri_chromosomeA_simulated.fasta");
-	genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_A_andCleft.fasta");
-	//genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/Skluyveri.fasta");
-	//genome.writeFasta("../../inst/resGenome.fasta
+	if(cedric){
+		genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_A_andCleft.fasta");
+	}else{
+		genome.readFasta("Skluyveri_chromosomeA.fasta");
+	}
 	std::cout << "done reading fasta file" << std::endl;
 	bool testing =  false;
 
@@ -288,29 +288,34 @@ int main()
 			 testThetaKMatrix();*/
 		testSimulateGenome(genome);
 	}else{
-
 		ROCModel model = ROCModel();
 		unsigned geneAssignment[genome.getGenomeSize()];
 		for(unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
-			if(i < 500) geneAssignment[i] = 1u;
-			else geneAssignment[i] = 0u;
+			if(i < 448) geneAssignment[i] = 0u;
+			else geneAssignment[i] = 1u;
 		}
 		std::cout << "initialize ROCParameter object" << std::endl;
-		double sphi_init = 1;
-		double numMixtures = 2;
+		double sphi_init = 2;
+		double numMixtures = 1;
 		std::string mixDef = ROCParameter::allUnique;
 		std::cout << "\tSphi init: " << sphi_init << "\n";
 		std::cout << "\t# mixtures: " << numMixtures << "\n";
 		std::cout << "\tmixture definition: " << mixDef << "\n";
 		ROCParameter parameter = ROCParameter(genome.getGenomeSize(), sphi_init, numMixtures, geneAssignment, true, mixDef);
-		std::string files[] = {std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv"),
+
+		std::string files[];
+		if(cedric){
+			std::string files[] = {std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv"),
 				std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv")};
+		}else{
+			std::string files[] = {std::string("Skluyveri_CSP_ChrA.csv"), std::string("Skluyveri_CSP_ChrCleft.csv")};
+		}
 		parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
 		parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
 		parameter.InitializeExpression(genome, sphi_init);
 		//double phiVals[genome.getGenomeSize()];
-		//parameter.readPhiValues("SimulatedGenome_allUnique_phi.csv", phiVals);
+		//parameter.readPhiValues("Skluyveri_ChrA_ChrCleft_phi_est.csv", phiVals);
 		//parameter.InitializeExpression(phiVals);
 		std::cout << "done initialize ROCParameter object" << std::endl;
 
