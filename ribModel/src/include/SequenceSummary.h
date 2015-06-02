@@ -3,7 +3,7 @@
 
 #include <string>
 #include <map>
-
+#include <Rcpp.h>
 class SequenceSummary
 {
     private:
@@ -36,6 +36,12 @@ class SequenceSummary
         int getCodonCountForCodon(int codon) {return ncodons[codon];}
 
 
+				//R Wrapper Functions
+				int getAAcount(char aa) {return getAAcountForAA(aa);}
+				int getCodonCount(std::string& codon) {return getCodonCountForCodon(codon);}
+
+
+
         //statics
         static char CodonToAA(std::string& codon);
         static unsigned GetNumCodonsForAA(const char& aa, bool forParamVector = false);
@@ -52,5 +58,23 @@ class SequenceSummary
 
 
 };
+
+
+RCPP_MODULE(SequenceSummary) 
+{
+		using namespace Rcpp;
+    class_<SequenceSummary>( "SequenceSummary" )
+    .constructor()
+		.constructor<std::string>()
+//		.constructor<SequenceSummary>() //custom object...How?
+		//operator overloading????
+				
+    .method("getCodonCount", &SequenceSummary::getCodonCount)
+		.method("getAAcount", &SequenceSummary::getAAcount)
+
+		.method("processSequence", &SequenceSummary::processSequence)
+		.method("clear", &SequenceSummary::clear)
+		; 
+}
 
 #endif // SequenceSummary_H

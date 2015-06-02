@@ -3,9 +3,9 @@
 
 #include <vector>
 
-#include "../include/Genome.h"
+//#include "../include/Genome.h"
 #include "../include/ROCModel.h"
-#include "../include/ROCParameter.h"
+//#include "../include/ROCParameter.h"
 
 class MCMCAlgorithm
 {
