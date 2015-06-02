@@ -6,7 +6,7 @@
 #include <string>
 #include <iostream>
 
-#include "../include/SequenceSummary.h"
+//#include "../include/SequenceSummary.h"
 #include "../include/Genome.h"
 
 class ROCParameter

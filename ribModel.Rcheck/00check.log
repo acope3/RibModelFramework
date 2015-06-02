@@ -1,0 +1,28 @@
+* using log directory ‘/Users/roxasoath1/Desktop/RibModelFramework1/ribModel.Rcheck’
+* using R version 3.2.0 (2015-04-16)
+* using platform: x86_64-apple-darwin13.4.0 (64-bit)
+* using session charset: UTF-8
+* checking for file ‘ribModel/DESCRIPTION’ ... OK
+* checking extension type ... Package
+* this is package ‘ribModel’ version ‘1.0’
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... NOTE
+Found the following hidden files and directories:
+  .DS_Store
+  R/.Rhistory
+  src/.DS_Store
+  src/.project
+  src/include/.Genome.h.swp
+  src/ribModel/.nfs00000000033f93a200000430
+These were most likely included in error. See section ‘Package
+structure’ in the ‘Writing R Extensions’ manual.
+* checking for portable file names ... OK
+* checking for sufficient/correct file permissions ... OK
+* checking whether package ‘ribModel’ can be installed ... ERROR
+Installation failed.
+See ‘/Users/roxasoath1/Desktop/RibModelFramework1/ribModel.Rcheck/00install.out’ for details.
+Status: 1 ERROR, 1 NOTE

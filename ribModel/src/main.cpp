@@ -3,11 +3,11 @@
 #include <fstream>
 #include <algorithm>
 
-#include "include/Genome.h"
-#include "include/Gene.h"
-#include "include/SequenceSummary.h"
-#include "include/ROCParameter.h"
-#include "include/ROCModel.h"
+//#include "include/Genome.h"
+//#include "include/Gene.h"
+//#include "include/SequenceSummary.h"
+//#include "include/ROCParameter.h"
+//#include "include/ROCModel.h"
 #include "include/MCMCAlgorithm.h"
 #include "include/CovarianceMatrix.h"
 
@@ -311,7 +311,8 @@ int main()
 			files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv");
 			files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv");
 		}else{
-			std::string files[] = {std::string("Skluyveri_CSP_ChrA.csv"), std::string("Skluyveri_CSP_ChrCleft.csv")};
+			files[0] = std::string("Skluyveri_CSP_ChrA.csv");
+			files[1] = std::string("Skluyveri_CSP_ChrCleft.csv");
 		}
 		parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
 		parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);

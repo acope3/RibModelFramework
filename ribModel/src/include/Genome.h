@@ -9,7 +9,7 @@
 #include "../include/Gene.h"
 
 
-//IMPORTANT NOTE: forward declarations used. Includes are in genome.cpp.
+//IMPORTANT NOTE: forward declarations used. Includes are in genome.cpp. 
 //Used to solve circular dependices. See http://www.cplusplus.com/forum/general/125/
 //for more information.
 class ROCParameter;

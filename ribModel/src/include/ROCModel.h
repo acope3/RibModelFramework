@@ -1,8 +1,8 @@
 #ifndef ROCMODEL_H
 #define ROCMODEL_H
 
-#include "../include/Gene.h"
-#include "../include/Genome.h"
+//#include "../include/Gene.h"
+//#include "../include/Genome.h"
 #include "../include/ROCParameter.h"
 
 class ROCModel

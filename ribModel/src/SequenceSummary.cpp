@@ -50,7 +50,7 @@ void SequenceSummary::processSequence(const std::string& sequence)
 		int aaID;
 		std::string codon;
 		
-    for(int i = 0; i < sequence.length(); i+=3)
+    for(unsigned i = 0u; i < sequence.length(); i+=3)
     {
         codon = sequence.substr(i, 3);
         codonID = SequenceSummary::CodonToIndex( codon );
