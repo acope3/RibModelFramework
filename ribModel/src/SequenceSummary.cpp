@@ -303,3 +303,28 @@ char SequenceSummary::CodonToAA(std::string& codon)
 
     return aa;
 }
+
+
+// ---------------------------------------------------------------------------
+// ----------------------------- RCPP STUFF ----------------------------------
+// ---------------------------------------------------------------------------
+#ifndef STANDALONE
+#include <Rcpp.h>
+RCPP_MODULE(SequenceSummary)
+{
+	using namespace Rcpp;
+    class_<SequenceSummary>( "SequenceSummary" )
+    .constructor()
+	.constructor<std::string>()
+//		.constructor<SequenceSummary>() //custom object...How?
+		//operator overloading????
+
+    .method("getCodonCount", &SequenceSummary::getCodonCount)
+	.method("getAAcount", &SequenceSummary::getAAcount)
+
+	.method("processSequence", &SequenceSummary::processSequence)
+	.method("clear", &SequenceSummary::clear)
+	;
+}
+#endif
+

@@ -4,10 +4,6 @@
 #include <string>
 #include <map>
 
-#ifndef STANDALONE
-#include <Rcpp.h>
-#endif
-
 class SequenceSummary
 {
     private:
@@ -63,22 +59,5 @@ class SequenceSummary
 
 };
 
-#ifndef STANDALONE
-RCPP_MODULE(SequenceSummary) 
-{
-		using namespace Rcpp;
-    class_<SequenceSummary>( "SequenceSummary" )
-    .constructor()
-		.constructor<std::string>()
-//		.constructor<SequenceSummary>() //custom object...How?
-		//operator overloading????
-				
-    .method("getCodonCount", &SequenceSummary::getCodonCount)
-		.method("getAAcount", &SequenceSummary::getAAcount)
 
-		.method("processSequence", &SequenceSummary::processSequence)
-		.method("clear", &SequenceSummary::clear)
-		; 
-}
-#endif
 #endif // SequenceSummary_H
