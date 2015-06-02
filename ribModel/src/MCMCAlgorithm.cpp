@@ -245,7 +245,7 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
         if( (iteration + 1) % 100 == 0)
         {
             std::cout << (iteration+1) << std::endl;
-            std::cout << "\t current logLikelihood: " << likelihoodTrace[iteration/thining] << std::endl;
+            std::cout << "\t current logLikelihood: " << likelihoodTrace[(iteration/thining) - 1] << std::endl;
             std::cout << "\t current Sphi estimate: " << parameter.getSphi() << std::endl;
             std::cout << "\t current Sphi proposal width: " << parameter.getSphiProposalWidth() << std::endl;
             for(unsigned i = 0u; i < parameter.getNumMixtureElements(); i++)

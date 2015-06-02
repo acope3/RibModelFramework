@@ -324,7 +324,7 @@ int main()
 
 
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
-        int samples = 3000;
+        int samples = 10000;
 		int thining = 10;
 		int useSamples = 100;
 

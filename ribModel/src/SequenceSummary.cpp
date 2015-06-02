@@ -310,12 +310,12 @@ char SequenceSummary::CodonToAA(std::string& codon)
 // ---------------------------------------------------------------------------
 #ifndef STANDALONE
 #include <Rcpp.h>
-RCPP_MODULE(SequenceSummary)
+using namespace Rcpp;
+RCPP_MODULE(SequenceSummary_mod)
 {
-	using namespace Rcpp;
     class_<SequenceSummary>( "SequenceSummary" )
-    .constructor()
-	.constructor<std::string>()
+    //.constructor("empty constructor")
+	.constructor<std::string>("Initialize with a DNA Sequence. Sequence must be a multiple of 3")
 //		.constructor<SequenceSummary>() //custom object...How?
 		//operator overloading????
 
