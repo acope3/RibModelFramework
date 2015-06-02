@@ -101,11 +101,16 @@ class ROCParameter
 		static std::default_random_engine generator; // static to make sure that the same generator is during the runtime.
 
 		explicit ROCParameter();
-		ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures, unsigned* geneAssignment = nullptr, bool splitSer = true,
-				std::string mutationSelectionState = "allUnique", unsigned thetaKMatrix[][2] = nullptr);
+		ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures,
+				unsigned* geneAssignment, bool splitSer, std::string _mutationSelectionState);
+		ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures,
+				unsigned* geneAssignment, bool splitSer, unsigned thetaKMatrix[][2]);
+
 		virtual ~ROCParameter();
 		ROCParameter(const ROCParameter& other);
 		ROCParameter& operator=(const ROCParameter& rhs);
+		void initParameterSet(unsigned numGenes, double sphi, unsigned _numMixtures, unsigned* geneAssignment, bool splitSer, std::string _mutationSelectionState,
+				unsigned thetaKMatrix[][2]);
 
 		void readPhiValues(char *filename, double temp[]);
 		void setNumMutationSelectionValues(std::string mutationSelectionState, unsigned thetaKMatrix[][2]);
@@ -241,8 +246,8 @@ class ROCParameter
 		// static functions
 		static double calculateSCUO(Gene& gene);
 
-		static double* drawIidRandomVector(unsigned draws, double mean, double sd, double (*proposal)(double a, double b));
-		static double* drawIidRandomVector(unsigned draws, double r, double (*proposal)(double r));
+		static void drawIidRandomVector(unsigned draws, double mean, double sd, double (*proposal)(double a, double b), double* randomNumbers);
+		static void drawIidRandomVector(unsigned draws, double r, double (*proposal)(double r), double* randomNumber);
 		static double randNorm(double mean, double sd);
 		static double randLogNorm(double m, double s);
 		static double randExp(double r);

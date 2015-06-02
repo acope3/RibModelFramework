@@ -5,7 +5,7 @@
 #include <iostream>
 Gene::Gene() : seq(""), id(""), description("")
 {
-    //geneData = SequenceSummary();
+
 }
 
 Gene::Gene(std::string _seq, std::string _id, std::string _desc) : seq(_seq), id(_id), description(_desc)

@@ -39,7 +39,7 @@ void Genome::addGene(const Gene& gene)
 
 void Genome::getCountsForAA(char aa, unsigned codonCounts[][5])
 {
-	for(int i = 0; i < genes.size(); i++)
+	for(unsigned i = 0u; i < genes.size(); i++)
 	{
 		Gene gene = genes[i];
 		SequenceSummary seqsum = gene.getSequenceSummary();
@@ -66,9 +66,9 @@ void Genome::writeFasta (char* filename, bool simulated)
 		}
 		if (simulated)
 		{
-			for(int i = 0; i < simulatedGenes.size(); i++)
+			for(unsigned i = 0u; i < simulatedGenes.size(); i++)
 			{
-				Fout << ">" << simulatedGenes[i].getId() <<" " << simulatedGenes[i].getDescription() <<"\n";
+				Fout << ">" << simulatedGenes[i].getId() << " " << simulatedGenes[i].getDescription() <<"\n";
 				for(int j = 0; j < simulatedGenes[i].length(); j++)
 				{
 					Fout << simulatedGenes[i].getNucleotideAt(j);
@@ -79,9 +79,9 @@ void Genome::writeFasta (char* filename, bool simulated)
 		}
 		else
 		{
-			for(int i = 0; i < genes.size(); i++)
+			for(unsigned i = 0u; i < genes.size(); i++)
 			{
-				Fout << ">" << genes[i].getId() <<" " << genes[i].getDescription() << std::endl;
+				Fout << ">" << genes[i].getId() << " " << genes[i].getDescription() << std::endl;
 				for(int j = 0; j < genes[i].length(); j++)
 				{
 					Fout << genes[i].getNucleotideAt(j);
@@ -214,7 +214,8 @@ Gene& Genome::getGene(std::string id)
 
 void Genome::simulateGenome(ROCParameter& parameter, ROCModel& model)
 {
-	int i, j, k;
+	unsigned i;
+	int j, k;
 	int aaCount;
 	int numCodons;
 	unsigned codonIndex;

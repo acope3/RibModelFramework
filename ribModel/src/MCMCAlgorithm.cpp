@@ -14,9 +14,11 @@
 
 
 
-MCMCAlgorithm::MCMCAlgorithm()
+MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), estimateExpression(true), estimateCodonSpecificParameter(true),
+estimateHyperParameter(true)
 {
     MCMCAlgorithm(1000, 1, true, true, true);
+    likelihoodTrace.resize(samples + 1);
     adaptiveWidth = 100;
 }
 

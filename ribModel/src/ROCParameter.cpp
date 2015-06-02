@@ -7,10 +7,124 @@
 #include <fstream>
 ROCParameter::ROCParameter()
 {
-	ROCParameter(100, 2, 1, nullptr, true, "allUnique", nullptr);
+	initParameterSet(100, 2, 1, nullptr, true, "allUnique", nullptr);
 }
 
-ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures, unsigned* geneAssignment, bool splitSer, std::string _mutationSelectionState,
+ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures,
+		unsigned* geneAssignment, bool splitSer, unsigned thetaKMatrix[][2])
+{
+	initParameterSet(numGenes, sphi, _numMixtures, geneAssignment, splitSer, nullptr, thetaKMatrix);
+}
+ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures,
+		unsigned* geneAssignment, bool splitSer, std::string _mutationSelectionState)
+{
+	initParameterSet(numGenes, sphi, _numMixtures, geneAssignment, splitSer, _mutationSelectionState, nullptr);
+}
+
+ROCParameter::~ROCParameter()
+{
+	//dtor
+}
+
+ROCParameter::ROCParameter(const ROCParameter& other)
+{
+	numParam = other.numParam;
+
+	Sphi = other.Sphi;
+	Aphi = other.Aphi;
+	Sphi_proposed = other.Sphi_proposed;
+	Aphi_proposed = other.Aphi_proposed;
+	sPhiTrace = other.sPhiTrace;
+	aPhiTrace = other.aPhiTrace;
+	numAcceptForSphi = other.numAcceptForSphi;
+	categories = other.categories;
+
+	// proposal bias and std for phi values
+	bias_sphi = other.bias_sphi;
+	std_sphi = other.std_sphi;
+
+	// proposal bias and std for phi values
+	bias_phi = other.bias_phi;
+	std_phi = other.std_phi;
+
+	// proposal bias and std for codon specific parameter
+	bias_csp = other.bias_csp;
+	std_csp = other.std_csp;
+
+	priorA = other.priorA;
+	priorB = other.priorB;
+
+	currentExpressionLevel = other.currentExpressionLevel;
+	proposedExpressionLevel = other.proposedExpressionLevel;
+	expressionTrace = other.expressionTrace;
+	numAcceptForExpression = other.numAcceptForExpression;
+
+	currentMutationParameter = other.currentMutationParameter;
+	proposedMutationParameter = other.proposedMutationParameter;
+
+	currentSelectionParameter = other.currentSelectionParameter;
+	proposedSelectionParameter = other.proposedSelectionParameter;
+
+	numMutationCategories = other.numMutationCategories;
+	numSelectionCategories = other.numSelectionCategories;
+
+	phiEpsilon = other.phiEpsilon;
+	phiEpsilon_proposed = other.phiEpsilon_proposed;
+
+	numMixtures = other.numMixtures;
+}
+ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
+{
+	if (this == &rhs) return *this; // handle self assignment
+	numParam = rhs.numParam;
+
+	Sphi = rhs.Sphi;
+	Aphi = rhs.Aphi;
+	Sphi_proposed = rhs.Sphi_proposed;
+	Aphi_proposed = rhs.Aphi_proposed;
+	sPhiTrace = rhs.sPhiTrace;
+	aPhiTrace = rhs.aPhiTrace;
+	numAcceptForSphi = rhs.numAcceptForSphi;
+	categories = rhs.categories;
+
+	// proposal bias and std for phi values
+	bias_sphi = rhs.bias_sphi;
+	std_sphi = rhs.std_sphi;
+
+	// proposal bias and std for phi values
+	bias_phi = rhs.bias_phi;
+	std_phi = rhs.std_phi;
+
+	// proposal bias and std for codon specific parameter
+	bias_csp = rhs.bias_csp;
+	std_csp = rhs.std_csp;
+
+	priorA = rhs.priorA;
+	priorB = rhs.priorB;
+
+	currentExpressionLevel = rhs.currentExpressionLevel;
+	proposedExpressionLevel = rhs.proposedExpressionLevel;
+	expressionTrace = rhs.expressionTrace;
+	numAcceptForExpression = rhs.numAcceptForExpression;
+
+	currentMutationParameter = rhs.currentMutationParameter;
+	proposedMutationParameter = rhs.proposedMutationParameter;
+
+	currentSelectionParameter = rhs.currentSelectionParameter;
+	proposedSelectionParameter = rhs.proposedSelectionParameter;
+
+	numMutationCategories = rhs.numMutationCategories;
+	numSelectionCategories = rhs.numSelectionCategories;
+
+	phiEpsilon = rhs.phiEpsilon;
+	phiEpsilon_proposed = rhs.phiEpsilon_proposed;
+
+	numMixtures = rhs.numMixtures;
+
+	return *this;
+}
+
+void ROCParameter::initParameterSet(unsigned numGenes, double sphi, unsigned _numMixtures, unsigned* geneAssignment, bool splitSer, std::string _mutationSelectionState,
 		unsigned thetaKMatrix[][2])
 {
 
@@ -32,6 +146,10 @@ ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures
 	Sphi_proposed = sphi;
 	bias_sphi = 0;
 	std_sphi = 0.1;
+
+
+	phiEpsilon = 0.1;
+	phiEpsilon_proposed = 0.1;
 
 	numAcceptForSphi = 0u;
 	// proposal bias and std for phi values
@@ -90,91 +208,6 @@ ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures
 	}
 }
 
-ROCParameter::~ROCParameter()
-{
-	//dtor
-}
-
-ROCParameter::ROCParameter(const ROCParameter& other)
-{
-	numParam = other.numParam;
-
-	Sphi = other.Sphi;
-	Aphi = other.Aphi;
-	Sphi_proposed = other.Sphi_proposed;
-	Aphi_proposed = other.Aphi_proposed;
-	sPhiTrace = other.sPhiTrace;
-	aPhiTrace = other.aPhiTrace;
-	numAcceptForSphi = other.numAcceptForSphi;
-	categories = other.categories;
-
-	// proposal bias and std for phi values
-	bias_sphi = other.bias_sphi;
-	std_sphi = other.std_sphi;
-
-	// proposal bias and std for phi values
-	bias_phi = other.bias_phi;
-	std_phi = other.std_phi;
-
-	// proposal bias and std for codon specific parameter
-	bias_csp = other.bias_csp;
-	std_csp = other.std_csp;
-
-	priorA = other.priorA;
-	priorB = other.priorB;
-
-	currentExpressionLevel = other.currentExpressionLevel;
-	proposedExpressionLevel = other.proposedExpressionLevel;
-	expressionTrace = other.expressionTrace;
-	numAcceptForExpression = other.numAcceptForExpression;
-
-	currentMutationParameter = other.currentMutationParameter;
-	proposedMutationParameter = other.proposedMutationParameter;
-
-	currentSelectionParameter = other.currentSelectionParameter;
-	proposedSelectionParameter = other.proposedSelectionParameter;
-}
-ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
-{
-	if (this == &rhs) return *this; // handle self assignment
-	numParam = rhs.numParam;
-
-	Sphi = rhs.Sphi;
-	Aphi = rhs.Aphi;
-	Sphi_proposed = rhs.Sphi_proposed;
-	Aphi_proposed = rhs.Aphi_proposed;
-	sPhiTrace = rhs.sPhiTrace;
-	aPhiTrace = rhs.aPhiTrace;
-	numAcceptForSphi = rhs.numAcceptForSphi;
-	categories = rhs.categories;
-
-	// proposal bias and std for phi values
-	bias_sphi = rhs.bias_sphi;
-	std_sphi = rhs.std_sphi;
-
-	// proposal bias and std for phi values
-	bias_phi = rhs.bias_phi;
-	std_phi = rhs.std_phi;
-
-	// proposal bias and std for codon specific parameter
-	bias_csp = rhs.bias_csp;
-	std_csp = rhs.std_csp;
-
-	priorA = rhs.priorA;
-	priorB = rhs.priorB;
-
-	currentExpressionLevel = rhs.currentExpressionLevel;
-	proposedExpressionLevel = rhs.proposedExpressionLevel;
-	expressionTrace = rhs.expressionTrace;
-	numAcceptForExpression = rhs.numAcceptForExpression;
-
-	currentMutationParameter = rhs.currentMutationParameter;
-	proposedMutationParameter = rhs.proposedMutationParameter;
-
-	currentSelectionParameter = rhs.currentSelectionParameter;
-	proposedSelectionParameter = rhs.proposedSelectionParameter;
-	return *this;
-}
 
 
 void ROCParameter::initMutationSelectionCategories(std::string files[], unsigned numCategories, unsigned paramType)
@@ -952,24 +985,19 @@ const std::string ROCParameter::selectionShared = "selectionShared";
 const std::string ROCParameter::mutationShared = "mutationShared";
 std::default_random_engine ROCParameter::generator(time(NULL));
 
-// TODO return array as reference and not as return
-double* ROCParameter::drawIidRandomVector(unsigned draws, double mean, double sd, double (*proposal)(double a, double b))
+void ROCParameter::drawIidRandomVector(unsigned draws, double mean, double sd, double (*proposal)(double a, double b), double* randomNumbers)
 {
-	double randomNumbers[draws];
-	for(unsigned i = 0; i < draws; i++)
+	for(unsigned i = 0u; i < draws; i++)
 	{
 		randomNumbers[i] = (*proposal)(mean, sd);
 	}
-	return randomNumbers;
 }
-double* ROCParameter::drawIidRandomVector(unsigned draws, double r, double (*proposal)(double r))
+void ROCParameter::drawIidRandomVector(unsigned draws, double r, double (*proposal)(double r), double* randomNumbers)
 {
-	double randomNumbers[draws];
-	for(unsigned i = 0; i < draws; i++)
+	for(unsigned i = 0u; i < draws; i++)
 	{
 		randomNumbers[i] = (*proposal)(r);
 	}
-	return randomNumbers;
 }
 double ROCParameter::randNorm(double mean, double sd)
 {

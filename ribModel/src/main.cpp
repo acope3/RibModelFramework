@@ -269,7 +269,8 @@ int main()
 	Genome genome;
 	std::cout << "reading fasta file" << std::endl;
 	if(cedric){
-		genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_A_andCleft.fasta");
+		genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/Skluyveri.fasta");
+		//genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_A_andCleft.fasta");
 	}else{
 		genome.readFasta("Skluyveri_chromosomeA.fasta");
 	}
@@ -297,17 +298,18 @@ int main()
 		}
 		std::cout << "initialize ROCParameter object" << std::endl;
 		double sphi_init = 2;
-		double numMixtures = 1;
+		double numMixtures = 2;
 		std::string mixDef = ROCParameter::allUnique;
 		std::cout << "\tSphi init: " << sphi_init << "\n";
 		std::cout << "\t# mixtures: " << numMixtures << "\n";
 		std::cout << "\tmixture definition: " << mixDef << "\n";
 		ROCParameter parameter = ROCParameter(genome.getGenomeSize(), sphi_init, numMixtures, geneAssignment, true, mixDef);
 
-		std::string files[];
-		if(cedric){
-			std::string files[] = {std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv"),
-				std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv")};
+		std::string files[2];
+		if(cedric)
+		{
+			files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv");
+			files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv");
 		}else{
 			std::string files[] = {std::string("Skluyveri_CSP_ChrA.csv"), std::string("Skluyveri_CSP_ChrCleft.csv")};
 		}
@@ -321,7 +323,7 @@ int main()
 
 
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
-        int samples = 2000;
+        int samples = 3000;
 		int thining = 10;
 		int useSamples = 100;
 

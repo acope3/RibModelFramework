@@ -5,32 +5,12 @@
 
 CovarianceMatrix::CovarianceMatrix()
 {
-    numVariates = 2; //Square 2x2 matrix
-    unsigned vectorLength = numVariates * numVariates;
-    covMatrix.resize(vectorLength);
-    choleskiMatrix.resize(vectorLength);
-
-    for(int i = 0; i < vectorLength; i++)
-    {
-        covMatrix[i] = (i % (numVariates + 1) ? 0.0 : 1.0);
-        choleskiMatrix[i] = 0.0;
-    }
+	initCovarianceMatrix(2);
 
 }
 CovarianceMatrix::CovarianceMatrix(int _numVariates)
 {
-    numVariates = _numVariates;
-    unsigned vectorLength = numVariates * numVariates;
-    covMatrix.resize(vectorLength);
-    choleskiMatrix.resize(vectorLength);
-
-    for(int i = 0; i < vectorLength; i++)
-    {
-        covMatrix[i] = (i % (numVariates + 1) ? 0.0 : 1.0);
-        //covMatrix[i] = ((i % (numVariates + 1)) == 0 ? 1.0 : 0.0);
-        choleskiMatrix[i] = 0.0;
-    }
-
+	initCovarianceMatrix(_numVariates);
 }
 
 CovarianceMatrix::CovarianceMatrix(std::vector <double> &matrix)
@@ -69,6 +49,21 @@ CovarianceMatrix& CovarianceMatrix::operator=(const CovarianceMatrix& rhs)
     return *this;
 }
 */
+void CovarianceMatrix::initCovarianceMatrix(unsigned _numVariates)
+{
+    numVariates = _numVariates;
+    unsigned vectorLength = numVariates * numVariates;
+    covMatrix.resize(vectorLength);
+    choleskiMatrix.resize(vectorLength);
+
+    for(unsigned i = 0u; i < vectorLength; i++)
+    {
+        covMatrix[i] = (i % (numVariates + 1) ? 0.0 : 1.0);
+        choleskiMatrix[i] = 0.0;
+    }
+}
+
+
 // addaptatoin of http://en.wikipedia.org/wiki/Cholesky_decomposition
 // http://rosettacode.org/wiki/Cholesky_decomposition#C
 void CovarianceMatrix::choleskiDecomposition()
@@ -107,9 +102,9 @@ void CovarianceMatrix::calculateCovarianceMatrixFromTraces(std::vector<std::vect
     }
 
 
-    for(int i = 0; i < numVariates; i++)
+    for(unsigned i = 0u; i < numVariates; i++)
     {
-        for (int k = 0; k < numVariates; k++)
+        for (unsigned k = 0u; k < numVariates; k++)
         {
             double nonNormalizedCovariance = 0.0; // missing term 1/(n-1)
             for(unsigned j = start; j < curSample; j++)

@@ -20,7 +20,7 @@ class Genome
 {
     private:
         std::vector<Gene> genes;
-				std::vector<Gene> simulatedGenes;
+		std::vector<Gene> simulatedGenes;
     public:
         //constructor/destructor
         explicit Genome();
