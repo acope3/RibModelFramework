@@ -314,7 +314,7 @@ using namespace Rcpp;
 RCPP_MODULE(SequenceSummary_mod)
 {
     class_<SequenceSummary>( "SequenceSummary" )
-    //.constructor("empty constructor")
+    .constructor("empty constructor")
 	.constructor<std::string>("Initialize with a DNA Sequence. Sequence must be a multiple of 3")
 //		.constructor<SequenceSummary>() //custom object...How?
 		//operator overloading????
