@@ -22,13 +22,12 @@ estimateHyperParameter(true)
     adaptiveWidth = 100;
 }
 
-MCMCAlgorithm::MCMCAlgorithm(int _samples, int _thining, bool _estimateExpression, bool _estimateCodonSpecificParameter, bool _estimateHyperParameter)
+MCMCAlgorithm::MCMCAlgorithm(int _samples, int _thining, bool _estimateExpression, bool _estimateCodonSpecificParameter, bool _estimateHyperParameter,
+		unsigned _adaptiveWidth)
     : samples(_samples), thining(_thining), estimateExpression(_estimateExpression), estimateCodonSpecificParameter(_estimateCodonSpecificParameter),
-        estimateHyperParameter(_estimateHyperParameter)
+        estimateHyperParameter(_estimateHyperParameter), adaptiveWidth(_adaptiveWidth)
 {
-    // TODO add adaptiveWidth to constructor
     likelihoodTrace.resize(samples + 1);
-    adaptiveWidth = 100;
 }
 
 MCMCAlgorithm::~MCMCAlgorithm()
@@ -388,3 +387,24 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
 
 }
 
+
+// ---------------------------------------------------------------------------
+// ----------------------------- RCPP STUFF ----------------------------------
+// ---------------------------------------------------------------------------
+#ifndef STANDALONE
+#include <Rcpp.h>
+using namespace Rcpp;
+
+RCPP_EXPOSED_CLASS(Genome)
+RCPP_EXPOSED_CLASS(ROCParameter)
+RCPP_EXPOSED_CLASS(ROCModel)
+
+RCPP_MODULE(MCMCAlgorithm_mod)
+{
+	class_<MCMCAlgorithm>( "MCMCAlgorithm" )
+		.constructor("empty constructor")
+		.constructor <int, int, bool, bool, bool, unsigned>()
+		.method("run", &MCMCAlgorithm::run)
+	;
+}
+#endif
