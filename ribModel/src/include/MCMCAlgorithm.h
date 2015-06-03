@@ -26,8 +26,8 @@ class MCMCAlgorithm
 
     public:
         explicit MCMCAlgorithm();
-        MCMCAlgorithm(int samples, int thining, bool _estimateExpression = true, bool _estimateCodonSpecificParameter = true, 
-						bool _estimateHyperParameter = true, unsigned _adaptiveWidth = 100);
+        MCMCAlgorithm(int samples, int thining, unsigned _adaptiveWidth = 100, bool _estimateExpression = true, bool _estimateCodonSpecificParameter = true,
+						bool _estimateHyperParameter = true);
         virtual ~MCMCAlgorithm();
         MCMCAlgorithm(const MCMCAlgorithm& other);
 

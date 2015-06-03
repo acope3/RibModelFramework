@@ -14,18 +14,16 @@
 
 
 
-MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), estimateExpression(true), estimateCodonSpecificParameter(true),
-estimateHyperParameter(true)
+MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100), estimateExpression(true),
+estimateCodonSpecificParameter(true), estimateHyperParameter(true)
 {
     MCMCAlgorithm(1000, 1, true, true, true);
     likelihoodTrace.resize(samples + 1);
-    adaptiveWidth = 100;
 }
 
-MCMCAlgorithm::MCMCAlgorithm(int _samples, int _thining, bool _estimateExpression, bool _estimateCodonSpecificParameter, bool _estimateHyperParameter,
-		unsigned _adaptiveWidth)
-    : samples(_samples), thining(_thining), estimateExpression(_estimateExpression), estimateCodonSpecificParameter(_estimateCodonSpecificParameter),
-        estimateHyperParameter(_estimateHyperParameter), adaptiveWidth(_adaptiveWidth)
+MCMCAlgorithm::MCMCAlgorithm(int _samples, int _thining, unsigned _adaptiveWidth, bool _estimateExpression, bool _estimateCodonSpecificParameter, bool _estimateHyperParameter)
+    : samples(_samples), thining(_thining), adaptiveWidth(_adaptiveWidth), estimateExpression(_estimateExpression), estimateCodonSpecificParameter(_estimateCodonSpecificParameter),
+        estimateHyperParameter(_estimateHyperParameter)
 {
     likelihoodTrace.resize(samples + 1);
 }
