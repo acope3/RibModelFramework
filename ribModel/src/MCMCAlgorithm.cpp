@@ -228,7 +228,7 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
     unsigned maximumIterations = samples * thining;
     // initialize everything
 
-    parameter.initAllTraces(samples, genome.getGenomeSize());
+    parameter.initAllTraces(samples, genome.getGenomeSize(), maximumIterations/adaptiveWidth);
     CovarianceMatrix covmat = CovarianceMatrix(2);
     // starting the MCMC
 

@@ -355,15 +355,51 @@ void ROCParameter::initCategoryDefinitions(std::string mutationSelectionState, u
 	//of unique categories.
 }
 
-void ROCParameter::initAllTraces(unsigned samples, unsigned num_genes)
+void ROCParameter::initAllTraces(unsigned samples, unsigned num_genes, unsigned adaptiveSamples)
 {
 	initExpressionTrace(samples, num_genes);
 	initMixtureAssignmentTrace(samples, num_genes);
+	initExpressionAcceptanceRatioTrace(samples, adaptiveSamples);
 	initSphiTrace(samples);
+	initSphiAcceptanceRatioTrace(adaptiveSamples);
 	initCategoryProbabilitesTrace(samples);
 	initSelectionParameterTrace(samples);
 	initMutationParameterTrace(samples);
+	initCSPAcceptanceRatioTrace(adaptiveSamples);
 }
+
+void ROCParameter::initSphiAcceptanceRatioTrace(unsigned samples)
+{
+	sphiAcceptanceRatioTrace.resize(samples);
+}
+
+void ROCParameter::initExpressionAcceptanceRatioTrace(unsigned samples, unsigned num_genes)
+{
+	expressionAcceptanceRatioTrace.resize(numMixtures);
+	for(unsigned category = 0; category < numMixtures; category++)
+	{
+		expressionAcceptanceRatioTrace[category].resize(num_genes);
+		for(unsigned i = 0; i < num_genes; i++)
+		{
+			expressionAcceptanceRatioTrace[category][i].resize(samples);
+			std::vector<double> temp(samples, 0.0);
+			expressionAcceptanceRatioTrace[category][i] = temp;
+		}
+	}
+}
+void ROCParameter::initCSPAcceptanceRatioTrace(unsigned samples)
+{
+	cspAcceptanceRatioTrace.resize(22);
+	for (unsigned i = 0; i < 22; i++)
+	{
+		cspAcceptanceRatioTrace[i].resize(samples);
+		std::vector <double> temp(samples, 0.0);
+		cspAcceptanceRatioTrace[i] = temp;
+	}
+}
+
+
+
 void ROCParameter::initExpressionTrace(unsigned samples, unsigned num_genes)
 {
 	expressionTrace.resize(numMixtures);
@@ -784,6 +820,7 @@ double ROCParameter::getSphiVariance(unsigned samples, bool unbiased)
 void ROCParameter::adaptSphiProposalWidth(unsigned adaptationWidth)
 {
 	double acceptanceLevel = (double)numAcceptForSphi / (double)adaptationWidth;
+	sphiAcceptanceRatioTrace.push_back(acceptanceLevel);
 	if(acceptanceLevel < 0.2)
 	{
 		std_sphi = std::max(0.01, std_sphi * 0.8);
@@ -802,6 +839,7 @@ void ROCParameter::adaptExpressionProposalWidth(unsigned adaptationWidth)
         for(unsigned i = 0; i < numExpressionLevels; i++)
         {
             double acceptanceLevel = (double)numAcceptForExpression[cat][i] / (double)adaptationWidth;
+            expressionAcceptanceRatioTrace[cat][i].push_back(acceptanceLevel);
             if(acceptanceLevel < 0.2)
             {
                 std_phi[cat][i] = std::max(0.01, std_phi[cat][i] * 0.8);
@@ -821,6 +859,7 @@ void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 	{
         if(i == 21 || i == 10 || i == 18) continue;
         double acceptanceLevel = (double)numAcceptForMutationAndSelection[i] / (double)adaptationWidth;
+        cspAcceptanceRatioTrace[i].push_back(acceptanceLevel);
         unsigned codonRange[2];
         SequenceSummary::AAindexToCodonRange(i, true, codonRange);
         for(unsigned k = codonRange[0]; k < codonRange[1]; k++)

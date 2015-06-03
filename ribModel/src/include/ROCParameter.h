@@ -29,6 +29,11 @@ class ROCParameter
 		std::vector<double> aPhiTrace;
 		unsigned numAcceptForSphi;
 
+
+		std::vector<double> sphiAcceptanceRatioTrace; // sample
+		std::vector<std::vector<std::vector<double>>> expressionAcceptanceRatioTrace; // order: category, gene, sample
+		std::vector<std::vector<double>> cspAcceptanceRatioTrace; // order: gene, sample
+
 		double phiEpsilon;
 		double phiEpsilon_proposed;
 
@@ -212,13 +217,17 @@ class ROCParameter
 		void getParameterForCategory(unsigned category, unsigned parameter, char aa, bool proposal, double* returnValue);
 
 		// functions to manage traces
-		void initAllTraces(unsigned samples, unsigned num_genes);
+		void initAllTraces(unsigned samples, unsigned num_genes, unsigned adaptiveSamples);
 		void initExpressionTrace(unsigned samples, unsigned num_genes);
 		void initSelectionParameterTrace(unsigned samples);
 		void initMutationParameterTrace(unsigned samples);
 		void initSphiTrace(unsigned sample) {sPhiTrace.resize(sample);}
 		void initMixtureAssignmentTrace(unsigned samples, unsigned num_genes);
 		void initCategoryProbabilitesTrace(int samples);
+		void initExpressionAcceptanceRatioTrace(unsigned samples, unsigned num_genes);
+		void initCSPAcceptanceRatioTrace(unsigned samples);
+		void initSphiAcceptanceRatioTrace(unsigned samples);
+
 		void updateExpressionTrace(unsigned sample, unsigned geneIndex)
 		{
 			for(unsigned category = 0; category < numSelectionCategories; category++)

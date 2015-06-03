@@ -127,7 +127,7 @@ void testRandMultiNom(unsigned numCat)
 
 void testThetaKMatrix()
 {
-	unsigned matrix[2][2] = { {2,1}, {1,1} };
+	//unsigned matrix[2][2] = { {2,1}, {1,1} };
 	std::cout << "------------------ TEST THETAKMATRIX ------------------" << std::endl;
 	ROCParameter R(100, 2, 2, nullptr, true, "allUnique");
 
