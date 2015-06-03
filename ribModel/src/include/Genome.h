@@ -36,22 +36,23 @@ class Genome
 				std::vector <Gene> getSimulatedGenes() {return simulatedGenes;}
         Gene& getGene(int index);
         Gene& getGene(std::string id);
-				void simulateGenome(ROCParameter& parameter, ROCModel& model);
+		void simulateGenome(ROCParameter& parameter, ROCModel& model);
         unsigned getGenomeSize() {return genes.size();}
 
     protected:
 };
 
-//using namespace Rcpp;
-//RCPP_MODULE(mGenome)
-//{
-//    class_<Genome>("Genome")
-//    .constructor<>()
-//    .constructor<std::string, std::string, std::string>()
-//
-//    .method("readFasta", &Genome::readFasta)
-//    .method("writeFasta", &Genome::writeFasta)
-//    ;
-//}
+#ifndef STANDALONE
+#include <Rcpp.h>
+using namespace Rcpp;
+RCPP_MODULE(Genome_mod)
+{
+    class_<Genome>("Genome")
+    .constructor<>()
 
+    .method("readFasta", &Genome::readFasta)
+    .method("writeFasta", &Genome::writeFasta)
+    ;
+}
+#endif
 #endif // GENOME_H

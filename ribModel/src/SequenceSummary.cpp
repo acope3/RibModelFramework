@@ -82,8 +82,8 @@ const std::map<char, int> SequenceSummary::aaToIndex = {{'A', 0}, {'C', 1}, {'D'
 
 void SequenceSummary::AAindexToCodonRange(unsigned aaIndex, bool forParamVector, unsigned aaRange[])
 {
-    unsigned startAAIndex;
-    unsigned endAAIndex;
+    unsigned startAAIndex = 0;
+    unsigned endAAIndex = 0;
     char aa = AminoAcidArray[aaIndex];
 
 		if (aa == 'A') 
@@ -317,16 +317,16 @@ using namespace Rcpp;
 RCPP_MODULE(SequenceSummary_mod)
 {
     class_<SequenceSummary>( "SequenceSummary" )
-    //.constructor("empty constructor")
+    .constructor("empty constructor")
 	.constructor<std::string>("Initialize with a DNA Sequence. Sequence must be a multiple of 3")
-//		.constructor<SequenceSummary>() //custom object...How?
+	//.constructor<SequenceSummary>("Copy constructor") //custom object...How?
 		//operator overloading????
 
-    .method("getCodonCount", &SequenceSummary::getCodonCount)
-	.method("getAAcount", &SequenceSummary::getAAcount)
+    .method("getCodonCount", &SequenceSummary::getCodonCount, "returns occurrence of given codon in sequence")
+	.method("getAAcount", &SequenceSummary::getAAcount, "returns occurrence of a given amino acid in a sequence")
 
-	.method("processSequence", &SequenceSummary::processSequence)
-	.method("clear", &SequenceSummary::clear)
+	.method("processSequence", &SequenceSummary::processSequence, "generates codon and amino acid count for sequence")
+	.method("clear", &SequenceSummary::clear, "removes all data from object")
 	;
 }
 #endif
