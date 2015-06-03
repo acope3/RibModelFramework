@@ -289,6 +289,7 @@ RCPP_MODULE(Genome_mod)
     .method("readFasta", &Genome::readFasta)
     .method("writeFasta", &Genome::writeFasta)
     .method("getGeneByIndex", &Genome::getGeneByIndex)
-		;
+    .method("getGenomeSize", &Genome::getGenomeSize)
+	;
 }
 #endif
