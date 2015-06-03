@@ -7,16 +7,17 @@
 #include <fstream>
 ROCParameter::ROCParameter()
 {
-	initParameterSet(100, 2, 1, nullptr, true, "allUnique", nullptr);
+	std::vector <unsigned> empty;
+	initParameterSet(100, 2, 1, empty, true, "allUnique", nullptr);
 }
 
 ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures,
-		unsigned* geneAssignment, bool splitSer, unsigned thetaKMatrix[][2])
+		std::vector<unsigned> geneAssignment, bool splitSer, unsigned thetaKMatrix[][2])
 {
 	initParameterSet(numGenes, sphi, _numMixtures, geneAssignment, splitSer, nullptr, thetaKMatrix);
 }
 ROCParameter::ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures,
-		unsigned* geneAssignment, bool splitSer, std::string _mutationSelectionState)
+		std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState)
 {
 	initParameterSet(numGenes, sphi, _numMixtures, geneAssignment, splitSer, _mutationSelectionState, nullptr);
 }
@@ -124,13 +125,13 @@ ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
 	return *this;
 }
 
-void ROCParameter::initParameterSet(unsigned numGenes, double sphi, unsigned _numMixtures, unsigned* geneAssignment, bool splitSer, std::string _mutationSelectionState,
+void ROCParameter::initParameterSet(unsigned numGenes, double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState,
 		unsigned thetaKMatrix[][2])
 {
 
 	// assign genes to mixture element
 	mixtureAssignment.resize(numGenes, 0);
-	if(geneAssignment)
+	if(!geneAssignment.empty())
 	{
 		for(unsigned i = 0u; i < numGenes; i++)
 		{
@@ -210,7 +211,7 @@ void ROCParameter::initParameterSet(unsigned numGenes, double sphi, unsigned _nu
 
 
 
-void ROCParameter::initMutationSelectionCategories(std::string files[], unsigned numCategories, unsigned paramType)
+void ROCParameter::initMutationSelectionCategories(std::vector<std::string> files, unsigned numCategories, unsigned paramType)
 {
 	unsigned i, j;
 	std::size_t pos, pos2;
@@ -560,7 +561,7 @@ void ROCParameter::InitializeExpression(double sd_phi)
 		}
 	}
 }
-void ROCParameter::InitializeExpression(double* expression)
+void ROCParameter::InitializeExpression(std::vector<double> expression)
 {
 	unsigned numGenes = currentExpressionLevel[0].size();
 	for(unsigned category = 0u; category < numSelectionCategories; category++)
@@ -982,24 +983,23 @@ void ROCParameter::updateCodonSpecificParameter(char aa)
 	}
 }
 
-void ROCParameter::readPhiValues(char *filename, double temp[])
+std::vector <double> ROCParameter::readPhiValues(std::string filename)
 {
-
-	int j;
 	std::size_t pos, pos2;
 	std::ifstream currentFile;
 	std::string tmpString;
-    currentFile.open(filename);
-    if (currentFile.fail())
-    {
-      std::cerr <<"Error opening file\n";
-      std::exit(1);
-		}
+	std::vector<double> RV;
+
+	currentFile.open(filename);
+  if (currentFile.fail())
+	{
+		std::cerr <<"Error opening file\n";
+		std::exit(1);
+	}
 
 	currentFile >> tmpString; //trash the first line, no info given.
 
 
-	j = 0;
 	while (currentFile >> tmpString)
 	{
 		pos = tmpString.find(",");
@@ -1007,10 +1007,11 @@ void ROCParameter::readPhiValues(char *filename, double temp[])
 		if (pos != std::string::npos && pos2 != std::string::npos)
 		{
 			std::string val = tmpString.substr(pos + 1, pos2 - (pos + 1));
-			temp[j] = std::stod(val);
-			j++;
+			RV.push_back(std::stod(val));
 		}
 	}
+
+	return RV;
 }
 
 /*
@@ -1201,5 +1202,39 @@ void ROCParameter::swap(int& a, int& b)
 	b = temp;
 }
 
+
+#ifndef STANDALONE
+#include <Rcpp.h>
+using namespace Rcpp;
+
+RCPP_EXPOSED_CLASS(Genome)
+
+RCPP_MODULE(ROCParameter_mod)
+{
+	class_<ROCParameter>( "ROCParameter" )
+    .constructor("empty constructor")
+		.constructor <unsigned, double, unsigned, std::vector<unsigned>, bool, std::string>("#Genes, sphi, #mixtures, gene assignment, splitSer?, mutation/selection state")
+
+		.method("initMutationSelectionCategories", &ROCParameter::initMutationSelectionCategories)
+		.method("readPhiValues", &ROCParameter::readPhiValues)
+		.method("initializeExpressionByGenome", &ROCParameter::initializeExpressionByGenome)
+		.method("initializeExpressionByList", &ROCParameter::initializeExpressionByList)
+		.method("initializeExpressionByRandom", &ROCParameter::initializeExpressionByRandom)
+		.method("getMixtureAssignment", &ROCParameter::getMixtureAssignment)
+		.method("setMixtureAssignment", &ROCParameter::setMixtureAssignment)
+		.method("getCategoryProbabilitiesTrace", &ROCParameter::getCategoryProbabilitiesTrace)
+
+		.method("getMixtureAssignmentTraceForGene", &ROCParameter::getMixtureAssignmentTraceForGene)
+		.method("getSelectionParameterTraceByCategoryForCodon", &ROCParameter::getSelectionParameterTraceByCategoryForCodon)
+		.method("getMutationParameterTraceByCategoryForCodon", &ROCParameter::getMutationParameterTraceByCategoryForCodon)
+		.method("getExpressionTraceForGene", &ROCParameter::getExpressionTraceForGene)
+		.method("getExpressionTraceByCategoryForGene", &ROCParameter::getExpressionTraceByCategoryForGene)
+		.property("getSPhiTrace", &ROCParameter::getSPhiTrace)
+		.property("numMutationCategories", &ROCParameter::getNumMutationCategories)
+		.property("numSelectionCategories", &ROCParameter::getNumSelectionCategories)
+		//.property("mixtureAssignment", &ROCParameter::getMixtureAssignment, &ROCParameter::setMixtureAssignment)
+	;
+}
+#endif
 
 

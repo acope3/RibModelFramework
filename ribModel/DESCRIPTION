@@ -6,7 +6,7 @@ Date: 2015-01-22
 Author: Your Name
 Maintainer: Your Name <your@email.com>
 Depends: Rcpp
-RcppModules: Genome_mod, Gene_mod
+RcppModules: ROCParameter_mod, Genome_mod, Gene_mod
 Description: More about what it does (maybe more than one line)
 License: GPL (>= 2)
 Imports: Rcpp (>= 0.11.3)

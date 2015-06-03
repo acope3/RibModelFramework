@@ -39,6 +39,9 @@ class Genome
 		void simulateGenome(ROCParameter& parameter, ROCModel& model);
         unsigned getGenomeSize() {return genes.size();}
 
+		//R wrapper functions
+		Gene& getGeneByIndex(int index) {return getGene(index);}
+
     protected:
 };
 

@@ -294,6 +294,9 @@ void Genome::simulateGenome(ROCParameter& parameter, ROCModel& model)
 #ifndef STANDALONE
 #include <Rcpp.h>
 using namespace Rcpp;
+
+RCPP_EXPOSED_CLASS(Gene)
+
 RCPP_MODULE(Genome_mod)
 {
     class_<Genome>("Genome")
@@ -301,6 +304,7 @@ RCPP_MODULE(Genome_mod)
 
     .method("readFasta", &Genome::readFasta)
     .method("writeFasta", &Genome::writeFasta)
-    ;
+    .method("getGeneByIndex", &Genome::getGeneByIndex)
+		;
 }
 #endif
