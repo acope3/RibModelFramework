@@ -54,11 +54,11 @@ void Genome::getCountsForAA(char aa, unsigned codonCounts[][5])
 	}
 }
 
-void Genome::writeFasta (char* filename, bool simulated)
+void Genome::writeFasta (std::string filename, bool simulated)
 {
 	try {
 		std::ofstream Fout;
-		Fout.open(filename);
+		Fout.open(filename.c_str());
 		if (Fout.fail())
 		{
 			std::cerr <<"Cannot open output Fasta file " << filename <<"\n";
@@ -95,12 +95,12 @@ void Genome::writeFasta (char* filename, bool simulated)
 	catch(char* pMsg) { std::cerr << std::endl << "Exception:" << pMsg << std::endl; }
 }
 
-void Genome::readFasta(char* filename) // read Fasta format sequences
+void Genome::readFasta(std::string filename) // read Fasta format sequences
 {
 	try
 	{
 		std::ifstream Fin;
-		Fin.open(filename);
+		Fin.open(filename.c_str());
 		if (Fin.fail())
 		{
 			std::cerr <<"Genome::readFasta throws: Cannot open input Fasta file " << filename <<"\n";
@@ -297,7 +297,7 @@ using namespace Rcpp;
 RCPP_MODULE(Genome_mod)
 {
     class_<Genome>("Genome")
-    .constructor<>()
+    .constructor()
 
     .method("readFasta", &Genome::readFasta)
     .method("writeFasta", &Genome::writeFasta)
