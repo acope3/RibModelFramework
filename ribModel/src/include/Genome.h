@@ -6,7 +6,7 @@
 
 //#include <Rcpp.h>
 
-#include "../include/Gene.h"
+#include "Gene.h"
 
 
 //IMPORTANT NOTE: forward declarations used. Includes are in genome.cpp. 
@@ -28,8 +28,8 @@ class Genome
         Genome(const Genome& other);
         Genome& operator=(const Genome& other);
 
-        void readFasta(char* filename);
-        void writeFasta(char* filename, bool simulated = false);
+        void readFasta(std::string filename);
+        void writeFasta(std::string filename, bool simulated = false);
         void addGene(const Gene& gene);
         void getCountsForAA(char aa, unsigned codonCounts[][5]);
 		std::vector <Gene> getGenes() {return genes;}
