@@ -1201,12 +1201,12 @@ RCPP_MODULE(ROCParameter_mod)
 		.method("getMixtureAssignment", &ROCParameter::getMixtureAssignment)
 		.method("setMixtureAssignment", &ROCParameter::setMixtureAssignment)
 		.method("getCategoryProbabilitiesTrace", &ROCParameter::getCategoryProbabilitiesTrace)
-
 		.method("getMixtureAssignmentTraceForGene", &ROCParameter::getMixtureAssignmentTraceForGene)
 		.method("getSelectionParameterTraceByCategoryForCodon", &ROCParameter::getSelectionParameterTraceByCategoryForCodon)
 		.method("getMutationParameterTraceByCategoryForCodon", &ROCParameter::getMutationParameterTraceByCategoryForCodon)
 		.method("getExpressionTraceForGene", &ROCParameter::getExpressionTraceForGene)
 		.method("getExpressionTraceByCategoryForGene", &ROCParameter::getExpressionTraceByCategoryForGene)
+		
 		.property("getSPhiTrace", &ROCParameter::getSPhiTrace)
 		.property("numMutationCategories", &ROCParameter::getNumMutationCategories)
 		.property("numSelectionCategories", &ROCParameter::getNumSelectionCategories)

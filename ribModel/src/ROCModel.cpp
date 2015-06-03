@@ -191,4 +191,14 @@ void ROCModel::obtainCodonCount(SequenceSummary& seqsum, char curAA, int codonCo
 
 
 
+#ifndef STANDALONE
+#include <Rcpp.h>
+using namespace Rcpp;
 
+RCPP_MODULE(ROCModel_mod)
+{
+	class_<ROCModel>( "ROCModel" )
+    .constructor("empty constructor")
+	;
+}
+#endif
