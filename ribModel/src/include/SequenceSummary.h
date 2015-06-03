@@ -3,6 +3,8 @@
 
 #include <string>
 #include <map>
+#include <algorithm>
+#include <cctype>
 
 class SequenceSummary
 {
@@ -36,9 +38,16 @@ class SequenceSummary
         int getCodonCountForCodon(int codon) {return ncodons[codon];}
 
 
-				//R Wrapper Functions
-				int getAAcount(char aa) {return getAAcountForAA(aa);}
-				int getCodonCount(std::string& codon) {return getCodonCountForCodon(codon);}
+		//R Wrapper Functions
+		int getAAcount(char aa) {aa = std::toupper(aa);	return getAAcountForAA(aa);}
+		int getCodonCount(std::string& codon)
+		{
+			codon[0] = std::toupper(codon[0]);
+			codon[1] = std::toupper(codon[1]);
+			codon[2] = std::toupper(codon[2]);
+
+			return (codon.length() != 3) ? -1 : getCodonCountForCodon(codon);
+		}
 
 
 

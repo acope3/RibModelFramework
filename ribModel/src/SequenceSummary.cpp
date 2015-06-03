@@ -1,8 +1,7 @@
 #include "include/SequenceSummary.h"
 
-#include <ctype.h>
+//#include <ctype.h>
 #include <algorithm>
-
 
 SequenceSummary::SequenceSummary()
 {
@@ -46,13 +45,17 @@ void SequenceSummary::clear()
 
 void SequenceSummary::processSequence(const std::string& sequence)
 {
-		int codonID;
-		int aaID;
-		std::string codon;
-		
+	int codonID;
+	int aaID;
+	std::string codon;
+
     for(unsigned i = 0u; i < sequence.length(); i+=3)
     {
         codon = sequence.substr(i, 3);
+		codon[0] = std::toupper(codon[0]);
+		codon[1] = std::toupper(codon[1]);
+		codon[2] = std::toupper(codon[2]);
+
         codonID = SequenceSummary::CodonToIndex( codon );
         aaID = SequenceSummary::CodonToAAIndex( codon );
         ncodons[codonID]++;
