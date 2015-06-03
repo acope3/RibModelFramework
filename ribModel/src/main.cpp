@@ -129,12 +129,13 @@ void testThetaKMatrix()
 {
 	unsigned matrix[2][2] = { {2,1}, {1,1} };
 	std::cout << "------------------ TEST THETAKMATRIX ------------------" << std::endl;
-	ROCParameter R(100, 2, 2, nullptr, true, "allUnique");
+	std::vector<unsigned> empty;
+	ROCParameter R(100, 2, 2, empty, true, "allUnique");
 
 	R.printThetaKMatrix();
 	std::cout <<"numMutationCategories: " << R.getNumMutationCategories() <<"\n";
 	std::cout <<"numSelectionCategories: " << R.getNumSelectionCategories() <<"\n";
-	std::string files[] = {std::string("Skluyveri_CSP_ChrA.csv"), std::string("Skluyveri_CSP_ChrCleft.csv")};
+	std::vector<std::string> files = {"Skluyveri_CSP_ChrA.csv", "Skluyveri_CSP_ChrCleft.csv"};
 	std::cout <<"files array good to go\n";
 	R.initMutationSelectionCategories(files, R.getNumMutationCategories(), ROCParameter::dM);
 	R.initMutationSelectionCategories(files, R.getNumSelectionCategories(), ROCParameter::dEta);
@@ -174,7 +175,7 @@ void testSimulateGenome(Genome& genome)
 
 
 	ROCModel model;
-	unsigned geneAssignment[genome.getGenomeSize()];
+	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 	for(unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{
 		if(i < 448) geneAssignment[i] = 0u;
@@ -185,22 +186,22 @@ void testSimulateGenome(Genome& genome)
 
 	std::cout << "initialize ROCParameter object" << std::endl;
 	double sphi_init = 2;
-	double numMixtures = 2;
+	unsigned numMixtures = 2;
 	std::string mixDef = ROCParameter::mutationShared;
 	std::cout << "\tSphi init: " << sphi_init << "\n";
 	std::cout << "\t# mixtures: " << numMixtures << "\n";
 	std::cout << "\tmixture definition: " << mixDef << "\n";
-	ROCParameter parameter = ROCParameter(genome.getGenomeSize(), sphi_init, numMixtures, geneAssignment, true, mixDef);
+	ROCParameter parameter(genome.getGenomeSize(), sphi_init, numMixtures, geneAssignment, true, mixDef);
 	int numParam = parameter.getNumParam();
-	std::string files[] = {std::string("Skluyveri_CSP_ChrA.csv"), std::string("Skluyveri_CSP_ChrCleft.csv")};
+	std::vector<std::string> files = {"Skluyveri_CSP_ChrA.csv", "Skluyveri_CSP_ChrCleft.csv"};
 	parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
 	parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
 
 
 
 	//parameter.InitializeExpression(genome, sphi_init);
-	double phiVals[genome.getGenomeSize()];
-	parameter.readPhiValues("Skluyveri_ChrA_ChrCleft_phi_est.csv", phiVals);
+	std::vector<double> phiVals;
+	phiVals = parameter.readPhiValues("Skluyveri_ChrA_ChrCleft_phi_est.csv");
 	parameter.InitializeExpression(phiVals);
 
 	std::cout << "done initialize ROCParameter object" << std::endl;
@@ -289,8 +290,8 @@ int main()
 			 testThetaKMatrix();*/
 		testSimulateGenome(genome);
 	}else{
-		ROCModel model = ROCModel();
-		unsigned geneAssignment[genome.getGenomeSize()];
+		ROCModel model;
+		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 		for(unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
 			if(i < 448) geneAssignment[i] = 0u;
@@ -305,7 +306,7 @@ int main()
 		std::cout << "\tmixture definition: " << mixDef << "\n";
 		ROCParameter parameter = ROCParameter(genome.getGenomeSize(), sphi_init, numMixtures, geneAssignment, true, mixDef);
 
-		std::string files[2];
+		std::vector<std::string> files(2);
 		if(cedric)
 		{
 			files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv");
@@ -317,8 +318,8 @@ int main()
 		parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
 		parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
 		parameter.InitializeExpression(genome, sphi_init);
-		//double phiVals[genome.getGenomeSize()];
-		//parameter.readPhiValues("Skluyveri_ChrA_ChrCleft_phi_est.csv", phiVals);
+		//std::vector<double> phiVals;
+		//phiVals = parameter.readPhiValues("Skluyveri_ChrA_ChrCleft_phi_est.csv");
 		//parameter.InitializeExpression(phiVals);
 		std::cout << "done initialize ROCParameter object" << std::endl;
 

@@ -113,6 +113,9 @@ std::string Gene::toAAsequence()
 #ifndef STANDALONE
 #include <Rcpp.h>
 using namespace Rcpp;
+
+RCPP_EXPOSED_CLASS(Gene)
+
 RCPP_MODULE(Gene_mod)
 {
   class_<Gene>( "Gene" )
