@@ -107,4 +107,28 @@ std::string Gene::toAAsequence()
 
 
 
+// ---------------------------------------------------------------------------
+// ----------------------------- RCPP STUFF ----------------------------------
+// ---------------------------------------------------------------------------
+#ifndef STANDALONE
+#include <Rcpp.h>
+using namespace Rcpp;
+RCPP_MODULE(Gene_mod)
+{
+  class_<Gene>( "Gene" )
+    
+		.constructor("empty constructor")
+    .constructor<std::string, std::string, std::string >("Initialize a gene by giving the id, description, and sequence string")
+
+    .property("id", &Gene::getId, &Gene::setId)
+    .property("description", &Gene::getDescription, &Gene::setDescription)
+    .property("seq", &Gene::getSequence, &Gene::setSequence)
+
+		.method("getAACount", &Gene::getAACount)
+		.method("getCodonCount", &Gene::getCodonCount)
+		.method("clear", &Gene::clear)
+    .method("length", &Gene::length)
+  ;
+}
+#endif
 

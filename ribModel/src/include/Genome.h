@@ -32,8 +32,8 @@ class Genome
         void writeFasta(char* filename, bool simulated = false);
         void addGene(const Gene& gene);
         void getCountsForAA(char aa, unsigned codonCounts[][5]);
-				std::vector <Gene> getGenes() {return genes;}
-				std::vector <Gene> getSimulatedGenes() {return simulatedGenes;}
+		std::vector <Gene> getGenes() {return genes;}
+		std::vector <Gene> getSimulatedGenes() {return simulatedGenes;}
         Gene& getGene(int index);
         Gene& getGene(std::string id);
 		void simulateGenome(ROCParameter& parameter, ROCModel& model);
@@ -42,17 +42,4 @@ class Genome
     protected:
 };
 
-#ifndef STANDALONE
-#include <Rcpp.h>
-using namespace Rcpp;
-RCPP_MODULE(Genome_mod)
-{
-    class_<Genome>("Genome")
-    .constructor<>()
-
-    .method("readFasta", &Genome::readFasta)
-    .method("writeFasta", &Genome::writeFasta)
-    ;
-}
-#endif
 #endif // GENOME_H

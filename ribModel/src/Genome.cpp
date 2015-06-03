@@ -287,3 +287,20 @@ void Genome::simulateGenome(ROCParameter& parameter, ROCModel& model)
 	}
 }
 
+
+// ---------------------------------------------------------------------------
+// ----------------------------- RCPP STUFF ----------------------------------
+// ---------------------------------------------------------------------------
+#ifndef STANDALONE
+#include <Rcpp.h>
+using namespace Rcpp;
+RCPP_MODULE(Genome_mod)
+{
+    class_<Genome>("Genome")
+    .constructor<>()
+
+    .method("readFasta", &Genome::readFasta)
+    .method("writeFasta", &Genome::writeFasta)
+    ;
+}
+#endif

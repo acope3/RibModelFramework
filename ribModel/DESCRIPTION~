@@ -6,7 +6,11 @@ Date: 2015-01-22
 Author: Your Name
 Maintainer: Your Name <your@email.com>
 Depends: Rcpp
-RcppModules: SequenceSummary_mod
+<<<<<<< HEAD
+RcppModules: Genome_mod
+=======
+RcppModules: Gene_mod
+>>>>>>> 58f860113212e323d801b361f3b534f445add970
 Description: More about what it does (maybe more than one line)
 License: GPL (>= 2)
 Imports: Rcpp (>= 0.11.3)
