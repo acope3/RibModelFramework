@@ -360,19 +360,14 @@ void ROCParameter::initAllTraces(unsigned samples, unsigned num_genes, unsigned 
 {
 	initExpressionTrace(samples, num_genes);
 	initMixtureAssignmentTrace(samples, num_genes);
-	initExpressionAcceptanceRatioTrace(samples, adaptiveSamples);
+	initExpressionAcceptanceRatioTrace(samples, num_genes);
 	initSphiTrace(samples);
-	initSphiAcceptanceRatioTrace(adaptiveSamples);
 	initCategoryProbabilitesTrace(samples);
 	initSelectionParameterTrace(samples);
 	initMutationParameterTrace(samples);
-	initCSPAcceptanceRatioTrace(adaptiveSamples);
+	cspAcceptanceRatioTrace.resize(22);
 }
 
-void ROCParameter::initSphiAcceptanceRatioTrace(unsigned samples)
-{
-	sphiAcceptanceRatioTrace.resize(samples);
-}
 
 void ROCParameter::initExpressionAcceptanceRatioTrace(unsigned samples, unsigned num_genes)
 {
@@ -380,25 +375,8 @@ void ROCParameter::initExpressionAcceptanceRatioTrace(unsigned samples, unsigned
 	for(unsigned category = 0; category < numMixtures; category++)
 	{
 		expressionAcceptanceRatioTrace[category].resize(num_genes);
-		for(unsigned i = 0; i < num_genes; i++)
-		{
-			expressionAcceptanceRatioTrace[category][i].resize(samples);
-			std::vector<double> temp(samples, 0.0);
-			expressionAcceptanceRatioTrace[category][i] = temp;
-		}
 	}
 }
-void ROCParameter::initCSPAcceptanceRatioTrace(unsigned samples)
-{
-	cspAcceptanceRatioTrace.resize(22);
-	for (unsigned i = 0; i < 22; i++)
-	{
-		cspAcceptanceRatioTrace[i].resize(samples);
-		std::vector <double> temp(samples, 0.0);
-		cspAcceptanceRatioTrace[i] = temp;
-	}
-}
-
 
 
 void ROCParameter::initExpressionTrace(unsigned samples, unsigned num_genes)

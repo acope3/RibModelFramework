@@ -144,19 +144,11 @@ void Genome::readFasta(std::string filename) // read Fasta format sequences
 					//tmpGene.cleanSeq();
 					addGene(tmpGene);
 
-					/*
-						 std::cout << tmpGene.getId() << std::endl;
-						 for(int i = 0; i < 22; i++)
-						 {
-						 std::cout << SequenceSummary::IndexToAA(i) << ":"<< tmpGene.geneData.getAAcountForAA(i) << "\t";
-						 }
-						 std::cout << std::endl << std::endl;
-					 */
 					tmpGene.clear();
 					tempSeq = "";
 				}
 				tmpGene.setDescription( buf.substr(1,buf.size()-1) );
-				int pos = buf.find(" ");
+				int pos = buf.find(" ") - 1;
 				tmpGene.setId( buf.substr(1,pos) );
 			}
 
@@ -176,14 +168,6 @@ void Genome::readFasta(std::string filename) // read Fasta format sequences
 					tmpGene.setSequence(tempSeq);
 					//tmpGene.cleanSeq();
 					addGene(tmpGene);
-					/*
-						 std::cout << tmpGene.getId() << std::endl;
-						 for(int i = 0; i < 22; i++)
-						 {
-						 std::cout << SequenceSummary::IndexToAA(i) << ":"<< tmpGene.geneData.getAAcountForAA(i) << "\t";
-						 }
-						 std::cout << std::endl << std::endl;
-					 */
 					break;
 				}
 			}

@@ -226,8 +226,6 @@ class ROCParameter
 		void initMixtureAssignmentTrace(unsigned samples, unsigned num_genes);
 		void initCategoryProbabilitesTrace(int samples);
 		void initExpressionAcceptanceRatioTrace(unsigned samples, unsigned num_genes);
-		void initCSPAcceptanceRatioTrace(unsigned samples);
-		void initSphiAcceptanceRatioTrace(unsigned samples);
 
 		void updateExpressionTrace(unsigned sample, unsigned geneIndex)
 		{
