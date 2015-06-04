@@ -301,14 +301,14 @@ class ROCParameter
 		void initializeExpressionByGenome(Genome& genome, double sd_phi) {InitializeExpression(genome, sd_phi);}
 		void initializeExpressionByList(double sd_phi) {InitializeExpression(sd_phi);}
 		void initializeExpressionByRandom(std::vector<double> expression) {InitializeExpression(expression);}
-		std::vector<double> getExpressionTraceForGene(int geneIndex) {return getExpressionTrace(geneIndex);}
+		std::vector<double> getExpressionTraceForGene(int geneIndex) {return getExpressionTrace(geneIndex - 1);}
 		std::vector<double> getExpressionTraceByCategoryForGene(int category, int geneIndex)
 		{
 			std::vector<double> RV;
-			unsigned samples = expressionTrace[category].size();
+			unsigned samples = expressionTrace[category - 1].size();
 			for (unsigned i = 0u; i < samples; i++)
 			{
-				RV.push_back(expressionTrace[category][i][geneIndex]);
+				RV.push_back(expressionTrace[category - 1][i][geneIndex - 1]);
 			}
 			
 			return RV;
@@ -317,10 +317,10 @@ class ROCParameter
 		{
 			std::vector<double> RV;
 			unsigned codonIndex = SequenceSummary::CodonToIndex(codon);
-			unsigned samples = mutationParameterTrace[category].size();
+			unsigned samples = mutationParameterTrace[category - 1].size();
 			for (unsigned i = 0u; i < samples; i++)
 			{
-				RV.push_back(mutationParameterTrace[category][i][codonIndex]);
+				RV.push_back(mutationParameterTrace[category - 1][i][codonIndex]);
 			}
 			
 			return RV;
@@ -329,10 +329,10 @@ class ROCParameter
 		{
 			std::vector<double> RV;
 			unsigned codonIndex = SequenceSummary::CodonToIndex(codon);
-			unsigned samples = selectionParameterTrace[category].size();
+			unsigned samples = selectionParameterTrace[category - 1].size();
 			for (unsigned i = 0u; i < samples; i++)
 			{
-				RV.push_back(selectionParameterTrace[category][i][codonIndex]);
+				RV.push_back(selectionParameterTrace[category - 1][i][codonIndex]);
 			}
 			
 			return RV;
@@ -343,10 +343,13 @@ class ROCParameter
 			unsigned samples = mixtureAssignmentTrace.size();
 			for(unsigned i = 0u; i < samples; i++)
 			{
-				RV.push_back(mixtureAssignmentTrace[i][geneIndex]);
+				RV.push_back(mixtureAssignmentTrace[i][geneIndex - 1]);
 			}
 			return RV;
 		}
+		unsigned getMixtureAssignmentForGene(unsigned geneIndex) {return mixtureAssignment[geneIndex - 1];}
+		void setMixtureAssignmentForGene(unsigned geneIndex, unsigned value) {mixtureAssignment[geneIndex - 1] = value;}
+		std::vector<double> getCategoryProbabilitiesTraceForCategory(unsigned categoryIndex) {return categoryProbabilitiesTrace[categoryIndex - 1];}	
 	protected:
 
 };
