@@ -870,6 +870,25 @@ std::vector<double> ROCParameter::getExpressionTrace(unsigned geneIndex)
 }
 
 
+std::vector<double> ROCParameter::getExpectedPhiTrace()
+{
+	unsigned numGenes = mixtureAssignment.size(); //number of genes
+	unsigned samples = expressionTrace[0].size(); //number of samples
+	std::vector<double> RV(numGenes, 0.0);
+
+	for (unsigned i = 0; i < samples; i++)
+	{
+		for (unsigned j = 0; j < numGenes; j++)
+		{
+			unsigned category = mixtureAssignmentTrace[i][j];
+			RV[i] += expressionTrace[category][i][j];
+		}
+		RV[i] /= numGenes;
+	}
+
+	return RV;
+}
+
 // Cedric: I decided to use a normal distribution to propose Sphi and phi instead of a lognormal because:
 // 1. It is a symmetric distribution and you therefore do not have to account for the unsymmetry in jump probabilities
 // 2. The one log and exp operation that have to be performed per parameter are cheaper than the operations necessary to draw from a lognormal
@@ -1206,7 +1225,11 @@ RCPP_MODULE(ROCParameter_mod)
 		.method("getMutationParameterTraceByCategoryForCodon", &ROCParameter::getMutationParameterTraceByCategoryForCodon)
 		.method("getExpressionTraceForGene", &ROCParameter::getExpressionTraceForGene)
 		.method("getExpressionTraceByCategoryForGene", &ROCParameter::getExpressionTraceByCategoryForGene)
-		
+		.method("getExpressionAcceptanceRatioTraceByCategoryForGene", &ROCParameter::getExpressionAcceptanceRatioTraceByCategoryForGene)
+		.method("getCspAcceptanceRatioTraceForGene", &ROCParameter::getCspAcceptanceRatioTraceForGene)
+		.method("getExpectedPhiTrace", &ROCParameter::getExpectedPhiTrace)
+
+		.property("getSphiAcceptanceRatioTrace", &ROCParameter::getSphiAcceptanceRatioTrace)
 		.property("getSPhiTrace", &ROCParameter::getSPhiTrace)
 		.property("numMutationCategories", &ROCParameter::getNumMutationCategories)
 		.property("numSelectionCategories", &ROCParameter::getNumSelectionCategories)

@@ -190,6 +190,10 @@ class ROCParameter
 		std::vector<std::vector<std::vector<double>>> getMutationParameterTrace() {return mutationParameterTrace;}
 		std::vector<std::vector<std::vector<double>>> getSelectionParameterTrace() {return selectionParameterTrace;}
 		std::vector<double> getCategoryProbabilitiesTrace(unsigned categoryIndex) {return categoryProbabilitiesTrace[categoryIndex];}
+		std::vector<double> getSphiAcceptanceRatioTrace() {return sphiAcceptanceRatioTrace;}
+		std::vector<double> getExpressionAcceptanceRatioTraceByCategoryForGene(int category, int geneIndex) 
+			{return expressionAcceptanceRatioTrace[category][geneIndex];}
+		std::vector<double> getCspAcceptanceRatioTraceForGene(int geneIndex) {return cspAcceptanceRatioTrace[geneIndex];}
 		void InitializeExpression(Genome& genome, double sd_phi);
 		void InitializeExpression(double sd_phi);
 		void InitializeExpression(std::vector<double> expression);
@@ -239,6 +243,7 @@ class ROCParameter
 		void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex) {mixtureAssignmentTrace[sample][geneIndex] = mixtureAssignment[geneIndex];}
 		std::vector<double> getAPhiTrace() {return aPhiTrace;}
 		std::vector<std::vector <unsigned>> getMixtureAssignmentTrace() {return mixtureAssignmentTrace;}
+		std::vector<double> getExpectedPhiTrace();
 
 		// functions to return estimates
 		double getExpressionPosteriorMean(unsigned samples, unsigned geneIndex, unsigned expressionCategory);
