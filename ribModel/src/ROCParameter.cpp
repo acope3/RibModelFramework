@@ -5,6 +5,12 @@
 #include <iostream>
 #include <set>
 #include <fstream>
+
+#ifndef STANDALONE
+#include <Rcpp.h>
+using namespace Rcpp;
+#endif
+
 ROCParameter::ROCParameter()
 {
 	std::vector <unsigned> empty;
@@ -1035,18 +1041,49 @@ void ROCParameter::drawIidRandomVector(unsigned draws, double r, double (*propos
 }
 double ROCParameter::randNorm(double mean, double sd)
 {
+	double rv;
+	#ifndef STANDALONE
+	RNGScope scope;
+	NumericVector xx(1);
+	xx = rnorm(1, mean, sd);
+	rv = xx[0];
+	#else
 	std::normal_distribution<double> distribution(mean, sd);
-	return distribution(generator);
+	rv = distribution(generator);
+	#endif
+	return rv;
 }
+
+
 double ROCParameter::randLogNorm(double m, double s)
 {
+	double rv;
+	#ifndef STANDALONE
+	RNGScope scope;
+	NumericVector xx(1);
+	xx = rlnorm(1, m, s);
+	rv = xx[0];
+	#else
 	std::lognormal_distribution<double> distribution(m, s);
-	return distribution(generator);
+	rv = distribution(generator);
+	#endif
+	return rv;
 }
+
+
 double ROCParameter::randExp(double r)
 {
+	double rv;
+	#ifndef STANDALONE
+	RNGScope scope;
+	NumericVector xx(1);
+	xx = rexp(1, r);
+	rv = xx[0];
+	#else
 	std::exponential_distribution<double> distribution(r);
-	return distribution(generator);
+	rv = distribution(generator);
+	#endif
+	return rv;
 }
 
 void ROCParameter::randDirichlet(double* input, unsigned numElements, double* output)
@@ -1055,12 +1092,23 @@ void ROCParameter::randDirichlet(double* input, unsigned numElements, double* ou
 	// normalize y_i such that x_i = y_i / sum(y_i)
 
 	double sumTotal = 0.0;
+	#ifndef STANDALONE
+	RNGScope scope;
+	NumericVector xx(1);
+	for(unsigned i = 0; i < numElements; i++)
+	{
+		xx = rgamma(1, input[i], 1);
+		output[i] = xx[0];
+		sumTotal += xx[0];
+	}
+	#else
 	for(unsigned i = 0; i < numElements; i++)
 	{
 		std::gamma_distribution<double> distribution(input[i], 1);
 		output[i] = distribution(generator);
 		sumTotal += output[i];
 	}
+	#endif
 	for(unsigned i = 0; i < numElements; i++)
 	{
 		output[i] = output[i] / sumTotal;
@@ -1069,8 +1117,17 @@ void ROCParameter::randDirichlet(double* input, unsigned numElements, double* ou
 
 double ROCParameter::randUnif(double minVal, double maxVal)
 {
+	double rv;
+	#ifndef STANDALONE
+	RNGScope scope;
+	NumericVector xx(1);
+	xx = runif(1, minVal, maxVal);
+	rv = xx[0];
+	#else
 	std::uniform_real_distribution<double> distribution(minVal, maxVal);
-	return distribution(generator);
+	rv = distribution(generator);	
+	#endif
+	return rv;
 }
 
 unsigned ROCParameter::randMultinom(double* probabilities, unsigned groups)
@@ -1084,8 +1141,16 @@ unsigned ROCParameter::randMultinom(double* probabilities, unsigned groups)
 		cumsum[i] = cumsum[i-1u] + probabilities[i];
 	}
 	// draw random number from U(0,1)
+	double referenceValue;
+	#ifndef STANDALONE
+	RNGScope scope;
+	NumericVector xx(1);
+	xx = runif(1, 0, 1);
+	referenceValue = xx[0];
+	#else
 	std::uniform_real_distribution<double> distribution(0, 1);
-	double referenceValue = distribution(generator);
+	referenceValue = distribution(generator);
+	#endif
 	// check in which category the element falls
 	unsigned returnValue = 0u;
 	for (unsigned i = 0u; i < groups; i++)
@@ -1198,8 +1263,6 @@ void ROCParameter::swap(int& a, int& b)
 
 
 #ifndef STANDALONE
-#include <Rcpp.h>
-using namespace Rcpp;
 
 RCPP_EXPOSED_CLASS(Genome)
 
@@ -1214,8 +1277,8 @@ RCPP_MODULE(ROCParameter_mod)
 		.method("initializeExpressionByGenome", &ROCParameter::initializeExpressionByGenome)
 		.method("initializeExpressionByList", &ROCParameter::initializeExpressionByList)
 		.method("initializeExpressionByRandom", &ROCParameter::initializeExpressionByRandom)
-		.method("getMixtureAssignment", &ROCParameter::getMixtureAssignment)
-		.method("setMixtureAssignment", &ROCParameter::setMixtureAssignment)
+		.method("getMixtureAssignmentForGene", &ROCParameter::getMixtureAssignmentForGene)
+		.method("setMixtureAssignmentForGene", &ROCParameter::setMixtureAssignmentForGene)
 		.method("getCategoryProbabilitiesTrace", &ROCParameter::getCategoryProbabilitiesTrace)
 		.method("getMixtureAssignmentTraceForGene", &ROCParameter::getMixtureAssignmentTraceForGene)
 		.method("getSelectionParameterTraceByCategoryForCodon", &ROCParameter::getSelectionParameterTraceByCategoryForCodon)
@@ -1232,6 +1295,10 @@ RCPP_MODULE(ROCParameter_mod)
 		.property("numSelectionCategories", &ROCParameter::getNumSelectionCategories)
 		//.property("mixtureAssignment", &ROCParameter::getMixtureAssignment, &ROCParameter::setMixtureAssignment)
 	;
+	function("randUnif", &ROCParameter::randUnif);
+	function("randExp", &ROCParameter::randExp);
+	function("randLogNorm", &ROCParameter::randLogNorm);
+	function("randNorm", &ROCParameter::randNorm);
 }
 #endif
 

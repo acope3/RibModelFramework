@@ -5,7 +5,7 @@
 #include <map>
 #include <algorithm>
 #include <cctype>
-
+#include <vector>
 class SequenceSummary
 {
     private:
@@ -36,7 +36,7 @@ class SequenceSummary
 
         int getCodonCountForCodon(std::string& codon) {return ncodons[SequenceSummary::CodonToIndex(codon)];}
         int getCodonCountForCodon(int codon) {return ncodons[codon];}
-
+		
 
 		//R Wrapper Functions
 		int getAAcount(char aa) {aa = std::toupper(aa);	return getAAcountForAA(aa);}
@@ -53,14 +53,14 @@ class SequenceSummary
 
         //statics
         static char CodonToAA(std::string& codon);
-        static unsigned GetNumCodonsForAA(const char& aa, bool forParamVector = false);
+        static unsigned GetNumCodonsForAA(char& aa, bool forParamVector = false);
         static unsigned CodonToIndex(std::string& codon);
         static std::string IndexToCodon(unsigned i);
         static unsigned CodonToAAIndex(std::string& codon);
         static char IndexToAA(int aa);
         static void AAindexToCodonRange(unsigned aaIndex, bool forParamVector = false, unsigned aaRange[] = nullptr);
         static void AAToCodonRange(char aa, bool forParamVector = false, unsigned aaRange[] = nullptr);
-
+				static std::vector<std::string> AAToCodon(char aa, bool forParamVector = false);
 
     protected:
 

@@ -305,7 +305,7 @@ RCPP_MODULE(Genome_mod)
     class_<Genome>("Genome")
     .constructor()
 
-    .method("readFasta", &Genome::readFasta)
+		.method("readFasta", &Genome::readFasta)
     .method("writeFasta", &Genome::writeFasta)
     .method("getGeneByIndex", &Genome::getGeneByIndex)
     .method("getGenomeSize", &Genome::getGenomeSize)
