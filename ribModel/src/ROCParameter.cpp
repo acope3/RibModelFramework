@@ -567,8 +567,8 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
 	}
 	else
 	{
-		std::cout << "Unkown parameter type: " << paramType << "\n";
-		std::cout << "Returning mutation parameter! \n";
+		std::cerr << "Warning in ROCParameter::getParameterForCategory: Unkown parameter type: " << paramType << "\n";
+		std::cerr << "\tReturning mutation parameter! \n";
 		tempSet = (proposal ? &proposedMutationParameter[category] : &currentMutationParameter[category]);
 	}
 	unsigned aaRange[2];
@@ -577,8 +577,6 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
 	unsigned j = 0u;
 	for(unsigned i = aaRange[0]; i < aaRange[1]; i++, j++)
 	{
-		if (aa =='X')
-			std::cout <<"aaRange[0]: " << aaRange[0] <<" & aaRange[1]: " << aaRange[1] << "\n";
 		returnSet[j] = tempSet -> at(i);
 	}
 }
@@ -592,7 +590,7 @@ double ROCParameter::getMixtureAssignmentPosteriorMean(unsigned samples, unsigne
 
 	if(samples > traceLength)
 	{
-		std::cout << "ROCParameter::getMixtureAssignmentPosteriorMean throws: Number of anticipated samples (" <<
+		std::cerr << "Warning in ROCParameter::getMixtureAssignmentPosteriorMean throws: Number of anticipated samples (" <<
 			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
 	}
@@ -614,7 +612,7 @@ double ROCParameter::getExpressionPosteriorMean(unsigned samples, unsigned geneI
 
 	if(samples > traceLength)
 	{
-		std::cout << "ROCParameter::getExpressionPosteriorMean throws: Number of anticipated samples (" <<
+		std::cerr << "Warning in ROCParameter::getExpressionPosteriorMean throws: Number of anticipated samples (" <<
 			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
 	}
@@ -641,7 +639,7 @@ double ROCParameter::getSphiPosteriorMean(unsigned samples)
 
 	if(samples > traceLength)
 	{
-		std::cout << "ROCParameter::getSphiPosteriorMean throws: Number of anticipated samples (" <<
+		std::cerr << "Warning in ROCParameter::getSphiPosteriorMean throws: Number of anticipated samples (" <<
 			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
 	}
@@ -659,7 +657,7 @@ double ROCParameter::getMutationPosteriorMean(unsigned category, unsigned sample
 
 	if(samples > traceLength)
 	{
-		std::cout << "ROCParameter::getMutationPosteriorMean throws: Number of anticipated samples (" <<
+		std::cerr << "Warning in ROCParameter::getMutationPosteriorMean throws: Number of anticipated samples (" <<
 			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
 	}
@@ -677,7 +675,7 @@ double ROCParameter::getSelectionPosteriorMean(unsigned category, unsigned sampl
 
 	if(samples > traceLength)
 	{
-		std::cout << "ROCParameter::getSelectionPosteriorMean throws: Number of anticipated samples (" <<
+		std::cerr << "Warning in ROCParameter::getSelectionPosteriorMean throws: Number of anticipated samples (" <<
 			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
 	}
@@ -694,7 +692,7 @@ double ROCParameter::getSelectionVariance(unsigned category, unsigned samples, u
 	unsigned traceLength = selectionParameterTrace[category].size();
 	if(samples > traceLength)
 	{
-		std::cout << "ROCParameter::getSelectionVariance throws: Number of anticipated samples (" <<
+		std::cerr << "Warning in ROCParameter::getSelectionVariance throws: Number of anticipated samples (" <<
 			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
 	}
@@ -719,7 +717,7 @@ double ROCParameter::getMutationVariance(unsigned category, unsigned samples, un
 	unsigned traceLength = mutationParameterTrace[category].size();
 	if(samples > traceLength)
 	{
-		std::cout << "ROCParameter::getMutationVariance throws: Number of anticipated samples (" <<
+		std::cerr << "Warning in ROCParameter::getMutationVariance throws: Number of anticipated samples (" <<
 			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
 	}
@@ -743,7 +741,7 @@ double ROCParameter::getExpressionVariance(unsigned samples, unsigned geneIndex,
 	unsigned traceLength = expressionTrace[0].size();
 	if(samples > traceLength)
 	{
-		std::cout << "ROCParameter::getExpressionVariance throws: Number of anticipated samples (" <<
+		std::cerr << "Warning in ROCParameter::getExpressionVariance throws: Number of anticipated samples (" <<
 			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
 	}
@@ -772,7 +770,7 @@ double ROCParameter::getSphiVariance(unsigned samples, bool unbiased)
 	unsigned traceLength = sPhiTrace.size();
 	if(samples > traceLength)
 	{
-		std::cout << "ROCParameter::getSphiVariance throws: Number of anticipated samples (" <<
+		std::cerr << "Warning in ROCParameter::getSphiVariance throws: Number of anticipated samples (" <<
 			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
 	}
@@ -1216,6 +1214,7 @@ RCPP_MODULE(ROCParameter_mod)
 		.method("initializeExpressionByRandom", &ROCParameter::initializeExpressionByRandom)
 		.method("getMixtureAssignment", &ROCParameter::getMixtureAssignment)
 		.method("setMixtureAssignment", &ROCParameter::setMixtureAssignment)
+		// Trace functions
 		.method("getCategoryProbabilitiesTrace", &ROCParameter::getCategoryProbabilitiesTrace)
 		.method("getMixtureAssignmentTraceForGene", &ROCParameter::getMixtureAssignmentTraceForGene)
 		.method("getSelectionParameterTraceByCategoryForCodon", &ROCParameter::getSelectionParameterTraceByCategoryForCodon)
@@ -1223,13 +1222,25 @@ RCPP_MODULE(ROCParameter_mod)
 		.method("getExpressionTraceForGene", &ROCParameter::getExpressionTraceForGene)
 		.method("getExpressionTraceByCategoryForGene", &ROCParameter::getExpressionTraceByCategoryForGene)
 		.method("getExpressionAcceptanceRatioTraceByCategoryForGene", &ROCParameter::getExpressionAcceptanceRatioTraceByCategoryForGene)
-		.method("getCspAcceptanceRatioTraceForGene", &ROCParameter::getCspAcceptanceRatioTraceForGene)
+		.method("getCspAcceptanceRatioTraceForAA", &ROCParameter::getCspAcceptanceRatioTraceForAA)
 		.method("getExpectedPhiTrace", &ROCParameter::getExpectedPhiTrace)
+		.method("getSphiAcceptanceRatioTrace", &ROCParameter::getSphiAcceptanceRatioTrace)
+		.method("getSPhiTrace", &ROCParameter::getSPhiTrace)
+		// Posterior functions
+		.method("getExpressionPosteriorMean", &ROCParameter::getExpressionPosteriorMean)
+		.method("getSphiPosteriorMean", &ROCParameter::getSphiPosteriorMean)
+		.method("getMutationPosteriorMeanForAA", &ROCParameter::getMutationPosteriorForAA)
+		.method("getSelectionPosteriorMeanForAA", &ROCParameter::getSelectionPosteriorForAA)
+		// Variance functions
+		.method("getMutationVarianceForAA", &ROCParameter::getMutationVarianceForAA)
+		.method("getSelectionVarianceForAA", &ROCParameter::getSelectionVarianceForAA)
+		.method("getExpressionVariance", &ROCParameter::getExpressionVariance)
+		.method("getSphiVariance", &ROCParameter::getSphiVariance)
 
-		.property("getSphiAcceptanceRatioTrace", &ROCParameter::getSphiAcceptanceRatioTrace)
-		.property("getSPhiTrace", &ROCParameter::getSPhiTrace)
+
 		.property("numMutationCategories", &ROCParameter::getNumMutationCategories)
 		.property("numSelectionCategories", &ROCParameter::getNumSelectionCategories)
+		.property("numMixtures", &ROCParameter::getNumMixtureElements)
 		//.property("mixtureAssignment", &ROCParameter::getMixtureAssignment, &ROCParameter::setMixtureAssignment)
 	;
 }

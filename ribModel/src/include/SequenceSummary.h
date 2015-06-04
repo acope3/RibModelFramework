@@ -17,7 +17,7 @@ class SequenceSummary
 
         //static member variables
         static const char Ser2;
-        static const char AminoAcidArray[];
+        static const std::vector<char> AminoAcidArray;
         static const std::string codonArray[];
         static const std::map<char, int> aaToIndex;
 
@@ -61,7 +61,8 @@ class SequenceSummary
         static void AAindexToCodonRange(unsigned aaIndex, bool forParamVector = false, unsigned aaRange[] = nullptr);
         static void AAToCodonRange(char aa, bool forParamVector = false, unsigned aaRange[] = nullptr);
 
-
+        //R wrapper
+        static std::vector<char> aminoAcids() {return AminoAcidArray; }
     protected:
 
 

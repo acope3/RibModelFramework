@@ -2,7 +2,7 @@
 #include "include/ROCParameter.h"//these two files must be included here to get at the implimentation
 #include "include/ROCModel.h" 		//for simulateGenome. They cannot be included in the header file. See genome.h for
 																		//more information on circular dependices/forward declarations
-#include <iostream>     // std::cout
+#include <iostream>     // std::cout, std::cerr
 #include <cstring>
 #include <fstream>
 #include <ctime>
@@ -62,37 +62,39 @@ void Genome::writeFasta (std::string filename, bool simulated)
 		Fout.open(filename.c_str());
 		if (Fout.fail())
 		{
-			std::cerr <<"Cannot open output Fasta file " << filename <<"\n";
-			exit(1);
-		}
-		if (simulated)
-		{
-			for(unsigned i = 0u; i < simulatedGenes.size(); i++)
-			{
-				Fout << ">" << simulatedGenes[i].getId() << " " << simulatedGenes[i].getDescription() <<"\n";
-				for(int j = 0; j < simulatedGenes[i].length(); j++)
-				{
-					Fout << simulatedGenes[i].getNucleotideAt(j);
-					if((j + 1) % 60 == 0) Fout << std::endl;
-				}
-				Fout << std::endl;
-			}
+			std::cerr <<"Error in Genome::writeFasta: Cannot open output Fasta file " << filename <<"\n";
 		}
 		else
 		{
-			for(unsigned i = 0u; i < genes.size(); i++)
+			if (simulated)
 			{
-				Fout << ">" << genes[i].getId() << " " << genes[i].getDescription() << std::endl;
-				for(int j = 0; j < genes[i].length(); j++)
+				for(unsigned i = 0u; i < simulatedGenes.size(); i++)
 				{
-					Fout << genes[i].getNucleotideAt(j);
-					if((j + 1) % 60 == 0) Fout << std::endl;
+					Fout << ">" << simulatedGenes[i].getId() << " " << simulatedGenes[i].getDescription() <<"\n";
+					for(int j = 0; j < simulatedGenes[i].length(); j++)
+					{
+						Fout << simulatedGenes[i].getNucleotideAt(j);
+						if((j + 1) % 60 == 0) Fout << std::endl;
+					}
+					Fout << std::endl;
 				}
-				Fout << std::endl;
 			}
-		}
+			else
+			{
+				for(unsigned i = 0u; i < genes.size(); i++)
+				{
+					Fout << ">" << genes[i].getId() << " " << genes[i].getDescription() << std::endl;
+					for(int j = 0; j < genes[i].length(); j++)
+					{
+						Fout << genes[i].getNucleotideAt(j);
+						if((j + 1) % 60 == 0) Fout << std::endl;
+					}
+					Fout << std::endl;
+				}
+			}
+		} // end else
 		Fout.close();
-	}
+	} // end try
 	catch(char* pMsg) { std::cerr << std::endl << "Exception:" << pMsg << std::endl; }
 }
 
@@ -108,76 +110,78 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 		Fin.open(filename.c_str());
 		if (Fin.fail())
 		{
-			std::cerr <<"Genome::readFasta throws: Cannot open input Fasta file " << filename <<"\n";
-			std::exit(1);
+			std::cerr << "Error in Genome::readFasta: Cannot open input Fasta file " << filename << "\n";
 		}
-
-		bool fastaFormat = false;
-		std::string buf;
-		int newLine;
-
-
-		Gene tmpGene;
-		std::string tempSeq = "";
-		while (1)
+		else
 		{
-			// read a new line in every cycle
-			std::getline(Fin, buf);
-			/* The new line is marked with an integer, which corresponds
-				 to one of the following cases:
 
-				 1. New sequence line, which starts with "> ".
-				 2. Sequence line, which starts with any charactor except for ">"
-				 3. End of file, detected by function eof().
-			 */
+			bool fastaFormat = false;
+			std::string buf;
+			int newLine;
 
-			if(buf[0] == '>' ) newLine=1;
-			else if(Fin.eof()) newLine=3;
-			else newLine=2;
 
-			if( newLine == 1 )
-			{ // this is a start of a new chain.
-				if( !fastaFormat )
-				{
-					// if it is the first chain, just build a new chain object
-					tmpGene.clear();
-					fastaFormat = true;
-				} else
-				{
-					// otherwise, need to store the old chain first, then build a new chain
-					tmpGene.setSequence(tempSeq);
-					//tmpGene.cleanSeq();
-					addGene(tmpGene);
+			Gene tmpGene;
+			std::string tempSeq = "";
+			while (1)
+			{
+				// read a new line in every cycle
+				std::getline(Fin, buf);
+				/* The new line is marked with an integer, which corresponds
+					 to one of the following cases:
 
-					tmpGene.clear();
-					tempSeq = "";
+					 1. New sequence line, which starts with "> ".
+					 2. Sequence line, which starts with any charactor except for ">"
+					 3. End of file, detected by function eof().
+				 */
+
+				if(buf[0] == '>' ) newLine=1;
+				else if(Fin.eof()) newLine=3;
+				else newLine=2;
+
+				if( newLine == 1 )
+				{ // this is a start of a new chain.
+					if( !fastaFormat )
+					{
+						// if it is the first chain, just build a new chain object
+						tmpGene.clear();
+						fastaFormat = true;
+					} else
+					{
+						// otherwise, need to store the old chain first, then build a new chain
+						tmpGene.setSequence(tempSeq);
+						//tmpGene.cleanSeq();
+						addGene(tmpGene);
+
+						tmpGene.clear();
+						tempSeq = "";
+					}
+					tmpGene.setDescription( buf.substr(1,buf.size()-1) );
+					int pos = buf.find(" ") - 1;
+					tmpGene.setId( buf.substr(1,pos) );
 				}
-				tmpGene.setDescription( buf.substr(1,buf.size()-1) );
-				int pos = buf.find(" ") - 1;
-				tmpGene.setId( buf.substr(1,pos) );
-			}
 
-			if( newLine == 2 && fastaFormat )
-			{ // sequence line
-				tempSeq.append(buf);
-				//tmpGene.seq.append(buf);
-			}
-
-			if( newLine == 3 )
-			{ // end of file
-				if( !fastaFormat ) throw std::string("Genome::readFasta throws: ") + std::string(filename) + std::string(" is not in Fasta format.");
-				else
-				{
-					// otherwise, need to store the old chain first, then to
-					// build a new chain
-					tmpGene.setSequence(tempSeq);
-					//tmpGene.cleanSeq();
-					addGene(tmpGene);
-					break;
+				if( newLine == 2 && fastaFormat )
+				{ // sequence line
+					tempSeq.append(buf);
+					//tmpGene.seq.append(buf);
 				}
-			}
-		}
-	}
+
+				if( newLine == 3 )
+				{ // end of file
+					if( !fastaFormat ) throw std::string("Genome::readFasta throws: ") + std::string(filename) + std::string(" is not in Fasta format.");
+					else
+					{
+						// otherwise, need to store the old chain first, then to
+						// build a new chain
+						tmpGene.setSequence(tempSeq);
+						//tmpGene.cleanSeq();
+						addGene(tmpGene);
+						break;
+					}
+				}
+			} // end while
+		} // end else
+	} // end try
 	catch(char* pMsg) { std::cerr << std::endl << "Exception:" << pMsg << std::endl; }
 }
 
@@ -189,7 +193,7 @@ Gene& Genome::getGene(unsigned index)
 	
 	if (index >= genes.size()) 
 	{
-		std::cout << "Index " << index << " is out of bounds.\n";
+		std::cerr << "Error in Genome::getGene: Index " << index << " is out of bounds.\n";
 	}
 
 	return index >= genes.size() ? gene  : genes[index];
@@ -268,20 +272,17 @@ void Genome::simulateGenome(ROCParameter& parameter, ROCModel& model)
 			}
 			for (k = 0; k < aaCount; k++)
 			{
-				//std::cout <<"\t\taaCount is " << aaCount <<"\n";
 				codonIndex = ROCParameter::randMultinom(codonProb, numCodons);
 				seqSum.AAToCodonRange(curAA, false, aaRange); //need the first spot in the array where the codons for curAA are
 				codon = seqSum.IndexToCodon(aaRange[0] + codonIndex);//get the correct codon based off codonIndex
 				tmpSeq += codon;
 			}
-			//std::cout <<"\tDone with amino acid " << curAA <<"\n";
 		}
 
 		codon =	seqSum.IndexToCodon((rand() % 3) + 61); //randomly choose a stop codon, from range 61-63
 		tmpSeq += codon;
 		Gene tmpGene(tmpSeq, tmpID, tmpDesc);
 		simulatedGenes[i] = tmpGene;
-		//std::cout <<"done with gene " << i <<"\n";
 	}
 }
 

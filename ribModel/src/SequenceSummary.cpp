@@ -67,7 +67,7 @@ void SequenceSummary::processSequence(const std::string& sequence)
 * STATIC FUNCTIONS
 */
 const char SequenceSummary::Ser2 = 'Z';
-const char SequenceSummary::AminoAcidArray[] = {'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y', SequenceSummary::Ser2, 'X'};
+const std::vector<char> SequenceSummary::AminoAcidArray = {'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y', SequenceSummary::Ser2, 'X'};
 const std::string SequenceSummary::codonArray[] = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
                                                     "TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT", "ATA", "ATC",
                                                     "ATT", "AAA", "AAG", "CTA", "CTC", "CTG", "CTT", "TTA", "TTG", "ATG",
@@ -328,6 +328,8 @@ RCPP_MODULE(SequenceSummary_mod)
 	.method("processSequence", &SequenceSummary::processSequence, "generates codon and amino acid count for sequence")
 	.method("clear", &SequenceSummary::clear, "removes all data from object")
 	;
+
+    function("aminoAcids", &SequenceSummary::aminoAcids, "returns all Amino Acids as one letter code");
 }
 #endif
 

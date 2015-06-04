@@ -32,7 +32,7 @@ class ROCParameter
 
 		std::vector<double> sphiAcceptanceRatioTrace; // sample
 		std::vector<std::vector<std::vector<double>>> expressionAcceptanceRatioTrace; // order: category, gene, sample
-		std::vector<std::vector<double>> cspAcceptanceRatioTrace; // order: gene, sample
+		std::vector<std::vector<double>> cspAcceptanceRatioTrace; // order: codon, sample
 
 		double phiEpsilon;
 		double phiEpsilon_proposed;
@@ -193,7 +193,11 @@ class ROCParameter
 		std::vector<double> getSphiAcceptanceRatioTrace() {return sphiAcceptanceRatioTrace;}
 		std::vector<double> getExpressionAcceptanceRatioTraceByCategoryForGene(int category, int geneIndex) 
 			{return expressionAcceptanceRatioTrace[category][geneIndex];}
-		std::vector<double> getCspAcceptanceRatioTraceForGene(int geneIndex) {return cspAcceptanceRatioTrace[geneIndex];}
+		std::vector<double> getCspAcceptanceRatioTraceForAA(char aa)
+		{
+			unsigned aaIndex = SequenceSummary:: aaToIndex.find(aa) -> second;
+			return cspAcceptanceRatioTrace[aaIndex];
+		}
 		void InitializeExpression(Genome& genome, double sd_phi);
 		void InitializeExpression(double sd_phi);
 		void InitializeExpression(std::vector<double> expression);
@@ -273,6 +277,27 @@ class ROCParameter
 
 
 		//R wrapper functions
+		double getMutationPosteriorForAA(unsigned category, unsigned samples, char aa)
+		{
+			unsigned aaIndex = SequenceSummary:: aaToIndex.find(aa) -> second;
+			return getMutationPosteriorMean(category, samples, aaIndex);
+		}
+		double getSelectionPosteriorForAA(unsigned category, unsigned samples, char aa)
+		{
+			unsigned aaIndex = SequenceSummary:: aaToIndex.find(aa) -> second;
+			return getSelectionPosteriorMean(category, samples, aaIndex);
+		}
+		double getMutationVarianceForAA(unsigned category, unsigned samples, char aa, bool unbiased)
+		{
+			unsigned aaIndex = SequenceSummary:: aaToIndex.find(aa) -> second;
+			return getMutationVariance(category, samples, aaIndex, unbiased);
+		}
+		double getSelectionVarianceForAA(unsigned category, unsigned samples, char aa, bool unbiased)
+		{
+			unsigned aaIndex = SequenceSummary:: aaToIndex.find(aa) -> second;
+			return getSelectionVariance(category, samples, aaIndex, unbiased);
+		}
+
 		void initializeExpressionByGenome(Genome& genome, double sd_phi) {InitializeExpression(genome, sd_phi);}
 		void initializeExpressionByList(double sd_phi) {InitializeExpression(sd_phi);}
 		void initializeExpressionByRandom(std::vector<double> expression) {InitializeExpression(expression);}

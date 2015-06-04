@@ -1,4 +1,12 @@
 useDynLib(ribModel)
-exportPattern("^[[:alpha:]]+")
-import( Rcpp )
+#exportPattern("^[[:alpha:]]+")
 importFrom(Rcpp, evalCpp)
+
+export(
+# Ploting
+## Parameter object
+plot.Rcpp_ROCParameter
+## Model object
+
+## Genome object
+)

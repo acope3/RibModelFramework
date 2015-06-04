@@ -1,3 +1,12 @@
 useDynLib(ribModel)
-exportPattern("^[[:alpha:]]+")
+#exportPattern("^[[:alpha:]]+") #<- if commented out, only functions explicitly exported will we exposed 
 importFrom(Rcpp, evalCpp)
+
+export(
+# Ploting
+## Parameter object
+plot.Rcpp_ROCParameter
+## Model object
+
+## Genome object
+)
