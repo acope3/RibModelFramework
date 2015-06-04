@@ -264,7 +264,7 @@ void testSimulateGenome(Genome& genome)
 
 int main()
 {
-	bool cedric = true;
+	bool cedric = false;
 	std::cout << "Hello world!" << std::endl << std::endl;
 
 	Genome genome;
@@ -273,7 +273,7 @@ int main()
 		genome.readFasta("/home/clandere/CodonUsageBias/organisms/yeast/data/LKluyveri/Skluyveri.fasta");
 		//genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_A_andCleft.fasta");
 	}else{
-		genome.readFasta("Skluyveri_chromosomeA.fasta");
+		genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_A_andCleft.fasta");
 	}
 	std::cout << "done reading fasta file" << std::endl;
 	bool testing =  false;
@@ -312,8 +312,8 @@ int main()
 			files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv");
 			files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv");
 		}else{
-			files[0] = std::string("Skluyveri_CSP_ChrA.csv");
-			files[1] = std::string("Skluyveri_CSP_ChrCleft.csv");
+			files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv");
+			files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv");
 		}
 		parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
 		parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
@@ -325,7 +325,7 @@ int main()
 
 
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
-        int samples = 10000;
+        int samples = 100;
 		int thining = 10;
 		int useSamples = 100;
 

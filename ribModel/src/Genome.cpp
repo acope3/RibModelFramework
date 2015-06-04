@@ -95,10 +95,14 @@ void Genome::writeFasta (std::string filename, bool simulated)
 	catch(char* pMsg) { std::cerr << std::endl << "Exception:" << pMsg << std::endl; }
 }
 
-void Genome::readFasta(std::string filename) // read Fasta format sequences
+void Genome::readFasta(std::string filename, bool Append) // read Fasta format sequences
 {
 	try
 	{
+		if (!Append)
+		{
+			clear();
+		}
 		std::ifstream Fin;
 		Fin.open(filename.c_str());
 		if (Fin.fail())
@@ -180,7 +184,14 @@ void Genome::readFasta(std::string filename) // read Fasta format sequences
 
 Gene& Genome::getGene(int index)
 {
-	return genes[index];
+	Gene gene;
+	
+	if (index >= genes.size()) 
+	{
+		std::cout <<"Index " << index <<" is out of bounds.\n";
+	}
+
+	return index >= genes.size() ? gene  : genes[index];
 }
 Gene& Genome::getGene(std::string id)
 {
@@ -271,6 +282,11 @@ void Genome::simulateGenome(ROCParameter& parameter, ROCModel& model)
 	}
 }
 
+void Genome::clear()
+{
+	genes.clear();
+	simulatedGenes.clear();
+}
 
 // ---------------------------------------------------------------------------
 // ----------------------------- RCPP STUFF ----------------------------------
@@ -290,6 +306,7 @@ RCPP_MODULE(Genome_mod)
     .method("writeFasta", &Genome::writeFasta)
     .method("getGeneByIndex", &Genome::getGeneByIndex)
     .method("getGenomeSize", &Genome::getGenomeSize)
+		.method("clear", &Genome::clear)
 	;
 }
 #endif
