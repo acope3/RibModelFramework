@@ -361,7 +361,9 @@ int main()
 		int numSelectionCategories = parameter.getNumSelectionCategories();
 		for (int i = 0; i < numMutationCategories; i++)
 		{
-			std::string file = "results/mutationPosterior_Cat" + std::to_string(i) + ".csv";
+			std::ostringstream strstream;
+			strstream << i;
+			std::string file = "results/mutationPosterior_Cat" + strstream.str() + ".csv";
 			std::ofstream mutout(file);
 			for (int n = 0; n < 22; n++) //going over the amino acids
 			{
@@ -388,7 +390,9 @@ int main()
         std::cout << "writing selection posterior file" << "\n";
 		for (int i = 0; i < numSelectionCategories; i++)
 		{
-			std::string file = "results/selectionPosterior_Cat" + std::to_string(i) + ".csv";
+			std::ostringstream strstream;
+			strstream << i;
+			std::string file = "results/selectionPosterior_Cat" + strstream.str() + ".csv";
 			std::ofstream selectout(file);
 			for (int n = 0; n < 22; n++)
 			{
@@ -417,7 +421,9 @@ int main()
 
         for(unsigned k = 0u; k < parameter.getNumExpressionCategories(); k++)
         {
-            std::string file = "results/expressionPosterior_Cat" + std::to_string(k) + ".csv";
+			std::ostringstream strstream;
+			strstream << k;
+            std::string file = "results/expressionPosterior_Cat" + strstream.str() + ".csv";
             std::ofstream phiout(file);
             for(unsigned n = 0u; n < genome.getGenomeSize(); n++)
             {
