@@ -1,6 +1,6 @@
 library(ribModel)
 genome <- new(Genome)
-genome$readFasta("RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_A_andCleft.fasta")
+genome$readFasta("../ribModel/data/Skluyveri.fasta")
 
 
 sphi_init <- 2;

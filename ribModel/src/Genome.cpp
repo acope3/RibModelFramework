@@ -6,6 +6,7 @@
 #include <cstring>
 #include <fstream>
 #include <ctime>
+#include <sstream> // ostringstream
 
 Genome::Genome()
 {
@@ -229,7 +230,9 @@ void Genome::simulateGenome(ROCParameter& parameter, ROCModel& model)
 		unsigned expressionCategory = parameter.getExpressionCategory(mixtureElement);
 		double phi = parameter.getExpression(i, expressionCategory, false);
 		
-		std::string tmpID = gene.getId() + "_MixtureElement" + std::to_string(mixtureElement);
+		std::ostringstream strstream;
+		strstream << mixtureElement;
+		std::string tmpID = gene.getId() + "_MixtureElement" + strstream.str();
 		for (j = 0; j < 22; j++) //loop over each amino acid, naa[]
 		{
 			aaCount = seqSum.getAAcountForAA(j);
