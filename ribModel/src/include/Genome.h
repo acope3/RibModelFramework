@@ -18,31 +18,32 @@ class ROCModel;
 
 class Genome
 {
-    private:
-        std::vector<Gene> genes;
+	private:
+		std::vector<Gene> genes;
 		std::vector<Gene> simulatedGenes;
-    public:
-        //constructor/destructor
-        explicit Genome();
-        virtual ~Genome();
-        Genome(const Genome& other);
-        Genome& operator=(const Genome& other);
+	public:
+		//constructor/destructor
+		explicit Genome();
+		virtual ~Genome();
+		Genome(const Genome& other);
+		Genome& operator=(const Genome& other);
 
-        void readFasta(std::string filename);
-        void writeFasta(std::string filename, bool simulated = false);
-        void addGene(const Gene& gene);
-        void getCountsForAA(char aa, unsigned codonCounts[][5]);
+		void readFasta(std::string filename, bool Append = false);
+		void writeFasta(std::string filename, bool simulated = false);
+		void addGene(const Gene& gene);
+		void getCountsForAA(char aa, unsigned codonCounts[][5]);
 		std::vector <Gene> getGenes() {return genes;}
 		std::vector <Gene> getSimulatedGenes() {return simulatedGenes;}
-        Gene& getGene(int index);
-        Gene& getGene(std::string id);
+		Gene& getGene(unsigned index);
+		Gene& getGene(std::string id);
 		void simulateGenome(ROCParameter& parameter, ROCModel& model);
-        unsigned getGenomeSize() {return genes.size();}
+		unsigned getGenomeSize() {return genes.size();}
+		void clear();
 
 		//R wrapper functions
 		Gene& getGeneByIndex(int index) {return getGene(index);}
 
-    protected:
+	protected:
 };
 
 #endif // GENOME_H
