@@ -874,7 +874,7 @@ std::vector<double> ROCParameter::getExpectedPhiTrace()
 {
 	unsigned numGenes = mixtureAssignment.size(); //number of genes
 	unsigned samples = expressionTrace[0].size(); //number of samples
-	std::vector<double> RV(numGenes, 0.0);
+	std::vector<double> RV(samples, 0.0);
 
 	for (unsigned i = 0; i < samples; i++)
 	{
