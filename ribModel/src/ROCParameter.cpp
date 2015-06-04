@@ -565,7 +565,12 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
 	{
 		tempSet = (proposal ? &proposedSelectionParameter[category] : &currentSelectionParameter[category]);
 	}
-	else throw "Unkown parameter type: " + std::to_string(paramType);
+	else
+	{
+		std::cout << "Unkown parameter type: " << paramType << "\n";
+		std::cout << "Returning mutation parameter! \n";
+		tempSet = (proposal ? &proposedMutationParameter[category] : &currentMutationParameter[category]);
+	}
 	unsigned aaRange[2];
 	SequenceSummary::AAToCodonRange(aa, true, aaRange);
 
@@ -573,7 +578,7 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
 	for(unsigned i = aaRange[0]; i < aaRange[1]; i++, j++)
 	{
 		if (aa =='X')
-			std::cout <<"aaRange[0]: " << aaRange[0] <<" & aaRange[1]: " << aaRange[1] <<"\n";
+			std::cout <<"aaRange[0]: " << aaRange[0] <<" & aaRange[1]: " << aaRange[1] << "\n";
 		returnSet[j] = tempSet -> at(i);
 	}
 }
@@ -587,9 +592,8 @@ double ROCParameter::getMixtureAssignmentPosteriorMean(unsigned samples, unsigne
 
 	if(samples > traceLength)
 	{
-		std::cout << std::string("ROCParameter::getMixtureAssignmentPosteriorMean throws: Number of anticipated samples (") +
-			std::to_string(samples) + std::string(") is greater than the length of the available trace (") + std::to_string(traceLength) + std::string(").") +
-			std::string("Whole trace is used for posterior estimate! \n");
+		std::cout << "ROCParameter::getMixtureAssignmentPosteriorMean throws: Number of anticipated samples (" <<
+			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
 	}
 	unsigned start = traceLength - samples;
@@ -610,9 +614,8 @@ double ROCParameter::getExpressionPosteriorMean(unsigned samples, unsigned geneI
 
 	if(samples > traceLength)
 	{
-		std::cout << std::string("ROCParameter::getExpressionPosteriorMean throws: Number of anticipated samples (") +
-			std::to_string(samples) + std::string(") is greater than the length of the available trace (") + std::to_string(traceLength) + std::string(").") +
-			std::string("Whole trace is used for posterior estimate! \n");
+		std::cout << "ROCParameter::getExpressionPosteriorMean throws: Number of anticipated samples (" <<
+			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
 	}
 	unsigned start = traceLength - samples;
@@ -638,9 +641,8 @@ double ROCParameter::getSphiPosteriorMean(unsigned samples)
 
 	if(samples > traceLength)
 	{
-		std::cout << std::string("ROCParameter::getSphiPosteriorMean throws: Number of anticipated samples (") +
-			std::to_string(samples) + std::string(") is greater than the length of the available trace(") + std::to_string(traceLength) + std::string(").") +
-			std::string("Whole trace is used for posterior estimate! \n");
+		std::cout << "ROCParameter::getSphiPosteriorMean throws: Number of anticipated samples (" <<
+			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
 	}
 	unsigned start = traceLength - samples;
@@ -657,9 +659,8 @@ double ROCParameter::getMutationPosteriorMean(unsigned category, unsigned sample
 
 	if(samples > traceLength)
 	{
-		std::cout << std::string("ROCParameter::getMutationPosteriorMean throws: Number of anticipated samples (") +
-			std::to_string(samples) + std::string(") is greater than the length of the available trace(") + std::to_string(traceLength) + std::string(").") +
-			std::string("Whole trace is used for posterior estimate! \n");
+		std::cout << "ROCParameter::getMutationPosteriorMean throws: Number of anticipated samples (" <<
+			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
 	}
     unsigned start = traceLength - samples;
@@ -676,9 +677,8 @@ double ROCParameter::getSelectionPosteriorMean(unsigned category, unsigned sampl
 
 	if(samples > traceLength)
 	{
-		std::cout << std::string("ROCParameter::getSelectionPosteriorMean throws: Number of anticipated samples (") +
-			std::to_string(samples) + std::string(") is greater than the length of the available trace(") + std::to_string(traceLength) + std::string(").") +
-			std::string("Whole trace is used for posterior estimate! \n");
+		std::cout << "ROCParameter::getSelectionPosteriorMean throws: Number of anticipated samples (" <<
+			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
 	}
     unsigned start = traceLength - samples;
@@ -694,9 +694,8 @@ double ROCParameter::getSelectionVariance(unsigned category, unsigned samples, u
 	unsigned traceLength = selectionParameterTrace[category].size();
 	if(samples > traceLength)
 	{
-		std::cout << std::string("ROCParameter::getSelectionVariance throws: Number of anticipated samples (") +
-			std::to_string(samples) + std::string(") is greater than the length of the available trace(") + std::to_string(traceLength) + std::string(").") +
-			std::string("Whole trace is used for posterior estimate! \n");
+		std::cout << "ROCParameter::getSelectionVariance throws: Number of anticipated samples (" <<
+			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
 	}
 
@@ -720,9 +719,8 @@ double ROCParameter::getMutationVariance(unsigned category, unsigned samples, un
 	unsigned traceLength = mutationParameterTrace[category].size();
 	if(samples > traceLength)
 	{
-		std::cout << std::string("ROCParameter::getMutationVariance throws: Number of anticipated samples (") +
-			std::to_string(samples) + std::string(") is greater than the length of the available trace(") + std::to_string(traceLength) + std::string(").") +
-			std::string("Whole trace is used for posterior estimate! \n");
+		std::cout << "ROCParameter::getMutationVariance throws: Number of anticipated samples (" <<
+			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
 	}
 
@@ -745,9 +743,8 @@ double ROCParameter::getExpressionVariance(unsigned samples, unsigned geneIndex,
 	unsigned traceLength = expressionTrace[0].size();
 	if(samples > traceLength)
 	{
-		std::cout << std::string("ROCParameter::getExpressionVariance throws: Number of anticipated samples (") +
-			std::to_string(samples) + std::string(") is greater than the length of the available trace (") + std::to_string(traceLength) + std::string(").") +
-			std::string("Whole trace is used for posterior estimate! \n");
+		std::cout << "ROCParameter::getExpressionVariance throws: Number of anticipated samples (" <<
+			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
 	}
 
@@ -775,9 +772,8 @@ double ROCParameter::getSphiVariance(unsigned samples, bool unbiased)
 	unsigned traceLength = sPhiTrace.size();
 	if(samples > traceLength)
 	{
-		std::cout << std::string("ROCParameter::getSphiVariance throws: Number of anticipated samples (") +
-			std::to_string(samples) + std::string(") is greater than the length of the available trace(") + std::to_string(traceLength) + std::string(").") +
-			std::string("Whole trace is used for posterior estimate! \n");
+		std::cout << "ROCParameter::getSphiVariance throws: Number of anticipated samples (" <<
+			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
 	}
 	double posteriorMean = getSphiPosteriorMean(samples);
@@ -985,7 +981,8 @@ std::vector <double> ROCParameter::readPhiValues(std::string filename)
 		if (pos != std::string::npos && pos2 != std::string::npos)
 		{
 			std::string val = tmpString.substr(pos + 1, pos2 - (pos + 1));
-			RV.push_back(std::stod(val));
+			//RV.push_back(std::stod(val));
+			RV.push_back(std::atof(val.c_str()));
 		}
 	}
 

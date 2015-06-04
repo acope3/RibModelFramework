@@ -2,12 +2,8 @@
 #include <time.h>
 #include <fstream>
 #include <algorithm>
+#include <sstream>
 
-//#include "include/Genome.h"
-//#include "include/Gene.h"
-//#include "include/SequenceSummary.h"
-//#include "include/ROCParameter.h"
-//#include "include/ROCModel.h"
 #include "include/MCMCAlgorithm.h"
 #include "include/CovarianceMatrix.h"
 
@@ -318,8 +314,7 @@ int main()
 		parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
 		parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
 		parameter.InitializeExpression(genome, sphi_init);
-		//std::vector<double> phiVals;
-		//phiVals = parameter.readPhiValues("Skluyveri_ChrA_ChrCleft_phi_est.csv");
+		//std::vector<double> phiVals = parameter.readPhiValues("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrCleft_phi_est.csv");
 		//parameter.InitializeExpression(phiVals);
 		std::cout << "done initialize ROCParameter object" << std::endl;
 
