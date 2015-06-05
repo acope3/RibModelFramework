@@ -105,6 +105,7 @@ class ROCParameter
 
 		static std::default_random_engine generator; // static to make sure that the same generator is during the runtime.
 
+		bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);
 		explicit ROCParameter();
 		ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures,
 				std::vector<unsigned> geneAssignment, bool splitSer = true, std::string _mutationSelectionState = allUnique);
@@ -192,7 +193,7 @@ class ROCParameter
 		std::vector<double> getCategoryProbabilitiesTrace(unsigned categoryIndex) {return categoryProbabilitiesTrace[categoryIndex];}
 		std::vector<double> getSphiAcceptanceRatioTrace() {return sphiAcceptanceRatioTrace;}
 		std::vector<double> getExpressionAcceptanceRatioTraceByCategoryForGene(int category, int geneIndex) 
-			{return expressionAcceptanceRatioTrace[category][geneIndex];}
+		{return expressionAcceptanceRatioTrace[category][geneIndex];}
 		std::vector<double> getCspAcceptanceRatioTraceForAA(char aa)
 		{
 			aa = std::toupper(aa);
@@ -282,127 +283,194 @@ class ROCParameter
 		//R wrapper functions
 		double getMutationPosteriorMeanForCodon(unsigned category, unsigned samples, std::string codon)
 		{
-
-			unsigned codonIndex = SequenceSummary::CodonToIndex(codon, true);
-			return getMutationPosteriorMean(category - 1, samples, codonIndex);
+			double rv = -1.0;
+			bool check = checkIndex(category, 1, mutationParameterTrace.size());
+			if (check)
+			{ 
+				unsigned codonIndex = SequenceSummary::CodonToIndex(codon, true);
+				rv = getMutationPosteriorMean(category - 1, samples, codonIndex);
+			}
+			return rv;
 		}
 		double getSelectionPosteriorMeanForCodon(unsigned category, unsigned samples, std::string codon)
 		{
-			unsigned codonIndex = SequenceSummary::CodonToIndex(codon, true);
-			return getSelectionPosteriorMean(category - 1, samples, codonIndex);
+			double rv = -1.0;
+			bool check = checkIndex(category, 1, selectionParameterTrace.size());
+			if (check)
+			{
+				unsigned codonIndex = SequenceSummary::CodonToIndex(codon, true);
+				rv = getSelectionPosteriorMean(category - 1, samples, codonIndex);
+			}
+			return rv;
 		}
 		double getMutationVarianceForCodon(unsigned category, unsigned samples, std::string codon, bool unbiased)
 		{
-			unsigned codonIndex = SequenceSummary::CodonToIndex(codon, true);
-			return getMutationVariance(category - 1, samples, codonIndex, unbiased);
+			double rv = -1.0;
+			bool check = checkIndex(category, 1, mutationParameterTrace.size());
+			if (check)
+			{
+				unsigned codonIndex = SequenceSummary::CodonToIndex(codon, true);
+				rv = getMutationVariance(category - 1, samples, codonIndex, unbiased);
+			}
+			return rv;
 		}
 		double getSelectionVarianceForCodon(unsigned category, unsigned samples, std::string codon, bool unbiased)
 		{
-			unsigned codonIndex = SequenceSummary::CodonToIndex(codon, true);
-			return getSelectionVariance(category - 1, samples, codonIndex, unbiased);
+			double rv = -1.0;
+			bool check = checkIndex(category, 1, selectionParameterTrace.size());
+			if (check)
+			{
+				unsigned codonIndex = SequenceSummary::CodonToIndex(codon, true);
+				rv = getSelectionVariance(category - 1, samples, codonIndex, unbiased);
+			}
+			return rv;
 		}
 
 		void initializeExpressionByGenome(Genome& genome, double sd_phi) {InitializeExpression(genome, sd_phi);}
 		void initializeExpressionByList(double sd_phi) {InitializeExpression(sd_phi);}
 		void initializeExpressionByRandom(std::vector<double> expression) {InitializeExpression(expression);}
-		std::vector<double> getExpressionTraceForGene(int geneIndex) {return getExpressionTrace(geneIndex - 1);}
+		std::vector<double> getExpressionTraceForGene(int geneIndex) 
+		{
+			std::vector<double> RV;
+			bool check = checkIndex(geneIndex, 1, expressionTrace[0][0].size());
+			if (check)
+			{ 
+				RV = getExpressionTrace(geneIndex - 1);
+			}
+			return RV;
+		}
 		std::vector<double> getExpressionTraceByCategoryForGene(int category, int geneIndex)
 		{
 			std::vector<double> RV;
-			unsigned samples = expressionTrace[category - 1].size();
-			for (unsigned i = 0u; i < samples; i++)
+			bool checkGene = checkIndex(geneIndex, 1, expressionTrace[0][0].size());
+			bool checkCategory = checkIndex(category, 1, expressionTrace.size());
+			if (checkGene && checkCategory)
 			{
-				RV.push_back(expressionTrace[category - 1][i][geneIndex - 1]);
+				unsigned samples = expressionTrace[category - 1].size();
+				for (unsigned i = 0u; i < samples; i++)
+				{
+					RV.push_back(expressionTrace[category - 1][i][geneIndex - 1]);
+				}
 			}
-			
 			return RV;
 		}
 		std::vector<double> getMutationParameterTraceByCategoryForCodon(int category, std::string& codon)
 		{
 			std::vector<double> RV;
-			unsigned codonIndex = SequenceSummary::CodonToIndex(codon);
-			unsigned samples = mutationParameterTrace[category - 1].size();
-			for (unsigned i = 0u; i < samples; i++)
-			{
-				RV.push_back(mutationParameterTrace[category - 1][i][codonIndex]);
+			bool check = checkIndex(category, 1, mutationParameterTrace.size());
+			if (check)
+			{	
+				unsigned codonIndex = SequenceSummary::CodonToIndex(codon);
+				unsigned samples = mutationParameterTrace[category - 1].size();
+				for (unsigned i = 0u; i < samples; i++)
+				{
+					RV.push_back(mutationParameterTrace[category - 1][i][codonIndex]);
+				}
 			}
-			
 			return RV;
 		}
 		std::vector<double> getSelectionParameterTraceByCategoryForCodon(int category, std::string& codon)
 		{
 			std::vector<double> RV;
-			unsigned codonIndex = SequenceSummary::CodonToIndex(codon);
-			unsigned samples = selectionParameterTrace[category - 1].size();
-			for (unsigned i = 0u; i < samples; i++)
-			{
-				RV.push_back(selectionParameterTrace[category - 1][i][codonIndex]);
+			bool check = checkIndex(category, 1, selectionParameterTrace.size());
+			if (check)
+			{	
+				unsigned codonIndex = SequenceSummary::CodonToIndex(codon);
+				unsigned samples = selectionParameterTrace[category - 1].size();
+				for (unsigned i = 0u; i < samples; i++)
+				{
+					RV.push_back(selectionParameterTrace[category - 1][i][codonIndex]);
+				}
 			}
-			
 			return RV;
 		}
 		std::vector<unsigned> getMixtureAssignmentTraceForGene(int geneIndex)
 		{
 			std::vector <unsigned> RV;
-			unsigned samples = mixtureAssignmentTrace.size();
-			for(unsigned i = 0u; i < samples; i++)
+			bool check = checkIndex(geneIndex, 1, mixtureAssignmentTrace[0].size());
+			if (check)
 			{
-				RV.push_back(mixtureAssignmentTrace[i][geneIndex - 1]);
+				unsigned samples = mixtureAssignmentTrace.size();
+				for(unsigned i = 0u; i < samples; i++)
+				{
+					RV.push_back(mixtureAssignmentTrace[i][geneIndex - 1] + 1);
+				}
 			}
 			return RV;
 		}
-		
+
 		unsigned getEstimatedMixtureAssignmentForGene(unsigned samples, unsigned geneIndex)
 		{
-			unsigned assignment;
-			if (geneIndex == 0 || geneIndex - 1 >= mixtureAssignment.size())
-			{
-				std::cerr <<"Bad gene index, " << geneIndex <<", given. Returning 0\n";
-				assignment = 0;
-			}
-			else 
-			{
-				assignment = getEstimatedMixtureAssignment(samples, geneIndex - 1);
-			}
-
-			return assignment + 1;
+			bool check = checkIndex(geneIndex, 1, mixtureAssignment.size());
+			return check ? getEstimatedMixtureAssignment(samples, geneIndex - 1) + 1 : 0;
 		}
 
 		std::vector<double> getEstimatedMixtureAssignmentProbabilitiesForGene(unsigned samples, unsigned geneIndex)
 		{
 			std::vector <double> probabilities;
-      if (geneIndex == 0 || geneIndex - 1 >= mixtureAssignment.size())
-      {
-        std::cerr <<"Bad gene index, " << geneIndex <<", given. Returning empty vector\n";
-        probabilities.resize(0);
-      }
-      else 
-      {
-        probabilities = getEstimatedMixtureAssignmentProbabilities(samples, geneIndex - 1);
-      }
+			bool check = checkIndex(geneIndex, 1, mixtureAssignment.size());
+			if (check) 
+			{
+				probabilities = getEstimatedMixtureAssignmentProbabilities(samples, geneIndex - 1);
+			}
 			return probabilities;
 		}
 
 
-		void setMixtureAssignmentForGene(unsigned geneIndex, unsigned value) {mixtureAssignment[geneIndex - 1] = value;}
-		std::vector<double> getCategoryProbabilitiesTraceForCategory(unsigned categoryIndex) {return categoryProbabilitiesTrace[categoryIndex - 1];}
-		/*double getMixtureAssignmentPosteriorMeanR(unsigned samples, unsigned geneIndex)
+		void setMixtureAssignmentForGene(unsigned geneIndex, unsigned value);
+		std::vector<double> getCategoryProbabilitiesTraceForCategory(unsigned categoryIndex)
 		{
-			return getMixtureAssignmentPosteriorMean(samples, geneIndex);
+			std::vector<double> RV;
+			bool check = checkIndex(categoryIndex, 1, categoryProbabilitiesTrace.size());
+			if (check)
+			{
+				RV = categoryProbabilitiesTrace[categoryIndex - 1];
+			}
+
+			return RV;
 		}
-		*/
+		/*double getMixtureAssignmentPosteriorMeanR(unsigned samples, unsigned geneIndex)
+			{
+			return getMixtureAssignmentPosteriorMean(samples, geneIndex);
+			}
+		 */
 
 		std::vector<double> getExpressionAcceptanceRatioTraceByCategoryForGeneR(int category, int geneIndex) 
-			{return getExpressionAcceptanceRatioTraceByCategoryForGene(category - 1, geneIndex - 1);}
+		{
+			std::vector<double> RV;
+			bool checkGene = checkIndex(geneIndex, 1, expressionAcceptanceRatioTrace.size());
+			bool checkCategory = checkIndex(category, 1, expressionAcceptanceRatioTrace[0].size()); 
+			if (checkGene && checkCategory)
+			{
+				RV = getExpressionAcceptanceRatioTraceByCategoryForGene(category - 1, geneIndex - 1);
+			}
+			return RV;
+		}
 		double getExpressionPosteriorMeanByExpressionCategoryForGene(unsigned samples, unsigned geneIndex, unsigned expressionCategory)
-		{return getExpressionPosteriorMean(samples, geneIndex - 1, expressionCategory - 1);}
-
+		{
+			double rv = -1.0;
+			bool checkGene = checkIndex(geneIndex, 1, expressionTrace[0][0].size());
+			bool checkCategory = checkIndex(expressionCategory, 1, expressionTrace.size()); 
+			if (checkGene && checkCategory)
+			{
+				rv = getExpressionPosteriorMean(samples, geneIndex - 1, expressionCategory - 1);
+			}
+			return rv;
+		}
 		double getExpressionVarianceByExpressionCategoryForGene(unsigned samples, unsigned geneIndex, unsigned expressionCategory, bool unbiased)
-		{return getExpressionVariance(samples, geneIndex - 1, expressionCategory - 1, unbiased);}
-
-		unsigned getMutationCategoryForGroup(unsigned group) {return categories[group - 1].delM;}
-		unsigned getSelectionCategoryForGroup(unsigned group) {return categories[group - 1].delEta;}
-		unsigned getExpressionCategoryForGroup(unsigned group) {return categories[group - 1].delEta;}
+		{
+			double rv = -1.0;
+			bool checkGene = checkIndex(geneIndex, 1, expressionTrace[0][0].size());
+			bool checkCategory = checkIndex(expressionCategory, 1, expressionTrace.size());
+			if (checkGene && checkCategory)
+			{
+				rv = getExpressionVariance(samples, geneIndex - 1, expressionCategory - 1, unbiased);
+			}
+			return rv;
+		}
+		unsigned getMutationCategoryForGroup(unsigned group); 
+		unsigned getSelectionCategoryForGroup(unsigned group); 
+		unsigned getExpressionCategoryForGroup(unsigned group); 
 	protected:
 
 };
