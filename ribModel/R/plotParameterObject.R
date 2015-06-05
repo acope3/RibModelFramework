@@ -113,13 +113,13 @@ plotSPhiTrace <- function(parameter)
 }
 plotMixtureProbability <- function(parameter)
 {
-  samples <- length(parameter$getCategoryProbabilitiesTrace(1))
+  samples <- length(parameter$getCategoryProbabilitiesTraceForCategory(1))
   numMixtures <- parameter$numMixtures
   
   plot(NULL, NULL, xlim = c(0, samples), ylim=c(0, 1), xlab = "Samples", ylab="Mixture Probability")
   for(i in 1:numMixtures)
   {
-    lines(parameter$getCategoryProbabilitiesTrace(i-1), col= .mixtureColors[i])    
+    lines(parameter$getCategoryProbabilitiesTraceForCategory(i), col= ribModel:::.mixtureColors[i])    
   }
   legend("topleft", legend = paste("Mixture Element", 1:numMixtures), 
          col = .mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")

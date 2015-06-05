@@ -245,9 +245,9 @@ unsigned SequenceSummary::CodonToIndex(std::string& codon, bool forParamVector)
 	}
 	return i;
 }
-std::string SequenceSummary::IndexToCodon(unsigned i)
+std::string SequenceSummary::IndexToCodon(unsigned i, bool forParamVector)
 {
-	return SequenceSummary::codonArray[i];
+	return forParamVector ? codonArrayParameter[i] : codonArray[i];
 }
 
 
@@ -336,10 +336,16 @@ std::vector<std::string> SequenceSummary::AAToCodon(char aa, bool forParamVector
 	aa = std::toupper(aa);
 
 	AAToCodonRange(aa, forParamVector, aaRange);
-
-	for (unsigned i = aaRange[0]; i < aaRange[1]; i++)
-	{
-		RV.push_back(codonArray[i]);
+	if(forParamVector){
+		for (unsigned i = aaRange[0]; i < aaRange[1]; i++)
+		{
+			RV.push_back(codonArrayParameter[i]);
+		}
+	}else{
+		for (unsigned i = aaRange[0]; i < aaRange[1]; i++)
+		{
+			RV.push_back(codonArray[i]);
+		}
 	}
 	return RV;
 }

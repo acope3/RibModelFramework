@@ -1320,9 +1320,9 @@ RCPP_MODULE(ROCParameter_mod)
 		.method("initMutationSelectionCategories", &ROCParameter::initMutationSelectionCategories)
 		.method("readPhiValues", &ROCParameter::readPhiValues)
 		.method("setMixtureAssignmentForGene", &ROCParameter::setMixtureAssignmentForGene)
-		.method("getMutationCategoryForGroup", &ROCParameter::getMutationCategoryForGroup)
-		.method("getSelectionCategoryForGroup", &ROCParameter::getSelectionCategoryForGroup)
-		.method("getExpressionCategoryForGroup", &ROCParameter::getExpressionCategoryForGroup)
+		.method("getMutationCategoryForGroup", &ROCParameter::getMutationCategoryForGroup) // TODO rename: group -> mixture
+		.method("getSelectionCategoryForGroup", &ROCParameter::getSelectionCategoryForGroup)// TODO rename: group -> mixture
+		.method("getExpressionCategoryForGroup", &ROCParameter::getExpressionCategoryForGroup)// TODO rename: group -> mixture
 		
 		//R wrapper functions
 		.method("initializeExpressionByGenome", &ROCParameter::initializeExpressionByGenome)

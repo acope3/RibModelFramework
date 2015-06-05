@@ -370,7 +370,7 @@ RCPP_MODULE(Genome_mod)
 		
 		//R Wrapper function
 		.method("getGeneByIndex", &Genome::getGeneByIndex, "returns a gene for a given index")
-		.method("getGenomeForGeneIndiciesR", &Genome::getGenomeForGeneIndiciesR, "returns a new genome based on the ones requested in the given vector")
+		.method("getGenomeForGeneIndicies", &Genome::getGenomeForGeneIndiciesR, "returns a new genome based on the ones requested in the given vector")
 		;
 }
 #endif

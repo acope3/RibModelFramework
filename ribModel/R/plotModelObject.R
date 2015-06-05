@@ -26,21 +26,19 @@ plot.Rcpp_ROCModel <- function(model, genome, parameter, samples = 100, category
   
   mixtureAssignment <- unlist(lapply(1:num.genes,  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))
   genes.in.category <- which(mixtureAssignment == category)
-  # TODO expressionCategory is actually mixtureElement, mapping to expressionCategory is missing!
+  expressionCategory <- parameter$getExpressionCategoryForGroup(category)
   
   # need expression values to know range
   num.genes <- length(genes.in.category)
   if(estim.Expression){ # use estimated expression values
     expressionValues <- unlist(lapply(genes.in.category, function(geneIndex){
-      parameter$getExpressionPosteriorMeanByExpressionCategoryForGene(samples, geneIndex, expressionCategory[geneIndex])
+      parameter$getExpressionPosteriorMeanByExpressionCategoryForGene(samples, geneIndex, expressionCategory)
     }))  
   }else{ # use empirical expression values
     
   }
   expressionValues <- log10(expressionValues)
-  #TODO wait for funciton from gabe to subset genome
-  
-  
+  genome <- genome$getGenomeForGeneIndicies(genes.in.category)
   
   names.aa <- aminoAcids()
   for(aa in names.aa)
@@ -116,8 +114,6 @@ plotSinglePanel <- function(parameter, model, genome, expressionValues, samples,
   codonCounts <- do.call("cbind", codonCounts)
   # codon proportions
   codonCounts <- codonCounts / rowSums(codonCounts)
-
-  #codonCounts <- codonCounts[genes.in.category, ]
   
   # make empty plot
   plot(NULL, NULL, xlim=range(expressionValues, na.rm = T), ylim=c(-0.05,1.05), 

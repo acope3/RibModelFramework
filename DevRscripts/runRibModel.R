@@ -3,7 +3,7 @@ genome <- new(Genome)
 genome$readFasta("../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta", F)
 
 
-sphi_init <- 2;
+sphi_init <- 1;
 numMixtures <- 2;
 mixDef <- "allUnique";
 geneAssignment <- c(rep(0,448), rep(0,513), rep(1,457))
@@ -15,7 +15,7 @@ parameter$initMutationSelectionCategories(files, 2, 1)
 
 
 
-samples <- 100
+samples <- 3000
 thining <- 10
 adaptiveWidth <- 10
 useSamples <- 50
@@ -39,4 +39,6 @@ plot(parameter, what = "Selection", category = 1)
 
 plot(model, genome, parameter, samples = samples*0.1, category = 1)
 
+parameter$getMutationPosteriorMeanForCodon(1,  10, "TGT" )
+parameter$getSelectionPosteriorMeanForCodon( 1, 10, "TGC" )
 

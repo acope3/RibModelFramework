@@ -61,7 +61,7 @@ class SequenceSummary
 		static char CodonToAA(std::string& codon);
 		static unsigned GetNumCodonsForAA(char& aa, bool forParamVector = false);
 		static unsigned CodonToIndex(std::string& codon, bool forParamVector = false);
-		static std::string IndexToCodon(unsigned i);
+		static std::string IndexToCodon(unsigned i, bool forParamVector = false);
 		static unsigned CodonToAAIndex(std::string& codon);
 		static char IndexToAA(int aa);
 		static void AAindexToCodonRange(unsigned aaIndex, bool forParamVector = false, unsigned aaRange[] = nullptr);
