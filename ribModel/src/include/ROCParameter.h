@@ -458,13 +458,6 @@ class ROCParameter
 			return rv;
 		}
 		double getExpressionVarianceByExpressionCategoryForGene(unsigned samples, unsigned geneIndex, unsigned expressionCategory, bool unbiased)
-<<<<<<< HEAD
-		{return getExpressionVariance(samples, geneIndex - 1, expressionCategory - 1, unbiased);}
-
-		unsigned getMutationCategoryForGroup(unsigned group) {return categories[group - 1].delM + 1;}
-		unsigned getSelectionCategoryForGroup(unsigned group) {return categories[group - 1].delEta + 1;}
-		unsigned getExpressionCategoryForGroup(unsigned group) {return categories[group - 1].delEta + 1;}
-=======
 		{
 			double rv = -1.0;
 			bool checkGene = checkIndex(geneIndex, 1, expressionTrace[0][0].size());
@@ -475,10 +468,9 @@ class ROCParameter
 			}
 			return rv;
 		}
-		unsigned getMutationCategoryForGroup(unsigned group); 
-		unsigned getSelectionCategoryForGroup(unsigned group); 
-		unsigned getExpressionCategoryForGroup(unsigned group); 
->>>>>>> 3bb6d298521f701c91b39dd12b42e827b848ee92
+		unsigned getMutationCategoryForMixture(unsigned group);
+		unsigned getSelectionCategoryForMixture(unsigned group);
+		unsigned getExpressionCategoryForMixture(unsigned group);
 	protected:
 
 };

@@ -1069,17 +1069,17 @@ void ROCParameter::setMixtureAssignmentForGene(unsigned geneIndex, unsigned valu
 		mixtureAssignment[geneIndex - 1] = value;
 	}
 }
-unsigned ROCParameter::getMutationCategoryForGroup(unsigned group) 
+unsigned ROCParameter::getMutationCategoryForMixture(unsigned group)
 {
 	bool check = checkIndex(group, 1, categories.size());
 	return check ? categories[group - 1].delM + 1 : 0;
 }
-unsigned ROCParameter::getSelectionCategoryForGroup(unsigned group) 
+unsigned ROCParameter::getSelectionCategoryForMixture(unsigned group)
 {
 	bool check = checkIndex(group, 1, categories.size());
 	return check ? categories[group - 1].delEta + 1 : 0;
 }
-unsigned ROCParameter::getExpressionCategoryForGroup(unsigned group) 
+unsigned ROCParameter::getExpressionCategoryForMixture(unsigned group)
 {
 	bool check = checkIndex(group, 1, categories.size());
 	return check ? categories[group - 1].delEta + 1 : 0;
@@ -1363,17 +1363,10 @@ RCPP_MODULE(ROCParameter_mod)
 		.method("initMutationSelectionCategories", &ROCParameter::initMutationSelectionCategories)
 		.method("readPhiValues", &ROCParameter::readPhiValues)
 		.method("setMixtureAssignmentForGene", &ROCParameter::setMixtureAssignmentForGene)
-<<<<<<< HEAD
-		.method("getMutationCategoryForGroup", &ROCParameter::getMutationCategoryForGroup) // TODO rename: group -> mixture
-		.method("getSelectionCategoryForGroup", &ROCParameter::getSelectionCategoryForGroup)// TODO rename: group -> mixture
-		.method("getExpressionCategoryForGroup", &ROCParameter::getExpressionCategoryForGroup)// TODO rename: group -> mixture
-		
-=======
-		.method("getMutationCategoryForGroup", &ROCParameter::getMutationCategoryForGroup)
-		.method("getSelectionCategoryForGroup", &ROCParameter::getSelectionCategoryForGroup)
-		.method("getExpressionCategoryForGroup", &ROCParameter::getExpressionCategoryForGroup)
+		.method("getMutationCategoryForMixture", &ROCParameter::getMutationCategoryForMixture)
+		.method("getSelectionCategoryForMixture", &ROCParameter::getSelectionCategoryForMixture)
+		.method("getExpressionCategoryForMixture", &ROCParameter::getExpressionCategoryForMixture)
 
->>>>>>> 3bb6d298521f701c91b39dd12b42e827b848ee92
 		//R wrapper functions
 		.method("initializeExpressionByGenome", &ROCParameter::initializeExpressionByGenome)
 		.method("initializeExpressionByList", &ROCParameter::initializeExpressionByList)
