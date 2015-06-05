@@ -401,6 +401,9 @@ class ROCParameter
 		double getExpressionVarianceByExpressionCategoryForGene(unsigned samples, unsigned geneIndex, unsigned expressionCategory, bool unbiased)
 		{return getExpressionVariance(samples, geneIndex - 1, expressionCategory - 1, unbiased);}
 
+		unsigned getMutationCategoryForGroup(unsigned group) {return categories[group - 1].delM;}
+		unsigned getSelectionCategoryForGroup(unsigned group) {return categories[group - 1].delEta;}
+		unsigned getExpressionCategoryForGroup(unsigned group) {return categories[group - 1].delEta;}
 	protected:
 
 };

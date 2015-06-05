@@ -51,8 +51,8 @@ class Gene
 		SequenceSummary& getSequenceSummary() {return geneData;}
 
 		//R Wrapper Functions
-		int getAACount(char aa) { return geneData.getAAcount(aa);}
-		int getCodonCount(std::string& codon) { return geneData.getCodonCount(codon);}
+		int getAACount(char aa) {return geneData.getAAcount(aa);}
+		int getCodonCount(std::string& codon) {return geneData.getCodonCount(codon);}
 
 	protected:
 
