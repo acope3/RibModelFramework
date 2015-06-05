@@ -15,7 +15,7 @@ parameter$initMutationSelectionCategories(files, 2, 1)
 
 
 
-samples <- 1000
+samples <- 100
 thining <- 10
 adaptiveWidth <- 10
 useSamples <- 50
@@ -37,6 +37,6 @@ plot(parameter$getExpressionTraceByCategoryForGene( 2, 905 ), type="l")
 plot(parameter, what = "Mutation", category = 1)
 plot(parameter, what = "Selection", category = 1)
 
-plot(model, genome, parameter, samples = 100, category = 1)
+plot(model, genome, parameter, samples = samples*0.1, category = 1)
 
 

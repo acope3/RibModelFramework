@@ -3,14 +3,14 @@ Type: Package
 Title: What the package does (short line)
 Version: 1.0
 Date: 2015-01-22
-Author: Your Name
-Maintainer: Your Name <your@email.com>
+Authors@R:c(person("Cedric", "Landerer", role = c("aut", "cre"), email = "cedric.landerer@gmail.com"),
+		person("Gabriel", "Hanas", role = "aut"))
+Author: Cedric Landerer [aut, cre],
+	Gabriel Hanas [aut]
+Maintainer: Cedric Landerer <cedric.landerer@gmail.com>
 Depends: Rcpp
-<<<<<<< HEAD
-RcppModules: Genome_mod
-=======
-RcppModules: Gene_mod
->>>>>>> 58f860113212e323d801b361f3b534f445add970
+Suggests: Hmisc
+RcppModules: MCMCAlgorithm_mod, ROCModel_mod, ROCParameter_mod, Genome_mod, Gene_mod, SequenceSummary_mod
 Description: More about what it does (maybe more than one line)
 License: GPL (>= 2)
 Imports: Rcpp (>= 0.11.3)

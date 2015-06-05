@@ -18,14 +18,14 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * 
 estimateCodonSpecificParameter(true), estimateHyperParameter(true)
 {
     MCMCAlgorithm(1000, 1, true, true, true);
-    likelihoodTrace.resize(samples + 1);
+    likelihoodTrace.resize(samples);
 }
 
 MCMCAlgorithm::MCMCAlgorithm(int _samples, int _thining, unsigned _adaptiveWidth, bool _estimateExpression, bool _estimateCodonSpecificParameter, bool _estimateHyperParameter)
     : samples(_samples), thining(_thining), adaptiveWidth(_adaptiveWidth * thining), estimateExpression(_estimateExpression), estimateCodonSpecificParameter(_estimateCodonSpecificParameter),
         estimateHyperParameter(_estimateHyperParameter)
 {
-    likelihoodTrace.resize(samples + 1);
+    likelihoodTrace.resize(samples);
 }
 
 MCMCAlgorithm::~MCMCAlgorithm()
@@ -241,7 +241,7 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
 
         if( (iteration + 1) % 100 == 0)
         {
-            std::cout << (iteration+1) << std::endl;
+            std::cout << "Status at iteration " << (iteration+1) << std::endl;
             std::cout << "\t current logLikelihood: " << likelihoodTrace[(iteration/thining) - 1] << std::endl;
             std::cout << "\t current Sphi estimate: " << parameter.getSphi() << std::endl;
             std::cout << "\t current Sphi proposal width: " << parameter.getSphiProposalWidth() << std::endl;

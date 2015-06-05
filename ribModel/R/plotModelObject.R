@@ -1,7 +1,7 @@
     
 
 
-plot.Rcpp_ROCModel <- function(model, genome, parameter, samples = 100, category = 1, ...)
+plot.Rcpp_ROCModel <- function(model, genome, parameter, samples = 100, category = 1, estim.Expression = TRUE, ...)
 {
   input_list <- as.list(list(...))
   
@@ -24,19 +24,23 @@ plot.Rcpp_ROCModel <- function(model, genome, parameter, samples = 100, category
   
   num.genes <- genome$getGenomeSize()
   
-  expressionCategory <- round(unlist(lapply(1:num.genes,  function(geneIndex){parameter$getMixtureAssignmentPosteriorMean(samples, geneIndex-1)})))
-  genes.in.category <- which(expressionCategory == category)
+  mixtureAssignment <- unlist(lapply(1:num.genes,  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))
+  genes.in.category <- which(mixtureAssignment == category)
   # TODO expressionCategory is actually mixtureElement, mapping to expressionCategory is missing!
+  
+  # need expression values to know range
   num.genes <- length(genes.in.category)
-  expressionValues <- vector("numeric", num.genes)
-  i <- 1
-  for(geneIndex in genes.in.category)
-  {
-    expressionValues[i] <- parameter$getExpressionPosteriorMean(samples, geneIndex-1, expressionCategory[geneIndex])
-    i <- i + 1
+  if(estim.Expression){ # use estimated expression values
+    expressionValues <- unlist(lapply(genes.in.category, function(geneIndex){
+      parameter$getExpressionPosteriorMeanByExpressionCategoryForGene(samples, geneIndex, expressionCategory[geneIndex])
+    }))  
+  }else{ # use empirical expression values
+    
   }
   expressionValues <- log10(expressionValues)
   #TODO wait for funciton from gabe to subset genome
+  
+  
   
   names.aa <- aminoAcids()
   for(aa in names.aa)
@@ -84,6 +88,7 @@ plotSinglePanel <- function(parameter, model, genome, expressionValues, samples,
 {
   codons <- AAToCodon(aa, T)
   
+  # get codon specific parameter
   selection <- vector("numeric", length(codons))
   mutation <- vector("numeric", length(codons))
   for(i in 1:length(codons))
@@ -92,12 +97,16 @@ plotSinglePanel <- function(parameter, model, genome, expressionValues, samples,
     mutation[i] <- parameter$getMutationPosteriorMeanForCodon(category, samples, codons[i])
   }
   
+  # calculate codon probabilities with respect to phi
+  expression.range <- range(expressionValues)
+  phis <- seq(from = expression.range[1], to = expression.range[2], by = 0.01)
   rank.index <- order(expressionValues)
-  codonProbability <- lapply(rank.index,  
-                             function(geneIndex){
-                               model$CalculateProbabilitiesForCodons(mutation, selection, expressionValues[geneIndex])
-                               
+  codonProbability <- lapply(phis,  
+                             function(phi){
+                               model$CalculateProbabilitiesForCodons(mutation, selection, phi)
                              })
+  
+  #get codon counts
   codons <- AAToCodon(aa, F)
   codonCounts <- vector("list", length(codons))
   for(i in 1:length(codons))
@@ -105,13 +114,16 @@ plotSinglePanel <- function(parameter, model, genome, expressionValues, samples,
     codonCounts[[i]] <- genome$getCodonCountsPerGene(codons[i])
   }
   codonCounts <- do.call("cbind", codonCounts)
+  # codon proportions
   codonCounts <- codonCounts / rowSums(codonCounts)
-  quantiles <- quantile(expressionValues, probs = seq(0.05, 0.95, 0.05), na.rm = T)
 
+  #codonCounts <- codonCounts[genes.in.category, ]
   
-  
+  # make empty plot
   plot(NULL, NULL, xlim=range(expressionValues, na.rm = T), ylim=c(-0.05,1.05), 
        xlab = "", ylab="", axes = FALSE)
+  # bin expression values of genes
+  quantiles <- quantile(expressionValues, probs = seq(0.05, 0.95, 0.05), na.rm = T)
   for(i in 1:length(quantiles))
   {
     if(i == 1){
@@ -135,7 +147,7 @@ plotSinglePanel <- function(parameter, model, genome, expressionValues, samples,
   codonProbability <- do.call("rbind", codonProbability)
   for(i in 1:length(codons))
   {
-    lines(expressionValues[rank.index], codonProbability[, i], col=ribModel:::.codonColors[i])
+    lines(phis, codonProbability[, i], col=ribModel:::.codonColors[i])
   }
   legend("topleft", legend = codons, col=ribModel:::.codonColors[1:length(codons)], bty = "n", lty=1, cex=0.75)  
 }

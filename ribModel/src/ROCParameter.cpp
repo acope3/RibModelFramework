@@ -651,7 +651,7 @@ unsigned ROCParameter::getEstimatedMixtureAssignment(unsigned samples, unsigned 
 		}
 	}
 
-	return rv; 
+	return rv;
 }
 
 

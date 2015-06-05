@@ -362,16 +362,15 @@ class ROCParameter
 			}
 			else 
 			{
-				assignment = getEstimatedMixtureAssignment(samples, geneIndex);
+				assignment = getEstimatedMixtureAssignment(samples, geneIndex - 1);
 			}
 
-			return assignment;
+			return assignment + 1;
 		}
 
 		std::vector<double> getEstimatedMixtureAssignmentProbabilitiesForGene(unsigned samples, unsigned geneIndex)
 		{
 			std::vector <double> probabilities;
-			geneIndex -= 1;
       if (geneIndex == 0 || geneIndex - 1 >= mixtureAssignment.size())
       {
         std::cerr <<"Bad gene index, " << geneIndex <<", given. Returning empty vector\n";
@@ -379,7 +378,7 @@ class ROCParameter
       }
       else 
       {
-        probabilities = getEstimatedMixtureAssignmentProbabilities(samples, geneIndex); 
+        probabilities = getEstimatedMixtureAssignmentProbabilities(samples, geneIndex - 1);
       }
 			return probabilities;
 		}
