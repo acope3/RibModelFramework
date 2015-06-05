@@ -586,7 +586,7 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
 		returnSet[j] = tempSet -> at(i);
 	}
 }
-
+/*
 double ROCParameter::getMixtureAssignmentPosteriorMean(unsigned samples, unsigned geneIndex)
 {
 
@@ -608,6 +608,52 @@ double ROCParameter::getMixtureAssignmentPosteriorMean(unsigned samples, unsigne
 
 	return posteriorMean / (double)samples;
 }
+*/
+std::vector <double> ROCParameter::getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex)
+{
+	std::vector<double> probabilities(numMixtures, 0.0);
+	unsigned traceLength = mixtureAssignmentTrace.size();
+
+  if(samples > traceLength)
+  {
+    std::cerr << "Warning in ROCParameter::getMixtureAssignmentPosteriorMean throws: Number of anticipated samples (" <<
+      samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
+    samples = traceLength;
+  }
+
+	unsigned start = traceLength - samples;
+	for (unsigned i = start; i < traceLength; i++)
+	{
+		unsigned value = mixtureAssignmentTrace[i][geneIndex];
+		probabilities[value]++;
+	}	
+
+	for (unsigned i = 0; i < numMixtures; i++)
+	{
+		probabilities[i] /= (double)samples;
+	}
+	return probabilities;
+}
+
+unsigned ROCParameter::getEstimatedMixtureAssignment(unsigned samples, unsigned geneIndex)
+{
+	unsigned  rv;
+	double value = -1.0;
+	std::vector <double> probabilities;
+	probabilities = getEstimatedMixtureAssignmentProbabilities(samples, geneIndex);
+
+	for (unsigned i = 0; i < probabilities.size(); i++)
+	{
+		if (value < probabilities[i])
+		{
+			value = probabilities[i];
+			rv = i;
+		}
+	}
+
+	return rv; 
+}
+
 
 double ROCParameter::getExpressionPosteriorMean(unsigned samples, unsigned geneIndex, unsigned expressionCategory)
 {
@@ -1272,35 +1318,46 @@ RCPP_MODULE(ROCParameter_mod)
 
 		.method("initMutationSelectionCategories", &ROCParameter::initMutationSelectionCategories)
 		.method("readPhiValues", &ROCParameter::readPhiValues)
+		.method("setMixtureAssignmentForGene", &ROCParameter::setMixtureAssignmentForGene)
+		
+		//R wrapper functions
 		.method("initializeExpressionByGenome", &ROCParameter::initializeExpressionByGenome)
 		.method("initializeExpressionByList", &ROCParameter::initializeExpressionByList)
 		.method("initializeExpressionByRandom", &ROCParameter::initializeExpressionByRandom)
-		.method("getMixtureAssignmentForGene", &ROCParameter::getMixtureAssignmentForGene)
-		.method("setMixtureAssignmentForGene", &ROCParameter::setMixtureAssignmentForGene)
+		.method("getEstimatedMixtureAssignmentForGene", &ROCParameter::getEstimatedMixtureAssignmentForGene, "returns the mixture assignement for a given gene")
+		.method("getEstimatedMixtureAssignmentProbabilitiesForGene", &ROCParameter::getEstimatedMixtureAssignmentProbabilitiesForGene, "returns the probabilities assignment for a given gene")	
+
 		// Trace functions
-		.method("getCategoryProbabilitiesTrace", &ROCParameter::getCategoryProbabilitiesTrace)
+		.method("getCspAcceptanceRatioTraceForAA", &ROCParameter::getCspAcceptanceRatioTraceForAA)
+		.method("getExpectedPhiTrace", &ROCParameter::getExpectedPhiTrace)
+		.method("getSphiAcceptanceRatioTrace", &ROCParameter::getSphiAcceptanceRatioTrace)
+		.method("getSPhiTrace", &ROCParameter::getSPhiTrace)
+		
+		//R wrapper functions
+		.method("getCategoryProbabilitiesTraceForCategory", &ROCParameter::getCategoryProbabilitiesTraceForCategory)
 		.method("getMixtureAssignmentTraceForGene", &ROCParameter::getMixtureAssignmentTraceForGene)
 		.method("getSelectionParameterTraceByCategoryForCodon", &ROCParameter::getSelectionParameterTraceByCategoryForCodon)
 		.method("getMutationParameterTraceByCategoryForCodon", &ROCParameter::getMutationParameterTraceByCategoryForCodon)
 		.method("getExpressionTraceForGene", &ROCParameter::getExpressionTraceForGene)
 		.method("getExpressionTraceByCategoryForGene", &ROCParameter::getExpressionTraceByCategoryForGene)
-		.method("getExpressionAcceptanceRatioTraceByCategoryForGene", &ROCParameter::getExpressionAcceptanceRatioTraceByCategoryForGene)
-		.method("getCspAcceptanceRatioTraceForAA", &ROCParameter::getCspAcceptanceRatioTraceForAA)
-		.method("getExpectedPhiTrace", &ROCParameter::getExpectedPhiTrace)
-		.method("getSphiAcceptanceRatioTrace", &ROCParameter::getSphiAcceptanceRatioTrace)
-		.method("getSPhiTrace", &ROCParameter::getSPhiTrace)
+		.method("getExpressionAcceptanceRatioTraceByCategoryForGeneR", &ROCParameter::getExpressionAcceptanceRatioTraceByCategoryForGeneR)
+		
 		// Posterior functions
-		.method("getExpressionPosteriorMean", &ROCParameter::getExpressionPosteriorMean)
 		.method("getSphiPosteriorMean", &ROCParameter::getSphiPosteriorMean)
-		.method("getMutationPosteriorMeanForCodon", &ROCParameter::getMutationPosteriorForCodon)
-		.method("getSelectionPosteriorMeanForCodon", &ROCParameter::getSelectionPosteriorForCodon)
-		.method("getMixtureAssignmentPosteriorMean", &ROCParameter::getMixtureAssignmentPosteriorMeanR)
+		//.method("getMixtureAssignmentPosteriorMean", &ROCParameter::getMixtureAssignmentPosteriorMeanR)
+		
+		//R wrapper functions
+		.method("getExpressionPosteriorMeanByExpressionCategoryForGene", &ROCParameter::getExpressionPosteriorMeanByExpressionCategoryForGene)
+		.method("getMutationPosteriorMeanForCodon", &ROCParameter::getMutationPosteriorMeanForCodon)
+		.method("getSelectionPosteriorMeanForCodon", &ROCParameter::getSelectionPosteriorMeanForCodon)
+		
 		// Variance functions
-		.method("getMutationVarianceForCodon", &ROCParameter::getMutationVarianceForCodon)
-		.method("getSelectionVarianceForCodon", &ROCParameter::getSelectionVarianceForCodon)
-		.method("getExpressionVariance", &ROCParameter::getExpressionVariance)
 		.method("getSphiVariance", &ROCParameter::getSphiVariance)
 
+		//R wrapper functions
+		.method("getMutationVarianceForCodon", &ROCParameter::getMutationVarianceForCodon)
+		.method("getSelectionVarianceForCodon", &ROCParameter::getSelectionVarianceForCodon)
+		.method("getExpressionVarianceByExpressionCategoryForGene", &ROCParameter::getExpressionVarianceByExpressionCategoryForGene)
 
 		.property("numMutationCategories", &ROCParameter::getNumMutationCategories)
 		.property("numSelectionCategories", &ROCParameter::getNumSelectionCategories)

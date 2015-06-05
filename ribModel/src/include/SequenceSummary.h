@@ -8,36 +8,36 @@
 #include <vector>
 class SequenceSummary
 {
-    private:
+	private:
 
-        int ncodons[64];
-        int naa[22];
+		int ncodons[64];
+		int naa[22];
 
-    public:
+	public:
 
-        //static member variables
-        static const char Ser2;
-        static const std::vector<char> AminoAcidArray;
-        static const std::string codonArray[];
-        static const std::string codonArrayParameter[];
-        static const std::map<char, int> aaToIndex;
+		//static member variables
+		static const char Ser2;
+		static const std::vector<char> AminoAcidArray;
+		static const std::string codonArray[];
+		static const std::string codonArrayParameter[];
+		static const std::map<char, int> aaToIndex;
 
-        explicit SequenceSummary();
-        SequenceSummary(const std::string& sequence);
-        virtual ~SequenceSummary();
-        SequenceSummary(const SequenceSummary& other);
-        SequenceSummary& operator=(const SequenceSummary& other);
+		explicit SequenceSummary();
+		SequenceSummary(const std::string& sequence);
+		virtual ~SequenceSummary();
+		SequenceSummary(const SequenceSummary& other);
+		SequenceSummary& operator=(const SequenceSummary& other);
 
 
-        void processSequence(const std::string& sequence);
-        void clear();
+		void processSequence(const std::string& sequence);
+		void clear();
 
-        int getAAcountForAA(char aa) {return naa[aaToIndex.find(aa)->second];}
-        int getAAcountForAA(int aa) {return naa[aa];}
+		int getAAcountForAA(char aa) {return naa[aaToIndex.find(aa)->second];}
+		int getAAcountForAA(int aa) {return naa[aa];}
 
-        int getCodonCountForCodon(std::string& codon) {return ncodons[SequenceSummary::CodonToIndex(codon)];}
-        int getCodonCountForCodon(int codon) {return ncodons[codon];}
-		
+		int getCodonCountForCodon(std::string& codon) {return ncodons[SequenceSummary::CodonToIndex(codon)];}
+		int getCodonCountForCodon(int codon) {return ncodons[codon];}
+
 
 		//R Wrapper Functions
 		int getAAcount(char aa) {aa = std::toupper(aa);	return getAAcountForAA(aa);}
@@ -52,21 +52,21 @@ class SequenceSummary
 
 
 
-        //statics
-        static char CodonToAA(std::string& codon);
-        static unsigned GetNumCodonsForAA(char& aa, bool forParamVector = false);
-        static unsigned CodonToIndex(std::string& codon, bool forParamVector = false);
-        static std::string IndexToCodon(unsigned i);
-        static unsigned CodonToAAIndex(std::string& codon);
-        static char IndexToAA(int aa);
-        static void AAindexToCodonRange(unsigned aaIndex, bool forParamVector = false, unsigned aaRange[] = nullptr);
-        static void AAToCodonRange(char aa, bool forParamVector = false, unsigned aaRange[] = nullptr);
+		//statics
+		static char CodonToAA(std::string& codon);
+		static unsigned GetNumCodonsForAA(char& aa, bool forParamVector = false);
+		static unsigned CodonToIndex(std::string& codon, bool forParamVector = false);
+		static std::string IndexToCodon(unsigned i);
+		static unsigned CodonToAAIndex(std::string& codon);
+		static char IndexToAA(int aa);
+		static void AAindexToCodonRange(unsigned aaIndex, bool forParamVector = false, unsigned aaRange[] = nullptr);
+		static void AAToCodonRange(char aa, bool forParamVector = false, unsigned aaRange[] = nullptr);
 		static std::vector<std::string> AAToCodon(char aa, bool forParamVector = false);
 
-        //R wrapper
-        static std::vector<char> aminoAcids() {return AminoAcidArray; }
+		//R wrapper
+		static std::vector<char> aminoAcids() {return AminoAcidArray; }
 
-    protected:
+	protected:
 
 
 

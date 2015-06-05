@@ -41,7 +41,7 @@ class Genome
 		void clear();
 
 		//R wrapper functions
-		Gene& getGeneByIndex(int index) {return getGene(index - 1);}
+		Gene& getGeneByIndex(int index) {return genes[index - 1];}
 
 	protected:
 };
