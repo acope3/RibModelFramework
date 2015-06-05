@@ -219,6 +219,7 @@ void ROCParameter::initParameterSet(unsigned numGenes, double sphi, unsigned _nu
 
 void ROCParameter::initMutationSelectionCategories(std::vector<std::string> files, unsigned numCategories, unsigned paramType)
 {
+	//TODO: R crashes due to different sizes given here.
 	unsigned i, j;
 	std::size_t pos, pos2;
 
@@ -1319,6 +1320,9 @@ RCPP_MODULE(ROCParameter_mod)
 		.method("initMutationSelectionCategories", &ROCParameter::initMutationSelectionCategories)
 		.method("readPhiValues", &ROCParameter::readPhiValues)
 		.method("setMixtureAssignmentForGene", &ROCParameter::setMixtureAssignmentForGene)
+		.method("getMutationCategoryForGroup", &ROCParameter::getMutationCategoryForGroup)
+		.method("getSelectionCategoryForGroup", &ROCParameter::getSelectionCategoryForGroup)
+		.method("getExpressionCategoryForGroup", &ROCParameter::getExpressionCategoryForGroup)
 		
 		//R wrapper functions
 		.method("initializeExpressionByGenome", &ROCParameter::initializeExpressionByGenome)

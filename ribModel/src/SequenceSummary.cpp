@@ -94,7 +94,7 @@ void SequenceSummary::AAindexToCodonRange(unsigned aaIndex, bool forParamVector,
 {
 	unsigned startAAIndex = 0;
 	unsigned endAAIndex = 0;
-	char aa = AminoAcidArray[aaIndex];
+	char aa = IndexToAA(aaIndex);
 
 	if (aa == 'A') 
 	{
@@ -205,6 +205,11 @@ void SequenceSummary::AAindexToCodonRange(unsigned aaIndex, bool forParamVector,
 	{
 		if (!forParamVector) {startAAIndex = 61; endAAIndex = 64;}
 		else { startAAIndex = 40; endAAIndex = 40;} 
+	}
+	else //Invalid AA
+	{
+		startAAIndex = 0;
+		endAAIndex = 0;
 	}
 
 	aaRange[0] = startAAIndex;

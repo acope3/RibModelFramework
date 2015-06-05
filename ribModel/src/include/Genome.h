@@ -39,9 +39,11 @@ class Genome
 		void simulateGenome(ROCParameter& parameter, ROCModel& model);
 		unsigned getGenomeSize() {return genes.size();}
 		void clear();
-
+		Genome getGenomeForGeneIndicies(std::vector <unsigned> indicies);
+		Genome getGenomeForGeneIndiciesR(std::vector <unsigned> indicies);
+		bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);
 		//R wrapper functions
-		Gene& getGeneByIndex(int index) {return genes[index - 1];}
+		Gene& getGeneByIndex(unsigned index);
 
 	protected:
 };

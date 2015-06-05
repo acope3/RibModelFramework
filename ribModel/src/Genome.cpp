@@ -288,6 +288,65 @@ void Genome::clear()
 	simulatedGenes.clear();
 }
 
+Genome Genome::getGenomeForGeneIndicies(std::vector <unsigned> indicies)
+{
+	Genome genome;
+
+	for (unsigned i = 0; i < indicies.size(); i++)
+	{
+		genome.addGene(genes[indicies[i]]);
+	}
+
+	return genome;
+}
+
+Genome Genome::getGenomeForGeneIndiciesR(std::vector <unsigned> indicies)
+{
+	Genome genome;
+	bool bad = false;
+	for (unsigned i = 0; i < indicies.size(); i++)
+	{
+		if (indicies[i] == 0 || indicies[i] >= genes.size())
+		{
+			std::cerr <<"Problem with index " << i << ".\n";
+			std::cerr <<"returning an empty genome\n";
+			bad = true;
+		}
+		else
+		{
+			indicies[i]--;
+		}
+	}
+	if (!bad)
+	{
+		genome = getGenomeForGeneIndicies(indicies);
+	}
+	
+	return genome;
+
+}
+Gene& Genome::getGeneByIndex(unsigned index)
+{
+	Gene gene;
+	bool checker = checkIndex(index, 1, genes.size());
+	return checker ? genes[index - 1] : gene;
+}
+
+bool Genome::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound)
+{
+	bool check = false;
+	if (lowerbound <= index && index <= upperbound)
+	{
+		check = true;
+	}
+	else
+	{
+		std::cerr <<"Error with the index\nGIVEN: " << index <<"\n";
+		std::cerr <<"MUST BE BETWEEN:	" << lowerbound << " & " << upperbound <<"\n";
+	}
+	return check;
+}
+
 // ---------------------------------------------------------------------------
 // ----------------------------- RCPP STUFF ----------------------------------
 // ---------------------------------------------------------------------------
@@ -296,6 +355,7 @@ void Genome::clear()
 using namespace Rcpp;
 
 RCPP_EXPOSED_CLASS(Gene)
+RCPP_EXPOSED_CLASS(Genome)
 
 RCPP_MODULE(Genome_mod)
 {
@@ -310,6 +370,7 @@ RCPP_MODULE(Genome_mod)
 		
 		//R Wrapper function
 		.method("getGeneByIndex", &Genome::getGeneByIndex, "returns a gene for a given index")
+		.method("getGenomeForGeneIndiciesR", &Genome::getGenomeForGeneIndiciesR, "returns a new genome based on the ones requested in the given vector")
 		;
 }
 #endif
