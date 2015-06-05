@@ -14,7 +14,7 @@
 
 
 
-MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100), estimateExpression(true),
+MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * thining), estimateExpression(true),
 estimateCodonSpecificParameter(true), estimateHyperParameter(true)
 {
     MCMCAlgorithm(1000, 1, true, true, true);
@@ -22,7 +22,7 @@ estimateCodonSpecificParameter(true), estimateHyperParameter(true)
 }
 
 MCMCAlgorithm::MCMCAlgorithm(int _samples, int _thining, unsigned _adaptiveWidth, bool _estimateExpression, bool _estimateCodonSpecificParameter, bool _estimateHyperParameter)
-    : samples(_samples), thining(_thining), adaptiveWidth(_adaptiveWidth), estimateExpression(_estimateExpression), estimateCodonSpecificParameter(_estimateCodonSpecificParameter),
+    : samples(_samples), thining(_thining), adaptiveWidth(_adaptiveWidth * thining), estimateExpression(_estimateExpression), estimateCodonSpecificParameter(_estimateCodonSpecificParameter),
         estimateHyperParameter(_estimateHyperParameter)
 {
     likelihoodTrace.resize(samples + 1);
@@ -385,7 +385,26 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
 
 }
 
+double MCMCAlgorithm::getLogLikelihoodPosteriorMean(unsigned samples)
+{
+	double posteriorMean = 0.0;
+	unsigned traceLength = likelihoodTrace.size();
 
+
+	if(samples > traceLength)
+	{
+		std::cerr << "Warning in MCMCAlgorithm::getLogLikelihoodPosteriorMean throws: Number of anticipated samples (" <<
+			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
+		samples = traceLength;
+	}
+	unsigned start = traceLength - samples;
+	for(unsigned i = start; i < traceLength; i++)
+	{
+		posteriorMean += likelihoodTrace[i];
+	}
+
+	return posteriorMean / (double)samples;
+}
 // ---------------------------------------------------------------------------
 // ----------------------------- RCPP STUFF ----------------------------------
 // ---------------------------------------------------------------------------
@@ -403,6 +422,8 @@ RCPP_MODULE(MCMCAlgorithm_mod)
 		.constructor("empty constructor")
 		.constructor <int, int, bool, bool, bool, unsigned>()
 		.method("run", &MCMCAlgorithm::run)
+		.method("getLogLikelihoodTrace", &MCMCAlgorithm::getLogLikelihoodTrace)
+		.method("getLogLikelihoodPosteriorMean", &MCMCAlgorithm::getLogLikelihoodPosteriorMean)
 	;
 }
 #endif

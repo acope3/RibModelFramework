@@ -41,7 +41,8 @@ class MCMCAlgorithm
         void setEstimateCodonSpecificParameter(bool in) {estimateCodonSpecificParameter = in;}
         void setEstimateHyperParameter(bool in) {estimateHyperParameter = in;}
 
-
+        std::vector<double> getLogLikelihoodTrace() {return likelihoodTrace;}
+        double getLogLikelihoodPosteriorMean(unsigned samples);
 
     protected:
 };
