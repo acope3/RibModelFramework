@@ -31,7 +31,7 @@ class Genome
 		void readFasta(std::string filename, bool Append = false);
 		void writeFasta(std::string filename, bool simulated = false);
 		void addGene(const Gene& gene);
-		void getCountsForAA(char aa, unsigned codonCounts[][5]);
+		std::vector<unsigned> getCodonCountsPerGene(std::string codon);
 		std::vector <Gene> getGenes() {return genes;}
 		std::vector <Gene> getSimulatedGenes() {return simulatedGenes;}
 		Gene& getGene(unsigned index);

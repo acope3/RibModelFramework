@@ -15,7 +15,7 @@ parameter$initMutationSelectionCategories(files, 2, 1)
 
 
 
-samples <- 500
+samples <- 100
 thining <- 10
 adaptiveWidth <- 100
 useSamples <- 50
@@ -27,7 +27,10 @@ mcmc$run(genome, model, parameter);
 plot(parameter, what = "MixtureProbability")
 plot(parameter, what = "SPhi")
 plot(parameter, what = "ExpectedPhi")
-plot(parameter, what = "Expression", geneIndex = 0)
+plot(parameter, what = "Expression", geneIndex = 1)
+plot(parameter, what = "Mutation", category = 1)
+plot(parameter, what = "Selection", category = 1)
 
+plot(model, genome, parameter, samples = 100, category = 1)
 
 

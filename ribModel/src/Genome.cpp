@@ -38,21 +38,18 @@ void Genome::addGene(const Gene& gene)
 }
 
 
-void Genome::getCountsForAA(char aa, unsigned codonCounts[][5])
+std::vector<unsigned> Genome::getCodonCountsPerGene(std::string codon)
 {
+	std::vector<unsigned> codonCounts;
+	codonCounts.resize(genes.size());
+	unsigned codonIndex = SequenceSummary::CodonToIndex(codon);
 	for(unsigned i = 0u; i < genes.size(); i++)
 	{
 		Gene gene = genes[i];
 		SequenceSummary seqsum = gene.getSequenceSummary();
-		unsigned codonRange[2];
-		SequenceSummary::AAToCodonRange(aa, false, codonRange);
-		// get codon counts for AA
-		unsigned j = 0u;
-		for(unsigned k = codonRange[0]; k < codonRange[1]; k++, j++)
-		{
-			codonCounts[i][j] = seqsum.getCodonCountForCodon(k);
-		}
+		codonCounts[i] = seqsum.getCodonCountForCodon(codonIndex);
 	}
+	return codonCounts;
 }
 
 void Genome::writeFasta (std::string filename, bool simulated)
@@ -224,7 +221,6 @@ void Genome::simulateGenome(ROCParameter& parameter, ROCModel& model)
 	std::string codon;
 	char curAA;
 	std::string tmpDesc;
-	int numParam = parameter.getNumParam();
 
 	//std::srand(std::time(0));
 	simulatedGenes.resize(genes.size());
@@ -268,7 +264,7 @@ void Genome::simulateGenome(ROCParameter& parameter, ROCModel& model)
 			{
 				parameter.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
 				parameter.getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
-				model.calculateCodonProbabilityVector(numCodons, mutation, selection, phi, codonProb, numParam);
+				model.calculateCodonProbabilityVector(numCodons, mutation, selection, phi, codonProb);
 			}
 			for (k = 0; k < aaCount; k++)
 			{
@@ -306,11 +302,12 @@ RCPP_MODULE(Genome_mod)
     class_<Genome>("Genome")
     .constructor()
 
-		.method("readFasta", &Genome::readFasta)
+	.method("readFasta", &Genome::readFasta)
     .method("writeFasta", &Genome::writeFasta)
     .method("getGeneByIndex", &Genome::getGeneByIndex)
     .method("getGenomeSize", &Genome::getGenomeSize)
-		.method("clear", &Genome::clear)
+	.method("clear", &Genome::clear)
+	.method("getCodonCountsPerGene", &Genome::getCodonCountsPerGene)
 	;
 }
 #endif

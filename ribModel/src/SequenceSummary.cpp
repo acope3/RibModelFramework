@@ -74,8 +74,17 @@ const std::string SequenceSummary::codonArray[] = {"GCA", "GCC", "GCG", "GCT", "
 	"ATT", "AAA", "AAG", "CTA", "CTC", "CTG", "CTT", "TTA", "TTG", "ATG",
 	"AAC", "AAT", "CCA", "CCC", "CCG", "CCT", "CAA", "CAG", "AGA", "AGG",
 	"CGA", "CGC", "CGG", "CGT", "TCA", "TCC", "TCG", "TCT", "ACA", "ACC",
-	"ACG", "ACT", "GTA", "GTC", "GTG", "GTT", "TGG", "TAC", "TAT", "AGT",
-	"AGC", "TAA", "TAG", "TGA"};
+	"ACG", "ACT", "GTA", "GTC", "GTG", "GTT", "TGG", "TAC", "TAT", "AGC",
+	"AGT", "TAA", "TAG", "TGA"};
+
+const std::string SequenceSummary::codonArrayParameter[] = {"GCA", "GCC", "GCG", "TGC", "GAC",
+	"GAA", "TTC", "GGA", "GGC", "GGG",
+	"CAC", "ATA", "ATC", "AAA", "CTA",
+	"CTC", "CTG", "CTT", "TTA",	"AAC",
+	"CCA", "CCC", "CCG", "CAA", "AGA",
+	"AGG", "CGA", "CGC", "CGG", "TCA",
+	"TCC", "TCG", "ACA", "ACC", "ACG",
+	"GTA", "GTC", "GTG", "TAC", "AGC"};
 
 const std::map<char, int> SequenceSummary::aaToIndex = {{'A', 0}, {'C', 1}, {'D', 2}, {'E', 3}, {'F', 4}, {'G', 5}, {'H', 6}, {'I', 7},
 	{'K', 8}, {'L', 9}, {'M', 10}, {'N', 11}, {'P', 12}, {'Q', 13}, {'R', 14},
@@ -220,10 +229,15 @@ unsigned SequenceSummary::CodonToAAIndex(std::string& codon)
 	return SequenceSummary::aaToIndex.find(aa) -> second;
 }
 
-unsigned SequenceSummary::CodonToIndex(std::string& codon)
+unsigned SequenceSummary::CodonToIndex(std::string& codon, bool forParamVector)
 {
-	//std::transform(codon.begin(), codon.end(), codon.begin(), ::toupper);
-	int i = std::distance(codonArray, std::find(codonArray, codonArray + 64, codon));
+	unsigned i = 0;
+	if(forParamVector)
+	{
+		i = std::distance(codonArrayParameter, std::find(codonArrayParameter, codonArrayParameter + 40, codon));
+	}else{
+		i = std::distance(codonArray, std::find(codonArray, codonArray + 64, codon));
+	}
 	return i;
 }
 std::string SequenceSummary::IndexToCodon(unsigned i)

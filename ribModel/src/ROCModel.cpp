@@ -34,7 +34,6 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCP
     double phiValue = parameter.getExpression(geneIndex, expressionCategory, false);
     double phiValue_proposed = parameter.getExpression(geneIndex, expressionCategory, true);
 	//#pragma omp parallel for
-    int numParam = parameter.getNumParam();
     for(int i = 0; i < 22; i++)
     {
         char curAA = seqsum.AminoAcidArray[i];
@@ -57,8 +56,8 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCP
 
         //#pragma omp parallel num_threads(2)
         {
-            logLikelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue, numParam);
-            logLikelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue_proposed, numParam);
+            logLikelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
+            logLikelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue_proposed);
         }
     }
 
@@ -72,7 +71,7 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCP
     logProbabilityRatio[1] = currentLogLikelihood - std::log(phiValue_proposed);
     logProbabilityRatio[2] = proposedLogLikelihood - std::log(phiValue);
 }
-void ROCModel::calculateCodonProbabilityVector(unsigned numCodons, double mutation[], double selection[], double phi, double codonProb[], int numParam)
+void ROCModel::calculateCodonProbabilityVector(unsigned numCodons, double mutation[], double selection[], double phi, double codonProb[])
 {
     // calculate numerator and denominator for codon probabilities
     unsigned minIndexVal = 0u;
@@ -118,12 +117,12 @@ void ROCModel::calculateCodonProbabilityVector(unsigned numCodons, double mutati
     }
 }
 
-double ROCModel::calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codonCount[], double mutation[], double selection[], double phiValue, int numParam)
+double ROCModel::calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codonCount[], double mutation[], double selection[], double phiValue)
 {
     double logLikelihood = 0.0;
     // calculate codon probabilities
     double codonProbabilities[numCodons];
-    calculateCodonProbabilityVector(numCodons, mutation, selection, phiValue, codonProbabilities, numParam);
+    calculateCodonProbabilityVector(numCodons, mutation, selection, phiValue, codonProbabilities);
 
     // calculate likelihood for current AA for this combination of selection and mutation category
     for(unsigned i = 0; i < numCodons; i++)
@@ -140,7 +139,6 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
     int numCodons = SequenceSummary::GetNumCodonsForAA(curAA);
     double likelihood = 0.0;
     double likelihood_proposed = 0.0;
-    int numParam = parameter.getNumParam();
     for(int i = 0; i < numGenes; i++)
     {
         int codonCount[numCodons];
@@ -170,8 +168,8 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
         parameter.getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, true, selection_proposed);
 
         obtainCodonCount(seqsum, curAA, codonCount);
-        likelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue, numParam);
-        likelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation_proposed, selection_proposed, phiValue, numParam);
+        likelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
+        likelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation_proposed, selection_proposed, phiValue);
     }
     logAcceptanceRatioForAllMixtures = likelihood_proposed - likelihood;
 }
@@ -189,7 +187,16 @@ void ROCModel::obtainCodonCount(SequenceSummary& seqsum, char curAA, int codonCo
 }
 
 
-
+std::vector<double> ROCModel::CalculateProbabilitiesForCodons(std::vector<double> mutation, std::vector<double> selection, double phi)
+{
+	unsigned numCodons = mutation.size() + 1;
+	double* _mutation = &mutation[0];
+	double* _selection = &selection[0];
+	double codonProb[numCodons];
+	calculateCodonProbabilityVector(numCodons, _mutation, _selection, phi, codonProb);
+	std::vector<double> returnVector(codonProb, codonProb + sizeof codonProb / sizeof codonProb[0]);
+	return returnVector;
+}
 
 #ifndef STANDALONE
 #include <Rcpp.h>
@@ -199,6 +206,7 @@ RCPP_MODULE(ROCModel_mod)
 {
 	class_<ROCModel>( "ROCModel" )
     .constructor("empty constructor")
+    .method("CalculateProbabilitiesForCodons", &ROCModel::CalculateProbabilitiesForCodons, "Calculated codon probabilities. Input is one element shorter than output")
 	;
 }
 #endif

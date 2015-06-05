@@ -1292,11 +1292,12 @@ RCPP_MODULE(ROCParameter_mod)
 		// Posterior functions
 		.method("getExpressionPosteriorMean", &ROCParameter::getExpressionPosteriorMean)
 		.method("getSphiPosteriorMean", &ROCParameter::getSphiPosteriorMean)
-		.method("getMutationPosteriorMeanForAA", &ROCParameter::getMutationPosteriorForAA)
-		.method("getSelectionPosteriorMeanForAA", &ROCParameter::getSelectionPosteriorForAA)
+		.method("getMutationPosteriorMeanForCodon", &ROCParameter::getMutationPosteriorForCodon)
+		.method("getSelectionPosteriorMeanForCodon", &ROCParameter::getSelectionPosteriorForCodon)
+		.method("getMixtureAssignmentPosteriorMean", &ROCParameter::getMixtureAssignmentPosteriorMeanR)
 		// Variance functions
-		.method("getMutationVarianceForAA", &ROCParameter::getMutationVarianceForAA)
-		.method("getSelectionVarianceForAA", &ROCParameter::getSelectionVarianceForAA)
+		.method("getMutationVarianceForCodon", &ROCParameter::getMutationVarianceForCodon)
+		.method("getSelectionVarianceForCodon", &ROCParameter::getSelectionVarianceForCodon)
 		.method("getExpressionVariance", &ROCParameter::getExpressionVariance)
 		.method("getSphiVariance", &ROCParameter::getSphiVariance)
 

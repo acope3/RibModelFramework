@@ -277,25 +277,26 @@ class ROCParameter
 
 
 		//R wrapper functions
-		double getMutationPosteriorForAA(unsigned category, unsigned samples, char aa)
+		double getMutationPosteriorForCodon(unsigned category, unsigned samples, std::string codon)
 		{
-			unsigned aaIndex = SequenceSummary:: aaToIndex.find(aa) -> second;
-			return getMutationPosteriorMean(category, samples, aaIndex);
+
+			unsigned codonIndex = SequenceSummary::CodonToIndex(codon, true);
+			return getMutationPosteriorMean(category, samples, codonIndex);
 		}
-		double getSelectionPosteriorForAA(unsigned category, unsigned samples, char aa)
+		double getSelectionPosteriorForCodon(unsigned category, unsigned samples, std::string codon)
 		{
-			unsigned aaIndex = SequenceSummary:: aaToIndex.find(aa) -> second;
-			return getSelectionPosteriorMean(category, samples, aaIndex);
+			unsigned codonIndex = SequenceSummary::CodonToIndex(codon, true);
+			return getSelectionPosteriorMean(category, samples, codonIndex);
 		}
-		double getMutationVarianceForAA(unsigned category, unsigned samples, char aa, bool unbiased)
+		double getMutationVarianceForCodon(unsigned category, unsigned samples, std::string codon, bool unbiased)
 		{
-			unsigned aaIndex = SequenceSummary:: aaToIndex.find(aa) -> second;
-			return getMutationVariance(category, samples, aaIndex, unbiased);
+			unsigned codonIndex = SequenceSummary::CodonToIndex(codon, true);
+			return getMutationVariance(category, samples, codonIndex, unbiased);
 		}
-		double getSelectionVarianceForAA(unsigned category, unsigned samples, char aa, bool unbiased)
+		double getSelectionVarianceForCodon(unsigned category, unsigned samples, std::string codon, bool unbiased)
 		{
-			unsigned aaIndex = SequenceSummary:: aaToIndex.find(aa) -> second;
-			return getSelectionVariance(category, samples, aaIndex, unbiased);
+			unsigned codonIndex = SequenceSummary::CodonToIndex(codon, true);
+			return getSelectionVariance(category, samples, codonIndex, unbiased);
 		}
 
 		void initializeExpressionByGenome(Genome& genome, double sd_phi) {InitializeExpression(genome, sd_phi);}
@@ -347,9 +348,15 @@ class ROCParameter
 			}
 			return RV;
 		}
+		// TODO getMixtureAssignmentForGene should be the estimated assignment, not just the current!
+		// I guess we need two functions here
 		unsigned getMixtureAssignmentForGene(unsigned geneIndex) {return mixtureAssignment[geneIndex - 1];}
 		void setMixtureAssignmentForGene(unsigned geneIndex, unsigned value) {mixtureAssignment[geneIndex - 1] = value;}
-		std::vector<double> getCategoryProbabilitiesTraceForCategory(unsigned categoryIndex) {return categoryProbabilitiesTrace[categoryIndex - 1];}	
+		std::vector<double> getCategoryProbabilitiesTraceForCategory(unsigned categoryIndex) {return categoryProbabilitiesTrace[categoryIndex - 1];}
+		double getMixtureAssignmentPosteriorMeanR(unsigned samples, unsigned geneIndex)
+		{
+			return getMixtureAssignmentPosteriorMean(samples, geneIndex);
+		}
 	protected:
 
 };

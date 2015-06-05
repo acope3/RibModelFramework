@@ -19,6 +19,7 @@ class SequenceSummary
         static const char Ser2;
         static const std::vector<char> AminoAcidArray;
         static const std::string codonArray[];
+        static const std::string codonArrayParameter[];
         static const std::map<char, int> aaToIndex;
 
         explicit SequenceSummary();
@@ -54,7 +55,7 @@ class SequenceSummary
         //statics
         static char CodonToAA(std::string& codon);
         static unsigned GetNumCodonsForAA(char& aa, bool forParamVector = false);
-        static unsigned CodonToIndex(std::string& codon);
+        static unsigned CodonToIndex(std::string& codon, bool forParamVector = false);
         static std::string IndexToCodon(unsigned i);
         static unsigned CodonToAAIndex(std::string& codon);
         static char IndexToAA(int aa);

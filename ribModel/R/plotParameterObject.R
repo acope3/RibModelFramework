@@ -1,16 +1,20 @@
 # Plot functions for parameter object
 # The generic plot function expects the parameter object
 # and a string to the the function what has to be ploted.
-# additional arguments are geneIndex, and aa to index function like
-# getExpressionTraceForGene or 
+# additional arguments are geneIndex, and category to index function like
+# getExpressionTraceForGene or plotCodonSpecificParameters
 
-plot.Rcpp_ROCParameter <- function(parameter, what=c("codonSpecificParameter", "MixtureProbability" ,"SPhi", "ExpectedPhi", "Expression"), 
-                                   geneIndex=1, ...)
+plot.Rcpp_ROCParameter <- function(parameter, what=c("Mutation", "Selection", "MixtureProbability" ,"SPhi", "ExpectedPhi", "Expression"), 
+                                   geneIndex=1, category = 1, ...)
 {
-  if(what[1] == "codonSpecificParameter")
+  if(what[1] == "Mutation")
   {
-    plotCodonSpecificParameters(parameter)
+    plotCodonSpecificParameters(parameter, category, "mutation", main="Mutation Parameter Traces")
   }
+  if(what[1] == "Selection")
+  {
+    plotCodonSpecificParameters(parameter, category, "selection", main="Selection Parameter Traces")
+  }  
   if(what[1] == "MixtureProbability")
   {
     plotMixtureProbability(parameter)
@@ -29,7 +33,7 @@ plot.Rcpp_ROCParameter <- function(parameter, what=c("codonSpecificParameter", "
   }
 }
 
-plotCodonSpecificParameters <- function(parameter, main="Codon specific parameter traces")
+plotCodonSpecificParameters <- function(parameter, category, type="mutation", main="Mutation Parameter Traces")
 {
   opar <- par(no.readonly = T) 
   
@@ -46,23 +50,43 @@ plotCodonSpecificParameters <- function(parameter, main="Codon specific paramete
   text(0.5, 0.4, date(), cex = 0.6)
   par(mar = c(5.1, 4.1, 4.1, 2.1))
   
-  for(i.aa in names.aa){
-    id.tmp <- grepl(paste(i.aa, i.aa, sep="."), names.b, fixed=T) & id.plot
-    trace <- lapply(1:length(bMat), function(i){ bMat[[i]][id.tmp] })
-    trace <- do.call("rbind", trace)
+  names.aa <- aminoAcids()
+  for(aa in names.aa)
+  {  
+    codons <- AAToCodon(aa, T)
+    if(length(codons) == 0) next
+    trace <- vector("list", length(codons))
+    if(type == "mutation")
+    {
+      ylab <- expression(Delta~"M")
+      for(i in 1:length(codons))
+      {
+        trace[[i]] <- parameter$getMutationParameterTraceByCategoryForCodon(category, codons[i])
+      }
+    }else{
+      ylab <- expression(Delta~eta)
+      for(i in 1:length(codons))
+      {
+        trace[[i]] <- parameter$getSelectionParameterTraceByCategoryForCodon(category, codons[i])
+      }
+    }
+    trace <- do.call("cbind", trace)
     if(length(trace) == 0) next
+    x <- 1:dim(trace)[1]
+    xlim <- range(x)
     ylim <- range(trace, na.rm=T)
     
-    main.aa <- oneLetterAAtoThreeLetterAA(i.aa)
+    main.aa <- aa #TODO map to three leter code
     plot(NULL, NULL, xlim = xlim, ylim = ylim,
          xlab = "Samples", ylab = ylab, main = main.aa)
     plot.order <- order(apply(trace, 2, sd), decreasing = TRUE)
     for(i.codon in plot.order){
-      lines(x = x, y = trace[, i.codon], col = .CF.PT$color[i.codon])
-    } 
+      lines(x = x, y = trace[, i.codon], col = ribModel:::.codonColors[i.codon])
+    }
+    legend("topleft", legend = codons[plot.order], 
+           col = ribModel:::.codonColors[plot.order], 
+           lty = rep(1, length(codons)), bty = "n", cex = 0.75)
   }
-  
-  
   par(opar)
 }
 
@@ -89,7 +113,7 @@ plotSPhiTrace <- function(parameter)
 }
 plotMixtureProbability <- function(parameter)
 {
-  samples <- length(parameter$getCategoryProbabilitiesTrace(0))
+  samples <- length(parameter$getCategoryProbabilitiesTrace(1))
   numMixtures <- parameter$numMixtures
   
   plot(NULL, NULL, xlim = c(0, samples), ylim=c(0, 1), xlab = "Samples", ylab="Mixture Probability")
