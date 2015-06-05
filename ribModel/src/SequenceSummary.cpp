@@ -331,7 +331,7 @@ std::vector<std::string> SequenceSummary::AAToCodon(char aa, bool forParamVector
 	aa = std::toupper(aa);
 
 	AAToCodonRange(aa, forParamVector, aaRange);
-	
+
 	for (unsigned i = aaRange[0]; i < aaRange[1]; i++)
 	{
 		RV.push_back(codonArray[i]);
@@ -347,23 +347,23 @@ std::vector<std::string> SequenceSummary::AAToCodon(char aa, bool forParamVector
 using namespace Rcpp;
 RCPP_MODULE(SequenceSummary_mod)
 {
-    class_<SequenceSummary>( "SequenceSummary" )
-    .constructor("empty constructor")
-	.constructor<std::string>("Initialize with a DNA Sequence. Sequence must be a multiple of 3")
-	//.constructor<SequenceSummary>("Copy constructor") //custom object...How?
-		//operator overloading????
+	class_<SequenceSummary>( "SequenceSummary" )
+		.constructor("empty constructor")
+		.constructor<std::string>("Initialize with a DNA Sequence. Sequence must be a multiple of 3")
 
-    .method("getCodonCount", &SequenceSummary::getCodonCount, "returns occurrence of given codon in sequence")
-	.method("getAAcount", &SequenceSummary::getAAcount, "returns occurrence of a given amino acid in a sequence")
+		.method("getCodonCount", &SequenceSummary::getCodonCount, "returns occurrence of given codon in sequence")
+		.method("getAAcount", &SequenceSummary::getAAcount, "returns occurrence of a given amino acid in a sequence")
+		.method("processSequence", &SequenceSummary::processSequence, "generates codon and amino acid count for sequence")
+		.method("clear", &SequenceSummary::clear, "removes all data from object")
+		;
 
-	.method("processSequence", &SequenceSummary::processSequence, "generates codon and amino acid count for sequence")
-	.method("clear", &SequenceSummary::clear, "removes all data from object")
-	;
-
-    function("aminoAcids", &SequenceSummary::aminoAcids, "returns all Amino Acids as one letter code");
-	function("CodonToAA", &SequenceSummary::CodonToAA, List::create(_["codon"]));
-	function("GetNumCodonsForAA", &SequenceSummary::GetNumCodonsForAA, List::create(_["aa"], _["forParamVector"] = false));
-	function("AAToCodon", &SequenceSummary::AAToCodon, List::create(_["aa"], _["forParamVector"] = false));
+	//static class functions
+	function("CodonToAA", &SequenceSummary::CodonToAA, List::create(_["codon"]), "returns an amino acid for a given codon");
+	function("GetNumCodonsForAA", &SequenceSummary::GetNumCodonsForAA, List::create(_["aa"], _["forParamVector"] = false), "returns the number of codons for a given amino acid");
+	function("AAToCodon", &SequenceSummary::AAToCodon, List::create(_["aa"], _["forParamVector"] = false), "returns a vector of codons for a given amino acid");
+	
+	//R wrapper function
+	function("aminoAcids", &SequenceSummary::aminoAcids, "returns all Amino Acids as one letter code");
 }
 #endif
 

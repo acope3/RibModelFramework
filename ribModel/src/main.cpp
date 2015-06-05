@@ -422,8 +422,8 @@ int main()
 		std::ofstream mixAssignment("results/mixAssignment.csv");
 		for(unsigned n = 0u; n < genome.getGenomeSize(); n++)
 		{
-			double mixtureAssignmentPosteriorMean = parameter.getMixtureAssignmentPosteriorMean(useSamples, n);
-			mixAssignment << genome.getGene(n).getId() << "," << mixtureAssignmentPosteriorMean << std::endl;
+			unsigned mixtureAssignment = parameter.getEstimatedMixtureAssignment(useSamples, n);
+			mixAssignment << genome.getGene(n).getId() << "," << mixtureAssignment << std::endl;
 		}
 		mixAssignment.close();
 	}

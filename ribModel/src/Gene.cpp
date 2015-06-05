@@ -123,14 +123,18 @@ RCPP_MODULE(Gene_mod)
 		.constructor("empty constructor")
     .constructor<std::string, std::string, std::string >("Initialize a gene by giving the id, description, and sequence string")
 
-    .property("id", &Gene::getId, &Gene::setId)
+		
+		.method("clear", &Gene::clear, "clears the id, sequence, and description in the object")
+    .method("length", &Gene::length, "returns the length of sequence")
+   
+		//R wrapper functions 
+		.method("getAACount", &Gene::getAACount, "returns the number of amino acids that are in the sequence for a given amino acid")
+		.method("getCodonCount", &Gene::getCodonCount, "returns the number of codons that are in the sequence for a given codon")
+
+		//getter and setter properties
+		.property("id", &Gene::getId, &Gene::setId)
     .property("description", &Gene::getDescription, &Gene::setDescription)
     .property("seq", &Gene::getSequence, &Gene::setSequence)
-
-		.method("getAACount", &Gene::getAACount)
-		.method("getCodonCount", &Gene::getCodonCount)
-		.method("clear", &Gene::clear)
-    .method("length", &Gene::length)
   ;
 }
 #endif

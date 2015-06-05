@@ -195,6 +195,7 @@ class ROCParameter
 			{return expressionAcceptanceRatioTrace[category][geneIndex];}
 		std::vector<double> getCspAcceptanceRatioTraceForAA(char aa)
 		{
+			aa = std::toupper(aa);
 			unsigned aaIndex = SequenceSummary:: aaToIndex.find(aa) -> second;
 			return cspAcceptanceRatioTrace[aaIndex];
 		}
@@ -252,7 +253,9 @@ class ROCParameter
 		// functions to return estimates
 		double getExpressionPosteriorMean(unsigned samples, unsigned geneIndex, unsigned expressionCategory);
 		double getSphiPosteriorMean(unsigned samples);
-		double getMixtureAssignmentPosteriorMean(unsigned samples, unsigned geneIndex); // TODO: implement variance function, fix Mean function (won't work with 3 groups)
+		//double getMixtureAssignmentPosteriorMean(unsigned samples, unsigned geneIndex); // TODO: implement variance function, fix Mean function (won't work with 3 groups)
+		unsigned getEstimatedMixtureAssignment(unsigned samples, unsigned geneIndex);
+		std::vector <double> getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex);
 		double getMutationPosteriorMean(unsigned category, unsigned samples, unsigned paramIndex);
 		double getSelectionPosteriorMean(unsigned category, unsigned samples, unsigned paramIndex);
 		double getMutationVariance(unsigned category, unsigned samples, unsigned paramIndex, bool unbiased = true);
@@ -277,26 +280,26 @@ class ROCParameter
 
 
 		//R wrapper functions
-		double getMutationPosteriorForCodon(unsigned category, unsigned samples, std::string codon)
+		double getMutationPosteriorMeanForCodon(unsigned category, unsigned samples, std::string codon)
 		{
 
 			unsigned codonIndex = SequenceSummary::CodonToIndex(codon, true);
-			return getMutationPosteriorMean(category, samples, codonIndex);
+			return getMutationPosteriorMean(category - 1, samples, codonIndex);
 		}
-		double getSelectionPosteriorForCodon(unsigned category, unsigned samples, std::string codon)
+		double getSelectionPosteriorMeanForCodon(unsigned category, unsigned samples, std::string codon)
 		{
 			unsigned codonIndex = SequenceSummary::CodonToIndex(codon, true);
-			return getSelectionPosteriorMean(category, samples, codonIndex);
+			return getSelectionPosteriorMean(category - 1, samples, codonIndex);
 		}
 		double getMutationVarianceForCodon(unsigned category, unsigned samples, std::string codon, bool unbiased)
 		{
 			unsigned codonIndex = SequenceSummary::CodonToIndex(codon, true);
-			return getMutationVariance(category, samples, codonIndex, unbiased);
+			return getMutationVariance(category - 1, samples, codonIndex, unbiased);
 		}
 		double getSelectionVarianceForCodon(unsigned category, unsigned samples, std::string codon, bool unbiased)
 		{
 			unsigned codonIndex = SequenceSummary::CodonToIndex(codon, true);
-			return getSelectionVariance(category, samples, codonIndex, unbiased);
+			return getSelectionVariance(category - 1, samples, codonIndex, unbiased);
 		}
 
 		void initializeExpressionByGenome(Genome& genome, double sd_phi) {InitializeExpression(genome, sd_phi);}
@@ -348,15 +351,56 @@ class ROCParameter
 			}
 			return RV;
 		}
-		// TODO getMixtureAssignmentForGene should be the estimated assignment, not just the current!
-		// I guess we need two functions here
-		unsigned getMixtureAssignmentForGene(unsigned geneIndex) {return mixtureAssignment[geneIndex - 1];}
+		
+		unsigned getEstimatedMixtureAssignmentForGene(unsigned samples, unsigned geneIndex)
+		{
+			unsigned assignment;
+			if (geneIndex == 0 || geneIndex - 1 >= mixtureAssignment.size())
+			{
+				std::cerr <<"Bad gene index, " << geneIndex <<", given. Returning 0\n";
+				assignment = 0;
+			}
+			else 
+			{
+				assignment = getEstimatedMixtureAssignment(samples, geneIndex);
+			}
+
+			return assignment;
+		}
+
+		std::vector<double> getEstimatedMixtureAssignmentProbabilitiesForGene(unsigned samples, unsigned geneIndex)
+		{
+			std::vector <double> probabilities;
+			geneIndex -= 1;
+      if (geneIndex == 0 || geneIndex - 1 >= mixtureAssignment.size())
+      {
+        std::cerr <<"Bad gene index, " << geneIndex <<", given. Returning empty vector\n";
+        probabilities.resize(0);
+      }
+      else 
+      {
+        probabilities = getEstimatedMixtureAssignmentProbabilities(samples, geneIndex); 
+      }
+			return probabilities;
+		}
+
+
 		void setMixtureAssignmentForGene(unsigned geneIndex, unsigned value) {mixtureAssignment[geneIndex - 1] = value;}
 		std::vector<double> getCategoryProbabilitiesTraceForCategory(unsigned categoryIndex) {return categoryProbabilitiesTrace[categoryIndex - 1];}
-		double getMixtureAssignmentPosteriorMeanR(unsigned samples, unsigned geneIndex)
+		/*double getMixtureAssignmentPosteriorMeanR(unsigned samples, unsigned geneIndex)
 		{
 			return getMixtureAssignmentPosteriorMean(samples, geneIndex);
 		}
+		*/
+
+		std::vector<double> getExpressionAcceptanceRatioTraceByCategoryForGeneR(int category, int geneIndex) 
+			{return getExpressionAcceptanceRatioTraceByCategoryForGene(category - 1, geneIndex - 1);}
+		double getExpressionPosteriorMeanByExpressionCategoryForGene(unsigned samples, unsigned geneIndex, unsigned expressionCategory)
+		{return getExpressionPosteriorMean(samples, geneIndex - 1, expressionCategory - 1);}
+
+		double getExpressionVarianceByExpressionCategoryForGene(unsigned samples, unsigned geneIndex, unsigned expressionCategory, bool unbiased)
+		{return getExpressionVariance(samples, geneIndex - 1, expressionCategory - 1, unbiased);}
+
 	protected:
 
 };

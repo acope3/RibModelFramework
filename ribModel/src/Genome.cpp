@@ -1,7 +1,7 @@
 #include "include/Genome.h"
 #include "include/ROCParameter.h"//these two files must be included here to get at the implimentation
 #include "include/ROCModel.h" 		//for simulateGenome. They cannot be included in the header file. See genome.h for
-																		//more information on circular dependices/forward declarations
+//more information on circular dependices/forward declarations
 #include <iostream>     // std::cout, std::cerr
 #include <cstring>
 #include <fstream>
@@ -187,7 +187,7 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 Gene& Genome::getGene(unsigned index)
 {
 	Gene gene;
-	
+
 	if (index >= genes.size()) 
 	{
 		std::cerr << "Error in Genome::getGene: Index " << index << " is out of bounds.\n";
@@ -240,7 +240,7 @@ void Genome::simulateGenome(ROCParameter& parameter, ROCModel& model)
 		unsigned selectionCategory = parameter.getSelectionCategory(mixtureElement);
 		unsigned expressionCategory = parameter.getExpressionCategory(mixtureElement);
 		double phi = parameter.getExpression(i, expressionCategory, false);
-		
+
 		std::ostringstream strstream;
 		strstream << mixtureElement;
 		std::string tmpID = gene.getId() + "_MixtureElement" + strstream.str();
@@ -299,15 +299,17 @@ RCPP_EXPOSED_CLASS(Gene)
 
 RCPP_MODULE(Genome_mod)
 {
-    class_<Genome>("Genome")
-    .constructor()
+	class_<Genome>("Genome")
+		.constructor("empty constructor")
 
-	.method("readFasta", &Genome::readFasta)
-    .method("writeFasta", &Genome::writeFasta)
-    .method("getGeneByIndex", &Genome::getGeneByIndex)
-    .method("getGenomeSize", &Genome::getGenomeSize)
-	.method("clear", &Genome::clear)
-	.method("getCodonCountsPerGene", &Genome::getCodonCountsPerGene)
-	;
+		.method("readFasta", &Genome::readFasta, "reads a genome into the object")
+		.method("writeFasta", &Genome::writeFasta, "writes the genome to a fasta file")
+		.method("getGenomeSize", &Genome::getGenomeSize, "returns how many genes are in the genome")
+		.method("clear", &Genome::clear, "clears the genome")
+		.method("getCodonCountsPerGene", &Genome::getCodonCountsPerGene, "returns a vector of codon counts for a given gene")
+		
+		//R Wrapper function
+		.method("getGeneByIndex", &Genome::getGeneByIndex, "returns a gene for a given index")
+		;
 }
 #endif

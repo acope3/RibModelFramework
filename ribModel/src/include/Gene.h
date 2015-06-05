@@ -10,57 +10,53 @@
 class Gene
 {
 
-    private:
-        //member variables
-        std::string seq;
-        std::string id;
-        std::string description;
+	private:
+		//member variables
+		std::string seq;
+		std::string id;
+		std::string description;
 
-        //double currentPhiValue;
-        //double currentLikelihood;
+		//double currentPhiValue;
+		//double currentLikelihood;
 
-        void cleanSeq(); // clean the sequence, remove non "AGCT" charactors
+		void cleanSeq(); // clean the sequence, remove non "AGCT" charactors
 
-    public:
-        SequenceSummary geneData;
+	public:
+		SequenceSummary geneData;
 
-        //constructor/destructors
-        Gene();
-        Gene(std::string _id, std::string _desc, std::string _seq);
-        virtual ~Gene();
-        Gene(const Gene& other);
-        Gene& operator=(const Gene& rhs);
+		//constructor/destructors
+		Gene();
+		Gene(std::string _id, std::string _desc, std::string _seq);
+		virtual ~Gene();
+		Gene(const Gene& other);
+		Gene& operator=(const Gene& rhs);
 
-        void clear(); // clear the content of object
-        int length() {return seq.size();}
+		void clear(); // clear the content of object
+		int length() {return seq.size();}
 
-        Gene reverseCompliment(); // return the reverse compliment
-        std::string toAAsequence();
+		Gene reverseCompliment(); // return the reverse compliment
+		std::string toAAsequence();
 
-        std::string toString() {return ">" + id + "\n" + seq + "\n";}
+		std::string toString() {return ">" + id + "\n" + seq + "\n";}
 
-        //getter/setter
-        std::string getId() {return id;}
-        std::string getDescription() {return description;}
-        std::string getSequence() {return seq;}
-        char getNucleotideAt(int i) {return seq[i];}
+		//getter/setter
+		std::string getId() {return id;}
+		std::string getDescription() {return description;}
+		std::string getSequence() {return seq;}
+		char getNucleotideAt(int i) {return seq[i];}
 
-        void setId(std::string _id) { id = _id;}
-        void setDescription(std::string _desc) {description = _desc;}
-        void setSequence(std::string _seq);
-        SequenceSummary& getSequenceSummary() {return geneData;}
+		void setId(std::string _id) { id = _id;}
+		void setDescription(std::string _desc) {description = _desc;}
+		void setSequence(std::string _seq);
+		SequenceSummary& getSequenceSummary() {return geneData;}
 
-				//R Wrapper Functions
-				int getAACount(char aa) { return geneData.getAAcount(aa);}
-				int getCodonCount(std::string& codon) { return geneData.getCodonCount(codon);}
-				
-    protected:
+		//R Wrapper Functions
+		int getAACount(char aa) { return geneData.getAAcount(aa);}
+		int getCodonCount(std::string& codon) { return geneData.getCodonCount(codon);}
 
-        //static member variables
+	protected:
 
-
-
-
+		//static member variables
 };
 
 
