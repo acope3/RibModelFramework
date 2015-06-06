@@ -306,11 +306,12 @@ Genome Genome::getGenomeForGeneIndiciesR(std::vector <unsigned> indicies)
 	bool bad = false;
 	for (unsigned i = 0; i < indicies.size(); i++)
 	{
-		if (indicies[i] == 0 || indicies[i] >= genes.size())
+		if (indicies[i] == 0 || indicies[i] > genes.size())
 		{
-			std::cerr <<"Problem with index " << i << ".\n";
-			std::cerr <<"returning an empty genome\n";
+			std::cerr << "Problem with index " << indicies[i] << ".\n";
+			std::cerr << "returning an empty genome\n";
 			bad = true;
+			break;
 		}
 		else
 		{

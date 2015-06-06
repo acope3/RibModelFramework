@@ -215,7 +215,6 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, ROCParame
         if((iteration % thining) == 0)
         {
             parameter.updateCodonSpecificParameterTrace(iteration/thining, curAA);
-            //parameter.updateSphiTrace(iteration/thining);
         }
     }
 }

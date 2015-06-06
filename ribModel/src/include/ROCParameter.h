@@ -360,7 +360,7 @@ class ROCParameter
 			bool check = checkIndex(category, 1, mutationParameterTrace.size());
 			if (check)
 			{	
-				unsigned codonIndex = SequenceSummary::CodonToIndex(codon);
+				unsigned codonIndex = SequenceSummary::CodonToIndex(codon, true);
 				unsigned samples = mutationParameterTrace[category - 1].size();
 				for (unsigned i = 0u; i < samples; i++)
 				{
@@ -375,7 +375,7 @@ class ROCParameter
 			bool check = checkIndex(category, 1, selectionParameterTrace.size());
 			if (check)
 			{	
-				unsigned codonIndex = SequenceSummary::CodonToIndex(codon);
+				unsigned codonIndex = SequenceSummary::CodonToIndex(codon, true);
 				unsigned samples = selectionParameterTrace[category - 1].size();
 				for (unsigned i = 0u; i < samples; i++)
 				{

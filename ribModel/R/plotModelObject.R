@@ -3,6 +3,8 @@
 
 plot.Rcpp_ROCModel <- function(model, genome, parameter, samples = 100, category = 1, estim.Expression = TRUE, ...)
 {
+  opar <- par(no.readonly = T) 
+  
   input_list <- as.list(list(...))
   
   if("main" %in% names(input_list)){
@@ -26,7 +28,7 @@ plot.Rcpp_ROCModel <- function(model, genome, parameter, samples = 100, category
   
   mixtureAssignment <- unlist(lapply(1:num.genes,  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))
   genes.in.category <- which(mixtureAssignment == category)
-  expressionCategory <- parameter$getExpressionCategoryForGroup(category)
+  expressionCategory <- parameter$getExpressionCategoryForMixture(category)
   
   # need expression values to know range
   num.genes <- length(genes.in.category)
@@ -80,6 +82,8 @@ plot.Rcpp_ROCModel <- function(model, genome, parameter, samples = 100, category
   ### Plot ylab.
   plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
   text(0.5, 0.5, "Propotion", srt = 90)
+  
+  par(opar)
 }
 
 plotSinglePanel <- function(parameter, model, genome, expressionValues, samples, category, aa)
@@ -135,15 +139,18 @@ plotSinglePanel <- function(parameter, model, genome, expressionValues, samples,
     
     for(k in 1:length(codons))
     {
-      points(median(expressionValues[tmp.id]), means[k], col=ribModel:::.codonColors[k], pch=19, cex = 0.5)
-      lines(rep(median(expressionValues[tmp.id]),2), c(means[k]-sd[k], means[k]+sd[k]), col=ribModel:::.codonColors[k], lwd=0.8)
+      points(median(expressionValues[tmp.id]), means[k], 
+             col=ribModel:::.codonColors[[ codons[k] ]] , pch=19, cex = 0.5)
+      lines(rep(median(expressionValues[tmp.id]),2), c(means[k]-sd[k], means[k]+sd[k]), 
+            col=ribModel:::.codonColors[[ codons[k] ]], lwd=0.8)
     }
   }
   
   codonProbability <- do.call("rbind", codonProbability)
   for(i in 1:length(codons))
   {
-    lines(phis, codonProbability[, i], col=ribModel:::.codonColors[i])
+    lines(phis, codonProbability[, i], col=ribModel:::.codonColors[[ codons[i] ]])
   }
-  legend("topleft", legend = codons, col=ribModel:::.codonColors[1:length(codons)], bty = "n", lty=1, cex=0.75)  
+  colors <- unlist(ribModel:::.codonColors[codons])
+  legend("topleft", legend = codons, col=colors, bty = "n", lty=1, cex=0.75)  
 }

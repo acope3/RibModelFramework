@@ -40,8 +40,6 @@ plotCodonSpecificParameters <- function(parameter, category, type="mutation", ma
   ### Trace plot.
   nf <- layout(matrix(c(rep(1, 4), 2:21), nrow = 6, ncol = 4, byrow = TRUE),
                rep(1, 4), c(2, 8, 8, 8, 8, 8), respect = FALSE)  
-  #   nf <- layout(matrix(c(rep(1, 5), 2:21), nrow = 5, ncol = 5, byrow = TRUE),
-  #                rep(1, 5), c(2, 8, 8, 8, 8), respect = FALSE)
   
   ### Plot title.
   par(mar = c(0, 0, 0, 0))
@@ -81,10 +79,10 @@ plotCodonSpecificParameters <- function(parameter, category, type="mutation", ma
          xlab = "Samples", ylab = ylab, main = main.aa)
     plot.order <- order(apply(trace, 2, sd), decreasing = TRUE)
     for(i.codon in plot.order){
-      lines(x = x, y = trace[, i.codon], col = ribModel:::.codonColors[i.codon])
+      lines(x = x, y = trace[, i.codon], col = ribModel:::.codonColors[[codons[i.codon]]])
     }
-    legend("topleft", legend = codons[plot.order], 
-           col = ribModel:::.codonColors[plot.order], 
+    colors <- unlist(ribModel:::.codonColors[codons])
+    legend("topleft", legend = codons, col = colors, 
            lty = rep(1, length(codons)), bty = "n", cex = 0.75)
   }
   par(opar)
