@@ -237,6 +237,9 @@ unsigned SequenceSummary::CodonToAAIndex(std::string& codon)
 unsigned SequenceSummary::CodonToIndex(std::string& codon, bool forParamVector)
 {
 	unsigned i = 0;
+	codon[0] = std::toupper(codon[0]);
+	codon[1] = std::toupper(codon[1]);
+	codon[2] = std::toupper(codon[2]);
 	if(forParamVector)
 	{
 		i = std::distance(codonArrayParameter, std::find(codonArrayParameter, codonArrayParameter + 40, codon));
@@ -268,6 +271,9 @@ unsigned SequenceSummary::GetNumCodonsForAA(char& aa, bool forParamVector)
 
 char SequenceSummary::CodonToAA(std::string& codon)
 {
+	codon[0] = std::toupper(codon[0]);
+	codon[1] = std::toupper(codon[1]);
+	codon[2] = std::toupper(codon[2]);
 	//std::transform(codon.begin(), codon.end(), codon.begin(), ::toupper);
 	char aa = '#';
 	//Phenylalanine
@@ -372,7 +378,7 @@ RCPP_MODULE(SequenceSummary_mod)
 	function("CodonToAA", &SequenceSummary::CodonToAA, List::create(_["codon"]), "returns an amino acid for a given codon");
 	function("GetNumCodonsForAA", &SequenceSummary::GetNumCodonsForAA, List::create(_["aa"], _["forParamVector"] = false), "returns the number of codons for a given amino acid");
 	function("AAToCodon", &SequenceSummary::AAToCodon, List::create(_["aa"], _["forParamVector"] = false), "returns a vector of codons for a given amino acid");
-	
+
 	//R wrapper function
 	function("aminoAcids", &SequenceSummary::aminoAcids, "returns all Amino Acids as one letter code");
 }

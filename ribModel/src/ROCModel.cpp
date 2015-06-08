@@ -45,13 +45,13 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCP
         // get codon count (total count not parameter count)
         int numCodons = seqsum.GetNumCodonsForAA(curAA);
         // get mutation and selection parameter for gene
-        double mutation[numCodons - 1];
+        double* mutation = new double[numCodons - 1]();
         parameter.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
-        double selection[numCodons - 1];
+        double* selection = new double[numCodons - 1]();
         parameter.getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
 
         // prepare array for codon counts for AA
-        int codonCount[numCodons];
+        int* codonCount = new int[numCodons]();
         obtainCodonCount(seqsum, curAA, codonCount);
 
         //#pragma omp parallel num_threads(2)
@@ -59,6 +59,9 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCP
             logLikelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
             logLikelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue_proposed);
         }
+				delete [] mutation;
+				delete [] selection;
+				delete [] codonCount;
     }
 
     double sPhi = parameter.getSphi(false);
@@ -121,7 +124,7 @@ double ROCModel::calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codo
 {
     double logLikelihood = 0.0;
     // calculate codon probabilities
-    double codonProbabilities[numCodons];
+    double* codonProbabilities = new double[numCodons]();
     calculateCodonProbabilityVector(numCodons, mutation, selection, phiValue, codonProbabilities);
 
     // calculate likelihood for current AA for this combination of selection and mutation category
@@ -130,6 +133,7 @@ double ROCModel::calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codo
         if (codonCount[i] == 0) continue;
         logLikelihood += std::log(codonProbabilities[i]) * codonCount[i];
     }
+		delete [] codonProbabilities;
     return logLikelihood;
 }
 
@@ -141,11 +145,11 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
     double likelihood_proposed = 0.0;
     for(int i = 0; i < numGenes; i++)
     {
-        int codonCount[numCodons];
-        double mutation[numCodons - 1];
-        double selection[numCodons - 1];
-        double mutation_proposed[numCodons - 1];
-        double selection_proposed[numCodons - 1];
+        int* codonCount = new int[numCodons]();
+        double* mutation = new double[numCodons - 1]();
+        double* selection = new double[numCodons - 1]();
+        double* mutation_proposed = new double[numCodons - 1]();
+        double* selection_proposed = new double[numCodons - 1]();
         Gene gene = genome.getGene(i);
         SequenceSummary seqsum = gene.getSequenceSummary();
         if(seqsum.getAAcountForAA(curAA) == 0) continue;
@@ -170,7 +174,12 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
         obtainCodonCount(seqsum, curAA, codonCount);
         likelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
         likelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation_proposed, selection_proposed, phiValue);
-    }
+    		delete [] codonCount;
+				delete [] mutation;
+				delete [] selection;
+				delete [] mutation_proposed;
+				delete [] selection_proposed;
+		}
     logAcceptanceRatioForAllMixtures = likelihood_proposed - likelihood;
 }
 
@@ -192,7 +201,7 @@ std::vector<double> ROCModel::CalculateProbabilitiesForCodons(std::vector<double
 	unsigned numCodons = mutation.size() + 1;
 	double* _mutation = &mutation[0];
 	double* _selection = &selection[0];
-	double codonProb[numCodons];
+	double* codonProb = new double[numCodons]();
 	calculateCodonProbabilityVector(numCodons, _mutation, _selection, phi, codonProb);
 	std::vector<double> returnVector(codonProb, codonProb + sizeof codonProb / sizeof codonProb[0]);
 	return returnVector;

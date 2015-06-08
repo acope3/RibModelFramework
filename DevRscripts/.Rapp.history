@@ -1,0 +1,16 @@
+library(ribModel)
+genome <- new(Genome)
+genome$readFasta("../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta", F)
+getwd
+getwd()
+library(ribModel)#
+genome <- new(Genome)#
+genome$readFasta("../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta", F)
+library(ribModel)
+genome <- new(Genome)
+genome$readFasta("../ribModel/data/Skluyveri_chromosomeA.fasta", F)
+genome$readFasta("../ribModel/data/Skluyveri_ChrA_andCleft.fasta", F)
+library(ribModel)#
+genome <- new(Genome)#
+genome$readFasta("../ribModel/data/Skluyveri_chromosomeA.fasta", F)
+genome$readFasta("../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta", F)

@@ -512,9 +512,13 @@ double ROCParameter::calculateSCUO(Gene& gene)
 void ROCParameter::InitializeExpression(Genome& genome, double sd_phi)
 {
 	unsigned genomeSize = genome.getGenomeSize();
-	double scuoValues[genomeSize];
-	double expression[genomeSize];
-	int index[genomeSize];
+	double* scuoValues = new double[genomeSize]();	
+	double* expression = new double[genomeSize]();	
+	int* index = new int[genomeSize]();	
+	//double scuoValues[genomeSize];
+	//double expression[genomeSize];
+	//int index[genomeSize];
+
 	for(unsigned i = 0u; i < genomeSize; i++)
 	{
 		index[i] = i;
@@ -529,10 +533,15 @@ void ROCParameter::InitializeExpression(Genome& genome, double sd_phi)
 		for(unsigned j = 0u; j < genomeSize; j++)
 		{
 			currentExpressionLevel[category][j] = expression[index[j]];
+			//std::cout << currentExpressionLevel[category][j] <<"\n";
 			std_phi[category][j] = 0.1;
 			numAcceptForExpression[category][j] = 0u;
 		}
 	}
+
+	delete [] scuoValues;
+	delete [] expression;
+	delete [] index;
 }
 void ROCParameter::InitializeExpression(double sd_phi)
 {
@@ -1221,7 +1230,8 @@ double ROCParameter::randUnif(double minVal, double maxVal)
 unsigned ROCParameter::randMultinom(double* probabilities, unsigned groups)
 {
 	// calculate cummulative sum to determine group boundaries
-	double cumsum[groups];
+	double* cumsum = new double[groups]();
+	//std::vector<double> cumsum(groups);
 	cumsum[0] = probabilities[0];
 
 	for(unsigned i = 1u; i < groups; i++)
@@ -1249,6 +1259,7 @@ unsigned ROCParameter::randMultinom(double* probabilities, unsigned groups)
 			break;
 		}
 	}
+	delete [] cumsum;
 	return returnValue;
 }
 
