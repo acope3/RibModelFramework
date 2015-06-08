@@ -89,7 +89,7 @@ void CovarianceMatrix::calculateCovarianceMatrixFromTraces(std::vector<std::vect
 {
     // calculate all means
     unsigned numVariates = trace.size(); // <- number of mixture elements or number of selection categories
-    double means[numVariates];
+    double* means = new double[numVariates]();
     unsigned start = curSample - adaptiveWidth;
     // calculate all means from trace
     for(unsigned i = 0u; i < numVariates; i++)

@@ -11,7 +11,14 @@ Gene::Gene() : seq(""), id(""), description("")
 Gene::Gene(std::string _seq, std::string _id, std::string _desc) : seq(_seq), id(_id), description(_desc)
 {
     cleanSeq();
-    geneData.processSequence(seq);
+	if (seq.length() % 3 == 0)
+	{
+		geneData.processSequence(seq);
+	}
+	else 
+	{
+		std::cerr << "Gene: " << id << "has sequence length NOT multiple of 3!\n Gene data is NOT processed!\n";
+	}
 }
 
 Gene::Gene(const Gene& other)
@@ -43,8 +50,15 @@ void Gene::setSequence(std::string _seq)
 {
     std::transform(_seq.begin(), _seq.end(), _seq.begin(), ::toupper);
     seq = _seq;
-    cleanSeq();
-    geneData.processSequence(seq);
+    //cleanSeq(); // causes problems when N is in sequence, Could N to cleanSeq alphabet TODO think about that option
+	if (seq.length() % 3 == 0)
+	{
+		geneData.processSequence(seq);
+	}
+	else
+	{
+		std::cerr << "Gene: " << id << " has sequence length NOT multiple of 3!\n Gene data is NOT processed!\n";
+	}
 }
 
 void Gene::clear()

@@ -49,7 +49,6 @@ void SequenceSummary::processSequence(const std::string& sequence)
 	int codonID;
 	int aaID;
 	std::string codon;
-
 	for(unsigned i = 0u; i < sequence.length(); i+=3)
 	{
 		codon = sequence.substr(i, 3);
@@ -58,10 +57,18 @@ void SequenceSummary::processSequence(const std::string& sequence)
 		codon[2] = std::toupper(codon[2]);
 
 		codonID = SequenceSummary::CodonToIndex( codon );
-		aaID = SequenceSummary::CodonToAAIndex( codon );
-		ncodons[codonID]++;
-		naa[aaID]++;
+		if (codonID != 64) // if codon id == 64 => codon not found. Ignore, probably N 
+		{
+			aaID = SequenceSummary::CodonToAAIndex( codon );
+			ncodons[codonID]++;
+			naa[aaID]++;
+		}
+		else 
+		{
+			std::cerr << "WARNING: Codon " << codon << " nor recognized!\n Codon will be ignored!\n";
+		}
 	}
+
 }
 
 /*

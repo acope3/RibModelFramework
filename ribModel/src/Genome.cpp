@@ -251,9 +251,9 @@ void Genome::simulateGenome(ROCParameter& parameter, ROCModel& model)
 			if (curAA == 'X') continue;
 			numCodons = seqSum.GetNumCodonsForAA(curAA);
 			if (curAA == 'M') aaCount -= 1;
-			double codonProb[numCodons]; //size the arrays to the proper size based on # of codons.
-			double mutation[numCodons - 1];
-			double selection[numCodons - 1];
+			double* codonProb = new double[numCodons](); //size the arrays to the proper size based on # of codons.
+			double* mutation = new double[numCodons - 1]();
+			double* selection = new double[numCodons - 1]();
 
 			//get the probability vector for each amino acid
 			if (curAA == 'M' || curAA == 'W')
