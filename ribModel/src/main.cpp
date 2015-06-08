@@ -218,9 +218,9 @@ void testSimulateGenome(Genome& genome)
 			SequenceSummary::AAindexToCodonRange(j, false, aaRange);
 			char curAA = SequenceSummary::IndexToAA(j);
 			unsigned numCodons = simSeqSum.GetNumCodonsForAA(curAA);
-			double codonProb[numCodons];
-			double mutation[numCodons - 1];
-			double selection[numCodons - 1];
+			double* codonProb = new double[numCodons];
+			double* mutation = new double[numCodons - 1];
+			double* selection = new double[numCodons - 1];
 			if (curAA == 'X') std::cout << numCodons <<"\n";
 			parameter.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
 			parameter.getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
@@ -242,6 +242,9 @@ void testSimulateGenome(Genome& genome)
 				std::cout <<"\tval: " << counts[k]/sum <<" VS " << codonProb[k] <<" with count of " << counts[k] <<"\n";
 			}
 			std::cout <<"\n";
+			delete [] codonProb;
+			delete [] mutation;
+			delete [] selection;
 		}
 
 	}
@@ -252,7 +255,7 @@ void testSimulateGenome(Genome& genome)
 
 int main()
 {
-	bool cedric = true;
+	bool cedric = false;
 	std::cout << "Hello world!" << std::endl << std::endl;
 
 	Genome genome;
@@ -261,7 +264,7 @@ int main()
 		genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta");
 		//genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_A_andCleft.fasta");
 	}else{
-		genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_A_andCleft.fasta");
+		genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_ChrA_andCleft.fasta");
 	}
 	std::cout << "done reading fasta file" << std::endl;
 	bool testing =  false;
@@ -310,7 +313,6 @@ int main()
 		//parameter.InitializeExpression(phiVals);
 		std::cout << "done initialize ROCParameter object" << std::endl;
 
-
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
         int samples = 100;
 		int thining = 10;
@@ -319,7 +321,7 @@ int main()
 		std::cout << "\t# samples: " << samples << "\n";
 		std::cout << "\t thining: " << thining << "\n";
 		std::cout << "\t # samples used: " << useSamples << "\n";
-		MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, true, true, true);
+		MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, 10, true, true, true);
 		std::cout << "done initialize MCMCAlgorithm object" << std::endl;
 
 		std::ofstream scuoout("results/scuo.csv");

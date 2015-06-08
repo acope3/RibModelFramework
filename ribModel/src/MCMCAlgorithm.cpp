@@ -61,7 +61,7 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
 
     unsigned numExpressionCategories = parameter.getNumExpressionCategories();
     unsigned numMixtures = parameter.getNumMixtureElements();
-    double dirichletParameters[numMixtures];
+    double* dirichletParameters = new double[numMixtures]();
 		//initialize parameter's size
     for(int i = 0; i < numGenes; i++)
     {
@@ -77,10 +77,10 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
                 => ln(P) = ln(P') - ln(c)
             Note that we use invere sign because our values of ln(f) and ln(f') are negative.
         */
-        double unscaledLogProb_curr[numExpressionCategories];
-        double unscaledLogProb_prop[numExpressionCategories];
+        double* unscaledLogProb_curr = new double[numExpressionCategories]();
+        double* unscaledLogProb_prop = new double[numExpressionCategories]();
 
-        double unscaledLogProb_curr_singleMixture[numMixtures];
+        double* unscaledLogProb_curr_singleMixture = new double[numMixtures]();
         double maxValue = -1000000.0;
         unsigned mixtureIndex = 0u;
         for(unsigned k = 0u; k < numExpressionCategories; k++)
@@ -126,7 +126,7 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
         // ln(f') = ln(c) + ln(f)
         // calculate ln(P) = ln( Sum(p_i*f'(...)) ) and obtain normalizing constant for new p_i
         double normalizingProbabilityConstant = 0.0;
-        double probabilities[numMixtures];
+        double* probabilities = new double[numMixtures]();
         for(unsigned k = 0u; k < numMixtures; k++)
         {
             unscaledLogProb_curr_singleMixture[k] -= maxValue;
@@ -150,11 +150,15 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
             parameter.updateExpressionTrace(iteration/thining, i);
             parameter.updateMixtureAssignmentTrace(iteration/thining, i);
         }
-    }
+				delete [] probabilities;
+    		delete [] unscaledLogProb_curr_singleMixture;
+				delete [] unscaledLogProb_prop;
+				delete [] unscaledLogProb_curr;
+		}
 
-    double newMixtureProbabilities[numMixtures];
+    double* newMixtureProbabilities = new double[numMixtures]();
     ROCParameter::randDirichlet(dirichletParameters, numMixtures, newMixtureProbabilities);
-    for(unsigned k = 0u; k < numMixtures; k++)
+		for(unsigned k = 0u; k < numMixtures; k++)
     {
       parameter.setCategoryProbability(k, newMixtureProbabilities[k]);
     }
@@ -162,6 +166,8 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
     {
         parameter.updateCategoryProbabilitiesTrace(iteration/thining);
     }
+    delete [] dirichletParameters;
+		delete [] newMixtureProbabilities;
     return logLikelihood;
 }
 
