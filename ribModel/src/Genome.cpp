@@ -193,7 +193,7 @@ Gene& Genome::getGene(unsigned index)
 		std::cerr << "Error in Genome::getGene: Index " << index << " is out of bounds.\n";
 	}
 
-	return index >= genes.size() ? gene  : genes[index];
+	return index >= genes.size() ? gene : genes[index];
 }
 Gene& Genome::getGene(std::string id)
 {

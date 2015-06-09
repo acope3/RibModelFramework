@@ -13,24 +13,9 @@ files <- c("../ribModel/data/Skluyveri_CSP_ChrA.csv", "../ribModel/data/Skluyver
 parameter$initMutationSelectionCategories(files, 2, "Mutation")
 parameter$initMutationSelectionCategories(files, 2, "Selection")
 
-
-samples <- 100
-thining <- 10
-adaptiveWidth <- 10
-useSamples <- 10
-
-model <- new(ROCModel)
-mcmc <- new(MCMCAlgorithm, samples, thining, adaptiveWidth, T, T, T)
-mcmc$run(genome, model, parameter);
-
-plot(mcmc)
-
-plot(parameter, what = "MixtureProbability")
-plot(parameter, what = "SPhi")
-plot(parameter, what = "ExpectedPhi")
-plot(parameter, what = "Expression", geneIndex = 905)
-plot(parameter, what = "Mutation", category = 2)
-plot(parameter, what = "Selection", category = 2)
-
-plot(model, genome, parameter, samples = samples*0.1, category = 2, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
-
+#check to see if the initCovarianceMatrix is working for ROCParameter
+A = matrix(c(2, 4, 3, 1), nrow = 2, ncol = 2, byrow = TRUE)
+ parameter$initCovarianceMatrix( A, "A" )
+cm <- parameter$getCovarianceMatrixForAA("a")
+cm$printCovarianceMatrix()
+A

@@ -37,6 +37,7 @@ ROCParameter::ROCParameter(const ROCParameter& other)
 {
 	numParam = other.numParam;
 
+	covarianceMatrix = other.covarianceMatrix;
 	Sphi = other.Sphi;
 	Aphi = other.Aphi;
 	Sphi_proposed = other.Sphi_proposed;
@@ -85,6 +86,7 @@ ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
 	if (this == &rhs) return *this; // handle self assignment
 	numParam = rhs.numParam;
 
+	covarianceMatrix = rhs.covarianceMatrix;
 	Sphi = rhs.Sphi;
 	Aphi = rhs.Aphi;
 	Sphi_proposed = rhs.Sphi_proposed;
@@ -137,6 +139,18 @@ void ROCParameter::initParameterSet(unsigned numGenes, double sphi, unsigned _nu
 
 	// assign genes to mixture element
 	mixtureAssignment.resize(numGenes, 0);
+	covarianceMatrix.resize(22);
+#ifndef STANDALONE
+	if(!geneAssignment.empty())
+	{
+		//TODO:need to check index are correct, consecutive, and don't exceed numMixtures
+		//possibly just use a set?
+		for(unsigned i = 0u; i < numGenes; i++)
+		{
+			mixtureAssignment[i] = geneAssignment[i] - 1;
+		}
+	}
+#else
 	if(!geneAssignment.empty())
 	{
 		for(unsigned i = 0u; i < numGenes; i++)
@@ -144,7 +158,7 @@ void ROCParameter::initParameterSet(unsigned numGenes, double sphi, unsigned _nu
 			mixtureAssignment[i] = geneAssignment[i];
 		}
 	}
-
+#endif	
 	mutationSelectionState = _mutationSelectionState;
 	numAcceptForMutationAndSelection.resize(22, 0u);
 
@@ -215,21 +229,90 @@ void ROCParameter::initParameterSet(unsigned numGenes, double sphi, unsigned _nu
 	}
 }
 
+void ROCParameter::initSelection(std::vector<double> selectionValues, unsigned mixtureElement, char aa)
+{
+	//currentSelectionParameter
+	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	if (check)
+	{
+		mixtureElement--;
+		unsigned aaRange[2];
+		int category = getSelectionCategory(mixtureElement);
+
+		aa = std::toupper(aa);
+		SequenceSummary::AAToCodonRange(aa, true, aaRange);
+		for (unsigned i = aaRange[0], j = 0; i < aaRange[1]; i++, j++)
+		{
+			currentSelectionParameter[category][i] = selectionValues[j];
+		}
+	}
+}
+
+void ROCParameter::initMutation(std::vector<double> mutationValues, unsigned mixtureElement, char aa)
+{
+	//currentMutationParameter
+	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	if (check)
+	{
+		mixtureElement--;
+
+		unsigned aaRange[2];
+		unsigned category = getMutationCategory(mixtureElement);
+
+		aa = std::toupper(aa);
+		SequenceSummary::AAToCodonRange(aa, true, aaRange);
+		for (unsigned i = aaRange[0], j = 0; i < aaRange[1]; i++, j++)
+		{
+			currentMutationParameter[category][i] = mutationValues[j];
+		}
+	}
+}
+
+#ifndef STANDALONE
+using namespace Rcpp;
+void ROCParameter::initCovarianceMatrix(SEXP _matrix, char aa)
+{
+	std::vector<double> tmp;
+	NumericMatrix matrix(_matrix);
+	aa = std::toupper(aa);
+	unsigned aaIndex = SequenceSummary::aaToIndex.find(aa) -> second;
+	unsigned numRows = matrix.nrow();
+	std::vector<double> covMatrix(numRows * numRows);
+
+	//NumericMatrix stores the matrix by column, not by row. The loop
+	//below transposes the matrix when it stores it.
+	unsigned index = 0;
+	for (unsigned i = 0; i < numRows; i++)
+	{
+		for(unsigned j = i; j < numRows * numRows; j += numRows, index++)
+		{
+			covMatrix[index] = matrix[j];
+		}
+	}
+	CovarianceMatrix m(covMatrix);
+	covarianceMatrix[aaIndex] = m;
+}
+#endif
+
+CovarianceMatrix& ROCParameter::getCovarianceMatrixForAA(char aa)
+{
+	aa = std::toupper(aa);
+	unsigned aaIndex = SequenceSummary::aaToIndex.find(aa) -> second;
+	return covarianceMatrix[aaIndex];
+}
 
 
 void ROCParameter::initMutationSelectionCategories(std::vector<std::string> files, unsigned numCategories, unsigned paramType)
 {
-	//TODO: R crashes due to different sizes given here.
 	//should noise be a variable?
 	unsigned i, j;
 	std::size_t pos, pos2;
-
 	std::ifstream currentFile;
 	std::string tmpString;
 	std::string type;
-
 	if (paramType == ROCParameter::dM) type = "mu";
 	else type = "eta";
+
 
 	for (i = 0; i < numCategories; i++)
 	{
@@ -239,7 +322,7 @@ void ROCParameter::initMutationSelectionCategories(std::vector<std::string> file
 		currentFile.open(files[i].c_str());
 		if (currentFile.fail())
 		{
-			std::cerr <<"Error opening file " << i <<" in the file array.\n";
+			std::cerr <<"Error opening file " << i <<" in the file vector.\n";
 			std::exit(1);
 		}
 		currentFile >> tmpString; //trash the first line, no info given.
@@ -330,8 +413,8 @@ void ROCParameter::initCategoryDefinitions(std::string mutationSelectionState, u
 		{
 			categories[i].delM = thetaKMatrix[i][0] - 1;
 			categories[i].delEta = thetaKMatrix[i][1] - 1; //need check for negative and consecutive checks
-			mutationIsInMixture[thetaKMatrix[i][1] - 1].push_back(i);
-			selectionIsInMixture[thetaKMatrix[i][0] - 1].push_back(i);
+			mutationIsInMixture[thetaKMatrix[i][0] - 1].push_back(i);
+			selectionIsInMixture[thetaKMatrix[i][1] - 1].push_back(i);
 		}
 		else if (mutationSelectionState == selectionShared)
 		{
@@ -1103,7 +1186,7 @@ bool ROCParameter::checkIndex(unsigned index, unsigned lowerbound, unsigned uppe
 	else
 	{
 		std::cerr <<"Error with Index\nINDEX: " << index <<"\n";
-			std::cerr <<"MUST BE BETWEEN " << lowerbound << " & " << upperbound <<"\n";
+		std::cerr <<"MUST BE BETWEEN " << lowerbound << " & " << upperbound <<"\n";
 	}
 
 	return check;
@@ -1360,10 +1443,41 @@ void ROCParameter::swap(int& a, int& b)
 	b = temp;
 }
 
+void ROCParameter::initMutationSelectionCategoriesR(std::vector<std::string> files, unsigned numCategories, std::string paramType)
+{
+	unsigned value;
+	bool check = true;
+	if (paramType == "Mutation")
+	{
+		value = ROCParameter::dM;
+	}
+	else if (paramType == "Selection")
+	{
+		value = ROCParameter::dEta;
+	}
+	else
+	{
+		std::cerr <<"Bad paramType given. Expected \"Mutation\" or \"Selection\".\nFunction not being executed!\n";
+		check = false;
+	}
+	if (files.size() != numCategories) //we have different sizes and need to stop
+	{
+		std::cerr <<"The number of files given and the number of categories given differ. Function will not be executed!\n";
+		check = false;
+	}
+
+	if (check)
+	{
+		initMutationSelectionCategories(files, numCategories, value);
+	}
+}
+
+
 
 #ifndef STANDALONE
 
-RCPP_EXPOSED_CLASS(Genome)
+	RCPP_EXPOSED_CLASS(Genome)
+RCPP_EXPOSED_CLASS(CovarianceMatrix)
 
 RCPP_MODULE(ROCParameter_mod)
 {
@@ -1371,13 +1485,17 @@ RCPP_MODULE(ROCParameter_mod)
 		.constructor("empty constructor")
 		.constructor <unsigned, double, unsigned, std::vector<unsigned>, bool, std::string>("#Genes, sphi, #mixtures, gene assignment, splitSer?, mutation/selection state")
 
-		.method("initMutationSelectionCategories", &ROCParameter::initMutationSelectionCategories)
+		.method("initMutationSelectionCategories", &ROCParameter::initMutationSelectionCategoriesR)
 		.method("readPhiValues", &ROCParameter::readPhiValues)
 		.method("setMixtureAssignmentForGene", &ROCParameter::setMixtureAssignmentForGene)
 		.method("getMutationCategoryForMixture", &ROCParameter::getMutationCategoryForMixture)
 		.method("getSelectionCategoryForMixture", &ROCParameter::getSelectionCategoryForMixture)
 		.method("getExpressionCategoryForMixture", &ROCParameter::getExpressionCategoryForMixture)
-
+		
+		.method("initSelection", &ROCParameter::initSelection)
+		.method("initMutation", &ROCParameter::initMutation)
+		.method("initCovarianceMatrix", &ROCParameter::initCovarianceMatrix)
+		.method("getCovarianceMatrixForAA", &ROCParameter::getCovarianceMatrixForAA)
 		//R wrapper functions
 		.method("initializeExpressionByGenome", &ROCParameter::initializeExpressionByGenome)
 		.method("initializeExpressionByList", &ROCParameter::initializeExpressionByList)

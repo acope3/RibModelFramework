@@ -6,8 +6,12 @@
 #include <string>
 #include <iostream>
 
+#ifndef STANDALONE
+#include <Rcpp.h>
+#endif
 //#include "../include/SequenceSummary.h"
-#include "../include/Genome.h"
+#include "Genome.h"
+#include "CovarianceMatrix.h"
 
 class ROCParameter
 {
@@ -28,7 +32,7 @@ class ROCParameter
 		std::vector<double> sPhiTrace;
 		std::vector<double> aPhiTrace;
 		unsigned numAcceptForSphi;
-
+		std::vector<CovarianceMatrix> covarianceMatrix;
 
 		std::vector<double> sphiAcceptanceRatioTrace; // sample
 		std::vector<std::vector<std::vector<double>>> expressionAcceptanceRatioTrace; // order: category, gene, sample
@@ -118,6 +122,13 @@ class ROCParameter
 		void initParameterSet(unsigned numGenes, double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, 
 				bool splitSer = true, std::string _mutationSelectionState = allUnique, unsigned thetaKMatrix[][2] = nullptr);
 
+
+		void initSelection(std::vector<double> selectionValues, unsigned mixtureElement, char aa);
+		void initMutation(std::vector<double> mutationValues, unsigned mixtureElement, char aa);
+		#ifndef STANDALONE
+		void initCovarianceMatrix(SEXP matrix, char aa);
+		#endif
+		CovarianceMatrix& getCovarianceMatrixForAA(char aa);
 		std::vector <double> readPhiValues(std::string filename);
 		void setNumMutationSelectionValues(std::string mutationSelectionState, unsigned thetaKMatrix[][2]);
 		void initCategoryDefinitions(std::string mutationSelectionState, unsigned thetaKMatrix[][2]);
@@ -281,6 +292,7 @@ class ROCParameter
 
 
 		//R wrapper functions
+		void initMutationSelectionCategoriesR(std::vector<std::string> files, unsigned numCategories, std::string paramType);
 		double getMutationPosteriorMeanForCodon(unsigned category, unsigned samples, std::string codon)
 		{
 			double rv = -1.0;
