@@ -1,5 +1,5 @@
 
-initializeParameterObejct <- function(genome, sphi, numMixtures, geneAssignment, expressionValues = NULL,
+initializeParameterObject <- function(genome, sphi, numMixtures, geneAssignment, expressionValues = NULL,
                                       split.serine = TRUE, mixture.definition = "allUnique")
 {
   # create parameter object
@@ -12,21 +12,23 @@ initializeParameterObejct <- function(genome, sphi, numMixtures, geneAssignment,
   }
   
   
-  phi <- parameter$getCurrentExpressionForMixture(1)
+  phi <- parameter$getCurrentExpressionForMixture(1) # phi values are all the same initially
   names.aa <- aminoAcids()
   for(aa in names.aa)
   {
     if(aa == "M" || aa == "W" || aa == "X") next
     
-    storage <- vector("list", numMixtures)
+    # TODO WORKS CURRENTLY ONLY FOR ALLUNIQUE!
+    covmat <- NULL
     for(mixElement in 1:numMixtures)
     {    
       idx <- geneAssignment == mixElement
       codonCounts <- getCodonCountsForAA(aa)
       csp <- getCSPbyLogit(codonCounts[idx, ], phi[idx])
       
-      parameter$initializeMutation(csp$coef.mat[1,], mixElement, aa)
-      parameter$initializeSelection(csp$coef.mat[2,], mixElement, aa)
+      parameter$initMutation(csp$coef.mat[1,], mixElement, aa)
+      parameter$initSelection(csp$coef.mat[2,], mixElement, aa)
+      covmat <- t(csp$R) %*% csp$R  # we expect the covariance matrix, but get the decomposition.
     }
     parameter$initCovarianceMatrix(covmat, aa)
   }
