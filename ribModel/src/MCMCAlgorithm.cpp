@@ -231,7 +231,6 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
     // initialize everything
 
     parameter.initAllTraces(samples, genome.getGenomeSize(), maximumIterations/adaptiveWidth);
-    CovarianceMatrix covmat = CovarianceMatrix(2);
     // starting the MCMC
 
     std::cout << "entering MCMC loop" << std::endl;

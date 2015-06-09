@@ -12,13 +12,13 @@ CovarianceMatrix::CovarianceMatrix(int _numVariates)
 {
 	initCovarianceMatrix(_numVariates);
 }
-
 CovarianceMatrix::CovarianceMatrix(std::vector <double> &matrix)
 {
     numVariates = std::sqrt(matrix.size());
     covMatrix = matrix;
     choleskiMatrix.resize(matrix.size(), 0.0);
 }
+
 
 CovarianceMatrix::~CovarianceMatrix()
 {
@@ -27,28 +27,18 @@ CovarianceMatrix::~CovarianceMatrix()
 
 CovarianceMatrix::CovarianceMatrix(const CovarianceMatrix& other)
 {
-    std::cout <<"copy constructor called\n";
     numVariates = other.numVariates;
     covMatrix = other.covMatrix;
     choleskiMatrix = other.choleskiMatrix;
 }
-/*
 CovarianceMatrix& CovarianceMatrix::operator=(const CovarianceMatrix& rhs)
 {
-		std::cout <<"op over constructor called\n";
     if (this == &rhs) return *this; // handle self assignment
-    covMatrix[rhs.numVariates][rhs.numVariates];
     numVariates = rhs.numVariates;
-    for(int i = 0; i < rhs.numVariates; i++)
-    {
-        for(int j = 0; j < rhs.numVariates; j++)
-        {
-            covMatrix[i][j] = rhs.covMatrix[i][j];
-        }
-    }
+    covMatrix = rhs.covMatrix;
+		choleskiMatrix = rhs.choleskiMatrix;
     return *this;
 }
-*/
 void CovarianceMatrix::initCovarianceMatrix(unsigned _numVariates)
 {
     numVariates = _numVariates;
@@ -153,3 +143,39 @@ void CovarianceMatrix::printCholeskiMatrix()
     std::cout <<"\n";
 }
 
+#ifndef STANDALONE
+#include <Rcpp.h>
+using namespace Rcpp;
+void CovarianceMatrix::setCovarianceMatrix(SEXP _matrix)
+{
+  std::vector<double> tmp;
+  NumericMatrix matrix(_matrix);
+  unsigned numRows = matrix.nrow();
+  covMatrix.resize(numRows * numRows, 0.0);
+	numVariates = numRows;
+ 
+  //NumericMatrix stores the matrix by column, not by row. The loop
+  //below transposes the matrix when it stores it.
+  unsigned index = 0;
+  for (unsigned i = 0; i < numRows; i++)
+  {
+    for(unsigned j = i; j < numRows * numRows; j += numRows, index++)
+    {
+      covMatrix[index] = matrix[j];
+    }
+  }
+}
+#endif
+#ifndef STANDALONE
+
+RCPP_MODULE(CovarianceMatrix_mod)
+{
+  class_<CovarianceMatrix>( "CovarianceMatrix" )
+		.constructor("Empty Constructor")
+		.method("choleskiDecomposition", &CovarianceMatrix::choleskiDecomposition)
+		.method("printCovarianceMatrix", &CovarianceMatrix::printCovarianceMatrix)
+		.method("printCholeskiMatrix", &CovarianceMatrix::printCholeskiMatrix)
+		.method("setCovarianceMatrix", &CovarianceMatrix::setCovarianceMatrix)
+		;
+}
+#endif
