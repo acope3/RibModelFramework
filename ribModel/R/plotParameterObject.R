@@ -5,15 +5,15 @@
 # getExpressionTraceForGene or plotCodonSpecificParameters
 
 plot.Rcpp_ROCParameter <- function(parameter, what=c("Mutation", "Selection", "MixtureProbability" ,"SPhi", "ExpectedPhi", "Expression"), 
-                                   geneIndex=1, category = 1, ...)
+                                   geneIndex=1, mixture = 1, ...)
 {
   if(what[1] == "Mutation")
   {
-    plotCodonSpecificParameters(parameter, category, "mutation", main="Mutation Parameter Traces")
+    plotCodonSpecificParameters(parameter, mixture, "mutation", main="Mutation Parameter Traces")
   }
   if(what[1] == "Selection")
   {
-    plotCodonSpecificParameters(parameter, category, "selection", main="Selection Parameter Traces")
+    plotCodonSpecificParameters(parameter, mixture, "selection", main="Selection Parameter Traces")
   }  
   if(what[1] == "MixtureProbability")
   {
@@ -33,7 +33,7 @@ plot.Rcpp_ROCParameter <- function(parameter, what=c("Mutation", "Selection", "M
   }
 }
 
-plotCodonSpecificParameters <- function(parameter, category, type="mutation", main="Mutation Parameter Traces")
+plotCodonSpecificParameters <- function(parameter, mixture, type="mutation", main="Mutation Parameter Traces")
 {
   opar <- par(no.readonly = T) 
   
@@ -59,13 +59,13 @@ plotCodonSpecificParameters <- function(parameter, category, type="mutation", ma
       ylab <- expression(Delta~"M")
       for(i in 1:length(codons))
       {
-        trace[[i]] <- parameter$getMutationParameterTraceByCategoryForCodon(category, codons[i])
+        trace[[i]] <- parameter$getMutationParameterTraceByCategoryForCodon(mixture, codons[i])
       }
     }else{
       ylab <- expression(Delta~eta)
       for(i in 1:length(codons))
       {
-        trace[[i]] <- parameter$getSelectionParameterTraceByCategoryForCodon(category, codons[i])
+        trace[[i]] <- parameter$getSelectionParameterTraceByCategoryForCodon(mixture, codons[i])
       }
     }
     trace <- do.call("cbind", trace)
@@ -90,7 +90,7 @@ plotCodonSpecificParameters <- function(parameter, category, type="mutation", ma
 
 plotExpressionTrace <- function(parameter, geneIndex)
 {
-  plot(parameter$getExpressionTraceForGene(geneIndex), type= "l", xlab = "Sample", ylab = expression(phi))
+  plot(log10(parameter$getExpressionTraceForGene(geneIndex)), type= "l", xlab = "Sample", ylab = expression("log"[10]~"("~phi~")"))
 }
 
 plotExpectedPhiTrace <- function(parameter)

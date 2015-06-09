@@ -203,7 +203,7 @@ std::vector<double> ROCModel::CalculateProbabilitiesForCodons(std::vector<double
 	double* _selection = &selection[0];
 	double* codonProb = new double[numCodons]();
 	calculateCodonProbabilityVector(numCodons, _mutation, _selection, phi, codonProb);
-	std::vector<double> returnVector(codonProb, codonProb + sizeof codonProb / sizeof codonProb[0]);
+	std::vector<double> returnVector(codonProb, codonProb + numCodons);
 	return returnVector;
 }
 

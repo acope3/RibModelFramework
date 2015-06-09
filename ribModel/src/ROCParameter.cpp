@@ -1416,6 +1416,7 @@ RCPP_MODULE(ROCParameter_mod)
 		.method("getMutationVarianceForCodon", &ROCParameter::getMutationVarianceForCodon)
 		.method("getSelectionVarianceForCodon", &ROCParameter::getSelectionVarianceForCodon)
 		.method("getExpressionVarianceByExpressionCategoryForGene", &ROCParameter::getExpressionVarianceByExpressionCategoryForGene)
+		.method("getCurrentExpressionForMixture", &ROCParameter::getCurrentExpressionForMixture)
 
 		.property("numMutationCategories", &ROCParameter::getNumMutationCategories)
 		.property("numSelectionCategories", &ROCParameter::getNumSelectionCategories)

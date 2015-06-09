@@ -1,7 +1,7 @@
     
 
 
-plot.Rcpp_ROCModel <- function(model, genome, parameter, samples = 100, category = 1, estim.Expression = TRUE, ...)
+plot.Rcpp_ROCModel <- function(model, genome, parameter, samples = 100, mixture = 1, estim.Expression = TRUE, ...)
 {
   opar <- par(no.readonly = T) 
   
@@ -27,26 +27,26 @@ plot.Rcpp_ROCModel <- function(model, genome, parameter, samples = 100, category
   num.genes <- genome$getGenomeSize()
   
   mixtureAssignment <- unlist(lapply(1:num.genes,  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))
-  genes.in.category <- which(mixtureAssignment == category)
-  expressionCategory <- parameter$getExpressionCategoryForMixture(category)
+  genes.in.mixture <- which(mixtureAssignment == mixture)
+  expressionCategory <- parameter$getExpressionCategoryForMixture(mixture)
   
   # need expression values to know range
-  num.genes <- length(genes.in.category)
+  num.genes <- length(genes.in.mixture)
   if(estim.Expression){ # use estimated expression values
-    expressionValues <- unlist(lapply(genes.in.category, function(geneIndex){
+    expressionValues <- unlist(lapply(genes.in.mixture, function(geneIndex){
       parameter$getExpressionPosteriorMeanByExpressionCategoryForGene(samples, geneIndex, expressionCategory)
     }))  
   }else{ # use empirical expression values
     
   }
   expressionValues <- log10(expressionValues)
-  genome <- genome$getGenomeForGeneIndicies(genes.in.category)
+  genome <- genome$getGenomeForGeneIndicies(genes.in.mixture)
   
   names.aa <- aminoAcids()
   for(aa in names.aa)
   {
     if(aa == "M" || aa == "W" || aa == "X") next
-    plotSinglePanel(parameter, model, genome, expressionValues, samples, category, aa)
+    plotSinglePanel(parameter, model, genome, expressionValues, samples, mixture, aa)
     box()
     main.aa <- aa #TODO map to three letter code
     text(0, 1, main.aa, cex = 1.5)
@@ -86,7 +86,7 @@ plot.Rcpp_ROCModel <- function(model, genome, parameter, samples = 100, category
   par(opar)
 }
 
-plotSinglePanel <- function(parameter, model, genome, expressionValues, samples, category, aa)
+plotSinglePanel <- function(parameter, model, genome, expressionValues, samples, mixture, aa)
 {
   codons <- AAToCodon(aa, T)
   
@@ -95,8 +95,8 @@ plotSinglePanel <- function(parameter, model, genome, expressionValues, samples,
   mutation <- vector("numeric", length(codons))
   for(i in 1:length(codons))
   {
-    selection[i] <- parameter$getSelectionPosteriorMeanForCodon(category, samples, codons[i])
-    mutation[i] <- parameter$getMutationPosteriorMeanForCodon(category, samples, codons[i])
+    selection[i] <- parameter$getSelectionPosteriorMeanForCodon(mixture, samples, codons[i])
+    mutation[i] <- parameter$getMutationPosteriorMeanForCodon(mixture, samples, codons[i])
   }
   
   # calculate codon probabilities with respect to phi

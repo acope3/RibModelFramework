@@ -471,6 +471,18 @@ class ROCParameter
 		unsigned getMutationCategoryForMixture(unsigned group);
 		unsigned getSelectionCategoryForMixture(unsigned group);
 		unsigned getExpressionCategoryForMixture(unsigned group);
+		std::vector<double> getCurrentExpressionForMixture(unsigned mixture)
+		{
+			bool checkMixture = checkIndex(mixture, 1, numMixtures);
+			unsigned exprCat = 0u;
+			if(checkMixture)
+			{
+				exprCat = getExpressionCategoryForMixture(mixture - 1);
+			}else{
+				std::cerr << "WARNING: Mixture element " << mixture << " NOT found. Mixture element 1 is returned instead. \n";
+			}
+			return currentExpressionLevel[exprCat];
+		}
 	protected:
 
 };

@@ -261,25 +261,25 @@ int main()
 	Genome genome;
 	std::cout << "reading fasta file" << std::endl;
 	if(cedric){
-		//genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta");
-		genome.readFasta("C:/Users/Cedric/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta");
+		genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta");
+		//genome.readFasta("C:/Users/Cedric/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta");
 	}else{
 		genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_ChrA_andCleft.fasta");
 	}
 	std::cout << "done reading fasta file" << std::endl;
-	bool testing =  false;
+	bool testing =  true;
 
 	if(testing)
 	{
 			 //testNumCodonsPerAA();
 			 //testCodonRangePerAA(false);
 			 //testCodonRangePerAA(true);
-			 /*testLogNormDensity();
-			 testSCUO(genome);
+			 //testLogNormDensity();
+			 //testSCUO(genome);
 			 testCovarianceMatrix();
-			 testRandMultiNom(3);
-			 testThetaKMatrix();*/
-		testSimulateGenome(genome);
+			 //testRandMultiNom(3);
+			 //testThetaKMatrix();
+		//testSimulateGenome(genome);
 	}else{
 		ROCModel model;
 		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
