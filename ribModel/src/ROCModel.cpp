@@ -145,11 +145,6 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
     double likelihood_proposed = 0.0;
     for(int i = 0; i < numGenes; i++)
     {
-        int* codonCount = new int[numCodons]();
-        double* mutation = new double[numCodons - 1]();
-        double* selection = new double[numCodons - 1]();
-        double* mutation_proposed = new double[numCodons - 1]();
-        double* selection_proposed = new double[numCodons - 1]();
         Gene gene = genome.getGene(i);
         SequenceSummary seqsum = gene.getSequenceSummary();
         if(seqsum.getAAcountForAA(curAA) == 0) continue;
@@ -164,21 +159,26 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
         double phiValue = parameter.getExpression(i, expressionCategory, false);
 
         // get current mutation and selection parameter
+        double* mutation = new double[numCodons - 1]();
         parameter.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
+        double* selection = new double[numCodons - 1]();
         parameter.getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
 
         // get proposed mutation and selection parameter
+        double* mutation_proposed = new double[numCodons - 1]();
         parameter.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, true, mutation_proposed);
+        double* selection_proposed = new double[numCodons - 1]();
         parameter.getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, true, selection_proposed);
 
+        int* codonCount = new int[numCodons]();
         obtainCodonCount(seqsum, curAA, codonCount);
         likelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
         likelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation_proposed, selection_proposed, phiValue);
-    		delete [] codonCount;
-				delete [] mutation;
-				delete [] selection;
-				delete [] mutation_proposed;
-				delete [] selection_proposed;
+		delete [] codonCount;
+		delete [] mutation;
+		delete [] selection;
+		delete [] mutation_proposed;
+		delete [] selection_proposed;
 		}
     logAcceptanceRatioForAllMixtures = likelihood_proposed - likelihood;
 }

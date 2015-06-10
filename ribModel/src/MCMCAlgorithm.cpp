@@ -208,7 +208,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, ROCParame
     double acceptanceRatioForAllMixtures = 0.0;
     for(unsigned i = 0; i < 22; i++)
     {
-        char curAA = SequenceSummary::AminoAcidArray[i];
+    	char curAA = SequenceSummary::AminoAcidArray[i];
         // skip amino acids with only one codon or stop codons
         if(curAA == 'X' || curAA == 'M' || curAA == 'W') continue;
         // calculate likelihood ratio for every Category for current AA
@@ -220,7 +220,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, ROCParame
         }
         if((iteration % thining) == 0)
         {
-            parameter.updateCodonSpecificParameterTrace(iteration/thining, curAA);
+        	parameter.updateCodonSpecificParameterTrace(iteration/thining, curAA);
         }
     }
 }
