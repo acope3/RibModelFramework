@@ -50,7 +50,7 @@ for(mixture in 1:2)
   # need expression values to know range
   num.genes <- length(genes.in.mixture)
   expressionValues <- unlist(lapply(genes.in.mixture, function(geneIndex){
-    parameter$getExpressionPosteriorMeanByExpressionCategoryForGene(samples*0.1, geneIndex, expressionCategory)
+    parameter$getExpressionPosteriorMeanByMixtureElementForGene(samples*0.1, geneIndex, expressionCategory)
   }))
   points(mixtureAssignment[genes.in.mixture, mixture], log10(expressionValues), col=colors[mixture])
 }

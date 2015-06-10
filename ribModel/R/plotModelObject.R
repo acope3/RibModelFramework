@@ -34,7 +34,7 @@ plot.Rcpp_ROCModel <- function(model, genome, parameter, samples = 100, mixture 
   num.genes <- length(genes.in.mixture)
   if(estim.Expression){ # use estimated expression values
     expressionValues <- unlist(lapply(genes.in.mixture, function(geneIndex){
-      parameter$getExpressionPosteriorMeanByExpressionCategoryForGene(samples, geneIndex, expressionCategory)
+      parameter$getExpressionPosteriorMeanByMixtureElementForGene(samples, geneIndex, expressionCategory)
     }))  
   }else{ # use empirical expression values
     

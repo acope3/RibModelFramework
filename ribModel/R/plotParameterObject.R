@@ -59,13 +59,13 @@ plotCodonSpecificParameters <- function(parameter, mixture, type="mutation", mai
       ylab <- expression(Delta~"M")
       for(i in 1:length(codons))
       {
-        trace[[i]] <- parameter$getMutationParameterTraceByCategoryForCodon(mixture, codons[i])
+        trace[[i]] <- parameter$getMutationParameterTraceByMixtureElementForCodon(mixture, codons[i])
       }
     }else{
       ylab <- expression(Delta~eta)
       for(i in 1:length(codons))
       {
-        trace[[i]] <- parameter$getSelectionParameterTraceByCategoryForCodon(mixture, codons[i])
+        trace[[i]] <- parameter$getSelectionParameterTraceByMixtureElementForCodon(mixture, codons[i])
       }
     }
     trace <- do.call("cbind", trace)
@@ -111,14 +111,14 @@ plotSPhiTrace <- function(parameter)
 }
 plotMixtureProbability <- function(parameter)
 {
-  samples <- length(parameter$getCategoryProbabilitiesTraceForCategory(1))
+  samples <- length(parameter$getMixtureProbabilitiesTraceForCategory(1))
   numMixtures <- parameter$numMixtures
   
   plot(NULL, NULL, xlim = c(0, samples), ylim=c(0, 1), xlab = "Samples", ylab="Mixture Probability")
   for(i in 1:numMixtures)
   {
-    lines(parameter$getCategoryProbabilitiesTraceForCategory(i), col= ribModel:::.mixtureColors[i])    
+    lines(parameter$getMixtureProbabilitiesTraceForCategory(i), col= ribModel:::.mixtureColors[i])    
   }
   legend("topleft", legend = paste("Mixture Element", 1:numMixtures), 
-         col = .mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")
+         col = ribModel:::.mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")
 }
