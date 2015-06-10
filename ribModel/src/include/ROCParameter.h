@@ -111,17 +111,17 @@ class ROCParameter
 
 		bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);
 		explicit ROCParameter();
-		ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures,
-				std::vector<unsigned> geneAssignment, bool splitSer = true, std::string _mutationSelectionState = allUnique);
-		ROCParameter(unsigned numGenes, double sphi, unsigned _numMixtures,
-				std::vector<unsigned> geneAssignment, bool splitSer = true, unsigned thetaKMatrix[][2] = nullptr);
-
+		ROCParameter(double sphi, unsigned _numMixtures,
+				std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer = true, std::string _mutationSelectionState = "allUnique");
 		virtual ~ROCParameter();
 		ROCParameter(const ROCParameter& other);
 		ROCParameter& operator=(const ROCParameter& rhs);
-		void initParameterSet(unsigned numGenes, double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, 
-				bool splitSer = true, std::string _mutationSelectionState = allUnique, unsigned thetaKMatrix[][2] = nullptr);
+		void initParameterSet(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, 
+				std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer = true, std::string _mutationSelectionState = allUnique);
 
+		#ifndef STANDALONE
+		ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer = true, std::string _mutationSelectionState = allUnique, SEXP _matrix = NULL);
+		#endif
 
 		void initSelection(std::vector<double> selectionValues, unsigned mixtureElement, char aa);
 		void initMutation(std::vector<double> mutationValues, unsigned mixtureElement, char aa);
@@ -130,8 +130,8 @@ class ROCParameter
 		#endif
 		CovarianceMatrix& getCovarianceMatrixForAA(char aa);
 		std::vector <double> readPhiValues(std::string filename);
-		void setNumMutationSelectionValues(std::string mutationSelectionState, unsigned thetaKMatrix[][2]);
-		void initCategoryDefinitions(std::string mutationSelectionState, unsigned thetaKMatrix[][2]);
+		void setNumMutationSelectionValues(std::string mutationSelectionState, std::vector<std::vector<unsigned>> thetaKMatrix);
+		void initCategoryDefinitions(std::string mutationSelectionState, std::vector<std::vector<unsigned>> thetaKMatrix);
 		void initMutationSelectionCategories(std::vector<std::string> files, unsigned numCategories, unsigned paramType);
 		void printThetaKMatrix()
 		{

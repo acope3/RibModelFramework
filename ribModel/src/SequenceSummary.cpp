@@ -44,8 +44,9 @@ void SequenceSummary::clear()
 	for(k = 0; k < 22; k++) { naa[k] = 0; }
 }
 
-void SequenceSummary::processSequence(const std::string& sequence)
+bool SequenceSummary::processSequence(const std::string& sequence)
 {
+	bool check = true;
 	int codonID;
 	int aaID;
 	std::string codon;
@@ -66,9 +67,10 @@ void SequenceSummary::processSequence(const std::string& sequence)
 		else 
 		{
 			std::cerr << "WARNING: Codon " << codon << " nor recognized!\n Codon will be ignored!\n";
+			check = false;
 		}
 	}
-
+	return check;
 }
 
 /*

@@ -20,7 +20,8 @@ class CovarianceMatrix
         virtual ~CovarianceMatrix();
 				CovarianceMatrix(const CovarianceMatrix& other);
         CovarianceMatrix& operator=(const CovarianceMatrix& other);
-        void initCovarianceMatrix(unsigned _numVariates);
+        void operator*(const double &value);
+				void initCovarianceMatrix(unsigned _numVariates);
         void choleskiDecomposition();
         void calculateCovarianceMatrixFromTraces(std::vector<std::vector <std::vector<double>>> trace, unsigned geneIndex, unsigned curSample, unsigned adaptiveWidte);
 				void printCovarianceMatrix();
