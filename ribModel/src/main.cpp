@@ -118,8 +118,9 @@ void testThetaKMatrix()
 {
 	//unsigned matrix[2][2] = { {2,1}, {1,1} };
 	std::cout << "------------------ TEST THETAKMATRIX ------------------" << std::endl;
-	std::vector<unsigned> empty;
-	ROCParameter R(100, 2, 2, empty, true, "allUnique");
+	std::vector<unsigned> empty(100, 1);
+	std::vector<std::vector<unsigned>> thetaKMatrix;
+	ROCParameter R(2, 2, empty, thetaKMatrix, true, "allUnique");
 
 	R.printThetaKMatrix();
 	std::cout <<"numMutationCategories: " << R.getNumMutationCategories() <<"\n";
@@ -180,7 +181,8 @@ void testSimulateGenome(Genome& genome)
 	std::cout << "\tSphi init: " << sphi_init << "\n";
 	std::cout << "\t# mixtures: " << numMixtures << "\n";
 	std::cout << "\tmixture definition: " << mixDef << "\n";
-	ROCParameter parameter(genome.getGenomeSize(), sphi_init, numMixtures, geneAssignment, true, mixDef);
+	std::vector<std::vector<unsigned>> thetaKMatrix;
+	ROCParameter parameter(sphi_init, numMixtures, geneAssignment, thetaKMatrix, true, mixDef);
 	std::vector<std::string> files = {"Skluyveri_CSP_ChrA.csv", "Skluyveri_CSP_ChrCleft.csv"};
 	parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
 	parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
@@ -253,6 +255,19 @@ void testSimulateGenome(Genome& genome)
 	std::cout << "------------------ TEST SIMULATEGENOME ------------------" << std::endl;
 }
 
+void testCovMatrixOverloading()
+{
+	std::cout << "------------------ TEST COVMATRIXOVERLOADING ------------------" << std::endl;
+	CovarianceMatrix cm(3);
+
+	cm.printCovarianceMatrix();
+	cm * 4;
+	std::cout <<"\n";
+	cm.printCovarianceMatrix();
+
+	std::cout << "------------------ TEST COVMATRIXOVERLOADING ------------------" << std::endl;
+}
+
 int main()
 {
 	bool cedric = true;
@@ -276,10 +291,11 @@ int main()
 			 //testCodonRangePerAA(true);
 			 //testLogNormDensity();
 			 //testSCUO(genome);
-			 testCovarianceMatrix();
+			 //testCovarianceMatrix();
 			 //testRandMultiNom(3);
 			 //testThetaKMatrix();
 		//testSimulateGenome(genome);
+		testCovMatrixOverloading();
 	}else{
 		ROCModel model;
 		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
@@ -295,7 +311,8 @@ int main()
 		std::cout << "\tSphi init: " << sphi_init << "\n";
 		std::cout << "\t# mixtures: " << numMixtures << "\n";
 		std::cout << "\tmixture definition: " << mixDef << "\n";
-		ROCParameter parameter = ROCParameter(genome.getGenomeSize(), sphi_init, numMixtures, geneAssignment, true, mixDef);
+		std::vector<std::vector<unsigned>> thetaKMatrix;
+		ROCParameter parameter = ROCParameter(sphi_init, numMixtures, geneAssignment, thetaKMatrix, true, mixDef);
 
 		std::vector<std::string> files(2);
 		if(cedric)

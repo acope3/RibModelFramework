@@ -53,7 +53,11 @@ void Gene::setSequence(std::string _seq)
     //cleanSeq(); // causes problems when N is in sequence, Could N to cleanSeq alphabet TODO think about that option
 	if (seq.length() % 3 == 0)
 	{
-		geneData.processSequence(seq);
+		bool check = geneData.processSequence(seq);
+		if (!check)
+		{
+			std::cerr <<"Error with gene " << id <<"\nBad codons found!\n";
+		}
 	}
 	else
 	{

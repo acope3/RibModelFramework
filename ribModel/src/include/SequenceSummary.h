@@ -29,7 +29,7 @@ class SequenceSummary
 		SequenceSummary(const SequenceSummary& other);
 		SequenceSummary& operator=(const SequenceSummary& other);
 
-		void processSequence(const std::string& sequence);
+		bool processSequence(const std::string& sequence);
 		void clear();
 
 		int getAAcountForAA(char aa) {return naa[aaToIndex.find(aa)->second];}
