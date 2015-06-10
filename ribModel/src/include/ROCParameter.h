@@ -489,7 +489,7 @@ class ROCParameter
 			unsigned exprCat = 0u;
 			if(checkMixture)
 			{
-				exprCat = getExpressionCategoryForMixture(mixture - 1);
+				exprCat = getExpressionCategory(mixture - 1);
 			}else{
 				std::cerr << "WARNING: Mixture element " << mixture << " NOT found. Mixture element 1 is returned instead. \n";
 			}

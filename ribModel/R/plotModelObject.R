@@ -102,7 +102,6 @@ plotSinglePanel <- function(parameter, model, genome, expressionValues, samples,
   # calculate codon probabilities with respect to phi
   expression.range <- range(expressionValues)
   phis <- seq(from = expression.range[1], to = expression.range[2], by = 0.01)
-  rank.index <- order(expressionValues)
   codonProbability <- lapply(phis,  
                              function(phi){
                                model$CalculateProbabilitiesForCodons(mutation, selection, phi)
@@ -118,6 +117,7 @@ plotSinglePanel <- function(parameter, model, genome, expressionValues, samples,
   codonCounts <- do.call("cbind", codonCounts)
   # codon proportions
   codonCounts <- codonCounts / rowSums(codonCounts)
+  codonCounts[is.nan(codonCounts)] <- NA # necessary if AA does not appear in gene
   
   # make empty plot
   plot(NULL, NULL, xlim=range(expressionValues, na.rm = T), ylim=c(-0.05,1.05), 
@@ -135,13 +135,12 @@ plotSinglePanel <- function(parameter, model, genome, expressionValues, samples,
     }
     
     means <- colMeans(codonCounts[tmp.id,], na.rm = T)
-    sd <- apply(codonCounts[tmp.id,], 2, sd)
-    
+    std <- apply(codonCounts[tmp.id,], 2, sd, na.rm = T)
     for(k in 1:length(codons))
     {
       points(median(expressionValues[tmp.id]), means[k], 
              col=ribModel:::.codonColors[[ codons[k] ]] , pch=19, cex = 0.5)
-      lines(rep(median(expressionValues[tmp.id]),2), c(means[k]-sd[k], means[k]+sd[k]), 
+      lines(rep(median(expressionValues[tmp.id]),2), c(means[k]-std[k], means[k]+std[k]), 
             col=ribModel:::.codonColors[[ codons[k] ]], lwd=0.8)
     }
   }

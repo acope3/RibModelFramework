@@ -1,6 +1,21 @@
 
-initializeParameterObject <- function(genome, sphi, numMixtures, geneAssignment, expressionValues = NULL,
+initializeParameterObject <- function(genome, sphi, numMixtures, geneAssignment, expressionValues = NULL, model = "ROC",
                                       split.serine = TRUE, mixture.definition = "allUnique")
+{
+  if(model == "ROC")
+  {
+    parameter <- initializeROCParameterObject(genome, sphi, numMixtures, geneAssignment, expressionValues,
+                                 split.serine, mixture.definition)
+  }else if(model == "NSE"){
+    cat("MODEL NOT IMPLEMENTED")
+  }else{
+    stop("Unkown model.")
+  }
+  return(parameter)
+}
+
+initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignment, expressionValues = NULL,
+                                          split.serine = TRUE, mixture.definition = "allUnique")
 {
   # create parameter object
   parameter <- new(ROCParameter, genome$getGenomeSize(), sphi, numMixtures, geneAssignment, split.serine, mixture.definition)
