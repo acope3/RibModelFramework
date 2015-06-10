@@ -164,7 +164,7 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
     }
     if((iteration % thining) == 0)
     {
-        parameter.updateCategoryProbabilitiesTrace(iteration/thining);
+        parameter.updateMixtureProbabilitiesTrace(iteration/thining);
     }
     delete [] dirichletParameters;
 		delete [] newMixtureProbabilities;
