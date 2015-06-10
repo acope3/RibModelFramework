@@ -453,7 +453,7 @@ void ROCParameter::initAllTraces(unsigned samples, unsigned num_genes, unsigned 
 	initMixtureAssignmentTrace(samples, num_genes);
 	initExpressionAcceptanceRatioTrace(samples, num_genes);
 	initSphiTrace(samples);
-	initCategoryProbabilitesTrace(samples);
+	initMixtureProbabilitesTrace(samples);
 	initSelectionParameterTrace(samples);
 	initMutationParameterTrace(samples);
 	cspAcceptanceRatioTrace.resize(22);
@@ -526,12 +526,12 @@ void ROCParameter::initMixtureAssignmentTrace(unsigned samples, unsigned num_gen
 }
 
 
-void ROCParameter::initCategoryProbabilitesTrace(int samples)
+void ROCParameter::initMixtureProbabilitesTrace(int samples)
 {
-	categoryProbabilitiesTrace.resize(numMixtures);
+	mixtureProbabilitiesTrace.resize(numMixtures);
 	for (unsigned i = 0u; i < numMixtures; i++)
 	{
-		categoryProbabilitiesTrace[i].resize(samples, 0.0);
+		mixtureProbabilitiesTrace[i].resize(samples, 0.0);
 	}
 
 }
@@ -749,9 +749,9 @@ unsigned ROCParameter::getEstimatedMixtureAssignment(unsigned samples, unsigned 
 }
 
 
-double ROCParameter::getExpressionPosteriorMean(unsigned samples, unsigned geneIndex, unsigned expressionCategory)
+double ROCParameter::getExpressionPosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement)
 {
-
+	unsigned expressionCategory = getExpressionCategory(mixtureElement);
 	double posteriorMean = 0.0;
 	unsigned traceLength = expressionTrace[0].size();
 
@@ -796,9 +796,10 @@ double ROCParameter::getSphiPosteriorMean(unsigned samples)
 	}
 	return posteriorMean / (double)samples;
 }
-double ROCParameter::getMutationPosteriorMean(unsigned category, unsigned samples, unsigned paramIndex)
+double ROCParameter::getMutationPosteriorMean(unsigned mixtureElement, unsigned samples, unsigned paramIndex)
 {
 	double posteriorMean = 0.0;
+	unsigned category = getMutationCategory(mixtureElement);
 	unsigned traceLength = mutationParameterTrace[category].size();
 
 	if(samples > traceLength)
@@ -814,9 +815,10 @@ double ROCParameter::getMutationPosteriorMean(unsigned category, unsigned sample
 	}
 	return posteriorMean / (double)samples;
 }
-double ROCParameter::getSelectionPosteriorMean(unsigned category, unsigned samples, unsigned paramIndex)
+double ROCParameter::getSelectionPosteriorMean(unsigned mixtureElement, unsigned samples, unsigned paramIndex)
 {
 	double posteriorMean = 0.0;
+	unsigned category = getSelectionCategory(mixtureElement);
 	unsigned traceLength = selectionParameterTrace[category].size();
 
 	if(samples > traceLength)
@@ -833,8 +835,9 @@ double ROCParameter::getSelectionPosteriorMean(unsigned category, unsigned sampl
 	return posteriorMean / (double)samples;
 }
 
-double ROCParameter::getSelectionVariance(unsigned category, unsigned samples, unsigned paramIndex, bool unbiased)
+double ROCParameter::getSelectionVariance(unsigned mixtureElement, unsigned samples, unsigned paramIndex, bool unbiased)
 {
+	unsigned category = getSelectionCategory(mixtureElement);
 	unsigned traceLength = selectionParameterTrace[category].size();
 	if(samples > traceLength)
 	{
@@ -843,7 +846,7 @@ double ROCParameter::getSelectionVariance(unsigned category, unsigned samples, u
 		samples = traceLength;
 	}
 
-	double posteriorMean = getSelectionPosteriorMean(category, samples, paramIndex);
+	double posteriorMean = getSelectionPosteriorMean(mixtureElement, samples, paramIndex);
 
 	double posteriorVariance = 0.0;
 
@@ -858,8 +861,9 @@ double ROCParameter::getSelectionVariance(unsigned category, unsigned samples, u
 	return normalizationTerm * posteriorVariance;
 }
 
-double ROCParameter::getMutationVariance(unsigned category, unsigned samples, unsigned paramIndex, bool unbiased)
+double ROCParameter::getMutationVariance(unsigned mixtureElement, unsigned samples, unsigned paramIndex, bool unbiased)
 {
+	unsigned category = getMutationCategory(mixtureElement);
 	unsigned traceLength = mutationParameterTrace[category].size();
 	if(samples > traceLength)
 	{
@@ -868,7 +872,7 @@ double ROCParameter::getMutationVariance(unsigned category, unsigned samples, un
 		samples = traceLength;
 	}
 
-	double posteriorMean = getMutationPosteriorMean(category, samples, paramIndex);
+	double posteriorMean = getMutationPosteriorMean(mixtureElement, samples, paramIndex);
 
 	double posteriorVariance = 0.0;
 
@@ -882,7 +886,7 @@ double ROCParameter::getMutationVariance(unsigned category, unsigned samples, un
 	double normalizationTerm = unbiased ? (1/((double)samples-1.0)) : (1/(double)samples);
 	return normalizationTerm * posteriorVariance;
 }
-double ROCParameter::getExpressionVariance(unsigned samples, unsigned geneIndex, unsigned expressionCategory, bool unbiased)
+double ROCParameter::getExpressionVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement, bool unbiased)
 {
 	unsigned traceLength = expressionTrace[0].size();
 	if(samples > traceLength)
@@ -892,7 +896,7 @@ double ROCParameter::getExpressionVariance(unsigned samples, unsigned geneIndex,
 		samples = traceLength;
 	}
 
-	double posteriorMean = getExpressionPosteriorMean(samples, geneIndex, expressionCategory);
+	double posteriorMean = getExpressionPosteriorMean(samples, geneIndex, mixtureElement);
 
 	double posteriorVariance = 0.0;
 	if(!std::isnan(posteriorMean))
@@ -1161,20 +1165,20 @@ void ROCParameter::setMixtureAssignmentForGene(unsigned geneIndex, unsigned valu
 		mixtureAssignment[geneIndex - 1] = value;
 	}
 }
-unsigned ROCParameter::getMutationCategoryForMixture(unsigned group)
+unsigned ROCParameter::getMutationCategoryForMixture(unsigned mixtureElement)
 {
-	bool check = checkIndex(group, 1, categories.size());
-	return check ? categories[group - 1].delM + 1 : 0;
+	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	return check ? categories[mixtureElement - 1].delM + 1 : 0;
 }
-unsigned ROCParameter::getSelectionCategoryForMixture(unsigned group)
+unsigned ROCParameter::getSelectionCategoryForMixture(unsigned mixtureElement)
 {
-	bool check = checkIndex(group, 1, categories.size());
-	return check ? categories[group - 1].delEta + 1 : 0;
+	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	return check ? categories[mixtureElement - 1].delEta + 1 : 0;
 }
-unsigned ROCParameter::getExpressionCategoryForMixture(unsigned group)
+unsigned ROCParameter::getExpressionCategoryForMixture(unsigned mixtureElement)
 {
-	bool check = checkIndex(group, 1, categories.size());
-	return check ? categories[group - 1].delEta + 1 : 0;
+	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	return check ? categories[mixtureElement - 1].delEta + 1 : 0;
 }
 bool ROCParameter::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound)
 {
@@ -1310,14 +1314,14 @@ double ROCParameter::randUnif(double minVal, double maxVal)
 	return rv;
 }
 
-unsigned ROCParameter::randMultinom(double* probabilities, unsigned groups)
+unsigned ROCParameter::randMultinom(double* probabilities, unsigned mixtureElements)
 {
 	// calculate cummulative sum to determine group boundaries
-	double* cumsum = new double[groups]();
+	double* cumsum = new double[mixtureElements]();
 	//std::vector<double> cumsum(groups);
 	cumsum[0] = probabilities[0];
 
-	for(unsigned i = 1u; i < groups; i++)
+	for(unsigned i = 1u; i < mixtureElements; i++)
 	{
 		cumsum[i] = cumsum[i-1u] + probabilities[i];
 	}
@@ -1334,7 +1338,7 @@ unsigned ROCParameter::randMultinom(double* probabilities, unsigned groups)
 #endif
 	// check in which category the element falls
 	unsigned returnValue = 0u;
-	for (unsigned i = 0u; i < groups; i++)
+	for (unsigned i = 0u; i < mixtureElements; i++)
 	{
 		if (referenceValue <= cumsum[i])
 		{
@@ -1510,20 +1514,20 @@ RCPP_MODULE(ROCParameter_mod)
 		.method("getSPhiTrace", &ROCParameter::getSPhiTrace)
 
 		//R wrapper functions
-		.method("getCategoryProbabilitiesTraceForCategory", &ROCParameter::getCategoryProbabilitiesTraceForCategory)
+		.method("getMixtureProbabilitiesTraceForCategory", &ROCParameter::getMixtureProbabilitiesTraceForCategory)
 		.method("getMixtureAssignmentTraceForGene", &ROCParameter::getMixtureAssignmentTraceForGene)
-		.method("getSelectionParameterTraceByCategoryForCodon", &ROCParameter::getSelectionParameterTraceByCategoryForCodon)
-		.method("getMutationParameterTraceByCategoryForCodon", &ROCParameter::getMutationParameterTraceByCategoryForCodon)
+		.method("getSelectionParameterTraceByMixtureElementForCodon", &ROCParameter::getSelectionParameterTraceByMixtureElementForCodon)
+		.method("getMutationParameterTraceByMixtureElementForCodon", &ROCParameter::getMutationParameterTraceByMixtureElementForCodon)
 		.method("getExpressionTraceForGene", &ROCParameter::getExpressionTraceForGene)
-		.method("getExpressionTraceByCategoryForGene", &ROCParameter::getExpressionTraceByCategoryForGene)
-		.method("getExpressionAcceptanceRatioTraceByCategoryForGene", &ROCParameter::getExpressionAcceptanceRatioTraceByCategoryForGeneR)
+		.method("getExpressionTraceByMixtureElementForGene", &ROCParameter::getExpressionTraceByMixtureElementForGene)
+		.method("getExpressionAcceptanceRatioTraceByMixtureElementForGene", &ROCParameter::getExpressionAcceptanceRatioTraceByMixtureElementForGeneR)
 
 		// Posterior functions
 		.method("getSphiPosteriorMean", &ROCParameter::getSphiPosteriorMean)
 		//.method("getMixtureAssignmentPosteriorMean", &ROCParameter::getMixtureAssignmentPosteriorMeanR)
 
 		//R wrapper functions
-		.method("getExpressionPosteriorMeanByExpressionCategoryForGene", &ROCParameter::getExpressionPosteriorMeanByExpressionCategoryForGene)
+		.method("getExpressionPosteriorMeanByMixtureElementForGene", &ROCParameter::getExpressionPosteriorMeanByMixtureElementForGene)
 		.method("getMutationPosteriorMeanForCodon", &ROCParameter::getMutationPosteriorMeanForCodon)
 		.method("getSelectionPosteriorMeanForCodon", &ROCParameter::getSelectionPosteriorMeanForCodon)
 
@@ -1533,8 +1537,7 @@ RCPP_MODULE(ROCParameter_mod)
 		//R wrapper functions
 		.method("getMutationVarianceForCodon", &ROCParameter::getMutationVarianceForCodon)
 		.method("getSelectionVarianceForCodon", &ROCParameter::getSelectionVarianceForCodon)
-		.method("getExpressionVarianceByExpressionCategoryForGene", &ROCParameter::getExpressionVarianceByExpressionCategoryForGene)
-		.method("getCurrentExpressionForMixture", &ROCParameter::getCurrentExpressionForMixture)
+		.method("getExpressionVarianceByMixtureElementForGene", &ROCParameter::getExpressionVarianceByMixtureElementForGene)
 
 		.property("numMutationCategories", &ROCParameter::getNumMutationCategories)
 		.property("numSelectionCategories", &ROCParameter::getNumSelectionCategories)
