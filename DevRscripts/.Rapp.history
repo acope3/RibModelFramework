@@ -223,4 +223,96 @@ geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
 numMixtures <- 3;
 A = matrix(c(1,2,3,1,2,2), nrow = 3, ncol = 2, byrow = TRUE)
 parameter <- new(ROCParameter, genome$getGenomeSize(), sphi_init, numMixtures, geneAssignment, A, T)
-parameter <- new(ROCParameter, genome$getGenomeSize(), sphi_init, numMixtures, geneAssignment, A, T)
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";
+geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
+parameter <- initializeParameterObject(sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
+parameter <- initializeParameterObject(sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
+sphi_init
+numMixtures
+geneAssignment
+split.serine
+mixture.definition
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
+parameter <- initializeParameterObject(sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
+parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
+parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef)
+parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef, NULL)
+parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef)
+A = matrix(c(2, 4, 3, 1), nrow = 2, ncol = 2, byrow = TRUE)
+parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef, A)
+library(ribModel)
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")
+sphi_init <- 2;
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
+p <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
+p <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
+p <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef, R_NilValue)
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
+p <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
+p <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, NULL split.serine = TRUE, mixture.definition = mixDef)
+p <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, NULL, split.serine = TRUE, mixture.definition = mixDef)
+A = matrix(c(2, 4, 3, 1), nrow = 2, ncol = 2, byrow = TRUE)
+p <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, A, split.serine = TRUE, mixture.definition = mixDef)
+p <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, A, TRUE, mixDef)
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
+p <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
+p2 <- new (ROCParameter, sphi_init, geneAssignment, c(1,1,2,2), TRUE)

@@ -90,7 +90,6 @@ class ROCParameter
 		// functions
 		std::vector<double> propose(std::vector<double> currentParam, double (*proposal)(double a, double b), double A, std::vector<double> B);
 
-
 		// sorting functions
 		static void quickSortPair(double a[], int b[], int first, int last);
 		static void quickSort(double a[], int first, int last);
@@ -115,14 +114,15 @@ class ROCParameter
 		ROCParameter(double sphi, unsigned _numMixtures,
 				std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer = true, std::string _mutationSelectionState = "allUnique");
 		virtual ~ROCParameter();
+		#ifndef STANDALONE
+		ROCParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer = true);
+		ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer = true, std::string _mutationSelectionState = "allUnique");
+		#endif
 		ROCParameter(const ROCParameter& other);
 		ROCParameter& operator=(const ROCParameter& rhs);
 		void initParameterSet(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, 
 				std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer = true, std::string _mutationSelectionState = allUnique);
 
-		#ifndef STANDALONE
-		ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer = true, std::string _mutationSelectionState = allUnique, SEXP _matrix = NULL);
-		#endif
 
 		void initSelection(std::vector<double> selectionValues, unsigned mixtureElement, char aa);
 		void initMutation(std::vector<double> mutationValues, unsigned mixtureElement, char aa);
