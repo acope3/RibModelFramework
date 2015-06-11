@@ -44,6 +44,7 @@ class ROCParameter
 		// proposal bias and std for phi values
 		double bias_sphi;
 		double std_sphi;
+		double prev_std_sphi;
 
 		// proposal bias and std for phi values
 		double bias_phi;
@@ -53,6 +54,7 @@ class ROCParameter
 		// proposal bias and std for codon specific parameter
 		double bias_csp;
 		std::vector<double> std_csp;
+		std::vector<double> prev_std_csp;
 
 		double priorA;
 		double priorB;
@@ -249,6 +251,8 @@ class ROCParameter
 		void proposeCodonSpecificParameter();
 		double getCurrentExpressionProposalWidth(unsigned expressionCategory, unsigned geneIndex) {return std_phi[expressionCategory][geneIndex];}
 		double getPreviousExpressionProposalWidth(unsigned expressionCategory, unsigned geneIndex) {return prev_std_phi[expressionCategory][geneIndex];}
+		double getCurrentSphiProposalWidth() {return std_sphi;}
+		double getPreviousSphiProposalWidth() {return prev_std_sphi;}
 
 		void getParameterForCategory(unsigned category, unsigned parameter, char aa, bool proposal, double* returnValue);
 

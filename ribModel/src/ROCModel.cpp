@@ -77,10 +77,9 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCP
     double revJump_proposed, revJump = 0.0;
 	if(curr_std_phi != prev_std_phi)
 	{
-		revJump_proposed = std::log(ROCParameter::densityLogNorm(phiValue_proposed, phiValue, prev_std_phi));
-		revJump = std::log(ROCParameter::densityLogNorm(phiValue, phiValue_proposed, curr_std_phi));
+		revJump_proposed = std::log(ROCParameter::densityNorm(std::log(phiValue_proposed), std::log(phiValue), prev_std_phi));
+		revJump = std::log(ROCParameter::densityNorm(std::log(phiValue), std::log(phiValue_proposed), curr_std_phi));
 	}
-
     logProbabilityRatio[0] = (proposedLogLikelihood - currentLogLikelihood) - (std::log(phiValue) - std::log(phiValue_proposed)) + (revJump_proposed - revJump);
     logProbabilityRatio[1] = currentLogLikelihood - std::log(phiValue_proposed) + revJump;
     logProbabilityRatio[2] = proposedLogLikelihood - std::log(phiValue) + revJump_proposed;
@@ -186,12 +185,14 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
         obtainCodonCount(seqsum, curAA, codonCount);
         likelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
         likelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation_proposed, selection_proposed, phiValue);
+
+
 		delete [] codonCount;
 		delete [] mutation;
 		delete [] selection;
 		delete [] mutation_proposed;
 		delete [] selection_proposed;
-		}
+	}
     logAcceptanceRatioForAllMixtures = likelihood_proposed - likelihood;
 }
 

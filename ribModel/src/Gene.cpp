@@ -17,7 +17,8 @@ Gene::Gene(std::string _seq, std::string _id, std::string _desc) : seq(_seq), id
 	}
 	else 
 	{
-		std::cerr << "Gene: " << id << "has sequence length NOT multiple of 3!\n Gene data is NOT processed!\n";
+		std::cerr << "Gene: " << id << " has sequence length NOT multiple of 3 after cleaning of the sequence!" <<
+				"\nGene data is NOT processed! \nValid characters are A,C,T,G, and N \n";
 	}
 }
 
@@ -50,7 +51,7 @@ void Gene::setSequence(std::string _seq)
 {
     std::transform(_seq.begin(), _seq.end(), _seq.begin(), ::toupper);
     seq = _seq;
-    //cleanSeq(); // causes problems when N is in sequence, Could N to cleanSeq alphabet TODO think about that option
+    cleanSeq();
 	if (seq.length() % 3 == 0)
 	{
 		bool check = geneData.processSequence(seq);
@@ -61,7 +62,8 @@ void Gene::setSequence(std::string _seq)
 	}
 	else
 	{
-		std::cerr << "Gene: " << id << " has sequence length NOT multiple of 3!\n Gene data is NOT processed!\n";
+		std::cerr << "Gene: " << id << " has sequence length NOT multiple of 3 after cleaning of the sequence!" <<
+				"\nGene data is NOT processed! \nValid characters are A,C,T,G, and N \n";
 	}
 }
 
@@ -75,7 +77,7 @@ void Gene::clear()
 
 bool notNucleotide(char ch)
 {
-    std::string str = "ACGT";
+    std::string str = "ACGTN";
     std::string ts(1,ch);
     return ( str.find(ts) == std::string::npos );
 }

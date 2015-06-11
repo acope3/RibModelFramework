@@ -189,8 +189,21 @@ void MCMCAlgorithm::acceptRejectHyperParameter(int numGenes, ROCParameter& param
         logProbabilityRatio += std::log(ROCParameter::densityLogNorm(phi, proposedMPhi, proposedSphi)) - std::log(ROCParameter::densityLogNorm(phi, currentMPhi, currentSphi));
     }
 
-    logProbabilityRatio -= (std::log(currentSphi) - std::log(proposedSphi));
-
+    // Take reverse jumb probability into account if phi proposal width is not identical.
+    // If phi proposal width is identical, the term cancels and does not have to be calculated.
+    double curr_std_sphi = parameter.getCurrentSphiProposalWidth();
+    double prev_std_sphi = parameter.getPreviousSphiProposalWidth();
+    double revJump_proposed, revJump = 0.0;
+	if(curr_std_sphi != prev_std_sphi)
+	{
+		revJump_proposed = std::log(ROCParameter::densityNorm(proposedSphi, currentSphi, prev_std_sphi));
+		revJump = std::log(ROCParameter::densityNorm(currentSphi, proposedSphi, curr_std_sphi));
+	}
+    logProbabilityRatio -= (std::log(currentSphi) - std::log(proposedSphi)) + (revJump_proposed - revJump);
+    if(!std::isfinite(logProbabilityRatio))
+    {
+    	std::cout << "logProbabilityRatio not finite!\n";
+    }
 
     if( -ROCParameter::randExp(1) < logProbabilityRatio )
     {

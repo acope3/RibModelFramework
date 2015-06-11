@@ -20,7 +20,7 @@ ROCParameter::ROCParameter()
 #ifndef STANDALONE
 ROCParameter::ROCParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer)
 {
-  unsigned _numMixtures = _matrix.size() / 2;
+	unsigned _numMixtures = _matrix.size() / 2;
 	std::vector<std::vector<unsigned>> thetaKMatrix;
 	thetaKMatrix.resize(_numMixtures);
 	
@@ -44,8 +44,8 @@ ROCParameter::ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsig
 }
 #endif
 
-ROCParameter::ROCParameter(double sphi, unsigned _numMixtures,
-		std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer, std::string _mutationSelectionState)
+ROCParameter::ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
+		std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer, std::string _mutationSelectionState)
 {
 	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
 }
@@ -71,6 +71,7 @@ ROCParameter::ROCParameter(const ROCParameter& other)
 	// proposal bias and std for phi values
 	bias_sphi = other.bias_sphi;
 	std_sphi = other.std_sphi;
+	prev_std_sphi = other.prev_std_sphi;
 
 	// proposal bias and std for phi values
 	bias_phi = other.bias_phi;
@@ -80,6 +81,7 @@ ROCParameter::ROCParameter(const ROCParameter& other)
 	// proposal bias and std for codon specific parameter
 	bias_csp = other.bias_csp;
 	std_csp = other.std_csp;
+	prev_std_csp = other.prev_std_csp;
 
 	priorA = other.priorA;
 	priorB = other.priorB;
@@ -121,6 +123,7 @@ ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
 	// proposal bias and std for phi values
 	bias_sphi = rhs.bias_sphi;
 	std_sphi = rhs.std_sphi;
+	prev_std_sphi = rhs.prev_std_sphi;
 
 	// proposal bias and std for phi values
 	bias_phi = rhs.bias_phi;
@@ -130,6 +133,7 @@ ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
 	// proposal bias and std for codon specific parameter
 	bias_csp = rhs.bias_csp;
 	std_csp = rhs.std_csp;
+	prev_std_csp = rhs.prev_std_csp;
 
 	priorA = rhs.priorA;
 	priorB = rhs.priorB;
@@ -183,7 +187,7 @@ void ROCParameter::initParameterSet(double sphi, unsigned _numMixtures, std::vec
 	Sphi_proposed = sphi;
 	bias_sphi = 0;
 	std_sphi = 0.1;
-
+	prev_std_sphi = 0.1;
 
 	phiEpsilon = 0.1;
 	phiEpsilon_proposed = 0.1;
@@ -194,7 +198,8 @@ void ROCParameter::initParameterSet(double sphi, unsigned _numMixtures, std::vec
 
 	// proposal bias and std for codon specific parameter
 	bias_csp = 0;
-	std_csp.resize(numParam, 0.1);
+	std_csp.resize(numParam, 0.1); //TODO hase to be initialized with 1 when switched to the covariance matrix!!!
+	prev_std_csp.resize(numParam, 0.1); //TODO hase to be initialized with 1 when switched to the covariance matrix!!!
 
 	priorA = 0;
 	priorB = 1;
@@ -967,10 +972,12 @@ void ROCParameter::adaptSphiProposalWidth(unsigned adaptationWidth)
 	sphiAcceptanceRatioTrace.push_back(acceptanceLevel);
 	if(acceptanceLevel < 0.2)
 	{
+		prev_std_sphi = std_sphi;
 		std_sphi = std::max(0.01, std_sphi * 0.8);
 	}
 	if(acceptanceLevel > 0.3)
 	{
+		prev_std_sphi = std_sphi;
 		std_sphi = std::min(100.0, std_sphi * 1.2);
 	}
 	numAcceptForSphi = 0u;
@@ -1012,10 +1019,12 @@ void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 		{
 			if(acceptanceLevel < 0.2)
 			{
+				prev_std_csp[k] = std_csp[k];
 				std_csp[k] = std::max(0.01, std_csp[k] * 0.8);
 			}
 			if(acceptanceLevel > 0.3)
 			{
+				prev_std_csp[k] = std_csp[k];
 				std_csp[k] = std::min(10.0, std_csp[k] * 1.2);
 			}
 		}

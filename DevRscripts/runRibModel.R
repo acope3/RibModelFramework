@@ -8,11 +8,10 @@ sphi_init <- 2;
 numMixtures <- 2;
 mixDef <- "allUnique";
 geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
-p <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
-parameter <- initializeParameterObject(sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
 
 # initialize MCMC object
-samples <- 100
+samples <- 3000
 thining <- 10
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, 
@@ -21,7 +20,9 @@ mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth,
 model <- initializeModelObject("ROC")
 
 #run mcmc on genome with parameter using model
-runMCMC(mcmc, genome, model, parameter);
+system.time(
+  runMCMC(mcmc, genome, model, parameter)
+)
 
 #plots log likelihood trace, possibly other mcmc diagnostics in the future
 plot(mcmc)

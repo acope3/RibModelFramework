@@ -1,11 +1,11 @@
 
 initializeParameterObject <- function(genome, sphi, numMixtures, geneAssignment, expressionValues = NULL, model = "ROC",
-                                      split.serine = TRUE, mixture.definition = "allUnique")
+                                      split.serine = TRUE, mixture.definition = "allUnique", mixture.definition.matrix = NULL)
 {
   if(model == "ROC")
   {
     parameter <- initializeROCParameterObject(genome, sphi, numMixtures, geneAssignment, expressionValues,
-                                 split.serine, mixture.definition)
+                                 split.serine, mixture.definition, mixture.definition.matrix)
   }else if(model == "NSE"){
     cat("MODEL NOT IMPLEMENTED")
   }else{
@@ -15,10 +15,22 @@ initializeParameterObject <- function(genome, sphi, numMixtures, geneAssignment,
 }
 
 initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignment, expressionValues = NULL,
-                                          split.serine = TRUE, mixture.definition = "allUnique")
+                                          split.serine = TRUE, mixture.definition = "allUnique", mixture.definition.matrix = NULL)
 {
+  # test input integrity
+  if(genome$getGenomeSize() != length(geneAssignment)) 
+  {
+    stop("Gene assignment length does not match genome size. Not every Gene has a mixture assignment")
+  }
   # create parameter object
-  parameter <- new(ROCParameter, genome$getGenomeSize(), sphi, numMixtures, geneAssignment, split.serine, mixture.definition)
+  if(is.null(mixture.definition.matrix))
+  { # keyword constructor
+    parameter <- new(ROCParameter, sphi, numMixtures, geneAssignment, split.serine, mixture.definition)
+  }else{
+    #matrix constructor
+    mixture.definition <- c(mixture.definition.matrix[, 1], mixture.definition.matrix[, 2])
+    parameter <- new(ROCParameter, sphi, numMixtures, geneAssignment, mixture.definition, split.serine)
+  }
   # initialize expression values
   if(is.null(expressionValues)){
     parameter$initializeExpressionByGenome(genome, sphi)
