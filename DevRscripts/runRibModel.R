@@ -8,7 +8,8 @@ sphi_init <- 2;
 numMixtures <- 2;
 mixDef <- "allUnique";
 geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
-parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
+p <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
+parameter <- initializeParameterObject(sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
 
 # initialize MCMC object
 samples <- 100

@@ -17,13 +17,38 @@ ROCParameter::ROCParameter()
 	std::vector<std::vector <unsigned>> empty2;
 	initParameterSet(2, 1, empty, empty2, true, "allUnique");
 }
+#ifndef STANDALONE
+ROCParameter::ROCParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer)
+{
+  unsigned _numMixtures = _matrix.size() / 2;
+	std::vector<std::vector<unsigned>> thetaKMatrix;
+	thetaKMatrix.resize(_numMixtures);
+	
+	unsigned index = 0;	
+	for (unsigned i = 0; i < _numMixtures; i++)
+	{
+		for (unsigned j = 0; j < 2; j++, index++)
+		{
+			thetaKMatrix[i].push_back(_matrix[index]);
+		}
+	}
+
+	initParameterSet( sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer);
+
+}
+
+ROCParameter::ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState)
+{
+	std::vector<std::vector<unsigned>> thetaKMatrix;
+	initParameterSet( sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
+}
+#endif
 
 ROCParameter::ROCParameter(double sphi, unsigned _numMixtures,
 		std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer, std::string _mutationSelectionState)
 {
 	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
 }
-
 ROCParameter::~ROCParameter()
 {
 	//dtor
@@ -129,32 +154,8 @@ ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
 	return *this;
 }
 
-#ifndef STANDALONE
-ROCParameter::ROCParameter(double sphi, unsigned _numMixtures,
-    std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState, SEXP _matrix)
-{
-  NumericMatrix matrix(_matrix);
-  unsigned numRows = matrix.nrow();
-	std::vector<std::vector<unsigned>> thetaKMatrix;
-	thetaKMatrix.resize(numRows);
-
-  //NumericMatrix stores the matrix by column, not by row. The loop
-  //below transposes the matrix when it stores it.
-  unsigned index = 0;
-  for (unsigned i = 0; i < numRows; i++)
-  {
-    for(unsigned j = i; j < numRows * 2; j += numRows, index++)
-    {
-      thetaKMatrix[index].push_back(matrix[j]);
-    }
-  }
-	initParameterSet( sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
-
-}
-#endif
 void ROCParameter::initParameterSet(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer, std::string _mutationSelectionState)
 {
-
 	// assign genes to mixture element
 	unsigned numGenes = geneAssignment.size();
 	mixtureAssignment.resize(numGenes, 0);
@@ -1500,7 +1501,8 @@ RCPP_MODULE(ROCParameter_mod)
 {
 	class_<ROCParameter>( "ROCParameter" )
 		.constructor("empty constructor")
-		.constructor <double, unsigned, std::vector<unsigned>, bool, std::string, SEXP>()
+		.constructor <double, std::vector<unsigned>, std::vector<unsigned>, bool>()
+		.constructor <double, unsigned, std::vector<unsigned>, bool, std::string>()
 		.method("initMutationSelectionCategories", &ROCParameter::initMutationSelectionCategoriesR)
 		.method("readPhiValues", &ROCParameter::readPhiValues)
 		.method("setMixtureAssignmentForGene", &ROCParameter::setMixtureAssignmentForGene)
