@@ -12,7 +12,6 @@ class ROCModel
 
         void obtainCodonCount(SequenceSummary& seqsum, char curAA, int codonCount[]);
         double calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codonCount[], double mutation[], double selection[], double phiValue);
-
     public:
         explicit ROCModel();
         virtual ~ROCModel();

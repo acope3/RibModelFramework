@@ -50,6 +50,7 @@ ROCParameter::ROCParameter(const ROCParameter& other)
 	// proposal bias and std for phi values
 	bias_phi = other.bias_phi;
 	std_phi = other.std_phi;
+	prev_std_phi = other.prev_std_phi;
 
 	// proposal bias and std for codon specific parameter
 	bias_csp = other.bias_csp;
@@ -99,6 +100,7 @@ ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
 	// proposal bias and std for phi values
 	bias_phi = rhs.bias_phi;
 	std_phi = rhs.std_phi;
+	prev_std_phi = rhs.prev_std_phi;
 
 	// proposal bias and std for codon specific parameter
 	bias_csp = rhs.bias_csp;
@@ -224,6 +226,7 @@ void ROCParameter::initParameterSet(double sphi, unsigned _numMixtures, std::vec
 
 	numAcceptForExpression.resize(numSelectionCategories);
 	std_phi.resize(numSelectionCategories);
+	prev_std_phi.resize(numSelectionCategories);
 	for (unsigned i = 0u; i < numSelectionCategories; i++)
 	{
 		std::vector<double> tmp(numParam, 0.0);
@@ -239,6 +242,7 @@ void ROCParameter::initParameterSet(double sphi, unsigned _numMixtures, std::vec
 
 		std::vector<double> tempStdPhi(numGenes, 0.1);
 		std_phi[i] = tempStdPhi;
+		prev_std_phi[i] = tempStdPhi;
 	}
 }
 
@@ -631,6 +635,7 @@ void ROCParameter::InitializeExpression(Genome& genome, double sd_phi)
 			currentExpressionLevel[category][j] = expression[index[j]];
 			//std::cout << currentExpressionLevel[category][j] <<"\n";
 			std_phi[category][j] = 0.1;
+			prev_std_phi[category][j] = 0.1;
 			numAcceptForExpression[category][j] = 0u;
 		}
 	}
@@ -648,6 +653,7 @@ void ROCParameter::InitializeExpression(double sd_phi)
 		{
 			currentExpressionLevel[category][i] = ROCParameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
 			std_phi[category][i] = 0.1;
+			prev_std_phi[category][i] = 0.1;
 			numAcceptForExpression[category][i] = 0u;
 		}
 	}
@@ -661,6 +667,7 @@ void ROCParameter::InitializeExpression(std::vector<double> expression)
 		{
 			currentExpressionLevel[category][i] = expression[i];
 			std_phi[category][i] = 0.1;
+			prev_std_phi[category][i] = 0.1;
 			numAcceptForExpression[category][i] = 0u;
 		}
 	}
@@ -978,10 +985,12 @@ void ROCParameter::adaptExpressionProposalWidth(unsigned adaptationWidth)
 			expressionAcceptanceRatioTrace[cat][i].push_back(acceptanceLevel);
 			if(acceptanceLevel < 0.2)
 			{
+				prev_std_phi[cat][i] = std_phi[cat][i];
 				std_phi[cat][i] = std::max(0.01, std_phi[cat][i] * 0.8);
 			}
 			if(acceptanceLevel > 0.3)
 			{
+				prev_std_phi[cat][i] = std_phi[cat][i];
 				std_phi[cat][i] = std::min(10.0, std_phi[cat][i] * 1.2);
 			}
 			numAcceptForExpression[cat][i] = 0u;

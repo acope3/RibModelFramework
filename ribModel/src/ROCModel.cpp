@@ -59,9 +59,9 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCP
             logLikelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
             logLikelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue_proposed);
         }
-				delete [] mutation;
-				delete [] selection;
-				delete [] codonCount;
+		delete [] mutation;
+		delete [] selection;
+		delete [] codonCount;
     }
 
     double sPhi = parameter.getSphi(false);
@@ -70,10 +70,22 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCP
     double currentLogLikelihood = (logLikelihood + logPhiProbability);
     double proposedLogLikelihood = (logLikelihood_proposed + logPhiProbability_proposed);
 
-    logProbabilityRatio[0] = (proposedLogLikelihood - currentLogLikelihood) - (std::log(phiValue) - std::log(phiValue_proposed));
-    logProbabilityRatio[1] = currentLogLikelihood - std::log(phiValue_proposed);
-    logProbabilityRatio[2] = proposedLogLikelihood - std::log(phiValue);
+    // Take reverse jumb probability into account if phi proposal width is not identical.
+    // If phi proposal width is identical, the term cancels and does not have to be calculated.
+    double curr_std_phi = parameter.getCurrentExpressionProposalWidth(expressionCategory, geneIndex);
+    double prev_std_phi = parameter.getPreviousExpressionProposalWidth(expressionCategory, geneIndex);
+    double revJump_proposed, revJump = 0.0;
+	if(curr_std_phi != prev_std_phi)
+	{
+		revJump_proposed = std::log(ROCParameter::densityLogNorm(phiValue_proposed, phiValue, prev_std_phi));
+		revJump = std::log(ROCParameter::densityLogNorm(phiValue, phiValue_proposed, curr_std_phi));
+	}
+
+    logProbabilityRatio[0] = (proposedLogLikelihood - currentLogLikelihood) - (std::log(phiValue) - std::log(phiValue_proposed)) + (revJump_proposed - revJump);
+    logProbabilityRatio[1] = currentLogLikelihood - std::log(phiValue_proposed) + revJump;
+    logProbabilityRatio[2] = proposedLogLikelihood - std::log(phiValue) + revJump_proposed;
 }
+
 void ROCModel::calculateCodonProbabilityVector(unsigned numCodons, double mutation[], double selection[], double phi, double codonProb[])
 {
     // calculate numerator and denominator for codon probabilities

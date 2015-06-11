@@ -48,6 +48,7 @@ class ROCParameter
 		// proposal bias and std for phi values
 		double bias_phi;
 		std::vector<std::vector<double>> std_phi;
+		std::vector<std::vector<double>> prev_std_phi;
 
 		// proposal bias and std for codon specific parameter
 		double bias_csp;
@@ -201,8 +202,6 @@ class ROCParameter
 		}
 		void updateExpression(unsigned geneIndex, unsigned mixtureElement)
 		{
-			// TODO: numAcceptForExpression is counted up for each category, -> make it a 2d vector such that each expression category has its own counter
-			// CAREFUL: that might cause us to have a different std_phi for each expression category -> 2d as well
 			unsigned category = getSelectionCategory(mixtureElement);
 			numAcceptForExpression[category][geneIndex]++;
 			currentExpressionLevel[category][geneIndex] = proposedExpressionLevel[category][geneIndex];
@@ -248,6 +247,8 @@ class ROCParameter
 		void proposeSPhi();
 		void proposeExpressionLevels();
 		void proposeCodonSpecificParameter();
+		double getCurrentExpressionProposalWidth(unsigned expressionCategory, unsigned geneIndex) {return std_phi[expressionCategory][geneIndex];}
+		double getPreviousExpressionProposalWidth(unsigned expressionCategory, unsigned geneIndex) {return prev_std_phi[expressionCategory][geneIndex];}
 
 		void getParameterForCategory(unsigned category, unsigned parameter, char aa, bool proposal, double* returnValue);
 

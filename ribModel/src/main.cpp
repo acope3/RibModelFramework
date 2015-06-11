@@ -282,7 +282,7 @@ int main()
 		genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_ChrA_andCleft.fasta");
 	}
 	std::cout << "done reading fasta file" << std::endl;
-	bool testing =  true;
+	bool testing =  false;
 
 	if(testing)
 	{
