@@ -76,7 +76,8 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCP
     // If phi proposal width is identical, the term cancels and does not have to be calculated.
     double curr_std_phi = parameter.getCurrentExpressionProposalWidth(expressionCategory, geneIndex);
     double prev_std_phi = parameter.getPreviousExpressionProposalWidth(expressionCategory, geneIndex);
-    double revJump_proposed, revJump = 0.0;
+	double revJump_proposed = 0.0;
+	double revJump = 0.0;
 	if(curr_std_phi != prev_std_phi)
 	{
 		revJump_proposed = std::log(ROCParameter::densityNorm(std::log(phiValue_proposed), std::log(phiValue), prev_std_phi));

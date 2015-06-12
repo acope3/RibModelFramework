@@ -167,7 +167,7 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
         parameter.updateMixtureProbabilitiesTrace(iteration/thining);
     }
     delete [] dirichletParameters;
-		delete [] newMixtureProbabilities;
+	delete [] newMixtureProbabilities;
     return logLikelihood;
 }
 
@@ -193,7 +193,8 @@ void MCMCAlgorithm::acceptRejectHyperParameter(int numGenes, ROCParameter& param
     // If phi proposal width is identical, the term cancels and does not have to be calculated.
     double curr_std_sphi = parameter.getCurrentSphiProposalWidth();
     double prev_std_sphi = parameter.getPreviousSphiProposalWidth();
-    double revJump_proposed, revJump = 0.0;
+	double revJump_proposed = 0.0;
+	double revJump = 0.0;
 	if(curr_std_sphi != prev_std_sphi)
 	{
 		revJump_proposed = std::log(ROCParameter::densityNorm(proposedSphi, currentSphi, prev_std_sphi));

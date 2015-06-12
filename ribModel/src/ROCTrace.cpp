@@ -229,7 +229,7 @@ void ROCTrace::updateExpressionTrace(unsigned sample, unsigned geneIndex, std::v
 {
 	for(unsigned category = 0; category < expressionTrace.size(); category++)
 	{
-		expressionTrace[category][sample][geneIndex] = currentExpressionLevel[category][geneIndex];
+		expressionTrace[category][geneIndex][sample] = currentExpressionLevel[category][geneIndex];
 	}
 }
 
