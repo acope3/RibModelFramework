@@ -270,7 +270,7 @@ void testCovMatrixOverloading()
 
 int main()
 {
-	bool cedric = true;
+	bool cedric = false;
 	std::cout << "Hello world!" << std::endl << std::endl;
 
 	Genome genome;
@@ -279,21 +279,21 @@ int main()
 		genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta");
 		//genome.readFasta("C:/Users/Cedric/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta");
 	}else{
-		genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_ChrA_andCleft.fasta");
+		genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta");
 	}
 	std::cout << "done reading fasta file" << std::endl;
 	bool testing =  false;
 
 	if(testing)
 	{
-			 //testNumCodonsPerAA();
-			 //testCodonRangePerAA(false);
-			 //testCodonRangePerAA(true);
-			 //testLogNormDensity();
-			 //testSCUO(genome);
-			 //testCovarianceMatrix();
-			 //testRandMultiNom(3);
-			 //testThetaKMatrix();
+		//testNumCodonsPerAA();
+		//testCodonRangePerAA(false);
+		//testCodonRangePerAA(true);
+		//testLogNormDensity();
+		//testSCUO(genome);
+		//testCovarianceMatrix();
+		//testRandMultiNom(3);
+		//testThetaKMatrix();
 		//testSimulateGenome(genome);
 		testCovMatrixOverloading();
 	}else{
@@ -331,7 +331,7 @@ int main()
 		std::cout << "done initialize ROCParameter object" << std::endl;
 
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
-        int samples = 100;
+		int samples = 100;
 		int thining = 10;
 		int useSamples = 100;
 
@@ -352,101 +352,21 @@ int main()
 		mcmc.run(genome, model, parameter);
 		std::cout << std::endl << "Finish MCMC" << std::endl;
 
-        std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
-        std::cout << "Sphi proposal width: " << parameter.getSphiProposalWidth() << std::endl;
+		std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
+		std::cout << "Sphi proposal width: " << parameter.getSphiProposalWidth() << std::endl;
 		std::cout << "CSP proposal width: \n";
 		for(unsigned n = 0; n < 22; n++)
 		{
-            if(n == 21 || n == 10 || n == 18) continue;
+			if(n == 21 || n == 10 || n == 18) continue;
 			std::cout << SequenceSummary::AminoAcidArray[n] << ": " << parameter.getCodonSpecificProposalWidth(n) << "\n";
 		}
 
-        std::cout << "writing mutation posterior file" << "\n";
-		//Get posterior estimates for mutation & selection
-		int numMutationCategories = parameter.getNumMutationCategories();
-		int numSelectionCategories = parameter.getNumSelectionCategories();
-		for (int i = 0; i < numMutationCategories; i++)
-		{
-			std::ostringstream strstream;
-			strstream << i;
-			std::string file = "results/mutationPosterior_Cat" + strstream.str() + ".csv";
-			std::ofstream mutout(file);
-			for (int n = 0; n < 22; n++) //going over the amino acids
-			{
-				unsigned aaRange[2];
-				char aa = SequenceSummary::AminoAcidArray[n];
-				if (aa == 'X' || aa == 'M' || aa == 'W') continue;
-				SequenceSummary::AAToCodonRange(aa, true, aaRange);
-				for (unsigned a = aaRange[0]; a <= aaRange[1]; a++)
-				{
-					double estimate = 0.0;
-					double variance = 0.0;
-					if (a != aaRange[1])
-					{
-						estimate = parameter.getMutationPosteriorMean(i, useSamples, a);
-						variance = parameter.getMutationVariance(i, useSamples, a);
-					}
-					std::string codon = SequenceSummary::IndexToCodon(a);
-					mutout << aa <<"." << codon <<".deltaM," << estimate <<"," << variance <<"\n";
-				}
-			}
-			mutout.close();
-		}
-        std::cout << "finished writing mutation posterior file" << "\n";
-        std::cout << "writing selection posterior file" << "\n";
-		for (int i = 0; i < numSelectionCategories; i++)
-		{
-			std::ostringstream strstream;
-			strstream << i;
-			std::string file = "results/selectionPosterior_Cat" + strstream.str() + ".csv";
-			std::ofstream selectout(file);
-			for (int n = 0; n < 22; n++)
-			{
-				unsigned aaRange[2];
-				char aa = SequenceSummary::AminoAcidArray[n];
-				if (aa == 'X' || aa == 'M' || aa == 'W') continue;
-				SequenceSummary::AAToCodonRange(aa, true, aaRange);
-				for (unsigned a = aaRange[0]; a <= aaRange[1]; a++)
-				{
-					std::string codon = SequenceSummary::IndexToCodon(a);
-					double estimate = 0.0;
-					double variance = 0.0;
-					if (a != aaRange[1])
-					{
-						estimate = parameter.getSelectionPosteriorMean(i, useSamples, a);
-						variance = parameter.getSelectionVariance(i, useSamples, a);
-					}
-					selectout << aa << "." << codon <<".deltaEta," << estimate <<"," << variance <<"\n";
-				}
-			}
-			selectout.close();
-		}
-        std::cout << "finished writing selection posterior file" << "\n";
-
-
-
-        for(unsigned k = 0u; k < parameter.getNumExpressionCategories(); k++)
-        {
-			std::ostringstream strstream;
-			strstream << k;
-            std::string file = "results/expressionPosterior_Cat" + strstream.str() + ".csv";
-            std::ofstream phiout(file);
-            for(unsigned n = 0u; n < genome.getGenomeSize(); n++)
-            {
-                phiout << genome.getGene(n).getId() << "," << parameter.getExpressionPosteriorMean(useSamples, n, k) << "," << parameter.getExpressionVariance(useSamples, n, k) << std::endl;
-            }
-            phiout.close();
-        }
-
-		std::ofstream mixAssignment("results/mixAssignment.csv");
-		for(unsigned n = 0u; n < genome.getGenomeSize(); n++)
-		{
-			unsigned mixtureAssignment = parameter.getEstimatedMixtureAssignment(useSamples, n);
-			mixAssignment << genome.getGene(n).getId() << "," << mixtureAssignment << std::endl;
-		}
-		mixAssignment.close();
+		//These files used to be written here:
+		//mutationPosterior_Cat#.csv
+		//selectionPosterior_Cat#.csv
+		//expressionPosterior_Cat#.csv
+		//mixAssignment.csv
 	}
-
 	return 0;
 }
 

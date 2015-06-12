@@ -12,16 +12,14 @@
 //#include "../include/SequenceSummary.h"
 #include "Genome.h"
 #include "CovarianceMatrix.h"
+#include "ROCTrace.h"
+
 
 class ROCParameter
 {
 	private:
 
-		struct thetaK
-		{
-			unsigned delM;
-			unsigned delEta;
-		};
+		ROCTrace traces;
 		//members
 		unsigned int numParam;
 
@@ -29,14 +27,9 @@ class ROCParameter
 		double Aphi;
 		double Sphi_proposed;
 		double Aphi_proposed;
-		std::vector<double> sPhiTrace;
-		std::vector<double> aPhiTrace;
 		unsigned numAcceptForSphi;
 		std::vector<CovarianceMatrix> covarianceMatrix;
 
-		std::vector<double> sphiAcceptanceRatioTrace; // sample
-		std::vector<std::vector<std::vector<double>>> expressionAcceptanceRatioTrace; // order: category, gene, sample
-		std::vector<std::vector<double>> cspAcceptanceRatioTrace; // order: codon, sample
 
 		double phiEpsilon;
 		double phiEpsilon_proposed;
@@ -61,9 +54,6 @@ class ROCParameter
 
 		std::vector<std::vector<double>> currentExpressionLevel;
 		std::vector<std::vector<double>> proposedExpressionLevel;
-		std::vector<std::vector<std::vector<double>>> expressionTrace;
-		std::vector<std::vector<std::vector<double>>> mutationParameterTrace;
-		std::vector<std::vector<std::vector<double>>> selectionParameterTrace;
 		std::vector<std::vector<unsigned>> numAcceptForExpression;
 
 		std::vector<std::vector<double>> currentMutationParameter;
@@ -82,9 +72,7 @@ class ROCParameter
 		std::vector<std::vector<unsigned>> selectionIsInMixture;
 		std::vector<std::vector<unsigned>> mutationIsInMixture;
 
-		std::vector<std::vector<unsigned>> mixtureAssignmentTrace;
 		std::vector<double> categoryProbabilities;
-		std::vector<std::vector<double>> mixtureProbabilitiesTrace;
 		//static members
 
 
@@ -128,10 +116,15 @@ class ROCParameter
 
 		void initSelection(std::vector<double> selectionValues, unsigned mixtureElement, char aa);
 		void initMutation(std::vector<double> mutationValues, unsigned mixtureElement, char aa);
+		std::vector<std::vector<double>> calculateSelectionCoefficients(unsigned sample, unsigned mixture);
 		#ifndef STANDALONE
 		void initCovarianceMatrix(SEXP matrix, char aa);
+		SEXP calculateSelectionCoefficientsR(unsigned sample, unsigned mixture);
 		#endif
 		CovarianceMatrix& getCovarianceMatrixForAA(char aa);
+		void initAllTraces(unsigned samples, unsigned num_genes, unsigned adaptiveSamples) {traces.initAllTraces(samples, num_genes, adaptiveSamples, 
+				numMutationCategories, numSelectionCategories, numParam, numMixtures, categories);}
+
 		std::vector <double> readPhiValues(std::string filename);
 		void setNumMutationSelectionValues(std::string mutationSelectionState, std::vector<std::vector<unsigned>> thetaKMatrix);
 		void initCategoryDefinitions(std::string mutationSelectionState, std::vector<std::vector<unsigned>> thetaKMatrix);
@@ -162,13 +155,6 @@ class ROCParameter
 		void setCategoryProbability(unsigned mixtureElement, double value) {categoryProbabilities[mixtureElement]= value;}
 		void setMixtureAssignment(unsigned gene, unsigned value) {mixtureAssignment[gene] = value;}
 		unsigned getMixtureAssignment(unsigned gene) {return mixtureAssignment[gene];}
-		void updateMixtureProbabilitiesTrace(int samples)
-		{
-			for(unsigned category = 0; category < numMixtures; category++)
-			{
-				mixtureProbabilitiesTrace[category][samples] = categoryProbabilities[category];
-			}
-		}
 
 		// Phi epsilon functions
 		double getPhiEpsilon() {return phiEpsilon;}
@@ -208,23 +194,6 @@ class ROCParameter
 			numAcceptForExpression[category][geneIndex]++;
 			currentExpressionLevel[category][geneIndex] = proposedExpressionLevel[category][geneIndex];
 		}
-		std::vector<std::vector<std::vector<double>>> getExpressionTrace() {return expressionTrace;}
-		std::vector<double> getExpressionTrace(unsigned geneIndex);
-		std::vector<std::vector<std::vector<double>>> getMutationParameterTrace() {return mutationParameterTrace;}
-		std::vector<std::vector<std::vector<double>>> getSelectionParameterTrace() {return selectionParameterTrace;}
-		std::vector<double> getMixtureProbabilitiesTrace(unsigned mixtureIndex) {return mixtureProbabilitiesTrace[mixtureIndex];}
-		std::vector<double> getSphiAcceptanceRatioTrace() {return sphiAcceptanceRatioTrace;}
-		std::vector<double> getExpressionAcceptanceRatioTraceByMixtureElementForGene(unsigned mixtureElement, unsigned geneIndex) 
-		{
-			unsigned category = getExpressionCategory(mixtureElement);
-			return expressionAcceptanceRatioTrace[category][geneIndex];
-		}
-		std::vector<double> getCspAcceptanceRatioTraceForAA(char aa)
-		{
-			aa = std::toupper(aa);
-			unsigned aaIndex = SequenceSummary:: aaToIndex.find(aa) -> second;
-			return cspAcceptanceRatioTrace[aaIndex];
-		}
 		void InitializeExpression(Genome& genome, double sd_phi);
 		void InitializeExpression(double sd_phi);
 		void InitializeExpression(std::vector<double> expression);
@@ -242,8 +211,16 @@ class ROCParameter
 		double getSphi(bool proposed = false) {return (proposed ? Sphi_proposed : Sphi);}
 		void setSphi(double sPhi) {Sphi = sPhi;}
 		void updateSphi() {Sphi = Sphi_proposed; numAcceptForSphi++;}
-		std::vector<double> getSPhiTrace() {return sPhiTrace;}
 		double getSphiProposalWidth() {return std_sphi;}
+
+
+		//update trace functions
+		void updateSphiTrace(unsigned sample) {traces.updateSphiTrace(sample, Sphi);}
+		void updateExpressionTrace(unsigned sample, unsigned geneIndex){traces.updateExpressionTrace(sample, geneIndex, currentExpressionLevel);}
+		void updateCodonSpecificParameterTrace(unsigned sample, char aa) {traces.updateCodonSpecificParameterTrace(sample, aa, currentMutationParameter, 
+				currentSelectionParameter);}
+		void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex) {traces.updateMixtureAssignmentTrace(sample, geneIndex, mixtureAssignment[geneIndex]);} 
+		void updateMixtureProbabilitiesTrace(unsigned samples) {traces.updateMixtureProbabilitiesTrace(samples, categoryProbabilities);}
 
 		// poposal functions
 		void proposeSPhi();
@@ -256,29 +233,6 @@ class ROCParameter
 
 		void getParameterForCategory(unsigned category, unsigned parameter, char aa, bool proposal, double* returnValue);
 
-		// functions to manage traces
-		void initAllTraces(unsigned samples, unsigned num_genes, unsigned adaptiveSamples);
-		void initExpressionTrace(unsigned samples, unsigned num_genes);
-		void initSelectionParameterTrace(unsigned samples);
-		void initMutationParameterTrace(unsigned samples);
-		void initSphiTrace(unsigned sample) {sPhiTrace.resize(sample);}
-		void initMixtureAssignmentTrace(unsigned samples, unsigned num_genes);
-		void initMixtureProbabilitesTrace(int samples);
-		void initExpressionAcceptanceRatioTrace(unsigned samples, unsigned num_genes);
-
-		void updateExpressionTrace(unsigned sample, unsigned geneIndex)
-		{
-			for(unsigned category = 0; category < numSelectionCategories; category++)
-			{
-				expressionTrace[category][sample][geneIndex] = currentExpressionLevel[category][geneIndex];
-			}
-		}
-		void updateCodonSpecificParameterTrace(unsigned sample, char aa);
-		void updateSphiTrace(unsigned sample) {sPhiTrace[sample] = Sphi;}
-		void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex) {mixtureAssignmentTrace[sample][geneIndex] = mixtureAssignment[geneIndex];}
-		std::vector<double> getAPhiTrace() {return aPhiTrace;}
-		std::vector<std::vector <unsigned>> getMixtureAssignmentTrace() {return mixtureAssignmentTrace;}
-		std::vector<double> getExpectedPhiTrace();
 
 		// functions to return estimates
 		double getExpressionPosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement);
@@ -286,10 +240,10 @@ class ROCParameter
 		//double getMixtureAssignmentPosteriorMean(unsigned samples, unsigned geneIndex); // TODO: implement variance function, fix Mean function (won't work with 3 groups)
 		unsigned getEstimatedMixtureAssignment(unsigned samples, unsigned geneIndex);
 		std::vector <double> getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex);
-		double getMutationPosteriorMean(unsigned mixtureElement, unsigned samples, unsigned paramIndex);
-		double getSelectionPosteriorMean(unsigned mixtureElement, unsigned samples, unsigned paramIndex);
-		double getMutationVariance(unsigned mixtureElement, unsigned samples, unsigned paramIndex, bool unbiased = true);
-		double getSelectionVariance(unsigned mixtureElement, unsigned samples, unsigned paramIndex, bool unbiased = true);
+		double getMutationPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon);
+		double getSelectionPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon);
+		double getMutationVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased = true);
+		double getSelectionVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased = true);
 		double getSphiVariance(unsigned samples, bool unbiased = true);
 		double getExpressionVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement, bool unbiased = true);
 
@@ -317,8 +271,7 @@ class ROCParameter
 			bool check = checkIndex(mixtureElement, 1, numMixtures);
 			if (check)
 			{ 
-				unsigned codonIndex = SequenceSummary::CodonToIndex(codon, true);
-				rv = getMutationPosteriorMean(mixtureElement - 1, samples, codonIndex);
+				rv = getMutationPosteriorMean(mixtureElement - 1, samples, codon);
 			}
 			return rv;
 		}
@@ -328,8 +281,7 @@ class ROCParameter
 			bool check = checkIndex(mixtureElement, 1, numMixtures);
 			if (check)
 			{
-				unsigned codonIndex = SequenceSummary::CodonToIndex(codon, true);
-				rv = getSelectionPosteriorMean(mixtureElement - 1, samples, codonIndex);
+				rv = getSelectionPosteriorMean(mixtureElement - 1, samples, codon);
 			}
 			return rv;
 		}
@@ -339,8 +291,7 @@ class ROCParameter
 			bool check = checkIndex(mixtureElement, 1, numMixtures);
 			if (check)
 			{
-				unsigned codonIndex = SequenceSummary::CodonToIndex(codon, true);
-				rv = getMutationVariance(mixtureElement - 1, samples, codonIndex, unbiased);
+				rv = getMutationVariance(mixtureElement - 1, samples, codon, unbiased);
 			}
 			return rv;
 		}
@@ -350,8 +301,7 @@ class ROCParameter
 			bool check = checkIndex(mixtureElement, 1, numMixtures);
 			if (check)
 			{
-				unsigned codonIndex = SequenceSummary::CodonToIndex(codon, true);
-				rv = getSelectionVariance(mixtureElement - 1, samples, codonIndex, unbiased);
+				rv = getSelectionVariance(mixtureElement - 1, samples, codon, unbiased);
 			}
 			return rv;
 		}
@@ -359,78 +309,6 @@ class ROCParameter
 		void initializeExpressionByGenome(Genome& genome, double sd_phi) {InitializeExpression(genome, sd_phi);}
 		void initializeExpressionByList(double sd_phi) {InitializeExpression(sd_phi);}
 		void initializeExpressionByRandom(std::vector<double> expression) {InitializeExpression(expression);}
-		std::vector<double> getExpressionTraceForGene(int geneIndex) 
-		{
-			std::vector<double> RV;
-			bool check = checkIndex(geneIndex, 1, expressionTrace[0][0].size());
-			if (check)
-			{ 
-				RV = getExpressionTrace(geneIndex - 1);
-			}
-			return RV;
-		}
-		std::vector<double> getExpressionTraceByMixtureElementForGene(unsigned mixtureElement, unsigned geneIndex)
-		{
-			std::vector<double> RV;
-			bool checkGene = checkIndex(geneIndex, 1, expressionTrace[0][0].size());
-			bool checkMixtureElement = checkIndex(mixtureElement, 1, numMixtures);
-			if (checkGene && checkMixtureElement)
-			{
-				unsigned category = getExpressionCategory(mixtureElement - 1);
-				unsigned samples = expressionTrace[category].size();
-				for (unsigned i = 0u; i < samples; i++)
-				{
-					RV.push_back(expressionTrace[category][i][geneIndex - 1]);
-				}
-			}
-			return RV;
-		}
-		std::vector<double> getMutationParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon)
-		{
-			std::vector<double> RV;
-			bool check = checkIndex(mixtureElement, 1, numMixtures);
-			if (check)
-			{	
-				unsigned category = getMutationCategory(mixtureElement - 1);
-				unsigned codonIndex = SequenceSummary::CodonToIndex(codon, true);
-				unsigned samples = mutationParameterTrace[category].size();
-				for (unsigned i = 0u; i < samples; i++)
-				{
-					RV.push_back(mutationParameterTrace[category][i][codonIndex]);
-				}
-			}
-			return RV;
-		}
-		std::vector<double> getSelectionParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon)
-		{
-			std::vector<double> RV;
-			bool check = checkIndex(mixtureElement, 1, numMixtures);
-			if (check)
-			{	
-				unsigned category = getSelectionCategory(mixtureElement - 1);
-				unsigned codonIndex = SequenceSummary::CodonToIndex(codon, true);
-				unsigned samples = selectionParameterTrace[category].size();
-				for (unsigned i = 0u; i < samples; i++)
-				{
-					RV.push_back(selectionParameterTrace[category][i][codonIndex]);
-				}
-			}
-			return RV;
-		}
-		std::vector<unsigned> getMixtureAssignmentTraceForGene(int geneIndex)
-		{
-			std::vector <unsigned> RV;
-			bool check = checkIndex(geneIndex, 1, mixtureAssignmentTrace[0].size());
-			if (check)
-			{
-				unsigned samples = mixtureAssignmentTrace.size();
-				for(unsigned i = 0u; i < samples; i++)
-				{
-					RV.push_back(mixtureAssignmentTrace[i][geneIndex - 1] + 1);
-				}
-			}
-			return RV;
-		}
 
 		unsigned getEstimatedMixtureAssignmentForGene(unsigned samples, unsigned geneIndex)
 		{
@@ -451,33 +329,11 @@ class ROCParameter
 
 
 		void setMixtureAssignmentForGene(unsigned geneIndex, unsigned value);
-		std::vector<double> getMixtureProbabilitiesTraceForCategory(unsigned categoryIndex)
-		{
-			std::vector<double> RV;
-			bool check = checkIndex(categoryIndex, 1, mixtureProbabilitiesTrace.size());
-			if (check)
-			{
-				RV = mixtureProbabilitiesTrace[categoryIndex - 1];
-			}
 
-			return RV;
-		}
-
-		std::vector<double> getExpressionAcceptanceRatioTraceByMixtureElementForGeneR(unsigned mixtureElement, unsigned geneIndex) 
-		{
-			std::vector<double> RV;
-			bool checkGene = checkIndex(geneIndex, 1, expressionAcceptanceRatioTrace.size());
-			bool checkMixtureElement = checkIndex(mixtureElement, 1, numMixtures); 
-			if (checkGene && checkMixtureElement)
-			{
-				RV = getExpressionAcceptanceRatioTraceByMixtureElementForGene(mixtureElement - 1, geneIndex - 1);
-			}
-			return RV;
-		}
 		double getExpressionPosteriorMeanByMixtureElementForGene(unsigned samples, unsigned geneIndex, unsigned mixtureElement)
 		{
 			double rv = -1.0;
-			bool checkGene = checkIndex(geneIndex, 1, expressionTrace[0][0].size());
+			bool checkGene = checkIndex(geneIndex, 1, mixtureAssignment.size());
 			bool checkMixtureElement = checkIndex(mixtureElement, 1, numMixtures); 
 			if (checkGene && checkMixtureElement)
 			{
@@ -488,7 +344,7 @@ class ROCParameter
 		double getExpressionVarianceByMixtureElementForGene(unsigned samples, unsigned geneIndex, unsigned mixtureElement, bool unbiased)
 		{
 			double rv = -1.0;
-			bool checkGene = checkIndex(geneIndex, 1, expressionTrace[0][0].size());
+			bool checkGene = checkIndex(geneIndex, 1, mixtureAssignment.size());
 			bool checkMixtureElement = checkIndex(mixtureElement, 1, numMixtures);
 			if (checkGene && checkMixtureElement)
 			{

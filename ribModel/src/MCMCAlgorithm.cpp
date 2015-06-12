@@ -243,7 +243,7 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
     unsigned maximumIterations = samples * thining;
     // initialize everything
 
-    parameter.initAllTraces(samples, genome.getGenomeSize(), maximumIterations/adaptiveWidth);
+    parameter.initAllTraces(samples, genome.getGenomeSize(), maximumIterations/adaptiveWidth); 
     // starting the MCMC
 
     std::cout << "entering MCMC loop" << std::endl;
@@ -304,101 +304,13 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
     } // end MCMC loop
     std::cout << "leaving MCMC loop" << std::endl;
 
-    // development output
-    std::vector<std::vector<std::vector<double>>> expressionTrace = parameter.getExpressionTrace();
-    unsigned numParam = parameter.getNumParam();
-    for(unsigned nm = 0u; nm < parameter.getNumSelectionCategories(); nm++)
-    {
-        std::vector<std::vector<std::vector<double>>> selectionParameterTrace = parameter.getSelectionParameterTrace();
-        std::stringstream oss;
-        std::stringstream oss2;
-        oss2 << "results/selectionParamTrace_" << nm<< ".csv";
-        oss << "results/phiTrace_nmix_" << nm << ".csv";
-        std::ofstream phitraceout(oss.str(), std::ofstream::out);
-        std::ofstream selectTraceOut(oss2.str(), std::ofstream::out);
-        for (int i = 0; i < 22; i++)
-        {
-            char aa = SequenceSummary::AminoAcidArray[i];
-            if (aa == 'X' || aa == 'W' || aa == 'M') continue;
-            unsigned aaRange[2];
-            SequenceSummary::AAToCodonRange(aa, false, aaRange);
-            for (unsigned j = aaRange[0]; j < aaRange[1] - 1; j++)
-            {
-                selectTraceOut << aa <<"." << SequenceSummary::codonArray[j] <<",";
-            }
-        }
-        selectTraceOut <<"\n";
-        for(unsigned iteration = 0; iteration < samples; iteration++)
-        {
-            for(unsigned i = 0u; i < genome.getGenomeSize(); i++)
-            {
-                phitraceout << expressionTrace[nm][iteration][i] << ",";
-            }
-            phitraceout << std::endl;
-            for(unsigned i = 0; i < numParam; i++)
-            {
-                selectTraceOut << selectionParameterTrace[nm][iteration][i] <<",";
-            }
-            selectTraceOut << std::endl;
-        }
-        phitraceout.close();
-        selectTraceOut.close();
-    }
-
-    for (unsigned nm = 0u; nm < parameter.getNumMutationCategories(); nm++)
-    {
-        std::vector<std::vector<std::vector<double>>> mutationParameterTrace = parameter.getMutationParameterTrace();
-        std::stringstream oss;
-        oss << "results/mutationParamTrace_" << nm << ".csv";
-        std::ofstream mutateTraceOut(oss.str(), std::ofstream::out);
-        for (int i = 0; i < 22; i++)
-        {
-            char aa = SequenceSummary::AminoAcidArray[i];
-            if (aa == 'X' || aa == 'W' || aa == 'M') continue;
-            unsigned aaRange[2];
-            SequenceSummary::AAToCodonRange(aa, false, aaRange);
-            for (unsigned j = aaRange[0]; j < aaRange[1] - 1; j++)
-            {
-                mutateTraceOut << aa <<"." << SequenceSummary::codonArray[j] <<",";
-            }
-        }
-        mutateTraceOut <<"\n";
-        for(unsigned iteration = 0; iteration < samples; iteration++)
-        {
-            for(unsigned i = 0u; i < numParam; i++)
-            {
-                mutateTraceOut << mutationParameterTrace[nm][iteration][i] <<",";
-            }
-            mutateTraceOut << std::endl;
-        }
-        mutateTraceOut.close();
-    }
-    std::ofstream likout("results/liklihoodTrace.csv", std::ofstream::out);
-    std::ofstream sphiout("results/sphiTrace.csv", std::ofstream::out);
-    std::vector<double> sphiTrace = parameter.getSPhiTrace();
-    for(unsigned iteration = 0u; iteration < samples; iteration++)
-    {
-        likout << likelihoodTrace[iteration] << std::endl;
-        sphiout << sphiTrace[iteration] << std::endl;
-    }
-    likout.close();
-    sphiout.close();
-
-
-    std::vector<std::vector<double>> phiTraces(genome.getGenomeSize());
-    for(unsigned i = 0u; i < genome.getGenomeSize(); i++)
-    {
-        phiTraces[i] = parameter.getExpressionTrace(i);
-    }
-    std::ofstream phitraceout("results/expressionLevelTrace.csv", std::ofstream::out);
-    for(unsigned iteration = 0u; iteration < samples; iteration++)
-    {
-        for(unsigned i = 0u; i < genome.getGenomeSize(); i++)
-        {
-            phitraceout << phiTraces[i][iteration] << ",";
-        }
-        phitraceout << std::endl;
-    }
+//NOTE: The following files used to be written here:
+		//selectionParamTrace_#.csv
+		//phiTrace_nmix_#.csv
+		//mutationParamTrace_#.csv
+    //liklihoodTrace.csv
+		//sphiTrace.csv
+		//expressionLevelTrace.csv
 
 }
 
