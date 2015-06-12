@@ -59,9 +59,11 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCP
             logLikelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
             logLikelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue_proposed);
         }
+		//std::cout <<"deleting mutation selection codonCount\n";
 		delete [] mutation;
 		delete [] selection;
 		delete [] codonCount;
+		//std::cout <<"DONE deleting mutation selection codonCount\n";
     }
 
     double sPhi = parameter.getSphi(false);
@@ -144,7 +146,9 @@ double ROCModel::calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codo
         if (codonCount[i] == 0) continue;
         logLikelihood += std::log(codonProbabilities[i]) * codonCount[i];
     }
+		//std::cout <<"deleting codonProbabilities\n";
 		delete [] codonProbabilities;
+		//std::cout <<"DONEdeleting codonProbabilities\n";
     return logLikelihood;
 }
 
@@ -186,12 +190,13 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
         likelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
         likelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation_proposed, selection_proposed, phiValue);
 
-
+		//std::cout <<"deleting 5 at once\n";
 		delete [] codonCount;
 		delete [] mutation;
 		delete [] selection;
 		delete [] mutation_proposed;
 		delete [] selection_proposed;
+		//std::cout <<"DONE deleting 5 at once\n";
 	}
     logAcceptanceRatioForAllMixtures = likelihood_proposed - likelihood;
 }

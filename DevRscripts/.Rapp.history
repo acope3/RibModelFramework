@@ -316,3 +316,88 @@ mixDef <- "allUnique";#
 geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
 p <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
 p2 <- new (ROCParameter, sphi_init, geneAssignment, c(1,1,2,2), TRUE)
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))#
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)#
+#
+# initialize MCMC object#
+samples <- 300#
+thining <- 10#
+adaptiveWidth <- 10#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
+# get model object#
+model <- initializeModelObject("ROC")
+system.time(#
+  runMCMC(mcmc, genome, model, parameter)#
+)
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";
+geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
+parameter <- new (ROCParameter, 1418, sphi_init, numMixtures, geneAssignment, TRUE, mixDef)
+parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef)
+samples <- 300
+thining <- 10
+adaptiveWidth <- 10
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth,
+est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
+model <- initializeModelObject("ROC")
+system.time(
+runMCMC(mcmc, genome, model, parameter)
+)
+library(ribModel)
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_chromosomeA.fasta")
+sphi_init <- 2;#
+numMixtures <- q;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,448), rep(2,448)
+parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef)#
+# initialize MCMC object#
+samples <- 300#
+thining <- 10#
+adaptiveWidth <- 10#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
+# get model object#
+model <- initializeModelObject("ROC")#
+#
+#run mcmc on genome with parameter using model#
+system.time(#
+  runMCMC(mcmc, genome, model, parameter)#
+)
+parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef)
+geneAssignment <- c(rep(1,448), rep(2,448))
+parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef)
+geneAssignment <- c(rep(1,448))
+parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef)
+geneAssignment <- c(rep(1,448), rep(2,448))
+parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef)
+samples <- 300
+thining <- 10
+adaptiveWidth <- 10
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth,
+est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
+model <- initializeModelObject("ROC")
+system.time(
+runMCMC(mcmc, genome, model, parameter)
+)
+geneAssignment <- c(rep(1,448), rep(2,448))
+parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef)
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_chromosomeA.fasta")
+geneAssignment <- c(rep(1,448))
+parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef)
