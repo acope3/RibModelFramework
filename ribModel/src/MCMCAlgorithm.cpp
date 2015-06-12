@@ -112,12 +112,12 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
             if( -ROCParameter::randExp(1) < (propLogLike - currLogLike) )
             {
                 parameter.updateExpression(i, k);
-                //#pragma omp atomic
                 // only count each gene once, not numExpressionCategories times
+                //#pragma omp critical
                 if(mixtureAssignmentOfGene == k) logLikelihood += propLogLike;
             }else{
-                //#pragma omp atomic
             	// only count each gene once, not numExpressionCategories times
+                //#pragma omp critical
             	if(mixtureAssignmentOfGene == k) logLikelihood += currLogLike;
             }
         }
@@ -150,10 +150,10 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
             parameter.updateExpressionTrace(iteration/thining, i);
             parameter.updateMixtureAssignmentTrace(iteration/thining, i);
         }
-				delete [] probabilities;
+			delete [] probabilities;
     		delete [] unscaledLogProb_curr_singleMixture;
-				delete [] unscaledLogProb_prop;
-				delete [] unscaledLogProb_curr;
+			delete [] unscaledLogProb_prop;
+			delete [] unscaledLogProb_curr;
 		}
 
     double* newMixtureProbabilities = new double[numMixtures]();
