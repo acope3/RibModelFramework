@@ -351,6 +351,8 @@ RCPP_MODULE(ROCTrace_mod)
 		.method("getSelectionParameterTraceByMixtureElementForCodon", &ROCTrace::getSelectionParameterTraceByMixtureElementForCodonR)
 		.method("getMixtureAssignmentTraceForGene", &ROCTrace::getMixtureAssignmentTraceForGeneR)
 		.method("getMixtureProbabilitiesTraceForMixture", &ROCTrace::getMixtureProbabilitiesTraceForMixtureR)
+		.method("getExpectedPhiTrace", &ROCTrace::getExpectedPhiTrace)
+		.method("getNumberOfMixtures", &ROCTrace::getNumberOfMixtures)
 		;
 }
 #endif

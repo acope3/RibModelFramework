@@ -1425,7 +1425,8 @@ void ROCParameter::initMutationSelectionCategoriesR(std::vector<std::string> fil
 
 #ifndef STANDALONE
 
-	RCPP_EXPOSED_CLASS(Genome)
+RCPP_EXPOSED_CLASS(ROCTrace)
+RCPP_EXPOSED_CLASS(Genome)
 RCPP_EXPOSED_CLASS(CovarianceMatrix)
 
 RCPP_MODULE(ROCParameter_mod)

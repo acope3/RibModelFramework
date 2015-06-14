@@ -11,9 +11,9 @@ geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
 
 # initialize MCMC object
-samples <- 300
+samples <- 100
 thining <- 10
-adaptiveWidth <- 300
+adaptiveWidth <- 100
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, 
                      est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
 # get model object
@@ -26,13 +26,15 @@ system.time(
 
 #plots log likelihood trace, possibly other mcmc diagnostics in the future
 plot(mcmc)
-# plots different aspects of parameter
-plot(parameter, what = "MixtureProbability")
-plot(parameter, what = "SPhi")
-plot(parameter, what = "ExpectedPhi")
-plot(parameter, what = "Expression", geneIndex = 905)
-plot(parameter, what = "Mutation", mixture = 1)
-plot(parameter, what = "Selection", mixture = 1)
+
+# plots different aspects of trace
+trace <- parameter$getTraceObject()
+plot(trace, what = "MixtureProbability")
+plot(trace, what = "SPhi")
+plot(trace, what = "ExpectedPhi")
+plot(trace, what = "Expression", geneIndex = 905)
+plot(trace, what = "Mutation", mixture = 1)
+plot(trace, what = "Selection", mixture = 1)
 
 # plots model fit (cub plot)
 plot(model, genome, parameter, samples = samples*0.1, mixture = 1, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")

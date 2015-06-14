@@ -5,7 +5,7 @@ importFrom(Rcpp, evalCpp)
 export(
 # Ploting
 ## Parameter object
-
+plot.Rcpp_ROCParameter
 ## Model object
 
 ## Genome object

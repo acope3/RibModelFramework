@@ -81,6 +81,7 @@ class ROCTrace
 		std::vector<double> getSelectionParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon); //R WRAPPER
 		std::vector<unsigned> getMixtureAssignmentTraceForGeneR(unsigned geneIndex); //R WRAPPER
 		std::vector<double> getMixtureProbabilitiesTraceForMixtureR(unsigned mixtureIndex); //R WRAPPER
+		unsigned getNumberOfMixtures() {return mixtureProbabilitiesTrace.size();}
 };
 
 #endif //ROCTRACE_H
