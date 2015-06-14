@@ -9,7 +9,7 @@
 #ifndef STANDALONE
 #include <Rcpp.h>
 #endif
-//#include "../include/SequenceSummary.h"
+
 #include "Genome.h"
 #include "CovarianceMatrix.h"
 #include "ROCTrace.h"
@@ -124,6 +124,7 @@ class ROCParameter
 		CovarianceMatrix& getCovarianceMatrixForAA(char aa);
 		void initAllTraces(unsigned samples, unsigned num_genes, unsigned adaptiveSamples) {traces.initAllTraces(samples, num_genes, adaptiveSamples, 
 				numMutationCategories, numSelectionCategories, numParam, numMixtures, categories);}
+		ROCTrace& getTraceObject() {return traces;}
 
 		std::vector <double> readPhiValues(std::string filename);
 		void setNumMutationSelectionValues(std::string mutationSelectionState, std::vector<std::vector<unsigned>> thetaKMatrix);

@@ -775,7 +775,6 @@ double ROCParameter::getSphiPosteriorMean(unsigned samples)
 double ROCParameter::getMutationPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon)
 {
 	double posteriorMean = 0.0;
-	unsigned category = getMutationCategory(mixtureElement);
 	std::vector<double> mutationParameterTrace = traces.getMutationParameterTraceByMixtureElementForCodon(mixtureElement, codon);
 	unsigned traceLength = mutationParameterTrace.size();
 
@@ -797,7 +796,6 @@ double ROCParameter::getMutationPosteriorMean(unsigned mixtureElement, unsigned 
 double ROCParameter::getSelectionPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon)
 {
 	double posteriorMean = 0.0;
-	unsigned category = getSelectionCategory(mixtureElement);
 	std::vector<double> selectionParameterTrace = traces.getSelectionParameterTraceByMixtureElementForCodon(mixtureElement, codon);
 	unsigned traceLength = selectionParameterTrace.size();
 
@@ -818,7 +816,6 @@ double ROCParameter::getSelectionPosteriorMean(unsigned mixtureElement, unsigned
 
 double ROCParameter::getSelectionVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased)
 {
-	unsigned category = getSelectionCategory(mixtureElement);
 	std::vector<double> selectionParameterTrace = traces.getSelectionParameterTraceByMixtureElementForCodon(mixtureElement, codon);
 	unsigned traceLength = selectionParameterTrace.size();
 	if(samples > traceLength)
@@ -846,7 +843,6 @@ double ROCParameter::getSelectionVariance(unsigned mixtureElement, unsigned samp
 
 double ROCParameter::getMutationVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased)
 {
-	unsigned category = getMutationCategory(mixtureElement);
 	std::vector<double> mutationParameterTrace = traces.getMutationParameterTraceByMixtureElementForCodon(mixtureElement, codon);
 	unsigned traceLength = mutationParameterTrace.size();
 	if(samples > traceLength)
@@ -1449,11 +1445,13 @@ RCPP_MODULE(ROCParameter_mod)
 		.method("initMutation", &ROCParameter::initMutation)
 		.method("initCovarianceMatrix", &ROCParameter::initCovarianceMatrix)
 		.method("getCovarianceMatrixForAA", &ROCParameter::getCovarianceMatrixForAA)
+		.method("getTraceObject", &ROCParameter::getTraceObject)
+
 		//R wrapper functions
 		.method("initializeExpressionByGenome", &ROCParameter::initializeExpressionByGenome)
 		.method("initializeExpressionByList", &ROCParameter::initializeExpressionByList)
 		.method("initializeExpressionByRandom", &ROCParameter::initializeExpressionByRandom)
-		.method("getEstimatedMixtureAssignmentForGene", &ROCParameter::getEstimatedMixtureAssignmentForGene, "returns the mixture assignement for a given gene")
+		.method("getEstimatedMixtureAssignmentForGene", &ROCParameter::getEstimatedMixtureAssignmentForGene, "returns the mixture assignment for a given gene")
 		.method("getEstimatedMixtureAssignmentProbabilitiesForGene", &ROCParameter::getEstimatedMixtureAssignmentProbabilitiesForGene, "returns the probabilities assignment for a given gene")	
 		.method("calculateSelectionCoefficients", &ROCParameter::calculateSelectionCoefficientsR)
 		// Posterior functions
