@@ -401,3 +401,50 @@ parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mi
 genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_chromosomeA.fasta")
 geneAssignment <- c(rep(1,448))
 parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef)
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))#
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)#
+#
+# initialize MCMC object#
+samples <- 100#
+thining <- 10#
+adaptiveWidth <- 100#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
+# get model object#
+model <- initializeModelObject("ROC")
+#run mcmc on genome with parameter using model#
+system.time(#
+  runMCMC(mcmc, genome, model, parameter)#
+)
+plot(mcmc)
+trace <- parameter$getTraceObject()
+plot(trace, what = "MixtureProbability")
+plot(trace, what = "SPhi")
+plot(trace, what = "ExpectedPhi")
+plot(trace, what = "Expression", geneIndex = 905)
+plot(trace, what = "Mutation", mixture = 1)
+plot(trace, what = "Selection", mixture = 1)
+plot(model, genome, parameter, samples = samples*0.1, mixture = 1, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
+num.genes <- genome$getGenomeSize()
+num.genes <- genome$getGenomeSize()
+mixtureAssignment <- do.call("rbind", lapply(1:num.genes,  function(geneIndex){parameter$getEstimatedMixtureAssignmentProbabilitiesForGene(samples*0.1, geneIndex)}))
+plot(NULL, NULL, xlim = c(0,1), ylim = c(-2, 1), xlab = "Probability beeing in Mixture 2", ylab = "log10(phi)")
+colors <- c("black", "red")
+for(mixture in 1:2)
+{
+genes.in.mixture <- which(round(mixtureAssignment[, mixture]+1) == mixture)
+expressionCategory <- parameter$getExpressionCategoryForMixture(mixture)
+num.genes <- length(genes.in.mixture)
+expressionValues <- unlist(lapply(genes.in.mixture, function(geneIndex){
+parameter$getExpressionPosteriorMeanByMixtureElementForGene(samples*0.1, geneIndex, expressionCategory)
+}))
+points(mixtureAssignment[genes.in.mixture, mixture], log10(expressionValues), col=colors[mixture])

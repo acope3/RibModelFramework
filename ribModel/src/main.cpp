@@ -70,7 +70,7 @@ void testCovarianceMatrix()
 	std::cout << "Matrix vector multiplication" << std::endl;
 	double brr[3] {1, 0, -1};
 	double res[3];
-	covMat.transformIidNumersIntoCovaryingNumbers(brr, res);
+	//covMat.transformIidNumersIntoCovaryingNumbers(brr, res);
 	for(int i = 0; i < 3; i++)
 	{
 		std::cout << res[i] << std::endl;
@@ -268,9 +268,19 @@ void testCovMatrixOverloading()
 	std::cout << "------------------ TEST COVMATRIXOVERLOADING ------------------" << std::endl;
 }
 
+void testProposeCodonSpecificParameters()
+{
+	std::cout << "------------------ TEST PROPOSECODONSPECIFICPARAMETERS ------------------" << std::endl;
+	ROCParameter parameter;
+
+
+	std::cout << "------------------ TEST PROPOSECODONSPECIFICPARAMETERS ------------------" << std::endl;
+}
+
+
 int main()
 {
-	bool cedric = true;
+	bool cedric = false;
 	std::cout << "Hello world!" << std::endl << std::endl;
 
 	Genome genome;
