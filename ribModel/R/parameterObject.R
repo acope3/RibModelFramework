@@ -38,6 +38,8 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
     parameter$initializeExpressionByList(expressionValues)
   }
   
+  numMutationCategory <- parameter$numMutationCategories
+  numSelectionCategory <- parameter$numSelectionCategories
   
   phi <- parameter$getCurrentExpressionForMixture(1) # phi values are all the same initially
   names.aa <- aminoAcids()
@@ -45,19 +47,50 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
   {
     if(aa == "M" || aa == "W" || aa == "X") next
     
+    codonCounts <- getCodonCountsForAA(aa)
+    numCodons <- dim(codonCounts)[2] - 1
+    #-----------------------------------------
     # TODO WORKS CURRENTLY ONLY FOR ALLUNIQUE!
-    covmat <- NULL
+    #-----------------------------------------
+    covmat <- vector("list", numMixtures)
     for(mixElement in 1:numMixtures)
     {    
       idx <- geneAssignment == mixElement
-      codonCounts <- getCodonCountsForAA(aa)
       csp <- getCSPbyLogit(codonCounts[idx, ], phi[idx])
       
       parameter$initMutation(csp$coef.mat[1,], mixElement, aa)
       parameter$initSelection(csp$coef.mat[2,], mixElement, aa)
-      covmat <- t(csp$R) %*% csp$R  # we expect the covariance matrix, but get the decomposition.
+      # split matrix into sup matrices (dM and dEta)
+      covmat[[mixElement]] <- split.matrix(t(csp$R) %*% csp$R, numCodons, numCodons)  # we expect the covariance matrix, but get the decomposition.
     }
-    parameter$initCovarianceMatrix(covmat, aa)
+    compl.covMat <- matrix(0, ncol = numMixtures * numCodons * 2, nrow = numMixtures * numCodons * 2)
+    matrix.positions <- sub.matrices(compl.covMat, numCodons, numCodons)
+    
+    compl.seq <- seq(1, dim(compl.covMat)[1], numCodons)
+    mut.seq <- compl.seq[1:(length(compl.seq)/2)]
+    i <- 1
+    for(pos in mut.seq)
+    { 
+      compl.covMat[matrix.positions == matrix.positions[pos, pos]] <- unlist(covmat[[i]][1])
+      i <- i + 1
+      i <- ifelse(i > numMutationCategory, 1, i)
+    }
+    sel.seq <- compl.seq[(length(compl.seq)/2 + 1):length(compl.seq)]
+    i <- 1
+    for(pos in sel.seq)
+    { 
+      compl.covMat[matrix.positions == matrix.positions[pos, pos]] <- unlist(covmat[[i]][4])
+      i <- i + 1
+      i <- ifelse(i > numMutationCategory, 1, i)
+    }
+    
+    ofdiag.seq <- mut.seq + numCodons*numMutationCategory
+    for(i in 1:length(mut.seq))
+    {
+      compl.covMat[matrix.positions == matrix.positions[mut.seq[i], ofdiag.seq[i]]] <- unlist(covmat[[i]][2])
+      compl.covMat[matrix.positions == matrix.positions[ofdiag.seq[i], mut.seq[i]]] <- unlist(covmat[[i]][3])
+    }
+    parameter$initCovarianceMatrix(compl.covMat, aa)
   }
   
   return(parameter)
@@ -91,3 +124,19 @@ getCSPbyLogit <- function(codonCounts, phi, coefstart = NULL, x.arg = FALSE, y.a
               coef.mat = matrix(coefficients, nrow = 2, byrow = TRUE),
               R = ret@R)
 }
+
+sub.matrices <- function(M, r, c)
+{
+  rg <- (row(M) - 1) %/% r + 1
+  cg <- (col(M) - 1) %/% c + 1
+  rci <- (rg - 1) * max(cg) + cg
+  return(rci)
+}
+split.matrix <- function(M, r, c)
+{
+  rci <- sub.matrices(M, r, c)
+  N <- prod(dim(M)) / r / c
+  cv <- lapply(1:N, function(x) M[rci==x])
+  
+  return(lapply(1:N, function(i) matrix(cv[[i]], nrow = r)))
+} 
