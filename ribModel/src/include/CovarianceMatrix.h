@@ -26,7 +26,7 @@ class CovarianceMatrix
         void calculateCovarianceMatrixFromTraces(std::vector<std::vector <std::vector<double>>> trace, unsigned geneIndex, unsigned curSample, unsigned adaptiveWidte);
 				void printCovarianceMatrix();
         void printCholeskiMatrix();
-        void transformIidNumersIntoCovaryingNumbers(double* iidnumbers, double* covnumbers);
+        std::vector<double> transformIidNumersIntoCovaryingNumbers(std::vector<double> iidnumbers);
 				#ifndef STANDALONE
 				void setCovarianceMatrix(SEXP _matrix);
 				#endif

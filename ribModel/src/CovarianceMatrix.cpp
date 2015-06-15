@@ -115,9 +115,9 @@ void CovarianceMatrix::calculateCovarianceMatrixFromTraces(std::vector<std::vect
 
     }
 }
-void CovarianceMatrix::transformIidNumersIntoCovaryingNumbers(double* iidnumbers, double* covnumbers)
+std::vector<double> CovarianceMatrix::transformIidNumersIntoCovaryingNumbers(std::vector <double> iidnumbers)
 {
-    //double covnumbers[numVariates];
+    std::vector<double> covnumbers;
     for(int i = 0; i < numVariates; i++)
     {
         double sum = 0.0;
@@ -126,9 +126,9 @@ void CovarianceMatrix::transformIidNumersIntoCovaryingNumbers(double* iidnumbers
             sum += choleskiMatrix[i * numVariates + k] * iidnumbers[k];
         }
 
-        covnumbers[i] = sum;
+        covnumbers.push_back(sum);
     }
-    //return covnumbers;
+    return covnumbers;
 }
 
 void CovarianceMatrix::printCovarianceMatrix()

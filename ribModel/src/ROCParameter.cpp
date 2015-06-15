@@ -159,7 +159,6 @@ void ROCParameter::initParameterSet(double sphi, unsigned _numMixtures, std::vec
 	// assign genes to mixture element
 	unsigned numGenes = geneAssignment.size();
 	mixtureAssignment.resize(numGenes, 0);
-	covarianceMatrix.resize(22);
 #ifndef STANDALONE
 	//TODO:need to check index are correct, consecutive, and don't exceed numMixtures
 	//possibly just use a set?
@@ -243,6 +242,13 @@ void ROCParameter::initParameterSet(double sphi, unsigned _numMixtures, std::vec
 		std::vector<double> tempStdPhi(numGenes, 0.1);
 		std_phi[i] = tempStdPhi;
 		prev_std_phi[i] = tempStdPhi;
+	}
+	for (unsigned i = 0; i < 22; i++)
+	{
+		char aa = SequenceSummary::AminoAcidArray[i];
+		unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa, true);
+		CovarianceMatrix m((numMutationCategories + numSelectionCategories) * numCodons);
+		covarianceMatrix.push_back(m);
 	}
 }
 
@@ -1024,14 +1030,59 @@ void ROCParameter::proposeExpressionLevels()
 }
 void ROCParameter::proposeCodonSpecificParameter()
 {
-	for(unsigned i = 0; i < numMutationCategories; i++)
+	for (unsigned k = 0; k < 22; k++)
 	{
-		proposedMutationParameter[i] = propose(currentMutationParameter[i], ROCParameter::randNorm, bias_csp, std_csp);
+		if (k == 21 || k == 18 || k == 10) continue;
+		std::vector<double> iIDProposed;
+		//need to skip W, M, X
+		unsigned aaRange[2];
+		SequenceSummary::AAindexToCodonRange(k, true, aaRange);
+		for(unsigned i = 0; i < numMutationCategories; i++)
+		{
+			std::vector<double>::const_iterator first = currentMutationParameter[i].begin() + aaRange[0];
+			std::vector<double>::const_iterator last = currentMutationParameter[i].begin() + aaRange[1];
+			std::vector<double> newVec(first, last);
+			newVec = (propose(newVec, ROCParameter::randNorm, bias_csp, std_csp));
+		/*	for (unsigned a = 0; a < newVec.size(); a++)
+			{
+				iIDProposed.push_back(newVec[a]);
+			}
+			*/
+			iIDProposed.insert(iIDProposed.end(), newVec.begin(), newVec.end());
+			//std::copy(newVec.begin(), newVec.end(), iIDProposed.begin() + (i * newVec.size()));
+			//std::copy(newVec.begin(), newVec.end(), iIDProposed.end());
+		}
+		for(unsigned i = 0; i < numSelectionCategories; i++)
+		{
+			std::vector<double>::const_iterator first = currentSelectionParameter[i].begin() + aaRange[0];
+			std::vector<double>::const_iterator last = currentSelectionParameter[i].begin() + aaRange[1];
+			std::vector<double> newVec(first, last);
+			newVec = (propose(newVec, ROCParameter::randNorm, bias_csp, std_csp));
+			//std::copy(newVec.begin(), newVec.end(), iIDProposed.begin() + (i * newVec.size()));
+			iIDProposed.insert(iIDProposed.end(), newVec.begin(), newVec.end());
+			//std::copy(newVec.begin(), newVec.end(), iIDProposed.end());
+		}
+		
+		std::vector<double> covaryingNums;
+		covaryingNums = covarianceMatrix[k].transformIidNumersIntoCovaryingNumbers(iIDProposed);
+		unsigned numCodons = aaRange[1] - aaRange[0];
+		for(unsigned i = 0; i < numMutationCategories; i++)
+		{
+			for(unsigned j = i * numCodons, l = aaRange[0]; j < (i * numCodons) + numCodons; j++, l++)
+			{
+				proposedMutationParameter[i][l] = covaryingNums[j];
+			}
+		}
+		for(unsigned i = 0; i < numSelectionCategories; i++)
+		{
+			for(unsigned j = i * numCodons, l = aaRange[0]; j < (i * numCodons) + numCodons; j++, l++)
+			{
+				proposedSelectionParameter[i][l] = covaryingNums[(numMutationCategories * numCodons) + j];
+			}
+		}
 	}
-	for(unsigned i = 0; i < numSelectionCategories; i++)
-	{
-		proposedSelectionParameter[i] = propose(currentSelectionParameter[i], ROCParameter::randNorm, bias_csp, std_csp);
-	}
+
+
 }
 std::vector<double> ROCParameter::propose(std::vector<double> currentParam, double (*proposal)(double a, double b), double A, std::vector<double> B)
 {
@@ -1425,8 +1476,8 @@ void ROCParameter::initMutationSelectionCategoriesR(std::vector<std::string> fil
 
 #ifndef STANDALONE
 
-RCPP_EXPOSED_CLASS(ROCTrace)
-RCPP_EXPOSED_CLASS(Genome)
+	RCPP_EXPOSED_CLASS(ROCTrace)
+	RCPP_EXPOSED_CLASS(Genome)
 RCPP_EXPOSED_CLASS(CovarianceMatrix)
 
 RCPP_MODULE(ROCParameter_mod)
