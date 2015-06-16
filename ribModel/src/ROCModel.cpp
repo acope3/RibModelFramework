@@ -191,15 +191,23 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
         likelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
         likelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation_proposed, selection_proposed, phiValue);
 
-		//std::cout <<"deleting 5 at once\n";
 		delete [] codonCount;
 		delete [] mutation;
 		delete [] selection;
 		delete [] mutation_proposed;
 		delete [] selection_proposed;
-		//std::cout <<"DONE deleting 5 at once\n";
 	}
-    logAcceptanceRatioForAllMixtures = likelihood_proposed - likelihood;
+	// Take reverse jumb probability into account if CSP proposal width is not identical.
+	// If CSP proposal width is identical, the term cancels and does not have to be calculated.
+	double revJumpRatio = 0.0;
+	double curr_std_csp = parameter.getCurrentCodonSpecificProposalWidth(SequenceSummary::AAToAAIndex(curAA));
+	double prev_std_csp = parameter.getPreviousCodonSpecificProposalWidth(SequenceSummary::AAToAAIndex(curAA));
+	if(curr_std_csp != prev_std_csp)
+	{
+		revJumpRatio = -0.5 * (parameter.getProposedIidSum(SequenceSummary::AAToAAIndex(curAA)) -
+				parameter.getCurrentIidSum(SequenceSummary::AAToAAIndex(curAA)) );
+	}
+    logAcceptanceRatioForAllMixtures = (likelihood_proposed - likelihood) - revJumpRatio;
 }
 
 void ROCModel::obtainCodonCount(SequenceSummary& seqsum, char curAA, int codonCount[])

@@ -61,6 +61,10 @@ class ROCParameter
 
 		std::vector<std::vector<double>> currentSelectionParameter;
 		std::vector<std::vector<double>> proposedSelectionParameter;
+
+		std::vector<double> proposediidSum;
+		std::vector<double> currentiidSum;
+
 		std::vector<unsigned> numAcceptForMutationAndSelection;
 
 		std::string mutationSelectionState;
@@ -201,13 +205,18 @@ class ROCParameter
 
 		// functions to manage codon specific parameter
 		void updateCodonSpecificParameter(char aa);
-		double getCodonSpecificProposalWidth(unsigned aa)
+		double getCurrentCodonSpecificProposalWidth(unsigned aa)
 		{
 			unsigned codonRange[2];
 			SequenceSummary::AAindexToCodonRange(aa, true, codonRange);
 			return std_csp[codonRange[0]];
 		}
-
+		double getPreviousCodonSpecificProposalWidth(unsigned aa)
+		{
+			unsigned codonRange[2];
+			SequenceSummary::AAindexToCodonRange(aa, true, codonRange);
+			return prev_std_csp[codonRange[0]];
+		}
 		// functions to manage Sphi
 		double getSphi(bool proposed = false) {return (proposed ? Sphi_proposed : Sphi);}
 		void setSphi(double sPhi) {Sphi = sPhi;}
@@ -231,6 +240,10 @@ class ROCParameter
 		double getPreviousExpressionProposalWidth(unsigned expressionCategory, unsigned geneIndex) {return prev_std_phi[expressionCategory][geneIndex];}
 		double getCurrentSphiProposalWidth() {return std_sphi;}
 		double getPreviousSphiProposalWidth() {return prev_std_sphi;}
+
+		double getCurrentIidSum(unsigned aaindex) {return currentiidSum[aaindex];}
+		double getProposedIidSum(unsigned aaindex) {return proposediidSum[aaindex];}
+
 
 		void getParameterForCategory(unsigned category, unsigned parameter, char aa, bool proposal, double* returnValue);
 

@@ -236,7 +236,10 @@ char SequenceSummary::IndexToAA(int aa)
 	return AminoAcidArray[aa];
 }
 
-
+unsigned SequenceSummary::AAToAAIndex(char aa)
+{
+	return SequenceSummary::aaToIndex.find(aa) -> second;
+}
 unsigned SequenceSummary::CodonToAAIndex(std::string& codon)
 {
 	char aa = SequenceSummary::CodonToAA(codon);

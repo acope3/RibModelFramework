@@ -280,7 +280,7 @@ void testProposeCodonSpecificParameters()
 
 int main()
 {
-	bool cedric = false;
+	bool cedric = true;
 	std::cout << "Hello world!" << std::endl << std::endl;
 
 	Genome genome;
@@ -343,9 +343,9 @@ int main()
 		std::cout << "done initialize ROCParameter object" << std::endl;
 
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
-		int samples = 100;
+		int samples = 200;
 		int thining = 10;
-		int useSamples = 100;
+		int useSamples = 10;
 
 		std::cout << "\t# samples: " << samples << "\n";
 		std::cout << "\t thining: " << thining << "\n";
@@ -370,7 +370,7 @@ int main()
 		for(unsigned n = 0; n < 22; n++)
 		{
 			if(n == 21 || n == 10 || n == 18) continue;
-			std::cout << SequenceSummary::AminoAcidArray[n] << ": " << parameter.getCodonSpecificProposalWidth(n) << "\n";
+			std::cout << SequenceSummary::AminoAcidArray[n] << ": " << parameter.getCurrentCodonSpecificProposalWidth(n) << "\n";
 		}
 
 		//These files used to be written here:

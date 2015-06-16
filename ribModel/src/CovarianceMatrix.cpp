@@ -47,6 +47,13 @@ void CovarianceMatrix::operator*(const double &value)
 		covMatrix[i] *= value;
 	}
 }
+void CovarianceMatrix::operator*=(const double &value)
+{
+	for (unsigned i = 0; i < covMatrix.size(); i++)
+	{
+		covMatrix[i] *= value;
+	}
+}
 
 void CovarianceMatrix::initCovarianceMatrix(unsigned _numVariates)
 {
@@ -67,7 +74,6 @@ void CovarianceMatrix::initCovarianceMatrix(unsigned _numVariates)
 // http://rosettacode.org/wiki/Cholesky_decomposition#C
 void CovarianceMatrix::choleskiDecomposition()
 {
-    std::cout <<"choleskiDecomposition called\n";
     for(int i = 0; i < numVariates; i++)
     {
         for(int j = 0; j < (i + 1); j++)
