@@ -48,6 +48,16 @@ void CovarianceMatrix::operator*(const double &value)
 	}
 }
 
+
+void CovarianceMatrix::operator*=(const double &value)
+{
+  for (unsigned i = 0; i < covMatrix.size(); i++)
+  {
+    covMatrix[i] *= value;
+  }
+}
+
+
 void CovarianceMatrix::initCovarianceMatrix(unsigned _numVariates)
 {
     numVariates = _numVariates;

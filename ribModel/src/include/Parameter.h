@@ -1,5 +1,5 @@
-#ifndef MODELPARAMETER_H
-#define MODELPARAMETER_H
+#ifndef PARAMETER_H
+#define PARAMETER_H
 
 #include <vector>
 #include <random>
@@ -12,15 +12,14 @@
 
 #include "Genome.h"
 #include "CovarianceMatrix.h"
-#include "ROCTrace.h"
 #include "Trace.h"
 
 
-class ROCParameter
+class Parameter
 {
 	private:
 
-		ROCTrace traces;
+		Trace traces;
 		//members
 		unsigned int numParam;
 
@@ -31,9 +30,6 @@ class ROCParameter
 		unsigned numAcceptForSphi;
 		std::vector<CovarianceMatrix> covarianceMatrix;
 
-
-		double phiEpsilon;
-		double phiEpsilon_proposed;
 
 		// proposal bias and std for phi values
 		double bias_sphi;
@@ -57,14 +53,6 @@ class ROCParameter
 		std::vector<std::vector<double>> proposedExpressionLevel;
 		std::vector<std::vector<unsigned>> numAcceptForExpression;
 
-		std::vector<std::vector<double>> currentMutationParameter;
-		std::vector<std::vector<double>> proposedMutationParameter;
-
-		std::vector<std::vector<double>> currentSelectionParameter;
-		std::vector<std::vector<double>> proposedSelectionParameter;
-		std::vector<unsigned> numAcceptForMutationAndSelection;
-		std::vector<double> proposediidSum;
-		std::vector<double> currentiidSum;
 		std::string mutationSelectionState;
 		unsigned numMixtures;
 		unsigned numMutationCategories;
@@ -76,10 +64,8 @@ class ROCParameter
 
 		std::vector<double> categoryProbabilities;
 
-		//static members
-
-
-
+		
+		// STATICS
 		// functions
 		std::vector<double> propose(std::vector<double> currentParam, double (*proposal)(double a, double b), double A, std::vector<double> B);
 
@@ -103,32 +89,32 @@ class ROCParameter
 		static std::default_random_engine generator; // static to make sure that the same generator is during the runtime.
 
 		bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);
-		explicit ROCParameter();
-		ROCParameter(double sphi, unsigned _numMixtures,
+		explicit Parameter();
+		Parameter(double sphi, unsigned _numMixtures,
 				std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer = true, std::string _mutationSelectionState = "allUnique");
-		virtual ~ROCParameter();
-#ifndef STANDALONE
+		~Parameter();
+		Parameter(const ROCParameter& other);
+		Parameter& operator=(const ROCParameter& rhs);
+		#ifndef STANDALONE
 		ROCParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer = true);
 		ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer = true, std::string _mutationSelectionState = "allUnique");
-#endif
-		ROCParameter(const ROCParameter& other);
-		ROCParameter& operator=(const ROCParameter& rhs);
+		#endif
+
+
 		void initParameterSet(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, 
 				std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer = true, std::string _mutationSelectionState = allUnique);
-
-
 		void initSelection(std::vector<double> selectionValues, unsigned mixtureElement, char aa);
 		void initMutation(std::vector<double> mutationValues, unsigned mixtureElement, char aa);
-		std::vector<std::vector<double>> calculateSelectionCoefficients(unsigned sample, unsigned mixture);
-#ifndef STANDALONE
-		void initCovarianceMatrix(SEXP matrix, char aa);
-		SEXP calculateSelectionCoefficientsR(unsigned sample, unsigned mixture);
-#endif
-		CovarianceMatrix& getCovarianceMatrixForAA(char aa);
 		void initAllTraces(unsigned samples, unsigned num_genes, unsigned adaptiveSamples) {traces.initAllTraces(samples, num_genes, adaptiveSamples, 
 				numMutationCategories, numSelectionCategories, numParam, numMixtures, categories);}
-		ROCTrace& getTraceObject() {return traces;}
+		#ifndef STANDALONE
+		void initCovarianceMatrix(SEXP matrix, char aa);
+		SEXP calculateSelectionCoefficientsR(unsigned sample, unsigned mixture);
+		#endif
 
+		CovarianceMatrix& getCovarianceMatrixForAA(char aa);
+		std::vector<std::vector<double>> calculateSelectionCoefficients(unsigned sample, unsigned mixture);
+		ROCTrace& getTraceObject() {return traces;}
 		std::vector <double> readPhiValues(std::string filename);
 		void setNumMutationSelectionValues(std::string mutationSelectionState, std::vector<std::vector<unsigned>> thetaKMatrix);
 		void initCategoryDefinitions(std::string mutationSelectionState, std::vector<std::vector<unsigned>> thetaKMatrix);
@@ -375,4 +361,4 @@ class ROCParameter
 
 };
 
-#endif // MODELPARAMETER_H
+#endif // PARAMETER_H
