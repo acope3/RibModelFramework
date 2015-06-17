@@ -14,15 +14,15 @@
 
 
 
-MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * thining), estimateExpression(true),
+MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * thining), estimateSynthesisRate(true),
 estimateCodonSpecificParameter(true), estimateHyperParameter(true)
 {
     MCMCAlgorithm(1000, 1, true, true, true);
     likelihoodTrace.resize(samples);
 }
 
-MCMCAlgorithm::MCMCAlgorithm(int _samples, int _thining, unsigned _adaptiveWidth, bool _estimateExpression, bool _estimateCodonSpecificParameter, bool _estimateHyperParameter)
-    : samples(_samples), thining(_thining), adaptiveWidth(_adaptiveWidth * thining), estimateExpression(_estimateExpression), estimateCodonSpecificParameter(_estimateCodonSpecificParameter),
+MCMCAlgorithm::MCMCAlgorithm(int _samples, int _thining, unsigned _adaptiveWidth, bool _estimateSynthesisRate, bool _estimateCodonSpecificParameter, bool _estimateHyperParameter)
+    : samples(_samples), thining(_thining), adaptiveWidth(_adaptiveWidth * thining), estimateSynthesisRate(_estimateSynthesisRate), estimateCodonSpecificParameter(_estimateCodonSpecificParameter),
         estimateHyperParameter(_estimateHyperParameter)
 {
     likelihoodTrace.resize(samples);
@@ -39,14 +39,14 @@ MCMCAlgorithm::MCMCAlgorithm(const MCMCAlgorithm& other)
         thining = other.thining;
         adaptiveWidth = other.adaptiveWidth;
 
-        estimateExpression = other.estimateExpression;
+        estimateSynthesisRate = other.estimateSynthesisRate;
         estimateCodonSpecificParameter = other.estimateCodonSpecificParameter;
         estimateHyperParameter = other.estimateHyperParameter;
 
         likelihoodTrace = other.likelihoodTrace;
 }
 
-double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROCParameter& parameter, ROCModel& model, int iteration)
+double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, ROCParameter& parameter, ROCModel& model, int iteration)
 {
     // TODO move the likelihood calculation out off here. make it a void function again.
 
@@ -59,7 +59,7 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
     //#pragma omp parallel for //shared(parameter)
     // testing end
 
-    unsigned numExpressionCategories = parameter.getNumExpressionCategories();
+    unsigned numSynthesisRateCategories = parameter.getNumSynthesisRateCategories();
     unsigned numMixtures = parameter.getNumMixtureElements();
     double* dirichletParameters = new double[numMixtures]();
 		//initialize parameter's size
@@ -77,13 +77,13 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
                 => ln(P) = ln(P') - ln(c)
             Note that we use invere sign because our values of ln(f) and ln(f') are negative.
         */
-        double* unscaledLogProb_curr = new double[numExpressionCategories]();
-        double* unscaledLogProb_prop = new double[numExpressionCategories]();
+        double* unscaledLogProb_curr = new double[numSynthesisRateCategories]();
+        double* unscaledLogProb_prop = new double[numSynthesisRateCategories]();
 
         double* unscaledLogProb_curr_singleMixture = new double[numMixtures]();
         double maxValue = -1000000.0;
         unsigned mixtureIndex = 0u;
-        for(unsigned k = 0u; k < numExpressionCategories; k++)
+        for(unsigned k = 0u; k < numSynthesisRateCategories; k++)
         {
             // logProbabilityRatio contains the logProbabilityRatio in element 0,
             // the current unscaled probability in elemen 1 and the proposed unscaled probability in element 2
@@ -104,19 +104,19 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
             }
         }
         unsigned mixtureAssignmentOfGene = parameter.getMixtureAssignment(i);
-        for(unsigned k = 0u; k < numExpressionCategories; k++)
+        for(unsigned k = 0u; k < numSynthesisRateCategories; k++)
         {
             // We do not need to add std::log(parameter.getCategoryProbability(k)) since it will cancel in the ratio!
             double currLogLike = unscaledLogProb_curr[k];
             double propLogLike = unscaledLogProb_prop[k];
             if( -ROCParameter::randExp(1) < (propLogLike - currLogLike) )
             {
-                parameter.updateExpression(i, k);
-                // only count each gene once, not numExpressionCategories times
+                parameter.updateSynthesisRate(i, k);
+                // only count each gene once, not numSynthesisRateCategories times
                 //#pragma omp critical
                 if(mixtureAssignmentOfGene == k) logLikelihood += propLogLike;
             }else{
-            	// only count each gene once, not numExpressionCategories times
+            	// only count each gene once, not numSynthesisRateCategories times
                 //#pragma omp critical
             	if(mixtureAssignmentOfGene == k) logLikelihood += currLogLike;
             }
@@ -184,8 +184,8 @@ void MCMCAlgorithm::acceptRejectHyperParameter(int numGenes, ROCParameter& param
     for(int i = 0; i < numGenes; i++)
     {
         unsigned mixture = parameter.getMixtureAssignment(i);
-        mixture = parameter.getExpressionCategory(mixture);
-        double phi = parameter.getExpression(i, mixture, false);
+        mixture = parameter.getSynthesisRateCategory(mixture);
+        double phi = parameter.getSynthesisRate(i, mixture, false);
         logProbabilityRatio += std::log(ROCParameter::densityLogNorm(phi, proposedMPhi, proposedSphi)) - std::log(ROCParameter::densityLogNorm(phi, currentMPhi, currentSphi));
     }
 
@@ -250,7 +250,7 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
     std::cout << "entering MCMC loop" << std::endl;
     std::cout << "\tEstimate Codon Specific Parameters? " << (estimateCodonSpecificParameter ? "TRUE" : "FALSE") << std::endl;
     std::cout << "\tEstimate Hyper Parameters? " << (estimateHyperParameter ? "TRUE" : "FALSE") << std::endl;
-    std::cout << "\tEstimate Expression Parameters? " << (estimateExpression ? "TRUE" : "FALSE") << std::endl;
+    std::cout << "\tEstimate SynthesisRate Parameters? " << (estimateSynthesisRate ? "TRUE" : "FALSE") << std::endl;
 
 
     std::cout << "\tStarting MCMC with " << maximumIterations << " iterations\n";
@@ -289,17 +289,17 @@ void MCMCAlgorithm::run(Genome& genome, ROCModel& model, ROCParameter& parameter
             }
         }
         // update expression level values
-        if(estimateExpression)
+        if(estimateSynthesisRate)
         {
-            parameter.proposeExpressionLevels();
-            double logLike = acceptRejectExpressionLevelForAllGenes(genome, parameter, model, iteration);
+            parameter.proposeSynthesisRateLevels();
+            double logLike = acceptRejectSynthesisRateLevelForAllGenes(genome, parameter, model, iteration);
             if((iteration % thining) == 0)
             {
                 likelihoodTrace[iteration/thining] = logLike;
             }
             if( ( (iteration + 1) % adaptiveWidth) == 0)
             {
-               parameter.adaptExpressionProposalWidth(adaptiveWidth);
+               parameter.adaptSynthesisRateProposalWidth(adaptiveWidth);
             }
         }
     } // end MCMC loop

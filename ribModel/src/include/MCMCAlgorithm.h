@@ -14,30 +14,30 @@ class MCMCAlgorithm
         unsigned thining;
         unsigned adaptiveWidth;
 
-        bool estimateExpression;
+        bool estimateSynthesisRate;
         bool estimateCodonSpecificParameter;
         bool estimateHyperParameter;
 
         std::vector<double> likelihoodTrace;
 
-        double acceptRejectExpressionLevelForAllGenes(Genome& genome, ROCParameter& parameter, ROCModel& model, int iteration);
+        double acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, ROCParameter& parameter, ROCModel& model, int iteration);
         void acceptRejectCodonSpecificParameter(Genome& genome, ROCParameter& parameter, ROCModel& model, int iteration);
         void acceptRejectHyperParameter(int numGenes, ROCParameter& parameter, ROCModel& model, int iteration);
 
     public:
         explicit MCMCAlgorithm();
-        MCMCAlgorithm(int samples, int thining, unsigned _adaptiveWidth = 100, bool _estimateExpression = true, bool _estimateCodonSpecificParameter = true,
+        MCMCAlgorithm(int samples, int thining, unsigned _adaptiveWidth = 100, bool _estimateSynthesisRate = true, bool _estimateCodonSpecificParameter = true,
 						bool _estimateHyperParameter = true);
         virtual ~MCMCAlgorithm();
         MCMCAlgorithm(const MCMCAlgorithm& other);
 
         void run(Genome& genome, ROCModel& model, ROCParameter& parameter);
 
-        bool isEstimateExpression() {return estimateExpression;}
+        bool isEstimateSynthesisRate() {return estimateSynthesisRate;}
         bool isEstimateCodonSpecificParameter() {return estimateCodonSpecificParameter;}
         bool isEstimateHyperParameter() {return estimateHyperParameter;}
 
-        void setEstimateExpression(bool in) {estimateExpression = in;}
+        void setEstimateSynthesisRate(bool in) {estimateSynthesisRate = in;}
         void setEstimateCodonSpecificParameter(bool in) {estimateCodonSpecificParameter = in;}
         void setEstimateHyperParameter(bool in) {estimateHyperParameter = in;}
 

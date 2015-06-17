@@ -189,10 +189,10 @@ void testSimulateGenome(Genome& genome)
 
 
 
-	//parameter.InitializeExpression(genome, sphi_init);
+	//parameter.InitializeSynthesisRate(genome, sphi_init);
 	std::vector<double> phiVals;
 	phiVals = parameter.readPhiValues("Skluyveri_ChrA_ChrCleft_phi_est.csv");
-	parameter.InitializeExpression(phiVals);
+	parameter.InitializeSynthesisRate(phiVals);
 
 	std::cout << "done initialize ROCParameter object" << std::endl;
 
@@ -207,8 +207,8 @@ void testSimulateGenome(Genome& genome)
 		unsigned mixtureElement = parameter.getMixtureAssignment(i);
 		unsigned mutationCategory = parameter.getMutationCategory(mixtureElement);
 		unsigned selectionCategory = parameter.getSelectionCategory(mixtureElement);
-		unsigned expressionCategory = parameter.getExpressionCategory(mixtureElement);
-		double phi= parameter.getExpression(i, expressionCategory, false);
+		unsigned expressionCategory = parameter.getSynthesisRateCategory(mixtureElement);
+		double phi= parameter.getSynthesisRate(i, expressionCategory, false);
 
 		std::cout <<"phi = " << phi <<"\n";
 		Gene gene = simGenes[i];
@@ -337,9 +337,9 @@ int main()
 		}
 		parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
 		parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
-		parameter.InitializeExpression(genome, sphi_init);
+		parameter.InitializeSynthesisRate(genome, sphi_init);
 		//std::vector<double> phiVals = parameter.readPhiValues("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrCleft_phi_est.csv");
-		//parameter.InitializeExpression(phiVals);
+		//parameter.InitializeSynthesisRate(phiVals);
 		std::cout << "done initialize ROCParameter object" << std::endl;
 
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;

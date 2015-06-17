@@ -29,10 +29,10 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCP
     // get correct index for everything
     unsigned mutationCategory = parameter.getMutationCategory(k);
     unsigned selectionCategory = parameter.getSelectionCategory(k);
-    unsigned expressionCategory = parameter.getExpressionCategory(k);
+    unsigned expressionCategory = parameter.getSynthesisRateCategory(k);
 
-    double phiValue = parameter.getExpression(geneIndex, expressionCategory, false);
-    double phiValue_proposed = parameter.getExpression(geneIndex, expressionCategory, true);
+    double phiValue = parameter.getSynthesisRate(geneIndex, expressionCategory, false);
+    double phiValue_proposed = parameter.getSynthesisRate(geneIndex, expressionCategory, true);
 	//#pragma omp parallel for
     for(int i = 0; i < 22; i++)
     {
@@ -74,8 +74,8 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCP
 
     // Take reverse jumb probability into account if phi proposal width is not identical.
     // If phi proposal width is identical, the term cancels and does not have to be calculated.
-    double curr_std_phi = parameter.getCurrentExpressionProposalWidth(expressionCategory, geneIndex);
-    double prev_std_phi = parameter.getPreviousExpressionProposalWidth(expressionCategory, geneIndex);
+    double curr_std_phi = parameter.getCurrentSynthesisRateProposalWidth(expressionCategory, geneIndex);
+    double prev_std_phi = parameter.getPreviousSynthesisRateProposalWidth(expressionCategory, geneIndex);
 	double revJump_proposed = 0.0;
 	double revJump = 0.0;
 	if(curr_std_phi != prev_std_phi)
@@ -170,9 +170,9 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
         // how is the mixture element defined. Which categories make it up
         unsigned mutationCategory = parameter.getMutationCategory(mixtureElement);
         unsigned selectionCategory = parameter.getSelectionCategory(mixtureElement);
-        unsigned expressionCategory = parameter.getExpressionCategory(mixtureElement);
+        unsigned expressionCategory = parameter.getSynthesisRateCategory(mixtureElement);
         // get phi value, calculate likelihood conditional on phi
-        double phiValue = parameter.getExpression(i, expressionCategory, false);
+        double phiValue = parameter.getSynthesisRate(i, expressionCategory, false);
 
         // get current mutation and selection parameter
         double* mutation = new double[numCodons - 1]();

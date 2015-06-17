@@ -238,8 +238,8 @@ void Genome::simulateGenome(ROCParameter& parameter, ROCModel& model)
 		unsigned mixtureElement = parameter.getMixtureAssignment(i);
 		unsigned mutationCategory = parameter.getMutationCategory(mixtureElement);
 		unsigned selectionCategory = parameter.getSelectionCategory(mixtureElement);
-		unsigned expressionCategory = parameter.getExpressionCategory(mixtureElement);
-		double phi = parameter.getExpression(i, expressionCategory, false);
+		unsigned expressionCategory = parameter.getSynthesisRateCategory(mixtureElement);
+		double phi = parameter.getSynthesisRate(i, expressionCategory, false);
 
 		std::ostringstream strstream;
 		strstream << mixtureElement;
