@@ -49,14 +49,14 @@ class ROCParameter : public Parameter
 				std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer = true, std::string _mutationSelectionState = "allUnique");
 		virtual ~ROCParameter();
 #ifndef STANDALONE
-		/*		ROCParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer = true);
-					ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer = true, std::string _mutationSelectionState = "allUnique");
-		 */
+		ROCParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer = true);
+		ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer = true, std::string _mutationSelectionState = "allUnique");
+		 
 #endif
 		ROCParameter(const ROCParameter& other);
 		ROCParameter& operator=(const ROCParameter& rhs);
-
-
+		ROCTrace& getTraceObject() {return traces;}
+		void initROCParameterSet();
 		void initSelection(std::vector<double> selectionValues, unsigned mixtureElement, char aa);
 		void initMutation(std::vector<double> mutationValues, unsigned mixtureElement, char aa);
 		std::vector<std::vector<double>> calculateSelectionCoefficients(unsigned sample, unsigned mixture);

@@ -16,9 +16,12 @@ ROCParameter::ROCParameter() : Parameter()
 	std::vector<unsigned> empty(100, 1);
 	std::vector<std::vector <unsigned>> empty2;
 //	initParameterSet(2, 1, empty, empty2, true, "allUnique");
+	//initParameter(); 
+	initROCParameterSet();
 }
+
 #ifndef STANDALONE
-/*ROCParameter::ROCParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer)
+ROCParameter::ROCParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter()
 {
 	unsigned _numMixtures = _matrix.size() / 2;
 	std::vector<std::vector<unsigned>> thetaKMatrix;
@@ -32,52 +35,27 @@ ROCParameter::ROCParameter() : Parameter()
 			thetaKMatrix[i].push_back(_matrix[index]);
 		}
 	}
-
-	initParameterSet( sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer);
+	initParameterSet(sphi, _matrix.size() / 2, geneAssignment, thetaKMatrix, splitSer);
+	initROCParameterSet();
 
 }
-*/
+
+ROCParameter::ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState) :
+		Parameter()
+{
+	std::vector<std::vector<unsigned>> thetaKMatrix;
+	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
+	initROCParameterSet();
+}
 #endif
 
+
+
 ROCParameter::ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix, 
-	bool splitSer, std::string _mutationSelectionState) : Parameter(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState)
+	bool splitSer, std::string _mutationSelectionState) : Parameter()
 {
-  // proposal bias and std for codon specific parameter
-  bias_csp = 0;
-  std_csp.resize(numParam, 0.1); //TODO hase to be initialized with 1 when switched to the covariance matrix!!!
-  prev_std_csp.resize(numParam, 0.1); //TODO hase to be initialized with 1 when switched to the covariance matrix!!!
-	numAcceptForMutationAndSelection.resize(22, 0u);
-
-
-
-
-  phiEpsilon = 0.1;
-  phiEpsilon_proposed = 0.1;
-
-  //may need getter fcts
-  currentMutationParameter.resize(numMutationCategories);
-  proposedMutationParameter.resize(numMutationCategories);
-
-  for (unsigned i = 0u; i < numMutationCategories; i++)
-  {
-    std::vector<double> tmp(numParam, 0.0);
-    currentMutationParameter[i] = tmp;
-    proposedMutationParameter[i] = tmp;
-  }
-
-
-  currentSelectionParameter.resize(numSelectionCategories);
-  proposedSelectionParameter.resize(numSelectionCategories);
-  
-
-  for (unsigned i = 0u; i < numSelectionCategories; i++)
-  {
-    std::vector<double> tmp(numParam, 0.0);
-    proposedSelectionParameter[i] = tmp;
-    currentSelectionParameter[i] = tmp;
-  }
-  proposediidSum.resize(22);
-  currentiidSum.resize(22);
+	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
+	initROCParameterSet();
 }
 
 
@@ -125,6 +103,44 @@ ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
 
 	return *this;
 }
+
+void ROCParameter::initROCParameterSet()
+{
+  // proposal bias and std for codon specific parameter
+  bias_csp = 0;
+  std_csp.resize(numParam, 0.1); //TODO hase to be initialized with 1 when switched to the covariance matrix!!!
+  prev_std_csp.resize(numParam, 0.1); //TODO hase to be initialized with 1 when switched to the covariance matrix!!!
+  numAcceptForMutationAndSelection.resize(22, 0u);
+
+  phiEpsilon = 0.1;
+  phiEpsilon_proposed = 0.1;
+
+  //may need getter fcts
+  currentMutationParameter.resize(numMutationCategories);
+  proposedMutationParameter.resize(numMutationCategories);
+
+  for (unsigned i = 0u; i < numMutationCategories; i++)
+  {
+    std::vector<double> tmp(numParam, 0.0);
+    currentMutationParameter[i] = tmp;
+    proposedMutationParameter[i] = tmp;
+  }
+
+
+  currentSelectionParameter.resize(numSelectionCategories);
+  proposedSelectionParameter.resize(numSelectionCategories);
+
+
+  for (unsigned i = 0u; i < numSelectionCategories; i++)
+  {
+    std::vector<double> tmp(numParam, 0.0);
+    proposedSelectionParameter[i] = tmp;
+    currentSelectionParameter[i] = tmp;
+  }
+  proposediidSum.resize(22);
+  currentiidSum.resize(22);
+}
+
 
 std::vector<std::vector<double>> ROCParameter::calculateSelectionCoefficients(unsigned sample, unsigned mixture)
 {

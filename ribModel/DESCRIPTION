@@ -11,7 +11,7 @@ Maintainer: Cedric Landerer <cedric.landerer@gmail.com>
 URL: https://github.com/clandere/RibModelFramework
 Depends: Rcpp
 Suggests: Hmisc
-RcppModules: Trace_mod, CovarianceMatrix_mod, MCMCAlgorithm_mod, ROCModel_mod, ROCParameter_mod, Genome_mod, Gene_mod, SequenceSummary_mod
+RcppModules: Trace_mod, CovarianceMatrix_mod, MCMCAlgorithm_mod, ROCModel_mod, Parameter_mod, Genome_mod, Gene_mod, SequenceSummary_mod
 Description: More about what it does (maybe more than one line)
 License: GPL (>= 2)
 Imports: Rcpp (>= 0.11.3)

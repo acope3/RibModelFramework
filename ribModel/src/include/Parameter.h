@@ -57,8 +57,8 @@ class Parameter
 		static std::default_random_engine generator; // static to make sure that the same generator is during the runtime.
 
 		Parameter();		
-		Parameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer, 
-				std::string _mutationSelectionState);
+		void initParameterSet(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, 
+				std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer = true, std::string _mutationSelectionState = "allUnique");
 		Parameter(const Parameter& other);
     Parameter& operator=(const Parameter& rhs);
 

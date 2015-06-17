@@ -4,7 +4,76 @@ Parameter::Parameter()
 {
 	//ctor
 }
-Parameter::Parameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer,		std::string _mutationSelectionState)
+
+Parameter::Parameter(const Parameter& other)
+{
+  numParam = other.numParam;
+
+  covarianceMatrix = other.covarianceMatrix;
+  Sphi = other.Sphi;
+  Aphi = other.Aphi;
+  Sphi_proposed = other.Sphi_proposed;
+  Aphi_proposed = other.Aphi_proposed;
+  numAcceptForSphi = other.numAcceptForSphi;
+  categories = other.categories;
+
+  // proposal bias and std for phi values
+  bias_sphi = other.bias_sphi;
+  std_sphi = other.std_sphi;
+  prev_std_sphi = other.prev_std_sphi;
+
+  // proposal bias and std for phi values
+  bias_phi = other.bias_phi;
+  std_phi = other.std_phi;
+  prev_std_phi = other.prev_std_phi;
+
+  currentSynthesisRateLevel = other.currentSynthesisRateLevel;
+  proposedSynthesisRateLevel = other.proposedSynthesisRateLevel;
+  numAcceptForSynthesisRate = other.numAcceptForSynthesisRate;
+
+  numMutationCategories = other.numMutationCategories;
+  numSelectionCategories = other.numSelectionCategories;
+
+  numMixtures = other.numMixtures;
+}
+Parameter& Parameter::operator=(const Parameter& rhs)
+{
+  if (this == &rhs) return *this; // handle self assignment
+  numParam = rhs.numParam;
+
+  covarianceMatrix = rhs.covarianceMatrix;
+  Sphi = rhs.Sphi;
+  Aphi = rhs.Aphi;
+  Sphi_proposed = rhs.Sphi_proposed;
+  Aphi_proposed = rhs.Aphi_proposed;
+  numAcceptForSphi = rhs.numAcceptForSphi;
+  categories = rhs.categories;
+
+  // proposal bias and std for phi values
+  bias_sphi = rhs.bias_sphi;
+  std_sphi = rhs.std_sphi;
+  prev_std_sphi = rhs.prev_std_sphi;
+
+  // proposal bias and std for phi values
+  bias_phi = rhs.bias_phi;
+  std_phi = rhs.std_phi;
+  prev_std_phi = rhs.prev_std_phi;
+
+  currentSynthesisRateLevel = rhs.currentSynthesisRateLevel;
+  proposedSynthesisRateLevel = rhs.proposedSynthesisRateLevel;
+  numAcceptForSynthesisRate = rhs.numAcceptForSynthesisRate;
+
+  numMutationCategories = rhs.numMutationCategories;
+  numSelectionCategories = rhs.numSelectionCategories;
+
+
+  numMixtures = rhs.numMixtures;
+
+  return *this;
+}
+
+void Parameter::initParameterSet(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, 
+		std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer,   std::string _mutationSelectionState)
 {
 	// assign genes to mixture element
 	unsigned numGenes = geneAssignment.size();
@@ -77,75 +146,6 @@ Parameter::Parameter(double sphi, unsigned _numMixtures, std::vector<unsigned> g
     covarianceMatrix.push_back(m);
   }
 }
-
-Parameter::Parameter(const Parameter& other)
-{
-  numParam = other.numParam;
-
-  covarianceMatrix = other.covarianceMatrix;
-  Sphi = other.Sphi;
-  Aphi = other.Aphi;
-  Sphi_proposed = other.Sphi_proposed;
-  Aphi_proposed = other.Aphi_proposed;
-  numAcceptForSphi = other.numAcceptForSphi;
-  categories = other.categories;
-
-  // proposal bias and std for phi values
-  bias_sphi = other.bias_sphi;
-  std_sphi = other.std_sphi;
-  prev_std_sphi = other.prev_std_sphi;
-
-  // proposal bias and std for phi values
-  bias_phi = other.bias_phi;
-  std_phi = other.std_phi;
-  prev_std_phi = other.prev_std_phi;
-
-  currentSynthesisRateLevel = other.currentSynthesisRateLevel;
-  proposedSynthesisRateLevel = other.proposedSynthesisRateLevel;
-  numAcceptForSynthesisRate = other.numAcceptForSynthesisRate;
-
-  numMutationCategories = other.numMutationCategories;
-  numSelectionCategories = other.numSelectionCategories;
-
-  numMixtures = other.numMixtures;
-}
-Parameter& Parameter::operator=(const Parameter& rhs)
-{
-  if (this == &rhs) return *this; // handle self assignment
-  numParam = rhs.numParam;
-
-  covarianceMatrix = rhs.covarianceMatrix;
-  Sphi = rhs.Sphi;
-  Aphi = rhs.Aphi;
-  Sphi_proposed = rhs.Sphi_proposed;
-  Aphi_proposed = rhs.Aphi_proposed;
-  numAcceptForSphi = rhs.numAcceptForSphi;
-  categories = rhs.categories;
-
-  // proposal bias and std for phi values
-  bias_sphi = rhs.bias_sphi;
-  std_sphi = rhs.std_sphi;
-  prev_std_sphi = rhs.prev_std_sphi;
-
-  // proposal bias and std for phi values
-  bias_phi = rhs.bias_phi;
-  std_phi = rhs.std_phi;
-  prev_std_phi = rhs.prev_std_phi;
-
-  currentSynthesisRateLevel = rhs.currentSynthesisRateLevel;
-  proposedSynthesisRateLevel = rhs.proposedSynthesisRateLevel;
-  numAcceptForSynthesisRate = rhs.numAcceptForSynthesisRate;
-
-  numMutationCategories = rhs.numMutationCategories;
-  numSelectionCategories = rhs.numSelectionCategories;
-
-
-  numMixtures = rhs.numMixtures;
-
-  return *this;
-}
-
-
 
 const unsigned Parameter::dM = 0;
 const unsigned Parameter::dEta = 1;
