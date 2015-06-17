@@ -991,19 +991,22 @@ void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 			if(acceptanceLevel < 0.2)
 			{
 				prev_std_csp[k] = std_csp[k];
-				std_csp[k] = std::max(0.01, std_csp[k] * 0.8);
+				std_csp[k] *= 0.8;
+				covarianceMatrix[i] *= 0.8;
+				covarianceMatrix[i].choleskiDecomposition();
 			}
 			if(acceptanceLevel > 0.3)
 			{
 				prev_std_csp[k] = std_csp[k];
-				std_csp[k] = std::min(10.0, std_csp[k] * 1.2);
+				std_csp[k] *= 1.2;
+				covarianceMatrix[i] *= 1.2;
+				covarianceMatrix[i].choleskiDecomposition();
 			}
 		}
 		if(prev_std_csp[codonRange[0]] != std_csp[codonRange[0]])
 		{
 			// rescale covariance matrix and decompose again
-			covarianceMatrix[i] *= std_csp[codonRange[0]];
-			covarianceMatrix[i].choleskiDecomposition();
+
 		}
 		numAcceptForMutationAndSelection[i] = 0u;
 	}
@@ -1069,14 +1072,17 @@ void ROCParameter::proposeCodonSpecificParameter()
 				proposediidSum[k] += covaryingNums[j] * covaryingNums[j];
 			}
 		}
+		//std::cout << "----------------------------------\n";
 		for(unsigned i = 0; i < numSelectionCategories; i++)
 		{
 			for(unsigned j = i * numCodons, l = aaRange[0]; j < (i * numCodons) + numCodons; j++, l++)
 			{
 				proposedSelectionParameter[i][l] = currentSelectionParameter[i][l] + covaryingNums[(numMutationCategories * numCodons) + j];
 				proposediidSum[k] += covaryingNums[(numMutationCategories * numCodons) + j] * covaryingNums[(numMutationCategories * numCodons) + j];
+				//std::cout << currentSelectionParameter[i][l] << " -> " << proposedSelectionParameter[i][l] << "\n";
 			}
 		}
+		//std::cout << "----------------------------------\n\n";
 	}
 
 

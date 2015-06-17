@@ -64,7 +64,7 @@ void CovarianceMatrix::initCovarianceMatrix(unsigned _numVariates)
 
     for(unsigned i = 0u; i < vectorLength; i++)
     {
-        covMatrix[i] = (i % (numVariates + 1) ? 0.0 : 1.0);
+        covMatrix[i] = (i % (numVariates + 1) ? 0.0 : 0.1);
         choleskiMatrix[i] = 0.0;
     }
 }
