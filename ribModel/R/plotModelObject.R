@@ -102,7 +102,7 @@ plotSinglePanel <- function(parameter, model, genome, expressionValues, samples,
   # calculate codon probabilities with respect to phi
   expression.range <- range(expressionValues)
   phis <- seq(from = expression.range[1], to = expression.range[2], by = 0.01)
-  codonProbability <- lapply(phis,  
+  codonProbability <- lapply(10^phis,  
                              function(phi){
                                model$CalculateProbabilitiesForCodons(mutation, selection, phi)
                              })
@@ -120,7 +120,7 @@ plotSinglePanel <- function(parameter, model, genome, expressionValues, samples,
   codonCounts[is.nan(codonCounts)] <- NA # necessary if AA does not appear in gene
   
   # make empty plot
-  plot(NULL, NULL, xlim=range(expressionValues, na.rm = T), ylim=c(-0.05,1.05), 
+  plot(NULL, NULL, xlim=range(expressionValues, na.rm = T) + c(-0.1, 0.05), ylim=c(-0.05,1.05), 
        xlab = "", ylab="", axes = FALSE)
   # bin expression values of genes
   quantiles <- quantile(expressionValues, probs = seq(0.05, 0.95, 0.05), na.rm = T)

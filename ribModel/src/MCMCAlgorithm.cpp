@@ -196,8 +196,8 @@ void MCMCAlgorithm::acceptRejectHyperParameter(int numGenes, ROCParameter& param
 	double revJump = 0.0;
 	if(curr_std_sphi != prev_std_sphi)
 	{
-		revJump_proposed = std::log(ROCParameter::densityNorm(proposedSphi, currentSphi, prev_std_sphi));
-		revJump = std::log(ROCParameter::densityNorm(currentSphi, proposedSphi, curr_std_sphi));
+		revJump_proposed = std::log(ROCParameter::densityNorm(std::log(proposedSphi), std::log(currentSphi), curr_std_sphi));
+		revJump = std::log(ROCParameter::densityNorm(std::log(currentSphi), std::log(proposedSphi), prev_std_sphi));
 	}
     logProbabilityRatio -= (std::log(currentSphi) - std::log(proposedSphi)) + (revJump_proposed - revJump);
     if(!std::isfinite(logProbabilityRatio))

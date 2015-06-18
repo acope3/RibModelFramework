@@ -100,7 +100,6 @@ void ROCModel::calculateCodonProbabilityVector(unsigned numCodons, double mutati
             minIndexVal = i;
         }
     }
-
     // if the min(selection) is less than zero than we have to adjust the reference codon.
     // if the reference codon is the min value (0) than we do not have to adjust the reference codon.
     // This is necessary to deal with very large phi values (> 10^4) and avoid  producing Inf which then
@@ -207,6 +206,7 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
 		revJumpRatio = -0.5 * (parameter.getProposedIidSum(SequenceSummary::AAToAAIndex(curAA)) -
 				parameter.getCurrentIidSum(SequenceSummary::AAToAAIndex(curAA)) );
 	}
+	// We do ont use a transformation here so no jacobian is necessary
     logAcceptanceRatioForAllMixtures = (likelihood_proposed - likelihood) - revJumpRatio;
 }
 

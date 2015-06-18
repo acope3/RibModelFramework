@@ -978,11 +978,17 @@ void ROCParameter::adaptExpressionProposalWidth(unsigned adaptationWidth)
 void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
 {
 	unsigned numCSPsets = numAcceptForMutationAndSelection.size();
+	std::cout << "acceptance ratio for amino acid:\n\t";
+	for(unsigned i = 0; i < numCSPsets; i++){
+		if(i == 21 || i == 10 || i == 18) continue;
+		std::cout << SequenceSummary::AminoAcidArray[i] << "\t";
+	}
+	std::cout << "\n\t";
 	for(unsigned i = 0; i < numCSPsets; i++)
 	{
 		if(i == 21 || i == 10 || i == 18) continue;
 		double acceptanceLevel = (double)numAcceptForMutationAndSelection[i] / (double)adaptationWidth;
-		std::cout << SequenceSummary::AminoAcidArray[i] << " acceptance ratio: " << acceptanceLevel << "\n";
+		std::cout << acceptanceLevel << "\t";
 		traces.updateCspAcceptanceRatioTrace(i, acceptanceLevel);
 		unsigned codonRange[2];
 		SequenceSummary::AAindexToCodonRange(i, true, codonRange);
@@ -1010,6 +1016,7 @@ void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 		}
 		numAcceptForMutationAndSelection[i] = 0u;
 	}
+	std::cout << "\n";
 }
 
 
