@@ -209,7 +209,7 @@ Gene& Genome::getGene(std::string id)
 	return genes[i-1];
 }
 
-void Genome::simulateGenome(ROCParameter& parameter, ROCModel& model)
+void Genome::simulateGenome(Model& model)
 {
 	unsigned i;
 	int j, k;
@@ -222,6 +222,8 @@ void Genome::simulateGenome(ROCParameter& parameter, ROCModel& model)
 	char curAA;
 	std::string tmpDesc;
 
+
+	/*
 	//std::srand(std::time(0));
 	simulatedGenes.resize(genes.size());
 	tmpDesc = "Simulated Gene";
@@ -280,6 +282,7 @@ void Genome::simulateGenome(ROCParameter& parameter, ROCModel& model)
 		Gene tmpGene(tmpSeq, tmpID, tmpDesc);
 		simulatedGenes[i] = tmpGene;
 	}
+*/
 }
 
 void Genome::clear()

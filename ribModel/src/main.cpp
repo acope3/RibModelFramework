@@ -5,8 +5,6 @@
 #include <sstream>
 
 #include "include/MCMCAlgorithm.h"
-#include "include/CovarianceMatrix.h"
-
 
 void testNumCodonsPerAA()
 {
@@ -38,7 +36,7 @@ void testLogNormDensity()
 	std::cout << "------------------ LOG NORM DENSITY ------------------" << std::endl;
 	for(int i = 0; i < 5; i++)
 	{
-		double result = std::log(ROCParameter::densityLogNorm(i, -1, 1));
+		double result = std::log(Parameter::densityLogNorm(i, -1, 1));
 		std::cout << "logP of " << i << "\t" << result << std::endl;
 	}
 	std::cout << "------------------ LOG NORM DENSITY ------------------" << std::endl;
@@ -49,7 +47,7 @@ void testSCUO(Genome& genome)
 	std::cout << "------------------ SCUO VALUES ------------------" << std::endl;
 	for(unsigned n = 0u; n < genome.getGenomeSize(); n++)
 	{
-		std::cout << genome.getGene(n).getId() << "\t" << ROCParameter::calculateSCUO(genome.getGene(n)) << std::endl;
+		std::cout << genome.getGene(n).getId() << "\t" << Parameter::calculateSCUO(genome.getGene(n)) << std::endl;
 	}
 	std::cout << "------------------ SCUO VALUES ------------------" << std::endl;
 }
@@ -100,7 +98,7 @@ void testRandMultiNom(unsigned numCat)
 	unsigned tmp;
 	for (int i = 0; i < 50; i++)
 	{
-		tmp = ROCParameter::randMultinom(probabilities, numCat);
+		tmp = Parameter::randMultinom(probabilities, numCat);
 		assignmentCounts[tmp] += 1;
 	}
 	std::cout <<"Printing dirichlet numbers:\n";
@@ -164,7 +162,6 @@ void testSimulateGenome(Genome& genome)
 	std::cout << "------------------ TEST SIMULATEGENOME ------------------" << std::endl;
 
 
-	ROCModel model;
 	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 	for(unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{
@@ -195,8 +192,9 @@ void testSimulateGenome(Genome& genome)
 	parameter.InitializeSynthesisRate(phiVals);
 
 	std::cout << "done initialize ROCParameter object" << std::endl;
+	ROCModel model(parameter);
 
-	genome.simulateGenome(parameter, model);
+	genome.simulateGenome(model);
 	std::vector <Gene> simGenes = genome.getSimulatedGenes();
 	unsigned aaRange[2];
 	std::cout <<"FREQUENCIES:\n";
@@ -307,7 +305,6 @@ int main()
 		//testSimulateGenome(genome);
 		testCovMatrixOverloading();
 	}else{
-		ROCModel model;
 		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 		for(unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
@@ -341,6 +338,7 @@ int main()
 		//std::vector<double> phiVals = parameter.readPhiValues("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrCleft_phi_est.csv");
 		//parameter.InitializeSynthesisRate(phiVals);
 		std::cout << "done initialize ROCParameter object" << std::endl;
+		ROCModel model(parameter);
 
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
 		int samples = 100;
@@ -361,7 +359,7 @@ int main()
 		scuoout.close();
 
 		std::cout << "starting MCMC" << std::endl;
-		mcmc.run(genome, model, parameter);
+		mcmc.run(genome, model);
 		std::cout << std::endl << "Finish MCMC" << std::endl;
 
 		std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;

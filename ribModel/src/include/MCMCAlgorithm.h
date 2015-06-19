@@ -2,11 +2,7 @@
 #define MCMCALGORITHM_H
 
 #include <vector>
-
-//#include "../include/Genome.h"
-#include "../include/ROCModel.h"
-//#include "../include/ROCParameter.h"
-
+#include "ROCModel.h"
 class MCMCAlgorithm
 {
     private:
@@ -20,9 +16,9 @@ class MCMCAlgorithm
 
         std::vector<double> likelihoodTrace;
 
-        double acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, ROCParameter& parameter, ROCModel& model, int iteration);
-        void acceptRejectCodonSpecificParameter(Genome& genome, ROCParameter& parameter, ROCModel& model, int iteration);
-        void acceptRejectHyperParameter(int numGenes, ROCParameter& parameter, ROCModel& model, int iteration);
+        double acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, Model& model, int iteration);
+        void acceptRejectCodonSpecificParameter(Genome& genome, Model& model, int iteration);
+        void acceptRejectHyperParameter(int numGenes, Model& model, int iteration);
 
     public:
         explicit MCMCAlgorithm();
@@ -31,7 +27,7 @@ class MCMCAlgorithm
         virtual ~MCMCAlgorithm();
         MCMCAlgorithm(const MCMCAlgorithm& other);
 
-        void run(Genome& genome, ROCModel& model, ROCParameter& parameter);
+        void run(Genome& genome, Model& model);
 
         bool isEstimateSynthesisRate() {return estimateSynthesisRate;}
         bool isEstimateCodonSpecificParameter() {return estimateCodonSpecificParameter;}

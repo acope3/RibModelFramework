@@ -4,7 +4,6 @@
 #include <iostream>
 #include <vector>
 #include <cctype>
-#include "SequenceSummary.h"
 #include "Trace.h"
 class ROCTrace : public Trace
 {

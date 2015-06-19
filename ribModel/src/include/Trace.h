@@ -6,7 +6,6 @@
 #include <cctype>
 #include "SequenceSummary.h"
 #include "thetaK.h"
-#include "Trace.h"
 
 class Trace
 {

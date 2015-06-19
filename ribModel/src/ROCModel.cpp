@@ -1,12 +1,11 @@
 #include "include/ROCModel.h"
-
 #include <vector>
 #include <math.h>
 #include <cfloat>
 #include <iostream>
-ROCModel::ROCModel()
+ROCModel::ROCModel(ROCParameter &_parameter) : Model()
 {
-    //ctor
+    parameter = &_parameter;
 }
 
 ROCModel::~ROCModel()
@@ -19,7 +18,7 @@ ROCModel::ROCModel(const ROCModel& other)
     //copy ctor
 }
 
-void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCParameter& parameter, unsigned k, double* logProbabilityRatio)
+void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio)
 {
     double logLikelihood = 0.0;
     double logLikelihood_proposed = 0.0;
@@ -27,12 +26,12 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCP
     SequenceSummary seqsum = gene.getSequenceSummary();
 
     // get correct index for everything
-    unsigned mutationCategory = parameter.getMutationCategory(k);
-    unsigned selectionCategory = parameter.getSelectionCategory(k);
-    unsigned expressionCategory = parameter.getSynthesisRateCategory(k);
+    unsigned mutationCategory = parameter->getMutationCategory(k);
+    unsigned selectionCategory = parameter->getSelectionCategory(k);
+    unsigned expressionCategory = parameter->getSynthesisRateCategory(k);
 
-    double phiValue = parameter.getSynthesisRate(geneIndex, expressionCategory, false);
-    double phiValue_proposed = parameter.getSynthesisRate(geneIndex, expressionCategory, true);
+    double phiValue = parameter->getSynthesisRate(geneIndex, expressionCategory, false);
+    double phiValue_proposed = parameter->getSynthesisRate(geneIndex, expressionCategory, true);
 	//#pragma omp parallel for
     for(int i = 0; i < 22; i++)
     {
@@ -42,13 +41,13 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCP
         // skip amino acids which do not occur in current gene. Avoid useless calculations and multiplying by 0
         if(seqsum.getAAcountForAA(i) == 0) continue;
 
-        // get codon count (total count not parameter count)
+        // get codon count (total count not parameter->count)
         int numCodons = seqsum.GetNumCodonsForAA(curAA);
-        // get mutation and selection parameter for gene
+        // get mutation and selection parameter->for gene
         double* mutation = new double[numCodons - 1]();
-        parameter.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
+        parameter->getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
         double* selection = new double[numCodons - 1]();
-        parameter.getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
+        parameter->getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
 
         // prepare array for codon counts for AA
         int* codonCount = new int[numCodons]();
@@ -66,7 +65,7 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCP
 		//std::cout <<"DONE deleting mutation selection codonCount\n";
     }
 
-    double sPhi = parameter.getSphi(false);
+    double sPhi = parameter->getSphi(false);
     double logPhiProbability = std::log(ROCParameter::densityLogNorm(phiValue, (-(sPhi * sPhi) / 2), sPhi));
     double logPhiProbability_proposed = std::log(ROCParameter::densityLogNorm(phiValue_proposed, (-(sPhi * sPhi) / 2), sPhi));
     double currentLogLikelihood = (logLikelihood + logPhiProbability);
@@ -74,8 +73,8 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCP
 
     // Take reverse jumb probability into account if phi proposal width is not identical.
     // If phi proposal width is identical, the term cancels and does not have to be calculated.
-    double curr_std_phi = parameter.getCurrentSynthesisRateProposalWidth(expressionCategory, geneIndex);
-    double prev_std_phi = parameter.getPreviousSynthesisRateProposalWidth(expressionCategory, geneIndex);
+    double curr_std_phi = parameter->getCurrentSynthesisRateProposalWidth(expressionCategory, geneIndex);
+    double prev_std_phi = parameter->getPreviousSynthesisRateProposalWidth(expressionCategory, geneIndex);
 	double revJump_proposed = 0.0;
 	double revJump = 0.0;
 	if(curr_std_phi != prev_std_phi)
@@ -153,7 +152,7 @@ double ROCModel::calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codo
     return logLikelihood;
 }
 
-void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& genome, ROCParameter& parameter, double& logAcceptanceRatioForAllMixtures)
+void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& genome, double& logAcceptanceRatioForAllMixtures)
 {
     int numGenes = genome.getGenomeSize();
     int numCodons = SequenceSummary::GetNumCodonsForAA(curAA);
@@ -166,25 +165,25 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
         if(seqsum.getAAcountForAA(curAA) == 0) continue;
 
         // which mixture element does this gene belong to
-        unsigned mixtureElement = parameter.getMixtureAssignment(i);
+        unsigned mixtureElement = parameter->getMixtureAssignment(i);
         // how is the mixture element defined. Which categories make it up
-        unsigned mutationCategory = parameter.getMutationCategory(mixtureElement);
-        unsigned selectionCategory = parameter.getSelectionCategory(mixtureElement);
-        unsigned expressionCategory = parameter.getSynthesisRateCategory(mixtureElement);
+        unsigned mutationCategory = parameter->getMutationCategory(mixtureElement);
+        unsigned selectionCategory = parameter->getSelectionCategory(mixtureElement);
+        unsigned expressionCategory = parameter->getSynthesisRateCategory(mixtureElement);
         // get phi value, calculate likelihood conditional on phi
-        double phiValue = parameter.getSynthesisRate(i, expressionCategory, false);
+        double phiValue = parameter->getSynthesisRate(i, expressionCategory, false);
 
         // get current mutation and selection parameter
         double* mutation = new double[numCodons - 1]();
-        parameter.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
+        parameter->getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
         double* selection = new double[numCodons - 1]();
-        parameter.getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
+        parameter->getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
 
         // get proposed mutation and selection parameter
         double* mutation_proposed = new double[numCodons - 1]();
-        parameter.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, true, mutation_proposed);
+        parameter->getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, true, mutation_proposed);
         double* selection_proposed = new double[numCodons - 1]();
-        parameter.getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, true, selection_proposed);
+        parameter->getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, true, selection_proposed);
 
         int* codonCount = new int[numCodons]();
         obtainCodonCount(seqsum, curAA, codonCount);
@@ -225,16 +224,3 @@ std::vector<double> ROCModel::CalculateProbabilitiesForCodons(std::vector<double
 	std::vector<double> returnVector(codonProb, codonProb + numCodons);
 	return returnVector;
 }
-
-#ifndef STANDALONE
-#include <Rcpp.h>
-using namespace Rcpp;
-
-RCPP_MODULE(ROCModel_mod)
-{
-	class_<ROCModel>( "ROCModel" )
-    .constructor("empty constructor")
-    .method("CalculateProbabilitiesForCodons", &ROCModel::CalculateProbabilitiesForCodons, "Calculated codon probabilities. Input is one element shorter than output")
-	;
-}
-#endif

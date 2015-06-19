@@ -10,10 +10,7 @@
 #include <Rcpp.h>
 #endif
 
-#include "Genome.h"
-#include "CovarianceMatrix.h"
 #include "ROCTrace.h"
-#include "Trace.h"
 #include "Parameter.h"
 
 class ROCParameter : public Parameter

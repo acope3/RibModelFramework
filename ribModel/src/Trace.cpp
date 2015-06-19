@@ -21,7 +21,7 @@ void Trace::initAllTraces(unsigned samples, unsigned num_genes, unsigned numSele
 
 void Trace::initBaseTraces(unsigned samples, unsigned num_genes, unsigned numSelectionCategories, unsigned numMixtures, std::vector<thetaK> &_categories)
 {
-	//numSelectionCategories always == numExpressionCategories, so only one is passed in for convience
+	//numSelectionCategories always == numSynthesisRateCategories, so only one is passed in for convience
 	initSphiTrace(samples);
 	initSynthesisRateAcceptanceRatioTrace(samples, num_genes, numSelectionCategories);
 	cspAcceptanceRatioTrace.resize(22);
@@ -56,20 +56,20 @@ void Trace::initSphiTrace(unsigned samples)
 }
 
 
-void Trace::initSynthesisRateAcceptanceRatioTrace(unsigned samples, unsigned num_genes, unsigned numExpressionCategories)
+void Trace::initSynthesisRateAcceptanceRatioTrace(unsigned samples, unsigned num_genes, unsigned numSynthesisRateCategories)
 {
-	synthesisRateAcceptanceRatioTrace.resize(numExpressionCategories);
-	for(unsigned category = 0; category < numExpressionCategories; category++)
+	synthesisRateAcceptanceRatioTrace.resize(numSynthesisRateCategories);
+	for(unsigned category = 0; category < numSynthesisRateCategories; category++)
 	{
 		synthesisRateAcceptanceRatioTrace[category].resize(num_genes);
 	}
 }
 
 
-void Trace::initSynthesisRateTrace(unsigned samples, unsigned num_genes, unsigned numExpressionCategories)
+void Trace::initSynthesisRateTrace(unsigned samples, unsigned num_genes, unsigned numSynthesisRateCategories)
 {
-	synthesisRateTrace.resize(numExpressionCategories);
-	for(unsigned category = 0; category < numExpressionCategories; category++)
+	synthesisRateTrace.resize(numSynthesisRateCategories);
+	for(unsigned category = 0; category < numSynthesisRateCategories; category++)
 	{
 		synthesisRateTrace[category].resize(num_genes);
 		for(unsigned i = 0; i < num_genes; i++)
@@ -111,7 +111,8 @@ std::vector<double> Trace::getExpectedPhiTrace()
 	{
 		for (unsigned geneIndex = 0; geneIndex < numGenes; geneIndex++)
 		{
-			unsigned category = mixtureAssignmentTrace[geneIndex][sample];
+			unsigned mixtureElement = mixtureAssignmentTrace[geneIndex][sample];
+      unsigned category = getSynthesisRateCategory(mixtureElement);
 			RV[sample] += synthesisRateTrace[category][geneIndex][sample];
 		}
 		RV[sample] /= numGenes;
@@ -142,7 +143,8 @@ std::vector<double> Trace::getSynthesisRateTraceForGene(unsigned geneIndex)
 	std::vector<double> returnVector(traceLength, 0.0);
 	for(unsigned i = 0u; i < traceLength; i++)
 	{
-		unsigned category = mixtureAssignmentTrace[geneIndex][i];
+		unsigned mixtureElement = mixtureAssignmentTrace[geneIndex][i];
+    unsigned category = getSynthesisRateCategory(mixtureElement);
 		returnVector[i] =  synthesisRateTrace[category][geneIndex][i];
 	}
 	return returnVector;
@@ -162,11 +164,11 @@ void Trace::updateSynthesisRateAcceptanceRatioTrace(unsigned category, unsigned 
 }
 
 
-void Trace::updateSynthesisRateTrace(unsigned sample, unsigned geneIndex, std::vector<std::vector <double>> &currentExpressionLevel)
+void Trace::updateSynthesisRateTrace(unsigned sample, unsigned geneIndex, std::vector<std::vector <double>> &currentSynthesisRateLevel)
 {
 	for(unsigned category = 0; category < synthesisRateTrace.size(); category++)
 	{
-		synthesisRateTrace[category][geneIndex][sample] = currentExpressionLevel[category][geneIndex];
+		synthesisRateTrace[category][geneIndex][sample] = currentSynthesisRateLevel[category][geneIndex];
 	}
 }
 

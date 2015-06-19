@@ -12,8 +12,7 @@
 //IMPORTANT NOTE: forward declarations used. Includes are in genome.cpp. 
 //Used to solve circular dependices. See http://www.cplusplus.com/forum/general/125/
 //for more information.
-class ROCParameter;
-class ROCModel;
+class Model;
 
 
 class Genome
@@ -36,7 +35,7 @@ class Genome
 		std::vector <Gene> getSimulatedGenes() {return simulatedGenes;}
 		Gene& getGene(unsigned index);
 		Gene& getGene(std::string id);
-		void simulateGenome(ROCParameter& parameter, ROCModel& model);
+		void simulateGenome(Model& model);
 		unsigned getGenomeSize() {return genes.size();}
 		void clear();
 		Genome getGenomeForGeneIndicies(std::vector <unsigned> indicies);
