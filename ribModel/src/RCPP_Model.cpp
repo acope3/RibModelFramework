@@ -1,5 +1,5 @@
 #ifndef STANDALONE
-#include "include/Model.h"
+#include "include/ROCModel.h"
 #include <Rcpp.h>
 using namespace Rcpp;
 RCPP_EXPOSED_CLASS(ROCParameter)
@@ -12,7 +12,7 @@ RCPP_MODULE(Model_mod)
 
   class_<ROCModel>( "ROCModel" )
     .derives<Model>("Model")
-		.constructor<ROCParameter>()
+//		.constructor<ROCParameter>()
     .method("CalculateProbabilitiesForCodons", &ROCModel::CalculateProbabilitiesForCodons, "Calculated codon probabilities. Input is one element shorter than output")
   ;
 }

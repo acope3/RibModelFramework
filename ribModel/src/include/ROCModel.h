@@ -12,9 +12,9 @@ class ROCModel : public Model
         virtual void obtainCodonCount(SequenceSummary& seqsum, char curAA, int codonCount[]);
         virtual double calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codonCount[], double mutation[], double selection[], double phiValue);
     public:
-        explicit ROCModel(ROCParameter& _parameter);
+        ROCModel(ROCParameter& _parameter);
         virtual ~ROCModel();
-        ROCModel(const ROCModel& other);
+        //ROCModel(const ROCModel& other);
 
         virtual void calculateCodonProbabilityVector(unsigned numCodons, double* mutation, double* selection, double phi, double* codonProb);
         // Likelihood ratio functions

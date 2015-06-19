@@ -13,11 +13,11 @@ ROCModel::~ROCModel()
     //dtor
 }
 
-ROCModel::ROCModel(const ROCModel& other)
+/*ROCModel::ROCModel(const ROCModel& other)
 {
     //copy ctor
 }
-
+*/
 void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio)
 {
     double logLikelihood = 0.0;

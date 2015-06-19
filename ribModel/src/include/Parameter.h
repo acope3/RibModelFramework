@@ -61,7 +61,7 @@ class Parameter
 				std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer = true, std::string _mutationSelectionState = "allUnique");
 		Parameter(const Parameter& other);
     Parameter& operator=(const Parameter& rhs);
-
+		virtual ~Parameter() {}
 		bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);
 
 
