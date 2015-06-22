@@ -1,110 +1,3 @@
-cm$setCovarianceMatrix(c(25,15,-5, 15,18,0, -5,0,11))
-A = matrix(c(25,15,-5, 15,18,0, -5,0,11), nrow = 3)
-A
-cm$setCovarianceMatrix(A)
-cm$printCovarianceMatrix()
-library(ribModel)#
-genome <- new(Genome)#
-genome$readFasta("../ribModel/data/Skluyveri_ChrA_andCleft.fasta", F)#
-sphi_init <- 2;#
-numMixtures <- 2;#
-mixDef <- "allUnique";#
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))#
-parameter <- new(ROCParameter, genome$getGenomeSize(), sphi_init, numMixtures, geneAssignment, T, mixDef)#
-parameter$initializeExpressionByGenome(genome, sphi_init)#
-files <- c("../ribModel/data/Skluyveri_CSP_ChrA.csv", "../ribModel/data/Skluyveri_CSP_ChrCleft.csv")#
-parameter$initMutationSelectionCategories(files, 2, "Mutation")#
-parameter$initMutationSelectionCategories(files, 2, "Selection")
-A = matrix(c(2, 4, 3, 1), nrow = 2, ncol = 2, byrow = TRUE)
-parameter$initCovarianceMatrix( A, "A" )
-cm <- parameter$getCovarianceMatrixForAA("a")
-cm$printCovarianceMatrix()
-A
-library(ribModel)#
-genome <- new(Genome)#
-genome$readFasta("../ribModel/data/Skluyveri_ChrA_andCleft.fasta", F)#
-sphi_init <- 2;#
-numMixtures <- 2;#
-mixDef <- "allUnique";#
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))#
-parameter <- new(ROCParameter, genome$getGenomeSize(), sphi_init, numMixtures, geneAssignment, T, mixDef)#
-parameter$initializeExpressionByGenome(genome, sphi_init)#
-files <- c("../ribModel/data/Skluyveri_CSP_ChrA.csv", "../ribModel/data/Skluyveri_CSP_ChrCleft.csv")#
-parameter$initMutationSelectionCategories(files, 2, "Mutation")#
-parameter$initMutationSelectionCategories(files, 2, "Selection")#
-#
-#check to see if the initCovarianceMatrix is working for ROCParameter#
-A = matrix(c(2, 4, 3, 1), nrow = 2, ncol = 2, byrow = TRUE)#
- parameter$initCovarianceMatrix( A, "A" )#
-cm <- parameter$getCovarianceMatrixForAA("a")#
-cm$printCovarianceMatrix()#
-A
-parameter$initSelection( c(1.2, 3.4, 5.0), "A" )
-parameter$initSelection( c(1.2, 3.4, 5.0), 1, "A" )
-library(ribModel)
-genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")
-library(ribModel)
-genome <- new(Genome)
-genome$readFasta("../ribModel/data/Skluyveri_ChrA_andCleft.fasta", F)
-sphi_init <- 2;
-numMixtures <- 2;
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
-numMixtures <- 3;
-A = matrix(c(1,2,3,1,2,2), nrow = 3, ncol = 2, byrow = TRUE)
-parameter <- new(ROCParameter, genome$getGenomeSize(), sphi_init, numMixtures, geneAssignment, A, T)
-library(ribModel)#
-#
-#read genome#
-genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")
-#initialize parameter object#
-sphi_init <- 2;#
-numMixtures <- 2;#
-mixDef <- "allUnique";
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
-parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
-parameter <- initializeParameterObject(sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
-library(ribModel)#
-#
-#read genome#
-genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")#
-#
-#initialize parameter object#
-sphi_init <- 2;#
-numMixtures <- 2;#
-mixDef <- "allUnique";#
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
-parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
-parameter <- initializeParameterObject(sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
-sphi_init
-numMixtures
-geneAssignment
-split.serine
-mixture.definition
-library(ribModel)#
-#
-#read genome#
-genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")#
-#
-#initialize parameter object#
-sphi_init <- 2;#
-numMixtures <- 2;#
-mixDef <- "allUnique";#
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
-parameter <- initializeParameterObject(sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
-parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
-parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef)
-parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef, NULL)
-parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef)
-A = matrix(c(2, 4, 3, 1), nrow = 2, ncol = 2, byrow = TRUE)
-parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef, A)
-library(ribModel)
-genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")
-sphi_init <- 2;
-sphi_init <- 2;#
-numMixtures <- 2;#
-mixDef <- "allUnique";#
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
-p <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
 library(ribModel)#
 #
 #read genome#
@@ -773,4 +666,362 @@ plot(trace, what = "ExpectedPhi")
 plot(trace, what = "Expression", geneIndex = 905)
 plot(trace, what = "Mutation", mixture = 1)
 plot(trace, what = "Selection", mixture = 1)
+plot(model, genome, parameter, samples = samples*0.1, mixture = 1, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
+library(ribModel)
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")
+sphi_init <- 2;
+numMixtures <- 2;
+mixDef <- "allUnique";
+geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
+samples <- 100
+thining <- 10
+adaptiveWidth <- 100
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth,
+est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
+model <- initializeModelObject("ROC")
+system.time(#
+  runMCMC(mcmc, genome, model, parameter)#
+)
+system.time(#
+  runMCMC(mcmc, genome, model)#
+)
+mcmc$run( genome, model)
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))#
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
+# initialize MCMC object#
+samples <- 100#
+thining <- 10#
+adaptiveWidth <- 100#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
+# get model object#
+model <- initializeModelObject("ROC")
+model$setParameter( parameter)
+mcmc$run(genome, model)
+plot(mcmc)
+trace <- parameter$getTraceObject()
+plot(trace, what = "MixtureProbability")
+plot(trace, what = "SPhi")
+plot(trace, what = "ExpectedPhi")
+plot(trace, what = "Expression", geneIndex = 905)
+plot(trace, what = "Mutation", mixture = 1)
+plot(trace, what = "Selection", mixture = 1)
+plot(model, genome, parameter, samples = samples*0.1, mixture = 1, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
+mcmc$run(genome, model)
+phivals <- parameter$readPhiValues( "../ribModel/data/simulatedSelectionSharedR_phi.csv" )
+parameter$initializeExpressionByRandom(phivals)
+parameter$initializeSynthesisRateByRandom(phivals)
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,500), rep(2,500))#
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)#
+ phivals <- parameter$readPhiValues( "../ribModel/data/simulatedSelectionSharedR_phi.csv" )#
+ parameter$initializeSynthesisRateByRandom(phivals)#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")#
+# initialize MCMC object#
+samples <- 100#
+thining <- 10#
+adaptiveWidth <- 100#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
+# get model object#
+model <- initializeModelObject("ROC")
+model$setParameter(parameter)
+mcmc$run(genome, model)
+plot(mcmc)
+trace <- parameter$getTraceObject()
+plot(trace, what = "MixtureProbability")
+plot(trace, what = "SPhi")
+plot(trace, what = "ExpectedPhi")
+plot(trace, what = "Expression", geneIndex = 905)
+plot(trace, what = "Mutation", mixture = 1)
+plot(trace, what = "Selection", mixture = 1)
+plot(model, genome, parameter, samples = samples*0.1, mixture = 1, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
+plot.Rcpp_ROCModel <- function(model, genome, parameter, samples = 100, mixture = 1, estim.Expression = TRUE, ...)#
+{#
+  opar <- par(no.readonly = T) #
+  input_list <- as.list(list(...))#
+  if("main" %in% names(input_list)){#
+    main <- input_list$main#
+    input_list$main <- NULL#
+  }else{#
+    main <- ""#
+  }#
+  mat <- matrix(c(rep(1, 4), 2:21, rep(22, 4)),#
+                nrow = 7, ncol = 4, byrow = TRUE)#
+  mat <- cbind(rep(23, 7), mat, rep(24, 7))#
+  nf <- layout(mat, c(3, rep(8, 4), 2), c(3, 8, 8, 8, 8, 8, 3), respect = FALSE)#
+  ### Plot title.#
+  par(mar = c(0, 0, 0, 0))#
+  plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)#
+  text(0.5, 0.6, main)#
+  text(0.5, 0.4, date(), cex = 0.6)#
+  num.genes <- genome$getGenomeSize()#
+  mixtureAssignment <- unlist(lapply(1:num.genes,  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))#
+  genes.in.mixture <- which(mixtureAssignment == mixture)#
+  expressionCategory <- parameter$getSynthesisRateCategoryForMixture(mixture)#
+  # need expression values to know range#
+  num.genes <- length(genes.in.mixture)#
+  if(estim.Expression){ # use estimated expression values#
+    expressionValues <- unlist(lapply(genes.in.mixture, function(geneIndex){#
+      parameter$getExpressionPosteriorMeanByMixtureElementForGene(samples, geneIndex, expressionCategory)#
+    }))  #
+  }else{ # use empirical expression values#
+  }#
+  expressionValues <- log10(expressionValues)#
+  genome <- genome$getGenomeForGeneIndicies(genes.in.mixture)#
+  names.aa <- aminoAcids()#
+  for(aa in names.aa)#
+  {#
+    if(aa == "M" || aa == "W" || aa == "X") next#
+    plotSinglePanel(parameter, model, genome, expressionValues, samples, mixture, aa)#
+    box()#
+    main.aa <- aa #TODO map to three letter code#
+    text(0, 1, main.aa, cex = 1.5)#
+    if(aa %in% c("A", "F", "K", "Q", "V")){#
+      axis(2, las=1)#
+    }#
+    if(aa %in% c("T", "V", "Y", "Z")){#
+      axis(1)#
+    }#
+    if(aa %in% c("A", "C", "D", "E")){#
+      axis(3)#
+    }#
+    if(aa %in% c("E", "I", "P", "T")){#
+      axis(4, las=1)#
+    }#
+    axis(1, tck = 0.02, labels = FALSE)#
+    axis(2, tck = 0.02, labels = FALSE)#
+    axis(3, tck = 0.02, labels = FALSE)#
+    axis(4, tck = 0.02, labels = FALSE)    #
+  }#
+  ## adding a histogram of phi values to plot#
+  hist.values <- hist(expressionValues, plot=FALSE, nclass=30)#
+  plot(hist.values, axes = FALSE, main="", xlab = "", ylab = "")#
+  axis(1)#
+  axis(4, las=1)#
+  ### Plot xlab.#
+  plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)#
+  text(0.5, 0.2, expression("log"[10]~"(Protein Synthesis Rate"~phi~")"))  #
+  #text(0.5, 0.5, "Production Rate (log10)")#
+  ### Plot ylab.#
+  plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)#
+  text(0.5, 0.5, "Propotion", srt = 90)#
+  par(opar)#
+}#
+#
+plotSinglePanel <- function(parameter, model, genome, expressionValues, samples, mixture, aa)#
+{#
+  codons <- AAToCodon(aa, T)#
+  # get codon specific parameter#
+  selection <- vector("numeric", length(codons))#
+  mutation <- vector("numeric", length(codons))#
+  for(i in 1:length(codons))#
+  {#
+    selection[i] <- parameter$getSelectionPosteriorMeanForCodon(mixture, samples, codons[i])#
+    mutation[i] <- parameter$getMutationPosteriorMeanForCodon(mixture, samples, codons[i])#
+  }#
+  # calculate codon probabilities with respect to phi#
+  expression.range <- range(expressionValues)#
+  phis <- seq(from = expression.range[1], to = expression.range[2], by = 0.01)#
+  codonProbability <- lapply(phis,  #
+                             function(phi){#
+                               model$CalculateProbabilitiesForCodons(mutation, selection, phi)#
+                             })#
+  #get codon counts#
+  codons <- AAToCodon(aa, F)#
+  codonCounts <- vector("list", length(codons))#
+  for(i in 1:length(codons))#
+  {#
+    codonCounts[[i]] <- genome$getCodonCountsPerGene(codons[i])#
+  }#
+  codonCounts <- do.call("cbind", codonCounts)#
+  # codon proportions#
+  codonCounts <- codonCounts / rowSums(codonCounts)#
+  codonCounts[is.nan(codonCounts)] <- NA # necessary if AA does not appear in gene#
+  # make empty plot#
+  plot(NULL, NULL, xlim=range(expressionValues, na.rm = T), ylim=c(-0.05,1.05), #
+       xlab = "", ylab="", axes = FALSE)#
+  # bin expression values of genes#
+  quantiles <- quantile(expressionValues, probs = seq(0.05, 0.95, 0.05), na.rm = T)#
+  for(i in 1:length(quantiles))#
+  {#
+    if(i == 1){#
+      tmp.id <- expressionValues < quantiles[i]#
+    }else if(i == length(quantiles)){#
+      tmp.id <- expressionValues > quantiles[i]#
+    }else{#
+      tmp.id <- expressionValues > quantiles[i] & expressionValues < quantiles[i + 1]#
+    }#
+    means <- colMeans(codonCounts[tmp.id,], na.rm = T)#
+    std <- apply(codonCounts[tmp.id,], 2, sd, na.rm = T)#
+    for(k in 1:length(codons))#
+    {#
+      points(median(expressionValues[tmp.id]), means[k], #
+             col=ribModel:::.codonColors[[ codons[k] ]] , pch=19, cex = 0.5)#
+      lines(rep(median(expressionValues[tmp.id]),2), c(means[k]-std[k], means[k]+std[k]), #
+            col=ribModel:::.codonColors[[ codons[k] ]], lwd=0.8)#
+    }#
+  }#
+  codonProbability <- do.call("rbind", codonProbability)#
+  for(i in 1:length(codons))#
+  {#
+    lines(phis, codonProbability[, i], col=ribModel:::.codonColors[[ codons[i] ]])#
+  }#
+  colors <- unlist(ribModel:::.codonColors[codons])#
+  legend("topleft", legend = codons, col=colors, bty = "n", lty=1, cex=0.75)  #
+}
+plot(model, genome, parameter, samples = samples*0.1, mixture = 1, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
+plot.Rcpp_ROCModel <- function(model, genome, parameter, samples = 100, mixture = 1, estim.Expression = TRUE, ...)#
+{#
+  opar <- par(no.readonly = T) #
+  input_list <- as.list(list(...))#
+  if("main" %in% names(input_list)){#
+    main <- input_list$main#
+    input_list$main <- NULL#
+  }else{#
+    main <- ""#
+  }#
+  mat <- matrix(c(rep(1, 4), 2:21, rep(22, 4)),#
+                nrow = 7, ncol = 4, byrow = TRUE)#
+  mat <- cbind(rep(23, 7), mat, rep(24, 7))#
+  nf <- layout(mat, c(3, rep(8, 4), 2), c(3, 8, 8, 8, 8, 8, 3), respect = FALSE)#
+  ### Plot title.#
+  par(mar = c(0, 0, 0, 0))#
+  plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)#
+  text(0.5, 0.6, main)#
+  text(0.5, 0.4, date(), cex = 0.6)#
+  num.genes <- genome$getGenomeSize()#
+  mixtureAssignment <- unlist(lapply(1:num.genes,  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))#
+  genes.in.mixture <- which(mixtureAssignment == mixture)#
+  expressionCategory <- parameter$getSynthesisRateCategoryForMixture(mixture)#
+  # need expression values to know range#
+  num.genes <- length(genes.in.mixture)#
+  if(estim.Expression){ # use estimated expression values#
+    expressionValues <- unlist(lapply(genes.in.mixture, function(geneIndex){#
+      parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(samples, geneIndex, expressionCategory)#
+    }))  #
+  }else{ # use empirical expression values#
+  }#
+  expressionValues <- log10(expressionValues)#
+  genome <- genome$getGenomeForGeneIndicies(genes.in.mixture)#
+  names.aa <- aminoAcids()#
+  for(aa in names.aa)#
+  {#
+    if(aa == "M" || aa == "W" || aa == "X") next#
+    plotSinglePanel(parameter, model, genome, expressionValues, samples, mixture, aa)#
+    box()#
+    main.aa <- aa #TODO map to three letter code#
+    text(0, 1, main.aa, cex = 1.5)#
+    if(aa %in% c("A", "F", "K", "Q", "V")){#
+      axis(2, las=1)#
+    }#
+    if(aa %in% c("T", "V", "Y", "Z")){#
+      axis(1)#
+    }#
+    if(aa %in% c("A", "C", "D", "E")){#
+      axis(3)#
+    }#
+    if(aa %in% c("E", "I", "P", "T")){#
+      axis(4, las=1)#
+    }#
+    axis(1, tck = 0.02, labels = FALSE)#
+    axis(2, tck = 0.02, labels = FALSE)#
+    axis(3, tck = 0.02, labels = FALSE)#
+    axis(4, tck = 0.02, labels = FALSE)    #
+  }#
+  ## adding a histogram of phi values to plot#
+  hist.values <- hist(expressionValues, plot=FALSE, nclass=30)#
+  plot(hist.values, axes = FALSE, main="", xlab = "", ylab = "")#
+  axis(1)#
+  axis(4, las=1)#
+  ### Plot xlab.#
+  plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)#
+  text(0.5, 0.2, expression("log"[10]~"(Protein Synthesis Rate"~phi~")"))  #
+  #text(0.5, 0.5, "Production Rate (log10)")#
+  ### Plot ylab.#
+  plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)#
+  text(0.5, 0.5, "Propotion", srt = 90)#
+  par(opar)#
+}#
+#
+plotSinglePanel <- function(parameter, model, genome, expressionValues, samples, mixture, aa)#
+{#
+  codons <- AAToCodon(aa, T)#
+  # get codon specific parameter#
+  selection <- vector("numeric", length(codons))#
+  mutation <- vector("numeric", length(codons))#
+  for(i in 1:length(codons))#
+  {#
+    selection[i] <- parameter$getSelectionPosteriorMeanForCodon(mixture, samples, codons[i])#
+    mutation[i] <- parameter$getMutationPosteriorMeanForCodon(mixture, samples, codons[i])#
+  }#
+  # calculate codon probabilities with respect to phi#
+  expression.range <- range(expressionValues)#
+  phis <- seq(from = expression.range[1], to = expression.range[2], by = 0.01)#
+  codonProbability <- lapply(phis,  #
+                             function(phi){#
+                               model$CalculateProbabilitiesForCodons(mutation, selection, phi)#
+                             })#
+  #get codon counts#
+  codons <- AAToCodon(aa, F)#
+  codonCounts <- vector("list", length(codons))#
+  for(i in 1:length(codons))#
+  {#
+    codonCounts[[i]] <- genome$getCodonCountsPerGene(codons[i])#
+  }#
+  codonCounts <- do.call("cbind", codonCounts)#
+  # codon proportions#
+  codonCounts <- codonCounts / rowSums(codonCounts)#
+  codonCounts[is.nan(codonCounts)] <- NA # necessary if AA does not appear in gene#
+  # make empty plot#
+  plot(NULL, NULL, xlim=range(expressionValues, na.rm = T), ylim=c(-0.05,1.05), #
+       xlab = "", ylab="", axes = FALSE)#
+  # bin expression values of genes#
+  quantiles <- quantile(expressionValues, probs = seq(0.05, 0.95, 0.05), na.rm = T)#
+  for(i in 1:length(quantiles))#
+  {#
+    if(i == 1){#
+      tmp.id <- expressionValues < quantiles[i]#
+    }else if(i == length(quantiles)){#
+      tmp.id <- expressionValues > quantiles[i]#
+    }else{#
+      tmp.id <- expressionValues > quantiles[i] & expressionValues < quantiles[i + 1]#
+    }#
+    means <- colMeans(codonCounts[tmp.id,], na.rm = T)#
+    std <- apply(codonCounts[tmp.id,], 2, sd, na.rm = T)#
+    for(k in 1:length(codons))#
+    {#
+      points(median(expressionValues[tmp.id]), means[k], #
+             col=ribModel:::.codonColors[[ codons[k] ]] , pch=19, cex = 0.5)#
+      lines(rep(median(expressionValues[tmp.id]),2), c(means[k]-std[k], means[k]+std[k]), #
+            col=ribModel:::.codonColors[[ codons[k] ]], lwd=0.8)#
+    }#
+  }#
+  codonProbability <- do.call("rbind", codonProbability)#
+  for(i in 1:length(codons))#
+  {#
+    lines(phis, codonProbability[, i], col=ribModel:::.codonColors[[ codons[i] ]])#
+  }#
+  colors <- unlist(ribModel:::.codonColors[codons])#
+  legend("topleft", legend = codons, col=colors, bty = "n", lty=1, cex=0.75)  #
+}
 plot(model, genome, parameter, samples = samples*0.1, mixture = 1, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")

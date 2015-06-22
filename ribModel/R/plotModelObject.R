@@ -28,13 +28,13 @@ plot.Rcpp_ROCModel <- function(model, genome, parameter, samples = 100, mixture 
   
   mixtureAssignment <- unlist(lapply(1:num.genes,  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))
   genes.in.mixture <- which(mixtureAssignment == mixture)
-  expressionCategory <- parameter$getExpressionCategoryForMixture(mixture)
+  expressionCategory <- parameter$getSynthesisRateCategoryForMixture(mixture)
   
   # need expression values to know range
   num.genes <- length(genes.in.mixture)
   if(estim.Expression){ # use estimated expression values
     expressionValues <- unlist(lapply(genes.in.mixture, function(geneIndex){
-      parameter$getExpressionPosteriorMeanByMixtureElementForGene(samples, geneIndex, expressionCategory)
+      parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(samples, geneIndex, expressionCategory)
     }))  
   }else{ # use empirical expression values
     
@@ -102,7 +102,7 @@ plotSinglePanel <- function(parameter, model, genome, expressionValues, samples,
   # calculate codon probabilities with respect to phi
   expression.range <- range(expressionValues)
   phis <- seq(from = expression.range[1], to = expression.range[2], by = 0.01)
-  codonProbability <- lapply(phis,  
+  codonProbability <- lapply(10^phis,  
                              function(phi){
                                model$CalculateProbabilitiesForCodons(mutation, selection, phi)
                              })
