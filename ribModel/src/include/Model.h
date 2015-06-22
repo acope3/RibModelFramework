@@ -20,7 +20,7 @@ class Model
     		virtual double getSphi(bool proposed = false) =0;
 				virtual double getSphiProposalWidth() =0;
 				virtual unsigned getNumMixtureElements() =0;
-				virtual unsigned getCategoryProbability(unsigned i) =0;
+				virtual double getCategoryProbability(unsigned i) =0;
 				virtual void proposeCodonSpecificParameter() =0;
 				virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth) =0;
 				virtual void updateCodonSpecificParameter(char aa) =0;

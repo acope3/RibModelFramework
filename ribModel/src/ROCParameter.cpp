@@ -15,7 +15,7 @@ ROCParameter::ROCParameter() : Parameter()
 {
 	std::vector<unsigned> empty(100, 1);
 	std::vector<std::vector <unsigned>> empty2;
-//	initParameterSet(2, 1, empty, empty2, true, "allUnique");
+	//	initParameterSet(2, 1, empty, empty2, true, "allUnique");
 	//initParameter(); 
 	initROCParameterSet();
 }
@@ -41,7 +41,7 @@ ROCParameter::ROCParameter(double sphi, std::vector<unsigned> geneAssignment, st
 }
 
 ROCParameter::ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState) :
-		Parameter()
+	Parameter()
 {
 	std::vector<std::vector<unsigned>> thetaKMatrix;
 	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
@@ -52,7 +52,7 @@ ROCParameter::ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsig
 
 
 ROCParameter::ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix, 
-	bool splitSer, std::string _mutationSelectionState) : Parameter()
+		bool splitSer, std::string _mutationSelectionState) : Parameter()
 {
 	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
 	initROCParameterSet();
@@ -67,10 +67,10 @@ ROCParameter::~ROCParameter()
 ROCParameter::ROCParameter(const ROCParameter& other) : Parameter(other)
 {
 
-  // proposal bias and std for codon specific parameter
-  bias_csp = other.bias_csp;
-  std_csp = other.std_csp;
-  prev_std_csp = other.prev_std_csp;
+	// proposal bias and std for codon specific parameter
+	bias_csp = other.bias_csp;
+	std_csp = other.std_csp;
+	prev_std_csp = other.prev_std_csp;
 
 	currentMutationParameter = other.currentMutationParameter;
 	proposedMutationParameter = other.proposedMutationParameter;
@@ -84,13 +84,13 @@ ROCParameter::ROCParameter(const ROCParameter& other) : Parameter(other)
 ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
 {
 	if (this == &rhs) return *this; // handle self assignment
-	
+
 	Parameter::operator=(rhs);
 
-  // proposal bias and std for codon specific parameter
-  bias_csp = rhs.bias_csp;
-  std_csp = rhs.std_csp;
-  prev_std_csp = rhs.prev_std_csp;
+	// proposal bias and std for codon specific parameter
+	bias_csp = rhs.bias_csp;
+	std_csp = rhs.std_csp;
+	prev_std_csp = rhs.prev_std_csp;
 
 	currentMutationParameter = rhs.currentMutationParameter;
 	proposedMutationParameter = rhs.proposedMutationParameter;
@@ -106,39 +106,39 @@ ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
 
 void ROCParameter::initROCParameterSet()
 {
-  // proposal bias and std for codon specific parameter
-  bias_csp = 0;
-  std_csp.resize(numParam, 0.1); //TODO hase to be initialized with 1 when switched to the covariance matrix!!!
-  prev_std_csp.resize(numParam, 0.1); //TODO hase to be initialized with 1 when switched to the covariance matrix!!!
-  numAcceptForMutationAndSelection.resize(22, 0u);
+	// proposal bias and std for codon specific parameter
+	bias_csp = 0;
+	std_csp.resize(numParam, 0.1); //TODO hase to be initialized with 1 when switched to the covariance matrix!!!
+	prev_std_csp.resize(numParam, 0.1); //TODO hase to be initialized with 1 when switched to the covariance matrix!!!
+	numAcceptForMutationAndSelection.resize(22, 0u);
 
-  phiEpsilon = 0.1;
-  phiEpsilon_proposed = 0.1;
+	phiEpsilon = 0.1;
+	phiEpsilon_proposed = 0.1;
 
-  //may need getter fcts
-  currentMutationParameter.resize(numMutationCategories);
-  proposedMutationParameter.resize(numMutationCategories);
+	//may need getter fcts
+	currentMutationParameter.resize(numMutationCategories);
+	proposedMutationParameter.resize(numMutationCategories);
 
-  for (unsigned i = 0u; i < numMutationCategories; i++)
-  {
-    std::vector<double> tmp(numParam, 0.0);
-    currentMutationParameter[i] = tmp;
-    proposedMutationParameter[i] = tmp;
-  }
-
-
-  currentSelectionParameter.resize(numSelectionCategories);
-  proposedSelectionParameter.resize(numSelectionCategories);
+	for (unsigned i = 0u; i < numMutationCategories; i++)
+	{
+		std::vector<double> tmp(numParam, 0.0);
+		currentMutationParameter[i] = tmp;
+		proposedMutationParameter[i] = tmp;
+	}
 
 
-  for (unsigned i = 0u; i < numSelectionCategories; i++)
-  {
-    std::vector<double> tmp(numParam, 0.0);
-    proposedSelectionParameter[i] = tmp;
-    currentSelectionParameter[i] = tmp;
-  }
-  proposediidSum.resize(22);
-  currentiidSum.resize(22);
+	currentSelectionParameter.resize(numSelectionCategories);
+	proposedSelectionParameter.resize(numSelectionCategories);
+
+
+	for (unsigned i = 0u; i < numSelectionCategories; i++)
+	{
+		std::vector<double> tmp(numParam, 0.0);
+		proposedSelectionParameter[i] = tmp;
+		currentSelectionParameter[i] = tmp;
+	}
+	proposediidSum.resize(22);
+	currentiidSum.resize(22);
 }
 
 
@@ -330,193 +330,199 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
 }
 
 
-double ROCParameter::getCodonSpecificProposalWidth(unsigned aa)
+double ROCParameter::getCurrentCodonSpecificProposalWidth(unsigned aa)
 {
-  unsigned codonRange[2];
-  SequenceSummary::AAindexToCodonRange(aa, true, codonRange);
-  return std_csp[codonRange[0]];
+	unsigned codonRange[2];
+	SequenceSummary::AAindexToCodonRange(aa, true, codonRange);
+	return std_csp[codonRange[0]];
 }
 
+double ROCParameter::getPreviousCodonSpecificProposalWidth(unsigned aa)
+{
+	unsigned codonRange[2];
+	SequenceSummary::AAindexToCodonRange(aa, true, codonRange);
+	return prev_std_csp[codonRange[0]];
+}
 
 void ROCParameter::adaptSphiProposalWidth(unsigned adaptationWidth)
 {
-  double acceptanceLevel = (double)numAcceptForSphi / (double)adaptationWidth;
-  traces.updateSphiAcceptanceRatioTrace(acceptanceLevel);
-  if(acceptanceLevel < 0.2)
-  {
-    prev_std_sphi = std_sphi;
-    std_sphi = std::max(0.01, std_sphi * 0.8);
-  }
-  if(acceptanceLevel > 0.3)
-  {
-    prev_std_sphi = std_sphi;
-    std_sphi = std::min(100.0, std_sphi * 1.2);
-  }
-  numAcceptForSphi = 0u;
+	double acceptanceLevel = (double)numAcceptForSphi / (double)adaptationWidth;
+	traces.updateSphiAcceptanceRatioTrace(acceptanceLevel);
+	if(acceptanceLevel < 0.2)
+	{
+		prev_std_sphi = std_sphi;
+		std_sphi = std::max(0.01, std_sphi * 0.8);
+	}
+	if(acceptanceLevel > 0.3)
+	{
+		prev_std_sphi = std_sphi;
+		std_sphi = std::min(100.0, std_sphi * 1.2);
+	}
+	numAcceptForSphi = 0u;
 }
 
 void ROCParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
 {
-  for(unsigned cat = 0u; cat < numSelectionCategories; cat ++)
-  {
-    unsigned numGenes = numAcceptForSynthesisRate[cat].size();
-    for(unsigned i = 0; i < numGenes; i++)
-    {
-      double acceptanceLevel = (double)numAcceptForSynthesisRate[cat][i] / (double)adaptationWidth;
-      traces.updateSynthesisRateAcceptanceRatioTrace(cat, i, acceptanceLevel);
-      if(acceptanceLevel < 0.2)
-      {
-        prev_std_phi[cat][i] = std_phi[cat][i];
-        std_phi[cat][i] = std::max(0.01, std_phi[cat][i] * 0.8);
-      }
-      if(acceptanceLevel > 0.3)
-      {
-        prev_std_phi[cat][i] = std_phi[cat][i];
-        std_phi[cat][i] = std::min(10.0, std_phi[cat][i] * 1.2);
-      }
-      numAcceptForSynthesisRate[cat][i] = 0u;
-    }
-  }
+	for(unsigned cat = 0u; cat < numSelectionCategories; cat ++)
+	{
+		unsigned numGenes = numAcceptForSynthesisRate[cat].size();
+		for(unsigned i = 0; i < numGenes; i++)
+		{
+			double acceptanceLevel = (double)numAcceptForSynthesisRate[cat][i] / (double)adaptationWidth;
+			traces.updateSynthesisRateAcceptanceRatioTrace(cat, i, acceptanceLevel);
+			if(acceptanceLevel < 0.2)
+			{
+				prev_std_phi[cat][i] = std_phi[cat][i];
+				std_phi[cat][i] = std::max(0.01, std_phi[cat][i] * 0.8);
+			}
+			if(acceptanceLevel > 0.3)
+			{
+				prev_std_phi[cat][i] = std_phi[cat][i];
+				std_phi[cat][i] = std::min(10.0, std_phi[cat][i] * 1.2);
+			}
+			numAcceptForSynthesisRate[cat][i] = 0u;
+		}
+	}
 }
 
 
 double ROCParameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement)
 {
-  unsigned expressionCategory = getSynthesisRateCategory(mixtureElement);
-  double posteriorMean = 0.0;
-  std::vector<double> synthesisRateTrace = traces.getSynthesisRateTraceByMixtureElementForGene(mixtureElement, geneIndex);
-  unsigned traceLength = synthesisRateTrace.size();
+	unsigned expressionCategory = getSynthesisRateCategory(mixtureElement);
+	double posteriorMean = 0.0;
+	std::vector<double> synthesisRateTrace = traces.getSynthesisRateTraceByMixtureElementForGene(mixtureElement, geneIndex);
+	unsigned traceLength = synthesisRateTrace.size();
 
 
-  if(samples > traceLength)
-  {
-    std::cerr << "Warning in Parameter::getSynthesisRatePosteriorMean throws: Number of anticipated samples (" <<
-      samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
-    samples = traceLength;
-  }
-  unsigned start = traceLength - samples;
-  unsigned category = 0u;
-  unsigned usedSamples = 0u;
-  std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
-  for(unsigned i = start; i < traceLength; i++)
-  {
-    category = mixtureAssignmentTrace[i];
-    category = getSynthesisRateCategory(category);
-    if(category == expressionCategory)
-    {
-      posteriorMean += synthesisRateTrace[i];
-      usedSamples++;
-    }
-  }
-  // Can return NaN if gene was never in category! But that is Ok.
-  return posteriorMean / (double)usedSamples;
+	if(samples > traceLength)
+	{
+		std::cerr << "Warning in Parameter::getSynthesisRatePosteriorMean throws: Number of anticipated samples (" <<
+			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
+		samples = traceLength;
+	}
+	unsigned start = traceLength - samples;
+	unsigned category = 0u;
+	unsigned usedSamples = 0u;
+	std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
+	for(unsigned i = start; i < traceLength; i++)
+	{
+		category = mixtureAssignmentTrace[i];
+		category = getSynthesisRateCategory(category);
+		if(category == expressionCategory)
+		{
+			posteriorMean += synthesisRateTrace[i];
+			usedSamples++;
+		}
+	}
+	// Can return NaN if gene was never in category! But that is Ok.
+	return posteriorMean / (double)usedSamples;
 }
 
 
 double ROCParameter::getSphiPosteriorMean(unsigned samples)
 {
-  double posteriorMean = 0.0;
-  std::vector<double> sPhiTrace = traces.getSPhiTrace();
-  unsigned traceLength = sPhiTrace.size();
+	double posteriorMean = 0.0;
+	std::vector<double> sPhiTrace = traces.getSPhiTrace();
+	unsigned traceLength = sPhiTrace.size();
 
-  if(samples > traceLength)
-  {
-    std::cerr << "Warning in Parameter::getSphiPosteriorMean throws: Number of anticipated samples (" <<
-      samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
-    samples = traceLength;
-  }
-  unsigned start = traceLength - samples;
-  for(unsigned i = start; i < traceLength; i++)
-  {
-    posteriorMean += sPhiTrace[i];
-  }
-  return posteriorMean / (double)samples;
+	if(samples > traceLength)
+	{
+		std::cerr << "Warning in Parameter::getSphiPosteriorMean throws: Number of anticipated samples (" <<
+			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
+		samples = traceLength;
+	}
+	unsigned start = traceLength - samples;
+	for(unsigned i = start; i < traceLength; i++)
+	{
+		posteriorMean += sPhiTrace[i];
+	}
+	return posteriorMean / (double)samples;
 }
 
 
 
 std::vector <double> ROCParameter::getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex)
 {
-  std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
-  std::vector<double> probabilities(numMixtures, 0.0);
-  unsigned traceLength = mixtureAssignmentTrace.size();
+	std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
+	std::vector<double> probabilities(numMixtures, 0.0);
+	unsigned traceLength = mixtureAssignmentTrace.size();
 
-  if(samples > traceLength)
-  {
-    std::cerr << "Warning in Parameter::getMixtureAssignmentPosteriorMean throws: Number of anticipated samples (" <<
-      samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
-    samples = traceLength;
-  }
+	if(samples > traceLength)
+	{
+		std::cerr << "Warning in Parameter::getMixtureAssignmentPosteriorMean throws: Number of anticipated samples (" <<
+			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
+		samples = traceLength;
+	}
 
-  unsigned start = traceLength - samples;
-  for (unsigned i = start; i < traceLength; i++)
-  {
-    unsigned value = mixtureAssignmentTrace[i];
-    probabilities[value]++;
-  }
+	unsigned start = traceLength - samples;
+	for (unsigned i = start; i < traceLength; i++)
+	{
+		unsigned value = mixtureAssignmentTrace[i];
+		probabilities[value]++;
+	}
 
-  for (unsigned i = 0; i < numMixtures; i++)
-  {
-    probabilities[i] /= (double)samples;
-  }
-  return probabilities;
+	for (unsigned i = 0; i < numMixtures; i++)
+	{
+		probabilities[i] /= (double)samples;
+	}
+	return probabilities;
 }
 
 
 double ROCParameter::getSphiVariance(unsigned samples, bool unbiased)
 {
-  std::vector<double> sPhiTrace = traces.getSPhiTrace();
-  unsigned traceLength = sPhiTrace.size();
-  if(samples > traceLength)
-  {
-    std::cerr << "Warning in Parameter::getSphiVariance throws: Number of anticipated samples (" <<
-      samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
-    samples = traceLength;
-  }
-  double posteriorMean = getSphiPosteriorMean(samples);
+	std::vector<double> sPhiTrace = traces.getSPhiTrace();
+	unsigned traceLength = sPhiTrace.size();
+	if(samples > traceLength)
+	{
+		std::cerr << "Warning in Parameter::getSphiVariance throws: Number of anticipated samples (" <<
+			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
+		samples = traceLength;
+	}
+	double posteriorMean = getSphiPosteriorMean(samples);
 
-  double posteriorVariance = 0.0;
+	double posteriorVariance = 0.0;
 
-  unsigned start = traceLength - samples;
-  for(unsigned i = start; i < traceLength; i++)
-  {
-    double difference = sPhiTrace[i] - posteriorMean;
-    posteriorVariance += difference * difference;
-  }
-  double normalizationTerm = unbiased ? (1/((double)samples-1.0)) : (1/(double)samples);
-  return normalizationTerm * posteriorVariance;
+	unsigned start = traceLength - samples;
+	for(unsigned i = start; i < traceLength; i++)
+	{
+		double difference = sPhiTrace[i] - posteriorMean;
+		posteriorVariance += difference * difference;
+	}
+	double normalizationTerm = unbiased ? (1/((double)samples-1.0)) : (1/(double)samples);
+	return normalizationTerm * posteriorVariance;
 }
 
 double ROCParameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement, bool unbiased)
 {
-  std::vector<double> synthesisRateTrace = traces.getSynthesisRateTraceByMixtureElementForGene(mixtureElement, geneIndex);
-  unsigned traceLength = synthesisRateTrace.size();
-  if(samples > traceLength)
-  {
-    std::cerr << "Warning in Parameter::getSynthesisRateVariance throws: Number of anticipated samples (" <<
-      samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
-    samples = traceLength;
-  }
+	std::vector<double> synthesisRateTrace = traces.getSynthesisRateTraceByMixtureElementForGene(mixtureElement, geneIndex);
+	unsigned traceLength = synthesisRateTrace.size();
+	if(samples > traceLength)
+	{
+		std::cerr << "Warning in Parameter::getSynthesisRateVariance throws: Number of anticipated samples (" <<
+			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
+		samples = traceLength;
+	}
 
-  double posteriorMean = getSynthesisRatePosteriorMean(samples, geneIndex, mixtureElement);
+	double posteriorMean = getSynthesisRatePosteriorMean(samples, geneIndex, mixtureElement);
 
-  double posteriorVariance = 0.0;
-  if(!std::isnan(posteriorMean))
-  {
-    unsigned start = traceLength - samples;
-    unsigned category = 0u;
-    double difference = 0.0;
-    std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
-    for(unsigned i = start; i < traceLength; i++)
-    {
-      category = mixtureAssignmentTrace[i];
-      category = getSynthesisRateCategory(category);
-      difference = synthesisRateTrace[i] - posteriorMean;
-      posteriorVariance += difference * difference;
-    }
-  }
-  double normalizationTerm = unbiased ? (1/((double)samples-1.0)) : (1/(double)samples);
-  return normalizationTerm * posteriorVariance;
+	double posteriorVariance = 0.0;
+	if(!std::isnan(posteriorMean))
+	{
+		unsigned start = traceLength - samples;
+		unsigned category = 0u;
+		double difference = 0.0;
+		std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
+		for(unsigned i = start; i < traceLength; i++)
+		{
+			category = mixtureAssignmentTrace[i];
+			category = getSynthesisRateCategory(category);
+			difference = synthesisRateTrace[i] - posteriorMean;
+			posteriorVariance += difference * difference;
+		}
+	}
+	double normalizationTerm = unbiased ? (1/((double)samples-1.0)) : (1/(double)samples);
+	return normalizationTerm * posteriorVariance;
 }
 
 
@@ -623,16 +629,16 @@ double ROCParameter::getMutationVariance(unsigned mixtureElement, unsigned sampl
 // 4. the adjusment of the likelihood by the jacobian that arises from this transformation is cheap and by grouping everything in one class it takes place more or less at the same place
 void ROCParameter::proposeCodonSpecificParameter()
 {
-/*
-	for(unsigned i = 0; i < numMutationCategories; i++)
-	{
-		proposedMutationParameter[i] = propose(currentMutationParameter[i], ROCParameter::randNorm, bias_csp, std_csp);
-	}
-	for(unsigned i = 0; i < numSelectionCategories; i++)
-	{
-		proposedSelectionParameter[i] = propose(currentSelectionParameter[i], ROCParameter::randNorm, bias_csp, std_csp);
-	}
-*/
+	/*
+		 for(unsigned i = 0; i < numMutationCategories; i++)
+		 {
+		 proposedMutationParameter[i] = propose(currentMutationParameter[i], ROCParameter::randNorm, bias_csp, std_csp);
+		 }
+		 for(unsigned i = 0; i < numSelectionCategories; i++)
+		 {
+		 proposedSelectionParameter[i] = propose(currentSelectionParameter[i], ROCParameter::randNorm, bias_csp, std_csp);
+		 }
+	 */
 	for (unsigned k = 0; k < 22; k++)
 	{
 		//need to skip W, M, X
@@ -645,7 +651,7 @@ void ROCParameter::proposeCodonSpecificParameter()
 		{
 			iidProposed.push_back( randNorm(0.0, 1.0) );
 		}
-		
+
 		std::vector<double> covaryingNums;
 		covaryingNums = covarianceMatrix[k].transformIidNumersIntoCovaryingNumbers(iidProposed);
 		for(unsigned i = 0; i < numMutationCategories; i++)
@@ -683,36 +689,34 @@ std::vector<double> ROCParameter::propose(std::vector<double> currentParam, doub
 
 void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
 {
-  unsigned numCSPsets = numAcceptForMutationAndSelection.size();
-  for(unsigned i = 0; i < numCSPsets; i++)
-  {
-    if(i == 21 || i == 10 || i == 18) continue;
-    double acceptanceLevel = (double)numAcceptForMutationAndSelection[i] / (double)adaptationWidth;
-    std::cout << SequenceSummary::AminoAcidArray[i] << " acceptance ratio: " << acceptanceLevel << "\n";
-    traces.updateCspAcceptanceRatioTrace(i, acceptanceLevel);
-    unsigned codonRange[2];
-    SequenceSummary::AAindexToCodonRange(i, true, codonRange);
-    for(unsigned k = codonRange[0]; k < codonRange[1]; k++)
-    {
-      if(acceptanceLevel < 0.2)
-      {
-        prev_std_csp[k] = std_csp[k];
-        std_csp[k] = std::max(0.01, std_csp[k] * 0.8);
-      }
-      if(acceptanceLevel > 0.3)
-      {
-        prev_std_csp[k] = std_csp[k];
-        std_csp[k] = std::min(10.0, std_csp[k] * 1.2);
-      }
-    }
-    if(prev_std_csp[codonRange[0]] != std_csp[codonRange[0]])
-    {
-      // rescale covariance matrix and decompose again
-      covarianceMatrix[i] *= std_csp[codonRange[0]];
-      covarianceMatrix[i].choleskiDecomposition();
-    }
-    numAcceptForMutationAndSelection[i] = 0u;
-  }
+	unsigned numCSPsets = numAcceptForMutationAndSelection.size();
+	for(unsigned i = 0; i < numCSPsets; i++)
+	{
+		if(i == 21 || i == 10 || i == 18) continue;
+		double acceptanceLevel = (double)numAcceptForMutationAndSelection[i] / (double)adaptationWidth;
+		std::cout << SequenceSummary::AminoAcidArray[i] << " acceptance ratio: " << acceptanceLevel << "\n";
+		traces.updateCspAcceptanceRatioTrace(i, acceptanceLevel);
+		unsigned codonRange[2];
+		SequenceSummary::AAindexToCodonRange(i, true, codonRange);
+		for(unsigned k = codonRange[0]; k < codonRange[1]; k++)
+		{
+			if(acceptanceLevel < 0.2)
+			{
+				prev_std_csp[k] = std_csp[k];
+				covarianceMatrix[i] *= 0.8;
+				covarianceMatrix[i].choleskiDecomposition();
+				std_csp[k] = std::max(0.01, std_csp[k] * 0.8);
+			}
+			if(acceptanceLevel > 0.3)
+			{
+				prev_std_csp[k] = std_csp[k];
+				covarianceMatrix[i] *= 1.2;
+				covarianceMatrix[i].choleskiDecomposition();
+				std_csp[k] = std::min(10.0, std_csp[k] * 1.2);
+			}
+		}
+		numAcceptForMutationAndSelection[i] = 0u;
+	}
 }
 
 

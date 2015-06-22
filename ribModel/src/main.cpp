@@ -368,7 +368,7 @@ int main()
 		for(unsigned n = 0; n < 22; n++)
 		{
 			if(n == 21 || n == 10 || n == 18) continue;
-			std::cout << SequenceSummary::AminoAcidArray[n] << ": " << parameter.getCodonSpecificProposalWidth(n) << "\n";
+			std::cout << SequenceSummary::AminoAcidArray[n] << ": " << parameter.getCurrentCodonSpecificProposalWidth(n) << "\n";
 		}
 
 		//These files used to be written here:

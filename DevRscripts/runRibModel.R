@@ -17,7 +17,7 @@ parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssig
 parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")
 parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")
 # initialize MCMC object
-samples <- 100
+samples <- 2000
 thining <- 10
 adaptiveWidth <- 100
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, 
@@ -46,7 +46,7 @@ plot(trace, what = "Mutation", mixture = 1)
 plot(trace, what = "Selection", mixture = 1)
 
 # plots model fit (cub plot)
-plot(model, genome, parameter, samples = samples*0.1, mixture = 1, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
+plot(model, genome, parameter, samples = samples*0.1, mixture = 2, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
 
 ##-----------------------------------------##
 

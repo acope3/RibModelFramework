@@ -197,6 +197,19 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
 		delete [] selection_proposed;
 		//std::cout <<"DONE deleting 5 at once\n";
 	}
+
+	// Take reverse jumb probability into account if CSP proposal width is not identical.
+	// If CSP proposal width is identical, the term cancels and does not have to be calculated.
+	double revJumpRatio = 0.0;
+	double curr_std_csp = parameter->getCurrentCodonSpecificProposalWidth(SequenceSummary::AAToAAIndex(curAA));
+	double prev_std_csp = parameter->getPreviousCodonSpecificProposalWidth(SequenceSummary::AAToAAIndex(curAA));
+	if(curr_std_csp != prev_std_csp)
+	{
+		revJumpRatio = -0.5 * (parameter->getProposedIidSum(SequenceSummary::AAToAAIndex(curAA)) -
+				parameter->getCurrentIidSum(SequenceSummary::AAToAAIndex(curAA)) );
+	}
+
+
     logAcceptanceRatioForAllMixtures = likelihood_proposed - likelihood;
 }
 

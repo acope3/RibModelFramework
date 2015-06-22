@@ -65,10 +65,14 @@ class ROCParameter : public Parameter
 
 		void initMutationSelectionCategories(std::vector<std::string> files, unsigned numCategories, unsigned paramType);
 
-		double getCodonSpecificProposalWidth(unsigned aa);
+		double getCurrentCodonSpecificProposalWidth(unsigned aa);
 		std::vector<std::vector<double>> getCurrentMutationParameter() {return currentMutationParameter;}
 		std::vector<std::vector<double>> getCurrentSelectionParameter() {return currentSelectionParameter;}
 
+		double getCurrentIidSum(unsigned aaindex) {return currentiidSum[aaindex];}
+		double getProposedIidSum(unsigned aaindex) {return proposediidSum[aaindex];}
+
+		double getPreviousCodonSpecificProposalWidth(unsigned aa);
 		// Phi epsilon functions
 		double getPhiEpsilon() {return phiEpsilon;}
 

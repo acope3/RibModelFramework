@@ -262,6 +262,10 @@ std::string SequenceSummary::IndexToCodon(unsigned i, bool forParamVector)
 	return forParamVector ? codonArrayParameter[i] : codonArray[i];
 }
 
+unsigned SequenceSummary::AAToAAIndex(char aa)
+{
+	return SequenceSummary::aaToIndex.find(aa) -> second;
+}
 
 unsigned SequenceSummary::GetNumCodonsForAA(char& aa, bool forParamVector)
 {

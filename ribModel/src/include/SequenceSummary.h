@@ -43,7 +43,6 @@ class SequenceSummary
 			return ncodons[codon];	
 		}
 
-
 		//R Wrapper Functions
 		int getAAcount(char aa) {aa = std::toupper(aa);	return getAAcountForAA(aa);}
 		int getCodonCount(std::string& codon)
@@ -58,6 +57,7 @@ class SequenceSummary
 
 
 		//static functions
+		static unsigned AAToAAIndex(char aa);
 		static char CodonToAA(std::string& codon);
 		static unsigned GetNumCodonsForAA(char& aa, bool forParamVector = false);
 		static unsigned CodonToIndex(std::string& codon, bool forParamVector = false);

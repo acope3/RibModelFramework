@@ -109,7 +109,11 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			// We do not need to add std::log(model.getCategoryProbability(k)) since it will cancel in the ratio!
 			double currLogLike = unscaledLogProb_curr[k];
 			double propLogLike = unscaledLogProb_prop[k];
-			if( -Parameter::randExp(1) < (propLogLike - currLogLike) )
+			/*std::cout <<"----------------------------\n";
+			std::cout <<"propLogLike = " << propLogLike <<"\n";
+			std::cout <<"currLogLike = " << currLogLike <<"\n";
+			std::cout <<"----------------------------\n";
+		*/	if( -Parameter::randExp(1) < (propLogLike - currLogLike) )
 			{
 				model.updateSynthesisRate(i, k);
 				// only count each gene once, not numSynthesisRateCategories times
@@ -122,7 +126,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			}
 		}
 
-		if (isinf(logLikelihood)) std::cout <<"Infinity reached\n";
+	if (isinf(logLikelihood)) std::cout <<"\tInfinity reached\n";
 		// adjust the the unscaled probabilities by the constant c
 		// ln(f') = ln(c) + ln(f)
 		// calculate ln(P) = ln( Sum(p_i*f'(...)) ) and obtain normalizing constant for new p_i
@@ -196,8 +200,8 @@ void MCMCAlgorithm::acceptRejectHyperParameter(int numGenes, Model& model, int i
 	double revJump = 0.0;
 	if(curr_std_sphi != prev_std_sphi)
 	{
-		revJump_proposed = std::log(Parameter::densityNorm(proposedSphi, currentSphi, prev_std_sphi));
-		revJump = std::log(Parameter::densityNorm(currentSphi, proposedSphi, curr_std_sphi));
+		revJump_proposed = std::log(Parameter::densityNorm(proposedSphi, currentSphi, curr_std_sphi));
+		revJump = std::log(Parameter::densityNorm(currentSphi, proposedSphi, prev_std_sphi));
 	}
 	logProbabilityRatio -= (std::log(currentSphi) - std::log(proposedSphi)) + (revJump_proposed - revJump);
 	if(!std::isfinite(logProbabilityRatio))

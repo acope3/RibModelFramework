@@ -25,7 +25,7 @@ class ROCModel : public Model
 				virtual double getSphi(bool proposed = false) {return parameter->getSphi(proposed);}
 				virtual double getSphiProposalWidth() {return parameter->getSphiProposalWidth();}
 				virtual unsigned getNumMixtureElements() {return parameter->getNumMixtureElements();}
-				virtual unsigned getCategoryProbability(unsigned i) {return parameter->getCategoryProbability(i);}
+				virtual double getCategoryProbability(unsigned i) {return parameter->getCategoryProbability(i);}
 				virtual void proposeCodonSpecificParameter() {parameter->proposeCodonSpecificParameter();}
 				virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth) {parameter->adaptCodonSpecificParameterProposalWidth(adaptiveWidth);}
 				virtual void updateCodonSpecificParameter(char aa) {parameter->updateCodonSpecificParameter(aa);}
