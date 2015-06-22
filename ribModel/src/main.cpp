@@ -192,8 +192,8 @@ void testSimulateGenome(Genome& genome)
 	parameter.InitializeSynthesisRate(phiVals);
 
 	std::cout << "done initialize ROCParameter object" << std::endl;
-	ROCModel model(parameter);
-
+	ROCModel model;
+	model.setParameter(parameter);
 	genome.simulateGenome(model);
 	std::vector <Gene> simGenes = genome.getSimulatedGenes();
 	unsigned aaRange[2];
@@ -338,8 +338,8 @@ int main()
 		//std::vector<double> phiVals = parameter.readPhiValues("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrCleft_phi_est.csv");
 		//parameter.InitializeSynthesisRate(phiVals);
 		std::cout << "done initialize ROCParameter object" << std::endl;
-		ROCModel model(parameter);
-
+		ROCModel model;
+		model.setParameter(parameter);
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
 		int samples = 100;
 		int thining = 10;

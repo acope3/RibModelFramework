@@ -28,6 +28,8 @@ class Model
 				virtual void proposeSPhi() =0;
 				virtual unsigned getMixtureAssignment(unsigned index) =0;
 				virtual unsigned getSynthesisRateCategory(unsigned mixture) =0;
+				virtual unsigned getSelectionCategory(unsigned mixture) =0;
+				virtual unsigned getMutationCategory(unsigned mixture) =0;
 				virtual double getSynthesisRate(unsigned index, unsigned mixture, bool proposed = false) =0; 
 				virtual double getCurrentSphiProposalWidth() =0;
 				virtual double getPreviousSphiProposalWidth() =0;
@@ -44,7 +46,7 @@ class Model
 				virtual void setCategoryProbability(unsigned mixture, double value) =0;
 				virtual void updateMixtureProbabilitiesTrace(unsigned sample) =0;
 				virtual void adaptSynthesisRateProposalWidth(unsigned adaptiveWidth) =0;
-				int blah() {return 1;}
+				virtual void getParameterForCategory(unsigned category, unsigned param, char aa, bool proposal, double* returnValue) =0;
 		protected:
 };
 

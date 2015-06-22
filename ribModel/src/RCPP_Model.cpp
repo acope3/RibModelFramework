@@ -12,8 +12,9 @@ RCPP_MODULE(Model_mod)
 
   class_<ROCModel>( "ROCModel" )
     .derives<Model>("Model")
-//		.constructor<ROCParameter>()
+		.constructor()
     .method("CalculateProbabilitiesForCodons", &ROCModel::CalculateProbabilitiesForCodons, "Calculated codon probabilities. Input is one element shorter than output")
-  ;
+  	.method("setParameter", &ROCModel::setParameter)
+		;
 }
 #endif

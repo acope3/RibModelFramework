@@ -12,10 +12,10 @@ class ROCModel : public Model
         virtual void obtainCodonCount(SequenceSummary& seqsum, char curAA, int codonCount[]);
         virtual double calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codonCount[], double mutation[], double selection[], double phiValue);
     public:
-        ROCModel(ROCParameter& _parameter);
+        ROCModel();
         virtual ~ROCModel();
-        //ROCModel(const ROCModel& other);
-
+        ROCModel(const ROCModel& other);
+				void setParameter(ROCParameter &_parameter);
         virtual void calculateCodonProbabilityVector(unsigned numCodons, double* mutation, double* selection, double phi, double* codonProb);
         // Likelihood ratio functions
         virtual void calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio);
@@ -33,6 +33,8 @@ class ROCModel : public Model
 				virtual void proposeSPhi() {parameter->proposeSPhi();}
 				virtual unsigned getMixtureAssignment(unsigned index) {return parameter->getMixtureAssignment(index);}
 				virtual unsigned getSynthesisRateCategory(unsigned mixture) {return parameter->getSynthesisRateCategory(mixture);}
+        virtual unsigned getSelectionCategory(unsigned mixture) {return parameter ->getSelectionCategory(mixture);}
+        virtual unsigned getMutationCategory(unsigned mixture)  {return parameter ->getMutationCategory(mixture);} 				
 				virtual double getSynthesisRate(unsigned index, unsigned mixture, bool proposed = false) {return parameter->getSynthesisRate(index, mixture, false);}
 				virtual double getCurrentSphiProposalWidth() {return parameter->getCurrentSphiProposalWidth();}
 				virtual double getPreviousSphiProposalWidth() {return parameter->getPreviousSphiProposalWidth();}
@@ -49,6 +51,10 @@ class ROCModel : public Model
         virtual void setCategoryProbability(unsigned mixture, double value) {parameter->setCategoryProbability(mixture, value);}
         virtual void updateMixtureProbabilitiesTrace(unsigned sample) {parameter->updateMixtureProbabilitiesTrace(sample);}
 				virtual void adaptSynthesisRateProposalWidth(unsigned adaptiveWidth) {parameter->adaptSynthesisRateProposalWidth(adaptiveWidth);}
+				virtual void getParameterForCategory(unsigned category, unsigned param, char aa, bool proposal, double* returnValue)
+				{
+					parameter -> getParameterForCategory(category, param, aa, proposal, returnValue);
+				}
 				 // R wrapper
         std::vector<double> CalculateProbabilitiesForCodons(std::vector<double> mutation, std::vector<double> selection, double phi);
 

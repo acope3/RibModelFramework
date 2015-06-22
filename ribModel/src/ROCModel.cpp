@@ -3,9 +3,8 @@
 #include <math.h>
 #include <cfloat>
 #include <iostream>
-ROCModel::ROCModel(ROCParameter &_parameter) : Model()
+ROCModel::ROCModel() : Model()
 {
-    parameter = &_parameter;
 }
 
 ROCModel::~ROCModel()
@@ -13,11 +12,11 @@ ROCModel::~ROCModel()
     //dtor
 }
 
-/*ROCModel::ROCModel(const ROCModel& other)
+ROCModel::ROCModel(const ROCModel& other)
 {
     //copy ctor
 }
-*/
+
 void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio)
 {
     double logLikelihood = 0.0;
@@ -213,6 +212,11 @@ void ROCModel::obtainCodonCount(SequenceSummary& seqsum, char curAA, int codonCo
     }
 }
 
+
+void ROCModel::setParameter(ROCParameter &_parameter)
+{
+	parameter = &_parameter;
+}
 
 std::vector<double> ROCModel::CalculateProbabilitiesForCodons(std::vector<double> mutation, std::vector<double> selection, double phi)
 {

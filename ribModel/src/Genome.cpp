@@ -223,7 +223,6 @@ void Genome::simulateGenome(Model& model)
 	std::string tmpDesc;
 
 
-	/*
 	//std::srand(std::time(0));
 	simulatedGenes.resize(genes.size());
 	tmpDesc = "Simulated Gene";
@@ -237,11 +236,11 @@ void Genome::simulateGenome(Model& model)
 		tmpSeq += "ATG"; //Always will have the start amino acid
 
 
-		unsigned mixtureElement = parameter.getMixtureAssignment(i);
-		unsigned mutationCategory = parameter.getMutationCategory(mixtureElement);
-		unsigned selectionCategory = parameter.getSelectionCategory(mixtureElement);
-		unsigned expressionCategory = parameter.getSynthesisRateCategory(mixtureElement);
-		double phi = parameter.getSynthesisRate(i, expressionCategory, false);
+		unsigned mixtureElement = model.getMixtureAssignment(i);
+		unsigned mutationCategory = model.getMutationCategory(mixtureElement);
+		unsigned selectionCategory = model.getSelectionCategory(mixtureElement);
+		unsigned expressionCategory = model.getSynthesisRateCategory(mixtureElement);
+		double phi = model.getSynthesisRate(i, expressionCategory, false);
 
 		std::ostringstream strstream;
 		strstream << mixtureElement;
@@ -264,8 +263,8 @@ void Genome::simulateGenome(Model& model)
 			}
 			else
 			{
-				parameter.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
-				parameter.getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
+				model.getParameterForCategory(mutationCategory, Parameter::dM, curAA, false, mutation);
+				model.getParameterForCategory(selectionCategory, Parameter::dEta, curAA, false, selection);
 				model.calculateCodonProbabilityVector(numCodons, mutation, selection, phi, codonProb);
 			}
 			for (k = 0; k < aaCount; k++)
@@ -276,13 +275,12 @@ void Genome::simulateGenome(Model& model)
 				tmpSeq += codon;
 			}
 		}
-
+		
 		codon =	seqSum.IndexToCodon((rand() % 3) + 61); //randomly choose a stop codon, from range 61-63
 		tmpSeq += codon;
 		Gene tmpGene(tmpSeq, tmpID, tmpDesc);
 		simulatedGenes[i] = tmpGene;
 	}
-*/
 }
 
 void Genome::clear()
