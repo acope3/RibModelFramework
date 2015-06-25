@@ -273,6 +273,8 @@ void MCMCAlgorithm::run(Genome& genome, Model& model)
 			{
 				std::cout << "\t current Mixture element probability for element " << i << ": " << model.getCategoryProbability(i) << std::endl;
 			}
+			std::cout <<"Writing restart file!\n";
+			model.writeRestartFile("RestartFile.txt");
 		}
 		if(estimateCodonSpecificParameter) 
 		{

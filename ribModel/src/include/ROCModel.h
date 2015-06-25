@@ -21,7 +21,7 @@ class ROCModel : public Model
         virtual void calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio);
         virtual void calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& genome, double& logAcceptanceRatioForAllMixtures);
 				virtual void initTraces(unsigned samples, unsigned num_genes, unsigned adaptiveSamples) {parameter -> initAllTraces(samples, num_genes, adaptiveSamples);}
-       
+				virtual void writeRestartFile(std::string filename) {return parameter->writeEntireRestartFile(filename);}       
 				virtual double getSphi(bool proposed = false) {return parameter->getSphi(proposed);}
 				virtual double getSphiProposalWidth() {return parameter->getSphiProposalWidth();}
 				virtual unsigned getNumMixtureElements() {return parameter->getNumMixtureElements();}

@@ -17,7 +17,8 @@ class Model
         virtual void calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio)=0;
         virtual void calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& genome, double& logAcceptanceRatioForAllMixtures)=0;
 				virtual void initTraces(unsigned samples, unsigned num_genes, unsigned adaptiveSamples) =0;
-    		virtual double getSphi(bool proposed = false) =0;
+    		virtual void writeRestartFile(std::string filename) =0;
+				virtual double getSphi(bool proposed = false) =0;
 				virtual double getSphiProposalWidth() =0;
 				virtual unsigned getNumMixtureElements() =0;
 				virtual double getCategoryProbability(unsigned i) =0;

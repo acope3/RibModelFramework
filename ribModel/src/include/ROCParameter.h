@@ -53,6 +53,11 @@ class ROCParameter : public Parameter
 		ROCParameter(const ROCParameter& other);
 		ROCParameter& operator=(const ROCParameter& rhs);
 		ROCTrace& getTraceObject() {return traces;}
+		
+		void writeEntireRestartFile(std::string filename);
+		void writeROCRestartFile(std::string filename);
+		void initFromRestartFile(std::string filename);
+		void initROCValuesFromFile(std::string filename);
 		void initROCParameterSet();
 		void initSelection(std::vector<double> selectionValues, unsigned mixtureElement, char aa);
 		void initMutation(std::vector<double> mutationValues, unsigned mixtureElement, char aa);

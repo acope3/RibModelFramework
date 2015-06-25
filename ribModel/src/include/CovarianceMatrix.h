@@ -28,6 +28,9 @@ class CovarianceMatrix
 				void printCovarianceMatrix();
         void printCholeskiMatrix();
         std::vector<double> transformIidNumersIntoCovaryingNumbers(std::vector<double> iidnumbers);
+				std::vector<double>* getCovMatrix();
+				int getNumVariates() {return numVariates;}
+
 				#ifndef STANDALONE
 				void setCovarianceMatrix(SEXP _matrix);
 				#endif

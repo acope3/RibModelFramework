@@ -162,6 +162,13 @@ void CovarianceMatrix::printCholeskiMatrix()
     std::cout <<"\n";
 }
 
+
+std::vector<double>* CovarianceMatrix::getCovMatrix()
+{
+	std::vector<double> *ptr = &covMatrix;
+	return ptr;
+}
+
 #ifndef STANDALONE
 #include <Rcpp.h>
 using namespace Rcpp;

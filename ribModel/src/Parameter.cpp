@@ -1,5 +1,5 @@
 #include "include/Parameter.h"
-
+#include <sstream>
 Parameter::Parameter()
 {
 	//ctor
@@ -252,6 +252,325 @@ bool Parameter::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbo
 
 }
 
+
+void Parameter::writeBasicRestartFile(std::string filename)
+{
+	std::ofstream out;
+	std::string output = "";
+	std::ostringstream oss;
+	out.open(filename.c_str());
+	if (out.fail())
+	{
+		std::cerr <<"Could not open restart file for writing\n";
+		std::exit(1);
+	}
+
+	oss <<">Sphi:\n" << Sphi <<"\n";
+	oss <<">Aphi:\n" << Aphi <<"\n";
+	oss <<">numParam:\n" << numParam <<"\n";
+	oss <<">numMixtures:\n" << numMixtures <<"\n";
+
+	//maybe clear the buffer	
+	oss <<">categories:\n";
+	for (unsigned i = 0; i < categories.size(); i++)
+	{
+		oss << categories[i].delM <<" " << categories[i].delEta <<"\n";	
+	}
+	
+	oss <<">mixtureAssignment:\n";
+	for (unsigned i = 0; i < mixtureAssignment.size(); i++)
+	{
+		oss << mixtureAssignment[i];
+		if ((i + 1) % 50 == 0) oss <<"\n";
+		else oss <<" ";
+	}
+	oss <<"\n";
+	oss <<">numMutationCategories:\n" << numMutationCategories <<"\n";
+	oss <<">numSelectionCategories:\n" << numSelectionCategories <<"\n";
+
+	oss <<">categoryProbabilities:\n";
+	for (unsigned i = 0; i < categoryProbabilities.size(); i++)
+	{
+		oss << categoryProbabilities[i];
+		if ((i + 1) % 10 == 0) oss <<"\n";
+		else oss <<" ";
+	}
+	oss <<"\n";
+
+
+	oss <<">selectionIsInMixture:\n";
+	for (unsigned i = 0; i < selectionIsInMixture.size(); i++)
+	{
+		oss <<"***\n";
+		for (unsigned j = 0; j < selectionIsInMixture[i].size(); j++)
+		{
+			oss << selectionIsInMixture[i][j] <<" ";
+		}
+		oss <<"\n";
+	}
+
+	oss <<">mutationIsInMixture:\n";
+	for (unsigned i = 0; i < mutationIsInMixture.size(); i++)
+	{
+		oss <<"***\n";
+		for (unsigned j = 0; j < mutationIsInMixture[i].size(); j++)
+		{
+			oss << mutationIsInMixture[i][j] <<" ";
+		}
+		oss <<"\n";
+	}
+
+	oss <<">currentSynthesisRateLevel:\n";
+	for (unsigned i = 0; i < currentSynthesisRateLevel.size(); i++)
+	{
+		oss <<"***\n";
+		for (unsigned j = 0; j < currentSynthesisRateLevel[i].size(); j++)
+		{
+    	oss << currentSynthesisRateLevel[i][j];
+    	if ((j + 1) % 10 == 0) oss <<"\n";
+    	else oss <<" ";
+		}
+		oss <<"\n";
+	}
+
+	output += oss.str();
+	oss.clear();
+	oss.str("");
+
+	for (unsigned i = 0; i < 22; i++)
+	{
+		char aa = SequenceSummary::IndexToAA(i);
+		oss <<">covarianceMatrix:\n" << aa <<"\n";
+		CovarianceMatrix m = covarianceMatrix[i];
+		std::vector<double>* tmp = m.getCovMatrix();
+		int size = m.getNumVariates();
+    for(int i = 0; i < size * size; i++)
+    {
+        if (i % size == 0 && i != 0) { oss <<"\n"; }
+        oss << tmp->at(i) << "\t";
+    }
+    oss <<"\n***\n";
+	}
+	output += oss.str();
+	out << output;
+	out.close();
+}
+
+
+void Parameter::initBaseValuesFromFile(std::string filename)
+{
+	std::ifstream input;
+	input.open(filename.c_str());
+	if (input.fail())
+	{
+		std::cerr <<"Could not open RestartFile.txt to initialzie base values\n";
+		std::exit(1);
+	}
+
+	covarianceMatrix.resize(22);
+	int cat = 0;
+	std::vector<double> mat;
+	std::string tmp, variableName;
+	while (getline(input, tmp))
+	{
+		int flag;
+		if (tmp[0] == '>') flag = 1;
+		else if (input.eof()) flag = 2;
+		else if (tmp[0] == '#') flag = 3;
+		else flag = 4;
+
+		if (flag == 1)
+		{
+			mat.clear();
+			cat = 0;
+			variableName = tmp.substr(1,tmp.size()-2);
+			if (variableName == "covarianceMatrix")
+			getline(input,tmp);
+			char aa = tmp[0];
+			cat = SequenceSummary::AAToAAIndex(aa);
+		}
+		else if (flag == 2)
+		{
+		}
+		else if (flag == 3) //user comment, continue
+		{
+			continue;
+		}
+		else //store variable information
+		{
+			std::istringstream iss;
+			if (variableName == "Sphi") {iss.str(tmp); iss >> Sphi;}
+			else if (variableName == "Aphi") {iss.str(tmp); iss >> Aphi;}	
+			else if (variableName == "numParam") {iss.str(tmp); iss >> numParam;}	
+			else if (variableName == "numMutationCategories") {iss.str(tmp); iss >> numMutationCategories;} 	
+			else if (variableName == "numSelectionCategories") {iss.str(tmp); iss >> numSelectionCategories;}	
+			else if (variableName == "numMixtures") {iss.str(tmp); iss >> numMixtures;}	
+			else if (variableName == "mixtureAssignment") 
+			{
+				unsigned val;
+				iss.str(tmp);
+				while (iss >> val)
+				{
+					mixtureAssignment.push_back(val);
+				}
+			}	
+			else if (variableName == "categories")
+			{
+				iss.str(tmp);
+				thetaK K;
+				//STOPED HERE
+				iss >> K.delM;
+				iss >> K.delEta;
+				categories.push_back(K);
+			} 	
+			else if (variableName == "categoryProbabilities")
+			{
+				double val;
+				iss.str(tmp);
+				while (iss >> val)
+				{
+					categoryProbabilities.push_back(val);
+				}
+			} 	
+			else if (variableName == "mutationIsInMixture")
+			{
+				if (tmp == "***")
+				{
+					mutationIsInMixture.resize(mutationIsInMixture.size() + 1);
+					cat++;
+				}
+				else
+				{
+					unsigned val;
+					iss.str(tmp);
+					while (iss >> val)
+					{
+						mutationIsInMixture[cat - 1].push_back(val);
+					}
+				}
+			} 	
+			else if (variableName == "selectionIsInMixture")
+			{
+				if (tmp == "***")
+				{
+					selectionIsInMixture.resize(selectionIsInMixture.size() + 1);
+					cat++;
+				}
+				else
+				{
+					unsigned val;
+					iss.str(tmp);
+					while (iss >> val)
+					{
+						selectionIsInMixture[cat - 1].push_back(val);
+					}
+				}
+			} 	
+			else if (variableName == "currentSynthesisRateLevel")
+			{
+        if (tmp == "***")
+        {
+          currentSynthesisRateLevel.resize(currentSynthesisRateLevel.size() + 1);
+          cat++;
+        }
+				else
+				{
+					std::cout << tmp <<"\n";
+          double val;
+          iss.str(tmp);
+          while (iss >> val)
+          {
+            currentSynthesisRateLevel[cat - 1].push_back(val);
+          }
+				}
+			} 	
+			else if (variableName == "covarianceMatrix")
+			{
+				if (tmp == "***") //end of matrix
+				{
+					CovarianceMatrix CM(mat);
+					covarianceMatrix[cat] = CM; //does old one get deleted/overwrote?
+				}
+				double val;
+				iss.str(tmp);
+				while (iss >> val)
+				{
+					mat.push_back(val);
+				}
+			} 	
+		}
+	}
+
+	//Testing only
+	std::cout <<"Sphi: " << Sphi <<"\n";
+	std::cout <<"Aphi: " << Aphi <<"\n";
+	std::cout <<"numParam: " << numParam <<"\n";
+	std::cout <<"numMutationCategories: " << numMutationCategories <<"\n";
+	std::cout <<"numSelectionCategories: " << numSelectionCategories <<"\n";
+	std::cout <<"numMixtures: " << numMixtures <<"\n";
+	std::cout <<"mixtureAssignment:\n";
+	for (unsigned i = 0; i < mixtureAssignment.size(); i++)
+	{
+		std::cout <<mixtureAssignment[i];
+		if ((i + 1) % 50 == 0) std::cout <<"\n";
+		else std::cout <<" ";
+	}
+	std::cout <<"\ncategories:\n";
+  for (unsigned i = 0; i < categories.size(); i++)
+	{
+		std::cout << categories[i].delM <<" " << categories[i].delEta <<"\n";
+	}
+	std::cout <<"\ncategoryProbabilities:\n";
+	for (unsigned i = 0; i < categoryProbabilities.size(); i++)
+	{
+		std::cout << categoryProbabilities[i];
+    if ((i + 1) % 10 == 0) std::cout <<"\n";
+    else std::cout <<" ";
+	}
+	std::cout <<"\nmutationIsInMixture:\n";
+	for (unsigned i = 0; i < mutationIsInMixture.size(); i++)
+	{
+		std::cout <<"Category " << i <<":\n";
+		for (unsigned j = 0; j < mutationIsInMixture[i].size(); j++)
+		{
+			std::cout << mutationIsInMixture[i][j];
+    	if ((j + 1) % 10 == 0) std::cout <<"\n";
+    	else std::cout <<" ";
+		}
+		std::cout <<"\n";
+	}
+	std::cout <<"\nselectionIsInMixture:\n";
+	for (unsigned i = 0; i < selectionIsInMixture.size(); i++)
+	{
+		std::cout <<"Category " << i <<":\n";
+		for (unsigned j = 0; j < selectionIsInMixture[i].size(); j++)
+		{
+			std::cout << selectionIsInMixture[i][j];
+    	if ((j + 1) % 10 == 0) std::cout <<"\n";
+    	else std::cout <<" ";
+		}
+		std::cout <<"\n";
+	}
+	std::cout <<"\ncurrentSynthesisRateLevel:\n";
+  for (unsigned i = 0; i < currentSynthesisRateLevel.size(); i++)
+  {
+    std::cout <<"Category " << i <<":\n";
+    for (unsigned j = 0; j < currentSynthesisRateLevel[i].size(); j++)
+    {
+      std::cout << currentSynthesisRateLevel[i][j];
+      if ((j + 1) % 10 == 0) std::cout <<"\n";
+      else std::cout <<" ";
+    }
+    std::cout <<"\n";
+  }
+	for (unsigned i = 0; i < 22; i++)
+	{
+		std::cout <<"\ncovarianceMatrix " << i <<":\n";
+		CovarianceMatrix CM = covarianceMatrix[i];
+		CM.printCovarianceMatrix();
+		std::cout <<"\n";
+	}
+}
 
 #ifndef STANDALONE
 using namespace Rcpp;

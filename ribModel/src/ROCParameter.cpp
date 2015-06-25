@@ -5,7 +5,7 @@
 #include <iostream>
 #include <set>
 #include <fstream>
-
+#include <sstream>
 #ifndef STANDALONE
 #include <Rcpp.h>
 using namespace Rcpp;
@@ -13,11 +13,7 @@ using namespace Rcpp;
 
 ROCParameter::ROCParameter() : Parameter()
 {
-	std::vector<unsigned> empty(100, 1);
-	std::vector<std::vector <unsigned>> empty2;
-	//	initParameterSet(2, 1, empty, empty2, true, "allUnique");
-	//initParameter(); 
-	initROCParameterSet();
+	initFromRestartFile("RestartFile1.txt");
 }
 
 #ifndef STANDALONE
@@ -108,7 +104,7 @@ void ROCParameter::initROCParameterSet()
 {
 	// proposal bias and std for codon specific parameter
 	bias_csp = 0;
-	std_csp.resize(numParam, 0.1); //TODO hase to be initialized with 1 when switched to the covariance matrix!!!
+	std_csp.resize(numParam, 0.1); 
 	prev_std_csp.resize(numParam, 0.1); //TODO hase to be initialized with 1 when switched to the covariance matrix!!!
 	numAcceptForMutationAndSelection.resize(22, 0u);
 
@@ -174,6 +170,75 @@ std::vector<std::vector<double>> ROCParameter::calculateSelectionCoefficients(un
 		}
 	}
 	return selectionCoefficients;
+}
+
+
+void ROCParameter::writeEntireRestartFile(std::string filename)
+{
+	writeBasicRestartFile(filename);
+	writeROCRestartFile(filename);
+}
+
+
+void ROCParameter::writeROCRestartFile(std::string filename)
+{
+	std::ofstream out;
+	out.open(filename.c_str(), std::ofstream::app);
+	if (out.fail())
+	{
+		std::cerr <<"Could not open RestartFile.txt to append\n";
+		std::exit(1);
+	}
+
+	std::ostringstream oss;
+
+	oss <<">std_csp:\n";
+	for (unsigned i = 0; i < std_csp.size(); i++)
+	{
+		oss << std_csp[i];
+    if ((i + 1) % 10 == 0) oss <<"\n";
+    else oss <<" ";
+	}
+	oss <<">currentMutationParameter:\n";
+	for (unsigned i = 0; i < currentMutationParameter.size(); i++)
+	{
+		oss <<"***\n";
+		for (unsigned j = 0; j < currentMutationParameter[i].size(); j++)
+		{
+			oss << currentMutationParameter[i][j];
+			if ((j + 1) % 10 == 0) oss <<"\n";
+    	else oss <<" ";
+		}
+		oss <<"\n";
+	}
+
+	oss <<">currentSelectionParameter:\n";
+	for (unsigned i = 0; i < currentSelectionParameter.size(); i++)
+	{
+		oss <<"***\n";
+		for (unsigned j = 0; j < currentSelectionParameter[i].size(); j++)
+		{
+			oss << currentSelectionParameter[i][j];
+			if ((j + 1) % 10 == 0) oss <<"\n";
+    	else oss <<" ";
+		}
+		oss <<"\n";
+	}
+	std::string output = oss.str();
+	out << output;
+	out.close();	
+}
+
+
+void ROCParameter::initFromRestartFile(std::string filename)
+{
+	initBaseValuesFromFile(filename);
+	initROCValuesFromFile(filename);
+}
+
+void ROCParameter::initROCValuesFromFile(std::string filename)
+{
+
 }
 
 #ifndef STANDALONE
@@ -647,7 +712,7 @@ void ROCParameter::proposeCodonSpecificParameter()
 		unsigned aaRange[2];
 		SequenceSummary::AAindexToCodonRange(k, true, aaRange);
 		unsigned numCodons = aaRange[1] - aaRange[0];
-		for(unsigned i = 0u; i < 2*numCodons*numMixtures; i++)
+		for(unsigned i = 0u; i < 2*numCodons*(numMutationCategories + numSelectionCategories); i++)
 		{
 			iidProposed.push_back( randNorm(0.0, 1.0) );
 		}

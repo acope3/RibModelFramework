@@ -266,15 +266,43 @@ void testCovMatrixOverloading()
 	std::cout << "------------------ TEST COVMATRIXOVERLOADING ------------------" << std::endl;
 }
 
-void testProposeCodonSpecificParameters()
+void testWriteRestartFile(Genome &genome)
 {
-	std::cout << "------------------ TEST PROPOSECODONSPECIFICPARAMETERS ------------------" << std::endl;
-	ROCParameter parameter;
-
-
-	std::cout << "------------------ TEST PROPOSECODONSPECIFICPARAMETERS ------------------" << std::endl;
+	std::cout << "------------------ TEST WRITERESTARTFILE ------------------" << std::endl;
+	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
+	for(unsigned i = 0u; i < genome.getGenomeSize(); i++)
+	{
+		if(i < 448) geneAssignment[i] = 0u;
+		else geneAssignment[i] = 1u;
+	}
+	double sphi_init = 2;
+	double numMixtures = 2;
+	std::string mixDef = ROCParameter::allUnique;
+	std::vector<std::vector<unsigned>> thetaKMatrix;
+	ROCParameter parameter = ROCParameter(sphi_init, numMixtures, geneAssignment, thetaKMatrix, true, mixDef);
+	std::vector<std::string> files(2);
+	files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv");
+	files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv");
+	parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
+	parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
+	parameter.InitializeSynthesisRate(genome, sphi_init);
+	ROCModel model;
+	model.setParameter(parameter);
+	model.writeRestartFile("RestartFile1.txt");
+	std::cout << "------------------ TEST WRITERESTARTFILE ------------------" << std::endl;
 }
 
+
+void testInitFromRestartFile()
+{
+	std::cout << "------------------ TEST INITFROMRESTARTFILE ------------------" << std::endl;
+	ROCParameter parameter;
+	ROCModel model;
+	model.setParameter(parameter);
+  model.writeRestartFile("RestartFile2.txt");
+	std::cout << "------------------ TEST INITFROMRESTARTFILE ------------------" << std::endl;
+
+}
 
 int main()
 {
@@ -290,7 +318,7 @@ int main()
 		genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta");
 	}
 	std::cout << "done reading fasta file" << std::endl;
-	bool testing =  false;
+	bool testing =  true;
 
 	if(testing)
 	{
@@ -303,7 +331,9 @@ int main()
 		//testRandMultiNom(3);
 		//testThetaKMatrix();
 		//testSimulateGenome(genome);
-		testCovMatrixOverloading();
+		//testCovMatrixOverloading();
+		testWriteRestartFile(genome);
+		testInitFromRestartFile();
 	}else{
 		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 		for(unsigned i = 0u; i < genome.getGenomeSize(); i++)

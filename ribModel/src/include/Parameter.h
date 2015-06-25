@@ -63,8 +63,8 @@ class Parameter
     Parameter& operator=(const Parameter& rhs);
 		virtual ~Parameter() {}
 		bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);
-
-
+		void writeBasicRestartFile(std::string filename);
+		void initBaseValuesFromFile(std::string filename);
 		#ifndef STANDALONE
 		void initCovarianceMatrix(SEXP matrix, char aa);
 		#endif
@@ -188,26 +188,36 @@ unsigned int getNumParam() {return numParam;}
 		unsigned getSynthesisRateCategoryForMixture(unsigned mixtureElement);
 		std::vector<double> getCurrentSynthesisRateForMixture(unsigned mixture);
 	protected:
+		double Sphi;
 		unsigned numMixtures;
+		unsigned int numParam;
+		
+
 		unsigned numMutationCategories; //Probably needs to be renamed
 		unsigned numSelectionCategories; //Probably needs to be renamed
-		unsigned int numParam;
+
+		//Objects
 		std::vector<thetaK> categories;
 		std::vector<CovarianceMatrix> covarianceMatrix;
+
+
+		unsigned numAcceptForSphi;
 		std::vector<unsigned> mixtureAssignment;
-		double Sphi;
-		std::vector<std::vector<double>> currentSynthesisRateLevel;
 		std::vector<double> categoryProbabilities;
+		std::vector<std::vector<double>> currentSynthesisRateLevel;
+		std::vector<std::vector<unsigned>> numAcceptForSynthesisRate;
+		
+
 		// proposal bias and std for phi values
 		double bias_sphi;
 		double std_sphi;
 		double prev_std_sphi;
+		
+
 		// proposal bias and std for phi values
 		double bias_phi;
 		std::vector<std::vector<double>> std_phi;
 		std::vector<std::vector<double>> prev_std_phi;
-		unsigned numAcceptForSphi;
-		std::vector<std::vector<unsigned>> numAcceptForSynthesisRate;
 };
 
 #endif // PARAMETER_H
