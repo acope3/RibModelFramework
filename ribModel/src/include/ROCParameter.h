@@ -41,7 +41,7 @@ class ROCParameter : public Parameter
 
 	public:
 		//static const members
-		explicit ROCParameter();
+		explicit ROCParameter(std::string filename);
 		ROCParameter(double sphi, unsigned _numMixtures,
 				std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer = true, std::string _mutationSelectionState = "allUnique");
 		virtual ~ROCParameter();
