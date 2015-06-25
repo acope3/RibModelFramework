@@ -36,6 +36,7 @@ RCPP_MODULE(Parameter_mod)
 
 	class_<ROCParameter>( "ROCParameter" )
 		.derives<Parameter>("Parameter")
+		.constructor <std::string>()
 		.constructor <double, std::vector<unsigned>, std::vector<unsigned>, bool>()
 		.constructor <double, unsigned, std::vector<unsigned>, bool, std::string>()
 		.method("initMutationSelectionCategories", &ROCParameter::initMutationSelectionCategoriesR)
