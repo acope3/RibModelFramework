@@ -269,9 +269,21 @@ void Parameter::writeBasicRestartFile(std::string filename)
 	oss <<">Aphi:\n" << Aphi <<"\n";
 	oss <<">numParam:\n" << numParam <<"\n";
 	oss <<">numMixtures:\n" << numMixtures <<"\n";
-
+	oss <<">std_sphi:\n" << std_sphi <<"\n";
 	unsigned i, j;
 	//maybe clear the buffer	
+	oss <<">std_phi:\n";
+	for (i = 0; i < std_phi.size(); i++)
+	{
+		oss <<"***\n";
+		for (j = 0; j < std_phi[i].size(); j++)
+		{
+			oss << std_phi[i][j];
+			if ((j + 1) % 10 == 0) oss <<"\n";
+			else oss <<" ";
+		}
+		if (j % 10 != 0) oss <<"\n";
+	}
 	oss <<">categories:\n";
 	for (i = 0; i < categories.size(); i++)
 	{
@@ -421,7 +433,6 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 			{
 				iss.str(tmp);
 				thetaK K;
-				//STOPED HERE
 				iss >> K.delM;
 				iss >> K.delEta;
 				categories.push_back(K);
@@ -499,6 +510,25 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 				{
 					mat.push_back(val);
 				}
+			}
+			else if (variableName == "std_sphi")
+			{
+				iss.str(tmp);
+				iss >> std_sphi;
+			}
+			else if (variableName == "std_phi")
+			{
+				if (tmp == "***")
+				{
+					std_phi.resize(std_phi.size() + 1);
+					cat++;
+				}
+				iss.str(tmp);
+				double val;
+				while (iss >> val)
+				{
+					std_phi[cat - 1].push_back(val);
+				}
 			} 	
 		}
 	}
@@ -510,11 +540,9 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 	Aphi_proposed = Aphi;
 	numAcceptForSphi = 0u;
 	bias_sphi = 0;
-	std_sphi = 0.1;
-	prev_std_sphi = 0.1;
+	prev_std_sphi = std_sphi;
 	bias_phi = 0;
 	
-	std_phi.resize(numSelectionCategories);
 	prev_std_phi.resize(numSelectionCategories);
 	numAcceptForSynthesisRate.resize(numSelectionCategories);
 	proposedSynthesisRateLevel.resize(numSelectionCategories);
@@ -522,8 +550,7 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 	{
 		proposedSynthesisRateLevel[i] = currentSynthesisRateLevel[i];
 		std::vector <double> tmp(currentSynthesisRateLevel[i].size(), 0.1);
-		std_phi[i] = tmp;
-		prev_std_phi[i] = tmp;
+		prev_std_phi[i] = std_phi[i];
 
 		std::vector <unsigned> tmp2(currentSynthesisRateLevel[i].size(), 0u);
 		numAcceptForSynthesisRate[i] = tmp2;

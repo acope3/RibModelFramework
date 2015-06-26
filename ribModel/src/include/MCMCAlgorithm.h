@@ -5,42 +5,46 @@
 #include "ROCModel.h"
 class MCMCAlgorithm
 {
-    private:
-        unsigned samples;
-        unsigned thining;
-        unsigned adaptiveWidth;
+	private:
+		unsigned samples;
+		unsigned thining;
+		unsigned adaptiveWidth;
 
-        bool estimateSynthesisRate;
-        bool estimateCodonSpecificParameter;
-        bool estimateHyperParameter;
+		bool estimateSynthesisRate;
+		bool estimateCodonSpecificParameter;
+		bool estimateHyperParameter;
 
-        std::vector<double> likelihoodTrace;
+		std::vector<double> likelihoodTrace;
 
-        double acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, Model& model, int iteration);
-        void acceptRejectCodonSpecificParameter(Genome& genome, Model& model, int iteration);
-        void acceptRejectHyperParameter(int numGenes, Model& model, int iteration);
+		std::string file;
+		unsigned fileWriteInterval;
+		bool multipleFiles;
+ 
+		double acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, Model& model, int iteration);
+		void acceptRejectCodonSpecificParameter(Genome& genome, Model& model, int iteration);
+		void acceptRejectHyperParameter(int numGenes, Model& model, int iteration);
 
-    public:
-        explicit MCMCAlgorithm();
-        MCMCAlgorithm(int samples, int thining, unsigned _adaptiveWidth = 100, bool _estimateSynthesisRate = true, bool _estimateCodonSpecificParameter = true,
-						bool _estimateHyperParameter = true);
-        virtual ~MCMCAlgorithm();
-        MCMCAlgorithm(const MCMCAlgorithm& other);
+	public:
+		explicit MCMCAlgorithm();
+		MCMCAlgorithm(int samples, int thining, unsigned _adaptiveWidth = 100, bool _estimateSynthesisRate = true, bool _estimateCodonSpecificParameter = true,
+				bool _estimateHyperParameter = true);
+		virtual ~MCMCAlgorithm();
+		MCMCAlgorithm(const MCMCAlgorithm& other);
 
-        void run(Genome& genome, Model& model);
+		void run(Genome& genome, Model& model);
 
-        bool isEstimateSynthesisRate() {return estimateSynthesisRate;}
-        bool isEstimateCodonSpecificParameter() {return estimateCodonSpecificParameter;}
-        bool isEstimateHyperParameter() {return estimateHyperParameter;}
+		bool isEstimateSynthesisRate() {return estimateSynthesisRate;}
+		bool isEstimateCodonSpecificParameter() {return estimateCodonSpecificParameter;}
+		bool isEstimateHyperParameter() {return estimateHyperParameter;}
 
-        void setEstimateSynthesisRate(bool in) {estimateSynthesisRate = in;}
-        void setEstimateCodonSpecificParameter(bool in) {estimateCodonSpecificParameter = in;}
-        void setEstimateHyperParameter(bool in) {estimateHyperParameter = in;}
+		void setEstimateSynthesisRate(bool in) {estimateSynthesisRate = in;}
+		void setEstimateCodonSpecificParameter(bool in) {estimateCodonSpecificParameter = in;}
+		void setEstimateHyperParameter(bool in) {estimateHyperParameter = in;}
+		void setRestartFileSettings(std::string filename, unsigned interval, bool multiple);
+		std::vector<double> getLogLikelihoodTrace() {return likelihoodTrace;}
+		double getLogLikelihoodPosteriorMean(unsigned samples);
 
-        std::vector<double> getLogLikelihoodTrace() {return likelihoodTrace;}
-        double getLogLikelihoodPosteriorMean(unsigned samples);
-
-    protected:
+	protected:
 };
 
 #endif // MCMCALGORITHM_H

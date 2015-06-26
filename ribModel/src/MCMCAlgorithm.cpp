@@ -19,6 +19,9 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * 
 {
 	MCMCAlgorithm(1000, 1, true, true, true);
 	likelihoodTrace.resize(samples);
+	file = "RestartFile.txt";
+	multipleFiles = false;
+	fileWriteInterval = 10;	
 }
 
 	MCMCAlgorithm::MCMCAlgorithm(int _samples, int _thining, unsigned _adaptiveWidth, bool _estimateSynthesisRate, bool _estimateCodonSpecificParameter, bool _estimateHyperParameter)
@@ -198,11 +201,11 @@ void MCMCAlgorithm::acceptRejectHyperParameter(int numGenes, Model& model, int i
 	double prev_std_sphi = model.getPreviousSphiProposalWidth();
 	double revJump_proposed = 0.0;
 	double revJump = 0.0;
-	if(curr_std_sphi != prev_std_sphi)
+	/*if(curr_std_sphi != prev_std_sphi)
 	{
 		revJump_proposed = std::log(Parameter::densityNorm(proposedSphi, currentSphi, curr_std_sphi));
 		revJump = std::log(Parameter::densityNorm(currentSphi, proposedSphi, prev_std_sphi));
-	}
+	}*/
 	logProbabilityRatio -= (std::log(currentSphi) - std::log(proposedSphi)) + (revJump_proposed - revJump);
 	if(!std::isfinite(logProbabilityRatio))
 	{
@@ -263,6 +266,21 @@ void MCMCAlgorithm::run(Genome& genome, Model& model)
 	for(unsigned iteration = 0; iteration < maximumIterations; iteration++)
 	{
 
+		if ((iteration + 1) % fileWriteInterval  == 0)
+		{
+			std::cout <<"Writing restart file!\n";
+			if (multipleFiles)
+			{
+				std::ostringstream oss;
+				oss << (iteration + 1) / thining << file;
+				std::string tmp = oss.str();
+				model.writeRestartFile(tmp);
+			}
+			else
+			{
+				model.writeRestartFile(file);
+			}
+		}
 		if( (iteration + 1) % 100 == 0)
 		{
 			std::cout << "Status at iteration " << (iteration+1) << std::endl;
@@ -273,8 +291,6 @@ void MCMCAlgorithm::run(Genome& genome, Model& model)
 			{
 				std::cout << "\t current Mixture element probability for element " << i << ": " << model.getCategoryProbability(i) << std::endl;
 			}
-			std::cout <<"Writing restart file!\n";
-			model.writeRestartFile("RestartFile.txt");
 		}
 		if(estimateCodonSpecificParameter) 
 		{
@@ -292,6 +308,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model)
 			acceptRejectHyperParameter(genome.getGenomeSize(), model, iteration);
 			if( ( (iteration + 1) % adaptiveWidth) == 0)
 			{
+				std::cout <<"Hi\n";
 				model.adaptSphiProposalWidth(adaptiveWidth);
 			}
 		}
@@ -341,6 +358,14 @@ double MCMCAlgorithm::getLogLikelihoodPosteriorMean(unsigned samples)
 
 	return posteriorMean / (double)samples;
 }
+
+void MCMCAlgorithm::setRestartFileSettings(std::string filename, unsigned interval, bool multiple)
+{
+	file = filename;
+	fileWriteInterval = interval * thining;
+	multipleFiles = multiple;
+
+}
 // ---------------------------------------------------------------------------
 // ----------------------------- RCPP STUFF ----------------------------------
 // ---------------------------------------------------------------------------
@@ -357,10 +382,11 @@ RCPP_MODULE(MCMCAlgorithm_mod)
 {
 	class_<MCMCAlgorithm>( "MCMCAlgorithm" )
 		.constructor("empty constructor")
-		.constructor <int, int, bool, bool, bool, unsigned>()
+		.constructor <int, int, int, bool, bool, bool>()
 		.method("run", &MCMCAlgorithm::run)
 		.method("getLogLikelihoodTrace", &MCMCAlgorithm::getLogLikelihoodTrace)
 		.method("getLogLikelihoodPosteriorMean", &MCMCAlgorithm::getLogLikelihoodPosteriorMean)
+		.method("setRestartFileSettings", &MCMCAlgorithm::setRestartFileSettings)
 		;
 }
 #endif

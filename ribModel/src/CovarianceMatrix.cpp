@@ -77,7 +77,6 @@ void CovarianceMatrix::initCovarianceMatrix(unsigned _numVariates)
 // http://rosettacode.org/wiki/Cholesky_decomposition#C
 void CovarianceMatrix::choleskiDecomposition()
 {
-    std::cout <<"choleskiDecomposition called\n";
     for(int i = 0; i < numVariates; i++)
     {
         for(int j = 0; j < (i + 1); j++)

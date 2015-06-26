@@ -296,7 +296,7 @@ void testWriteRestartFile(Genome &genome)
 void testInitFromRestartFile()
 {
 	std::cout << "------------------ TEST INITFROMRESTARTFILE ------------------" << std::endl;
-	ROCParameter parameter("RestartFile.txt");
+	ROCParameter parameter("RestartFile1.txt");
 	ROCModel model;
 	model.setParameter(parameter);
 	model.writeRestartFile("RestartFile2.txt");
@@ -306,7 +306,7 @@ void testInitFromRestartFile()
 
 int main()
 {
-	bool read = true;
+	bool read = false;
 	bool cedric = false;
 	std::cout << "Hello world!" << std::endl << std::endl;
 
@@ -389,6 +389,7 @@ int main()
 			}
 			scuoout.close();
 
+			mcmc.setRestartFileSettings("RestartFile.txt" , 20, true);
 			std::cout << "starting MCMC" << std::endl;
 			mcmc.run(genome, model);
 			std::cout << std::endl << "Finish MCMC" << std::endl;
@@ -413,7 +414,7 @@ int main()
 				scuoout << genome.getGene(n).getId() << "," << parameter.calculateSCUO(genome.getGene(n)) << std::endl;
 			}
 			scuoout.close();
-
+			mcmc.setRestartFileSettings("RestartFile.txt" , 20, true);
 			std::cout << "starting MCMC" << std::endl;
 			mcmc.run(genome, model);
 			std::cout << std::endl << "Finish MCMC" << std::endl;
