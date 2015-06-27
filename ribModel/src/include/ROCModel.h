@@ -10,7 +10,7 @@ class ROCModel : public Model
 
 				ROCParameter *parameter;
         virtual void obtainCodonCount(SequenceSummary& seqsum, char curAA, int codonCount[]);
-        virtual double calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codonCount[], double mutation[], double selection[], double phiValue);
+        double calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codonCount[], double mutation[], double selection[], double phiValue);
     public:
         ROCModel();
         virtual ~ROCModel();
@@ -19,7 +19,9 @@ class ROCModel : public Model
         virtual void calculateCodonProbabilityVector(unsigned numCodons, double* mutation, double* selection, double phi, double* codonProb);
         // Likelihood ratio functions
         virtual void calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio);
-        virtual void calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& genome, double& logAcceptanceRatioForAllMixtures);
+        virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures);
+
+				//Parameter wrapper functions:
 				virtual void initTraces(unsigned samples, unsigned num_genes, unsigned adaptiveSamples) {parameter -> initAllTraces(samples, num_genes, adaptiveSamples);}
 				virtual void writeRestartFile(std::string filename) {return parameter->writeEntireRestartFile(filename);}       
 				virtual double getSphi(bool proposed = false) {return parameter->getSphi(proposed);}
@@ -28,8 +30,8 @@ class ROCModel : public Model
 				virtual double getCategoryProbability(unsigned i) {return parameter->getCategoryProbability(i);}
 				virtual void proposeCodonSpecificParameter() {parameter->proposeCodonSpecificParameter();}
 				virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth) {parameter->adaptCodonSpecificParameterProposalWidth(adaptiveWidth);}
-				virtual void updateCodonSpecificParameter(char aa) {parameter->updateCodonSpecificParameter(aa);}
-				virtual void updateCodonSpecificParameterTrace(unsigned sample, char aa) {parameter->updateCodonSpecificParameterTrace(sample, aa);}
+				virtual void updateCodonSpecificParameter(std::string grouping) {parameter->updateCodonSpecificParameter(grouping);}
+				virtual void updateCodonSpecificParameterTrace(unsigned sample, std::string grouping) {parameter->updateCodonSpecificParameterTrace(sample,grouping);}
 				virtual void proposeSPhi() {parameter->proposeSPhi();}
 				virtual unsigned getMixtureAssignment(unsigned index) {return parameter->getMixtureAssignment(index);}
 				virtual unsigned getSynthesisRateCategory(unsigned mixture) {return parameter->getSynthesisRateCategory(mixture);}
@@ -55,6 +57,8 @@ class ROCModel : public Model
 				{
 					parameter -> getParameterForCategory(category, param, aa, proposal, returnValue);
 				}
+				virtual unsigned getListSize() {return 19;} //TODO: make not hardcoded?
+
 				 // R wrapper
         std::vector<double> CalculateProbabilitiesForCodons(std::vector<double> mutation, std::vector<double> selection, double phi);
 

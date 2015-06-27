@@ -29,6 +29,9 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * 
 	estimateHyperParameter(_estimateHyperParameter)
 {
 	likelihoodTrace.resize(samples);
+  file = "RestartFile.txt";
+  multipleFiles = false;
+  fileWriteInterval = 10;
 }
 
 MCMCAlgorithm::~MCMCAlgorithm()
@@ -229,21 +232,23 @@ void MCMCAlgorithm::acceptRejectHyperParameter(int numGenes, Model& model, int i
 void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& model, int iteration)
 {
 	double acceptanceRatioForAllMixtures = 0.0;
-	for(unsigned i = 0; i < 22; i++)
+	unsigned size = model.getListSize();
+	for(unsigned i = 0; i < size; i++)
 	{
-		char curAA = SequenceSummary::AminoAcidArray[i];
-		// skip amino acids with only one codon or stop codons
-		if(curAA == 'X' || curAA == 'M' || curAA == 'W') continue;
+		std::string grouping; 
+		if (size == 19) grouping = SequenceSummary::AminoAcidArray[i];
+		//TODO: add for RFP Model here
+
 		// calculate likelihood ratio for every Category for current AA
-		model.calculateLogLikelihoodRatioPerAAPerCategory(curAA, genome, acceptanceRatioForAllMixtures);
+		model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures);
 		if( -Parameter::randExp(1) < acceptanceRatioForAllMixtures )
 		{
 			// moves proposed codon specific parameters to current codon specific parameters
-			model.updateCodonSpecificParameter(curAA);
+			model.updateCodonSpecificParameter(grouping);
 		}
 		if((iteration % thining) == 0)
 		{
-			model.updateCodonSpecificParameterTrace(iteration/thining, curAA);
+			model.updateCodonSpecificParameterTrace(iteration/thining, grouping);
 		}
 	}
 }

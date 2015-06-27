@@ -66,7 +66,7 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsi
 
     double sPhi = parameter->getSphi(false);
     double logPhiProbability = std::log(ROCParameter::densityLogNorm(phiValue, (-(sPhi * sPhi) / 2), sPhi));
-    double logPhiProbability_proposed = std::log(ROCParameter::densityLogNorm(phiValue_proposed, (-(sPhi * sPhi) / 2), sPhi));
+    double logPhiProbability_proposed = std::log(Parameter::densityLogNorm(phiValue_proposed, (-(sPhi * sPhi) / 2), sPhi));
     double currentLogLikelihood = (logLikelihood + logPhiProbability);
     double proposedLogLikelihood = (logLikelihood_proposed + logPhiProbability_proposed);
 
@@ -151,8 +151,9 @@ double ROCModel::calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codo
     return logLikelihood;
 }
 
-void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& genome, double& logAcceptanceRatioForAllMixtures)
+void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures)
 {
+		char curAA = grouping[0];
     int numGenes = genome.getGenomeSize();
     int numCodons = SequenceSummary::GetNumCodonsForAA(curAA);
     double likelihood = 0.0;

@@ -100,6 +100,11 @@ ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
 	return *this;
 }
 
+//static initialization:
+const char groupList[] = {'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'Y', SequenceSummary::Ser2};
+
+
+
 void ROCParameter::initROCParameterSet()
 {
 	// proposal bias and std for codon specific parameter
@@ -883,8 +888,9 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 	}
 
 
-	void ROCParameter::updateCodonSpecificParameter(char aa)
+	void ROCParameter::updateCodonSpecificParameter(std::string grouping)
 	{
+		char aa = grouping[0];
 		unsigned aaRange[2];
 		SequenceSummary::AAToCodonRange(aa, true, aaRange);
 		unsigned aaIndex = SequenceSummary::aaToIndex.find(aa)->second;

@@ -32,6 +32,8 @@ class ROCParameter : public Parameter
 		std::vector<double> proposediidSum;
 		std::vector<double> currentiidSum;
 
+
+		static const char groupList[];
 		// proposal bias and std for codon specific parameter
 		double bias_csp;
 		std::vector<double> std_csp;
@@ -83,7 +85,7 @@ class ROCParameter : public Parameter
 
 
 		// functions to manage codon specific parameter
-		void updateCodonSpecificParameter(char aa);
+		void updateCodonSpecificParameter(std::string grouping);
 
 
 
@@ -92,8 +94,8 @@ class ROCParameter : public Parameter
 		virtual void updateSynthesisRateTrace(unsigned sample, unsigned geneIndex){traces.updateSynthesisRateTrace(sample, geneIndex, currentSynthesisRateLevel);}
 		virtual void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex) {traces.updateMixtureAssignmentTrace(sample, geneIndex, mixtureAssignment[geneIndex]);}
 		virtual void updateMixtureProbabilitiesTrace(unsigned samples) {traces.updateMixtureProbabilitiesTrace(samples, categoryProbabilities);}
-		void updateCodonSpecificParameterTrace(unsigned sample, char aa) {traces.updateCodonSpecificParameterTrace(sample, aa, currentMutationParameter, 
-				currentSelectionParameter);}
+		void updateCodonSpecificParameterTrace(unsigned sample, std::string grouping) {traces.updateCodonSpecificParameterTrace(sample, grouping[0], 
+			currentMutationParameter, currentSelectionParameter);}
 
 		// poposal functions
 		void proposeCodonSpecificParameter();
