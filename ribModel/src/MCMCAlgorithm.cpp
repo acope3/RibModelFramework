@@ -237,7 +237,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 	{
 		std::string grouping; 
 		if (size == 19) grouping = model.getGrouping(i);
-		//TODO: add for RFP Model here
+		else if (size == 61) grouping = model.getGrouping(i);
 
 		// calculate likelihood ratio for every Category for current AA
 		model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures);

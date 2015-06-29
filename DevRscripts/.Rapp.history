@@ -1,39 +1,3 @@
-mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth,
-est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
-model <- initializeModelObject("ROC")
-system.time(#
-  runMCMC(mcmc, genome, model, parameter)#
-)
-system.time(#
-  runMCMC(mcmc, genome, model)#
-)
-mcmc$run( genome, model)
-library(ribModel)#
-#
-#read genome#
-genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")#
-#
-#initialize parameter object#
-sphi_init <- 2;#
-numMixtures <- 2;#
-mixDef <- "allUnique";#
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))#
-parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
-# initialize MCMC object#
-samples <- 100#
-thining <- 10#
-adaptiveWidth <- 100#
-mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
-                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
-# get model object#
-model <- initializeModelObject("ROC")
-model$setParameter( parameter)
-mcmc$run(genome, model)
-plot(mcmc)
-trace <- parameter$getTraceObject()
-plot(trace, what = "MixtureProbability")
-plot(trace, what = "SPhi")
-plot(trace, what = "ExpectedPhi")
 plot(trace, what = "Expression", geneIndex = 905)
 plot(trace, what = "Mutation", mixture = 1)
 plot(trace, what = "Selection", mixture = 1)
@@ -1534,6 +1498,42 @@ model <- initializeModelObject("ROC")
 model$setParameter(parameter)
 mcmc$run(genome, model)
 plot(mcmc)
+trace <- parameter$getTraceObject()
+plot(trace, what = "MixtureProbability")
+plot(trace, what = "SPhi")
+plot(trace, what = "ExpectedPhi")
+plot(trace, what = "Expression", geneIndex = 905)
+plot(trace, what = "Mutation", mixture = 1)
+plot(trace, what = "Selection", mixture = 1)
+plot(model, genome, parameter, samples = samples*0.1, mixture = 2, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,500), rep(2,500))#
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)#
+ phivals <- parameter$readPhiValues( "../ribModel/data/simulatedSelectionSharedR_phi.csv" )#
+ parameter$initializeSynthesisRateByRandom(phivals)#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")#
+# initialize MCMC object#
+samples <- 100#
+thining <- 10#
+adaptiveWidth <- 10#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
+mcmc$setRestartFileSettings( "RestartFile.txt", 20, TRUE)
+model <- initializeModelObject("ROC")
+model$setParameter(parameter)
+mcmc$run(genome, model)
+plot(mcmc)
+plot(trace, what = "MixtureProbability")
+plot(trace, what = "MixtureProbability")
 trace <- parameter$getTraceObject()
 plot(trace, what = "MixtureProbability")
 plot(trace, what = "SPhi")

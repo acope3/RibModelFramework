@@ -12,7 +12,8 @@ class SequenceSummary
 
 		int ncodons[64];
 		int naa[22];
-
+		unsigned RFPObserved[64];
+		unsigned numCodonsInMRNA[64];
 	public:
 
 		//static member variables
@@ -21,7 +22,6 @@ class SequenceSummary
 		static const std::string codonArray[];
 		static const std::string codonArrayParameter[];
 		static const std::map<char, int> aaToIndex;
-
 		//constructors and destructors
 		explicit SequenceSummary();
 		SequenceSummary(const std::string& sequence);
@@ -33,15 +33,12 @@ class SequenceSummary
 		void clear();
 
 		int getAAcountForAA(char aa) {return naa[aaToIndex.find(aa)->second];}
-		int getAAcountForAA(int aa) 
-		{
-			return naa[aa];
-		}
+		int getAAcountForAA(int aa) {return naa[aa];}
 		int getCodonCountForCodon(std::string& codon) {return ncodons[SequenceSummary::CodonToIndex(codon)];}
-		int getCodonCountForCodon(int codon) 
-		{
-			return ncodons[codon];	
-		}
+		int getCodonCountForCodon(int codon) {return ncodons[codon];}
+
+		unsigned getRFPObserved(unsigned codonIndex) {return RFPObserved[codonIndex];}
+		unsigned getNumCodonsInMRNA(unsigned codonIndex) {return numCodonsInMRNA[codonIndex];}
 
 		//R Wrapper Functions
 		int getAAcount(char aa) {aa = std::toupper(aa);	return getAAcountForAA(aa);}
