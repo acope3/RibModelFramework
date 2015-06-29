@@ -1,17 +1,19 @@
 library(ribModel)
 rm(list=ls())
 #read genome
-genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_andCleft.fasta")
 
 #initialize parameter object
-sphi_init <- 2;
-numMixtures <- 2;
-mixDef <- "allUnique";
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
+sphi_init <- 2
+numMixtures <- 2
+mixDef <- "allUnique"
+#geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457), rep(1, 3903))
+#geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
+geneAssignment <- c(rep(1,448), rep(2,457))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
 
 # initialize MCMC object
-samples <- 1000
+samples <- 5000
 thining <- 10
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples=samples, thining=thining, adaptive.width=adaptiveWidth, 
@@ -29,15 +31,22 @@ plot(mcmc)
 
 # plots different aspects of trace
 trace <- parameter$getTraceObject()
+pdf("simulated_Genome_allUnique_startCSP_True_startPhi_true_adaptSphi_True.pdf")
 plot(trace, what = "MixtureProbability")
 plot(trace, what = "SPhi")
 plot(trace, what = "ExpectedPhi")
+dev.off()
 plot(trace, what = "Expression", geneIndex = 905)
+pdf("simulated_Genome_allUnique_startCSP_True_startPhi_true_adaptSphi_True_mix1.pdf", width = 11, height = 12)
 plot(trace, what = "Mutation", mixture = 1)
-plot(trace, what = "Selection", mixture = 2)
+plot(trace, what = "Selection", mixture = 1)
 
 # plots model fit (cub plot)
 plot(model, genome, parameter, samples = samples*0.1, mixture = 1, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
+dev.off()
+
+plot(parameter, what = "Mutation", main = "Mutation Correlation, Not shared")
+plot(parameter, what = "Selection", main = "Selecion Correlation, Not shared")
 
 ##-----------------------------------------##
 

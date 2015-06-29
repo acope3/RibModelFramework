@@ -92,6 +92,11 @@ class ROCParameter
 		static void swap(double& a, double& b);
 		static void swap(int& a, int& b);
 
+		static void quickSortPair(std::vector<double>& a, std::vector<int>& b, int first, int last);
+		static int pivotPair(std::vector<double>& a, std::vector<int>& b, int first, int last);
+		static void quickSort(std::vector<double>& a, int first, int last);
+		static int pivot(std::vector<double>& a, int first, int last);
+
 	public:
 		//static const members
 		static const unsigned dM;

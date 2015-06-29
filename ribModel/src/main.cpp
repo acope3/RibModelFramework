@@ -285,13 +285,13 @@ int main()
 	Genome genome;
 	std::cout << "reading fasta file" << std::endl;
 	if(cedric){
-		genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta");
+		genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/shortTestGenome.fasta");
 		//genome.readFasta("C:/Users/Cedric/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta");
 	}else{
 		genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta");
 	}
 	std::cout << "done reading fasta file" << std::endl;
-	bool testing =  false;
+	bool testing = false;
 
 	if(testing)
 	{
@@ -299,12 +299,12 @@ int main()
 		//testCodonRangePerAA(false);
 		//testCodonRangePerAA(true);
 		//testLogNormDensity();
-		//testSCUO(genome);
+		testSCUO(genome);
 		//testCovarianceMatrix();
 		//testRandMultiNom(3);
 		//testThetaKMatrix();
 		//testSimulateGenome(genome);
-		testCovMatrixOverloading();
+		//testCovMatrixOverloading();
 	}else{
 		ROCModel model;
 		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
@@ -339,6 +339,7 @@ int main()
 		parameter.InitializeExpression(genome, sphi_init);
 		//std::vector<double> phiVals = parameter.readPhiValues("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrCleft_phi_est.csv");
 		//parameter.InitializeExpression(phiVals);
+		exit(1);
 		std::cout << "done initialize ROCParameter object" << std::endl;
 
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;

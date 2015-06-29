@@ -78,11 +78,11 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, ROCP
     double prev_std_phi = parameter.getPreviousExpressionProposalWidth(expressionCategory, geneIndex);
 	double revJump_proposed = 0.0;
 	double revJump = 0.0;
-	if(curr_std_phi != prev_std_phi)
+	/*if(curr_std_phi != prev_std_phi)
 	{
 		revJump_proposed = std::log(ROCParameter::densityNorm(std::log(phiValue_proposed), std::log(phiValue), prev_std_phi));
 		revJump = std::log(ROCParameter::densityNorm(std::log(phiValue), std::log(phiValue_proposed), curr_std_phi));
-	}
+	}*/
     logProbabilityRatio[0] = (proposedLogLikelihood - currentLogLikelihood) - (std::log(phiValue) - std::log(phiValue_proposed)) + (revJump_proposed - revJump);
     logProbabilityRatio[1] = currentLogLikelihood - std::log(phiValue_proposed) + revJump;
     logProbabilityRatio[2] = proposedLogLikelihood - std::log(phiValue) + revJump_proposed;
@@ -201,11 +201,11 @@ void ROCModel::calculateLogLikelihoodRatioPerAAPerCategory(char curAA, Genome& g
 	double revJumpRatio = 0.0;
 	double curr_std_csp = parameter.getCurrentCodonSpecificProposalWidth(SequenceSummary::AAToAAIndex(curAA));
 	double prev_std_csp = parameter.getPreviousCodonSpecificProposalWidth(SequenceSummary::AAToAAIndex(curAA));
-	if(curr_std_csp != prev_std_csp)
+	/*if(curr_std_csp != prev_std_csp)
 	{
 		revJumpRatio = -0.5 * (parameter.getProposedIidSum(SequenceSummary::AAToAAIndex(curAA)) -
 				parameter.getCurrentIidSum(SequenceSummary::AAToAAIndex(curAA)) );
-	}
+	}*/
 	// We do ont use a transformation here so no jacobian is necessary
     logAcceptanceRatioForAllMixtures = (likelihood_proposed - likelihood) - revJumpRatio;
 }

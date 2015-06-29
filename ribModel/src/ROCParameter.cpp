@@ -590,33 +590,44 @@ double ROCParameter::calculateSCUO(Gene& gene)
 void ROCParameter::InitializeExpression(Genome& genome, double sd_phi)
 {
 	unsigned genomeSize = genome.getGenomeSize();
-	double* scuoValues = new double[genomeSize]();	
-	double* expression = new double[genomeSize]();	
-	int* index = new int[genomeSize]();	
+	std::vector<double> scuoValues;
+	scuoValues.resize(genomeSize);
+	std::vector<double> scuoValues2;
+	scuoValues2.resize(genomeSize);
+	std::vector<double> expression;
+	expression.resize(genomeSize);
+	//double* scuoValues = new double[genomeSize]();
+	//double* scuoValues2 = new double[genomeSize]();
+	//double* expression = new double[genomeSize]();
+	//int* index = new int[genomeSize]();
+	std::vector<int> index;
+	index.resize(genomeSize);
 
 	for(unsigned i = 0u; i < genomeSize; i++)
 	{
 		index[i] = i;
 		scuoValues[i] = calculateSCUO( genome.getGene(i) );
+		scuoValues2[i] = scuoValues[i];
 		expression[i] = ROCParameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
 	}
 	quickSortPair(scuoValues, index, 0, genomeSize);
 	quickSort(expression, 0, genomeSize);
-
+//	std::cout << "ORF" << "\t" << "SCUO" << "\t" << "PHI" << "\t" << "j" << "\t" << "index[j]" << std::endl;
 	for(unsigned category = 0u; category < numSelectionCategories; category++)
 	{
 		for(unsigned j = 0u; j < genomeSize; j++)
 		{
-			currentExpressionLevel[category][j] = expression[index[j]];
+			//std::cout << genome.getGene(j).getId() << "\t" << scuoValues2[index[j]] << "\t" << expression[j] << "\t" << j << "\t" << index[j] << std::endl;
+			currentExpressionLevel[category][index[j]] = expression[j];
 			std_phi[category][j] = 0.1;
 			prev_std_phi[category][j] = 0.1;
 			numAcceptForExpression[category][j] = 0u;
 		}
 	}
 
-	delete [] scuoValues;
-	delete [] expression;
-	delete [] index;
+	//delete [] scuoValues;
+	//delete [] expression;
+	//delete [] index;
 }
 void ROCParameter::InitializeExpression(double sd_phi)
 {
@@ -939,12 +950,12 @@ void ROCParameter::adaptSphiProposalWidth(unsigned adaptationWidth)
 	if(acceptanceLevel < 0.2)
 	{
 		prev_std_sphi = std_sphi;
-		std_sphi = std::max(0.01, std_sphi * 0.8);
+		std_sphi *= 0.8;
 	}
 	if(acceptanceLevel > 0.3)
 	{
 		prev_std_sphi = std_sphi;
-		std_sphi = std::min(100.0, std_sphi * 1.2);
+		std_sphi *= 1.2;
 	}
 	numAcceptForSphi = 0u;
 }
@@ -981,14 +992,14 @@ void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 	std::cout << "acceptance ratio for amino acid:\n\t";
 	for(unsigned i = 0; i < numCSPsets; i++){
 		if(i == 21 || i == 10 || i == 18) continue;
-		std::cout << SequenceSummary::AminoAcidArray[i] << "\t";
+		std::cout << SequenceSummary::AminoAcidArray[i] << "\t\t";
 	}
 	std::cout << "\n\t";
 	for(unsigned i = 0; i < numCSPsets; i++)
 	{
 		if(i == 21 || i == 10 || i == 18) continue;
 		double acceptanceLevel = (double)numAcceptForMutationAndSelection[i] / (double)adaptationWidth;
-		std::cout << acceptanceLevel << "\t";
+		std::cout << acceptanceLevel << "\t\t";
 		traces.updateCspAcceptanceRatioTrace(i, acceptanceLevel);
 		unsigned codonRange[2];
 		SequenceSummary::AAindexToCodonRange(i, true, codonRange);
@@ -1008,11 +1019,6 @@ void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 				covarianceMatrix[i] *= 1.2;
 				covarianceMatrix[i].choleskiDecomposition();
 			}
-		}
-		if(prev_std_csp[codonRange[0]] != std_csp[codonRange[0]])
-		{
-			// rescale covariance matrix and decompose again
-
 		}
 		numAcceptForMutationAndSelection[i] = 0u;
 	}
@@ -1064,7 +1070,7 @@ void ROCParameter::proposeCodonSpecificParameter()
 		unsigned aaRange[2];
 		SequenceSummary::AAindexToCodonRange(k, true, aaRange);
 		unsigned numCodons = aaRange[1] - aaRange[0];
-		for(unsigned i = 0u; i < 2*numCodons*numMixtures; i++)
+		for(unsigned i = 0u; i < numCodons * (numMutationCategories + numSelectionCategories); i++)
 		{
 			iidProposed.push_back( randNorm(0.0, 1.0) );
 		}
@@ -1376,30 +1382,33 @@ double ROCParameter::densityLogNorm(double x, double mean, double sd)
 // sort array interval from first (included) to last (excluded)!!
 // quick sort, sorting arrays a and b by a.
 // Elements in b corespond to a, a will be sorted and it will be assured that b will be sorted by a
-void ROCParameter::quickSortPair(double a[], int b[], int first, int last)
+void ROCParameter::quickSortPair(std::vector<double>& a, std::vector<int>& b, int first, int last)
+//void ROCParameter::quickSortPair(double a[], int b[], int first, int last)
 {
 	int pivotElement;
 
 	if(first < last)
 	{
 		pivotElement = pivotPair(a, b, first, last);
-		quickSortPair(a, b, first, pivotElement - 1);
+		quickSortPair(a, b, first, pivotElement);
 		quickSortPair(a, b, pivotElement + 1, last);
 	}
 }
 // sort array interval from first (included) to last (excluded)!!
-void ROCParameter::quickSort(double a[], int first, int last)
+void ROCParameter::quickSort(std::vector<double>& a, int first, int last)
+//void ROCParameter::quickSort(double a[], int first, int last)
 {
 	int pivotElement;
 
 	if(first < last)
 	{
 		pivotElement = pivot(a, first, last);
-		quickSort(a, first, pivotElement - 1);
+		quickSort(a, first, pivotElement);
 		quickSort(a, pivotElement + 1, last);
 	}
 }
-int ROCParameter::pivot(double a[], int first, int last)
+int ROCParameter::pivot(std::vector<double>& a, int first, int last)
+//int ROCParameter::pivot(double a[], int first, int last)
 {
 	int p = first;
 	double pivotElement = a[first];
@@ -1417,7 +1426,8 @@ int ROCParameter::pivot(double a[], int first, int last)
 
 	return p;
 }
-int ROCParameter::pivotPair(double a[], int b[], int first, int last)
+int ROCParameter::pivotPair(std::vector<double>& a, std::vector<int>& b, int first, int last)
+//int ROCParameter::pivotPair(double a[], int b[], int first, int last)
 {
 	int p = first;
 	double pivotElement = a[first];

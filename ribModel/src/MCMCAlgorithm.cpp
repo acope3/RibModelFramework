@@ -140,7 +140,7 @@ double MCMCAlgorithm::acceptRejectExpressionLevelForAllGenes(Genome& genome, ROC
             probabilities[k] = probabilities[k] / normalizingProbabilityConstant;
         }
         // Get category in which the gene is placed in.
-        // If we use multiple sequence observation (like different mutatnts) randMultinom needs an parameter N to place N observations in numMixture buckets
+        // If we use multiple sequence observation (like different mutants) randMultinom needs an parameter N to place N observations in numMixture buckets
         unsigned categoryOfGene = ROCParameter::randMultinom(probabilities, numMixtures);
         parameter.setMixtureAssignment(i, categoryOfGene);
         dirichletParameters[categoryOfGene] += 1;
@@ -194,12 +194,14 @@ void MCMCAlgorithm::acceptRejectHyperParameter(int numGenes, ROCParameter& param
     double prev_std_sphi = parameter.getPreviousSphiProposalWidth();
 	double revJump_proposed = 0.0;
 	double revJump = 0.0;
-	if(curr_std_sphi != prev_std_sphi)
+	/*if(curr_std_sphi != prev_std_sphi)
 	{
 		revJump_proposed = std::log(ROCParameter::densityNorm(std::log(proposedSphi), std::log(currentSphi), curr_std_sphi));
 		revJump = std::log(ROCParameter::densityNorm(std::log(currentSphi), std::log(proposedSphi), prev_std_sphi));
-	}
+	}*/
+	// take jacobian and reverse jumb probability into account
     logProbabilityRatio -= (std::log(currentSphi) - std::log(proposedSphi)) + (revJump_proposed - revJump);
+
     if(!std::isfinite(logProbabilityRatio))
     {
     	std::cout << "logProbabilityRatio not finite!\n";
