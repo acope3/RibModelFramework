@@ -117,10 +117,10 @@ void testThetaKMatrix()
 	//unsigned matrix[2][2] = { {2,1}, {1,1} };
 	std::cout << "------------------ TEST THETAKMATRIX ------------------" << std::endl;
 	std::vector<unsigned> empty(100, 1);
-	std::vector<std::vector<unsigned>> thetaKMatrix;
-	ROCParameter R(2, 2, empty, thetaKMatrix, true, "allUnique");
+	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
+	ROCParameter R(2, 2, empty, mixtureDefinitionMatrix, true, "allUnique");
 
-	R.printThetaKMatrix();
+	//R.printThetaKMatrix();
 	std::cout <<"numMutationCategories: " << R.getNumMutationCategories() <<"\n";
 	std::cout <<"numSelectionCategories: " << R.getNumSelectionCategories() <<"\n";
 	std::vector<std::string> files = {"Skluyveri_CSP_ChrA.csv", "Skluyveri_CSP_ChrCleft.csv"};
@@ -178,8 +178,8 @@ void testSimulateGenome(Genome& genome)
 	std::cout << "\tSphi init: " << sphi_init << "\n";
 	std::cout << "\t# mixtures: " << numMixtures << "\n";
 	std::cout << "\tmixture definition: " << mixDef << "\n";
-	std::vector<std::vector<unsigned>> thetaKMatrix;
-	ROCParameter parameter(sphi_init, numMixtures, geneAssignment, thetaKMatrix, true, mixDef);
+	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
+	ROCParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 	std::vector<std::string> files = {"Skluyveri_CSP_ChrA.csv", "Skluyveri_CSP_ChrCleft.csv"};
 	parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
 	parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
@@ -278,8 +278,8 @@ void testWriteRestartFile(Genome &genome)
 	double sphi_init = 2;
 	double numMixtures = 2;
 	std::string mixDef = ROCParameter::allUnique;
-	std::vector<std::vector<unsigned>> thetaKMatrix;
-	ROCParameter parameter = ROCParameter(sphi_init, numMixtures, geneAssignment, thetaKMatrix, true, mixDef);
+	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
+	ROCParameter parameter = ROCParameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 	std::vector<std::string> files(2);
 	files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv");
 	files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv");
@@ -360,8 +360,8 @@ int main()
 			std::cout << "\tSphi init: " << sphi_init << "\n";
 			std::cout << "\t# mixtures: " << numMixtures << "\n";
 			std::cout << "\tmixture definition: " << mixDef << "\n";
-			std::vector<std::vector<unsigned>> thetaKMatrix;
-			ROCParameter parameter = ROCParameter(sphi_init, numMixtures, geneAssignment, thetaKMatrix, true, mixDef);
+			std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
+			ROCParameter parameter = ROCParameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 
 			std::vector<std::string> files(2);
 			if(cedric)

@@ -10,7 +10,7 @@ ROCTrace::ROCTrace() : Trace()
 }
 
 void ROCTrace::initAllTraces(unsigned samples, unsigned num_genes, unsigned adaptiveSamples, unsigned numMutationCategories, unsigned numSelectionCategories,
-		unsigned numParam, unsigned numMixtures, std::vector<thetaK> &_categories)
+		unsigned numParam, unsigned numMixtures, std::vector<mixtureDefinition> &_categories)
 {
 	initBaseTraces(samples, num_genes, numMutationCategories, numMixtures, _categories);
 	initROCTraces(samples, numMutationCategories, numSelectionCategories, numParam);

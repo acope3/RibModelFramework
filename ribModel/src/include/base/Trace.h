@@ -26,8 +26,8 @@ class Trace
 
 
 		//Init functions
-		void initAllTraces(unsigned samples, unsigned num_genes, unsigned numSelectionCategories, unsigned numMixtures, std::vector<mixtureDefintion> &_categories);
-		void initBaseTraces(unsigned samples, unsigned num_genes, unsigned numSelectionCategories, unsigned numMixtures, std::vector<mixtureDefintion> &_categories);
+		void initAllTraces(unsigned samples, unsigned num_genes, unsigned numSelectionCategories, unsigned numMixtures, std::vector<mixtureDefinition> &_categories);
+		void initBaseTraces(unsigned samples, unsigned num_genes, unsigned numSelectionCategories, unsigned numMixtures, std::vector<mixtureDefinition> &_categories);
 		bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);
 
 		void initSphiTrace(unsigned samples);
@@ -72,7 +72,7 @@ class Trace
 		unsigned getNumberOfMixtures() {return mixtureProbabilitiesTrace.size();}
 
 	protected:
-		std::vector<mixtureDefintion> *categories;
+		std::vector<mixtureDefinition> *categories;
 };
 
 #endif //TRACE_H

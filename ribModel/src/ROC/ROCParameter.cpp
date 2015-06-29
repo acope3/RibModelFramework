@@ -66,7 +66,6 @@ ROCParameter::ROCParameter(const ROCParameter& other) : Parameter(other)
 	// proposal bias and std for codon specific parameter
 	bias_csp = other.bias_csp;
 	std_csp = other.std_csp;
-	prev_std_csp = other.prev_std_csp;
 
 	currentMutationParameter = other.currentMutationParameter;
 	proposedMutationParameter = other.proposedMutationParameter;
@@ -86,7 +85,6 @@ ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
 	// proposal bias and std for codon specific parameter
 	bias_csp = rhs.bias_csp;
 	std_csp = rhs.std_csp;
-	prev_std_csp = rhs.prev_std_csp;
 
 	currentMutationParameter = rhs.currentMutationParameter;
 	proposedMutationParameter = rhs.proposedMutationParameter;
@@ -107,7 +105,6 @@ void ROCParameter::initROCParameterSet()
 	// proposal bias and std for codon specific parameter
 	bias_csp = 0;
 	std_csp.resize(numParam, 0.1); 
-	prev_std_csp.resize(numParam, 0.1); //TODO hase to be initialized with 1 when switched to the covariance matrix!!!
 	numAcceptForMutationAndSelection.resize(22, 0u);
 
 	phiEpsilon = 0.1;
@@ -135,8 +132,6 @@ void ROCParameter::initROCParameterSet()
 		proposedSelectionParameter[i] = tmp;
 		currentSelectionParameter[i] = tmp;
 	}
-	proposediidSum.resize(22);
-	currentiidSum.resize(22);
 }
 
 
@@ -325,10 +320,7 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 	//init other values
 	phiEpsilon = 0.1;
 	phiEpsilon_proposed = 0.1;
-	proposediidSum.resize(22);
-	currentiidSum.resize(22);
 	bias_csp = 0;
-	prev_std_csp.resize(numParam, 0.1);
 	numAcceptForMutationAndSelection.resize(22, 0u);
 	proposedMutationParameter.resize(numMutationCategories);
 	proposedSelectionParameter.resize(numSelectionCategories);
@@ -500,13 +492,6 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 		unsigned codonRange[2];
 		SequenceSummary::AAindexToCodonRange(aa, true, codonRange);
 		return std_csp[codonRange[0]];
-	}
-
-	double ROCParameter::getPreviousCodonSpecificProposalWidth(unsigned aa)
-	{
-		unsigned codonRange[2];
-		SequenceSummary::AAindexToCodonRange(aa, true, codonRange);
-		return prev_std_csp[codonRange[0]];
 	}
 
 	void ROCParameter::adaptSphiProposalWidth(unsigned adaptationWidth)
@@ -860,7 +845,7 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 			std::cout << SequenceSummary::AminoAcidArray[i] << "\t";
 
 			double acceptanceLevel = (double)numAcceptForMutationAndSelection[i] / (double)adaptationWidth;
-			std::cout << acceptanceLevel << "\t";
+			std::cout << acceptanceLevel << "\n";
 			traces.updateCspAcceptanceRatioTrace(i, acceptanceLevel);
 			unsigned codonRange[2];
 			SequenceSummary::AAindexToCodonRange(i, true, codonRange);
@@ -907,7 +892,6 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 				currentSelectionParameter[k][i] = proposedSelectionParameter[k][i];
 			}
 		}
-		currentiidSum = proposediidSum;
 	}
 
 

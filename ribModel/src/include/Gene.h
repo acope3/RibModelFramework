@@ -1,7 +1,7 @@
 #ifndef GENE_H
 #define GENE_H
 
-#include "include/SequenceSummary.h"
+#include "SequenceSummary.h"
 
 #include <string>
 #include <vector>

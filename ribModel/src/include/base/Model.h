@@ -34,7 +34,6 @@ class Model
 				virtual unsigned getMutationCategory(unsigned mixture) =0;
 				virtual double getSynthesisRate(unsigned index, unsigned mixture, bool proposed = false) =0; 
 				virtual double getCurrentSphiProposalWidth() =0;
-				virtual double getPreviousSphiProposalWidth() =0;
 				virtual void updateSphi() =0;
 				virtual void updateSphiTrace(unsigned sample) =0;
 				virtual void adaptSphiProposalWidth(unsigned adaptiveWidth) =0;

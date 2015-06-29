@@ -73,8 +73,6 @@ class ROCParameter : public Parameter
 		std::vector<std::vector<double>> getCurrentMutationParameter() {return currentMutationParameter;}
 		std::vector<std::vector<double>> getCurrentSelectionParameter() {return currentSelectionParameter;}
 
-		double getCurrentIidSum(unsigned aaindex) {return currentiidSum[aaindex];}
-		double getProposedIidSum(unsigned aaindex) {return proposediidSum[aaindex];}
 
 		double getPreviousCodonSpecificProposalWidth(unsigned aa);
 		// Phi epsilon functions

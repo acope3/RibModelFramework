@@ -1,4 +1,4 @@
-#include "include/base/Parameter.h"
+#include "../include/base/Parameter.h"
 #include <sstream>
 Parameter::Parameter()
 {
@@ -20,12 +20,10 @@ Parameter::Parameter(const Parameter& other)
   // proposal bias and std for phi values
   bias_sphi = other.bias_sphi;
   std_sphi = other.std_sphi;
-  prev_std_sphi = other.prev_std_sphi;
 
   // proposal bias and std for phi values
   bias_phi = other.bias_phi;
   std_phi = other.std_phi;
-  prev_std_phi = other.prev_std_phi;
 
   currentSynthesisRateLevel = other.currentSynthesisRateLevel;
   proposedSynthesisRateLevel = other.proposedSynthesisRateLevel;
@@ -52,12 +50,10 @@ Parameter& Parameter::operator=(const Parameter& rhs)
   // proposal bias and std for phi values
   bias_sphi = rhs.bias_sphi;
   std_sphi = rhs.std_sphi;
-  prev_std_sphi = rhs.prev_std_sphi;
 
   // proposal bias and std for phi values
   bias_phi = rhs.bias_phi;
   std_phi = rhs.std_phi;
-  prev_std_phi = rhs.prev_std_phi;
 
   currentSynthesisRateLevel = rhs.currentSynthesisRateLevel;
   proposedSynthesisRateLevel = rhs.proposedSynthesisRateLevel;
@@ -73,7 +69,7 @@ Parameter& Parameter::operator=(const Parameter& rhs)
 }
 
 void Parameter::initParameterSet(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, 
-		std::vector<std::vector<unsigned>> mixtureDefintionMatrix, bool splitSer,   std::string _mutationSelectionState)
+		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix, bool splitSer,   std::string _mutationSelectionState)
 {
 	// assign genes to mixture element
 	unsigned numGenes = geneAssignment.size();
@@ -100,7 +96,6 @@ void Parameter::initParameterSet(double sphi, unsigned _numMixtures, std::vector
 	Sphi_proposed = sphi;
 	bias_sphi = 0;
 	std_sphi = 0.1;
-	prev_std_sphi = 0.1;
 
 	numAcceptForSphi = 0u;
 
@@ -108,10 +103,10 @@ void Parameter::initParameterSet(double sphi, unsigned _numMixtures, std::vector
 	bias_phi = 0;
 
 
-	setNumMutationSelectionValues(_mutationSelectionState, mixtureDefintionMatrix);
+	setNumMutationSelectionValues(_mutationSelectionState, mixtureDefinitionMatrix);
 	mutationIsInMixture.resize(numMutationCategories);
 	selectionIsInMixture.resize(numSelectionCategories);
-	initCategoryDefinitions(_mutationSelectionState, mixtureDefintionMatrix);
+	initCategoryDefinitions(_mutationSelectionState, mixtureDefinitionMatrix);
 
 	categoryProbabilities.resize(numMixtures, 1.0/(double)numMixtures);
 
@@ -120,7 +115,6 @@ void Parameter::initParameterSet(double sphi, unsigned _numMixtures, std::vector
 
 	numAcceptForSynthesisRate.resize(numSelectionCategories);
 	std_phi.resize(numSelectionCategories);
-  prev_std_phi.resize(numSelectionCategories);
 
   for (unsigned i = 0u; i < numSelectionCategories; i++)
   {
@@ -134,7 +128,6 @@ void Parameter::initParameterSet(double sphi, unsigned _numMixtures, std::vector
 
     std::vector<double> tempStdPhi(numGenes, 0.1);
     std_phi[i] = tempStdPhi;
-    prev_std_phi[i] = tempStdPhi;
   }
 
   for (unsigned i = 0; i < 22; i++)
@@ -432,7 +425,7 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 			else if (variableName == "categories")
 			{
 				iss.str(tmp);
-				mixtureDefintion K;
+				mixtureDefinition K;
 				iss >> K.delM;
 				iss >> K.delEta;
 				categories.push_back(K);
@@ -540,17 +533,14 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 	Aphi_proposed = Aphi;
 	numAcceptForSphi = 0u;
 	bias_sphi = 0;
-	prev_std_sphi = std_sphi;
 	bias_phi = 0;
 	
-	prev_std_phi.resize(numSelectionCategories);
 	numAcceptForSynthesisRate.resize(numSelectionCategories);
 	proposedSynthesisRateLevel.resize(numSelectionCategories);
 	for (unsigned i = 0; i < numSelectionCategories; i++)
 	{
 		proposedSynthesisRateLevel[i] = currentSynthesisRateLevel[i];
 		std::vector <double> tmp(currentSynthesisRateLevel[i].size(), 0.1);
-		prev_std_phi[i] = std_phi[i];
 
 		std::vector <unsigned> tmp2(currentSynthesisRateLevel[i].size(), 0u);
 		numAcceptForSynthesisRate[i] = tmp2;
@@ -626,9 +616,9 @@ std::vector <double> Parameter::readPhiValues(std::string filename)
 }
 
 
-void Parameter::setNumMutationSelectionValues(std::string mutationSelectionState, std::vector<std::vector<unsigned>> mixtureDefintionMatrix)
+void Parameter::setNumMutationSelectionValues(std::string mutationSelectionState, std::vector<std::vector<unsigned>> mixtureDefinitionMatrix)
 {
-	if (!mixtureDefintionMatrix.empty())
+	if (!mixtureDefinitionMatrix.empty())
 	{
 		//sets allow only the unique numbers to be added.
 		//at the end, the size of the set is equal to the number
@@ -638,8 +628,8 @@ void Parameter::setNumMutationSelectionValues(std::string mutationSelectionState
 
 		for (unsigned i = 0u; i < numMixtures; i++)
 		{
-			delMCounter.insert(mixtureDefintionMatrix[i][0] - 1);
-			delEtaCounter.insert(mixtureDefintionMatrix[i][1] - 1);
+			delMCounter.insert(mixtureDefinitionMatrix[i][0] - 1);
+			delEtaCounter.insert(mixtureDefinitionMatrix[i][1] - 1);
 		}
 		numMutationCategories = delMCounter.size();
 		numSelectionCategories = delEtaCounter.size();
@@ -661,20 +651,20 @@ void Parameter::setNumMutationSelectionValues(std::string mutationSelectionState
 	}
 }
 
-void Parameter::initCategoryDefinitions(std::string mutationSelectionState, std::vector<std::vector<unsigned>> mixtureDefintionMatrix)
+void Parameter::initCategoryDefinitions(std::string mutationSelectionState, std::vector<std::vector<unsigned>> mixtureDefinitionMatrix)
 {
 	std::set<unsigned> delMCounter;
 	std::set<unsigned> delEtaCounter;
 
 	for (unsigned i = 0; i < numMixtures; i++)
 	{
-		categories.push_back(mixtureDefintion()); //push a blank mixtureDefintion on the vector, then alter.
-		if (!mixtureDefintionMatrix.empty())
+		categories.push_back(mixtureDefinition()); //push a blank mixtureDefinition on the vector, then alter.
+		if (!mixtureDefinitionMatrix.empty())
 		{
-			categories[i].delM = mixtureDefintionMatrix[i][0] - 1;
-			categories[i].delEta = mixtureDefintionMatrix[i][1] - 1; //need check for negative and consecutive checks
-			mutationIsInMixture[mixtureDefintionMatrix[i][0] - 1].push_back(i);
-			selectionIsInMixture[mixtureDefintionMatrix[i][1] - 1].push_back(i);
+			categories[i].delM = mixtureDefinitionMatrix[i][0] - 1;
+			categories[i].delEta = mixtureDefinitionMatrix[i][1] - 1; //need check for negative and consecutive checks
+			mutationIsInMixture[mixtureDefinitionMatrix[i][0] - 1].push_back(i);
+			selectionIsInMixture[mixtureDefinitionMatrix[i][1] - 1].push_back(i);
 		}
 		else if (mutationSelectionState == selectionShared)
 		{
@@ -709,7 +699,7 @@ void Parameter::initCategoryDefinitions(std::string mutationSelectionState, std:
 
 
 
-void Parameter::printThetaKMatrix()
+void Parameter::printMixtureDefinitionMatrix()
 {
 	for (unsigned i = 0u; i < numMixtures; i++)
 	{
@@ -775,7 +765,6 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 			currentSynthesisRateLevel[category][index[j]] = expression[j];
 			//std::cout << currentSynthesisRateLevel[category][j] <<"\n";
 			std_phi[category][j] = 0.1;
-			prev_std_phi[category][j] = 0.1;
 			numAcceptForSynthesisRate[category][j] = 0u;
 		}
 	}
@@ -798,7 +787,6 @@ void Parameter::InitializeSynthesisRate(double sd_phi)
 		{
 			currentSynthesisRateLevel[category][i] = Parameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
 			std_phi[category][i] = 0.1;
-			prev_std_phi[category][i] = 0.1;
 			numAcceptForSynthesisRate[category][i] = 0u;
 		}
 	}
@@ -812,7 +800,6 @@ void Parameter::InitializeSynthesisRate(std::vector<double> expression)
 		{
 			currentSynthesisRateLevel[category][i] = expression[i];
 			std_phi[category][i] = 0.1;
-			prev_std_phi[category][i] = 0.1;
 			numAcceptForSynthesisRate[category][i] = 0u;
 		}
 	}
