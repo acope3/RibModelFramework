@@ -47,13 +47,16 @@ void CovarianceMatrix::operator*(const double &value)
 		covMatrix[i] *= value;
 	}
 }
+
+
 void CovarianceMatrix::operator*=(const double &value)
 {
-	for (unsigned i = 0; i < covMatrix.size(); i++)
-	{
-		covMatrix[i] *= value;
-	}
+  for (unsigned i = 0; i < covMatrix.size(); i++)
+  {
+    covMatrix[i] *= value;
+  }
 }
+
 
 void CovarianceMatrix::initCovarianceMatrix(unsigned _numVariates)
 {
@@ -156,6 +159,13 @@ void CovarianceMatrix::printCholeskiMatrix()
         std::cout << choleskiMatrix[i]<< "\t";
     }
     std::cout <<"\n";
+}
+
+
+std::vector<double>* CovarianceMatrix::getCovMatrix()
+{
+	std::vector<double> *ptr = &covMatrix;
+	return ptr;
 }
 
 #ifndef STANDALONE

@@ -33,15 +33,15 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
   }
   # initialize expression values
   if(is.null(expressionValues)){
-    parameter$initializeExpressionByGenome(genome, sphi)
+    parameter$initializeSynthesisRateByGenome(genome, sphi)
   }else{
-    parameter$initializeExpressionByList(expressionValues)
+    parameter$initializeSynthesisRateByList(expressionValues)
   }
   
   numMutationCategory <- parameter$numMutationCategories
   numSelectionCategory <- parameter$numSelectionCategories
   
-  phi <- parameter$getCurrentExpressionForMixture(1) # phi values are all the same initially
+  phi <- parameter$getCurrentSynthesisRateForMixture(1) # phi values are all the same initially
   names.aa <- aminoAcids()
   for(aa in names.aa)
   {
@@ -91,9 +91,10 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
       compl.covMat[matrix.positions == matrix.positions[ofdiag.seq[i], mut.seq[i]]] <- unlist(covmat[[i]][3])
     }
     #for testing
-    compl.covMat <- diag((numMutationCategory+numSelectionCategory) * numCodons) * 0.05
-    #compl.covMat / max(abs(compl.covMat))
+    compl.covMat <- diag((numMutationCategory + numSelectionCategory) * numCodons) *0.05
+    #compl.covMat / max(compl.covMat)
     parameter$initCovarianceMatrix(compl.covMat, aa)
+    
   }
   
   return(parameter)

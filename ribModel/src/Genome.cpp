@@ -1,6 +1,6 @@
 #include "include/Genome.h"
-#include "include/ROCParameter.h"//these two files must be included here to get at the implimentation
-#include "include/ROCModel.h" 		//for simulateGenome. They cannot be included in the header file. See genome.h for
+#include "include/ROC/ROCParameter.h"//these two files must be included here to get at the implimentation
+#include "include/ROC/ROCModel.h" 		//for simulateGenome. They cannot be included in the header file. See genome.h for
 //more information on circular dependices/forward declarations
 #include <iostream>     // std::cout, std::cerr
 #include <cstring>
@@ -209,7 +209,7 @@ Gene& Genome::getGene(std::string id)
 	return genes[i-1];
 }
 
-void Genome::simulateGenome(ROCParameter& parameter, ROCModel& model)
+void Genome::simulateGenome(Model& model)
 {
 	unsigned i;
 	int j, k;
@@ -221,6 +221,7 @@ void Genome::simulateGenome(ROCParameter& parameter, ROCModel& model)
 	std::string codon;
 	char curAA;
 	std::string tmpDesc;
+
 
 	//std::srand(std::time(0));
 	simulatedGenes.resize(genes.size());
@@ -235,11 +236,11 @@ void Genome::simulateGenome(ROCParameter& parameter, ROCModel& model)
 		tmpSeq += "ATG"; //Always will have the start amino acid
 
 
-		unsigned mixtureElement = parameter.getMixtureAssignment(i);
-		unsigned mutationCategory = parameter.getMutationCategory(mixtureElement);
-		unsigned selectionCategory = parameter.getSelectionCategory(mixtureElement);
-		unsigned expressionCategory = parameter.getExpressionCategory(mixtureElement);
-		double phi = parameter.getExpression(i, expressionCategory, false);
+		unsigned mixtureElement = model.getMixtureAssignment(i);
+		unsigned mutationCategory = model.getMutationCategory(mixtureElement);
+		unsigned selectionCategory = model.getSelectionCategory(mixtureElement);
+		unsigned expressionCategory = model.getSynthesisRateCategory(mixtureElement);
+		double phi = model.getSynthesisRate(i, expressionCategory, false);
 
 		std::ostringstream strstream;
 		strstream << mixtureElement;
@@ -262,8 +263,8 @@ void Genome::simulateGenome(ROCParameter& parameter, ROCModel& model)
 			}
 			else
 			{
-				parameter.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
-				parameter.getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
+				model.getParameterForCategory(mutationCategory, Parameter::dM, curAA, false, mutation);
+				model.getParameterForCategory(selectionCategory, Parameter::dEta, curAA, false, selection);
 				model.calculateCodonProbabilityVector(numCodons, mutation, selection, phi, codonProb);
 			}
 			for (k = 0; k < aaCount; k++)
@@ -274,7 +275,7 @@ void Genome::simulateGenome(ROCParameter& parameter, ROCModel& model)
 				tmpSeq += codon;
 			}
 		}
-
+		
 		codon =	seqSum.IndexToCodon((rand() % 3) + 61); //randomly choose a stop codon, from range 61-63
 		tmpSeq += codon;
 		Gene tmpGene(tmpSeq, tmpID, tmpDesc);

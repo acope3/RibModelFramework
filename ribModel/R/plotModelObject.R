@@ -28,13 +28,13 @@ plot.Rcpp_ROCModel <- function(model, genome, parameter, samples = 100, mixture 
   
   mixtureAssignment <- unlist(lapply(1:num.genes,  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))
   genes.in.mixture <- which(mixtureAssignment == mixture)
-  expressionCategory <- parameter$getExpressionCategoryForMixture(mixture)
+  expressionCategory <- parameter$getSynthesisRateCategoryForMixture(mixture)
   
   # need expression values to know range
   num.genes <- length(genes.in.mixture)
   if(estim.Expression){ # use estimated expression values
     expressionValues <- unlist(lapply(genes.in.mixture, function(geneIndex){
-      parameter$getExpressionPosteriorMeanByMixtureElementForGene(samples, geneIndex, expressionCategory)
+      parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(samples, geneIndex, expressionCategory)
     }))  
   }else{ # use empirical expression values
     
@@ -120,7 +120,7 @@ plotSinglePanel <- function(parameter, model, genome, expressionValues, samples,
   codonCounts[is.nan(codonCounts)] <- NA # necessary if AA does not appear in gene
   
   # make empty plot
-  plot(NULL, NULL, xlim=range(expressionValues, na.rm = T) + c(-0.1, 0.05), ylim=c(-0.05,1.05), 
+  plot(NULL, NULL, xlim=range(expressionValues, na.rm = T), ylim=c(-0.05,1.05), 
        xlab = "", ylab="", axes = FALSE)
   # bin expression values of genes
   quantiles <- quantile(expressionValues, probs = seq(0.05, 0.95, 0.05), na.rm = T)

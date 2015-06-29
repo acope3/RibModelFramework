@@ -66,7 +66,7 @@ bool SequenceSummary::processSequence(const std::string& sequence)
 		}
 		else 
 		{
-			std::cerr << "WARNING: Codon " << codon << " nor recognized!\n Codon will be ignored!\n";
+			std::cerr << "WARNING: Codon " << codon << " not recognized!\n Codon will be ignored!\n";
 			check = false;
 		}
 	}
@@ -89,7 +89,7 @@ const std::string SequenceSummary::codonArray[] = {"GCA", "GCC", "GCG", "GCT", "
 const std::string SequenceSummary::codonArrayParameter[] = {"GCA", "GCC", "GCG", "TGC", "GAC",
 	"GAA", "TTC", "GGA", "GGC", "GGG",
 	"CAC", "ATA", "ATC", "AAA", "CTA",
-	"CTC", "CTG", "CTT", "TTA",	"AAC",
+	"CTC", "CTG", "CTT", "TTA", "AAC",
 	"CCA", "CCC", "CCG", "CAA", "AGA",
 	"AGG", "CGA", "CGC", "CGG", "TCA",
 	"TCC", "TCG", "ACA", "ACC", "ACG",
@@ -236,10 +236,7 @@ char SequenceSummary::IndexToAA(int aa)
 	return AminoAcidArray[aa];
 }
 
-unsigned SequenceSummary::AAToAAIndex(char aa)
-{
-	return SequenceSummary::aaToIndex.find(aa) -> second;
-}
+
 unsigned SequenceSummary::CodonToAAIndex(std::string& codon)
 {
 	char aa = SequenceSummary::CodonToAA(codon);
@@ -265,6 +262,10 @@ std::string SequenceSummary::IndexToCodon(unsigned i, bool forParamVector)
 	return forParamVector ? codonArrayParameter[i] : codonArray[i];
 }
 
+unsigned SequenceSummary::AAToAAIndex(char aa)
+{
+	return SequenceSummary::aaToIndex.find(aa) -> second;
+}
 
 unsigned SequenceSummary::GetNumCodonsForAA(char& aa, bool forParamVector)
 {

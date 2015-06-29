@@ -1,7 +1,7 @@
 #ifndef GENE_H
 #define GENE_H
 
-#include "../include/SequenceSummary.h"
+#include "include/SequenceSummary.h"
 
 #include <string>
 #include <vector>
@@ -16,8 +16,7 @@ class Gene
 		std::string id;
 		std::string description;
 
-		//double currentPhiValue;
-		//double currentLikelihood;
+		std::vector<double> observedPhiValues;
 
 		void cleanSeq(); // clean the sequence, remove non "AGCT" charactors
 

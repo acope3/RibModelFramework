@@ -2,5 +2,8 @@
 *.o
 *.so
 *.gz
+*.txt
+*.swp
+*.Rcheck
 .Rhistory
 Test

@@ -1,418 +1,26 @@
-library(ribModel)
-genome <- new(Genome)
-genome$readFasta("../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta", F)
-getwd
-getwd()
-library(ribModel)#
-genome <- new(Genome)#
-genome$readFasta("../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta", F)
-library(ribModel)
-genome <- new(Genome)
-genome$readFasta("../ribModel/data/Skluyveri_chromosomeA.fasta", F)
-genome$readFasta("../ribModel/data/Skluyveri_ChrA_andCleft.fasta", F)
-library(ribModel)#
-genome <- new(Genome)#
-genome$readFasta("../ribModel/data/Skluyveri_chromosomeA.fasta", F)
-genome$readFasta("../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta", F)
-library(ribModel)#
-genome <- new(Genome)#
-genome$readFasta("../ribModel/data/Skluyveri_chromosomeA.fasta", F)
-genome <- new(Genome)
-genome$readFasta("../ribModel/data/Skluyveri_ChrA_andCleft.fasta", F)
-sphi_init <- 2;#
-numMixtures <- 2;#
-mixDef <- "allUnique";#
-geneAssignment <- c(rep(0,448), rep(0,513), rep(1,457))#
-parameter <- new(ROCParameter, genome$getGenomeSize(), sphi_init, numMixtures, geneAssignment, T, mixDef)#
-parameter$initializeExpressionByGenome(genome, sphi_init)#
-files <- c("../ribModel/data/Skluyveri_CSP_ChrA.csv", "../ribModel/data/Skluyveri_CSP_ChrCleft.csv")#
-parameter$initMutationSelectionCategories(files, 2, 0)#
-parameter$initMutationSelectionCategories(files, 2, 1)
-samples <- 100#
-thining <- 10#
-adaptiveWidth <- 10#
-useSamples <- 10
-model <- new(ROCModel)#
-mcmc <- new(MCMCAlgorithm, samples, thining, adaptiveWidth, T, T, T)#
-mcmc$run(genome, model, parameter);
-library(ribModel)#
-genome <- new(Genome)#
-genome$readFasta("../ribModel/data/Skluyveri_ChrA_andCleft.fasta", F)
-sphi_init <- 2;#
-numMixtures <- 2;#
-mixDef <- "allUnique";#
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
-parameter <- new(ROCParameter, genome$getGenomeSize(), sphi_init, numMixtures, geneAssignment, T, mixDef)
-parameter$initializeExpressionByGenome(genome, sphi_init)
-files <- c("../ribModel/data/Skluyveri_CSP_ChrA.csv", "../ribModel/data/Skluyveri_CSP_ChrCleft.csv")
-parameter$initMutationSelectionCategories(files, 2, "bob")
-parameter$initMutationSelectionCategories(files, 2, "mutation")
-parameter$initMutationSelectionCategories(files, 2, "Mutation")
-parameter$initMutationSelectionCategories(files, 2, "Selection")
-samples <- 100
-thining <- 10
-adaptiveWidth <- 10
-useSamples <- 10
-model <- new(ROCModel)
-mcmc <- new(MCMCAlgorithm, samples, thining, adaptiveWidth, T, T, T)
-mcmc$run(genome, model, parameter);
-library(ribModel)#
-genome <- new(Genome)#
-genome$readFasta("../ribModel/data/Skluyveri_ChrA_andCleft.fasta", F)#
-sphi_init <- 2;#
-numMixtures <- 2;#
-mixDef <- "allUnique";#
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))#
-parameter <- new(ROCParameter, genome$getGenomeSize(), sphi_init, numMixtures, geneAssignment, T, mixDef)#
-parameter$initializeExpressionByGenome(genome, sphi_init)#
-files <- c("../ribModel/data/Skluyveri_CSP_ChrA.csv", "../ribModel/data/Skluyveri_CSP_ChrCleft.csv")#
-parameter$initMutationSelectionCategories(files, 2, "Mutation")#
-parameter$initMutationSelectionCategories(files, 2, "Selection")
-sphi_init <- 2;#
-numMixtures <- 2;#
-mixDef <- "allUnique";#
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))#
-parameter <- new(ROCParameter, genome$getGenomeSize(), sphi_init, numMixtures, geneAssignment, T, mixDef)#
-parameter$initializeExpressionByGenome(genome, sphi_init)#
-files <- c("../ribModel/data/Skluyveri_CSP_ChrA.csv", "../ribModel/data/Skluyveri_CSP_ChrCleft.csv")#
-parameter$initMutationSelectionCategories(files, 2, "Mutation")#
-parameter$initMutationSelectionCategories(files, 2, "Selection")
-A = matrix(c(2, 4, 3, 1, 5, 7), nrow = 2, ncol = 3, byrow = TRUE)
-print A
-A
-parameter$initCovarianceMatrix( A, "A")
-parameter$getCovarianceMatrixForAA( "A" )
-cM <- parameter$getCovarianceMatrixForAA( "A" )
-cM$printCovarianceMatrix( )
-library(ribModel)#
-genome <- new(Genome)#
-genome$readFasta("../ribModel/data/Skluyveri_ChrA_andCleft.fasta", F)#
-sphi_init <- 2;#
-numMixtures <- 2;#
-mixDef <- "allUnique";#
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))#
-parameter <- new(ROCParameter, genome$getGenomeSize(), sphi_init, numMixtures, geneAssignment, T, mixDef)#
-parameter$initializeExpressionByGenome(genome, sphi_init)#
-files <- c("../ribModel/data/Skluyveri_CSP_ChrA.csv", "../ribModel/data/Skluyveri_CSP_ChrCleft.csv")#
-parameter$initMutationSelectionCategories(files, 2, "Mutation")#
-parameter$initMutationSelectionCategories(files, 2, "Selection")#
-A = matrix(c(2, 4, 3, 1, 5, 7), nrow = 2, ncol = 3, byrow = TRUE)
-A
-parameter$initCovarianceMatrix( A, "A" )
-library(ribModel)#
-genome <- new(Genome)#
-genome$readFasta("../ribModel/data/Skluyveri_ChrA_andCleft.fasta", F)#
-sphi_init <- 2;#
-numMixtures <- 2;#
-mixDef <- "allUnique";#
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))#
-parameter <- new(ROCParameter, genome$getGenomeSize(), sphi_init, numMixtures, geneAssignment, T, mixDef)#
-parameter$initializeExpressionByGenome(genome, sphi_init)#
-files <- c("../ribModel/data/Skluyveri_CSP_ChrA.csv", "../ribModel/data/Skluyveri_CSP_ChrCleft.csv")#
-parameter$initMutationSelectionCategories(files, 2, "Mutation")#
-parameter$initMutationSelectionCategories(files, 2, "Selection")#
-A = matrix(c(2, 4, 3, 1), nrow = 2, ncol = 2, byrow = TRUE)#
- parameter$initCovarianceMatrix( A, "A" )
-A
-parameter$initCovarianceMatrix( A, "A" )
-library(ribModel)#
-genome <- new(Genome)#
-genome$readFasta("../ribModel/data/Skluyveri_ChrA_andCleft.fasta", F)
-sphi_init <- 2;#
-numMixtures <- 2;#
-mixDef <- "allUnique";#
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))#
-parameter <- new(ROCParameter, genome$getGenomeSize(), sphi_init, numMixtures, geneAssignment, T, mixDef)#
-parameter$initializeExpressionByGenome(genome, sphi_init)#
-files <- c("../ribModel/data/Skluyveri_CSP_ChrA.csv", "../ribModel/data/Skluyveri_CSP_ChrCleft.csv")#
-parameter$initMutationSelectionCategories(files, 2, "Mutation")#
-parameter$initMutationSelectionCategories(files, 2, "Selection")#
-A = matrix(c(2, 4, 3, 1, 5, 7), nrow = 2, ncol = 3, byrow = TRUE)#
- parameter$initCovarianceMatrix( A, "A" )
-cM <- parameter$getCovarianceMatrixForAA( "A")
-cM$initCovarianceMatrix( )
-cM$printCovarianceMatrix( )
-A
-A = matrix(c(2, 4, 3, 1), nrow = 2, ncol = 2, byrow = TRUE)
-parameter$initCovarianceMatrix( A, "A" )
-cM <- parameter$getCovarianceMatrixForAA( "A")
-cM$printCovarianceMatrix( )
-A
-library(ribModel)#
-genome <- new(Genome)#
-genome$readFasta("../ribModel/data/Skluyveri_ChrA_andCleft.fasta", F)#
-sphi_init <- 2;
-sphi_init <- 2;#
-numMixtures <- 2;#
-mixDef <- "allUnique";#
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))#
-parameter <- new(ROCParameter, genome$getGenomeSize(), sphi_init, numMixtures, geneAssignment, T, mixDef)#
-parameter$initializeExpressionByGenome(genome, sphi_init)#
-files <- c("../ribModel/data/Skluyveri_CSP_ChrA.csv", "../ribModel/data/Skluyveri_CSP_ChrCleft.csv")#
-parameter$initMutationSelectionCategories(files, 2, "Mutation")#
-parameter$initMutationSelectionCategories(files, 2, "Selection")#
-A = matrix(c(2, 4, 3, 1), nrow = 2, ncol = 2, byrow = TRUE)#
- parameter$initCovarianceMatrix( A, "A" )
-cm <- parameter$getCovarianceMatrixForAA("a")
-cm$printCovarianceMatrix()
-A
-library(ribModel)#
-genome <- new(Genome)#
-genome$readFasta("../ribModel/data/Skluyveri_ChrA_andCleft.fasta", F)#
-sphi_init <- 2;#
-numMixtures <- 2;#
-mixDef <- "allUnique";#
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))#
-parameter <- new(ROCParameter, genome$getGenomeSize(), sphi_init, numMixtures, geneAssignment, T, mixDef)#
-parameter$initializeExpressionByGenome(genome, sphi_init)#
-files <- c("../ribModel/data/Skluyveri_CSP_ChrA.csv", "../ribModel/data/Skluyveri_CSP_ChrCleft.csv")#
-parameter$initMutationSelectionCategories(files, 2, "Mutation")#
-parameter$initMutationSelectionCategories(files, 2, "Selection")
-cm <- new (CovarianceMatrix)
-cm$setCovarianceMatrix(c(25,15,-5, 15,18,0, -5,0,11))
-A = matrix(c(25,15,-5, 15,18,0, -5,0,11), nrow = 3)
-A
-cm$setCovarianceMatrix(A)
-cm$printCovarianceMatrix()
-library(ribModel)#
-genome <- new(Genome)#
-genome$readFasta("../ribModel/data/Skluyveri_ChrA_andCleft.fasta", F)#
-sphi_init <- 2;#
-numMixtures <- 2;#
-mixDef <- "allUnique";#
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))#
-parameter <- new(ROCParameter, genome$getGenomeSize(), sphi_init, numMixtures, geneAssignment, T, mixDef)#
-parameter$initializeExpressionByGenome(genome, sphi_init)#
-files <- c("../ribModel/data/Skluyveri_CSP_ChrA.csv", "../ribModel/data/Skluyveri_CSP_ChrCleft.csv")#
-parameter$initMutationSelectionCategories(files, 2, "Mutation")#
-parameter$initMutationSelectionCategories(files, 2, "Selection")
-A = matrix(c(2, 4, 3, 1), nrow = 2, ncol = 2, byrow = TRUE)
-parameter$initCovarianceMatrix( A, "A" )
-cm <- parameter$getCovarianceMatrixForAA("a")
-cm$printCovarianceMatrix()
-A
-library(ribModel)#
-genome <- new(Genome)#
-genome$readFasta("../ribModel/data/Skluyveri_ChrA_andCleft.fasta", F)#
-sphi_init <- 2;#
-numMixtures <- 2;#
-mixDef <- "allUnique";#
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))#
-parameter <- new(ROCParameter, genome$getGenomeSize(), sphi_init, numMixtures, geneAssignment, T, mixDef)#
-parameter$initializeExpressionByGenome(genome, sphi_init)#
-files <- c("../ribModel/data/Skluyveri_CSP_ChrA.csv", "../ribModel/data/Skluyveri_CSP_ChrCleft.csv")#
-parameter$initMutationSelectionCategories(files, 2, "Mutation")#
-parameter$initMutationSelectionCategories(files, 2, "Selection")#
-#
-#check to see if the initCovarianceMatrix is working for ROCParameter#
-A = matrix(c(2, 4, 3, 1), nrow = 2, ncol = 2, byrow = TRUE)#
- parameter$initCovarianceMatrix( A, "A" )#
-cm <- parameter$getCovarianceMatrixForAA("a")#
-cm$printCovarianceMatrix()#
-A
-parameter$initSelection( c(1.2, 3.4, 5.0), "A" )
-parameter$initSelection( c(1.2, 3.4, 5.0), 1, "A" )
-library(ribModel)
-genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")
-library(ribModel)
-genome <- new(Genome)
-genome$readFasta("../ribModel/data/Skluyveri_ChrA_andCleft.fasta", F)
-sphi_init <- 2;
-numMixtures <- 2;
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
-numMixtures <- 3;
-A = matrix(c(1,2,3,1,2,2), nrow = 3, ncol = 2, byrow = TRUE)
-parameter <- new(ROCParameter, genome$getGenomeSize(), sphi_init, numMixtures, geneAssignment, A, T)
-library(ribModel)#
-#
+plot(trace, what = "Expression", geneIndex = 905)
+plot(trace, what = "Mutation", mixture = 1)
+plot(trace, what = "Selection", mixture = 1)
+plot(model, genome, parameter, samples = samples*0.1, mixture = 1, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
+mcmc$run(genome, model)
+phivals <- parameter$readPhiValues( "../ribModel/data/simulatedSelectionSharedR_phi.csv" )
+parameter$initializeExpressionByRandom(phivals)
+parameter$initializeSynthesisRateByRandom(phivals)
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")
 #read genome#
-genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")
-#initialize parameter object#
-sphi_init <- 2;#
-numMixtures <- 2;#
-mixDef <- "allUnique";
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
-parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
-parameter <- initializeParameterObject(sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
-library(ribModel)#
-#
-#read genome#
-genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")#
 #
 #initialize parameter object#
 sphi_init <- 2;#
 numMixtures <- 2;#
 mixDef <- "allUnique";#
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
-parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
-parameter <- initializeParameterObject(sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
-sphi_init
-numMixtures
-geneAssignment
-split.serine
-mixture.definition
-library(ribModel)#
-#
-#read genome#
-genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")#
-#
-#initialize parameter object#
-sphi_init <- 2;#
-numMixtures <- 2;#
-mixDef <- "allUnique";#
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
-parameter <- initializeParameterObject(sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
-parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
-parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef)
-parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef, NULL)
-parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef)
-A = matrix(c(2, 4, 3, 1), nrow = 2, ncol = 2, byrow = TRUE)
-parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef, A)
-library(ribModel)
-genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")
-sphi_init <- 2;
-sphi_init <- 2;#
-numMixtures <- 2;#
-mixDef <- "allUnique";#
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
-p <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
-library(ribModel)#
-#
-#read genome#
-genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")#
-#
-#initialize parameter object#
-sphi_init <- 2;#
-numMixtures <- 2;#
-mixDef <- "allUnique";#
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
-p <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
-p <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef, R_NilValue)
-library(ribModel)#
-#
-#read genome#
-genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")#
-#
-#initialize parameter object#
-sphi_init <- 2;#
-numMixtures <- 2;#
-mixDef <- "allUnique";#
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
-p <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
-p <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, NULL split.serine = TRUE, mixture.definition = mixDef)
-p <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, NULL, split.serine = TRUE, mixture.definition = mixDef)
-A = matrix(c(2, 4, 3, 1), nrow = 2, ncol = 2, byrow = TRUE)
-p <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, A, split.serine = TRUE, mixture.definition = mixDef)
-p <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, A, TRUE, mixDef)
-library(ribModel)#
-#
-#read genome#
-genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")#
-#
-#initialize parameter object#
-sphi_init <- 2;#
-numMixtures <- 2;#
-mixDef <- "allUnique";#
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
-p <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
-p2 <- new (ROCParameter, sphi_init, geneAssignment, c(1,1,2,2), TRUE)
-library(ribModel)#
-#
-#read genome#
-genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")#
-#
-#initialize parameter object#
-sphi_init <- 2;#
-numMixtures <- 2;#
-mixDef <- "allUnique";#
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))#
+geneAssignment <- c(rep(1,500), rep(2,500))#
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)#
-#
-# initialize MCMC object#
-samples <- 300#
-thining <- 10#
-adaptiveWidth <- 10#
-mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
-                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
-# get model object#
-model <- initializeModelObject("ROC")
-system.time(#
-  runMCMC(mcmc, genome, model, parameter)#
-)
-library(ribModel)#
-#
-#read genome#
-genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")#
-#
-#initialize parameter object#
-sphi_init <- 2;#
-numMixtures <- 2;#
-mixDef <- "allUnique";
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
-parameter <- new (ROCParameter, 1418, sphi_init, numMixtures, geneAssignment, TRUE, mixDef)
-parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef)
-samples <- 300
-thining <- 10
-adaptiveWidth <- 10
-mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth,
-est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
-model <- initializeModelObject("ROC")
-system.time(
-runMCMC(mcmc, genome, model, parameter)
-)
-library(ribModel)
-genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_chromosomeA.fasta")
-sphi_init <- 2;#
-numMixtures <- q;#
-mixDef <- "allUnique";#
-geneAssignment <- c(rep(1,448), rep(2,448)
-parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef)#
-# initialize MCMC object#
-samples <- 300#
-thining <- 10#
-adaptiveWidth <- 10#
-mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
-                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
-# get model object#
-model <- initializeModelObject("ROC")#
-#
-#run mcmc on genome with parameter using model#
-system.time(#
-  runMCMC(mcmc, genome, model, parameter)#
-)
-parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef)
-geneAssignment <- c(rep(1,448), rep(2,448))
-parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef)
-geneAssignment <- c(rep(1,448))
-parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef)
-geneAssignment <- c(rep(1,448), rep(2,448))
-parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef)
-samples <- 300
-thining <- 10
-adaptiveWidth <- 10
-mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth,
-est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
-model <- initializeModelObject("ROC")
-system.time(
-runMCMC(mcmc, genome, model, parameter)
-)
-geneAssignment <- c(rep(1,448), rep(2,448))
-parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef)
-genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_chromosomeA.fasta")
-geneAssignment <- c(rep(1,448))
-parameter <- new (ROCParameter, sphi_init, numMixtures, geneAssignment, TRUE, mixDef)
-library(ribModel)#
-#
-#read genome#
-genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta")#
-#
-#initialize parameter object#
-sphi_init <- 2;#
-numMixtures <- 2;#
-mixDef <- "allUnique";#
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))#
-parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)#
-#
+ phivals <- parameter$readPhiValues( "../ribModel/data/simulatedSelectionSharedR_phi.csv" )#
+ parameter$initializeSynthesisRateByRandom(phivals)#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")#
 # initialize MCMC object#
 samples <- 100#
 thining <- 10#
@@ -421,10 +29,8 @@ mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
                      est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
 # get model object#
 model <- initializeModelObject("ROC")
-#run mcmc on genome with parameter using model#
-system.time(#
-  runMCMC(mcmc, genome, model, parameter)#
-)
+model$setParameter(parameter)
+mcmc$run(genome, model)
 plot(mcmc)
 trace <- parameter$getTraceObject()
 plot(trace, what = "MixtureProbability")
@@ -434,17 +40,1505 @@ plot(trace, what = "Expression", geneIndex = 905)
 plot(trace, what = "Mutation", mixture = 1)
 plot(trace, what = "Selection", mixture = 1)
 plot(model, genome, parameter, samples = samples*0.1, mixture = 1, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
-num.genes <- genome$getGenomeSize()
-num.genes <- genome$getGenomeSize()
-mixtureAssignment <- do.call("rbind", lapply(1:num.genes,  function(geneIndex){parameter$getEstimatedMixtureAssignmentProbabilitiesForGene(samples*0.1, geneIndex)}))
-plot(NULL, NULL, xlim = c(0,1), ylim = c(-2, 1), xlab = "Probability beeing in Mixture 2", ylab = "log10(phi)")
-colors <- c("black", "red")
-for(mixture in 1:2)
-{
-genes.in.mixture <- which(round(mixtureAssignment[, mixture]+1) == mixture)
-expressionCategory <- parameter$getExpressionCategoryForMixture(mixture)
-num.genes <- length(genes.in.mixture)
-expressionValues <- unlist(lapply(genes.in.mixture, function(geneIndex){
-parameter$getExpressionPosteriorMeanByMixtureElementForGene(samples*0.1, geneIndex, expressionCategory)
-}))
-points(mixtureAssignment[genes.in.mixture, mixture], log10(expressionValues), col=colors[mixture])
+plot.Rcpp_ROCModel <- function(model, genome, parameter, samples = 100, mixture = 1, estim.Expression = TRUE, ...)#
+{#
+  opar <- par(no.readonly = T) #
+  input_list <- as.list(list(...))#
+  if("main" %in% names(input_list)){#
+    main <- input_list$main#
+    input_list$main <- NULL#
+  }else{#
+    main <- ""#
+  }#
+  mat <- matrix(c(rep(1, 4), 2:21, rep(22, 4)),#
+                nrow = 7, ncol = 4, byrow = TRUE)#
+  mat <- cbind(rep(23, 7), mat, rep(24, 7))#
+  nf <- layout(mat, c(3, rep(8, 4), 2), c(3, 8, 8, 8, 8, 8, 3), respect = FALSE)#
+  ### Plot title.#
+  par(mar = c(0, 0, 0, 0))#
+  plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)#
+  text(0.5, 0.6, main)#
+  text(0.5, 0.4, date(), cex = 0.6)#
+  num.genes <- genome$getGenomeSize()#
+  mixtureAssignment <- unlist(lapply(1:num.genes,  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))#
+  genes.in.mixture <- which(mixtureAssignment == mixture)#
+  expressionCategory <- parameter$getSynthesisRateCategoryForMixture(mixture)#
+  # need expression values to know range#
+  num.genes <- length(genes.in.mixture)#
+  if(estim.Expression){ # use estimated expression values#
+    expressionValues <- unlist(lapply(genes.in.mixture, function(geneIndex){#
+      parameter$getExpressionPosteriorMeanByMixtureElementForGene(samples, geneIndex, expressionCategory)#
+    }))  #
+  }else{ # use empirical expression values#
+  }#
+  expressionValues <- log10(expressionValues)#
+  genome <- genome$getGenomeForGeneIndicies(genes.in.mixture)#
+  names.aa <- aminoAcids()#
+  for(aa in names.aa)#
+  {#
+    if(aa == "M" || aa == "W" || aa == "X") next#
+    plotSinglePanel(parameter, model, genome, expressionValues, samples, mixture, aa)#
+    box()#
+    main.aa <- aa #TODO map to three letter code#
+    text(0, 1, main.aa, cex = 1.5)#
+    if(aa %in% c("A", "F", "K", "Q", "V")){#
+      axis(2, las=1)#
+    }#
+    if(aa %in% c("T", "V", "Y", "Z")){#
+      axis(1)#
+    }#
+    if(aa %in% c("A", "C", "D", "E")){#
+      axis(3)#
+    }#
+    if(aa %in% c("E", "I", "P", "T")){#
+      axis(4, las=1)#
+    }#
+    axis(1, tck = 0.02, labels = FALSE)#
+    axis(2, tck = 0.02, labels = FALSE)#
+    axis(3, tck = 0.02, labels = FALSE)#
+    axis(4, tck = 0.02, labels = FALSE)    #
+  }#
+  ## adding a histogram of phi values to plot#
+  hist.values <- hist(expressionValues, plot=FALSE, nclass=30)#
+  plot(hist.values, axes = FALSE, main="", xlab = "", ylab = "")#
+  axis(1)#
+  axis(4, las=1)#
+  ### Plot xlab.#
+  plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)#
+  text(0.5, 0.2, expression("log"[10]~"(Protein Synthesis Rate"~phi~")"))  #
+  #text(0.5, 0.5, "Production Rate (log10)")#
+  ### Plot ylab.#
+  plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)#
+  text(0.5, 0.5, "Propotion", srt = 90)#
+  par(opar)#
+}#
+#
+plotSinglePanel <- function(parameter, model, genome, expressionValues, samples, mixture, aa)#
+{#
+  codons <- AAToCodon(aa, T)#
+  # get codon specific parameter#
+  selection <- vector("numeric", length(codons))#
+  mutation <- vector("numeric", length(codons))#
+  for(i in 1:length(codons))#
+  {#
+    selection[i] <- parameter$getSelectionPosteriorMeanForCodon(mixture, samples, codons[i])#
+    mutation[i] <- parameter$getMutationPosteriorMeanForCodon(mixture, samples, codons[i])#
+  }#
+  # calculate codon probabilities with respect to phi#
+  expression.range <- range(expressionValues)#
+  phis <- seq(from = expression.range[1], to = expression.range[2], by = 0.01)#
+  codonProbability <- lapply(phis,  #
+                             function(phi){#
+                               model$CalculateProbabilitiesForCodons(mutation, selection, phi)#
+                             })#
+  #get codon counts#
+  codons <- AAToCodon(aa, F)#
+  codonCounts <- vector("list", length(codons))#
+  for(i in 1:length(codons))#
+  {#
+    codonCounts[[i]] <- genome$getCodonCountsPerGene(codons[i])#
+  }#
+  codonCounts <- do.call("cbind", codonCounts)#
+  # codon proportions#
+  codonCounts <- codonCounts / rowSums(codonCounts)#
+  codonCounts[is.nan(codonCounts)] <- NA # necessary if AA does not appear in gene#
+  # make empty plot#
+  plot(NULL, NULL, xlim=range(expressionValues, na.rm = T), ylim=c(-0.05,1.05), #
+       xlab = "", ylab="", axes = FALSE)#
+  # bin expression values of genes#
+  quantiles <- quantile(expressionValues, probs = seq(0.05, 0.95, 0.05), na.rm = T)#
+  for(i in 1:length(quantiles))#
+  {#
+    if(i == 1){#
+      tmp.id <- expressionValues < quantiles[i]#
+    }else if(i == length(quantiles)){#
+      tmp.id <- expressionValues > quantiles[i]#
+    }else{#
+      tmp.id <- expressionValues > quantiles[i] & expressionValues < quantiles[i + 1]#
+    }#
+    means <- colMeans(codonCounts[tmp.id,], na.rm = T)#
+    std <- apply(codonCounts[tmp.id,], 2, sd, na.rm = T)#
+    for(k in 1:length(codons))#
+    {#
+      points(median(expressionValues[tmp.id]), means[k], #
+             col=ribModel:::.codonColors[[ codons[k] ]] , pch=19, cex = 0.5)#
+      lines(rep(median(expressionValues[tmp.id]),2), c(means[k]-std[k], means[k]+std[k]), #
+            col=ribModel:::.codonColors[[ codons[k] ]], lwd=0.8)#
+    }#
+  }#
+  codonProbability <- do.call("rbind", codonProbability)#
+  for(i in 1:length(codons))#
+  {#
+    lines(phis, codonProbability[, i], col=ribModel:::.codonColors[[ codons[i] ]])#
+  }#
+  colors <- unlist(ribModel:::.codonColors[codons])#
+  legend("topleft", legend = codons, col=colors, bty = "n", lty=1, cex=0.75)  #
+}
+plot(model, genome, parameter, samples = samples*0.1, mixture = 1, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
+plot.Rcpp_ROCModel <- function(model, genome, parameter, samples = 100, mixture = 1, estim.Expression = TRUE, ...)#
+{#
+  opar <- par(no.readonly = T) #
+  input_list <- as.list(list(...))#
+  if("main" %in% names(input_list)){#
+    main <- input_list$main#
+    input_list$main <- NULL#
+  }else{#
+    main <- ""#
+  }#
+  mat <- matrix(c(rep(1, 4), 2:21, rep(22, 4)),#
+                nrow = 7, ncol = 4, byrow = TRUE)#
+  mat <- cbind(rep(23, 7), mat, rep(24, 7))#
+  nf <- layout(mat, c(3, rep(8, 4), 2), c(3, 8, 8, 8, 8, 8, 3), respect = FALSE)#
+  ### Plot title.#
+  par(mar = c(0, 0, 0, 0))#
+  plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)#
+  text(0.5, 0.6, main)#
+  text(0.5, 0.4, date(), cex = 0.6)#
+  num.genes <- genome$getGenomeSize()#
+  mixtureAssignment <- unlist(lapply(1:num.genes,  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))#
+  genes.in.mixture <- which(mixtureAssignment == mixture)#
+  expressionCategory <- parameter$getSynthesisRateCategoryForMixture(mixture)#
+  # need expression values to know range#
+  num.genes <- length(genes.in.mixture)#
+  if(estim.Expression){ # use estimated expression values#
+    expressionValues <- unlist(lapply(genes.in.mixture, function(geneIndex){#
+      parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(samples, geneIndex, expressionCategory)#
+    }))  #
+  }else{ # use empirical expression values#
+  }#
+  expressionValues <- log10(expressionValues)#
+  genome <- genome$getGenomeForGeneIndicies(genes.in.mixture)#
+  names.aa <- aminoAcids()#
+  for(aa in names.aa)#
+  {#
+    if(aa == "M" || aa == "W" || aa == "X") next#
+    plotSinglePanel(parameter, model, genome, expressionValues, samples, mixture, aa)#
+    box()#
+    main.aa <- aa #TODO map to three letter code#
+    text(0, 1, main.aa, cex = 1.5)#
+    if(aa %in% c("A", "F", "K", "Q", "V")){#
+      axis(2, las=1)#
+    }#
+    if(aa %in% c("T", "V", "Y", "Z")){#
+      axis(1)#
+    }#
+    if(aa %in% c("A", "C", "D", "E")){#
+      axis(3)#
+    }#
+    if(aa %in% c("E", "I", "P", "T")){#
+      axis(4, las=1)#
+    }#
+    axis(1, tck = 0.02, labels = FALSE)#
+    axis(2, tck = 0.02, labels = FALSE)#
+    axis(3, tck = 0.02, labels = FALSE)#
+    axis(4, tck = 0.02, labels = FALSE)    #
+  }#
+  ## adding a histogram of phi values to plot#
+  hist.values <- hist(expressionValues, plot=FALSE, nclass=30)#
+  plot(hist.values, axes = FALSE, main="", xlab = "", ylab = "")#
+  axis(1)#
+  axis(4, las=1)#
+  ### Plot xlab.#
+  plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)#
+  text(0.5, 0.2, expression("log"[10]~"(Protein Synthesis Rate"~phi~")"))  #
+  #text(0.5, 0.5, "Production Rate (log10)")#
+  ### Plot ylab.#
+  plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)#
+  text(0.5, 0.5, "Propotion", srt = 90)#
+  par(opar)#
+}#
+#
+plotSinglePanel <- function(parameter, model, genome, expressionValues, samples, mixture, aa)#
+{#
+  codons <- AAToCodon(aa, T)#
+  # get codon specific parameter#
+  selection <- vector("numeric", length(codons))#
+  mutation <- vector("numeric", length(codons))#
+  for(i in 1:length(codons))#
+  {#
+    selection[i] <- parameter$getSelectionPosteriorMeanForCodon(mixture, samples, codons[i])#
+    mutation[i] <- parameter$getMutationPosteriorMeanForCodon(mixture, samples, codons[i])#
+  }#
+  # calculate codon probabilities with respect to phi#
+  expression.range <- range(expressionValues)#
+  phis <- seq(from = expression.range[1], to = expression.range[2], by = 0.01)#
+  codonProbability <- lapply(phis,  #
+                             function(phi){#
+                               model$CalculateProbabilitiesForCodons(mutation, selection, phi)#
+                             })#
+  #get codon counts#
+  codons <- AAToCodon(aa, F)#
+  codonCounts <- vector("list", length(codons))#
+  for(i in 1:length(codons))#
+  {#
+    codonCounts[[i]] <- genome$getCodonCountsPerGene(codons[i])#
+  }#
+  codonCounts <- do.call("cbind", codonCounts)#
+  # codon proportions#
+  codonCounts <- codonCounts / rowSums(codonCounts)#
+  codonCounts[is.nan(codonCounts)] <- NA # necessary if AA does not appear in gene#
+  # make empty plot#
+  plot(NULL, NULL, xlim=range(expressionValues, na.rm = T), ylim=c(-0.05,1.05), #
+       xlab = "", ylab="", axes = FALSE)#
+  # bin expression values of genes#
+  quantiles <- quantile(expressionValues, probs = seq(0.05, 0.95, 0.05), na.rm = T)#
+  for(i in 1:length(quantiles))#
+  {#
+    if(i == 1){#
+      tmp.id <- expressionValues < quantiles[i]#
+    }else if(i == length(quantiles)){#
+      tmp.id <- expressionValues > quantiles[i]#
+    }else{#
+      tmp.id <- expressionValues > quantiles[i] & expressionValues < quantiles[i + 1]#
+    }#
+    means <- colMeans(codonCounts[tmp.id,], na.rm = T)#
+    std <- apply(codonCounts[tmp.id,], 2, sd, na.rm = T)#
+    for(k in 1:length(codons))#
+    {#
+      points(median(expressionValues[tmp.id]), means[k], #
+             col=ribModel:::.codonColors[[ codons[k] ]] , pch=19, cex = 0.5)#
+      lines(rep(median(expressionValues[tmp.id]),2), c(means[k]-std[k], means[k]+std[k]), #
+            col=ribModel:::.codonColors[[ codons[k] ]], lwd=0.8)#
+    }#
+  }#
+  codonProbability <- do.call("rbind", codonProbability)#
+  for(i in 1:length(codons))#
+  {#
+    lines(phis, codonProbability[, i], col=ribModel:::.codonColors[[ codons[i] ]])#
+  }#
+  colors <- unlist(ribModel:::.codonColors[codons])#
+  legend("topleft", legend = codons, col=colors, bty = "n", lty=1, cex=0.75)  #
+}
+plot(model, genome, parameter, samples = samples*0.1, mixture = 1, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,500), rep(2,500))#
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)#
+ phivals <- parameter$readPhiValues( "../ribModel/data/simulatedSelectionSharedR_phi.csv" )#
+ parameter$initializeSynthesisRateByRandom(phivals)#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")#
+# initialize MCMC object#
+samples <- 1000#
+thining <- 10#
+adaptiveWidth <- 100#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
+# get model object#
+model <- initializeModelObject("ROC")#
+#
+model$setParameter(parameter)#
+mcmc$run(genome, model)
+plot(mcmc)
+trace <- parameter$getTraceObject()
+plot(trace, what = "MixtureProbability")
+plot(trace, what = "SPhi")
+plot(trace, what = "ExpectedPhi")
+plot(trace, what = "Expression", geneIndex = 905)
+plot(trace, what = "Mutation", mixture = 1)
+plot(trace, what = "Selection", mixture = 1)
+plot(model, genome, parameter, samples = samples*0.1, mixture = 1, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
+plot.Rcpp_ROCModel <- function(model, genome, parameter, samples = 100, mixture = 1, estim.Expression = TRUE, ...)#
+{#
+  opar <- par(no.readonly = T) #
+  input_list <- as.list(list(...))#
+  if("main" %in% names(input_list)){#
+    main <- input_list$main#
+    input_list$main <- NULL#
+  }else{#
+    main <- ""#
+  }#
+  mat <- matrix(c(rep(1, 4), 2:21, rep(22, 4)),#
+                nrow = 7, ncol = 4, byrow = TRUE)#
+  mat <- cbind(rep(23, 7), mat, rep(24, 7))#
+  nf <- layout(mat, c(3, rep(8, 4), 2), c(3, 8, 8, 8, 8, 8, 3), respect = FALSE)#
+  ### Plot title.#
+  par(mar = c(0, 0, 0, 0))#
+  plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)#
+  text(0.5, 0.6, main)#
+  text(0.5, 0.4, date(), cex = 0.6)#
+  num.genes <- genome$getGenomeSize()#
+  mixtureAssignment <- unlist(lapply(1:num.genes,  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))#
+  genes.in.mixture <- which(mixtureAssignment == mixture)#
+  expressionCategory <- parameter$getSynthesisRateCategoryForMixture(mixture)#
+  # need expression values to know range#
+  num.genes <- length(genes.in.mixture)#
+  if(estim.Expression){ # use estimated expression values#
+    expressionValues <- unlist(lapply(genes.in.mixture, function(geneIndex){#
+      parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(samples, geneIndex, expressionCategory)#
+    }))  #
+  }else{ # use empirical expression values#
+  }#
+  expressionValues <- log10(expressionValues)#
+  genome <- genome$getGenomeForGeneIndicies(genes.in.mixture)#
+  names.aa <- aminoAcids()#
+  for(aa in names.aa)#
+  {#
+    if(aa == "M" || aa == "W" || aa == "X") next#
+    plotSinglePanel(parameter, model, genome, expressionValues, samples, mixture, aa)#
+    box()#
+    main.aa <- aa #TODO map to three letter code#
+    text(0, 1, main.aa, cex = 1.5)#
+    if(aa %in% c("A", "F", "K", "Q", "V")){#
+      axis(2, las=1)#
+    }#
+    if(aa %in% c("T", "V", "Y", "Z")){#
+      axis(1)#
+    }#
+    if(aa %in% c("A", "C", "D", "E")){#
+      axis(3)#
+    }#
+    if(aa %in% c("E", "I", "P", "T")){#
+      axis(4, las=1)#
+    }#
+    axis(1, tck = 0.02, labels = FALSE)#
+    axis(2, tck = 0.02, labels = FALSE)#
+    axis(3, tck = 0.02, labels = FALSE)#
+    axis(4, tck = 0.02, labels = FALSE)    #
+  }#
+  ## adding a histogram of phi values to plot#
+  hist.values <- hist(expressionValues, plot=FALSE, nclass=30)#
+  plot(hist.values, axes = FALSE, main="", xlab = "", ylab = "")#
+  axis(1)#
+  axis(4, las=1)#
+  ### Plot xlab.#
+  plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)#
+  text(0.5, 0.2, expression("log"[10]~"(Protein Synthesis Rate"~phi~")"))  #
+  #text(0.5, 0.5, "Production Rate (log10)")#
+  ### Plot ylab.#
+  plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)#
+  text(0.5, 0.5, "Propotion", srt = 90)#
+  par(opar)#
+}#
+#
+plotSinglePanel <- function(parameter, model, genome, expressionValues, samples, mixture, aa)#
+{#
+  codons <- AAToCodon(aa, T)#
+  # get codon specific parameter#
+  selection <- vector("numeric", length(codons))#
+  mutation <- vector("numeric", length(codons))#
+  for(i in 1:length(codons))#
+  {#
+    selection[i] <- parameter$getSelectionPosteriorMeanForCodon(mixture, samples, codons[i])#
+    mutation[i] <- parameter$getMutationPosteriorMeanForCodon(mixture, samples, codons[i])#
+  }#
+  # calculate codon probabilities with respect to phi#
+  expression.range <- range(expressionValues)#
+  phis <- seq(from = expression.range[1], to = expression.range[2], by = 0.01)#
+  codonProbability <- lapply(phis,  #
+                             function(phi){#
+                               model$CalculateProbabilitiesForCodons(mutation, selection, phi)#
+                             })#
+  #get codon counts#
+  codons <- AAToCodon(aa, F)#
+  codonCounts <- vector("list", length(codons))#
+  for(i in 1:length(codons))#
+  {#
+    codonCounts[[i]] <- genome$getCodonCountsPerGene(codons[i])#
+  }#
+  codonCounts <- do.call("cbind", codonCounts)#
+  # codon proportions#
+  codonCounts <- codonCounts / rowSums(codonCounts)#
+  codonCounts[is.nan(codonCounts)] <- NA # necessary if AA does not appear in gene#
+  # make empty plot#
+  plot(NULL, NULL, xlim=range(expressionValues, na.rm = T), ylim=c(-0.05,1.05), #
+       xlab = "", ylab="", axes = FALSE)#
+  # bin expression values of genes#
+  quantiles <- quantile(expressionValues, probs = seq(0.05, 0.95, 0.05), na.rm = T)#
+  for(i in 1:length(quantiles))#
+  {#
+    if(i == 1){#
+      tmp.id <- expressionValues < quantiles[i]#
+    }else if(i == length(quantiles)){#
+      tmp.id <- expressionValues > quantiles[i]#
+    }else{#
+      tmp.id <- expressionValues > quantiles[i] & expressionValues < quantiles[i + 1]#
+    }#
+    means <- colMeans(codonCounts[tmp.id,], na.rm = T)#
+    std <- apply(codonCounts[tmp.id,], 2, sd, na.rm = T)#
+    for(k in 1:length(codons))#
+    {#
+      points(median(expressionValues[tmp.id]), means[k], #
+             col=ribModel:::.codonColors[[ codons[k] ]] , pch=19, cex = 0.5)#
+      lines(rep(median(expressionValues[tmp.id]),2), c(means[k]-std[k], means[k]+std[k]), #
+            col=ribModel:::.codonColors[[ codons[k] ]], lwd=0.8)#
+    }#
+  }#
+  codonProbability <- do.call("rbind", codonProbability)#
+  for(i in 1:length(codons))#
+  {#
+    lines(phis, codonProbability[, i], col=ribModel:::.codonColors[[ codons[i] ]])#
+  }#
+  colors <- unlist(ribModel:::.codonColors[codons])#
+  legend("topleft", legend = codons, col=colors, bty = "n", lty=1, cex=0.75)  #
+}
+plot(model, genome, parameter, samples = samples*0.1, mixture = 1, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
+plot.Rcpp_ROCModel <- function(model, genome, parameter, samples = 100, mixture = 1, estim.Expression = TRUE, ...)#
+{#
+  opar <- par(no.readonly = T) #
+  input_list <- as.list(list(...))#
+  if("main" %in% names(input_list)){#
+    main <- input_list$main#
+    input_list$main <- NULL#
+  }else{#
+    main <- ""#
+  }#
+  mat <- matrix(c(rep(1, 4), 2:21, rep(22, 4)),#
+                nrow = 7, ncol = 4, byrow = TRUE)#
+  mat <- cbind(rep(23, 7), mat, rep(24, 7))#
+  nf <- layout(mat, c(3, rep(8, 4), 2), c(3, 8, 8, 8, 8, 8, 3), respect = FALSE)#
+  ### Plot title.#
+  par(mar = c(0, 0, 0, 0))#
+  plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)#
+  text(0.5, 0.6, main)#
+  text(0.5, 0.4, date(), cex = 0.6)#
+  num.genes <- genome$getGenomeSize()#
+  mixtureAssignment <- unlist(lapply(1:num.genes,  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))#
+  genes.in.mixture <- which(mixtureAssignment == mixture)#
+  expressionCategory <- parameter$getSynthesisRateCategoryForMixture(mixture)#
+  # need expression values to know range#
+  num.genes <- length(genes.in.mixture)#
+  if(estim.Expression){ # use estimated expression values#
+    expressionValues <- unlist(lapply(genes.in.mixture, function(geneIndex){#
+      parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(samples, geneIndex, expressionCategory)#
+    }))  #
+  }else{ # use empirical expression values#
+  }#
+  expressionValues <- log10(expressionValues)#
+  genome <- genome$getGenomeForGeneIndicies(genes.in.mixture)#
+  names.aa <- aminoAcids()#
+  for(aa in names.aa)#
+  {#
+    if(aa == "M" || aa == "W" || aa == "X") next#
+    plotSinglePanel(parameter, model, genome, expressionValues, samples, mixture, aa)#
+    box()#
+    main.aa <- aa #TODO map to three letter code#
+    text(0, 1, main.aa, cex = 1.5)#
+    if(aa %in% c("A", "F", "K", "Q", "V")){#
+      axis(2, las=1)#
+    }#
+    if(aa %in% c("T", "V", "Y", "Z")){#
+      axis(1)#
+    }#
+    if(aa %in% c("A", "C", "D", "E")){#
+      axis(3)#
+    }#
+    if(aa %in% c("E", "I", "P", "T")){#
+      axis(4, las=1)#
+    }#
+    axis(1, tck = 0.02, labels = FALSE)#
+    axis(2, tck = 0.02, labels = FALSE)#
+    axis(3, tck = 0.02, labels = FALSE)#
+    axis(4, tck = 0.02, labels = FALSE)    #
+  }#
+  ## adding a histogram of phi values to plot#
+  hist.values <- hist(expressionValues, plot=FALSE, nclass=30)#
+  plot(hist.values, axes = FALSE, main="", xlab = "", ylab = "")#
+  axis(1)#
+  axis(4, las=1)#
+  ### Plot xlab.#
+  plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)#
+  text(0.5, 0.2, expression("log"[10]~"(Protein Synthesis Rate"~phi~")"))  #
+  #text(0.5, 0.5, "Production Rate (log10)")#
+  ### Plot ylab.#
+  plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)#
+  text(0.5, 0.5, "Propotion", srt = 90)#
+  par(opar)#
+}#
+#
+plotSinglePanel <- function(parameter, model, genome, expressionValues, samples, mixture, aa)#
+{#
+  codons <- AAToCodon(aa, T)#
+  # get codon specific parameter#
+  selection <- vector("numeric", length(codons))#
+  mutation <- vector("numeric", length(codons))#
+  for(i in 1:length(codons))#
+  {#
+    selection[i] <- parameter$getSelectionPosteriorMeanForCodon(mixture, samples, codons[i])#
+    mutation[i] <- parameter$getMutationPosteriorMeanForCodon(mixture, samples, codons[i])#
+  }#
+  # calculate codon probabilities with respect to phi#
+  expression.range <- range(expressionValues)#
+  phis <- seq(from = expression.range[1], to = expression.range[2], by = 0.01)#
+  codonProbability <- lapply(10^phis,  #
+                             function(phi){#
+                               model$CalculateProbabilitiesForCodons(mutation, selection, phi)#
+                             })#
+  #get codon counts#
+  codons <- AAToCodon(aa, F)#
+  codonCounts <- vector("list", length(codons))#
+  for(i in 1:length(codons))#
+  {#
+    codonCounts[[i]] <- genome$getCodonCountsPerGene(codons[i])#
+  }#
+  codonCounts <- do.call("cbind", codonCounts)#
+  # codon proportions#
+  codonCounts <- codonCounts / rowSums(codonCounts)#
+  codonCounts[is.nan(codonCounts)] <- NA # necessary if AA does not appear in gene#
+  # make empty plot#
+  plot(NULL, NULL, xlim=range(expressionValues, na.rm = T), ylim=c(-0.05,1.05), #
+       xlab = "", ylab="", axes = FALSE)#
+  # bin expression values of genes#
+  quantiles <- quantile(expressionValues, probs = seq(0.05, 0.95, 0.05), na.rm = T)#
+  for(i in 1:length(quantiles))#
+  {#
+    if(i == 1){#
+      tmp.id <- expressionValues < quantiles[i]#
+    }else if(i == length(quantiles)){#
+      tmp.id <- expressionValues > quantiles[i]#
+    }else{#
+      tmp.id <- expressionValues > quantiles[i] & expressionValues < quantiles[i + 1]#
+    }#
+    means <- colMeans(codonCounts[tmp.id,], na.rm = T)#
+    std <- apply(codonCounts[tmp.id,], 2, sd, na.rm = T)#
+    for(k in 1:length(codons))#
+    {#
+      points(median(expressionValues[tmp.id]), means[k], #
+             col=ribModel:::.codonColors[[ codons[k] ]] , pch=19, cex = 0.5)#
+      lines(rep(median(expressionValues[tmp.id]),2), c(means[k]-std[k], means[k]+std[k]), #
+            col=ribModel:::.codonColors[[ codons[k] ]], lwd=0.8)#
+    }#
+  }#
+  codonProbability <- do.call("rbind", codonProbability)#
+  for(i in 1:length(codons))#
+  {#
+    lines(phis, codonProbability[, i], col=ribModel:::.codonColors[[ codons[i] ]])#
+  }#
+  colors <- unlist(ribModel:::.codonColors[codons])#
+  legend("topleft", legend = codons, col=colors, bty = "n", lty=1, cex=0.75)  #
+}
+plot(model, genome, parameter, samples = samples*0.1, mixture = 1, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,500), rep(2,500))#
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)#
+ phivals <- parameter$readPhiValues( "../ribModel/data/simulatedSelectionSharedR_phi.csv" )#
+ parameter$initializeSynthesisRateByRandom(phivals)#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")#
+# initialize MCMC object#
+samples <- 100#
+thining <- 10#
+adaptiveWidth <- 100#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
+# get model object#
+model <- initializeModelObject("ROC")
+model$setParameter(parameter)
+mcmc$run(genome, model)
+plot(mcmc)
+trace <- parameter$getTraceObject()
+plot(trace, what = "MixtureProbability")
+plot(trace, what = "SPhi")
+plot(trace, what = "ExpectedPhi")
+plot(trace, what = "Expression", geneIndex = 905)
+plot(trace, what = "Mutation", mixture = 1)
+plot(trace, what = "Selection", mixture = 1)
+plot(model, genome, parameter, samples = samples*0.1, mixture = 1, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
+initializeParameterObject <- function(genome, sphi, numMixtures, geneAssignment, expressionValues = NULL, model = "ROC",#
+                                      split.serine = TRUE, mixture.definition = "allUnique", mixture.definition.matrix = NULL)#
+{#
+  if(model == "ROC")#
+  {#
+    parameter <- initializeROCParameterObject(genome, sphi, numMixtures, geneAssignment, expressionValues,#
+                                 split.serine, mixture.definition, mixture.definition.matrix)#
+  }else if(model == "NSE"){#
+    cat("MODEL NOT IMPLEMENTED")#
+  }else{#
+    stop("Unkown model.")#
+  }#
+  return(parameter)#
+}#
+#
+initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignment, expressionValues = NULL,#
+                                          split.serine = TRUE, mixture.definition = "allUnique", mixture.definition.matrix = NULL)#
+{#
+  # test input integrity#
+  if(genome$getGenomeSize() != length(geneAssignment)) #
+  {#
+    stop("Gene assignment length does not match genome size. Not every Gene has a mixture assignment")#
+  }#
+  # create parameter object#
+  if(is.null(mixture.definition.matrix))#
+  { # keyword constructor#
+    parameter <- new(ROCParameter, sphi, numMixtures, geneAssignment, split.serine, mixture.definition)#
+  }else{#
+    #matrix constructor#
+    mixture.definition <- c(mixture.definition.matrix[, 1], mixture.definition.matrix[, 2])#
+    parameter <- new(ROCParameter, sphi, numMixtures, geneAssignment, mixture.definition, split.serine)#
+  }#
+  # initialize expression values#
+  if(is.null(expressionValues)){#
+    parameter$initializeSynthesisRateByGenome(genome, sphi)#
+  }else{#
+    parameter$initializeSynthesisRateByList(expressionValues)#
+  }#
+  numMutationCategory <- parameter$numMutationCategories#
+  numSelectionCategory <- parameter$numSelectionCategories#
+  phi <- parameter$getCurrentSynthesisRateForMixture(1) # phi values are all the same initially#
+  names.aa <- aminoAcids()#
+  for(aa in names.aa)#
+  {#
+    if(aa == "M" || aa == "W" || aa == "X") next#
+    codonCounts <- getCodonCountsForAA(aa)#
+    numCodons <- dim(codonCounts)[2] - 1#
+    #-----------------------------------------#
+    # TODO WORKS CURRENTLY ONLY FOR ALLUNIQUE!#
+    #-----------------------------------------#
+    covmat <- vector("list", numMixtures)#
+    for(mixElement in 1:numMixtures)#
+    {    #
+      idx <- geneAssignment == mixElement#
+      csp <- getCSPbyLogit(codonCounts[idx, ], phi[idx])#
+      parameter$initMutation(csp$coef.mat[1,], mixElement, aa)#
+      parameter$initSelection(csp$coef.mat[2,], mixElement, aa)#
+      # split matrix into sup matrices (dM and dEta)#
+      covmat[[mixElement]] <- split.matrix(t(csp$R) %*% csp$R, numCodons, numCodons)  # we expect the covariance matrix, but get the decomposition.#
+    }#
+    compl.covMat <- matrix(0, ncol = numMixtures * numCodons * 2, nrow = numMixtures * numCodons * 2)#
+    matrix.positions <- sub.matrices(compl.covMat, numCodons, numCodons)#
+    compl.seq <- seq(1, dim(compl.covMat)[1], numCodons)#
+    mut.seq <- compl.seq[1:(length(compl.seq)/2)]#
+    i <- 1#
+    for(pos in mut.seq)#
+    { #
+      compl.covMat[matrix.positions == matrix.positions[pos, pos]] <- unlist(covmat[[i]][1])#
+      i <- i + 1#
+      i <- ifelse(i > numMutationCategory, 1, i)#
+    }#
+    sel.seq <- compl.seq[(length(compl.seq)/2 + 1):length(compl.seq)]#
+    i <- 1#
+    for(pos in sel.seq)#
+    { #
+      compl.covMat[matrix.positions == matrix.positions[pos, pos]] <- unlist(covmat[[i]][4])#
+      i <- i + 1#
+      i <- ifelse(i > numMutationCategory, 1, i)#
+    }#
+    ofdiag.seq <- mut.seq + numCodons*numMutationCategory#
+    for(i in 1:length(mut.seq))#
+    {#
+      compl.covMat[matrix.positions == matrix.positions[mut.seq[i], ofdiag.seq[i]]] <- unlist(covmat[[i]][2])#
+      compl.covMat[matrix.positions == matrix.positions[ofdiag.seq[i], mut.seq[i]]] <- unlist(covmat[[i]][3])#
+    }#
+    #for testing#
+    compl.covMat <- diag(numMixtures * numCodons * 2) *0.05#
+    #compl.covMat / max(compl.covMat)#
+    parameter$initCovarianceMatrix(compl.covMat, aa)#
+  }#
+  return(parameter)#
+}#
+#
+getCodonCountsForAA <- function(aa)#
+{#
+  # get codon count for aa#
+  codons <- AAToCodon(aa, F)#
+  codonCounts <- lapply(codons, function(codon){#
+    codonCounts <- genome$getCodonCountsPerGene(codon)#
+  })#
+  codonCounts <- do.call("cbind", codonCounts)#
+  return(codonCounts)#
+}#
+#
+getCSPbyLogit <- function(codonCounts, phi, coefstart = NULL, x.arg = FALSE, y.arg = FALSE, qr.arg = FALSE)#
+{#
+  #avoid cases with 0 aa count#
+  idx <- rowSums(codonCounts) != 0#
+  ### Obtain new beta (M, S_1) from vglm.#
+  ret <- VGAM::vglm(codonCounts[idx, ] ~ phi[idx],#
+                    VGAM::multinomial, coefstart = coefstart,#
+                    x.arg = x.arg, y.arg = y.arg, qr.arg = qr.arg)#
+  coefficients <- ret@coefficients#
+  ## convert delta.t to delta.eta#
+  coefficients <- -coefficients#
+  ret <- list(coefficients = coefficients,#
+              coef.mat = matrix(coefficients, nrow = 2, byrow = TRUE),#
+              R = ret@R)#
+}#
+#
+sub.matrices <- function(M, r, c)#
+{#
+  rg <- (row(M) - 1) %/% r + 1#
+  cg <- (col(M) - 1) %/% c + 1#
+  rci <- (rg - 1) * max(cg) + cg#
+  return(rci)#
+}#
+split.matrix <- function(M, r, c)#
+{#
+  rci <- sub.matrices(M, r, c)#
+  N <- prod(dim(M)) / r / c#
+  cv <- lapply(1:N, function(x) M[rci==x])#
+  return(lapply(1:N, function(i) matrix(cv[[i]], nrow = r)))#
+}
+initializeParameterObject <- function(genome, sphi, numMixtures, geneAssignment, expressionValues = NULL, model = "ROC",#
+                                      split.serine = TRUE, mixture.definition = "allUnique", mixture.definition.matrix = NULL)#
+{#
+  if(model == "ROC")#
+  {#
+    parameter <- initializeROCParameterObject(genome, sphi, numMixtures, geneAssignment, expressionValues,#
+                                 split.serine, mixture.definition, mixture.definition.matrix)#
+  }else if(model == "NSE"){#
+    cat("MODEL NOT IMPLEMENTED")#
+  }else{#
+    stop("Unkown model.")#
+  }#
+  return(parameter)#
+}#
+#
+initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignment, expressionValues = NULL,#
+                                          split.serine = TRUE, mixture.definition = "allUnique", mixture.definition.matrix = NULL)#
+{#
+  # test input integrity#
+  if(genome$getGenomeSize() != length(geneAssignment)) #
+  {#
+    stop("Gene assignment length does not match genome size. Not every Gene has a mixture assignment")#
+  }#
+  # create parameter object#
+  if(is.null(mixture.definition.matrix))#
+  { # keyword constructor#
+    parameter <- new(ROCParameter, sphi, numMixtures, geneAssignment, split.serine, mixture.definition)#
+  }else{#
+    #matrix constructor#
+    mixture.definition <- c(mixture.definition.matrix[, 1], mixture.definition.matrix[, 2])#
+    parameter <- new(ROCParameter, sphi, numMixtures, geneAssignment, mixture.definition, split.serine)#
+  }#
+  # initialize expression values#
+  if(is.null(expressionValues)){#
+    parameter$initializeSynthesisRateByGenome(genome, sphi)#
+  }else{#
+    parameter$initializeSynthesisRateByList(expressionValues)#
+  }#
+  numMutationCategory <- parameter$numMutationCategories#
+  numSelectionCategory <- parameter$numSelectionCategories#
+  phi <- parameter$getCurrentSynthesisRateForMixture(1) # phi values are all the same initially#
+  names.aa <- aminoAcids()#
+  for(aa in names.aa)#
+  {#
+    if(aa == "M" || aa == "W" || aa == "X") next#
+    codonCounts <- getCodonCountsForAA(aa)#
+    numCodons <- dim(codonCounts)[2] - 1#
+    #-----------------------------------------#
+    # TODO WORKS CURRENTLY ONLY FOR ALLUNIQUE!#
+    #-----------------------------------------#
+    covmat <- vector("list", numMixtures)#
+    for(mixElement in 1:numMixtures)#
+    {    #
+      idx <- geneAssignment == mixElement#
+      csp <- getCSPbyLogit(codonCounts[idx, ], phi[idx])#
+      parameter$initMutation(csp$coef.mat[1,], mixElement, aa)#
+      parameter$initSelection(csp$coef.mat[2,], mixElement, aa)#
+      # split matrix into sup matrices (dM and dEta)#
+      covmat[[mixElement]] <- split.matrix(t(csp$R) %*% csp$R, numCodons, numCodons)  # we expect the covariance matrix, but get the decomposition.#
+    }#
+    compl.covMat <- matrix(0, ncol = numMixtures * numCodons * 2, nrow = numMixtures * numCodons * 2)#
+    matrix.positions <- sub.matrices(compl.covMat, numCodons, numCodons)#
+    compl.seq <- seq(1, dim(compl.covMat)[1], numCodons)#
+    mut.seq <- compl.seq[1:(length(compl.seq)/2)]#
+    i <- 1#
+    for(pos in mut.seq)#
+    { #
+      compl.covMat[matrix.positions == matrix.positions[pos, pos]] <- unlist(covmat[[i]][1])#
+      i <- i + 1#
+      i <- ifelse(i > numMutationCategory, 1, i)#
+    }#
+    sel.seq <- compl.seq[(length(compl.seq)/2 + 1):length(compl.seq)]#
+    i <- 1#
+    for(pos in sel.seq)#
+    { #
+      compl.covMat[matrix.positions == matrix.positions[pos, pos]] <- unlist(covmat[[i]][4])#
+      i <- i + 1#
+      i <- ifelse(i > numMutationCategory, 1, i)#
+    }#
+    ofdiag.seq <- mut.seq + numCodons*numMutationCategory#
+    for(i in 1:length(mut.seq))#
+    {#
+      compl.covMat[matrix.positions == matrix.positions[mut.seq[i], ofdiag.seq[i]]] <- unlist(covmat[[i]][2])#
+      compl.covMat[matrix.positions == matrix.positions[ofdiag.seq[i], mut.seq[i]]] <- unlist(covmat[[i]][3])#
+    }#
+    #for testing#
+    compl.covMat <- diag((numMutationCategory + numSelectionCategory) * numCodons) *0.05#
+    #compl.covMat / max(compl.covMat)#
+    parameter$initCovarianceMatrix(compl.covMat, aa)#
+  }#
+  return(parameter)#
+}#
+#
+getCodonCountsForAA <- function(aa)#
+{#
+  # get codon count for aa#
+  codons <- AAToCodon(aa, F)#
+  codonCounts <- lapply(codons, function(codon){#
+    codonCounts <- genome$getCodonCountsPerGene(codon)#
+  })#
+  codonCounts <- do.call("cbind", codonCounts)#
+  return(codonCounts)#
+}#
+#
+getCSPbyLogit <- function(codonCounts, phi, coefstart = NULL, x.arg = FALSE, y.arg = FALSE, qr.arg = FALSE)#
+{#
+  #avoid cases with 0 aa count#
+  idx <- rowSums(codonCounts) != 0#
+  ### Obtain new beta (M, S_1) from vglm.#
+  ret <- VGAM::vglm(codonCounts[idx, ] ~ phi[idx],#
+                    VGAM::multinomial, coefstart = coefstart,#
+                    x.arg = x.arg, y.arg = y.arg, qr.arg = qr.arg)#
+  coefficients <- ret@coefficients#
+  ## convert delta.t to delta.eta#
+  coefficients <- -coefficients#
+  ret <- list(coefficients = coefficients,#
+              coef.mat = matrix(coefficients, nrow = 2, byrow = TRUE),#
+              R = ret@R)#
+}#
+#
+sub.matrices <- function(M, r, c)#
+{#
+  rg <- (row(M) - 1) %/% r + 1#
+  cg <- (col(M) - 1) %/% c + 1#
+  rci <- (rg - 1) * max(cg) + cg#
+  return(rci)#
+}#
+split.matrix <- function(M, r, c)#
+{#
+  rci <- sub.matrices(M, r, c)#
+  N <- prod(dim(M)) / r / c#
+  cv <- lapply(1:N, function(x) M[rci==x])#
+  return(lapply(1:N, function(i) matrix(cv[[i]], nrow = r)))#
+}
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,500), rep(2,500))#
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)#
+ phivals <- parameter$readPhiValues( "../ribModel/data/simulatedSelectionSharedR_phi.csv" )#
+ parameter$initializeSynthesisRateByRandom(phivals)#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")#
+# initialize MCMC object#
+samples <- 100#
+thining <- 10#
+adaptiveWidth <- 100#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
+# get model object#
+model <- initializeModelObject("ROC")#
+#
+model$setParameter(parameter)
+mcmc$run(genome, model)
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,500), rep(2,500))#
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)#
+ phivals <- parameter$readPhiValues( "../ribModel/data/simulatedSelectionSharedR_phi.csv" )#
+ parameter$initializeSynthesisRateByRandom(phivals)#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")#
+# initialize MCMC object#
+samples <- 100#
+thining <- 10#
+adaptiveWidth <- 100#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
+# get model object#
+model <- initializeModelObject("ROC")
+model$setParameter(parameter)#
+mcmc$run(genome, model)
+plot(mcmc)
+trace <- parameter$getTraceObject()
+plot(trace, what = "MixtureProbability")
+plot(trace, what = "SPhi")
+plot(trace, what = "ExpectedPhi")
+plot(trace, what = "Expression", geneIndex = 905)
+plot(trace, what = "Mutation", mixture = 1)
+plot(trace, what = "Selection", mixture = 1)
+plot(model, genome, parameter, samples = samples*0.1, mixture = 1, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,500), rep(2,500))#
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)#
+ phivals <- parameter$readPhiValues( "../ribModel/data/simulatedSelectionSharedR_phi.csv" )#
+ parameter$initializeSynthesisRateByRandom(phivals)#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")#
+# initialize MCMC object#
+samples <- 2000#
+thining <- 10#
+adaptiveWidth <- 100#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
+# get model object#
+model <- initializeModelObject("ROC")
+model$setParameter(parameter)
+mcmc$run(genome, model)
+plot(mcmc)
+trace <- parameter$getTraceObject()
+plot(trace, what = "MixtureProbability")
+plot(trace, what = "SPhi")
+plot(trace, what = "ExpectedPhi")
+plot(trace, what = "Expression", geneIndex = 905)
+plot(trace, what = "Mutation", mixture = 1)
+plot(trace, what = "Selection", mixture = 1)
+plot(model, genome, parameter, samples = samples*0.1, mixture = 1, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
+plot(model, genome, parameter, samples = samples*0.1, mixture = 2, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,500), rep(2,500))#
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)#
+ phivals <- parameter$readPhiValues( "../ribModel/data/simulatedSelectionSharedR_phi.csv" )#
+ parameter$initializeSynthesisRateByRandom(phivals)#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")#
+# initialize MCMC object#
+samples <- 200#
+thining <- 10#
+adaptiveWidth <- 100#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
+# get model object#
+model <- initializeModelObject("ROC")#
+#
+model$setParameter(parameter)#
+mcmc$run(genome, model)
+plot(mcmc)
+install.packages("Hmisc")
+plot(mcmc)
+trace <- parameter$getTraceObject()
+plot(trace, what = "MixtureProbability")
+plot(trace, what = "SPhi")
+plot(trace, what = "ExpectedPhi")
+plot(trace, what = "Expression", geneIndex = 905)
+plot(trace, what = "Mutation", mixture = 1)
+plot(trace, what = "Selection", mixture = 1)
+plot(model, genome, parameter, samples = samples*0.1, mixture = 2, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")
+# initialize MCMC object#
+samples <- 200#
+thining <- 10#
+adaptiveWidth <- 100#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
+# get model object
+parameter <- new (ROCParameter, "RestartFile.txt")
+model <- initializeModelObject("ROC")
+model$setParameter(parameter)
+mcmc$run(genome, model)
+plot(mcmc)
+trace <- parameter$getTraceObject()
+plot(trace, what = "MixtureProbability")
+plot(trace, what = "SPhi")
+plot(trace, what = "ExpectedPhi")
+plot(trace, what = "Expression", geneIndex = 905)
+plot(trace, what = "Mutation", mixture = 1)
+plot(trace, what = "Selection", mixture = 1)
+plot(model, genome, parameter, samples = samples*0.1, mixture = 2, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,500), rep(2,500))#
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)#
+ phivals <- parameter$readPhiValues( "../ribModel/data/simulatedSelectionSharedR_phi.csv" )#
+ parameter$initializeSynthesisRateByRandom(phivals)#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")#
+# initialize MCMC object#
+samples <- 400#
+thining <- 10#
+adaptiveWidth <- 100#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
+# get model object
+#end of reloading...#
+model <- initializeModelObject("ROC")#
+#
+model$setParameter(parameter)#
+mcmc$run(genome, model)
+plot(mcmc)
+trace <- parameter$getTraceObject()
+plot(trace, what = "MixtureProbability")
+plot(trace, what = "SPhi")
+plot(trace, what = "ExpectedPhi")
+plot(trace, what = "Expression", geneIndex = 905)
+plot(trace, what = "Mutation", mixture = 1)
+plot(trace, what = "Selection", mixture = 1)
+plot(model, genome, parameter, samples = samples*0.1, mixture = 2, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")
+parameter <- new(ROCParameter, "RestartFile.txt")
+model$setParameter(parameter)
+model <- initializeModelObject("ROC")
+# initialize MCMC object#
+samples <- 50#
+thining <- 10#
+adaptiveWidth <- 100#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
+# get model object#
+model <- initializeModelObject("ROC")#
+parameter <- new(ROCParameter, "RestartFile.txt")#
+model$setParameter(parameter)
+mcmc$run(genome, model)
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")
+samples <- 50#
+thining <- 10#
+adaptiveWidth <- 100#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
+# get model object#
+model <- initializeModelObject("ROC")#
+parameter <- new(ROCParameter, "RestartFile.txt")#
+model$setParameter(parameter)
+mcmc$run(genome, model)
+plot(mcmc)
+trace <- parameter$getTraceObject()
+plot(trace, what = "MixtureProbability")
+plot(trace, what = "SPhi")
+plot(trace, what = "ExpectedPhi")
+plot(trace, what = "Expression", geneIndex = 905)
+plot(trace, what = "Mutation", mixture = 1)
+plot(trace, what = "Selection", mixture = 1)
+plot(model, genome, parameter, samples = samples*0.1, mixture = 2, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,500), rep(2,500))#
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)#
+ phivals <- parameter$readPhiValues( "../ribModel/data/simulatedSelectionSharedR_phi.csv" )#
+ parameter$initializeSynthesisRateByRandom(phivals)#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")#
+# initialize MCMC object#
+samples <- 100#
+thining <- 10#
+adaptiveWidth <- 100#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
+# get model object#
+model <- initializeModelObject("ROC")
+model$setParameter(parameter)
+mcmc$run(genome, model)
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")
+parameter <- new(ROCParameter, "RestartFile.txt")#
+model$setParameter(parameter)#
+mcmc$run(genome, model)
+model <- initializeModelObject("ROC")#
+parameter <- new(ROCParameter, "RestartFile.txt")#
+model$setParameter(parameter)#
+mcmc$run(genome, model)
+samples <- 100#
+thining <- 10#
+adaptiveWidth <- 100#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
+# get model object#
+model <- initializeModelObject("ROC")#
+parameter <- new(ROCParameter, "RestartFile.txt")#
+model$setParameter(parameter)#
+mcmc$run(genome, model)
+plot(mcmc)
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,500), rep(2,500))#
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)#
+ phivals <- parameter$readPhiValues( "../ribModel/data/simulatedSelectionSharedR_phi.csv" )#
+ parameter$initializeSynthesisRateByRandom(phivals)#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")#
+# initialize MCMC object#
+samples <- 200#
+thining <- 10#
+adaptiveWidth <- 100#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
+# get model object#
+model <- initializeModelObject("ROC")
+model$setParameter(parameter)#
+mcmc$run(genome, model)
+plot(mcmc)
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,500), rep(2,500))#
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)#
+ phivals <- parameter$readPhiValues( "../ribModel/data/simulatedSelectionSharedR_phi.csv" )#
+ parameter$initializeSynthesisRateByRandom(phivals)#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")#
+# initialize MCMC object#
+samples <- 100#
+thining <- 10#
+adaptiveWidth <- 100#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
+# get model object#
+model <- initializeModelObject("ROC")
+model$setParameter(parameter)#
+mcmc$run(genome, model)
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")
+model <- initializeModelObject("ROC")
+parameter <- new(ROCParameter, "RestartFile.txt")
+model$setParameter(parameter)
+mcmc$run(genome, model)
+plot(mcmc)
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,500), rep(2,500))#
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)#
+ phivals <- parameter$readPhiValues( "../ribModel/data/simulatedSelectionSharedR_phi.csv" )#
+ parameter$initializeSynthesisRateByRandom(phivals)#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")#
+# initialize MCMC object#
+samples <- 100#
+thining <- 10#
+adaptiveWidth <- 100#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
+# get model object#
+model <- initializeModelObject("ROC")
+model$setParameter(parameter)#
+mcmc$run(genome, model)
+model <- initializeModelObject("ROC")
+parameter <- new(ROCParameter, "RestartFile.txt")
+model$setParameter(parameter)
+mcmc$run(genome, model)
+adaptiveWidth <- 10
+model <- initializeModelObject("ROC")
+parameter <- new(ROCParameter, "RestartFile.txt")
+model$setParameter(parameter)
+mcmc$run(genome, model)
+plot(mcmc)
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")
+samples <- 100#
+thining <- 10#
+adaptiveWidth <- 10#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
+# get model object#
+model <- initializeModelObject("ROC")#
+parameter <- new(ROCParameter, "RestartFile.txt")#
+model$setParameter(parameter)#
+mcmc$run(genome, model)
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,500), rep(2,500))#
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)#
+ phivals <- parameter$readPhiValues( "../ribModel/data/simulatedSelectionSharedR_phi.csv" )#
+ parameter$initializeSynthesisRateByRandom(phivals)#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")#
+# initialize MCMC object#
+samples <- 100#
+thining <- 10#
+adaptiveWidth <- 10#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
+mcmc$setRestartFileSettings( "RestartFile.txt", 200, TRUE)
+model <- initializeModelObject("ROC")
+model$setParameter(parameter)
+mcmc$run(genome, model)
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,500), rep(2,500))#
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)#
+ phivals <- parameter$readPhiValues( "../ribModel/data/simulatedSelectionSharedR_phi.csv" )#
+ parameter$initializeSynthesisRateByRandom(phivals)#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")#
+# initialize MCMC object#
+samples <- 100#
+thining <- 10#
+adaptiveWidth <- 10#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
+# get model object
+mcmc$setRestartFileSettings( "RestartFile.txt", 20, TRUE)
+model <- initializeModelObject("ROC")
+model$setParameter(parameter)
+mcmc$run(genome, model)
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,500), rep(2,500))#
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)#
+ phivals <- parameter$readPhiValues( "../ribModel/data/simulatedSelectionSharedR_phi.csv" )#
+ parameter$initializeSynthesisRateByRandom(phivals)#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")#
+# initialize MCMC object#
+samples <- 100#
+thining <- 10#
+adaptiveWidth <- 10#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
+mcmc$setRestartFileSettings( "RestartFile.txt", 20, TRUE)
+model <- initializeModelObject("ROC")
+model$setParameter(parameter)
+mcmc$run(genome, model)
+plot(mcmc)
+trace <- parameter$getTraceObject()
+plot(trace, what = "MixtureProbability")
+plot(trace, what = "SPhi")
+plot(trace, what = "ExpectedPhi")
+plot(trace, what = "Expression", geneIndex = 905)
+plot(trace, what = "Mutation", mixture = 1)
+plot(trace, what = "Selection", mixture = 1)
+plot(model, genome, parameter, samples = samples*0.1, mixture = 2, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,500), rep(2,500))#
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)#
+ phivals <- parameter$readPhiValues( "../ribModel/data/simulatedSelectionSharedR_phi.csv" )#
+ parameter$initializeSynthesisRateByRandom(phivals)#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")#
+# initialize MCMC object#
+samples <- 100#
+thining <- 10#
+adaptiveWidth <- 10#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
+model <- initializeModelObject("ROC")
+model$setParameter(parameter)
+mcmc$run(genome, model)
+plot(mcmc)
+trace <- parameter$getTraceObject()
+plot(trace, what = "MixtureProbability")
+plot(trace, what = "SPhi")
+plot(trace, what = "ExpectedPhi")
+plot(trace, what = "Expression", geneIndex = 905)
+plot(trace, what = "Mutation", mixture = 1)
+plot(trace, what = "Selection", mixture = 1)
+plot(model, genome, parameter, samples = samples*0.1, mixture = 2, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,500), rep(2,500))#
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)#
+ phivals <- parameter$readPhiValues( "../ribModel/data/simulatedSelectionSharedR_phi.csv" )#
+ parameter$initializeSynthesisRateByRandom(phivals)#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")#
+# initialize MCMC object#
+samples <- 100#
+thining <- 10#
+adaptiveWidth <- 10#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
+mcmc$setRestartFileSettings( "RestartFile.txt", 20, TRUE)
+model <- initializeModelObject("ROC")
+model$setParameter(parameter)
+mcmc$run(genome, model)
+plot(mcmc)
+trace <- parameter$getTraceObject()
+plot(trace, what = "MixtureProbability")
+plot(trace, what = "SPhi")
+plot(trace, what = "ExpectedPhi")
+plot(trace, what = "Expression", geneIndex = 905)
+plot(trace, what = "Mutation", mixture = 1)
+plot(trace, what = "Selection", mixture = 1)
+plot(model, genome, parameter, samples = samples*0.1, mixture = 2, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,500), rep(2,500))#
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)#
+ phivals <- parameter$readPhiValues( "../ribModel/data/simulatedSelectionSharedR_phi.csv" )#
+ parameter$initializeSynthesisRateByRandom(phivals)#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")#
+# initialize MCMC object#
+samples <- 100#
+thining <- 10#
+adaptiveWidth <- 10#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
+mcmc$setRestartFileSettings( "RestartFile.txt", 20, TRUE)#
+# get model object#
+model <- initializeModelObject("ROC")
+model$setParameter(parameter)
+mcmc$run(genome, model)
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,500), rep(2,500))#
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)#
+ phivals <- parameter$readPhiValues( "../ribModel/data/simulatedSelectionSharedR_phi.csv" )#
+ parameter$initializeSynthesisRateByRandom(phivals)#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")#
+# initialize MCMC object#
+samples <- 100#
+thining <- 10#
+adaptiveWidth <- 10#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
+mcmc$setRestartFileSettings( "RestartFile.txt", 20, TRUE)#
+# get model object#
+model <- initializeModelObject("ROC")
+model$setParameter(parameter)
+mcmc$run(genome, model)
+plot(mcmc)
+trace <- parameter$getTraceObject()
+plot(trace, what = "MixtureProbability")
+plot(trace, what = "SPhi")
+plot(trace, what = "ExpectedPhi")
+plot(trace, what = "Expression", geneIndex = 905)
+plot(trace, what = "Mutation", mixture = 1)
+plot(trace, what = "Selection", mixture = 1)
+plot(model, genome, parameter, samples = samples*0.1, mixture = 2, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
+library(ribModel)#
+#
+#read genome#
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")#
+#
+#initialize parameter object#
+sphi_init <- 2;#
+numMixtures <- 2;#
+mixDef <- "allUnique";#
+geneAssignment <- c(rep(1,500), rep(2,500))#
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)#
+ phivals <- parameter$readPhiValues( "../ribModel/data/simulatedSelectionSharedR_phi.csv" )#
+ parameter$initializeSynthesisRateByRandom(phivals)#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")#
+parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")#
+# initialize MCMC object#
+samples <- 100#
+thining <- 10#
+adaptiveWidth <- 10#
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, #
+                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)#
+mcmc$setRestartFileSettings( "RestartFile.txt", 20, TRUE)
+model <- initializeModelObject("ROC")
+model$setParameter(parameter)
+mcmc$run(genome, model)
+plot(mcmc)
+plot(trace, what = "MixtureProbability")
+plot(trace, what = "MixtureProbability")
+trace <- parameter$getTraceObject()
+plot(trace, what = "MixtureProbability")
+plot(trace, what = "SPhi")
+plot(trace, what = "ExpectedPhi")
+plot(trace, what = "Expression", geneIndex = 905)
+plot(trace, what = "Mutation", mixture = 1)
+plot(trace, what = "Selection", mixture = 1)
+plot(model, genome, parameter, samples = samples*0.1, mixture = 2, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")

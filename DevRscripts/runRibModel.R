@@ -68,4 +68,3 @@ for(mixture in 1:2)
   points(mixtureAssignment[genes.in.mixture, mixture], log10(expressionValues), col=colors[mixture])
 }
 
-

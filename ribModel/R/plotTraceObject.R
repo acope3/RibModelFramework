@@ -90,7 +90,7 @@ plotCodonSpecificParameters <- function(trace, mixture, type="mutation", main="M
 
 plotExpressionTrace <- function(trace, geneIndex)
 {
-  plot(log10(trace$getExpressionTraceForGene(geneIndex)), type= "l", xlab = "Sample", ylab = expression("log"[10]~"("~phi~")"))
+  plot(log10(trace$getSynthesisRateTraceForGene(geneIndex)), type= "l", xlab = "Sample", ylab = expression("log"[10]~"("~phi~")"))
 }
 
 plotExpectedPhiTrace <- function(trace)

@@ -5,8 +5,6 @@
 #include <sstream>
 
 #include "include/MCMCAlgorithm.h"
-#include "include/CovarianceMatrix.h"
-
 
 void testNumCodonsPerAA()
 {
@@ -38,7 +36,7 @@ void testLogNormDensity()
 	std::cout << "------------------ LOG NORM DENSITY ------------------" << std::endl;
 	for(int i = 0; i < 5; i++)
 	{
-		double result = std::log(ROCParameter::densityLogNorm(i, -1, 1));
+		double result = std::log(Parameter::densityLogNorm(i, -1, 1));
 		std::cout << "logP of " << i << "\t" << result << std::endl;
 	}
 	std::cout << "------------------ LOG NORM DENSITY ------------------" << std::endl;
@@ -49,7 +47,7 @@ void testSCUO(Genome& genome)
 	std::cout << "------------------ SCUO VALUES ------------------" << std::endl;
 	for(unsigned n = 0u; n < genome.getGenomeSize(); n++)
 	{
-		std::cout << genome.getGene(n).getId() << "\t" << ROCParameter::calculateSCUO(genome.getGene(n)) << std::endl;
+		std::cout << genome.getGene(n).getId() << "\t" << Parameter::calculateSCUO(genome.getGene(n)) << std::endl;
 	}
 	std::cout << "------------------ SCUO VALUES ------------------" << std::endl;
 }
@@ -68,8 +66,9 @@ void testCovarianceMatrix()
 	std::cout << "Choleski Matrix" << std::endl;
 	covMat.printCholeskiMatrix();
 	std::cout << "Matrix vector multiplication" << std::endl;
-	std::vector <double> brr {1, 0, -1};
-	std::vector <double> res = covMat.transformIidNumersIntoCovaryingNumbers(brr);
+	double brr[3] {1, 0, -1};
+	double res[3];
+	//covMat.transformIidNumersIntoCovaryingNumbers(brr, res);
 	for(int i = 0; i < 3; i++)
 	{
 		std::cout << res[i] << std::endl;
@@ -99,7 +98,7 @@ void testRandMultiNom(unsigned numCat)
 	unsigned tmp;
 	for (int i = 0; i < 50; i++)
 	{
-		tmp = ROCParameter::randMultinom(probabilities, numCat);
+		tmp = Parameter::randMultinom(probabilities, numCat);
 		assignmentCounts[tmp] += 1;
 	}
 	std::cout <<"Printing dirichlet numbers:\n";
@@ -163,7 +162,6 @@ void testSimulateGenome(Genome& genome)
 	std::cout << "------------------ TEST SIMULATEGENOME ------------------" << std::endl;
 
 
-	ROCModel model;
 	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 	for(unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{
@@ -188,14 +186,15 @@ void testSimulateGenome(Genome& genome)
 
 
 
-	//parameter.InitializeExpression(genome, sphi_init);
+	//parameter.InitializeSynthesisRate(genome, sphi_init);
 	std::vector<double> phiVals;
 	phiVals = parameter.readPhiValues("Skluyveri_ChrA_ChrCleft_phi_est.csv");
-	parameter.InitializeExpression(phiVals);
+	parameter.InitializeSynthesisRate(phiVals);
 
 	std::cout << "done initialize ROCParameter object" << std::endl;
-
-	genome.simulateGenome(parameter, model);
+	ROCModel model;
+	model.setParameter(parameter);
+	genome.simulateGenome(model);
 	std::vector <Gene> simGenes = genome.getSimulatedGenes();
 	unsigned aaRange[2];
 	std::cout <<"FREQUENCIES:\n";
@@ -206,8 +205,8 @@ void testSimulateGenome(Genome& genome)
 		unsigned mixtureElement = parameter.getMixtureAssignment(i);
 		unsigned mutationCategory = parameter.getMutationCategory(mixtureElement);
 		unsigned selectionCategory = parameter.getSelectionCategory(mixtureElement);
-		unsigned expressionCategory = parameter.getExpressionCategory(mixtureElement);
-		double phi= parameter.getExpression(i, expressionCategory, false);
+		unsigned expressionCategory = parameter.getSynthesisRateCategory(mixtureElement);
+		double phi= parameter.getSynthesisRate(i, expressionCategory, false);
 
 		std::cout <<"phi = " << phi <<"\n";
 		Gene gene = simGenes[i];
@@ -267,31 +266,60 @@ void testCovMatrixOverloading()
 	std::cout << "------------------ TEST COVMATRIXOVERLOADING ------------------" << std::endl;
 }
 
-void testProposeCodonSpecificParameters()
+void testWriteRestartFile(Genome &genome)
 {
-	std::cout << "------------------ TEST PROPOSECODONSPECIFICPARAMETERS ------------------" << std::endl;
-	ROCParameter parameter;
-
-
-	std::cout << "------------------ TEST PROPOSECODONSPECIFICPARAMETERS ------------------" << std::endl;
+	std::cout << "------------------ TEST WRITERESTARTFILE ------------------" << std::endl;
+	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
+	for(unsigned i = 0u; i < genome.getGenomeSize(); i++)
+	{
+		if(i < 448) geneAssignment[i] = 0u;
+		else geneAssignment[i] = 1u;
+	}
+	double sphi_init = 2;
+	double numMixtures = 2;
+	std::string mixDef = ROCParameter::allUnique;
+	std::vector<std::vector<unsigned>> thetaKMatrix;
+	ROCParameter parameter = ROCParameter(sphi_init, numMixtures, geneAssignment, thetaKMatrix, true, mixDef);
+	std::vector<std::string> files(2);
+	files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv");
+	files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv");
+	parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
+	parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
+	parameter.InitializeSynthesisRate(genome, sphi_init);
+	ROCModel model;
+	model.setParameter(parameter);
+	model.writeRestartFile("RestartFile1.txt");
+	std::cout << "------------------ TEST WRITERESTARTFILE ------------------" << std::endl;
 }
 
 
+void testInitFromRestartFile()
+{
+	std::cout << "------------------ TEST INITFROMRESTARTFILE ------------------" << std::endl;
+	ROCParameter parameter("RestartFile1.txt");
+	ROCModel model;
+	model.setParameter(parameter);
+	model.writeRestartFile("RestartFile2.txt");
+	std::cout << "------------------ TEST INITFROMRESTARTFILE ------------------" << std::endl;
+
+}
+
 int main()
 {
-	bool cedric = true;
+	bool read = false;
+	bool cedric = false;
 	std::cout << "Hello world!" << std::endl << std::endl;
 
 	Genome genome;
 	std::cout << "reading fasta file" << std::endl;
 	if(cedric){
-		genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/shortTestGenome.fasta");
+		genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta");
 		//genome.readFasta("C:/Users/Cedric/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta");
 	}else{
 		genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta");
 	}
 	std::cout << "done reading fasta file" << std::endl;
-	bool testing = false;
+	bool testing =  false;
 
 	if(testing)
 	{
@@ -299,79 +327,109 @@ int main()
 		//testCodonRangePerAA(false);
 		//testCodonRangePerAA(true);
 		//testLogNormDensity();
-		testSCUO(genome);
+		//testSCUO(genome);
 		//testCovarianceMatrix();
 		//testRandMultiNom(3);
 		//testThetaKMatrix();
 		//testSimulateGenome(genome);
 		//testCovMatrixOverloading();
+		testWriteRestartFile(genome);
+		testInitFromRestartFile();
 	}else{
-		ROCModel model;
-		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
-		for(unsigned i = 0u; i < genome.getGenomeSize(); i++)
-		{
-			if(i < 448) geneAssignment[i] = 0u;
-			else geneAssignment[i] = 1u;
-		}
-		std::cout << "initialize ROCParameter object" << std::endl;
-		double sphi_init = 2;
-		double numMixtures = 2;
-		std::string mixDef = ROCParameter::allUnique;
-		std::cout << "\tSphi init: " << sphi_init << "\n";
-		std::cout << "\t# mixtures: " << numMixtures << "\n";
-		std::cout << "\tmixture definition: " << mixDef << "\n";
-		std::vector<std::vector<unsigned>> thetaKMatrix;
-		ROCParameter parameter = ROCParameter(sphi_init, numMixtures, geneAssignment, thetaKMatrix, true, mixDef);
-
-		std::vector<std::string> files(2);
-		if(cedric)
-		{
-			files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv");
-			files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv");
-			//files[0] = std::string("C:/Users/Cedric/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv");
-			//files[1] = std::string("C:/Users/Cedric/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv");
-		}else{
-			files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv");
-			files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv");
-		}
-		parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
-		parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
-		parameter.InitializeExpression(genome, sphi_init);
-		//std::vector<double> phiVals = parameter.readPhiValues("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrCleft_phi_est.csv");
-		//parameter.InitializeExpression(phiVals);
-		exit(1);
-		std::cout << "done initialize ROCParameter object" << std::endl;
-
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
-		int samples = 200;
+		int samples = 100;
 		int thining = 10;
-		int useSamples = 10;
-
+		int useSamples = 100;
 		std::cout << "\t# samples: " << samples << "\n";
 		std::cout << "\t thining: " << thining << "\n";
 		std::cout << "\t # samples used: " << useSamples << "\n";
 		MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, 10, true, true, true);
 		std::cout << "done initialize MCMCAlgorithm object" << std::endl;
-
-		std::ofstream scuoout("results/scuo.csv");
-		for(unsigned n = 0u; n < genome.getGenomeSize(); n++)
+		if (!read)
 		{
-			scuoout << genome.getGene(n).getId() << "," << parameter.calculateSCUO(genome.getGene(n)) << std::endl;
+			std::vector<unsigned> geneAssignment(genome.getGenomeSize());
+			for(unsigned i = 0u; i < genome.getGenomeSize(); i++)
+			{
+				if(i < 448) geneAssignment[i] = 0u;
+				else geneAssignment[i] = 1u;
+			}
+			std::cout << "initialize ROCParameter object" << std::endl;
+			double sphi_init = 2;
+			double numMixtures = 2;
+			std::string mixDef = ROCParameter::allUnique;
+			std::cout << "\tSphi init: " << sphi_init << "\n";
+			std::cout << "\t# mixtures: " << numMixtures << "\n";
+			std::cout << "\tmixture definition: " << mixDef << "\n";
+			std::vector<std::vector<unsigned>> thetaKMatrix;
+			ROCParameter parameter = ROCParameter(sphi_init, numMixtures, geneAssignment, thetaKMatrix, true, mixDef);
+
+			std::vector<std::string> files(2);
+			if(cedric)
+			{
+				files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv");
+				files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv");
+				//files[0] = std::string("C:/Users/Cedric/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv");
+				//files[1] = std::string("C:/Users/Cedric/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv");
+			}else{
+				files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv");
+				files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv");
+			}
+			parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
+			parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
+			parameter.InitializeSynthesisRate(genome, sphi_init);
+			//std::vector<double> phiVals = parameter.readPhiValues("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrCleft_phi_est.csv");
+			//parameter.InitializeSynthesisRate(phiVals);
+			std::cout << "done initialize ROCParameter object" << std::endl;
+			ROCModel model;
+			model.setParameter(parameter);
+			std::ofstream scuoout("results/scuo.csv");
+			for(unsigned n = 0u; n < genome.getGenomeSize(); n++)
+			{
+				scuoout << genome.getGene(n).getId() << "," << parameter.calculateSCUO(genome.getGene(n)) << std::endl;
+			}
+			scuoout.close();
+
+			mcmc.setRestartFileSettings("RestartFile.txt" , 20, true);
+			std::cout << "starting MCMC" << std::endl;
+			mcmc.run(genome, model);
+			std::cout << std::endl << "Finish MCMC" << std::endl;
+
+			std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
+			std::cout << "Sphi proposal width: " << parameter.getSphiProposalWidth() << std::endl;
+			std::cout << "CSP proposal width: \n";
+			for(unsigned n = 0; n < 22; n++)
+			{
+				if(n == 21 || n == 10 || n == 18) continue;
+				std::cout << SequenceSummary::AminoAcidArray[n] << ": " << parameter.getCurrentCodonSpecificProposalWidth(n) << "\n";
+			}
 		}
-		scuoout.close();
-
-		std::cout << "starting MCMC" << std::endl;
-		mcmc.run(genome, model, parameter);
-		std::cout << std::endl << "Finish MCMC" << std::endl;
-
-		std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
-		std::cout << "Sphi proposal width: " << parameter.getSphiProposalWidth() << std::endl;
-		std::cout << "CSP proposal width: \n";
-		for(unsigned n = 0; n < 22; n++)
+		else 
 		{
-			if(n == 21 || n == 10 || n == 18) continue;
-			std::cout << SequenceSummary::AminoAcidArray[n] << ": " << parameter.getCurrentCodonSpecificProposalWidth(n) << "\n";
+			ROCParameter parameter("RestartFile.txt");
+			ROCModel model;
+			model.setParameter(parameter);
+			std::ofstream scuoout("results/scuo.csv");
+			for(unsigned n = 0u; n < genome.getGenomeSize(); n++)
+			{
+				scuoout << genome.getGene(n).getId() << "," << parameter.calculateSCUO(genome.getGene(n)) << std::endl;
+			}
+			scuoout.close();
+			mcmc.setRestartFileSettings("RestartFile.txt" , 20, true);
+			std::cout << "starting MCMC" << std::endl;
+			mcmc.run(genome, model);
+			std::cout << std::endl << "Finish MCMC" << std::endl;
+
+			std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
+			std::cout << "Sphi proposal width: " << parameter.getSphiProposalWidth() << std::endl;
+			std::cout << "CSP proposal width: \n";
+			for(unsigned n = 0; n < 22; n++)
+			{
+				if(n == 21 || n == 10 || n == 18) continue;
+				std::cout << SequenceSummary::AminoAcidArray[n] << ": " << parameter.getCurrentCodonSpecificProposalWidth(n) << "\n";
+			}
 		}
+
+
 
 		//These files used to be written here:
 		//mutationPosterior_Cat#.csv

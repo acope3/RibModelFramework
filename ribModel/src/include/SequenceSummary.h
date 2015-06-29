@@ -12,7 +12,8 @@ class SequenceSummary
 
 		int ncodons[64];
 		int naa[22];
-
+		unsigned RFPObserved[64];
+		unsigned numCodonsInMRNA[64];
 	public:
 
 		//static member variables
@@ -33,16 +34,12 @@ class SequenceSummary
 		void clear();
 
 		int getAAcountForAA(char aa) {return naa[aaToIndex.find(aa)->second];}
-		int getAAcountForAA(int aa) 
-		{
-			return naa[aa];
-		}
+		int getAAcountForAA(int aa) {return naa[aa];}
 		int getCodonCountForCodon(std::string& codon) {return ncodons[SequenceSummary::CodonToIndex(codon)];}
-		int getCodonCountForCodon(int codon) 
-		{
-			return ncodons[codon];	
-		}
+		int getCodonCountForCodon(int codon) {return ncodons[codon];}
 
+		unsigned getRFPObserved(unsigned codonIndex) {return RFPObserved[codonIndex];}
+		unsigned getNumCodonsInMRNA(unsigned codonIndex) {return numCodonsInMRNA[codonIndex];}
 
 		//R Wrapper Functions
 		int getAAcount(char aa) {aa = std::toupper(aa);	return getAAcountForAA(aa);}
@@ -58,12 +55,12 @@ class SequenceSummary
 
 
 		//static functions
+		static unsigned AAToAAIndex(char aa);
 		static char CodonToAA(std::string& codon);
 		static unsigned GetNumCodonsForAA(char& aa, bool forParamVector = false);
 		static unsigned CodonToIndex(std::string& codon, bool forParamVector = false);
 		static std::string IndexToCodon(unsigned i, bool forParamVector = false);
 		static unsigned CodonToAAIndex(std::string& codon);
-		static unsigned AAToAAIndex(char aa);
 		static char IndexToAA(int aa);
 		static void AAindexToCodonRange(unsigned aaIndex, bool forParamVector = false, unsigned aaRange[] = nullptr);
 		static void AAToCodonRange(char aa, bool forParamVector = false, unsigned aaRange[] = nullptr);
