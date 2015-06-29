@@ -6,5 +6,6 @@
 *.txt
 *.swp
 *.Rcheck
+*.history
 .Rhistory
 Test
