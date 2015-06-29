@@ -100,9 +100,6 @@ ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
 	return *this;
 }
 
-//static initialization:
-const char groupList[] = {'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'Y', SequenceSummary::Ser2};
-
 
 
 void ROCParameter::initROCParameterSet()
@@ -789,6 +786,10 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 		return normalizationTerm * posteriorVariance;
 	}
 
+	std::string ROCParameter::getGrouping(unsigned index)
+	{
+		return groupList[index];
+	}
 
 	// Cedric: I decided to use a normal distribution to propose Sphi and phi instead of a lognormal because:
 	// 1. It is a symmetric distribution and you therefore do not have to account for the unsymmetry in jump probabilities

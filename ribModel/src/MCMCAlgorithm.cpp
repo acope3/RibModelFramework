@@ -236,7 +236,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 	for(unsigned i = 0; i < size; i++)
 	{
 		std::string grouping; 
-		if (size == 19) grouping = SequenceSummary::AminoAcidArray[i];
+		if (size == 19) grouping = model.getGrouping(i);
 		//TODO: add for RFP Model here
 
 		// calculate likelihood ratio for every Category for current AA

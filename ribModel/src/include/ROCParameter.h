@@ -33,7 +33,8 @@ class ROCParameter : public Parameter
 		std::vector<double> currentiidSum;
 
 
-		static const char groupList[];
+		const std::string groupList[19] = {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "P", "Q", "R", "S", "T", "V", "Y", "Z"};
+//Z is Ser2, but must be wrote as Z here for C++ types to accept it.
 		// proposal bias and std for codon specific parameter
 		double bias_csp;
 		std::vector<double> std_csp;
@@ -115,7 +116,7 @@ class ROCParameter : public Parameter
 		double getSelectionPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon);
 		double getMutationVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased = true);
 		double getSelectionVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased = true);
-
+		std::string getGrouping(unsigned index);
 
 		//R wrapper functions
 		void initMutationSelectionCategoriesR(std::vector<std::string> files, unsigned numCategories, std::string paramType);
