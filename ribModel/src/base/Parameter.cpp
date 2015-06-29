@@ -2,7 +2,18 @@
 #include <sstream>
 Parameter::Parameter()
 {
-	//ctor
+	numParam = 0u;
+	Sphi = 0.0;
+	Sphi_proposed = 0.0;
+	Aphi = 0.0;
+	Aphi_proposed = 0.0;
+	numAcceptForSphi = 0u;
+	bias_sphi = 0.0;
+	bias_phi = 0.0;
+	numMutationCategories = 0u;
+	numSelectionCategories = 0u;
+	numMixtures = 0u;
+	std_sphi = 0.0;
 }
 
 Parameter::Parameter(const Parameter& other)
@@ -11,8 +22,8 @@ Parameter::Parameter(const Parameter& other)
 
   covarianceMatrix = other.covarianceMatrix;
   Sphi = other.Sphi;
-  Aphi = other.Aphi;
   Sphi_proposed = other.Sphi_proposed;
+  Aphi = other.Aphi;
   Aphi_proposed = other.Aphi_proposed;
   numAcceptForSphi = other.numAcceptForSphi;
   categories = other.categories;
@@ -833,7 +844,7 @@ void Parameter::proposeSynthesisRateLevels()
 
 unsigned Parameter::getEstimatedMixtureAssignment(unsigned samples, unsigned geneIndex)
 {
-	unsigned  rv;
+	unsigned rv = 0u;
 	double value = -1.0;
 	std::vector <double> probabilities;
 	probabilities = getEstimatedMixtureAssignmentProbabilities(samples, geneIndex);
@@ -846,7 +857,6 @@ unsigned Parameter::getEstimatedMixtureAssignment(unsigned samples, unsigned gen
 			rv = i;
 		}
 	}
-
 	return rv;
 }
 

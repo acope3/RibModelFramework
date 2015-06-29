@@ -66,7 +66,7 @@ void testCovarianceMatrix()
 	std::cout << "Choleski Matrix" << std::endl;
 	covMat.printCholeskiMatrix();
 	std::cout << "Matrix vector multiplication" << std::endl;
-	double brr[3] {1, 0, -1};
+	//double brr[3] {1, 0, -1};
 	double res[3];
 	//covMat.transformIidNumersIntoCovaryingNumbers(brr, res);
 	for(int i = 0; i < 3; i++)

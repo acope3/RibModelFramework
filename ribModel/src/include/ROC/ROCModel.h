@@ -9,17 +9,20 @@ class ROCModel : public Model
     private:
 
 	ROCParameter *parameter;
-        virtual void obtainCodonCount(SequenceSummary& seqsum, char curAA, int codonCount[]);
-        double calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codonCount[], double mutation[], double selection[], double phiValue);
+	virtual void obtainCodonCount(SequenceSummary& seqsum, char curAA, int codonCount[]);
+	double calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codonCount[], double mutation[], double selection[], double phiValue);
+
     public:
-        ROCModel();
-        virtual ~ROCModel();
-        ROCModel(const ROCModel& other);
+
+	ROCModel();
+	virtual ~ROCModel();
+	ROCModel(const ROCModel& other);
+
 	void setParameter(ROCParameter &_parameter);
-        virtual void calculateCodonProbabilityVector(unsigned numCodons, double* mutation, double* selection, double phi, double* codonProb);
-        // Likelihood ratio functions
-        virtual void calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio);
-        virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures);
+	virtual void calculateCodonProbabilityVector(unsigned numCodons, double* mutation, double* selection, double phi, double* codonProb);
+	// Likelihood ratio functions
+	virtual void calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio);
+	virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures);
 
 	//Parameter wrapper functions:
 	virtual void initTraces(unsigned samples, unsigned num_genes, unsigned adaptiveSamples) {parameter -> initAllTraces(samples, num_genes, adaptiveSamples);}
@@ -36,8 +39,8 @@ class ROCModel : public Model
 	virtual unsigned getMixtureAssignment(unsigned index) {return parameter->getMixtureAssignment(index);}
 	virtual unsigned getSynthesisRateCategory(unsigned mixture) {return parameter->getSynthesisRateCategory(mixture);}
 	virtual unsigned getSelectionCategory(unsigned mixture) {return parameter ->getSelectionCategory(mixture);}
-        virtual unsigned getMutationCategory(unsigned mixture)  {return parameter ->getMutationCategory(mixture);} 				
-	virtual double getSynthesisRate(unsigned index, unsigned mixture, bool proposed = false) {return parameter->getSynthesisRate(index, mixture, false);}
+	virtual unsigned getMutationCategory(unsigned mixture)  {return parameter ->getMutationCategory(mixture);}
+	virtual double getSynthesisRate(unsigned index, unsigned mixture, bool proposed = false) {return parameter->getSynthesisRate(index, mixture, proposed);}
 	virtual double getCurrentSphiProposalWidth() {return parameter->getCurrentSphiProposalWidth();}
 	virtual void updateSphi() {parameter->updateSphi();}
 	virtual void updateSphiTrace(unsigned sample) {parameter->updateSphiTrace(sample);}
@@ -47,10 +50,10 @@ class ROCModel : public Model
 	virtual std::vector<unsigned> getMixtureElementsOfSelectionCategory(unsigned k) {return parameter->getMixtureElementsOfSelectionCategory(k);}
 	virtual void updateSynthesisRate(unsigned i, unsigned k) {parameter->updateSynthesisRate(i,k);}
 	virtual void setMixtureAssignment(unsigned i, unsigned catOfGene) {parameter->setMixtureAssignment(i, catOfGene);}
-        virtual void updateSynthesisRateTrace(unsigned sample, unsigned i) {parameter->updateSynthesisRateTrace(sample, i);}
-        virtual void updateMixtureAssignmentTrace(unsigned sample, unsigned i) {parameter->updateMixtureAssignmentTrace(sample, i);}
-        virtual void setCategoryProbability(unsigned mixture, double value) {parameter->setCategoryProbability(mixture, value);}
-        virtual void updateMixtureProbabilitiesTrace(unsigned sample) {parameter->updateMixtureProbabilitiesTrace(sample);}
+	virtual void updateSynthesisRateTrace(unsigned sample, unsigned i) {parameter->updateSynthesisRateTrace(sample, i);}
+	virtual void updateMixtureAssignmentTrace(unsigned sample, unsigned i) {parameter->updateMixtureAssignmentTrace(sample, i);}
+	virtual void setCategoryProbability(unsigned mixture, double value) {parameter->setCategoryProbability(mixture, value);}
+	virtual void updateMixtureProbabilitiesTrace(unsigned sample) {parameter->updateMixtureProbabilitiesTrace(sample);}
 	virtual void adaptSynthesisRateProposalWidth(unsigned adaptiveWidth) {parameter->adaptSynthesisRateProposalWidth(adaptiveWidth);}
 	virtual void getParameterForCategory(unsigned category, unsigned param, char aa, bool proposal, double* returnValue)
 	{
@@ -59,7 +62,7 @@ class ROCModel : public Model
 	virtual unsigned getListSize() {return 19;} //TODO: make not hardcoded?
 	virtual std::string getGrouping(unsigned index) {return parameter -> getGrouping(index);}
 	// R wrapper
-        std::vector<double> CalculateProbabilitiesForCodons(std::vector<double> mutation, std::vector<double> selection, double phi);
+	std::vector<double> CalculateProbabilitiesForCodons(std::vector<double> mutation, std::vector<double> selection, double phi);
 
     protected:
 };

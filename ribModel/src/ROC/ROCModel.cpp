@@ -5,6 +5,7 @@
 #include <iostream>
 ROCModel::ROCModel() : Model()
 {
+	parameter = nullptr;
 }
 
 ROCModel::~ROCModel()
@@ -15,6 +16,7 @@ ROCModel::~ROCModel()
 ROCModel::ROCModel(const ROCModel& other)
 {
 	//copy ctor
+	parameter = other.parameter;
 }
 
 void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio)
