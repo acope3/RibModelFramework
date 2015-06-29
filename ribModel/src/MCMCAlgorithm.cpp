@@ -200,21 +200,21 @@ void MCMCAlgorithm::acceptRejectHyperParameter(int numGenes, Model& model, int i
 
 	// Take reverse jumb probability into account if phi proposal width is not identical.
 	// If phi proposal width is identical, the term cancels and does not have to be calculated.
-	double curr_std_sphi = model.getCurrentSphiProposalWidth();
+	/*double curr_std_sphi = model.getCurrentSphiProposalWidth();
 	double prev_std_sphi = model.getPreviousSphiProposalWidth();
 	double revJump_proposed = 0.0;
-	double revJump = 0.0;
+	double revJump = 0.0;*/
 	/*if(curr_std_sphi != prev_std_sphi)
 	{
 		revJump_proposed = std::log(Parameter::densityNorm(proposedSphi, currentSphi, curr_std_sphi));
 		revJump = std::log(Parameter::densityNorm(currentSphi, proposedSphi, prev_std_sphi));
 	}*/
-	logProbabilityRatio -= (std::log(currentSphi) - std::log(proposedSphi)) + (revJump_proposed - revJump);
+	logProbabilityRatio -= (std::log(currentSphi) - std::log(proposedSphi));// + (revJump_proposed - revJump);
 	if(!std::isfinite(logProbabilityRatio))
 	{
 		std::cout << "logProbabilityRatio not finite!\n";
 		std::cout <<"currentSphi = " << currentSphi << " proposedSphi = " << proposedSphi <<"\n";
-		std::cout <<"revJump_proposed - revJump = " << revJump_proposed - revJump <<"\n";
+		//std::cout <<"revJump_proposed - revJump = " << revJump_proposed - revJump <<"\n";
 	}
 
 	if( -Parameter::randExp(1) < logProbabilityRatio )
