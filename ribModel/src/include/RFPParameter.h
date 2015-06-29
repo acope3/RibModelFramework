@@ -61,6 +61,13 @@ class RFPParameter : public Parameter
 		RFPParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer = true, std::string _mutationSelectionState = "allUnique");
 #endif
 	
+		//Inititalization Functions:
+		void initRFPParameterSet();
+		void initAlpha(std::vector<double> alphaValues, unsigned mixtureElement, char aa);
+		void initLambdaPrime(std::vector<double> lambdaPrimeValues, unsigned mixtureElement, char aa);
+		void initMutationSelectionCategories(std::vector<std::string> files, unsigned numCategories, unsigned paramType); //still need to alter, not sure how
+		
+
 		//Restart File functions:	
 		void writeEntireRestartFile(std::string filename); //maybe move up?
 		void writeRFPRestartFile(std::string filename);
@@ -79,11 +86,6 @@ class RFPParameter : public Parameter
 		void updateCodonSpecificParameterTrace(unsigned sample, char aa) {traces.updateCodonSpecificParameterTrace(sample, aa, currentLambdaPrimeParameter, 
 				currentAlphaParameter);}
 		
-		//Inititalization Functions:
-		void initRFPParameterSet();
-		void initAlpha(std::vector<double> alphaValues, unsigned mixtureElement, char aa);
-		void initLambdaPrime(std::vector<double> lambdaPrimeValues, unsigned mixtureElement, char aa);
-		void initMutationSelectionCategories(std::vector<std::string> files, unsigned numCategories, unsigned paramType); //still need to alter, not sure how
 
 		// functions to manage codon specific parameter
 		void updateCodonSpecificParameter(char aa);
