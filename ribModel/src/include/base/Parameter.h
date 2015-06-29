@@ -129,9 +129,7 @@ unsigned int getNumParam() {return numParam;}
 		void proposeSPhi();
 		void proposeSynthesisRateLevels();
 		double getCurrentSynthesisRateProposalWidth(unsigned expressionCategory, unsigned geneIndex) {return std_phi[expressionCategory][geneIndex];}
-		double getPreviousSynthesisRateProposalWidth(unsigned expressionCategory, unsigned geneIndex) {return prev_std_phi[expressionCategory][geneIndex];}
 		double getCurrentSphiProposalWidth() {return std_sphi;}
-		double getPreviousSphiProposalWidth() {return prev_std_sphi;}
 		
 
 		// functions to return estimates

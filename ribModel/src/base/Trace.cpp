@@ -1,4 +1,4 @@
-#include "include/base/Trace.h"
+#include "../include/base/Trace.h"
 #ifndef STANDALONE
 #include <Rcpp.h>
 using namespace Rcpp;
@@ -14,12 +14,12 @@ Trace::~Trace()
 	//DTOR
 }
 
-void Trace::initAllTraces(unsigned samples, unsigned num_genes, unsigned numSelectionCategories, unsigned numMixtures, std::vector<thetaK> &_categories)
+void Trace::initAllTraces(unsigned samples, unsigned num_genes, unsigned numSelectionCategories, unsigned numMixtures, std::vector<mixtureDefinition> &_categories)
 {
 	initBaseTraces(samples, num_genes, numSelectionCategories, numMixtures, _categories);
 }
 
-void Trace::initBaseTraces(unsigned samples, unsigned num_genes, unsigned numSelectionCategories, unsigned numMixtures, std::vector<thetaK> &_categories)
+void Trace::initBaseTraces(unsigned samples, unsigned num_genes, unsigned numSelectionCategories, unsigned numMixtures, std::vector<mixtureDefinition> &_categories)
 {
 	//numSelectionCategories always == numSynthesisRateCategories, so only one is passed in for convience
 	initSphiTrace(samples);

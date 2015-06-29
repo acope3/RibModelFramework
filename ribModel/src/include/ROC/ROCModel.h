@@ -39,7 +39,6 @@ class ROCModel : public Model
         virtual unsigned getMutationCategory(unsigned mixture)  {return parameter ->getMutationCategory(mixture);} 				
 	virtual double getSynthesisRate(unsigned index, unsigned mixture, bool proposed = false) {return parameter->getSynthesisRate(index, mixture, false);}
 	virtual double getCurrentSphiProposalWidth() {return parameter->getCurrentSphiProposalWidth();}
-	virtual double getPreviousSphiProposalWidth() {return parameter->getPreviousSphiProposalWidth();}
 	virtual void updateSphi() {parameter->updateSphi();}
 	virtual void updateSphiTrace(unsigned sample) {parameter->updateSphiTrace(sample);}
 	virtual void adaptSphiProposalWidth(unsigned adaptiveWidth) {parameter->adaptSphiProposalWidth(adaptiveWidth);}
