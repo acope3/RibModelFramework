@@ -62,6 +62,10 @@ void Trace::initSynthesisRateAcceptanceRatioTrace(unsigned samples, unsigned num
 	for(unsigned category = 0; category < numSynthesisRateCategories; category++)
 	{
 		synthesisRateAcceptanceRatioTrace[category].resize(num_genes);
+		for (unsigned i = 0; i < num_genes; i++) 
+		{
+			synthesisRateAcceptanceRatioTrace[category][i].resize(samples);
+		}
 	}
 }
 

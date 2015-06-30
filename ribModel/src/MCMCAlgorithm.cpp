@@ -215,9 +215,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 	unsigned size = model.getGroupListSize();
 	for(unsigned i = 0; i < size; i++)
 	{
-		std::string grouping; 
-		if (size == 19) grouping = model.getGrouping(i);
-		else if (size == 61) grouping = model.getGrouping(i);
+		std::string grouping = model.getGrouping(i);
 
 		// calculate likelihood ratio for every Category for current AA
 		model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures);

@@ -30,8 +30,7 @@ class ROCParameter : public Parameter
 		std::vector<std::vector<double>> proposedSelectionParameter;
 		std::vector<unsigned> numAcceptForMutationAndSelection;
 
-		std::vector <std::string> groupList;
-//Z is Ser2, but must be wrote as Z here for C++ types to accept it.
+		//Z is Ser2, but must be written as Z here for C++ types to accept it.
 		// proposal bias and std for codon specific parameter
 		double bias_csp;
 		std::vector<double> std_csp;
@@ -40,6 +39,9 @@ class ROCParameter : public Parameter
 
 	public:
 		//static const members
+		static const unsigned dM;
+		static const unsigned dEta;
+
 		explicit ROCParameter(std::string filename);
 		ROCParameter(double sphi, unsigned _numMixtures,
 				std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer = true, std::string _mutationSelectionState = "allUnique");
@@ -110,7 +112,6 @@ class ROCParameter : public Parameter
 		double getSelectionPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon);
 		double getMutationVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased = true);
 		double getSelectionVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased = true);
-		std::string getGrouping(unsigned index);
 
 		//R wrapper functions
 		void initMutationSelectionCategoriesR(std::vector<std::string> files, unsigned numCategories, std::string paramType);
@@ -155,7 +156,6 @@ class ROCParameter : public Parameter
 			return rv;
 		}
 
-		unsigned getGroupListSize();
 	protected:
 
 };

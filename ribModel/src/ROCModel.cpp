@@ -34,25 +34,24 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsi
 	double phiValue = parameter->getSynthesisRate(geneIndex, expressionCategory, false);
 	double phiValue_proposed = parameter->getSynthesisRate(geneIndex, expressionCategory, true);
 	//#pragma omp parallel for
-	for(int i = 0; i < 22; i++)
+	for(unsigned i = 0; i < getGroupListSize(); i++)
 	{
-		char curAA = seqsum.AminoAcidArray[i];
-		// skip amino acids with only one codon or stop codons
-		if(curAA == 'X' || curAA == 'M' || curAA == 'W') continue;
+		std::string curAA = getGrouping(i);
+
 		// skip amino acids which do not occur in current gene. Avoid useless calculations and multiplying by 0
-		if(seqsum.getAAcountForAA(i) == 0) continue;
+		if(seqsum.getAAcountForAA(curAA[0]) == 0) continue;
 
 		// get codon count (total count not parameter->count)
-		int numCodons = seqsum.GetNumCodonsForAA(curAA);
+		int numCodons = seqsum.GetNumCodonsForAA(curAA[0]);
 		// get mutation and selection parameter->for gene
 		double* mutation = new double[numCodons - 1]();
-		parameter->getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
+		parameter->getParameterForCategory(mutationCategory, ROCParameter::dM, curAA[0], false, mutation);
 		double* selection = new double[numCodons - 1]();
-		parameter->getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
+		parameter->getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA[0], false, selection);
 
 		// prepare array for codon counts for AA
 		int* codonCount = new int[numCodons]();
-		obtainCodonCount(seqsum, curAA, codonCount);
+		obtainCodonCount(seqsum, curAA[0], codonCount);
 
 		//#pragma omp parallel num_threads(2)
 		{
