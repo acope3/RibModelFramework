@@ -44,7 +44,7 @@ class Trace
 		std::vector<double> getAPhiTrace() {return aPhiTrace;}
 		std::vector<double> getSphiAcceptanceRatioTrace() {return sphiAcceptanceRatioTrace;}
 		std::vector<double> getSynthesisRateAcceptanceRatioTraceByMixtureElementForGene(unsigned mixtureElement, unsigned geneIndex); 
-		std::vector<double> getCspAcceptanceRatioTraceForAA(char aa);
+		std::vector<double> getCspAcceptanceRatioTraceForAA(std::string aa);
 		std::vector<double> getSynthesisRateTraceForGene(unsigned geneIndex);//will build the trace appropriately based on what cat you are in
 		std::vector<double> getSynthesisRateTraceByMixtureElementForGene(unsigned mixtureElement, unsigned geneIndex);
 		std::vector<unsigned> getMixtureAssignmentTraceForGene(unsigned geneIndex) {return mixtureAssignmentTrace[geneIndex];}

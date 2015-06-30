@@ -219,7 +219,7 @@ void Genome::simulateGenome(Model& model)
 	unsigned aaRange[2];
 	std::string tmpSeq;
 	std::string codon;
-	char curAA;
+	std::string curAA;
 	std::string tmpDesc;
 
 

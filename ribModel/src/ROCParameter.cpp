@@ -360,7 +360,7 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 #endif
 
 //This function seems to be used only for the purpose of R
-	void ROCParameter::initSelection(std::vector<double> selectionValues, unsigned mixtureElement, char aa)
+	void ROCParameter::initSelection(std::vector<double> selectionValues, unsigned mixtureElement, std::string aa)
 	{
 		//TODO: seperate out the R wrapper functionality and make the wrapper
 		//currentSelectionParameter
@@ -371,7 +371,7 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 			unsigned aaRange[2];
 			int category = getSelectionCategory(mixtureElement);
 
-			aa = std::toupper(aa);
+			aa = std::toupper(aa[0]);
 			SequenceSummary::AAToCodonRange(aa, true, aaRange);
 			for (unsigned i = aaRange[0], j = 0; i < aaRange[1]; i++, j++)
 			{
@@ -381,7 +381,7 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 	}
 
 //This function seems to be used only for the purpose of R
-	void ROCParameter::initMutation(std::vector<double> mutationValues, unsigned mixtureElement, char aa)
+	void ROCParameter::initMutation(std::vector<double> mutationValues, unsigned mixtureElement, std::string aa)
 	{
 		//TODO: seperate out the R wrapper functionality and make the wrapper
 		//currentMutationParameter
@@ -393,7 +393,7 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 			unsigned aaRange[2];
 			unsigned category = getMutationCategory(mixtureElement);
 
-			aa = std::toupper(aa);
+			aa = std::toupper(aa[0]);
 			SequenceSummary::AAToCodonRange(aa, true, aaRange);
 			for (unsigned i = aaRange[0], j = 0; i < aaRange[1]; i++, j++)
 			{
@@ -468,7 +468,7 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 	}
 
 
-	void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType, char aa, bool proposal, double* returnSet)
+	void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType, std::string aa, bool proposal, double* returnSet)
 	{
 		std::vector<double> *tempSet;
 		if(paramType == ROCParameter::dM)
@@ -881,10 +881,9 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 
 	void ROCParameter::updateCodonSpecificParameter(std::string grouping)
 	{
-		char aa = grouping[0];
 		unsigned aaRange[2];
-		SequenceSummary::AAToCodonRange(aa, true, aaRange);
-		unsigned aaIndex = SequenceSummary::aaToIndex.find(aa)->second;
+		SequenceSummary::AAToCodonRange(grouping, true, aaRange);
+		unsigned aaIndex = SequenceSummary::aaToIndex.find(grouping)->second;
 		numAcceptForMutationAndSelection[aaIndex]++;
 
 		for(unsigned k = 0u; k < numMutationCategories; k++)
