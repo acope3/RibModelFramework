@@ -1,6 +1,14 @@
-#include "../include/base/Parameter.h"
+#include "include/base/Parameter.h"
 #include <sstream>
 #include <ctime>
+
+const unsigned Parameter::dM = 0;
+const unsigned Parameter::dEta = 1;
+const std::string Parameter::allUnique = "allUnique";
+const std::string Parameter::selectionShared = "selectionShared";
+const std::string Parameter::mutationShared = "mutationShared";
+std::default_random_engine Parameter::generator(std::time(NULL));
+
 
 Parameter::Parameter()
 {
@@ -153,12 +161,6 @@ void Parameter::initParameterSet(double sphi, unsigned _numMixtures, std::vector
   }
 }
 
-const unsigned Parameter::dM = 0;
-const unsigned Parameter::dEta = 1;
-const std::string Parameter::allUnique = "allUnique";
-const std::string Parameter::selectionShared = "selectionShared";
-const std::string Parameter::mutationShared = "mutationShared";
-std::default_random_engine Parameter::generator(std::time(NULL));
 
 // sort array interval from first (included) to last (excluded)!!
 // quick sort, sorting arrays a and b by a.

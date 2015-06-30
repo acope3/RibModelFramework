@@ -1,5 +1,5 @@
 #ifndef STANDALONE
-#include "../include/ROC/ROCModel.h"
+#include "include/ROC/ROCModel.h"
 #include <Rcpp.h>
 using namespace Rcpp;
 RCPP_EXPOSED_CLASS(ROCParameter)

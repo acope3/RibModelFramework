@@ -1,4 +1,4 @@
-#include "../include/ROC/ROCModel.h"
+#include "include/ROC/ROCModel.h"
 #include <vector>
 #include <math.h>
 #include <cfloat>

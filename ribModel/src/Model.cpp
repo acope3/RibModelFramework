@@ -1,4 +1,4 @@
-#include "../include/base/Model.h"
+#include "include/base/Model.h"
 
 Model::Model()
 {
