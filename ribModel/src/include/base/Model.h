@@ -4,7 +4,7 @@
 class Model
 {
     private:
-        virtual void obtainCodonCount(SequenceSummary& seqsum, char curAA, int codonCount[]) = 0;
+        virtual void obtainCodonCount(SequenceSummary& seqsum, std::string curAA, int codonCount[]) = 0;
 
 
     public:
@@ -48,7 +48,7 @@ class Model
 		virtual void setCategoryProbability(unsigned mixture, double value) = 0;
 		virtual void updateMixtureProbabilitiesTrace(unsigned sample) = 0;
 		virtual void adaptSynthesisRateProposalWidth(unsigned adaptiveWidth) = 0;
-		virtual void getParameterForCategory(unsigned category, unsigned param, char aa, bool proposal, double* returnValue) = 0;
+		virtual void getParameterForCategory(unsigned category, unsigned param, std::string aa, bool proposal, double* returnValue) = 0;
 		virtual unsigned getGroupListSize() = 0;
 		virtual std::string getGrouping(unsigned index) = 0;
 

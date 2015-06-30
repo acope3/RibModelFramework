@@ -30,7 +30,7 @@ class ROCTrace : public Trace
     unsigned getMutationCategory(unsigned mixtureElement) {return categories->at(mixtureElement).delM;}
     unsigned getSelectionCategory(unsigned mixtureElement) {return categories->at(mixtureElement).delEta;}
 		//Update functions	
-		void updateCodonSpecificParameterTrace(unsigned sample, char aa, std::vector<std::vector<double>> &curMutParam, std::vector<std::vector<double>> &curSelectParam);
+		void updateCodonSpecificParameterTrace(unsigned sample, std::string aa, std::vector<std::vector<double>> &curMutParam, std::vector<std::vector<double>> &curSelectParam);
 
 		//R WRAPPER FUNCTIONS
 

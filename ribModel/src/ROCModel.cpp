@@ -42,16 +42,16 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsi
 		if(seqsum.getAAcountForAA(curAA[0]) == 0) continue;
 
 		// get codon count (total count not parameter->count)
-		int numCodons = seqsum.GetNumCodonsForAA(curAA[0]);
+		int numCodons = seqsum.GetNumCodonsForAA(curAA);
 		// get mutation and selection parameter->for gene
 		double* mutation = new double[numCodons - 1]();
-		parameter->getParameterForCategory(mutationCategory, ROCParameter::dM, curAA[0], false, mutation);
+		parameter->getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
 		double* selection = new double[numCodons - 1]();
-		parameter->getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA[0], false, selection);
+		parameter->getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
 
 		// prepare array for codon counts for AA
 		int* codonCount = new int[numCodons]();
-		obtainCodonCount(seqsum, curAA[0], codonCount);
+		obtainCodonCount(seqsum, curAA, codonCount);
 
 		//#pragma omp parallel num_threads(2)
 		{
@@ -143,16 +143,15 @@ double ROCModel::calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codo
 
 void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures)
 {
-	char curAA = grouping[0];
 	int numGenes = genome.getGenomeSize();
-	int numCodons = SequenceSummary::GetNumCodonsForAA(curAA);
+	int numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
 	double likelihood = 0.0;
 	double likelihood_proposed = 0.0;
 	for(int i = 0; i < numGenes; i++)
 	{
 		Gene gene = genome.getGene(i);
 		SequenceSummary seqsum = gene.getSequenceSummary();
-		if(seqsum.getAAcountForAA(curAA) == 0) continue;
+		if(seqsum.getAAcountForAA(grouping) == 0) continue;
 
 		// which mixture element does this gene belong to
 		unsigned mixtureElement = parameter->getMixtureAssignment(i);
@@ -165,18 +164,18 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 
 		// get current mutation and selection parameter
 		double* mutation = new double[numCodons - 1]();
-		parameter->getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
+		parameter->getParameterForCategory(mutationCategory, ROCParameter::dM, grouping, false, mutation);
 		double* selection = new double[numCodons - 1]();
-		parameter->getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
+		parameter->getParameterForCategory(selectionCategory, ROCParameter::dEta, grouping, false, selection);
 
 		// get proposed mutation and selection parameter
 		double* mutation_proposed = new double[numCodons - 1]();
-		parameter->getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, true, mutation_proposed);
+		parameter->getParameterForCategory(mutationCategory, ROCParameter::dM, grouping, true, mutation_proposed);
 		double* selection_proposed = new double[numCodons - 1]();
-		parameter->getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, true, selection_proposed);
+		parameter->getParameterForCategory(selectionCategory, ROCParameter::dEta, grouping, true, selection_proposed);
 
 		int* codonCount = new int[numCodons]();
-		obtainCodonCount(seqsum, curAA, codonCount);
+		obtainCodonCount(seqsum, grouping, codonCount);
 		likelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
 		likelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation_proposed, selection_proposed, phiValue);
 
@@ -189,7 +188,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 	logAcceptanceRatioForAllMixtures = likelihood_proposed - likelihood;
 }
 
-void ROCModel::obtainCodonCount(SequenceSummary& seqsum, char curAA, int codonCount[])
+void ROCModel::obtainCodonCount(SequenceSummary& seqsum, std::string curAA, int codonCount[])
 {
 	unsigned codonRange[2];
 	SequenceSummary::AAToCodonRange(curAA, false, codonRange);
