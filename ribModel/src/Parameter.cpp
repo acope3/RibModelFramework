@@ -562,11 +562,13 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 
 #ifndef STANDALONE
 using namespace Rcpp;
-void Parameter::initCovarianceMatrix(SEXP _matrix, char aa)
+void Parameter::initCovarianceMatrix(SEXP _matrix, std::string aa)
 {
 	std::vector<double> tmp;
 	NumericMatrix matrix(_matrix);
-	aa = std::toupper(aa);
+
+	for(unsigned i = 0u; i < aa.length(); i++)	aa[i] = (char)std::toupper(aa[i]);
+
 	unsigned aaIndex = SequenceSummary::aaToIndex.find(aa) -> second;
 	unsigned numRows = matrix.nrow();
 	std::vector<double> covMatrix(numRows * numRows);

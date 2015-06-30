@@ -57,7 +57,7 @@ public:
 	void writeBasicRestartFile(std::string filename);
 	void initBaseValuesFromFile(std::string filename);
 #ifndef STANDALONE
-	void initCovarianceMatrix(SEXP matrix, char aa);
+	void initCovarianceMatrix(SEXP matrix, std::string aa);
 #endif
 
 	unsigned int getNumParam() { return numParam; }
@@ -177,8 +177,8 @@ public:
 	unsigned getSynthesisRateCategoryForMixture(unsigned mixtureElement);
 	std::vector<double> getCurrentSynthesisRateForMixture(unsigned mixture);
 	void setGroupList(std::vector <std::string> gl);
-	std::string Parameter::getGrouping(unsigned index);
-	unsigned Parameter::getGroupListSize();
+	std::string getGrouping(unsigned index);
+	unsigned getGroupListSize();
 
 protected:
 	double Aphi;
