@@ -9,7 +9,7 @@ class ROCModel : public Model
     private:
 
 	ROCParameter *parameter;
-	virtual void obtainCodonCount(SequenceSummary& seqsum, char curAA, int codonCount[]);
+	virtual void obtainCodonCount(SequenceSummary& seqsum, std::string curAA, int codonCount[]);
 	double calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codonCount[], double mutation[], double selection[], double phiValue);
 
     public:
@@ -55,7 +55,7 @@ class ROCModel : public Model
 	virtual void setCategoryProbability(unsigned mixture, double value) {parameter->setCategoryProbability(mixture, value);}
 	virtual void updateMixtureProbabilitiesTrace(unsigned sample) {parameter->updateMixtureProbabilitiesTrace(sample);}
 	virtual void adaptSynthesisRateProposalWidth(unsigned adaptiveWidth) {parameter->adaptSynthesisRateProposalWidth(adaptiveWidth);}
-	virtual void getParameterForCategory(unsigned category, unsigned param, char aa, bool proposal, double* returnValue)
+	virtual void getParameterForCategory(unsigned category, unsigned param, std::string aa, bool proposal, double* returnValue)
 	{
 		parameter -> getParameterForCategory(category, param, aa, proposal, returnValue);
 	}

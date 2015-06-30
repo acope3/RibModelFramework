@@ -71,7 +71,7 @@ std::vector<double> ROCTrace::getSelectionParameterTraceByMixtureElementForCodon
 	return selectionParameterTrace[category][codonIndex];
 }
 
-void ROCTrace::updateCodonSpecificParameterTrace(unsigned sample, char aa, std::vector<std::vector<double>> &curMutParam, std::vector<std::vector<double>> &curSelectParam)
+void ROCTrace::updateCodonSpecificParameterTrace(unsigned sample, std::string aa, std::vector<std::vector<double>> &curMutParam, std::vector<std::vector<double>> &curSelectParam)
 {
 	for(unsigned category = 0; category < mutationParameterTrace.size(); category++)
 	{

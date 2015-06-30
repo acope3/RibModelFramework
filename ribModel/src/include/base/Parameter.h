@@ -68,7 +68,7 @@ public:
 	void updateSphi() { Sphi = Sphi_proposed; numAcceptForSphi++; }
 	double getSphiProposalWidth() { return std_sphi; }
 
-	CovarianceMatrix& getCovarianceMatrixForAA(char aa);
+	CovarianceMatrix& getCovarianceMatrixForAA(std::string aa);
 	std::vector <double> readPhiValues(std::string filename); //General function, not specific to class, possibly move
 
 

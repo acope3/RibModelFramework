@@ -249,15 +249,15 @@ void Genome::simulateGenome(Model& model)
 		{
 			aaCount = seqSum.getAAcountForAA(j);
 			curAA = seqSum.AminoAcidArray[j];
-			if (curAA == 'X') continue;
+			if (curAA == "X") continue;
 			numCodons = seqSum.GetNumCodonsForAA(curAA);
-			if (curAA == 'M') aaCount -= 1;
+			if (curAA == "M") aaCount -= 1;
 			double* codonProb = new double[numCodons](); //size the arrays to the proper size based on # of codons.
 			double* mutation = new double[numCodons - 1]();
 			double* selection = new double[numCodons - 1]();
 
 			//get the probability vector for each amino acid
-			if (curAA == 'M' || curAA == 'W')
+			if (curAA == "M" || curAA == "W")
 			{
 				codonProb[0] = 1;
 			}

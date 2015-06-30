@@ -420,7 +420,7 @@ int main()
 			for (unsigned n = 0; n < model.getGroupListSize(); n++)
 			{
 				std::string aa = model.getGrouping(n);
-				index = SequenceSummary::AAToAAIndex(aa[0]);
+				index = SequenceSummary::AAToAAIndex(aa);
 				std::cout << SequenceSummary::AminoAcidArray[index] << ": " << parameter.getCurrentCodonSpecificProposalWidth(index) << "\n";
 			}
 		}
@@ -446,7 +446,7 @@ int main()
 			for (unsigned n = 0; n < model.getGroupListSize(); n++)
 			{
 				std::string aa = model.getGrouping(n);
-				index = SequenceSummary::AAToAAIndex(aa[0]);
+				index = SequenceSummary::AAToAAIndex(aa);
 				std::cout << SequenceSummary::AminoAcidArray[index] << ": " << parameter.getCurrentCodonSpecificProposalWidth(index) << "\n";
 			}
 		}

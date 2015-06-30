@@ -149,9 +149,9 @@ void Parameter::initParameterSet(double sphi, unsigned _numMixtures, std::vector
     std_phi[i] = tempStdPhi;
   }
 
-  for (unsigned i = 0; i < 22; i++)
+  for (unsigned i = 0; i < 22; i++) // TODO: change this from being hardcoded
   {
-    char aa = SequenceSummary::AminoAcidArray[i];
+    std::string aa = SequenceSummary::AminoAcidArray[i];
     unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa, true);
     CovarianceMatrix m((numMutationCategories + numSelectionCategories) * numCodons);
     m.choleskiDecomposition();
@@ -356,9 +356,9 @@ void Parameter::writeBasicRestartFile(std::string filename)
 	oss.clear();
 	oss.str("");
 
-	for (i = 0; i < 22; i++)
+	for (i = 0; i < 22; i++) // TODO: change this from being hardcoded
 	{
-		char aa = SequenceSummary::IndexToAA(i);
+		std::string aa = SequenceSummary::IndexToAA(i);
 		oss <<">covarianceMatrix:\n" << aa <<"\n";
 		CovarianceMatrix m = covarianceMatrix[i];
 		std::vector<double>* tmp = m.getCovMatrix();
@@ -386,7 +386,7 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 		std::exit(1);
 	}
 
-	covarianceMatrix.resize(22);
+	covarianceMatrix.resize(22); // TODO: change this from being hardcoded
 	int cat = 0;
 	std::vector<double> mat;
 	std::string tmp, variableName;
@@ -406,8 +406,8 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 			if (variableName == "covarianceMatrix")
 			{
 				getline(input,tmp);
-				char aa = tmp[0];
-				cat = SequenceSummary::AAToAAIndex(aa);
+				//char aa = tmp[0];
+				cat = SequenceSummary::AAToAAIndex(tmp); // ????
 			}
 		}
 		else if (flag == 2)
@@ -876,7 +876,7 @@ double Parameter::calculateSCUO(Gene& gene)
 	{
 		std::string curAA = seqsum.AminoAcidArray[i];
 		// skip amino acids with only one codon or stop codons
-		if(curAA == 'X' || curAA == 'M' || curAA == 'W') continue;
+		if(curAA == "X" || curAA == "M" || curAA == "W") continue;
 		totalDegenerateAACount += (double)seqsum.getAAcountForAA(i);
 	}
 
@@ -885,7 +885,7 @@ double Parameter::calculateSCUO(Gene& gene)
 	{
 		std::string curAA = seqsum.AminoAcidArray[i];
 		// skip amino acids with only one codon or stop codons
-		if(curAA == 'X' || curAA == 'M' || curAA == 'W') continue;
+		if(curAA == "X" || curAA == "M" || curAA == "W") continue;
 		double numDegenerateCodons = SequenceSummary::GetNumCodonsForAA(curAA);
 
 		double aaCount = (double)seqsum.getAAcountForAA(i);
