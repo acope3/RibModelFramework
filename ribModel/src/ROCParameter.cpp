@@ -354,8 +354,11 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 		return RSelectionCoefficents;
 	}
 #endif
+
+//This function seems to be used only for the purpose of R
 	void ROCParameter::initSelection(std::vector<double> selectionValues, unsigned mixtureElement, char aa)
 	{
+		//TODO: seperate out the R wrapper functionality and make the wrapper
 		//currentSelectionParameter
 		bool check = checkIndex(mixtureElement, 1, numMixtures);
 		if (check)
@@ -373,8 +376,10 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 		}
 	}
 
+//This function seems to be used only for the purpose of R
 	void ROCParameter::initMutation(std::vector<double> mutationValues, unsigned mixtureElement, char aa)
 	{
+		//TODO: seperate out the R wrapper functionality and make the wrapper
 		//currentMutationParameter
 		bool check = checkIndex(mixtureElement, 1, numMixtures);
 		if (check)
