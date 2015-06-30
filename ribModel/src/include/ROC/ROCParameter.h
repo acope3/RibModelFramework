@@ -30,7 +30,7 @@ class ROCParameter : public Parameter
 		std::vector<std::vector<double>> proposedSelectionParameter;
 		std::vector<unsigned> numAcceptForMutationAndSelection;
 
-		const std::string groupList[19] = {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "P", "Q", "R", "S", "T", "V", "Y", "Z"};
+		std::vector <std::string> groupList;
 //Z is Ser2, but must be wrote as Z here for C++ types to accept it.
 		// proposal bias and std for codon specific parameter
 		double bias_csp;
@@ -155,6 +155,7 @@ class ROCParameter : public Parameter
 			return rv;
 		}
 
+		unsigned getGroupListSize();
 	protected:
 
 };
