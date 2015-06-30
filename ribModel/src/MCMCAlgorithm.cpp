@@ -19,9 +19,7 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * 
 {
 	MCMCAlgorithm(1000, 1, true, true, true);
 	likelihoodTrace.resize(samples);
-	file = "RestartFile.txt";
-	multipleFiles = false;
-	fileWriteInterval = 10;	
+	writeRestartFile = false;
 }
 
 	MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thining, unsigned _adaptiveWidth, bool _estimateSynthesisRate, bool _estimateCodonSpecificParameter, bool _estimateHyperParameter)
@@ -29,9 +27,7 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * 
 	estimateHyperParameter(_estimateHyperParameter)
 {
 	likelihoodTrace.resize(samples);
-  file = "RestartFile.txt";
-  multipleFiles = false;
-  fileWriteInterval = 10;
+	writeRestartFile = false;
 }
 
 MCMCAlgorithm::~MCMCAlgorithm()
@@ -128,7 +124,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			}
 		}
 
-	if (isinf(logLikelihood)) std::cout <<"\tInfinity reached\n";
+		if (isinf(logLikelihood)) std::cout <<"\tInfinity reached\n";
 		// adjust the the unscaled probabilities by the constant c
 		// ln(f') = ln(c) + ln(f)
 		// calculate ln(P) = ln( Sum(p_i*f'(...)) ) and obtain normalizing constant for new p_i
@@ -254,20 +250,22 @@ void MCMCAlgorithm::run(Genome& genome, Model& model)
 	std::cout << "\tStarting MCMC with " << maximumIterations << " iterations\n";
 	for(unsigned iteration = 0u; iteration < maximumIterations; iteration++)
 	{
-
-		if ((iteration + 1u) % fileWriteInterval  == 0u)
+		if (writeRestartFile)
 		{
-			std::cout <<"Writing restart file!\n";
-			if (multipleFiles)
+			if ((iteration + 1u) % fileWriteInterval  == 0u)
 			{
-				std::ostringstream oss;
-				oss << (iteration + 1) / thining << file;
-				std::string tmp = oss.str();
-				model.writeRestartFile(tmp);
-			}
-			else
-			{
-				model.writeRestartFile(file);
+				std::cout <<"Writing restart file!\n";
+				if (multipleFiles)
+				{
+					std::ostringstream oss;
+					oss << (iteration + 1) / thining << file;
+					std::string tmp = oss.str();
+					model.writeRestartFile(tmp);
+				}
+				else
+				{
+					model.writeRestartFile(file);
+				}
 			}
 		}
 		if( (iteration + 1u) % 100u == 0u)
@@ -352,7 +350,7 @@ void MCMCAlgorithm::setRestartFileSettings(std::string filename, unsigned interv
 	file = filename;
 	fileWriteInterval = interval * thining;
 	multipleFiles = multiple;
-
+	writeRestartFile = true;
 }
 // ---------------------------------------------------------------------------
 // ----------------------------- RCPP STUFF ----------------------------------
