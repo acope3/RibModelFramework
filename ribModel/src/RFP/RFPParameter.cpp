@@ -89,10 +89,9 @@ void RFPParameter::initRFPParameterSet()
     std_csp.resize(61, 0.1);
 }
 
-//NOTE: These next 2 functions are implemented for use of R....Maybe we move these to an R section of the code?
+
 void RFPParameter::initAlpha(double alphaValue, unsigned mixtureElement, std::string codon)
 {
-    //TODO: used to check the mixture element here, but I think there should just go ahead an be an R wrapper that does that job.
     unsigned category = getMutationCategory(mixtureElement);
     unsigned index = SequenceSummary::CodonToIndex(codon);
     currentAlphaParameter[category][index] = alphaValue;
@@ -101,7 +100,6 @@ void RFPParameter::initAlpha(double alphaValue, unsigned mixtureElement, std::st
 
 void RFPParameter::initLambdaPrime(double lambdaPrimeValue, unsigned mixtureElement, std::string codon)
 {
-    //TODO: used to check the mixture element here, but I think there should just go ahead an be an R wrapper that does that job.
     unsigned category = getMutationCategory(mixtureElement);
     unsigned index = SequenceSummary::CodonToIndex(codon);
     currentLambdaPrimeParameter[category][index] = lambdaPrimeValue;
@@ -458,3 +456,35 @@ std::vector <double> RFPParameter::getEstimatedMixtureAssignmentProbabilities(un
 {
 }
 
+
+
+
+//R Wrapper functions:
+void RFPParameter::initAlphaR(double alphaValue, unsigned mixtureElement, std::string codon)
+{
+    bool check = checkIndex(mixtureElement, 1, numMixtures);
+    if (check)
+    {
+        mixtureElement--;
+        codon[0] = std::toupper(codon[0]);
+        codon[1] = std::toupper(codon[1]);
+        codon[2] = std::toupper(codon[2]);
+        
+        initAlpha(alphaValue, mixtureElement, codon);
+    }
+}
+
+
+void RFPParameter::initLambdaPrimeR(double lambdaPrimeValue, unsigned mixtureElement, std::string codon)
+{
+    bool check = checkIndex(mixtureElement, 1, numMixtures);
+    if (check)
+    {
+        mixtureElement--;
+        codon[0] = std::toupper(codon[0]);
+        codon[1] = std::toupper(codon[1]);
+        codon[2] = std::toupper(codon[2]);
+        
+        initLambdaPrime(lambdaPrimeValue, mixtureElement, codon);
+    }
+}

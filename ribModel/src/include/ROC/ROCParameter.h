@@ -60,8 +60,8 @@ class ROCParameter : public Parameter
 		void initFromRestartFile(std::string filename);
 		void initROCValuesFromFile(std::string filename);
 		void initROCParameterSet();
-		void initSelection(std::vector<double> selectionValues, unsigned mixtureElement, char aa);
-		void initMutation(std::vector<double> mutationValues, unsigned mixtureElement, char aa);
+		void initSelection(std::vector<double> selectionValues, unsigned mixtureElement, std::string aa);
+		void initMutation(std::vector<double> mutationValues, unsigned mixtureElement, std::string aa);
 		std::vector<std::vector<double>> calculateSelectionCoefficients(unsigned sample, unsigned mixture);
 #ifndef STANDALONE
 		SEXP calculateSelectionCoefficientsR(unsigned sample, unsigned mixture);
@@ -96,7 +96,7 @@ class ROCParameter : public Parameter
 
 		// poposal functions
 		void proposeCodonSpecificParameter();
-		void getParameterForCategory(unsigned category, unsigned parameter, char aa, bool proposal, double* returnValue);
+		void getParameterForCategory(unsigned category, unsigned parameter, std::string aa, bool proposal, double* returnValue);
 
 		void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth);
 

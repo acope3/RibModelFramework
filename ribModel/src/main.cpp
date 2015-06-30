@@ -11,7 +11,7 @@ void testNumCodonsPerAA()
 	std::cout << "------------------ # CODONS PER AA ------------------" << std::endl;
 	for (int i = 0; i < 22; i++)
 	{
-		char aa = SequenceSummary::AminoAcidArray[i];
+		std::string aa = SequenceSummary::AminoAcidArray[i];
 		int ncodons = SequenceSummary::GetNumCodonsForAA(aa);
 		std::cout << "# codons for " << aa << "\t" << ncodons << std::endl;
 	}
@@ -23,7 +23,7 @@ void testCodonRangePerAA(bool forParamVector)
 	std::cout << "------------------ CODON RANGE PER AA ------------------" << std::endl;
 	for (int i = 0; i < 22; i++)
 	{
-		char aa = SequenceSummary::AminoAcidArray[i];
+		std::string aa = SequenceSummary::AminoAcidArray[i];
 		unsigned codonRange[2];
 		SequenceSummary::AAToCodonRange(aa, forParamVector, codonRange);
 		std::cout << "codon range for " << aa << "\t" << codonRange[0] << " - " << codonRange[1] << std::endl;
@@ -217,12 +217,12 @@ void testSimulateGenome(Genome& genome)
 		for (int j = 0; j < 22; j++)
 		{
 			SequenceSummary::AAindexToCodonRange(j, false, aaRange);
-			char curAA = SequenceSummary::IndexToAA(j);
+			std::string curAA = SequenceSummary::IndexToAA(j);
 			unsigned numCodons = simSeqSum.GetNumCodonsForAA(curAA);
 			double* codonProb = new double[numCodons];
 			double* mutation = new double[numCodons - 1];
 			double* selection = new double[numCodons - 1];
-			if (curAA == 'X') std::cout << numCodons << "\n";
+			if (curAA == "X") std::cout << numCodons << "\n";
 			parameter.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
 			parameter.getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
 			model.calculateCodonProbabilityVector(numCodons, mutation, selection, phi, codonProb);

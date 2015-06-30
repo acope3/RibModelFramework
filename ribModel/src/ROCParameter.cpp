@@ -364,7 +364,7 @@ SEXP ROCParameter::calculateSelectionCoefficientsR(unsigned sample, unsigned mix
 #endif
 
 //This function seems to be used only for the purpose of R
-void ROCParameter::initSelection(std::vector<double> selectionValues, unsigned mixtureElement, char aa)
+void ROCParameter::initSelection(std::vector<double> selectionValues, unsigned mixtureElement, std::string aa)
 {
 	//TODO: seperate out the R wrapper functionality and make the wrapper
 	//currentSelectionParameter
@@ -375,7 +375,7 @@ void ROCParameter::initSelection(std::vector<double> selectionValues, unsigned m
 		unsigned aaRange[2];
 		int category = getSelectionCategory(mixtureElement);
 
-		aa = std::toupper(aa);
+		aa[0] = (char)std::toupper(aa[0]);
 		SequenceSummary::AAToCodonRange(aa, true, aaRange);
 		for (unsigned i = aaRange[0], j = 0; i < aaRange[1]; i++, j++)
 		{
@@ -385,7 +385,7 @@ void ROCParameter::initSelection(std::vector<double> selectionValues, unsigned m
 }
 
 //This function seems to be used only for the purpose of R
-void ROCParameter::initMutation(std::vector<double> mutationValues, unsigned mixtureElement, char aa)
+void ROCParameter::initMutation(std::vector<double> mutationValues, unsigned mixtureElement, std::string aa)
 {
 	//TODO: seperate out the R wrapper functionality and make the wrapper
 	//currentMutationParameter
@@ -396,8 +396,7 @@ void ROCParameter::initMutation(std::vector<double> mutationValues, unsigned mix
 
 		unsigned aaRange[2];
 		unsigned category = getMutationCategory(mixtureElement);
-
-		aa = std::toupper(aa);
+		aa[0] = (char)std::toupper(aa[0]);
 		SequenceSummary::AAToCodonRange(aa, true, aaRange);
 		for (unsigned i = aaRange[0], j = 0; i < aaRange[1]; i++, j++)
 		{
@@ -472,7 +471,7 @@ void ROCParameter::initMutationSelectionCategories(std::vector<std::string> file
 }
 
 
-void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType, char aa, bool proposal, double* returnSet)
+void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType, std::string aa, bool proposal, double* returnSet)
 {
 	std::vector<double> *tempSet;
 	if (paramType == ROCParameter::dM)

@@ -588,9 +588,9 @@ void Parameter::initCovarianceMatrix(SEXP _matrix, char aa)
 #endif
 
 
-CovarianceMatrix& Parameter::getCovarianceMatrixForAA(char aa)
+CovarianceMatrix& Parameter::getCovarianceMatrixForAA(std::string aa)
 {
-	aa = std::toupper(aa);
+	aa[0] = std::toupper(aa[0]);
 	unsigned aaIndex = SequenceSummary::aaToIndex.find(aa) -> second;
 	return covarianceMatrix[aaIndex];
 }
@@ -874,7 +874,7 @@ double Parameter::calculateSCUO(Gene& gene)
 	double totalDegenerateAACount = 0.0;
 	for(int i = 0; i < 22; i++)
 	{
-		char curAA = seqsum.AminoAcidArray[i];
+		std::string curAA = seqsum.AminoAcidArray[i];
 		// skip amino acids with only one codon or stop codons
 		if(curAA == 'X' || curAA == 'M' || curAA == 'W') continue;
 		totalDegenerateAACount += (double)seqsum.getAAcountForAA(i);
@@ -883,7 +883,7 @@ double Parameter::calculateSCUO(Gene& gene)
 	double scuoValue = 0.0;
 	for(int i = 0; i < 22; i++)
 	{
-		char curAA = seqsum.AminoAcidArray[i];
+		std::string curAA = seqsum.AminoAcidArray[i];
 		// skip amino acids with only one codon or stop codons
 		if(curAA == 'X' || curAA == 'M' || curAA == 'W') continue;
 		double numDegenerateCodons = SequenceSummary::GetNumCodonsForAA(curAA);
