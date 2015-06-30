@@ -276,7 +276,7 @@ void testWriteRestartFile(Genome &genome)
 		else geneAssignment[i] = 1u;
 	}
 	double sphi_init = 2;
-	double numMixtures = 2;
+	unsigned numMixtures = 2;
 	std::string mixDef = ROCParameter::allUnique;
 	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 	ROCParameter parameter = ROCParameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
@@ -355,7 +355,7 @@ int main()
 			}
 			std::cout << "initialize ROCParameter object" << std::endl;
 			double sphi_init = 2;
-			double numMixtures = 2;
+			unsigned numMixtures = 2;
 			std::string mixDef = ROCParameter::allUnique;
 			std::cout << "\tSphi init: " << sphi_init << "\n";
 			std::cout << "\t# mixtures: " << numMixtures << "\n";

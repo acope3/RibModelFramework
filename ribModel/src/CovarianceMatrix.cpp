@@ -14,7 +14,7 @@ CovarianceMatrix::CovarianceMatrix(int _numVariates)
 }
 CovarianceMatrix::CovarianceMatrix(std::vector <double> &matrix)
 {
-    numVariates = std::sqrt(matrix.size());
+    numVariates = (int)std::sqrt(matrix.size());
     covMatrix = matrix;
     choleskiMatrix.resize(matrix.size(), 0.0);
 }
