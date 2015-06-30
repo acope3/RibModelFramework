@@ -1,6 +1,6 @@
 #ifndef STANDALONE
-#include "../include/base/Trace.h"
-#include "../include/ROC/ROCTrace.h"
+#include "include/base/Trace.h"
+#include "include/ROC/ROCTrace.h"
 #include <Rcpp.h>
 using namespace Rcpp;
 RCPP_MODULE(Trace_mod)

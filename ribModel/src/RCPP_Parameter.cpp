@@ -1,6 +1,6 @@
 #ifndef STANDALONE
-#include "../include/base/Parameter.h"
-#include "../include/ROC/ROCParameter.h"
+#include "include/base/Parameter.h"
+#include "include/ROC/ROCParameter.h"
 #include <Rcpp.h>
 using namespace Rcpp;
 
