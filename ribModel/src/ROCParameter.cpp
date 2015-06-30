@@ -132,6 +132,8 @@ void ROCParameter::initROCParameterSet()
 		proposedSelectionParameter[i] = tmp;
 		currentSelectionParameter[i] = tmp;
 	}
+
+	groupList = { "A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "P", "Q", "R", "S", "T", "V", "Y", "Z" };
 }
 
 
@@ -332,6 +334,8 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 	{
 		proposedSelectionParameter[i] = currentSelectionParameter[i];
 	}
+
+	groupList = {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "P", "Q", "R", "S", "T", "V", "Y", "Z"};
 }
 #ifndef STANDALONE
 	SEXP ROCParameter::calculateSelectionCoefficientsR(unsigned sample, unsigned mixture)
@@ -928,5 +932,10 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 		{
 			initMutationSelectionCategories(files, numCategories, value);
 		}
+	}
+
+	unsigned ROCParameter::getGroupListSize()
+	{
+		return groupList.size();
 	}
 

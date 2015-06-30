@@ -212,7 +212,7 @@ void MCMCAlgorithm::acceptRejectHyperParameter(int numGenes, Model& model, int i
 void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& model, int iteration)
 {
 	double acceptanceRatioForAllMixtures = 0.0;
-	unsigned size = model.getListSize();
+	unsigned size = model.getGroupListSize();
 	for(unsigned i = 0; i < size; i++)
 	{
 		std::string grouping; 

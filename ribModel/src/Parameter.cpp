@@ -7,7 +7,7 @@ const unsigned Parameter::dEta = 1;
 const std::string Parameter::allUnique = "allUnique";
 const std::string Parameter::selectionShared = "selectionShared";
 const std::string Parameter::mutationShared = "mutationShared";
-std::default_random_engine Parameter::generator(std::time(NULL));
+std::default_random_engine Parameter::generator( (unsigned) std::time(NULL));
 
 
 Parameter::Parameter()
