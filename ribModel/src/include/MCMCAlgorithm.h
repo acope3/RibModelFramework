@@ -13,7 +13,7 @@ class MCMCAlgorithm
 		bool estimateSynthesisRate;
 		bool estimateCodonSpecificParameter;
 		bool estimateHyperParameter;
-
+		bool writeRestartFile;
 		std::vector<double> likelihoodTrace;
 
 		std::string file;
