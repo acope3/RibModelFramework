@@ -1,11 +1,17 @@
 
 initializeParameterObject <- function(genome, sphi, numMixtures, geneAssignment, expressionValues = NULL, model = "ROC",
-                                      split.serine = TRUE, mixture.definition = "allUnique", mixture.definition.matrix = NULL)
+                                      split.serine = TRUE, mixture.definition = "allUnique", mixture.definition.matrix = NULL,
+                                      restart.file = NULL)
 {
   if(model == "ROC")
   {
-    parameter <- initializeROCParameterObject(genome, sphi, numMixtures, geneAssignment, expressionValues,
-                                 split.serine, mixture.definition, mixture.definition.matrix)
+    if(is.null(restart.file))
+    {
+      parameter <- initializeROCParameterObject(genome, sphi, numMixtures, geneAssignment, expressionValues,
+                                   split.serine, mixture.definition, mixture.definition.matrix)    
+    }else{
+      parameter <- new(ROCParameter, restart.file)
+    }
   }else if(model == "NSE"){
     cat("MODEL NOT IMPLEMENTED")
   }else{

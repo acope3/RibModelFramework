@@ -4,10 +4,11 @@ rm(list=ls())
 genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri.fasta")
 
 #initialize parameter object
-sphi_init <- 2.0
+sphi_init <- 2
 numMixtures <- 2
 mixDef <- "allUnique"
 #geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457), rep(1, 3903))
+#geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
 geneAssignment <- c(rep(1,500), rep(2,500))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
 
@@ -26,9 +27,7 @@ mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth,
 # get model object
 model <- initializeModelObject("ROC")
 
-#model$setParameter(parameter)
-#mcmc$run(genome, model)
-
+setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth, TRUE)
 #run mcmc on genome with parameter using model
 system.time(
   runMCMC(mcmc, genome, model, parameter)

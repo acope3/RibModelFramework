@@ -11,7 +11,6 @@ mixDef <- "allUnique"
 #geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
 geneAssignment <- c(rep(1,448), rep(2,457))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
-#NOTE: should be able to give a restart file as an alternative right?
 
 # initialize MCMC object
 samples <- 100
@@ -19,16 +18,13 @@ thining <- 10
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples=samples, thining=thining, adaptive.width=adaptiveWidth, 
                      est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
-#NOTE: initializeMCMCObject might also take care of restart file stuff??
 # get model object
-#NOTE: Cedric, maybe initializeModelObject should also go ahead and set the parameter? Not entirely sure if that is "good" in R, but thought I would throw that out there.
 model <- initializeModelObject("ROC")
-model$setParameter( parameter )
-mcmc$run(genome, model)
+
+setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth, TRUE)
 #run mcmc on genome with parameter using model
-#NOTE: Cedric, this function no longer works, run has been changed and no longer takes parameter
 system.time(
-  runMCMC(mcmc, genome, model, parameter)
+  runMCMC(mcmc, genome, model)
 )
 
 #plots log likelihood trace, possibly other mcmc diagnostics in the future

@@ -1,5 +1,5 @@
 
-initializeModelObject <- function(model = "ROC")
+initializeModelObject <- function(parameter, model = "ROC")
 {  
   if(model == "ROC")
   {
@@ -9,5 +9,6 @@ initializeModelObject <- function(model = "ROC")
   }else{
     stop("Unkown model.")
   }
+  c.model$setParameter(parameter)
   return(c.model)
 }

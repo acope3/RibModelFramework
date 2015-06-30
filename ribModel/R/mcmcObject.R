@@ -5,11 +5,19 @@ initializeMCMCObject <- function(samples, thining=1, adaptive.width=100, est.exp
   return(mcmc)
 }
 
-runMCMC <- function(mcmc, genome, model, parameter)
+runMCMC <- function(mcmc, genome, model)
 {
   UseMethod("runMCMC", mcmc)
 }
-runMCMC.Rcpp_MCMCAlgorithm <- function(mcmc, genome, model, parameter)
+runMCMC.Rcpp_MCMCAlgorithm <- function(mcmc, genome, model)
 {
-  mcmc$run(genome, model, parameter)
+  mcmc$run(genome, model)
+}
+setRestartSettings <- function(mcmc, filename, samples, write.multiple=TRUE)
+{
+  UseMethod("restartSettings", mcmc)
+}
+setRestartSettings.Rcpp_MCMCAlgorithm <- function(mcmc, filename, samples, write.multiple=TRUE)
+{
+  mcmc$setRestartFileSetting(filename, samples, write.multiple)
 }
