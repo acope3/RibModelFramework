@@ -308,6 +308,7 @@ void testInitFromRestartFile()
 int main()
 {
 	bool read = false;
+	unsigned index;
 	std::string user = "jeremy";
 	std::cout << "Hello world!" << std::endl << std::endl;
 
@@ -371,7 +372,7 @@ int main()
 			std::cout << "\t# mixtures: " << numMixtures << "\n";
 			std::cout << "\tmixture definition: " << mixDef << "\n";
 			std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
-			ROCParameter parameter = ROCParameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
+			ROCParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 
 			std::vector<std::string> files(2);
 			if (user == "cedric")
@@ -416,10 +417,11 @@ int main()
 			std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
 			std::cout << "Sphi proposal width: " << parameter.getSphiProposalWidth() << std::endl;
 			std::cout << "CSP proposal width: \n";
-			for (unsigned n = 0; n < 22; n++)
+			for (unsigned n = 0; n < model.getGroupListSize(); n++)
 			{
-				if (n == 21 || n == 10 || n == 18) continue;
-				std::cout << SequenceSummary::AminoAcidArray[n] << ": " << parameter.getCurrentCodonSpecificProposalWidth(n) << "\n";
+				std::string aa = model.getGrouping(n);
+				index = SequenceSummary::AAToAAIndex(aa[0]);
+				std::cout << SequenceSummary::AminoAcidArray[index] << ": " << parameter.getCurrentCodonSpecificProposalWidth(index) << "\n";
 			}
 		}
 		else
@@ -441,10 +443,11 @@ int main()
 			std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
 			std::cout << "Sphi proposal width: " << parameter.getSphiProposalWidth() << std::endl;
 			std::cout << "CSP proposal width: \n";
-			for (unsigned n = 0; n < 22; n++)
+			for (unsigned n = 0; n < model.getGroupListSize(); n++)
 			{
-				if (n == 21 || n == 10 || n == 18) continue;
-				std::cout << SequenceSummary::AminoAcidArray[n] << ": " << parameter.getCurrentCodonSpecificProposalWidth(n) << "\n";
+				std::string aa = model.getGrouping(n);
+				index = SequenceSummary::AAToAAIndex(aa[0]);
+				std::cout << SequenceSummary::AminoAcidArray[index] << ": " << parameter.getCurrentCodonSpecificProposalWidth(index) << "\n";
 			}
 		}
 

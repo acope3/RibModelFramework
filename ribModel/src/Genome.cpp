@@ -263,8 +263,8 @@ void Genome::simulateGenome(Model& model)
 			}
 			else
 			{
-				model.getParameterForCategory(mutationCategory, Parameter::dM, curAA, false, mutation);
-				model.getParameterForCategory(selectionCategory, Parameter::dEta, curAA, false, selection);
+				model.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
+				model.getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
 				model.calculateCodonProbabilityVector(numCodons, mutation, selection, phi, codonProb);
 			}
 			for (k = 0; k < aaCount; k++)

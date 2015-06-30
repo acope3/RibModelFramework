@@ -2,8 +2,6 @@
 #include <sstream>
 #include <ctime>
 
-const unsigned Parameter::dM = 0;
-const unsigned Parameter::dEta = 1;
 const std::string Parameter::allUnique = "allUnique";
 const std::string Parameter::selectionShared = "selectionShared";
 const std::string Parameter::mutationShared = "mutationShared";
@@ -1170,4 +1168,19 @@ std::vector<double> Parameter::getCurrentSynthesisRateForMixture(unsigned mixtur
 		std::cerr << "WARNING: Mixture element " << mixture << " NOT found. Mixture element 1 is returned instead. \n";
 	}
 	return currentSynthesisRateLevel[exprCat];
+}
+
+void Parameter::setGroupList(std::vector <std::string> gl)
+{
+	groupList = gl;
+}
+
+std::string Parameter::getGrouping(unsigned index)
+{
+	return groupList[index];
+}
+
+unsigned Parameter::getGroupListSize()
+{
+	return groupList.size();
 }
