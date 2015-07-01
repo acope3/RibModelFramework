@@ -5,6 +5,7 @@
 *.gz
 *.txt
 *.swp
+*.pdf
 *.Rcheck
 *.history
 .Rhistory
