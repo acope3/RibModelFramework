@@ -119,7 +119,7 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 
 			Gene tmpGene;
 			std::string tempSeq = "";
-			while (1)
+			for (;;)
 			{
 				// read a new line in every cycle
 				std::getline(Fin, buf);

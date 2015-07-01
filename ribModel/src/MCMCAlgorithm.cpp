@@ -124,7 +124,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			}
 		}
 
-		if (isinf(logLikelihood)) std::cout <<"\tInfinity reached\n";
+		if (std::isinf(logLikelihood)) std::cout <<"\tInfinity reached\n";
 		// adjust the the unscaled probabilities by the constant c
 		// ln(f') = ln(c) + ln(f)
 		// calculate ln(P) = ln( Sum(p_i*f'(...)) ) and obtain normalizing constant for new p_i
@@ -236,7 +236,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model)
 	unsigned maximumIterations = samples * thining;
 	// initialize everything
 
-	model.initTraces(samples, genome.getGenomeSize(), maximumIterations/adaptiveWidth); 
+	model.initTraces(samples, genome.getGenomeSize()); 
 	// starting the MCMC
 
 	std::cout << "entering MCMC loop" << std::endl;

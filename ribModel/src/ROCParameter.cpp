@@ -20,7 +20,7 @@ ROCParameter::ROCParameter(std::string filename) : Parameter(22)
 }
 
 #ifndef STANDALONE
-ROCParameter::ROCParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter()
+ROCParameter::ROCParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter(22)
 {
 	unsigned _numMixtures = _matrix.size() / 2;
 	std::vector<std::vector<unsigned>> thetaKMatrix;
@@ -42,7 +42,7 @@ ROCParameter::ROCParameter(double sphi, std::vector<unsigned> geneAssignment, st
 }
 
 ROCParameter::ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState) :
-Parameter()
+Parameter(22)
 {
 	std::vector<std::vector<unsigned>> thetaKMatrix;
 	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
@@ -62,7 +62,7 @@ ROCParameter::ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsig
 
 	for (unsigned i = 0; i < groupList.size(); i++) {
 		if (groupList[i] == "M" || groupList[i] == "W" || groupList[i] == "X") {
-			fprintf(stderr, "Warning: Codon %s not recognized in ROC model\n", groupList[i]);
+			std::cerr << "Warning: Codon " << groupList[i] << " not recognized in ROC model\n";
 			groupList.erase(groupList.begin() + i);
 		}
 	}
@@ -916,7 +916,7 @@ void ROCParameter::updateCodonSpecificParameter(std::string grouping)
 
 void ROCParameter::initMutationSelectionCategoriesR(std::vector<std::string> files, unsigned numCategories, std::string paramType)
 {
-	unsigned value;
+	unsigned value = 0;
 	bool check = true;
 	if (paramType == "Mutation")
 	{

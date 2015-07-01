@@ -53,9 +53,9 @@ bool SequenceSummary::processSequence(const std::string& sequence)
 	for(unsigned i = 0u; i < sequence.length(); i+=3)
 	{
 		codon = sequence.substr(i, 3);
-		codon[0] = std::toupper(codon[0]);
-		codon[1] = std::toupper(codon[1]);
-		codon[2] = std::toupper(codon[2]);
+		codon[0] = (char) std::toupper(codon[0]);
+		codon[1] = (char) std::toupper(codon[1]);
+		codon[2] = (char) std::toupper(codon[2]);
 
 		codonID = SequenceSummary::CodonToIndex( codon );
 		if (codonID != 64) // if codon id == 64 => codon not found. Ignore, probably N 
@@ -246,9 +246,9 @@ unsigned SequenceSummary::CodonToAAIndex(std::string& codon)
 unsigned SequenceSummary::CodonToIndex(std::string& codon, bool forParamVector)
 {
 	unsigned i = 0;
-	codon[0] = std::toupper(codon[0]);
-	codon[1] = std::toupper(codon[1]);
-	codon[2] = std::toupper(codon[2]);
+	codon[0] = (char) std::toupper(codon[0]);
+	codon[1] = (char) std::toupper(codon[1]);
+	codon[2] = (char) std::toupper(codon[2]);
 	if(forParamVector)
 	{
 		i = std::distance(codonArrayParameter, std::find(codonArrayParameter, codonArrayParameter + 40, codon));
@@ -269,8 +269,8 @@ unsigned SequenceSummary::AAToAAIndex(std::string aa)
 
 unsigned SequenceSummary::GetNumCodonsForAA(std::string& aa, bool forParamVector)
 {
-	aa = std::toupper(aa[0]);
-	unsigned ncodon = -1;
+	aa[0] = (char) std::toupper(aa[0]);
+	unsigned ncodon = 0;
 	if(aa == "M" || aa == "W") ncodon = 1;
 	else if(aa == "C" || aa == "D" || aa == "E" || aa == "F" || aa == "H" || aa == "K" || aa == "N" || aa == "Q" || aa == Ser2 || aa == "Y") ncodon = 2;
 	else if(aa == "I" || aa == "X") ncodon = 3;
@@ -283,9 +283,9 @@ unsigned SequenceSummary::GetNumCodonsForAA(std::string& aa, bool forParamVector
 
 std::string SequenceSummary::CodonToAA(std::string& codon)
 {
-	codon[0] = std::toupper(codon[0]);
-	codon[1] = std::toupper(codon[1]);
-	codon[2] = std::toupper(codon[2]);
+	codon[0] = (char) std::toupper(codon[0]);
+	codon[1] = (char) std::toupper(codon[1]);
+	codon[2] = (char) std::toupper(codon[2]);
 	//std::transform(codon.begin(), codon.end(), codon.begin(), ::toupper);
 	std::string aa = "#";
 	//Phenylalanine
@@ -351,7 +351,7 @@ std::vector<std::string> SequenceSummary::AAToCodon(std::string aa, bool forPara
 {
 	std::vector <std::string> RV;
 	unsigned aaRange[2];
-	aa = std::toupper(aa[0]);
+	aa = (char) std::toupper(aa[0]);
 
 	AAToCodonRange(aa, forParamVector, aaRange);
 	if(forParamVector){
