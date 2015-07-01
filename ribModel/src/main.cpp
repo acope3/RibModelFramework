@@ -314,7 +314,6 @@ int main()
 
 	bool read = false;
 	unsigned index;
-	std::cout << "Hello world!" << std::endl << std::endl;
 
 	Genome genome;
 	std::cout << "reading fasta file" << std::endl;

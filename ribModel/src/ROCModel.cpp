@@ -39,7 +39,7 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsi
 		std::string curAA = getGrouping(i);
 
 		// skip amino acids which do not occur in current gene. Avoid useless calculations and multiplying by 0
-		if(seqsum.getAAcountForAA(curAA[0]) == 0) continue;
+		if(seqsum.getAAcountForAA(curAA) == 0) continue;
 
 		// get codon count (total count not parameter->count)
 		int numCodons = seqsum.GetNumCodonsForAA(curAA);
