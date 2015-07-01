@@ -62,7 +62,7 @@ ROCParameter::ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsig
 
 	for (unsigned i = 0; i < groupList.size(); i++) {
 		if (groupList[i] == "M" || groupList[i] == "W" || groupList[i] == "X") {
-			fprintf(stderr, "Warning: Codon %s not recognized in ROC model\n", groupList[i]);
+			std::cerr <<"Warning: Codon " << groupList[i] <<" not recognized in ROC model\n";
 			groupList.erase(groupList.begin() + i);
 		}
 	}
