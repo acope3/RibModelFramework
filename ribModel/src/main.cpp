@@ -310,7 +310,7 @@ int main()
 	enum User { cedric, gabe, jeremy };
 
 	/* Test variables */
-	User user = jeremy;
+	User user = gabe;
 
 	bool read = false;
 	unsigned index;

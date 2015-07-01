@@ -1,4 +1,4 @@
-#include "../include/RFP/RFPParameter.h"
+#include "include/RFP/RFPParameter.h"
 #ifndef STANDALONE
 #include <Rcpp.h>
 using namespace Rcpp;
@@ -8,11 +8,12 @@ using namespace Rcpp;
 RFPParameter::RFPParameter(std::string filename) : Parameter(61)
 {
 	initFromRestartFile(filename);
+	numParam = 61;
 }
 
 
 RFPParameter::RFPParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix, 
-		bool splitSer = true, std::string _mutationSelectionState = "allUnique") : Parameter(61)
+		bool splitSer, std::string _mutationSelectionState) : Parameter(61)
 {
 	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
 	initRFPParameterSet();
@@ -28,33 +29,35 @@ RFPParameter::~RFPParameter()
 
 RFPParameter::RFPParameter(const RFPParameter& other) : Parameter(other)
 {
-    currentAlphaParameter = other.currentAlphaParameter;
-    proposedAlphaParameter = other.proposedAlphaParameter;
-    currentLambdaPrimeParameter = other.proposedLambdaPrimeParameter;
-    proposedLambdaPrimeParameter = other.proposedLambdaPrimeParameter;
-    
-    lambdaValues = other.lambdaValues;
-    numAcceptForAlphaAndLambdaPrime = other.numAcceptForAlphaAndLambdaPrime;
-    
-    bias_csp = other.bias_csp;
-    std_csp = other.std_csp;
+	currentAlphaParameter = other.currentAlphaParameter;
+	proposedAlphaParameter = other.proposedAlphaParameter;
+	currentLambdaPrimeParameter = other.proposedLambdaPrimeParameter;
+	proposedLambdaPrimeParameter = other.proposedLambdaPrimeParameter;
+
+	lambdaValues = other.lambdaValues;
+	numAcceptForAlphaAndLambdaPrime = other.numAcceptForAlphaAndLambdaPrime;
+
+	bias_csp = other.bias_csp;
+	std_csp = other.std_csp;
 }
 
 
-RFPParameter::RFPParameter& operator=(const RFPParameter& rhs)
+RFPParameter& RFPParameter::operator=(const RFPParameter& rhs)
 {
 	if (this == &rhs) return *this; // handle self assignment
 
-    currentAlphaParameter = rhs.currentAlphaParameter;
-    proposedAlphaParameter = rhs.proposedAlphaParameter;
-    currentLambdaPrimeParameter = rhs.proposedLambdaPrimeParameter;
-    proposedLambdaPrimeParameter = rhs.proposedLambdaPrimeParameter;
-    
-    lambdaValues = rhs.lambdaValues;
-    numAcceptForAlphaAndLambdaPrime = rhs.numAcceptForAlphaAndLambdaPrime;
-    
-    bias_csp = rhs.bias_csp;
-    std_csp = rhs.std_csp;
+	Parameter::operator=(rhs);
+
+	currentAlphaParameter = rhs.currentAlphaParameter;
+	proposedAlphaParameter = rhs.proposedAlphaParameter;
+	currentLambdaPrimeParameter = rhs.proposedLambdaPrimeParameter;
+	proposedLambdaPrimeParameter = rhs.proposedLambdaPrimeParameter;
+
+	lambdaValues = rhs.lambdaValues;
+	numAcceptForAlphaAndLambdaPrime = rhs.numAcceptForAlphaAndLambdaPrime;
+
+	bias_csp = rhs.bias_csp;
+	std_csp = rhs.std_csp;
 
 	return *this;
 }
@@ -63,44 +66,53 @@ RFPParameter::RFPParameter& operator=(const RFPParameter& rhs)
 //Initialization functions:
 void RFPParameter::initRFPParameterSet()
 {
-    unsigned alphaCategories = getNumMutationCategories();
-    unsigned lambdaPrimeCategories = getNumSelectionCategories();
-    
-    currentAlphaParameter.resize(alphaCategories);
-    proposedAlphaParameter.resize(alphaCategories);
-    currentLambdaPrimeParameter.resize(lambdaPrimeCategories);
-    proposedLambdaPrimeParameter.resize(lambdaPrimeCategories);
-    lambdaValues.resize(lambdaPrimeCategories);
-    
-    for (unsigned i = 0; i < 61; i++)
-    {
-        std::vector <double> tmp(61,1.0);
-        currentAlphaParameter[i] = tmp;
-        proposedAlphaParameter[i] = tmp;
-        currentLambdaPrimeParameter[i] = tmp;
-        proposedLambdaPrimeParameter[i] = tmp;
-        lambdaValues[i] = tmp; //Maybe we don't initialize this one? or we do it differently?
-    }
-    
-    numAcceptForAlphaAndLambdaPrime.resize(61, 0u);
-    bias_csp = 0;
-    std_csp.resize(61, 0.1);
+	unsigned alphaCategories = getNumMutationCategories();
+	unsigned lambdaPrimeCategories = getNumSelectionCategories();
+
+	currentAlphaParameter.resize(alphaCategories);
+	proposedAlphaParameter.resize(alphaCategories);
+	currentLambdaPrimeParameter.resize(lambdaPrimeCategories);
+	proposedLambdaPrimeParameter.resize(lambdaPrimeCategories);
+	lambdaValues.resize(lambdaPrimeCategories);
+	numParam = 61;
+
+	for (unsigned i = 0; i < numParam; i++)
+	{
+		std::vector <double> tmp(numParam,1.0);
+		currentAlphaParameter[i] = tmp;
+		proposedAlphaParameter[i] = tmp;
+		currentLambdaPrimeParameter[i] = tmp;
+		proposedLambdaPrimeParameter[i] = tmp;
+		lambdaValues[i] = tmp; //Maybe we don't initialize this one? or we do it differently?
+	}
+
+	numAcceptForAlphaAndLambdaPrime.resize(numParam, 0u);
+	bias_csp = 0;
+	std_csp.resize(numParam, 0.1);
+
+	groupList = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
+		"TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT", "ATA", "ATC",
+		"ATT", "AAA", "AAG", "CTA", "CTC", "CTG", "CTT", "TTA", "TTG", "ATG",
+		"AAC", "AAT", "CCA", "CCC", "CCG", "CCT", "CAA", "CAG", "AGA", "AGG",
+		"CGA", "CGC", "CGG", "CGT", "TCA", "TCC", "TCG", "TCT", "ACA", "ACC",
+		"ACG", "ACT", "GTA", "GTC", "GTG", "GTT", "TGG", "TAC", "TAT", "AGC",
+		"AGT"};
 }
 
 
 void RFPParameter::initAlpha(double alphaValue, unsigned mixtureElement, std::string codon)
 {
-    unsigned category = getMutationCategory(mixtureElement);
-    unsigned index = SequenceSummary::CodonToIndex(codon);
-    currentAlphaParameter[category][index] = alphaValue;
+	unsigned category = getMutationCategory(mixtureElement);
+	unsigned index = SequenceSummary::CodonToIndex(codon);
+	currentAlphaParameter[category][index] = alphaValue;
 }
 
 
 void RFPParameter::initLambdaPrime(double lambdaPrimeValue, unsigned mixtureElement, std::string codon)
 {
-    unsigned category = getMutationCategory(mixtureElement);
-    unsigned index = SequenceSummary::CodonToIndex(codon);
-    currentLambdaPrimeParameter[category][index] = lambdaPrimeValue;
+	unsigned category = getMutationCategory(mixtureElement);
+	unsigned index = SequenceSummary::CodonToIndex(codon);
+	currentLambdaPrimeParameter[category][index] = lambdaPrimeValue;
 }
 
 
@@ -108,6 +120,8 @@ void RFPParameter::initMutationSelectionCategories(std::vector<std::string> file
 {
 	//TODO: Not sure we need this function here and in ROCParameter. This could possibly move up to Parameter. Some changes may
 	//need to be made to the function in order for it to function. Mainly, the paramType needs to be better defined.
+
+	//Not needed yet because we have no "true" values to give it.
 }
 
 
@@ -139,8 +153,8 @@ void RFPParameter::initRFPValuesFromFile(std::string filename)
 //Codon Specific Parameter functions:
 void RFPParameter::updateCodonSpecificParameter(std::string grouping)
 {
-	numAcceptForAlphaAndLambdaPrime++;
 	unsigned i = SequenceSummary::CodonToIndex(grouping);
+	numAcceptForAlphaAndLambdaPrime[i]++;
 
 	for(unsigned k = 0u; k < numMutationCategories; k++)
 	{
@@ -155,33 +169,60 @@ void RFPParameter::updateCodonSpecificParameter(std::string grouping)
 
 double RFPParameter::getCurrentCodonSpecificProposalWidth(unsigned index)
 {
-	return curr_std_csp[index];
+	return std_csp[index];
 }
 
 
+//TODO: Are we wanting to use a Covaraince Matrix structure?
 void RFPParameter::proposeCodonSpecificParameter()
 {
-	//TODO: Needs to be implimented
-    
-    /*-----------------------------
-     Loop over all codons (or all in the list?)
-     get AA for the codon?
-     do the iid stuff/loop
-     pretty much follow the rest of the function?
-    ------------------------------*/
+	unsigned numAlpha = currentAlphaParameter[0].size();
+	unsigned numLambdaPrime = currentLambdaPrimeParameter[0].size();
+
+	for (unsigned i = 0; i < numMutationCategories; i++)
+	{
+		for (unsigned j = 0; j < numAlpha; j++)
+		{
+			proposedAlphaParameter[i][j] = std::exp( randNorm( std::log(currentAlphaParameter[i][j]) , std_csp[j]) );
+		}
+	}
+
+	for (unsigned i = 0; i < numSelectionCategories; i++)
+	{
+		for (unsigned j = 0; j < numLambdaPrime; j++)
+		{
+			proposedLambdaPrimeParameter[i][j] = std::exp( randNorm( std::log(currentLambdaPrimeParameter[i][j]) , std_csp[j]) );
+		}
+	}
 }
 
 
 //functions to manage proposal widths:
+//TODO: Does not use a Covaraince Matrix if we need them.
 void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
 {
-	//TODO: Needs to be implimented
-    /*-----------------------------
-     Loop over all codons (or all in the list?)
-     do the update
-     get AA and do CM stuff???
-     why do we reset numAccept to 0? (in ROC)
-     ------------------------------*/
+
+	unsigned numCSPsets = numAcceptForAlphaAndLambdaPrime.size();
+	std::cout << "acceptance ratio for codon:\n";
+	for (unsigned i = 0; i < numCSPsets; i++)
+	{
+		if (i >= 61) continue;
+		std::cout << SequenceSummary::IndexToCodon(i) << "\t";
+
+		double acceptanceLevel = (double)numAcceptForAlphaAndLambdaPrime[i] / (double)adaptationWidth;
+		std::cout << acceptanceLevel << "\n";
+		traces.updateCspAcceptanceRatioTrace(i, acceptanceLevel);
+		if (acceptanceLevel < 0.2)
+		{
+			std_csp[i] *= 0.8;
+		}
+		if (acceptanceLevel > 0.3)
+		{
+			std_csp[i] *= 1.2;
+		}
+		numAcceptForAlphaAndLambdaPrime[i] = 0u;
+	}
+	std::cout << "\n";
 }
 
 //TODO: The only thing stopping this from moving up to Parameter is the trace
@@ -308,7 +349,7 @@ double RFPParameter::getAlphaPosteriorMean(unsigned mixtureElement, unsigned sam
 double RFPParameter::getLambdaPrimePosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon)
 {
 	double posteriorMean = 0.0;
-	std::vector<double> lambdaPrimeParameterTrace = traces.getlambdaPrimeParameterTraceByMixtureElementForCodon(mixtureElement, codon);
+	std::vector<double> lambdaPrimeParameterTrace = traces.getLambdaPrimeParameterTraceByMixtureElementForCodon(mixtureElement, codon);
 	unsigned traceLength = lambdaPrimeParameterTrace.size();
 
 	if(samples > traceLength)
@@ -443,46 +484,88 @@ double RFPParameter::getLambdaPrimeVariance(unsigned mixtureElement, unsigned sa
 
 
 //Other functions:
-void RFPParameter::getParameterForCategory(unsigned category, unsigned parameter, char aa, bool proposal, double* returnValue)
+double RFPParameter::getParameterForCategory(unsigned category, unsigned paramType, std::string codon, bool proposal)
 {
-    //TODO: Ask Cedric about this function, will probably replace the functions I have outlined to
-    //get alpha & lambdaPrime in the model implimentations
+	double rv;
+	unsigned codonIndex = SequenceSummary::CodonToIndex(codon);
+	if (paramType == RFPParameter::alp)
+	{
+		rv = (proposal ? proposedAlphaParameter[category][codonIndex] : currentAlphaParameter[category][codonIndex]);
+	}
+	else if (paramType == RFPParameter::lmPri)
+	{
+		rv = (proposal ? proposedLambdaPrimeParameter[category][codonIndex] : currentLambdaPrimeParameter[category][codonIndex]);
+	}
+	else
+	{
+		std::cerr << "Warning in RFPParameter::getParameterForCategory: Unkown parameter type: " << paramType << "\n";
+		std::cerr << "\tReturning alpha parameter! \n";
+		rv = (proposal ? proposedAlphaParameter[category][codonIndex] : currentAlphaParameter[category][codonIndex]);
+	}
+
+	return rv;
 }
 
 
+//TODO: Use of Trace prevents this from being in the base class
 std::vector <double> RFPParameter::getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex)
 {
+	std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
+	std::vector<double> probabilities(numMixtures, 0.0);
+	unsigned traceLength = mixtureAssignmentTrace.size();
+
+	if (samples > traceLength)
+	{
+		std::cerr << "Warning in RFPParameter::getMixtureAssignmentPosteriorMean throws: Number of anticipated samples (" <<
+			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
+		samples = traceLength;
+	}
+
+	unsigned start = traceLength - samples;
+	for (unsigned i = start; i < traceLength; i++)
+	{
+		unsigned value = mixtureAssignmentTrace[i];
+		probabilities[value]++;
+	}
+
+	for (unsigned i = 0; i < numMixtures; i++)
+	{
+		probabilities[i] /= (double)samples;
+	}
+	return probabilities;
 }
 
 
-
+//Statics:
+const unsigned RFPParameter::alp = 0u;
+const unsigned RFPParameter::lmPri = 1u;
 
 //R Wrapper functions:
 void RFPParameter::initAlphaR(double alphaValue, unsigned mixtureElement, std::string codon)
 {
-    bool check = checkIndex(mixtureElement, 1, numMixtures);
-    if (check)
-    {
-        mixtureElement--;
-        codon[0] = std::toupper(codon[0]);
-        codon[1] = std::toupper(codon[1]);
-        codon[2] = std::toupper(codon[2]);
-        
-        initAlpha(alphaValue, mixtureElement, codon);
-    }
+	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	if (check)
+	{
+		mixtureElement--;
+		codon[0] = std::toupper(codon[0]);
+		codon[1] = std::toupper(codon[1]);
+		codon[2] = std::toupper(codon[2]);
+
+		initAlpha(alphaValue, mixtureElement, codon);
+	}
 }
 
 
 void RFPParameter::initLambdaPrimeR(double lambdaPrimeValue, unsigned mixtureElement, std::string codon)
 {
-    bool check = checkIndex(mixtureElement, 1, numMixtures);
-    if (check)
-    {
-        mixtureElement--;
-        codon[0] = std::toupper(codon[0]);
-        codon[1] = std::toupper(codon[1]);
-        codon[2] = std::toupper(codon[2]);
-        
-        initLambdaPrime(lambdaPrimeValue, mixtureElement, codon);
-    }
+	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	if (check)
+	{
+		mixtureElement--;
+		codon[0] = std::toupper(codon[0]);
+		codon[1] = std::toupper(codon[1]);
+		codon[2] = std::toupper(codon[2]);
+
+		initLambdaPrime(lambdaPrimeValue, mixtureElement, codon);
+	}
 }

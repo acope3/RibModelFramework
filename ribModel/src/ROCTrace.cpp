@@ -9,7 +9,7 @@ ROCTrace::ROCTrace() : Trace()
 	//CTOR
 }
 
-void ROCTrace::initAllTraces(unsigned samples, unsigned num_genes, unsigned adaptiveSamples, unsigned numMutationCategories, unsigned numSelectionCategories,
+void ROCTrace::initAllTraces(unsigned samples, unsigned num_genes, unsigned numMutationCategories, unsigned numSelectionCategories,
 		unsigned numParam, unsigned numMixtures, std::vector<mixtureDefinition> &_categories)
 {
 	initBaseTraces(samples, num_genes, numMutationCategories, numMixtures, _categories);

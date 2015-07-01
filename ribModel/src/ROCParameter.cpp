@@ -20,7 +20,7 @@ ROCParameter::ROCParameter(std::string filename) : Parameter(22)
 }
 
 #ifndef STANDALONE
-ROCParameter::ROCParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter()
+ROCParameter::ROCParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter(22)
 {
 	unsigned _numMixtures = _matrix.size() / 2;
 	std::vector<std::vector<unsigned>> thetaKMatrix;
@@ -40,7 +40,7 @@ ROCParameter::ROCParameter(double sphi, std::vector<unsigned> geneAssignment, st
 }
 
 ROCParameter::ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState) :
-Parameter()
+Parameter(22)
 {
 	std::vector<std::vector<unsigned>> thetaKMatrix;
 	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
@@ -546,6 +546,43 @@ void ROCParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
 }
 
 
+void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
+{
+  unsigned numCSPsets = numAcceptForMutationAndSelection.size();
+  std::cout << "acceptance ratio for amino acid:\n";
+  for (unsigned i = 0; i < numCSPsets; i++)
+  {
+    if (i == 21 || i == 10 || i == 18) continue;
+    std::cout << SequenceSummary::AminoAcidArray[i] << "\t";
+
+    double acceptanceLevel = (double)numAcceptForMutationAndSelection[i] / (double)adaptationWidth;
+    std::cout << acceptanceLevel << "\n";
+    traces.updateCspAcceptanceRatioTrace(i, acceptanceLevel);
+    unsigned codonRange[2];
+    SequenceSummary::AAindexToCodonRange(i, true, codonRange);
+    for (unsigned k = codonRange[0]; k < codonRange[1]; k++)
+    {
+      if (acceptanceLevel < 0.2)
+      {
+        covarianceMatrix[i] *= 0.8;
+        covarianceMatrix[i].choleskiDecomposition();
+        std_csp[k] *= 0.8;
+      }
+      if (acceptanceLevel > 0.3)
+      {
+        covarianceMatrix[i] *= 1.2;
+        covarianceMatrix[i].choleskiDecomposition();
+        std_csp[k] *= 1.2;
+      }
+    }
+    numAcceptForMutationAndSelection[i] = 0u;
+  }
+  std::cout << "\n";
+}
+
+
+
+
 double ROCParameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement)
 {
 	unsigned expressionCategory = getSynthesisRateCategory(mixtureElement);
@@ -609,7 +646,7 @@ std::vector <double> ROCParameter::getEstimatedMixtureAssignmentProbabilities(un
 
 	if (samples > traceLength)
 	{
-		std::cerr << "Warning in Parameter::getMixtureAssignmentPosteriorMean throws: Number of anticipated samples (" <<
+		std::cerr << "Warning in ROCParameter::getMixtureAssignmentPosteriorMean throws: Number of anticipated samples (" <<
 			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
 	}
@@ -842,40 +879,6 @@ std::vector<double> ROCParameter::propose(std::vector<double> currentParam, doub
 		proposedParam[i] = (*proposal)(A + currentParam[i], B[i]);
 	}
 	return proposedParam;
-}
-
-void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
-{
-	unsigned numCSPsets = numAcceptForMutationAndSelection.size();
-	std::cout << "acceptance ratio for amino acid:\n\t";
-	for (unsigned i = 0; i < numCSPsets; i++)
-	{
-		if (i == 21 || i == 10 || i == 18) continue;
-		std::cout << SequenceSummary::AminoAcidArray[i] << "\t";
-
-		double acceptanceLevel = (double)numAcceptForMutationAndSelection[i] / (double)adaptationWidth;
-		std::cout << acceptanceLevel << "\n";
-		traces.updateCspAcceptanceRatioTrace(i, acceptanceLevel);
-		unsigned codonRange[2];
-		SequenceSummary::AAindexToCodonRange(i, true, codonRange);
-		for (unsigned k = codonRange[0]; k < codonRange[1]; k++)
-		{
-			if (acceptanceLevel < 0.2)
-			{
-				covarianceMatrix[i] *= 0.8;
-				covarianceMatrix[i].choleskiDecomposition();
-				std_csp[k] *= 0.8;
-			}
-			if (acceptanceLevel > 0.3)
-			{
-				covarianceMatrix[i] *= 1.2;
-				covarianceMatrix[i].choleskiDecomposition();
-				std_csp[k] *= 1.2;
-			}
-		}
-		numAcceptForMutationAndSelection[i] = 0u;
-	}
-	std::cout << "\n";
 }
 
 

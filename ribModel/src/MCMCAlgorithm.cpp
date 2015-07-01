@@ -236,7 +236,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model)
 	unsigned maximumIterations = samples * thining;
 	// initialize everything
 
-	model.initTraces(samples, genome.getGenomeSize(), maximumIterations/adaptiveWidth); 
+	model.initTraces(samples, genome.getGenomeSize()); 
 	// starting the MCMC
 
 	std::cout << "entering MCMC loop" << std::endl;

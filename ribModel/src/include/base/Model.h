@@ -18,7 +18,7 @@ class Model
         		double& logAcceptanceRatioForAllMixtures) = 0;
 		
 				//Parameter wrapper functions:
-		virtual void initTraces(unsigned samples, unsigned num_genes, unsigned adaptiveSamples) = 0;
+		virtual void initTraces(unsigned samples, unsigned num_genes) = 0;
 		virtual void writeRestartFile(std::string filename) = 0;
 		virtual double getSphi(bool proposed = false) = 0;
 		virtual double getSphiProposalWidth() = 0;
@@ -48,7 +48,7 @@ class Model
 		virtual void setCategoryProbability(unsigned mixture, double value) = 0;
 		virtual void updateMixtureProbabilitiesTrace(unsigned sample) = 0;
 		virtual void adaptSynthesisRateProposalWidth(unsigned adaptiveWidth) = 0;
-		virtual void getParameterForCategory(unsigned category, unsigned param, std::string aa, bool proposal, double* returnValue) = 0;
+		//virtual void getParameterForCategory(unsigned category, unsigned param, std::string aa, bool proposal, double* returnValue) = 0;
 		virtual unsigned getGroupListSize() = 0;
 		virtual std::string getGrouping(unsigned index) = 0;
 

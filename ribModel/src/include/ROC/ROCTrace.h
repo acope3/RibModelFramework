@@ -16,7 +16,7 @@ class ROCTrace : public Trace
 		ROCTrace();
 
 		//Init functions
-		void initAllTraces(unsigned samples, unsigned num_genes, unsigned adaptiveSamples, unsigned numMutationCategories,
+		void initAllTraces(unsigned samples, unsigned num_genes, unsigned numMutationCategories,
 				unsigned numSelectionCategories, unsigned numParam, unsigned numMixtures, std::vector<mixtureDefinition> &_categories);
 		void initROCTraces(unsigned samples, unsigned numMutationCategories, unsigned numSelectionCategories, unsigned numParam);
 		void initMutationParameterTrace(unsigned samples, unsigned numMutationCategories, unsigned numParam); 

@@ -9,7 +9,7 @@ class RFPModel : public Model
 	private:
 
 		RFPParameter *parameter;
-		virtual void obtainCodonCount(SequenceSummary& seqsum, char curAA, int codonCount[]); //Might no longer need?
+		virtual void obtainCodonCount(SequenceSummary& seqsum, std::string curAA, int codonCount[]) {} //Might no longer need?
 		virtual double calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime, unsigned currRFPObserved,
     unsigned currNumCodonsInMRNA, double phiValue);
 	public:
@@ -20,7 +20,7 @@ class RFPModel : public Model
 
 
 		void setParameter(RFPParameter &_parameter); //may move up PV
-		virtual void calculateCodonProbabilityVector(unsigned numCodons, double* mutation, double* selection, double phi, double* codonProb); //May not need?
+		virtual void calculateCodonProbabilityVector(unsigned numCodons, double* mutation, double* selection, double phi, double* codonProb) {} //May not need?
 
 		// Likelihood ratio functions
 		virtual void calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio);
@@ -36,7 +36,7 @@ class RFPModel : public Model
 		virtual void proposeCodonSpecificParameter() {parameter->proposeCodonSpecificParameter();}
 		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth) {parameter->adaptCodonSpecificParameterProposalWidth(adaptiveWidth);}
 		virtual void updateCodonSpecificParameter(std::string aa) {parameter->updateCodonSpecificParameter(aa);}
-		virtual void updateCodonSpecificParameterTrace(unsigned sample, char aa) {parameter->updateCodonSpecificParameterTrace(sample, aa);}
+		virtual void updateCodonSpecificParameterTrace(unsigned sample, std::string codon) {parameter->updateCodonSpecificParameterTrace(sample, codon);}
 		virtual void proposeSPhi() {parameter->proposeSPhi();}
 		virtual unsigned getMixtureAssignment(unsigned index) {return parameter->getMixtureAssignment(index);}
 		virtual unsigned getSynthesisRateCategory(unsigned mixture) {return parameter->getSynthesisRateCategory(mixture);}
@@ -57,9 +57,9 @@ class RFPModel : public Model
 		virtual void setCategoryProbability(unsigned mixture, double value) {parameter->setCategoryProbability(mixture, value);}
 		virtual void updateMixtureProbabilitiesTrace(unsigned sample) {parameter->updateMixtureProbabilitiesTrace(sample);}
 		virtual void adaptSynthesisRateProposalWidth(unsigned adaptiveWidth) {parameter->adaptSynthesisRateProposalWidth(adaptiveWidth);}
-		virtual void getParameterForCategory(unsigned category, unsigned param, char aa, bool proposal, double* returnValue)
+		virtual double getParameterForCategory(unsigned category, unsigned param, std::string codon, bool proposal)
 		{
-			parameter -> getParameterForCategory(category, param, aa, proposal, returnValue);
+			return parameter -> getParameterForCategory(category, param, codon, proposal);
 		}
 		virtual unsigned getListSize() {return 61;}
 		virtual std::string getGrouping(unsigned index) {return parameter -> getGrouping(index);}

@@ -211,6 +211,7 @@ Gene& Genome::getGene(std::string id)
 
 void Genome::simulateGenome(Model& model)
 {
+/*
 	unsigned i;
 	int j, k;
 	int aaCount;
@@ -281,6 +282,7 @@ void Genome::simulateGenome(Model& model)
 		Gene tmpGene(tmpSeq, tmpID, tmpDesc);
 		simulatedGenes[i] = tmpGene;
 	}
+*/
 }
 
 void Genome::clear()
