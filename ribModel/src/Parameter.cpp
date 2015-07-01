@@ -265,6 +265,7 @@ void Parameter::writeBasicRestartFile(std::string filename)
 	std::ofstream out;
 	std::string output = "";
 	std::ostringstream oss;
+	unsigned i, j;
 	out.open(filename.c_str());
 	if (out.fail())
 	{
@@ -272,12 +273,20 @@ void Parameter::writeBasicRestartFile(std::string filename)
 		std::exit(1);
 	}
 
+
+	oss << ">groupList:\n";
+	for (i = 0; i < groupList.size(); i++) {
+		oss << groupList[i];
+		if ((i + 1) % 10 == 0) oss << "\n";
+		else oss << " ";
+	}
+	if (i % 10 != 0) oss << "\n";
+	oss << "\n";
 	oss <<">Sphi:\n" << Sphi <<"\n";
 	oss <<">Aphi:\n" << Aphi <<"\n";
 	oss <<">numParam:\n" << numParam <<"\n";
 	oss <<">numMixtures:\n" << numMixtures <<"\n";
 	oss <<">std_sphi:\n" << std_sphi <<"\n";
-	unsigned i, j;
 	//maybe clear the buffer	
 	oss <<">std_phi:\n";
 	for (i = 0; i < std_phi.size(); i++)
@@ -387,7 +396,6 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 		std::exit(1);
 	}
 
-	covarianceMatrix.resize(maxGrouping); // TODO: change this from being hardcoded
 	int cat = 0;
 	std::vector<double> mat;
 	std::string tmp, variableName;
@@ -421,7 +429,14 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 		else //store variable information
 		{
 			std::istringstream iss;
-			if (variableName == "Sphi") {iss.str(tmp); iss >> Sphi;}
+			if (variableName == "groupList") {
+				std::string val;
+				iss.str(tmp);
+				while (iss >> val) {
+					groupList.push_back(val);
+				}
+			} 
+			else if (variableName == "Sphi") {iss.str(tmp); iss >> Sphi;}
 			else if (variableName == "Aphi") {iss.str(tmp); iss >> Aphi;}	
 			else if (variableName == "numParam") {iss.str(tmp); iss >> numParam;}	
 			else if (variableName == "numMutationCategories") {iss.str(tmp); iss >> numMutationCategories;} 	
