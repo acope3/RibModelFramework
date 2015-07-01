@@ -8,7 +8,7 @@ const std::string Parameter::mutationShared = "mutationShared";
 std::default_random_engine Parameter::generator( (unsigned) std::time(NULL));
 
 
-Parameter::Parameter()
+Parameter::Parameter(unsigned max_AA)
 {
 	numParam = 0u;
 	Sphi = 0.0;
@@ -22,6 +22,7 @@ Parameter::Parameter()
 	numSelectionCategories = 0u;
 	numMixtures = 0u;
 	std_sphi = 0.0;
+	maxAA = max_AA;
 }
 
 Parameter::Parameter(const Parameter& other)
@@ -149,7 +150,7 @@ void Parameter::initParameterSet(double sphi, unsigned _numMixtures, std::vector
     std_phi[i] = tempStdPhi;
   }
 
-  for (unsigned i = 0; i < 22; i++) // TODO: change this from being hardcoded
+  for (unsigned i = 0; i < maxAA; i++) // TODO: change this from being hardcoded
   {
     std::string aa = SequenceSummary::AminoAcidArray[i];
     unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa, true);
@@ -356,7 +357,7 @@ void Parameter::writeBasicRestartFile(std::string filename)
 	oss.clear();
 	oss.str("");
 
-	for (i = 0; i < 22; i++) // TODO: change this from being hardcoded
+	for (i = 0; i < maxAA; i++) // TODO: change this from being hardcoded
 	{
 		std::string aa = SequenceSummary::IndexToAA(i);
 		oss <<">covarianceMatrix:\n" << aa <<"\n";
@@ -386,7 +387,7 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 		std::exit(1);
 	}
 
-	covarianceMatrix.resize(22); // TODO: change this from being hardcoded
+	covarianceMatrix.resize(maxAA); // TODO: change this from being hardcoded
 	int cat = 0;
 	std::vector<double> mat;
 	std::string tmp, variableName;
@@ -767,7 +768,7 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 	for(unsigned i = 0u; i < genomeSize; i++)
 	{
 		index[i] = i;
-		scuoValues[i] = calculateSCUO( genome.getGene(i) );
+		scuoValues[i] = calculateSCUO( genome.getGene(i), maxAA );
 		expression[i] = Parameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
 	}
 	quickSortPair(scuoValues, index, 0, genomeSize);
@@ -869,12 +870,12 @@ unsigned Parameter::getEstimatedMixtureAssignment(unsigned samples, unsigned gen
 // Wan et al. CodonO: a new informatics method for measuring synonymous codon usage bias within and across genomes
 // International Journal of General Systems, Vol. 35, No. 1, February 2006, 109–125
 // http://www.tandfonline.com/doi/pdf/10.1080/03081070500502967
-double Parameter::calculateSCUO(Gene& gene)
+double Parameter::calculateSCUO(Gene& gene, unsigned maxAA)
 {
 	SequenceSummary seqsum = gene.getSequenceSummary();
 
 	double totalDegenerateAACount = 0.0;
-	for(int i = 0; i < 22; i++)
+	for(unsigned i = 0; i < maxAA; i++)
 	{
 		std::string curAA = seqsum.AminoAcidArray[i];
 		// skip amino acids with only one codon or stop codons
@@ -883,7 +884,7 @@ double Parameter::calculateSCUO(Gene& gene)
 	}
 
 	double scuoValue = 0.0;
-	for(int i = 0; i < 22; i++)
+	for(unsigned i = 0; i < maxAA; i++)
 	{
 		std::string curAA = seqsum.AminoAcidArray[i];
 		// skip amino acids with only one codon or stop codons

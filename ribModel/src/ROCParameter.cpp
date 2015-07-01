@@ -14,7 +14,7 @@ using namespace Rcpp;
 const unsigned ROCParameter::dM = 0;
 const unsigned ROCParameter::dEta = 1;
 
-ROCParameter::ROCParameter(std::string filename) : Parameter()
+ROCParameter::ROCParameter(std::string filename) : Parameter(22)
 {
 	initFromRestartFile(filename);
 }
@@ -51,7 +51,7 @@ Parameter()
 
 
 ROCParameter::ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix,
-	bool splitSer, std::string _mutationSelectionState) : Parameter()
+	bool splitSer, std::string _mutationSelectionState) : Parameter(22)
 {
 	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
 	initROCParameterSet();
@@ -137,6 +137,7 @@ void ROCParameter::initROCParameterSet()
 	}
 	
 	groupList = { "A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "P", "Q", "R", "S", "T", "V", "Y", "Z" };
+	//groupList = { "C", "D", "E", "F", "H", "K", "M", "N", "Q", "W", "Y" };
 }
 
 
@@ -340,6 +341,7 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 	}
 
 	groupList = { "A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "P", "Q", "R", "S", "T", "V", "Y", "Z" };
+	//groupList = { "C", "D", "E", "F", "H", "K", "M", "N", "Q", "W", "Y" };
 }
 #ifndef STANDALONE
 SEXP ROCParameter::calculateSelectionCoefficientsR(unsigned sample, unsigned mixture)

@@ -25,7 +25,7 @@ private:
 	std::string mutationSelectionState; //Probably needs to be renamed
 	std::vector<std::vector<unsigned>> selectionIsInMixture;
 	std::vector<std::vector<unsigned>> mutationIsInMixture;
-
+	unsigned maxAA;
 
 
 	// STATICS
@@ -47,7 +47,7 @@ public:
 
 	static std::default_random_engine generator; // static to make sure that the same generator is during the runtime.
 
-	Parameter();
+	Parameter(unsigned maxAA);
 	void initParameterSet(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
 		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix, bool splitSer = true, std::string _mutationSelectionState = "allUnique");
 	Parameter(const Parameter& other);
@@ -140,7 +140,7 @@ public:
 	virtual double getSphiVariance(unsigned samples, bool unbiased = true) = 0;
 	virtual double getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement, bool unbiased = true) = 0;
 	// static functions
-	static double calculateSCUO(Gene& gene);
+	static double calculateSCUO(Gene& gene, unsigned maxAA);
 
 	static void drawIidRandomVector(unsigned draws, double mean, double sd, double(*proposal)(double a, double b), double* randomNumbers);
 	static void drawIidRandomVector(unsigned draws, double r, double(*proposal)(double r), double* randomNumber);
