@@ -19,7 +19,7 @@ adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples=samples, thining=thining, adaptive.width=adaptiveWidth, 
                      est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
 # get model object
-model <- initializeModelObject("ROC")
+model <- initializeModelObject(parameter, "ROC")
 
 setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth, TRUE)
 #run mcmc on genome with parameter using model

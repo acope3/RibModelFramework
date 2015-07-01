@@ -15,9 +15,9 @@ runMCMC.Rcpp_MCMCAlgorithm <- function(mcmc, genome, model)
 }
 setRestartSettings <- function(mcmc, filename, samples, write.multiple=TRUE)
 {
-  UseMethod("restartSettings", mcmc)
+  UseMethod("setRestartSettings", mcmc)
 }
 setRestartSettings.Rcpp_MCMCAlgorithm <- function(mcmc, filename, samples, write.multiple=TRUE)
 {
-  mcmc$setRestartFileSetting(filename, samples, write.multiple)
+  mcmc$setRestartFileSettings(filename, samples, write.multiple)
 }

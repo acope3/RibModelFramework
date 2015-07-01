@@ -1,7 +1,7 @@
 library(ribModel)
 rm(list=ls())
 #read genome
-genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri.fasta")
+genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")
 
 #initialize parameter object
 sphi_init <- 2
@@ -19,24 +19,26 @@ parameter$initializeExpressionByRandom(phivals)
 parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")
 parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")
 # initialize MCMC object
-samples <- 20000
+samples <- 1000
 thining <- 10
-adaptiveWidth <- 100
+adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, 
                              est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
 # get model object
-model <- initializeModelObject("ROC")
+model <- initializeModelObject(parameter, "ROC")
 
 setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth, TRUE)
 #run mcmc on genome with parameter using model
 system.time(
-  runMCMC(mcmc, genome, model, parameter)
+  runMCMC(mcmc, genome, model)
 )
 
 
 #plots log likelihood trace, possibly other mcmc diagnostics in the future
 pdf("simulated_Genome_allUnique_startCSP_VGAM_startPhi_SCUO_adaptSphi_True.pdf")
 plot(mcmc)
+loglik.trace <- mcmc$getLogLikelihoodTrace()
+acf(loglik.trace)
 
 # plots different aspects of trace
 trace <- parameter$getTraceObject()
@@ -46,15 +48,15 @@ plot(trace, what = "ExpectedPhi")
 
 mixtureAssignment <- unlist(lapply(1:genome$getGenomeSize(),  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))
 expressionValues <- unlist(lapply(1:genome$getGenomeSize(), function(geneIndex){
-  expressionCategory <- parameter$getExpressionCategoryForMixture(mixtureAssignment[geneIndex])
-  parameter$getExpressionPosteriorMeanByMixtureElementForGene(samples, geneIndex, expressionCategory)
+  expressionCategory <- parameter$getSynthesisRateCategoryForMixture(mixtureAssignment[geneIndex])
+  parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(samples, geneIndex, expressionCategory)
 }))
 expressionValues <- log10(expressionValues)
-obs.phi <- log10(read.table("../ribModel/data/Skluyveri_phi.csv", sep=",", header=T)[, 2])
-plot(NULL, NULL, xlim=range(expressionValues, na.rm = T), ylim=range(obs.phi), 
-     main = "Synthesis Rate", xlab = "estimated values", ylab = "true values")
-upper.panel.plot(expressionValues[mixtureAssignment == 1], obs.phi[mixtureAssignment == 1], col="black")
-upper.panel.plot(expressionValues[mixtureAssignment == 2], obs.phi[mixtureAssignment == 2], col="red")
+obs.phi <- log10(read.table("../ribModel/data/simulatedAllUniqueR_phi.csv", sep=",", header=T)[, 2])
+plot(NULL, NULL, xlim=range(expressionValues, na.rm = T) + c(-0.1, 0.1), ylim=range(obs.phi) + c(-0.1, 0.1), 
+     main = "Synthesis Rate", xlab = "true values", ylab = "estimated values")
+upper.panel.plot(obs.phi[mixtureAssignment == 1], expressionValues[mixtureAssignment == 1], col="black")
+upper.panel.plot(obs.phi[mixtureAssignment == 2], expressionValues[mixtureAssignment == 2], col="red")
 legend("topleft", legend = paste("Mixture Element", 1:numMixtures), 
        col = ribModel:::.mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")
 
@@ -63,7 +65,7 @@ plot(parameter, what = "Selection")
 dev.off()
 
 
-plot(trace, what = "Expression", geneIndex = 905)
+plot(trace, what = "Expression", geneIndex = 999, mixture = 2)
 
 pdf("simulated_Genome_allUnique_startCSP_VGAM_startPhi_SCUO_adaptSphi_True_mix2.pdf", width = 11, height = 12)
 mixture <- 2
@@ -91,9 +93,9 @@ for(aa in names.aa)
   }
 }
 plot(NULL, NULL, xlim=range(mutation, na.rm = T), ylim=range(csp[idx.mu, 2]), 
-     main = "Mutation", xlab = "estimated values", ylab = "true values")
-upper.panel.plot(mutation, csp[idx.mu, 2])
+     main = "Mutation", xlab = "true values", ylab = "estimated values")
+upper.panel.plot(csp[idx.mu, 2], mutation)
 plot(NULL, NULL, xlim=range(selection, na.rm = T), ylim=range(csp[idx.eta, 2]), 
-     main = "Selection", xlab = "estimated values", ylab = "true values")
-upper.panel.plot(selection, csp[idx.eta, 2])
+     main = "Selection", xlab = "true values", ylab = "estimated values")
+upper.panel.plot(csp[idx.eta, 2], selection)
 dev.off()
