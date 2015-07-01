@@ -59,16 +59,6 @@ ROCParameter::ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsig
 	//groupList = { "C", "D", "E", "F", "H", "K", "M", "N", "Q", "W", "Y" };
 	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
 	initROCParameterSet();
-<<<<<<< HEAD
-=======
-
-	for (unsigned i = 0; i < groupList.size(); i++) {
-		if (groupList[i] == "M" || groupList[i] == "W" || groupList[i] == "X") {
-			std::cerr << "Warning: Codon " << groupList[i] << " not recognized in ROC model\n";
-			groupList.erase(groupList.begin() + i);
-		}
-	}
->>>>>>> 86e7887e98e2d400667a1451306b952e05058a13
 }
 
 ROCParameter::~ROCParameter()
