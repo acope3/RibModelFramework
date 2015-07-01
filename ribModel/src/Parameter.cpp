@@ -608,7 +608,7 @@ void Parameter::initCovarianceMatrix(SEXP _matrix, std::string aa)
 
 CovarianceMatrix& Parameter::getCovarianceMatrixForAA(std::string aa)
 {
-	aa[0] = std::toupper(aa[0]);
+	aa[0] = (char) std::toupper(aa[0]);
 	unsigned aaIndex = SequenceSummary::aaToIndex.find(aa) -> second;
 	return covarianceMatrix[aaIndex];
 }

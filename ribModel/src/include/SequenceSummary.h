@@ -42,12 +42,12 @@ class SequenceSummary
 		unsigned getNumCodonsInMRNA(unsigned codonIndex) {return numCodonsInMRNA[codonIndex];}
 
 		//R Wrapper Functions
-		int getAAcount(std::string aa) {aa = std::toupper(aa[0]);	return getAAcountForAA(aa);}
+		int getAAcount(std::string aa) {aa[0] = (char) std::toupper(aa[0]);	return getAAcountForAA(aa);}
 		int getCodonCount(std::string& codon)
 		{
-			codon[0] = std::toupper(codon[0]);
-			codon[1] = std::toupper(codon[1]);
-			codon[2] = std::toupper(codon[2]);
+			codon[0] = (char) std::toupper(codon[0]);
+			codon[1] = (char) std::toupper(codon[1]);
+			codon[2] = (char) std::toupper(codon[2]);
 
 			return (codon.length() != 3) ? -1 : getCodonCountForCodon(codon);
 		}
