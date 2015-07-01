@@ -19,7 +19,7 @@ parameter$initializeExpressionByRandom(phivals)
 parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")
 parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")
 # initialize MCMC object
-samples <- 1000
+samples <- 100
 thining <- 10
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, 
@@ -79,7 +79,7 @@ plot(model, genome, parameter, samples = samples*0.1, mixture = mixture, main = 
 names.aa <- aminoAcids()
 selection <- c()
 mutation <- c()
-csp <- read.table("../ribModel/data/Skluyveri_CSP_ChrCleft.csv", sep=",", header=T)
+csp <- read.table("../ribModel/data/simulated_CSP1.csv", sep=",", header=T)
 idx.eta <- grepl(pattern = "[A-Z].[A-Z]{3}.Delta.eta", x = as.character(csp[,1]))
 idx.mu <- grepl(pattern = "[A-Z].[A-Z]{3}.log.mu", x = as.character(csp[,1]))
 for(aa in names.aa)
@@ -92,10 +92,10 @@ for(aa in names.aa)
     mutation <- c(mutation, parameter$getMutationPosteriorMeanForCodon(mixture, samples*0.1, codons[i]))
   }
 }
-plot(NULL, NULL, xlim=range(mutation, na.rm = T), ylim=range(csp[idx.mu, 2]), 
+plot(NULL, NULL, xlim=range(csp[idx.mu, 2], na.rm = T), ylim=range(mutation), 
      main = "Mutation", xlab = "true values", ylab = "estimated values")
 upper.panel.plot(csp[idx.mu, 2], mutation)
-plot(NULL, NULL, xlim=range(selection, na.rm = T), ylim=range(csp[idx.eta, 2]), 
+plot(NULL, NULL, xlim=range(csp[idx.eta, 2], na.rm = T), ylim=range(selection), 
      main = "Selection", xlab = "true values", ylab = "estimated values")
 upper.panel.plot(csp[idx.eta, 2], selection)
 dev.off()

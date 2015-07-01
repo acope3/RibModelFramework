@@ -89,7 +89,7 @@ Parameter& Parameter::operator=(const Parameter& rhs)
 }
 
 void Parameter::initParameterSet(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, 
-		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix, bool splitSer,   std::string _mutationSelectionState)
+		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix, bool splitSer, std::string _mutationSelectionState)
 {
 	// assign genes to mixture element
 	unsigned numGenes = geneAssignment.size();
