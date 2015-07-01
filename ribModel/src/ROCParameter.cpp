@@ -35,8 +35,7 @@ ROCParameter::ROCParameter(double sphi, std::vector<unsigned> geneAssignment, st
 			thetaKMatrix[i].push_back(_matrix[index]);
 		}
 	}
-	groupList =
-	{	"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "P", "Q", "R", "S", "T", "V", "Y", "Z"};
+	groupList = {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "P", "Q", "R", "S", "T", "V", "Y", "Z"};
 	//groupList = { "C", "D", "E", "F", "H", "K", "M", "N", "Q", "W", "Y" };
 	initParameterSet(sphi, _matrix.size() / 2, geneAssignment, thetaKMatrix, splitSer);
 	initROCParameterSet();
@@ -56,20 +55,10 @@ ROCParameter::ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsig
 		std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer, std::string _mutationSelectionState) :
 		Parameter(22)
 {
-	groupList =
-	{	"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "P", "Q", "R", "S", "T", "V", "Y", "Z"};
+	groupList = {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "P", "Q", "R", "S", "T", "V", "Y", "Z"};
 	//groupList = { "C", "D", "E", "F", "H", "K", "M", "N", "Q", "W", "Y" };
 	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
 	initROCParameterSet();
-
-	for (unsigned i = 0; i < groupList.size(); i++)
-	{
-		if (groupList[i] == "M" || groupList[i] == "W" || groupList[i] == "X")
-		{
-			fprintf(stderr, "Warning: Codon %s not recognized in ROC model\n", groupList[i]);
-			groupList.erase(groupList.begin() + i);
-		}
-	}
 }
 
 ROCParameter::~ROCParameter()
@@ -360,8 +349,7 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 		proposedSelectionParameter[i] = currentSelectionParameter[i];
 	}
 
-	groupList =
-	{	"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "P", "Q", "R", "S", "T", "V", "Y", "Z"};
+	groupList = {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "P", "Q", "R", "S", "T", "V", "Y", "Z"};
 	//groupList = { "C", "D", "E", "F", "H", "K", "M", "N", "Q", "W", "Y" };
 }
 #ifndef STANDALONE

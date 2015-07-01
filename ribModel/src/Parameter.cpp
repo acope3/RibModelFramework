@@ -1190,7 +1190,16 @@ std::vector<double> Parameter::getCurrentSynthesisRateForMixture(unsigned mixtur
 
 void Parameter::setGroupList(std::vector <std::string> gl)
 {
-	groupList = gl;
+	groupList.clear();
+	for (unsigned i = 0; i < gl.size(); i++)
+	{
+		if (gl[i] == "M" || gl[i] == "W" || gl[i] == "X")
+		{
+			std::cerr << "Warning: Amino Acid" << gl[i] << "not recognized in ROC model\n";
+		}else{
+			groupList.push_back(gl[i]);
+		}
+	}
 }
 
 std::string Parameter::getGrouping(unsigned index)
