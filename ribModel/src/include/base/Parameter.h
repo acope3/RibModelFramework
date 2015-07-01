@@ -25,7 +25,7 @@ private:
 	std::string mutationSelectionState; //Probably needs to be renamed
 	std::vector<std::vector<unsigned>> selectionIsInMixture;
 	std::vector<std::vector<unsigned>> mutationIsInMixture;
-	unsigned maxAA;
+	unsigned maxGrouping;
 
 
 	// STATICS
@@ -47,7 +47,7 @@ public:
 
 	static std::default_random_engine generator; // static to make sure that the same generator is during the runtime.
 
-	Parameter(unsigned maxAA);
+	Parameter(unsigned maxGrouping);
 	void initParameterSet(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
 		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix, bool splitSer = true, std::string _mutationSelectionState = "allUnique");
 	Parameter(const Parameter& other);

@@ -5,14 +5,14 @@ using namespace Rcpp;
 #endif
 
 //Constructors & Destructors:
-RFPParameter::RFPParameter(std::string filename) : Parameter()
+RFPParameter::RFPParameter(std::string filename) : Parameter(61)
 {
 	initFromRestartFile(filename);
 }
 
 
 RFPParameter::RFPParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix, 
-		bool splitSer = true, std::string _mutationSelectionState = "allUnique") : Parameter()
+		bool splitSer = true, std::string _mutationSelectionState = "allUnique") : Parameter(61)
 {
 	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
 	initRFPParameterSet();
@@ -45,8 +45,6 @@ RFPParameter::RFPParameter& operator=(const RFPParameter& rhs)
 {
 	if (this == &rhs) return *this; // handle self assignment
 
-	Parameter::operator=(rhs);
-    
     currentAlphaParameter = rhs.currentAlphaParameter;
     proposedAlphaParameter = rhs.proposedAlphaParameter;
     currentLambdaPrimeParameter = rhs.proposedLambdaPrimeParameter;

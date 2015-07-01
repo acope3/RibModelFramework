@@ -8,7 +8,7 @@ const std::string Parameter::mutationShared = "mutationShared";
 std::default_random_engine Parameter::generator( (unsigned) std::time(NULL));
 
 
-Parameter::Parameter(unsigned max_AA)
+Parameter::Parameter(unsigned _maxGrouping)
 {
 	numParam = 0u;
 	Sphi = 0.0;
@@ -22,7 +22,7 @@ Parameter::Parameter(unsigned max_AA)
 	numSelectionCategories = 0u;
 	numMixtures = 0u;
 	std_sphi = 0.0;
-	maxAA = max_AA;
+	maxGrouping = _maxGrouping;
 }
 
 Parameter::Parameter(const Parameter& other)
@@ -150,7 +150,7 @@ void Parameter::initParameterSet(double sphi, unsigned _numMixtures, std::vector
     std_phi[i] = tempStdPhi;
   }
 
-  for (unsigned i = 0; i < maxAA; i++) // TODO: change this from being hardcoded
+  for (unsigned i = 0; i < maxGrouping; i++) // TODO: change this from being hardcoded
   {
     std::string aa = SequenceSummary::AminoAcidArray[i];
     unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa, true);
@@ -357,7 +357,7 @@ void Parameter::writeBasicRestartFile(std::string filename)
 	oss.clear();
 	oss.str("");
 
-	for (i = 0; i < maxAA; i++) // TODO: change this from being hardcoded
+	for (i = 0; i < maxGrouping; i++) // TODO: change this from being hardcoded
 	{
 		std::string aa = SequenceSummary::IndexToAA(i);
 		oss <<">covarianceMatrix:\n" << aa <<"\n";
@@ -387,7 +387,7 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 		std::exit(1);
 	}
 
-	covarianceMatrix.resize(maxAA); // TODO: change this from being hardcoded
+	covarianceMatrix.resize(maxGrouping); // TODO: change this from being hardcoded
 	int cat = 0;
 	std::vector<double> mat;
 	std::string tmp, variableName;
@@ -768,7 +768,7 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 	for(unsigned i = 0u; i < genomeSize; i++)
 	{
 		index[i] = i;
-		scuoValues[i] = calculateSCUO( genome.getGene(i), maxAA );
+		scuoValues[i] = calculateSCUO( genome.getGene(i), maxGrouping );
 		expression[i] = Parameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
 	}
 	quickSortPair(scuoValues, index, 0, genomeSize);

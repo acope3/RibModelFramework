@@ -66,7 +66,7 @@ void RFPModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsi
 	}
 
 	double sPhi = parameter->getSphi(false);
-	double logPhiProbability = std::log(ROCParameter::densityLogNorm(phiValue, (-(sPhi * sPhi) / 2), sPhi));
+	double logPhiProbability = std::log(Parameter::densityLogNorm(phiValue, (-(sPhi * sPhi) / 2), sPhi));
 	double logPhiProbability_proposed = std::log(Parameter::densityLogNorm(phiValue_proposed, (-(sPhi * sPhi) / 2), sPhi));
 	double currentLogLikelihood = (logLikelihood + logPhiProbability);
 	double proposedLogLikelihood = (logLikelihood_proposed + logPhiProbability_proposed);
@@ -79,10 +79,10 @@ void RFPModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsi
 
 void RFPModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures)
 {
-	double likelihood = 0.0;
-	double likelihood_proposed = 0.0;
+	double logLikelihood = 0.0;
+	double logLikelihood_proposed = 0.0;
     unsigned index = SequenceSummary::CodonToIndex(grouping);
-    for (unsigned i = 0; i < genome.size(); i++)
+    for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
     {
         Gene gene = genome.getGene(i);
         // which mixture element does this gene belong to
@@ -106,7 +106,7 @@ void RFPModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
         logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
         logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
         
-        logAcceptanceRatioForAllMixtures = likelihood_proposed - likelihood;
+        logAcceptanceRatioForAllMixtures = logLikelihood_proposed - logLikelihood;
         
     }
 }

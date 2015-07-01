@@ -27,7 +27,7 @@ class RFPModel : public Model
 		virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures);
 
 		//Parameter wrapper functions:
-		virtual void initTraces(unsigned samples, unsigned num_genes, unsigned adaptiveSamples) {parameter -> initAllTraces(samples, num_genes, adaptiveSamples);}
+		virtual void initTraces(unsigned samples, unsigned num_genes) {parameter -> initAllTraces(samples, num_genes);}
 		virtual void writeRestartFile(std::string filename) {return parameter->writeEntireRestartFile(filename);}       
 		virtual double getSphi(bool proposed = false) {return parameter->getSphi(proposed);}
 		virtual double getSphiProposalWidth() {return parameter->getSphiProposalWidth();}
@@ -35,14 +35,14 @@ class RFPModel : public Model
 		virtual double getCategoryProbability(unsigned i) {return parameter->getCategoryProbability(i);}
 		virtual void proposeCodonSpecificParameter() {parameter->proposeCodonSpecificParameter();}
 		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth) {parameter->adaptCodonSpecificParameterProposalWidth(adaptiveWidth);}
-		virtual void updateCodonSpecificParameter(char aa) {parameter->updateCodonSpecificParameter(aa);}
+		virtual void updateCodonSpecificParameter(std::string aa) {parameter->updateCodonSpecificParameter(aa);}
 		virtual void updateCodonSpecificParameterTrace(unsigned sample, char aa) {parameter->updateCodonSpecificParameterTrace(sample, aa);}
 		virtual void proposeSPhi() {parameter->proposeSPhi();}
 		virtual unsigned getMixtureAssignment(unsigned index) {return parameter->getMixtureAssignment(index);}
 		virtual unsigned getSynthesisRateCategory(unsigned mixture) {return parameter->getSynthesisRateCategory(mixture);}
 		virtual unsigned getSelectionCategory(unsigned mixture) {return parameter ->getSelectionCategory(mixture);}
 		virtual unsigned getMutationCategory(unsigned mixture)  {return parameter ->getMutationCategory(mixture);} 				
-		virtual double getSynthesisRate(unsigned index, unsigned mixture, bool proposed = false) {return parameter->getSynthesisRate(index, mixture, false);}
+		virtual double getSynthesisRate(unsigned index, unsigned mixture, bool proposed = false) {return parameter->getSynthesisRate(index, mixture, proposed);}
 		virtual double getCurrentSphiProposalWidth() {return parameter->getCurrentSphiProposalWidth();}
 		virtual void updateSphi() {parameter->updateSphi();}
 		virtual void updateSphiTrace(unsigned sample) {parameter->updateSphiTrace(sample);}

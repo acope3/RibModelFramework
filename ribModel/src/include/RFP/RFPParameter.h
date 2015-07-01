@@ -75,8 +75,10 @@ class RFPParameter : public Parameter
 		
 		//Trace functions:
 		RFPTrace& getTraceObject() {return traces;}
-		void initAllTraces(unsigned samples, unsigned num_genes, unsigned adaptiveSamples) {traces.initAllTraces(samples, num_genes, adaptiveSamples, 
-				numMutationCategories, numSelectionCategories, numParam, numMixtures, categories);}
+		void initAllTraces(unsigned samples, unsigned num_genes)
+		{
+			traces.initAllTraces(samples, num_genes, numMutationCategories, numSelectionCategories, numParam, numMixtures, categories);
+		}
 		//update trace functions
 		virtual void updateSphiTrace(unsigned sample) {traces.updateSphiTrace(sample, Sphi);}
 		virtual void updateSynthesisRateTrace(unsigned sample, unsigned geneIndex){traces.updateSynthesisRateTrace(sample, geneIndex, currentSynthesisRateLevel);}

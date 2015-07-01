@@ -16,8 +16,8 @@ public:
 	RFPTrace();
 
 	//Init functions
-	void initAllTraces(unsigned samples, unsigned num_genes, unsigned adaptiveSamples, unsigned numMutationCategories,
-		unsigned numSelectionCategories, unsigned numParam, unsigned numMixtures, std::vector<thetaK> &_categories);
+	void initAllTraces(unsigned samples, unsigned num_genes, unsigned numMutationCategories,
+		unsigned numSelectionCategories, unsigned numParam, unsigned numMixtures, std::vector<mixtureDefinition> &_categories);
 	void initROCTraces(unsigned samples, unsigned numMutationCategories, unsigned numSelectionCategories, unsigned numParam);
 	void initAlphaParameterTrace(unsigned samples, unsigned numMutationCategories, unsigned numParam);
 	void initLambdaPrimeParameterTrace(unsigned samples, unsigned numSelectionCategories, unsigned numParam);
