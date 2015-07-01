@@ -23,7 +23,7 @@ void Trace::initBaseTraces(unsigned samples, unsigned num_genes, unsigned numSel
 {
 	//numSelectionCategories always == numSynthesisRateCategories, so only one is passed in for convience
 	initSphiTrace(samples);
-	initSynthesisRateAcceptanceRatioTrace(samples, num_genes, numSelectionCategories);
+	initSynthesisRateAcceptanceRatioTrace(num_genes, numSelectionCategories);
 	cspAcceptanceRatioTrace.resize(22);
 	initSynthesisRateTrace(samples, num_genes, numSelectionCategories);
 	initMixtureAssignmentTrace(samples, num_genes);
@@ -56,17 +56,14 @@ void Trace::initSphiTrace(unsigned samples)
 }
 
 
-void Trace::initSynthesisRateAcceptanceRatioTrace(unsigned samples, unsigned num_genes, unsigned numSynthesisRateCategories)
+void Trace::initSynthesisRateAcceptanceRatioTrace(unsigned num_genes, unsigned numSynthesisRateCategories)
 {
 	synthesisRateAcceptanceRatioTrace.resize(numSynthesisRateCategories);
 	for(unsigned category = 0; category < numSynthesisRateCategories; category++)
 	{
 		synthesisRateAcceptanceRatioTrace[category].resize(num_genes);
-		for (unsigned i = 0; i < num_genes; i++) 
-		{
-			synthesisRateAcceptanceRatioTrace[category][i].resize(samples);
-		}
 	}
+	//NOTE: this is not sized to samples because push_back takes care of the initialization
 }
 
 

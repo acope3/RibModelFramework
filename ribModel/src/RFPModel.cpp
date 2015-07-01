@@ -1,4 +1,4 @@
-#include "../include/RFP/RFPModel.h"
+#include "include/RFP/RFPModel.h"
 
 RFPModel::RFPModel() : Model()
 {
@@ -54,10 +54,10 @@ void RFPModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsi
 
 	for (unsigned index = 0; index < 61; index++) //number of codons, without the stop codons
 	{
-		std::string codon = SequenceSummary::IndexToCodon(index, false); //may not need
+		std::string codon = SequenceSummary::IndexToCodon(index, false);
 
-		double currAlpha = getAlphaByCodonIndex(index, alphaCategory, false); //getParamForCategory
-		double currLambdaPrime = getLambdaPrimeByCodonIndex(index, lambdaPrimeCategory, false); //getParamForCategory
+        double currAlpha = getParameterForCategory(alphaCategory, RFPParameter::alp, codon, false);
+		double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, RFPParameter::lmPri, codon, false);
 		unsigned currRFPObserved = gene.geneData.getRFPObserved(index);
 		unsigned currNumCodonsInMRNA = gene.geneData.getNumCodonsInMRNA(index);
 
@@ -97,11 +97,11 @@ void RFPModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
         unsigned currNumCodonsInMRNA = gene.geneData.getNumCodonsInMRNA(index);
         
         
-        double currAlpha = getAlphaByCodonIndex(index, alphaCategory, false);
-        double currLambdaPrime = getLambdaPrimeByCodonIndex(index, lambdaPrimeCategory, false);
+        double currAlpha = getParameterForCategory(alphaCategory, RFPParameter::alp, grouping, false);
+        double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, RFPParameter::lmPri, grouping, false);
         
-        double propAlpha = getAlphaByCodonIndex(index, alphaCategory, true);
-        double propLambdaPrime = getLambdaPrimeByCodonIndex(index, lambdaPrimeCategory, true);
+        double propAlpha = getParameterForCategory(alphaCategory, RFPParameter::alp, grouping, true);
+        double propLambdaPrime = getParameterForCategory(lambdaPrimeCategory, RFPParameter::lmPri, grouping, true);
         
         logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
         logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);

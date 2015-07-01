@@ -32,7 +32,7 @@ class Trace
 
 		void initSphiTrace(unsigned samples);
 		//aPhi will go here once implemented.
-		void initSynthesisRateAcceptanceRatioTrace(unsigned samples, unsigned num_genes, unsigned numExpressionCategories);
+		void initSynthesisRateAcceptanceRatioTrace(unsigned num_genes, unsigned numExpressionCategories);
 		void initSynthesisRateTrace(unsigned samples, unsigned num_genes, unsigned numExpressionCategories); 
 		void initMixtureAssignmentTrace(unsigned samples, unsigned num_genes); 
 		void initMixtureProbabilitesTrace(unsigned samples, unsigned numMixtures);

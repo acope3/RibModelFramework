@@ -29,14 +29,7 @@ class RFPParameter : public Parameter
 		std::vector<std::vector<double>> lambdaValues;
 		std::vector<unsigned> numAcceptForAlphaAndLambdaPrime;
     
-    const std::string groupList[61] = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
-        "TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT", "ATA", "ATC",
-        "ATT", "AAA", "AAG", "CTA", "CTC", "CTG", "CTT", "TTA", "TTG", "ATG",
-        "AAC", "AAT", "CCA", "CCC", "CCG", "CCT", "CAA", "CAG", "AGA", "AGG",
-        "CGA", "CGC", "CGG", "CGT", "TCA", "TCC", "TCG", "TCT", "ACA", "ACC",
-        "ACG", "ACT", "GTA", "GTC", "GTG", "GTT", "TGG", "TAC", "TAT", "AGC",
-        "AGT"};
-
+        std::vector <std::string> groupList;
 
 		// proposal bias and std for codon specific parameter -- probably can move up to Parameter
 		double bias_csp;
@@ -84,8 +77,8 @@ class RFPParameter : public Parameter
 		virtual void updateSynthesisRateTrace(unsigned sample, unsigned geneIndex){traces.updateSynthesisRateTrace(sample, geneIndex, currentSynthesisRateLevel);}
 		virtual void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex) {traces.updateMixtureAssignmentTrace(sample, geneIndex, mixtureAssignment[geneIndex]);}
 		virtual void updateMixtureProbabilitiesTrace(unsigned samples) {traces.updateMixtureProbabilitiesTrace(samples, categoryProbabilities);}
-		void updateCodonSpecificParameterTrace(unsigned sample, char aa) {traces.updateCodonSpecificParameterTrace(sample, aa, currentLambdaPrimeParameter, 
-				currentAlphaParameter);}
+		void updateCodonSpecificParameterTrace(unsigned sample, std::string codon) {traces.updateCodonSpecificParameterTrace(sample, codon, 
+				currentLambdaPrimeParameter, currentAlphaParameter);}
 		
 
 		// functions to manage codon specific parameter
@@ -97,7 +90,7 @@ class RFPParameter : public Parameter
 		
 
 		//Proposal Widths:
-		void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth);
+		void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth); //may make virtual
 		virtual void adaptSphiProposalWidth(unsigned adaptationWidth);
 		virtual void adaptSynthesisRateProposalWidth(unsigned adaptationWidth);
 
@@ -116,10 +109,16 @@ class RFPParameter : public Parameter
 	
 
 		// Other functions
-		void getParameterForCategory(unsigned category, unsigned parameter, char aa, bool proposal, double* returnValue);
+        double getParameterForCategory(unsigned category, unsigned paramType, std::string codon, bool proposal);
 		virtual std::vector <double> getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex);
         virtual std::string getGrouping(unsigned index) {return groupList[index];}
-
+    
+    
+        //Statics:
+        static const unsigned alp;
+        static const unsigned lmPri;
+    
+    
 		//Still need????
 		std::vector<std::vector<double>> calculateSelectionCoefficients(unsigned sample, unsigned mixture);
 #ifndef STANDALONE

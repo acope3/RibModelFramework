@@ -25,7 +25,7 @@ class ROCModel : public Model
 	virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures);
 
 	//Parameter wrapper functions:
-	virtual void initTraces(unsigned samples, unsigned num_genes, unsigned adaptiveSamples) {parameter -> initAllTraces(samples, num_genes, adaptiveSamples);}
+	virtual void initTraces(unsigned samples, unsigned num_genes) {parameter -> initAllTraces(samples, num_genes);}
 	virtual void writeRestartFile(std::string filename) {return parameter->writeEntireRestartFile(filename);}       
 	virtual double getSphi(bool proposed = false) {return parameter->getSphi(proposed);}
 	virtual double getSphiProposalWidth() {return parameter->getSphiProposalWidth();}
