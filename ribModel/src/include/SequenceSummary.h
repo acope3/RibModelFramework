@@ -40,6 +40,8 @@ class SequenceSummary
 
 		unsigned getRFPObserved(unsigned codonIndex) {return RFPObserved[codonIndex];}
 		unsigned getNumCodonsInMRNA(unsigned codonIndex) {return numCodonsInMRNA[codonIndex];}
+		void setRFPObserved(unsigned codonIndex, unsigned value) {RFPObserved[codonIndex] = value;}
+		void setNumCodonsInMRNA(unsigned codonIndex, unsigned value) {numCodonsInMRNA[codonIndex] = value;}
 
 		//R Wrapper Functions
 		int getAAcount(std::string aa) {aa[0] = (char) std::toupper(aa[0]);	return getAAcountForAA(aa);}

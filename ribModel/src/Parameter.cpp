@@ -262,6 +262,7 @@ bool Parameter::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbo
 
 void Parameter::writeBasicRestartFile(std::string filename)
 {
+	std::cout <<"Writing File\n";
 	std::ofstream out;
 	std::string output = "";
 	std::ostringstream oss;
@@ -281,7 +282,6 @@ void Parameter::writeBasicRestartFile(std::string filename)
 		else oss << " ";
 	}
 	if (i % 10 != 0) oss << "\n";
-	oss << "\n";
 	oss <<">Sphi:\n" << Sphi <<"\n";
 	oss <<">Aphi:\n" << Aphi <<"\n";
 	oss <<">numParam:\n" << numParam <<"\n";
@@ -366,11 +366,11 @@ void Parameter::writeBasicRestartFile(std::string filename)
 	oss.clear();
 	oss.str("");
 
-	for (i = 0; i < maxGrouping; i++) // TODO: change this from being hardcoded
+	for (i = 0; i < groupList.size(); i++) // TODO: change this from being hardcoded
 	{
-		std::string aa = SequenceSummary::IndexToAA(i);
+		std::string aa = groupList[i];
 		oss <<">covarianceMatrix:\n" << aa <<"\n";
-		CovarianceMatrix m = covarianceMatrix[i];
+		CovarianceMatrix m = covarianceMatrix[SequenceSummary::AAToAAIndex(aa)];
 		std::vector<double>* tmp = m.getCovMatrix();
 		int size = m.getNumVariates();
     for(int k = 0; k < size * size; k++)
@@ -380,6 +380,7 @@ void Parameter::writeBasicRestartFile(std::string filename)
     }
     oss <<"\n***\n";
 	}
+	std::cout <<"Done writing\n";
 	output += oss.str();
 	out << output;
 	out.close();
@@ -417,6 +418,7 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 				getline(input,tmp);
 				//char aa = tmp[0];
 				cat = SequenceSummary::AAToAAIndex(tmp); // ????
+				std::cout << cat <<"\n";
 			}
 		}
 		else if (flag == 2)
@@ -524,7 +526,7 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 				if (tmp == "***") //end of matrix
 				{
 					CovarianceMatrix CM(mat);
-					covarianceMatrix[cat] = CM; //does old one get deleted/overwrote?
+					covarianceMatrix.push_back(CM); //does old one get deleted/overwrote?
 				}
 				double val;
 				iss.str(tmp);

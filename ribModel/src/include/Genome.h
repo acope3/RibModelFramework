@@ -29,6 +29,7 @@ class Genome
 
 		void readFasta(std::string filename, bool Append = false);
 		void writeFasta(std::string filename, bool simulated = false);
+		void readRFPFile(std::string filename);
 		void addGene(const Gene& gene);
 		std::vector<unsigned> getCodonCountsPerGene(std::string codon);
 		std::vector <Gene> getGenes() {return genes;}

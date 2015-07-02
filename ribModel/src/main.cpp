@@ -305,26 +305,44 @@ void testInitFromRestartFile()
 
 }
 
+void testReadRFPFile()
+{
+	std::cout <<"------------------- TEST READRFPFILE ----------------------" <<"\n";
+	Genome genome;	
+
+	genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+	std::cout <<"Writing to screen:\n";
+	for (unsigned i = 0; i < genome.getGenomeSize(); i++)
+	{
+		std::cout <<"Working with gene " << i <<"\n";
+		Gene gene = genome.getGene(i);
+		SequenceSummary SS = gene.geneData;
+		for (unsigned j = 0; j < 64; j++)
+		{
+			std::cout << gene.getId() <<" " << SS.getRFPObserved(j) << " " << SS.getNumCodonsInMRNA(j) << " " << SS.IndexToCodon(j) <<"\n";
+		}
+	}
+	std::cout <<"------------------- TEST READRFPFILE ----------------------" <<"\n";
+}
 int main()
 {
 	enum User { cedric, gabe, jeremy };
 
 	/* Test variables */
-	User user = cedric;
+	User user = gabe;
 
 	bool read = false;
 	unsigned index;
 
 	Genome genome;
 	std::cout << "reading fasta file" << std::endl;
-	
 	switch (user) {
 		case cedric:
 			genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
 			//genome.readFasta("C:/Users/Cedric/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta");
 			break;
 		case gabe:
-			genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR.fastaa");
+			genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
 			break;
 		case jeremy:
 			genome.readFasta("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
@@ -332,7 +350,7 @@ int main()
 	}
 
 	std::cout << "done reading fasta file" << std::endl;
-	bool testing = false;
+	bool testing = true;
 
 	if (testing)
 	{
@@ -348,6 +366,7 @@ int main()
 		//testCovMatrixOverloading();
 		testWriteRestartFile(genome);
 		testInitFromRestartFile();
+		//testReadRFPFile();
 	}
 	else{
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
