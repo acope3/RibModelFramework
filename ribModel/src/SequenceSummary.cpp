@@ -1,4 +1,4 @@
-#include "include/SequenceSummary.h"
+#include "SequenceSummary.h"
 
 #include <cctype>
 #include <algorithm>

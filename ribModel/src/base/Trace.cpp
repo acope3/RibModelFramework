@@ -1,4 +1,4 @@
-#include "include/base/Trace.h"
+#include "Trace.h"
 #ifndef STANDALONE
 #include <Rcpp.h>
 using namespace Rcpp;

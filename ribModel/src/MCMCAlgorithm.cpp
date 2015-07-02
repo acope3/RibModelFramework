@@ -1,5 +1,5 @@
-#include "include/MCMCAlgorithm.h"
-#include "include/CovarianceMatrix.h"
+#include "MCMCAlgorithm.h"
+#include "CovarianceMatrix.h"
 
 #include <random>
 #include <cstdlib>
