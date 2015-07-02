@@ -5,7 +5,7 @@ initializeMCMCObject <- function(samples, thining=1, adaptive.width=100, est.exp
   return(mcmc)
 }
 
-runMCMC <- function(mcmc, genome, model)
+runMCMC <- function(mcmc, genome, model, ncores = 1)
 {
   UseMethod("runMCMC", mcmc)
 }
