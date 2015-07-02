@@ -310,8 +310,9 @@ void testReadRFPFile()
 	std::cout <<"------------------- TEST READRFPFILE ----------------------" <<"\n";
 	Genome genome;	
 
-	genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
-	std::cout <<"Writing to screen:\n";
+	genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/test.csv");
+	std::string codon = "ATG";	
+	std::cout << SequenceSummary::CodonToIndex(codon) <<"\n";
 	for (unsigned i = 0; i < genome.getGenomeSize(); i++)
 	{
 		std::cout <<"Working with gene " << i <<"\n";
@@ -364,9 +365,9 @@ int main()
 		//testThetaKMatrix();
 		//testSimulateGenome(genome);
 		//testCovMatrixOverloading();
-		testWriteRestartFile(genome);
-		testInitFromRestartFile();
-		//testReadRFPFile();
+		//testWriteRestartFile(genome);
+		//testInitFromRestartFile();
+		testReadRFPFile();
 	}
 	else{
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;

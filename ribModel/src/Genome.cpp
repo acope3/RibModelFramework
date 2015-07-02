@@ -196,11 +196,10 @@ void Genome::readRFPFile(std::string filename)
 	std::getline(Fin, tmp); //trash the first line
 	std::string prevID = "";
 	Gene tmpGene;
-	int a = 0;
+	SequenceSummary SS;
 	bool first = true;
-	while (a < 63)
+	while (getline(Fin,tmp))
 	{
-		getline(Fin, tmp);
 		unsigned pos = tmp.find(",");
 		std::string ID = tmp.substr(0, pos);
 		unsigned pos2 = tmp.find(",", pos + 1);
@@ -211,9 +210,12 @@ void Genome::readRFPFile(std::string filename)
 		value = tmp.substr(pos2 + 1, pos - (pos2 + 1));
 		unsigned counts = std::atoi(value.c_str());
 
-		std::string codon = tmp.substr(pos + 1, tmp.size());
+		std::string codon = tmp.substr(pos + 1, tmp.size() - 1 - (pos + 1));
+		std::cout <<"pos + 1 = " << pos + 1 <<"\n";
+		std::cout <<"tmp.size() - (pos + 1) = " << tmp.size() - (pos + 1) <<"\n";
 
-		std::cout << ID <<" " << tmpRFP <<" " << counts << " " << codon <<"\n";
+		std::cout << codon <<"\n";
+		//std::cout << ID <<" " << tmpRFP <<" " << counts << " " << codon <<"\n";
 		if (first)
 		{
 			prevID = ID;
@@ -224,22 +226,34 @@ void Genome::readRFPFile(std::string filename)
 			tmpGene.setId(prevID);
 			tmpGene.setDescription("No description for RFP Model");
 			tmpGene.setSequence("");
+			tmpGene.geneData = SS;
+		//	std::cout << tmpGene.geneData.getNumCodonsInMRNA(0) <<"\n";
 			addGene(tmpGene); //add to genome
+			//std::cout << genes[genes.size()-1].geneData.getNumCodonsInMRNA(0) <<"\n";
 			tmpGene.clear();
+			//std::cout << genes[genes.size()-1].geneData.getNumCodonsInMRNA(0) <<"\n";
+			//SS.clear();
 		}
-		unsigned index = SequenceSummary::CodonToIndex(codon);
-		tmpGene.geneData.setRFPObserved(index, tmpRFP);
-		tmpGene.geneData.setNumCodonsInMRNA(index, counts);
-		//TODO: Add the other two fields for completeness			
 		prevID = ID;
-		a++;
+		unsigned index = SequenceSummary::CodonToIndex(codon);
+		//tmpGene.geneData.setRFPObserved(index, tmpRFP);
+		//tmpGene.geneData.setNumCodonsInMRNA(index, counts);
+		SS.setRFPObserved(index, tmpRFP);
+		SS.setNumCodonsInMRNA(index, counts);
+
+		//TODO: Add the other two fields for completeness			
 	}
 
 	//for the last gene
 	tmpGene.setId(prevID);
 	tmpGene.setDescription("No description for RFP Model");
 	tmpGene.setSequence("");
+	tmpGene.geneData = SS;
+	//std::cout << tmpGene.geneData.getNumCodonsInMRNA(0) <<"\n";
+
 	addGene(tmpGene); //add to genome
+	//std::cout << tmpGene.geneData.getNumCodonsInMRNA(0) <<"\n";
+	//SS.clear();
 
 	Fin.close();
 }
