@@ -329,7 +329,7 @@ int main()
 	enum User { cedric, gabe, jeremy };
 
 	/* Test variables */
-	User user = gabe;
+	User user = cedric;
 
 	bool read = false;
 	unsigned index;
@@ -350,7 +350,7 @@ int main()
 	}
 
 	std::cout << "done reading fasta file" << std::endl;
-	bool testing = true;
+	bool testing = false;
 
 	if (testing)
 	{

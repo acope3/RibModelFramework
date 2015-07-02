@@ -560,7 +560,7 @@ void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 	{
 		if (i == 21 || i == 10 || i == 18)
 			continue;
-		std::cout << SequenceSummary::AminoAcidArray[i] << "\t\t";
+		std::cout << SequenceSummary::AminoAcidArray[i] << "\t";
 	}
 	std::cout << "\n\t";
 	for (unsigned i = 0; i < numCSPsets; i++)

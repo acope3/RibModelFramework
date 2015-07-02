@@ -72,9 +72,6 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	double* dirichletParameters = new double[numMixtures]();
 	//initialize parameter's size
 
-#ifndef __APPLE__
-#pragma omp parallel for
-#endif
 	for(int i = 0; i < numGenes; i++)
 	{
 		Gene gene = genome.getGene(i);
@@ -126,11 +123,11 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			{
 				model.updateSynthesisRate(i, k);
 				// only count each gene once, not numSynthesisRateCategories times
-				#pragma omp critical
+				//#pragma omp critical
 				if(mixtureAssignmentOfGene == k) logLikelihood += propLogLike;
 			}else{
 				// only count each gene once, not numSynthesisRateCategories times
-				#pragma omp critical
+				//#pragma omp critical
 				if(mixtureAssignmentOfGene == k) logLikelihood += currLogLike;
 			}
 		}
@@ -194,7 +191,7 @@ void MCMCAlgorithm::acceptRejectHyperParameter(int numGenes, Model& model, int i
 	double proposedMPhi = -(proposedSphi * proposedSphi) / 2;
 
 #ifndef __APPLE__
-#pragma omp parallel for
+#pragma omp parallel for reduction(+:logProbabilityRatio)
 #endif
 	for(int i = 0; i < numGenes; i++)
 	{
@@ -228,9 +225,6 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 	double acceptanceRatioForAllMixtures = 0.0;
 	unsigned size = model.getGroupListSize();
 
-#ifndef __APPLE__
-#pragma omp parallel for
-#endif
 	for(unsigned i = 0; i < size; i++)
 	{
 		std::string grouping = model.getGrouping(i);

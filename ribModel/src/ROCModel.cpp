@@ -35,6 +35,12 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsi
 	double phiValue = parameter->getSynthesisRate(geneIndex, expressionCategory, false);
 	double phiValue_proposed = parameter->getSynthesisRate(geneIndex, expressionCategory, true);
 
+	double mutation[5];
+	double selection[5];
+	int codonCount[5];
+#ifndef __APPLE__
+#pragma omp parallel for private(mutation, selection, codonCount) reduction(+:logLikelihood,logLikelihood_proposed)
+#endif
 	for(unsigned i = 0; i < getGroupListSize(); i++)
 	{
 		std::string curAA = getGrouping(i);
@@ -54,16 +60,12 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsi
 		int* codonCount = new int[numCodons]();
 		obtainCodonCount(seqsum, curAA, codonCount);
 
-		//#pragma omp parallel num_threads(2)
-		{
-			logLikelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
-			logLikelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue_proposed);
-		}
-		//std::cout <<"deleting mutation selection codonCount\n";
-		delete [] mutation;
-		delete [] selection;
-		delete [] codonCount;
-		//std::cout <<"DONE deleting mutation selection codonCount\n";
+		logLikelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
+		logLikelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue_proposed);
+
+		//delete [] mutation;
+		//delete [] selection;
+		//delete [] codonCount;
 	}
 
 	double sPhi = parameter->getSphi(false);
@@ -148,6 +150,15 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 	int numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
 	double likelihood = 0.0;
 	double likelihood_proposed = 0.0;
+
+	double mutation[5];
+	double selection[5];
+	double mutation_proposed[5];
+	double selection_proposed[5];
+	int codonCount[5];
+#ifndef __APPLE__
+#pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed, codonCount)
+#endif
 	for(int i = 0; i < numGenes; i++)
 	{
 		Gene gene = genome.getGene(i);
@@ -164,27 +175,26 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 		double phiValue = parameter->getSynthesisRate(i, expressionCategory, false);
 
 		// get current mutation and selection parameter
-		double* mutation = new double[numCodons - 1]();
+		//double* mutation = new double[numCodons - 1]();
 		parameter->getParameterForCategory(mutationCategory, ROCParameter::dM, grouping, false, mutation);
-		double* selection = new double[numCodons - 1]();
+		//double* selection = new double[numCodons - 1]();
 		parameter->getParameterForCategory(selectionCategory, ROCParameter::dEta, grouping, false, selection);
 
 		// get proposed mutation and selection parameter
-		double* mutation_proposed = new double[numCodons - 1]();
+		//double* mutation_proposed = new double[numCodons - 1]();
 		parameter->getParameterForCategory(mutationCategory, ROCParameter::dM, grouping, true, mutation_proposed);
-		double* selection_proposed = new double[numCodons - 1]();
+		//double* selection_proposed = new double[numCodons - 1]();
 		parameter->getParameterForCategory(selectionCategory, ROCParameter::dEta, grouping, true, selection_proposed);
 
-		int* codonCount = new int[numCodons]();
+		//int* codonCount = new int[numCodons]();
 		obtainCodonCount(seqsum, grouping, codonCount);
 		likelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
 		likelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation_proposed, selection_proposed, phiValue);
-
-		delete [] codonCount;
-		delete [] mutation;
-		delete [] selection;
-		delete [] mutation_proposed;
-		delete [] selection_proposed;
+		//delete [] codonCount;
+		//delete [] mutation;
+		//delete [] selection;
+		//delete [] mutation_proposed;
+		//delete [] selection_proposed;
 	}
 	logAcceptanceRatioForAllMixtures = likelihood_proposed - likelihood;
 }
