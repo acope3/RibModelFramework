@@ -9,9 +9,9 @@ runMCMC <- function(mcmc, genome, model)
 {
   UseMethod("runMCMC", mcmc)
 }
-runMCMC.Rcpp_MCMCAlgorithm <- function(mcmc, genome, model)
+runMCMC.Rcpp_MCMCAlgorithm <- function(mcmc, genome, model, ncores = 1)
 {
-  mcmc$run(genome, model)
+  mcmc$run(genome, model, ncores)
 }
 setRestartSettings <- function(mcmc, filename, samples, write.multiple=TRUE)
 {

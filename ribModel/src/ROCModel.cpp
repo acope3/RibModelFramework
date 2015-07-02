@@ -3,6 +3,7 @@
 #include <math.h>
 #include <cfloat>
 #include <iostream>
+
 ROCModel::ROCModel() : Model()
 {
 	parameter = nullptr;
@@ -33,7 +34,7 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsi
 
 	double phiValue = parameter->getSynthesisRate(geneIndex, expressionCategory, false);
 	double phiValue_proposed = parameter->getSynthesisRate(geneIndex, expressionCategory, true);
-	//#pragma omp parallel for
+
 	for(unsigned i = 0; i < getGroupListSize(); i++)
 	{
 		std::string curAA = getGrouping(i);

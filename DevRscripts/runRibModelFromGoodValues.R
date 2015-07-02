@@ -12,25 +12,25 @@ mixDef <- "allUnique"
 geneAssignment <- c(rep(1,500), rep(2,500))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
 
-
+#parameter <- initializeParameterObject(restart.file = "2000restartFile.rst")
 
 phivals <- parameter$readPhiValues( "../ribModel/data/simulatedAllUniqueR_phi.csv")
 parameter$initializeExpressionByRandom(phivals)
 parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")
 parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")
 # initialize MCMC object
-samples <- 100
+samples <- 1000
 thining <- 10
-adaptiveWidth <- 10
+adaptiveWidth <- 100
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, 
                              est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
 # get model object
 model <- initializeModelObject(parameter, "ROC")
 
-setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth, TRUE)
+setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth*10, TRUE)
 #run mcmc on genome with parameter using model
 system.time(
-  runMCMC(mcmc, genome, model)
+  runMCMC(mcmc, genome, model, 8)
 )
 
 
@@ -67,8 +67,8 @@ dev.off()
 
 plot(trace, what = "Expression", geneIndex = 999, mixture = 2)
 
-pdf("simulated_Genome_allUnique_startCSP_VGAM_startPhi_SCUO_adaptSphi_True_mix2.pdf", width = 11, height = 12)
-mixture <- 2
+pdf("simulated_Genome_allUnique_startCSP_VGAM_startPhi_SCUO_adaptSphi_True_mix1.pdf", width = 11, height = 12)
+mixture <- 1
 plot(trace, what = "Mutation", mixture = mixture)
 plot(trace, what = "Selection", mixture = mixture)
 
@@ -79,7 +79,7 @@ plot(model, genome, parameter, samples = samples*0.1, mixture = mixture, main = 
 names.aa <- aminoAcids()
 selection <- c()
 mutation <- c()
-csp <- read.table("../ribModel/data/simulated_CSP1.csv", sep=",", header=T)
+csp <- read.table("../ribModel/data/simulated_CSP0.csv", sep=",", header=T)
 idx.eta <- grepl(pattern = "[A-Z].[A-Z]{3}.Delta.eta", x = as.character(csp[,1]))
 idx.mu <- grepl(pattern = "[A-Z].[A-Z]{3}.log.mu", x = as.character(csp[,1]))
 for(aa in names.aa)

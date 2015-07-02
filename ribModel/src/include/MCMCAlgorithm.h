@@ -9,6 +9,7 @@ class MCMCAlgorithm
 		unsigned samples;
 		unsigned thining;
 		unsigned adaptiveWidth;
+		unsigned numCores;
 
 		bool estimateSynthesisRate;
 		bool estimateCodonSpecificParameter;
@@ -31,7 +32,7 @@ class MCMCAlgorithm
 		virtual ~MCMCAlgorithm();
 		MCMCAlgorithm(const MCMCAlgorithm& other);
 
-		void run(Genome& genome, Model& model);
+		void run(Genome& genome, Model& model, unsigned numCores = 1u);
 
 		bool isEstimateSynthesisRate() {return estimateSynthesisRate;}
 		bool isEstimateCodonSpecificParameter() {return estimateCodonSpecificParameter;}

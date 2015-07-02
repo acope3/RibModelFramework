@@ -1,16 +1,21 @@
 #include "include/MCMCAlgorithm.h"
 #include "include/CovarianceMatrix.h"
 
+#ifdef STANDALONE
 #include <random>
+#endif
+
 #include <cstdlib>
-#include <thread>
 #include <sstream>
 
 #include <iostream>
 #include <fstream>
 #include <stdlib.h> //can be removed later
 
-//#include <omp.h>
+#ifndef __APPLE__
+#include <omp.h>
+#include <thread>
+#endif
 
 
 
@@ -20,6 +25,7 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * 
 	MCMCAlgorithm(1000, 1, true, true, true);
 	likelihoodTrace.resize(samples);
 	writeRestartFile = false;
+	numCores = 1u;
 }
 
 	MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thining, unsigned _adaptiveWidth, bool _estimateSynthesisRate, bool _estimateCodonSpecificParameter, bool _estimateHyperParameter)
@@ -28,6 +34,7 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * 
 {
 	likelihoodTrace.resize(samples);
 	writeRestartFile = false;
+	numCores = 1u;
 }
 
 MCMCAlgorithm::~MCMCAlgorithm()
@@ -64,6 +71,10 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	unsigned numMixtures = model.getNumMixtureElements();
 	double* dirichletParameters = new double[numMixtures]();
 	//initialize parameter's size
+
+#ifndef __APPLE__
+#pragma omp parallel for
+#endif
 	for(int i = 0; i < numGenes; i++)
 	{
 		Gene gene = genome.getGene(i);
@@ -115,11 +126,11 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			{
 				model.updateSynthesisRate(i, k);
 				// only count each gene once, not numSynthesisRateCategories times
-				//#pragma omp critical
+				#pragma omp critical
 				if(mixtureAssignmentOfGene == k) logLikelihood += propLogLike;
 			}else{
 				// only count each gene once, not numSynthesisRateCategories times
-				//#pragma omp critical
+				#pragma omp critical
 				if(mixtureAssignmentOfGene == k) logLikelihood += currLogLike;
 			}
 		}
@@ -182,6 +193,9 @@ void MCMCAlgorithm::acceptRejectHyperParameter(int numGenes, Model& model, int i
 	double proposedSphi = model.getSphi(true);
 	double proposedMPhi = -(proposedSphi * proposedSphi) / 2;
 
+#ifndef __APPLE__
+#pragma omp parallel for
+#endif
 	for(int i = 0; i < numGenes; i++)
 	{
 		unsigned mixture = model.getMixtureAssignment(i);
@@ -213,6 +227,10 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 {
 	double acceptanceRatioForAllMixtures = 0.0;
 	unsigned size = model.getGroupListSize();
+
+#ifndef __APPLE__
+#pragma omp parallel for
+#endif
 	for(unsigned i = 0; i < size; i++)
 	{
 		std::string grouping = model.getGrouping(i);
@@ -231,8 +249,12 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 	}
 }
 
-void MCMCAlgorithm::run(Genome& genome, Model& model)
+void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores)
 {
+#ifndef __APPLE__
+	omp_set_num_threads(numCores);
+#endif
+
 	unsigned maximumIterations = samples * thining;
 	// initialize everything
 

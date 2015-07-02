@@ -412,7 +412,7 @@ int main()
 
 			mcmc.setRestartFileSettings("RestartFile.txt", 20, true);
 			std::cout << "starting MCMC" << std::endl;
-			mcmc.run(genome, model);
+			mcmc.run(genome, model, 4);
 			std::cout << std::endl << "Finish MCMC" << std::endl;
 
 			std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
