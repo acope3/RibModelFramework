@@ -144,6 +144,16 @@ void ROCParameter::initROCParameterSet()
 		currentSelectionParameter[i] = tmp;
 	}
 
+  for (unsigned i = 0; i < maxGrouping; i++) // TODO: change this from being hardcoded
+  {
+    std::string aa = SequenceSummary::AminoAcidArray[i];
+    unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa, true);
+    CovarianceMatrix m((numMutationCategories + numSelectionCategories) * numCodons);
+    m.choleskiDecomposition();
+    covarianceMatrix.push_back(m);
+  }
+
+
 }
 
 std::vector<std::vector<double>> ROCParameter::calculateSelectionCoefficients(unsigned sample, unsigned mixture)

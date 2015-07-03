@@ -23,7 +23,7 @@ double RFPModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double 
 		unsigned currNumCodonsInMRNA, double phiValue)
 {
 	//TODO: is lgamma the correct function to use here? Any reason to make the math cleaner?
-	double logLikelihood = (std::log(std::lgamma((currNumCodonsInMRNA * currAlpha) + currRFPObserved)) - std::log(std::lgamma(currNumCodonsInMRNA * currAlpha)))
+	double logLikelihood = ((std::lgamma((currNumCodonsInMRNA * currAlpha) + currRFPObserved)) - (std::lgamma(currNumCodonsInMRNA * currAlpha)))
 		+ (currRFPObserved * (std::log(phiValue) + std::log(currLambdaPrime + phiValue))) + ((currNumCodonsInMRNA * currAlpha) * (std::log(currLambdaPrime) + 
 					std::log(currLambdaPrime + phiValue)));
 
@@ -59,7 +59,7 @@ void RFPModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsi
         double currAlpha = getParameterForCategory(alphaCategory, RFPParameter::alp, codon, false);
 		double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, RFPParameter::lmPri, codon, false);
 		unsigned currRFPObserved = gene.geneData.getRFPObserved(index);
-		unsigned currNumCodonsInMRNA = gene.geneData.getNumCodonsInMRNA(index);
+		unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(index);
 
 		logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
 		logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue_proposed);
@@ -94,7 +94,7 @@ void RFPModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
         // get non codon specific values, calculate likelihood conditional on these
         double phiValue = parameter->getSynthesisRate(i, synthesisRateCategory, false);
         unsigned currRFPObserved = gene.geneData.getRFPObserved(index);
-        unsigned currNumCodonsInMRNA = gene.geneData.getNumCodonsInMRNA(index);
+        unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(index);
         
         
         double currAlpha = getParameterForCategory(alphaCategory, RFPParameter::alp, grouping, false);

@@ -41,6 +41,7 @@ class RFPParameter: public Parameter {
 
 	public:
 		//Constructors & Destructors:
+		RFPParameter();
 		explicit RFPParameter(std::string filename);
 		RFPParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
 				std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer = true,
@@ -74,7 +75,7 @@ class RFPParameter: public Parameter {
 		void initAllTraces(unsigned samples, unsigned num_genes)
 		{
 			traces.initAllTraces(samples, num_genes, numMutationCategories, numSelectionCategories, numParam,
-					numMixtures, categories);
+					numMixtures, categories, groupList.size());
 		}
 		//update trace functions
 		virtual void updateSphiTrace(unsigned sample)

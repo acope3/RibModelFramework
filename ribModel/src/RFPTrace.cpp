@@ -10,9 +10,9 @@ RFPTrace::RFPTrace() : Trace()
 }
 
 void RFPTrace::initAllTraces(unsigned samples, unsigned num_genes, unsigned numMutationCategories, unsigned numSelectionCategories,
-		unsigned numParam, unsigned numMixtures, std::vector<mixtureDefinition> &_categories)
+		unsigned numParam, unsigned numMixtures, std::vector<mixtureDefinition> &_categories, unsigned maxGrouping)
 {
-	initBaseTraces(samples, num_genes, numMutationCategories, numMixtures, _categories);
+	initBaseTraces(samples, num_genes, numMutationCategories, numMixtures, _categories, maxGrouping);
 	initRFPTraces(samples, numMutationCategories, numSelectionCategories, numParam);
 }
 

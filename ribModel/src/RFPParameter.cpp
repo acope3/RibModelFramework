@@ -5,7 +5,12 @@ using namespace Rcpp;
 #endif
 
 //Constructors & Destructors:
-RFPParameter::RFPParameter(std::string filename) : Parameter(61)
+RFPParameter::RFPParameter() : Parameter()
+{
+}
+
+
+RFPParameter::RFPParameter(std::string filename) : Parameter(64)
 {
 	initFromRestartFile(filename);
 	numParam = 61;
@@ -13,7 +18,7 @@ RFPParameter::RFPParameter(std::string filename) : Parameter(61)
 
 
 RFPParameter::RFPParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix, 
-		bool splitSer, std::string _mutationSelectionState) : Parameter(61)
+		bool splitSer, std::string _mutationSelectionState) : Parameter(64)
 {
 	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
 	initRFPParameterSet();
@@ -76,11 +81,15 @@ void RFPParameter::initRFPParameterSet()
 	lambdaValues.resize(lambdaPrimeCategories);
 	numParam = 61;
 
-	for (unsigned i = 0; i < numParam; i++)
+	for (unsigned i = 0; i < alphaCategories; i++)
 	{
 		std::vector <double> tmp(numParam,1.0);
 		currentAlphaParameter[i] = tmp;
 		proposedAlphaParameter[i] = tmp;
+	}
+	for (unsigned i = 0; i < lambdaPrimeCategories; i++)
+	{
+		std::vector <double> tmp(numParam,1.0);
 		currentLambdaPrimeParameter[i] = tmp;
 		proposedLambdaPrimeParameter[i] = tmp;
 		lambdaValues[i] = tmp; //Maybe we don't initialize this one? or we do it differently?

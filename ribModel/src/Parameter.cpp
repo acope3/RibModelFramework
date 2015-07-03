@@ -169,14 +169,8 @@ void Parameter::initParameterSet(double sphi, unsigned _numMixtures, std::vector
     std_phi[i] = tempStdPhi;
   }
 
-  for (unsigned i = 0; i < maxGrouping; i++) // TODO: change this from being hardcoded
-  {
-    std::string aa = SequenceSummary::AminoAcidArray[i];
-    unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa, true);
-    CovarianceMatrix m((numMutationCategories + numSelectionCategories) * numCodons);
-    m.choleskiDecomposition();
-    covarianceMatrix.push_back(m);
-  }
+	//TODO: Moved CM stuff down to ROCParameter to avoid interfering with RFPModel. Function needs to
+	//be changed at some point it would seem anyways.
 }
 
 
@@ -804,7 +798,7 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 	for(unsigned i = 0u; i < genomeSize; i++)
 	{
 		index[i] = i;
-		scuoValues[i] = calculateSCUO( genome.getGene(i), maxGrouping );
+		scuoValues[i] = calculateSCUO( genome.getGene(i), 22);
 		expression[i] = Parameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
 	}
 	quickSortPair(scuoValues, index, 0, genomeSize);
