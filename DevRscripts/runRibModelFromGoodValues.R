@@ -30,7 +30,7 @@ model <- initializeModelObject(parameter, "ROC")
 setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth*10, TRUE)
 #run mcmc on genome with parameter using model
 system.time(
-  runMCMC(mcmc, genome, model, 6)
+  runMCMC(mcmc, genome, model, 7)
 )
 
 

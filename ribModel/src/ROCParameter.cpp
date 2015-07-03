@@ -532,6 +532,9 @@ void ROCParameter::adaptSphiProposalWidth(unsigned adaptationWidth)
 
 void ROCParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
 {
+	unsigned acceptanceUnder = 0u;
+	unsigned acceptanceOver = 0u;
+
 	for (unsigned cat = 0u; cat < numSelectionCategories; cat++)
 	{
 		unsigned numGenes = numAcceptForSynthesisRate[cat].size();
@@ -542,14 +545,19 @@ void ROCParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
 			if (acceptanceLevel < 0.2)
 			{
 				std_phi[cat][i] *= 0.8;
+				if (acceptanceLevel < 0.15) acceptanceUnder++;
 			}
 			if (acceptanceLevel > 0.3)
 			{
 				std_phi[cat][i] *= 1.2;
+				if (acceptanceLevel > 0.35) acceptanceOver++;
 			}
 			numAcceptForSynthesisRate[cat][i] = 0u;
 		}
 	}
+	std::cout << "acceptance ratio for synthesis rate:\n";
+	std::cout << "\t acceptance ratio to low: " << acceptanceUnder << "\n";
+	std::cout << "\t acceptance ratio to high: " << acceptanceOver << "\n";
 }
 
 void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)

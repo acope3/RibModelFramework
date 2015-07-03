@@ -146,7 +146,7 @@ void Parameter::initParameterSet(double sphi, unsigned _numMixtures, std::vector
     std::vector<unsigned> tempAccExpr(numGenes, 0u);
     numAcceptForSynthesisRate[i] = tempAccExpr;
 
-    std::vector<double> tempStdPhi(numGenes, 0.1);
+    std::vector<double> tempStdPhi(numGenes, 1.0);
     std_phi[i] = tempStdPhi;
   }
 
