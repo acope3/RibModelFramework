@@ -35,6 +35,9 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsi
 	double phiValue = parameter->getSynthesisRate(geneIndex, expressionCategory, false);
 	double phiValue_proposed = parameter->getSynthesisRate(geneIndex, expressionCategory, true);
 
+	double mutation[5];
+	double selection[5];
+	int codonCount[5];
 #ifndef __APPLE__
 #pragma omp parallel for private(mutation, selection, codonCount) reduction(+:logLikelihood,logLikelihood_proposed)
 #endif
