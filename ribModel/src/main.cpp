@@ -447,22 +447,6 @@ int main()
 			std::vector<std::string> files(2);
 
 			switch (user) {
-<<<<<<< HEAD
-			case cedric:
-				files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/simulated_CSP0.csv");
-				files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/simulated_CSP1.csv");
-				//files[0] = std::string("C:/Users/Cedric/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv");
-				//files[1] = std::string("C:/Users/Cedric/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv");
-				break;
-
-			case gabe:
-				files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_CSP0.csv");
-				files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_CSP1.csv");
-				break;
-			case jeremy:
-				files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_CSP0.csv");
-				files[1] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_CSP1.csv");
-=======
 				case cedric:
 					files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/simulated_CSP0.csv");
 					files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/simulated_CSP1.csv");
@@ -478,7 +462,6 @@ int main()
 					files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_CSP0.csv");
 					files[1] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_CSP1.csv");
 					break;
->>>>>>> 2ce74f682bc0273da47c0535d28ac918ba57025a
 			}
 
 			tmp.initMutationSelectionCategories(files, tmp.getNumMutationCategories(), ROCParameter::dM);
