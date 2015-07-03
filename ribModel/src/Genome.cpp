@@ -211,11 +211,7 @@ void Genome::readRFPFile(std::string filename)
 		unsigned counts = std::atoi(value.c_str());
 
 		std::string codon = tmp.substr(pos + 1, tmp.size() - 1 - (pos + 1));
-		std::cout <<"pos + 1 = " << pos + 1 <<"\n";
-		std::cout <<"tmp.size() - (pos + 1) = " << tmp.size() - (pos + 1) <<"\n";
 
-		std::cout << codon <<"\n";
-		//std::cout << ID <<" " << tmpRFP <<" " << counts << " " << codon <<"\n";
 		if (first)
 		{
 			prevID = ID;
@@ -227,17 +223,11 @@ void Genome::readRFPFile(std::string filename)
 			tmpGene.setDescription("No description for RFP Model");
 			tmpGene.setSequence("");
 			tmpGene.geneData = SS;
-		//	std::cout << tmpGene.geneData.getNumCodonsInMRNA(0) <<"\n";
 			addGene(tmpGene); //add to genome
-			//std::cout << genes[genes.size()-1].geneData.getNumCodonsInMRNA(0) <<"\n";
 			tmpGene.clear();
-			//std::cout << genes[genes.size()-1].geneData.getNumCodonsInMRNA(0) <<"\n";
-			//SS.clear();
 		}
 		prevID = ID;
 		unsigned index = SequenceSummary::CodonToIndex(codon);
-		//tmpGene.geneData.setRFPObserved(index, tmpRFP);
-		//tmpGene.geneData.setNumCodonsInMRNA(index, counts);
 		SS.setRFPObserved(index, tmpRFP);
 		SS.setNumCodonsInMRNA(index, counts);
 
@@ -249,11 +239,8 @@ void Genome::readRFPFile(std::string filename)
 	tmpGene.setDescription("No description for RFP Model");
 	tmpGene.setSequence("");
 	tmpGene.geneData = SS;
-	//std::cout << tmpGene.geneData.getNumCodonsInMRNA(0) <<"\n";
 
 	addGene(tmpGene); //add to genome
-	//std::cout << tmpGene.geneData.getNumCodonsInMRNA(0) <<"\n";
-	//SS.clear();
 
 	Fin.close();
 }
