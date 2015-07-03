@@ -7,6 +7,10 @@ const std::string Parameter::selectionShared = "selectionShared";
 const std::string Parameter::mutationShared = "mutationShared";
 std::default_random_engine Parameter::generator( (unsigned) std::time(NULL));
 
+Parameter::Parameter()
+{
+}
+
 
 Parameter::Parameter(unsigned _maxGrouping)
 {
@@ -53,6 +57,14 @@ Parameter::Parameter(const Parameter& other)
   numSelectionCategories = other.numSelectionCategories;
 
   numMixtures = other.numMixtures;
+
+	mutationSelectionState = other.mutationSelectionState;
+	selectionIsInMixture = other.selectionIsInMixture;
+	mutationIsInMixture = other.mutationIsInMixture;
+	maxGrouping = other.maxGrouping;
+	groupList = other.groupList;
+	mixtureAssignment = other.mixtureAssignment;
+	categoryProbabilities = other.categoryProbabilities;
 }
 Parameter& Parameter::operator=(const Parameter& rhs)
 {
@@ -85,6 +97,13 @@ Parameter& Parameter::operator=(const Parameter& rhs)
 
   numMixtures = rhs.numMixtures;
 
+  mutationSelectionState = rhs.mutationSelectionState;
+  selectionIsInMixture = rhs.selectionIsInMixture;
+  mutationIsInMixture = rhs.mutationIsInMixture;
+  maxGrouping = rhs.maxGrouping;
+  groupList = rhs.groupList;
+  mixtureAssignment = rhs.mixtureAssignment;
+  categoryProbabilities = rhs.categoryProbabilities;
   return *this;
 }
 
