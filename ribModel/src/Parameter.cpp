@@ -400,6 +400,7 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 	int cat = 0;
 	std::vector<double> mat;
 	std::string tmp, variableName;
+	covarianceMatrix.resize(maxGrouping);
 	while (getline(input, tmp))
 	{
 		int flag;

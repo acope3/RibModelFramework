@@ -1,4 +1,4 @@
-#include "include/RFP/RFPParameter.h"
+#include "../include/RFP/RFPParameter.h"
 #ifndef STANDALONE
 #include <Rcpp.h>
 using namespace Rcpp;

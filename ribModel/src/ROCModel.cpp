@@ -51,13 +51,13 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsi
 		// get codon count (total count not parameter->count)
 		int numCodons = seqsum.GetNumCodonsForAA(curAA);
 		// get mutation and selection parameter->for gene
-		double* mutation = new double[numCodons - 1]();
+		//double* mutation = new double[numCodons - 1]();
 		parameter->getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
-		double* selection = new double[numCodons - 1]();
+		//double* selection = new double[numCodons - 1]();
 		parameter->getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
 
 		// prepare array for codon counts for AA
-		int* codonCount = new int[numCodons]();
+		//int* codonCount = new int[numCodons]();
 		obtainCodonCount(seqsum, curAA, codonCount);
 
 		logLikelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
