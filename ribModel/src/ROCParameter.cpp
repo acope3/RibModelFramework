@@ -14,6 +14,11 @@ using namespace Rcpp;
 const unsigned ROCParameter::dM = 0;
 const unsigned ROCParameter::dEta = 1;
 
+ROCParameter::ROCParameter() : Parameter()
+{
+}
+
+
 ROCParameter::ROCParameter(std::string filename) :
 		Parameter(22)
 {
@@ -78,6 +83,9 @@ ROCParameter::ROCParameter(const ROCParameter& other) :
 
 	phiEpsilon = other.phiEpsilon;
 	phiEpsilon_proposed = other.phiEpsilon_proposed;
+
+	traces = other.traces;
+	numAcceptForMutationAndSelection = other.numAcceptForMutationAndSelection;
 }
 ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
 {
@@ -98,6 +106,8 @@ ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
 
 	phiEpsilon = rhs.phiEpsilon;
 	phiEpsilon_proposed = rhs.phiEpsilon_proposed;
+	traces = rhs.traces;
+	numAcceptForMutationAndSelection = rhs.numAcceptForMutationAndSelection;
 
 	return *this;
 }
