@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <sstream>
 
-#include "MCMCAlgorithm.h"
+#include "include/MCMCAlgorithm.h"
 
 void testNumCodonsPerAA()
 {
@@ -308,14 +308,12 @@ void testInitFromRestartFile()
 
 }
 
-<<<<<<< Updated upstream
-=======
 void testReadRFPFile()
 {
 	std::cout << "------------------- TEST READRFPFILE ----------------------" << "\n";
 	Genome genome;
 
-	genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+//	genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 	std::cout << "Writing to screen:\n";
 	for (unsigned i = 0; i < genome.getGenomeSize(); i++)
 	{
@@ -329,17 +327,13 @@ void testReadRFPFile()
 	}
 	std::cout << "------------------- TEST READRFPFILE ----------------------" << "\n";
 }
->>>>>>> Stashed changes
 int main()
 {
 	enum User { cedric, gabe, jeremy };
 
 	/* Test variables */
-<<<<<<< Updated upstream
-	User user = cedric;
-=======
+
 	User user = jeremy;
->>>>>>> Stashed changes
 
 	bool read = false;
 	unsigned index;
@@ -348,18 +342,6 @@ int main()
 	std::cout << "reading fasta file" << std::endl;
 	
 	switch (user) {
-<<<<<<< Updated upstream
-		case cedric:
-			genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
-			//genome.readFasta("C:/Users/Cedric/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta");
-			break;
-		case gabe:
-			genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR.fastaa");
-			break;
-		case jeremy:
-			genome.readFasta("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
-			break;
-=======
 	case cedric:
 		genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
 		//genome.readFasta("C:/Users/Cedric/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta");
@@ -370,11 +352,10 @@ int main()
 	case jeremy:
 		genome.readFasta("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
 		break;
->>>>>>> Stashed changes
 	}
 
 	std::cout << "done reading fasta file" << std::endl;
-	bool testing = false;
+	bool testing = true;
 
 	if (testing)
 	{

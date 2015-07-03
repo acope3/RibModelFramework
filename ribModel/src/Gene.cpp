@@ -1,4 +1,4 @@
-#include "Gene.h"
+#include "include/Gene.h"
 
 #include <algorithm>
 #include <iostream>

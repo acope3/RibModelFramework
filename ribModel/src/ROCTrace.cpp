@@ -1,4 +1,4 @@
-#include "ROCTrace.h"
+#include "include/ROC/ROCTrace.h"
 #ifndef STANDALONE
 #include <Rcpp.h>
 using namespace Rcpp;
