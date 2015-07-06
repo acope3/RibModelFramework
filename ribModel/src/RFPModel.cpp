@@ -50,15 +50,17 @@ void RFPModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsi
 
 	double phiValue = parameter->getSynthesisRate(geneIndex, synthesisRateCategory, false);
 	double phiValue_proposed = parameter->getSynthesisRate(geneIndex, synthesisRateCategory, true);
-    
 
-	for (unsigned index = 0; index < 61; index++) //number of codons, without the stop codons
+
+	for (unsigned index = 0; index < getGroupListSize(); index++) //number of codons, without the stop codons
 	{
-		std::string codon = SequenceSummary::IndexToCodon(index, false);
+		std::string codon = getGrouping(index);
 
-        double currAlpha = getParameterForCategory(alphaCategory, RFPParameter::alp, codon, false);
+		double currAlpha = getParameterForCategory(alphaCategory, RFPParameter::alp, codon, false);
 		double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, RFPParameter::lmPri, codon, false);
 		unsigned currRFPObserved = gene.geneData.getRFPObserved(index);
+
+		if (currRFPObserved == 0) continue;
 		unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(index);
 
 		logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
@@ -81,32 +83,39 @@ void RFPModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 {
 	double logLikelihood = 0.0;
 	double logLikelihood_proposed = 0.0;
-    unsigned index = SequenceSummary::CodonToIndex(grouping);
-    for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
-    {
-        Gene gene = genome.getGene(i);
-        // which mixture element does this gene belong to
-        unsigned mixtureElement = parameter->getMixtureAssignment(i);
-        // how is the mixture element defined. Which categories make it up
-        unsigned alphaCategory = parameter->getMutationCategory(mixtureElement);
-        unsigned lambdaPrimeCategory = parameter->getSelectionCategory(mixtureElement);
-        unsigned synthesisRateCategory = parameter->getSynthesisRateCategory(mixtureElement);
-        // get non codon specific values, calculate likelihood conditional on these
-        double phiValue = parameter->getSynthesisRate(i, synthesisRateCategory, false);
-        unsigned currRFPObserved = gene.geneData.getRFPObserved(index);
-        unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(index);
-        
-        
-        double currAlpha = getParameterForCategory(alphaCategory, RFPParameter::alp, grouping, false);
-        double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, RFPParameter::lmPri, grouping, false);
-        
-        double propAlpha = getParameterForCategory(alphaCategory, RFPParameter::alp, grouping, true);
-        double propLambdaPrime = getParameterForCategory(lambdaPrimeCategory, RFPParameter::lmPri, grouping, true);
-        
-        logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
-        logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
-        
-        logAcceptanceRatioForAllMixtures = logLikelihood_proposed - logLikelihood;
-        
-    }
+	unsigned index = SequenceSummary::CodonToIndex(grouping);
+	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+	{
+		Gene gene = genome.getGene(i);
+		// which mixture element does this gene belong to
+		unsigned mixtureElement = parameter->getMixtureAssignment(i);
+		// how is the mixture element defined. Which categories make it up
+		unsigned alphaCategory = parameter->getMutationCategory(mixtureElement);
+		unsigned lambdaPrimeCategory = parameter->getSelectionCategory(mixtureElement);
+		unsigned synthesisRateCategory = parameter->getSynthesisRateCategory(mixtureElement);
+		// get non codon specific values, calculate likelihood conditional on these
+		double phiValue = parameter->getSynthesisRate(i, synthesisRateCategory, false);
+		unsigned currRFPObserved = gene.geneData.getRFPObserved(index);
+		unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(index);
+
+
+		double currAlpha = getParameterForCategory(alphaCategory, RFPParameter::alp, grouping, false);
+		double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, RFPParameter::lmPri, grouping, false);
+
+		double propAlpha = getParameterForCategory(alphaCategory, RFPParameter::alp, grouping, true);
+		double propLambdaPrime = getParameterForCategory(lambdaPrimeCategory, RFPParameter::lmPri, grouping, true);
+
+	/*	std::cout <<"currAlpha: " << currAlpha <<"\n";
+		std::cout <<"currLambdaPrime: " << currLambdaPrime <<"\n";
+		std::cout <<"propAlpha: " << propAlpha <<"\n";
+		std::cout <<"propLambdaPrime: " << propLambdaPrime <<"\n";
+		std::cout <<"phiValue: " << phiValue <<"\n";
+		std::cout <<"currRFPObserved: " << currRFPObserved <<"\n";
+		std::cout <<"currNumCodonsInMRNA: " << currNumCodonsInMRNA <<"\n";
+		*/logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
+		logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
+//		std::cout << "logLikelihood: " << logLikelihood <<"\n";
+//		std::cout << "logLikelihood_proposed: " << logLikelihood_proposed <<"\n";
+	}
+	logAcceptanceRatioForAllMixtures = logLikelihood_proposed - logLikelihood;
 }

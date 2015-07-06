@@ -27,7 +27,7 @@ void Trace::initBaseTraces(unsigned samples, unsigned num_genes, unsigned numSel
 	//numSelectionCategories always == numSynthesisRateCategories, so only one is passed in for convience
 	initSphiTrace(samples);
 	initSynthesisRateAcceptanceRatioTrace(num_genes, numSelectionCategories);
-	cspAcceptanceRatioTrace.resize(22);
+	cspAcceptanceRatioTrace.resize(maxGrouping);
 	initSynthesisRateTrace(samples, num_genes, numSelectionCategories);
 	initMixtureAssignmentTrace(samples, num_genes);
 	initMixtureProbabilitesTrace(samples, numMixtures);

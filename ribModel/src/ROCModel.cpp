@@ -165,6 +165,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 		// which mixture element does this gene belong to
 		unsigned mixtureElement = parameter->getMixtureAssignment(i);
 		// how is the mixture element defined. Which categories make it up
+
 		unsigned mutationCategory = parameter->getMutationCategory(mixtureElement);
 		unsigned selectionCategory = parameter->getSelectionCategory(mixtureElement);
 		unsigned expressionCategory = parameter->getSynthesisRateCategory(mixtureElement);

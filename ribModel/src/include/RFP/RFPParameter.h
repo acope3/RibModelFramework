@@ -28,8 +28,6 @@ class RFPParameter: public Parameter {
 		std::vector<std::vector<double>> lambdaValues;
 		std::vector<unsigned> numAcceptForAlphaAndLambdaPrime;
 
-		std::vector<std::string> groupList;
-
 		// proposal bias and std for codon specific parameter -- probably can move up to Parameter
 		double bias_csp;
 		std::vector<double> std_csp;

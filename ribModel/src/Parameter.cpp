@@ -383,7 +383,7 @@ void Parameter::writeBasicRestartFile(std::string filename)
 	{
 		std::string aa = groupList[i];
 		oss <<">covarianceMatrix:\n" << aa <<"\n";
-		CovarianceMatrix m = covarianceMatrix[SequenceSummary::AAToAAIndex(aa)];
+		CovarianceMatrix m = covarianceMatrix[i];
 		std::vector<double>* tmp = m.getCovMatrix();
 		int size = m.getNumVariates();
     for(int k = 0; k < size * size; k++)
@@ -1064,6 +1064,7 @@ double Parameter::randUnif(double minVal, double maxVal)
 unsigned Parameter::randMultinom(double* probabilities, unsigned mixtureElements)
 {
 	// calculate cummulative sum to determine group boundaries
+	
 	double* cumsum = new double[mixtureElements]();
 	//std::vector<double> cumsum(groups);
 	cumsum[0] = probabilities[0];

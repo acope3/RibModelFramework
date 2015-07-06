@@ -174,7 +174,7 @@ void testSimulateGenome(Genome& genome)
 
 	std::cout << "initialize ROCParameter object" << std::endl;
 	double sphi_init = 2;
-	unsigned numMixtures = 2;
+	unsigned numMixtures = 1;
 	std::string mixDef = ROCParameter::mutationShared;
 	std::cout << "\tSphi init: " << sphi_init << "\n";
 	std::cout << "\t# mixtures: " << numMixtures << "\n";
@@ -333,7 +333,7 @@ int main()
 	enum ModelToRun { ROC, RFP };
 	/* Test variables */
 	User user = gabe;
-	ModelToRun  modelToRun = ROC;
+	ModelToRun  modelToRun = RFP;
 	bool read = false;
 	bool testing = false;
 
@@ -412,10 +412,14 @@ int main()
 		std::cout <<"Initializing shared parameter variables\n";
 
 		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
-		for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+	/*	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
 			if (i < 448) geneAssignment[i] = 0u;
 			else geneAssignment[i] = 1u;
+		}*/
+		for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+		{
+			geneAssignment[i] = 0u;
 		}
 		double sphi_init = 2;
 		unsigned numMixtures = 1;
@@ -532,9 +536,9 @@ int main()
 			scuoout.close();
 			*/std::cout <<"Done initializing RFPModel object\n";
 		
-			std::cout << "starting MCMC for ROC" << std::endl;
+			std::cout << "starting MCMC for RFP" << std::endl;
       mcmc.run(genome, model, 4);
-      std::cout << std::endl << "Finished MCMC for ROC" << std::endl;
+      std::cout << std::endl << "Finished MCMC for RFP" << std::endl;
 
 
       std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;

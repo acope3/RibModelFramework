@@ -71,6 +71,8 @@ RFPParameter& RFPParameter::operator=(const RFPParameter& rhs)
 //Initialization functions:
 void RFPParameter::initRFPParameterSet()
 {
+
+	std::cout <<"MG: " << maxGrouping <<"\n";
 	unsigned alphaCategories = getNumMutationCategories();
 	unsigned lambdaPrimeCategories = getNumSelectionCategories();
 
