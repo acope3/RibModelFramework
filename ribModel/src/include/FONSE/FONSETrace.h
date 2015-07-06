@@ -9,8 +9,8 @@
 class FONSETrace : public Trace
 {
 private:
-	std::vector<std::vector<std::vector<double>>> mutationParameterTrace; //order: mutationcategoy, numparam, samples
-	std::vector<std::vector<std::vector<double>>> selectionParameterTrace; //order: selectioncategoy, numparam, samples
+	std::vector< std::vector< std::vector<double> > > mutationParameterTrace; //order: mutationcategoy, numparam, samples
+	std::vector< std::vector< std::vector<double> > > selectionParameterTrace; //order: selectioncategoy, numparam, samples
 
 public:
 	//Constructor & Destructors
@@ -25,8 +25,8 @@ public:
 
 
 	//Getter functions
-	std::vector<double> getMutationParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon);
-	std::vector<double> getSelectionParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon);
+	std::vector <double> getMutationParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon);
+	std::vector <double> getSelectionParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon);
 
 	unsigned getMutationCategory(unsigned mixtureElement) { return categories->at(mixtureElement).delM; }
 	unsigned getSelectionCategory(unsigned mixtureElement) { return categories->at(mixtureElement).delEta; }
@@ -36,8 +36,8 @@ public:
 	//R WRAPPER FUNCTIONS
 
 	//Getter functions
-	std::vector<double> getMutationParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon); //R WRAPPER 
-	std::vector<double> getSelectionParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon); //R WRAPPER
+	std::vector <double> getMutationParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon); //R WRAPPER 
+	std::vector <double> getSelectionParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon); //R WRAPPER
 };
 
 #endif //ROCTRACE_H

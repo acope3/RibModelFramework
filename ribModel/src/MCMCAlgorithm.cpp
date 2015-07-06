@@ -63,8 +63,8 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	int numGenes = genome.getGenomeSize();
 
 	// just for testing
-	//unsigned concurentThreadsSupported = std::thread::hardware_concurrency();
-	//omp_set_num_threads(concurentThreadsSupported);
+	//unsigned concurrentThreadsSupported = std::thread::hardware_concurrency();
+	//omp_set_num_threads(concurrentThreadsSupported);
 	//#pragma omp parallel for //shared(parameter)
 	// testing end
 	unsigned numSynthesisRateCategories = model.getNumSynthesisRateCategories();

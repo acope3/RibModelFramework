@@ -44,7 +44,8 @@ class FONSEParameter : public Parameter
 		FONSEParameter(double sphi, unsigned _numMixtures, std::vector <unsigned> geneAssignment,
 			std::vector <std::vector <unsigned> > thetaKmatrix, bool splitSer = true,
 			std::string _mutationSelectionState = "allUnique");
-	
+
+		virtual ~FONSEParameter();
 #ifndef STANDALONE
 		FONSEParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer = true);
 		FONSEParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer = true, std::string _mutationSelectionState = "allUnique");

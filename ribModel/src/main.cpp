@@ -410,7 +410,7 @@ int main()
 				break;
 		}
 		std::cout << "done initializing Genome object" << std::endl;
-		std::cout <<"Initializing shared parameter variables\n";
+		std::cout << "Initializing shared parameter variables\n";
 
 		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 		for (unsigned i = 0u; i < genome.getGenomeSize(); i++)

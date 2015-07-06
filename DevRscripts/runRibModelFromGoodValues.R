@@ -19,15 +19,15 @@ parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssig
 #parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")
 #parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")
 # initialize MCMC object
-samples <- 200
+samples <- 2000
 thining <- 10
-adaptiveWidth <- 200
+adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, 
                              est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
 # get model object
 model <- initializeModelObject(parameter, "ROC")
 
-setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth*10, TRUE)
+setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth*20, TRUE)
 #run mcmc on genome with parameter using model
 system.time(
   runMCMC(mcmc, genome, model, 4)
