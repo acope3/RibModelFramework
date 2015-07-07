@@ -1,0 +1,7 @@
+Loading required package: Rcpp
+Error : .onLoad failed in loadNamespace() for 'ribModel', details:
+  call: value[[3L]](cond)
+  error: failed to load module Trace_mod from package ribModel
+could not find function "new"
+Error: package or namespace load failed for ‘ribModel’
+Execution halted

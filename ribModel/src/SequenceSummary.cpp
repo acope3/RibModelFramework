@@ -25,6 +25,7 @@ SequenceSummary::SequenceSummary(const SequenceSummary& other)
 	std::copy(std::begin(other.ncodons), std::end(other.ncodons), std::begin(ncodons));
 	std::copy(std::begin(other.naa), std::end(other.naa), std::begin(naa));
 	std::copy(std::begin(other.RFPObserved), std::end(other.RFPObserved), std::begin(RFPObserved));
+	std::copy(std::begin(other.numCodonsInMRNA), std::end(other.numCodonsInMRNA), std::begin(numCodonsInMRNA));
 }
 
 SequenceSummary& SequenceSummary::operator=(const SequenceSummary& rhs)
@@ -33,6 +34,7 @@ SequenceSummary& SequenceSummary::operator=(const SequenceSummary& rhs)
 	std::copy(std::begin(rhs.ncodons), std::end(rhs.ncodons), std::begin(ncodons));
 	std::copy(std::begin(rhs.naa), std::end(rhs.naa), std::begin(naa));
 	std::copy(std::begin(rhs.RFPObserved), std::end(rhs.RFPObserved), std::begin(RFPObserved));
+	std::copy(std::begin(rhs.numCodonsInMRNA), std::end(rhs.numCodonsInMRNA), std::begin(numCodonsInMRNA));
 	//assignment operator
 	return *this;
 }
@@ -45,6 +47,7 @@ void SequenceSummary::clear()
 	for(k = 0; k < 64; k++) { ncodons[k] = 0; }
 	for(k = 0; k < 22; k++) { naa[k] = 0; }
 	for(k = 0; k < 64; k++) { RFPObserved[k] = 0; }
+	for(k = 0; k < 64; k++) { numCodonsInMRNA[k] = 0; }
 }
 
 bool SequenceSummary::processSequence(const std::string& sequence)

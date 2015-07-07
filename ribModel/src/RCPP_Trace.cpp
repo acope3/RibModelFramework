@@ -1,3 +1,4 @@
+
 #ifndef STANDALONE
 #include "include/base/Trace.h"
 #include "include/ROC/ROCTrace.h"
@@ -32,3 +33,4 @@ RCPP_MODULE(Trace_mod)
 
 }
 #endif
+

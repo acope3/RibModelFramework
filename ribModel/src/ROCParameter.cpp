@@ -20,13 +20,13 @@ ROCParameter::ROCParameter() : Parameter()
 
 
 ROCParameter::ROCParameter(std::string filename) :
-		Parameter(19)
+		Parameter(22)
 {
 	initFromRestartFile(filename);
 }
 
 #ifndef STANDALONE
-ROCParameter::ROCParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter(19)
+ROCParameter::ROCParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter(22)
 {
 	unsigned _numMixtures = _matrix.size() / 2;
 	std::vector<std::vector<unsigned>> thetaKMatrix;
@@ -46,7 +46,7 @@ ROCParameter::ROCParameter(double sphi, std::vector<unsigned> geneAssignment, st
 }
 
 ROCParameter::ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState) :
-Parameter(19)
+Parameter(22)
 {
 	std::vector<std::vector<unsigned>> thetaKMatrix;
 	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
@@ -56,7 +56,7 @@ Parameter(19)
 
 ROCParameter::ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
 		std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer, std::string _mutationSelectionState) :
-		Parameter(19)
+		Parameter(22)
 {
 	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
 	initROCParameterSet();
@@ -118,7 +118,7 @@ void ROCParameter::initROCParameterSet()
 	// proposal bias and std for codon specific parameter
 	bias_csp = 0;
 	std_csp.resize(numParam, 0.1);
-	numAcceptForMutationAndSelection.resize(groupList.size(), 0u);
+	numAcceptForMutationAndSelection.resize(maxGrouping, 0u);
 
 	phiEpsilon = 0.1;
 	phiEpsilon_proposed = 0.1;
@@ -143,16 +143,6 @@ void ROCParameter::initROCParameterSet()
 		proposedSelectionParameter[i] = tmp;
 		currentSelectionParameter[i] = tmp;
 	}
-
-  for (unsigned i = 0; i < groupList.size(); i++) // TODO: change this from being hardcoded
-  {
-    std::string aa = getGrouping(i);
-    unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa, true);
-    CovarianceMatrix m((numMutationCategories + numSelectionCategories) * numCodons);
-    m.choleskiDecomposition();
-    covarianceMatrix.push_back(m);
-  }
-
 
 }
 
@@ -447,8 +437,6 @@ void ROCParameter::initMutationSelectionCategories(std::vector<std::string> file
 	else
 		type = "eta";
 
-
-	std::cout << numCategories <<"\n";
 	for (i = 0; i < numCategories; i++)
 	{
 		std::vector<double> temp(numParam, 0.0);
@@ -585,27 +573,23 @@ void ROCParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
 void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
 {
 	unsigned numCSPsets = numAcceptForMutationAndSelection.size();
-	
-	std::cout << numCSPsets <<"\n";
 	std::cout << "acceptance ratio for amino acid:\n\t";
 	for (unsigned i = 0; i < numCSPsets; i++)
 	{
-	//	if (i == 21 || i == 10 || i == 18)
-	//		continue;
-//		std::cout << SequenceSummary::AminoAcidArray[i] << "\t";
-			std::cout << groupList[i] <<"\t";
+		if (i == 21 || i == 10 || i == 18)
+			continue;
+		std::cout << SequenceSummary::AminoAcidArray[i] << "\t";
 	}
 	std::cout << "\n\t";
 	for (unsigned i = 0; i < numCSPsets; i++)
 	{
-	//	if (i == 21 || i == 10 || i == 18)
-	//		continue;
+		if (i == 21 || i == 10 || i == 18)
+			continue;
 		double acceptanceLevel = (double) numAcceptForMutationAndSelection[i] / (double) adaptationWidth;
 		std::cout << acceptanceLevel << "\t";
 		traces.updateCspAcceptanceRatioTrace(i, acceptanceLevel);
 		unsigned codonRange[2];
-		std::string aa = getGrouping(i);
-		SequenceSummary::AAToCodonRange(aa, true, codonRange);
+		SequenceSummary::AAindexToCodonRange(i, true, codonRange);
 		for (unsigned k = codonRange[0]; k < codonRange[1]; k++)
 		{
 			if (acceptanceLevel < 0.2)
@@ -899,7 +883,7 @@ void ROCParameter::proposeCodonSpecificParameter()
 		}
 
 		std::vector<double> covaryingNums;
-		covaryingNums = covarianceMatrix[k].transformIidNumersIntoCovaryingNumbers(
+		covaryingNums = covarianceMatrix[SequenceSummary::AAToAAIndex(aa)].transformIidNumersIntoCovaryingNumbers(
 				iidProposed);
 		for (unsigned i = 0; i < numMutationCategories; i++)
 		{

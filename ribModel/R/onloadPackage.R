@@ -3,8 +3,6 @@
   library.dynam("ribModel", pkgname, libname)
 
   loadRcppModules()
-  #SequenceSummary <- Module("SequenceSummary_mod")
-  #populate(SequenceSummary, NAMESPACE)
   
   invisible()
 } # End of .onLoad().

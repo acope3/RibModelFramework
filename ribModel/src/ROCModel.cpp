@@ -35,6 +35,9 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsi
 	double phiValue = parameter->getSynthesisRate(geneIndex, expressionCategory, false);
 	double phiValue_proposed = parameter->getSynthesisRate(geneIndex, expressionCategory, true);
 
+	double mutation[5];
+	double selection[5];
+	int codonCount[5];
 #ifndef __APPLE__
 #pragma omp parallel for private(mutation, selection, codonCount) reduction(+:logLikelihood,logLikelihood_proposed)
 #endif
@@ -48,13 +51,13 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsi
 		// get codon count (total count not parameter->count)
 		int numCodons = seqsum.GetNumCodonsForAA(curAA);
 		// get mutation and selection parameter->for gene
-		double* mutation = new double[numCodons - 1]();
+		//double* mutation = new double[numCodons - 1]();
 		parameter->getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
-		double* selection = new double[numCodons - 1]();
+		//double* selection = new double[numCodons - 1]();
 		parameter->getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
 
 		// prepare array for codon counts for AA
-		int* codonCount = new int[numCodons]();
+		//int* codonCount = new int[numCodons]();
 		obtainCodonCount(seqsum, curAA, codonCount);
 
 		logLikelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
@@ -154,7 +157,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 	double selection_proposed[5];
 	int codonCount[5];
 #ifndef __APPLE__
-#pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed, codonCount)
+#pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed, codonCount) reduction(+:likelihood,likelihood_proposed)
 #endif
 	for(int i = 0; i < numGenes; i++)
 	{
@@ -165,7 +168,6 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 		// which mixture element does this gene belong to
 		unsigned mixtureElement = parameter->getMixtureAssignment(i);
 		// how is the mixture element defined. Which categories make it up
-
 		unsigned mutationCategory = parameter->getMutationCategory(mixtureElement);
 		unsigned selectionCategory = parameter->getSelectionCategory(mixtureElement);
 		unsigned expressionCategory = parameter->getSynthesisRateCategory(mixtureElement);

@@ -1,5 +1,5 @@
-library(ribModel)
 rm(list=ls())
+library(ribModel)
 #read genome
 genome <- initializeGenomeObject(fasta.file = "../ribModel/data/simulatedAllUniqueR.fasta")
 
@@ -14,12 +14,12 @@ parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssig
 
 #parameter <- initializeParameterObject(restart.file = "2000restartFile.rst")
 
-phivals <- parameter$readPhiValues( "../ribModel/data/simulatedAllUniqueR_phi.csv")
-parameter$initializeExpressionByRandom(phivals)
-parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")
-parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")
+#phivals <- parameter$readPhiValues( "../ribModel/data/simulatedAllUniqueR_phi.csv")
+#parameter$initializeExpressionByRandom(phivals)
+#parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")
+#parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")
 # initialize MCMC object
-samples <- 100
+samples <- 2000
 thining <- 10
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, 
@@ -27,10 +27,10 @@ mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth,
 # get model object
 model <- initializeModelObject(parameter, "ROC")
 
-setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth*10, TRUE)
+setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth*20, TRUE)
 #run mcmc on genome with parameter using model
 system.time(
-  runMCMC(mcmc, genome, model, 7)
+  runMCMC(mcmc, genome, model, 4)
 )
 
 
@@ -65,7 +65,7 @@ plot(parameter, what = "Selection")
 dev.off()
 
 
-plot(trace, what = "Expression", geneIndex = 999, mixture = 2)
+#plot(trace, what = "Expression", geneIndex = 999, mixture = 2)
 
 pdf("simulated_Genome_allUnique_startCSP_VGAM_startPhi_SCUO_adaptSphi_True_mix1.pdf", width = 11, height = 12)
 mixture <- 1
@@ -80,6 +80,41 @@ names.aa <- aminoAcids()
 selection <- c()
 mutation <- c()
 csp <- read.table("../ribModel/data/simulated_CSP0.csv", sep=",", header=T)
+idx.eta <- grepl(pattern = "[A-Z].[A-Z]{3}.Delta.eta", x = as.character(csp[,1]))
+idx.mu <- grepl(pattern = "[A-Z].[A-Z]{3}.log.mu", x = as.character(csp[,1]))
+for(aa in names.aa)
+{
+  if(aa == "M" || aa == "W" || aa == "X") next
+  codons <- AAToCodon(aa, T)
+  for(i in 1:length(codons))
+  {
+    selection <- c(selection, parameter$getSelectionPosteriorMeanForCodon(mixture, samples*0.1, codons[i]))
+    mutation <- c(mutation, parameter$getMutationPosteriorMeanForCodon(mixture, samples*0.1, codons[i]))
+  }
+}
+plot(NULL, NULL, xlim=range(csp[idx.mu, 2], na.rm = T), ylim=range(mutation), 
+     main = "Mutation", xlab = "true values", ylab = "estimated values")
+upper.panel.plot(csp[idx.mu, 2], mutation)
+plot(NULL, NULL, xlim=range(csp[idx.eta, 2], na.rm = T), ylim=range(selection), 
+     main = "Selection", xlab = "true values", ylab = "estimated values")
+upper.panel.plot(csp[idx.eta, 2], selection)
+dev.off()
+
+
+
+pdf("simulated_Genome_allUnique_startCSP_VGAM_startPhi_SCUO_adaptSphi_True_mix2.pdf", width = 11, height = 12)
+mixture <- 2
+plot(trace, what = "Mutation", mixture = mixture)
+plot(trace, what = "Selection", mixture = mixture)
+
+# plots model fit (cub plot)
+plot(model, genome, parameter, samples = samples*0.1, mixture = mixture, main = "Codon Usage Plot")
+
+
+names.aa <- aminoAcids()
+selection <- c()
+mutation <- c()
+csp <- read.table("../ribModel/data/simulated_CSP1.csv", sep=",", header=T)
 idx.eta <- grepl(pattern = "[A-Z].[A-Z]{3}.Delta.eta", x = as.character(csp[,1]))
 idx.mu <- grepl(pattern = "[A-Z].[A-Z]{3}.log.mu", x = as.character(csp[,1]))
 for(aa in names.aa)

@@ -169,8 +169,14 @@ void Parameter::initParameterSet(double sphi, unsigned _numMixtures, std::vector
     std_phi[i] = tempStdPhi;
   }
 
-	//TODO: Moved CM stuff down to ROCParameter to avoid interfering with RFPModel. Function needs to
-	//be changed at some point it would seem anyways.
+  for (unsigned i = 0; i < maxGrouping; i++) // TODO: change this from being hardcoded
+  {
+    std::string aa = SequenceSummary::AminoAcidArray[i];
+    unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa, true);
+    CovarianceMatrix m((numMutationCategories + numSelectionCategories) * numCodons);
+    m.choleskiDecomposition();
+    covarianceMatrix.push_back(m);
+  }
 }
 
 
@@ -383,7 +389,7 @@ void Parameter::writeBasicRestartFile(std::string filename)
 	{
 		std::string aa = groupList[i];
 		oss <<">covarianceMatrix:\n" << aa <<"\n";
-		CovarianceMatrix m = covarianceMatrix[i];
+		CovarianceMatrix m = covarianceMatrix[SequenceSummary::AAToAAIndex(aa)];
 		std::vector<double>* tmp = m.getCovMatrix();
 		int size = m.getNumVariates();
     for(int k = 0; k < size * size; k++)
@@ -413,6 +419,7 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 	int cat = 0;
 	std::vector<double> mat;
 	std::string tmp, variableName;
+	covarianceMatrix.resize(maxGrouping);
 	while (getline(input, tmp))
 	{
 		int flag;
@@ -798,7 +805,7 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 	for(unsigned i = 0u; i < genomeSize; i++)
 	{
 		index[i] = i;
-		scuoValues[i] = calculateSCUO( genome.getGene(i), 22);
+		scuoValues[i] = calculateSCUO( genome.getGene(i), maxGrouping );
 		expression[i] = Parameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
 	}
 	quickSortPair(scuoValues, index, 0, genomeSize);
@@ -1064,7 +1071,6 @@ double Parameter::randUnif(double minVal, double maxVal)
 unsigned Parameter::randMultinom(double* probabilities, unsigned mixtureElements)
 {
 	// calculate cummulative sum to determine group boundaries
-	
 	double* cumsum = new double[mixtureElements]();
 	//std::vector<double> cumsum(groups);
 	cumsum[0] = probabilities[0];

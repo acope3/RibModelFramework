@@ -72,7 +72,6 @@ RFPParameter& RFPParameter::operator=(const RFPParameter& rhs)
 void RFPParameter::initRFPParameterSet()
 {
 
-	std::cout <<"MG: " << maxGrouping <<"\n";
 	unsigned alphaCategories = getNumMutationCategories();
 	unsigned lambdaPrimeCategories = getNumSelectionCategories();
 
@@ -97,7 +96,7 @@ void RFPParameter::initRFPParameterSet()
 		lambdaValues[i] = tmp; //Maybe we don't initialize this one? or we do it differently?
 	}
 
-	numAcceptForAlphaAndLambdaPrime.resize(numParam, 0u);
+	numAcceptForAlphaAndLambdaPrime.resize(maxGrouping, 0u);
 	bias_csp = 0;
 	std_csp.resize(numParam, 0.1);
 

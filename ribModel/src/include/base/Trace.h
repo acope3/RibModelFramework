@@ -62,8 +62,8 @@ class Trace {
 		void updateSphiAcceptanceRatioTrace(double acceptanceLevel)
 		{	sphiAcceptanceRatioTrace.push_back(acceptanceLevel);}
 		void updateSynthesisRateAcceptanceRatioTrace(unsigned category, unsigned geneIndex, double acceptanceLevel);
-		void updateCspAcceptanceRatioTrace(unsigned groupingIndex, double acceptanceLevel)
-		{	cspAcceptanceRatioTrace[groupingIndex].push_back(acceptanceLevel);}
+		void updateCspAcceptanceRatioTrace(unsigned codonIndex, double acceptanceLevel)
+		{	cspAcceptanceRatioTrace[codonIndex].push_back(acceptanceLevel);}
 		void updateSynthesisRateTrace(unsigned sample, unsigned geneIndex, std::vector<std::vector <double>> &currentExpressionLevel);
 		void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex, unsigned value)
 		{	mixtureAssignmentTrace[geneIndex][sample] = value;}

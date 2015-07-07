@@ -184,82 +184,65 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 
 void Genome::readRFPFile(std::string filename)
 {
-	std::ifstream Fin;
-	Fin.open(filename.c_str());
-	if (Fin.fail())
-	{
-		std::cerr << "Error in Genome::readRFPFile: Cannot open input RFP file " << filename << "\n";
-	}
+  std::ifstream Fin;
+  Fin.open(filename.c_str());
+  if (Fin.fail())
+  {
+    std::cerr << "Error in Genome::readRFPFile: Cannot open input RFP file " << filename << "\n";
+  }
 
-	std::string tmp;
-	std::getline(Fin, tmp); //trash the first line
-	std::string prevID = "";
-	Gene tmpGene;
-	SequenceSummary SS;
-	bool first = true;
-	std::string seq = "";
-	/*
-	int tmpNCodons[64];
-	int tmpNAA[22];
-	for (unsigned k = 0; k < 64; k++) tmpNCodons[k] = 0;
-	for (unsigned k = 0; k < 22; k++) tmpNAA[k] = 0;
-	*/
-	while (getline(Fin,tmp))
-	{
-		unsigned pos = tmp.find(",");
-		std::string ID = tmp.substr(0, pos);
-		unsigned pos2 = tmp.find(",", pos + 1);
-		std::string value = tmp.substr(pos + 1, pos2 - (pos + 1));
-		unsigned tmpRFP = std::atoi(value.c_str());
+  std::string tmp;
+  std::getline(Fin, tmp); //trash the first line
+  std::string prevID = "";
+  Gene tmpGene;
+  SequenceSummary SS;
+  bool first = true;
+  std::string seq = "";
 
-		pos = tmp.find(",", pos2 + 1);
-		value = tmp.substr(pos2 + 1, pos - (pos2 + 1));
-		unsigned counts = std::atoi(value.c_str());
+  while (getline(Fin,tmp))
+  {
+    unsigned pos = tmp.find(",");
+    std::string ID = tmp.substr(0, pos);
+    unsigned pos2 = tmp.find(",", pos + 1);
+    std::string value = tmp.substr(pos + 1, pos2 - (pos + 1));
+    unsigned tmpRFP = std::atoi(value.c_str());
 
-		std::string codon = tmp.substr(pos + 1, 3);
-		for (unsigned i = 0; i < counts; i++)
-			seq += codon;
+    pos = tmp.find(",", pos2 + 1);
+    value = tmp.substr(pos2 + 1, pos - (pos2 + 1));
+    unsigned counts = std::atoi(value.c_str());
 
-		if (first)
-		{
-			prevID = ID;
-			first = false;
+    std::string codon = tmp.substr(pos + 1, 3);
+    for (unsigned i = 0; i < counts; i++)
+      seq += codon;
+
+    if (first)
+    {
+      prevID = ID;
+      first = false;
+    }
+    if (ID != prevID)
+    {
+      tmpGene.setId(prevID);
+      tmpGene.setDescription("No description for RFP Model");
+      tmpGene.setSequence(seq);
+      addGene(tmpGene); //add to genome
+      tmpGene.clear();
+      seq = "";
 		}
-		if (ID != prevID)
-		{
-			tmpGene.setId(prevID);
-			tmpGene.setDescription("No description for RFP Model");
-			tmpGene.setSequence(seq);
-		//	SS.setNCodons(tmpNCodons);
-		//	SS.setNAA(tmpNAA);
-	//		tmpGene.geneData = SS;
-			addGene(tmpGene); //add to genome
-			tmpGene.clear();
-			seq = "";
-			/*for (unsigned k = 0; k < 64; k++) tmpNCodons[k] = 0;
-			for (unsigned k = 0; k < 22; k++) tmpNAA[k] = 0;
-			std::cout <<"reset\n";
-		*/}
-		prevID = ID;
-		unsigned index = SequenceSummary::CodonToIndex(codon);
-		tmpGene.geneData.setRFPObserved(index, tmpRFP);
-		//tmpNCodons[index] = counts;
-		//tmpNAA[SequenceSummary::CodonToAAIndex(codon)] += counts;
-		//if (codon == "GCT" || codon == "GCC" || codon == "GCA" || codon == "GCG") std::cout << tmpNAA[0] <<"\n";
-		//TODO: Values need to be checked!			
+
+    prevID = ID;
+    unsigned index = SequenceSummary::CodonToIndex(codon);
+    tmpGene.geneData.setRFPObserved(index, tmpRFP);
 	}
 
-	//for the last gene
-	tmpGene.setId(prevID);
-	tmpGene.setDescription("No description for RFP Model");
-	tmpGene.setSequence(seq);
-//	SS.setNCodons(tmpNCodons);
-//	SS.setNAA(tmpNAA);
-//	tmpGene.geneData = SS;
 
-	addGene(tmpGene); //add to genome
+  tmpGene.setId(prevID);
+  tmpGene.setDescription("No description for RFP Model");
+  tmpGene.setSequence(seq);
 
-	Fin.close();
+  addGene(tmpGene); //add to genome
+
+  Fin.close();
 }
 
 

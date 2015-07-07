@@ -1,12 +1,18 @@
-UNAME_S := $(shell uname -s)
-ifeq ($(UNAME_S),Linux)
-	## We need the headers exported via inst/include
-	## Use openMP if in Linux
-	PKG_CPPFLAGS = -fopenmp -I../inst/include/ -DCPPTOML_USE_MAP
+ifeq ($(OS),Windows_NT)
+	PKG_CPPFLAGS = -fopenmp -I../inst/include -DCPPTOML_USE_MAP
 	PKG_LIBS = -fopenmp
 else
-	## We need the headers exported via inst/include:
-	PKG_CPPFLAGS = -I../inst/include/ -DCPPTOML_USE_MAP
+	UNAME_S := $(shell uname -s)
+	ifeq ($(UNAME_S),Linux)
+		## We need the headers exported via inst/include
+		## Use openMP if in Linux
+		PKG_CPPFLAGS = -fopenmp -I../inst/include/ -DCPPTOML_USE_MAP
+		PKG_LIBS = -fopenmp
+	else
+		## We need the headers exported via inst/include:
+		PKG_CPPFLAGS = -I../inst/include/ -DCPPTOML_USE_MAP
+	endif
 endif
+
 ## This is a C++11 package
 CXX_STD = CXX11

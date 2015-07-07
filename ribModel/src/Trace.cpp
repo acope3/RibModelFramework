@@ -23,7 +23,7 @@ void Trace::initAllTraces(unsigned samples, unsigned num_genes, unsigned numSele
 void Trace::initBaseTraces(unsigned samples, unsigned num_genes, unsigned numSelectionCategories, unsigned numMixtures, 
 		std::vector<mixtureDefinition> &_categories, unsigned maxGrouping)
 {
-	std::cout <<"-----maxGrouping = " << maxGrouping <<"\n";
+	std::cout <<"maxGrouping: " << maxGrouping <<"\n";
 	//numSelectionCategories always == numSynthesisRateCategories, so only one is passed in for convience
 	initSphiTrace(samples);
 	initSynthesisRateAcceptanceRatioTrace(num_genes, numSelectionCategories);
@@ -251,27 +251,3 @@ std::vector<double> Trace::getMixtureProbabilitiesTraceForMixtureR(unsigned mixt
 	return RV;
 }
 
-/*
-#ifndef STANDALONE
-
-RCPP_MODULE(Trace_mod)
-{
-	class_<Trace>( "Trace" )
-		//These methods have only a C++ implementation
-		.method("getSPhiTrace", &Trace::getSPhiTrace)
-		.method("getAPhiTrace", &Trace::getAPhiTrace)
-		.method("getSphiAcceptanceRatioTrace", &Trace::getSphiAcceptanceRatioTrace)
-		.method("getCspAcceptanceRatioTraceForAA", &Trace::getCspAcceptanceRatioTraceForAA)
-
-
-		//These methods have specific R wrappers
-		.method("getSynthesisRateAcceptanceRatioTraceByMixtureElementForGene", &Trace::getSynthesisRateAcceptanceRatioTraceByMixtureElementForGeneR)
-		.method("getSynthesisRateTraceForGene", &Trace::getSynthesisRateTraceForGeneR)
-		.method("getSynthesisRateTraceByMixtureElementForGene", &Trace::getSynthesisRateTraceByMixtureElementForGeneR)
-		.method("getMixtureAssignmentTraceForGene", &Trace::getMixtureAssignmentTraceForGeneR)
-		.method("getMixtureProbabilitiesTraceForMixture", &Trace::getMixtureProbabilitiesTraceForMixtureR)
-		.method("getExpectedPhiTrace", &Trace::getExpectedPhiTrace)
-		.method("getNumberOfMixtures", &Trace::getNumberOfMixtures)
-		;
-}
-#endif*/
