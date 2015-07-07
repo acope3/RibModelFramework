@@ -334,7 +334,7 @@ int main()
 	enum ModelToRun { ROC, RFP };
 	/* Test variables */
 	User user = gabe;
-	ModelToRun  modelToRun = ROC;
+	ModelToRun  modelToRun = RFP;
 	bool read = false;
 	bool testing = false;
 
@@ -500,7 +500,49 @@ int main()
 				std::cout << SequenceSummary::AminoAcidArray[index] << ": " << parameter.getCurrentCodonSpecificProposalWidth(index) << "\n";
 			}
 		}
+		else if (modelToRun == RFP)
+		{
+			RFPParameter parameter;
+			if (read)
+			{
 
+			}
+			else
+			{
+				std::cout << "initialize RFPParameter object" << std::endl;
+				std::string mixDef = Parameter::allUnique;
+				std::cout << "\tSphi init: " << sphi_init << "\n";
+				std::cout << "\t# mixtures: " << numMixtures << "\n";
+				std::cout << "\tmixture definition: " << mixDef << "\n";
+				RFPParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
+				tmp.InitializeSynthesisRate(genome, sphi_init);
+				parameter = tmp;
+				std::cout << "Done initialize RFPParameter object" << std::endl;
+			}
+			
+
+			std::cout <<"Initializing RFPModel object\n";
+			RFPModel model;
+			model.setParameter(parameter);
+			//TODO: what does this do in the RFP case? Do we even need it????
+		/*	std::ofstream scuoout("results/scuo.csv");
+			for (unsigned n = 0u; n < genome.getGenomeSize(); n++)
+			{
+				scuoout << genome.getGene(n).getId() << "," << parameter.calculateSCUO(genome.getGene(n), 64) << std::endl;
+			}
+			scuoout.close();
+			*/std::cout <<"Done initializing RFPModel object\n";
+		
+			std::cout << "starting MCMC for RFP" << std::endl;
+      mcmc.run(genome, model, 4);
+      std::cout << std::endl << "Finished MCMC for RFP" << std::endl;
+
+
+      std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
+      std::cout << "Sphi proposal width: " << parameter.getSphiProposalWidth() << std::endl;
+
+		}
+		else {}
 
 		//These files used to be written here:
 		//mutationPosterior_Cat#.csv

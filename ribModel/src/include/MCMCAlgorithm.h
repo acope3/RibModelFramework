@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "ROC/ROCModel.h"
+#include "RFP/RFPModel.h"
 class MCMCAlgorithm
 {
 	private:
