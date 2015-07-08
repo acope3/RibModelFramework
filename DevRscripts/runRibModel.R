@@ -1,7 +1,7 @@
 library(ribModel)
 rm(list=ls())
 #read genome
-genome <- initializeGenomeObject(fasta.file = "../ribModel/data/Skluyveri_ChrA_andCleft.fasta")
+genome <- initializeGenomeObject(file = "../ribModel/data/Skluyveri_ChrA_andCleft.fasta")
 
 #initialize parameter object
 sphi_init <- 2

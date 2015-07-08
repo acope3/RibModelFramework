@@ -14,6 +14,15 @@ initializeParameterObject <- function(genome, sphi, numMixtures, geneAssignment,
     }
   }else if(model == "NSE"){
     cat("MODEL NOT IMPLEMENTED")
+  }else if(model == "RFP"){
+    if(is.null(restart.file))
+    {
+      parameter <- initializeRFPParameterObject(genome, sphi, numMixtures, geneAssignment, expressionValues,
+                                                split.serine, mixture.definition, mixture.definition.matrix) 
+    }
+    else{
+      parameter <- new(RFPParameter, restart.file)
+    }
   }else{
     stop("Unkown model.")
   }
@@ -105,6 +114,40 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
   
   return(parameter)
 }
+
+
+initializeRFPParameterObject <- function(genome, sphi, numMixtures, geneAssignment, expressionValues = NULL,
+                                         split.serine = TRUE, mixture.definition = "allUnique", mixture.definition.matrix = NULL)
+{
+  # test input integrity
+  if(genome$getGenomeSize() != length(geneAssignment)) 
+  {
+    stop("Gene assignment length does not match genome size. Not every Gene has a mixture assignment")
+  }
+  # create parameter object
+  if(is.null(mixture.definition.matrix))
+  { # keyword constructor
+    parameter <- new(RFPParameter, sphi, numMixtures, geneAssignment, split.serine, mixture.definition)
+  }else{
+    #matrix constructor
+    mixture.definition <- c(mixture.definition.matrix[, 1], mixture.definition.matrix[, 2])
+    parameter <- new(RFPParameter, sphi, numMixtures, geneAssignment, mixture.definition, split.serine)
+  }
+  # initialize expression values
+  if(is.null(expressionValues)){
+    parameter$initializeSynthesisRateByGenome(genome, sphi)
+  }else{
+    parameter$initializeSynthesisRateByList(expressionValues)
+  }
+  
+  return (parameter)
+}
+
+
+
+
+
+
 
 getCodonCountsForAA <- function(aa)
 {

@@ -1,8 +1,15 @@
 
-initializeGenomeObject <- function(fasta.file, expression.file=NULL, append=FALSE)
+initializeGenomeObject <- function(file, fasta=TRUE, expression.file=NULL, append=FALSE)
 {
   genome <- new(Genome)
-  genome$readFasta(fasta.file, append)
+  if (fasta == TRUE)
+  {
+    genome$readFasta(file, append)
+  }
+  else
+  {
+    genome$readRFPFile(file)
+  }
   if(!is.null(expression.file))
   {
     #TODO implement reading expressin csv file and attaching expression values to genes

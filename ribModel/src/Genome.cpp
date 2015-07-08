@@ -430,6 +430,7 @@ RCPP_MODULE(Genome_mod)
 
 		.method("readFasta", &Genome::readFasta, "reads a genome into the object")
 		.method("writeFasta", &Genome::writeFasta, "writes the genome to a fasta file")
+		.method("readRFPFile", &Genome::readRFPFile, "reads RFP data in for the RFP model")
 		.method("getGenomeSize", &Genome::getGenomeSize, "returns how many genes are in the genome")
 		.method("clear", &Genome::clear, "clears the genome")
 		.method("getCodonCountsPerGene", &Genome::getCodonCountsPerGene, "returns a vector of codon counts for a given gene")

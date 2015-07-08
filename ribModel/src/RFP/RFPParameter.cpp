@@ -579,3 +579,33 @@ void RFPParameter::initLambdaPrimeR(double lambdaPrimeValue, unsigned mixtureEle
 		initLambdaPrime(lambdaPrimeValue, mixtureElement, codon);
 	}
 }
+
+
+#ifndef STANDALONE
+RFPParameter::RFPParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter(64)
+{
+  unsigned _numMixtures = _matrix.size() / 2;
+  std::vector<std::vector<unsigned>> thetaKMatrix;
+  thetaKMatrix.resize(_numMixtures);
+
+  unsigned index = 0;
+  for (unsigned i = 0; i < _numMixtures; i++)
+  {
+    for (unsigned j = 0; j < 2; j++, index++)
+    {
+      thetaKMatrix[i].push_back(_matrix[index]);
+    }
+  }
+  initParameterSet(sphi, _matrix.size() / 2, geneAssignment, thetaKMatrix, splitSer);
+  initRFPParameterSet();
+
+}
+
+RFPParameter::RFPParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState) :
+Parameter(64)
+{
+  std::vector<std::vector<unsigned>> thetaKMatrix;
+  initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
+  initRFPParameterSet();
+}
+#endif

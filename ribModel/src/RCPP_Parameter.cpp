@@ -1,10 +1,12 @@
 #ifndef STANDALONE
 #include "include/base/Parameter.h"
 #include "include/ROC/ROCParameter.h"
+#include "include/RFP/RFPParameter.h"
 #include <Rcpp.h>
 using namespace Rcpp;
 
 RCPP_EXPOSED_CLASS(ROCTrace)
+RCPP_EXPOSED_CLASS(RFPTrace)
 RCPP_EXPOSED_CLASS(Genome)
 RCPP_EXPOSED_CLASS(CovarianceMatrix)
 
@@ -62,6 +64,14 @@ RCPP_MODULE(Parameter_mod)
 		.method("getMutationVarianceForCodon", &ROCParameter::getMutationVarianceForCodon)
 		.method("getSelectionVarianceForCodon", &ROCParameter::getSelectionVarianceForCodon)
 
+		;
+
+	class_<RFPParameter>( "RFPParameter" )
+		.derives<Parameter>("Parameter")
+		.constructor <double, std::vector<unsigned>, std::vector<unsigned>, bool>()
+		.constructor <double, unsigned, std::vector<unsigned>, bool, std::string>()
+		
+		.method("getTraceObject", &RFPParameter::getTraceObject)
 		;
 }
 #endif
