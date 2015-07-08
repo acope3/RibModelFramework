@@ -334,7 +334,7 @@ int main()
 	enum ModelToRun { ROC, RFP };
 	/* Test variables */
 	User user = gabe;
-	ModelToRun  modelToRun = ROC;
+	ModelToRun  modelToRun = RFP;
 	bool read = false;
 	bool testing = false;
 
@@ -413,13 +413,17 @@ int main()
 		std::cout << "Initializing shared parameter variables\n";
 
 		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
-		for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+		/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
 			if (i < 448) geneAssignment[i] = 0u;
 			else geneAssignment[i] = 1u;
+		}*/
+		for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+		{
+			geneAssignment[i] = 0u;
 		}
 		double sphi_init = 2;
-		unsigned numMixtures = 2;
+		unsigned numMixtures = 1;
 		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 		std::cout <<"Done initializing shared parameter variables\n";
 
@@ -500,7 +504,49 @@ int main()
 				std::cout << SequenceSummary::AminoAcidArray[index] << ": " << parameter.getCurrentCodonSpecificProposalWidth(index) << "\n";
 			}
 		}
+		else if (modelToRun == RFP)
+		{
+			RFPParameter parameter;
+			if (read)
+			{
 
+			}
+			else
+			{
+				std::cout << "initialize RFPParameter object" << std::endl;
+				std::string mixDef = Parameter::allUnique;
+				std::cout << "\tSphi init: " << sphi_init << "\n";
+				std::cout << "\t# mixtures: " << numMixtures << "\n";
+				std::cout << "\tmixture definition: " << mixDef << "\n";
+				RFPParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
+				tmp.InitializeSynthesisRate(genome, sphi_init);
+				parameter = tmp;
+				std::cout << "Done initialize RFPParameter object" << std::endl;
+			}
+			
+
+			std::cout <<"Initializing RFPModel object\n";
+			RFPModel model;
+			model.setParameter(parameter);
+			//TODO: what does this do in the RFP case? Do we even need it????
+		/*	std::ofstream scuoout("results/scuo.csv");
+			for (unsigned n = 0u; n < genome.getGenomeSize(); n++)
+			{
+				scuoout << genome.getGene(n).getId() << "," << parameter.calculateSCUO(genome.getGene(n), 64) << std::endl;
+			}
+			scuoout.close();
+			*/std::cout <<"Done initializing RFPModel object\n";
+		
+			std::cout << "starting MCMC for RFP" << std::endl;
+      mcmc.run(genome, model, 4);
+      std::cout << std::endl << "Finished MCMC for RFP" << std::endl;
+
+
+      std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
+      std::cout << "Sphi proposal width: " << parameter.getSphiProposalWidth() << std::endl;
+
+		}
+		else {}
 
 		//These files used to be written here:
 		//mutationPosterior_Cat#.csv

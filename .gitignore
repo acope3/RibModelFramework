@@ -3,6 +3,7 @@
 *.o
 *.so
 *.gz
+*.out
 *.txt
 *.swp
 *.pdf

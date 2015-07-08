@@ -15,7 +15,7 @@ class RFPModel: public Model {
 				unsigned currRFPObserved, unsigned currNumCodonsInMRNA, double phiValue);
 	public:
 		//Constructors & Destructors:
-		RFPModel();
+		explicit RFPModel();
 		virtual ~RFPModel();
 		RFPModel(const RFPModel& other);
 
@@ -164,6 +164,8 @@ class RFPModel: public Model {
 		{
 			return parameter->getGrouping(index);
 		}
+		virtual unsigned getGroupListSize() {return parameter->getGroupListSize();}
+
 		// R wrapper
 		std::vector<double> CalculateProbabilitiesForCodons(std::vector<double> mutation, std::vector<double> selection,
 				double phi);

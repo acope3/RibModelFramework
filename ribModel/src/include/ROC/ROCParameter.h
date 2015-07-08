@@ -68,7 +68,7 @@ class ROCParameter : public Parameter
 		SEXP calculateSelectionCoefficientsR(unsigned sample, unsigned mixture);
 #endif
 		void initAllTraces(unsigned samples, unsigned num_genes) {traces.initAllTraces(samples, num_genes,
-				numMutationCategories, numSelectionCategories, numParam, numMixtures, categories);}
+				numMutationCategories, numSelectionCategories, numParam, numMixtures, categories, maxGrouping);}
 
 		void initMutationSelectionCategories(std::vector<std::string> files, unsigned numCategories, unsigned paramType);
 

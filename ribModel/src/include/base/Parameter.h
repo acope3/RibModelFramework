@@ -22,7 +22,6 @@ class Parameter {
 		std::string mutationSelectionState; //Probably needs to be renamed
 		std::vector<std::vector<unsigned>> selectionIsInMixture;
 		std::vector<std::vector<unsigned>> mutationIsInMixture;
-		unsigned maxGrouping;
 
 		// STATICS
 
@@ -275,6 +274,7 @@ class Parameter {
 		// proposal bias and std for phi values
 		double bias_phi;
 		std::vector<std::vector<double>> std_phi;
+		unsigned maxGrouping;
 };
 
 #endif // PARAMETER_H

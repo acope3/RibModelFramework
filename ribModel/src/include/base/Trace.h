@@ -24,8 +24,10 @@ class Trace {
 		~Trace();
 
 		//Init functions
-		void initAllTraces(unsigned samples, unsigned num_genes, unsigned numSelectionCategories, unsigned numMixtures, std::vector<mixtureDefinition> &_categories);
-		void initBaseTraces(unsigned samples, unsigned num_genes, unsigned numSelectionCategories, unsigned numMixtures, std::vector<mixtureDefinition> &_categories);
+		void initAllTraces(unsigned samples, unsigned num_genes, unsigned numSelectionCategories, unsigned numMixtures, 
+				std::vector<mixtureDefinition> &_categories, unsigned maxGrouping);
+		void initBaseTraces(unsigned samples, unsigned num_genes, unsigned numSelectionCategories, unsigned numMixtures, 
+				std::vector<mixtureDefinition> &_categories, unsigned maxGrouping);
 		bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);
 
 		void initSphiTrace(unsigned samples);

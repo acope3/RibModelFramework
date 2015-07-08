@@ -118,7 +118,7 @@ void ROCParameter::initROCParameterSet()
 	// proposal bias and std for codon specific parameter
 	bias_csp = 0;
 	std_csp.resize(numParam, 0.1);
-	numAcceptForMutationAndSelection.resize(22, 0u);
+	numAcceptForMutationAndSelection.resize(maxGrouping, 0u);
 
 	phiEpsilon = 0.1;
 	phiEpsilon_proposed = 0.1;
@@ -143,6 +143,16 @@ void ROCParameter::initROCParameterSet()
 		proposedSelectionParameter[i] = tmp;
 		currentSelectionParameter[i] = tmp;
 	}
+
+  for (unsigned i = 0; i < maxGrouping; i++)
+  {
+    std::string aa = SequenceSummary::AminoAcidArray[i];
+    unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa, true);
+    CovarianceMatrix m((numMutationCategories + numSelectionCategories) * numCodons);
+    m.choleskiDecomposition();
+    covarianceMatrix.push_back(m);
+  }
+
 
 }
 

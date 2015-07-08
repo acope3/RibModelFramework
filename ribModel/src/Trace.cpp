@@ -14,17 +14,20 @@ Trace::~Trace()
 	//DTOR
 }
 
-void Trace::initAllTraces(unsigned samples, unsigned num_genes, unsigned numSelectionCategories, unsigned numMixtures, std::vector<mixtureDefinition> &_categories)
+void Trace::initAllTraces(unsigned samples, unsigned num_genes, unsigned numSelectionCategories, unsigned numMixtures, 
+		std::vector<mixtureDefinition> &_categories, unsigned maxGrouping)
 {
-	initBaseTraces(samples, num_genes, numSelectionCategories, numMixtures, _categories);
+	initBaseTraces(samples, num_genes, numSelectionCategories, numMixtures, _categories, maxGrouping);
 }
 
-void Trace::initBaseTraces(unsigned samples, unsigned num_genes, unsigned numSelectionCategories, unsigned numMixtures, std::vector<mixtureDefinition> &_categories)
+void Trace::initBaseTraces(unsigned samples, unsigned num_genes, unsigned numSelectionCategories, unsigned numMixtures, 
+		std::vector<mixtureDefinition> &_categories, unsigned maxGrouping)
 {
+	std::cout <<"maxGrouping: " << maxGrouping <<"\n";
 	//numSelectionCategories always == numSynthesisRateCategories, so only one is passed in for convience
 	initSphiTrace(samples);
 	initSynthesisRateAcceptanceRatioTrace(num_genes, numSelectionCategories);
-	cspAcceptanceRatioTrace.resize(22);
+	cspAcceptanceRatioTrace.resize(maxGrouping);
 	initSynthesisRateTrace(samples, num_genes, numSelectionCategories);
 	initMixtureAssignmentTrace(samples, num_genes);
 	initMixtureProbabilitesTrace(samples, numMixtures);
