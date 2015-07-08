@@ -396,9 +396,10 @@ RCPP_MODULE(SequenceSummary_mod)
 	function("CodonToAA", &SequenceSummary::CodonToAA, List::create(_["codon"]), "returns an amino acid for a given codon");
 	function("GetNumCodonsForAA", &SequenceSummary::GetNumCodonsForAA, List::create(_["aa"], _["forParamVector"] = false), "returns the number of codons for a given amino acid");
 	function("AAToCodon", &SequenceSummary::AAToCodon, List::create(_["aa"], _["forParamVector"] = false), "returns a vector of codons for a given amino acid");
-
+	function("CodonToIndex", &SequenceSummary::CodonToIndex, List::create(_["codon"], _["forParamVector"] = false));
 	//R wrapper function
 	function("aminoAcids", &SequenceSummary::aminoAcids, "returns all Amino Acids as one letter code");
+	function("codons", &SequenceSummary::codons, "returns all codons or all reference codons");
 }
 #endif
 

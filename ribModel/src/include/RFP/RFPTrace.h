@@ -36,8 +36,8 @@ class RFPTrace: public Trace {
 		//R WRAPPER FUNCTIONS
 
 		//Getter functions
-		std::vector<double> getMutationParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon);//R WRAPPER
-		std::vector<double> getSelectionParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon);//R WRAPPER
+		std::vector<double> getAlphaParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon);//R WRAPPER
+		std::vector<double> getLambdaPrimeParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon);//R WRAPPER
 	};
 
 #endif //RFPTRACE_H

@@ -88,28 +88,25 @@ void RFPTrace::updateCodonSpecificParameterTrace(unsigned sample, std::string co
 //----------------------------------------------------
 //----------------------R WRAPPERS--------------------
 //----------------------------------------------------
-/*
-std::vector<double> ROCTrace::getMutationParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon) 
+std::vector<double> RFPTrace::getAlphaParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon) 
 {
 	std::vector<double> RV;
 	bool checkMixtureElement = checkIndex(mixtureElement, 1, getNumberOfMixtures());
 	if (checkMixtureElement)
 	{
-		RV = getMutationParameterTraceByMixtureElementForCodon(mixtureElement - 1, codon);  
+		RV = getAlphaParameterTraceByMixtureElementForCodon(mixtureElement - 1, codon);  
 	}
 	return RV;
 }
 
 
-std::vector<double> ROCTrace::getSelectionParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon) 
+std::vector<double> RFPTrace::getLambdaPrimeParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon) 
 {
 	std::vector<double> RV;
 	bool checkMixtureElement = checkIndex(mixtureElement, 1, getNumberOfMixtures());
 	if (checkMixtureElement)
 	{
-		RV = getSelectionParameterTraceByMixtureElementForCodon(mixtureElement - 1, codon);  
+		RV = getLambdaPrimeParameterTraceByMixtureElementForCodon(mixtureElement - 1, codon);  
 	}
 	return RV;
 }
-*/
-

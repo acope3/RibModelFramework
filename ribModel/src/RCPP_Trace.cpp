@@ -2,6 +2,7 @@
 #ifndef STANDALONE
 #include "include/base/Trace.h"
 #include "include/ROC/ROCTrace.h"
+#include "include/RFP/RFPTrace.h"
 #include <Rcpp.h>
 using namespace Rcpp;
 RCPP_MODULE(Trace_mod)
@@ -31,6 +32,11 @@ RCPP_MODULE(Trace_mod)
     .method("getSelectionParameterTraceByMixtureElementForCodon", &ROCTrace::getSelectionParameterTraceByMixtureElementForCodonR)
     ;
 
+	class_<RFPTrace>("RFPTrace")
+		.derives<Trace>("Trace")
+		.method("getAlphaParameterTraceByMixtureElementForCodon", &RFPTrace::getAlphaParameterTraceByMixtureElementForCodonR)
+		.method("getLambdaPrimeParameterTraceByMixtureElementForCodon", &RFPTrace::getLambdaPrimeParameterTraceByMixtureElementForCodonR)
+		;
 }
 #endif
 

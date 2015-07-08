@@ -4,16 +4,44 @@
 # additional arguments are geneIndex, and category to index function like
 # getExpressionTraceForGene or plotCodonSpecificParameters
 
+plot.Rcpp_RFPTrace <- function(trace, what=c("Mutation", "Selection", "MixtureProbability" ,"SPhi", "ExpectedPhi", "Expression"), 
+                               geneIndex=1, mixture = 1, ...)
+{
+  if(what[1] == "Mutation")
+  {
+    plotRFPCodonSpecificParameters(trace, mixture, "mutation", main="Mutation Parameter Traces")
+  }
+  if(what[1] == "Selection")
+  {
+    plotRFPCodonSpecificParameters(trace, mixture, "selection", main="Selection Parameter Traces")
+  }  
+  if(what[1] == "MixtureProbability")
+  {
+    plotMixtureProbability(trace)
+  }
+  if(what[1] == "SPhi")
+  {
+    plotSPhiTrace(trace)
+  }
+  if(what[1] == "ExpectedPhi")
+  {
+    plotExpectedPhiTrace(trace)
+  }
+  if(what[1] == "Expression")
+  {
+    plotExpressionTrace(trace, geneIndex)
+  }
+}
 plot.Rcpp_ROCTrace <- function(trace, what=c("Mutation", "Selection", "MixtureProbability" ,"SPhi", "ExpectedPhi", "Expression"), 
                                    geneIndex=1, mixture = 1, ...)
 {
   if(what[1] == "Mutation")
   {
-    plotCodonSpecificParameters(trace, mixture, "mutation", main="Mutation Parameter Traces")
+    plotROCCodonSpecificParameters(trace, mixture, "mutation", main="Mutation Parameter Traces")
   }
   if(what[1] == "Selection")
   {
-    plotCodonSpecificParameters(trace, mixture, "selection", main="Selection Parameter Traces")
+    plotROCCodonSpecificParameters(trace, mixture, "selection", main="Selection Parameter Traces")
   }  
   if(what[1] == "MixtureProbability")
   {
@@ -33,7 +61,7 @@ plot.Rcpp_ROCTrace <- function(trace, what=c("Mutation", "Selection", "MixturePr
   }
 }
 
-plotCodonSpecificParameters <- function(trace, mixture, type="mutation", main="Mutation Parameter Traces")
+plotROCCodonSpecificParameters <- function(trace, mixture, type="mutation", main="Mutation Parameter Traces")
 {
   opar <- par(no.readonly = T) 
   
@@ -87,6 +115,56 @@ plotCodonSpecificParameters <- function(trace, mixture, type="mutation", main="M
   }
   par(opar)
 }
+
+plotRFPCodonSpecificParameters <- function(trace, mixture, type="mutation", main="Mutation Parameter Traces")
+{
+  opar <- par(no.readonly = T) 
+  
+  ### Trace plot.
+  nf <- layout(matrix(c(rep(1, 4), 2:21), nrow = 6, ncol = 4, byrow = TRUE),
+               rep(1, 4), c(2, 8, 8, 8, 8, 8), respect = FALSE)  
+  
+  ### Plot title.
+  par(mar = c(0, 0, 0, 0))
+  plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
+  text(0.5, 0.6, main)
+  text(0.5, 0.4, date(), cex = 0.6)
+  par(mar = c(5.1, 4.1, 4.1, 2.1))
+  
+  names.codons <- codons()
+  for(codon in names.codons)
+  {  
+    cur.trace <- vector("list", length(codon))
+    if(type == "alpha")
+    {
+      ylab <- expression("alpha")
+        cur.trace[[CodonToIndex(codon)]] <- trace$getAlphaParameterTraceByMixtureElementForCodon(mixture, codon)
+    }else{
+      ylab <- expression("lambdaPrime")
+        cur.trace[[CodonToIndex(codon)]] <- trace$getLambdaPrimeParameterTraceByMixtureElementForCodon(mixture, codon)
+    }
+    cur.trace <- do.call("cbind", cur.trace)
+    if(length(cur.trace) == 0) next
+    x <- 1:dim(cur.trace)[1]
+    xlim <- range(x)
+    ylim <- range(cur.trace, na.rm=T)
+    
+    main.aa <- aa #TODO map to three leter code
+    plot(NULL, NULL, xlim = xlim, ylim = ylim,
+         xlab = "Samples", ylab = ylab, main = main.aa)
+    plot.order <- order(apply(cur.trace, 2, sd), decreasing = TRUE)
+    for(i.codon in plot.order){
+      lines(x = x, y = cur.trace[, i.codon], col = ribModel:::.codonColors[[codons[i.codon]]])
+    }
+    colors <- unlist(ribModel:::.codonColors[codons])
+    legend("topleft", legend = codons, col = colors, 
+           lty = rep(1, length(codons)), bty = "n", cex = 0.75)
+  }
+  par(opar)
+}
+
+
+
 
 plotExpressionTrace <- function(trace, geneIndex)
 {

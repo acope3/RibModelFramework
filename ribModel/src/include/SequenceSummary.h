@@ -70,7 +70,12 @@ class SequenceSummary
 
 		//static R wrapper functions
 		static std::vector<std::string> aminoAcids() {return AminoAcidArray; }
-
+		static std::vector<std::string> codons()
+		{
+			std::vector<std::string> RV;
+			for (unsigned i = 0; i < 64; i++) RV.push_back(codonArray[i]);
+			return RV;
+		}
 	protected:
 
 
