@@ -13,9 +13,9 @@ FONSETrace::FONSETrace() : Trace()
 }
 
 void FONSETrace::initAllTraces(unsigned samples, unsigned numGenes, unsigned numMutationCategories,
-	unsigned numSelectionCategories, unsigned numParam, unsigned numMixtures, std::vector <mixtureDefinition> &_categories)
+	unsigned numSelectionCategories, unsigned numParam, unsigned numMixtures, std::vector <mixtureDefinition> &_categories, unsigned maxGrouping)
 {
-	initBaseTraces(samples, numGenes, numMutationCategories, numMixtures, _categories);
+	initBaseTraces(samples, numGenes, numMutationCategories, numMixtures, _categories, maxGrouping);
 	initFONSETraces(samples, numMutationCategories, numSelectionCategories, numParam);
 }
 
