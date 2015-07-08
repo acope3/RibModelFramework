@@ -19,7 +19,7 @@ parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv
 
 
 # initialize MCMC object
-samples <- 100
+samples <- 500
 thining <- 10
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples=samples, thining=thining, adaptive.width=adaptiveWidth, 
@@ -65,12 +65,12 @@ colors <- c("black", "red")
 for(mixture in 1:2)
 {
   genes.in.mixture <- which(round(mixtureAssignment[, mixture]+1) == mixture)
-  expressionCategory <- parameter$getExpressionCategoryForMixture(mixture)
+  expressionCategory <- parameter$getSynthesisRateCategoryForMixture(mixture)
   
   # need expression values to know range
   num.genes <- length(genes.in.mixture)
   expressionValues <- unlist(lapply(genes.in.mixture, function(geneIndex){
-    parameter$getExpressionPosteriorMeanByMixtureElementForGene(samples*0.1, geneIndex, expressionCategory)
+    parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(samples*0.1, geneIndex, expressionCategory)
   }))
   points(mixtureAssignment[genes.in.mixture, mixture], log10(expressionValues), col=colors[mixture])
 }

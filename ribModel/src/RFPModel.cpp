@@ -22,12 +22,21 @@ RFPModel::RFPModel (const RFPModel& other)
 double RFPModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime, unsigned currRFPObserved, 
 		unsigned currNumCodonsInMRNA, double phiValue)
 {
-	//TODO: is lgamma the correct function to use here? Any reason to make the math cleaner?
 	double logLikelihood = ((std::lgamma((currNumCodonsInMRNA * currAlpha) + currRFPObserved)) - (std::lgamma(currNumCodonsInMRNA * currAlpha)))
 		+ (currRFPObserved * (std::log(phiValue) + std::log(currLambdaPrime + phiValue))) + ((currNumCodonsInMRNA * currAlpha) * (std::log(currLambdaPrime) + 
 					std::log(currLambdaPrime + phiValue)));
+/*	double term1 = ((std::lgamma((currNumCodonsInMRNA * currAlpha) + currRFPObserved)) - (std::lgamma(currNumCodonsInMRNA * currAlpha)));
+	double term2 = (currRFPObserved * (std::log(phiValue) + std::log(currLambdaPrime + phiValue)));
+	double term3 = ((currNumCodonsInMRNA * currAlpha) * (std::log(currLambdaPrime) +
+          std::log(currLambdaPrime + phiValue)));
+	double gamma1 = (std::lgamma((currNumCodonsInMRNA * currAlpha) + currRFPObserved));
+	double gamma2 = (std::lgamma(currNumCodonsInMRNA * currAlpha));
 
-	return logLikelihood;
+	std::cout << "currNumCodonsInMRNA: " << currNumCodonsInMRNA <<"\tcurrAlpha: " << currAlpha <<"\n";
+	std::cout << "currRFPObserved: " << currRFPObserved <<"\n";
+	std::cout <<gamma1 <<"\t" <<gamma2 <<"\n\n\n";
+//	std::cout << term1 <<"\t" << term2 <<"\t" <<term3 <<"\n";
+	*/return logLikelihood;
 }
 
 
@@ -60,8 +69,8 @@ void RFPModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsi
 		double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, RFPParameter::lmPri, codon, false);
 		unsigned currRFPObserved = gene.geneData.getRFPObserved(index);
 
-		if (currRFPObserved == 0) continue;
 		unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(index);
+		if (currNumCodonsInMRNA == 0) continue;
 
 		logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
 		logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue_proposed);
@@ -97,6 +106,7 @@ void RFPModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 		double phiValue = parameter->getSynthesisRate(i, synthesisRateCategory, false);
 		unsigned currRFPObserved = gene.geneData.getRFPObserved(index);
 		unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(index);
+		if (currNumCodonsInMRNA == 0) continue;
 
 
 		double currAlpha = getParameterForCategory(alphaCategory, RFPParameter::alp, grouping, false);

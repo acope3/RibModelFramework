@@ -413,13 +413,17 @@ int main()
 		std::cout << "Initializing shared parameter variables\n";
 
 		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
-		for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+		/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
 			if (i < 448) geneAssignment[i] = 0u;
 			else geneAssignment[i] = 1u;
+		}*/
+		for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+		{
+			geneAssignment[i] = 0u;
 		}
 		double sphi_init = 2;
-		unsigned numMixtures = 2;
+		unsigned numMixtures = 1;
 		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 		std::cout <<"Done initializing shared parameter variables\n";
 
