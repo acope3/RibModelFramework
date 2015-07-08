@@ -1,4 +1,4 @@
-#include "../include/RFP/RFPModel.h"
+#include "include/RFP/RFPModel.h"
 
 RFPModel::RFPModel() : Model()
 {
