@@ -22,19 +22,25 @@ SequenceSummary::~SequenceSummary()
 
 SequenceSummary::SequenceSummary(const SequenceSummary& other)
 {
+	codonPositions.resize(other.codonPositions.size());
+	for (unsigned i = 0u; i < codonPositions.size(); i++) {
+		codonPositions[i] = other.codonPositions[i];
+	}
 	std::copy(std::begin(other.ncodons), std::end(other.ncodons), std::begin(ncodons));
 	std::copy(std::begin(other.naa), std::end(other.naa), std::begin(naa));
 	std::copy(std::begin(other.RFPObserved), std::end(other.RFPObserved), std::begin(RFPObserved));
-	std::copy(std::begin(other.numCodonsInMRNA), std::end(other.numCodonsInMRNA), std::begin(numCodonsInMRNA));
 }
 
 SequenceSummary& SequenceSummary::operator=(const SequenceSummary& rhs)
 {
 	if (this == &rhs) return *this; // handle self assignment
+	codonPositions.resize(rhs.codonPositions.size());
+	for (unsigned i = 0u; i < codonPositions.size(); i++) {
+		codonPositions[i] = rhs.codonPositions[i];
+	}
 	std::copy(std::begin(rhs.ncodons), std::end(rhs.ncodons), std::begin(ncodons));
 	std::copy(std::begin(rhs.naa), std::end(rhs.naa), std::begin(naa));
 	std::copy(std::begin(rhs.RFPObserved), std::end(rhs.RFPObserved), std::begin(RFPObserved));
-	std::copy(std::begin(rhs.numCodonsInMRNA), std::end(rhs.numCodonsInMRNA), std::begin(numCodonsInMRNA));
 	//assignment operator
 	return *this;
 }
@@ -43,11 +49,11 @@ void SequenceSummary::clear()
 {
 	// Why is "ncodons[64] = {};" not working?
 	int k;
-
+	
+	codonPositions.clear();
 	for(k = 0; k < 64; k++) { ncodons[k] = 0; }
 	for(k = 0; k < 22; k++) { naa[k] = 0; }
 	for(k = 0; k < 64; k++) { RFPObserved[k] = 0; }
-	for(k = 0; k < 64; k++) { numCodonsInMRNA[k] = 0; }
 }
 
 bool SequenceSummary::processSequence(const std::string& sequence)
@@ -56,21 +62,23 @@ bool SequenceSummary::processSequence(const std::string& sequence)
 	int codonID;
 	int aaID;
 	std::string codon;
-	for(unsigned i = 0u; i < sequence.length(); i+=3)
+	codonPositions.resize(64);
+	for (unsigned i = 0u; i < sequence.length(); i += 3)
 	{
 		codon = sequence.substr(i, 3);
-		codon[0] = (char) std::toupper(codon[0]);
-		codon[1] = (char) std::toupper(codon[1]);
-		codon[2] = (char) std::toupper(codon[2]);
+		codon[0] = (char)std::toupper(codon[0]);
+		codon[1] = (char)std::toupper(codon[1]);
+		codon[2] = (char)std::toupper(codon[2]);
 
-		codonID = SequenceSummary::CodonToIndex( codon );
+		codonID = SequenceSummary::CodonToIndex(codon);
 		if (codonID != 64) // if codon id == 64 => codon not found. Ignore, probably N 
 		{
-			aaID = SequenceSummary::CodonToAAIndex( codon );
+			aaID = SequenceSummary::CodonToAAIndex(codon);
 			ncodons[codonID]++;
 			naa[aaID]++;
+			codonPositions[codonID].push_back(i / 3);
 		}
-		else 
+		else
 		{
 			std::cerr << "WARNING: Codon " << codon << " not recognized!\n Codon will be ignored!\n";
 			check = false;
