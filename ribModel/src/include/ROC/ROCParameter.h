@@ -5,6 +5,7 @@
 #include <random>
 #include <string>
 #include <iostream>
+#include <array>
 
 #ifndef STANDALONE
 #include <Rcpp.h>
@@ -52,7 +53,6 @@ class ROCParameter : public Parameter
 		ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer = true, std::string _mutationSelectionState = "allUnique");
 		 
 #endif
-		ROCParameter(const ROCParameter& other);
 		ROCParameter& operator=(const ROCParameter& rhs);
 		ROCTrace& getTraceObject() {return traces;}
 		
@@ -97,7 +97,7 @@ class ROCParameter : public Parameter
 
 		// poposal functions
 		void proposeCodonSpecificParameter();
-		void getParameterForCategory(unsigned category, unsigned parameter, std::string aa, bool proposal, double* returnValue);
+		void getParameterForCategory(unsigned category, unsigned parameter, std::string aa, bool proposal, double *returnValue);
 
 		void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth);
 

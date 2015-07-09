@@ -29,43 +29,6 @@ Parameter::Parameter(unsigned _maxGrouping)
 	maxGrouping = _maxGrouping;
 }
 
-Parameter::Parameter(const Parameter& other)
-{
-  numParam = other.numParam;
-
-  covarianceMatrix = other.covarianceMatrix;
-  Sphi = other.Sphi;
-  Sphi_proposed = other.Sphi_proposed;
-  Aphi = other.Aphi;
-  Aphi_proposed = other.Aphi_proposed;
-  numAcceptForSphi = other.numAcceptForSphi;
-  categories = other.categories;
-
-  // proposal bias and std for phi values
-  bias_sphi = other.bias_sphi;
-  std_sphi = other.std_sphi;
-
-  // proposal bias and std for phi values
-  bias_phi = other.bias_phi;
-  std_phi = other.std_phi;
-
-  currentSynthesisRateLevel = other.currentSynthesisRateLevel;
-  proposedSynthesisRateLevel = other.proposedSynthesisRateLevel;
-  numAcceptForSynthesisRate = other.numAcceptForSynthesisRate;
-
-  numMutationCategories = other.numMutationCategories;
-  numSelectionCategories = other.numSelectionCategories;
-
-  numMixtures = other.numMixtures;
-
-	mutationSelectionState = other.mutationSelectionState;
-	selectionIsInMixture = other.selectionIsInMixture;
-	mutationIsInMixture = other.mutationIsInMixture;
-	maxGrouping = other.maxGrouping;
-	groupList = other.groupList;
-	mixtureAssignment = other.mixtureAssignment;
-	categoryProbabilities = other.categoryProbabilities;
-}
 Parameter& Parameter::operator=(const Parameter& rhs)
 {
   if (this == &rhs) return *this; // handle self assignment

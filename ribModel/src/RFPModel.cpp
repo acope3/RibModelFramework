@@ -13,12 +13,6 @@ RFPModel::~RFPModel()
 }
 
 
-RFPModel::RFPModel (const RFPModel& other)
-{
-	//TODO: complete implimentation
-}
-
-
 double RFPModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime, unsigned currRFPObserved, 
 		unsigned currNumCodonsInMRNA, double phiValue)
 {

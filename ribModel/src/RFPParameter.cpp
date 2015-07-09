@@ -31,22 +31,6 @@ RFPParameter::~RFPParameter()
 	//TODO: Need to call Parameter's deconstructor
 }
 
-
-RFPParameter::RFPParameter(const RFPParameter& other) : Parameter(other)
-{
-	currentAlphaParameter = other.currentAlphaParameter;
-	proposedAlphaParameter = other.proposedAlphaParameter;
-	currentLambdaPrimeParameter = other.proposedLambdaPrimeParameter;
-	proposedLambdaPrimeParameter = other.proposedLambdaPrimeParameter;
-
-	lambdaValues = other.lambdaValues;
-	numAcceptForAlphaAndLambdaPrime = other.numAcceptForAlphaAndLambdaPrime;
-
-	bias_csp = other.bias_csp;
-	std_csp = other.std_csp;
-}
-
-
 RFPParameter& RFPParameter::operator=(const RFPParameter& rhs)
 {
 	if (this == &rhs) return *this; // handle self assignment

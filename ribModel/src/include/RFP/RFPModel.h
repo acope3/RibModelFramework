@@ -17,8 +17,6 @@ class RFPModel: public Model {
 		//Constructors & Destructors:
 		explicit RFPModel();
 		virtual ~RFPModel();
-		RFPModel(const RFPModel& other);
-
 		void setParameter(RFPParameter &_parameter); //may move up PV
 		virtual void calculateCodonProbabilityVector(unsigned numCodons, double* mutation, double* selection,
 				double phi, double* codonProb)

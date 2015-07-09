@@ -42,19 +42,6 @@ MCMCAlgorithm::~MCMCAlgorithm()
 	//dtor
 }
 
-MCMCAlgorithm::MCMCAlgorithm(const MCMCAlgorithm& other)
-{
-	samples = other.samples;
-	thining = other.thining;
-	adaptiveWidth = other.adaptiveWidth;
-
-	estimateSynthesisRate = other.estimateSynthesisRate;
-	estimateCodonSpecificParameter = other.estimateCodonSpecificParameter;
-	estimateHyperParameter = other.estimateHyperParameter;
-
-	likelihoodTrace = other.likelihoodTrace;
-}
-
 double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, Model& model, int iteration)
 {
 	// TODO move the likelihood calculation out off here. make it a void function again.
@@ -191,7 +178,7 @@ void MCMCAlgorithm::acceptRejectHyperParameter(int numGenes, Model& model, int i
 	double proposedMPhi = -(proposedSphi * proposedSphi) / 2;
 
 #ifndef __APPLE__
-#pragma omp parallel for reduction(+:logProbabilityRatio)
+//#pragma omp parallel for reduction(+:logProbabilityRatio)
 #endif
 	for(int i = 0; i < numGenes; i++)
 	{

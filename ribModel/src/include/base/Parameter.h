@@ -47,7 +47,6 @@ class Parameter {
 		void initParameterSet(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
 				std::vector<std::vector<unsigned>> mixtureDefinitionMatrix, bool splitSer = true,
 				std::string _mutationSelectionState = "allUnique");
-		Parameter(const Parameter& other);
 		Parameter& operator=(const Parameter& rhs);
 		virtual ~Parameter()
 		{
