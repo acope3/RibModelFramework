@@ -67,26 +67,6 @@ ROCParameter::~ROCParameter()
 	//dtor
 }
 
-ROCParameter::ROCParameter(const ROCParameter& other) :
-		Parameter(other)
-{
-
-	// proposal bias and std for codon specific parameter
-	bias_csp = other.bias_csp;
-	std_csp = other.std_csp;
-
-	currentMutationParameter = other.currentMutationParameter;
-	proposedMutationParameter = other.proposedMutationParameter;
-
-	currentSelectionParameter = other.currentSelectionParameter;
-	proposedSelectionParameter = other.proposedSelectionParameter;
-
-	phiEpsilon = other.phiEpsilon;
-	phiEpsilon_proposed = other.phiEpsilon_proposed;
-
-	traces = other.traces;
-	numAcceptForMutationAndSelection = other.numAcceptForMutationAndSelection;
-}
 ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
 {
 	if (this == &rhs)
@@ -501,7 +481,7 @@ void ROCParameter::initMutationSelectionCategories(std::vector<std::string> file
 }
 
 void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType, std::string aa, bool proposal,
-		double* returnSet)
+		double *returnSet)
 {
 	std::vector<double> *tempSet;
 	if (paramType == ROCParameter::dM)

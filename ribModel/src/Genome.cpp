@@ -18,12 +18,6 @@ Genome::~Genome()
 	//dtor
 }
 
-Genome::Genome(const Genome& other)
-{
-	//copy ctor
-	genes = other.genes;
-}
-
 Genome& Genome::operator=(const Genome& rhs)
 {
 	if (this == &rhs) return *this; // handle self assignment

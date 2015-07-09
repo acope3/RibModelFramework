@@ -24,7 +24,6 @@ class Genome
 		//constructor/destructor
 		explicit Genome();
 		virtual ~Genome();
-		Genome(const Genome& other);
 		Genome& operator=(const Genome& other);
 
 		void readFasta(std::string filename, bool Append = false);

@@ -45,7 +45,6 @@ class RFPParameter: public Parameter {
 				std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer = true,
 				std::string _mutationSelectionState = "allUnique");
 		virtual ~RFPParameter();
-		RFPParameter(const RFPParameter& other);
 		RFPParameter& operator=(const RFPParameter& rhs);
 #ifndef STANDALONE
 		RFPParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer = true);

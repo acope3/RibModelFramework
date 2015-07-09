@@ -31,7 +31,7 @@ class MCMCAlgorithm
 		MCMCAlgorithm(unsigned samples, unsigned thining, unsigned _adaptiveWidth = 100, bool _estimateSynthesisRate = true, bool _estimateCodonSpecificParameter = true,
 		bool _estimateHyperParameter = true);
 		virtual ~MCMCAlgorithm();
-		MCMCAlgorithm(const MCMCAlgorithm& other);
+	
 
 		void run(Genome& genome, Model& model, unsigned numCores = 1u);
 

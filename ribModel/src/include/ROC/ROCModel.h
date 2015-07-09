@@ -16,8 +16,6 @@ class ROCModel : public Model
 
 	ROCModel();
 	virtual ~ROCModel();
-	ROCModel(const ROCModel& other);
-
 	void setParameter(ROCParameter &_parameter);
 	virtual void calculateCodonProbabilityVector(unsigned numCodons, double* mutation, double* selection, double phi, double* codonProb);
 	// Likelihood ratio functions

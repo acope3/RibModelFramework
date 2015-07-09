@@ -3,6 +3,7 @@
 #include <math.h>
 #include <cfloat>
 #include <iostream>
+#include <array>
 
 ROCModel::ROCModel() : Model()
 {
@@ -12,12 +13,6 @@ ROCModel::ROCModel() : Model()
 ROCModel::~ROCModel()
 {
 	//dtor
-}
-
-ROCModel::ROCModel(const ROCModel& other)
-{
-	//copy ctor
-	parameter = other.parameter;
 }
 
 void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio)
@@ -37,9 +32,9 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsi
 
 	double mutation[5];
 	double selection[5];
-	int codonCount[5];
+	int codonCount[6];
 #ifndef __APPLE__
-#pragma omp parallel for private(mutation, selection, codonCount) reduction(+:logLikelihood,logLikelihood_proposed)
+//#pragma omp parallel for private(mutation, selection, codonCount) reduction(+:logLikelihood,logLikelihood_proposed)
 #endif
 	for(unsigned i = 0; i < getGroupListSize(); i++)
 	{
@@ -63,9 +58,9 @@ void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsi
 		logLikelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
 		logLikelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue_proposed);
 
-		//delete [] mutation;
-		//delete [] selection;
-		//delete [] codonCount;
+		//delete [] &mutation;
+		//delete [] &selection;
+		//delete [] &codonCount;
 	}
 
 	double sPhi = parameter->getSphi(false);
@@ -155,9 +150,9 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 	double selection[5];
 	double mutation_proposed[5];
 	double selection_proposed[5];
-	int codonCount[5];
+	int codonCount[6];
 #ifndef __APPLE__
-#pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed, codonCount) reduction(+:likelihood,likelihood_proposed)
+//#pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed, codonCount) reduction(+:likelihood,likelihood_proposed)
 #endif
 	for(int i = 0; i < numGenes; i++)
 	{
@@ -190,11 +185,11 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 		obtainCodonCount(seqsum, grouping, codonCount);
 		likelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
 		likelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation_proposed, selection_proposed, phiValue);
-		//delete [] codonCount;
-		//delete [] mutation;
-		//delete [] selection;
-		//delete [] mutation_proposed;
-		//delete [] selection_proposed;
+		//delete [] &codonCount;
+		//delete [] &mutation;
+		//delete [] &selection;
+		//delete [] &mutation_proposed;
+		//delete [] &selection_proposed;
 	}
 	logAcceptanceRatioForAllMixtures = likelihood_proposed - likelihood;
 }
