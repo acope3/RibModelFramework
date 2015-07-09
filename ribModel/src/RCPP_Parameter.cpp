@@ -72,6 +72,7 @@ RCPP_MODULE(Parameter_mod)
 		.constructor <double, unsigned, std::vector<unsigned>, bool, std::string>()
 		
 		.method("getTraceObject", &RFPParameter::getTraceObject)
+		.method("getParameterForCategory", &RFPParameter::getParameterForCategory) //need to implement the R wrapper
 		;
 }
 #endif

@@ -212,16 +212,15 @@ void RFPParameter::proposeCodonSpecificParameter()
 void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
 {
 
-	unsigned numCSPsets = numAcceptForAlphaAndLambdaPrime.size();
 	std::cout << "acceptance ratio for codon:\n";
-	for (unsigned i = 0; i < numCSPsets; i++)
+	for (unsigned i = 0; i < groupList.size(); i++)
 	{
-		if (i >= 61) continue;
-		std::cout << SequenceSummary::IndexToCodon(i) << "\t";
+		std::cout << groupList[i] << "\t";
 
-		double acceptanceLevel = (double)numAcceptForAlphaAndLambdaPrime[i] / (double)adaptationWidth;
+		unsigned codonIndex = SequenceSummary::CodonToIndex(groupList[i]);
+		double acceptanceLevel = (double)numAcceptForAlphaAndLambdaPrime[codonIndex] / (double)adaptationWidth;
 		std::cout << acceptanceLevel << "\n";
-		traces.updateCspAcceptanceRatioTrace(i, acceptanceLevel);
+		traces.updateCspAcceptanceRatioTrace(codonIndex, acceptanceLevel);
 		if (acceptanceLevel < 0.2)
 		{
 			std_csp[i] *= 0.8;
@@ -230,10 +229,11 @@ void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 		{
 			std_csp[i] *= 1.2;
 		}
-		numAcceptForAlphaAndLambdaPrime[i] = 0u;
+		numAcceptForAlphaAndLambdaPrime[codonIndex] = 0u;
 	}
 	std::cout << "\n";
 }
+
 
 //TODO: The only thing stopping this from moving up to Parameter is the trace
 //stuff. Is there a way around this?

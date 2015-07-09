@@ -11,7 +11,7 @@ geneAssignment <- c(rep(1, genome$getGenomeSize()))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, model= "RFP", split.serine = TRUE, mixture.definition = mixDef)
 
 # initialize MCMC object
-samples <- 100
+samples <- 50
 thining <- 10
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples=samples, thining=thining, adaptive.width=adaptiveWidth, 
@@ -37,3 +37,13 @@ plot(trace, what = "ExpectedPhi")
 dev.off()
 
 plot(trace, what = "Expression", geneIndex = 905)
+pdf("simulated_Genome_allUnique_startCSP_True_startPhi_true_adaptSphi_True_mix1.pdf", width = 11, height = 12)
+plot(trace, what = "Alpha", mixture = 1)
+plot(trace, what = "LambdaPrime", mixture = 1)
+dev.off()
+
+
+pdf("corralationBetweenAlphaAndLambdaPrime.pdf")
+
+reg <- lm()
+dev.off()
