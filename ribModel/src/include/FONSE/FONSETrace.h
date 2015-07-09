@@ -18,7 +18,7 @@ public:
 
 	//Init functions
 	void initAllTraces(unsigned samples, unsigned num_genes, unsigned numMutationCategories,
-		unsigned numSelectionCategories, unsigned numParam, unsigned numMixtures, std::vector<mixtureDefinition> &_categories);
+		unsigned numSelectionCategories, unsigned numParam, unsigned numMixtures, std::vector<mixtureDefinition> &_categories, unsigned maxGrouping);
 	void initFONSETraces(unsigned samples, unsigned numMutationCategories, unsigned numSelectionCategories, unsigned numParam);
 	void initMutationParameterTrace(unsigned samples, unsigned numMutationCategories, unsigned numParam);
 	void initSelectionParameterTrace(unsigned samples, unsigned numSelectionCategories, unsigned numParam);
