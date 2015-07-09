@@ -323,18 +323,19 @@ void testReadRFPFile()
 		SequenceSummary SS = gene.geneData;
 		for (unsigned j = 0; j < 64; j++)
 		{
-			std::cout << gene.getId() << " " << SS.getRFPObserved(j) << " " << SS.getNumCodonsInMRNA(j) << " " << SS.IndexToCodon(j) << "\n";
+			//std::cout << gene.getId() << " " << SS.getRFPObserved(j) << " " << SS.getNumCodonsInMRNA(j) << " " << SS.IndexToCodon(j) << "\n";
 		}
 	}
 	std::cout << "------------------- TEST READRFPFILE ----------------------" << "\n";
 }
 int main()
 {
+	std::cout <<"Testing this\n";
 	enum User { cedric, gabe, jeremy };
 	enum ModelToRun { ROC, RFP };
 	/* Test variables */
 	User user = gabe;
-	ModelToRun  modelToRun = RFP;
+	ModelToRun  modelToRun = ROC;
 	bool read = false;
 	bool testing = false;
 
@@ -413,17 +414,17 @@ int main()
 		std::cout << "Initializing shared parameter variables\n";
 
 		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
-		/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+		for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
 			if (i < 448) geneAssignment[i] = 0u;
 			else geneAssignment[i] = 1u;
-		}*/
-		for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+		}
+		/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
 			geneAssignment[i] = 0u;
-		}
+		}*/
 		double sphi_init = 2;
-		unsigned numMixtures = 1;
+		unsigned numMixtures = 2;
 		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 		std::cout <<"Done initializing shared parameter variables\n";
 

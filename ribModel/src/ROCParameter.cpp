@@ -562,40 +562,37 @@ void ROCParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
 
 void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
 {
-	unsigned numCSPsets = numAcceptForMutationAndSelection.size();
 	std::cout << "acceptance ratio for amino acid:\n\t";
-	for (unsigned i = 0; i < numCSPsets; i++)
+	for (unsigned i = 0; i < groupList.size(); i++)
 	{
-		if (i == 21 || i == 10 || i == 18)
-			continue;
-		std::cout << SequenceSummary::AminoAcidArray[i] << "\t";
+		std::cout << groupList[i] << "\t";
 	}
 	std::cout << "\n\t";
-	for (unsigned i = 0; i < numCSPsets; i++)
+	for (unsigned i = 0; i < groupList.size(); i++)
 	{
-		if (i == 21 || i == 10 || i == 18)
-			continue;
-		double acceptanceLevel = (double) numAcceptForMutationAndSelection[i] / (double) adaptationWidth;
+		std::string aa = groupList[i];
+		unsigned aaIndex = SequenceSummary::AAToAAIndex(aa);
+		double acceptanceLevel = (double) numAcceptForMutationAndSelection[aaIndex] / (double) adaptationWidth;
 		std::cout << acceptanceLevel << "\t";
-		traces.updateCspAcceptanceRatioTrace(i, acceptanceLevel);
+		traces.updateCspAcceptanceRatioTrace(aaIndex, acceptanceLevel);
 		unsigned codonRange[2];
-		SequenceSummary::AAindexToCodonRange(i, true, codonRange);
+		SequenceSummary::AAindexToCodonRange(aaIndex, true, codonRange);
 		for (unsigned k = codonRange[0]; k < codonRange[1]; k++)
 		{
 			if (acceptanceLevel < 0.2)
 			{
-				covarianceMatrix[i] *= 0.8;
-				covarianceMatrix[i].choleskiDecomposition();
+				covarianceMatrix[aaIndex] *= 0.8;
+				covarianceMatrix[aaIndex].choleskiDecomposition();
 				std_csp[k] *= 0.8;
 			}
 			if (acceptanceLevel > 0.3)
 			{
-				covarianceMatrix[i] *= 1.2;
-				covarianceMatrix[i].choleskiDecomposition();
+				covarianceMatrix[aaIndex] *= 1.2;
+				covarianceMatrix[aaIndex].choleskiDecomposition();
 				std_csp[k] *= 1.2;
 			}
 		}
-		numAcceptForMutationAndSelection[i] = 0u;
+		numAcceptForMutationAndSelection[aaIndex] = 0u;
 	}
 	std::cout << "\n";
 }

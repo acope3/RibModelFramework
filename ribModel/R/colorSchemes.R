@@ -10,7 +10,8 @@
                      CAC="darkorange", CAT="green4", #His
                      ATA="blue", ATC="darkorange", ATT="green4", #Ile
                      AAA="blue", AAG="purple", #Lys
-                     CTA="blue", CTC="darkorange", CTG="purple", CTT="green4", TTA="darkturquoise", TTG="deeppink3", #Leu 
+                     CTA="blue", CTC="darkorange", CTG="purple", CTT="green4", TTA="darkturquoise", TTG="deeppink3", #Leu
+                     ATG="purple",
                      AAC="darkorange", AAT="green4", #Asn
                      CCA="blue", CCC="darkorange", CCG="purple", CCT="green4", #Pro
                      CAA="blue", CAG="purple", #Gln
@@ -19,4 +20,6 @@
                      ACA="blue", ACC="darkorange", ACG="purple", ACT="green4", #Thr
                      GTA="blue", GTC="darkorange", GTG="purple", GTT="green4", #Val
                      TAC="darkorange", TAT="green4", #Tyr
-                     AGC="darkorange", AGT="green4") #Ser2
+                     AGC="darkorange", AGT="green4", #Ser2
+                     TGG="blue",
+                     TAA="blue", TAG="purple", TGA="darkturquoise") #Stop
