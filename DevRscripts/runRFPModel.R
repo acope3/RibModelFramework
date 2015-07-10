@@ -26,11 +26,12 @@ system.time(
   runMCMC(mcmc, genome, model)
 )
 
-plot(mcmc)
+
 
 # plots different aspects of trace
 trace <- parameter$getTraceObject()
 pdf("RFP_Genome_allUnique_startCSP_True_startPhi_true_adaptSphi_True.pdf")
+plot(mcmc)
 plot(trace, what = "MixtureProbability")
 plot(trace, what = "SPhi")
 plot(trace, what = "ExpectedPhi")
