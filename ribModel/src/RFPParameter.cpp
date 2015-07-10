@@ -565,6 +565,32 @@ void RFPParameter::initLambdaPrimeR(double lambdaPrimeValue, unsigned mixtureEle
 }
 
 
+double RFPParameter::getParameterForCategoryR(unsigned mixtureElement, unsigned paramType, std::string codon, bool proposal)
+{
+	double rv = 0.0;
+	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	if (check)
+	{
+		mixtureElement--;
+		unsigned category = 0;
+		codon[0] = std::toupper(codon[0]);
+		codon[1] = std::toupper(codon[1]);
+		codon[2] = std::toupper(codon[2]);
+		if (paramType == RFPParameter::alp)
+		{
+			//THIS NEEDS TO CHANGE!!!!
+			category = getMutationCategory(mixtureElement); //really alpha here
+		}
+		else if (paramType == RFPParameter::lmPri)
+		{
+			category = getSelectionCategory(mixtureElement);
+		}
+		rv = getParameterForCategory(category, paramType, codon, proposal);
+	}
+	return rv;
+}
+
+
 #ifndef STANDALONE
 RFPParameter::RFPParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter(64)
 {
