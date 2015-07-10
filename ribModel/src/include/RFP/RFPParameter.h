@@ -149,6 +149,8 @@ class RFPParameter: public Parameter {
 		//More R Wrappers:
 		void initAlphaR(double alphaValue, unsigned mixtureElement, std::string codon);
 		void initLambdaPrimeR(double lambdaPrimeValue, unsigned mixtureElement, std::string codon);
+		double getParameterForCategoryR(unsigned mixtureElement, unsigned paramType, std::string codon, bool proposal);
+
 		//Need to alter these functions, not going to deal with these at this time-----------------------------------
 		/*//R wrapper functions
 		 void initMutationSelectionCategoriesR(std::vector<std::string> files, unsigned numCategories, std::string paramType);
