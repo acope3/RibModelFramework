@@ -40,6 +40,7 @@ class FONSEParameter : public Parameter
 		static const unsigned dM;
 		static const unsigned dOmega;
 
+		FONSEParameter();
 		explicit FONSEParameter(std::string filename);
 		FONSEParameter(double sphi, unsigned _numMixtures, std::vector <unsigned> geneAssignment,
 			std::vector <std::vector <unsigned> > thetaKmatrix, bool splitSer = true,
@@ -69,7 +70,9 @@ class FONSEParameter : public Parameter
 		SEXP calculateSelectionCoefficientsR(unsigned sample, unsigned mixture);
 #endif
 
-		void initAllTraces(unsigned samples, unsigned num_genes);
+		void initAllTraces(unsigned samples, unsigned num_genes) {
+			traces.initAllTraces(samples, num_genes, numMutationCategories, numSelectionCategories, numParam, numMixtures, categories, maxGrouping);
+		}
 		void initMutationSelectionCategories(std::vector <std::string> files, unsigned numCategories, unsigned paramType);
 
 		double getCurrentCodonSpecificProposalWidth(unsigned aa);
@@ -92,7 +95,7 @@ class FONSEParameter : public Parameter
 		}
 
 		void proposeCodonSpecificParameter();
-		void getParameterForCategory(unsigned category, unsigned parameter, std::string aa, bool proposal, double* returnValue);
+		std::vector <double> *getParameterForCategory(unsigned category, unsigned parameter, bool proposal);
 
 		void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth);
 

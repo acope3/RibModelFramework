@@ -220,8 +220,8 @@ void testSimulateGenome(Genome& genome)
 			std::string curAA = SequenceSummary::IndexToAA(j);
 			unsigned numCodons = simSeqSum.GetNumCodonsForAA(curAA);
 			double* codonProb = new double[numCodons];
-			double* mutation = new double[numCodons - 1];
-			double* selection = new double[numCodons - 1];
+			double *mutation = new double[numCodons - 1];
+			double *selection = new double[numCodons - 1];
 			if (curAA == "X") std::cout << numCodons << "\n";
 			parameter.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
 			parameter.getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
@@ -324,18 +324,41 @@ void testReadRFPFile()
 		for (unsigned j = 0; j < 64; j++)
 		{
 			//std::cout << gene.getId() << " " << SS.getRFPObserved(j) << " " << SS.getNumCodonsInMRNA(j) << " " << SS.IndexToCodon(j) << "\n";
+			std::cout << gene.getId() << " " << SS.getRFPObserved(j) << " " << SS.IndexToCodon(j) << "\n";
+
 		}
 	}
 	std::cout << "------------------- TEST READRFPFILE ----------------------" << "\n";
 }
+
+void testSynonymousCodons()
+{
+	std::string codon = "GAG";
+	std::string aa = "L";
+	unsigned codonIndex = 25;
+	unsigned aaIndex = 7;
+
+	std::vector <std::string> strAATest, strAAIndexTest, strCodonTest, strCodonIndexTest;
+	std::vector <unsigned> AATest, AAIndexTest, AACodonTest, AACodonIndexTest;
+
+	AATest = SequenceSummary::getSynonymousCodonIndicesByAA(aa);
+	SequenceSummary::getSynonymousCodonIndicesByAAIndex(aaIndex);
+	SequenceSummary::getSynonymousCodonIndicesByCodon(codon);
+	SequenceSummary::getSynonymousCodonIndicesByCodonIndex(codonIndex);
+	SequenceSummary::getSynonymousCodonsByAA(aa);
+	SequenceSummary::getSynonymousCodonsByAAIndex(aaIndex);
+	SequenceSummary::getSynonymousCodonsByCodon(codon);
+	SequenceSummary::getSynonymousCodonsByCodonIndex(codonIndex);
+}
+
 int main()
 {
 	std::cout <<"Testing this\n";
 	enum User { cedric, gabe, jeremy };
-	enum ModelToRun { ROC, RFP };
+	enum ModelToRun { ROC, RFP, FONSE };
 	/* Test variables */
-	User user = gabe;
-	ModelToRun  modelToRun = ROC;
+	User user = jeremy;
+	ModelToRun modelToRun = FONSE;
 	bool read = false;
 	bool testing = false;
 
@@ -353,7 +376,8 @@ int main()
 		//testCovMatrixOverloading();
 		//testWriteRestartFile(genome);
 		//testInitFromRestartFile();
-		testReadRFPFile();
+		//testReadRFPFile();
+		testSynonymousCodons();
 	}
 	else //not doing unit testing, running a model
 	{
@@ -399,7 +423,7 @@ int main()
 				else {}
 				break;
 			case jeremy:
-				if (modelToRun == ROC)
+				if (modelToRun == ROC || modelToRun == FONSE)
 				{
 					genome.readFasta("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
 				}
@@ -547,7 +571,81 @@ int main()
       std::cout << "Sphi proposal width: " << parameter.getSphiProposalWidth() << std::endl;
 
 		}
-		else {}
+		else if (modelToRun == FONSE)
+		{
+			FONSEParameter parameter;
+			if (read)
+			{
+				std::cout << "Initializing ROCParameter object from Restart File\n";
+				FONSEParameter tmp("RestartFile.txt");
+				parameter = tmp;
+				std::cout << "Done initializing ROCParameter object from Restart File\n";
+			}
+			else
+			{
+				std::cout << "initialize ROCParameter object" << std::endl;
+				std::string mixDef = FONSEParameter::allUnique;
+				std::cout << "\tSphi init: " << sphi_init << "\n";
+				std::cout << "\t# mixtures: " << numMixtures << "\n";
+				std::cout << "\tmixture definition: " << mixDef << "\n";
+
+				FONSEParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
+				std::vector<std::string> files(2);
+
+				switch (user) {
+				case cedric:
+					files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/simulated_CSP0.csv");
+					files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/simulated_CSP1.csv");
+					//files[0] = std::string("C:/Users/Cedric/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv");
+					//files[1] = std::string("C:/Users/Cedric/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv");
+					break;
+
+				case gabe:
+					files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_CSP0.csv");
+					files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_CSP1.csv");
+					break;
+				case jeremy:
+					files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_CSP0.csv");
+					files[1] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_CSP1.csv");
+					break;
+				}
+
+				tmp.initMutationSelectionCategories(files, tmp.getNumMutationCategories(), FONSEParameter::dM);
+				tmp.initMutationSelectionCategories(files, tmp.getNumSelectionCategories(), FONSEParameter::dOmega);
+				tmp.InitializeSynthesisRate(genome, sphi_init);
+				//std::vector<double> phiVals = parameter.readPhiValues("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrCleft_phi_est.csv");
+				//parameter.InitializeSynthesisRate(phiVals);
+				parameter = tmp;
+				std::cout << "done initialize FONSEParameter object" << std::endl;
+			}
+
+			std::cout << "Initializing FONSEModel object\n";
+			FONSEModel model;
+			model.setParameter(parameter);
+			std::ofstream scuoout("results/scuo.csv");
+			for (unsigned n = 0u; n < genome.getGenomeSize(); n++)
+			{
+				scuoout << genome.getGene(n).getId() << "," << parameter.calculateSCUO(genome.getGene(n), 22) << std::endl;
+			}
+			scuoout.close();
+			std::cout << "Done initializing FONSEModel object\n";
+
+
+			std::cout << "starting MCMC for FONSE" << std::endl;
+			mcmc.run(genome, model, 4);
+			std::cout << std::endl << "Finished MCMC for FONSE" << std::endl;
+
+
+			std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
+			std::cout << "Sphi proposal width: " << parameter.getSphiProposalWidth() << std::endl;
+			std::cout << "CSP proposal width: \n";
+			for (unsigned n = 0; n < model.getGroupListSize(); n++)
+			{
+				std::string aa = model.getGrouping(n);
+				index = SequenceSummary::AAToAAIndex(aa);
+				std::cout << SequenceSummary::AminoAcidArray[index] << ": " << parameter.getCurrentCodonSpecificProposalWidth(index) << "\n";
+			}
+		}
 
 		//These files used to be written here:
 		//mutationPosterior_Cat#.csv

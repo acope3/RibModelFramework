@@ -1,6 +1,6 @@
 // FONSEParameter.cpp
 
-#include "../include/FONSE/FONSEParameter.h"
+#include "include/FONSE/FONSEParameter.h"
 
 #include <cmath>
 #include <ctime>
