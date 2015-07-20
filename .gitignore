@@ -11,4 +11,5 @@
 *.Rcheck
 *.history
 .Rhistory
+.DS_Store
 Test
