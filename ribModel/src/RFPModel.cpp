@@ -17,7 +17,7 @@ double RFPModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double 
 		unsigned currNumCodonsInMRNA, double phiValue)
 {
 	double logLikelihood = ((std::lgamma((currNumCodonsInMRNA * currAlpha) + currRFPObserved)) - (std::lgamma(currNumCodonsInMRNA * currAlpha)))
-		+ (currRFPObserved * (std::log(phiValue) + std::log(currLambdaPrime + phiValue))) + ((currNumCodonsInMRNA * currAlpha) * (std::log(currLambdaPrime) + 
+		+ (currRFPObserved * (std::log(phiValue) - std::log(currLambdaPrime + phiValue))) + ((currNumCodonsInMRNA * currAlpha) * (std::log(currLambdaPrime) -
 					std::log(currLambdaPrime + phiValue)));
 /*	double term1 = ((std::lgamma((currNumCodonsInMRNA * currAlpha) + currRFPObserved)) - (std::lgamma(currNumCodonsInMRNA * currAlpha)));
 	double term2 = (currRFPObserved * (std::log(phiValue) + std::log(currLambdaPrime + phiValue)));
@@ -26,11 +26,8 @@ double RFPModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double 
 	double gamma1 = (std::lgamma((currNumCodonsInMRNA * currAlpha) + currRFPObserved));
 	double gamma2 = (std::lgamma(currNumCodonsInMRNA * currAlpha));
 
-	std::cout << "currNumCodonsInMRNA: " << currNumCodonsInMRNA <<"\tcurrAlpha: " << currAlpha <<"\n";
-	std::cout << "currRFPObserved: " << currRFPObserved <<"\n";
-	std::cout <<gamma1 <<"\t" <<gamma2 <<"\n\n\n";
-//	std::cout << term1 <<"\t" << term2 <<"\t" <<term3 <<"\n";
-	*/return logLikelihood;
+	*/
+	return logLikelihood;
 }
 
 

@@ -11,7 +11,7 @@ geneAssignment <- c(rep(1, genome$getGenomeSize()))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, model= "RFP", split.serine = TRUE, mixture.definition = mixDef)
 
 # initialize MCMC object
-samples <- 10
+samples <- 100
 thining <- 10
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples=samples, thining=thining, adaptive.width=adaptiveWidth, 
@@ -47,8 +47,8 @@ dev.off()
 pdf("correlationBetweenAlphaAndLambdaPrime.pdf")
 cat <- 1
 proposal <- FALSE
-alphaList <- list()
-lambdaPrimeList <- list()
+alphaList <- vector("numeric", 61)
+lambdaPrimeList <- vector("numeric", 61)
 codonList <- codons()
 i <- 1
 for (i in 1:61)
@@ -58,9 +58,8 @@ for (i in 1:61)
   lambdaPrimeList[i] <- parameter$getParameterForCategory(cat, 1, codon, FALSE)
 }
 
-reg <- lm(as.matrix(alphaList)~as.matrix(lambdaPrimeList))
-plot(alphaList, lambdaPrimeList,
-     main="correlationBetweenAlphaAndLambdaPrime", 
-     sub=paste("r^2 = ", format(summary(reg)$r.squared, digits=3), sep=""))
-abline(reg, col="red", lwd=2)
+
+plot(NULL, NULL, xlim=range(alphaList, na.rm = T), ylim=range(lambdaPrimeList), 
+     main = "Correlation Between Alpha and Lambda Prime", xlab = "alpha", ylab = "lambdaPrime")
+upper.panel.plot(alphaList, lambdaPrimeList)
 dev.off()
