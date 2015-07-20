@@ -10,6 +10,15 @@
 *.rst
 *.Rcheck
 *.history
+*.Rhistory
+*.DS_Store
+.autotools
+.project
+.cproject
+.prefs
+.xml
+.launch
+.idea
 .Rhistory
-.DS_Store
+.externalToolBuilders
 Test
