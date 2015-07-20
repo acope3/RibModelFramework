@@ -4,6 +4,8 @@
 #include <vector>
 #include "ROC/ROCModel.h"
 #include "RFP/RFPModel.h"
+#include "FONSE/FONSEModel.h"
+
 class MCMCAlgorithm
 {
 	private:

@@ -40,7 +40,7 @@ void RFPModel::setParameter(RFPParameter &_parameter)
 }
 
 
-void RFPModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio)
+void RFPModel::calculateLogLikelihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio)
 {
 	//TODO: Many functions used here are unimplimented as of now
 	double logLikelihood = 0.0;

@@ -12,7 +12,7 @@ private:
 
 	FONSEParameter *parameter;
 	virtual void obtainCodonCount(SequenceSummary& seqsum, std::string curAA, int codonCount[]);
-	double calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codonCount[], double mutation[], double selection[], double phiValue);
+	double calculateLogLikelihoodPerPositionPerGene(unsigned position, unsigned codonIndex, std::vector <double> *mutation, std::vector <double> *selection, double phiValue);
 
 public:
 
@@ -23,7 +23,7 @@ public:
 	void setParameter(FONSEParameter &_parameter);
 	virtual void calculateCodonProbabilityVector(unsigned numCodons, double* mutation, double* selection, double phi, double* codonProb);
 	// Likelihood ratio functions
-	virtual void calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio);
+	virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio);
 	virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures);
 
 	//Parameter wrapper functions:
@@ -57,9 +57,9 @@ public:
 	virtual void setCategoryProbability(unsigned mixture, double value) { parameter->setCategoryProbability(mixture, value); }
 	virtual void updateMixtureProbabilitiesTrace(unsigned sample) { parameter->updateMixtureProbabilitiesTrace(sample); }
 	virtual void adaptSynthesisRateProposalWidth(unsigned adaptiveWidth) { parameter->adaptSynthesisRateProposalWidth(adaptiveWidth); }
-	virtual void getParameterForCategory(unsigned category, unsigned param, std::string aa, bool proposal, double* returnValue)
+	virtual std::vector <double> *getParameterForCategory(unsigned category, unsigned param, std::string aa, bool proposal, double* returnValue)
 	{
-		parameter->getParameterForCategory(category, param, aa, proposal, returnValue);
+		return parameter->getParameterForCategory(category, param, proposal);
 	}
 	virtual unsigned getGroupListSize() { return parameter->getGroupListSize(); } //TODO: make not hardcoded?
 	virtual std::string getGrouping(unsigned index) { return parameter->getGrouping(index); }

@@ -13,7 +13,7 @@ class Model
 
         virtual void calculateCodonProbabilityVector(unsigned numCodons, double* mutation, double* selection, double phi, double* codonProb) = 0;
         // Likelihood ratio functions
-        virtual void calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio) = 0;
+        virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio) = 0;
         virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
         		double& logAcceptanceRatioForAllMixtures) = 0;
 		
