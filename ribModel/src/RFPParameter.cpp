@@ -1,4 +1,5 @@
 #include "include/RFP/RFPParameter.h"
+#include <sstream>
 #ifndef STANDALONE
 #include <Rcpp.h>
 using namespace Rcpp;
@@ -122,25 +123,191 @@ void RFPParameter::initMutationSelectionCategories(std::vector<std::string> file
 //Restart file functions:
 void RFPParameter::writeEntireRestartFile(std::string filename)
 {
-	//TODO: not a priority right now
+	writeBasicRestartFile(filename);
+	writeRFPRestartFile(filename);
 }
 
 
 void RFPParameter::writeRFPRestartFile(std::string filename)
 {
-	//TODO: not a priority right now
-}
 
+	std::ofstream out;
+	std::string output = "";
+	std::ostringstream oss;
+	unsigned i, j;
+	out.open(filename.c_str());
+	if (out.fail())
+	{
+		std::cerr <<"Could not open restart file for writing\n";
+		std::exit(1);
+	}
+
+	oss <<">currentAlphaParameter:\n";
+	for (i = 0; i < currentAlphaParameter.size(); i++)
+	{
+		oss << "***\n";
+		for (j = 0; j < currentAlphaParameter[i].size(); j++)
+		{
+			oss << currentAlphaParameter[i][j];
+			if ((j + 1) % 10 == 0)
+				oss << "\n";
+			else
+				oss << " ";
+		}
+		if (j % 10 != 0)
+			oss << "\n";
+	}
+
+	oss <<">currentLambdaPrimeParameter:\n";
+	for (i = 0; i < currentLambdaPrimeParameter.size(); i++)
+	{
+		oss << "***\n";
+		for (j = 0; j < currentLambdaPrimeParameter[i].size(); j++)
+		{
+			oss << currentLambdaPrimeParameter[i][j];
+			if ((j + 1) % 10 == 0)
+				oss << "\n";
+			else
+				oss << " ";
+		}
+		if (j % 10 != 0)
+			oss << "\n";
+	}
+
+	oss << ">std_csp:\n";
+	for (unsigned i = 0; i < std_csp.size(); i++)
+	{
+		oss << std_csp[i];
+		if ((i + 1) % 10 == 0)
+			oss << "\n";
+		else
+			oss << " ";
+	}
+
+	output = oss.str();
+	out << output;
+	out.close();
+
+}
 
 void RFPParameter::initFromRestartFile(std::string filename)
 {
-	//TODO: not a priority right now
+	initBaseValuesFromFile(filename);
+	initRFPValuesFromFile(filename);
 }
 
 
 void RFPParameter::initRFPValuesFromFile(std::string filename)
 {
-	//TODO: not a priority right now
+	std::ifstream input;
+	input.open(filename.c_str());
+	if (input.fail())
+	{
+		std::cerr << "Could not open RestartFile.txt to initialzie ROC values\n";
+		std::exit(1);
+	}
+	std::string tmp, variableName;
+	unsigned cat = 0;
+	while (getline(input, tmp))
+	{
+		int flag;
+		if (tmp[0] == '>')
+			flag = 1;
+		else if (input.eof() || tmp == "\n")
+			flag = 2;
+		else if (tmp[0] == '#')
+			flag = 3;
+		else
+			flag = 4;
+
+		if (flag == 1)
+		{
+			cat = 0;
+			variableName = tmp.substr(1, tmp.size() - 2);
+		}
+		else if (flag == 2)
+		{
+			std::cout << "here\n";
+		}
+		else if (flag == 3) //user comment, continue
+		{
+			continue;
+		}
+		else
+		{
+			std::istringstream iss;
+			if (variableName == "currentAlphaParameter")
+			{
+				if (tmp == "***")
+				{
+					currentAlphaParameter.resize(currentAlphaParameter.size() + 1);
+					cat++;
+				}
+				else if (tmp == "\n")
+					continue;
+				else
+				{
+					double val;
+					iss.str(tmp);
+					while (iss >> val)
+					{
+						currentAlphaParameter[cat - 1].push_back(val);
+					}
+				}
+			}
+			else if (variableName == "currentLambdaPrimeParameter")
+			{
+				if (tmp == "***")
+				{
+					currentLambdaPrimeParameter.resize(currentLambdaPrimeParameter.size() + 1);
+					cat++;
+				}
+				else if (tmp == "\n")
+					continue;
+				else
+				{
+					double val;
+					iss.str(tmp);
+					while (iss >> val)
+					{
+						currentLambdaPrimeParameter[cat - 1].push_back(val);
+					}
+				}
+			}
+			else if (variableName == "std_csp")
+			{
+				double val;
+				iss.str(tmp);
+				while (iss >> val)
+				{
+					std_csp.push_back(val);
+				}
+			}
+		}
+	}
+	input.close();
+
+	bias_csp = 0;
+	numAcceptForAlphaAndLambdaPrime.resize(22, 0u);
+	proposedAlphaParameter.resize(numMutationCategories);
+	proposedLambdaPrimeParameter.resize(numSelectionCategories);
+	for (unsigned i = 0; i < numMutationCategories; i++)
+	{
+		proposedAlphaParameter[i] = currentAlphaParameter[i];
+	}
+	for (unsigned i = 0; i < numSelectionCategories; i++)
+	{
+		proposedLambdaPrimeParameter[i] = currentLambdaPrimeParameter[i];
+	}
+
+	groupList = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
+				 "TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT", "ATA", "ATC",
+				 "ATT", "AAA", "AAG", "CTA", "CTC", "CTG", "CTT", "TTA", "TTG", "ATG",
+				 "AAC", "AAT", "CCA", "CCC", "CCG", "CCT", "CAA", "CAG", "AGA", "AGG",
+				 "CGA", "CGC", "CGG", "CGT", "TCA", "TCC", "TCG", "TCT", "ACA", "ACC",
+				 "ACG", "ACT", "GTA", "GTC", "GTG", "GTT", "TGG", "TAC", "TAT", "AGC",
+				 "AGT"};
+
 }
 
 

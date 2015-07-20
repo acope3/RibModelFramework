@@ -25,7 +25,7 @@ class RFPParameter: public Parameter {
 		std::vector<std::vector<double>> currentLambdaPrimeParameter;
 		std::vector<std::vector<double>> proposedLambdaPrimeParameter;
 
-		std::vector<std::vector<double>> lambdaValues;
+		std::vector<std::vector<double>> lambdaValues; //not included (yet) in restart files
 		std::vector<unsigned> numAcceptForAlphaAndLambdaPrime;
 
 		// proposal bias and std for codon specific parameter -- probably can move up to Parameter
@@ -61,7 +61,7 @@ class RFPParameter: public Parameter {
 		//Restart File functions:	
 		void writeEntireRestartFile(std::string filename); //maybe move up?
 		void writeRFPRestartFile(std::string filename);
-		void initFromRestartFile(std::string filename); //maybe move up?
+		void initFromRestartFile(std::string filename);
 		void initRFPValuesFromFile(std::string filename);
 
 		//Trace functions:
