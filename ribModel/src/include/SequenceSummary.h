@@ -52,6 +52,8 @@ class SequenceSummary
 			return (codon.length() != 3) ? -1 : getCodonCountForCodon(codon);
 		}
 
+		std::vector <unsigned> getCodonPositions(unsigned index);
+
 
 
 		//static functions
@@ -65,6 +67,14 @@ class SequenceSummary
 		static void AAindexToCodonRange(unsigned aaIndex, bool forParamVector = false, unsigned aaRange[] = nullptr);
 		static void AAToCodonRange(std::string aa, bool forParamVector = false, unsigned aaRange[] = nullptr);
 		static std::vector<std::string> AAToCodon(std::string aa, bool forParamVector = false);
+		static std::vector<unsigned> getSynonymousCodonIndicesByAA(std::string aa);
+		static std::vector<unsigned> getSynonymousCodonIndicesByAAIndex(unsigned index);
+		static std::vector<unsigned> getSynonymousCodonIndicesByCodon(std::string codon);
+		static std::vector<unsigned> getSynonymousCodonIndicesByCodonIndex(unsigned index);
+		static std::vector<std::string> getSynonymousCodonsByAA(std::string aa);
+		static std::vector<std::string> getSynonymousCodonsByAAIndex(unsigned index);
+		static std::vector<std::string> getSynonymousCodonsByCodon(std::string codon);
+		static std::vector<std::string> getSynonymousCodonsByCodonIndex(unsigned index);
 
 		//static R wrapper functions
 		static std::vector<std::string> aminoAcids() {return AminoAcidArray; }

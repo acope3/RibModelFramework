@@ -24,7 +24,7 @@ class RFPModel: public Model {
 		} //May not need?
 
 		// Likelihood ratio functions
-		virtual void calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k,
+		virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k,
 				double* logProbabilityRatio);
 		virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
 				double& logAcceptanceRatioForAllMixtures);

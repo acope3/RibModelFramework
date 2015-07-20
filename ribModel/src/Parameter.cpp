@@ -29,6 +29,7 @@ Parameter::Parameter(unsigned _maxGrouping)
 	maxGrouping = _maxGrouping;
 }
 
+
 Parameter& Parameter::operator=(const Parameter& rhs)
 {
   if (this == &rhs) return *this; // handle self assignment

@@ -87,6 +87,18 @@ bool SequenceSummary::processSequence(const std::string& sequence)
 	return check;
 }
 
+std::vector <unsigned> SequenceSummary::getCodonPositions(unsigned index)
+{
+	std::vector <unsigned> rv;
+
+	for (unsigned i = 0; i < codonPositions[index].size(); i++) {
+		rv.push_back(codonPositions[index][i]);
+	}
+
+	return rv;
+}
+
+
 /*
  * STATIC FUNCTIONS
  */
@@ -380,6 +392,125 @@ std::vector<std::string> SequenceSummary::AAToCodon(std::string aa, bool forPara
 		}
 	}
 	return RV;
+}
+
+std::vector <unsigned> SequenceSummary::getSynonymousCodonIndicesByAA(std::string aa)
+{
+	std::vector <unsigned> indices;
+	unsigned aaRange[2];
+
+	AAToCodonRange(aa, false, aaRange);
+
+	for (unsigned i = aaRange[0]; i <= aaRange[1]; i++) {
+		indices.push_back(i);
+	}
+	
+	return indices;
+}
+
+std::vector <unsigned> SequenceSummary::getSynonymousCodonIndicesByAAIndex(unsigned index)
+{
+	std::vector <unsigned> indices;
+	unsigned aaRange[2];
+
+	AAindexToCodonRange(index, false, aaRange);
+
+	for (unsigned i = aaRange[0]; i <= aaRange[1]; i++) {
+		indices.push_back(i);
+	}
+
+	return indices;
+}
+
+std::vector <unsigned> SequenceSummary::getSynonymousCodonIndicesByCodon(std::string codon)
+{
+	std::vector <unsigned> indices;
+	unsigned aaRange[2];
+
+	unsigned aa = CodonToAAIndex(codon);
+	AAindexToCodonRange(aa, false, aaRange);
+
+	for (unsigned i = aaRange[0]; i <= aaRange[1]; i++) {
+		indices.push_back(i);
+	}
+
+	return indices;
+
+}
+
+std::vector <unsigned> SequenceSummary::getSynonymousCodonIndicesByCodonIndex(unsigned index)
+{
+	std::vector <unsigned> indices;
+	unsigned aaRange[2];
+
+	std::string codon = IndexToCodon(index);
+	unsigned aa = CodonToAAIndex(codon);
+	AAindexToCodonRange(aa, false, aaRange);
+
+	for (unsigned i = aaRange[0]; i <= aaRange[1]; i++) {
+		indices.push_back(i);
+	}
+
+	return indices;
+}
+
+std::vector <std::string> SequenceSummary::getSynonymousCodonsByAA(std::string aa)
+{
+	std::vector <std::string> codons;
+	unsigned aaRange[2];
+
+	AAToCodonRange(aa, false, aaRange);
+
+	for (unsigned i = aaRange[0]; i <= aaRange[1]; i++) {
+		codons.push_back(IndexToCodon(i));
+	}
+
+	return codons;
+}
+
+std::vector <std::string> SequenceSummary::getSynonymousCodonsByAAIndex(unsigned index)
+{
+	std::vector <std::string> codons;
+	unsigned aaRange[2];
+
+	AAindexToCodonRange(index, false, aaRange);
+
+	for (unsigned i = aaRange[0]; i <= aaRange[1]; i++) {
+		codons.push_back(IndexToCodon(i));
+	}
+
+	return codons;
+}
+
+std::vector<std::string> SequenceSummary::getSynonymousCodonsByCodon(std::string codon)
+{
+	std::vector <std::string> codons;
+	unsigned aaRange[2];
+
+	unsigned aa = CodonToAAIndex(codon);
+	AAindexToCodonRange(aa, false, aaRange);
+
+	for (unsigned i = aaRange[0]; i <= aaRange[1]; i++) {
+		codons.push_back(IndexToCodon(i));
+	}
+
+	return codons;
+}
+
+std::vector<std::string> SequenceSummary::getSynonymousCodonsByCodonIndex(unsigned index)
+{
+	std::vector <std::string> codons;
+	unsigned aaRange[2];
+
+	std::string codon = IndexToCodon(index);
+	unsigned aa = CodonToAAIndex(codon);
+	AAindexToCodonRange(aa, false, aaRange);
+
+	for (unsigned i = aaRange[0]; i <= aaRange[1]; i++) {
+		codons.push_back(IndexToCodon(i));
+	}
+
+	return codons;
 }
 
 // ---------------------------------------------------------------------------

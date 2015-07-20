@@ -15,7 +15,7 @@ ROCModel::~ROCModel()
 	//dtor
 }
 
-void ROCModel::calculateLogLiklihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio)
+void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio)
 {
 	double logLikelihood = 0.0;
 	double logLikelihood_proposed = 0.0;
