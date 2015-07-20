@@ -9,6 +9,19 @@ std::default_random_engine Parameter::generator( (unsigned) std::time(NULL));
 
 Parameter::Parameter()
 {
+	numParam = 0u;
+	Sphi = 0.0;
+	Sphi_proposed = 0.0;
+	Aphi = 0.0;
+	Aphi_proposed = 0.0;
+	numAcceptForSphi = 0u;
+	bias_sphi = 0.0;
+	bias_phi = 0.0;
+	numMutationCategories = 0u;
+	numSelectionCategories = 0u;
+	numMixtures = 0u;
+	std_sphi = 0.0;
+	maxGrouping = 22;
 }
 
 

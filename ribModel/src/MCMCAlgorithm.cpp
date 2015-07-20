@@ -25,6 +25,8 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * 
 	MCMCAlgorithm(1000, 1, true, true, true);
 	likelihoodTrace.resize(samples);
 	writeRestartFile = false;
+	multipleFiles = false;
+	fileWriteInterval = 1u;
 	numCores = 1u;
 }
 
@@ -34,6 +36,8 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * 
 {
 	likelihoodTrace.resize(samples);
 	writeRestartFile = false;
+	multipleFiles = false;
+	fileWriteInterval = 1u;
 	numCores = 1u;
 }
 

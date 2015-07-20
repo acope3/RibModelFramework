@@ -8,9 +8,6 @@ class RFPModel: public Model {
 	private:
 
 		RFPParameter *parameter;
-		virtual void obtainCodonCount(SequenceSummary& seqsum, std::string curAA, int codonCount[])
-		{
-		} //Might no longer need?
 		virtual double calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
 				unsigned currRFPObserved, unsigned currNumCodonsInMRNA, double phiValue);
 	public:

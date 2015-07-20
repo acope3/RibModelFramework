@@ -4,8 +4,6 @@
 class Model
 {
     private:
-        virtual void obtainCodonCount(SequenceSummary& seqsum, std::string curAA, int codonCount[]) = 0;
-
 
     public:
         explicit Model();
