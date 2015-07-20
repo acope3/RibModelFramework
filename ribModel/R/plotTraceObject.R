@@ -66,11 +66,22 @@ plotCodonSpecificParameters <- function(trace, mixture, type="mutation", main="M
   opar <- par(no.readonly = T) 
   
   ### Trace plot.
-  nf <- layout(matrix(c(rep(1, 4), 2:21), nrow = 6, ncol = 4, byrow = TRUE),
+  if (ROC)
+  {
+    nf <- layout(matrix(c(rep(1, 4), 2:21), nrow = 6, ncol = 4, byrow = TRUE),
                rep(1, 4), c(2, 8, 8, 8, 8, 8), respect = FALSE)  
-  
+  }
+  else
+  {    nf <- layout(matrix(c(rep(1, 4), 2:25), nrow = 7, ncol = 4, byrow = TRUE),
+                    rep(1, 4), c(2, 8, 8, 8, 8, 8, 8), respect = FALSE) 
+  }
   ### Plot title.
+  if (ROC){
   par(mar = c(0, 0, 0, 0))
+  }
+  else{
+    par(mar = c(1,1,1,1))
+  }
   plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
   text(0.5, 0.6, main)
   text(0.5, 0.4, date(), cex = 0.6)
