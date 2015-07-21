@@ -12,8 +12,12 @@ initializeParameterObject <- function(genome, sphi, numMixtures, geneAssignment,
     }else{
       parameter <- new(ROCParameter, restart.file)
     }
-  }else if(model == "NSE"){
-    cat("MODEL NOT IMPLEMENTED")
+  }else if(model == "FONSE"){
+    if(is.null(restart.file))
+    {
+      paramter <- initializeFONSEParameterObject(genome, sphi, numMixtures, geneAssignment, expressionValues,
+                                    split.serine, mixture.definition, mixture.definition.matrix)
+    }
   }else if(model == "RFP"){
     if(is.null(restart.file))
     {
@@ -24,7 +28,7 @@ initializeParameterObject <- function(genome, sphi, numMixtures, geneAssignment,
       parameter <- new(RFPParameter, restart.file)
     }
   }else{
-    stop("Unkown model.")
+    stop("Unknown model.")
   }
   return(parameter)
 }
@@ -145,6 +149,91 @@ initializeRFPParameterObject <- function(genome, sphi, numMixtures, geneAssignme
 
 
 
+initializeFONSEParameterObject <- function(genome, sphi, numMixtures, geneAssignment, expressionValues = NULL,
+                                         split.serine = TRUE, mixture.definition = "allUnique", mixture.definition.matrix = NULL)
+{
+  # test input integrity
+  if(genome$getGenomeSize() != length(geneAssignment)) 
+  {
+    stop("Gene assignment length does not match genome size. Not every Gene has a mixture assignment")
+  }
+  # create parameter object
+  if(is.null(mixture.definition.matrix))
+  { # keyword constructor
+    parameter <- new(FONSEParameter, sphi, numMixtures, geneAssignment, split.serine, mixture.definition)
+  }else{
+    #matrix constructor
+    mixture.definition <- c(mixture.definition.matrix[, 1], mixture.definition.matrix[, 2])
+    parameter <- new(FONSEParameter, sphi, numMixtures, geneAssignment, mixture.definition, split.serine)
+  }
+  # initialize expression values
+  if(is.null(expressionValues)){
+    parameter$initializeSynthesisRateByGenome(genome, sphi)
+  }else{
+    parameter$initializeSynthesisRateByList(expressionValues)
+  }
+  
+  numMutationCategory <- parameter$numMutationCategories
+  numSelectionCategory <- parameter$numSelectionCategories
+  
+  phi <- parameter$getCurrentSynthesisRateForMixture(1) # phi values are all the same initially
+  names.aa <- aminoAcids()
+  for(aa in names.aa)
+  {
+    if(aa == "M" || aa == "W" || aa == "X") next
+    
+    codonCounts <- getCodonCountsForAA(aa)
+    numCodons <- dim(codonCounts)[2] - 1
+    #-----------------------------------------
+    # TODO WORKS CURRENTLY ONLY FOR ALLUNIQUE!
+    #-----------------------------------------
+    covmat <- vector("list", numMixtures)
+    for(mixElement in 1:numMixtures)
+    {    
+      idx <- geneAssignment == mixElement
+      csp <- getCSPbyLogit(codonCounts[idx, ], phi[idx])
+      
+      parameter$initMutation(csp$coef.mat[1,], mixElement, aa)
+      parameter$initSelection(csp$coef.mat[2,], mixElement, aa)
+      # split matrix into sup matrices (dM and dEta)
+      covmat[[mixElement]] <- split.matrix(t(csp$R) %*% csp$R, numCodons, numCodons)  # we expect the covariance matrix, but get the decomposition.
+    }
+    compl.covMat <- matrix(0, ncol = numMixtures * numCodons * 2, nrow = numMixtures * numCodons * 2)
+    matrix.positions <- sub.matrices(compl.covMat, numCodons, numCodons)
+    
+    compl.seq <- seq(1, dim(compl.covMat)[1], numCodons)
+    mut.seq <- compl.seq[1:(length(compl.seq)/2)]
+    i <- 1
+    for(pos in mut.seq)
+    { 
+      compl.covMat[matrix.positions == matrix.positions[pos, pos]] <- unlist(covmat[[i]][1])
+      i <- i + 1
+      i <- ifelse(i > numMutationCategory, 1, i)
+    }
+    sel.seq <- compl.seq[(length(compl.seq)/2 + 1):length(compl.seq)]
+    i <- 1
+    for(pos in sel.seq)
+    { 
+      compl.covMat[matrix.positions == matrix.positions[pos, pos]] <- unlist(covmat[[i]][4])
+      i <- i + 1
+      i <- ifelse(i > numMutationCategory, 1, i)
+    }
+    
+    ofdiag.seq <- mut.seq + numCodons*numMutationCategory
+    for(i in 1:length(mut.seq))
+    {
+      compl.covMat[matrix.positions == matrix.positions[mut.seq[i], ofdiag.seq[i]]] <- unlist(covmat[[i]][2])
+      compl.covMat[matrix.positions == matrix.positions[ofdiag.seq[i], mut.seq[i]]] <- unlist(covmat[[i]][3])
+    }
+    #for testing
+    compl.covMat <- diag((numMutationCategory + numSelectionCategory) * numCodons) *0.05
+    #compl.covMat / max(compl.covMat)
+    parameter$initCovarianceMatrix(compl.covMat, aa)
+    
+  }
+  
+  return(parameter)
+}
 
 
 
