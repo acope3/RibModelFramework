@@ -116,6 +116,7 @@ std::vector<double> ROCTrace::getSelectionParameterTraceByMixtureElementForCodon
 	if (checkMixtureElement)
 	{
 		RV = getSelectionParameterTraceByMixtureElementForCodon(mixtureElement - 1, codon);  
+
 	}
 	return RV;
 }

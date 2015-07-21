@@ -1,10 +1,12 @@
 #ifndef STANDALONE
 #include "include/ROC/ROCModel.h"
 #include "include/RFP/RFPModel.h"
+#include "include/FONSE/FONSEModel.h"
 #include <Rcpp.h>
 using namespace Rcpp;
 RCPP_EXPOSED_CLASS(ROCParameter)
 RCPP_EXPOSED_CLASS(RFPParameter)
+RCPP_EXPOSED_CLASS(FONSEParameter)
 RCPP_EXPOSED_CLASS(Parameter)
 RCPP_EXPOSED_CLASS(Genome)
 RCPP_MODULE(Model_mod)
@@ -23,6 +25,12 @@ RCPP_MODULE(Model_mod)
 		.derives<Model>("Model")
 		.constructor()
 		.method("setParameter", &RFPModel::setParameter)
+		;
+
+	class_<FONSEModel>("FONSEModel")
+		.derives<Model>("Model")
+		.constructor()
+		.method("setParameter", &FONSEModel::setParameter)
 		;
 }
 #endif

@@ -2,11 +2,13 @@
 #include "include/base/Parameter.h"
 #include "include/ROC/ROCParameter.h"
 #include "include/RFP/RFPParameter.h"
+#include "include/FONSE/FONSEParameter.h"
 #include <Rcpp.h>
 using namespace Rcpp;
 
 RCPP_EXPOSED_CLASS(ROCTrace)
 RCPP_EXPOSED_CLASS(RFPTrace)
+RCPP_EXPOSED_CLASS(FONSETrace)
 RCPP_EXPOSED_CLASS(Genome)
 RCPP_EXPOSED_CLASS(CovarianceMatrix)
 
@@ -73,6 +75,36 @@ RCPP_MODULE(Parameter_mod)
 		
 		.method("getTraceObject", &RFPParameter::getTraceObject)
 		.method("getParameterForCategory", &RFPParameter::getParameterForCategoryR) //need to implement the R wrapper
+		;
+
+	class_<FONSEParameter>("FONSEParameter")
+		.derives<Parameter>("Parameter")
+		.constructor <std::string>()
+		.constructor <double, std::vector<unsigned>, std::vector<unsigned>, bool>()
+		.constructor <double, unsigned, std::vector<unsigned>, bool, std::string>()
+		.method("initMutationSelectionCategories", &FONSEParameter::initMutationSelectionCategoriesR)
+		.method("initSelection", &FONSEParameter::initSelection)
+		.method("initMutation", &FONSEParameter::initMutation)
+		.method("getTraceObject", &FONSEParameter::getTraceObject)
+
+		//R wrapper functions
+		.method("calculateSelectionCoefficients", &FONSEParameter::calculateSelectionCoefficientsR)
+
+
+		// Posterior functions
+		.method("getSphiPosteriorMean", &FONSEParameter::getSphiPosteriorMean)
+
+		//R wrapper functions
+		.method("getMutationPosteriorMeanForCodon", &FONSEParameter::getMutationPosteriorMeanForCodon)
+		.method("getSelectionPosteriorMeanForCodon", &FONSEParameter::getSelectionPosteriorMeanForCodon)
+
+		// Variance functions
+		.method("getSphiVariance", &FONSEParameter::getSphiVariance)
+
+		//R wrapper functions
+		.method("getMutationVarianceForCodon", &FONSEParameter::getMutationVarianceForCodon)
+		.method("getSelectionVarianceForCodon", &FONSEParameter::getSelectionVarianceForCodon)
+
 		;
 }
 #endif

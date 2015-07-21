@@ -21,7 +21,7 @@ public:
 	FONSEModel(const FONSEModel& other);
 
 	void setParameter(FONSEParameter &_parameter);
-	virtual void calculateCodonProbabilityVector(unsigned numCodons, double* mutation, double* selection, double phi, double* codonProb);
+	double calculateCodonProbability(unsigned position, double* mutation, double* selection, double phi);
 	// Likelihood ratio functions
 	virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio);
 	virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures);
@@ -64,7 +64,7 @@ public:
 	virtual unsigned getGroupListSize() { return parameter->getGroupListSize(); } //TODO: make not hardcoded?
 	virtual std::string getGrouping(unsigned index) { return parameter->getGrouping(index); }
 	// R wrapper
-	std::vector<double> CalculateProbabilitiesForCodons(std::vector<double> mutation, std::vector<double> selection, double phi);
+	//std::vector<double> CalculateProbabilitiesForCodons(std::vector<double> mutation, std::vector<double> selection, double phi);
 
 protected:
 };

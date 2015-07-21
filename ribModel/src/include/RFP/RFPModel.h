@@ -15,10 +15,6 @@ class RFPModel: public Model {
 		explicit RFPModel();
 		virtual ~RFPModel();
 		void setParameter(RFPParameter &_parameter); //may move up PV
-		virtual void calculateCodonProbabilityVector(unsigned numCodons, double* mutation, double* selection,
-				double phi, double* codonProb)
-		{
-		} //May not need?
 
 		// Likelihood ratio functions
 		virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k,
