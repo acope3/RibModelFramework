@@ -142,6 +142,7 @@ std::vector<double> CovarianceMatrix::transformIidNumersIntoCovaryingNumbers(std
 
 void CovarianceMatrix::printCovarianceMatrix()
 {
+
     for(int i = 0; i < numVariates * numVariates; i++)
     {
         if (i % numVariates == 0 && i != 0) { std::cout << std::endl; }

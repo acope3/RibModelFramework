@@ -25,7 +25,7 @@ class RFPParameter: public Parameter {
 		std::vector<std::vector<double>> currentLambdaPrimeParameter;
 		std::vector<std::vector<double>> proposedLambdaPrimeParameter;
 
-		std::vector<std::vector<double>> lambdaValues; //not included (yet) in restart files
+		std::vector<std::vector<double>> lambdaValues;
 		std::vector<unsigned> numAcceptForAlphaAndLambdaPrime;
 
 		// proposal bias and std for codon specific parameter -- probably can move up to Parameter
@@ -35,7 +35,7 @@ class RFPParameter: public Parameter {
 		// functions
 		std::vector<double> propose(std::vector<double> currentParam, double (*proposal)(double a, double b), double A,
 				std::vector<double> B);
-		//might change at the moment
+
 
 	public:
 		//Constructors & Destructors:
@@ -46,10 +46,7 @@ class RFPParameter: public Parameter {
 				std::string _mutationSelectionState = "allUnique");
 		virtual ~RFPParameter();
 		RFPParameter& operator=(const RFPParameter& rhs);
-#ifndef STANDALONE
-		RFPParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer = true);
-		RFPParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer = true, std::string _mutationSelectionState = "allUnique");
-#endif
+
 
 		//Inititalization Functions:
 		void initRFPParameterSet();
@@ -59,7 +56,7 @@ class RFPParameter: public Parameter {
 				unsigned paramType); //still need to alter, not sure how
 
 		//Restart File functions:	
-		void writeEntireRestartFile(std::string filename); //maybe move up?
+		void writeEntireRestartFile(std::string filename);
 		void writeRFPRestartFile(std::string filename);
 		void initFromRestartFile(std::string filename);
 		void initRFPValuesFromFile(std::string filename);
@@ -144,6 +141,8 @@ class RFPParameter: public Parameter {
 		std::vector<std::vector<double>> calculateSelectionCoefficients(unsigned sample, unsigned mixture);
 #ifndef STANDALONE
 		SEXP calculateSelectionCoefficientsR(unsigned sample, unsigned mixture);
+		RFPParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer = true);
+		RFPParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer = true, std::string _mutationSelectionState = "allUnique");
 #endif
 
 		//More R Wrappers:

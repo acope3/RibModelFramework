@@ -20,8 +20,7 @@ RCPP_MODULE(Parameter_mod)
 		.method("getMutationCategoryForMixture", &Parameter::getMutationCategoryForMixture)
 		.method("getSelectionCategoryForMixture", &Parameter::getSelectionCategoryForMixture)
 		.method("getSynthesisRateCategoryForMixture", &Parameter::getSynthesisRateCategoryForMixture)
-		.method("initCovarianceMatrix", &Parameter::initCovarianceMatrix)
-		.method("getCovarianceMatrixForAA", &Parameter::getCovarianceMatrixForAA)
+
 		.method("initializeSynthesisRateByGenome", &Parameter::initializeSynthesisRateByGenome)
 		.method("initializeSynthesisRateByList", &Parameter::initializeSynthesisRateByList)
 		.method("initializeSynthesisRateByRandom", &Parameter::initializeSynthesisRateByRandom)
@@ -47,6 +46,8 @@ RCPP_MODULE(Parameter_mod)
 		.method("initSelection", &ROCParameter::initSelection)
 		.method("initMutation", &ROCParameter::initMutation)
 		.method("getTraceObject", &ROCParameter::getTraceObject)
+		.method("initCovarianceMatrix", &ROCParameter::initCovarianceMatrix)
+		.method("getCovarianceMatrixForAA", &ROCParameter::getCovarianceMatrixForAA)
 
 		//R wrapper functions
 		.method("calculateSelectionCoefficients", &ROCParameter::calculateSelectionCoefficientsR)
