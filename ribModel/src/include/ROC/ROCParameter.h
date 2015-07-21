@@ -20,6 +20,7 @@ class ROCParameter : public Parameter
 
 		ROCTrace traces;
 		//members
+		std::vector<CovarianceMatrix> covarianceMatrix;
 
 		double phiEpsilon;
 		double phiEpsilon_proposed;
@@ -51,10 +52,11 @@ class ROCParameter : public Parameter
 #ifndef STANDALONE
 		ROCParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer = true);
 		ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer = true, std::string _mutationSelectionState = "allUnique");
-		 
+		void initCovarianceMatrix(SEXP matrix, std::string aa);
 #endif
 		ROCParameter& operator=(const ROCParameter& rhs);
 		ROCTrace& getTraceObject() {return traces;}
+		CovarianceMatrix& getCovarianceMatrixForAA(std::string aa);
 		
 		void writeEntireRestartFile(std::string filename);
 		void writeROCRestartFile(std::string filename);

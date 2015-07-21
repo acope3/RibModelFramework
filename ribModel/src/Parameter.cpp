@@ -48,7 +48,7 @@ Parameter& Parameter::operator=(const Parameter& rhs)
   if (this == &rhs) return *this; // handle self assignment
   numParam = rhs.numParam;
 
-  covarianceMatrix = rhs.covarianceMatrix;
+
   Sphi = rhs.Sphi;
   Aphi = rhs.Aphi;
   Sphi_proposed = rhs.Sphi_proposed;
@@ -145,18 +145,6 @@ void Parameter::initParameterSet(double sphi, unsigned _numMixtures, std::vector
     std::vector<double> tempStdPhi(numGenes, 1.0);
     std_phi[i] = tempStdPhi;
   }
-/*
-  for (unsigned i = 0; i < maxGrouping; i++) // TODO: change this from being hardcoded
-  {
-    std::string aa = SequenceSummary::AminoAcidArray[i];
-    unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa, true);
-    CovarianceMatrix m((numMutationCategories + numSelectionCategories) * numCodons);
-    m.choleskiDecomposition();
-    covarianceMatrix.push_back(m);
-  }*/
-
-//NOTE: currently moved to ROC in order for RFP to work properly
-
 }
 
 
@@ -361,34 +349,11 @@ void Parameter::writeBasicRestartFile(std::string filename)
 		if (j % 10 != 0) oss <<"\n";
 	}
 
-	output += oss.str();
-	oss.clear();
-	oss.str("");
-
-	for (i = 0; i < groupList.size(); i++) // TODO: change this from being hardcoded
-	{
-		std::string aa = groupList[i];
-		oss <<">covarianceMatrix:\n" << aa <<"\n";
-		CovarianceMatrix m = covarianceMatrix[SequenceSummary::AAToAAIndex(aa)];
-		std::vector<double>* tmp = m.getCovMatrix();
-		int size = m.getNumVariates();
-    for(int k = 0; k < size * size; k++)
-    {
-        if (k % size == 0 && k != 0) { oss <<"\n"; }
-        oss << tmp->at(k) << "\t";
-    }
-    oss <<"\n***\n";
-	}
 	std::cout <<"Done writing\n";
 	output += oss.str();
 	out << output;
 	out.close();
 
-	for (unsigned a = 0; a < groupList.size(); a++)
-	{
-		std::cout << groupList[a] <<" ";
-	}
-	std::cout <<"\n";
 }
 
 
@@ -405,7 +370,6 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 	int cat = 0;
 	std::vector<double> mat;
 	std::string tmp, variableName;
-	covarianceMatrix.resize(maxGrouping);
 	while (getline(input, tmp))
 	{
 		int flag;
@@ -419,13 +383,6 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 			mat.clear();
 			cat = 0;
 			variableName = tmp.substr(1,tmp.size()-2);
-			if (variableName == "covarianceMatrix")
-			{
-				getline(input,tmp);
-				//char aa = tmp[0];
-				cat = SequenceSummary::AAToAAIndex(tmp); // ????
-				std::cout << cat <<"\n";
-			}
 		}
 		else if (flag == 2)
 		{
@@ -512,33 +469,19 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 			} 	
 			else if (variableName == "currentSynthesisRateLevel")
 			{
-        if (tmp == "***")
-        {
-          currentSynthesisRateLevel.resize(currentSynthesisRateLevel.size() + 1);
-          cat++;
-        }
+        		if (tmp == "***")
+				{
+					currentSynthesisRateLevel.resize(currentSynthesisRateLevel.size() + 1);
+          			cat++;
+        		}
 				else
 				{
-          double val;
-          iss.str(tmp);
-          while (iss >> val)
-          {
-            currentSynthesisRateLevel[cat - 1].push_back(val);
-          }
-				}
-			} 	
-			else if (variableName == "covarianceMatrix")
-			{
-				if (tmp == "***") //end of matrix
-				{
-					CovarianceMatrix CM(mat);
-					covarianceMatrix[cat] = CM;
-				}
-				double val;
-				iss.str(tmp);
-				while (iss >> val)
-				{
-					mat.push_back(val);
+					double val;
+          			iss.str(tmp);
+					while (iss >> val)
+          			{
+            			currentSynthesisRateLevel[cat - 1].push_back(val);
+          			}
 				}
 			}
 			else if (variableName == "std_sphi")
@@ -584,42 +527,10 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 	}	
 }
 
-#ifndef STANDALONE
-using namespace Rcpp;
-void Parameter::initCovarianceMatrix(SEXP _matrix, std::string aa)
-{
-	std::vector<double> tmp;
-	NumericMatrix matrix(_matrix);
-
-	for(unsigned i = 0u; i < aa.length(); i++)	aa[i] = (char)std::toupper(aa[i]);
-
-	unsigned aaIndex = SequenceSummary::aaToIndex.find(aa) -> second;
-	unsigned numRows = matrix.nrow();
-	std::vector<double> covMatrix(numRows * numRows);
-
-	//NumericMatrix stores the matrix by column, not by row. The loop
-	//below transposes the matrix when it stores it.
-	unsigned index = 0;
-	for (unsigned i = 0; i < numRows; i++)
-	{
-		for(unsigned j = i; j < numRows * numRows; j += numRows, index++)
-		{
-			covMatrix[index] = matrix[j];
-		}
-	}
-	CovarianceMatrix m(covMatrix);
-	m.choleskiDecomposition();
-	covarianceMatrix[aaIndex] = m;
-}
-#endif
 
 
-CovarianceMatrix& Parameter::getCovarianceMatrixForAA(std::string aa)
-{
-	aa[0] = (char) std::toupper(aa[0]);
-	unsigned aaIndex = SequenceSummary::aaToIndex.find(aa) -> second;
-	return covarianceMatrix[aaIndex];
-}
+
+
 
 
 std::vector <double> Parameter::readPhiValues(std::string filename)

@@ -74,6 +74,7 @@ ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
 
 	Parameter::operator=(rhs);
 
+	covarianceMatrix = rhs.covarianceMatrix;
 	// proposal bias and std for codon specific parameter
 	bias_csp = rhs.bias_csp;
 	std_csp = rhs.std_csp;
@@ -229,6 +230,23 @@ void ROCParameter::writeROCRestartFile(std::string filename)
 		if (j % 10 != 0)
 			oss << "\n";
 	}
+
+	for (unsigned i = 0; i < groupList.size(); i++)
+	{
+		std::string aa = groupList[i];
+		oss <<">covarianceMatrix:\n" << aa <<"\n";
+		CovarianceMatrix m = covarianceMatrix[SequenceSummary::AAToAAIndex(aa)];
+		std::vector<double>* tmp = m.getCovMatrix();
+		int size = m.getNumVariates();
+		for(int k = 0; k < size * size; k++)
+		{
+			if (k % size == 0 && k != 0) { oss <<"\n"; }
+			oss << tmp->at(k) << "\t";
+		}
+		oss <<"\n***\n";
+	}
+
+
 	std::string output = oss.str();
 	out << output;
 	out.close();
@@ -243,6 +261,8 @@ void ROCParameter::initFromRestartFile(std::string filename)
 void ROCParameter::initROCValuesFromFile(std::string filename)
 {
 	std::ifstream input;
+	covarianceMatrix.resize(maxGrouping);
+	std::vector <double> mat;
 	input.open(filename.c_str());
 	if (input.fail())
 	{
@@ -265,8 +285,16 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 
 		if (flag == 1)
 		{
+			mat.clear();
 			cat = 0;
-			variableName = tmp.substr(1, tmp.size() - 2);
+			variableName = tmp.substr(1,tmp.size()-2);
+			if (variableName == "covarianceMatrix")
+			{
+				getline(input,tmp);
+				//char aa = tmp[0];
+				cat = SequenceSummary::AAToAAIndex(tmp); // ????
+				std::cout << cat <<"\n";
+			}
 		}
 		else if (flag == 2)
 		{
@@ -321,9 +349,22 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 			{
 				double val;
 				iss.str(tmp);
+				while (iss >> val) {
+					std_csp.push_back(val);
+				}
+			}
+			else if (variableName == "covarianceMatrix")
+			{
+				if (tmp == "***") //end of matrix
+				{
+					CovarianceMatrix CM(mat);
+					covarianceMatrix[cat] = CM;
+				}
+				double val;
+				iss.str(tmp);
 				while (iss >> val)
 				{
-					std_csp.push_back(val);
+					mat.push_back(val);
 				}
 			}
 		}
@@ -370,6 +411,43 @@ SEXP ROCParameter::calculateSelectionCoefficientsR(unsigned sample, unsigned mix
 	return RSelectionCoefficents;
 }
 #endif
+
+
+#ifndef STANDALONE
+using namespace Rcpp;
+void ROCParameter::initCovarianceMatrix(SEXP _matrix, std::string aa)
+{
+	std::vector<double> tmp;
+	NumericMatrix matrix(_matrix);
+
+	for(unsigned i = 0u; i < aa.length(); i++)	aa[i] = (char)std::toupper(aa[i]);
+
+	unsigned aaIndex = SequenceSummary::aaToIndex.find(aa) -> second;
+	unsigned numRows = matrix.nrow();
+	std::vector<double> covMatrix(numRows * numRows);
+
+	//NumericMatrix stores the matrix by column, not by row. The loop
+	//below transposes the matrix when it stores it.
+	unsigned index = 0;
+	for (unsigned i = 0; i < numRows; i++)
+	{
+		for(unsigned j = i; j < numRows * numRows; j += numRows, index++)
+		{
+			covMatrix[index] = matrix[j];
+		}
+	}
+	CovarianceMatrix m(covMatrix);
+	m.choleskiDecomposition();
+	covarianceMatrix[aaIndex] = m;
+}
+#endif
+
+CovarianceMatrix& ROCParameter::getCovarianceMatrixForAA(std::string aa)
+{
+	aa[0] = (char) std::toupper(aa[0]);
+	unsigned aaIndex = SequenceSummary::aaToIndex.find(aa) -> second;
+	return covarianceMatrix[aaIndex];
+}
 
 //This function seems to be used only for the purpose of R
 void ROCParameter::initSelection(std::vector<double> selectionValues, unsigned mixtureElement, std::string aa)
