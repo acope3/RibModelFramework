@@ -19,6 +19,7 @@ class ROCParameter : public Parameter
 	private:
 
 		ROCTrace traces;
+
 		//members
 		std::vector<CovarianceMatrix> covarianceMatrix;
 
@@ -32,10 +33,12 @@ class ROCParameter : public Parameter
 		std::vector<std::vector<double>> proposedSelectionParameter;
 		std::vector<unsigned> numAcceptForMutationAndSelection;
 
-		//Z is Ser2, but must be written as Z here for C++ types to accept it.
+
 		// proposal bias and std for codon specific parameter
 		double bias_csp;
 		std::vector<double> std_csp;
+
+
 		// functions
 		std::vector<double> propose(std::vector<double> currentParam, double (*proposal)(double a, double b), double A, std::vector<double> B);
 
@@ -44,6 +47,7 @@ class ROCParameter : public Parameter
 		static const unsigned dM;
 		static const unsigned dEta;
 
+		//Constructors & Destructors:
 		ROCParameter();
 		explicit ROCParameter(std::string filename);
 		ROCParameter(double sphi, unsigned _numMixtures,

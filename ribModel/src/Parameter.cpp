@@ -1,7 +1,10 @@
 #include "include/base/Parameter.h"
 #include <sstream>
 #include <ctime>
-
+#ifndef STANDALONE
+#include <Rcpp.h>
+using namespace Rcpp;
+#endif
 const std::string Parameter::allUnique = "allUnique";
 const std::string Parameter::selectionShared = "selectionShared";
 const std::string Parameter::mutationShared = "mutationShared";
