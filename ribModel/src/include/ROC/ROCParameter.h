@@ -19,7 +19,9 @@ class ROCParameter : public Parameter
 	private:
 
 		ROCTrace traces;
+
 		//members
+		std::vector<CovarianceMatrix> covarianceMatrix;
 
 		double phiEpsilon;
 		double phiEpsilon_proposed;
@@ -31,10 +33,12 @@ class ROCParameter : public Parameter
 		std::vector<std::vector<double>> proposedSelectionParameter;
 		std::vector<unsigned> numAcceptForMutationAndSelection;
 
-		//Z is Ser2, but must be written as Z here for C++ types to accept it.
+
 		// proposal bias and std for codon specific parameter
 		double bias_csp;
 		std::vector<double> std_csp;
+
+
 		// functions
 		std::vector<double> propose(std::vector<double> currentParam, double (*proposal)(double a, double b), double A, std::vector<double> B);
 
@@ -43,6 +47,7 @@ class ROCParameter : public Parameter
 		static const unsigned dM;
 		static const unsigned dEta;
 
+		//Constructors & Destructors:
 		ROCParameter();
 		explicit ROCParameter(std::string filename);
 		ROCParameter(double sphi, unsigned _numMixtures,
@@ -51,10 +56,11 @@ class ROCParameter : public Parameter
 #ifndef STANDALONE
 		ROCParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer = true);
 		ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer = true, std::string _mutationSelectionState = "allUnique");
-		 
+		void initCovarianceMatrix(SEXP matrix, std::string aa);
 #endif
 		ROCParameter& operator=(const ROCParameter& rhs);
 		ROCTrace& getTraceObject() {return traces;}
+		CovarianceMatrix& getCovarianceMatrixForAA(std::string aa);
 		
 		void writeEntireRestartFile(std::string filename);
 		void writeROCRestartFile(std::string filename);

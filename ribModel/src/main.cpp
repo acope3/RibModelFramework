@@ -267,29 +267,30 @@ void testCovMatrixOverloading()
 	std::cout << "------------------ TEST COVMATRIXOVERLOADING ------------------" << std::endl;
 }
 
-void testWriteRestartFile(Genome &genome)
+void testWriteRestartFile()
 {
+	Genome genome;
+	genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 	std::cout << "------------------ TEST WRITERESTARTFILE ------------------" << std::endl;
 	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{
-		if (i < 448) geneAssignment[i] = 0u;
-		else geneAssignment[i] = 1u;
+		geneAssignment[i] = 0u;
 	}
 	double sphi_init = 2;
-	unsigned numMixtures = 2;
+	unsigned numMixtures = 1;
 	std::string mixDef = ROCParameter::allUnique;
 	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
-	ROCParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
+	RFPParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 	std::vector<std::string> files(2);
-	//files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv");
-	//files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv");
-	files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_CSP0.csv");
-	files[1] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_CSP1.csv");
+	files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv");
+	files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv");
+	//files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_CSP0.csv");
+	//files[1] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_CSP1.csv");
 	parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
 	parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
 	parameter.InitializeSynthesisRate(genome, sphi_init);
-	ROCModel model;
+	RFPModel model;
 	model.setParameter(parameter);
 	model.writeRestartFile("RestartFile1.txt");
 	std::cout << "------------------ TEST WRITERESTARTFILE ------------------" << std::endl;
@@ -299,8 +300,8 @@ void testWriteRestartFile(Genome &genome)
 void testInitFromRestartFile()
 {
 	std::cout << "------------------ TEST INITFROMRESTARTFILE ------------------" << std::endl;
-	ROCParameter parameter("RestartFile1.txt");
-	ROCModel model;
+	RFPParameter parameter("RestartFile1.txt");
+	RFPModel model;
 
 	model.setParameter(parameter);
 	model.writeRestartFile("RestartFile2.txt");
@@ -357,10 +358,10 @@ int main()
 	enum User { cedric, gabe, jeremy };
 	enum ModelToRun { ROC, RFP, FONSE };
 	/* Test variables */
-	User user = jeremy;
-	ModelToRun modelToRun = FONSE;
+	User user = gabe;
+	ModelToRun modelToRun = ROC;
 	bool read = false;
-	bool testing = false;
+	bool testing = true;
 
 	if (testing)
 	{
@@ -374,8 +375,8 @@ int main()
 		//testThetaKMatrix();
 		//testSimulateGenome(genome);
 		//testCovMatrixOverloading();
-		//testWriteRestartFile(genome);
-		//testInitFromRestartFile();
+		testWriteRestartFile();
+		testInitFromRestartFile();
 		//testReadRFPFile();
 		testSynonymousCodons();
 	}
@@ -440,7 +441,7 @@ int main()
 		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 		for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
-			if (i < 448) geneAssignment[i] = 0u;
+			if (i < 500) geneAssignment[i] = 0u;
 			else geneAssignment[i] = 1u;
 		}
 		/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)

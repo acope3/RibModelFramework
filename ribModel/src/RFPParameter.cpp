@@ -135,7 +135,7 @@ void RFPParameter::writeRFPRestartFile(std::string filename)
 	std::string output = "";
 	std::ostringstream oss;
 	unsigned i, j;
-	out.open(filename.c_str());
+	out.open(filename.c_str(), std::ofstream::app);
 	if (out.fail())
 	{
 		std::cerr <<"Could not open restart file for writing\n";
@@ -175,7 +175,8 @@ void RFPParameter::writeRFPRestartFile(std::string filename)
 	}
 
 	oss << ">std_csp:\n";
-	for (unsigned i = 0; i < std_csp.size(); i++)
+	std::cout << std_csp.size() <<"\n";
+	for (i = 0; i < std_csp.size(); i++)
 	{
 		oss << std_csp[i];
 		if ((i + 1) % 10 == 0)
@@ -183,6 +184,8 @@ void RFPParameter::writeRFPRestartFile(std::string filename)
 		else
 			oss << " ";
 	}
+	if (i % 10 != 0)
+		oss << "\n";
 
 	output = oss.str();
 	out << output;
@@ -299,15 +302,6 @@ void RFPParameter::initRFPValuesFromFile(std::string filename)
 	{
 		proposedLambdaPrimeParameter[i] = currentLambdaPrimeParameter[i];
 	}
-
-	groupList = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
-				 "TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT", "ATA", "ATC",
-				 "ATT", "AAA", "AAG", "CTA", "CTC", "CTG", "CTT", "TTA", "TTG", "ATG",
-				 "AAC", "AAT", "CCA", "CCC", "CCG", "CCT", "CAA", "CAG", "AGA", "AGG",
-				 "CGA", "CGC", "CGG", "CGT", "TCA", "TCC", "TCG", "TCT", "ACA", "ACC",
-				 "ACG", "ACT", "GTA", "GTC", "GTG", "GTT", "TGG", "TAC", "TAT", "AGC",
-				 "AGT"};
-
 }
 
 

@@ -54,9 +54,7 @@ class Parameter {
 		bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);
 		void writeBasicRestartFile(std::string filename);
 		void initBaseValuesFromFile(std::string filename);
-#ifndef STANDALONE
-		void initCovarianceMatrix(SEXP matrix, std::string aa);
-#endif
+
 
 		unsigned int getNumParam()
 		{
@@ -82,7 +80,7 @@ class Parameter {
 			return std_sphi;
 		}
 
-		CovarianceMatrix& getCovarianceMatrixForAA(std::string aa);
+
 		std::vector<double> readPhiValues(std::string filename); //General function, not specific to class, possibly move
 
 		//functions to deal with the mixtureDefinition Matrix
@@ -257,7 +255,7 @@ class Parameter {
 
 		//Objects
 		std::vector<mixtureDefinition> categories;
-		std::vector<CovarianceMatrix> covarianceMatrix;
+
 		std::vector<std::string> groupList;
 
 		unsigned numAcceptForSphi;

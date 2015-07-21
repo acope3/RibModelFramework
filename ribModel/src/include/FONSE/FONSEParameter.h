@@ -20,6 +20,7 @@ class FONSEParameter : public Parameter
 	private:
 		FONSETrace traces;
 
+		std::vector<CovarianceMatrix> covarianceMatrix;
 		double phiEpsilon;
 		double phiEpsilon_proposed;
 
