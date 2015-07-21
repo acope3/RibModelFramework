@@ -383,6 +383,12 @@ void Parameter::writeBasicRestartFile(std::string filename)
 	output += oss.str();
 	out << output;
 	out.close();
+
+	for (unsigned a = 0; a < groupList.size(); a++)
+	{
+		std::cout << groupList[a] <<" ";
+	}
+	std::cout <<"\n";
 }
 
 
@@ -526,7 +532,7 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 				if (tmp == "***") //end of matrix
 				{
 					CovarianceMatrix CM(mat);
-					covarianceMatrix.push_back(CM); //does old one get deleted/overwrote?
+					covarianceMatrix[cat] = CM;
 				}
 				double val;
 				iss.str(tmp);

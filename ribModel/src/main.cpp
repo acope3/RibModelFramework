@@ -267,8 +267,10 @@ void testCovMatrixOverloading()
 	std::cout << "------------------ TEST COVMATRIXOVERLOADING ------------------" << std::endl;
 }
 
-void testWriteRestartFile(Genome &genome)
+void testWriteRestartFile()
 {
+	Genome genome;
+	genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
 	std::cout << "------------------ TEST WRITERESTARTFILE ------------------" << std::endl;
 	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
@@ -282,10 +284,10 @@ void testWriteRestartFile(Genome &genome)
 	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 	ROCParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 	std::vector<std::string> files(2);
-	//files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv");
-	//files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv");
-	files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_CSP0.csv");
-	files[1] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_CSP1.csv");
+	files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv");
+	files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv");
+	//files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_CSP0.csv");
+	//files[1] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_CSP1.csv");
 	parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
 	parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
 	parameter.InitializeSynthesisRate(genome, sphi_init);
@@ -360,7 +362,7 @@ int main()
 	User user = jeremy;
 	ModelToRun modelToRun = FONSE;
 	bool read = false;
-	bool testing = false;
+	bool testing = true;
 
 	if (testing)
 	{
@@ -374,8 +376,8 @@ int main()
 		//testThetaKMatrix();
 		//testSimulateGenome(genome);
 		//testCovMatrixOverloading();
-		//testWriteRestartFile(genome);
-		//testInitFromRestartFile();
+		testWriteRestartFile();
+		testInitFromRestartFile();
 		//testReadRFPFile();
 		testSynonymousCodons();
 	}
