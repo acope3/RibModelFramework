@@ -386,10 +386,9 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 	{
 		proposedSelectionParameter[i] = currentSelectionParameter[i];
 	}
-
-	groupList = {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "P", "Q", "R", "S", "T", "V", "Y", "Z"};
-	//groupList = { "C", "D", "E", "F", "H", "K", "M", "N", "Q", "W", "Y" };
 }
+
+
 #ifndef STANDALONE
 SEXP ROCParameter::calculateSelectionCoefficientsR(unsigned sample, unsigned mixture)
 {
