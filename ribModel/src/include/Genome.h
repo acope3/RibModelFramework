@@ -3,6 +3,8 @@
 
 #include <vector>
 #include <string>
+#include <algorithm>
+#include <map>
 
 //#include <Rcpp.h>
 
@@ -30,6 +32,8 @@ class Genome
 		void writeFasta(std::string filename, bool simulated = false);
 		void readRFPFile(std::string filename);
 		void addGene(const Gene& gene);
+
+		void readObservedPhiValues(std::string filename, bool byId = true);
 		std::vector<unsigned> getCodonCountsPerGene(std::string codon);
 		std::vector <Gene> getGenes() {return genes;}
 		std::vector <Gene> getSimulatedGenes() {return simulatedGenes;}
