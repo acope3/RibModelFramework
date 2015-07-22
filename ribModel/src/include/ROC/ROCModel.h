@@ -21,6 +21,7 @@ class ROCModel : public Model
 	// Likelihood ratio functions
 	virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio);
 	virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures);
+	void simulateGenome(Genome &genome);
 
 	//Parameter wrapper functions:
 	virtual void initTraces(unsigned samples, unsigned num_genes) {parameter -> initAllTraces(samples, num_genes);}

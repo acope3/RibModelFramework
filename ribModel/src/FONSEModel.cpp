@@ -79,7 +79,7 @@ double FONSEModel::calculateLogLikelihoodPerPositionPerGene(unsigned position, u
 	
 	// if we are the last codon alphabetically, then we are the reference codon
 
-	if (codonIndex = codonRange[1]) {
+	if (codonIndex == codonRange[1]) {
 		mut = 0.0;
 		sel = 0.0;
 	}

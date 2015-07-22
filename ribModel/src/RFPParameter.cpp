@@ -291,7 +291,7 @@ void RFPParameter::initRFPValuesFromFile(std::string filename)
 	input.close();
 
 	bias_csp = 0;
-	numAcceptForAlphaAndLambdaPrime.resize(22, 0u);
+	numAcceptForAlphaAndLambdaPrime.resize(maxGrouping, 0u);
 	proposedAlphaParameter.resize(numMutationCategories);
 	proposedLambdaPrimeParameter.resize(numSelectionCategories);
 	for (unsigned i = 0; i < numMutationCategories; i++)

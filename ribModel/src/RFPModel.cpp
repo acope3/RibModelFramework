@@ -120,3 +120,25 @@ void RFPModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 	}
 	logAcceptanceRatioForAllMixtures = logLikelihood_proposed - logLikelihood;
 }
+
+
+void RFPModel::simulateGenome(Genome &genome)
+{
+	for (unsigned geneIndex = 0; geneIndex < genome.getGenomeSize(); geneIndex++)
+	{
+		unsigned mixtureElement = getMixtureAssignment(geneIndex);
+		Gene gene = genome.getGene(geneIndex);
+		for (unsigned codonIndex = 0; codonIndex < 64; codonIndex++)
+		{
+			std::string codon = SequenceSummary::codonArray[codonIndex];
+			unsigned alphaCat = parameter -> getMutationCategory(mixtureElement);
+			unsigned lambdaPrimeCat = parameter -> getSelectionCategory(mixtureElement);
+
+			double alpha = getParameterForCategory(alphaCat, RFPParameter::alp, codon, false);
+			double lambdaPrime = getParameterForCategory(lambdaPrimeCat, RFPParameter::lmPri, codon, false);
+
+			unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(codonIndex);
+
+		}
+	}
+}
