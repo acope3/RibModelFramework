@@ -9,6 +9,7 @@
 *.swp
 *.pdf
 *.rst
+*.mk
 *.Rcheck
 *.history
 *.Rhistory
