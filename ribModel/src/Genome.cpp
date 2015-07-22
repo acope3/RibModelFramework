@@ -222,7 +222,7 @@ void Genome::readRFPFile(std::string filename)
       addGene(tmpGene); //add to genome
       tmpGene.clear();
       seq = "";
-		}
+	}
 
     prevID = ID;
     unsigned index = SequenceSummary::CodonToIndex(codon);
@@ -264,6 +264,97 @@ Gene& Genome::getGene(std::string id)
 	// i is increase after a potential finding, therefore i-1 is correct
 	return genes[i-1];
 }
+
+
+void Genome::readObservedPhiValues(std::string filename, bool byId)
+{
+	std::ifstream input;
+	std::string tmp;
+
+	std::cout <<"Opening " << filename <<"\n";
+	input.open(filename);
+	if (input.fail())
+	{
+		std::cerr <<"Error opening file in readObservedPhiValues\n";
+		std::exit(1);
+	}
+
+
+
+	if (genes.size() == 0)
+	{
+		std::cerr << "Genome is empty, function will not execute!\n";
+	}
+	else
+	{
+		if (byId)
+		{
+			//Mapping is done so the genes can be found
+			std::map <std::string, Gene* > genomeMapping;
+			for (unsigned i = 0; i < genes.size(); i++)
+			{
+				genomeMapping.insert(make_pair(genes[i].getId(), &genes[i]));
+			}
+
+
+			while (input >> tmp)
+			{
+				std::size_t pos = tmp.find(",");
+				std::string geneID = tmp.substr(0, pos);
+				std::map <std::string, Gene * >::iterator it;
+				it = genomeMapping.find(geneID);
+				if (it == genomeMapping.end()) {
+					std::cerr << "Gene " << geneID << " not found!\n";
+				}
+				else //gene is found
+				{
+
+					bool notDone = true;
+					while (notDone)
+					{
+						std::size_t pos2 = tmp.find(",", pos + 1);
+						if (pos2 == std::string::npos)
+						{
+							notDone = false;
+						}
+						std::string val = tmp.substr(pos + 1, pos2 - (pos + 1));
+						it->second -> observedPhiValues.push_back(std::atof(val.c_str())); //make vector private again
+						pos = pos2;
+					}
+				}
+			}
+
+
+		} //end of putting in by ID
+		else //doing this by index
+		{
+			unsigned geneIndex = 0;
+			while (input >> tmp)
+			{
+				if (geneIndex >= genes.size())
+				{
+					std::cerr <<"GeneIndex exceeds the number of genes in the genome. Exiting function\n";
+					break;
+				}
+				std::size_t pos = tmp.find(",");
+				bool notDone = true;
+				while (notDone)
+				{
+					std::size_t pos2 = tmp.find(",", pos + 1);
+					if (pos2 == std::string::npos)
+					{
+						notDone = false;
+					}
+					std::string val = tmp.substr(pos + 1, pos2 - (pos + 1));
+					genes[geneIndex].observedPhiValues.push_back(std::atof(val.c_str()));
+					pos = pos2;
+				}
+				geneIndex++;
+			}
+		}//end of reading by index
+	}
+}
+
 
 void Genome::simulateGenome(Model& model)
 {

@@ -16,13 +16,13 @@ class Gene
 		std::string id;
 		std::string description;
 
-		std::vector<double> observedPhiValues;
+
 
 		void cleanSeq(); // clean the sequence, remove non "AGCT" charactors
 
 	public:
 		SequenceSummary geneData;
-
+	std::vector<double> observedPhiValues;
 		//constructor/destructors
 		Gene();
 		Gene(std::string _id, std::string _desc, std::string _seq);

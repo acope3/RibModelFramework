@@ -326,7 +326,6 @@ void testReadRFPFile()
 		{
 			//std::cout << gene.getId() << " " << SS.getRFPObserved(j) << " " << SS.getNumCodonsInMRNA(j) << " " << SS.IndexToCodon(j) << "\n";
 			std::cout << gene.getId() << " " << SS.getRFPObserved(j) << " " << SS.IndexToCodon(j) << "\n";
-
 		}
 	}
 	std::cout << "------------------- TEST READRFPFILE ----------------------" << "\n";
@@ -352,6 +351,15 @@ void testSynonymousCodons()
 	SequenceSummary::getSynonymousCodonsByCodonIndex(codonIndex);
 }
 
+void testReadObservedPhis()
+{
+	Genome genome;
+	genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/fake.fasta");
+	genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/fakeObserved.csv", false);
+
+
+}
+
 int main()
 {
 	std::cout <<"Testing this\n";
@@ -375,10 +383,11 @@ int main()
 		//testThetaKMatrix();
 		//testSimulateGenome(genome);
 		//testCovMatrixOverloading();
-		testWriteRestartFile();
-		testInitFromRestartFile();
+		//testWriteRestartFile();
+		//testInitFromRestartFile();
 		//testReadRFPFile();
-		testSynonymousCodons();
+		//testSynonymousCodons();
+		testReadObservedPhis();
 	}
 	else //not doing unit testing, running a model
 	{
