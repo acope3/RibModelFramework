@@ -1,6 +1,7 @@
 *~
 *.*~
 *.o
+*.d
 *.so
 *.gz
 *.out
@@ -22,3 +23,5 @@
 .Rhistory
 .externalToolBuilders
 Test
+Default
+junk

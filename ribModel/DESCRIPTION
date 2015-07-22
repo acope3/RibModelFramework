@@ -3,16 +3,20 @@ Type: Package
 Title: What the package does (short line)
 Version: 1.0
 Date: 2015-01-22
-Authors@R:c(person("Cedric", "Landerer", role = c("aut", "cre"), email = "cedric.landerer@gmail.com"),
-		person("Gabriel", "Hanas", role = "aut"))
+Authors@R: c(person("Cedric", "Landerer", role = c("aut", "cre"), email = "cedric.landerer@gmail.com"),
+		person("Gabriel", "Hanas", role = "ctb"),
+		person("Jeremy", "Rogers", role = "ctb"))
 Author: Cedric Landerer [aut, cre],
-	Gabriel Hanas [aut]
+	Gabriel Hanas [ctb]
+	Jeremy Rogers [ctb]
 Maintainer: Cedric Landerer <cedric.landerer@gmail.com>
 URL: https://github.com/clandere/RibModelFramework
-Depends: Rcpp
-Suggests: Hmisc
+Depends: R (>= 3.1.2), Rcpp (>= 0.11.3), methods
+Suggests: Hmisc, VGAM
 RcppModules: Trace_mod, CovarianceMatrix_mod, MCMCAlgorithm_mod, Model_mod, Parameter_mod, Genome_mod, Gene_mod, SequenceSummary_mod
 Description: More about what it does (maybe more than one line)
 License: GPL (>= 2)
-Imports: Rcpp (>= 0.11.3)
+Imports:
 LinkingTo: Rcpp
+LazyLoad: yes
+LazyData: yes
