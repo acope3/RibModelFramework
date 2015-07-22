@@ -71,6 +71,7 @@ RCPP_MODULE(Parameter_mod)
 
 	class_<RFPParameter>( "RFPParameter" )
 		.derives<Parameter>("Parameter")
+		.constructor <std::string>()
 		.constructor <double, std::vector<unsigned>, std::vector<unsigned>, bool>()
 		.constructor <double, unsigned, std::vector<unsigned>, bool, std::string>()
 		

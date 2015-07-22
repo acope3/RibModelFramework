@@ -1,4 +1,4 @@
-#NAMESPACE <- environment()
+NAMESPACE <- environment()
 .onLoad <- function(libname, pkgname){
   library.dynam("ribModel", pkgname, libname)
 

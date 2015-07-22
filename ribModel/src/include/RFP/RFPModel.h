@@ -22,6 +22,7 @@ class RFPModel: public Model {
 		virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
 				double& logAcceptanceRatioForAllMixtures);
 
+		void simulateGenome(Genome &genome);
 		//Parameter wrapper functions:
 		virtual void initTraces(unsigned samples, unsigned num_genes)
 		{
