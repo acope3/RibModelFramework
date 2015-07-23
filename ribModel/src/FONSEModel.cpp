@@ -81,7 +81,6 @@ double FONSEModel::calculateLogLikelihoodPerPositionPerGene(unsigned position, s
 	double denominator = 1.0;
 
 	// if we are the last codon alphabetically, then we are the reference codon
-
 	SequenceSummary::AAToCodonRange(curAA, true, paramRange);
 	SequenceSummary::AAToCodonRange(curAA, false, codonRange);
 

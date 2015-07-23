@@ -1,7 +1,5 @@
 #include "include/Genome.h"
-#include "include/ROC/ROCParameter.h"//these two files must be included here to get at the implimentation
-#include "include/ROC/ROCModel.h" 		//for simulateGenome. They cannot be included in the header file. See genome.h for
-//more information on circular dependices/forward declarations
+
 #include <iostream>     // std::cout, std::cerr
 #include <cstring>
 #include <fstream>
@@ -222,7 +220,7 @@ void Genome::readRFPFile(std::string filename)
       addGene(tmpGene); //add to genome
       tmpGene.clear();
       seq = "";
-		}
+	}
 
     prevID = ID;
     unsigned index = SequenceSummary::CodonToIndex(codon);
@@ -265,81 +263,98 @@ Gene& Genome::getGene(std::string id)
 	return genes[i-1];
 }
 
-void Genome::simulateGenome(Model& model)
+
+void Genome::readObservedPhiValues(std::string filename, bool byId)
 {
-	/*
-		 unsigned i;
-		 int j, k;
-		 int aaCount;
-		 int numCodons;
-		 unsigned codonIndex;
-		 unsigned aaRange[2];
-		 std::string tmpSeq;
-		 std::string codon;
-		 std::string curAA;
-		 std::string tmpDesc;
+	std::ifstream input;
+	std::string tmp;
 
-
-	//std::srand(std::time(0));
-	simulatedGenes.resize(genes.size());
-	tmpDesc = "Simulated Gene";
-
-
-	for (i = 0; i < genes.size(); i++) //loop over all genes in the genome
+	std::cout <<"Opening " << filename <<"\n";
+	input.open(filename);
+	if (input.fail())
 	{
-	Gene gene = genes[i];
-	SequenceSummary seqSum = gene.geneData;
-	tmpSeq = ""; //reset the sequence to blank
-	tmpSeq += "ATG"; //Always will have the start amino acid
+		std::cerr <<"Error opening file in readObservedPhiValues\n";
+		std::exit(1);
+	}
 
 
-	unsigned mixtureElement = model.getMixtureAssignment(i);
-	unsigned mutationCategory = model.getMutationCategory(mixtureElement);
-	unsigned selectionCategory = model.getSelectionCategory(mixtureElement);
-	unsigned expressionCategory = model.getSynthesisRateCategory(mixtureElement);
-	double phi = model.getSynthesisRate(i, expressionCategory, false);
 
-	std::ostringstream strstream;
-	strstream << mixtureElement;
-	std::string tmpID = gene.getId() + "_MixtureElement" + strstream.str();
-	for (j = 0; j < 22; j++) //loop over each amino acid, naa[]
+	if (genes.size() == 0)
 	{
-	aaCount = seqSum.getAAcountForAA(j);
-	curAA = seqSum.AminoAcidArray[j];
-	if (curAA == "X") continue;
-	numCodons = seqSum.GetNumCodonsForAA(curAA);
-	if (curAA == "M") aaCount -= 1;
-	double* codonProb = new double[numCodons](); //size the arrays to the proper size based on # of codons.
-	double* mutation = new double[numCodons - 1]();
-	double* selection = new double[numCodons - 1]();
-
-	//get the probability vector for each amino acid
-	if (curAA == "M" || curAA == "W")
-	{
-	codonProb[0] = 1;
+		std::cerr << "Genome is empty, function will not execute!\n";
 	}
 	else
 	{
-	model.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
-	model.getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
-	model.calculateCodonProbabilityVector(numCodons, mutation, selection, phi, codonProb);
-	}
-	for (k = 0; k < aaCount; k++)
-	{
-	codonIndex = ROCParameter::randMultinom(codonProb, numCodons);
-	seqSum.AAToCodonRange(curAA, false, aaRange); //need the first spot in the array where the codons for curAA are
-	codon = seqSum.IndexToCodon(aaRange[0] + codonIndex);//get the correct codon based off codonIndex
-	tmpSeq += codon;
-	}
-	}
+		if (byId)
+		{
+			//Mapping is done so the genes can be found
+			std::map <std::string, Gene* > genomeMapping;
+			for (unsigned i = 0; i < genes.size(); i++)
+			{
+				genomeMapping.insert(make_pair(genes[i].getId(), &genes[i]));
+			}
 
-	codon =	seqSum.IndexToCodon((rand() % 3) + 61); //randomly choose a stop codon, from range 61-63
-	tmpSeq += codon;
-	Gene tmpGene(tmpSeq, tmpID, tmpDesc);
-	simulatedGenes[i] = tmpGene;
+
+			while (input >> tmp)
+			{
+				std::size_t pos = tmp.find(",");
+				std::string geneID = tmp.substr(0, pos);
+				std::map <std::string, Gene * >::iterator it;
+				it = genomeMapping.find(geneID);
+				if (it == genomeMapping.end()) {
+					std::cerr << "Gene " << geneID << " not found!\n";
+				}
+				else //gene is found
+				{
+
+					bool notDone = true;
+					while (notDone)
+					{
+						std::size_t pos2 = tmp.find(",", pos + 1);
+						if (pos2 == std::string::npos)
+						{
+							notDone = false;
+						}
+						std::string val = tmp.substr(pos + 1, pos2 - (pos + 1));
+						it->second -> observedPhiValues.push_back(std::atof(val.c_str())); //make vector private again
+						pos = pos2;
+					}
+				}
+			}
+
+
+		} //end of putting in by ID
+		else //doing this by index
+		{
+			unsigned geneIndex = 0;
+			while (input >> tmp)
+			{
+				if (geneIndex >= genes.size())
+				{
+					std::cerr <<"GeneIndex exceeds the number of genes in the genome. Exiting function\n";
+					break;
+				}
+				std::size_t pos = tmp.find(",");
+				bool notDone = true;
+				while (notDone)
+				{
+					std::size_t pos2 = tmp.find(",", pos + 1);
+					if (pos2 == std::string::npos)
+					{
+						notDone = false;
+					}
+					std::string val = tmp.substr(pos + 1, pos2 - (pos + 1));
+					genes[geneIndex].observedPhiValues.push_back(std::atof(val.c_str()));
+					pos = pos2;
+				}
+				geneIndex++;
+			}
+		}//end of reading by index
 	}
-	*/
 }
+
+
+
 
 void Genome::clear()
 {

@@ -1,17 +1,17 @@
-#NAMESPACE <- environment()
+NAMESPACE <- environment()
 .onLoad <- function(libname, pkgname){
-  library.dynam("ribModel", pkgname, libname)
+  #library.dynam("ribModel", pkgname, libname)
 
-  loadRcppModules()
+  Rcpp::loadRcppModules()
   
-  invisible()
+#  invisible()
 } # End of .onLoad().
 
-.onUnload <- function(libpath){
-  library.dynam.unload("ribModel", libpath)
-  invisible()
-} # End of .onUnload().
+#.onUnload <- function(libpath){
+#  library.dynam.unload("ribModel", libpath)
+#  invisible()
+#} # End of .onUnload().
 
-.onAttach <- function(libname, pkgname){
-  invisible()
-} # End of .onAttach().
+#.onAttach <- function(libname, pkgname){
+#  invisible()
+#} # End of .onAttach().

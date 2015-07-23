@@ -13,7 +13,7 @@ class Model
         virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio) = 0;
         virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
         		double& logAcceptanceRatioForAllMixtures) = 0;
-		
+
 				//Parameter wrapper functions:
 		virtual void initTraces(unsigned samples, unsigned num_genes) = 0;
 		virtual void writeRestartFile(std::string filename) = 0;

@@ -3,15 +3,11 @@
 
 #include <vector>
 #include <string>
-
-//#include <Rcpp.h>
+#include <map>
 
 #include "Gene.h"
 
 
-//IMPORTANT NOTE: forward declarations used. Includes are in genome.cpp. 
-//Used to solve circular dependices. See http://www.cplusplus.com/forum/general/125/
-//for more information.
 class Model;
 
 
@@ -30,12 +26,13 @@ class Genome
 		void writeFasta(std::string filename, bool simulated = false);
 		void readRFPFile(std::string filename);
 		void addGene(const Gene& gene);
+
+		void readObservedPhiValues(std::string filename, bool byId = true);
 		std::vector<unsigned> getCodonCountsPerGene(std::string codon);
 		std::vector <Gene> getGenes() {return genes;}
 		std::vector <Gene> getSimulatedGenes() {return simulatedGenes;}
 		Gene& getGene(unsigned index);
 		Gene& getGene(std::string id);
-		void simulateGenome(Model& model);
 		unsigned getGenomeSize() {return genes.size();}
 		void clear();
 		Genome getGenomeForGeneIndicies(std::vector <unsigned> indicies);

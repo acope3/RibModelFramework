@@ -195,7 +195,7 @@ void testSimulateGenome(Genome& genome)
 	std::cout << "done initialize ROCParameter object" << std::endl;
 	ROCModel model;
 	model.setParameter(parameter);
-	genome.simulateGenome(model);
+	model.simulateGenome(genome);
 	std::vector <Gene> simGenes = genome.getSimulatedGenes();
 	unsigned aaRange[2];
 	std::cout << "FREQUENCIES:\n";
@@ -326,7 +326,6 @@ void testReadRFPFile()
 		{
 			//std::cout << gene.getId() << " " << SS.getRFPObserved(j) << " " << SS.getNumCodonsInMRNA(j) << " " << SS.IndexToCodon(j) << "\n";
 			std::cout << gene.getId() << " " << SS.getRFPObserved(j) << " " << SS.IndexToCodon(j) << "\n";
-
 		}
 	}
 	std::cout << "------------------- TEST READRFPFILE ----------------------" << "\n";
@@ -352,6 +351,15 @@ void testSynonymousCodons()
 	SequenceSummary::getSynonymousCodonsByCodonIndex(codonIndex);
 }
 
+void testReadObservedPhis()
+{
+	Genome genome;
+	genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/fake.fasta");
+	genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/fakeObserved.csv", false);
+
+
+}
+
 int main()
 {
 	std::cout <<"Testing this\n";
@@ -359,9 +367,9 @@ int main()
 	enum ModelToRun { ROC, RFP, FONSE };
 	/* Test variables */
 	User user = gabe;
-	ModelToRun modelToRun = ROC;
-	bool read = false;
-	bool testing = true;
+	ModelToRun modelToRun = RFP;
+	bool read = true;
+	bool testing = false;
 
 	if (testing)
 	{
@@ -375,10 +383,11 @@ int main()
 		//testThetaKMatrix();
 		//testSimulateGenome(genome);
 		//testCovMatrixOverloading();
-		testWriteRestartFile();
-		testInitFromRestartFile();
+		//testWriteRestartFile();
+		//testInitFromRestartFile();
 		//testReadRFPFile();
-		testSynonymousCodons();
+		//testSynonymousCodons();
+		testReadObservedPhis();
 	}
 	else //not doing unit testing, running a model
 	{
@@ -439,17 +448,17 @@ int main()
 		std::cout << "Initializing shared parameter variables\n";
 
 		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
-		for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+		/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
 			if (i < 500) geneAssignment[i] = 0u;
 			else geneAssignment[i] = 1u;
-		}
-		/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+		}*/
+		for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
 			geneAssignment[i] = 0u;
-		}*/
+		}
 		double sphi_init = 2;
-		unsigned numMixtures = 2;
+		unsigned numMixtures = 1;
 		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 		std::cout <<"Done initializing shared parameter variables\n";
 
@@ -535,7 +544,10 @@ int main()
 			RFPParameter parameter;
 			if (read)
 			{
-
+				std::cout <<"Initializing RFPParameter object from Restart File\n";
+				RFPParameter tmp("RestartFile1.txt");
+				parameter = tmp;
+				std::cout <<"Done initializing RFPParameter object from Restart File\n";
 			}
 			else
 			{

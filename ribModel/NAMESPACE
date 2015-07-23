@@ -1,12 +1,21 @@
-useDynLib(ribModel)
-exportPattern("^[[:alpha:]]+") #<- if commented out, only functions explicitly exported will we exposed 
+#imports
+importFrom(methods, new)
 importFrom(Rcpp, evalCpp)
 
-export(
+#loading
+useDynLib(ribModel)
+
+#exports
+exportPattern("^[[:alpha:]]+") #<- if commented out, only functions explicitly exported will we exposed 
+
+
+
+
+#export(
 # Ploting
 ## Parameter object
 
 ## Model object
 
 ## Genome object
-)
+#)

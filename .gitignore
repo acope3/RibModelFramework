@@ -1,6 +1,7 @@
 *~
 *.*~
 *.o
+*.d
 *.so
 *.gz
 *.out
@@ -8,6 +9,7 @@
 *.swp
 *.pdf
 *.rst
+*.mk
 *.Rcheck
 *.history
 *.Rhistory
@@ -22,3 +24,5 @@
 .Rhistory
 .externalToolBuilders
 Test
+Default
+junk
