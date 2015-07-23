@@ -1,6 +1,6 @@
 #include "include/base/Parameter.h"
 #include <sstream>
-#include <ctime>
+
 #ifndef STANDALONE
 #include <Rcpp.h>
 using namespace Rcpp;

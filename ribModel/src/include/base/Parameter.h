@@ -7,6 +7,7 @@
 #include <iostream>
 #include <set>
 #include <fstream>
+#include <ctime>
 #ifndef STANDALONE
 #include <Rcpp.h>
 #endif
