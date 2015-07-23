@@ -87,7 +87,7 @@ double FONSEModel::calculateLogLikelihoodPerPositionPerGene(unsigned position, s
 	paramIndex = paramRange[0] + (codonIndex - codonRange[0]);
 
 	// if we are the reference codon, the numerator is simply 1
-	if (codonIndex = paramRange[1] - 1) {
+	if (codonIndex == codonRange[1] - 1) {
 		numerator = 1.0;
 	}
 	else {
@@ -129,7 +129,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 	std::string curAA;
 
 #ifndef __APPLE__
-	//#pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed, codonCount) reduction(+:likelihood,likelihood_proposed)
+	#pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed) reduction(+:likelihood,likelihood_proposed)
 #endif
 	for (int i = 0; i < numGenes; i++)
 	{
@@ -173,6 +173,11 @@ void FONSEModel::setParameter(FONSEParameter &_parameter)
 {
 	parameter = &_parameter;
 }
+
+/*double FONSEModel::calculateCodonProbability(unsigned position, double * mutation, double * selection, double phi)
+{
+	return 0.0;
+}*/
 
 /*std::vector<double> FONSEModel::CalculateProbabilitiesForCodons(std::vector<double> mutation, std::vector<double> selection, double phi)
 {

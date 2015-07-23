@@ -17,7 +17,7 @@ public:
 
 	FONSEModel();
 	virtual ~FONSEModel();
-	FONSEModel(const FONSEModel& other);
+	//FONSEModel(const FONSEModel& other);
 
 	void setParameter(FONSEParameter &_parameter);
 	double calculateCodonProbability(unsigned position, double* mutation, double* selection, double phi);

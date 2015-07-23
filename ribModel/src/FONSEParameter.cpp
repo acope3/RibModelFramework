@@ -83,6 +83,8 @@ FONSEParameter::FONSEParameter(const FONSEParameter &other) : Parameter(other)
 	phiEpsilon = other.phiEpsilon;
 	phiEpsilon_proposed = other.phiEpsilon_proposed;
 
+	numAcceptForMutationAndSelection = other.numAcceptForMutationAndSelection;
+
 }
 
 FONSEParameter& FONSEParameter::operator=(const FONSEParameter& rhs)
@@ -106,6 +108,8 @@ FONSEParameter& FONSEParameter::operator=(const FONSEParameter& rhs)
 	phiEpsilon_proposed = rhs.phiEpsilon_proposed;
 
 	covarianceMatrix = rhs.covarianceMatrix;
+
+	numAcceptForMutationAndSelection = rhs.numAcceptForMutationAndSelection;
 
 	return *this;
 }
