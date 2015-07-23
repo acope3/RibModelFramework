@@ -11,8 +11,7 @@ class FONSEModel : public Model
 private:
 
 	FONSEParameter *parameter;
-	virtual void obtainCodonCount(SequenceSummary& seqsum, std::string curAA, int codonCount[]);
-	double calculateLogLikelihoodPerPositionPerGene(unsigned position, unsigned codonIndex, std::vector <double> *mutation, std::vector <double> *selection, double phiValue);
+	double calculateLogLikelihoodPerPositionPerGene(unsigned position, std::string curAA, unsigned codonIndex, std::vector <double> *mutation, std::vector <double> *selection, double phiValue);
 
 public:
 

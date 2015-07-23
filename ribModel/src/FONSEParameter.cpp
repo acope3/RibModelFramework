@@ -105,6 +105,8 @@ FONSEParameter& FONSEParameter::operator=(const FONSEParameter& rhs)
 	phiEpsilon = rhs.phiEpsilon;
 	phiEpsilon_proposed = rhs.phiEpsilon_proposed;
 
+	covarianceMatrix = rhs.covarianceMatrix;
+
 	return *this;
 }
 
@@ -385,7 +387,40 @@ SEXP FONSEParameter::calculateSelectionCoefficientsR(unsigned sample, unsigned m
 	}
 	return RSelectionCoefficents;
 }
+
+void FONSEParameter::initCovarianceMatrix(SEXP _matrix, std::string aa)
+{
+	std::vector<double> tmp;
+	NumericMatrix matrix(_matrix);
+
+	for (unsigned i = 0u; i < aa.length(); i++)	aa[i] = (char)std::toupper(aa[i]);
+
+	unsigned aaIndex = SequenceSummary::aaToIndex.find(aa)->second;
+	unsigned numRows = matrix.nrow();
+	std::vector<double> covMatrix(numRows * numRows);
+
+	//NumericMatrix stores the matrix by column, not by row. The loop
+	//below transposes the matrix when it stores it.
+	unsigned index = 0;
+	for (unsigned i = 0; i < numRows; i++)
+	{
+		for (unsigned j = i; j < numRows * numRows; j += numRows, index++)
+		{
+			covMatrix[index] = matrix[j];
+		}
+	}
+	CovarianceMatrix m(covMatrix);
+	m.choleskiDecomposition();
+	covarianceMatrix[aaIndex] = m;
+}
 #endif
+
+CovarianceMatrix& FONSEParameter::getCovarianceMatrixForAA(std::string aa)
+{
+	aa[0] = (char)std::toupper(aa[0]);
+	unsigned aaIndex = SequenceSummary::aaToIndex.find(aa)->second;
+	return covarianceMatrix[aaIndex];
+}
 
 void FONSEParameter::initSelection(std::vector<double> selectionValues, unsigned mixtureElement, std::string aa)
 {

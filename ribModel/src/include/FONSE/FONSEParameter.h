@@ -42,6 +42,7 @@ class FONSEParameter : public Parameter
 		static const unsigned dOmega;
 
 		FONSEParameter();
+		FONSEParameter(const FONSEParameter &other);
 		explicit FONSEParameter(std::string filename);
 		FONSEParameter(double sphi, unsigned _numMixtures, std::vector <unsigned> geneAssignment,
 			std::vector <std::vector <unsigned> > thetaKmatrix, bool splitSer = true,
@@ -51,12 +52,12 @@ class FONSEParameter : public Parameter
 #ifndef STANDALONE
 		FONSEParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer = true);
 		FONSEParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer = true, std::string _mutationSelectionState = "allUnique");
-
+		void initCovarianceMatrix(SEXP matrix, std::string aa);
 #endif
 
-		FONSEParameter(const FONSEParameter& other);
 		FONSEParameter& operator=(const FONSEParameter& rhs);
 		FONSETrace& getTraceObject() { return traces; }
+		CovarianceMatrix& getCovarianceMatrixForAA(std::string aa);
 
 		void writeEntireRestartFile(std::string filename);
 		void writeFONSERestartFile(std::string filename);
