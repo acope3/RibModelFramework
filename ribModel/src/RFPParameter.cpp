@@ -113,10 +113,67 @@ void RFPParameter::initLambdaPrime(double lambdaPrimeValue, unsigned mixtureElem
 
 void RFPParameter::initMutationSelectionCategories(std::vector<std::string> files, unsigned numCategories, unsigned paramType)
 {
-	//TODO: Not sure we need this function here and in ROCParameter. This could possibly move up to Parameter. Some changes may
-	//need to be made to the function in order for it to function. Mainly, the paramType needs to be better defined.
+	std::ifstream currentFile;
+	std::string tmpString;
+	std::string type;
 
-	//Not needed yet because we have no "true" values to give it.
+
+	if (paramType == RFPParameter::alp)
+		type = "alpha";
+	else
+		type = "lambda";
+
+
+	for (unsigned i = 0; i < numCategories; i++)
+	{
+		std::vector<double> temp(numParam, 0.0);
+
+		//open the file, make sure it opens
+		currentFile.open(files[i].c_str());
+		if (currentFile.fail())
+		{
+			std::cerr << "Error opening file " << i << " in the file vector.\n";
+			std::exit(1);
+		}
+		currentFile >> tmpString; //trash the first line, no info given.
+
+		unsigned j = 0;
+		while (currentFile >> tmpString)
+		{
+			std::size_t pos = tmpString.find(",");
+			std::size_t pos2 = tmpString.find(",", pos + 1);
+			if (pos != std::string::npos && pos2 != std::string::npos)
+			{
+				std::string val = tmpString.substr(pos + 1, pos2 - (pos + 1));
+				if (tmpString.find(type) != std::string::npos) //alpha or lambda was found
+				{
+					temp[j] = std::atof(val.c_str());
+					j++;
+					if (j == numParam)
+						break;
+				}
+			}
+		}
+		unsigned altered = 0u;
+		for (j = 0; j < categories.size(); j++)
+		{
+			if (paramType == RFPParameter::alp && categories[j].delM == i)
+			{
+				currentAlphaParameter[j] = temp;
+				proposedAlphaParameter[j] = temp;
+				altered++;
+			}
+			else if (paramType == RFPParameter::lmPri && categories[j].delEta == i)
+			{
+				currentLambdaPrimeParameter[j] = temp;
+				proposedLambdaPrimeParameter[j] = temp;
+				altered++;
+			}
+			if (altered == numCategories)
+				break; //to not access indicies out of bounds.
+		}
+		currentFile.close();
+	}
 }
 
 

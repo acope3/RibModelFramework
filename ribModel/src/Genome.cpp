@@ -238,6 +238,40 @@ void Genome::readRFPFile(std::string filename)
 }
 
 
+void Genome::writeRFPFile(std::string filename, bool simulated)
+{
+	std::ofstream Fout;
+	Fout.open(filename.c_str());
+	if (Fout.fail())
+	{
+		std::cerr <<"Error in Genome::writeRFPFile: Cannot open output RFP file " << filename <<"\n";
+	}
+
+	Fout <<"ORF,RFP_Counts,Codon_Counts,Codon\n";
+	for (unsigned geneIndex = 0; geneIndex < genes.size(); geneIndex++)
+	{
+		Gene currentGene = genes[geneIndex];
+
+		for (unsigned codonIndex = 0; codonIndex < 64; codonIndex++)
+		{
+			std::string codon = SequenceSummary::codonArray[codonIndex];
+
+			Fout << currentGene.getId() <<",";
+			if (simulated)
+			{
+				Fout << currentGene.geneData.getRFPObservedCounts(codonIndex, true) <<",";
+			}
+			else
+			{
+				Fout << currentGene.geneData.getRFPObservedCounts(codonIndex, true) <<",";
+			}
+			Fout << currentGene.geneData.getCodonCountForCodon(codonIndex) <<"," << codon <<"\n";
+		}
+	}
+	Fout.close();
+}
+
+
 Gene& Genome::getGene(unsigned index)
 {
 	Gene gene;

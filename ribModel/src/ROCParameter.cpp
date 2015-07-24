@@ -527,8 +527,7 @@ void ROCParameter::initMutationSelectionCategories(std::vector<std::string> file
 				std::string val = tmpString.substr(pos + 1, pos2 - (pos + 1));
 				if (tmpString.find(type) != std::string::npos) //mu or eta was found, depending on category
 				{
-					temp[j] = std::atof(val.c_str()); //std::stod(val);
-					//					temp[j] = randNorm(temp[j], 0.3);
+					temp[j] = std::atof(val.c_str());
 					j++;
 					if (j == numParam)
 						break;
