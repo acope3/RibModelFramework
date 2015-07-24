@@ -106,7 +106,8 @@ RCPP_MODULE(Parameter_mod)
 		//R wrapper functions
 		.method("getMutationVarianceForCodon", &FONSEParameter::getMutationVarianceForCodon)
 		.method("getSelectionVarianceForCodon", &FONSEParameter::getSelectionVarianceForCodon)
-
+		.method("initCovarianceMatrix", &FONSEParameter::initCovarianceMatrix)
+		.method("getCovarianceMatrixForAA", &FONSEParameter::getCovarianceMatrixForAA)
 		;
 }
 #endif

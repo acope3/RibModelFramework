@@ -26,9 +26,22 @@ SequenceSummary::SequenceSummary(const SequenceSummary& other)
 	for (unsigned i = 0u; i < codonPositions.size(); i++) {
 		codonPositions[i] = other.codonPositions[i];
 	}
-	std::copy(std::begin(other.ncodons), std::end(other.ncodons), std::begin(ncodons));
-	std::copy(std::begin(other.naa), std::end(other.naa), std::begin(naa));
+
+	for (unsigned i = 0u; i < 64; i++) {
+		ncodons[i] = other.ncodons[i];
+	}
+
+	for (unsigned i = 0u; i < 22; i++) {
+		naa[i] = other.naa[i];
+	}
+
+	for (unsigned i = 0u; i < 64; i++) {
+		RFPObserved[i] = other.RFPObserved[i];
+	}
+
+	/*std::copy(std::begin(other.naa), std::end(other.naa), std::begin(naa));
 	std::copy(std::begin(other.RFPObserved), std::end(other.RFPObserved), std::begin(RFPObserved));
+	*/
 }
 
 SequenceSummary& SequenceSummary::operator=(const SequenceSummary& rhs)
@@ -38,9 +51,23 @@ SequenceSummary& SequenceSummary::operator=(const SequenceSummary& rhs)
 	for (unsigned i = 0u; i < codonPositions.size(); i++) {
 		codonPositions[i] = rhs.codonPositions[i];
 	}
-	std::copy(std::begin(rhs.ncodons), std::end(rhs.ncodons), std::begin(ncodons));
+
+	for (unsigned i = 0u; i < 64; i++) {
+		ncodons[i] = rhs.ncodons[i];
+	}
+
+	for (unsigned i = 0u; i < 22; i++) {
+		naa[i] = rhs.naa[i];
+	}
+
+	for (unsigned i = 0u; i < 64; i++) {
+		RFPObserved[i] = rhs.RFPObserved[i];
+	}
+
+	/*std::copy(std::begin(rhs.ncodons), std::end(rhs.ncodons), std::begin(ncodons));
 	std::copy(std::begin(rhs.naa), std::end(rhs.naa), std::begin(naa));
 	std::copy(std::begin(rhs.RFPObserved), std::end(rhs.RFPObserved), std::begin(RFPObserved));
+	*/
 	//assignment operator
 	return *this;
 }

@@ -54,15 +54,15 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	int numGenes = genome.getGenomeSize();
 
 	// just for testing
-	//unsigned concurrentThreadsSupported = std::thread::hardware_concurrency();
-	//omp_set_num_threads(concurrentThreadsSupported);
-	//#pragma omp parallel for //shared(parameter)
+	unsigned concurrentThreadsSupported = std::thread::hardware_concurrency();
+	omp_set_num_threads(concurrentThreadsSupported);
+	
 	// testing end
 	unsigned numSynthesisRateCategories = model.getNumSynthesisRateCategories();
 	unsigned numMixtures = model.getNumMixtureElements();
 	double* dirichletParameters = new double[numMixtures]();
 	//initialize parameter's size
-
+	#pragma omp parallel for //shared(parameter)
 	for(int i = 0; i < numGenes; i++)
 	{
 		Gene gene = genome.getGene(i);
@@ -114,11 +114,11 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			{
 				model.updateSynthesisRate(i, k);
 				// only count each gene once, not numSynthesisRateCategories times
-				//#pragma omp critical
+				#pragma omp critical
 				if(mixtureAssignmentOfGene == k) logLikelihood += propLogLike;
 			}else{
 				// only count each gene once, not numSynthesisRateCategories times
-				//#pragma omp critical
+				#pragma omp critical
 				if(mixtureAssignmentOfGene == k) logLikelihood += currLogLike;
 			}
 		}
@@ -182,7 +182,7 @@ void MCMCAlgorithm::acceptRejectHyperParameter(int numGenes, Model& model, int i
 	double proposedMPhi = -(proposedSphi * proposedSphi) / 2;
 
 #ifndef __APPLE__
-//#pragma omp parallel for reduction(+:logProbabilityRatio)
+#pragma omp parallel for reduction(+:logProbabilityRatio)
 #endif
 	for(int i = 0; i < numGenes; i++)
 	{

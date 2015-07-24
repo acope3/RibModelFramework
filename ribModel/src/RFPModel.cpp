@@ -84,10 +84,11 @@ void RFPModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 {
 	double logLikelihood = 0.0;
 	double logLikelihood_proposed = 0.0;
+	Gene *gene;
 	unsigned index = SequenceSummary::CodonToIndex(grouping);
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{
-		Gene gene = genome.getGene(i);
+		gene = &genome.getGene(i);
 		// which mixture element does this gene belong to
 		unsigned mixtureElement = parameter->getMixtureAssignment(i);
 		// how is the mixture element defined. Which categories make it up
@@ -96,8 +97,8 @@ void RFPModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 		unsigned synthesisRateCategory = parameter->getSynthesisRateCategory(mixtureElement);
 		// get non codon specific values, calculate likelihood conditional on these
 		double phiValue = parameter->getSynthesisRate(i, synthesisRateCategory, false);
-		unsigned currRFPObserved = gene.geneData.getRFPObserved(index);
-		unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(index);
+		unsigned currRFPObserved = gene->geneData.getRFPObserved(index);
+		unsigned currNumCodonsInMRNA = gene->geneData.getCodonCountForCodon(index);
 		if (currNumCodonsInMRNA == 0) continue;
 
 
