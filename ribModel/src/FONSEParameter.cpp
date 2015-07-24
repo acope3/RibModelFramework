@@ -267,7 +267,7 @@ void FONSEParameter::initFONSEValuesFromFile(std::string filename)
 	input.open(filename.c_str());
 	if (input.fail())
 	{
-		std::cerr << "Could not open RestartFile.txt to initialzie ROC values\n";
+		std::cerr << "Could not open RestartFile.txt to initialize FONSE values\n";
 		std::exit(1);
 	}
 	std::string tmp, variableName;
@@ -547,7 +547,7 @@ void FONSEParameter::getParameterForCategory(unsigned category, unsigned paramTy
 	}
 	else
 	{
-		std::cerr << "Warning in ROCParameter::getParameterForCategory: Unkown parameter type: " << paramType << "\n";
+		std::cerr << "Warning in FONSEParameter::getParameterForCategory: Unknown parameter type: " << paramType << "\n";
 		std::cerr << "\tReturning mutation parameter! \n";
 		tempSet = (proposal ? &proposedMutationParameter[category] : &currentMutationParameter[category]);
 	}
@@ -708,7 +708,7 @@ std::vector<double> FONSEParameter::getEstimatedMixtureAssignmentProbabilities(u
 	if (samples > traceLength)
 	{
 		std::cerr
-			<< "Warning in ROCParameter::getMixtureAssignmentPosteriorMean throws: Number of anticipated samples ("
+			<< "Warning in FONSEParameter::getMixtureAssignmentPosteriorMean throws: Number of anticipated samples ("
 			<< samples << ") is greater than the length of the available trace (" << traceLength << ")."
 			<< "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
@@ -797,7 +797,7 @@ double FONSEParameter::getMutationPosteriorMean(unsigned mixtureElement, unsigne
 
 	if (samples > traceLength)
 	{
-		std::cerr << "Warning in ROCParameter::getMutationPosteriorMean throws: Number of anticipated samples ("
+		std::cerr << "Warning in FONSEParameter::getMutationPosteriorMean throws: Number of anticipated samples ("
 			<< samples << ") is greater than the length of the available trace (" << traceLength << ")."
 			<< "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
@@ -819,7 +819,7 @@ double FONSEParameter::getSelectionPosteriorMean(unsigned mixtureElement, unsign
 
 	if (samples > traceLength)
 	{
-		std::cerr << "Warning in ROCParameter::getSelectionPosteriorMean throws: Number of anticipated samples ("
+		std::cerr << "Warning in FONSEParameter::getSelectionPosteriorMean throws: Number of anticipated samples ("
 			<< samples << ") is greater than the length of the available trace (" << traceLength << ")."
 			<< "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
@@ -839,7 +839,7 @@ double FONSEParameter::getSelectionVariance(unsigned mixtureElement, unsigned sa
 	unsigned traceLength = selectionParameterTrace.size();
 	if (samples > traceLength)
 	{
-		std::cerr << "Warning in ROCParameter::getSelectionVariance throws: Number of anticipated samples (" << samples
+		std::cerr << "Warning in FONSEParameter::getSelectionVariance throws: Number of anticipated samples (" << samples
 			<< ") is greater than the length of the available trace (" << traceLength << ")."
 			<< "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
