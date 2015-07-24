@@ -360,6 +360,42 @@ void testReadObservedPhis()
 
 }
 
+
+void simulateRFPData()
+{
+	Genome genome;
+	genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+
+
+	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
+	/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+    {
+        if (i < 500) geneAssignment[i] = 0u;
+        else geneAssignment[i] = 1u;
+    }*/
+	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+	{
+		geneAssignment[i] = 0u;
+	}
+	double sphi_init = 2;
+	unsigned numMixtures = 1;
+	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
+
+	RFPParameter tmp("/Users/roxasoath1/Desktop/RibModelFramework/DevRscripts/500restartFile.rst");
+
+
+	RFPModel model;
+
+	model.setParameter(tmp);
+
+	std::cout <<"init done\n";
+	model.simulateGenome(genome);
+
+	genome.writeRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/SimulatedRFPData.csv", true);
+
+
+}
+
 int main()
 {
 	std::cout <<"Testing this\n";
@@ -369,7 +405,7 @@ int main()
 	User user = gabe;
 	ModelToRun modelToRun = RFP;
 	bool read = true;
-	bool testing = false;
+	bool testing = true;
 
 	if (testing)
 	{
@@ -387,7 +423,8 @@ int main()
 		//testInitFromRestartFile();
 		//testReadRFPFile();
 		//testSynonymousCodons();
-		testReadObservedPhis();
+		//testReadObservedPhis();
+		simulateRFPData();
 	}
 	else //not doing unit testing, running a model
 	{

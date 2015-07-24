@@ -513,6 +513,12 @@ std::vector<std::string> SequenceSummary::getSynonymousCodonsByCodonIndex(unsign
 	return codons;
 }
 
+
+unsigned SequenceSummary::getRFPObservedCounts(unsigned codonIndex, bool simulated)
+{
+	return simulated ? simulatedRFPObserved[codonIndex] : RFPObserved[codonIndex];
+}
+
 // ---------------------------------------------------------------------------
 // ----------------------------- RCPP STUFF ----------------------------------
 // ---------------------------------------------------------------------------

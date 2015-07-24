@@ -39,7 +39,7 @@ class SequenceSummary
 		int getAAcountForAA(int aa) {return naa[aa];}
 		int getCodonCountForCodon(std::string& codon) {return ncodons[SequenceSummary::CodonToIndex(codon)];}
 		int getCodonCountForCodon(int codon) {return ncodons[codon];}
-
+		unsigned getRFPObservedCounts(unsigned codonIndex, bool simulated = false);
 		unsigned getRFPObserved(unsigned codonIndex) {return RFPObserved[codonIndex];}
 		void setRFPObserved(unsigned codonIndex, unsigned value) {RFPObserved[codonIndex] = value;}
 
@@ -87,9 +87,6 @@ class SequenceSummary
 			return RV;
 		}
 	protected:
-
-
-
 };
 
 

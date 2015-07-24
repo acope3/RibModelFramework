@@ -227,76 +227,96 @@ std::vector<double> ROCModel::CalculateProbabilitiesForCodons(std::vector<double
 
 void ROCModel::simulateGenome(Genome &genome)
 {
-	/*
-     unsigned i;
-     int j, k;
+
+
+     int k;
      int aaCount;
-     int numCodons;
+
      unsigned codonIndex;
      unsigned aaRange[2];
-     std::string tmpSeq;
-     std::string codon;
      std::string curAA;
-     std::string tmpDesc;
 
 
-//std::srand(std::time(0));
-simulatedGenes.resize(genes.size());
-tmpDesc = "Simulated Gene";
+	//std::srand(std::time(0));
+	//simulatedGenes.resize(genes.size());
+	std::string tmpDesc = "Simulated Gene";
 
 
-for (i = 0; i < genes.size(); i++) //loop over all genes in the genome
-{
-Gene gene = genes[i];
-SequenceSummary seqSum = gene.geneData;
-tmpSeq = ""; //reset the sequence to blank
-tmpSeq += "ATG"; //Always will have the start amino acid
+	for (unsigned geneIndex = 0; geneIndex < genome.getGenomeSize(); geneIndex++) //loop over all genes in the genome
+	{
+		Gene gene = genome.getGene(geneIndex);
+		SequenceSummary seqSum = gene.geneData;
+		std::string tmpSeq = "ATG"; //Always will have the start amino acid
 
 
-unsigned mixtureElement = model.getMixtureAssignment(i);
-unsigned mutationCategory = model.getMutationCategory(mixtureElement);
-unsigned selectionCategory = model.getSelectionCategory(mixtureElement);
-unsigned expressionCategory = model.getSynthesisRateCategory(mixtureElement);
-double phi = model.getSynthesisRate(i, expressionCategory, false);
+		unsigned mixtureElement = getMixtureAssignment(geneIndex);
+		unsigned mutationCategory = getMutationCategory(mixtureElement);
+		unsigned selectionCategory = getSelectionCategory(mixtureElement);
+		unsigned synthesisRateCategory = getSynthesisRateCategory(mixtureElement);
+		double phi = getSynthesisRate(geneIndex, synthesisRateCategory, false);
 
-std::ostringstream strstream;
-strstream << mixtureElement;
-std::string tmpID = gene.getId() + "_MixtureElement" + strstream.str();
-for (j = 0; j < 22; j++) //loop over each amino acid, naa[]
-{
-aaCount = seqSum.getAAcountForAA(j);
-curAA = seqSum.AminoAcidArray[j];
-if (curAA == "X") continue;
-numCodons = seqSum.GetNumCodonsForAA(curAA);
-if (curAA == "M") aaCount -= 1;
-double* codonProb = new double[numCodons](); //size the arrays to the proper size based on # of codons.
-double* mutation = new double[numCodons - 1]();
-double* selection = new double[numCodons - 1]();
+		std::string geneSeq = gene.getSequence();
+		for (unsigned position = 1; position < (geneSeq.size() / 3); position++)
+	 	{
+	 		std::string codon = geneSeq.substr((position * 3), 3);
+			std::string aa = SequenceSummary::CodonToAA(codon);
+			unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa);
 
-//get the probability vector for each amino acid
-if (curAA == "M" || curAA == "W")
-{
-codonProb[0] = 1;
-}
-else
-{
-model.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
-model.getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
-model.calculateCodonProbabilityVector(numCodons, mutation, selection, phi, codonProb);
-}
-for (k = 0; k < aaCount; k++)
-{
-codonIndex = ROCParameter::randMultinom(codonProb, numCodons);
-seqSum.AAToCodonRange(curAA, false, aaRange); //need the first spot in the array where the codons for curAA are
-codon = seqSum.IndexToCodon(aaRange[0] + codonIndex);//get the correct codon based off codonIndex
-tmpSeq += codon;
-}
-}
+			double* codonProb = new double[numCodons](); //size the arrays to the proper size based on # of codons.
+			double* mutation = new double[numCodons - 1]();
+			double* selection = new double[numCodons - 1]();
 
-codon =	seqSum.IndexToCodon((rand() % 3) + 61); //randomly choose a stop codon, from range 61-63
-tmpSeq += codon;
-Gene tmpGene(tmpSeq, tmpID, tmpDesc);
-simulatedGenes[i] = tmpGene;
-}
-*/
+			getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
+			getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
+			calculateCodonProbabilityVector(numCodons, mutation, selection, phi, codonProb);
+
+			codonIndex = Parameter::randMultinom(codonProb, numCodons);
+			SequenceSummary::AAToCodonRange(curAA, false, aaRange); //need the first spot in the array where the codons for curAA are
+			codon = seqSum.IndexToCodon(aaRange[0] + codonIndex);//get the correct codon based off codonIndex
+			tmpSeq += codon;
+	 	}
+
+
+/*
+
+		std::ostringstream strstream;
+		strstream << mixtureElement;
+		std::string tmpID = gene.getId() + "_MixtureElement" + strstream.str();
+		for (j = 0; j < 22; j++) //loop over each amino acid, naa[]
+		{
+			aaCount = seqSum.getAAcountForAA(j);
+			curAA = seqSum.AminoAcidArray[j];
+			if (curAA == "X") continue;
+			numCodons = seqSum.GetNumCodonsForAA(curAA);
+			if (curAA == "M") aaCount -= 1;
+			double* codonProb = new double[numCodons](); //size the arrays to the proper size based on # of codons.
+			double* mutation = new double[numCodons - 1]();
+			double* selection = new double[numCodons - 1]();
+
+			//get the probability vector for each amino acid
+			if (curAA == "M" || curAA == "W")
+			{
+				codonProb[0] = 1;
+			}
+			else
+			{
+				model.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
+				model.getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
+				model.calculateCodonProbabilityVector(numCodons, mutation, selection, phi, codonProb);
+			}
+			for (k = 0; k < aaCount; k++)
+			{
+				codonIndex = ROCParameter::randMultinom(codonProb, numCodons);
+				seqSum.AAToCodonRange(curAA, false, aaRange); //need the first spot in the array where the codons for curAA are
+				codon = seqSum.IndexToCodon(aaRange[0] + codonIndex);//get the correct codon based off codonIndex
+				tmpSeq += codon;
+			}
+		}
+
+		codon =	seqSum.IndexToCodon((rand() % 3) + 61); //randomly choose a stop codon, from range 61-63
+		tmpSeq += codon;
+		Gene tmpGene(tmpSeq, tmpID, tmpDesc);
+		simulatedGenes[i] = tmpGene;
+	}
+*/}
 }
