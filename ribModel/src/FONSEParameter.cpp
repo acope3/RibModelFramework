@@ -533,9 +533,10 @@ void FONSEParameter::initMutationSelectionCategories(std::vector<std::string> fi
 	}
 }
 
-std::vector <double> *FONSEParameter::getParameterForCategory(unsigned category, unsigned paramType, bool proposal)
+void FONSEParameter::getParameterForCategory(unsigned category, unsigned paramType, std::string aa, bool proposal,
+	double *returnSet)
 {
-	std::vector <double> *tempSet;
+	std::vector<double> *tempSet;
 	if (paramType == FONSEParameter::dM)
 	{
 		tempSet = (proposal ? &proposedMutationParameter[category] : &currentMutationParameter[category]);
@@ -546,11 +547,18 @@ std::vector <double> *FONSEParameter::getParameterForCategory(unsigned category,
 	}
 	else
 	{
-		std::cerr << "Warning in FONSEParameter::getParameterForCategory: Unknown parameter type: " << paramType << "\n";
+		std::cerr << "Warning in ROCParameter::getParameterForCategory: Unkown parameter type: " << paramType << "\n";
 		std::cerr << "\tReturning mutation parameter! \n";
 		tempSet = (proposal ? &proposedMutationParameter[category] : &currentMutationParameter[category]);
 	}
-	return tempSet;
+	unsigned aaRange[2];
+	SequenceSummary::AAToCodonRange(aa, true, aaRange);
+
+	unsigned j = 0u;
+	for (unsigned i = aaRange[0]; i < aaRange[1]; i++, j++)
+	{
+		returnSet[j] = tempSet->at(i);
+	}
 }
 
 double FONSEParameter::getCurrentCodonSpecificProposalWidth(unsigned aa)

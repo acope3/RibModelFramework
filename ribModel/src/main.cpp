@@ -366,9 +366,9 @@ int main()
 	enum User { cedric, gabe, jeremy };
 	enum ModelToRun { ROC, RFP, FONSE };
 	/* Test variables */
-	User user = gabe;
-	ModelToRun modelToRun = RFP;
-	bool read = true;
+	User user = jeremy;
+	ModelToRun modelToRun = FONSE;
+	bool read = false;
 	bool testing = false;
 
 	if (testing)
@@ -448,11 +448,16 @@ int main()
 		std::cout << "Initializing shared parameter variables\n";
 
 		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
+
+
+		/* For 2 mixtures */
 		/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
 			if (i < 500) geneAssignment[i] = 0u;
 			else geneAssignment[i] = 1u;
 		}*/
+
+		/* For 1 mixture */
 		for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
 			geneAssignment[i] = 0u;

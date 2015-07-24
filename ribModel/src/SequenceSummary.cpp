@@ -310,6 +310,7 @@ unsigned SequenceSummary::CodonToIndex(std::string& codon, bool forParamVector)
 	}
 	return i;
 }
+
 std::string SequenceSummary::IndexToCodon(unsigned i, bool forParamVector)
 {
 	return forParamVector ? codonArrayParameter[i] : codonArray[i];
