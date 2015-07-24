@@ -115,11 +115,11 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				model.updateSynthesisRate(i, k);
 				// only count each gene once, not numSynthesisRateCategories times
 				#pragma omp critical
-				if(mixtureAssignmentOfGene == k) logLikelihood += propLogLike;
+				logLikelihood += model.getCategoryProbability(k) * propLogLike;
 			}else{
 				// only count each gene once, not numSynthesisRateCategories times
 				#pragma omp critical
-				if(mixtureAssignmentOfGene == k) logLikelihood += currLogLike;
+				logLikelihood += model.getCategoryProbability(k) * currLogLike;
 			}
 		}
 

@@ -34,7 +34,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, int geneIndex, uns
 	double selection[5];
 	int codonCount[6];
 #ifndef __APPLE__
-//#pragma omp parallel for private(mutation, selection, codonCount) reduction(+:logLikelihood,logLikelihood_proposed)
+#pragma omp parallel for private(mutation, selection, codonCount) reduction(+:logLikelihood,logLikelihood_proposed)
 #endif
 	for(unsigned i = 0; i < getGroupListSize(); i++)
 	{
@@ -152,7 +152,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 	double selection_proposed[5];
 	int codonCount[6];
 #ifndef __APPLE__
-//#pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed, codonCount) reduction(+:likelihood,likelihood_proposed)
+#pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed, codonCount) reduction(+:likelihood,likelihood_proposed)
 #endif
 	for(int i = 0; i < numGenes; i++)
 	{
