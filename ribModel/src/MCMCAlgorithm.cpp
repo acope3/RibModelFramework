@@ -114,11 +114,11 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			{
 				model.updateSynthesisRate(i, k);
 				// only count each gene once, not numSynthesisRateCategories times
-				//#pragma omp critical
+				#pragma omp critical
 				if(mixtureAssignmentOfGene == k) logLikelihood += propLogLike;
 			}else{
 				// only count each gene once, not numSynthesisRateCategories times
-				//#pragma omp critical
+				#pragma omp critical
 				if(mixtureAssignmentOfGene == k) logLikelihood += currLogLike;
 			}
 		}
@@ -182,7 +182,7 @@ void MCMCAlgorithm::acceptRejectHyperParameter(int numGenes, Model& model, int i
 	double proposedMPhi = -(proposedSphi * proposedSphi) / 2;
 
 #ifndef __APPLE__
-//#pragma omp parallel for reduction(+:logProbabilityRatio)
+#pragma omp parallel for reduction(+:logProbabilityRatio)
 #endif
 	for(int i = 0; i < numGenes; i++)
 	{
