@@ -128,6 +128,7 @@ void RFPModel::simulateGenome(Genome &genome)
 	{
 		unsigned mixtureElement = getMixtureAssignment(geneIndex);
 		Gene gene = genome.getGene(geneIndex);
+		Gene tmpGene = gene;
 		for (unsigned codonIndex = 0; codonIndex < 64; codonIndex++)
 		{
 			std::string codon = SequenceSummary::codonArray[codonIndex];
@@ -144,16 +145,16 @@ void RFPModel::simulateGenome(Genome &genome)
 				NumericVector xx(1);
 				xx = rgamma(1, alphaPrime, lambdaPrime);
 				xx = rpois(1, xx[0]);
-				gene.geneData.simulatedRFPObserved[codonIndex] = xx[0];
+				gene.geneData.RFPObserved[codonIndex] = xx[0];
 			#else
 
 				std::gamma_distribution<double> GDistribution(alphaPrime, lambdaPrime);
 				double tmp = GDistribution(Parameter::generator);
 				std::poisson_distribution<unsigned> PDistribution(tmp);
 				unsigned simulatedValue = PDistribution(Parameter::generator);
-				gene.geneData.simulatedRFPObserved[codonIndex] = simulatedValue;
+				tmpGene.geneData.setRFPObserved(codonIndex, simulatedValue);
 			#endif
-			//TODO: check R implimentation
 		}
+		genome.addGene(tmpGene, true);
 	}
 }
