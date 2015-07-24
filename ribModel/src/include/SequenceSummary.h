@@ -14,8 +14,10 @@ class SequenceSummary
 		int naa[22];
 		std::vector <std::vector <unsigned> > codonPositions;
 		unsigned RFPObserved[64];
+
 	public:
 
+	unsigned simulatedRFPObserved[64]; //TODO:Make private
 		//static member variables
 		static const std::string Ser2;
 		static const std::vector<std::string> AminoAcidArray;

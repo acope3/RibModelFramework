@@ -1,5 +1,6 @@
 #include "include/RFP/RFPModel.h"
 
+
 RFPModel::RFPModel() : Model()
 {
 	//ctor
@@ -128,6 +129,7 @@ void RFPModel::simulateGenome(Genome &genome)
 	{
 		unsigned mixtureElement = getMixtureAssignment(geneIndex);
 		Gene gene = genome.getGene(geneIndex);
+		double phi = getSynthesisRate(geneIndex, mixtureElement);
 		for (unsigned codonIndex = 0; codonIndex < 64; codonIndex++)
 		{
 			std::string codon = SequenceSummary::codonArray[codonIndex];
@@ -137,8 +139,15 @@ void RFPModel::simulateGenome(Genome &genome)
 			double alpha = getParameterForCategory(alphaCat, RFPParameter::alp, codon, false);
 			double lambdaPrime = getParameterForCategory(lambdaPrimeCat, RFPParameter::lmPri, codon, false);
 
-			unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(codonIndex);
+			double p = phi / (lambdaPrime + phi);
 
+			double alphaPrime = alpha * gene.geneData.getCodonCount(codon);
+			std::gamma_distribution<double> GDistribution(alphaPrime, lambdaPrime);
+			double tmp = GDistribution(Parameter::generator);
+			std::poisson_distribution<unsigned> PDistribution(tmp);
+			gene.geneData.simulatedRFPObserved[codonIndex] = PDistribution(Parameter::generator);
+
+			//TODO: impliment R generation
 		}
 	}
 }
