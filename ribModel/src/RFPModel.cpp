@@ -36,7 +36,7 @@ void RFPModel::setParameter(RFPParameter &_parameter)
 
 void RFPModel::calculateLogLikelihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio)
 {
-	//TODO: Many functions used here are unimplimented as of now
+
 	double logLikelihood = 0.0;
 	double logLikelihood_proposed = 0.0;
 
@@ -48,7 +48,9 @@ void RFPModel::calculateLogLikelihoodRatioPerGene(Gene& gene, int geneIndex, uns
 	double phiValue = parameter->getSynthesisRate(geneIndex, synthesisRateCategory, false);
 	double phiValue_proposed = parameter->getSynthesisRate(geneIndex, synthesisRateCategory, true);
 
-
+#ifndef __APPLE__
+#pragma omp parallel for reduction(+:logLikelihood,logLikelihood_proposed)
+#endif
 	for (unsigned index = 0; index < getGroupListSize(); index++) //number of codons, without the stop codons
 	{
 		std::string codon = getGrouping(index);
@@ -84,6 +86,9 @@ void RFPModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 	unsigned index = SequenceSummary::CodonToIndex(grouping);
 
 	Gene *gene;
+#ifndef __APPLE__
+#pragma omp parallel for private(gene) reduction(+:likelihood,likelihood_proposed)
+#endif
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{
 		gene = &genome.getGene(i);
@@ -106,17 +111,9 @@ void RFPModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 		double propAlpha = getParameterForCategory(alphaCategory, RFPParameter::alp, grouping, true);
 		double propLambdaPrime = getParameterForCategory(lambdaPrimeCategory, RFPParameter::lmPri, grouping, true);
 
-	/*	std::cout <<"currAlpha: " << currAlpha <<"\n";
-		std::cout <<"currLambdaPrime: " << currLambdaPrime <<"\n";
-		std::cout <<"propAlpha: " << propAlpha <<"\n";
-		std::cout <<"propLambdaPrime: " << propLambdaPrime <<"\n";
-		std::cout <<"phiValue: " << phiValue <<"\n";
-		std::cout <<"currRFPObserved: " << currRFPObserved <<"\n";
-		std::cout <<"currNumCodonsInMRNA: " << currNumCodonsInMRNA <<"\n";
-		*/logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
+
+		logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
 		logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
-//		std::cout << "logLikelihood: " << logLikelihood <<"\n";
-//		std::cout << "logLikelihood_proposed: " << logLikelihood_proposed <<"\n";
 	}
 	logAcceptanceRatioForAllMixtures = logLikelihood_proposed - logLikelihood;
 }
@@ -128,6 +125,7 @@ void RFPModel::simulateGenome(Genome &genome)
 	{
 		unsigned mixtureElement = getMixtureAssignment(geneIndex);
 		Gene gene = genome.getGene(geneIndex);
+		Gene tmpGene = gene;
 		for (unsigned codonIndex = 0; codonIndex < 64; codonIndex++)
 		{
 			std::string codon = SequenceSummary::codonArray[codonIndex];
@@ -144,16 +142,16 @@ void RFPModel::simulateGenome(Genome &genome)
 				NumericVector xx(1);
 				xx = rgamma(1, alphaPrime, lambdaPrime);
 				xx = rpois(1, xx[0]);
-				gene.geneData.simulatedRFPObserved[codonIndex] = xx[0];
+				tmpGene.geneData.setRFPObserved(codonIndex, xx[0]);
 			#else
 
 				std::gamma_distribution<double> GDistribution(alphaPrime, lambdaPrime);
 				double tmp = GDistribution(Parameter::generator);
 				std::poisson_distribution<unsigned> PDistribution(tmp);
 				unsigned simulatedValue = PDistribution(Parameter::generator);
-				gene.geneData.simulatedRFPObserved[codonIndex] = simulatedValue;
+				tmpGene.geneData.setRFPObserved(codonIndex, simulatedValue);
 			#endif
-			//TODO: check R implimentation
 		}
+		genome.addGene(tmpGene, true);
 	}
 }

@@ -17,7 +17,6 @@ class SequenceSummary
 
 	public:
 
-	unsigned simulatedRFPObserved[64]; //TODO:Make private
 		//static member variables
 		static const std::string Ser2;
 		static const std::vector<std::string> AminoAcidArray;
@@ -39,7 +38,6 @@ class SequenceSummary
 		int getAAcountForAA(int aa) {return naa[aa];}
 		int getCodonCountForCodon(std::string& codon) {return ncodons[SequenceSummary::CodonToIndex(codon)];}
 		int getCodonCountForCodon(int codon) {return ncodons[codon];}
-		unsigned getRFPObservedCounts(unsigned codonIndex, bool simulated = false);
 		unsigned getRFPObserved(unsigned codonIndex) {return RFPObserved[codonIndex];}
 		void setRFPObserved(unsigned codonIndex, unsigned value) {RFPObserved[codonIndex] = value;}
 

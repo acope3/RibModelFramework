@@ -10,6 +10,7 @@ mixDef <- "allUnique"
 geneAssignment <- c(rep(1, genome$getGenomeSize()))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, model= "RFP", split.serine = TRUE, mixture.definition = mixDef)
 
+parameter <- new(RFPParameter, "3330restartFile.rst")
 # initialize MCMC object
 samples <- 500
 thining <- 10
