@@ -97,7 +97,7 @@ class FONSEParameter : public Parameter
 		}
 
 		void proposeCodonSpecificParameter();
-		std::vector <double> *getParameterForCategory(unsigned category, unsigned parameter, bool proposal);
+		void getParameterForCategory(unsigned category, unsigned paramType, std::string aa, bool proposal, double *returnSet);
 
 		void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth);
 

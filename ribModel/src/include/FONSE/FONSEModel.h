@@ -11,7 +11,7 @@ class FONSEModel : public Model
 private:
 
 	FONSEParameter *parameter;
-	double calculateLogLikelihoodPerPositionPerGene(unsigned position, std::string curAA, unsigned codonIndex, std::vector <double> *mutation, std::vector <double> *selection, double phiValue);
+	double calculateLogLikelihoodPerPositionPerGene(unsigned position, unsigned numCodons, double phiValue, double codonProb[]);
 
 public:
 
@@ -20,9 +20,10 @@ public:
 	//FONSEModel(const FONSEModel& other);
 
 	void setParameter(FONSEParameter &_parameter);
-	double calculateCodonProbability(unsigned position, double* mutation, double* selection, double phi);
+	void calculateCodonProbabilityVector(unsigned numCodons, unsigned position, unsigned maxIndexValue, double* mutation, double* selection, double phi, double codonProb[]);
 	// Likelihood ratio functions
 	virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio);
+	double calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grouping, double *mutation, double *selection, double phiValue);
 	virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures);
 
 	//Parameter wrapper functions:
@@ -56,9 +57,9 @@ public:
 	virtual void setCategoryProbability(unsigned mixture, double value) { parameter->setCategoryProbability(mixture, value); }
 	virtual void updateMixtureProbabilitiesTrace(unsigned sample) { parameter->updateMixtureProbabilitiesTrace(sample); }
 	virtual void adaptSynthesisRateProposalWidth(unsigned adaptiveWidth) { parameter->adaptSynthesisRateProposalWidth(adaptiveWidth); }
-	virtual std::vector <double> *getParameterForCategory(unsigned category, unsigned param, std::string aa, bool proposal, double* returnValue)
+	virtual void getParameterForCategory(unsigned category, unsigned param, std::string aa, bool proposal, double* returnValue)
 	{
-		return parameter->getParameterForCategory(category, param, proposal);
+		parameter->getParameterForCategory(category, param, aa, proposal, returnValue);
 	}
 	virtual unsigned getGroupListSize() { return parameter->getGroupListSize(); } //TODO: make not hardcoded?
 	virtual std::string getGrouping(unsigned index) { return parameter->getGrouping(index); }
