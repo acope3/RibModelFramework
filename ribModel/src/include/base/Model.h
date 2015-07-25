@@ -1,20 +1,32 @@
 #ifndef MODEL_H
 #define MODEL_H
+
+
 #include "../Genome.h"
+
+
 class Model
 {
     private:
 
+
     public:
+		//Constructors & Destructors:
         explicit Model();
         virtual ~Model();
 
-        // Likelihood ratio functions
+
+        //Likelihood ratio functions:
         virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio) = 0;
         virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
         		double& logAcceptanceRatioForAllMixtures) = 0;
 
-				//Parameter wrapper functions:
+
+		//Other functions:
+		virtual void simulateGenome(Genome &genome) =0;
+
+
+		//Parameter wrapper functions:
 		virtual void initTraces(unsigned samples, unsigned num_genes) = 0;
 		virtual void writeRestartFile(std::string filename) = 0;
 		virtual double getSphi(bool proposed = false) = 0;

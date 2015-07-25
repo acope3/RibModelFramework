@@ -216,7 +216,7 @@ void testSimulateGenome(Genome& genome)
 
 		for (int j = 0; j < 22; j++)
 		{
-			SequenceSummary::AAindexToCodonRange(j, false, aaRange);
+			SequenceSummary::AAIndexToCodonRange(j, false, aaRange);
 			std::string curAA = SequenceSummary::IndexToAA(j);
 			unsigned numCodons = simSeqSum.GetNumCodonsForAA(curAA);
 			double* codonProb = new double[numCodons];
@@ -236,7 +236,7 @@ void testSimulateGenome(Genome& genome)
 				a++;
 			}
 			std::cout << "size of counts: " << counts.size() << "\n";
-			int aaCount = simSeqSum.getAAcountForAA(j);
+			int aaCount = simSeqSum.getAACountForAA(j);
 			std::cout << "amino acid " << curAA << ": " << aaCount << "\n";
 			for (unsigned k = 0u; k < counts.size(); k++)
 			{
@@ -331,25 +331,7 @@ void testReadRFPFile()
 	std::cout << "------------------- TEST READRFPFILE ----------------------" << "\n";
 }
 
-void testSynonymousCodons()
-{
-	std::string codon = "GAG";
-	std::string aa = "L";
-	unsigned codonIndex = 25;
-	unsigned aaIndex = 7;
 
-	std::vector <std::string> strAATest, strAAIndexTest, strCodonTest, strCodonIndexTest;
-	std::vector <unsigned> AATest, AAIndexTest, AACodonTest, AACodonIndexTest;
-
-	AATest = SequenceSummary::getSynonymousCodonIndicesByAA(aa);
-	SequenceSummary::getSynonymousCodonIndicesByAAIndex(aaIndex);
-	SequenceSummary::getSynonymousCodonIndicesByCodon(codon);
-	SequenceSummary::getSynonymousCodonIndicesByCodonIndex(codonIndex);
-	SequenceSummary::getSynonymousCodonsByAA(aa);
-	SequenceSummary::getSynonymousCodonsByAAIndex(aaIndex);
-	SequenceSummary::getSynonymousCodonsByCodon(codon);
-	SequenceSummary::getSynonymousCodonsByCodonIndex(codonIndex);
-}
 
 void testReadObservedPhis()
 {
@@ -422,7 +404,6 @@ int main()
 		//testWriteRestartFile();
 		//testInitFromRestartFile();
 		//testReadRFPFile();
-		//testSynonymousCodons();
 		//testReadObservedPhis();
 		simulateRFPData();
 	}

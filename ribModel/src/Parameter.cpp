@@ -817,7 +817,7 @@ double Parameter::calculateSCUO(Gene& gene, unsigned maxAA)
 		std::string curAA = seqsum.AminoAcidArray[i];
 		// skip amino acids with only one codon or stop codons
 		if(curAA == "X" || curAA == "M" || curAA == "W") continue;
-		totalDegenerateAACount += (double)seqsum.getAAcountForAA(i);
+		totalDegenerateAACount += (double)seqsum.getAACountForAA(i);
 	}
 
 	double scuoValue = 0.0;
@@ -828,11 +828,11 @@ double Parameter::calculateSCUO(Gene& gene, unsigned maxAA)
 		if(curAA == "X" || curAA == "M" || curAA == "W") continue;
 		double numDegenerateCodons = SequenceSummary::GetNumCodonsForAA(curAA);
 
-		double aaCount = (double)seqsum.getAAcountForAA(i);
+		double aaCount = (double)seqsum.getAACountForAA(i);
 		if(aaCount == 0) continue;
 
 		unsigned codonRange[2];
-		SequenceSummary::AAindexToCodonRange(i, false, codonRange);
+		SequenceSummary::AAIndexToCodonRange(i, false, codonRange);
 
 		// calculate -sum(pij log(pij))
 		double aaEntropy = 0.0;

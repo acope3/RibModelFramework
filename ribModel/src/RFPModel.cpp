@@ -1,8 +1,11 @@
 #include "include/RFP/RFPModel.h"
+
+
 #ifndef STANDALONE
 #include <Rcpp.h>
 using namespace Rcpp;
 #endif
+
 
 RFPModel::RFPModel() : Model()
 {
@@ -17,8 +20,8 @@ RFPModel::~RFPModel()
 }
 
 
-double RFPModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime, unsigned currRFPObserved, 
-		unsigned currNumCodonsInMRNA, double phiValue)
+double RFPModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
+	unsigned currRFPObserved, unsigned currNumCodonsInMRNA, double phiValue)
 {
 	double logLikelihood = ((std::lgamma((currNumCodonsInMRNA * currAlpha) + currRFPObserved)) - (std::lgamma(currNumCodonsInMRNA * currAlpha)))
 		+ (currRFPObserved * (std::log(phiValue) - std::log(currLambdaPrime + phiValue))) + ((currNumCodonsInMRNA * currAlpha) * (std::log(currLambdaPrime) -
@@ -85,7 +88,7 @@ void RFPModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 	Gene *gene;
 	unsigned index = SequenceSummary::CodonToIndex(grouping);
 
-	Gene *gene;
+
 #ifndef __APPLE__
 #pragma omp parallel for private(gene) reduction(+:likelihood,likelihood_proposed)
 #endif
@@ -135,7 +138,7 @@ void RFPModel::simulateGenome(Genome &genome)
 			double alpha = getParameterForCategory(alphaCat, RFPParameter::alp, codon, false);
 			double lambdaPrime = getParameterForCategory(lambdaPrimeCat, RFPParameter::lmPri, codon, false);
 
-			double alphaPrime = alpha * gene.geneData.getCodonCount(codon);
+			double alphaPrime = alpha * gene.geneData.getCodonCountForCodon(codon);
 
 			#ifndef STANDALONE
 				RNGScope scope;
