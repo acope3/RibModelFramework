@@ -124,7 +124,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 	{
 		gene = &genome.getGene(i);
 		seqsum = &gene->getSequenceSummary();
-		if (seqsum->getAAcountForAA(grouping) == 0) continue;
+		if (seqsum->getAACountForAA(grouping) == 0) continue;
 
 		// which mixture element does this gene belong to
 		unsigned mixtureElement = parameter->getMixtureAssignment(i);

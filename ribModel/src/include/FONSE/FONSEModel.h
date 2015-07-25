@@ -19,6 +19,8 @@ public:
 	virtual ~FONSEModel();
 	//FONSEModel(const FONSEModel& other);
 
+
+	virtual void simulateGenome(Genome &genome) {} //TODO: needs implimentation
 	void setParameter(FONSEParameter &_parameter);
 	void calculateCodonProbabilityVector(unsigned numCodons, unsigned position, unsigned maxIndexValue, double* mutation, double* selection, double phi, double codonProb[]);
 	// Likelihood ratio functions

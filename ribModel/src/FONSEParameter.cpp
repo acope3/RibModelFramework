@@ -564,7 +564,7 @@ void FONSEParameter::getParameterForCategory(unsigned category, unsigned paramTy
 double FONSEParameter::getCurrentCodonSpecificProposalWidth(unsigned aa)
 {
 	unsigned codonRange[2];
-	SequenceSummary::AAindexToCodonRange(aa, true, codonRange);
+	SequenceSummary::AAIndexToCodonRange(aa, true, codonRange);
 	return std_csp[codonRange[0]];
 }
 
@@ -624,7 +624,7 @@ void FONSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptatio
 		std::cout << acceptanceLevel << "\t";
 		traces.updateCspAcceptanceRatioTrace(i, acceptanceLevel);
 		unsigned codonRange[2];
-		SequenceSummary::AAindexToCodonRange(i, true, codonRange);
+		SequenceSummary::AAIndexToCodonRange(i, true, codonRange);
 		for (unsigned k = codonRange[0]; k < codonRange[1]; k++)
 		{
 			if (acceptanceLevel < 0.2)
