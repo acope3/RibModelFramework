@@ -21,7 +21,7 @@ FONSEModel::~FONSEModel()
 	//dtor
 }
 
-void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio)
+void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k, double* logProbabilityRatio)
 {
 	double likelihood = 0.0;
 	double likelihood_proposed = 0.0;

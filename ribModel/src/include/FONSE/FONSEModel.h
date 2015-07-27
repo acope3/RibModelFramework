@@ -24,7 +24,7 @@ public:
 	void setParameter(FONSEParameter &_parameter);
 	void calculateCodonProbabilityVector(unsigned numCodons, unsigned position, unsigned maxIndexValue, double* mutation, double* selection, double phi, double codonProb[]);
 	// Likelihood ratio functions
-	virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio);
+	virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k, double* logProbabilityRatio);
 	double calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grouping, double *mutation, double *selection, double phiValue);
 	virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures);
 

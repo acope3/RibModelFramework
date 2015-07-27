@@ -378,6 +378,65 @@ void simulateRFPData()
 
 }
 
+void simulateROCData()
+{
+	Genome genome;
+	genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_chromosomeA.fasta");
+
+
+	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
+	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+    {
+        if (i < 448) geneAssignment[i] = 0u;
+        else geneAssignment[i] = 1u;
+    }
+	/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+	{
+		geneAssignment[i] = 0u;
+	}*/
+	double sphi_init = 2;
+	unsigned numMixtures = 2;
+	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
+
+	ROCParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, Parameter::allUnique);
+	std::vector<std::string> files = { "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv",
+									   "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv" };
+	tmp.initMutationSelectionCategories(files, tmp.getNumMutationCategories(), ROCParameter::dM);
+	tmp.initMutationSelectionCategories(files, tmp.getNumSelectionCategories(), ROCParameter::dEta);
+	ROCModel model;
+
+	model.setParameter(tmp);
+
+	std::cout <<"init done\n";
+
+	//TODO: not currently working
+	model.simulateGenome(genome);
+
+	genome.writeFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/SimulatedROCData.fasta", true);
+}
+
+void testCodonToIndex()
+{
+	for(unsigned i = 0; i < 64; i++)
+	{
+		std::string codon = SequenceSummary::IndexToCodon(i, false);
+		unsigned a = SequenceSummary::CodonToIndex(codon, false);
+		unsigned b = std::distance(SequenceSummary::codonArray, std::find(SequenceSummary::codonArray, SequenceSummary::codonArray + 64, codon));
+
+		if (a != b) std::cout << i <<"\n";
+	}
+
+	std::cout <<"Param vector\n";
+	for (unsigned i = 0; i < 40; i++)
+	{
+		std::string codon = SequenceSummary::IndexToCodon(i, true);
+		unsigned a = SequenceSummary::CodonToIndex(codon, true);
+		unsigned b = std::distance(SequenceSummary::codonArrayParameter, std::find(SequenceSummary::codonArrayParameter, SequenceSummary::codonArrayParameter + 40, codon));
+		if (a != b) std::cout << i <<"\n";
+	}
+
+}
+
 int main()
 {
 	std::cout <<"Testing this\n";
@@ -387,7 +446,7 @@ int main()
 	User user = jeremy;
 	ModelToRun modelToRun = FONSE;
 	bool read = false;
-	bool testing = false;
+	bool testing = true;
 
 	if (testing)
 	{
@@ -405,7 +464,9 @@ int main()
 		//testInitFromRestartFile();
 		//testReadRFPFile();
 		//testReadObservedPhis();
-		simulateRFPData();
+		//simulateRFPData();
+		//simulateROCData();
+		testCodonToIndex();
 	}
 	else //not doing unit testing, running a model
 	{

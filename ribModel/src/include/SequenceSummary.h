@@ -27,6 +27,8 @@ class SequenceSummary
 		static const std::string codonArray[];
 		static const std::string codonArrayParameter[];
 		static const std::map<std::string, unsigned> aaToIndex;
+		static const std::map<std::string, unsigned> codonToIndexWithReference;
+		static const std::map<std::string, unsigned> codonToIndexWithoutReference;
 
 
 		//Constructors & destructors:

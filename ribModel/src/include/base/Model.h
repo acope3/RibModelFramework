@@ -17,7 +17,7 @@ class Model
 
 
         //Likelihood ratio functions:
-        virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k, double* logProbabilityRatio) = 0;
+        virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k, double* logProbabilityRatio) = 0;
         virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
         		double& logAcceptanceRatioForAllMixtures) = 0;
 
