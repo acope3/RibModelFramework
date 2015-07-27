@@ -43,15 +43,15 @@ class SequenceSummary
 		unsigned getAACountForAA(std::string aa);  //DONE!
 		unsigned getAACountForAA(unsigned aaIndex); //DONE!
 
+
 		//Codon functions:
 		unsigned getCodonCountForCodon(std::string& codon); //DONE!
 		unsigned getCodonCountForCodon(unsigned codonIndex); //DONE!
 
+
 		//Ribosome footprint functions:
 		unsigned getRFPObserved(unsigned codonIndex); //DONE!
-		void setRFPObserved(unsigned codonIndex, unsigned value); //DONE!
-
-		//TODO: create RFP functions for a given codon
+		void setRFPObserved(unsigned codonIndex, unsigned value); //DONE! //TODO: create RFP functions for a given codon
 
 
 		//Posistion functions:
@@ -76,14 +76,9 @@ class SequenceSummary
 		static unsigned CodonToAAIndex(std::string& codon);
 
 
+		static std::string IndexToAA(unsigned aaIndex);
+		static std::string IndexToCodon(unsigned index, bool forParamVector = false);
 		static unsigned GetNumCodonsForAA(std::string& aa, bool forParamVector = false);
-		static std::string IndexToCodon(unsigned i, bool forParamVector = false);
-		static std::string IndexToAA(int aa);
-
-
-
-
-
 
 
 		//R wrapper functions:
