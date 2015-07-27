@@ -20,13 +20,17 @@ Genome& Genome::operator=(const Genome& rhs)
 {
 	if (this == &rhs) return *this; // handle self assignment
 	genes = rhs.genes;
+	simulatedGenes = rhs.simulatedGenes;
 	//assignment operator
 	return *this;
 }
 
-void Genome::addGene(const Gene& gene)
+void Genome::addGene(const Gene& gene, bool simulated)
 {
-	genes.push_back(gene);
+	if (!simulated)
+		genes.push_back(gene);
+	else
+		simulatedGenes.push_back(gene);
 }
 
 
@@ -235,6 +239,38 @@ void Genome::readRFPFile(std::string filename)
   addGene(tmpGene); //add to genome
 
   Fin.close();
+}
+
+
+void Genome::writeRFPFile(std::string filename, bool simulated)
+{
+	std::ofstream Fout;
+	Fout.open(filename.c_str());
+	if (Fout.fail())
+	{
+		std::cerr <<"Error in Genome::writeRFPFile: Cannot open output RFP file " << filename <<"\n";
+	}
+
+	Fout <<"ORF,RFP_Counts,Codon_Counts,Codon\n";
+	for (unsigned geneIndex = 0; geneIndex < genes.size(); geneIndex++)
+	{
+		Gene *currentGene;
+		if (simulated)
+			currentGene = &simulatedGenes[geneIndex];
+		else
+			currentGene = &genes[geneIndex];
+
+
+		for (unsigned codonIndex = 0; codonIndex < 64; codonIndex++)
+		{
+			std::string codon = SequenceSummary::codonArray[codonIndex];
+
+			Fout << currentGene->getId() <<",";
+			Fout << currentGene->geneData.getRFPObserved(codonIndex) <<",";
+			Fout << currentGene->geneData.getCodonCountForCodon(codonIndex) <<"," << codon <<"\n";
+		}
+	}
+	Fout.close();
 }
 
 

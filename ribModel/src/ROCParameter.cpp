@@ -527,8 +527,7 @@ void ROCParameter::initMutationSelectionCategories(std::vector<std::string> file
 				std::string val = tmpString.substr(pos + 1, pos2 - (pos + 1));
 				if (tmpString.find(type) != std::string::npos) //mu or eta was found, depending on category
 				{
-					temp[j] = std::atof(val.c_str()); //std::stod(val);
-					//					temp[j] = randNorm(temp[j], 0.3);
+					temp[j] = std::atof(val.c_str());
 					j++;
 					if (j == numParam)
 						break;
@@ -588,7 +587,7 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
 double ROCParameter::getCurrentCodonSpecificProposalWidth(unsigned aa)
 {
 	unsigned codonRange[2];
-	SequenceSummary::AAindexToCodonRange(aa, true, codonRange);
+	SequenceSummary::AAIndexToCodonRange(aa, true, codonRange);
 	return std_csp[codonRange[0]];
 }
 
@@ -653,7 +652,7 @@ void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 		std::cout << acceptanceLevel << "\t";
 		traces.updateCspAcceptanceRatioTrace(aaIndex, acceptanceLevel);
 		unsigned codonRange[2];
-		SequenceSummary::AAindexToCodonRange(aaIndex, true, codonRange);
+		SequenceSummary::AAIndexToCodonRange(aaIndex, true, codonRange);
 		for (unsigned k = codonRange[0]; k < codonRange[1]; k++)
 		{
 			if (acceptanceLevel < 0.2)

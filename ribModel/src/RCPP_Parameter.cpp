@@ -12,6 +12,9 @@ RCPP_EXPOSED_CLASS(FONSETrace)
 RCPP_EXPOSED_CLASS(Genome)
 RCPP_EXPOSED_CLASS(CovarianceMatrix)
 
+
+
+
 RCPP_MODULE(Parameter_mod)
 {
 	class_<Parameter>(	"Parameter" )

@@ -216,7 +216,7 @@ void testSimulateGenome(Genome& genome)
 
 		for (int j = 0; j < 22; j++)
 		{
-			SequenceSummary::AAindexToCodonRange(j, false, aaRange);
+			SequenceSummary::AAIndexToCodonRange(j, false, aaRange);
 			std::string curAA = SequenceSummary::IndexToAA(j);
 			unsigned numCodons = simSeqSum.GetNumCodonsForAA(curAA);
 			double* codonProb = new double[numCodons];
@@ -236,7 +236,7 @@ void testSimulateGenome(Genome& genome)
 				a++;
 			}
 			std::cout << "size of counts: " << counts.size() << "\n";
-			int aaCount = simSeqSum.getAAcountForAA(j);
+			int aaCount = simSeqSum.getAACountForAA(j);
 			std::cout << "amino acid " << curAA << ": " << aaCount << "\n";
 			for (unsigned k = 0u; k < counts.size(); k++)
 			{
@@ -331,25 +331,7 @@ void testReadRFPFile()
 	std::cout << "------------------- TEST READRFPFILE ----------------------" << "\n";
 }
 
-void testSynonymousCodons()
-{
-	std::string codon = "GAG";
-	std::string aa = "L";
-	unsigned codonIndex = 25;
-	unsigned aaIndex = 7;
 
-	std::vector <std::string> strAATest, strAAIndexTest, strCodonTest, strCodonIndexTest;
-	std::vector <unsigned> AATest, AAIndexTest, AACodonTest, AACodonIndexTest;
-
-	AATest = SequenceSummary::getSynonymousCodonIndicesByAA(aa);
-	SequenceSummary::getSynonymousCodonIndicesByAAIndex(aaIndex);
-	SequenceSummary::getSynonymousCodonIndicesByCodon(codon);
-	SequenceSummary::getSynonymousCodonIndicesByCodonIndex(codonIndex);
-	SequenceSummary::getSynonymousCodonsByAA(aa);
-	SequenceSummary::getSynonymousCodonsByAAIndex(aaIndex);
-	SequenceSummary::getSynonymousCodonsByCodon(codon);
-	SequenceSummary::getSynonymousCodonsByCodonIndex(codonIndex);
-}
 
 void testReadObservedPhis()
 {
@@ -360,16 +342,111 @@ void testReadObservedPhis()
 
 }
 
+
+void simulateRFPData()
+{
+	Genome genome;
+	genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+
+
+	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
+	/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+    {
+        if (i < 500) geneAssignment[i] = 0u;
+        else geneAssignment[i] = 1u;
+    }*/
+	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+	{
+		geneAssignment[i] = 0u;
+	}
+	double sphi_init = 2;
+	unsigned numMixtures = 1;
+	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
+
+	RFPParameter tmp("/Users/roxasoath1/Desktop/RibModelFramework/DevRscripts/500restartFile.rst");
+
+
+	RFPModel model;
+
+	model.setParameter(tmp);
+
+	std::cout <<"init done\n";
+	model.simulateGenome(genome);
+
+	genome.writeRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/SimulatedRFPData.csv", true);
+
+
+}
+
+void simulateROCData()
+{
+	Genome genome;
+	genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_chromosomeA.fasta");
+
+
+	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
+	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+    {
+        if (i < 448) geneAssignment[i] = 0u;
+        else geneAssignment[i] = 1u;
+    }
+	/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+	{
+		geneAssignment[i] = 0u;
+	}*/
+	double sphi_init = 2;
+	unsigned numMixtures = 2;
+	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
+
+	ROCParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, Parameter::allUnique);
+	std::vector<std::string> files = { "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv",
+									   "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv" };
+	tmp.initMutationSelectionCategories(files, tmp.getNumMutationCategories(), ROCParameter::dM);
+	tmp.initMutationSelectionCategories(files, tmp.getNumSelectionCategories(), ROCParameter::dEta);
+	ROCModel model;
+
+	model.setParameter(tmp);
+
+	std::cout <<"init done\n";
+
+	//TODO: not currently working
+	model.simulateGenome(genome);
+
+	genome.writeFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/SimulatedROCData.fasta", true);
+}
+
+void testCodonToIndex()
+{
+	for(unsigned i = 0; i < 64; i++)
+	{
+		std::string codon = SequenceSummary::IndexToCodon(i, false);
+		unsigned a = SequenceSummary::CodonToIndex(codon, false);
+		unsigned b = std::distance(SequenceSummary::codonArray, std::find(SequenceSummary::codonArray, SequenceSummary::codonArray + 64, codon));
+
+		if (a != b) std::cout << i <<"\n";
+	}
+
+	std::cout <<"Param vector\n";
+	for (unsigned i = 0; i < 40; i++)
+	{
+		std::string codon = SequenceSummary::IndexToCodon(i, true);
+		unsigned a = SequenceSummary::CodonToIndex(codon, true);
+		unsigned b = std::distance(SequenceSummary::codonArrayParameter, std::find(SequenceSummary::codonArrayParameter, SequenceSummary::codonArrayParameter + 40, codon));
+		if (a != b) std::cout << i <<"\n";
+	}
+
+}
+
 int main()
 {
 	std::cout <<"Testing this\n";
 	enum User { cedric, gabe, jeremy };
 	enum ModelToRun { ROC, RFP, FONSE };
 	/* Test variables */
-	User user = gabe;
-	ModelToRun modelToRun = RFP;
-	bool read = true;
-	bool testing = false;
+	User user = jeremy;
+	ModelToRun modelToRun = FONSE;
+	bool read = false;
+	bool testing = true;
 
 	if (testing)
 	{
@@ -386,8 +463,10 @@ int main()
 		//testWriteRestartFile();
 		//testInitFromRestartFile();
 		//testReadRFPFile();
-		//testSynonymousCodons();
-		testReadObservedPhis();
+		//testReadObservedPhis();
+		//simulateRFPData();
+		//simulateROCData();
+		testCodonToIndex();
 	}
 	else //not doing unit testing, running a model
 	{
@@ -448,11 +527,16 @@ int main()
 		std::cout << "Initializing shared parameter variables\n";
 
 		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
+
+
+		/* For 2 mixtures */
 		/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
 			if (i < 500) geneAssignment[i] = 0u;
 			else geneAssignment[i] = 1u;
 		}*/
+
+		/* For 1 mixture */
 		for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
 			geneAssignment[i] = 0u;
