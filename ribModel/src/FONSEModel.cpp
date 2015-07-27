@@ -75,7 +75,7 @@ double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grou
 	SequenceSummary::AAToCodonRange(grouping, false, codonRange);
 
 	unsigned maxIndexVal = 0u;
-	for (int i = 0; i < (numCodons - 2); i++)
+	for (int i = 1; i < (numCodons - 1); i++)
 	{
 		if (selection[maxIndexVal] < selection[i])
 		{
@@ -90,7 +90,10 @@ double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grou
 			calculateCodonProbabilityVector(numCodons, positions[j], maxIndexVal, mutation, selection, phiValue, codonProb);
 
 			for (int k = 0; k < numCodons; k++) {
-				logLikelihood += std::log(codonProb[i]);
+				if (isnan(codonProb[k])) {
+					std::cout << "nan in per aa" << std::endl;
+				}
+				logLikelihood += std::log(codonProb[k]);
 			}
 			delete[] codonProb;
 		} 
@@ -166,7 +169,7 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 			codonProb[i] = std::exp(((mutation[i] - mutation[maxIndexValue])) + (phi * position * (selection[i] - selection[maxIndexValue])));
 			denominator += codonProb[i];
 		}
-		codonProb[numCodons - 1] = std::exp((mutation[maxIndexValue]) + (phi * position * selection[maxIndexValue]));
+		codonProb[numCodons - 1] = std::exp((-1.0 * mutation[maxIndexValue]) - (phi * position * selection[maxIndexValue]));
 		denominator += codonProb[numCodons - 1];
 	}
 	else {
@@ -180,6 +183,9 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 
 	for (unsigned i = 0; i < numCodons; i++) {
 		codonProb[i] /= denominator;
+		if (isnan(codonProb[i])) {
+			std::cout << "nan" << std::endl;
+		}
 	}
 }
 

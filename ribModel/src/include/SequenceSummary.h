@@ -127,5 +127,4 @@ class SequenceSummary
 };
 
 //TODO: talk about why some functiosn have R wrappers while others don't
-
 #endif // SequenceSummary_H
