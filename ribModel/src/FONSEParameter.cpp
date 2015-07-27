@@ -927,6 +927,7 @@ void FONSEParameter::proposeCodonSpecificParameter()
 void FONSEParameter::updateCodonSpecificParameter(std::string grouping)
 {
 	unsigned aaRange[2];
+
 	SequenceSummary::AAToCodonRange(grouping, true, aaRange);
 	unsigned aaIndex = SequenceSummary::aaToIndex.find(grouping)->second;
 	numAcceptForMutationAndSelection[aaIndex]++;
