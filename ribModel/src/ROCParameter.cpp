@@ -587,7 +587,7 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
 double ROCParameter::getCurrentCodonSpecificProposalWidth(unsigned aa)
 {
 	unsigned codonRange[2];
-	SequenceSummary::AAindexToCodonRange(aa, true, codonRange);
+	SequenceSummary::AAIndexToCodonRange(aa, true, codonRange);
 	return std_csp[codonRange[0]];
 }
 
@@ -652,7 +652,7 @@ void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 		std::cout << acceptanceLevel << "\t";
 		traces.updateCspAcceptanceRatioTrace(aaIndex, acceptanceLevel);
 		unsigned codonRange[2];
-		SequenceSummary::AAindexToCodonRange(aaIndex, true, codonRange);
+		SequenceSummary::AAIndexToCodonRange(aaIndex, true, codonRange);
 		for (unsigned k = codonRange[0]; k < codonRange[1]; k++)
 		{
 			if (acceptanceLevel < 0.2)

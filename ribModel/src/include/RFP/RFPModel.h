@@ -1,28 +1,37 @@
 #ifndef RFPMODEL_H
 #define RFPMODEL_H
 
+
 #include "../base/Model.h"
 #include "RFPParameter.h"
 
+
 class RFPModel: public Model {
 	private:
-
 		RFPParameter *parameter;
+
 		virtual double calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
 				unsigned currRFPObserved, unsigned currNumCodonsInMRNA, double phiValue);
+
+
 	public:
 		//Constructors & Destructors:
 		explicit RFPModel();
 		virtual ~RFPModel();
-		void setParameter(RFPParameter &_parameter); //may move up PV
 
-		// Likelihood ratio functions
+
+		//Likelihood ratio functions
 		virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, int geneIndex, unsigned k,
 				double* logProbabilityRatio);
 		virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
 				double& logAcceptanceRatioForAllMixtures);
 
-		void simulateGenome(Genome &genome);
+
+		//Other functions:
+		void setParameter(RFPParameter &_parameter);
+		virtual void simulateGenome(Genome &genome);
+
+
 		//Parameter wrapper functions:
 		virtual void initTraces(unsigned samples, unsigned num_genes)
 		{

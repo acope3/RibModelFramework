@@ -41,7 +41,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, int geneIndex, uns
 		std::string curAA = getGrouping(i);
 
 		// skip amino acids which do not occur in current gene. Avoid useless calculations and multiplying by 0
-		if(seqsum.getAAcountForAA(curAA) == 0) continue;
+		if(seqsum.getAACountForAA(curAA) == 0) continue;
 
 		// get codon count (total count not parameter->count)
 		int numCodons = seqsum.GetNumCodonsForAA(curAA);
@@ -158,7 +158,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 	{
 		Gene gene = genome.getGene(i);
 		SequenceSummary seqsum = gene.getSequenceSummary();
-		if(seqsum.getAAcountForAA(grouping) == 0) continue;
+		if(seqsum.getAACountForAA(grouping) == 0) continue;
 
 		// which mixture element does this gene belong to
 		unsigned mixtureElement = parameter->getMixtureAssignment(i);
