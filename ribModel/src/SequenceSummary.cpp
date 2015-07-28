@@ -348,6 +348,7 @@ std::array<unsigned, 2> SequenceSummary::AAIndexToCodonRange(unsigned aaIndex, b
 	}
 	else //Invalid AA
 	{
+		std::cerr << "Invalid aa given, returning 0,0\n";
 		startAAIndex = 0;
 		endAAIndex = 0;
 	}
@@ -362,8 +363,16 @@ std::array<unsigned, 2> SequenceSummary::AAIndexToCodonRange(unsigned aaIndex, b
 
 std::array<unsigned, 2> SequenceSummary::AAToCodonRange(std::string aa, bool forParamVector)
 {
-	unsigned aaIndex = aaToIndex.find(aa) -> second;
-	return AAIndexToCodonRange(aaIndex, forParamVector);
+	std::array <unsigned, 2> aaRange;
+	if (aaToIndex.find(aa) != aaToIndex.end()) {
+		unsigned aaIndex = aaToIndex.find(aa)->second;
+		aaRange = AAIndexToCodonRange(aaIndex, forParamVector);
+	}
+	else {
+		aaRange[0] = 0;
+		aaRange[1] = 0;
+	}
+	return aaRange;
 }
 
 
