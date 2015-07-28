@@ -35,10 +35,10 @@
         <entry file="file://$PROJECT_DIR$/SequenceSummary.cpp">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="537" column="0" selection-start-line="537" selection-start-column="0" selection-end-line="537" selection-end-column="0" />
+              <caret line="364" column="52" selection-start-line="364" selection-start-column="52" selection-end-line="364" selection-end-column="52" />
               <folding>
                 <element signature="e#0#36#0" expanded="true" />
-                <element signature="e#17062#19593#0" expanded="true" />
+                <element signature="e#17073#19568#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -48,7 +48,7 @@
         <entry file="file://$PROJECT_DIR$/include/RFP/RFPParameter.h">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="203" column="54" selection-start-line="203" selection-start-column="54" selection-end-line="203" selection-end-column="54" />
+              <caret line="54" column="32" selection-start-line="54" selection-start-column="32" selection-end-line="54" selection-end-column="32" />
               <folding>
                 <element signature="e#5221#5576#0" expanded="true" />
               </folding>
@@ -56,25 +56,32 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="RCPP_Parameter.cpp" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/RCPP_Parameter.cpp">
+      <file leaf-file-name="RFPParameter.cpp" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/RFPParameter.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.6454918">
-              <caret line="85" column="96" selection-start-line="85" selection-start-column="96" selection-end-line="85" selection-end-column="96" />
+            <state vertical-scroll-proportion="0.05532787">
+              <caret line="113" column="19" selection-start-line="113" selection-start-column="19" selection-end-line="113" selection-end-column="19" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="RFPParameter.cpp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/RFPParameter.cpp">
+      <file leaf-file-name="SequenceSummary.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/include/SequenceSummary.h">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="584" column="0" selection-start-line="584" selection-start-column="0" selection-end-line="584" selection-end-column="0" />
-              <folding>
-                <element signature="e#0#37#0" expanded="true" />
-                <element signature="e#76#115#0" expanded="true" />
-              </folding>
+              <caret line="61" column="95" selection-start-line="61" selection-start-column="95" selection-end-line="61" selection-end-column="95" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="main.cpp" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/main.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="22" column="0" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -108,11 +115,11 @@
         <option value="$PROJECT_DIR$/ROCModel.cpp" />
         <option value="$PROJECT_DIR$/FONSEParameter.cpp" />
         <option value="$PROJECT_DIR$/ROCParameter.cpp" />
-        <option value="$PROJECT_DIR$/include/SequenceSummary.h" />
-        <option value="$PROJECT_DIR$/SequenceSummary.cpp" />
         <option value="$PROJECT_DIR$/RFPParameter.cpp" />
         <option value="$PROJECT_DIR$/include/RFP/RFPParameter.h" />
         <option value="$PROJECT_DIR$/RCPP_Parameter.cpp" />
+        <option value="$PROJECT_DIR$/SequenceSummary.cpp" />
+        <option value="$PROJECT_DIR$/include/SequenceSummary.h" />
       </list>
     </option>
   </component>
@@ -320,7 +327,7 @@
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Messages" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.39507622" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.39507622" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -646,14 +653,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="22" column="0" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/FONSEModel.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-6.48">
@@ -693,23 +692,37 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/RCPP_Parameter.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.6454918">
+          <caret line="85" column="96" selection-start-line="85" selection-start-column="96" selection-end-line="85" selection-end-column="96" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="22" column="0" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/include/SequenceSummary.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.8727273">
-          <caret line="92" column="67" selection-start-line="92" selection-start-column="67" selection-end-line="92" selection-end-column="67" />
-          <folding>
-            <element signature="e#54#71#0" expanded="false" />
-          </folding>
+        <state vertical-scroll-proportion="0.0">
+          <caret line="61" column="95" selection-start-line="61" selection-start-column="95" selection-end-line="61" selection-end-column="95" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/SequenceSummary.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="537" column="0" selection-start-line="537" selection-start-column="0" selection-end-line="537" selection-end-column="0" />
+          <caret line="364" column="52" selection-start-line="364" selection-start-column="52" selection-end-line="364" selection-end-column="52" />
           <folding>
             <element signature="e#0#36#0" expanded="true" />
-            <element signature="e#17062#19593#0" expanded="true" />
+            <element signature="e#17073#19568#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -717,7 +730,7 @@
     <entry file="file://$PROJECT_DIR$/include/RFP/RFPParameter.h">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="203" column="54" selection-start-line="203" selection-start-column="54" selection-end-line="203" selection-end-column="54" />
+          <caret line="54" column="32" selection-start-line="54" selection-start-column="32" selection-end-line="54" selection-end-column="32" />
           <folding>
             <element signature="e#5221#5576#0" expanded="true" />
           </folding>
@@ -726,19 +739,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/RFPParameter.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="584" column="0" selection-start-line="584" selection-start-column="0" selection-end-line="584" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#37#0" expanded="true" />
-            <element signature="e#76#115#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/RCPP_Parameter.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.6454918">
-          <caret line="85" column="96" selection-start-line="85" selection-start-column="96" selection-end-line="85" selection-end-column="96" />
+        <state vertical-scroll-proportion="0.05532787">
+          <caret line="113" column="19" selection-start-line="113" selection-start-column="19" selection-end-line="113" selection-end-column="19" />
           <folding />
         </state>
       </provider>
