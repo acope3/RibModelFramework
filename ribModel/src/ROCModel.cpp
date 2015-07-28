@@ -187,8 +187,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 
 void ROCModel::obtainCodonCount(SequenceSummary& seqsum, std::string curAA, int codonCount[])
 {
-	unsigned codonRange[2];
-	SequenceSummary::AAToCodonRange(curAA, false, codonRange);
+	std::array <unsigned, 2> codonRange = SequenceSummary::AAToCodonRange(curAA);
 	// get codon counts for AA
 	unsigned j = 0u;
 	for(unsigned i = codonRange[0]; i < codonRange[1]; i++, j++)
@@ -219,7 +218,6 @@ std::vector<double> ROCModel::CalculateProbabilitiesForCodons(std::vector<double
 void ROCModel::simulateGenome(Genome &genome)
 {
      unsigned codonIndex;
-     unsigned aaRange[2];
      std::string curAA;
 
 	std::string tmpDesc = "Simulated Gene";
@@ -242,7 +240,7 @@ void ROCModel::simulateGenome(Genome &genome)
 		for (unsigned position = 1; position < (geneSeq.size() / 3); position++)
 	 	{
 	 		std::string codon = geneSeq.substr((position * 3), 3);
-			std::string aa = SequenceSummary::CodonToAA(codon);
+			std::string aa = SequenceSummary::codonToAA(codon);
 
 			if (aa == "X") continue;
 
@@ -266,11 +264,11 @@ void ROCModel::simulateGenome(Genome &genome)
 
 
 			codonIndex = Parameter::randMultinom(codonProb, numCodons);
-			SequenceSummary::AAToCodonRange(curAA, false, aaRange); //need the first spot in the array where the codons for curAA are
-			codon = seqSum.IndexToCodon(aaRange[0] + codonIndex);//get the correct codon based off codonIndex
+			std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(curAA); //need the first spot in the array where the codons for curAA are
+			codon = seqSum.indexToCodon(aaRange[0] + codonIndex);//get the correct codon based off codonIndex
 			tmpSeq += codon;
 	 	}
-		std::string codon =	seqSum.IndexToCodon((unsigned)((rand() % 3) + 61)); //randomly choose a stop codon, from range 61-63
+		std::string codon =	seqSum.indexToCodon((unsigned)((rand() % 3) + 61)); //randomly choose a stop codon, from range 61-63
 		tmpSeq += codon;
 		Gene simulatedGene(tmpSeq, tmpDesc, gene.getId());
 		genome.addGene(simulatedGene, true);

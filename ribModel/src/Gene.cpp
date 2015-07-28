@@ -119,7 +119,7 @@ std::string Gene::toAAsequence()
     {
         std::string codon = seq.substr(i, 3);
         //std::cout << codon << ": " << Gene::CodonToAA(codon) << "\n" << std::endl;
-        aaseq += SequenceSummary::CodonToAA(codon);
+        aaseq += SequenceSummary::codonToAA(codon);
     }
     return aaseq;
 }

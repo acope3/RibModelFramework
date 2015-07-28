@@ -20,15 +20,7 @@ void testNumCodonsPerAA()
 
 void testCodonRangePerAA(bool forParamVector)
 {
-	std::cout << "------------------ CODON RANGE PER AA ------------------" << std::endl;
-	for (int i = 0; i < 22; i++)
-	{
-		std::string aa = SequenceSummary::AminoAcidArray[i];
-		unsigned codonRange[2];
-		SequenceSummary::AAToCodonRange(aa, forParamVector, codonRange);
-		std::cout << "codon range for " << aa << "\t" << codonRange[0] << " - " << codonRange[1] << std::endl;
-	}
-	std::cout << "------------------ CODON RANGE PER AA ------------------" << std::endl;
+
 }
 
 void testLogNormDensity()
@@ -197,7 +189,6 @@ void testSimulateGenome(Genome& genome)
 	model.setParameter(parameter);
 	model.simulateGenome(genome);
 	std::vector <Gene> simGenes = genome.getSimulatedGenes();
-	unsigned aaRange[2];
 	std::cout << "FREQUENCIES:\n";
 
 
@@ -216,8 +207,8 @@ void testSimulateGenome(Genome& genome)
 
 		for (int j = 0; j < 22; j++)
 		{
-			SequenceSummary::AAIndexToCodonRange(j, false, aaRange);
-			std::string curAA = SequenceSummary::IndexToAA(j);
+			std::array<unsigned, 2> aaRange = SequenceSummary::AAIndexToCodonRange(j, false);
+			std::string curAA = SequenceSummary::indexToAA(j);
 			unsigned numCodons = simSeqSum.GetNumCodonsForAA(curAA);
 			double* codonProb = new double[numCodons];
 			double *mutation = new double[numCodons - 1];
@@ -316,7 +307,7 @@ void testReadRFPFile()
 
 	genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 	std::string codon = "ATG";	
-	std::cout << SequenceSummary::CodonToIndex(codon) <<"\n";
+	std::cout << SequenceSummary::codonToIndex(codon) <<"\n";
 	for (unsigned i = 0; i < genome.getGenomeSize(); i++)
 	{
 		std::cout << "Working with gene " << i << "\n";
@@ -325,7 +316,7 @@ void testReadRFPFile()
 		for (unsigned j = 0; j < 64; j++)
 		{
 			//std::cout << gene.getId() << " " << SS.getRFPObserved(j) << " " << SS.getNumCodonsInMRNA(j) << " " << SS.IndexToCodon(j) << "\n";
-			std::cout << gene.getId() << " " << SS.getRFPObserved(j) << " " << SS.IndexToCodon(j) << "\n";
+			std::cout << gene.getId() << " " << SS.getRFPObserved(j) << " " << SS.indexToCodon(j) << "\n";
 		}
 	}
 	std::cout << "------------------- TEST READRFPFILE ----------------------" << "\n";
@@ -419,8 +410,8 @@ void testCodonToIndex()
 {
 	for(unsigned i = 0; i < 64; i++)
 	{
-		std::string codon = SequenceSummary::IndexToCodon(i, false);
-		unsigned a = SequenceSummary::CodonToIndex(codon, false);
+		std::string codon = SequenceSummary::indexToCodon(i, false);
+		unsigned a = SequenceSummary::codonToIndex(codon, false);
 		unsigned b = std::distance(SequenceSummary::codonArray, std::find(SequenceSummary::codonArray, SequenceSummary::codonArray + 64, codon));
 
 		if (a != b) std::cout << i <<"\n";
@@ -429,8 +420,8 @@ void testCodonToIndex()
 	std::cout <<"Param vector\n";
 	for (unsigned i = 0; i < 40; i++)
 	{
-		std::string codon = SequenceSummary::IndexToCodon(i, true);
-		unsigned a = SequenceSummary::CodonToIndex(codon, true);
+		std::string codon = SequenceSummary::indexToCodon(i, true);
+		unsigned a = SequenceSummary::codonToIndex(codon, true);
 		unsigned b = std::distance(SequenceSummary::codonArrayParameter, std::find(SequenceSummary::codonArrayParameter, SequenceSummary::codonArrayParameter + 40, codon));
 		if (a != b) std::cout << i <<"\n";
 	}

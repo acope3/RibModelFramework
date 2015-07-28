@@ -98,7 +98,7 @@ void RFPParameter::initRFPParameterSet()
 void RFPParameter::initAlpha(double alphaValue, unsigned mixtureElement, std::string codon)
 {
 	unsigned category = getMutationCategory(mixtureElement);
-	unsigned index = SequenceSummary::CodonToIndex(codon);
+	unsigned index = SequenceSummary::codonToIndex(codon);
 	currentAlphaParameter[category][index] = alphaValue;
 }
 
@@ -106,7 +106,7 @@ void RFPParameter::initAlpha(double alphaValue, unsigned mixtureElement, std::st
 void RFPParameter::initLambdaPrime(double lambdaPrimeValue, unsigned mixtureElement, std::string codon)
 {
 	unsigned category = getMutationCategory(mixtureElement);
-	unsigned index = SequenceSummary::CodonToIndex(codon);
+	unsigned index = SequenceSummary::codonToIndex(codon);
 	currentLambdaPrimeParameter[category][index] = lambdaPrimeValue;
 }
 
@@ -365,7 +365,7 @@ void RFPParameter::initRFPValuesFromFile(std::string filename)
 //Codon Specific Parameter functions:
 void RFPParameter::updateCodonSpecificParameter(std::string grouping)
 {
-	unsigned i = SequenceSummary::CodonToIndex(grouping);
+	unsigned i = SequenceSummary::codonToIndex(grouping);
 	numAcceptForAlphaAndLambdaPrime[i]++;
 
 	for(unsigned k = 0u; k < numMutationCategories; k++)
@@ -388,8 +388,8 @@ double RFPParameter::getCurrentCodonSpecificProposalWidth(unsigned index)
 //TODO: Are we wanting to use a Covaraince Matrix structure?
 void RFPParameter::proposeCodonSpecificParameter()
 {
-	unsigned numAlpha = currentAlphaParameter[0].size();
-	unsigned numLambdaPrime = currentLambdaPrimeParameter[0].size();
+	unsigned numAlpha = (unsigned)currentAlphaParameter[0].size();
+	unsigned numLambdaPrime = (unsigned)currentLambdaPrimeParameter[0].size();
 
 	for (unsigned i = 0; i < numMutationCategories; i++)
 	{
@@ -419,7 +419,7 @@ void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 	{
 		std::cout << groupList[i] << "\t";
 
-		unsigned codonIndex = SequenceSummary::CodonToIndex(groupList[i]);
+		unsigned codonIndex = SequenceSummary::codonToIndex(groupList[i]);
 		double acceptanceLevel = (double)numAcceptForAlphaAndLambdaPrime[codonIndex] / (double)adaptationWidth;
 		std::cout << acceptanceLevel << "\n";
 		traces.updateCspAcceptanceRatioTrace(codonIndex, acceptanceLevel);
@@ -699,7 +699,7 @@ double RFPParameter::getLambdaPrimeVariance(unsigned mixtureElement, unsigned sa
 double RFPParameter::getParameterForCategory(unsigned category, unsigned paramType, std::string codon, bool proposal)
 {
 	double rv;
-	unsigned codonIndex = SequenceSummary::CodonToIndex(codon);
+	unsigned codonIndex = SequenceSummary::codonToIndex(codon);
 	if (paramType == RFPParameter::alp)
 	{
 		rv = (proposal ? proposedAlphaParameter[category][codonIndex] : currentAlphaParameter[category][codonIndex]);

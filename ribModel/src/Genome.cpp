@@ -38,7 +38,7 @@ std::vector<unsigned> Genome::getCodonCountsPerGene(std::string codon)
 {
 	std::vector<unsigned> codonCounts;
 	codonCounts.resize(genes.size());
-	unsigned codonIndex = SequenceSummary::CodonToIndex(codon);
+	unsigned codonIndex = SequenceSummary::codonToIndex(codon);
 	for(unsigned i = 0u; i < genes.size(); i++)
 	{
 		Gene gene = genes[i];
@@ -227,7 +227,7 @@ void Genome::readRFPFile(std::string filename)
 	}
 
     prevID = ID;
-    unsigned index = SequenceSummary::CodonToIndex(codon);
+    unsigned index = SequenceSummary::codonToIndex(codon);
     tmpGene.geneData.setRFPObserved(index, tmpRFP);
 	}
 

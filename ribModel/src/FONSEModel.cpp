@@ -68,11 +68,11 @@ double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grou
 {
 	int numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
 	double logLikelihood = 0.0;
-	unsigned codonRange[2];
-	std::vector <unsigned> positions;
-	double *codonProb;
 
-	SequenceSummary::AAToCodonRange(grouping, false, codonRange);
+	std::vector <unsigned> positions;
+	double codonProb[6];
+
+	std::array <unsigned, 2> codonRange = SequenceSummary::AAToCodonRange(grouping);
 
 	unsigned maxIndexVal = 0u;
 	for (int i = 1; i < (numCodons - 1); i++)
@@ -86,16 +86,11 @@ double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grou
 	for (unsigned i = codonRange[0]; i < codonRange[1]; i++) {
 		positions = gene.geneData.getCodonPositions(i);
 		for (unsigned j = 0; j < positions.size(); j++) {
-			codonProb = new double[numCodons]();
 			calculateCodonProbabilityVector(numCodons, positions[j], maxIndexVal, mutation, selection, phiValue, codonProb);
-
 			for (int k = 0; k < numCodons; k++) {
-				if (isnan(codonProb[k])) {
-					std::cout << "nan in per aa" << std::endl;
-				}
+				if (codonProb[k] == 0) continue;
 				logLikelihood += std::log(codonProb[k]);
 			}
-			delete[] codonProb;
 		} 
 		positions.clear();
 	}
@@ -183,9 +178,9 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 
 	for (unsigned i = 0; i < numCodons; i++) {
 		codonProb[i] /= denominator;
-		if (isnan(codonProb[i])) {
+		/*if (std::isnan(codonProb[i])) {
 			std::cout << "nan" << std::endl;
-		}
+		}*/
 	}
 }
 
