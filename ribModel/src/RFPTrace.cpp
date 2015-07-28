@@ -58,7 +58,7 @@ void RFPTrace::initLambdaPrimeParameterTrace(unsigned samples, unsigned numSelec
 
 std::vector<double> RFPTrace::getAlphaParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon)
 {
-	unsigned codonIndex = SequenceSummary::CodonToIndex(codon);
+	unsigned codonIndex = SequenceSummary::codonToIndex(codon);
 	unsigned category = getAlphaCategory(mixtureElement);
 	return alphaParameterTrace[category][codonIndex];
 }
@@ -66,7 +66,7 @@ std::vector<double> RFPTrace::getAlphaParameterTraceByMixtureElementForCodon(uns
 
 std::vector<double> RFPTrace::getLambdaPrimeParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon)
 {
-	unsigned codonIndex = SequenceSummary::CodonToIndex(codon);
+	unsigned codonIndex = SequenceSummary::codonToIndex(codon);
 	unsigned category = getLambdaPrimeCategory(mixtureElement);
 	return lambdaPrimeParameterTrace[category][codonIndex];
 }
@@ -74,7 +74,7 @@ std::vector<double> RFPTrace::getLambdaPrimeParameterTraceByMixtureElementForCod
 
 void RFPTrace::updateCodonSpecificParameterTrace(unsigned sample, std::string codon, std::vector<std::vector<double>> &curAlpParam, std::vector<std::vector<double>> &curLmPriParam)
 {
-    unsigned i = SequenceSummary::CodonToIndex(codon);
+    unsigned i = SequenceSummary::codonToIndex(codon);
 	for(unsigned category = 0; category < alphaParameterTrace.size(); category++)
 	{
         alphaParameterTrace[category][i][sample] = curAlpParam[category][i];

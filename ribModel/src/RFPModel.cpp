@@ -86,11 +86,11 @@ void RFPModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 	double logLikelihood = 0.0;
 	double logLikelihood_proposed = 0.0;
 	Gene *gene;
-	unsigned index = SequenceSummary::CodonToIndex(grouping);
+	unsigned index = SequenceSummary::codonToIndex(grouping);
 
 
 #ifndef __APPLE__
-#pragma omp parallel for private(gene) reduction(+:likelihood,likelihood_proposed)
+#pragma omp parallel for private(gene) reduction(+:logLikelihood,logLikelihood_proposed)
 #endif
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{

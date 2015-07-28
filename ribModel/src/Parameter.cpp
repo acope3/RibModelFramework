@@ -831,8 +831,7 @@ double Parameter::calculateSCUO(Gene& gene, unsigned maxAA)
 		double aaCount = (double)seqsum.getAACountForAA(i);
 		if(aaCount == 0) continue;
 
-		unsigned codonRange[2];
-		SequenceSummary::AAIndexToCodonRange(i, false, codonRange);
+		std::array<unsigned, 2> codonRange = SequenceSummary::AAIndexToCodonRange(i, false);
 
 		// calculate -sum(pij log(pij))
 		double aaEntropy = 0.0;

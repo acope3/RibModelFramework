@@ -58,7 +58,7 @@ void ROCTrace::initSelectionParameterTrace(unsigned samples, unsigned numSelecti
 
 std::vector<double> ROCTrace::getMutationParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon)
 {
-	unsigned codonIndex = SequenceSummary::CodonToIndex(codon, true);
+	unsigned codonIndex = SequenceSummary::codonToIndex(codon, true);
 	unsigned category = getMutationCategory(mixtureElement);
 	return mutationParameterTrace[category][codonIndex];
 }
@@ -66,7 +66,7 @@ std::vector<double> ROCTrace::getMutationParameterTraceByMixtureElementForCodon(
 
 std::vector<double> ROCTrace::getSelectionParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon)
 {
-	unsigned codonIndex = SequenceSummary::CodonToIndex(codon, true);
+	unsigned codonIndex = SequenceSummary::codonToIndex(codon, true);
 	unsigned category = getSelectionCategory(mixtureElement);
 	return selectionParameterTrace[category][codonIndex];
 }
@@ -75,8 +75,7 @@ void ROCTrace::updateCodonSpecificParameterTrace(unsigned sample, std::string aa
 {
 	for(unsigned category = 0; category < mutationParameterTrace.size(); category++)
 	{
-		unsigned aaRange[2];
-		SequenceSummary::AAToCodonRange(aa, true, aaRange);
+		std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(aa, true);
 		for (unsigned i = aaRange[0]; i < aaRange[1]; i++)
 		{
 			mutationParameterTrace[category][i][sample] = curMutParam[category][i];
@@ -84,8 +83,7 @@ void ROCTrace::updateCodonSpecificParameterTrace(unsigned sample, std::string aa
 	}
 	for(unsigned category = 0; category < selectionParameterTrace.size(); category++)
 	{
-		unsigned aaRange[2];
-		SequenceSummary::AAToCodonRange(aa, true, aaRange);
+		std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(aa, true);
 		for (unsigned i = aaRange[0]; i < aaRange[1]; i++)
 		{
 			selectionParameterTrace[category][i][sample] = curSelectParam[category][i];
