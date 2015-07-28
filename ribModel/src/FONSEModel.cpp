@@ -68,11 +68,11 @@ double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grou
 {
 	int numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
 	double logLikelihood = 0.0;
-	unsigned codonRange[2];
+
 	std::vector <unsigned> positions;
 	double codonProb[6];
 
-	SequenceSummary::AAToCodonRange(grouping, false, codonRange);
+	std::array <unsigned, 2> codonRange = SequenceSummary::AAToCodonRange(grouping);
 
 	unsigned maxIndexVal = 0u;
 	for (int i = 1; i < (numCodons - 1); i++)

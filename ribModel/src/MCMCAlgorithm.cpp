@@ -30,7 +30,7 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * 
 	numCores = 1u;
 }
 
-	MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thining, unsigned _adaptiveWidth, bool _estimateSynthesisRate, bool _estimateCodonSpecificParameter, bool _estimateHyperParameter)
+MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thining, unsigned _adaptiveWidth, bool _estimateSynthesisRate, bool _estimateCodonSpecificParameter, bool _estimateHyperParameter)
 : samples(_samples), thining(_thining), adaptiveWidth(_adaptiveWidth * thining), estimateSynthesisRate(_estimateSynthesisRate), estimateCodonSpecificParameter(_estimateCodonSpecificParameter),
 	estimateHyperParameter(_estimateHyperParameter)
 {

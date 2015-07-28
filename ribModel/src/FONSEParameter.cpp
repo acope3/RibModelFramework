@@ -166,9 +166,9 @@ std::vector <std::vector <double> > FONSEParameter::calculateSelectionCoefficien
 	{
 		for (unsigned j = 0; j < getGroupListSize(); j++)
 		{
-			unsigned aaRange[2];
+
 			std::string aa = getGrouping(j);
-			SequenceSummary::AAToCodonRange(aa, true, aaRange);
+			std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(aa, true);
 			std::vector<double> tmp;
 			double minValue = 0.0;
 			for (unsigned k = aaRange[0]; k < aaRange[1]; k++)
@@ -434,11 +434,11 @@ void FONSEParameter::initSelection(std::vector<double> selectionValues, unsigned
 	if (check)
 	{
 		mixtureElement--;
-		unsigned aaRange[2];
+
 		int category = getSelectionCategory(mixtureElement);
 
 		aa[0] = (char)std::toupper(aa[0]);
-		SequenceSummary::AAToCodonRange(aa, true, aaRange);
+		std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(aa, true);
 		for (unsigned i = aaRange[0], j = 0; i < aaRange[1]; i++, j++)
 		{
 			currentSelectionParameter[category][i] = selectionValues[j];
@@ -455,10 +455,10 @@ void FONSEParameter::initMutation(std::vector<double> mutationValues, unsigned m
 	{
 		mixtureElement--;
 
-		unsigned aaRange[2];
+
 		unsigned category = getMutationCategory(mixtureElement);
 		aa[0] = (char)std::toupper(aa[0]);
-		SequenceSummary::AAToCodonRange(aa, true, aaRange);
+		std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(aa, true);
 		for (unsigned i = aaRange[0], j = 0; i < aaRange[1]; i++, j++)
 		{
 			currentMutationParameter[category][i] = mutationValues[j];
@@ -551,8 +551,7 @@ void FONSEParameter::getParameterForCategory(unsigned category, unsigned paramTy
 		std::cerr << "\tReturning mutation parameter! \n";
 		tempSet = (proposal ? &proposedMutationParameter[category] : &currentMutationParameter[category]);
 	}
-	unsigned aaRange[2];
-	SequenceSummary::AAToCodonRange(aa, true, aaRange);
+	std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(aa, true);
 
 	unsigned j = 0u;
 	for (unsigned i = aaRange[0]; i < aaRange[1]; i++, j++)
@@ -563,8 +562,7 @@ void FONSEParameter::getParameterForCategory(unsigned category, unsigned paramTy
 
 double FONSEParameter::getCurrentCodonSpecificProposalWidth(unsigned aa)
 {
-	unsigned codonRange[2];
-	SequenceSummary::AAIndexToCodonRange(aa, true, codonRange);
+	std::array<unsigned , 2> codonRange = SequenceSummary::AAIndexToCodonRange(aa, true);
 	return std_csp[codonRange[0]];
 }
 
@@ -623,8 +621,7 @@ void FONSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptatio
 		double acceptanceLevel = (double)numAcceptForMutationAndSelection[i] / (double)adaptationWidth;
 		std::cout << acceptanceLevel << "\t";
 		traces.updateCspAcceptanceRatioTrace(i, acceptanceLevel);
-		unsigned codonRange[2];
-		SequenceSummary::AAIndexToCodonRange(i, true, codonRange);
+		std::array <unsigned, 2> codonRange = SequenceSummary::AAIndexToCodonRange(i, true);
 		for (unsigned k = codonRange[0]; k < codonRange[1]; k++)
 		{
 			if (acceptanceLevel < 0.2)
@@ -893,9 +890,8 @@ void FONSEParameter::proposeCodonSpecificParameter()
 	for (unsigned k = 0; k < getGroupListSize(); k++)
 	{
 		std::vector<double> iidProposed;
-		unsigned aaRange[2];
 		std::string aa = getGrouping(k);
-		SequenceSummary::AAToCodonRange(aa, true, aaRange);
+		std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(aa, true);
 		unsigned numCodons = aaRange[1] - aaRange[0];
 		for (unsigned i = 0u; i < numCodons * (numMutationCategories + numSelectionCategories); i++)
 		{
@@ -926,9 +922,7 @@ void FONSEParameter::proposeCodonSpecificParameter()
 
 void FONSEParameter::updateCodonSpecificParameter(std::string grouping)
 {
-	unsigned aaRange[2];
-
-	SequenceSummary::AAToCodonRange(grouping, true, aaRange);
+	std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(grouping, true);
 	unsigned aaIndex = SequenceSummary::aaToIndex.find(grouping)->second;
 	numAcceptForMutationAndSelection[aaIndex]++;
 
