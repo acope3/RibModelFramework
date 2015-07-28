@@ -150,50 +150,66 @@ class RFPParameter: public Parameter {
 		void initLambdaPrimeR(double lambdaPrimeValue, unsigned mixtureElement, std::string codon);
 		double getParameterForCategoryR(unsigned mixtureElement, unsigned paramType, std::string codon, bool proposal);
 
-		//Need to alter these functions, not going to deal with these at this time-----------------------------------
-		/*//R wrapper functions
-		 void initMutationSelectionCategoriesR(std::vector<std::string> files, unsigned numCategories, std::string paramType);
-		 double getMutationPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
+		//R wrapper functions
+		// void initMutationSelectionCategoriesR(std::vector<std::string> files, unsigned numCategories, std::string paramType);
+		 double getAlphaPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
 		 {
-		 double rv = -1.0;
-		 bool check = checkIndex(mixtureElement, 1, numMixtures);
-		 if (check)
+		 	double rv = -1.0;
+		 	bool check = checkIndex(mixtureElement, 1, numMixtures);
+			 codon[0] = (char) std::toupper(codon[0]);
+			 codon[1] = (char) std::toupper(codon[1]);
+			 codon[2] = (char) std::toupper(codon[2]);
+		 	if (check)
+		 	{
+		 		rv = getAlphaPosteriorMean(mixtureElement - 1, samples, codon);
+		 	}
+		 	return rv;
+		 }
+
+		 double getLambdaPrimePosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
 		 {
-		 rv = getMutationPosteriorMean(mixtureElement - 1, samples, codon);
+		 	double rv = -1.0;
+			 codon[0] = (char) std::toupper(codon[0]);
+			 codon[1] = (char) std::toupper(codon[1]);
+			 codon[2] = (char) std::toupper(codon[2]);
+		 	bool check = checkIndex(mixtureElement, 1, numMixtures);
+		 	if (check)
+			{
+				 rv = getLambdaPrimePosteriorMean(mixtureElement - 1, samples, codon);
+			}
+		 	return rv;
 		 }
-		 return rv;
-		 }
-		 double getSelectionPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
+
+
+		 double getAlphaVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased)
 		 {
-		 double rv = -1.0;
-		 bool check = checkIndex(mixtureElement, 1, numMixtures);
-		 if (check)
+			 double rv = -1.0;
+			 codon[0] = (char) std::toupper(codon[0]);
+			 codon[1] = (char) std::toupper(codon[1]);
+			 codon[2] = (char) std::toupper(codon[2]);
+		 	bool check = checkIndex(mixtureElement, 1, numMixtures);
+		 	if (check)
+		 	{
+		 		rv = getAlphaVariance(mixtureElement - 1, samples, codon, unbiased);
+		 	}
+		 	return rv;
+		 }
+
+
+		 double getLambdaPrimeVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased)
 		 {
-		 rv = getSelectionPosteriorMean(mixtureElement - 1, samples, codon);
+		 	double rv = -1.0;
+			 codon[0] = (char) std::toupper(codon[0]);
+			 codon[1] = (char) std::toupper(codon[1]);
+			 codon[2] = (char) std::toupper(codon[2]);
+		 	bool check = checkIndex(mixtureElement, 1, numMixtures);
+		 	if (check)
+		 	{
+		 		rv = getLambdaPrimeVariance(mixtureElement - 1, samples, codon, unbiased);
+		 	}
+		 	return rv;
 		 }
-		 return rv;
-		 }
-		 double getMutationVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased)
-		 {
-		 double rv = -1.0;
-		 bool check = checkIndex(mixtureElement, 1, numMixtures);
-		 if (check)
-		 {
-		 rv = getMutationVariance(mixtureElement - 1, samples, codon, unbiased);
-		 }
-		 return rv;
-		 }
-		 double getSelectionVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased)
-		 {
-		 double rv = -1.0;
-		 bool check = checkIndex(mixtureElement, 1, numMixtures);
-		 if (check)
-		 {
-		 rv = getSelectionVariance(mixtureElement - 1, samples, codon, unbiased);
-		 }
-		 return rv;
-		 }
-		 */
+
 
 	protected:
 

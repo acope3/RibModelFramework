@@ -388,8 +388,8 @@ double RFPParameter::getCurrentCodonSpecificProposalWidth(unsigned index)
 //TODO: Are we wanting to use a Covaraince Matrix structure?
 void RFPParameter::proposeCodonSpecificParameter()
 {
-	unsigned numAlpha = currentAlphaParameter[0].size();
-	unsigned numLambdaPrime = currentLambdaPrimeParameter[0].size();
+	unsigned numAlpha = (unsigned)currentAlphaParameter[0].size();
+	unsigned numLambdaPrime = (unsigned)currentLambdaPrimeParameter[0].size();
 
 	for (unsigned i = 0; i < numMutationCategories; i++)
 	{

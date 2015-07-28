@@ -80,6 +80,10 @@ RCPP_MODULE(Parameter_mod)
 		
 		.method("getTraceObject", &RFPParameter::getTraceObject)
 		.method("getParameterForCategory", &RFPParameter::getParameterForCategoryR) //need to implement the R wrapper
+		.method("getAlphaPosteriorMeanForCodon", &RFPParameter::getAlphaPosteriorMeanForCodon)
+		.method("getLambdaPrimePosteriorMeanForCodon", &RFPParameter::getLambdaPrimePosteriorMeanForCodon)
+		.method("getAlphaVarianceForCodon", &RFPParameter::getAlphaVarianceForCodon)
+		.method("getLambdaPrimeVarianceForCodon", &RFPParameter::getLambdaPrimeVarianceForCodon)
 		;
 
 	class_<FONSEParameter>("FONSEParameter")
