@@ -145,6 +145,8 @@ bool SequenceSummary::processSequence(const std::string& sequence)
 	int codonID;
 	int aaID;
 	std::string codon;
+
+	clear();
 	codonPositions.resize(64);
 	for (unsigned i = 0u; i < sequence.length(); i += 3)
 	{
@@ -346,6 +348,7 @@ std::array<unsigned, 2> SequenceSummary::AAIndexToCodonRange(unsigned aaIndex, b
 	}
 	else //Invalid AA
 	{
+		std::cerr << "Invalid aa given, returning 0,0\n";
 		startAAIndex = 0;
 		endAAIndex = 0;
 	}
@@ -360,8 +363,16 @@ std::array<unsigned, 2> SequenceSummary::AAIndexToCodonRange(unsigned aaIndex, b
 
 std::array<unsigned, 2> SequenceSummary::AAToCodonRange(std::string aa, bool forParamVector)
 {
-	unsigned aaIndex = aaToIndex.find(aa) -> second;
-	return AAIndexToCodonRange(aaIndex, forParamVector);
+	std::array <unsigned, 2> aaRange;
+	if (aaToIndex.find(aa) != aaToIndex.end()) {
+		unsigned aaIndex = aaToIndex.find(aa)->second;
+		aaRange = AAIndexToCodonRange(aaIndex, forParamVector);
+	}
+	else {
+		aaRange[0] = 0;
+		aaRange[1] = 0;
+	}
+	return aaRange;
 }
 
 
@@ -588,8 +599,8 @@ RCPP_MODULE(SequenceSummary_mod)
 		function("AAIndexToCodonRange", &SequenceSummary::AAIndexToCodonRange); //TEST THAT ONLY!
 		function("AAToCodonRange", &SequenceSummary::AAToCodonRange); //TEST THAT ONLY!
 		function("AAToCodon", &SequenceSummary::AAToCodon, List::create(_["aa"], _["forParamVector"] = false),
-			"returns a vector of codons for a given amino acid"); //TEST THAT ONLY!
-		function("codonToAA", &SequenceSummary::codonToAA, List::create(_["codon"]), "returns an amino acid for a given codon"); //TEST THAT ONLY!
+			"returns a vector of codons for a given amino acid");
+		function("codonToAA", &SequenceSummary::codonToAA, List::create(_["codon"]), "returns an amino acid for a given codon");
 		function("codonToIndex", &SequenceSummary::codonToIndex, List::create(_["codon"], _["forParamVector"] = false)); //TEST THAT ONLY!
 		function("codonToAAIndex", &SequenceSummary::codonToAAIndex); //TEST THAT ONLY!
 		function("indexToAA", &SequenceSummary::indexToAA); //TEST THAT ONLY!

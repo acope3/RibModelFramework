@@ -178,9 +178,6 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 
 	for (unsigned i = 0; i < numCodons; i++) {
 		codonProb[i] /= denominator;
-		/*if (std::isnan(codonProb[i])) {
-			std::cout << "nan" << std::endl;
-		}*/
 	}
 }
 

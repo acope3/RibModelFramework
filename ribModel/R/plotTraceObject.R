@@ -61,6 +61,35 @@ plot.Rcpp_ROCTrace <- function(trace, what=c("Mutation", "Selection", "MixturePr
   }
 }
 
+plot.Rcpp_FONSETrace <- function(trace, what=c("Mutation", "Selection", "MixtureProbability" ,"SPhi", "ExpectedPhi", "Expression"), 
+                               geneIndex=1, mixture = 1, ...)
+{
+  if(what[1] == "Mutation")
+  {
+    plotCodonSpecificParameters(trace, mixture, "mutation", main="Mutation Parameter Traces")
+  }
+  if(what[1] == "Selection")
+  {
+    plotCodonSpecificParameters(trace, mixture, "selection", main="Selection Parameter Traces")
+  }  
+  if(what[1] == "MixtureProbability")
+  {
+    plotMixtureProbability(trace)
+  }
+  if(what[1] == "SPhi")
+  {
+    plotSPhiTrace(trace)
+  }
+  if(what[1] == "ExpectedPhi")
+  {
+    plotExpectedPhiTrace(trace)
+  }
+  if(what[1] == "Expression")
+  {
+    plotExpressionTrace(trace, geneIndex)
+  }
+}
+
 plotCodonSpecificParameters <- function(trace, mixture, type="mutation", main="Mutation Parameter Traces", ROC=TRUE)
 {
   opar <- par(no.readonly = T) 
