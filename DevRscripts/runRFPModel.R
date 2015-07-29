@@ -12,7 +12,7 @@ parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssig
 
 parameter <- new(RFPParameter, "3330restartFile.rst")
 # initialize MCMC object
-samples <- 500
+samples <- 1000
 thining <- 10
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples=samples, thining=thining, adaptive.width=adaptiveWidth, 
