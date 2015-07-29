@@ -10,9 +10,9 @@ mixDef <- "allUnique"
 geneAssignment <- c(rep(1, genome$getGenomeSize()))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, model= "RFP", split.serine = TRUE, mixture.definition = mixDef)
 
-parameter <- new(RFPParameter, "3330restartFile.rst")
+
 # initialize MCMC object
-samples <- 1000
+samples <- 100
 thining <- 10
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples=samples, thining=thining, adaptive.width=adaptiveWidth, 
@@ -48,8 +48,8 @@ dev.off()
 pdf("correlationBetweenAlphaAndLambdaPrime.pdf")
 cat <- 1
 proposal <- FALSE
-alphaList <- vector("numeric", 61)
-lambdaPrimeList <- vector("numeric", 61)
+alphaList <- numeric (61)
+lambdaPrimeList <- numeric (61)
 codonList <- codons()
 i <- 1
 for (i in 1:61)
@@ -64,3 +64,18 @@ plot(NULL, NULL, xlim=range(alphaList, na.rm = T), ylim=range(lambdaPrimeList),
      main = "Correlation Between Alpha and Lambda Prime", xlab = "alpha", ylab = "lambdaPrime")
 upper.panel.plot(alphaList, lambdaPrimeList)
 dev.off()
+
+alphaValues <- numeric(61)
+lambdaPrimeValues <- numeric(61)
+for (i in 1:61)
+{
+  codon <- codonList[i]
+  alphaValues[i] <- parameter$getAlphaPosteriorMeanForCodon(1, 30, codon)
+  lambdaPrimeValues[i] <- parameter$getLambdaPrimePosteriorMeanForCodon(1, 30, codon)
+}
+
+m <- matrix(c(codonList[-c(62,63,64)], alphaValues, lambdaPrimeValues), ncol = 3, byrow = FALSE)
+colnames(m) <- c("Codon", "alpha", "lambda")
+write.table(m, "RFPPhiValues.csv", sep = ",", quote = F, row.names = F, col.names = T)
+
+
