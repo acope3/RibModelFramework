@@ -197,15 +197,15 @@ void Genome::readRFPFile(std::string filename)
 
   while (getline(Fin,tmp))
   {
-    unsigned pos = tmp.find(",");
+	std::size_t pos = tmp.find(",");
     std::string ID = tmp.substr(0, pos);
-    unsigned pos2 = tmp.find(",", pos + 1);
+	std::size_t pos2 = tmp.find(",", pos + 1);
     std::string value = tmp.substr(pos + 1, pos2 - (pos + 1));
-    unsigned tmpRFP = std::atoi(value.c_str());
+    unsigned tmpRFP = (unsigned)std::atoi(value.c_str());
 
     pos = tmp.find(",", pos2 + 1);
     value = tmp.substr(pos2 + 1, pos - (pos2 + 1));
-    unsigned counts = std::atoi(value.c_str());
+    unsigned counts = (unsigned)std::atoi(value.c_str());
 
     std::string codon = tmp.substr(pos + 1, 3);
     for (unsigned i = 0; i < counts; i++)

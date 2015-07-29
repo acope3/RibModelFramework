@@ -62,7 +62,7 @@ class SequenceSummary
 		static std::vector<std::string> AAToCodon(std::string aa, bool forParamVector = false); //DONE!
 		static std::string codonToAA(std::string& codon); //DONE!
 		static unsigned codonToIndex(std::string& codon, bool forParamVector = false); //DONE!
-		static unsigned codonToAAIndex(std::string& codon); //DONE! 
+		static unsigned codonToAAIndex(std::string& codon); //DONE!
 		static std::string indexToAA(unsigned aaIndex); //DONE!
 		static std::string indexToCodon(unsigned index, bool forParamVector = false);
 		static unsigned GetNumCodonsForAA(std::string& aa, bool forParamVector = false);
