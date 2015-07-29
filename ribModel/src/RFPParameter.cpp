@@ -473,7 +473,7 @@ void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 
 		unsigned codonIndex = SequenceSummary::codonToIndex(groupList[i]);
 		double acceptanceLevel = (double)numAcceptForAlphaAndLambdaPrime[codonIndex] / (double)adaptationWidth;
-		std::cout << acceptanceLevel << "\n";
+		std::cout << acceptanceLevel << " with std_csp = " << std_csp[i] <<"\n";
 		traces.updateCspAcceptanceRatioTrace(codonIndex, acceptanceLevel);
 		if (acceptanceLevel < 0.2)
 		{
