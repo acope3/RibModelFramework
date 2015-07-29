@@ -57,13 +57,13 @@ class SequenceSummary
 
 		//Static functions:
 		static unsigned AAToAAIndex(std::string aa); //DONE!
-		static std::array<unsigned, 2> AAIndexToCodonRange(unsigned aaIndex, bool forParamVector = false);
-		static std::array<unsigned, 2> AAToCodonRange(std::string aa, bool forParamVector = false);
-		static std::vector<std::string> AAToCodon(std::string aa, bool forParamVector = false); //TODO: Not used????!
-		static std::string codonToAA(std::string& codon);
-		static unsigned codonToIndex(std::string& codon, bool forParamVector = false);
-		static unsigned codonToAAIndex(std::string& codon);
-		static std::string indexToAA(unsigned aaIndex);
+		static std::array<unsigned, 2> AAIndexToCodonRange(unsigned aaIndex, bool forParamVector = false); //DONE!
+		static std::array<unsigned, 2> AAToCodonRange(std::string aa, bool forParamVector = false); //DONE!
+		static std::vector<std::string> AAToCodon(std::string aa, bool forParamVector = false); //DONE!
+		static std::string codonToAA(std::string& codon); //DONE!
+		static unsigned codonToIndex(std::string& codon, bool forParamVector = false); //DONE!
+		static unsigned codonToAAIndex(std::string& codon); //DONE!
+		static std::string indexToAA(unsigned aaIndex); //DONE!
 		static std::string indexToCodon(unsigned index, bool forParamVector = false);
 		static unsigned GetNumCodonsForAA(std::string& aa, bool forParamVector = false);
 		static std::vector<std::string> aminoAcids();

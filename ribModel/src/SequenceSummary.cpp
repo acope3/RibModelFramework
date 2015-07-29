@@ -141,10 +141,15 @@ void SequenceSummary::clear()
 
 bool SequenceSummary::processSequence(const std::string& sequence)
 {
+	//NOTE! Clear() cannot be called in this function because of the RFP model.
+	//RFP sets RFPObserved by codon, and not by setting the sequence. This causes
+	//the values to be zero during the MCMC.
+	
 	bool check = true;
 	int codonID;
 	int aaID;
 	std::string codon;
+
 	codonPositions.resize(64);
 	for (unsigned i = 0u; i < sequence.length(); i += 3)
 	{
@@ -597,8 +602,8 @@ RCPP_MODULE(SequenceSummary_mod)
 		function("AAIndexToCodonRange", &SequenceSummary::AAIndexToCodonRange); //TEST THAT ONLY!
 		function("AAToCodonRange", &SequenceSummary::AAToCodonRange); //TEST THAT ONLY!
 		function("AAToCodon", &SequenceSummary::AAToCodon, List::create(_["aa"], _["forParamVector"] = false),
-			"returns a vector of codons for a given amino acid"); //TEST THAT ONLY!
-		function("codonToAA", &SequenceSummary::codonToAA, List::create(_["codon"]), "returns an amino acid for a given codon"); //TEST THAT ONLY!
+			"returns a vector of codons for a given amino acid");
+		function("codonToAA", &SequenceSummary::codonToAA, List::create(_["codon"]), "returns an amino acid for a given codon");
 		function("codonToIndex", &SequenceSummary::codonToIndex, List::create(_["codon"], _["forParamVector"] = false)); //TEST THAT ONLY!
 		function("codonToAAIndex", &SequenceSummary::codonToAAIndex); //TEST THAT ONLY!
 		function("indexToAA", &SequenceSummary::indexToAA); //TEST THAT ONLY!
