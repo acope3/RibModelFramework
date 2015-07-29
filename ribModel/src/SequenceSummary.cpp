@@ -144,7 +144,7 @@ bool SequenceSummary::processSequence(const std::string& sequence)
 	//NOTE! Clear() cannot be called in this function because of the RFP model.
 	//RFP sets RFPObserved by codon, and not by setting the sequence. This causes
 	//the values to be zero during the MCMC.
-	
+
 	bool check = true;
 	int codonID;
 	int aaID;

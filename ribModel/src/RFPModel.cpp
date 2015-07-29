@@ -128,6 +128,7 @@ void RFPModel::simulateGenome(Genome &genome)
 	{
 		unsigned mixtureElement = getMixtureAssignment(geneIndex);
 		Gene gene = genome.getGene(geneIndex);
+		double phi = parameter -> getSynthesisRate(geneIndex, mixtureElement, false);
 		Gene tmpGene = gene;
 		for (unsigned codonIndex = 0; codonIndex < 64; codonIndex++)
 		{
@@ -150,7 +151,7 @@ void RFPModel::simulateGenome(Genome &genome)
 
 				std::gamma_distribution<double> GDistribution(alphaPrime, lambdaPrime);
 				double tmp = GDistribution(Parameter::generator);
-				std::poisson_distribution<unsigned> PDistribution(tmp);
+				std::poisson_distribution<unsigned> PDistribution(phi * tmp);
 				unsigned simulatedValue = PDistribution(Parameter::generator);
 				tmpGene.geneData.setRFPObserved(codonIndex, simulatedValue);
 			#endif
