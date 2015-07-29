@@ -161,16 +161,16 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 	if (selection[maxIndexValue] > 0.0) {
 		denominator = 0.0;
 		for (unsigned i = 0u; i < (numCodons - 1); i++) {
-			codonProb[i] = std::exp(((mutation[i] - mutation[maxIndexValue])) + (phi * position * (selection[i] - selection[maxIndexValue])));
+			codonProb[i] = std::exp(((mutation[i] - mutation[maxIndexValue])) + (phi * position * (selection[i] - selection[maxIndexValue]) * 4.0));
 			denominator += codonProb[i];
 		}
-		codonProb[numCodons - 1] = std::exp((-1.0 * mutation[maxIndexValue]) - (phi * position * selection[maxIndexValue]));
+		codonProb[numCodons - 1] = std::exp((-1.0 * mutation[maxIndexValue]) - (phi * position * selection[maxIndexValue] * 4.0));
 		denominator += codonProb[numCodons - 1];
 	}
 	else {
 		denominator = 1.0;
 		for (unsigned i = 0u; i < (numCodons - 1); i++) {
-			codonProb[i] = std::exp((mutation[i]) + (phi * position * selection[i]));
+			codonProb[i] = std::exp((mutation[i]) + (phi * position * selection[i] * 4.0));
 			denominator += codonProb[i];
 		}
 		codonProb[numCodons - 1] = 1.0;
