@@ -543,8 +543,8 @@ test_that("Index to AA", {
 })
 
 test_that("Index to Codon", {
-  expect_equal(indexToCodon("GCA", FALSE), 0) 
-  expect_equal(indexToCodon("GCC", FALSE), 1)
+  expect_equal(indexToCodon(0, FALSE), "GCA") 
+  expect_equal(indexToCodon(1, FALSE), "GCC")
   expect_equal(indexToCodon("GCG", FALSE), 2)
   expect_equal(indexToCodon("GCT", FALSE), 3)
   expect_equal(indexToCodon("TGC", FALSE), 4)
@@ -681,3 +681,72 @@ test_that("Amino Acid Vector", {
   "Z",
   "X"))
 }) 
+
+test_that("Codon Vector", {
+  expect_equal(codons(), c(
+    "GCA", 
+    "GCC",
+    "GCG",
+    "GCT",
+    "TGC",
+    "TGT",
+    "GAC",
+    "GAT",
+    "GAA",
+    "GAG",
+    "TTC",
+    "TTT",
+    "GGA",
+    "GGC",
+    "GGG",
+    "GGT",
+    "CAC",
+    "CAT",
+    "ATA",
+    "ATC",
+    "ATT",
+    "AAA",
+    "AAG",
+    "CTA",
+    "CTC",
+    "CTG",
+    "CTT",
+    "TTA",
+    "TTG",
+    "ATG",
+    "AAC",
+    "AAT",
+    "CCA",
+    "CCC",
+    "CCG",
+    "CCT",
+    "CAA",
+    "CAG",
+    "AGA",
+    "AGG",
+    "CGA",
+    "CGC",
+    "CGG",
+    "CGT",
+    "TCA",
+    "TCC",
+    "TCG",
+    "TCT",
+    "ACA",
+    "ACC",
+    "ACG",
+    "ACT",
+    "GTA",
+    "GTC",
+    "GTG",
+    "GTT",
+    "TGG",
+    "TAC",
+    "TAT",
+    "AGC",
+    "AGT",
+    "TAA",
+    "TAG",
+    "TGA"
+  ))
+})
