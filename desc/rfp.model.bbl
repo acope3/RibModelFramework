@@ -1,0 +1,18 @@
+\begin{thebibliography}{}
+
+\bibitem[Gilchrist and Wagner(2006)Gilchrist and Wagner]{GilchristAndWagner06}
+Gilchrist, M.~A. and Wagner, A. (2006).
+\newblock A model of protein translation including codon bias, nonsense errors,
+  and ribosome recycling.
+\newblock {\em Journal of Theoretical Biology\/}, {\bf 239}, 417--434.
+
+\bibitem[Pop {\em et~al.}(2014)Pop, Rouskin, Ingolia, Han, Phizicky, Weissman,
+  and Koller]{PopEtAl14}
+Pop, C., Rouskin, S., Ingolia, N.~T., Han, L., Phizicky, E.~M., Weissman,
+  J.~S., and Koller, D. (2014).
+\newblock Causal signals between codon bias, mrna structure, and the efficiency
+  of translation and elongation.
+\newblock {\em Molecular Systems Biology\/}, {\bf 10}(12), 770.
+\newblock 770.
+
+\end{thebibliography}
