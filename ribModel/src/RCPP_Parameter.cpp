@@ -52,21 +52,17 @@ RCPP_MODULE(Parameter_mod)
 		.method("initCovarianceMatrix", &ROCParameter::initCovarianceMatrix)
 		.method("getCovarianceMatrixForAA", &ROCParameter::getCovarianceMatrixForAA)
 
-		//R wrapper functions
+
 		.method("calculateSelectionCoefficients", &ROCParameter::calculateSelectionCoefficientsR)
 		
 
-		// Posterior functions
 		.method("getSphiPosteriorMean", &ROCParameter::getSphiPosteriorMean)
 
-		//R wrapper functions
 		.method("getMutationPosteriorMeanForCodon", &ROCParameter::getMutationPosteriorMeanForCodon)
 		.method("getSelectionPosteriorMeanForCodon", &ROCParameter::getSelectionPosteriorMeanForCodon)
 
-		// Variance functions
 		.method("getSphiVariance", &ROCParameter::getSphiVariance)
 
-		//R wrapper functions
 		.method("getMutationVarianceForCodon", &ROCParameter::getMutationVarianceForCodon)
 		.method("getSelectionVarianceForCodon", &ROCParameter::getSelectionVarianceForCodon)
 
@@ -77,9 +73,12 @@ RCPP_MODULE(Parameter_mod)
 		.constructor <std::string>()
 		.constructor <double, std::vector<unsigned>, std::vector<unsigned>, bool>()
 		.constructor <double, unsigned, std::vector<unsigned>, bool, std::string>()
-		
+
+		.method("initAlpha", &RFPParameter::initAlphaR)
+		.method("initLambdaPrime", &RFPParameter::initLambdaPrimeR)
 		.method("getTraceObject", &RFPParameter::getTraceObject)
-		.method("getParameterForCategory", &RFPParameter::getParameterForCategoryR) //need to implement the R wrapper
+		.method("getParameterForCategory", &RFPParameter::getParameterForCategoryR)
+		.method("initMutationSelectionCategories", &RFPParameter::initMutationSelectionCategoriesR)
 		.method("getAlphaPosteriorMeanForCodon", &RFPParameter::getAlphaPosteriorMeanForCodon)
 		.method("getLambdaPrimePosteriorMeanForCodon", &RFPParameter::getLambdaPrimePosteriorMeanForCodon)
 		.method("getAlphaVarianceForCodon", &RFPParameter::getAlphaVarianceForCodon)

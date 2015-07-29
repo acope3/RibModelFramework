@@ -1,13 +1,18 @@
 #include "include/RFP/RFPParameter.h"
+
+
 #include <sstream>
+
+
 #ifndef STANDALONE
 #include <Rcpp.h>
 using namespace Rcpp;
 #endif
 
-//Constructors & Destructors:
+
 RFPParameter::RFPParameter() : Parameter()
 {
+	//ctor
 }
 
 
@@ -32,6 +37,7 @@ RFPParameter::~RFPParameter()
 	//TODO: Need to call Parameter's deconstructor
 }
 
+
 RFPParameter& RFPParameter::operator=(const RFPParameter& rhs)
 {
 	if (this == &rhs) return *this; // handle self assignment
@@ -53,7 +59,6 @@ RFPParameter& RFPParameter::operator=(const RFPParameter& rhs)
 }
 
 
-//Initialization functions:
 void RFPParameter::initRFPParameterSet()
 {
 
@@ -138,20 +143,16 @@ void RFPParameter::initMutationSelectionCategories(std::vector<std::string> file
 		currentFile >> tmpString; //trash the first line, no info given.
 
 		unsigned j = 0;
+		//expecting CTG.alpha,3.239 as the current format
 		while (currentFile >> tmpString)
 		{
 			std::size_t pos = tmpString.find(",");
-			std::size_t pos2 = tmpString.find(",", pos + 1);
-			if (pos != std::string::npos && pos2 != std::string::npos)
+			std::string val = tmpString.substr(pos + 1, std::string::npos);
+			if (tmpString.find(type) != std::string::npos) //alpha or lambda was found
 			{
-				std::string val = tmpString.substr(pos + 1, pos2 - (pos + 1));
-				if (tmpString.find(type) != std::string::npos) //alpha or lambda was found
-				{
-					temp[j] = std::atof(val.c_str());
-					j++;
-					if (j == numParam)
-						break;
-				}
+				temp[j] = std::atof(val.c_str());
+				j++;
+				if (j == numParam) break;
 			}
 		}
 		unsigned altered = 0u;
@@ -177,7 +178,6 @@ void RFPParameter::initMutationSelectionCategories(std::vector<std::string> file
 }
 
 
-//Restart file functions:
 void RFPParameter::writeEntireRestartFile(std::string filename)
 {
 	writeBasicRestartFile(filename);
@@ -249,6 +249,7 @@ void RFPParameter::writeRFPRestartFile(std::string filename)
 	out.close();
 
 }
+
 
 void RFPParameter::initFromRestartFile(std::string filename)
 {
@@ -362,7 +363,49 @@ void RFPParameter::initRFPValuesFromFile(std::string filename)
 }
 
 
-//Codon Specific Parameter functions:
+RFPTrace& RFPParameter::getTraceObject()
+{
+	return traces;
+}
+
+
+void RFPParameter::initAllTraces(unsigned samples, unsigned num_genes)
+{
+	traces.initAllTraces(samples, num_genes, numMutationCategories, numSelectionCategories, numParam,
+						 numMixtures, categories, (unsigned)groupList.size());
+}
+
+
+void RFPParameter::updateSphiTrace(unsigned sample)
+{
+	traces.updateSphiTrace(sample, Sphi);
+}
+
+
+void RFPParameter::updateSynthesisRateTrace(unsigned sample, unsigned geneIndex)
+{
+	traces.updateSynthesisRateTrace(sample, geneIndex, currentSynthesisRateLevel);
+}
+
+
+void RFPParameter::updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex)
+{
+	traces.updateMixtureAssignmentTrace(sample, geneIndex, mixtureAssignment[geneIndex]);
+}
+
+
+void RFPParameter::updateMixtureProbabilitiesTrace(unsigned samples)
+{
+	traces.updateMixtureProbabilitiesTrace(samples, categoryProbabilities);
+}
+
+
+void RFPParameter::updateCodonSpecificParameterTrace(unsigned sample, std::string codon)
+{
+	traces.updateCodonSpecificParameterTrace(sample, codon, currentLambdaPrimeParameter, currentAlphaParameter);
+}
+
+
 void RFPParameter::updateCodonSpecificParameter(std::string grouping)
 {
 	unsigned i = SequenceSummary::codonToIndex(grouping);
@@ -385,7 +428,18 @@ double RFPParameter::getCurrentCodonSpecificProposalWidth(unsigned index)
 }
 
 
-//TODO: Are we wanting to use a Covaraince Matrix structure?
+std::vector<std::vector<double>> RFPParameter::getCurrentAlphaParameter()
+{
+	return currentAlphaParameter;
+}
+
+
+std::vector<std::vector<double>> RFPParameter::getCurrentLambdaPrimeParameter()
+{
+	return currentLambdaPrimeParameter;
+}
+
+
 void RFPParameter::proposeCodonSpecificParameter()
 {
 	unsigned numAlpha = (unsigned)currentAlphaParameter[0].size();
@@ -409,8 +463,6 @@ void RFPParameter::proposeCodonSpecificParameter()
 }
 
 
-//functions to manage proposal widths:
-//TODO: Does not use a Covaraince Matrix if we need them.
 void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
 {
 
@@ -437,8 +489,7 @@ void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 }
 
 
-//TODO: The only thing stopping this from moving up to Parameter is the trace
-//stuff. Is there a way around this?
+//TODO: The only thing stopping this from moving up to Parameter is the trace stuff. Is there a way around this?
 void RFPParameter::adaptSphiProposalWidth(unsigned adaptationWidth)
 {
 	double acceptanceLevel = (double)numAcceptForSphi / (double)adaptationWidth;
@@ -455,8 +506,7 @@ void RFPParameter::adaptSphiProposalWidth(unsigned adaptationWidth)
 }
 
 
-//TODO: The only thing stopping this from moving up to Parameter is the trace
-//stuff. Is there a way around this?
+//TODO: The only thing stopping this from moving up to Parameter is the trace stuff. Is there a way around this?
 void RFPParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
 {
 	for(unsigned cat = 0u; cat < numSelectionCategories; cat ++)
@@ -480,13 +530,12 @@ void RFPParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
 }
 
 
-//Posterior Mean Functions:
 //TODO: Traces prevent this from being in the parent class
 double RFPParameter::getSphiPosteriorMean(unsigned samples)
 {
 	double posteriorMean = 0.0;
 	std::vector<double> sPhiTrace = traces.getSPhiTrace();
-	unsigned traceLength = sPhiTrace.size();
+	unsigned traceLength = (unsigned)sPhiTrace.size();
 
 	if(samples > traceLength)
 	{
@@ -509,7 +558,7 @@ double RFPParameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned ge
 	unsigned expressionCategory = getSynthesisRateCategory(mixtureElement);
 	double posteriorMean = 0.0;
 	std::vector<double> synthesisRateTrace = traces.getSynthesisRateTraceByMixtureElementForGene(mixtureElement, geneIndex);
-	unsigned traceLength = synthesisRateTrace.size();
+	unsigned traceLength = (unsigned)synthesisRateTrace.size();
 
 
 	if(samples > traceLength)
@@ -541,7 +590,7 @@ double RFPParameter::getAlphaPosteriorMean(unsigned mixtureElement, unsigned sam
 {
 	double posteriorMean = 0.0;
 	std::vector<double> alphaParameterTrace = traces.getAlphaParameterTraceByMixtureElementForCodon(mixtureElement, codon);
-	unsigned traceLength = alphaParameterTrace.size();
+	unsigned traceLength = (unsigned)alphaParameterTrace.size();
 
 	if(samples > traceLength)
 	{
@@ -562,7 +611,7 @@ double RFPParameter::getLambdaPrimePosteriorMean(unsigned mixtureElement, unsign
 {
 	double posteriorMean = 0.0;
 	std::vector<double> lambdaPrimeParameterTrace = traces.getLambdaPrimeParameterTraceByMixtureElementForCodon(mixtureElement, codon);
-	unsigned traceLength = lambdaPrimeParameterTrace.size();
+	unsigned traceLength = (unsigned)lambdaPrimeParameterTrace.size();
 
 	if(samples > traceLength)
 	{
@@ -579,13 +628,11 @@ double RFPParameter::getLambdaPrimePosteriorMean(unsigned mixtureElement, unsign
 }
 
 
-
-//Variance Functions:
 //TODO: Traces prevent this from being in the parent class
 double RFPParameter::getSphiVariance(unsigned samples, bool unbiased)
 {
 	std::vector<double> sPhiTrace = traces.getSPhiTrace();
-	unsigned traceLength = sPhiTrace.size();
+	unsigned traceLength = (unsigned)sPhiTrace.size();
 	if(samples > traceLength)
 	{
 		std::cerr << "Warning in Parameter::getSphiVariance throws: Number of anticipated samples (" <<
@@ -611,7 +658,7 @@ double RFPParameter::getSphiVariance(unsigned samples, bool unbiased)
 double RFPParameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement, bool unbiased)
 {
 	std::vector<double> synthesisRateTrace = traces.getSynthesisRateTraceByMixtureElementForGene(mixtureElement, geneIndex);
-	unsigned traceLength = synthesisRateTrace.size();
+	unsigned traceLength = (unsigned)synthesisRateTrace.size();
 	if(samples > traceLength)
 	{
 		std::cerr << "Warning in Parameter::getSynthesisRateVariance throws: Number of anticipated samples (" <<
@@ -644,7 +691,7 @@ double RFPParameter::getSynthesisRateVariance(unsigned samples, unsigned geneInd
 double RFPParameter::getAlphaVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased)
 {
 	std::vector<double> alphaParameterTrace = traces.getAlphaParameterTraceByMixtureElementForCodon(mixtureElement, codon);
-	unsigned traceLength = alphaParameterTrace.size();
+	unsigned traceLength = (unsigned)alphaParameterTrace.size();
 	if(samples > traceLength)
 	{
 		std::cerr << "Warning in RFPParameter::getAlphaVariance throws: Number of anticipated samples (" <<
@@ -671,7 +718,7 @@ double RFPParameter::getAlphaVariance(unsigned mixtureElement, unsigned samples,
 double RFPParameter::getLambdaPrimeVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased)
 {
 	std::vector<double> lambdaPrimeParameterTrace = traces.getLambdaPrimeParameterTraceByMixtureElementForCodon(mixtureElement, codon);
-	unsigned traceLength = lambdaPrimeParameterTrace.size();
+	unsigned traceLength = (unsigned)lambdaPrimeParameterTrace.size();
 	if(samples > traceLength)
 	{
 		std::cerr << "Warning in RFPParameter::getSelectionVariance throws: Number of anticipated samples (" <<
@@ -695,7 +742,6 @@ double RFPParameter::getLambdaPrimeVariance(unsigned mixtureElement, unsigned sa
 }
 
 
-//Other functions:
 double RFPParameter::getParameterForCategory(unsigned category, unsigned paramType, std::string codon, bool proposal)
 {
 	double rv;
@@ -724,7 +770,7 @@ std::vector <double> RFPParameter::getEstimatedMixtureAssignmentProbabilities(un
 {
 	std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
 	std::vector<double> probabilities(numMixtures, 0.0);
-	unsigned traceLength = mixtureAssignmentTrace.size();
+	unsigned traceLength = (unsigned)mixtureAssignmentTrace.size();
 
 	if (samples > traceLength)
 	{
@@ -748,20 +794,23 @@ std::vector <double> RFPParameter::getEstimatedMixtureAssignmentProbabilities(un
 }
 
 
-//Statics:
+//---------------------STATIC VARIABLE DECLARATIONS---------------------//
+
 const unsigned RFPParameter::alp = 0u;
 const unsigned RFPParameter::lmPri = 1u;
 
-//R Wrapper functions:
+
+//---------------------R WRAPPER FUNCTIONS---------------------//
+
 void RFPParameter::initAlphaR(double alphaValue, unsigned mixtureElement, std::string codon)
 {
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
 	if (check)
 	{
 		mixtureElement--;
-		codon[0] = std::toupper(codon[0]);
-		codon[1] = std::toupper(codon[1]);
-		codon[2] = std::toupper(codon[2]);
+		codon[0] = (char)std::toupper(codon[0]);
+		codon[1] = (char)std::toupper(codon[1]);
+		codon[2] = (char)std::toupper(codon[2]);
 
 		initAlpha(alphaValue, mixtureElement, codon);
 	}
@@ -774,9 +823,9 @@ void RFPParameter::initLambdaPrimeR(double lambdaPrimeValue, unsigned mixtureEle
 	if (check)
 	{
 		mixtureElement--;
-		codon[0] = std::toupper(codon[0]);
-		codon[1] = std::toupper(codon[1]);
-		codon[2] = std::toupper(codon[2]);
+		codon[0] = (char)std::toupper(codon[0]);
+		codon[1] = (char)std::toupper(codon[1]);
+		codon[2] = (char)std::toupper(codon[2]);
 
 		initLambdaPrime(lambdaPrimeValue, mixtureElement, codon);
 	}
@@ -791,9 +840,9 @@ double RFPParameter::getParameterForCategoryR(unsigned mixtureElement, unsigned 
 	{
 		mixtureElement--;
 		unsigned category = 0;
-		codon[0] = std::toupper(codon[0]);
-		codon[1] = std::toupper(codon[1]);
-		codon[2] = std::toupper(codon[2]);
+		codon[0] = (char)std::toupper(codon[0]);
+		codon[1] = (char)std::toupper(codon[1]);
+		codon[2] = (char)std::toupper(codon[2]);
 		if (paramType == RFPParameter::alp)
 		{
 			//THIS NEEDS TO CHANGE!!!!
@@ -804,6 +853,97 @@ double RFPParameter::getParameterForCategoryR(unsigned mixtureElement, unsigned 
 			category = getSelectionCategory(mixtureElement);
 		}
 		rv = getParameterForCategory(category, paramType, codon, proposal);
+	}
+	return rv;
+}
+
+
+void RFPParameter::initMutationSelectionCategoriesR(std::vector<std::string> files, unsigned numCategories,
+													std::string paramType)
+{
+	unsigned value = 0;
+	bool check = true;
+	if (paramType == "Alpha")
+	{
+		value = RFPParameter::alp;
+	}
+	else if (paramType == "LambdaPrime")
+	{
+		value = RFPParameter::lmPri;
+	}
+	else
+	{
+		std::cerr << "Bad paramType given. Expected \"Alpha\" or \"LambdaPrime\".\nFunction not being executed!\n";
+		check = false;
+	}
+	if (files.size() != numCategories) //we have different sizes and need to stop
+	{
+		std::cerr
+		<< "The number of files given and the number of categories given differ. Function will not be executed!\n";
+		check = false;
+	}
+
+	if (check)
+	{
+		initMutationSelectionCategories(files, numCategories, value);
+	}
+}
+
+
+double RFPParameter::getAlphaPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
+{
+	double rv = -1.0;
+	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	codon[0] = (char) std::toupper(codon[0]);
+	codon[1] = (char) std::toupper(codon[1]);
+	codon[2] = (char) std::toupper(codon[2]);
+	if (check)
+	{
+		rv = getAlphaPosteriorMean(mixtureElement - 1, samples, codon);
+	}
+	return rv;
+}
+
+double RFPParameter::getLambdaPrimePosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
+{
+	double rv = -1.0;
+	codon[0] = (char) std::toupper(codon[0]);
+	codon[1] = (char) std::toupper(codon[1]);
+	codon[2] = (char) std::toupper(codon[2]);
+	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	if (check)
+	{
+		rv = getLambdaPrimePosteriorMean(mixtureElement - 1, samples, codon);
+	}
+	return rv;
+}
+
+
+double RFPParameter::getAlphaVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased)
+{
+	double rv = -1.0;
+	codon[0] = (char) std::toupper(codon[0]);
+	codon[1] = (char) std::toupper(codon[1]);
+	codon[2] = (char) std::toupper(codon[2]);
+	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	if (check)
+	{
+		rv = getAlphaVariance(mixtureElement - 1, samples, codon, unbiased);
+	}
+	return rv;
+}
+
+
+double RFPParameter::getLambdaPrimeVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased)
+{
+	double rv = -1.0;
+	codon[0] = (char) std::toupper(codon[0]);
+	codon[1] = (char) std::toupper(codon[1]);
+	codon[2] = (char) std::toupper(codon[2]);
+	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	if (check)
+	{
+		rv = getLambdaPrimeVariance(mixtureElement - 1, samples, codon, unbiased);
 	}
 	return rv;
 }
