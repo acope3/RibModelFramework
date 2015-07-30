@@ -142,21 +142,17 @@ void RFPParameter::initMutationSelectionCategories(std::vector<std::string> file
 		}
 		currentFile >> tmpString; //trash the first line, no info given.
 
-		unsigned j = 0;
-		//expecting CTG.alpha,3.239 as the current format
+		//expecting CTG,3.239 as the current format
 		while (currentFile >> tmpString)
 		{
-			std::size_t pos = tmpString.find(",");
+			std::string codon = tmpString.substr(0, 3);
+			std::size_t pos = tmpString.find(",", 3);
 			std::string val = tmpString.substr(pos + 1, std::string::npos);
-			if (tmpString.find(type) != std::string::npos) //alpha or lambda was found
-			{
-				temp[j] = std::atof(val.c_str());
-				j++;
-				if (j == numParam) break;
-			}
+			unsigned index = SequenceSummary::codonToIndex(codon, false);
+			temp[index] = std::atof(val.c_str());
 		}
 		unsigned altered = 0u;
-		for (j = 0; j < categories.size(); j++)
+		for (unsigned j = 0; j < categories.size(); j++)
 		{
 			if (paramType == RFPParameter::alp && categories[j].delM == i)
 			{

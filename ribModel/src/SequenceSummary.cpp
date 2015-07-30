@@ -517,6 +517,15 @@ unsigned SequenceSummary::GetNumCodonsForAA(std::string& aa, bool forParamVector
 }
 
 
+char SequenceSummary::complimentNucleotide(char ch)
+{
+	if( ch == 'A' ) return 'T';
+	else if( ch == 'T' ) return 'A';
+	else if( ch == 'C' ) return 'G';
+	else return 'C';
+}
+
+
 std::vector<std::string> SequenceSummary::aminoAcids()
 {
 	return AminoAcidArray;

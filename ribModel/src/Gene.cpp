@@ -1,11 +1,14 @@
 #include "include/Gene.h"
 
-#include <algorithm>
+
 #include <iostream>
+
+
 Gene::Gene() : seq(""), id(""), description("")
 {
-
+    //ctor
 }
+
 
 Gene::Gene(std::string _seq, std::string _id, std::string _desc) : seq(_seq), id(_id), description(_desc)
 {
@@ -21,6 +24,12 @@ Gene::Gene(std::string _seq, std::string _id, std::string _desc) : seq(_seq), id
 	}
 }
 
+Gene::~Gene()
+{
+    //dtor
+}
+
+
 Gene::Gene(const Gene& other)
 {
     seq = other.seq;
@@ -28,6 +37,7 @@ Gene::Gene(const Gene& other)
     description = other.description;
     geneData = other.geneData;
 }
+
 
 Gene& Gene::operator=(const Gene& rhs)
 {
@@ -40,9 +50,45 @@ Gene& Gene::operator=(const Gene& rhs)
     return *this;
 }
 
-Gene::~Gene()
+
+void Gene::cleanSeq()
 {
-    //dtor
+    std::string valid = "ACGTN";
+    for (unsigned i = 0; i < seq.length(); i++) {
+        if (valid.find(seq[i]) == std::string::npos) {
+            seq.erase(i);
+        }
+    }
+}
+
+
+std::string Gene::getId()
+{
+    return id;
+}
+
+
+void Gene::setId(std::string _id)
+{
+    id = _id;
+}
+
+
+std::string Gene::getDescription()
+{
+    return description;
+}
+
+
+void Gene::setDescription(std::string _desc)
+{
+    description = _desc;
+}
+
+
+std::string Gene::getSequence()
+{
+    return seq;
 }
 
 
@@ -66,6 +112,19 @@ void Gene::setSequence(std::string _seq)
 	}
 }
 
+
+SequenceSummary& Gene::getSequenceSummary()
+{
+    return geneData;
+}
+
+
+char Gene::getNucleotideAt(unsigned i)
+{
+    return seq[i];
+}
+
+
 void Gene::clear()
 {
   seq = "";
@@ -74,28 +133,11 @@ void Gene::clear()
   geneData.clear();
 }
 
-bool notNucleotide(char ch)
+unsigned Gene::length()
 {
-    std::string str = "ACGTN";
-    std::string ts(1,ch);
-    return ( str.find(ts) == std::string::npos );
+    return (unsigned)seq.size();
 }
 
-void Gene::cleanSeq()
-{
-  std::string::iterator endp = std::remove_if(seq.begin(), seq.end(), notNucleotide);
-  seq.erase(endp, seq.end());
-}
-
-char complimentNucleotide(char ch)
-{
-  //std::string str = "ACGT";
-  std::string ts(1,ch);
-  if( ch == 'A' ) return 'T';
-  else if( ch == 'T' ) return 'A';
-  else if( ch == 'C' ) return 'G';
-  else return 'C';
-}
 
 Gene Gene::reverseCompliment()
 {
@@ -106,7 +148,7 @@ Gene Gene::reverseCompliment()
 
   std::reverse_copy(seq.begin(), seq.end(), tmpGene.seq.begin());
   std::transform(tmpGene.seq.begin(), tmpGene.seq.end(), tmpGene.seq.begin(),
-            complimentNucleotide);
+            SequenceSummary::complimentNucleotide);
   return tmpGene;
 }
 
@@ -118,7 +160,6 @@ std::string Gene::toAAsequence()
     for(unsigned i = 0; i < seq.length(); i+=3)
     {
         std::string codon = seq.substr(i, 3);
-        //std::cout << codon << ": " << Gene::CodonToAA(codon) << "\n" << std::endl;
         aaseq += SequenceSummary::codonToAA(codon);
     }
     return aaseq;
@@ -133,27 +174,32 @@ std::string Gene::toAAsequence()
 #include <Rcpp.h>
 using namespace Rcpp;
 
-RCPP_EXPOSED_CLASS(Gene)
+RCPP_EXPOSED_CLASS(Gene) //Exposed because of functions that return a gene.
+RCPP_EXPOSED_CLASS(SequenceSummary)
 
 RCPP_MODULE(Gene_mod)
 {
   class_<Gene>( "Gene" )
     
-		.constructor("empty constructor")
+	.constructor("empty constructor")
     .constructor<std::string, std::string, std::string >("Initialize a gene by giving the id, description, and sequence string")
 
-		
-		.method("clear", &Gene::clear, "clears the id, sequence, and description in the object")
-    .method("length", &Gene::length, "returns the length of sequence")
-   
-		//R wrapper functions 
-		.method("getAACount", &Gene::getAACount, "returns the number of amino acids that are in the sequence for a given amino acid")
-		.method("getCodonCount", &Gene::getCodonCount, "returns the number of codons that are in the sequence for a given codon")
+    //Private functions:
+    //.method("cleanSeq", &Gene::cleanSeq) //TEST THAT ONLY!
 
-		//getter and setter properties
-		.property("id", &Gene::getId, &Gene::setId)
+
+	//Public functions:
+	.property("id", &Gene::getId, &Gene::setId)
     .property("description", &Gene::getDescription, &Gene::setDescription)
     .property("seq", &Gene::getSequence, &Gene::setSequence)
+    .method("getSequenceSummary", &Gene::getSequenceSummary) //TEST THAT ONLY!
+    .method("getNucleotideAt", &Gene::getNucleotideAt) //TEST THAT ONLY!
+	.method("clear", &Gene::clear, "clears the id, sequence, and description in the object")
+    .method("length", &Gene::length, "returns the length of sequence")
+
+
+	.method("getAACount", &Gene::getAACount, "returns the number of amino acids that are in the sequence for a given amino acid")
+	.method("getCodonCount", &Gene::getCodonCount, "returns the number of codons that are in the sequence for a given codon")
   ;
 }
 #endif
