@@ -158,19 +158,26 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 {
 	double denominator;
 
+	/* c_i = exp[\Delta M - (\phi * \beta(i) * \Delta \omega)]                  *
+	 * \beta(i) = a_1 + (i * a_2)                                               *	
+	 *                                                                          *
+	 * Right now a_1 and a_2 are set to 4.0. However, we are planning on making *
+	 * them hyperparameters in the future, since they are constant for the      *
+	 * entire genome.                                                           */
+
 	if (selection[maxIndexValue] > 0.0) {
 		denominator = 0.0;
 		for (unsigned i = 0u; i < (numCodons - 1); i++) {
-			codonProb[i] = std::exp(((mutation[i] - mutation[maxIndexValue])) + (phi * position * (selection[i] - selection[maxIndexValue]) * 4.0));
+			codonProb[i] = std::exp(((mutation[i] - mutation[maxIndexValue])) + (phi * (4.0 + (4.0 * position)) * (selection[i] - selection[maxIndexValue])));
 			denominator += codonProb[i];
 		}
-		codonProb[numCodons - 1] = std::exp((-1.0 * mutation[maxIndexValue]) - (phi * position * selection[maxIndexValue] * 4.0));
+		codonProb[numCodons - 1] = std::exp((-1.0 * mutation[maxIndexValue]) - (phi * (4.0 + (4.0 * position)) * selection[maxIndexValue]));
 		denominator += codonProb[numCodons - 1];
 	}
 	else {
 		denominator = 1.0;
 		for (unsigned i = 0u; i < (numCodons - 1); i++) {
-			codonProb[i] = std::exp((mutation[i]) + (phi * position * selection[i] * 4.0));
+			codonProb[i] = std::exp((mutation[i]) + (phi * (4.0 + (4.0 * position)) * selection[i]));
 			denominator += codonProb[i];
 		}
 		codonProb[numCodons - 1] = 1.0;
