@@ -74,8 +74,15 @@ for (i in 1:61)
   lambdaPrimeValues[i] <- parameter$getLambdaPrimePosteriorMeanForCodon(1, 30, codon)
 }
 
-m <- matrix(c(codonList[-c(62,63,64)], alphaValues, lambdaPrimeValues), ncol = 3, byrow = FALSE)
-colnames(m) <- c("Codon", "alpha", "lambda")
+m <- matrix(c(codonList[-c(62,63,64)], alphaValues), ncol = 2, byrow = FALSE)
+colnames(m) <- c("Codon", "Alpha")
+write.table(m, "RFPAlphaValues.csv", sep = ",", quote = F, row.names = F, col.names = T)
+
+m <- matrix(c(codonList[-c(62,63,64)], lambdaPrimeValues), ncol = 2, byrow = FALSE)
+colnames(m) <- c("Codon", "LambdaPrime")
+write.table(m, "RFPLambdaPrimeValues.csv", sep = ",", quote = F, row.names = F, col.names = T)
+
+phis <- parameter$getCurrentSynthesisRateForMixture(1)
+m <- matrix(c(rep("void", genome$getGenomeSize()), phis, phis), ncol = 3, byrow = FALSE)
+colnames(m) <- c("Gene", "PhiValue", "PhiValue")
 write.table(m, "RFPPhiValues.csv", sep = ",", quote = F, row.names = F, col.names = T)
-
-
