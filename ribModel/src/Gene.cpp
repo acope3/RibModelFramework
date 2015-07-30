@@ -51,6 +51,17 @@ Gene& Gene::operator=(const Gene& rhs)
 }
 
 
+void Gene::cleanSeq()
+{
+    std::string valid = "ACGTN";
+    for (unsigned i = 0; i < seq.length(); i++) {
+        if (valid.find(seq[i]) == std::string::npos) {
+            seq.erase(i);
+        }
+    }
+}
+
+
 std::string Gene::getId()
 {
     return id;
@@ -128,25 +139,6 @@ unsigned Gene::length()
 }
 
 
-void Gene::cleanSeq()
-{
-    std::string valid = "ACGTN";
-    for (unsigned i = 0; i < seq.length(); i++) {
-        if (valid.find(seq[i]) == std::string::npos) {
-            seq.erase(i);
-        }
-    }
-}
-
-
-char complimentNucleotide(char ch)
-{
-  if( ch == 'A' ) return 'T';
-  else if( ch == 'T' ) return 'A';
-  else if( ch == 'C' ) return 'G';
-  else return 'C';
-}
-
 Gene Gene::reverseCompliment()
 {
   Gene tmpGene;
@@ -156,7 +148,7 @@ Gene Gene::reverseCompliment()
 
   std::reverse_copy(seq.begin(), seq.end(), tmpGene.seq.begin());
   std::transform(tmpGene.seq.begin(), tmpGene.seq.end(), tmpGene.seq.begin(),
-            complimentNucleotide);
+            SequenceSummary::complimentNucleotide);
   return tmpGene;
 }
 
@@ -183,6 +175,7 @@ std::string Gene::toAAsequence()
 using namespace Rcpp;
 
 RCPP_EXPOSED_CLASS(Gene) //Exposed because of functions that return a gene.
+RCPP_EXPOSED_CLASS(SequenceSummary)
 
 RCPP_MODULE(Gene_mod)
 {
@@ -191,12 +184,14 @@ RCPP_MODULE(Gene_mod)
 	.constructor("empty constructor")
     .constructor<std::string, std::string, std::string >("Initialize a gene by giving the id, description, and sequence string")
 
+    //Private functions:
+    //.method("cleanSeq", &Gene::cleanSeq) //TEST THAT ONLY!
 
+
+	//Public functions:
 	.property("id", &Gene::getId, &Gene::setId)
     .property("description", &Gene::getDescription, &Gene::setDescription)
     .property("seq", &Gene::getSequence, &Gene::setSequence)
-
-
     .method("getSequenceSummary", &Gene::getSequenceSummary) //TEST THAT ONLY!
     .method("getNucleotideAt", &Gene::getNucleotideAt) //TEST THAT ONLY!
 	.method("clear", &Gene::clear, "clears the id, sequence, and description in the object")

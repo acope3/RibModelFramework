@@ -16,6 +16,25 @@ parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssig
 
 #init from "true" values
 
-#DO I NEED THE PREVIOUS PHI VALUES???????
-parameter$initMutationSelectionCategories("FILENAME HERE", 1, "Alpha")
-parameter$initMutationSelectionCategories("FILENAME HERE", 1, "LambdaPrime")
+phiVals <- parameter$readPhiValues( "../ribModel/data/RFPPhiValues.csv" )
+parameter$initializeSynthesisRateByRandom(phiVals)
+parameter$initMutationSelectionCategories(c("../ribModel/data/RFPAlphaValues.csv"), 1, "Alpha")
+parameter$initMutationSelectionCategories(c("../ribModel/data/RFPLambdaPrimeValues.csv"), 1, "LambdaPrime")
+
+
+# initialize MCMC object
+samples <- 100
+thining <- 10
+adaptiveWidth <- 10
+mcmc <- initializeMCMCObject(samples=samples, thining=thining, adaptive.width=adaptiveWidth, 
+                             est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
+# get model object
+model <- initializeModelObject(parameter, "RFP")
+
+setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth, TRUE)
+
+#run mcmc on genome with parameter using model
+system.time(
+  runMCMC(mcmc, genome, model)
+)
+
