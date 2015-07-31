@@ -103,6 +103,13 @@ unsigned SequenceSummary::getCodonCountForCodon(unsigned codonIndex)
 }
 
 
+
+unsigned SequenceSummary::getRFPObserved(std::string codon)
+{
+	return RFPObserved[codonToIndex(codon)];
+}
+
+
 unsigned SequenceSummary::getRFPObserved(unsigned codonIndex)
 {
 	return RFPObserved[codonIndex];
@@ -112,6 +119,13 @@ unsigned SequenceSummary::getRFPObserved(unsigned codonIndex)
 void SequenceSummary::setRFPObserved(unsigned codonIndex, unsigned value)
 {
 	RFPObserved[codonIndex] = value;
+}
+
+
+std::vector <unsigned> SequenceSummary::getCodonPositions(std::string codon)
+{
+	unsigned codonIndex = codonToIndex(codon);
+	return getCodonPositions(codonIndex);
 }
 
 
@@ -501,7 +515,6 @@ std::string SequenceSummary::indexToCodon(unsigned index, bool forParamVector)
 }
 
 
-
 unsigned SequenceSummary::GetNumCodonsForAA(std::string& aa, bool forParamVector)
 {
 	aa[0] = (char) std::toupper(aa[0]);
@@ -580,6 +593,36 @@ unsigned SequenceSummary::getCodonCountForCodonIndexR(unsigned codonIndex)
 }
 
 
+unsigned SequenceSummary::getRFPObservedForCodonR(std::string codon)
+{
+	codon[0] = (char) std::toupper(codon[0]);
+	codon[1] = (char) std::toupper(codon[1]);
+	codon[2] = (char) std::toupper(codon[2]);
+	return getRFPObserved(codon);
+
+}
+
+
+unsigned SequenceSummary::getRFPObservedForCodonIndexR(unsigned codonIndex)
+{
+	return getRFPObserved(codonIndex);
+}
+
+
+std::vector <unsigned> SequenceSummary::getCodonPositionsForCodonR(std::string codon)
+{
+	codon[0] = (char) std::toupper(codon[0]);
+	codon[1] = (char) std::toupper(codon[1]);
+	codon[2] = (char) std::toupper(codon[2]);
+	return getCodonPositions(codon);
+}
+
+std::vector <unsigned> SequenceSummary::getCodonPositionsForCodonIndexR(unsigned codonIndex)
+{
+	return getCodonPositions(codonIndex);
+}
+
+
 
 // ---------------------------------------------------------------------------
 // ----------------------------- RCPP MODULE ---------------------------------
@@ -597,9 +640,12 @@ RCPP_MODULE(SequenceSummary_mod)
 		.method("getAACountForAAIndex", &SequenceSummary::getAACountForAAIndexR) //TEST THAT ONLY!
 		.method("getCodonCountForCodon", &SequenceSummary::getCodonCountForCodonR, "returns occurrence of given codon in sequence")
 		.method("getCodonCountForCodonIndex", &SequenceSummary::getCodonCountForCodonIndexR, "returns occurrence of given codon in sequence") //TEST THAT ONLY
-		.method("getRFPObserved", &SequenceSummary::getRFPObserved) //TEST THAT ONLY!
+		.method("getRFPObservedForCodon", &SequenceSummary::getRFPObservedForCodonR)
+		.method("getRFPObservedForCodonIndex", &SequenceSummary::getRFPObservedForCodonIndexR) //TEST THAT ONLY!
 		.method("setRFPObserved", &SequenceSummary::setRFPObserved) //TEST THAT ONLY!
-		.method("getCodonPositions", &SequenceSummary::getCodonPositions) //TEST THAT ONLY!
+		.method("getCodonPositionsForCodon", &SequenceSummary::getCodonPositionsForCodonR)
+		.method("getCodonPositionsForCodonIndex", &SequenceSummary::getCodonPositionsForCodonIndexR) //TEST THAT ONLY!
+
 		.method("clear", &SequenceSummary::clear, "removes all data from object")
 		.method("processSequence", &SequenceSummary::processSequence, "generates codon and amino acid count for sequence")
 		;
@@ -618,6 +664,7 @@ RCPP_MODULE(SequenceSummary_mod)
 		function("indexToCodon", &SequenceSummary::indexToCodon); //TEST THAT ONLY!
 		function("GetNumCodonsForAA", &SequenceSummary::GetNumCodonsForAA,
 			List::create(_["aa"], _["forParamVector"] = false), "returns the number of codons for a given amino acid");
+		function("complimentNucleotide", &SequenceSummary::complimentNucleotide) //TEST THAT ONLY!
 		function("aminoAcids", &SequenceSummary::aminoAcids, "returns all Amino Acids as one letter code");
 		function("codons", &SequenceSummary::codons, "returns all codons or all reference codons");
 

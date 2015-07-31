@@ -445,6 +445,37 @@ void testInitMutationSelection()
 
 }
 
+void testRFPVarianceAndMean()
+{
+	Genome genome;
+	genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
+	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+	{
+		geneAssignment[i] = 0u;
+	}
+	double sphi_init = 2;
+	unsigned numMixtures = 1;
+	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
+	RFPParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
+
+	std::cout <<"about to calculate\n";
+	tmp.calculateRFPMean(genome);
+
+	Genome genome2;
+	genome2.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/SimulatedRFPData.csv");
+	std::vector<unsigned> geneAssignment2(genome2.getGenomeSize());
+	for (unsigned i = 0u; i < genome2.getGenomeSize(); i++)
+	{
+		geneAssignment2[i] = 0u;
+	}
+	RFPParameter tmp2(sphi_init, numMixtures, geneAssignment2, mixtureDefinitionMatrix, true, "allUnique");
+
+	tmp2.calculateRFPMean(genome2);
+
+
+}
+
 int main()
 {
 
@@ -472,10 +503,11 @@ int main()
 		//testInitFromRestartFile();
 		//testReadRFPFile();
 		//testReadObservedPhis();
-		simulateRFPData();
+		//simulateRFPData();
 		//simulateROCData();
 		//testCodonToIndex();
 		//testInitMutationSelection();
+		testRFPVarianceAndMean();
 	}
 	else //not doing unit testing, running a model
 	{
