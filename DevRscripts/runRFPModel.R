@@ -56,6 +56,7 @@ cat <- 1
 proposal <- FALSE
 alphaList <- numeric (61)
 lambdaPrimeList <- numeric (61)
+waitingTimes <- numeric(61)
 codonList <- codons()
 i <- 1
 for (i in 1:61)
@@ -63,6 +64,7 @@ for (i in 1:61)
   codon <- codonList[i]
   alphaList[i] <- parameter$getParameterForCategory(cat, 0, codon, FALSE)
   lambdaPrimeList[i] <- parameter$getParameterForCategory(cat, 1, codon, FALSE)
+  waitingTimes[i] <- alphaList[i] * lambdaPrimeList[i]
 }
 plot(NULL, NULL, xlim=range(alphaList, na.rm = T), ylim=range(lambdaPrimeList), 
      main = "Correlation Between Alpha and Lambda Prime", xlab = "alpha", ylab = "lambdaPrime")
@@ -70,6 +72,19 @@ upper.panel.plot(alphaList, lambdaPrimeList)
 dev.off()
 
 
+#corrolation between RFPModel and Premal's data
+X <- read.table("codon.specific.translation.rates.table.csv", header = TRUE, sep =",")
+X <- X[order(X[,1]) , ]
+
+XM <- matrix(c(X[,1], X[,2]), ncol = 2, byrow = FALSE)
+Y <- matrix(c(codonList[-c(62,63,64)], waitingTimes), ncol = 2, byrow = FALSE)
+colnames(Y) <- c("Codon", "PausingTime")
+Y <- Y[order(Y[,1]) , ]
+
+plot(NULL, NULL, xlim=range(XM[,2], na.rm = T), ylim=range(Y[,2]), 
+     main = "Correlation Between True and RFP Model Pausing Times", xlab = "True Values", ylab = "Run Values")
+upper.panel.plot(XM[,2], Y[,2])
+dev.off()
 
 #Will write csv files based off posterior for alpha, lambda prime, and phi
 alphaValues <- numeric(61)
