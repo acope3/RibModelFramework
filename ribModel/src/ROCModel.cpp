@@ -31,7 +31,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 #ifndef __APPLE__
 #pragma omp parallel for private(mutation, selection, codonCount) reduction(+:logLikelihood,logLikelihood_proposed)
 #endif
-	for(unsigned i = 0; i < getGroupListSize(); i++)
+	for(int i = 0; i < getGroupListSize(); i++)
 	{
 		std::string curAA = getGrouping(i);
 
@@ -48,6 +48,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 
 		// prepare array for codon counts for AA
 		//int* codonCount = new int[numCodons]();
+
 		obtainCodonCount(seqsum, curAA, codonCount);
 
 		logLikelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);

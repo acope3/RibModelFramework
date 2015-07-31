@@ -61,8 +61,13 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	unsigned numSynthesisRateCategories = model.getNumSynthesisRateCategories();
 	unsigned numMixtures = model.getNumMixtureElements();
 	double* dirichletParameters = new double[numMixtures]();
+	
+	for (unsigned i = 0u; i < numMixtures; i++) {
+		dirichletParameters[i] = 0.0;
+	}
+
 	//initialize parameter's size
-	#pragma omp parallel for //shared(parameter)
+	#pragma omp parallel for reduction(+:logLikelihood)
 	for(int i = 0; i < numGenes; i++)
 	{
 		Gene gene = genome.getGene(i);
@@ -78,12 +83,28 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			 => ln(P) = ln(P') - ln(c)
 			 Note that we use invere sign because our values of ln(f) and ln(f') are negative.
 		 */        
+		
+		double maxValue = -1000000.0;
+		unsigned mixtureIndex = 0u;
+		
 		double* unscaledLogProb_curr = new double[numSynthesisRateCategories]();
 		double* unscaledLogProb_prop = new double[numSynthesisRateCategories]();
 
 		double* unscaledLogProb_curr_singleMixture = new double[numMixtures]();
-		double maxValue = -1000000.0;
-		unsigned mixtureIndex = 0u;
+		double* probabilities = new double[numMixtures]();
+
+		for (unsigned j = 0u; j < numMixtures; j++) 
+		{
+			probabilities[j] = 0.0;
+			unscaledLogProb_curr_singleMixture[j] = 0.0;
+		}
+
+		for (unsigned j = 0u; j < numSynthesisRateCategories; j++)
+		{
+			unscaledLogProb_curr[j] = 0.0;
+			unscaledLogProb_prop[j] = 0.0;
+		}
+		
 		for(unsigned k = 0u; k < numSynthesisRateCategories; k++)
 		{
 			// logProbabilityRatio contains the logProbabilityRatio in element 0,
@@ -104,7 +125,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				mixtureIndex++;
 			}
 		}
-		unsigned mixtureAssignmentOfGene = model.getMixtureAssignment(i);
+//		unsigned mixtureAssignmentOfGene = model.getMixtureAssignment(i);
 		for(unsigned k = 0u; k < numSynthesisRateCategories; k++)
 		{
 			// We do not need to add std::log(model.getCategoryProbability(k)) since it will cancel in the ratio!
@@ -114,11 +135,11 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			{
 				model.updateSynthesisRate(i, k);
 				// only count each gene once, not numSynthesisRateCategories times
-				#pragma omp critical
+				//#pragma omp critical
 				logLikelihood += model.getCategoryProbability(k) * propLogLike;
 			}else{
 				// only count each gene once, not numSynthesisRateCategories times
-				#pragma omp critical
+				//#pragma omp critical
 				logLikelihood += model.getCategoryProbability(k) * currLogLike;
 			}
 		}
@@ -128,7 +149,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		// ln(f') = ln(c) + ln(f)
 		// calculate ln(P) = ln( Sum(p_i*f'(...)) ) and obtain normalizing constant for new p_i
 		double normalizingProbabilityConstant = 0.0;
-		double* probabilities = new double[numMixtures]();
+		
 		for(unsigned k = 0u; k < numMixtures; k++)
 		{
 			unscaledLogProb_curr_singleMixture[k] -= maxValue;
@@ -152,10 +173,10 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			model.updateSynthesisRateTrace(iteration/thining, i);
 			model.updateMixtureAssignmentTrace(iteration/thining, i);
 		}
-		delete [] probabilities;
-		delete [] unscaledLogProb_curr_singleMixture;
-		delete [] unscaledLogProb_prop;
-		delete [] unscaledLogProb_curr;
+		//delete [] probabilities;
+		//delete [] unscaledLogProb_curr_singleMixture;
+		//delete [] unscaledLogProb_prop;
+		//delete [] unscaledLogProb_curr;
 	}
 	double* newMixtureProbabilities = new double[numMixtures]();
 	Parameter::randDirichlet(dirichletParameters, numMixtures, newMixtureProbabilities);

@@ -29,7 +29,7 @@ setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth, TRUE)
 
 #run mcmc on genome with parameter using model
 system.time(
-  runMCMC(mcmc, genome, model)
+  runMCMC(mcmc, genome, model, 8)
 )
 
 

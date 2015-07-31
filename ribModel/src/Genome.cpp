@@ -64,7 +64,7 @@ void Genome::writeFasta (std::string filename, bool simulated)
 				for(unsigned i = 0u; i < simulatedGenes.size(); i++)
 				{
 					Fout << ">" << simulatedGenes[i].getId() << " " << simulatedGenes[i].getDescription() <<"\n";
-					for(int j = 0; j < simulatedGenes[i].length(); j++)
+					for(unsigned j = 0u; j < simulatedGenes[i].length(); j++)
 					{
 						Fout << simulatedGenes[i].getNucleotideAt(j);
 						if((j + 1) % 60 == 0) Fout << std::endl;
@@ -77,7 +77,7 @@ void Genome::writeFasta (std::string filename, bool simulated)
 				for(unsigned i = 0u; i < genes.size(); i++)
 				{
 					Fout << ">" << genes[i].getId() << " " << genes[i].getDescription() << std::endl;
-					for(int j = 0; j < genes[i].length(); j++)
+					for(unsigned j = 0u; j < genes[i].length(); j++)
 					{
 						Fout << genes[i].getNucleotideAt(j);
 						if((j + 1) % 60 == 0) Fout << std::endl;

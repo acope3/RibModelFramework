@@ -54,7 +54,7 @@ void RFPModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 #ifndef __APPLE__
 #pragma omp parallel for reduction(+:logLikelihood,logLikelihood_proposed)
 #endif
-	for (unsigned index = 0; index < getGroupListSize(); index++) //number of codons, without the stop codons
+	for (int index = 0; index < getGroupListSize(); index++) //number of codons, without the stop codons
 	{
 		std::string codon = getGrouping(index);
 
@@ -92,7 +92,7 @@ void RFPModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 #ifndef __APPLE__
 #pragma omp parallel for private(gene) reduction(+:logLikelihood,logLikelihood_proposed)
 #endif
-	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+	for (int i = 0u; i < genome.getGenomeSize(); i++)
 	{
 		gene = &genome.getGene(i);
 		// which mixture element does this gene belong to
