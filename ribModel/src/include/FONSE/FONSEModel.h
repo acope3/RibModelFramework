@@ -11,7 +11,6 @@ class FONSEModel : public Model
 private:
 
 	FONSEParameter *parameter;
-	double calculateLogLikelihoodPerPositionPerGene(unsigned position, unsigned numCodons, double phiValue, double codonProb[]);
 
 public:
 

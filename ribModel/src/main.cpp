@@ -18,11 +18,6 @@ void testNumCodonsPerAA()
 	std::cout << "------------------ # CODONS PER AA ------------------" << std::endl;
 }
 
-void testCodonRangePerAA(bool forParamVector)
-{
-
-}
-
 void testLogNormDensity()
 {
 	std::cout << "------------------ LOG NORM DENSITY ------------------" << std::endl;
@@ -457,9 +452,9 @@ int main()
 	enum ModelToRun { ROC, RFP, FONSE };
 	/* Test variables */
 	User user = jeremy;
-	ModelToRun modelToRun = FONSE;
+	ModelToRun modelToRun = ROC;
 	bool read = false;
-	bool testing = true;
+	bool testing = false;
 
 	if (testing)
 	{
@@ -544,19 +539,19 @@ int main()
 
 
 		/* For 2 mixtures */
-		/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+		for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
 			if (i < 500) geneAssignment[i] = 0u;
 			else geneAssignment[i] = 1u;
-		}*/
+		}
 
 		/* For 1 mixture */
-		for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+		/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
 			geneAssignment[i] = 0u;
-		}
+		}*/
 		double sphi_init = 2;
-		unsigned numMixtures = 1;
+		unsigned numMixtures = 2;
 		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 		std::cout <<"Done initializing shared parameter variables\n";
 

@@ -67,7 +67,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	}
 
 	//initialize parameter's size
-	//#pragma omp parallel for reduction(+:logLikelihood)
+	#pragma omp parallel for reduction(+:logLikelihood)
 	for(int i = 0; i < numGenes; i++)
 	{
 		Gene gene = genome.getGene(i);
@@ -125,7 +125,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				mixtureIndex++;
 			}
 		}
-		unsigned mixtureAssignmentOfGene = model.getMixtureAssignment(i);
+//		unsigned mixtureAssignmentOfGene = model.getMixtureAssignment(i);
 		for(unsigned k = 0u; k < numSynthesisRateCategories; k++)
 		{
 			// We do not need to add std::log(model.getCategoryProbability(k)) since it will cancel in the ratio!

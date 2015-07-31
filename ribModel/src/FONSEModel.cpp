@@ -6,11 +6,6 @@
 #include <array>
 #include <limits.h>
 
-double FONSEModel::calculateLogLikelihoodPerPositionPerGene(unsigned position, unsigned numCodons, double phiValue, double codonProb[])
-{
-	return 0.0;
-}
-
 FONSEModel::FONSEModel() : Model()
 {
 	parameter = nullptr;
@@ -104,7 +99,7 @@ double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grou
 void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures)
 {
 	int numGenes = genome.getGenomeSize();
-	int numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
+//	int numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
 	double likelihood = 0.0;
 	double likelihood_proposed = 0.0;
 
