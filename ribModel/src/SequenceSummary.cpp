@@ -616,7 +616,6 @@ RCPP_MODULE(SequenceSummary_mod)
 		function("codonToAAIndex", &SequenceSummary::codonToAAIndex); //TEST THAT ONLY!
 		function("indexToAA", &SequenceSummary::indexToAA); //TEST THAT ONLY!
 		function("indexToCodon", &SequenceSummary::indexToCodon); //TEST THAT ONLY!
-
 		function("GetNumCodonsForAA", &SequenceSummary::GetNumCodonsForAA,
 			List::create(_["aa"], _["forParamVector"] = false), "returns the number of codons for a given amino acid");
 		function("aminoAcids", &SequenceSummary::aminoAcids, "returns all Amino Acids as one letter code");
