@@ -40,7 +40,10 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 	double phiValue = parameter->getSynthesisRate(geneIndex, expressionCategory, false);
 	double phiValue_proposed = parameter->getSynthesisRate(geneIndex, expressionCategory, true);
 
-	for (unsigned i = 0; i < getGroupListSize(); i++)
+#ifndef __APPLE__
+#pragma omp parallel for private(mutation, selection, positions, curAA) reduction(+:likelihood,likelihood_proposed)
+#endif
+	for (int i = 0; i < getGroupListSize(); i++)
 	{
 		curAA = getGrouping(i);
 
@@ -158,8 +161,8 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 {
 	double denominator;
 
-	/* c_i = exp[\Delta M - (\phi * \beta(i) * \Delta \omega)]                  *
-	 * \beta(i) = a_1 + (i * a_2)                                               *	
+	/* c_i = exp[\Delta M - (\phi * \beta(i) * \Delta \omega)],                 *
+	 * where \beta(i) = a_1 + (i * a_2)                                         *
 	 *                                                                          *
 	 * Right now a_1 and a_2 are set to 4.0. However, we are planning on making *
 	 * them hyperparameters in the future, since they are constant for the      *

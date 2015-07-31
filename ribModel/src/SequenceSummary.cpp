@@ -117,10 +117,9 @@ void SequenceSummary::setRFPObserved(unsigned codonIndex, unsigned value)
 
 std::vector <unsigned> SequenceSummary::getCodonPositions(unsigned index)
 {
-	std::vector <unsigned> rv;
-
+	std::vector <unsigned> rv(codonPositions[index].size());
 	for (unsigned i = 0; i < codonPositions[index].size(); i++) {
-		rv.push_back(codonPositions[index][i]);
+		rv[i] = codonPositions[index][i];
 	}
 
 	return rv;
