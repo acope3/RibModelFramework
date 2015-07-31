@@ -7,7 +7,7 @@
 \usepackage{natbib}
 \usepackage[doublespacing]{setspace}
 \usepackage{tabulary} %Allows multirowed columns whose width is calculated automatically. Similar to tabularx but allows column width to vary between column types and calculated based on content of columns.  See p 253 of Mittelbach and Gossens LaTeX Companion, 2nd Ed
-
+\usepackage[colorlinks=true,urlcolor=blue]{hyperref} %usage: \href{http://...}{link representation}
 
 \newcommand{\waitTerm}{\ensuremath{w}\xspace}
 \newcommand{\wc}{\ensuremath{\waitTerm^c}\xspace}
@@ -189,9 +189,16 @@ Letting $f(\alpha, \lambda)$ represent the PDF of the Gamma distribution, the co
 \begin{align}
 \label{eq:defElongPr}
 \Pr(\text{Elongation at position $j$}) &= \int_0^\infty \frac{\vgj}{\wgj + \vgj} f\left(\wgj | \alphaj, \lambdaj\right) d\wgj\\
- &= \exp\left[\lambdaj \vgj\right] E_{n = \alphaj}\left(\lambdaj \vgj\right)
+ &= \exp\left[\lambdaj \vgj\right] E_{p = \alphaj}\left(\lambdaj \vgj\right)
 \end{align}
-where $E_n(x)$ is the exponential integral function.
+where $E_p(z)$ is the generalized exponential integral function and can is represented as,
+\begin{equation}
+  \label{eq:defGeneralizedExpoInt}
+   E_p(z) = \int_1^\infty \frac{e^{-z t}}{t^p} = z^{p-1} \int_z^\infty \frac{e^{-t}}{t^p} dt = z^{p-1} \Gamma(1-p,z)
+\end{equation}
+where $\Gamma(1-p,z)$ is the incomplete gamma function.
+See \href{http://dlmf.nist.gov/8.19}{http://dlmf.nist.gov/8.19} for more details.
+
 Assuming independence in \wgi between positions, 
   \label{eq:defSigma}
 \begin{align}
