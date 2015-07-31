@@ -17,7 +17,7 @@
 \newcommand{\alphai}{\ensuremath{{\alpha_i}}\xspace}
 \newcommand{\alphaj}{\ensuremath{{\alpha_j}}\xspace}
 \newcommand{\alphac}{\ensuremath{{\alpha_c}}\xspace}
-\newcommand{\alphacprime}{\ensuremath{{\alpha_c^\prime}}\xspace}
+\newcommand{\alphacgprime}{\ensuremath{{\alpha_{c,g}^\prime}}\xspace}
 \newcommand{\alphacvec}{\ensuremath{{\vec{\alpha}_c}}\xspace}
 \newcommand{\lambdac}{\ensuremath{{\lambda_c}}\xspace}
 \newcommand{\lambdacprime}{\ensuremath{{\lambda_c^\prime}}\xspace}
@@ -121,7 +121,7 @@ Equations (\ref{eq:defPgi}) and (\ref{eq:defZtheta}) indicate that our choices o
 
 %We will do our best to avoid calculting \Ztheta directly and, instead, treat it as an unknown variable and attempt to sample from its posterior distribution.
 
-Letting $\ns$ be the footprint sample size, i.e.~the number of footprints examined, where $\ns \gg 1$ and $\Pgi \ll 1$, then we can approximate the probability of observing $\Ygi$ samples of a footprint in \mRNAg at position $i$ using a Poisson distribution with a sampling rate of $\ns \Pgi$.
+Letting $\ns = \sum_{g,i}\Ygi$ be the footprint sample size, where $\ns \gg 1$ and $\Pgi \ll 1$, then we can approximate the probability of observing $\Ygi$ samples of a footprint in \mRNAg at position $i$ using a Poisson distribution with a sampling rate of $\ns \Pgi$.
 Note that deep sequencing may violate the sampling with replacement assumption of the Poisson distribution.
 Given our assumption about the distribution of $\pgi$,  $\Ygi \sim \text{NB}(x = \alphac, p = \kappag \mg /(\lambdacprime + \kappag \mg)$ where $\lambdacprime = \lambdac \Ztheta/\ns$.
 Explicitly,
@@ -139,10 +139,10 @@ Given the properties of the NB and the fact that most codons appear within a gen
 \begin{align}
   \Lik\left(\phig, \alphac, \lambdacprime \middle| \Ygc, \ngc\right) &= \frac{\Gamma\left(\ngc \alphac + \Ygc\right)}{\Gamma\left(\ngc \alphac\right) \Ygc!} 
   \left(\frac{\phig}{\lambdacprime + \phig}\right)^\Ygc \left(\frac{\lambdacprime}{\lambdacprime + \phig}\right)^{\ngc \alphac}\\
-\label{eq:distYgCodon}&= \frac{\Gamma\left(\alphacprime + \Ygc\right)}{\Gamma\left(\alphacprime\right) \Ygc!} 
-  \left(\frac{\phig}{\lambdacprime + \phig}\right)^\Ygc \left(\frac{\lambdacprime}{\lambdacprime + \phig}\right)^{\alphacprime}
+\label{eq:distYgCodon}&= \frac{\Gamma\left(\alphacgprime + \Ygc\right)}{\Gamma\left(\alphacgprime\right) \Ygc!} 
+  \left(\frac{\phig}{\lambdacprime + \phig}\right)^\Ygc \left(\frac{\lambdacprime}{\lambdacprime + \phig}\right)^{\alphacgprime}
 \end{align}
-where $\ngc$ is the number of times codon $c$ is found in the ORF of gene $g$ and $\alphacprime = \ngc \times \alphac$.
+where $\ngc$ is the number of times codon $c$ is found in the ORF of gene $g$ and $\alphacgprime = \ngc \times \alphac$.
 The total Likelihood of the data is
 \begin{equation}
   \Lik\left(\phigvec, \alphacvec, \lambdacprimevec \middle| \Ygcvec, \ngcvec\right) = \prod_{g \in \setG} \prod_{c \in \setC}  \Lik\left(\phig, \alphac, \lambdacprime \middle| \Ygc, \ngc\right)
@@ -150,16 +150,19 @@ The total Likelihood of the data is
 Note that using RFP data alone, $\kappag \times \mg = \phi$ and $\lambdac \Ztheta$ are only identifiable as joint parameters. 
 (Although it seems like you should be able to calculate \Ztheta post-hoc from the state of the chain.)
 Most standard libraries require that the $x$ parameter in a NB be discrete, which in this case it is not.
-Thus to simulate \Yg values based on equations (\ref{eq:distYgSite}) or (\ref{eq:distYgCodon}), first pull $L$ from Gamma(\alphac, \lambdacprime) or Gamma(\alphacprime, \lambdacprime), then pull $Y$ from Poisson($L$).
+Thus to simulate \Yg values based on equations (\ref{eq:distYgSite}) or (\ref{eq:distYgCodon}), first pull $W$ from Gamma(\alphac, \lambdacprime), then pull $Y$ from Poisson($W \ngc \phig$).
   
 \citet{PopEtAl14} provide RNA-Seq based counts of mRNA abundances, \Mg, in addition to RFP counts.
 If we assume that $\Mg \sim \text{Poisson}(\ns \mg)$, we can easily combine both the RFP and the mRNA counts together and estimate $\kappag$ and $\mg$ separately.
 Alternatively, we could estimate the composite \kappag \mg parameter using the RPF data and then analyze the those results using the \Mg data.
 
+An additional fact worth noting is that we are treating $Z$ as a constant for much of our calculations when, in fact, it is a random variate.
+We should discuss this with Russ to ensure there are no issues.
+
 \subsection*{Simulation}
 Although our Likelihood function can be described using a Negative Binomial distribution, because $x = \alpha$ and $\alpha$ is not discrete, we cannot use standard NB routines to simulate our data.
 Instead we need simulate in two steps.
-First, we generate $W_c$  from $\text{Gamma}(\alphacprime, \lambdacprime)$ and then we generate $\Ygc$ from $\text{Poisson}\left(\phi_g W_c\right)$
+First, we generate $W_c$  from $\text{Gamma}(\alphac, \lambdacprime)$ and then we generate $\Ygc$ from $\text{Poisson}\left(\phi_g W_c\right)$
 
 
 \section*{Pausing Time with Nonsense Error Model Definition}
