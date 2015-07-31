@@ -569,7 +569,7 @@ std::vector <double> Parameter::readPhiValues(std::string filename)
 }
 
 
-void Parameter::setNumMutationSelectionValues(std::string mutationSelectionState, std::vector<std::vector<unsigned>> mixtureDefinitionMatrix)
+void Parameter::setNumMutationSelectionValues(std::string _mutationSelectionState, std::vector<std::vector<unsigned>> mixtureDefinitionMatrix)
 {
 	if (!mixtureDefinitionMatrix.empty())
 	{
@@ -587,12 +587,12 @@ void Parameter::setNumMutationSelectionValues(std::string mutationSelectionState
 		numMutationCategories = delMCounter.size();
 		numSelectionCategories = delEtaCounter.size();
 	}
-	else if (mutationSelectionState == selectionShared)
+	else if (_mutationSelectionState == selectionShared)
 	{
 		numMutationCategories = numMixtures;
 		numSelectionCategories = 1u;
 	}
-	else if (mutationSelectionState == mutationShared)
+	else if (_mutationSelectionState == mutationShared)
 	{
 		numMutationCategories = 1u;
 		numSelectionCategories = numMixtures;
@@ -604,7 +604,7 @@ void Parameter::setNumMutationSelectionValues(std::string mutationSelectionState
 	}
 }
 
-void Parameter::initCategoryDefinitions(std::string mutationSelectionState, std::vector<std::vector<unsigned>> mixtureDefinitionMatrix)
+void Parameter::initCategoryDefinitions(std::string _mutationSelectionState, std::vector<std::vector<unsigned>> mixtureDefinitionMatrix)
 {
 	std::set<unsigned> delMCounter;
 	std::set<unsigned> delEtaCounter;
@@ -619,14 +619,14 @@ void Parameter::initCategoryDefinitions(std::string mutationSelectionState, std:
 			mutationIsInMixture[mixtureDefinitionMatrix[i][0] - 1].push_back(i);
 			selectionIsInMixture[mixtureDefinitionMatrix[i][1] - 1].push_back(i);
 		}
-		else if (mutationSelectionState == selectionShared)
+		else if (_mutationSelectionState == selectionShared)
 		{
 			categories[i].delM = i;
 			categories[i].delEta = 0;
 			mutationIsInMixture[i].push_back(i);
 			selectionIsInMixture[0].push_back(i);
 		}
-		else if (mutationSelectionState == mutationShared)
+		else if (_mutationSelectionState == mutationShared)
 		{
 			categories[i].delM = 0;
 			categories[i].delEta = i;

@@ -964,9 +964,9 @@ void ROCParameter::proposeCodonSpecificParameter()
 std::vector<double> ROCParameter::propose(std::vector<double> currentParam, double (*proposal)(double a, double b),
 		double A, std::vector<double> B)
 {
-	unsigned numParam = currentParam.size();
-	std::vector<double> proposedParam(numParam, 0.0);
-	for (unsigned i = 0; i < numParam; i++)
+	unsigned _numParam = currentParam.size();
+	std::vector<double> proposedParam(_numParam, 0.0);
+	for (unsigned i = 0; i < _numParam; i++)
 	{
 		proposedParam[i] = (*proposal)(A + currentParam[i], B[i]);
 	}

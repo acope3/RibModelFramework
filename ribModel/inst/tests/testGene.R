@@ -63,8 +63,12 @@ test_that("Length", {
   expect_equal(g$length(), 27)
 })
 
-test_that("Not Nucleotide", {
-  
+test_that("Reverse Complement", {
+  expect_equal(g$reverseComplement()$seq, "CTACGAGGCAGCAGTGAGAATGAGCAT")
+})
+
+test_that("AA Sequence", {
+  expect_equal("MLILTAASX")
 })
 
 test_that("clear", {
