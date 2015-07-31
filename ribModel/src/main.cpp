@@ -363,7 +363,7 @@ void simulateRFPData()
 
 	std::cout <<"init done\n";
 	model.simulateGenome(genome);
-
+	std::cout <<"writing file\n";
 	genome.writeRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/SimulatedRFPData.csv", true);
 
 

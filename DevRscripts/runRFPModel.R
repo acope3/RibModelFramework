@@ -1,7 +1,10 @@
 library(ribModel)
 rm(list=ls())
+
+
 #read genome
 genome <- initializeGenomeObject(file = "../ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv", FALSE)
+
 
 #initialize parameter object
 sphi_init <- 2
@@ -12,16 +15,18 @@ parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssig
 
 
 # initialize MCMC object
-samples <- 100
+samples <- 10
 thining <- 10
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples=samples, thining=thining, adaptive.width=adaptiveWidth, 
                              est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
 
+
 # get model object
 model <- initializeModelObject(parameter, "RFP")
-
 setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth, TRUE)
+
+
 #run mcmc on genome with parameter using model
 system.time(
   runMCMC(mcmc, genome, model)
@@ -38,8 +43,9 @@ plot(trace, what = "SPhi")
 plot(trace, what = "ExpectedPhi")
 dev.off()
 
-plot(trace, what = "Expression", geneIndex = 905)
+
 pdf("RFP_CSP_Values_Mixture1.pdf", width = 11, height = 12)
+plot(trace, what = "Expression", geneIndex = 905)
 plot(trace, what = "Alpha", mixture = 1)
 plot(trace, what = "LambdaPrime", mixture = 1)
 dev.off()
@@ -58,20 +64,35 @@ for (i in 1:61)
   alphaList[i] <- parameter$getParameterForCategory(cat, 0, codon, FALSE)
   lambdaPrimeList[i] <- parameter$getParameterForCategory(cat, 1, codon, FALSE)
 }
-
-
 plot(NULL, NULL, xlim=range(alphaList, na.rm = T), ylim=range(lambdaPrimeList), 
      main = "Correlation Between Alpha and Lambda Prime", xlab = "alpha", ylab = "lambdaPrime")
 upper.panel.plot(alphaList, lambdaPrimeList)
 dev.off()
 
+
+
+#Will write csv files based off posterior for alpha, lambda prime, and phi
 alphaValues <- numeric(61)
 lambdaPrimeValues <- numeric(61)
+size <- genome$getGenomeSize()
+phis <- numeric(size)
+ids <- numeric(size)
 for (i in 1:61)
 {
   codon <- codonList[i]
-  alphaValues[i] <- parameter$getAlphaPosteriorMeanForCodon(1, 30, codon)
-  lambdaPrimeValues[i] <- parameter$getLambdaPrimePosteriorMeanForCodon(1, 30, codon)
+  alphaValues[i] <- parameter$getAlphaPosteriorMeanForCodon(1, 5, codon)
+  lambdaPrimeValues[i] <- parameter$getLambdaPrimePosteriorMeanForCodon(1, 5, codon)
+}
+
+for (i in 1:size)
+{
+  phis[i] <- parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(5, i, 1)
+}
+
+for (i in 1:size)
+{
+  g <- genome$getGeneByIndex(i)
+  ids[i] <- g$id
 }
 
 m <- matrix(c(codonList[-c(62,63,64)], alphaValues), ncol = 2, byrow = FALSE)
@@ -82,7 +103,9 @@ m <- matrix(c(codonList[-c(62,63,64)], lambdaPrimeValues), ncol = 2, byrow = FAL
 colnames(m) <- c("Codon", "LambdaPrime")
 write.table(m, "RFPLambdaPrimeValues.csv", sep = ",", quote = F, row.names = F, col.names = T)
 
-phis <- parameter$getCurrentSynthesisRateForMixture(1)
-m <- matrix(c(rep("void", genome$getGenomeSize()), phis, phis), ncol = 3, byrow = FALSE)
+
+m <- matrix(c(ids, phis, phis), ncol = 3, byrow = FALSE)
 colnames(m) <- c("Gene", "PhiValue", "PhiValue")
 write.table(m, "RFPPhiValues.csv", sep = ",", quote = F, row.names = F, col.names = T)
+
+

@@ -50,13 +50,14 @@ class Gene
 		void clear(); // clear the content of object
 		unsigned length();
 		Gene reverseCompliment(); // return the reverse compliment
-		std::string toAAsequence();
+		std::string toAASequence();
 
 
 
 		//R wrapper functions:
-		unsigned getAACount(std::string aa) {return geneData.getAACountForAAR(aa);}
-		unsigned getCodonCount(std::string& codon) {return geneData.getCodonCountForCodonR(codon);}
+		unsigned getAACount(std::string aa);
+		unsigned getCodonCount(std::string& codon);
+		unsigned getRFPObserved(std::string codon);
 		//TODO: add functions for other SS variables
 
 	protected:
