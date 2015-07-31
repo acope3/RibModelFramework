@@ -49,7 +49,7 @@ class Gene
 		//Other functions:
 		void clear(); // clear the content of object
 		unsigned length();
-		Gene reverseCompliment(); // return the reverse compliment
+		Gene reverseComplement(); // return the reverse compliment
 		std::string toAASequence();
 
 
@@ -58,7 +58,7 @@ class Gene
 		unsigned getAACount(std::string aa);
 		unsigned getCodonCount(std::string& codon);
 		unsigned getRFPObserved(std::string codon);
-		//TODO: add functions for other SS variables
+		std::vector <unsigned> getCodonPositions(std::string codon);
 
 	protected:
 };

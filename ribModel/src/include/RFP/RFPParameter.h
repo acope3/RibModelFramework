@@ -107,6 +107,7 @@ class RFPParameter: public Parameter {
 		//Other functions:
 		double getParameterForCategory(unsigned category, unsigned paramType, std::string codon, bool proposal);
 		virtual std::vector<double> getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex);
+		void calculateRFPMean(Genome& genome);
 
 
 		//Statics:

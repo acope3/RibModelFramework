@@ -790,6 +790,50 @@ std::vector <double> RFPParameter::getEstimatedMixtureAssignmentProbabilities(un
 }
 
 
+void RFPParameter::calculateRFPMean(Genome& genome)
+{
+	std::vector<unsigned> RFPSums(61,0);
+	std::vector <unsigned> Means(61, 0);
+	for(unsigned geneIndex = 0; geneIndex < genome.getGenomeSize(); geneIndex++)
+	{
+		Gene *gene = &genome.getGene(geneIndex);
+		for (unsigned codonIndex = 0; codonIndex < 61; codonIndex++)
+		{
+			RFPSums[codonIndex] += gene -> geneData.getRFPObserved(codonIndex);
+		}
+	}
+
+	std::cout <<"Means calculated\n";
+	for (unsigned codonIndex = 0; codonIndex < 61; codonIndex++)
+	{
+		Means[codonIndex] = RFPSums[codonIndex] / genome.getGenomeSize();
+	}
+
+	std::vector <unsigned> variance(61, 0);
+	for (unsigned codonIndex = 0; codonIndex < 61; codonIndex++)
+	{
+		long long squareSum = 0;
+		for (unsigned geneIndex = 0; geneIndex < genome.getGenomeSize(); geneIndex++)
+		{
+			Gene *gene = &genome.getGene(geneIndex);
+			long long count = gene -> geneData.getRFPObserved(codonIndex);
+			count -= Means[codonIndex];
+			count *= count;
+			squareSum += count;
+		}
+		variance[codonIndex] = squareSum /= genome.getGenomeSize();
+	}
+
+	std::cout <<"Variance calculated\n";
+	for (unsigned codonIndex = 0; codonIndex < 61; codonIndex++)
+	{
+		std::cout << SequenceSummary::indexToCodon(codonIndex) <<" Mean:" << Means[codonIndex];
+		std::cout <<"\tVariance:" << variance[codonIndex] <<"\n";
+	}
+}
+
+
+
 //---------------------STATIC VARIABLE DECLARATIONS---------------------//
 
 const unsigned RFPParameter::alp = 0u;

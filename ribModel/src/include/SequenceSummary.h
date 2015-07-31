@@ -40,14 +40,17 @@ class SequenceSummary
 		SequenceSummary& operator=(const SequenceSummary& other);
 
 
-		//AA, codon, RFP, & posistion functions:
+		//AA, codon, RFP, & position functions:
 		unsigned getAACountForAA(std::string aa);
 		unsigned getAACountForAA(unsigned aaIndex);
 		unsigned getCodonCountForCodon(std::string& codon);
 		unsigned getCodonCountForCodon(unsigned codonIndex);
+		unsigned getRFPObserved(std::string codon);
 		unsigned getRFPObserved(unsigned codonIndex);
-		void setRFPObserved(unsigned codonIndex, unsigned value);  //TODO: create RFP functions for a given codon
+		void setRFPObserved(unsigned codonIndex, unsigned value);
+		std::vector <unsigned> getCodonPositions(std::string codon);
 		std::vector <unsigned> getCodonPositions(unsigned index);
+
 
 
 		//Functions to manage stored data:
@@ -77,6 +80,10 @@ class SequenceSummary
 		unsigned getAACountForAAIndexR(unsigned aaIndex); //TEST THAT ONLY!
 		unsigned getCodonCountForCodonR(std::string& codon);
 		unsigned getCodonCountForCodonIndexR(unsigned codonIndex); //TEST THAT ONLY!
+		unsigned getRFPObservedForCodonR(std::string codon);
+		unsigned getRFPObservedForCodonIndexR(unsigned codonIndex); //TEST THAT ONLY!
+		std::vector <unsigned> getCodonPositionsForCodonR(std::string codon);
+		std::vector <unsigned> getCodonPositionsForCodonIndexR(unsigned codonIndex); //TEST THAT ONLY!
 
 
 	protected:

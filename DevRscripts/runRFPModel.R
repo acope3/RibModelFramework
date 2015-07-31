@@ -15,7 +15,7 @@ parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssig
 
 
 # initialize MCMC object
-samples <- 10
+samples <- 5000
 thining <- 10
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples=samples, thining=thining, adaptive.width=adaptiveWidth, 
@@ -77,7 +77,7 @@ X <- read.table("codon.specific.translation.rates.table.csv", header = TRUE, sep
 X <- X[order(X[,1]) , ]
 
 XM <- matrix(c(X[,1], X[,2]), ncol = 2, byrow = FALSE)
-Y <- matrix(c(codonList[-c(62,63,64)], waitingTimes), ncol = 2, byrow = FALSE)
+Y <- data.frame(codonList[-c(62,63,64)], waitingTimes)
 colnames(Y) <- c("Codon", "PausingTime")
 Y <- Y[order(Y[,1]) , ]
 

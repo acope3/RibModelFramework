@@ -139,7 +139,7 @@ unsigned Gene::length()
 }
 
 
-Gene Gene::reverseCompliment()
+Gene Gene::reverseComplement()
 {
   Gene tmpGene;
   tmpGene.id = id;
@@ -180,17 +180,16 @@ unsigned Gene::getCodonCount(std::string& codon)
 }
 
 
-unsigned Gene::getRFPObserved(std::string codon) //TODO: should I write a function in SS like the ones above?
+unsigned Gene::getRFPObserved(std::string codon)
 {
-    codon[0] = (char) std::toupper(codon[0]);
-    codon[1] = (char) std::toupper(codon[1]);
-    codon[2] = (char) std::toupper(codon[2]);
-    unsigned codonIndex = SequenceSummary::codonToIndex(codon, false);
-    return geneData.getRFPObserved(codonIndex);
+    return geneData.getRFPObservedForCodonR(codon);
 }
 
 
-
+std::vector <unsigned> Gene::getCodonPositions(std::string codon)
+{
+    return geneData.getCodonPositionsForCodonR(codon);
+}
 
 
 
@@ -223,11 +222,12 @@ RCPP_MODULE(Gene_mod)
     .method("getNucleotideAt", &Gene::getNucleotideAt) //TEST THAT ONLY!
 	.method("clear", &Gene::clear, "clears the id, sequence, and description in the object")
     .method("length", &Gene::length, "returns the length of sequence")
-    .method("reverseCompliment", &Gene::reverseCompliment)
+    .method("reverseComplement", &Gene::reverseComplement) //TEST THAT ONLY!
     .method("toAASequence", &Gene::toAASequence)
 	.method("getAACount", &Gene::getAACount, "returns the number of amino acids that are in the sequence for a given amino acid")
 	.method("getCodonCount", &Gene::getCodonCount, "returns the number of codons that are in the sequence for a given codon")
 	.method("getRFPObserved", &Gene::getRFPObserved)
+	.method("getCodonPositions", &Gene::getCodonPositions)
   ;
 }
 #endif
