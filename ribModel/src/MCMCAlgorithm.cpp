@@ -27,7 +27,6 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * 
 	writeRestartFile = false;
 	multipleFiles = false;
 	fileWriteInterval = 1u;
-	numCores = 1u;
 }
 
 MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thining, unsigned _adaptiveWidth, bool _estimateSynthesisRate, bool _estimateCodonSpecificParameter, bool _estimateHyperParameter)
@@ -38,7 +37,6 @@ MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thining, unsigned _ada
 	writeRestartFile = false;
 	multipleFiles = false;
 	fileWriteInterval = 1u;
-	numCores = 1u;
 }
 
 MCMCAlgorithm::~MCMCAlgorithm()
@@ -350,25 +348,25 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores)
 
 }
 
-double MCMCAlgorithm::getLogLikelihoodPosteriorMean(unsigned samples)
+double MCMCAlgorithm::getLogLikelihoodPosteriorMean(unsigned _samples)
 {
 	double posteriorMean = 0.0;
 	unsigned traceLength = likelihoodTrace.size();
 
 
-	if(samples > traceLength)
+	if(_samples > traceLength)
 	{
 		std::cerr << "Warning in MCMCAlgorithm::getLogLikelihoodPosteriorMean throws: Number of anticipated samples (" <<
-			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
-		samples = traceLength;
+			_samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
+		_samples = traceLength;
 	}
-	unsigned start = traceLength - samples;
+	unsigned start = traceLength - _samples;
 	for(unsigned i = start; i < traceLength; i++)
 	{
 		posteriorMean += likelihoodTrace[i];
 	}
 
-	return posteriorMean / (double)samples;
+	return posteriorMean / (double)_samples;
 }
 
 void MCMCAlgorithm::setRestartFileSettings(std::string filename, unsigned interval, bool multiple)

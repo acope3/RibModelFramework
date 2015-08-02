@@ -53,28 +53,51 @@ test_that("Codon Counts for Codon Index", {
   expect_equal(ss$getCodonCountForCodonIndex(2), 0)
 })
 
-test_that("RFP Observed test", {
+test_that("RFP Observed for codon", {
+  ss$setRFPObserved(4, 35)
+  ss$setRFPObserved(16, 45)
+  ss$setRFPObserved(54, 2)
+  ss$setRFPObserved(45, 0)
+  expect_equal(ss$getRFPObservedForCodon("TGC", 35))
+  expect_equal(ss$getRFPObservedForCodon("CAC", 45))
+  expect_equal(ss$getRFPObservedForCodon("GTG", 2))
+  expect_equal(ss$getRFPObservedForCodon("TCC", 0))
+})
+
+test_that("RFP Observed test for codon Index", {
   ss$setRFPObserved(0, 45)
   ss$setRFPObserved(1, 52)
   ss$setRFPObserved(2, 63)
   ss$setRFPObserved(60, 23)
-  expect_equal(ss$getRFPObserved(0), 45)
-  expect_equal(ss$getRFPObserved(1), 52)
-  expect_equal(ss$getRFPObserved(2), 63)
-  expect_equal(ss$getRFPObserved(60), 23)
+  expect_equal(ss$getRFPObservedForCodonIndex(0), 45)
+  expect_equal(ss$getRFPObservedForCodonIndex(1), 52)
+  expect_equal(ss$getRFPObservedForCodonIndex(2), 63)
+  expect_equal(ss$getRFPObservedForCodonIndex(60), 23)
+})
+
+test_that("Codon Positions by Codon", {
+  expect_equal(ss$getCodonPositionsForCodon("ATG"), c(0))
+  expect_equal(ss$getCodonPositionsForCodon("CTC"), c(1,3))
+  expect_equal(ss$getCodonPositionsForCodon("ATT"), c(2))
+  expect_equal(ss$getCodonPositionsForCodon("ACT"), c(4))
+  expect_equal(ss$getCodonPositionsForCodon("GCT"), c(5))
+  expect_equal(ss$getCodonPositionsForCodon("GCC"), c(6))
+  expect_equal(ss$getCodonPositionsForCodon("TCG"), c(7))
+  expect_equal(ss$getCodonPositionsForCodon("TAG"), c(8))
+  expect_equal(ss$getCodonPositionsForCodon("GTG"), numeric(0))
 })
 
 test_that("Codon Positions", {
   # TODO: These return vectors. Fix it.
-  expect_equal(ss$getCodonPositions(29), c(0))
-  expect_equal(ss$getCodonPositions(24), c(1,3))
-  expect_equal(ss$getCodonPositions(20), c(2))
-  expect_equal(ss$getCodonPositions(51), c(4))
-  expect_equal(ss$getCodonPositions(3), c(5))
-  expect_equal(ss$getCodonPositions(1), c(6))
-  expect_equal(ss$getCodonPositions(46), c(7))
-  expect_equal(ss$getCodonPositions(62), c(8))
-  expect_equal(ss$getCodonPositions(54), numeric(0))
+  expect_equal(ss$getCodonPositionsForCodonIndex(29), c(0))
+  expect_equal(ss$getCodonPositionsForCodonIndex(24), c(1,3))
+  expect_equal(ss$getCodonPositionsForCodonIndex(20), c(2))
+  expect_equal(ss$getCodonPositionsForCodonIndex(51), c(4))
+  expect_equal(ss$getCodonPositionsForCodonIndex(3), c(5))
+  expect_equal(ss$getCodonPositionsForCodonIndex(1), c(6))
+  expect_equal(ss$getCodonPositionsForCodonIndex(46), c(7))
+  expect_equal(ss$getCodonPositionsForCodonIndex(62), c(8))
+  expect_equal(ss$getCodonPositionsForCodonIndex(54), numeric(0))
 })
 
 test_that("Clear", {
@@ -694,6 +717,14 @@ test_that("Num Codons for AA", {
   expect_equal(GetNumCodonsForAA("Y", TRUE), 1)
   expect_equal(GetNumCodonsForAA("Z", TRUE), 1)
   expect_equal(GetNumCodonsForAA("X", TRUE), 2)
+})
+
+test_that("Complement Nucleotide", {
+  expect_equal(complementNucleotide("A"), "T")
+  expect_equal(complementNucleotide("T"), "A")
+  expect_equal(complementNucleotide("C"), "G")
+  expect_equal(complementNucleotide("G"), "C")
+  expect_equal(complementNucleotide("Q"), "C")
 })
 
 test_that("Amino Acid Vector", {

@@ -12,7 +12,6 @@ class MCMCAlgorithm
 		unsigned samples;
 		unsigned thining;
 		unsigned adaptiveWidth;
-		unsigned numCores;
 
 		bool estimateSynthesisRate;
 		bool estimateCodonSpecificParameter;
