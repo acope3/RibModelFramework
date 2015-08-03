@@ -1,20 +1,22 @@
 #include "include/Genome.h"
 
-#include <iostream>     // std::cout, std::cerr
-#include <cstring>
+
+#include <iostream>
 #include <fstream>
-#include <ctime>
-#include <sstream> // ostringstream
+#include <sstream>
+
 
 Genome::Genome()
 {
 	//ctor
 }
 
+
 Genome::~Genome()
 {
 	//dtor
 }
+
 
 Genome& Genome::operator=(const Genome& rhs)
 {
@@ -25,71 +27,6 @@ Genome& Genome::operator=(const Genome& rhs)
 	return *this;
 }
 
-void Genome::addGene(const Gene& gene, bool simulated)
-{
-	if (!simulated)
-		genes.push_back(gene);
-	else
-		simulatedGenes.push_back(gene);
-}
-
-
-std::vector<unsigned> Genome::getCodonCountsPerGene(std::string codon)
-{
-	std::vector<unsigned> codonCounts;
-	codonCounts.resize(genes.size());
-	unsigned codonIndex = SequenceSummary::codonToIndex(codon);
-	for(unsigned i = 0u; i < genes.size(); i++)
-	{
-		Gene gene = genes[i];
-		SequenceSummary seqsum = gene.getSequenceSummary();
-		codonCounts[i] = seqsum.getCodonCountForCodon(codonIndex);
-	}
-	return codonCounts;
-}
-
-void Genome::writeFasta (std::string filename, bool simulated)
-{
-	try {
-		std::ofstream Fout;
-		Fout.open(filename.c_str());
-		if (Fout.fail())
-		{
-			std::cerr <<"Error in Genome::writeFasta: Cannot open output Fasta file " << filename <<"\n";
-		}
-		else
-		{
-			if (simulated)
-			{
-				for(unsigned i = 0u; i < simulatedGenes.size(); i++)
-				{
-					Fout << ">" << simulatedGenes[i].getId() << " " << simulatedGenes[i].getDescription() <<"\n";
-					for(unsigned j = 0u; j < simulatedGenes[i].length(); j++)
-					{
-						Fout << simulatedGenes[i].getNucleotideAt(j);
-						if((j + 1) % 60 == 0) Fout << std::endl;
-					}
-					Fout << std::endl;
-				}
-			}
-			else
-			{
-				for(unsigned i = 0u; i < genes.size(); i++)
-				{
-					Fout << ">" << genes[i].getId() << " " << genes[i].getDescription() << std::endl;
-					for(unsigned j = 0u; j < genes[i].length(); j++)
-					{
-						Fout << genes[i].getNucleotideAt(j);
-						if((j + 1) % 60 == 0) Fout << std::endl;
-					}
-					Fout << std::endl;
-				}
-			}
-		} // end else
-		Fout.close();
-	} // end try
-	catch(char* pMsg) { std::cerr << std::endl << "Exception:" << pMsg << std::endl; }
-}
 
 void Genome::readFasta(std::string filename, bool Append) // read Fasta format sequences
 {
@@ -178,67 +115,112 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 	catch(char* pMsg) { std::cerr << std::endl << "Exception:" << pMsg << std::endl; }
 }
 
+
+void Genome::writeFasta (std::string filename, bool simulated)
+{
+	try {
+		std::ofstream Fout;
+		Fout.open(filename.c_str());
+		if (Fout.fail())
+		{
+			std::cerr <<"Error in Genome::writeFasta: Cannot open output Fasta file " << filename <<"\n";
+		}
+		else
+		{
+			if (simulated)
+			{
+				for(unsigned i = 0u; i < simulatedGenes.size(); i++)
+				{
+					Fout << ">" << simulatedGenes[i].getId() << " " << simulatedGenes[i].getDescription() <<"\n";
+					for(unsigned j = 0u; j < simulatedGenes[i].length(); j++)
+					{
+						Fout << simulatedGenes[i].getNucleotideAt(j);
+						if((j + 1) % 60 == 0) Fout << std::endl;
+					}
+					Fout << std::endl;
+				}
+			}
+			else
+			{
+				for(unsigned i = 0u; i < genes.size(); i++)
+				{
+					Fout << ">" << genes[i].getId() << " " << genes[i].getDescription() << std::endl;
+					for(unsigned j = 0u; j < genes[i].length(); j++)
+					{
+						Fout << genes[i].getNucleotideAt(j);
+						if((j + 1) % 60 == 0) Fout << std::endl;
+					}
+					Fout << std::endl;
+				}
+			}
+		} // end else
+		Fout.close();
+	} // end try
+	catch(char* pMsg) { std::cerr << std::endl << "Exception:" << pMsg << std::endl; }
+}
+
+
 void Genome::readRFPFile(std::string filename)
 {
-  std::ifstream Fin;
-  Fin.open(filename.c_str());
-  if (Fin.fail())
-  {
-    std::cerr << "Error in Genome::readRFPFile: Cannot open input RFP file " << filename << "\n";
-  }
-
-  std::string tmp;
-  std::getline(Fin, tmp); //trash the first line
-  std::string prevID = "";
-  Gene tmpGene;
-  SequenceSummary SS;
-  bool first = true;
-  std::string seq = "";
-
-  while (getline(Fin,tmp))
-  {
-	std::size_t pos = tmp.find(",");
-    std::string ID = tmp.substr(0, pos);
-	std::size_t pos2 = tmp.find(",", pos + 1);
-    std::string value = tmp.substr(pos + 1, pos2 - (pos + 1));
-    unsigned tmpRFP = (unsigned)std::atoi(value.c_str());
-
-    pos = tmp.find(",", pos2 + 1);
-    value = tmp.substr(pos2 + 1, pos - (pos2 + 1));
-    unsigned counts = (unsigned)std::atoi(value.c_str());
-
-    std::string codon = tmp.substr(pos + 1, 3);
-    for (unsigned i = 0; i < counts; i++)
-      seq += codon;
-
-    if (first)
-    {
-      prevID = ID;
-      first = false;
-    }
-    if (ID != prevID)
-    {
-      tmpGene.setId(prevID);
-      tmpGene.setDescription("No description for RFP Model");
-      tmpGene.setSequence(seq);
-      addGene(tmpGene); //add to genome
-      tmpGene.clear();
-      seq = "";
+	std::ifstream Fin;
+	Fin.open(filename.c_str());
+	if (Fin.fail())
+	{
+		std::cerr << "Error in Genome::readRFPFile: Cannot open input RFP file " << filename << "\n";
 	}
 
-    prevID = ID;
-    unsigned index = SequenceSummary::codonToIndex(codon);
-    tmpGene.geneData.setRFPObserved(index, tmpRFP);
+	std::string tmp;
+	std::getline(Fin, tmp); //trash the first line
+	std::string prevID = "";
+	Gene tmpGene;
+	SequenceSummary SS;
+	bool first = true;
+	std::string seq = "";
+
+	while (getline(Fin,tmp))
+	{
+		std::size_t pos = tmp.find(",");
+		std::string ID = tmp.substr(0, pos);
+		std::size_t pos2 = tmp.find(",", pos + 1);
+		std::string value = tmp.substr(pos + 1, pos2 - (pos + 1));
+		unsigned tmpRFP = (unsigned)std::atoi(value.c_str());
+
+		pos = tmp.find(",", pos2 + 1);
+		value = tmp.substr(pos2 + 1, pos - (pos2 + 1));
+		unsigned counts = (unsigned)std::atoi(value.c_str());
+
+		std::string codon = tmp.substr(pos + 1, 3);
+		for (unsigned i = 0; i < counts; i++)
+			seq += codon;
+
+		if (first)
+		{
+			prevID = ID;
+			first = false;
+		}
+		if (ID != prevID)
+		{
+			tmpGene.setId(prevID);
+			tmpGene.setDescription("No description for RFP Model");
+			tmpGene.setSequence(seq);
+			addGene(tmpGene); //add to genome
+			tmpGene.clear();
+			seq = "";
+		}
+
+		prevID = ID;
+		unsigned index = SequenceSummary::codonToIndex(codon);
+		tmpGene.geneData.setRFPObserved(index, tmpRFP);
 	}
 
 
-  tmpGene.setId(prevID);
-  tmpGene.setDescription("No description for RFP Model");
-  tmpGene.setSequence(seq);
+	tmpGene.setId(prevID);
+	tmpGene.setDescription("No description for RFP Model");
+	tmpGene.setSequence(seq);
 
-  addGene(tmpGene); //add to genome
+	addGene(tmpGene); //add to genome
 
-  Fin.close();
+	Fin.close();
 }
 
 
@@ -271,32 +253,6 @@ void Genome::writeRFPFile(std::string filename, bool simulated)
 		}
 	}
 	Fout.close();
-}
-
-
-Gene& Genome::getGene(unsigned index)
-{
-	Gene gene;
-
-	if (index >= genes.size()) 
-	{
-		std::cerr << "Error in Genome::getGene: Index " << index << " is out of bounds.\n";
-	}
-
-	return index >= genes.size() ? gene : genes[index];
-}
-Gene& Genome::getGene(std::string id)
-{
-	unsigned i = 0;
-	bool geneFound = false;
-	while(!geneFound)
-	{
-		Gene tempGene = genes[i];
-		geneFound = (tempGene.getId().compare(id) == 0);
-		i++;
-	}
-	// i is increase after a potential finding, therefore i-1 is correct
-	return genes[i-1];
 }
 
 
@@ -390,6 +346,69 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 }
 
 
+void Genome::addGene(const Gene& gene, bool simulated)
+{
+	if (!simulated)
+		genes.push_back(gene);
+	else
+		simulatedGenes.push_back(gene);
+}
+
+
+std::vector <Gene> Genome::getGenes(bool simulated)
+{
+	return  !simulated ? genes : simulatedGenes;
+}
+
+
+Gene& Genome::getGene(unsigned index)
+{
+	Gene gene;
+
+	if (index >= genes.size())
+	{
+		std::cerr << "Error in Genome::getGene: Index " << index << " is out of bounds.\n";
+	}
+
+	return index >= genes.size() ? gene : genes[index];
+}
+
+
+Gene& Genome::getGene(std::string id)
+{
+	unsigned i = 0;
+	bool geneFound = false;
+	while(!geneFound)
+	{
+		Gene tempGene = genes[i];
+		geneFound = (tempGene.getId().compare(id) == 0);
+		i++;
+	}
+	// i is increase after a potential finding, therefore i-1 is correct
+	return genes[i-1];
+}
+
+
+bool Genome::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound)
+{
+	bool check = false;
+	if (lowerbound <= index && index <= upperbound)
+	{
+		check = true;
+	}
+	else
+	{
+		std::cerr <<"Error with the index\nGIVEN: " << index <<"\n";
+		std::cerr <<"MUST BE BETWEEN:	" << lowerbound << " & " << upperbound <<"\n";
+	}
+	return check;
+}
+
+
+unsigned Genome::getGenomeSize()
+{
+	return genes.size();
+}
 
 
 void Genome::clear()
@@ -397,6 +416,7 @@ void Genome::clear()
 	genes.clear();
 	simulatedGenes.clear();
 }
+
 
 Genome Genome::getGenomeForGeneIndicies(std::vector <unsigned> indicies)
 {
@@ -409,6 +429,38 @@ Genome Genome::getGenomeForGeneIndicies(std::vector <unsigned> indicies)
 
 	return genome;
 }
+
+
+std::vector<unsigned> Genome::getCodonCountsPerGene(std::string codon)
+{
+	std::vector<unsigned> codonCounts;
+	codonCounts.resize(genes.size());
+	unsigned codonIndex = SequenceSummary::codonToIndex(codon);
+	for(unsigned i = 0u; i < genes.size(); i++)
+	{
+		Gene gene = genes[i];
+		SequenceSummary seqsum = gene.getSequenceSummary();
+		codonCounts[i] = seqsum.getCodonCountForCodon(codonIndex);
+	}
+	return codonCounts;
+}
+
+
+//---------------------R WRAPPER FUNCTIONS---------------------//
+
+Gene& Genome::getGeneByIndex(unsigned index)
+{
+	Gene gene;
+	bool checker = checkIndex(index, 1, (unsigned)genes.size());
+	return checker ? genes[index - 1] : gene;
+}
+
+
+Gene& Genome::getGeneById(std::string ID)
+{
+	return getGene(ID);
+}
+
 
 Genome Genome::getGenomeForGeneIndiciesR(std::vector <unsigned> indicies)
 {
@@ -434,29 +486,9 @@ Genome Genome::getGenomeForGeneIndiciesR(std::vector <unsigned> indicies)
 	}
 
 	return genome;
-
-}
-Gene& Genome::getGeneByIndex(unsigned index)
-{
-	Gene gene;
-	bool checker = checkIndex(index, 1, genes.size());
-	return checker ? genes[index - 1] : gene;
 }
 
-bool Genome::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound)
-{
-	bool check = false;
-	if (lowerbound <= index && index <= upperbound)
-	{
-		check = true;
-	}
-	else
-	{
-		std::cerr <<"Error with the index\nGIVEN: " << index <<"\n";
-		std::cerr <<"MUST BE BETWEEN:	" << lowerbound << " & " << upperbound <<"\n";
-	}
-	return check;
-}
+
 
 // ---------------------------------------------------------------------------
 // ----------------------------- RCPP STUFF ----------------------------------
@@ -465,7 +497,7 @@ bool Genome::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound
 #include <Rcpp.h>
 using namespace Rcpp;
 
-	RCPP_EXPOSED_CLASS(Gene)
+RCPP_EXPOSED_CLASS(Gene)
 RCPP_EXPOSED_CLASS(Genome)
 
 RCPP_MODULE(Genome_mod)
@@ -476,12 +508,20 @@ RCPP_MODULE(Genome_mod)
 		.method("readFasta", &Genome::readFasta, "reads a genome into the object")
 		.method("writeFasta", &Genome::writeFasta, "writes the genome to a fasta file")
 		.method("readRFPFile", &Genome::readRFPFile, "reads RFP data in for the RFP model")
+		.method("writeRFPFile", &Genome::writeRFPFile)
+		.method("readObservedPhiValues", &Genome::readObservedPhiValues)
+
+		.method("addGene", &Genome::addGene) //TEST THAT ONLY!
+		.method("getGenes", &Genome::getGenes) //TEST THAT ONLY!
+
+		.method("checkIndex", &Genome::checkIndex) //TEST THAT ONLY!
 		.method("getGenomeSize", &Genome::getGenomeSize, "returns how many genes are in the genome")
 		.method("clear", &Genome::clear, "clears the genome")
 		.method("getCodonCountsPerGene", &Genome::getCodonCountsPerGene, "returns a vector of codon counts for a given gene")
 
 		//R Wrapper function
 		.method("getGeneByIndex", &Genome::getGeneByIndex, "returns a gene for a given index")
+		.method("getGeneById", &Genome::getGeneById) //TEST THAT ONLY!
 		.method("getGenomeForGeneIndicies", &Genome::getGenomeForGeneIndiciesR, "returns a new genome based on the ones requested in the given vector")
 		;
 }

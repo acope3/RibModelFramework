@@ -11,12 +11,12 @@ sphi_init <- 2
 numMixtures <- 1
 mixDef <- "allUnique"
 geneAssignment <- c(rep(1, genome$getGenomeSize()))
-parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, model= "RFP", split.serine = TRUE, mixture.definition = mixDef)
-
+#parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, model= "RFP", split.serine = TRUE, mixture.definition = mixDef)
+parameter <- new(RFPParameter, "5000restartFile.rst")
 
 # initialize MCMC object
-samples <- 5000
-thining <- 10
+samples <- 1000
+thining <- 30
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples=samples, thining=thining, adaptive.width=adaptiveWidth, 
                              est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
@@ -41,6 +41,8 @@ plot(mcmc)
 plot(trace, what = "MixtureProbability")
 plot(trace, what = "SPhi")
 plot(trace, what = "ExpectedPhi")
+loglik.trace <- mcmc$getLogLikelihoodTrace()
+acf(loglik.trace)
 dev.off()
 
 
@@ -69,7 +71,6 @@ for (i in 1:61)
 plot(NULL, NULL, xlim=range(alphaList, na.rm = T), ylim=range(lambdaPrimeList), 
      main = "Correlation Between Alpha and Lambda Prime", xlab = "alpha", ylab = "lambdaPrime")
 upper.panel.plot(alphaList, lambdaPrimeList)
-dev.off()
 
 
 #corrolation between RFPModel and Premal's data

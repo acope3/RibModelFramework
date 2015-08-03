@@ -183,7 +183,7 @@ void testSimulateGenome(Genome& genome)
 	ROCModel model;
 	model.setParameter(parameter);
 	model.simulateGenome(genome);
-	std::vector <Gene> simGenes = genome.getSimulatedGenes();
+	std::vector <Gene> simGenes = genome.getGenes(true);
 	std::cout << "FREQUENCIES:\n";
 
 
