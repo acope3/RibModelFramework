@@ -58,10 +58,10 @@ test_that("RFP Observed for codon", {
   ss$setRFPObserved(16, 45)
   ss$setRFPObserved(54, 2)
   ss$setRFPObserved(45, 0)
-  expect_equal(ss$getRFPObservedForCodon("TGC", 35))
-  expect_equal(ss$getRFPObservedForCodon("CAC", 45))
-  expect_equal(ss$getRFPObservedForCodon("GTG", 2))
-  expect_equal(ss$getRFPObservedForCodon("TCC", 0))
+  expect_equal(ss$getRFPObservedForCodon("TGC"), 35)
+  expect_equal(ss$getRFPObservedForCodon("CAC"), 45)
+  expect_equal(ss$getRFPObservedForCodon("GTG"),2)
+  expect_equal(ss$getRFPObservedForCodon("TCC"), 0)
 })
 
 test_that("RFP Observed test for codon Index", {
@@ -107,7 +107,7 @@ test_that("Clear", {
   
   for (i in 1:64) {
     expect_equal(ss$getCodonCountForCodonIndex(i-1), 0)
-    expect_equal(ss$getRFPObserved(i-1), 0)
+    expect_equal(ss$getRFPObservedForCodonIndex(i-1), 0)
   }
   
   for (i in 1:22) {
@@ -127,8 +127,8 @@ test_that("Process Sequence", {
   expect_equal(ss$getCodonCountForCodon("ACT"), 1)
   expect_equal(ss$getCodonCountForCodon("GCT"), 1)
   expect_equal(ss$getCodonCountForCodon("GCC"), 1)
-  expect_equal(ss$getCodonPositions(24), c(1,3))
-  expect_equal(ss$getCodonPositions(20), c(2))
+  expect_equal(ss$getCodonPositionsForCodonIndex(24), c(1,3))
+  expect_equal(ss$getCodonPositionsForCodonIndex(20), c(2))
 })
 
 test_that("AA to AA index", {
@@ -720,11 +720,11 @@ test_that("Num Codons for AA", {
 })
 
 test_that("Complement Nucleotide", {
-  expect_equal(complementNucleotide("A"), "T")
-  expect_equal(complementNucleotide("T"), "A")
-  expect_equal(complementNucleotide("C"), "G")
-  expect_equal(complementNucleotide("G"), "C")
-  expect_equal(complementNucleotide("Q"), "C")
+  expect_equal(complimentNucleotide("A"), "T")
+  expect_equal(complimentNucleotide("T"), "A")
+  expect_equal(complimentNucleotide("C"), "G")
+  expect_equal(complimentNucleotide("G"), "C")
+  expect_equal(complimentNucleotide("Q"), "C")
 })
 
 test_that("Amino Acid Vector", {

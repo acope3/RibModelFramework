@@ -68,7 +68,7 @@ test_that("Reverse Complement", {
 })
 
 test_that("AA Sequence", {
-  expect_equal("MLILTAASX")
+  expect_equal(g$toAASequence(), "MLILTAASX")
 })
 
 test_that("clear", {

@@ -31,23 +31,46 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="Genome.h" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/include/Genome.h">
+      <file leaf-file-name="Gene.cpp" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Gene.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="55" column="8" selection-start-line="55" selection-start-column="8" selection-end-line="55" selection-end-column="8" />
+            <state vertical-scroll-proportion="0.6454918">
+              <caret line="228" column="4" selection-start-line="228" selection-start-column="4" selection-end-line="228" selection-end-column="4" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Genome.cpp" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Genome.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/include/Genome.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="6" column="12" selection-start-line="6" selection-start-column="12" selection-end-line="6" selection-end-column="12" />
+              <folding>
+                <element signature="e#35#52#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Genome.cpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Genome.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.3852459">
+            <state vertical-scroll-proportion="0.0">
               <caret line="514" column="13" selection-start-line="514" selection-start-column="13" selection-end-line="514" selection-end-column="13" />
               <folding>
                 <element signature="e#0#27#0" expanded="true" />
+                <marker date="1438615873000" expanded="true" signature="5160:5932" placeholder="{...}" />
+                <marker date="1438615873000" expanded="true" signature="6003:7965" placeholder="{...}" />
+                <marker date="1438615873000" expanded="true" signature="8023:8108" placeholder="{...}" />
+                <marker date="1438615873000" expanded="true" signature="8163:8212" placeholder="{...}" />
+                <marker date="1438615873000" expanded="true" signature="8253:8443" placeholder="{...}" />
+                <marker date="1438615873000" expanded="true" signature="8484:8730" placeholder="{...}" />
+                <marker date="1438615873000" expanded="true" signature="8815:9079" placeholder="{...}" />
+                <marker date="1438615873000" expanded="true" signature="9115:9140" placeholder="{...}" />
+                <marker date="1438615873000" expanded="true" signature="9164:9208" placeholder="{...}" />
+                <marker date="1438615873000" expanded="true" signature="10113:10137" placeholder="{...}" />
+                <marker date="1438615873000" expanded="true" signature="10214:10617" placeholder="{...}" />
               </folding>
             </state>
           </provider>
@@ -120,11 +143,11 @@
         <option value="$PROJECT_DIR$/RFPParameter.cpp" />
         <option value="$PROJECT_DIR$/include/SequenceSummary.h" />
         <option value="$PROJECT_DIR$/include/Gene.h" />
-        <option value="$PROJECT_DIR$/Gene.cpp" />
         <option value="$PROJECT_DIR$/SequenceSummary.cpp" />
         <option value="$PROJECT_DIR$/main.cpp" />
-        <option value="$PROJECT_DIR$/include/Genome.h" />
         <option value="$PROJECT_DIR$/Genome.cpp" />
+        <option value="$PROJECT_DIR$/include/Genome.h" />
+        <option value="$PROJECT_DIR$/Gene.cpp" />
       </list>
     </option>
   </component>
@@ -721,16 +744,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Gene.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="1.4909091">
-          <caret line="229" column="56" selection-start-line="229" selection-start-column="56" selection-end-line="229" selection-end-column="56" />
-          <folding>
-            <element signature="e#0#25#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/include/SequenceSummary.h">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -760,21 +773,42 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/include/Genome.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="55" column="8" selection-start-line="55" selection-start-column="8" selection-end-line="55" selection-end-column="8" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Genome.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.3852459">
+        <state vertical-scroll-proportion="0.0">
           <caret line="514" column="13" selection-start-line="514" selection-start-column="13" selection-end-line="514" selection-end-column="13" />
           <folding>
             <element signature="e#0#27#0" expanded="true" />
+            <marker date="1438615873000" expanded="true" signature="5160:5932" placeholder="{...}" />
+            <marker date="1438615873000" expanded="true" signature="6003:7965" placeholder="{...}" />
+            <marker date="1438615873000" expanded="true" signature="8023:8108" placeholder="{...}" />
+            <marker date="1438615873000" expanded="true" signature="8163:8212" placeholder="{...}" />
+            <marker date="1438615873000" expanded="true" signature="8253:8443" placeholder="{...}" />
+            <marker date="1438615873000" expanded="true" signature="8484:8730" placeholder="{...}" />
+            <marker date="1438615873000" expanded="true" signature="8815:9079" placeholder="{...}" />
+            <marker date="1438615873000" expanded="true" signature="9115:9140" placeholder="{...}" />
+            <marker date="1438615873000" expanded="true" signature="9164:9208" placeholder="{...}" />
+            <marker date="1438615873000" expanded="true" signature="10113:10137" placeholder="{...}" />
+            <marker date="1438615873000" expanded="true" signature="10214:10617" placeholder="{...}" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/Genome.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="6" column="12" selection-start-line="6" selection-start-column="12" selection-end-line="6" selection-end-column="12" />
+          <folding>
+            <element signature="e#35#52#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Gene.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.6454918">
+          <caret line="228" column="4" selection-start-line="228" selection-start-column="4" selection-end-line="228" selection-end-column="4" />
+          <folding />
         </state>
       </provider>
     </entry>
