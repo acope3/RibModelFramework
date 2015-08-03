@@ -22,6 +22,8 @@ class ROCModel : public Model
 	virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k, double* logProbabilityRatio);
 	virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures);
 	void simulateGenome(Genome &genome);
+	virtual void calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, unsigned iteration, double &logProbabilityRatio);
+
 
 	//Parameter wrapper functions:
 	virtual void initTraces(unsigned samples, unsigned num_genes) {parameter -> initAllTraces(samples, num_genes);}
@@ -34,7 +36,7 @@ class ROCModel : public Model
 	virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth) {parameter->adaptCodonSpecificParameterProposalWidth(adaptiveWidth);}
 	virtual void updateCodonSpecificParameter(std::string grouping) {parameter->updateCodonSpecificParameter(grouping);}
 	virtual void updateCodonSpecificParameterTrace(unsigned sample, std::string grouping) {parameter->updateCodonSpecificParameterTrace(sample,grouping);}
-	virtual void proposeSPhi() {parameter->proposeSPhi();}
+	virtual void proposeHyperParameters() {parameter->proposeHyperParameters();}
 	virtual unsigned getMixtureAssignment(unsigned index) {return parameter->getMixtureAssignment(index);}
 	virtual unsigned getSynthesisRateCategory(unsigned mixture) {return parameter->getSynthesisRateCategory(mixture);}
 	virtual unsigned getSelectionCategory(unsigned mixture) {return parameter ->getSelectionCategory(mixture);}

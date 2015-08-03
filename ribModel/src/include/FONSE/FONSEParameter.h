@@ -97,6 +97,7 @@ class FONSEParameter : public Parameter
 		}
 
 		void proposeCodonSpecificParameter();
+		void proposeHyperParameters();
 		void getParameterForCategory(unsigned category, unsigned paramType, std::string aa, bool proposal, double *returnSet);
 
 		void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth);

@@ -20,6 +20,7 @@ class Model
         virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k, double* logProbabilityRatio) = 0;
         virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
         		double& logAcceptanceRatioForAllMixtures) = 0;
+		virtual void calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, unsigned iteration, double &logProbabilityRatio) = 0;
 
 
 		//Other functions:
@@ -37,7 +38,7 @@ class Model
 		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth) = 0;
 		virtual void updateCodonSpecificParameter(std::string grouping) = 0;
 		virtual void updateCodonSpecificParameterTrace(unsigned sample, std::string grouping) = 0;
-		virtual void proposeSPhi() = 0;
+		virtual void proposeHyperParameters() = 0;
 		virtual unsigned getMixtureAssignment(unsigned index) = 0;
 		virtual unsigned getSynthesisRateCategory(unsigned mixture) = 0;
 		virtual unsigned getSelectionCategory(unsigned mixture) = 0;

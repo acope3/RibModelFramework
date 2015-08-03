@@ -4,7 +4,6 @@
 #include <vector>
 #include <string>
 #include <map>
-#include <sys/_types/_id_t.h>
 
 #include "Gene.h"
 
@@ -19,7 +18,7 @@ class Genome
 		std::vector<Gene> genes;
 		std::vector<Gene> simulatedGenes;
 
-
+		unsigned numGenesWithPhi;
 	public:
 
 		//Constructors & destructors:

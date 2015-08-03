@@ -170,8 +170,8 @@ class Parameter {
 		virtual void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex) = 0;
 		virtual void updateMixtureProbabilitiesTrace(unsigned samples) = 0;
 
-		// poposal functions
-		void proposeSPhi();
+		// proposal functions
+		virtual void proposeHyperParameters() = 0;
 		void proposeSynthesisRateLevels();
 		double getCurrentSynthesisRateProposalWidth(unsigned expressionCategory, unsigned geneIndex)
 		{

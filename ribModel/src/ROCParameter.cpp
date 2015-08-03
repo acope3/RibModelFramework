@@ -961,6 +961,11 @@ void ROCParameter::proposeCodonSpecificParameter()
 
 }
 
+void ROCParameter::proposeHyperParameters()
+{
+	Sphi_proposed = std::exp(randNorm(std::log(Sphi), std_sphi));
+}
+
 std::vector<double> ROCParameter::propose(std::vector<double> currentParam, double (*proposal)(double a, double b),
 		double A, std::vector<double> B)
 {

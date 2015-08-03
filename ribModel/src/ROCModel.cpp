@@ -215,7 +215,6 @@ std::vector<double> ROCModel::CalculateProbabilitiesForCodons(std::vector<double
 }
 
 
-
 void ROCModel::simulateGenome(Genome &genome)
 {
      unsigned codonIndex;
@@ -274,4 +273,27 @@ void ROCModel::simulateGenome(Genome &genome)
 		Gene simulatedGene(tmpSeq, tmpDesc, gene.getId());
 		genome.addGene(simulatedGene, true);
 	}
+}
+
+void ROCModel::calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, unsigned iteration, double &logProbabilityRatio)
+{	
+	double currentSphi = getSphi(false);
+	double currentMPhi = -(currentSphi * currentSphi) / 2;
+	double lpr = logProbabilityRatio; // this variable is only needed because OpenMP doesn't allow variables in reduction clause to be reference
+	double proposedSphi = getSphi(true);
+	double proposedMPhi = -(proposedSphi * proposedSphi) / 2;
+
+#ifndef __APPLE__
+#pragma omp parallel for reduction(+:lpr)
+#endif
+	for (int i = 0; i < numGenes; i++)
+	{
+		unsigned mixture = getMixtureAssignment(i);
+		mixture = getSynthesisRateCategory(mixture);
+		double phi = getSynthesisRate(i, mixture, false);
+		lpr += std::log(Parameter::densityLogNorm(phi, proposedMPhi, proposedSphi)) - std::log(Parameter::densityLogNorm(phi, currentMPhi, currentSphi));
+	}
+
+	lpr -= (std::log(currentSphi) - std::log(proposedSphi));
+	logProbabilityRatio = lpr;
 }

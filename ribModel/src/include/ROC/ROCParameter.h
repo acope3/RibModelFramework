@@ -103,6 +103,7 @@ class ROCParameter : public Parameter
 
 		// poposal functions
 		void proposeCodonSpecificParameter();
+		void proposeHyperParameters();
 		void getParameterForCategory(unsigned category, unsigned parameter, std::string aa, bool proposal, double *returnValue);
 
 		void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth);

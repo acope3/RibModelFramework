@@ -14,7 +14,7 @@ parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssig
                                        mixture.definition = mixDef)
 
 # initialize MCMC object
-samples <- 100
+samples <- 20
 thining <- 10
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples=samples, thining=thining, adaptive.width=adaptiveWidth, 
@@ -25,7 +25,7 @@ model <- initializeModelObject(parameter, "FONSE")
 setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth, TRUE)
 #run mcmc on genome with parameter using model
 system.time(
-  runMCMC(mcmc, genome, model, 4)
+  runMCMC(mcmc, genome, model)
 )
 
 #plots log likelihood trace, possibly other mcmc diagnostics in the future
