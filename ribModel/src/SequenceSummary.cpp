@@ -42,10 +42,6 @@ SequenceSummary::SequenceSummary(const SequenceSummary& other)
 	for (unsigned i = 0u; i < 64; i++) {
 		RFPObserved[i] = other.RFPObserved[i];
 	}
-
-	/*std::copy(std::begin(other.naa), std::end(other.naa), std::begin(naa));
-	std::copy(std::begin(other.RFPObserved), std::end(other.RFPObserved), std::begin(RFPObserved));
-	*/
 }
 
 
@@ -664,7 +660,7 @@ RCPP_MODULE(SequenceSummary_mod)
 		function("indexToCodon", &SequenceSummary::indexToCodon); //TEST THAT ONLY!
 		function("GetNumCodonsForAA", &SequenceSummary::GetNumCodonsForAA,
 			List::create(_["aa"], _["forParamVector"] = false), "returns the number of codons for a given amino acid");
-		function("complimentNucleotide", &SequenceSummary::complimentNucleotide) //TEST THAT ONLY!
+		function("complimentNucleotide", &SequenceSummary::complimentNucleotide); //TEST THAT ONLY!
 		function("aminoAcids", &SequenceSummary::aminoAcids, "returns all Amino Acids as one letter code");
 		function("codons", &SequenceSummary::codons, "returns all codons or all reference codons");
 
