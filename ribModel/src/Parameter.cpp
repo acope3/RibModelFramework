@@ -759,16 +759,6 @@ void Parameter::InitializeSynthesisRate(std::vector<double> expression)
 
 }
 
-
-
-void Parameter::proposeSPhi()
-{
-	//Sphi_proposed = randLogNorm(Sphi, std_sphi);
-	// avoid adjusting probabilities for asymmetry of distribution
-	Sphi_proposed = std::exp(randNorm(std::log(Sphi), std_sphi));
-}
-
-
 void Parameter::proposeSynthesisRateLevels()
 {
 	unsigned numSynthesisRateLevels = currentSynthesisRateLevel[0].size();

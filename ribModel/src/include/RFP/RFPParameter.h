@@ -80,7 +80,7 @@ class RFPParameter: public Parameter {
 		std::vector<std::vector<double>> getCurrentAlphaParameter();
 		std::vector<std::vector<double>> getCurrentLambdaPrimeParameter();
 		void proposeCodonSpecificParameter();
-
+		void proposeHyperParameters();
 
 		//Proposal widths:
 		void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth); //may make virtual

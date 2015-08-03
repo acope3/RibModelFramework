@@ -920,6 +920,11 @@ void FONSEParameter::proposeCodonSpecificParameter()
 
 }
 
+void FONSEParameter::proposeHyperParameters()
+{
+	Sphi_proposed = std::exp(randNorm(std::log(Sphi), std_sphi));
+}
+
 void FONSEParameter::updateCodonSpecificParameter(std::string grouping)
 {
 	std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(grouping, true);

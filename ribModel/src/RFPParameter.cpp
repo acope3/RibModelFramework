@@ -458,6 +458,11 @@ void RFPParameter::proposeCodonSpecificParameter()
 	}
 }
 
+void RFPParameter::proposeHyperParameters()
+{
+	Sphi_proposed = std::exp(randNorm(std::log(Sphi), std_sphi));
+}
+
 
 void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
 {

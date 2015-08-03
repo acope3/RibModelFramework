@@ -25,7 +25,7 @@ class RFPModel: public Model {
 				double* logProbabilityRatio);
 		virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
 				double& logAcceptanceRatioForAllMixtures);
-
+		virtual void calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, unsigned iteration, double &logProbabilityRatio);
 
 		//Other functions:
 		void setParameter(RFPParameter &_parameter);
@@ -73,9 +73,9 @@ class RFPModel: public Model {
 		{
 			parameter->updateCodonSpecificParameterTrace(sample, codon);
 		}
-		virtual void proposeSPhi()
+		virtual void proposeHyperParameters()
 		{
-			parameter->proposeSPhi();
+			parameter->proposeHyperParameters();
 		}
 		virtual unsigned getMixtureAssignment(unsigned index)
 		{

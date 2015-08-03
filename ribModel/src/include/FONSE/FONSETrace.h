@@ -9,8 +9,8 @@
 class FONSETrace : public Trace
 {
 private:
-	std::vector< std::vector< std::vector<double> > > mutationParameterTrace; //order: mutationcategoy, numparam, samples
-	std::vector< std::vector< std::vector<double> > > selectionParameterTrace; //order: selectioncategoy, numparam, samples
+	std::vector< std::vector< std::vector<double> > > mutationParameterTrace; //order: mutationcategory, numparam, samples
+	std::vector< std::vector< std::vector<double> > > selectionParameterTrace; //order: selectioncategory, numparam, samples
 
 public:
 	//Constructor & Destructors

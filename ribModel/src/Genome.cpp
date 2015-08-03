@@ -9,6 +9,7 @@
 Genome::Genome()
 {
 	//ctor
+	numGenesWithPhi = 0;
 }
 
 Genome::~Genome()
@@ -21,6 +22,7 @@ Genome& Genome::operator=(const Genome& rhs)
 	if (this == &rhs) return *this; // handle self assignment
 	genes = rhs.genes;
 	simulatedGenes = rhs.simulatedGenes;
+	numGenesWithPhi = rhs.numGenesWithPhi;
 	//assignment operator
 	return *this;
 }
@@ -353,6 +355,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 						}
 						std::string val = tmp.substr(pos + 1, pos2 - (pos + 1));
 						it->second -> observedPhiValues.push_back(std::atof(val.c_str())); //make vector private again
+						if (it->second->observedPhiValues.size() == 1) numGenesWithPhi++;
 						pos = pos2;
 					}
 				}
@@ -381,6 +384,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 					}
 					std::string val = tmp.substr(pos + 1, pos2 - (pos + 1));
 					genes[geneIndex].observedPhiValues.push_back(std::atof(val.c_str()));
+					if (genes[geneIndex].observedPhiValues.size() == 1) numGenesWithPhi++;
 					pos = pos2;
 				}
 				geneIndex++;

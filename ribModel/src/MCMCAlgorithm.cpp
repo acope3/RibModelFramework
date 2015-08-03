@@ -65,7 +65,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	}
 
 	//initialize parameter's size
-	#pragma omp parallel for reduction(+:logLikelihood)
+	//#pragma omp parallel for reduction(+:logLikelihood)
 	for(int i = 0; i < numGenes; i++)
 	{
 		Gene gene = genome.getGene(i);
@@ -132,7 +132,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			if( -Parameter::randExp(1) < (propLogLike - currLogLike) )
 			{
 				model.updateSynthesisRate(i, k);
-				// only count each gene once, not numSynthesisRateCategories times
+				// only count each gene once, not numSynthesigeneIndexsRateCategories times
 				//#pragma omp critical
 				logLikelihood += model.getCategoryProbability(k) * propLogLike;
 			}else{
@@ -194,28 +194,11 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 void MCMCAlgorithm::acceptRejectHyperParameter(int numGenes, Model& model, int iteration)
 {
 	double logProbabilityRatio = 0.0;
-	double currentSphi = model.getSphi(false);
-	double currentMPhi = -(currentSphi * currentSphi) / 2;
 
-	double proposedSphi = model.getSphi(true);
-	double proposedMPhi = -(proposedSphi * proposedSphi) / 2;
-
-#ifndef __APPLE__
-#pragma omp parallel for reduction(+:logProbabilityRatio)
-#endif
-	for(int i = 0; i < numGenes; i++)
-	{
-		unsigned mixture = model.getMixtureAssignment(i);
-		mixture = model.getSynthesisRateCategory(mixture);
-		double phi = model.getSynthesisRate(i, mixture, false);
-		logProbabilityRatio += std::log(Parameter::densityLogNorm(phi, proposedMPhi, proposedSphi)) - std::log(Parameter::densityLogNorm(phi, currentMPhi, currentSphi));
-	}
-
-	logProbabilityRatio -= (std::log(currentSphi) - std::log(proposedSphi));
+	model.calculateLogLikelihoodRatioForHyperParameters(numGenes, iteration, logProbabilityRatio);
 	if(!std::isfinite(logProbabilityRatio))
 	{
 		std::cout << "logProbabilityRatio not finite!\n";
-		std::cout <<"currentSphi = " << currentSphi << " proposedSphi = " << proposedSphi <<"\n";
 	}
 
 	if( -Parameter::randExp(1) < logProbabilityRatio )
@@ -315,7 +298,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores)
 		// update hyper parameter
 		if(estimateHyperParameter)
 		{
-			model.proposeSPhi();
+			model.proposeHyperParameters();
 			acceptRejectHyperParameter(genome.getGenomeSize(), model, iteration);
 			if( ( (iteration + 1u) % adaptiveWidth) == 0u)
 			{

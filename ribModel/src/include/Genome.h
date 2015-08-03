@@ -16,6 +16,7 @@ class Genome
 	private:
 		std::vector<Gene> genes;
 		std::vector<Gene> simulatedGenes;
+		unsigned numGenesWithPhi;
 	public:
 		//constructor/destructor
 		explicit Genome();
