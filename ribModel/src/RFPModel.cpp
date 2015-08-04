@@ -181,3 +181,8 @@ void RFPModel::simulateGenome(Genome &genome)
 		genome.addGene(tmpGene, true);
 	}
 }
+
+void RFPModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth)
+{
+	adaptSphiProposalWidth(adaptiveWidth);
+}

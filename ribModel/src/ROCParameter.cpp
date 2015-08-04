@@ -87,6 +87,9 @@ ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
 
 	phiEpsilon = rhs.phiEpsilon;
 	phiEpsilon_proposed = rhs.phiEpsilon_proposed;
+	Aphi = rhs.Aphi;
+	Aphi_proposed = rhs.Aphi_proposed;
+	numAcceptForAphi = rhs.numAcceptForAphi;
 	traces = rhs.traces;
 	numAcceptForMutationAndSelection = rhs.numAcceptForMutationAndSelection;
 
@@ -103,6 +106,10 @@ void ROCParameter::initROCParameterSet()
 
 	phiEpsilon = 0.1;
 	phiEpsilon_proposed = 0.1;
+	Aphi = 0.0;
+	Aphi_proposed = 0.0;
+	std_Aphi = 0.1;
+	numAcceptForAphi = 0;
 
 	//may need getter fcts
 	currentMutationParameter.resize(numMutationCategories);
@@ -602,6 +609,21 @@ void ROCParameter::adaptSphiProposalWidth(unsigned adaptationWidth)
 	numAcceptForSphi = 0u;
 }
 
+void ROCParameter::adaptAphiProposalWidth(unsigned adaptationWidth)
+{
+	double acceptanceLevel = (double)numAcceptForAphi / (double)adaptationWidth;
+	traces.updateAphiAcceptanceRatioTrace(acceptanceLevel);
+	if (acceptanceLevel < 0.2)
+	{
+		std_Aphi *= 0.8;
+	}
+	if (acceptanceLevel > 0.3)
+	{
+		std_Aphi *= 1.2;
+	}
+	numAcceptForAphi = 0u;
+}
+
 void ROCParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
 {
 	unsigned acceptanceUnder = 0u;
@@ -722,6 +744,27 @@ double ROCParameter::getSphiPosteriorMean(unsigned samples)
 	return posteriorMean / (double) samples;
 }
 
+double ROCParameter::getAphiPosteriorMean(unsigned samples)
+{
+	double posteriorMean = 0.0;
+	std::vector<double> aPhiTrace = traces.getAphiTrace();
+	unsigned traceLength = aPhiTrace.size();
+
+	if (samples > traceLength)
+	{
+		std::cerr << "Warning in Parameter::getSphiPosteriorMean throws: Number of anticipated samples (" << samples
+			<< ") is greater than the length of the available trace (" << traceLength << ")."
+			<< "Whole trace is used for posterior estimate! \n";
+		samples = traceLength;
+	}
+	unsigned start = traceLength - samples;
+	for (unsigned i = start; i < traceLength; i++)
+	{
+		posteriorMean += aPhiTrace[i];
+	}
+	return posteriorMean / (double)samples;;
+}
+
 std::vector<double> ROCParameter::getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex)
 {
 	std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
@@ -773,6 +816,31 @@ double ROCParameter::getSphiVariance(unsigned samples, bool unbiased)
 		posteriorVariance += difference * difference;
 	}
 	double normalizationTerm = unbiased ? (1 / ((double) samples - 1.0)) : (1 / (double) samples);
+	return normalizationTerm * posteriorVariance;
+}
+
+double ROCParameter::getAphiVariance(unsigned samples, bool unbiased)
+{
+	std::vector<double> aPhiTrace = traces.getAphiTrace();
+	unsigned traceLength = aPhiTrace.size();
+	if (samples > traceLength)
+	{
+		std::cerr << "Warning in Parameter::getSphiVariance throws: Number of anticipated samples (" << samples
+			<< ") is greater than the length of the available trace (" << traceLength << ")."
+			<< "Whole trace is used for posterior estimate! \n";
+		samples = traceLength;
+	}
+	double posteriorMean = getAphiPosteriorMean(samples);
+
+	double posteriorVariance = 0.0;
+
+	unsigned start = traceLength - samples;
+	for (unsigned i = start; i < traceLength; i++)
+	{
+		double difference = aPhiTrace[i] - posteriorMean;
+		posteriorVariance += difference * difference;
+	}
+	double normalizationTerm = unbiased ? (1 / ((double)samples - 1.0)) : (1 / (double)samples);
 	return normalizationTerm * posteriorVariance;
 }
 
@@ -961,9 +1029,9 @@ void ROCParameter::proposeCodonSpecificParameter()
 
 }
 
-void ROCParameter::proposeHyperParameters()
+void ROCParameter::proposeAphi()
 {
-	Sphi_proposed = std::exp(randNorm(std::log(Sphi), std_sphi));
+	Aphi_proposed = std::exp(randNorm(std::log(Aphi), std_Aphi));
 }
 
 std::vector<double> ROCParameter::propose(std::vector<double> currentParam, double (*proposal)(double a, double b),

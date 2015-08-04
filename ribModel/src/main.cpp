@@ -180,7 +180,7 @@ void testSimulateGenome(Genome& genome)
 	parameter.InitializeSynthesisRate(phiVals);
 
 	std::cout << "done initialize ROCParameter object" << std::endl;
-	ROCModel model;
+	ROCModel model(false);
 	model.setParameter(parameter);
 	model.simulateGenome(genome);
 	std::vector <Gene> simGenes = genome.getGenes(true);
@@ -389,7 +389,7 @@ void simulateROCData()
 									   "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv" };
 	tmp.initMutationSelectionCategories(files, tmp.getNumMutationCategories(), ROCParameter::dM);
 	tmp.initMutationSelectionCategories(files, tmp.getNumSelectionCategories(), ROCParameter::dEta);
-	ROCModel model;
+	ROCModel model(false);
 
 	model.setParameter(tmp);
 
@@ -638,7 +638,7 @@ int main()
 			}
 
 			std::cout <<"Initializing ROCModel object\n";
-			ROCModel model;
+			ROCModel model(false);
 			model.setParameter(parameter);
 			std::ofstream scuoout("results/scuo.csv");
 			for (unsigned n = 0u; n < genome.getGenomeSize(); n++)

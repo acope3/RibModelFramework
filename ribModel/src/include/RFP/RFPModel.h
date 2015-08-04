@@ -93,6 +93,7 @@ class RFPModel: public Model {
 		{
 			return parameter->getSynthesisRate(index, mixture, proposed);
 		}
+		virtual void adaptHyperParameterProposalWidths(unsigned adaptiveWidth);
 		virtual double getCurrentSphiProposalWidth()
 		{
 			return parameter->getCurrentSphiProposalWidth();

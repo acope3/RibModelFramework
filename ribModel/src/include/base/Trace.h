@@ -10,7 +10,6 @@
 class Trace {
 	private:
 		std::vector<double> sPhiTrace; //samples
-		std::vector<double> aPhiTrace; //Not used yet
 		std::vector<double> sphiAcceptanceRatioTrace; //samples
 		std::vector<std::vector<std::vector<double>>>synthesisRateAcceptanceRatioTrace; //order: expressionCategory, gene, sample
 		std::vector<std::vector<double>> cspAcceptanceRatioTrace;//order: codon, sample
@@ -41,8 +40,6 @@ class Trace {
 		std::vector<double> getSPhiTrace()
 		{	return sPhiTrace;}
 		std::vector<double> getExpectedPhiTrace();
-		std::vector<double> getAPhiTrace()
-		{	return aPhiTrace;}
 		std::vector<double> getSphiAcceptanceRatioTrace()
 		{	return sphiAcceptanceRatioTrace;}
 		std::vector<double> getSynthesisRateAcceptanceRatioTraceByMixtureElementForGene(unsigned mixtureElement, unsigned geneIndex);

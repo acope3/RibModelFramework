@@ -750,6 +750,11 @@ void Parameter::InitializeSynthesisRate(std::vector<double> expression)
 
 }
 
+void Parameter::proposeSphi()
+{
+	Sphi_proposed = std::exp(randNorm(std::log(Sphi), std_sphi));
+}
+
 void Parameter::proposeSynthesisRateLevels()
 {
 	unsigned numSynthesisRateLevels = currentSynthesisRateLevel[0].size();

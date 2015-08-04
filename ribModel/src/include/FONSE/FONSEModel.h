@@ -45,6 +45,7 @@ public:
 	virtual unsigned getMutationCategory(unsigned mixture)  { return parameter->getMutationCategory(mixture); }
 	virtual double getSynthesisRate(unsigned index, unsigned mixture, bool proposed = false) { return parameter->getSynthesisRate(index, mixture, proposed); }
 	virtual double getCurrentSphiProposalWidth() { return parameter->getCurrentSphiProposalWidth(); }
+	virtual void adaptHyperParameterProposalWidths(unsigned adaptiveWidth);
 	virtual void updateSphi() { parameter->updateSphi(); }
 	virtual void updateSphiTrace(unsigned sample) { parameter->updateSphiTrace(sample); }
 	virtual void adaptSphiProposalWidth(unsigned adaptiveWidth) { parameter->adaptSphiProposalWidth(adaptiveWidth); }

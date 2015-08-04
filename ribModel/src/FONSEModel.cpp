@@ -170,6 +170,11 @@ void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes
 	logProbabilityRatio = lpr;
 }
 
+void FONSEModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth)
+{
+	adaptSphiProposalWidth(adaptiveWidth);
+}
+
 void FONSEModel::setParameter(FONSEParameter &_parameter)
 {
 	parameter = &_parameter;
