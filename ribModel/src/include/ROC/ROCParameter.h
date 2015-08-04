@@ -25,6 +25,10 @@ class ROCParameter : public Parameter
 
 		double phiEpsilon;
 		double phiEpsilon_proposed;
+		double Aphi;
+		double Aphi_proposed;
+		double std_Aphi;
+		double numAcceptForAphi;
 
 		std::vector<std::vector<double>> currentMutationParameter;
 		std::vector<std::vector<double>> proposedMutationParameter;
@@ -84,6 +88,7 @@ class ROCParameter : public Parameter
 
 
 		double getPreviousCodonSpecificProposalWidth(unsigned aa);
+		double getCurrentAphiProposalWidth() { return std_Aphi; }
 		// Phi epsilon functions
 		double getPhiEpsilon() {return phiEpsilon;}
 
@@ -91,10 +96,18 @@ class ROCParameter : public Parameter
 		// functions to manage codon specific parameter
 		void updateCodonSpecificParameter(std::string grouping);
 
-
+		// functions to manage Aphi
+		double getAphi(bool proposed = false) { return (proposed ? Aphi_proposed : Aphi); }
+		void setAphi(double aPhi) { Aphi = aPhi; }
+		void updateAphi()
+		{
+			Aphi = Aphi_proposed;
+			numAcceptForAphi++;
+		}
 
 		//update trace functions
 		virtual void updateSphiTrace(unsigned sample) {traces.updateSphiTrace(sample, Sphi);}
+		void updateAphiTrace(unsigned sample) { traces.updateAphiTrace(sample, Aphi); }
 		virtual void updateSynthesisRateTrace(unsigned sample, unsigned geneIndex){traces.updateSynthesisRateTrace(sample, geneIndex, currentSynthesisRateLevel);}
 		virtual void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex) {traces.updateMixtureAssignmentTrace(sample, geneIndex, mixtureAssignment[geneIndex]);}
 		virtual void updateMixtureProbabilitiesTrace(unsigned samples) {traces.updateMixtureProbabilitiesTrace(samples, categoryProbabilities);}
@@ -103,18 +116,21 @@ class ROCParameter : public Parameter
 
 		// poposal functions
 		void proposeCodonSpecificParameter();
-		void proposeHyperParameters();
+		void proposeAphi();
 		void getParameterForCategory(unsigned category, unsigned parameter, std::string aa, bool proposal, double *returnValue);
 
 		void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth);
 
 
 		virtual void adaptSphiProposalWidth(unsigned adaptationWidth);
+		void adaptAphiProposalWidth(unsigned adaptationWidth);
 		virtual void adaptSynthesisRateProposalWidth(unsigned adaptationWidth);
 		virtual double getSphiPosteriorMean(unsigned samples);
+		double getAphiPosteriorMean(unsigned samples);
 		virtual std::vector <double> getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex);
 		virtual double getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement);
 		virtual double getSphiVariance(unsigned samples, bool unbiased = true );
+		double getAphiVariance(unsigned samples, bool unbiased = true);
 		virtual double getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement, bool unbiased = true);
 		double getMutationPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon);
 		double getSelectionPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon);
@@ -165,7 +181,6 @@ class ROCParameter : public Parameter
 		}
 
 	protected:
-
 };
 
 #endif // ROCPARAMETER_H

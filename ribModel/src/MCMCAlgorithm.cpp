@@ -302,7 +302,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores)
 			acceptRejectHyperParameter(genome.getGenomeSize(), model, iteration);
 			if( ( (iteration + 1u) % adaptiveWidth) == 0u)
 			{
-				model.adaptSphiProposalWidth(adaptiveWidth);
+				model.adaptHyperParameterProposalWidths(adaptiveWidth);
 			}
 		}
 		// update expression level values

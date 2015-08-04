@@ -1,8 +1,9 @@
 #include "include/ROC/ROCModel.h"
 
-ROCModel::ROCModel() : Model()
+ROCModel::ROCModel(bool _withPhi = false) : Model()
 {
 	parameter = nullptr;
+	withPhi = _withPhi;
 }
 
 ROCModel::~ROCModel()
@@ -278,10 +279,24 @@ void ROCModel::simulateGenome(Genome &genome)
 void ROCModel::calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, unsigned iteration, double &logProbabilityRatio)
 {	
 	double currentSphi = getSphi(false);
-	double currentMPhi = -(currentSphi * currentSphi) / 2;
+	double currentMphi;
+	double proposedMphi;
+	if (withPhi) {
+		double currentAphi = getAphi(false);
+		currentMphi = currentAphi - ((currentSphi * currentSphi) / 2);
+	}
+	else {
+		currentMphi = -((currentSphi * currentSphi) / 2);
+	}
 	double lpr = logProbabilityRatio; // this variable is only needed because OpenMP doesn't allow variables in reduction clause to be reference
 	double proposedSphi = getSphi(true);
-	double proposedMPhi = -(proposedSphi * proposedSphi) / 2;
+	if (withPhi) {
+		double proposedAphi = getAphi(true);
+		proposedMphi = proposedAphi - ((proposedSphi * proposedSphi) / 2);
+	}
+	else {
+		proposedMphi = -((proposedSphi * proposedSphi) / 2);
+	}
 
 #ifndef __APPLE__
 #pragma omp parallel for reduction(+:lpr)
@@ -291,9 +306,25 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, 
 		unsigned mixture = getMixtureAssignment(i);
 		mixture = getSynthesisRateCategory(mixture);
 		double phi = getSynthesisRate(i, mixture, false);
-		lpr += std::log(Parameter::densityLogNorm(phi, proposedMPhi, proposedSphi)) - std::log(Parameter::densityLogNorm(phi, currentMPhi, currentSphi));
+		lpr += std::log(Parameter::densityLogNorm(phi, proposedMphi, proposedSphi)) - std::log(Parameter::densityLogNorm(phi, currentMphi, currentSphi));
 	}
 
 	lpr -= (std::log(currentSphi) - std::log(proposedSphi));
 	logProbabilityRatio = lpr;
+}
+
+void ROCModel::proposeHyperParameters()
+{
+	parameter->proposeSphi();
+	if (withPhi) {
+		parameter->proposeAphi();
+	}
+}
+
+void ROCModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth)
+{
+	adaptSphiProposalWidth(adaptiveWidth);
+	if (withPhi) {
+		adaptAphiProposalWidth(adaptiveWidth);
+	}
 }

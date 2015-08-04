@@ -47,6 +47,7 @@ class Model
 		virtual void updateSphi() = 0;
 		virtual void updateSphiTrace(unsigned sample) = 0;
 		virtual void adaptSphiProposalWidth(unsigned adaptiveWidth) = 0;
+		virtual void adaptHyperParameterProposalWidths(unsigned adaptiveWidth) = 0;
 		virtual void proposeSynthesisRateLevels() = 0;
 		virtual unsigned getNumSynthesisRateCategories() = 0;
 		virtual std::vector<unsigned> getMixtureElementsOfSelectionCategory(unsigned k) = 0;
