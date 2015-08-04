@@ -45,10 +45,6 @@ class RFPModel: public Model {
 		{
 			return parameter->getSphi(proposed);
 		}
-		virtual double getSphiProposalWidth()
-		{
-			return parameter->getSphiProposalWidth();
-		}
 		virtual unsigned getNumMixtureElements()
 		{
 			return parameter->getNumMixtureElements();

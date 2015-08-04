@@ -29,7 +29,6 @@ class ROCModel : public Model
 	virtual void initTraces(unsigned samples, unsigned num_genes) {parameter -> initAllTraces(samples, num_genes);}
 	virtual void writeRestartFile(std::string filename) {return parameter->writeEntireRestartFile(filename);}       
 	virtual double getSphi(bool proposed = false) {return parameter->getSphi(proposed);}
-	virtual double getSphiProposalWidth() {return parameter->getSphiProposalWidth();}
 	virtual unsigned getNumMixtureElements() {return parameter->getNumMixtureElements();}
 	virtual double getCategoryProbability(unsigned i) {return parameter->getCategoryProbability(i);}
 	virtual void proposeCodonSpecificParameter() {parameter->proposeCodonSpecificParameter();}
@@ -66,6 +65,8 @@ class ROCModel : public Model
 	std::vector<double> CalculateProbabilitiesForCodons(std::vector<double> mutation, std::vector<double> selection, double phi);
 
     protected:
+		double Aphi;
+		double Aphi_proposed;
 };
 
 #endif // ROCMODEL_H

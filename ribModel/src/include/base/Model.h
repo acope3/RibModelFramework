@@ -31,7 +31,6 @@ class Model
 		virtual void initTraces(unsigned samples, unsigned num_genes) = 0;
 		virtual void writeRestartFile(std::string filename) = 0;
 		virtual double getSphi(bool proposed = false) = 0;
-		virtual double getSphiProposalWidth() = 0;
 		virtual unsigned getNumMixtureElements() = 0;
 		virtual double getCategoryProbability(unsigned i) = 0;
 		virtual void proposeCodonSpecificParameter() = 0;
