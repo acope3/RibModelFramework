@@ -76,10 +76,6 @@ class Parameter {
 			Sphi = Sphi_proposed;
 			numAcceptForSphi++;
 		}
-		double getSphiProposalWidth()
-		{
-			return std_sphi;
-		}
 
 
 		std::vector<double> readPhiValues(std::string filename); //General function, not specific to class, possibly move
@@ -243,8 +239,6 @@ class Parameter {
 		unsigned getGroupListSize();
 
 	protected:
-		double Aphi;
-		double Aphi_proposed;
 		double Sphi;
 		double Sphi_proposed;
 

@@ -655,7 +655,7 @@ int main()
 			
 
 			std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
-			std::cout << "Sphi proposal width: " << parameter.getSphiProposalWidth() << std::endl;
+			std::cout << "Sphi proposal width: " << parameter.getCurrentSphiProposalWidth() << std::endl;
 			std::cout << "CSP proposal width: \n";
 			for (unsigned n = 0; n < model.getGroupListSize(); n++)
 			{
@@ -706,7 +706,7 @@ int main()
 
 
       std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
-      std::cout << "Sphi proposal width: " << parameter.getSphiProposalWidth() << std::endl;
+      std::cout << "Sphi proposal width: " << parameter.getCurrentSphiProposalWidth() << std::endl;
 
 		}
 		else if (modelToRun == FONSE)
@@ -775,7 +775,7 @@ int main()
 
 
 			std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
-			std::cout << "Sphi proposal width: " << parameter.getSphiProposalWidth() << std::endl;
+			std::cout << "Sphi proposal width: " << parameter.getCurrentSphiProposalWidth() << std::endl;
 			std::cout << "CSP proposal width: \n";
 			for (unsigned n = 0; n < model.getGroupListSize(); n++)
 			{

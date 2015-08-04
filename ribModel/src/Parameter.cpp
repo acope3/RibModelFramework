@@ -15,8 +15,6 @@ Parameter::Parameter()
 	numParam = 0u;
 	Sphi = 0.0;
 	Sphi_proposed = 0.0;
-	Aphi = 0.0;
-	Aphi_proposed = 0.0;
 	numAcceptForSphi = 0u;
 	bias_sphi = 0.0;
 	bias_phi = 0.0;
@@ -33,8 +31,6 @@ Parameter::Parameter(unsigned _maxGrouping)
 	numParam = 0u;
 	Sphi = 0.0;
 	Sphi_proposed = 0.0;
-	Aphi = 0.0;
-	Aphi_proposed = 0.0;
 	numAcceptForSphi = 0u;
 	bias_sphi = 0.0;
 	bias_phi = 0.0;
@@ -53,9 +49,7 @@ Parameter& Parameter::operator=(const Parameter& rhs)
 
 
   Sphi = rhs.Sphi;
-  Aphi = rhs.Aphi;
   Sphi_proposed = rhs.Sphi_proposed;
-  Aphi_proposed = rhs.Aphi_proposed;
   numAcceptForSphi = rhs.numAcceptForSphi;
   categories = rhs.categories;
 
@@ -273,7 +267,6 @@ void Parameter::writeBasicRestartFile(std::string filename)
 	}
 	if (i % 10 != 0) oss << "\n";
 	oss <<">Sphi:\n" << Sphi <<"\n";
-	oss <<">Aphi:\n" << Aphi <<"\n";
 	oss <<">numParam:\n" << numParam <<"\n";
 	oss <<">numMixtures:\n" << numMixtures <<"\n";
 	oss <<">std_sphi:\n" << std_sphi <<"\n";
@@ -405,7 +398,6 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 				}
 			} 
 			else if (variableName == "Sphi") {iss.str(tmp); iss >> Sphi;}
-			else if (variableName == "Aphi") {iss.str(tmp); iss >> Aphi;}	
 			else if (variableName == "numParam") {iss.str(tmp); iss >> numParam;}	
 			else if (variableName == "numMutationCategories") {iss.str(tmp); iss >> numMutationCategories;} 	
 			else if (variableName == "numSelectionCategories") {iss.str(tmp); iss >> numSelectionCategories;}	
@@ -513,7 +505,6 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 	
 	//initialize all the default Parameter values now.
 	Sphi_proposed = Sphi;
-	Aphi_proposed = Aphi;
 	numAcceptForSphi = 0u;
 	bias_sphi = 0;
 	bias_phi = 0;
