@@ -55,6 +55,7 @@ class Gene
 
 
 		//R wrapper functions:
+		void cleanSeqR();
 		unsigned getAACount(std::string aa);
 		unsigned getCodonCount(std::string& codon);
 		unsigned getRFPObserved(std::string codon);
