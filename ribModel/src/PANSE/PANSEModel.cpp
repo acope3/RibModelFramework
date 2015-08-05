@@ -1,4 +1,4 @@
-#include "include/PANSE/PANSEModel.h"
+#include "../include/PANSE/PANSEModel.h"
 
 
 #ifndef STANDALONE
@@ -7,20 +7,20 @@ using namespace Rcpp;
 #endif
 
 
-RFPModel::RFPModel() : Model()
+PANSEModel::PANSEModel() : Model()
 {
 	//ctor
 }
 
 
-RFPModel::~RFPModel()
+PANSEModel::~PANSEModel()
 {
 	//dtor
 	//TODO: call Parent's deconstructor
 }
 
 
-double RFPModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
+double PANSEModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
 	unsigned currRFPObserved, unsigned currNumCodonsInMRNA, double phiValue)
 {
 	double logLikelihood = ((std::lgamma((currNumCodonsInMRNA * currAlpha) + currRFPObserved)) - (std::lgamma(currNumCodonsInMRNA * currAlpha)))
@@ -31,13 +31,13 @@ double RFPModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double 
 }
 
 
-void RFPModel::setParameter(RFPParameter &_parameter)
+void PANSEModel::setParameter(PANSEParameter &_parameter)
 {
 	parameter = &_parameter;
 }
 
 
-void RFPModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k, double* logProbabilityRatio)
+void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k, double* logProbabilityRatio)
 {
 
 	double logLikelihood = 0.0;
@@ -58,8 +58,8 @@ void RFPModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 	{
 		std::string codon = getGrouping(index);
 
-		double currAlpha = getParameterForCategory(alphaCategory, RFPParameter::alp, codon, false);
-		double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, RFPParameter::lmPri, codon, false);
+		double currAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, false);
+		double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PANSEParameter::lmPri, codon, false);
 		unsigned currRFPObserved = gene.geneData.getRFPObserved(index);
 
 		unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(index);
@@ -81,7 +81,7 @@ void RFPModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 }
 
 
-void RFPModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures)
+void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures)
 {
 	double logLikelihood = 0.0;
 	double logLikelihood_proposed = 0.0;
@@ -108,11 +108,11 @@ void RFPModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 		if (currNumCodonsInMRNA == 0) continue;
 
 
-		double currAlpha = getParameterForCategory(alphaCategory, RFPParameter::alp, grouping, false);
-		double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, RFPParameter::lmPri, grouping, false);
+		double currAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, grouping, false);
+		double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PANSEParameter::lmPri, grouping, false);
 
-		double propAlpha = getParameterForCategory(alphaCategory, RFPParameter::alp, grouping, true);
-		double propLambdaPrime = getParameterForCategory(lambdaPrimeCategory, RFPParameter::lmPri, grouping, true);
+		double propAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, grouping, true);
+		double propLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PANSEParameter::lmPri, grouping, true);
 
 
 		logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
@@ -122,7 +122,7 @@ void RFPModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 }
 
 
-void RFPModel::simulateGenome(Genome &genome)
+void PANSEModel::simulateGenome(Genome &genome)
 {
 	for (unsigned geneIndex = 0; geneIndex < genome.getGenomeSize(); geneIndex++)
 	{
@@ -136,8 +136,8 @@ void RFPModel::simulateGenome(Genome &genome)
 			unsigned alphaCat = parameter -> getMutationCategory(mixtureElement);
 			unsigned lambdaPrimeCat = parameter -> getSelectionCategory(mixtureElement);
 
-			double alpha = getParameterForCategory(alphaCat, RFPParameter::alp, codon, false);
-			double lambdaPrime = getParameterForCategory(lambdaPrimeCat, RFPParameter::lmPri, codon, false);
+			double alpha = getParameterForCategory(alphaCat, PANSEParameter::alp, codon, false);
+			double lambdaPrime = getParameterForCategory(lambdaPrimeCat, PANSEParameter::lmPri, codon, false);
 
 			double alphaPrime = alpha * gene.geneData.getCodonCountForCodon(codon);
 

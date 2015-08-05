@@ -1,4 +1,4 @@
-#include "include/RFP/RFPParameter.h"
+#include "../include/PANSE/PANSEParameter.h"
 
 
 #include <sstream>
@@ -10,35 +10,35 @@ using namespace Rcpp;
 #endif
 
 
-RFPParameter::RFPParameter() : Parameter()
+PANSEParameter::PANSEParameter() : Parameter()
 {
 	//ctor
 }
 
 
-RFPParameter::RFPParameter(std::string filename) : Parameter(64)
+PANSEParameter::PANSEParameter(std::string filename) : Parameter(64)
 {
 	initFromRestartFile(filename);
 	numParam = 61;
 }
 
 
-RFPParameter::RFPParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix, 
+PANSEParameter::PANSEParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix,
 		bool splitSer, std::string _mutationSelectionState) : Parameter(64)
 {
 	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
-	initRFPParameterSet();
+	initPANSEParameterSet();
 }
 
 
-RFPParameter::~RFPParameter()
+PANSEParameter::~PANSEParameter()
 {
 	//dtor 
 	//TODO: Need to call Parameter's deconstructor
 }
 
 
-RFPParameter& RFPParameter::operator=(const RFPParameter& rhs)
+PANSEParameter& PANSEParameter::operator=(const PANSEParameter& rhs)
 {
 	if (this == &rhs) return *this; // handle self assignment
 
@@ -59,7 +59,7 @@ RFPParameter& RFPParameter::operator=(const RFPParameter& rhs)
 }
 
 
-void RFPParameter::initRFPParameterSet()
+void PANSEParameter::initPANSEParameterSet()
 {
 
 	unsigned alphaCategories = getNumMutationCategories();
@@ -100,7 +100,7 @@ void RFPParameter::initRFPParameterSet()
 }
 
 
-void RFPParameter::initAlpha(double alphaValue, unsigned mixtureElement, std::string codon)
+void PANSEParameter::initAlpha(double alphaValue, unsigned mixtureElement, std::string codon)
 {
 	unsigned category = getMutationCategory(mixtureElement);
 	unsigned index = SequenceSummary::codonToIndex(codon);
@@ -108,7 +108,7 @@ void RFPParameter::initAlpha(double alphaValue, unsigned mixtureElement, std::st
 }
 
 
-void RFPParameter::initLambdaPrime(double lambdaPrimeValue, unsigned mixtureElement, std::string codon)
+void PANSEParameter::initLambdaPrime(double lambdaPrimeValue, unsigned mixtureElement, std::string codon)
 {
 	unsigned category = getMutationCategory(mixtureElement);
 	unsigned index = SequenceSummary::codonToIndex(codon);
@@ -116,14 +116,14 @@ void RFPParameter::initLambdaPrime(double lambdaPrimeValue, unsigned mixtureElem
 }
 
 
-void RFPParameter::initMutationSelectionCategories(std::vector<std::string> files, unsigned numCategories, unsigned paramType)
+void PANSEParameter::initMutationSelectionCategories(std::vector<std::string> files, unsigned numCategories, unsigned paramType)
 {
 	std::ifstream currentFile;
 	std::string tmpString;
 	std::string type;
 
 
-	if (paramType == RFPParameter::alp)
+	if (paramType == PANSEParameter::alp)
 		type = "alpha";
 	else
 		type = "lambda";
@@ -154,13 +154,13 @@ void RFPParameter::initMutationSelectionCategories(std::vector<std::string> file
 		unsigned altered = 0u;
 		for (unsigned j = 0; j < categories.size(); j++)
 		{
-			if (paramType == RFPParameter::alp && categories[j].delM == i)
+			if (paramType == PANSEParameter::alp && categories[j].delM == i)
 			{
 				currentAlphaParameter[j] = temp;
 				proposedAlphaParameter[j] = temp;
 				altered++;
 			}
-			else if (paramType == RFPParameter::lmPri && categories[j].delEta == i)
+			else if (paramType == PANSEParameter::lmPri && categories[j].delEta == i)
 			{
 				currentLambdaPrimeParameter[j] = temp;
 				proposedLambdaPrimeParameter[j] = temp;
@@ -174,14 +174,14 @@ void RFPParameter::initMutationSelectionCategories(std::vector<std::string> file
 }
 
 
-void RFPParameter::writeEntireRestartFile(std::string filename)
+void PANSEParameter::writeEntireRestartFile(std::string filename)
 {
 	writeBasicRestartFile(filename);
-	writeRFPRestartFile(filename);
+	writePANSERestartFile(filename);
 }
 
 
-void RFPParameter::writeRFPRestartFile(std::string filename)
+void PANSEParameter::writePANSERestartFile(std::string filename)
 {
 
 	std::ofstream out;
@@ -247,14 +247,14 @@ void RFPParameter::writeRFPRestartFile(std::string filename)
 }
 
 
-void RFPParameter::initFromRestartFile(std::string filename)
+void PANSEParameter::initFromRestartFile(std::string filename)
 {
 	initBaseValuesFromFile(filename);
-	initRFPValuesFromFile(filename);
+	initPANSEValuesFromFile(filename);
 }
 
 
-void RFPParameter::initRFPValuesFromFile(std::string filename)
+void PANSEParameter::initPANSEValuesFromFile(std::string filename)
 {
 	std::ifstream input;
 	input.open(filename.c_str());
@@ -359,50 +359,50 @@ void RFPParameter::initRFPValuesFromFile(std::string filename)
 }
 
 
-RFPTrace& RFPParameter::getTraceObject()
+PANSETrace& PANSEParameter::getTraceObject()
 {
 	return traces;
 }
 
 
-void RFPParameter::initAllTraces(unsigned samples, unsigned num_genes)
+void PANSEParameter::initAllTraces(unsigned samples, unsigned num_genes)
 {
 	traces.initAllTraces(samples, num_genes, numMutationCategories, numSelectionCategories, numParam,
 						 numMixtures, categories, (unsigned)groupList.size());
 }
 
 
-void RFPParameter::updateSphiTrace(unsigned sample)
+void PANSEParameter::updateSphiTrace(unsigned sample)
 {
 	traces.updateSphiTrace(sample, Sphi);
 }
 
 
-void RFPParameter::updateSynthesisRateTrace(unsigned sample, unsigned geneIndex)
+void PANSEParameter::updateSynthesisRateTrace(unsigned sample, unsigned geneIndex)
 {
 	traces.updateSynthesisRateTrace(sample, geneIndex, currentSynthesisRateLevel);
 }
 
 
-void RFPParameter::updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex)
+void PANSEParameter::updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex)
 {
 	traces.updateMixtureAssignmentTrace(sample, geneIndex, mixtureAssignment[geneIndex]);
 }
 
 
-void RFPParameter::updateMixtureProbabilitiesTrace(unsigned samples)
+void PANSEParameter::updateMixtureProbabilitiesTrace(unsigned samples)
 {
 	traces.updateMixtureProbabilitiesTrace(samples, categoryProbabilities);
 }
 
 
-void RFPParameter::updateCodonSpecificParameterTrace(unsigned sample, std::string codon)
+void PANSEParameter::updateCodonSpecificParameterTrace(unsigned sample, std::string codon)
 {
 	traces.updateCodonSpecificParameterTrace(sample, codon, currentLambdaPrimeParameter, currentAlphaParameter);
 }
 
 
-void RFPParameter::updateCodonSpecificParameter(std::string grouping)
+void PANSEParameter::updateCodonSpecificParameter(std::string grouping)
 {
 	unsigned i = SequenceSummary::codonToIndex(grouping);
 	numAcceptForAlphaAndLambdaPrime[i]++;
@@ -418,25 +418,25 @@ void RFPParameter::updateCodonSpecificParameter(std::string grouping)
 }
 
 
-double RFPParameter::getCurrentCodonSpecificProposalWidth(unsigned index)
+double PANSEParameter::getCurrentCodonSpecificProposalWidth(unsigned index)
 {
 	return std_csp[index];
 }
 
 
-std::vector<std::vector<double>> RFPParameter::getCurrentAlphaParameter()
+std::vector<std::vector<double>> PANSEParameter::getCurrentAlphaParameter()
 {
 	return currentAlphaParameter;
 }
 
 
-std::vector<std::vector<double>> RFPParameter::getCurrentLambdaPrimeParameter()
+std::vector<std::vector<double>> PANSEParameter::getCurrentLambdaPrimeParameter()
 {
 	return currentLambdaPrimeParameter;
 }
 
 
-void RFPParameter::proposeCodonSpecificParameter()
+void PANSEParameter::proposeCodonSpecificParameter()
 {
 	unsigned numAlpha = (unsigned)currentAlphaParameter[0].size();
 	unsigned numLambdaPrime = (unsigned)currentLambdaPrimeParameter[0].size();
@@ -459,7 +459,7 @@ void RFPParameter::proposeCodonSpecificParameter()
 }
 
 
-void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
+void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
 {
 
 	std::cout << "acceptance ratio for codon:\n";
@@ -486,7 +486,7 @@ void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 
 
 //TODO: The only thing stopping this from moving up to Parameter is the trace stuff. Is there a way around this?
-void RFPParameter::adaptSphiProposalWidth(unsigned adaptationWidth)
+void PANSEParameter::adaptSphiProposalWidth(unsigned adaptationWidth)
 {
 	double acceptanceLevel = (double)numAcceptForSphi / (double)adaptationWidth;
 	traces.updateSphiAcceptanceRatioTrace(acceptanceLevel);
@@ -503,7 +503,7 @@ void RFPParameter::adaptSphiProposalWidth(unsigned adaptationWidth)
 
 
 //TODO: The only thing stopping this from moving up to Parameter is the trace stuff. Is there a way around this?
-void RFPParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
+void PANSEParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
 {
 	for(unsigned cat = 0u; cat < numSelectionCategories; cat ++)
 	{
@@ -527,7 +527,7 @@ void RFPParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
 
 
 //TODO: Traces prevent this from being in the parent class
-double RFPParameter::getSphiPosteriorMean(unsigned samples)
+double PANSEParameter::getSphiPosteriorMean(unsigned samples)
 {
 	double posteriorMean = 0.0;
 	std::vector<double> sPhiTrace = traces.getSPhiTrace();
@@ -549,7 +549,7 @@ double RFPParameter::getSphiPosteriorMean(unsigned samples)
 
 
 //TODO: Traces prevent this from being in the parent class
-double RFPParameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement)
+double PANSEParameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement)
 {
 	unsigned expressionCategory = getSynthesisRateCategory(mixtureElement);
 	double posteriorMean = 0.0;
@@ -582,7 +582,7 @@ double RFPParameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned ge
 }
 
 
-double RFPParameter::getAlphaPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon)
+double PANSEParameter::getAlphaPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon)
 {
 	double posteriorMean = 0.0;
 	std::vector<double> alphaParameterTrace = traces.getAlphaParameterTraceByMixtureElementForCodon(mixtureElement, codon);
@@ -590,7 +590,7 @@ double RFPParameter::getAlphaPosteriorMean(unsigned mixtureElement, unsigned sam
 
 	if(samples > traceLength)
 	{
-		std::cerr << "Warning in RFPParameter::getAlphaPosteriorMean throws: Number of anticipated samples (" <<
+		std::cerr << "Warning in PANSEParameter::getAlphaPosteriorMean throws: Number of anticipated samples (" <<
 			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
 	}
@@ -603,7 +603,7 @@ double RFPParameter::getAlphaPosteriorMean(unsigned mixtureElement, unsigned sam
 }
 
 
-double RFPParameter::getLambdaPrimePosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon)
+double PANSEParameter::getLambdaPrimePosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon)
 {
 	double posteriorMean = 0.0;
 	std::vector<double> lambdaPrimeParameterTrace = traces.getLambdaPrimeParameterTraceByMixtureElementForCodon(mixtureElement, codon);
@@ -611,7 +611,7 @@ double RFPParameter::getLambdaPrimePosteriorMean(unsigned mixtureElement, unsign
 
 	if(samples > traceLength)
 	{
-		std::cerr << "Warning in RFPParameter::getLambdaPrimePosteriorMean throws: Number of anticipated samples (" <<
+		std::cerr << "Warning in PANSEParameter::getLambdaPrimePosteriorMean throws: Number of anticipated samples (" <<
 			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
 	}
@@ -625,7 +625,7 @@ double RFPParameter::getLambdaPrimePosteriorMean(unsigned mixtureElement, unsign
 
 
 //TODO: Traces prevent this from being in the parent class
-double RFPParameter::getSphiVariance(unsigned samples, bool unbiased)
+double PANSEParameter::getSphiVariance(unsigned samples, bool unbiased)
 {
 	std::vector<double> sPhiTrace = traces.getSPhiTrace();
 	unsigned traceLength = (unsigned)sPhiTrace.size();
@@ -651,7 +651,7 @@ double RFPParameter::getSphiVariance(unsigned samples, bool unbiased)
 
 
 //TODO: Traces prevent this from being in the parent class
-double RFPParameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement, bool unbiased)
+double PANSEParameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement, bool unbiased)
 {
 	std::vector<double> synthesisRateTrace = traces.getSynthesisRateTraceByMixtureElementForGene(mixtureElement, geneIndex);
 	unsigned traceLength = (unsigned)synthesisRateTrace.size();
@@ -684,13 +684,13 @@ double RFPParameter::getSynthesisRateVariance(unsigned samples, unsigned geneInd
 }
 
 
-double RFPParameter::getAlphaVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased)
+double PANSEParameter::getAlphaVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased)
 {
 	std::vector<double> alphaParameterTrace = traces.getAlphaParameterTraceByMixtureElementForCodon(mixtureElement, codon);
 	unsigned traceLength = (unsigned)alphaParameterTrace.size();
 	if(samples > traceLength)
 	{
-		std::cerr << "Warning in RFPParameter::getAlphaVariance throws: Number of anticipated samples (" <<
+		std::cerr << "Warning in PANSEParameter::getAlphaVariance throws: Number of anticipated samples (" <<
 			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
 	}
@@ -711,13 +711,13 @@ double RFPParameter::getAlphaVariance(unsigned mixtureElement, unsigned samples,
 }
 
 
-double RFPParameter::getLambdaPrimeVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased)
+double PANSEParameter::getLambdaPrimeVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased)
 {
 	std::vector<double> lambdaPrimeParameterTrace = traces.getLambdaPrimeParameterTraceByMixtureElementForCodon(mixtureElement, codon);
 	unsigned traceLength = (unsigned)lambdaPrimeParameterTrace.size();
 	if(samples > traceLength)
 	{
-		std::cerr << "Warning in RFPParameter::getSelectionVariance throws: Number of anticipated samples (" <<
+		std::cerr << "Warning in PANSEParameter::getSelectionVariance throws: Number of anticipated samples (" <<
 			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
 	}
@@ -738,21 +738,21 @@ double RFPParameter::getLambdaPrimeVariance(unsigned mixtureElement, unsigned sa
 }
 
 
-double RFPParameter::getParameterForCategory(unsigned category, unsigned paramType, std::string codon, bool proposal)
+double PANSEParameter::getParameterForCategory(unsigned category, unsigned paramType, std::string codon, bool proposal)
 {
 	double rv;
 	unsigned codonIndex = SequenceSummary::codonToIndex(codon);
-	if (paramType == RFPParameter::alp)
+	if (paramType == PANSEParameter::alp)
 	{
 		rv = (proposal ? proposedAlphaParameter[category][codonIndex] : currentAlphaParameter[category][codonIndex]);
 	}
-	else if (paramType == RFPParameter::lmPri)
+	else if (paramType == PANSEParameter::lmPri)
 	{
 		rv = (proposal ? proposedLambdaPrimeParameter[category][codonIndex] : currentLambdaPrimeParameter[category][codonIndex]);
 	}
 	else
 	{
-		std::cerr << "Warning in RFPParameter::getParameterForCategory: Unkown parameter type: " << paramType << "\n";
+		std::cerr << "Warning in PANSEParameter::getParameterForCategory: Unkown parameter type: " << paramType << "\n";
 		std::cerr << "\tReturning alpha parameter! \n";
 		rv = (proposal ? proposedAlphaParameter[category][codonIndex] : currentAlphaParameter[category][codonIndex]);
 	}
@@ -762,7 +762,7 @@ double RFPParameter::getParameterForCategory(unsigned category, unsigned paramTy
 
 
 //TODO: Use of Trace prevents this from being in the base class
-std::vector <double> RFPParameter::getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex)
+std::vector <double> PANSEParameter::getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex)
 {
 	std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
 	std::vector<double> probabilities(numMixtures, 0.0);
@@ -770,7 +770,7 @@ std::vector <double> RFPParameter::getEstimatedMixtureAssignmentProbabilities(un
 
 	if (samples > traceLength)
 	{
-		std::cerr << "Warning in RFPParameter::getMixtureAssignmentPosteriorMean throws: Number of anticipated samples (" <<
+		std::cerr << "Warning in PANSEParameter::getMixtureAssignmentPosteriorMean throws: Number of anticipated samples (" <<
 			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
 	}
@@ -792,13 +792,13 @@ std::vector <double> RFPParameter::getEstimatedMixtureAssignmentProbabilities(un
 
 //---------------------STATIC VARIABLE DECLARATIONS---------------------//
 
-const unsigned RFPParameter::alp = 0u;
-const unsigned RFPParameter::lmPri = 1u;
+const unsigned PANSEParameter::alp = 0u;
+const unsigned PANSEParameter::lmPri = 1u;
 
 
 //---------------------R WRAPPER FUNCTIONS---------------------//
 
-void RFPParameter::initAlphaR(double alphaValue, unsigned mixtureElement, std::string codon)
+void PANSEParameter::initAlphaR(double alphaValue, unsigned mixtureElement, std::string codon)
 {
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
 	if (check)
@@ -813,7 +813,7 @@ void RFPParameter::initAlphaR(double alphaValue, unsigned mixtureElement, std::s
 }
 
 
-void RFPParameter::initLambdaPrimeR(double lambdaPrimeValue, unsigned mixtureElement, std::string codon)
+void PANSEParameter::initLambdaPrimeR(double lambdaPrimeValue, unsigned mixtureElement, std::string codon)
 {
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
 	if (check)
@@ -828,7 +828,7 @@ void RFPParameter::initLambdaPrimeR(double lambdaPrimeValue, unsigned mixtureEle
 }
 
 
-double RFPParameter::getParameterForCategoryR(unsigned mixtureElement, unsigned paramType, std::string codon, bool proposal)
+double PANSEParameter::getParameterForCategoryR(unsigned mixtureElement, unsigned paramType, std::string codon, bool proposal)
 {
 	double rv = 0.0;
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
@@ -839,12 +839,12 @@ double RFPParameter::getParameterForCategoryR(unsigned mixtureElement, unsigned 
 		codon[0] = (char)std::toupper(codon[0]);
 		codon[1] = (char)std::toupper(codon[1]);
 		codon[2] = (char)std::toupper(codon[2]);
-		if (paramType == RFPParameter::alp)
+		if (paramType == PANSEParameter::alp)
 		{
 			//THIS NEEDS TO CHANGE!!!!
 			category = getMutationCategory(mixtureElement); //really alpha here
 		}
-		else if (paramType == RFPParameter::lmPri)
+		else if (paramType == PANSEParameter::lmPri)
 		{
 			category = getSelectionCategory(mixtureElement);
 		}
@@ -854,18 +854,18 @@ double RFPParameter::getParameterForCategoryR(unsigned mixtureElement, unsigned 
 }
 
 
-void RFPParameter::initMutationSelectionCategoriesR(std::vector<std::string> files, unsigned numCategories,
+void PANSEParameter::initMutationSelectionCategoriesR(std::vector<std::string> files, unsigned numCategories,
 													std::string paramType)
 {
 	unsigned value = 0;
 	bool check = true;
 	if (paramType == "Alpha")
 	{
-		value = RFPParameter::alp;
+		value = PANSEParameter::alp;
 	}
 	else if (paramType == "LambdaPrime")
 	{
-		value = RFPParameter::lmPri;
+		value = PANSEParameter::lmPri;
 	}
 	else
 	{
@@ -886,7 +886,7 @@ void RFPParameter::initMutationSelectionCategoriesR(std::vector<std::string> fil
 }
 
 
-double RFPParameter::getAlphaPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
+double PANSEParameter::getAlphaPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
 {
 	double rv = -1.0;
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
@@ -900,7 +900,7 @@ double RFPParameter::getAlphaPosteriorMeanForCodon(unsigned mixtureElement, unsi
 	return rv;
 }
 
-double RFPParameter::getLambdaPrimePosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
+double PANSEParameter::getLambdaPrimePosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
 {
 	double rv = -1.0;
 	codon[0] = (char) std::toupper(codon[0]);
@@ -915,7 +915,7 @@ double RFPParameter::getLambdaPrimePosteriorMeanForCodon(unsigned mixtureElement
 }
 
 
-double RFPParameter::getAlphaVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased)
+double PANSEParameter::getAlphaVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased)
 {
 	double rv = -1.0;
 	codon[0] = (char) std::toupper(codon[0]);
@@ -930,7 +930,7 @@ double RFPParameter::getAlphaVarianceForCodon(unsigned mixtureElement, unsigned 
 }
 
 
-double RFPParameter::getLambdaPrimeVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased)
+double PANSEParameter::getLambdaPrimeVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased)
 {
 	double rv = -1.0;
 	codon[0] = (char) std::toupper(codon[0]);
@@ -946,7 +946,7 @@ double RFPParameter::getLambdaPrimeVarianceForCodon(unsigned mixtureElement, uns
 
 
 #ifndef STANDALONE
-RFPParameter::RFPParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter(64)
+PANSEParameter::PANSEParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter(64)
 {
   unsigned _numMixtures = _matrix.size() / 2;
   std::vector<std::vector<unsigned>> thetaKMatrix;
@@ -961,15 +961,15 @@ RFPParameter::RFPParameter(double sphi, std::vector<unsigned> geneAssignment, st
     }
   }
   initParameterSet(sphi, _matrix.size() / 2, geneAssignment, thetaKMatrix, splitSer);
-  initRFPParameterSet();
+  initPANSEParameterSet();
 
 }
 
-RFPParameter::RFPParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState) :
+PANSEParameter::PANSEParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState) :
 Parameter(64)
 {
   std::vector<std::vector<unsigned>> thetaKMatrix;
   initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
-  initRFPParameterSet();
+  initPANSEParameterSet();
 }
 #endif

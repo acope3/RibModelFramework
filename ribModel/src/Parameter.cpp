@@ -13,7 +13,7 @@ std::default_random_engine Parameter::generator( (unsigned) std::time(NULL));
 Parameter::Parameter()
 {
 	numParam = 0u;
-	Sphi = 0.0;
+	Sphi = 0.1;
 	Sphi_proposed = 0.0;
 	numAcceptForSphi = 0u;
 	bias_sphi = 0.0;
@@ -21,7 +21,7 @@ Parameter::Parameter()
 	numMutationCategories = 0u;
 	numSelectionCategories = 0u;
 	numMixtures = 0u;
-	std_sphi = 0.0;
+	std_sphi = 0.1;
 	maxGrouping = 22;
 }
 
@@ -29,7 +29,7 @@ Parameter::Parameter()
 Parameter::Parameter(unsigned _maxGrouping)
 {
 	numParam = 0u;
-	Sphi = 0.0;
+	Sphi = 0.1;
 	Sphi_proposed = 0.0;
 	numAcceptForSphi = 0u;
 	bias_sphi = 0.0;
@@ -37,7 +37,7 @@ Parameter::Parameter(unsigned _maxGrouping)
 	numMutationCategories = 0u;
 	numSelectionCategories = 0u;
 	numMixtures = 0u;
-	std_sphi = 0.0;
+	std_sphi = 0.1;
 	maxGrouping = _maxGrouping;
 }
 

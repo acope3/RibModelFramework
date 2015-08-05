@@ -45,10 +45,6 @@ class PANSEModel: public Model {
 		{
 			return parameter->getSphi(proposed);
 		}
-		virtual double getSphiProposalWidth()
-		{
-			return parameter->getSphiProposalWidth();
-		}
 		virtual unsigned getNumMixtureElements()
 		{
 			return parameter->getNumMixtureElements();
@@ -75,7 +71,7 @@ class PANSEModel: public Model {
 		}
 		virtual void proposeSPhi()
 		{
-			parameter->proposeSPhi();
+			parameter->proposeSphi();
 		}
 		virtual unsigned getMixtureAssignment(unsigned index)
 		{

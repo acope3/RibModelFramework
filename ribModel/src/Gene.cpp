@@ -168,6 +168,12 @@ std::string Gene::toAASequence()
 
 //---------------------R WRAPPER FUNCTIONS---------------------//
 
+void Gene::cleanSeqR()
+{
+    cleanSeq();
+}
+
+
 unsigned Gene::getAACount(std::string aa)
 {
     return geneData.getAACountForAAR(aa);
@@ -211,19 +217,22 @@ RCPP_MODULE(Gene_mod)
     .constructor<std::string, std::string, std::string >("Initialize a gene by giving the id, description, and sequence string")
 
     //Private functions:
-    //.method("cleanSeq", &Gene::cleanSeq) //TEST THAT ONLY!
+    .method("cleanSeq", &Gene::cleanSeqR) //TEST THAT ONLY!
 
 
 	//Public functions:
 	.property("id", &Gene::getId, &Gene::setId)
     .property("description", &Gene::getDescription, &Gene::setDescription)
     .property("seq", &Gene::getSequence, &Gene::setSequence)
+
     .method("getSequenceSummary", &Gene::getSequenceSummary) //TEST THAT ONLY!
     .method("getNucleotideAt", &Gene::getNucleotideAt) //TEST THAT ONLY!
 	.method("clear", &Gene::clear, "clears the id, sequence, and description in the object")
     .method("length", &Gene::length, "returns the length of sequence")
     .method("reverseComplement", &Gene::reverseComplement) //TEST THAT ONLY!
     .method("toAASequence", &Gene::toAASequence)
+
+
 	.method("getAACount", &Gene::getAACount, "returns the number of amino acids that are in the sequence for a given amino acid")
 	.method("getCodonCount", &Gene::getCodonCount, "returns the number of codons that are in the sequence for a given codon")
 	.method("getRFPObserved", &Gene::getRFPObserved)

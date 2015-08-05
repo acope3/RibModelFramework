@@ -1,30 +1,30 @@
-#include "include/RFP/RFPTrace.h"
+#include "../include/PANSE/PANSETrace.h"
 #ifndef STANDALONE
 #include <Rcpp.h>
 using namespace Rcpp;
 #endif
 
-RFPTrace::RFPTrace() : Trace()
+PANSETrace::PANSETrace() : Trace()
 {
 	//CTOR
 }
 
-void RFPTrace::initAllTraces(unsigned samples, unsigned num_genes, unsigned numMutationCategories, unsigned numSelectionCategories,
+void PANSETrace::initAllTraces(unsigned samples, unsigned num_genes, unsigned numMutationCategories, unsigned numSelectionCategories,
 		unsigned numParam, unsigned numMixtures, std::vector<mixtureDefinition> &_categories, unsigned maxGrouping)
 {
 	initBaseTraces(samples, num_genes, numMutationCategories, numMixtures, _categories, maxGrouping);
-	initRFPTraces(samples, numMutationCategories, numSelectionCategories, numParam);
+	initPANSETraces(samples, numMutationCategories, numSelectionCategories, numParam);
 }
 
 
-void RFPTrace::initRFPTraces(unsigned samples, unsigned numMutationCategories, unsigned numSelectionCategories, unsigned numParam)
+void PANSETrace::initPANSETraces(unsigned samples, unsigned numMutationCategories, unsigned numSelectionCategories, unsigned numParam)
 {
 	initAlphaParameterTrace(samples, numMutationCategories, numParam);
 	initLambdaPrimeParameterTrace(samples, numSelectionCategories, numParam);
 }
 
 
-void RFPTrace::initAlphaParameterTrace(unsigned samples, unsigned numMutationCategories, unsigned numParam)
+void PANSETrace::initAlphaParameterTrace(unsigned samples, unsigned numMutationCategories, unsigned numParam)
 {
 	alphaParameterTrace.resize(numMutationCategories);
 	for (unsigned category = 0; category < numMutationCategories; category++)
@@ -40,7 +40,7 @@ void RFPTrace::initAlphaParameterTrace(unsigned samples, unsigned numMutationCat
 }
 
 
-void RFPTrace::initLambdaPrimeParameterTrace(unsigned samples, unsigned numSelectionCategories, unsigned numParam)
+void PANSETrace::initLambdaPrimeParameterTrace(unsigned samples, unsigned numSelectionCategories, unsigned numParam)
 {
 	lambdaPrimeParameterTrace.resize(numSelectionCategories);
 	for (unsigned category = 0; category < numSelectionCategories; category++)
@@ -56,7 +56,7 @@ void RFPTrace::initLambdaPrimeParameterTrace(unsigned samples, unsigned numSelec
 }
 
 
-std::vector<double> RFPTrace::getAlphaParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon)
+std::vector<double> PANSETrace::getAlphaParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon)
 {
 	unsigned codonIndex = SequenceSummary::codonToIndex(codon);
 	unsigned category = getAlphaCategory(mixtureElement);
@@ -64,7 +64,7 @@ std::vector<double> RFPTrace::getAlphaParameterTraceByMixtureElementForCodon(uns
 }
 
 
-std::vector<double> RFPTrace::getLambdaPrimeParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon)
+std::vector<double> PANSETrace::getLambdaPrimeParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon)
 {
 	unsigned codonIndex = SequenceSummary::codonToIndex(codon);
 	unsigned category = getLambdaPrimeCategory(mixtureElement);
@@ -72,7 +72,7 @@ std::vector<double> RFPTrace::getLambdaPrimeParameterTraceByMixtureElementForCod
 }
 
 
-void RFPTrace::updateCodonSpecificParameterTrace(unsigned sample, std::string codon, std::vector<std::vector<double>> &curAlpParam, std::vector<std::vector<double>> &curLmPriParam)
+void PANSETrace::updateCodonSpecificParameterTrace(unsigned sample, std::string codon, std::vector<std::vector<double>> &curAlpParam, std::vector<std::vector<double>> &curLmPriParam)
 {
     unsigned i = SequenceSummary::codonToIndex(codon);
 	for(unsigned category = 0; category < alphaParameterTrace.size(); category++)
@@ -88,7 +88,7 @@ void RFPTrace::updateCodonSpecificParameterTrace(unsigned sample, std::string co
 //----------------------------------------------------
 //----------------------R WRAPPERS--------------------
 //----------------------------------------------------
-std::vector<double> RFPTrace::getAlphaParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon) 
+std::vector<double> PANSETrace::getAlphaParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon)
 {
 	std::vector<double> RV;
 	bool checkMixtureElement = checkIndex(mixtureElement, 1, getNumberOfMixtures());
@@ -100,7 +100,7 @@ std::vector<double> RFPTrace::getAlphaParameterTraceByMixtureElementForCodonR(un
 }
 
 
-std::vector<double> RFPTrace::getLambdaPrimeParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon) 
+std::vector<double> PANSETrace::getLambdaPrimeParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon)
 {
 	std::vector<double> RV;
 	bool checkMixtureElement = checkIndex(mixtureElement, 1, getNumberOfMixtures());
