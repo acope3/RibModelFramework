@@ -25,7 +25,7 @@ class Model
 
 		//Other functions:
 		virtual void simulateGenome(Genome &genome) =0;
-
+		virtual void updateGibbsSampledHyperParameters(Genome &genome) = 0;
 
 		//Parameter wrapper functions:
 		virtual void initTraces(unsigned samples, unsigned num_genes) = 0;
@@ -46,6 +46,7 @@ class Model
 		virtual double getCurrentSphiProposalWidth() = 0;
 		virtual void updateSphi() = 0;
 		virtual void updateSphiTrace(unsigned sample) = 0;
+		virtual void updateHyperParameterTraces(unsigned sample) = 0;
 		virtual void adaptSphiProposalWidth(unsigned adaptiveWidth) = 0;
 		virtual void adaptHyperParameterProposalWidths(unsigned adaptiveWidth) = 0;
 		virtual void proposeSynthesisRateLevels() = 0;

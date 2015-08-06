@@ -283,20 +283,14 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, 
 	double proposedMphi;
 	if (withPhi) {
 		double currentAphi = getAphi(false);
-		currentMphi = currentAphi - ((currentSphi * currentSphi) / 2);
 	}
-	else {
-		currentMphi = -((currentSphi * currentSphi) / 2);
-	}
+	currentMphi = -((currentSphi * currentSphi) / 2);
 	double lpr = logProbabilityRatio; // this variable is only needed because OpenMP doesn't allow variables in reduction clause to be reference
 	double proposedSphi = getSphi(true);
 	if (withPhi) {
 		double proposedAphi = getAphi(true);
-		proposedMphi = proposedAphi - ((proposedSphi * proposedSphi) / 2);
 	}
-	else {
-		proposedMphi = -((proposedSphi * proposedSphi) / 2);
-	}
+	proposedMphi = -((proposedSphi * proposedSphi) / 2);
 
 #ifndef __APPLE__
 #pragma omp parallel for reduction(+:lpr)
@@ -313,6 +307,24 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, 
 	logProbabilityRatio = lpr;
 }
 
+void ROCModel::updateGibbsSampledHyperParameters(Genome &genome)
+{
+	// TODO: Fix this for any numbers of phi values
+	if (withPhi) {
+		double shape = (genome.getGenomeSize() - 1) / 2;
+		double rate = 0.0;
+		unsigned mixtureAssignment;
+		for (unsigned i = 0; i < genome.getGenomeSize(); i++) {
+			mixtureAssignment = getMixtureAssignment(i);
+			rate += genome.getGeneByIndex(i).observedPhiValues.at(0) - getAphi() - getSynthesisRate(i, mixtureAssignment, false);
+		}
+		rate *= rate;
+		rate /= 2;
+
+		parameter->setSepsilon(parameter->randGamma(shape, rate));
+	}
+}
+
 void ROCModel::proposeHyperParameters()
 {
 	parameter->proposeSphi();
@@ -327,4 +339,11 @@ void ROCModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth)
 	if (withPhi) {
 		adaptAphiProposalWidth(adaptiveWidth);
 	}
+}
+
+void ROCModel::updateHyperParameterTraces(unsigned sample)
+{
+	updateSphiTrace(sample);
+	updateAphiTrace(sample);
+	updateSepsilonTrace(sample);
 }

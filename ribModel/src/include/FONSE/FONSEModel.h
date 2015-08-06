@@ -28,6 +28,8 @@ public:
 	virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures);
 	virtual void calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, unsigned iteration, double &logProbabilityRatio);
 
+	virtual void updateGibbsSampledHyperParameters(Genome &genome) {}
+
 	//Parameter wrapper functions:
 	virtual void initTraces(unsigned samples, unsigned num_genes) { parameter->initAllTraces(samples, num_genes); }
 	virtual void writeRestartFile(std::string filename) { return parameter->writeEntireRestartFile(filename); }
@@ -48,6 +50,7 @@ public:
 	virtual void adaptHyperParameterProposalWidths(unsigned adaptiveWidth);
 	virtual void updateSphi() { parameter->updateSphi(); }
 	virtual void updateSphiTrace(unsigned sample) { parameter->updateSphiTrace(sample); }
+	virtual void updateHyperParameterTraces(unsigned sample);
 	virtual void adaptSphiProposalWidth(unsigned adaptiveWidth) { parameter->adaptSphiProposalWidth(adaptiveWidth); }
 	virtual void proposeSynthesisRateLevels() { parameter->proposeSynthesisRateLevels(); }
 	virtual unsigned getNumSynthesisRateCategories() { return parameter->getNumSynthesisRateCategories(); }

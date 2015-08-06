@@ -22,6 +22,7 @@ void ROCTrace::initROCTraces(unsigned samples, unsigned numMutationCategories, u
 	initMutationParameterTrace(samples, numMutationCategories, numParam);
 	initSelectionParameterTrace(samples, numSelectionCategories, numParam);
 	initAphiTrace(samples);
+	initSepsilonTrace(samples);
 }
 
 
@@ -59,6 +60,11 @@ void ROCTrace::initSelectionParameterTrace(unsigned samples, unsigned numSelecti
 void ROCTrace::initAphiTrace(unsigned samples)
 {
 	AphiTrace.resize(samples);
+}
+
+void ROCTrace::initSepsilonTrace(unsigned samples)
+{
+	SepsilonTrace.resize(samples);
 }
 
 

@@ -186,3 +186,8 @@ void RFPModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth)
 {
 	adaptSphiProposalWidth(adaptiveWidth);
 }
+
+void RFPModel::updateHyperParameterTraces(unsigned sample)
+{
+	updateSphiTrace(sample);
+}
