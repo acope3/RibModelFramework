@@ -437,8 +437,7 @@ Genome Genome::getGenomeForGeneIndicies(std::vector <unsigned> indicies)
 
 std::vector<unsigned> Genome::getCodonCountsPerGene(std::string codon)
 {
-	std::vector<unsigned> codonCounts;
-	codonCounts.resize(genes.size());
+	std::vector<unsigned> codonCounts(genes.size());
 	unsigned codonIndex = SequenceSummary::codonToIndex(codon);
 	for(unsigned i = 0u; i < genes.size(); i++)
 	{
