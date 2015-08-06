@@ -25,12 +25,14 @@ class ROCModel : public Model
 	void simulateGenome(Genome &genome);
 	virtual void calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, unsigned iteration, double &logProbabilityRatio);
 
+	virtual void updateGibbsSampledHyperParameters(Genome &genome);
 
 	//Parameter wrapper functions:
 	virtual void initTraces(unsigned samples, unsigned num_genes) {parameter -> initAllTraces(samples, num_genes);}
 	virtual void writeRestartFile(std::string filename) {return parameter->writeEntireRestartFile(filename);}       
 	virtual double getSphi(bool proposed = false) {return parameter->getSphi(proposed);}
 	double getAphi(bool proposed = false) { return parameter->getAphi(proposed); }
+	double getSepsilon() { return parameter->getSepsilon(); }
 	virtual unsigned getNumMixtureElements() {return parameter->getNumMixtureElements();}
 	virtual double getCategoryProbability(unsigned i) {return parameter->getCategoryProbability(i);}
 	virtual void proposeCodonSpecificParameter() {parameter->proposeCodonSpecificParameter();}
@@ -51,7 +53,9 @@ class ROCModel : public Model
 	virtual void adaptSphiProposalWidth(unsigned adaptiveWidth) {parameter->adaptSphiProposalWidth(adaptiveWidth);}
 	void updateAphi() { parameter->updateAphi(); }
 	void updateAphiTrace(unsigned sample) { parameter->updateAphiTrace(sample); }
+	void updateSepsilonTrace(unsigned sample) { parameter->updateSepsilonTrace(sample); }
 	void adaptAphiProposalWidth(unsigned adaptiveWidth) { parameter->adaptAphiProposalWidth(adaptiveWidth); }
+	virtual void updateHyperParameterTraces(unsigned sample);
 	virtual void proposeSynthesisRateLevels() {parameter->proposeSynthesisRateLevels();}
 	virtual unsigned getNumSynthesisRateCategories() {return parameter->getNumSynthesisRateCategories();}
 	virtual std::vector<unsigned> getMixtureElementsOfSelectionCategory(unsigned k) {return parameter->getMixtureElementsOfSelectionCategory(k);}
@@ -66,7 +70,7 @@ class ROCModel : public Model
 	{
 		parameter -> getParameterForCategory(category, param, aa, proposal, returnValue);
 	}
-	virtual unsigned getGroupListSize() {return parameter->getGroupListSize();} //TODO: make not hardcoded?
+	virtual unsigned getGroupListSize() {return parameter->getGroupListSize();} 
 	virtual std::string getGrouping(unsigned index) {return parameter -> getGrouping(index);}
 	// R wrapper
 	std::vector<double> CalculateProbabilitiesForCodons(std::vector<double> mutation, std::vector<double> selection, double phi);

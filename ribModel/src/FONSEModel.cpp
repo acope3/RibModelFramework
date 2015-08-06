@@ -175,6 +175,11 @@ void FONSEModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth)
 	adaptSphiProposalWidth(adaptiveWidth);
 }
 
+void FONSEModel::updateHyperParameterTraces(unsigned sample)
+{
+	updateSphiTrace(sample);
+}
+
 void FONSEModel::setParameter(FONSEParameter &_parameter)
 {
 	parameter = &_parameter;

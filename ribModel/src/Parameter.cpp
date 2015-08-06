@@ -907,6 +907,21 @@ double Parameter::randExp(double r)
 	return rv;
 }
 
+double Parameter::randGamma(double shape, double rate)
+{
+	double rv;
+#ifndef STANDALONE
+	RNGScope scope;
+	NumericVector xx(1);
+	xx = rgamma(1, shape, rate = rate);
+	rv = xx[0];
+#else
+	std::gamma_distribution<double> distribution(shape, 1 / rate);
+	rv = distribution(generator);
+#endif
+	return rv;
+}
+
 
 void Parameter::randDirichlet(double* input, unsigned numElements, double* output)
 {

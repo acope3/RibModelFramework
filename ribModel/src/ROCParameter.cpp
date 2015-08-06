@@ -109,6 +109,7 @@ void ROCParameter::initROCParameterSet()
 	Aphi = 0.0;
 	Aphi_proposed = 0.0;
 	std_Aphi = 0.1;
+	Sepsilon = 0.0;
 	numAcceptForAphi = 0;
 
 	//may need getter fcts

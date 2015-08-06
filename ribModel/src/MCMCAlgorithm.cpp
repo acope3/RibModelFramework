@@ -209,7 +209,7 @@ void MCMCAlgorithm::acceptRejectHyperParameter(int numGenes, Model& model, int i
 
 	if((iteration % thining) == 0)
 	{
-		model.updateSphiTrace(iteration/thining);
+		model.updateHyperParameterTraces(iteration/thining);
 	}
 }
 
@@ -298,6 +298,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores)
 		// update hyper parameter
 		if(estimateHyperParameter)
 		{
+			model.updateGibbsSampledHyperParameters(genome);
 			model.proposeHyperParameters();
 			acceptRejectHyperParameter(genome.getGenomeSize(), model, iteration);
 			if( ( (iteration + 1u) % adaptiveWidth) == 0u)

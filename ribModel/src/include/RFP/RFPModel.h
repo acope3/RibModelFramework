@@ -30,7 +30,7 @@ class RFPModel: public Model {
 		//Other functions:
 		void setParameter(RFPParameter &_parameter);
 		virtual void simulateGenome(Genome &genome);
-
+		virtual void updateGibbsSampledHyperParameters(Genome &genome) {}
 
 		//Parameter wrapper functions:
 		virtual void initTraces(unsigned samples, unsigned num_genes)
@@ -106,6 +106,7 @@ class RFPModel: public Model {
 		{
 			parameter->updateSphiTrace(sample);
 		}
+		virtual void updateHyperParameterTraces(unsigned sample);
 		virtual void adaptSphiProposalWidth(unsigned adaptiveWidth)
 		{
 			parameter->adaptSphiProposalWidth(adaptiveWidth);

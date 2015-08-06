@@ -27,6 +27,7 @@ class ROCParameter : public Parameter
 		double phiEpsilon_proposed;
 		double Aphi;
 		double Aphi_proposed;
+		double Sepsilon;
 		double std_Aphi;
 		double numAcceptForAphi;
 
@@ -90,7 +91,7 @@ class ROCParameter : public Parameter
 		double getPreviousCodonSpecificProposalWidth(unsigned aa);
 		double getCurrentAphiProposalWidth() { return std_Aphi; }
 		// Phi epsilon functions
-		double getPhiEpsilon() {return phiEpsilon;}
+		double getPhiEpsilon() { return phiEpsilon; }
 
 
 		// functions to manage codon specific parameter
@@ -105,16 +106,20 @@ class ROCParameter : public Parameter
 			numAcceptForAphi++;
 		}
 
+		// functions to manage Sepsilon
+		double getSepsilon() { return Sepsilon; }
+		void setSepsilon(double se) { Sepsilon = se; }
 		//update trace functions
 		virtual void updateSphiTrace(unsigned sample) {traces.updateSphiTrace(sample, Sphi);}
 		void updateAphiTrace(unsigned sample) { traces.updateAphiTrace(sample, Aphi); }
+		void updateSepsilonTrace(unsigned sample) { traces.updateSepsilonTrace(sample, Sepsilon); }
 		virtual void updateSynthesisRateTrace(unsigned sample, unsigned geneIndex){traces.updateSynthesisRateTrace(sample, geneIndex, currentSynthesisRateLevel);}
 		virtual void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex) {traces.updateMixtureAssignmentTrace(sample, geneIndex, mixtureAssignment[geneIndex]);}
 		virtual void updateMixtureProbabilitiesTrace(unsigned samples) {traces.updateMixtureProbabilitiesTrace(samples, categoryProbabilities);}
 		void updateCodonSpecificParameterTrace(unsigned sample, std::string grouping) {traces.updateCodonSpecificParameterTrace(sample, grouping, 
 			currentMutationParameter, currentSelectionParameter);}
 
-		// poposal functions
+		// proposal functions
 		void proposeCodonSpecificParameter();
 		void proposeAphi();
 		void getParameterForCategory(unsigned category, unsigned parameter, std::string aa, bool proposal, double *returnValue);
