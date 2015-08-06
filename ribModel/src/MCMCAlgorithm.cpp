@@ -193,15 +193,17 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 
 void MCMCAlgorithm::acceptRejectHyperParameter(int numGenes, Model& model, int iteration)
 {
-	double logProbabilityRatio = 0.0;
+	std::vector <double> logProbabilityRatios;
 
-	model.calculateLogLikelihoodRatioForHyperParameters(numGenes, iteration, logProbabilityRatio);
-	if(!std::isfinite(logProbabilityRatio))
-	{
-		std::cout << "logProbabilityRatio not finite!\n";
+	model.calculateLogLikelihoodRatioForHyperParameters(numGenes, iteration, logProbabilityRatios);
+	for (unsigned i = 0u; i < logProbabilityRatios.size(); i++) {
+		if (!std::isfinite(logProbabilityRatios[i]))
+		{
+			std::cout << "logProbabilityRatio not finite!\n";
+		}
 	}
 
-	if( -Parameter::randExp(1) < logProbabilityRatio )
+	if( -Parameter::randExp(1) < logProbabilityRatios[0] )
 	{
 		// moves proposed Sphi to current Sphi
 		model.updateSphi();
