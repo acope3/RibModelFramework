@@ -80,6 +80,10 @@ void ROCModel::calculateCodonProbabilityVector(unsigned numCodons, double mutati
 		}
 	}
 
+	if (withPhi) {
+		phi *= std::exp(getAphi()) * getSepsilon();
+	}
+
 	// if the min(selection) is less than zero than we have to adjust the reference codon.
 	// if the reference codon is the min value (0) than we do not have to adjust the reference codon.
 	// This is necessary to deal with very large phi values (> 10^4) and avoid  producing Inf which then
@@ -276,22 +280,35 @@ void ROCModel::simulateGenome(Genome &genome)
 	}
 }
 
-void ROCModel::calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, unsigned iteration, double &logProbabilityRatio)
+void ROCModel::calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, unsigned iteration, std::vector <double> &logProbabilityRatio)
 {	
 	double currentSphi = getSphi(false);
 	double currentMphi;
 	double proposedMphi;
 	if (withPhi) {
 		double currentAphi = getAphi(false);
+		currentMphi = currentAphi - ((currentSphi * currentSphi) / 2);
 	}
-	currentMphi = -((currentSphi * currentSphi) / 2);
-	double lpr = logProbabilityRatio; // this variable is only needed because OpenMP doesn't allow variables in reduction clause to be reference
+	else {
+		currentMphi = -((currentSphi * currentSphi) / 2);
+	}
 	double proposedSphi = getSphi(true);
 	if (withPhi) {
 		double proposedAphi = getAphi(true);
+		proposedMphi = proposedAphi - ((proposedSphi * proposedSphi) / 2);
 	}
-	proposedMphi = -((proposedSphi * proposedSphi) / 2);
+	else {
+		proposedMphi = -((proposedSphi * proposedSphi) / 2);
+	}
 
+	//TODO: Don't hardcode this.
+	if (withPhi) {
+		logProbabilityRatio.resize(2);
+	}
+	else {
+		logProbabilityRatio.resize(1);
+	}
+	double lpr = 0.0;
 #ifndef __APPLE__
 #pragma omp parallel for reduction(+:lpr)
 #endif
@@ -303,20 +320,22 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, 
 		lpr += std::log(Parameter::densityLogNorm(phi, proposedMphi, proposedSphi)) - std::log(Parameter::densityLogNorm(phi, currentMphi, currentSphi));
 	}
 
+	// TODO: USE CONSTANTS INSTEAD OF 0
 	lpr -= (std::log(currentSphi) - std::log(proposedSphi));
-	logProbabilityRatio = lpr;
+	logProbabilityRatio[0] = lpr;
 }
 
 void ROCModel::updateGibbsSampledHyperParameters(Genome &genome)
 {
 	// TODO: Fix this for any numbers of phi values
 	if (withPhi) {
-		double shape = (genome.getGenomeSize() - 1) / 2;
+		double shape = (genome.getGenomeSize() - 1.0) / 2.0;
 		double rate = 0.0;
 		unsigned mixtureAssignment;
+		double aphi = getAphi();
 		for (unsigned i = 0; i < genome.getGenomeSize(); i++) {
 			mixtureAssignment = getMixtureAssignment(i);
-			rate += genome.getGeneByIndex(i).observedPhiValues.at(0) - getAphi() - getSynthesisRate(i, mixtureAssignment, false);
+			rate += genome.getGeneByIndex(i).observedPhiValues.at(0) - aphi - getSynthesisRate(i, mixtureAssignment, false);
 		}
 		rate *= rate;
 		rate /= 2;

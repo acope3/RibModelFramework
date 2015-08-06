@@ -23,7 +23,7 @@ class ROCModel : public Model
 	virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k, double* logProbabilityRatio);
 	virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures);
 	void simulateGenome(Genome &genome);
-	virtual void calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, unsigned iteration, double &logProbabilityRatio);
+	virtual void calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, unsigned iteration, std::vector <double> &logProbabilityRatio);
 
 	virtual void updateGibbsSampledHyperParameters(Genome &genome);
 

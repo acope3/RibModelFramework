@@ -147,11 +147,11 @@ void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 	logAcceptanceRatioForAllMixtures = likelihood_proposed - likelihood;
 }
 
-void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, unsigned iteration, double & logProbabilityRatio)
+void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, unsigned iteration, std::vector <double> & logProbabilityRatio)
 {
 	double currentSphi = getSphi(false);
 	double currentMPhi = -(currentSphi * currentSphi) / 2;
-	double lpr = logProbabilityRatio; // this variable is only needed because OpenMP doesn't allow variables in reduction clause to be reference
+	double lpr = 0.0; // this variable is only needed because OpenMP doesn't allow variables in reduction clause to be reference
 	double proposedSphi = getSphi(true);
 	double proposedMPhi = -(proposedSphi * proposedSphi) / 2;
 
@@ -167,7 +167,7 @@ void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes
 	}
 
 	lpr -= (std::log(currentSphi) - std::log(proposedSphi));
-	logProbabilityRatio = lpr;
+	logProbabilityRatio[0] = lpr;
 }
 
 void FONSEModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth)

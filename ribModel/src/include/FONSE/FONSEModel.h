@@ -26,7 +26,7 @@ public:
 	virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k, double* logProbabilityRatio);
 	double calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grouping, double *mutation, double *selection, double phiValue);
 	virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures);
-	virtual void calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, unsigned iteration, double &logProbabilityRatio);
+	virtual void calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, unsigned iteration, std::vector <double> &logProbabilityRatio);
 
 	virtual void updateGibbsSampledHyperParameters(Genome &genome) {}
 

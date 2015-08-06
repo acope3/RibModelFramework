@@ -121,11 +121,11 @@ void RFPModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 	logAcceptanceRatioForAllMixtures = logLikelihood_proposed - logLikelihood;
 }
 
-void RFPModel::calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, unsigned iteration, double & logProbabilityRatio)
+void RFPModel::calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, unsigned iteration, std::vector <double> & logProbabilityRatio)
 {
 	double currentSphi = getSphi(false);
 	double currentMPhi = -(currentSphi * currentSphi) / 2;
-	double lpr = logProbabilityRatio; // this variable is only needed because OpenMP doesn't allow variables in reduction clause to be reference
+	double lpr = 0.0; // this variable is only needed because OpenMP doesn't allow variables in reduction clause to be reference
 	double proposedSphi = getSphi(true);
 	double proposedMPhi = -(proposedSphi * proposedSphi) / 2;
 
@@ -141,7 +141,7 @@ void RFPModel::calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, 
 	}
 
 	lpr -= (std::log(currentSphi) - std::log(proposedSphi));
-	logProbabilityRatio = lpr;
+	logProbabilityRatio[0] = lpr;
 }
 
 
