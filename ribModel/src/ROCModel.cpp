@@ -1,6 +1,6 @@
 #include "include/ROC/ROCModel.h"
 
-ROCModel::ROCModel(bool _withPhi = false) : Model()
+ROCModel::ROCModel(bool _withPhi) : Model()
 {
 	parameter = nullptr;
 	withPhi = _withPhi;

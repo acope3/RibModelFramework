@@ -15,7 +15,7 @@ class ROCModel : public Model
 
     public:
 
-	ROCModel(bool _withPhi);
+	ROCModel(bool _withPhi = false);
 	virtual ~ROCModel();
 	void setParameter(ROCParameter &_parameter);
 	void calculateCodonProbabilityVector(unsigned numCodons, double mutation[], double selection[], double phi, double codonProb[]);
