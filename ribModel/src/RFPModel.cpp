@@ -129,6 +129,7 @@ void RFPModel::calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, 
 	double proposedSphi = getSphi(true);
 	double proposedMPhi = -(proposedSphi * proposedSphi) / 2;
 
+	logProbabilityRatio.resize(1);
 #ifndef __APPLE__
 #pragma omp parallel for reduction(+:lpr)
 #endif
