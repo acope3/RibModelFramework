@@ -23,7 +23,7 @@ class ROCModel : public Model
 	virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k, double* logProbabilityRatio);
 	virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures);
 	void simulateGenome(Genome &genome);
-	virtual void calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, unsigned iteration, std::vector <double> &logProbabilityRatio);
+	virtual void calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration, std::vector <double> &logProbabilityRatio);
 
 	virtual void updateGibbsSampledHyperParameters(Genome &genome);
 
@@ -48,6 +48,7 @@ class ROCModel : public Model
 	virtual double getCurrentSphiProposalWidth() {return parameter->getCurrentSphiProposalWidth();}
 	double getCurrentAphiProposalWidth() { return parameter->getCurrentAphiProposalWidth(); }
 	virtual void adaptHyperParameterProposalWidths(unsigned adaptiveWidth);
+	virtual void updateHyperParameter(unsigned hp);
 	virtual void updateSphi() {parameter->updateSphi();}
 	virtual void updateSphiTrace(unsigned sample) {parameter->updateSphiTrace(sample);}
 	virtual void adaptSphiProposalWidth(unsigned adaptiveWidth) {parameter->adaptSphiProposalWidth(adaptiveWidth);}

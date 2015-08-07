@@ -147,7 +147,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 	logAcceptanceRatioForAllMixtures = likelihood_proposed - likelihood;
 }
 
-void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, unsigned iteration, std::vector <double> & logProbabilityRatio)
+void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration, std::vector <double> & logProbabilityRatio)
 {
 	double currentSphi = getSphi(false);
 	double currentMPhi = -(currentSphi * currentSphi) / 2;
@@ -160,7 +160,7 @@ void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes
 #ifndef __APPLE__
 #pragma omp parallel for reduction(+:lpr)
 #endif
-	for (int i = 0; i < numGenes; i++)
+	for (int i = 0u; i < genome.getGenomeSize(); i++)
 	{
 		unsigned mixture = getMixtureAssignment(i);
 		mixture = getSynthesisRateCategory(mixture);
@@ -175,6 +175,15 @@ void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes
 void FONSEModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth)
 {
 	adaptSphiProposalWidth(adaptiveWidth);
+}
+
+void FONSEModel::updateHyperParameter(unsigned hp)
+{
+	switch (hp) {
+	case 0:
+		updateSphi();
+		break;
+	}
 }
 
 void FONSEModel::updateHyperParameterTraces(unsigned sample)

@@ -12,7 +12,7 @@ initializeGenomeObject <- function(file, fasta=TRUE, expression.file=NULL, appen
   }
   if(!is.null(expression.file))
   {
-    #TODO implement reading expressin csv file and attaching expression values to genes
+    genome$readObservedPhiValues(expression.file, FALSE)
   }
   return(genome)
 }

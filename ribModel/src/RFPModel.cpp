@@ -121,7 +121,7 @@ void RFPModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 	logAcceptanceRatioForAllMixtures = logLikelihood_proposed - logLikelihood;
 }
 
-void RFPModel::calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, unsigned iteration, std::vector <double> & logProbabilityRatio)
+void RFPModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration, std::vector <double> & logProbabilityRatio)
 {
 	double currentSphi = getSphi(false);
 	double currentMPhi = -(currentSphi * currentSphi) / 2;
@@ -133,7 +133,7 @@ void RFPModel::calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, 
 #ifndef __APPLE__
 #pragma omp parallel for reduction(+:lpr)
 #endif
-	for (int i = 0; i < numGenes; i++)
+	for (int i = 0u; i < genome.getGenomeSize(); i++)
 	{
 		unsigned mixture = getMixtureAssignment(i);
 		mixture = getSynthesisRateCategory(mixture);
@@ -186,6 +186,15 @@ void RFPModel::simulateGenome(Genome &genome)
 void RFPModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth)
 {
 	adaptSphiProposalWidth(adaptiveWidth);
+}
+
+void RFPModel::updateHyperParameter(unsigned hp)
+{
+	switch (hp) {
+	case 0:
+		updateSphi();
+		break;
+	}
 }
 
 void RFPModel::updateHyperParameterTraces(unsigned sample)

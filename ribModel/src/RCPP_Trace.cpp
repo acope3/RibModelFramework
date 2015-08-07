@@ -31,6 +31,9 @@ RCPP_MODULE(Trace_mod)
     //These methods have specific R wrappers
     .method("getMutationParameterTraceByMixtureElementForCodon", &ROCTrace::getMutationParameterTraceByMixtureElementForCodonR)
     .method("getSelectionParameterTraceByMixtureElementForCodon", &ROCTrace::getSelectionParameterTraceByMixtureElementForCodonR)
+	.method("getAphiTrace", &ROCTrace::getAphiTrace)
+	.method("getAphiAcceptanceRatioTrace", &ROCTrace::getAphiAcceptanceRatioTrace)
+	.method("getSepsilonTrace", &ROCTrace::getSepsilonTrace)
     ;
 
 	class_<RFPTrace>("RFPTrace")

@@ -191,22 +191,23 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	return logLikelihood;
 }
 
-void MCMCAlgorithm::acceptRejectHyperParameter(int numGenes, Model& model, int iteration)
+void MCMCAlgorithm::acceptRejectHyperParameter(Genome &genome, Model& model, int iteration)
 {
 	std::vector <double> logProbabilityRatios;
 
-	model.calculateLogLikelihoodRatioForHyperParameters(numGenes, iteration, logProbabilityRatios);
-	for (unsigned i = 0u; i < logProbabilityRatios.size(); i++) {
+	model.calculateLogLikelihoodRatioForHyperParameters(genome, iteration, logProbabilityRatios);
+
+	for (unsigned i = 0; i < logProbabilityRatios.size(); i++)
+	{
 		if (!std::isfinite(logProbabilityRatios[i]))
 		{
 			std::cout << "logProbabilityRatio not finite!\n";
 		}
-	}
 
-	if( -Parameter::randExp(1) < logProbabilityRatios[0] )
-	{
-		// moves proposed Sphi to current Sphi
-		model.updateSphi();
+		if (-Parameter::randExp(1) < logProbabilityRatios[i])
+		{
+			model.updateHyperParameter(i);
+		}
 	}
 
 	if((iteration % thining) == 0)
@@ -302,7 +303,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores)
 		{
 			model.updateGibbsSampledHyperParameters(genome);
 			model.proposeHyperParameters();
-			acceptRejectHyperParameter(genome.getGenomeSize(), model, iteration);
+			acceptRejectHyperParameter(genome, model, iteration);
 			if( ( (iteration + 1u) % adaptiveWidth) == 0u)
 			{
 				model.adaptHyperParameterProposalWidths(adaptiveWidth);

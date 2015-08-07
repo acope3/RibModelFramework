@@ -25,7 +25,7 @@ class MCMCAlgorithm
  
 		double acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, Model& model, int iteration);
 		void acceptRejectCodonSpecificParameter(Genome& genome, Model& model, int iteration);
-		void acceptRejectHyperParameter(int numGenes, Model& model, int iteration);
+		void acceptRejectHyperParameter(Genome &genome, Model& model, int iteration);
 
 	public:
 		explicit MCMCAlgorithm();

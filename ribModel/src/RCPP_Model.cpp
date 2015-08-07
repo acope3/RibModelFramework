@@ -14,11 +14,11 @@ RCPP_MODULE(Model_mod)
 	class_<Model>("Model")
 		;
 
-  class_<ROCModel>( "ROCModel" )
-    .derives<Model>("Model")
-		.constructor()
-    .method("CalculateProbabilitiesForCodons", &ROCModel::CalculateProbabilitiesForCodons, "Calculated codon probabilities. Input is one element shorter than output")
-  	.method("setParameter", &ROCModel::setParameter)
+	class_<ROCModel>( "ROCModel" )
+		.derives<Model>("Model")
+		.constructor<bool>()
+		.method("CalculateProbabilitiesForCodons", &ROCModel::CalculateProbabilitiesForCodons, "Calculated codon probabilities. Input is one element shorter than output")
+  		.method("setParameter", &ROCModel::setParameter)
 		;
 	
 	class_<RFPModel>("RFPModel")

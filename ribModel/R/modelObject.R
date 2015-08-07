@@ -1,9 +1,9 @@
 
-initializeModelObject <- function(parameter, model = "ROC")
+initializeModelObject <- function(parameter, model = "ROC", with.phi = FALSE)
 {  
   if(model == "ROC")
   {
-    c.model <- new(ROCModel)
+    c.model <- new(ROCModel, with.phi)
   }else if(model == "FONSE"){
     c.model = new(FONSEModel)
   }else if (model == "RFP"){
