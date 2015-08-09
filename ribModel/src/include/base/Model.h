@@ -20,7 +20,7 @@ class Model
         virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k, double* logProbabilityRatio) = 0;
         virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
         		double& logAcceptanceRatioForAllMixtures) = 0;
-		virtual void calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, unsigned iteration, std::vector <double> &logProbabilityRatio) = 0;
+		virtual void calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration, std::vector <double> &logProbabilityRatio) = 0;
 
 
 		//Other functions:
@@ -44,6 +44,7 @@ class Model
 		virtual unsigned getMutationCategory(unsigned mixture) = 0;
 		virtual double getSynthesisRate(unsigned index, unsigned mixture, bool proposed = false) = 0;
 		virtual double getCurrentSphiProposalWidth() = 0;
+		virtual void updateHyperParameter(unsigned hp) = 0;
 		virtual void updateSphi() = 0;
 		virtual void updateSphiTrace(unsigned sample) = 0;
 		virtual void updateHyperParameterTraces(unsigned sample) = 0;

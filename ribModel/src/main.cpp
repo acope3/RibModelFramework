@@ -484,6 +484,7 @@ int main()
 	/* Test variables */
 	User user = jeremy;
 	ModelToRun modelToRun = ROC;
+	bool withPhi = true;
 	bool read = false;
 	bool testing = false;
 
@@ -556,6 +557,9 @@ int main()
 				if (modelToRun == ROC || modelToRun == FONSE)
 				{
 					genome.readFasta("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
+					if (withPhi) {
+						genome.readObservedPhiValues("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv");
+					}
 				}
 				else if (modelToRun == RFP)
 				{

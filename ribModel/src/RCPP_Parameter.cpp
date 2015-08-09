@@ -62,6 +62,7 @@ RCPP_MODULE(Parameter_mod)
 		.method("getSelectionPosteriorMeanForCodon", &ROCParameter::getSelectionPosteriorMeanForCodon)
 
 		.method("getSphiVariance", &ROCParameter::getSphiVariance)
+		.method("getAphiVariance", &ROCParameter::getAphiVariance)
 
 		.method("getMutationVarianceForCodon", &ROCParameter::getMutationVarianceForCodon)
 		.method("getSelectionVarianceForCodon", &ROCParameter::getSelectionVarianceForCodon)

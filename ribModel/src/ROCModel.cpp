@@ -62,6 +62,12 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 	double currentLogLikelihood = (logLikelihood + logPhiProbability);
 	double proposedLogLikelihood = (logLikelihood_proposed + logPhiProbability_proposed);
 
+	// TODO: make this work for more than one phi value, or for genes that don't have phi values
+	if (withPhi) {
+		logPhiProbability += std::log(Parameter::densityLogNorm(gene.observedPhiValues[0] - getAphi(), std::log(phiValue), getSepsilon()));
+		logPhiProbability_proposed += std::log(Parameter::densityLogNorm(gene.observedPhiValues[0] - getAphi(), std::log(phiValue_proposed), getSepsilon()));
+	}
+
 	logProbabilityRatio[0] = (proposedLogLikelihood - currentLogLikelihood) - (std::log(phiValue) - std::log(phiValue_proposed));
 	logProbabilityRatio[1] = currentLogLikelihood - std::log(phiValue_proposed);
 	logProbabilityRatio[2] = proposedLogLikelihood - std::log(phiValue);
@@ -78,10 +84,6 @@ void ROCModel::calculateCodonProbabilityVector(unsigned numCodons, double mutati
 		{
 			minIndexVal = i;
 		}
-	}
-
-	if (withPhi) {
-		phi *= std::exp(getAphi()) * getSepsilon();
 	}
 
 	// if the min(selection) is less than zero than we have to adjust the reference codon.
@@ -280,7 +282,7 @@ void ROCModel::simulateGenome(Genome &genome)
 	}
 }
 
-void ROCModel::calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, unsigned iteration, std::vector <double> &logProbabilityRatio)
+void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration, std::vector <double> &logProbabilityRatio)
 {	
 	double currentSphi = getSphi(false);
 	double currentMphi;
@@ -293,6 +295,8 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, 
 		currentMphi = -((currentSphi * currentSphi) / 2);
 	}
 	double proposedSphi = getSphi(true);
+
+	// TODO: double check the formulation of this
 	if (withPhi) {
 		double proposedAphi = getAphi(true);
 		proposedMphi = proposedAphi - ((proposedSphi * proposedSphi) / 2);
@@ -312,7 +316,7 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, 
 #ifndef __APPLE__
 #pragma omp parallel for reduction(+:lpr)
 #endif
-	for (int i = 0; i < numGenes; i++)
+	for (int i = 0; i < genome.getGenomeSize(); i++)
 	{
 		unsigned mixture = getMixtureAssignment(i);
 		mixture = getSynthesisRateCategory(mixture);
@@ -323,6 +327,23 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, 
 	// TODO: USE CONSTANTS INSTEAD OF 0
 	lpr -= (std::log(currentSphi) - std::log(proposedSphi));
 	logProbabilityRatio[0] = lpr;
+
+	if (withPhi) {
+		lpr = 0.0;
+#ifndef __APPLE__
+#pragma omp parallel for reduction(+:lpr)
+#endif
+		for (int i = 0; i < genome.getGenomeSize(); i++) {
+			unsigned mixtureAssignment = getMixtureAssignment(i);
+			mixtureAssignment = getSynthesisRateCategory(mixtureAssignment);
+
+			// TODO: clean this awful line up
+			lpr += std::log(Parameter::densityNorm(std::log(genome.getGene(i).observedPhiValues.at(0)), getSynthesisRate(i, mixtureAssignment, false) + getAphi(), getSepsilon()))
+				- std::log(Parameter::densityNorm(std::log(genome.getGene(i).observedPhiValues.at(0)), getSynthesisRate(i, mixtureAssignment, false) + getAphi(true), getSepsilon()));
+		}
+		lpr -= std::log(Parameter::densityNorm(getAphi(true), getAphi(false), getCurrentAphiProposalWidth())) - std::log(Parameter::densityNorm(getAphi(false), getAphi(true), getCurrentAphiProposalWidth()));
+		logProbabilityRatio[1] = lpr;
+	}
 }
 
 void ROCModel::updateGibbsSampledHyperParameters(Genome &genome)
@@ -335,7 +356,7 @@ void ROCModel::updateGibbsSampledHyperParameters(Genome &genome)
 		double aphi = getAphi();
 		for (unsigned i = 0; i < genome.getGenomeSize(); i++) {
 			mixtureAssignment = getMixtureAssignment(i);
-			rate += genome.getGeneByIndex(i).observedPhiValues.at(0) - aphi - getSynthesisRate(i, mixtureAssignment, false);
+			rate += genome.getGene(i).observedPhiValues.at(0) - aphi - getSynthesisRate(i, mixtureAssignment, false);
 		}
 		rate *= rate;
 		rate /= 2;
@@ -357,6 +378,18 @@ void ROCModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth)
 	adaptSphiProposalWidth(adaptiveWidth);
 	if (withPhi) {
 		adaptAphiProposalWidth(adaptiveWidth);
+	}
+}
+
+void ROCModel::updateHyperParameter(unsigned hp)
+{
+	switch (hp) {
+	case 0:
+		updateSphi();
+		break;
+	case 1:
+		updateAphi();
+		break;
 	}
 }
 

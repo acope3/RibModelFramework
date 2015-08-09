@@ -26,7 +26,7 @@ public:
 	virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k, double* logProbabilityRatio);
 	double calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grouping, double *mutation, double *selection, double phiValue);
 	virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures);
-	virtual void calculateLogLikelihoodRatioForHyperParameters(unsigned numGenes, unsigned iteration, std::vector <double> &logProbabilityRatio);
+	virtual void calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration, std::vector <double> &logProbabilityRatio);
 
 	virtual void updateGibbsSampledHyperParameters(Genome &genome) {}
 
@@ -48,6 +48,7 @@ public:
 	virtual double getSynthesisRate(unsigned index, unsigned mixture, bool proposed = false) { return parameter->getSynthesisRate(index, mixture, proposed); }
 	virtual double getCurrentSphiProposalWidth() { return parameter->getCurrentSphiProposalWidth(); }
 	virtual void adaptHyperParameterProposalWidths(unsigned adaptiveWidth);
+	virtual void updateHyperParameter(unsigned hp);
 	virtual void updateSphi() { parameter->updateSphi(); }
 	virtual void updateSphiTrace(unsigned sample) { parameter->updateSphiTrace(sample); }
 	virtual void updateHyperParameterTraces(unsigned sample);
