@@ -185,6 +185,10 @@ unsigned Gene::getCodonCount(std::string& codon)
     return geneData.getCodonCountForCodonR(codon);
 }
 
+void Gene::setRFPObserved(unsigned index, unsigned value)
+{
+	geneData.setRFPObserved(index, value);
+}
 
 unsigned Gene::getRFPObserved(std::string codon)
 {
@@ -236,6 +240,7 @@ RCPP_MODULE(Gene_mod)
 	.method("getAACount", &Gene::getAACount, "returns the number of amino acids that are in the sequence for a given amino acid")
 	.method("getCodonCount", &Gene::getCodonCount, "returns the number of codons that are in the sequence for a given codon")
 	.method("getRFPObserved", &Gene::getRFPObserved)
+	.method("setRFPObserved", &Gene::setRFPObserved)
 	.method("getCodonPositions", &Gene::getCodonPositions)
   ;
 }

@@ -117,11 +117,10 @@ test_that("get Codon Counts", {
 })
 
 test_that("get RFP Observed", {
-  ss <- g$getSequenceSummary()
-  g$getSequenceSummary()$setRFPObserved(4, 35)
-  ss$setRFPObserved(16, 45)
-  ss$setRFPObserved(54, 2)
-  ss$setRFPObserved(45, 0)
+  g$setRFPObserved(4, 35)
+  g$setRFPObserved(16, 45)
+  g$setRFPObserved(54, 2)
+  g$setRFPObserved(45, 0)
   expect_equal(g$getRFPObserved("TGC"), 35)
   expect_equal(g$getRFPObserved("CAC"), 45)
   expect_equal(g$getRFPObserved("GTG"),2)

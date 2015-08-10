@@ -2,7 +2,7 @@ library(ribModel)
 rm(list=ls())
 #read genome
 
-with.phi <- TRUE
+with.phi <- FALSE
 
 if (with.phi) {
   genome <- initializeGenomeObject(file = "../ribModel/data/simulatedAllUniqueR.fasta", expression.file = "../ribModel/data/simulatedAllUniqueR_phi.csv")
