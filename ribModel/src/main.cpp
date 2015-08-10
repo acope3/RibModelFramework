@@ -395,7 +395,6 @@ void simulateROCData()
 
 	std::cout <<"init done\n";
 
-	//TODO: not currently working
 	model.simulateGenome(genome);
 
 	genome.writeFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/SimulatedROCData.fasta", true);
@@ -500,7 +499,6 @@ int main()
 	/* Test variables */
 	User user = jeremy;
 	ModelToRun modelToRun = ROC;
-	bool withPhi = true;
 	bool read = false;
 	bool testing = true;
 
@@ -521,11 +519,11 @@ int main()
 		//testReadRFPFile();
 		//testReadObservedPhis();
 		//simulateRFPData();
-		//simulateROCData();
+		simulateROCData();
 		//testCodonToIndex();
 		//testInitMutationSelection();
 		//testRFPVarianceAndMean();
-		testGeneSequenceSummary();
+		//testGeneSequenceSummary();
 	}
 	else //not doing unit testing, running a model
 	{
@@ -574,9 +572,6 @@ int main()
 				if (modelToRun == ROC || modelToRun == FONSE)
 				{
 					genome.readFasta("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
-					if (withPhi) {
-						genome.readObservedPhiValues("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv");
-					}
 				}
 				else if (modelToRun == RFP)
 				{
