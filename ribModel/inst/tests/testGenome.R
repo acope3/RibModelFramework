@@ -60,7 +60,29 @@ test_that("get Codon Counts Per Gene", {
 })
 
 test_that("read Fasta", {
+    genome$clear()
+    genome$readFasta("../ribModel/data/test.fasta", FALSE)
+    compareGenome <- new(Genome)
+    gene1 <- new(Gene, "ATGGCCACTATTGGGTCTTAG", "TEST001", "TEST001 Test Gene")
+    gene2 <- new(Gene, "ATGACCGTAATTTTTTACTAG", "TEST002", "TEST002 Test Gene")
+    gene3 <- new(Gene, "ATGGTCTACTTTCTGACATAG", "TEST003", "TEST003 Test Gene")
+    compareGenome$addGene(gene1, FALSE)
+    compareGenome$addGene(gene2, FALSE)
+    compareGenome$addGene(gene3, FALSE)
+    expect_equal(genome$getGenes(FALSE), compareGenome$getGenes(FALSE))
+})
 
+test_that("write Fasta", {
+    genome$writeFasta("../ribModel/data/testWrite.fasta", FALSE)
+    fromFile <- new(Genome)
+    fromFile$readFasta("../ribModel/data/testWrite.fasta", FALSE)
+    expect_equal(genome, fromFile)
+})
+
+test_that("read RFP File", {
+    genome$clear()
+    genome$readRFPFile("../ribModel/data/testRFPFile.csv")
+    
 })
 
 genome$clear()

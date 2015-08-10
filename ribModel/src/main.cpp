@@ -476,6 +476,22 @@ void testRFPVarianceAndMean()
 
 }
 
+
+void testGeneSequenceSummary()
+{
+	Gene g("ATGCTCATTCTCACTGCTGCCTCGTAG", "a", "a");
+
+	std::cout << g.getRFPObserved("ATG") <<"\n";
+	SequenceSummary ss = g.getSequenceSummary();
+
+	std::cout << ss.getRFPObserved("ATG") <<"\n";
+
+	ss.setRFPObserved(29, 5);
+	g.geneData.setRFPObserved(29,5);
+	std::cout << ss.getRFPObserved("ATG") <<"\n";
+	std::cout << g.getRFPObserved("ATG") <<"\n";
+}
+
 int main()
 {
 
@@ -485,7 +501,7 @@ int main()
 	User user = jeremy;
 	ModelToRun modelToRun = ROC;
 	bool read = false;
-	bool testing = false;
+	bool testing = true;
 
 	if (testing)
 	{
@@ -507,7 +523,8 @@ int main()
 		//simulateROCData();
 		//testCodonToIndex();
 		//testInitMutationSelection();
-		testRFPVarianceAndMean();
+		//testRFPVarianceAndMean();
+		testGeneSequenceSummary();
 	}
 	else //not doing unit testing, running a model
 	{

@@ -220,7 +220,8 @@ RCPP_MODULE(Gene_mod)
     .method("cleanSeq", &Gene::cleanSeqR) //TEST THAT ONLY!
 
 
-	//Public functions:
+	//Public functions & variables:
+	.field("geneData", &Gene::geneData)
 	.property("id", &Gene::getId, &Gene::setId)
     .property("description", &Gene::getDescription, &Gene::setDescription)
     .property("seq", &Gene::getSequence, &Gene::setSequence)

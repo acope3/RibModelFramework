@@ -117,12 +117,11 @@ test_that("get Codon Counts", {
 })
 
 test_that("get RFP Observed", {
-  ss <- g$getSequenceSummary()
-  g$getSequenceSummary()$setRFPObserved(4, 35)
-  ss$setRFPObserved(16, 45)
-  ss$setRFPObserved(54, 2)
-  ss$setRFPObserved(45, 0)
-  expect_equal(g$getRFPObserved("TGC"), 35)
+  g$geneData$setRFPObserved(0, 35)
+  g$geneData$setRFPObserved(16, 45)
+  g$geneData$setRFPObserved(54, 2)
+  g$geneData$setRFPObserved(45, 0)
+  expect_equal(g$getRFPObserved("GCA"), 35)
   expect_equal(g$getRFPObserved("CAC"), 45)
   expect_equal(g$getRFPObserved("GTG"),2)
   expect_equal(g$getRFPObserved("TCC"), 0)
