@@ -19,6 +19,7 @@ RCPP_MODULE(Model_mod)
 		.constructor<bool>()
 		.method("CalculateProbabilitiesForCodons", &ROCModel::CalculateProbabilitiesForCodons, "Calculated codon probabilities. Input is one element shorter than output")
   		.method("setParameter", &ROCModel::setParameter)
+  		.method("simulateGenome", &ROCModel::simulateGenome)
 		;
 	
 	class_<RFPModel>("RFPModel")

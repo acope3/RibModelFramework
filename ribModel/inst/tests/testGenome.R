@@ -82,6 +82,8 @@ test_that("write Fasta", {
 test_that("read RFP File", {
     genome$clear()
     genome$readRFPFile("../ribModel/data/testRFPFile.csv")
+    compareGenome <- new(Genome)
+    gene1 <- new(Gene, )
     
 })
 
