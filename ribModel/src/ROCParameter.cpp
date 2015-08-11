@@ -588,7 +588,8 @@ void ROCParameter::initMutationCategories(std::vector<std::string> files, unsign
 
 			//get the value to store
 			std::size_t pos2 = tmp.find(",", pos + 1);
-			double value = std::atof(tmp.substr(pos, pos2 - pos).c_str());
+			std::cout << tmp.substr(pos + 1, pos2 - pos - 1 ) <<"\n";
+			double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
 
 			currentMutationParameter[category][codonIndex] = value;
 			proposedMutationParameter[category][codonIndex] = value;

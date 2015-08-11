@@ -392,11 +392,11 @@ void testReadMutationValues()
 	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 
 	ROCParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, Parameter::allUnique);
-	std::vector<std::string> files = { "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv",
-									   "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv" };
+	std::vector<std::string> files = { "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/new_simulated_mutation0.csv",
+									   "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/new_simulated_mutation1.csv" };
 
 
-	tmp.initMutationCategories(files, 1);
+	tmp.initMutationCategories(files, 2);
 
 	std::vector <std::vector <double>> v = tmp.getCurrentMutationParameter();
 
@@ -420,10 +420,10 @@ int main()
 	enum User { cedric, gabe, jeremy };
 	enum ModelToRun { ROC, RFP, FONSE };
 	/* Test variables */
-	User user = jeremy;
+	User user = gabe;
 	ModelToRun modelToRun = ROC;
 	bool read = false;
-	bool testing = false;
+	bool testing = true;
 	bool withPhi = true;
 	if (testing)
 	{
@@ -439,15 +439,11 @@ int main()
 		//testReadObservedPhis();
 		//simulateRFPData();
 	//	simulateROCData();
-		//testCodonToIndex();
 		//testInitMutationSelection();
 		//testRFPVarianceAndMean();
-		testReadMutationValues();
-		simulateROCData();
-		//testCodonToIndex();
-		//testInitMutationSelection();
-		//testRFPVarianceAndMean();
+		//testReadMutationValues();
 		//testGeneSequenceSummary();
+		testReadMutationValues();
 	}
 	else //not doing unit testing, running a model
 	{
