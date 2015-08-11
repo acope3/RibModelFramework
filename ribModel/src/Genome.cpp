@@ -324,6 +324,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 			unsigned geneIndex = 0;
 			while (input >> tmp)
 			{
+				std::cout << tmp << std::endl;
 				if (geneIndex >= genes.size())
 				{
 					std::cerr <<"GeneIndex exceeds the number of genes in the genome. Exiting function\n";
@@ -346,6 +347,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 				geneIndex++;
 			}
 		}//end of reading by index
+		input.close();
 	}
 }
 
