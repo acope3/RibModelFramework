@@ -289,23 +289,11 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 	double currentSphi = getSphi(false);
 	double currentMphi;
 	double proposedMphi;
-	if (withPhi) {
-		double currentAphi = getAphi(false);
-		currentMphi = currentAphi - ((currentSphi * currentSphi) / 2);
-	}
-	else {
-		currentMphi = -((currentSphi * currentSphi) / 2);
-	}
+	currentMphi = -((currentSphi * currentSphi) / 2);
 	double proposedSphi = getSphi(true);
 
 	// TODO: double check the formulation of this
-	if (withPhi) {
-		double proposedAphi = getAphi(true);
-		proposedMphi = proposedAphi - ((proposedSphi * proposedSphi) / 2);
-	}
-	else {
-		proposedMphi = -((proposedSphi * proposedSphi) / 2);
-	}
+	proposedMphi = -((proposedSphi * proposedSphi) / 2);
 
 	//TODO: Don't hardcode this.
 	if (withPhi) {
@@ -332,18 +320,28 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 
 	if (withPhi) {
 		lpr = 0.0;
+		double Aphi = getAphi(false);
+		double Aphi_proposed = getAphi(true);
+		double AphiPropWidth = getCurrentAphiProposalWidth();
+		double Sepsilon = getSepsilon();
 #ifndef __APPLE__
 #pragma omp parallel for reduction(+:lpr)
 #endif
 		for (int i = 0; i < genome.getGenomeSize(); i++) {
 			unsigned mixtureAssignment = getMixtureAssignment(i);
 			mixtureAssignment = getSynthesisRateCategory(mixtureAssignment);
-
+			double logphi = std::log(getSynthesisRate(i, mixtureAssignment, false));
+			double logobsPhi = std::log(genome.getGene(i).observedPhiValues.at(0));
+			double first = Parameter::densityNorm(logobsPhi, logphi + Aphi, Sepsilon);
+			double logfirst = std::log(first);
+			double second = std::log(Parameter::densityNorm(logobsPhi, logphi + Aphi_proposed, Sepsilon));
 			// TODO: clean this awful line up
-			lpr += std::log(Parameter::densityNorm(std::log(genome.getGene(i).observedPhiValues.at(0)), getSynthesisRate(i, mixtureAssignment, false) + getAphi(), getSepsilon()))
-				- std::log(Parameter::densityNorm(std::log(genome.getGene(i).observedPhiValues.at(0)), getSynthesisRate(i, mixtureAssignment, false) + getAphi(true), getSepsilon()));
+			lpr += logfirst - second;
+			if (!std::isfinite(lpr)) {
+				std::cout << "problem\n";
+			}
 		}
-		lpr -= std::log(Parameter::densityNorm(getAphi(true), getAphi(false), getCurrentAphiProposalWidth())) - std::log(Parameter::densityNorm(getAphi(false), getAphi(true), getCurrentAphiProposalWidth()));
+		lpr -= std::log(Parameter::densityNorm(Aphi_proposed, Aphi, AphiPropWidth)) - std::log(Parameter::densityNorm(Aphi, Aphi_proposed, AphiPropWidth));
 		logProbabilityRatio[1] = lpr;
 	}
 }

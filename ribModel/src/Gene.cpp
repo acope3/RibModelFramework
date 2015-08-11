@@ -36,6 +36,7 @@ Gene::Gene(const Gene& other)
     id = other.id;
     description = other.description;
     geneData = other.geneData;
+	observedPhiValues = other.observedPhiValues;
 }
 
 
@@ -46,6 +47,7 @@ Gene& Gene::operator=(const Gene& rhs)
     id = rhs.id;
     description = rhs.description;
     geneData = rhs.geneData;
+	observedPhiValues = rhs.observedPhiValues;
     //assignment operator
     return *this;
 }
