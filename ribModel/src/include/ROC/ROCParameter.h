@@ -82,6 +82,7 @@ class ROCParameter : public Parameter
 				numMutationCategories, numSelectionCategories, numParam, numMixtures, categories, maxGrouping);}
 
 		void initMutationSelectionCategories(std::vector<std::string> files, unsigned numCategories, unsigned paramType);
+		void initMutationCategories(std::vector<std::string> files, unsigned numCategories);
 
 		double getCurrentCodonSpecificProposalWidth(unsigned aa);
 		std::vector<std::vector<double>> getCurrentMutationParameter() {return currentMutationParameter;}
