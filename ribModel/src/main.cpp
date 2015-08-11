@@ -6,17 +6,6 @@
 
 #include "include/MCMCAlgorithm.h"
 
-void testNumCodonsPerAA()
-{
-	std::cout << "------------------ # CODONS PER AA ------------------" << std::endl;
-	for (int i = 0; i < 22; i++)
-	{
-		std::string aa = SequenceSummary::AminoAcidArray[i];
-		int ncodons = SequenceSummary::GetNumCodonsForAA(aa);
-		std::cout << "# codons for " << aa << "\t" << ncodons << std::endl;
-	}
-	std::cout << "------------------ # CODONS PER AA ------------------" << std::endl;
-}
 
 void testLogNormDensity()
 {
@@ -145,100 +134,7 @@ void testThetaKMatrix()
 
 }
 
-void testSimulateGenome(Genome& genome)
-{
-	std::cout << "------------------ TEST SIMULATEGENOME ------------------" << std::endl;
 
-
-	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
-	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
-	{
-		if (i < 448) geneAssignment[i] = 0u;
-		else geneAssignment[i] = 1u;
-	}
-
-
-
-	std::cout << "initialize ROCParameter object" << std::endl;
-	double sphi_init = 2;
-	unsigned numMixtures = 2;
-	std::string mixDef = ROCParameter::mutationShared;
-	std::cout << "\tSphi init: " << sphi_init << "\n";
-	std::cout << "\t# mixtures: " << numMixtures << "\n";
-	std::cout << "\tmixture definition: " << mixDef << "\n";
-	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
-	ROCParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
-	std::vector<std::string> files = { "Skluyveri_CSP_ChrA.csv", "Skluyveri_CSP_ChrCleft.csv" };
-	parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
-	parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
-
-
-
-	//parameter.InitializeSynthesisRate(genome, sphi_init);
-	std::vector<double> phiVals;
-	phiVals = parameter.readPhiValues("Skluyveri_ChrA_ChrCleft_phi_est.csv");
-	parameter.InitializeSynthesisRate(phiVals);
-
-	std::cout << "done initialize ROCParameter object" << std::endl;
-	ROCModel model(false);
-	model.setParameter(parameter);
-	model.simulateGenome(genome);
-	std::vector <Gene> simGenes = genome.getGenes(true);
-	std::cout << "FREQUENCIES:\n";
-
-
-	for (unsigned i = 0u; i < simGenes.size(); i++)
-	{
-		unsigned mixtureElement = parameter.getMixtureAssignment(i);
-		unsigned mutationCategory = parameter.getMutationCategory(mixtureElement);
-		unsigned selectionCategory = parameter.getSelectionCategory(mixtureElement);
-		unsigned expressionCategory = parameter.getSynthesisRateCategory(mixtureElement);
-		double phi = parameter.getSynthesisRate(i, expressionCategory, false);
-
-		std::cout << "phi = " << phi << "\n";
-		Gene gene = simGenes[i];
-		SequenceSummary simSeqSum = gene.geneData;
-
-
-		for (int j = 0; j < 22; j++)
-		{
-			std::array<unsigned, 2> aaRange = SequenceSummary::AAIndexToCodonRange(j, false);
-			std::string curAA = SequenceSummary::indexToAA(j);
-			unsigned numCodons = simSeqSum.GetNumCodonsForAA(curAA);
-			double* codonProb = new double[numCodons];
-			double *mutation = new double[numCodons - 1];
-			double *selection = new double[numCodons - 1];
-			if (curAA == "X") std::cout << numCodons << "\n";
-			parameter.getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
-			parameter.getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
-			model.calculateCodonProbabilityVector(numCodons, mutation, selection, phi, codonProb);
-			std::vector <double> counts(numCodons, 0.0);
-			double sum = 0;
-			int a = 0;
-			for (unsigned k = aaRange[0]; k < aaRange[1]; k++)
-			{
-				counts[a] = simSeqSum.getCodonCountForCodon(k);
-				sum += counts[a];
-				a++;
-			}
-			std::cout << "size of counts: " << counts.size() << "\n";
-			int aaCount = simSeqSum.getAACountForAA(j);
-			std::cout << "amino acid " << curAA << ": " << aaCount << "\n";
-			for (unsigned k = 0u; k < counts.size(); k++)
-			{
-				std::cout << "\tval: " << counts[k] / sum << " VS " << codonProb[k] << " with count of " << counts[k] << "\n";
-			}
-			std::cout << "\n";
-			delete[] codonProb;
-			delete[] mutation;
-			delete[] selection;
-		}
-
-	}
-	std::cout << "Writing new fasta file\n";
-	genome.writeFasta("SIMULATED_MUTATION_SHARED_Skluyveri_A_andCleft.fasta", true);
-	std::cout << "------------------ TEST SIMULATEGENOME ------------------" << std::endl;
-}
 
 void testCovMatrixOverloading()
 {
@@ -376,10 +272,7 @@ void simulateROCData()
         if (i < 448) geneAssignment[i] = 0u;
         else geneAssignment[i] = 1u;
     }
-	/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
-	{
-		geneAssignment[i] = 0u;
-	}*/
+
 	double sphi_init = 2;
 	unsigned numMixtures = 2;
 	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
@@ -476,20 +369,47 @@ void testRFPVarianceAndMean()
 }
 
 
-void testGeneSequenceSummary()
+void testReadMutationValues()
 {
-	Gene g("ATGCTCATTCTCACTGCTGCCTCGTAG", "a", "a");
+	std::cout <<"----------TEST INITMUTATIONCATEGORIES----------\n";
 
-	std::cout << g.getRFPObserved("ATG") <<"\n";
-	SequenceSummary ss = g.getSequenceSummary();
+	Genome genome;
+	genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_chromosomeA.fasta");
 
-	std::cout << ss.getRFPObserved("ATG") <<"\n";
 
-	ss.setRFPObserved(29, 5);
-	g.geneData.setRFPObserved(29,5);
-	std::cout << ss.getRFPObserved("ATG") <<"\n";
-	std::cout << g.getRFPObserved("ATG") <<"\n";
+	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
+	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+	{
+		if (i < 448) geneAssignment[i] = 0u;
+		else geneAssignment[i] = 1u;
+	}
+
+	double sphi_init = 2;
+	unsigned numMixtures = 2;
+	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
+
+	ROCParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, Parameter::allUnique);
+	std::vector<std::string> files = { "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv",
+									   "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv" };
+
+
+	tmp.initMutationCategories(files, 1);
+
+	std::vector <std::vector <double>> v = tmp.getCurrentMutationParameter();
+
+	for (unsigned i = 0; i < v.size(); i++)
+	{
+		for(unsigned j = 0; j < v[i].size(); j++)
+		{
+			std::cout << v[i][j] <<"\n";
+		}
+		std::cout <<"\n\n\n";
+	}
+
+
+	std::cout <<"----------END TEST INITMUTATIONCATEGORIES----------\n";
 }
+
 
 int main()
 {
@@ -504,26 +424,22 @@ int main()
 
 	if (testing)
 	{
-		//testNumCodonsPerAA();
-		//testCodonRangePerAA(false);
-		//testCodonRangePerAA(true);
 		//testLogNormDensity();
 		//testSCUO(genome);
 		//testCovarianceMatrix();
 		//testRandMultiNom(3);
 		//testThetaKMatrix();
-		//testSimulateGenome(genome);
 		//testCovMatrixOverloading();
 		//testWriteRestartFile();
 		//testInitFromRestartFile();
 		//testReadRFPFile();
 		//testReadObservedPhis();
 		//simulateRFPData();
-		simulateROCData();
+	//	simulateROCData();
 		//testCodonToIndex();
 		//testInitMutationSelection();
 		//testRFPVarianceAndMean();
-		//testGeneSequenceSummary();
+		testReadMutationValues();
 	}
 	else //not doing unit testing, running a model
 	{

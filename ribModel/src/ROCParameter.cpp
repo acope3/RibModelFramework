@@ -561,6 +561,41 @@ void ROCParameter::initMutationSelectionCategories(std::vector<std::string> file
 	}
 }
 
+
+void ROCParameter::initMutationCategories(std::vector<std::string> files, unsigned numCategories)
+{
+	for (unsigned category = 0; category < numCategories; category++)
+	{
+		//Open the file for the category
+		std::ifstream currentFile;
+		currentFile.open(files[category].c_str());
+		if (currentFile.fail())
+		{
+			std::cerr << "Error opening file " << category << " to initialize mutation values.\n";
+			std::exit(1);
+		}
+
+		std::string tmp;
+		currentFile >> tmp; //The first line is a header (Amino Acid, Codon, Value, Std_deviation)
+
+		while (currentFile >> tmp)
+		{
+			//Get the Codon and Index
+			std::size_t pos = tmp.find(",", 2); //Amino Acid and a comma will always be the first 2 characters
+			std::string codon = tmp.substr(2, pos - 2);
+			unsigned codonIndex = SequenceSummary::codonToIndex(codon, true);
+
+			//get the value to store
+			std::size_t pos2 = tmp.find(",", pos + 1);
+			double value = std::atof(tmp.substr(pos, pos2 - pos).c_str());
+
+			currentMutationParameter[category][codonIndex] = value;
+			proposedMutationParameter[category][codonIndex] = value;
+		}
+		currentFile.close();
+	} //END OF A CATEGORY/FILE
+}
+
 void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType, std::string aa, bool proposal,
 		double *returnSet)
 {
