@@ -89,6 +89,7 @@ ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
 	phiEpsilon_proposed = rhs.phiEpsilon_proposed;
 	Aphi = rhs.Aphi;
 	Aphi_proposed = rhs.Aphi_proposed;
+	std_Aphi = rhs.std_Aphi;
 	numAcceptForAphi = rhs.numAcceptForAphi;
 	traces = rhs.traces;
 	numAcceptForMutationAndSelection = rhs.numAcceptForMutationAndSelection;
@@ -1067,7 +1068,7 @@ void ROCParameter::proposeCodonSpecificParameter()
 
 void ROCParameter::proposeAphi()
 {
-	Aphi_proposed = std::exp(randNorm(std::log(Aphi), std_Aphi));
+	Aphi_proposed = std::exp(randNorm(Aphi, std_Aphi));
 }
 
 std::vector<double> ROCParameter::propose(std::vector<double> currentParam, double (*proposal)(double a, double b),

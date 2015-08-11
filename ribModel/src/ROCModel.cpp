@@ -150,14 +150,16 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 	double mutation_proposed[5];
 	double selection_proposed[5];
 	int codonCount[6];
+	Gene *gene;
+	SequenceSummary *seqsum;
 #ifndef __APPLE__
-#pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed, codonCount) reduction(+:likelihood,likelihood_proposed)
+#pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed, codonCount, gene, seqsum) reduction(+:likelihood,likelihood_proposed)
 #endif
 	for(int i = 0; i < numGenes; i++)
 	{
-		Gene gene = genome.getGene(i);
-		SequenceSummary seqsum = gene.getSequenceSummary();
-		if(seqsum.getAACountForAA(grouping) == 0) continue;
+		gene = &genome.getGene(i);
+		seqsum = &gene->getSequenceSummary();
+		if(seqsum->getAACountForAA(grouping) == 0) continue;
 
 		// which mixture element does this gene belong to
 		unsigned mixtureElement = parameter->getMixtureAssignment(i);
@@ -181,7 +183,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 		parameter->getParameterForCategory(selectionCategory, ROCParameter::dEta, grouping, true, selection_proposed);
 
 		//int* codonCount = new int[numCodons]();
-		obtainCodonCount(seqsum, grouping, codonCount);
+		obtainCodonCount(*seqsum, grouping, codonCount);
 		likelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
 		likelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation_proposed, selection_proposed, phiValue);
 	}

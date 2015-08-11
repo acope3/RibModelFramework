@@ -263,8 +263,8 @@ void simulateRFPData()
 void simulateROCData()
 {
 	Genome genome;
-	genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_chromosomeA.fasta");
-
+	//genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_chromosomeA.fasta");
+	genome.readFasta("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_chromosomeA.fasta");
 
 	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
@@ -278,8 +278,10 @@ void simulateROCData()
 	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 
 	ROCParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, Parameter::allUnique);
-	std::vector<std::string> files = { "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv",
-									   "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv" };
+	std::vector<std::string> files = { "C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv",
+		"C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv" };
+	//std::vector<std::string> files = { "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv",
+									   //"/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv" };
 	tmp.initMutationSelectionCategories(files, tmp.getNumMutationCategories(), ROCParameter::dM);
 	tmp.initMutationSelectionCategories(files, tmp.getNumSelectionCategories(), ROCParameter::dEta);
 	ROCModel model(false);
@@ -290,7 +292,8 @@ void simulateROCData()
 
 	model.simulateGenome(genome);
 
-	genome.writeFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/SimulatedROCData.fasta", true);
+	//genome.writeFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/SimulatedROCData.fasta", true);
+	genome.writeFasta("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/SimulatedROCData.fasta", true);
 }
 
 void testCodonToIndex()
@@ -420,8 +423,8 @@ int main()
 	User user = jeremy;
 	ModelToRun modelToRun = ROC;
 	bool read = false;
-	bool testing = true;
-
+	bool testing = false;
+	bool withPhi = true;
 	if (testing)
 	{
 		//testLogNormDensity();
@@ -440,6 +443,11 @@ int main()
 		//testInitMutationSelection();
 		//testRFPVarianceAndMean();
 		testReadMutationValues();
+		simulateROCData();
+		//testCodonToIndex();
+		//testInitMutationSelection();
+		//testRFPVarianceAndMean();
+		//testGeneSequenceSummary();
 	}
 	else //not doing unit testing, running a model
 	{
@@ -488,6 +496,9 @@ int main()
 				if (modelToRun == ROC || modelToRun == FONSE)
 				{
 					genome.readFasta("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
+					if (withPhi) {
+						genome.readObservedPhiValues("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv", false);
+					}
 				}
 				else if (modelToRun == RFP)
 				{
@@ -570,7 +581,7 @@ int main()
 			}
 
 			std::cout <<"Initializing ROCModel object\n";
-			ROCModel model(false);
+			ROCModel model(withPhi);
 			model.setParameter(parameter);
 			std::ofstream scuoout("results/scuo.csv");
 			for (unsigned n = 0u; n < genome.getGenomeSize(); n++)

@@ -309,7 +309,6 @@ void Parameter::writeBasicRestartFile(std::string filename)
 	}
 	if (i % 10 != 0) oss <<"\n";
 
-
 	oss <<">selectionIsInMixture:\n";
 	for (i = 0; i < selectionIsInMixture.size(); i++)
 	{

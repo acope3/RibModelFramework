@@ -51,10 +51,6 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	double logLikelihood = 0.0;
 	int numGenes = genome.getGenomeSize();
 
-	// just for testing
-	//unsigned concurrentThreadsSupported = std::thread::hardware_concurrency();
-	//omp_set_num_threads(concurrentThreadsSupported);
-	
 	// testing end
 	unsigned numSynthesisRateCategories = model.getNumSynthesisRateCategories();
 	unsigned numMixtures = model.getNumMixtureElements();
