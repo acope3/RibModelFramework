@@ -3,7 +3,7 @@ rm(list=ls())
 
 
 #read genome
-genome <- initializeGenomeObject(file = "../ribModel/data/simulatedRFPData.csv", FALSE)
+genome <- initializeGenomeObject(file = "../ribModel/data/SimulatedRFPData.csv", FALSE)
 
 
 #initialize parameter object
@@ -46,6 +46,8 @@ plot(mcmc)
 plot(trace, what = "MixtureProbability")
 plot(trace, what = "SPhi")
 plot(trace, what = "ExpectedPhi")
+loglik.trace <- mcmc$getLogLikelihoodTrace()
+acf(loglik.trace)
 dev.off()
 
 plot(trace, what = "Expression", geneIndex = 905)
@@ -73,7 +75,7 @@ for (i in 1:61)
 plot(NULL, NULL, xlim=range(alphaList, na.rm = T), ylim=range(lambdaPrimeList), 
      main = "Correlation Between Alpha and Lambda Prime", xlab = "alpha", ylab = "lambdaPrime")
 upper.panel.plot(alphaList, lambdaPrimeList)
-dev.off()
+
 
 A <- read.table("../ribModel/data/RFPAlphaValues.csv", header =TRUE, sep = ",")
 LP <- read.table("../ribModel/data/RFPLambdaPrimeValues.csv", header =TRUE, sep = ",")

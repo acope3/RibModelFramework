@@ -186,11 +186,6 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 		obtainCodonCount(*seqsum, grouping, codonCount);
 		likelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
 		likelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation_proposed, selection_proposed, phiValue);
-		//delete [] &codonCount;
-		//delete [] &mutation;
-		//delete [] &selection;
-		//delete [] &mutation_proposed;
-		//delete [] &selection_proposed;
 	}
 	logAcceptanceRatioForAllMixtures = likelihood_proposed - likelihood;
 }

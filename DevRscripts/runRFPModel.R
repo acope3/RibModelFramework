@@ -11,12 +11,12 @@ sphi_init <- 2
 numMixtures <- 1
 mixDef <- "allUnique"
 geneAssignment <- c(rep(1, genome$getGenomeSize()))
-#parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, model= "RFP", split.serine = TRUE, mixture.definition = mixDef)
-parameter <- new(RFPParameter, "180KrestartFile.rst")
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, model= "RFP", split.serine = TRUE, mixture.definition = mixDef)
+#parameter <- new(RFPParameter, "180KrestartFile.rst")
 
 # initialize MCMC object
-samples <- 4000
-thining <- 30
+samples <- 100
+thining <- 10
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples=samples, thining=thining, adaptive.width=adaptiveWidth, 
                              est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
@@ -46,7 +46,7 @@ acf(loglik.trace)
 dev.off()
 
 
-pdf("RFP_CSP_Values_Mixture1.pdf", width = 11, height = 12)
+pdf("RFP_CSP_Values_Mixture1.pdf", width = 11, height = 20)
 plot(trace, what = "Expression", geneIndex = 905)
 plot(trace, what = "Alpha", mixture = 1)
 plot(trace, what = "LambdaPrime", mixture = 1)
