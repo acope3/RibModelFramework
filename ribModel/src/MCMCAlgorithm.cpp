@@ -193,7 +193,8 @@ void MCMCAlgorithm::acceptRejectHyperParameter(Genome &genome, Model& model, int
 
 	model.calculateLogLikelihoodRatioForHyperParameters(genome, iteration, logProbabilityRatios);
 
-	for (unsigned i = 0; i < logProbabilityRatios.size(); i++)
+	//#pragma omp for
+	for (int i = 0; i < logProbabilityRatios.size(); i++)
 	{
 		if (!std::isfinite(logProbabilityRatios[i]))
 		{

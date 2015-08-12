@@ -202,7 +202,7 @@ class Parameter {
 		static double randUnif(double minVal, double maxVal);
 		static unsigned randMultinom(double* probabilities, unsigned mixtureElements);
 
-		static double densityNorm(double x, double mean, double sd);
+		static double densityNorm(double x, double mean, double sd, bool log = false);
 		static double densityLogNorm(double x, double mean, double sd);
 
 		//double getMixtureAssignmentPosteriorMean(unsigned samples, unsigned geneIndex); // TODO: implement variance function, fix Mean function (won't work with 3 groups)

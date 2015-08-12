@@ -1003,13 +1003,15 @@ unsigned Parameter::randMultinom(double* probabilities, unsigned mixtureElements
 	return returnValue;
 }
 
-double Parameter::densityNorm(double x, double mean, double sd)
+double Parameter::densityNorm(double x, double mean, double sd, bool log)
 {
 	const double inv_sqrt_2pi = 0.3989422804014327;
+	const double log_sqrt_2pi = 0.9189385332046727;
 	double a = (x - mean) / sd;
 
-	return (inv_sqrt_2pi / sd) * std::exp(-0.5 * a * a);
+	return log ? -log_sqrt_2pi - std::log(sd) - (0.5 * a * a) : (inv_sqrt_2pi / sd) * std::exp(-0.5 * a * a);
 }
+
 double Parameter::densityLogNorm(double x, double mean, double sd)
 {
 	double returnValue = 0.0;
