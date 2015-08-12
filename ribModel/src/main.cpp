@@ -100,10 +100,12 @@ void testThetaKMatrix()
 	//R.printThetaKMatrix();
 	std::cout << "numMutationCategories: " << R.getNumMutationCategories() << "\n";
 	std::cout << "numSelectionCategories: " << R.getNumSelectionCategories() << "\n";
-	std::vector<std::string> files = { "Skluyveri_CSP_ChrA.csv", "Skluyveri_CSP_ChrCleft.csv" };
+	std::vector<std::string> Mfiles = { "Skluyveri_CSP_ChrA.csv", "Skluyveri_CSP_ChrCleft.csv" };
 	std::cout << "files array good to go\n";
-	R.initMutationSelectionCategories(files, R.getNumMutationCategories(), ROCParameter::dM);
-	R.initMutationSelectionCategories(files, R.getNumSelectionCategories(), ROCParameter::dEta);
+
+	//THIS DOES NOT CURRENTLY WORK!!!!
+	R.initMutationCategories(Mfiles, R.getNumMutationCategories());
+	R.initSelectionCategories(Mfiles, R.getNumSelectionCategories());
 
 
 	std::cout << "looping through all mutation params:\n";
@@ -278,12 +280,12 @@ void simulateROCData()
 	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 
 	ROCParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, Parameter::allUnique);
-	std::vector<std::string> files = { "C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv",
-		"C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv" };
-	//std::vector<std::string> files = { "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv",
-									   //"/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv" };
-	tmp.initMutationSelectionCategories(files, tmp.getNumMutationCategories(), ROCParameter::dM);
-	tmp.initMutationSelectionCategories(files, tmp.getNumSelectionCategories(), ROCParameter::dEta);
+	std::vector<std::string> files = { "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_mutation_ChrA.csv",
+									   "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_mutation_ChrCleft.csv" };
+	tmp.initMutationCategories(files, tmp.getNumMutationCategories());
+	files[0] = "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_selection_ChrA.csv";
+	files[1] = "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_selection_ChrCleft.csv";
+	tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
 	ROCModel model(false);
 
 	model.setParameter(tmp);
@@ -423,7 +425,7 @@ int main()
 	User user = gabe;
 	ModelToRun modelToRun = ROC;
 	bool read = false;
-	bool testing = true;
+	bool testing = false;
 	bool withPhi = true;
 	if (testing)
 	{
@@ -551,24 +553,34 @@ int main()
 
 			switch (user) {
 				case cedric:
-					files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/simulated_CSP0.csv");
-					files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/simulated_CSP1.csv");
-					//files[0] = std::string("C:/Users/Cedric/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv");
-					//files[1] = std::string("C:/Users/Cedric/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv");
+					files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/simulated_mutation0.csv");
+					files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/simulated_mutation1.csv");
+					tmp.initMutationCategories(files, tmp.getNumMutationCategories());
+
+					files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/simulated_selection0.csv");
+					files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/simulated_selection1.csv");
+					tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
 					break;
 
 				case gabe:
-					files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_CSP0.csv");
-					files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_CSP1.csv");
+					files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_mutation0.csv");
+					files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_mutation1.csv");
+					tmp.initMutationCategories(files, tmp.getNumMutationCategories());
+
+					files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_selection0.csv");
+					files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_selection1.csv");
+					tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
 					break;
 				case jeremy:
-					files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_CSP0.csv");
-					files[1] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_CSP1.csv");
+					files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_mutation0.csv");
+					files[1] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_mutation1.csv");
+					tmp.initMutationCategories(files, tmp.getNumMutationCategories());
+
+					files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_selection0.csv");
+					files[1] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_selection1.csv");
+					tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
 					break;
 			}
-
-			tmp.initMutationSelectionCategories(files, tmp.getNumMutationCategories(), ROCParameter::dM);
-			tmp.initMutationSelectionCategories(files, tmp.getNumSelectionCategories(), ROCParameter::dEta);
 			tmp.InitializeSynthesisRate(genome, sphi_init);
 			//std::vector<double> phiVals = parameter.readPhiValues("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrCleft_phi_est.csv");
 			//parameter.InitializeSynthesisRate(phiVals);

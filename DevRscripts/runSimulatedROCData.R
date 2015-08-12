@@ -14,12 +14,12 @@ parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssig
 #init from true values
 phiVals <- parameter$readPhiValues( "../ribModel/data/simulatedSelectionSharedR_phi.csv" )
 parameter$initializeSynthesisRateByRandom(phiVals)
-parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv"), 2, "Selection")
-parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")
+parameter$initMutationCategories(c("../ribModel/data/simulated_mutation0.csv", "../ribModel/data/simulated_mutation1.csv"), 2)
+parameter$initSelectionCategories(c("../ribModel/data/simulated_selection0.csv", "../ribModel/data/simulated_selection1.csv") , 2)
 
 
 # initialize MCMC object
-samples <- 500
+samples <- 300
 thining <- 10
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples=samples, thining=thining, adaptive.width=adaptiveWidth, 

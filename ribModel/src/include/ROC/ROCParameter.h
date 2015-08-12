@@ -81,9 +81,8 @@ class ROCParameter : public Parameter
 		void initAllTraces(unsigned samples, unsigned num_genes) {traces.initAllTraces(samples, num_genes,
 				numMutationCategories, numSelectionCategories, numParam, numMixtures, categories, maxGrouping);}
 
-		void initMutationSelectionCategories(std::vector<std::string> files, unsigned numCategories, unsigned paramType);
 		void initMutationCategories(std::vector<std::string> files, unsigned numCategories);
-
+		void initSelectionCategories(std::vector<std::string> files, unsigned numCategories);
 		double getCurrentCodonSpecificProposalWidth(unsigned aa);
 		std::vector<std::vector<double>> getCurrentMutationParameter() {return currentMutationParameter;}
 		std::vector<std::vector<double>> getCurrentSelectionParameter() {return currentSelectionParameter;}
@@ -144,7 +143,6 @@ class ROCParameter : public Parameter
 		double getSelectionVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased = true);
 
 		//R wrapper functions
-		void initMutationSelectionCategoriesR(std::vector<std::string> files, unsigned numCategories, std::string paramType);
 		double getMutationPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
 		{
 			double rv = -1.0;
