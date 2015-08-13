@@ -19,7 +19,7 @@ parameter$initSelectionCategories(c("../ribModel/data/simulated_selection0.csv",
 
 
 # initialize MCMC object
-samples <- 300
+samples <- 100
 thining <- 10
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples=samples, thining=thining, adaptive.width=adaptiveWidth, 
@@ -32,7 +32,10 @@ setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth, TRUE)
 system.time(
   runMCMC(mcmc, genome, model)
 )
-
+writeParameterToCSV(parameter,"MutationMixture1.csv", CSP="Mutation", 1)
+writeParameterToCSV(parameter,filename="MutationMixture2.csv", CSP="Mutation", 2)
+writeParameterToCSV(parameter,filename="SelectionMixture1.csv", CSP="Selection", 1)
+writeParameterToCSV(parameter,filename="SelectionMixture2.csv", CSP="Selection", 2)
 #plots log likelihood trace, possibly other mcmc diagnostics in the future
 plot(mcmc)
 

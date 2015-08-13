@@ -83,8 +83,13 @@ test_that("read RFP File", {
     genome$clear()
     genome$readRFPFile("../ribModel/data/testRFPFile.csv")
     compareGenome <- new(Genome)
-    gene1 <- new(Gene, )
-    
+    gene1 <- new(Gene, "TAGATGGCCGCGGCGGGC", "YAL001C", "YAL001C No description for RFP Model")
+    gene2 <- new(Gene, "TTTTTTTAGCTTCTTATG", "YAL002W", "YAL002W No description for RFP Model")
+    gene3 <- new(Gene, "TAGATGATGATGATGATG", "YAL003W", "YAL003W No description for RFP Model")
+    compareGenome$addGene(gene1, FALSE)
+    compareGenome$addGene(gene2, FALSE)
+    compareGenome$addGene(gene3, FALSE)
+    expect_equal(genome$getGenes(FALSE), compareGenome$getGenes(FALSE))
 })
 
 genome$clear()

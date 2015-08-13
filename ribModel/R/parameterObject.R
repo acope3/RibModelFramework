@@ -235,8 +235,50 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures, geneAssign
   return(parameter)
 }
 
+writeParameterToCSV <- function(parameter, filename, CSP, mixture)
+{
+  UseMethod("writeParameterToCSV", parameter)
+}
 
-
+writeParameterToCSV.Rcpp_ROCParameter <- function(parameter, filename=NULL, CSP=NULL, mixture=1)
+{
+  names.aa <- aminoAcids()
+  Amino_Acid <- c()
+  Value <- c()
+  Codon <- c()
+  Std_Deviation <- c()
+  for(aa in names.aa)
+  {
+    if(aa == "M" || aa == "W" || aa == "X") next
+    codons <- AAToCodon(aa, T)
+    for(i in 1:length(codons))
+    {
+      Amino_Acid <- c(Amino_Acid, aa)
+      Codon <- c(Codon, codons[i])
+      if(CSP == "Mutation")
+      {
+        Value <- c(Value,parameter$getMutationPosteriorMeanForCodon(mixture, samples*0.1, codons[i]))
+        Std_Deviation <- c(Std_Deviation, sqrt(parameter$getMutationVarianceForCodon(mixture, samples*0.1, codons[i], TRUE)))
+      }
+      else if(CSP == "Selection")
+      {
+        Value <- c(Value,parameter$getSelectionPosteriorMeanForCodon(mixture, samples*0.1, codons[i]))
+        Std_Deviation <- c(Std_Deviation, sqrt(parameter$getSelectionVarianceForCodon(mixture, samples*0.1, codons[i], TRUE)))
+      }else 
+      {
+        stop("Unknown Parameter type given")
+      }
+    }
+  }
+  data <- data.frame(Amino_Acid,Codon,Value, Std_Deviation)
+  if(is.null(filename))
+  {
+    print(data)
+  }else 
+  {
+    write.csv(data, file = filename, row.names = FALSE, quote=FALSE)
+  }
+}
 
 getCodonCountsForAA <- function(aa)
 {
