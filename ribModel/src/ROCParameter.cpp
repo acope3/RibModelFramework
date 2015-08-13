@@ -559,7 +559,7 @@ void ROCParameter::initSelectionCategories(std::vector<std::string> files, unsig
 
 			//get the value to store
 			std::size_t pos2 = tmp.find(",", pos + 1);
-			std::cout << tmp.substr(pos + 1, pos2 - pos - 1 ) <<"\n";
+		//	std::cout << tmp.substr(pos + 1, pos2 - pos - 1 ) <<"\n";
 			double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
 
 			currentSelectionParameter[category][codonIndex] = value;
@@ -1027,7 +1027,10 @@ void ROCParameter::proposeCodonSpecificParameter()
 
 void ROCParameter::proposeAphi()
 {
-	Aphi_proposed = std::exp(randNorm(Aphi, std_Aphi));
+	Aphi_proposed = randNorm(Aphi, std_Aphi);
+	if (!std::isfinite(Aphi_proposed)) {
+		std::cout << "problem" << std::endl;
+	}
 }
 
 std::vector<double> ROCParameter::propose(std::vector<double> currentParam, double (*proposal)(double a, double b),

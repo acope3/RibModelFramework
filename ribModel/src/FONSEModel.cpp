@@ -114,7 +114,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 	SequenceSummary *seqsum;
 
 #ifndef __APPLE__
-	#pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed) reduction(+:likelihood,likelihood_proposed)
+	#pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed, curAA, gene, seqsum) reduction(+:likelihood,likelihood_proposed)
 #endif
 	for (int i = 0; i < numGenes; i++)
 	{

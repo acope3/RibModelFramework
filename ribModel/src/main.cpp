@@ -394,8 +394,10 @@ void testReadMutationValues()
 	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 
 	ROCParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, Parameter::allUnique);
-	std::vector<std::string> files = { "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/new_simulated_mutation0.csv",
-									   "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/new_simulated_mutation1.csv" };
+//	std::vector<std::string> files = { "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/new_simulated_mutation0.csv",
+	//								   "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/new_simulated_mutation1.csv" };
+	std::vector<std::string> files = { "C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/new_simulated_mutation0.csv",
+									   "C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/new_simulated_mutation1.csv" };
 
 
 	tmp.initMutationCategories(files, 2);
@@ -422,7 +424,7 @@ int main()
 	enum User { cedric, gabe, jeremy };
 	enum ModelToRun { ROC, RFP, FONSE };
 	/* Test variables */
-	User user = gabe;
+	User user = jeremy;
 	ModelToRun modelToRun = ROC;
 	bool read = false;
 	bool testing = false;
@@ -601,7 +603,7 @@ int main()
 			
 
 			std::cout << "starting MCMC for ROC" << std::endl;
-			mcmc.run(genome, model, 4);
+			mcmc.run(genome, model, 8);
 			std::cout << std::endl << "Finished MCMC for ROC" << std::endl;
 			
 
