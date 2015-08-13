@@ -119,6 +119,12 @@ SequenceSummary& Gene::getSequenceSummary()
 }
 
 
+std::vector<double> Gene::getObservedPhiValues()
+{
+    return observedPhiValues;
+}
+
+
 char Gene::getNucleotideAt(unsigned i)
 {
     return seq[i];
@@ -231,6 +237,7 @@ RCPP_MODULE(Gene_mod)
     .property("seq", &Gene::getSequence, &Gene::setSequence)
 
     .method("getSequenceSummary", &Gene::getSequenceSummary) //TEST THAT ONLY!
+    .method("getObservedPhiValues", &Gene::getObservedPhiValues)
     .method("getNucleotideAt", &Gene::getNucleotideAt) //TEST THAT ONLY!
 	.method("clear", &Gene::clear, "clears the id, sequence, and description in the object")
     .method("length", &Gene::length, "returns the length of sequence")
