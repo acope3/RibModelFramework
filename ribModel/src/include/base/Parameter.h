@@ -228,7 +228,7 @@ class Parameter {
 			bool check = checkIndex(geneIndex, 1, (unsigned)mixtureAssignment.size());
 			if (check)
 			{
-				rv = getMixtureAssignment(geneIndex - 1);
+				rv = getMixtureAssignment(geneIndex - 1) + 1;
 			}
 			return rv;
 		}
