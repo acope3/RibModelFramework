@@ -69,7 +69,7 @@ class SequenceSummary
 		static std::string indexToAA(unsigned aaIndex);
 		static std::string indexToCodon(unsigned index, bool forParamVector = false);
 		static unsigned GetNumCodonsForAA(std::string& aa, bool forParamVector = false);
-		static char complimentNucleotide(char ch); //TODO: impliment for test that!
+		static char complimentNucleotide(char ch);
 		static std::vector<std::string> aminoAcids();
 		static std::vector<std::string> codons();
 

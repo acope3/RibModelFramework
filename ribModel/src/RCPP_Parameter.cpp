@@ -32,6 +32,7 @@ RCPP_MODULE(Parameter_mod)
 		.method("getSynthesisRatePosteriorMeanByMixtureElementForGene", &Parameter::getSynthesisRatePosteriorMeanByMixtureElementForGene)
 		.method("getSynthesisRateVarianceByMixtureElementForGene", &Parameter::getSynthesisRateVarianceByMixtureElementForGene)
 		.method("getCurrentSynthesisRateForMixture", &Parameter::getCurrentSynthesisRateForMixture)
+		.method("getMixtureAssignmentForGene", &Parameter::getMixtureAssignmentForGeneR)
 		
 
 		.property("numMutationCategories", &Parameter::getNumMutationCategories)

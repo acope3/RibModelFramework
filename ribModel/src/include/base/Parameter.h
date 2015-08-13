@@ -222,6 +222,18 @@ class Parameter {
 			InitializeSynthesisRate(expression);
 		}
 
+		unsigned getMixtureAssignmentForGeneR(unsigned geneIndex)
+		{
+			unsigned rv = 0;
+			bool check = checkIndex(geneIndex, 1, (unsigned)mixtureAssignment.size());
+			if (check)
+			{
+				rv = getMixtureAssignment(geneIndex - 1);
+			}
+			return rv;
+		}
+
+
 		unsigned getEstimatedMixtureAssignmentForGene(unsigned samples, unsigned geneIndex);
 		std::vector<double> getEstimatedMixtureAssignmentProbabilitiesForGene(unsigned samples, unsigned geneIndex);
 
