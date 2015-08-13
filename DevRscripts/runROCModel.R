@@ -34,7 +34,7 @@ model <- initializeModelObject(parameter, "ROC", with.phi)
 setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth, TRUE)
 #run mcmc on genome with parameter using model
 system.time(
-  runMCMC(mcmc, genome, model)
+  runMCMC(mcmc, genome, model, 8)
 )
 
 #plots log likelihood trace, possibly other mcmc diagnostics in the future
@@ -51,7 +51,19 @@ plot(trace, what = "Expression", geneIndex = 905)
 pdf("simulated_Genome_allUnique_startCSP_True_startPhi_true_adaptSphi_True_mix1.pdf", width = 11, height = 12)
 plot(trace, what = "Mutation", mixture = 1)
 plot(trace, what = "Selection", mixture = 1)
-
+mixtureAssignment <- unlist(lapply(1:genome$getGenomeSize(),  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))
+expressionValues <- unlist(lapply(1:genome$getGenomeSize(), function(geneIndex){
+  expressionCategory <- parameter$getSynthesisRateCategoryForMixture(mixtureAssignment[geneIndex])
+  parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(samples, geneIndex, expressionCategory)
+}))
+expressionValues <- log10(expressionValues)
+obs.phi <- log10(read.table("../ribModel/data/simulatedAllUniqueR_phi.csv", sep=",", header=T)[, 2])
+plot(NULL, NULL, xlim=range(expressionValues, na.rm = T) + c(-0.1, 0.1), ylim=range(obs.phi) + c(-0.1, 0.1), 
+     main = "Synthesis Rate", xlab = "true values", ylab = "estimated values")
+upper.panel.plot(obs.phi[mixtureAssignment == 1], expressionValues[mixtureAssignment == 1], col="black")
+upper.panel.plot(obs.phi[mixtureAssignment == 2], expressionValues[mixtureAssignment == 2], col="red")
+legend("topleft", legend = paste("Mixture Element", 1:numMixtures), 
+       col = ribModel:::.mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")
 # plots model fit (cub plot)
 plot(model, genome, parameter, samples = samples*0.1, mixture = 1, main = "S. kluyveri Chr (A,B,Cleft) Codon Usage Plot")
 dev.off()
@@ -69,7 +81,7 @@ colors <- c("black", "red")
 for(mixture in 1:2)
 {
   genes.in.mixture <- which(round(mixtureAssignment[, mixture]+1) == mixture)
-  expressionCategory <- parameter$getExpressionCategoryForMixture(mixture)
+  expressionCategory <- parameter$getSynthesisRateCategoryForMixture(mixture)
   
   # need expression values to know range
   num.genes <- length(genes.in.mixture)
