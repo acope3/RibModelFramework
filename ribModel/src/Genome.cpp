@@ -72,7 +72,7 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 
 				if( newLine == 1 )
 				{ // this is a start of a new chain.
-					if( !fastaFormat )
+					if(!fastaFormat)
 					{
 						// if it is the first chain, just build a new chain object
 						tmpGene.clear();
@@ -88,7 +88,7 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 						tempSeq = "";
 					}
 					tmpGene.setDescription( buf.substr(1,buf.size()-1) );
-					int pos = buf.find(" ") - 1;
+					std::size_t pos = buf.find(" ") - 1;
 					tmpGene.setId( buf.substr(1,pos) );
 				}
 
@@ -175,7 +175,6 @@ void Genome::readRFPFile(std::string filename)
 	std::getline(Fin, tmp); //trash the first line
 	std::string prevID = "";
 	Gene tmpGene;
-	SequenceSummary SS;
 	bool first = true;
 	std::string seq = "";
 
@@ -413,7 +412,7 @@ bool Genome::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound
 
 unsigned Genome::getGenomeSize()
 {
-	return genes.size();
+	return (unsigned)genes.size();
 }
 
 

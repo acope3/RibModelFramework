@@ -32,6 +32,7 @@ RCPP_MODULE(Parameter_mod)
 		.method("getSynthesisRatePosteriorMeanByMixtureElementForGene", &Parameter::getSynthesisRatePosteriorMeanByMixtureElementForGene)
 		.method("getSynthesisRateVarianceByMixtureElementForGene", &Parameter::getSynthesisRateVarianceByMixtureElementForGene)
 		.method("getCurrentSynthesisRateForMixture", &Parameter::getCurrentSynthesisRateForMixture)
+		.method("getMixtureAssignmentForGene", &Parameter::getMixtureAssignmentForGeneR)
 		
 
 		.property("numMutationCategories", &Parameter::getNumMutationCategories)
@@ -45,13 +46,13 @@ RCPP_MODULE(Parameter_mod)
 		.constructor <std::string>()
 		.constructor <double, std::vector<unsigned>, std::vector<unsigned>, bool>()
 		.constructor <double, unsigned, std::vector<unsigned>, bool, std::string>()
-		.method("initMutationSelectionCategories", &ROCParameter::initMutationSelectionCategoriesR)
 		.method("initSelection", &ROCParameter::initSelection)
 		.method("initMutation", &ROCParameter::initMutation)
 		.method("getTraceObject", &ROCParameter::getTraceObject)
 		.method("initCovarianceMatrix", &ROCParameter::initCovarianceMatrix)
 		.method("getCovarianceMatrixForAA", &ROCParameter::getCovarianceMatrixForAA)
-
+		.method("initMutationCategories", &ROCParameter::initMutationCategories)
+		.method("initSelectionCategories", &ROCParameter::initSelectionCategories)
 
 		.method("calculateSelectionCoefficients", &ROCParameter::calculateSelectionCoefficientsR)
 		

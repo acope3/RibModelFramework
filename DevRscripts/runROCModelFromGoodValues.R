@@ -16,8 +16,8 @@ parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssig
 
 #phivals <- parameter$readPhiValues( "../ribModel/data/simulatedAllUniqueR_phi.csv")
 #parameter$initializeExpressionByRandom(phivals)
-#parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Selection")
-#parameter$initMutationSelectionCategories(c("../ribModel/data/simulated_CSP0.csv", "../ribModel/data/simulated_CSP1.csv") , 2, "Mutation")
+#parameter$initMutationCategories(c("../ribModel/data/simulated_mutation0.csv", "../ribModel/data/simulated_mutation1.csv") , 2)
+#parameter$initSelectionCategories(c("../ribModel/data/simulated_selection0.csv", "../ribModel/data/simulated_selection1.csv") , 2)
 # initialize MCMC object
 samples <- 2000
 thining <- 10
@@ -79,25 +79,29 @@ plot(model, genome, parameter, samples = samples*0.1, mixture = mixture, main = 
 names.aa <- aminoAcids()
 selection <- c()
 mutation <- c()
-csp <- read.table("../ribModel/data/simulated_CSP0.csv", sep=",", header=T)
-idx.eta <- grepl(pattern = "[A-Z].[A-Z]{3}.Delta.eta", x = as.character(csp[,1]))
-idx.mu <- grepl(pattern = "[A-Z].[A-Z]{3}.log.mu", x = as.character(csp[,1]))
+codon.storage <- c()
+csp.m <- read.table("../ribModel/data/simulated_mutation0.csv", sep=",", header=T)
+csp.e <- read.table("../ribModel/data/simulated_selection0.csv", sep=",", header=T)
+csp <- rbind(csp.m,csp.e)
+idx.eta <- 41:80
+idx.mu <- 1:40
 for(aa in names.aa)
 {
   if(aa == "M" || aa == "W" || aa == "X") next
   codons <- AAToCodon(aa, T)
+  codon.storage <- c(codon.storage,codons)
   for(i in 1:length(codons))
   {
     selection <- c(selection, parameter$getSelectionPosteriorMeanForCodon(mixture, samples*0.1, codons[i]))
     mutation <- c(mutation, parameter$getMutationPosteriorMeanForCodon(mixture, samples*0.1, codons[i]))
   }
 }
-plot(NULL, NULL, xlim=range(csp[idx.mu, 2], na.rm = T), ylim=range(mutation), 
+plot(NULL, NULL, xlim=range(csp[idx.mu, 3], na.rm = T), ylim=range(mutation), 
      main = "Mutation", xlab = "true values", ylab = "estimated values")
-upper.panel.plot(csp[idx.mu, 2], mutation)
-plot(NULL, NULL, xlim=range(csp[idx.eta, 2], na.rm = T), ylim=range(selection), 
+upper.panel.plot(csp[idx.mu, 3], mutation)
+plot(NULL, NULL, xlim=range(csp[idx.eta, 3], na.rm = T), ylim=range(selection), 
      main = "Selection", xlab = "true values", ylab = "estimated values")
-upper.panel.plot(csp[idx.eta, 2], selection)
+upper.panel.plot(csp[idx.eta, 3], selection)
 dev.off()
 
 
@@ -114,9 +118,11 @@ plot(model, genome, parameter, samples = samples*0.1, mixture = mixture, main = 
 names.aa <- aminoAcids()
 selection <- c()
 mutation <- c()
-csp <- read.table("../ribModel/data/simulated_CSP1.csv", sep=",", header=T)
-idx.eta <- grepl(pattern = "[A-Z].[A-Z]{3}.Delta.eta", x = as.character(csp[,1]))
-idx.mu <- grepl(pattern = "[A-Z].[A-Z]{3}.log.mu", x = as.character(csp[,1]))
+csp.m <- read.table("../ribModel/data/simulated_mutation1.csv", sep=",", header=T)
+csp.e <- read.table("../ribModel/data/simulated_selection1.csv", sep=",", header=T)
+csp <- rbind(csp.m,csp.e)
+idx.eta <- 41:80
+idx.mu <- 1:40
 for(aa in names.aa)
 {
   if(aa == "M" || aa == "W" || aa == "X") next
@@ -127,10 +133,10 @@ for(aa in names.aa)
     mutation <- c(mutation, parameter$getMutationPosteriorMeanForCodon(mixture, samples*0.1, codons[i]))
   }
 }
-plot(NULL, NULL, xlim=range(csp[idx.mu, 2], na.rm = T), ylim=range(mutation), 
+plot(NULL, NULL, xlim=range(csp[idx.mu, 3], na.rm = T), ylim=range(mutation), 
      main = "Mutation", xlab = "true values", ylab = "estimated values")
-upper.panel.plot(csp[idx.mu, 2], mutation)
-plot(NULL, NULL, xlim=range(csp[idx.eta, 2], na.rm = T), ylim=range(selection), 
+upper.panel.plot(csp[idx.mu, 3], mutation)
+plot(NULL, NULL, xlim=range(csp[idx.eta, 3], na.rm = T), ylim=range(selection), 
      main = "Selection", xlab = "true values", ylab = "estimated values")
-upper.panel.plot(csp[idx.eta, 2], selection)
+upper.panel.plot(csp[idx.eta, 3], selection)
 dev.off()
