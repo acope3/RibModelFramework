@@ -222,6 +222,10 @@ void Genome::readRFPFile(std::string filename)
 	addGene(tmpGene); //add to genome
 
 	Fin.close();
+
+	Gene g = getGene(0);
+	std::cout << "ID: " << g.getId() <<"\n";
+	std::exit(0);
 }
 
 
@@ -288,7 +292,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 			}
 
 
-			while (input >> tmp)
+			while (std::getline(input, tmp))
 			{
 				std::size_t pos = tmp.find(",");
 				std::string geneID = tmp.substr(0, pos);
@@ -321,9 +325,9 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 		else //doing this by index
 		{
 			unsigned geneIndex = 0;
-			while (input >> tmp)
+			while (std::getline(input, tmp))
 			{
-				std::cout << tmp << std::endl;
+				//std::cout << tmp << std::endl;
 				if (geneIndex >= genes.size())
 				{
 					std::cerr <<"GeneIndex exceeds the number of genes in the genome. Exiting function\n";
