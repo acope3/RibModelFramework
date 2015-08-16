@@ -485,10 +485,14 @@ int main()
 				if (modelToRun == ROC)
 				{
 					genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
+					if (withPhi) {
+						genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv", false);
+					}
 				}
 				else if (modelToRun == RFP)
 				{
-					genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+					//genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+					genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/testRFPFile.csv");
 				}
 				else {}
 				break;
@@ -567,11 +571,11 @@ int main()
 				case gabe:
 					files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_mutation0.csv");
 					files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_mutation1.csv");
-					tmp.initMutationCategories(files, tmp.getNumMutationCategories());
+				//	tmp.initMutationCategories(files, tmp.getNumMutationCategories());
 
 					files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_selection0.csv");
 					files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_selection1.csv");
-					tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
+				//	tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
 					break;
 				case jeremy:
 					files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_mutation0.csv");
