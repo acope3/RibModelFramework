@@ -14,12 +14,12 @@ parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssig
 
 #parameter <- initializeParameterObject(restart.file = "2000restartFile.rst")
 
-#phivals <- parameter$readPhiValues( "../ribModel/data/simulatedAllUniqueR_phi.csv")
-#parameter$initializeExpressionByRandom(phivals)
-#parameter$initMutationCategories(c("../ribModel/data/simulated_mutation0.csv", "../ribModel/data/simulated_mutation1.csv") , 2)
-#parameter$initSelectionCategories(c("../ribModel/data/simulated_selection0.csv", "../ribModel/data/simulated_selection1.csv") , 2)
+phivals <- parameter$readPhiValues( "../ribModel/data/simulatedAllUniqueR_phi.csv")
+parameter$initializeSynthesisRateByRandom(phivals)
+parameter$initMutationCategories(c("../ribModel/data/simulated_mutation0.csv", "../ribModel/data/simulated_mutation1.csv") , 2)
+parameter$initSelectionCategories(c("../ribModel/data/simulated_selection0.csv", "../ribModel/data/simulated_selection1.csv") , 2)
 # initialize MCMC object
-samples <- 2000
+samples <- 100
 thining <- 10
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, 
