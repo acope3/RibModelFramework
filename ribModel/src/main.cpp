@@ -424,11 +424,11 @@ int main()
 	enum User { cedric, gabe, jeremy };
 	enum ModelToRun { ROC, RFP, FONSE };
 	/* Test variables */
-	User user = gabe;
-	ModelToRun modelToRun = RFP;
+	User user = jeremy;
+	ModelToRun modelToRun = ROC;
 	bool read = false;
 	bool testing = false;
-	bool withPhi = false;
+	bool withPhi = true;
 	if (testing)
 	{
 		//testLogNormDensity();
@@ -439,7 +439,7 @@ int main()
 		//testCovMatrixOverloading();
 		//testWriteRestartFile();
 		//testInitFromRestartFile();
-		//testReadRFPFile();
+		testReadRFPFile();
 		//testReadObservedPhis();
 		//simulateRFPData();
 	//	simulateROCData();
@@ -447,7 +447,7 @@ int main()
 		//testRFPVarianceAndMean();
 		//testReadMutationValues();
 		//testGeneSequenceSummary();
-		testReadMutationValues();
+		//testReadMutationValues();
 	}
 	else //not doing unit testing, running a model
 	{
@@ -580,11 +580,11 @@ int main()
 				case jeremy:
 					files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_mutation0.csv");
 					files[1] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_mutation1.csv");
-					tmp.initMutationCategories(files, tmp.getNumMutationCategories());
+				//	tmp.initMutationCategories(files, tmp.getNumMutationCategories());
 
 					files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_selection0.csv");
 					files[1] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_selection1.csv");
-					tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
+				//	tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
 					break;
 			}
 			tmp.InitializeSynthesisRate(genome, sphi_init);
