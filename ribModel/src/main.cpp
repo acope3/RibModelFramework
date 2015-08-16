@@ -486,7 +486,7 @@ int main()
 				{
 					genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
 					if (withPhi) {
-						genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv", false);
+						genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv", true);
 					}
 				}
 				else if (modelToRun == RFP)

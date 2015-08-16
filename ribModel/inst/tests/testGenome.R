@@ -76,20 +76,79 @@ test_that("write Fasta", {
     genome$writeFasta("../../data/testWrite.fasta", FALSE)
     fromFile <- new(Genome)
     fromFile$readFasta("../../data/testWrite.fasta", FALSE)
-    expect_equal(genome, fromFile)
+    expect_equal(genome$getGenes(FALSE), fromFile$getGenes(FALSE))
 })
 
 test_that("read RFP File", {
     genome$clear()
-    genome$readRFPFile("../../data/testRFPFile.csv")
+    genome$readRFPFile("../../data/IKJ.csv")
     compareGenome <- new(Genome)
-    gene1 <- new(Gene, "TAGATGGCCGCGGCGGGC", "YAL001C", "YAL001C No description for RFP Model")
-    gene2 <- new(Gene, "TTTTTTTAGCTTCTTATG", "YAL002W", "YAL002W No description for RFP Model")
-    gene3 <- new(Gene, "TAGATGATGATGATGATG", "YAL003W", "YAL003W No description for RFP Model")
+    gene1 <- new(Gene, "TAGATGGCCGCGGCGGGC", "YAL001C", "No description for RFP Model")
+    gene1$setRFPObserved(1, 5)
+    gene1$setRFPObserved(2, 4)
+    gene1$setRFPObserved(13, 2)
+    compss1 <- gene1$getSequenceSummary()
+    gene2 <- new(Gene, "TTTTTTTAGCTTCTTATG", "YAL002W", "No description for RFP Model")
+    gene2$setRFPObserved(11, 4)
+    gene2$setRFPObserved(62, 3)
+    gene2$setRFPObserved(26, 1)
+    compss2 <- gene2$getSequenceSummary()
+    gene3 <- new(Gene, "TAGATGATGATGATGATG", "YAL003W", "No description for RFP Model")
+    gene3$setRFPObserved(29, 13)
+    compss3 <- gene3$getSequenceSummary()
     compareGenome$addGene(gene1, FALSE)
     compareGenome$addGene(gene2, FALSE)
     compareGenome$addGene(gene3, FALSE)
     expect_equal(genome$getGenes(FALSE), compareGenome$getGenes(FALSE))
+    expect_equal(genome$getGenomeSize(), 3)
+    g1 <- genome$getGeneByIndex(1)
+    g2 <- genome$getGeneByIndex(2)
+    g3 <- genome$getGeneByIndex(3)
+    ss1 <- g1$getSequenceSummary()
+    ss2 <- g2$getSequenceSummary()
+    ss3 <- g3$getSequenceSummary()
+    codonList <- codons()
+    for (codon in codonList){
+      expect_equal(compss1$getRFPObservedForCodon(codon),ss1$getRFPObservedForCodon(codon))
+    }
+    for (codon in codonList){
+      expect_equal(compss2$getRFPObservedForCodon(codon),ss2$getRFPObservedForCodon(codon))
+    }
+    for (codon in codonList){
+      expect_equal(compss3$getRFPObservedForCodon(codon),ss3$getRFPObservedForCodon(codon))
+    }
+})
+
+test_that("write RFP File", {
+  genome$writeRFPFile("../../data/testWriteRFP.csv", FALSE)
+  fromFile <- new(Genome)
+  fromFile$readRFPFile("../../data/testWriteRFP.csv")
+  expect_equal(genome$getGenomeSize(), fromFile$getGenomeSize())
+  g1 <- genome$getGeneByIndex(1)
+  g2 <- genome$getGeneByIndex(2)
+  g3 <- genome$getGeneByIndex(3)
+  ss1 <- g1$getSequenceSummary()
+  ss2 <- g2$getSequenceSummary()
+  ss3 <- g3$getSequenceSummary()
+  ffg1 <- fromFile$getGeneByIndex(1)
+  ffg2 <- fromFile$getGeneByIndex(2)
+  ffg3 <- fromFile$getGeneByIndex(3)
+  compss1 <- ffg1$getSequenceSummary()
+  compss2 <- ffg2$getSequenceSummary()
+  compss3 <- ffg3$getSequenceSummary()
+  codonList <- codons()
+  for (codon in codonList){
+    expect_equal(compss1$getRFPObservedForCodon(codon),ss1$getRFPObservedForCodon(codon))
+    expect_equal(compss1$getCodonCountForCodon(codon), ss1$getCodonCountForCodon(codon))
+  }
+  for (codon in codonList){
+    expect_equal(compss2$getRFPObservedForCodon(codon),ss2$getRFPObservedForCodon(codon))
+    expect_equal(compss2$getCodonCountForCodon(codon), ss2$getCodonCountForCodon(codon))
+  }
+  for (codon in codonList){
+    expect_equal(compss3$getRFPObservedForCodon(codon),ss3$getRFPObservedForCodon(codon))
+    expect_equal(compss3$getCodonCountForCodon(codon), ss3$getCodonCountForCodon(codon))
+  }
 })
 
 genome$clear()

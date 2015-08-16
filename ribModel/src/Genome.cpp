@@ -182,17 +182,7 @@ void Genome::readRFPFile(std::string filename)
 	{
 		std::size_t pos = tmp.find(",");
 		std::string ID = tmp.substr(0, pos);
-		std::size_t pos2 = tmp.find(",", pos + 1);
-		std::string value = tmp.substr(pos + 1, pos2 - (pos + 1));
-		unsigned tmpRFP = (unsigned)std::atoi(value.c_str());
 
-		pos = tmp.find(",", pos2 + 1);
-		value = tmp.substr(pos2 + 1, pos - (pos2 + 1));
-		unsigned counts = (unsigned)std::atoi(value.c_str());
-
-		std::string codon = tmp.substr(pos + 1, 3);
-		for (unsigned i = 0; i < counts; i++)
-			seq += codon;
 
 		if (first)
 		{
@@ -208,6 +198,16 @@ void Genome::readRFPFile(std::string filename)
 			tmpGene.clear();
 			seq = "";
 		}
+		std::size_t pos2 = tmp.find(",", pos + 1);
+		std::string value = tmp.substr(pos + 1, pos2 - (pos + 1));
+		unsigned tmpRFP = (unsigned)std::atoi(value.c_str());
+		pos = tmp.find(",", pos2 + 1);
+		value = tmp.substr(pos2 + 1, pos - (pos2 + 1));
+		unsigned counts = (unsigned)std::atoi(value.c_str());
+
+		std::string codon = tmp.substr(pos + 1, 3);
+		for (unsigned i = 0; i < counts; i++)
+			seq += codon;
 
 		prevID = ID;
 		unsigned index = SequenceSummary::codonToIndex(codon);
@@ -223,9 +223,6 @@ void Genome::readRFPFile(std::string filename)
 
 	Fin.close();
 
-	Gene g = getGene(0);
-	std::cout << "ID: " << g.getId() <<"\n";
-	std::exit(0);
 }
 
 
@@ -265,6 +262,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 {
 	std::ifstream input;
 	std::string tmp;
+	unsigned numPhi = 0;
 
 	std::cout <<"Opening " << filename <<"\n";
 	input.open(filename);
@@ -291,13 +289,14 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 				genomeMapping.insert(make_pair(genes[i].getId(), &genes[i]));
 			}
 
-
+			bool first = true;
 			while (std::getline(input, tmp))
 			{
 				std::size_t pos = tmp.find(",");
 				std::string geneID = tmp.substr(0, pos);
 				std::map <std::string, Gene * >::iterator it;
 				it = genomeMapping.find(geneID);
+				std::cout <<"Gene found!\n";
 				if (it == genomeMapping.end()) {
 					std::cerr << "Gene " << geneID << " not found!\n";
 				}
@@ -311,6 +310,22 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 						if (pos2 == std::string::npos)
 						{
 							notDone = false;
+							if (first)
+							{
+								first = false;
+								numPhi = (unsigned) it -> second -> observedPhiValues.size() + 1;
+								std::cout << numPhi <<"\n";
+							}
+							else
+							{
+								if (it-> second -> observedPhiValues.size() + 1 != numPhi)
+								{
+									std::cerr << geneID <<": has a differnt number of phi values given than other genes: ";
+									std::cerr << it-> second -> observedPhiValues.size() + 1 <<". Exiting.\n";
+									std::cerr << tmp <<"\n";
+									std::exit(1);
+								}
+							}
 						}
 						std::string val = tmp.substr(pos + 1, pos2 - (pos + 1));
 						it->second -> observedPhiValues.push_back(std::atof(val.c_str())); //make vector private again
