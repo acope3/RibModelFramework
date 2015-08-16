@@ -425,10 +425,10 @@ int main()
 	enum ModelToRun { ROC, RFP, FONSE };
 	/* Test variables */
 	User user = jeremy;
-	ModelToRun modelToRun = RFP;
+	ModelToRun modelToRun = ROC;
 	bool read = false;
 	bool testing = false;
-	bool withPhi = false;
+	bool withPhi = true;
 	if (testing)
 	{
 		//testLogNormDensity();

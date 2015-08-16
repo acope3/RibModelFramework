@@ -274,7 +274,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 		std::exit(1);
 	}
 
-
+	std::getline(input, tmp); //Trash the header line
 
 	if (genes.size() == 0)
 	{
