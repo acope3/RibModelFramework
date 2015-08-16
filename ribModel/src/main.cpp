@@ -425,10 +425,10 @@ int main()
 	enum ModelToRun { ROC, RFP, FONSE };
 	/* Test variables */
 	User user = gabe;
-	ModelToRun modelToRun = RFP;
+	ModelToRun modelToRun = ROC;
 	bool read = false;
 	bool testing = false;
-	bool withPhi = false;
+	bool withPhi = true;
 	if (testing)
 	{
 		//testLogNormDensity();
@@ -486,7 +486,7 @@ int main()
 				{
 					genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
 					if (withPhi) {
-						genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv", false);
+						genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv", true);
 					}
 				}
 				else if (modelToRun == RFP)
