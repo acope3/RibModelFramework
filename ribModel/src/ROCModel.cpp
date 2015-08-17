@@ -389,6 +389,7 @@ void ROCModel::updateHyperParameter(unsigned hp)
 void ROCModel::updateHyperParameterTraces(unsigned sample)
 {
 	updateSphiTrace(sample);
+	for (unsigned i = 0; i < parameter->phiGroupings; i++)
 	updateAphiTrace(sample);
 	updateSepsilonTrace(sample);
 }

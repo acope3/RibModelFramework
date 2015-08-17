@@ -10,9 +10,9 @@ class ROCTrace : public Trace
 	private:
 		std::vector<std::vector<std::vector<double>>> mutationParameterTrace; //order: mutationcategoy, numparam, samples
 		std::vector<std::vector<std::vector<double>>> selectionParameterTrace; //order: selectioncategoy, numparam, samples
-		std::vector<double> AphiTrace;
-		std::vector<double> AphiAcceptanceRatioTrace;
-		std::vector<double> SepsilonTrace;
+		std::vector<std::vector <double> > AphiTrace;
+		std::vector<std::vector <double> > AphiAcceptanceRatioTrace;
+		std::vector<std::vector <double> > SepsilonTrace;
 
 	public:
 		//Constructor & Destructors
@@ -30,18 +30,18 @@ class ROCTrace : public Trace
 		//Getter functions
 		std::vector<double> getMutationParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon);
 		std::vector<double> getSelectionParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon);
-		std::vector<double> getAphiTrace() { return AphiTrace; }
-		std::vector<double> getAphiAcceptanceRatioTrace() { return AphiAcceptanceRatioTrace; }
-		std::vector<double> getSepsilonTrace() { return SepsilonTrace; }
+		std::vector<double> getAphiTrace(unsigned index) { return AphiTrace[index]; }
+		std::vector<double> getAphiAcceptanceRatioTrace(unsigned index) { return AphiAcceptanceRatioTrace[index]; }
+		std::vector<double> getSepsilonTrace(unsigned index) { return SepsilonTrace[index]; }
 		
 
 		unsigned getMutationCategory(unsigned mixtureElement) {return categories->at(mixtureElement).delM;}
 		unsigned getSelectionCategory(unsigned mixtureElement) {return categories->at(mixtureElement).delEta;}
 		//Update functions	
 		void updateCodonSpecificParameterTrace(unsigned sample, std::string aa, std::vector<std::vector<double>> &curMutParam, std::vector<std::vector<double>> &curSelectParam);
-		void updateAphiTrace(unsigned sample, double value) { AphiTrace[sample] = value; }
-		void updateAphiAcceptanceRatioTrace(double value) { AphiAcceptanceRatioTrace.push_back(value); }
-		void updateSepsilonTrace(unsigned sample, double value) { SepsilonTrace[sample] = value; }
+		void updateAphiTrace(unsigned index, unsigned sample, double value) { AphiTrace[index][sample] = value; }
+		void updateAphiAcceptanceRatioTrace(unsigned index, double value) { AphiAcceptanceRatioTrace[index].push_back(value); }
+		void updateSepsilonTrace(unsigned index, unsigned sample, double value) { SepsilonTrace[index][sample] = value; }
 		//R WRAPPER FUNCTIONS
 
 		//Getter functions
