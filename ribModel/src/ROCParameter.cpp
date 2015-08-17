@@ -107,11 +107,13 @@ void ROCParameter::initROCParameterSet()
 
 	phiEpsilon = 0.1;
 	phiEpsilon_proposed = 0.1;
-	Aphi = 0.0;
-	Aphi_proposed = 0.0;
-	std_Aphi = 0.1;
-	Sepsilon = 0.0;
-	numAcceptForAphi = 0;
+	for (unsigned i = 0; i < getNumPhiGroupings(); i++) {
+		Aphi[i] = 0.0;
+		Aphi_proposed[i] = 0.0;
+		std_Aphi[i] = 0.1;
+		Sepsilon[i] = 0.0;
+		numAcceptForAphi[i] = 0;
+	}
 
 	//may need getter fcts
 	currentMutationParameter.resize(numMutationCategories);
@@ -620,17 +622,19 @@ void ROCParameter::adaptSphiProposalWidth(unsigned adaptationWidth)
 
 void ROCParameter::adaptAphiProposalWidth(unsigned adaptationWidth)
 {
-	double acceptanceLevel =  numAcceptForAphi / (double)adaptationWidth;
-	traces.updateAphiAcceptanceRatioTrace(acceptanceLevel);
-	if (acceptanceLevel < 0.2)
-	{
-		std_Aphi *= 0.8;
+	for (unsigned i = 0; i < getNumPhiGroupings(); i++) {
+		double acceptanceLevel = numAcceptForAphi[i] / (double)adaptationWidth;
+		traces.updateAphiAcceptanceRatioTrace(i, acceptanceLevel);
+		if (acceptanceLevel < 0.2)
+		{
+			std_Aphi[i] *= 0.8;
+		}
+		if (acceptanceLevel > 0.3)
+		{
+			std_Aphi[i] *= 1.2;
+		}
+		numAcceptForAphi[i] = 0u;
 	}
-	if (acceptanceLevel > 0.3)
-	{
-		std_Aphi *= 1.2;
-	}
-	numAcceptForAphi = 0u;
 }
 
 void ROCParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
@@ -753,15 +757,15 @@ double ROCParameter::getSphiPosteriorMean(unsigned samples)
 	return posteriorMean / (double) samples;
 }
 
-double ROCParameter::getAphiPosteriorMean(unsigned samples)
+double ROCParameter::getAphiPosteriorMean(unsigned index, unsigned samples)
 {
 	double posteriorMean = 0.0;
-	std::vector<double> aPhiTrace = traces.getAphiTrace();
+	std::vector<double> aPhiTrace = traces.getAphiTrace(index);
 	unsigned traceLength = (unsigned)aPhiTrace.size();
 
 	if (samples > traceLength)
 	{
-		std::cerr << "Warning in Parameter::getSphiPosteriorMean throws: Number of anticipated samples (" << samples
+		std::cerr << "Warning in Parameter::getAphiPosteriorMean throws: Number of anticipated samples (" << samples
 			<< ") is greater than the length of the available trace (" << traceLength << ")."
 			<< "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
@@ -828,9 +832,9 @@ double ROCParameter::getSphiVariance(unsigned samples, bool unbiased)
 	return normalizationTerm * posteriorVariance;
 }
 
-double ROCParameter::getAphiVariance(unsigned samples, bool unbiased)
+double ROCParameter::getAphiVariance(unsigned index, unsigned samples, bool unbiased)
 {
-	std::vector<double> aPhiTrace = traces.getAphiTrace();
+	std::vector<double> aPhiTrace = traces.getAphiTrace(index);
 	unsigned traceLength = (unsigned)aPhiTrace.size();
 	if (samples > traceLength)
 	{
@@ -839,7 +843,7 @@ double ROCParameter::getAphiVariance(unsigned samples, bool unbiased)
 			<< "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
 	}
-	double posteriorMean = getAphiPosteriorMean(samples);
+	double posteriorMean = getAphiPosteriorMean(index, samples);
 
 	double posteriorVariance = 0.0;
 
@@ -1027,9 +1031,8 @@ void ROCParameter::proposeCodonSpecificParameter()
 
 void ROCParameter::proposeAphi()
 {
-	Aphi_proposed = randNorm(Aphi, std_Aphi);
-	if (!std::isfinite(Aphi_proposed)) {
-		std::cout << "problem" << std::endl;
+	for (unsigned i = 0; i < getNumPhiGroupings(); i++) {
+		Aphi_proposed[i] = randNorm(Aphi[i], std_Aphi[i]);
 	}
 }
 

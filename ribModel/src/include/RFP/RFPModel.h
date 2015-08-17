@@ -45,6 +45,8 @@ class RFPModel: public Model {
 		{
 			return parameter->getSphi(proposed);
 		}
+		virtual unsigned getNumPhiGroupings() { return parameter->getNumPhiGroupings(); }
+		virtual void setNumPhiGroupings(unsigned value) { parameter->setNumPhiGroupings(value); }
 		virtual unsigned getNumMixtureElements()
 		{
 			return parameter->getNumMixtureElements();

@@ -106,6 +106,7 @@ class Parameter {
 			return numSelectionCategories;
 		}
 		unsigned getNumPhiGroupings() { return phiGroupings; }
+		void setNumPhiGroupings(unsigned _phiGroupings) { phiGroupings = _phiGroupings; }
 
 		std::vector<unsigned> getMixtureElementsOfMutationCategory(unsigned category)
 		{

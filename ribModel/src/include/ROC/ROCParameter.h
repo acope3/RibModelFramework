@@ -131,11 +131,11 @@ class ROCParameter : public Parameter
 		void adaptAphiProposalWidth(unsigned adaptationWidth);
 		virtual void adaptSynthesisRateProposalWidth(unsigned adaptationWidth);
 		virtual double getSphiPosteriorMean(unsigned samples);
-		double getAphiPosteriorMean(unsigned samples);
+		double getAphiPosteriorMean(unsigned index, unsigned samples);
 		virtual std::vector <double> getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex);
 		virtual double getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement);
 		virtual double getSphiVariance(unsigned samples, bool unbiased = true );
-		double getAphiVariance(unsigned samples, bool unbiased = true);
+		double getAphiVariance(unsigned index, unsigned samples, bool unbiased = true);
 		virtual double getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement, bool unbiased = true);
 		double getMutationPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon);
 		double getSelectionPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon);

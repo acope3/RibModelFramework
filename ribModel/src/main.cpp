@@ -658,7 +658,7 @@ int main()
 			*/std::cout <<"Done initializing RFPModel object\n";
 		
 			std::cout << "starting MCMC for RFP" << std::endl;
-      mcmc.run(genome, model, 4);
+      mcmc.run(genome, model, 1);
       std::cout << std::endl << "Finished MCMC for RFP" << std::endl;
 
 

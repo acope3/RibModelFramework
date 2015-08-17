@@ -31,8 +31,10 @@ class ROCModel : public Model
 	virtual void initTraces(unsigned samples, unsigned num_genes) {parameter -> initAllTraces(samples, num_genes);}
 	virtual void writeRestartFile(std::string filename) {return parameter->writeEntireRestartFile(filename);}       
 	virtual double getSphi(bool proposed = false) {return parameter->getSphi(proposed);}
-	double getAphi(bool proposed = false) { return parameter->getAphi(proposed); }
-	double getSepsilon() { return parameter->getSepsilon(); }
+	virtual unsigned getNumPhiGroupings() { return parameter->getNumPhiGroupings(); }
+	virtual void setNumPhiGroupings(unsigned value) { parameter->setNumPhiGroupings(value); }
+	double getAphi(unsigned index, bool proposed = false) { return parameter->getAphi(index, proposed); }
+	double getSepsilon(unsigned index) { return parameter->getSepsilon(index); }
 	virtual unsigned getNumMixtureElements() {return parameter->getNumMixtureElements();}
 	virtual double getCategoryProbability(unsigned i) {return parameter->getCategoryProbability(i);}
 	virtual void proposeCodonSpecificParameter() {parameter->proposeCodonSpecificParameter();}
@@ -46,15 +48,15 @@ class ROCModel : public Model
 	virtual unsigned getMutationCategory(unsigned mixture)  {return parameter ->getMutationCategory(mixture);}
 	virtual double getSynthesisRate(unsigned index, unsigned mixture, bool proposed = false) {return parameter->getSynthesisRate(index, mixture, proposed);}
 	virtual double getCurrentSphiProposalWidth() {return parameter->getCurrentSphiProposalWidth();}
-	double getCurrentAphiProposalWidth() { return parameter->getCurrentAphiProposalWidth(); }
+	double getCurrentAphiProposalWidth(unsigned index) { return parameter->getCurrentAphiProposalWidth(index); }
 	virtual void adaptHyperParameterProposalWidths(unsigned adaptiveWidth);
 	virtual void updateHyperParameter(unsigned hp);
 	virtual void updateSphi() {parameter->updateSphi();}
 	virtual void updateSphiTrace(unsigned sample) {parameter->updateSphiTrace(sample);}
 	virtual void adaptSphiProposalWidth(unsigned adaptiveWidth) {parameter->adaptSphiProposalWidth(adaptiveWidth);}
-	void updateAphi() { parameter->updateAphi(); }
-	void updateAphiTrace(unsigned sample) { parameter->updateAphiTrace(sample); }
-	void updateSepsilonTrace(unsigned sample) { parameter->updateSepsilonTrace(sample); }
+	void updateAphi(unsigned index) { parameter->updateAphi(index); }
+	void updateAphiTrace(unsigned index, unsigned sample) { parameter->updateAphiTraces(sample); }
+	void updateSepsilonTrace(unsigned index, unsigned sample) { parameter->updateSepsilonTraces(sample); }
 	void adaptAphiProposalWidth(unsigned adaptiveWidth) { parameter->adaptAphiProposalWidth(adaptiveWidth); }
 	virtual void updateHyperParameterTraces(unsigned sample);
 	virtual void proposeSynthesisRateLevels() {parameter->proposeSynthesisRateLevels();}
