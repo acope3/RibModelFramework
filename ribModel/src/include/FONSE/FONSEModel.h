@@ -34,6 +34,8 @@ public:
 	virtual void initTraces(unsigned samples, unsigned num_genes) { parameter->initAllTraces(samples, num_genes); }
 	virtual void writeRestartFile(std::string filename) { return parameter->writeEntireRestartFile(filename); }
 	virtual double getSphi(bool proposed = false) { return parameter->getSphi(proposed); }
+	virtual unsigned getNumPhiGroupings() { return parameter->getNumPhiGroupings(); }
+	virtual void setNumPhiGroupings(unsigned value) { parameter->setNumPhiGroupings(value); }
 	virtual unsigned getNumMixtureElements() { return parameter->getNumMixtureElements(); }
 	virtual double getCategoryProbability(unsigned i) { return parameter->getCategoryProbability(i); }
 	virtual void proposeCodonSpecificParameter() { parameter->proposeCodonSpecificParameter(); }

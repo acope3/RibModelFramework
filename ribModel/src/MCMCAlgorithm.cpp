@@ -245,6 +245,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores)
 	unsigned maximumIterations = samples * thining;
 	// initialize everything
 
+	// model.setNumPhiGroupings(genome.phigroupings);
 	model.initTraces(samples, genome.getGenomeSize()); 
 	// starting the MCMC
 

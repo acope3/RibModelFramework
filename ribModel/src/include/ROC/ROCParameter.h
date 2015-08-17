@@ -25,11 +25,12 @@ class ROCParameter : public Parameter
 
 		double phiEpsilon;
 		double phiEpsilon_proposed;
-		double Aphi;
-		double Aphi_proposed;
-		double Sepsilon;
-		double std_Aphi;
-		double numAcceptForAphi;
+
+		std::vector <double> Aphi;
+		std::vector <double> Aphi_proposed;
+		std::vector <double> Sepsilon;
+		std::vector <double> std_Aphi;
+		std::vector <double> numAcceptForAphi;
 
 		std::vector<std::vector<double>> currentMutationParameter;
 		std::vector<std::vector<double>> proposedMutationParameter;
@@ -88,7 +89,7 @@ class ROCParameter : public Parameter
 		std::vector<std::vector<double>> getCurrentSelectionParameter() {return currentSelectionParameter;}
 
 
-		double getCurrentAphiProposalWidth() { return std_Aphi; }
+		double getCurrentAphiProposalWidth(unsigned index) { return std_Aphi[index]; }
 		// Phi epsilon functions
 		double getPhiEpsilon() { return phiEpsilon; }
 
@@ -97,21 +98,21 @@ class ROCParameter : public Parameter
 		void updateCodonSpecificParameter(std::string grouping);
 
 		// functions to manage Aphi
-		double getAphi(bool proposed = false) { return (proposed ? Aphi_proposed : Aphi); }
-		void setAphi(double aPhi) { Aphi = aPhi; }
-		void updateAphi()
+		double getAphi(unsigned index, bool proposed = false) { return (proposed ? Aphi_proposed[index] : Aphi[index]); }
+		void setAphi(unsigned index, double aPhi) { Aphi[index] = aPhi; }
+		void updateAphi(unsigned index)
 		{
-			Aphi = Aphi_proposed;
-			numAcceptForAphi++;
+			Aphi[index] = Aphi_proposed[index];
+			numAcceptForAphi[index]++;
 		}
 
 		// functions to manage Sepsilon
-		double getSepsilon() { return Sepsilon; }
-		void setSepsilon(double se) { Sepsilon = se; }
+		double getSepsilon(unsigned index) { return Sepsilon[index]; }
+		void setSepsilon(unsigned index, double se) { Sepsilon[index] = se; }
 		//update trace functions
 		virtual void updateSphiTrace(unsigned sample) {traces.updateSphiTrace(sample, Sphi);}
-		void updateAphiTrace(unsigned sample) { traces.updateAphiTrace(sample, Aphi); }
-		void updateSepsilonTrace(unsigned sample) { traces.updateSepsilonTrace(sample, Sepsilon); }
+		void updateAphiTraces(unsigned sample) { for (unsigned i = 0; i < Aphi.size(); i++) traces.updateAphiTrace(i, sample, Aphi[i]); }
+		void updateSepsilonTraces(unsigned sample) { for (unsigned i = 0; i < Sepsilon.size(); i++) traces.updateSepsilonTrace(i, sample, Sepsilon[i]); }
 		virtual void updateSynthesisRateTrace(unsigned sample, unsigned geneIndex){traces.updateSynthesisRateTrace(sample, geneIndex, currentSynthesisRateLevel);}
 		virtual void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex) {traces.updateMixtureAssignmentTrace(sample, geneIndex, mixtureAssignment[geneIndex]);}
 		virtual void updateMixtureProbabilitiesTrace(unsigned samples) {traces.updateMixtureProbabilitiesTrace(samples, categoryProbabilities);}
@@ -130,11 +131,11 @@ class ROCParameter : public Parameter
 		void adaptAphiProposalWidth(unsigned adaptationWidth);
 		virtual void adaptSynthesisRateProposalWidth(unsigned adaptationWidth);
 		virtual double getSphiPosteriorMean(unsigned samples);
-		double getAphiPosteriorMean(unsigned samples);
+		double getAphiPosteriorMean(unsigned index, unsigned samples);
 		virtual std::vector <double> getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex);
 		virtual double getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement);
 		virtual double getSphiVariance(unsigned samples, bool unbiased = true );
-		double getAphiVariance(unsigned samples, bool unbiased = true);
+		double getAphiVariance(unsigned index, unsigned samples, bool unbiased = true);
 		virtual double getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement, bool unbiased = true);
 		double getMutationPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon);
 		double getSelectionPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon);
