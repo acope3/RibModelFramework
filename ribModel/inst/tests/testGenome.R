@@ -151,6 +151,77 @@ test_that("write RFP File", {
   }
 })
 
+test_that("read Observed Phi Values", {
+  genome$clear()
+  genome$readFasta("../../data/test.fasta", FALSE)
+  
+  #Test for Valid values by Id
+  genome$readObservedPhiValues("../../data/testReadObservedPhiValuesValid.csv", TRUE)
+  gene1 <- genome$getGeneById("TEST001")
+  gene2 <- genome$getGeneById("TEST002")
+  gene3 <- genome$getGeneById("TEST003")
+  expect_equal(gene1$getObservedPhiValues(), c(0.4834983,1.4839493))
+  expect_equal(gene2$getObservedPhiValues(), c(0.5388484,0.2222321))
+  expect_equal(gene3$getObservedPhiValues(), c(0.4328382,2.3838239))
+  
+  #Test for valid values by index
+  genome$clear()
+  genome$readFasta("../../data/test.fasta", FALSE)
+  genome$readObservedPhiValues("../../data/testReadObservedPhiValuesValid.csv", FALSE)
+  gene1 <- genome$getGeneByIndex(1)
+  gene2 <- genome$getGeneByIndex(2)
+  gene3 <- genome$getGeneByIndex(3)
+  expect_equal(gene1$getObservedPhiValues(), c(0.4834983,1.4839493))
+  expect_equal(gene2$getObservedPhiValues(), c(0.5388484,0.2222321))
+  expect_equal(gene3$getObservedPhiValues(), c(0.4328382,2.3838239))
+  
+  
+  #Test for when phi Values are missing
+  genome$clear()
+  genome$readFasta("../../data/test.fasta", FALSE)
+  genome$readObservedPhiValues("../../data/testReadObservedPhiValuesMissing.csv", TRUE)
+  gene1 <- genome$getGeneById("TEST001")
+  gene2 <- genome$getGeneById("TEST002")
+  gene3 <- genome$getGeneById("TEST003")
+  expect_equal(gene1$getObservedPhiValues(), numeric(0))
+  expect_equal(gene2$getObservedPhiValues(), numeric(0))
+  expect_equal(gene3$getObservedPhiValues(), numeric(0))
+  
+  
+  genome$clear()
+  genome$readFasta("../../data/test.fasta", FALSE)
+  genome$readObservedPhiValues("../../data/testReadObservedPhiValuesMissing.csv", FALSE)
+  gene1 <- genome$getGeneByIndex(1)
+  gene2 <- genome$getGeneByIndex(2)
+  gene3 <- genome$getGeneByIndex(3)
+  expect_equal(gene1$getObservedPhiValues(), numeric(0))
+  expect_equal(gene2$getObservedPhiValues(), numeric(0))
+  expect_equal(gene3$getObservedPhiValues(), numeric(0))
+  
+  
+  #Test for valid phi files with "filler" values
+  genome$clear()
+  genome$readFasta("../../data/test.fasta", FALSE)
+  genome$readObservedPhiValues("../../data/testReadObservedPhiValuesFilled.csv", TRUE)
+  gene1 <- genome$getGeneById("TEST001")
+  gene2 <- genome$getGeneById("TEST002")
+  gene3 <- genome$getGeneById("TEST003")
+  expect_equal(gene1$getObservedPhiValues(), c(0.4834983,-1))
+  expect_equal(gene2$getObservedPhiValues(), c(0.5388484,-1))
+  expect_equal(gene3$getObservedPhiValues(), c(-1.323,2.3838239))
+  
+  
+  genome$clear()
+  genome$readFasta("../../data/test.fasta", FALSE)
+  genome$readObservedPhiValues("../../data/testReadObservedPhiValuesFilled.csv", FALSE)
+  gene1 <- genome$getGeneByIndex(1)
+  gene2 <- genome$getGeneByIndex(2)
+  gene3 <- genome$getGeneByIndex(3)
+  expect_equal(gene1$getObservedPhiValues(), numeric(0))
+  expect_equal(gene2$getObservedPhiValues(), numeric(0))
+  expect_equal(gene3$getObservedPhiValues(), numeric(0))
+})
+
 genome$clear()
 gene <- new(Gene, "ATGCTCATTCTCACTGCTGCCTCGTAG", "001", "just a test")
 gene2 <- new(Gene, "ATGCTCATTTAG", "002", "just a second test")

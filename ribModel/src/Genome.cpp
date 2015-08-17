@@ -263,8 +263,8 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 	std::ifstream input;
 	std::string tmp;
 	unsigned numPhi = 0;
+	bool exitfunction = false;
 
-	std::cout <<"Opening " << filename <<"\n";
 	input.open(filename);
 	if (input.fail())
 	{
@@ -296,43 +296,62 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 				std::string geneID = tmp.substr(0, pos);
 				std::map <std::string, Gene * >::iterator it;
 				it = genomeMapping.find(geneID);
-				std::cout <<"Gene found!\n";
 				if (it == genomeMapping.end()) {
 					std::cerr << "Gene " << geneID << " not found!\n";
 				}
 				else //gene is found
 				{
-
+					unsigned count = 0;
+					std::string val ="";
 					bool notDone = true;
 					while (notDone)
 					{
 						std::size_t pos2 = tmp.find(",", pos + 1);
 						if (pos2 == std::string::npos)
 						{
+							val = tmp.substr(pos + 1, tmp.size() + 1);
 							notDone = false;
 							if (first)
 							{
 								first = false;
 								numPhi = (unsigned) it -> second -> observedPhiValues.size() + 1;
-								std::cout << numPhi <<"\n";
 							}
 							else
 							{
-								if (it-> second -> observedPhiValues.size() + 1 != numPhi)
+								if (count + 1 != numPhi)
 								{
 									std::cerr << geneID <<": has a differnt number of phi values given than other genes: ";
-									std::cerr << it-> second -> observedPhiValues.size() + 1 <<". Exiting.\n";
-									std::cerr << tmp <<"\n";
-									std::exit(1);
+									std::cerr << it-> second -> getId() <<"\n";
+									std::cerr << it-> second -> observedPhiValues.size() + 1 <<". Exiting function.\n";
+									exitfunction = true;
+									for (unsigned a = 0; a < getGenomeSize(); a++)
+									{
+										genes[a].observedPhiValues.clear();
+									}
+									break;
 								}
 							}
 						}
-						std::string val = tmp.substr(pos + 1, pos2 - (pos + 1));
-						it->second -> observedPhiValues.push_back(std::atof(val.c_str())); //make vector private again
+						else {
+							val = tmp.substr(pos + 1, pos2 - (pos + 1));
+						}
+						double value = std::atof(val.c_str());
+						if (value <=  0)
+						{
+							if (value == 0) value = -1;
+							else
+							{
+								std::cerr <<"WARNING! Negative phi value given - values should not be on the log scale. Negative Value stored.";
+							}
+						}
+
+						it->second->observedPhiValues.push_back(value); //make vector private again
 						if (it->second->observedPhiValues.size() == 1) numGenesWithPhi++;
 						pos = pos2;
+						count++;
 					}
 				}
+				if (exitfunction) break;
 			}
 
 
@@ -340,9 +359,9 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 		else //doing this by index
 		{
 			unsigned geneIndex = 0;
+			bool first = true;
 			while (std::getline(input, tmp))
 			{
-				//std::cout << tmp << std::endl;
 				if (geneIndex >= genes.size())
 				{
 					std::cerr <<"GeneIndex exceeds the number of genes in the genome. Exiting function\n";
@@ -355,14 +374,43 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 					std::size_t pos2 = tmp.find(",", pos + 1);
 					if (pos2 == std::string::npos)
 					{
+						if (first)
+						{
+							first = false;
+							numPhi = (unsigned) genes[geneIndex].observedPhiValues.size() + 1;
+						}
 						notDone = false;
+						if (numPhi != genes[geneIndex].observedPhiValues.size() + 1)
+						{
+							std::cerr <<"gene " << geneIndex <<": has a differnt number of phi values given than other genes, exiting.\n";
+							for (unsigned a = 0; a < getGenomeSize(); a++)
+							{
+								genes[a].observedPhiValues.clear();
+							}
+							exitfunction = true;
+							break;
+						}
 					}
+
 					std::string val = tmp.substr(pos + 1, pos2 - (pos + 1));
-					genes[geneIndex].observedPhiValues.push_back(std::atof(val.c_str()));
+					double value = std::atof(val.c_str());
+					if (value <=  0)
+					{
+						if (value == 0) value = -1;
+						else
+						{
+							std::cerr <<"WARNING! Negative phi value given - values should not be on the log scale. Negative Value stored.";
+						}
+					}
+					genes[geneIndex].observedPhiValues.push_back(value);
 					if (genes[geneIndex].observedPhiValues.size() == 1) numGenesWithPhi++;
 					pos = pos2;
 				}
 				geneIndex++;
+				if (exitfunction)
+				{
+					break;
+				}
 			}
 		}//end of reading by index
 		input.close();

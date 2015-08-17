@@ -417,6 +417,28 @@ void testReadMutationValues()
 	std::cout <<"----------END TEST INITMUTATIONCATEGORIES----------\n";
 }
 
+void testMultiplePhi()
+{
+	std::cout <<"----------TEST MULTIPLEPHI----------\n";
+
+	Genome genome;
+	genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
+	genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv", false);
+
+	for (unsigned i = 0; i < genome.getGenomeSize(); i++)
+	{
+		Gene gene = genome.getGene(i);
+		std::cout << gene.getId() <<": ";
+		for (unsigned j = 0; j < gene.observedPhiValues.size(); j++)
+		{
+			std::cout << gene.observedPhiValues[j] <<", ";
+		}
+		std::cout <<"\n";
+	}
+
+	std::cout <<"----------END TEST MULTIPLEPHI----------\n";
+}
+
 
 int main()
 {
@@ -424,10 +446,10 @@ int main()
 	enum User { cedric, gabe, jeremy };
 	enum ModelToRun { ROC, RFP, FONSE };
 	/* Test variables */
-	User user = jeremy;
+	User user = gabe;
 	ModelToRun modelToRun = ROC;
 	bool read = false;
-	bool testing = false;
+	bool testing = true;
 	bool withPhi = true;
 	if (testing)
 	{
@@ -439,7 +461,7 @@ int main()
 		//testCovMatrixOverloading();
 		//testWriteRestartFile();
 		//testInitFromRestartFile();
-		testReadRFPFile();
+		//testReadRFPFile();
 		//testReadObservedPhis();
 		//simulateRFPData();
 	//	simulateROCData();
@@ -448,6 +470,7 @@ int main()
 		//testReadMutationValues();
 		//testGeneSequenceSummary();
 		//testReadMutationValues();
+		testMultiplePhi();
 	}
 	else //not doing unit testing, running a model
 	{
@@ -486,7 +509,7 @@ int main()
 				{
 					genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
 					if (withPhi) {
-						genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv", true);
+						genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv", false);
 					}
 				}
 				else if (modelToRun == RFP)
