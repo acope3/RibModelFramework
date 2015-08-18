@@ -19,7 +19,7 @@ parameter$initializeSynthesisRateByRandom(phivals)
 parameter$initMutationCategories(c("../ribModel/data/simulated_mutation0.csv", "../ribModel/data/simulated_mutation1.csv") , 2)
 parameter$initSelectionCategories(c("../ribModel/data/simulated_selection0.csv", "../ribModel/data/simulated_selection1.csv") , 2)
 # initialize MCMC object
-samples <- 100
+samples <- 1000
 thining <- 10
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, 

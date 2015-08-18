@@ -188,6 +188,8 @@ class Parameter {
 		virtual double getSphiVariance(unsigned samples, bool unbiased = true) = 0;
 		virtual double getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement,
 				bool unbiased = true) = 0;
+
+
 		// static functions
 		static double calculateSCUO(Gene& gene, unsigned maxAA);
 

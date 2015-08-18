@@ -61,13 +61,12 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	}
 
 	//initialize parameter's size
-	//#pragma omp parallel for reduction(+:logLikelihood)
 	for(int i = 0; i < numGenes; i++)
 	{
 		Gene gene = genome.getGene(i);
 
 		/*
-			 Since some values returned by calculateLogLikelihoodRatioPerGene are veyr small (~ -1100), exponantiation leads to 0.
+			 Since some values returned by calculateLogLikelihoodRatioPerGene are veyr small (~ -1100), exponentiation leads to 0.
 			 To solve this problem, we adjust the value by a constant c. I choose to use the average value across all mixtures.
 			 We justify this by
 			 P = Sum(p_i*f(...))
@@ -102,7 +101,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		for(unsigned k = 0u; k < numSynthesisRateCategories; k++)
 		{
 			// logProbabilityRatio contains the logProbabilityRatio in element 0,
-			// the current unscaled probability in elemen 1 and the proposed unscaled probability in element 2
+			// the current unscaled probability in element 1 and the proposed unscaled probability in element 2
 			std::vector<unsigned> mixtureElements = model.getMixtureElementsOfSelectionCategory(k);
 			for(unsigned n = 0u; n < mixtureElements.size(); n++)
 			{
@@ -119,6 +118,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				mixtureIndex++;
 			}
 		}
+
 //		unsigned mixtureAssignmentOfGene = model.getMixtureAssignment(i);
 		for(unsigned k = 0u; k < numSynthesisRateCategories; k++)
 		{
@@ -167,10 +167,10 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			model.updateSynthesisRateTrace(iteration/thining, i);
 			model.updateMixtureAssignmentTrace(iteration/thining, i);
 		}
-		//delete [] probabilities;
-		//delete [] unscaledLogProb_curr_singleMixture;
-		//delete [] unscaledLogProb_prop;
-		//delete [] unscaledLogProb_curr;
+		delete [] probabilities;
+		delete [] unscaledLogProb_curr_singleMixture;
+		delete [] unscaledLogProb_prop;
+		delete [] unscaledLogProb_curr;
 	}
 	double* newMixtureProbabilities = new double[numMixtures]();
 	Parameter::randDirichlet(dirichletParameters, numMixtures, newMixtureProbabilities);
@@ -193,7 +193,6 @@ void MCMCAlgorithm::acceptRejectHyperParameter(Genome &genome, Model& model, int
 
 	model.calculateLogLikelihoodRatioForHyperParameters(genome, iteration, logProbabilityRatios);
 
-	//#pragma omp for
 	for (int i = 0; i < logProbabilityRatios.size(); i++)
 	{
 		if (!std::isfinite(logProbabilityRatios[i]))
