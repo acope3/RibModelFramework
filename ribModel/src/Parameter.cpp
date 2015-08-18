@@ -510,6 +510,7 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 	numAcceptForSphi = 0u;
 	bias_sphi = 0;
 	bias_phi = 0;
+	phiGroupings = 0;
 	
 	numAcceptForSynthesisRate.resize(numSelectionCategories);
 	proposedSynthesisRateLevel.resize(numSelectionCategories);

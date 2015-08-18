@@ -200,6 +200,33 @@ void ROCParameter::writeROCRestartFile(std::string filename)
 
 	std::ostringstream oss;
 	unsigned j;
+	oss << ">Aphi:\n";
+	for (unsigned i = 0; i < Aphi.size(); i++)
+	{
+		oss << Aphi[i];
+		if ((i + 1) % 10 == 0)
+			oss << "\n";
+		else
+			oss << " ";
+	}
+	oss << ">Sepsilon:\n";
+	for (unsigned i = 0; i < Sepsilon.size(); i++)
+	{
+		oss << Sepsilon[i];
+		if ((i + 1) % 10 == 0)
+			oss << "\n";
+		else
+			oss << " ";
+	}
+	oss << ">std_Aphi:\n";
+	for (unsigned i = 0; i < std_Aphi.size(); i++)
+	{
+		oss << std_Aphi[i];
+		if ((i + 1) % 10 == 0)
+			oss << "\n";
+		else
+			oss << " ";
+	}
 	oss << ">std_csp:\n";
 	for (unsigned i = 0; i < std_csp.size(); i++)
 	{
@@ -361,6 +388,30 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 				iss.str(tmp);
 				while (iss >> val) {
 					std_csp.push_back(val);
+				}
+			}
+			else if (variableName == "Aphi")
+			{
+				double val;
+				iss.str(tmp);
+				while (iss >> val) {
+					Aphi.push_back(val);
+				}
+			}
+			else if (variableName == "Sepsilon")
+			{
+				double val;
+				iss.str(tmp);
+				while (iss >> val) {
+					Sepsilon.push_back(val);
+				}
+			}
+			else if (variableName == "std_Aphi")
+			{
+				double val;
+				iss.str(tmp);
+				while (iss >> val) {
+					std_Aphi.push_back(val);
 				}
 			}
 			else if (variableName == "covarianceMatrix")

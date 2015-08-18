@@ -154,7 +154,7 @@ void testCovMatrixOverloading()
 void testWriteRestartFile()
 {
 	Genome genome;
-	genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+	genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/fake.fasta", false);
 	std::cout << "------------------ TEST WRITERESTARTFILE ------------------" << std::endl;
 	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
@@ -165,16 +165,17 @@ void testWriteRestartFile()
 	unsigned numMixtures = 1;
 	std::string mixDef = ROCParameter::allUnique;
 	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
-	RFPParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
+	ROCParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 	std::vector<std::string> files(2);
-	files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrA.csv");
-	files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_CSP_ChrCleft.csv");
-	//files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_CSP0.csv");
-	//files[1] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_CSP1.csv");
-	parameter.initMutationSelectionCategories(files, parameter.getNumMutationCategories(), ROCParameter::dM);
-	parameter.initMutationSelectionCategories(files, parameter.getNumSelectionCategories(), ROCParameter::dEta);
+	files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_mutation0.csv");
+	files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_mutation1.csv");
+	parameter.initMutationCategories(files, parameter.getNumMutationCategories());
+
+	files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_selection0.csv");
+	files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_selection1.csv");
+	parameter.initSelectionCategories(files, parameter.getNumSelectionCategories());
 	parameter.InitializeSynthesisRate(genome, sphi_init);
-	RFPModel model;
+	ROCModel model;
 	model.setParameter(parameter);
 	model.writeRestartFile("RestartFile1.txt");
 	std::cout << "------------------ TEST WRITERESTARTFILE ------------------" << std::endl;
@@ -184,8 +185,8 @@ void testWriteRestartFile()
 void testInitFromRestartFile()
 {
 	std::cout << "------------------ TEST INITFROMRESTARTFILE ------------------" << std::endl;
-	RFPParameter parameter("RestartFile1.txt");
-	RFPModel model;
+	ROCParameter parameter("RestartFile1.txt");
+	ROCModel model;
 
 	model.setParameter(parameter);
 	model.writeRestartFile("RestartFile2.txt");
@@ -298,27 +299,7 @@ void simulateROCData()
 	genome.writeFasta("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/SimulatedROCData.fasta", true);
 }
 
-void testCodonToIndex()
-{
-	for(unsigned i = 0; i < 64; i++)
-	{
-		std::string codon = SequenceSummary::indexToCodon(i, false);
-		unsigned a = SequenceSummary::codonToIndex(codon, false);
-		unsigned b = std::distance(SequenceSummary::codonArray, std::find(SequenceSummary::codonArray, SequenceSummary::codonArray + 64, codon));
 
-		if (a != b) std::cout << i <<"\n";
-	}
-
-	std::cout <<"Param vector\n";
-	for (unsigned i = 0; i < 40; i++)
-	{
-		std::string codon = SequenceSummary::indexToCodon(i, true);
-		unsigned a = SequenceSummary::codonToIndex(codon, true);
-		unsigned b = std::distance(SequenceSummary::codonArrayParameter, std::find(SequenceSummary::codonArrayParameter, SequenceSummary::codonArrayParameter + 40, codon));
-		if (a != b) std::cout << i <<"\n";
-	}
-
-}
 
 
 void testInitMutationSelection()
@@ -422,9 +403,10 @@ void testMultiplePhi()
 	std::cout <<"----------TEST MULTIPLEPHI----------\n";
 
 	Genome genome;
-	genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
-	genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv", false);
+	genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/test.fasta");
+	genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/testReadObservedPhiValuesFilled.csv", false);
 
+	std::cout << std::isnan(NAN);
 	for (unsigned i = 0; i < genome.getGenomeSize(); i++)
 	{
 		Gene gene = genome.getGene(i);
@@ -435,6 +417,7 @@ void testMultiplePhi()
 		}
 		std::cout <<"\n";
 	}
+
 
 	std::cout <<"----------END TEST MULTIPLEPHI----------\n";
 }
@@ -459,8 +442,8 @@ int main()
 		//testRandMultiNom(3);
 		//testThetaKMatrix();
 		//testCovMatrixOverloading();
-		//testWriteRestartFile();
-		//testInitFromRestartFile();
+		testWriteRestartFile();
+		testInitFromRestartFile();
 		//testReadRFPFile();
 		//testReadObservedPhis();
 		//simulateRFPData();
@@ -470,7 +453,7 @@ int main()
 		//testReadMutationValues();
 		//testGeneSequenceSummary();
 		//testReadMutationValues();
-		testMultiplePhi();
+		//testMultiplePhi();
 	}
 	else //not doing unit testing, running a model
 	{
