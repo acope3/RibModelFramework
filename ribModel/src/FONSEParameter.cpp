@@ -566,6 +566,11 @@ double FONSEParameter::getCurrentCodonSpecificProposalWidth(unsigned aa)
 	return std_csp[codonRange[0]];
 }
 
+void FONSEParameter::setNumPhiGroupings(unsigned _phiGroupings)
+{
+	phiGroupings = _phiGroupings;
+}
+
 void FONSEParameter::adaptSphiProposalWidth(unsigned adaptationWidth)
 {
 	double acceptanceLevel = (double)numAcceptForSphi / (double)adaptationWidth;

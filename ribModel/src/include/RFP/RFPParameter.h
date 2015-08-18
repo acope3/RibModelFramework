@@ -55,7 +55,7 @@ class RFPParameter: public Parameter {
 		void initLambdaPrime(double lambdaPrimeValue, unsigned mixtureElement, std::string codon);
 		void initMutationSelectionCategories(std::vector<std::string> files, unsigned numCategories,
 				unsigned paramType); //TODO: function needs to be changed
-
+		virtual void setNumPhiGroupings(unsigned _phiGroupings);
 
 		//Restart file functions:
 		void writeEntireRestartFile(std::string filename);

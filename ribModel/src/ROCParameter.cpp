@@ -107,13 +107,6 @@ void ROCParameter::initROCParameterSet()
 
 	phiEpsilon = 0.1;
 	phiEpsilon_proposed = 0.1;
-	for (unsigned i = 0; i < getNumPhiGroupings(); i++) {
-		Aphi[i] = 0.0;
-		Aphi_proposed[i] = 0.0;
-		std_Aphi[i] = 0.1;
-		Sepsilon[i] = 0.0;
-		numAcceptForAphi[i] = 0;
-	}
 
 	//may need getter fcts
 	currentMutationParameter.resize(numMutationCategories);
@@ -569,6 +562,16 @@ void ROCParameter::initSelectionCategories(std::vector<std::string> files, unsig
 		}
 		currentFile.close();
 	} //END OF A CATEGORY/FILE
+}
+
+void ROCParameter::setNumPhiGroupings(unsigned _phiGroupings)
+{
+	phiGroupings = _phiGroupings;
+	Aphi.resize(phiGroupings, 0);
+	Aphi_proposed.resize(phiGroupings, 0);
+	std_Aphi.resize(phiGroupings, 0.1);
+	numAcceptForAphi.resize(phiGroupings, 0);
+	Sepsilon.resize(phiGroupings, 0);
 }
 
 void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType, std::string aa, bool proposal,

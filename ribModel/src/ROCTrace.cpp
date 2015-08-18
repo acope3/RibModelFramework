@@ -10,19 +10,19 @@ ROCTrace::ROCTrace() : Trace()
 }
 
 void ROCTrace::initAllTraces(unsigned samples, unsigned num_genes, unsigned numMutationCategories, unsigned numSelectionCategories,
-		unsigned numParam, unsigned numMixtures, std::vector<mixtureDefinition> &_categories, unsigned maxGrouping)
+		unsigned numParam, unsigned numMixtures, std::vector<mixtureDefinition> &_categories, unsigned maxGrouping, unsigned numPhiGroupings)
 {
 	initBaseTraces(samples, num_genes, numMutationCategories, numMixtures, _categories, maxGrouping);
-	initROCTraces(samples, numMutationCategories, numSelectionCategories, numParam);
+	initROCTraces(samples, numMutationCategories, numSelectionCategories, numParam, numPhiGroupings);
 }
 
 
-void ROCTrace::initROCTraces(unsigned samples, unsigned numMutationCategories, unsigned numSelectionCategories, unsigned numParam)
+void ROCTrace::initROCTraces(unsigned samples, unsigned numMutationCategories, unsigned numSelectionCategories, unsigned numParam, unsigned numPhiGroupings)
 {
 	initMutationParameterTrace(samples, numMutationCategories, numParam);
 	initSelectionParameterTrace(samples, numSelectionCategories, numParam);
-	initAphiTrace(samples);
-	initSepsilonTrace(samples);
+	initAphiTrace(samples, numPhiGroupings);
+	initSepsilonTrace(samples, numPhiGroupings);
 }
 
 
@@ -57,14 +57,22 @@ void ROCTrace::initSelectionParameterTrace(unsigned samples, unsigned numSelecti
 	}
 }
 
-void ROCTrace::initAphiTrace(unsigned samples)
+void ROCTrace::initAphiTrace(unsigned samples, unsigned numPhiGroupings)
 {
-	AphiTrace.resize(samples);
+	AphiTrace.resize(numPhiGroupings);
+	for (unsigned i = 0; i < numPhiGroupings; i++) {
+		AphiTrace[i].resize(samples);
+	}
+	
+	AphiAcceptanceRatioTrace.resize(numPhiGroupings);
 }
 
-void ROCTrace::initSepsilonTrace(unsigned samples)
+void ROCTrace::initSepsilonTrace(unsigned samples, unsigned numPhiGroupings)
 {
-	SepsilonTrace.resize(samples);
+	SepsilonTrace.resize(numPhiGroupings);
+	for (unsigned i = 0; i < numPhiGroupings; i++) {
+		SepsilonTrace[i].resize(samples);
+	}
 }
 
 

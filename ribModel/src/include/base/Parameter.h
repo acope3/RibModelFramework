@@ -7,7 +7,7 @@
 #include <iostream>
 #include <set>
 #include <fstream>
-#include <ctime>
+#include <ctime>ROC
 #ifndef STANDALONE
 #include <Rcpp.h>
 #endif
@@ -20,7 +20,6 @@ class Parameter {
 	private:
 		std::vector<std::vector<double>> proposedSynthesisRateLevel;
 		
-		unsigned phiGroupings;
 		std::string mutationSelectionState; //Probably needs to be renamed
 		std::vector<std::vector<unsigned>> selectionIsInMixture;
 		std::vector<std::vector<unsigned>> mutationIsInMixture;
@@ -106,7 +105,7 @@ class Parameter {
 			return numSelectionCategories;
 		}
 		unsigned getNumPhiGroupings() { return phiGroupings; }
-		void setNumPhiGroupings(unsigned _phiGroupings) { phiGroupings = _phiGroupings; }
+		virtual void setNumPhiGroupings(unsigned _phiGroupings) = 0;
 
 		std::vector<unsigned> getMixtureElementsOfMutationCategory(unsigned category)
 		{
@@ -258,6 +257,7 @@ class Parameter {
 		double Sphi;
 		double Sphi_proposed;
 
+		unsigned phiGroupings;
 		unsigned numMixtures;
 		unsigned int numParam;
 

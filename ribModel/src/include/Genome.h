@@ -17,7 +17,6 @@ class Genome
 
 		std::vector<Gene> genes;
 		std::vector<Gene> simulatedGenes;
-
 		unsigned numGenesWithPhi;
 	public:
 

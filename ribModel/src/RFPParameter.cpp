@@ -173,6 +173,11 @@ void RFPParameter::initMutationSelectionCategories(std::vector<std::string> file
 	}
 }
 
+void RFPParameter::setNumPhiGroupings(unsigned _phiGroupings)
+{
+	phiGroupings = _phiGroupings;
+}
+
 
 void RFPParameter::writeEntireRestartFile(std::string filename)
 {

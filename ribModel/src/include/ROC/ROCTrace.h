@@ -20,12 +20,12 @@ class ROCTrace : public Trace
 
 		//Init functions
 		void initAllTraces(unsigned samples, unsigned num_genes, unsigned numMutationCategories,
-				unsigned numSelectionCategories, unsigned numParam, unsigned numMixtures, std::vector<mixtureDefinition> &_categories, unsigned maxGrouping);
-		void initROCTraces(unsigned samples, unsigned numMutationCategories, unsigned numSelectionCategories, unsigned numParam);
+				unsigned numSelectionCategories, unsigned numParam, unsigned numMixtures, std::vector<mixtureDefinition> &_categories, unsigned maxGrouping, unsigned numPhiGroupings);
+		void initROCTraces(unsigned samples, unsigned numMutationCategories, unsigned numSelectionCategories, unsigned numParam, unsigned numPhiGroupings);
 		void initMutationParameterTrace(unsigned samples, unsigned numMutationCategories, unsigned numParam); 
 		void initSelectionParameterTrace(unsigned samples, unsigned numSelectionCategories, unsigned numParam); 
-		void initAphiTrace(unsigned samples);
-		void initSepsilonTrace(unsigned samples);
+		void initAphiTrace(unsigned samples, unsigned numPhiGroupings);
+		void initSepsilonTrace(unsigned samples, unsigned numPhiGroupings);
 
 		//Getter functions
 		std::vector<double> getMutationParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon);
