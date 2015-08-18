@@ -80,10 +80,11 @@ class ROCParameter : public Parameter
 		SEXP calculateSelectionCoefficientsR(unsigned sample, unsigned mixture);
 #endif
 		void initAllTraces(unsigned samples, unsigned num_genes) {traces.initAllTraces(samples, num_genes,
-				numMutationCategories, numSelectionCategories, numParam, numMixtures, categories, maxGrouping);}
+				numMutationCategories, numSelectionCategories, numParam, numMixtures, categories, maxGrouping, phiGroupings);}
 
 		void initMutationCategories(std::vector<std::string> files, unsigned numCategories);
 		void initSelectionCategories(std::vector<std::string> files, unsigned numCategories);
+		virtual void setNumPhiGroupings(unsigned _phiGroupings);
 		double getCurrentCodonSpecificProposalWidth(unsigned aa);
 		std::vector<std::vector<double>> getCurrentMutationParameter() {return currentMutationParameter;}
 		std::vector<std::vector<double>> getCurrentSelectionParameter() {return currentSelectionParameter;}

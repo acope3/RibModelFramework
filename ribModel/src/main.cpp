@@ -429,10 +429,10 @@ int main()
 	enum User { cedric, gabe, jeremy };
 	enum ModelToRun { ROC, RFP, FONSE };
 	/* Test variables */
-	User user = gabe;
+	User user = jeremy;
 	ModelToRun modelToRun = ROC;
 	bool read = false;
-	bool testing = true;
+	bool testing = false;
 	bool withPhi = true;
 	if (testing)
 	{
@@ -664,7 +664,7 @@ int main()
 			*/std::cout <<"Done initializing RFPModel object\n";
 		
 			std::cout << "starting MCMC for RFP" << std::endl;
-      mcmc.run(genome, model, 1);
+      mcmc.run(genome, model, 8);
       std::cout << std::endl << "Finished MCMC for RFP" << std::endl;
 
 

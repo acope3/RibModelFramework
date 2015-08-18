@@ -12,6 +12,7 @@ class ROCModel : public Model
 	virtual void obtainCodonCount(SequenceSummary& seqsum, std::string curAA, int codonCount[]);
 	double calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codonCount[], double mutation[], double selection[], double phiValue);
 	bool withPhi;
+	Genome *genome;
 
     public:
 

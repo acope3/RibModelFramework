@@ -103,6 +103,7 @@ class FONSEParameter : public Parameter
 		void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth);
 
 
+		virtual void setNumPhiGroupings(unsigned _phiGroupings);
 		virtual void adaptSphiProposalWidth(unsigned adaptationWidth);
 		virtual void adaptSynthesisRateProposalWidth(unsigned adaptationWidth);
 		virtual double getSphiPosteriorMean(unsigned samples);
