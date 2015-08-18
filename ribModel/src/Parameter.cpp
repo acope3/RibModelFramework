@@ -13,6 +13,7 @@ std::default_random_engine Parameter::generator( (unsigned) std::time(NULL));
 Parameter::Parameter()
 {
 	numParam = 0u;
+	phiGroupings = 0u;
 	Sphi = 0.1;
 	Sphi_proposed = 0.0;
 	numAcceptForSphi = 0u;
@@ -29,6 +30,7 @@ Parameter::Parameter()
 Parameter::Parameter(unsigned _maxGrouping)
 {
 	numParam = 0u;
+	phiGroupings = 0u;
 	Sphi = 0.1;
 	Sphi_proposed = 0.0;
 	numAcceptForSphi = 0u;
@@ -51,6 +53,7 @@ Parameter& Parameter::operator=(const Parameter& rhs)
   Sphi = rhs.Sphi;
   Sphi_proposed = rhs.Sphi_proposed;
   numAcceptForSphi = rhs.numAcceptForSphi;
+  phiGroupings = rhs.phiGroupings;
   categories = rhs.categories;
 
   // proposal bias and std for phi values

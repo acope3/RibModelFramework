@@ -19,7 +19,8 @@
 class Parameter {
 	private:
 		std::vector<std::vector<double>> proposedSynthesisRateLevel;
-
+		
+		unsigned phiGroupings;
 		std::string mutationSelectionState; //Probably needs to be renamed
 		std::vector<std::vector<unsigned>> selectionIsInMixture;
 		std::vector<std::vector<unsigned>> mutationIsInMixture;
@@ -104,6 +105,8 @@ class Parameter {
 		{
 			return numSelectionCategories;
 		}
+		unsigned getNumPhiGroupings() { return phiGroupings; }
+		void setNumPhiGroupings(unsigned _phiGroupings) { phiGroupings = _phiGroupings; }
 
 		std::vector<unsigned> getMixtureElementsOfMutationCategory(unsigned category)
 		{
