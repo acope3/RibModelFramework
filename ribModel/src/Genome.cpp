@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <cmath>
 
 
 Genome::Genome()
@@ -133,7 +134,7 @@ void Genome::writeFasta (std::string filename, bool simulated)
 			{
 				for(unsigned i = 0u; i < simulatedGenes.size(); i++)
 				{
-					Fout << ">" << simulatedGenes[i].getId() << " " << simulatedGenes[i].getDescription() <<"\n";
+					Fout << ">" << simulatedGenes[i].getDescription() <<"\n";
 					for(unsigned j = 0u; j < simulatedGenes[i].length(); j++)
 					{
 						Fout << simulatedGenes[i].getNucleotideAt(j);
@@ -146,7 +147,7 @@ void Genome::writeFasta (std::string filename, bool simulated)
 			{
 				for(unsigned i = 0u; i < genes.size(); i++)
 				{
-					Fout << ">" << genes[i].getId() << " " << genes[i].getDescription() << std::endl;
+					Fout << ">" << genes[i].getDescription() << std::endl;
 					for(unsigned j = 0u; j < genes[i].length(); j++)
 					{
 						Fout << genes[i].getNucleotideAt(j);
@@ -336,9 +337,9 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 							val = tmp.substr(pos + 1, pos2 - (pos + 1));
 						}
 						double value = std::atof(val.c_str());
-						if (value <=  0)
+						if (value <=  0 || std::isnan(value))
 						{
-							if (value == 0) value = -1;
+							if (value == 0 || std::isnan(value)) value = -1;
 							else
 							{
 								std::cerr <<"WARNING! Negative phi value given - values should not be on the log scale. Negative Value stored.";
@@ -393,10 +394,11 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 					}
 
 					std::string val = tmp.substr(pos + 1, pos2 - (pos + 1));
+					std::cout << "std::atof(val.c_str()) = " << std::atof(val.c_str()) <<"when val = " << val <<"\n";
 					double value = std::atof(val.c_str());
-					if (value <=  0)
+					if (value <=  0 || std::isnan(value))
 					{
-						if (value == 0) value = -1;
+						if (value == 0 || std::isnan(value)) value = -1;
 						else
 						{
 							std::cerr <<"WARNING! Negative phi value given - values should not be on the log scale. Negative Value stored.";

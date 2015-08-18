@@ -217,9 +217,9 @@ test_that("read Observed Phi Values", {
   gene1 <- genome$getGeneByIndex(1)
   gene2 <- genome$getGeneByIndex(2)
   gene3 <- genome$getGeneByIndex(3)
-  expect_equal(gene1$getObservedPhiValues(), numeric(0))
-  expect_equal(gene2$getObservedPhiValues(), numeric(0))
-  expect_equal(gene3$getObservedPhiValues(), numeric(0))
+  expect_equal(gene1$getObservedPhiValues(), c(0.4834983,-1))
+  expect_equal(gene2$getObservedPhiValues(), c(0.5388484,-1))
+  expect_equal(gene3$getObservedPhiValues(), c(-1.323,2.3838239))
 })
 
 genome$clear()
