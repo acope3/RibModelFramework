@@ -261,6 +261,7 @@ void Genome::writeRFPFile(std::string filename, bool simulated)
 
 void Genome::readObservedPhiValues(std::string filename, bool byId)
 {
+	std::cout << numGenesWithPhi <<"\n";
 	std::ifstream input;
 	std::string tmp;
 	unsigned numPhi = 0;
@@ -354,7 +355,19 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 				}
 				if (exitfunction) break;
 			}
-
+			if (!exitfunction)
+			{
+				for (unsigned geneIndex = 0; geneIndex < getGenomeSize(); geneIndex++)
+				{
+					if (getGene(geneIndex).observedPhiValues.size() != numPhi)
+					{
+						Gene *gene = &(getGene(geneIndex));
+						std::cerr <<"Gene # " << geneIndex <<" (" << gene->getId() <<") does not have any phi values.";
+						std::cerr <<" Filling with -1's\n";
+						gene->observedPhiValues.resize(numPhi, -1);
+					}
+				}
+			}
 
 		} //end of putting in by ID
 		else //doing this by index
@@ -394,7 +407,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 					}
 
 					std::string val = tmp.substr(pos + 1, pos2 - (pos + 1));
-					std::cout << "std::atof(val.c_str()) = " << std::atof(val.c_str()) <<"when val = " << val <<"\n";
+
 					double value = std::atof(val.c_str());
 					if (value <=  0 || std::isnan(value))
 					{
@@ -412,6 +425,21 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 				if (exitfunction)
 				{
 					break;
+				}
+			}
+			if (!exitfunction)
+			{
+				if (numGenesWithPhi != getGenomeSize())
+				{
+					std::cerr <<"The last " << getGenomeSize() - numGenesWithPhi <<" genes do not have phi values.";
+					std::cerr <<"Please check your file to make sure every gene has a phi value. Filling empty genes";
+					std::cerr <<"with -1's for calculations.\n";
+
+					for (unsigned a = numGenesWithPhi; a < getGenomeSize(); a++)
+					{
+						Gene *gene = &(getGene(a));
+						gene->observedPhiValues.resize(numPhi, -1);
+					}
 				}
 			}
 		}//end of reading by index
@@ -489,6 +517,7 @@ void Genome::clear()
 {
 	genes.clear();
 	simulatedGenes.clear();
+	numGenesWithPhi = 0;
 }
 
 
