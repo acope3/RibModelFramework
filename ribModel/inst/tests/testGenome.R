@@ -247,6 +247,10 @@ test_that("read Observed Phi Values", {
   
 })
 
+test_that("get Num Genes With Phi", {
+  expect_equal(genome$getNumGenesWithPhi(), 2)
+})
+
 genome$clear()
 gene <- new(Gene, "ATGCTCATTCTCACTGCTGCCTCGTAG", "001", "just a test")
 gene2 <- new(Gene, "ATGCTCATTTAG", "002", "just a second test")

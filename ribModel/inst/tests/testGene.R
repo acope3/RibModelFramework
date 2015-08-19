@@ -24,9 +24,25 @@ ss <- new(SequenceSummary, "ATGCTCATTCTCACTGCTGCCTCGTAG")
 
 test_that("get Sequence Summary", {
   ss2 <- g$getSequenceSummary()
-  expect_equal(ss, ss2)
+  for (codon in codons()){
+    expect_equal(ss$getCodonCountForCodon(codon), ss2$getCodonCountForCodon(codon))
+  }
+  for (codon in codons()) {
+    expect_equal(ss$getRFPObservedForCodon(codon), ss2$getRFPObservedForCodon(codon))
+  }
+  for (aa in aminoAcids()){
+    expect_equal(ss$getAACountForAA(aa), ss2$getAACountForAA(aa))
+  }
+  for (codon in codons()) {
+    expect_equal(ss$getCodonPositionsForCodon(codon), ss2$getCodonPositionsForCodon(codon))
+  }
 }) 
 
+test_that("get Observed Phi Values", {
+  expect_equal(g$getObservedPhiValues(), numeric())
+  g$setObservedPhiValues(c(2.34,3.234,0.123))
+  expect_equal(g$getObservedPhiValues(), c(2.34,3.234,0.123))
+})
 
 
 test_that("get Nucleotide At", {

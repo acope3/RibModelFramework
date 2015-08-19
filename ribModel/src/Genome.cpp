@@ -463,6 +463,12 @@ std::vector <Gene> Genome::getGenes(bool simulated)
 }
 
 
+unsigned Genome::getNumGenesWithPhi()
+{
+	return numGenesWithPhi;
+}
+
+
 Gene& Genome::getGene(unsigned index)
 {
 	Gene gene;
@@ -615,6 +621,7 @@ RCPP_MODULE(Genome_mod)
 
 		.method("addGene", &Genome::addGene) //TEST THAT ONLY!
 		.method("getGenes", &Genome::getGenes) //TEST THAT ONLY!
+		.method("getNumGenesWithPhi", &Genome::getNumGenesWithPhi) //TEST THAT ONLY!
 
 		.method("checkIndex", &Genome::checkIndex) //TEST THAT ONLY!
 		.method("getGenomeSize", &Genome::getGenomeSize, "returns how many genes are in the genome")
