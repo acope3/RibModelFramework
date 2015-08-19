@@ -38,6 +38,14 @@ system.time(
 trace <- parameter$getTraceObject()
 pdf("RFP_Genome_allUnique_startCSP_True_startPhi_true_adaptSphi_True.pdf")
 plot(mcmc)
+
+
+loglik.trace <- mcmc$getLogLikelihoodTrace()
+start <- length(loglik.trace) * 0.2
+logL <- logL <- mean(loglik.trace[start:length(loglik.trace)])
+plot(loglik.trace[start:length(loglik.trace)], type="l", main=paste("logL:", logL), xlab="Sample", ylab="log(Likelihood)")
+grid (NULL,NULL, lty = 6, col = "cornsilk2")
+
 plot(trace, what = "MixtureProbability")
 plot(trace, what = "SPhi")
 plot(trace, what = "ExpectedPhi")

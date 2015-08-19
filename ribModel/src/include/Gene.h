@@ -44,6 +44,7 @@ class Gene
 		void setSequence(std::string _seq);
 		SequenceSummary& getSequenceSummary();
 		std::vector<double> getObservedPhiValues();
+		void setObservedPhiValues(std::vector <double> values); //FOR TEST THAT ONLY!
 		char getNucleotideAt(unsigned i);
 
 

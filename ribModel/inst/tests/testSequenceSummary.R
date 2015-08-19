@@ -88,7 +88,6 @@ test_that("Codon Positions by Codon", {
 })
 
 test_that("Codon Positions", {
-  # TODO: These return vectors. Fix it.
   expect_equal(ss$getCodonPositionsForCodonIndex(29), c(0))
   expect_equal(ss$getCodonPositionsForCodonIndex(24), c(1,3))
   expect_equal(ss$getCodonPositionsForCodonIndex(20), c(2))
@@ -366,7 +365,7 @@ test_that("Codon To AA", {
   expect_equal(codonToAA("TGA"), "X")
 })
 
-test_that("Codon To AA", {
+test_that("Codon To Index", {
   expect_equal(codonToIndex("GCA", FALSE), 0) 
   expect_equal(codonToIndex("GCC", FALSE), 1)
   expect_equal(codonToIndex("GCG", FALSE), 2)

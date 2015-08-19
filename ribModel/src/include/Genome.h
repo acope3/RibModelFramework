@@ -37,6 +37,7 @@ class Genome
 		//Gene functions:
 		void addGene(const Gene& gene, bool simulated = false);
 		std::vector <Gene> getGenes(bool simulated = false);
+		unsigned getNumGenesWithPhi();
 		Gene& getGene(unsigned index);
 		Gene& getGene(std::string id);
 

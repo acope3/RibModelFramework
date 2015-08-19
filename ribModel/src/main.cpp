@@ -404,9 +404,8 @@ void testMultiplePhi()
 
 	Genome genome;
 	genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/test.fasta");
-	genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/testReadObservedPhiValuesFilled.csv", false);
+	genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/testReadObservedPhiValuesValid.csv", false);
 
-	std::cout << std::isnan(NAN);
 	for (unsigned i = 0; i < genome.getGenomeSize(); i++)
 	{
 		Gene gene = genome.getGene(i);
@@ -442,8 +441,8 @@ int main()
 		//testRandMultiNom(3);
 		//testThetaKMatrix();
 		//testCovMatrixOverloading();
-		testWriteRestartFile();
-		testInitFromRestartFile();
+		//testWriteRestartFile();
+		//testInitFromRestartFile();
 		//testReadRFPFile();
 		//testReadObservedPhis();
 		//simulateRFPData();
@@ -453,7 +452,7 @@ int main()
 		//testReadMutationValues();
 		//testGeneSequenceSummary();
 		//testReadMutationValues();
-		//testMultiplePhi();
+		testMultiplePhi();
 	}
 	else //not doing unit testing, running a model
 	{

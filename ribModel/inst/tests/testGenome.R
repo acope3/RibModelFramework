@@ -35,6 +35,7 @@ test_that("clear", {
    genome$clear()
    expect_equal(genome$getGenes(FALSE), list())
    expect_equal(genome$getGenes(TRUE), list())
+   #TODO add numGenesWithPhi expected to equal 0 here
 })
 
 test_that("get Genome Size", {
@@ -220,6 +221,34 @@ test_that("read Observed Phi Values", {
   expect_equal(gene1$getObservedPhiValues(), c(0.4834983,-1))
   expect_equal(gene2$getObservedPhiValues(), c(0.5388484,-1))
   expect_equal(gene3$getObservedPhiValues(), c(-1.323,2.3838239))
+  
+  
+  #Testing missing genes
+  genome$clear()
+  genome$readFasta("../../data/test.fasta", FALSE)
+  genome$readObservedPhiValues("../../data/TestReadObservedPhiValuesGeneMissing.csv", TRUE)
+  gene1 <- genome$getGeneByIndex(1)
+  gene2 <- genome$getGeneByIndex(2)
+  gene3 <- genome$getGeneByIndex(3)
+  expect_equal(gene1$getObservedPhiValues(), c(0.324394,4.3849298))
+  expect_equal(gene2$getObservedPhiValues(), c(-1,-1))
+  expect_equal(gene3$getObservedPhiValues(), c(3.348394,1.3943493))
+  
+  #Testing missing genes by index
+  genome$clear()
+  genome$readFasta("../../data/test.fasta", FALSE)
+  genome$readObservedPhiValues("../../data/TestReadObservedPhiValuesMissingGeneByIndex.csv", FALSE)
+  gene1 <- genome$getGeneByIndex(1)
+  gene2 <- genome$getGeneByIndex(2)
+  gene3 <- genome$getGeneByIndex(3)
+  expect_equal(gene1$getObservedPhiValues(), c(0.324394,4.3849298))
+  expect_equal(gene2$getObservedPhiValues(), c(3.348394,1.3943493))
+  expect_equal(gene3$getObservedPhiValues(), c(-1,-1))
+  
+})
+
+test_that("get Num Genes With Phi", {
+  expect_equal(genome$getNumGenesWithPhi(), 2)
 })
 
 genome$clear()
