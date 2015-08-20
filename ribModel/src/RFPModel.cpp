@@ -201,3 +201,9 @@ void RFPModel::updateHyperParameterTraces(unsigned sample)
 {
 	updateSphiTrace(sample);
 }
+
+void RFPModel::printHyperParameters()
+{
+	std::cout << "\t current Sphi estimate: " << getSphi() << std::endl;
+	std::cout << "\t current Sphi proposal width: " << getCurrentSphiProposalWidth() << std::endl;
+}

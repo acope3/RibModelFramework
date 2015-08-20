@@ -220,6 +220,31 @@ std::vector<double> ROCModel::CalculateProbabilitiesForCodons(std::vector<double
 	return returnVector;
 }
 
+void ROCModel::printHyperParameters()
+{
+	std::cout << "\t current Sphi estimate: " << getSphi() << std::endl;
+	std::cout << "\t current Sphi proposal width: " << getCurrentSphiProposalWidth() << std::endl;
+	std::cout << "\t current Aphi estimates:";
+	for (unsigned i = 0; i < getNumPhiGroupings(); i++) 
+	{
+		std::cout << " " << getAphi(i, false);
+	}
+	std::cout << std::endl;
+	std::cout << "\t current Aphi proposal widths:";
+	for (unsigned i = 0; i < getNumPhiGroupings(); i++)
+	{
+		std::cout << " " << getCurrentAphiProposalWidth(i);
+	}
+	std::cout << std::endl;
+	std::cout << "\t current Sepsilon estimates:";
+	for (unsigned i = 0; i < getNumPhiGroupings(); i++)
+	{
+		std::cout << " " << getSepsilon(i);
+	}
+	std::cout << std::endl;
+	
+}
+
 
 void ROCModel::simulateGenome(Genome &genome)
 {

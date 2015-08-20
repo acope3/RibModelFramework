@@ -74,6 +74,8 @@ public:
 	// R wrapper
 	//std::vector<double> CalculateProbabilitiesForCodons(std::vector<double> mutation, std::vector<double> selection, double phi);
 
+	virtual void printHyperParameters();
+
 protected:
 };
 
