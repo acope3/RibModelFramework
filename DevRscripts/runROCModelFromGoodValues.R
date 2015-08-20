@@ -1,8 +1,14 @@
-rm(list=ls())
 library(ribModel)
-#read genome
-genome <- initializeGenomeObject(file = "../ribModel/data/simulatedAllUniqueR.fasta")
-
+rm(list=ls())
+  
+with.phi <- FALSE 
+  
+if (with.phi) {
+  genome <- initializeGenomeObject(file = "../ribModel/data/simulatedAllUniqueR.fasta", expression.file = "../ribModel/data/simulatedAllUniqueR_phi.csv")
+} else {
+  genome <- initializeGenomeObject(file = "../ribModel/data/simulatedAllUniqueR.fasta")
+}
+ 
 #initialize parameter object
 sphi_init <- 2
 numMixtures <- 2
@@ -25,14 +31,13 @@ adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, 
                              est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
 # get model object
-model <- initializeModelObject(parameter, "ROC")
-
+model <- initializeModelObject(parameter, "ROC", with.phi = with.phi)
+  
 setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth*20, TRUE)
 #run mcmc on genome with parameter using model
 system.time(
   runMCMC(mcmc, genome, model, 4)
 )
-
 
 #plots log likelihood trace, possibly other mcmc diagnostics in the future
 pdf("simulated_Genome_allUnique_startCSP_VGAM_startPhi_SCUO_adaptSphi_True.pdf")
@@ -43,7 +48,13 @@ acf(loglik.trace)
 # plots different aspects of trace
 trace <- parameter$getTraceObject()
 plot(trace, what = "MixtureProbability")
-plot(trace, what = "SPhi")
+plot(trace, what = "Shi")
+plot(trace, what = "Mphi")
+for (i in 1:length(genome$getGeneByIndex(1)$getObservedPhiValues()))
+{
+  plot(trace, what = "Aphi", which = i)
+  plot(trace, what = "Sepsilon", which = i)
+}
 plot(trace, what = "ExpectedPhi")
 
 mixtureAssignment <- unlist(lapply(1:genome$getGenomeSize(),  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))

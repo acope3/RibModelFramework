@@ -279,8 +279,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores)
 		{
 			std::cout << "Status at iteration " << (iteration+1) << std::endl;
 			std::cout << "\t current logLikelihood: " << likelihoodTrace[(iteration/thining) - 1] << std::endl;
-			std::cout << "\t current Sphi estimate: " << model.getSphi() << std::endl;
-			std::cout << "\t current Sphi proposal width: " << model.getCurrentSphiProposalWidth() << std::endl;
+			model.printHyperParameters();
 			for(unsigned i = 0u; i < model.getNumMixtureElements(); i++)
 			{
 				std::cout << "\t current Mixture element probability for element " << i << ": " << model.getCategoryProbability(i) << std::endl;

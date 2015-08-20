@@ -191,6 +191,12 @@ void FONSEModel::updateHyperParameterTraces(unsigned sample)
 	updateSphiTrace(sample);
 }
 
+void FONSEModel::printHyperParameters()
+{
+	std::cout << "\t current Sphi estimate: " << getSphi() << std::endl;
+	std::cout << "\t current Sphi proposal width: " << getCurrentSphiProposalWidth() << std::endl;
+}
+
 void FONSEModel::setParameter(FONSEParameter &_parameter)
 {
 	parameter = &_parameter;
