@@ -138,3 +138,23 @@ std::vector<double> ROCTrace::getSelectionParameterTraceByMixtureElementForCodon
 	}
 	return RV;
 }
+
+std::vector<double> ROCTrace::getAphiTraceR(unsigned index)
+{
+	std::vector <double> rv;
+	bool checkTraceIndex = checkIndex(index, 1, AphiTrace.size());
+	if (checkTraceIndex) {
+		rv = getAphiTrace(index - 1);
+	}
+	return rv;
+}
+
+std::vector<double> ROCTrace::getSepsilonTraceR(unsigned index)
+{
+	std::vector <double> rv;
+	bool checkTraceIndex = checkIndex(index, 1, SepsilonTrace.size());
+	if (checkTraceIndex) {
+		rv = getSepsilonTrace(index - 1);
+	}
+	return rv;
+}

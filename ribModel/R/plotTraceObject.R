@@ -4,7 +4,7 @@
 # additional arguments are geneIndex, and category to index function like
 # getExpressionTraceForGene or plotCodonSpecificParameters
 
-plot.Rcpp_RFPTrace <- function(trace, what=c("Alpha", "LambdaPrime", "MixtureProbability" ,"SPhi", "ExpectedPhi", "Expression"), 
+plot.Rcpp_RFPTrace <- function(trace, what=c("Alpha", "LambdaPrime", "MixtureProbability" ,"Sphi", "ExpectedPhi", "Expression"), 
                                geneIndex=1, mixture = 1, ...)
 {
   if(what[1] == "Alpha")
@@ -19,9 +19,9 @@ plot.Rcpp_RFPTrace <- function(trace, what=c("Alpha", "LambdaPrime", "MixturePro
   {
     plotMixtureProbability(trace)
   }
-  if(what[1] == "SPhi")
+  if(what[1] == "Sphi")
   {
-    plotSPhiTrace(trace)
+    plotHyperParameterTrace(trace, what = what[1])
   }
   if(what[1] == "ExpectedPhi")
   {
@@ -32,8 +32,10 @@ plot.Rcpp_RFPTrace <- function(trace, what=c("Alpha", "LambdaPrime", "MixturePro
     plotExpressionTrace(trace, geneIndex)
   }
 }
-plot.Rcpp_ROCTrace <- function(trace, what=c("Mutation", "Selection", "MixtureProbability" ,"SPhi", "ExpectedPhi", "Expression"), 
-                                   geneIndex=1, mixture = 1, ...)
+
+# The `which' variable is the number of the trace to be plotted for Aphi and Sepsilon
+plot.Rcpp_ROCTrace <- function(trace, what=c("Mutation", "Selection", "MixtureProbability" ,"Sphi", "Mphi", "Aphi", "Sepsilon", "ExpectedPhi", "Expression"), 
+                                   geneIndex=1, mixture = 1, which = 1, ...)
 {
   if(what[1] == "Mutation")
   {
@@ -47,9 +49,20 @@ plot.Rcpp_ROCTrace <- function(trace, what=c("Mutation", "Selection", "MixturePr
   {
     plotMixtureProbability(trace)
   }
-  if(what[1] == "SPhi")
+  if(what[1] == "Sphi")
   {
-    plotSPhiTrace(trace)
+    plotHyperParameterTrace(trace, what = what[1])
+  }
+  if(what[1] == "Mphi") {
+    plotHyperParameterTrace(trace, what = what[1])
+  }
+  if(what[1] == "Aphi")
+  {
+    plotHyperParameterTrace(trace, what = what[1], which = which)
+  }
+  if(what[1] == "Sepsilon") 
+  {
+    plotHyperParameterTrace(trace, what = what[1], which = which)
   }
   if(what[1] == "ExpectedPhi")
   {
@@ -78,7 +91,7 @@ plot.Rcpp_FONSETrace <- function(trace, what=c("Mutation", "Selection", "Mixture
   }
   if(what[1] == "SPhi")
   {
-    plotSPhiTrace(trace)
+    plotHyperParameterTrace(trace, what = what[1])
   }
   if(what[1] == "ExpectedPhi")
   {
@@ -192,15 +205,32 @@ plotExpectedPhiTrace <- function(trace)
        main = expression("Trace of the Expected value of "~phi))
   abline(h=1, col="red", lwd=1.5, lty=2)
 }
-plotSPhiTrace <- function(trace)
+plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sepsilon"), which = 1)
 {
-  opar <- par(no.readonly = T) 
-  par(oma=c(1,1,2,1), mgp=c(2,1,0), mar = c(3,4,2,1), mfrow=c(2, 1))
-  sphi <- trace$getSPhiTrace()
-  mphi <- -(sphi * sphi) / 2;
-  plot(mphi, type="l", xlab = "Sample", ylab = expression("m"[phi]))
-  plot(sphi, type="l", xlab = "Sample", ylab = expression("s"[phi]))
-  par(opar)
+#  opar <- par(no.readonly = T) 
+#  par(oma=c(1,1,2,1), mgp=c(2,1,0), mar = c(3,4,2,1), mfrow=c(2, 1))
+  if (what[1] == "Sphi")
+  {
+    sphi <- trace$getSphiTrace();
+    plot(sphi, type="l", xlab = "Sample", ylab = expression("s"[phi]))
+  }
+  if (what[1] == "Mphi")
+  {
+    sphi <- trace$getSphiTrace();
+    mphi <- -(sphi * sphi) / 2;
+    plot(mphi, type="l", xlab = "Sample", ylab = expression("m"[phi]));
+  }
+  if (what[1] == "Aphi") 
+  {
+    aphi <- trace$getAphiTrace(which);
+    plot(aphi, type="l", xlab = "Sample", ylab = expression("A"[phi]));
+  }
+  if (what[1] == "Sepsilon")
+  {
+    sepsilon <- trace$getSepsilonTrace(which);
+    plot(sepsilon, type="l", xlab = "Sample", ylab = expression("S"[epsilon]))
+  }
+  #par(opar)
 }
 plotMixtureProbability <- function(trace)
 {

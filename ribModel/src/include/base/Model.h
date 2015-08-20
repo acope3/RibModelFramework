@@ -66,6 +66,9 @@ class Model
 		virtual unsigned getGroupListSize() = 0;
 		virtual std::string getGrouping(unsigned index) = 0;
 
+		// print functions
+		virtual void printHyperParameters() = 0;
+
 	protected:
 };
 
