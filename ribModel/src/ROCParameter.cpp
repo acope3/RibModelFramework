@@ -829,7 +829,7 @@ double ROCParameter::getAphiPosteriorMean(unsigned index, unsigned samples)
 	{
 		posteriorMean += aPhiTrace[i];
 	}
-	return posteriorMean / (double)samples;;
+	return posteriorMean / (double)samples;
 }
 
 std::vector<double> ROCParameter::getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex)
