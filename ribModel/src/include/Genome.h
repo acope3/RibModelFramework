@@ -38,23 +38,23 @@ class Genome
 		void addGene(const Gene& gene, bool simulated = false);
 		std::vector <Gene> getGenes(bool simulated = false);
 		unsigned getNumGenesWithPhi();
-		Gene& getGene(unsigned index);
-		Gene& getGene(std::string id);
+		Gene& getGene(unsigned index, bool simulated = false);
+		Gene& getGene(std::string id, bool simulated = false);
 
 
 		//Other functions:
 		bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);
 		unsigned getGenomeSize();
 		void clear();
-		Genome getGenomeForGeneIndicies(std::vector <unsigned> indicies);
+		Genome getGenomeForGeneIndicies(std::vector <unsigned> indicies, bool simulated = false); //NOTE: If simulated is true, it will return a genome with the simulated genes, but the returned genome's genes vector will contain the simulated genes.
 		std::vector<unsigned> getCodonCountsPerGene(std::string codon);
 
 
 
 		//R wrapper functions:
-		Gene& getGeneByIndex(unsigned index);
-		Gene& getGeneById(std::string ID);
-		Genome getGenomeForGeneIndiciesR(std::vector <unsigned> indicies);
+		Gene& getGeneByIndex(unsigned index, bool simulated = false);
+		Gene& getGeneById(std::string ID, bool simulated = false);
+		Genome getGenomeForGeneIndiciesR(std::vector <unsigned> indicies, bool simulated = false);
 
 	protected:
 };

@@ -469,31 +469,23 @@ unsigned Genome::getNumGenesWithPhi()
 }
 
 
-Gene& Genome::getGene(unsigned index)
+Gene& Genome::getGene(unsigned index, bool simulated)
 {
-	Gene gene;
-
-	if (index >= genes.size())
-	{
-		std::cerr << "Error in Genome::getGene: Index " << index << " is out of bounds.\n";
-	}
-
-	return index >= genes.size() ? gene : genes[index];
+	return simulated ? simulatedGenes[index] : genes[index];
 }
 
 
-Gene& Genome::getGene(std::string id)
+Gene& Genome::getGene(std::string id, bool simulated)
 {
-	unsigned i = 0;
-	bool geneFound = false;
-	while(!geneFound)
+	Gene tempGene;
+	unsigned geneIndex;
+	for (geneIndex = 0; geneIndex < getGenomeSize(); geneIndex++)
 	{
-		Gene tempGene = genes[i];
-		geneFound = (tempGene.getId().compare(id) == 0);
-		i++;
+		if (!simulated) tempGene = genes[geneIndex];
+		else tempGene = simulatedGenes[geneIndex];
+		if (tempGene.getId().compare(id) == 0) break;
 	}
-	// i is increase after a potential finding, therefore i-1 is correct
-	return genes[i-1];
+	return simulated ? simulatedGenes[geneIndex] : genes[geneIndex];
 }
 
 
@@ -527,13 +519,13 @@ void Genome::clear()
 }
 
 
-Genome Genome::getGenomeForGeneIndicies(std::vector <unsigned> indicies)
+Genome Genome::getGenomeForGeneIndicies(std::vector <unsigned> indicies, bool simulated)
 {
 	Genome genome;
 
 	for (unsigned i = 0; i < indicies.size(); i++)
 	{
-		genome.addGene(genes[indicies[i]]);
+		simulated ? genome.addGene(simulatedGenes[indicies[i]]) : genome.addGene(genes[indicies[i]]);
 	}
 
 	return genome;
@@ -556,24 +548,38 @@ std::vector<unsigned> Genome::getCodonCountsPerGene(std::string codon)
 
 //---------------------R WRAPPER FUNCTIONS---------------------//
 
-Gene& Genome::getGeneByIndex(unsigned index)
+Gene& Genome::getGeneByIndex(unsigned index, bool simulated) //NOTE: This function does the check and performs the function itself because of memory issues.
 {
-	Gene gene;
 	bool checker = checkIndex(index, 1, (unsigned)genes.size());
-	return checker ? genes[index - 1] : gene;
+	if (!checker) std::cerr << "Invalid index given, returning gene 1, not simulated\n";
+	return checker ? simulated ? simulatedGenes[index - 1] : genes[index - 1] : genes[0];
 }
 
 
-Gene& Genome::getGeneById(std::string ID)
+Gene& Genome::getGeneById(std::string ID, bool simulated)
 {
-	return getGene(ID);
+	return getGene(ID, simulated);
 }
 
 
-Genome Genome::getGenomeForGeneIndiciesR(std::vector <unsigned> indicies)
+Genome Genome::getGenomeForGeneIndiciesR(std::vector <unsigned> indicies, bool simulated)
 {
 	Genome genome;
-	bool bad = false;
+	bool check = true;
+	for (unsigned i = 0; i < indicies.size(); i++)
+	{
+		if (indicies[i] < 1 || indicies[i] > getGenomeSize())
+		{
+			check = false;
+			break;
+		}
+		else
+		{
+			indicies[i] -= 1;
+		}
+	}
+	return check ? getGenomeForGeneIndicies(indicies, simulated) : genome;
+	/*bool bad = false;
 	for (unsigned i = 0; i < indicies.size(); i++)
 	{
 		if (indicies[i] == 0 || indicies[i] > genes.size())
@@ -593,7 +599,7 @@ Genome Genome::getGenomeForGeneIndiciesR(std::vector <unsigned> indicies)
 		genome = getGenomeForGeneIndicies(indicies);
 	}
 
-	return genome;
+	return genome;*/
 }
 
 
