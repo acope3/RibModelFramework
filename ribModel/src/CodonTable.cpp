@@ -58,43 +58,19 @@ CodonTable::CodonTable(unsigned _tableId, bool _splitAA) : tableId(_tableId), sp
     const std::string CodonTable::Thr4_2 = "B";
     const std::string CodonTable::Leu1 = "U";
 
-    const std::string CodonTable::AminoAcidArray[25][23] = {
-        {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y", CodonTable::Ser2, "X", ""}, // 1. The Standard Code
-        {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y", CodonTable::Ser2, "X", ""}, // 2. The Vertebrate Mitochondrial Code
-        {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", CodonTable::Thr4_1, CodonTable::Thr4_2, "V", "W", "Y", CodonTable::Ser2, "X"}, // 3. The Yeast Mitochondrial Code
-        {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y", CodonTable::Ser2, "X", ""}, // 4. The Mold, Protozoan, and Coelenterate Mitochondrial Code and the Mycoplasma/Spiroplasma Code
-        {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y", CodonTable::Ser2, "X", ""}, // 5. The Invertebrate Mitochondrial Code
-        {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y", CodonTable::Ser2, "X", ""}, // 6. The Ciliate, Dasycladacean and Hexamita Nuclear Code
-        {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}, // 7. Invalid Codon Table
-        {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}, // 8. Invalid Codon Table
-        {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y", CodonTable::Ser2, "X", ""}, // 9. The Echinoderm and Flatworm Mitochondrial Code
-        {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y", CodonTable::Ser2, "X", ""}, // 10. The Euplotid Nuclear Code
-        {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y", CodonTable::Ser2, "X", ""}, // 11. The Bacterial, Archaeal and Plant Plastid Code
-        {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y", CodonTable::Ser2, CodonTable::Ser1, "X"}, // 12. The Alternative Yeast Nuclear Code
-        {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y", CodonTable::Ser2, "X", ""}, // 13. The Ascidian Mitochondrial Code
-        {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y", CodonTable::Ser2, "X", ""}, // 14. The Alternative Flatworm Mitochondrial Code
-        {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}, // 15. Invalid Codon Table
-        {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", CodonTable::Leu1, "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y", CodonTable::Ser2, "X"}, // 16. Chlorophycean Mitochondrial Code
-        {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}, // 17. Invalid Codon Table
-        {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}, // 18. Invalid Codon Table
-        {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}, // 19. Invalid Codon Table
-        {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}, // 20. Invalid Codon Table
-        {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y", CodonTable::Ser2, "X", ""}, // 21. Trematode Mitochondrial Code
-        {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", CodonTable::Leu1, "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y", CodonTable::Ser2, "X"}, // 22. Scenedesmus obliquus Mitochondrial Code
-        {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y", CodonTable::Ser2, "X", ""}, // 23. Thraustochytrium Mitochondrial Code
-        {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y", CodonTable::Ser2, "X", ""}, // 24. Pterobranchia Mitochondrial Code
-        {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y", CodonTable::Ser2, "X", ""}  // 25. Candidate Division SR1 and Gracilibacteria Code
-    };
+    const std::string CodonTable::AminoAcidArray[] = {
+        "A", "C", "D", "E", "F", "G", "H", "I", "K", "L", CodonTable::Leu1, "M", "N", "P", "Q", "R",
+        CodonTable::Ser1, CodonTable::Ser2, "S", "T", CodonTable::Thr4_1, CodonTable::Thr4_2, "V", "W", "Y", "X"};
 
-    const std::map<std::string, unsigned> CodonTable::aaToIndex = {{"A", 0}, {"C", 1}, {"D", 2}, {"E", 3}, {"F", 4},
+   /* const std::map<std::string, unsigned> CodonTable::aaToIndex = {{"A", 0}, {"C", 1}, {"D", 2}, {"E", 3}, {"F", 4},
         {"G", 5}, {"H", 6}, {"I", 7}, {"K", 8}, {"L", 9}, {"M", 10}, {"N", 11}, {"P", 12}, {"Q", 13}, {"R", 14}, {"S", 15},
         {"T", 16}, {"V", 17}, {"W", 18}, {"Y", 19}, {CodonTable::Ser2, 20}, {"X", 21}};
+*/
 
-
-/*const std::map<std::string, unsigned> CodonTable::aaToIndex = {{"A", 0}, {CodonTable::Thr4_2, 1}, {"C", 2}, {"D", 3}, {"E", 4}, {"F", 5},
+    const std::map<std::string, unsigned> CodonTable::aaToIndex = {{"A", 0}, {CodonTable::Thr4_2, 1}, {"C", 2}, {"D", 3}, {"E", 4}, {"F", 5},
      {"G", 6}, {"H", 7}, {"I", 8}, {CodonTable::Ser1, 9}, {"K", 10}, {"L",11}, {"M", 12}, {"N", 13}, {CodonTable::Thr4_1, 14}, {"P", 15}, {"Q", 16}, {"R", 17}, {"S", 18},
      {"T", 19}, {CodonTable::Leu1, 20}, {"V", 21}, {"W", 22}, {"Y", 23}, {CodonTable::Ser2, 24}, {"X", 25}};
-*/
+
     const std::map<std::string, unsigned> CodonTable::codonToIndexWithReference = {{"GCA", 0}, {"GCC", 1}, {"GCG", 2},
         {"GCT", 3}, {"TGC", 4}, {"TGT", 5}, {"GAC", 6}, {"GAT", 7}, {"GAA", 8}, {"GAG", 9}, {"TTC", 10}, {"TTT", 11},
         {"GGA", 12}, {"GGC", 13}, {"GGG", 14}, {"GGT", 15}, {"CAC", 16}, {"CAT", 17}, {"ATA", 18}, {"ATC", 19}, {"ATT", 20},
@@ -144,32 +120,32 @@ CodonTable::CodonTable(unsigned _tableId, bool _splitAA) : tableId(_tableId), sp
 
 
     // {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y", "Z", "X"};
-    const unsigned CodonTable::numCodonsPerAAForTable[25][23] = {
-            {4,2,2,2,2,4,2,3,2,6,1,2,4,2,6,4,4,4,1,2,2,3,0}, // 1. The Standard Code
-            {4,2,2,2,2,4,2,2,2,6,2,2,4,2,4,4,4,4,2,2,2,4,0}, // 2. The Vertebrate Mitochondrial Code
-            {4,2,2,2,2,4,2,2,2,2,2,2,4,2,4,4,4,4,4,2,2,2,2}, // 3. The Yeast Mitochondrial Code
-            {4,2,2,2,2,4,2,3,2,6,1,2,4,2,6,4,4,4,2,2,2,2,0}, // 4. The Mold, Protozoan, and Coelenterate Mitochondrial Code and the Mycoplasma/Spiroplasma Code
-            {4,2,2,2,2,4,2,2,2,6,2,2,4,2,4,4,4,4,2,2,4,2,0}, // 5. The Invertebrate Mitochondrial Code
-            {4,2,2,2,2,4,2,3,2,6,1,2,4,4,6,4,4,4,1,2,2,1,0}, // 6. The Ciliate, Dasycladacean and Hexamita Nuclear Code
-            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 7. Invalid Codon Table
-            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 8. Invalid Codon Table
-            {4,2,2,2,2,4,2,3,1,6,1,3,4,2,4,4,4,4,2,2,4,2,0}, // 9. The Echinoderm and Flatworm Mitochondrial Code
-            {4,3,2,2,2,4,2,3,2,6,1,2,4,2,6,4,4,4,1,2,2,2,0}, // 10. The Euplotid Nuclear Code
-            {4,2,2,2,2,4,2,3,2,6,1,2,4,2,6,4,4,4,1,2,2,3,0}, // 11. The Bacterial, Archaeal and Plant Plastid Codee
-            {4,2,2,2,2,4,2,3,2,5,1,2,4,2,6,4,4,4,1,2,2,1,3}, // 12. The Alternative Yeast Nuclear Code
-            {4,2,2,2,2,6,2,2,2,6,2,2,4,2,4,4,4,4,2,2,2,2,0}, // 13. The Ascidian Mitochondrial Code
-            {4,2,2,2,2,4,2,3,1,6,1,3,4,2,4,4,4,4,2,3,4,1,0}, // 14. The Alternative Flatworm Mitochondrial Code
-            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 15. Invalid Codon Table
-            {4,2,2,2,2,4,2,3,2,6,1,1,2,4,2,6,4,4,4,1,2,2,2}, // 16. Chlorophycean Mitochondrial Code
-            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 17. Invalid Codon Table
-            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 18. Invalid Codon Table
-            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 19. Invalid Codon Table
-            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 20. Invalid Codon Table
-            {4,2,2,2,2,4,2,2,1,6,2,3,4,2,4,4,4,4,2,2,4,2,0}, // 21. Trematode Mitochondrial Code
-            {4,2,2,2,2,4,2,3,2,6,1,1,2,4,2,6,3,4,4,1,2,2,3}, // 22. Scenedesmus obliquus Mitochondrial Code
-            {4,2,2,2,2,4,2,3,2,5,1,2,4,2,6,4,4,4,1,2,2,4,0}, // 23. Thraustochytrium Mitochondrial Code
-            {4,2,2,2,2,4,2,3,3,6,1,2,4,2,4,4,4,4,2,2,3,2,0}, // 24. Pterobranchia Mitochondrial Code
-            {4,2,2,2,2,5,2,3,2,6,1,2,4,2,6,4,4,4,1,2,2,2,0}, // 25. Candidate Division SR1 and Gracilibacteria Code
+    const unsigned CodonTable::numCodonsPerAAForTable[25][26] = {
+            {4,2,2,2,2,4,2,3,2,6,0,1,2,4,2,6,0,2,4,4,0,0,4,1,2,3}, // 1. The Standard Code
+            {4,2,2,2,2,4,2,2,2,6,0,2,2,4,2,4,0,2,4,4,0,0,4,2,2,4}, // 2. The Vertebrate Mitochondrial Code
+            {4,2,2,2,2,4,2,2,2,2,0,2,2,4,2,4,0,2,4,0,4,4,4,2,2,2}, // 3. The Yeast Mitochondrial Code
+            {4,2,2,2,2,4,2,3,2,6,0,1,2,4,2,6,0,2,4,4,0,0,4,2,2,2}, // 4. The Mold, Protozoan, and Coelenterate Mitochondrial Code and the Mycoplasma/Spiroplasma Code
+            {4,2,2,2,2,4,2,2,2,6,0,2,2,4,2,4,0,4,4,4,0,0,4,2,2,2}, // 5. The Invertebrate Mitochondrial Code
+            {4,2,2,2,2,4,2,3,2,6,0,1,2,4,4,6,0,2,4,4,0,0,4,1,2,1}, // 6. The Ciliate, Dasycladacean and Hexamita Nuclear Code
+            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 7. Invalid Codon Table
+            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 8. Invalid Codon Table
+            {4,2,2,2,2,4,2,3,1,6,0,1,3,4,2,4,0,4,4,4,0,0,4,2,2,2}, // 9. The Echinoderm and Flatworm Mitochondrial Code
+            {4,3,2,2,2,4,2,3,2,6,0,1,2,4,2,6,0,2,4,4,0,0,4,1,2,2}, // 10. The Euplotid Nuclear Code
+            {4,2,2,2,2,4,2,3,2,6,0,1,2,4,2,6,0,2,4,4,0,0,4,1,2,3}, // 11. The Bacterial, Archaeal and Plant Plastid Codee
+            {4,2,2,2,2,4,2,3,2,5,0,1,2,4,2,6,1,2,4,4,0,0,4,1,2,3}, // 12. The Alternative Yeast Nuclear Code
+            {4,2,2,2,2,6,2,2,2,6,0,2,2,4,2,4,0,2,4,4,0,0,4,2,2,2}, // 13. The Ascidian Mitochondrial Code
+            {4,2,2,2,2,4,2,3,1,6,0,1,3,4,2,4,0,4,4,4,0,0,4,2,3,1}, // 14. The Alternative Flatworm Mitochondrial Code
+            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 15. Invalid Codon Table
+            {4,2,2,2,2,4,2,3,2,6,1,1,2,4,2,6,0,2,4,4,0,0,4,1,2,2}, // 16. Chlorophycean Mitochondrial Code
+            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 17. Invalid Codon Table
+            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 18. Invalid Codon Table
+            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 19. Invalid Codon Table
+            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 20. Invalid Codon Table
+            {4,2,2,2,2,4,2,2,1,6,0,2,3,4,2,4,0,4,4,4,0,0,4,2,2,2}, // 21. Trematode Mitochondrial Code
+            {4,2,2,2,2,4,2,3,2,6,1,1,2,4,2,6,0,2,3,4,0,0,4,1,2,3}, // 22. Scenedesmus obliquus Mitochondrial Code
+            {4,2,2,2,2,4,2,3,2,5,0,1,2,4,2,6,0,2,4,4,0,0,4,1,2,4}, // 23. Thraustochytrium Mitochondrial Code
+            {4,2,2,2,2,4,2,3,3,6,0,1,2,4,2,4,0,3,4,4,0,0,4,2,2,2}, // 24. Pterobranchia Mitochondrial Code
+            {4,2,2,2,2,5,2,3,2,6,0,1,2,4,2,6,0,2,4,4,0,0,4,1,2,2}, // 25. Candidate Division SR1 and Gracilibacteria Code
     };
 
     // --- CODON TABLE SPECIFIC MAPPER FUNCTIONS ------
