@@ -67,9 +67,10 @@ CodonTable::CodonTable(unsigned _tableId, bool _splitAA) : tableId(_tableId), sp
         {"T", 16}, {"V", 17}, {"W", 18}, {"Y", 19}, {CodonTable::Ser2, 20}, {"X", 21}};
 */
 
-    const std::map<std::string, unsigned> CodonTable::aaToIndex = {{"A", 0}, {CodonTable::Thr4_2, 1}, {"C", 2}, {"D", 3}, {"E", 4}, {"F", 5},
-     {"G", 6}, {"H", 7}, {"I", 8}, {CodonTable::Ser1, 9}, {"K", 10}, {"L",11}, {"M", 12}, {"N", 13}, {CodonTable::Thr4_1, 14}, {"P", 15}, {"Q", 16}, {"R", 17}, {"S", 18},
-     {"T", 19}, {CodonTable::Leu1, 20}, {"V", 21}, {"W", 22}, {"Y", 23}, {CodonTable::Ser2, 24}, {"X", 25}};
+    const std::map<std::string, unsigned> CodonTable::aaToIndex = {{"A", 0}, {"C", 1}, {"D", 2}, {"E", 3}, {"F", 4},
+     {"G", 5}, {"H", 6}, {"I", 7}, {"K", 8}, {"L",9}, {CodonTable::Leu1, 10}, {"M", 11}, {"N", 12}, {"P", 13}, {"Q", 14}, {"R", 15},
+                                                                   {CodonTable::Ser1, 16}, {CodonTable::Ser2, 17}, {"S", 18},
+     {"T", 19}, {CodonTable::Thr4_1, 20}, {CodonTable::Thr4_2, 21}, {"V", 22}, {"W", 23}, {"Y", 24}, {"X", 25}};
 
     const std::map<std::string, unsigned> CodonTable::codonToIndexWithReference = {{"GCA", 0}, {"GCC", 1}, {"GCG", 2},
         {"GCT", 3}, {"TGC", 4}, {"TGT", 5}, {"GAC", 6}, {"GAT", 7}, {"GAA", 8}, {"GAG", 9}, {"TTC", 10}, {"TTT", 11},
@@ -150,8 +151,8 @@ CodonTable::CodonTable(unsigned _tableId, bool _splitAA) : tableId(_tableId), sp
 
     // --- CODON TABLE SPECIFIC MAPPER FUNCTIONS ------
 
-    unsigned CodonTable::AAToAAIndex(std::string aa)
-    {
+unsigned CodonTable::AAToAAIndex(std::string aa)
+{
         return CodonTable::aaToIndex.find(aa) -> second;
 }
 
@@ -176,11 +177,363 @@ void CodonTable::setupCodonTable()
 
 	codon_mapping.resize(numAA);
 
-	for(unsigned aaIndex = 0; aaIndex < numAA; aaIndex++)
-	{
-		codon_mapping[aaIndex].resize(getNumCodons(aaIndex));
-		// TODO fill with codon index
-	}
+    unsigned aaIndex = 0;
+    unsigned filled = 0;
+    while (filled != numAA)
+    {
+        unsigned numCodons = getNumCodons(aaIndex);
+        if (numCodons != 0)
+        {
+            if (aaIndex == 0) //A
+            {
+                for (unsigned i = 0; i < 4; i++)
+                {
+                    codon_mapping[filled].push_back(i);
+                }
+            }
+            else if (aaIndex == 1) //C
+            {
+                for (unsigned i = 4; i < 6; i++)
+                {
+                    codon_mapping[filled].push_back(i);
+                }
+                if (tableId == 10)
+                {
+                    codon_mapping[filled].push_back(63);
+                }
+            }
+            else if (aaIndex == 2) //D
+            {
+                for (unsigned i = 6; i < 8; i++)
+                {
+                    codon_mapping[filled].push_back(i);
+                }
+            }
+            else if (aaIndex == 3) //E
+            {
+                for (unsigned i = 8; i < 10; i++)
+                {
+                    codon_mapping[filled].push_back(i);
+                }
+            }
+            else if (aaIndex == 4) //F
+            {
+                for (unsigned i = 10; i < 12; i++)
+                {
+                    codon_mapping[filled].push_back(i);
+                }
+            }
+            else if (aaIndex == 5) //G
+            {
+                for (unsigned i = 12; i < 16; i++)
+                {
+                    codon_mapping[filled].push_back(i);
+                }
+                if (tableId == 13)
+                {
+                    codon_mapping[filled].push_back(38);
+                    codon_mapping[filled].push_back(39);
+                }
+                else if (tableId == 25)
+                {
+                    codon_mapping[filled].push_back(63);
+                }
+            }
+            else if (aaIndex == 6) //H
+            {
+                for (unsigned i = 16; i < 18; i++)
+                {
+                    codon_mapping[filled].push_back(i);
+                }
+            }
+            else if (aaIndex == 7) //I
+            {
+                if (tableId == 1 || tableId == 4 || tableId == 6 || tableId == 9 || tableId == 10 || tableId == 11
+                        || tableId == 12 || tableId == 14 || tableId == 16 || tableId >= 22)
+                {
+                    codon_mapping[filled].push_back(18);
+                }
+                for (unsigned i = 19; i < 21; i++)
+                {
+                    codon_mapping[filled].push_back(i);
+                }
+            }
+            else if (aaIndex == 8) //K
+            {
+                if ((tableId >= 1 && tableId <= 6) || (tableId >= 10 && tableId <= 13) || (tableId == 16) ||
+                        (tableId >= 22))
+                {
+                    for (unsigned i = 21; i < 23; i++)
+                    {
+                        codon_mapping[filled].push_back(i);
+                    }
+                }
+                else if (tableId == 9 || tableId == 14 || tableId == 21)
+                {
+                    codon_mapping[filled].push_back(22);
+                }
+
+                if (tableId == 24)
+                {
+                    codon_mapping[filled].push_back(39);
+                }
+            }
+            else if (aaIndex == 9) //L
+            {
+                if (tableId != 3 && tableId != 23)
+                {
+                    for (unsigned i = 23; i < 29; i++)
+                    {
+                        if (i == 25 && tableId != 12)
+                        {
+                            codon_mapping[filled].push_back(i);
+                        }
+                        else
+                        {
+                            codon_mapping[filled].push_back(i);
+                        }
+                    }
+                    if ((tableId == 16 || tableId == 22) && !splitAA)
+                    {
+                        codon_mapping[filled].push_back(62);
+                    }
+                }
+                else if (tableId == 3)
+                {
+                    for (unsigned i = 27; i < 29; i++)
+                    {
+                        codon_mapping[filled].push_back(i);
+                    }
+                }
+                else if (tableId == 23)
+                {
+                    for (unsigned i = 23; i < 27; i++)
+                    {
+                        codon_mapping[filled].push_back(i);
+                    }
+                    codon_mapping[filled].push_back(28);
+                }
+            }
+            else if (aaIndex == 10) //Leu1
+            {
+                if (splitAA)
+                {
+                    codon_mapping[filled].push_back(62);
+                }
+                else
+                {
+                    filled--;
+                }
+            }
+            else if (aaIndex == 11) //M
+            {
+                codon_mapping[filled].push_back(29);
+                if (tableId == 2 || tableId == 3 || tableId == 5 || tableId == 13 || tableId == 21)
+                {
+                    codon_mapping[filled].push_back(18);
+                }
+            }
+            else if (aaIndex == 12) //N
+            {
+                for (unsigned i = 30; i < 32; i++)
+                {
+                    codon_mapping[filled].push_back(i);
+                }
+                if (tableId == 9 || tableId == 14 || tableId == 21)
+                {
+                    codon_mapping[filled].push_back(21);
+                }
+            }
+            else if (aaIndex == 13) //P
+            {
+                for (unsigned i = 32; i < 36; i++)
+                {
+                    codon_mapping[filled].push_back(i);
+                }
+            }
+            else if (aaIndex == 14) //Q
+            {
+                for (unsigned i = 36; i < 38; i++)
+                {
+                    codon_mapping[filled].push_back(i);
+                }
+                if (tableId == 6)
+                {
+                    codon_mapping[filled].push_back(61);
+                    codon_mapping[filled].push_back(62);
+                }
+            }
+            else if (aaIndex == 15) //R
+            {
+                if (tableId == 1 || tableId == 3 || tableId == 4 || tableId == 6 || (tableId >= 10 && tableId <= 12) || tableId == 16 ||
+                        tableId == 22 || tableId == 23 || tableId == 25)
+                {
+                    codon_mapping[filled].push_back(38);
+                    codon_mapping[filled].push_back(39);
+                }
+
+                if (tableId == 3)
+                {
+                    codon_mapping[filled].push_back(42);
+                    codon_mapping[filled].push_back(43);
+                }
+                else
+                {
+                    for (unsigned i = 40; i < 44; i++)
+                    {
+                        codon_mapping[filled].push_back(i);
+                    }
+                }
+            }
+            else if (aaIndex == 16) //Ser1
+            {
+                if(splitAA)
+                {
+                    codon_mapping[filled].push_back(25); //table 12
+                }
+                else
+                {
+                    filled--;
+                }
+            }
+            else if (aaIndex == 17) //Ser2
+            {
+                if (splitAA)
+                {
+                    codon_mapping[filled].push_back(59);
+                    codon_mapping[filled].push_back(60);
+
+                    if (tableId == 5 || tableId == 9 || tableId == 14 || tableId == 21)
+                    {
+                        codon_mapping[filled].push_back(38);
+                        codon_mapping[filled].push_back(39);
+                    }
+                    else if (tableId == 24)
+                    {
+                        codon_mapping[filled].push_back(38);
+                    }
+                }
+                else
+                {
+                    filled--;
+                }
+            }
+            else if (aaIndex == 18) //Ser (Ser4)
+            {
+                if (tableId != 22)
+                {
+                    for(unsigned i = 44; i < 48; i++)
+                    {
+                        codon_mapping[filled].push_back(i);
+                    }
+                }
+                else
+                {
+                    for(unsigned i = 45; i < 48; i++)
+                    {
+                        codon_mapping[filled].push_back(i);
+                    }
+                }
+
+                if (!splitAA)
+                {
+                    if (tableId == 12)
+                    {
+                        codon_mapping[filled].push_back(25);
+                    }
+
+                    codon_mapping[filled].push_back(59);
+                    codon_mapping[filled].push_back(60);
+
+                    if (tableId == 5 || tableId == 9 || tableId == 14 || tableId == 21)
+                    {
+                        codon_mapping[filled].push_back(38);
+                        codon_mapping[filled].push_back(39);
+                    }
+                    else if (tableId == 24)
+                    {
+                        codon_mapping[filled].push_back(38);
+                    }
+                }
+            }
+            else if (aaIndex == 19) //T
+            {
+                if (tableId != 3)
+                {
+                    for (unsigned i = 48; i < 52; i++)
+                    {
+                        codon_mapping[filled].push_back(i);
+                    }
+                }
+                else if (tableId == 3 && !splitAA)
+                {
+                    for (unsigned i = 48; i < 52; i++)
+                    {
+                        codon_mapping[filled].push_back(i);
+                    }
+
+                    for (unsigned i = 23; i < 27; i++)
+                    {
+                        codon_mapping[filled].push_back(i);
+                    }
+                }
+            }
+            else if (aaIndex == 20) //Thr1
+            {
+                if (splitAA)
+                {
+                    for (unsigned i = 48; i < 52; i++)
+                    {
+                        codon_mapping[filled].push_back(i);
+                    }
+                }
+                else
+                {
+                    filled--;
+                }
+            }
+            else if (aaIndex == 21) //Thr2
+            {
+                if (splitAA)
+                {
+                    for (unsigned i = 23; i < 27; i++)
+                    {
+                        codon_mapping[filled].push_back(i);
+                    }
+                }
+                else
+                {
+                    filled--;
+                }
+            }
+            else if (aaIndex == 22) //V
+            {
+                for (unsigned i = 52; i < 56; i++)
+                {
+                    codon_mapping[filled].push_back(i);
+                }
+            }
+            else if (aaIndex == 23) //W
+            {
+                codon_mapping[filled].push_back(56);
+                if ((tableId >= 2 && tableId <= 5) || (tableId == 9) || (tableId == 13) || (tableId == 14) || (tableId == 21))
+                {
+                    codon_mapping[filled].push_back(63);
+                }
+            }
+            else if (aaIndex == 24) //Y
+            {
+                for (unsigned i = 56; i < 58; i++)
+                {
+                    codon_mapping[filled].push_back(i);
+                }
+                if (tableId == 14) codon_mapping[filled].push_back(61);
+            }
+            //ignoring stop amino acid for now
+            filled++;
+        }
+        aaIndex++;
+    }
 }
 
 
