@@ -374,11 +374,11 @@ void ROCModel::updateGibbsSampledHyperParameters(Genome &genome)
 			double rate = 0.0;
 			unsigned mixtureAssignment;
 			double aphi = getAphi(i);
-			for (unsigned i = 0; i < genome.getGenomeSize(); i++) {
+			for (unsigned j = 0; j < genome.getGenomeSize(); j++) {
 				mixtureAssignment = getMixtureAssignment(i);
-				rate += genome.getGene(i).observedPhiValues.at(0) - aphi - getSynthesisRate(i, mixtureAssignment, false);
+				double sum = std::log(genome.getGene(i).observedPhiValues.at(i)) - aphi - std::log(getSynthesisRate(j, mixtureAssignment, false));
+				rate += sum * sum;
 			}
-			rate *= rate;
 			rate /= 2;
 
 			parameter->setSepsilon(i, parameter->randGamma(shape, rate));

@@ -36,7 +36,7 @@ model <- initializeModelObject(parameter, "ROC", with.phi = with.phi)
 setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth*20, TRUE)
 #run mcmc on genome with parameter using model
 system.time(
-  runMCMC(mcmc, genome, model, 4)
+  runMCMC(mcmc, genome, model, 8)
 )
 
 #plots log likelihood trace, possibly other mcmc diagnostics in the future
@@ -50,7 +50,8 @@ trace <- parameter$getTraceObject()
 plot(trace, what = "MixtureProbability")
 plot(trace, what = "Sphi")
 plot(trace, what = "Mphi")
-for (i in 1:length(genome$getGeneByIndex(1)$getObservedPhiValues()))
+first.gene <- genome$getGeneByIndex(1, FALSE)
+for (i in 1:length(first.gene$getObservedPhiValues()))
 {
   plot(trace, what = "Aphi", which = i)
   plot(trace, what = "Sepsilon", which = i)
