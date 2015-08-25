@@ -37,8 +37,7 @@ class Trace {
 		void initMixtureProbabilitesTrace(unsigned samples, unsigned numMixtures);
 
 		//Getter functions
-		std::vector<double> getSPhiTrace()
-		{	return sPhiTrace;}
+		std::vector<double> getSphiTrace() { return sPhiTrace; }
 		std::vector<double> getExpectedPhiTrace();
 		std::vector<double> getSphiAcceptanceRatioTrace()
 		{	return sphiAcceptanceRatioTrace;}

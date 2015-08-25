@@ -411,8 +411,8 @@ void ROCModel::updateHyperParameter(unsigned hp)
 	case 1:
 		for (unsigned i = 0; i < parameter->getNumPhiGroupings(); i++) {
 			updateAphi(i);
-			break;
 		}
+		break;
 	}
 }
 

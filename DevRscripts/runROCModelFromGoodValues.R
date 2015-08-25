@@ -1,7 +1,7 @@
 library(ribModel)
 rm(list=ls())
   
-with.phi <- FALSE 
+with.phi <- TRUE 
   
 if (with.phi) {
   genome <- initializeGenomeObject(file = "../ribModel/data/simulatedAllUniqueR.fasta", expression.file = "../ribModel/data/simulatedAllUniqueR_phi.csv")
@@ -25,7 +25,7 @@ parameter$initializeSynthesisRateByRandom(phivals)
 parameter$initMutationCategories(c("../ribModel/data/simulated_mutation0.csv", "../ribModel/data/simulated_mutation1.csv") , 2)
 parameter$initSelectionCategories(c("../ribModel/data/simulated_selection0.csv", "../ribModel/data/simulated_selection1.csv") , 2)
 # initialize MCMC object
-samples <- 1000
+samples <- 100
 thining <- 10
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, 
@@ -48,7 +48,7 @@ acf(loglik.trace)
 # plots different aspects of trace
 trace <- parameter$getTraceObject()
 plot(trace, what = "MixtureProbability")
-plot(trace, what = "Shi")
+plot(trace, what = "Sphi")
 plot(trace, what = "Mphi")
 for (i in 1:length(genome$getGeneByIndex(1)$getObservedPhiValues()))
 {
