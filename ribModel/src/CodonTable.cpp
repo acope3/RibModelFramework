@@ -15,18 +15,10 @@ CodonTable::CodonTable(unsigned _tableId, bool _splitAA) : tableId(_tableId), sp
 	if(tableId == 7 || tableId == 8 || tableId == 15 || tableId == 17 || tableId == 18 || tableId == 19 || tableId == 20)
 	{
 		tableId = 1; //standard codon table by NCBI
-            std::cerr << "Invalid codon table: " << tableId << " using default codon table (NCBI codon table 1)\n";
-        }
-
-        // TODO CAREFULL! tableId is 1 indexed, but we need it 0 indexed! ALSO NOT ALL IDs ARE USED, SEE COMMENT FOR CodonTable::codonTableDefinition[]
-        //ctor
-        switch (tableId)
-        {
-        case 1:
-            break;
-
-        }
+        std::cerr << "Invalid codon table: " << tableId << " using default codon table (NCBI codon table 1)\n";
     }
+    tableId--; //Make it 0 indexed
+}
 
 
     CodonTable::~CodonTable()
@@ -62,10 +54,6 @@ CodonTable::CodonTable(unsigned _tableId, bool _splitAA) : tableId(_tableId), sp
         "A", "C", "D", "E", "F", "G", "H", "I", "K", "L", CodonTable::Leu1, "M", "N", "P", "Q", "R",
         CodonTable::Ser1, CodonTable::Ser2, "S", "T", CodonTable::Thr4_1, CodonTable::Thr4_2, "V", "W", "Y", "X"};
 
-   /* const std::map<std::string, unsigned> CodonTable::aaToIndex = {{"A", 0}, {"C", 1}, {"D", 2}, {"E", 3}, {"F", 4},
-        {"G", 5}, {"H", 6}, {"I", 7}, {"K", 8}, {"L", 9}, {"M", 10}, {"N", 11}, {"P", 12}, {"Q", 13}, {"R", 14}, {"S", 15},
-        {"T", 16}, {"V", 17}, {"W", 18}, {"Y", 19}, {CodonTable::Ser2, 20}, {"X", 21}};
-*/
 
     const std::map<std::string, unsigned> CodonTable::aaToIndex = {{"A", 0}, {"C", 1}, {"D", 2}, {"E", 3}, {"F", 4},
      {"G", 5}, {"H", 6}, {"I", 7}, {"K", 8}, {"L",9}, {CodonTable::Leu1, 10}, {"M", 11}, {"N", 12}, {"P", 13}, {"Q", 14}, {"R", 15},
@@ -158,7 +146,65 @@ unsigned CodonTable::AAToAAIndex(std::string aa)
 
 unsigned CodonTable::getNumCodons(std::string aa)
 {
-	return getNumCodons(AAToAAIndex(aa));
+    unsigned numCodons = 0;
+    if (!splitAA && (aa == CodonTable::Leu1 || aa == CodonTable::Ser1 || aa == CodonTable::Ser2 || aa == CodonTable::Thr4_1 ||
+                    aa == CodonTable::Thr4_2 || aa == "L" || aa == "S" || aa == "T"))
+    {
+        std::cerr <<"WARNING! Amino acids are not currently split, returning the number of codons per the amino acid ";
+        std::cerr <<"group containing " << aa <<"\n";
+
+        if (aa == CodonTable::Leu1)
+        {
+            numCodons += getNumCodons(AAToAAIndex(aa));
+            numCodons += getNumCodons(AAToAAIndex("L"));
+        }
+        else if (aa == "L")
+        {
+            numCodons += getNumCodons(AAToAAIndex(aa));
+            numCodons += getNumCodons(AAToAAIndex(CodonTable::Leu1));
+        }
+        else if (aa == CodonTable::Ser1)
+        {
+            numCodons += getNumCodons(AAToAAIndex(aa));
+            numCodons += getNumCodons(AAToAAIndex(CodonTable::Ser2));
+            numCodons += getNumCodons(AAToAAIndex("S"));
+        }
+        else if (aa == CodonTable::Ser2)
+        {
+            numCodons += getNumCodons(AAToAAIndex(aa));
+            numCodons += getNumCodons(AAToAAIndex(CodonTable::Ser1));
+            numCodons += getNumCodons(AAToAAIndex("S"));
+        }
+        else if (aa == "S")
+        {
+            numCodons += getNumCodons(AAToAAIndex(aa));
+            numCodons += getNumCodons(AAToAAIndex(CodonTable::Ser1));
+            numCodons += getNumCodons(AAToAAIndex(CodonTable::Ser2));
+        }
+        else if (aa == CodonTable::Thr4_1)
+        {
+            numCodons += getNumCodons(AAToAAIndex(aa));
+            numCodons += getNumCodons(AAToAAIndex(CodonTable::Thr4_2));
+            numCodons += getNumCodons(AAToAAIndex("T"));
+        }
+        else if (aa == CodonTable::Thr4_2)
+        {
+            numCodons += getNumCodons(AAToAAIndex(aa));
+            numCodons += getNumCodons(AAToAAIndex(CodonTable::Thr4_1));
+            numCodons += getNumCodons(AAToAAIndex("T"));
+        }
+        else //T
+        {
+            numCodons += getNumCodons(AAToAAIndex(aa));
+            numCodons += getNumCodons(AAToAAIndex(CodonTable::Thr4_1));
+            numCodons += getNumCodons(AAToAAIndex(CodonTable::Thr4_2));
+        }
+    }
+    else
+    {
+       numCodons = getNumCodons(AAToAAIndex(aa));
+    }
+	return numCodons;
 }
 
 unsigned CodonTable::getNumCodons(unsigned aa)
@@ -169,10 +215,10 @@ unsigned CodonTable::getNumCodons(unsigned aa)
 void CodonTable::setupCodonTable()
 {
 	unsigned numAA = 21;
-	if(tableId >= 1 && tableId <= 6  && !splitAA) numAA = 20; //If not splitting AAs, tables 1-6 all have 20 AA, excluding stop codes
-    else if (tableId >= 9 && tableId <= 14  && !splitAA) numAA = 20;
-    else if (tableId == 16 && !splitAA) numAA = 20;
-    else if (tableId >= 21 && tableId <= 25 && !splitAA) numAA = 20;
+	if(tableId >= 0 && tableId <= 5  && !splitAA) numAA = 20; //If not splitting AAs, tables 1-6 all have 20 AA, excluding stop codes
+    else if (tableId >= 8 && tableId <= 13  && !splitAA) numAA = 20;
+    else if (tableId == 15 && !splitAA) numAA = 20;
+    else if (tableId >= 20 && tableId <= 24 && !splitAA) numAA = 20;
 
 
 	codon_mapping.resize(numAA);
@@ -229,12 +275,12 @@ void CodonTable::setupCodonTable()
                 {
                     codon_mapping[filled].push_back(i);
                 }
-                if (tableId == 13)
+                if (tableId == 12)
                 {
                     codon_mapping[filled].push_back(38);
                     codon_mapping[filled].push_back(39);
                 }
-                else if (tableId == 25)
+                else if (tableId == 24)
                 {
                     codon_mapping[filled].push_back(63);
                 }
@@ -248,8 +294,8 @@ void CodonTable::setupCodonTable()
             }
             else if (aaIndex == 7) //I
             {
-                if (tableId == 1 || tableId == 4 || tableId == 6 || tableId == 9 || tableId == 10 || tableId == 11
-                        || tableId == 12 || tableId == 14 || tableId == 16 || tableId >= 22)
+                if (tableId == 0 || tableId == 3 || tableId == 5 || tableId == 8 || tableId == 9 || tableId == 10
+                        || tableId == 11 || tableId == 13 || tableId == 15 || tableId >= 21)
                 {
                     codon_mapping[filled].push_back(18);
                 }
@@ -260,31 +306,31 @@ void CodonTable::setupCodonTable()
             }
             else if (aaIndex == 8) //K
             {
-                if ((tableId >= 1 && tableId <= 6) || (tableId >= 10 && tableId <= 13) || (tableId == 16) ||
-                        (tableId >= 22))
+                if ((tableId >= 0 && tableId <= 5) || (tableId >= 9 && tableId <= 12) || (tableId == 15) ||
+                        (tableId >= 21))
                 {
                     for (unsigned i = 21; i < 23; i++)
                     {
                         codon_mapping[filled].push_back(i);
                     }
                 }
-                else if (tableId == 9 || tableId == 14 || tableId == 21)
+                else if (tableId == 8 || tableId == 13 || tableId == 20)
                 {
                     codon_mapping[filled].push_back(22);
                 }
 
-                if (tableId == 24)
+                if (tableId == 23)
                 {
                     codon_mapping[filled].push_back(39);
                 }
             }
             else if (aaIndex == 9) //L
             {
-                if (tableId != 3 && tableId != 23)
+                if (tableId != 2 && tableId != 22)
                 {
                     for (unsigned i = 23; i < 29; i++)
                     {
-                        if (i == 25 && tableId != 12)
+                        if (i == 25 && tableId != 11)
                         {
                             codon_mapping[filled].push_back(i);
                         }
@@ -293,19 +339,19 @@ void CodonTable::setupCodonTable()
                             codon_mapping[filled].push_back(i);
                         }
                     }
-                    if ((tableId == 16 || tableId == 22) && !splitAA)
+                    if ((tableId == 15 || tableId == 21) && !splitAA)
                     {
                         codon_mapping[filled].push_back(62);
                     }
                 }
-                else if (tableId == 3)
+                else if (tableId == 2)
                 {
                     for (unsigned i = 27; i < 29; i++)
                     {
                         codon_mapping[filled].push_back(i);
                     }
                 }
-                else if (tableId == 23)
+                else if (tableId == 22)
                 {
                     for (unsigned i = 23; i < 27; i++)
                     {
@@ -328,7 +374,7 @@ void CodonTable::setupCodonTable()
             else if (aaIndex == 11) //M
             {
                 codon_mapping[filled].push_back(29);
-                if (tableId == 2 || tableId == 3 || tableId == 5 || tableId == 13 || tableId == 21)
+                if (tableId == 1 || tableId == 2 || tableId == 4 || tableId == 12 || tableId == 20)
                 {
                     codon_mapping[filled].push_back(18);
                 }
@@ -339,7 +385,7 @@ void CodonTable::setupCodonTable()
                 {
                     codon_mapping[filled].push_back(i);
                 }
-                if (tableId == 9 || tableId == 14 || tableId == 21)
+                if (tableId == 8 || tableId == 13 || tableId == 20)
                 {
                     codon_mapping[filled].push_back(21);
                 }
@@ -357,7 +403,7 @@ void CodonTable::setupCodonTable()
                 {
                     codon_mapping[filled].push_back(i);
                 }
-                if (tableId == 6)
+                if (tableId == 5)
                 {
                     codon_mapping[filled].push_back(61);
                     codon_mapping[filled].push_back(62);
@@ -365,14 +411,14 @@ void CodonTable::setupCodonTable()
             }
             else if (aaIndex == 15) //R
             {
-                if (tableId == 1 || tableId == 3 || tableId == 4 || tableId == 6 || (tableId >= 10 && tableId <= 12) || tableId == 16 ||
-                        tableId == 22 || tableId == 23 || tableId == 25)
+                if (tableId == 0 || tableId == 2 || tableId == 3 || tableId == 5 || (tableId >= 9 && tableId <= 11) || tableId == 15 ||
+                        tableId == 21 || tableId == 22 || tableId == 24)
                 {
                     codon_mapping[filled].push_back(38);
                     codon_mapping[filled].push_back(39);
                 }
 
-                if (tableId == 3)
+                if (tableId == 2)
                 {
                     codon_mapping[filled].push_back(42);
                     codon_mapping[filled].push_back(43);
@@ -403,12 +449,12 @@ void CodonTable::setupCodonTable()
                     codon_mapping[filled].push_back(59);
                     codon_mapping[filled].push_back(60);
 
-                    if (tableId == 5 || tableId == 9 || tableId == 14 || tableId == 21)
+                    if (tableId == 4 || tableId == 8 || tableId == 13 || tableId == 20)
                     {
                         codon_mapping[filled].push_back(38);
                         codon_mapping[filled].push_back(39);
                     }
-                    else if (tableId == 24)
+                    else if (tableId == 23)
                     {
                         codon_mapping[filled].push_back(38);
                     }
@@ -420,7 +466,7 @@ void CodonTable::setupCodonTable()
             }
             else if (aaIndex == 18) //Ser (Ser4)
             {
-                if (tableId != 22)
+                if (tableId != 21)
                 {
                     for(unsigned i = 44; i < 48; i++)
                     {
@@ -437,7 +483,7 @@ void CodonTable::setupCodonTable()
 
                 if (!splitAA)
                 {
-                    if (tableId == 12)
+                    if (tableId == 11)
                     {
                         codon_mapping[filled].push_back(25);
                     }
@@ -445,12 +491,12 @@ void CodonTable::setupCodonTable()
                     codon_mapping[filled].push_back(59);
                     codon_mapping[filled].push_back(60);
 
-                    if (tableId == 5 || tableId == 9 || tableId == 14 || tableId == 21)
+                    if (tableId == 4 || tableId == 8 || tableId == 13 || tableId == 20)
                     {
                         codon_mapping[filled].push_back(38);
                         codon_mapping[filled].push_back(39);
                     }
-                    else if (tableId == 24)
+                    else if (tableId == 23)
                     {
                         codon_mapping[filled].push_back(38);
                     }
@@ -458,14 +504,14 @@ void CodonTable::setupCodonTable()
             }
             else if (aaIndex == 19) //T
             {
-                if (tableId != 3)
+                if (tableId != 2)
                 {
                     for (unsigned i = 48; i < 52; i++)
                     {
                         codon_mapping[filled].push_back(i);
                     }
                 }
-                else if (tableId == 3 && !splitAA)
+                else if (tableId == 2 && !splitAA)
                 {
                     for (unsigned i = 48; i < 52; i++)
                     {
@@ -516,7 +562,7 @@ void CodonTable::setupCodonTable()
             else if (aaIndex == 23) //W
             {
                 codon_mapping[filled].push_back(56);
-                if ((tableId >= 2 && tableId <= 5) || (tableId == 9) || (tableId == 13) || (tableId == 14) || (tableId == 21))
+                if ((tableId >= 1 && tableId <= 4) || (tableId == 8) || (tableId == 12) || (tableId == 13) || (tableId == 20))
                 {
                     codon_mapping[filled].push_back(63);
                 }
@@ -527,7 +573,7 @@ void CodonTable::setupCodonTable()
                 {
                     codon_mapping[filled].push_back(i);
                 }
-                if (tableId == 14) codon_mapping[filled].push_back(61);
+                if (tableId == 13) codon_mapping[filled].push_back(61);
             }
             //ignoring stop amino acid for now
             filled++;
