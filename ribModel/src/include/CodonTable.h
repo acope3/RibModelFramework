@@ -25,8 +25,8 @@ class CodonTable
         static const std::string Thr4_2; // necessary for codon table 3
         static const std::string Leu1; // necessary for codon table 16, 22
 
-		static const std::string AminoAcidArray[25][23]; // dim: table, AA
-		static const unsigned numCodonsPerAAForTable[25][23]; // dim: table, AA
+		static const std::string AminoAcidArray[]; // dim: table, AA
+		static const unsigned numCodonsPerAAForTable[25][26]; // dim: table, AA
 		static const std::string codonTableDefinition[25];
 		static const std::string codonArray[];
 		static const std::string codonArrayParameter[];
