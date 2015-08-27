@@ -1,7 +1,8 @@
     
 
 
-plot.Rcpp_ROCModel <- function(model, genome, parameter, samples = 100, mixture = 1, estim.Expression = TRUE, ...)
+plot.Rcpp_ROCModel <- function(model, genome, parameter, samples = 100, mixture = 1, 
+                               estim.Expression = TRUE, simulated = FALSE, ...)
 {
   opar <- par(no.readonly = T) 
   
@@ -40,7 +41,7 @@ plot.Rcpp_ROCModel <- function(model, genome, parameter, samples = 100, mixture 
     
   }
   expressionValues <- log10(expressionValues)
-  genome <- genome$getGenomeForGeneIndicies(genes.in.mixture)
+  genome <- genome$getGenomeForGeneIndicies(genes.in.mixture, simulated)
   
   names.aa <- aminoAcids()
   for(aa in names.aa)
