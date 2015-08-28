@@ -86,7 +86,7 @@ void RFPModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 	double logLikelihood = 0.0;
 	double logLikelihood_proposed = 0.0;
 	Gene *gene;
-	unsigned index = SequenceSummary::codonToIndex(grouping);
+	unsigned index = parameter -> codonTable -> codonToIndex(grouping);
 
 
 #ifndef __APPLE__

@@ -64,7 +64,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 
 double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grouping, double *mutation, double *selection, double phiValue)
 {
-	int numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
+	int numCodons = parameter -> codonTable -> getNumCodons(grouping);
 	double logLikelihood = 0.0;
 
 	std::vector <unsigned> positions;

@@ -6,6 +6,7 @@
 #include <map>
 
 #include "Gene.h"
+#include "CodonTable.h"
 
 
 class Model;
@@ -29,7 +30,7 @@ class Genome
 		//File I/O functions:
 		void readFasta(std::string filename, bool Append = false);
 		void writeFasta(std::string filename, bool simulated = false);
-		void readRFPFile(std::string filename);
+		void readRFPFile(std::string filename, CodonTable *codonTable);
 		void writeRFPFile(std::string filename, bool simulated = false);
 		void readObservedPhiValues(std::string filename, bool byId = true);
 
@@ -47,7 +48,7 @@ class Genome
 		unsigned getGenomeSize();
 		void clear();
 		Genome getGenomeForGeneIndicies(std::vector <unsigned> indicies, bool simulated = false); //NOTE: If simulated is true, it will return a genome with the simulated genes, but the returned genome's genes vector will contain the simulated genes.
-		std::vector<unsigned> getCodonCountsPerGene(std::string codon);
+		std::vector<unsigned> getCodonCountsPerGene(std::string codon, CodonTable *codonTable);
 
 
 

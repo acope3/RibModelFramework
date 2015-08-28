@@ -20,6 +20,7 @@ class CodonTable
         std::map <std::string, std::string> codonToAAMap;
         std::map <std::string, unsigned> AAMap;
         std::map <std::string, unsigned> AAToNumCodonsMap;
+        std::map <std::string, unsigned> forParamVectorMap;
 
 
 
@@ -56,7 +57,7 @@ class CodonTable
         std::vector<std::string> AAToCodon(std::string aa, bool forParamVector = false);
         std::string indexToCodon(unsigned index);
         std::string codonToAA(std::string& codon);
-        unsigned codonToIndex(std::string& codon);
+        unsigned codonToIndex(std::string& codon, bool forParamVector = false);
         unsigned codonToAAIndex(std::string& codon);
         std::string indexToAA(unsigned aaIndex);
         unsigned getNumCodons(std::string aa, bool forParamVector = false);

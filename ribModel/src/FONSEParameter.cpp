@@ -149,7 +149,7 @@ void FONSEParameter::initFONSEParameterSet()
 	for (unsigned i = 0; i < maxGrouping; i++)
 	{
 		std::string aa = SequenceSummary::AminoAcidArray[i];
-		unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa, true);
+		unsigned numCodons = codonTable -> GetNumCodonsForAA(aa, true);
 		CovarianceMatrix m((numMutationCategories + numSelectionCategories) * numCodons);
 		m.choleskiDecomposition();
 		covarianceMatrix.push_back(m);
@@ -173,12 +173,12 @@ std::vector <std::vector <double> > FONSEParameter::calculateSelectionCoefficien
 			double minValue = 0.0;
 			for (unsigned k = 0; k < 8; k++)
 			{
-				if (codonRange[k] == 100) break;
-				std::string codon = SequenceSummary::codonArrayParameter[codonRange[k]];
+				if (aaRange[k] == 100) break;
+				std::string codon = SequenceSummary::codonArrayParameter[aaRange[k]];
 				tmp.push_back(getSelectionPosteriorMean(sample, mixture, codon));
-				if (tmp[codonRange[k]] < minValue)
+				if (tmp[aaRange[k]] < minValue)
 				{
-					minValue = tmp[codonRange[k]];
+					minValue = tmp[aaRange[k]];
 				}
 			}
 			tmp.push_back(0.0);

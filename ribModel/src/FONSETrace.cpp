@@ -55,16 +55,16 @@ void FONSETrace::initSelectionParameterTrace(unsigned samples, unsigned numSelec
 	}
 }
 
-std::vector <double> FONSETrace::getMutationParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string &codon)
+std::vector <double> FONSETrace::getMutationParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string &codon, CodonTable *codonTable)
 {
-	unsigned codonIndex = SequenceSummary::codonToIndex(codon, true);
+	unsigned codonIndex = codonTable -> codonToIndex(codon, true);
 	unsigned category = getMutationCategory(mixtureElement);
 	return mutationParameterTrace[category][codonIndex];
 }
 
-std::vector <double> FONSETrace::getSelectionParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string &codon)
+std::vector <double> FONSETrace::getSelectionParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string &codon, CodonTable *codonTable)
 {
-	unsigned codonIndex = SequenceSummary::codonToIndex(codon, true);
+	unsigned codonIndex = codonTable -> codonToIndex(codon, true);
 	unsigned category = getSelectionCategory(mixtureElement);
 	return selectionParameterTrace[category][codonIndex];
 }
@@ -96,24 +96,24 @@ void FONSETrace::updateCodonSpecificParameterTrace(unsigned sample, std::string 
  *   R WRAPPERS    *
  *******************/
 
-std::vector <double> FONSETrace::getMutationParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string &codon)
+std::vector <double> FONSETrace::getMutationParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string &codon, CodonTable *codonTable)
 {
 	std::vector<double> RV;
 	bool checkMixtureElement = checkIndex(mixtureElement, 1, getNumberOfMixtures());
 	if (checkMixtureElement)
 	{
-		RV = getMutationParameterTraceByMixtureElementForCodon(mixtureElement - 1, codon);
+		RV = getMutationParameterTraceByMixtureElementForCodon(mixtureElement - 1, codon, codonTable);
 	}
 	return RV;
 }
 
-std::vector <double> FONSETrace::getSelectionParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon)
+std::vector <double> FONSETrace::getSelectionParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon, CodonTable *codonTable)
 {
 	std::vector<double> RV;
 	bool checkMixtureElement = checkIndex(mixtureElement, 1, getNumberOfMixtures());
 	if (checkMixtureElement)
 	{
-		RV = getMutationParameterTraceByMixtureElementForCodon(mixtureElement - 1, codon);
+		RV = getMutationParameterTraceByMixtureElementForCodon(mixtureElement - 1, codon, codonTable);
 	}
 	return RV;
 }

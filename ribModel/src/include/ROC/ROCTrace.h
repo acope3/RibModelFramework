@@ -28,8 +28,8 @@ class ROCTrace : public Trace
 		void initSepsilonTrace(unsigned samples, unsigned numPhiGroupings);
 
 		//Getter functions
-		std::vector<double> getMutationParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon);
-		std::vector<double> getSelectionParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon);
+		std::vector<double> getMutationParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon, CodonTable *codonTable);
+		std::vector<double> getSelectionParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon, CodonTable *codonTable);
 		std::vector<double> getAphiTrace(unsigned index) { return AphiTrace[index]; }
 		std::vector<double> getAphiAcceptanceRatioTrace(unsigned index) { return AphiAcceptanceRatioTrace[index]; }
 		std::vector<double> getSepsilonTrace(unsigned index) { return SepsilonTrace[index]; }
@@ -45,8 +45,8 @@ class ROCTrace : public Trace
 		//R WRAPPER FUNCTIONS
 
 		//Getter functions
-		std::vector<double> getMutationParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon); //R WRAPPER 
-		std::vector<double> getSelectionParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon); //R WRAPPER
+		std::vector<double> getMutationParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon, CodonTable *codonTable); //R WRAPPER
+		std::vector<double> getSelectionParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon, CodonTable *codonTable); //R WRAPPER
 		std::vector<double> getAphiTraceR(unsigned index);
 		std::vector<double> getSepsilonTraceR(unsigned index);
 };

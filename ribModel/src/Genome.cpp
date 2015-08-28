@@ -163,7 +163,7 @@ void Genome::writeFasta (std::string filename, bool simulated)
 }
 
 
-void Genome::readRFPFile(std::string filename)
+void Genome::readRFPFile(std::string filename, CodonTable *codonTable)
 {
 	std::ifstream Fin;
 	Fin.open(filename.c_str());
@@ -211,7 +211,7 @@ void Genome::readRFPFile(std::string filename)
 			seq += codon;
 
 		prevID = ID;
-		unsigned index = SequenceSummary::codonToIndex(codon);
+		unsigned index = codonTable -> codonToIndex(codon);
 		tmpGene.geneData.setRFPObserved(index, tmpRFP);
 	}
 
@@ -532,10 +532,10 @@ Genome Genome::getGenomeForGeneIndicies(std::vector <unsigned> indicies, bool si
 }
 
 
-std::vector<unsigned> Genome::getCodonCountsPerGene(std::string codon)
+std::vector<unsigned> Genome::getCodonCountsPerGene(std::string codon, CodonTable *codonTable)
 {
 	std::vector<unsigned> codonCounts(genes.size());
-	unsigned codonIndex = SequenceSummary::codonToIndex(codon);
+	unsigned codonIndex = codonTable -> codonToIndex(codon);
 	for(unsigned i = 0u; i < genes.size(); i++)
 	{
 		Gene gene = genes[i];

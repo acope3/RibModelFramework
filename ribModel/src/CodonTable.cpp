@@ -225,9 +225,9 @@ std::string CodonTable::codonToAA(std::string& codon)
 }
 
 
-unsigned CodonTable::codonToIndex(std::string& codon)
+unsigned CodonTable::codonToIndex(std::string& codon, bool forParamVector)
 {
-    return codonToIndexWithReference.find(codon) -> second;
+    return forParamVector ? forParamVectorMap.find(codon) -> second : codonToIndexWithReference.find(codon) -> second;
 }
 
 unsigned CodonTable::codonToAAIndex(std::string& codon)
@@ -243,7 +243,7 @@ std::string CodonTable::indexToAA(unsigned aaIndex)
 
 unsigned CodonTable::getNumCodons(std::string aa, bool forParamVector)
 {
-    unsigned numCodons = AAToNumCodonsMap.find(aa);
+    unsigned numCodons = AAToNumCodonsMap.find(aa) -> second;
     return forParamVector ? numCodons - 1 : numCodons;
 }
 
@@ -679,12 +679,17 @@ void CodonTable::setupCodonTable()
     }
 
     //fill without refernce mapping
+    unsigned val = 0;
     codon_mapping_without_reference.resize(numAA);
     for (unsigned i = 0; i < numAA; i++)
     {
         for (unsigned j = 0; j < codon_mapping[i].size() - 1; j++)
         {
             codon_mapping_without_reference[i].push_back(codon_mapping[i][j]);
+            unsigned codonIndex = codon_mapping[i][j];
+            std::string codon = codonArray[codonIndex];
+            forParamVectorMap.insert(std::make_pair(codon, val));
+            val++;
         }
     }
 
