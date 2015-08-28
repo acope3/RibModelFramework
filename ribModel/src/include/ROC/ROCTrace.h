@@ -38,7 +38,7 @@ class ROCTrace : public Trace
 		unsigned getMutationCategory(unsigned mixtureElement) {return categories->at(mixtureElement).delM;}
 		unsigned getSelectionCategory(unsigned mixtureElement) {return categories->at(mixtureElement).delEta;}
 		//Update functions	
-		void updateCodonSpecificParameterTrace(unsigned sample, std::string aa, std::vector<std::vector<double>> &curMutParam, std::vector<std::vector<double>> &curSelectParam);
+		void updateCodonSpecificParameterTrace(unsigned sample, std::string aa, std::vector<std::vector<double>> &curMutParam, std::vector<std::vector<double>> &curSelectParam, CodonTable *codonTable);
 		void updateAphiTrace(unsigned index, unsigned sample, double value) { AphiTrace[index][sample] = value; }
 		void updateAphiAcceptanceRatioTrace(unsigned index, double value) { AphiAcceptanceRatioTrace[index].push_back(value); }
 		void updateSepsilonTrace(unsigned index, unsigned sample, double value) { SepsilonTrace[index][sample] = value; }

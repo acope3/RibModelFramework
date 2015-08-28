@@ -18,7 +18,7 @@ void testLogNormDensity()
 	std::cout << "------------------ LOG NORM DENSITY ------------------" << std::endl;
 }
 
-void testSCUO(Genome& genome)
+/*void testSCUO(Genome& genome)
 {
 	std::cout << "------------------ SCUO VALUES ------------------" << std::endl;
 	for (unsigned n = 0u; n < genome.getGenomeSize(); n++)
@@ -27,7 +27,7 @@ void testSCUO(Genome& genome)
 	}
 	std::cout << "------------------ SCUO VALUES ------------------" << std::endl;
 }
-
+*/
 void testCovarianceMatrix()
 {
 	std::cout << "------------------ TEST COVARIANCE ROUTINES ------------------" << std::endl;
@@ -210,7 +210,7 @@ void testReadRFPFile()
 		for (unsigned j = 0; j < 64; j++)
 		{
 			//std::cout << gene.getId() << " " << SS.getRFPObserved(j) << " " << SS.getNumCodonsInMRNA(j) << " " << SS.IndexToCodon(j) << "\n";
-			std::cout << gene.getId() << " " << SS.getRFPObserved(j) << " " << SS.indexToCodon(j) << "\n";
+//			std::cout << gene.getId() << " " << SS.getRFPObserved(j) << " " << SS.indexToCodon(j) << "\n";
 		}
 	}
 	std::cout << "------------------- TEST READRFPFILE ----------------------" << "\n";
@@ -622,7 +622,7 @@ int main()
 			for (unsigned n = 0; n < model.getGroupListSize(); n++)
 			{
 				std::string aa = model.getGrouping(n);
-				index = SequenceSummary::AAToAAIndex(aa);
+				index = parameter.codonTable -> AAToAAIndex(aa);
 				std::cout << SequenceSummary::AminoAcidArray[index] << ": " << parameter.getCurrentCodonSpecificProposalWidth(index) << "\n";
 			}
 		}
@@ -742,7 +742,7 @@ int main()
 			for (unsigned n = 0; n < model.getGroupListSize(); n++)
 			{
 				std::string aa = model.getGrouping(n);
-				index = SequenceSummary::AAToAAIndex(aa);
+				index = parameter.codonTable -> AAToAAIndex(aa);
 				std::cout << SequenceSummary::AminoAcidArray[index] << ": " << parameter.getCurrentCodonSpecificProposalWidth(index) << "\n";
 			}
 		}

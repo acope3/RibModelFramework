@@ -93,7 +93,7 @@ class FONSEParameter : public Parameter
 		virtual void updateMixtureProbabilitiesTrace(unsigned samples) { traces.updateMixtureProbabilitiesTrace(samples, categoryProbabilities); }
 		void updateCodonSpecificParameterTrace(unsigned sample, std::string grouping) {
 			traces.updateCodonSpecificParameterTrace(sample, grouping,
-				currentMutationParameter, currentSelectionParameter);
+				currentMutationParameter, currentSelectionParameter, codonTable);
 		}
 
 		void proposeCodonSpecificParameter();

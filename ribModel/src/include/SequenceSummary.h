@@ -59,19 +59,7 @@ class SequenceSummary
 
 
 		//Static functions:
-		static unsigned AAToAAIndex(std::string aa);
-		static std::array<unsigned, 2> AAIndexToCodonRange(unsigned aaIndex, bool forParamVector = false);
-		static std::array<unsigned, 2> AAToCodonRange(std::string aa, bool forParamVector = false);
-		static std::vector<std::string> AAToCodon(std::string aa, bool forParamVector = false);
-		static std::string codonToAA(std::string& codon);
-		static unsigned codonToIndex(std::string& codon, bool forParamVector = false);
-		static unsigned codonToAAIndex(std::string& codon);
-		static std::string indexToAA(unsigned aaIndex);
-		static std::string indexToCodon(unsigned index, bool forParamVector = false);
-		static unsigned GetNumCodonsForAA(std::string& aa, bool forParamVector = false);
 		static char complimentNucleotide(char ch);
-		static std::vector<std::string> aminoAcids();
-		static std::vector<std::string> codons();
 
 
 

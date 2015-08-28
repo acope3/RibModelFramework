@@ -70,7 +70,7 @@ double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grou
 	std::vector <unsigned> positions;
 	double codonProb[6];
 
-	std::array <unsigned, 2> codonRange = SequenceSummary::AAToCodonRange(grouping);
+	std::array <unsigned, 8> codonRange = parameter -> codonTable -> AAToCodonRange(grouping); //checked
 
 	unsigned maxIndexVal = 0u;
 	for (int i = 1; i < (numCodons - 1); i++)
@@ -81,8 +81,9 @@ double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grou
 		}
 	}
 
-	for (unsigned i = codonRange[0]; i < codonRange[1]; i++) {
-		positions = gene.geneData.getCodonPositions(i);
+	for (unsigned i = 0; i < 8; i++) {
+		if (codonRange[i] == 100) break;
+		positions = gene.geneData.getCodonPositions(codonRange[i]);
 		for (unsigned j = 0; j < positions.size(); j++) {
 			calculateCodonProbabilityVector(numCodons, positions[j], maxIndexVal, mutation, selection, phiValue, codonProb);
 			for (int k = 0; k < numCodons; k++) {

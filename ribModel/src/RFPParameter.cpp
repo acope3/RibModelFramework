@@ -837,7 +837,7 @@ void RFPParameter::calculateRFPMean(Genome& genome)
 	std::cout <<"Variance calculated\n";
 	for (unsigned codonIndex = 0; codonIndex < 61; codonIndex++)
 	{
-		std::cout << SequenceSummary::indexToCodon(codonIndex) <<" Mean:" << Means[codonIndex];
+		std::cout << codonTable -> indexToCodon(codonIndex) <<" Mean:" << Means[codonIndex];
 		std::cout <<"\tVariance:" << variance[codonIndex] <<"\n";
 	}
 }

@@ -6,6 +6,7 @@
 #include <cctype>
 #include "../SequenceSummary.h"
 #include "../mixtureDefinition.h"
+#include "../CodonTable.h"
 
 class Trace {
 	private:

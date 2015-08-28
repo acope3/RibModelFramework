@@ -820,15 +820,14 @@ double Parameter::calculateSCUO(Gene& gene, unsigned maxAA)
 		double aaCount = (double)seqsum.getAACountForAA(i);
 		if(aaCount == 0) continue;
 
-		std::array<unsigned, 2> codonRange = SequenceSummary::AAIndexToCodonRange(i, false);
+		std::array<unsigned, 8> codonRange = codonTable -> AAIndexToCodonRange(i, false); //check
 
 		// calculate -sum(pij log(pij))
 		double aaEntropy = 0.0;
-		unsigned start = codonRange[0];
-		unsigned endd = codonRange[1];
-		for(unsigned k = start; k < endd; k++)
+		for(unsigned k = 0; k < 8; k++)
 		{
-			int currCodonCount = seqsum.getCodonCountForCodon(k);
+			if (codonRange[k] == 100) break;
+			int currCodonCount = seqsum.getCodonCountForCodon(codonRange[k]);
 			if(currCodonCount == 0) continue;
 			double codonProportion = (double)currCodonCount / aaCount;
 			aaEntropy += codonProportion*std::log(codonProportion);
