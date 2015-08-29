@@ -149,61 +149,27 @@ unsigned CodonTable::AAToAAIndex(std::string aa)
         return CodonTable::AAMap.find(aa) -> second;
 }
 
-std::array<unsigned, 8> CodonTable::AAIndexToCodonRange(unsigned aaIndex, bool forParamVector)
+std::vector <unsigned> CodonTable::AAIndexToCodonRange(unsigned aaIndex, bool forParamVector)
 {
-    std::array<unsigned, 8> aaRange;
-    aaRange.fill(100);
-    if (forParamVector)
-    {
-        unsigned numCodons = getNumCodons(aaIndex) - 1;
-        for (unsigned i = 0; i < numCodons; i++)
-        {
-            //TODO: Assuming the index corrosponds to the current mapping
-            aaRange[i] = codon_mapping[aaIndex][i];
-        }
-        //use without reference mapping
-    }
-    else
-    {
-        unsigned numCodons = getNumCodons(aaIndex);
-        for (unsigned i = 0; i < numCodons; i++)
-        {
-            //TODO: Assuming the index corrosponds to the current mapping
-            aaRange[i] = codon_mapping[aaIndex][i];
-        }
-    }
-
-    return aaRange;
+    return codon_mapping[aaIndex];
 }
 
-std::array<unsigned, 8> CodonTable::AAToCodonRange(std::string aa, bool forParamVector)
+std::vector <unsigned> CodonTable::AAToCodonRange(std::string aa, bool forParamVector)
 {
-    unsigned index = 0;
-    for (unsigned i = 0; i < aa_mapping.size(); i++)
-    {
-        if (aa_mapping[i] == aa)
-        {
-            index = i;
-            break;
-        }
-    }
-    //std::array<unsigned, 8> aaRange;
-    return AAIndexToCodonRange(index, forParamVector);
+    unsigned aaIndex = AAToAAIndex(aa);
+    return AAIndexToCodonRange(aaIndex, forParamVector);
 }
 
 
 std::vector<std::string> CodonTable::AAToCodon(std::string aa, bool forParamVector)
 {
     std::vector <std::string> codons;
-    std::array <unsigned , 8> aaRange = AAToCodonRange(aa, forParamVector);
+    std::vector <unsigned> aaRange = AAToCodonRange(aa, forParamVector);
 
-        for (unsigned i = 0; i < 8; i++)
+        for (unsigned i = 0; i < aaRange.size(); i++)
         {
-            if (aaRange[i] != 100)
-            {
-                unsigned index = codon_mapping_without_reference[AAToAAIndex(aa)][aaRange[i]];
-                codons.push_back(indexToCodon(index));
-            }
+            unsigned index = codon_mapping_without_reference[AAToAAIndex(aa)][aaRange[i]];
+            codons.push_back(indexToCodon(index));
         }
 
     return codons;
@@ -744,5 +710,16 @@ void CodonTable::setupCodonTable()
 
 }
 
+CodonTable* CodonTable::codonTable;
+
+void CodonTable::createCodonTable(unsigned tableId, bool split)
+{
+    codonTable = new CodonTable(tableId, split);
+    codonTable -> setupCodonTable();
+}
 
 
+CodonTable* CodonTable::getInstance()
+{
+    return codonTable;
+}

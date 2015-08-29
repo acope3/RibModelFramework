@@ -12,6 +12,7 @@ class CodonTable
 {
     private:
 
+        static CodonTable *codonTable;
         unsigned tableId;
         bool splitAA;
         std::vector<std::vector<unsigned>> codon_mapping; // dim: AA, codon
@@ -41,6 +42,8 @@ class CodonTable
         static const std::map<std::string, unsigned> aaToIndexWithoutSplit;
 		static const std::map<std::string, unsigned> codonToIndexWithReference;
 		static const std::map<std::string, unsigned> codonToIndexWithoutReference;
+        static void createCodonTable(unsigned tableId, bool split = true);
+        static CodonTable* getInstance();
 
 
         //Constructors & destructors:
@@ -52,8 +55,8 @@ class CodonTable
 
         void setupCodonTable();
         unsigned AAToAAIndex(std::string aa);
-        std::array<unsigned, 8> AAIndexToCodonRange(unsigned aaIndex, bool forParamVector = false);
-        std::array<unsigned, 8> AAToCodonRange(std::string aa, bool forParamVector = false);
+        std::vector <unsigned> AAIndexToCodonRange(unsigned aaIndex, bool forParamVector = false);
+        std::vector <unsigned> AAToCodonRange(std::string aa, bool forParamVector = false);
         std::vector<std::string> AAToCodon(std::string aa, bool forParamVector = false);
         std::string indexToCodon(unsigned index);
         std::string codonToAA(std::string& codon);

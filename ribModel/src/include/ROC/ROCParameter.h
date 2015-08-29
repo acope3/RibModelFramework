@@ -118,7 +118,7 @@ class ROCParameter : public Parameter
 		virtual void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex) {traces.updateMixtureAssignmentTrace(sample, geneIndex, mixtureAssignment[geneIndex]);}
 		virtual void updateMixtureProbabilitiesTrace(unsigned samples) {traces.updateMixtureProbabilitiesTrace(samples, categoryProbabilities);}
 		void updateCodonSpecificParameterTrace(unsigned sample, std::string grouping) {traces.updateCodonSpecificParameterTrace(sample, grouping, 
-			currentMutationParameter, currentSelectionParameter, codonTable);}
+			currentMutationParameter, currentSelectionParameter);}
 
 		// proposal functions
 		void proposeCodonSpecificParameter();

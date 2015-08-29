@@ -134,8 +134,9 @@ std::vector<double> Trace::getSynthesisRateAcceptanceRatioTraceByMixtureElementF
 
 std::vector<double> Trace::getCspAcceptanceRatioTraceForAA(std::string aa)
 {
+	CodonTable *codonTable = CodonTable::getInstance();
 	aa[0] = (char) std::toupper(aa[0]);
-	unsigned aaIndex = SequenceSummary::aaToIndex.find(aa) -> second;
+	unsigned aaIndex = codonTable -> aaToIndex.find(aa) -> second;
 	return cspAcceptanceRatioTrace[aaIndex];
 }
 

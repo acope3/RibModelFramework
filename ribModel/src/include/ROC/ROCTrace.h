@@ -28,8 +28,8 @@ class ROCTrace : public Trace
 		void initSepsilonTrace(unsigned samples, unsigned numPhiGroupings);
 
 		//Getter functions
-		std::vector<double> getMutationParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon, CodonTable *codonTable);
-		std::vector<double> getSelectionParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon, CodonTable *codonTable);
+		std::vector<double> getMutationParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon);
+		std::vector<double> getSelectionParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon);
 		std::vector<double> getAphiTrace(unsigned index) { return AphiTrace[index]; }
 		std::vector<double> getAphiAcceptanceRatioTrace(unsigned index) { return AphiAcceptanceRatioTrace[index]; }
 		std::vector<double> getSepsilonTrace(unsigned index) { return SepsilonTrace[index]; }
@@ -38,7 +38,7 @@ class ROCTrace : public Trace
 		unsigned getMutationCategory(unsigned mixtureElement) {return categories->at(mixtureElement).delM;}
 		unsigned getSelectionCategory(unsigned mixtureElement) {return categories->at(mixtureElement).delEta;}
 		//Update functions	
-		void updateCodonSpecificParameterTrace(unsigned sample, std::string aa, std::vector<std::vector<double>> &curMutParam, std::vector<std::vector<double>> &curSelectParam, CodonTable *codonTable);
+		void updateCodonSpecificParameterTrace(unsigned sample, std::string aa, std::vector<std::vector<double>> &curMutParam, std::vector<std::vector<double>> &curSelectParam);
 		void updateAphiTrace(unsigned index, unsigned sample, double value) { AphiTrace[index][sample] = value; }
 		void updateAphiAcceptanceRatioTrace(unsigned index, double value) { AphiAcceptanceRatioTrace[index].push_back(value); }
 		void updateSepsilonTrace(unsigned index, unsigned sample, double value) { SepsilonTrace[index][sample] = value; }

@@ -1,6 +1,5 @@
 #include "include/SequenceSummary.h"
 
-
 #include <iostream>
 
 
@@ -76,7 +75,8 @@ SequenceSummary& SequenceSummary::operator=(const SequenceSummary& rhs)
 
 unsigned SequenceSummary::getAACountForAA(std::string aa)
 {
-	return naa[aaToIndex.find(aa)->second];
+	CodonTable *codonTable = CodonTable::getInstance();
+	return naa[codonTable -> aaToIndex.find(aa)->second];
 }
 
 
@@ -89,7 +89,8 @@ unsigned SequenceSummary::getAACountForAA(unsigned aaIndex)
 
 unsigned SequenceSummary::getCodonCountForCodon(std::string& codon)
 {
-	return ncodons[codonToIndex(codon)];
+	CodonTable *codonTable = CodonTable::getInstance();
+	return ncodons[codonTable -> codonToIndex(codon)];
 }
 
 
@@ -102,7 +103,8 @@ unsigned SequenceSummary::getCodonCountForCodon(unsigned codonIndex)
 
 unsigned SequenceSummary::getRFPObserved(std::string codon)
 {
-	return RFPObserved[codonToIndex(codon)];
+	CodonTable *codonTable = CodonTable::getInstance();
+	return RFPObserved[codonTable -> codonToIndex(codon)];
 }
 
 
@@ -120,7 +122,8 @@ void SequenceSummary::setRFPObserved(unsigned codonIndex, unsigned value)
 
 std::vector <unsigned> SequenceSummary::getCodonPositions(std::string codon)
 {
-	unsigned codonIndex = codonToIndex(codon);
+	CodonTable *codonTable = CodonTable::getInstance();
+	unsigned codonIndex = codonTable -> codonToIndex(codon);
 	return getCodonPositions(codonIndex);
 }
 
@@ -160,6 +163,7 @@ bool SequenceSummary::processSequence(const std::string& sequence)
 	std::string codon;
 
 	codonPositions.resize(64);
+	CodonTable *codonTable = CodonTable::getInstance();
 	for (unsigned i = 0u; i < sequence.length(); i += 3)
 	{
 		codon = sequence.substr(i, 3);
@@ -167,10 +171,10 @@ bool SequenceSummary::processSequence(const std::string& sequence)
 		codon[1] = (char)std::toupper(codon[1]);
 		codon[2] = (char)std::toupper(codon[2]);
 
-		codonID = codonToIndex(codon);
+		codonID = codonTable -> codonToIndex(codon);
 		if (codonID != 64) // if codon id == 64 => codon not found. Ignore, probably N 
 		{
-			aaID = codonToAAIndex(codon);
+			aaID = codonTable -> codonToAAIndex(codon);
 			ncodons[codonID]++;
 			naa[aaID]++;
 			codonPositions[codonID].push_back(i / 3);

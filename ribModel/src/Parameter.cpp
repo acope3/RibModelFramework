@@ -803,30 +803,30 @@ double Parameter::calculateSCUO(Gene& gene, unsigned maxAA)
 	double totalDegenerateAACount = 0.0;
 	for(unsigned i = 0; i < maxAA; i++)
 	{
-		std::string curAA = seqsum.AminoAcidArray[i];
+		std::string curAA = CodonTable::AminoAcidArray[i];
 		// skip amino acids with only one codon or stop codons
 		if(curAA == "X" || curAA == "M" || curAA == "W") continue;
 		totalDegenerateAACount += (double)seqsum.getAACountForAA(i);
 	}
 
 	double scuoValue = 0.0;
+	CodonTable *codonTable = CodonTable::getInstance();
 	for(unsigned i = 0; i < maxAA; i++)
 	{
-		std::string curAA = seqsum.AminoAcidArray[i];
+		std::string curAA = CodonTable::AminoAcidArray[i];
 		// skip amino acids with only one codon or stop codons
 		if(curAA == "X" || curAA == "M" || curAA == "W") continue;
-		double numDegenerateCodons = SequenceSummary::GetNumCodonsForAA(curAA);
+		double numDegenerateCodons = codonTable -> getNumCodons(curAA);
 
 		double aaCount = (double)seqsum.getAACountForAA(i);
 		if(aaCount == 0) continue;
 
-		std::array<unsigned, 8> codonRange = codonTable -> AAIndexToCodonRange(i, false); //check
+		std::vector <unsigned> codonRange = codonTable -> AAIndexToCodonRange(i, false); //check
 
 		// calculate -sum(pij log(pij))
 		double aaEntropy = 0.0;
-		for(unsigned k = 0; k < 8; k++)
+		for(unsigned k = 0; k < codonRange.size(); k++)
 		{
-			if (codonRange[k] == 100) break;
 			int currCodonCount = seqsum.getCodonCountForCodon(codonRange[k]);
 			if(currCodonCount == 0) continue;
 			double codonProportion = (double)currCodonCount / aaCount;

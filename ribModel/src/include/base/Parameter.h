@@ -43,7 +43,6 @@ class Parameter {
 		static const std::string allUnique;
 		static const std::string selectionShared;
 		static const std::string mutationShared;
-	CodonTable *codonTable;
 
 		static std::default_random_engine generator; // static to make sure that the same generator is during the runtime.
 
@@ -59,10 +58,7 @@ class Parameter {
 		bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);
 		void writeBasicRestartFile(std::string filename);
 		void initBaseValuesFromFile(std::string filename);
-		void setCodonTable(CodonTable &table)
-		{
-			codonTable = &table;
-		}
+
 
 
 		unsigned int getNumParam()

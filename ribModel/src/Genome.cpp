@@ -11,6 +11,8 @@ Genome::Genome()
 {
 	//ctor
 	numGenesWithPhi = 0;
+	CodonTable CT(1, false);
+	CT.createCodonTable(1, false);
 }
 
 
@@ -163,7 +165,7 @@ void Genome::writeFasta (std::string filename, bool simulated)
 }
 
 
-void Genome::readRFPFile(std::string filename, CodonTable *codonTable)
+void Genome::readRFPFile(std::string filename)
 {
 	std::ifstream Fin;
 	Fin.open(filename.c_str());
@@ -178,6 +180,7 @@ void Genome::readRFPFile(std::string filename, CodonTable *codonTable)
 	Gene tmpGene;
 	bool first = true;
 	std::string seq = "";
+	CodonTable *codonTable = CodonTable::getInstance();
 
 	while (getline(Fin,tmp))
 	{
@@ -248,7 +251,7 @@ void Genome::writeRFPFile(std::string filename, bool simulated)
 
 		for (unsigned codonIndex = 0; codonIndex < 64; codonIndex++)
 		{
-			std::string codon = SequenceSummary::codonArray[codonIndex];
+			std::string codon = CodonTable::codonArray[codonIndex];
 
 			Fout << currentGene->getId() <<",";
 			Fout << currentGene->geneData.getRFPObserved(codonIndex) <<",";

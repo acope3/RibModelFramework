@@ -198,10 +198,10 @@ void testReadRFPFile()
 {
 	std::cout << "------------------- TEST READRFPFILE ----------------------" << "\n";
 	Genome genome;
-
 	genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
-	std::string codon = "ATG";	
-	std::cout << SequenceSummary::codonToIndex(codon) <<"\n";
+	std::string codon = "ATG";
+	CodonTable *codonTable = CodonTable::getInstance();
+	std::cout << codonTable -> codonToIndex(codon) <<"\n";
 	for (unsigned i = 0; i < genome.getGenomeSize(); i++)
 	{
 		std::cout << "Working with gene " << i << "\n";
@@ -457,8 +457,6 @@ int main()
 	else //not doing unit testing, running a model
 	{
 		unsigned index;
-
-
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
 		int samples = 100;
 		int thining = 10;
@@ -619,11 +617,12 @@ int main()
 			std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
 			std::cout << "Sphi proposal width: " << parameter.getCurrentSphiProposalWidth() << std::endl;
 			std::cout << "CSP proposal width: \n";
+			CodonTable *codonTable = CodonTable::getInstance();
 			for (unsigned n = 0; n < model.getGroupListSize(); n++)
 			{
 				std::string aa = model.getGrouping(n);
-				index = parameter.codonTable -> AAToAAIndex(aa);
-				std::cout << SequenceSummary::AminoAcidArray[index] << ": " << parameter.getCurrentCodonSpecificProposalWidth(index) << "\n";
+				index = codonTable -> AAToAAIndex(aa);
+				std::cout << CodonTable::AminoAcidArray[index] << ": " << parameter.getCurrentCodonSpecificProposalWidth(index) << "\n";
 			}
 		}
 		else if (modelToRun == RFP)
@@ -739,11 +738,12 @@ int main()
 			std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
 			std::cout << "Sphi proposal width: " << parameter.getCurrentSphiProposalWidth() << std::endl;
 			std::cout << "CSP proposal width: \n";
+			CodonTable *codonTable = CodonTable::getInstance();
 			for (unsigned n = 0; n < model.getGroupListSize(); n++)
 			{
 				std::string aa = model.getGrouping(n);
-				index = parameter.codonTable -> AAToAAIndex(aa);
-				std::cout << SequenceSummary::AminoAcidArray[index] << ": " << parameter.getCurrentCodonSpecificProposalWidth(index) << "\n";
+				index = codonTable -> AAToAAIndex(aa);
+				std::cout << CodonTable::AminoAcidArray[index] << ": " << parameter.getCurrentCodonSpecificProposalWidth(index) << "\n";
 			}
 		}
 

@@ -1,7 +1,7 @@
 #ifndef SequenceSummary_H
 #define SequenceSummary_H
 
-
+#include "CodonTable.h"
 #include <string>
 #include <map>
 #include <algorithm>
@@ -21,15 +21,6 @@ class SequenceSummary
 
 
 	public:
-
-		//Static member variables:
-		static const std::string Ser2;
-		static const std::vector<std::string> AminoAcidArray;
-		static const std::string codonArray[];
-		static const std::string codonArrayParameter[];
-		static const std::map<std::string, unsigned> aaToIndex;
-		static const std::map<std::string, unsigned> codonToIndexWithReference;
-		static const std::map<std::string, unsigned> codonToIndexWithoutReference;
 
 
 		//Constructors & destructors:
