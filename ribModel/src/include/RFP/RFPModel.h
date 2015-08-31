@@ -100,6 +100,7 @@ class RFPModel: public Model {
 		{
 			return parameter->getCurrentSphiProposalWidth();
 		}
+		virtual void updateAllHyperParameter();
 		virtual void updateHyperParameter(unsigned hp);
 		virtual void updateSphi()
 		{

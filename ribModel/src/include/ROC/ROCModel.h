@@ -50,6 +50,7 @@ class ROCModel : public Model
 	virtual double getCurrentSphiProposalWidth() {return parameter->getCurrentSphiProposalWidth();}
 	double getCurrentAphiProposalWidth(unsigned index) { return parameter->getCurrentAphiProposalWidth(index); }
 	virtual void adaptHyperParameterProposalWidths(unsigned adaptiveWidth);
+	virtual void updateAllHyperParameter();
 	virtual void updateHyperParameter(unsigned hp);
 	virtual void updateSphi() {parameter->updateSphi();}
 	virtual void updateSphiTrace(unsigned sample) {parameter->updateSphiTrace(sample);}

@@ -6,18 +6,18 @@ with.phi <- FALSE
 if (with.phi) {
   genome <- initializeGenomeObject(file = "../ribModel/data/simulatedAllUniqueR.fasta", expression.file = "../ribModel/data/simulatedAllUniqueR_phi.csv")
 } else {
-  #genome <- initializeGenomeObject(file = "../ribModel/data/simulatedAllUniqueR.fasta")
-  genome <- initializeGenomeObject(file = "../ribModel/data/Skluyveri_main.fasta")
+  genome <- initializeGenomeObject(file = "../ribModel/data/simulatedAllUniqueR.fasta")
+  #genome <- initializeGenomeObject(file = "../ribModel/data/simulatedOneMix.fasta")
 }
  
 #initialize parameter object
 sphi_init <- 1
-numMixtures <- 1
+numMixtures <- 2
 mixDef <- "allUnique"
 #geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457), rep(1, 3903))
 #geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
-geneAssignment <- rep(1,4864)
-#geneAssignment <- c(rep(1,500), rep(2,500))
+#geneAssignment <- rep(1,4864)
+geneAssignment <- c(rep(1,500), rep(2,500))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
 
 #parameter <- initializeParameterObject(restart.file = "2000restartFile.rst")
@@ -27,9 +27,10 @@ parameter$initializeSynthesisRateByRandom(phivals)
 parameter$initMutationCategories(c("../ribModel/data/simulated_mutation0.csv", "../ribModel/data/simulated_mutation1.csv") , 2)
 parameter$initSelectionCategories(c("../ribModel/data/simulated_selection0.csv", "../ribModel/data/simulated_selection1.csv") , 2)
 # initialize MCMC object
-samples <- 1000
+samples <- 100
 thining <- 10
 adaptiveWidth <- 10
+divergence.iteration <- 0
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, 
                              est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
 # get model object
@@ -38,7 +39,7 @@ model <- initializeModelObject(parameter, "ROC", with.phi = with.phi)
 setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth*20, TRUE)
 #run mcmc on genome with parameter using model
 system.time(
-  runMCMC(mcmc, genome, model, 4)
+  runMCMC(mcmc, genome, model, 4, divergence.iteration)
 )
 
 #plots log likelihood trace, possibly other mcmc diagnostics in the future
@@ -46,11 +47,12 @@ pdf("simulated_Genome_allUnique_startCSP_VGAM_startPhi_SCUO_adaptSphi_True.pdf")
 plot(mcmc)
 loglik.trace <- mcmc$getLogLikelihoodTrace()
 acf(loglik.trace)
+convergence.test(mcmc, n.samples = 50, plot=T)
 
 # plots different aspects of trace
 trace <- parameter$getTraceObject()
 plot(trace, what = "MixtureProbability")
-plot(trace, what = "Shi")
+plot(trace, what = "Sphi")
 plot(trace, what = "Mphi")
 for (i in 1:length(genome$getGeneByIndex(1)$getObservedPhiValues()))
 {
@@ -66,7 +68,7 @@ expressionValues <- unlist(lapply(1:genome$getGenomeSize(), function(geneIndex){
 }))
 expressionValues <- log10(expressionValues)
 #obs.phi <- log10(read.table("../ribModel/data/simulatedAllUniqueR_phi.csv", sep=",", header=T)[, 2])
-obs.phi <- log10(read.table("../ribModel/data/Skluyveri_main_phi.csv", sep=",", header=T)[, 2])
+obs.phi <- log10(read.table("../ribModel/data/simulatedOneMix_phi.csv", sep=",", header=T)[, 2])
 plot(NULL, NULL, xlim=range(obs.phi) + c(-0.1, 0.1), ylim=range(expressionValues, na.rm = T) + c(-0.1, 0.1), 
      main = "Synthesis Rate", xlab = "true values", ylab = "estimated values")
 upper.panel.plot(obs.phi[mixtureAssignment == 1], expressionValues[mixtureAssignment == 1], col="black")
@@ -94,10 +96,10 @@ names.aa <- aminoAcids()
 selection <- c()
 mutation <- c()
 codon.storage <- c()
-#csp.m <- read.table("../ribModel/data/simulated_mutation0.csv", sep=",", header=T)
-#csp.e <- read.table("../ribModel/data/simulated_selection0.csv", sep=",", header=T)
-csp.m <- read.table("../ribModel/data/Skluyveri_mutation_ChrA.csv", sep=",", header=T)
-csp.e <- read.table("../ribModel/data/Skluyveri_selection_ChrA.csv", sep=",", header=T)
+csp.m <- read.table("../ribModel/data/simulated_mutation0.csv", sep=",", header=T)
+csp.e <- read.table("../ribModel/data/simulated_selection0.csv", sep=",", header=T)
+#csp.m <- read.table("../ribModel/data/simulatedOneMix_mutation.csv", sep=",", header=T)
+#csp.e <- read.table("../ribModel/data/simulatedOneMix_selection.csv", sep=",", header=T)
 
 csp <- rbind(csp.m,csp.e)
 idx.eta <- 41:80

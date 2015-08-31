@@ -51,7 +51,6 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	double logLikelihood = 0.0;
 	int numGenes = genome.getGenomeSize();
 
-	// testing end
 	unsigned numSynthesisRateCategories = model.getNumSynthesisRateCategories();
 	unsigned numMixtures = model.getNumMixtureElements();
 	double* dirichletParameters = new double[numMixtures]();
@@ -130,15 +129,25 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				model.updateSynthesisRate(i, k);
 				// only count each gene once, not numSynthesigeneIndexsRateCategories times
 				//#pragma omp critical
-				logLikelihood += model.getCategoryProbability(k) * propLogLike;
+				if(std::isinf(std::log(model.getCategoryProbability(k)) + propLogLike))
+				{
+					std::cout <<"\t P: " << model.getCategoryProbability(k) << ")\n";
+					std::cout <<"\t L: " << propLogLike << ")\n";
+				}
+				logLikelihood += std::log(model.getCategoryProbability(k)) + propLogLike;
 			}else{
 				// only count each gene once, not numSynthesisRateCategories times
 				//#pragma omp critical
-				logLikelihood += model.getCategoryProbability(k) * currLogLike;
+				if(std::isinf(std::log(model.getCategoryProbability(k)) + currLogLike))
+				{
+					std::cout <<"\t P: " << model.getCategoryProbability(k) << ")\n";
+					std::cout <<"\t L: " << currLogLike << ")\n";
+				}
+				logLikelihood += std::log(model.getCategoryProbability(k)) + currLogLike;
 			}
 		}
 
-		if (std::isinf(logLikelihood)) std::cout <<"\tInfinity reached\n";
+		if (std::isinf(logLikelihood)) std::cout <<"\tInfinity reached (Gene: " << i << ")\n";
 		// adjust the the unscaled probabilities by the constant c
 		// ln(f') = ln(c) + ln(f)
 		// calculate ln(P) = ln( Sum(p_i*f'(...)) ) and obtain normalizing constant for new p_i
@@ -193,7 +202,7 @@ void MCMCAlgorithm::acceptRejectHyperParameter(Genome &genome, Model& model, int
 
 	model.calculateLogLikelihoodRatioForHyperParameters(genome, iteration, logProbabilityRatios);
 
-	for (int i = 0; i < logProbabilityRatios.size(); i++)
+	for (unsigned i = 0; i < logProbabilityRatios.size(); i++)
 	{
 		if (!std::isfinite(logProbabilityRatios[i]))
 		{
@@ -235,11 +244,76 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 	}
 }
 
-void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores)
+// Allows to diverge from initial conditions (divergenceIterations controls the divergence).
+// This allows for varying initial conditions for better exploration of the parameter space.
+// This functions does not take the likelihood into account, the random walk is only constrained by the prior
+// for each parameter. If no prior (flat prior) is present, an unconstrained random walk is performed.
+void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned divergenceIterations)
+{
+	// TODO THIS FUNCTON THROWS THE ACCEPTANCE COUNTER OFF!
+
+
+	// NOTE: IF PRIORS ARE ADDED, TAKE INTO ACCOUNT HERE!
+	std::cout << "Allowing divergence from initial conditions for " << divergenceIterations << " iterations.\n" << std::endl;
+	// divergence from initial conditions is not stored in trace
+
+	// how many steps do you want to walk "away" from the initial conditions
+	for(unsigned iteration = 0u; iteration < divergenceIterations; iteration++)
+	{
+		// propose all parameters
+		model.proposeCodonSpecificParameter();
+		model.proposeHyperParameters();
+		model.proposeSynthesisRateLevels();
+
+		// no prior on codon specific parameters -> just accept everything
+		unsigned size = model.getGroupListSize();
+		for(unsigned i = 0; i < size; i++)
+		{
+			std::string grouping = model.getGrouping(i);
+			model.updateCodonSpecificParameter(grouping);
+		}
+
+		// no prior on hyper parameters -> just accept everything
+		model.updateAllHyperParameter();
+
+		// prior on phi values -> take prior into account, but only the prior no likelihood
+		int numGenes = genome.getGenomeSize();
+		unsigned numSynthesisRateCategories = model.getNumSynthesisRateCategories();
+		double sPhi = model.getSphi(false);
+		for(int i = 0; i < numGenes; i++)
+		{
+
+			for(unsigned k = 0u; k < numSynthesisRateCategories; k++)
+			{
+				// map from mixture to category and obtain corresponding phi value
+				unsigned expressionCategory = model.getSynthesisRateCategory(k);
+				double phiValue = model.getSynthesisRate(i, expressionCategory, false);
+				double phiValue_proposed = model.getSynthesisRate(i, expressionCategory, true);
+
+				// accept/ reject based on prior ratio
+				double logPhiProbability = std::log(ROCParameter::densityLogNorm(phiValue, (-(sPhi * sPhi) / 2), sPhi));
+				double logPhiProbability_proposed = std::log(Parameter::densityLogNorm(phiValue_proposed, (-(sPhi * sPhi) / 2), sPhi));
+				if( -Parameter::randExp(1) < (logPhiProbability_proposed - logPhiProbability) )
+				{
+					model.updateSynthesisRate(i, k);
+				}
+			}
+		}
+
+		// update Gibbs sampled parameter.
+		model.updateGibbsSampledHyperParameters(genome);
+	}
+}
+
+void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigned divergenceIterations)
 {
 #ifndef __APPLE__
 	omp_set_num_threads(numCores);
 #endif
+
+	// Allows to diverge from initial conditions (divergenceIterations controls the divergence).
+	// This allows for varying initial conditions for better exploration of the parameter space.
+	varyInitialConditions(genome, model, divergenceIterations);
 
 	unsigned maximumIterations = samples * thining;
 	// initialize everything
@@ -319,6 +393,19 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores)
 				model.adaptSynthesisRateProposalWidth(adaptiveWidth);
 			}
 		}
+
+
+		if( ( (iteration + 1u) % (2*adaptiveWidth)) == 0u)
+		{
+			double gewekeScore = calculateGewekeScore(iteration);
+			std::cout << "Geweke Score after " << iteration << " iterations: " << gewekeScore << "\n";
+
+			if(std::abs(gewekeScore) < 1.96)
+			{
+				std::cout << "Stopping run based on convergence after " << iteration << " iterations\n" << std::endl;
+				break;
+			}
+		}
 	} // end MCMC loop
 	std::cout << "leaving MCMC loop" << std::endl;
 	//NOTE: The following files used to be written here:
@@ -329,6 +416,45 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores)
 	//sphiTrace.csv
 	//expressionLevelTrace.csv
 
+}
+
+double MCMCAlgorithm::calculateGewekeScore(unsigned current_iteration)
+{
+	double posteriorMean1 = 0.0;
+	double posteriorMean2 = 0.0;
+	double posteriorVariance1 = 0.0;
+	double posteriorVariance2 = 0.0;
+
+	unsigned end1 = std::round(current_iteration * 0.1);
+	unsigned start2 = std::round(current_iteration - (current_iteration * 0.5) + 1);
+
+	double numSamples1 = (double) end1;
+	double numSamples2 = (double) (double) std::round(current_iteration * 0.5);
+
+	// calculate mean and and variance of first part of likelihood trace
+	for(unsigned i = 1u; i < end1; i++)
+	{
+		posteriorMean1 += likelihoodTrace[i];
+	}
+	posteriorMean1 = posteriorMean1 / numSamples1;
+	for(unsigned i = 1u; i < end1; i++)
+	{
+		posteriorVariance1 += (likelihoodTrace[i] - posteriorMean1) * (likelihoodTrace[i] - posteriorMean1);
+	}
+	posteriorVariance1 = posteriorVariance1 / numSamples1;
+	// calculate mean and and variance of last part of likelihood trace
+	for(unsigned i = start2; i < current_iteration; i++)
+	{
+		posteriorMean2 += likelihoodTrace[i];
+	}
+	posteriorMean2 = posteriorMean2 / numSamples2;
+	for(unsigned i = 1u; i < end1; i++)
+	{
+		posteriorVariance2 += (likelihoodTrace[i] - posteriorMean2) * (likelihoodTrace[i] - posteriorMean2);
+	}
+	posteriorVariance2 = posteriorVariance2 / numSamples2;
+	// Geweke score
+	return (posteriorMean1 - posteriorMean2) / std::sqrt( ( posteriorVariance1 / numSamples1 ) + ( posteriorVariance2 / numSamples2 ) );
 }
 
 double MCMCAlgorithm::getLogLikelihoodPosteriorMean(unsigned _samples)

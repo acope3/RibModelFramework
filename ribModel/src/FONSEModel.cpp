@@ -177,8 +177,14 @@ void FONSEModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth)
 	adaptSphiProposalWidth(adaptiveWidth);
 }
 
+void FONSEModel::updateAllHyperParameter()
+{
+	updateSphi();
+}
+
 void FONSEModel::updateHyperParameter(unsigned hp)
 {
+	// NOTE: when adding additional hyper parameter, also add to updateAllHyperParameter()
 	switch (hp) {
 	case 0:
 		updateSphi();
