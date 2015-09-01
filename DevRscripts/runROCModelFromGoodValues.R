@@ -12,12 +12,12 @@ if (with.phi) {
  
 #initialize parameter object
 sphi_init <- 1
-numMixtures <- 1
+numMixtures <- 2
 mixDef <- "allUnique"
 #geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457), rep(1, 3903))
 #geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
-geneAssignment <- rep(1,4864)
-#geneAssignment <- c(rep(1,500), rep(2,500))
+#geneAssignment <- rep(1,4864)
+geneAssignment <- c(rep(1,500), rep(2,500))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
 
 #parameter <- initializeParameterObject(restart.file = "2000restartFile.rst")
@@ -66,8 +66,8 @@ expressionValues <- unlist(lapply(1:genome$getGenomeSize(), function(geneIndex){
   parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(samples, geneIndex, expressionCategory)
 }))
 expressionValues <- log10(expressionValues)
-#obs.phi <- log10(read.table("../ribModel/data/simulatedAllUniqueR_phi.csv", sep=",", header=T)[, 2])
-obs.phi <- log10(read.table("../ribModel/data/Skluyveri_main_phi.csv", sep=",", header=T)[, 2])
+obs.phi <- log10(read.table("../ribModel/data/simulatedAllUniqueR_phi.csv", sep=",", header=T)[, 2])
+#obs.phi <- log10(read.table("../ribModel/data/Skluyveri_main_phi.csv", sep=",", header=T)[, 2])
 plot(NULL, NULL, xlim=range(obs.phi) + c(-0.1, 0.1), ylim=range(expressionValues, na.rm = T) + c(-0.1, 0.1), 
      main = "Synthesis Rate", xlab = "true values", ylab = "estimated values")
 upper.panel.plot(obs.phi[mixtureAssignment == 1], expressionValues[mixtureAssignment == 1], col="black")

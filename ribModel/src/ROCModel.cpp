@@ -65,8 +65,8 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 	// TODO: make this work for more than one phi value, or for genes that don't have phi values
 	if (withPhi) {
 		for (unsigned i = 0; i < parameter->getNumPhiGroupings(); i++) {
-			logPhiProbability += std::log(Parameter::densityLogNorm(gene.observedPhiValues.at(i) - getAphi(i), std::log(phiValue), getSepsilon(i)));
-			logPhiProbability_proposed += std::log(Parameter::densityLogNorm(gene.observedPhiValues.at(i) - getAphi(i), std::log(phiValue_proposed), getSepsilon(i)));
+			logPhiProbability += std::log(Parameter::densityLogNorm(gene.observedPhiValues.at(i) + getAphi(i), std::log(phiValue), getSepsilon(i)));
+			logPhiProbability_proposed += std::log(Parameter::densityLogNorm(gene.observedPhiValues.at(i) + getAphi(i), std::log(phiValue_proposed), getSepsilon(i)));
 		}
 	}
 
@@ -319,9 +319,9 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 	// TODO: double check the formulation of this
 	proposedMphi = -((proposedSphi * proposedSphi) / 2);
 
-	//TODO: Don't hardcode this.
 	if (withPhi) {
-		logProbabilityRatio.resize(2);
+		// one for each Aphi, and one for Sphi
+		logProbabilityRatio.resize(getNumPhiGroupings()+1);
 	}
 	else {
 		logProbabilityRatio.resize(1);
@@ -343,8 +343,8 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 	logProbabilityRatio[0] = lpr;
 
 	if (withPhi) {
-		lpr = 0.0;
 		for (unsigned i = 0; i < parameter->getNumPhiGroupings(); i++) {
+			lpr = 0.0;
 			double Aphi = getAphi(i, false);
 			double Aphi_proposed = getAphi(i, true);
 			double AphiPropWidth = getCurrentAphiProposalWidth(i);
@@ -361,9 +361,8 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 				double second = Parameter::densityNorm(logobsPhi, logphi + Aphi_proposed, Sepsilon, true);
 				lpr += first - second;
 			}
-			lpr -= Parameter::densityNorm(Aphi_proposed, Aphi, AphiPropWidth, true) - Parameter::densityNorm(Aphi, Aphi_proposed, AphiPropWidth, true);
+			logProbabilityRatio[i+1] = lpr;
 		}
-		logProbabilityRatio[1] = lpr;
 	}
 }
 
@@ -383,7 +382,8 @@ void ROCModel::updateGibbsSampledHyperParameters(Genome &genome)
 			}
 			rate /= 2;
 
-			parameter->setSepsilon(i, parameter->randGamma(shape, rate));
+			double rand = parameter->randGamma(shape, rate);
+			parameter->setSepsilon(i, std::sqrt(1 / rand));
 		}
 	}
 }
@@ -406,15 +406,11 @@ void ROCModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth)
 
 void ROCModel::updateHyperParameter(unsigned hp)
 {
-	switch (hp) {
-	case 0:
+	if (hp == 0) {
 		updateSphi();
-		break;
-	case 1:
-		for (unsigned i = 0; i < parameter->getNumPhiGroupings(); i++) {
-			updateAphi(i);
-		}
-		break;
+	}
+	else {
+		updateAphi(hp - 1);
 	}
 }
 
