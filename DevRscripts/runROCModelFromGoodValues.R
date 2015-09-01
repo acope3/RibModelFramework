@@ -4,7 +4,8 @@ rm(list=ls())
 with.phi <- TRUE 
   
 if (with.phi) {
-  genome <- initializeGenomeObject(file = "../ribModel/data/simulatedAllUniqueR.fasta", expression.file = "../ribModel/data/simulatedAllUniqueR_phi.csv")
+  #genome <- initializeGenomeObject(file = "../ribModel/data/simulatedAllUniqueR.fasta", expression.file = "../ribModel/data/simulatedAllUniqueR_phi.csv")
+  genome <- initializeGenomeObject(file = "../ribModel/data/simulatedOneMix.fasta", expression.file = "../ribModel/data/simulatedOneMix_simphi.csv")
 } else {
   genome <- initializeGenomeObject(file = "../ribModel/data/simulatedAllUniqueR.fasta")
   #genome <- initializeGenomeObject(file = "../ribModel/data/simulatedOneMix.fasta")
@@ -17,7 +18,8 @@ mixDef <- "allUnique"
 #geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457), rep(1, 3903))
 #geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
 #geneAssignment <- rep(1,4864)
-geneAssignment <- c(rep(1,500), rep(2,500))
+#geneAssignment <- c(rep(1,500), rep(2,500))
+geneAssignment <- rep(1,1000)
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
 
 #parameter <- initializeParameterObject(restart.file = "2000restartFile.rst")

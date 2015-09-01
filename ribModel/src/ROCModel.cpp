@@ -357,8 +357,8 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 				mixtureAssignment = getSynthesisRateCategory(mixtureAssignment);
 				double logphi = std::log(getSynthesisRate(j, mixtureAssignment, false));
 				double logobsPhi = std::log(genome.getGene(j).observedPhiValues.at(i));
-				double first = Parameter::densityNorm(logobsPhi, logphi + Aphi, Sepsilon, true);
-				double second = Parameter::densityNorm(logobsPhi, logphi + Aphi_proposed, Sepsilon, true);
+				double first = Parameter::densityNorm(logobsPhi, logphi + Aphi_proposed, Sepsilon, true);
+				double second = Parameter::densityNorm(logobsPhi, logphi + Aphi, Sepsilon, true);
 				lpr += first - second;
 			}
 			logProbabilityRatio[i+1] = lpr;
