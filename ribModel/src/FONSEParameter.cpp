@@ -683,7 +683,7 @@ double FONSEParameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned 
 double FONSEParameter::getSphiPosteriorMean(unsigned samples)
 {
 	double posteriorMean = 0.0;
-	std::vector<double> sPhiTrace = traces.getSPhiTrace();
+	std::vector<double> sPhiTrace = traces.getSphiTrace();
 	unsigned traceLength = sPhiTrace.size();
 
 	if (samples > traceLength)
@@ -732,7 +732,7 @@ std::vector<double> FONSEParameter::getEstimatedMixtureAssignmentProbabilities(u
 
 double FONSEParameter::getSphiVariance(unsigned samples, bool unbiased)
 {
-	std::vector<double> sPhiTrace = traces.getSPhiTrace();
+	std::vector<double> sPhiTrace = traces.getSphiTrace();
 	unsigned traceLength = sPhiTrace.size();
 	if (samples > traceLength)
 	{

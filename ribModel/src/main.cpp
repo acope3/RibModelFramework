@@ -457,8 +457,6 @@ int main()
 	else //not doing unit testing, running a model
 	{
 		unsigned index;
-
-
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
 		int samples = 100;
 		int thining = 10;

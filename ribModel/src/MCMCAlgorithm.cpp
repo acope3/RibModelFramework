@@ -208,7 +208,7 @@ void MCMCAlgorithm::acceptRejectHyperParameter(Genome &genome, Model& model, int
 	{
 		if (!std::isfinite(logProbabilityRatios[i]))
 		{
-			std::cout << "logProbabilityRatio not finite!\n";
+			std::cout << "logProbabilityRatio " << i << " not finite!\n";
 		}
 
 		if (-Parameter::randExp(1) < logProbabilityRatios[i])
