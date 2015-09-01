@@ -540,7 +540,7 @@ void RFPParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
 double RFPParameter::getSphiPosteriorMean(unsigned samples)
 {
 	double posteriorMean = 0.0;
-	std::vector<double> sPhiTrace = traces.getSPhiTrace();
+	std::vector<double> sPhiTrace = traces.getSphiTrace();
 	unsigned traceLength = (unsigned)sPhiTrace.size();
 
 	if(samples > traceLength)
@@ -637,7 +637,7 @@ double RFPParameter::getLambdaPrimePosteriorMean(unsigned mixtureElement, unsign
 //TODO: Traces prevent this from being in the parent class
 double RFPParameter::getSphiVariance(unsigned samples, bool unbiased)
 {
-	std::vector<double> sPhiTrace = traces.getSPhiTrace();
+	std::vector<double> sPhiTrace = traces.getSphiTrace();
 	unsigned traceLength = (unsigned)sPhiTrace.size();
 	if(samples > traceLength)
 	{

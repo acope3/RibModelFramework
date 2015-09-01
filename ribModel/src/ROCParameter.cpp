@@ -800,7 +800,7 @@ double ROCParameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned ge
 double ROCParameter::getSphiPosteriorMean(unsigned samples)
 {
 	double posteriorMean = 0.0;
-	std::vector<double> sPhiTrace = traces.getSPhiTrace();
+	std::vector<double> sPhiTrace = traces.getSphiTrace();
 	unsigned traceLength = (unsigned)sPhiTrace.size();
 
 	if (samples > traceLength)
@@ -870,7 +870,7 @@ std::vector<double> ROCParameter::getEstimatedMixtureAssignmentProbabilities(uns
 
 double ROCParameter::getSphiVariance(unsigned samples, bool unbiased)
 {
-	std::vector<double> sPhiTrace = traces.getSPhiTrace();
+	std::vector<double> sPhiTrace = traces.getSphiTrace();
 	unsigned traceLength = (unsigned)sPhiTrace.size();
 	if (samples > traceLength)
 	{

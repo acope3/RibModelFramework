@@ -10,7 +10,7 @@ RCPP_MODULE(Trace_mod)
 {
   class_<Trace>( "Trace" )
     //These methods have only a C++ implementation
-    .method("getSPhiTrace", &Trace::getSPhiTrace)
+    .method("getSphiTrace", &Trace::getSphiTrace)
     //.method("getAPhiTrace", &Trace::getAPhiTrace)
     .method("getSphiAcceptanceRatioTrace", &Trace::getSphiAcceptanceRatioTrace)
     .method("getCspAcceptanceRatioTraceForAA", &Trace::getCspAcceptanceRatioTraceForAA)
