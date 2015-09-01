@@ -27,6 +27,7 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * 
 	writeRestartFile = false;
 	multipleFiles = false;
 	fileWriteInterval = 1u;
+	lastConvergenceTest = 0u;
 }
 
 MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thining, unsigned _adaptiveWidth, bool _estimateSynthesisRate, bool _estimateCodonSpecificParameter, bool _estimateHyperParameter)
@@ -37,6 +38,7 @@ MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thining, unsigned _ada
 	writeRestartFile = false;
 	multipleFiles = false;
 	fileWriteInterval = 1u;
+	lastConvergenceTest = 0u;
 }
 
 MCMCAlgorithm::~MCMCAlgorithm()
@@ -131,8 +133,8 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				//#pragma omp critical
 				if(std::isinf(std::log(model.getCategoryProbability(k)) + propLogLike))
 				{
-					std::cout <<"\t P: " << model.getCategoryProbability(k) << ")\n";
-					std::cout <<"\t L: " << propLogLike << ")\n";
+					std::cout <<"\t P: " << model.getCategoryProbability(k) << "\n";
+					std::cout <<"\t L: " << propLogLike << "\n";
 				}
 				logLikelihood += std::log(model.getCategoryProbability(k)) + propLogLike;
 			}else{
@@ -140,8 +142,8 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				//#pragma omp critical
 				if(std::isinf(std::log(model.getCategoryProbability(k)) + currLogLike))
 				{
-					std::cout <<"\t P: " << model.getCategoryProbability(k) << ")\n";
-					std::cout <<"\t L: " << currLogLike << ")\n";
+					std::cout <<"\t P: " << model.getCategoryProbability(k) << "\n";
+					std::cout <<"\t L: " << currLogLike << "\n";
 				}
 				logLikelihood += std::log(model.getCategoryProbability(k)) + currLogLike;
 			}
@@ -395,7 +397,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 		}
 
 
-		if( ( (iteration + 1u) % (2*adaptiveWidth)) == 0u)
+		if( ( (iteration + 1u) % (5*adaptiveWidth)) == 0u)
 		{
 			double gewekeScore = calculateGewekeScore(iteration);
 			std::cout << "Geweke Score after " << iteration << " iterations: " << gewekeScore << "\n";
@@ -425,14 +427,14 @@ double MCMCAlgorithm::calculateGewekeScore(unsigned current_iteration)
 	double posteriorVariance1 = 0.0;
 	double posteriorVariance2 = 0.0;
 
-	unsigned end1 = std::round(current_iteration * 0.1);
-	unsigned start2 = std::round(current_iteration - (current_iteration * 0.5) + 1);
+	unsigned end1 = std::round( (current_iteration - lastConvergenceTest) * 0.1) + lastConvergenceTest;
+	unsigned start2 = std::round(current_iteration - (current_iteration * 0.5));
 
-	double numSamples1 = (double) end1;
+	double numSamples1 = (double) end1 - lastConvergenceTest;
 	double numSamples2 = (double) (double) std::round(current_iteration * 0.5);
 
 	// calculate mean and and variance of first part of likelihood trace
-	for(unsigned i = 1u; i < end1; i++)
+	for(unsigned i = lastConvergenceTest; i < end1; i++)
 	{
 		posteriorMean1 += likelihoodTrace[i];
 	}

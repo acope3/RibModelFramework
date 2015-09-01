@@ -32,7 +32,7 @@ parameter$initSelectionCategories(c("../ribModel/data/simulated_selection0.csv",
 samples <- 100
 thining <- 10
 adaptiveWidth <- 10
-divergence.iteration <- 0
+divergence.iteration <- 10
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, 
                              est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
 # get model object
