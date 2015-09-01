@@ -404,6 +404,15 @@ void ROCModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth)
 	}
 }
 
+void ROCModel::updateAllHyperParameter()
+{
+	updateSphi();
+	for (unsigned i = 0; i < parameter->getNumPhiGroupings(); i++) {
+		updateAphi(i);
+		break;
+	}
+}
+
 void ROCModel::updateHyperParameter(unsigned hp)
 {
 	if (hp == 0) {

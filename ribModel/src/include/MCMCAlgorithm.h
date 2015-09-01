@@ -34,7 +34,9 @@ class MCMCAlgorithm
 		virtual ~MCMCAlgorithm();
 	
 
-		void run(Genome& genome, Model& model, unsigned numCores = 1u);
+		void run(Genome& genome, Model& model, unsigned numCores = 1u, unsigned divergenceIterations = 0u);
+		void varyInitialConditions(Genome& genome, Model& model, unsigned divergenceIterations);
+		double calculateGewekeScore(unsigned current_iteration);
 
 		bool isEstimateSynthesisRate() {return estimateSynthesisRate;}
 		bool isEstimateCodonSpecificParameter() {return estimateCodonSpecificParameter;}

@@ -53,7 +53,8 @@ plot.Rcpp_ROCTrace <- function(trace, what=c("Mutation", "Selection", "MixturePr
   {
     plotHyperParameterTrace(trace, what = what[1])
   }
-  if(what[1] == "Mphi") {
+  if(what[1] == "Mphi") 
+  {
     plotHyperParameterTrace(trace, what = what[1])
   }
   if(what[1] == "Aphi")
@@ -129,6 +130,7 @@ plotCodonSpecificParameters <- function(trace, mixture, type="mutation", main="M
   text(0.5, 0.4, date(), cex = 0.6)
   par(mar = c(5.1, 4.1, 4.1, 2.1))
   
+  # TODO change to groupList -> checks for ROC like model is not necessary!
   names.aa <- aminoAcids()
   for(aa in names.aa)
   { 
@@ -141,7 +143,7 @@ plotCodonSpecificParameters <- function(trace, mixture, type="mutation", main="M
     }
     if(length(codons) == 0) next
     if (!ROC){
-      if(aa=="X") next
+      if(aa == "X") next
     }
     cur.trace <- vector("list", length(codons))
       if(type == "mutation")
@@ -211,12 +213,12 @@ plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sep
 #  par(oma=c(1,1,2,1), mgp=c(2,1,0), mar = c(3,4,2,1), mfrow=c(2, 1))
   if (what[1] == "Sphi")
   {
-    sphi <- trace$getSphiTrace();
+    sphi <- trace$getSPhiTrace();
     plot(sphi, type="l", xlab = "Sample", ylab = expression("s"[phi]))
   }
   if (what[1] == "Mphi")
   {
-    sphi <- trace$getSphiTrace();
+    sphi <- trace$getSPhiTrace();
     mphi <- -(sphi * sphi) / 2;
     plot(mphi, type="l", xlab = "Sample", ylab = expression("m"[phi]));
   }
@@ -228,7 +230,7 @@ plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sep
   if (what[1] == "Sepsilon")
   {
     sepsilon <- trace$getSepsilonTrace(which);
-    plot(sepsilon, type="l", xlab = "Sample", ylab = expression("S"[epsilon]))
+    plot(sepsilon, type="l", xlab = "Sample", ylab = expression("s"[epsilon]))
   }
   #par(opar)
 }

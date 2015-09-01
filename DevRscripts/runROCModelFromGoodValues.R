@@ -6,8 +6,8 @@ with.phi <- TRUE
 if (with.phi) {
   genome <- initializeGenomeObject(file = "../ribModel/data/simulatedAllUniqueR.fasta", expression.file = "../ribModel/data/simulatedAllUniqueR_phi.csv")
 } else {
-  #genome <- initializeGenomeObject(file = "../ribModel/data/simulatedAllUniqueR.fasta")
-  genome <- initializeGenomeObject(file = "../ribModel/data/Skluyveri_main.fasta")
+  genome <- initializeGenomeObject(file = "../ribModel/data/simulatedAllUniqueR.fasta")
+  #genome <- initializeGenomeObject(file = "../ribModel/data/simulatedOneMix.fasta")
 }
  
 #initialize parameter object
@@ -30,6 +30,7 @@ parameter$initSelectionCategories(c("../ribModel/data/simulated_selection0.csv",
 samples <- 100
 thining <- 10
 adaptiveWidth <- 10
+divergence.iteration <- 0
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, 
                              est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
 # get model object
@@ -38,7 +39,7 @@ model <- initializeModelObject(parameter, "ROC", with.phi = with.phi)
 setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth*20, TRUE)
 #run mcmc on genome with parameter using model
 system.time(
-  runMCMC(mcmc, genome, model, 8)
+  runMCMC(mcmc, genome, model, 4, divergence.iteration)
 )
 
 #plots log likelihood trace, possibly other mcmc diagnostics in the future
@@ -46,6 +47,7 @@ pdf("simulated_Genome_allUnique_startCSP_VGAM_startPhi_SCUO_adaptSphi_True.pdf")
 plot(mcmc)
 loglik.trace <- mcmc$getLogLikelihoodTrace()
 acf(loglik.trace)
+convergence.test(mcmc, n.samples = 50, plot=T)
 
 # plots different aspects of trace
 trace <- parameter$getTraceObject()
@@ -95,10 +97,10 @@ names.aa <- aminoAcids()
 selection <- c()
 mutation <- c()
 codon.storage <- c()
-#csp.m <- read.table("../ribModel/data/simulated_mutation0.csv", sep=",", header=T)
-#csp.e <- read.table("../ribModel/data/simulated_selection0.csv", sep=",", header=T)
-csp.m <- read.table("../ribModel/data/Skluyveri_mutation_ChrA.csv", sep=",", header=T)
-csp.e <- read.table("../ribModel/data/Skluyveri_selection_ChrA.csv", sep=",", header=T)
+csp.m <- read.table("../ribModel/data/simulated_mutation0.csv", sep=",", header=T)
+csp.e <- read.table("../ribModel/data/simulated_selection0.csv", sep=",", header=T)
+#csp.m <- read.table("../ribModel/data/simulatedOneMix_mutation.csv", sep=",", header=T)
+#csp.e <- read.table("../ribModel/data/simulatedOneMix_selection.csv", sep=",", header=T)
 
 csp <- rbind(csp.m,csp.e)
 idx.eta <- 41:80

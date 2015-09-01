@@ -188,8 +188,14 @@ void RFPModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth)
 	adaptSphiProposalWidth(adaptiveWidth);
 }
 
+void RFPModel::updateAllHyperParameter()
+{
+	updateSphi();
+}
+
 void RFPModel::updateHyperParameter(unsigned hp)
 {
+	// NOTE: when adding additional hyper parameter, also add to updateAllHyperParameter()
 	switch (hp) {
 	case 0:
 		updateSphi();
