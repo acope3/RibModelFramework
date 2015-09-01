@@ -13,6 +13,8 @@ class MCMCAlgorithm
 		unsigned thining;
 		unsigned adaptiveWidth;
 
+		unsigned lastConvergenceTest;
+
 		bool estimateSynthesisRate;
 		bool estimateCodonSpecificParameter;
 		bool estimateHyperParameter;
