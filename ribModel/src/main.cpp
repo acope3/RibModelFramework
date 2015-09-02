@@ -194,40 +194,6 @@ void testInitFromRestartFile()
 
 }
 
-void testReadRFPFile()
-{
-	std::cout << "------------------- TEST READRFPFILE ----------------------" << "\n";
-	Genome genome;
-	genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
-	std::string codon = "ATG";
-	CodonTable *codonTable = CodonTable::getInstance();
-	std::cout << codonTable -> codonToIndex(codon) <<"\n";
-	for (unsigned i = 0; i < genome.getGenomeSize(); i++)
-	{
-		std::cout << "Working with gene " << i << "\n";
-		Gene gene = genome.getGene(i);
-		SequenceSummary SS = gene.geneData;
-		for (unsigned j = 0; j < 64; j++)
-		{
-			//std::cout << gene.getId() << " " << SS.getRFPObserved(j) << " " << SS.getNumCodonsInMRNA(j) << " " << SS.IndexToCodon(j) << "\n";
-//			std::cout << gene.getId() << " " << SS.getRFPObserved(j) << " " << SS.indexToCodon(j) << "\n";
-		}
-	}
-	std::cout << "------------------- TEST READRFPFILE ----------------------" << "\n";
-}
-
-
-
-void testReadObservedPhis()
-{
-	Genome genome;
-	genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/fake.fasta");
-	genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/fakeObserved.csv", false);
-
-
-}
-
-
 void simulateRFPData()
 {
 	Genome genome;
@@ -420,20 +386,25 @@ void testMultiplePhi()
 
 	std::cout <<"----------END TEST MULTIPLEPHI----------\n";
 }
-
+//---------------------------------------------------------------------------------------------//
+//-----------------------------------------END OF UNIT TESTING---------------------------------//
+//---------------------------------------------------------------------------------------------//
 
 int main()
 {
-
-	enum User { cedric, gabe, jeremy };
+	enum User { cedric, gabe, jeremy }; //For file IO paths
 	enum ModelToRun { ROC, RFP, FONSE };
-	/* Test variables */
-	User user = jeremy;
+
+
+	User user = gabe;
 	ModelToRun modelToRun = ROC;
-	bool read = false;
-	bool testing = false;
-	bool withPhi = true;
-	if (testing)
+
+	bool read = false; //Initialize parameter by reading a restart file
+	bool testing = false; //Run unit testing
+	bool withPhi = false; //Using multiple phi values per gene
+
+
+	if (testing) //Unit testing
 	{
 		//testLogNormDensity();
 		//testSCUO(genome);
@@ -443,37 +414,42 @@ int main()
 		//testCovMatrixOverloading();
 		//testWriteRestartFile();
 		//testInitFromRestartFile();
-		//testReadRFPFile();
-		//testReadObservedPhis();
 		//simulateRFPData();
-	//	simulateROCData();
+		//simulateROCData();
 		//testInitMutationSelection();
 		//testRFPVarianceAndMean();
 		//testReadMutationValues();
 		//testGeneSequenceSummary();
 		//testReadMutationValues();
-		testMultiplePhi();
+		//testMultiplePhi();
 	}
-	else //not doing unit testing, running a model
+	else //Not doing unit testing, running a model
 	{
 		unsigned index;
-		std::cout << "initialize MCMCAlgorithm object" << std::endl;
 		int samples = 100;
 		int thining = 10;
 		int useSamples = 100;
+
+		std::cout << "Initializing MCMCAlgorithm object" << std::endl;
 		std::cout << "\t# samples: " << samples << "\n";
 		std::cout << "\t thining: " << thining << "\n";
 		std::cout << "\t # samples used: " << useSamples << "\n";
+
+
 		MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, 10, true, true, true);
 		mcmc.setRestartFileSettings("RestartFile.txt", 20, true);
-		std::cout << "done initialize MCMCAlgorithm object" << std::endl;
+		std::cout << "Done initializing MCMCAlgorithm object" <<"\n\n";
 		
 
-		std::cout << "initialize Genome object" << std::endl;
-		Genome genome;
+		std::cout << "Initializing Genome object" << std::endl;
+		unsigned tableId = 1;
+		bool splitAA = false;
+		Genome genome(tableId, splitAA);
+
+
 		switch (user) {
 			case cedric:
-				if (modelToRun == ROC)
+				if (modelToRun == ROC || modelToRun == FONSE)
 				{
 					genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
 					//genome.readFasta("C:/Users/Cedric/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta");
@@ -484,21 +460,24 @@ int main()
 				}
 				else {}
 				break;
+
 			case gabe:
-				if (modelToRun == ROC)
+				if (modelToRun == ROC || modelToRun == FONSE)
 				{
+					std::cout <<"\tReading Fasta File\n";
 					genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
-					if (withPhi) {
+					if (withPhi)
+					{
 						genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv", false);
 					}
 				}
 				else if (modelToRun == RFP)
 				{
-					//genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
-					genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/testRFPFile.csv");
+					genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 				}
 				else {}
 				break;
+
 			case jeremy:
 				if (modelToRun == ROC || modelToRun == FONSE)
 				{
@@ -514,9 +493,12 @@ int main()
 				else {}
 				break;
 		}
-		std::cout << "done initializing Genome object" << std::endl;
-		std::cout << "Initializing shared parameter variables\n";
+		std::cout << "Done initializing Genome object" <<"\n\n";
 
+		std::cout <<"Temp exit\n";
+		std::exit(1);
+
+		std::cout << "Initializing shared parameter variables\n";
 		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 
 
@@ -594,7 +576,7 @@ int main()
 			//std::vector<double> phiVals = parameter.readPhiValues("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrCleft_phi_est.csv");
 			//parameter.InitializeSynthesisRate(phiVals);
 			parameter = tmp;
-			std::cout << "done initialize ROCParameter object" << std::endl;
+			std::cout << "Done initializing ROCParameter object\n\n";
 			}
 
 			std::cout <<"Initializing ROCModel object\n";
@@ -603,10 +585,12 @@ int main()
 			std::ofstream scuoout("results/scuo.csv");
 			for (unsigned n = 0u; n < genome.getGenomeSize(); n++)
 			{
-				scuoout << genome.getGene(n).getId() << "," << parameter.calculateSCUO(genome.getGene(n), 22) << std::endl;
+				scuoout << genome.getGene(n).getId() << "," << parameter.calculateSCUO(genome.getGene(n)) << std::endl;
 			}
 			scuoout.close();
-			std::cout <<"Done initializing ROCModel object\n";
+			std::cout <<"Done initializing ROCModel object\n\n";
+
+			std::cout <<"Temparary exit\n";
 			
 
 			std::cout << "starting MCMC for ROC" << std::endl;
@@ -724,7 +708,7 @@ int main()
 			std::ofstream scuoout("results/scuo.csv");
 			for (unsigned n = 0u; n < genome.getGenomeSize(); n++)
 			{
-				scuoout << genome.getGene(n).getId() << "," << parameter.calculateSCUO(genome.getGene(n), 22) << std::endl;
+				scuoout << genome.getGene(n).getId() << "," << parameter.calculateSCUO(genome.getGene(n)) << std::endl;
 			}
 			scuoout.close();
 			std::cout << "Done initializing FONSEModel object\n";

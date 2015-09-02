@@ -21,14 +21,14 @@ FONSEParameter::FONSEParameter() : Parameter()
 {
 }
 
-FONSEParameter::FONSEParameter(std::string filename) : Parameter(22)
+FONSEParameter::FONSEParameter(std::string filename) : Parameter()
 {
 	initFromRestartFile(filename);
 }
 
 #ifndef STANDALONE
 FONSEParameter::FONSEParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) 
-	: Parameter(22)
+	: Parameter()
 {
 	unsigned _numMixtures = _matrix.size() / 2;
 	std::vector<std::vector<unsigned>> thetaKMatrix;
@@ -48,7 +48,7 @@ FONSEParameter::FONSEParameter(double sphi, std::vector<unsigned> geneAssignment
 }
 
 FONSEParameter::FONSEParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState)
-	: Parameter(22)
+	: Parameter()
 {
 	std::vector<std::vector<unsigned>> thetaKMatrix;
 	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
@@ -58,7 +58,7 @@ FONSEParameter::FONSEParameter(double sphi, unsigned _numMixtures, std::vector<u
 
 FONSEParameter::FONSEParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
 	std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer, std::string _mutationSelectionState) :
-	Parameter(22)
+	Parameter()
 {
 	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
 	initFONSEParameterSet();
@@ -175,7 +175,7 @@ std::vector <std::vector <double> > FONSEParameter::calculateSelectionCoefficien
 			double minValue = 0.0;
 			for (unsigned k = 0; k < codonRange.size(); k++)
 			{
-				std::string codon = CodonTable::codonArrayParameter[codonRange[k]];
+				std::string codon = codonTable -> getForParamVectorCodon(codonRange[k]);
 				tmp.push_back(getSelectionPosteriorMean(sample, mixture, codon));
 				if (tmp[codonRange[k]] < minValue)
 				{
@@ -401,7 +401,8 @@ void FONSEParameter::initCovarianceMatrix(SEXP _matrix, std::string aa)
 
 	for (unsigned i = 0u; i < aa.length(); i++)	aa[i] = (char)std::toupper(aa[i]);
 
-	unsigned aaIndex = SequenceSummary::aaToIndex.find(aa)->second;
+	CodonTable *codonTable = CodonTable::getInstance();
+	unsigned aaIndex = codonTable -> AAToAAIndex(aa);
 	unsigned numRows = matrix.nrow();
 	std::vector<double> covMatrix(numRows * numRows);
 
@@ -425,7 +426,7 @@ CovarianceMatrix& FONSEParameter::getCovarianceMatrixForAA(std::string aa)
 {
 	CodonTable *codonTable = CodonTable::getInstance();
 	aa[0] = (char)std::toupper(aa[0]);
-	unsigned aaIndex = codonTable -> aaToIndex.find(aa)->second;
+	unsigned aaIndex = codonTable -> AAToAAIndex(aa);
 	return covarianceMatrix[aaIndex];
 }
 
@@ -947,7 +948,7 @@ void FONSEParameter::updateCodonSpecificParameter(std::string grouping)
 {
 	CodonTable *codonTable = CodonTable::getInstance();
 	std::vector <unsigned> codonRange = codonTable -> AAToCodonRange(grouping, true); //checked
-	unsigned aaIndex = CodonTable::aaToIndex.find(grouping)->second;
+	unsigned aaIndex = codonTable -> AAToAAIndex(grouping);
 	numAcceptForMutationAndSelection[aaIndex]++;
 
 	for (unsigned k = 0u; k < numMutationCategories; k++)

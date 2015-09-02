@@ -13,19 +13,22 @@ using namespace Rcpp;
 RFPParameter::RFPParameter() : Parameter()
 {
 	//ctor
+	maxGrouping = 64;
 }
 
 
-RFPParameter::RFPParameter(std::string filename) : Parameter(64)
+RFPParameter::RFPParameter(std::string filename) : Parameter()
 {
 	initFromRestartFile(filename);
+	maxGrouping = 64;
 	numParam = 61;
 }
 
 
 RFPParameter::RFPParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix, 
-		bool splitSer, std::string _mutationSelectionState) : Parameter(64)
+		bool splitSer, std::string _mutationSelectionState) : Parameter()
 {
+	maxGrouping = 64;
 	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
 	initRFPParameterSet();
 }
@@ -1006,8 +1009,9 @@ double RFPParameter::getLambdaPrimeVarianceForCodon(unsigned mixtureElement, uns
 
 
 #ifndef STANDALONE
-RFPParameter::RFPParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter(64)
+RFPParameter::RFPParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter()
 {
+  maxGrouping = 64;
   unsigned _numMixtures = _matrix.size() / 2;
   std::vector<std::vector<unsigned>> thetaKMatrix;
   thetaKMatrix.resize(_numMixtures);
@@ -1026,8 +1030,9 @@ RFPParameter::RFPParameter(double sphi, std::vector<unsigned> geneAssignment, st
 }
 
 RFPParameter::RFPParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState) :
-Parameter(64)
+Parameter()
 {
+  maxGrouping = 64;
   std::vector<std::vector<unsigned>> thetaKMatrix;
   initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
   initRFPParameterSet();

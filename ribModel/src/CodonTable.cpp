@@ -57,14 +57,6 @@ CodonTable::CodonTable(unsigned _tableId, bool _splitAA) : tableId(_tableId), sp
         "A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y", "X"};
 
 
-    const std::map<std::string, unsigned> CodonTable::aaToIndex = {{"A", 0}, {"C", 1}, {"D", 2}, {"E", 3}, {"F", 4},
-     {"G", 5}, {"H", 6}, {"I", 7}, {"K", 8}, {"L",9}, {CodonTable::Leu1, 10}, {"M", 11}, {"N", 12}, {"P", 13}, {"Q", 14}, {"R", 15},
-                                                                   {CodonTable::Ser1, 16}, {CodonTable::Ser2, 17}, {"S", 18},
-     {"T", 19}, {CodonTable::Thr4_1, 20}, {CodonTable::Thr4_2, 21}, {"V", 22}, {"W", 23}, {"Y", 24}, {"X", 25}};
-
-const std::map<std::string, unsigned> CodonTable::aaToIndexWithoutSplit = {{"A", 0}, {"C", 1}, {"D", 2}, {"E", 3}, {"F", 4},
-  {"G", 5}, {"H", 6}, {"I", 7}, {"K", 8}, {"L",9}, {"M", 10}, {"N", 11}, {"P", 12}, {"Q", 13}, {"R", 14}, {"S", 15}, {"T", 16}, {"V", 17}, {"W", 18}, {"Y", 19}, {"X", 20}};
-
     const std::map<std::string, unsigned> CodonTable::codonToIndexWithReference = {{"GCA", 0}, {"GCC", 1}, {"GCG", 2},
         {"GCT", 3}, {"TGC", 4}, {"TGT", 5}, {"GAC", 6}, {"GAT", 7}, {"GAA", 8}, {"GAG", 9}, {"TTC", 10}, {"TTT", 11},
         {"GGA", 12}, {"GGC", 13}, {"GGG", 14}, {"GGT", 15}, {"CAC", 16}, {"CAT", 17}, {"ATA", 18}, {"ATC", 19}, {"ATT", 20},
@@ -73,13 +65,6 @@ const std::map<std::string, unsigned> CodonTable::aaToIndexWithoutSplit = {{"A",
         {"AGG", 39}, {"CGA", 40}, {"CGC", 41}, {"CGG", 42}, {"CGT", 43}, {"TCA", 44}, {"TCC", 45}, {"TCG", 46}, {"TCT", 47},
         {"ACA", 48}, {"ACC", 49}, {"ACG", 50}, {"ACT", 51}, {"GTA", 52}, {"GTC", 53}, {"GTG", 54}, {"GTT", 55}, {"TGG", 56},
         {"TAC", 57}, {"TAT", 58}, {"AGC", 59}, {"AGT", 60}, {"TAA", 61}, {"TAG", 62}, {"TGA", 63}};
-
-    const std::map<std::string, unsigned> CodonTable::codonToIndexWithoutReference = {{"GCA", 0}, {"GCC", 1},
-        {"GCG", 2}, {"TGC", 3}, {"GAC", 4}, {"GAA", 5}, {"TTC", 6}, {"GGA", 7}, {"GGC", 8}, {"GGG", 9}, {"CAC", 10},
-        {"ATA", 11}, {"ATC", 12}, {"AAA", 13}, {"CTA", 14}, {"CTC", 15}, {"CTG", 16}, {"CTT", 17}, {"TTA", 18}, {"AAC", 19},
-        {"CCA", 20}, {"CCC", 21}, {"CCG", 22}, {"CAA", 23}, {"AGA", 24}, {"AGG", 25}, {"CGA", 26}, {"CGC", 27}, {"CGG", 28},
-        {"TCA", 29}, {"TCC", 30}, {"TCG", 31}, {"ACA", 32}, {"ACC", 33}, {"ACG", 34}, {"GTA", 35}, {"GTC", 36}, {"GTG", 37},
-        {"TAC", 38}, {"AGC", 39}};
 
     const std::string CodonTable::codonArray[] =
         {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
@@ -90,15 +75,7 @@ const std::map<std::string, unsigned> CodonTable::aaToIndexWithoutSplit = {{"A",
         "ACG", "ACT", "GTA", "GTC", "GTG", "GTT", "TGG", "TAC", "TAT", "AGC",
         "AGT", "TAA", "TAG", "TGA"};
 
-    const std::string CodonTable::codonArrayParameter[] =
-        {"GCA", "GCC", "GCG", "TGC", "GAC",
-        "GAA", "TTC", "GGA", "GGC", "GGG",
-        "CAC", "ATA", "ATC", "AAA", "CTA",
-        "CTC", "CTG", "CTT", "TTA", "AAC",
-        "CCA", "CCC", "CCG", "CAA", "AGA",
-        "AGG", "CGA", "CGC", "CGG", "TCA",
-        "TCC", "TCG", "ACA", "ACC", "ACG",
-        "GTA", "GTC", "GTG", "TAC", "AGC"};
+
 
     // TODO NOTE: THERE IS NO CODON TABLE 7, 8, 15, 17, 18, 19, 20 ACCORDING TO NCBI !
     // http://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi
@@ -146,12 +123,12 @@ const std::map<std::string, unsigned> CodonTable::aaToIndexWithoutSplit = {{"A",
 
 unsigned CodonTable::AAToAAIndex(std::string aa)
 {
-        return CodonTable::AAMap.find(aa) -> second;
+        return AAMap.find(aa) -> second;
 }
 
 std::vector <unsigned> CodonTable::AAIndexToCodonRange(unsigned aaIndex, bool forParamVector)
 {
-    return codon_mapping[aaIndex];
+    return codonIndexListing[aaIndex];
 }
 
 std::vector <unsigned> CodonTable::AAToCodonRange(std::string aa, bool forParamVector)
@@ -168,7 +145,7 @@ std::vector<std::string> CodonTable::AAToCodon(std::string aa, bool forParamVect
 
         for (unsigned i = 0; i < aaRange.size(); i++)
         {
-            unsigned index = codon_mapping_without_reference[AAToAAIndex(aa)][aaRange[i]];
+            unsigned index = codonIndexListing_without_reference[AAToAAIndex(aa)][aaRange[i]];
             codons.push_back(indexToCodon(index));
         }
 
@@ -198,13 +175,15 @@ unsigned CodonTable::codonToIndex(std::string& codon, bool forParamVector)
 
 unsigned CodonTable::codonToAAIndex(std::string& codon)
 {
+    std::cout << codon <<"\n";
     std::string AA = codonToAA(codon);
+    std::cout <<  AAMap.find(AA) -> second <<"\n\n";
     return AAMap.find(AA) -> second;
 }
 
 std::string CodonTable::indexToAA(unsigned aaIndex)
 {
-    return aa_mapping[aaIndex];
+    return AAListing[aaIndex];
 }
 
 unsigned CodonTable::getNumCodons(std::string aa, bool forParamVector)
@@ -228,20 +207,20 @@ void CodonTable::setupCodonTable()
     else if (tableId >= 20 && tableId <= 24 && !splitAA) numAA = 20;
 
 
-	codon_mapping.resize(numAA);
+	codonIndexListing.resize(numAA);
 
     unsigned aaIndex = 0;
     unsigned filled = 0;
     while (filled != numAA)
     {
-        unsigned numCodons = getNumCodons(aaIndex);
+        unsigned numCodons = numCodonsPerAAForTable[tableId][aaIndex];
         if (numCodons != 0)
         {
             if (aaIndex == 0) //A
             {
                 for (unsigned i = 0; i < 4; i++)
                 {
-                    codon_mapping[filled].push_back(i);
+                    codonIndexListing[filled].push_back(i);
                 }
                 AAToNumCodonsMap.insert(std::make_pair("A", 4));
             }
@@ -250,11 +229,11 @@ void CodonTable::setupCodonTable()
                 AAToNumCodonsMap.insert(std::make_pair("C", 2));
                 for (unsigned i = 4; i < 6; i++)
                 {
-                    codon_mapping[filled].push_back(i);
+                    codonIndexListing[filled].push_back(i);
                 }
                 if (tableId == 10)
                 {
-                    codon_mapping[filled].push_back(63);
+                    codonIndexListing[filled].push_back(63);
                     AAToNumCodonsMap["C"]++;
                 }
 
@@ -264,7 +243,7 @@ void CodonTable::setupCodonTable()
                 AAToNumCodonsMap.insert(std::make_pair("D", 2));
                 for (unsigned i = 6; i < 8; i++)
                 {
-                    codon_mapping[filled].push_back(i);
+                    codonIndexListing[filled].push_back(i);
                 }
             }
             else if (aaIndex == 3) //E
@@ -272,7 +251,7 @@ void CodonTable::setupCodonTable()
                 AAToNumCodonsMap.insert(std::make_pair("E", 2));
                 for (unsigned i = 8; i < 10; i++)
                 {
-                    codon_mapping[filled].push_back(i);
+                    codonIndexListing[filled].push_back(i);
                 }
             }
             else if (aaIndex == 4) //F
@@ -280,7 +259,7 @@ void CodonTable::setupCodonTable()
                 AAToNumCodonsMap.insert(std::make_pair("F", 2));
                 for (unsigned i = 10; i < 12; i++)
                 {
-                    codon_mapping[filled].push_back(i);
+                    codonIndexListing[filled].push_back(i);
                 }
             }
             else if (aaIndex == 5) //G
@@ -288,18 +267,18 @@ void CodonTable::setupCodonTable()
                 AAToNumCodonsMap.insert(std::make_pair("G", 4));
                 for (unsigned i = 12; i < 16; i++)
                 {
-                    codon_mapping[filled].push_back(i);
+                    codonIndexListing[filled].push_back(i);
                 }
                 if (tableId == 12)
                 {
                     AAToNumCodonsMap["G"] += 2;
-                    codon_mapping[filled].push_back(38);
-                    codon_mapping[filled].push_back(39);
+                    codonIndexListing[filled].push_back(38);
+                    codonIndexListing[filled].push_back(39);
                 }
                 else if (tableId == 24)
                 {
                     AAToNumCodonsMap["G"]++;
-                    codon_mapping[filled].push_back(63);
+                    codonIndexListing[filled].push_back(63);
                 }
             }
             else if (aaIndex == 6) //H
@@ -307,7 +286,7 @@ void CodonTable::setupCodonTable()
                 AAToNumCodonsMap.insert(std::make_pair("H", 2));
                 for (unsigned i = 16; i < 18; i++)
                 {
-                    codon_mapping[filled].push_back(i);
+                    codonIndexListing[filled].push_back(i);
                 }
             }
             else if (aaIndex == 7) //I
@@ -317,11 +296,11 @@ void CodonTable::setupCodonTable()
                         || tableId == 11 || tableId == 13 || tableId == 15 || tableId >= 21)
                 {
                     AAToNumCodonsMap["I"]++;
-                    codon_mapping[filled].push_back(18);
+                    codonIndexListing[filled].push_back(18);
                 }
                 for (unsigned i = 19; i < 21; i++)
                 {
-                    codon_mapping[filled].push_back(i);
+                    codonIndexListing[filled].push_back(i);
                 }
             }
             else if (aaIndex == 8) //K
@@ -333,19 +312,19 @@ void CodonTable::setupCodonTable()
                     AAToNumCodonsMap.insert(std::make_pair("K", 2));
                     for (unsigned i = 21; i < 23; i++)
                     {
-                        codon_mapping[filled].push_back(i);
+                        codonIndexListing[filled].push_back(i);
                     }
                 }
                 else if (tableId == 8 || tableId == 13 || tableId == 20)
                 {
                     AAToNumCodonsMap.insert(std::make_pair("K", 1));
-                    codon_mapping[filled].push_back(22);
+                    codonIndexListing[filled].push_back(22);
                 }
 
                 if (tableId == 23)
                 {
                     AAToNumCodonsMap["K"]++;
-                    codon_mapping[filled].push_back(39);
+                    codonIndexListing[filled].push_back(39);
                 }
             }
             else if (aaIndex == 9) //L
@@ -358,17 +337,17 @@ void CodonTable::setupCodonTable()
                     {
                         if (i == 25 && tableId != 11)
                         {
-                            codon_mapping[filled].push_back(i);
+                            codonIndexListing[filled].push_back(i);
                         }
                         else
                         {
-                            codon_mapping[filled].push_back(i);
+                            codonIndexListing[filled].push_back(i);
                         }
                     }
                     if ((tableId == 15 || tableId == 21) && !splitAA)
                     {
                         AAToNumCodonsMap["L"]++;
-                        codon_mapping[filled].push_back(62);
+                        codonIndexListing[filled].push_back(62);
                     }
                 }
                 else if (tableId == 2)
@@ -376,7 +355,7 @@ void CodonTable::setupCodonTable()
                     AAToNumCodonsMap.insert(std::make_pair("L", 2));
                     for (unsigned i = 27; i < 29; i++)
                     {
-                        codon_mapping[filled].push_back(i);
+                        codonIndexListing[filled].push_back(i);
                     }
                 }
                 else if (tableId == 22)
@@ -384,9 +363,9 @@ void CodonTable::setupCodonTable()
                     AAToNumCodonsMap.insert(std::make_pair("L", 5));
                     for (unsigned i = 23; i < 27; i++)
                     {
-                        codon_mapping[filled].push_back(i);
+                        codonIndexListing[filled].push_back(i);
                     }
-                    codon_mapping[filled].push_back(28);
+                    codonIndexListing[filled].push_back(28);
                 }
             }
             else if (aaIndex == 10) //Leu1
@@ -394,7 +373,7 @@ void CodonTable::setupCodonTable()
                 if (splitAA)
                 {
                     AAToNumCodonsMap.insert(std::make_pair(CodonTable::Leu1, 1));
-                    codon_mapping[filled].push_back(62);
+                    codonIndexListing[filled].push_back(62);
                 }
                 else
                 {
@@ -404,11 +383,11 @@ void CodonTable::setupCodonTable()
             else if (aaIndex == 11) //M
             {
                 AAToNumCodonsMap.insert(std::make_pair("M", 1));
-                codon_mapping[filled].push_back(29);
+                codonIndexListing[filled].push_back(29);
                 if (tableId == 1 || tableId == 2 || tableId == 4 || tableId == 12 || tableId == 20)
                 {
                     AAToNumCodonsMap["M"]++;
-                    codon_mapping[filled].push_back(18);
+                    codonIndexListing[filled].push_back(18);
                 }
             }
             else if (aaIndex == 12) //N
@@ -416,12 +395,12 @@ void CodonTable::setupCodonTable()
                 AAToNumCodonsMap["M"] += 2;
                 for (unsigned i = 30; i < 32; i++)
                 {
-                    codon_mapping[filled].push_back(i);
+                    codonIndexListing[filled].push_back(i);
                 }
                 if (tableId == 8 || tableId == 13 || tableId == 20)
                 {
                     AAToNumCodonsMap["M"]++;
-                    codon_mapping[filled].push_back(21);
+                    codonIndexListing[filled].push_back(21);
                 }
             }
             else if (aaIndex == 13) //P
@@ -429,7 +408,7 @@ void CodonTable::setupCodonTable()
                 AAToNumCodonsMap.insert(std::make_pair("P", 4));
                 for (unsigned i = 32; i < 36; i++)
                 {
-                    codon_mapping[filled].push_back(i);
+                    codonIndexListing[filled].push_back(i);
                 }
             }
             else if (aaIndex == 14) //Q
@@ -437,13 +416,13 @@ void CodonTable::setupCodonTable()
                 AAToNumCodonsMap.insert(std::make_pair("Q", 2));
                 for (unsigned i = 36; i < 38; i++)
                 {
-                    codon_mapping[filled].push_back(i);
+                    codonIndexListing[filled].push_back(i);
                 }
                 if (tableId == 5)
                 {
                     AAToNumCodonsMap["Q"] += 2;
-                    codon_mapping[filled].push_back(61);
-                    codon_mapping[filled].push_back(62);
+                    codonIndexListing[filled].push_back(61);
+                    codonIndexListing[filled].push_back(62);
                 }
             }
             else if (aaIndex == 15) //R
@@ -453,22 +432,22 @@ void CodonTable::setupCodonTable()
                         tableId == 21 || tableId == 22 || tableId == 24)
                 {
                     AAToNumCodonsMap["R"] += 2;
-                    codon_mapping[filled].push_back(38);
-                    codon_mapping[filled].push_back(39);
+                    codonIndexListing[filled].push_back(38);
+                    codonIndexListing[filled].push_back(39);
                 }
 
                 if (tableId == 2)
                 {
                     AAToNumCodonsMap["R"] += 2;
-                    codon_mapping[filled].push_back(42);
-                    codon_mapping[filled].push_back(43);
+                    codonIndexListing[filled].push_back(42);
+                    codonIndexListing[filled].push_back(43);
                 }
                 else
                 {
                     AAToNumCodonsMap["R"] += 4;
                     for (unsigned i = 40; i < 44; i++)
                     {
-                        codon_mapping[filled].push_back(i);
+                        codonIndexListing[filled].push_back(i);
                     }
                 }
             }
@@ -477,7 +456,7 @@ void CodonTable::setupCodonTable()
                 if(splitAA)
                 {
                     AAToNumCodonsMap.insert(std::make_pair(CodonTable::Ser1, 1));
-                    codon_mapping[filled].push_back(25); //table 12
+                    codonIndexListing[filled].push_back(25); //table 12
                 }
                 else
                 {
@@ -489,19 +468,19 @@ void CodonTable::setupCodonTable()
                 if (splitAA)
                 {
                     AAToNumCodonsMap.insert(std::make_pair(CodonTable::Ser2, 2));
-                    codon_mapping[filled].push_back(59);
-                    codon_mapping[filled].push_back(60);
+                    codonIndexListing[filled].push_back(59);
+                    codonIndexListing[filled].push_back(60);
 
                     if (tableId == 4 || tableId == 8 || tableId == 13 || tableId == 20)
                     {
                         AAToNumCodonsMap[CodonTable::Ser2] += 2;
-                        codon_mapping[filled].push_back(38);
-                        codon_mapping[filled].push_back(39);
+                        codonIndexListing[filled].push_back(38);
+                        codonIndexListing[filled].push_back(39);
                     }
                     else if (tableId == 23)
                     {
                         AAToNumCodonsMap[CodonTable::Ser2]++;
-                        codon_mapping[filled].push_back(38);
+                        codonIndexListing[filled].push_back(38);
                     }
                 }
                 else
@@ -517,14 +496,14 @@ void CodonTable::setupCodonTable()
                     AAToNumCodonsMap["S"]++;
                     for(unsigned i = 44; i < 48; i++)
                     {
-                        codon_mapping[filled].push_back(i);
+                        codonIndexListing[filled].push_back(i);
                     }
                 }
                 else
                 {
                     for(unsigned i = 45; i < 48; i++)
                     {
-                        codon_mapping[filled].push_back(i);
+                        codonIndexListing[filled].push_back(i);
                     }
                 }
 
@@ -534,22 +513,22 @@ void CodonTable::setupCodonTable()
                     if (tableId == 11)
                     {
                         AAToNumCodonsMap["S"]++;
-                        codon_mapping[filled].push_back(25);
+                        codonIndexListing[filled].push_back(25);
                     }
 
-                    codon_mapping[filled].push_back(59);
-                    codon_mapping[filled].push_back(60);
+                    codonIndexListing[filled].push_back(59);
+                    codonIndexListing[filled].push_back(60);
 
                     if (tableId == 4 || tableId == 8 || tableId == 13 || tableId == 20)
                     {
                         AAToNumCodonsMap["S"] += 2;
-                        codon_mapping[filled].push_back(38);
-                        codon_mapping[filled].push_back(39);
+                        codonIndexListing[filled].push_back(38);
+                        codonIndexListing[filled].push_back(39);
                     }
                     else if (tableId == 23)
                     {
                         AAToNumCodonsMap["S"]++;
-                        codon_mapping[filled].push_back(38);
+                        codonIndexListing[filled].push_back(38);
                     }
                 }
             }
@@ -561,7 +540,7 @@ void CodonTable::setupCodonTable()
                     AAToNumCodonsMap["T"] += 4;
                     for (unsigned i = 48; i < 52; i++)
                     {
-                        codon_mapping[filled].push_back(i);
+                        codonIndexListing[filled].push_back(i);
                     }
                 }
                 else if (tableId == 2 && !splitAA)
@@ -569,12 +548,12 @@ void CodonTable::setupCodonTable()
                     AAToNumCodonsMap["T"] += 8;
                     for (unsigned i = 48; i < 52; i++)
                     {
-                        codon_mapping[filled].push_back(i);
+                        codonIndexListing[filled].push_back(i);
                     }
 
                     for (unsigned i = 23; i < 27; i++)
                     {
-                        codon_mapping[filled].push_back(i);
+                        codonIndexListing[filled].push_back(i);
                     }
                 }
             }
@@ -585,7 +564,7 @@ void CodonTable::setupCodonTable()
                     AAToNumCodonsMap.insert(std::make_pair(CodonTable::Thr4_1, 4));
                     for (unsigned i = 48; i < 52; i++)
                     {
-                        codon_mapping[filled].push_back(i);
+                        codonIndexListing[filled].push_back(i);
                     }
                 }
                 else
@@ -600,7 +579,7 @@ void CodonTable::setupCodonTable()
                     AAToNumCodonsMap.insert(std::make_pair(CodonTable::Thr4_2, 4));
                     for (unsigned i = 23; i < 27; i++)
                     {
-                        codon_mapping[filled].push_back(i);
+                        codonIndexListing[filled].push_back(i);
                     }
                 }
                 else
@@ -613,17 +592,17 @@ void CodonTable::setupCodonTable()
                 AAToNumCodonsMap.insert(std::make_pair("V", 4));
                 for (unsigned i = 52; i < 56; i++)
                 {
-                    codon_mapping[filled].push_back(i);
+                    codonIndexListing[filled].push_back(i);
                 }
             }
             else if (aaIndex == 23) //W
             {
                 AAToNumCodonsMap.insert(std::make_pair("W", 1));
-                codon_mapping[filled].push_back(56);
+                codonIndexListing[filled].push_back(56);
                 if ((tableId >= 1 && tableId <= 4) || (tableId == 8) || (tableId == 12) || (tableId == 13) || (tableId == 20))
                 {
                     AAToNumCodonsMap["W"]++;
-                    codon_mapping[filled].push_back(63);
+                    codonIndexListing[filled].push_back(63);
                 }
             }
             else if (aaIndex == 24) //Y
@@ -631,11 +610,11 @@ void CodonTable::setupCodonTable()
                 AAToNumCodonsMap.insert(std::make_pair("Y", 2));
                 for (unsigned i = 56; i < 58; i++)
                 {
-                    codon_mapping[filled].push_back(i);
+                    codonIndexListing[filled].push_back(i);
                 }
                 if (tableId == 13){
                     AAToNumCodonsMap["Y"]++;
-                    codon_mapping[filled].push_back(61);
+                    codonIndexListing[filled].push_back(61);
                 }
             }
             //ignoring stop amino acid for now
@@ -646,15 +625,16 @@ void CodonTable::setupCodonTable()
 
     //fill without refernce mapping
     unsigned val = 0;
-    codon_mapping_without_reference.resize(numAA);
+    codonIndexListing_without_reference.resize(numAA);
     for (unsigned i = 0; i < numAA; i++)
     {
-        for (unsigned j = 0; j < codon_mapping[i].size() - 1; j++)
+        for (unsigned j = 0; j < codonIndexListing[i].size() - 1; j++)
         {
-            codon_mapping_without_reference[i].push_back(codon_mapping[i][j]);
-            unsigned codonIndex = codon_mapping[i][j];
+            codonIndexListing_without_reference[i].push_back(codonIndexListing[i][j]);
+            unsigned codonIndex = codonIndexListing[i][j];
             std::string codon = codonArray[codonIndex];
             forParamVectorMap.insert(std::make_pair(codon, val));
+            forParamVectorListing.push_back(codon);
             val++;
         }
     }
@@ -667,7 +647,7 @@ void CodonTable::setupCodonTable()
         {
             if (numCodonsPerAAForTable[tableId][i] != 0)
             {
-                aa_mapping.push_back(AminoAcidArray[i]);
+                AAListing.push_back(AminoAcidArray[i]);
                 AAMap.insert(std::make_pair(AminoAcidArray[i], index));
                 index++;
             }
@@ -677,16 +657,16 @@ void CodonTable::setupCodonTable()
     {
         for (unsigned i = 0; i < 26; i++)
         {
-            aa_mapping.push_back(AminoAcidArrayWithoutSplit[i]);
+            AAListing.push_back(AminoAcidArrayWithoutSplit[i]);
             if (numCodonsPerAAForTable[tableId][i] != 0 || AminoAcidArray[i] != CodonTable::Leu1 || AminoAcidArray[i] != CodonTable::Ser1
                     || AminoAcidArray[i] != Ser2 || AminoAcidArray[i] != CodonTable::Thr4_2)
             {
                 if (AminoAcidArray[i] == CodonTable::Thr4_1) //this accounts for the table where Thr4_1 and Thr4_2 and filled, but T is the one actually used when not split
                 {
-                    aa_mapping.push_back("T");
+                    AAListing.push_back("T");
                     AAMap.insert(std::make_pair("T", index));
                 }
-                aa_mapping.push_back(AminoAcidArray[i]);
+                AAListing.push_back(AminoAcidArray[i]);
                 AAMap.insert(std::make_pair(AminoAcidArray[i], index));
                 index++;
             }
@@ -696,20 +676,33 @@ void CodonTable::setupCodonTable()
 
 
 
+
     //Build a map for the Codon To AA
-    for(unsigned AAIndex = 0; AAIndex < codon_mapping.size(); AAIndex++)
+    for(unsigned AAIndex = 0; AAIndex < codonIndexListing.size(); AAIndex++)
     {
-        std::string AA = aa_mapping[AAIndex];
-        for (unsigned codonIndex = 0; codonIndex < codon_mapping[AAIndex].size(); codonIndex++)
+        std::string AA = AAListing[AAIndex];
+        for (unsigned codonIndex = 0; codonIndex < codonIndexListing[AAIndex].size(); codonIndex++)
         {
-            std::string codon = codonArray[codon_mapping[AAIndex][codonIndex]];
+            std::string codon = codonArray[codonIndexListing[AAIndex][codonIndex]];
             codonToAAMap.insert(std::make_pair(codon, AA));
         }
     }
-
-
 }
 
+std::vector <std::string> CodonTable::getAA_mapping()
+{
+    return AAListing;
+}
+
+std::map <std::string, unsigned> CodonTable::getAAMap()
+{
+    return AAMap;
+}
+
+unsigned  CodonTable::getTableId()
+{
+    return tableId;
+}
 CodonTable* CodonTable::codonTable;
 
 void CodonTable::createCodonTable(unsigned tableId, bool split)
@@ -722,4 +715,9 @@ void CodonTable::createCodonTable(unsigned tableId, bool split)
 CodonTable* CodonTable::getInstance()
 {
     return codonTable;
+}
+
+std::string CodonTable::getForParamVectorCodon(unsigned codonIndex)
+{
+    return forParamVectorListing[codonIndex];
 }

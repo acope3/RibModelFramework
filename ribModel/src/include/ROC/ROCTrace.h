@@ -45,8 +45,8 @@ class ROCTrace : public Trace
 		//R WRAPPER FUNCTIONS
 
 		//Getter functions
-		std::vector<double> getMutationParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon, CodonTable *codonTable); //R WRAPPER
-		std::vector<double> getSelectionParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon, CodonTable *codonTable); //R WRAPPER
+		std::vector<double> getMutationParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon); //R WRAPPER
+		std::vector<double> getSelectionParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon); //R WRAPPER
 		std::vector<double> getAphiTraceR(unsigned index);
 		std::vector<double> getSepsilonTraceR(unsigned index);
 };

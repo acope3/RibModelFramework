@@ -20,14 +20,15 @@ ROCParameter::ROCParameter() : Parameter()
 
 
 ROCParameter::ROCParameter(std::string filename) :
-		Parameter(22)
+		Parameter()
 {
 	initFromRestartFile(filename);
 }
 
 #ifndef STANDALONE
-ROCParameter::ROCParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter(22)
+ROCParameter::ROCParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter()
 {
+	maxGrouping = 22;
 	unsigned _numMixtures = _matrix.size() / 2;
 	std::vector<std::vector<unsigned>> thetaKMatrix;
 	thetaKMatrix.resize(_numMixtures);
@@ -46,8 +47,9 @@ ROCParameter::ROCParameter(double sphi, std::vector<unsigned> geneAssignment, st
 }
 
 ROCParameter::ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState) :
-Parameter(22)
+Parameter()
 {
+	maxGrouping = 22;
 	std::vector<std::vector<unsigned>> thetaKMatrix;
 	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
 	initROCParameterSet();
@@ -56,7 +58,7 @@ Parameter(22)
 
 ROCParameter::ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
 		std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer, std::string _mutationSelectionState) :
-		Parameter(22)
+		Parameter()
 {
 	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
 	initROCParameterSet();
@@ -165,7 +167,7 @@ std::vector<std::vector<double>> ROCParameter::calculateSelectionCoefficients(un
 			double minValue = 0.0;
 			for (unsigned k = 0; k < codonRange.size(); k++)
 			{
-				std::string codon = CodonTable::codonArrayParameter[codonRange[k]];
+				std::string codon = codonTable -> getForParamVectorCodon(codonRange[k]);
 				tmp.push_back(getSelectionPosteriorMean(sample, mixture, codon));
 				if (tmp[codonRange[k]] < minValue)
 				{
@@ -486,7 +488,8 @@ void ROCParameter::initCovarianceMatrix(SEXP _matrix, std::string aa)
 
 	for(unsigned i = 0u; i < aa.length(); i++)	aa[i] = (char)std::toupper(aa[i]);
 
-	unsigned aaIndex = SequenceSummary::aaToIndex.find(aa) -> second;
+	CodonTable *codonTable = CodonTable::getInstance();
+	unsigned aaIndex = codonTable -> AAToAAIndex(aa);
 	unsigned numRows = matrix.nrow();
 	std::vector<double> covMatrix(numRows * numRows);
 
@@ -508,8 +511,9 @@ void ROCParameter::initCovarianceMatrix(SEXP _matrix, std::string aa)
 
 CovarianceMatrix& ROCParameter::getCovarianceMatrixForAA(std::string aa)
 {
+	CodonTable *codonTable = CodonTable::getInstance();
 	aa[0] = (char) std::toupper(aa[0]);
-	unsigned aaIndex = CodonTable::aaToIndex.find(aa) -> second;
+	unsigned aaIndex = codonTable -> AAToAAIndex(aa);;
 	return covarianceMatrix[aaIndex];
 }
 
@@ -1129,7 +1133,7 @@ void ROCParameter::updateCodonSpecificParameter(std::string grouping)
 {
 	CodonTable *codonTable = CodonTable::getInstance();
 	std::vector <unsigned> codonRange = codonTable -> AAToCodonRange(grouping, true); //checked
-	unsigned aaIndex = CodonTable::aaToIndex.find(grouping)->second;
+	unsigned aaIndex = codonTable -> AAToAAIndex(grouping);
 	numAcceptForMutationAndSelection[aaIndex]++;
 
 	for (unsigned k = 0u; k < numMutationCategories; k++)

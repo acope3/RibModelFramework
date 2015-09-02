@@ -6,13 +6,17 @@
 #include <sstream>
 #include <cmath>
 
-
 Genome::Genome()
 {
 	//ctor
 	numGenesWithPhi = 0;
-	CodonTable CT(1, false);
-	CT.createCodonTable(1, false);
+}
+Genome::Genome(unsigned tableId, bool splitAA)
+{
+	//ctor
+	numGenesWithPhi = 0;
+	CodonTable CT(tableId, splitAA);
+	CT.createCodonTable(tableId, splitAA);
 }
 
 
@@ -49,6 +53,7 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 		}
 		else
 		{
+
 
 			bool fastaFormat = false;
 			std::string buf;
@@ -535,8 +540,9 @@ Genome Genome::getGenomeForGeneIndicies(std::vector <unsigned> indicies, bool si
 }
 
 
-std::vector<unsigned> Genome::getCodonCountsPerGene(std::string codon, CodonTable *codonTable)
+std::vector<unsigned> Genome::getCodonCountsPerGene(std::string codon)
 {
+	CodonTable *codonTable = CodonTable::getInstance();
 	std::vector<unsigned> codonCounts(genes.size());
 	unsigned codonIndex = codonTable -> codonToIndex(codon);
 	for(unsigned i = 0u; i < genes.size(); i++)

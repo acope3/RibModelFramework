@@ -53,7 +53,7 @@ class Gene
 		void clear(); // clear the content of object
 		unsigned length();
 		Gene reverseComplement(); // return the reverse compliment
-		std::string toAASequence(CodonTable *codonTable);
+		std::string toAASequence();
 
 
 

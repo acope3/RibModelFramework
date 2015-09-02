@@ -22,7 +22,8 @@ class Genome
 	public:
 
 		//Constructors & destructors:
-		explicit Genome();
+		Genome();
+		explicit Genome(unsigned tableId, bool splitAA = false);
 		virtual ~Genome();
 		Genome& operator=(const Genome& other);
 
@@ -48,7 +49,7 @@ class Genome
 		unsigned getGenomeSize();
 		void clear();
 		Genome getGenomeForGeneIndicies(std::vector <unsigned> indicies, bool simulated = false); //NOTE: If simulated is true, it will return a genome with the simulated genes, but the returned genome's genes vector will contain the simulated genes.
-		std::vector<unsigned> getCodonCountsPerGene(std::string codon, CodonTable *codonTable);
+		std::vector<unsigned> getCodonCountsPerGene(std::string codon);
 
 
 

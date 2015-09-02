@@ -6,6 +6,8 @@
 SequenceSummary::SequenceSummary()
 {
 	clear();
+	CodonTable *codonTable = CodonTable::getInstance();
+	naa.resize(codonTable -> getAA_mapping().size(), 0);
 	//ctor
 }
 
@@ -34,9 +36,7 @@ SequenceSummary::SequenceSummary(const SequenceSummary& other)
 		ncodons[i] = other.ncodons[i];
 	}
 
-	for (unsigned i = 0u; i < 22; i++) {
-		naa[i] = other.naa[i];
-	}
+	naa = other.naa;
 
 	for (unsigned i = 0u; i < 64; i++) {
 		RFPObserved[i] = other.RFPObserved[i];
@@ -56,9 +56,7 @@ SequenceSummary& SequenceSummary::operator=(const SequenceSummary& rhs)
 		ncodons[i] = rhs.ncodons[i];
 	}
 
-	for (unsigned i = 0u; i < 22; i++) {
-		naa[i] = rhs.naa[i];
-	}
+	naa = rhs.naa;
 
 	for (unsigned i = 0u; i < 64; i++) {
 		RFPObserved[i] = rhs.RFPObserved[i];
@@ -76,7 +74,7 @@ SequenceSummary& SequenceSummary::operator=(const SequenceSummary& rhs)
 unsigned SequenceSummary::getAACountForAA(std::string aa)
 {
 	CodonTable *codonTable = CodonTable::getInstance();
-	return naa[codonTable -> aaToIndex.find(aa)->second];
+	return naa[codonTable -> AAToAAIndex(aa)];
 }
 
 
@@ -147,7 +145,7 @@ void SequenceSummary::clear()
 		ncodons[k] = 0;
 		RFPObserved[k] = 0;
 	}
-	for(unsigned k = 0; k < 22; k++) { naa[k] = 0; }
+	naa.clear();
 }
 
 
@@ -301,21 +299,7 @@ RCPP_MODULE(SequenceSummary_mod)
 
 
 		//Static functions:
-		function("AAToAAIndex", &SequenceSummary::AAToAAIndex); //TEST THAT ONLY!
-		function("AAIndexToCodonRange", &SequenceSummary::AAIndexToCodonRange); //TEST THAT ONLY!
-		function("AAToCodonRange", &SequenceSummary::AAToCodonRange); //TEST THAT ONLY!
-		function("AAToCodon", &SequenceSummary::AAToCodon, List::create(_["aa"], _["forParamVector"] = false),
-			"returns a vector of codons for a given amino acid");
-		function("codonToAA", &SequenceSummary::codonToAA, List::create(_["codon"]), "returns an amino acid for a given codon");
-		function("codonToIndex", &SequenceSummary::codonToIndex, List::create(_["codon"], _["forParamVector"] = false)); //TEST THAT ONLY!
-		function("codonToAAIndex", &SequenceSummary::codonToAAIndex); //TEST THAT ONLY!
-		function("indexToAA", &SequenceSummary::indexToAA); //TEST THAT ONLY!
-		function("indexToCodon", &SequenceSummary::indexToCodon); //TEST THAT ONLY!
-		function("GetNumCodonsForAA", &SequenceSummary::GetNumCodonsForAA,
-			List::create(_["aa"], _["forParamVector"] = false), "returns the number of codons for a given amino acid");
 		function("complimentNucleotide", &SequenceSummary::complimentNucleotide); //TEST THAT ONLY!
-		function("aminoAcids", &SequenceSummary::aminoAcids, "returns all Amino Acids as one letter code");
-		function("codons", &SequenceSummary::codons, "returns all codons or all reference codons");
 
 }
 #endif

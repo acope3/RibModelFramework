@@ -23,24 +23,8 @@ Parameter::Parameter()
 	numSelectionCategories = 0u;
 	numMixtures = 0u;
 	std_sphi = 0.1;
-	maxGrouping = 22;
-}
-
-
-Parameter::Parameter(unsigned _maxGrouping)
-{
-	numParam = 0u;
-	phiGroupings = 0u;
-	Sphi = 0.1;
-	Sphi_proposed = 0.0;
-	numAcceptForSphi = 0u;
-	bias_sphi = 0.0;
-	bias_phi = 0.0;
-	numMutationCategories = 0u;
-	numSelectionCategories = 0u;
-	numMixtures = 0u;
-	std_sphi = 0.1;
-	maxGrouping = _maxGrouping;
+	CodonTable *codonTable = CodonTable::getInstance();
+	maxGrouping = codonTable -> getAA_mapping().size();
 }
 
 
@@ -699,7 +683,7 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 	for(unsigned i = 0u; i < genomeSize; i++)
 	{
 		index[i] = i;
-		scuoValues[i] = calculateSCUO( genome.getGene(i), 22 ); //This used to be maxGrouping, but RFP model will not work that way
+		scuoValues[i] = calculateSCUO(genome.getGene(i)); //This used to be maxGrouping, but RFP model will not work that way
 		expression[i] = Parameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
 	}
 	quickSortPair(scuoValues, index, 0, genomeSize);
@@ -796,32 +780,32 @@ unsigned Parameter::getEstimatedMixtureAssignment(unsigned samples, unsigned gen
 // Wan et al. CodonO: a new informatics method for measuring synonymous codon usage bias within and across genomes
 // International Journal of General Systems, Vol. 35, No. 1, February 2006, 109–125
 // http://www.tandfonline.com/doi/pdf/10.1080/03081070500502967
-double Parameter::calculateSCUO(Gene& gene, unsigned maxAA)
+double Parameter::calculateSCUO(Gene& gene)
 {
 	SequenceSummary seqsum = gene.getSequenceSummary();
+	CodonTable *codonTable = CodonTable::getInstance();
 
 	double totalDegenerateAACount = 0.0;
-	for(unsigned i = 0; i < maxAA; i++)
+	for(unsigned i = 0; i < groupList.size(); i++)
 	{
-		std::string curAA = CodonTable::AminoAcidArray[i];
+		std::string curAA = groupList[i];
 		// skip amino acids with only one codon or stop codons
-		if(curAA == "X" || curAA == "M" || curAA == "W") continue;
+		if(codonTable -> getNumCodons(curAA) == 1 || curAA == "X") continue;
 		totalDegenerateAACount += (double)seqsum.getAACountForAA(i);
 	}
 
 	double scuoValue = 0.0;
-	CodonTable *codonTable = CodonTable::getInstance();
-	for(unsigned i = 0; i < maxAA; i++)
+	for(unsigned i = 0; i < groupList.size(); i++)
 	{
-		std::string curAA = CodonTable::AminoAcidArray[i];
+		std::string curAA = groupList[i];
 		// skip amino acids with only one codon or stop codons
-		if(curAA == "X" || curAA == "M" || curAA == "W") continue;
+		if(codonTable -> getNumCodons(curAA) == 1 || curAA == "X") continue;
 		double numDegenerateCodons = codonTable -> getNumCodons(curAA);
 
 		double aaCount = (double)seqsum.getAACountForAA(i);
 		if(aaCount == 0) continue;
 
-		std::vector <unsigned> codonRange = codonTable -> AAIndexToCodonRange(i, false); //check
+		std::vector <unsigned> codonRange = codonTable -> AAToCodonRange(curAA, false); //check
 
 		// calculate -sum(pij log(pij))
 		double aaEntropy = 0.0;
@@ -1116,13 +1100,18 @@ std::vector<double> Parameter::getCurrentSynthesisRateForMixture(unsigned mixtur
 
 void Parameter::setGroupList(std::vector <std::string> gl)
 {
+	CodonTable *codonTable = CodonTable::getInstance();
+	std::map <std::string, unsigned> AAMap = codonTable -> getAAMap();
+
 	groupList.clear();
 	for (unsigned i = 0; i < gl.size(); i++)
 	{
-		if (gl[i] == "M" || gl[i] == "W" || gl[i] == "X")
+		if (AAMap.find(gl[i]) == AAMap.end())
 		{
-			std::cerr << "Warning: Amino Acid" << gl[i] << "not recognized in ROC model\n";
-		}else{
+			std::cerr << "Warning: Amino Acid" << gl[i] << "not an Amino Acid in Codon Table " << codonTable -> getTableId() <<"\n";
+		}
+		else
+		{
 			groupList.push_back(gl[i]);
 		}
 	}

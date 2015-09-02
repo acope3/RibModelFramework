@@ -168,9 +168,9 @@ Gene Gene::reverseComplement()
 }
 
 
-std::string Gene::toAASequence(CodonTable *codonTable)
+std::string Gene::toAASequence()
 {
-
+    CodonTable *codonTable = CodonTable::getInstance();
     std::string aaseq = "";
     for(unsigned i = 0; i < seq.length(); i+=3)
     {

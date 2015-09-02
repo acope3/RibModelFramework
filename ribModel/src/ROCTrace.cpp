@@ -118,7 +118,7 @@ void ROCTrace::updateCodonSpecificParameterTrace(unsigned sample, std::string aa
 //----------------------R WRAPPERS--------------------
 //----------------------------------------------------
 
-std::vector<double> ROCTrace::getMutationParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon, CodonTable *codonTable)
+std::vector<double> ROCTrace::getMutationParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon)
 {
 	std::vector<double> RV;
 	bool checkMixtureElement = checkIndex(mixtureElement, 1, getNumberOfMixtures());
@@ -130,7 +130,7 @@ std::vector<double> ROCTrace::getMutationParameterTraceByMixtureElementForCodonR
 }
 
 
-std::vector<double> ROCTrace::getSelectionParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon, CodonTable *codonTable)
+std::vector<double> ROCTrace::getSelectionParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon)
 {
 	std::vector<double> RV;
 	bool checkMixtureElement = checkIndex(mixtureElement, 1, getNumberOfMixtures());
