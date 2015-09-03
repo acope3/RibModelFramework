@@ -397,15 +397,17 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 		}
 
 
-		if( ( (iteration + 1u) % (5*adaptiveWidth)) == 0u)
+		if( ( (iteration + 1u) % (50*adaptiveWidth)) == 0u)
 		{
-			double gewekeScore = calculateGewekeScore(iteration);
+			double gewekeScore = calculateGewekeScore(iteration/thining);
+			std::cout << "##################################################" << "\n";
 			std::cout << "Geweke Score after " << iteration << " iterations: " << gewekeScore << "\n";
+			std::cout << "##################################################" << "\n";
 
 			if(std::abs(gewekeScore) < 1.96)
 			{
 				std::cout << "Stopping run based on convergence after " << iteration << " iterations\n" << std::endl;
-				break;
+				//break;
 			}
 		}
 	} // end MCMC loop
@@ -430,8 +432,8 @@ double MCMCAlgorithm::calculateGewekeScore(unsigned current_iteration)
 	unsigned end1 = std::round( (current_iteration - lastConvergenceTest) * 0.1) + lastConvergenceTest;
 	unsigned start2 = std::round(current_iteration - (current_iteration * 0.5));
 
-	double numSamples1 = (double) end1 - lastConvergenceTest;
-	double numSamples2 = (double) (double) std::round(current_iteration * 0.5);
+	double numSamples1 = (double) (end1 - lastConvergenceTest);
+	double numSamples2 = (double) std::round(current_iteration * 0.5);
 
 	// calculate mean and and variance of first part of likelihood trace
 	for(unsigned i = lastConvergenceTest; i < end1; i++)
@@ -439,7 +441,7 @@ double MCMCAlgorithm::calculateGewekeScore(unsigned current_iteration)
 		posteriorMean1 += likelihoodTrace[i];
 	}
 	posteriorMean1 = posteriorMean1 / numSamples1;
-	for(unsigned i = 1u; i < end1; i++)
+	for(unsigned i = lastConvergenceTest; i < end1; i++)
 	{
 		posteriorVariance1 += (likelihoodTrace[i] - posteriorMean1) * (likelihoodTrace[i] - posteriorMean1);
 	}
@@ -450,11 +452,13 @@ double MCMCAlgorithm::calculateGewekeScore(unsigned current_iteration)
 		posteriorMean2 += likelihoodTrace[i];
 	}
 	posteriorMean2 = posteriorMean2 / numSamples2;
-	for(unsigned i = 1u; i < end1; i++)
+	for(unsigned i = start2; i < current_iteration; i++)
 	{
 		posteriorVariance2 += (likelihoodTrace[i] - posteriorMean2) * (likelihoodTrace[i] - posteriorMean2);
 	}
 	posteriorVariance2 = posteriorVariance2 / numSamples2;
+
+	lastConvergenceTest = current_iteration;
 	// Geweke score
 	return (posteriorMean1 - posteriorMean2) / std::sqrt( ( posteriorVariance1 / numSamples1 ) + ( posteriorVariance2 / numSamples2 ) );
 }

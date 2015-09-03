@@ -1,0 +1,1082 @@
+
+R version 3.1.1 (2014-07-10) -- "Sock it to Me"
+Copyright (C) 2014 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(ribModel)
+> rm(list=ls())
+> 
+> with.phi <- FALSE
+> 
+> if (with.phi) {
++   genome <- initializeGenomeObject(file = "../ribModel/data/simulatedAllUniqueR.fasta", expression.file = "../ribModel/data/simulatedAllUniqueR_phi.csv")
++ } else {
++   #genome <- initializeGenomeObject(file = "../ribModel/data/simulatedAllUniqueR.fasta")
++   genome <- initializeGenomeObject(file = "../ribModel/data/simulatedOneMix.fasta")
++ }
+> 
+> #initialize parameter object
+> sphi_init <- 1
+> numMixtures <- 1
+> mixDef <- "allUnique"
+> #geneAssignment <- c(rep(1,500), rep(2,500))
+> geneAssignment <- rep(1,1000)
+> parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
+> 
+> # initialize MCMC object
+> samples <- 6000
+> thining <- 10
+> adaptiveWidth <- 10
+> divergence.iteration <- 50
+> mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, 
++                              est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
+> 
+> # get model object
+> model <- initializeModelObject(parameter, "ROC", with.phi = with.phi)
+> 
+> #run mcmc on genome with parameter using model
+> system.time(
++   runMCMC(mcmc, genome, model, 4, divergence.iteration)
++ )
+Allowing divergence from initial conditions for 50 iterations.
+
+maxGrouping: 22
+entering MCMC loop
+	Estimate Codon Specific Parameters? TRUE
+	Estimate Hyper Parameters? TRUE
+	Estimate SynthesisRate Parameters? TRUE
+	Starting MCMC with 60000 iterations
+Status at iteration 100
+	 current logLikelihood: -1.16303e+06
+	 current Sphi estimate: 1.24244
+	 current Sphi proposal width: 0.1
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.66	0.66	0.72	0.64	0.71	0.68	0.66	0.71	0.72	0.77	0.67	0.71	0.72	0.71	0.68	0.83	0.83	0.8	0.76	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 0
+	 acceptance ratio to high: 1000
+Status at iteration 200
+	 current logLikelihood: -1.15375e+06
+	 current Sphi estimate: 1.23889
+	 current Sphi proposal width: 0.12
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0	0.07	0.01	0.01	0.07	0.03	0.04	0.08	0.03	0.03	0	0.03	0	0.01	0.01	0.06	0.01	0.07	0.01	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 0
+	 acceptance ratio to high: 992
+Status at iteration 300
+	 current logLikelihood: -1.15053e+06
+	 current Sphi estimate: 1.29176
+	 current Sphi proposal width: 0.096
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.02	0.03	0	0.03	0.03	0.06	0.04	0.03	0.03	0.08	0.05	0.02	0.05	0.04	0.06	0.04	0.03	0.03	0	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 2
+	 acceptance ratio to high: 963
+Status at iteration 400
+	 current logLikelihood: -1.14885e+06
+	 current Sphi estimate: 1.31043
+	 current Sphi proposal width: 0.0768
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.01	0.03	0.02	0.02	0.02	0.08	0.03	0.01	0.06	0.04	0.04	0.03	0.02	0.03	0.01	0.03	0.01	0.03	0	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 2
+	 acceptance ratio to high: 947
+Status at iteration 500
+	 current logLikelihood: -1.14836e+06
+	 current Sphi estimate: 1.32444
+	 current Sphi proposal width: 0.06144
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.06	0.04	0.04	0.01	0.02	0.01	0.02	0	0.02	0.06	0.03	0.05	0.01	0.05	0.01	0.05	0.01	0.01	0.05	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 6
+	 acceptance ratio to high: 915
+Status at iteration 600
+	 current logLikelihood: -1.14781e+06
+	 current Sphi estimate: 1.40112
+	 current Sphi proposal width: 0.073728
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.04	0.03	0.04	0.06	0.02	0.01	0.04	0.01	0.02	0.12	0.01	0.04	0.02	0.07	0.03	0.01	0.03	0.03	0.04	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 6
+	 acceptance ratio to high: 858
+Status at iteration 700
+	 current logLikelihood: -1.14727e+06
+	 current Sphi estimate: 1.49763
+	 current Sphi proposal width: 0.073728
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.04	0.05	0.03	0.02	0.02	0.02	0.01	0.09	0.01	0.26	0.05	0.05	0.04	0.24	0.05	0.07	0.13	0.02	0.05	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 9
+	 acceptance ratio to high: 845
+Status at iteration 800
+	 current logLikelihood: -1.14695e+06
+	 current Sphi estimate: 1.57607
+	 current Sphi proposal width: 0.073728
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.08	0.08	0.06	0.02	0.03	0.06	0.03	0.04	0.04	0.17	0.01	0.09	0.06	0.21	0.11	0.08	0.1	0.02	0.01	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 16
+	 acceptance ratio to high: 815
+Status at iteration 900
+	 current logLikelihood: -1.14667e+06
+	 current Sphi estimate: 1.65863
+	 current Sphi proposal width: 0.073728
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.12	0.09	0.05	0.06	0.03	0.09	0.05	0.04	0.05	0.27	0.08	0.07	0.03	0.19	0.15	0.06	0.09	0.02	0.06	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 21
+	 acceptance ratio to high: 780
+Status at iteration 1000
+	 current logLikelihood: -1.14644e+06
+	 current Sphi estimate: 1.71729
+	 current Sphi proposal width: 0.073728
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.24	0.09	0.01	0.06	0.02	0.2	0.02	0.06	0.02	0.27	0.01	0.11	0.08	0.38	0.21	0.14	0.19	0.01	0.01	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 26
+	 acceptance ratio to high: 750
+Status at iteration 1100
+	 current logLikelihood: -1.14625e+06
+	 current Sphi estimate: 1.82293
+	 current Sphi proposal width: 0.0589824
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.18	0.07	0.01	0.05	0.06	0.17	0.07	0.13	0.05	0.34	0.05	0.28	0.05	0.23	0.08	0.25	0.18	0.07	0.04	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 33
+	 acceptance ratio to high: 727
+Status at iteration 1200
+	 current logLikelihood: -1.14601e+06
+	 current Sphi estimate: 1.96542
+	 current Sphi proposal width: 0.0589824
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.22	0.05	0.03	0.06	0.1	0.25	0.04	0.14	0.03	0.19	0.04	0.3	0.07	0.21	0.28	0.29	0.35	0.1	0.01	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 34
+	 acceptance ratio to high: 693
+Status at iteration 1300
+	 current logLikelihood: -1.14575e+06
+	 current Sphi estimate: 1.993
+	 current Sphi proposal width: 0.0589824
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.19	0.09	0.05	0.1	0.08	0.24	0.03	0.18	0.04	0.28	0.08	0.23	0.08	0.1	0.33	0.22	0.3	0.12	0.02	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 48
+	 acceptance ratio to high: 664
+Status at iteration 1400
+	 current logLikelihood: -1.14565e+06
+	 current Sphi estimate: 1.98574
+	 current Sphi proposal width: 0.0589824
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.39	0.09	0.09	0.12	0.07	0.2	0.08	0.33	0.09	0.25	0.09	0.22	0.11	0.26	0.12	0.23	0.33	0.13	0.09	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 45
+	 acceptance ratio to high: 614
+Status at iteration 1500
+	 current logLikelihood: -1.14588e+06
+	 current Sphi estimate: 1.95572
+	 current Sphi proposal width: 0.0589824
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.38	0.16	0.03	0.18	0.08	0.12	0.13	0.18	0.09	0.35	0.22	0.25	0.15	0.28	0.26	0.21	0.14	0.12	0.04	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 51
+	 acceptance ratio to high: 569
+Status at iteration 1600
+	 current logLikelihood: -1.14563e+06
+	 current Sphi estimate: 1.98962
+	 current Sphi proposal width: 0.0589824
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.21	0.18	0.07	0.1	0.11	0.34	0.15	0.21	0.09	0.14	0.06	0.25	0.1	0.29	0.26	0.32	0.27	0.12	0.13	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 72
+	 acceptance ratio to high: 528
+Status at iteration 1700
+	 current logLikelihood: -1.1457e+06
+	 current Sphi estimate: 2.00144
+	 current Sphi proposal width: 0.0589824
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.17	0.22	0.1	0.15	0.15	0.32	0.12	0.27	0.1	0.39	0.13	0.2	0.16	0.35	0.26	0.09	0.28	0.17	0.09	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 80
+	 acceptance ratio to high: 509
+Status at iteration 1800
+	 current logLikelihood: -1.14569e+06
+	 current Sphi estimate: 1.92362
+	 current Sphi proposal width: 0.0589824
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.34	0.18	0.11	0.25	0.19	0.2	0.19	0.33	0.1	0.15	0.16	0.21	0.21	0.19	0.19	0.28	0.37	0.15	0.2	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 73
+	 acceptance ratio to high: 458
+Status at iteration 1900
+	 current logLikelihood: -1.14564e+06
+	 current Sphi estimate: 1.94022
+	 current Sphi proposal width: 0.0589824
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.19	0.17	0.13	0.26	0.2	0.16	0.26	0.21	0.15	0.37	0.17	0.35	0.26	0.39	0.33	0.31	0.2	0.2	0.1	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 95
+	 acceptance ratio to high: 407
+Status at iteration 2000
+	 current logLikelihood: -1.14558e+06
+	 current Sphi estimate: 2.01082
+	 current Sphi proposal width: 0.0589824
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.3	0.19	0.23	0.19	0.25	0.29	0.2	0.24	0.22	0.23	0.24	0.22	0.11	0.21	0.21	0.16	0.12	0.1	0.17	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 85
+	 acceptance ratio to high: 346
+Status at iteration 2100
+	 current logLikelihood: -1.14553e+06
+	 current Sphi estimate: 1.9695
+	 current Sphi proposal width: 0.0707789
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.31	0.34	0.18	0.22	0.23	0.26	0.22	0.24	0.23	0.24	0.2	0.17	0.23	0.17	0.26	0.21	0.31	0.22	0.13	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 110
+	 acceptance ratio to high: 286
+Status at iteration 2200
+	 current logLikelihood: -1.14573e+06
+	 current Sphi estimate: 1.88275
+	 current Sphi proposal width: 0.0566231
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.27	0.24	0.19	0.24	0.2	0.23	0.18	0.14	0.21	0.17	0.17	0.27	0.32	0.46	0.34	0.24	0.25	0.21	0.22	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 129
+	 acceptance ratio to high: 240
+Status at iteration 2300
+	 current logLikelihood: -1.14596e+06
+	 current Sphi estimate: 1.90748
+	 current Sphi proposal width: 0.0566231
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.18	0.23	0.29	0.15	0.17	0.34	0.2	0.29	0.2	0.35	0.28	0.24	0.23	0.25	0.16	0.35	0.15	0.16	0.24	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 143
+	 acceptance ratio to high: 171
+Status at iteration 2400
+	 current logLikelihood: -1.14563e+06
+	 current Sphi estimate: 1.93452
+	 current Sphi proposal width: 0.0679477
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.33	0.28	0.32	0.32	0.1	0.15	0.16	0.3	0.18	0.22	0.3	0.3	0.26	0.22	0.36	0.21	0.4	0.18	0.2	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 153
+	 acceptance ratio to high: 185
+Status at iteration 2500
+	 current logLikelihood: -1.14588e+06
+	 current Sphi estimate: 1.94396
+	 current Sphi proposal width: 0.0543582
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.23	0.16	0.16	0.26	0.18	0.3	0.21	0.25	0.32	0.27	0.19	0.3	0.28	0.32	0.15	0.16	0.23	0.28	0.25	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 195
+	 acceptance ratio to high: 167
+Status at iteration 2600
+	 current logLikelihood: -1.14562e+06
+	 current Sphi estimate: 1.95402
+	 current Sphi proposal width: 0.0652298
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.22	0.32	0.31	0.19	0.19	0.28	0.3	0.25	0.26	0.24	0.24	0.35	0.12	0.04	0.36	0.31	0.2	0.3	0.26	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 102
+	 acceptance ratio to high: 321
+Status at iteration 2700
+	 current logLikelihood: -1.14546e+06
+	 current Sphi estimate: 1.95094
+	 current Sphi proposal width: 0.0652298
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.25	0.26	0.22	0.21	0.34	0.34	0.21	0.22	0.24	0.25	0.22	0.2	0.28	0.22	0.28	0.24	0.27	0.33	0.29	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 117
+	 acceptance ratio to high: 260
+Status at iteration 2800
+	 current logLikelihood: -1.14548e+06
+	 current Sphi estimate: 1.96468
+	 current Sphi proposal width: 0.0652298
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.28	0.21	0.23	0.2	0.3	0.23	0.23	0.27	0.23	0.24	0.26	0.18	0.17	0.25	0.25	0.25	0.27	0.27	0.22	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 118
+	 acceptance ratio to high: 214
+Status at iteration 2900
+	 current logLikelihood: -1.14556e+06
+	 current Sphi estimate: 1.93862
+	 current Sphi proposal width: 0.0652298
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.32	0.23	0.2	0.25	0.26	0.14	0.25	0.28	0.2	0.23	0.27	0.36	0.2	0.23	0.14	0.21	0.21	0.29	0.23	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 126
+	 acceptance ratio to high: 235
+Status at iteration 3000
+	 current logLikelihood: -1.14564e+06
+	 current Sphi estimate: 1.93688
+	 current Sphi proposal width: 0.0652298
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.14	0.33	0.24	0.34	0.29	0.3	0.22	0.31	0.22	0.27	0.26	0.22	0.3	0.3	0.31	0.2	0.17	0.29	0.31	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 150
+	 acceptance ratio to high: 186
+Status at iteration 3100
+	 current logLikelihood: -1.14565e+06
+	 current Sphi estimate: 1.96546
+	 current Sphi proposal width: 0.0652298
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.25	0.17	0.31	0.26	0.3	0.37	0.18	0.24	0.1	0.2	0.34	0.23	0.26	0.2	0.27	0.26	0.46	0.27	0.22	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 140
+	 acceptance ratio to high: 198
+Status at iteration 3200
+	 current logLikelihood: -1.14583e+06
+	 current Sphi estimate: 1.94832
+	 current Sphi proposal width: 0.0521839
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.32	0.26	0.17	0.32	0.22	0.27	0.31	0.26	0.29	0.26	0.17	0.22	0.33	0.25	0.14	0.15	0.23	0.21	0.23	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 159
+	 acceptance ratio to high: 194
+Status at iteration 3300
+	 current logLikelihood: -1.1458e+06
+	 current Sphi estimate: 2.00016
+	 current Sphi proposal width: 0.0626206
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.11	0.36	0.26	0.25	0.28	0.15	0.24	0.26	0.25	0.28	0.24	0.27	0.11	0.27	0.33	0.38	0.2	0.35	0.18	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 165
+	 acceptance ratio to high: 183
+Status at iteration 3400
+	 current logLikelihood: -1.1459e+06
+	 current Sphi estimate: 1.86992
+	 current Sphi proposal width: 0.0626206
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.23	0.19	0.27	0.2	0.22	0.31	0.21	0.22	0.28	0.29	0.24	0.26	0.28	0.25	0.23	0.29	0.22	0.32	0.28	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 183
+	 acceptance ratio to high: 164
+Status at iteration 3500
+	 current logLikelihood: -1.14571e+06
+	 current Sphi estimate: 1.93395
+	 current Sphi proposal width: 0.0626206
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.34	0.28	0.27	0.19	0.28	0.25	0.26	0.23	0.27	0.14	0.3	0.23	0.36	0.21	0.33	0.21	0.25	0.24	0.35	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 153
+	 acceptance ratio to high: 202
+Status at iteration 3600
+	 current logLikelihood: -1.14564e+06
+	 current Sphi estimate: 1.96326
+	 current Sphi proposal width: 0.0626206
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.14	0.21	0.22	0.22	0.25	0.25	0.23	0.24	0.35	0.52	0.3	0.2	0.23	0.28	0.18	0.23	0.29	0.24	0.15	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 136
+	 acceptance ratio to high: 212
+Status at iteration 3700
+	 current logLikelihood: -1.14565e+06
+	 current Sphi estimate: 1.86957
+	 current Sphi proposal width: 0.0626206
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.34	0.26	0.19	0.16	0.33	0.16	0.24	0.29	0.24	0.38	0.25	0.22	0.25	0.19	0.23	0.23	0.22	0.26	0.26	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 143
+	 acceptance ratio to high: 227
+Status at iteration 3800
+	 current logLikelihood: -1.14555e+06
+	 current Sphi estimate: 1.9285
+	 current Sphi proposal width: 0.0626206
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.2	0.25	0.24	0.32	0.3	0.32	0.24	0.16	0.19	0.05	0.28	0.24	0.22	0.36	0.26	0.23	0.22	0.13	0.13	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 141
+	 acceptance ratio to high: 199
+Status at iteration 3900
+	 current logLikelihood: -1.14578e+06
+	 current Sphi estimate: 1.90493
+	 current Sphi proposal width: 0.0500965
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.21	0.25	0.31	0.19	0.21	0.3	0.21	0.29	0.2	0.32	0.24	0.16	0.25	0.21	0.34	0.2	0.21	0.29	0.27	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 136
+	 acceptance ratio to high: 226
+Status at iteration 4000
+	 current logLikelihood: -1.1456e+06
+	 current Sphi estimate: 1.90701
+	 current Sphi proposal width: 0.0500965
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.19	0.26	0.32	0.36	0.28	0.18	0.29	0.35	0.14	0.14	0.32	0.36	0.32	0.29	0.2	0.25	0.23	0.21	0.29	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 162
+	 acceptance ratio to high: 185
+Status at iteration 4100
+	 current logLikelihood: -1.14572e+06
+	 current Sphi estimate: 1.93946
+	 current Sphi proposal width: 0.0601158
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.31	0.19	0.16	0.22	0.28	0.39	0.15	0.24	0.26	0.24	0.21	0.22	0.17	0.18	0.18	0.25	0.2	0.28	0.23	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 149
+	 acceptance ratio to high: 228
+Status at iteration 4200
+	 current logLikelihood: -1.14568e+06
+	 current Sphi estimate: 1.89211
+	 current Sphi proposal width: 0.0601158
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.17	0.21	0.21	0.25	0.23	0.33	0.31	0.27	0.31	0.37	0.25	0.2	0.28	0.56	0.31	0.22	0.26	0.2	0.19	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 188
+	 acceptance ratio to high: 194
+Status at iteration 4300
+	 current logLikelihood: -1.1458e+06
+	 current Sphi estimate: 1.92411
+	 current Sphi proposal width: 0.072139
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.3	0.2	0.24	0.27	0.35	0.25	0.27	0.22	0.32	0.17	0.23	0.28	0.23	0.28	0.12	0.23	0.3	0.24	0.31	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 137
+	 acceptance ratio to high: 197
+Status at iteration 4400
+	 current logLikelihood: -1.14553e+06
+	 current Sphi estimate: 1.9462
+	 current Sphi proposal width: 0.0577112
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.33	0.33	0.26	0.31	0.26	0.12	0.21	0.19	0.23	0.32	0.17	0.22	0.25	0.24	0.32	0.22	0.22	0.22	0.39	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 148
+	 acceptance ratio to high: 192
+Status at iteration 4500
+	 current logLikelihood: -1.14574e+06
+	 current Sphi estimate: 1.90349
+	 current Sphi proposal width: 0.0577112
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.19	0.24	0.22	0.24	0.23	0.23	0.24	0.35	0.22	0.19	0.28	0.2	0.31	0.31	0.24	0.19	0.28	0.15	0.27	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 117
+	 acceptance ratio to high: 248
+Status at iteration 4600
+	 current logLikelihood: -1.14562e+06
+	 current Sphi estimate: 1.92349
+	 current Sphi proposal width: 0.0692534
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.38	0.31	0.32	0.2	0.19	0.39	0.26	0.27	0.25	0.49	0.25	0.28	0.17	0.2	0.18	0.4	0.2	0.27	0.21	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 138
+	 acceptance ratio to high: 222
+Status at iteration 4700
+	 current logLikelihood: -1.14586e+06
+	 current Sphi estimate: 1.7951
+	 current Sphi proposal width: 0.0692534
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.33	0.15	0.27	0.21	0.27	0.21	0.28	0.22	0.19	0.28	0.23	0.21	0.27	0.22	0.35	0.28	0.21	0.23	0.26	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 189
+	 acceptance ratio to high: 173
+Status at iteration 4800
+	 current logLikelihood: -1.14587e+06
+	 current Sphi estimate: 1.87141
+	 current Sphi proposal width: 0.0692534
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.2	0.2	0.13	0.22	0.26	0.19	0.19	0.32	0.32	0.27	0.32	0.15	0.21	0.15	0.2	0.32	0.27	0.2	0.33	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 192
+	 acceptance ratio to high: 128
+Status at iteration 4900
+	 current logLikelihood: -1.14577e+06
+	 current Sphi estimate: 1.89014
+	 current Sphi proposal width: 0.0554027
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.18	0.22	0.29	0.25	0.25	0.32	0.31	0.13	0.17	0.31	0.3	0.42	0.25	0.25	0.21	0.2	0.25	0.27	0.16	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 143
+	 acceptance ratio to high: 223
+Status at iteration 5000
+	 current logLikelihood: -1.14586e+06
+	 current Sphi estimate: 1.90894
+	 current Sphi proposal width: 0.0554027
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.31	0.27	0.32	0.24	0.22	0.23	0.21	0.3	0.17	0.07	0.23	0.31	0.28	0.34	0.25	0.2	0.24	0.17	0.31	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 112
+	 acceptance ratio to high: 284
+##################################################
+Geweke Score after 4999 iterations: -2.28799
+##################################################
+Status at iteration 5100
+	 current logLikelihood: -1.14571e+06
+	 current Sphi estimate: 1.89957
+	 current Sphi proposal width: 0.0554027
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.24	0.22	0.27	0.21	0.24	0.18	0.25	0.28	0.29	0.21	0.3	0.16	0.26	0.13	0.29	0.08	0.18	0.28	0.17	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 127
+	 acceptance ratio to high: 258
+Status at iteration 5200
+	 current logLikelihood: -1.14563e+06
+	 current Sphi estimate: 1.90931
+	 current Sphi proposal width: 0.0664833
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.24	0.26	0.19	0.21	0.27	0.25	0.16	0.24	0.32	0.32	0.19	0.35	0.18	0.37	0.26	0.32	0.39	0.3	0.27	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 141
+	 acceptance ratio to high: 212
+Status at iteration 5300
+	 current logLikelihood: -1.1456e+06
+	 current Sphi estimate: 1.92395
+	 current Sphi proposal width: 0.0664833
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.21	0.25	0.19	0.13	0.26	0.34	0.26	0.34	0.28	0.05	0.22	0.18	0.26	0.25	0.23	0.2	0.22	0.22	0.19	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 125
+	 acceptance ratio to high: 235
+Status at iteration 5400
+	 current logLikelihood: -1.14561e+06
+	 current Sphi estimate: 1.86671
+	 current Sphi proposal width: 0.0531866
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.26	0.24	0.33	0.3	0.25	0.25	0.23	0.24	0.29	0.38	0.28	0.24	0.3	0.23	0.22	0.19	0.28	0.32	0.36	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 193
+	 acceptance ratio to high: 159
+Status at iteration 5500
+	 current logLikelihood: -1.1458e+06
+	 current Sphi estimate: 1.82762
+	 current Sphi proposal width: 0.0638239
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.21	0.21	0.22	0.15	0.26	0.24	0.3	0.29	0.23	0.1	0.27	0.29	0.3	0.21	0.16	0.24	0.29	0.21	0.16	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 192
+	 acceptance ratio to high: 180
+Status at iteration 5600
+	 current logLikelihood: -1.14572e+06
+	 current Sphi estimate: 1.84168
+	 current Sphi proposal width: 0.0638239
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.16	0.36	0.27	0.31	0.26	0.27	0.3	0.29	0.23	0.17	0.21	0.26	0.25	0.24	0.4	0.29	0.33	0.3	0.28	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 157
+	 acceptance ratio to high: 181
+Status at iteration 5700
+	 current logLikelihood: -1.14588e+06
+	 current Sphi estimate: 1.85149
+	 current Sphi proposal width: 0.0638239
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.29	0.18	0.23	0.28	0.28	0.27	0.37	0.18	0.29	0.65	0.26	0.34	0.33	0.25	0.29	0.29	0.22	0.26	0.33	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 129
+	 acceptance ratio to high: 219
+Status at iteration 5800
+	 current logLikelihood: -1.14577e+06
+	 current Sphi estimate: 1.87501
+	 current Sphi proposal width: 0.0765887
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.28	0.25	0.23	0.3	0.3	0.26	0.25	0.25	0.23	0.34	0.34	0.24	0.19	0.22	0.32	0.33	0.14	0.23	0.27	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 153
+	 acceptance ratio to high: 209
+Status at iteration 5900
+	 current logLikelihood: -1.14546e+06
+	 current Sphi estimate: 1.9007
+	 current Sphi proposal width: 0.061271
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.32	0.25	0.28	0.21	0.29	0.17	0.21	0.29	0.31	0.24	0.31	0.22	0.38	0.2	0.2	0.34	0.26	0.25	0.31	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 152
+	 acceptance ratio to high: 203
+Status at iteration 6000
+	 current logLikelihood: -1.14571e+06
+	 current Sphi estimate: 1.87141
+	 current Sphi proposal width: 0.061271
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.22	0.25	0.33	0.18	0.33	0.45	0.21	0.27	0.18	0.22	0.22	0.19	0.14	0.18	0.24	0.15	0.33	0.19	0.24	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 135
+	 acceptance ratio to high: 250
+Status at iteration 6100
+	 current logLikelihood: -1.14574e+06
+	 current Sphi estimate: 1.82033
+	 current Sphi proposal width: 0.0735252
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.26	0.24	0.25	0.39	0.22	0.27	0.26	0.29	0.32	0.24	0.17	0.23	0.29	0.42	0.18	0.28	0.19	0.24	0.24	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 129
+	 acceptance ratio to high: 226
+Status at iteration 6200
+	 current logLikelihood: -1.14552e+06
+	 current Sphi estimate: 1.86657
+	 current Sphi proposal width: 0.0735252
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.24	0.26	0.28	0.23	0.21	0.24	0.21	0.28	0.28	0.19	0.31	0.29	0.29	0.27	0.34	0.21	0.38	0.32	0.3	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 106
+	 acceptance ratio to high: 278
+Status at iteration 6300
+	 current logLikelihood: -1.14543e+06
+	 current Sphi estimate: 1.9925
+	 current Sphi proposal width: 0.0735252
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.2	0.22	0.26	0.34	0.21	0.26	0.28	0.34	0.28	0.41	0.19	0.35	0.3	0.26	0.15	0.23	0.21	0.25	0.27	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 122
+	 acceptance ratio to high: 230
+Status at iteration 6400
+	 current logLikelihood: -1.14559e+06
+	 current Sphi estimate: 1.95914
+	 current Sphi proposal width: 0.0735252
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.18	0.21	0.25	0.2	0.21	0.31	0.16	0.17	0.28	0.28	0.31	0.17	0.39	0.22	0.25	0.23	0.16	0.3	0.26	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 124
+	 acceptance ratio to high: 237
+Status at iteration 6500
+	 current logLikelihood: -1.14574e+06
+	 current Sphi estimate: 1.90819
+	 current Sphi proposal width: 0.0735252
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.29	0.18	0.39	0.21	0.24	0.21	0.31	0.33	0.31	0.26	0.23	0.31	0.28	0.19	0.32	0.14	0.3	0.21	0.23	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 161
+	 acceptance ratio to high: 210
+Status at iteration 6600
+	 current logLikelihood: -1.14576e+06
+	 current Sphi estimate: 1.83493
+	 current Sphi proposal width: 0.0735252
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.36	0.31	0.26	0.23	0.18	0.18	0.34	0.3	0.24	0.21	0.15	0.23	0.23	0.5	0.18	0.39	0.36	0.24	0.22	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 189
+	 acceptance ratio to high: 162
+Status at iteration 6700
+	 current logLikelihood: -1.14588e+06
+	 current Sphi estimate: 1.84484
+	 current Sphi proposal width: 0.0735252
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.22	0.18	0.26	0.23	0.22	0.36	0.26	0.23	0.22	0.18	0.22	0.2	0.26	0.26	0.31	0.26	0.31	0.37	0.3	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 229
+	 acceptance ratio to high: 157
+Status at iteration 6800
+	 current logLikelihood: -1.14556e+06
+	 current Sphi estimate: 1.91898
+	 current Sphi proposal width: 0.0735252
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.27	0.28	0.12	0.21	0.3	0.16	0.23	0.3	0.23	0.51	0.22	0.3	0.24	0.31	0.19	0.29	0.15	0.26	0.24	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 132
+	 acceptance ratio to high: 213
+Status at iteration 6900
+	 current logLikelihood: -1.14572e+06
+	 current Sphi estimate: 1.89344
+	 current Sphi proposal width: 0.0735252
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.23	0.3	0.22	0.26	0.29	0.39	0.16	0.2	0.25	0.31	0.26	0.26	0.32	0.07	0.41	0.21	0.34	0.33	0.25	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 123
+	 acceptance ratio to high: 216
+Status at iteration 7000
+	 current logLikelihood: -1.14564e+06
+	 current Sphi estimate: 1.82462
+	 current Sphi proposal width: 0.0735252
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.16	0.28	0.25	0.28	0.36	0.23	0.35	0.2	0.25	0.11	0.3	0.27	0.24	0.43	0.31	0.21	0.21	0.15	0.26	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 158
+	 acceptance ratio to high: 191
+Status at iteration 7100
+	 current logLikelihood: -1.14581e+06
+	 current Sphi estimate: 1.84027
+	 current Sphi proposal width: 0.0735252
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.38	0.28	0.41	0.17	0.16	0.18	0.23	0.21	0.13	0.32	0.23	0.25	0.27	0.13	0.14	0.24	0.11	0.23	0.25	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 170
+	 acceptance ratio to high: 172
+Status at iteration 7200
+	 current logLikelihood: -1.14562e+06
+	 current Sphi estimate: 1.83803
+	 current Sphi proposal width: 0.0735252
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.33	0.28	0.22	0.27	0.32	0.22	0.29	0.18	0.23	0.17	0.27	0.17	0.21	0.38	0.21	0.19	0.25	0.19	0.35	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 142
+	 acceptance ratio to high: 222
+Status at iteration 7300
+	 current logLikelihood: -1.14572e+06
+	 current Sphi estimate: 1.91034
+	 current Sphi proposal width: 0.0735252
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.16	0.25	0.13	0.18	0.28	0.3	0.28	0.41	0.31	0.41	0.38	0.37	0.26	0.22	0.27	0.38	0.26	0.23	0.17	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 125
+	 acceptance ratio to high: 240
+Status at iteration 7400
+	 current logLikelihood: -1.14582e+06
+	 current Sphi estimate: 1.92105
+	 current Sphi proposal width: 0.0735252
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.2	0.26	0.24	0.28	0.23	0.37	0.26	0.19	0.18	0.17	0.32	0.24	0.32	0.23	0.39	0.29	0.22	0.24	0.26	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 164
+	 acceptance ratio to high: 195
+Status at iteration 7500
+	 current logLikelihood: -1.14559e+06
+	 current Sphi estimate: 1.83651
+	 current Sphi proposal width: 0.0735252
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.29	0.26	0.2	0.29	0.26	0.29	0.23	0.4	0.27	0.48	0.31	0.25	0.26	0.22	0.25	0.18	0.26	0.2	0.29	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 134
+	 acceptance ratio to high: 218
+Status at iteration 7600
+	 current logLikelihood: -1.14588e+06
+	 current Sphi estimate: 1.82488
+	 current Sphi proposal width: 0.0735252
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.26	0.3	0.23	0.3	0.28	0.24	0.26	0.25	0.28	0.25	0.15	0.27	0.24	0.15	0.24	0.43	0.32	0.31	0.31	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 182
+	 acceptance ratio to high: 187
+Status at iteration 7700
+	 current logLikelihood: -1.14564e+06
+	 current Sphi estimate: 1.90532
+	 current Sphi proposal width: 0.0735252
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.27	0.27	0.32	0.32	0.24	0.28	0.29	0.31	0.29	0.21	0.17	0.26	0.23	0.49	0.13	0.35	0.21	0.24	0.23	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 136
+	 acceptance ratio to high: 239
+Status at iteration 7800
+	 current logLikelihood: -1.14569e+06
+	 current Sphi estimate: 1.96149
+	 current Sphi proposal width: 0.0735252
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.3	0.32	0.28	0.24	0.25	0.25	0.17	0.23	0.36	0.26	0.27	0.28	0.25	0.3	0.35	0.22	0.19	0.2	0.19	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 100
+	 acceptance ratio to high: 293
+Status at iteration 7900
+	 current logLikelihood: -1.14567e+06
+	 current Sphi estimate: 1.90645
+	 current Sphi proposal width: 0.0588201
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.29	0.3	0.23	0.24	0.24	0.3	0.27	0.24	0.15	0.16	0.15	0.26	0.3	0.18	0.24	0.14	0.27	0.24	0.26	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 138
+	 acceptance ratio to high: 209
+Status at iteration 8000
+	 current logLikelihood: -1.14581e+06
+	 current Sphi estimate: 1.98032
+	 current Sphi proposal width: 0.0705842
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.22	0.27	0.23	0.25	0.15	0.22	0.28	0.21	0.29	0.44	0.25	0.22	0.19	0.34	0.1	0.4	0.3	0.25	0.21	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 145
+	 acceptance ratio to high: 235
+Status at iteration 8100
+	 current logLikelihood: -1.14561e+06
+	 current Sphi estimate: 1.94131
+	 current Sphi proposal width: 0.0705842
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.28	0.34	0.2	0.26	0.23	0.27	0.29	0.15	0.27	0.18	0.37	0.25	0.24	0.3	0.34	0.27	0.39	0.28	0.25	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 127
+	 acceptance ratio to high: 228
+Status at iteration 8200
+	 current logLikelihood: -1.14569e+06
+	 current Sphi estimate: 1.89474
+	 current Sphi proposal width: 0.0564673
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.26	0.24	0.21	0.24	0.36	0.28	0.29	0.33	0.27	0.48	0.27	0.29	0.22	0.27	0.23	0.26	0.21	0.31	0.27	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 135
+	 acceptance ratio to high: 208
+Status at iteration 8300
+	 current logLikelihood: -1.14573e+06
+	 current Sphi estimate: 1.93838
+	 current Sphi proposal width: 0.0677608
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.27	0.27	0.25	0.26	0.27	0.23	0.27	0.13	0.19	0.28	0.28	0.2	0.2	0.34	0.18	0.26	0.2	0.2	0.34	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 129
+	 acceptance ratio to high: 210
+Status at iteration 8400
+	 current logLikelihood: -1.14541e+06
+	 current Sphi estimate: 1.89589
+	 current Sphi proposal width: 0.0677608
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.3	0.28	0.18	0.29	0.3	0.24	0.2	0.26	0.33	0.4	0.3	0.26	0.35	0.16	0.38	0.17	0.13	0.3	0.33	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 184
+	 acceptance ratio to high: 156
+Status at iteration 8500
+	 current logLikelihood: -1.14571e+06
+	 current Sphi estimate: 1.90884
+	 current Sphi proposal width: 0.0677608
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.37	0.21	0.27	0.2	0.29	0.2	0.28	0.31	0.24	0.17	0.26	0.23	0.22	0.31	0.29	0.35	0.26	0.3	0.27	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 169
+	 acceptance ratio to high: 174
+Status at iteration 8600
+	 current logLikelihood: -1.14577e+06
+	 current Sphi estimate: 1.9133
+	 current Sphi proposal width: 0.0677608
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.19	0.15	0.35	0.26	0.29	0.21	0.28	0.32	0.25	0.31	0.24	0.18	0.21	0.23	0.36	0.15	0.44	0.22	0.22	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 157
+	 acceptance ratio to high: 167
+Status at iteration 8700
+	 current logLikelihood: -1.14575e+06
+	 current Sphi estimate: 1.8636
+	 current Sphi proposal width: 0.0677608
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.26	0.13	0.29	0.22	0.21	0.26	0.26	0.22	0.31	0.15	0.21	0.37	0.21	0.15	0.28	0.34	0.27	0.21	0.25	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 147
+	 acceptance ratio to high: 182
+Status at iteration 8800
+	 current logLikelihood: -1.14565e+06
+	 current Sphi estimate: 1.91713
+	 current Sphi proposal width: 0.0677608
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.24	0.31	0.37	0.24	0.28	0.29	0.31	0.15	0.23	0.39	0.21	0.27	0.23	0.4	0.13	0.27	0.22	0.21	0.2	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 132
+	 acceptance ratio to high: 235
+Status at iteration 8900
+	 current logLikelihood: -1.14569e+06
+	 current Sphi estimate: 1.88999
+	 current Sphi proposal width: 0.0677608
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.35	0.31	0.19	0.29	0.26	0.21	0.26	0.09	0.24	0.27	0.27	0.26	0.26	0.28	0.3	0.21	0.17	0.21	0.19	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 122
+	 acceptance ratio to high: 252
+Status at iteration 9000
+	 current logLikelihood: -1.14576e+06
+	 current Sphi estimate: 1.87279
+	 current Sphi proposal width: 0.0677608
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.17	0.24	0.21	0.21	0.34	0.26	0.2	0.35	0.17	0.21	0.18	0.3	0.21	0.22	0.25	0.18	0.38	0.09	0.23	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 149
+	 acceptance ratio to high: 175
+Status at iteration 9100
+	 current logLikelihood: -1.14592e+06
+	 current Sphi estimate: 1.80799
+	 current Sphi proposal width: 0.0677608
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.37	0.32	0.32	0.28	0.18	0.26	0.24	0.18	0.25	0.12	0.26	0.33	0.23	0.22	0.28	0.35	0.27	0.14	0.23	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 183
+	 acceptance ratio to high: 171
+Status at iteration 9200
+	 current logLikelihood: -1.1459e+06
+	 current Sphi estimate: 1.85208
+	 current Sphi proposal width: 0.0677608
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.2	0.22	0.2	0.24	0.17	0.18	0.31	0.34	0.26	0.5	0.3	0.08	0.26	0.14	0.29	0.28	0.22	0.32	0.22	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 162
+	 acceptance ratio to high: 173
+Status at iteration 9300
+	 current logLikelihood: -1.14584e+06
+	 current Sphi estimate: 1.85725
+	 current Sphi proposal width: 0.0542086
+	 current Mixture element probability for element 0: 1

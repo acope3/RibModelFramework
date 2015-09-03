@@ -610,7 +610,7 @@ int main()
 			
 
 			std::cout << "starting MCMC for ROC" << std::endl;
-			mcmc.run(genome, model, 1, 200);
+			mcmc.run(genome, model, 1, 20);
 			std::cout << std::endl << "Finished MCMC for ROC" << std::endl;
 			
 

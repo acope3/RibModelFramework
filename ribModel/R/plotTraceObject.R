@@ -213,12 +213,12 @@ plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sep
 #  par(oma=c(1,1,2,1), mgp=c(2,1,0), mar = c(3,4,2,1), mfrow=c(2, 1))
   if (what[1] == "Sphi")
   {
-    sphi <- trace$getSPhiTrace();
+    sphi <- trace$getSphiTrace();
     plot(sphi, type="l", xlab = "Sample", ylab = expression("s"[phi]))
   }
   if (what[1] == "Mphi")
   {
-    sphi <- trace$getSPhiTrace();
+    sphi <- trace$getSphiTrace();
     mphi <- -(sphi * sphi) / 2;
     plot(mphi, type="l", xlab = "Sample", ylab = expression("m"[phi]));
   }
