@@ -4,8 +4,8 @@ rm(list=ls())
 with.phi <- TRUE 
   
 if (with.phi) {
-  #genome <- initializeGenomeObject(file = "../ribModel/data/simulatedAllUniqueR.fasta", expression.file = "../ribModel/data/simulatedAllUniqueR_phi.csv")
-  genome <- initializeGenomeObject(file = "../ribModel/data/simulatedOneMix.fasta", expression.file = "../ribModel/data/simulatedOneMix_simphi.csv")
+  genome <- initializeGenomeObject(file = "../ribModel/data/simulatedAllUniqueR.fasta", expression.file = "../ribModel/data/simulatedAllUniqueR_phi.csv")
+  #genome <- initializeGenomeObject(file = "../ribModel/data/simulatedOneMix.fasta", expression.file = "../ribModel/data/simulatedOneMix_simphi.csv")
 } else {
   genome <- initializeGenomeObject(file = "../ribModel/data/simulatedAllUniqueR.fasta")
   #genome <- initializeGenomeObject(file = "../ribModel/data/simulatedOneMix.fasta")
@@ -18,8 +18,8 @@ mixDef <- "allUnique"
 #geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457), rep(1, 3903))
 #geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
 #geneAssignment <- rep(1,4864)
-#geneAssignment <- c(rep(1,500), rep(2,500))
-geneAssignment <- rep(1,1000)
+geneAssignment <- c(rep(1,500), rep(2,500))
+#geneAssignment <- rep(1,1000)
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
 
 #parameter <- initializeParameterObject(restart.file = "2000restartFile.rst")
@@ -32,7 +32,7 @@ parameter$initSelectionCategories(c("../ribModel/data/simulated_selection0.csv",
 samples <- 100
 thining <- 10
 adaptiveWidth <- 10
-divergence.iteration <- 10
+divergence.iteration <- 0
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, 
                              est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
 # get model object

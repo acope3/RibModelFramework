@@ -405,7 +405,8 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 			if(std::abs(gewekeScore) < 1.96)
 			{
 				std::cout << "Stopping run based on convergence after " << iteration << " iterations\n" << std::endl;
-				break;
+				// Comment out this break to keep the run from stopping on convergence
+				// break;
 			}
 		}
 	} // end MCMC loop
