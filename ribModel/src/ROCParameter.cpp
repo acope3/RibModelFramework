@@ -710,15 +710,15 @@ void ROCParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
 		{
 			double acceptanceLevel = (double) numAcceptForSynthesisRate[cat][i] / (double) adaptationWidth;
 			traces.updateSynthesisRateAcceptanceRatioTrace(cat, i, acceptanceLevel);
-			if (acceptanceLevel < 0.2)
+			if (acceptanceLevel < 0.225)
 			{
 				std_phi[cat][i] *= 0.8;
-				if (acceptanceLevel < 0.15) acceptanceUnder++;
+				if (acceptanceLevel < 0.2) acceptanceUnder++;
 			}
-			if (acceptanceLevel > 0.3)
+			if (acceptanceLevel > 0.275)
 			{
 				std_phi[cat][i] *= 1.2;
-				if (acceptanceLevel > 0.35) acceptanceOver++;
+				if (acceptanceLevel > 0.3) acceptanceOver++;
 			}
 			numAcceptForSynthesisRate[cat][i] = 0u;
 		}

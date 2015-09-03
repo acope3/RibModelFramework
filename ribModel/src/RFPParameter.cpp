@@ -515,6 +515,9 @@ void RFPParameter::adaptSphiProposalWidth(unsigned adaptationWidth)
 //TODO: The only thing stopping this from moving up to Parameter is the trace stuff. Is there a way around this?
 void RFPParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
 {
+	unsigned acceptanceUnder = 0u;
+	unsigned acceptanceOver = 0u;
+
 	for(unsigned cat = 0u; cat < numSelectionCategories; cat ++)
 	{
 		unsigned numGenes = numAcceptForSynthesisRate[cat].size();
@@ -522,17 +525,22 @@ void RFPParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
 		{
 			double acceptanceLevel = (double)numAcceptForSynthesisRate[cat][i] / (double)adaptationWidth;
 			traces.updateSynthesisRateAcceptanceRatioTrace(cat, i, acceptanceLevel);
-			if(acceptanceLevel < 0.2)
+			if (acceptanceLevel < 0.225)
 			{
 				std_phi[cat][i] *= 0.8;
+				if (acceptanceLevel < 0.2) acceptanceUnder++;
 			}
-			if(acceptanceLevel > 0.3)
+			if (acceptanceLevel > 0.275)
 			{
 				std_phi[cat][i] *= 1.2;
+				if (acceptanceLevel > 0.3) acceptanceOver++;
 			}
 			numAcceptForSynthesisRate[cat][i] = 0u;
 		}
 	}
+	std::cout << "acceptance ratio for synthesis rate:\n";
+	std::cout << "\t acceptance ratio to low: " << acceptanceUnder << "\n";
+	std::cout << "\t acceptance ratio to high: " << acceptanceOver << "\n";
 }
 
 
