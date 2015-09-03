@@ -65,8 +65,10 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 	// TODO: make this work for more than one phi value, or for genes that don't have phi values
 	if (withPhi) {
 		for (unsigned i = 0; i < parameter->getNumPhiGroupings(); i++) {
-			logPhiProbability += std::log(Parameter::densityLogNorm(gene.observedPhiValues.at(i) + getAphi(i), std::log(phiValue), getSepsilon(i)));
-			logPhiProbability_proposed += std::log(Parameter::densityLogNorm(gene.observedPhiValues.at(i) + getAphi(i), std::log(phiValue_proposed), getSepsilon(i)));
+			if (gene.observedPhiValues.at(i) != -1) {
+				logPhiProbability += std::log(Parameter::densityLogNorm(gene.observedPhiValues.at(i) + getAphi(i), std::log(phiValue), getSepsilon(i)));
+				logPhiProbability_proposed += std::log(Parameter::densityLogNorm(gene.observedPhiValues.at(i) + getAphi(i), std::log(phiValue_proposed), getSepsilon(i)));
+			}
 		}
 	}
 
@@ -356,10 +358,12 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 				unsigned mixtureAssignment = getMixtureAssignment(j);
 				mixtureAssignment = getSynthesisRateCategory(mixtureAssignment);
 				double logphi = std::log(getSynthesisRate(j, mixtureAssignment, false));
-				double logobsPhi = std::log(genome.getGene(j).observedPhiValues.at(i));
-				double first = Parameter::densityNorm(logobsPhi, logphi + Aphi, Sepsilon, true);
-				double second = Parameter::densityNorm(logobsPhi, logphi + Aphi_proposed, Sepsilon, true);
-				lpr += first - second;
+				if (genome.getGene(j).observedPhiValues.at(i) != -1) {
+					double logobsPhi = std::log(genome.getGene(j).observedPhiValues.at(i));
+					double first = Parameter::densityNorm(logobsPhi, logphi + Aphi_proposed, Sepsilon, true);
+					double second = Parameter::densityNorm(logobsPhi, logphi + Aphi, Sepsilon, true);
+					lpr += first - second;
+				}
 			}
 			logProbabilityRatio[i+1] = lpr;
 		}
@@ -377,8 +381,10 @@ void ROCModel::updateGibbsSampledHyperParameters(Genome &genome)
 			double aphi = getAphi(i);
 			for (unsigned j = 0; j < genome.getGenomeSize(); j++) {
 				mixtureAssignment = getMixtureAssignment(i);
-				double sum = std::log(genome.getGene(i).observedPhiValues.at(i)) - aphi - std::log(getSynthesisRate(j, mixtureAssignment, false));
-				rate += sum * sum;
+				if (genome.getGene(i).observedPhiValues.at(i) != -1) {
+					double sum = std::log(genome.getGene(i).observedPhiValues.at(i)) - aphi - std::log(getSynthesisRate(j, mixtureAssignment, false));
+					rate += sum * sum;
+				}
 			}
 			rate /= 2;
 

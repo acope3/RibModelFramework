@@ -17,7 +17,8 @@ class Genome
 
 		std::vector<Gene> genes;
 		std::vector<Gene> simulatedGenes;
-		unsigned numGenesWithPhi;
+		std::vector <unsigned> numGenesWithPhi;
+
 	public:
 
 		//Constructors & destructors:
@@ -37,7 +38,7 @@ class Genome
 		//Gene functions:
 		void addGene(const Gene& gene, bool simulated = false);
 		std::vector <Gene> getGenes(bool simulated = false);
-		unsigned getNumGenesWithPhi();
+		unsigned getNumGenesWithPhi(unsigned index);
 		Gene& getGene(unsigned index, bool simulated = false);
 		Gene& getGene(std::string id, bool simulated = false);
 

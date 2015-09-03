@@ -1080,3 +1080,47 @@ Status at iteration 9300
 	 current Sphi estimate: 0.469778
 	 current Sphi proposal width: 0.0882302
 	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.25	0.24	0.21	0.24	0.29	0.2	0.28	0.32	0.29	0.41	0.26	0.2	0.21	0.04	0.16	0.23	0.29	0.28	0.29	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 121
+	 acceptance ratio to high: 225
+Status at iteration 9400
+	 current logLikelihood: -1.14839e+06
+	 current Sphi estimate: 0.491294
+	 current Sphi proposal width: 0.0882302
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.25	0.27	0.24	0.34	0.22	0.18	0.3	0.2	0.28	0.25	0.2	0.26	0.27	0.27	0.39	0.24	0.24	0.23	0.22	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 113
+	 acceptance ratio to high: 247
+Status at iteration 9500
+	 current logLikelihood: -1.14838e+06
+	 current Sphi estimate: 0.505906
+	 current Sphi proposal width: 0.105876
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.29	0.27	0.25	0.36	0.32	0.38	0.34	0.21	0.34	0.19	0.21	0.2	0.26	0.34	0.21	0.32	0.26	0.22	0.29	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 121
+	 acceptance ratio to high: 209
+Status at iteration 9600
+	 current logLikelihood: -1.14841e+06
+	 current Sphi estimate: 0.493629
+	 current Sphi proposal width: 0.084701
+	 current Mixture element probability for element 0: 1
+acceptance ratio for amino acid:
+	A	C	D	E	F	G	H	I	K	L	N	P	Q	R	S	T	V	Y	Z	
+	0.16	0.32	0.24	0.23	0.26	0.23	0.26	0.14	0.24	0.52	0.29	0.13	0.35	0.15	0.25	0.16	0.32	0.27	0.21	
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 132
+	 acceptance ratio to high: 183
+Status at iteration 9700
+	 current logLikelihood: -1.14841e+06
+	 current Sphi estimate: 0.493103
+	 current Sphi proposal width: 0.084701
+	 current Mixture element probability for element 0: 1
