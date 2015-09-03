@@ -10,7 +10,6 @@
 Genome::Genome()
 {
 	//ctor
-	numGenesWithPhi = 0;
 }
 
 
@@ -261,7 +260,6 @@ void Genome::writeRFPFile(std::string filename, bool simulated)
 
 void Genome::readObservedPhiValues(std::string filename, bool byId)
 {
-	std::cout << numGenesWithPhi <<"\n";
 	std::ifstream input;
 	std::string tmp;
 	unsigned numPhi = 0;
@@ -317,6 +315,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 							{
 								first = false;
 								numPhi = (unsigned) it -> second -> observedPhiValues.size() + 1;
+								numGenesWithPhi.resize(numPhi, 0);
 							}
 							else
 							{
@@ -340,15 +339,21 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 						double value = std::atof(val.c_str());
 						if (value <=  0 || std::isnan(value))
 						{
-							if (value == 0 || std::isnan(value)) value = -1;
+							if (value == 0 || std::isnan(value))
+							{
+								value = -1;
+							}
 							else
 							{
 								std::cerr <<"WARNING! Negative phi value given - values should not be on the log scale. Negative Value stored.";
 							}
 						}
+						else 
+						{
+							numGenesWithPhi[count]++;
+						}
 
 						it->second->observedPhiValues.push_back(value); //make vector private again
-						if (it->second->observedPhiValues.size() == 1) numGenesWithPhi++;
 						pos = pos2;
 						count++;
 					}
@@ -374,6 +379,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 		{
 			unsigned geneIndex = 0;
 			bool first = true;
+			bool firstValue = false;
 			while (std::getline(input, tmp))
 			{
 				if (geneIndex >= genes.size())
@@ -392,11 +398,13 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 						{
 							first = false;
 							numPhi = (unsigned) genes[geneIndex].observedPhiValues.size() + 1;
+							numGenesWithPhi.resize(numPhi);
+							if (firstValue) numGenesWithPhi[0] = 1;
 						}
 						notDone = false;
 						if (numPhi != genes[geneIndex].observedPhiValues.size() + 1)
 						{
-							std::cerr <<"gene " << geneIndex <<": has a differnt number of phi values given than other genes, exiting.\n";
+							std::cerr <<"gene " << geneIndex <<": has a different number of phi values given than other genes, exiting.\n";
 							for (unsigned a = 0; a < getGenomeSize(); a++)
 							{
 								genes[a].observedPhiValues.clear();
@@ -417,8 +425,17 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 							std::cerr <<"WARNING! Negative phi value given - values should not be on the log scale. Negative Value stored.";
 						}
 					}
+					else
+					{
+						if (first) {
+							firstValue = true;
+						}
+						else
+						{
+							numGenesWithPhi[genes[geneIndex].observedPhiValues.size()]++;
+						}
+					}
 					genes[geneIndex].observedPhiValues.push_back(value);
-					if (genes[geneIndex].observedPhiValues.size() == 1) numGenesWithPhi++;
 					pos = pos2;
 				}
 				geneIndex++;
@@ -429,16 +446,19 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 			}
 			if (!exitfunction)
 			{
-				if (numGenesWithPhi != getGenomeSize())
-				{
-					std::cerr <<"The last " << getGenomeSize() - numGenesWithPhi <<" genes do not have phi values.";
-					std::cerr <<"Please check your file to make sure every gene has a phi value. Filling empty genes";
-					std::cerr <<"with -1's for calculations.\n";
+				for (unsigned i = 0; i < numPhi; i++) {
 
-					for (unsigned a = numGenesWithPhi; a < getGenomeSize(); a++)
+					if (numGenesWithPhi[i] != getGenomeSize())
 					{
-						Gene *gene = &(getGene(a));
-						gene->observedPhiValues.resize(numPhi, -1);
+						std::cerr << "The last " << getGenomeSize() - numGenesWithPhi[i] << " genes do not have phi values.";
+						std::cerr << "Please check your file to make sure every gene has a phi value. Filling empty genes";
+						std::cerr << "with -1's for calculations.\n";
+
+						for (unsigned a = numGenesWithPhi[i]; a < getGenomeSize(); a++)
+						{
+							Gene *gene = &(getGene(a));
+							gene->observedPhiValues[i] = -1;
+						}
 					}
 				}
 			}
@@ -463,9 +483,9 @@ std::vector <Gene> Genome::getGenes(bool simulated)
 }
 
 
-unsigned Genome::getNumGenesWithPhi()
+unsigned Genome::getNumGenesWithPhi(unsigned index)
 {
-	return numGenesWithPhi;
+	return numGenesWithPhi[index];
 }
 
 
@@ -515,7 +535,7 @@ void Genome::clear()
 {
 	genes.clear();
 	simulatedGenes.clear();
-	numGenesWithPhi = 0;
+	numGenesWithPhi.clear();
 }
 
 
