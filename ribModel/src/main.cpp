@@ -428,11 +428,11 @@ int main()
 	enum User { cedric, gabe, jeremy };
 	enum ModelToRun { ROC, RFP, FONSE };
 	/* Test variables */
-	User user = cedric;
+	User user = jeremy;
 	ModelToRun modelToRun = ROC;
 	bool read = false;
 	bool testing = false;
-	bool withPhi = false;
+	bool withPhi = true;
 	if (testing)
 	{
 		//testLogNormDensity();
