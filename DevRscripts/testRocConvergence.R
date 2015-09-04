@@ -19,7 +19,7 @@ geneAssignment <- rep(1,1000)
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
 
 # initialize MCMC object
-samples <- 6000
+samples <- 10000
 thining <- 10
 adaptiveWidth <- 10
 divergence.iteration <- 50
@@ -30,15 +30,19 @@ mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth,
 model <- initializeModelObject(parameter, "ROC", with.phi = with.phi)
 
 #run mcmc on genome with parameter using model
+start <- Sys.time()
 system.time(
   runMCMC(mcmc, genome, model, 4, divergence.iteration)
 )
+end <- Sys.time()
+end - start
+
+
 
 colour <- c("black", "chartreuse4", "red", "blue", "blue4", "blueviolet", "darkgoldenrod2", "darkgreen", "darkorchid1", "deeppink2",
             "khaki4", "midnightblue", "lightsteelblue", "ivory4", "gray47", "orangered3", "slateblue4", "yellow3", "tomato3", "turquoise3",
             "plum", "orangered", "red4", "navy", "gold", "darkred", "darkmagenta", "burlywood4", "mediumseagreen", "cornflowerblue",
             "cyan2", "darkcyan", "darkolivegreen3", "darkturquoise", "hotpink", "lightpink4", "mediumaquamarine", "springgreen2", "chartreuse", "azure4")
-
 
 pdf("single_mixture_convergence_test_10.pdf")
 plot(mcmc)
@@ -90,7 +94,7 @@ axis(2)
 legend("topleft", legend = c("I.C.", "Posterior"), col=c("black", "black"), pch=c(20, 1), bty = "n")
 
 cat("Percent quantiles overlap with true value: ", sum(true.value < up & true.value > low) / 40, "\n")
-cat("Geweke Score: ", convergence.test(mcmc, n.samples = 500, plot=F)$z, "\n")
+cat("Geweke Score: ", convergence.test(mcmc, n.samples = 5000, plot=F)$z, "\n")
 
 #true.sel <- read.csv(file="../ribModel/data/simulated_mutation0.csv", header=T)
 true.sel <- read.csv(file="../ribModel/data/simulatedOneMix_mutation.csv", header=T)
@@ -133,6 +137,6 @@ axis(2)
 legend("topleft", legend = c("I.C.", "Posterior"), col=c("black", "black"), pch=c(20, 1), bty = "n")
 
 cat("Percent quantiles overlap with true value: ", sum(true.value < up & true.value > low) / 40, "\n")
-cat("Geweke Score: ", convergence.test(mcmc, n.samples = 500, plot=F)$z, "\n")
+cat("Geweke Score: ", convergence.test(mcmc, n.samples = 5000, plot=F)$z, "\n")
 
 dev.off()

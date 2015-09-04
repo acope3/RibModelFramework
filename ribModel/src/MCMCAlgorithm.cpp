@@ -110,7 +110,6 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				double logProbabilityRatio[3];
 				model.calculateLogLikelihoodRatioPerGene(gene, i, mixtureElement, logProbabilityRatio);
 
-				// store values so they can be processed
 				unscaledLogProb_curr[k] += logProbabilityRatio[1];
 				unscaledLogProb_prop[k] += logProbabilityRatio[2];
 
