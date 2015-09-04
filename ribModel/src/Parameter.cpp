@@ -24,7 +24,7 @@ Parameter::Parameter()
 	numMixtures = 0u;
 	std_sphi = 0.1;
 	CodonTable *codonTable = CodonTable::getInstance();
-	maxGrouping = codonTable -> getAA_mapping().size();
+	maxGrouping = codonTable -> getAAListing().size();
 }
 
 
@@ -790,7 +790,7 @@ double Parameter::calculateSCUO(Gene& gene)
 	{
 		std::string curAA = groupList[i];
 		// skip amino acids with only one codon or stop codons
-		if(codonTable -> getNumCodons(curAA) == 1 || curAA == "X") continue;
+		if(codonTable -> getNumCodonsForAA(curAA) == 1 || curAA == "X") continue;
 		totalDegenerateAACount += (double)seqsum.getAACountForAA(i);
 	}
 
@@ -799,8 +799,8 @@ double Parameter::calculateSCUO(Gene& gene)
 	{
 		std::string curAA = groupList[i];
 		// skip amino acids with only one codon or stop codons
-		if(codonTable -> getNumCodons(curAA) == 1 || curAA == "X") continue;
-		double numDegenerateCodons = codonTable -> getNumCodons(curAA);
+		if(codonTable -> getNumCodonsForAA(curAA) == 1 || curAA == "X") continue;
+		double numDegenerateCodons = codonTable -> getNumCodonsForAA(curAA);
 
 		double aaCount = (double)seqsum.getAACountForAA(i);
 		if(aaCount == 0) continue;

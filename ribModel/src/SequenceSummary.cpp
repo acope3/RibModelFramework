@@ -7,7 +7,7 @@ SequenceSummary::SequenceSummary()
 {
 	clear();
 	CodonTable *codonTable = CodonTable::getInstance();
-	naa.resize(codonTable -> getAA_mapping().size(), 0);
+	naa.resize(codonTable -> getAAListing().size(), 0);
 	//ctor
 }
 

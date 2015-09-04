@@ -150,7 +150,7 @@ void FONSEParameter::initFONSEParameterSet()
 	for (unsigned i = 0; i < maxGrouping; i++)
 	{
 		std::string aa = CodonTable::AminoAcidArray[i];
-		unsigned numCodons = codonTable -> getNumCodons(aa, true);
+		unsigned numCodons = codonTable -> getNumCodonsForAA(aa, true);
 		CovarianceMatrix m((numMutationCategories + numSelectionCategories) * numCodons);
 		m.choleskiDecomposition();
 		covarianceMatrix.push_back(m);

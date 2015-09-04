@@ -41,7 +41,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 		if(seqsum.getAACountForAA(curAA) == 0) continue;
 
 		// get codon count (total count not parameter->count)
-		unsigned numCodons = codonTable -> getNumCodons(curAA);
+		unsigned numCodons = codonTable -> getNumCodonsForAA(curAA);
 		// get mutation and selection parameter->for gene
 		//double* mutation = new double[numCodons - 1]();
 		parameter->getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
@@ -145,7 +145,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 {
 	CodonTable *codonTable = CodonTable::getInstance();
 	int numGenes = genome.getGenomeSize();
-	int numCodons = codonTable -> getNumCodons(grouping);
+	int numCodons = codonTable -> getNumCodonsForAA(grouping);
 	double likelihood = 0.0;
 	double likelihood_proposed = 0.0;
 
@@ -280,7 +280,7 @@ void ROCModel::simulateGenome(Genome &genome)
 
 			if (aa == "X") continue;
 
-			unsigned numCodons = codonTable -> getNumCodons(aa);
+			unsigned numCodons = codonTable -> getNumCodonsForAA(aa);
 
 			double* codonProb = new double[numCodons](); //size the arrays to the proper size based on # of codons.
 			double* mutation = new double[numCodons - 1]();
