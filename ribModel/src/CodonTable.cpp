@@ -17,8 +17,8 @@ CodonTable::CodonTable(unsigned _tableId, bool _splitAA) : tableId(_tableId), sp
 {
 	if(tableId == 7 || tableId == 8 || tableId == 15 || tableId == 17 || tableId == 18 || tableId == 19 || tableId == 20)
 	{
-		tableId = 1; //standard codon table by NCBI
         std::cerr << "Invalid codon table: " << tableId << " using default codon table (NCBI codon table 1)\n";
+        tableId = 1; //standard codon table by NCBI
     }
     tableId--; //Make it 0 indexed
 }
@@ -244,20 +244,27 @@ std::vector<std::string> CodonTable::AAToCodon(std::string aa, bool forParamVect
 {
     std::vector <std::string> codons;
     std::vector <unsigned> aaRange = AAToCodonRange(aa, forParamVector);
-
+    if (forParamVector)
+    {
         for (unsigned i = 0; i < aaRange.size(); i++)
         {
-            unsigned index = codonIndexListingWithoutReference[AAToAAIndex(aa)][aaRange[i]];
-            codons.push_back(indexToCodon(index));
+            codons.push_back(indexToCodon(aaRange[i]));
         }
-
+    }
+    else
+    {
+        for (unsigned i = 0; i < aaRange.size(); i++)
+        {
+            codons.push_back(indexToCodon(aaRange[i]));
+        }
+    }
     return codons;
 }
 
 
-std::string CodonTable::indexToCodon(unsigned index)
+std::string CodonTable::indexToCodon(unsigned index, bool forParamVector)
 {
-    return codonArray[index];
+    return forParamVector ? CodonTable::codonArray[index] : forParamVectorListing[index];
 }
 
 
@@ -906,14 +913,14 @@ std::vector <unsigned> CodonTable::AAIndexToCodonRangeR(unsigned aaIndex, bool f
 }
 
 
-std::vector <unsigned> CodonTable::AAToCodonRangeR(std::string aa, bool forParamVector = false)
+std::vector <unsigned> CodonTable::AAToCodonRangeR(std::string aa, bool forParamVector)
 {
     std::vector <unsigned> RV;
     aa[0] = (char)std::toupper(aa[0]);
     if (AAMap.find(aa) == AAMap.end())
     {
         std::cerr <<"AA, " << aa <<" is not a valid AA for table " << getTableIdR() <<".\n";
-        std::cerr <<"Returning a value of 0.\n";
+        std::cerr <<"Returning an empty vector.\n";
     }
     else
     {
@@ -926,6 +933,44 @@ std::vector <unsigned> CodonTable::AAToCodonRangeR(std::string aa, bool forParam
 
     return RV; 
 }
+
+
+std::vector<std::string> CodonTable::AAToCodonR(std::string aa, bool forParamVector)
+{
+    std::vector <std::string> RV;
+    aa[0] = (char)std::toupper(aa[0]);
+    if (AAMap.find(aa) == AAMap.end())
+    {
+        std::cerr <<"AA, " << aa <<" is not a valid AA for table " << getTableIdR() <<".\n";
+        std::cerr <<"Returning an empty vector.\n";
+    }
+    else
+    {
+        RV = AAToCodon(aa, forParamVector);
+    }
+
+    return RV;
+}
+
+
+std::string CodonTable::indexToCodonR(unsigned index, bool forParamVector)
+{
+    std::string codon = "";
+    bool check;
+    check = forParamVector ? checkIndex(index, 1, (unsigned)forParamVectorListing.size()) : checkIndex(index, 1, 64);
+    if (check)
+    {
+        index--;
+        codon = indexToCodon(index, forParamVector);
+    }
+    else
+    {
+        std::cerr <<"Returning a blank string\n";
+    }
+
+    return codon;
+}
+
 
 
 // ---------------------------------------------------------------------------
@@ -960,8 +1005,9 @@ RCPP_MODULE(CodonTable_mod)
         .method("setupCodonTable", &CodonTable::setupCodonTable)
         .method("AAToAAIndex", &CodonTable::AAToAAIndexR)
         .method("AAIndexToCodonRange", &CodonTable::AAIndexToCodonRangeR)
-        .method("AAToCodonRange", &CodonTable::AAToCodonRange) //TODO:Wrap answer
-        .method("indexToCodon", &CodonTable::indexToCodon) //TODO: Wrap
+        .method("AAToCodonRange", &CodonTable::AAToCodonRangeR)
+        .method("AAToCodon", &CodonTable::AAToCodonR)
+        .method("indexToCodon", &CodonTable::indexToCodonR) //TODO: Wrap
         .method("codonToAA", &CodonTable::codonToAA)
         .method("codonToIndex", &CodonTable::codonToIndex) //TODO: Wrap answer
         .method("codonToAAIndex", &CodonTable::codonToAAIndex) //TODO: Wrap answer

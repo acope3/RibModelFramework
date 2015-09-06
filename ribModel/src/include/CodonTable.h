@@ -84,7 +84,7 @@ class CodonTable
         std::vector <unsigned> AAIndexToCodonRange(unsigned aaIndex, bool forParamVector = false);
         std::vector <unsigned> AAToCodonRange(std::string aa, bool forParamVector = false);
         std::vector<std::string> AAToCodon(std::string aa, bool forParamVector = false);
-        std::string indexToCodon(unsigned index);
+        std::string indexToCodon(unsigned index, bool forParamVector = false);
         std::string codonToAA(std::string& codon);
         unsigned codonToIndex(std::string& codon, bool forParamVector = false);
         unsigned codonToAAIndex(std::string& codon);
@@ -106,6 +106,8 @@ class CodonTable
         unsigned AAToAAIndexR(std::string aa);
         std::vector <unsigned> AAIndexToCodonRangeR(unsigned aaIndex, bool forParamVector = false);
         std::vector <unsigned> AAToCodonRangeR(std::string aa, bool forParamVector = false);
+        std::vector<std::string> AAToCodonR(std::string aa, bool forParamVector = false);
+        std::string indexToCodonR(unsigned index, bool forParamVector = false);
 
 };
 

@@ -386,6 +386,16 @@ void testMultiplePhi()
 
 	std::cout <<"----------END TEST MULTIPLEPHI----------\n";
 }
+
+
+void codonTableTest()
+{
+	CodonTable CT(1, false);
+	CT.setupCodonTable();
+	CT.AAToCodon("C", false);
+
+	return;
+}
 //---------------------------------------------------------------------------------------------//
 //-----------------------------------------END OF UNIT TESTING---------------------------------//
 //---------------------------------------------------------------------------------------------//
@@ -400,7 +410,7 @@ int main()
 	ModelToRun modelToRun = ROC;
 
 	bool read = false; //Initialize parameter by reading a restart file
-	bool testing = false; //Run unit testing
+	bool testing = true; //Run unit testing
 	bool withPhi = false; //Using multiple phi values per gene
 
 
@@ -422,6 +432,7 @@ int main()
 		//testGeneSequenceSummary();
 		//testReadMutationValues();
 		//testMultiplePhi();
+		codonTableTest();
 	}
 	else //Not doing unit testing, running a model
 	{

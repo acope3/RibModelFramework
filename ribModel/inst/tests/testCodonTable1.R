@@ -2,28 +2,7 @@ library(testthat)
 library(ribModel)
 
 context("Codon Table")
-
 CT <- new(CodonTable, 1, FALSE)
-
-test_that("Get TableId",{
-  expect_equal(CT$getTableId(), 1)
-  badCT <- new(CodonTable, 7, FALSE)
-  expect_equal(badCT$getTableId(), 1)
-  #ToDo: check all values
-})
-
-test_that("Get SplitAA",{
-  expect_equal(CT$getSplitAA(), FALSE)
-  otherCT <- new(CodonTable, 1, TRUE)
-  expect_equal(otherCT$getSplitAA(), TRUE)
-})
-
-test_that("Default Constructor",{
-  defaultCT <- new(CodonTable)
-  expect_equal(defaultCT$getTableId(), 1)
-  expect_equal(defaultCT$getSplitAA(), TRUE)
-})
-
 CT$setupCodonTable()
 codonIndexList <- list(c(1,2,3,4))
 codonIndexList[[2]] <- c(5,6)
@@ -238,6 +217,80 @@ test_that("AA Index To Codon Range",{
     expect_equal(CT$AAIndexToCodonRange(i, FALSE), codonIndexList[[i]])
   }
   for (i in 1:20){
-    expect_equal(CT$AAIndexToCodonRange(i,TRUE), codonIndexListWithoutRef[[i]]) #problem in C++ function 
+    expect_equal(CT$AAIndexToCodonRange(i,TRUE), codonIndexListWithoutRef[[i]])
   }
+  
+  expect_equal(CT$AAIndexToCodonRange(21, FALSE), numeric(0)) #Test with bad index
+  expect_equal(CT$AAIndexToCodonRange(0, FALSE), numeric(0)) #Test with bad index
+  expect_equal(CT$AAIndexToCodonRange(-1, FALSE), numeric(0)) #Test with bad index
+})
+
+test_that("Index to Codon",{
+  expect_equal(CT$indexToCodon(1, FALSE), "GCA")
+})
+
+test_that("AA To Codon Range",{
+  aaListing <- CT$getAAListing()
+  i <- 1
+  for (aa in aaListing){
+    expect_equal(CT$AAToCodonRange(aa, FALSE), codonIndexList[[i]])
+    i <- i + 1
+  }
+  i <- 1
+  for (aa in aaListing){
+    expect_equal(CT$AAToCodonRange(aa,TRUE), codonIndexListWithoutRef[[i]])
+    i <- i + 1
+  }
+  
+  expect_equal(CT$AAToCodonRange("a", FALSE), codonIndexList[[1]]) #Lower case AA test
+  expect_equal(CT$AAToCodonRange("BOB", FALSE), numeric(0)) #Test with bad AA given
+})
+
+test_that("AA To Codon",{
+  expect_equal(CT$AAToCodon("A", FALSE), c("GCA", "GCC", "GCG", "GCT"))
+  expect_equal(CT$AAToCodon("C", FALSE), c("TGC", "TGT"))
+  expect_equal(CT$AAToCodon("D", FALSE), c("GAC", "GAT"))
+  expect_equal(CT$AAToCodon("E", FALSE), c("GAA", "GAG"))
+  expect_equal(CT$AAToCodon("F", FALSE), c("TTC", "TTT"))
+  expect_equal(CT$AAToCodon("G", FALSE), c("GGA", "GGC", "GGG", "GGT"))
+  expect_equal(CT$AAToCodon("H", FALSE), c("CAC", "CAT"))
+  expect_equal(CT$AAToCodon("I", FALSE), c("ATA", "ATC", "ATT"))
+  expect_equal(CT$AAToCodon("K", FALSE), c("AAA", "AAG"))
+  expect_equal(CT$AAToCodon("L", FALSE), c("CTA", "CTC", "CTG", "CTT", "TTA", "TTG"))
+  expect_equal(CT$AAToCodon("M", FALSE), c("ATG"))
+  expect_equal(CT$AAToCodon("N", FALSE), c("AAC", "AAT"))
+  expect_equal(CT$AAToCodon("P", FALSE), c("CCA", "CCC", "CCG", "CCT"))
+  expect_equal(CT$AAToCodon("Q", FALSE), c("CAA", "CAG"))
+  expect_equal(CT$AAToCodon("R", FALSE), c("AGA", "AGG", "CGA", "CGC", "CGG", "CGT"))
+  expect_equal(CT$AAToCodon("S", FALSE), c("TCA", "TCC", "TCG", "TCT", "AGC", "AGT"))
+  expect_equal(CT$AAToCodon("T", FALSE), c("ACA", "ACC", "ACG", "ACT"))
+  expect_equal(CT$AAToCodon("V", FALSE), c("GTA", "GTC", "GTG", "GTT"))
+  expect_equal(CT$AAToCodon("W", FALSE), c("TGG"))
+  expect_equal(CT$AAToCodon("Y", FALSE), c("TAC", "TAT"))
+  
+  
+  expect_equal(CT$AAToCodon("A", TRUE), c("GCA", "GCC", "GCG"))
+  expect_equal(CT$AAToCodon("C", TRUE), c("TGC"))
+  expect_equal(CT$AAToCodon("D", TRUE), c("GAC"))
+  expect_equal(CT$AAToCodon("E", TRUE), c("GAA"))
+  expect_equal(CT$AAToCodon("F", TRUE), c("TTC"))
+  expect_equal(CT$AAToCodon("G", TRUE), c("GGA", "GGC", "GGG"))
+  expect_equal(CT$AAToCodon("H", TRUE), c("CAC"))
+  expect_equal(CT$AAToCodon("I", TRUE), c("ATA", "ATC"))
+  expect_equal(CT$AAToCodon("K", TRUE), c("AAA"))
+  expect_equal(CT$AAToCodon("L", TRUE), c("CTA", "CTC", "CTG", "CTT", "TTA"))
+  expect_equal(CT$AAToCodon("M", TRUE), character(0))
+  expect_equal(CT$AAToCodon("N", TRUE), c("AAC"))
+  expect_equal(CT$AAToCodon("P", TRUE), c("CCA", "CCC", "CCG"))
+  expect_equal(CT$AAToCodon("Q", TRUE), c("CAA"))
+  expect_equal(CT$AAToCodon("R", TRUE), c("AGA", "AGG", "CGA", "CGC", "CGG"))
+  expect_equal(CT$AAToCodon("S", TRUE), c("TCA", "TCC", "TCG", "TCT", "AGC"))
+  expect_equal(CT$AAToCodon("T", TRUE), c("ACA", "ACC", "ACG"))
+  expect_equal(CT$AAToCodon("V", TRUE), c("GTA", "GTC", "GTG"))
+  expect_equal(CT$AAToCodon("W", TRUE), character(0))
+  expect_equal(CT$AAToCodon("Y", TRUE), c("TAC"))
+  
+  expect_equal(CT$AAToCodon("a", TRUE), c("GCA", "GCC", "GCG")) #test that lower case works
+  expect_equal(CT$AAToCodon("z", TRUE), character(0)) #check invalid
+  
 })
