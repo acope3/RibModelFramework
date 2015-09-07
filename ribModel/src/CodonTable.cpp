@@ -62,6 +62,7 @@ bool CodonTable::checkIndex(unsigned index, unsigned lowerbound, unsigned upperb
 }
 
 
+
 //------------------------------------//
 //----------Getter Functions----------//
 //------------------------------------//
@@ -140,87 +141,9 @@ std::string CodonTable::getForParamVectorCodon(unsigned codonIndex)
 
 
 
-
-
-// STATIC MEMBERS
-
-const std::string CodonTable::Ser2 = "Z";
-const std::string CodonTable::Ser1 = "J";
-const std::string CodonTable::Thr4_1 = "O";
-const std::string CodonTable::Thr4_2 = "B";
-const std::string CodonTable::Leu1 = "U";
-
-const std::string CodonTable::AminoAcidArray[] = {
-        "A", "C", "D", "E", "F", "G", "H", "I", "K", "L", CodonTable::Leu1, "M", "N", "P", "Q", "R",
-        CodonTable::Ser1, CodonTable::Ser2, "S", "T", CodonTable::Thr4_1, CodonTable::Thr4_2, "V", "W", "Y", "X"};
-const std::string CodonTable::AminoAcidArrayWithoutSplit[] = {
-        "A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y", "X"};
-
-
-const std::map<std::string, unsigned> CodonTable::codonToIndexWithReference = {{"GCA", 0}, {"GCC", 1}, {"GCG", 2},
-        {"GCT", 3}, {"TGC", 4}, {"TGT", 5}, {"GAC", 6}, {"GAT", 7}, {"GAA", 8}, {"GAG", 9}, {"TTC", 10}, {"TTT", 11},
-        {"GGA", 12}, {"GGC", 13}, {"GGG", 14}, {"GGT", 15}, {"CAC", 16}, {"CAT", 17}, {"ATA", 18}, {"ATC", 19}, {"ATT", 20},
-        {"AAA", 21}, {"AAG", 22}, {"CTA", 23}, {"CTC", 24}, {"CTG", 25}, {"CTT", 26}, {"TTA", 27}, {"TTG", 28}, {"ATG", 29},
-        {"AAC", 30}, {"AAT", 31}, {"CCA", 32}, {"CCC", 33}, {"CCG", 34}, {"CCT", 35}, {"CAA", 36}, {"CAG", 37}, {"AGA", 38},
-        {"AGG", 39}, {"CGA", 40}, {"CGC", 41}, {"CGG", 42}, {"CGT", 43}, {"TCA", 44}, {"TCC", 45}, {"TCG", 46}, {"TCT", 47},
-        {"ACA", 48}, {"ACC", 49}, {"ACG", 50}, {"ACT", 51}, {"GTA", 52}, {"GTC", 53}, {"GTG", 54}, {"GTT", 55}, {"TGG", 56},
-        {"TAC", 57}, {"TAT", 58}, {"AGC", 59}, {"AGT", 60}, {"TAA", 61}, {"TAG", 62}, {"TGA", 63}};
-
-const std::string CodonTable::codonArray[] =
-        {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
-        "TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT", "ATA", "ATC",
-        "ATT", "AAA", "AAG", "CTA", "CTC", "CTG", "CTT", "TTA", "TTG", "ATG",
-        "AAC", "AAT", "CCA", "CCC", "CCG", "CCT", "CAA", "CAG", "AGA", "AGG",
-        "CGA", "CGC", "CGG", "CGT", "TCA", "TCC", "TCG", "TCT", "ACA", "ACC",
-        "ACG", "ACT", "GTA", "GTC", "GTG", "GTT", "TGG", "TAC", "TAT", "AGC",
-        "AGT", "TAA", "TAG", "TGA"};
-
-
-
-// TODO NOTE: THERE IS NO CODON TABLE 7, 8, 15, 17, 18, 19, 20 ACCORDING TO NCBI !
-// http://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi
-const std::string CodonTable::codonTableDefinition[] = {"1. The Standard Code", "2. The Vertebrate Mitochondrial Code",
-        "3. The Yeast Mitochondrial Code", "4. The Mold, Protozoan, and Coelenterate Mitochondrial Code and the Mycoplasma/Spiroplasma Code",
-        "5. The Invertebrate Mitochondrial Code", "6. The Ciliate, Dasycladacean and Hexamita Nuclear Code", "7. Invalid Codon Table", "8. Invalid Codon Table",
-        "9. The Echinoderm and Flatworm Mitochondrial Code", "10. The Euplotid Nuclear Code",
-        "11. The Bacterial, Archaeal and Plant Plastid Code", "12. The Alternative Yeast Nuclear Code", "13. The Ascidian Mitochondrial Code",
-        "14. The Alternative Flatworm Mitochondrial Code", "15. Invalid Codon Table", "16. Chlorophycean Mitochondrial Code",
-        "17. Invalid Codon Table", "18. Invalid Codon Table", "19. Invalid Codon Table", "20. Invalid Codon Table",
-        "21. Trematode Mitochondrial Code", "22. Scenedesmus obliquus Mitochondrial Code", "23. Thraustochytrium Mitochondrial Code",
-        "24. Pterobranchia Mitochondrial Code",	"25. Candidate Division SR1 and Gracilibacteria Code"};
-
-
-    // {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y", "Z", "X"};
-    const unsigned CodonTable::numCodonsPerAAForTable[25][26] = {
-            {4,2,2,2,2,4,2,3,2,6,0,1,2,4,2,6,0,2,4,4,0,0,4,1,2,3}, // 1. The Standard Code
-            {4,2,2,2,2,4,2,2,2,6,0,2,2,4,2,4,0,2,4,4,0,0,4,2,2,4}, // 2. The Vertebrate Mitochondrial Code
-            {4,2,2,2,2,4,2,2,2,2,0,2,2,4,2,4,0,2,4,0,4,4,4,2,2,2}, // 3. The Yeast Mitochondrial Code
-            {4,2,2,2,2,4,2,3,2,6,0,1,2,4,2,6,0,2,4,4,0,0,4,2,2,2}, // 4. The Mold, Protozoan, and Coelenterate Mitochondrial Code and the Mycoplasma/Spiroplasma Code
-            {4,2,2,2,2,4,2,2,2,6,0,2,2,4,2,4,0,4,4,4,0,0,4,2,2,2}, // 5. The Invertebrate Mitochondrial Code
-            {4,2,2,2,2,4,2,3,2,6,0,1,2,4,4,6,0,2,4,4,0,0,4,1,2,1}, // 6. The Ciliate, Dasycladacean and Hexamita Nuclear Code
-            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 7. Invalid Codon Table
-            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 8. Invalid Codon Table
-            {4,2,2,2,2,4,2,3,1,6,0,1,3,4,2,4,0,4,4,4,0,0,4,2,2,2}, // 9. The Echinoderm and Flatworm Mitochondrial Code
-            {4,3,2,2,2,4,2,3,2,6,0,1,2,4,2,6,0,2,4,4,0,0,4,1,2,2}, // 10. The Euplotid Nuclear Code
-            {4,2,2,2,2,4,2,3,2,6,0,1,2,4,2,6,0,2,4,4,0,0,4,1,2,3}, // 11. The Bacterial, Archaeal and Plant Plastid Codee
-            {4,2,2,2,2,4,2,3,2,5,0,1,2,4,2,6,1,2,4,4,0,0,4,1,2,3}, // 12. The Alternative Yeast Nuclear Code
-            {4,2,2,2,2,6,2,2,2,6,0,2,2,4,2,4,0,2,4,4,0,0,4,2,2,2}, // 13. The Ascidian Mitochondrial Code
-            {4,2,2,2,2,4,2,3,1,6,0,1,3,4,2,4,0,4,4,4,0,0,4,2,3,1}, // 14. The Alternative Flatworm Mitochondrial Code
-            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 15. Invalid Codon Table
-            {4,2,2,2,2,4,2,3,2,6,1,1,2,4,2,6,0,2,4,4,0,0,4,1,2,2}, // 16. Chlorophycean Mitochondrial Code
-            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 17. Invalid Codon Table
-            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 18. Invalid Codon Table
-            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 19. Invalid Codon Table
-            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 20. Invalid Codon Table
-            {4,2,2,2,2,4,2,2,1,6,0,2,3,4,2,4,0,4,4,4,0,0,4,2,2,2}, // 21. Trematode Mitochondrial Code
-            {4,2,2,2,2,4,2,3,2,6,1,1,2,4,2,6,0,2,3,4,0,0,4,1,2,3}, // 22. Scenedesmus obliquus Mitochondrial Code
-            {4,2,2,2,2,4,2,3,2,5,0,1,2,4,2,6,0,2,4,4,0,0,4,1,2,4}, // 23. Thraustochytrium Mitochondrial Code
-            {4,2,2,2,2,4,2,3,3,6,0,1,2,4,2,4,0,3,4,4,0,0,4,2,2,2}, // 24. Pterobranchia Mitochondrial Code
-            {4,2,2,2,2,5,2,3,2,6,0,1,2,4,2,6,0,2,4,4,0,0,4,1,2,2}, // 25. Candidate Division SR1 and Gracilibacteria Code
-    };
-
-    // --- CODON TABLE SPECIFIC MAPPER FUNCTIONS ------
-
+//--------------------------------------//
+//----------Mapping Operations----------//
+//--------------------------------------//
 unsigned CodonTable::AAToAAIndex(std::string aa)
 {
         return AAMap.find(aa) -> second;
@@ -230,6 +153,12 @@ unsigned CodonTable::AAToAAIndex(std::string aa)
 std::vector <unsigned> CodonTable::AAIndexToCodonRange(unsigned aaIndex, bool forParamVector)
 {
     return forParamVector ? codonIndexListingWithoutReference[aaIndex] : codonIndexListing[aaIndex];
+}
+
+
+std::string CodonTable::indexToCodon(unsigned index, bool forParamVector)
+{
+    return forParamVector ? forParamVectorListing[index] : CodonTable::codonArray[index];
 }
 
 
@@ -262,12 +191,6 @@ std::vector<std::string> CodonTable::AAToCodon(std::string aa, bool forParamVect
 }
 
 
-std::string CodonTable::indexToCodon(unsigned index, bool forParamVector)
-{
-    return forParamVector ? CodonTable::codonArray[index] : forParamVectorListing[index];
-}
-
-
 std::string CodonTable::codonToAA(std::string& codon)
 {
     std::map <std::string, std::string>::iterator mit;
@@ -285,9 +208,7 @@ unsigned CodonTable::codonToIndex(std::string& codon, bool forParamVector)
 
 unsigned CodonTable::codonToAAIndex(std::string& codon)
 {
-    std::cout << codon <<"\n";
     std::string AA = codonToAA(codon);
-    std::cout <<  AAMap.find(AA) -> second <<"\n\n";
     return AAMap.find(AA) -> second;
 }
 
@@ -299,6 +220,9 @@ std::string CodonTable::indexToAA(unsigned aaIndex)
 
 
 
+//-----------------------------------//
+//----------Other Functions----------//
+//-----------------------------------//
 void CodonTable::setupCodonTable()
 {
 	unsigned numAA = 21;
@@ -744,7 +668,7 @@ void CodonTable::setupCodonTable()
     unsigned index = 0;
     if (splitAA)
     {
-        for (unsigned i = 0; i < 26; i++)
+        for (unsigned i = 0; i < 25; i++) //25 since we are ignoring the stop codon.
         {
             if (numCodonsPerAAForTable[tableId][i] != 0)
             {
@@ -780,6 +704,10 @@ void CodonTable::setupCodonTable()
 }
 
 
+
+
+
+
 CodonTable* CodonTable::codonTable;
 
 void CodonTable::createCodonTable(unsigned tableId, bool split)
@@ -793,6 +721,95 @@ CodonTable* CodonTable::getInstance()
 {
     return codonTable;
 }
+
+
+
+
+
+
+//--------------------------------//
+//---------Static Members---------//
+//--------------------------------//
+const std::string CodonTable::Ser2 = "Z";
+const std::string CodonTable::Ser1 = "J";
+const std::string CodonTable::Thr4_1 = "O";
+const std::string CodonTable::Thr4_2 = "B";
+const std::string CodonTable::Leu1 = "U";
+
+const std::string CodonTable::AminoAcidArray[] = {
+        "A", "C", "D", "E", "F", "G", "H", "I", "K", "L", CodonTable::Leu1, "M", "N", "P", "Q", "R",
+        CodonTable::Ser1, CodonTable::Ser2, "S", "T", CodonTable::Thr4_1, CodonTable::Thr4_2, "V", "W", "Y", "X"};
+const std::string CodonTable::AminoAcidArrayWithoutSplit[] = {
+        "A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y", "X"};
+
+
+const std::map<std::string, unsigned> CodonTable::codonToIndexWithReference = {{"GCA", 0}, {"GCC", 1}, {"GCG", 2},
+                                                                               {"GCT", 3}, {"TGC", 4}, {"TGT", 5}, {"GAC", 6}, {"GAT", 7}, {"GAA", 8}, {"GAG", 9}, {"TTC", 10}, {"TTT", 11},
+                                                                               {"GGA", 12}, {"GGC", 13}, {"GGG", 14}, {"GGT", 15}, {"CAC", 16}, {"CAT", 17}, {"ATA", 18}, {"ATC", 19}, {"ATT", 20},
+                                                                               {"AAA", 21}, {"AAG", 22}, {"CTA", 23}, {"CTC", 24}, {"CTG", 25}, {"CTT", 26}, {"TTA", 27}, {"TTG", 28}, {"ATG", 29},
+                                                                               {"AAC", 30}, {"AAT", 31}, {"CCA", 32}, {"CCC", 33}, {"CCG", 34}, {"CCT", 35}, {"CAA", 36}, {"CAG", 37}, {"AGA", 38},
+                                                                               {"AGG", 39}, {"CGA", 40}, {"CGC", 41}, {"CGG", 42}, {"CGT", 43}, {"TCA", 44}, {"TCC", 45}, {"TCG", 46}, {"TCT", 47},
+                                                                               {"ACA", 48}, {"ACC", 49}, {"ACG", 50}, {"ACT", 51}, {"GTA", 52}, {"GTC", 53}, {"GTG", 54}, {"GTT", 55}, {"TGG", 56},
+                                                                               {"TAC", 57}, {"TAT", 58}, {"AGC", 59}, {"AGT", 60}, {"TAA", 61}, {"TAG", 62}, {"TGA", 63}};
+
+const std::string CodonTable::codonArray[] =
+        {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
+         "TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT", "ATA", "ATC",
+         "ATT", "AAA", "AAG", "CTA", "CTC", "CTG", "CTT", "TTA", "TTG", "ATG",
+         "AAC", "AAT", "CCA", "CCC", "CCG", "CCT", "CAA", "CAG", "AGA", "AGG",
+         "CGA", "CGC", "CGG", "CGT", "TCA", "TCC", "TCG", "TCT", "ACA", "ACC",
+         "ACG", "ACT", "GTA", "GTC", "GTG", "GTT", "TGG", "TAC", "TAT", "AGC",
+         "AGT", "TAA", "TAG", "TGA"};
+
+
+// TODO NOTE: THERE IS NO CODON TABLE 7, 8, 15, 17, 18, 19, 20 ACCORDING TO NCBI !
+// http://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi
+const std::string CodonTable::codonTableDefinition[] = {"1. The Standard Code", "2. The Vertebrate Mitochondrial Code",
+                                                        "3. The Yeast Mitochondrial Code", "4. The Mold, Protozoan, and Coelenterate Mitochondrial Code and the Mycoplasma/Spiroplasma Code",
+                                                        "5. The Invertebrate Mitochondrial Code", "6. The Ciliate, Dasycladacean and Hexamita Nuclear Code", "7. Invalid Codon Table", "8. Invalid Codon Table",
+                                                        "9. The Echinoderm and Flatworm Mitochondrial Code", "10. The Euplotid Nuclear Code",
+                                                        "11. The Bacterial, Archaeal and Plant Plastid Code", "12. The Alternative Yeast Nuclear Code", "13. The Ascidian Mitochondrial Code",
+                                                        "14. The Alternative Flatworm Mitochondrial Code", "15. Invalid Codon Table", "16. Chlorophycean Mitochondrial Code",
+                                                        "17. Invalid Codon Table", "18. Invalid Codon Table", "19. Invalid Codon Table", "20. Invalid Codon Table",
+                                                        "21. Trematode Mitochondrial Code", "22. Scenedesmus obliquus Mitochondrial Code", "23. Thraustochytrium Mitochondrial Code",
+                                                        "24. Pterobranchia Mitochondrial Code",	"25. Candidate Division SR1 and Gracilibacteria Code"};
+
+
+// {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y", "Z", "X"};
+const unsigned CodonTable::numCodonsPerAAForTable[25][26] = {
+        {4,2,2,2,2,4,2,3,2,6,0,1,2,4,2,6,0,2,4,4,0,0,4,1,2,3}, // 1. The Standard Code
+        {4,2,2,2,2,4,2,2,2,6,0,2,2,4,2,4,0,2,4,4,0,0,4,2,2,4}, // 2. The Vertebrate Mitochondrial Code
+        {4,2,2,2,2,4,2,2,2,2,0,2,2,4,2,4,0,2,4,0,4,4,4,2,2,2}, // 3. The Yeast Mitochondrial Code
+        {4,2,2,2,2,4,2,3,2,6,0,1,2,4,2,6,0,2,4,4,0,0,4,2,2,2}, // 4. The Mold, Protozoan, and Coelenterate Mitochondrial Code and the Mycoplasma/Spiroplasma Code
+        {4,2,2,2,2,4,2,2,2,6,0,2,2,4,2,4,0,4,4,4,0,0,4,2,2,2}, // 5. The Invertebrate Mitochondrial Code
+        {4,2,2,2,2,4,2,3,2,6,0,1,2,4,4,6,0,2,4,4,0,0,4,1,2,1}, // 6. The Ciliate, Dasycladacean and Hexamita Nuclear Code
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 7. Invalid Codon Table
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 8. Invalid Codon Table
+        {4,2,2,2,2,4,2,3,1,6,0,1,3,4,2,4,0,4,4,4,0,0,4,2,2,2}, // 9. The Echinoderm and Flatworm Mitochondrial Code
+        {4,3,2,2,2,4,2,3,2,6,0,1,2,4,2,6,0,2,4,4,0,0,4,1,2,2}, // 10. The Euplotid Nuclear Code
+        {4,2,2,2,2,4,2,3,2,6,0,1,2,4,2,6,0,2,4,4,0,0,4,1,2,3}, // 11. The Bacterial, Archaeal and Plant Plastid Codee
+        {4,2,2,2,2,4,2,3,2,5,0,1,2,4,2,6,1,2,4,4,0,0,4,1,2,3}, // 12. The Alternative Yeast Nuclear Code
+        {4,2,2,2,2,6,2,2,2,6,0,2,2,4,2,4,0,2,4,4,0,0,4,2,2,2}, // 13. The Ascidian Mitochondrial Code
+        {4,2,2,2,2,4,2,3,1,6,0,1,3,4,2,4,0,4,4,4,0,0,4,2,3,1}, // 14. The Alternative Flatworm Mitochondrial Code
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 15. Invalid Codon Table
+        {4,2,2,2,2,4,2,3,2,6,1,1,2,4,2,6,0,2,4,4,0,0,4,1,2,2}, // 16. Chlorophycean Mitochondrial Code
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 17. Invalid Codon Table
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 18. Invalid Codon Table
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 19. Invalid Codon Table
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 20. Invalid Codon Table
+        {4,2,2,2,2,4,2,2,1,6,0,2,3,4,2,4,0,4,4,4,0,0,4,2,2,2}, // 21. Trematode Mitochondrial Code
+        {4,2,2,2,2,4,2,3,2,6,1,1,2,4,2,6,0,2,3,4,0,0,4,1,2,3}, // 22. Scenedesmus obliquus Mitochondrial Code
+        {4,2,2,2,2,4,2,3,2,5,0,1,2,4,2,6,0,2,4,4,0,0,4,1,2,4}, // 23. Thraustochytrium Mitochondrial Code
+        {4,2,2,2,2,4,2,3,3,6,0,1,2,4,2,4,0,3,4,4,0,0,4,2,2,2}, // 24. Pterobranchia Mitochondrial Code
+        {4,2,2,2,2,5,2,3,2,6,0,1,2,4,2,6,0,2,4,4,0,0,4,1,2,2}, // 25. Candidate Division SR1 and Gracilibacteria Code
+};
+
+
+
+
+
+
+
 
 //------------------------------//
 //----------R Wrappers----------//
@@ -913,6 +930,25 @@ std::vector <unsigned> CodonTable::AAIndexToCodonRangeR(unsigned aaIndex, bool f
 }
 
 
+std::string CodonTable::indexToCodonR(unsigned index, bool forParamVector)
+{
+    std::string codon = "";
+    bool check;
+    check = forParamVector ? checkIndex(index, 1, (unsigned)forParamVectorListing.size()) : checkIndex(index, 1, 64);
+    if (check)
+    {
+        index--;
+        codon = indexToCodon(index, forParamVector);
+    }
+    else
+    {
+        std::cerr <<"Returning a blank string\n";
+    }
+
+    return codon;
+}
+
+
 std::vector <unsigned> CodonTable::AAToCodonRangeR(std::string aa, bool forParamVector)
 {
     std::vector <unsigned> RV;
@@ -953,24 +989,87 @@ std::vector<std::string> CodonTable::AAToCodonR(std::string aa, bool forParamVec
 }
 
 
-std::string CodonTable::indexToCodonR(unsigned index, bool forParamVector)
+std::string CodonTable::codonToAAR(std::string& codon)
 {
-    std::string codon = "";
-    bool check;
-    check = forParamVector ? checkIndex(index, 1, (unsigned)forParamVectorListing.size()) : checkIndex(index, 1, 64);
-    if (check)
+    std::string AA = "";
+    codon[0] = (char) std::toupper(codon[0]);
+    codon[1] = (char) std::toupper(codon[1]);
+    codon[2] = (char) std::toupper(codon[2]);
+    if (codonToIndexWithReference.find(codon) == codonToIndexWithReference.end())
     {
-        index--;
-        codon = indexToCodon(index, forParamVector);
+        std::cerr <<"Bad codon, " << codon <<", given. Returning a blank AA\n";
     }
     else
     {
-        std::cerr <<"Returning a blank string\n";
+        AA = codonToAA(codon);
     }
 
-    return codon;
+    return AA;
 }
 
+
+unsigned CodonTable::codonToIndexR(std::string& codon, bool forParamVector)
+{
+    unsigned index = 0;
+    codon[0] = (char) std::toupper(codon[0]);
+    codon[1] = (char) std::toupper(codon[1]);
+    codon[2] = (char) std::toupper(codon[2]);
+
+    if ((forParamVector ? forParamVectorMap.find(codon) : codonToIndexWithReference.find(codon)) ==
+            (forParamVector ? forParamVectorMap.end() : codonToIndexWithReference.end()))
+    {
+        std::cerr <<"Error with codon, " << codon <<", returning 0.\n";
+        index = 0;
+    }
+    else
+    {
+        index = codonToIndex(codon, forParamVector);
+        index++; //For R index purposes
+    }
+
+    return index;
+}
+
+
+unsigned CodonTable::codonToAAIndexR(std::string& codon)
+{
+    unsigned AAIndex = 0;
+    codon[0] = (char) std::toupper(codon[0]);
+    codon[1] = (char) std::toupper(codon[1]);
+    codon[2] = (char) std::toupper(codon[2]);
+
+    if (codonToIndexWithReference.find(codon) == codonToIndexWithReference.end())
+    {
+        std::cerr <<"Error with codon, " << codon <<". Not a valid codon, returning 0.\n";
+    }
+    else
+    {
+        AAIndex = codonToAAIndex(codon) + 1;
+    }
+
+    return AAIndex;
+}
+
+std::string CodonTable::indexToAAR(unsigned aaIndex)
+{
+    std::string AA = "";
+    bool check = checkIndex(aaIndex, 1, (unsigned)AAListing.size());
+    if (check)
+    {
+        aaIndex--;
+        AA = indexToAA(aaIndex);
+    }
+
+    return AA;
+}
+
+
+std::vector<std::string> CodonTable::getCodonArrayR()
+{
+    std::vector<std::string> RV;
+    for (unsigned i = 0; i < 64; i++) RV.push_back(CodonTable::codonArray[i]);
+    return RV;
+}
 
 
 // ---------------------------------------------------------------------------
@@ -1007,15 +1106,19 @@ RCPP_MODULE(CodonTable_mod)
         .method("AAIndexToCodonRange", &CodonTable::AAIndexToCodonRangeR)
         .method("AAToCodonRange", &CodonTable::AAToCodonRangeR)
         .method("AAToCodon", &CodonTable::AAToCodonR)
-        .method("indexToCodon", &CodonTable::indexToCodonR) //TODO: Wrap
-        .method("codonToAA", &CodonTable::codonToAA)
-        .method("codonToIndex", &CodonTable::codonToIndex) //TODO: Wrap answer
-        .method("codonToAAIndex", &CodonTable::codonToAAIndex) //TODO: Wrap answer
-        .method("indexToAA", &CodonTable::indexToAA) //TODO: Wrap
+        .method("indexToCodon", &CodonTable::indexToCodonR)
+        .method("codonToAA", &CodonTable::codonToAAR)
+        .method("codonToIndex", &CodonTable::codonToIndexR)
+        .method("codonToAAIndex", &CodonTable::codonToAAIndexR)
+        .method("indexToAA", &CodonTable::indexToAAR)
 		;
 
 		//Static functions:
-		//function("complimentNucleotide", &SequenceSummary::complimentNucleotide); //TEST THAT ONLY!
+		//function("AminoAcidArray", &CodonTable::AminoAcidArray);
+      //  function("AminoAcidArrayWithoutSplit", &CodonTable::AminoAcidArrayWithoutSplit);
+	//	function("numCodonsPerAAForTable", &CodonTable::numCodonsPerAAForTable);
+	//	function("codonTableDefinition", &CodonTable::codonTableDefinition);
+	    function("getCodonArray", &CodonTable::getCodonArrayR);
 
 }
 #endif
