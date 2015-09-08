@@ -13,19 +13,22 @@ using namespace Rcpp;
 RFPParameter::RFPParameter() : Parameter()
 {
 	//ctor
+	maxGrouping = 64;
 }
 
 
-RFPParameter::RFPParameter(std::string filename) : Parameter(64)
+RFPParameter::RFPParameter(std::string filename) : Parameter()
 {
 	initFromRestartFile(filename);
+	maxGrouping = 64;
 	numParam = 61;
 }
 
 
 RFPParameter::RFPParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix, 
-		bool splitSer, std::string _mutationSelectionState) : Parameter(64)
+		bool splitSer, std::string _mutationSelectionState) : Parameter()
 {
+	maxGrouping = 64;
 	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
 	initRFPParameterSet();
 }
@@ -102,16 +105,18 @@ void RFPParameter::initRFPParameterSet()
 
 void RFPParameter::initAlpha(double alphaValue, unsigned mixtureElement, std::string codon)
 {
+	CodonTable *codonTable = CodonTable::getInstance();
 	unsigned category = getMutationCategory(mixtureElement);
-	unsigned index = SequenceSummary::codonToIndex(codon);
+	unsigned index = codonTable -> codonToIndex(codon);
 	currentAlphaParameter[category][index] = alphaValue;
 }
 
 
 void RFPParameter::initLambdaPrime(double lambdaPrimeValue, unsigned mixtureElement, std::string codon)
 {
+	CodonTable *codonTable = CodonTable::getInstance();
 	unsigned category = getMutationCategory(mixtureElement);
-	unsigned index = SequenceSummary::codonToIndex(codon);
+	unsigned index = codonTable -> codonToIndex(codon);
 	currentLambdaPrimeParameter[category][index] = lambdaPrimeValue;
 }
 
@@ -128,7 +133,7 @@ void RFPParameter::initMutationSelectionCategories(std::vector<std::string> file
 	else
 		type = "lambda";
 
-
+	CodonTable *codonTable = CodonTable::getInstance();
 	for (unsigned i = 0; i < numCategories; i++)
 	{
 		std::vector<double> temp(numParam, 0.0);
@@ -148,7 +153,7 @@ void RFPParameter::initMutationSelectionCategories(std::vector<std::string> file
 			std::string codon = tmpString.substr(0, 3);
 			std::size_t pos = tmpString.find(",", 3);
 			std::string val = tmpString.substr(pos + 1, std::string::npos);
-			unsigned index = SequenceSummary::codonToIndex(codon, false);
+			unsigned index = codonTable -> codonToIndex(codon, false);
 			temp[index] = std::atof(val.c_str());
 		}
 		unsigned altered = 0u;
@@ -409,7 +414,8 @@ void RFPParameter::updateCodonSpecificParameterTrace(unsigned sample, std::strin
 
 void RFPParameter::updateCodonSpecificParameter(std::string grouping)
 {
-	unsigned i = SequenceSummary::codonToIndex(grouping);
+	CodonTable *codonTable = CodonTable::getInstance();
+	unsigned i = codonTable -> codonToIndex(grouping);
 	numAcceptForAlphaAndLambdaPrime[i]++;
 
 	for(unsigned k = 0u; k < numMutationCategories; k++)
@@ -472,12 +478,13 @@ void RFPParameter::proposeHyperParameters()
 void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
 {
 
+	CodonTable *codonTable = CodonTable::getInstance();
 	std::cout << "acceptance ratio for codon:\n";
 	for (unsigned i = 0; i < groupList.size(); i++)
 	{
 		std::cout << groupList[i] << "\t";
 
-		unsigned codonIndex = SequenceSummary::codonToIndex(groupList[i]);
+		unsigned codonIndex = codonTable -> codonToIndex(groupList[i]);
 		double acceptanceLevel = (double)numAcceptForAlphaAndLambdaPrime[codonIndex] / (double)adaptationWidth;
 		std::cout << acceptanceLevel << " with std_csp = " << std_csp[i] <<"\n";
 		traces.updateCspAcceptanceRatioTrace(codonIndex, acceptanceLevel);
@@ -758,8 +765,9 @@ double RFPParameter::getLambdaPrimeVariance(unsigned mixtureElement, unsigned sa
 
 double RFPParameter::getParameterForCategory(unsigned category, unsigned paramType, std::string codon, bool proposal)
 {
+	CodonTable *codonTable = CodonTable::getInstance();
 	double rv;
-	unsigned codonIndex = SequenceSummary::codonToIndex(codon);
+	unsigned codonIndex = codonTable -> codonToIndex(codon);
 	if (paramType == RFPParameter::alp)
 	{
 		rv = (proposal ? proposedAlphaParameter[category][codonIndex] : currentAlphaParameter[category][codonIndex]);
@@ -843,9 +851,10 @@ void RFPParameter::calculateRFPMean(Genome& genome)
 	}
 
 	std::cout <<"Variance calculated\n";
+	CodonTable *codonTable = CodonTable::getInstance();
 	for (unsigned codonIndex = 0; codonIndex < 61; codonIndex++)
 	{
-		std::cout << SequenceSummary::indexToCodon(codonIndex) <<" Mean:" << Means[codonIndex];
+		std::cout << codonTable -> indexToCodon(codonIndex) <<" Mean:" << Means[codonIndex];
 		std::cout <<"\tVariance:" << variance[codonIndex] <<"\n";
 	}
 }
@@ -1008,8 +1017,9 @@ double RFPParameter::getLambdaPrimeVarianceForCodon(unsigned mixtureElement, uns
 
 
 #ifndef STANDALONE
-RFPParameter::RFPParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter(64)
+RFPParameter::RFPParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter()
 {
+  maxGrouping = 64;
   unsigned _numMixtures = _matrix.size() / 2;
   std::vector<std::vector<unsigned>> thetaKMatrix;
   thetaKMatrix.resize(_numMixtures);
@@ -1028,8 +1038,9 @@ RFPParameter::RFPParameter(double sphi, std::vector<unsigned> geneAssignment, st
 }
 
 RFPParameter::RFPParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState) :
-Parameter(64)
+Parameter()
 {
+  maxGrouping = 64;
   std::vector<std::vector<unsigned>> thetaKMatrix;
   initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
   initRFPParameterSet();

@@ -18,7 +18,7 @@
 #endif
 
 
-
+//TODO: should not call a constructor from a constructor
 MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * thining), estimateSynthesisRate(true),
 	estimateCodonSpecificParameter(true), estimateHyperParameter(true)
 {

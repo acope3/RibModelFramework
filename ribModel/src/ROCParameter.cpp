@@ -20,14 +20,15 @@ ROCParameter::ROCParameter() : Parameter()
 
 
 ROCParameter::ROCParameter(std::string filename) :
-		Parameter(22)
+		Parameter()
 {
 	initFromRestartFile(filename);
 }
 
 #ifndef STANDALONE
-ROCParameter::ROCParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter(22)
+ROCParameter::ROCParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter()
 {
+	maxGrouping = 22;
 	unsigned _numMixtures = _matrix.size() / 2;
 	std::vector<std::vector<unsigned>> thetaKMatrix;
 	thetaKMatrix.resize(_numMixtures);
@@ -46,8 +47,9 @@ ROCParameter::ROCParameter(double sphi, std::vector<unsigned> geneAssignment, st
 }
 
 ROCParameter::ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState) :
-Parameter(22)
+Parameter()
 {
+	maxGrouping = 22;
 	std::vector<std::vector<unsigned>> thetaKMatrix;
 	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
 	initROCParameterSet();
@@ -56,7 +58,7 @@ Parameter(22)
 
 ROCParameter::ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
 		std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer, std::string _mutationSelectionState) :
-		Parameter(22)
+		Parameter()
 {
 	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
 	initROCParameterSet();
@@ -136,10 +138,11 @@ void ROCParameter::initROCParameterSet()
 		currentSelectionParameter[i] = tmp;
 	}
 
+	CodonTable *codonTable = CodonTable::getInstance();
   for (unsigned i = 0; i < maxGrouping; i++)
   {
-    std::string aa = SequenceSummary::AminoAcidArray[i];
-    unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa, true);
+    std::string aa = CodonTable::AminoAcidArray[i];
+    unsigned numCodons = codonTable -> getNumCodonsForAA(aa, true);
     CovarianceMatrix m((numMutationCategories + numSelectionCategories) * numCodons);
     m.choleskiDecomposition();
     covarianceMatrix.push_back(m);
@@ -153,21 +156,22 @@ std::vector<std::vector<double>> ROCParameter::calculateSelectionCoefficients(un
 	unsigned numGenes = (unsigned)mixtureAssignment.size();
 	std::vector<std::vector<double>> selectionCoefficients;
 	selectionCoefficients.resize(numGenes);
+	CodonTable *codonTable = CodonTable::getInstance();
 	for (unsigned i = 0; i < numGenes; i++)
 	{
 		for (unsigned j = 0; j < getGroupListSize(); j++)
 		{
 			std::string aa = getGrouping(j);
-			std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(aa, true);
+			std::vector <unsigned> codonRange = codonTable -> AAToCodonRange(aa, true); //checked
 			std::vector<double> tmp;
 			double minValue = 0.0;
-			for (unsigned k = aaRange[0]; k < aaRange[1]; k++)
+			for (unsigned k = 0; k < codonRange.size(); k++)
 			{
-				std::string codon = SequenceSummary::codonArrayParameter[k];
+				std::string codon = codonTable -> getForParamVectorCodon(codonRange[k]);
 				tmp.push_back(getSelectionPosteriorMean(sample, mixture, codon));
-				if (tmp[k] < minValue)
+				if (tmp[codonRange[k]] < minValue)
 				{
-					minValue = tmp[k];
+					minValue = tmp[codonRange[k]];
 				}
 			}
 			tmp.push_back(0.0);
@@ -268,11 +272,12 @@ void ROCParameter::writeROCRestartFile(std::string filename)
 			oss << "\n";
 	}
 
+	CodonTable *codonTable = CodonTable::getInstance();
 	for (unsigned i = 0; i < groupList.size(); i++)
 	{
 		std::string aa = groupList[i];
 		oss <<">covarianceMatrix:\n" << aa <<"\n";
-		CovarianceMatrix m = covarianceMatrix[SequenceSummary::AAToAAIndex(aa)];
+		CovarianceMatrix m = covarianceMatrix[codonTable -> AAToAAIndex(aa)];
 		std::vector<double>* tmp = m.getCovMatrix();
 		int size = m.getNumVariates();
 		for(unsigned k = 0; k < size * size; k++)
@@ -297,6 +302,7 @@ void ROCParameter::initFromRestartFile(std::string filename)
 
 void ROCParameter::initROCValuesFromFile(std::string filename)
 {
+	CodonTable *codonTable = CodonTable::getInstance();
 	std::ifstream input;
 	covarianceMatrix.resize(maxGrouping);
 	std::vector <double> mat;
@@ -329,7 +335,7 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 			{
 				getline(input,tmp);
 				//char aa = tmp[0];
-				cat = SequenceSummary::AAToAAIndex(tmp); // ????
+				cat = codonTable -> AAToAAIndex(tmp); // ????
 				std::cout << cat <<"\n";
 			}
 		}
@@ -482,7 +488,8 @@ void ROCParameter::initCovarianceMatrix(SEXP _matrix, std::string aa)
 
 	for(unsigned i = 0u; i < aa.length(); i++)	aa[i] = (char)std::toupper(aa[i]);
 
-	unsigned aaIndex = SequenceSummary::aaToIndex.find(aa) -> second;
+	CodonTable *codonTable = CodonTable::getInstance();
+	unsigned aaIndex = codonTable -> AAToAAIndex(aa);
 	unsigned numRows = matrix.nrow();
 	std::vector<double> covMatrix(numRows * numRows);
 
@@ -504,8 +511,9 @@ void ROCParameter::initCovarianceMatrix(SEXP _matrix, std::string aa)
 
 CovarianceMatrix& ROCParameter::getCovarianceMatrixForAA(std::string aa)
 {
+	CodonTable *codonTable = CodonTable::getInstance();
 	aa[0] = (char) std::toupper(aa[0]);
-	unsigned aaIndex = SequenceSummary::aaToIndex.find(aa) -> second;
+	unsigned aaIndex = codonTable -> AAToAAIndex(aa);;
 	return covarianceMatrix[aaIndex];
 }
 
@@ -514,6 +522,7 @@ void ROCParameter::initSelection(std::vector<double> selectionValues, unsigned m
 {
 	//TODO: seperate out the R wrapper functionality and make the wrapper
 	//currentSelectionParameter
+	CodonTable *codonTable = CodonTable::getInstance();
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
 	if (check)
 	{
@@ -521,10 +530,10 @@ void ROCParameter::initSelection(std::vector<double> selectionValues, unsigned m
 		int category = getSelectionCategory(mixtureElement);
 
 		aa[0] = (char) std::toupper(aa[0]);
-		std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(aa, true);
-		for (unsigned i = aaRange[0], j = 0; i < aaRange[1]; i++, j++)
+		std::vector <unsigned> codonRange = codonTable -> AAToCodonRange(aa, true); //checked
+		for (unsigned i = 0, j = 0; i < codonRange.size(); i++, j++)
 		{
-			currentSelectionParameter[category][i] = selectionValues[j];
+			currentSelectionParameter[category][codonRange[i]] = selectionValues[j];
 		}
 	}
 }
@@ -532,6 +541,7 @@ void ROCParameter::initSelection(std::vector<double> selectionValues, unsigned m
 //This function seems to be used only for the purpose of R
 void ROCParameter::initMutation(std::vector<double> mutationValues, unsigned mixtureElement, std::string aa)
 {
+	CodonTable *codonTable = CodonTable::getInstance();
 	//TODO: seperate out the R wrapper functionality and make the wrapper
 	//currentMutationParameter
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
@@ -541,10 +551,10 @@ void ROCParameter::initMutation(std::vector<double> mutationValues, unsigned mix
 
 		unsigned category = getMutationCategory(mixtureElement);
 		aa[0] = (char) std::toupper(aa[0]);
-		std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(aa, true);
-		for (unsigned i = aaRange[0], j = 0; i < aaRange[1]; i++, j++)
+		std::vector <unsigned> codonRange = codonTable -> AAToCodonRange(aa, true); //checked
+		for (unsigned i = 0, j = 0; i < codonRange.size(); i++, j++)
 		{
-			currentMutationParameter[category][i] = mutationValues[j];
+			currentMutationParameter[category][codonRange[i]] = mutationValues[j];
 		}
 	}
 }
@@ -567,12 +577,13 @@ void ROCParameter::initMutationCategories(std::vector<std::string> files, unsign
 		std::string tmp;
 		currentFile >> tmp; //The first line is a header (Amino Acid, Codon, Value, Std_deviation)
 
+		CodonTable *codonTable = CodonTable::getInstance();
 		while (currentFile >> tmp)
 		{
 			//Get the Codon and Index
 			std::size_t pos = tmp.find(",", 2); //Amino Acid and a comma will always be the first 2 characters
 			std::string codon = tmp.substr(2, pos - 2);
-			unsigned codonIndex = SequenceSummary::codonToIndex(codon, true);
+			unsigned codonIndex = codonTable -> codonToIndex(codon, true);
 
 			//get the value to store
 			std::size_t pos2 = tmp.find(",", pos + 1);
@@ -608,7 +619,8 @@ void ROCParameter::initSelectionCategories(std::vector<std::string> files, unsig
 			//Get the Codon and Index
 			std::size_t pos = tmp.find(",", 2); //Amino Acid and a comma will always be the first 2 characters
 			std::string codon = tmp.substr(2, pos - 2);
-			unsigned codonIndex = SequenceSummary::codonToIndex(codon, true);
+			CodonTable *codonTable = CodonTable::getInstance();
+			unsigned codonIndex = codonTable -> codonToIndex(codon, true);
 
 			//get the value to store
 			std::size_t pos2 = tmp.find(",", pos + 1);
@@ -650,19 +662,20 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
 		std::cerr << "\tReturning mutation parameter! \n";
 		tempSet = (proposal ? &proposedMutationParameter[category] : &currentMutationParameter[category]);
 	}
-
-	std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(aa, true);
+	CodonTable *codonTable = CodonTable::getInstance();
+	std::vector <unsigned> codonRange = codonTable -> AAToCodonRange(aa, true); //checked
 
 	unsigned j = 0u;
-	for (unsigned i = aaRange[0]; i < aaRange[1]; i++, j++)
+	for (unsigned i = 0; i < codonRange.size(); i++, j++)
 	{
-		returnSet[j] = tempSet->at(i);
+		returnSet[j] = tempSet->at(codonRange[i]);
 	}
 }
 
 double ROCParameter::getCurrentCodonSpecificProposalWidth(unsigned aa)
 {
-	std::array <unsigned, 2> codonRange = SequenceSummary::AAIndexToCodonRange(aa, true);
+	CodonTable *codonTable = CodonTable::getInstance();
+	std::vector <unsigned> codonRange = codonTable -> AAIndexToCodonRange(aa, true); //checked
 	return std_csp[codonRange[0]];
 }
 
@@ -736,27 +749,30 @@ void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 		std::cout << groupList[i] << "\t";
 	}
 	std::cout << "\n\t";
+
+	CodonTable *codonTable = CodonTable::getInstance();
 	for (unsigned i = 0; i < groupList.size(); i++)
 	{
 		std::string aa = groupList[i];
-		unsigned aaIndex = SequenceSummary::AAToAAIndex(aa);
+		unsigned aaIndex = codonTable -> AAToAAIndex(aa);
 		double acceptanceLevel = (double) numAcceptForMutationAndSelection[aaIndex] / (double) adaptationWidth;
 		std::cout << acceptanceLevel << "\t";
 		traces.updateCspAcceptanceRatioTrace(aaIndex, acceptanceLevel);
-		std::array <unsigned, 2> codonRange = SequenceSummary::AAIndexToCodonRange(aaIndex, true);
-		for (unsigned k = codonRange[0]; k < codonRange[1]; k++)
+		std::vector <unsigned> codonRange = codonTable -> AAIndexToCodonRange(aaIndex, true); //checked
+		for (unsigned k = 0; k < 8; k++)
 		{
+			if (codonRange[k] == 100) break;
 			if (acceptanceLevel < 0.2)
 			{
 				covarianceMatrix[aaIndex] *= 0.8;
 				covarianceMatrix[aaIndex].choleskiDecomposition();
-				std_csp[k] *= 0.8;
+				std_csp[codonRange[k]] *= 0.8;
 			}
 			if (acceptanceLevel > 0.3)
 			{
 				covarianceMatrix[aaIndex] *= 1.2;
 				covarianceMatrix[aaIndex].choleskiDecomposition();
-				std_csp[k] *= 1.2;
+				std_csp[codonRange[k]] *= 1.2;
 			}
 		}
 		numAcceptForMutationAndSelection[aaIndex] = 0u;
@@ -1056,31 +1072,35 @@ double ROCParameter::getMutationVariance(unsigned mixtureElement, unsigned sampl
 // 4. the adjusment of the likelihood by the jacobian that arises from this transformation is cheap and by grouping everything in one class it takes place more or less at the same place
 void ROCParameter::proposeCodonSpecificParameter()
 {
-
+	CodonTable *codonTable = CodonTable::getInstance();
 	for (unsigned k = 0; k < getGroupListSize(); k++)
 	{
 		std::vector<double> iidProposed;
 		std::string aa = getGrouping(k);
-		std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(aa, true);
-		unsigned numCodons = aaRange[1] - aaRange[0];
+		std::vector <unsigned> codonRange = codonTable -> AAToCodonRange(aa, true); //checked
+		unsigned numCodons = 0; 
+		for (unsigned i = 0; i < codonRange.size(); i++)
+		{
+			numCodons++;
+		}
 		for (unsigned i = 0u; i < numCodons * (numMutationCategories + numSelectionCategories); i++)
 		{
 			iidProposed.push_back(randNorm(0.0, 1.0));
 		}
 
 		std::vector<double> covaryingNums;
-		covaryingNums = covarianceMatrix[SequenceSummary::AAToAAIndex(aa)].transformIidNumersIntoCovaryingNumbers(
+		covaryingNums = covarianceMatrix[codonTable -> AAToAAIndex(aa)].transformIidNumersIntoCovaryingNumbers(
 				iidProposed);
 		for (unsigned i = 0; i < numMutationCategories; i++)
 		{
-			for (unsigned j = i * numCodons, l = aaRange[0]; j < (i * numCodons) + numCodons; j++, l++)
+			for (unsigned j = i * numCodons, l = codonRange[0]; j < (i * numCodons) + numCodons; j++, l++)
 			{
 				proposedMutationParameter[i][l] = currentMutationParameter[i][l] + covaryingNums[j];
 			}
 		}
 		for (unsigned i = 0; i < numSelectionCategories; i++)
 		{
-			for (unsigned j = i * numCodons, l = aaRange[0]; j < (i * numCodons) + numCodons; j++, l++)
+			for (unsigned j = i * numCodons, l = codonRange[0]; j < (i * numCodons) + numCodons; j++, l++)
 			{
 				proposedSelectionParameter[i][l] = currentSelectionParameter[i][l]
 						+ covaryingNums[(numMutationCategories * numCodons) + j];
@@ -1111,20 +1131,21 @@ std::vector<double> ROCParameter::propose(std::vector<double> currentParam, doub
 
 void ROCParameter::updateCodonSpecificParameter(std::string grouping)
 {
-	std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(grouping, true);
-	unsigned aaIndex = SequenceSummary::aaToIndex.find(grouping)->second;
+	CodonTable *codonTable = CodonTable::getInstance();
+	std::vector <unsigned> codonRange = codonTable -> AAToCodonRange(grouping, true); //checked
+	unsigned aaIndex = codonTable -> AAToAAIndex(grouping);
 	numAcceptForMutationAndSelection[aaIndex]++;
 
 	for (unsigned k = 0u; k < numMutationCategories; k++)
 	{
-		for (unsigned i = aaRange[0]; i < aaRange[1]; i++)
+		for (unsigned i = 0; i < codonRange.size(); i++)
 		{
-			currentMutationParameter[k][i] = proposedMutationParameter[k][i];
+			currentMutationParameter[k][codonRange[i]] = proposedMutationParameter[k][codonRange[i]];
 		}
 	}
 	for (unsigned k = 0u; k < numSelectionCategories; k++)
 	{
-		for (unsigned i = aaRange[0]; i < aaRange[1]; i++)
+		for (unsigned i = 0; i < codonRange.size(); i++)
 		{
 			currentSelectionParameter[k][i] = proposedSelectionParameter[k][i];
 		}

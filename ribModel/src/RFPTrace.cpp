@@ -58,7 +58,8 @@ void RFPTrace::initLambdaPrimeParameterTrace(unsigned samples, unsigned numSelec
 
 std::vector<double> RFPTrace::getAlphaParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon)
 {
-	unsigned codonIndex = SequenceSummary::codonToIndex(codon);
+	CodonTable *codonTable = CodonTable::getInstance();
+	unsigned codonIndex = codonTable -> codonToIndex(codon);
 	unsigned category = getAlphaCategory(mixtureElement);
 	return alphaParameterTrace[category][codonIndex];
 }
@@ -66,7 +67,8 @@ std::vector<double> RFPTrace::getAlphaParameterTraceByMixtureElementForCodon(uns
 
 std::vector<double> RFPTrace::getLambdaPrimeParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon)
 {
-	unsigned codonIndex = SequenceSummary::codonToIndex(codon);
+	CodonTable *codonTable = CodonTable::getInstance();
+	unsigned codonIndex = codonTable -> codonToIndex(codon);
 	unsigned category = getLambdaPrimeCategory(mixtureElement);
 	return lambdaPrimeParameterTrace[category][codonIndex];
 }
@@ -74,7 +76,8 @@ std::vector<double> RFPTrace::getLambdaPrimeParameterTraceByMixtureElementForCod
 
 void RFPTrace::updateCodonSpecificParameterTrace(unsigned sample, std::string codon, std::vector<std::vector<double>> &curAlpParam, std::vector<std::vector<double>> &curLmPriParam)
 {
-    unsigned i = SequenceSummary::codonToIndex(codon);
+	CodonTable *codonTable = CodonTable::getInstance();
+    unsigned i = codonTable -> codonToIndex(codon);
 	for(unsigned category = 0; category < alphaParameterTrace.size(); category++)
 	{
         alphaParameterTrace[category][i][sample] = curAlpParam[category][i];
@@ -88,25 +91,25 @@ void RFPTrace::updateCodonSpecificParameterTrace(unsigned sample, std::string co
 //----------------------------------------------------
 //----------------------R WRAPPERS--------------------
 //----------------------------------------------------
-std::vector<double> RFPTrace::getAlphaParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon) 
+std::vector<double> RFPTrace::getAlphaParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon)
 {
 	std::vector<double> RV;
 	bool checkMixtureElement = checkIndex(mixtureElement, 1, getNumberOfMixtures());
 	if (checkMixtureElement)
 	{
-		RV = getAlphaParameterTraceByMixtureElementForCodon(mixtureElement - 1, codon);  
+		RV = getAlphaParameterTraceByMixtureElementForCodon(mixtureElement - 1, codon);
 	}
 	return RV;
 }
 
 
-std::vector<double> RFPTrace::getLambdaPrimeParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon) 
+std::vector<double> RFPTrace::getLambdaPrimeParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon)
 {
 	std::vector<double> RV;
 	bool checkMixtureElement = checkIndex(mixtureElement, 1, getNumberOfMixtures());
 	if (checkMixtureElement)
 	{
-		RV = getLambdaPrimeParameterTraceByMixtureElementForCodon(mixtureElement - 1, codon);  
+		RV = getLambdaPrimeParameterTraceByMixtureElementForCodon(mixtureElement - 1, codon);
 	}
 	return RV;
 }

@@ -15,6 +15,7 @@
 #include "../Genome.h"
 #include "../CovarianceMatrix.h"
 #include "Trace.h"
+#include "../CodonTable.h"
 
 class Parameter {
 	private:
@@ -23,6 +24,8 @@ class Parameter {
 		std::string mutationSelectionState; //Probably needs to be renamed
 		std::vector<std::vector<unsigned>> selectionIsInMixture;
 		std::vector<std::vector<unsigned>> mutationIsInMixture;
+
+
 
 		// STATICS
 
@@ -44,7 +47,6 @@ class Parameter {
 		static std::default_random_engine generator; // static to make sure that the same generator is during the runtime.
 
 		Parameter();
-		Parameter(unsigned maxGrouping);
 		void initParameterSet(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
 				std::vector<std::vector<unsigned>> mixtureDefinitionMatrix, bool splitSer = true,
 				std::string _mutationSelectionState = "allUnique");
@@ -55,6 +57,7 @@ class Parameter {
 		bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);
 		void writeBasicRestartFile(std::string filename);
 		void initBaseValuesFromFile(std::string filename);
+
 
 
 		unsigned int getNumParam()
@@ -193,7 +196,7 @@ class Parameter {
 
 
 		// static functions
-		static double calculateSCUO(Gene& gene, unsigned maxAA);
+		double calculateSCUO(Gene& gene);
 
 		static void drawIidRandomVector(unsigned draws, double mean, double sd, double (*proposal)(double a, double b),
 				double* randomNumbers);
@@ -285,6 +288,7 @@ class Parameter {
 		double bias_phi;
 		std::vector<std::vector<double>> std_phi;
 		unsigned maxGrouping;
+
 };
 
 #endif // PARAMETER_H

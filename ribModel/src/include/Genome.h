@@ -6,6 +6,7 @@
 #include <map>
 
 #include "Gene.h"
+#include "CodonTable.h"
 
 
 class Model;
@@ -22,7 +23,8 @@ class Genome
 	public:
 
 		//Constructors & destructors:
-		explicit Genome();
+		Genome();
+		explicit Genome(unsigned tableId, bool splitAA = false);
 		virtual ~Genome();
 		Genome& operator=(const Genome& other);
 

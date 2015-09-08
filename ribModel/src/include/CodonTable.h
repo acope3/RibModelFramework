@@ -12,41 +12,111 @@ class CodonTable
 {
     private:
 
+        static CodonTable *codonTable;
         unsigned tableId;
         bool splitAA;
-        std::vector<std::vector<unsigned>> codon_mapping; // dim: AA, codon
+        std::vector<std::vector<unsigned>> codonIndexListing; //Stored by AA index then codon index.
+        std::vector<std::vector<unsigned>> codonIndexListingWithoutReference;
+        //Stored by AA index then codon index. Excludes the last codon index in every AA grouping.
 
+        std::vector <std::string> AAListing; //List of all AAs for the current tableId and split condition.
+        std::vector <std::string> forParamVectorListing; //List of all codons without the last codon in every AA group.
+        std::map <std::string, std::string> codonToAAMap; //Maps ALL codons for current conditions to AAs.
+        std::map <std::string, unsigned> AAMap; //Maps currently used AAs to indices.
+        std::map <std::string, unsigned> AAToNumCodonsMap;
+        //Maps currently used AAs to the number of codons that code for them.
+
+        std::map <std::string, unsigned> forParamVectorMap;
+        //Maps codons to indices (not including last in each AA grouping).
 
 
     public:
-        static const std::string Ser2;
-        static const std::string Ser1; // necessary for codon table 12
-        static const std::string Thr4_1; // necessary for codon table 3
-        static const std::string Thr4_2; // necessary for codon table 3
-        static const std::string Leu1; // necessary for codon table 16, 22
 
-		static const std::string AminoAcidArray[]; // dim: table, AA
-		static const unsigned numCodonsPerAAForTable[25][26]; // dim: table, AA
-		static const std::string codonTableDefinition[25];
-		static const std::string codonArray[];
-		static const std::string codonArrayParameter[];
-		static const std::map<std::string, unsigned> aaToIndex;
-		static const std::map<std::string, unsigned> codonToIndexWithReference;
-		static const std::map<std::string, unsigned> codonToIndexWithoutReference;
+        //Static variables & functions:
+        static const std::string Ser2;
+        static const std::string Ser1; //Necessary for codon table 12
+        static const std::string Thr4_1; //Necessary for codon table 3
+        static const std::string Thr4_2; //Necessary for codon table 3
+        static const std::string Leu1; //Necessary for codon table 16, 22
+
+		static const std::string AminoAcidArray[26]; //Index = AA
+        static const std::string AminoAcidArrayWithoutSplit[21]; //Array containing all non-split AAs.
+		static const unsigned numCodonsPerAAForTable[25][26]; //Sized on tableId and AA.
+		static const std::string codonTableDefinition[25]; //Description title for each codon table according to NCBI.
+		static const std::string codonArray[]; //List of codons.
+
+		static const std::map<std::string, unsigned> codonToIndexWithReference; //Map of indices to all codons.
+        static void createCodonTable(unsigned tableId, bool split = true); //Used to create the singleton instance.
+        static CodonTable* getInstance(); //Get the singleton instance.
 
 
         //Constructors & destructors:
-        explicit CodonTable();
+        explicit CodonTable(); //Defaults to table 1 and splitting AA
         CodonTable(unsigned _tableId, bool _splitAA);
         virtual ~CodonTable();
-        CodonTable(const CodonTable& other);
-        CodonTable& operator=(const CodonTable& other);
+        CodonTable(const CodonTable& other); //Todo: Need? If so update the function.
+        CodonTable& operator=(const CodonTable& other); //Todo: Need? if so update the function.
 
-        void setupCodonTable();
+
+        //Other functions:
+        void setupCodonTable(); //Sets up the private variables that do all the mappings.
+        bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);
+
+
+        //Getter functions:
+        unsigned getTableId();
+        bool getSplitAA();
+        std::vector<std::vector<unsigned>> getCodonIndexListing();
+        std::vector<std::vector<unsigned>> getCodonIndexListingWithoutReference();
+        std::vector<std::string> getAAListing();
+        std::vector <std::string> getForParamVectorListing(); //List of all codons without the last codon in every AA group.
+        std::map <std::string, std::string> getCodonToAAMap(); //Maps ALL codons for current conditions to AAs.
+        std::map <std::string, unsigned> getAAMap(); //Maps currently used AAs to indices.
+        std::map <std::string, unsigned> getAAToNumCodonsMap();
+
+        unsigned getNumCodonsForAA(std::string aa, bool forParamVector = false);
+        unsigned getNumCodonsForAAIndex(unsigned aaIndex, bool forParamVector = false);
+        std::string getForParamVectorCodon(unsigned codonIndex);
+
+
+        //Mapping operations:
         unsigned AAToAAIndex(std::string aa);
-        unsigned getNumCodons(std::string aa);
-        unsigned getNumCodons(unsigned aa);
+        std::vector <unsigned> AAIndexToCodonRange(unsigned aaIndex, bool forParamVector = false);
+        std::string indexToCodon(unsigned index, bool forParamVector = false);
+        std::vector <unsigned> AAToCodonRange(std::string aa, bool forParamVector = false);
+        std::vector<std::string> AAToCodon(std::string aa, bool forParamVector = false);
+        std::string codonToAA(std::string& codon);
+        unsigned codonToIndex(std::string& codon, bool forParamVector = false);
+        unsigned codonToAAIndex(std::string& codon);
+        std::string indexToAA(unsigned aaIndex);
 
+
+
+        //--------------------R WRAPPERS--------------------//
+        //Getter functions:
+        unsigned getTableIdR();
+        std::vector<std::vector<unsigned>> getCodonIndexListingR();
+        std::vector<std::vector<unsigned>> getCodonIndexListingWithoutReferenceR();
+        std::map <std::string, unsigned> getAAMapR();
+
+        unsigned getNumCodonsForAAIndexR(unsigned aaIndex, bool forParamVector = false);
+        std::string getForParamVectorCodonR(unsigned codonIndex);
+
+
+        //Mapping operations:
+        unsigned AAToAAIndexR(std::string aa);
+        std::vector <unsigned> AAIndexToCodonRangeR(unsigned aaIndex, bool forParamVector = false);
+        std::string indexToCodonR(unsigned index, bool forParamVector = false);
+        std::vector <unsigned> AAToCodonRangeR(std::string aa, bool forParamVector = false);
+        std::vector<std::string> AAToCodonR(std::string aa, bool forParamVector = false);
+        std::string codonToAAR(std::string& codon);
+        unsigned codonToIndexR(std::string& codon, bool forParamVector = false);
+        unsigned codonToAAIndexR(std::string& codon);
+        std::string indexToAAR(unsigned aaIndex);
+
+
+        //Static getter functions:
+        static std::vector<std::string> getCodonArrayR();
 };
 
 #endif
