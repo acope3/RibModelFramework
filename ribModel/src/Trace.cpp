@@ -148,7 +148,7 @@ std::vector<double> Trace::getSynthesisRateTraceForGene(unsigned geneIndex)
 	for(unsigned i = 0u; i < traceLength; i++)
 	{
 		unsigned mixtureElement = mixtureAssignmentTrace[geneIndex][i];
-    unsigned category = getSynthesisRateCategory(mixtureElement);
+		unsigned category = getSynthesisRateCategory(mixtureElement);
 		returnVector[i] =  synthesisRateTrace[category][geneIndex][i];
 	}
 	return returnVector;

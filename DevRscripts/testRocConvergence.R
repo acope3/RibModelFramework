@@ -1,5 +1,5 @@
-library(ribModel)
 rm(list=ls())
+library(ribModel)
 
 with.phi <- FALSE
 
@@ -19,7 +19,7 @@ geneAssignment <- rep(1,1000)
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
 
 # initialize MCMC object
-samples <- 10000
+samples <- 100
 thining <- 10
 adaptiveWidth <- 10
 divergence.iteration <- 50
@@ -32,11 +32,21 @@ model <- initializeModelObject(parameter, "ROC", with.phi = with.phi)
 #run mcmc on genome with parameter using model
 start <- Sys.time()
 system.time(
-  runMCMC(mcmc, genome, model, 4, divergence.iteration)
+    runMCMC(mcmc, genome, model, 4, divergence.iteration)
 )
 end <- Sys.time()
 end - start
 
+#collect traces
+loglik.trace <- mcmc$getLogLikelihoodTrace()
+trace <- parameter$getTraceObject()
+expected.phi.trace <- trace$getExpectedPhiTrace()
+sphi.trace <- trace$getSphiTrace()
+
+expressionValues <- unlist(lapply(1:genome$getGenomeSize(), function(geneIndex){
+  expressionCategory <- parameter$getSynthesisRateCategoryForMixture(geneAssignment[geneIndex])
+  trace$getSynthesisRateTraceForGene(geneIndex)[1]
+}))
 
 
 colour <- c("black", "chartreuse4", "red", "blue", "blue4", "blueviolet", "darkgoldenrod2", "darkgreen", "darkorchid1", "deeppink2",
@@ -44,9 +54,12 @@ colour <- c("black", "chartreuse4", "red", "blue", "blue4", "blueviolet", "darkg
             "plum", "orangered", "red4", "navy", "gold", "darkred", "darkmagenta", "burlywood4", "mediumseagreen", "cornflowerblue",
             "cyan2", "darkcyan", "darkolivegreen3", "darkturquoise", "hotpink", "lightpink4", "mediumaquamarine", "springgreen2", "chartreuse", "azure4")
 
-pdf("single_mixture_convergence_test_10.pdf")
+
+run.name <- "single_mixture_convergence_test_1"
+
+pdf(paste(run.name, ".pdf", sep=""))
 plot(mcmc)
-trace <- parameter$getTraceObject()
+
 plot(trace, what = "MixtureProbability")
 plot(trace, what = "Sphi")
 
@@ -92,9 +105,11 @@ segments(true.value-epsilon, low ,true.value+epsilon, low, col=colour)
 axis(1)
 axis(2)
 legend("topleft", legend = c("I.C.", "Posterior"), col=c("black", "black"), pch=c(20, 1), bty = "n")
-
+start.sel.values <- start.value
 cat("Percent quantiles overlap with true value: ", sum(true.value < up & true.value > low) / 40, "\n")
-cat("Geweke Score: ", convergence.test(mcmc, n.samples = 5000, plot=F)$z, "\n")
+cat("Geweke Score: ", convergence.test(mcmc, n.samples = 500, plot=F)$z, ", using 500 samples\n")
+cat("Geweke Score: ", convergence.test(mcmc, n.samples = 5000, plot=F)$z, ", using 5,000 samples\n")
+cat("Geweke Score: ", convergence.test(mcmc, n.samples = 50000, plot=F)$z, ", using 50,000 samples\n")
 
 #true.sel <- read.csv(file="../ribModel/data/simulated_mutation0.csv", header=T)
 true.sel <- read.csv(file="../ribModel/data/simulatedOneMix_mutation.csv", header=T)
@@ -135,8 +150,13 @@ segments(true.value-epsilon, low ,true.value+epsilon, low, col=colour)
 axis(1)
 axis(2)
 legend("topleft", legend = c("I.C.", "Posterior"), col=c("black", "black"), pch=c(20, 1), bty = "n")
-
+start.mut.values <- start.value
 cat("Percent quantiles overlap with true value: ", sum(true.value < up & true.value > low) / 40, "\n")
-cat("Geweke Score: ", convergence.test(mcmc, n.samples = 5000, plot=F)$z, "\n")
+cat("Geweke Score: ", convergence.test(mcmc, n.samples = 500, plot=F)$z, ", using 500 samples\n")
+cat("Geweke Score: ", convergence.test(mcmc, n.samples = 5000, plot=F)$z, ", using 5,000 samples\n")
+cat("Geweke Score: ", convergence.test(mcmc, n.samples = 50000, plot=F)$z, ", using 50,000 samples\n")
 
 dev.off()
+
+
+save(list=c("start.mut.values", "start.sel.values", "expressionValues", "loglik.trace", "expected.phi.trace", "sphi.trace"), file = paste(run.name, ".rda", sep=""))
