@@ -73,6 +73,7 @@ class CodonTable
         std::map <std::string, std::string> getCodonToAAMap(); //Maps ALL codons for current conditions to AAs.
         std::map <std::string, unsigned> getAAMap(); //Maps currently used AAs to indices.
         std::map <std::string, unsigned> getAAToNumCodonsMap();
+        std::map <std::string, unsigned> getForParamVectorMap();
 
         unsigned getNumCodonsForAA(std::string aa, bool forParamVector = false);
         unsigned getNumCodonsForAAIndex(unsigned aaIndex, bool forParamVector = false);
@@ -98,6 +99,7 @@ class CodonTable
         std::vector<std::vector<unsigned>> getCodonIndexListingR();
         std::vector<std::vector<unsigned>> getCodonIndexListingWithoutReferenceR();
         std::map <std::string, unsigned> getAAMapR();
+        std::map <std::string, unsigned> getForParamVectorMapR();
 
         unsigned getNumCodonsForAAIndexR(unsigned aaIndex, bool forParamVector = false);
         std::string getForParamVectorCodonR(unsigned codonIndex);
@@ -116,6 +118,11 @@ class CodonTable
 
 
         //Static getter functions:
+        static std::string getSer2R();
+        static std::string getSer1R();
+        static std::string getThr4_1R();
+        static std::string getThr4_2R();
+        static std::string getLeu1R();
         static std::vector<std::string> getCodonArrayR();
 };
 

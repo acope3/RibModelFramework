@@ -1,4 +1,4 @@
-#include "../include/CodonTable.h"
+#include "include/CodonTable.h"
 
 #include <iostream>
 
@@ -117,6 +117,12 @@ std::map <std::string, unsigned> CodonTable::getAAMap()
 std::map <std::string, unsigned> CodonTable::getAAToNumCodonsMap()
 {
     return AAToNumCodonsMap;
+}
+
+
+std::map <std::string, unsigned> CodonTable::getForParamVectorMap()
+{
+    return forParamVectorMap;
 }
 
 
@@ -868,6 +874,20 @@ std::map <std::string, unsigned> CodonTable::getAAMapR()
 }
 
 
+std::map <std::string, unsigned> CodonTable::getForParamVectorMapR()
+{
+    //Return the map where all the indices are start from 1.
+    std::map <std::string, unsigned>::iterator mit;
+    std::map <std::string, unsigned> forParamVectorMapCopy = getForParamVectorMap();
+    for(mit = forParamVectorMapCopy.begin(); mit != forParamVectorMapCopy.end(); mit++)
+    {
+        mit -> second++;
+    }
+
+    return forParamVectorMapCopy;
+}
+
+
 unsigned CodonTable::getNumCodonsForAAIndexR(unsigned aaIndex, bool forParamVector)
 {
     unsigned numCodons = 0;
@@ -1064,6 +1084,36 @@ std::string CodonTable::indexToAAR(unsigned aaIndex)
 }
 
 
+std::string CodonTable::getSer2R()
+{
+    return Ser2;
+}
+
+
+std::string CodonTable::getSer1R()
+{
+    return Ser1;
+}
+
+
+std::string CodonTable::getThr4_1R()
+{
+    return Thr4_1;
+}
+
+
+std::string CodonTable::getThr4_2R()
+{
+    return Thr4_2;
+}
+
+
+std::string CodonTable::getLeu1R()
+{
+    return Leu1;
+}
+
+
 std::vector<std::string> CodonTable::getCodonArrayR()
 {
     std::vector<std::string> RV;
@@ -1094,6 +1144,7 @@ RCPP_MODULE(CodonTable_mod)
         .method("getCodonToAAMap", &CodonTable::getCodonToAAMap)
         .method("getAAMap", &CodonTable::getAAMapR)
         .method("getAAToNumCodonsMap", &CodonTable::getAAToNumCodonsMap)
+        .method("getForParamVectorMap", &CodonTable::getForParamVectorMapR)
 
         .method("getNumCodonsForAA", &CodonTable::getNumCodonsForAA)
         .method("getNumCodonsForAAIndex", &CodonTable::getNumCodonsForAAIndexR)
@@ -1118,6 +1169,11 @@ RCPP_MODULE(CodonTable_mod)
       //  function("AminoAcidArrayWithoutSplit", &CodonTable::AminoAcidArrayWithoutSplit);
 	//	function("numCodonsPerAAForTable", &CodonTable::numCodonsPerAAForTable);
 	//	function("codonTableDefinition", &CodonTable::codonTableDefinition);
+	    function("getSer2", &CodonTable::getSer2R);
+	    function("getSer1", &CodonTable::getSer1R);
+	    function("getThr4_1", &CodonTable::getThr4_1R);
+	    function("getThr4_2", &CodonTable::getThr4_2R);
+	    function("getLeu1", &CodonTable::getLeu1R);
 	    function("getCodonArray", &CodonTable::getCodonArrayR);
 
 }

@@ -113,6 +113,18 @@ test_that("Get AA To Num Codons Map",{
 })
 
 
+test_that("Get For Param Vector Map",{
+  map <- CT$getForParamVectorMap()
+  trueMap <-   c(AAA = 14, AAC = 20, ACA = 35, ACC = 36, ACG = 37, AGA = 25, AGC = 34, 
+                 AGG = 26, ATA = 12, ATC = 13, CAA = 24, CAC = 11, CCA = 21, CCC = 22, 
+                 CCG = 23, CGA = 27, CGC = 28, CGG = 29, CTA = 15, CTC = 16, CTG = 17, 
+                 CTT = 18, GAA = 6, GAC = 5, GCA = 1, GCC = 2, GCG = 3, GGA = 8, GGC = 9, 
+                 GGG = 10, GTA = 38, GTC = 39, GTG = 40, TAC = 41, TCA = 30, TCC = 31, 
+                 TCG = 32, TCT = 33, TGC = 4, TTA = 19, TTC = 7)
+  expect_equal(map,trueMap)
+})
+
+
 test_that("Get Num Codons For AA",{
   expect_equal(CT$getNumCodonsForAA("A", FALSE), 4)
   expect_equal(CT$getNumCodonsForAA("C", FALSE), 2)
@@ -622,6 +634,18 @@ test_that("Get AA Map (Split)",{
   trueMap <- c(A = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, K = 9, L = 10, M = 11,
                N = 12, P = 13, Q = 14, R = 15, S = 17, T = 18, V = 19, W = 20, Y = 21, Z = 16)
   expect_equal(map, trueMap)
+})
+
+
+test_that("Get For Param Vector Map (Split)",{
+  map <- CT$getForParamVectorMap()
+  trueMap <-   c(AAA = 14, AAC = 20, ACA = 34, ACC = 35, ACG = 36, AGA = 25, AGC = 30, 
+                 AGG = 26, ATA = 12, ATC = 13, CAA = 24, CAC = 11, CCA = 21, CCC = 22, 
+                 CCG = 23, CGA = 27, CGC = 28, CGG = 29, CTA = 15, CTC = 16, CTG = 17, 
+                 CTT = 18, GAA = 6, GAC = 5, GCA = 1, GCC = 2, GCG = 3, GGA = 8, GGC = 9, 
+                 GGG = 10, GTA = 37, GTC = 38, GTG = 39, TAC = 40, TCA = 31, TCC = 32, 
+                 TCG = 33, TGC = 4, TTA = 19, TTC = 7)
+  expect_equal(map,trueMap)
 })
 
 
