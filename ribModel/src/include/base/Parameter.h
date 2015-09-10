@@ -191,7 +191,6 @@ class Parameter {
 		virtual double getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement,
 				bool unbiased = true) = 0;
 
-
 		// static functions
 		static double calculateSCUO(Gene& gene, unsigned maxAA);
 
@@ -255,6 +254,9 @@ class Parameter {
 		std::string getGrouping(unsigned index);
 		unsigned getGroupListSize();
 
+		void setLastIteration(unsigned iteration) { lastIteration = iteration; }
+		unsigned getLastIteration() { return lastIteration; }
+
 	protected:
 		double Sphi;
 		double Sphi_proposed;
@@ -262,6 +264,8 @@ class Parameter {
 		unsigned phiGroupings;
 		unsigned numMixtures;
 		unsigned int numParam;
+
+		unsigned lastIteration;
 
 		unsigned numMutationCategories; //TODO Probably needs to be renamed
 		unsigned numSelectionCategories; //TODO Probably needs to be renamed

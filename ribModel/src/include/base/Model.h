@@ -66,6 +66,8 @@ class Model
 		//virtual void getParameterForCategory(unsigned category, unsigned param, std::string aa, bool proposal, double* returnValue) = 0;
 		virtual unsigned getGroupListSize() = 0;
 		virtual std::string getGrouping(unsigned index) = 0;
+		virtual void setLastIteration(unsigned iteration) = 0;
+		virtual unsigned getLastIteration() = 0;
 
 		// print functions
 		virtual void printHyperParameters() = 0;
