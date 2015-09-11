@@ -141,7 +141,7 @@ void ROCParameter::initROCParameterSet()
 	CodonTable *codonTable = CodonTable::getInstance();
   for (unsigned i = 0; i < maxGrouping; i++)
   {
-    std::string aa = CodonTable::AminoAcidArray[i];
+    std::string aa = CodonTable::aminoAcidArray[i];
     unsigned numCodons = codonTable -> getNumCodonsForAA(aa, true);
     CovarianceMatrix m((numMutationCategories + numSelectionCategories) * numCodons);
     m.choleskiDecomposition();

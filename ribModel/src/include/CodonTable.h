@@ -39,10 +39,10 @@ class CodonTable
         static const std::string Thr4_2; //Necessary for codon table 3
         static const std::string Leu1; //Necessary for codon table 16, 22
 
-		static const std::string AminoAcidArray[26]; //Index = AA
-        static const std::string AminoAcidArrayWithoutSplit[21]; //Array containing all non-split AAs.
+		static const std::vector <std::string> aminoAcidArray; //Index = AA
+        static const std::vector <std::string> aminoAcidArrayWithoutSplit; //Array containing all non-split AAs.
 		static const unsigned numCodonsPerAAForTable[25][26]; //Sized on tableId and AA.
-		static const std::string codonTableDefinition[25]; //Description title for each codon table according to NCBI.
+		static const std::vector <std::string> codonTableDefinition; //Description title for each codon table according to NCBI.
 		static const std::string codonArray[]; //List of codons.
 
 		static const std::map<std::string, unsigned> codonToIndexWithReference; //Map of indices to all codons.
@@ -123,6 +123,12 @@ class CodonTable
         static std::string getThr4_1R();
         static std::string getThr4_2R();
         static std::string getLeu1R();
+
+        static std::vector <std::string> getAminoAcidArrayR();
+        static std::vector <std::string> getAminoAcidArrayWithoutSplitR();
+        static std::vector <std::vector <unsigned>> getNumCodonsPerAAForTableR();
+        static std::vector <std::string> getCodonTableDefinitionR();
+
         static std::vector<std::string> getCodonArrayR();
 };
 

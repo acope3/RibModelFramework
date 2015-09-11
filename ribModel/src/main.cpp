@@ -618,7 +618,7 @@ int main()
 			{
 				std::string aa = model.getGrouping(n);
 				index = codonTable -> AAToAAIndex(aa);
-				std::cout << CodonTable::AminoAcidArray[index] << ": " << parameter.getCurrentCodonSpecificProposalWidth(index) << "\n";
+				std::cout << CodonTable::aminoAcidArray[index] << ": " << parameter.getCurrentCodonSpecificProposalWidth(index) << "\n";
 			}
 		}
 		else if (modelToRun == RFP)
@@ -739,7 +739,7 @@ int main()
 			{
 				std::string aa = model.getGrouping(n);
 				index = codonTable -> AAToAAIndex(aa);
-				std::cout << CodonTable::AminoAcidArray[index] << ": " << parameter.getCurrentCodonSpecificProposalWidth(index) << "\n";
+				std::cout << CodonTable::aminoAcidArray[index] << ": " << parameter.getCurrentCodonSpecificProposalWidth(index) << "\n";
 			}
 		}
 

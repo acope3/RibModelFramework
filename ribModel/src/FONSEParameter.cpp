@@ -149,7 +149,7 @@ void FONSEParameter::initFONSEParameterSet()
 	CodonTable *codonTable = CodonTable::getInstance();
 	for (unsigned i = 0; i < maxGrouping; i++)
 	{
-		std::string aa = CodonTable::AminoAcidArray[i];
+		std::string aa = CodonTable::aminoAcidArray[i];
 		unsigned numCodons = codonTable -> getNumCodonsForAA(aa, true);
 		CovarianceMatrix m((numMutationCategories + numSelectionCategories) * numCodons);
 		m.choleskiDecomposition();
@@ -630,7 +630,7 @@ void FONSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptatio
 	{
 		if (i == 21 || i == 10 || i == 18)
 			continue;
-		std::cout << CodonTable::AminoAcidArray[i] << "\t\t";
+		std::cout << CodonTable::aminoAcidArray[i] << "\t\t";
 	}
 	std::cout << "\n\t";
 	for (unsigned i = 0; i < numCSPsets; i++)

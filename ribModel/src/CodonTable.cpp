@@ -678,8 +678,8 @@ void CodonTable::setupCodonTable()
         {
             if (numCodonsPerAAForTable[tableId][i] != 0)
             {
-                AAListing.push_back(AminoAcidArray[i]);
-                AAMap.insert(std::make_pair(AminoAcidArray[i], index));
+                AAListing.push_back(aminoAcidArray[i]);
+                AAMap.insert(std::make_pair(aminoAcidArray[i], index));
                 index++;
             }
         }
@@ -688,8 +688,8 @@ void CodonTable::setupCodonTable()
     {
         for (unsigned i = 0; i < 20; i++)
         {
-            AAListing.push_back(AminoAcidArrayWithoutSplit[i]);
-            AAMap.insert(std::make_pair(AminoAcidArrayWithoutSplit[i], index));
+            AAListing.push_back(aminoAcidArrayWithoutSplit[i]);
+            AAMap.insert(std::make_pair(aminoAcidArrayWithoutSplit[i], index));
             index++;
         }
     }
@@ -738,14 +738,14 @@ CodonTable* CodonTable::getInstance()
 //--------------------------------//
 const std::string CodonTable::Ser2 = "Z";
 const std::string CodonTable::Ser1 = "J";
-const std::string CodonTable::Thr4_1 = "O";
+const std::string CodonTable::Thr4_1 = "T";
 const std::string CodonTable::Thr4_2 = "B";
 const std::string CodonTable::Leu1 = "U";
 
-const std::string CodonTable::AminoAcidArray[] = {
+const std::vector <std::string> CodonTable::aminoAcidArray = {
         "A", "C", "D", "E", "F", "G", "H", "I", "K", "L", CodonTable::Leu1, "M", "N", "P", "Q", "R",
         CodonTable::Ser1, CodonTable::Ser2, "S", "T", CodonTable::Thr4_1, CodonTable::Thr4_2, "V", "W", "Y", "X"};
-const std::string CodonTable::AminoAcidArrayWithoutSplit[] = {
+const std::vector <std::string> CodonTable::aminoAcidArrayWithoutSplit = {
         "A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y", "X"};
 
 
@@ -770,7 +770,7 @@ const std::string CodonTable::codonArray[] =
 
 // TODO NOTE: THERE IS NO CODON TABLE 7, 8, 15, 17, 18, 19, 20 ACCORDING TO NCBI !
 // http://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi
-const std::string CodonTable::codonTableDefinition[] = {"1. The Standard Code", "2. The Vertebrate Mitochondrial Code",
+const std::vector <std::string> CodonTable::codonTableDefinition = {"1. The Standard Code", "2. The Vertebrate Mitochondrial Code",
                                                         "3. The Yeast Mitochondrial Code", "4. The Mold, Protozoan, and Coelenterate Mitochondrial Code and the Mycoplasma/Spiroplasma Code",
                                                         "5. The Invertebrate Mitochondrial Code", "6. The Ciliate, Dasycladacean and Hexamita Nuclear Code", "7. Invalid Codon Table", "8. Invalid Codon Table",
                                                         "9. The Echinoderm and Flatworm Mitochondrial Code", "10. The Euplotid Nuclear Code",
@@ -785,7 +785,7 @@ const std::string CodonTable::codonTableDefinition[] = {"1. The Standard Code", 
 const unsigned CodonTable::numCodonsPerAAForTable[25][26] = {
         {4,2,2,2,2,4,2,3,2,6,0,1,2,4,2,6,0,2,4,4,0,0,4,1,2,3}, // 1. The Standard Code
         {4,2,2,2,2,4,2,2,2,6,0,2,2,4,2,4,0,2,4,4,0,0,4,2,2,4}, // 2. The Vertebrate Mitochondrial Code
-        {4,2,2,2,2,4,2,2,2,2,0,2,2,4,2,4,0,2,4,0,4,4,4,2,2,2}, // 3. The Yeast Mitochondrial Code
+        {4,2,2,2,2,4,2,2,2,2,0,2,2,4,2,6,0,2,4,0,4,4,4,2,2,2}, // 3. The Yeast Mitochondrial Code
         {4,2,2,2,2,4,2,3,2,6,0,1,2,4,2,6,0,2,4,4,0,0,4,2,2,2}, // 4. The Mold, Protozoan, and Coelenterate Mitochondrial Code and the Mycoplasma/Spiroplasma Code
         {4,2,2,2,2,4,2,2,2,6,0,2,2,4,2,4,0,4,4,4,0,0,4,2,2,2}, // 5. The Invertebrate Mitochondrial Code
         {4,2,2,2,2,4,2,3,2,6,0,1,2,4,4,6,0,2,4,4,0,0,4,1,2,1}, // 6. The Ciliate, Dasycladacean and Hexamita Nuclear Code
@@ -804,7 +804,7 @@ const unsigned CodonTable::numCodonsPerAAForTable[25][26] = {
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 19. Invalid Codon Table
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 20. Invalid Codon Table
         {4,2,2,2,2,4,2,2,1,6,0,2,3,4,2,4,0,4,4,4,0,0,4,2,2,2}, // 21. Trematode Mitochondrial Code
-        {4,2,2,2,2,4,2,3,2,6,1,1,2,4,2,6,0,2,3,4,0,0,4,1,2,3}, // 22. Scenedesmus obliquus Mitochondrial Code
+        {4,2,2,2,2,4,3,2,2,6,1,1,2,4,2,6,0,2,3,4,0,0,4,1,2,3}, // 22. Scenedesmus obliquus Mitochondrial Code
         {4,2,2,2,2,4,2,3,2,5,0,1,2,4,2,6,0,2,4,4,0,0,4,1,2,4}, // 23. Thraustochytrium Mitochondrial Code
         {4,2,2,2,2,4,2,3,3,6,0,1,2,4,2,4,0,3,4,4,0,0,4,2,2,2}, // 24. Pterobranchia Mitochondrial Code
         {4,2,2,2,2,5,2,3,2,6,0,1,2,4,2,6,0,2,4,4,0,0,4,1,2,2}, // 25. Candidate Division SR1 and Gracilibacteria Code
@@ -1114,6 +1114,42 @@ std::string CodonTable::getLeu1R()
 }
 
 
+std::vector <std::string> CodonTable::getAminoAcidArrayR()
+{
+    return aminoAcidArray;
+}
+
+
+std::vector <std::string> CodonTable::getAminoAcidArrayWithoutSplitR()
+{
+    return aminoAcidArrayWithoutSplit;
+}
+
+
+std::vector <std::vector <unsigned>> CodonTable::getNumCodonsPerAAForTableR()
+{
+    std::vector <std::vector <unsigned>> RV(25);
+
+    for (unsigned index = 0; index < 25; index++)
+    {
+        for (unsigned j = 0; j < 26; j++)
+        {
+            RV[index].push_back(numCodonsPerAAForTable[index][j]);
+        }
+    }
+
+    return RV;
+}
+//Hard coded values (25,26) are ok here since this is a
+//constant and there are no functions to get the size of an array.
+
+
+std::vector <std::string> CodonTable::getCodonTableDefinitionR()
+{
+    return codonTableDefinition;
+}
+
+
 std::vector<std::string> CodonTable::getCodonArrayR()
 {
     std::vector<std::string> RV;
@@ -1165,10 +1201,10 @@ RCPP_MODULE(CodonTable_mod)
 		;
 
 		//Static functions:
-		//function("AminoAcidArray", &CodonTable::AminoAcidArray);
-      //  function("AminoAcidArrayWithoutSplit", &CodonTable::AminoAcidArrayWithoutSplit);
-	//	function("numCodonsPerAAForTable", &CodonTable::numCodonsPerAAForTable);
-	//	function("codonTableDefinition", &CodonTable::codonTableDefinition);
+		function("getAminoAcidArray", &CodonTable::getAminoAcidArrayR);
+        function("getAminoAcidArrayWithoutSplit", &CodonTable::getAminoAcidArrayWithoutSplitR);
+		function("getNumCodonsPerAAForTable", &CodonTable::getNumCodonsPerAAForTableR);
+		function("getCodonTableDefinition", &CodonTable::getCodonTableDefinitionR);
 	    function("getSer2", &CodonTable::getSer2R);
 	    function("getSer1", &CodonTable::getSer1R);
 	    function("getThr4_1", &CodonTable::getThr4_1R);
