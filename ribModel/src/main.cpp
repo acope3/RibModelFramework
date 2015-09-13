@@ -396,6 +396,13 @@ void codonTableTest()
 
 	return;
 }
+
+void testProcessSequence()
+{
+	std::cout <<"Testing process sequence\n";
+	CodonTable::createCodonTable(1, true);
+	SequenceSummary SS("ATGCTCATTCTCAGTGCTGCCTCGTAG");
+}
 //---------------------------------------------------------------------------------------------//
 //-----------------------------------------END OF UNIT TESTING---------------------------------//
 //---------------------------------------------------------------------------------------------//
@@ -410,7 +417,7 @@ int main()
 	ModelToRun modelToRun = ROC;
 
 	bool read = false; //Initialize parameter by reading a restart file
-	bool testing = true; //Run unit testing
+	bool testing = false; //Run unit testing
 	bool withPhi = false; //Using multiple phi values per gene
 
 
@@ -432,7 +439,8 @@ int main()
 		//testGeneSequenceSummary();
 		//testReadMutationValues();
 		//testMultiplePhi();
-		codonTableTest();
+		//codonTableTest();
+		testProcessSequence();
 	}
 	else //Not doing unit testing, running a model
 	{
@@ -507,8 +515,6 @@ int main()
 		}
 		std::cout << "Done initializing Genome object" <<"\n\n";
 
-		std::cout <<"Temp exit\n";
-		std::exit(1);
 
 		std::cout << "Initializing shared parameter variables\n";
 		std::vector<unsigned> geneAssignment(genome.getGenomeSize());

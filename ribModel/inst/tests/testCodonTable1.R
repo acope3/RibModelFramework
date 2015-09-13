@@ -30,6 +30,7 @@ codonIndexList[[17]] <- c(49,50,51,52)
 codonIndexList[[18]] <- c(53,54,55,56)
 codonIndexList[[19]] <- c(57)
 codonIndexList[[20]] <- c(58,59)
+codonIndexList[[21]] <- c(62,64,63)
 codonIndexListWithoutRef <- list(c(1,2,3))
 codonIndexListWithoutRef[[2]] <- c(5)
 codonIndexListWithoutRef[[3]] <- c(7)
@@ -50,7 +51,7 @@ codonIndexListWithoutRef[[17]] <- c(49,50,51)
 codonIndexListWithoutRef[[18]] <- c(53,54,55)
 codonIndexListWithoutRef[[19]] <- numeric(0)
 codonIndexListWithoutRef[[20]] <- c(58)
-
+codonIndexListWithoutRef[[21]] <- c(62,64)
 
 test_that("Get Codon Index Listing",{
   listing <- CT$getCodonIndexListing()
@@ -67,7 +68,7 @@ test_that("Get Codon Index Listing Without Reference", {
 test_that("Get AA Listing",{
   listing <- CT$getAAListing()
   trueList <- c("A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R",
-                "S", "T", "V", "W", "Y")
+                "S", "T", "V", "W", "Y", "X")
   expect_equal(listing, trueList)
 })
 
@@ -77,7 +78,7 @@ test_that("Get For Param Vector Listing",{
   trueList <- c("GCA", "GCC", "GCG", "TGC", "GAC", "GAA", "TTC", "GGA", "GGC", "GGG", "CAC",
                 "ATA", "ATC", "AAA", "CTA", "CTC", "CTG", "CTT", "TTA", "AAC", "CCA", "CCC",
                 "CCG", "CAA", "AGA", "AGG", "CGA", "CGC", "CGG", "TCA", "TCC", "TCG", "TCT",
-                "AGC", "ACA", "ACC", "ACG", "GTA", "GTC", "GTG", "TAC")
+                "AGC", "ACA", "ACC", "ACG", "GTA", "GTC", "GTG", "TAC", "TAA", "TGA")
   expect_equal(listing, trueList)
 })
 
@@ -90,9 +91,10 @@ test_that("Get Codon To AA Map",{
                CCC = "P", CCG = "P", CCT = "P", CGA = "R", CGC = "R", CGG = "R", CGT = "R", 
                CTA = "L", CTC = "L", CTG = "L", CTT = "L", GAA = "E", GAC = "D", GAG = "E", 
                GAT = "D", GCA = "A", GCC = "A", GCG = "A", GCT = "A", GGA = "G", GGC = "G", 
-               GGG = "G", GGT = "G", GTA = "V", GTC = "V", GTG = "V", GTT = "V", TAC = "Y", 
-               TAT = "Y", TCA = "S", TCC = "S", TCG = "S", TCT = "S", TGC = "C", TGG = "W", 
-               TGT = "C", TTA = "L", TTC = "F", TTG = "L", TTT = "F")
+               GGG = "G", GGT = "G", GTA = "V", GTC = "V", GTG = "V", GTT = "V", TAA = "X",
+               TAC = "Y", TAG = "X", TAT = "Y", TCA = "S", TCC = "S", TCG = "S", TCT = "S", 
+               TGA = "X", TGC = "C", TGG = "W", TGT = "C", TTA = "L", TTC = "F", TTG = "L", 
+               TTT = "F")
   expect_equal(map, trueMap)
 })
 
@@ -100,7 +102,7 @@ test_that("Get Codon To AA Map",{
 test_that("Get AA Map",{
   map <- CT$getAAMap()
   trueMap <- c(A = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, K = 9, L = 10, M = 11,
-               N = 12, P = 13, Q = 14, R = 15, S = 16, T = 17, V = 18, W = 19, Y = 20)
+               N = 12, P = 13, Q = 14, R = 15, S = 16, T = 17, V = 18, W = 19, X = 21, Y = 20)
   expect_equal(map, trueMap)
 })
 
@@ -108,7 +110,7 @@ test_that("Get AA Map",{
 test_that("Get AA To Num Codons Map",{
   map <- CT$getAAToNumCodonsMap()
   trueMap <- c(A = 4, C = 2, D = 2, E = 2, F = 2, G = 4, H = 2, I = 3, K = 2, L = 6, M = 1,
-               N = 2, P = 4, Q = 2, R = 6, S = 6, T = 4, V = 4, W = 1, Y = 2)
+               N = 2, P = 4, Q = 2, R = 6, S = 6, T = 4, V = 4, W = 1, X = 3, Y = 2)
   expect_equal(map,trueMap)
 })
 
@@ -119,8 +121,8 @@ test_that("Get For Param Vector Map",{
                  AGG = 26, ATA = 12, ATC = 13, CAA = 24, CAC = 11, CCA = 21, CCC = 22, 
                  CCG = 23, CGA = 27, CGC = 28, CGG = 29, CTA = 15, CTC = 16, CTG = 17, 
                  CTT = 18, GAA = 6, GAC = 5, GCA = 1, GCC = 2, GCG = 3, GGA = 8, GGC = 9, 
-                 GGG = 10, GTA = 38, GTC = 39, GTG = 40, TAC = 41, TCA = 30, TCC = 31, 
-                 TCG = 32, TCT = 33, TGC = 4, TTA = 19, TTC = 7)
+                 GGG = 10, GTA = 38, GTC = 39, GTG = 40, TAA = 42, TAC = 41, TCA = 30, 
+                 TCC = 31, TCG = 32, TCT = 33, TGA = 43, TGC = 4, TTA = 19, TTC = 7)
   expect_equal(map,trueMap)
 })
 
@@ -146,6 +148,7 @@ test_that("Get Num Codons For AA",{
   expect_equal(CT$getNumCodonsForAA("V", FALSE), 4)
   expect_equal(CT$getNumCodonsForAA("W", FALSE), 1)
   expect_equal(CT$getNumCodonsForAA("Y", FALSE), 2)
+  expect_equal(CT$getNumCodonsForAA("X", FALSE), 3)
   
   expect_equal(CT$getNumCodonsForAA("A", TRUE), 3)
   expect_equal(CT$getNumCodonsForAA("C", TRUE), 1)
@@ -167,6 +170,7 @@ test_that("Get Num Codons For AA",{
   expect_equal(CT$getNumCodonsForAA("V", TRUE), 3)
   expect_equal(CT$getNumCodonsForAA("W", TRUE), 0)
   expect_equal(CT$getNumCodonsForAA("Y", TRUE), 1)
+  expect_equal(CT$getNumCodonsForAA("X", TRUE), 2)
 })
 
 
@@ -191,6 +195,7 @@ test_that("Get Num Codons For AA Index",{
   expect_equal(CT$getNumCodonsForAAIndex(18, FALSE), 4)
   expect_equal(CT$getNumCodonsForAAIndex(19, FALSE), 1)
   expect_equal(CT$getNumCodonsForAAIndex(20, FALSE), 2)
+  expect_equal(CT$getNumCodonsForAAIndex(21, FALSE), 3)
   
   expect_equal(CT$getNumCodonsForAAIndex(1, TRUE), 3)
   expect_equal(CT$getNumCodonsForAAIndex(2, TRUE), 1)
@@ -212,6 +217,7 @@ test_that("Get Num Codons For AA Index",{
   expect_equal(CT$getNumCodonsForAAIndex(18, TRUE), 3)
   expect_equal(CT$getNumCodonsForAAIndex(19, TRUE), 0)
   expect_equal(CT$getNumCodonsForAAIndex(20, TRUE), 1)
+  expect_equal(CT$getNumCodonsForAAIndex(21, TRUE), 2)
 })
 
 
@@ -239,14 +245,14 @@ test_that("AA To AA Index",{
 
 
 test_that("AA Index To Codon Range",{
-  for (i in 1:20){
+  for (i in 1:21){
     expect_equal(CT$AAIndexToCodonRange(i, FALSE), codonIndexList[[i]])
   }
-  for (i in 1:20){
+  for (i in 1:21){
     expect_equal(CT$AAIndexToCodonRange(i,TRUE), codonIndexListWithoutRef[[i]])
   }
   
-  expect_equal(CT$AAIndexToCodonRange(21, FALSE), numeric(0)) #Test with bad index
+  expect_equal(CT$AAIndexToCodonRange(22, FALSE), numeric(0)) #Test with bad index
   expect_equal(CT$AAIndexToCodonRange(0, FALSE), numeric(0)) #Test with bad index
   expect_equal(CT$AAIndexToCodonRange(-1, FALSE), numeric(0)) #Test with bad index
 })
@@ -307,6 +313,7 @@ test_that("AA To Codon",{
   expect_equal(CT$AAToCodon("V", FALSE), c("GTA", "GTC", "GTG", "GTT"))
   expect_equal(CT$AAToCodon("W", FALSE), c("TGG"))
   expect_equal(CT$AAToCodon("Y", FALSE), c("TAC", "TAT"))
+  expect_equal(CT$AAToCodon("X", FALSE), c("TAA", "TGA", "TAG"))
   
   
   expect_equal(CT$AAToCodon("A", TRUE), c("GCA", "GCC", "GCG"))
@@ -329,10 +336,10 @@ test_that("AA To Codon",{
   expect_equal(CT$AAToCodon("V", TRUE), c("GTA", "GTC", "GTG"))
   expect_equal(CT$AAToCodon("W", TRUE), character(0))
   expect_equal(CT$AAToCodon("Y", TRUE), c("TAC"))
+  expect_equal(CT$AAToCodon("X", TRUE), c("TAA", "TGA"))
   
   expect_equal(CT$AAToCodon("a", TRUE), c("GCA", "GCC", "GCG")) #test that lower case works
   expect_equal(CT$AAToCodon("z", TRUE), character(0)) #check invalid
-  
 })
 
 
@@ -418,6 +425,9 @@ test_that("Codon To AA",{
     expect_equal(CT$codonToAA(codonArray[i]), "S")
   }
   
+  for (i in 62:64) {
+    expect_equal(CT$codonToAA(codonArray[i]), "X")
+  }
   expect_equal(CT$codonToAA("BOB"), "") #invalid argument test
   
 })
@@ -520,6 +530,10 @@ test_that("Codon To AA Index",{
     expect_equal(CT$codonToAAIndex(codonArray[i]), 16)
   }
   
+  for(i in 62:64) {
+    expect_equal(CT$codonToAAIndex(codonArray[i]), 21)
+  }
+  
   expect_equal(CT$codonToAAIndex("BOB"), 0)
 })
 
@@ -529,7 +543,7 @@ test_that("Index to AA",{
   for (i in 1:length(AAList)) {
     expect_equal(CT$indexToAA(i), AAList[i])
   }
-  expect_equal(CT$indexToAA(22), "") #invalid case
+  expect_equal(CT$indexToAA(23), "") #invalid case
 })
 
 #-----------------------------END OF NO SPLIT TESTING-------------------------------------#
@@ -559,6 +573,7 @@ codonIndexList[[18]] <- c(49,50,51,52)
 codonIndexList[[19]] <- c(53,54,55,56)
 codonIndexList[[20]] <- c(57)
 codonIndexList[[21]] <- c(58,59)
+codonIndexList[[22]] <- c(62,64,63)
 
 
 codonIndexListWithoutRef <- list(c(1,2,3))
@@ -582,7 +597,7 @@ codonIndexListWithoutRef[[18]] <- c(49,50,51)
 codonIndexListWithoutRef[[19]] <- c(53,54,55)
 codonIndexListWithoutRef[[20]] <- numeric(0)
 codonIndexListWithoutRef[[21]] <- c(58)
-
+codonIndexListWithoutRef[[22]] <- c(62,64)
 
 test_that("Get Codon Index Listing (Split)",{
   listing <- CT$getCodonIndexListing()
@@ -599,7 +614,7 @@ test_that("Get Codon Index Listing Without Reference (Split)", {
 test_that("Get AA Listing (Split)",{
   listing <- CT$getAAListing()
   trueList <- c("A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", 
-                "Z", "S", "T", "V", "W", "Y")
+                "Z", "S", "T", "V", "W", "Y", "X")
   expect_equal(listing, trueList)
 })
 
@@ -609,7 +624,7 @@ test_that("Get For Param Vector Listing (Split)",{
   trueList <- c("GCA", "GCC", "GCG", "TGC", "GAC", "GAA", "TTC", "GGA", "GGC", "GGG", "CAC",
                 "ATA", "ATC", "AAA", "CTA", "CTC", "CTG", "CTT", "TTA", "AAC", "CCA", "CCC",
                 "CCG", "CAA", "AGA", "AGG", "CGA", "CGC", "CGG", "AGC", "TCA", "TCC", "TCG", 
-                "ACA", "ACC", "ACG", "GTA", "GTC", "GTG", "TAC")
+                "ACA", "ACC", "ACG", "GTA", "GTC", "GTG", "TAC", "TAA", "TGA")
   expect_equal(listing, trueList)
 })
 
@@ -622,9 +637,10 @@ test_that("Get Codon To AA Map (Split)",{
                CCC = "P", CCG = "P", CCT = "P", CGA = "R", CGC = "R", CGG = "R", CGT = "R", 
                CTA = "L", CTC = "L", CTG = "L", CTT = "L", GAA = "E", GAC = "D", GAG = "E", 
                GAT = "D", GCA = "A", GCC = "A", GCG = "A", GCT = "A", GGA = "G", GGC = "G", 
-               GGG = "G", GGT = "G", GTA = "V", GTC = "V", GTG = "V", GTT = "V", TAC = "Y", 
-               TAT = "Y", TCA = "S", TCC = "S", TCG = "S", TCT = "S", TGC = "C", TGG = "W", 
-               TGT = "C", TTA = "L", TTC = "F", TTG = "L", TTT = "F")
+               GGG = "G", GGT = "G", GTA = "V", GTC = "V", GTG = "V", GTT = "V", TAA = "X",
+               TAC = "Y", TAG = "X", TAT = "Y", TCA = "S", TCC = "S", TCG = "S", TCT = "S", 
+               TGA = "X", TGC = "C", TGG = "W", TGT = "C", TTA = "L", TTC = "F", TTG = "L", 
+               TTT = "F")
   expect_equal(map, trueMap)
 })
 
@@ -632,7 +648,8 @@ test_that("Get Codon To AA Map (Split)",{
 test_that("Get AA Map (Split)",{
   map <- CT$getAAMap()
   trueMap <- c(A = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, K = 9, L = 10, M = 11,
-               N = 12, P = 13, Q = 14, R = 15, S = 17, T = 18, V = 19, W = 20, Y = 21, Z = 16)
+               N = 12, P = 13, Q = 14, R = 15, S = 17, T = 18, V = 19, W = 20, X = 22, Y = 21, 
+               Z = 16)
   expect_equal(map, trueMap)
 })
 
@@ -643,8 +660,8 @@ test_that("Get For Param Vector Map (Split)",{
                  AGG = 26, ATA = 12, ATC = 13, CAA = 24, CAC = 11, CCA = 21, CCC = 22, 
                  CCG = 23, CGA = 27, CGC = 28, CGG = 29, CTA = 15, CTC = 16, CTG = 17, 
                  CTT = 18, GAA = 6, GAC = 5, GCA = 1, GCC = 2, GCG = 3, GGA = 8, GGC = 9, 
-                 GGG = 10, GTA = 37, GTC = 38, GTG = 39, TAC = 40, TCA = 31, TCC = 32, 
-                 TCG = 33, TGC = 4, TTA = 19, TTC = 7)
+                 GGG = 10, GTA = 37, GTC = 38, GTG = 39, TAA = 41, TAC = 40, TCA = 31, 
+                 TCC = 32, TCG = 33, TGA = 42, TGC = 4, TTA = 19, TTC = 7)
   expect_equal(map,trueMap)
 })
 
@@ -652,7 +669,7 @@ test_that("Get For Param Vector Map (Split)",{
 test_that("Get AA To Num Codons Map (Split)",{
   map <- CT$getAAToNumCodonsMap()
   trueMap <- c(A = 4, C = 2, D = 2, E = 2, F = 2, G = 4, H = 2, I = 3, K = 2, L = 6, M = 1,
-               N = 2, P = 4, Q = 2, R = 6, S = 4, T = 4, V = 4, W = 1, Y = 2, Z = 2)
+               N = 2, P = 4, Q = 2, R = 6, S = 4, T = 4, V = 4, W = 1, X = 3, Y = 2, Z = 2)
   expect_equal(map,trueMap)
 })
 
@@ -679,6 +696,7 @@ test_that("Get Num Codons For AA (Split)",{
   expect_equal(CT$getNumCodonsForAA("V", FALSE), 4)
   expect_equal(CT$getNumCodonsForAA("W", FALSE), 1)
   expect_equal(CT$getNumCodonsForAA("Y", FALSE), 2)
+  expect_equal(CT$getNumCodonsForAA("X", FALSE), 3)
   
   expect_equal(CT$getNumCodonsForAA("A", TRUE), 3)
   expect_equal(CT$getNumCodonsForAA("C", TRUE), 1)
@@ -701,6 +719,7 @@ test_that("Get Num Codons For AA (Split)",{
   expect_equal(CT$getNumCodonsForAA("V", TRUE), 3)
   expect_equal(CT$getNumCodonsForAA("W", TRUE), 0)
   expect_equal(CT$getNumCodonsForAA("Y", TRUE), 1)
+  expect_equal(CT$getNumCodonsForAA("X", TRUE), 2)
 })
 
 
@@ -726,6 +745,7 @@ test_that("Get Num Codons For AA Index (Split)",{
   expect_equal(CT$getNumCodonsForAAIndex(19, FALSE), 4)
   expect_equal(CT$getNumCodonsForAAIndex(20, FALSE), 1)
   expect_equal(CT$getNumCodonsForAAIndex(21, FALSE), 2)
+  expect_equal(CT$getNumCodonsForAAIndex(22, FALSE), 3)
   
   expect_equal(CT$getNumCodonsForAAIndex(1, TRUE), 3)
   expect_equal(CT$getNumCodonsForAAIndex(2, TRUE), 1)
@@ -748,6 +768,7 @@ test_that("Get Num Codons For AA Index (Split)",{
   expect_equal(CT$getNumCodonsForAAIndex(19, TRUE), 3)
   expect_equal(CT$getNumCodonsForAAIndex(20, TRUE), 0)
   expect_equal(CT$getNumCodonsForAAIndex(21, TRUE), 1)
+  expect_equal(CT$getNumCodonsForAAIndex(22, TRUE), 2)
 })
 
 
@@ -844,6 +865,7 @@ test_that("AA To Codon (Split)",{
   expect_equal(CT$AAToCodon("V", FALSE), c("GTA", "GTC", "GTG", "GTT"))
   expect_equal(CT$AAToCodon("W", FALSE), c("TGG"))
   expect_equal(CT$AAToCodon("Y", FALSE), c("TAC", "TAT"))
+  expect_equal(CT$AAToCodon("X", FALSE), c("TAA", "TGA", "TAG"))
   
   
   expect_equal(CT$AAToCodon("A", TRUE), c("GCA", "GCC", "GCG"))
@@ -867,6 +889,7 @@ test_that("AA To Codon (Split)",{
   expect_equal(CT$AAToCodon("V", TRUE), c("GTA", "GTC", "GTG"))
   expect_equal(CT$AAToCodon("W", TRUE), character(0))
   expect_equal(CT$AAToCodon("Y", TRUE), c("TAC"))
+  expect_equal(CT$AAToCodon("X", TRUE), c("TAA", "TGA"))
   
   expect_equal(CT$AAToCodon("a", TRUE), c("GCA", "GCC", "GCG")) #test that lower case works
   expect_equal(CT$AAToCodon("j", TRUE), character(0)) #check invalid
@@ -954,6 +977,10 @@ test_that("Codon To AA (Split)",{
   
   for (i in 60:61) {
     expect_equal(CT$codonToAA(codonArray[i]), "Z")
+  }
+  
+  for (i in 62:64) {
+    expect_equal(CT$codonToAA(codonArray[i]), "X")
   }
   
   expect_equal(CT$codonToAA("BOB"), "") #invalid argument test
@@ -1058,6 +1085,9 @@ test_that("Codon To AA Index (Split)",{
     expect_equal(CT$codonToAAIndex(codonArray[i]), 16)
   }
   
+  for (i in 62:64) {
+    expect_equal(CT$codonToAAIndex(codonArray[i]), 22)
+  }
   expect_equal(CT$codonToAAIndex("BOB"), 0)
 })
 
@@ -1067,5 +1097,5 @@ test_that("Index to AA (Split)",{
   for (i in 1:length(AAList)) {
     expect_equal(CT$indexToAA(i), AAList[i])
   }
-  expect_equal(CT$indexToAA(22), "") #invalid case
+  expect_equal(CT$indexToAA(23), "") #invalid case
 })

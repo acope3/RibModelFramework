@@ -22,7 +22,6 @@ class SequenceSummary
 
 	public:
 
-
 		//Constructors & destructors:
 		explicit SequenceSummary();
 		SequenceSummary(const std::string& sequence);

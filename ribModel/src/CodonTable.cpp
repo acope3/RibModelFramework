@@ -222,6 +222,7 @@ void CodonTable::setupCodonTable()
     else if (tableId >= 20 && tableId <= 24 && !splitAA) numAA = 20;
 
 
+    numAA++; //Account for the stop codon
 	codonIndexListing.resize(numAA);
 
     unsigned aaIndex = 0;
@@ -632,7 +633,61 @@ void CodonTable::setupCodonTable()
                     codonIndexListing[filled].push_back(61);
                 }
             }
-            //ignoring stop amino acid for now
+            else if (aaIndex == 25) //X
+            {
+                AAToNumCodonsMap.insert(std::make_pair("X", 1));
+                if (tableId == 5)
+                {
+                    codonIndexListing[filled].push_back(63);
+                }
+                else if (tableId == 13)
+                {
+                    codonIndexListing[filled].push_back(62);
+                }
+                else if (tableId == 15)
+                {
+                    codonIndexListing[filled].push_back(61);
+                    codonIndexListing[filled].push_back(63);
+                    AAToNumCodonsMap["X"]++;
+                }
+                else if ((tableId >= 2 && tableId <= 4) || tableId == 8 || tableId == 9 || tableId == 12 ||
+                        tableId == 20 || tableId == 23 || tableId == 24)
+                {
+                    codonIndexListing[filled].push_back(61);
+                    codonIndexListing[filled].push_back(62);
+                    AAToNumCodonsMap["X"]++;
+                }
+                else if (tableId == 0 || tableId == 10 || tableId == 11)
+                {
+                    codonIndexListing[filled].push_back(61);
+                    codonIndexListing[filled].push_back(63);
+                    codonIndexListing[filled].push_back(62);
+                    AAToNumCodonsMap["X"] += 2;
+                }
+                else if (tableId == 21)
+                {
+                    codonIndexListing[filled].push_back(61);
+                    codonIndexListing[filled].push_back(63);
+                    codonIndexListing[filled].push_back(44);
+                    AAToNumCodonsMap["X"] += 2;
+                }
+                else if (tableId == 1)
+                {
+                    codonIndexListing[filled].push_back(61);
+                    codonIndexListing[filled].push_back(62);
+                    codonIndexListing[filled].push_back(38);
+                    codonIndexListing[filled].push_back(39);
+                    AAToNumCodonsMap["X"] += 3;
+                }
+                else if (tableId == 22)
+                {
+                    codonIndexListing[filled].push_back(61);
+                    codonIndexListing[filled].push_back(63);
+                    codonIndexListing[filled].push_back(62);
+                    codonIndexListing[filled].push_back(27);
+                    AAToNumCodonsMap["X"] += 3;
+                }
+            }
             filled++;
         }
         aaIndex++;
@@ -658,7 +713,7 @@ void CodonTable::setupCodonTable()
     unsigned index = 0;
     if (splitAA)
     {
-        for (unsigned i = 0; i < 25; i++) //25 since we are ignoring the stop codon.
+        for (unsigned i = 0; i < 26; i++)
         {
             if (numCodonsPerAAForTable[tableId][i] != 0)
             {
@@ -670,7 +725,7 @@ void CodonTable::setupCodonTable()
     }
     else
     {
-        for (unsigned i = 0; i < 20; i++)
+        for (unsigned i = 0; i < 21; i++)
         {
             AAListing.push_back(aminoAcidArrayWithoutSplit[i]);
             AAMap.insert(std::make_pair(aminoAcidArrayWithoutSplit[i], index));
@@ -1214,6 +1269,8 @@ RCPP_MODULE(CodonTable_mod)
 	    function("getThr4_2", &CodonTable::getThr4_2R);
 	    function("getLeu1", &CodonTable::getLeu1R);
 	    function("getCodonArray", &CodonTable::getCodonArrayR);
+	    function("getInstance", &CodonTable::getInstance);
+	    function("createCodonTable", &CodonTable::createCodonTable);
 
 }
 #endif

@@ -3,11 +3,14 @@ library(ribModel)
 
 context("Sequence Summary")
 
+CT <- new(CodonTable)
+createCodonTable(1,TRUE)
+
 ss <- new(SequenceSummary, 
 "ATGCTCATTCTCACTGCTGCCTCGTAG"
 )
 
-test_that("AA counts for AA", {
+test_that("Get AA counts for AA", {
 	expect_equal(ss$getAACountForAA("M"), 1)
 	expect_equal(ss$getAACountForAA("L"), 2)
 	expect_equal(ss$getAACountForAA("I"), 1)
@@ -18,7 +21,7 @@ test_that("AA counts for AA", {
 	expect_equal(ss$getAACountForAA("G"), 0)
 })
 
-test_that("AA counts for AA Index", {
+test_that("Get AA counts for AA Index", {
   expect_equal(ss$getAACountForAAIndex(10), 1)
   expect_equal(ss$getAACountForAAIndex(9), 2)
   expect_equal(ss$getAACountForAAIndex(7), 1)
