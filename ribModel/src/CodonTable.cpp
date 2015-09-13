@@ -46,22 +46,6 @@ CodonTable& CodonTable::operator=(const CodonTable& rhs)
 }
 
 
-bool CodonTable::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound)
-{
-    bool check = false;
-    if (lowerbound <= index && index <= upperbound)
-    {
-        check = true;
-    }
-    else
-    {
-        std::cerr <<"Error with the index\nGIVEN: " << index <<"\n";
-        std::cerr <<"MUST BE BETWEEN:	" << lowerbound << " & " << upperbound <<"\n";
-    }
-    return check;
-}
-
-
 
 //------------------------------------//
 //----------Getter Functions----------//
@@ -710,32 +694,27 @@ void CodonTable::setupCodonTable()
 }
 
 
+bool CodonTable::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound)
+{
+    bool check = false;
+    if (lowerbound <= index && index <= upperbound)
+    {
+        check = true;
+    }
+    else
+    {
+        std::cerr <<"Error with the index\nGIVEN: " << index <<"\n";
+        std::cerr <<"MUST BE BETWEEN:	" << lowerbound << " & " << upperbound <<"\n";
+    }
+    return check;
+}
 
 
 
-
+//----------------------------------------------//
+//---------Static Variables & Functions---------//
+//----------------------------------------------//
 CodonTable* CodonTable::codonTable;
-
-void CodonTable::createCodonTable(unsigned tableId, bool split)
-{
-    codonTable = new CodonTable(tableId, split);
-    codonTable -> setupCodonTable();
-}
-
-
-CodonTable* CodonTable::getInstance()
-{
-    return codonTable;
-}
-
-
-
-
-
-
-//--------------------------------//
-//---------Static Members---------//
-//--------------------------------//
 const std::string CodonTable::Ser2 = "Z";
 const std::string CodonTable::Ser1 = "J";
 const std::string CodonTable::Thr4_1 = "T";
@@ -750,13 +729,14 @@ const std::vector <std::string> CodonTable::aminoAcidArrayWithoutSplit = {
 
 
 const std::map<std::string, unsigned> CodonTable::codonToIndexWithReference = {{"GCA", 0}, {"GCC", 1}, {"GCG", 2},
-                                                                               {"GCT", 3}, {"TGC", 4}, {"TGT", 5}, {"GAC", 6}, {"GAT", 7}, {"GAA", 8}, {"GAG", 9}, {"TTC", 10}, {"TTT", 11},
-                                                                               {"GGA", 12}, {"GGC", 13}, {"GGG", 14}, {"GGT", 15}, {"CAC", 16}, {"CAT", 17}, {"ATA", 18}, {"ATC", 19}, {"ATT", 20},
-                                                                               {"AAA", 21}, {"AAG", 22}, {"CTA", 23}, {"CTC", 24}, {"CTG", 25}, {"CTT", 26}, {"TTA", 27}, {"TTG", 28}, {"ATG", 29},
-                                                                               {"AAC", 30}, {"AAT", 31}, {"CCA", 32}, {"CCC", 33}, {"CCG", 34}, {"CCT", 35}, {"CAA", 36}, {"CAG", 37}, {"AGA", 38},
-                                                                               {"AGG", 39}, {"CGA", 40}, {"CGC", 41}, {"CGG", 42}, {"CGT", 43}, {"TCA", 44}, {"TCC", 45}, {"TCG", 46}, {"TCT", 47},
-                                                                               {"ACA", 48}, {"ACC", 49}, {"ACG", 50}, {"ACT", 51}, {"GTA", 52}, {"GTC", 53}, {"GTG", 54}, {"GTT", 55}, {"TGG", 56},
-                                                                               {"TAC", 57}, {"TAT", 58}, {"AGC", 59}, {"AGT", 60}, {"TAA", 61}, {"TAG", 62}, {"TGA", 63}};
+   {"GCT", 3}, {"TGC", 4}, {"TGT", 5}, {"GAC", 6}, {"GAT", 7}, {"GAA", 8}, {"GAG", 9}, {"TTC", 10}, {"TTT", 11},
+   {"GGA", 12}, {"GGC", 13}, {"GGG", 14}, {"GGT", 15}, {"CAC", 16}, {"CAT", 17}, {"ATA", 18}, {"ATC", 19}, {"ATT", 20},
+   {"AAA", 21}, {"AAG", 22}, {"CTA", 23}, {"CTC", 24}, {"CTG", 25}, {"CTT", 26}, {"TTA", 27}, {"TTG", 28}, {"ATG", 29},
+   {"AAC", 30}, {"AAT", 31}, {"CCA", 32}, {"CCC", 33}, {"CCG", 34}, {"CCT", 35}, {"CAA", 36}, {"CAG", 37}, {"AGA", 38},
+   {"AGG", 39}, {"CGA", 40}, {"CGC", 41}, {"CGG", 42}, {"CGT", 43}, {"TCA", 44}, {"TCC", 45}, {"TCG", 46}, {"TCT", 47},
+   {"ACA", 48}, {"ACC", 49}, {"ACG", 50}, {"ACT", 51}, {"GTA", 52}, {"GTC", 53}, {"GTG", 54}, {"GTT", 55}, {"TGG", 56},
+   {"TAC", 57}, {"TAT", 58}, {"AGC", 59}, {"AGT", 60}, {"TAA", 61}, {"TAG", 62}, {"TGA", 63}};
+
 
 const std::string CodonTable::codonArray[] =
         {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
@@ -768,20 +748,21 @@ const std::string CodonTable::codonArray[] =
          "AGT", "TAA", "TAG", "TGA"};
 
 
-// TODO NOTE: THERE IS NO CODON TABLE 7, 8, 15, 17, 18, 19, 20 ACCORDING TO NCBI !
 // http://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi
-const std::vector <std::string> CodonTable::codonTableDefinition = {"1. The Standard Code", "2. The Vertebrate Mitochondrial Code",
-                                                        "3. The Yeast Mitochondrial Code", "4. The Mold, Protozoan, and Coelenterate Mitochondrial Code and the Mycoplasma/Spiroplasma Code",
-                                                        "5. The Invertebrate Mitochondrial Code", "6. The Ciliate, Dasycladacean and Hexamita Nuclear Code", "7. Invalid Codon Table", "8. Invalid Codon Table",
-                                                        "9. The Echinoderm and Flatworm Mitochondrial Code", "10. The Euplotid Nuclear Code",
-                                                        "11. The Bacterial, Archaeal and Plant Plastid Code", "12. The Alternative Yeast Nuclear Code", "13. The Ascidian Mitochondrial Code",
-                                                        "14. The Alternative Flatworm Mitochondrial Code", "15. Invalid Codon Table", "16. Chlorophycean Mitochondrial Code",
-                                                        "17. Invalid Codon Table", "18. Invalid Codon Table", "19. Invalid Codon Table", "20. Invalid Codon Table",
-                                                        "21. Trematode Mitochondrial Code", "22. Scenedesmus obliquus Mitochondrial Code", "23. Thraustochytrium Mitochondrial Code",
-                                                        "24. Pterobranchia Mitochondrial Code",	"25. Candidate Division SR1 and Gracilibacteria Code"};
+const std::vector <std::string> CodonTable::codonTableDefinition = {"1. The Standard Code",
+   "2. The Vertebrate Mitochondrial Code", "3. The Yeast Mitochondrial Code",
+   "4. The Mold, Protozoan, and Coelenterate Mitochondrial Code and the Mycoplasma/Spiroplasma Code",
+   "5. The Invertebrate Mitochondrial Code", "6. The Ciliate, Dasycladacean and Hexamita Nuclear Code",
+   "7. Invalid Codon Table", "8. Invalid Codon Table", "9. The Echinoderm and Flatworm Mitochondrial Code",
+   "10. The Euplotid Nuclear Code", "11. The Bacterial, Archaeal and Plant Plastid Code",
+   "12. The Alternative Yeast Nuclear Code", "13. The Ascidian Mitochondrial Code",
+   "14. The Alternative Flatworm Mitochondrial Code", "15. Invalid Codon Table", "16. Chlorophycean Mitochondrial Code",
+   "17. Invalid Codon Table", "18. Invalid Codon Table", "19. Invalid Codon Table", "20. Invalid Codon Table",
+   "21. Trematode Mitochondrial Code", "22. Scenedesmus obliquus Mitochondrial Code",
+   "23. Thraustochytrium Mitochondrial Code", "24. Pterobranchia Mitochondrial Code",
+   "25. Candidate Division SR1 and Gracilibacteria Code"};
 
 
-// {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y", "Z", "X"};
 const unsigned CodonTable::numCodonsPerAAForTable[25][26] = {
         {4,2,2,2,2,4,2,3,2,6,0,1,2,4,2,6,0,2,4,4,0,0,4,1,2,3}, // 1. The Standard Code
         {4,2,2,2,2,4,2,2,2,6,0,2,2,4,2,4,0,2,4,4,0,0,4,2,2,4}, // 2. The Vertebrate Mitochondrial Code
@@ -811,15 +792,29 @@ const unsigned CodonTable::numCodonsPerAAForTable[25][26] = {
 };
 
 
+void CodonTable::createCodonTable(unsigned tableId, bool split)
+{
+    codonTable = new CodonTable(tableId, split);
+    codonTable -> setupCodonTable();
+}
+
+
+CodonTable* CodonTable::getInstance()
+{
+    return codonTable;
+}
 
 
 
+//--------------------------------------------------//
+//--------------------R Wrappers--------------------//
+//--------------------------------------------------//
 
 
 
-//------------------------------//
-//----------R Wrappers----------//
-//------------------------------//
+//------------------------------------//
+//----------Getter Functions----------//
+//------------------------------------//
 unsigned CodonTable::getTableIdR()
 {
     return getTableId() + 1;
@@ -914,6 +909,10 @@ std::string CodonTable::getForParamVectorCodonR(unsigned codonIndex)
 }
 
 
+
+//--------------------------------------//
+//----------Mapping Operations----------//
+//--------------------------------------//
 unsigned CodonTable::AAToAAIndexR(std::string aa)
 {
     unsigned aaIndex = 0;
@@ -1084,6 +1083,10 @@ std::string CodonTable::indexToAAR(unsigned aaIndex)
 }
 
 
+
+//----------------------------------------------//
+//---------Static Variables & Functions---------//
+//----------------------------------------------//
 std::string CodonTable::getSer2R()
 {
     return Ser2;

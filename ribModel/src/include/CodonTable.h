@@ -8,6 +8,7 @@
 #include <vector>
 #include <array>
 
+
 class CodonTable
 {
     private:
@@ -32,24 +33,6 @@ class CodonTable
 
     public:
 
-        //Static variables & functions:
-        static const std::string Ser2;
-        static const std::string Ser1; //Necessary for codon table 12
-        static const std::string Thr4_1; //Necessary for codon table 3
-        static const std::string Thr4_2; //Necessary for codon table 3
-        static const std::string Leu1; //Necessary for codon table 16, 22
-
-		static const std::vector <std::string> aminoAcidArray; //Index = AA
-        static const std::vector <std::string> aminoAcidArrayWithoutSplit; //Array containing all non-split AAs.
-		static const unsigned numCodonsPerAAForTable[25][26]; //Sized on tableId and AA.
-		static const std::vector <std::string> codonTableDefinition; //Description title for each codon table according to NCBI.
-		static const std::string codonArray[]; //List of codons.
-
-		static const std::map<std::string, unsigned> codonToIndexWithReference; //Map of indices to all codons.
-        static void createCodonTable(unsigned tableId, bool split = true); //Used to create the singleton instance.
-        static CodonTable* getInstance(); //Get the singleton instance.
-
-
         //Constructors & destructors:
         explicit CodonTable(); //Defaults to table 1 and splitting AA
         CodonTable(unsigned _tableId, bool _splitAA);
@@ -57,10 +40,6 @@ class CodonTable
         CodonTable(const CodonTable& other); //Todo: Need? If so update the function.
         CodonTable& operator=(const CodonTable& other); //Todo: Need? if so update the function.
 
-
-        //Other functions:
-        void setupCodonTable(); //Sets up the private variables that do all the mappings.
-        bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);
 
 
         //Getter functions:
@@ -80,6 +59,7 @@ class CodonTable
         std::string getForParamVectorCodon(unsigned codonIndex);
 
 
+
         //Mapping operations:
         unsigned AAToAAIndex(std::string aa);
         std::vector <unsigned> AAIndexToCodonRange(unsigned aaIndex, bool forParamVector = false);
@@ -90,6 +70,34 @@ class CodonTable
         unsigned codonToIndex(std::string& codon, bool forParamVector = false);
         unsigned codonToAAIndex(std::string& codon);
         std::string indexToAA(unsigned aaIndex);
+
+
+
+        //Other functions:
+        void setupCodonTable(); //Sets up the private variables that do all the mappings.
+        bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);
+
+
+        //Static variables & functions:
+        static const std::string Ser2;
+        static const std::string Ser1; //Necessary for codon table 12
+        static const std::string Thr4_1; //Necessary for codon table 3
+        static const std::string Thr4_2; //Necessary for codon table 3
+        static const std::string Leu1; //Necessary for codon table 16, 22
+
+
+        static const std::vector <std::string> aminoAcidArray; //Index = AA
+        static const std::vector <std::string> aminoAcidArrayWithoutSplit; //Array containing all non-split AAs.
+        static const std::map<std::string, unsigned> codonToIndexWithReference; //Map of indices to all codons.
+        static const std::string codonArray[]; //List of codons.
+        static const std::vector <std::string> codonTableDefinition;
+        //Description title for each codon table according to NCBI.
+
+        static const unsigned numCodonsPerAAForTable[25][26]; //Sized on tableId and AA.
+
+
+        static void createCodonTable(unsigned tableId, bool split = true); //Used to create the singleton instance.
+        static CodonTable* getInstance(); //Get the singleton instance.
 
 
 
@@ -105,6 +113,7 @@ class CodonTable
         std::string getForParamVectorCodonR(unsigned codonIndex);
 
 
+
         //Mapping operations:
         unsigned AAToAAIndexR(std::string aa);
         std::vector <unsigned> AAIndexToCodonRangeR(unsigned aaIndex, bool forParamVector = false);
@@ -115,6 +124,7 @@ class CodonTable
         unsigned codonToIndexR(std::string& codon, bool forParamVector = false);
         unsigned codonToAAIndexR(std::string& codon);
         std::string indexToAAR(unsigned aaIndex);
+
 
 
         //Static getter functions:

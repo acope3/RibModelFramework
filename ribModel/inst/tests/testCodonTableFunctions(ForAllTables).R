@@ -72,7 +72,7 @@ test_that("Get Ser1",{
 
 
 test_that("Get Thr4_1",{
-  expect_equal(getThr4_1(), "O")
+  expect_equal(getThr4_1(), "T")
 })
 
 
@@ -89,7 +89,7 @@ test_that("Get Leu1",{
 test_that("Get Amino Acid Array",{
   AAList <- getAminoAcidArray()
   trueList <- c("A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "U", "M", "N", "P", "Q",
-                "R", "J", "Z", "S", "T", "O", "B", "V", "W", "Y", "X")
+                "R", "J", "Z", "S", "T", "T", "B", "V", "W", "Y", "X")
   expect_equal(AAList, trueList)
 })
 
