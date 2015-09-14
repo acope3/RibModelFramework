@@ -33,6 +33,7 @@ RCPP_MODULE(Parameter_mod)
 		.method("getSynthesisRateVarianceByMixtureElementForGene", &Parameter::getSynthesisRateVarianceByMixtureElementForGene)
 		.method("getCurrentSynthesisRateForMixture", &Parameter::getCurrentSynthesisRateForMixture)
 		.method("getMixtureAssignmentForGene", &Parameter::getMixtureAssignmentForGeneR)
+		.method("getLastIteration", &Parameter::getLastIteration)
 		
 
 		.property("numMutationCategories", &Parameter::getNumMutationCategories)
