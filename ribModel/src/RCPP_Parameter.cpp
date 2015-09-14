@@ -65,6 +65,9 @@ RCPP_MODULE(Parameter_mod)
 		.method("getSphiVariance", &ROCParameter::getSphiVariance)
 		.method("getAphiVariance", &ROCParameter::getAphiVariance)
 
+		.method("getMutationPriorStandardDeviation", &ROCParameter::getMutationPriorStandardDeviation)
+		.method("setMutationPriorStandardDeviation", &ROCParameter::setMutationPriorStandardDeviation)
+
 		.method("getMutationVarianceForCodon", &ROCParameter::getMutationVarianceForCodon)
 		.method("getSelectionVarianceForCodon", &ROCParameter::getSelectionVarianceForCodon)
 

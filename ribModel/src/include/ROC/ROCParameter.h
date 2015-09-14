@@ -44,6 +44,8 @@ class ROCParameter : public Parameter
 		double bias_csp;
 		std::vector<double> std_csp;
 
+		double mutation_prior_sd;
+
 
 		// functions TODO: never used?
 		std::vector<double> propose(std::vector<double> currentParam, double (*proposal)(double a, double b), double A, std::vector<double> B);
@@ -94,6 +96,8 @@ class ROCParameter : public Parameter
 		// Phi epsilon functions
 		double getPhiEpsilon() { return phiEpsilon; }
 
+		double getMutationPriorStandardDeviation() { return mutation_prior_sd; }
+		void setMutationPriorStandardDeviation(double _mutation_prior_sd) { mutation_prior_sd = _mutation_prior_sd; }
 
 		// functions to manage codon specific parameter
 		void updateCodonSpecificParameter(std::string grouping);

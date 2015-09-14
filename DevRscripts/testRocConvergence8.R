@@ -19,8 +19,8 @@ geneAssignment <- rep(1,1000)
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
 
 # initialize MCMC object
-samples <- 100
-thining <- 10
+samples <- 10000
+thining <- 20
 adaptiveWidth <- 10
 divergence.iteration <- 50
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, 
@@ -32,7 +32,7 @@ model <- initializeModelObject(parameter, "ROC", with.phi = with.phi)
 #run mcmc on genome with parameter using model
 start <- Sys.time()
 system.time(
-    runMCMC(mcmc, genome, model, 4, divergence.iteration)
+  runMCMC(mcmc, genome, model, 4, divergence.iteration)
 )
 end <- Sys.time()
 end - start
@@ -43,11 +43,15 @@ trace <- parameter$getTraceObject()
 expected.phi.trace <- trace$getExpectedPhiTrace()
 sphi.trace <- trace$getSphiTrace()
 
-expressionValues <- unlist(lapply(1:genome$getGenomeSize(), function(geneIndex){
+initialExpressionValues <- unlist(lapply(1:genome$getGenomeSize(), function(geneIndex){
   expressionCategory <- parameter$getSynthesisRateCategoryForMixture(geneAssignment[geneIndex])
   trace$getSynthesisRateTraceForGene(geneIndex)[1]
 }))
 
+estsimatedExpressionValues <- unlist(lapply(1:genome$getGenomeSize(), function(geneIndex){
+  expressionCategory <- parameter$getSynthesisRateCategoryForMixture(geneAssignment[geneIndex])
+parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(samples, geneIndex, expressionCategory)
+}))
 
 colour <- c("black", "chartreuse4", "red", "blue", "blue4", "blueviolet", "darkgoldenrod2", "darkgreen", "darkorchid1", "deeppink2",
             "khaki4", "midnightblue", "lightsteelblue", "ivory4", "gray47", "orangered3", "slateblue4", "yellow3", "tomato3", "turquoise3",
@@ -55,15 +59,35 @@ colour <- c("black", "chartreuse4", "red", "blue", "blue4", "blueviolet", "darkg
             "cyan2", "darkcyan", "darkolivegreen3", "darkturquoise", "hotpink", "lightpink4", "mediumaquamarine", "springgreen2", "chartreuse", "azure4")
 
 
-run.name <- "single_mixture_convergence_test_1"
+run.name <- "single_mixture_convergence_test_8"
 
 pdf(paste(run.name, ".pdf", sep=""))
 plot(mcmc)
-
+acf(loglik.trace)
 plot(trace, what = "MixtureProbability")
 plot(trace, what = "Sphi")
 
 plot(trace, what = "ExpectedPhi")
+mixture <- 1
+plot(trace, what = "Mutation", mixture = mixture)
+plot(trace, what = "Selection", mixture = mixture)
+
+
+mixtureAssignment <- unlist(lapply(1:genome$getGenomeSize(),  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))
+expressionValues <- unlist(lapply(1:genome$getGenomeSize(), function(geneIndex){
+  expressionCategory <- parameter$getSynthesisRateCategoryForMixture(mixtureAssignment[geneIndex])
+  parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(samples, geneIndex, expressionCategory)
+}))
+expressionValues <- log10(expressionValues)
+#obs.phi <- log10(read.table("../ribModel/data/simulatedAllUniqueR_phi.csv", sep=",", header=T)[, 2])
+obs.phi <- log10(read.table("../ribModel/data/simulatedOneMix_phi.csv", sep=",", header=T)[, 2])
+plot(NULL, NULL, xlim=range(obs.phi) + c(-0.1, 0.1), ylim=range(expressionValues, na.rm = T) + c(-0.1, 0.1), 
+     main = "Synthesis Rate", xlab = "true values", ylab = "estimated values")
+upper.panel.plot(obs.phi[mixtureAssignment == 1], expressionValues[mixtureAssignment == 1], col="black")
+#upper.panel.plot(obs.phi[mixtureAssignment == 2], expressionValues[mixtureAssignment == 2], col="red")
+legend("topleft", legend = paste("Mixture Element", 1:numMixtures), 
+       col = ribModel:::.mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")
+
 
 
 #true.sel <- read.csv(file="../ribModel/data/simulated_selection0.csv", header=T)
@@ -80,12 +104,12 @@ for(aa in names.aa)
   codons <- AAToCodon(aa, T)
   for(i in 1:length(codons))
   {
-      cur.trace <- trace$getSelectionParameterTraceByMixtureElementForCodon(1, codons[i])
-      start.value <- c(start.value, cur.trace[1])
-      end.value <- c(end.value, cur.trace[length(cur.trace)])
-      true.value <- c(true.value, true.sel[as.character(true.sel[, 2]) == codons[i], 3])
-      post.estm <- c(post.estm, parameter$getSelectionPosteriorMeanForCodon(1, length(cur.trace) * 0.2, codons[i]) )
-      post.var <- c(post.var, 1.96*sqrt(parameter$getSelectionVarianceForCodon(1, length(cur.trace) * 0.2, codons[i], TRUE)) )
+    cur.trace <- trace$getSelectionParameterTraceByMixtureElementForCodon(1, codons[i])
+    start.value <- c(start.value, cur.trace[1])
+    end.value <- c(end.value, cur.trace[length(cur.trace)])
+    true.value <- c(true.value, true.sel[as.character(true.sel[, 2]) == codons[i], 3])
+    post.estm <- c(post.estm, parameter$getSelectionPosteriorMeanForCodon(1, length(cur.trace) * 0.2, codons[i]) )
+    post.var <- c(post.var, 1.96*sqrt(parameter$getSelectionVarianceForCodon(1, length(cur.trace) * 0.2, codons[i], TRUE)) )
   }
 }
 up <- post.estm + post.var
@@ -159,4 +183,5 @@ cat("Geweke Score: ", convergence.test(mcmc, n.samples = 50000, plot=F)$z, ", us
 dev.off()
 
 
-save(list=c("start.mut.values", "start.sel.values", "expressionValues", "loglik.trace", "expected.phi.trace", "sphi.trace"), file = paste(run.name, ".rda", sep=""))
+save(list=c("start.mut.values", "start.sel.values", "initialExpressionValues", "estsimatedExpressionValues", 
+            "loglik.trace", "expected.phi.trace", "sphi.trace"), file = paste(run.name, ".rda", sep=""))

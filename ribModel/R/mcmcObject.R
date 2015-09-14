@@ -32,9 +32,10 @@ convergence.test.Rcpp_MCMCAlgorithm <- function(mcmc, n.samples = 10, frac1 = 0.
   
   loglik.trace <- mcmc$getLogLikelihoodTrace()
   trace.length <- length(loglik.trace)
-  start <- max(0, trace.length - n.samples)
+  start <- max(1, trace.length - n.samples)
   
-  mcmcobj <- coda::mcmc(data=loglik.trace, start=start, thin=1)
+  # the start and end parameter do NOT work, using subsetting to achieve goal
+  mcmcobj <- coda::mcmc(data=loglik.trace[start:trace.length])
   diag <- coda::geweke.diag(mcmcobj, frac1=frac1, frac2=frac2)
   if(plot){ 
     coda::geweke.plot(mcmcobj, frac1=frac1, frac2=frac2)
@@ -42,3 +43,6 @@ convergence.test.Rcpp_MCMCAlgorithm <- function(mcmc, n.samples = 10, frac1 = 0.
     return(diag)
   }
 }
+
+
+

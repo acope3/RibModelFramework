@@ -99,6 +99,8 @@ ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
 
 void ROCParameter::initROCParameterSet()
 {
+	mutation_prior_sd = 0.35;
+
 	groupList = {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "P", "Q", "R", "S", "T", "V", "Y", "Z"};
 	// proposal bias and std for codon specific parameter
 	bias_csp = 0;

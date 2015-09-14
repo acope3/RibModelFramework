@@ -191,7 +191,34 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 		likelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
 		likelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation_proposed, selection_proposed, phiValue);
 	}
-	logAcceptanceRatioForAllMixtures = likelihood_proposed - likelihood;
+
+
+	double mutation_prior = calculateMutationPrior(grouping);
+	logAcceptanceRatioForAllMixtures = (likelihood_proposed - likelihood) - mutation_prior;
+}
+
+double ROCModel::calculateMutationPrior(std::string grouping)
+{
+	unsigned numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
+	double mutation[5];
+	double mutation_proposed[5];
+
+	double curr = 0.0;
+	double prop = 0.0;
+
+	unsigned numMutCat = parameter->getNumMutationCategories();
+	double mutation_prior_sd = parameter->getMutationPriorStandardDeviation();
+	for(unsigned i = 0u; i < numMutCat; i++)
+	{
+		parameter->getParameterForCategory(i, ROCParameter::dM, grouping, false, mutation);
+		parameter->getParameterForCategory(i, ROCParameter::dM, grouping, true, mutation_proposed);
+		for(unsigned k = 0u; k < numCodons; k++)
+		{
+			curr += Parameter::densityNorm(mutation[k], 0.0, mutation_prior_sd, true);
+			prop += Parameter::densityNorm(mutation_proposed[k], 0.0, mutation_prior_sd, true);
+		}
+	}
+	return curr - prop;
 }
 
 void ROCModel::obtainCodonCount(SequenceSummary& seqsum, std::string curAA, int codonCount[])
@@ -349,7 +376,7 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 			lpr = 0.0;
 			double Aphi = getAphi(i, false);
 			double Aphi_proposed = getAphi(i, true);
-			double AphiPropWidth = getCurrentAphiProposalWidth(i);
+			//double AphiPropWidth = getCurrentAphiProposalWidth(i);
 			double Sepsilon = getSepsilon(i);
 #ifndef __APPLE__
 #pragma omp parallel for reduction(+:lpr)
