@@ -101,7 +101,8 @@ ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
 
 void ROCParameter::initROCParameterSet()
 {
-	groupList = {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "P", "Q", "R", "S", "T", "V", "Y", "Z"};
+	CodonTable *CT = CodonTable::getInstance();
+	groupList = CT -> getAAListing();
 	// proposal bias and std for codon specific parameter
 	bias_csp = 0;
 	std_csp.resize(numParam, 0.1);
@@ -141,7 +142,7 @@ void ROCParameter::initROCParameterSet()
 	CodonTable *codonTable = CodonTable::getInstance();
   for (unsigned i = 0; i < maxGrouping; i++)
   {
-    std::string aa = CodonTable::aminoAcidArray[i];
+    std::string aa = groupList[i];
     unsigned numCodons = codonTable -> getNumCodonsForAA(aa, true);
     CovarianceMatrix m((numMutationCategories + numSelectionCategories) * numCodons);
     m.choleskiDecomposition();

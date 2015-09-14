@@ -14,16 +14,9 @@ SequenceSummary::SequenceSummary()
 
 SequenceSummary::SequenceSummary(const std::string& sequence)
 {
-	std::cout <<"ABOUT TO CLEAR --CONSTRUCTOR\n";
 	clear();
-	std::cout <<"CLEAR DONE --CONSTRUCTOR\n";
 	CodonTable *codonTable = CodonTable::getInstance();
-	//std::vector <std::string> aalist = codonTable -> getAAListing();
-	//std::cout <<"here\n";
-	//std::cout <<size<<"\n";
 	naa.resize(codonTable -> getAAListing().size(), 0);
-	//std::cout <<"here\n";
-	std::cout <<"ABOUT TO PROCESS SEQUENCE --CONSTRUCTOR\n";
 	processSequence(sequence);
 }
 
@@ -154,7 +147,10 @@ void SequenceSummary::clear()
 		ncodons[k] = 0;
 		RFPObserved[k] = 0;
 	}
-	naa.clear();
+	for (unsigned k = 0; k < naa.size(); k++)
+	{
+		naa[k] = 0;
+	}
 }
 
 
@@ -164,13 +160,11 @@ bool SequenceSummary::processSequence(const std::string& sequence)
 	//RFP sets RFPObserved by codon, and not by setting the sequence. This causes
 	//the values to be zero during the MCMC.
 
-	std::cout <<"PROCESS SEQUENCE\n";
 	bool check = true;
 	int codonID;
 	int aaID;
 	std::string codon;
 
-	std::cout <<"sequence length is " << sequence.length() <<"\n";
 	codonPositions.resize(64);
 	CodonTable *codonTable = CodonTable::getInstance();
 	for (unsigned i = 0u; i < sequence.length(); i += 3)

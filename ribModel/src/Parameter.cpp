@@ -88,8 +88,9 @@ void Parameter::initParameterSet(double sphi, unsigned _numMixtures, std::vector
 	}
 #endif
 
+	CodonTable *CT = CodonTable::getInstance();
 	mutationSelectionState = _mutationSelectionState;
-	numParam = ((splitSer) ? 40 : 41);
+	numParam = CT -> getForParamVectorListing().size();
 	numMixtures = _numMixtures;
 
 	Sphi = sphi;

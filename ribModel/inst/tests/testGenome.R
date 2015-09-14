@@ -3,6 +3,7 @@ library(ribModel)
 
 context("Genome")
 
+createCodonTable(1, TRUE)
 genome <- new(Genome)
 
 test_that("check Index", {
@@ -35,7 +36,7 @@ test_that("clear", {
    genome$clear()
    expect_equal(genome$getGenes(FALSE), list())
    expect_equal(genome$getGenes(TRUE), list())
-   expect_equal(genome$getNumGenesWithPhi(), 0)
+   expect_equal(genome$getNumGenesWithPhi(), numeric(0)) #TODO: implement valid method
 
 })
 
@@ -109,7 +110,7 @@ test_that("read RFP File", {
     ss1 <- g1$getSequenceSummary()
     ss2 <- g2$getSequenceSummary()
     ss3 <- g3$getSequenceSummary()
-    codonList <- codons()
+    codonList <- getCodonArray()
     for (codon in codonList){
       expect_equal(compss1$getRFPObservedForCodon(codon),ss1$getRFPObservedForCodon(codon))
     }
@@ -138,7 +139,7 @@ test_that("write RFP File", {
   compss1 <- ffg1$getSequenceSummary()
   compss2 <- ffg2$getSequenceSummary()
   compss3 <- ffg3$getSequenceSummary()
-  codonList <- codons()
+  codonList <- getCodonArray()
   for (codon in codonList){
     expect_equal(compss1$getRFPObservedForCodon(codon),ss1$getRFPObservedForCodon(codon))
     expect_equal(compss1$getCodonCountForCodon(codon), ss1$getCodonCountForCodon(codon))

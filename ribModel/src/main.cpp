@@ -368,6 +368,7 @@ void testMultiplePhi()
 {
 	std::cout <<"----------TEST MULTIPLEPHI----------\n";
 
+	CodonTable::createCodonTable(1, true);
 	Genome genome;
 	genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/test.fasta");
 	genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/testReadObservedPhiValuesValid.csv", false);
@@ -438,7 +439,7 @@ int main()
 		//testReadMutationValues();
 		//testGeneSequenceSummary();
 		//testReadMutationValues();
-		//testMultiplePhi();
+		testMultiplePhi();
 		//codonTableTest();
 		testProcessSequence();
 	}

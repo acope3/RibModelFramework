@@ -355,7 +355,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 								std::cerr <<"WARNING! Negative phi value given - values should not be on the log scale. Negative Value stored.";
 							}
 						}
-						else 
+						else
 						{
 							numGenesWithPhi[count]++;
 						}
@@ -490,9 +490,14 @@ std::vector <Gene> Genome::getGenes(bool simulated)
 }
 
 
-unsigned Genome::getNumGenesWithPhi(unsigned index)
+unsigned Genome::getNumGenesWithPhiForIndex(unsigned index)
 {
 	return numGenesWithPhi[index];
+}
+
+std::vector <unsigned> Genome::getNumGenesWithPhi()
+{
+	return numGenesWithPhi;
 }
 
 
