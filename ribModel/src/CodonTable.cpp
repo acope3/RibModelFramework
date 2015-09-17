@@ -1,4 +1,4 @@
-#include "../include/CodonTable.h"
+#include "include/CodonTable.h"
 
 #include <iostream>
 
