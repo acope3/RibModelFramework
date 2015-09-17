@@ -329,7 +329,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	std::cout << "\tEstimate SynthesisRate Parameters? " << (estimateSynthesisRate ? "TRUE" : "FALSE") << std::endl;
 
 	// set the last iteration to the max iterations, this way if the MCMC doesn't exit based on Geweke score, it will use the max iteration for posterior means
-	model.setLastIteration(maximumIterations);
+	model.setLastIteration(samples);
 	std::cout << "\tStarting MCMC with " << maximumIterations << " iterations\n";
 	for(unsigned iteration = 0u; iteration < maximumIterations; iteration++)
 	{
@@ -408,7 +408,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 			{
 				std::cout << "Stopping run based on convergence after " << iteration << " iterations\n" << std::endl;
 				// Comment out this break to keep the run from stopping on convergence
-				model.setLastIteration(iteration);
+				model.setLastIteration(iteration/thining);
 				break;
 			}
 		}
