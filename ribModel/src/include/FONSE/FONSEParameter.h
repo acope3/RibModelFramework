@@ -44,14 +44,14 @@ class FONSEParameter : public Parameter
 		FONSEParameter();
 		FONSEParameter(const FONSEParameter &other);
 		explicit FONSEParameter(std::string filename);
-		FONSEParameter(double sphi, unsigned _numMixtures, std::vector <unsigned> geneAssignment,
+		FONSEParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector <unsigned> geneAssignment,
 			std::vector <std::vector <unsigned> > thetaKmatrix, bool splitSer = true,
 			std::string _mutationSelectionState = "allUnique");
 
 		virtual ~FONSEParameter();
 #ifndef STANDALONE
-		FONSEParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer = true);
-		FONSEParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer = true, std::string _mutationSelectionState = "allUnique");
+		FONSEParameter(std::vector<double> sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer = true);
+		FONSEParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer = true, std::string _mutationSelectionState = "allUnique");
 		void initCovarianceMatrix(SEXP matrix, std::string aa);
 #endif
 
@@ -87,7 +87,13 @@ class FONSEParameter : public Parameter
 
 		void updateCodonSpecificParameter(std::string grouping);
 
-		virtual void updateSphiTrace(unsigned sample) { traces.updateSphiTrace(sample, Sphi); }
+		virtual void updateSphiTrace(unsigned sample)
+		{
+			for(unsigned i = 0u; i < numSelectionCategories; i++)
+			{
+				traces.updateSphiTrace(sample, Sphi[i], i);
+			}
+		}
 		virtual void updateSynthesisRateTrace(unsigned sample, unsigned geneIndex){ traces.updateSynthesisRateTrace(sample, geneIndex, currentSynthesisRateLevel); }
 		virtual void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex) { traces.updateMixtureAssignmentTrace(sample, geneIndex, mixtureAssignment[geneIndex]); }
 		virtual void updateMixtureProbabilitiesTrace(unsigned samples) { traces.updateMixtureProbabilitiesTrace(samples, categoryProbabilities); }
@@ -106,10 +112,10 @@ class FONSEParameter : public Parameter
 		virtual void setNumPhiGroupings(unsigned _phiGroupings);
 		virtual void adaptSphiProposalWidth(unsigned adaptationWidth);
 		virtual void adaptSynthesisRateProposalWidth(unsigned adaptationWidth);
-		virtual double getSphiPosteriorMean(unsigned samples);
+		virtual double getSphiPosteriorMean(unsigned samples, unsigned mixture);
 		virtual std::vector <double> getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex);
 		virtual double getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement);
-		virtual double getSphiVariance(unsigned samples, bool unbiased = true);
+		virtual double getSphiVariance(unsigned samples, unsigned mixture, bool unbiased = true);
 		virtual double getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement, bool unbiased = true);
 		double getMutationPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon);
 		double getSelectionPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon);

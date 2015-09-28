@@ -280,7 +280,6 @@ void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned
 		// prior on phi values -> take prior into account, but only the prior no likelihood
 		int numGenes = genome.getGenomeSize();
 		unsigned numSynthesisRateCategories = model.getNumSynthesisRateCategories();
-		double sPhi = model.getSphi(false);
 		for(int i = 0; i < numGenes; i++)
 		{
 
@@ -291,9 +290,14 @@ void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned
 				double phiValue = model.getSynthesisRate(i, expressionCategory, false);
 				double phiValue_proposed = model.getSynthesisRate(i, expressionCategory, true);
 
+				unsigned mixture = model.getMixtureAssignment(k);
+				mixture = model.getSynthesisRateCategory(mixture);
+				double sPhi = model.getSphi(mixture, false);
+				double mPhi = (-(sPhi * sPhi) / 2);
+
 				// accept/ reject based on prior ratio
-				double logPhiProbability = std::log(ROCParameter::densityLogNorm(phiValue, (-(sPhi * sPhi) / 2), sPhi));
-				double logPhiProbability_proposed = std::log(Parameter::densityLogNorm(phiValue_proposed, (-(sPhi * sPhi) / 2), sPhi));
+				double logPhiProbability = std::log(ROCParameter::densityLogNorm(phiValue, mPhi, sPhi));
+				double logPhiProbability_proposed = std::log(Parameter::densityLogNorm(phiValue_proposed, mPhi, sPhi));
 				if( -Parameter::randExp(1) < (logPhiProbability_proposed - logPhiProbability) )
 				{
 					model.updateSynthesisRate(i, k);
@@ -462,6 +466,111 @@ double MCMCAlgorithm::calculateGewekeScore(unsigned current_iteration)
 	// Geweke score
 	return (posteriorMean1 - posteriorMean2) / std::sqrt( ( posteriorVariance1 / numSamples1 ) + ( posteriorVariance2 / numSamples2 ) );
 }
+
+
+void MCMCAlgorithm::solveToeplitzMatrix(int lr, double* r, double* g, double** f, double* var, double* a)
+{
+
+//      solves Toeplitz matrix equation toep(r)f=g(1+.)
+//		by Levinson's algorithm
+//      a is a workspace of size lr, the number of equations
+
+
+unsigned l1,l2,k;
+double v, d, q, hold;
+v = r[1];
+d = r[2];
+a[1] = 1.0;
+f[1][1] = g[2]/v;
+q = f[1][1]*r[2];
+var[1] = (1 - f[1][1]*f[1][1])*r[1];
+
+if (lr == 1) return;
+for(unsigned l = 2; l < lr; l++)
+{
+  a[l] = -d/v;
+  if (l > 2)
+  {
+    l1 = (l - 2)/2;
+    l2 = l1 + 1;
+    for(unsigned j = 2; j < l2; j++)
+    {
+      hold = a[j];
+      k = l - j + 1;
+      a[j] = a[j] + a[l]*a[k];
+      a[k] = a[k] + a[l]*hold;
+    }
+    if (2*l1 != l - 2) a[l2+1] = a[l2+1]*(1.0 + a[l]);
+  }
+  v = v + a[l]*d;
+  f[l][l] = (g[l+1] - q)/v;
+  for(unsigned j = 1; j < (l-1); j++)
+  {
+	  f[l][j] = f[l-1][j] + f[l][l]*a[l-j+1];
+  }
+//  estimate the innovations variance
+  var[l] = var[l-1] * (1 - f[l][l]*f[l][l]);
+  if (l == lr) return;
+  d = 0.0;
+  q = 0.0;
+  for(unsigned i = 1; i < l; i++)
+  {
+    k = l-i+2;
+    d = d + a[i]*r[k];
+    q = q + f[l][i]*r[k];
+  }
+}
+return;
+}
+
+
+void MCMCAlgorithm::acf(double *x, int nrows, int ncols, int lagmax, bool correlation, double *acf)
+{
+    int d1 = lagmax + 1, d2 = ncols*d1;
+
+    for(int u = 0; u < ncols; u++)
+    {
+		for(int v = 0; v < ncols; v++)
+		{
+			for(int lag = 0; lag <= lagmax; lag++)
+			{
+				double sum = 0.0; int nu = 0;
+				for(int i = 0; i < nrows-lag; i++)
+				{
+					nu++;
+					sum += x[i + lag + nrows*u] * x[i + nrows*v];
+				}
+				acf[lag + d1*u + d2*v] = sum/(nu + lag);
+			}
+		}
+    }
+    if(correlation) {
+		if(nrows == 1) {
+			for(int u = 0; u < ncols; u++)
+			{
+				acf[0 + d1*u + d2*u] = 1.0;
+			}
+		} else {
+			double *se = new double[ncols]();
+			for(int u = 0; u < ncols; u++)
+			{
+				se[u] = sqrt(acf[0 + d1*u + d2*u]);
+			}
+			for(int u = 0; u < ncols; u++)
+			{
+				for(int v = 0; v < ncols; v++)
+				{
+					for(int lag = 0; lag <= lagmax; lag++) // ensure correlations remain in  [-1,1] :
+					{
+						double a = acf[lag + d1*u + d2*v] / (se[u]*se[v]);
+						acf[lag + d1*u + d2*v] = (a > 1.) ? 1. : ((a < -1.) ? -1. : a);
+					}
+				}
+			}
+		}
+    }
+}
+
 
 double MCMCAlgorithm::getLogLikelihoodPosteriorMean(unsigned _samples)
 {

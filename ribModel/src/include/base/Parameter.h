@@ -45,7 +45,7 @@ class Parameter {
 
 		Parameter();
 		Parameter(unsigned maxGrouping);
-		void initParameterSet(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
+		void initParameterSet(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
 				std::vector<std::vector<unsigned>> mixtureDefinitionMatrix, bool splitSer = true,
 				std::string _mutationSelectionState = "allUnique");
 		Parameter& operator=(const Parameter& rhs);
@@ -63,17 +63,20 @@ class Parameter {
 		}
 
 		// functions to manage Sphi
-		double getSphi(bool proposed = false)
+		double getSphi(unsigned selectionCategory, bool proposed = false)
 		{
-			return (proposed ? Sphi_proposed : Sphi);
+			return (proposed ? Sphi_proposed[selectionCategory] : Sphi[selectionCategory]);
 		}
-		void setSphi(double sPhi)
+		void setSphi(double sPhi, unsigned selectionCategory)
 		{
-			Sphi = sPhi;
+			Sphi[selectionCategory] = sPhi;
 		}
 		void updateSphi()
 		{
-			Sphi = Sphi_proposed;
+			for(unsigned i = 0u; i < numSelectionCategories; i++)
+			{
+				Sphi[i] = Sphi_proposed[i];
+			}
 			numAcceptForSphi++;
 		}
 
@@ -182,12 +185,12 @@ class Parameter {
 
 		// functions to return estimates
 		virtual double getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement) = 0;
-		virtual double getSphiPosteriorMean(unsigned samples) = 0;
+		virtual double getSphiPosteriorMean(unsigned samples, unsigned mixture) = 0;
 		unsigned getEstimatedMixtureAssignment(unsigned samples, unsigned geneIndex);
 		virtual std::vector<double> getEstimatedMixtureAssignmentProbabilities(unsigned samples,
 				unsigned geneIndex) = 0;
 
-		virtual double getSphiVariance(unsigned samples, bool unbiased = true) = 0;
+		virtual double getSphiVariance(unsigned samples, unsigned mixture, bool unbiased) = 0;
 		virtual double getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement,
 				bool unbiased = true) = 0;
 
@@ -256,8 +259,8 @@ class Parameter {
 		unsigned getGroupListSize();
 
 	protected:
-		double Sphi;
-		double Sphi_proposed;
+		std::vector<double> Sphi;
+		std::vector<double> Sphi_proposed;
 
 		unsigned phiGroupings;
 		unsigned numMixtures;

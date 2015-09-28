@@ -14,8 +14,8 @@ Parameter::Parameter()
 {
 	numParam = 0u;
 	phiGroupings = 0u;
-	Sphi = 0.1;
-	Sphi_proposed = 0.0;
+	Sphi.resize(1);
+	Sphi_proposed.resize(1);
 	numAcceptForSphi = 0u;
 	bias_sphi = 0.0;
 	bias_phi = 0.0;
@@ -31,8 +31,8 @@ Parameter::Parameter(unsigned _maxGrouping)
 {
 	numParam = 0u;
 	phiGroupings = 0u;
-	Sphi = 0.1;
-	Sphi_proposed = 0.0;
+	Sphi.resize(1);
+	Sphi_proposed.resize(1);
 	numAcceptForSphi = 0u;
 	bias_sphi = 0.0;
 	bias_phi = 0.0;
@@ -46,12 +46,17 @@ Parameter::Parameter(unsigned _maxGrouping)
 
 Parameter& Parameter::operator=(const Parameter& rhs)
 {
-  if (this == &rhs) return *this; // handle self assignment
-  numParam = rhs.numParam;
+	if (this == &rhs) return *this; // handle self assignment
+	numParam = rhs.numParam;
 
+	Sphi.resize(rhs.Sphi.size());
+	Sphi_proposed.resize(rhs.Sphi.size());
+	for(unsigned i = 0u; i < rhs.Sphi.size(); i++)
+	{
+		Sphi[i] = rhs.Sphi[i];
+		Sphi_proposed[i] = rhs.Sphi_proposed[i];
+	}
 
-  Sphi = rhs.Sphi;
-  Sphi_proposed = rhs.Sphi_proposed;
   numAcceptForSphi = rhs.numAcceptForSphi;
   phiGroupings = rhs.phiGroupings;
   categories = rhs.categories;
@@ -84,7 +89,7 @@ Parameter& Parameter::operator=(const Parameter& rhs)
   return *this;
 }
 
-void Parameter::initParameterSet(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, 
+void Parameter::initParameterSet(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
 		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix, bool splitSer, std::string _mutationSelectionState)
 {
 	// assign genes to mixture element
@@ -107,9 +112,13 @@ void Parameter::initParameterSet(double sphi, unsigned _numMixtures, std::vector
 	mutationSelectionState = _mutationSelectionState;
 	numParam = ((splitSer) ? 40 : 41);
 	numMixtures = _numMixtures;
-
-	Sphi = sphi;
-	Sphi_proposed = sphi;
+	Sphi.resize(sphi.size());
+	Sphi_proposed.resize(sphi.size());
+	for(unsigned i = 0u; i < sphi.size(); i++)
+	{
+		Sphi[i] = sphi[i];
+		Sphi_proposed[i] = sphi[i];
+	}
 	bias_sphi = 0;
 	std_sphi = 0.1;
 
@@ -269,7 +278,14 @@ void Parameter::writeBasicRestartFile(std::string filename)
 		else oss << " ";
 	}
 	if (i % 10 != 0) oss << "\n";
-	oss <<">Sphi:\n" << Sphi <<"\n";
+	oss <<">Sphi:\n";
+	for (i = 0; i < Sphi.size(); i++)
+	{
+		oss << Sphi[i];
+		if ((i + 1) % 10 == 0) oss <<"\n";
+		else oss <<" ";
+	}
+	if (i % 10 != 0) oss <<"\n";
 	oss <<">numParam:\n" << numParam <<"\n";
 	oss <<">numMixtures:\n" << numMixtures <<"\n";
 	oss <<">std_sphi:\n" << std_sphi <<"\n";
@@ -399,7 +415,15 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 					groupList.push_back(val);
 				}
 			} 
-			else if (variableName == "Sphi") {iss.str(tmp); iss >> Sphi;}
+			else if (variableName == "Sphi")
+			{
+				unsigned val;
+				iss.str(tmp);
+				while (iss >> val)
+				{
+					Sphi.push_back(val);
+				}
+			}
 			else if (variableName == "numParam") {iss.str(tmp); iss >> numParam;}	
 			else if (variableName == "numMutationCategories") {iss.str(tmp); iss >> numMutationCategories;} 	
 			else if (variableName == "numSelectionCategories") {iss.str(tmp); iss >> numSelectionCategories;}	
@@ -755,7 +779,10 @@ void Parameter::InitializeSynthesisRate(std::vector<double> expression)
 
 void Parameter::proposeSphi()
 {
-	Sphi_proposed = std::exp(randNorm(std::log(Sphi), std_sphi));
+	for(unsigned i = 0u; i < numSelectionCategories; i++)
+	{
+		Sphi_proposed[i] = std::exp(randNorm(std::log(Sphi[i]), std_sphi));
+	}
 }
 
 void Parameter::proposeSynthesisRateLevels()

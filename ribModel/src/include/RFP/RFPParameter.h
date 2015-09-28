@@ -42,11 +42,18 @@ class RFPParameter: public Parameter {
 		//Constructors & destructors:
 		explicit RFPParameter();
 		RFPParameter(std::string filename);
-		RFPParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
+		RFPParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
 				std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer = true,
 				std::string _mutationSelectionState = "allUnique");
 		virtual ~RFPParameter();
 		RFPParameter& operator=(const RFPParameter& rhs);
+#ifndef STANDALONE
+		SEXP calculateSelectionCoefficientsR(unsigned sample, unsigned mixture);
+		RFPParameter(std::vector<double> sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix,
+			bool splitSer = true);
+		RFPParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer = true,
+			std::string _mutationSelectionState = "allUnique");
+#endif
 
 
 		//Initialization functions:
@@ -89,14 +96,14 @@ class RFPParameter: public Parameter {
 
 
 		//Posterior mean functions:
-		virtual double getSphiPosteriorMean(unsigned samples);
+		virtual double getSphiPosteriorMean(unsigned samples, unsigned mixture);
 		virtual double getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement);
 		double getAlphaPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon);
 		double getLambdaPrimePosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon);
 
 
 		//Variance functions:
-		virtual double getSphiVariance(unsigned samples, bool unbiased = true);
+		virtual double getSphiVariance(unsigned samples, unsigned mixture, bool unbiased = true);
 		virtual double getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement,
 				bool unbiased = true);
 		double getAlphaVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased = true);
@@ -130,13 +137,6 @@ class RFPParameter: public Parameter {
 		double getLambdaPrimeVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased);
 
 
-#ifndef STANDALONE
-		SEXP calculateSelectionCoefficientsR(unsigned sample, unsigned mixture);
-		RFPParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix,
-			bool splitSer = true);
-		RFPParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer = true,
-			std::string _mutationSelectionState = "allUnique");
-#endif
 
 
 	protected:

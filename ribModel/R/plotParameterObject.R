@@ -63,7 +63,7 @@ upper.panel.plot <- function(x, y, ...)
     eq <- paste("y = ", sprintf("%.3f", intercept), " + ", sprintf("%.3f", slope), "x *", sep = "")
     text(xlim[1] + width * 0.1, ylim[2] - height * 0.2, eq)
   }else{
-    eq <- paste("y = ", sprintf("%.3f", intercept), " + ", sprintf("%.3f", slope), sep = "")
+    eq <- paste("y = ", sprintf("%.3f", intercept), " + ", sprintf("%.3f", slope), "x", sep = "")
     text(xlim[1] + width * 0.1, ylim[2] - height * 0.2, eq)
   } 
   text(xlim[2] - width * 0.04, ylim[1] + height * 0.05,

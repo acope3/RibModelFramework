@@ -30,7 +30,7 @@ class Model
 		//Parameter wrapper functions:
 		virtual void initTraces(unsigned samples, unsigned num_genes) = 0;
 		virtual void writeRestartFile(std::string filename) = 0;
-		virtual double getSphi(bool proposed = false) = 0;
+		virtual double getSphi(unsigned selectionCategory, bool proposed = false) = 0;
 		virtual unsigned getNumPhiGroupings() = 0;
 		virtual void setNumPhiGroupings(unsigned value) = 0;
 		virtual unsigned getNumMixtureElements() = 0;

@@ -53,7 +53,7 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
   }
   # initialize expression values
   if(is.null(expressionValues)){
-    parameter$initializeSynthesisRateByGenome(genome, sphi)
+    parameter$initializeSynthesisRateByGenome(genome, mean(sphi))
   }else{
     parameter$initializeSynthesisRateByList(expressionValues)
   }
@@ -69,7 +69,7 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
   {
     if(aa == "M" || aa == "W" || aa == "X") next
     
-    codonCounts <- getCodonCountsForAA(aa)
+    codonCounts <- getCodonCountsForAA(aa, genome)
     numCodons <- dim(codonCounts)[2] - 1
     #-----------------------------------------
     # TODO WORKS CURRENTLY ONLY FOR ALLUNIQUE!
@@ -185,7 +185,7 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures, geneAssign
   {
     if(aa == "M" || aa == "W" || aa == "X") next
     
-    codonCounts <- getCodonCountsForAA(aa)
+    codonCounts <- getCodonCountsForAA(aa, genome)
     numCodons <- dim(codonCounts)[2] - 1
     #-----------------------------------------
     # TODO WORKS CURRENTLY ONLY FOR ALLUNIQUE!
@@ -283,7 +283,7 @@ writeParameterToCSV.Rcpp_ROCParameter <- function(parameter, filename=NULL, CSP=
   }
 }
 
-getCodonCountsForAA <- function(aa)
+getCodonCountsForAA <- function(aa, genome)
 {
   # get codon count for aa
   codons <- AAToCodon(aa, F)

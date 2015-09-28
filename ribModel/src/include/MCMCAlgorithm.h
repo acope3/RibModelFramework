@@ -53,6 +53,9 @@ class MCMCAlgorithm
 		std::vector<double> getLogLikelihoodTrace() {return likelihoodTrace;}
 		double getLogLikelihoodPosteriorMean(unsigned samples);
 
+		static void acf(double *x, int nrows, int ncols, int lagmax, bool correlation, double *acf);
+		static void solveToeplitzMatrix(int lr, double* r, double* g, double** f, double* var, double* a);
+
 	protected:
 };
 
