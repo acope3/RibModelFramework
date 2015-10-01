@@ -8,7 +8,7 @@
 
 FONSEModel::FONSEModel() : Model()
 {
-	parameter = nullptr;
+	parameter = 0;
 }
 
 FONSEModel::~FONSEModel()

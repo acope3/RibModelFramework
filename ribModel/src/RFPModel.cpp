@@ -9,6 +9,7 @@ using namespace Rcpp;
 
 RFPModel::RFPModel() : Model()
 {
+	parameter = 0;
 	//ctor
 }
 

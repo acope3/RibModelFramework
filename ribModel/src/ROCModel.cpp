@@ -2,7 +2,7 @@
 
 ROCModel::ROCModel(bool _withPhi) : Model()
 {
-	parameter = nullptr;
+	parameter = 0;
 	withPhi = _withPhi;
 }
 
