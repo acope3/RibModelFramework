@@ -641,7 +641,7 @@ RCPP_MODULE(MCMCAlgorithm_mod)
 		.method("setRestartFileSettings", &MCMCAlgorithm::setRestartFileSettings)
 		;
 
-	function("TestACF", &MCMCAlgorithm::acf); //TEST THAT ONLY!
-	function("solveToeplitzMatrix", &MCMCAlgorithm::solveToeplitzMatrix); //TEST THAT ONLY!
+	Rcpp::function("TestACF", &MCMCAlgorithm::acf); //TEST THAT ONLY!
+	Rcpp::function("solveToeplitzMatrix", &MCMCAlgorithm::solveToeplitzMatrix); //TEST THAT ONLY!
 }
 #endif
