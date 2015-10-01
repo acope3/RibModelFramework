@@ -40,9 +40,9 @@ class Parameter {
 		static const std::string allUnique;
 		static const std::string selectionShared;
 		static const std::string mutationShared;
-
+#ifdef STANDALONE
 		static std::default_random_engine generator; // static to make sure that the same generator is during the runtime.
-
+#endif
 		Parameter();
 		Parameter(unsigned maxGrouping);
 		void initParameterSet(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,

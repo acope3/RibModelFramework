@@ -7,9 +7,10 @@ if (with.phi) {
   genome <- initializeGenomeObject(file = "../ribModel/data/simulatedAllUniqueR.fasta", expression.file = "../ribModel/data/simulatedAllUniqueR_phi.csv")
   #genome <- initializeGenomeObject(file = "../ribModel/data/simulatedOneMix.fasta", expression.file = "../ribModel/data/simulatedOneMix_simphi.csv")
 } else {
+  genome <- initializeGenomeObject(file = "../ribModel/data/realGenomes/Skluyveri.fasta")
   #genome <- initializeGenomeObject(file = "../ribModel/data/twoMixtures/simulatedAllUniqueR.fasta")
   #genome <- initializeGenomeObject(file = "../ribModel/data/genome_2000.fasta")
-  genome <- initializeGenomeObject(file = "../ribModel/data/twoMixtures/simulatedKluyveri_full.fasta")
+  #genome <- initializeGenomeObject(file = "../ribModel/data/twoMixtures/simulatedKluyveri_full.fasta")
   #genome <- initializeGenomeObject(file = "../../../organisms/human/data/human_genome_cds_brain.fasta")
 }
  
@@ -17,8 +18,8 @@ if (with.phi) {
 sphi_init <- c(1, 1)
 numMixtures <- 2
 mixDef <- "allUnique"
-geneAssignment <- c(rep(1,4860), rep(2,457)) # simulated Skluyveri
-#geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457), rep(1, 3903)) # S.kluyveri full genome
+#geneAssignment <- c(rep(1,4860), rep(2,457)) # simulated Skluyveri
+geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457), rep(1, 3903)) # S.kluyveri full genome
 #geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
 #geneAssignment <- rep(1,328) # human brain
 #geneAssignment <- c(rep(1,500), rep(2,500))
@@ -32,7 +33,7 @@ parameter$initializeSynthesisRateByRandom(phivals)
 parameter$initMutationCategories(c("../ribModel/data/Skluyveri_mutation_ChrA.csv", "../ribModel/data/Skluyveri_mutation_ChrCleft.csv") , 2)
 parameter$initSelectionCategories(c("../ribModel/data/Skluyveri_selection_ChrA.csv", "../ribModel/data/Skluyveri_selection_ChrCleft.csv") , 2)
 # initialize MCMC object
-samples <- 50000
+samples <- 1000
 thining <- 10
 adaptiveWidth <- 10
 divergence.iteration <- 0
@@ -49,11 +50,11 @@ system.time(
 
 #plots log likelihood trace, possibly other mcmc diagnostics in the future
 
-pdf("Skluyveri_Genome_allUnique_startCSP_VGAM_startPhi_SCUO_adaptSphi_True.pdf", width = 11, height = 12)
+pdf("Skluyveri_Kluyveri_allUnique_startCSP_VGAM_startPhi_SCUO_adaptSphi_True.pdf", width = 11, height = 12)
 plot(mcmc)
 loglik.trace <- mcmc$getLogLikelihoodTrace()
 acf(loglik.trace)
-convergence.test(mcmc, n.samples = 50, plot=T)
+convergence.test(mcmc, n.samples = 500, plot=T)
 
 # plots different aspects of trace
 trace <- parameter$getTraceObject()
@@ -72,7 +73,7 @@ expressionValues <- unlist(lapply(1:genome$getGenomeSize(), function(geneIndex){
   parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(samples, geneIndex, expressionCategory)
 }))
 expressionValues <- log10(expressionValues)
-obs.phi <- log10(read.table("../ribModel/data/twoMixtures/simulatedKluyveri_full_phi.csv", sep=",", header=T)[, 2])
+obs.phi <- log10(read.table("../ribModel/data/realGenomes/Skluyveri_phi.csv", sep=",", header=T)[, 2])
 #obs.phi <- log10(read.table("../ribModel/data/twoMixtures/simulatedAllUniqueR_phi.csv", sep=",", header=T)[, 2])
 #obs.phi <- log10(read.table("../ribModel/data/genome_2000.phi.csv", sep=",", header=T)[, 2])
 plot(NULL, NULL, xlim=range(obs.phi) + c(-0.1, 0.1), ylim=range(expressionValues, na.rm = T) + c(-0.1, 0.1), 
@@ -89,7 +90,7 @@ dev.off()
 
 #plot(trace, what = "Expression", geneIndex = 999, mixture = 2)
 
-pdf("Skluyveri_Genome_allUnique_startCSP_VGAM_startPhi_SCUO_adaptSphi_True_mix1.pdf", width = 11, height = 12)
+pdf("Skluyveri_Kluyveri_allUnique_startCSP_VGAM_startPhi_SCUO_adaptSphi_True_mix1.pdf", width = 11, height = 12)
 mixture <- 1 
 plot(trace, what = "Mutation", mixture = mixture)
 plot(trace, what = "Selection", mixture = mixture)
@@ -102,8 +103,8 @@ names.aa <- aminoAcids()
 selection <- c()
 mutation <- c()
 codon.storage <- c()
-csp.m <- -read.table("../ribModel/data/realGenomes/Skluyveri_mutation_ChrA.csv", sep=",", header=T)
-csp.e <- -read.table("../ribModel/data/realGenomes/Skluyveri_selection_ChrA.csv", sep=",", header=T)
+csp.m <- read.table("../ribModel/data/realGenomes/Skluyveri_mutation_ChrA.csv", sep=",", header=T)
+csp.e <- read.table("../ribModel/data/realGenomes/Skluyveri_selection_ChrA.csv", sep=",", header=T)
 #csp.m <- read.table("../ribModel/data/twoMixtures/simulated_mutation0.csv", sep=",", header=T)
 #csp.e <- read.table("../ribModel/data/twoMixtures/simulated_selection0.csv", sep=",", header=T)
 #csp.m <- read.table("../ribModel/data/simulatedOneMix_mutation.csv", sep=",", header=T)
@@ -133,7 +134,7 @@ dev.off()
 
 
 
-pdf("Skluyveri_Genome_allUnique_startCSP_VGAM_startPhi_SCUO_adaptSphi_True_mix2.pdf", width = 11, height = 12)
+pdf("Skluyveri_Kluyveri_allUnique_startCSP_VGAM_startPhi_SCUO_adaptSphi_True_mix2.pdf", width = 11, height = 12)
 mixture <- 2
 plot(trace, what = "Mutation", mixture = mixture)
 plot(trace, what = "Selection", mixture = mixture)
@@ -145,8 +146,8 @@ plot(model, genome, parameter, samples = samples*0.1, mixture = mixture, main = 
 names.aa <- aminoAcids()
 selection <- c()
 mutation <- c()
-csp.m <- -read.table("../ribModel/data/realGenomes/Skluyveri_mutation_ChrCleft.csv", sep=",", header=T)
-csp.e <- -read.table("../ribModel/data/realGenomes/Skluyveri_selection_ChrCleft.csv", sep=",", header=T)
+csp.m <- read.table("../ribModel/data/realGenomes/Skluyveri_mutation_ChrCleft.csv", sep=",", header=T)
+csp.e <- read.table("../ribModel/data/realGenomes/Skluyveri_selection_ChrCleft.csv", sep=",", header=T)
 #csp.m <- read.table("../ribModel/data/twoMixtures/simulated_mutation1.csv", sep=",", header=T)
 #csp.e <- read.table("../ribModel/data/twoMixtures/simulated_selection1.csv", sep=",", header=T)
 csp <- rbind(csp.m,csp.e)

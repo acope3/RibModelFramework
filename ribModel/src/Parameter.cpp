@@ -8,7 +8,9 @@ using namespace Rcpp;
 const std::string Parameter::allUnique = "allUnique";
 const std::string Parameter::selectionShared = "selectionShared";
 const std::string Parameter::mutationShared = "mutationShared";
+#ifdef STANDALONE
 std::default_random_engine Parameter::generator( (unsigned) std::time(NULL));
+#endif
 
 Parameter::Parameter()
 {

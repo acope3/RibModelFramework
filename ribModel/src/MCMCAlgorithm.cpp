@@ -468,64 +468,81 @@ double MCMCAlgorithm::calculateGewekeScore(unsigned current_iteration)
 }
 
 
-void MCMCAlgorithm::solveToeplitzMatrix(int lr, double* r, double* g, double** f, double* var, double* a)
+std::vector<std::vector<double>> MCMCAlgorithm::solveToeplitzMatrix(int lr, std::vector<double> r, std::vector<double> g)
 {
+// TODO switch f from 2d index to 1d index
+	//choleskiMatrix[i * numVariates + k]
+	//      solves Toeplitz matrix equation toep(r)f=g(1+.)
+	//		by Levinson's algorithm
+	//      a is a workspace of size lr, the number of equations
+	std::vector<double> f(lr*lr, 0.0);
+	std::vector<double> var(lr, 0.0);
+	std::vector<std::vector<double>> returnVec(2);
 
-//      solves Toeplitz matrix equation toep(r)f=g(1+.)
-//		by Levinson's algorithm
-//      a is a workspace of size lr, the number of equations
+	double* a = new double[lr]();
 
+	unsigned l1,l2,k;
+	double v, d, q, hold;
+	v = r[0];
+	d = r[1];
+	a[0] = 1.0;
+	f[0] = g[1]/v;
+	q = f[0]*r[1];
+	var[0] = (1 - f[0]*f[0])*r[0];
 
-unsigned l1,l2,k;
-double v, d, q, hold;
-v = r[1];
-d = r[2];
-a[1] = 1.0;
-f[1][1] = g[2]/v;
-q = f[1][1]*r[2];
-var[1] = (1 - f[1][1]*f[1][1])*r[1];
+	if (lr == 1) return returnVec;
+	for(unsigned l = 1; l < lr; l++)
+	{
+	  a[l] = -d/v;
+	  if (l > 1)
+	  {
+		l1 = (l - 2)/2;
+		l2 = l1 + 1;
+		for(unsigned j = 1; j < l2; j++)
+		{
+		  hold = a[j];
+		  k = l - j + 1;
+		  a[j] = a[j] + a[l]*a[k];
+		  a[k] = a[k] + a[l]*hold;
+		}
+		if (2*l1 != l - 2) a[l2+1] = a[l2+1]*(1.0 + a[l]);
+	  }
+	  v = v + a[l]*d;
+	  f[l*lr + l] = (g[l+1] - q)/v;
+	  for(unsigned j = 0; j < (l-1); j++)
+	  {
+		  f[l*lr + j] = f[(l-1)*lr +j] + f[l*lr + l]*a[l-j+1];
+	  }
+	//  estimate the innovations variance
+	  var[l] = var[l-1] * (1 - f[l*lr + l]*f[l*lr + l]);
+	  if (l == lr) return returnVec;
+	  d = 0.0;
+	  q = 0.0;
+	  for(unsigned i = 0; i < l; i++)
+	  {
+		k = l-i+2;
+		d = d + a[i]*r[k];
+		q = q + f[l*lr + i]*r[k];
+	  }
+	}
 
-if (lr == 1) return;
-for(unsigned l = 2; l < lr; l++)
-{
-  a[l] = -d/v;
-  if (l > 2)
-  {
-    l1 = (l - 2)/2;
-    l2 = l1 + 1;
-    for(unsigned j = 2; j < l2; j++)
-    {
-      hold = a[j];
-      k = l - j + 1;
-      a[j] = a[j] + a[l]*a[k];
-      a[k] = a[k] + a[l]*hold;
-    }
-    if (2*l1 != l - 2) a[l2+1] = a[l2+1]*(1.0 + a[l]);
-  }
-  v = v + a[l]*d;
-  f[l][l] = (g[l+1] - q)/v;
-  for(unsigned j = 1; j < (l-1); j++)
-  {
-	  f[l][j] = f[l-1][j] + f[l][l]*a[l-j+1];
-  }
-//  estimate the innovations variance
-  var[l] = var[l-1] * (1 - f[l][l]*f[l][l]);
-  if (l == lr) return;
-  d = 0.0;
-  q = 0.0;
-  for(unsigned i = 1; i < l; i++)
-  {
-    k = l-i+2;
-    d = d + a[i]*r[k];
-    q = q + f[l][i]*r[k];
-  }
+	returnVec[0] = f;
+	returnVec[1] = var;
+	return returnVec;
 }
-return;
-}
 
 
-void MCMCAlgorithm::acf(double *x, int nrows, int ncols, int lagmax, bool correlation, double *acf)
+std::vector<double> MCMCAlgorithm::acf(std::vector<double>& x, int nrows, int ncols, int lagmax, bool correlation, bool demean)
 {
+	if(demean)
+	{
+		double sum = 0.0;
+		for(unsigned i = 0u; i < x.size(); i++) sum += x[i];
+		double mean = sum / (double)x.size();
+		for(unsigned i = 0u; i < x.size(); i++) x[i] - mean;
+	}
+
+	std::vector<double> acf(lagmax, 1.0);
     int d1 = lagmax + 1, d2 = ncols*d1;
 
     for(int u = 0; u < ncols; u++)
@@ -569,6 +586,7 @@ void MCMCAlgorithm::acf(double *x, int nrows, int ncols, int lagmax, bool correl
 			}
 		}
     }
+    return acf;
 }
 
 
@@ -610,7 +628,7 @@ using namespace Rcpp;
 	RCPP_EXPOSED_CLASS(Genome)
 	RCPP_EXPOSED_CLASS(ROCParameter)
 	RCPP_EXPOSED_CLASS(ROCModel)
-RCPP_EXPOSED_CLASS(Model)
+	RCPP_EXPOSED_CLASS(Model)
 
 RCPP_MODULE(MCMCAlgorithm_mod)
 {
@@ -622,5 +640,8 @@ RCPP_MODULE(MCMCAlgorithm_mod)
 		.method("getLogLikelihoodPosteriorMean", &MCMCAlgorithm::getLogLikelihoodPosteriorMean)
 		.method("setRestartFileSettings", &MCMCAlgorithm::setRestartFileSettings)
 		;
+
+	function("TestACF", &MCMCAlgorithm::acf); //TEST THAT ONLY!
+	function("solveToeplitzMatrix", &MCMCAlgorithm::solveToeplitzMatrix); //TEST THAT ONLY!
 }
 #endif
