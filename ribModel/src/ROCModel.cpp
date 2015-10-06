@@ -127,7 +127,7 @@ double ROCModel::calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codo
 {
 	double logLikelihood = 0.0;
 	// calculate codon probabilities
-	double* codonProbabilities = new double[numCodons]();
+	double codonProbabilities[6];
 	calculateCodonProbabilityVector(numCodons, mutation, selection, phiValue, codonProbabilities);
 
 	// calculate likelihood for current AA for this combination of selection and mutation category
@@ -137,7 +137,7 @@ double ROCModel::calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codo
 		logLikelihood += std::log(codonProbabilities[i]) * codonCount[i];
 	}
 	//std::cout <<"deleting codonProbabilities\n";
-	delete [] codonProbabilities;
+	//delete [] codonProbabilities;
 	//std::cout <<"DONEdeleting codonProbabilities\n";
 	return logLikelihood;
 }
@@ -252,11 +252,10 @@ void ROCModel::printHyperParameters()
 
 void ROCModel::simulateGenome(Genome &genome)
 {
-     unsigned codonIndex;
-     std::string curAA;
+	unsigned codonIndex;
+    std::string curAA;
 
 	std::string tmpDesc = "Simulated Gene";
-
 
 	for (unsigned geneIndex = 0; geneIndex < genome.getGenomeSize(); geneIndex++) //loop over all genes in the genome
 	{

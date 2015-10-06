@@ -429,10 +429,10 @@ int main()
 	enum ModelToRun { ROC, RFP, FONSE };
 	/* Test variables */
 	User user = jeremy;
-	ModelToRun modelToRun = ROC;
+	ModelToRun modelToRun = FONSE;
 	bool read = false;
 	bool testing = false;
-	bool withPhi = true;
+	bool withPhi = false;
 	if (testing)
 	{
 		//testLogNormDensity();
@@ -610,7 +610,7 @@ int main()
 			
 
 			std::cout << "starting MCMC for ROC" << std::endl;
-			mcmc.run(genome, model, 1, 20);
+			mcmc.run(genome, model, 1, 0);
 			std::cout << std::endl << "Finished MCMC for ROC" << std::endl;
 			
 

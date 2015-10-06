@@ -118,21 +118,21 @@ void SequenceSummary::setRFPObserved(unsigned codonIndex, unsigned value)
 }
 
 
-std::vector <unsigned> SequenceSummary::getCodonPositions(std::string codon)
+std::vector <unsigned> *SequenceSummary::getCodonPositions(std::string codon)
 {
 	unsigned codonIndex = codonToIndex(codon);
 	return getCodonPositions(codonIndex);
 }
 
 
-std::vector <unsigned> SequenceSummary::getCodonPositions(unsigned index)
+std::vector <unsigned> *SequenceSummary::getCodonPositions(unsigned index)
 {
-	std::vector <unsigned> rv(codonPositions[index].size());
+	/*std::vector <unsigned> *rv = new std::vector <unsigned> (codonPositions[index].size());
 	for (unsigned i = 0; i < codonPositions[index].size(); i++) {
-		rv[i] = codonPositions[index][i];
-	}
+		rv->at(i) = codonPositions[index][i];
+	}*/
 
-	return rv;
+	return &codonPositions[index];
 }
 
 
@@ -605,7 +605,7 @@ unsigned SequenceSummary::getRFPObservedForCodonIndexR(unsigned codonIndex)
 }
 
 
-std::vector <unsigned> SequenceSummary::getCodonPositionsForCodonR(std::string codon)
+std::vector <unsigned> *SequenceSummary::getCodonPositionsForCodonR(std::string codon)
 {
 	codon[0] = (char) std::toupper(codon[0]);
 	codon[1] = (char) std::toupper(codon[1]);
@@ -613,7 +613,7 @@ std::vector <unsigned> SequenceSummary::getCodonPositionsForCodonR(std::string c
 	return getCodonPositions(codon);
 }
 
-std::vector <unsigned> SequenceSummary::getCodonPositionsForCodonIndexR(unsigned codonIndex)
+std::vector <unsigned> *SequenceSummary::getCodonPositionsForCodonIndexR(unsigned codonIndex)
 {
 	return getCodonPositions(codonIndex);
 }

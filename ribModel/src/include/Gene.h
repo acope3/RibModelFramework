@@ -62,7 +62,7 @@ class Gene
 		unsigned getCodonCount(std::string& codon);
 		void setRFPObserved(unsigned index, unsigned value); // testthat only
 		unsigned getRFPObserved(std::string codon);
-		std::vector <unsigned> getCodonPositions(std::string codon);
+		std::vector <unsigned> *getCodonPositions(std::string codon);
 
 	protected:
 };

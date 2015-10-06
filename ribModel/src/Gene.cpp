@@ -210,7 +210,7 @@ unsigned Gene::getRFPObserved(std::string codon)
 }
 
 
-std::vector <unsigned> Gene::getCodonPositions(std::string codon)
+std::vector <unsigned> *Gene::getCodonPositions(std::string codon)
 {
     return geneData.getCodonPositionsForCodonR(codon);
 }
