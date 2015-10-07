@@ -911,7 +911,7 @@ double RFPParameter::getParameterForCategoryR(unsigned mixtureElement, unsigned 
 		codon[2] = (char)std::toupper(codon[2]);
 		if (paramType == RFPParameter::alp)
 		{
-			//THIS NEEDS TO CHANGE!!!!
+			//TODO THIS NEEDS TO CHANGE, NAMING!!!!
 			category = getMutationCategory(mixtureElement); //really alpha here
 		}
 		else if (paramType == RFPParameter::lmPri)
