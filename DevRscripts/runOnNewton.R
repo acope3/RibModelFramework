@@ -30,10 +30,11 @@ name <- "clandere_kluyveri_"
 n.cores <- 4
 queue = "long*"
 number.of.runs <- 1
-
+seeds <- runif(number.of.runs, 1000, 10000000)
 for (index in 1:number.of.runs) {
     cat("rm(list=ls()) \n",
         "library(ribModel) \n",
+        "set.seed(", seeds[index], ") \n",
         "with.phi <- ", with.phi, "\n\n",
         "if (with.phi) { \n",
         "genome <- initializeGenomeObject(file =\"", genome, "\", expression.file = \"", expression.file, "\") \n",
