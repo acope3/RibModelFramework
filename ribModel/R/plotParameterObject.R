@@ -34,10 +34,24 @@ plot.Rcpp_ROCParameter <- function(parameter, what = "Mutation", sample = 100, .
 }
 
 
-upper.panel.plot <- function(x, y, ...)
+upper.panel.plot <- function(x, y, sd.x=NULL, sd.y=NULL, ...)
 {
   abline(0, 1, col = "blue", lty = 2)
   points(x, y, ...)
+  if(!is.null(sd.y))
+  {
+    y.up <- y + sd.y
+    y.low <- y - sd.y
+    epsilon <- range(x) * 0.1
+    segments(x, y.low, x, y.up, ...)
+  }
+  if(!is.null(sd.x))
+  {
+    x.up <- x + sd.x
+    x.low <- x - sd.x
+    epsilon <- range(y) * 0.1
+    segments(x.low, y, x.up, y, ...)
+  }  
   
   lm.line <- lm(y~x)
   abline(lm.line, col="blue", lwd = 2)
