@@ -6,15 +6,10 @@
 #include <sstream>
 #include <cmath>
 
+
 Genome::Genome()
 {
 	//ctor
-}
-Genome::Genome(unsigned tableId, bool splitAA)
-{
-	//ctor
-	CodonTable CT(tableId, splitAA);
-	CT.createCodonTable(tableId, splitAA);
 }
 
 
@@ -51,7 +46,6 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 		}
 		else
 		{
-
 
 			bool fastaFormat = false;
 			std::string buf;
@@ -183,7 +177,6 @@ void Genome::readRFPFile(std::string filename)
 	Gene tmpGene;
 	bool first = true;
 	std::string seq = "";
-	CodonTable *codonTable = CodonTable::getInstance();
 
 	while (getline(Fin,tmp))
 	{
@@ -217,7 +210,7 @@ void Genome::readRFPFile(std::string filename)
 			seq += codon;
 
 		prevID = ID;
-		unsigned index = codonTable -> codonToIndex(codon);
+		unsigned index = SequenceSummary::codonToIndex(codon);
 		tmpGene.geneData.setRFPObserved(index, tmpRFP);
 	}
 
@@ -254,7 +247,7 @@ void Genome::writeRFPFile(std::string filename, bool simulated)
 
 		for (unsigned codonIndex = 0; codonIndex < 64; codonIndex++)
 		{
-			std::string codon = CodonTable::codonArray[codonIndex];
+			std::string codon = SequenceSummary::codonArray[codonIndex];
 
 			Fout << currentGene->getId() <<",";
 			Fout << currentGene->geneData.getRFPObserved(codonIndex) <<",";
@@ -355,7 +348,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 								std::cerr <<"WARNING! Negative phi value given - values should not be on the log scale. Negative Value stored.";
 							}
 						}
-						else
+						else 
 						{
 							numGenesWithPhi[count]++;
 						}
@@ -490,14 +483,9 @@ std::vector <Gene> Genome::getGenes(bool simulated)
 }
 
 
-unsigned Genome::getNumGenesWithPhiForIndex(unsigned index)
+unsigned Genome::getNumGenesWithPhi(unsigned index)
 {
 	return numGenesWithPhi[index];
-}
-
-std::vector <unsigned> Genome::getNumGenesWithPhi()
-{
-	return numGenesWithPhi;
 }
 
 
@@ -566,9 +554,8 @@ Genome Genome::getGenomeForGeneIndicies(std::vector <unsigned> indicies, bool si
 
 std::vector<unsigned> Genome::getCodonCountsPerGene(std::string codon)
 {
-	CodonTable *codonTable = CodonTable::getInstance();
 	std::vector<unsigned> codonCounts(genes.size());
-	unsigned codonIndex = codonTable -> codonToIndex(codon);
+	unsigned codonIndex = SequenceSummary::codonToIndex(codon);
 	for(unsigned i = 0u; i < genes.size(); i++)
 	{
 		Gene gene = genes[i];

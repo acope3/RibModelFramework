@@ -1,14 +1,14 @@
 
 initializeParameterObject <- function(genome, sphi, numMixtures, geneAssignment, expressionValues = NULL, model = "ROC",
                                       split.serine = TRUE, mixture.definition = "allUnique", mixture.definition.matrix = NULL,
-                                      restart.file = NULL)
+                                      restart.file = NULL, mutation_prior_sd = 0.35)
 {
   if(model == "ROC")
   {
     if(is.null(restart.file))
     {
       parameter <- initializeROCParameterObject(genome, sphi, numMixtures, geneAssignment, expressionValues,
-                                   split.serine, mixture.definition, mixture.definition.matrix)    
+                                   split.serine, mixture.definition, mixture.definition.matrix, mutation_prior_sd)    
     }else{
       parameter <- new(ROCParameter, restart.file)
     }
@@ -34,7 +34,8 @@ initializeParameterObject <- function(genome, sphi, numMixtures, geneAssignment,
 }
 
 initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignment, expressionValues = NULL,
-                                          split.serine = TRUE, mixture.definition = "allUnique", mixture.definition.matrix = NULL)
+                                         split.serine = TRUE, mixture.definition = "allUnique", mixture.definition.matrix = NULL,
+                                         mutation_prior_sd = 0.35)
 {
   # test input integrity
   if(genome$getGenomeSize() != length(geneAssignment)) 
@@ -56,6 +57,8 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
   }else{
     parameter$initializeSynthesisRateByList(expressionValues)
   }
+  
+  parameter$setMutationPriorStandardDeviation(mutation_prior_sd)
   
   numMutationCategory <- parameter$numMutationCategories
   numSelectionCategory <- parameter$numSelectionCategories

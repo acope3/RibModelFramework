@@ -134,9 +134,8 @@ std::vector<double> Trace::getSynthesisRateAcceptanceRatioTraceByMixtureElementF
 
 std::vector<double> Trace::getCspAcceptanceRatioTraceForAA(std::string aa)
 {
-	CodonTable *codonTable = CodonTable::getInstance();
 	aa[0] = (char) std::toupper(aa[0]);
-	unsigned aaIndex = codonTable -> AAToAAIndex(aa);
+	unsigned aaIndex = SequenceSummary::aaToIndex.find(aa) -> second;
 	return cspAcceptanceRatioTrace[aaIndex];
 }
 
@@ -149,7 +148,7 @@ std::vector<double> Trace::getSynthesisRateTraceForGene(unsigned geneIndex)
 	for(unsigned i = 0u; i < traceLength; i++)
 	{
 		unsigned mixtureElement = mixtureAssignmentTrace[geneIndex][i];
-    unsigned category = getSynthesisRateCategory(mixtureElement);
+		unsigned category = getSynthesisRateCategory(mixtureElement);
 		returnVector[i] =  synthesisRateTrace[category][geneIndex][i];
 	}
 	return returnVector;

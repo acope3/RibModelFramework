@@ -3,7 +3,6 @@
 
 
 #include "SequenceSummary.h"
-#include "CodonTable.h"
 
 
 #include <string>

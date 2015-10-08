@@ -10,6 +10,7 @@ class ROCModel : public Model
 
 	ROCParameter *parameter;
 	virtual void obtainCodonCount(SequenceSummary& seqsum, std::string curAA, int codonCount[]);
+	double calculateMutationPrior(std::string grouping); // TODO add to FONSE as well? // cedric
 	double calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codonCount[], double mutation[], double selection[], double phiValue);
 	bool withPhi;
 
@@ -78,7 +79,7 @@ class ROCModel : public Model
 	virtual std::string getGrouping(unsigned index) {return parameter -> getGrouping(index);}
 	// R wrapper
 	std::vector<double> CalculateProbabilitiesForCodons(std::vector<double> mutation, std::vector<double> selection, double phi);
-
+	virtual void updateTmp() {}
 	virtual void printHyperParameters();
     protected:
 };

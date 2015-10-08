@@ -36,7 +36,7 @@ class RFPParameter: public Parameter {
 		//Functions:
 		std::vector<double> propose(std::vector<double> currentParam, double (*proposal)(double a, double b), double A,
 				std::vector<double> B);
-
+		std::vector <double> tmp;
 
 	public:
 		//Constructors & destructors:
@@ -48,7 +48,8 @@ class RFPParameter: public Parameter {
 		virtual ~RFPParameter();
 		RFPParameter& operator=(const RFPParameter& rhs);
 
-
+		std::vector <double> getTmp(); 
+		void updateTmp() { tmp.push_back(currentAlphaParameter[0][0]); }
 		//Initialization functions:
 		void initRFPParameterSet();
 		void initAlpha(double alphaValue, unsigned mixtureElement, std::string codon);

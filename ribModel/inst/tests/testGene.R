@@ -3,7 +3,6 @@ library(ribModel)
 
 context("Gene")
 
-createCodonTable(1, TRUE)
 g <- new(Gene)
 
 test_that("set ID", {
@@ -25,19 +24,16 @@ ss <- new(SequenceSummary, "ATGCTCATTCTCACTGCTGCCTCGTAG")
 
 test_that("get Sequence Summary", {
   ss2 <- g$getSequenceSummary()
-  CT <- getInstance()
-  codons <- getCodonArray()
-  aminoAcids <- CT$getAAListing()
-  for (codon in codons){
+  for (codon in codons()){
     expect_equal(ss$getCodonCountForCodon(codon), ss2$getCodonCountForCodon(codon))
   }
-  for (codon in codons) {
+  for (codon in codons()) {
     expect_equal(ss$getRFPObservedForCodon(codon), ss2$getRFPObservedForCodon(codon))
   }
-  for (aa in aminoAcids){
+  for (aa in aminoAcids()){
     expect_equal(ss$getAACountForAA(aa), ss2$getAACountForAA(aa))
   }
-  for (codon in codons) {
+  for (codon in codons()) {
     expect_equal(ss$getCodonPositionsForCodon(codon), ss2$getCodonPositionsForCodon(codon))
   }
 }) 

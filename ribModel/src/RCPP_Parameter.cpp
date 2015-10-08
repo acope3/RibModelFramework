@@ -65,6 +65,9 @@ RCPP_MODULE(Parameter_mod)
 		.method("getSphiVariance", &ROCParameter::getSphiVariance)
 		.method("getAphiVariance", &ROCParameter::getAphiVariance)
 
+		.method("getMutationPriorStandardDeviation", &ROCParameter::getMutationPriorStandardDeviation)
+		.method("setMutationPriorStandardDeviation", &ROCParameter::setMutationPriorStandardDeviation)
+
 		.method("getMutationVarianceForCodon", &ROCParameter::getMutationVarianceForCodon)
 		.method("getSelectionVarianceForCodon", &ROCParameter::getSelectionVarianceForCodon)
 
@@ -85,6 +88,7 @@ RCPP_MODULE(Parameter_mod)
 		.method("getLambdaPrimePosteriorMeanForCodon", &RFPParameter::getLambdaPrimePosteriorMeanForCodon)
 		.method("getAlphaVarianceForCodon", &RFPParameter::getAlphaVarianceForCodon)
 		.method("getLambdaPrimeVarianceForCodon", &RFPParameter::getLambdaPrimeVarianceForCodon)
+		.method("getTmpTrace", &RFPParameter::getTmp)
 		;
 
 	class_<FONSEParameter>("FONSEParameter")

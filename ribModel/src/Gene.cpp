@@ -1,5 +1,4 @@
 #include "include/Gene.h"
-#include "include/CodonTable.h"
 
 
 #include <iostream>
@@ -170,12 +169,12 @@ Gene Gene::reverseComplement()
 
 std::string Gene::toAASequence()
 {
-    CodonTable *codonTable = CodonTable::getInstance();
+
     std::string aaseq = "";
     for(unsigned i = 0; i < seq.length(); i+=3)
     {
         std::string codon = seq.substr(i, 3);
-        aaseq += codonTable -> codonToAA(codon);
+        aaseq += SequenceSummary::codonToAA(codon);
     }
     return aaseq;
 }

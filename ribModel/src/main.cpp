@@ -18,7 +18,7 @@ void testLogNormDensity()
 	std::cout << "------------------ LOG NORM DENSITY ------------------" << std::endl;
 }
 
-/*void testSCUO(Genome& genome)
+void testSCUO(Genome& genome)
 {
 	std::cout << "------------------ SCUO VALUES ------------------" << std::endl;
 	for (unsigned n = 0u; n < genome.getGenomeSize(); n++)
@@ -27,7 +27,7 @@ void testLogNormDensity()
 	}
 	std::cout << "------------------ SCUO VALUES ------------------" << std::endl;
 }
-*/
+
 void testCovarianceMatrix()
 {
 	std::cout << "------------------ TEST COVARIANCE ROUTINES ------------------" << std::endl;
@@ -194,10 +194,44 @@ void testInitFromRestartFile()
 
 }
 
+void testReadRFPFile()
+{
+	std::cout << "------------------- TEST READRFPFILE ----------------------" << "\n";
+	Genome genome;
+
+	genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+	std::string codon = "ATG";	
+	std::cout << SequenceSummary::codonToIndex(codon) <<"\n";
+	for (unsigned i = 0; i < genome.getGenomeSize(); i++)
+	{
+		std::cout << "Working with gene " << i << "\n";
+		Gene gene = genome.getGene(i);
+		SequenceSummary SS = gene.geneData;
+		for (unsigned j = 0; j < 64; j++)
+		{
+			//std::cout << gene.getId() << " " << SS.getRFPObserved(j) << " " << SS.getNumCodonsInMRNA(j) << " " << SS.IndexToCodon(j) << "\n";
+			std::cout << gene.getId() << " " << SS.getRFPObserved(j) << " " << SS.indexToCodon(j) << "\n";
+		}
+	}
+	std::cout << "------------------- TEST READRFPFILE ----------------------" << "\n";
+}
+
+
+
+void testReadObservedPhis()
+{
+	Genome genome;
+	genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/fake.fasta");
+	genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/fakeObserved.csv", false);
+
+
+}
+
+
 void simulateRFPData()
 {
 	Genome genome;
-	genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+	genome.readRFPFile("/export/home/ghanas/RibModelFramework-master/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{
@@ -209,11 +243,11 @@ void simulateRFPData()
 	RFPParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
 
 	std::vector<std::string> files;
-	files.push_back("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/RFPAlphaValues.csv");
+	files.push_back("/export/home/ghanas/RibModelFramework-master/ribModel/data/RFPAlphaValues.csv");
 	tmp.initMutationSelectionCategories(files, 1, RFPParameter::alp);
-	files[0] = "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/RFPLambdaPrimeValues.csv";
+	files[0] = "/export/home/ghanas/RibModelFramework-master/ribModel/data/RFPLambdaPrimeValues.csv";
 	tmp.initMutationSelectionCategories(files, 1, RFPParameter::lmPri);
-	std::vector<double> phi = tmp.readPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/RFPPhiValues.csv");
+	std::vector<double> phi = tmp.readPhiValues("/export/home/ghanas/RibModelFramework-master/ribModel/data/RFPPhiValues.csv");
 	tmp.InitializeSynthesisRate(phi);
 
 
@@ -224,7 +258,7 @@ void simulateRFPData()
 	std::cout <<"init done\n";
 	model.simulateGenome(genome);
 	std::cout <<"writing file\n";
-	genome.writeRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/SimulatedRFPData.csv", true);
+	genome.writeRFPFile("/export/home/ghanas/RibModelFramework-master/ribModel/data/SimulatedRFPData.csv", true);
 
 
 }
@@ -368,7 +402,6 @@ void testMultiplePhi()
 {
 	std::cout <<"----------TEST MULTIPLEPHI----------\n";
 
-	CodonTable::createCodonTable(1, true);
 	Genome genome;
 	genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/test.fasta");
 	genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/testReadObservedPhiValuesValid.csv", false);
@@ -389,40 +422,18 @@ void testMultiplePhi()
 }
 
 
-void codonTableTest()
-{
-	CodonTable CT(1, false);
-	CT.setupCodonTable();
-	CT.AAToCodon("C", false);
-
-	return;
-}
-
-void testProcessSequence()
-{
-	std::cout <<"Testing process sequence\n";
-	CodonTable::createCodonTable(1, true);
-	SequenceSummary SS("ATGCTCATTCTCAGTGCTGCCTCGTAG");
-}
-//---------------------------------------------------------------------------------------------//
-//-----------------------------------------END OF UNIT TESTING---------------------------------//
-//---------------------------------------------------------------------------------------------//
-
 int main()
 {
-	enum User { cedric, gabe, jeremy }; //For file IO paths
+
+	enum User { cedric, gabe, jeremy };
 	enum ModelToRun { ROC, RFP, FONSE };
-
-
+	/* Test variables */
 	User user = gabe;
 	ModelToRun modelToRun = ROC;
-
-	bool read = false; //Initialize parameter by reading a restart file
-	bool testing = false; //Run unit testing
-	bool withPhi = false; //Using multiple phi values per gene
-
-
-	if (testing) //Unit testing
+	bool read = false;
+	bool testing = true;
+	bool withPhi = false;
+	if (testing)
 	{
 		//testLogNormDensity();
 		//testSCUO(genome);
@@ -432,45 +443,37 @@ int main()
 		//testCovMatrixOverloading();
 		//testWriteRestartFile();
 		//testInitFromRestartFile();
-		//simulateRFPData();
-		//simulateROCData();
+		//testReadRFPFile();
+		//testReadObservedPhis();
+		simulateRFPData();
+	//	simulateROCData();
 		//testInitMutationSelection();
 		//testRFPVarianceAndMean();
 		//testReadMutationValues();
 		//testGeneSequenceSummary();
 		//testReadMutationValues();
-		testMultiplePhi();
-		//codonTableTest();
-		testProcessSequence();
+		//testMultiplePhi();
 	}
-	else //Not doing unit testing, running a model
+	else //not doing unit testing, running a model
 	{
 		unsigned index;
 		std::cout << "initialize MCMCAlgorithm object" << std::endl;
 		int samples = 100;
 		int thining = 10;
 		int useSamples = 100;
-
-		std::cout << "Initializing MCMCAlgorithm object" << std::endl;
 		std::cout << "\t# samples: " << samples << "\n";
 		std::cout << "\t thining: " << thining << "\n";
 		std::cout << "\t # samples used: " << useSamples << "\n";
-
-
 		MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, 10, true, true, true);
 		mcmc.setRestartFileSettings("RestartFile.txt", 20, true);
-		std::cout << "Done initializing MCMCAlgorithm object" <<"\n\n";
+		std::cout << "done initialize MCMCAlgorithm object" << std::endl;
 		
 
-		std::cout << "Initializing Genome object" << std::endl;
-		unsigned tableId = 1;
-		bool splitAA = false;
-		Genome genome(tableId, splitAA);
-
-
+		std::cout << "initialize Genome object" << std::endl;
+		Genome genome;
 		switch (user) {
 			case cedric:
-				if (modelToRun == ROC || modelToRun == FONSE)
+				if (modelToRun == ROC)
 				{
 					genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
 					//genome.readFasta("C:/Users/Cedric/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta");
@@ -481,24 +484,21 @@ int main()
 				}
 				else {}
 				break;
-
 			case gabe:
-				if (modelToRun == ROC || modelToRun == FONSE)
+				if (modelToRun == ROC)
 				{
-					std::cout <<"\tReading Fasta File\n";
 					genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
-					if (withPhi)
-					{
+					if (withPhi) {
 						genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv", false);
 					}
 				}
 				else if (modelToRun == RFP)
 				{
-					genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+					//genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+					genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/testRFPFile.csv");
 				}
 				else {}
 				break;
-
 			case jeremy:
 				if (modelToRun == ROC || modelToRun == FONSE)
 				{
@@ -514,10 +514,9 @@ int main()
 				else {}
 				break;
 		}
-		std::cout << "Done initializing Genome object" <<"\n\n";
-
-
+		std::cout << "done initializing Genome object" << std::endl;
 		std::cout << "Initializing shared parameter variables\n";
+
 		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 
 
@@ -595,7 +594,7 @@ int main()
 			//std::vector<double> phiVals = parameter.readPhiValues("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrCleft_phi_est.csv");
 			//parameter.InitializeSynthesisRate(phiVals);
 			parameter = tmp;
-			std::cout << "Done initializing ROCParameter object\n\n";
+			std::cout << "done initialize ROCParameter object" << std::endl;
 			}
 
 			std::cout <<"Initializing ROCModel object\n";
@@ -604,12 +603,10 @@ int main()
 			std::ofstream scuoout("results/scuo.csv");
 			for (unsigned n = 0u; n < genome.getGenomeSize(); n++)
 			{
-				scuoout << genome.getGene(n).getId() << "," << parameter.calculateSCUO(genome.getGene(n)) << std::endl;
+				scuoout << genome.getGene(n).getId() << "," << parameter.calculateSCUO(genome.getGene(n), 22) << std::endl;
 			}
 			scuoout.close();
-			std::cout <<"Done initializing ROCModel object\n\n";
-
-			std::cout <<"Temparary exit\n";
+			std::cout <<"Done initializing ROCModel object\n";
 			
 
 			std::cout << "starting MCMC for ROC" << std::endl;
@@ -620,12 +617,11 @@ int main()
 			std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
 			std::cout << "Sphi proposal width: " << parameter.getCurrentSphiProposalWidth() << std::endl;
 			std::cout << "CSP proposal width: \n";
-			CodonTable *codonTable = CodonTable::getInstance();
 			for (unsigned n = 0; n < model.getGroupListSize(); n++)
 			{
 				std::string aa = model.getGrouping(n);
-				index = codonTable -> AAToAAIndex(aa);
-				std::cout << CodonTable::aminoAcidArray[index] << ": " << parameter.getCurrentCodonSpecificProposalWidth(index) << "\n";
+				index = SequenceSummary::AAToAAIndex(aa);
+				std::cout << SequenceSummary::AminoAcidArray[index] << ": " << parameter.getCurrentCodonSpecificProposalWidth(index) << "\n";
 			}
 		}
 		else if (modelToRun == RFP)
@@ -671,7 +667,9 @@ int main()
 
       std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
       std::cout << "Sphi proposal width: " << parameter.getCurrentSphiProposalWidth() << std::endl;
-
+	std::vector <double> jjj = parameter.getTmp();
+	for (int i = 0; i < jjj.size(); i++)
+		std::cout << jjj[i] <<"\n";
 		}
 		else if (modelToRun == FONSE)
 		{
@@ -727,7 +725,7 @@ int main()
 			std::ofstream scuoout("results/scuo.csv");
 			for (unsigned n = 0u; n < genome.getGenomeSize(); n++)
 			{
-				scuoout << genome.getGene(n).getId() << "," << parameter.calculateSCUO(genome.getGene(n)) << std::endl;
+				scuoout << genome.getGene(n).getId() << "," << parameter.calculateSCUO(genome.getGene(n), 22) << std::endl;
 			}
 			scuoout.close();
 			std::cout << "Done initializing FONSEModel object\n";
@@ -741,15 +739,13 @@ int main()
 			std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
 			std::cout << "Sphi proposal width: " << parameter.getCurrentSphiProposalWidth() << std::endl;
 			std::cout << "CSP proposal width: \n";
-			CodonTable *codonTable = CodonTable::getInstance();
 			for (unsigned n = 0; n < model.getGroupListSize(); n++)
 			{
 				std::string aa = model.getGrouping(n);
-				index = codonTable -> AAToAAIndex(aa);
-				std::cout << CodonTable::aminoAcidArray[index] << ": " << parameter.getCurrentCodonSpecificProposalWidth(index) << "\n";
+				index = SequenceSummary::AAToAAIndex(aa);
+				std::cout << SequenceSummary::AminoAcidArray[index] << ": " << parameter.getCurrentCodonSpecificProposalWidth(index) << "\n";
 			}
 		}
-
 		//These files used to be written here:
 		//mutationPosterior_Cat#.csv
 		//selectionPosterior_Cat#.csv

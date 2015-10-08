@@ -6,7 +6,6 @@
 #include <map>
 
 #include "Gene.h"
-#include "CodonTable.h"
 
 
 class Model;
@@ -23,8 +22,7 @@ class Genome
 	public:
 
 		//Constructors & destructors:
-		Genome();
-		explicit Genome(unsigned tableId, bool splitAA = false);
+		explicit Genome();
 		virtual ~Genome();
 		Genome& operator=(const Genome& other);
 
@@ -40,8 +38,7 @@ class Genome
 		//Gene functions:
 		void addGene(const Gene& gene, bool simulated = false);
 		std::vector <Gene> getGenes(bool simulated = false);
-		unsigned getNumGenesWithPhiForIndex(unsigned index);
-		std::vector <unsigned> getNumGenesWithPhi();
+		unsigned getNumGenesWithPhi(unsigned index);
 		Gene& getGene(unsigned index, bool simulated = false);
 		Gene& getGene(std::string id, bool simulated = false);
 

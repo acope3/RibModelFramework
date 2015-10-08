@@ -64,14 +64,13 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 
 double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grouping, double *mutation, double *selection, double phiValue)
 {
-	CodonTable *codonTable = CodonTable::getInstance();
-	int numCodons = codonTable -> getNumCodonsForAA(grouping);
+	int numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
 	double logLikelihood = 0.0;
 
 	std::vector <unsigned> positions;
 	double codonProb[6];
 
-	std::vector <unsigned> codonRange = (codonTable -> AAToCodonRange(grouping)); //checked
+	std::array <unsigned, 2> codonRange = SequenceSummary::AAToCodonRange(grouping);
 
 	unsigned maxIndexVal = 0u;
 	for (int i = 1; i < (numCodons - 1); i++)
@@ -82,8 +81,8 @@ double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grou
 		}
 	}
 
-	for (unsigned i = 0; i < codonRange.size(); i++) {
-		positions = gene.geneData.getCodonPositions(codonRange[i]);
+	for (unsigned i = codonRange[0]; i < codonRange[1]; i++) {
+		positions = gene.geneData.getCodonPositions(i);
 		for (unsigned j = 0; j < positions.size(); j++) {
 			calculateCodonProbabilityVector(numCodons, positions[j], maxIndexVal, mutation, selection, phiValue, codonProb);
 			for (int k = 0; k < numCodons; k++) {
