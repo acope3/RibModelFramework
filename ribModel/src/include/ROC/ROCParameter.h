@@ -44,6 +44,8 @@ class ROCParameter : public Parameter
 		double bias_csp;
 		std::vector<double> std_csp;
 
+		double mutation_prior_sd;
+
 
 		// functions TODO: never used?
 		std::vector<double> propose(std::vector<double> currentParam, double (*proposal)(double a, double b), double A, std::vector<double> B);
@@ -56,12 +58,12 @@ class ROCParameter : public Parameter
 		//Constructors & Destructors:
 		ROCParameter();
 		explicit ROCParameter(std::string filename);
-		ROCParameter(double sphi, unsigned _numMixtures,
+		ROCParameter(std::vector<double> sphi, unsigned _numMixtures,
 				std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer = true, std::string _mutationSelectionState = "allUnique");
 		virtual ~ROCParameter();
 #ifndef STANDALONE
-		ROCParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer = true);
-		ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer = true, std::string _mutationSelectionState = "allUnique");
+		ROCParameter(std::vector<double> sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer = true);
+		ROCParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer = true, std::string _mutationSelectionState = "allUnique");
 		void initCovarianceMatrix(SEXP matrix, std::string aa);
 #endif
 		ROCParameter& operator=(const ROCParameter& rhs);
@@ -94,6 +96,8 @@ class ROCParameter : public Parameter
 		// Phi epsilon functions
 		double getPhiEpsilon() { return phiEpsilon; }
 
+		double getMutationPriorStandardDeviation() { return mutation_prior_sd; }
+		void setMutationPriorStandardDeviation(double _mutation_prior_sd) { mutation_prior_sd = _mutation_prior_sd; }
 
 		// functions to manage codon specific parameter
 		void updateCodonSpecificParameter(std::string grouping);
@@ -111,7 +115,13 @@ class ROCParameter : public Parameter
 		double getSepsilon(unsigned index) { return Sepsilon[index]; }
 		void setSepsilon(unsigned index, double se) { Sepsilon[index] = se; }
 		//update trace functions
-		virtual void updateSphiTrace(unsigned sample) {traces.updateSphiTrace(sample, Sphi);}
+		virtual void updateSphiTrace(unsigned sample)
+		{
+			for(unsigned i = 0u; i < numSelectionCategories; i++)
+			{
+				traces.updateSphiTrace(sample, Sphi[i], i);
+			}
+		}
 		void updateAphiTraces(unsigned sample) { for (unsigned i = 0; i < Aphi.size(); i++) traces.updateAphiTrace(i, sample, Aphi[i]); }
 		void updateSepsilonTraces(unsigned sample) { for (unsigned i = 0; i < Sepsilon.size(); i++) traces.updateSepsilonTrace(i, sample, Sepsilon[i]); }
 		virtual void updateSynthesisRateTrace(unsigned sample, unsigned geneIndex){traces.updateSynthesisRateTrace(sample, geneIndex, currentSynthesisRateLevel);}
@@ -131,11 +141,11 @@ class ROCParameter : public Parameter
 		virtual void adaptSphiProposalWidth(unsigned adaptationWidth);
 		void adaptAphiProposalWidth(unsigned adaptationWidth);
 		virtual void adaptSynthesisRateProposalWidth(unsigned adaptationWidth);
-		virtual double getSphiPosteriorMean(unsigned samples);
+		virtual double getSphiPosteriorMean(unsigned samples, unsigned mixture);
 		double getAphiPosteriorMean(unsigned index, unsigned samples);
 		virtual std::vector <double> getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex);
 		virtual double getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement);
-		virtual double getSphiVariance(unsigned samples, bool unbiased = true);
+		virtual double getSphiVariance(unsigned samples, unsigned mixture, bool unbiased = true);
 		double getAphiVariance(unsigned index, unsigned samples, bool unbiased = true);
 		virtual double getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement, bool unbiased = true);
 		double getMutationPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon);

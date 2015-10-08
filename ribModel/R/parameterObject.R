@@ -1,14 +1,14 @@
 
 initializeParameterObject <- function(genome, sphi, numMixtures, geneAssignment, expressionValues = NULL, model = "ROC",
                                       split.serine = TRUE, mixture.definition = "allUnique", mixture.definition.matrix = NULL,
-                                      restart.file = NULL)
+                                      restart.file = NULL, mutation_prior_sd = 0.35)
 {
   if(model == "ROC")
   {
     if(is.null(restart.file))
     {
       parameter <- initializeROCParameterObject(genome, sphi, numMixtures, geneAssignment, expressionValues,
-                                   split.serine, mixture.definition, mixture.definition.matrix)    
+                                   split.serine, mixture.definition, mixture.definition.matrix, mutation_prior_sd)    
     }else{
       parameter <- new(ROCParameter, restart.file)
     }
@@ -34,7 +34,8 @@ initializeParameterObject <- function(genome, sphi, numMixtures, geneAssignment,
 }
 
 initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignment, expressionValues = NULL,
-                                          split.serine = TRUE, mixture.definition = "allUnique", mixture.definition.matrix = NULL)
+                                         split.serine = TRUE, mixture.definition = "allUnique", mixture.definition.matrix = NULL,
+                                         mutation_prior_sd = 0.35)
 {
   # test input integrity
   if(genome$getGenomeSize() != length(geneAssignment)) 
@@ -52,10 +53,12 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
   }
   # initialize expression values
   if(is.null(expressionValues)){
-    parameter$initializeSynthesisRateByGenome(genome, sphi)
+    parameter$initializeSynthesisRateByGenome(genome, mean(sphi))
   }else{
     parameter$initializeSynthesisRateByList(expressionValues)
   }
+  
+  parameter$setMutationPriorStandardDeviation(mutation_prior_sd)
   
   numMutationCategory <- parameter$numMutationCategories
   numSelectionCategory <- parameter$numSelectionCategories
@@ -66,7 +69,7 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
   {
     if(aa == "M" || aa == "W" || aa == "X") next
     
-    codonCounts <- getCodonCountsForAA(aa)
+    codonCounts <- getCodonCountsForAA(aa, genome)
     numCodons <- dim(codonCounts)[2] - 1
     #-----------------------------------------
     # TODO WORKS CURRENTLY ONLY FOR ALLUNIQUE!
@@ -182,7 +185,7 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures, geneAssign
   {
     if(aa == "M" || aa == "W" || aa == "X") next
     
-    codonCounts <- getCodonCountsForAA(aa)
+    codonCounts <- getCodonCountsForAA(aa, genome)
     numCodons <- dim(codonCounts)[2] - 1
     #-----------------------------------------
     # TODO WORKS CURRENTLY ONLY FOR ALLUNIQUE!
@@ -280,7 +283,7 @@ writeParameterToCSV.Rcpp_ROCParameter <- function(parameter, filename=NULL, CSP=
   }
 }
 
-getCodonCountsForAA <- function(aa)
+getCodonCountsForAA <- function(aa, genome)
 {
   # get codon count for aa
   codons <- AAToCodon(aa, F)

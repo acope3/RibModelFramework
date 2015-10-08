@@ -648,21 +648,21 @@ RCPP_MODULE(SequenceSummary_mod)
 
 
 		//Static functions:
-		function("AAToAAIndex", &SequenceSummary::AAToAAIndex); //TEST THAT ONLY!
-		function("AAIndexToCodonRange", &SequenceSummary::AAIndexToCodonRange); //TEST THAT ONLY!
-		function("AAToCodonRange", &SequenceSummary::AAToCodonRange); //TEST THAT ONLY!
-		function("AAToCodon", &SequenceSummary::AAToCodon, List::create(_["aa"], _["forParamVector"] = false),
-			"returns a vector of codons for a given amino acid");
-		function("codonToAA", &SequenceSummary::codonToAA, List::create(_["codon"]), "returns an amino acid for a given codon");
-		function("codonToIndex", &SequenceSummary::codonToIndex, List::create(_["codon"], _["forParamVector"] = false)); //TEST THAT ONLY!
-		function("codonToAAIndex", &SequenceSummary::codonToAAIndex); //TEST THAT ONLY!
-		function("indexToAA", &SequenceSummary::indexToAA); //TEST THAT ONLY!
-		function("indexToCodon", &SequenceSummary::indexToCodon); //TEST THAT ONLY!
-		function("GetNumCodonsForAA", &SequenceSummary::GetNumCodonsForAA,
-			List::create(_["aa"], _["forParamVector"] = false), "returns the number of codons for a given amino acid");
-		function("complimentNucleotide", &SequenceSummary::complimentNucleotide); //TEST THAT ONLY!
-		function("aminoAcids", &SequenceSummary::aminoAcids, "returns all Amino Acids as one letter code");
-		function("codons", &SequenceSummary::codons, "returns all codons or all reference codons");
+		Rcpp::function("AAToAAIndex", &SequenceSummary::AAToAAIndex); //TEST THAT ONLY!
+		Rcpp::function("AAIndexToCodonRange", &SequenceSummary::AAIndexToCodonRange); //TEST THAT ONLY!
+		Rcpp::function("AAToCodonRange", &SequenceSummary::AAToCodonRange); //TEST THAT ONLY!
+		Rcpp::function("AAToCodon", &SequenceSummary::AAToCodon, List::create(_["aa"], _["forParamVector"] = false),
+				"returns a vector of codons for a given amino acid");
+		Rcpp::function("codonToAA", &SequenceSummary::codonToAA, List::create(_["codon"]), "returns an amino acid for a given codon");
+		Rcpp::function("codonToIndex", &SequenceSummary::codonToIndex, List::create(_["codon"], _["forParamVector"] = false)); //TEST THAT ONLY!
+		Rcpp::function("codonToAAIndex", &SequenceSummary::codonToAAIndex); //TEST THAT ONLY!
+		Rcpp::function("indexToAA", &SequenceSummary::indexToAA); //TEST THAT ONLY!
+		Rcpp::function("indexToCodon", &SequenceSummary::indexToCodon); //TEST THAT ONLY!
+		Rcpp::function("GetNumCodonsForAA", &SequenceSummary::GetNumCodonsForAA,
+				List::create(_["aa"], _["forParamVector"] = false), "returns the number of codons for a given amino acid");
+		Rcpp::function("complimentNucleotide", &SequenceSummary::complimentNucleotide); //TEST THAT ONLY!
+		Rcpp::function("aminoAcids", &SequenceSummary::aminoAcids, "returns all Amino Acids as one letter code");
+		Rcpp::function("codons", &SequenceSummary::codons, "returns all codons or all reference codons");
 
 }
 #endif

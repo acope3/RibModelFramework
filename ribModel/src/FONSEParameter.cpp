@@ -27,7 +27,7 @@ FONSEParameter::FONSEParameter(std::string filename) : Parameter(22)
 }
 
 #ifndef STANDALONE
-FONSEParameter::FONSEParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) 
+FONSEParameter::FONSEParameter(std::vector<double> sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer)
 	: Parameter(22)
 {
 	unsigned _numMixtures = _matrix.size() / 2;
@@ -47,7 +47,7 @@ FONSEParameter::FONSEParameter(double sphi, std::vector<unsigned> geneAssignment
 
 }
 
-FONSEParameter::FONSEParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState)
+FONSEParameter::FONSEParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState)
 	: Parameter(22)
 {
 	std::vector<std::vector<unsigned>> thetaKMatrix;
@@ -56,7 +56,7 @@ FONSEParameter::FONSEParameter(double sphi, unsigned _numMixtures, std::vector<u
 }
 #endif
 
-FONSEParameter::FONSEParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
+FONSEParameter::FONSEParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
 	std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer, std::string _mutationSelectionState) :
 	Parameter(22)
 {
@@ -687,10 +687,11 @@ double FONSEParameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned 
 	return posteriorMean / (double)usedSamples;
 }
 
-double FONSEParameter::getSphiPosteriorMean(unsigned samples)
+double FONSEParameter::getSphiPosteriorMean(unsigned samples, unsigned mixture)
 {
 	double posteriorMean = 0.0;
-	std::vector<double> sPhiTrace = traces.getSphiTrace();
+	unsigned selectionCategory = getSelectionCategoryForMixture(mixture);
+	std::vector<double> sPhiTrace = traces.getSphiTrace(selectionCategory);
 	unsigned traceLength = sPhiTrace.size();
 
 	if (samples > traceLength)
@@ -737,9 +738,10 @@ std::vector<double> FONSEParameter::getEstimatedMixtureAssignmentProbabilities(u
 	return probabilities;
 }
 
-double FONSEParameter::getSphiVariance(unsigned samples, bool unbiased)
+double FONSEParameter::getSphiVariance(unsigned samples, unsigned mixture, bool unbiased)
 {
-	std::vector<double> sPhiTrace = traces.getSphiTrace();
+	unsigned selectionCategory = getSelectionCategoryForMixture(mixture);
+	std::vector<double> sPhiTrace = traces.getSphiTrace(selectionCategory);
 	unsigned traceLength = sPhiTrace.size();
 	if (samples > traceLength)
 	{
@@ -748,7 +750,7 @@ double FONSEParameter::getSphiVariance(unsigned samples, bool unbiased)
 			<< "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
 	}
-	double posteriorMean = getSphiPosteriorMean(samples);
+	double posteriorMean = getSphiPosteriorMean(samples, mixture);
 
 	double posteriorVariance = 0.0;
 
@@ -934,7 +936,10 @@ void FONSEParameter::proposeCodonSpecificParameter()
 
 void FONSEParameter::proposeHyperParameters()
 {
-	Sphi_proposed = std::exp(randNorm(std::log(Sphi), std_sphi));
+	for(unsigned i = 0u; i < numSelectionCategories; i++)
+	{
+		Sphi_proposed[i] = std::exp(randNorm(std::log(Sphi[i]), std_sphi));
+	}
 }
 
 void FONSEParameter::updateCodonSpecificParameter(std::string grouping)

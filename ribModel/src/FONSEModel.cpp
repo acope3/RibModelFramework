@@ -8,7 +8,7 @@
 
 FONSEModel::FONSEModel() : Model()
 {
-	parameter = nullptr;
+	parameter = 0;
 }
 
 FONSEModel::~FONSEModel()
@@ -148,11 +148,20 @@ void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 
 void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration, std::vector <double> & logProbabilityRatio)
 {
-	double currentSphi = getSphi(false);
-	double currentMPhi = -(currentSphi * currentSphi) / 2;
-	double lpr = 0.0; // this variable is only needed because OpenMP doesn't allow variables in reduction clause to be reference
-	double proposedSphi = getSphi(true);
-	double proposedMPhi = -(proposedSphi * proposedSphi) / 2;
+	double lpr = 0.0;
+	unsigned selectionCategory = getNumSynthesisRateCategories();
+	std::vector<double> currentSphi(selectionCategory, 0.0);
+	std::vector<double> currentMphi(selectionCategory, 0.0);
+	std::vector<double> proposedSphi(selectionCategory, 0.0);
+	std::vector<double> proposedMphi(selectionCategory, 0.0);
+	for(unsigned i = 0u; i < selectionCategory; i++)
+	{
+		currentSphi[i] = getSphi(i, false);
+		currentMphi[i] = -((currentSphi[i] * currentSphi[i]) / 2);
+		proposedSphi[i] = getSphi(i, true);
+		proposedMphi[i] = -((proposedMphi[i] * proposedMphi[i]) / 2);
+		lpr -= (std::log(currentSphi[i]) - std::log(proposedSphi[i]));
+	}
 
 	logProbabilityRatio.resize(1);
 
@@ -164,10 +173,9 @@ void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 		unsigned mixture = getMixtureAssignment(i);
 		mixture = getSynthesisRateCategory(mixture);
 		double phi = getSynthesisRate(i, mixture, false);
-		lpr += std::log(Parameter::densityLogNorm(phi, proposedMPhi, proposedSphi)) - std::log(Parameter::densityLogNorm(phi, currentMPhi, currentSphi));
+		lpr += std::log(Parameter::densityLogNorm(phi, proposedMphi[mixture], proposedSphi[mixture]))
+				- std::log(Parameter::densityLogNorm(phi, currentMphi[mixture], currentSphi[mixture]));
 	}
-
-	lpr -= (std::log(currentSphi) - std::log(proposedSphi));
 	logProbabilityRatio[0] = lpr;
 }
 
@@ -198,7 +206,10 @@ void FONSEModel::updateHyperParameterTraces(unsigned sample)
 
 void FONSEModel::printHyperParameters()
 {
-	std::cout << "\t current Sphi estimate: " << getSphi() << std::endl;
+	for(unsigned i = 0u; i < getNumSynthesisRateCategories(); i++)
+	{
+		std::cout << "Sphi posterior estimate for selection category " << i << ": " << getSphi(i) << std::endl;
+	}
 	std::cout << "\t current Sphi proposal width: " << getCurrentSphiProposalWidth() << std::endl;
 }
 

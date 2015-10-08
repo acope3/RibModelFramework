@@ -10,7 +10,8 @@ RCPP_MODULE(Trace_mod)
 {
   class_<Trace>( "Trace" )
     //These methods have only a C++ implementation
-    .method("getSphiTrace", &Trace::getSphiTrace)
+    //.method("getSphiTrace", &Trace::getSphiTrace)
+    .method("getSphiTraces", &Trace::getSphiTraces)
     //.method("getAPhiTrace", &Trace::getAPhiTrace)
     .method("getSphiAcceptanceRatioTrace", &Trace::getSphiAcceptanceRatioTrace)
     .method("getCspAcceptanceRatioTraceForAA", &Trace::getCspAcceptanceRatioTraceForAA)
@@ -31,9 +32,9 @@ RCPP_MODULE(Trace_mod)
     //These methods have specific R wrappers
     .method("getMutationParameterTraceByMixtureElementForCodon", &ROCTrace::getMutationParameterTraceByMixtureElementForCodonR)
     .method("getSelectionParameterTraceByMixtureElementForCodon", &ROCTrace::getSelectionParameterTraceByMixtureElementForCodonR)
-	.method("getAphiTrace", &ROCTrace::getAphiTraceR)
+	.method("getAphiTraces", &ROCTrace::getAphiTraceR)
 	.method("getAphiAcceptanceRatioTrace", &ROCTrace::getAphiAcceptanceRatioTrace)
-	.method("getSepsilonTrace", &ROCTrace::getSepsilonTraceR)
+	.method("getSepsilonTraces", &ROCTrace::getSepsilonTraceR)
     ;
 
 	class_<RFPTrace>("RFPTrace")

@@ -1,0 +1,49 @@
+
+R version 3.1.1 (2014-07-10) -- "Sock it to Me"
+Copyright (C) 2014 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> rm(list=ls())
+> library(ribModel)
+>   
+> with.phi <- FALSE
+>   
+> if (with.phi) {
++   genome <- initializeGenomeObject(file = "../ribModel/data/simulatedAllUniqueR.fasta", expression.file = "../ribModel/data/simulatedAllUniqueR_phi.csv")
++   #genome <- initializeGenomeObject(file = "../ribModel/data/simulatedOneMix.fasta", expression.file = "../ribModel/data/simulatedOneMix_simphi.csv")
++ } else {
++   #genome <- initializeGenomeObject(file = "../ribModel/data/simulatedAllUniqueR.fasta")
++   #genome <- initializeGenomeObject(file = "../ribModel/data/genome_2000.fasta")
++   genome <- initializeGenomeObject(file = "../ribModel/data/Skluyveri.fasta")
++   #genome <- initializeGenomeObject(file = "../../../organisms/human/data/human_genome_cds_brain.fasta")
++ }
+>  
+> #initialize parameter object
+> sphi_init <- 1
+> numMixtures <- 2
+> mixDef <- "allUnique"
+> geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457), rep(1, 3903)) # S.kluyveri full genome
+> #geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
+> #geneAssignment <- rep(1,328) # human brain
+> #geneAssignment <- c(rep(1,200), rep(2,800))
+> #geneAssignment <- rep(1,2000)
+> parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
+> 
+> #parameter <- initializeParameterObject(restart.file = "2000restartFile.rst")
+> 
+> phivals <- parameter$readPhiValues( "../ribModel/data/Skluyveri_GSM552569.csv")
+> parameter$initializeSynthesisRateByRandom(phivals)

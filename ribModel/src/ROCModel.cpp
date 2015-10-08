@@ -2,7 +2,7 @@
 
 ROCModel::ROCModel(bool _withPhi) : Model()
 {
-	parameter = nullptr;
+	parameter = 0;
 	withPhi = _withPhi;
 }
 
@@ -55,10 +55,12 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 		logLikelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
 		logLikelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue_proposed);
 	}
-
-	double sPhi = parameter->getSphi(false);
-	double logPhiProbability = std::log(ROCParameter::densityLogNorm(phiValue, (-(sPhi * sPhi) / 2), sPhi));
-	double logPhiProbability_proposed = std::log(Parameter::densityLogNorm(phiValue_proposed, (-(sPhi * sPhi) / 2), sPhi));
+	unsigned mixture = getMixtureAssignment(geneIndex);
+	mixture = getSynthesisRateCategory(mixture);
+	double sPhi = parameter->getSphi(mixture, false);
+	double mPhi = (-(sPhi * sPhi) / 2);
+	double logPhiProbability = std::log(ROCParameter::densityLogNorm(phiValue, mPhi, sPhi));
+	double logPhiProbability_proposed = std::log(Parameter::densityLogNorm(phiValue_proposed, mPhi, sPhi));
 	double currentLogLikelihood = (logLikelihood + logPhiProbability);
 	double proposedLogLikelihood = (logLikelihood_proposed + logPhiProbability_proposed);
 
@@ -191,7 +193,34 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 		likelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
 		likelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation_proposed, selection_proposed, phiValue);
 	}
-	logAcceptanceRatioForAllMixtures = likelihood_proposed - likelihood;
+
+
+	double mutation_prior = calculateMutationPrior(grouping);
+	logAcceptanceRatioForAllMixtures = (likelihood_proposed - likelihood) - mutation_prior;
+}
+
+double ROCModel::calculateMutationPrior(std::string grouping)
+{
+	unsigned numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
+	double mutation[5];
+	double mutation_proposed[5];
+
+	double curr = 0.0;
+	double prop = 0.0;
+
+	unsigned numMutCat = parameter->getNumMutationCategories();
+	double mutation_prior_sd = parameter->getMutationPriorStandardDeviation();
+	for(unsigned i = 0u; i < numMutCat; i++)
+	{
+		parameter->getParameterForCategory(i, ROCParameter::dM, grouping, false, mutation);
+		parameter->getParameterForCategory(i, ROCParameter::dM, grouping, true, mutation_proposed);
+		for(unsigned k = 0u; k < numCodons; k++)
+		{
+			curr += Parameter::densityNorm(mutation[k], 0.0, mutation_prior_sd, true);
+			prop += Parameter::densityNorm(mutation_proposed[k], 0.0, mutation_prior_sd, true);
+		}
+	}
+	return curr - prop;
 }
 
 void ROCModel::obtainCodonCount(SequenceSummary& seqsum, std::string curAA, int codonCount[])
@@ -224,7 +253,11 @@ std::vector<double> ROCModel::CalculateProbabilitiesForCodons(std::vector<double
 
 void ROCModel::printHyperParameters()
 {
-	std::cout << "\t current Sphi estimate: " << getSphi() << std::endl;
+	for(unsigned i = 0u; i < getNumSynthesisRateCategories(); i++)
+	{
+		std::cout << "Sphi posterior estimate for selection category " << i << ": " << getSphi(i, false) << std::endl;
+	}
+
 	std::cout << "\t current Sphi proposal width: " << getCurrentSphiProposalWidth() << std::endl;
 	if(withPhi)
 	{
@@ -311,14 +344,20 @@ void ROCModel::simulateGenome(Genome &genome)
 
 void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration, std::vector <double> &logProbabilityRatio)
 {	
-	double currentSphi = getSphi(false);
-	double currentMphi;
-	double proposedMphi;
-	currentMphi = -((currentSphi * currentSphi) / 2);
-	double proposedSphi = getSphi(true);
-
-	// TODO: double check the formulation of this
-	proposedMphi = -((proposedSphi * proposedSphi) / 2);
+	double lpr = 0.0;
+	unsigned selectionCategory = getNumSynthesisRateCategories();
+	std::vector<double> currentSphi(selectionCategory, 0.0);
+	std::vector<double> currentMphi(selectionCategory, 0.0);
+	std::vector<double> proposedSphi(selectionCategory, 0.0);
+	std::vector<double> proposedMphi(selectionCategory, 0.0);
+	for(unsigned i = 0u; i < selectionCategory; i++)
+	{
+		currentSphi[i] = getSphi(i, false);
+		currentMphi[i] = -((currentSphi[i] * currentSphi[i]) / 2);
+		proposedSphi[i] = getSphi(i, true);
+		proposedMphi[i] = -((proposedSphi[i] * proposedSphi[i]) / 2);
+		lpr -= (std::log(currentSphi[i]) - std::log(proposedSphi[i]));
+	}
 
 	if (withPhi) {
 		// one for each Aphi, and one for Sphi
@@ -327,7 +366,6 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 	else {
 		logProbabilityRatio.resize(1);
 	}
-	double lpr = 0.0;
 #ifndef __APPLE__
 #pragma omp parallel for reduction(+:lpr)
 #endif
@@ -336,11 +374,11 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 		unsigned mixture = getMixtureAssignment(i);
 		mixture = getSynthesisRateCategory(mixture);
 		double phi = getSynthesisRate(i, mixture, false);
-		lpr += std::log(Parameter::densityLogNorm(phi, proposedMphi, proposedSphi)) - std::log(Parameter::densityLogNorm(phi, currentMphi, currentSphi));
+		lpr += std::log(Parameter::densityLogNorm(phi, proposedMphi[mixture], proposedSphi[mixture]))
+				- std::log(Parameter::densityLogNorm(phi, currentMphi[mixture], currentSphi[mixture]));
 	}
 
 	// TODO: USE CONSTANTS INSTEAD OF 0
-	lpr -= (std::log(currentSphi) - std::log(proposedSphi));
 	logProbabilityRatio[0] = lpr;
 
 	if (withPhi) {
@@ -348,7 +386,7 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 			lpr = 0.0;
 			double Aphi = getAphi(i, false);
 			double Aphi_proposed = getAphi(i, true);
-			double AphiPropWidth = getCurrentAphiProposalWidth(i);
+			//double AphiPropWidth = getCurrentAphiProposalWidth(i);
 			double Sepsilon = getSepsilon(i);
 #ifndef __APPLE__
 #pragma omp parallel for reduction(+:lpr)
@@ -414,7 +452,6 @@ void ROCModel::updateAllHyperParameter()
 	updateSphi();
 	for (unsigned i = 0; i < parameter->getNumPhiGroupings(); i++) {
 		updateAphi(i);
-		break;
 	}
 }
 

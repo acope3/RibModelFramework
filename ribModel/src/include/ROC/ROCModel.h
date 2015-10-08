@@ -10,6 +10,7 @@ class ROCModel : public Model
 
 	ROCParameter *parameter;
 	virtual void obtainCodonCount(SequenceSummary& seqsum, std::string curAA, int codonCount[]);
+	double calculateMutationPrior(std::string grouping); // TODO add to FONSE as well? // cedric
 	double calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codonCount[], double mutation[], double selection[], double phiValue);
 	bool withPhi;
 
@@ -30,7 +31,7 @@ class ROCModel : public Model
 	//Parameter wrapper functions:
 	virtual void initTraces(unsigned samples, unsigned num_genes) {parameter -> initAllTraces(samples, num_genes);}
 	virtual void writeRestartFile(std::string filename) {return parameter->writeEntireRestartFile(filename);}       
-	virtual double getSphi(bool proposed = false) {return parameter->getSphi(proposed);}
+	virtual double getSphi(unsigned selectionCategory, bool proposed = false) {return parameter->getSphi(selectionCategory, proposed);}
 	virtual unsigned getNumPhiGroupings() { return parameter->getNumPhiGroupings(); }
 	virtual void setNumPhiGroupings(unsigned value) { parameter->setNumPhiGroupings(value); }
 	double getAphi(unsigned index, bool proposed = false) { return parameter->getAphi(index, proposed); }

@@ -95,7 +95,8 @@ void testThetaKMatrix()
 	std::cout << "------------------ TEST THETAKMATRIX ------------------" << std::endl;
 	std::vector<unsigned> empty(100, 1);
 	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
-	ROCParameter R(2, 2, empty, mixtureDefinitionMatrix, true, "allUnique");
+	std::vector<double> sphi_init(2, 2);
+	ROCParameter R(sphi_init, 2, empty, mixtureDefinitionMatrix, true, "allUnique");
 
 	//R.printThetaKMatrix();
 	std::cout << "numMutationCategories: " << R.getNumMutationCategories() << "\n";
@@ -161,8 +162,8 @@ void testWriteRestartFile()
 	{
 		geneAssignment[i] = 0u;
 	}
-	double sphi_init = 2;
 	unsigned numMixtures = 1;
+	std::vector<double> sphi_init(numMixtures, 2);
 	std::string mixDef = ROCParameter::allUnique;
 	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 	ROCParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
@@ -174,7 +175,7 @@ void testWriteRestartFile()
 	files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_selection0.csv");
 	files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_selection1.csv");
 	parameter.initSelectionCategories(files, parameter.getNumSelectionCategories());
-	parameter.InitializeSynthesisRate(genome, sphi_init);
+	parameter.InitializeSynthesisRate(genome, sphi_init[0]);
 	ROCModel model;
 	model.setParameter(parameter);
 	model.writeRestartFile("RestartFile1.txt");
@@ -237,8 +238,8 @@ void simulateRFPData()
 	{
 		geneAssignment[i] = 0u;
 	}
-	double sphi_init = 2;
 	unsigned numMixtures = 1;
+	std::vector<double> sphi_init(numMixtures, 2);
 	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 	RFPParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
 
@@ -276,8 +277,8 @@ void simulateROCData()
         else geneAssignment[i] = 1u;
     }
 
-	double sphi_init = 2;
 	unsigned numMixtures = 2;
+	std::vector<double> sphi_init(numMixtures, 2);
 	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 
 	ROCParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, Parameter::allUnique);
@@ -311,8 +312,8 @@ void testInitMutationSelection()
 	{
 		geneAssignment[i] = 0u;
 	}
-	double sphi_init = 2;
 	unsigned numMixtures = 1;
+	std::vector<double> sphi_init(numMixtures, 2);
 	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 	RFPParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
 
@@ -332,8 +333,8 @@ void testRFPVarianceAndMean()
 	{
 		geneAssignment[i] = 0u;
 	}
-	double sphi_init = 2;
 	unsigned numMixtures = 1;
+	std::vector<double> sphi_init(numMixtures, 2);
 	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 	RFPParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
 
@@ -370,8 +371,8 @@ void testReadMutationValues()
 		else geneAssignment[i] = 1u;
 	}
 
-	double sphi_init = 2;
 	unsigned numMixtures = 2;
+	std::vector<double> sphi_init(numMixtures, 2);
 	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 
 	ROCParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, Parameter::allUnique);
@@ -475,7 +476,7 @@ int main()
 			case cedric:
 				if (modelToRun == ROC)
 				{
-					genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
+					genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/twoMixtures/simulatedAllUniqueR.fasta");
 					//genome.readFasta("C:/Users/Cedric/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta");
 				}
 				else if (modelToRun == RFP)
@@ -532,8 +533,8 @@ int main()
 		{
 			geneAssignment[i] = 0u;
 		}*/
-		double sphi_init = 2;
 		unsigned numMixtures = 2;
+		std::vector<double> sphi_init(numMixtures, 1);
 		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 		std::cout <<"Done initializing shared parameter variables\n";
 
@@ -551,50 +552,55 @@ int main()
 			}
 			else
 			{
-			std::cout << "initialize ROCParameter object" << std::endl;
-			std::string mixDef = ROCParameter::allUnique;
-			std::cout << "\tSphi init: " << sphi_init << "\n";
-			std::cout << "\t# mixtures: " << numMixtures << "\n";
-			std::cout << "\tmixture definition: " << mixDef << "\n";
+				std::cout << "initialize ROCParameter object" << std::endl;
+				std::string mixDef = ROCParameter::allUnique;
+				ROCParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 
-			ROCParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
-			std::vector<std::string> files(2);
+				for(unsigned i = 0u; i < numMixtures; i++)
+				{
+					unsigned selectionCategry = tmp.getSelectionCategory(i);
+					std::cout << "Sphi_init for selection category " << selectionCategry << ": " << sphi_init[selectionCategry] << std::endl;
+				}
+				std::cout << "\t# mixtures: " << numMixtures << "\n";
+				std::cout << "\tmixture definition: " << mixDef << "\n";
 
-			switch (user) {
-				case cedric:
-					files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/simulated_mutation0.csv");
-					files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/simulated_mutation1.csv");
-					tmp.initMutationCategories(files, tmp.getNumMutationCategories());
+				std::vector<std::string> files(2);
 
-					files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/simulated_selection0.csv");
-					files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/simulated_selection1.csv");
-					tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
-					break;
+				switch (user) {
+					case cedric:
+						files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/twoMixtures/simulated_mutation0.csv");
+						files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/twoMixtures/simulated_mutation1.csv");
+						tmp.initMutationCategories(files, tmp.getNumMutationCategories());
 
-				case gabe:
-					files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_mutation0.csv");
-					files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_mutation1.csv");
-				//	tmp.initMutationCategories(files, tmp.getNumMutationCategories());
+						files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/twoMixtures/simulated_selection0.csv");
+						files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/twoMixtures/simulated_selection1.csv");
+						tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
+						break;
 
-					files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_selection0.csv");
-					files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_selection1.csv");
-				//	tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
-					break;
-				case jeremy:
-					files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_mutation0.csv");
-					files[1] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_mutation1.csv");
-				//	tmp.initMutationCategories(files, tmp.getNumMutationCategories());
+					case gabe:
+						files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_mutation0.csv");
+						files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_mutation1.csv");
+					//	tmp.initMutationCategories(files, tmp.getNumMutationCategories());
 
-					files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_selection0.csv");
-					files[1] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_selection1.csv");
-				//	tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
-					break;
-			}
-			tmp.InitializeSynthesisRate(genome, sphi_init);
-			//std::vector<double> phiVals = parameter.readPhiValues("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrCleft_phi_est.csv");
-			//parameter.InitializeSynthesisRate(phiVals);
-			parameter = tmp;
-			std::cout << "done initialize ROCParameter object" << std::endl;
+						files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_selection0.csv");
+						files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_selection1.csv");
+					//	tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
+						break;
+					case jeremy:
+						files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_mutation0.csv");
+						files[1] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_mutation1.csv");
+					//	tmp.initMutationCategories(files, tmp.getNumMutationCategories());
+
+						files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_selection0.csv");
+						files[1] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulated_selection1.csv");
+					//	tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
+						break;
+				}
+				tmp.InitializeSynthesisRate(genome, sphi_init[0]);
+				//std::vector<double> phiVals = parameter.readPhiValues("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrCleft_phi_est.csv");
+				//parameter.InitializeSynthesisRate(phiVals);
+				parameter = tmp;
+				std::cout << "done initialize ROCParameter object" << std::endl;
 			}
 
 			std::cout <<"Initializing ROCModel object\n";
@@ -614,7 +620,11 @@ int main()
 			std::cout << std::endl << "Finished MCMC for ROC" << std::endl;
 			
 
-			std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
+			for(unsigned i = 0u; i < numMixtures; i++)
+			{
+				unsigned selectionCategry = parameter.getSelectionCategoryForMixture(i);
+				std::cout << "Sphi posterior estimate for selection category " << selectionCategry << ": " << parameter.getSphiPosteriorMean(useSamples, selectionCategry) << std::endl;
+			}
 			std::cout << "Sphi proposal width: " << parameter.getCurrentSphiProposalWidth() << std::endl;
 			std::cout << "CSP proposal width: \n";
 			for (unsigned n = 0; n < model.getGroupListSize(); n++)
@@ -638,11 +648,15 @@ int main()
 			{
 				std::cout << "initialize RFPParameter object" << std::endl;
 				std::string mixDef = Parameter::allUnique;
-				std::cout << "\tSphi init: " << sphi_init << "\n";
+				for(unsigned i = 0u; i < numMixtures; i++)
+				{
+					unsigned selectionCategry = parameter.getSelectionCategoryForMixture(i);
+					std::cout << "Sphi_init for selection category " << selectionCategry << ": " << sphi_init[selectionCategry] << std::endl;
+				}
 				std::cout << "\t# mixtures: " << numMixtures << "\n";
 				std::cout << "\tmixture definition: " << mixDef << "\n";
 				RFPParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
-				tmp.InitializeSynthesisRate(genome, sphi_init);
+				tmp.InitializeSynthesisRate(genome, sphi_init[0]);
 				parameter = tmp;
 				std::cout << "Done initialize RFPParameter object" << std::endl;
 			}
@@ -665,7 +679,11 @@ int main()
       std::cout << std::endl << "Finished MCMC for RFP" << std::endl;
 
 
-      std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
+	for(unsigned i = 0u; i < numMixtures; i++)
+	{
+		unsigned selectionCategry = parameter.getSelectionCategoryForMixture(i);
+		std::cout << "Sphi posterior estimate for selection category " << selectionCategry << ": " << parameter.getSphiPosteriorMean(useSamples, selectionCategry) << std::endl;
+	}
       std::cout << "Sphi proposal width: " << parameter.getCurrentSphiProposalWidth() << std::endl;
 
 		}
@@ -683,7 +701,11 @@ int main()
 			{
 				std::cout << "initialize ROCParameter object" << std::endl;
 				std::string mixDef = FONSEParameter::allUnique;
-				std::cout << "\tSphi init: " << sphi_init << "\n";
+				for(unsigned i = 0u; i < numMixtures; i++)
+				{
+					unsigned selectionCategry = parameter.getSelectionCategoryForMixture(i);
+					std::cout << "Sphi_init for selection category " << selectionCategry << ": " << sphi_init[selectionCategry] << std::endl;
+				}
 				std::cout << "\t# mixtures: " << numMixtures << "\n";
 				std::cout << "\tmixture definition: " << mixDef << "\n";
 
@@ -710,7 +732,7 @@ int main()
 
 				tmp.initMutationSelectionCategories(files, tmp.getNumMutationCategories(), FONSEParameter::dM);
 				tmp.initMutationSelectionCategories(files, tmp.getNumSelectionCategories(), FONSEParameter::dOmega);
-				tmp.InitializeSynthesisRate(genome, sphi_init);
+				tmp.InitializeSynthesisRate(genome, sphi_init[0]);
 				//std::vector<double> phiVals = parameter.readPhiValues("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrCleft_phi_est.csv");
 				//parameter.InitializeSynthesisRate(phiVals);
 				parameter = tmp;
@@ -733,8 +755,11 @@ int main()
 			mcmc.run(genome, model, 4);
 			std::cout << std::endl << "Finished MCMC for FONSE" << std::endl;
 
-
-			std::cout << "Sphi posterior estimate: " << parameter.getSphiPosteriorMean(useSamples) << std::endl;
+			for(unsigned i = 0u; i < numMixtures; i++)
+			{
+				unsigned selectionCategry = parameter.getSelectionCategoryForMixture(i);
+				std::cout << "Sphi posterior estimate for selection category " << selectionCategry << ": " << parameter.getSphiPosteriorMean(useSamples, selectionCategry) << std::endl;
+			}
 			std::cout << "Sphi proposal width: " << parameter.getCurrentSphiProposalWidth() << std::endl;
 			std::cout << "CSP proposal width: \n";
 			for (unsigned n = 0; n < model.getGroupListSize(); n++)

@@ -41,9 +41,9 @@ class RFPModel: public Model {
 		{
 			return parameter->writeEntireRestartFile(filename);
 		}
-		virtual double getSphi(bool proposed = false)
+		virtual double getSphi(unsigned selectionCategory, bool proposed = false)
 		{
-			return parameter->getSphi(proposed);
+			return parameter->getSphi(selectionCategory, proposed);
 		}
 		virtual unsigned getNumPhiGroupings() { return parameter->getNumPhiGroupings(); }
 		virtual void setNumPhiGroupings(unsigned value) { parameter->setNumPhiGroupings(value); }

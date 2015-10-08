@@ -35,7 +35,7 @@ plot.Rcpp_RFPTrace <- function(trace, what=c("Alpha", "LambdaPrime", "MixturePro
 
 # The `which' variable is the number of the trace to be plotted for Aphi and Sepsilon
 plot.Rcpp_ROCTrace <- function(trace, what=c("Mutation", "Selection", "MixtureProbability" ,"Sphi", "Mphi", "Aphi", "Sepsilon", "ExpectedPhi", "Expression"), 
-                                   geneIndex=1, mixture = 1, which = 1, ...)
+                                   geneIndex=1, mixture = 1, ...)
 {
   if(what[1] == "Mutation")
   {
@@ -59,11 +59,11 @@ plot.Rcpp_ROCTrace <- function(trace, what=c("Mutation", "Selection", "MixturePr
   }
   if(what[1] == "Aphi")
   {
-    plotHyperParameterTrace(trace, what = what[1], which = which)
+    plotHyperParameterTrace(trace, what = what[1])
   }
   if(what[1] == "Sepsilon") 
   {
-    plotHyperParameterTrace(trace, what = what[1], which = which)
+    plotHyperParameterTrace(trace, what = what[1])
   }
   if(what[1] == "ExpectedPhi")
   {
@@ -207,30 +207,67 @@ plotExpectedPhiTrace <- function(trace)
        main = expression("Trace of the Expected value of "~phi))
   abline(h=1, col="red", lwd=1.5, lty=2)
 }
-plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sepsilon"), which = 1)
+plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sepsilon"))
 {
 #  opar <- par(no.readonly = T) 
 #  par(oma=c(1,1,2,1), mgp=c(2,1,0), mar = c(3,4,2,1), mfrow=c(2, 1))
   if (what[1] == "Sphi")
   {
-    sphi <- trace$getSphiTrace();
-    plot(sphi, type="l", xlab = "Sample", ylab = expression("s"[phi]))
+    sphi <- trace$getSphiTraces();
+    sphi <- do.call("cbind", sphi)
+    ylimit <- range(sphi) + c(-0.1, 0.1)
+    xlimit <- c(1, nrow(sphi))
+    plot(NULL, NULL, type="l", xlab = "Sample", ylab = expression("s"[phi]), xlim  = xlimit, ylim = ylimit)
+    for(i in 1:ncol(sphi))
+    {
+      lines(sphi[,i], col= ribModel:::.mixtureColors[i])
+    }
+    legend("topleft", legend = paste("Mixture Element", 1:numMixtures), 
+           col = ribModel:::.mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")
   }
   if (what[1] == "Mphi")
   {
-    sphi <- trace$getSphiTrace();
+    sphi <- trace$getSphiTraces();
+    sphi <- do.call("cbind", sphi)
     mphi <- -(sphi * sphi) / 2;
-    plot(mphi, type="l", xlab = "Sample", ylab = expression("m"[phi]));
+    ylimit <- range(mphi) + c(-0.1, 0.1)
+    xlimit <- c(1, nrow(mphi))
+    plot(NULL, NULL, type="l", xlab = "Sample", ylab = expression("m"[phi]), xlim  = xlimit, ylim = ylimit)
+    for(i in 1:ncol(mphi))
+    {
+      lines(mphi[,i], col= ribModel:::.mixtureColors[i])
+    }
+    legend("topleft", legend = paste("Mixture Element", 1:numMixtures), 
+           col = ribModel:::.mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")    
+
   }
   if (what[1] == "Aphi") 
   {
-    aphi <- trace$getAphiTrace(which);
-    plot(aphi, type="l", xlab = "Sample", ylab = expression("A"[phi]));
+    aphi <- trace$getAphiTraces();
+    aphi <- do.call("cbind", aphi)
+    ylimit <- range(aphi) + c(-0.1, 0.1)
+    xlimit <- c(1, nrow(aphi))
+    plot(NULL, NULL, type="l", xlab = "Sample", ylab = expression("A"[phi]), xlim  = xlimit, ylim = ylimit)
+    for(i in 1:ncol(aphi))
+    {
+      lines(aphi[,i], col= ribModel:::.mixtureColors[i])
+    }
+    legend("topleft", legend = paste("Observed Data", 1:numMixtures), 
+           col = ribModel:::.mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")        
   }
   if (what[1] == "Sepsilon")
   {
-    sepsilon <- trace$getSepsilonTrace(which);
-    plot(sepsilon, type="l", xlab = "Sample", ylab = expression("s"[epsilon]))
+    sepsilon <- trace$getSepsilonTraces();
+    sepsilon <- do.call("cbind", sepsilon)
+    ylimit <- range(sepsilon) + c(-0.1, 0.1)
+    xlimit <- c(1, nrow(sepsilon))
+    plot(NULL, NULL, type="l", xlab = "Sample", ylab = expression("s"[epsilon]), xlim  = xlimit, ylim = ylimit)
+    for(i in 1:ncol(sepsilon))
+    {
+      lines(sepsilon[,i], col= ribModel:::.mixtureColors[i])
+    }
+    legend("topleft", legend = paste("Observed Data", 1:numMixtures), 
+           col = ribModel:::.mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")  
   }
   #par(opar)
 }
