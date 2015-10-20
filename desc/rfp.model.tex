@@ -39,18 +39,20 @@
 \newcommand{\vgc}{\ensuremath{\vc_{g}}\xspace}
 \newcommand{\betac}{\ensuremath{{\beta_c}}\xspace}
 \newcommand{\muc}{\ensuremath{{\mu_c}}\xspace}
-
+\newcommand{\sigmag}{\ensuremath{\sigma_{g}}\xspace}
 
 \newcommand{\pgi}{\ensuremath{{p_{g,i}}}\xspace}
 \newcommand{\Pgi}{\ensuremath{{P_{g,i}}}\xspace}
 \newcommand{\Pgj}{\ensuremath{{P_{g,j}}}\xspace}
 \newcommand{\Pgc}{\ensuremath{{P_{g}^c}}\xspace}
 \newcommand{\ngc}{\ensuremath{{n_{g}^c}}\xspace}
+\renewcommand{\ng}{\ensuremath{{n_{g}}}\xspace}
 \newcommand{\ns}{\ensuremath{{n_s}}\xspace}
 \newcommand{\mg}{\ensuremath{{m_g}}\xspace}
 \newcommand{\Mg}{\ensuremath{{M_g}}\xspace}
+\newcommand{\psig}{\ensuremath{{\psi_g}}\xspace}
 \newcommand{\phig}{\ensuremath{{\phi_g}}\xspace}
-\newcommand{\phige}{\ensuremath{{\phi_g^e}}\xspace}
+\newcommand{\psie}{\ensuremath{{\psi_g^e}}\xspace}
 %\newcommand{\lambdagi}{\ensuremath{{\lambda_{g,i}}}\xspace}
 %\newcommand{\lambdagc}{\ensuremath{{\lambda_{g}^c}}\xspace}
 \newcommand{\kappag}{\ensuremath{{\kappa_{g}}}\xspace}
@@ -72,7 +74,7 @@
 \newcommand{\Ygcvec}{\ensuremath{{\Vec{\Ygc}}}\xspace}
 \newcommand{\kappagvec}{\ensuremath{{\Vec{\kappag}}}\xspace}
 \newcommand{\ngcvec}{\ensuremath{{\Vec{\ngc}}}\xspace}
-\newcommand{\phigvec}{\ensuremath{{\Vec{\phig}}}\xspace}
+\newcommand{\psigvec}{\ensuremath{{\Vec{\psig}}}\xspace}
 \begin{document}
 
 
@@ -80,7 +82,7 @@
 \begin{itemize}
 \item Initial model  by mikeg on 6/10/15.
 \item NSE model added by mikeg on 7/21/15.
-\item Compiled on \today at \ \currenttime
+\item Compiled on \today \ at \ \currenttime
  \end{itemize}
 \subsection*{Goal}
 \label{goal}
@@ -104,7 +106,7 @@ We can link it to \citet{PopEtAl14} work by noting the ribsome flux $J_g$ on an 
 
 Biologically speaking, \wgi values for the same codon are not independent.
 The values of \wgi for the relevant codon likely vary within a gene as a function of mRNA structure and other factors.
-To capture this variation, we will assume that for when the codon at position $i$ is of type $c$, $\wgi \sim \text{Gamma}(\alphac, \lambdac)$, where \alphac is the shape parameter, \lambdac is the scale parameter, and $E[\wgi] = \alphac \lambdac$.
+To capture this variation, we will assume that for when the codon at position $i$ is of type $c$, $\wgi \sim \text{Gamma}(\alphac, \lambdac)$, where \alphac is the shape parameter, \lambdac is the rate parameter, and $E[\wgi] = \alphac/\lambdac$. %originally thought we were using the 'scale' formulation, but double checking Mathematica code indicates we are using the 'rate' formulation.
 Gene specific effects could also be incorporated since  mRNA structures which interfere with efficient translation likely declines with expression level.
 As a result of this assumption, we can use a Negative-Binomial (NB) distribution model to analyze the RFP data.
 
@@ -126,32 +128,34 @@ Letting $\Ytotal = \sum_{g,i}\Ygi$ be the footprint sample size, where $\Ytotal 
 Note that deep sequencing may violate the sampling with replacement assumption of the Poisson distribution.
 Given our assumption about the distribution of $\pgi$,  $\Ygi \sim \text{NB}(x = \alphac, p = \kappag \mg /(\lambdacprime + \kappag \mg)$ where $\lambdacprime = \lambdac \Ztheta/\Ytotal$.
 Explicitly,
-\begin{equation}
+\begin{align}
+  \Pr\left(\Ygi \middle| \alphac, \lambdacprime, \mg, \kappag\right) &= \frac{\Gamma\left(\alphac + \Ygi\right)}{\Gamma\left(\alphac\right) \Ygi!} 
+  \left(\frac{\mg \kappag}{\lambdacprime + \mg \kappag}\right)^\Ygi \left(\frac{\lambdacprime}{\lambdacprime + \mg \kappag}\right)^\alphac \nonumber\\
   \label{eq:distYgSite}
-  \Pr\left(\Ygi \middle| \alphac, \lambdacprime, \mg, \kappag\right) = \frac{\Gamma\left(\alphac + \Ygi\right)}{\Gamma\left(\alphac\right) \Ygi!} 
-  \left(\frac{\mg \kappag}{\lambdacprime + \mg \kappag}\right)^\Ygi \left(\frac{\lambdacprime}{\lambdacprime + \mg \kappag}\right)^\alphac
-\end{equation}
-Note that $\mg$ and \kappag are gene $g$ and environment specific terms which can be equated to the equilibrium protein synthesis rate $\phi_g$ for gene $g$ under the experimental conditions, i.e.~$\phig = \kappag \mg$.
+  &=\frac{\Gamma\left(\alphac + \Ygi\right)}{\Gamma\left(\alphac\right) \Ygi!} 
+  \left(\frac{\mg \kappag}{\lambdacprime + \mg \kappag}\right)^\Ygi \left(1-\frac{\mg \kappag}{\lambdacprime + \mg \kappag}\right)^\alphac
+\end{align}
+Note that $\mg$ and \kappag are gene $g$ and environment specific terms which can be equated to the equilibrium protein synthesis initiation rate $\psig$ for gene $g$ under the experimental conditions, i.e.~$\psig = \kappag \mg$.
 The composite parameter \lambdacprime consists of the codon specific scale term \lambdac and  the ratio of \Ztheta to \Ytotal, two genome wide parameters.
 The term \Ytotal/\Ztheta can be interpreted as the sampling efficiency, i.e.~what proportion of the RFP state space is sampled.
 If $\Ytotal/\Ztheta \ll 1$, then sampling is sparse.
 
-Given the properties of the NB and the fact that most codons appear within a gene's ORF multiple times, the likelihood of the parameters given the total number of RFP observed derived from codons of type $c$ in gene $g$, $\Ygc = \sum_{i=\in c} \Ygi$, is,
+Given the properties of the NB \citep[p.~141]{ForbesEtAl11} and the fact that most codons appear within a gene's ORF multiple times, the likelihood of the parameters given the total number of RFP observed derived from codons of type $c$ in gene $g$, $\Ygc = \sum_{i=\in c} \Ygi$, is,
 \begin{align}
-  \Lik\left(\phig, \alphac, \lambdacprime \middle| \Ygc, \ngc\right) &= \frac{\Gamma\left(\ngc \alphac + \Ygc\right)}{\Gamma\left(\ngc \alphac\right) \Ygc!} 
-  \left(\frac{\phig}{\lambdacprime + \phig}\right)^\Ygc \left(\frac{\lambdacprime}{\lambdacprime + \phig}\right)^{\ngc \alphac}\\
+  \Lik\left(\psig, \alphac, \lambdacprime \middle| \Ygc, \ngc\right) &= \frac{\Gamma\left(\ngc \alphac + \Ygc\right)}{\Gamma\left(\ngc \alphac\right) \Ygc!} 
+  \left(\frac{\psig}{\lambdacprime + \psig}\right)^\Ygc \left(1-\frac{\psig}{\lambdacprime + \psig}\right)^{\ngc \alphac}\\
 \label{eq:distYgCodon}&= \frac{\Gamma\left(\alphacgprime + \Ygc\right)}{\Gamma\left(\alphacgprime\right) \Ygc!} 
-  \left(\frac{\phig}{\lambdacprime + \phig}\right)^\Ygc \left(\frac{\lambdacprime}{\lambdacprime + \phig}\right)^{\alphacgprime}
+  \left(\frac{\psig}{\lambdacprime + \psig}\right)^\Ygc \left(1-\frac{\psig}{\lambdacprime + \psig}\right)^{\alphacgprime}
 \end{align}
 where $\ngc$ is the number of times codon $c$ is found in the ORF of gene $g$ and $\alphacgprime = \ngc \times \alphac$.
 The total Likelihood of the data is
 \begin{equation}
-  \Lik\left(\phigvec, \alphacvec, \lambdacprimevec \middle| \Ygcvec, \ngcvec\right) = \prod_{g \in \setG} \prod_{c \in \setC}  \Lik\left(\phig, \alphac, \lambdacprime \middle| \Ygc, \ngc\right)
+  \Lik\left(\psigvec, \alphacvec, \lambdacprimevec \middle| \Ygcvec, \ngcvec\right) = \prod_{g \in \setG} \prod_{c \in \setC}  \Lik\left(\psig, \alphac, \lambdacprime \middle| \Ygc, \ngc\right)
 \end{equation}
 Note that using RFP data alone, $\kappag \times \mg = \phi$ and $\lambdacprime = \lambdac \Ztheta/\Ytotal$ are only identifiable as joint parameters. 
 (Although it seems like you should be able to calculate \Ztheta post-hoc from the state of the chain and estimates of \mg are available from other sources.)
 Most standard libraries require that the $x$ parameter in a NB be discrete, which in this case it is not.
-Thus to simulate \Yg values based on equations (\ref{eq:distYgSite}) or (\ref{eq:distYgCodon}), first pull $W$ from Gamma(\alphac, \lambdacprime), then pull $Y$ from Poisson($W \ngc \phig$).
+Thus to simulate \Yg values based on equations (\ref{eq:distYgSite}) or (\ref{eq:distYgCodon}), first pull $W$ from Gamma(\alphac, \lambdacprime)\footnote{recall that \lambdacprime is the 'rate' parameter}, then pull $Y$ from Poisson($W \ngc \psig$).
   
 \citet{PopEtAl14} provide RNA-Seq based counts of mRNA abundances, \Mg, in addition to RFP counts.
 If we assume that $\Mg \sim \text{Poisson}(\Ytotal \mg)$, we can easily combine both the RFP and the mRNA counts together and estimate $\kappag$ and $\mg$ separately.
@@ -188,7 +192,7 @@ which is equivalent to the simple pausing time calculation except $\pgi$ is redu
 The function $\sigma(i-1)$ depends on the probability of successful elongation at the $i-1$ upstream codons.
 Letting $f(\alpha, \lambda)$ represent the PDF of the Gamma distribution, the codon specific elongation probability is
 \begin{align}
-\label{eq:defElongPr}
+  \label{eq:defElongPr}
 \Pr(\text{Elongation at position $j$}) &= \int_0^\infty \frac{\vgj}{\wgj + \vgj} f\left(\wgj | \alphaj, \lambdaj\right) d\wgj\\
  &= \exp\left[\lambdaj \vgj\right] E_{p = \alphaj}\left(\lambdaj \vgj\right)
 \end{align}
@@ -201,25 +205,32 @@ where $\Gamma(1-p,z)$ is the upper incomplete gamma function.
 See \href{http://dlmf.nist.gov/8.19}{http://dlmf.nist.gov/8.19} for more details.
 
 Assuming independence in \wgi between positions, 
-  \label{eq:defSigma}
+  \label{eq:defSigmag}
 \begin{align}
-  \sigma(i) &=  \exp\left[\sum_{j=1}^i \lambdaj \vgj\right]  \prod_{j=1}^{i} E_{\alphaj}\left(\lambdaj \vgj\right)
+  \sigmag(i) &=  \exp\left[\sum_{j=1}^i \lambdaj \vgj\right]  \prod_{j=1}^{i} E_{\alphaj}\left(\lambdaj \vgj\right)
 \end{align}
 Note that these \lambdaj terms are equivalent as \lambdac, but not \lambdacprime.
 
 Noting that the reasoning which led to equations \ref{eq:defPgi} and \ref{eq:defZtheta} for the pausing time model should still apply if we use Equation (\ref{eq:defpgiNse}) for \pgi, rather than Equation (\ref{eq:defpgi}). 
 As a result,
-\begin{equation}
+\begin{align}
   \label{eq:distYgSiteNse}
-  \Pr\left(\Ygi \middle| \alphai, \lambdaiprime, \mg, \kappag, \sigma(i-i)\right) = \frac{\Gamma\left(\alphai + \Ygi\right)}{\Gamma\left(\alphai\right) \Ygi!} 
-  \left(\frac{\mg \kappag \sigma(i-1)}{\lambdaiprime + \mg \kappag \sigma(i-1)}\right)^\Ygi \left(\frac{\lambdaiprime}{\lambdaiprime + \mg \kappag \sigma(i-1)}\right)^\alphai
-\end{equation}
-While the NSE model requires the likelihood for each position be calculated separately, the underlying terms for $\sigma(i-1)$ need only be calculated once per parameter evaluation since it is only how these terms are combined that varies between codons at different positions.
+  \Pr\left(\Ygi \middle| \alphai, \lambdaiprime, \psig, \sigmag(i-i)\right) 
+  &= \frac{\Gamma\left(\alphai + \Ygi\right)}{\Gamma\left(\alphai\right) \Ygi!} 
+  \left(\frac{\psig \sigmag(i-1)}{\lambdaiprime + \psig \sigmag(i-1)}\right)^\Ygi \left(1-\frac{\psig\sigmag(i-1)}{\lambdaiprime + \psig \sigmag(i-1)}\right)^\alphai\\
+\end{align}
+where \ng is the number of amino acids encoded in gene $g$, i.e.~$\ng \ \sum_c \ngc$.
+For completeness, we define $\phig$ as the target production rate of the functionality produced by a complete, error free protein, i.e. $\phig = \psig \sigmag(\ng)$.
+Thus, in the absence of translation errors, $\phig$ is equal to the total synthesis rate protein $g$, $\psig$.
+In contrast, in the presence of translation errors, $\psig > \phig$ since the translation initiation rate must be elevated to compensate for the reduction in protein functionality due to translation errors.
+Furthermore, while the NSE model requires the likelihood for each position be calculated separately, the underlying terms for $\sigmag(i-1)$ need only be calculated once per parameter evaluation since it is only how these terms are combined that varies between codons at different positions.
+
+
 
 \subsection*{Simulation}
 Unlike with the Pausing Time Model, we cannot aggregate codon specific RPF counts within a gene.
 Instead we have to simulate each position and as before we simulate in two steps.
-First, we generate $W_i$  from $\text{Gamma}(\alphai, \lambdaiprime)$ and then we generate $\Ygi$ from $\text{Poisson}\left(\phi_g \sigma(i-1) W_i\right)$
+First, we generate $W_i$  from $\text{Gamma}(\alphai, \lambdaiprime)$ and then we generate $\Ygi$ from $\text{Poisson}\left(\psi_g \, \sigmag(i-1)\, W_i\right)$
 
 
 \section*{Parameter Definitions}
@@ -236,7 +247,12 @@ First, we generate $W_i$  from $\text{Gamma}(\alphai, \lambdaiprime)$ and then w
     \mg & Density of mRNA transcripts for gene $g$ in cytosol.& 1/{Vol}\\  
     \Mg & Observed mRNA counts from RNA-Seq data.             & 1/{Vol}\\  
     \kappag & Rate constant determining ribosome initiation rate per mRNA.  Function of diffusion of ribosomes, mRNA, and other factors. & $\frac{1}{\text{rib. mRNA Vol} t}$\\
-    \phig & Steady state protein production rate. Equal to $\mg \times \kappag$. &\\ 
+    \phig & Target protein functionality production rate under a given set of conditions. 
+            Equal to $\mg \kappag \sigmag(\ng)$ which is initiation rate discounted by the expected functionality of a protein.& 1/t\\
+    \psig &  Rate of initiation of protein synthesis under a given set of conditions. 
+             Equal to $\mg \kappag = \phig/\sigmag(\ng)$ and, thus, is always greater than or equal to $\phig$. & 1/t\\ 
+    \sigmag(i) & Probability ribosome reaches and successfully translate codon $i$. & \\
+
     \pgi & Probability a ribosome is found at position $i$ on an mRNA transcript from gene $g$ when translation initiation and completion of mRNA is at steady state. &\\%$\pgi \prop \kappag \wgi$ & \\
     \Pgi & Probability of observing a footprint for position $i$ of mRNA from gene $g$.& \\%$\Pgi = \left(\pgi \mg\right)/\Ztheta$.& \\
     \Pgc & Probability of observing a footprint for codon $c$ of mRNA from gene $g$. &\\%Generally, $\Pgc = \sum_{i \in c} \Pgi$. Assuming constant elongation rates for a codon type within a transcript, i.e.$\wgi = \wgj = \wgc | \{i,j\} \in c$ gives, $\Pgc = \Pgi \ngc$.& \\
