@@ -220,11 +220,11 @@ class Parameter {
 		{
 			InitializeSynthesisRate(genome, sd_phi);
 		}
-		void initializeSynthesisRateByList(double sd_phi)
+		void initializeSynthesisRateByRandom(double sd_phi)
 		{
 			InitializeSynthesisRate(sd_phi);
 		}
-		void initializeSynthesisRateByRandom(std::vector<double> expression)
+		void initializeSynthesisRateByList(std::vector<double> expression)
 		{
 			InitializeSynthesisRate(expression);
 		}

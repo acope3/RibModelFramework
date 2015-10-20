@@ -47,10 +47,10 @@ plot.Rcpp_ROCModel <- function(model, genome, parameter, samples = 100, mixture 
   for(aa in names.aa)
   {
     if(aa == "M" || aa == "W" || aa == "X") next
-    plotSinglePanel(parameter, model, genome, expressionValues, samples, mixture, aa)
+    xlimit <- plotSinglePanel(parameter, model, genome, expressionValues, samples, mixture, aa)
     box()
     main.aa <- aa #TODO map to three letter code
-    text(0, 1, main.aa, cex = 1.5)
+    text(mean(xlimit), 1, main.aa, cex = 1.5)
     if(aa %in% c("A", "F", "K", "Q", "V")){
       axis(2, las=1)
     }
@@ -121,7 +121,8 @@ plotSinglePanel <- function(parameter, model, genome, expressionValues, samples,
   codonCounts[is.nan(codonCounts)] <- NA # necessary if AA does not appear in gene
   
   # make empty plot
-  plot(NULL, NULL, xlim=range(expressionValues, na.rm = T), ylim=c(-0.05,1.05), 
+  xlimit <- range(expressionValues, na.rm = T)
+  plot(NULL, NULL, xlim=xlimit, ylim=c(-0.05,1.05), 
        xlab = "", ylab="", axes = FALSE)
   # bin expression values of genes
   quantiles <- quantile(expressionValues, probs = seq(0.05, 0.95, 0.05), na.rm = T)
@@ -134,7 +135,8 @@ plotSinglePanel <- function(parameter, model, genome, expressionValues, samples,
     }else{
       tmp.id <- expressionValues > quantiles[i] & expressionValues < quantiles[i + 1]
     }
-    
+
+    # plot quantiles
     means <- colMeans(codonCounts[tmp.id,], na.rm = T)
     std <- apply(codonCounts[tmp.id,], 2, sd, na.rm = T)
     for(k in 1:length(codons))
@@ -146,11 +148,18 @@ plotSinglePanel <- function(parameter, model, genome, expressionValues, samples,
     }
   }
   
+  # draw model fit
   codonProbability <- do.call("rbind", codonProbability)
   for(i in 1:length(codons))
   {
     lines(phis, codonProbability[, i], col=ribModel:::.codonColors[[ codons[i] ]])
   }
   colors <- unlist(ribModel:::.codonColors[codons])
-  legend("topleft", legend = codons, col=colors, bty = "n", lty=1, cex=0.75)  
+  
+  # add indicator to optimal codon
+  optim.codon.index <- which(min(c(selection, 0)) == c(selection, 0))
+  codons[optim.codon.index] <- paste(codons[optim.codon.index], "*", sep="")
+  legend("topleft", legend = codons, col=colors, bty = "n", lty=1, cex=0.75)
+  
+  return(xlimit)
 }
