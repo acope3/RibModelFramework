@@ -406,7 +406,7 @@ void RFPParameter::updateMixtureProbabilitiesTrace(unsigned samples)
 
 void RFPParameter::updateCodonSpecificParameterTrace(unsigned sample, std::string codon)
 {
-	traces.updateCodonSpecificParameterTrace(sample, codon, currentLambdaPrimeParameter, currentAlphaParameter);
+	traces.updateCodonSpecificParameterTrace(sample, codon, currentAlphaParameter, currentLambdaPrimeParameter);
 }
 
 
@@ -1014,6 +1014,10 @@ double RFPParameter::getLambdaPrimeVarianceForCodon(unsigned mixtureElement, uns
 	return rv;
 }
 
+std::vector <double> RFPParameter::getTmp()
+{
+return tmp;
+}
 
 #ifndef STANDALONE
 RFPParameter::RFPParameter(std::vector<double> sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter(64)
