@@ -53,7 +53,7 @@ void testCovarianceMatrix()
 	{
 		std::cout << "CHECK" << std::endl;
 	}
-	else{
+	else {
 		std::cout << "ERROR" << std::endl;
 	}
 	std::cout << "------------------ TEST COVARIANCE ROUTINES ------------------" << std::endl;
@@ -201,8 +201,8 @@ void testReadRFPFile()
 	Genome genome;
 
 	genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
-	std::string codon = "ATG";	
-	std::cout << SequenceSummary::codonToIndex(codon) <<"\n";
+	std::string codon = "ATG";
+	std::cout << SequenceSummary::codonToIndex(codon) << "\n";
 	for (unsigned i = 0; i < genome.getGenomeSize(); i++)
 	{
 		std::cout << "Working with gene " << i << "\n";
@@ -256,9 +256,9 @@ void simulateRFPData()
 
 	model.setParameter(tmp);
 
-	std::cout <<"init done\n";
+	std::cout << "init done\n";
 	model.simulateGenome(genome);
-	std::cout <<"writing file\n";
+	std::cout << "writing file\n";
 	genome.writeRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/SimulatedRFPData.csv", true);
 
 
@@ -272,10 +272,10 @@ void simulateROCData()
 
 	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
-    {
-        if (i < 448) geneAssignment[i] = 0u;
-        else geneAssignment[i] = 1u;
-    }
+	{
+		if (i < 448) geneAssignment[i] = 0u;
+		else geneAssignment[i] = 1u;
+	}
 
 	unsigned numMixtures = 2;
 	std::vector<double> sphi_init(numMixtures, 2);
@@ -292,7 +292,7 @@ void simulateROCData()
 
 	model.setParameter(tmp);
 
-	std::cout <<"init done\n";
+	std::cout << "init done\n";
 
 	model.simulateGenome(genome);
 
@@ -338,7 +338,7 @@ void testRFPVarianceAndMean()
 	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 	RFPParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
 
-	std::cout <<"about to calculate\n";
+	std::cout << "about to calculate\n";
 	tmp.calculateRFPMean(genome);
 
 	Genome genome2;
@@ -358,7 +358,7 @@ void testRFPVarianceAndMean()
 
 void testReadMutationValues()
 {
-	std::cout <<"----------TEST INITMUTATIONCATEGORIES----------\n";
+	std::cout << "----------TEST INITMUTATIONCATEGORIES----------\n";
 
 	Genome genome;
 	genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_chromosomeA.fasta");
@@ -376,8 +376,8 @@ void testReadMutationValues()
 	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 
 	ROCParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, Parameter::allUnique);
-//	std::vector<std::string> files = { "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/new_simulated_mutation0.csv",
-	//								   "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/new_simulated_mutation1.csv" };
+	//	std::vector<std::string> files = { "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/new_simulated_mutation0.csv",
+		//								   "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/new_simulated_mutation1.csv" };
 	std::vector<std::string> files = { "C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/new_simulated_mutation0.csv",
 									   "C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/new_simulated_mutation1.csv" };
 
@@ -388,20 +388,20 @@ void testReadMutationValues()
 
 	for (unsigned i = 0; i < v.size(); i++)
 	{
-		for(unsigned j = 0; j < v[i].size(); j++)
+		for (unsigned j = 0; j < v[i].size(); j++)
 		{
-			std::cout << v[i][j] <<"\n";
+			std::cout << v[i][j] << "\n";
 		}
-		std::cout <<"\n\n\n";
+		std::cout << "\n\n\n";
 	}
 
 
-	std::cout <<"----------END TEST INITMUTATIONCATEGORIES----------\n";
+	std::cout << "----------END TEST INITMUTATIONCATEGORIES----------\n";
 }
 
 void testMultiplePhi()
 {
-	std::cout <<"----------TEST MULTIPLEPHI----------\n";
+	std::cout << "----------TEST MULTIPLEPHI----------\n";
 
 	Genome genome;
 	genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/test.fasta");
@@ -410,16 +410,16 @@ void testMultiplePhi()
 	for (unsigned i = 0; i < genome.getGenomeSize(); i++)
 	{
 		Gene gene = genome.getGene(i);
-		std::cout << gene.getId() <<": ";
+		std::cout << gene.getId() << ": ";
 		for (unsigned j = 0; j < gene.observedPhiValues.size(); j++)
 		{
-			std::cout << gene.observedPhiValues[j] <<", ";
+			std::cout << gene.observedPhiValues[j] << ", ";
 		}
-		std::cout <<"\n";
+		std::cout << "\n";
 	}
 
 
-	std::cout <<"----------END TEST MULTIPLEPHI----------\n";
+	std::cout << "----------END TEST MULTIPLEPHI----------\n";
 }
 
 
@@ -468,52 +468,52 @@ int main()
 		MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, 10, true, true, true);
 		mcmc.setRestartFileSettings("RestartFile.txt", 20, true);
 		std::cout << "done initialize MCMCAlgorithm object" << std::endl;
-		
+
 
 		std::cout << "initialize Genome object" << std::endl;
 		Genome genome;
 		switch (user) {
-			case cedric:
-				if (modelToRun == ROC)
-				{
-					genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/twoMixtures/simulatedAllUniqueR.fasta");
-					//genome.readFasta("C:/Users/Cedric/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta");
+		case cedric:
+			if (modelToRun == ROC)
+			{
+				genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/twoMixtures/simulatedAllUniqueR.fasta");
+				//genome.readFasta("C:/Users/Cedric/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta");
+			}
+			else if (modelToRun == RFP)
+			{
+				genome.readRFPFile("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+			}
+			else {}
+			break;
+		case gabe:
+			if (modelToRun == ROC)
+			{
+				genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
+				if (withPhi) {
+					genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv", false);
 				}
-				else if (modelToRun == RFP)
-				{
-					genome.readRFPFile("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+			}
+			else if (modelToRun == RFP)
+			{
+				//genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+				genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/testRFPFile.csv");
+			}
+			else {}
+			break;
+		case jeremy:
+			if (modelToRun == ROC || modelToRun == FONSE)
+			{
+				genome.readFasta("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/data/twoMixtures/simulatedAllUniqueR.fasta");
+				if (withPhi) {
+					genome.readObservedPhiValues("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/data/twoMixtures/simulatedAllUniqueR_phi.csv", false);
 				}
-				else {}
-				break;
-			case gabe:
-				if (modelToRun == ROC)
-				{
-					genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
-					if (withPhi) {
-						genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv", false);
-					}
-				}
-				else if (modelToRun == RFP)
-				{
-					//genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
-					genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/testRFPFile.csv");
-				}
-				else {}
-				break;
-			case jeremy:
-				if (modelToRun == ROC || modelToRun == FONSE)
-				{
-					genome.readFasta("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/twoMixtures/simulatedAllUniqueR.fasta");
-					if (withPhi) {
-						genome.readObservedPhiValues("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/twoMixtures/simulatedAllUniqueR_phi.csv", false);
-					}
-				}
-				else if (modelToRun == RFP)
-				{
-					genome.readRFPFile("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
-				}
-				else {}
-				break;
+			}
+			else if (modelToRun == RFP)
+			{
+				genome.readRFPFile("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+			}
+			else {}
+			break;
 		}
 		std::cout << "done initializing Genome object" << std::endl;
 		std::cout << "Initializing shared parameter variables\n";
@@ -536,7 +536,7 @@ int main()
 		unsigned numMixtures = 2;
 		std::vector<double> sphi_init(numMixtures, 1);
 		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
-		std::cout <<"Done initializing shared parameter variables\n";
+		std::cout << "Done initializing shared parameter variables\n";
 
 
 		if (modelToRun == ROC)
@@ -545,10 +545,10 @@ int main()
 			ROCParameter parameter;
 			if (read)
 			{
-				std::cout <<"Initializing ROCParameter object from Restart File\n";
+				std::cout << "Initializing ROCParameter object from Restart File\n";
 				ROCParameter tmp("RestartFile.txt");
 				parameter = tmp;
-				std::cout <<"Done initializing ROCParameter object from Restart File\n";
+				std::cout << "Done initializing ROCParameter object from Restart File\n";
 			}
 			else
 			{
@@ -556,7 +556,7 @@ int main()
 				std::string mixDef = ROCParameter::allUnique;
 				ROCParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 
-				for(unsigned i = 0u; i < numMixtures; i++)
+				for (unsigned i = 0u; i < numMixtures; i++)
 				{
 					unsigned selectionCategry = tmp.getSelectionCategory(i);
 					std::cout << "Sphi_init for selection category " << selectionCategry << ": " << sphi_init[selectionCategry] << std::endl;
@@ -567,34 +567,34 @@ int main()
 				std::vector<std::string> files(2);
 
 				switch (user) {
-					case cedric:
-						files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/twoMixtures/simulated_mutation0.csv");
-						files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/twoMixtures/simulated_mutation1.csv");
-						tmp.initMutationCategories(files, tmp.getNumMutationCategories());
+				case cedric:
+					files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/twoMixtures/simulated_mutation0.csv");
+					files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/twoMixtures/simulated_mutation1.csv");
+					tmp.initMutationCategories(files, tmp.getNumMutationCategories());
 
-						files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/twoMixtures/simulated_selection0.csv");
-						files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/twoMixtures/simulated_selection1.csv");
-						tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
-						break;
+					files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/twoMixtures/simulated_selection0.csv");
+					files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/twoMixtures/simulated_selection1.csv");
+					tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
+					break;
 
-					case gabe:
-						files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_mutation0.csv");
-						files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_mutation1.csv");
+				case gabe:
+					files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_mutation0.csv");
+					files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_mutation1.csv");
 					//	tmp.initMutationCategories(files, tmp.getNumMutationCategories());
 
-						files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_selection0.csv");
-						files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_selection1.csv");
+					files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_selection0.csv");
+					files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_selection1.csv");
 					//	tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
-						break;
-					case jeremy:
-						files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/twoMixtures/simulated_mutation0.csv");
-						files[1] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/twoMixtures/simulated_mutation1.csv");
+					break;
+				case jeremy:
+					files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/twoMixtures/simulated_mutation0.csv");
+					files[1] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/twoMixtures/simulated_mutation1.csv");
 					//	tmp.initMutationCategories(files, tmp.getNumMutationCategories());
 
-						files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/twoMixtures/simulated_selection0.csv");
-						files[1] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/twoMixtures/simulated_selection1.csv");
+					files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/twoMixtures/simulated_selection0.csv");
+					files[1] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/twoMixtures/simulated_selection1.csv");
 					//	tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
-						break;
+					break;
 				}
 				tmp.InitializeSynthesisRate(genome, sphi_init[0]);
 				//std::vector<double> phiVals = parameter.readPhiValues("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrCleft_phi_est.csv");
@@ -603,7 +603,7 @@ int main()
 				std::cout << "done initialize ROCParameter object" << std::endl;
 			}
 
-			std::cout <<"Initializing ROCModel object\n";
+			std::cout << "Initializing ROCModel object\n";
 			ROCModel model(withPhi);
 			model.setParameter(parameter);
 			std::ofstream scuoout("results/scuo.csv");
@@ -612,15 +612,15 @@ int main()
 				scuoout << genome.getGene(n).getId() << "," << parameter.calculateSCUO(genome.getGene(n), 22) << std::endl;
 			}
 			scuoout.close();
-			std::cout <<"Done initializing ROCModel object\n";
-			
+			std::cout << "Done initializing ROCModel object\n";
+
 
 			std::cout << "starting MCMC for ROC" << std::endl;
 			mcmc.run(genome, model, 1, 0);
 			std::cout << std::endl << "Finished MCMC for ROC" << std::endl;
-			
 
-			for(unsigned i = 0u; i < numMixtures; i++)
+
+			for (unsigned i = 0u; i < numMixtures; i++)
 			{
 				unsigned selectionCategry = parameter.getSelectionCategoryForMixture(i);
 				std::cout << "Sphi posterior estimate for selection category " << selectionCategry << ": " << parameter.getSphiPosteriorMean(useSamples, selectionCategry) << std::endl;
@@ -639,16 +639,16 @@ int main()
 			RFPParameter parameter;
 			if (read)
 			{
-				std::cout <<"Initializing RFPParameter object from Restart File\n";
+				std::cout << "Initializing RFPParameter object from Restart File\n";
 				RFPParameter tmp("RestartFile1.txt");
 				parameter = tmp;
-				std::cout <<"Done initializing RFPParameter object from Restart File\n";
+				std::cout << "Done initializing RFPParameter object from Restart File\n";
 			}
 			else
 			{
 				std::cout << "initialize RFPParameter object" << std::endl;
 				std::string mixDef = Parameter::allUnique;
-				for(unsigned i = 0u; i < numMixtures; i++)
+				for (unsigned i = 0u; i < numMixtures; i++)
 				{
 					unsigned selectionCategry = parameter.getSelectionCategoryForMixture(i);
 					std::cout << "Sphi_init for selection category " << selectionCategry << ": " << sphi_init[selectionCategry] << std::endl;
@@ -660,9 +660,9 @@ int main()
 				parameter = tmp;
 				std::cout << "Done initialize RFPParameter object" << std::endl;
 			}
-			
 
-			std::cout <<"Initializing RFPModel object\n";
+
+			std::cout << "Initializing RFPModel object\n";
 			RFPModel model;
 			model.setParameter(parameter);
 			//TODO: what does this do in the RFP case? Do we even need it????
@@ -672,19 +672,19 @@ int main()
 				scuoout << genome.getGene(n).getId() << "," << parameter.calculateSCUO(genome.getGene(n), 64) << std::endl;
 			}
 			scuoout.close();
-			*/std::cout <<"Done initializing RFPModel object\n";
-		
+			*/std::cout << "Done initializing RFPModel object\n";
+
 			std::cout << "starting MCMC for RFP" << std::endl;
-      mcmc.run(genome, model, 8);
-      std::cout << std::endl << "Finished MCMC for RFP" << std::endl;
+			mcmc.run(genome, model, 8);
+			std::cout << std::endl << "Finished MCMC for RFP" << std::endl;
 
 
-	for(unsigned i = 0u; i < numMixtures; i++)
-	{
-		unsigned selectionCategry = parameter.getSelectionCategoryForMixture(i);
-		std::cout << "Sphi posterior estimate for selection category " << selectionCategry << ": " << parameter.getSphiPosteriorMean(useSamples, selectionCategry) << std::endl;
-	}
-      std::cout << "Sphi proposal width: " << parameter.getCurrentSphiProposalWidth() << std::endl;
+			for (unsigned i = 0u; i < numMixtures; i++)
+			{
+				unsigned selectionCategry = parameter.getSelectionCategoryForMixture(i);
+				std::cout << "Sphi posterior estimate for selection category " << selectionCategry << ": " << parameter.getSphiPosteriorMean(useSamples, selectionCategry) << std::endl;
+			}
+			std::cout << "Sphi proposal width: " << parameter.getCurrentSphiProposalWidth() << std::endl;
 
 		}
 		else if (modelToRun == FONSE)
@@ -692,24 +692,24 @@ int main()
 			FONSEParameter parameter;
 			if (read)
 			{
-				std::cout << "Initializing ROCParameter object from Restart File\n";
+				std::cout << "Initializing FONSEParameter object from Restart File\n";
 				FONSEParameter tmp("RestartFile.txt");
 				parameter = tmp;
-				std::cout << "Done initializing ROCParameter object from Restart File\n";
+				std::cout << "Done initializing FONSEParameter object from Restart File\n";
 			}
 			else
 			{
-				std::cout << "initialize ROCParameter object" << std::endl;
+				std::cout << "initialize FONSEParameter object" << std::endl;
 				std::string mixDef = FONSEParameter::allUnique;
-				for(unsigned i = 0u; i < numMixtures; i++)
+				FONSEParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
+				for (unsigned i = 0u; i < numMixtures; i++)
 				{
-					unsigned selectionCategry = parameter.getSelectionCategoryForMixture(i);
-					std::cout << "Sphi_init for selection category " << selectionCategry << ": " << sphi_init[selectionCategry] << std::endl;
+					unsigned selectionCategory = tmp.getSelectionCategory(i);
+					std::cout << "Sphi_init for selection category " << selectionCategory << ": " << sphi_init[selectionCategory] << std::endl;
 				}
 				std::cout << "\t# mixtures: " << numMixtures << "\n";
 				std::cout << "\tmixture definition: " << mixDef << "\n";
 
-				FONSEParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 				std::vector<std::string> files(2);
 
 				switch (user) {
@@ -725,8 +725,8 @@ int main()
 					files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/twoMixtures/simulated_CSP1.csv");
 					break;
 				case jeremy:
-					files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/twoMixtures/simulated_CSP0.csv");
-					files[1] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/twoMixtures/simulated_CSP1.csv");
+					files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/data/twoMixtures/simulated_CSP0.csv");
+					files[1] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/data/twoMixtures/simulated_CSP1.csv");
 					break;
 				}
 
@@ -755,7 +755,7 @@ int main()
 			mcmc.run(genome, model, 4);
 			std::cout << std::endl << "Finished MCMC for FONSE" << std::endl;
 
-			for(unsigned i = 0u; i < numMixtures; i++)
+			for (unsigned i = 0u; i < numMixtures; i++)
 			{
 				unsigned selectionCategry = parameter.getSelectionCategoryForMixture(i);
 				std::cout << "Sphi posterior estimate for selection category " << selectionCategry << ": " << parameter.getSphiPosteriorMean(useSamples, selectionCategry) << std::endl;

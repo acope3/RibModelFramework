@@ -55,11 +55,12 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 
 	unsigned numSynthesisRateCategories = model.getNumSynthesisRateCategories();
 	unsigned numMixtures = model.getNumMixtureElements();
-	double* dirichletParameters = new double[numMixtures]();
+	//double* dirichletParameters = new double[numMixtures]();
+	std::vector <double> dirichletParameters(numMixtures, 0.0);
 	
-	for (unsigned i = 0u; i < numMixtures; i++) {
+	/*for (unsigned i = 0u; i < numMixtures; i++) {
 		dirichletParameters[i] = 0.0;
-	}
+	}*/
 
 	//initialize parameter's size
 	for(int i = 0; i < numGenes; i++)
@@ -148,7 +149,10 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			}
 		}
 
-		if (std::isinf(logLikelihood)) std::cout <<"\tInfinity reached (Gene: " << i << ")\n";
+		if (std::isinf(logLikelihood))
+		{
+			std::cout << "\tInfinity reached (Gene: " << i << ")\n";
+		}
 		// adjust the the unscaled probabilities by the constant c
 		// ln(f') = ln(c) + ln(f)
 		// calculate ln(P) = ln( Sum(p_i*f'(...)) ) and obtain normalizing constant for new p_i
