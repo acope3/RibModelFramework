@@ -88,6 +88,7 @@ RCPP_MODULE(Parameter_mod)
 		.method("getLambdaPrimePosteriorMeanForCodon", &RFPParameter::getLambdaPrimePosteriorMeanForCodon)
 		.method("getAlphaVarianceForCodon", &RFPParameter::getAlphaVarianceForCodon)
 		.method("getLambdaPrimeVarianceForCodon", &RFPParameter::getLambdaPrimeVarianceForCodon)
+		.method("getTmpTrace", &RFPParameter::getTmp)
 		;
 
 	class_<FONSEParameter>("FONSEParameter")

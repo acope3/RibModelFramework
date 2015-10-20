@@ -1,4 +1,4 @@
-library(ribModel)
+library(ribModel, lib.loc= "~/R")
 rm(list=ls())
 
 
@@ -61,17 +61,26 @@ pdf("correlationBetweenAlphaAndLambdaPrime.pdf")
 cat <- 1
 proposal <- FALSE
 alphaList <- numeric (61)
+alphaList2 <- numeric (61)
 lambdaPrimeList <- numeric (61)
+lambdaPrimeList2 <- numeric (61)
+LambdaPrimeLis3t <- numeric (61)
+phiList <- numeric(genome$getGenomeSize())
 codonList <- codons()
 i <- 1
 for (i in 1:61)
 {
   codon <- codonList[i]
-  alphaList[i] <- parameter$getParameterForCategory(cat, 0, codon, FALSE)
-  lambdaPrimeList[i] <- parameter$getParameterForCategory(cat, 1, codon, FALSE)
+  #alphaList[i] <- parameter$getParameterForCategory(cat, 0, codon, FALSE)
+  alphaList[i] <- parameter$getAlphaPosteriorMeanForCodon(cat, 100, codon)
+  #lambdaPrimeList[i] <- parameter$getParameterForCategory(cat, 1, codon, FALSE)
+  lambdaPrimeList[i] <- parameter$getLambdaPrimePosteriorMeanForCodon(cat, 100, codon)
+  #LambdaPrimeLis3t[i] <- trace$getLambdaPrimeParameterTraceByMixtureElementForCodon(1, codon)[1000]
 }
-
-
+for (geneIndex in 1:genome$getGenomeSize()) {
+  phiList[geneIndex] <- parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(100, geneIndex, 1)
+}
+log10(phiList) -> phiList
 plot(NULL, NULL, xlim=range(alphaList, na.rm = T), ylim=range(lambdaPrimeList), 
      main = "Correlation Between Alpha and Lambda Prime", xlab = "alpha", ylab = "lambdaPrime")
 upper.panel.plot(alphaList, lambdaPrimeList)
@@ -79,6 +88,8 @@ upper.panel.plot(alphaList, lambdaPrimeList)
 
 A <- read.table("../ribModel/data/RFPAlphaValues.csv", header =TRUE, sep = ",")
 LP <- read.table("../ribModel/data/RFPLambdaPrimeValues.csv", header =TRUE, sep = ",")
+PHI <- log10(read.table("../ribModel/data/RFPPhiValues.csv", header = TRUE, sep = ",")[,2])
+
 
 plot(NULL, NULL, xlim=range(alphaList, na.rm = T), ylim=range(A[,2]), 
      main = "Correlation Between Initial and Simulated Alphas", xlab = "true alpha", ylab = "simulated alpha")
@@ -87,4 +98,10 @@ upper.panel.plot(alphaList, A[,2])
 plot(NULL, NULL, xlim=range(lambdaPrimeList, na.rm = T), ylim=range(LP[,2]), 
      main = "Correlation Between Initial and Simulated Lambda Primes", xlab = "true lambda prime", ylab = "simulated lambda prime")
 upper.panel.plot(lambdaPrimeList, LP[,2])
+
+plot(NULL, NULL, xlim=range(phiList, na.rm = T), ylim=range(PHI), 
+     main = "Correlation Between Initial and Simulated Synthesis Rates", xlab = "true Synthesis Rate", ylab = "simulated synthesis rate")
+upper.panel.plot(phiList, PHI)
+
+
 dev.off()
