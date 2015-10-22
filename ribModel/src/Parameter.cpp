@@ -1041,18 +1041,19 @@ double Parameter::densityNorm(double x, double mean, double sd, bool log)
 	const double log_sqrt_2pi = 0.9189385332046727;
 	double a = (x - mean) / sd;
 
-	return log ? -log_sqrt_2pi - std::log(sd) - (0.5 * a * a) : (inv_sqrt_2pi / sd) * std::exp(-0.5 * a * a);
+	return log ? (-log_sqrt_2pi - std::log(sd) - (0.5 * a * a)) : ((inv_sqrt_2pi / sd) * std::exp(-0.5 * a * a));
 }
 
-double Parameter::densityLogNorm(double x, double mean, double sd)
+double Parameter::densityLogNorm(double x, double mean, double sd, bool log)
 {
 	double returnValue = 0.0;
 	// logN is only defined for x > 0 => all values less or equal to zero have probability 0
 	if(x > 0.0)
 	{
 		const double inv_sqrt_2pi = 0.3989422804014327;
+		const double log_sqrt_2pi = 0.9189385332046727;
 		double a = (std::log(x) - mean) / sd;
-		returnValue = (inv_sqrt_2pi / (x * sd)) * std::exp(-0.5 * a * a);
+		returnValue = log ? (-std::log(x * sd) - log_sqrt_2pi + (0.5 * a * a)) : ((inv_sqrt_2pi / (x * sd)) * std::exp(-0.5 * a * a));
 	}
 	if (returnValue <= 0) {
 		std::cout << "densityLogNorm == 0\n";
