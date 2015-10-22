@@ -204,7 +204,7 @@ class Parameter {
 		static double randLogNorm(double m, double s);
 		static double randExp(double r);
 		static double randGamma(double shape, double rate);
-		static void randDirichlet(double* input, unsigned numElements, double* output);
+		static void randDirichlet(double *input, unsigned numElements, double *output);
 		static double randUnif(double minVal, double maxVal);
 		static unsigned randMultinom(double* probabilities, unsigned mixtureElements);
 

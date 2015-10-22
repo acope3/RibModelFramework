@@ -369,7 +369,6 @@ void Parameter::writeBasicRestartFile(std::string filename)
 	output += oss.str();
 	out << output;
 	out.close();
-
 }
 
 
@@ -954,8 +953,8 @@ double Parameter::randGamma(double shape, double rate)
 	return rv;
 }
 
-
-void Parameter::randDirichlet(double* input, unsigned numElements, double* output)
+// TODO: CHANGE THIS BACK TO DOUBLE*
+void Parameter::randDirichlet(double *input, unsigned numElements, double *output)
 {
 	// draw y_i from Gamma(a_i, 1)
 	// normalize y_i such that x_i = y_i / sum(y_i)
@@ -1054,6 +1053,9 @@ double Parameter::densityLogNorm(double x, double mean, double sd)
 		const double inv_sqrt_2pi = 0.3989422804014327;
 		double a = (std::log(x) - mean) / sd;
 		returnValue = (inv_sqrt_2pi / (x * sd)) * std::exp(-0.5 * a * a);
+	}
+	if (returnValue <= 0) {
+		std::cout << "densityLogNorm == 0\n";
 	}
 	return returnValue;
 }

@@ -55,12 +55,12 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 
 	unsigned numSynthesisRateCategories = model.getNumSynthesisRateCategories();
 	unsigned numMixtures = model.getNumMixtureElements();
-	//double* dirichletParameters = new double[numMixtures]();
-	std::vector <double> dirichletParameters(numMixtures, 0.0);
+	double* dirichletParameters = new double[numMixtures]();
+
 	
-	/*for (unsigned i = 0u; i < numMixtures; i++) {
+	for (unsigned i = 0u; i < numMixtures; i++) {
 		dirichletParameters[i] = 0.0;
-	}*/
+	}
 
 	//initialize parameter's size
 	for(int i = 0; i < numGenes; i++)
@@ -111,6 +111,12 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				double logProbabilityRatio[3];
 				model.calculateLogLikelihoodRatioPerGene(gene, i, mixtureElement, logProbabilityRatio);
 
+				if (std::isinf(logProbabilityRatio[1])) {
+					std::cout << "logprob1 inf\n";
+				}
+				if (std::isinf(logProbabilityRatio[2])) {
+					std::cout << "logprob2 inf\n";
+				}
 				unscaledLogProb_curr[k] += logProbabilityRatio[1];
 				unscaledLogProb_prop[k] += logProbabilityRatio[2];
 
@@ -133,6 +139,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				//#pragma omp critical
 				if(std::isinf(std::log(model.getCategoryProbability(k)) + propLogLike))
 				{
+					std::cout << "proposed\n";
 					std::cout <<"\t P: " << model.getCategoryProbability(k) << "\n";
 					std::cout <<"\t L: " << propLogLike << "\n";
 				}
@@ -142,6 +149,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				//#pragma omp critical
 				if(std::isinf(std::log(model.getCategoryProbability(k)) + currLogLike))
 				{
+					std::cout << "current\n";
 					std::cout <<"\t P: " << model.getCategoryProbability(k) << "\n";
 					std::cout <<"\t L: " << currLogLike << "\n";
 				}
@@ -186,7 +194,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		delete [] unscaledLogProb_prop;
 		delete [] unscaledLogProb_curr;
 	}
-	double* newMixtureProbabilities = new double[numMixtures]();
+	double *newMixtureProbabilities = new double[numMixtures]();
 	Parameter::randDirichlet(dirichletParameters, numMixtures, newMixtureProbabilities);
 	for(unsigned k = 0u; k < numMixtures; k++)
 	{
@@ -196,8 +204,8 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	{
 		model.updateMixtureProbabilitiesTrace(iteration/thining);
 	}
-	delete [] dirichletParameters;
-	delete [] newMixtureProbabilities;
+	//delete [] dirichletParameters;
+//	delete [] newMixtureProbabilities;
 	return logLikelihood;
 }
 

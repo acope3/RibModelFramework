@@ -522,18 +522,18 @@ int main()
 
 
 		/* For 2 mixtures */
-		for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+		/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
 			if (i < 500) geneAssignment[i] = 0u;
 			else geneAssignment[i] = 1u;
-		}
+		}/*
 
 		/* For 1 mixture */
-		/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+		for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
 			geneAssignment[i] = 0u;
-		}*/
-		unsigned numMixtures = 2;
+		}
+		unsigned numMixtures = 1;
 		std::vector<double> sphi_init(numMixtures, 1);
 		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 		std::cout << "Done initializing shared parameter variables\n";
