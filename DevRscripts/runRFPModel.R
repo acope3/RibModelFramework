@@ -3,7 +3,7 @@ rm(list=ls())
 
 
 #read genome
-genome <- initializeGenomeObject(file = "../ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv", FALSE)
+genome <- initializeGenomeObject(file = "../ribModel/data/RFPDataSets/GSM1406453_untreated_1.percodon.csv", FALSE)
 
 
 #initialize parameter object
@@ -15,7 +15,7 @@ parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssig
 #parameter <- new(RFPParameter, "50KrestartFile.rst")
 
 # initialize MCMC object
-samples <- 100
+samples <- 10000
 thining <- 10
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples=samples, thining=thining, adaptive.width=adaptiveWidth, 
@@ -24,12 +24,12 @@ mcmc <- initializeMCMCObject(samples=samples, thining=thining, adaptive.width=ad
 
 # get model object
 model <- initializeModelObject(parameter, "RFP")
-setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth, TRUE)
+setRestartSettings(mcmc, "D1.restartFile.rst", adaptiveWidth, TRUE)
 
 
 #run mcmc on genome with parameter using model
 system.time(
-  runMCMC(mcmc, genome, model, 8)
+  runMCMC(mcmc, genome, model, 16)
 )
 
 

@@ -910,6 +910,9 @@ double Parameter::randExp(double r)
 	return rv;
 }
 
+//The R version and C++ differ because C++ uses the 
+//shape and scale parameter version while R uses the 
+//shape and rate.
 double Parameter::randGamma(double shape, double rate)
 {
 	double rv;

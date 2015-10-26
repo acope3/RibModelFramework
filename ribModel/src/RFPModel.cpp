@@ -161,18 +161,18 @@ void RFPModel::simulateGenome(Genome &genome)
 			unsigned lambdaPrimeCat = parameter -> getSelectionCategory(mixtureElement);
 
 			double alpha = getParameterForCategory(alphaCat, RFPParameter::alp, codon, false);
-			double lambdaPrime = getParameterForCategory(lambdaPrimeCat, RFPParameter::lmPri, codon, false) * .01;
+			double lambdaPrime = getParameterForCategory(lambdaPrimeCat, RFPParameter::lmPri, codon, false);
 
 			double alphaPrime = alpha * gene.geneData.getCodonCountForCodon(codon);
 
 			#ifndef STANDALONE
 				RNGScope scope;
 				NumericVector xx(1);
-				xx = rgamma(1, alphaPrime, 1.0/lambdaPrime);
+				xx = rgamma(1, alphaPrime, lambdaPrime);
 				xx = rpois(1, xx[0] * phi);
 				tmpGene.geneData.setRFPObserved(codonIndex, xx[0]);
 			#else
-				std::gamma_distribution<double> GDistribution(alphaPrime, 1.0/lambdaPrime);
+				std::gamma_distribution<double> GDistribution(alphaPrime, lambdaPrime);
 				double tmp = GDistribution(Parameter::generator);
 				std::poisson_distribution<unsigned> PDistribution(phi * tmp);
 				unsigned simulatedValue = PDistribution(Parameter::generator);
