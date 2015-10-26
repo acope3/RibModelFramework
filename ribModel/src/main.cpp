@@ -430,7 +430,6 @@ void testDensityLogNorm()
 
 	Parameter::densityLogNorm(x, mean, sd, true);
 
-
 }
 
 int main()
