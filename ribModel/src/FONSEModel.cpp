@@ -52,8 +52,8 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 	//std::cout << logLikelihood << " " << logLikelihood_proposed << std::endl;
 
 	double sPhi = parameter->getSphi(false);
-	double logPhiProbability = std::log(FONSEParameter::densityLogNorm(phiValue, (-(sPhi * sPhi) / 2), sPhi));
-	double logPhiProbability_proposed = std::log(Parameter::densityLogNorm(phiValue_proposed, (-(sPhi * sPhi) / 2), sPhi));
+	double logPhiProbability = FONSEParameter::densityLogNorm(phiValue, (-(sPhi * sPhi) / 2), sPhi, true);
+	double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, (-(sPhi * sPhi) / 2), sPhi, true);
 	double currentLogLikelihood = (likelihood + logPhiProbability);
 	double proposedLogLikelihood = (likelihood_proposed + logPhiProbability_proposed);
 	if (phiValue == 0) {
@@ -184,8 +184,8 @@ void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 		unsigned mixture = getMixtureAssignment(i);
 		mixture = getSynthesisRateCategory(mixture);
 		double phi = getSynthesisRate(i, mixture, false);
-		lpr += std::log(Parameter::densityLogNorm(phi, proposedMphi[mixture], proposedSphi[mixture]))
-				- std::log(Parameter::densityLogNorm(phi, currentMphi[mixture], currentSphi[mixture]));
+		lpr += Parameter::densityLogNorm(phi, proposedMphi[mixture], proposedSphi[mixture], true)
+				- Parameter::densityLogNorm(phi, currentMphi[mixture], currentSphi[mixture], true);
 	}
 	logProbabilityRatio[0] = lpr;
 }

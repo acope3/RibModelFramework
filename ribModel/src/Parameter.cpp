@@ -1053,10 +1053,7 @@ double Parameter::densityLogNorm(double x, double mean, double sd, bool log)
 		const double inv_sqrt_2pi = 0.3989422804014327;
 		const double log_sqrt_2pi = 0.9189385332046727;
 		double a = (std::log(x) - mean) / sd;
-		returnValue = log ? (-std::log(x * sd) - log_sqrt_2pi + (0.5 * a * a)) : ((inv_sqrt_2pi / (x * sd)) * std::exp(-0.5 * a * a));
-	}
-	if (returnValue <= 0) {
-		std::cout << "densityLogNorm == 0\n";
+		returnValue = log ? (-std::log(x * sd) - log_sqrt_2pi - (0.5 * a * a)) : ((inv_sqrt_2pi / (x * sd)) * std::exp(-0.5 * a * a));
 	}
 	return returnValue;
 }

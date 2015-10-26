@@ -422,6 +422,16 @@ void testMultiplePhi()
 	std::cout << "----------END TEST MULTIPLEPHI----------\n";
 }
 
+void testDensityLogNorm()
+{
+	double x = 3;
+	double mean = 4;
+	double sd = 1.2;
+
+	Parameter::densityLogNorm(x, mean, sd, true);
+
+
+}
 
 int main()
 {
@@ -453,7 +463,9 @@ int main()
 		//testReadMutationValues();
 		//testGeneSequenceSummary();
 		//testReadMutationValues();
-		testMultiplePhi();
+		//testMultiplePhi();
+		testDensityLogNorm();
+
 	}
 	else //not doing unit testing, running a model
 	{
