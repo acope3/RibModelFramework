@@ -1,6 +1,6 @@
 rm(list=ls()) 
 library(ribModel) 
-set.seed(5969490) 
+set.seed(1843486) 
 with.phi <- FALSE
 
 if (with.phi) { 
@@ -16,13 +16,13 @@ geneAssignment <- c(rep(1,961), rep(2,457), rep(1, 3903))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef) 
 
 phivals <- parameter$readPhiValues( "../data/realGenomes/Skluyveri_phi.csv")
-parameter$initializeSynthesisRateByRandom(phivals)
+parameter$initializeSynthesisRateByList(phivals)
 parameter$initMutationCategories(c("../data/realGenomes/Skluyveri_mutation_ChrA.csv", "../data/realGenomes/Skluyveri_mutation_ChrCleft.csv") , 2)
 parameter$initSelectionCategories(c("../data/realGenomes/Skluyveri_selection_ChrA.csv", "../data/realGenomes/Skluyveri_selection_ChrCleft.csv") , 2)
 
 
 
-samples <- 1300
+samples <- 1000
 thining <- 50
 adaptiveWidth <- 10
 divergence.iteration <- 0
@@ -38,19 +38,19 @@ end <- Sys.time()
 end - start 
 
 
-pdf("1_kluyveri_full_global_65k.pdf", width = 11, height = 12) 
+pdf("1_kluyveri_full_global_50kseed.pdf", width = 11, height = 12) 
 plot(mcmc)
 loglik.trace <- mcmc$getLogLikelihoodTrace() 
 acf(loglik.trace) 
 convergence.test(mcmc, n.samples = 500, plot=T) 
 
-trace <- parameter$getTraceObject() 
+trace <- parameter$getTraceObject()
 plot(trace, what = "MixtureProbability") 
 plot(trace, what = "Sphi") 
 plot(trace, what = "Mphi") 
 if (with.phi) { 
-plot(trace, what = "Aphi") 
-plot(trace, what = "Sepsilon") 
+  plot(trace, what = "Aphi") 
+  plot(trace, what = "Sepsilon") 
 } 
 plot(trace, what = "ExpectedPhi") 
 
@@ -77,7 +77,7 @@ dev.off()
 observed.mutation <- c("../data/realGenomes/Skluyveri_mutation_ChrA.csv", "../data/realGenomes/Skluyveri_mutation_ChrCleft.csv")
 observed.selection <- c("../data/realGenomes/Skluyveri_selection_ChrA.csv", "../data/realGenomes/Skluyveri_selection_ChrCleft.csv")
 for(k in 1:numMixtures){
-   pdf(paste("1_kluyveri_full_mixture_", k, "_65k.pdf", sep=""), width = 11, height = 12)
+   pdf(paste("1_kluyveri_full_mixture_", k, "_50kseed.pdf", sep=""), width = 11, height = 12)
    mixture <- k
    plot(trace, what = "Mutation", mixture = mixture)
    plot(trace, what = "Selection", mixture = mixture)
