@@ -733,7 +733,7 @@ void ROCParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
 void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
 {
 	std::cout << "Acceptance Ratio for Codon Specific Parameter\n";
-	std::cout << "AA\tAcc.Rat\tProp.Width\n"
+	std::cout << "AA\tAcc.Rat\tProp.Width\n";:
 	for (unsigned i = 0; i < groupList.size(); i++)
 	{
 		std::string aa = groupList[i];
