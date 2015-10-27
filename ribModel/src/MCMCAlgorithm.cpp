@@ -126,6 +126,9 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			}
 		}
 
+		unsigned mixAssign = model.getMixtureAssignment(i);
+		unsigned geneSynthCat = model.getSynthesisRateCategory(mixAssign);
+
 //		unsigned mixtureAssignmentOfGene = model.getMixtureAssignment(i);
 		for(unsigned k = 0u; k < numSynthesisRateCategories; k++)
 		{
@@ -143,7 +146,8 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 					std::cout <<"\t P: " << model.getCategoryProbability(k) << "\n";
 					std::cout <<"\t L: " << propLogLike << "\n";
 				}
-				logLikelihood += std::log(model.getCategoryProbability(k)) + propLogLike;
+				if(geneSynthCat == k)
+					logLikelihood += std::log(model.getCategoryProbability(k)) + propLogLike;
 			}else{
 				// only count each gene once, not numSynthesisRateCategories times
 				//#pragma omp critical
@@ -153,7 +157,8 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 					std::cout <<"\t P: " << model.getCategoryProbability(k) << "\n";
 					std::cout <<"\t L: " << currLogLike << "\n";
 				}
-				logLikelihood += std::log(model.getCategoryProbability(k)) + currLogLike;
+				if(geneSynthCat == k)
+					logLikelihood += std::log(model.getCategoryProbability(k)) + currLogLike;
 			}
 		}
 
@@ -255,6 +260,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 			model.updateCodonSpecificParameterTrace(iteration/thining, grouping);
 		}
 	}
+	model.updateTmp(); //update the tmp trace I have created to track alphas.
 }
 
 // Allows to diverge from initial conditions (divergenceIterations controls the divergence).
@@ -336,7 +342,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	// initialize everything
 
 	model.setNumPhiGroupings(genome.getGene(0).getObservedPhiValues().size());
-	model.initTraces(samples, genome.getGenomeSize()); 
+	model.initTraces(samples + 1, genome.getGenomeSize()); //Samples + 2 so we can store the starting and ending values.
 	// starting the MCMC
 
 	std::cout << "entering MCMC loop" << std::endl;
@@ -347,11 +353,11 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	// set the last iteration to the max iterations, this way if the MCMC doesn't exit based on Geweke score, it will use the max iteration for posterior means
 	model.setLastIteration(samples);
 	std::cout << "\tStarting MCMC with " << maximumIterations << " iterations\n";
-	for(unsigned iteration = 0u; iteration < maximumIterations; iteration++)
+	for(unsigned iteration = 1u; iteration <= maximumIterations; iteration++)
 	{
 		if (writeRestartFile)
 		{
-			if ((iteration + 1u) % fileWriteInterval  == 0u)
+			if ((iteration) % fileWriteInterval  == 0u)
 			{
 				std::cout <<"Writing restart file!\n";
 				if (multipleFiles)
@@ -367,7 +373,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 				}
 			}
 		}
-		if( (iteration + 1u) % 100u == 0u)
+		if( (iteration) % 100u == 0u)
 		{
 			std::cout << "Status at iteration " << (iteration+1) << std::endl;
 			std::cout << "\t current logLikelihood: " << likelihoodTrace[(iteration/thining) - 1] << std::endl;
@@ -381,7 +387,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 		{
 			model.proposeCodonSpecificParameter();
 			acceptRejectCodonSpecificParameter(genome, model, iteration);
-			if( ( (iteration + 1u) % adaptiveWidth) == 0u)
+			if( ( (iteration) % adaptiveWidth) == 0u)
 			{
 				model.adaptCodonSpecificParameterProposalWidth(adaptiveWidth);
 			}
@@ -392,7 +398,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 			model.updateGibbsSampledHyperParameters(genome);
 			model.proposeHyperParameters();
 			acceptRejectHyperParameter(genome, model, iteration);
-			if( ( (iteration + 1u) % adaptiveWidth) == 0u)
+			if( ( (iteration) % adaptiveWidth) == 0u)
 			{
 				model.adaptHyperParameterProposalWidths(adaptiveWidth);
 			}
@@ -406,14 +412,14 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 			{
 				likelihoodTrace[iteration/thining] = logLike;
 			}
-			if( ( (iteration + 1u) % adaptiveWidth) == 0u)
+			if( ( (iteration) % adaptiveWidth) == 0u)
 			{
 				model.adaptSynthesisRateProposalWidth(adaptiveWidth);
 			}
 		}
 
 
-		if( ( (iteration + 1u) % (adaptiveWidth)) == 0u)
+		if( ( (iteration) % (50*adaptiveWidth)) == 0u)
 		{
 			double gewekeScore = calculateGewekeScore(iteration/thining);
 			std::cout << "##################################################" << "\n";
@@ -429,6 +435,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 			}
 		}
 	} // end MCMC loop
+
 	std::cout << "leaving MCMC loop" << std::endl;
 	//NOTE: The following files used to be written here:
 	//selectionParamTrace_#.csv

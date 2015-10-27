@@ -732,20 +732,16 @@ void ROCParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
 
 void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
 {
-	std::cout << "acceptance ratio for amino acid:\n\t";
-	for (unsigned i = 0; i < groupList.size(); i++)
-	{
-		std::cout << groupList[i] << "\t";
-	}
-	std::cout << "\n\t";
+	std::cout << "Acceptance Ratio for Codon Specific Parameter\n";
+	std::cout << "AA\tAcc.Rat\tProp.Width\n";
 	for (unsigned i = 0; i < groupList.size(); i++)
 	{
 		std::string aa = groupList[i];
 		unsigned aaIndex = SequenceSummary::AAToAAIndex(aa);
 		double acceptanceLevel = (double) numAcceptForMutationAndSelection[aaIndex] / (double) adaptationWidth;
-		std::cout << acceptanceLevel << "\t";
 		traces.updateCspAcceptanceRatioTrace(aaIndex, acceptanceLevel);
 		std::array <unsigned, 2> codonRange = SequenceSummary::AAIndexToCodonRange(aaIndex, true);
+		std::cout << "\t" << aa << ":\t" << acceptanceLevel << "\t" << std_csp[codonRange[0]] << "\n";
 		for (unsigned k = codonRange[0]; k < codonRange[1]; k++)
 		{
 			if (acceptanceLevel < 0.2)

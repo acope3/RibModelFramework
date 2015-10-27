@@ -232,7 +232,7 @@ void testReadObservedPhis()
 void simulateRFPData()
 {
 	Genome genome;
-	genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+	genome.readRFPFile("/export/home/ghanas/RibModelFramework-master/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{
@@ -244,11 +244,11 @@ void simulateRFPData()
 	RFPParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
 
 	std::vector<std::string> files;
-	files.push_back("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/RFPAlphaValues.csv");
+	files.push_back("/export/home/ghanas/RibModelFramework-master/ribModel/data/RFPAlphaValues.csv");
 	tmp.initMutationSelectionCategories(files, 1, RFPParameter::alp);
-	files[0] = "/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/RFPLambdaPrimeValues.csv";
+	files[0] = "/export/home/ghanas/RibModelFramework-master/ribModel/data/RFPLambdaPrimeValues.csv";
 	tmp.initMutationSelectionCategories(files, 1, RFPParameter::lmPri);
-	std::vector<double> phi = tmp.readPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/RFPPhiValues.csv");
+	std::vector<double> phi = tmp.readPhiValues("/export/home/ghanas/RibModelFramework-master/ribModel/data/RFPPhiValues.csv");
 	tmp.InitializeSynthesisRate(phi);
 
 
@@ -258,8 +258,8 @@ void simulateRFPData()
 
 	std::cout << "init done\n";
 	model.simulateGenome(genome);
-	std::cout << "writing file\n";
-	genome.writeRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/SimulatedRFPData.csv", true);
+	std::cout <<"writing file\n";
+	genome.writeRFPFile("/export/home/ghanas/RibModelFramework-master/ribModel/data/SimulatedRFPData.csv", true);
 
 
 }
@@ -441,7 +441,7 @@ int main()
 	User user = jeremy;
 	ModelToRun modelToRun = FONSE;
 	bool read = false;
-	bool testing = false;
+	bool testing = true;
 	bool withPhi = false;
 	if (testing)
 	{
@@ -455,7 +455,7 @@ int main()
 		//testInitFromRestartFile();
 		//testReadRFPFile();
 		//testReadObservedPhis();
-		//simulateRFPData();
+		simulateRFPData();
 	//	simulateROCData();
 		//testInitMutationSelection();
 		//testRFPVarianceAndMean();
@@ -464,7 +464,6 @@ int main()
 		//testReadMutationValues();
 		//testMultiplePhi();
 		testDensityLogNorm();
-
 	}
 	else //not doing unit testing, running a model
 	{
@@ -696,7 +695,6 @@ int main()
 				std::cout << "Sphi posterior estimate for selection category " << selectionCategry << ": " << parameter.getSphiPosteriorMean(useSamples, selectionCategry) << std::endl;
 			}
 			std::cout << "Sphi proposal width: " << parameter.getCurrentSphiProposalWidth() << std::endl;
-
 		}
 		else if (modelToRun == FONSE)
 		{
@@ -780,7 +778,6 @@ int main()
 				std::cout << SequenceSummary::AminoAcidArray[index] << ": " << parameter.getCurrentCodonSpecificProposalWidth(index) << "\n";
 			}
 		}
-
 		//These files used to be written here:
 		//mutationPosterior_Cat#.csv
 		//selectionPosterior_Cat#.csv

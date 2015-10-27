@@ -20,7 +20,7 @@ class MCMCAlgorithm
 		bool estimateHyperParameter;
 		bool writeRestartFile;
 		std::vector<double> likelihoodTrace;
-
+		std::vector<double> tmp;
 		std::string file;
 		unsigned fileWriteInterval;
 		bool multipleFiles;

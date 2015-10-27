@@ -82,6 +82,7 @@ class ROCModel : public Model
 
 	virtual void setLastIteration(unsigned iteration) { parameter->setLastIteration(iteration); }
 	virtual unsigned getLastIteration() { return parameter->getLastIteration(); }
+	virtual void updateTmp() {}
 	virtual void printHyperParameters();
     protected:
 };

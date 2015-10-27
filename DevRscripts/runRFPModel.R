@@ -1,4 +1,4 @@
-library(ribModel)
+library(ribModel, lib.loc="~/R")
 rm(list=ls())
 
 
@@ -12,7 +12,7 @@ numMixtures <- 1
 mixDef <- "allUnique"
 geneAssignment <- c(rep(1, genome$getGenomeSize()))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, model= "RFP", split.serine = TRUE, mixture.definition = mixDef)
-#parameter <- new(RFPParameter, "180KrestartFile.rst")
+#parameter <- new(RFPParameter, "50KrestartFile.rst")
 
 # initialize MCMC object
 samples <- 100
@@ -91,7 +91,7 @@ colnames(Y) <- c("Codon", "PausingTime")
 Y <- Y[order(Y[,1]) , ]
 
 plot(NULL, NULL, xlim=range(XM[,2], na.rm = T), ylim=range(Y[,2]), 
-     main = "Correlation Between True and RFP Model Pausing Times", xlab = "True Values", ylab = "Run Values")
+     main = "Correlation Between Premal and RFP Model Pausing Times", xlab = "True Values", ylab = "Run Values")
 upper.panel.plot(XM[,2], Y[,2])
 dev.off()
 
@@ -115,7 +115,7 @@ for (i in 1:size)
 
 for (i in 1:size)
 {
-  g <- genome$getGeneByIndex(i)
+  g <- genome$getGeneByIndex(i, FALSE)
   ids[i] <- g$id
 }
 
