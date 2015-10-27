@@ -42,7 +42,7 @@ class PANSEParameter: public Parameter {
 		//Constructors & destructors:
 		explicit PANSEParameter();
 		PANSEParameter(std::string filename);
-		PANSEParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
+		PANSEParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
 				std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer = true,
 				std::string _mutationSelectionState = "allUnique");
 		virtual ~PANSEParameter();
@@ -89,14 +89,14 @@ class PANSEParameter: public Parameter {
 
 
 		//Posterior mean functions:
-		virtual double getSphiPosteriorMean(unsigned samples);
+		virtual double getSphiPosteriorMean(unsigned samples, unsigned mixture);
 		virtual double getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement);
 		double getAlphaPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon);
 		double getLambdaPrimePosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon);
 
 
 		//Variance functions:
-		virtual double getSphiVariance(unsigned samples, bool unbiased = true);
+		virtual double getSphiVariance(unsigned samples, unsigned mixture, bool unbiased = true);
 		virtual double getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement,
 				bool unbiased = true);
 		double getAlphaVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased = true);

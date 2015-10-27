@@ -26,7 +26,7 @@ ROCParameter::ROCParameter(std::string filename) :
 }
 
 #ifndef STANDALONE
-ROCParameter::ROCParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter(22)
+ROCParameter::ROCParameter(std::vector<double> sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter(22)
 {
 	unsigned _numMixtures = _matrix.size() / 2;
 	std::vector<std::vector<unsigned>> thetaKMatrix;
@@ -45,7 +45,7 @@ ROCParameter::ROCParameter(double sphi, std::vector<unsigned> geneAssignment, st
 
 }
 
-ROCParameter::ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState) :
+ROCParameter::ROCParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState) :
 Parameter(22)
 {
 	std::vector<std::vector<unsigned>> thetaKMatrix;
@@ -54,7 +54,7 @@ Parameter(22)
 }
 #endif
 
-ROCParameter::ROCParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
+ROCParameter::ROCParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
 		std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer, std::string _mutationSelectionState) :
 		Parameter(22)
 {
@@ -166,7 +166,7 @@ std::vector<std::vector<double>> ROCParameter::calculateSelectionCoefficients(un
 			for (unsigned k = aaRange[0]; k < aaRange[1]; k++)
 			{
 				std::string codon = SequenceSummary::codonArrayParameter[k];
-				tmp.push_back(getSelectionPosteriorMean(sample, mixture, codon));
+				tmp.push_back(getSelectionPosteriorMean(mixture, sample, codon));
 				if (tmp[k] < minValue)
 				{
 					minValue = tmp[k];
@@ -732,20 +732,16 @@ void ROCParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
 
 void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
 {
-	std::cout << "acceptance ratio for amino acid:\n\t";
-	for (unsigned i = 0; i < groupList.size(); i++)
-	{
-		std::cout << groupList[i] << "\t";
-	}
-	std::cout << "\n\t";
+	std::cout << "Acceptance Ratio for Codon Specific Parameter\n";
+	std::cout << "AA\tAcc.Rat\tProp.Width\n";
 	for (unsigned i = 0; i < groupList.size(); i++)
 	{
 		std::string aa = groupList[i];
 		unsigned aaIndex = SequenceSummary::AAToAAIndex(aa);
 		double acceptanceLevel = (double) numAcceptForMutationAndSelection[aaIndex] / (double) adaptationWidth;
-		std::cout << acceptanceLevel << "\t";
 		traces.updateCspAcceptanceRatioTrace(aaIndex, acceptanceLevel);
 		std::array <unsigned, 2> codonRange = SequenceSummary::AAIndexToCodonRange(aaIndex, true);
+		std::cout << "\t" << aa << ":\t" << acceptanceLevel << "\t" << std_csp[codonRange[0]] << "\n";
 		for (unsigned k = codonRange[0]; k < codonRange[1]; k++)
 		{
 			if (acceptanceLevel < 0.2)
@@ -799,10 +795,11 @@ double ROCParameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned ge
 	return posteriorMean / (double) usedSamples;
 }
 
-double ROCParameter::getSphiPosteriorMean(unsigned samples)
+double ROCParameter::getSphiPosteriorMean(unsigned samples, unsigned mixture)
 {
 	double posteriorMean = 0.0;
-	std::vector<double> sPhiTrace = traces.getSphiTrace();
+	unsigned selectionCategory = getSelectionCategoryForMixture(mixture);
+	std::vector<double> sPhiTrace = traces.getSphiTrace(selectionCategory);
 	unsigned traceLength = (unsigned)sPhiTrace.size();
 
 	if (samples > traceLength)
@@ -870,9 +867,10 @@ std::vector<double> ROCParameter::getEstimatedMixtureAssignmentProbabilities(uns
 	return probabilities;
 }
 
-double ROCParameter::getSphiVariance(unsigned samples, bool unbiased)
+double ROCParameter::getSphiVariance(unsigned samples, unsigned mixture, bool unbiased)
 {
-	std::vector<double> sPhiTrace = traces.getSphiTrace();
+	unsigned selectionCategory = getSelectionCategoryForMixture(mixture);
+	std::vector<double> sPhiTrace = traces.getSphiTrace(selectionCategory);
 	unsigned traceLength = (unsigned)sPhiTrace.size();
 	if (samples > traceLength)
 	{
@@ -881,7 +879,7 @@ double ROCParameter::getSphiVariance(unsigned samples, bool unbiased)
 				<< "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
 	}
-	double posteriorMean = getSphiPosteriorMean(samples);
+	double posteriorMean = getSphiPosteriorMean(samples, mixture);
 
 	double posteriorVariance = 0.0;
 

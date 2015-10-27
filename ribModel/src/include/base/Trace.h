@@ -9,7 +9,7 @@
 
 class Trace {
 	private:
-		std::vector<double> sPhiTrace; //samples
+		std::vector<std::vector<double>> sPhiTrace; //samples
 		std::vector<double> sphiAcceptanceRatioTrace; //samples
 		std::vector<std::vector<std::vector<double>>>synthesisRateAcceptanceRatioTrace; //order: expressionCategory, gene, sample
 		std::vector<std::vector<double>> cspAcceptanceRatioTrace;//order: codon, sample
@@ -29,7 +29,7 @@ class Trace {
 				std::vector<mixtureDefinition> &_categories, unsigned maxGrouping);
 		bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);
 
-		void initSphiTrace(unsigned samples);
+		void initSphiTrace(unsigned numSelectionCategories, unsigned samples);
 		//aPhi will go here once implemented.
 		void initSynthesisRateAcceptanceRatioTrace(unsigned num_genes, unsigned numExpressionCategories);
 		void initSynthesisRateTrace(unsigned samples, unsigned num_genes, unsigned numExpressionCategories);
@@ -37,7 +37,7 @@ class Trace {
 		void initMixtureProbabilitesTrace(unsigned samples, unsigned numMixtures);
 
 		//Getter functions
-		std::vector<double> getSphiTrace() { return sPhiTrace; }
+		std::vector<double> getSphiTrace(unsigned selectionCategory) { return sPhiTrace[selectionCategory]; }
 		std::vector<double> getExpectedPhiTrace();
 		std::vector<double> getSphiAcceptanceRatioTrace()
 		{	return sphiAcceptanceRatioTrace;}
@@ -53,8 +53,8 @@ class Trace {
 		unsigned getSynthesisRateCategory(unsigned mixtureElement)
 		{	return categories->at(mixtureElement).delEta;}
 		//Update functions	
-		void updateSphiTrace(unsigned sample, double Sphi)
-		{	sPhiTrace[sample] = Sphi;}
+		void updateSphiTrace(unsigned sample, double Sphi, unsigned selectionCategory)
+		{	sPhiTrace[selectionCategory][sample] = Sphi;}
 		void updateSphiAcceptanceRatioTrace(double acceptanceLevel)
 		{	sphiAcceptanceRatioTrace.push_back(acceptanceLevel);}
 		void updateSynthesisRateAcceptanceRatioTrace(unsigned category, unsigned geneIndex, double acceptanceLevel);
@@ -73,6 +73,10 @@ class Trace {
 		std::vector<double> getSynthesisRateTraceByMixtureElementForGeneR(unsigned mixtureElement, unsigned geneIndex);//R WRAPPER
 		std::vector<unsigned> getMixtureAssignmentTraceForGeneR(unsigned geneIndex);//R WRAPPER
 		std::vector<double> getMixtureProbabilitiesTraceForMixtureR(unsigned mixtureIndex);//R WRAPPER
+		std::vector<std::vector<double>> getSphiTraces()
+		{
+			return sPhiTrace;
+		}
 		unsigned getNumberOfMixtures()
 		{	return mixtureProbabilitiesTrace.size();}
 

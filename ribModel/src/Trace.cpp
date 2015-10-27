@@ -25,7 +25,7 @@ void Trace::initBaseTraces(unsigned samples, unsigned num_genes, unsigned numSel
 {
 	std::cout <<"maxGrouping: " << maxGrouping <<"\n";
 	//numSelectionCategories always == numSynthesisRateCategories, so only one is passed in for convience
-	initSphiTrace(samples);
+	initSphiTrace(numSelectionCategories, samples);
 	initSynthesisRateAcceptanceRatioTrace(num_genes, numSelectionCategories);
 	cspAcceptanceRatioTrace.resize(maxGrouping);
 	initSynthesisRateTrace(samples, num_genes, numSelectionCategories);
@@ -53,9 +53,14 @@ bool Trace::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound)
 }
 
 
-void Trace::initSphiTrace(unsigned samples)
+void Trace::initSphiTrace(unsigned numSelectionCategories, unsigned samples)
 {
-	sPhiTrace.resize(samples);
+	sPhiTrace.resize(numSelectionCategories);
+	for(unsigned i = 0u; i < numSelectionCategories; i++)
+	{
+		std::vector<double> temp(samples, 0.0);
+		sPhiTrace[i] = temp;
+	}
 }
 
 

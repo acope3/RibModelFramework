@@ -23,10 +23,10 @@ PANSEParameter::PANSEParameter(std::string filename) : Parameter(64)
 }
 
 
-PANSEParameter::PANSEParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix,
+PANSEParameter::PANSEParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix,
 		bool splitSer, std::string _mutationSelectionState) : Parameter(64)
 {
-	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
+	initParameterSet(sphi, numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
 	initPANSEParameterSet();
 }
 
@@ -374,7 +374,10 @@ void PANSEParameter::initAllTraces(unsigned samples, unsigned num_genes)
 
 void PANSEParameter::updateSphiTrace(unsigned sample)
 {
-	traces.updateSphiTrace(sample, Sphi);
+	for(unsigned i = 0u; i < numSelectionCategories; i++)
+	{
+		traces.updateSphiTrace(sample, Sphi[i], i);
+	}
 }
 
 
@@ -535,10 +538,11 @@ void PANSEParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
 
 
 //TODO: Traces prevent this from being in the parent class
-double PANSEParameter::getSphiPosteriorMean(unsigned samples)
+double PANSEParameter::getSphiPosteriorMean(unsigned samples, unsigned mixture)
 {
 	double posteriorMean = 0.0;
-	std::vector<double> sPhiTrace = traces.getSphiTrace();
+	unsigned selectionCategory = getSelectionCategoryForMixture(mixture);
+	std::vector<double> sPhiTrace = traces.getSphiTrace(selectionCategory);
 	unsigned traceLength = (unsigned)sPhiTrace.size();
 
 	if(samples > traceLength)
@@ -633,9 +637,10 @@ double PANSEParameter::getLambdaPrimePosteriorMean(unsigned mixtureElement, unsi
 
 
 //TODO: Traces prevent this from being in the parent class
-double PANSEParameter::getSphiVariance(unsigned samples, bool unbiased)
+double PANSEParameter::getSphiVariance(unsigned samples, unsigned mixture, bool unbiased)
 {
-	std::vector<double> sPhiTrace = traces.getSphiTrace();
+	unsigned selectionCategory = getSelectionCategoryForMixture(mixture);
+	std::vector<double> sPhiTrace = traces.getSphiTrace(selectionCategory);
 	unsigned traceLength = (unsigned)sPhiTrace.size();
 	if(samples > traceLength)
 	{
@@ -643,7 +648,8 @@ double PANSEParameter::getSphiVariance(unsigned samples, bool unbiased)
 			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;
 	}
-	double posteriorMean = getSphiPosteriorMean(samples);
+	// has to be mixture since getSphiPosteriorMean does its own mapping
+	double posteriorMean = getSphiPosteriorMean(samples, mixture);
 
 	double posteriorVariance = 0.0;
 
@@ -954,7 +960,7 @@ double PANSEParameter::getLambdaPrimeVarianceForCodon(unsigned mixtureElement, u
 
 
 #ifndef STANDALONE
-PANSEParameter::PANSEParameter(double sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter(64)
+PANSEParameter::PANSEParameter(std::vector<double> sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter(64)
 {
   unsigned _numMixtures = _matrix.size() / 2;
   std::vector<std::vector<unsigned>> thetaKMatrix;
@@ -973,7 +979,7 @@ PANSEParameter::PANSEParameter(double sphi, std::vector<unsigned> geneAssignment
 
 }
 
-PANSEParameter::PANSEParameter(double sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState) :
+PANSEParameter::PANSEParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState) :
 Parameter(64)
 {
   std::vector<std::vector<unsigned>> thetaKMatrix;

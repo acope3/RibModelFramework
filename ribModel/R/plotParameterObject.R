@@ -34,12 +34,26 @@ plot.Rcpp_ROCParameter <- function(parameter, what = "Mutation", sample = 100, .
 }
 
 
-upper.panel.plot <- function(x, y, ...)
+upper.panel.plot <- function(x, y, sd.x=NULL, sd.y=NULL, ...)
 {
   abline(0, 1, col = "blue", lty = 2)
   points(x, y, ...)
+  if(!is.null(sd.y))
+  {
+    y.up <- y + sd.y
+    y.low <- y - sd.y
+    epsilon <- range(x, na.rm = T) * 0.1
+    segments(x, y.low, x, y.up, ...)
+  }
+  if(!is.null(sd.x))
+  {
+    x.up <- x + sd.x
+    x.low <- x - sd.x
+    epsilon <- range(y, na.rm = T) * 0.1
+    segments(x.low, y, x.up, y, ...)
+  }  
   
-  lm.line <- lm(y~x)
+  lm.line <- lm(y~x, na.action = "na.exclude")
   abline(lm.line, col="blue", lwd = 2)
   
   R2 <- summary(lm.line)$r.squared
@@ -47,8 +61,8 @@ upper.panel.plot <- function(x, y, ...)
   b <- lm.line$coef[2]
   rho <- ifelse(b > 0, sqrt(R2), -sqrt(R2)) #make sure rho has correct sign
   
-  xlim <- range(x)
-  ylim <- range(y)
+  xlim <- range(x, na.rm = T)
+  ylim <- range(y, na.rm = T)
   
   width <- xlim[2] - xlim[1]
   height <- ylim[2] - ylim[1]
@@ -63,7 +77,7 @@ upper.panel.plot <- function(x, y, ...)
     eq <- paste("y = ", sprintf("%.3f", intercept), " + ", sprintf("%.3f", slope), "x *", sep = "")
     text(xlim[1] + width * 0.1, ylim[2] - height * 0.2, eq)
   }else{
-    eq <- paste("y = ", sprintf("%.3f", intercept), " + ", sprintf("%.3f", slope), sep = "")
+    eq <- paste("y = ", sprintf("%.3f", intercept), " + ", sprintf("%.3f", slope), "x", sep = "")
     text(xlim[1] + width * 0.1, ylim[2] - height * 0.2, eq)
   } 
   text(xlim[2] - width * 0.04, ylim[1] + height * 0.05,
