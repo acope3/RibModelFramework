@@ -232,7 +232,7 @@ void testReadObservedPhis()
 void simulateRFPData()
 {
 	Genome genome;
-	genome.readRFPFile("/export/home/ghanas/github/RibModelFramework/ribModel/data/RFPDataSets/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+	genome.readRFPFile("/export/home/ghanas/github/RibModelFramework/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{
@@ -244,11 +244,11 @@ void simulateRFPData()
 	RFPParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
 
 	std::vector<std::string> files;
-	files.push_back("/export/home/ghanas/github/RibModelFramework/ribModel/data/RFPAlphaValues.csv");
+	files.push_back("/export/home/ghanas/github/RibModelFramework/data/rfp/RFPAlphaValues.csv");
 	tmp.initMutationSelectionCategories(files, 1, RFPParameter::alp);
-	files[0] = "/export/home/ghanas/github/RibModelFramework/ribModel/data/RFPLambdaPrimeValues.csv";
+	files[0] = "/export/home/ghanas/github/RibModelFramework/data/rfp/RFPLambdaPrimeValues.csv";
 	tmp.initMutationSelectionCategories(files, 1, RFPParameter::lmPri);
-	std::vector<double> phi = tmp.readPhiValues("/export/home/ghanas/github/RibModelFramework/ribModel/data/RFPPhiValues.csv");
+	std::vector<double> phi = tmp.readPhiValues("/export/home/ghanas/github/RibModelFramework/data/rfp/RFPPhiValues.csv");
 	tmp.InitializeSynthesisRate(phi);
 
 
@@ -259,7 +259,7 @@ void simulateRFPData()
 	std::cout <<"init done\n";
 	model.simulateGenome(genome);
 	std::cout <<"writing file\n";
-	genome.writeRFPFile("/export/home/ghanas/github/RibModelFramework/ribModel/data/SimulatedRFPData2.csv", true);
+	genome.writeRFPFile("/export/home/ghanas/github/RibModelFramework/data/rfp/simulatedRFPData.csv", true);
 
 
 }
