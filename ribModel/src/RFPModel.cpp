@@ -162,7 +162,7 @@ void RFPModel::simulateGenome(Genome &genome)
 			unsigned lambdaPrimeCat = parameter -> getSelectionCategory(mixtureElement);
 
 			double alpha = getParameterForCategory(alphaCat, RFPParameter::alp, codon, false);
-			double lambdaPrime = getParameterForCategory(lambdaPrimeCat, RFPParameter::lmPri, codon, false) * 100;
+			double lambdaPrime = getParameterForCategory(lambdaPrimeCat, RFPParameter::lmPri, codon, false);
 
 			double alphaPrime = alpha * gene.geneData.getCodonCountForCodon(codon);
 

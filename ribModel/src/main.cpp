@@ -259,7 +259,7 @@ void simulateRFPData()
 	std::cout <<"init done\n";
 	model.simulateGenome(genome);
 	std::cout <<"writing file\n";
-	genome.writeRFPFile("/export/home/ghanas/github/RibModelFramework/data/rfp/simulatedRFPData.csv", true);
+	genome.writeRFPFile("/export/home/ghanas/github/RibModelFramework/data/rfp/simulatedRFPData-noScaling.csv", true);
 
 
 }
