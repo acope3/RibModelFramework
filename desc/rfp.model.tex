@@ -155,7 +155,7 @@ The total Likelihood of the data is
 Note that using RFP data alone, $\kappag \times \mg = \phi$ and $\lambdacprime = \lambdac \Ztheta/\Ytotal$ are only identifiable as joint parameters. 
 (Although it seems like you should be able to calculate \Ztheta post-hoc from the state of the chain and estimates of \mg are available from other sources.)
 Most standard libraries require that the $x$ parameter in a NB be discrete, which in this case it is not.
-Thus to simulate \Yg values based on equations (\ref{eq:distYgSite}) or (\ref{eq:distYgCodon}), first pull $W$ from Gamma(\alphac, \lambdacprime)\footnote{recall that \lambdacprime is the 'rate' parameter}, then pull $Y$ from Poisson($W \ngc \psig$).
+Thus to simulate \Yg values based on equations (\ref{eq:distYgSite}) or (\ref{eq:distYgCodon}), first pull $W$ from Gamma(\ngc \alphac, \lambdacprime)\footnote{recall that \lambdacprime is the 'rate' parameter}, then pull $Y$ from Poisson($W \psig$).
   
 \citet{PopEtAl14} provide RNA-Seq based counts of mRNA abundances, \Mg, in addition to RFP counts.
 If we assume that $\Mg \sim \text{Poisson}(\Ytotal \mg)$, we can easily combine both the RFP and the mRNA counts together and estimate $\kappag$ and $\mg$ separately.
@@ -164,10 +164,10 @@ Alternatively, we could estimate the composite \kappag \mg parameter using the R
 An additional fact worth noting is that we are treating $Z$ as a constant for much of our calculations when, in fact, it is a random variate.
 We should discuss this with Russ to ensure there are no issues.
 
-\subsection*{Simulation}
-Although our Likelihood function can be described using a Negative Binomial distribution, because $x = \alpha$ and $\alpha$ is not discrete, we cannot use standard NB routines to simulate our data.
-Instead we need simulate in two steps.
-First, we generate $W_c$  from $\text{Gamma}(\alphac, \lambdacprime)$ and then we generate $\Ygc$ from $\text{Poisson}\left(\phi_g W_c\right)$
+%\subsection*{Simulation}
+%Although our Likelihood function can be described using a Negative Binomial distribution, because $x = \alpha$ and $\a%lpha$ is not discrete, we cannot use standard NB routines to simulate our data.
+%Instead we need simulate in two steps.
+%First, we generate $W_c$  from $\text{Gamma}(\alphac \ngc, \lambdacprime)$ and then we generate $\Ygc$ from $\text{Poi%sson}\left(\phi_g W_c\right)$
 
 
 \section*{Pausing Time with Nonsense Error Model Definition}
