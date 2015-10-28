@@ -1,9 +1,9 @@
-library(ribModel, lib.loc= "~/R")
+library(ribModel)
 rm(list=ls())
 
 
 #read genome
-genome <- initializeGenomeObject(file = "../ribModel/data/SimulatedRFPData.csv", FALSE)
+genome <- initializeGenomeObject(file = "../data/rfp/simulatedRFPData.csv", FALSE)
 
 
 #initialize parameter object
@@ -11,19 +11,19 @@ sphi_init <- 2
 numMixtures <- 1
 mixDef <- "allUnique"
 geneAssignment <- c(rep(1, genome$getGenomeSize()))
-parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, model= "RFP", split.serine = TRUE, mixture.definition = mixDef)
-
+#parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, model= "RFP", split.serine = TRUE, mixture.definition = mixDef)
+parameter <- new(RFPParameter, "1000restartFile.rst")
 
 #init from "true" values
 
-phiVals <- parameter$readPhiValues( "../ribModel/data/RFPPhiValues.csv" )
-parameter$initializeSynthesisRateByRandom(phiVals)
-parameter$initMutationSelectionCategories(c("../ribModel/data/RFPAlphaValues.csv"), 1, "Alpha")
-parameter$initMutationSelectionCategories(c("../ribModel/data/RFPLambdaPrimeValues.csv"), 1, "LambdaPrime")
+phiVals <- parameter$readPhiValues( "../data/rfp/RFPPhiValues.csv" )
+parameter$initializeSynthesisRateByList(phiVals)
+parameter$initMutationSelectionCategories(c("../data/rfp/RFPAlphaValues.csv"), 1, "Alpha")
+parameter$initMutationSelectionCategories(c("../data/rfp/RFPLambdaPrimeValues.csv"), 1, "LambdaPrime")
 
 
 # initialize MCMC object
-samples <- 1000
+samples <- 100
 thining <- 10
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples=samples, thining=thining, adaptive.width=adaptiveWidth, 
@@ -35,7 +35,7 @@ setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth, TRUE)
 
 #run mcmc on genome with parameter using model
 system.time(
-  runMCMC(mcmc, genome, model)
+  runMCMC(mcmc, genome, model, 8)
 )
 
 
@@ -65,39 +65,42 @@ alphaList2 <- numeric (61)
 lambdaPrimeList <- numeric (61)
 lambdaPrimeList2 <- numeric (61)
 LambdaPrimeLis3t <- numeric (61)
+lambdaPrime.ci <-numeric(61)
 phiList <- numeric(genome$getGenomeSize())
 codonList <- codons()
 i <- 1
 for (i in 1:61)
 {
   codon <- codonList[i]
-  #alphaList[i] <- parameter$getParameterForCategory(cat, 0, codon, FALSE)
   alphaList[i] <- parameter$getAlphaPosteriorMeanForCodon(cat, 100, codon)
-  #lambdaPrimeList[i] <- parameter$getParameterForCategory(cat, 1, codon, FALSE)
   lambdaPrimeList[i] <- parameter$getLambdaPrimePosteriorMeanForCodon(cat, 100, codon)
-  #LambdaPrimeLis3t[i] <- trace$getLambdaPrimeParameterTraceByMixtureElementForCodon(1, codon)[1000]
+  lambdaPrime.ci[i] <- parameter$getLambdaPrimeVarianceForCodon(cat, 100, codon, TRUE)
 }
 for (geneIndex in 1:genome$getGenomeSize()) {
   phiList[geneIndex] <- parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(100, geneIndex, 1)
 }
 log10(phiList) -> phiList
-plot(NULL, NULL, xlim=range(alphaList, na.rm = T), ylim=range(lambdaPrimeList), 
-     main = "Correlation Between Alpha and Lambda Prime", xlab = "alpha", ylab = "lambdaPrime")
-upper.panel.plot(alphaList, lambdaPrimeList)
 
+A <- read.table("../data/rfp/RFPAlphaValues.csv", header =TRUE, sep = ",")
+LP1 <- read.table("../data/rfp/RFPLambdaPrimeValues.csv", header =TRUE, sep = ",")
+PHI <- log10(read.table("../data/rfp/RFPPhiValues.csv", header = TRUE, sep = ",")[,2])
 
-A <- read.table("../ribModel/data/RFPAlphaValues.csv", header =TRUE, sep = ",")
-LP <- read.table("../ribModel/data/RFPLambdaPrimeValues.csv", header =TRUE, sep = ",")
-PHI <- log10(read.table("../ribModel/data/RFPPhiValues.csv", header = TRUE, sep = ",")[,2])
-
+for(i in length(LP)){
+  LP[i] <- (1/LP[i])
+}
 
 plot(NULL, NULL, xlim=range(alphaList, na.rm = T), ylim=range(A[,2]), 
-     main = "Correlation Between Initial and Simulated Alphas", xlab = "true alpha", ylab = "simulated alpha")
+     main = "Correlation Between Initial and Simulated Alphas", xlab = "estimated alpha", ylab = "true alpha")
 upper.panel.plot(alphaList, A[,2])
 
-plot(NULL, NULL, xlim=range(lambdaPrimeList, na.rm = T), ylim=range(LP[,2]), 
-     main = "Correlation Between Initial and Simulated Lambda Primes", xlab = "true lambda prime", ylab = "simulated lambda prime")
-upper.panel.plot(lambdaPrimeList, LP[,2])
+
+plot(NULL, NULL, xlim=range(lambdaPrimeList, na.rm = T), ylim=range(LP1[,2]), 
+     main = "Correlation Between Initial and Simulated Lambda Primes", xlab = "estimated lambda prime", ylab = "true lambda prime")
+upper.panel.plot(lambdaPrimeList, LP1[,2],sd.y = 1.96 * sqrt(lambdaPrime.ci))
+
+plot(NULL, NULL, xlim=range(LP1[,2], na.rm = T), ylim=range(lambdaPrimeList), 
+     main = "Correlation Between Initial and Simulated Lambda Primes", xlab = "true lambda prime", ylab = "estimated lambda prime")
+upper.panel.plot(LP1[,2], lambdaPrimeList,sd.y = 1.96 * sqrt(lambdaPrime.ci))
 
 plot(NULL, NULL, xlim=range(phiList, na.rm = T), ylim=range(PHI), 
      main = "Correlation Between Initial and Simulated Synthesis Rates", xlab = "true Synthesis Rate", ylab = "simulated synthesis rate")
