@@ -169,11 +169,11 @@ void RFPModel::simulateGenome(Genome &genome)
 			#ifndef STANDALONE
 				RNGScope scope;
 				NumericVector xx(1);
-				xx = rgamma(1, alphaPrime, lambdaPrime);
+				xx = rgamma(1, alphaPrime, 1.0/lambdaPrime);
 				xx = rpois(1, xx[0] * phi);
 				tmpGene.geneData.setRFPObserved(codonIndex, xx[0]);
 			#else
-				std::gamma_distribution<double> GDistribution(alphaPrime, lambdaPrime);
+				std::gamma_distribution<double> GDistribution(alphaPrime,1.0/lambdaPrime);
 				double tmp = GDistribution(Parameter::generator);
 				std::poisson_distribution<unsigned> PDistribution(phi * tmp);
 				unsigned simulatedValue = PDistribution(Parameter::generator);
