@@ -52,7 +52,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 	//std::cout << logLikelihood << " " << logLikelihood_proposed << std::endl;
 
 	double sPhi = parameter->getSphi(false);
-	double logPhiProbability = FONSEParameter::densityLogNorm(phiValue, (-(sPhi * sPhi) / 2), sPhi, true);
+	double logPhiProbability = Parameter::densityLogNorm(phiValue, (-(sPhi * sPhi) / 2), sPhi, true);
 	double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, (-(sPhi * sPhi) / 2), sPhi, true);
 	double currentLogLikelihood = (likelihood + logPhiProbability);
 	double proposedLogLikelihood = (likelihood_proposed + logPhiProbability_proposed);

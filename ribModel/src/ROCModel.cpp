@@ -59,8 +59,8 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 	mixture = getSynthesisRateCategory(mixture);
 	double sPhi = parameter->getSphi(mixture, false);
 	double mPhi = (-(sPhi * sPhi) / 2);
-	double logPhiProbability = std::log(ROCParameter::densityLogNorm(phiValue, mPhi, sPhi));
-	double logPhiProbability_proposed = std::log(Parameter::densityLogNorm(phiValue_proposed, mPhi, sPhi));
+	double logPhiProbability = Parameter::densityLogNorm(phiValue, mPhi, sPhi, true);
+	double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, mPhi, sPhi, true);
 	double currentLogLikelihood = (logLikelihood + logPhiProbability);
 	double proposedLogLikelihood = (logLikelihood_proposed + logPhiProbability_proposed);
 
@@ -68,8 +68,8 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 	if (withPhi) {
 		for (unsigned i = 0; i < parameter->getNumPhiGroupings(); i++) {
 			if (gene.observedPhiValues.at(i) != -1) {
-				logPhiProbability += std::log(Parameter::densityLogNorm(gene.observedPhiValues.at(i) + getAphi(i), std::log(phiValue), getSepsilon(i)));
-				logPhiProbability_proposed += std::log(Parameter::densityLogNorm(gene.observedPhiValues.at(i) + getAphi(i), std::log(phiValue_proposed), getSepsilon(i)));
+				logPhiProbability += Parameter::densityLogNorm(gene.observedPhiValues.at(i) + getAphi(i), std::log(phiValue), getSepsilon(i), true);
+				logPhiProbability_proposed += Parameter::densityLogNorm(gene.observedPhiValues.at(i) + getAphi(i), std::log(phiValue_proposed), getSepsilon(i), true);
 			}
 		}
 	}
@@ -374,8 +374,8 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 		unsigned mixture = getMixtureAssignment(i);
 		mixture = getSynthesisRateCategory(mixture);
 		double phi = getSynthesisRate(i, mixture, false);
-		lpr += std::log(Parameter::densityLogNorm(phi, proposedMphi[mixture], proposedSphi[mixture]))
-				- std::log(Parameter::densityLogNorm(phi, currentMphi[mixture], currentSphi[mixture]));
+		lpr += Parameter::densityLogNorm(phi, proposedMphi[mixture], proposedSphi[mixture], true)
+				- Parameter::densityLogNorm(phi, currentMphi[mixture], currentSphi[mixture], true);
 	}
 
 	// TODO: USE CONSTANTS INSTEAD OF 0

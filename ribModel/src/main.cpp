@@ -12,7 +12,7 @@ void testLogNormDensity()
 	std::cout << "------------------ LOG NORM DENSITY ------------------" << std::endl;
 	for (int i = 0; i < 5; i++)
 	{
-		double result = std::log(Parameter::densityLogNorm(i, -1, 1));
+		double result = Parameter::densityLogNorm(i, -1, 1, true);
 		std::cout << "logP of " << i << "\t" << result << std::endl;
 	}
 	std::cout << "------------------ LOG NORM DENSITY ------------------" << std::endl;
@@ -439,9 +439,9 @@ int main()
 	enum ModelToRun { ROC, RFP, FONSE };
 	/* Test variables */
 	User user = jeremy;
-	ModelToRun modelToRun = FONSE;
+	ModelToRun modelToRun = ROC;
 	bool read = false;
-	bool testing = true;
+	bool testing = false;
 	bool withPhi = false;
 	if (testing)
 	{

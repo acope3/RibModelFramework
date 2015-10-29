@@ -314,8 +314,8 @@ void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned
 				double mPhi = (-(sPhi * sPhi) / 2);
 
 				// accept/ reject based on prior ratio
-				double logPhiProbability = std::log(ROCParameter::densityLogNorm(phiValue, mPhi, sPhi));
-				double logPhiProbability_proposed = std::log(Parameter::densityLogNorm(phiValue_proposed, mPhi, sPhi));
+				double logPhiProbability = Parameter::densityLogNorm(phiValue, mPhi, sPhi, true);
+				double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, mPhi, sPhi, true);
 				if( -Parameter::randExp(1) < (logPhiProbability_proposed - logPhiProbability) )
 				{
 					model.updateSynthesisRate(i, k);
