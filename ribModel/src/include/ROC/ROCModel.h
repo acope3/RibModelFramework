@@ -79,6 +79,9 @@ class ROCModel : public Model
 	virtual std::string getGrouping(unsigned index) {return parameter -> getGrouping(index);}
 	// R wrapper
 	std::vector<double> CalculateProbabilitiesForCodons(std::vector<double> mutation, std::vector<double> selection, double phi);
+
+	virtual void setLastIteration(unsigned iteration) { parameter->setLastIteration(iteration); }
+	virtual unsigned getLastIteration() { return parameter->getLastIteration(); }
 	virtual void updateTmp() {}
 	virtual void printHyperParameters();
     protected:

@@ -52,14 +52,25 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 	//std::cout << logLikelihood << " " << logLikelihood_proposed << std::endl;
 
 	double sPhi = parameter->getSphi(false);
-	double logPhiProbability = std::log(FONSEParameter::densityLogNorm(phiValue, (-(sPhi * sPhi) / 2), sPhi));
-	double logPhiProbability_proposed = std::log(Parameter::densityLogNorm(phiValue_proposed, (-(sPhi * sPhi) / 2), sPhi));
+	double logPhiProbability = Parameter::densityLogNorm(phiValue, (-(sPhi * sPhi) / 2), sPhi, true);
+	double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, (-(sPhi * sPhi) / 2), sPhi, true);
 	double currentLogLikelihood = (likelihood + logPhiProbability);
 	double proposedLogLikelihood = (likelihood_proposed + logPhiProbability_proposed);
-
+	if (phiValue == 0) {
+		std::cout << "phiValue is 0\n";
+	}
+	if (phiValue_proposed == 0) {
+		std::cout << "phiValue_prop is 0\n";
+	}
 	logProbabilityRatio[0] = (proposedLogLikelihood - currentLogLikelihood) - (std::log(phiValue) - std::log(phiValue_proposed));
 	logProbabilityRatio[1] = currentLogLikelihood - std::log(phiValue_proposed);
+	if (std::isinf(logProbabilityRatio[1])) {
+		std::cout << "logprob1 inf\n";
+	}
 	logProbabilityRatio[2] = proposedLogLikelihood - std::log(phiValue);
+	if (std::isinf(logProbabilityRatio[2])) {
+		std::cout << "logprob2 inf\n";
+	}
 }
 
 double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grouping, double *mutation, double *selection, double phiValue)
@@ -67,9 +78,8 @@ double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grou
 	int numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
 	double logLikelihood = 0.0;
 
-	std::vector <unsigned> positions;
+	std::vector <unsigned> *positions;
 	double codonProb[6];
-
 	std::array <unsigned, 2> codonRange = SequenceSummary::AAToCodonRange(grouping);
 
 	unsigned maxIndexVal = 0u;
@@ -83,14 +93,14 @@ double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grou
 
 	for (unsigned i = codonRange[0]; i < codonRange[1]; i++) {
 		positions = gene.geneData.getCodonPositions(i);
-		for (unsigned j = 0; j < positions.size(); j++) {
-			calculateCodonProbabilityVector(numCodons, positions[j], maxIndexVal, mutation, selection, phiValue, codonProb);
+		for (unsigned j = 0; j < positions->size(); j++) {
+			calculateCodonProbabilityVector(numCodons, positions->at(j), maxIndexVal, mutation, selection, phiValue, codonProb);
 			for (int k = 0; k < numCodons; k++) {
 				if (codonProb[k] == 0) continue;
 				logLikelihood += std::log(codonProb[k]);
 			}
 		} 
-		positions.clear();
+		//positions->clear();
 	}
 
 	return logLikelihood;
@@ -174,8 +184,8 @@ void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 		unsigned mixture = getMixtureAssignment(i);
 		mixture = getSynthesisRateCategory(mixture);
 		double phi = getSynthesisRate(i, mixture, false);
-		lpr += std::log(Parameter::densityLogNorm(phi, proposedMphi[mixture], proposedSphi[mixture]))
-				- std::log(Parameter::densityLogNorm(phi, currentMphi[mixture], currentSphi[mixture]));
+		lpr += Parameter::densityLogNorm(phi, proposedMphi[mixture], proposedSphi[mixture], true)
+				- Parameter::densityLogNorm(phi, currentMphi[mixture], currentSphi[mixture], true);
 	}
 	logProbabilityRatio[0] = lpr;
 }
@@ -212,6 +222,73 @@ void FONSEModel::printHyperParameters()
 		std::cout << "Sphi posterior estimate for selection category " << i << ": " << getSphi(i) << std::endl;
 	}
 	std::cout << "\t current Sphi proposal width: " << getCurrentSphiProposalWidth() << std::endl;
+}
+
+void FONSEModel::simulateGenome(Genome & genome)
+{
+	unsigned codonIndex;
+	std::string curAA;
+
+	std::string tmpDesc = "Simulated Gene";
+
+	for (unsigned geneIndex = 0; geneIndex < genome.getGenomeSize(); geneIndex++) //loop over all genes in the genome
+	{
+		Gene gene = genome.getGene(geneIndex);
+		SequenceSummary seqSum = gene.geneData;
+		std::string tmpSeq = "ATG"; //Always will have the start amino acid
+
+
+		unsigned mixtureElement = getMixtureAssignment(geneIndex);
+		unsigned mutationCategory = getMutationCategory(mixtureElement);
+		unsigned selectionCategory = getSelectionCategory(mixtureElement);
+		unsigned synthesisRateCategory = getSynthesisRateCategory(mixtureElement);
+		double phi = getSynthesisRate(geneIndex, synthesisRateCategory, false);
+
+		std::string geneSeq = gene.getSequence();
+		for (unsigned position = 1; position < (geneSeq.size() / 3); position++)
+		{
+			std::string codon = geneSeq.substr((position * 3), 3);
+			std::string aa = SequenceSummary::codonToAA(codon);
+
+			if (aa == "X") continue;
+
+			unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa);
+
+			double* codonProb = new double[numCodons](); //size the arrays to the proper size based on # of codons.
+			double* mutation = new double[numCodons - 1]();
+			double* selection = new double[numCodons - 1]();
+
+
+			if (aa == "M" || aa == "W")
+			{
+				codonProb[0] = 1;
+			}
+			else
+			{
+				unsigned maxIndexVal = 0u;
+				for (int i = 1; i < (numCodons - 1); i++)
+				{
+					if (selection[maxIndexVal] < selection[i])
+					{
+						maxIndexVal = i;
+					}
+				}
+				getParameterForCategory(mutationCategory, FONSEParameter::dM, curAA, false, mutation);
+				getParameterForCategory(selectionCategory, FONSEParameter::dOmega, curAA, false, selection);
+				calculateCodonProbabilityVector(numCodons, position, maxIndexVal, mutation, selection, phi, codonProb);
+			}
+
+
+			codonIndex = Parameter::randMultinom(codonProb, numCodons);
+			std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(curAA); //need the first spot in the array where the codons for curAA are
+			codon = seqSum.indexToCodon(aaRange[0] + codonIndex);//get the correct codon based off codonIndex
+			tmpSeq += codon;
+		}
+		std::string codon = seqSum.indexToCodon((unsigned)((rand() % 3) + 61)); //randomly choose a stop codon, from range 61-63
+		tmpSeq += codon;
+		Gene simulatedGene(tmpSeq, tmpDesc, gene.getId());
+		genome.addGene(simulatedGene, true);
+	}
 }
 
 void FONSEModel::setParameter(FONSEParameter &_parameter)

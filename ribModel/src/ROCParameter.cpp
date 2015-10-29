@@ -770,18 +770,18 @@ double ROCParameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned ge
 			geneIndex);
 	unsigned traceLength = (unsigned)synthesisRateTrace.size();
 
-	if (samples > traceLength)
+	if (samples > lastIteration)
 	{
 		std::cerr << "Warning in Parameter::getSynthesisRatePosteriorMean throws: Number of anticipated samples ("
-				<< samples << ") is greater than the length of the available trace (" << traceLength << ")."
+				<< samples << ") is greater than the length of the available trace (" << lastIteration << ")."
 				<< "Whole trace is used for posterior estimate! \n";
-		samples = traceLength;
+		samples = lastIteration;
 	}
-	unsigned start = traceLength - samples;
+	unsigned start = lastIteration - samples;
 	unsigned category;
 	unsigned usedSamples = 0u;
 	std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
-	for (unsigned i = start; i < traceLength; i++)
+	for (unsigned i = start; i < lastIteration; i++)
 	{
 		category = mixtureAssignmentTrace[i];
 		category = getSynthesisRateCategory(category);
@@ -821,7 +821,7 @@ double ROCParameter::getAphiPosteriorMean(unsigned index, unsigned samples)
 {
 	double posteriorMean = 0.0;
 	std::vector<double> aPhiTrace = traces.getAphiTrace(index);
-	unsigned traceLength = (unsigned)aPhiTrace.size();
+	unsigned traceLength = lastIteration;
 
 	if (samples > traceLength)
 	{
@@ -842,7 +842,7 @@ std::vector<double> ROCParameter::getEstimatedMixtureAssignmentProbabilities(uns
 {
 	std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
 	std::vector<double> probabilities(numMixtures, 0.0);
-	unsigned traceLength = (unsigned)mixtureAssignmentTrace.size();
+	unsigned traceLength = lastIteration;
 
 	if (samples > traceLength)
 	{
@@ -896,7 +896,7 @@ double ROCParameter::getSphiVariance(unsigned samples, unsigned mixture, bool un
 double ROCParameter::getAphiVariance(unsigned index, unsigned samples, bool unbiased)
 {
 	std::vector<double> aPhiTrace = traces.getAphiTrace(index);
-	unsigned traceLength = (unsigned)aPhiTrace.size();
+	unsigned traceLength = lastIteration;
 	if (samples > traceLength)
 	{
 		std::cerr << "Warning in Parameter::getSphiVariance throws: Number of anticipated samples (" << samples
@@ -923,7 +923,7 @@ double ROCParameter::getSynthesisRateVariance(unsigned samples, unsigned geneInd
 {
 	std::vector<double> synthesisRateTrace = traces.getSynthesisRateTraceByMixtureElementForGene(mixtureElement,
 			geneIndex);
-	unsigned traceLength = (unsigned)synthesisRateTrace.size();
+	unsigned traceLength = lastIteration;
 	if (samples > traceLength)
 	{
 		std::cerr << "Warning in Parameter::getSynthesisRateVariance throws: Number of anticipated samples (" << samples
@@ -954,7 +954,7 @@ double ROCParameter::getMutationPosteriorMean(unsigned mixtureElement, unsigned 
 	double posteriorMean = 0.0;
 	std::vector<double> mutationParameterTrace = traces.getMutationParameterTraceByMixtureElementForCodon(
 			mixtureElement, codon);
-	unsigned traceLength = (unsigned)mutationParameterTrace.size();
+	unsigned traceLength = lastIteration;
 
 	if (samples > traceLength)
 	{
@@ -976,7 +976,7 @@ double ROCParameter::getSelectionPosteriorMean(unsigned mixtureElement, unsigned
 	double posteriorMean = 0.0;
 	std::vector<double> selectionParameterTrace = traces.getSelectionParameterTraceByMixtureElementForCodon(
 			mixtureElement, codon);
-	unsigned traceLength = (unsigned)selectionParameterTrace.size();
+	unsigned traceLength = lastIteration;
 
 	if (samples > traceLength)
 	{
@@ -997,7 +997,7 @@ double ROCParameter::getSelectionVariance(unsigned mixtureElement, unsigned samp
 {
 	std::vector<double> selectionParameterTrace = traces.getSelectionParameterTraceByMixtureElementForCodon(
 			mixtureElement, codon);
-	unsigned traceLength = (unsigned)selectionParameterTrace.size();
+	unsigned traceLength = lastIteration;
 	if (samples > traceLength)
 	{
 		std::cerr << "Warning in ROCParameter::getSelectionVariance throws: Number of anticipated samples (" << samples
@@ -1025,7 +1025,7 @@ double ROCParameter::getMutationVariance(unsigned mixtureElement, unsigned sampl
 {
 	std::vector<double> mutationParameterTrace = traces.getMutationParameterTraceByMixtureElementForCodon(
 			mixtureElement, codon);
-	unsigned traceLength = (unsigned)mutationParameterTrace.size();
+	unsigned traceLength = lastIteration;
 	if (samples > traceLength)
 	{
 		std::cerr << "Warning in ROCParameter::getMutationVariance throws: Number of anticipated samples (" << samples

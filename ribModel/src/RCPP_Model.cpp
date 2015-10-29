@@ -32,6 +32,7 @@ RCPP_MODULE(Model_mod)
 		.derives<Model>("Model")
 		.constructor()
 		.method("setParameter", &FONSEModel::setParameter)
+		.method("simulateGenome", &FONSEModel::simulateGenome)
 		;
 }
 #endif

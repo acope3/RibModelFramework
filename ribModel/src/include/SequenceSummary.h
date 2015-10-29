@@ -48,8 +48,8 @@ class SequenceSummary
 		unsigned getRFPObserved(std::string codon);
 		unsigned getRFPObserved(unsigned codonIndex);
 		void setRFPObserved(unsigned codonIndex, unsigned value);
-		std::vector <unsigned> getCodonPositions(std::string codon);
-		std::vector <unsigned> getCodonPositions(unsigned index);
+		std::vector <unsigned> *getCodonPositions(std::string codon);
+		std::vector <unsigned> *getCodonPositions(unsigned index);
 
 
 
@@ -82,8 +82,8 @@ class SequenceSummary
 		unsigned getCodonCountForCodonIndexR(unsigned codonIndex); //TEST THAT ONLY!
 		unsigned getRFPObservedForCodonR(std::string codon);
 		unsigned getRFPObservedForCodonIndexR(unsigned codonIndex); //TEST THAT ONLY!
-		std::vector <unsigned> getCodonPositionsForCodonR(std::string codon);
-		std::vector <unsigned> getCodonPositionsForCodonIndexR(unsigned codonIndex); //TEST THAT ONLY!
+		std::vector <unsigned> *getCodonPositionsForCodonR(std::string codon);
+		std::vector <unsigned> *getCodonPositionsForCodonIndexR(unsigned codonIndex); //TEST THAT ONLY!
 
 
 	protected:
