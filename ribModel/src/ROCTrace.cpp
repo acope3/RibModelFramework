@@ -12,7 +12,7 @@ ROCTrace::ROCTrace() : Trace()
 void ROCTrace::initAllTraces(unsigned samples, unsigned num_genes, unsigned numMutationCategories, unsigned numSelectionCategories,
 		unsigned numParam, unsigned numMixtures, std::vector<mixtureDefinition> &_categories, unsigned maxGrouping, unsigned numPhiGroupings)
 {
-	initBaseTraces(samples, num_genes, numMutationCategories, numMixtures, _categories, maxGrouping);
+	initBaseTraces(samples, num_genes, numSelectionCategories, numMixtures, _categories, maxGrouping);
 	initROCTraces(samples, numMutationCategories, numSelectionCategories, numParam, numPhiGroupings);
 }
 

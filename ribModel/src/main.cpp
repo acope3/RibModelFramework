@@ -586,34 +586,26 @@ int main()
 
 				switch (user) {
 					case cedric:
-						files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/data/realGenomes/Skluyveri_mutation_ChrA.csv");
-						files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/data/realGenomes/Skluyveri_mutation_ChrCleft.csv");
+						//files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/data/realGenomes/Skluyveri_mutation_ChrA.csv");
+						//files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/data/realGenomes/Skluyveri_mutation_ChrCleft.csv");
 						//files[2] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/data/realGenomes/Skluyveri_mutation_ChrCleft.csv");
-						tmp.initMutationCategories(files, tmp.getNumMutationCategories());
 
-						files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/data/realGenomes/Skluyveri_selection_ChrA.csv");
-						files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/data/realGenomes/Skluyveri_selection_ChrCleft.csv");
-						//files[2] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/data/realGenomes/Skluyveri_selection_ChrCleft.csv");
-						tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
+						files[0] = std::string("C:/Users/Cedric/Documents/GitHub/RibModelFramework/data/realGenomes/Skluyveri_mutation_ChrA.csv");
+						files[1] = std::string("C:/Users/Cedric/Documents/GitHub/RibModelFramework/data/realGenomes/Skluyveri_mutation_ChrCleft.csv");
+						tmp.initMutationCategories(files, tmp.getNumMutationCategories());
 						break;
 
 					case gabe:
 						files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_mutation0.csv");
 						files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_mutation1.csv");
-					//	tmp.initMutationCategories(files, tmp.getNumMutationCategories());
+						//	tmp.initMutationCategories(files, tmp.getNumMutationCategories());
 
-					files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_selection0.csv");
-					files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_selection1.csv");
-					//	tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
 					break;
 				case jeremy:
 					files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/twoMixtures/simulated_mutation0.csv");
 					files[1] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/twoMixtures/simulated_mutation1.csv");
 					//	tmp.initMutationCategories(files, tmp.getNumMutationCategories());
 
-					files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/twoMixtures/simulated_selection0.csv");
-					files[1] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/twoMixtures/simulated_selection1.csv");
-					//	tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
 					break;
 				}
 				tmp.InitializeSynthesisRate(genome, sphi_init[0]);
