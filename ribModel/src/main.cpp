@@ -486,8 +486,8 @@ int main()
 			case cedric:
 				if (modelToRun == ROC)
 				{
-					genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/data/realGenomes/Skluyveri.fasta");
-					//genome.readFasta("C:/Users/Cedric/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta");
+					//genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/data/realGenomes/Skluyveri.fasta");
+					genome.readFasta("C:/Users/Cedric/Documents/GitHub/RibModelFramework/data/realGenomes/Skluyveri.fasta");
 				}
 				else if (modelToRun == RFP)
 				{
@@ -525,20 +525,6 @@ int main()
 				}
 			else {}
 			break;
-		case jeremy:
-			if (modelToRun == ROC || modelToRun == FONSE)
-			{
-				genome.readFasta("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/data/twoMixtures/simulatedAllUniqueR.fasta");
-				if (withPhi) {
-					genome.readObservedPhiValues("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/data/twoMixtures/simulatedAllUniqueR_phi.csv", false);
-				}
-			}
-			else if (modelToRun == RFP)
-			{
-				genome.readRFPFile("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
-			}
-			else {}
-			break;
 		}
 		std::cout << "done initializing Genome object" << std::endl;
 		std::cout << "Initializing shared parameter variables\n";
@@ -565,7 +551,7 @@ int main()
 		{
 			geneAssignment[i] = 0u;
 		}*/
-		unsigned numMixtures = 1;
+		unsigned numMixtures = 2;
 		std::vector<double> sphi_init(numMixtures, 1);
 		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 		std::cout << "Done initializing shared parameter variables\n";
