@@ -1063,7 +1063,7 @@ void ROCParameter::proposeCodonSpecificParameter()
 		std::string aa = getGrouping(k);
 		std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(aa, true);
 		unsigned numCodons = aaRange[1] - aaRange[0];
-		for (unsigned i = 0u; i < numCodons * (numMutationCategories + numSelectionCategories); i++)
+		for (unsigned i = 0u; i < (numCodons * (numMutationCategories + numSelectionCategories)); i++)
 		{
 			iidProposed.push_back(randNorm(0.0, 1.0));
 		}

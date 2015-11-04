@@ -429,10 +429,10 @@ int main()
 	enum User { cedric, gabe, jeremy };
 	enum ModelToRun { ROC, RFP, FONSE };
 	/* Test variables */
-	User user = gabe;
+	User user = cedric;
 	ModelToRun modelToRun = ROC;
 	bool read = false;
-	bool testing = true;
+	bool testing = false;
 	bool withPhi = false;
 	if (testing)
 	{
@@ -476,7 +476,7 @@ int main()
 			case cedric:
 				if (modelToRun == ROC)
 				{
-					genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/twoMixtures/simulatedAllUniqueR.fasta");
+					genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/data/realGenomes/Skluyveri.fasta");
 					//genome.readFasta("C:/Users/Cedric/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta");
 				}
 				else if (modelToRun == RFP)
@@ -520,13 +520,19 @@ int main()
 
 		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 
+		for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+		{
+			if (i < 961) geneAssignment[i] = 0u;
+			else if (i < 1418) geneAssignment[i] = 1u;
+			else geneAssignment[i] = 0u;
+		}
 
 		/* For 2 mixtures */
-		for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+		/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
 			if (i < 500) geneAssignment[i] = 0u;
 			else geneAssignment[i] = 1u;
-		}
+		}*/
 
 		/* For 1 mixture */
 		/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
@@ -553,7 +559,7 @@ int main()
 			else
 			{
 				std::cout << "initialize ROCParameter object" << std::endl;
-				std::string mixDef = ROCParameter::allUnique;
+				std::string mixDef = ROCParameter::selectionShared;
 				ROCParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 
 				for(unsigned i = 0u; i < numMixtures; i++)
@@ -568,12 +574,14 @@ int main()
 
 				switch (user) {
 					case cedric:
-						files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/twoMixtures/simulated_mutation0.csv");
-						files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/twoMixtures/simulated_mutation1.csv");
+						files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/data/realGenomes/Skluyveri_mutation_ChrA.csv");
+						files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/data/realGenomes/Skluyveri_mutation_ChrCleft.csv");
+						//files[2] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/data/realGenomes/Skluyveri_mutation_ChrCleft.csv");
 						tmp.initMutationCategories(files, tmp.getNumMutationCategories());
 
-						files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/twoMixtures/simulated_selection0.csv");
-						files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/twoMixtures/simulated_selection1.csv");
+						files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/data/realGenomes/Skluyveri_selection_ChrA.csv");
+						files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/data/realGenomes/Skluyveri_selection_ChrCleft.csv");
+						//files[2] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/data/realGenomes/Skluyveri_selection_ChrCleft.csv");
 						tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
 						break;
 
@@ -616,7 +624,7 @@ int main()
 			
 
 			std::cout << "starting MCMC for ROC" << std::endl;
-			mcmc.run(genome, model, 1, 20);
+			mcmc.run(genome, model, 1, 0);
 			std::cout << std::endl << "Finished MCMC for ROC" << std::endl;
 			
 

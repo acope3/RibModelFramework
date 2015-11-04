@@ -113,7 +113,7 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
       compl.covMat[matrix.positions == matrix.positions[ofdiag.seq[i], mut.seq[i]]] <- unlist(covmat[[i]][3])
     }
     #for testing
-    compl.covMat <- diag((numMutationCategory + numSelectionCategory) * numCodons) *0.05
+    compl.covMat <- diag((numMutationCategory + numSelectionCategory) * numCodons) * 0.05
     #compl.covMat / max(compl.covMat)
     parameter$initCovarianceMatrix(compl.covMat, aa)
     
