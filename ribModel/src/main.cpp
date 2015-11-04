@@ -186,7 +186,7 @@ void testWriteRestartFile()
 void testInitFromRestartFile()
 {
 	std::cout << "------------------ TEST INITFROMRESTARTFILE ------------------" << std::endl;
-	ROCParameter parameter("RestartFile1.txt");
+	ROCParameter parameter("20RestartFile.txt");
 	ROCModel model;
 
 	model.setParameter(parameter);
@@ -438,8 +438,8 @@ int main()
 	enum User { cedric, gabe, jeremy };
 	enum ModelToRun { ROC, RFP, FONSE };
 	/* Test variables */
-	User user = cedric;
-	ModelToRun modelToRun = ROC;
+	User user = gabe;
+	ModelToRun modelToRun = RFP;
 	bool read = false;
 	bool testing = false;
 	bool withPhi = false;
@@ -452,10 +452,10 @@ int main()
 		//testThetaKMatrix();
 		//testCovMatrixOverloading();
 		//testWriteRestartFile();
-		//testInitFromRestartFile();
+		testInitFromRestartFile();
 		//testReadRFPFile();
 		//testReadObservedPhis();
-		simulateRFPData();
+		//simulateRFPData();
 	//	simulateROCData();
 		//testInitMutationSelection();
 		//testRFPVarianceAndMean();
@@ -463,21 +463,21 @@ int main()
 		//testGeneSequenceSummary();
 		//testReadMutationValues();
 		//testMultiplePhi();
-		testDensityLogNorm();
+		//testDensityLogNorm();
 	}
 	else //not doing unit testing, running a model
 	{
 		unsigned index;
-		std::cout << "initialize MCMCAlgorithm object" << std::endl;
+		std::cout << "Initializing MCMCAlgorithm object---------------" << std::endl;
 		int samples = 100;
 		int thining = 10;
 		int useSamples = 100;
-		std::cout << "\t# samples: " << samples << "\n";
-		std::cout << "\t thining: " << thining << "\n";
-		std::cout << "\t # samples used: " << useSamples << "\n";
+		std::cout << "\t# Samples: " << samples << "\n";
+		std::cout << "\tThining: " << thining << "\n";
+		std::cout << "\t # Samples used: " << useSamples << "\n";
 		MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, 10, true, true, true);
 		mcmc.setRestartFileSettings("RestartFile.txt", 20, true);
-		std::cout << "done initialize MCMCAlgorithm object" << std::endl;
+		std::cout << "Done!-------------------------------\n\n\n";
 
 
 		std::cout << "initialize Genome object" << std::endl;
@@ -498,7 +498,8 @@ int main()
 			case gabe:
 				if (modelToRun == ROC)
 				{
-					genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
+					//genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
+					genome.readFasta("/export/home/ghanas/Downloads/RibModelFramework-master/data/realGenomes/Skluyveri.fasta");
 					if (withPhi) {
 						genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv", false);
 					}
@@ -506,7 +507,8 @@ int main()
 				else if (modelToRun == RFP)
 				{
 					//genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
-					genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/testRFPFile.csv");
+					//genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/testRFPFile.csv");
+					genome.readRFPFile("/export/home/ghanas/Downloads/RibModelFramework-master/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 				}
 				else {}
 				break;
@@ -538,6 +540,7 @@ int main()
 			else geneAssignment[i] = 0u;
 		}
 
+
 		/* For 2 mixtures */
 		/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
@@ -564,7 +567,7 @@ int main()
 			if (read)
 			{
 				std::cout << "Initializing ROCParameter object from Restart File\n";
-				ROCParameter tmp("RestartFile.txt");
+				ROCParameter tmp("20RestartFile.txt");
 				parameter = tmp;
 				std::cout << "Done initializing ROCParameter object from Restart File\n";
 			}
@@ -582,7 +585,7 @@ int main()
 				std::cout << "\t# mixtures: " << numMixtures << "\n";
 				std::cout << "\tmixture definition: " << mixDef << "\n";
 
-				std::vector<std::string> files(2);
+				std::vector<std::string> files(3);
 
 				switch (user) {
 					case cedric:
@@ -596,9 +599,13 @@ int main()
 						break;
 
 					case gabe:
-						files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_mutation0.csv");
-						files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_mutation1.csv");
-						//	tmp.initMutationCategories(files, tmp.getNumMutationCategories());
+//						files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_mutation0.csv");
+//						files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_mutation1.csv");
+						files[0] = std::string("/export/home/ghanas/Downloads/RibModelFramework-master/data/realGenomes/Skluyveri_mutation_ChrA.csv");
+						files[1] = std::string("/export/home/ghanas/Downloads/RibModelFramework-master/data/realGenomes/Skluyveri_mutation_ChrCleft.csv");
+//						files[2] = std::string("/export/home/ghanas/Downloads/RibModelFramework-master/data/realGenomes/Skluyveri_mutation_ChrCleft.csv");
+						tmp.initMutationCategories(files, tmp.getNumMutationCategories());
+
 
 					break;
 				case jeremy:

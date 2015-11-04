@@ -332,7 +332,6 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 				getline(input,tmp);
 				//char aa = tmp[0];
 				cat = SequenceSummary::AAToAAIndex(tmp); // ????
-				std::cout << cat <<"\n";
 			}
 		}
 		else if (flag == 2)

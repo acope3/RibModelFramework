@@ -19,7 +19,7 @@ parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssig
 phivals <- parameter$readPhiValues( "../data/realGenomes/Skluyveri_phi.csv")
 parameter$initializeSynthesisRateByList(phivals)
 parameter$initMutationCategories(c("../data/realGenomes/Skluyveri_mutation_ChrA.csv", "../data/realGenomes/Skluyveri_mutation_ChrCleft.csv") , 2)
-parameter$initSelectionCategories(c("../data/realGenomes/Skluyveri_selection_ChrA.csv", "../data/realGenomes/Skluyveri_selection_ChrCleft.csv") , 1)
+parameter$initSelectionCategories(c("../data/realGenomes/Skluyveri_selection_ChrA.csv", "../data/realGenomes/Skluyveri_selection_ChrCleft.csv") , 2)
 
 
 samples <- 100

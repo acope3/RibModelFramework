@@ -178,10 +178,6 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 
 		// get current mutation and selection parameter
 		//double* mutation = new double[numCodons - 1]();
-		if(mutationCategory > 1)
-		{
-			std::cout << "Gene " << i << " mutCat " << mutationCategory << "\n";
-		}
 		parameter->getParameterForCategory(mutationCategory, ROCParameter::dM, grouping, false, mutation);
 		//double* selection = new double[numCodons - 1]();
 		parameter->getParameterForCategory(selectionCategory, ROCParameter::dEta, grouping, false, selection);

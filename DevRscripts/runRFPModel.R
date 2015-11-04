@@ -1,9 +1,9 @@
-library(ribModel, lib.loc="~/R")
+library(ribModel)
 rm(list=ls())
 
 
 #read genome
-genome <- initializeGenomeObject(file = "../ribModel/data/RFPDataSets/GSM1406453_untreated_1.percodon.csv", FALSE)
+genome <- initializeGenomeObject(file = "../data/rfp/GSM1406453_untreated_1.percodon.csv", FALSE)
 
 
 #initialize parameter object
