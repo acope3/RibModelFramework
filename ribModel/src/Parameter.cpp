@@ -369,7 +369,6 @@ void Parameter::writeBasicRestartFile(std::string filename)
 	output += oss.str();
 	out << output;
 	out.close();
-
 }
 
 
@@ -957,8 +956,8 @@ double Parameter::randGamma(double shape, double rate)
 	return rv;
 }
 
-
-void Parameter::randDirichlet(double* input, unsigned numElements, double* output)
+// TODO: CHANGE THIS BACK TO DOUBLE*
+void Parameter::randDirichlet(double *input, unsigned numElements, double *output)
 {
 	// draw y_i from Gamma(a_i, 1)
 	// normalize y_i such that x_i = y_i / sum(y_i)
@@ -1045,18 +1044,19 @@ double Parameter::densityNorm(double x, double mean, double sd, bool log)
 	const double log_sqrt_2pi = 0.9189385332046727;
 	double a = (x - mean) / sd;
 
-	return log ? -log_sqrt_2pi - std::log(sd) - (0.5 * a * a) : (inv_sqrt_2pi / sd) * std::exp(-0.5 * a * a);
+	return log ? (-log_sqrt_2pi - std::log(sd) - (0.5 * a * a)) : ((inv_sqrt_2pi / sd) * std::exp(-0.5 * a * a));
 }
 
-double Parameter::densityLogNorm(double x, double mean, double sd)
+double Parameter::densityLogNorm(double x, double mean, double sd, bool log)
 {
 	double returnValue = 0.0;
 	// logN is only defined for x > 0 => all values less or equal to zero have probability 0
 	if(x > 0.0)
 	{
 		const double inv_sqrt_2pi = 0.3989422804014327;
+		const double log_sqrt_2pi = 0.9189385332046727;
 		double a = (std::log(x) - mean) / sd;
-		returnValue = (inv_sqrt_2pi / (x * sd)) * std::exp(-0.5 * a * a);
+		returnValue = log ? (-std::log(x * sd) - log_sqrt_2pi - (0.5 * a * a)) : ((inv_sqrt_2pi / (x * sd)) * std::exp(-0.5 * a * a));
 	}
 	return returnValue;
 }

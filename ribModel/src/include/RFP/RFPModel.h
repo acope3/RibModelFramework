@@ -175,6 +175,9 @@ class RFPModel: public Model {
 		std::vector<double> CalculateProbabilitiesForCodons(std::vector<double> mutation, std::vector<double> selection,
 				double phi);
 
+		virtual void setLastIteration(unsigned iteration) { parameter->setLastIteration(iteration); }
+		virtual unsigned getLastIteration() { return parameter->getLastIteration(); }
+
 		virtual void printHyperParameters();
 	protected:
 };

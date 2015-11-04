@@ -59,8 +59,8 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 	mixture = getSynthesisRateCategory(mixture);
 	double sPhi = parameter->getSphi(mixture, false);
 	double mPhi = (-(sPhi * sPhi) / 2);
-	double logPhiProbability = std::log(ROCParameter::densityLogNorm(phiValue, mPhi, sPhi));
-	double logPhiProbability_proposed = std::log(Parameter::densityLogNorm(phiValue_proposed, mPhi, sPhi));
+	double logPhiProbability = Parameter::densityLogNorm(phiValue, mPhi, sPhi, true);
+	double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, mPhi, sPhi, true);
 	double currentLogLikelihood = (logLikelihood + logPhiProbability);
 	double proposedLogLikelihood = (logLikelihood_proposed + logPhiProbability_proposed);
 
@@ -68,8 +68,8 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 	if (withPhi) {
 		for (unsigned i = 0; i < parameter->getNumPhiGroupings(); i++) {
 			if (gene.observedPhiValues.at(i) != -1) {
-				logPhiProbability += std::log(Parameter::densityLogNorm(gene.observedPhiValues.at(i) + getAphi(i), std::log(phiValue), getSepsilon(i)));
-				logPhiProbability_proposed += std::log(Parameter::densityLogNorm(gene.observedPhiValues.at(i) + getAphi(i), std::log(phiValue_proposed), getSepsilon(i)));
+				logPhiProbability += Parameter::densityLogNorm(gene.observedPhiValues.at(i) + getAphi(i), std::log(phiValue), getSepsilon(i), true);
+				logPhiProbability_proposed += Parameter::densityLogNorm(gene.observedPhiValues.at(i) + getAphi(i), std::log(phiValue_proposed), getSepsilon(i), true);
 			}
 		}
 	}
@@ -129,7 +129,7 @@ double ROCModel::calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codo
 {
 	double logLikelihood = 0.0;
 	// calculate codon probabilities
-	double* codonProbabilities = new double[numCodons]();
+	double codonProbabilities[6];
 	calculateCodonProbabilityVector(numCodons, mutation, selection, phiValue, codonProbabilities);
 
 	// calculate likelihood for current AA for this combination of selection and mutation category
@@ -139,7 +139,7 @@ double ROCModel::calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codo
 		logLikelihood += std::log(codonProbabilities[i]) * codonCount[i];
 	}
 	//std::cout <<"deleting codonProbabilities\n";
-	delete [] codonProbabilities;
+	//delete [] codonProbabilities;
 	//std::cout <<"DONEdeleting codonProbabilities\n";
 	return logLikelihood;
 }
@@ -289,11 +289,10 @@ void ROCModel::printHyperParameters()
 
 void ROCModel::simulateGenome(Genome &genome)
 {
-     unsigned codonIndex;
-     std::string curAA;
+	unsigned codonIndex;
+    std::string curAA;
 
 	std::string tmpDesc = "Simulated Gene";
-
 
 	for (unsigned geneIndex = 0; geneIndex < genome.getGenomeSize(); geneIndex++) //loop over all genes in the genome
 	{
@@ -383,8 +382,8 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 		unsigned mixture = getMixtureAssignment(i);
 		mixture = getSynthesisRateCategory(mixture);
 		double phi = getSynthesisRate(i, mixture, false);
-		lpr += std::log(Parameter::densityLogNorm(phi, proposedMphi[mixture], proposedSphi[mixture]))
-				- std::log(Parameter::densityLogNorm(phi, currentMphi[mixture], currentSphi[mixture]));
+		lpr += Parameter::densityLogNorm(phi, proposedMphi[mixture], proposedSphi[mixture], true)
+				- Parameter::densityLogNorm(phi, currentMphi[mixture], currentSphi[mixture], true);
 	}
 
 	// TODO: USE CONSTANTS INSTEAD OF 0
@@ -461,7 +460,6 @@ void ROCModel::updateAllHyperParameter()
 	updateSphi();
 	for (unsigned i = 0; i < parameter->getNumPhiGroupings(); i++) {
 		updateAphi(i);
-		break;
 	}
 }
 

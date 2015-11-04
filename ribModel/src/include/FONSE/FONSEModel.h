@@ -19,7 +19,7 @@ public:
 	//FONSEModel(const FONSEModel& other);
 
 
-	virtual void simulateGenome(Genome &genome) {} //TODO: needs implimentation
+	virtual void simulateGenome(Genome &genome); //TODO: needs implimentation
 	void setParameter(FONSEParameter &_parameter);
 	void calculateCodonProbabilityVector(unsigned numCodons, unsigned position, unsigned maxIndexValue, double* mutation, double* selection, double phi, double codonProb[]);
 	// Likelihood ratio functions
@@ -74,6 +74,9 @@ public:
 	virtual std::string getGrouping(unsigned index) { return parameter->getGrouping(index); }
 	// R wrapper
 	//std::vector<double> CalculateProbabilitiesForCodons(std::vector<double> mutation, std::vector<double> selection, double phi);
+
+	virtual void setLastIteration(unsigned iteration) { parameter->setLastIteration(iteration); }
+	virtual unsigned getLastIteration() { return parameter->getLastIteration(); }
 	virtual void updateTmp() {}
 	virtual void printHyperParameters();
 

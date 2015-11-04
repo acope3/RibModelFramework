@@ -71,8 +71,8 @@ void RFPModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 	}
 
 	double sPhi = parameter->getSphi(false);
-	double logPhiProbability = std::log(Parameter::densityLogNorm(phiValue, (-(sPhi * sPhi) / 2), sPhi));
-	double logPhiProbability_proposed = std::log(Parameter::densityLogNorm(phiValue_proposed, (-(sPhi * sPhi) / 2), sPhi));
+	double logPhiProbability = Parameter::densityLogNorm(phiValue, (-(sPhi * sPhi) / 2), sPhi, true);
+	double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, (-(sPhi * sPhi) / 2), sPhi, true);
 	double currentLogLikelihood = (logLikelihood + logPhiProbability);
 	double proposedLogLikelihood = (logLikelihood_proposed + logPhiProbability_proposed);
 
@@ -139,7 +139,7 @@ void RFPModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 		unsigned mixture = getMixtureAssignment(i);
 		mixture = getSynthesisRateCategory(mixture);
 		double phi = getSynthesisRate(i, mixture, false);
-		lpr += std::log(Parameter::densityLogNorm(phi, proposedMPhi, proposedSphi)) - std::log(Parameter::densityLogNorm(phi, currentMPhi, currentSphi));
+		lpr += Parameter::densityLogNorm(phi, proposedMPhi, proposedSphi, true) - Parameter::densityLogNorm(phi, currentMPhi, currentSphi, true);
 	}
 
 	lpr -= (std::log(currentSphi) - std::log(proposedSphi));
@@ -162,18 +162,18 @@ void RFPModel::simulateGenome(Genome &genome)
 			unsigned lambdaPrimeCat = parameter -> getSelectionCategory(mixtureElement);
 
 			double alpha = getParameterForCategory(alphaCat, RFPParameter::alp, codon, false);
-			double lambdaPrime = getParameterForCategory(lambdaPrimeCat, RFPParameter::lmPri, codon, false) * 100;
+			double lambdaPrime = getParameterForCategory(lambdaPrimeCat, RFPParameter::lmPri, codon, false);
 
 			double alphaPrime = alpha * gene.geneData.getCodonCountForCodon(codon);
 
 			#ifndef STANDALONE
 				RNGScope scope;
 				NumericVector xx(1);
-				xx = rgamma(1, alphaPrime, lambdaPrime);
+				xx = rgamma(1, alphaPrime, 1.0/lambdaPrime);
 				xx = rpois(1, xx[0] * phi);
 				tmpGene.geneData.setRFPObserved(codonIndex, xx[0]);
 			#else
-				std::gamma_distribution<double> GDistribution(alphaPrime, lambdaPrime);
+				std::gamma_distribution<double> GDistribution(alphaPrime,1.0/lambdaPrime);
 				double tmp = GDistribution(Parameter::generator);
 				std::poisson_distribution<unsigned> PDistribution(phi * tmp);
 				unsigned simulatedValue = PDistribution(Parameter::generator);

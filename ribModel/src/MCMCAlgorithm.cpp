@@ -56,6 +56,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	unsigned numSynthesisRateCategories = model.getNumSynthesisRateCategories();
 	unsigned numMixtures = model.getNumMixtureElements();
 	double* dirichletParameters = new double[numMixtures]();
+
 	
 	for (unsigned i = 0u; i < numMixtures; i++) {
 		dirichletParameters[i] = 0.0;
@@ -110,6 +111,12 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				double logProbabilityRatio[3];
 				model.calculateLogLikelihoodRatioPerGene(gene, i, mixtureElement, logProbabilityRatio);
 
+				if (std::isinf(logProbabilityRatio[1])) {
+					std::cout << "logprob1 inf\n";
+				}
+				if (std::isinf(logProbabilityRatio[2])) {
+					std::cout << "logprob2 inf\n";
+				}
 				unscaledLogProb_curr[k] += logProbabilityRatio[1];
 				unscaledLogProb_prop[k] += logProbabilityRatio[2];
 
@@ -135,6 +142,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				//#pragma omp critical
 				if(std::isinf(std::log(model.getCategoryProbability(k)) + propLogLike))
 				{
+					std::cout << "proposed\n";
 					std::cout <<"\t P: " << model.getCategoryProbability(k) << "\n";
 					std::cout <<"\t L: " << propLogLike << "\n";
 				}
@@ -145,6 +153,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				//#pragma omp critical
 				if(std::isinf(std::log(model.getCategoryProbability(k)) + currLogLike))
 				{
+					std::cout << "current\n";
 					std::cout <<"\t P: " << model.getCategoryProbability(k) << "\n";
 					std::cout <<"\t L: " << currLogLike << "\n";
 				}
@@ -153,7 +162,10 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			}
 		}
 
-		if (std::isinf(logLikelihood)) std::cout <<"\tInfinity reached (Gene: " << i << ")\n";
+		if (std::isinf(logLikelihood))
+		{
+			std::cout << "\tInfinity reached (Gene: " << i << ")\n";
+		}
 		// adjust the the unscaled probabilities by the constant c
 		// ln(f') = ln(c) + ln(f)
 		// calculate ln(P) = ln( Sum(p_i*f'(...)) ) and obtain normalizing constant for new p_i
@@ -187,7 +199,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		delete [] unscaledLogProb_prop;
 		delete [] unscaledLogProb_curr;
 	}
-	double* newMixtureProbabilities = new double[numMixtures]();
+	double *newMixtureProbabilities = new double[numMixtures]();
 	Parameter::randDirichlet(dirichletParameters, numMixtures, newMixtureProbabilities);
 	for(unsigned k = 0u; k < numMixtures; k++)
 	{
@@ -197,8 +209,8 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	{
 		model.updateMixtureProbabilitiesTrace(iteration/thining);
 	}
-	delete [] dirichletParameters;
-	delete [] newMixtureProbabilities;
+	//delete [] dirichletParameters;
+//	delete [] newMixtureProbabilities;
 	return logLikelihood;
 }
 
@@ -302,8 +314,8 @@ void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned
 				double mPhi = (-(sPhi * sPhi) / 2);
 
 				// accept/ reject based on prior ratio
-				double logPhiProbability = std::log(ROCParameter::densityLogNorm(phiValue, mPhi, sPhi));
-				double logPhiProbability_proposed = std::log(Parameter::densityLogNorm(phiValue_proposed, mPhi, sPhi));
+				double logPhiProbability = Parameter::densityLogNorm(phiValue, mPhi, sPhi, true);
+				double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, mPhi, sPhi, true);
 				if( -Parameter::randExp(1) < (logPhiProbability_proposed - logPhiProbability) )
 				{
 					model.updateSynthesisRate(i, k);
@@ -338,7 +350,8 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	std::cout << "\tEstimate Hyper Parameters? " << (estimateHyperParameter ? "TRUE" : "FALSE") << std::endl;
 	std::cout << "\tEstimate SynthesisRate Parameters? " << (estimateSynthesisRate ? "TRUE" : "FALSE") << std::endl;
 
-
+	// set the last iteration to the max iterations, this way if the MCMC doesn't exit based on Geweke score, it will use the max iteration for posterior means
+	model.setLastIteration(samples);
 	std::cout << "\tStarting MCMC with " << maximumIterations << " iterations\n";
 	for(unsigned iteration = 1u; iteration <= maximumIterations; iteration++)
 	{
@@ -417,7 +430,8 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 			{
 				std::cout << "Stopping run based on convergence after " << iteration << " iterations\n" << std::endl;
 				// Comment out this break to keep the run from stopping on convergence
-				// break;
+				model.setLastIteration(iteration/thining);
+				//break;
 			}
 		}
 	} // end MCMC loop

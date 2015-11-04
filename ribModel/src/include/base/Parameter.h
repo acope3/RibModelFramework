@@ -194,7 +194,6 @@ class Parameter {
 		virtual double getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement,
 				bool unbiased = true) = 0;
 
-
 		// static functions
 		static double calculateSCUO(Gene& gene, unsigned maxAA);
 
@@ -205,12 +204,12 @@ class Parameter {
 		static double randLogNorm(double m, double s);
 		static double randExp(double r);
 		static double randGamma(double shape, double rate);
-		static void randDirichlet(double* input, unsigned numElements, double* output);
+		static void randDirichlet(double *input, unsigned numElements, double *output);
 		static double randUnif(double minVal, double maxVal);
 		static unsigned randMultinom(double* probabilities, unsigned mixtureElements);
 
 		static double densityNorm(double x, double mean, double sd, bool log = false);
-		static double densityLogNorm(double x, double mean, double sd);
+		static double densityLogNorm(double x, double mean, double sd, bool log = false);
 
 		//double getMixtureAssignmentPosteriorMean(unsigned samples, unsigned geneIndex); // TODO: implement variance function, fix Mean function (won't work with 3 groups)
 
@@ -258,6 +257,9 @@ class Parameter {
 		std::string getGrouping(unsigned index);
 		unsigned getGroupListSize();
 
+		void setLastIteration(unsigned iteration) { lastIteration = iteration; }
+		unsigned getLastIteration() { return lastIteration; }
+
 	protected:
 		std::vector<double> Sphi;
 		std::vector<double> Sphi_proposed;
@@ -265,6 +267,8 @@ class Parameter {
 		unsigned phiGroupings;
 		unsigned numMixtures;
 		unsigned int numParam;
+
+		unsigned lastIteration;
 
 		unsigned numMutationCategories; //TODO Probably needs to be renamed
 		unsigned numSelectionCategories; //TODO Probably needs to be renamed
