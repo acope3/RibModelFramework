@@ -159,7 +159,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 	Gene *gene;
 	SequenceSummary *seqsum;
 #ifndef __APPLE__
-#pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed, codonCount, gene, seqsum) reduction(+:likelihood,likelihood_proposed)
+//#pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed, codonCount, gene, seqsum) reduction(+:likelihood,likelihood_proposed)
 #endif
 	for(int i = 0; i < numGenes; i++)
 	{
@@ -178,6 +178,10 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 
 		// get current mutation and selection parameter
 		//double* mutation = new double[numCodons - 1]();
+		if(mutationCategory > 1)
+		{
+		//	std::cout << "Gene " << i << " mutCat " << mutationCategory << "\n";
+		}
 		parameter->getParameterForCategory(mutationCategory, ROCParameter::dM, grouping, false, mutation);
 		//double* selection = new double[numCodons - 1]();
 		parameter->getParameterForCategory(selectionCategory, ROCParameter::dEta, grouping, false, selection);
@@ -356,7 +360,11 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 		currentMphi[i] = -((currentSphi[i] * currentSphi[i]) / 2);
 		proposedSphi[i] = getSphi(i, true);
 		proposedMphi[i] = -((proposedSphi[i] * proposedSphi[i]) / 2);
+		// take the jacobian into account for the non-linear transformation from logN to N distribution
 		lpr -= (std::log(currentSphi[i]) - std::log(proposedSphi[i]));
+		// take prior into account
+		//TODO(Cedric): make sure you can control that prior from R
+		lpr -= Parameter::densityNorm(currentSphi[i], 1.0, 0.1, true) - Parameter::densityNorm(proposedSphi[i], 1.0, 0.1, true);
 	}
 
 	if (withPhi) {
@@ -367,7 +375,7 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 		logProbabilityRatio.resize(1);
 	}
 #ifndef __APPLE__
-#pragma omp parallel for reduction(+:lpr)
+//#pragma omp parallel for reduction(+:lpr)
 #endif
 	for (int i = 0; i < genome.getGenomeSize(); i++)
 	{
@@ -389,7 +397,7 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 			//double AphiPropWidth = getCurrentAphiProposalWidth(i);
 			double Sepsilon = getSepsilon(i);
 #ifndef __APPLE__
-#pragma omp parallel for reduction(+:lpr)
+//#pragma omp parallel for reduction(+:lpr)
 #endif
 			for (int j = 0; j < genome.getGenomeSize(); j++) {
 				unsigned mixtureAssignment = getMixtureAssignment(j);

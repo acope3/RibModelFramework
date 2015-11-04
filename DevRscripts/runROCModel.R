@@ -2,26 +2,29 @@ library(ribModel)
 rm(list=ls())
 #read genome
 
-with.phi <- TRUE
+with.phi <- FALSE
 
 if (with.phi) {
-  genome <- initializeGenomeObject(file = "../ribModel/data/simulatedAllUniqueR.fasta", expression.file = "../ribModel/data/simulatedAllUniqueR_phi.csv")
+  genome <- initializeGenomeObject(file = "../data/twoMixtures/simulatedAllUniqueR.fasta", expression.file = "../data/twoMixtures/simulatedAllUniqueR_phi.csv")
 } else {
-  genome <- initializeGenomeObject(file = "../ribModel/data/simulatedAllUniqueR.fasta")
+  genome <- initializeGenomeObject(file = "../data/realGenomes/Skluyveri.fasta")
 }
 
 #initialize parameter object
-sphi_init <- 2
-numMixtures <- 2
+sphi_init <- (c(1,1,1))
+numMixtures <- 3
 mixDef <- "allUnique"
-#geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457), rep(1, 3903))
+geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457), rep(1, 3403), rep(3, 500))
 #geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
 #geneAssignment <- c(rep(1,448), rep(2,457))
-geneAssignment <- c(rep(1,500), rep(2,500))
+#geneAssignment <- c(rep(1,500), rep(2,500))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
+#parameter <- initializeParameterObject(restart.file = "../ribModel/src/20RestartFile.txt")
+
+
 
 # initialize MCMC object
-samples <- 300
+samples <- 10
 thining <- 10
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples=samples, thining=thining, adaptive.width=adaptiveWidth, 

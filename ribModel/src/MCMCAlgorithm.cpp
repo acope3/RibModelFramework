@@ -363,7 +363,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 				if (multipleFiles)
 				{
 					std::ostringstream oss;
-					oss << (iteration + 1) / thining << file;
+					oss << (iteration) / thining << file;
 					std::string tmp = oss.str();
 					model.writeRestartFile(tmp);
 				}
@@ -375,7 +375,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 		}
 		if( (iteration) % 100u == 0u)
 		{
-			std::cout << "Status at iteration " << (iteration+1) << std::endl;
+			std::cout << "Status at iteration " << (iteration) << std::endl;
 			std::cout << "\t current logLikelihood: " << likelihoodTrace[(iteration/thining) - 1] << std::endl;
 			model.printHyperParameters();
 			for(unsigned i = 0u; i < model.getNumMixtureElements(); i++)

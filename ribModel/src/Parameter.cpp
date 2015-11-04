@@ -418,7 +418,8 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 			} 
 			else if (variableName == "Sphi")
 			{
-				unsigned val;
+				Sphi.resize(0);
+				double val;
 				iss.str(tmp);
 				while (iss >> val)
 				{
@@ -1056,6 +1057,7 @@ double Parameter::densityLogNorm(double x, double mean, double sd, bool log)
 		const double inv_sqrt_2pi = 0.3989422804014327;
 		const double log_sqrt_2pi = 0.9189385332046727;
 		double a = (std::log(x) - mean) / sd;
+		std::cout << a <<"\n";
 		returnValue = log ? (-std::log(x * sd) - log_sqrt_2pi - (0.5 * a * a)) : ((inv_sqrt_2pi / (x * sd)) * std::exp(-0.5 * a * a));
 	}
 	return returnValue;

@@ -130,6 +130,11 @@ void RFPModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 	double proposedSphi = getSphi(true);
 	double proposedMPhi = -(proposedSphi * proposedSphi) / 2;
 
+	std::cout <<"curSphi: " << currentSphi <<"\n";
+	std::cout <<"curMphi: " << currentMPhi <<"\n";
+	std::cout <<"propSphi: " << proposedSphi <<"\n";
+	std::cout <<"PropMphi: " << proposedMPhi <<"\n";
+
 	logProbabilityRatio.resize(1);
 #ifndef __APPLE__
 #pragma omp parallel for reduction(+:lpr)
@@ -139,7 +144,12 @@ void RFPModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 		unsigned mixture = getMixtureAssignment(i);
 		mixture = getSynthesisRateCategory(mixture);
 		double phi = getSynthesisRate(i, mixture, false);
+		if (i == 0) {
+		std::cout <<"proposed: " << Parameter::densityLogNorm(phi, proposedMPhi, proposedSphi, false) <<"\n";
+		std::cout <<"current: " << Parameter::densityLogNorm(phi, currentMPhi, currentSphi, false) <<"\n";
+		}
 		lpr += Parameter::densityLogNorm(phi, proposedMPhi, proposedSphi, true) - Parameter::densityLogNorm(phi, currentMPhi, currentSphi, true);
+		//std::cout <<"LPR: " << lpr <<"\n";
 	}
 
 	lpr -= (std::log(currentSphi) - std::log(proposedSphi));

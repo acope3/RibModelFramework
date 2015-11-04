@@ -332,7 +332,6 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 				getline(input,tmp);
 				//char aa = tmp[0];
 				cat = SequenceSummary::AAToAAIndex(tmp); // ????
-				std::cout << cat <<"\n";
 			}
 		}
 		else if (flag == 2)
@@ -1063,7 +1062,7 @@ void ROCParameter::proposeCodonSpecificParameter()
 		std::string aa = getGrouping(k);
 		std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(aa, true);
 		unsigned numCodons = aaRange[1] - aaRange[0];
-		for (unsigned i = 0u; i < numCodons * (numMutationCategories + numSelectionCategories); i++)
+		for (unsigned i = 0u; i < (numCodons * (numMutationCategories + numSelectionCategories)); i++)
 		{
 			iidProposed.push_back(randNorm(0.0, 1.0));
 		}

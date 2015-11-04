@@ -482,11 +482,20 @@ unsigned SequenceSummary::codonToIndex(std::string& codon, bool forParamVector)
 	codon[0] = (char) std::toupper(codon[0]);
 	codon[1] = (char) std::toupper(codon[1]);
 	codon[2] = (char) std::toupper(codon[2]);
-	if(forParamVector)
+	if (((codon[0] != 'A') && (codon[0] != 'C') && (codon[0] != 'G') && (codon[0] != 'T')) ||
+		((codon[1] != 'A') && (codon[1] != 'C') && (codon[1] != 'G') && (codon[1] != 'T')) ||
+		((codon[2] != 'A') && (codon[2] != 'C') && (codon[2] != 'G') && (codon[2] != 'T')))
 	{
-		i = SequenceSummary::codonToIndexWithoutReference.find(codon) -> second;
-	}else{
-		i = SequenceSummary::codonToIndexWithReference.find(codon) -> second;
+		i = 64;
+	}
+	else 
+	{
+		if(forParamVector)
+		{
+			i = SequenceSummary::codonToIndexWithoutReference.find(codon) -> second;
+		}else{
+			i = SequenceSummary::codonToIndexWithReference.find(codon) -> second;
+		}
 	}
 	return i;
 }

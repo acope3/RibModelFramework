@@ -186,7 +186,7 @@ void testWriteRestartFile()
 void testInitFromRestartFile()
 {
 	std::cout << "------------------ TEST INITFROMRESTARTFILE ------------------" << std::endl;
-	ROCParameter parameter("RestartFile1.txt");
+	ROCParameter parameter("20RestartFile.txt");
 	ROCModel model;
 
 	model.setParameter(parameter);
@@ -438,8 +438,8 @@ int main()
 	enum User { cedric, gabe, jeremy };
 	enum ModelToRun { ROC, RFP, FONSE };
 	/* Test variables */
-	User user = jeremy;
-	ModelToRun modelToRun = ROC;
+	User user = gabe;
+	ModelToRun modelToRun = RFP;
 	bool read = false;
 	bool testing = false;
 	bool withPhi = false;
@@ -452,10 +452,10 @@ int main()
 		//testThetaKMatrix();
 		//testCovMatrixOverloading();
 		//testWriteRestartFile();
-		//testInitFromRestartFile();
+		testInitFromRestartFile();
 		//testReadRFPFile();
 		//testReadObservedPhis();
-		simulateRFPData();
+		//simulateRFPData();
 	//	simulateROCData();
 		//testInitMutationSelection();
 		//testRFPVarianceAndMean();
@@ -463,65 +463,66 @@ int main()
 		//testGeneSequenceSummary();
 		//testReadMutationValues();
 		//testMultiplePhi();
-		testDensityLogNorm();
+		//testDensityLogNorm();
 	}
 	else //not doing unit testing, running a model
 	{
 		unsigned index;
-		std::cout << "initialize MCMCAlgorithm object" << std::endl;
+		std::cout << "Initializing MCMCAlgorithm object---------------" << std::endl;
 		int samples = 100;
 		int thining = 10;
 		int useSamples = 100;
-		std::cout << "\t# samples: " << samples << "\n";
-		std::cout << "\t thining: " << thining << "\n";
-		std::cout << "\t # samples used: " << useSamples << "\n";
+		std::cout << "\t# Samples: " << samples << "\n";
+		std::cout << "\tThining: " << thining << "\n";
+		std::cout << "\t # Samples used: " << useSamples << "\n";
 		MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, 10, true, true, true);
 		mcmc.setRestartFileSettings("RestartFile.txt", 20, true);
-		std::cout << "done initialize MCMCAlgorithm object" << std::endl;
+		std::cout << "Done!-------------------------------\n\n\n";
 
 
 		std::cout << "initialize Genome object" << std::endl;
 		Genome genome;
 		switch (user) {
-		case cedric:
-			if (modelToRun == ROC)
-			{
-				genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/twoMixtures/simulatedAllUniqueR.fasta");
-				//genome.readFasta("C:/Users/Cedric/Documents/GitHub/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrB_andCleft.fasta");
-			}
-			else if (modelToRun == RFP)
-			{
-				genome.readRFPFile("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
-			}
-			else {}
-			break;
-		case gabe:
-			if (modelToRun == ROC)
-			{
-				genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
-				if (withPhi) {
-					genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv", false);
+			case cedric:
+				if (modelToRun == ROC)
+				{
+					//genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/data/realGenomes/Skluyveri.fasta");
+					genome.readFasta("C:/Users/Cedric/Documents/GitHub/RibModelFramework/data/realGenomes/Skluyveri.fasta");
 				}
-			}
-			else if (modelToRun == RFP)
-			{
-				//genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
-				genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/testRFPFile.csv");
-			}
-			else {}
-			break;
-		case jeremy:
-			if (modelToRun == ROC || modelToRun == FONSE)
-			{
-				genome.readFasta("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/data/twoMixtures/simulatedAllUniqueR.fasta");
-				if (withPhi) {
-					genome.readObservedPhiValues("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/data/twoMixtures/simulatedAllUniqueR_phi.csv", false);
+				else if (modelToRun == RFP)
+				{
+					genome.readRFPFile("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 				}
-			}
-			else if (modelToRun == RFP)
-			{
-				genome.readRFPFile("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
-			}
+				else {}
+				break;
+			case gabe:
+				if (modelToRun == ROC)
+				{
+					genome.readFasta("/export/home/ghanas/Downloads/RibModelFramework-master/data/realGenomes/Skluyveri.fasta");
+					if (withPhi) {
+						genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv", false);
+					}
+				}
+				else if (modelToRun == RFP)
+				{
+					//genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+					genome.readRFPFile("/export/home/ghanas/Downloads/RibModelFramework-master/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+				}
+				else {}
+				break;
+			case jeremy:
+				if (modelToRun == ROC || modelToRun == FONSE)
+				{
+					genome.readFasta("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
+					if (withPhi) {
+						genome.readObservedPhiValues("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv", false);
+					}
+				}
+				else if (modelToRun == RFP)
+				{
+					//genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+					genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/testRFPFile.csv");
+				}
 			else {}
 			break;
 		}
@@ -530,13 +531,20 @@ int main()
 
 		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 
+		/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+		{
+			if (i < 961) geneAssignment[i] = 0u;
+			else if (i < 1418) geneAssignment[i] = 1u;
+			else geneAssignment[i] = 2u;
+		}*/
 
 		/* For 2 mixtures */
 		/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
 			if (i < 500) geneAssignment[i] = 0u;
 			else geneAssignment[i] = 1u;
-		}/*
+		}*/
+
 
 		/* For 1 mixture */
 		for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
@@ -556,7 +564,7 @@ int main()
 			if (read)
 			{
 				std::cout << "Initializing ROCParameter object from Restart File\n";
-				ROCParameter tmp("RestartFile.txt");
+				ROCParameter tmp("20RestartFile.txt");
 				parameter = tmp;
 				std::cout << "Done initializing ROCParameter object from Restart File\n";
 			}
@@ -574,36 +582,31 @@ int main()
 				std::cout << "\t# mixtures: " << numMixtures << "\n";
 				std::cout << "\tmixture definition: " << mixDef << "\n";
 
-				std::vector<std::string> files(2);
+				std::vector<std::string> files(3);
 
 				switch (user) {
-				case cedric:
-					files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/twoMixtures/simulated_mutation0.csv");
-					files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/twoMixtures/simulated_mutation1.csv");
-					tmp.initMutationCategories(files, tmp.getNumMutationCategories());
+					case cedric:
+						//files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/data/realGenomes/Skluyveri_mutation_ChrA.csv");
+						//files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/data/realGenomes/Skluyveri_mutation_ChrCleft.csv");
+						//files[2] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/data/realGenomes/Skluyveri_mutation_ChrCleft.csv");
 
-					files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/twoMixtures/simulated_selection0.csv");
-					files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/twoMixtures/simulated_selection1.csv");
-					tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
-					break;
+						files[0] = std::string("C:/Users/Cedric/Documents/GitHub/RibModelFramework/data/realGenomes/Skluyveri_mutation_ChrA.csv");
+						files[1] = std::string("C:/Users/Cedric/Documents/GitHub/RibModelFramework/data/realGenomes/Skluyveri_mutation_ChrCleft.csv");
+						tmp.initMutationCategories(files, tmp.getNumMutationCategories());
+						break;
 
-				case gabe:
-					files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_mutation0.csv");
-					files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_mutation1.csv");
-					//	tmp.initMutationCategories(files, tmp.getNumMutationCategories());
+					case gabe:
+						files[0] = std::string("/export/home/ghanas/Downloads/RibModelFramework-master/data/realGenomes/Skluyveri_mutation_ChrA.csv");
+						files[1] = std::string("/export/home/ghanas/Downloads/RibModelFramework-master/data/realGenomes/Skluyveri_mutation_ChrCleft.csv");
+						files[2] = std::string("/export/home/ghanas/Downloads/RibModelFramework-master/data/realGenomes/Skluyveri_mutation_ChrCleft.csv");
+						tmp.initMutationCategories(files, tmp.getNumMutationCategories());
 
-					files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_selection0.csv");
-					files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_selection1.csv");
-					//	tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
 					break;
 				case jeremy:
 					files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/twoMixtures/simulated_mutation0.csv");
 					files[1] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/twoMixtures/simulated_mutation1.csv");
 					//	tmp.initMutationCategories(files, tmp.getNumMutationCategories());
 
-					files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/twoMixtures/simulated_selection0.csv");
-					files[1] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/twoMixtures/simulated_selection1.csv");
-					//	tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
 					break;
 				}
 				tmp.InitializeSynthesisRate(genome, sphi_init[0]);

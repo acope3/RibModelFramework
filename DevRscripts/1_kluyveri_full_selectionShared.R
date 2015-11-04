@@ -10,21 +10,21 @@ genome <- initializeGenomeObject(file = "../data/realGenomes/Skluyveri.fasta")
 } 
 
 sphi_init <- c(1,1)
-numMixtures <- 3
-mixDef <- "allUnique"
-#mixDef <- "selectionShared"
-geneAssignment <- c(rep(1,961), rep(2,457), rep(1, 3403), rep(3, 500))
+numMixtures <- 2
+#mixDef <- "allUnique"
+mixDef <- "selectionShared"
+geneAssignment <- c(rep(1,961), rep(2,457), rep(1, 3403), rep(1, 500))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef) 
 
 phivals <- parameter$readPhiValues( "../data/realGenomes/Skluyveri_phi.csv")
 parameter$initializeSynthesisRateByList(phivals)
 parameter$initMutationCategories(c("../data/realGenomes/Skluyveri_mutation_ChrA.csv", "../data/realGenomes/Skluyveri_mutation_ChrCleft.csv") , 2)
-parameter$initSelectionCategories(c("../data/realGenomes/Skluyveri_selection_ChrA.csv", "../data/realGenomes/Skluyveri_selection_ChrCleft.csv") , 2)
+parameter$initSelectionCategories(c("../data/realGenomes/Skluyveri_selection_ChrA.csv", "../data/realGenomes/Skluyveri_selection_ChrCleft.csv") , 1)
 
 
-samples <- 1000
+samples <- 100
 thining <- 50
-adaptiveWidth <- 10
+adaptiveWidth <- 1000000
 divergence.iteration <- 0
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE) 
 
