@@ -9,7 +9,7 @@
 
 void testLogNormDensity()
 {
-	std::cout << "------------------ LOG NORM DENSITY ------------------" << std::endl;
+	std::cout << "------------------- LOG NORM DENSITY ------------------" << std::endl;
 	for (int i = 0; i < 5; i++)
 	{
 		double result = Parameter::densityLogNorm(i, -1, 1, true);
