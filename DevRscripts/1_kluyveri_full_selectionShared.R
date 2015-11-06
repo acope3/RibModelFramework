@@ -23,7 +23,11 @@ parameter$initSelectionCategories("../data/realGenomes/Skluyveri_selection_ChrA.
 
 samples <- 100
 thining <- 50
+<<<<<<< HEAD
 adaptiveWidth <- 10
+=======
+adaptiveWidth <- 100
+>>>>>>> e0b4a5c670dc2e8845bea36b3000776e604a97e1
 divergence.iteration <- 0
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE) 
 

@@ -466,13 +466,6 @@ void RFPParameter::proposeCodonSpecificParameter()
 	}
 }
 
-void RFPParameter::proposeHyperParameters()
-{
-	for(unsigned i = 0u; i < numSelectionCategories; i++)
-	{
-		Sphi_proposed[i] = std::exp(randNorm(std::log(Sphi[i]), std_sphi));
-	}
-}
 
 
 void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)

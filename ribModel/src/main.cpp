@@ -9,7 +9,7 @@
 
 void testLogNormDensity()
 {
-	std::cout << "------------------ LOG NORM DENSITY ------------------" << std::endl;
+	std::cout << "------------------- LOG NORM DENSITY ------------------" << std::endl;
 	for (int i = 0; i < 5; i++)
 	{
 		double result = Parameter::densityLogNorm(i, -1, 1, true);
@@ -480,7 +480,7 @@ int main()
 		std::cout << "Done!-------------------------------\n\n\n";
 
 
-		std::cout << "initialize Genome object" << std::endl;
+		std::cout << "initialize Genome object--------------------------" << std::endl;
 		Genome genome;
 		switch (user) {
 			case cedric:
@@ -528,8 +528,8 @@ int main()
 			else {}
 			break;
 		}
-		std::cout << "done initializing Genome object" << std::endl;
-		std::cout << "Initializing shared parameter variables\n";
+		std::cout << "Done!-------------------------------\n\n\n";
+		std::cout << "Initializing shared parameter variables---------------\n";
 
 		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 
@@ -539,7 +539,11 @@ int main()
 			else if (i < 1418) geneAssignment[i] = 1u;
 			else geneAssignment[i] = 0u;
 		}
+<<<<<<< HEAD
 
+=======
+*/
+>>>>>>> e0b4a5c670dc2e8845bea36b3000776e604a97e1
 
 		/* For 2 mixtures */
 		/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
@@ -553,11 +557,17 @@ int main()
 		/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
 			geneAssignment[i] = 0u;
+<<<<<<< HEAD
 		}*/
 		unsigned numMixtures = 2;
 		std::vector<double> sphi_init(numMixtures, 1);
+=======
+		}
+		unsigned numMixtures = 1;
+		std::vector<double> sphi_init(numMixtures, 2);
+>>>>>>> e0b4a5c670dc2e8845bea36b3000776e604a97e1
 		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
-		std::cout << "Done initializing shared parameter variables\n";
+		std::cout << "Done!------------------------\n\n\n";
 
 
 		if (modelToRun == ROC)
@@ -641,7 +651,7 @@ int main()
 
 			for (unsigned i = 0u; i < numMixtures; i++)
 			{
-				unsigned selectionCategry = parameter.getSelectionCategoryForMixture(i);
+				unsigned selectionCategry = parameter.getSelectionCategory(i);
 				std::cout << "Sphi posterior estimate for selection category " << selectionCategry << ": " << parameter.getSphiPosteriorMean(useSamples, selectionCategry) << std::endl;
 			}
 			std::cout << "Sphi proposal width: " << parameter.getCurrentSphiProposalWidth() << std::endl;
@@ -667,14 +677,14 @@ int main()
 			{
 				std::cout << "initialize RFPParameter object" << std::endl;
 				std::string mixDef = Parameter::allUnique;
-				for (unsigned i = 0u; i < numMixtures; i++)
-				{
-					unsigned selectionCategry = parameter.getSelectionCategoryForMixture(i);
-					std::cout << "Sphi_init for selection category " << selectionCategry << ": " << sphi_init[selectionCategry] << std::endl;
-				}
 				std::cout << "\t# mixtures: " << numMixtures << "\n";
 				std::cout << "\tmixture definition: " << mixDef << "\n";
 				RFPParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
+				for (unsigned i = 0u; i < numMixtures; i++)
+				{
+					unsigned selectionCategry = tmp.getSelectionCategory(i);
+					std::cout << "Sphi_init for selection category " << selectionCategry << ": " << sphi_init[selectionCategry] << std::endl;
+				}
 				tmp.InitializeSynthesisRate(genome, sphi_init[0]);
 				parameter = tmp;
 				std::cout << "Done initialize RFPParameter object" << std::endl;
@@ -700,7 +710,7 @@ int main()
 
 			for (unsigned i = 0u; i < numMixtures; i++)
 			{
-				unsigned selectionCategry = parameter.getSelectionCategoryForMixture(i);
+				unsigned selectionCategry = parameter.getSelectionCategory(i);
 				std::cout << "Sphi posterior estimate for selection category " << selectionCategry << ": " << parameter.getSphiPosteriorMean(useSamples, selectionCategry) << std::endl;
 			}
 			std::cout << "Sphi proposal width: " << parameter.getCurrentSphiProposalWidth() << std::endl;
@@ -775,7 +785,7 @@ int main()
 
 			for (unsigned i = 0u; i < numMixtures; i++)
 			{
-				unsigned selectionCategry = parameter.getSelectionCategoryForMixture(i);
+				unsigned selectionCategry = parameter.getSelectionCategory(i);
 				std::cout << "Sphi posterior estimate for selection category " << selectionCategry << ": " << parameter.getSphiPosteriorMean(useSamples, selectionCategry) << std::endl;
 			}
 			std::cout << "Sphi proposal width: " << parameter.getCurrentSphiProposalWidth() << std::endl;

@@ -124,10 +124,10 @@ void RFPModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 
 void RFPModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration, std::vector <double> & logProbabilityRatio)
 {
-	double currentSphi = getSphi(false);
+	double currentSphi = parameter -> getSphi(false);
 	double currentMPhi = -(currentSphi * currentSphi) / 2;
 	double lpr = 0.0; // this variable is only needed because OpenMP doesn't allow variables in reduction clause to be reference
-	double proposedSphi = getSphi(true);
+	double proposedSphi = parameter -> getSphi(true);
 	double proposedMPhi = -(proposedSphi * proposedSphi) / 2;
 
 	std::cout <<"curSphi: " << currentSphi <<"\n";
@@ -223,7 +223,7 @@ void RFPModel::printHyperParameters()
 {
 	for(unsigned i = 0u; i < getNumSynthesisRateCategories(); i++)
 	{
-		std::cout << "Sphi posterior estimate for selection category " << i << ": " << getSphi(i) << std::endl;
+		std::cout << "Sphi posterior estimate for selection category " << i << ": " << parameter -> getSphi(i) << std::endl;
 	}
 	std::cout << "\t current Sphi proposal width: " << getCurrentSphiProposalWidth() << std::endl;
 }
