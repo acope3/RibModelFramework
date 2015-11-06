@@ -19,16 +19,16 @@ parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssig
 phivals <- parameter$readPhiValues( "../data/realGenomes/Skluyveri_phi.csv")
 parameter$initializeSynthesisRateByList(phivals)
 parameter$initMutationCategories(c("../data/realGenomes/Skluyveri_mutation_ChrA.csv", "../data/realGenomes/Skluyveri_mutation_ChrCleft.csv") , 2)
-parameter$initSelectionCategories(c("../data/realGenomes/Skluyveri_selection_ChrA.csv", "../data/realGenomes/Skluyveri_selection_ChrCleft.csv") , 1)
+parameter$initSelectionCategories("../data/realGenomes/Skluyveri_selection_ChrA.csv" , 1)
 
 
 samples <- 100
 thining <- 50
-adaptiveWidth <- 1000000
+adaptiveWidth <- 100
 divergence.iteration <- 0
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE) 
 
-setRestartSettings(mcmc, "1_kluyveri_full.rst", adaptiveWidth*50, TRUE) 
+setRestartSettings(mcmc, "1_kluyveri_full_selectionShared.rst", adaptiveWidth*50, TRUE) 
 
 model <- initializeModelObject(parameter, "ROC", with.phi = with.phi) 
 

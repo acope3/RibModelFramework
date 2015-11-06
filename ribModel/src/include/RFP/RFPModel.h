@@ -73,7 +73,7 @@ class RFPModel: public Model {
 		}
 		virtual void proposeHyperParameters()
 		{
-			parameter->proposeHyperParameters();
+			parameter->proposeSphi();
 		}
 		virtual unsigned getMixtureAssignment(unsigned index)
 		{

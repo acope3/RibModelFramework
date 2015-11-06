@@ -480,7 +480,7 @@ int main()
 		std::cout << "Done!-------------------------------\n\n\n";
 
 
-		std::cout << "initialize Genome object" << std::endl;
+		std::cout << "initialize Genome object--------------------------" << std::endl;
 		Genome genome;
 		switch (user) {
 			case cedric:
@@ -498,6 +498,7 @@ int main()
 			case gabe:
 				if (modelToRun == ROC)
 				{
+					//genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
 					genome.readFasta("/export/home/ghanas/Downloads/RibModelFramework-master/data/realGenomes/Skluyveri.fasta");
 					if (withPhi) {
 						genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv", false);
@@ -506,6 +507,7 @@ int main()
 				else if (modelToRun == RFP)
 				{
 					//genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+					//genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/testRFPFile.csv");
 					genome.readRFPFile("/export/home/ghanas/Downloads/RibModelFramework-master/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 				}
 				else {}
@@ -526,8 +528,8 @@ int main()
 			else {}
 			break;
 		}
-		std::cout << "done initializing Genome object" << std::endl;
-		std::cout << "Initializing shared parameter variables\n";
+		std::cout << "Done!-------------------------------\n\n\n";
+		std::cout << "Initializing shared parameter variables---------------\n";
 
 		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 
@@ -535,8 +537,9 @@ int main()
 		{
 			if (i < 961) geneAssignment[i] = 0u;
 			else if (i < 1418) geneAssignment[i] = 1u;
-			else geneAssignment[i] = 2u;
-		}*/
+			else geneAssignment[i] = 0u;
+		}
+*/
 
 		/* For 2 mixtures */
 		/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
@@ -552,9 +555,9 @@ int main()
 			geneAssignment[i] = 0u;
 		}
 		unsigned numMixtures = 1;
-		std::vector<double> sphi_init(numMixtures, 1);
+		std::vector<double> sphi_init(numMixtures, 2);
 		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
-		std::cout << "Done initializing shared parameter variables\n";
+		std::cout << "Done!------------------------\n\n\n";
 
 
 		if (modelToRun == ROC)
@@ -571,7 +574,7 @@ int main()
 			else
 			{
 				std::cout << "initialize ROCParameter object" << std::endl;
-				std::string mixDef = ROCParameter::allUnique;
+				std::string mixDef = ROCParameter::selectionShared;
 				ROCParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 
 				for (unsigned i = 0u; i < numMixtures; i++)
@@ -596,10 +599,13 @@ int main()
 						break;
 
 					case gabe:
+//						files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_mutation0.csv");
+//						files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_mutation1.csv");
 						files[0] = std::string("/export/home/ghanas/Downloads/RibModelFramework-master/data/realGenomes/Skluyveri_mutation_ChrA.csv");
 						files[1] = std::string("/export/home/ghanas/Downloads/RibModelFramework-master/data/realGenomes/Skluyveri_mutation_ChrCleft.csv");
-						files[2] = std::string("/export/home/ghanas/Downloads/RibModelFramework-master/data/realGenomes/Skluyveri_mutation_ChrCleft.csv");
+//						files[2] = std::string("/export/home/ghanas/Downloads/RibModelFramework-master/data/realGenomes/Skluyveri_mutation_ChrCleft.csv");
 						tmp.initMutationCategories(files, tmp.getNumMutationCategories());
+
 
 					break;
 				case jeremy:
@@ -635,7 +641,7 @@ int main()
 
 			for (unsigned i = 0u; i < numMixtures; i++)
 			{
-				unsigned selectionCategry = parameter.getSelectionCategoryForMixture(i);
+				unsigned selectionCategry = parameter.getSelectionCategory(i);
 				std::cout << "Sphi posterior estimate for selection category " << selectionCategry << ": " << parameter.getSphiPosteriorMean(useSamples, selectionCategry) << std::endl;
 			}
 			std::cout << "Sphi proposal width: " << parameter.getCurrentSphiProposalWidth() << std::endl;
@@ -661,14 +667,14 @@ int main()
 			{
 				std::cout << "initialize RFPParameter object" << std::endl;
 				std::string mixDef = Parameter::allUnique;
-				for (unsigned i = 0u; i < numMixtures; i++)
-				{
-					unsigned selectionCategry = parameter.getSelectionCategoryForMixture(i);
-					std::cout << "Sphi_init for selection category " << selectionCategry << ": " << sphi_init[selectionCategry] << std::endl;
-				}
 				std::cout << "\t# mixtures: " << numMixtures << "\n";
 				std::cout << "\tmixture definition: " << mixDef << "\n";
 				RFPParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
+				for (unsigned i = 0u; i < numMixtures; i++)
+				{
+					unsigned selectionCategry = tmp.getSelectionCategory(i);
+					std::cout << "Sphi_init for selection category " << selectionCategry << ": " << sphi_init[selectionCategry] << std::endl;
+				}
 				tmp.InitializeSynthesisRate(genome, sphi_init[0]);
 				parameter = tmp;
 				std::cout << "Done initialize RFPParameter object" << std::endl;
@@ -694,7 +700,7 @@ int main()
 
 			for (unsigned i = 0u; i < numMixtures; i++)
 			{
-				unsigned selectionCategry = parameter.getSelectionCategoryForMixture(i);
+				unsigned selectionCategry = parameter.getSelectionCategory(i);
 				std::cout << "Sphi posterior estimate for selection category " << selectionCategry << ": " << parameter.getSphiPosteriorMean(useSamples, selectionCategry) << std::endl;
 			}
 			std::cout << "Sphi proposal width: " << parameter.getCurrentSphiProposalWidth() << std::endl;
@@ -769,7 +775,7 @@ int main()
 
 			for (unsigned i = 0u; i < numMixtures; i++)
 			{
-				unsigned selectionCategry = parameter.getSelectionCategoryForMixture(i);
+				unsigned selectionCategry = parameter.getSelectionCategory(i);
 				std::cout << "Sphi posterior estimate for selection category " << selectionCategry << ": " << parameter.getSphiPosteriorMean(useSamples, selectionCategry) << std::endl;
 			}
 			std::cout << "Sphi proposal width: " << parameter.getCurrentSphiProposalWidth() << std::endl;

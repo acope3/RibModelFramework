@@ -39,9 +39,9 @@ end - start
 
 
 pdf("1_kluyveri_full_global.pdf", width = 11, height = 12) 
-plot(mcmc) 
+plot(mcmc)
 loglik.trace <- mcmc$getLogLikelihoodTrace() 
-acf(loglik.trace) 
+acf(loglik.trace[2:1000])
 convergence.test(mcmc, n.samples = 500, plot=T) 
 
 trace <- parameter$getTraceObject() 
@@ -83,6 +83,8 @@ legend("bottomleft", legend = paste("Mixture Element", 1:numMixtures),
        col = ribModel:::.mixtureColors[1:numMixtures], pch = rep(1, numMixtures), bty = "n")
 
 write.table(file="1_kluyveri_full.csv", x = mixprob, sep = ",", row.names = F, quote = F, col.names = F)
+mat <- cbind(gene.ids, expressionValues, mixtureAssignment)
+write.table(file="1_kluyveri_full_filtered_expression.csv", x = mat, sep=",", quote = F, row.names = F, col.names = F)
 
 plot(parameter, what = "Mutation") 
 plot(parameter, what = "Selection") 
