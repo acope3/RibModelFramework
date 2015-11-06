@@ -111,12 +111,14 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				double logProbabilityRatio[3];
 				model.calculateLogLikelihoodRatioPerGene(gene, i, mixtureElement, logProbabilityRatio);
 
+/*
 				if (std::isinf(logProbabilityRatio[1])) {
 					std::cout << "logprob1 inf\n";
 				}
 				if (std::isinf(logProbabilityRatio[2])) {
 					std::cout << "logprob2 inf\n";
 				}
+*/
 				unscaledLogProb_curr[k] += logProbabilityRatio[1];
 				unscaledLogProb_prop[k] += logProbabilityRatio[2];
 
