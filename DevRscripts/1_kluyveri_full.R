@@ -9,7 +9,7 @@ genome <- initializeGenomeObject(file ="../data/realGenomes/Skluyveri.fasta", ex
 genome <- initializeGenomeObject(file = "../data/realGenomes/Skluyveri.fasta") 
 } 
 
-sphi_init <- c(1,1)
+sphi_init <- c(1,1,1)
 numMixtures <- 3
 mixDef <- "allUnique"
 #mixDef <- "selectionShared"
@@ -28,7 +28,7 @@ adaptiveWidth <- 10
 divergence.iteration <- 0
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE) 
 
-setRestartSettings(mcmc, "1_kluyveri_full.rst", adaptiveWidth*50, TRUE) 
+setRestartSettings(mcmc, "1_kluyveri_full_3mix.rst", adaptiveWidth*50, TRUE) 
 
 model <- initializeModelObject(parameter, "ROC", with.phi = with.phi) 
 
@@ -38,7 +38,7 @@ end <- Sys.time()
 end - start 
 
 
-pdf("1_kluyveri_full_global.pdf", width = 11, height = 12) 
+pdf("1_kluyveri_full_global_3mix.pdf", width = 11, height = 12) 
 plot(mcmc)
 loglik.trace <- mcmc$getLogLikelihoodTrace() 
 acf(loglik.trace[2:1000])
@@ -82,9 +82,9 @@ for(k in 1:numMixtures){
 legend("bottomleft", legend = paste("Mixture Element", 1:numMixtures),
        col = ribModel:::.mixtureColors[1:numMixtures], pch = rep(1, numMixtures), bty = "n")
 
-write.table(file="1_kluyveri_full.csv", x = mixprob, sep = ",", row.names = F, quote = F, col.names = F)
+write.table(file="1_kluyveri_full_3mix.csv", x = mixprob, sep = ",", row.names = F, quote = F, col.names = F)
 mat <- cbind(gene.ids, expressionValues, mixtureAssignment)
-write.table(file="1_kluyveri_full_filtered_expression.csv", x = mat, sep=",", quote = F, row.names = F, col.names = F)
+write.table(file="1_kluyveri_full_filtered_expression_3mix.csv", x = mat, sep=",", quote = F, row.names = F, col.names = F)
 
 plot(parameter, what = "Mutation") 
 plot(parameter, what = "Selection") 
@@ -93,7 +93,7 @@ dev.off()
 observed.mutation <- c("../data/realGenomes/Skluyveri_mutation_ChrA.csv", "../data/realGenomes/Skluyveri_mutation_ChrCleft.csv")
 observed.selection <- c("../data/realGenomes/Skluyveri_selection_ChrA.csv", "../data/realGenomes/Skluyveri_selection_ChrCleft.csv")
 for(k in 1:numMixtures){ 
-   pdf(paste("1_kluyveri_full_mixture_", k, ".pdf", sep=""), width = 11, height = 12) 
+   pdf(paste("1_kluyveri_full_mixture_", k, "_3mix.pdf", sep=""), width = 11, height = 12) 
    mixture <- k 
    plot(trace, what = "Mutation", mixture = mixture) 
    plot(trace, what = "Selection", mixture = mixture) 

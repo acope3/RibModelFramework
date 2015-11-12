@@ -255,7 +255,7 @@ void ROCModel::printHyperParameters()
 {
 	for(unsigned i = 0u; i < getNumSynthesisRateCategories(); i++)
 	{
-		std::cout << "Sphi posterior estimate for selection category " << i << ": " << getSphi(i, false) << std::endl;
+		std::cout << "Current Sphi estimate for selection category " << i << ": " << getSphi(i, false) << std::endl;
 	}
 
 	std::cout << "\t current Sphi proposal width: " << getCurrentSphiProposalWidth() << std::endl;

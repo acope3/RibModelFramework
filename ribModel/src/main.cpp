@@ -532,16 +532,14 @@ int main()
 		std::cout << "Initializing shared parameter variables---------------\n";
 
 		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
-
-		/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+/*
+		for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
 			if (i < 961) geneAssignment[i] = 0u;
 			else if (i < 1418) geneAssignment[i] = 1u;
 			else geneAssignment[i] = 0u;
 		}
-*/
-
-		/* For 2 mixtures */
+*/		/* For 2 mixtures */
 		/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
 			if (i < 500) geneAssignment[i] = 0u;
@@ -694,7 +692,7 @@ int main()
 			*/std::cout << "Done initializing RFPModel object\n";
 
 			std::cout << "starting MCMC for RFP" << std::endl;
-			mcmc.run(genome, model, 8);
+			mcmc.run(genome, model, 1);
 			std::cout << std::endl << "Finished MCMC for RFP" << std::endl;
 
 
