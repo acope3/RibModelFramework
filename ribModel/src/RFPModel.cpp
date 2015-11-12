@@ -138,10 +138,6 @@ void RFPModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 		currentMphi[i] = -((currentSphi[i] * currentSphi[i]) / 2);
 		proposedSphi[i] = getSphi(i, true);
 		proposedMphi[i] = -((proposedSphi[i] * proposedSphi[i]) / 2);
-		std::cout <<"curSphi: " << currentSphi[i] <<"\n";
-		std::cout <<"curMphi: " << currentMphi[i] <<"\n";
-		std::cout <<"propSphi: " << proposedSphi[i] <<"\n";
-		std::cout <<"PropMphi: " << proposedMphi[i] <<"\n";
 		// take the jacobian into account for the non-linear transformation from logN to N distribution
 		lpr -= (std::log(currentSphi[i]) - std::log(proposedSphi[i]));
 		// take prior into account

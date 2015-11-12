@@ -4,7 +4,7 @@
 # additional arguments are geneIndex, and category to index function like
 # getExpressionTraceForGene or plotCodonSpecificParameters
 
-plot.Rcpp_RFPTrace <- function(trace, what=c("Alpha", "LambdaPrime", "MixtureProbability" ,"Sphi", "ExpectedPhi", "Expression"), 
+plot.Rcpp_RFPTrace <- function(trace, what=c("Alpha", "LambdaPrime", "MixtureProbability" ,"Sphi", "Mphi", "ExpectedPhi", "Expression"), 
                                geneIndex=1, mixture = 1, ...)
 {
   if(what[1] == "Alpha")
@@ -20,6 +20,10 @@ plot.Rcpp_RFPTrace <- function(trace, what=c("Alpha", "LambdaPrime", "MixturePro
     plotMixtureProbability(trace)
   }
   if(what[1] == "Sphi")
+  {
+    plotHyperParameterTrace(trace, what = what[1])
+  }
+  if(what[1] == "Mphi") 
   {
     plotHyperParameterTrace(trace, what = what[1])
   }
