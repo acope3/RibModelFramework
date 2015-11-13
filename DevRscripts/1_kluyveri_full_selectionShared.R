@@ -9,26 +9,29 @@ genome <- initializeGenomeObject(file ="../data/realGenomes/Skluyveri.fasta", ex
 genome <- initializeGenomeObject(file = "../data/realGenomes/Skluyveri.fasta") 
 } 
 
-sphi_init <- c(1,1,1)
-numMixtures <- 3
-mixDef <- "allUnique"
-#mixDef <- "selectionShared"
-geneAssignment <- c(rep(1,961), rep(2,457), rep(1, 3403), rep(3, 500))
+sphi_init <- c(1,1)
+numMixtures <- 2
+mixDef <- "selectionShared"
+geneAssignment <- c(rep(1,961), rep(2,457), rep(1, 3903))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef) 
 
 phivals <- parameter$readPhiValues( "../data/realGenomes/Skluyveri_phi.csv")
 parameter$initializeSynthesisRateByList(phivals)
 parameter$initMutationCategories(c("../data/realGenomes/Skluyveri_mutation_ChrA.csv", "../data/realGenomes/Skluyveri_mutation_ChrCleft.csv") , 2)
-parameter$initSelectionCategories(c("../data/realGenomes/Skluyveri_selection_ChrA.csv", "../data/realGenomes/Skluyveri_selection_ChrCleft.csv") , 2)
+parameter$initSelectionCategories("../data/realGenomes/Skluyveri_selection_ChrA.csv" , 1)
 
 
-samples <- 1000
+samples <- 100
 thining <- 50
+<<<<<<< HEAD
 adaptiveWidth <- 10
+=======
+adaptiveWidth <- 100
+>>>>>>> e0b4a5c670dc2e8845bea36b3000776e604a97e1
 divergence.iteration <- 0
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE) 
 
-setRestartSettings(mcmc, "1_kluyveri_full_3mix.rst", adaptiveWidth*50, TRUE) 
+setRestartSettings(mcmc, "1_kluyveri_full_selectionShared.rst", adaptiveWidth*50, TRUE) 
 
 model <- initializeModelObject(parameter, "ROC", with.phi = with.phi) 
 
@@ -38,10 +41,10 @@ end <- Sys.time()
 end - start 
 
 
-pdf("1_kluyveri_full_global_3mix.pdf", width = 11, height = 12) 
-plot(mcmc)
+pdf("1_kluyveri_full_global_selectionShared.pdf", width = 11, height = 12) 
+plot(mcmc) 
 loglik.trace <- mcmc$getLogLikelihoodTrace() 
-acf(loglik.trace[2:1000])
+acf(loglik.trace) 
 convergence.test(mcmc, n.samples = 500, plot=T) 
 
 trace <- parameter$getTraceObject() 
@@ -82,18 +85,27 @@ for(k in 1:numMixtures){
 legend("bottomleft", legend = paste("Mixture Element", 1:numMixtures),
        col = ribModel:::.mixtureColors[1:numMixtures], pch = rep(1, numMixtures), bty = "n")
 
-write.table(file="1_kluyveri_full_3mix.csv", x = mixprob, sep = ",", row.names = F, quote = F, col.names = F)
-mat <- cbind(gene.ids, expressionValues, mixtureAssignment)
-write.table(file="1_kluyveri_full_filtered_expression_3mix.csv", x = mat, sep=",", quote = F, row.names = F, col.names = F)
+write.table(file="1_kluyveri_full_selectionShared.csv", x = mixprob, sep = ",", row.names = F, quote = F, col.names = F)
 
-plot(parameter, what = "Mutation") 
-plot(parameter, what = "Selection") 
+gene.ids <- unlist(lapply(1:genome$getGenomeSize(), function(geneIndex){ 
+  gene <- genome$getGeneByIndex(geneIndex, F)
+  return(gene$id)
+})) 
+gene.obs.ids <- as.character(read.table("../data/realGenomes/Skluyveri_GSM552569.csv", sep=",", header=T)[, 1])
+gene.ids <- gene.ids[gene.ids %in% gene.obs.ids]
+mixtureAssignment <- mixtureAssignment[gene.ids %in% gene.obs.ids]
+expressionValues <- expressionValues[gene.ids %in% gene.obs.ids]
+mat <- cbind(gene.ids, expressionValues, mixtureAssignment)
+write.table(file="1_kluyveri_full_filtered_expression_selectionShared.csv", x = mat, sep=",", quote = F, row.names = F, col.names = F)
+
+plot(parameter, what = "Mutation", samples = samples*0.1) 
+plot(parameter, what = "Selection", samples = samples*0.1) 
 dev.off() 
 
 observed.mutation <- c("../data/realGenomes/Skluyveri_mutation_ChrA.csv", "../data/realGenomes/Skluyveri_mutation_ChrCleft.csv")
 observed.selection <- c("../data/realGenomes/Skluyveri_selection_ChrA.csv", "../data/realGenomes/Skluyveri_selection_ChrCleft.csv")
 for(k in 1:numMixtures){ 
-   pdf(paste("1_kluyveri_full_mixture_", k, "_3mix.pdf", sep=""), width = 11, height = 12) 
+   pdf(paste("1_kluyveri_full_mixture_", k, "_selectionShared_short.pdf", sep=""), width = 11, height = 12) 
    mixture <- k 
    plot(trace, what = "Mutation", mixture = mixture) 
    plot(trace, what = "Selection", mixture = mixture) 

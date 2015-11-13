@@ -111,12 +111,14 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				double logProbabilityRatio[3];
 				model.calculateLogLikelihoodRatioPerGene(gene, i, mixtureElement, logProbabilityRatio);
 
+/*
 				if (std::isinf(logProbabilityRatio[1])) {
 					std::cout << "logprob1 inf\n";
 				}
 				if (std::isinf(logProbabilityRatio[2])) {
 					std::cout << "logprob2 inf\n";
 				}
+*/
 				unscaledLogProb_curr[k] += logProbabilityRatio[1];
 				unscaledLogProb_prop[k] += logProbabilityRatio[2];
 
@@ -363,7 +365,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 				if (multipleFiles)
 				{
 					std::ostringstream oss;
-					oss << (iteration + 1) / thining << file;
+					oss << (iteration) / thining << file;
 					std::string tmp = oss.str();
 					model.writeRestartFile(tmp);
 				}
@@ -375,7 +377,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 		}
 		if( (iteration) % 100u == 0u)
 		{
-			std::cout << "Status at iteration " << (iteration+1) << std::endl;
+			std::cout << "Status at iteration " << (iteration) << std::endl;
 			std::cout << "\t current logLikelihood: " << likelihoodTrace[(iteration/thining) - 1] << std::endl;
 			model.printHyperParameters();
 			for(unsigned i = 0u; i < model.getNumMixtureElements(); i++)

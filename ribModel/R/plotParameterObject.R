@@ -1,4 +1,4 @@
-plot.Rcpp_ROCParameter <- function(parameter, what = "Mutation", sample = 100, ...)
+plot.Rcpp_ROCParameter <- function(parameter, what = "Mutation", samples = 100, ...)
 {
   
   numMixtures <- parameter$numMixtures

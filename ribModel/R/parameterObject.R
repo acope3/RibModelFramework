@@ -3,6 +3,20 @@ initializeParameterObject <- function(genome, sphi, numMixtures, geneAssignment,
                                       split.serine = TRUE, mixture.definition = "allUnique", mixture.definition.matrix = NULL,
                                       restart.file = NULL, mutation_prior_sd = 0.35)
 {
+  # check input integrity
+  if(length(sphi) != numMixtures)
+  {
+    stop("Not all mixtures have an Sphi value assigned!\n")
+  }
+  if(length(genome) != length(geneAssignment))
+  {
+    stop("Not all Genes have a mixture assignment!\n")
+  }
+  if(max(geneAssignment) > numMixtures)
+  {
+    stop("Gene is assigned to non existing mixture!\n")
+  }  
+  
   if(model == "ROC")
   {
     if(is.null(restart.file))
@@ -113,7 +127,7 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
       compl.covMat[matrix.positions == matrix.positions[ofdiag.seq[i], mut.seq[i]]] <- unlist(covmat[[i]][3])
     }
     #for testing
-    compl.covMat <- diag((numMutationCategory + numSelectionCategory) * numCodons) *0.05
+    compl.covMat <- diag((numMutationCategory + numSelectionCategory) * numCodons) * 0.05
     #compl.covMat / max(compl.covMat)
     parameter$initCovarianceMatrix(compl.covMat, aa)
     

@@ -418,7 +418,8 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 			} 
 			else if (variableName == "Sphi")
 			{
-				unsigned val;
+				Sphi.resize(0);
+				double val;
 				iss.str(tmp);
 				while (iss >> val)
 				{

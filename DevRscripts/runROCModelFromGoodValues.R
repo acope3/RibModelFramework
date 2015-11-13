@@ -8,7 +8,8 @@ if (with.phi) {
   #genome <- initializeGenomeObject(file = "../ribModel/data/simulatedOneMix.fasta", expression.file = "../ribModel/data/simulatedOneMix_simphi.csv")
 } else {
   #genome <- initializeGenomeObject(file = "../ribModel/data/simulatedAllUniqueR.fasta")
-  genome <- initializeGenomeObject(file = "../ribModel/data/simulatedAllUniqueR_unevenMixtures.fasta")
+  #genome <- initializeGenomeObject(file = "../ribModel/data/simulatedAllUniqueR_unevenMixtures.fasta")
+  genome <- initializeGenomeObject(file = "../data/realGenomes/Skluyveri.fasta")
   #genome <- initializeGenomeObject(file = "../ribModel/data/genome_2000.fasta")
   #genome <- initializeGenomeObject(file = "../ribModel/data/Skluyveri.fasta")
   #genome <- initializeGenomeObject(file = "../../../organisms/human/data/human_genome_cds_brain.fasta")
@@ -16,13 +17,14 @@ if (with.phi) {
  
 #initialize parameter object
 sphi_init <- 1
-numMixtures <- 1
+numMixtures <- 3
 mixDef <- "allUnique"
-#geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457), rep(1, 3903)) # S.kluyveri full genome
+geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457), rep(1, 3403), rep(3, 500)) # S.kluyveri full genome
 #geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
 #geneAssignment <- rep(1,328) # human brain
 #geneAssignment <- c(rep(1,200), rep(2,800))
 geneAssignment <- sample(x = c(1,2), size = 806, replace = T) #c(rep(1,400), rep(2,406))
+#geneAssignment <- sample(x = c(1,2), size = 806, replace = T) #c(rep(1,400), rep(2,406))
 #geneAssignment <- rep(1,2000)
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
 

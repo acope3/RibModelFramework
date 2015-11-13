@@ -9,7 +9,6 @@ RM := rm
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include PANSE/subdir.mk
--include CodonTable/subdir.mk
 -include subdir.mk
 -include objects.mk
 
@@ -39,19 +38,19 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: RibModelFramework
+all: src
 
 # Tool invocations
-RibModelFramework: $(OBJS) $(USER_OBJS)
+src: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++ -fopenmp -std=c++11 -o "RibModelFramework" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -fopenmp -std=c++11 -o "src" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(OBJS)$(C++_DEPS)$(C_DEPS)$(CC_DEPS)$(CPP_DEPS)$(EXECUTABLES)$(CXX_DEPS)$(C_UPPER_DEPS) RibModelFramework
+	-$(RM) $(OBJS)$(C++_DEPS)$(C_DEPS)$(CC_DEPS)$(CPP_DEPS)$(EXECUTABLES)$(CXX_DEPS)$(C_UPPER_DEPS) src
 	-@echo ' '
 
 .PHONY: all clean dependents

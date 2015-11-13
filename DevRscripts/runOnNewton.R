@@ -51,7 +51,7 @@ for (index in 1:number.of.runs) {
         "adaptiveWidth <- ", adaptiveWidth, "\n",
         "divergence.iteration <- ", divergence.iteration, "\n",
         "mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE) \n\n", 
-        "setRestartSettings(mcmc, \"", paste(index, run.name, ".rst", sep=""), "\", adaptiveWidth*200, TRUE) \n\n",
+        "setRestartSettings(mcmc, \"", paste(index, run.name, ".rst", sep=""), "\", adaptiveWidth*50, TRUE) \n\n",
         "model <- initializeModelObject(parameter, \"", model, "\", with.phi = with.phi) \n\n",
         "start <- Sys.time() \n",
         "system.time(runMCMC(mcmc, genome, model, ", n.cores, ", divergence.iteration)) \n",
@@ -71,10 +71,10 @@ for (index in 1:number.of.runs) {
           "plot(trace, what = \"Sepsilon\") \n",
         "} \n",
         "plot(trace, what = \"ExpectedPhi\") \n\n",
-        "mixtureAssignment <- unlist(lapply(1:genome$getGenomeSize(),  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)})) \n",
+        "mixtureAssignment <- unlist(lapply(1:genome$getGenomeSize(),  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples*0.1, geneIndex)})) \n",
         "expressionValues <- unlist(lapply(1:genome$getGenomeSize(), function(geneIndex){ \n",
         "  expressionCategory <- parameter$getSynthesisRateCategoryForMixture(mixtureAssignment[geneIndex]) \n",
-        "  parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(samples, geneIndex, expressionCategory) \n",
+        "  parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(samples*0.1, geneIndex, expressionCategory) \n",
         "})) \n",
         "expressionValues <- log10(expressionValues) \n",
         "obs.phi <- log10(read.table(\"", observed.phi.file, "\", sep=\",\", header=T)[, 2]) \n",
@@ -85,6 +85,18 @@ for (index in 1:number.of.runs) {
         "} \n",
         "legend(\"topleft\", legend = paste(\"Mixture Element\", 1:numMixtures), \n",
         "       col = ribModel:::.mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = \"n\") \n\n",
+        "mixprob <- do.call(\"rbind\", lapply(1:genome$getGenomeSize(), function(geneIndex){\n",
+        "  props <- parameter$getEstimatedMixtureAssignmentProbabilitiesForGene(samples*0.1, geneIndex)\n",
+        "  gene <- genome$getGeneByIndex(geneIndex, F)\n",
+        "  c(gene$id, props)\n",
+        "}))\n",
+        "plot(NULL, NULL, xlim = c(1, numMixtures), ylim = c(0, 1), xlab=\"Mixture Assignment\", ylab = \"Probability\")\n",
+        "for(k in 1:numMixtures){\n",
+        "  points(mixtureAssignment[mixtureAssignment == k], as.numeric(mixprob[mixtureAssignment == k, k+1]), col = ribModel:::.mixtureColors[k])\n",
+        "}\n",
+        "legend(\"bottomleft\", legend = paste(\"Mixture Element\", 1:numMixtures),\n",
+        "       col = ribModel:::.mixtureColors[1:numMixtures], pch = rep(1, numMixtures), bty = \"n\")\n\n",
+        "write.table(file=\"", paste(index, run.name, sep=""), ".csv\", x = mixprob, sep = \",\", row.names = F, quote = F, col.names = F)\n\n",
         "plot(parameter, what = \"Mutation\") \n",
         "plot(parameter, what = \"Selection\") \n",
         "dev.off() \n\n",
@@ -136,7 +148,7 @@ for (index in 1:number.of.runs) {
     qsubCommands <- paste(qsubCommands, "#$ -cwd \n", sep="")
     qsubCommands <- paste(qsubCommands, "#$ -M clandere@vols.utk.edu \n", sep="")
     qsubCommands <- paste(qsubCommands, "module load R/3.1.0 \n", sep="")
-    qsubCommands <- paste(qsubCommands, "R CMD BATCH ", index, run.name, ".R", sep="")
+    qsubCommands <- paste(qsubCommands, "R CMD BATCH ", index, run.name, ".R\n", sep="")
     
     qsubFile <- paste(index, run.name, ".sge", sep="")
     cat(qsubCommands, file=qsubFile, append=FALSE)
