@@ -536,7 +536,7 @@ int main()
 		{
 			if (i < 500) geneAssignment[i] = 0u;
 			else geneAssignment[i] = 1u;
-		}/*
+		}*/
 
 		/* For 1 mixture */
 		for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
