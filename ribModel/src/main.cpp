@@ -539,11 +539,7 @@ int main()
 			else if (i < 1418) geneAssignment[i] = 1u;
 			else geneAssignment[i] = 0u;
 		}
-<<<<<<< HEAD
 
-=======
-*/
->>>>>>> e0b4a5c670dc2e8845bea36b3000776e604a97e1
 
 		/* For 2 mixtures */
 		/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
@@ -551,21 +547,8 @@ int main()
 			if (i < 500) geneAssignment[i] = 0u;
 			else geneAssignment[i] = 1u;
 		}*/
-
-
-		/* For 1 mixture */
-		/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
-		{
-			geneAssignment[i] = 0u;
-<<<<<<< HEAD
-		}*/
-		unsigned numMixtures = 2;
-		std::vector<double> sphi_init(numMixtures, 1);
-=======
-		}
 		unsigned numMixtures = 1;
-		std::vector<double> sphi_init(numMixtures, 2);
->>>>>>> e0b4a5c670dc2e8845bea36b3000776e604a97e1
+		std::vector<double> sphi_init(numMixtures, 1);
 		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 		std::cout << "Done!------------------------\n\n\n";
 
