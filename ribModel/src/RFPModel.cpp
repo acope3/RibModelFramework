@@ -124,16 +124,29 @@ void RFPModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 
 void RFPModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration, std::vector <double> & logProbabilityRatio)
 {
-	double currentSphi = parameter -> getSphi(false);
-	double currentMPhi = -(currentSphi * currentSphi) / 2;
-	double lpr = 0.0; // this variable is only needed because OpenMP doesn't allow variables in reduction clause to be reference
-	double proposedSphi = parameter -> getSphi(true);
-	double proposedMPhi = -(proposedSphi * proposedSphi) / 2;
 
-	std::cout <<"curSphi: " << currentSphi <<"\n";
-	std::cout <<"curMphi: " << currentMPhi <<"\n";
-	std::cout <<"propSphi: " << proposedSphi <<"\n";
-	std::cout <<"PropMphi: " << proposedMPhi <<"\n";
+	double lpr = 0.0; // this variable is only needed because OpenMP doesn't allow variables in reduction clause to be reference
+
+	unsigned selectionCategory = getNumSynthesisRateCategories();
+	std::vector<double> currentSphi(selectionCategory, 0.0);
+	std::vector<double> currentMphi(selectionCategory, 0.0);
+	std::vector<double> proposedSphi(selectionCategory, 0.0);
+	std::vector<double> proposedMphi(selectionCategory, 0.0);
+	for(unsigned i = 0u; i < selectionCategory; i++)
+	{
+		currentSphi[i] = getSphi(i, false);
+		currentMphi[i] = -((currentSphi[i] * currentSphi[i]) / 2);
+		proposedSphi[i] = getSphi(i, true);
+		proposedMphi[i] = -((proposedSphi[i] * proposedSphi[i]) / 2);
+		// take the jacobian into account for the non-linear transformation from logN to N distribution
+		lpr -= (std::log(currentSphi[i]) - std::log(proposedSphi[i]));
+		// take prior into account
+		//TODO(Cedric): make sure you can control that prior from R
+		lpr -= Parameter::densityNorm(currentSphi[i], 1.0, 0.1, true) - Parameter::densityNorm(proposedSphi[i], 1.0, 0.1, true);
+	}
+
+
+
 
 	logProbabilityRatio.resize(1);
 #ifndef __APPLE__
@@ -145,14 +158,14 @@ void RFPModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 		mixture = getSynthesisRateCategory(mixture);
 		double phi = getSynthesisRate(i, mixture, false);
 		if (i == 0) {
-		std::cout <<"proposed: " << Parameter::densityLogNorm(phi, proposedMPhi, proposedSphi, false) <<"\n";
-		std::cout <<"current: " << Parameter::densityLogNorm(phi, currentMPhi, currentSphi, false) <<"\n";
+	//	std::cout <<"proposed: " << Parameter::densityLogNorm(phi, proposedMPhi[mixture], proposedSphi[mixture], false) <<"\n";
+		//std::cout <<"current: " << Parameter::densityLogNorm(phi, currentMPhi, currentSphi, false) <<"\n";
 		}
-		lpr += Parameter::densityLogNorm(phi, proposedMPhi, proposedSphi, true) - Parameter::densityLogNorm(phi, currentMPhi, currentSphi, true);
+		lpr += Parameter::densityLogNorm(phi, proposedMphi[mixture], proposedSphi[mixture], true) -
+				Parameter::densityLogNorm(phi, currentMphi[mixture], currentSphi[mixture], true);
 		//std::cout <<"LPR: " << lpr <<"\n";
 	}
 
-	lpr -= (std::log(currentSphi) - std::log(proposedSphi));
 	logProbabilityRatio[0] = lpr;
 }
 
