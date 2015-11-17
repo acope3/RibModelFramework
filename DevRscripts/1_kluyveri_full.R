@@ -24,10 +24,10 @@ parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssig
 #parameter$initSelectionCategories(c("../data/realGenomes/Skluyveri_selection_ChrA.csv", "../data/realGenomes/Skluyveri_selection_ChrCleft.csv") , 2)
 
 
-samples <- 1000
-thining <- 50
+samples <- 10
+thining <- 10
 adaptiveWidth <- 10
-divergence.iteration <- 30
+divergence.iteration <- 10
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE) 
 
 setRestartSettings(mcmc, paste(task.id, "_kluyveri_full_allUnique.rst", sep=""), adaptiveWidth*50, TRUE) 
