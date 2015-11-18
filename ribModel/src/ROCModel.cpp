@@ -94,7 +94,7 @@ void ROCModel::calculateCodonProbabilityVector(unsigned numCodons, double mutati
 
 	// if the min(selection) is less than zero than we have to adjust the reference codon.
 	// if the reference codon is the min value (0) than we do not have to adjust the reference codon.
-	// This is necessary to deal with very large phi values (> 10^4) and avoid  producing Inf which then
+	// This is necessary to deal with very large phi values (> 10^4) and avoid producing Inf which then
 	// causes the denominator to be Inf (Inf / Inf = NaN).
 	if(selection[minIndexVal] < 0.0)
 	{
@@ -194,33 +194,47 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 		likelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation_proposed, selection_proposed, phiValue);
 	}
 
+	likelihood_proposed = likelihood_proposed + calculateMutationPrior(grouping, true);
+	likelihood = likelihood + calculateMutationPrior(grouping, false);
 
-	double mutation_prior = calculateMutationPrior(grouping);
-	logAcceptanceRatioForAllMixtures = (likelihood_proposed - likelihood) - mutation_prior;
+	logAcceptanceRatioForAllMixtures = (likelihood_proposed - likelihood);
 }
 
-double ROCModel::calculateMutationPrior(std::string grouping)
+double ROCModel::calculateAllPriors()
+{
+	double priorRatio = 0.0;
+	unsigned size = getGroupListSize();
+
+	for(unsigned i = 0; i < size; i++)
+	{
+		std::string grouping = getGrouping(i);
+		priorRatio += calculateMutationPrior(grouping, false);
+	}
+
+	// add more priors if necessary.
+
+	return priorRatio;
+}
+
+double ROCModel::calculateMutationPrior(std::string grouping, bool proposed)
 {
 	unsigned numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
 	double mutation[5];
 	double mutation_proposed[5];
 
-	double curr = 0.0;
-	double prop = 0.0;
+	double priorValue = 0.0;
 
 	unsigned numMutCat = parameter->getNumMutationCategories();
 	double mutation_prior_sd = parameter->getMutationPriorStandardDeviation();
 	for(unsigned i = 0u; i < numMutCat; i++)
 	{
-		parameter->getParameterForCategory(i, ROCParameter::dM, grouping, false, mutation);
-		parameter->getParameterForCategory(i, ROCParameter::dM, grouping, true, mutation_proposed);
+		parameter->getParameterForCategory(i, ROCParameter::dM, grouping, proposed, mutation);
 		for(unsigned k = 0u; k < numCodons; k++)
 		{
-			curr += Parameter::densityNorm(mutation[k], 0.0, mutation_prior_sd, true);
-			prop += Parameter::densityNorm(mutation_proposed[k], 0.0, mutation_prior_sd, true);
+			priorValue += Parameter::densityNorm(mutation[k], 0.0, mutation_prior_sd, true);
 		}
 	}
-	return curr - prop;
+	return priorValue;
 }
 
 void ROCModel::obtainCodonCount(SequenceSummary& seqsum, std::string curAA, int codonCount[])
@@ -358,9 +372,10 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 		proposedMphi[i] = -((proposedSphi[i] * proposedSphi[i]) / 2);
 		// take the jacobian into account for the non-linear transformation from logN to N distribution
 		lpr -= (std::log(currentSphi[i]) - std::log(proposedSphi[i]));
+
 		// take prior into account
 		//TODO(Cedric): make sure you can control that prior from R
-		lpr -= Parameter::densityNorm(currentSphi[i], 1.0, 0.1, true) - Parameter::densityNorm(proposedSphi[i], 1.0, 0.1, true);
+		//lpr -= Parameter::densityNorm(currentSphi[i], 1.0, 0.1, true) - Parameter::densityNorm(proposedSphi[i], 1.0, 0.1, true);
 	}
 
 	if (withPhi) {

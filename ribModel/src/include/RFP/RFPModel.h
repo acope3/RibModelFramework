@@ -27,6 +27,8 @@ class RFPModel: public Model {
 				double& logAcceptanceRatioForAllMixtures);
 		virtual void calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration, std::vector <double> &logProbabilityRatio);
 
+		virtual double calculateAllPriors(){ return 0.0; } //TODO(Cedric): implement me, see ROCModel
+
 		//Other functions:
 		void setParameter(RFPParameter &_parameter);
 		virtual void simulateGenome(Genome &genome);

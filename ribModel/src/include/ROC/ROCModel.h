@@ -10,7 +10,7 @@ class ROCModel : public Model
 
 	ROCParameter *parameter;
 	virtual void obtainCodonCount(SequenceSummary& seqsum, std::string curAA, int codonCount[]);
-	double calculateMutationPrior(std::string grouping); // TODO add to FONSE as well? // cedric
+	double calculateMutationPrior(std::string grouping, bool proposed = false); // TODO add to FONSE as well? // cedric
 	double calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codonCount[], double mutation[], double selection[], double phiValue);
 	bool withPhi;
 
@@ -25,6 +25,7 @@ class ROCModel : public Model
 	virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures);
 	void simulateGenome(Genome &genome);
 	virtual void calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration, std::vector <double> &logProbabilityRatio);
+	virtual double calculateAllPriors();
 
 	virtual void updateGibbsSampledHyperParameters(Genome &genome);
 

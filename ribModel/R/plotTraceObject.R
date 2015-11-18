@@ -198,7 +198,7 @@ plotCodonSpecificParameters <- function(trace, mixture, type="mutation", main="M
            lty = rep(1, length(codons)), bty = "n", cex = 0.75)
   }
   par(opar)
-}
+} 
 
 plotExpressionTrace <- function(trace, geneIndex)
 {
@@ -207,7 +207,8 @@ plotExpressionTrace <- function(trace, geneIndex)
 
 plotExpectedPhiTrace <- function(trace)
 {
-  plot(trace$getExpectedPhiTrace( ), type="l", xlab = "Sample", ylab = expression("E["~phi~"]"), 
+  par(mar=c(5,5,4,2))
+  plot(trace$getExpectedPhiTrace()[-1], type="l", xlab = "Sample", ylab = expression(bar(phi)), 
        main = expression("Trace of the Expected value of "~phi))
   abline(h=1, col="red", lwd=1.5, lty=2)
 }
@@ -224,7 +225,7 @@ plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sep
     plot(NULL, NULL, type="l", xlab = "Sample", ylab = expression("s"[phi]), xlim  = xlimit, ylim = ylimit)
     for(i in 1:ncol(sphi))
     {
-      lines(sphi[,i], col= ribModel:::.mixtureColors[i])
+      lines(sphi[-1,i], col= ribModel:::.mixtureColors[i])
     }
     legend("topleft", legend = paste("Mixture Element", 1:numMixtures), 
            col = ribModel:::.mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")
@@ -239,7 +240,7 @@ plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sep
     plot(NULL, NULL, type="l", xlab = "Sample", ylab = expression("m"[phi]), xlim  = xlimit, ylim = ylimit)
     for(i in 1:ncol(mphi))
     {
-      lines(mphi[,i], col= ribModel:::.mixtureColors[i])
+      lines(mphi[-1,i], col= ribModel:::.mixtureColors[i])
     }
     legend("topleft", legend = paste("Mixture Element", 1:numMixtures), 
            col = ribModel:::.mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")    
@@ -254,7 +255,7 @@ plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sep
     plot(NULL, NULL, type="l", xlab = "Sample", ylab = expression("A"[phi]), xlim  = xlimit, ylim = ylimit)
     for(i in 1:ncol(aphi))
     {
-      lines(aphi[,i], col= ribModel:::.mixtureColors[i])
+      lines(aphi[-1,i], col= ribModel:::.mixtureColors[i])
     }
     legend("topleft", legend = paste("Observed Data", 1:numMixtures), 
            col = ribModel:::.mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")        
@@ -268,7 +269,7 @@ plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sep
     plot(NULL, NULL, type="l", xlab = "Sample", ylab = expression("s"[epsilon]), xlim  = xlimit, ylim = ylimit)
     for(i in 1:ncol(sepsilon))
     {
-      lines(sepsilon[,i], col= ribModel:::.mixtureColors[i])
+      lines(sepsilon[-1,i], col= ribModel:::.mixtureColors[i])
     }
     legend("topleft", legend = paste("Observed Data", 1:numMixtures), 
            col = ribModel:::.mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")  
@@ -283,7 +284,7 @@ plotMixtureProbability <- function(trace)
   plot(NULL, NULL, xlim = c(0, samples), ylim=c(0, 1), xlab = "Samples", ylab="Mixture Probability")
   for(i in 1:numMixtures)
   {
-    lines(trace$getMixtureProbabilitiesTraceForMixture(i), col= ribModel:::.mixtureColors[i])    
+    lines(trace$getMixtureProbabilitiesTraceForMixture(i)[-1], col= ribModel:::.mixtureColors[i])    
   }
   legend("topleft", legend = paste("Mixture Element", 1:numMixtures), 
          col = ribModel:::.mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")
