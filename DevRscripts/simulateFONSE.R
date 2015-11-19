@@ -3,9 +3,9 @@ rm(list=ls())
 
 genome <- initializeGenomeObject("../data/FONSE/genome_2000.fasta")
 mutation.file <- "../data/FONSE/S.cer.mut.ref.csv"
-selection.file <- "../data/FONSE/selection1ref.csv"
+selection.file <- "../data/FONSE/selection3ref.csv"
 phi.file <- "../data/FONSE/genome_2000.phi.csv"
-genome.out.file <- "../data/FONSE/fonse1.fasta"
+genome.out.file <- "../data/FONSE/fonse3.fasta"
 
 sphi_init <- 1.2
 numMixtures <- 1
