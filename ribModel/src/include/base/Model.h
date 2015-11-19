@@ -22,6 +22,7 @@ class Model
         		double& logAcceptanceRatioForAllMixtures) = 0;
 		virtual void calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration, std::vector <double> &logProbabilityRatio) = 0;
 
+		virtual double calculateAllPriors() = 0;
 
 		//Other functions:
 		virtual void simulateGenome(Genome &genome) =0;

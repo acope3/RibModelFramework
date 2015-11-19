@@ -267,7 +267,7 @@ void FONSEModel::simulateGenome(Genome & genome)
 			else
 			{
 				unsigned maxIndexVal = 0u;
-				for (int i = 1; i < (numCodons - 1); i++)
+				for (unsigned i = 1; i < (numCodons - 1); i++)
 				{
 					if (selection[maxIndexVal] < selection[i])
 					{

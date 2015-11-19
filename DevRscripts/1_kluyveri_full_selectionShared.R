@@ -1,6 +1,10 @@
 rm(list=ls()) 
 library(ribModel) 
-set.seed(2935642) 
+
+seeds <- read.table(file = "seed.txt")[,1]
+task.id <- Sys.getenv("SGE_TASK_ID")
+
+set.seed(seeds[task.id]) 
 with.phi <- FALSE
 
 if (with.phi) { 
@@ -15,23 +19,19 @@ mixDef <- "selectionShared"
 geneAssignment <- c(rep(1,961), rep(2,457), rep(1, 3903))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef) 
 
-phivals <- parameter$readPhiValues( "../data/realGenomes/Skluyveri_phi.csv")
-parameter$initializeSynthesisRateByList(phivals)
-parameter$initMutationCategories(c("../data/realGenomes/Skluyveri_mutation_ChrA.csv", "../data/realGenomes/Skluyveri_mutation_ChrCleft.csv") , 2)
-parameter$initSelectionCategories("../data/realGenomes/Skluyveri_selection_ChrA.csv" , 1)
+#phivals <- parameter$readPhiValues( "../data/realGenomes/Skluyveri_phi.csv")
+#parameter$initializeSynthesisRateByList(phivals)
+#parameter$initMutationCategories(c("../data/realGenomes/Skluyveri_mutation_ChrA.csv", "../data/realGenomes/Skluyveri_mutation_ChrCleft.csv") , 2)
+#parameter$initSelectionCategories("../data/realGenomes/Skluyveri_selection_ChrA.csv" , 1)
 
 
-samples <- 100
+samples <- 1000
 thining <- 50
-<<<<<<< HEAD
 adaptiveWidth <- 10
-=======
-adaptiveWidth <- 100
->>>>>>> e0b4a5c670dc2e8845bea36b3000776e604a97e1
-divergence.iteration <- 0
+divergence.iteration <- 30
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE) 
 
-setRestartSettings(mcmc, "1_kluyveri_full_selectionShared.rst", adaptiveWidth*50, TRUE) 
+setRestartSettings(mcmc, paste(task.id, "_kluyveri_full_selectionShared.rst", sep=""), adaptiveWidth*50, TRUE) 
 
 model <- initializeModelObject(parameter, "ROC", with.phi = with.phi) 
 
@@ -41,7 +41,7 @@ end <- Sys.time()
 end - start 
 
 
-pdf("1_kluyveri_full_global_selectionShared.pdf", width = 11, height = 12) 
+pdf(paste(task.id, "_kluyveri_full_global_selectionShared.pdf", sep=""), width = 11, height = 12) 
 plot(mcmc) 
 loglik.trace <- mcmc$getLogLikelihoodTrace() 
 acf(loglik.trace) 
@@ -85,18 +85,20 @@ for(k in 1:numMixtures){
 legend("bottomleft", legend = paste("Mixture Element", 1:numMixtures),
        col = ribModel:::.mixtureColors[1:numMixtures], pch = rep(1, numMixtures), bty = "n")
 
-write.table(file="1_kluyveri_full_selectionShared.csv", x = mixprob, sep = ",", row.names = F, quote = F, col.names = F)
+write.table(file=paste(task.id, "_kluyveri_full_selectionShared.csv", sep=""), x = mixprob, sep = ",", row.names = F, quote = F, col.names = F)
 
 gene.ids <- unlist(lapply(1:genome$getGenomeSize(), function(geneIndex){ 
   gene <- genome$getGeneByIndex(geneIndex, F)
   return(gene$id)
 })) 
 gene.obs.ids <- as.character(read.table("../data/realGenomes/Skluyveri_GSM552569.csv", sep=",", header=T)[, 1])
-gene.ids <- gene.ids[gene.ids %in% gene.obs.ids]
 mixtureAssignment <- mixtureAssignment[gene.ids %in% gene.obs.ids]
 expressionValues <- expressionValues[gene.ids %in% gene.obs.ids]
+gene.ids <- gene.ids[gene.ids %in% gene.obs.ids]
 mat <- cbind(gene.ids, expressionValues, mixtureAssignment)
-write.table(file="1_kluyveri_full_filtered_expression_selectionShared.csv", x = mat, sep=",", quote = F, row.names = F, col.names = F)
+
+
+write.table(file=paste(task.id, "_kluyveri_full_filtered_expression_selectionShared.csv", sep=""), x = mat, sep=",", quote = F, row.names = F, col.names = F)
 
 plot(parameter, what = "Mutation", samples = samples*0.1) 
 plot(parameter, what = "Selection", samples = samples*0.1) 
@@ -104,12 +106,12 @@ dev.off()
 
 observed.mutation <- c("../data/realGenomes/Skluyveri_mutation_ChrA.csv", "../data/realGenomes/Skluyveri_mutation_ChrCleft.csv")
 observed.selection <- c("../data/realGenomes/Skluyveri_selection_ChrA.csv", "../data/realGenomes/Skluyveri_selection_ChrCleft.csv")
-for(k in 1:numMixtures){ 
-   pdf(paste("1_kluyveri_full_mixture_", k, "_selectionShared_short.pdf", sep=""), width = 11, height = 12) 
+for(k in 1:numMixtures){
+   pdf(paste(task.id, "_kluyveri_full_mixture_", k, "_selectionShared.pdf", sep=""), width = 11, height = 12) 
    mixture <- k 
-   plot(trace, what = "Mutation", mixture = mixture) 
-   plot(trace, what = "Selection", mixture = mixture) 
-   plot(model, genome, parameter, samples = samples*0.1, mixture = mixture, main = "Codon Usage Plot") 
+   plot(trace, what = "Mutation", mixture = mixture)
+   plot(trace, what = "Selection", mixture = mixture)
+   plot(model, genome, parameter, samples = samples*0.1, mixture = mixture, main = "Codon Usage Plot")
    names.aa <- aminoAcids() 
    selection.ci <- c() 
    mutation.ci <- c() 

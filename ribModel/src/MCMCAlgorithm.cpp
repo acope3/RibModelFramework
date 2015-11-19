@@ -131,6 +131,10 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		unsigned mixAssign = model.getMixtureAssignment(i);
 		unsigned geneSynthCat = model.getSynthesisRateCategory(mixAssign);
 
+		// take all priors into account
+		double priorvalues = model.calculateAllPriors();
+
+
 //		unsigned mixtureAssignmentOfGene = model.getMixtureAssignment(i);
 		for(unsigned k = 0u; k < numSynthesisRateCategories; k++)
 		{
@@ -141,26 +145,12 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			{
 				model.updateSynthesisRate(i, k);
 				// only count each gene once, not numSynthesigeneIndexsRateCategories times
-				//#pragma omp critical
-				if(std::isinf(std::log(model.getCategoryProbability(k)) + propLogLike))
-				{
-					std::cout << "proposed\n";
-					std::cout <<"\t P: " << model.getCategoryProbability(k) << "\n";
-					std::cout <<"\t L: " << propLogLike << "\n";
-				}
 				if(geneSynthCat == k)
-					logLikelihood += std::log(model.getCategoryProbability(k)) + propLogLike;
+					logLikelihood += std::log(model.getCategoryProbability(k)) + propLogLike + priorvalues;
 			}else{
 				// only count each gene once, not numSynthesisRateCategories times
-				//#pragma omp critical
-				if(std::isinf(std::log(model.getCategoryProbability(k)) + currLogLike))
-				{
-					std::cout << "current\n";
-					std::cout <<"\t P: " << model.getCategoryProbability(k) << "\n";
-					std::cout <<"\t L: " << currLogLike << "\n";
-				}
 				if(geneSynthCat == k)
-					logLikelihood += std::log(model.getCategoryProbability(k)) + currLogLike;
+					logLikelihood += std::log(model.getCategoryProbability(k)) + currLogLike + priorvalues;
 			}
 		}
 

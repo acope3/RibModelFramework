@@ -3,11 +3,14 @@
 plot.Rcpp_MCMCAlgorithm <- function(mcmc, ...)
 {
   loglik.trace <- mcmc$getLogLikelihoodTrace()
+  
+  loglik.trace <- loglik.trace[-1]
+  
   trace.length <- length(loglik.trace)
   zoomStart <- round(0.9*trace.length)
   logL <- mean(loglik.trace[zoomStart:trace.length])
   #TODO change main title
-  plot(loglik.trace, type="l", main=paste("logL:", logL), xlab="Sample", ylab="log(Likelihood)")
+  plot(loglik.trace, type="l", main=paste("logPP:", logL), xlab="Sample", ylab="log(Posterior Probability)")
   grid (NULL,NULL, lty = 6, col = "cornsilk2")
   loglik.trace[loglik.trace == -Inf] <- NA
   
