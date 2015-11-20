@@ -1167,6 +1167,12 @@ std::string Parameter::getGrouping(unsigned index)
 	return groupList[index];
 }
 
+
+std::vector<std::string> Parameter::getGroupList()
+{
+	return groupList;
+}
+
 unsigned Parameter::getGroupListSize()
 {
 	return groupList.size();

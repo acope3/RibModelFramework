@@ -15,7 +15,7 @@ geneAssignment <- c(rep(1, genome$getGenomeSize()))
 parameter <- new(RFPParameter, "500KrestartFile.rst")
 
 # initialize MCMC object
-samples <- 100
+samples <- 10
 thining <- 10
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples=samples, thining=thining, adaptive.width=adaptiveWidth, 
@@ -36,7 +36,7 @@ system.time(
 
 # plots different aspects of trace
 trace <- parameter$getTraceObject()
-
+writeTraces(parameter, file="traces.Rdat")
 
 pdf("RFP_Genome_allUnique_startCSP_True_startPhi_true_adaptSphi_True.pdf")
 
@@ -148,4 +148,72 @@ m <- matrix(c(ids, phiList, phiList), ncol = 3, byrow = FALSE)
 colnames(m) <- c("Gene", "PhiValue", "PhiValue")
 write.table(m, "RFPPhiValues.csv", sep = ",", quote = F, row.names = F, col.names = T)
 
+
+# Write the traces for the run.
+
+
+# -------Sphi Traces ----------#
+sPhiTraces <- trace$getSphiTraces()
+m <- matrix(nrow = samples + 1, ncol = length(sPhiTraces), byrow = FALSE)
+colnames(m) <- c("Mixture 1") 
+for (i in 1:length(sPhiTraces)){
+  m[,i] <- sPhiTraces[[i]]
+}
+write.table(m, "SphiTraces.csv", sep = ",", quote = F, row.names = F, col.names = T)
+# -------End Sphi Traces ------#
+
+
+# -------Sphi Acceptance Ratio Trace -------#
+sphiAcceptRatTrace <- trace$getSphiAcceptanceRatioTrace()
+m <- matrix(nrow = 1, ncol = length(sphiAcceptRatTrace), byrow = FALSE)
+names <- paste(c(rep("sample", length(sphiAcceptRatTrace))), 1:length(sphiAcceptRatTrace))
+colnames(m) <- names
+m[1,] <- sphiAcceptRatTrace
+write.table(m, "SphiAcceptanceRatioTrace.csv", sep = ",", quote = F, row.names = F, col.names = T)
+# -------End Sphi Acceptance Raiot Trace ------#
+
+
+# -------Synthesis Rate Trace ----------#
+synthRateTrace <- trace$getSynthesisRateTrace()
+for (cat in 1:length(synthRateTrace)){
+  m <- matrix(nrow = samples+1, ncol = length(synthRateTrace[[cat]]), byrow = FALSE)
+  names <- paste(c(rep("gene", length(synthRateTrace[[cat]]))), 1:length(synthRateTrace[[cat]]))
+  colnames(m) <- names
+  for (i in 1:length(synthRateTrace[[cat]])){
+    m[,i] <- synthRateTrace[[cat]][[i]]
+  }
+  fileName <- paste("SynthesisRateTrace_ExpressionCategory", cat, "csv", sep = ".")
+  write.table(m, file = fileName, sep = ",", quote = F, row.names = F, col.names = T)
+}
+# -------End Synthesis Rate Trace ------#
+
+
+# ---------Synthesis Acceptance Ratio Trace ---------#
+synthAcceptRatTrace <- trace$getSynthesisRateAcceptanceRatioTrace()
+for (cat in 1:length(synthAcceptRatTrace)){
+  m <- matrix(nrow = length(synthAcceptRatTrace), ncol = length(synthAcceptRatTrace[[cat]]), byrow = FALSE)
+  names <- paste(c(rep("gene", length(synthAcceptRatTrace[[cat]]))), 1:length(synthAcceptRatTrace[[cat]]))
+  colnames(m) <- names
+  for (i in 1:length(synthAcceptRatTrace[[cat]])){
+    m[,i] <- synthAcceptRatTrace[[cat]][[i]]
+  }
+  fileName <- paste("SynthesisRateAcceptanceRatioTrace_ExpressionCategory", cat, "csv", sep = ".")
+  write.table(m, file = fileName, sep = ",", quote = F, row.names = F, col.names = T)
+}
+# ---------End Synthesis Acceptance Ratio Trace --------#
+
+
+# --------- Mixture Assignment Trace -------#
+
+mixAssignTrace <- trace$getmixtureP
+
+# --------- End Mixture Assignment Trace -------#
+groupList <- parameter$getGroupList()
+m <- matrix(nrow = samples + 1, ncol = length(groupList))
+
+colnames(m) <- c(groupList)
+for (codon in groupList){
+  tmp <- trace$getAlphaParameterTraceByMixtureElementForCodon(1, codon)
+  m[,codon] <- tmp
+}
 

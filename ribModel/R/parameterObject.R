@@ -341,3 +341,27 @@ split.matrix <- function(M, r, c)
   
   return(lapply(1:N, function(i) matrix(cv[[i]], nrow = r)))
 } 
+
+
+
+writeTraces <- function(parameter, file)
+{
+  UseMethod("writeTraces", parameter)
+}
+
+writeTraces.Rcpp_RFPParameter <- function(parameter, file)
+{
+  trace <- parameter$getTraceObject()
+  sPhiTraces <- trace$getSphiTraces()
+  sphiAcceptRatTrace <- trace$getSphiAcceptanceRatioTrace()
+  synthRateTrace <- trace$getSynthesisRateTrace()
+  synthAcceptRatTrace <- trace$getSynthesisRateAcceptanceRatioTrace()
+  mixAssignTrace <- trace$getMixutreAssignmentTrace()
+  mixProbTrace <- trace$getMixtureProbabilitiesTrace()
+  cspAcceptRatTrace <- trace$getCspAcceptanceRatioTrace()
+  alphaTrace <- trace$getAlphaParameterTrace()
+  lambdaPrimeTrace <- trace$getLambdaPrimeParameterTrace()
+  save(list = c("sPhiTraces", "sphiAcceptRatTrace", "synthRateTrace", "synthAcceptRatTrace", 
+               "mixAssignTrace", "mixProbTrace", "cspAcceptRatTrace", "alphaTrace", "lambdaPrimeTrace"),
+       file=file)
+}

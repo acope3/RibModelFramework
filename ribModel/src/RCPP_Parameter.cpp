@@ -34,7 +34,7 @@ RCPP_MODULE(Parameter_mod)
 		.method("getCurrentSynthesisRateForMixture", &Parameter::getCurrentSynthesisRateForMixture)
 		.method("getMixtureAssignmentForGene", &Parameter::getMixtureAssignmentForGeneR)
 		.method("getLastIteration", &Parameter::getLastIteration)
-		
+		.method("getGroupList", &Parameter::getGroupList)		
 
 		.property("numMutationCategories", &Parameter::getNumMutationCategories)
 		.property("numSelectionCategories", &Parameter::getNumSelectionCategories)
