@@ -72,6 +72,18 @@ std::vector<double> RFPTrace::getLambdaPrimeParameterTraceByMixtureElementForCod
 }
 
 
+std::vector<std::vector<std::vector<double>>> RFPTrace::getAlphaParameterTrace()
+{
+	return alphaParameterTrace;
+}
+
+
+std::vector<std::vector<std::vector<double>>> RFPTrace::getLambdaPrimeParameterTrace()
+{
+	return lambdaPrimeParameterTrace;
+}
+
+
 void RFPTrace::updateCodonSpecificParameterTrace(unsigned sample, std::string codon, std::vector<std::vector<double>> &curAlpParam, std::vector<std::vector<double>> &curLmPriParam)
 {
     unsigned i = SequenceSummary::codonToIndex(codon);

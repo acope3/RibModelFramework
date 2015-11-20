@@ -255,6 +255,7 @@ class Parameter {
 		std::vector<double> getCurrentSynthesisRateForMixture(unsigned mixture);
 		void setGroupList(std::vector<std::string> gl);
 		std::string getGrouping(unsigned index);
+		std::vector<std::string> getGroupList();
 		unsigned getGroupListSize();
 
 		void setLastIteration(unsigned iteration) { lastIteration = iteration; }
