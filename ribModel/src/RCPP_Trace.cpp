@@ -15,14 +15,19 @@ RCPP_MODULE(Trace_mod)
     //.method("getAPhiTrace", &Trace::getAPhiTrace)
     .method("getSphiAcceptanceRatioTrace", &Trace::getSphiAcceptanceRatioTrace)
     .method("getCspAcceptanceRatioTraceForAA", &Trace::getCspAcceptanceRatioTraceForAA)
+    .method("getCspAcceptanceRatioTrace", &Trace::getCspAcceptanceRatioTrace)
 
 
     //These methods have specific R wrappers
     .method("getSynthesisRateAcceptanceRatioTraceByMixtureElementForGene", &Trace::getSynthesisRateAcceptanceRatioTraceByMixtureElementForGeneR)
+    .method("getSynthesisRateAcceptanceRatioTrace", &Trace::getSynthesisRateAcceptanceRatioTrace)
     .method("getSynthesisRateTraceForGene", &Trace::getSynthesisRateTraceForGeneR)
     .method("getSynthesisRateTraceByMixtureElementForGene", &Trace::getSynthesisRateTraceByMixtureElementForGeneR)
+    .method("getSynthesisRateTrace", &Trace::getSynthesisRateTrace)
     .method("getMixtureAssignmentTraceForGene", &Trace::getMixtureAssignmentTraceForGeneR)
     .method("getMixtureProbabilitiesTraceForMixture", &Trace::getMixtureProbabilitiesTraceForMixtureR)
+    .method("getMixutreAssignmentTrace", &Trace::getMixtureAssignmentTrace)
+    .method("getMixtureProbabilitiesTrace", &Trace::getMixtureProbabilitiesTrace)
     .method("getExpectedPhiTrace", &Trace::getExpectedPhiTrace)
     .method("getNumberOfMixtures", &Trace::getNumberOfMixtures)
     ;
@@ -40,7 +45,9 @@ RCPP_MODULE(Trace_mod)
 	class_<RFPTrace>("RFPTrace")
 		.derives<Trace>("Trace")
 		.method("getAlphaParameterTraceByMixtureElementForCodon", &RFPTrace::getAlphaParameterTraceByMixtureElementForCodonR)
+		.method("getAlphaParameterTrace", &RFPTrace::getAlphaParameterTrace)
 		.method("getLambdaPrimeParameterTraceByMixtureElementForCodon", &RFPTrace::getLambdaPrimeParameterTraceByMixtureElementForCodonR)
+		.method("getLambdaPrimeParameterTrace", &RFPTrace::getLambdaPrimeParameterTrace)
 		;
 
 	class_<FONSETrace>("FONSETrace")

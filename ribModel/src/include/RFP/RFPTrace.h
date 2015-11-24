@@ -25,6 +25,9 @@ class RFPTrace: public Trace {
 		std::vector<double> getAlphaParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon);
 		std::vector<double> getLambdaPrimeParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon);
 
+		std::vector<std::vector<std::vector<double>>> getAlphaParameterTrace();
+		std::vector<std::vector<std::vector<double>>> getLambdaPrimeParameterTrace();
+
 		unsigned getAlphaCategory(unsigned mixtureElement)
 		{	return categories->at(mixtureElement).delM;}
 		unsigned getLambdaPrimeCategory(unsigned mixtureElement)

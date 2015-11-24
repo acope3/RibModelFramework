@@ -137,6 +137,12 @@ std::vector<double> Trace::getSynthesisRateAcceptanceRatioTraceByMixtureElementF
 }
 
 
+std::vector<std::vector<std::vector <double>>> Trace::getSynthesisRateAcceptanceRatioTrace()
+{
+	return synthesisRateAcceptanceRatioTrace;
+}
+
+
 std::vector<double> Trace::getCspAcceptanceRatioTraceForAA(std::string aa)
 {
 	aa[0] = (char) std::toupper(aa[0]);
@@ -144,6 +150,11 @@ std::vector<double> Trace::getCspAcceptanceRatioTraceForAA(std::string aa)
 	return cspAcceptanceRatioTrace[aaIndex];
 }
 
+
+std::vector<std::vector<std::vector<double>>> Trace::getSynthesisRateTrace()
+{
+	return synthesisRateTrace;
+}
 
 std::vector<double> Trace::getSynthesisRateTraceForGene(unsigned geneIndex)
 {
@@ -190,6 +201,19 @@ void Trace::updateMixtureProbabilitiesTrace(unsigned samples, std::vector<double
 	}
 }
 
+
+std::vector<std::vector<unsigned>> Trace::getMixtureAssignmentTrace()
+{
+	return mixtureAssignmentTrace;
+}
+std::vector<std::vector<double>> Trace::getMixtureProbabilitiesTrace()
+{
+	return mixtureProbabilitiesTrace;
+}
+std::vector<std::vector<double>> Trace::getCspAcceptanceRatioTrace()
+{
+	return cspAcceptanceRatioTrace;
+}
 //----------------------------------------------------
 //----------------------R WRAPPERS--------------------
 //----------------------------------------------------

@@ -41,7 +41,9 @@ class Trace {
 		std::vector<double> getExpectedPhiTrace();
 		std::vector<double> getSphiAcceptanceRatioTrace()
 		{	return sphiAcceptanceRatioTrace;}
+		std::vector<std::vector<std::vector<double>>> getSynthesisRateTrace();
 		std::vector<double> getSynthesisRateAcceptanceRatioTraceByMixtureElementForGene(unsigned mixtureElement, unsigned geneIndex);
+		std::vector<std::vector<std::vector<double>>> getSynthesisRateAcceptanceRatioTrace();
 		std::vector<double> getCspAcceptanceRatioTraceForAA(std::string aa);
 		std::vector<double> getSynthesisRateTraceForGene(unsigned geneIndex); //will build the trace appropriately based on what cat you are in
 		std::vector<double> getSynthesisRateTraceByMixtureElementForGene(unsigned mixtureElement, unsigned geneIndex);
@@ -49,6 +51,10 @@ class Trace {
 		{	return mixtureAssignmentTrace[geneIndex];}
 		std::vector<double> getMixtureProbabilitiesTraceForMixture(unsigned mixtureIndex)
 		{	return mixtureProbabilitiesTrace[mixtureIndex];}
+
+		std::vector<std::vector<unsigned>> getMixtureAssignmentTrace();
+		std::vector<std::vector<double>> getMixtureProbabilitiesTrace();
+		std::vector<std::vector<double>> getCspAcceptanceRatioTrace();
 
 		unsigned getSynthesisRateCategory(unsigned mixtureElement)
 		{	return categories->at(mixtureElement).delEta;}
