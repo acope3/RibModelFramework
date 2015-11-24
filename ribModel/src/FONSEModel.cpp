@@ -233,6 +233,7 @@ void FONSEModel::simulateGenome(Genome & genome)
 
 	for (unsigned geneIndex = 0; geneIndex < genome.getGenomeSize(); geneIndex++) //loop over all genes in the genome
 	{
+		std::cout << "Simulating Gene " << geneIndex << std::endl;
 		Gene gene = genome.getGene(geneIndex);
 		SequenceSummary seqSum = gene.geneData;
 		std::string tmpSeq = "ATG"; //Always will have the start amino acid
@@ -248,18 +249,18 @@ void FONSEModel::simulateGenome(Genome & genome)
 		for (unsigned position = 1; position < (geneSeq.size() / 3); position++)
 		{
 			std::string codon = geneSeq.substr((position * 3), 3);
-			std::string aa = SequenceSummary::codonToAA(codon);
+			curAA = SequenceSummary::codonToAA(codon);
 
-			if (aa == "X") continue;
+			if (curAA == "X") continue;
 
-			unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa);
+			unsigned numCodons = SequenceSummary::GetNumCodonsForAA(curAA);
 
 			double* codonProb = new double[numCodons](); //size the arrays to the proper size based on # of codons.
 			double* mutation = new double[numCodons - 1]();
 			double* selection = new double[numCodons - 1]();
 
 
-			if (aa == "M" || aa == "W")
+			if (curAA == "M" || curAA == "W")
 			{
 				codonProb[0] = 1;
 			}
