@@ -300,7 +300,6 @@ void ROCModel::printHyperParameters()
 void ROCModel::simulateGenome(Genome &genome)
 {
 	unsigned codonIndex;
-    std::string curAA;
 
 	std::string tmpDesc = "Simulated Gene";
 
@@ -338,14 +337,14 @@ void ROCModel::simulateGenome(Genome &genome)
 			}
 			else
 			{
-				getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
-				getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
+				getParameterForCategory(mutationCategory, ROCParameter::dM, aa, false, mutation);
+				getParameterForCategory(selectionCategory, ROCParameter::dEta, aa, false, selection);
 				calculateCodonProbabilityVector(numCodons, mutation, selection, phi, codonProb);
 			}
 
 
 			codonIndex = Parameter::randMultinom(codonProb, numCodons);
-			std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(curAA); //need the first spot in the array where the codons for curAA are
+			std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(aa); //need the first spot in the array where the codons for curAA are
 			codon = seqSum.indexToCodon(aaRange[0] + codonIndex);//get the correct codon based off codonIndex
 			tmpSeq += codon;
 	 	}
