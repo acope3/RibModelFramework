@@ -300,6 +300,34 @@ void simulateROCData()
 	genome.writeFasta("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/SimulatedROCData.fasta", true);
 }
 
+void simulateFONSEData()
+{
+	Genome genome;
+	//genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_chromosomeA.fasta");
+	genome.readFasta("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/data/FONSE/genome_2000.fasta");
+
+	std::vector<unsigned> geneAssignment(genome.getGenomeSize(), 0);
+	unsigned numMixtures = 1;
+	std::vector<double> sphi_init(numMixtures, 1.2);
+	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
+
+	FONSEParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, Parameter::allUnique);
+	std::vector <std::string> file(1, "C:/Users/Jeremy/Documents/GitHub/ribModelFramework/data/FONSE/S.cer.mut.csv");
+	tmp.initMutationSelectionCategories(file, 1, FONSEParameter::dM);
+	file.resize(1, "C:/Users/Jeremy/Documents/GitHub/RibModelFramework/data/FONSE/selection2ref.csv");
+	tmp.initMutationSelectionCategories(file, 1, FONSEParameter::dOmega);
+	FONSEModel model;
+
+	model.setParameter(tmp);
+
+	std::cout << "init done\n";
+
+	model.simulateGenome(genome);
+
+	//genome.writeFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/SimulatedROCData.fasta", true);
+	genome.writeFasta("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/data/FONSE/test.fasta", true);
+}
+
 
 
 
@@ -441,7 +469,7 @@ int main()
 	User user = gabe;
 	ModelToRun modelToRun = RFP;
 	bool read = false;
-	bool testing = false;
+	bool testing = true;
 	bool withPhi = false;
 	if (testing)
 	{
@@ -452,11 +480,12 @@ int main()
 		//testThetaKMatrix();
 		//testCovMatrixOverloading();
 		//testWriteRestartFile();
-		testInitFromRestartFile();
+		//testInitFromRestartFile();
 		//testReadRFPFile();
 		//testReadObservedPhis();
 		//simulateRFPData();
 	//	simulateROCData();
+		simulateFONSEData();
 		//testInitMutationSelection();
 		//testRFPVarianceAndMean();
 		//testReadMutationValues();

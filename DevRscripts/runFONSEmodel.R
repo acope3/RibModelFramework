@@ -1,8 +1,10 @@
 library(ribModel)
 rm(list=ls())
 #read genome
-genome <- initializeGenomeObject(file = "../data/singleMixture/simulatedOneMix.fasta")
+
+#genome <- initializeGenomeObject(file = "../data/singleMixture/simulatedOneMix.fasta")
 #genome <- initializeGenomeObject(file = "../ribModel/data/realGenomes/s288c.genome.fasta")
+genome <- initializeGenomeObject(file = "../data/FONSE/fonse2.fasta")
 
 #initialize parameter object
 sphi_init <- 2
@@ -13,7 +15,7 @@ mixDef <- "allUnique"
 #geneAssignment <- c(rep(1,448), rep(2,457))
 #geneAssignment <- c(rep(1,500), rep(2,500))
 geneAssignment <- rep(1,length(genome))
-parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, model= "FONSE", split.serine = TRUE,
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, model="FONSE", split.serine = TRUE,
                                        mixture.definition = mixDef)
 
 # initialize MCMC object
@@ -32,7 +34,7 @@ system.time(
 )
 
 #plots log likelihood trace, possibly other mcmc diagnostics in the future
-pdf("simulatedOneMixMCMC.pdf")
+pdf("Fonse3MCMC.pdf")
 plot(mcmc)
 loglik.trace <- mcmc$getLogLikelihoodTrace()
 acf(loglik.trace)
@@ -49,7 +51,7 @@ expressionValues <- unlist(lapply(1:genome$getGenomeSize(), function(geneIndex){
   parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(samples, geneIndex, expressionCategory)
 }))
 expressionValues <- log10(expressionValues)
-obs.phi <- log10(read.table("../data/singleMixture/simulatedOneMix_phi.csv", sep=",", header=T)[, 2])
+obs.phi <- log10(read.table("../data/FONSE/genome_2000.phi.csv", sep=",", header=T)[, 2])
 plot(NULL, NULL, xlim=range(expressionValues, na.rm = T) + c(-0.1, 0.1), ylim=range(obs.phi) + c(-0.1, 0.1), 
      main = "Synthesis Rate", xlab = "true values", ylab = "estimated values")
 upper.panel.plot(obs.phi[mixtureAssignment == 1], expressionValues[mixtureAssignment == 1], col="black")
@@ -64,7 +66,7 @@ dev.off()
 
 #plot(trace, what = "Expression", geneIndex = 999, mixture = 2)
 
-pdf("simulatedOneMixCSP.pdf", width = 11, height = 12)
+pdf("Fonse3CSP.pdf", width = 11, height = 12)
 mixture <- 1
 plot(trace, what = "Mutation", mixture = mixture)
 plot(trace, what = "Selection", mixture = mixture)
@@ -76,8 +78,8 @@ names.aa <- aminoAcids()
 selection <- c()
 mutation <- c()
 #csp <- read.table("../ribModel/data/simulated_CSP0.csv", sep=",", header=T)
-mut <- read.table("../data/singleMixture/simulatedOneMix_mutation.csv", sep=",", header=TRUE)
-sel <- read.table("../data/singleMixture/simulatedOneMix_selection.csv", sep=",", header=TRUE)
+mut <- read.table("../data/FONSE/S.cer.mut.ref.csv", sep=",", header=TRUE)
+sel <- read.table("../data/FONSE/selection3ref.csv", sep=",", header=TRUE)
 #idx.eta <- grepl(pattern = "[A-Z].[A-Z]{3}.Delta.eta", x = as.character(csp[,1]))
 #idx.mu <- grepl(pattern = "[A-Z].[A-Z]{3}.log.mu", x = as.character(csp[,1]))
 for(aa in names.aa)
