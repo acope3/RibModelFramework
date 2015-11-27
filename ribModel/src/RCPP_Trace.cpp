@@ -37,8 +37,11 @@ RCPP_MODULE(Trace_mod)
     //These methods have specific R wrappers
     .method("getMutationParameterTraceByMixtureElementForCodon", &ROCTrace::getMutationParameterTraceByMixtureElementForCodonR)
     .method("getSelectionParameterTraceByMixtureElementForCodon", &ROCTrace::getSelectionParameterTraceByMixtureElementForCodonR)
+    .method("getMutationParameterTrace", &ROCTrace::getMutationParameterTrace)
+    .method("getSelectionParameterTrace", &ROCTrace::getSelectionParameterTrace)
+    .method("getAphiAcceptanceRatioTrace", &ROCTrace::getAphiAcceptanceRatioTrace)
 	.method("getAphiTraces", &ROCTrace::getAphiTraceR)
-	.method("getAphiAcceptanceRatioTrace", &ROCTrace::getAphiAcceptanceRatioTrace)
+	.method("getAphiAcceptanceRatioTraceForIndex", &ROCTrace::getAphiAcceptanceRatioTraceForIndex)
 	.method("getSepsilonTraces", &ROCTrace::getSepsilonTraceR)
     ;
 
@@ -52,6 +55,9 @@ RCPP_MODULE(Trace_mod)
 
 	class_<FONSETrace>("FONSETrace")
 		.derives<Trace>("Trace")
+
+		.method("getMutationParameterTrace", &FONSETrace::getMutationParameterTrace)
+		.method("getSelectionParameterTrace", &FONSETrace::getSelectionParameterTrace)
 		//These methods have specific R wrappers
 		.method("getMutationParameterTraceByMixtureElementForCodon", &FONSETrace::getMutationParameterTraceByMixtureElementForCodonR)
 		.method("getSelectionParameterTraceByMixtureElementForCodon", &FONSETrace::getSelectionParameterTraceByMixtureElementForCodonR)
