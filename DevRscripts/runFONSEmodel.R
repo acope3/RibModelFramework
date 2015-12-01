@@ -2,12 +2,13 @@ library(ribModel)
 rm(list=ls())
 #read genome
 
+from.good.values <- TRUE
 #genome <- initializeGenomeObject(file = "../data/singleMixture/simulatedOneMix.fasta")
 #genome <- initializeGenomeObject(file = "../ribModel/data/realGenomes/s288c.genome.fasta")
-genome <- initializeGenomeObject(file = "../data/FONSE/fonse2.fasta")
+genome <- initializeGenomeObject(file = "../data/FONSE/fonse3.fasta")
 
 #initialize parameter object
-sphi_init <- 2
+sphi_init <- 1.2
 numMixtures <- 1
 mixDef <- "allUnique"
 #geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457), rep(1, 3903))
@@ -20,17 +21,27 @@ parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssig
 
 # initialize MCMC object
 samples <- 100
-thining <- 10
+thining <- 1
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples=samples, thining=thining, adaptive.width=adaptiveWidth, 
                              est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
 # get model object
 model <- initializeModelObject(parameter, "FONSE")
 
+if(from.good.values) {
+  parameter$initMutationSelectionCategories("../data/FONSE/S.cer.mut.ref.csv", 1, "Mutation")
+  parameter$initMutationSelectionCategories("../data/FONSE/selection3ref.csv", 1, "Selection")
+  
+  phi <- read.table("../data/FONSE/genome_2000.phi.csv", header = T, sep = ",")
+  phi.values <- phi[,2]
+  
+  parameter$initializeSynthesisRateByList(phi.values)
+}
+
 setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth, TRUE)
 #run mcmc on genome with parameter using model
 system.time(
-  runMCMC(mcmc, genome, model, 8)
+  runMCMC(mcmc, genome, model, 4)
 )
 
 #plots log likelihood trace, possibly other mcmc diagnostics in the future
@@ -59,8 +70,8 @@ cat(length(obs.phi[mixtureAssignment == 1]), " ", length(expressionValues[mixtur
 legend("topleft", legend = paste("Mixture Element", 1:numMixtures), 
        col = ribModel:::.mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")
 
-plot(parameter, what = "Mutation")
-plot(parameter, what = "Selection")
+#plot(parameter, what = "Mutation")
+#plot(parameter, what = "Selection")
 dev.off()
 
 
@@ -70,16 +81,16 @@ pdf("Fonse3CSP.pdf", width = 11, height = 12)
 mixture <- 1
 plot(trace, what = "Mutation", mixture = mixture)
 plot(trace, what = "Selection", mixture = mixture)
-
+#dev.off()
 # plots model fit (cub plot)
-plot(model, genome, parameter, samples = samples*0.1, mixture = mixture, main = "Codon Usage Plot")
+#plot(model, genome, parameter, samples = samples*0.1, mixture = mixture, main = "Codon Usage Plot")
 
 names.aa <- aminoAcids()
 selection <- c()
 mutation <- c()
 #csp <- read.table("../ribModel/data/simulated_CSP0.csv", sep=",", header=T)
-mut <- read.table("../data/FONSE/S.cer.mut.ref.csv", sep=",", header=TRUE)
-sel <- read.table("../data/FONSE/selection3ref.csv", sep=",", header=TRUE)
+mut <- read.table("../data/FONSE/S.cer.mut.ref.csv", sep=",", header=FALSE)
+sel <- read.table("../data/FONSE/selection3ref.csv", sep=",", header=FALSE)
 #idx.eta <- grepl(pattern = "[A-Z].[A-Z]{3}.Delta.eta", x = as.character(csp[,1]))
 #idx.mu <- grepl(pattern = "[A-Z].[A-Z]{3}.log.mu", x = as.character(csp[,1]))
 for(aa in names.aa)
