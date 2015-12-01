@@ -18,6 +18,7 @@ class MCMCAlgorithm
 		bool estimateSynthesisRate;
 		bool estimateCodonSpecificParameter;
 		bool estimateHyperParameter;
+		bool estimateMixtureAssignment;
 		bool writeRestartFile;
 		std::vector<double> likelihoodTrace;
 		std::vector<double> tmp;
@@ -43,10 +44,12 @@ class MCMCAlgorithm
 		bool isEstimateSynthesisRate() {return estimateSynthesisRate;}
 		bool isEstimateCodonSpecificParameter() {return estimateCodonSpecificParameter;}
 		bool isEstimateHyperParameter() {return estimateHyperParameter;}
+		bool isEstimateMixtureAssignment() {return estimateMixtureAssignment;}
 
 		void setEstimateSynthesisRate(bool in) {estimateSynthesisRate = in;}
 		void setEstimateCodonSpecificParameter(bool in) {estimateCodonSpecificParameter = in;}
 		void setEstimateHyperParameter(bool in) {estimateHyperParameter = in;}
+		void setEstimateMixtureAssignment(bool in) {estimateMixtureAssignment = in;}
 
 		void setRestartFileSettings(std::string filename, unsigned interval, bool multiple);
 

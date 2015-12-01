@@ -28,6 +28,8 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * 
 	multipleFiles = false;
 	fileWriteInterval = 1u;
 	lastConvergenceTest = 0u;
+
+	estimateMixtureAssignment = true;
 }
 
 MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thining, unsigned _adaptiveWidth, bool _estimateSynthesisRate, bool _estimateCodonSpecificParameter, bool _estimateHyperParameter)
@@ -39,6 +41,8 @@ MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thining, unsigned _ada
 	multipleFiles = false;
 	fileWriteInterval = 1u;
 	lastConvergenceTest = 0u;
+
+	estimateMixtureAssignment = true;
 }
 
 MCMCAlgorithm::~MCMCAlgorithm()
@@ -131,9 +135,6 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		unsigned mixAssign = model.getMixtureAssignment(i);
 		unsigned geneSynthCat = model.getSynthesisRateCategory(mixAssign);
 
-		// take all priors into account
-		double priorvalues = model.calculateAllPriors();
-
 
 //		unsigned mixtureAssignmentOfGene = model.getMixtureAssignment(i);
 		for(unsigned k = 0u; k < numSynthesisRateCategories; k++)
@@ -146,11 +147,11 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				model.updateSynthesisRate(i, k);
 				// only count each gene once, not numSynthesigeneIndexsRateCategories times
 				if(geneSynthCat == k)
-					logLikelihood += std::log(model.getCategoryProbability(k)) + propLogLike + priorvalues;
+					logLikelihood += std::log(model.getCategoryProbability(k)) + propLogLike;
 			}else{
 				// only count each gene once, not numSynthesisRateCategories times
 				if(geneSynthCat == k)
-					logLikelihood += std::log(model.getCategoryProbability(k)) + currLogLike + priorvalues;
+					logLikelihood += std::log(model.getCategoryProbability(k)) + currLogLike;
 			}
 		}
 
@@ -179,7 +180,11 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		// Get category in which the gene is placed in.
 		// If we use multiple sequence observation (like different mutants) randMultinom needs an parameter N to place N observations in numMixture buckets
 		unsigned categoryOfGene = Parameter::randMultinom(probabilities, numMixtures);
-		model.setMixtureAssignment(i, categoryOfGene);
+		if(estimateMixtureAssignment)
+		{
+			model.setMixtureAssignment(i, categoryOfGene);
+		}
+
 		dirichletParameters[categoryOfGene] += 1;
 		if((iteration % thining) == 0)
 		{
@@ -191,6 +196,10 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		delete [] unscaledLogProb_prop;
 		delete [] unscaledLogProb_curr;
 	}
+
+	// take all priors into account
+	logLikelihood += model.calculateAllPriors();
+
 	double *newMixtureProbabilities = new double[numMixtures]();
 	Parameter::randDirichlet(dirichletParameters, numMixtures, newMixtureProbabilities);
 	for(unsigned k = 0u; k < numMixtures; k++)
@@ -652,6 +661,7 @@ RCPP_MODULE(MCMCAlgorithm_mod)
 		.method("getLogLikelihoodTrace", &MCMCAlgorithm::getLogLikelihoodTrace)
 		.method("getLogLikelihoodPosteriorMean", &MCMCAlgorithm::getLogLikelihoodPosteriorMean)
 		.method("setRestartFileSettings", &MCMCAlgorithm::setRestartFileSettings)
+		.method("setEstimateMixtureAssignment", &MCMCAlgorithm::setEstimateMixtureAssignment)
 		;
 
 	Rcpp::function("TestACF", &MCMCAlgorithm::acf); //TEST THAT ONLY!
