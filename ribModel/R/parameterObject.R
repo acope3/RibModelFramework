@@ -370,9 +370,9 @@ extractBaseInfo <- function(parameter)
                     synthAcceptRatTrace = synthAcceptRatTrace,
                     mixAssignTrace = mixAssignTrace,
                     mixProbTrace = mixProbTrace,
-                    cspAcceptRatTrace = cspAcceptRatTrace
-                    numMix = numMix
-                    numMut = numMut
+                    cspAcceptRatTrace = cspAcceptRatTrace,
+                    numMix = numMix,
+                    numMut = numMut,
                     numSel = numSel
                     )
   return(varList)
@@ -380,13 +380,16 @@ extractBaseInfo <- function(parameter)
 
 writeParameterObject.Rcpp_RFPParameter <- function(parameter, file)
 {
-  rv <- extractBaseInfo(parameter)
+  paramBase <- extractBaseInfo(parameter)
   alphaTrace <- trace$getAlphaParameterTrace()
   lambdaPrimeTrace <- trace$getLambdaPrimeParameterTrace()
-  loglikeTrace <- mcmc$getLogLikelihoodTrace()
-  save(list = c("rv$sPhiTraces", "rv$sphiAcceptRatTrace", "rv$synthRateTrace",
-                "rv$synthAcceptRatTrace", "rv$mixAssignTrace", "rv$mixProbTrace",
-                "rv$mixProbTrace", "rv$cspAcceptRatTrace", "rv$numMix", "rv$numMut", "rv$numSel"),
+  currentAlpha <- parameter$getCurrentAlphaParameter()
+  currentLambdaPrime <- parameter$getCurrentLambdaPrimeParameter()
+  proposedAlpha <- parameter$getProposedAlphaParameter()
+  proposedLambdaPrime <- parameter$getProposedLambdaPrimeParameter()
+  #loglikeTrace <- mcmc$getLogLikelihoodTrace() should be moved
+  save(list = c("paramBase", "currentAlpha", "currentLambdaPrime", "proposedAlpha",
+                "proposedLambdaPrime"),
        file=file)
 }
 

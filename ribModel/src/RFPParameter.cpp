@@ -852,6 +852,18 @@ void RFPParameter::calculateRFPMean(Genome& genome)
 }
 
 
+std::vector<std::vector<double>> RFPParameter::getProposedAlphaParameter()
+{
+	return proposedAlphaParameter;
+}
+
+
+std::vector<std::vector<double>> RFPParameter::getProposedLambdaPrimeParameter()
+{
+	return proposedLambdaPrimeParameter;
+}
+
+
 
 //---------------------STATIC VARIABLE DECLARATIONS---------------------//
 
@@ -1013,6 +1025,8 @@ return tmp;
 }
 
 #ifndef STANDALONE
+#include <Rcpp.h>
+using namespace Rcpp;
 RFPParameter::RFPParameter(std::vector<double> sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter(64)
 {
   unsigned _numMixtures = _matrix.size() / 2;
@@ -1038,5 +1052,30 @@ Parameter(64)
   std::vector<std::vector<unsigned>> thetaKMatrix;
   initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
   initRFPParameterSet();
+}
+
+
+void RFPParameter::setCurrentAlphaParameter(Rcpp::List _alpha)
+{
+    int size = _alpha.size();
+    std::cout << size <<"\n";
+}
+
+
+void RFPParameter::setProposedAlphaParameter(SEXP _alpha)
+{
+    
+}
+
+
+void RFPParameter::setCurrentLambdaPrimeParameter(SEXP _lambdaPrime)
+{
+    
+}
+
+
+void RFPParameter::setProposedLambdaPrimeParameter(SEXP _lambdaPrime)
+{
+    
 }
 #endif
