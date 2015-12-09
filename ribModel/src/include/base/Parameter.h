@@ -24,12 +24,9 @@ class Parameter {
 		std::vector<std::vector<unsigned>> selectionIsInMixture;
 		std::vector<std::vector<unsigned>> mutationIsInMixture;
 
-		// STATICS
-
-		// sorting functions
+		//STATICS - Sorting Functions:
 		void quickSortPair(double a[], int b[], int first, int last);
 		void quickSort(double a[], int first, int last);
-
 		static int pivotPair(double a[], int b[], int first, int last);
 		static int pivot(double a[], int first, int last);
 		static void swap(double& a, double& b);
@@ -43,115 +40,65 @@ class Parameter {
 #ifdef STANDALONE
 		static std::default_random_engine generator; // static to make sure that the same generator is during the runtime.
 #endif
+
+
+		//Constructors & Destructors:
 		Parameter();
 		Parameter(unsigned maxGrouping);
+		Parameter& operator=(const Parameter& rhs);
+		virtual ~Parameter();
+
+
+
+		//Initialization, Restart, Index Checking:
 		void initParameterSet(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
 				std::vector<std::vector<unsigned>> mixtureDefinitionMatrix, bool splitSer = true,
 				std::string _mutationSelectionState = "allUnique");
-		Parameter& operator=(const Parameter& rhs);
-		virtual ~Parameter()
-		{
-		}
-		bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);
-		void writeBasicRestartFile(std::string filename);
 		void initBaseValuesFromFile(std::string filename);
-
-
-		unsigned int getNumParam()
-		{
-			return numParam;
-		}
-
-		// functions to manage Sphi
-		double getSphi(unsigned selectionCategory, bool proposed = false)
-		{
-			return (proposed ? Sphi_proposed[selectionCategory] : Sphi[selectionCategory]);
-		}
-		void setSphi(double sPhi, unsigned selectionCategory)
-		{
-			Sphi[selectionCategory] = sPhi;
-		}
-		void updateSphi()
-		{
-			for(unsigned i = 0u; i < numSelectionCategories; i++)
-			{
-				Sphi[i] = Sphi_proposed[i];
-			}
-			numAcceptForSphi++;
-		}
-
-
+		void writeBasicRestartFile(std::string filename);
 		std::vector<double> readPhiValues(std::string filename); //General function, not specific to class, possibly move
+		bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);
 
-		//functions to deal with the mixtureDefinition Matrix
+
+
+		//Sphi Functions:
+		double getSphi(unsigned selectionCategory, bool proposed = false);
+		void setSphi(double sPhi, unsigned selectionCategory);
+		void updateSphi();
+
+
+
+		//Mixture Definition Matrix:
 		void setNumMutationSelectionValues(std::string mutationSelectionState,
 				std::vector<std::vector<unsigned>> mixtureDefinitionMatrix);
 		void initCategoryDefinitions(std::string mutationSelectionState,
 				std::vector<std::vector<unsigned>> mixtureDefinitionMatrix);
-		void printMixtureDefinitionMatrix();
+		void printMixtureDefinitionMatrix();		
 
-		//Getter functions for categories
-		unsigned getNumMixtureElements()
-		{
-			return numMixtures;
-		}
-		unsigned getNumMutationCategories()
-		{
-			return numMutationCategories;
-		}
-		unsigned getNumSelectionCategories()
-		{
-			return numSelectionCategories;
-		}
-		unsigned getNumSynthesisRateCategories()
-		{
-			return numSelectionCategories;
-		}
-		unsigned getNumPhiGroupings() { return phiGroupings; }
+
+
+		//Getter Functions:
+		unsigned int getNumParam();
+		unsigned getNumMixtureElements();
+		unsigned getNumMutationCategories();
+		unsigned getNumSelectionCategories();
+		unsigned getNumSynthesisRateCategories();
+		unsigned getNumPhiGroupings();
+		std::vector<unsigned> getMixtureElementsOfMutationCategory(unsigned category);
+		std::vector<unsigned> getMixtureElementsOfSelectionCategory(unsigned category);
+		std::string getMutationSelectionState();
+		unsigned getMutationCategory(unsigned mixtureElement);
+		unsigned getSelectionCategory(unsigned mixtureElement);
+		unsigned getSynthesisRateCategory(unsigned mixtureElement);
+		double getCategoryProbability(unsigned mixtureElement);
+		void setCategoryProbability(unsigned mixtureElement, double value);
+		void setMixtureAssignment(unsigned gene, unsigned value);
+		unsigned getMixtureAssignment(unsigned gene);
 		virtual void setNumPhiGroupings(unsigned _phiGroupings) = 0;
 
-		std::vector<unsigned> getMixtureElementsOfMutationCategory(unsigned category)
-		{
-			return mutationIsInMixture[category];
-		}
-		std::vector<unsigned> getMixtureElementsOfSelectionCategory(unsigned category)
-		{
-			return selectionIsInMixture[category];
-		}
-		std::string getMutationSelectionState()
-		{
-			return mutationSelectionState;
-		}
-		unsigned getMutationCategory(unsigned mixtureElement)
-		{
-			return categories[mixtureElement].delM;
-		}
-		unsigned getSelectionCategory(unsigned mixtureElement)
-		{
-			return categories[mixtureElement].delEta;
-		}
-		unsigned getSynthesisRateCategory(unsigned mixtureElement)
-		{
-			return categories[mixtureElement].delEta;
-		}
-		double getCategoryProbability(unsigned mixtureElement)
-		{
-			return categoryProbabilities[mixtureElement];
-		}
-		void setCategoryProbability(unsigned mixtureElement, double value)
-		{
-			categoryProbabilities[mixtureElement] = value;
-		}
-		void setMixtureAssignment(unsigned gene, unsigned value)
-		{
-			mixtureAssignment[gene] = value;
-		}
-		unsigned getMixtureAssignment(unsigned gene)
-		{
-			return mixtureAssignment[gene];
-		}
 
-		// functions to manage SynthesisRate
+
+		//Synthesis Rate Functions:
 		double getSynthesisRate(unsigned geneIndex, unsigned mixtureElement, bool proposed = false);
 		void setSynthesisRate(double phi, unsigned geneIndex, unsigned mixtureElement);
 		double getSynthesisRateProposalWidth(unsigned geneIndex, unsigned mixtureElement);
@@ -161,9 +108,15 @@ class Parameter {
 		void InitializeSynthesisRate(double sd_phi);
 		void InitializeSynthesisRate(std::vector<double> expression);
 
-		// functions to manage adaptive step
-		virtual void adaptSphiProposalWidth(unsigned adaptationWidth) = 0;
-		virtual void adaptSynthesisRateProposalWidth(unsigned adaptationWidth) = 0;
+
+
+		//Proposal Functions:
+		virtual void proposeSphi();
+		void proposeSynthesisRateLevels();
+		double getCurrentSynthesisRateProposalWidth(unsigned expressionCategory, unsigned geneIndex);
+		double getCurrentSphiProposalWidth();
+
+
 
 		//update trace functions
 		virtual void updateSphiTrace(unsigned sample) = 0;
@@ -171,32 +124,43 @@ class Parameter {
 		virtual void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex) = 0;
 		virtual void updateMixtureProbabilitiesTrace(unsigned samples) = 0;
 
-		// proposal functions
-		virtual void proposeSphi();
-		void proposeSynthesisRateLevels();
-		double getCurrentSynthesisRateProposalWidth(unsigned expressionCategory, unsigned geneIndex)
-		{
-			return std_phi[expressionCategory][geneIndex];
-		}
-		double getCurrentSphiProposalWidth()
-		{
-			return std_sphi;
-		}
 
-		// functions to return estimates
+
+		// functions to manage adaptive step
+		virtual void adaptSphiProposalWidth(unsigned adaptationWidth) = 0;
+		virtual void adaptSynthesisRateProposalWidth(unsigned adaptationWidth) = 0;
+
+
+
+		//Posterior, Variance, Estimates:
 		virtual double getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement) = 0;
 		virtual double getSphiPosteriorMean(unsigned samples, unsigned mixture) = 0;
-		unsigned getEstimatedMixtureAssignment(unsigned samples, unsigned geneIndex);
 		virtual std::vector<double> getEstimatedMixtureAssignmentProbabilities(unsigned samples,
 				unsigned geneIndex) = 0;
 
 		virtual double getSphiVariance(unsigned samples, unsigned mixture, bool unbiased) = 0;
 		virtual double getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement,
 				bool unbiased = true) = 0;
+		unsigned getEstimatedMixtureAssignment(unsigned samples, unsigned geneIndex);
 
-		// static functions
+
+
+		//Group List Functions:
+		void setGroupList(std::vector<std::string> gl);
+		std::string getGrouping(unsigned index);
+		std::vector<std::string> getGroupList();
+		unsigned getGroupListSize();
+
+
+
+		//Iteration Functions:		
+		void setLastIteration(unsigned iteration);
+		unsigned getLastIteration();
+
+
+
+		//Static Functions:
 		static double calculateSCUO(Gene& gene, unsigned maxAA);
-
 		static void drawIidRandomVector(unsigned draws, double mean, double sd, double (*proposal)(double a, double b),
 				double* randomNumbers);
 		static void drawIidRandomVector(unsigned draws, double r, double (*proposal)(double r), double* randomNumber);
@@ -207,38 +171,23 @@ class Parameter {
 		static void randDirichlet(double *input, unsigned numElements, double *output);
 		static double randUnif(double minVal, double maxVal);
 		static unsigned randMultinom(double* probabilities, unsigned mixtureElements);
-
 		static double densityNorm(double x, double mean, double sd, bool log = false);
 		static double densityLogNorm(double x, double mean, double sd, bool log = false);
-
 		//double getMixtureAssignmentPosteriorMean(unsigned samples, unsigned geneIndex); // TODO: implement variance function, fix Mean function (won't work with 3 groups)
 
-		//R wrapper functions
 
-		void initializeSynthesisRateByGenome(Genome& genome, double sd_phi)
-		{
-			InitializeSynthesisRate(genome, sd_phi);
-		}
-		void initializeSynthesisRateByRandom(double sd_phi)
-		{
-			InitializeSynthesisRate(sd_phi);
-		}
-		void initializeSynthesisRateByList(std::vector<double> expression)
-		{
-			InitializeSynthesisRate(expression);
-		}
 
-		unsigned getMixtureAssignmentForGeneR(unsigned geneIndex)
-		{
-			unsigned rv = 0;
-			bool check = checkIndex(geneIndex, 1, (unsigned)mixtureAssignment.size());
-			if (check)
-			{
-				rv = getMixtureAssignment(geneIndex - 1) + 1;
-			}
-			return rv;
-		}
 
+
+
+
+		//R Wrapper Functions
+
+		void initializeSynthesisRateByGenome(Genome& genome, double sd_phi);
+		void initializeSynthesisRateByRandom(double sd_phi);
+		void initializeSynthesisRateByList(std::vector<double> expression);
+
+		unsigned getMixtureAssignmentForGeneR(unsigned geneIndex);
 
 		unsigned getEstimatedMixtureAssignmentForGene(unsigned samples, unsigned geneIndex);
 		std::vector<double> getEstimatedMixtureAssignmentProbabilitiesForGene(unsigned samples, unsigned geneIndex);
@@ -253,13 +202,16 @@ class Parameter {
 		unsigned getSelectionCategoryForMixture(unsigned mixtureElement);
 		unsigned getSynthesisRateCategoryForMixture(unsigned mixtureElement);
 		std::vector<double> getCurrentSynthesisRateForMixture(unsigned mixture);
-		void setGroupList(std::vector<std::string> gl);
-		std::string getGrouping(unsigned index);
-		std::vector<std::string> getGroupList();
-		unsigned getGroupListSize();
 
-		void setLastIteration(unsigned iteration) { lastIteration = iteration; }
-		unsigned getLastIteration() { return lastIteration; }
+
+		//Used to write R objects:
+		std::vector<unsigned> getMixtureAssignmentR();
+		std::vector<std::vector<double>> getSynthesisRateR();
+
+		
+
+
+
 
 	protected:
 		std::vector<double> Sphi;

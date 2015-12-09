@@ -31,9 +31,12 @@ class ROCTrace : public Trace
 		std::vector<double> getMutationParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon);
 		std::vector<double> getSelectionParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon);
 		std::vector<double> getAphiTrace(unsigned index) { return AphiTrace[index]; }
-		std::vector<double> getAphiAcceptanceRatioTrace(unsigned index) { return AphiAcceptanceRatioTrace[index]; }
+		std::vector<double> getAphiAcceptanceRatioTraceForIndex(unsigned index) { return AphiAcceptanceRatioTrace[index]; }
 		std::vector<double> getSepsilonTrace(unsigned index) { return SepsilonTrace[index]; }
-		
+		std::vector<std::vector<std::vector<double>>> getMutationParameterTrace();
+		std::vector<std::vector<std::vector<double>>> getSelectionParameterTrace();
+		std::vector<std::vector<double>> getAphiAcceptanceRatioTrace();
+
 
 		unsigned getMutationCategory(unsigned mixtureElement) {return categories->at(mixtureElement).delM;}
 		unsigned getSelectionCategory(unsigned mixtureElement) {return categories->at(mixtureElement).delEta;}

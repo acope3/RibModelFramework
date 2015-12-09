@@ -344,12 +344,13 @@ split.matrix <- function(M, r, c)
 
 
 
-writeTraces <- function(parameter, file)
+writeParameterObject <- function(parameter, file)
 {
-  UseMethod("writeTraces", parameter)
+  UseMethod("writeParameterObject", parameter)
 }
 
-writeTraces.Rcpp_RFPParameter <- function(parameter, file)
+
+extractBaseInfo <- function(parameter)
 {
   trace <- parameter$getTraceObject()
   sPhiTraces <- trace$getSphiTraces()
@@ -359,9 +360,75 @@ writeTraces.Rcpp_RFPParameter <- function(parameter, file)
   mixAssignTrace <- trace$getMixutreAssignmentTrace()
   mixProbTrace <- trace$getMixtureProbabilitiesTrace()
   cspAcceptRatTrace <- trace$getCspAcceptanceRatioTrace()
+  numMix <- parameter$numMixtures
+  numMut <- parameter$numMutationCategories
+  numSel <- parameter$numSelectionCategories
+  
+  varList <- list(sPhiTraces = sPhiTraces, 
+                    sphiAcceptRatTrace = sphiAcceptRatTrace,
+                    synthRateTrace = synthRateTrace,
+                    synthAcceptRatTrace = synthAcceptRatTrace,
+                    mixAssignTrace = mixAssignTrace,
+                    mixProbTrace = mixProbTrace,
+                    cspAcceptRatTrace = cspAcceptRatTrace
+                    numMix = numMix
+                    numMut = numMut
+                    numSel = numSel
+                    )
+  return(varList)
+}
+
+writeParameterObject.Rcpp_RFPParameter <- function(parameter, file)
+{
+  rv <- extractBaseInfo(parameter)
   alphaTrace <- trace$getAlphaParameterTrace()
   lambdaPrimeTrace <- trace$getLambdaPrimeParameterTrace()
+  loglikeTrace <- mcmc$getLogLikelihoodTrace()
+  save(list = c("rv$sPhiTraces", "rv$sphiAcceptRatTrace", "rv$synthRateTrace",
+                "rv$synthAcceptRatTrace", "rv$mixAssignTrace", "rv$mixProbTrace",
+                "rv$mixProbTrace", "rv$cspAcceptRatTrace", "rv$numMix", "rv$numMut", "rv$numSel"),
+       file=file)
+}
+
+writeParameterObject.Rcpp_ROCParameter <- function(parameter, file)
+{
+  trace <- parameter$getTraceObject()
+  sPhiTraces <- trace$getSphiTraces()
+  sphiAcceptRatTrace <- trace$getSphiAcceptanceRatioTrace()
+  synthRateTrace <- trace$getSynthesisRateTrace()
+  synthAcceptRatTrace <- trace$getSynthesisRateAcceptanceRatioTrace()
+  mixAssignTrace <- trace$getMixutreAssignmentTrace()
+  mixProbTrace <- trace$getMixtureProbabilitiesTrace()
+  cspAcceptRatTrace <- trace$getCspAcceptanceRatioTrace()
+  loglikeTrace <- mcmc$getLogLikelihoodTrace()
+  mutationTrace <- trace$getMutationParameterTrace()
+  selectionTrace <- trace$getSelectionParameterTrace()
+  aphiAcceptRatTrace <- trace$getAphiAcceptanceRatioTrace()
+  aphiTrace <- trace$getAphiTraces()
+  sepisolonTrace <- trace$getSepsilonTraces()
   save(list = c("sPhiTraces", "sphiAcceptRatTrace", "synthRateTrace", "synthAcceptRatTrace", 
-               "mixAssignTrace", "mixProbTrace", "cspAcceptRatTrace", "alphaTrace", "lambdaPrimeTrace"),
+                "mixAssignTrace", "mixProbTrace", "cspAcceptRatTrace", "mutationTrace", "selectionTrace",
+                "loglikeTrace", "aphiAcceptRatTrace", "aphiTrace", "sepisolonTrace"),
+       file=file)
+}
+
+
+
+writeParameterObject.Rcpp_FONSEParameter <- function(parameter, file)
+{
+  trace <- parameter$getTraceObject()
+  sPhiTraces <- trace$getSphiTraces()
+  sphiAcceptRatTrace <- trace$getSphiAcceptanceRatioTrace()
+  synthRateTrace <- trace$getSynthesisRateTrace()
+  synthAcceptRatTrace <- trace$getSynthesisRateAcceptanceRatioTrace()
+  mixAssignTrace <- trace$getMixutreAssignmentTrace()
+  mixProbTrace <- trace$getMixtureProbabilitiesTrace()
+  cspAcceptRatTrace <- trace$getCspAcceptanceRatioTrace()
+  loglikeTrace <- mcmc$getLogLikelihoodTrace()
+  mutationTrace <- trace$getMutationParameterTrace()
+  selectionTrace <- trace$getSelectionParameterTrace()
+  save(list = c("sPhiTraces", "sphiAcceptRatTrace", "synthRateTrace", "synthAcceptRatTrace", 
+                "mixAssignTrace", "mixProbTrace", "cspAcceptRatTrace", "mutationTrace", "selectionTrace",
+                "loglikeTrace"),
        file=file)
 }
