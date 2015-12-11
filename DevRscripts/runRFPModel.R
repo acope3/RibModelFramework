@@ -15,7 +15,7 @@ parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssig
 #parameter <- new(RFPParameter, "30restartFile.rst")
 
 # initialize MCMC object
-samples <- 10
+samples <- 100
 thining <- 10
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples=samples, thining=thining, adaptive.width=adaptiveWidth, 
@@ -34,9 +34,37 @@ system.time(
 
 
 
+#TEST BLOCK
+load("RFPObject.Rdat")
+p <- new(RFPParameter)
+p$setCurrentAlphaParameter(currentAlpha)
+p$setProposedAlphaParameter(proposedAlpha)
+p$setCurrentLambdaPrimeParameter(currentLambdaPrime)
+p$setProposedLambdaPrimeParameter(proposedLambdaPrime)
+
+t <- p$getTraceObject()
+t$setSphiTraces(paramBase$sPhiTraces)
+t$setSphiAcceptanceRatioTrace(paramBase$sphiAcceptRatTrace)
+
+t$setSynthesisRateTrace(paramBase$synthRateTrace)
+t$setSynthesisRateAcceptanceRatioTrace(paramBase$synthAcceptRatTrace)
+t$setMixtureAssignmentTrace(paramBase$mixAssignTrace)
+t$setMixtureProbabilitiesTrace(paramBase$mixProbTrace)
+t$setCspAcceptanceRatioTrace(paramBase$cspAcceptRatTrace)
+p$setRFPTrace(t)
+p$numMixtures <- paramBase$numMix
+p$numMutationCategories <- paramBase$numMut
+p$numSelectionCategories <- paramBase$numSel
+#END TEST BLOCK
+
+
+
+
+
+
 # plots different aspects of trace
 trace <- parameter$getTraceObject()
-writeParameterObject(parameter, file="RFPtraces2.Rdat")
+writeParameterObject(parameter, file="RFPObject.Rdat")
 
 pdf("RFP_Genome_allUnique_startCSP_True_startPhi_true_adaptSphi_True.pdf")
 

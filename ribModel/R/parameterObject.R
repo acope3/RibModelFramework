@@ -381,6 +381,7 @@ extractBaseInfo <- function(parameter)
 writeParameterObject.Rcpp_RFPParameter <- function(parameter, file)
 {
   paramBase <- extractBaseInfo(parameter)
+  trace <- parameter$getTraceObject()
   alphaTrace <- trace$getAlphaParameterTrace()
   lambdaPrimeTrace <- trace$getLambdaPrimeParameterTrace()
   currentAlpha <- parameter$getCurrentAlphaParameter()

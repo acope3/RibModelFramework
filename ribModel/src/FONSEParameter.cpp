@@ -995,3 +995,7 @@ void FONSEParameter::initMutationSelectionCategoriesR(std::vector<std::string> f
 	}
 }
 
+void FONSEParameter::setTraceObject(FONSETrace _trace)
+{
+    traces = _trace;
+}

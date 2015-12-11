@@ -194,6 +194,8 @@ class ROCParameter : public Parameter
 			}
 			return rv;
 		}
+    
+        void setTraceObject(ROCTrace _trace);
 
 	protected:
 };

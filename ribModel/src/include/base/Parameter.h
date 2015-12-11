@@ -207,6 +207,10 @@ class Parameter {
 		//Used to write R objects:
 		std::vector<unsigned> getMixtureAssignmentR();
 		std::vector<std::vector<double>> getSynthesisRateR();
+        void setNumMutationCategories(unsigned _numMutationCategories);
+        void setNumSelectionCategories(unsigned _numSelectionCategories);
+        void setNumMixtureElements(unsigned _numMixtures);
+
 
 		
 

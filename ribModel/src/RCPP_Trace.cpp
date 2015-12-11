@@ -6,6 +6,7 @@
 #include "include/FONSE/FONSETrace.h"
 #include <Rcpp.h>
 using namespace Rcpp;
+
 RCPP_MODULE(Trace_mod)
 {
   class_<Trace>( "Trace" )
@@ -30,6 +31,15 @@ RCPP_MODULE(Trace_mod)
     .method("getMixtureProbabilitiesTrace", &Trace::getMixtureProbabilitiesTrace)
     .method("getExpectedPhiTrace", &Trace::getExpectedPhiTrace)
     .method("getNumberOfMixtures", &Trace::getNumberOfMixtures)
+    
+    .method("setSphiTraces", &Trace::setSphiTraces)
+    .method("setSphiAcceptanceRatioTrace", &Trace::setSphiAcceptanceRatioTrace)
+    .method("setSynthesisRateTrace", &Trace::setSynthesisRateTrace)
+    .method("setSynthesisRateAcceptanceRatioTrace", &Trace::setSynthesisRateAcceptanceRatioTrace)
+    .method("setMixtureAssignmentTrace", &Trace::setMixtureAssignmentTrace)
+    .method("setMixtureProbabilitiesTrace", &Trace::setMixtureProbabilitiesTrace)
+    .method("setCspAcceptanceRatioTrace", &Trace::setCspAcceptanceRatioTrace)
+
     ;
 
   class_<ROCTrace>( "ROCTrace" )

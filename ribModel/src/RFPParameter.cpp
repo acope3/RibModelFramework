@@ -1053,29 +1053,33 @@ Parameter(64)
   initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
   initRFPParameterSet();
 }
-
-
-void RFPParameter::setCurrentAlphaParameter(Rcpp::List _alpha)
-{
-    int size = _alpha.size();
-    std::cout << size <<"\n";
-}
-
-
-void RFPParameter::setProposedAlphaParameter(SEXP _alpha)
-{
-    
-}
-
-
-void RFPParameter::setCurrentLambdaPrimeParameter(SEXP _lambdaPrime)
-{
-    
-}
-
-
-void RFPParameter::setProposedLambdaPrimeParameter(SEXP _lambdaPrime)
-{
-    
-}
 #endif
+
+void RFPParameter::setCurrentAlphaParameter(std::vector<std::vector<double>> alpha)
+{
+    currentAlphaParameter = alpha;
+}
+
+
+void RFPParameter::setProposedAlphaParameter(std::vector<std::vector<double>> alpha)
+{
+    proposedAlphaParameter = alpha;
+}
+
+
+void RFPParameter::setCurrentLambdaPrimeParameter(std::vector<std::vector<double>> lambdaPrime)
+{
+    currentLambdaPrimeParameter = lambdaPrime;
+}
+
+
+void RFPParameter::setProposedLambdaPrimeParameter(std::vector<std::vector<double>> lambdaPrime)
+{
+    proposedLambdaPrimeParameter = lambdaPrime;
+}
+
+void RFPParameter::setTraceObject(RFPTrace _trace)
+{
+    traces = _trace;
+}
+

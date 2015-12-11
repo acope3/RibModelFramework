@@ -220,6 +220,7 @@ plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sep
   {
     sphi <- trace$getSphiTraces();
     sphi <- do.call("cbind", sphi)
+    numMixtures <- length(sphi)
     ylimit <- range(sphi) + c(-0.1, 0.1)
     xlimit <- c(1, nrow(sphi))
     plot(NULL, NULL, type="l", xlab = "Sample", ylab = expression("s"[phi]), xlim  = xlimit, ylim = ylimit)
@@ -233,6 +234,7 @@ plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sep
   if (what[1] == "Mphi")
   {
     sphi <- trace$getSphiTraces();
+    numMixtures <- length(sphi)
     sphi <- do.call("cbind", sphi)
     mphi <- -(sphi * sphi) / 2;
     ylimit <- range(mphi) + c(-0.1, 0.1)

@@ -1130,5 +1130,9 @@ void ROCParameter::updateCodonSpecificParameter(std::string grouping)
 	}
 }
 
+void ROCParameter::setTraceObject(ROCTrace _trace)
+{
+    traces = _trace;
+}
 
 

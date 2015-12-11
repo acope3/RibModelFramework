@@ -165,5 +165,6 @@ class FONSEParameter : public Parameter
 			return rv;
 		}
 
+        void setTraceObject(FONSETrace _trace);
 };
 #endif // FONSEPARAMETER_H

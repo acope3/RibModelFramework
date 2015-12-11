@@ -138,12 +138,12 @@ class RFPParameter: public Parameter {
 		double getLambdaPrimeVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased);
     
         //Functions that should only be used in R:
-    #ifndef STANDALONE
-        void setCurrentAlphaParameter(Rcpp::List _alpha);
-        void setProposedAlphaParameter(SEXP _alpha);
-        void setCurrentLambdaPrimeParameter(SEXP _lambdaPrime);
-        void setProposedLambdaPrimeParameter(SEXP _lambdaPrime);
-    #endif
+        void setCurrentAlphaParameter(std::vector<std::vector<double>> alpha);
+        void setProposedAlphaParameter(std::vector<std::vector<double>> alpha);
+        void setCurrentLambdaPrimeParameter(std::vector<std::vector<double>> lambdaPrime);
+        void setProposedLambdaPrimeParameter(std::vector<std::vector<double>> lambdaPrime);
+        void setTraceObject(RFPTrace _trace);
+
 
 
 

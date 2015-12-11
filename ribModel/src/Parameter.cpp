@@ -1476,3 +1476,21 @@ std::vector<std::vector<double>> Parameter::getSynthesisRateR()
 	return currentSynthesisRateLevel;
 }
 
+void Parameter::setNumMutationCategories(unsigned _numMutationCategories)
+{
+    numMutationCategories = _numMutationCategories;
+}
+
+
+void Parameter::setNumSelectionCategories(unsigned _numSelectionCategories)
+{
+    numSelectionCategories = _numSelectionCategories;
+}
+
+
+void Parameter::setNumMixtureElements(unsigned _numMixtures)
+{
+    numMixtures = _numMixtures;
+}
+
+
