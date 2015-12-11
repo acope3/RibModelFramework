@@ -771,6 +771,7 @@ void Parameter::InitializeSynthesisRate(std::vector<double> expression)
 	{
 		for(unsigned i = 0u; i < numGenes; i++)
 		{
+			std::cout << "Initializing gene " << i << ".\n";
 			currentSynthesisRateLevel[category][i] = expression[i];
 			std_phi[category][i] = 0.1;
 			numAcceptForSynthesisRate[category][i] = 0u;

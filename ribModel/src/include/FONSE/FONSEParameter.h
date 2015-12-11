@@ -75,7 +75,8 @@ class FONSEParameter : public Parameter
 		void initAllTraces(unsigned samples, unsigned num_genes) {
 			traces.initAllTraces(samples, num_genes, numMutationCategories, numSelectionCategories, numParam, numMixtures, categories, maxGrouping);
 		}
-		void initMutationSelectionCategories(std::vector <std::string> files, unsigned numCategories, unsigned paramType);
+		void initMutationCategories(std::vector<std::string> files, unsigned numCategories);
+		void initSelectionCategories(std::vector<std::string> files, unsigned numCategories);
 
 		double getCurrentCodonSpecificProposalWidth(unsigned aa);
 		std::vector< std::vector <double> > getCurrentMutationParameter() { return currentMutationParameter; }
