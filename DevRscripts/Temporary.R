@@ -1,29 +1,11 @@
 library(ribModel)
 rm(list=ls())
-#TEST BLOCK
-load("RFPObject.Rdat")
-p <- new(RFPParameter)
-p$setCurrentAlphaParameter(currentAlpha)
-p$setProposedAlphaParameter(proposedAlpha)
-p$setCurrentLambdaPrimeParameter(currentLambdaPrime)
-p$setProposedLambdaPrimeParameter(proposedLambdaPrime)
 
-t <- p$getTraceObject()
-t$setSphiTraces(paramBase$sPhiTraces)
-t$setSphiAcceptanceRatioTrace(paramBase$sphiAcceptRatTrace)
+parameter <- new(RFPParameter)
+parameter <- loadParameterObject(parameter, "RFPObject.Rdat")
+mcmc <- loadMCMCObject("MCMCObject.Rdat")
 
-t$setSynthesisRateTrace(paramBase$synthRateTrace)
-t$setSynthesisRateAcceptanceRatioTrace(paramBase$synthAcceptRatTrace)
-t$setMixtureAssignmentTrace(paramBase$mixAssignTrace)
-t$setMixtureProbabilitiesTrace(paramBase$mixProbTrace)
-t$setCspAcceptanceRatioTrace(paramBase$cspAcceptRatTrace)
-p$setRFPTrace(t)
-p$numMixtures <- paramBase$numMix
-p$numMutationCategories <- paramBase$numMut
-p$numSelectionCategories <- paramBase$numSel
-#END TEST BLOCK
-
-trace <- p$getTraceObject()
+trace <- parameter$getTraceObject()
 
 pdf("test1.pdf")
 
@@ -66,13 +48,12 @@ dev.off()
 
 
 pdf("test3.pdf")
+samples <- length(trace$getAlphaParameterTrace()[[1]][[1]])
 cat <- 1
 proposal <- FALSE
 alphaList <- numeric (61)
 lambdaPrimeList <- numeric (61)
 waitingTimes <- numeric(61)
-phiList <- numeric(genome$getGenomeSize())
-ids <- numeric(genome$getGenomeSize())
 codonList <- codons()
 i <- 1
 for (i in 1:61)
@@ -83,36 +64,9 @@ for (i in 1:61)
   waitingTimes[i] <- alphaList[i] * lambdaPrimeList[i]
 }
 
-for (geneIndex in 1:genome$getGenomeSize()) {
-  phiList[geneIndex] <- parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(samples * 0.5, geneIndex, 1)
-}
-
-for (i in 1:genome$getGenomeSize())
-{
-  g <- genome$getGeneByIndex(i, FALSE)
-  ids[i] <- g$id
-}
-
-
-
-
-
 
 plot(NULL, NULL, xlim=range(alphaList, na.rm = T), ylim=range(lambdaPrimeList), 
      main = "Correlation Between Alpha and Lambda Prime", xlab = "alpha", ylab = "lambdaPrime")
 upper.panel.plot(alphaList, lambdaPrimeList)
 
-
-#corrolation between RFPModel and Premal's data
-#X <- read.table("../data/rfp/codon.specific.translation.rates.table.csv", header = TRUE, sep =",")
-#X <- X[order(X[,1]) , ]
-
-#XM <- matrix(c(X[,1], X[,2]), ncol = 2, byrow = FALSE)
-#Y <- data.frame(codonList[-c(62,63,64)], waitingTimes)
-#colnames(Y) <- c("Codon", "PausingTime")
-#Y <- Y[order(Y[,1]) , ]
-
-#plot(NULL, NULL, xlim=range(XM[,2], na.rm = T), ylim=range(Y[,2]), 
-#     main = "Correlation Between Premal and RFP Model Pausing Times", xlab = "True Values", ylab = "Run Values")
-#upper.panel.plot(XM[,2], Y[,2])
 dev.off()

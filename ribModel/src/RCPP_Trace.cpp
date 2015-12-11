@@ -53,6 +53,7 @@ RCPP_MODULE(Trace_mod)
 	.method("getAphiTraces", &ROCTrace::getAphiTraceR)
 	.method("getAphiAcceptanceRatioTraceForIndex", &ROCTrace::getAphiAcceptanceRatioTraceForIndex)
 	.method("getSepsilonTraces", &ROCTrace::getSepsilonTraceR)
+
     ;
 
 	class_<RFPTrace>("RFPTrace")
@@ -61,6 +62,8 @@ RCPP_MODULE(Trace_mod)
 		.method("getAlphaParameterTrace", &RFPTrace::getAlphaParameterTrace)
 		.method("getLambdaPrimeParameterTraceByMixtureElementForCodon", &RFPTrace::getLambdaPrimeParameterTraceByMixtureElementForCodonR)
 		.method("getLambdaPrimeParameterTrace", &RFPTrace::getLambdaPrimeParameterTrace)
+        .method("setAlphaParameterTrace", &RFPTrace::setAlphaParameterTrace)
+        .method("setLambdaPrimeParameterTrace", &RFPTrace::setLambdaPrimeParameterTrace)
 		;
 
 	class_<FONSETrace>("FONSETrace")

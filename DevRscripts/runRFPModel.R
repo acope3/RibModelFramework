@@ -34,28 +34,7 @@ system.time(
 
 
 
-#TEST BLOCK
-load("RFPObject.Rdat")
-p <- new(RFPParameter)
-p$setCurrentAlphaParameter(currentAlpha)
-p$setProposedAlphaParameter(proposedAlpha)
-p$setCurrentLambdaPrimeParameter(currentLambdaPrime)
-p$setProposedLambdaPrimeParameter(proposedLambdaPrime)
 
-t <- p$getTraceObject()
-t$setSphiTraces(paramBase$sPhiTraces)
-t$setSphiAcceptanceRatioTrace(paramBase$sphiAcceptRatTrace)
-
-t$setSynthesisRateTrace(paramBase$synthRateTrace)
-t$setSynthesisRateAcceptanceRatioTrace(paramBase$synthAcceptRatTrace)
-t$setMixtureAssignmentTrace(paramBase$mixAssignTrace)
-t$setMixtureProbabilitiesTrace(paramBase$mixProbTrace)
-t$setCspAcceptanceRatioTrace(paramBase$cspAcceptRatTrace)
-p$setRFPTrace(t)
-p$numMixtures <- paramBase$numMix
-p$numMutationCategories <- paramBase$numMut
-p$numSelectionCategories <- paramBase$numSel
-#END TEST BLOCK
 
 
 
@@ -65,6 +44,8 @@ p$numSelectionCategories <- paramBase$numSel
 # plots different aspects of trace
 trace <- parameter$getTraceObject()
 writeParameterObject(parameter, file="RFPObject.Rdat")
+writeMCMCObject(mcmc, file="MCMCObject.Rdat")
+
 
 pdf("RFP_Genome_allUnique_startCSP_True_startPhi_true_adaptSphi_True.pdf")
 

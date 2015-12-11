@@ -143,6 +143,7 @@ class RFPParameter: public Parameter {
         void setCurrentLambdaPrimeParameter(std::vector<std::vector<double>> lambdaPrime);
         void setProposedLambdaPrimeParameter(std::vector<std::vector<double>> lambdaPrime);
         void setTraceObject(RFPTrace _trace);
+        void setCategoriesForTrace();
 
 
 

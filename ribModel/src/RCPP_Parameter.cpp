@@ -38,6 +38,9 @@ RCPP_MODULE(Parameter_mod)
 		.method("getGroupList", &Parameter::getGroupList)	
 		.method("getMixtureAssignment", &Parameter::getMixtureAssignmentR)
 		.method("getSynthesisRate", &Parameter::getSynthesisRateR)
+        .method("getCategories", &Parameter::getCategories)
+        .method("setCategories", &Parameter::setCategories)
+    
 
 
 		.property("numMutationCategories", &Parameter::getNumMutationCategories, &Parameter::setNumMutationCategories)
@@ -106,6 +109,7 @@ RCPP_MODULE(Parameter_mod)
         .method("setCurrentLambdaPrimeParameter", &RFPParameter::setCurrentLambdaPrimeParameter)
         .method("setProposedLambdaPrimeParameter", &RFPParameter::setProposedLambdaPrimeParameter)
         .method("setRFPTrace", &RFPParameter::setTraceObject)
+        .method("setCategoriesForTrace", &RFPParameter::setCategoriesForTrace)
 		;
 
 	class_<FONSEParameter>("FONSEParameter")

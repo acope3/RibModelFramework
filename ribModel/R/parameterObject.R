@@ -349,6 +349,49 @@ writeParameterObject <- function(parameter, file)
   UseMethod("writeParameterObject", parameter)
 }
 
+loadParameterObject <- function(parameter, file)
+{
+  UseMethod("loadParameterObject", parameter)
+}
+
+loadParameterObject.Rcpp_RFPParameter <- function(parameter, file)
+{
+  load(file)
+  setBaseInfo(parameter, file)
+  parameter$setCurrentAlphaParameter(currentAlpha)
+  parameter$setProposedAlphaParameter(proposedAlpha)
+  parameter$setCurrentLambdaPrimeParameter(currentLambdaPrime)
+  parameter$setProposedLambdaPrimeParameter(proposedLambdaPrime)
+
+  trace <- parameter$getTraceObject()
+  trace$setAlphaParameterTrace(alphaTrace)
+  trace$setLambdaPrimeParameterTrace(lambdaPrimeTrace)
+
+  parameter$setRFPTrace(trace)
+  return(parameter) #R seems to produce copies, not pointers.
+}
+
+setBaseInfo <- function(parameter, file)
+{
+  load(file)
+  parameter$setCategories(paramBase$categories)
+  parameter$setCategoriesForTrace()
+  parameter$numMixtures <- paramBase$numMix
+  parameter$numMutationCategories <- paramBase$numMut
+  parameter$numSelectionCategories <- paramBase$numSel
+  
+  trace <- parameter$getTraceObject()
+  trace$setSphiTraces(paramBase$sPhiTraces)
+  trace$setSphiAcceptanceRatioTrace(paramBase$sphiAcceptRatTrace)
+  trace$setSynthesisRateTrace(paramBase$synthRateTrace)
+  trace$setSynthesisRateAcceptanceRatioTrace(paramBase$synthAcceptRatTrace)
+  trace$setMixtureAssignmentTrace(paramBase$mixAssignTrace)
+  trace$setMixtureProbabilitiesTrace(paramBase$mixProbTrace)
+  trace$setCspAcceptanceRatioTrace(paramBase$cspAcceptRatTrace)
+  parameter$setRFPTrace(trace)
+  return(parameter)
+}
+
 
 extractBaseInfo <- function(parameter)
 {
@@ -363,6 +406,7 @@ extractBaseInfo <- function(parameter)
   numMix <- parameter$numMixtures
   numMut <- parameter$numMutationCategories
   numSel <- parameter$numSelectionCategories
+  categories <- parameter$getCategories()
   
   varList <- list(sPhiTraces = sPhiTraces, 
                     sphiAcceptRatTrace = sphiAcceptRatTrace,
@@ -373,7 +417,8 @@ extractBaseInfo <- function(parameter)
                     cspAcceptRatTrace = cspAcceptRatTrace,
                     numMix = numMix,
                     numMut = numMut,
-                    numSel = numSel
+                    numSel = numSel,
+                    categories = categories
                     )
   return(varList)
 }
@@ -388,9 +433,9 @@ writeParameterObject.Rcpp_RFPParameter <- function(parameter, file)
   currentLambdaPrime <- parameter$getCurrentLambdaPrimeParameter()
   proposedAlpha <- parameter$getProposedAlphaParameter()
   proposedLambdaPrime <- parameter$getProposedLambdaPrimeParameter()
-  #loglikeTrace <- mcmc$getLogLikelihoodTrace() should be moved
+  
   save(list = c("paramBase", "currentAlpha", "currentLambdaPrime", "proposedAlpha",
-                "proposedLambdaPrime"),
+                "proposedLambdaPrime", "alphaTrace", "lambdaPrimeTrace"),
        file=file)
 }
 

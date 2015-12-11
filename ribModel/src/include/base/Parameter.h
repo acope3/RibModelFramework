@@ -210,6 +210,8 @@ class Parameter {
         void setNumMutationCategories(unsigned _numMutationCategories);
         void setNumSelectionCategories(unsigned _numSelectionCategories);
         void setNumMixtureElements(unsigned _numMixtures);
+        std::vector<std::vector<int>> getCategories();
+        void setCategories(std::vector<std::vector<int>> _categories);
 
 
 		

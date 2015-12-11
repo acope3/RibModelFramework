@@ -1493,4 +1493,27 @@ void Parameter::setNumMixtureElements(unsigned _numMixtures)
     numMixtures = _numMixtures;
 }
 
+std::vector<std::vector<int>> Parameter::getCategories()
+{
+    unsigned size = categories.size();
+    std::vector<std::vector<int>> RV;
+    for (unsigned i = 0; i < size; i++)
+    {
+        std::vector<int> tmp;
+        tmp.push_back(categories[i].delM);
+        tmp.push_back(categories[i].delEta);
+        RV.push_back(tmp);
+    }
+    
+    return RV;
+}
 
+void Parameter::setCategories(std::vector<std::vector<int>> _categories)
+{
+    for (unsigned i = 0; i < _categories.size(); i++)
+    {
+        categories.push_back(mixtureDefinition());
+        categories[i].delM = _categories[i][0];
+        categories[i].delEta = _categories[i][1];
+    }
+}

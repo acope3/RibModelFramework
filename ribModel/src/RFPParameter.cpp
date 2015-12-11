@@ -1083,3 +1083,9 @@ void RFPParameter::setTraceObject(RFPTrace _trace)
     traces = _trace;
 }
 
+void RFPParameter::setCategoriesForTrace()
+{
+    //std::vector<mixtureDefinition> *_categories = &categories;
+    traces.setCategories(categories);
+}
+
