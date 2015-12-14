@@ -603,7 +603,7 @@ CovarianceMatrix& ROCParameter::getCovarianceMatrixForAA(std::string aa)
 // ------------------------------------//
 
 
-double ROCParameter::getAphi(unsigned index, bool proposed = false)
+double ROCParameter::getAphi(unsigned index, bool proposed)
 {
 	return (proposed ? Aphi_proposed[index] : Aphi[index]);
 }
@@ -1262,7 +1262,15 @@ std::vector<std::vector<double>> ROCParameter::calculateSelectionCoefficients(un
 
 
 #ifndef STANDALONE
-ROCParameter::ROCParameter(std::vector<double> sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter(22)
+
+
+//--------------------------------------------------//
+// ---------- Constructors & Destructors ---------- //
+//--------------------------------------------------//
+
+
+ROCParameter::ROCParameter(std::vector<double> sphi, std::vector<unsigned> geneAssignment,
+						std::vector<unsigned> _matrix, bool splitSer) : Parameter(22)
 {
 	unsigned _numMixtures = _matrix.size() / 2;
 	std::vector<std::vector<unsigned>> thetaKMatrix;
@@ -1281,40 +1289,23 @@ ROCParameter::ROCParameter(std::vector<double> sphi, std::vector<unsigned> geneA
 
 }
 
-ROCParameter::ROCParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState) :
-Parameter(22)
+ROCParameter::ROCParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
+							bool splitSer, std::string _mutationSelectionState) : Parameter(22)
 {
 	std::vector<std::vector<unsigned>> thetaKMatrix;
 	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
 	initROCParameterSet();
 }
-#endif
-
-#ifndef STANDALONE
-SEXP ROCParameter::calculateSelectionCoefficientsR(unsigned sample, unsigned mixture)
-{
-	NumericMatrix RSelectionCoefficents(mixtureAssignment.size(), 62); //62 due to stop codons
-	std::vector<std::vector<double>> selectionCoefficients;
-	bool checkMixture = checkIndex(mixture, 1, numMixtures);
-	if (checkMixture)
-	{
-		selectionCoefficients = calculateSelectionCoefficients(sample, mixture - 1);
-		unsigned index = 0;
-		for (unsigned i = 0; i < selectionCoefficients.size(); i++)
-		{
-			for(unsigned j = 0; j < selectionCoefficients[i].size(); j++, index++)
-			{
-				RSelectionCoefficents[index] = selectionCoefficients[i][j];
-			}
-		}
-	}
-	return RSelectionCoefficents;
-}
-#endif
 
 
-#ifndef STANDALONE
-using namespace Rcpp;
+
+
+
+//---------------------------------------------------------------//
+// ---------- Initialization, Restart, Index Checking ---------- //
+//---------------------------------------------------------------//
+
+
 void ROCParameter::initCovarianceMatrix(SEXP _matrix, std::string aa)
 {
 	std::vector<double> tmp;
@@ -1340,11 +1331,28 @@ void ROCParameter::initCovarianceMatrix(SEXP _matrix, std::string aa)
 	m.choleskiDecomposition();
 	covarianceMatrix[aaIndex] = m;
 }
-#endif
 
 
+void ROCParameter::initMutation(std::vector<double> mutationValues, unsigned mixtureElement, std::string aa)
+{
+	//TODO: seperate out the R wrapper functionality and make the wrapper
+	//currentMutationParameter
+	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	if (check)
+	{
+		mixtureElement--;
 
-//This function seems to be used only for the purpose of R
+		unsigned category = getMutationCategory(mixtureElement);
+		aa[0] = (char) std::toupper(aa[0]);
+		std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(aa, true);
+		for (unsigned i = aaRange[0], j = 0; i < aaRange[1]; i++, j++)
+		{
+			currentMutationParameter[category][i] = mutationValues[j];
+		}
+	}
+}
+
+
 void ROCParameter::initSelection(std::vector<double> selectionValues, unsigned mixtureElement, std::string aa)
 {
 	//TODO: seperate out the R wrapper functionality and make the wrapper
@@ -1364,25 +1372,110 @@ void ROCParameter::initSelection(std::vector<double> selectionValues, unsigned m
 	}
 }
 
-//This function seems to be used only for the purpose of R
-void ROCParameter::initMutation(std::vector<double> mutationValues, unsigned mixtureElement, std::string aa)
+
+
+
+
+// --------------------------------------//
+// ---------- Trace Functions -----------//
+// --------------------------------------//
+
+
+void ROCParameter::setTraceObject(ROCTrace _trace)
 {
-	//TODO: seperate out the R wrapper functionality and make the wrapper
-	//currentMutationParameter
+    traces = _trace;
+}
+
+
+
+
+
+// ------------------------------------------------------------------//
+// ---------- Posterior, Variance, and Estimates Functions ----------//
+// ------------------------------------------------------------------//
+
+
+double ROCParameter::getMutationPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
+{
+	double rv = -1.0;
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
 	if (check)
 	{
-		mixtureElement--;
+		rv = getMutationPosteriorMean(mixtureElement - 1, samples, codon);
+	}
+	return rv;
+}
 
-		unsigned category = getMutationCategory(mixtureElement);
-		aa[0] = (char) std::toupper(aa[0]);
-		std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(aa, true);
-		for (unsigned i = aaRange[0], j = 0; i < aaRange[1]; i++, j++)
+
+double ROCParameter::getSelectionPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
+{
+	double rv = -1.0;
+	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	if (check)
+	{
+		rv = getSelectionPosteriorMean(mixtureElement - 1, samples, codon);
+	}
+	return rv;
+}
+
+
+double ROCParameter::getMutationVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased)
+{
+	double rv = -1.0;
+	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	if (check)
+	{
+		rv = getMutationVariance(mixtureElement - 1, samples, codon, unbiased);
+	}
+	return rv;
+}
+
+
+double ROCParameter::getSelectionVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased)
+{
+	double rv = -1.0;
+	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	if (check)
+	{
+		rv = getSelectionVariance(mixtureElement - 1, samples, codon, unbiased);
+	}
+	return rv;
+}
+
+
+
+
+
+// -------------------------------------//
+// ---------- Other Functions ----------//
+// -------------------------------------//
+
+
+SEXP ROCParameter::calculateSelectionCoefficientsR(unsigned sample, unsigned mixture)
+{
+	NumericMatrix RSelectionCoefficents(mixtureAssignment.size(), 62); //62 due to stop codons
+	std::vector<std::vector<double>> selectionCoefficients;
+	bool checkMixture = checkIndex(mixture, 1, numMixtures);
+	if (checkMixture)
+	{
+		selectionCoefficients = calculateSelectionCoefficients(sample, mixture - 1);
+		unsigned index = 0;
+		for (unsigned i = 0; i < selectionCoefficients.size(); i++)
 		{
-			currentMutationParameter[category][i] = mutationValues[j];
+			for(unsigned j = 0; j < selectionCoefficients[i].size(); j++, index++)
+			{
+				RSelectionCoefficents[index] = selectionCoefficients[i][j];
+			}
 		}
 	}
+	return RSelectionCoefficents;
 }
+
+#endif
+
+
+
+
 
 
 
@@ -1421,9 +1514,6 @@ std::vector<double> ROCParameter::propose(std::vector<double> currentParam, doub
 
 
 
-void ROCParameter::setTraceObject(ROCTrace _trace)
-{
-    traces = _trace;
-}
+
 
 

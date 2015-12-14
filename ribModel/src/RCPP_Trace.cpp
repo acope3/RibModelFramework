@@ -53,6 +53,11 @@ RCPP_MODULE(Trace_mod)
 	.method("getAphiTraces", &ROCTrace::getAphiTraceR)
 	.method("getAphiAcceptanceRatioTraceForIndex", &ROCTrace::getAphiAcceptanceRatioTraceForIndex)
 	.method("getSepsilonTraces", &ROCTrace::getSepsilonTraceR)
+	.method("setAphiTrace", &ROCTrace::setAphiTrace)
+    .method("setAphiAcceptanceRatioTrace", &ROCTrace::setAphiAcceptanceRatioTrace)
+	.method("setSepsilonTrace", &ROCTrace::setSepsilonTrace)
+	.method("setMutationParameterTrace", &ROCTrace::setMutationParameterTrace)
+	.method("setSelectionParameterTrace", &ROCTrace::setSelectionParameterTrace)
 
     ;
 

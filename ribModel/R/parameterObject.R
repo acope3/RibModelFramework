@@ -433,13 +433,13 @@ writeParameterObject.Rcpp_FONSEParameter <- function(parameter, file)
 }
 
 
-loadParameterObject <- function(parameter, file)
+loadParameterObject <- function(parameter, file, model)
 {
   UseMethod("loadParameterObject", parameter)
 }
 
 
-setBaseInfo <- function(parameter, file)
+setBaseInfo <- function(parameter, file, model)
 {
   load(file)
   parameter$setCategories(paramBase$categories)
@@ -456,15 +456,41 @@ setBaseInfo <- function(parameter, file)
   trace$setMixtureAssignmentTrace(paramBase$mixAssignTrace)
   trace$setMixtureProbabilitiesTrace(paramBase$mixProbTrace)
   trace$setCspAcceptanceRatioTrace(paramBase$cspAcceptRatTrace)
-  parameter$setRFPTrace(trace)
+  if (model == "ROC"){
+    parameter$setROCTrace(trace)
+  }
+  else if (model == "RFP"){
+    parameter$setRFPTrace(trace)
+  }
+  else if (model == "FONSE"){
+    parameter$setFONSETrace(trace)
+  }
   return(parameter)
 }
 
 
-loadParameterObject.Rcpp_RFPParameter <- function(parameter, file)
+loadParameterObject.Rcpp_ROCParameter <- function(parameter, file, model)
 {
   load(file)
-  setBaseInfo(parameter, file)
+  setBaseInfo(parameter, file, model)
+  
+  trace <- parameter$getTraceObject()
+  trace$setAphiTrace(aphiTrace)
+  trace$setAphiAcceptanceRatioTrace(aphiAcceptRatTrace)
+  trace$setSepsilonTrace(sepisolonTrace)
+  trace$setMutationParameterTrace(mutationTrace)
+  trace$setSelectionParameterTrace(selectionTrace)
+  
+  
+  parameter$setROCTrace(trace)
+  return(parameter) #Because of concerns with R passing arguments, we return explicitly.
+}
+
+
+loadParameterObject.Rcpp_RFPParameter <- function(parameter, file, model)
+{
+  load(file)
+  setBaseInfo(parameter, file, model)
   parameter$setCurrentAlphaParameter(currentAlpha)
   parameter$setProposedAlphaParameter(proposedAlpha)
   parameter$setCurrentLambdaPrimeParameter(currentLambdaPrime)

@@ -47,7 +47,6 @@ class ROCParameter : public Parameter
 		std::vector<double> propose(std::vector<double> currentParam, double (*proposal)(double a, double b), double A, std::vector<double> B);
 
 	public:
-		//static const members
 		static const unsigned dM;
 		static const unsigned dEta;
 
@@ -93,7 +92,7 @@ class ROCParameter : public Parameter
 
 		//Aphi Functions:
 		double getAphi(unsigned index, bool proposed = false);
-		double getCurrentAphiProposalWidth(unsigned index) { return std_Aphi[index]; }
+		double getCurrentAphiProposalWidth(unsigned index);
 		void proposeAphi();
 		void setAphi(unsigned index, double aPhi);
 		void updateAphi(unsigned index);
@@ -162,62 +161,55 @@ class ROCParameter : public Parameter
 
 
 
-
-
-
-
-		//R wrapper functions
+		//R Section:
 
 #ifndef STANDALONE
-		SEXP calculateSelectionCoefficientsR(unsigned sample, unsigned mixture);
-		ROCParameter(std::vector<double> sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer = true);
-		ROCParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer = true, std::string _mutationSelectionState = "allUnique");
+
+		//Constructors & Destructors:
+		ROCParameter(std::vector<double> sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix,
+					bool splitSer = true);
+		ROCParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
+					bool splitSer = true, std::string _mutationSelectionState = "allUnique");
+
+
+
+		//Initialization, Restart, Index Checking:
 		void initCovarianceMatrix(SEXP matrix, std::string aa);
-#endif
-		void initSelection(std::vector<double> selectionValues, unsigned mixtureElement, std::string aa);
 		void initMutation(std::vector<double> mutationValues, unsigned mixtureElement, std::string aa);
-		double getMutationPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
-		{
-			double rv = -1.0;
-			bool check = checkIndex(mixtureElement, 1, numMixtures);
-			if (check)
-			{ 
-				rv = getMutationPosteriorMean(mixtureElement - 1, samples, codon);
-			}
-			return rv;
-		}
-		double getSelectionPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
-		{
-			double rv = -1.0;
-			bool check = checkIndex(mixtureElement, 1, numMixtures);
-			if (check)
-			{
-				rv = getSelectionPosteriorMean(mixtureElement - 1, samples, codon);
-			}
-			return rv;
-		}
-		double getMutationVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased)
-		{
-			double rv = -1.0;
-			bool check = checkIndex(mixtureElement, 1, numMixtures);
-			if (check)
-			{
-				rv = getMutationVariance(mixtureElement - 1, samples, codon, unbiased);
-			}
-			return rv;
-		}
-		double getSelectionVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased)
-		{
-			double rv = -1.0;
-			bool check = checkIndex(mixtureElement, 1, numMixtures);
-			if (check)
-			{
-				rv = getSelectionVariance(mixtureElement - 1, samples, codon, unbiased);
-			}
-			return rv;
-		}
-    
-        void setTraceObject(ROCTrace _trace);
+		void initSelection(std::vector<double> selectionValues, unsigned mixtureElement, std::string aa);
+
+
+
+ 		//Trace Functions:
+ 		void setTraceObject(ROCTrace _trace);
+
+
+
+		//Posterior, Variance, and Estimates Functions:
+		double getMutationPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon);
+		double getSelectionPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon);
+		double getMutationVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased);
+		double getSelectionVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased);
+
+
+
+		//Other Functions:
+		SEXP calculateSelectionCoefficientsR(unsigned sample, unsigned mixture);
+
+
+
+
+#endif
+
+
+
+	void setCategoriesForTrace()
+	{
+		//std::vector<mixtureDefinition> *_categories = &categories;
+		traces.setCategories(categories);
+	}
+
+
 
 	protected:
 };

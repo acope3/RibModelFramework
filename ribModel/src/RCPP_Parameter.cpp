@@ -55,6 +55,8 @@ RCPP_MODULE(Parameter_mod)
 		.constructor <std::string>()
 		.constructor <std::vector<double>, std::vector<unsigned>, std::vector<unsigned>, bool>()
 		.constructor <std::vector<double>, unsigned, std::vector<unsigned>, bool, std::string>()
+
+
 		.method("initSelection", &ROCParameter::initSelection)
 		.method("initMutation", &ROCParameter::initMutation)
 		.method("getTraceObject", &ROCParameter::getTraceObject)
@@ -80,7 +82,7 @@ RCPP_MODULE(Parameter_mod)
 		.method("getMutationVarianceForCodon", &ROCParameter::getMutationVarianceForCodon)
 		.method("getSelectionVarianceForCodon", &ROCParameter::getSelectionVarianceForCodon)
         .method("setROCTrace", &ROCParameter::setTraceObject)
-
+		.method("setCategoriesForTrace", &ROCParameter::setCategoriesForTrace)
 		;
 
 	class_<RFPParameter>( "RFPParameter" )
