@@ -466,10 +466,10 @@ int main()
 	enum User { cedric, gabe, jeremy };
 	enum ModelToRun { ROC, RFP, FONSE };
 	/* Test variables */
-	User user = gabe;
-	ModelToRun modelToRun = RFP;
+	User user = jeremy;
+	ModelToRun modelToRun = ROC;
 	bool read = false;
-	bool testing = true;
+	bool testing = false;
 	bool withPhi = false;
 	if (testing)
 	{
@@ -544,7 +544,7 @@ int main()
 			case jeremy:
 				if (modelToRun == ROC || modelToRun == FONSE)
 				{
-					genome.readFasta("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
+					genome.readFasta("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/data/twoMixtures/simulatedAllUniqueR.fasta");
 					if (withPhi) {
 						genome.readObservedPhiValues("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv", false);
 					}

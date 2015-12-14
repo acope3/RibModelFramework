@@ -227,6 +227,27 @@ double FONSEModel::calculateAllPriors()
 	return priorRatio;
 }
 
+void FONSEModel::updateTracesWithInitialValues(Genome & genome)
+{
+	std::vector <std::string> groupList = parameter->getGroupList();
+
+	for (unsigned i = 0; i < genome.getGenomeSize(); i++)
+	{
+		parameter->updateSynthesisRateTrace(0, i);
+		parameter->updateMixtureAssignmentTrace(0, i);
+	}
+
+	for (unsigned i = 0; i < groupList.size(); i++)
+	{
+		std::array <unsigned, 2> codonRange = SequenceSummary::AAToCodonRange(groupList[i], true);
+		for (unsigned j = codonRange[0]; j < codonRange[1]; j++)
+		{
+			std::string codon = SequenceSummary::indexToCodon(j, true);
+			parameter->updateCodonSpecificParameterTrace(0, codon);
+		}
+	}
+}
+
 void FONSEModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth)
 {
 	adaptSphiProposalWidth(adaptiveWidth);

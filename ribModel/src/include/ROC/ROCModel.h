@@ -62,6 +62,7 @@ class ROCModel : public Model
 	void updateSepsilonTrace(unsigned index, unsigned sample) { parameter->updateSepsilonTraces(sample); }
 	void adaptAphiProposalWidth(unsigned adaptiveWidth) { parameter->adaptAphiProposalWidth(adaptiveWidth); }
 	virtual void updateHyperParameterTraces(unsigned sample);
+	virtual void updateTracesWithInitialValues(Genome &genome);
 	virtual void proposeSynthesisRateLevels() {parameter->proposeSynthesisRateLevels();}
 	virtual unsigned getNumSynthesisRateCategories() {return parameter->getNumSynthesisRateCategories();}
 	virtual std::vector<unsigned> getMixtureElementsOfSelectionCategory(unsigned k) {return parameter->getMixtureElementsOfSelectionCategory(k);}

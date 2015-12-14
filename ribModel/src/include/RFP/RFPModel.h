@@ -39,6 +39,7 @@ class RFPModel: public Model {
 		{
 			parameter->initAllTraces(samples, num_genes);
 		}
+		virtual void updateTracesWithInitialValues(Genome &genome);
 		virtual void writeRestartFile(std::string filename)
 		{
 			return parameter->writeEntireRestartFile(filename);
