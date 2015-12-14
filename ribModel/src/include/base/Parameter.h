@@ -8,6 +8,7 @@
 #include <set>
 #include <fstream>
 #include <ctime>
+#include <sstream>
 #ifndef STANDALONE
 #include <Rcpp.h>
 #endif
@@ -52,11 +53,11 @@ class Parameter {
 
 		//Initialization, Restart, Index Checking:
 		void initParameterSet(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
-				std::vector<std::vector<unsigned>> mixtureDefinitionMatrix, bool splitSer = true,
-				std::string _mutationSelectionState = "allUnique");
+							  std::vector<std::vector<unsigned>> mixtureDefinitionMatrix,
+							  bool splitSer = true, std::string _mutationSelectionState = "allUnique");
 		void initBaseValuesFromFile(std::string filename);
 		void writeBasicRestartFile(std::string filename);
-		std::vector<double> readPhiValues(std::string filename); //General function, not specific to class, possibly move
+		std::vector<double> readPhiValues(std::string filename); //General function, possibly move
 		bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);
 
 
@@ -137,7 +138,6 @@ class Parameter {
 		virtual double getSphiPosteriorMean(unsigned samples, unsigned mixture) = 0;
 		virtual std::vector<double> getEstimatedMixtureAssignmentProbabilities(unsigned samples,
 				unsigned geneIndex) = 0;
-
 		virtual double getSphiVariance(unsigned samples, unsigned mixture, bool unbiased) = 0;
 		virtual double getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement,
 				bool unbiased = true) = 0;
@@ -220,8 +220,12 @@ class Parameter {
 
 
 	protected:
-		std::vector<double> Sphi;
+		std::vector<mixtureDefinition> categories;
+		std::vector<std::string> groupList;
+
 		std::vector<double> Sphi_proposed;
+		std::vector<double> Sphi;
+
 
 		unsigned phiGroupings;
 		unsigned numMixtures;
@@ -232,10 +236,7 @@ class Parameter {
 		unsigned numMutationCategories; //TODO Probably needs to be renamed
 		unsigned numSelectionCategories; //TODO Probably needs to be renamed
 
-		//Objects
-		std::vector<mixtureDefinition> categories;
 
-		std::vector<std::string> groupList;
 
 		unsigned numAcceptForSphi;
 		std::vector<unsigned> mixtureAssignment;

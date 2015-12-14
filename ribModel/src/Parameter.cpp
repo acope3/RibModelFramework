@@ -1,5 +1,4 @@
 #include "include/base/Parameter.h"
-#include <sstream>
 
 
 //R runs only
@@ -23,8 +22,9 @@ const std::string Parameter::mutationShared = "mutationShared";
 
 
 
-
+//--------------------------------------------------//
 // ---------- Constructors & Destructors ---------- //
+//--------------------------------------------------//
 
 
 Parameter::Parameter()
@@ -115,12 +115,13 @@ Parameter::~Parameter()
 
 
 
-
+//---------------------------------------------------------------//
 // ---------- Initialization, Restart, Index Checking ---------- //
+//---------------------------------------------------------------//
 
 
-void Parameter::initParameterSet(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
-		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix, bool splitSer, std::string _mutationSelectionState)
+void Parameter::initParameterSet(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> mixtureDefinitionMatrix, bool splitSer,
+    std::string _mutationSelectionState)
 {
 	// assign genes to mixture element
 	unsigned numGenes = geneAssignment.size();
