@@ -1,16 +1,31 @@
 #include "include/base/Parameter.h"
-#include <sstream>
 
+
+//R runs only
 #ifndef STANDALONE
 #include <Rcpp.h>
 using namespace Rcpp;
 #endif
-const std::string Parameter::allUnique = "allUnique";
-const std::string Parameter::selectionShared = "selectionShared";
-const std::string Parameter::mutationShared = "mutationShared";
+
+
+//C++ runs only
 #ifdef STANDALONE
 std::default_random_engine Parameter::generator( (unsigned) std::time(NULL));
 #endif
+
+
+//Definition of constant variables
+const std::string Parameter::allUnique = "allUnique";
+const std::string Parameter::selectionShared = "selectionShared";
+const std::string Parameter::mutationShared = "mutationShared";
+
+
+
+
+//--------------------------------------------------//
+// ---------- Constructors & Destructors -----------//
+//--------------------------------------------------//
+
 
 Parameter::Parameter()
 {
@@ -59,40 +74,54 @@ Parameter& Parameter::operator=(const Parameter& rhs)
 		Sphi_proposed[i] = rhs.Sphi_proposed[i];
 	}
 
-  numAcceptForSphi = rhs.numAcceptForSphi;
-  phiGroupings = rhs.phiGroupings;
-  categories = rhs.categories;
+	numAcceptForSphi = rhs.numAcceptForSphi;
+	phiGroupings = rhs.phiGroupings;
+	categories = rhs.categories;
 
-  // proposal bias and std for phi values
-  bias_sphi = rhs.bias_sphi;
-  std_sphi = rhs.std_sphi;
+  	// proposal bias and std for phi values
+  	bias_sphi = rhs.bias_sphi;
+  	std_sphi = rhs.std_sphi;
 
-  // proposal bias and std for phi values
-  bias_phi = rhs.bias_phi;
-  std_phi = rhs.std_phi;
+  	// proposal bias and std for phi values
+  	bias_phi = rhs.bias_phi;
+  	std_phi = rhs.std_phi;
 
-  currentSynthesisRateLevel = rhs.currentSynthesisRateLevel;
-  proposedSynthesisRateLevel = rhs.proposedSynthesisRateLevel;
-  numAcceptForSynthesisRate = rhs.numAcceptForSynthesisRate;
+  	currentSynthesisRateLevel = rhs.currentSynthesisRateLevel;
+  	proposedSynthesisRateLevel = rhs.proposedSynthesisRateLevel;
+  	numAcceptForSynthesisRate = rhs.numAcceptForSynthesisRate;
 
-  numMutationCategories = rhs.numMutationCategories;
-  numSelectionCategories = rhs.numSelectionCategories;
+  	numMutationCategories = rhs.numMutationCategories;
+  	numSelectionCategories = rhs.numSelectionCategories;
 
 
-  numMixtures = rhs.numMixtures;
+  	numMixtures = rhs.numMixtures;
 
-  mutationSelectionState = rhs.mutationSelectionState;
-  selectionIsInMixture = rhs.selectionIsInMixture;
-  mutationIsInMixture = rhs.mutationIsInMixture;
-  maxGrouping = rhs.maxGrouping;
-  groupList = rhs.groupList;
-  mixtureAssignment = rhs.mixtureAssignment;
-  categoryProbabilities = rhs.categoryProbabilities;
-  return *this;
+  	mutationSelectionState = rhs.mutationSelectionState;
+  	selectionIsInMixture = rhs.selectionIsInMixture;
+	mutationIsInMixture = rhs.mutationIsInMixture;
+	maxGrouping = rhs.maxGrouping;
+	groupList = rhs.groupList;
+	mixtureAssignment = rhs.mixtureAssignment;
+	categoryProbabilities = rhs.categoryProbabilities;
+	return *this;
 }
 
-void Parameter::initParameterSet(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
-		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix, bool splitSer, std::string _mutationSelectionState)
+
+Parameter::~Parameter()
+{
+	//dtor
+}
+
+
+
+
+//---------------------------------------------------------------//
+// ---------- Initialization and Restart Functions --------------//
+//---------------------------------------------------------------//
+
+
+void Parameter::initParameterSet(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> mixtureDefinitionMatrix, bool splitSer,
+    std::string _mutationSelectionState)
 {
 	// assign genes to mixture element
 	unsigned numGenes = geneAssignment.size();
@@ -143,232 +172,19 @@ void Parameter::initParameterSet(std::vector<double> sphi, unsigned _numMixtures
 	numAcceptForSynthesisRate.resize(numSelectionCategories);
 	std_phi.resize(numSelectionCategories);
 
-  for (unsigned i = 0u; i < numSelectionCategories; i++)
-  {
-
-    std::vector<double> tempExpr(numGenes, 0.0);
-    currentSynthesisRateLevel[i] = tempExpr;
-    proposedSynthesisRateLevel[i] = tempExpr;
-
-    std::vector<unsigned> tempAccExpr(numGenes, 0u);
-    numAcceptForSynthesisRate[i] = tempAccExpr;
-
-    std::vector<double> tempStdPhi(numGenes, 1.0);
-    std_phi[i] = tempStdPhi;
-  }
-}
-
-
-// sort array interval from first (included) to last (excluded)!!
-// quick sort, sorting arrays a and b by a.
-// Elements in b corespond to a, a will be sorted and it will be assured that b will be sorted by a
-void Parameter::quickSortPair(double a[], int b[], int first, int last)
-{
-	int pivotElement;
-
-	if(first < last)
+	for (unsigned i = 0u; i < numSelectionCategories; i++)
 	{
-		pivotElement = pivotPair(a, b, first, last);
-		quickSortPair(a, b, first, pivotElement);
-		quickSortPair(a, b, pivotElement + 1, last);
+
+		std::vector<double> tempExpr(numGenes, 0.0);
+		currentSynthesisRateLevel[i] = tempExpr;
+		proposedSynthesisRateLevel[i] = tempExpr;
+
+		std::vector<unsigned> tempAccExpr(numGenes, 0u);
+		numAcceptForSynthesisRate[i] = tempAccExpr;
+
+		std::vector<double> tempStdPhi(numGenes, 1.0);
+		std_phi[i] = tempStdPhi;
 	}
-}
-
-
-// sort array interval from first (included) to last (excluded)!!
-void Parameter::quickSort(double a[], int first, int last)
-{
-	int pivotElement;
-
-	if(first < last)
-	{
-		pivotElement = pivot(a, first, last);
-		quickSort(a, first, pivotElement);
-		quickSort(a, pivotElement + 1, last);
-	}
-}
-int Parameter::pivot(double a[], int first, int last)
-{
-	int p = first;
-	double pivotElement = a[first];
-
-	for(int i = (first + 1) ; i < last ; i++)
-	{
-		/* If you want to sort the list in the other order, change "<=" to ">" */
-		if(a[i] <= pivotElement)
-		{
-			p++;
-			swap(a[i], a[p]);
-		}
-	}
-	swap(a[p], a[first]);
-
-	return p;
-}
-
-
-int Parameter::pivotPair(double a[], int b[], int first, int last)
-{
-	int p = first;
-	double pivotElement = a[first];
-
-	for(int i = (first + 1) ; i < last ; i++)
-	{
-		/* If you want to sort the list in the other order, change "<=" to ">" */
-		if(a[i] <= pivotElement)
-		{
-			p++;
-			swap(a[i], a[p]);
-			swap(b[i], b[p]);
-		}
-	}
-	swap(a[p], a[first]);
-	swap(b[p], b[first]);
-
-	return p;
-}
-void Parameter::swap(double& a, double& b)
-{
-	double temp = a;
-	a = b;
-	b = temp;
-}
-void Parameter::swap(int& a, int& b)
-{
-	int temp = a;
-	a = b;
-	b = temp;
-}
-
-bool Parameter::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound)
-{
-	bool check = false;
-	if (lowerbound <= index && index <= upperbound)
-	{
-		check = true;
-	}
-	else
-	{
-		std::cerr <<"Error with Index\nINDEX: " << index <<"\n";
-		std::cerr <<"MUST BE BETWEEN " << lowerbound << " & " << upperbound <<"\n";
-	}
-
-	return check;
-
-}
-
-
-void Parameter::writeBasicRestartFile(std::string filename)
-{
-	std::cout <<"Writing File\n";
-	std::ofstream out;
-	std::string output = "";
-	std::ostringstream oss;
-	unsigned i, j;
-	out.open(filename.c_str());
-	if (out.fail())
-	{
-		std::cerr <<"Could not open restart file for writing\n";
-		std::exit(1);
-	}
-
-
-	oss << ">groupList:\n";
-	for (i = 0; i < groupList.size(); i++) {
-		oss << groupList[i];
-		if ((i + 1) % 10 == 0) oss << "\n";
-		else oss << " ";
-	}
-	if (i % 10 != 0) oss << "\n";
-	oss <<">Sphi:\n";
-	for (i = 0; i < Sphi.size(); i++)
-	{
-		oss << Sphi[i];
-		if ((i + 1) % 10 == 0) oss <<"\n";
-		else oss <<" ";
-	}
-	if (i % 10 != 0) oss <<"\n";
-	oss <<">numParam:\n" << numParam <<"\n";
-	oss <<">numMixtures:\n" << numMixtures <<"\n";
-	oss <<">std_sphi:\n" << std_sphi <<"\n";
-	//maybe clear the buffer	
-	oss <<">std_phi:\n";
-	for (i = 0; i < std_phi.size(); i++)
-	{
-		oss <<"***\n";
-		for (j = 0; j < std_phi[i].size(); j++)
-		{
-			oss << std_phi[i][j];
-			if ((j + 1) % 10 == 0) oss <<"\n";
-			else oss <<" ";
-		}
-		if (j % 10 != 0) oss <<"\n";
-	}
-	oss <<">categories:\n";
-	for (i = 0; i < categories.size(); i++)
-	{
-		oss << categories[i].delM <<" " << categories[i].delEta <<"\n";	
-	}
-	
-	oss <<">mixtureAssignment:\n";
-	for (i = 0; i < mixtureAssignment.size(); i++)
-	{
-		oss << mixtureAssignment[i];
-		if ((i + 1) % 50 == 0) oss <<"\n";
-		else oss <<" ";
-	}
-	if (i % 50 != 0) oss <<"\n";
-	oss <<">numMutationCategories:\n" << numMutationCategories <<"\n";
-	oss <<">numSelectionCategories:\n" << numSelectionCategories <<"\n";
-
-	oss <<">categoryProbabilities:\n";
-	for (i = 0; i < categoryProbabilities.size(); i++)
-	{
-		oss << categoryProbabilities[i];
-		if ((i + 1) % 10 == 0) oss <<"\n";
-		else oss <<" ";
-	}
-	if (i % 10 != 0) oss <<"\n";
-
-	oss <<">selectionIsInMixture:\n";
-	for (i = 0; i < selectionIsInMixture.size(); i++)
-	{
-		oss <<"***\n";
-		for (j = 0; j < selectionIsInMixture[i].size(); j++)
-		{
-			oss << selectionIsInMixture[i][j] <<" ";
-		}
-		oss <<"\n";
-	}
-
-	oss <<">mutationIsInMixture:\n";
-	for (i = 0; i < mutationIsInMixture.size(); i++)
-	{
-		oss <<"***\n";
-		for (j = 0; j < mutationIsInMixture[i].size(); j++)
-		{
-			oss << mutationIsInMixture[i][j] <<" ";
-		}
-		oss <<"\n";
-	}
-
-	oss <<">currentSynthesisRateLevel:\n";
-	for (i = 0; i < currentSynthesisRateLevel.size(); i++)
-	{
-		oss <<"***\n";
-		for (j = 0; j < currentSynthesisRateLevel[i].size(); j++)
-		{
-    	oss << currentSynthesisRateLevel[i][j];
-    	if ((j + 1) % 10 == 0) oss <<"\n";
-    	else oss <<" ";
-		}
-		if (j % 10 != 0) oss <<"\n";
-	}
-
-	std::cout <<"Done writing\n";
-	output += oss.str();
-	out << output;
-	out.close();
 }
 
 
@@ -551,78 +367,119 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 }
 
 
-
-
-
-
-
-std::vector <double> Parameter::readPhiValues(std::string filename)
+void Parameter::writeBasicRestartFile(std::string filename)
 {
-	std::size_t pos, pos2;
-	std::ifstream currentFile;
-	std::string tmpString;
-	std::vector<double> RV;
-
-	currentFile.open(filename);
-	if (currentFile.fail())
+	std::cout <<"Writing File\n";
+	std::ofstream out;
+	std::string output = "";
+	std::ostringstream oss;
+	unsigned i, j;
+	out.open(filename.c_str());
+	if (out.fail())
 	{
-		std::cerr <<"Error opening file\n";
+		std::cerr <<"Could not open restart file for writing\n";
 		std::exit(1);
 	}
 
-	currentFile >> tmpString; //trash the first line, no info given.
 
-
-	while (currentFile >> tmpString)
+	oss << ">groupList:\n";
+	for (i = 0; i < groupList.size(); i++) {
+		oss << groupList[i];
+		if ((i + 1) % 10 == 0) oss << "\n";
+		else oss << " ";
+	}
+	if (i % 10 != 0) oss << "\n";
+	oss <<">Sphi:\n";
+	for (i = 0; i < Sphi.size(); i++)
 	{
-		pos = tmpString.find(",");
-		pos2 = tmpString.find(",", pos + 1);
-		if (pos != std::string::npos && pos2 != std::string::npos)
+		oss << Sphi[i];
+		if ((i + 1) % 10 == 0) oss <<"\n";
+		else oss <<" ";
+	}
+	if (i % 10 != 0) oss <<"\n";
+	oss <<">numParam:\n" << numParam <<"\n";
+	oss <<">numMixtures:\n" << numMixtures <<"\n";
+	oss <<">std_sphi:\n" << std_sphi <<"\n";
+	//maybe clear the buffer	
+	oss <<">std_phi:\n";
+	for (i = 0; i < std_phi.size(); i++)
+	{
+		oss <<"***\n";
+		for (j = 0; j < std_phi[i].size(); j++)
 		{
-			std::string val = tmpString.substr(pos + 1, pos2 - (pos + 1));
-			//RV.push_back(std::stod(val));
-			RV.push_back(std::atof(val.c_str()));
+			oss << std_phi[i][j];
+			if ((j + 1) % 10 == 0) oss <<"\n";
+			else oss <<" ";
 		}
+		if (j % 10 != 0) oss <<"\n";
+	}
+	oss <<">categories:\n";
+	for (i = 0; i < categories.size(); i++)
+	{
+		oss << categories[i].delM <<" " << categories[i].delEta <<"\n";	
+	}
+	
+	oss <<">mixtureAssignment:\n";
+	for (i = 0; i < mixtureAssignment.size(); i++)
+	{
+		oss << mixtureAssignment[i];
+		if ((i + 1) % 50 == 0) oss <<"\n";
+		else oss <<" ";
+	}
+	if (i % 50 != 0) oss <<"\n";
+	oss <<">numMutationCategories:\n" << numMutationCategories <<"\n";
+	oss <<">numSelectionCategories:\n" << numSelectionCategories <<"\n";
+
+	oss <<">categoryProbabilities:\n";
+	for (i = 0; i < categoryProbabilities.size(); i++)
+	{
+		oss << categoryProbabilities[i];
+		if ((i + 1) % 10 == 0) oss <<"\n";
+		else oss <<" ";
+	}
+	if (i % 10 != 0) oss <<"\n";
+
+	oss <<">selectionIsInMixture:\n";
+	for (i = 0; i < selectionIsInMixture.size(); i++)
+	{
+		oss <<"***\n";
+		for (j = 0; j < selectionIsInMixture[i].size(); j++)
+		{
+			oss << selectionIsInMixture[i][j] <<" ";
+		}
+		oss <<"\n";
 	}
 
-	return RV;
+	oss <<">mutationIsInMixture:\n";
+	for (i = 0; i < mutationIsInMixture.size(); i++)
+	{
+		oss <<"***\n";
+		for (j = 0; j < mutationIsInMixture[i].size(); j++)
+		{
+			oss << mutationIsInMixture[i][j] <<" ";
+		}
+		oss <<"\n";
+	}
+
+	oss <<">currentSynthesisRateLevel:\n";
+	for (i = 0; i < currentSynthesisRateLevel.size(); i++)
+	{
+		oss <<"***\n";
+		for (j = 0; j < currentSynthesisRateLevel[i].size(); j++)
+		{
+    	oss << currentSynthesisRateLevel[i][j];
+    	if ((j + 1) % 10 == 0) oss <<"\n";
+    	else oss <<" ";
+		}
+		if (j % 10 != 0) oss <<"\n";
+	}
+
+	std::cout <<"Done writing\n";
+	output += oss.str();
+	out << output;
+	out.close();
 }
 
-
-void Parameter::setNumMutationSelectionValues(std::string _mutationSelectionState, std::vector<std::vector<unsigned>> mixtureDefinitionMatrix)
-{
-	if (!mixtureDefinitionMatrix.empty())
-	{
-		//sets allow only the unique numbers to be added.
-		//at the end, the size of the set is equal to the number
-		//of unique categories.
-		std::set<unsigned> delMCounter;
-		std::set<unsigned> delEtaCounter;
-
-		for (unsigned i = 0u; i < numMixtures; i++)
-		{
-			delMCounter.insert(mixtureDefinitionMatrix[i][0] - 1);
-			delEtaCounter.insert(mixtureDefinitionMatrix[i][1] - 1);
-		}
-		numMutationCategories = delMCounter.size();
-		numSelectionCategories = delEtaCounter.size();
-	}
-	else if (_mutationSelectionState == selectionShared)
-	{
-		numMutationCategories = numMixtures;
-		numSelectionCategories = 1u;
-	}
-	else if (_mutationSelectionState == mutationShared)
-	{
-		numMutationCategories = 1u;
-		numSelectionCategories = numMixtures;
-	}
-	else //assuming the default of allUnique
-	{
-		numMutationCategories = numMixtures;
-		numSelectionCategories = numMixtures;
-	}
-}
 
 void Parameter::initCategoryDefinitions(std::string _mutationSelectionState, std::vector<std::vector<unsigned>> mixtureDefinitionMatrix)
 {
@@ -663,55 +520,10 @@ void Parameter::initCategoryDefinitions(std::string _mutationSelectionState, std
 		delMCounter.insert(categories[i].delM);
 		delEtaCounter.insert(categories[i].delEta);
 	}
-	//  numMutationCategories = delMCounter.size();
-	//  numSelectionCategories = delEtaCounter.size();
+
 	//sets allow only the unique numbers to be added.
 	//at the end, the size of the set is equal to the number
 	//of unique categories.
-}
-
-
-
-void Parameter::printMixtureDefinitionMatrix()
-{
-	for (unsigned i = 0u; i < numMixtures; i++)
-	{
-		std::cout << categories[i].delM <<"\t" << categories[i].delEta <<"\n";
-	}
-}
-
-double Parameter::getSynthesisRate(unsigned geneIndex, unsigned mixtureElement, bool proposed)
-{
-	unsigned category = getSelectionCategory(mixtureElement);
-	return (proposed ? proposedSynthesisRateLevel[category][geneIndex] : currentSynthesisRateLevel[category][geneIndex]);
-}
-
-void Parameter::setSynthesisRate(double phi, unsigned geneIndex, unsigned mixtureElement)
-{
-	unsigned category = getSelectionCategory(mixtureElement);
-	currentSynthesisRateLevel[category][geneIndex] = phi;
-}
-
-double Parameter::getSynthesisRateProposalWidth(unsigned geneIndex, unsigned mixtureElement)
-{
-	unsigned category = getSelectionCategory(mixtureElement);
-	return std_phi[category][geneIndex];
-}
-
-void Parameter::updateSynthesisRate(unsigned geneIndex)
-{
-	for(unsigned category = 0; category < numSelectionCategories; category++)
-	{
-		numAcceptForSynthesisRate[category][geneIndex]++;
-		currentSynthesisRateLevel[category][geneIndex] = proposedSynthesisRateLevel[category][geneIndex];
-	}
-}
-
-void Parameter::updateSynthesisRate(unsigned geneIndex, unsigned mixtureElement)
-{
-	unsigned category = getSelectionCategory(mixtureElement);
-	numAcceptForSynthesisRate[category][geneIndex]++;
-	currentSynthesisRateLevel[category][geneIndex] = proposedSynthesisRateLevel[category][geneIndex];
 }
 
 
@@ -748,9 +560,6 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 }
 
 
-
-
-
 void Parameter::InitializeSynthesisRate(double sd_phi)
 {
 	unsigned numGenes = currentSynthesisRateLevel[1].size();
@@ -764,6 +573,8 @@ void Parameter::InitializeSynthesisRate(double sd_phi)
 		}
 	}
 }
+
+
 void Parameter::InitializeSynthesisRate(std::vector<double> expression)
 {
 	unsigned numGenes = currentSynthesisRateLevel[0].size();
@@ -776,8 +587,214 @@ void Parameter::InitializeSynthesisRate(std::vector<double> expression)
 			numAcceptForSynthesisRate[category][i] = 0u;
 		}
 	}
-
 }
+
+
+std::vector <double> Parameter::readPhiValues(std::string filename)
+{
+	std::size_t pos, pos2;
+	std::ifstream currentFile;
+	std::string tmpString;
+	std::vector<double> RV;
+
+	currentFile.open(filename);
+	if (currentFile.fail())
+	{
+		std::cerr <<"Error opening file\n";
+		std::exit(1);
+	}
+
+	currentFile >> tmpString; //trash the first line, no info given.
+
+
+	while (currentFile >> tmpString)
+	{
+		pos = tmpString.find(",");
+		pos2 = tmpString.find(",", pos + 1);
+		if (pos != std::string::npos && pos2 != std::string::npos)
+		{
+			std::string val = tmpString.substr(pos + 1, pos2 - (pos + 1));
+			//RV.push_back(std::stod(val));
+			RV.push_back(std::atof(val.c_str()));
+		}
+	}
+
+	return RV;
+}
+
+
+
+
+
+// ----------------------------------------------------------------------//
+// ---------- Mixture Definition Matrix and Category Functions ----------//
+// ----------------------------------------------------------------------//
+
+
+void Parameter::setNumMutationSelectionValues(std::string _mutationSelectionState, std::vector<std::vector<unsigned>> mixtureDefinitionMatrix)
+{
+	if (!mixtureDefinitionMatrix.empty())
+	{
+		//sets allow only the unique numbers to be added.
+		//at the end, the size of the set is equal to the number
+		//of unique categories.
+		std::set<unsigned> delMCounter;
+		std::set<unsigned> delEtaCounter;
+
+		for (unsigned i = 0u; i < numMixtures; i++)
+		{
+			delMCounter.insert(mixtureDefinitionMatrix[i][0] - 1);
+			delEtaCounter.insert(mixtureDefinitionMatrix[i][1] - 1);
+		}
+		numMutationCategories = delMCounter.size();
+		numSelectionCategories = delEtaCounter.size();
+	}
+	else if (_mutationSelectionState == selectionShared)
+	{
+		numMutationCategories = numMixtures;
+		numSelectionCategories = 1u;
+	}
+	else if (_mutationSelectionState == mutationShared)
+	{
+		numMutationCategories = 1u;
+		numSelectionCategories = numMixtures;
+	}
+	else //assuming the default of allUnique
+	{
+		numMutationCategories = numMixtures;
+		numSelectionCategories = numMixtures;
+	}
+}
+
+
+void Parameter::printMixtureDefinitionMatrix()
+{
+	for (unsigned i = 0u; i < numMixtures; i++)
+	{
+		std::cout << categories[i].delM <<"\t" << categories[i].delEta <<"\n";
+	}
+}
+
+
+double Parameter::getCategoryProbability(unsigned mixtureElement)
+{
+	return categoryProbabilities[mixtureElement];
+}
+
+
+void Parameter::setCategoryProbability(unsigned mixtureElement, double value)
+{
+	categoryProbabilities[mixtureElement] = value;
+}
+
+
+unsigned Parameter::getNumMutationCategories()
+{
+	return numMutationCategories;
+}
+
+
+unsigned Parameter::getNumSelectionCategories()
+{
+	return numSelectionCategories;
+}
+
+
+unsigned Parameter::getNumSynthesisRateCategories()
+{
+	return numSelectionCategories;
+}
+
+
+unsigned Parameter::getMutationCategory(unsigned mixtureElement)
+{
+	return categories[mixtureElement].delM;
+}
+
+
+unsigned Parameter::getSelectionCategory(unsigned mixtureElement)
+{
+	return categories[mixtureElement].delEta;
+}
+
+
+unsigned Parameter::getSynthesisRateCategory(unsigned mixtureElement)
+{
+	return categories[mixtureElement].delEta;
+}
+
+
+std::vector<unsigned> Parameter::getMixtureElementsOfMutationCategory(unsigned category)
+{
+	return mutationIsInMixture[category];
+}
+
+
+std::vector<unsigned> Parameter::getMixtureElementsOfSelectionCategory(unsigned category)
+{
+	return selectionIsInMixture[category];
+}
+
+
+std::string Parameter::getMutationSelectionState()
+{
+	return mutationSelectionState;
+}
+
+
+
+
+
+// -------------------------------------------//
+// ---------- Group List Functions -----------//
+// -------------------------------------------//
+
+
+void Parameter::setGroupList(std::vector <std::string> gl)
+{
+	groupList.clear();
+	for (unsigned i = 0; i < gl.size(); i++)
+	{
+		if (gl[i] == "M" || gl[i] == "W" || gl[i] == "X")
+		{
+			std::cerr << "Warning: Amino Acid" << gl[i] << "not recognized in ROC model\n";
+		}else{
+			groupList.push_back(gl[i]);
+		}
+	}
+}
+
+std::string Parameter::getGrouping(unsigned index)
+{
+	return groupList[index];
+}
+
+
+std::vector<std::string> Parameter::getGroupList()
+{
+	return groupList;
+}
+
+
+unsigned Parameter::getGroupListSize()
+{
+	return (unsigned) groupList.size();
+}
+
+
+
+
+
+// -------------------------------------//
+// ---------- Sphi Functions -----------//
+// -------------------------------------//
+
+
+double Parameter::getSphi(unsigned selectionCategory, bool proposed)
+{
+	return (proposed ? Sphi_proposed[selectionCategory] : Sphi[selectionCategory]);
+}
+
 
 void Parameter::proposeSphi()
 {
@@ -787,9 +804,60 @@ void Parameter::proposeSphi()
 	}
 }
 
+
+void Parameter::setSphi(double sPhi, unsigned selectionCategory)
+{
+	Sphi[selectionCategory] = sPhi;
+}
+
+
+double Parameter::getCurrentSphiProposalWidth()
+{
+	return std_sphi;
+}
+
+
+void Parameter::updateSphi()
+{
+	for(unsigned i = 0u; i < numSelectionCategories; i++)
+	{
+		Sphi[i] = Sphi_proposed[i];
+	}
+	numAcceptForSphi++;
+}
+
+
+
+
+
+// -----------------------------------------------//
+// ---------- Synthesis Rate Functions -----------//
+// -----------------------------------------------//
+
+
+double Parameter::getSynthesisRate(unsigned geneIndex, unsigned mixtureElement, bool proposed)
+{
+	unsigned category = getSelectionCategory(mixtureElement);
+	return (proposed ? proposedSynthesisRateLevel[category][geneIndex] : currentSynthesisRateLevel[category][geneIndex]);
+}
+
+
+double Parameter::getCurrentSynthesisRateProposalWidth(unsigned expressionCategory, unsigned geneIndex)
+{
+	return std_phi[expressionCategory][geneIndex];
+}
+
+
+double Parameter::getSynthesisRateProposalWidth(unsigned geneIndex, unsigned mixtureElement)
+{
+	unsigned category = getSelectionCategory(mixtureElement);
+	return std_phi[category][geneIndex];
+}
+
+
 void Parameter::proposeSynthesisRateLevels()
 {
-	unsigned numSynthesisRateLevels = currentSynthesisRateLevel[0].size();
+	unsigned numSynthesisRateLevels = (unsigned) currentSynthesisRateLevel[0].size();
 	for(unsigned category = 0; category < numSelectionCategories; category++)
 	{
 		for(unsigned i = 0u; i < numSynthesisRateLevels; i++)
@@ -800,6 +868,58 @@ void Parameter::proposeSynthesisRateLevels()
 	}
 }
 
+
+void Parameter::setSynthesisRate(double phi, unsigned geneIndex, unsigned mixtureElement)
+{
+	unsigned category = getSelectionCategory(mixtureElement);
+	currentSynthesisRateLevel[category][geneIndex] = phi;
+}
+
+
+void Parameter::updateSynthesisRate(unsigned geneIndex)
+{
+	for(unsigned category = 0; category < numSelectionCategories; category++)
+	{
+		numAcceptForSynthesisRate[category][geneIndex]++;
+		currentSynthesisRateLevel[category][geneIndex] = proposedSynthesisRateLevel[category][geneIndex];
+	}
+}
+
+
+void Parameter::updateSynthesisRate(unsigned geneIndex, unsigned mixtureElement)
+{
+	unsigned category = getSelectionCategory(mixtureElement);
+	numAcceptForSynthesisRate[category][geneIndex]++;
+	currentSynthesisRateLevel[category][geneIndex] = proposedSynthesisRateLevel[category][geneIndex];
+}
+
+
+
+
+
+// ------------------------------------------//
+// ---------- Iteration Functions -----------//
+// ------------------------------------------//
+
+
+unsigned Parameter::getLastIteration()
+{
+	return lastIteration;
+}
+
+
+void Parameter::setLastIteration(unsigned iteration)
+{
+	lastIteration = iteration;
+}
+
+
+
+
+
+// ------------------------------------------------------------------//
+// ---------- Posterior, Variance, and Estimates Functions ----------//
+// ------------------------------------------------------------------//
 
 
 unsigned Parameter::getEstimatedMixtureAssignment(unsigned samples, unsigned geneIndex)
@@ -818,6 +938,141 @@ unsigned Parameter::getEstimatedMixtureAssignment(unsigned samples, unsigned gen
 		}
 	}
 	return rv;
+}
+
+
+
+
+
+// -------------------------------------//
+// ---------- Other Functions ----------//
+// -------------------------------------//
+
+
+unsigned Parameter::getNumParam()
+{
+	return numParam;
+}
+
+
+unsigned Parameter::getNumMixtureElements()
+{
+	return numMixtures;
+}
+
+
+unsigned Parameter::getNumPhiGroupings() 
+{ 
+	return phiGroupings;
+}
+
+
+void Parameter::setMixtureAssignment(unsigned gene, unsigned value)
+{
+	mixtureAssignment[gene] = value;
+}
+
+
+unsigned Parameter::getMixtureAssignment(unsigned gene)
+{
+	return mixtureAssignment[gene];
+}
+
+
+
+
+
+
+// --------------------------------------------------//
+// ---------- STATICS - Sorting Functions -----------//
+// --------------------------------------------------//
+
+
+// sort array interval from first (included) to last (excluded)!!
+// quick sort, sorting arrays a and b by a.
+// Elements in b corespond to a, a will be sorted and it will be assured that b will be sorted by a
+void Parameter::quickSortPair(double a[], int b[], int first, int last)
+{
+	int pivotElement;
+
+	if(first < last)
+	{
+		pivotElement = pivotPair(a, b, first, last);
+		quickSortPair(a, b, first, pivotElement);
+		quickSortPair(a, b, pivotElement + 1, last);
+	}
+}
+
+
+// sort array interval from first (included) to last (excluded)!!
+void Parameter::quickSort(double a[], int first, int last)
+{
+	int pivotElement;
+
+	if(first < last)
+	{
+		pivotElement = pivot(a, first, last);
+		quickSort(a, first, pivotElement);
+		quickSort(a, pivotElement + 1, last);
+	}
+}
+
+
+int Parameter::pivotPair(double a[], int b[], int first, int last)
+{
+	int p = first;
+	double pivotElement = a[first];
+
+	for(int i = (first + 1) ; i < last ; i++)
+	{
+		/* If you want to sort the list in the other order, change "<=" to ">" */
+		if(a[i] <= pivotElement)
+		{
+			p++;
+			swap(a[i], a[p]);
+			swap(b[i], b[p]);
+		}
+	}
+	swap(a[p], a[first]);
+	swap(b[p], b[first]);
+
+	return p;
+}
+
+
+int Parameter::pivot(double a[], int first, int last)
+{
+	int p = first;
+	double pivotElement = a[first];
+
+	for(int i = (first + 1) ; i < last ; i++)
+	{
+		/* If you want to sort the list in the other order, change "<=" to ">" */
+		if(a[i] <= pivotElement)
+		{
+			p++;
+			swap(a[i], a[p]);
+		}
+	}
+	swap(a[p], a[first]);
+
+	return p;
+}
+
+
+void Parameter::swap(double& a, double& b)
+{
+	double temp = a;
+	a = b;
+	b = temp;
+}
+
+
+void Parameter::swap(int& a, int& b)
+{
+	int temp = a;
+	a = b;
+	b = temp;
 }
 
 
@@ -884,6 +1139,8 @@ void Parameter::drawIidRandomVector(unsigned draws, double mean, double sd, doub
 		randomNumbers[i] = (*proposal)(mean, sd);
 	}
 }
+
+
 void Parameter::drawIidRandomVector(unsigned draws, double r, double (*proposal)(double r), double* randomNumbers)
 {
 	for(unsigned i = 0u; i < draws; i++)
@@ -924,6 +1181,7 @@ double Parameter::randLogNorm(double m, double s)
 	return rv;
 }
 
+
 double Parameter::randExp(double r)
 {
 	double rv;
@@ -938,6 +1196,7 @@ double Parameter::randExp(double r)
 #endif
 	return rv;
 }
+
 
 //The R version and C++ differ because C++ uses the 
 //shape and scale parameter version while R uses the 
@@ -1003,6 +1262,7 @@ double Parameter::randUnif(double minVal, double maxVal)
 	return rv;
 }
 
+
 unsigned Parameter::randMultinom(double* probabilities, unsigned mixtureElements)
 {
 	// calculate cummulative sum to determine group boundaries
@@ -1039,6 +1299,7 @@ unsigned Parameter::randMultinom(double* probabilities, unsigned mixtureElements
 	return returnValue;
 }
 
+
 double Parameter::densityNorm(double x, double mean, double sd, bool log)
 {
 	const double inv_sqrt_2pi = 0.3989422804014327;
@@ -1047,6 +1308,7 @@ double Parameter::densityNorm(double x, double mean, double sd, bool log)
 
 	return log ? (-log_sqrt_2pi - std::log(sd) - (0.5 * a * a)) : ((inv_sqrt_2pi / sd) * std::exp(-0.5 * a * a));
 }
+
 
 double Parameter::densityLogNorm(double x, double mean, double sd, bool log)
 {
@@ -1063,16 +1325,66 @@ double Parameter::densityLogNorm(double x, double mean, double sd, bool log)
 }
 
 
-//R Wrapper functions
 
-void Parameter::setMixtureAssignmentForGene(unsigned geneIndex, unsigned value)
+
+
+
+
+
+
+
+// -----------------------------------------------------------------------------------------------------//
+// ---------------------------------------- R SECTION --------------------------------------------------//
+// -----------------------------------------------------------------------------------------------------//
+
+#ifndef STANDALONE
+
+//---------------------------------------------------------------//
+// ---------- Initialization and Restart Functions --------------//
+//---------------------------------------------------------------//
+
+
+void Parameter::initializeSynthesisRateByGenome(Genome& genome, double sd_phi)
 {
-	bool check = checkIndex(geneIndex, 1, mixtureAssignment.size());
-	if (check)
-	{
-		mixtureAssignment[geneIndex - 1] = value;
-	}
+	InitializeSynthesisRate(genome, sd_phi);
 }
+
+
+void Parameter::initializeSynthesisRateByRandom(double sd_phi)
+{
+	InitializeSynthesisRate(sd_phi);
+}
+
+
+void Parameter::initializeSynthesisRateByList(std::vector<double> expression)
+{
+	InitializeSynthesisRate(expression);
+}
+
+
+bool Parameter::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound)
+{
+	bool check = false;
+	if (lowerbound <= index && index <= upperbound)
+	{
+		check = true;
+	}
+	else
+	{
+		std::cerr <<"Error with Index\nINDEX: " << index <<"\n";
+		std::cerr <<"MUST BE BETWEEN " << lowerbound << " & " << upperbound <<"\n";
+	}
+
+	return check;
+}
+
+
+
+
+
+// ----------------------------------------------------------------------//
+// ---------- Mixture Definition Matrix and Category Functions ----------//
+// ----------------------------------------------------------------------//
 
 
 unsigned Parameter::getMutationCategoryForMixture(unsigned mixtureElement)
@@ -1080,11 +1392,15 @@ unsigned Parameter::getMutationCategoryForMixture(unsigned mixtureElement)
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
 	return check ? categories[mixtureElement - 1].delM + 1 : 0;
 }
+
+
 unsigned Parameter::getSelectionCategoryForMixture(unsigned mixtureElement)
 {
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
 	return check ? categories[mixtureElement - 1].delEta + 1 : 0;
 }
+
+
 unsigned Parameter::getSynthesisRateCategoryForMixture(unsigned mixtureElement)
 {
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
@@ -1092,46 +1408,56 @@ unsigned Parameter::getSynthesisRateCategoryForMixture(unsigned mixtureElement)
 }
 
 
-unsigned Parameter::getEstimatedMixtureAssignmentForGene(unsigned samples, unsigned geneIndex)
+std::vector<std::vector<unsigned>> Parameter::getCategories()
 {
-	bool check = checkIndex(geneIndex, 1, mixtureAssignment.size());
-	return check ? getEstimatedMixtureAssignment(samples, geneIndex - 1) + 1 : 0;
+	unsigned size = (unsigned) categories.size();
+	std::vector<std::vector<unsigned>> RV;
+	for (unsigned i = 0; i < size; i++)
+	{
+		std::vector<unsigned> tmp;
+		tmp.push_back(categories[i].delM);
+		tmp.push_back(categories[i].delEta);
+		RV.push_back(tmp);
+	}
+
+	return RV;
 }
 
-std::vector<double> Parameter::getEstimatedMixtureAssignmentProbabilitiesForGene(unsigned samples, unsigned geneIndex)
+
+void Parameter::setCategories(std::vector<std::vector<unsigned>> _categories)
 {
-	std::vector <double> probabilities;
-	bool check = checkIndex(geneIndex, 1, mixtureAssignment.size());
-	if (check)
+	for (unsigned i = 0; i < _categories.size(); i++)
 	{
-		probabilities = getEstimatedMixtureAssignmentProbabilities(samples, geneIndex - 1);
+		categories.push_back(mixtureDefinition());
+		categories[i].delM = _categories[i][0];
+		categories[i].delEta = _categories[i][1];
 	}
-	return probabilities;
+}
+
+
+void Parameter::setNumMutationCategories(unsigned _numMutationCategories)
+{
+	numMutationCategories = _numMutationCategories;
+}
+
+
+void Parameter::setNumSelectionCategories(unsigned _numSelectionCategories)
+{
+	numSelectionCategories = _numSelectionCategories;
 }
 
 
 
-double Parameter::getSynthesisRatePosteriorMeanByMixtureElementForGene(unsigned samples, unsigned geneIndex, unsigned mixtureElement)
+
+
+// -----------------------------------------------//
+// ---------- Synthesis Rate Functions -----------//
+// -----------------------------------------------//
+
+
+std::vector<std::vector<double>> Parameter::getSynthesisRateR()
 {
-	double rv = -1.0;
-	bool checkGene = checkIndex(geneIndex, 1, mixtureAssignment.size());
-	bool checkMixtureElement = checkIndex(mixtureElement, 1, numMixtures);
-	if (checkGene && checkMixtureElement)
-	{
-		rv = getSynthesisRatePosteriorMean(samples, geneIndex - 1, mixtureElement - 1);
-	}
-	return rv;
-}
-double Parameter::getSynthesisRateVarianceByMixtureElementForGene(unsigned samples, unsigned geneIndex, unsigned mixtureElement, bool unbiased)
-{
-	double rv = -1.0;
-	bool checkGene = checkIndex(geneIndex, 1, mixtureAssignment.size());
-	bool checkMixtureElement = checkIndex(mixtureElement, 1, numMixtures);
-	if (checkGene && checkMixtureElement)
-	{
-		rv = getSynthesisRateVariance(samples, geneIndex - 1, mixtureElement - 1, unbiased);
-	}
-	return rv;
+	return currentSynthesisRateLevel;
 }
 
 
@@ -1148,32 +1474,99 @@ std::vector<double> Parameter::getCurrentSynthesisRateForMixture(unsigned mixtur
 	return currentSynthesisRateLevel[exprCat];
 }
 
-void Parameter::setGroupList(std::vector <std::string> gl)
+
+
+
+
+// ------------------------------------------------------------------//
+// ---------- Posterior, Variance, and Estimates Functions ----------//
+// ------------------------------------------------------------------//
+
+
+double Parameter::getSynthesisRatePosteriorMeanByMixtureElementForGene(unsigned samples, unsigned geneIndex, unsigned mixtureElement)
 {
-	groupList.clear();
-	for (unsigned i = 0; i < gl.size(); i++)
+	double rv = -1.0;
+	bool checkGene = checkIndex(geneIndex, 1, (unsigned) mixtureAssignment.size());
+	bool checkMixtureElement = checkIndex(mixtureElement, 1, numMixtures);
+	if (checkGene && checkMixtureElement)
 	{
-		if (gl[i] == "M" || gl[i] == "W" || gl[i] == "X")
-		{
-			std::cerr << "Warning: Amino Acid" << gl[i] << "not recognized in ROC model\n";
-		}else{
-			groupList.push_back(gl[i]);
-		}
+		rv = getSynthesisRatePosteriorMean(samples, geneIndex - 1, mixtureElement - 1);
+	}
+	return rv;
+}
+
+
+double Parameter::getSynthesisRateVarianceByMixtureElementForGene(unsigned samples, unsigned geneIndex, unsigned mixtureElement, bool unbiased)
+{
+	double rv = -1.0;
+	bool checkGene = checkIndex(geneIndex, 1, (unsigned) mixtureAssignment.size());
+	bool checkMixtureElement = checkIndex(mixtureElement, 1, numMixtures);
+	if (checkGene && checkMixtureElement)
+	{
+		rv = getSynthesisRateVariance(samples, geneIndex - 1, mixtureElement - 1, unbiased);
+	}
+	return rv;
+}
+
+
+unsigned Parameter::getEstimatedMixtureAssignmentForGene(unsigned samples, unsigned geneIndex)
+{
+	bool check = checkIndex(geneIndex, 1, (unsigned) mixtureAssignment.size());
+	return check ? getEstimatedMixtureAssignment(samples, geneIndex - 1) + 1 : 0;
+}
+
+
+std::vector<double> Parameter::getEstimatedMixtureAssignmentProbabilitiesForGene(unsigned samples, unsigned geneIndex)
+{
+	std::vector <double> probabilities;
+	bool check = checkIndex(geneIndex, 1, (unsigned) mixtureAssignment.size());
+	if (check)
+	{
+		probabilities = getEstimatedMixtureAssignmentProbabilities(samples, geneIndex - 1);
+	}
+	return probabilities;
+}
+
+
+
+
+
+// -------------------------------------//
+// ---------- Other Functions ----------//
+// -------------------------------------//
+
+
+std::vector<unsigned> Parameter::getMixtureAssignmentR()
+{
+	return mixtureAssignment;
+}
+
+
+unsigned Parameter::getMixtureAssignmentForGeneR(unsigned geneIndex)
+{
+	unsigned rv = 0;
+	bool check = checkIndex(geneIndex, 1, (unsigned)mixtureAssignment.size());
+	if (check)
+	{
+		rv = getMixtureAssignment(geneIndex - 1) + 1;
+	}
+	return rv;
+}
+
+
+void Parameter::setMixtureAssignmentForGene(unsigned geneIndex, unsigned value)
+{
+	bool check = checkIndex(geneIndex, 1, (unsigned) mixtureAssignment.size());
+	if (check)
+	{
+		mixtureAssignment[geneIndex - 1] = value;
 	}
 }
 
-std::string Parameter::getGrouping(unsigned index)
+
+void Parameter::setNumMixtureElements(unsigned _numMixtures)
 {
-	return groupList[index];
+    numMixtures = _numMixtures;
 }
 
-
-std::vector<std::string> Parameter::getGroupList()
-{
-	return groupList;
-}
-
-unsigned Parameter::getGroupListSize()
-{
-	return groupList.size();
-}
+#endif

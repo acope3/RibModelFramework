@@ -115,7 +115,8 @@ class RFPParameter: public Parameter {
 		double getParameterForCategory(unsigned category, unsigned paramType, std::string codon, bool proposal);
 		virtual std::vector<double> getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex);
 		void calculateRFPMean(Genome& genome);
-
+		std::vector<std::vector<double>> getProposedAlphaParameter();
+		std::vector<std::vector<double>> getProposedLambdaPrimeParameter();
 
 		//Statics:
 		static const unsigned alp;
@@ -135,6 +136,15 @@ class RFPParameter: public Parameter {
 		double getLambdaPrimePosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon);
 		double getAlphaVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased);
 		double getLambdaPrimeVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased);
+    
+        //Functions that should only be used in R:
+        void setCurrentAlphaParameter(std::vector<std::vector<double>> alpha);
+        void setProposedAlphaParameter(std::vector<std::vector<double>> alpha);
+        void setCurrentLambdaPrimeParameter(std::vector<std::vector<double>> lambdaPrime);
+        void setProposedLambdaPrimeParameter(std::vector<std::vector<double>> lambdaPrime);
+        void setTraceObject(RFPTrace _trace);
+        void setCategoriesForTrace();
+
 
 
 

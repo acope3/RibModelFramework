@@ -568,7 +568,7 @@ int main()
 			else if (i < 1418) geneAssignment[i] = 1u;
 			else geneAssignment[i] = 0u;
 		}
-		/* For 2 mixtures */
+		 For 2 mixtures */
 		/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
 			if (i < 500) geneAssignment[i] = 0u;
