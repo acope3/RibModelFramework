@@ -124,6 +124,7 @@ class FONSEParameter : public Parameter
 		
 		void initMutationSelectionCategoriesR(std::vector<std::string> files, unsigned numCategories, std::string paramType);
 
+#ifndef STANDALONE
 		double getMutationPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
 		{
 			double rv = -1.0;
@@ -164,7 +165,7 @@ class FONSEParameter : public Parameter
 			}
 			return rv;
 		}
-
+#endif
         void setTraceObject(FONSETrace _trace);
 };
 #endif // FONSEPARAMETER_H

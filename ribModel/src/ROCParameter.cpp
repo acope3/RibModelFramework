@@ -765,7 +765,7 @@ void ROCParameter::updateCodonSpecificParameterTrace(unsigned sample, std::strin
 double ROCParameter::getSphiPosteriorMean(unsigned samples, unsigned mixture)
 {
 	double posteriorMean = 0.0;
-	unsigned selectionCategory = getSelectionCategoryForMixture(mixture);
+	unsigned selectionCategory = getSelectionCategory(mixture);
 	std::vector<double> sPhiTrace = traces.getSphiTrace(selectionCategory);
 	unsigned traceLength = (unsigned)sPhiTrace.size();
 
@@ -889,7 +889,7 @@ double ROCParameter::getSelectionPosteriorMean(unsigned mixtureElement, unsigned
 
 double ROCParameter::getSphiVariance(unsigned samples, unsigned mixture, bool unbiased)
 {
-	unsigned selectionCategory = getSelectionCategoryForMixture(mixture);
+	unsigned selectionCategory = getSelectionCategory(mixture);
 	std::vector<double> sPhiTrace = traces.getSphiTrace(selectionCategory);
 	unsigned traceLength = (unsigned)sPhiTrace.size();
 	if (samples > traceLength)

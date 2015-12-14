@@ -547,7 +547,7 @@ void RFPParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
 double RFPParameter::getSphiPosteriorMean(unsigned samples, unsigned mixture)
 {
 	double posteriorMean = 0.0;
-	unsigned selectionCategory = getSelectionCategoryForMixture(mixture);
+	unsigned selectionCategory = getSelectionCategory(mixture);
 	std::vector<double> sPhiTrace = traces.getSphiTrace(selectionCategory);
 	unsigned traceLength = (unsigned)sPhiTrace.size();
 
@@ -645,7 +645,7 @@ double RFPParameter::getLambdaPrimePosteriorMean(unsigned mixtureElement, unsign
 //TODO: Traces prevent this from being in the parent class
 double RFPParameter::getSphiVariance(unsigned samples, unsigned mixture, bool unbiased)
 {
-	unsigned selectionCategory = getSelectionCategoryForMixture(mixture);
+	unsigned selectionCategory = getSelectionCategory(mixture);
 	std::vector<double> sPhiTrace = traces.getSphiTrace(selectionCategory);
 	unsigned traceLength = (unsigned)sPhiTrace.size();
 	if(samples > traceLength)
@@ -873,6 +873,7 @@ const unsigned RFPParameter::lmPri = 1u;
 
 //---------------------R WRAPPER FUNCTIONS---------------------//
 
+#ifndef STANDALONE
 void RFPParameter::initAlphaR(double alphaValue, unsigned mixtureElement, std::string codon)
 {
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
@@ -928,7 +929,7 @@ double RFPParameter::getParameterForCategoryR(unsigned mixtureElement, unsigned 
 	return rv;
 }
 
-
+#endif
 void RFPParameter::initMutationSelectionCategoriesR(std::vector<std::string> files, unsigned numCategories,
 													std::string paramType)
 {
@@ -960,7 +961,7 @@ void RFPParameter::initMutationSelectionCategoriesR(std::vector<std::string> fil
 	}
 }
 
-
+#ifndef STANDALONE
 double RFPParameter::getAlphaPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
 {
 	double rv = -1.0;
@@ -1019,6 +1020,7 @@ double RFPParameter::getLambdaPrimeVarianceForCodon(unsigned mixtureElement, uns
 	return rv;
 }
 
+#endif
 std::vector <double> RFPParameter::getTmp()
 {
 return tmp;

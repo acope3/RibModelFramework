@@ -23,7 +23,7 @@ const std::string Parameter::mutationShared = "mutationShared";
 
 
 //--------------------------------------------------//
-// ---------- Constructors & Destructors ---------- //
+// ---------- Constructors & Destructors -----------//
 //--------------------------------------------------//
 
 
@@ -116,7 +116,7 @@ Parameter::~Parameter()
 
 
 //---------------------------------------------------------------//
-// ---------- Initialization, Restart, Index Checking ---------- //
+// ---------- Initialization and Restart Functions --------------//
 //---------------------------------------------------------------//
 
 
@@ -481,127 +481,6 @@ void Parameter::writeBasicRestartFile(std::string filename)
 }
 
 
-std::vector <double> Parameter::readPhiValues(std::string filename)
-{
-	std::size_t pos, pos2;
-	std::ifstream currentFile;
-	std::string tmpString;
-	std::vector<double> RV;
-
-	currentFile.open(filename);
-	if (currentFile.fail())
-	{
-		std::cerr <<"Error opening file\n";
-		std::exit(1);
-	}
-
-	currentFile >> tmpString; //trash the first line, no info given.
-
-
-	while (currentFile >> tmpString)
-	{
-		pos = tmpString.find(",");
-		pos2 = tmpString.find(",", pos + 1);
-		if (pos != std::string::npos && pos2 != std::string::npos)
-		{
-			std::string val = tmpString.substr(pos + 1, pos2 - (pos + 1));
-			//RV.push_back(std::stod(val));
-			RV.push_back(std::atof(val.c_str()));
-		}
-	}
-
-	return RV;
-}
-
-
-bool Parameter::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound)
-{
-	bool check = false;
-	if (lowerbound <= index && index <= upperbound)
-	{
-		check = true;
-	}
-	else
-	{
-		std::cerr <<"Error with Index\nINDEX: " << index <<"\n";
-		std::cerr <<"MUST BE BETWEEN " << lowerbound << " & " << upperbound <<"\n";
-	}
-
-	return check;
-
-}
-
-
-
-
-
-// ---------- Sphi Functions ---------- //
-
-
-double Parameter::getSphi(unsigned selectionCategory, bool proposed)
-{
-	return (proposed ? Sphi_proposed[selectionCategory] : Sphi[selectionCategory]);
-}
-
-
-void Parameter::setSphi(double sPhi, unsigned selectionCategory)
-{
-	Sphi[selectionCategory] = sPhi;
-}
-
-
-void Parameter::updateSphi()
-{
-	for(unsigned i = 0u; i < numSelectionCategories; i++)
-	{
-		Sphi[i] = Sphi_proposed[i];
-	}
-	numAcceptForSphi++;
-}
-
-
-
-
-
-// ---------- Mixture Definition Matrix ---------- //
-
-
-void Parameter::setNumMutationSelectionValues(std::string _mutationSelectionState, std::vector<std::vector<unsigned>> mixtureDefinitionMatrix)
-{
-	if (!mixtureDefinitionMatrix.empty())
-	{
-		//sets allow only the unique numbers to be added.
-		//at the end, the size of the set is equal to the number
-		//of unique categories.
-		std::set<unsigned> delMCounter;
-		std::set<unsigned> delEtaCounter;
-
-		for (unsigned i = 0u; i < numMixtures; i++)
-		{
-			delMCounter.insert(mixtureDefinitionMatrix[i][0] - 1);
-			delEtaCounter.insert(mixtureDefinitionMatrix[i][1] - 1);
-		}
-		numMutationCategories = delMCounter.size();
-		numSelectionCategories = delEtaCounter.size();
-	}
-	else if (_mutationSelectionState == selectionShared)
-	{
-		numMutationCategories = numMixtures;
-		numSelectionCategories = 1u;
-	}
-	else if (_mutationSelectionState == mutationShared)
-	{
-		numMutationCategories = 1u;
-		numSelectionCategories = numMixtures;
-	}
-	else //assuming the default of allUnique
-	{
-		numMutationCategories = numMixtures;
-		numSelectionCategories = numMixtures;
-	}
-}
-
-
 void Parameter::initCategoryDefinitions(std::string _mutationSelectionState, std::vector<std::vector<unsigned>> mixtureDefinitionMatrix)
 {
 	std::set<unsigned> delMCounter;
@@ -641,168 +520,10 @@ void Parameter::initCategoryDefinitions(std::string _mutationSelectionState, std
 		delMCounter.insert(categories[i].delM);
 		delEtaCounter.insert(categories[i].delEta);
 	}
-	//  numMutationCategories = delMCounter.size();
-	//  numSelectionCategories = delEtaCounter.size();
+
 	//sets allow only the unique numbers to be added.
 	//at the end, the size of the set is equal to the number
 	//of unique categories.
-}
-
-
-void Parameter::printMixtureDefinitionMatrix()
-{
-	for (unsigned i = 0u; i < numMixtures; i++)
-	{
-		std::cout << categories[i].delM <<"\t" << categories[i].delEta <<"\n";
-	}
-}
-
-
-
-
-
-// ---------- Getter Functions ---------- //
-
-
-
-unsigned int Parameter::getNumParam()
-{
-	return numParam;
-}
-
-
-unsigned Parameter::getNumMixtureElements()
-{
-	return numMixtures;
-}
-
-
-unsigned Parameter::getNumMutationCategories()
-{
-	return numMutationCategories;
-}
-
-
-unsigned Parameter::getNumSelectionCategories()
-{
-	return numSelectionCategories;
-}
-
-
-unsigned Parameter::getNumSynthesisRateCategories()
-{
-	return numSelectionCategories;
-}
-
-
-unsigned Parameter::getNumPhiGroupings() 
-{ 
-	return phiGroupings;
-}
-
-
-std::vector<unsigned> Parameter::getMixtureElementsOfMutationCategory(unsigned category)
-{
-	return mutationIsInMixture[category];
-}
-
-
-std::vector<unsigned> Parameter::getMixtureElementsOfSelectionCategory(unsigned category)
-{
-	return selectionIsInMixture[category];
-}
-
-
-std::string Parameter::getMutationSelectionState()
-{
-	return mutationSelectionState;
-}
-
-
-unsigned Parameter::getMutationCategory(unsigned mixtureElement)
-{
-	return categories[mixtureElement].delM;
-}
-
-
-unsigned Parameter::getSelectionCategory(unsigned mixtureElement)
-{
-	return categories[mixtureElement].delEta;
-}
-
-
-unsigned Parameter::getSynthesisRateCategory(unsigned mixtureElement)
-{
-	return categories[mixtureElement].delEta;
-}
-
-
-double Parameter::getCategoryProbability(unsigned mixtureElement)
-{
-	return categoryProbabilities[mixtureElement];
-}
-
-
-void Parameter::setCategoryProbability(unsigned mixtureElement, double value)
-{
-	categoryProbabilities[mixtureElement] = value;
-}
-
-
-void Parameter::setMixtureAssignment(unsigned gene, unsigned value)
-{
-	mixtureAssignment[gene] = value;
-}
-
-
-unsigned Parameter::getMixtureAssignment(unsigned gene)
-{
-	return mixtureAssignment[gene];
-}
-
-
-
-
-
-// ---------- Synthesis Rate Functions ---------- //
-
-
-double Parameter::getSynthesisRate(unsigned geneIndex, unsigned mixtureElement, bool proposed)
-{
-	unsigned category = getSelectionCategory(mixtureElement);
-	return (proposed ? proposedSynthesisRateLevel[category][geneIndex] : currentSynthesisRateLevel[category][geneIndex]);
-}
-
-
-void Parameter::setSynthesisRate(double phi, unsigned geneIndex, unsigned mixtureElement)
-{
-	unsigned category = getSelectionCategory(mixtureElement);
-	currentSynthesisRateLevel[category][geneIndex] = phi;
-}
-
-
-double Parameter::getSynthesisRateProposalWidth(unsigned geneIndex, unsigned mixtureElement)
-{
-	unsigned category = getSelectionCategory(mixtureElement);
-	return std_phi[category][geneIndex];
-}
-
-
-void Parameter::updateSynthesisRate(unsigned geneIndex)
-{
-	for(unsigned category = 0; category < numSelectionCategories; category++)
-	{
-		numAcceptForSynthesisRate[category][geneIndex]++;
-		currentSynthesisRateLevel[category][geneIndex] = proposedSynthesisRateLevel[category][geneIndex];
-	}
-}
-
-
-void Parameter::updateSynthesisRate(unsigned geneIndex, unsigned mixtureElement)
-{
-	unsigned category = getSelectionCategory(mixtureElement);
-	numAcceptForSynthesisRate[category][geneIndex]++;
-	currentSynthesisRateLevel[category][geneIndex] = proposedSynthesisRateLevel[category][geneIndex];
 }
 
 
@@ -866,81 +587,167 @@ void Parameter::InitializeSynthesisRate(std::vector<double> expression)
 			numAcceptForSynthesisRate[category][i] = 0u;
 		}
 	}
-
 }
 
 
-
-
-
-// ---------- Proposal Functions ---------- //
-
-
-void Parameter::proposeSphi()
+std::vector <double> Parameter::readPhiValues(std::string filename)
 {
-	for(unsigned i = 0u; i < numSelectionCategories; i++)
+	std::size_t pos, pos2;
+	std::ifstream currentFile;
+	std::string tmpString;
+	std::vector<double> RV;
+
+	currentFile.open(filename);
+	if (currentFile.fail())
 	{
-		Sphi_proposed[i] = std::exp(randNorm(std::log(Sphi[i]), std_sphi));
+		std::cerr <<"Error opening file\n";
+		std::exit(1);
 	}
-}
+
+	currentFile >> tmpString; //trash the first line, no info given.
 
 
-void Parameter::proposeSynthesisRateLevels()
-{
-	unsigned numSynthesisRateLevels = currentSynthesisRateLevel[0].size();
-	for(unsigned category = 0; category < numSelectionCategories; category++)
+	while (currentFile >> tmpString)
 	{
-		for(unsigned i = 0u; i < numSynthesisRateLevels; i++)
+		pos = tmpString.find(",");
+		pos2 = tmpString.find(",", pos + 1);
+		if (pos != std::string::npos && pos2 != std::string::npos)
 		{
-			// avoid adjusting probabilities for asymmetry of distribution
-			proposedSynthesisRateLevel[category][i] = std::exp( randNorm( std::log(currentSynthesisRateLevel[category][i]) , std_phi[category][i]) );
+			std::string val = tmpString.substr(pos + 1, pos2 - (pos + 1));
+			//RV.push_back(std::stod(val));
+			RV.push_back(std::atof(val.c_str()));
 		}
 	}
-}
 
-
-double Parameter::getCurrentSynthesisRateProposalWidth(unsigned expressionCategory, unsigned geneIndex)
-{
-	return std_phi[expressionCategory][geneIndex];
-}
-
-
-double Parameter::getCurrentSphiProposalWidth()
-{
-	return std_sphi;
+	return RV;
 }
 
 
 
 
 
-// ---------- Posterior, Variance, Estimates ---------- //
+// ----------------------------------------------------------------------//
+// ---------- Mixture Definition Matrix and Category Functions ----------//
+// ----------------------------------------------------------------------//
 
 
-unsigned Parameter::getEstimatedMixtureAssignment(unsigned samples, unsigned geneIndex)
+void Parameter::setNumMutationSelectionValues(std::string _mutationSelectionState, std::vector<std::vector<unsigned>> mixtureDefinitionMatrix)
 {
-	unsigned rv = 0u;
-	double value = -1.0;
-	std::vector <double> probabilities;
-	probabilities = getEstimatedMixtureAssignmentProbabilities(samples, geneIndex);
-
-	for (unsigned i = 0; i < probabilities.size(); i++)
+	if (!mixtureDefinitionMatrix.empty())
 	{
-		if (value < probabilities[i])
+		//sets allow only the unique numbers to be added.
+		//at the end, the size of the set is equal to the number
+		//of unique categories.
+		std::set<unsigned> delMCounter;
+		std::set<unsigned> delEtaCounter;
+
+		for (unsigned i = 0u; i < numMixtures; i++)
 		{
-			value = probabilities[i];
-			rv = i;
+			delMCounter.insert(mixtureDefinitionMatrix[i][0] - 1);
+			delEtaCounter.insert(mixtureDefinitionMatrix[i][1] - 1);
 		}
+		numMutationCategories = delMCounter.size();
+		numSelectionCategories = delEtaCounter.size();
 	}
-	return rv;
+	else if (_mutationSelectionState == selectionShared)
+	{
+		numMutationCategories = numMixtures;
+		numSelectionCategories = 1u;
+	}
+	else if (_mutationSelectionState == mutationShared)
+	{
+		numMutationCategories = 1u;
+		numSelectionCategories = numMixtures;
+	}
+	else //assuming the default of allUnique
+	{
+		numMutationCategories = numMixtures;
+		numSelectionCategories = numMixtures;
+	}
+}
+
+
+void Parameter::printMixtureDefinitionMatrix()
+{
+	for (unsigned i = 0u; i < numMixtures; i++)
+	{
+		std::cout << categories[i].delM <<"\t" << categories[i].delEta <<"\n";
+	}
+}
+
+
+double Parameter::getCategoryProbability(unsigned mixtureElement)
+{
+	return categoryProbabilities[mixtureElement];
+}
+
+
+void Parameter::setCategoryProbability(unsigned mixtureElement, double value)
+{
+	categoryProbabilities[mixtureElement] = value;
+}
+
+
+unsigned Parameter::getNumMutationCategories()
+{
+	return numMutationCategories;
+}
+
+
+unsigned Parameter::getNumSelectionCategories()
+{
+	return numSelectionCategories;
+}
+
+
+unsigned Parameter::getNumSynthesisRateCategories()
+{
+	return numSelectionCategories;
+}
+
+
+unsigned Parameter::getMutationCategory(unsigned mixtureElement)
+{
+	return categories[mixtureElement].delM;
+}
+
+
+unsigned Parameter::getSelectionCategory(unsigned mixtureElement)
+{
+	return categories[mixtureElement].delEta;
+}
+
+
+unsigned Parameter::getSynthesisRateCategory(unsigned mixtureElement)
+{
+	return categories[mixtureElement].delEta;
+}
+
+
+std::vector<unsigned> Parameter::getMixtureElementsOfMutationCategory(unsigned category)
+{
+	return mutationIsInMixture[category];
+}
+
+
+std::vector<unsigned> Parameter::getMixtureElementsOfSelectionCategory(unsigned category)
+{
+	return selectionIsInMixture[category];
+}
+
+
+std::string Parameter::getMutationSelectionState()
+{
+	return mutationSelectionState;
 }
 
 
 
 
 
-
-// ---------- Group List Functions ---------- //
+// -------------------------------------------//
+// ---------- Group List Functions -----------//
+// -------------------------------------------//
 
 
 void Parameter::setGroupList(std::vector <std::string> gl)
@@ -971,32 +778,214 @@ std::vector<std::string> Parameter::getGroupList()
 
 unsigned Parameter::getGroupListSize()
 {
-	return groupList.size();
+	return (unsigned) groupList.size();
 }
 
 
 
 
 
-// ---------- Iteration Functions ---------- //
+// -------------------------------------//
+// ---------- Sphi Functions -----------//
+// -------------------------------------//
 
 
-void Parameter::setLastIteration(unsigned iteration) 
-{ 
-	lastIteration = iteration; 
-}
-
-
-unsigned Parameter::getLastIteration() 
+double Parameter::getSphi(unsigned selectionCategory, bool proposed)
 {
-	return lastIteration; 
+	return (proposed ? Sphi_proposed[selectionCategory] : Sphi[selectionCategory]);
+}
+
+
+void Parameter::proposeSphi()
+{
+	for(unsigned i = 0u; i < numSelectionCategories; i++)
+	{
+		Sphi_proposed[i] = std::exp(randNorm(std::log(Sphi[i]), std_sphi));
+	}
+}
+
+
+void Parameter::setSphi(double sPhi, unsigned selectionCategory)
+{
+	Sphi[selectionCategory] = sPhi;
+}
+
+
+double Parameter::getCurrentSphiProposalWidth()
+{
+	return std_sphi;
+}
+
+
+void Parameter::updateSphi()
+{
+	for(unsigned i = 0u; i < numSelectionCategories; i++)
+	{
+		Sphi[i] = Sphi_proposed[i];
+	}
+	numAcceptForSphi++;
 }
 
 
 
 
 
-// ---------- STATICS - Sorting Functions ---------- //
+// -----------------------------------------------//
+// ---------- Synthesis Rate Functions -----------//
+// -----------------------------------------------//
+
+
+double Parameter::getSynthesisRate(unsigned geneIndex, unsigned mixtureElement, bool proposed)
+{
+	unsigned category = getSelectionCategory(mixtureElement);
+	return (proposed ? proposedSynthesisRateLevel[category][geneIndex] : currentSynthesisRateLevel[category][geneIndex]);
+}
+
+
+double Parameter::getCurrentSynthesisRateProposalWidth(unsigned expressionCategory, unsigned geneIndex)
+{
+	return std_phi[expressionCategory][geneIndex];
+}
+
+
+double Parameter::getSynthesisRateProposalWidth(unsigned geneIndex, unsigned mixtureElement)
+{
+	unsigned category = getSelectionCategory(mixtureElement);
+	return std_phi[category][geneIndex];
+}
+
+
+void Parameter::proposeSynthesisRateLevels()
+{
+	unsigned numSynthesisRateLevels = (unsigned) currentSynthesisRateLevel[0].size();
+	for(unsigned category = 0; category < numSelectionCategories; category++)
+	{
+		for(unsigned i = 0u; i < numSynthesisRateLevels; i++)
+		{
+			// avoid adjusting probabilities for asymmetry of distribution
+			proposedSynthesisRateLevel[category][i] = std::exp( randNorm( std::log(currentSynthesisRateLevel[category][i]) , std_phi[category][i]) );
+		}
+	}
+}
+
+
+void Parameter::setSynthesisRate(double phi, unsigned geneIndex, unsigned mixtureElement)
+{
+	unsigned category = getSelectionCategory(mixtureElement);
+	currentSynthesisRateLevel[category][geneIndex] = phi;
+}
+
+
+void Parameter::updateSynthesisRate(unsigned geneIndex)
+{
+	for(unsigned category = 0; category < numSelectionCategories; category++)
+	{
+		numAcceptForSynthesisRate[category][geneIndex]++;
+		currentSynthesisRateLevel[category][geneIndex] = proposedSynthesisRateLevel[category][geneIndex];
+	}
+}
+
+
+void Parameter::updateSynthesisRate(unsigned geneIndex, unsigned mixtureElement)
+{
+	unsigned category = getSelectionCategory(mixtureElement);
+	numAcceptForSynthesisRate[category][geneIndex]++;
+	currentSynthesisRateLevel[category][geneIndex] = proposedSynthesisRateLevel[category][geneIndex];
+}
+
+
+
+
+
+// ------------------------------------------//
+// ---------- Iteration Functions -----------//
+// ------------------------------------------//
+
+
+unsigned Parameter::getLastIteration()
+{
+	return lastIteration;
+}
+
+
+void Parameter::setLastIteration(unsigned iteration)
+{
+	lastIteration = iteration;
+}
+
+
+
+
+
+// ------------------------------------------------------------------//
+// ---------- Posterior, Variance, and Estimates Functions ----------//
+// ------------------------------------------------------------------//
+
+
+unsigned Parameter::getEstimatedMixtureAssignment(unsigned samples, unsigned geneIndex)
+{
+	unsigned rv = 0u;
+	double value = -1.0;
+	std::vector <double> probabilities;
+	probabilities = getEstimatedMixtureAssignmentProbabilities(samples, geneIndex);
+
+	for (unsigned i = 0; i < probabilities.size(); i++)
+	{
+		if (value < probabilities[i])
+		{
+			value = probabilities[i];
+			rv = i;
+		}
+	}
+	return rv;
+}
+
+
+
+
+
+// -------------------------------------//
+// ---------- Other Functions ----------//
+// -------------------------------------//
+
+
+unsigned Parameter::getNumParam()
+{
+	return numParam;
+}
+
+
+unsigned Parameter::getNumMixtureElements()
+{
+	return numMixtures;
+}
+
+
+unsigned Parameter::getNumPhiGroupings() 
+{ 
+	return phiGroupings;
+}
+
+
+void Parameter::setMixtureAssignment(unsigned gene, unsigned value)
+{
+	mixtureAssignment[gene] = value;
+}
+
+
+unsigned Parameter::getMixtureAssignment(unsigned gene)
+{
+	return mixtureAssignment[gene];
+}
+
+
+
+
+
+
+// --------------------------------------------------//
+// ---------- STATICS - Sorting Functions -----------//
+// --------------------------------------------------//
 
 
 // sort array interval from first (included) to last (excluded)!!
@@ -1344,8 +1333,15 @@ double Parameter::densityLogNorm(double x, double mean, double sd, bool log)
 
 
 
+// -----------------------------------------------------------------------------------------------------//
+// ---------------------------------------- R SECTION --------------------------------------------------//
+// -----------------------------------------------------------------------------------------------------//
 
-// --------------- R Wrapper Functions --------------- //
+#ifndef STANDALONE
+
+//---------------------------------------------------------------//
+// ---------- Initialization and Restart Functions --------------//
+//---------------------------------------------------------------//
 
 
 void Parameter::initializeSynthesisRateByGenome(Genome& genome, double sd_phi)
@@ -1366,26 +1362,29 @@ void Parameter::initializeSynthesisRateByList(std::vector<double> expression)
 }
 
 
-unsigned Parameter::getMixtureAssignmentForGeneR(unsigned geneIndex)
+bool Parameter::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound)
 {
-	unsigned rv = 0;
-	bool check = checkIndex(geneIndex, 1, (unsigned)mixtureAssignment.size());
-	if (check)
+	bool check = false;
+	if (lowerbound <= index && index <= upperbound)
 	{
-		rv = getMixtureAssignment(geneIndex - 1) + 1;
+		check = true;
 	}
-	return rv;
+	else
+	{
+		std::cerr <<"Error with Index\nINDEX: " << index <<"\n";
+		std::cerr <<"MUST BE BETWEEN " << lowerbound << " & " << upperbound <<"\n";
+	}
+
+	return check;
 }
 
 
-void Parameter::setMixtureAssignmentForGene(unsigned geneIndex, unsigned value)
-{
-	bool check = checkIndex(geneIndex, 1, mixtureAssignment.size());
-	if (check)
-	{
-		mixtureAssignment[geneIndex - 1] = value;
-	}
-}
+
+
+
+// ----------------------------------------------------------------------//
+// ---------- Mixture Definition Matrix and Category Functions ----------//
+// ----------------------------------------------------------------------//
 
 
 unsigned Parameter::getMutationCategoryForMixture(unsigned mixtureElement)
@@ -1393,11 +1392,15 @@ unsigned Parameter::getMutationCategoryForMixture(unsigned mixtureElement)
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
 	return check ? categories[mixtureElement - 1].delM + 1 : 0;
 }
+
+
 unsigned Parameter::getSelectionCategoryForMixture(unsigned mixtureElement)
 {
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
 	return check ? categories[mixtureElement - 1].delEta + 1 : 0;
 }
+
+
 unsigned Parameter::getSynthesisRateCategoryForMixture(unsigned mixtureElement)
 {
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
@@ -1405,48 +1408,56 @@ unsigned Parameter::getSynthesisRateCategoryForMixture(unsigned mixtureElement)
 }
 
 
-unsigned Parameter::getEstimatedMixtureAssignmentForGene(unsigned samples, unsigned geneIndex)
+std::vector<std::vector<unsigned>> Parameter::getCategories()
 {
-	bool check = checkIndex(geneIndex, 1, mixtureAssignment.size());
-	return check ? getEstimatedMixtureAssignment(samples, geneIndex - 1) + 1 : 0;
-}
-
-std::vector<double> Parameter::getEstimatedMixtureAssignmentProbabilitiesForGene(unsigned samples, unsigned geneIndex)
-{
-	std::vector <double> probabilities;
-	bool check = checkIndex(geneIndex, 1, mixtureAssignment.size());
-	if (check)
+	unsigned size = (unsigned) categories.size();
+	std::vector<std::vector<unsigned>> RV;
+	for (unsigned i = 0; i < size; i++)
 	{
-		probabilities = getEstimatedMixtureAssignmentProbabilities(samples, geneIndex - 1);
+		std::vector<unsigned> tmp;
+		tmp.push_back(categories[i].delM);
+		tmp.push_back(categories[i].delEta);
+		RV.push_back(tmp);
 	}
-	return probabilities;
-}
 
-
-
-double Parameter::getSynthesisRatePosteriorMeanByMixtureElementForGene(unsigned samples, unsigned geneIndex, unsigned mixtureElement)
-{
-	double rv = -1.0;
-	bool checkGene = checkIndex(geneIndex, 1, mixtureAssignment.size());
-	bool checkMixtureElement = checkIndex(mixtureElement, 1, numMixtures);
-	if (checkGene && checkMixtureElement)
-	{
-		rv = getSynthesisRatePosteriorMean(samples, geneIndex - 1, mixtureElement - 1);
-	}
-	return rv;
+	return RV;
 }
 
 
-double Parameter::getSynthesisRateVarianceByMixtureElementForGene(unsigned samples, unsigned geneIndex, unsigned mixtureElement, bool unbiased)
+void Parameter::setCategories(std::vector<std::vector<unsigned>> _categories)
 {
-	double rv = -1.0;
-	bool checkGene = checkIndex(geneIndex, 1, mixtureAssignment.size());
-	bool checkMixtureElement = checkIndex(mixtureElement, 1, numMixtures);
-	if (checkGene && checkMixtureElement)
+	for (unsigned i = 0; i < _categories.size(); i++)
 	{
-		rv = getSynthesisRateVariance(samples, geneIndex - 1, mixtureElement - 1, unbiased);
+		categories.push_back(mixtureDefinition());
+		categories[i].delM = _categories[i][0];
+		categories[i].delEta = _categories[i][1];
 	}
-	return rv;
+}
+
+
+void Parameter::setNumMutationCategories(unsigned _numMutationCategories)
+{
+	numMutationCategories = _numMutationCategories;
+}
+
+
+void Parameter::setNumSelectionCategories(unsigned _numSelectionCategories)
+{
+	numSelectionCategories = _numSelectionCategories;
+}
+
+
+
+
+
+// -----------------------------------------------//
+// ---------- Synthesis Rate Functions -----------//
+// -----------------------------------------------//
+
+
+std::vector<std::vector<double>> Parameter::getSynthesisRateR()
+{
+	return currentSynthesisRateLevel;
 }
 
 
@@ -1465,27 +1476,91 @@ std::vector<double> Parameter::getCurrentSynthesisRateForMixture(unsigned mixtur
 
 
 
-//Used to write R objects:
+
+
+// ------------------------------------------------------------------//
+// ---------- Posterior, Variance, and Estimates Functions ----------//
+// ------------------------------------------------------------------//
+
+
+double Parameter::getSynthesisRatePosteriorMeanByMixtureElementForGene(unsigned samples, unsigned geneIndex, unsigned mixtureElement)
+{
+	double rv = -1.0;
+	bool checkGene = checkIndex(geneIndex, 1, (unsigned) mixtureAssignment.size());
+	bool checkMixtureElement = checkIndex(mixtureElement, 1, numMixtures);
+	if (checkGene && checkMixtureElement)
+	{
+		rv = getSynthesisRatePosteriorMean(samples, geneIndex - 1, mixtureElement - 1);
+	}
+	return rv;
+}
+
+
+double Parameter::getSynthesisRateVarianceByMixtureElementForGene(unsigned samples, unsigned geneIndex, unsigned mixtureElement, bool unbiased)
+{
+	double rv = -1.0;
+	bool checkGene = checkIndex(geneIndex, 1, (unsigned) mixtureAssignment.size());
+	bool checkMixtureElement = checkIndex(mixtureElement, 1, numMixtures);
+	if (checkGene && checkMixtureElement)
+	{
+		rv = getSynthesisRateVariance(samples, geneIndex - 1, mixtureElement - 1, unbiased);
+	}
+	return rv;
+}
+
+
+unsigned Parameter::getEstimatedMixtureAssignmentForGene(unsigned samples, unsigned geneIndex)
+{
+	bool check = checkIndex(geneIndex, 1, (unsigned) mixtureAssignment.size());
+	return check ? getEstimatedMixtureAssignment(samples, geneIndex - 1) + 1 : 0;
+}
+
+
+std::vector<double> Parameter::getEstimatedMixtureAssignmentProbabilitiesForGene(unsigned samples, unsigned geneIndex)
+{
+	std::vector <double> probabilities;
+	bool check = checkIndex(geneIndex, 1, (unsigned) mixtureAssignment.size());
+	if (check)
+	{
+		probabilities = getEstimatedMixtureAssignmentProbabilities(samples, geneIndex - 1);
+	}
+	return probabilities;
+}
+
+
+
+
+
+// -------------------------------------//
+// ---------- Other Functions ----------//
+// -------------------------------------//
+
+
 std::vector<unsigned> Parameter::getMixtureAssignmentR()
 {
 	return mixtureAssignment;
 }
 
 
-std::vector<std::vector<double>> Parameter::getSynthesisRateR()
+unsigned Parameter::getMixtureAssignmentForGeneR(unsigned geneIndex)
 {
-	return currentSynthesisRateLevel;
+	unsigned rv = 0;
+	bool check = checkIndex(geneIndex, 1, (unsigned)mixtureAssignment.size());
+	if (check)
+	{
+		rv = getMixtureAssignment(geneIndex - 1) + 1;
+	}
+	return rv;
 }
 
-void Parameter::setNumMutationCategories(unsigned _numMutationCategories)
-{
-    numMutationCategories = _numMutationCategories;
-}
 
-
-void Parameter::setNumSelectionCategories(unsigned _numSelectionCategories)
+void Parameter::setMixtureAssignmentForGene(unsigned geneIndex, unsigned value)
 {
-    numSelectionCategories = _numSelectionCategories;
+	bool check = checkIndex(geneIndex, 1, (unsigned) mixtureAssignment.size());
+	if (check)
+	{
+		mixtureAssignment[geneIndex - 1] = value;
+	}
 }
 
 
@@ -1494,27 +1569,4 @@ void Parameter::setNumMixtureElements(unsigned _numMixtures)
     numMixtures = _numMixtures;
 }
 
-std::vector<std::vector<int>> Parameter::getCategories()
-{
-    unsigned size = categories.size();
-    std::vector<std::vector<int>> RV;
-    for (unsigned i = 0; i < size; i++)
-    {
-        std::vector<int> tmp;
-        tmp.push_back(categories[i].delM);
-        tmp.push_back(categories[i].delEta);
-        RV.push_back(tmp);
-    }
-    
-    return RV;
-}
-
-void Parameter::setCategories(std::vector<std::vector<int>> _categories)
-{
-    for (unsigned i = 0; i < _categories.size(); i++)
-    {
-        categories.push_back(mixtureDefinition());
-        categories[i].delM = _categories[i][0];
-        categories[i].delEta = _categories[i][1];
-    }
-}
+#endif
