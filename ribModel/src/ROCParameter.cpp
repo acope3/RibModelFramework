@@ -491,6 +491,162 @@ void ROCParameter::initSelectionCategories(std::vector<std::string> files, unsig
 
 
 
+// --------------------------------------//
+// ---------- Trace Functions -----------//
+// --------------------------------------//
+
+
+ROCTrace& ROCParameter::getTraceObject()
+{
+	return traces;
+}
+
+
+void ROCParameter::updateSphiTrace(unsigned sample)
+{
+	for(unsigned i = 0u; i < numSelectionCategories; i++)
+	{
+		traces.updateSphiTrace(sample, Sphi[i], i);
+	}
+}
+
+
+void ROCParameter::updateSynthesisRateTrace(unsigned sample, unsigned geneIndex)
+{
+	traces.updateSynthesisRateTrace(sample, geneIndex, currentSynthesisRateLevel);
+}
+
+
+void ROCParameter::updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex)
+{
+	traces.updateMixtureAssignmentTrace(sample, geneIndex, mixtureAssignment[geneIndex]);
+}
+
+
+void ROCParameter::updateMixtureProbabilitiesTrace(unsigned samples)
+{
+	traces.updateMixtureProbabilitiesTrace(samples, categoryProbabilities);
+}
+
+
+void ROCParameter::updateSepsilonTraces(unsigned sample)
+{
+	for (unsigned i = 0; i < Sepsilon.size(); i++)
+	{
+		traces.updateSepsilonTrace(i, sample, Sepsilon[i]);
+	}
+}
+
+
+void ROCParameter::updateAphiTraces(unsigned sample)
+{
+	for (unsigned i = 0; i < Aphi.size(); i++)
+	{
+		traces.updateAphiTrace(i, sample, Aphi[i]);
+	}
+}
+
+
+void ROCParameter::updateCodonSpecificParameterTrace(unsigned sample, std::string grouping)
+{
+	traces.updateCodonSpecificParameterTrace(sample, grouping, currentMutationParameter, currentSelectionParameter);
+}
+
+
+
+
+
+// ------------------------------------------//
+// ---------- Covariance Functions ----------//
+// ------------------------------------------//
+
+
+CovarianceMatrix& ROCParameter::getCovarianceMatrixForAA(std::string aa)
+{
+	aa[0] = (char) std::toupper(aa[0]);
+	unsigned aaIndex = SequenceSummary::aaToIndex.find(aa) -> second;
+	return covarianceMatrix[aaIndex];
+}
+
+
+
+
+
+// --------------------------------------------//
+// ---------- Phi Episolon Functions ----------//
+// --------------------------------------------//
+
+
+double ROCParameter::getPhiEpsilon()
+{
+	return phiEpsilon;
+}
+
+
+
+
+
+// ----------------------------------------//
+// ---------- Sepsilon Functions ----------//
+// ----------------------------------------//
+
+
+double ROCParameter::getSepsilon(unsigned index)
+{
+	return Sepsilon[index];
+}
+
+
+void ROCParameter::setSepsilon(unsigned index, double se)
+{
+	Sepsilon[index] = se;
+}
+
+
+
+
+
+// ------------------------------------//
+// ---------- Aphi Functions ----------//
+// ------------------------------------//
+
+
+double ROCParameter::getAphi(unsigned index, bool proposed)
+{
+	return (proposed ? Aphi_proposed[index] : Aphi[index]);
+}
+
+
+double ROCParameter::getCurrentAphiProposalWidth(unsigned index)
+{
+	return std_Aphi[index];
+}
+
+
+void ROCParameter::proposeAphi()
+{
+	for (unsigned i = 0; i < getNumPhiGroupings(); i++) {
+		Aphi_proposed[i] = randNorm(Aphi[i], std_Aphi[i]);
+	}
+}
+
+
+void ROCParameter::setAphi(unsigned index, double aPhi)
+{
+	Aphi[index] = aPhi;
+}
+
+
+void ROCParameter::updateAphi(unsigned index)
+{
+	Aphi[index] = Aphi_proposed[index];
+	numAcceptForAphi[index]++;
+}
+
+
+
+
+
 // -----------------------------------//
 // ---------- CSP Functions ----------//
 // -----------------------------------//
@@ -582,98 +738,6 @@ void ROCParameter::updateCodonSpecificParameter(std::string grouping)
 
 
 
-// ------------------------------------------//
-// ---------- Covariance Functions ----------//
-// ------------------------------------------//
-
-
-CovarianceMatrix& ROCParameter::getCovarianceMatrixForAA(std::string aa)
-{
-	aa[0] = (char) std::toupper(aa[0]);
-	unsigned aaIndex = SequenceSummary::aaToIndex.find(aa) -> second;
-	return covarianceMatrix[aaIndex];
-}
-
-
-
-
-
-// ------------------------------------//
-// ---------- Aphi Functions ----------//
-// ------------------------------------//
-
-
-double ROCParameter::getAphi(unsigned index, bool proposed)
-{
-	return (proposed ? Aphi_proposed[index] : Aphi[index]);
-}
-
-
-double ROCParameter::getCurrentAphiProposalWidth(unsigned index)
-{
-	return std_Aphi[index];
-}
-
-
-void ROCParameter::proposeAphi()
-{
-	for (unsigned i = 0; i < getNumPhiGroupings(); i++) {
-		Aphi_proposed[i] = randNorm(Aphi[i], std_Aphi[i]);
-	}
-}
-
-
-void ROCParameter::setAphi(unsigned index, double aPhi)
-{
-	Aphi[index] = aPhi;
-}
-
-
-void ROCParameter::updateAphi(unsigned index)
-{
-	Aphi[index] = Aphi_proposed[index];
-	numAcceptForAphi[index]++;
-}
-
-
-
-
-
-
-// --------------------------------------------//
-// ---------- Phi Episolon Functions ----------//
-// --------------------------------------------//
-
-
-double ROCParameter::getPhiEpsilon()
-{
-	return phiEpsilon;
-}
-
-
-
-
-
-// ----------------------------------------//
-// ---------- Sepsilon Functions ----------//
-// ----------------------------------------//
-
-
-double ROCParameter::getSepsilon(unsigned index)
-{
-	return Sepsilon[index];
-}
-
-
-void ROCParameter::setSepsilon(unsigned index, double se)
-{
-	Sepsilon[index] = se;
-}
-
-
-
-
-
 // -------------------------------------//
 // ---------- Prior Functions ----------//
 // -------------------------------------//
@@ -686,71 +750,6 @@ double ROCParameter::getMutationPriorStandardDeviation()
 void ROCParameter::setMutationPriorStandardDeviation(double _mutation_prior_sd)
 {
 	mutation_prior_sd = _mutation_prior_sd;
-}
-
-
-
-
-
-// --------------------------------------//
-// ---------- Trace Functions -----------//
-// --------------------------------------//
-
-
-ROCTrace& ROCParameter::getTraceObject()
-{
-	return traces;
-}
-
-
-void ROCParameter::updateSphiTrace(unsigned sample)
-{
-	for(unsigned i = 0u; i < numSelectionCategories; i++)
-	{
-		traces.updateSphiTrace(sample, Sphi[i], i);
-	}
-}
-
-
-void ROCParameter::updateSynthesisRateTrace(unsigned sample, unsigned geneIndex)
-{
-	traces.updateSynthesisRateTrace(sample, geneIndex, currentSynthesisRateLevel);
-}
-
-
-void ROCParameter::updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex)
-{
-	traces.updateMixtureAssignmentTrace(sample, geneIndex, mixtureAssignment[geneIndex]);
-}
-
-
-void ROCParameter::updateMixtureProbabilitiesTrace(unsigned samples)
-{
-	traces.updateMixtureProbabilitiesTrace(samples, categoryProbabilities);
-}
-
-
-void ROCParameter::updateSepsilonTraces(unsigned sample)
-{
-	for (unsigned i = 0; i < Sepsilon.size(); i++)
-	{
-		traces.updateSepsilonTrace(i, sample, Sepsilon[i]);
-	}
-}
-
-
-void ROCParameter::updateAphiTraces(unsigned sample)
-{
-	for (unsigned i = 0; i < Aphi.size(); i++)
-	{
-		traces.updateAphiTrace(i, sample, Aphi[i]);
-	}
-}
-
-
-void ROCParameter::updateCodonSpecificParameterTrace(unsigned sample, std::string grouping)
-{
-	traces.updateCodonSpecificParameterTrace(sample, grouping, currentMutationParameter, currentSelectionParameter);
 }
 
 
@@ -1384,6 +1383,12 @@ void ROCParameter::initSelection(std::vector<double> selectionValues, unsigned m
 void ROCParameter::setTraceObject(ROCTrace _trace)
 {
     traces = _trace;
+}
+
+
+void ROCParameter::setCategoriesForTrace()
+{
+	traces.setCategories(categories);
 }
 
 

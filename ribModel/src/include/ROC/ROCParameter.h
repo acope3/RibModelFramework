@@ -76,26 +76,20 @@ class ROCParameter : public Parameter
 
 
 
+		//Trace Functions:
+		ROCTrace& getTraceObject();
+		virtual void updateSphiTrace(unsigned sample);
+		virtual void updateSynthesisRateTrace(unsigned sample, unsigned geneIndex);
+		virtual void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex);
+		virtual void updateMixtureProbabilitiesTrace(unsigned samples);
+		void updateSepsilonTraces(unsigned sample);
+		void updateAphiTraces(unsigned sample);
+		void updateCodonSpecificParameterTrace(unsigned sample, std::string grouping);
+
+
+
 		//Covariance Functions:
 		CovarianceMatrix& getCovarianceMatrixForAA(std::string aa);
-
-
-
-		//CSP Functions:
-		std::vector<std::vector<double>> getCurrentMutationParameter();
-		std::vector<std::vector<double>> getCurrentSelectionParameter();
-		double getCurrentCodonSpecificProposalWidth(unsigned aa);
-		void proposeCodonSpecificParameter();
-		void updateCodonSpecificParameter(std::string grouping);
-
-
-
-		//Aphi Functions:
-		double getAphi(unsigned index, bool proposed = false);
-		double getCurrentAphiProposalWidth(unsigned index);
-		void proposeAphi();
-		void setAphi(unsigned index, double aPhi);
-		void updateAphi(unsigned index);
 
 
 
@@ -110,21 +104,27 @@ class ROCParameter : public Parameter
 
 
 
+		//Aphi Functions:
+		double getAphi(unsigned index, bool proposed = false);
+		double getCurrentAphiProposalWidth(unsigned index);
+		void proposeAphi();
+		void setAphi(unsigned index, double aPhi);
+		void updateAphi(unsigned index);
+
+
+
+		//CSP Functions:
+		std::vector<std::vector<double>> getCurrentMutationParameter();
+		std::vector<std::vector<double>> getCurrentSelectionParameter();
+		double getCurrentCodonSpecificProposalWidth(unsigned aa);
+		void proposeCodonSpecificParameter();
+		void updateCodonSpecificParameter(std::string grouping);
+
+
+
 		//Prior Functions:
 		double getMutationPriorStandardDeviation();
 		void setMutationPriorStandardDeviation(double _mutation_prior_sd);
-
-
-
-		//Trace Functions:
-		ROCTrace& getTraceObject();
-		virtual void updateSphiTrace(unsigned sample);
-		virtual void updateSynthesisRateTrace(unsigned sample, unsigned geneIndex);
-		virtual void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex);
-		virtual void updateMixtureProbabilitiesTrace(unsigned samples);
-		void updateSepsilonTraces(unsigned sample);
-		void updateAphiTraces(unsigned sample);
-		void updateCodonSpecificParameterTrace(unsigned sample, std::string grouping);
 
 
 
@@ -182,6 +182,8 @@ class ROCParameter : public Parameter
 
  		//Trace Functions:
  		void setTraceObject(ROCTrace _trace);
+ 		void setCategoriesForTrace();
+
 
 
 
@@ -195,21 +197,7 @@ class ROCParameter : public Parameter
 
 		//Other Functions:
 		SEXP calculateSelectionCoefficientsR(unsigned sample, unsigned mixture);
-
-
-
-
-#endif
-
-
-
-	void setCategoriesForTrace()
-	{
-		//std::vector<mixtureDefinition> *_categories = &categories;
-		traces.setCategories(categories);
-	}
-
-
+#endif //STADNALONE
 
 	protected:
 };
