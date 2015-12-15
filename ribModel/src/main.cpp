@@ -89,54 +89,6 @@ void testRandMultiNom(unsigned numCat)
 
 }
 
-void testThetaKMatrix()
-{
-	//unsigned matrix[2][2] = { {2,1}, {1,1} };
-	std::cout << "------------------ TEST THETAKMATRIX ------------------" << std::endl;
-	std::vector<unsigned> empty(100, 1);
-	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
-	std::vector<double> sphi_init(2, 2);
-	ROCParameter R(sphi_init, 2, empty, mixtureDefinitionMatrix, true, "allUnique");
-
-	//R.printThetaKMatrix();
-	std::cout << "numMutationCategories: " << R.getNumMutationCategories() << "\n";
-	std::cout << "numSelectionCategories: " << R.getNumSelectionCategories() << "\n";
-	std::vector<std::string> Mfiles = { "Skluyveri_CSP_ChrA.csv", "Skluyveri_CSP_ChrCleft.csv" };
-	std::cout << "files array good to go\n";
-
-	//THIS DOES NOT CURRENTLY WORK!!!!
-	R.initMutationCategories(Mfiles, R.getNumMutationCategories());
-	R.initSelectionCategories(Mfiles, R.getNumSelectionCategories());
-
-
-	std::cout << "looping through all mutation params:\n";
-	std::vector<std::vector <double>> temp;
-	temp = R.getCurrentMutationParameter();
-	for (unsigned i = 0u; i < temp.size(); i++)
-	{
-		std::cout << "Mutation param " << i << ":\n";
-		for (unsigned j = 0u; j < temp[i].size(); j++)
-		{
-			std::cout << temp[i][j] << "\n";
-		}
-		std::cout << "\n\n";
-	}
-
-	std::cout << "looping through all selection params:\n";
-	temp = R.getCurrentSelectionParameter();
-	for (unsigned i = 0u; i < temp.size(); i++)
-	{
-		std::cout << "Selection param " << i << ":\n";
-		for (unsigned j = 0u; j < temp[i].size(); j++)
-		{
-			std::cout << temp[i][j] << "\n";
-		}
-		std::cout << "\n\n";
-	}
-	std::cout << "------------------ TEST THETAKMATRIX ------------------" << std::endl;
-
-}
-
 
 
 void testCovMatrixOverloading()
@@ -412,7 +364,7 @@ void testReadMutationValues()
 
 	tmp.initMutationCategories(files, 2);
 
-	std::vector <std::vector <double>> v = tmp.getCurrentMutationParameter();
+/*	std::vector <std::vector <double>> v = tmp.getCurrentMutationParameter();
 
 	for (unsigned i = 0; i < v.size(); i++)
 	{
@@ -423,7 +375,7 @@ void testReadMutationValues()
 		std::cout << "\n\n\n";
 	}
 
-
+*/
 	std::cout << "----------END TEST INITMUTATIONCATEGORIES----------\n";
 }
 
@@ -568,7 +520,7 @@ int main()
 			else if (i < 1418) geneAssignment[i] = 1u;
 			else geneAssignment[i] = 0u;
 		}
-		/* For 2 mixtures */
+		 For 2 mixtures */
 		/*for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
 			if (i < 500) geneAssignment[i] = 0u;

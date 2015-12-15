@@ -111,6 +111,26 @@ void ROCTrace::updateCodonSpecificParameterTrace(unsigned sample, std::string aa
 	}
 }
 
+
+
+std::vector<std::vector<std::vector<double>>> ROCTrace::getMutationParameterTrace()
+{
+	return mutationParameterTrace;
+}
+
+
+std::vector<std::vector<std::vector<double>>> ROCTrace::getSelectionParameterTrace()
+{
+	return selectionParameterTrace;
+}
+
+
+std::vector<std::vector<double>> ROCTrace::getAphiAcceptanceRatioTrace()
+{
+	return AphiAcceptanceRatioTrace;
+}
+
+
 //----------------------------------------------------
 //----------------------R WRAPPERS--------------------
 //----------------------------------------------------
@@ -147,4 +167,39 @@ std::vector<std::vector<double>> ROCTrace::getAphiTraceR()
 std::vector<std::vector<double>> ROCTrace::getSepsilonTraceR()
 {
 	return SepsilonTrace;
+}
+
+
+
+
+
+
+
+void ROCTrace::setAphiTrace(std::vector<std::vector <double> > _AphiTrace)
+{
+	AphiTrace = _AphiTrace;
+}
+
+
+void ROCTrace::setAphiAcceptanceRatioTrace(std::vector<std::vector <double> > _AphiAcceptanceRatioTrace)
+{
+	AphiAcceptanceRatioTrace = _AphiAcceptanceRatioTrace;
+}
+
+
+void ROCTrace::setSepsilonTrace(std::vector<std::vector <double> > _SepsilonTrace)
+{
+	SepsilonTrace = _SepsilonTrace;
+}
+
+
+void ROCTrace::setMutationParameterTrace(std::vector<std::vector<std::vector<double>>> _mutationParameterTrace)
+{
+	mutationParameterTrace = _mutationParameterTrace;
+}
+
+
+void ROCTrace::setSelectionParameterTrace(std::vector<std::vector<std::vector<double>>> _selectionParameterTrace)
+{
+	selectionParameterTrace = _selectionParameterTrace;
 }

@@ -122,3 +122,14 @@ std::vector<double> RFPTrace::getLambdaPrimeParameterTraceByMixtureElementForCod
 	}
 	return RV;
 }
+
+
+void RFPTrace::setAlphaParameterTrace(std::vector<std::vector<std::vector<double>>> _alphaParameterTrace)
+{
+    alphaParameterTrace = _alphaParameterTrace;
+}
+
+void RFPTrace::setLambdaPrimeParameterTrace(std::vector<std::vector<std::vector<double>>> _lambdaPrimeParameterTrace)
+{
+    lambdaPrimeParameterTrace = _lambdaPrimeParameterTrace;
+}

@@ -72,7 +72,7 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
     parameter$initializeSynthesisRateByList(expressionValues)
   }
   
-  parameter$setMutationPriorStandardDeviation(mutation_prior_sd)
+  parameter$mutation_prior_sd <- (mutation_prior_sd)
   
   numMutationCategory <- parameter$numMutationCategories
   numSelectionCategory <- parameter$numSelectionCategories
@@ -344,12 +344,13 @@ split.matrix <- function(M, r, c)
 
 
 
-writeTraces <- function(parameter, file)
+writeParameterObject <- function(parameter, file)
 {
-  UseMethod("writeTraces", parameter)
+  UseMethod("writeParameterObject", parameter)
 }
 
-writeTraces.Rcpp_RFPParameter <- function(parameter, file)
+
+extractBaseInfo <- function(parameter)
 {
   trace <- parameter$getTraceObject()
   sPhiTraces <- trace$getSphiTraces()
@@ -359,9 +360,162 @@ writeTraces.Rcpp_RFPParameter <- function(parameter, file)
   mixAssignTrace <- trace$getMixutreAssignmentTrace()
   mixProbTrace <- trace$getMixtureProbabilitiesTrace()
   cspAcceptRatTrace <- trace$getCspAcceptanceRatioTrace()
+  numMix <- parameter$numMixtures
+  numMut <- parameter$numMutationCategories
+  numSel <- parameter$numSelectionCategories
+  categories <- parameter$getCategories()
+  
+  varList <- list(sPhiTraces = sPhiTraces, 
+                    sphiAcceptRatTrace = sphiAcceptRatTrace,
+                    synthRateTrace = synthRateTrace,
+                    synthAcceptRatTrace = synthAcceptRatTrace,
+                    mixAssignTrace = mixAssignTrace,
+                    mixProbTrace = mixProbTrace,
+                    cspAcceptRatTrace = cspAcceptRatTrace,
+                    numMix = numMix,
+                    numMut = numMut,
+                    numSel = numSel,
+                    categories = categories
+                    )
+  return(varList)
+}
+
+
+writeParameterObject.Rcpp_ROCParameter <- function(parameter, file)
+{
+  paramBase <- extractBaseInfo(parameter)
+  
+  currentMutation <- parameter$currentMutationParameter
+  currentSelection <- parameter$currentSelectionParameter
+  proposedMutation <- parameter$proposedMutationParameter
+  proposedSelection <- parameter$proposedSelectionParameter
+  
+  trace <- parameter$getTraceObject()
+  
+  mutationTrace <- trace$getMutationParameterTrace()
+  selectionTrace <- trace$getSelectionParameterTrace()
+  aphiAcceptRatTrace <- trace$getAphiAcceptanceRatioTrace()
+  aphiTrace <- trace$getAphiTraces()
+  sepisolonTrace <- trace$getSepsilonTraces()
+  
+  save(list = c("paramBase", "currentMutation", "currentSelection",
+                "proposedMutation", "proposedSelection",  
+                "mutationTrace", "selectionTrace", 
+                "aphiAcceptRatTrace", "aphiTrace", "sepisolonTrace"),
+       file=file)
+}
+
+
+writeParameterObject.Rcpp_RFPParameter <- function(parameter, file)
+{
+  paramBase <- extractBaseInfo(parameter)
+  
+  currentAlpha <- parameter$currentAlphaParameter
+  currentLambdaPrime <- parameter$currentLambdaPrimeParameter
+  proposedAlpha <- parameter$proposedAlphaParameter
+  proposedLambdaPrime <- parameter$proposedLambdaPrimeParameter
+  
+  
+  trace <- parameter$getTraceObject()
   alphaTrace <- trace$getAlphaParameterTrace()
   lambdaPrimeTrace <- trace$getLambdaPrimeParameterTrace()
-  save(list = c("sPhiTraces", "sphiAcceptRatTrace", "synthRateTrace", "synthAcceptRatTrace", 
-               "mixAssignTrace", "mixProbTrace", "cspAcceptRatTrace", "alphaTrace", "lambdaPrimeTrace"),
+
+  save(list = c("paramBase", "currentAlpha", "currentLambdaPrime", "proposedAlpha",
+                "proposedLambdaPrime", "alphaTrace", "lambdaPrimeTrace"),
        file=file)
+}
+
+
+writeParameterObject.Rcpp_FONSEParameter <- function(parameter, file)
+{
+  trace <- parameter$getTraceObject()
+  sPhiTraces <- trace$getSphiTraces()
+  sphiAcceptRatTrace <- trace$getSphiAcceptanceRatioTrace()
+  synthRateTrace <- trace$getSynthesisRateTrace()
+  synthAcceptRatTrace <- trace$getSynthesisRateAcceptanceRatioTrace()
+  mixAssignTrace <- trace$getMixutreAssignmentTrace()
+  mixProbTrace <- trace$getMixtureProbabilitiesTrace()
+  cspAcceptRatTrace <- trace$getCspAcceptanceRatioTrace()
+  loglikeTrace <- mcmc$getLogLikelihoodTrace()
+  mutationTrace <- trace$getMutationParameterTrace()
+  selectionTrace <- trace$getSelectionParameterTrace()
+  save(list = c("sPhiTraces", "sphiAcceptRatTrace", "synthRateTrace", "synthAcceptRatTrace", 
+                "mixAssignTrace", "mixProbTrace", "cspAcceptRatTrace", "mutationTrace", "selectionTrace",
+                "loglikeTrace"),
+       file=file)
+}
+
+
+loadParameterObject <- function(parameter, file, model)
+{
+  UseMethod("loadParameterObject", parameter)
+}
+
+
+setBaseInfo <- function(parameter, file, model)
+{
+  load(file)
+  parameter$setCategories(paramBase$categories)
+  parameter$setCategoriesForTrace()
+  parameter$numMixtures <- paramBase$numMix
+  parameter$numMutationCategories <- paramBase$numMut
+  parameter$numSelectionCategories <- paramBase$numSel
+  
+  trace <- parameter$getTraceObject()
+  trace$setSphiTraces(paramBase$sPhiTraces)
+  trace$setSphiAcceptanceRatioTrace(paramBase$sphiAcceptRatTrace)
+  trace$setSynthesisRateTrace(paramBase$synthRateTrace)
+  trace$setSynthesisRateAcceptanceRatioTrace(paramBase$synthAcceptRatTrace)
+  trace$setMixtureAssignmentTrace(paramBase$mixAssignTrace)
+  trace$setMixtureProbabilitiesTrace(paramBase$mixProbTrace)
+  trace$setCspAcceptanceRatioTrace(paramBase$cspAcceptRatTrace)
+  if (model == "ROC"){
+    parameter$setROCTrace(trace)
+  }
+  else if (model == "RFP"){
+    parameter$setRFPTrace(trace)
+  }
+  else if (model == "FONSE"){
+    parameter$setFONSETrace(trace)
+  }
+  return(parameter)
+}
+
+
+loadParameterObject.Rcpp_ROCParameter <- function(parameter, file, model)
+{
+  load(file)
+  setBaseInfo(parameter, file, model)
+  parameter$currentMutationParameter <- currentMutation
+  parameter$currentSelectionParameter <- currentSelection
+  parameter$proposedMutationParameter <- proposedMutation
+  parameter$proposedSelectionParameter <- proposedSelection
+  trace <- parameter$getTraceObject()
+  trace$setAphiTrace(aphiTrace)
+  trace$setAphiAcceptanceRatioTrace(aphiAcceptRatTrace)
+  trace$setSepsilonTrace(sepisolonTrace)
+  trace$setMutationParameterTrace(mutationTrace)
+  trace$setSelectionParameterTrace(selectionTrace)
+  
+  
+  parameter$setROCTrace(trace)
+  return(parameter) #Because of concerns with R passing arguments, we return explicitly.
+}
+
+
+loadParameterObject.Rcpp_RFPParameter <- function(parameter, file, model)
+{
+  load(file)
+  setBaseInfo(parameter, file, model)
+  parameter$currentAlphaParameter <- currentAlpha
+  parameter$proposedAlphaParameter <- proposedAlpha
+  parameter$currentLambdaPrimeParameter <- currentLambdaPrime
+  parameter$proposedLambdaPrimeParameter <- proposedLambdaPrime
+  
+  trace <- parameter$getTraceObject()
+  trace$setAlphaParameterTrace(alphaTrace)
+  trace$setLambdaPrimeParameterTrace(lambdaPrimeTrace)
+  
+  parameter$setRFPTrace(trace)
+  return(parameter) #R seems to produce copies, not pointers.
 }

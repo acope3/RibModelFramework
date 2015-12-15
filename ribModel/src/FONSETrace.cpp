@@ -90,6 +90,21 @@ void FONSETrace::updateCodonSpecificParameterTrace(unsigned sample, std::string 
 	}
 }
 
+
+
+
+std::vector<std::vector<std::vector<double>>> FONSETrace::getMutationParameterTrace()
+{
+	return mutationParameterTrace;
+}
+
+
+std::vector<std::vector<std::vector<double>>> FONSETrace::getSelectionParameterTrace()
+{
+	return selectionParameterTrace;
+}
+
+
 /*******************
  *   R WRAPPERS    *
  *******************/

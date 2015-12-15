@@ -85,6 +85,18 @@ class Trace {
 		}
 		unsigned getNumberOfMixtures()
 		{	return mixtureProbabilitiesTrace.size();}
+    
+    
+        //Only use R:
+        void setSphiTraces(std::vector<std::vector<double>> _sPhiTrace);
+        void setSphiAcceptanceRatioTrace(std::vector<double> _sphiAcceptanceRatioTrace);
+        void setSynthesisRateTrace(std::vector<std::vector<std::vector<double>>> _synthesisRateTrace);
+        void setSynthesisRateAcceptanceRatioTrace(std::vector<std::vector<std::vector<double>>>_synthesisRateAcceptanceRatioTrace);
+        void setMixtureAssignmentTrace(std::vector<std::vector<unsigned>> _mixtureAssignmentTrace);
+        void setMixtureProbabilitiesTrace(std::vector<std::vector<double>> _mixtureProbabilitiesTrace);
+        void setCspAcceptanceRatioTrace(std::vector<std::vector<double>> _cspAcceptanceRatioTrace);
+        void setCategories(std::vector<mixtureDefinition> &_categories);
+    
 
 		protected:
 		std::vector<mixtureDefinition> *categories;
