@@ -33,6 +33,40 @@ plot.Rcpp_ROCParameter <- function(parameter, what = "Mutation", samples = 100, 
   pairs(csp.params, upper.panel = upper.panel.plot, lower.panel=NULL, main = ...)
 }
 
+plot.Rcpp_FONSEParameter <- function(parameter, what = "Mutation", samples = 100, ...)
+{
+  
+  numMixtures <- parameter$numMixtures
+  csp.params <- data.frame(matrix(0, ncol=numMixtures, nrow = 40))
+  
+  names.aa <- aminoAcids()
+  for(mixture in 1:numMixtures)
+  {
+    
+    param.storage <- vector("numeric", 0)
+    param.name.storage <- vector("numeric", 0)
+    # get codon specific parameter
+    for(aa in names.aa)
+    {
+      if(aa == "M" || aa == "W" || aa == "X") next
+      codons <- AAToCodon(aa, T)
+      for(i in 1:length(codons))
+      {
+        if(what == "Mutation")
+        {
+          param.storage <- c(param.storage, parameter$getMutationPosteriorMeanForCodon(mixture, samples, codons[i]))
+        }else{
+          param.storage <- c(param.storage, parameter$getSelectionPosteriorMeanForCodon(mixture, samples, codons[i]))
+        }
+        param.name.storage <- c(param.name.storage, paste(aa, codons[i], sep="."))
+      }
+    }
+    csp.params[, mixture] <- param.storage
+  }
+  rownames(csp.params) <- param.name.storage
+  colnames(csp.params) <- paste("Mixture\nElement", 1:numMixtures)
+  #pairs(csp.params, upper.panel = upper.panel.plot, lower.panel=NULL, main = ...)
+}
 
 upper.panel.plot <- function(x, y, sd.x=NULL, sd.y=NULL, ...)
 {

@@ -7,7 +7,7 @@
 
 #include <cstdlib>
 #include <sstream>
-
+#include <chrono>
 #include <iostream>
 #include <fstream>
 #include <stdlib.h> //can be removed later
@@ -135,35 +135,11 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		unsigned mixAssign = model.getMixtureAssignment(i);
 		unsigned geneSynthCat = model.getSynthesisRateCategory(mixAssign);
 
-
-//		unsigned mixtureAssignmentOfGene = model.getMixtureAssignment(i);
-		for(unsigned k = 0u; k < numSynthesisRateCategories; k++)
-		{
-			// We do not need to add std::log(model.getCategoryProbability(k)) since it will cancel in the ratio!
-			double currLogLike = unscaledLogProb_curr[k];
-			double propLogLike = unscaledLogProb_prop[k];
-			if( -Parameter::randExp(1) < (propLogLike - currLogLike) )
-			{
-				model.updateSynthesisRate(i, k);
-				// only count each gene once, not numSynthesigeneIndexsRateCategories times
-				if(geneSynthCat == k)
-					logLikelihood += std::log(model.getCategoryProbability(k)) + propLogLike;
-			}else{
-				// only count each gene once, not numSynthesisRateCategories times
-				if(geneSynthCat == k)
-					logLikelihood += std::log(model.getCategoryProbability(k)) + currLogLike;
-			}
-		}
-
-		if (std::isinf(logLikelihood))
-		{
-			std::cout << "\tInfinity reached (Gene: " << i << ")\n";
-		}
 		// adjust the the unscaled probabilities by the constant c
 		// ln(f') = ln(c) + ln(f)
 		// calculate ln(P) = ln( Sum(p_i*f'(...)) ) and obtain normalizing constant for new p_i
 		double normalizingProbabilityConstant = 0.0;
-		
+
 		for(unsigned k = 0u; k < numMixtures; k++)
 		{
 			unscaledLogProb_curr_singleMixture[k] -= maxValue;
@@ -177,6 +153,33 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		{
 			probabilities[k] = probabilities[k] / normalizingProbabilityConstant;
 		}
+
+//		unsigned mixtureAssignmentOfGene = model.getMixtureAssignment(i);
+		for(unsigned k = 0u; k < numSynthesisRateCategories; k++)
+		{
+			// We do not need to add std::log(model.getCategoryProbability(k)) since it will cancel in the ratio!
+			double currLogLike = unscaledLogProb_curr[k];
+			double propLogLike = unscaledLogProb_prop[k];
+			if( -Parameter::randExp(1) < (propLogLike - currLogLike) )
+			{
+				model.updateSynthesisRate(i, k);
+				// only count each gene once, not numSynthesigeneIndexsRateCategories times
+				//if(geneSynthCat == k)
+					//logLikelihood += std::log(model.getCategoryProbability(k)) + propLogLike;
+				logLikelihood += probabilities[k] * propLogLike;
+			}else{
+				// only count each gene once, not numSynthesisRateCategories times
+				//if(geneSynthCat == k)
+					//logLikelihood += std::log(model.getCategoryProbability(k)) + currLogLike;
+				logLikelihood += probabilities[k] * currLogLike;
+			}
+		}
+
+		if (std::isinf(logLikelihood))
+		{
+			std::cout << "\tInfinity reached (Gene: " << i << ")\n";
+		}
+
 		// Get category in which the gene is placed in.
 		// If we use multiple sequence observation (like different mutants) randMultinom needs an parameter N to place N observations in numMixture buckets
 		unsigned categoryOfGene = Parameter::randMultinom(probabilities, numMixtures);
@@ -345,6 +348,9 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	model.initTraces(samples + 1, genome.getGenomeSize()); //Samples + 2 so we can store the starting and ending values.
 	// starting the MCMC
 
+	model.updateTracesWithInitialValues(genome);
+
+
 	std::cout << "entering MCMC loop" << std::endl;
 	std::cout << "\tEstimate Codon Specific Parameters? " << (estimateCodonSpecificParameter ? "TRUE" : "FALSE") << std::endl;
 	std::cout << "\tEstimate Hyper Parameters? " << (estimateHyperParameter ? "TRUE" : "FALSE") << std::endl;
@@ -353,6 +359,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	// set the last iteration to the max iterations, this way if the MCMC doesn't exit based on Geweke score, it will use the max iteration for posterior means
 	model.setLastIteration(samples);
 	std::cout << "\tStarting MCMC with " << maximumIterations << " iterations\n";
+	//std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 	for(unsigned iteration = 1u; iteration <= maximumIterations; iteration++)
 	{
 		if (writeRestartFile)
@@ -437,6 +444,10 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	} // end MCMC loop
 
 	std::cout << "leaving MCMC loop" << std::endl;
+	//std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+	//std::chrono::duration<int> time_span = std::chrono::duration_cast<std::chrono::duration<int>> (t2 - t1);
+	//std::cout << "The MCMC took " << (unsigned) time_span.count() / 3600 << " hours, " << (unsigned) (time_span.count() / 60) % 60 << 
+		//" minutes, and " << (unsigned) time_span.count() % 60 << " seconds." << std::endl;
 	//NOTE: The following files used to be written here:
 	//selectionParamTrace_#.csv
 	//phiTrace_nmix_#.csv

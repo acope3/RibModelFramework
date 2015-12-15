@@ -343,7 +343,25 @@ split.matrix <- function(M, r, c)
 } 
 
 
-
+#' Write Parameter Object to a File
+#' 
+#' @param parameter A parameter object that corrosponds to
+#' one of the model types, such as "ROC", or "FONSE".
+#' 
+#' @param file A filename that where the data will be stored.
+#' The file should end with the extension "Rdat".
+#' 
+#' @return This function has no return value.
+#' 
+#' @description \code{writeParameterObject} will call the appropriate followup
+#' call to writeParameterObject based off of the parameter type 
+#' given.
+#' 
+#' @details For example, if a ROCParameter is passed, the the writeParameterObject
+#' for the ROCParameter will be called. This allows us to not have an if-else
+#' block in the code - making use of the how R handles these situations.
+#' 
+#' 
 writeParameterObject <- function(parameter, file)
 {
   UseMethod("writeParameterObject", parameter)

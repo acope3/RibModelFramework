@@ -104,9 +104,11 @@ RCPP_MODULE(Parameter_mod)
 
 
 
+
 		//CSP Functions:
 		//Listed in the properties section below. NOTE: these getter/setters are ONLY
 		//used in R
+
 
 
 
@@ -204,7 +206,7 @@ RCPP_MODULE(Parameter_mod)
 		.method("getCovarianceMatrixForAA", &FONSEParameter::getCovarianceMatrixForAA) //Not an R wrapper
 		.method("initMutation", &FONSEParameter::initMutation)
 		.method("initSelection", &FONSEParameter::initSelection)
-		.method("initMutationSelectionCategories", &FONSEParameter::initMutationSelectionCategoriesR)
+
 
 
 

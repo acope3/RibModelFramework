@@ -16,13 +16,15 @@ parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssig
                                        mixture.definition = mixDef)
 model <- initializeModelObject(parameter, "FONSE")
 
-parameter$initMutationSelectionCategories(mutation.file, 1, "Mutation")
-parameter$initMutationSelectionCategories(selection.file, 1, "Selection")
+parameter$initMutationCategories(c(mutation.file), 1)
+parameter$initSelectionCategories(c(selection.file), 1)
 
-phi <- read.table(phi.file, header = T, sep = ",")
-phi.values <- phi[,2]
+#phi <- read.table(phi.file, header = T, sep = ",")
+#phi.vals <- phi[,2]
 
-parameter$initializeSynthesisRateByList(phi.values)
+phi.vals <- parameter$readPhiValues(phi.file)
+
+parameter$initializeSynthesisRateByList(phi.vals)
 model$simulateGenome(genome)
 
 genome$writeFasta(genome.out.file, TRUE)

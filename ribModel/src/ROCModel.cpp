@@ -39,17 +39,12 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 		// skip amino acids which do not occur in current gene. Avoid useless calculations and multiplying by 0
 		if(seqsum.getAACountForAA(curAA) == 0) continue;
 
-		// get codon count (total count not parameter->count)
+		// get number of codons for AA (total number not parameter->count)
 		unsigned numCodons = seqsum.GetNumCodonsForAA(curAA);
 		// get mutation and selection parameter->for gene
-		//double* mutation = new double[numCodons - 1]();
 		parameter->getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
-		//double* selection = new double[numCodons - 1]();
 		parameter->getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
-
-		// prepare array for codon counts for AA
-		//int* codonCount = new int[numCodons]();
-
+		// get codon occurence in sequence
 		obtainCodonCount(seqsum, curAA, codonCount);
 
 		logLikelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
@@ -61,8 +56,6 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 	double mPhi = (-(sPhi * sPhi) / 2);
 	double logPhiProbability = Parameter::densityLogNorm(phiValue, mPhi, sPhi, true);
 	double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, mPhi, sPhi, true);
-	double currentLogLikelihood = (logLikelihood + logPhiProbability);
-	double proposedLogLikelihood = (logLikelihood_proposed + logPhiProbability_proposed);
 
 	// TODO: make this work for more than one phi value, or for genes that don't have phi values
 	if (withPhi) {
@@ -73,6 +66,9 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 			}
 		}
 	}
+
+	double currentLogLikelihood = (logLikelihood + logPhiProbability);
+	double proposedLogLikelihood = (logLikelihood_proposed + logPhiProbability_proposed);
 
 	logProbabilityRatio[0] = (proposedLogLikelihood - currentLogLikelihood) - (std::log(phiValue) - std::log(phiValue_proposed));
 	logProbabilityRatio[1] = currentLogLikelihood - std::log(phiValue_proposed);
@@ -202,18 +198,18 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 
 double ROCModel::calculateAllPriors()
 {
-	double priorRatio = 0.0;
+	double prior = 0.0;
 	unsigned size = getGroupListSize();
 
 	for(unsigned i = 0; i < size; i++)
 	{
 		std::string grouping = getGrouping(i);
-		priorRatio += calculateMutationPrior(grouping, false);
+		prior += calculateMutationPrior(grouping, false);
 	}
 
 	// add more priors if necessary.
 
-	return priorRatio;
+	return prior;
 }
 
 double ROCModel::calculateMutationPrior(std::string grouping, bool proposed)
@@ -363,6 +359,8 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 	std::vector<double> currentMphi(selectionCategory, 0.0);
 	std::vector<double> proposedSphi(selectionCategory, 0.0);
 	std::vector<double> proposedMphi(selectionCategory, 0.0);
+
+
 	for(unsigned i = 0u; i < selectionCategory; i++)
 	{
 		currentSphi[i] = getSphi(i, false);
@@ -392,6 +390,10 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 		unsigned mixture = getMixtureAssignment(i);
 		mixture = getSynthesisRateCategory(mixture);
 		double phi = getSynthesisRate(i, mixture, false);
+		if (!std::isfinite(phi))
+		{
+			std::cout << "phi " << i << " not finite! " << phi << "\n";
+		}
 		lpr += Parameter::densityLogNorm(phi, proposedMphi[mixture], proposedSphi[mixture], true)
 				- Parameter::densityLogNorm(phi, currentMphi[mixture], currentSphi[mixture], true);
 	}
@@ -399,7 +401,8 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 	// TODO: USE CONSTANTS INSTEAD OF 0
 	logProbabilityRatio[0] = lpr;
 
-	if (withPhi) {
+	if (withPhi)
+	{
 		for (unsigned i = 0; i < parameter->getNumPhiGroupings(); i++) {
 			lpr = 0.0;
 			double Aphi = getAphi(i, false);
@@ -429,8 +432,8 @@ void ROCModel::updateGibbsSampledHyperParameters(Genome &genome)
 {
 	// TODO: Fix this for any numbers of phi values
 	if (withPhi) {
+		double shape = (genome.getGenomeSize() - 1.0) / 2.0;
 		for (unsigned i = 0; i < parameter->getNumPhiGroupings(); i++) {
-			double shape = (genome.getGenomeSize() - 1.0) / 2.0;
 			double rate = 0.0;
 			unsigned mixtureAssignment;
 			double aphi = getAphi(i);
@@ -442,7 +445,7 @@ void ROCModel::updateGibbsSampledHyperParameters(Genome &genome)
 				}
 			}
 			rate /= 2;
-
+			// TODO(Cedric): rate has to be 1/rate? see relatioship gamma to inv-gamma
 			double rand = parameter->randGamma(shape, rate);
 			parameter->setSepsilon(i, std::sqrt(1 / rand));
 		}
@@ -489,5 +492,26 @@ void ROCModel::updateHyperParameterTraces(unsigned sample)
 	for (unsigned i = 0; i < parameter->getNumPhiGroupings(); i++) {
 		updateAphiTrace(i, sample);
 		updateSepsilonTrace(i, sample);
+	}
+}
+
+void ROCModel::updateTracesWithInitialValues(Genome &genome)
+{
+	std::vector <std::string> groupList = parameter->getGroupList();
+
+	for (unsigned i = 0; i < genome.getGenomeSize(); i++)
+	{
+		parameter->updateSynthesisRateTrace(0, i);
+		parameter->updateMixtureAssignmentTrace(0, i);
+	}
+
+	for (unsigned i = 0; i < groupList.size(); i++)
+	{
+		std::array <unsigned, 2> codonRange = SequenceSummary::AAToCodonRange(groupList[i], true);
+		for (unsigned j = codonRange[0]; j < codonRange[1]; j++)
+		{
+			std::string codon = SequenceSummary::indexToCodon(j, true);
+			parameter->updateCodonSpecificParameterTrace(0, codon);
+		}
 	}
 }
