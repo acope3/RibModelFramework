@@ -58,6 +58,16 @@ class MCMCAlgorithm
 
 		static std::vector<double> acf(std::vector<double>& x, int nrows, int ncols, int lagmax, bool correlation, bool demean);
 		static std::vector<std::vector<double>> solveToeplitzMatrix(int lr, std::vector<double> r, std::vector<double> g);
+    
+    
+    //R Only:
+    unsigned getSamples();
+    unsigned getThining();
+    unsigned getAdaptiveWidth();
+    void setSamples(unsigned _samples);
+    void setThining(unsigned _thining);
+    void setAdaptiveWidth(unsigned _adaptiveWidth);
+    void setLogLikelihoodTrace(std::vector<double> _likelihoodTrace);
 
 	protected:
 };

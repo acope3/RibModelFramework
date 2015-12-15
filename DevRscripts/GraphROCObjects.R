@@ -1,61 +1,24 @@
 library(ribModel)
 rm(list=ls())
-#read genome
 
-with.phi <- FALSE
+parameter <- new(ROCParameter)
+parameter <- loadParameterObject(parameter, "ROCParameter.Rdat", "ROC")
+mcmc <- loadMCMCObject("MCMCObject.Rdat")
+genome <- initializeGenomeObject(file = "../data/realGenomes/Skluyveri.fasta")
 
-if (with.phi) {
-  genome <- initializeGenomeObject(file = "../data/twoMixtures/simulatedAllUniqueR.fasta", expression.file = "../data/twoMixtures/simulatedAllUniqueR_phi.csv")
-} else {
-  genome <- initializeGenomeObject(file = "../data/realGenomes/Skluyveri.fasta")
-}
-
-#initialize parameter object
-sphi_init <- (c(1,1,1))
-numMixtures <- 3
-mixDef <- "allUnique"
-geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457), rep(1, 3403), rep(3, 500))
-#geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
-#geneAssignment <- c(rep(1,448), rep(2,457))
-#geneAssignment <- c(rep(1,500), rep(2,500))
-parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
-#parameter <- initializeParameterObject(restart.file = "../ribModel/src/20RestartFile.txt")
-
-
-
-# initialize MCMC object
-samples <- 30
-thining <- 10
-adaptiveWidth <- 10
-mcmc <- initializeMCMCObject(samples=samples, thining=thining, adaptive.width=adaptiveWidth, 
-                     est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
-
-
-# get model object
-model <- initializeModelObject(parameter, "ROC", with.phi)
-
-setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth, TRUE)
-#run mcmc on genome with parameter using model
-system.time(
-  runMCMC(mcmc, genome, model, 8)
-)
-
-
-#plots log likelihood trace, possibly other mcmc diagnostics in the future
 
 
 # plots different aspects of trace
 trace <- parameter$getTraceObject()
-writeParameterObject(parameter, file="ROCParameter.Rdat")
-writeMCMCObject(mcmc, file="MCMCObject.Rdat")
-pdf("simulated_Genome_allUnique_startCSP_True_startPhi_true_adaptSphi_True.pdf")
+
+pdf("test1.pdf")
 plot(mcmc)
 plot(trace, what = "MixtureProbability")
 plot(trace, what = "SPhi")
 plot(trace, what = "ExpectedPhi")
 dev.off()
 plot(trace, what = "Expression", geneIndex = 905)
-pdf("simulated_Genome_allUnique_startCSP_True_startPhi_true_adaptSphi_True_mix1.pdf", width = 11, height = 12)
+pdf("test2.pdf", width = 11, height = 12)
 plot(trace, what = "Mutation", mixture = 1)
 plot(trace, what = "Selection", mixture = 1)
 mixtureAssignment <- unlist(lapply(1:genome$getGenomeSize(),  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))
@@ -97,4 +60,3 @@ for(mixture in 1:2)
   }))
   points(mixtureAssignment[genes.in.mixture, mixture], log10(expressionValues), col=colors[mixture])
 }
-

@@ -11,11 +11,11 @@ sphi_init <- 2
 numMixtures <- 1
 mixDef <- "allUnique"
 geneAssignment <- c(rep(1, genome$getGenomeSize()))
-#parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, model= "RFP", split.serine = TRUE, mixture.definition = mixDef)
-parameter <- new(RFPParameter, "500KrestartFile.rst")
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, model= "RFP", split.serine = TRUE, mixture.definition = mixDef)
+#parameter <- new(RFPParameter, "30restartFile.rst")
 
 # initialize MCMC object
-samples <- 10
+samples <- 100
 thining <- 10
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples=samples, thining=thining, adaptive.width=adaptiveWidth, 
@@ -24,7 +24,7 @@ mcmc <- initializeMCMCObject(samples=samples, thining=thining, adaptive.width=ad
 
 # get model object
 model <- initializeModelObject(parameter, "RFP")
-setRestartSettings(mcmc, "restartFile.rst", 100, TRUE)
+setRestartSettings(mcmc, "restartFile.rst", 10, TRUE)
 
 
 #run mcmc on genome with parameter using model
@@ -34,9 +34,18 @@ system.time(
 
 
 
+
+
+
+
+
+
+
 # plots different aspects of trace
 trace <- parameter$getTraceObject()
-writeTraces(parameter, file="traces.Rdat")
+writeParameterObject(parameter, file="RFPObject.Rdat")
+writeMCMCObject(mcmc, file="MCMCObject.Rdat")
+
 
 pdf("RFP_Genome_allUnique_startCSP_True_startPhi_true_adaptSphi_True.pdf")
 
@@ -97,7 +106,7 @@ for (i in 1:61)
 }
 
 for (geneIndex in 1:genome$getGenomeSize()) {
-  phiList[geneIndex] <- parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(100, geneIndex, 1)
+  phiList[geneIndex] <- parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(samples * 0.5, geneIndex, 1)
 }
 
 for (i in 1:genome$getGenomeSize())
@@ -147,6 +156,105 @@ write.table(m, "RFPLambdaPrimeValues.csv", sep = ",", quote = F, row.names = F, 
 m <- matrix(c(ids, phiList, phiList), ncol = 3, byrow = FALSE)
 colnames(m) <- c("Gene", "PhiValue", "PhiValue")
 write.table(m, "RFPPhiValues.csv", sep = ",", quote = F, row.names = F, col.names = T)
+
+
+
+
+
+
+
+
+
+
+
+load("RFPtraces1.Rdat")
+curloglikeTrace <- mcmc$getLogLikelihoodTrace()
+cursPhiTraces <- trace$getSphiTraces()
+cursphiAcceptRatTrace <- trace$getSphiAcceptanceRatioTrace()
+cursynthRateTrace <- trace$getSynthesisRateTrace()
+cursynthAcceptRatTrace <- trace$getSynthesisRateAcceptanceRatioTrace()
+curmixAssignTrace <- trace$getMixutreAssignmentTrace()
+curmixProbTrace <- trace$getMixtureProbabilitiesTrace()
+curcspAcceptRatTrace <- trace$getCspAcceptanceRatioTrace()
+curalphaTrace <- trace$getAlphaParameterTrace()
+curlambdaPrimeTrace <- trace$getLambdaPrimeParameterTrace()
+
+max <- samples + 1
+fullAlphaTrace <- alphaTrace
+for (size in 1:length(curalphaTrace))
+{
+  for (csp in 1:length(curalphaTrace[[size]]))
+  {
+    fullAlphaTrace[[size]][[csp]] <- c(fullAlphaTrace[[size]][[csp]], curalphaTrace[[size]][[csp]][2:max])
+  }
+}
+
+fullLambdaPrimeTrace <- lambdaPrimeTrace
+for (size in 1:length(curlambdaPrimeTrace))
+{
+  for (csp in 1:length(curlambdaPrimeTrace[[size]]))
+  {
+    fullLambdaPrimeTrace[[size]][[csp]] <- c(fullLambdaPrimeTrace[[size]][[csp]], curlambdaPrimeTrace[[size]][[csp]][2:max])
+  }
+}
+
+fullcspAcceptRatTrace <- cspAcceptRatTrace
+for (size in 1:length(curcspAcceptRatTrace))
+{
+  fullcspAcceptRatTrace[[size]]<- c(fullcspAcceptRatTrace[[size]], curcspAcceptRatTrace[[size]])
+}
+
+fullmixProbTrace <- mixProbTrace
+for (size in 1:length(curmixProbTrace))
+{
+  fullmixProbTrace[[size]]<- c(fullmixProbTrace[[size]], curmixProbTrace[[size]][2:max])
+}
+
+
+fullmixAssignTrace <- mixAssignTrace
+for (size in 1:length(curmixAssignTrace))
+{
+  fullmixAssignTrace[[size]]<- c(fullmixAssignTrace[[size]], curmixAssignTrace[[size]][2:max])
+}
+
+fullsynthAcceptRatTrace <- synthAcceptRatTrace
+for (size in 1:length(cursynthAcceptRatTrace))
+{
+  for (csp in 1:length(cursynthAcceptRatTrace[[size]]))
+  {
+    fullsynthAcceptRatTrace[[size]][[csp]] <- c(fullsynthAcceptRatTrace[[size]][[csp]], cursynthAcceptRatTrace[[size]][[csp]])
+  }
+}
+
+
+fullsynthRateTrace <- synthRateTrace
+for (size in 1:length(cursynthRateTrace))
+{
+  for (csp in 1:length(cursynthRateTrace[[size]]))
+  {
+    fullsynthRateTrace[[size]][[csp]] <- c(fullsynthRateTrace[[size]][[csp]], cursynthRateTrace[[size]][[csp]][2:max])
+  }
+}
+
+
+
+fullsphiAcceptRatTrace <- sphiAcceptRatTrace
+fullsphiAcceptRatTrace <- c(fullsphiAcceptRatTrace, cursphiAcceptRatTrace)
+
+
+
+
+fullsPhiTraces <- sPhiTraces
+for (size in 1:length(cursPhiTraces))
+{
+  fullsPhiTraces[[size]]<- c(fullsPhiTraces[[size]], cursPhiTraces[[size]][2:max])
+}
+
+max <- max - 1
+fullloglikeTrace <- loglikeTrace
+fullloglikeTrace <- c(fullloglikeTrace, curloglikeTrace[2:max])
+
+
 
 
 # Write the traces for the run.

@@ -264,7 +264,6 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 			model.updateCodonSpecificParameterTrace(iteration/thining, grouping);
 		}
 	}
-	model.updateTmp(); //update the tmp trace I have created to track alphas.
 }
 
 // Allows to diverge from initial conditions (divergenceIterations controls the divergence).
@@ -643,6 +642,48 @@ void MCMCAlgorithm::setRestartFileSettings(std::string filename, unsigned interv
 	multipleFiles = multiple;
 	writeRestartFile = true;
 }
+
+
+
+
+unsigned MCMCAlgorithm::getSamples()
+{
+    return samples;
+}
+
+
+unsigned MCMCAlgorithm::getThining()
+{
+    return thining;
+}
+
+
+unsigned MCMCAlgorithm::getAdaptiveWidth()
+{
+    return adaptiveWidth;
+}
+
+void MCMCAlgorithm::setSamples(unsigned _samples)
+{
+    samples = _samples;
+}
+
+
+void MCMCAlgorithm::setThining(unsigned _thining)
+{
+    thining = _thining;
+}
+
+
+void MCMCAlgorithm::setAdaptiveWidth(unsigned _adaptiveWidth)
+{
+    adaptiveWidth = _adaptiveWidth;
+}
+
+void MCMCAlgorithm::setLogLikelihoodTrace(std::vector<double> _likelihoodTrace)
+{
+    likelihoodTrace = _likelihoodTrace;
+}
 // ---------------------------------------------------------------------------
 // ----------------------------- RCPP STUFF ----------------------------------
 // ---------------------------------------------------------------------------
@@ -665,6 +706,13 @@ RCPP_MODULE(MCMCAlgorithm_mod)
 		.method("getLogLikelihoodPosteriorMean", &MCMCAlgorithm::getLogLikelihoodPosteriorMean)
 		.method("setRestartFileSettings", &MCMCAlgorithm::setRestartFileSettings)
 		.method("setEstimateMixtureAssignment", &MCMCAlgorithm::setEstimateMixtureAssignment)
+        .method("getSamples", &MCMCAlgorithm::getSamples)
+        .method("getThining", &MCMCAlgorithm::getThining)
+        .method("getAdaptiveWidth", &MCMCAlgorithm::getAdaptiveWidth)
+        .method("setSamples", &MCMCAlgorithm::setSamples)
+        .method("setThining", &MCMCAlgorithm::setThining)
+        .method("setAdaptiveWidth", &MCMCAlgorithm::setAdaptiveWidth)
+        .method("setLogLikelihoodTrace", &MCMCAlgorithm::setLogLikelihoodTrace)
 		;
 
 	Rcpp::function("TestACF", &MCMCAlgorithm::acf); //TEST THAT ONLY!

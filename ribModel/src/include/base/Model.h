@@ -70,7 +70,6 @@ class Model
 		virtual void setLastIteration(unsigned iteration) = 0;
 		virtual unsigned getLastIteration() = 0;
 
-		virtual void updateTmp() =0;
 		// print functions
 		virtual void printHyperParameters() = 0;
 
