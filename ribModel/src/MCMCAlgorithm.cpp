@@ -135,35 +135,11 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		unsigned mixAssign = model.getMixtureAssignment(i);
 		unsigned geneSynthCat = model.getSynthesisRateCategory(mixAssign);
 
-
-//		unsigned mixtureAssignmentOfGene = model.getMixtureAssignment(i);
-		for(unsigned k = 0u; k < numSynthesisRateCategories; k++)
-		{
-			// We do not need to add std::log(model.getCategoryProbability(k)) since it will cancel in the ratio!
-			double currLogLike = unscaledLogProb_curr[k];
-			double propLogLike = unscaledLogProb_prop[k];
-			if( -Parameter::randExp(1) < (propLogLike - currLogLike) )
-			{
-				model.updateSynthesisRate(i, k);
-				// only count each gene once, not numSynthesigeneIndexsRateCategories times
-				if(geneSynthCat == k)
-					logLikelihood += std::log(model.getCategoryProbability(k)) + propLogLike;
-			}else{
-				// only count each gene once, not numSynthesisRateCategories times
-				if(geneSynthCat == k)
-					logLikelihood += std::log(model.getCategoryProbability(k)) + currLogLike;
-			}
-		}
-
-		if (std::isinf(logLikelihood))
-		{
-			std::cout << "\tInfinity reached (Gene: " << i << ")\n";
-		}
 		// adjust the the unscaled probabilities by the constant c
 		// ln(f') = ln(c) + ln(f)
 		// calculate ln(P) = ln( Sum(p_i*f'(...)) ) and obtain normalizing constant for new p_i
 		double normalizingProbabilityConstant = 0.0;
-		
+
 		for(unsigned k = 0u; k < numMixtures; k++)
 		{
 			unscaledLogProb_curr_singleMixture[k] -= maxValue;
@@ -177,6 +153,33 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		{
 			probabilities[k] = probabilities[k] / normalizingProbabilityConstant;
 		}
+
+//		unsigned mixtureAssignmentOfGene = model.getMixtureAssignment(i);
+		for(unsigned k = 0u; k < numSynthesisRateCategories; k++)
+		{
+			// We do not need to add std::log(model.getCategoryProbability(k)) since it will cancel in the ratio!
+			double currLogLike = unscaledLogProb_curr[k];
+			double propLogLike = unscaledLogProb_prop[k];
+			if( -Parameter::randExp(1) < (propLogLike - currLogLike) )
+			{
+				model.updateSynthesisRate(i, k);
+				// only count each gene once, not numSynthesigeneIndexsRateCategories times
+				//if(geneSynthCat == k)
+					//logLikelihood += std::log(model.getCategoryProbability(k)) + propLogLike;
+				logLikelihood += probabilities[k] * propLogLike;
+			}else{
+				// only count each gene once, not numSynthesisRateCategories times
+				//if(geneSynthCat == k)
+					//logLikelihood += std::log(model.getCategoryProbability(k)) + currLogLike;
+				logLikelihood += probabilities[k] * currLogLike;
+			}
+		}
+
+		if (std::isinf(logLikelihood))
+		{
+			std::cout << "\tInfinity reached (Gene: " << i << ")\n";
+		}
+
 		// Get category in which the gene is placed in.
 		// If we use multiple sequence observation (like different mutants) randMultinom needs an parameter N to place N observations in numMixture buckets
 		unsigned categoryOfGene = Parameter::randMultinom(probabilities, numMixtures);
@@ -261,7 +264,6 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 			model.updateCodonSpecificParameterTrace(iteration/thining, grouping);
 		}
 	}
-	model.updateTmp(); //update the tmp trace I have created to track alphas.
 }
 
 // Allows to diverge from initial conditions (divergenceIterations controls the divergence).
@@ -648,6 +650,48 @@ void MCMCAlgorithm::setRestartFileSettings(std::string filename, unsigned interv
 	multipleFiles = multiple;
 	writeRestartFile = true;
 }
+
+
+
+
+unsigned MCMCAlgorithm::getSamples()
+{
+    return samples;
+}
+
+
+unsigned MCMCAlgorithm::getThining()
+{
+    return thining;
+}
+
+
+unsigned MCMCAlgorithm::getAdaptiveWidth()
+{
+    return adaptiveWidth;
+}
+
+void MCMCAlgorithm::setSamples(unsigned _samples)
+{
+    samples = _samples;
+}
+
+
+void MCMCAlgorithm::setThining(unsigned _thining)
+{
+    thining = _thining;
+}
+
+
+void MCMCAlgorithm::setAdaptiveWidth(unsigned _adaptiveWidth)
+{
+    adaptiveWidth = _adaptiveWidth;
+}
+
+void MCMCAlgorithm::setLogLikelihoodTrace(std::vector<double> _likelihoodTrace)
+{
+    likelihoodTrace = _likelihoodTrace;
+}
 // ---------------------------------------------------------------------------
 // ----------------------------- RCPP STUFF ----------------------------------
 // ---------------------------------------------------------------------------
@@ -670,6 +714,13 @@ RCPP_MODULE(MCMCAlgorithm_mod)
 		.method("getLogLikelihoodPosteriorMean", &MCMCAlgorithm::getLogLikelihoodPosteriorMean)
 		.method("setRestartFileSettings", &MCMCAlgorithm::setRestartFileSettings)
 		.method("setEstimateMixtureAssignment", &MCMCAlgorithm::setEstimateMixtureAssignment)
+        .method("getSamples", &MCMCAlgorithm::getSamples)
+        .method("getThining", &MCMCAlgorithm::getThining)
+        .method("getAdaptiveWidth", &MCMCAlgorithm::getAdaptiveWidth)
+        .method("setSamples", &MCMCAlgorithm::setSamples)
+        .method("setThining", &MCMCAlgorithm::setThining)
+        .method("setAdaptiveWidth", &MCMCAlgorithm::setAdaptiveWidth)
+        .method("setLogLikelihoodTrace", &MCMCAlgorithm::setLogLikelihoodTrace)
 		;
 
 	Rcpp::function("TestACF", &MCMCAlgorithm::acf); //TEST THAT ONLY!

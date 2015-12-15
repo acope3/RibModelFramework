@@ -46,4 +46,24 @@ convergence.test.Rcpp_MCMCAlgorithm <- function(mcmc, n.samples = 10, frac1 = 0.
 }
 
 
+writeMCMCObject <- function(mcmc, file)
+{
+  loglikeTrace <- mcmc$getLogLikelihoodTrace()
+  samples <- mcmc$getSamples()
+  thining <- mcmc$getThining()
+  adaptiveWidth <- mcmc$getAdaptiveWidth()
+  save(list = c("loglikeTrace", "samples", "thining", "adaptiveWidth"), file=file)
+}
+
+loadMCMCObject <- function(file)
+{
+  mcmc <- new(MCMCAlgorithm)
+  load(file)
+  mcmc$setSamples(samples)
+  mcmc$setThining(thining)
+  mcmc$setAdaptiveWidth(adaptiveWidth)
+  mcmc$setLogLikelihoodTrace(loglikeTrace)
+  return(mcmc)
+}
+
 
