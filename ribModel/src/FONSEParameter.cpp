@@ -1005,33 +1005,56 @@ void FONSEParameter::proposeHyperParameters()
 
 
 
-
-
-
-
-
+// -----------------------------------------------------------------------------------------------------//
+// ---------------------------------------- R SECTION --------------------------------------------------//
+// -----------------------------------------------------------------------------------------------------//
 
 
 #ifndef STANDALONE
-SEXP FONSEParameter::calculateSelectionCoefficientsR(unsigned sample, unsigned mixture)
+
+
+//--------------------------------------------------//
+// ---------- Constructors & Destructors ---------- //
+//--------------------------------------------------//
+
+
+FONSEParameter::FONSEParameter(std::vector<double> sphi, std::vector<unsigned> geneAssignment,
+		std::vector<unsigned> _matrix, bool splitSer) : Parameter(22)
 {
-	NumericMatrix RSelectionCoefficents(mixtureAssignment.size(), 62); //62 due to stop codons
-	std::vector<std::vector<double>> selectionCoefficients;
-	bool checkMixture = checkIndex(mixture, 1, numMixtures);
-	if (checkMixture)
+	unsigned _numMixtures = _matrix.size() / 2;
+	std::vector<std::vector<unsigned>> thetaKMatrix;
+	thetaKMatrix.resize(_numMixtures);
+
+	unsigned index = 0;
+	for (unsigned i = 0; i < _numMixtures; i++)
 	{
-		selectionCoefficients = calculateSelectionCoefficients(sample, mixture - 1);
-		unsigned index = 0;
-		for (unsigned i = 0; i < selectionCoefficients.size(); i++)
+		for (unsigned j = 0; j < 2; j++, index++)
 		{
-			for (unsigned j = 0; j < selectionCoefficients[i].size(); j++, index++)
-			{
-				RSelectionCoefficents[index] = selectionCoefficients[i][j];
-			}
+			thetaKMatrix[i].push_back(_matrix[index]);
 		}
 	}
-	return RSelectionCoefficents;
+	initParameterSet(sphi, _matrix.size() / 2, geneAssignment, thetaKMatrix, splitSer);
+	initFONSEParameterSet();
+
 }
+
+
+FONSEParameter::FONSEParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
+		bool splitSer, std::string _mutationSelectionState) : Parameter(22)
+{
+	std::vector<std::vector<unsigned>> thetaKMatrix;
+	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
+	initFONSEParameterSet();
+}
+
+
+
+
+
+//---------------------------------------------------------------//
+// ---------- Initialization, Restart, Index Checking ---------- //
+//---------------------------------------------------------------//
+
 
 void FONSEParameter::initCovarianceMatrix(SEXP _matrix, std::string aa)
 {
@@ -1058,31 +1081,7 @@ void FONSEParameter::initCovarianceMatrix(SEXP _matrix, std::string aa)
 	m.choleskiDecomposition();
 	covarianceMatrix[aaIndex] = m;
 }
-#endif
 
-
-
-
-#ifndef STANDALONE
-void FONSEParameter::initSelection(std::vector<double> selectionValues, unsigned mixtureElement, std::string aa)
-{
-	//TODO: seperate out the R wrapper functionality and make the wrapper
-	//currentSelectionParameter
-	bool check = checkIndex(mixtureElement, 1, numMixtures);
-	if (check)
-	{
-		mixtureElement--;
-
-		int category = getSelectionCategory(mixtureElement);
-
-		aa[0] = (char)std::toupper(aa[0]);
-		std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(aa, true);
-		for (unsigned i = aaRange[0], j = 0; i < aaRange[1]; i++, j++)
-		{
-			currentSelectionParameter[category][i] = selectionValues[j];
-		}
-	}
-}
 
 void FONSEParameter::initMutation(std::vector<double> mutationValues, unsigned mixtureElement, std::string aa)
 {
@@ -1104,38 +1103,26 @@ void FONSEParameter::initMutation(std::vector<double> mutationValues, unsigned m
 	}
 }
 
-#endif
 
+void FONSEParameter::initSelection(std::vector<double> selectionValues, unsigned mixtureElement, std::string aa)
+{
+	//TODO: seperate out the R wrapper functionality and make the wrapper
+	//currentSelectionParameter
+	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	if (check)
+	{
+		mixtureElement--;
 
+		int category = getSelectionCategory(mixtureElement);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		aa[0] = (char)std::toupper(aa[0]);
+		std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(aa, true);
+		for (unsigned i = aaRange[0], j = 0; i < aaRange[1]; i++, j++)
+		{
+			currentSelectionParameter[category][i] = selectionValues[j];
+		}
+	}
+}
 
 
 void FONSEParameter::initMutationSelectionCategoriesR(std::vector<std::string> files, unsigned numCategories,
@@ -1169,36 +1156,129 @@ void FONSEParameter::initMutationSelectionCategoriesR(std::vector<std::string> f
 	}
 }
 
+
+
+
+
+// --------------------------------------//
+// ---------- Trace Functions -----------//
+// --------------------------------------//
+
+
 void FONSEParameter::setTraceObject(FONSETrace _trace)
 {
     traces = _trace;
 }
-#ifndef STANDALONE
-FONSEParameter::FONSEParameter(std::vector<double> sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer)
-	: Parameter(22)
-{
-	unsigned _numMixtures = _matrix.size() / 2;
-	std::vector<std::vector<unsigned>> thetaKMatrix;
-	thetaKMatrix.resize(_numMixtures);
 
-	unsigned index = 0;
-	for (unsigned i = 0; i < _numMixtures; i++)
+
+void FONSEParameter::setCategoriesForTrace()
+{
+	traces.setCategories(categories);
+}
+
+
+
+
+
+// -----------------------------------//
+// ---------- CSP Functions ----------//
+// -----------------------------------//
+
+
+std::vector< std::vector <double> > FONSEParameter::getCurrentMutationParameter()
+{
+	return currentMutationParameter;
+}
+
+
+std::vector< std::vector <double> > FONSEParameter::getCurrentSelectionParameter()
+{
+	return currentSelectionParameter;
+}
+
+
+
+
+
+// ------------------------------------------------------------------//
+// ---------- Posterior, Variance, and Estimates Functions ----------//
+// ------------------------------------------------------------------//
+
+
+double FONSEParameter::getMutationPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
+{
+	double rv = -1.0;
+	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	if (check)
 	{
-		for (unsigned j = 0; j < 2; j++, index++)
+		rv = getMutationPosteriorMean(mixtureElement - 1, samples, codon);
+	}
+	return rv;
+}
+
+
+double FONSEParameter::getSelectionPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
+{
+	double rv = -1.0;
+	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	if (check)
+	{
+		rv = getSelectionPosteriorMean(mixtureElement - 1, samples, codon);
+	}
+	return rv;
+}
+
+
+double FONSEParameter::getMutationVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased)
+{
+	double rv = -1.0;
+	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	if (check)
+	{
+		rv = getMutationVariance(mixtureElement - 1, samples, codon, unbiased);
+	}
+	return rv;
+}
+
+
+double FONSEParameter::getSelectionVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased)
+{
+	double rv = -1.0;
+	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	if (check)
+	{
+		rv = getSelectionVariance(mixtureElement - 1, samples, codon, unbiased);
+	}
+	return rv;
+}
+
+
+
+
+
+// -------------------------------------//
+// ---------- Other Functions ----------//
+// -------------------------------------//
+
+
+SEXP FONSEParameter::calculateSelectionCoefficientsR(unsigned sample, unsigned mixture)
+{
+	NumericMatrix RSelectionCoefficents(mixtureAssignment.size(), 62); //62 due to stop codons
+	std::vector<std::vector<double>> selectionCoefficients;
+	bool checkMixture = checkIndex(mixture, 1, numMixtures);
+	if (checkMixture)
+	{
+		selectionCoefficients = calculateSelectionCoefficients(sample, mixture - 1);
+		unsigned index = 0;
+		for (unsigned i = 0; i < selectionCoefficients.size(); i++)
 		{
-			thetaKMatrix[i].push_back(_matrix[index]);
+			for (unsigned j = 0; j < selectionCoefficients[i].size(); j++, index++)
+			{
+				RSelectionCoefficents[index] = selectionCoefficients[i][j];
+			}
 		}
 	}
-	initParameterSet(sphi, _matrix.size() / 2, geneAssignment, thetaKMatrix, splitSer);
-	initFONSEParameterSet();
-
-}
-
-FONSEParameter::FONSEParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState)
-	: Parameter(22)
-{
-	std::vector<std::vector<unsigned>> thetaKMatrix;
-	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
-	initFONSEParameterSet();
+	return RSelectionCoefficents;
 }
 #endif
+

@@ -128,67 +128,53 @@ class FONSEParameter : public Parameter
 
 
 
+		//R Section:
 
-
-
-
-
-
-
-		
-		void initMutationSelectionCategoriesR(std::vector<std::string> files, unsigned numCategories, std::string paramType);
 #ifndef STANDALONE
-		FONSEParameter(std::vector<double> sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer = true);
-		FONSEParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer = true, std::string _mutationSelectionState = "allUnique");
+
+
+
+		//Constructors & Destructors:
+		FONSEParameter(std::vector<double> sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix,
+		 				bool splitSer = true);
+		FONSEParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
+						bool splitSer = true, std::string _mutationSelectionState = "allUnique");
+
+
+
+		//Initialization, Restart, Index Checking:
 		void initCovarianceMatrix(SEXP matrix, std::string aa);
-		double getMutationPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
-		{
-			double rv = -1.0;
-			bool check = checkIndex(mixtureElement, 1, numMixtures);
-			if (check)
-			{
-				rv = getMutationPosteriorMean(mixtureElement - 1, samples, codon);
-			}
-			return rv;
-		}
-		double getSelectionPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
-		{
-			double rv = -1.0;
-			bool check = checkIndex(mixtureElement, 1, numMixtures);
-			if (check)
-			{
-				rv = getSelectionPosteriorMean(mixtureElement - 1, samples, codon);
-			}
-			return rv;
-		}
-		double getMutationVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased)
-		{
-			double rv = -1.0;
-			bool check = checkIndex(mixtureElement, 1, numMixtures);
-			if (check)
-			{
-				rv = getMutationVariance(mixtureElement - 1, samples, codon, unbiased);
-			}
-			return rv;
-		}
-		double getSelectionVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased)
-		{
-			double rv = -1.0;
-			bool check = checkIndex(mixtureElement, 1, numMixtures);
-			if (check)
-			{
-				rv = getSelectionVariance(mixtureElement - 1, samples, codon, unbiased);
-			}
-			return rv;
-		}
+		void initMutation(std::vector <double> mutationValues, unsigned mixtureElement, std::string aa);
+		void initSelection(std::vector <double> selectionValues, unsigned mixtureElement, std::string aa);
+		void initMutationSelectionCategoriesR(std::vector<std::string> files, unsigned numCategories,
+						std::string paramType);
+
+
+
+		//Trace Functions:
+		void setTraceObject(FONSETrace _trace);
+		void setCategoriesForTrace();
+
+
+
+		//CSP Functions:
+		std::vector< std::vector <double> > getCurrentMutationParameter();
+		std::vector< std::vector <double> > getCurrentSelectionParameter();
+
+
+
+		//Posterior, Variance, and Estimates Functions:
+		double getMutationPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon);
+		double getSelectionPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon);
+		double getMutationVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased);
+		double getSelectionVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased);
+
+
+
+		//Other Functions:
 		SEXP calculateSelectionCoefficientsR(unsigned sample, unsigned mixture);
-#endif
+#endif //STANDALONE
 
-
-	void initSelection(std::vector <double> selectionValues, unsigned mixtureElement, std::string aa);
-	void initMutation(std::vector <double> mutationValues, unsigned mixtureElement, std::string aa);
-        void setTraceObject(FONSETrace _trace);
-	std::vector< std::vector <double> > getCurrentMutationParameter() { return currentMutationParameter; }
-	std::vector< std::vector <double> > getCurrentSelectionParameter() { return currentSelectionParameter; }
+	protected:
 };
 #endif // FONSEPARAMETER_H
