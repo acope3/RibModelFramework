@@ -1,0 +1,169 @@
+\documentclass[11pt]{article}
+\usepackage{setspace}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+
+%\usepackage[sort&compress]{natbib}
+\begin{document}
+  \title{Description of the mixture model implemented in the R package ribModel}
+  \author{Cedric Landerer} % Your name
+  \date{\today}
+  \maketitle
+  \doublespacing
+
+  
+  \section{General}
+  \begin{table}[h]
+    \centering
+    \caption{Variable legend}
+    \label{var_desc}
+    \begin{tabular}{|l|l|}
+      \cline{1-2}
+      \textbf{Variable} & \textbf{Description}		\\ \cline{1-2}
+      $G$		& Number of genes		\\ \cline{1-2}
+      $g$		& Gene index			\\ \cline{1-2}
+      $A$		& Number of Amino Acids		\\ \cline{1-2}
+      $a$		& Amino acid index		\\ \cline{1-2}
+      $C$		& Number of Codons		\\ \cline{1-2}
+      $c$		& Codon index			\\ \cline{1-2}
+      $\vec{\zeta}$	& Vector of codon counts	\\ \cline{1-2}
+      $\zeta_c$		& Codon count for codon $c$	\\ \cline{1-2}
+      $f$		& log Likelihood function	\\ \cline{1-2}
+      $\Theta$		& Set of parameters for $f$	\\ \cline{1-2}
+      $I$		& Number of $\phi$ obs.		\\ \cline{1-2}
+      $\iota$		& $\phi$ obs. index		\\ \cline{1-2}
+      $\Phi$		& Obs. $\phi$ value		\\ \cline{1-2}
+      $\phi$		& estm. $\phi$ value		\\ \cline{1-2}
+      $P$		& Posterior			\\ \cline{1-2}
+      $\Upsilon$	& Posterior Jacobian adjusted	\\ \cline{1-2}
+      $z$		& Mixture			\\ \cline{1-2}
+      $Z$		& Number of mixtures		\\ \cline{1-2}
+      $p_z$		& Mixture probability		\\ \cline{1-2}
+    \end{tabular}
+  \end{table}
+  
+  
+  \begin{table}[h]
+    \centering
+    \caption{Parameter distributions}
+    \label{param_dist}
+    \begin{tabular}{|l|l|l|}
+      \cline{1-3}
+      \textbf{Parameter} & \textbf{Distribution}				& \textbf{proposal}					\\ \cline{1-3}
+      $\phi$		& $logN(-\frac{s_{\phi}^2}{2}, s_{\phi})$	& $\log(\phi') \sim N(\log(\phi), \sigma_{\phi})$		\\ \cline{1-3}
+      $s_{\phi}$	& $U(0, \infty)$	& $\log(s_\phi') \sim N(\log(s_\phi), \sigma_{s_{\phi}})$		\\ \cline{1-3}
+
+    \end{tabular}
+  \end{table}
+  
+  \subsection{Calculating the Posterior trace}
+  The unscaled marginal log posterior is defined by equation \ref{post_trace}
+  \begin{equation}
+    P(\phi | \zeta, z, \Delta M, \Delta \eta, s_{\phi}, A_{\phi}, s_{\epsilon}) \propto \sum_g^G \left(\log(p_z) + \Upsilon_g(\phi_g|\zeta, \Theta_z)\right) + \sum_a^A \log(\pi(\Delta M_a| 0, \sigma))
+    \label{post_trace}
+  \end{equation}
+  where $\Upsilon_g(\phi_g|\zeta, \Theta_z)$ is given by equation \ref{roc_posterior_jacobian}
+  
+  \subsection{Calculate mixture assignment}
+  The assignment is drawn from a multinomial distribution where the probability of a gene being in each mixture is given by the normalization of equation \ref{mix_assign_prob}
+  \begin{equation}
+    p_{z|g} = \exp \left(\frac{\log(p_z) + \Upsilon_g(\phi_g|\vec{\zeta}, \Theta_z)}{\sum_z^Z \log(p_z) + \Upsilon_g(\phi_g|\vec{\zeta}, \Theta_z)}\right)
+    \label{mix_assign_prob}
+  \end{equation}  
+
+  \section{ROC}
+  
+  The probability of each synonymous codon is given by the log multinomial distribution in equation \ref{codon_prob}.
+  \begin{equation}
+    p_{g,c} = \frac{-\Delta M_c - \Delta\eta_c \phi_g}{\sum_c^C -\Delta M_c - \Delta\eta_c \phi_g}
+    \label{codon_prob}
+  \end{equation}
+  The log likelihood for the parameter describing each amino acid given by equation \ref{roc_lik_aa}.
+  \begin{equation}
+    f_a(\cdot|\zeta, \Theta_z) = \sum_c^C log(p_{g,c}) \zeta_c
+    \label{roc_lik_aa}
+  \end{equation}
+
+  \subsection{Accept/Reject $\phi$}
+  The log likelihood per gene is the sum over the log likelihoods for each amino acid (eqn. \ref{roc_lik_aa})
+  \begin{equation}
+    f_g(\phi_g|\zeta, \Theta_z) = \sum_a^A f_a(\phi_g|\vec{\zeta}, \Theta_z)
+    \label{roc_lik_gene}
+  \end{equation}
+  All priors on $\phi$ are taken into account as seen in equation \ref{roc_posterior}.
+  \begin{equation}
+    P_g(\phi_g|\zeta, \Theta_z) = f_g(\phi_g|\zeta, \Theta_z) + \log(p(\phi_g|-\frac{s_{\phi}^2}{2}, s_{\phi})) + \sum_{\iota}^I \log(p(\Phi_{g,\iota} + {A_{\phi}}_{\iota}| \phi_g, {s_{\epsilon}}_{\iota}))
+    \label{roc_posterior}
+  \end{equation}
+  Equation \ref{roc_posterior} is then adjusted by the Jacobian.
+  \begin{equation}
+    \Upsilon_g(\phi_g|\zeta, \Theta_z) = P_g(\phi_g|\zeta, \Theta_z) - \log(\phi_g)
+    \label{roc_posterior_jacobian}
+  \end{equation}
+  The acceptance/rejection of a proposed $\phi_g'$ is given by equation \ref{a/r} where $r \sim Exp(1)$ and $\alpha$ is given by equation \ref{log_acceptance_ratio}
+  \begin{equation}
+    \phi_g = 
+    \begin{cases}
+      \phi_g',	& \text{if } -r < \alpha \\
+      \phi_g,	& \text{else } \\
+    \end{cases}
+     \label{a/r}
+  \end{equation}  
+  \begin{equation}
+    \alpha = \Upsilon_g(\phi_g'|\zeta, \Theta_z) - \Upsilon_g(\phi_g|\zeta, \Theta_z)
+    \label{log_acceptance_ratio}
+  \end{equation}
+  
+  \subsection{Accept/Reject $s_{\phi}$}
+  For $s_{\phi}$, all ratios are calculated directly for performance reasons. $s_{\phi}$ is proposed on the log scale. Equation \ref{jacobian_ratio_sphi} shows the log ratio of the Jacobian adjustment. 
+  \begin{equation}
+    \Delta J = \frac{\log(J)}{\log(J')} = \sum_z^Z -(\log({s_{\phi}}_z) - \log({s_{\phi}'}_z))
+    \label{jacobian_ratio_sphi}
+  \end{equation}
+  Equation \ref{loglik_ratio_sphi} is the log acceptance ratio without the adjustment by the Jacobian.
+  \begin{equation}
+    \Delta f(s_{\phi}|\phi_z) = \sum_g^G \left(\log(logN(\phi_{g,z} | -\frac{{s_{\phi}}_z^2}{2}, {s_{\phi}}_z)) - \log(logN(\phi_{g,z} | -\frac{{s_{\phi}'}_z^2}{2}, {s_{\phi}'}_z)) \right)
+    \label{loglik_ratio_sphi}
+  \end{equation}
+  Equation \ref{alpha_sphi} is the complete log acceptance ratio adjusted by the Jacobian.
+  \begin{equation}
+    \alpha = \Delta f_z(s_{\phi}|\phi_z) + \Delta J
+    \label{alpha_sphi}
+  \end{equation}
+  
+ 
+  The acceptance/rejection of proposed $s_{\phi}'$ is given by equation \ref{a/r_sphi} where $r \sim Exp(1)$ and $\alpha$ is given by equation \ref{alpha_sphi}
+  \begin{equation}
+    \phi_g = 
+    \begin{cases}
+      s_{\phi}',	& \text{if } -r < \alpha \\
+      s_{\phi},		& \text{else } \\
+    \end{cases}
+     \label{a/r_sphi}
+  \end{equation}    
+  
+  \subsection{Accept/Reject $\Delta M$ and $\Delta \eta$}
+  The posterior is for a set of $\Delta M$ and $\Delta \eta$ is calculated as
+    \begin{equation}
+    P_a(\Delta M_a, \Delta \eta_a|\zeta, \phi, z) = \sum_g^G f_a(\Delta M_a, \Delta \eta_a|\zeta, \phi_{g,z}) + \log(\pi(\Delta M_a| 0, \sigma))
+    \label{roc_lik_csp}
+  \end{equation}
+  The acceptance/rejection of a proposed set of $\Delta M_a$ and $\Delta \eta_A$ is given by equation \ref{a/r_aa} where $r \sim Exp(1)$ and $\alpha$ is given by equation \ref{log_acceptance_ratio_aa}
+  \begin{equation}
+    \phi_g = 
+    \begin{cases}
+      \Delta M_a', \Delta \eta_a'	& -r < \alpha \\
+      \Delta M_a, \Delta \eta_a		& else \\
+    \end{cases}
+     \label{a/r_aa}
+  \end{equation}  
+  \begin{equation}
+    \alpha = P_a(\Delta M_a', \Delta \eta_a'|\zeta, \phi) - P_a(\Delta M_a, \Delta \eta_a|\zeta, \phi_z)
+    \label{log_acceptance_ratio_aa}
+  \end{equation}
+  
+
+  
+  \section{FONSE}
+  
+\end{document}

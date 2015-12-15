@@ -1,31 +1,26 @@
 rm(list=ls())
-library(ribModel) 
-seeds <- read.table(file = "seed.txt")[,1]
-task.id <- 1#Sys.getenv("SGE_TASK_ID")
+library(ribModel)
+#seeds <- read.table(file = "seed.txt")[,1]
+#task.id <- as.numeric(Sys.getenv("SGE_TASK_ID"))
 
-set.seed(seeds[task.id])
+#set.seed(seeds[task.id])
+set.seed(446141)
 with.phi <- FALSE
 
-if (with.phi) { 
-  genome <- initializeGenomeObject(file ="../data/realGenomes/Skluyveri.fasta", expression.file = "../data/simulatedAllUniqueR_phi.csv") 
-} else { 
+if (with.phi) {
+  genome <- initializeGenomeObject(file = "../data/realGenomes/Skluyveri.fasta", expression.file = "../data/simulatedAllUniqueR_phi.csv") 
+} else {
   genome <- initializeGenomeObject(file = "../data/realGenomes/Skluyveri.fasta") 
-} 
+}
 
 sphi_init <- c(1,1)
 numMixtures <- 2
 mixDef <- "allUnique"
-geneAssignment <- c(rep(1,961), rep(2,457), rep(1, 3403), rep(1, 500))
-parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef) 
+geneAssignment <- c(rep(1,961), rep(2,457), rep(1, 3903))
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
 
-#phivals <- parameter$readPhiValues( "../data/realGenomes/Skluyveri_phi.csv")
-#parameter$initializeSynthesisRateByList(phivals)
-#parameter$initMutationCategories(c("../data/realGenomes/Skluyveri_mutation_ChrA.csv", "../data/realGenomes/Skluyveri_mutation_ChrCleft.csv") , 2)
-#parameter$initSelectionCategories(c("../data/realGenomes/Skluyveri_selection_ChrA.csv", "../data/realGenomes/Skluyveri_selection_ChrCleft.csv") , 2)
-
-
-samples <- 10
-thining <- 10
+samples <- 500
+thining <- 50
 adaptiveWidth <- 10
 divergence.iteration <- 20
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE) 
@@ -46,9 +41,9 @@ loglik.trace <- mcmc$getLogLikelihoodTrace()[-1]
 acf(loglik.trace) 
 convergence.test(mcmc, n.samples = 500, plot=T) 
 
-trace <- parameter$getTraceObject() 
+trace <- parameter$getTraceObject()
 plot(trace, what = "MixtureProbability") 
-plot(trace, what = "Sphi")
+plot(trace, what = "Sphi") 
 plot(trace, what = "Mphi") 
 if (with.phi) { 
   plot(trace, what = "Aphi") 
@@ -65,7 +60,8 @@ expressionValues <- log10(expressionValues)
 obs.phi <- log10(read.table("../data/realGenomes/Skluyveri_phi.csv", sep=",", header=T)[, 2]) 
 plot(NULL, NULL, xlim=range(obs.phi) + c(-0.1, 0.1), ylim=range(expressionValues, na.rm = T) + c(-0.1, 0.1), 
      main = "Synthesis Rate", xlab = "True values", ylab = "Estimated values") 
-for(k in 1:numMixtures){ 
+for(k in 1:numMixtures){
+  if(sum(mixtureAssignment == k) == 0) next
   upper.panel.plot(obs.phi[mixtureAssignment == k], expressionValues[mixtureAssignment == k], col=ribModel:::.mixtureColors[k]) 
 } 
 legend("topleft", legend = paste("Mixture Element", 1:numMixtures), 
@@ -99,13 +95,14 @@ mat <- cbind(gene.ids, expressionValues, mixtureAssignment)
 
 write.table(file=paste(task.id, "_kluyveri_full_filtered_expression_allUnique.csv", sep=""), x = mat, sep=",", quote = F, row.names = F, col.names = F)
 
-plot(parameter, what = "Mutation", samples = samples*0.1)
-plot(parameter, what = "Selection", samples = samples*0.1)
-dev.off()
+plot(parameter, what = "Mutation", samples = samples*0.1) 
+plot(parameter, what = "Selection", samples = samples*0.1) 
+dev.off() 
 
 observed.mutation <- c("../data/realGenomes/Skluyveri_mutation_ChrA.csv", "../data/realGenomes/Skluyveri_mutation_ChrCleft.csv")
 observed.selection <- c("../data/realGenomes/Skluyveri_selection_ChrA.csv", "../data/realGenomes/Skluyveri_selection_ChrCleft.csv")
 for(k in 1:numMixtures){
+  if(sum(mixtureAssignment == k) == 0) next
   pdf(paste(task.id, "_kluyveri_full_mixture_", k, "_allUnique.pdf", sep=""), width = 11, height = 12) 
   mixture <- k 
   plot(trace, what = "Mutation", mixture = mixture)
