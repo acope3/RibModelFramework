@@ -11,6 +11,7 @@ class FONSEModel : public Model
 	private:
 
 		FONSEParameter *parameter;
+		double calculateMutationPrior(std::string grouping, bool proposed = false);
 
 	public:
 
@@ -27,10 +28,11 @@ class FONSEModel : public Model
 		virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures);
 		virtual void calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration, std::vector <double> &logProbabilityRatio);
 
-		virtual double calculateAllPriors(){ return 0.0; } //TODO(Cedric): implement me, see ROCModel
+		virtual double calculateAllPriors(); //TODO(Cedric): implement me, see ROCModel
 
 		virtual void updateGibbsSampledHyperParameters(Genome &genome) {}
 
+		virtual void updateTracesWithInitialValues(Genome &genome);
 		//Parameter wrapper functions:
 		virtual void initTraces(unsigned samples, unsigned num_genes) { parameter->initAllTraces(samples, num_genes); }
 		virtual void writeRestartFile(std::string filename) { return parameter->writeEntireRestartFile(filename); }
@@ -74,7 +76,7 @@ class FONSEModel : public Model
 		virtual unsigned getGroupListSize() { return parameter->getGroupListSize(); } //TODO: make not hardcoded?
 		virtual std::string getGrouping(unsigned index) { return parameter->getGrouping(index); }
 		// R wrapper
-		//std::vector<double> CalculateProbabilitiesForCodons(std::vector<double> mutation, std::vector<double> selection, double phi);
+		std::vector<double> CalculateProbabilitiesForCodons(std::vector<double> mutation, std::vector<double> selection, double phi);
 
 		virtual void setLastIteration(unsigned iteration) { parameter->setLastIteration(iteration); }
 		virtual unsigned getLastIteration() { return parameter->getLastIteration(); }

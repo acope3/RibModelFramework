@@ -6,6 +6,27 @@
 #include <array>
 #include <limits.h>
 
+double FONSEModel::calculateMutationPrior(std::string grouping, bool proposed)
+{
+	unsigned numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
+	double mutation[5];
+	double mutation_proposed[5];
+
+	double priorValue = 0.0;
+
+	unsigned numMutCat = parameter->getNumMutationCategories();
+	double mutation_prior_sd = parameter->getMutationPriorStandardDeviation();
+	for (unsigned i = 0u; i < numMutCat; i++)
+	{
+		parameter->getParameterForCategory(i, FONSEParameter::dM, grouping, proposed, mutation);
+		for (unsigned k = 0u; k < numCodons; k++)
+		{
+			priorValue += Parameter::densityNorm(mutation[k], 0.0, mutation_prior_sd, true);
+		}
+	}
+	return priorValue;
+}
+
 FONSEModel::FONSEModel() : Model()
 {
 	parameter = 0;
@@ -190,6 +211,43 @@ void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 	logProbabilityRatio[0] = lpr;
 }
 
+double FONSEModel::calculateAllPriors()
+{
+	double priorRatio = 0.0;
+	unsigned size = getGroupListSize();
+
+	for (unsigned i = 0; i < size; i++)
+	{
+		std::string grouping = getGrouping(i);
+		priorRatio += calculateMutationPrior(grouping, false);
+	}
+
+	// add more priors if necessary.
+
+	return priorRatio;
+}
+
+void FONSEModel::updateTracesWithInitialValues(Genome & genome)
+{
+	std::vector <std::string> groupList = parameter->getGroupList();
+
+	for (unsigned i = 0; i < genome.getGenomeSize(); i++)
+	{
+		parameter->updateSynthesisRateTrace(0, i);
+		parameter->updateMixtureAssignmentTrace(0, i);
+	}
+
+	for (unsigned i = 0; i < groupList.size(); i++)
+	{
+		std::array <unsigned, 2> codonRange = SequenceSummary::AAToCodonRange(groupList[i], true);
+		for (unsigned j = codonRange[0]; j < codonRange[1]; j++)
+		{
+			std::string codon = SequenceSummary::indexToCodon(j, true);
+			parameter->updateCodonSpecificParameterTrace(0, codon);
+		}
+	}
+}
+
 void FONSEModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth)
 {
 	adaptSphiProposalWidth(adaptiveWidth);
@@ -330,3 +388,14 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 		codonProb[i] /= denominator;
 	}
 }
+
+/*std::vector<double> FONSEModel::CalculateProbabilitiesForCodons(std::vector<double> mutation, std::vector<double> selection, double phi)
+{
+	unsigned numCodons = mutation.size() + 1;
+	double* _mutation = &mutation[0];
+	double* _selection = &selection[0];
+	double* codonProb = new double[numCodons]();
+	calculateCodonProbabilityVector(numCodons, _mutation, _selection, phi, codonProb);
+	std::vector<double> returnVector(codonProb, codonProb + numCodons);
+	return returnVector;
+}*/

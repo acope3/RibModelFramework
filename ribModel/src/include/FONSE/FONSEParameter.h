@@ -33,9 +33,9 @@ class FONSEParameter : public Parameter
 
 		double bias_csp;
 		std::vector <double> std_csp;
+		double mutation_prior_sd;
 
 		std::vector <double> propose(std::vector <double> currentParam, double(*proposal)(double a, double b), double A, std::vector <double> B);
-
 	public:
 
 		static const unsigned dM;
@@ -75,7 +75,8 @@ class FONSEParameter : public Parameter
 		void initAllTraces(unsigned samples, unsigned num_genes) {
 			traces.initAllTraces(samples, num_genes, numMutationCategories, numSelectionCategories, numParam, numMixtures, categories, maxGrouping);
 		}
-		void initMutationSelectionCategories(std::vector <std::string> files, unsigned numCategories, unsigned paramType);
+		void initMutationCategories(std::vector<std::string> files, unsigned numCategories);
+		void initSelectionCategories(std::vector<std::string> files, unsigned numCategories);
 
 		double getCurrentCodonSpecificProposalWidth(unsigned aa);
 		std::vector< std::vector <double> > getCurrentMutationParameter() { return currentMutationParameter; }
@@ -84,6 +85,9 @@ class FONSEParameter : public Parameter
 		double getPreviousCodonSpecificProposalWidth(unsigned aa);
 
 		double getPhiEpsilon() { return phiEpsilon; }
+
+		double getMutationPriorStandardDeviation() { return mutation_prior_sd; }
+		void setMutationPriorStandardDeviation(double _mutation_prior_sd) { mutation_prior_sd = _mutation_prior_sd; }
 
 		void updateCodonSpecificParameter(std::string grouping);
 

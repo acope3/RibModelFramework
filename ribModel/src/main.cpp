@@ -300,7 +300,7 @@ void simulateROCData()
 	genome.writeFasta("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/SimulatedROCData.fasta", true);
 }
 
-void simulateFONSEData()
+/*void simulateFONSEData()
 {
 	Genome genome;
 	//genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/Skluyveri_chromosomeA.fasta");
@@ -326,7 +326,7 @@ void simulateFONSEData()
 
 	//genome.writeFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/SimulatedROCData.fasta", true);
 	genome.writeFasta("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/data/FONSE/test.fasta", true);
-}
+}*/
 
 
 
@@ -466,10 +466,10 @@ int main()
 	enum User { cedric, gabe, jeremy };
 	enum ModelToRun { ROC, RFP, FONSE };
 	/* Test variables */
-	User user = gabe;
-	ModelToRun modelToRun = RFP;
+	User user = jeremy;
+	ModelToRun modelToRun = ROC;
 	bool read = false;
-	bool testing = true;
+	bool testing = false;
 	bool withPhi = false;
 	if (testing)
 	{
@@ -485,7 +485,7 @@ int main()
 		//testReadObservedPhis();
 		//simulateRFPData();
 	//	simulateROCData();
-		simulateFONSEData();
+//		simulateFONSEData();
 		//testInitMutationSelection();
 		//testRFPVarianceAndMean();
 		//testReadMutationValues();
@@ -544,7 +544,7 @@ int main()
 			case jeremy:
 				if (modelToRun == ROC || modelToRun == FONSE)
 				{
-					genome.readFasta("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulatedAllUniqueR.fasta");
+					genome.readFasta("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/data/twoMixtures/simulatedAllUniqueR.fasta");
 					if (withPhi) {
 						genome.readObservedPhiValues("C:/Users/Jeremy/Documents/GitHub/RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv", false);
 					}
@@ -774,9 +774,9 @@ int main()
 					break;
 				}
 
-				tmp.initMutationSelectionCategories(files, tmp.getNumMutationCategories(), FONSEParameter::dM);
-				tmp.initMutationSelectionCategories(files, tmp.getNumSelectionCategories(), FONSEParameter::dOmega);
-				tmp.InitializeSynthesisRate(genome, sphi_init[0]);
+//				tmp.initMutationSelectionCategories(files, tmp.getNumMutationCategories(), FONSEParameter::dM);
+//				tmp.initMutationSelectionCategories(files, tmp.getNumSelectionCategories(), FONSEParameter::dOmega);
+//				tmp.InitializeSynthesisRate(genome, sphi_init[0]);
 				//std::vector<double> phiVals = parameter.readPhiValues("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrCleft_phi_est.csv");
 				//parameter.InitializeSynthesisRate(phiVals);
 				parameter = tmp;

@@ -97,9 +97,10 @@ RCPP_MODULE(Parameter_mod)
 		.constructor <std::string>()
 		.constructor <std::vector<double>, std::vector<unsigned>, std::vector<unsigned>, bool>()
 		.constructor <std::vector<double>, unsigned, std::vector<unsigned>, bool, std::string>()
-		.method("initMutationSelectionCategories", &FONSEParameter::initMutationSelectionCategoriesR)
 		.method("initSelection", &FONSEParameter::initSelection)
 		.method("initMutation", &FONSEParameter::initMutation)
+		.method("initMutationCategories", &FONSEParameter::initMutationCategories)
+		.method("initSelectionCategories", &FONSEParameter::initSelectionCategories)
 		.method("getTraceObject", &FONSEParameter::getTraceObject)
 
 		//R wrapper functions

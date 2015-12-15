@@ -207,6 +207,11 @@ void RFPModel::simulateGenome(Genome &genome)
 	}
 }
 
+void RFPModel::updateTracesWithInitialValues(Genome & genome)
+{
+	return;
+}
+
 void RFPModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth)
 {
 	adaptSphiProposalWidth(adaptiveWidth);

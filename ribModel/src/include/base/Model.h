@@ -52,6 +52,7 @@ class Model
 		virtual void updateSphi() = 0;
 		virtual void updateSphiTrace(unsigned sample) = 0;
 		virtual void updateHyperParameterTraces(unsigned sample) = 0;
+		virtual void updateTracesWithInitialValues(Genome &genome) = 0;
 		virtual void adaptSphiProposalWidth(unsigned adaptiveWidth) = 0;
 		virtual void adaptHyperParameterProposalWidths(unsigned adaptiveWidth) = 0;
 		virtual void proposeSynthesisRateLevels() = 0;

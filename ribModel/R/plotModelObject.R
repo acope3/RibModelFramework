@@ -87,6 +87,92 @@ plot.Rcpp_ROCModel <- function(model, genome, parameter, samples = 100, mixture 
   par(opar)
 }
 
+plot.Rcpp_FONSEModel <- function(model, genome, parameter, samples = 100, mixture = 1, 
+                               estim.Expression = TRUE, simulated = FALSE, ...)
+{
+  opar <- par(no.readonly = T) 
+  
+  input_list <- as.list(list(...))
+  
+  if("main" %in% names(input_list)){
+    main <- input_list$main
+    input_list$main <- NULL
+  }else{
+    main <- ""
+  }
+  
+  mat <- matrix(c(rep(1, 4), 2:21, rep(22, 4)),
+                nrow = 7, ncol = 4, byrow = TRUE)
+  mat <- cbind(rep(23, 7), mat, rep(24, 7))
+  nf <- layout(mat, c(3, rep(8, 4), 2), c(3, 8, 8, 8, 8, 8, 3), respect = FALSE)
+  ### Plot title.
+  par(mar = c(0, 0, 0, 0))
+  plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
+  text(0.5, 0.6, main)
+  text(0.5, 0.4, date(), cex = 0.6)
+  
+  num.genes <- genome$getGenomeSize()
+  
+  mixtureAssignment <- unlist(lapply(1:num.genes,  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))
+  genes.in.mixture <- which(mixtureAssignment == mixture)
+  expressionCategory <- parameter$getSynthesisRateCategoryForMixture(mixture)
+  
+  # need expression values to know range
+  num.genes <- length(genes.in.mixture)
+  if(estim.Expression){ # use estimated expression values
+    expressionValues <- unlist(lapply(genes.in.mixture, function(geneIndex){
+      parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(samples, geneIndex, expressionCategory)
+    }))  
+  }else{ # use empirical expression values
+    
+  }
+  expressionValues <- log10(expressionValues)
+  genome <- genome$getGenomeForGeneIndicies(genes.in.mixture, simulated)
+  
+  names.aa <- aminoAcids()
+  for(aa in names.aa)
+  {
+    if(aa == "M" || aa == "W" || aa == "X") next
+    xlimit <- plotSinglePanel(parameter, model, genome, expressionValues, samples, mixture, aa)
+    box()
+    main.aa <- aa #TODO map to three letter code
+    text(mean(xlimit), 1, main.aa, cex = 1.5)
+    if(aa %in% c("A", "F", "K", "Q", "V")){
+      axis(2, las=1)
+    }
+    if(aa %in% c("T", "V", "Y", "Z")){
+      axis(1)
+    }
+    if(aa %in% c("A", "C", "D", "E")){
+      axis(3)
+    }
+    if(aa %in% c("E", "I", "P", "T")){
+      axis(4, las=1)
+    }
+    axis(1, tck = 0.02, labels = FALSE)
+    axis(2, tck = 0.02, labels = FALSE)
+    axis(3, tck = 0.02, labels = FALSE)
+    axis(4, tck = 0.02, labels = FALSE)    
+  }
+  
+  ## adding a histogram of phi values to plot
+  hist.values <- hist(expressionValues, plot=FALSE, nclass=30)
+  plot(hist.values, axes = FALSE, main="", xlab = "", ylab = "")
+  axis(1)
+  axis(4, las=1)
+  
+  ### Plot xlab.
+  plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
+  text(0.5, 0.2, expression("log"[10]~"(Protein Synthesis Rate"~phi~")"))  
+  #text(0.5, 0.5, "Production Rate (log10)")
+  
+  ### Plot ylab.
+  plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
+  text(0.5, 0.5, "Propotion", srt = 90)
+  
+  par(opar)
+}
+
 plotSinglePanel <- function(parameter, model, genome, expressionValues, samples, mixture, aa)
 {
   codons <- AAToCodon(aa, T)
