@@ -19,10 +19,10 @@ class RFPParameter: public Parameter {
 
 		RFPTrace traces;
 
-		std::vector<std::vector<double>> currentAlphaParameter;
 		std::vector<std::vector<double>> proposedAlphaParameter;
-		std::vector<std::vector<double>> currentLambdaPrimeParameter;
+		std::vector<std::vector<double>> currentAlphaParameter;
 		std::vector<std::vector<double>> proposedLambdaPrimeParameter;
+		std::vector<std::vector<double>> currentLambdaPrimeParameter;
 		std::vector<std::vector<double>> lambdaValues; //Currently not used.
 		std::vector<unsigned> numAcceptForAlphaAndLambdaPrime;
 		double bias_csp;

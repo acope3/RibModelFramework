@@ -44,49 +44,31 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ROCParameter.h" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/include/ROC/ROCParameter.h">
+      <file leaf-file-name="FONSEParameter.h" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/include/FONSE/FONSEParameter.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.025590552">
+              <caret line="124" column="23" selection-start-line="124" selection-start-column="23" selection-end-line="124" selection-end-column="23" />
+              <folding>
+                <element signature="e#51#68#0" expanded="true" />
+                <element signature="e#146#163#0" expanded="true" />
+                <element signature="e#172#202#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="RFPParameter.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/include/RFP/RFPParameter.h">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="193" column="0" selection-start-line="193" selection-start-column="0" selection-end-line="193" selection-end-column="0" />
+              <caret line="105" column="8" selection-start-line="105" selection-start-column="8" selection-end-line="105" selection-end-column="8" />
               <folding>
                 <element signature="e#47#64#0" expanded="true" />
-                <element signature="e#158#175#0" expanded="true" />
-                <element signature="e#184#205#0" expanded="true" />
+                <element signature="e#142#159#0" expanded="true" />
+                <element signature="e#168#189#0" expanded="true" />
+                <element signature="e#4118#6140#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ROCParameter.cpp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ROCParameter.cpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="654" column="40" selection-start-line="654" selection-start-column="40" selection-end-line="654" selection-end-column="40" />
-              <folding>
-                <element signature="e#166#205#0" expanded="true" />
-                <element signature="e#34657#40898#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="main.cpp" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/main.cpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.6574803">
-              <caret line="377" column="2" selection-start-line="377" selection-start-column="2" selection-end-line="377" selection-end-column="2" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="RCPP_Parameter.cpp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/RCPP_Parameter.cpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="103" column="0" selection-start-line="103" selection-start-column="0" selection-end-line="103" selection-end-column="0" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -101,6 +83,49 @@
                 <element signature="e#204#221#0" expanded="true" />
                 <element signature="e#230#252#0" expanded="true" />
                 <element signature="e#6551#8357#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ROCParameter.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/include/ROC/ROCParameter.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="96" column="8" selection-start-line="96" selection-start-column="8" selection-end-line="96" selection-end-column="8" />
+              <folding>
+                <element signature="e#47#64#0" expanded="true" />
+                <element signature="e#158#175#0" expanded="true" />
+                <element signature="e#184#205#0" expanded="true" />
+                <element signature="e#5266#6766#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="RFPParameter.cpp" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/RFPParameter.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="822" column="0" selection-start-line="822" selection-start-column="0" selection-end-line="822" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#37#0" expanded="true" />
+                <element signature="e#80#119#0" expanded="true" />
+                <element signature="e#26474#33624#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="FONSEParameter.cpp" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/FONSEParameter.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="1012" column="0" selection-start-line="1012" selection-start-column="0" selection-end-line="1012" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#41#0" expanded="true" />
+                <element signature="e#170#209#0" expanded="true" />
+                <element signature="e#31859#32806#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -136,19 +161,19 @@
         <option value="$PROJECT_DIR$/ROCTrace.cpp" />
         <option value="$PROJECT_DIR$/RCPP_Trace.cpp" />
         <option value="$PROJECT_DIR$/include/base/Parameter.h" />
-        <option value="$PROJECT_DIR$/include/FONSE/FONSEParameter.h" />
         <option value="$PROJECT_DIR$/PANSE/PANSEParameter.cpp" />
-        <option value="$PROJECT_DIR$/FONSEParameter.cpp" />
         <option value="$PROJECT_DIR$/Parameter.cpp" />
         <option value="$PROJECT_DIR$/include/RFP/RFPModel.h" />
         <option value="$PROJECT_DIR$/include/base/Model.h" />
         <option value="$PROJECT_DIR$/MCMCAlgorithm.cpp" />
         <option value="$PROJECT_DIR$/RCPP_Parameter.cpp" />
-        <option value="$PROJECT_DIR$/include/RFP/RFPParameter.h" />
         <option value="$PROJECT_DIR$/RFPParameter.cpp" />
         <option value="$PROJECT_DIR$/include/ROC/ROCParameter.h" />
         <option value="$PROJECT_DIR$/ROCParameter.cpp" />
         <option value="$PROJECT_DIR$/main.cpp" />
+        <option value="$PROJECT_DIR$/include/RFP/RFPParameter.h" />
+        <option value="$PROJECT_DIR$/include/FONSE/FONSEParameter.h" />
+        <option value="$PROJECT_DIR$/FONSEParameter.cpp" />
       </list>
     </option>
   </component>
@@ -414,7 +439,7 @@
           <option name="timeStamp" value="62" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="67" />
+      <option name="time" value="68" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -588,13 +613,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/include/Gene.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="46" column="8" selection-start-line="46" selection-start-column="8" selection-end-line="46" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/SequenceSummary.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-6.340206">
@@ -694,50 +712,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/FONSEParameter.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="746" column="53" selection-start-line="746" selection-start-column="53" selection-end-line="746" selection-end-column="53" />
-          <folding>
-            <element signature="e#11026#12273#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/include/FONSE/FONSEParameter.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="1.6521739">
-          <caret line="167" column="6" selection-start-line="167" selection-start-column="6" selection-end-line="167" selection-end-column="6" />
-          <folding>
-            <element signature="e#5786#7025#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/include/base/Parameter.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="79" column="0" selection-start-line="79" selection-start-column="0" selection-end-line="79" selection-end-column="0" />
-          <folding>
-            <element signature="e#41#58#0" expanded="true" />
-            <element signature="e#204#221#0" expanded="true" />
-            <element signature="e#230#252#0" expanded="true" />
-            <element signature="e#6551#8357#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Parameter.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="859" column="49" selection-start-line="859" selection-start-column="49" selection-end-line="859" selection-end-column="49" />
-          <folding>
-            <element signature="e#3158#3362#0" expanded="true" />
-            <element signature="e#31762#37616#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/include/RFP/RFPModel.h">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -762,28 +736,58 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/main.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.6574803">
+          <caret line="377" column="2" selection-start-line="377" selection-start-column="2" selection-end-line="377" selection-end-column="2" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/RCPP_Parameter.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
+        <state vertical-scroll-proportion="2.5944881">
           <caret line="103" column="0" selection-start-line="103" selection-start-column="0" selection-end-line="103" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/RFPParameter.cpp">
+    <entry file="file://$PROJECT_DIR$/ROCParameter.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="1162" column="0" selection-start-line="1162" selection-start-column="0" selection-end-line="1162" selection-end-column="0" />
+          <caret line="654" column="40" selection-start-line="654" selection-start-column="40" selection-end-line="654" selection-end-column="40" />
           <folding>
-            <element signature="e#80#119#0" expanded="true" />
+            <element signature="e#166#205#0" expanded="false" />
+            <element signature="e#34657#40898#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/Gene.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="46" column="8" selection-start-line="46" selection-start-column="8" selection-end-line="46" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/base/Parameter.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="79" column="0" selection-start-line="79" selection-start-column="0" selection-end-line="79" selection-end-column="0" />
+          <folding>
+            <element signature="e#41#58#0" expanded="true" />
+            <element signature="e#204#221#0" expanded="true" />
+            <element signature="e#230#252#0" expanded="true" />
+            <element signature="e#6551#8357#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/include/RFP/RFPParameter.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="1.6496063">
-          <caret line="164" column="19" selection-start-line="164" selection-start-column="19" selection-end-line="164" selection-end-column="19" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="105" column="8" selection-start-line="105" selection-start-column="8" selection-end-line="105" selection-end-column="8" />
           <folding>
             <element signature="e#47#64#0" expanded="true" />
             <element signature="e#142#159#0" expanded="true" />
@@ -796,31 +800,60 @@
     <entry file="file://$PROJECT_DIR$/include/ROC/ROCParameter.h">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="193" column="0" selection-start-line="193" selection-start-column="0" selection-end-line="193" selection-end-column="0" />
+          <caret line="96" column="8" selection-start-line="96" selection-start-column="8" selection-end-line="96" selection-end-column="8" />
           <folding>
             <element signature="e#47#64#0" expanded="true" />
             <element signature="e#158#175#0" expanded="true" />
             <element signature="e#184#205#0" expanded="true" />
+            <element signature="e#5266#6766#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ROCParameter.cpp">
+    <entry file="file://$PROJECT_DIR$/Parameter.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="654" column="40" selection-start-line="654" selection-start-column="40" selection-end-line="654" selection-end-column="40" />
+          <caret line="859" column="49" selection-start-line="859" selection-start-column="49" selection-end-line="859" selection-end-column="49" />
           <folding>
-            <element signature="e#166#205#0" expanded="true" />
-            <element signature="e#34657#40898#0" expanded="true" />
+            <element signature="e#3158#3362#0" expanded="true" />
+            <element signature="e#31762#37616#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.cpp">
+    <entry file="file://$PROJECT_DIR$/RFPParameter.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.6574803">
-          <caret line="377" column="2" selection-start-line="377" selection-start-column="2" selection-end-line="377" selection-end-column="2" />
-          <folding />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="822" column="0" selection-start-line="822" selection-start-column="0" selection-end-line="822" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#37#0" expanded="true" />
+            <element signature="e#80#119#0" expanded="true" />
+            <element signature="e#26474#33624#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/FONSEParameter.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="1012" column="0" selection-start-line="1012" selection-start-column="0" selection-end-line="1012" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#41#0" expanded="true" />
+            <element signature="e#170#209#0" expanded="true" />
+            <element signature="e#31859#32806#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/FONSE/FONSEParameter.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.025590552">
+          <caret line="124" column="23" selection-start-line="124" selection-start-column="23" selection-end-line="124" selection-end-column="23" />
+          <folding>
+            <element signature="e#51#68#0" expanded="true" />
+            <element signature="e#146#163#0" expanded="true" />
+            <element signature="e#172#202#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
