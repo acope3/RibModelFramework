@@ -172,7 +172,6 @@ class RFPModel: public Model {
 		virtual unsigned getGroupListSize() {return parameter->getGroupListSize();}
 
 
-		virtual void updateTmp() { parameter -> updateTmp();}
 		// R wrapper
 		std::vector<double> CalculateProbabilitiesForCodons(std::vector<double> mutation, std::vector<double> selection,
 				double phi);

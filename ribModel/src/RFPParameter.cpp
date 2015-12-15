@@ -9,6 +9,15 @@
 using namespace Rcpp;
 #endif
 
+const unsigned RFPParameter::alp = 0u;
+const unsigned RFPParameter::lmPri = 1u;
+
+
+
+//--------------------------------------------------//
+// ---------- Constructors & Destructors ---------- //
+//--------------------------------------------------//
+
 
 RFPParameter::RFPParameter() : Parameter()
 {
@@ -31,13 +40,6 @@ RFPParameter::RFPParameter(std::vector<double> sphi, unsigned _numMixtures, std:
 }
 
 
-RFPParameter::~RFPParameter()
-{
-	//dtor 
-	//TODO: Need to call Parameter's deconstructor
-}
-
-
 RFPParameter& RFPParameter::operator=(const RFPParameter& rhs)
 {
 	if (this == &rhs) return *this; // handle self assignment
@@ -57,6 +59,21 @@ RFPParameter& RFPParameter::operator=(const RFPParameter& rhs)
 
 	return *this;
 }
+
+
+RFPParameter::~RFPParameter()
+{
+	//dtor 
+	//TODO: Need to call Parameter's deconstructor
+}
+
+
+
+
+
+//---------------------------------------------------------------//
+// ---------- Initialization, Restart, Index Checking ---------- //
+//---------------------------------------------------------------//
 
 
 void RFPParameter::initRFPParameterSet()
@@ -97,165 +114,6 @@ void RFPParameter::initRFPParameterSet()
 		"CGA", "CGC", "CGG", "CGT", "TCA", "TCC", "TCG", "TCT", "ACA", "ACC",
 		"ACG", "ACT", "GTA", "GTC", "GTG", "GTT", "TGG", "TAC", "TAT", "AGC",
 		"AGT"};
-}
-
-
-void RFPParameter::initAlpha(double alphaValue, unsigned mixtureElement, std::string codon)
-{
-	unsigned category = getMutationCategory(mixtureElement);
-	unsigned index = SequenceSummary::codonToIndex(codon);
-	currentAlphaParameter[category][index] = alphaValue;
-}
-
-
-void RFPParameter::initLambdaPrime(double lambdaPrimeValue, unsigned mixtureElement, std::string codon)
-{
-	unsigned category = getMutationCategory(mixtureElement);
-	unsigned index = SequenceSummary::codonToIndex(codon);
-	currentLambdaPrimeParameter[category][index] = lambdaPrimeValue;
-}
-
-
-void RFPParameter::initMutationSelectionCategories(std::vector<std::string> files, unsigned numCategories, unsigned paramType)
-{
-	std::ifstream currentFile;
-	std::string tmpString;
-	std::string type;
-
-
-	if (paramType == RFPParameter::alp)
-		type = "alpha";
-	else
-		type = "lambda";
-
-
-	for (unsigned i = 0; i < numCategories; i++)
-	{
-		std::vector<double> temp(numParam, 0.0);
-
-		//open the file, make sure it opens
-		currentFile.open(files[i].c_str());
-		if (currentFile.fail())
-		{
-			std::cerr << "Error opening file " << i << " in the file vector.\n";
-			std::exit(1);
-		}
-		currentFile >> tmpString; //trash the first line, no info given.
-
-		//expecting CTG,3.239 as the current format
-		while (currentFile >> tmpString)
-		{
-			std::string codon = tmpString.substr(0, 3);
-			std::size_t pos = tmpString.find(",", 3);
-			std::string val = tmpString.substr(pos + 1, std::string::npos);
-			unsigned index = SequenceSummary::codonToIndex(codon, false);
-			temp[index] = std::atof(val.c_str());
-		}
-		unsigned altered = 0u;
-		for (unsigned j = 0; j < categories.size(); j++)
-		{
-			if (paramType == RFPParameter::alp && categories[j].delM == i)
-			{
-				currentAlphaParameter[j] = temp;
-				proposedAlphaParameter[j] = temp;
-				altered++;
-			}
-			else if (paramType == RFPParameter::lmPri && categories[j].delEta == i)
-			{
-				currentLambdaPrimeParameter[j] = temp;
-				proposedLambdaPrimeParameter[j] = temp;
-				altered++;
-			}
-			if (altered == numCategories)
-				break; //to not access indicies out of bounds.
-		}
-		currentFile.close();
-	}
-}
-
-void RFPParameter::setNumPhiGroupings(unsigned _phiGroupings)
-{
-	phiGroupings = _phiGroupings;
-}
-
-
-void RFPParameter::writeEntireRestartFile(std::string filename)
-{
-	writeBasicRestartFile(filename);
-	writeRFPRestartFile(filename);
-}
-
-
-void RFPParameter::writeRFPRestartFile(std::string filename)
-{
-
-	std::ofstream out;
-	std::string output = "";
-	std::ostringstream oss;
-	unsigned i, j;
-	out.open(filename.c_str(), std::ofstream::app);
-	if (out.fail())
-	{
-		std::cerr <<"Could not open restart file for writing\n";
-		std::exit(1);
-	}
-
-	oss <<">currentAlphaParameter:\n";
-	for (i = 0; i < currentAlphaParameter.size(); i++)
-	{
-		oss << "***\n";
-		for (j = 0; j < currentAlphaParameter[i].size(); j++)
-		{
-			oss << currentAlphaParameter[i][j];
-			if ((j + 1) % 10 == 0)
-				oss << "\n";
-			else
-				oss << " ";
-		}
-		if (j % 10 != 0)
-			oss << "\n";
-	}
-
-	oss <<">currentLambdaPrimeParameter:\n";
-	for (i = 0; i < currentLambdaPrimeParameter.size(); i++)
-	{
-		oss << "***\n";
-		for (j = 0; j < currentLambdaPrimeParameter[i].size(); j++)
-		{
-			oss << currentLambdaPrimeParameter[i][j];
-			if ((j + 1) % 10 == 0)
-				oss << "\n";
-			else
-				oss << " ";
-		}
-		if (j % 10 != 0)
-			oss << "\n";
-	}
-
-	oss << ">std_csp:\n";
-	std::cout << std_csp.size() <<"\n";
-	for (i = 0; i < std_csp.size(); i++)
-	{
-		oss << std_csp[i];
-		if ((i + 1) % 10 == 0)
-			oss << "\n";
-		else
-			oss << " ";
-	}
-	if (i % 10 != 0)
-		oss << "\n";
-
-	output = oss.str();
-	out << output;
-	out.close();
-
-}
-
-
-void RFPParameter::initFromRestartFile(std::string filename)
-{
-	initBaseValuesFromFile(filename);
-	initRFPValuesFromFile(filename);
 }
 
 
@@ -364,9 +222,83 @@ void RFPParameter::initRFPValuesFromFile(std::string filename)
 }
 
 
-RFPTrace& RFPParameter::getTraceObject()
+void RFPParameter::writeEntireRestartFile(std::string filename)
 {
-	return traces;
+	writeBasicRestartFile(filename);
+	writeRFPRestartFile(filename);
+}
+
+
+void RFPParameter::writeRFPRestartFile(std::string filename)
+{
+
+	std::ofstream out;
+	std::string output = "";
+	std::ostringstream oss;
+	unsigned i, j;
+	out.open(filename.c_str(), std::ofstream::app);
+	if (out.fail())
+	{
+		std::cerr <<"Could not open restart file for writing\n";
+		std::exit(1);
+	}
+
+	oss <<">currentAlphaParameter:\n";
+	for (i = 0; i < currentAlphaParameter.size(); i++)
+	{
+		oss << "***\n";
+		for (j = 0; j < currentAlphaParameter[i].size(); j++)
+		{
+			oss << currentAlphaParameter[i][j];
+			if ((j + 1) % 10 == 0)
+				oss << "\n";
+			else
+				oss << " ";
+		}
+		if (j % 10 != 0)
+			oss << "\n";
+	}
+
+	oss <<">currentLambdaPrimeParameter:\n";
+	for (i = 0; i < currentLambdaPrimeParameter.size(); i++)
+	{
+		oss << "***\n";
+		for (j = 0; j < currentLambdaPrimeParameter[i].size(); j++)
+		{
+			oss << currentLambdaPrimeParameter[i][j];
+			if ((j + 1) % 10 == 0)
+				oss << "\n";
+			else
+				oss << " ";
+		}
+		if (j % 10 != 0)
+			oss << "\n";
+	}
+
+	oss << ">std_csp:\n";
+	std::cout << std_csp.size() <<"\n";
+	for (i = 0; i < std_csp.size(); i++)
+	{
+		oss << std_csp[i];
+		if ((i + 1) % 10 == 0)
+			oss << "\n";
+		else
+			oss << " ";
+	}
+	if (i % 10 != 0)
+		oss << "\n";
+
+	output = oss.str();
+	out << output;
+	out.close();
+
+}
+
+
+void RFPParameter::initFromRestartFile(std::string filename)
+{
+	initBaseValuesFromFile(filename);
+	initRFPValuesFromFile(filename);
 }
 
 
@@ -374,6 +306,94 @@ void RFPParameter::initAllTraces(unsigned samples, unsigned num_genes)
 {
 	traces.initAllTraces(samples, num_genes, numMutationCategories, numSelectionCategories, numParam,
 						 numMixtures, categories, (unsigned)groupList.size());
+}
+
+
+void RFPParameter::initAlpha(double alphaValue, unsigned mixtureElement, std::string codon)
+{
+	unsigned category = getMutationCategory(mixtureElement);
+	unsigned index = SequenceSummary::codonToIndex(codon);
+	currentAlphaParameter[category][index] = alphaValue;
+}
+
+
+void RFPParameter::initLambdaPrime(double lambdaPrimeValue, unsigned mixtureElement, std::string codon)
+{
+	unsigned category = getMutationCategory(mixtureElement);
+	unsigned index = SequenceSummary::codonToIndex(codon);
+	currentLambdaPrimeParameter[category][index] = lambdaPrimeValue;
+}
+
+
+void RFPParameter::initMutationSelectionCategories(std::vector<std::string> files, unsigned numCategories, unsigned paramType)
+{
+	std::ifstream currentFile;
+	std::string tmpString;
+	std::string type;
+
+
+	if (paramType == RFPParameter::alp)
+		type = "alpha";
+	else
+		type = "lambda";
+
+
+	for (unsigned i = 0; i < numCategories; i++)
+	{
+		std::vector<double> temp(numParam, 0.0);
+
+		//open the file, make sure it opens
+		currentFile.open(files[i].c_str());
+		if (currentFile.fail())
+		{
+			std::cerr << "Error opening file " << i << " in the file vector.\n";
+			std::exit(1);
+		}
+		currentFile >> tmpString; //trash the first line, no info given.
+
+		//expecting CTG,3.239 as the current format
+		while (currentFile >> tmpString)
+		{
+			std::string codon = tmpString.substr(0, 3);
+			std::size_t pos = tmpString.find(",", 3);
+			std::string val = tmpString.substr(pos + 1, std::string::npos);
+			unsigned index = SequenceSummary::codonToIndex(codon, false);
+			temp[index] = std::atof(val.c_str());
+		}
+		unsigned altered = 0u;
+		for (unsigned j = 0; j < categories.size(); j++)
+		{
+			if (paramType == RFPParameter::alp && categories[j].delM == i)
+			{
+				currentAlphaParameter[j] = temp;
+				proposedAlphaParameter[j] = temp;
+				altered++;
+			}
+			else if (paramType == RFPParameter::lmPri && categories[j].delEta == i)
+			{
+				currentLambdaPrimeParameter[j] = temp;
+				proposedLambdaPrimeParameter[j] = temp;
+				altered++;
+			}
+			if (altered == numCategories)
+				break; //to not access indicies out of bounds.
+		}
+		currentFile.close();
+	}
+}
+
+
+
+
+
+// --------------------------------------//
+// ---------- Trace Functions -----------//
+// --------------------------------------//
+
+
+RFPTrace& RFPParameter::getTraceObject()
+{
+	return traces;
 }
 
 
@@ -410,37 +430,17 @@ void RFPParameter::updateCodonSpecificParameterTrace(unsigned sample, std::strin
 }
 
 
-void RFPParameter::updateCodonSpecificParameter(std::string grouping)
-{
-	unsigned i = SequenceSummary::codonToIndex(grouping);
-	numAcceptForAlphaAndLambdaPrime[i]++;
 
-	for(unsigned k = 0u; k < numMutationCategories; k++)
-	{
-		currentAlphaParameter[k][i] = proposedAlphaParameter[k][i];
-	}
-	for(unsigned k = 0u; k < numSelectionCategories; k++)
-	{
-		currentLambdaPrimeParameter[k][i] = proposedLambdaPrimeParameter[k][i];
-	}
-}
+
+
+// -----------------------------------//
+// ---------- CSP Functions ----------//
+// -----------------------------------//
 
 
 double RFPParameter::getCurrentCodonSpecificProposalWidth(unsigned index)
 {
 	return std_csp[index];
-}
-
-
-std::vector<std::vector<double>> RFPParameter::getCurrentAlphaParameter()
-{
-	return currentAlphaParameter;
-}
-
-
-std::vector<std::vector<double>> RFPParameter::getCurrentLambdaPrimeParameter()
-{
-	return currentLambdaPrimeParameter;
 }
 
 
@@ -467,31 +467,279 @@ void RFPParameter::proposeCodonSpecificParameter()
 }
 
 
-
-void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
+void RFPParameter::updateCodonSpecificParameter(std::string grouping)
 {
+	unsigned i = SequenceSummary::codonToIndex(grouping);
+	numAcceptForAlphaAndLambdaPrime[i]++;
 
-	std::cout << "acceptance ratio for codon:\n";
-	for (unsigned i = 0; i < groupList.size(); i++)
+	for(unsigned k = 0u; k < numMutationCategories; k++)
 	{
-		std::cout << groupList[i] << "\t";
-
-		unsigned codonIndex = SequenceSummary::codonToIndex(groupList[i]);
-		double acceptanceLevel = (double)numAcceptForAlphaAndLambdaPrime[codonIndex] / (double)adaptationWidth;
-		std::cout << acceptanceLevel << " with std_csp = " << std_csp[i] <<"\n";
-		traces.updateCspAcceptanceRatioTrace(codonIndex, acceptanceLevel);
-		if (acceptanceLevel < 0.2)
-		{
-			std_csp[i] *= 0.8;
-		}
-		if (acceptanceLevel > 0.3)
-		{
-			std_csp[i] *= 1.2;
-		}
-		numAcceptForAlphaAndLambdaPrime[codonIndex] = 0u;
+		currentAlphaParameter[k][i] = proposedAlphaParameter[k][i];
 	}
-	std::cout << "\n";
+	for(unsigned k = 0u; k < numSelectionCategories; k++)
+	{
+		currentLambdaPrimeParameter[k][i] = proposedLambdaPrimeParameter[k][i];
+	}
 }
+
+
+
+
+
+// ------------------------------------------------------------------//
+// ---------- Posterior, Variance, and Estimates Functions ----------//
+// ------------------------------------------------------------------//
+
+
+//TODO: Traces prevent this from being in the parent class
+double RFPParameter::getSphiPosteriorMean(unsigned samples, unsigned mixture)
+{
+	double posteriorMean = 0.0;
+	unsigned selectionCategory = getSelectionCategory(mixture);
+	std::vector<double> sPhiTrace = traces.getSphiTrace(selectionCategory);
+	unsigned traceLength = (unsigned)sPhiTrace.size();
+
+	if(samples > traceLength)
+	{
+		std::cerr << "Warning in Parameter::getSphiPosteriorMean throws: Number of anticipated samples (" <<
+		samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
+		samples = traceLength;
+	}
+	unsigned start = traceLength - samples;
+	for(unsigned i = start; i < traceLength; i++)
+	{
+		posteriorMean += sPhiTrace[i];
+	}
+	return posteriorMean / (double)samples;
+}
+
+
+//TODO: Traces prevent this from being in the parent class
+double RFPParameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement)
+{
+	unsigned expressionCategory = getSynthesisRateCategory(mixtureElement);
+	double posteriorMean = 0.0;
+	std::vector<double> synthesisRateTrace = traces.getSynthesisRateTraceByMixtureElementForGene(mixtureElement, geneIndex);
+	unsigned traceLength = (unsigned)synthesisRateTrace.size();
+
+
+	if(samples > traceLength)
+	{
+		std::cerr << "Warning in Parameter::getSynthesisRatePosteriorMean throws: Number of anticipated samples (" <<
+		samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
+		samples = traceLength;
+	}
+	unsigned start = traceLength - samples;
+	unsigned category = 0u;
+	unsigned usedSamples = 0u;
+	std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
+	for(unsigned i = start; i < traceLength; i++)
+	{
+		category = mixtureAssignmentTrace[i];
+		category = getSynthesisRateCategory(category);
+		if(category == expressionCategory)
+		{
+			posteriorMean += synthesisRateTrace[i];
+			usedSamples++;
+		}
+	}
+	// Can return NaN if gene was never in category! But that is Ok.
+	return posteriorMean / (double)usedSamples;
+}
+
+
+double RFPParameter::getAlphaPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon)
+{
+	double posteriorMean = 0.0;
+	std::vector<double> alphaParameterTrace = traces.getAlphaParameterTraceByMixtureElementForCodon(mixtureElement, codon);
+	unsigned traceLength = (unsigned)alphaParameterTrace.size();
+
+	if(samples > traceLength)
+	{
+		std::cerr << "Warning in RFPParameter::getAlphaPosteriorMean throws: Number of anticipated samples (" <<
+		samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
+		samples = traceLength;
+	}
+	unsigned start = traceLength - samples;
+	for(unsigned i = start; i < traceLength; i++)
+	{
+		posteriorMean += alphaParameterTrace[i];
+	}
+	return posteriorMean / (double)samples;
+}
+
+
+double RFPParameter::getLambdaPrimePosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon)
+{
+	double posteriorMean = 0.0;
+	std::vector<double> lambdaPrimeParameterTrace = traces.getLambdaPrimeParameterTraceByMixtureElementForCodon(mixtureElement, codon);
+	unsigned traceLength = (unsigned)lambdaPrimeParameterTrace.size();
+
+	if(samples > traceLength)
+	{
+		std::cerr << "Warning in RFPParameter::getLambdaPrimePosteriorMean throws: Number of anticipated samples (" <<
+		samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
+		samples = traceLength;
+	}
+	unsigned start = traceLength - samples;
+	for(unsigned i = start; i < traceLength; i++)
+	{
+		posteriorMean += lambdaPrimeParameterTrace[i];
+	}
+	return posteriorMean / (double)samples;
+}
+
+
+//TODO: Traces prevent this from being in the parent class
+double RFPParameter::getSphiVariance(unsigned samples, unsigned mixture, bool unbiased)
+{
+	unsigned selectionCategory = getSelectionCategory(mixture);
+	std::vector<double> sPhiTrace = traces.getSphiTrace(selectionCategory);
+	unsigned traceLength = (unsigned)sPhiTrace.size();
+	if(samples > traceLength)
+	{
+		std::cerr << "Warning in Parameter::getSphiVariance throws: Number of anticipated samples (" <<
+		samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
+		samples = traceLength;
+	}
+	double posteriorMean = getSphiPosteriorMean(samples, mixture);
+
+	double posteriorVariance = 0.0;
+
+	unsigned start = traceLength - samples;
+	for(unsigned i = start; i < traceLength; i++)
+	{
+		double difference = sPhiTrace[i] - posteriorMean;
+		posteriorVariance += difference * difference;
+	}
+	double normalizationTerm = unbiased ? (1/((double)samples-1.0)) : (1/(double)samples);
+	return normalizationTerm * posteriorVariance;
+}
+
+
+//TODO: Traces prevent this from being in the parent class
+double RFPParameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement, bool unbiased)
+{
+	std::vector<double> synthesisRateTrace = traces.getSynthesisRateTraceByMixtureElementForGene(mixtureElement, geneIndex);
+	unsigned traceLength = (unsigned)synthesisRateTrace.size();
+	if(samples > traceLength)
+	{
+		std::cerr << "Warning in Parameter::getSynthesisRateVariance throws: Number of anticipated samples (" <<
+		samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
+		samples = traceLength;
+	}
+
+	double posteriorMean = getSynthesisRatePosteriorMean(samples, geneIndex, mixtureElement);
+
+	double posteriorVariance = 0.0;
+	if(!std::isnan(posteriorMean))
+	{
+		unsigned start = traceLength - samples;
+		unsigned category = 0u;
+		double difference = 0.0;
+		std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
+		for(unsigned i = start; i < traceLength; i++)
+		{
+			category = mixtureAssignmentTrace[i];
+			category = getSynthesisRateCategory(category);
+			difference = synthesisRateTrace[i] - posteriorMean;
+			posteriorVariance += difference * difference;
+		}
+	}
+	double normalizationTerm = unbiased ? (1/((double)samples-1.0)) : (1/(double)samples);
+	return normalizationTerm * posteriorVariance;
+}
+
+
+double RFPParameter::getAlphaVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased)
+{
+	std::vector<double> alphaParameterTrace = traces.getAlphaParameterTraceByMixtureElementForCodon(mixtureElement, codon);
+	unsigned traceLength = (unsigned)alphaParameterTrace.size();
+	if(samples > traceLength)
+	{
+		std::cerr << "Warning in RFPParameter::getAlphaVariance throws: Number of anticipated samples (" <<
+		samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
+		samples = traceLength;
+	}
+
+	double posteriorMean = getAlphaPosteriorMean(mixtureElement, samples, codon);
+
+	double posteriorVariance = 0.0;
+
+	unsigned start = traceLength - samples;
+	double difference = 0.0;
+	for(unsigned i = start; i < traceLength; i++)
+	{
+		difference = alphaParameterTrace[i] - posteriorMean;
+		posteriorVariance += difference * difference;
+	}
+	double normalizationTerm = unbiased ? (1/((double)samples-1.0)) : (1/(double)samples);
+	return normalizationTerm * posteriorVariance;
+}
+
+
+double RFPParameter::getLambdaPrimeVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased)
+{
+	std::vector<double> lambdaPrimeParameterTrace = traces.getLambdaPrimeParameterTraceByMixtureElementForCodon(mixtureElement, codon);
+	unsigned traceLength = (unsigned)lambdaPrimeParameterTrace.size();
+	if(samples > traceLength)
+	{
+		std::cerr << "Warning in RFPParameter::getSelectionVariance throws: Number of anticipated samples (" <<
+		samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
+		samples = traceLength;
+	}
+
+	double posteriorMean = getLambdaPrimePosteriorMean(mixtureElement, samples, codon);
+
+	double posteriorVariance = 0.0;
+
+	unsigned start = traceLength - samples;
+	double difference = 0.0;
+	for(unsigned i = start; i < traceLength; i++)
+	{
+		difference = lambdaPrimeParameterTrace[i] - posteriorMean;
+		posteriorVariance += difference * difference;
+	}
+	double normalizationTerm = unbiased ? (1/((double)samples-1.0)) : (1/(double)samples);
+	return normalizationTerm * posteriorVariance;
+}
+
+
+//TODO: Use of Trace prevents this from being in the base class
+std::vector <double> RFPParameter::getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex)
+{
+	std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
+	std::vector<double> probabilities(numMixtures, 0.0);
+	unsigned traceLength = (unsigned)mixtureAssignmentTrace.size();
+
+	if (samples > traceLength)
+	{
+		std::cerr << "Warning in RFPParameter::getMixtureAssignmentPosteriorMean throws: Number of anticipated samples (" <<
+		samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
+		samples = traceLength;
+	}
+
+	unsigned start = traceLength - samples;
+	for (unsigned i = start; i < traceLength; i++)
+	{
+		unsigned value = mixtureAssignmentTrace[i];
+		probabilities[value]++;
+	}
+
+	for (unsigned i = 0; i < numMixtures; i++)
+	{
+		probabilities[i] /= (double)samples;
+	}
+	return probabilities;
+}
+
+
+
+
+
+// ----------------------------------------------//
+// ---------- Adaptive Width Functions ----------//
+// ----------------------------------------------//
 
 
 //TODO: The only thing stopping this from moving up to Parameter is the trace stuff. Is there a way around this?
@@ -543,217 +791,43 @@ void RFPParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
 }
 
 
-//TODO: Traces prevent this from being in the parent class
-double RFPParameter::getSphiPosteriorMean(unsigned samples, unsigned mixture)
+void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
 {
-	double posteriorMean = 0.0;
-	unsigned selectionCategory = getSelectionCategory(mixture);
-	std::vector<double> sPhiTrace = traces.getSphiTrace(selectionCategory);
-	unsigned traceLength = (unsigned)sPhiTrace.size();
 
-	if(samples > traceLength)
+	std::cout << "acceptance ratio for codon:\n";
+	for (unsigned i = 0; i < groupList.size(); i++)
 	{
-		std::cerr << "Warning in Parameter::getSphiPosteriorMean throws: Number of anticipated samples (" <<
-			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
-		samples = traceLength;
-	}
-	unsigned start = traceLength - samples;
-	for(unsigned i = start; i < traceLength; i++)
-	{
-		posteriorMean += sPhiTrace[i];
-	}
-	return posteriorMean / (double)samples;
-}
+		std::cout << groupList[i] << "\t";
 
-
-//TODO: Traces prevent this from being in the parent class
-double RFPParameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement)
-{
-	unsigned expressionCategory = getSynthesisRateCategory(mixtureElement);
-	double posteriorMean = 0.0;
-	std::vector<double> synthesisRateTrace = traces.getSynthesisRateTraceByMixtureElementForGene(mixtureElement, geneIndex);
-	unsigned traceLength = (unsigned)synthesisRateTrace.size();
-
-
-	if(samples > traceLength)
-	{
-		std::cerr << "Warning in Parameter::getSynthesisRatePosteriorMean throws: Number of anticipated samples (" <<
-			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
-		samples = traceLength;
-	}
-	unsigned start = traceLength - samples;
-	unsigned category = 0u;
-	unsigned usedSamples = 0u;
-	std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
-	for(unsigned i = start; i < traceLength; i++)
-	{
-		category = mixtureAssignmentTrace[i];
-		category = getSynthesisRateCategory(category);
-		if(category == expressionCategory)
+		unsigned codonIndex = SequenceSummary::codonToIndex(groupList[i]);
+		double acceptanceLevel = (double)numAcceptForAlphaAndLambdaPrime[codonIndex] / (double)adaptationWidth;
+		std::cout << acceptanceLevel << " with std_csp = " << std_csp[i] <<"\n";
+		traces.updateCspAcceptanceRatioTrace(codonIndex, acceptanceLevel);
+		if (acceptanceLevel < 0.2)
 		{
-			posteriorMean += synthesisRateTrace[i];
-			usedSamples++;
+			std_csp[i] *= 0.8;
 		}
-	}
-	// Can return NaN if gene was never in category! But that is Ok.
-	return posteriorMean / (double)usedSamples;
-}
-
-
-double RFPParameter::getAlphaPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon)
-{
-	double posteriorMean = 0.0;
-	std::vector<double> alphaParameterTrace = traces.getAlphaParameterTraceByMixtureElementForCodon(mixtureElement, codon);
-	unsigned traceLength = (unsigned)alphaParameterTrace.size();
-
-	if(samples > traceLength)
-	{
-		std::cerr << "Warning in RFPParameter::getAlphaPosteriorMean throws: Number of anticipated samples (" <<
-			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
-		samples = traceLength;
-	}
-	unsigned start = traceLength - samples;
-	for(unsigned i = start; i < traceLength; i++)
-	{
-		posteriorMean += alphaParameterTrace[i];
-	}
-	return posteriorMean / (double)samples;
-}
-
-
-double RFPParameter::getLambdaPrimePosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon)
-{
-	double posteriorMean = 0.0;
-	std::vector<double> lambdaPrimeParameterTrace = traces.getLambdaPrimeParameterTraceByMixtureElementForCodon(mixtureElement, codon);
-	unsigned traceLength = (unsigned)lambdaPrimeParameterTrace.size();
-
-	if(samples > traceLength)
-	{
-		std::cerr << "Warning in RFPParameter::getLambdaPrimePosteriorMean throws: Number of anticipated samples (" <<
-			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
-		samples = traceLength;
-	}
-	unsigned start = traceLength - samples;
-	for(unsigned i = start; i < traceLength; i++)
-	{
-		posteriorMean += lambdaPrimeParameterTrace[i];
-	}
-	return posteriorMean / (double)samples;
-}
-
-
-//TODO: Traces prevent this from being in the parent class
-double RFPParameter::getSphiVariance(unsigned samples, unsigned mixture, bool unbiased)
-{
-	unsigned selectionCategory = getSelectionCategory(mixture);
-	std::vector<double> sPhiTrace = traces.getSphiTrace(selectionCategory);
-	unsigned traceLength = (unsigned)sPhiTrace.size();
-	if(samples > traceLength)
-	{
-		std::cerr << "Warning in Parameter::getSphiVariance throws: Number of anticipated samples (" <<
-			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
-		samples = traceLength;
-	}
-	double posteriorMean = getSphiPosteriorMean(samples, mixture);
-
-	double posteriorVariance = 0.0;
-
-	unsigned start = traceLength - samples;
-	for(unsigned i = start; i < traceLength; i++)
-	{
-		double difference = sPhiTrace[i] - posteriorMean;
-		posteriorVariance += difference * difference;
-	}
-	double normalizationTerm = unbiased ? (1/((double)samples-1.0)) : (1/(double)samples);
-	return normalizationTerm * posteriorVariance;
-}
-
-
-//TODO: Traces prevent this from being in the parent class
-double RFPParameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement, bool unbiased)
-{
-	std::vector<double> synthesisRateTrace = traces.getSynthesisRateTraceByMixtureElementForGene(mixtureElement, geneIndex);
-	unsigned traceLength = (unsigned)synthesisRateTrace.size();
-	if(samples > traceLength)
-	{
-		std::cerr << "Warning in Parameter::getSynthesisRateVariance throws: Number of anticipated samples (" <<
-			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
-		samples = traceLength;
-	}
-
-	double posteriorMean = getSynthesisRatePosteriorMean(samples, geneIndex, mixtureElement);
-
-	double posteriorVariance = 0.0;
-	if(!std::isnan(posteriorMean))
-	{
-		unsigned start = traceLength - samples;
-		unsigned category = 0u;
-		double difference = 0.0;
-		std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
-		for(unsigned i = start; i < traceLength; i++)
+		if (acceptanceLevel > 0.3)
 		{
-			category = mixtureAssignmentTrace[i];
-			category = getSynthesisRateCategory(category);
-			difference = synthesisRateTrace[i] - posteriorMean;
-			posteriorVariance += difference * difference;
+			std_csp[i] *= 1.2;
 		}
+		numAcceptForAlphaAndLambdaPrime[codonIndex] = 0u;
 	}
-	double normalizationTerm = unbiased ? (1/((double)samples-1.0)) : (1/(double)samples);
-	return normalizationTerm * posteriorVariance;
+	std::cout << "\n";
 }
 
 
-double RFPParameter::getAlphaVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased)
+
+
+
+// -------------------------------------//
+// ---------- Other Functions ----------//
+// -------------------------------------//
+
+
+void RFPParameter::setNumPhiGroupings(unsigned _phiGroupings)
 {
-	std::vector<double> alphaParameterTrace = traces.getAlphaParameterTraceByMixtureElementForCodon(mixtureElement, codon);
-	unsigned traceLength = (unsigned)alphaParameterTrace.size();
-	if(samples > traceLength)
-	{
-		std::cerr << "Warning in RFPParameter::getAlphaVariance throws: Number of anticipated samples (" <<
-			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
-		samples = traceLength;
-	}
-
-	double posteriorMean = getAlphaPosteriorMean(mixtureElement, samples, codon);
-
-	double posteriorVariance = 0.0;
-
-	unsigned start = traceLength - samples;
-	double difference = 0.0;
-	for(unsigned i = start; i < traceLength; i++)
-	{
-		difference = alphaParameterTrace[i] - posteriorMean;
-		posteriorVariance += difference * difference;
-	}
-	double normalizationTerm = unbiased ? (1/((double)samples-1.0)) : (1/(double)samples);
-	return normalizationTerm * posteriorVariance;
-}
-
-
-double RFPParameter::getLambdaPrimeVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased)
-{
-	std::vector<double> lambdaPrimeParameterTrace = traces.getLambdaPrimeParameterTraceByMixtureElementForCodon(mixtureElement, codon);
-	unsigned traceLength = (unsigned)lambdaPrimeParameterTrace.size();
-	if(samples > traceLength)
-	{
-		std::cerr << "Warning in RFPParameter::getSelectionVariance throws: Number of anticipated samples (" <<
-			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
-		samples = traceLength;
-	}
-
-	double posteriorMean = getLambdaPrimePosteriorMean(mixtureElement, samples, codon);
-
-	double posteriorVariance = 0.0;
-
-	unsigned start = traceLength - samples;
-	double difference = 0.0;
-	for(unsigned i = start; i < traceLength; i++)
-	{
-		difference = lambdaPrimeParameterTrace[i] - posteriorMean;
-		posteriorVariance += difference * difference;
-	}
-	double normalizationTerm = unbiased ? (1/((double)samples-1.0)) : (1/(double)samples);
-	return normalizationTerm * posteriorVariance;
+	phiGroupings = _phiGroupings;
 }
 
 
@@ -777,35 +851,6 @@ double RFPParameter::getParameterForCategory(unsigned category, unsigned paramTy
 	}
 
 	return rv;
-}
-
-
-//TODO: Use of Trace prevents this from being in the base class
-std::vector <double> RFPParameter::getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex)
-{
-	std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
-	std::vector<double> probabilities(numMixtures, 0.0);
-	unsigned traceLength = (unsigned)mixtureAssignmentTrace.size();
-
-	if (samples > traceLength)
-	{
-		std::cerr << "Warning in RFPParameter::getMixtureAssignmentPosteriorMean throws: Number of anticipated samples (" <<
-			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
-		samples = traceLength;
-	}
-
-	unsigned start = traceLength - samples;
-	for (unsigned i = start; i < traceLength; i++)
-	{
-		unsigned value = mixtureAssignmentTrace[i];
-		probabilities[value]++;
-	}
-
-	for (unsigned i = 0; i < numMixtures; i++)
-	{
-		probabilities[i] /= (double)samples;
-	}
-	return probabilities;
 }
 
 
@@ -852,28 +897,61 @@ void RFPParameter::calculateRFPMean(Genome& genome)
 }
 
 
-std::vector<std::vector<double>> RFPParameter::getProposedAlphaParameter()
-{
-	return proposedAlphaParameter;
-}
-
-
-std::vector<std::vector<double>> RFPParameter::getProposedLambdaPrimeParameter()
-{
-	return proposedLambdaPrimeParameter;
-}
 
 
 
-//---------------------STATIC VARIABLE DECLARATIONS---------------------//
-
-const unsigned RFPParameter::alp = 0u;
-const unsigned RFPParameter::lmPri = 1u;
 
 
-//---------------------R WRAPPER FUNCTIONS---------------------//
+// -----------------------------------------------------------------------------------------------------//
+// ---------------------------------------- R SECTION --------------------------------------------------//
+// -----------------------------------------------------------------------------------------------------//
+
 
 #ifndef STANDALONE
+
+
+//--------------------------------------------------//
+// ---------- Constructors & Destructors ---------- //
+//--------------------------------------------------//
+
+
+RFPParameter::RFPParameter(std::vector<double> sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter(64)
+{
+  unsigned _numMixtures = _matrix.size() / 2;
+  std::vector<std::vector<unsigned>> thetaKMatrix;
+  thetaKMatrix.resize(_numMixtures);
+
+  unsigned index = 0;
+  for (unsigned i = 0; i < _numMixtures; i++)
+  {
+    for (unsigned j = 0; j < 2; j++, index++)
+    {
+      thetaKMatrix[i].push_back(_matrix[index]);
+    }
+  }
+  initParameterSet(sphi, _matrix.size() / 2, geneAssignment, thetaKMatrix, splitSer);
+  initRFPParameterSet();
+
+}
+
+
+RFPParameter::RFPParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState) :
+Parameter(64)
+{
+  std::vector<std::vector<unsigned>> thetaKMatrix;
+  initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
+  initRFPParameterSet();
+}
+
+
+
+
+
+//---------------------------------------------------------------//
+// ---------- Initialization, Restart, Index Checking ---------- //
+//---------------------------------------------------------------//
+
+
 void RFPParameter::initAlphaR(double alphaValue, unsigned mixtureElement, std::string codon)
 {
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
@@ -904,32 +982,6 @@ void RFPParameter::initLambdaPrimeR(double lambdaPrimeValue, unsigned mixtureEle
 }
 
 
-double RFPParameter::getParameterForCategoryR(unsigned mixtureElement, unsigned paramType, std::string codon, bool proposal)
-{
-	double rv = 0.0;
-	bool check = checkIndex(mixtureElement, 1, numMixtures);
-	if (check)
-	{
-		mixtureElement--;
-		unsigned category = 0;
-		codon[0] = (char)std::toupper(codon[0]);
-		codon[1] = (char)std::toupper(codon[1]);
-		codon[2] = (char)std::toupper(codon[2]);
-		if (paramType == RFPParameter::alp)
-		{
-			//TODO THIS NEEDS TO CHANGE, NAMING!!!!
-			category = getMutationCategory(mixtureElement); //really alpha here
-		}
-		else if (paramType == RFPParameter::lmPri)
-		{
-			category = getSelectionCategory(mixtureElement);
-		}
-		rv = getParameterForCategory(category, paramType, codon, proposal);
-	}
-	return rv;
-}
-
-#endif
 void RFPParameter::initMutationSelectionCategoriesR(std::vector<std::string> files, unsigned numCategories,
 													std::string paramType)
 {
@@ -961,7 +1013,91 @@ void RFPParameter::initMutationSelectionCategoriesR(std::vector<std::string> fil
 	}
 }
 
-#ifndef STANDALONE
+
+
+
+
+// --------------------------------------//
+// ---------- Trace Functions -----------//
+// --------------------------------------//
+
+
+void RFPParameter::setTraceObject(RFPTrace _trace)
+{
+	traces = _trace;
+}
+
+
+void RFPParameter::setCategoriesForTrace()
+{
+	traces.setCategories(categories);
+}
+
+
+
+
+
+// -----------------------------------//
+// ---------- CSP Functions ----------//
+// -----------------------------------//
+
+
+std::vector<std::vector<double>> RFPParameter::getProposedAlphaParameter()
+{
+	return proposedAlphaParameter;
+}
+
+
+std::vector<std::vector<double>> RFPParameter::getProposedLambdaPrimeParameter()
+{
+	return proposedLambdaPrimeParameter;
+}
+
+
+std::vector<std::vector<double>> RFPParameter::getCurrentAlphaParameter()
+{
+	return currentAlphaParameter;
+}
+
+
+std::vector<std::vector<double>> RFPParameter::getCurrentLambdaPrimeParameter()
+{
+	return currentLambdaPrimeParameter;
+}
+
+
+void RFPParameter::setProposedAlphaParameter(std::vector<std::vector<double>> alpha)
+{
+	proposedAlphaParameter = alpha;
+}
+
+
+void RFPParameter::setProposedLambdaPrimeParameter(std::vector<std::vector<double>> lambdaPrime)
+{
+	proposedLambdaPrimeParameter = lambdaPrime;
+}
+
+
+void RFPParameter::setCurrentAlphaParameter(std::vector<std::vector<double>> alpha)
+{
+	currentAlphaParameter = alpha;
+}
+
+
+void RFPParameter::setCurrentLambdaPrimeParameter(std::vector<std::vector<double>> lambdaPrime)
+{
+	currentLambdaPrimeParameter = lambdaPrime;
+}
+
+
+
+
+
+// ------------------------------------------------------------------//
+// ---------- Posterior, Variance, and Estimates Functions ----------//
+// ------------------------------------------------------------------//
+
+
 double RFPParameter::getAlphaPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
 {
 	double rv = -1.0;
@@ -975,6 +1111,7 @@ double RFPParameter::getAlphaPosteriorMeanForCodon(unsigned mixtureElement, unsi
 	}
 	return rv;
 }
+
 
 double RFPParameter::getLambdaPrimePosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
 {
@@ -1020,74 +1157,54 @@ double RFPParameter::getLambdaPrimeVarianceForCodon(unsigned mixtureElement, uns
 	return rv;
 }
 
+
+
+
+
+// -------------------------------------//
+// ---------- Other Functions ----------//
+// -------------------------------------//
+
+
+double RFPParameter::getParameterForCategoryR(unsigned mixtureElement, unsigned paramType, std::string codon, bool proposal)
+{
+	double rv = 0.0;
+	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	if (check)
+	{
+		mixtureElement--;
+		unsigned category = 0;
+		codon[0] = (char)std::toupper(codon[0]);
+		codon[1] = (char)std::toupper(codon[1]);
+		codon[2] = (char)std::toupper(codon[2]);
+		if (paramType == RFPParameter::alp)
+		{
+			//TODO THIS NEEDS TO CHANGE, NAMING!!!!
+			category = getMutationCategory(mixtureElement); //really alpha here
+		}
+		else if (paramType == RFPParameter::lmPri)
+		{
+			category = getSelectionCategory(mixtureElement);
+		}
+		rv = getParameterForCategory(category, paramType, codon, proposal);
+	}
+	return rv;
+}
+
 #endif
-std::vector <double> RFPParameter::getTmp()
-{
-return tmp;
-}
-
-#ifndef STANDALONE
-#include <Rcpp.h>
-using namespace Rcpp;
-RFPParameter::RFPParameter(std::vector<double> sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter(64)
-{
-  unsigned _numMixtures = _matrix.size() / 2;
-  std::vector<std::vector<unsigned>> thetaKMatrix;
-  thetaKMatrix.resize(_numMixtures);
-
-  unsigned index = 0;
-  for (unsigned i = 0; i < _numMixtures; i++)
-  {
-    for (unsigned j = 0; j < 2; j++, index++)
-    {
-      thetaKMatrix[i].push_back(_matrix[index]);
-    }
-  }
-  initParameterSet(sphi, _matrix.size() / 2, geneAssignment, thetaKMatrix, splitSer);
-  initRFPParameterSet();
-
-}
-
-RFPParameter::RFPParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState) :
-Parameter(64)
-{
-  std::vector<std::vector<unsigned>> thetaKMatrix;
-  initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
-  initRFPParameterSet();
-}
-#endif
-
-void RFPParameter::setCurrentAlphaParameter(std::vector<std::vector<double>> alpha)
-{
-    currentAlphaParameter = alpha;
-}
 
 
-void RFPParameter::setProposedAlphaParameter(std::vector<std::vector<double>> alpha)
-{
-    proposedAlphaParameter = alpha;
-}
 
 
-void RFPParameter::setCurrentLambdaPrimeParameter(std::vector<std::vector<double>> lambdaPrime)
-{
-    currentLambdaPrimeParameter = lambdaPrime;
-}
 
 
-void RFPParameter::setProposedLambdaPrimeParameter(std::vector<std::vector<double>> lambdaPrime)
-{
-    proposedLambdaPrimeParameter = lambdaPrime;
-}
 
-void RFPParameter::setTraceObject(RFPTrace _trace)
-{
-    traces = _trace;
-}
 
-void RFPParameter::setCategoriesForTrace()
-{
-    //std::vector<mixtureDefinition> *_categories = &categories;
-    traces.setCategories(categories);
-}
+
+
+
+
+
+
+
 

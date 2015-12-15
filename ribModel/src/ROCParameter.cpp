@@ -652,18 +652,6 @@ void ROCParameter::updateAphi(unsigned index)
 // -----------------------------------//
 
 
-std::vector<std::vector<double>> ROCParameter::getCurrentMutationParameter()
-{
-	return currentMutationParameter;
-}
-
-
-std::vector<std::vector<double>> ROCParameter::getCurrentSelectionParameter()
-{
-	return currentSelectionParameter;
-}
-
-
 double ROCParameter::getCurrentCodonSpecificProposalWidth(unsigned aa)
 {
 	std::array <unsigned, 2> codonRange = SequenceSummary::AAIndexToCodonRange(aa, true);
@@ -1389,6 +1377,26 @@ void ROCParameter::setTraceObject(ROCTrace _trace)
 void ROCParameter::setCategoriesForTrace()
 {
 	traces.setCategories(categories);
+}
+
+
+
+
+
+// -----------------------------------//
+// ---------- CSP Functions ----------//
+// -----------------------------------//
+
+
+std::vector<std::vector<double>> ROCParameter::getCurrentMutationParameter()
+{
+	return currentMutationParameter;
+}
+
+
+std::vector<std::vector<double>> ROCParameter::getCurrentSelectionParameter()
+{
+	return currentSelectionParameter;
 }
 
 

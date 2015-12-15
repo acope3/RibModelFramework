@@ -70,6 +70,7 @@ class ROCParameter : public Parameter
 		void writeEntireRestartFile(std::string filename);
 		void writeROCRestartFile(std::string filename);
 		void initFromRestartFile(std::string filename);
+
 		void initAllTraces(unsigned samples, unsigned num_genes);
 		void initMutationCategories(std::vector<std::string> files, unsigned numCategories);
 		void initSelectionCategories(std::vector<std::string> files, unsigned numCategories);
@@ -114,8 +115,7 @@ class ROCParameter : public Parameter
 
 
 		//CSP Functions:
-		std::vector<std::vector<double>> getCurrentMutationParameter();
-		std::vector<std::vector<double>> getCurrentSelectionParameter();
+
 		double getCurrentCodonSpecificProposalWidth(unsigned aa);
 		void proposeCodonSpecificParameter();
 		void updateCodonSpecificParameter(std::string grouping);
@@ -125,14 +125,6 @@ class ROCParameter : public Parameter
 		//Prior Functions:
 		double getMutationPriorStandardDeviation();
 		void setMutationPriorStandardDeviation(double _mutation_prior_sd);
-
-
-
-		//Adaptive Width Functions:
-		virtual void adaptSphiProposalWidth(unsigned adaptationWidth);
-		virtual void adaptSynthesisRateProposalWidth(unsigned adaptationWidth);
-		void adaptAphiProposalWidth(unsigned adaptationWidth);
-		void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth);
 
 
 
@@ -150,6 +142,14 @@ class ROCParameter : public Parameter
 		double getSelectionVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased = true);
 
 		virtual std::vector <double> getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex);
+
+
+
+		//Adaptive Width Functions:
+		virtual void adaptSphiProposalWidth(unsigned adaptationWidth);
+		virtual void adaptSynthesisRateProposalWidth(unsigned adaptationWidth);
+		void adaptAphiProposalWidth(unsigned adaptationWidth);
+		void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth);
 
 
 
@@ -184,6 +184,11 @@ class ROCParameter : public Parameter
  		void setTraceObject(ROCTrace _trace);
  		void setCategoriesForTrace();
 
+
+
+		//CSP Functions:
+		std::vector<std::vector<double>> getCurrentMutationParameter();
+		std::vector<std::vector<double>> getCurrentSelectionParameter();
 
 
 

@@ -261,7 +261,6 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 			model.updateCodonSpecificParameterTrace(iteration/thining, grouping);
 		}
 	}
-	model.updateTmp(); //update the tmp trace I have created to track alphas.
 }
 
 // Allows to diverge from initial conditions (divergenceIterations controls the divergence).
