@@ -1086,8 +1086,6 @@ void FONSEParameter::initCovarianceMatrix(SEXP _matrix, std::string aa)
 	covarianceMatrix[aaIndex] = m;
 }
 
-<<<<<<< HEAD
-
 void FONSEParameter::initMutation(std::vector<double> mutationValues, unsigned mixtureElement, std::string aa)
 {
 	//TODO: seperate out the R wrapper functionality and make the wrapper
@@ -1160,8 +1158,6 @@ void FONSEParameter::initMutationSelectionCategoriesR(std::vector<std::string> f
 		initMutationSelectionCategories(files, numCategories, value);
 	}
 }
-=======
->>>>>>> 7d2da23b3b23ef26c5bb022fcea657bb9ae5b52d
 
 
 
