@@ -24,6 +24,10 @@ const unsigned ROCParameter::dEta = 1;
 ROCParameter::ROCParameter() : Parameter()
 {
 	//CTOR
+	phiEpsilon = 0.1;
+	phiEpsilon_proposed = 0.1;
+	bias_csp = 0;
+	mutation_prior_sd = 0.35;
 }
 
 
@@ -777,7 +781,6 @@ double ROCParameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned ge
 	unsigned expressionCategory = getSynthesisRateCategory(mixtureElement);
 	double posteriorMean = 0.0;
 	std::vector<double> synthesisRateTrace = traces.getSynthesisRateTraceByMixtureElementForGene(mixtureElement, geneIndex);
-	unsigned traceLength = (unsigned)synthesisRateTrace.size();
 
 	if (samples > lastIteration)
 	{

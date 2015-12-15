@@ -25,6 +25,10 @@ const unsigned FONSEParameter::dOmega = 1;
 FONSEParameter::FONSEParameter() : Parameter()
 {
 	//CTOR
+	phiEpsilon = 0.1;
+	phiEpsilon_proposed = 0.1;
+	bias_csp = 0;
+	mutation_prior_sd = 0.35;
 }
 
 
@@ -54,6 +58,8 @@ FONSEParameter& FONSEParameter::operator=(const FONSEParameter& rhs)
 	bias_csp = rhs.bias_csp;
 	std_csp = rhs.std_csp;
 
+	mutation_prior_sd = rhs.mutation_prior_sd;
+
 	currentMutationParameter = rhs.currentMutationParameter;
 	proposedMutationParameter = rhs.proposedMutationParameter;
 
@@ -75,6 +81,8 @@ FONSEParameter::FONSEParameter(const FONSEParameter &other) : Parameter(other)
 {
 	bias_csp = other.bias_csp;
 	std_csp = other.std_csp;
+
+	mutation_prior_sd = other.mutation_prior_sd;
 
 	currentMutationParameter = other.currentMutationParameter;
 	proposedMutationParameter = other.proposedMutationParameter;

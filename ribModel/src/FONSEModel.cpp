@@ -10,7 +10,6 @@ double FONSEModel::calculateMutationPrior(std::string grouping, bool proposed)
 {
 	unsigned numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
 	double mutation[5];
-	double mutation_proposed[5];
 
 	double priorValue = 0.0;
 

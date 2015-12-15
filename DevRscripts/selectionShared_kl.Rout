@@ -1,0 +1,220 @@
+
+R version 3.1.1 (2014-07-10) -- "Sock it to Me"
+Copyright (C) 2014 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> rm(list=ls()) 
+> library(ribModel) 
+Loading required package: Rcpp
+> 
+> seeds <- read.table(file = "seed.txt")[,1]
+> task.id <- 1
+> 
+> set.seed(seeds[task.id]) 
+> with.phi <- FALSE
+> 
+> if (with.phi) { 
++   genome <- initializeGenomeObject(file ="../data/realGenomes/Skluyveri.fasta", expression.file = "../data/simulatedAllUniqueR_phi.csv") 
++ } else { 
++   genome <- initializeGenomeObject(file = "../data/realGenomes/Skluyveri.fasta") 
++ } 
+WARNING: Codon ANN not recognized!
+ Codon will be ignored!
+WARNING: Codon CNN not recognized!
+ Codon will be ignored!
+WARNING: Codon CNN not recognized!
+ Codon will be ignored!
+WARNING: Codon NNN not recognized!
+ Codon will be ignored!
+WARNING: Codon NCC not recognized!
+ Codon will be ignored!
+WARNING: Codon NGC not recognized!
+ Codon will be ignored!
+WARNING: Codon NNN not recognized!
+ Codon will be ignored!
+WARNING: Codon NNN not recognized!
+ Codon will be ignored!
+WARNING: Codon GGN not recognized!
+ Codon will be ignored!
+WARNING: Codon NNC not recognized!
+ Codon will be ignored!
+WARNING: Codon TCN not recognized!
+ Codon will be ignored!
+WARNING: Codon NCA not recognized!
+ Codon will be ignored!
+Error with gene SAKL0C04620g
+Bad codons found!
+> 
+> sphi_init <- c(1,1)
+> numMixtures <- 2
+> mixDef <- "selectionShared"
+> geneAssignment <- c(rep(1,961), rep(2,457), rep(1, 3903))
+> parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef) 
+Warning messages:
+1: In vglm.fitter(x = x, y = y, w = w, offset = offset, Xm2 = Xm2,  :
+  iterations terminated because half-step sizes are very small
+2: In vglm.fitter(x = x, y = y, w = w, offset = offset, Xm2 = Xm2,  :
+  iterations terminated because half-step sizes are very small
+> 
+> samples <- 2000
+> thining <- 50
+> adaptiveWidth <- 10
+> divergence.iteration <- 20
+> mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE) 
+> 
+> setRestartSettings(mcmc, paste(task.id, "_kluyveri_full_selectionShared.rst", sep=""), adaptiveWidth*50, TRUE) 
+> 
+> model <- initializeModelObject(parameter, "ROC", with.phi = with.phi) 
+> 
+> start <- Sys.time() 
+> system.time(runMCMC(mcmc, genome, model, 4, divergence.iteration)) 
+Allowing divergence from initial conditions for 20 iterations.
+
+maxGrouping: 22
+entering MCMC loop
+	Estimate Codon Specific Parameters? TRUE
+	Estimate Hyper Parameters? TRUE
+	Estimate SynthesisRate Parameters? TRUE
+	Starting MCMC with 100000 iterations
+Status at iteration 100
+	 current logLikelihood: -5.71834e+06
+Current Sphi estimate for selection category 0: 1.1804
+	 current Sphi proposal width: 0.1
+	 current Mixture element probability for element 0: 0.915505
+	 current Mixture element probability for element 1: 0.0844951
+Status at iteration 200
+	 current logLikelihood: -5.53537e+06
+Current Sphi estimate for selection category 0: 0.93762
+	 current Sphi proposal width: 0.1
+	 current Mixture element probability for element 0: 0.919039
+	 current Mixture element probability for element 1: 0.0809614
+Status at iteration 300
+	 current logLikelihood: -5.40708e+06
+Current Sphi estimate for selection category 0: 0.837193
+	 current Sphi proposal width: 0.1
+	 current Mixture element probability for element 0: 0.914478
+	 current Mixture element probability for element 1: 0.0855217
+Status at iteration 400
+	 current logLikelihood: -5.46624e+06
+Current Sphi estimate for selection category 0: 0.773559
+	 current Sphi proposal width: 0.1
+	 current Mixture element probability for element 0: 0.913973
+	 current Mixture element probability for element 1: 0.0860273
+Status at iteration 500
+	 current logLikelihood: -5.40155e+06
+Current Sphi estimate for selection category 0: 0.701106
+	 current Sphi proposal width: 0.1
+	 current Mixture element probability for element 0: 0.911045
+	 current Mixture element probability for element 1: 0.0889548
+Acceptance Ratio for Codon Specific Parameter
+AA	Acc.Rat	Prop.Width
+	A:	0.098	0.1
+	C:	0.06	0.1
+	D:	0.08	0.1
+	E:	0.064	0.1
+	F:	0.078	0.1
+	G:	0.094	0.1
+	H:	0.09	0.1
+	I:	0.114	0.1
+	K:	0.07	0.1
+	L:	0.098	0.1
+	N:	0.086	0.1
+	P:	0.11	0.1
+	Q:	0.1	0.1
+	R:	0.114	0.1
+	S:	0.088	0.1
+	T:	0.086	0.1
+	V:	0.086	0.1
+	Y:	0.094	0.1
+	Z:	0.078	0.1
+
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 0
+	 acceptance ratio to high: 5321
+Status at iteration 600
+	 current logLikelihood: -5.33634e+06
+Current Sphi estimate for selection category 0: 0.6708
+	 current Sphi proposal width: 0.08
+	 current Mixture element probability for element 0: 0.917879
+	 current Mixture element probability for element 1: 0.0821208
+Status at iteration 700
+	 current logLikelihood: -5.38943e+06
+Current Sphi estimate for selection category 0: 0.644195
+	 current Sphi proposal width: 0.08
+	 current Mixture element probability for element 0: 0.914809
+	 current Mixture element probability for element 1: 0.0851913
+Status at iteration 800
+	 current logLikelihood: -5.39161e+06
+Current Sphi estimate for selection category 0: 0.63747
+	 current Sphi proposal width: 0.08
+	 current Mixture element probability for element 0: 0.918178
+	 current Mixture element probability for element 1: 0.0818216
+Status at iteration 900
+	 current logLikelihood: -5.36893e+06
+Current Sphi estimate for selection category 0: 0.637905
+	 current Sphi proposal width: 0.08
+	 current Mixture element probability for element 0: 0.906687
+	 current Mixture element probability for element 1: 0.0933131
+Status at iteration 1000
+	 current logLikelihood: -5.37582e+06
+Current Sphi estimate for selection category 0: 0.617776
+	 current Sphi proposal width: 0.08
+	 current Mixture element probability for element 0: 0.909347
+	 current Mixture element probability for element 1: 0.0906534
+Acceptance Ratio for Codon Specific Parameter
+AA	Acc.Rat	Prop.Width
+	A:	0.014	0.08
+	C:	0.012	0.08
+	D:	0.01	0.08
+	E:	0.01	0.08
+	F:	0.008	0.08
+	G:	0.008	0.08
+	H:	0.01	0.08
+	I:	0.014	0.08
+	K:	0.006	0.08
+	L:	0.01	0.08
+	N:	0.012	0.08
+	P:	0.016	0.08
+	Q:	0.014	0.08
+	R:	0.04	0.08
+	S:	0.014	0.08
+	T:	0.016	0.08
+	V:	0.01	0.08
+	Y:	0.014	0.08
+	Z:	0.004	0.08
+
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 0
+	 acceptance ratio to high: 5307
+Status at iteration 1100
+	 current logLikelihood: -5.34517e+06
+Current Sphi estimate for selection category 0: 0.593676
+	 current Sphi proposal width: 0.064
+	 current Mixture element probability for element 0: 0.909856
+	 current Mixture element probability for element 1: 0.0901442
+Status at iteration 1200
+	 current logLikelihood: -5.36307e+06
+Current Sphi estimate for selection category 0: 0.607641
+	 current Sphi proposal width: 0.064
+	 current Mixture element probability for element 0: 0.916998
+	 current Mixture element probability for element 1: 0.0830021
+Status at iteration 1300
+	 current logLikelihood: -5.35135e+06
+Current Sphi estimate for selection category 0: 0.614423
+	 current Sphi proposal width: 0.064
+	 current Mixture element probability for element 0: 0.900944
+	 current Mixture element probability for element 1: 0.0990557

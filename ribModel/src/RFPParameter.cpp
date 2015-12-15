@@ -22,6 +22,7 @@ const unsigned RFPParameter::lmPri = 1u;
 RFPParameter::RFPParameter() : Parameter()
 {
 	//ctor
+	bias_csp = 0;
 }
 
 

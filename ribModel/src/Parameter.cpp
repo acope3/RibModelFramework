@@ -29,6 +29,7 @@ const std::string Parameter::mutationShared = "mutationShared";
 
 Parameter::Parameter()
 {
+	lastIteration = 0u;
 	numParam = 0u;
 	phiGroupings = 0u;
 	Sphi.resize(1);
@@ -46,6 +47,7 @@ Parameter::Parameter()
 
 Parameter::Parameter(unsigned _maxGrouping)
 {
+	lastIteration = 0u;
 	numParam = 0u;
 	phiGroupings = 0u;
 	Sphi.resize(1);
@@ -1201,16 +1203,16 @@ double Parameter::randExp(double r)
 //The R version and C++ differ because C++ uses the 
 //shape and scale parameter version while R uses the 
 //shape and rate.
-double Parameter::randGamma(double shape, double rate)
+double Parameter::randGamma(double shape, double _rate)
 {
 	double rv;
 #ifndef STANDALONE
 	RNGScope scope;
 	NumericVector xx(1);
-	xx = rgamma(1, shape, rate = rate);
+	xx = rgamma(1, shape, rate = _rate);
 	rv = xx[0];
 #else
-	std::gamma_distribution<double> distribution(shape, 1 / rate);
+	std::gamma_distribution<double> distribution(shape, 1 / _rate);
 	rv = distribution(generator);
 #endif
 	return rv;

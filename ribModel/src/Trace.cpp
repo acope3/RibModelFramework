@@ -7,6 +7,7 @@ using namespace Rcpp;
 Trace::Trace()
 {
 	//CTOR
+	categories = NULL;
 }
 
 Trace::~Trace()

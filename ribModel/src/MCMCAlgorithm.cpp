@@ -133,7 +133,6 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		}
 
 		unsigned mixAssign = model.getMixtureAssignment(i);
-		unsigned geneSynthCat = model.getSynthesisRateCategory(mixAssign);
 
 		// adjust the the unscaled probabilities by the constant c
 		// ln(f') = ln(c) + ln(f)
@@ -155,6 +154,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		}
 
 //		unsigned mixtureAssignmentOfGene = model.getMixtureAssignment(i);
+//		unsigned geneSynthCat = model.getSynthesisRateCategory(mixAssign);
 		for(unsigned k = 0u; k < numSynthesisRateCategories; k++)
 		{
 			// We do not need to add std::log(model.getCategoryProbability(k)) since it will cancel in the ratio!
@@ -571,7 +571,7 @@ std::vector<double> MCMCAlgorithm::acf(std::vector<double>& x, int nrows, int nc
 		double sum = 0.0;
 		for(unsigned i = 0u; i < x.size(); i++) sum += x[i];
 		double mean = sum / (double)x.size();
-		for(unsigned i = 0u; i < x.size(); i++) x[i] - mean;
+		for(unsigned i = 0u; i < x.size(); i++) x[i] = x[i] - mean;
 	}
 
 	std::vector<double> acf(lagmax, 1.0);

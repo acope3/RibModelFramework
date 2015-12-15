@@ -10,6 +10,7 @@ using namespace Rcpp;
 PANSEModel::PANSEModel() : Model()
 {
 	//ctor
+	parameter = NULL;
 }
 
 
