@@ -104,9 +104,11 @@ RCPP_MODULE(Parameter_mod)
 
 
 
+
 		//CSP Functions:
 		//Listed in the properties section below. NOTE: these getter/setters are ONLY
 		//used in R
+
 
 
 
@@ -202,12 +204,9 @@ RCPP_MODULE(Parameter_mod)
 		//Initialization, Restart, Index Checking:
 		.method("initCovarianceMatrix", &FONSEParameter::initCovarianceMatrix)
 		.method("getCovarianceMatrixForAA", &FONSEParameter::getCovarianceMatrixForAA) //Not an R wrapper
-
-		.method("initSelection", &FONSEParameter::initSelection)
 		.method("initMutation", &FONSEParameter::initMutation)
-		.method("initMutationCategories", &FONSEParameter::initMutationCategories)
-		.method("initSelectionCategories", &FONSEParameter::initSelectionCategories)
-		.method("getTraceObject", &FONSEParameter::getTraceObject)
+		.method("initSelection", &FONSEParameter::initSelection)
+
 
 
 

@@ -1,5 +1,6 @@
-library(ribModel)
 rm(list=ls())
+library(ribModel)
+
 
 
 #read genome

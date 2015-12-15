@@ -34,7 +34,9 @@ class FONSEParameter : public Parameter
 		double mutation_prior_sd;
 
 
+
 		std::vector <double> propose(std::vector <double> currentParam, double(*proposal)(double a, double b), double A, std::vector <double> B);
+
 
 	public:
 		static const unsigned dM;
@@ -60,6 +62,7 @@ class FONSEParameter : public Parameter
 		void writeEntireRestartFile(std::string filename);
 		void writeFONSERestartFile(std::string filename);
 		void initFromRestartFile(std::string filename);
+
 		void initAllTraces(unsigned samples, unsigned num_genes);
 		void initMutationCategories(std::vector<std::string> files, unsigned numCategories);
 		void initSelectionCategories(std::vector<std::string> files, unsigned numCategories);
