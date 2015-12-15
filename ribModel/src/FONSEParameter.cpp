@@ -1127,42 +1127,6 @@ void FONSEParameter::initSelection(std::vector<double> selectionValues, unsigned
 	}
 }
 
-
-void FONSEParameter::initMutationSelectionCategoriesR(std::vector<std::string> files, unsigned numCategories,
-	std::string paramType)
-{
-	unsigned value = 0;
-	bool check = true;
-	if (paramType == "Mutation")
-	{
-		value = FONSEParameter::dM;
-	}
-	else if (paramType == "Selection")
-	{
-		value = FONSEParameter::dOmega;
-	}
-	else
-	{
-		std::cerr << "Bad paramType given. Expected \"Mutation\" or \"Selection\".\nFunction not being executed!\n";
-		check = false;
-	}
-	if (files.size() != numCategories) //we have different sizes and need to stop
-	{
-		std::cerr
-			<< "The number of files given and the number of categories given differ. Function will not be executed!\n";
-		check = false;
-	}
-
-	if (check)
-	{
-		initMutationSelectionCategories(files, numCategories, value);
-	}
-}
-
-
-
-
-
 // --------------------------------------//
 // ---------- Trace Functions -----------//
 // --------------------------------------//

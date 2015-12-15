@@ -2,7 +2,7 @@
 % Please edit documentation in R/genomeObject.R
 \name{initializeGenomeObject}
 \alias{initializeGenomeObject}
-\title{Genome initialization}
+\title{Genome Initialization}
 \usage{
 initializeGenomeObject(file, fasta = TRUE, expression.file = NULL,
   append = FALSE)
@@ -20,9 +20,9 @@ empirical expression rates, if needed.}
  to the end of the genome}
 }
 \value{
-This function has no return value.
+This function returns the Genome Rcpp object created.
 }
 \description{
-\code{initializeGenomeObject} initializes the RCpp Genome object
+\code{initializeGenomeObject} initializes the Rcpp Genome object
 }
 

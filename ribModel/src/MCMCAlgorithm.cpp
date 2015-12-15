@@ -571,7 +571,7 @@ std::vector<double> MCMCAlgorithm::acf(std::vector<double>& x, int nrows, int nc
 		double sum = 0.0;
 		for(unsigned i = 0u; i < x.size(); i++) sum += x[i];
 		double mean = sum / (double)x.size();
-		for(unsigned i = 0u; i < x.size(); i++) x[i] - mean;
+		for(unsigned i = 0u; i < x.size(); i++) x[i] = mean;
 	}
 
 	std::vector<double> acf(lagmax, 1.0);

@@ -1,6 +1,6 @@
-#' Genome initialization
+#' Genome Initialization
 #' 
-#' \code{initializeGenomeObject} initializes the RCpp Genome object
+#' \code{initializeGenomeObject} initializes the Rcpp Genome object
 #' 
 #' @param file A string containing the location of the input file.
 #' @param fasta A boolean value which decides whether to initialize with a
@@ -9,8 +9,8 @@
 #'  empirical expression rates, if needed.
 #' @param append A boolean value that states whether the genes should be appended
 #'  to the end of the genome
-#'
-#' @return This function has no return value.
+#' 
+#' @return This function returns the Genome Rcpp object created.
 #' 
 initializeGenomeObject <- function(file, fasta=TRUE, expression.file=NULL, append=FALSE)
 {
