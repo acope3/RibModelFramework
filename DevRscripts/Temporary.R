@@ -2,7 +2,7 @@ library(ribModel)
 rm(list=ls())
 
 parameter <- new(RFPParameter)
-parameter <- loadParameterObject(parameter, "RFPObject.Rdat")
+parameter <- loadParameterObject(parameter, "RFPObject.Rdat", "RFP")
 mcmc <- loadMCMCObject("MCMCObject.Rdat")
 
 trace <- parameter$getTraceObject()

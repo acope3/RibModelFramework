@@ -776,8 +776,7 @@ double ROCParameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned ge
 {
 	unsigned expressionCategory = getSynthesisRateCategory(mixtureElement);
 	double posteriorMean = 0.0;
-	std::vector<double> synthesisRateTrace = traces.getSynthesisRateTraceByMixtureElementForGene(mixtureElement,
-																								 geneIndex);
+	std::vector<double> synthesisRateTrace = traces.getSynthesisRateTraceByMixtureElementForGene(mixtureElement, geneIndex);
 	unsigned traceLength = (unsigned)synthesisRateTrace.size();
 
 	if (samples > lastIteration)
@@ -1388,15 +1387,51 @@ void ROCParameter::setCategoriesForTrace()
 // -----------------------------------//
 
 
+std::vector<std::vector<double>> ROCParameter::getProposedMutationParameter()
+{
+	return proposedMutationParameter;
+}
+
+
 std::vector<std::vector<double>> ROCParameter::getCurrentMutationParameter()
 {
 	return currentMutationParameter;
 }
 
 
+std::vector<std::vector<double>> ROCParameter::getProposedSelectionParameter()
+{
+	return proposedSelectionParameter;
+}
+
+
 std::vector<std::vector<double>> ROCParameter::getCurrentSelectionParameter()
 {
 	return currentSelectionParameter;
+}
+
+
+void ROCParameter::setProposedMutationParameter(std::vector<std::vector<double>> _proposedMutationParameter)
+{
+	proposedMutationParameter = _proposedMutationParameter;
+}
+
+
+void ROCParameter::setCurrentMutationParameter(std::vector<std::vector<double>> _currentMutationParameter)
+{
+	currentMutationParameter = _currentMutationParameter;
+}
+
+
+void ROCParameter::setProposedSelectionParameter(std::vector<std::vector<double>> _proposedSelectionParameter)
+{
+	proposedSelectionParameter = _proposedSelectionParameter;
+}
+
+
+void ROCParameter::setCurrentSelectionParameter(std::vector<std::vector<double>> _currentSelectionParameter)
+{
+	currentSelectionParameter = _currentSelectionParameter;
 }
 
 

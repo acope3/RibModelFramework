@@ -72,7 +72,7 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
     parameter$initializeSynthesisRateByList(expressionValues)
   }
   
-  parameter$setMutationPriorStandardDeviation(mutation_prior_sd)
+  parameter$mutation_prior_sd <- (mutation_prior_sd)
   
   numMutationCategory <- parameter$numMutationCategories
   numSelectionCategory <- parameter$numSelectionCategories
@@ -384,13 +384,23 @@ extractBaseInfo <- function(parameter)
 writeParameterObject.Rcpp_ROCParameter <- function(parameter, file)
 {
   paramBase <- extractBaseInfo(parameter)
+  
+  currentMutation <- parameter$currentMutationParameter
+  currentSelection <- parameter$currentSelectionParameter
+  proposedMutation <- parameter$proposedMutationParameter
+  proposedSelection <- parameter$proposedSelectionParameter
+  
   trace <- parameter$getTraceObject()
+  
   mutationTrace <- trace$getMutationParameterTrace()
   selectionTrace <- trace$getSelectionParameterTrace()
   aphiAcceptRatTrace <- trace$getAphiAcceptanceRatioTrace()
   aphiTrace <- trace$getAphiTraces()
   sepisolonTrace <- trace$getSepsilonTraces()
-  save(list = c("paramBase", "mutationTrace", "selectionTrace", 
+  
+  save(list = c("paramBase", "currentMutation", "currentSelection",
+                "proposedMutation", "proposedSelection",  
+                "mutationTrace", "selectionTrace", 
                 "aphiAcceptRatTrace", "aphiTrace", "sepisolonTrace"),
        file=file)
 }
@@ -399,14 +409,17 @@ writeParameterObject.Rcpp_ROCParameter <- function(parameter, file)
 writeParameterObject.Rcpp_RFPParameter <- function(parameter, file)
 {
   paramBase <- extractBaseInfo(parameter)
+  
+  currentAlpha <- parameter$currentAlphaParameter
+  currentLambdaPrime <- parameter$currentLambdaPrimeParameter
+  proposedAlpha <- parameter$proposedAlphaParameter
+  proposedLambdaPrime <- parameter$proposedLambdaPrimeParameter
+  
+  
   trace <- parameter$getTraceObject()
   alphaTrace <- trace$getAlphaParameterTrace()
   lambdaPrimeTrace <- trace$getLambdaPrimeParameterTrace()
-  currentAlpha <- parameter$getCurrentAlphaParameter()
-  currentLambdaPrime <- parameter$getCurrentLambdaPrimeParameter()
-  proposedAlpha <- parameter$getProposedAlphaParameter()
-  proposedLambdaPrime <- parameter$getProposedLambdaPrimeParameter()
-  
+
   save(list = c("paramBase", "currentAlpha", "currentLambdaPrime", "proposedAlpha",
                 "proposedLambdaPrime", "alphaTrace", "lambdaPrimeTrace"),
        file=file)
@@ -473,7 +486,10 @@ loadParameterObject.Rcpp_ROCParameter <- function(parameter, file, model)
 {
   load(file)
   setBaseInfo(parameter, file, model)
-  
+  parameter$currentMutationParameter <- currentMutation
+  parameter$currentSelectionParameter <- currentSelection
+  parameter$proposedMutationParameter <- proposedMutation
+  parameter$proposedSelectionParameter <- proposedSelection
   trace <- parameter$getTraceObject()
   trace$setAphiTrace(aphiTrace)
   trace$setAphiAcceptanceRatioTrace(aphiAcceptRatTrace)
@@ -491,10 +507,10 @@ loadParameterObject.Rcpp_RFPParameter <- function(parameter, file, model)
 {
   load(file)
   setBaseInfo(parameter, file, model)
-  parameter$setCurrentAlphaParameter(currentAlpha)
-  parameter$setProposedAlphaParameter(proposedAlpha)
-  parameter$setCurrentLambdaPrimeParameter(currentLambdaPrime)
-  parameter$setProposedLambdaPrimeParameter(proposedLambdaPrime)
+  parameter$currentAlphaParameter <- currentAlpha
+  parameter$proposedAlphaParameter <- proposedAlpha
+  parameter$currentLambdaPrimeParameter <- currentLambdaPrime
+  parameter$proposedLambdaPrimeParameter <- proposedLambdaPrime
   
   trace <- parameter$getTraceObject()
   trace$setAlphaParameterTrace(alphaTrace)

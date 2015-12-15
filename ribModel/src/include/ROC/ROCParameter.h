@@ -115,7 +115,6 @@ class ROCParameter : public Parameter
 
 
 		//CSP Functions:
-
 		double getCurrentCodonSpecificProposalWidth(unsigned aa);
 		void proposeCodonSpecificParameter();
 		void updateCodonSpecificParameter(std::string grouping);
@@ -187,8 +186,16 @@ class ROCParameter : public Parameter
 
 
 		//CSP Functions:
+		std::vector<std::vector<double>> getProposedMutationParameter();
 		std::vector<std::vector<double>> getCurrentMutationParameter();
+		std::vector<std::vector<double>> getProposedSelectionParameter();
 		std::vector<std::vector<double>> getCurrentSelectionParameter();
+
+
+		void setProposedMutationParameter(std::vector<std::vector<double>> _proposedMutationParameter);
+		void setCurrentMutationParameter(std::vector<std::vector<double>> _currentMutationParameter);
+		void setProposedSelectionParameter(std::vector<std::vector<double>> _proposedSelectionParameter);
+		void setCurrentSelectionParameter(std::vector<std::vector<double>> _currentSelectionParameter);
 
 
 
