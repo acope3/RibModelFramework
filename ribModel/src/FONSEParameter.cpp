@@ -426,6 +426,8 @@ CovarianceMatrix& FONSEParameter::getCovarianceMatrixForAA(std::string aa)
 	return covarianceMatrix[aaIndex];
 }
 
+
+#ifndef STANDALONE
 void FONSEParameter::initSelection(std::vector<double> selectionValues, unsigned mixtureElement, std::string aa)
 {
 	//TODO: seperate out the R wrapper functionality and make the wrapper
@@ -465,6 +467,8 @@ void FONSEParameter::initMutation(std::vector<double> mutationValues, unsigned m
 		}
 	}
 }
+
+#endif
 
 void FONSEParameter::initMutationSelectionCategories(std::vector<std::string> files, unsigned numCategories,
 	unsigned paramType)
@@ -690,7 +694,7 @@ double FONSEParameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned 
 double FONSEParameter::getSphiPosteriorMean(unsigned samples, unsigned mixture)
 {
 	double posteriorMean = 0.0;
-	unsigned selectionCategory = getSelectionCategoryForMixture(mixture);
+	unsigned selectionCategory = getSelectionCategory(mixture);
 	std::vector<double> sPhiTrace = traces.getSphiTrace(selectionCategory);
 	unsigned traceLength = sPhiTrace.size();
 
@@ -740,7 +744,7 @@ std::vector<double> FONSEParameter::getEstimatedMixtureAssignmentProbabilities(u
 
 double FONSEParameter::getSphiVariance(unsigned samples, unsigned mixture, bool unbiased)
 {
-	unsigned selectionCategory = getSelectionCategoryForMixture(mixture);
+	unsigned selectionCategory = getSelectionCategory(mixture);
 	std::vector<double> sPhiTrace = traces.getSphiTrace(selectionCategory);
 	unsigned traceLength = sPhiTrace.size();
 	if (samples > traceLength)
@@ -995,3 +999,7 @@ void FONSEParameter::initMutationSelectionCategoriesR(std::vector<std::string> f
 	}
 }
 
+void FONSEParameter::setTraceObject(FONSETrace _trace)
+{
+    traces = _trace;
+}

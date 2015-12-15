@@ -280,3 +280,49 @@ std::vector<double> Trace::getMixtureProbabilitiesTraceForMixtureR(unsigned mixt
 	return RV;
 }
 
+
+void Trace::setSphiTraces(std::vector<std::vector<double>> _sPhiTrace)
+{
+    sPhiTrace = _sPhiTrace;
+}
+
+
+void Trace::setSphiAcceptanceRatioTrace(std::vector<double> _sphiAcceptanceRatioTrace)
+{
+    sphiAcceptanceRatioTrace = _sphiAcceptanceRatioTrace;
+}
+
+
+void Trace::setSynthesisRateTrace(std::vector<std::vector<std::vector<double>>> _synthesisRateTrace)
+{
+    synthesisRateTrace = _synthesisRateTrace;
+}
+
+
+void Trace::setSynthesisRateAcceptanceRatioTrace(std::vector<std::vector<std::vector<double>>>_synthesisRateAcceptanceRatioTrace)
+{
+    synthesisRateAcceptanceRatioTrace = _synthesisRateAcceptanceRatioTrace;
+}
+
+
+void Trace::setMixtureAssignmentTrace(std::vector<std::vector<unsigned>> _mixtureAssignmentTrace)
+{
+    mixtureAssignmentTrace = _mixtureAssignmentTrace;
+}
+
+
+void Trace::setMixtureProbabilitiesTrace(std::vector<std::vector<double>> _mixtureProbabilitiesTrace)
+{
+    mixtureProbabilitiesTrace = _mixtureProbabilitiesTrace;
+}
+
+
+void Trace::setCspAcceptanceRatioTrace(std::vector<std::vector<double>> _cspAcceptanceRatioTrace)
+{
+    cspAcceptanceRatioTrace = _cspAcceptanceRatioTrace;
+}
+
+void Trace::setCategories(std::vector<mixtureDefinition> &_categories)
+{
+    categories = &_categories;
+}

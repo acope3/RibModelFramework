@@ -19,7 +19,7 @@ parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssig
                                        mixture.definition = mixDef)
 
 # initialize MCMC object
-samples <- 100
+samples <- 30
 thining <- 10
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples=samples, thining=thining, adaptive.width=adaptiveWidth, 
@@ -41,6 +41,7 @@ acf(loglik.trace)
 
 # plots different aspects of trace
 trace <- parameter$getTraceObject()
+writeTraces(parameter, file="FONSETraces.Rdat")
 plot(trace, what = "MixtureProbability")
 plot(trace, what = "SPhi")
 plot(trace, what = "ExpectedPhi")

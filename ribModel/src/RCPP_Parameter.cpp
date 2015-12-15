@@ -15,6 +15,7 @@ RCPP_EXPOSED_CLASS(CovarianceMatrix)
 
 
 
+
 RCPP_MODULE(Parameter_mod)
 {
 	class_<Parameter>(	"Parameter" )
@@ -34,19 +35,28 @@ RCPP_MODULE(Parameter_mod)
 		.method("getCurrentSynthesisRateForMixture", &Parameter::getCurrentSynthesisRateForMixture)
 		.method("getMixtureAssignmentForGene", &Parameter::getMixtureAssignmentForGeneR)
 		.method("getLastIteration", &Parameter::getLastIteration)
-		.method("getGroupList", &Parameter::getGroupList)		
+		.method("getGroupList", &Parameter::getGroupList)	
+		.method("getMixtureAssignment", &Parameter::getMixtureAssignmentR)
+		.method("getSynthesisRate", &Parameter::getSynthesisRateR)
+        .method("getCategories", &Parameter::getCategories)
+        .method("setCategories", &Parameter::setCategories)
+    
 
-		.property("numMutationCategories", &Parameter::getNumMutationCategories)
-		.property("numSelectionCategories", &Parameter::getNumSelectionCategories)
-		.property("numMixtures", &Parameter::getNumMixtureElements)
+
+		.property("numMutationCategories", &Parameter::getNumMutationCategories, &Parameter::setNumMutationCategories)
+		.property("numSelectionCategories", &Parameter::getNumSelectionCategories, &Parameter::setNumSelectionCategories)
+		.property("numMixtures", &Parameter::getNumMixtureElements, &Parameter::setNumMixtureElements)
 		;
 
 
 	class_<ROCParameter>( "ROCParameter" )
 		.derives<Parameter>("Parameter")
+        .constructor()
 		.constructor <std::string>()
 		.constructor <std::vector<double>, std::vector<unsigned>, std::vector<unsigned>, bool>()
 		.constructor <std::vector<double>, unsigned, std::vector<unsigned>, bool, std::string>()
+
+
 		.method("initSelection", &ROCParameter::initSelection)
 		.method("initMutation", &ROCParameter::initMutation)
 		.method("getTraceObject", &ROCParameter::getTraceObject)
@@ -71,11 +81,13 @@ RCPP_MODULE(Parameter_mod)
 
 		.method("getMutationVarianceForCodon", &ROCParameter::getMutationVarianceForCodon)
 		.method("getSelectionVarianceForCodon", &ROCParameter::getSelectionVarianceForCodon)
-
+        .method("setROCTrace", &ROCParameter::setTraceObject)
+		.method("setCategoriesForTrace", &ROCParameter::setCategoriesForTrace)
 		;
 
 	class_<RFPParameter>( "RFPParameter" )
 		.derives<Parameter>("Parameter")
+        .constructor()
 		.constructor <std::string>()
 		.constructor <std::vector<double>, std::vector<unsigned>, std::vector<unsigned>, bool>()
 		.constructor <std::vector<double>, unsigned, std::vector<unsigned>, bool, std::string>()
@@ -89,7 +101,16 @@ RCPP_MODULE(Parameter_mod)
 		.method("getLambdaPrimePosteriorMeanForCodon", &RFPParameter::getLambdaPrimePosteriorMeanForCodon)
 		.method("getAlphaVarianceForCodon", &RFPParameter::getAlphaVarianceForCodon)
 		.method("getLambdaPrimeVarianceForCodon", &RFPParameter::getLambdaPrimeVarianceForCodon)
-		.method("getTmpTrace", &RFPParameter::getTmp)
+        .method("getProposedAlphaParameter", &RFPParameter::getProposedAlphaParameter)
+        .method("getProposedLambdaPrimeParameter", &RFPParameter::getProposedLambdaPrimeParameter)
+        .method("getCurrentAlphaParameter", &RFPParameter::getCurrentAlphaParameter)
+        .method("getCurrentLambdaPrimeParameter", &RFPParameter::getCurrentLambdaPrimeParameter)
+        .method("setCurrentAlphaParameter", &RFPParameter::setCurrentAlphaParameter)
+        .method("setProposedAlphaParameter", &RFPParameter::setProposedAlphaParameter)
+        .method("setCurrentLambdaPrimeParameter", &RFPParameter::setCurrentLambdaPrimeParameter)
+        .method("setProposedLambdaPrimeParameter", &RFPParameter::setProposedLambdaPrimeParameter)
+        .method("setRFPTrace", &RFPParameter::setTraceObject)
+        .method("setCategoriesForTrace", &RFPParameter::setCategoriesForTrace)
 		;
 
 	class_<FONSEParameter>("FONSEParameter")
@@ -101,6 +122,7 @@ RCPP_MODULE(Parameter_mod)
 		.method("initSelection", &FONSEParameter::initSelection)
 		.method("initMutation", &FONSEParameter::initMutation)
 		.method("getTraceObject", &FONSEParameter::getTraceObject)
+        .method("setFONSETrace", &FONSEParameter::setTraceObject)
 
 		//R wrapper functions
 		.method("calculateSelectionCoefficients", &FONSEParameter::calculateSelectionCoefficientsR)

@@ -28,6 +28,10 @@ public:
 	std::vector <double> getMutationParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon);
 	std::vector <double> getSelectionParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon);
 
+	std::vector<std::vector<std::vector<double>>> getMutationParameterTrace();
+	std::vector<std::vector<std::vector<double>>> getSelectionParameterTrace();
+
+
 	unsigned getMutationCategory(unsigned mixtureElement) { return categories->at(mixtureElement).delM; }
 	unsigned getSelectionCategory(unsigned mixtureElement) { return categories->at(mixtureElement).delEta; }
 	//Update functions	

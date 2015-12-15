@@ -541,7 +541,7 @@ void PANSEParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
 double PANSEParameter::getSphiPosteriorMean(unsigned samples, unsigned mixture)
 {
 	double posteriorMean = 0.0;
-	unsigned selectionCategory = getSelectionCategoryForMixture(mixture);
+	unsigned selectionCategory = getSelectionCategory(mixture);
 	std::vector<double> sPhiTrace = traces.getSphiTrace(selectionCategory);
 	unsigned traceLength = (unsigned)sPhiTrace.size();
 
@@ -639,7 +639,7 @@ double PANSEParameter::getLambdaPrimePosteriorMean(unsigned mixtureElement, unsi
 //TODO: Traces prevent this from being in the parent class
 double PANSEParameter::getSphiVariance(unsigned samples, unsigned mixture, bool unbiased)
 {
-	unsigned selectionCategory = getSelectionCategoryForMixture(mixture);
+	unsigned selectionCategory = getSelectionCategory(mixture);
 	std::vector<double> sPhiTrace = traces.getSphiTrace(selectionCategory);
 	unsigned traceLength = (unsigned)sPhiTrace.size();
 	if(samples > traceLength)
@@ -812,6 +812,7 @@ const unsigned PANSEParameter::lmPri = 1u;
 
 //---------------------R WRAPPER FUNCTIONS---------------------//
 
+#ifndef STANDALONE
 void PANSEParameter::initAlphaR(double alphaValue, unsigned mixtureElement, std::string codon)
 {
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
@@ -866,7 +867,7 @@ double PANSEParameter::getParameterForCategoryR(unsigned mixtureElement, unsigne
 	}
 	return rv;
 }
-
+#endif
 
 void PANSEParameter::initMutationSelectionCategoriesR(std::vector<std::string> files, unsigned numCategories,
 													std::string paramType)
@@ -899,7 +900,7 @@ void PANSEParameter::initMutationSelectionCategoriesR(std::vector<std::string> f
 	}
 }
 
-
+#ifndef STANDALONE
 double PANSEParameter::getAlphaPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
 {
 	double rv = -1.0;
@@ -957,6 +958,7 @@ double PANSEParameter::getLambdaPrimeVarianceForCodon(unsigned mixtureElement, u
 	}
 	return rv;
 }
+#endif
 
 
 #ifndef STANDALONE
