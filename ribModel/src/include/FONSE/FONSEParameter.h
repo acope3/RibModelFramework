@@ -31,12 +31,10 @@ class FONSEParameter : public Parameter
 		std::vector <unsigned> numAcceptForMutationAndSelection;
 		double bias_csp;
 		std::vector <double> std_csp;
+		double mutation_prior_sd;
 
 
 		std::vector <double> propose(std::vector <double> currentParam, double(*proposal)(double a, double b), double A, std::vector <double> B);
-
-
-
 
 	public:
 		static const unsigned dM;
@@ -62,9 +60,9 @@ class FONSEParameter : public Parameter
 		void writeEntireRestartFile(std::string filename);
 		void writeFONSERestartFile(std::string filename);
 		void initFromRestartFile(std::string filename);
-
 		void initAllTraces(unsigned samples, unsigned num_genes);
-		void initMutationSelectionCategories(std::vector <std::string> files, unsigned numCategories, unsigned paramType);
+		void initMutationCategories(std::vector<std::string> files, unsigned numCategories);
+		void initSelectionCategories(std::vector<std::string> files, unsigned numCategories);
 
 
 
@@ -76,6 +74,8 @@ class FONSEParameter : public Parameter
 		virtual void updateMixtureProbabilitiesTrace(unsigned samples);
 		void updateCodonSpecificParameterTrace(unsigned sample, std::string grouping);
 
+		double getMutationPriorStandardDeviation() { return mutation_prior_sd; }
+		void setMutationPriorStandardDeviation(double _mutation_prior_sd) { mutation_prior_sd = _mutation_prior_sd; }
 
 
 		//Covariance Functions:

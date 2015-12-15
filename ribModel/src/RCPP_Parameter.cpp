@@ -202,9 +202,12 @@ RCPP_MODULE(Parameter_mod)
 		//Initialization, Restart, Index Checking:
 		.method("initCovarianceMatrix", &FONSEParameter::initCovarianceMatrix)
 		.method("getCovarianceMatrixForAA", &FONSEParameter::getCovarianceMatrixForAA) //Not an R wrapper
-		.method("initMutation", &FONSEParameter::initMutation)
+
 		.method("initSelection", &FONSEParameter::initSelection)
-		.method("initMutationSelectionCategories", &FONSEParameter::initMutationSelectionCategoriesR)
+		.method("initMutation", &FONSEParameter::initMutation)
+		.method("initMutationCategories", &FONSEParameter::initMutationCategories)
+		.method("initSelectionCategories", &FONSEParameter::initSelectionCategories)
+		.method("getTraceObject", &FONSEParameter::getTraceObject)
 
 
 

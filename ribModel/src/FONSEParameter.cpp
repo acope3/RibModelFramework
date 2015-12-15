@@ -106,6 +106,7 @@ FONSEParameter::~FONSEParameter()
 
 void FONSEParameter::initFONSEParameterSet()
 {
+	mutation_prior_sd = 0.35;
 	groupList = { "A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "P", "Q", "R", "S", "T", "V", "Y", "Z" };
 	// proposal bias and std for codon specific parameter
 	bias_csp = 0;
@@ -337,72 +338,75 @@ void FONSEParameter::initAllTraces(unsigned samples, unsigned num_genes)
 						 numMixtures, categories, maxGrouping);
 }
 
-
-void FONSEParameter::initMutationSelectionCategories(std::vector<std::string> files, unsigned numCategories,
-													 unsigned paramType)
+void FONSEParameter::initMutationCategories(std::vector<std::string> files, unsigned numCategories)
 {
-	//should noise be a variable?
-	unsigned i, j;
-	std::size_t pos, pos2;
-	std::ifstream currentFile;
-	std::string tmpString;
-	std::string type;
-	if (paramType == FONSEParameter::dM)
-		type = "mu";
-	else
-		type = "eta";
-
-	for (i = 0; i < numCategories; i++)
+	for (unsigned category = 0; category < numCategories; category++)
 	{
-		std::vector<double> temp(numParam, 0.0);
-
-		//open the file, make sure it opens
-		currentFile.open(files[i].c_str());
+		//Open the file for the category
+		std::ifstream currentFile;
+		currentFile.open(files[category].c_str());
 		if (currentFile.fail())
 		{
-			std::cerr << "Error opening file " << i << " in the file vector.\n";
+			std::cerr << "Error opening file " << category << " to initialize mutation values.\n";
 			std::exit(1);
 		}
-		currentFile >> tmpString; //trash the first line, no info given.
 
-		j = 0;
-		while (currentFile >> tmpString)
+		std::string tmp;
+		currentFile >> tmp; //The first line is a header (Amino Acid, Codon, Value, Std_deviation)
+
+		while (currentFile >> tmp)
 		{
-			pos = tmpString.find(",");
-			pos2 = tmpString.find(",", pos + 1);
-			if (pos != std::string::npos && pos2 != std::string::npos)
-			{
-				std::string val = tmpString.substr(pos + 1, pos2 - (pos + 1));
-				if (tmpString.find(type) != std::string::npos) //mu or eta was found, depending on category
-				{
-					temp[j] = std::atof(val.c_str()); //std::stod(val);
-					//					temp[j] = randNorm(temp[j], 0.3);
-					j++;
-					if (j == numParam)
-						break;
-				}
-			}
-		}
-		unsigned altered = 0u;
-		for (j = 0; j < categories.size(); j++)
-		{
-			if (paramType == FONSEParameter::dM && categories[j].delM == i)
-			{
-				currentMutationParameter[j] = temp;
-				proposedMutationParameter[j] = temp;
-				altered++;
-			}
-			else if (paramType == FONSEParameter::dOmega && categories[j].delEta == i)
-			{
-				currentSelectionParameter[j] = temp;
-				proposedSelectionParameter[j] = temp;
-				altered++;
-			}
-			if (altered == numCategories)
-				break; //to not access indicies out of bounds.
+			//Get the Codon and Index
+			std::size_t pos = tmp.find(",", 2); //Amino Acid and a comma will always be the first 2 characters
+			std::string codon = tmp.substr(2, pos - 2);
+			unsigned codonIndex = SequenceSummary::codonToIndex(codon, true);
+
+			//get the value to store
+			std::size_t pos2 = tmp.find(",", pos + 1);
+			//std::cout << tmp.substr(pos + 1, pos2 - pos - 1 ) <<"\n";
+			double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
+
+			currentMutationParameter[category][codonIndex] = value;
+			proposedMutationParameter[category][codonIndex] = value;
 		}
 		currentFile.close();
-	}
+	} //END OF A CATEGORY/FILE
+}
+
+
+void FONSEParameter::initSelectionCategories(std::vector<std::string> files, unsigned numCategories)
+{
+	for (unsigned category = 0; category < numCategories; category++)
+	{
+		//Open the file for the category
+		std::ifstream currentFile;
+		currentFile.open(files[category].c_str());
+		if (currentFile.fail())
+		{
+			std::cerr << "Error opening file " << category << " to initialize mutation values.\n";
+			std::exit(1);
+		}
+
+		std::string tmp;
+		currentFile >> tmp; //The first line is a header (Amino Acid, Codon, Value, Std_deviation)
+
+		while (currentFile >> tmp)
+		{
+			//Get the Codon and Index
+			std::size_t pos = tmp.find(",", 2); //Amino Acid and a comma will always be the first 2 characters
+			std::string codon = tmp.substr(2, pos - 2);
+			unsigned codonIndex = SequenceSummary::codonToIndex(codon, true);
+
+			//get the value to store
+			std::size_t pos2 = tmp.find(",", pos + 1);
+			//	std::cout << tmp.substr(pos + 1, pos2 - pos - 1 ) <<"\n";
+			double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
+
+			currentSelectionParameter[category][codonIndex] = value;
+			proposedSelectionParameter[category][codonIndex] = value;
+		}
+		currentFile.close();
+	} //END OF A CATEGORY/FILE
 }
 
 
@@ -1082,6 +1086,7 @@ void FONSEParameter::initCovarianceMatrix(SEXP _matrix, std::string aa)
 	covarianceMatrix[aaIndex] = m;
 }
 
+<<<<<<< HEAD
 
 void FONSEParameter::initMutation(std::vector<double> mutationValues, unsigned mixtureElement, std::string aa)
 {
@@ -1155,6 +1160,8 @@ void FONSEParameter::initMutationSelectionCategoriesR(std::vector<std::string> f
 		initMutationSelectionCategories(files, numCategories, value);
 	}
 }
+=======
+>>>>>>> 7d2da23b3b23ef26c5bb022fcea657bb9ae5b52d
 
 
 

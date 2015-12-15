@@ -7,7 +7,7 @@
 
 #include <cstdlib>
 #include <sstream>
-
+#include <chrono>
 #include <iostream>
 #include <fstream>
 #include <stdlib.h> //can be removed later
@@ -348,6 +348,9 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	model.initTraces(samples + 1, genome.getGenomeSize()); //Samples + 2 so we can store the starting and ending values.
 	// starting the MCMC
 
+	model.updateTracesWithInitialValues(genome);
+
+
 	std::cout << "entering MCMC loop" << std::endl;
 	std::cout << "\tEstimate Codon Specific Parameters? " << (estimateCodonSpecificParameter ? "TRUE" : "FALSE") << std::endl;
 	std::cout << "\tEstimate Hyper Parameters? " << (estimateHyperParameter ? "TRUE" : "FALSE") << std::endl;
@@ -356,6 +359,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	// set the last iteration to the max iterations, this way if the MCMC doesn't exit based on Geweke score, it will use the max iteration for posterior means
 	model.setLastIteration(samples);
 	std::cout << "\tStarting MCMC with " << maximumIterations << " iterations\n";
+	//std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 	for(unsigned iteration = 1u; iteration <= maximumIterations; iteration++)
 	{
 		if (writeRestartFile)
@@ -440,6 +444,10 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	} // end MCMC loop
 
 	std::cout << "leaving MCMC loop" << std::endl;
+	//std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+	//std::chrono::duration<int> time_span = std::chrono::duration_cast<std::chrono::duration<int>> (t2 - t1);
+	//std::cout << "The MCMC took " << (unsigned) time_span.count() / 3600 << " hours, " << (unsigned) (time_span.count() / 60) % 60 << 
+		//" minutes, and " << (unsigned) time_span.count() % 60 << " seconds." << std::endl;
 	//NOTE: The following files used to be written here:
 	//selectionParamTrace_#.csv
 	//phiTrace_nmix_#.csv
