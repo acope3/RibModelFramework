@@ -1,5 +1,8 @@
 #include "include/Gene.h"
-
+#ifndef STANDALONE
+#include <Rcpp.h>
+using namespace Rcpp;
+#endif
 
 #include <iostream>
 
@@ -19,8 +22,12 @@ Gene::Gene(std::string _seq, std::string _id, std::string _desc) : seq(_seq), id
 	}
 	else 
 	{
+#ifndef STANDALONE
+		Rf_warning("Gene: %s has sequence length NOT multiple of 3 after cleaning of the sequence!\nGene data is NOT processed! \nValid characters are A,C,T,G, and N \n", id.c_str());
+#else
 		std::cerr << "Gene: " << id << " has sequence length NOT multiple of 3 after cleaning of the sequence!" <<
 				"\nGene data is NOT processed! \nValid characters are A,C,T,G, and N \n";
+#endif
 	}
 }
 
@@ -104,13 +111,21 @@ void Gene::setSequence(std::string _seq)
 		bool check = geneData.processSequence(seq);
 		if (!check)
 		{
-			std::cerr <<"Error with gene " << id <<"\nBad codons found!\n";
+#ifndef STANDALONE
+			Rf_warning("Error with gene %s\nBad codons found!\n", id.c_str());
+#else
+			std::cerr << "Error with gene " << id << "\nBad codons found!\n";
+#endif
 		}
 	}
 	else
 	{
+#ifndef STANDALONE
+		Rf_warning("Gene: %s has sequence length NOT multiple of 3 after cleaning of the sequence!\nGene data is NOT processed! \nValid characters are A,C,T,G, and N \n", id.c_str());
+#else
 		std::cerr << "Gene: " << id << " has sequence length NOT multiple of 3 after cleaning of the sequence!" <<
 				"\nGene data is NOT processed! \nValid characters are A,C,T,G, and N \n";
+#endif
 	}
 }
 
@@ -221,8 +236,8 @@ std::vector <unsigned> *Gene::getCodonPositions(std::string codon)
 // ----------------------------- RCPP STUFF ----------------------------------
 // ---------------------------------------------------------------------------
 #ifndef STANDALONE
-#include <Rcpp.h>
-using namespace Rcpp;
+//#include <Rcpp.h>
+//using namespace Rcpp;
 
 RCPP_EXPOSED_CLASS(Gene) //Exposed because of functions that return a gene.
 RCPP_EXPOSED_CLASS(SequenceSummary)

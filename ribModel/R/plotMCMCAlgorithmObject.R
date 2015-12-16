@@ -1,8 +1,8 @@
 
 
-plot.Rcpp_MCMCAlgorithm <- function(mcmc, ...)
+plot.Rcpp_MCMCAlgorithm <- function(x, ...)
 {
-  loglik.trace <- mcmc$getLogLikelihoodTrace()
+  loglik.trace <- x$getLogLikelihoodTrace()
   
   loglik.trace <- loglik.trace[-1]
   

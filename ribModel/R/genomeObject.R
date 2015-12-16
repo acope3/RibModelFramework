@@ -17,12 +17,12 @@ initializeGenomeObject <- function(file, fasta=TRUE, expression.file=NULL, appen
   return(genome)
 }
 
-length.Rcpp_Genome <- function(genome)
+length.Rcpp_Genome <- function(x)
 {
-  return(genome$getGenomeSize())
+  return(x$getGenomeSize())
 }
 
-summary.Rcpp_Genome <- function(genome)
+summary.Rcpp_Genome <- function(object, ...)
 {
   # TODO output stuff like:
   # - no. of genes
@@ -30,4 +30,5 @@ summary.Rcpp_Genome <- function(genome)
   # - avg. A,C,G,T content
   # - avg. AA composition
   # - ...
+  summary(object, ...)
 }

@@ -177,7 +177,11 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 
 		if (std::isinf(logLikelihood))
 		{
+#ifndef STANDALONE
+			Rprintf("\tInfinity reached (Gene: %d)\n", i);
+#else
 			std::cout << "\tInfinity reached (Gene: " << i << ")\n";
+#endif
 		}
 
 		// Get category in which the gene is placed in.
@@ -228,7 +232,11 @@ void MCMCAlgorithm::acceptRejectHyperParameter(Genome &genome, Model& model, int
 	{
 		if (!std::isfinite(logProbabilityRatios[i]))
 		{
+#ifndef STANDALONE
+			Rprintf("logProbabilityRatio %d not finite!\n", i);
+#else
 			std::cout << "logProbabilityRatio " << i << " not finite!\n";
+#endif
 		}
 
 		if (-Parameter::randExp(1) < logProbabilityRatios[i])
@@ -276,7 +284,11 @@ void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned
 
 
 	// NOTE: IF PRIORS ARE ADDED, TAKE INTO ACCOUNT HERE!
+#ifndef STANDALONE
+	Rprintf("Allowing divergence from initial conditions for %d iterations.\n\n", divergenceIterations);
+#else
 	std::cout << "Allowing divergence from initial conditions for " << divergenceIterations << " iterations.\n" << std::endl;
+#endif
 	// divergence from initial conditions is not stored in trace
 
 	// how many steps do you want to walk "away" from the initial conditions
@@ -349,24 +361,35 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	// starting the MCMC
 
 	model.updateTracesWithInitialValues(genome);
+#ifndef STANDALONE
+	Rprintf("entering MCMC loop\n");
+	Rprintf("\tEstimate Codon Specific Parameters? %s \n", (estimateCodonSpecificParameter ? "TRUE" : "FALSE") );
+	Rprintf("\tEstimate Hyper Parameters? %s \n", (estimateCodonSpecificParameter ? "TRUE" : "FALSE") );
+	Rprintf("\tEstimate Synthesis rates? %s \n", (estimateCodonSpecificParameter ? "TRUE" : "FALSE") );
+	Rprintf("\tStarting MCMC with %d iterations\n", maximumIterations);
 
-
+#else
 	std::cout << "entering MCMC loop" << std::endl;
 	std::cout << "\tEstimate Codon Specific Parameters? " << (estimateCodonSpecificParameter ? "TRUE" : "FALSE") << std::endl;
 	std::cout << "\tEstimate Hyper Parameters? " << (estimateHyperParameter ? "TRUE" : "FALSE") << std::endl;
-	std::cout << "\tEstimate SynthesisRate Parameters? " << (estimateSynthesisRate ? "TRUE" : "FALSE") << std::endl;
+	std::cout << "\tEstimate Synthesis rates? " << (estimateSynthesisRate ? "TRUE" : "FALSE") << std::endl;
+	std::cout << "\tStarting MCMC with " << maximumIterations << " iterations\n";
+#endif
+
 
 	// set the last iteration to the max iterations, this way if the MCMC doesn't exit based on Geweke score, it will use the max iteration for posterior means
 	model.setLastIteration(samples);
-	std::cout << "\tStarting MCMC with " << maximumIterations << " iterations\n";
-	//std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 	for(unsigned iteration = 1u; iteration <= maximumIterations; iteration++)
 	{
 		if (writeRestartFile)
 		{
 			if ((iteration) % fileWriteInterval  == 0u)
 			{
-				std::cout <<"Writing restart file!\n";
+#ifndef STANDALONE
+				Rprintf("Writing restart file!\n");
+#else
+				std::cout << "Writing restart file!\n";
+#endif
 				if (multipleFiles)
 				{
 					std::ostringstream oss;
@@ -382,12 +405,21 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 		}
 		if( (iteration) % 100u == 0u)
 		{
+#ifndef STANDALONE
+			Rprintf("Status at iteration %d \n", iteration);
+			Rprintf("\t current logLikelihood: %f \n", likelihoodTrace[(iteration/thining) - 1] );
+#else
 			std::cout << "Status at iteration " << (iteration) << std::endl;
 			std::cout << "\t current logLikelihood: " << likelihoodTrace[(iteration/thining) - 1] << std::endl;
+#endif
 			model.printHyperParameters();
 			for(unsigned i = 0u; i < model.getNumMixtureElements(); i++)
 			{
+#ifndef STANDALONE
+				Rprintf("\t current Mixture element probability for element %d: %f\n", i, model.getCategoryProbability(i));
+#else
 				std::cout << "\t current Mixture element probability for element " << i << ": " << model.getCategoryProbability(i) << std::endl;
+#endif
 			}
 		}
 		if(estimateCodonSpecificParameter) 
@@ -429,21 +461,34 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 		if( ( (iteration) % (50*adaptiveWidth)) == 0u)
 		{
 			double gewekeScore = calculateGewekeScore(iteration/thining);
+#ifndef STANDALONE
+			Rprintf("##################################################\n");
+			Rprintf("Geweke Score after %d iterations: %f\n", iteration, gewekeScore);
+			Rprintf("##################################################\n");
+#else
 			std::cout << "##################################################" << "\n";
 			std::cout << "Geweke Score after " << iteration << " iterations: " << gewekeScore << "\n";
 			std::cout << "##################################################" << "\n";
+#endif
 
 			if(std::abs(gewekeScore) < 1.96)
 			{
+#ifndef STANDALONE
+				Rprintf("Stopping run based on convergence after %d iterations\n\n", iteration);
+#else
 				std::cout << "Stopping run based on convergence after " << iteration << " iterations\n" << std::endl;
+#endif
 				// Comment out this break to keep the run from stopping on convergence
 				model.setLastIteration(iteration/thining);
 				//break;
 			}
 		}
 	} // end MCMC loop
-
+#ifndef STANDALONE
+	Rprintf("leaving MCMC loop\n");
+#else
 	std::cout << "leaving MCMC loop" << std::endl;
+#endif
 	//std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 	//std::chrono::duration<int> time_span = std::chrono::duration_cast<std::chrono::duration<int>> (t2 - t1);
 	//std::cout << "The MCMC took " << (unsigned) time_span.count() / 3600 << " hours, " << (unsigned) (time_span.count() / 60) % 60 << 
@@ -630,9 +675,13 @@ double MCMCAlgorithm::getLogLikelihoodPosteriorMean(unsigned _samples)
 
 	if(_samples > traceLength)
 	{
+#ifndef STANDALONE
+		Rf_warning("Warning in MCMCAlgorithm::getLogLikelihoodPosteriorMean throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n", _samples, traceLength);
+#else
 		std::cerr << "Warning in MCMCAlgorithm::getLogLikelihoodPosteriorMean throws: Number of anticipated samples (" <<
 			_samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
 		_samples = traceLength;
+#endif
 	}
 	unsigned start = traceLength - _samples;
 	for(unsigned i = start; i < traceLength; i++)

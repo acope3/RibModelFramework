@@ -4,107 +4,107 @@
 # additional arguments are geneIndex, and category to index function like
 # getExpressionTraceForGene or plotCodonSpecificParameters
 
-plot.Rcpp_RFPTrace <- function(trace, what=c("Alpha", "LambdaPrime", "MixtureProbability" ,"Sphi", "Mphi", "ExpectedPhi", "Expression"), 
+plot.Rcpp_RFPTrace <- function(x, what=c("Alpha", "LambdaPrime", "MixtureProbability" ,"Sphi", "Mphi", "ExpectedPhi", "Expression"), 
                                geneIndex=1, mixture = 1, ...)
 {
   if(what[1] == "Alpha")
   {
-    plotCodonSpecificParameters(trace, mixture, "alpha", main="Alpha Parameter Traces", ROC=FALSE)
+    plotCodonSpecificParameters(x, mixture, "alpha", main="Alpha Parameter Traces", ROC=FALSE)
   }
   if(what[1] == "LambdaPrime")
   {
-    plotCodonSpecificParameters(trace, mixture, "lambdaPrime", main="LambdaPrime Parameter Traces", ROC=FALSE)
+    plotCodonSpecificParameters(x, mixture, "lambdaPrime", main="LambdaPrime Parameter Traces", ROC=FALSE)
   }  
   if(what[1] == "MixtureProbability")
   {
-    plotMixtureProbability(trace)
+    plotMixtureProbability(x)
   }
   if(what[1] == "Sphi")
   {
-    plotHyperParameterTrace(trace, what = what[1])
+    plotHyperParameterTrace(x, what = what[1])
   }
   if(what[1] == "Mphi") 
   {
-    plotHyperParameterTrace(trace, what = what[1])
+    plotHyperParameterTrace(x, what = what[1])
   }
   if(what[1] == "ExpectedPhi")
   {
-    plotExpectedPhiTrace(trace)
+    plotExpectedPhiTrace(x)
   }
   if(what[1] == "Expression")
   {
-    plotExpressionTrace(trace, geneIndex)
+    plotExpressionTrace(x, geneIndex)
   }
 }
 
 # The `which' variable is the number of the trace to be plotted for Aphi and Sepsilon
-plot.Rcpp_ROCTrace <- function(trace, what=c("Mutation", "Selection", "MixtureProbability" ,"Sphi", "Mphi", "Aphi", "Sepsilon", "ExpectedPhi", "Expression"), 
+plot.Rcpp_ROCTrace <- function(x, what=c("Mutation", "Selection", "MixtureProbability" ,"Sphi", "Mphi", "Aphi", "Sepsilon", "ExpectedPhi", "Expression"), 
                                    geneIndex=1, mixture = 1, ...)
 {
   if(what[1] == "Mutation")
   {
-    plotCodonSpecificParameters(trace, mixture, "mutation", main="Mutation Parameter Traces")
+    plotCodonSpecificParameters(x, mixture, "mutation", main="Mutation Parameter Traces")
   }
   if(what[1] == "Selection")
   {
-    plotCodonSpecificParameters(trace, mixture, "selection", main="Selection Parameter Traces")
+    plotCodonSpecificParameters(x, mixture, "selection", main="Selection Parameter Traces")
   }  
   if(what[1] == "MixtureProbability")
   {
-    plotMixtureProbability(trace)
+    plotMixtureProbability(x)
   }
   if(what[1] == "Sphi")
   {
-    plotHyperParameterTrace(trace, what = what[1])
+    plotHyperParameterTrace(x, what = what[1])
   }
   if(what[1] == "Mphi") 
   {
-    plotHyperParameterTrace(trace, what = what[1])
+    plotHyperParameterTrace(x, what = what[1])
   }
   if(what[1] == "Aphi")
   {
-    plotHyperParameterTrace(trace, what = what[1])
+    plotHyperParameterTrace(x, what = what[1])
   }
   if(what[1] == "Sepsilon") 
   {
-    plotHyperParameterTrace(trace, what = what[1])
+    plotHyperParameterTrace(x, what = what[1])
   }
   if(what[1] == "ExpectedPhi")
   {
-    plotExpectedPhiTrace(trace)
+    plotExpectedPhiTrace(x)
   }
   if(what[1] == "Expression")
   {
-    plotExpressionTrace(trace, geneIndex)
+    plotExpressionTrace(x, geneIndex)
   }
 }
 
-plot.Rcpp_FONSETrace <- function(trace, what=c("Mutation", "Selection", "MixtureProbability" ,"SPhi", "ExpectedPhi", "Expression"), 
+plot.Rcpp_FONSETrace <- function(x, what=c("Mutation", "Selection", "MixtureProbability" ,"SPhi", "ExpectedPhi", "Expression"), 
                                geneIndex=1, mixture = 1, ...)
 {
   if(what[1] == "Mutation")
   {
-    plotCodonSpecificParameters(trace, mixture, "mutation", main="Mutation Parameter Traces")
+    plotCodonSpecificParameters(x, mixture, "mutation", main="Mutation Parameter Traces")
   }
   if(what[1] == "Selection")
   {
-    plotCodonSpecificParameters(trace, mixture, "selection", main="Selection Parameter Traces")
+    plotCodonSpecificParameters(x, mixture, "selection", main="Selection Parameter Traces")
   }  
   if(what[1] == "MixtureProbability")
   {
-    plotMixtureProbability(trace)
+    plotMixtureProbability(x)
   }
   if(what[1] == "SPhi")
   {
-    plotHyperParameterTrace(trace, what = what[1])
+    plotHyperParameterTrace(x, what = what[1])
   }
   if(what[1] == "ExpectedPhi")
   {
-    plotExpectedPhiTrace(trace)
+    plotExpectedPhiTrace(x)
   }
   if(what[1] == "Expression")
   {
-    plotExpressionTrace(trace, geneIndex)
+    plotExpressionTrace(x, geneIndex)
   }
 }
 
@@ -191,9 +191,9 @@ plotCodonSpecificParameters <- function(trace, mixture, type="mutation", main="M
          xlab = "Samples", ylab = ylab, main = main.aa)
     plot.order <- order(apply(cur.trace, 2, sd), decreasing = TRUE)
     for(i.codon in plot.order){
-      lines(x = x, y = cur.trace[, i.codon], col = ribModel:::.codonColors[[codons[i.codon]]])
+      lines(x = x, y = cur.trace[, i.codon], col = .codonColors[[codons[i.codon]]])
     }
-    colors <- unlist(ribModel:::.codonColors[codons])
+    colors <- unlist(.codonColors[codons])
     legend("topleft", legend = codons, col = colors, 
            lty = rep(1, length(codons)), bty = "n", cex = 0.75)
   }
@@ -226,10 +226,10 @@ plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sep
     plot(NULL, NULL, type="l", xlab = "Sample", ylab = expression("s"[phi]), xlim  = xlimit, ylim = ylimit)
     for(i in 1:ncol(sphi))
     {
-      lines(sphi[-1,i], col= ribModel:::.mixtureColors[i])
+      lines(sphi[-1,i], col = .mixtureColors[i])
     }
     legend("topleft", legend = paste("Mixture Element", 1:numMixtures), 
-           col = ribModel:::.mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")
+           col = .mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")
   }
   if (what[1] == "Mphi")
   {
@@ -242,10 +242,10 @@ plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sep
     plot(NULL, NULL, type="l", xlab = "Sample", ylab = expression("m"[phi]), xlim  = xlimit, ylim = ylimit)
     for(i in 1:ncol(mphi))
     {
-      lines(mphi[-1,i], col= ribModel:::.mixtureColors[i])
+      lines(mphi[-1,i], col= .mixtureColors[i])
     }
     legend("topleft", legend = paste("Mixture Element", 1:numMixtures), 
-           col = ribModel:::.mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")    
+           col = .mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")    
 
   }
   if (what[1] == "Aphi") 
@@ -257,10 +257,10 @@ plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sep
     plot(NULL, NULL, type="l", xlab = "Sample", ylab = expression("A"[phi]), xlim  = xlimit, ylim = ylimit)
     for(i in 1:ncol(aphi))
     {
-      lines(aphi[-1,i], col= ribModel:::.mixtureColors[i])
+      lines(aphi[-1,i], col = .mixtureColors[i])
     }
     legend("topleft", legend = paste("Observed Data", 1:numMixtures), 
-           col = ribModel:::.mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")        
+           col = .mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")        
   }
   if (what[1] == "Sepsilon")
   {
@@ -271,10 +271,10 @@ plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sep
     plot(NULL, NULL, type="l", xlab = "Sample", ylab = expression("s"[epsilon]), xlim  = xlimit, ylim = ylimit)
     for(i in 1:ncol(sepsilon))
     {
-      lines(sepsilon[-1,i], col= ribModel:::.mixtureColors[i])
+      lines(sepsilon[-1,i], col = .mixtureColors[i])
     }
     legend("topleft", legend = paste("Observed Data", 1:numMixtures), 
-           col = ribModel:::.mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")  
+           col = .mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")  
   }
   #par(opar)
 }
@@ -286,8 +286,8 @@ plotMixtureProbability <- function(trace)
   plot(NULL, NULL, xlim = c(0, samples), ylim=c(0, 1), xlab = "Samples", ylab="Mixture Probability")
   for(i in 1:numMixtures)
   {
-    lines(trace$getMixtureProbabilitiesTraceForMixture(i)[-1], col= ribModel:::.mixtureColors[i])    
+    lines(trace$getMixtureProbabilitiesTraceForMixture(i)[-1], col = .mixtureColors[i])    
   }
   legend("topleft", legend = paste("Mixture Element", 1:numMixtures), 
-         col = ribModel:::.mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")
+         col = .mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")
 }

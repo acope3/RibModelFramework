@@ -97,10 +97,10 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
       parameter$initMutation(csp$coef.mat[1,], mixElement, aa)
       parameter$initSelection(csp$coef.mat[2,], mixElement, aa)
       # split matrix into sup matrices (dM and dEta)
-      covmat[[mixElement]] <- split.matrix(t(csp$R) %*% csp$R, numCodons, numCodons)  # we expect the covariance matrix, but get the decomposition.
+      covmat[[mixElement]] <- splitMatrix(t(csp$R) %*% csp$R, numCodons, numCodons)  # we expect the covariance matrix, but get the decomposition.
     }
     compl.covMat <- matrix(0, ncol = numMixtures * numCodons * 2, nrow = numMixtures * numCodons * 2)
-    matrix.positions <- sub.matrices(compl.covMat, numCodons, numCodons)
+    matrix.positions <- subMatrices(compl.covMat, numCodons, numCodons)
     
     compl.seq <- seq(1, dim(compl.covMat)[1], numCodons)
     mut.seq <- compl.seq[1:(length(compl.seq)/2)]
@@ -213,10 +213,10 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures, geneAssign
       parameter$initMutation(csp$coef.mat[1,], mixElement, aa)
       parameter$initSelection(csp$coef.mat[2,], mixElement, aa)
       # split matrix into sup matrices (dM and dEta)
-      covmat[[mixElement]] <- split.matrix(t(csp$R) %*% csp$R, numCodons, numCodons)  # we expect the covariance matrix, but get the decomposition.
+      covmat[[mixElement]] <- splitMatrix(t(csp$R) %*% csp$R, numCodons, numCodons)  # we expect the covariance matrix, but get the decomposition.
     }
     compl.covMat <- matrix(0, ncol = numMixtures * numCodons * 2, nrow = numMixtures * numCodons * 2)
-    matrix.positions <- sub.matrices(compl.covMat, numCodons, numCodons)
+    matrix.positions <- subMatrices(compl.covMat, numCodons, numCodons)
     
     compl.seq <- seq(1, dim(compl.covMat)[1], numCodons)
     mut.seq <- compl.seq[1:(length(compl.seq)/2)]
@@ -252,12 +252,12 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures, geneAssign
   return(parameter)
 }
 
-writeParameterToCSV <- function(parameter, filename, CSP, mixture)
+writeParameterToCSV <- function(parameter, filename, CSP, mixture, samples)
 {
   UseMethod("writeParameterToCSV", parameter)
 }
 
-writeParameterToCSV.Rcpp_ROCParameter <- function(parameter, filename=NULL, CSP=NULL, mixture=1)
+writeParameterToCSV.Rcpp_ROCParameter <- function(parameter, filename=NULL, CSP=NULL, mixture = 1, samples = 10)
 {
   names.aa <- aminoAcids()
   Amino_Acid <- c()
@@ -274,13 +274,13 @@ writeParameterToCSV.Rcpp_ROCParameter <- function(parameter, filename=NULL, CSP=
       Codon <- c(Codon, codons[i])
       if(CSP == "Mutation")
       {
-        Value <- c(Value,parameter$getMutationPosteriorMeanForCodon(mixture, samples*0.1, codons[i]))
-        Std_Deviation <- c(Std_Deviation, sqrt(parameter$getMutationVarianceForCodon(mixture, samples*0.1, codons[i], TRUE)))
+        Value <- c(Value,parameter$getMutationPosteriorMeanForCodon(mixture, samples, codons[i]))
+        Std_Deviation <- c(Std_Deviation, sqrt(parameter$getMutationVarianceForCodon(mixture, samples, codons[i], TRUE)))
       }
       else if(CSP == "Selection")
       {
-        Value <- c(Value,parameter$getSelectionPosteriorMeanForCodon(mixture, samples*0.1, codons[i]))
-        Std_Deviation <- c(Std_Deviation, sqrt(parameter$getSelectionVarianceForCodon(mixture, samples*0.1, codons[i], TRUE)))
+        Value <- c(Value,parameter$getSelectionPosteriorMeanForCodon(mixture, samples, codons[i]))
+        Std_Deviation <- c(Std_Deviation, sqrt(parameter$getSelectionVarianceForCodon(mixture, samples, codons[i], TRUE)))
       }else 
       {
         stop("Unknown Parameter type given")
@@ -326,16 +326,16 @@ getCSPbyLogit <- function(codonCounts, phi, coefstart = NULL, x.arg = FALSE, y.a
               R = ret@R)
 }
 
-sub.matrices <- function(M, r, c)
+subMatrices <- function(M, r, c)
 {
   rg <- (row(M) - 1) %/% r + 1
   cg <- (col(M) - 1) %/% c + 1
   rci <- (rg - 1) * max(cg) + cg
   return(rci)
 }
-split.matrix <- function(M, r, c)
+splitMatrix <- function(M, r, c)
 {
-  rci <- sub.matrices(M, r, c)
+  rci <- subMatrices(M, r, c)
   N <- prod(dim(M)) / r / c
   cv <- lapply(1:N, function(x) M[rci==x])
   
@@ -454,7 +454,6 @@ writeParameterObject.Rcpp_FONSEParameter <- function(parameter, file)
   mixAssignTrace <- trace$getMixutreAssignmentTrace()
   mixProbTrace <- trace$getMixtureProbabilitiesTrace()
   cspAcceptRatTrace <- trace$getCspAcceptanceRatioTrace()
-  loglikeTrace <- mcmc$getLogLikelihoodTrace()
   mutationTrace <- trace$getMutationParameterTrace()
   selectionTrace <- trace$getSelectionParameterTrace()
   save(list = c("sPhiTraces", "sphiAcceptRatTrace", "synthRateTrace", "synthAcceptRatTrace", 
@@ -472,21 +471,22 @@ loadParameterObject <- function(parameter, file, model)
 
 setBaseInfo <- function(parameter, file, model)
 {
-  load(file)
-  parameter$setCategories(paramBase$categories)
+  tempEnv <- new.env();
+  load(file = file, envir = tempEnv)
+  parameter$setCategories(tempEnv$paramBase$categories)
   parameter$setCategoriesForTrace()
-  parameter$numMixtures <- paramBase$numMix
-  parameter$numMutationCategories <- paramBase$numMut
-  parameter$numSelectionCategories <- paramBase$numSel
+  parameter$numMixtures <- tempEnv$paramBase$numMix
+  parameter$numMutationCategories <- tempEnv$paramBase$numMut
+  parameter$numSelectionCategories <- tempEnv$paramBase$numSel
   
   trace <- parameter$getTraceObject()
-  trace$setSphiTraces(paramBase$sPhiTraces)
-  trace$setSphiAcceptanceRatioTrace(paramBase$sphiAcceptRatTrace)
-  trace$setSynthesisRateTrace(paramBase$synthRateTrace)
-  trace$setSynthesisRateAcceptanceRatioTrace(paramBase$synthAcceptRatTrace)
-  trace$setMixtureAssignmentTrace(paramBase$mixAssignTrace)
-  trace$setMixtureProbabilitiesTrace(paramBase$mixProbTrace)
-  trace$setCspAcceptanceRatioTrace(paramBase$cspAcceptRatTrace)
+  trace$setSphiTraces(tempEnv$paramBase$sPhiTraces)
+  trace$setSphiAcceptanceRatioTrace(tempEnv$paramBase$sphiAcceptRatTrace)
+  trace$setSynthesisRateTrace(tempEnv$paramBase$synthRateTrace)
+  trace$setSynthesisRateAcceptanceRatioTrace(tempEnv$paramBase$synthAcceptRatTrace)
+  trace$setMixtureAssignmentTrace(tempEnv$paramBase$mixAssignTrace)
+  trace$setMixtureProbabilitiesTrace(tempEnv$paramBase$mixProbTrace)
+  trace$setCspAcceptanceRatioTrace(tempEnv$paramBase$cspAcceptRatTrace)
   if (model == "ROC"){
     parameter$setROCTrace(trace)
   }
@@ -502,18 +502,19 @@ setBaseInfo <- function(parameter, file, model)
 
 loadParameterObject.Rcpp_ROCParameter <- function(parameter, file, model)
 {
-  load(file)
+  tempEnv <- new.env();
+  load(file = file, envir = tempEnv)
   setBaseInfo(parameter, file, model)
-  parameter$currentMutationParameter <- currentMutation
-  parameter$currentSelectionParameter <- currentSelection
-  parameter$proposedMutationParameter <- proposedMutation
-  parameter$proposedSelectionParameter <- proposedSelection
+  parameter$currentMutationParameter <- tempEnv$currentMutation
+  parameter$currentSelectionParameter <- tempEnv$currentSelection
+  parameter$proposedMutationParameter <- tempEnv$proposedMutation
+  parameter$proposedSelectionParameter <- tempEnv$proposedSelection
   trace <- parameter$getTraceObject()
-  trace$setAphiTrace(aphiTrace)
-  trace$setAphiAcceptanceRatioTrace(aphiAcceptRatTrace)
-  trace$setSepsilonTrace(sepisolonTrace)
-  trace$setMutationParameterTrace(mutationTrace)
-  trace$setSelectionParameterTrace(selectionTrace)
+  trace$setAphiTrace(tempEnv$aphiTrace)
+  trace$setAphiAcceptanceRatioTrace(tempEnv$aphiAcceptRatTrace)
+  trace$setSepsilonTrace(tempEnv$sepisolonTrace)
+  trace$setMutationParameterTrace(tempEnv$mutationTrace)
+  trace$setSelectionParameterTrace(tempEnv$selectionTrace)
   
   
   parameter$setROCTrace(trace)
@@ -523,16 +524,17 @@ loadParameterObject.Rcpp_ROCParameter <- function(parameter, file, model)
 
 loadParameterObject.Rcpp_RFPParameter <- function(parameter, file, model)
 {
-  load(file)
+  tempEnv <- new.env();
+  load(file = file, envir = tempEnv)
   setBaseInfo(parameter, file, model)
-  parameter$currentAlphaParameter <- currentAlpha
-  parameter$proposedAlphaParameter <- proposedAlpha
-  parameter$currentLambdaPrimeParameter <- currentLambdaPrime
-  parameter$proposedLambdaPrimeParameter <- proposedLambdaPrime
+  parameter$currentAlphaParameter <- tempEnv$currentAlpha
+  parameter$proposedAlphaParameter <- tempEnv$proposedAlpha
+  parameter$currentLambdaPrimeParameter <- tempEnv$currentLambdaPrime
+  parameter$proposedLambdaPrimeParameter <- tempEnv$proposedLambdaPrime
   
   trace <- parameter$getTraceObject()
-  trace$setAlphaParameterTrace(alphaTrace)
-  trace$setLambdaPrimeParameterTrace(lambdaPrimeTrace)
+  trace$setAlphaParameterTrace(tempEnv$alphaTrace)
+  trace$setLambdaPrimeParameterTrace(tempEnv$lambdaPrimeTrace)
   
   parameter$setRFPTrace(trace)
   return(parameter) #R seems to produce copies, not pointers.

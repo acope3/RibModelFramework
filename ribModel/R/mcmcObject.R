@@ -23,23 +23,23 @@ setRestartSettings.Rcpp_MCMCAlgorithm <- function(mcmc, filename, samples, write
   mcmc$setRestartFileSettings(filename, samples, write.multiple)
 }
 
-convergence.test <- function(mcmc, n.samples = 10, frac1 = 0.1, frac2 = 0.5, plot = FALSE)
+convergence.test <- function(object, nsamples = 10, frac1 = 0.1, frac2 = 0.5, thin = 1, plot = FALSE, ...)
 {
-  UseMethod("convergence.test", mcmc)
+  UseMethod("convergence.test", object)
 }
-convergence.test.Rcpp_MCMCAlgorithm <- function(mcmc, n.samples = 10, frac1 = 0.1, frac2 = 0.5, plot = FALSE)
+convergence.test.Rcpp_MCMCAlgorithm <- function(object, nsamples = 10, frac1 = 0.1, frac2 = 0.5, thin = 1, plot = FALSE, ...)
 {
   # TODO: extend to work with multiple chains once we have that capability.
   
-  loglik.trace <- mcmc$getLogLikelihoodTrace()
+  loglik.trace <- object$getLogLikelihoodTrace()
   trace.length <- length(loglik.trace)
-  start <- max(1, trace.length - n.samples)
+  start <- max(1, trace.length - nsamples)
   
   # the start and end parameter do NOT work, using subsetting to achieve goal
-  mcmcobj <- coda::mcmc(data=loglik.trace[start:trace.length])
+  mcmcobj <- coda::mcmc(data=loglik.trace[start:trace.length], thin = thin)
   diag <- coda::geweke.diag(mcmcobj, frac1=frac1, frac2=frac2)
   if(plot){ 
-    coda::geweke.plot(mcmcobj, frac1=frac1, frac2=frac2)
+    coda::geweke.plot(mcmcobj, frac1=frac1, frac2=frac2, ...)
   }else{
     return(diag)
   }
@@ -58,11 +58,12 @@ writeMCMCObject <- function(mcmc, file)
 loadMCMCObject <- function(file)
 {
   mcmc <- new(MCMCAlgorithm)
-  load(file)
-  mcmc$setSamples(samples)
-  mcmc$setThining(thining)
-  mcmc$setAdaptiveWidth(adaptiveWidth)
-  mcmc$setLogLikelihoodTrace(loglikeTrace)
+  tempEnv <- new.env();
+  load(file = file, envir = tempEnv)
+  mcmc$setSamples(tempEnv$samples)
+  mcmc$setThining(tempEnv$thining)
+  mcmc$setAdaptiveWidth(tempEnv$adaptiveWidth)
+  mcmc$setLogLikelihoodTrace(tempEnv$loglikeTrace)
   return(mcmc)
 }
 
