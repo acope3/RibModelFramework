@@ -2,7 +2,7 @@
 % Please edit documentation in R/parameterObject.R
 \name{writeParameterObject}
 \alias{writeParameterObject}
-\title{writeParameterObject}
+\title{Write Parameter Object to a File}
 \usage{
 writeParameterObject(parameter, file)
 }
@@ -13,11 +13,17 @@ one of the model types, such as "ROC", or "FONSE".}
 \item{file}{A filename that where the data will be stored.
 The file should end with the extension "Rdat".}
 }
+\value{
+This function has no return value.
+}
 \description{
-This function will call the appropriate followup
+\code{writeParameterObject} will call the appropriate followup
 call to writeParameterObject based off of the parameter type 
-given. For example, if a ROCParameter is passed, the the writeParameterObject
+given.
+}
+\details{
+For example, if a ROCParameter is passed, the the writeParameterObject
 for the ROCParameter will be called. This allows us to not have an if-else
-block in the code.
+block in the code - making use of the how R handles these situations.
 }
 
