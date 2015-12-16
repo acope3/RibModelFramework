@@ -382,6 +382,8 @@ extractBaseInfo <- function(parameter)
   numMut <- parameter$numMutationCategories
   numSel <- parameter$numSelectionCategories
   categories <- parameter$getCategories()
+  curMixAssignment <- parameter$getMixtureAssignment()
+  lastIteration <- parameter$getLastIteration()
   
   varList <- list(sPhiTraces = sPhiTraces, 
                     sphiAcceptRatTrace = sphiAcceptRatTrace,
@@ -478,6 +480,8 @@ setBaseInfo <- function(parameter, file, model)
   parameter$numMixtures <- tempEnv$paramBase$numMix
   parameter$numMutationCategories <- tempEnv$paramBase$numMut
   parameter$numSelectionCategories <- tempEnv$paramBase$numSel
+  parameter$setMixtureAssignment(tempEnv$paramBase$curMixAssignment)
+  parameter$setLastIteration(tempEnv$paramBase$lastIteration)
   
   trace <- parameter$getTraceObject()
   trace$setSphiTraces(tempEnv$paramBase$sPhiTraces)

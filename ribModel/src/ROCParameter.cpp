@@ -1028,7 +1028,7 @@ std::vector<double> ROCParameter::getEstimatedMixtureAssignmentProbabilities(uns
 	if (samples > traceLength)
 	{
 		std::cerr
-		<< "Warning in ROCParameter::getMixtureAssignmentPosteriorMean throws: Number of anticipated samples ("
+		<< "Warning in ROCParameter::getEstimatedMixtureAssignmentProbabilities throws: Number of anticipated samples ("
 		<< samples << ") is greater than the length of the available trace (" << traceLength << ")."
 		<< "Whole trace is used for posterior estimate! \n";
 		samples = traceLength;

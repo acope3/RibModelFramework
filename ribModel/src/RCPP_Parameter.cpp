@@ -50,6 +50,7 @@ RCPP_MODULE(Parameter_mod)
 
 		//Iteration Functions:
 		.method("getLastIteration", &Parameter::getLastIteration) //Not a R wrapper
+		.method("setLastIteration", &Parameter::setLastIteration) //Not a R wrapper
 
 
 
@@ -63,6 +64,7 @@ RCPP_MODULE(Parameter_mod)
 
 		//Other Functions:
 		.method("getMixtureAssignment", &Parameter::getMixtureAssignmentR)
+		.method("setMixtureAssignment", &Parameter::setMixtureAssignmentR)
 		.method("getMixtureAssignmentForGene", &Parameter::getMixtureAssignmentForGeneR)
 		.method("setMixtureAssignmentForGene", &Parameter::setMixtureAssignmentForGene)
 		//setNumMixtureElements it taken care in the properties section below

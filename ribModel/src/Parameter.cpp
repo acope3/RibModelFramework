@@ -1502,16 +1502,13 @@ std::vector<double> Parameter::getCurrentSynthesisRateForMixture(unsigned mixtur
 		exprCat = getSynthesisRateCategory(mixture - 1);
 	}else{
 #ifndef STANDALONE
-		Rf_warning("WARNING: Mixture element %d NOT found. Mixture element 1 is returned instead. \n", mixture);
+		Rf_warning("Mixture element %d NOT found. Mixture element 1 is returned instead. \n", mixture);
 #else
 		std::cerr << "WARNING: Mixture element " << mixture << " NOT found. Mixture element 1 is returned instead. \n";
 #endif
 	}
 	return currentSynthesisRateLevel[exprCat];
 }
-
-
-
 
 
 // ------------------------------------------------------------------//
@@ -1575,6 +1572,11 @@ std::vector<double> Parameter::getEstimatedMixtureAssignmentProbabilitiesForGene
 std::vector<unsigned> Parameter::getMixtureAssignmentR()
 {
 	return mixtureAssignment;
+}
+
+void Parameter::setMixtureAssignmentR(std::vector<unsigned> _mixtureAssignment)
+{
+	mixtureAssignment = _mixtureAssignment;
 }
 
 

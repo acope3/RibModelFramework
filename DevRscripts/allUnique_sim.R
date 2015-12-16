@@ -50,8 +50,8 @@ if (with.phi) {
 } 
 plot(trace, what = "ExpectedPhi")
 
-mixtureAssignment <- unlist(lapply(1:genome$getGenomeSize(),  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples*0.1, geneIndex)})) 
-expressionValues <- unlist(lapply(1:genome$getGenomeSize(), function(geneIndex){ 
+mixtureAssignment <- unlist(lapply(1:length(genome),  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples*0.1, geneIndex)})) 
+expressionValues <- unlist(lapply(1:length(genome), function(geneIndex){ 
   expressionCategory <- parameter$getSynthesisRateCategoryForMixture(mixtureAssignment[geneIndex]) 
   parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(samples*0.1, geneIndex, expressionCategory) 
 })) 
