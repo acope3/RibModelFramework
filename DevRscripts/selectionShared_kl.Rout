@@ -3630,3 +3630,64 @@ Current Sphi estimate for selection category 0: 4.74921
 	 current Sphi proposal width: 0.0134218
 	 current Mixture element probability for element 0: 0.913805
 	 current Mixture element probability for element 1: 0.0861952
+Status at iteration 32300
+	 current logLikelihood: -5.41575e+06
+Current Sphi estimate for selection category 0: 4.75616
+	 current Sphi proposal width: 0.0134218
+	 current Mixture element probability for element 0: 0.906412
+	 current Mixture element probability for element 1: 0.0935876
+Status at iteration 32400
+	 current logLikelihood: -5.42082e+06
+Current Sphi estimate for selection category 0: 4.73646
+	 current Sphi proposal width: 0.0134218
+	 current Mixture element probability for element 0: 0.906843
+	 current Mixture element probability for element 1: 0.0931567
+Status at iteration 32500
+	 current logLikelihood: -5.41817e+06
+Current Sphi estimate for selection category 0: 4.75186
+	 current Sphi proposal width: 0.0134218
+	 current Mixture element probability for element 0: 0.914246
+	 current Mixture element probability for element 1: 0.0857541
+Acceptance Ratio for Codon Specific Parameter
+AA	Acc.Rat	Prop.Width
+	A:	0.124	3.69943e-06
+	C:	0.002	9.80797e-08
+	D:	0	6.2771e-08
+	E:	0.002	6.2771e-08
+	F:	0.002	6.2771e-08
+	G:	0.15	4.62428e-06
+	H:	0	6.2771e-08
+	I:	0.004	2.99316e-07
+	K:	0	6.2771e-08
+	L:	0.124	0.000218027
+	N:	0	6.2771e-08
+	P:	0.256	3.85357e-06
+	Q:	0	6.2771e-08
+	R:	0.112	0.000261632
+	S:	0.118	3.85357e-06
+	T:	0.096	4.18139e-06
+	V:	0.156	3.48449e-06
+	Y:	0.004	6.2771e-08
+	Z:	0	6.2771e-08
+
+acceptance ratio for synthesis rate:
+	 acceptance ratio to low: 158
+	 acceptance ratio to high: 498
+Status at iteration 32600
+	 current logLikelihood: -5.42432e+06
+Current Sphi estimate for selection category 0: 4.75583
+	 current Sphi proposal width: 0.0134218
+	 current Mixture element probability for element 0: 0.903632
+	 current Mixture element probability for element 1: 0.0963681
+Status at iteration 32700
+	 current logLikelihood: -5.42324e+06
+Current Sphi estimate for selection category 0: 4.73637
+	 current Sphi proposal width: 0.0134218
+	 current Mixture element probability for element 0: 0.917706
+	 current Mixture element probability for element 1: 0.0822941
+Status at iteration 32800
+	 current logLikelihood: -5.42401e+06
+Current Sphi estimate for selection category 0: 4.77805
+	 current Sphi proposal width: 0.0134218
+	 current Mixture element probability for element 0: 0.905537
+	 current Mixture element probability for element 1: 0.094463
