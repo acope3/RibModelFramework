@@ -1,51 +1,150 @@
-
+#' Initialize Parameter 
+#' 
+#' @param genome A genome object which the parameter use.
+#' 
+#' @param sphi Initial sphi values that corrosponds with the sphi for
+#' each mixture. sphi is a vector whose length should equal numMixtures.
+#' 
+#' @param numMixtures The number of mixtures the parameter 
+#' should use with the genome. This should be a positive number.
+#' 
+#' @param geneAssignment A vector holding that corrosponds to each
+#' gene in the genome. The vector size should equal the number of 
+#' genes in the genome. The assignment is to which mixture the 
+#' gene initially starts in. Valid values for the vector go from
+#' 1 to numMixtures.
+#' 
+#' @param expressionValues A vector containing the starting phi 
+#' values. This is an optional argument and is set to null if
+#' no value is given. If it is provided, the length of the 
+#' vector should equal the number of genes in the genome.
+#' 
+#' @param model The string name of the model and parameter type 
+#' to create. Valid options are "ROC", "RFP", or "FONSE". The default
+#' value for model is "ROC".
+#' 
+#' @param split.serine Whether serine should be considered as 
+#' one or two amino acids when running the model. TRUE and FALSE
+#' are the only valid values. The default value for split.serine is
+#' TRUE.
+#' 
+#' @param mixture.definition A string describing how each mixture should
+#' be treated with respect to mutation and selection. Valid values consist
+#' of "allUnique", "mutationShared", and "selectionShared". The default value
+#' for mixture.definition is "allUnique". See details for more information.
+#' 
+#' @param mixture.definition.matrix A matrix representation of how
+#' the mutation and selection categories corrospond to the mixtures.
+#' The default value for mixture.definition.matrix is NULL. If provided,
+#' the model will use the matrix to initialize the mutation and selection
+#' categories instead of the definition listed directly above. See details
+#' for more information.
+#' 
+#' @param  restart.file File name containing information to reinitialize a 
+#' previous parameter object. If given, all other arguments will be ignored.
+#' The default value for restart.file is NULL.
+#' 
+#' @param mutation_prior_sd TODO: Cedric needs to fill this in.
+#' 
+#' @return parameter Returns an initialized parameter object.
+#' 
+#' @description \code{initializeParameterObject} will call the appropriate followup
+#' call to writeXXXParameterObject based off of the value of model and restart.file.
+#' 
+#' @details \code{initializeParameterObject} checks the values of the arguments 
+#' given to insure the values are valid. Additionally, if a restart file is given,
+#' no follow up function calls are made - a new call is made instead which calls
+#' the C++ constructor that only takes a file name.
+#' 
+#' The mixture definition and mixture definition matrix describe how the mutation
+#' and selection categories are set up with respect to the number of mixtures. For
+#' example, if mixture.definition = "allUnique" and numMixtures = 3, a matrix
+#' representation would be as follows:
+#' 
+#' 1 1
+#' 
+#' 2 2
+#' 
+#' 3 3
+#' 
+#' where each row represents a mixture, the first column represents the mutation
+#' category, and the second column represents the selection category. Another 
+#' example would be mixture.definition = "selectionShared" and numMixtures = 4.
+#' 
+#' 1 1
+#' 
+#' 2 1
+#' 
+#' 3 1
+#' 
+#' 4 1
+#' 
+#' In this case, the selection category is the same for every mixture. If a matrix
+#' is given, and it is valid, then the mutation/selection relationship will be
+#' defined by the given matrix as opposed to the keyword. A matrix should only
+#' be given in cases where the keywords would not create the desired valid matrix.
+#' 
+#' 
 initializeParameterObject <- function(genome, sphi, numMixtures, geneAssignment, expressionValues = NULL, model = "ROC",
                                       split.serine = TRUE, mixture.definition = "allUnique", mixture.definition.matrix = NULL,
                                       restart.file = NULL, mutation_prior_sd = 0.35)
 {
   # check input integrity
-  if(length(sphi) != numMixtures)
-  {
+  if(length(sphi) != numMixtures){
     stop("Not all mixtures have an Sphi value assigned!\n")
   }
-  if(length(genome) != length(geneAssignment))
-  {
+  
+  if(length(genome) != length(geneAssignment)){
     stop("Not all Genes have a mixture assignment!\n")
   }
-  if(max(geneAssignment) > numMixtures)
-  {
+  
+  if(max(geneAssignment) > numMixtures){
     stop("Gene is assigned to non existing mixture!\n")
   }  
+  #TODO: should we check integraty of other values, such as numMixtures being
+  #positive?
   
-  if(model == "ROC")
-  {
-    if(is.null(restart.file))
-    {
-      parameter <- initializeROCParameterObject(genome, sphi, numMixtures, geneAssignment, expressionValues,
-                                   split.serine, mixture.definition, mixture.definition.matrix, mutation_prior_sd)    
-    }else{
+  
+  
+  if(model == "ROC"){
+    if(is.null(restart.file)){
+      parameter <- initializeROCParameterObject(genome, sphi, numMixtures, 
+                            geneAssignment, expressionValues, split.serine, 
+                            mixture.definition, mixture.definition.matrix, 
+                            mutation_prior_sd)    
+    }
+    else{
       parameter <- new(ROCParameter, restart.file)
     }
-  }else if(model == "FONSE"){
-    if(is.null(restart.file))
-    {
-      parameter <- initializeFONSEParameterObject(genome, sphi, numMixtures, geneAssignment, expressionValues,
-                                    split.serine, mixture.definition, mixture.definition.matrix)
+  }
+  else if(model == "FONSE"){
+    if(is.null(restart.file)){
+      parameter <- initializeFONSEParameterObject(genome, sphi, numMixtures, 
+                            geneAssignment, expressionValues, split.serine, 
+                            mixture.definition, mixture.definition.matrix)
     }
-  }else if(model == "RFP"){
-    if(is.null(restart.file))
-    {
-      parameter <- initializeRFPParameterObject(genome, sphi, numMixtures, geneAssignment, expressionValues,
-                                                split.serine, mixture.definition, mixture.definition.matrix) 
+    else{
+      parameter <- new(FONSEParameter, restart.file)
+    }
+  }
+  else if(model == "RFP"){
+    if(is.null(restart.file)){
+      parameter <- initializeRFPParameterObject(genome, sphi, numMixtures, 
+                            geneAssignment, expressionValues, split.serine, 
+                            mixture.definition, mixture.definition.matrix) 
     }
     else{
       parameter <- new(RFPParameter, restart.file)
     }
-  }else{
+  }
+  else{
     stop("Unknown model.")
   }
+  
   return(parameter)
 }
+
+
 
 initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignment, expressionValues = NULL,
                                          split.serine = TRUE, mixture.definition = "allUnique", mixture.definition.matrix = NULL,
