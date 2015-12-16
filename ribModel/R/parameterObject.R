@@ -44,7 +44,7 @@
 #' previous parameter object. If given, all other arguments will be ignored.
 #' The default value for restart.file is NULL.
 #' 
-#' @param mutation_prior_sd TODO: Cedric needs to fill this in.
+#' @param mutation_prior_sd Controling the standard deviation of the normal prior on the mutation parameters
 #' 
 #' @return parameter Returns an initialized parameter object.
 #' 

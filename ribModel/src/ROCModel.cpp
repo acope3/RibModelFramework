@@ -134,9 +134,6 @@ double ROCModel::calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codo
 		if (codonCount[i] == 0) continue;
 		logLikelihood += std::log(codonProbabilities[i]) * codonCount[i];
 	}
-	//std::cout <<"deleting codonProbabilities\n";
-	//delete [] codonProbabilities;
-	//std::cout <<"DONEdeleting codonProbabilities\n";
 	return logLikelihood;
 }
 
@@ -264,30 +261,63 @@ void ROCModel::printHyperParameters()
 {
 	for(unsigned i = 0u; i < getNumSynthesisRateCategories(); i++)
 	{
+#ifndef STANDALONE
+		Rprintf("Current Sphi estimate for selection category %d: %f\n", i, getSphi(i, false));
+#else
 		std::cout << "Current Sphi estimate for selection category " << i << ": " << getSphi(i, false) << std::endl;
+#endif
 	}
-
+#ifndef STANDALONE
+	Rprintf("\t current Sphi proposal width: %f\n", getCurrentSphiProposalWidth());
+#else
 	std::cout << "\t current Sphi proposal width: " << getCurrentSphiProposalWidth() << std::endl;
+#endif
 	if(withPhi)
 	{
-		std::cout << "\t current Aphi estimates:";
+#ifndef STANDALONE
+	Rprintf("\t current Aphi estimates:");
+#else
+	std::cout << "\t current Aphi estimates:";
+#endif
 		for (unsigned i = 0; i < getNumPhiGroupings(); i++)
 		{
+#ifndef STANDALONE
+			Rprintf(" %f", getAphi(i, false));
+#else
 			std::cout << " " << getAphi(i, false);
+#endif
 		}
-		std::cout << std::endl;
-		std::cout << "\t current Aphi proposal widths:";
+#ifndef STANDALONE
+		Rprintf("\n\t current Aphi proposal widths:");
+#else
+		std::cout << "\n\t current Aphi proposal widths:";
+#endif
 		for (unsigned i = 0; i < getNumPhiGroupings(); i++)
 		{
+#ifndef STANDALONE
+			Rprintf(" %f", getCurrentAphiProposalWidth(i));
+#else
 			std::cout << " " << getCurrentAphiProposalWidth(i);
+#endif
 		}
-		std::cout << std::endl;
-		std::cout << "\t current Sepsilon estimates:";
+#ifndef STANDALONE
+		Rprintf("\n\t current Sepsilon estimates:");
+#else
+		std::cout << "\n\t current Sepsilon estimates:";
+#endif
 		for (unsigned i = 0; i < getNumPhiGroupings(); i++)
 		{
+#ifndef STANDALONE
+			Rprintf(" %f", getSepsilon(i));
+#else
 			std::cout << " " << getSepsilon(i);
+#endif
 		}
+#ifndef STANDALONE
+		Rprintf("\n");
+#else
 		std::cout << std::endl;
+#endif
 	}
 }
 
@@ -391,7 +421,11 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 		double phi = getSynthesisRate(i, mixture, false);
 		if (!std::isfinite(phi))
 		{
-			std::cout << "phi " << i << " not finite! " << phi << "\n";
+#ifndef STANDALONE
+			Rf_error("Phi value for gene %d is not finite (%f)!", i, phi);
+#else
+			std::cerr << "phi " << i << " not finite! " << phi << "\n";
+#endif
 		}
 		lpr += Parameter::densityLogNorm(phi, proposedMphi[mixture], proposedSphi[mixture], true)
 				- Parameter::densityLogNorm(phi, currentMphi[mixture], currentSphi[mixture], true);

@@ -176,7 +176,14 @@ void Genome::writeFasta (std::string filename, bool simulated)
 		} // end else
 		Fout.close();
 	} // end try
-	catch(char* pMsg) { std::cerr << std::endl << "Exception:" << pMsg << std::endl; }
+	catch(char* pMsg)
+	{
+#ifndef STANDALONE
+		Rf_error("\nException: %s\n", pMsg);
+#else
+		std::cerr << std::endl << "Exception:" << pMsg << std::endl;
+#endif
+	}
 }
 
 
@@ -255,7 +262,7 @@ void Genome::writeRFPFile(std::string filename, bool simulated)
 	if (Fout.fail())
 	{
 #ifndef STANDALONE
-			Rf_error("Error in Genome::writeRFPFile: Can not open output RFP file %s\n", filename.c_str());
+		Rf_error("Error in Genome::writeRFPFile: Can not open output RFP file %s\n", filename.c_str());
 #else
 		std::cerr <<"Error in Genome::writeRFPFile: Can not open output RFP file " << filename <<"\n";
 #endif
