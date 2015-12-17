@@ -17,11 +17,12 @@ numMixtures <- 2
 mixDef <- "allUnique"
 geneAssignment <- sample(c(1,2), size = length(genome), replace = TRUE, prob = c(0.3, 0.7)) #c(rep(1,500), rep(2,500))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
+#parameter <- initializeParameterObject(genome, sphi = sphi_init, geneAssignment = geneAssignment, numMixtures = numMixtures, restart.file = "5001_simulated_allUnique.rst")
 
 samples <- 500
-thining <- 50
-adaptiveWidth <- 250000
-divergence.iteration <- 40
+thining <- 10
+adaptiveWidth <- 10000
+divergence.iteration <- 0
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE) 
 
 setRestartSettings(mcmc, paste(task.id, "_simulated_allUnique.rst", sep=""), adaptiveWidth*50, TRUE) 
