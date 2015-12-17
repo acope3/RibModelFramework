@@ -85,10 +85,12 @@
 #' be given in cases where the keywords would not create the desired valid matrix.
 #' 
 #' 
-initializeParameterObject <- function(genome, sphi, numMixtures, geneAssignment, expressionValues = NULL, model = "ROC",
-                                      split.serine = TRUE, mixture.definition = "allUnique", mixture.definition.matrix = NULL,
-                                      restart.file = NULL, mutation_prior_sd = 0.35)
-{
+initializeParameterObject <- function(genome, sphi, numMixtures, geneAssignment, 
+                                    expressionValues = NULL, model = "ROC",
+                                    split.serine = TRUE, 
+                                    mixture.definition = "allUnique", 
+                                    mixture.definition.matrix = NULL,
+                                    restart.file = NULL, mutation_prior_sd = 0.35){
   # check input integrity
   if(length(sphi) != numMixtures){
     stop("Not all mixtures have an Sphi value assigned!\n")
@@ -145,29 +147,78 @@ initializeParameterObject <- function(genome, sphi, numMixtures, geneAssignment,
 }
 
 
+#' Initialize  ROC Parameter 
+#' 
+#' @param genome A genome object which the parameter use.
+#' 
+#' @param sphi Initial sphi values that corrosponds with the sphi for
+#' each mixture. sphi is a vector whose length should equal numMixtures.
+#' 
+#' @param numMixtures The number of mixtures the parameter 
+#' should use with the genome. This should be a positive number.
+#' 
+#' @param geneAssignment A vector holding that corrosponds to each
+#' gene in the genome. The vector size should equal the number of 
+#' genes in the genome. The assignment is to which mixture the 
+#' gene initially starts in. Valid values for the vector go from
+#' 1 to numMixtures.
+#' 
+#' @param expressionValues A vector containing the starting phi 
+#' values. This is an optional argument and is set to null if
+#' no value is given. If it is provided, the length of the 
+#' vector should equal the number of genes in the genome.
+#' 
+#' @param split.serine Whether serine should be considered as 
+#' one or two amino acids when running the model. TRUE and FALSE
+#' are the only valid values. The default value for split.serine is
+#' TRUE.
+#' 
+#' @param mixture.definition A string describing how each mixture should
+#' be treated with respect to mutation and selection. Valid values consist
+#' of "allUnique", "mutationShared", and "selectionShared". The default value
+#' for mixture.definition is "allUnique". See details for more information.
+#' 
+#' @param mixture.definition.matrix A matrix representation of how
+#' the mutation and selection categories corrospond to the mixtures.
+#' The default value for mixture.definition.matrix is NULL. If provided,
+#' the model will use the matrix to initialize the mutation and selection
+#' categories instead of the definition listed directly above. See details
+#' for more information.
+#' 
+#' @param mutation_prior_sd TODO: Cedric needs to fill this in.
+#' 
+#' @return parameter Returns an initialized ROC parameter object.
+#' 
+#' @description \code{initializeROCParameterObject} will initialize
+#' the ROC Parameter object with the given values.
+#' 
+#' @details \code{initializeROCParameterObject} should never be called; it
+#' is called from the \code{initializeParameterObject}. Because of this,
+#' no error checking is doen in this function. Additional documentation on 
+#' the mixture.definition.matrix and mixture.definition can
+#' be found in the documentation for \code{initializeParameterObject}.
+#' 
+initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignment,
+                      expressionValues = NULL, split.serine = TRUE,
+                      mixture.definition = "allUnique", 
+                      mixture.definition.matrix = NULL, mutation_prior_sd = 0.35){
 
-initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignment, expressionValues = NULL,
-                                         split.serine = TRUE, mixture.definition = "allUnique", mixture.definition.matrix = NULL,
-                                         mutation_prior_sd = 0.35)
-{
-  # test input integrity
-  if(genome$getGenomeSize() != length(geneAssignment)) 
-  {
-    stop("Gene assignment length does not match genome size. Not every Gene has a mixture assignment")
-  }
-  # create parameter object
-  if(is.null(mixture.definition.matrix))
-  { # keyword constructor
+  if(is.null(mixture.definition.matrix)){ 
+    # keyword constructor
     parameter <- new(ROCParameter, sphi, numMixtures, geneAssignment, split.serine, mixture.definition)
-  }else{
+  }
+  else{
     #matrix constructor
     mixture.definition <- c(mixture.definition.matrix[, 1], mixture.definition.matrix[, 2])
     parameter <- new(ROCParameter, sphi, numMixtures, geneAssignment, mixture.definition, split.serine)
   }
+  
+  
   # initialize expression values
   if(is.null(expressionValues)){
     parameter$initializeSynthesisRateByGenome(genome, mean(sphi))
-  }else{
+  }
+  else{
     parameter$initializeSynthesisRateByList(expressionValues)
   }
   
@@ -178,9 +229,9 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
   
   phi <- parameter$getCurrentSynthesisRateForMixture(1) # phi values are all the same initially
   names.aa <- aminoAcids()
-  for(aa in names.aa)
-  {
+  for(aa in names.aa){
     if(aa == "M" || aa == "W" || aa == "X") next
+    #should go away when CT is up and running
     
     codonCounts <- getCodonCountsForAA(aa, genome)
     numCodons <- dim(codonCounts)[2] - 1
@@ -188,8 +239,7 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
     # TODO WORKS CURRENTLY ONLY FOR ALLUNIQUE!
     #-----------------------------------------
     covmat <- vector("list", numMixtures)
-    for(mixElement in 1:numMixtures)
-    {    
+    for(mixElement in 1:numMixtures){    
       idx <- geneAssignment == mixElement
       csp <- getCSPbyLogit(codonCounts[idx, ], phi[idx])
       
@@ -204,24 +254,21 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
     compl.seq <- seq(1, dim(compl.covMat)[1], numCodons)
     mut.seq <- compl.seq[1:(length(compl.seq)/2)]
     i <- 1
-    for(pos in mut.seq)
-    { 
+    for(pos in mut.seq){ 
       compl.covMat[matrix.positions == matrix.positions[pos, pos]] <- unlist(covmat[[i]][1])
       i <- i + 1
       i <- ifelse(i > numMutationCategory, 1, i)
     }
     sel.seq <- compl.seq[(length(compl.seq)/2 + 1):length(compl.seq)]
     i <- 1
-    for(pos in sel.seq)
-    { 
+    for(pos in sel.seq){ 
       compl.covMat[matrix.positions == matrix.positions[pos, pos]] <- unlist(covmat[[i]][4])
       i <- i + 1
       i <- ifelse(i > numMutationCategory, 1, i)
     }
     
     ofdiag.seq <- mut.seq + numCodons*numMutationCategory
-    for(i in 1:length(mut.seq))
-    {
+    for(i in 1:length(mut.seq)){
       compl.covMat[matrix.positions == matrix.positions[mut.seq[i], ofdiag.seq[i]]] <- unlist(covmat[[i]][2])
       compl.covMat[matrix.positions == matrix.positions[ofdiag.seq[i], mut.seq[i]]] <- unlist(covmat[[i]][3])
     }
@@ -229,34 +276,86 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
     compl.covMat <- diag((numMutationCategory + numSelectionCategory) * numCodons) * 0.05
     #compl.covMat / max(compl.covMat)
     parameter$initCovarianceMatrix(compl.covMat, aa)
-    
   }
   
   return(parameter)
 }
 
 
-initializeRFPParameterObject <- function(genome, sphi, numMixtures, geneAssignment, expressionValues = NULL,
-                                         split.serine = TRUE, mixture.definition = "allUnique", mixture.definition.matrix = NULL)
-{
-  # test input integrity
-  if(genome$getGenomeSize() != length(geneAssignment)) 
-  {
-    stop("Gene assignment length does not match genome size. Not every Gene has a mixture assignment")
-  }
-  # create parameter object
+
+#' Initialize  RFP Parameter 
+#' 
+#' @param genome A genome object which the parameter use.
+#' 
+#' @param sphi Initial sphi values that corrosponds with the sphi for
+#' each mixture. sphi is a vector whose length should equal numMixtures.
+#' 
+#' @param numMixtures The number of mixtures the parameter 
+#' should use with the genome. This should be a positive number.
+#' 
+#' @param geneAssignment A vector holding that corrosponds to each
+#' gene in the genome. The vector size should equal the number of 
+#' genes in the genome. The assignment is to which mixture the 
+#' gene initially starts in. Valid values for the vector go from
+#' 1 to numMixtures.
+#' 
+#' @param expressionValues A vector containing the starting phi 
+#' values. This is an optional argument and is set to null if
+#' no value is given. If it is provided, the length of the 
+#' vector should equal the number of genes in the genome.
+#' 
+#' @param split.serine Whether serine should be considered as 
+#' one or two amino acids when running the model. TRUE and FALSE
+#' are the only valid values. The default value for split.serine is
+#' TRUE.
+#' 
+#' @param mixture.definition A string describing how each mixture should
+#' be treated with respect to mutation and selection. Valid values consist
+#' of "allUnique", "mutationShared", and "selectionShared". The default value
+#' for mixture.definition is "allUnique". See details for more information.
+#' 
+#' @param mixture.definition.matrix A matrix representation of how
+#' the mutation and selection categories corrospond to the mixtures.
+#' The default value for mixture.definition.matrix is NULL. If provided,
+#' the model will use the matrix to initialize the mutation and selection
+#' categories instead of the definition listed directly above. See details
+#' for more information.
+#' 
+#' @return parameter Returns an initialized RFP parameter object.
+#' 
+#' @description \code{initializeRFPParameterObject} will initialize
+#' the RFP Parameter object with the given values.
+#' 
+#' @details \code{initializeRFPParameterObject} should never be called; it
+#' is called from the \code{initializeParameterObject}. Because of this,
+#' no error checking is doen in this function. Additional documentation on 
+#' the mixture.definition.matrix and mixture.definition can
+#' be found in the documentation for \code{initializeParameterObject}.
+#' 
+initializeRFPParameterObject <- function(genome, sphi, numMixtures, geneAssignment, 
+                          expressionValues = NULL, split.serine = TRUE, 
+                          mixture.definition = "allUnique", 
+                          mixture.definition.matrix = NULL){
+
   if(is.null(mixture.definition.matrix))
   { # keyword constructor
-    parameter <- new(RFPParameter, sphi, numMixtures, geneAssignment, split.serine, mixture.definition)
-  }else{
-    #matrix constructor
-    mixture.definition <- c(mixture.definition.matrix[, 1], mixture.definition.matrix[, 2])
-    parameter <- new(RFPParameter, sphi, numMixtures, geneAssignment, mixture.definition, split.serine)
+    parameter <- new(RFPParameter, sphi, numMixtures, geneAssignment, 
+                     split.serine, mixture.definition)
   }
+  else{
+    #matrix constructor
+    mixture.definition <- c(mixture.definition.matrix[, 1], 
+                            mixture.definition.matrix[, 2])
+    parameter <- new(RFPParameter, sphi, numMixtures, geneAssignment, 
+                     mixture.definition, split.serine)
+  }
+  
+  
   # initialize expression values
   if(is.null(expressionValues)){
     parameter$initializeSynthesisRateByGenome(genome, sphi)
-  }else{
+  }
+  else{
     parameter$initializeSynthesisRateByList(expressionValues)
   }
   
@@ -265,27 +364,82 @@ initializeRFPParameterObject <- function(genome, sphi, numMixtures, geneAssignme
 
 
 
-initializeFONSEParameterObject <- function(genome, sphi, numMixtures, geneAssignment, expressionValues = NULL,
-                                         split.serine = TRUE, mixture.definition = "allUnique", mixture.definition.matrix = NULL)
-{
-  # test input integrity
-  if(genome$getGenomeSize() != length(geneAssignment)) 
-  {
-    stop("Gene assignment length does not match genome size. Not every Gene has a mixture assignment")
-  }
+
+#' Initialize  FONSE Parameter 
+#' 
+#' @param genome A genome object which the parameter use.
+#' 
+#' @param sphi Initial sphi values that corrosponds with the sphi for
+#' each mixture. sphi is a vector whose length should equal numMixtures.
+#' 
+#' @param numMixtures The number of mixtures the parameter 
+#' should use with the genome. This should be a positive number.
+#' 
+#' @param geneAssignment A vector holding that corrosponds to each
+#' gene in the genome. The vector size should equal the number of 
+#' genes in the genome. The assignment is to which mixture the 
+#' gene initially starts in. Valid values for the vector go from
+#' 1 to numMixtures.
+#' 
+#' @param expressionValues A vector containing the starting phi 
+#' values. This is an optional argument and is set to null if
+#' no value is given. If it is provided, the length of the 
+#' vector should equal the number of genes in the genome.
+#' 
+#' @param split.serine Whether serine should be considered as 
+#' one or two amino acids when running the model. TRUE and FALSE
+#' are the only valid values. The default value for split.serine is
+#' TRUE.
+#' 
+#' @param mixture.definition A string describing how each mixture should
+#' be treated with respect to mutation and selection. Valid values consist
+#' of "allUnique", "mutationShared", and "selectionShared". The default value
+#' for mixture.definition is "allUnique". See details for more information.
+#' 
+#' @param mixture.definition.matrix A matrix representation of how
+#' the mutation and selection categories corrospond to the mixtures.
+#' The default value for mixture.definition.matrix is NULL. If provided,
+#' the model will use the matrix to initialize the mutation and selection
+#' categories instead of the definition listed directly above. See details
+#' for more information.
+#' 
+#' @return parameter Returns an initialized FONSE parameter object.
+#' 
+#' @description \code{initializeFONSEParameterObject} will initialize
+#' the ROC Parameter object with the given values.
+#' 
+#' @details \code{initializeFONSEParameterObject} should never be called; it
+#' is called from the \code{initializeParameterObject}. Because of this,
+#' no error checking is doen in this function. Additional documentation on 
+#' the mixture.definition.matrix and mixture.definition can
+#' be found in the documentation for \code{initializeParameterObject}.
+#' 
+initializeFONSEParameterObject <- function(genome, sphi, numMixtures, 
+                        geneAssignment, expressionValues = NULL, split.serine = TRUE,
+                        mixture.definition = "allUnique", 
+                        mixture.definition.matrix = NULL){
+
+  
   # create parameter object
   if(is.null(mixture.definition.matrix))
   { # keyword constructor
-    parameter <- new(FONSEParameter, sphi, numMixtures, geneAssignment, split.serine, mixture.definition)
-  }else{
-    #matrix constructor
-    mixture.definition <- c(mixture.definition.matrix[, 1], mixture.definition.matrix[, 2])
-    parameter <- new(FONSEParameter, sphi, numMixtures, geneAssignment, mixture.definition, split.serine)
+    parameter <- new(FONSEParameter, sphi, numMixtures, geneAssignment, 
+                     split.serine, mixture.definition)
   }
+  else{
+    #matrix constructor
+    mixture.definition <- c(mixture.definition.matrix[, 1], 
+                            mixture.definition.matrix[, 2])
+    parameter <- new(FONSEParameter, sphi, numMixtures, geneAssignment, 
+                     mixture.definition, split.serine)
+  }
+  
+  
   # initialize expression values
   if(is.null(expressionValues)){
     parameter$initializeSynthesisRateByGenome(genome, sphi)
-  }else{
+  }
+  else{
     parameter$initializeSynthesisRateByList(expressionValues)
   }
   
@@ -294,8 +448,7 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures, geneAssign
   
   phi <- parameter$getCurrentSynthesisRateForMixture(1) # phi values are all the same initially
   names.aa <- aminoAcids()
-  for(aa in names.aa)
-  {
+  for(aa in names.aa){
     if(aa == "M" || aa == "W" || aa == "X") next
     
     codonCounts <- getCodonCountsForAA(aa, genome)
@@ -304,8 +457,7 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures, geneAssign
     # TODO WORKS CURRENTLY ONLY FOR ALLUNIQUE!
     #-----------------------------------------
     covmat <- vector("list", numMixtures)
-    for(mixElement in 1:numMixtures)
-    {    
+    for(mixElement in 1:numMixtures){    
       idx <- geneAssignment == mixElement
       csp <- getCSPbyLogit(codonCounts[idx, ], phi[idx])
       
@@ -314,78 +466,139 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures, geneAssign
       # split matrix into sup matrices (dM and dEta)
       covmat[[mixElement]] <- splitMatrix(t(csp$R) %*% csp$R, numCodons, numCodons)  # we expect the covariance matrix, but get the decomposition.
     }
+    
+    
     compl.covMat <- matrix(0, ncol = numMixtures * numCodons * 2, nrow = numMixtures * numCodons * 2)
     matrix.positions <- subMatrices(compl.covMat, numCodons, numCodons)
     
     compl.seq <- seq(1, dim(compl.covMat)[1], numCodons)
     mut.seq <- compl.seq[1:(length(compl.seq)/2)]
     i <- 1
-    for(pos in mut.seq)
-    { 
+    for(pos in mut.seq){ 
       compl.covMat[matrix.positions == matrix.positions[pos, pos]] <- unlist(covmat[[i]][1])
       i <- i + 1
       i <- ifelse(i > numMutationCategory, 1, i)
     }
+    
+    
     sel.seq <- compl.seq[(length(compl.seq)/2 + 1):length(compl.seq)]
     i <- 1
-    for(pos in sel.seq)
-    { 
+    for(pos in sel.seq){ 
       compl.covMat[matrix.positions == matrix.positions[pos, pos]] <- unlist(covmat[[i]][4])
       i <- i + 1
       i <- ifelse(i > numMutationCategory, 1, i)
     }
     
     ofdiag.seq <- mut.seq + numCodons*numMutationCategory
-    for(i in 1:length(mut.seq))
-    {
+    for(i in 1:length(mut.seq)){
       compl.covMat[matrix.positions == matrix.positions[mut.seq[i], ofdiag.seq[i]]] <- unlist(covmat[[i]][2])
       compl.covMat[matrix.positions == matrix.positions[ofdiag.seq[i], mut.seq[i]]] <- unlist(covmat[[i]][3])
     }
+    
     #for testing
     compl.covMat <- diag((numMutationCategory + numSelectionCategory) * numCodons) *0.05
     #compl.covMat / max(compl.covMat)
     parameter$initCovarianceMatrix(compl.covMat, aa)
-    
   }
   
   return(parameter)
 }
 
-writeParameterToCSV <- function(parameter, filename, CSP, mixture, samples)
-{
+
+
+#' Write Parameter To CSV File 
+#' 
+#' @param parameter A parameter object that corrosponds to
+#' one of the model types. Valid values are "ROC", "RFP", and
+#' "FONSE".
+#' 
+#' @param filename A filename where the data will be written to.
+#' This file should end with a "csv" extension.
+#' 
+#' @param CSP Tells what codon specific parameter should be written to the file.
+#' This will vary between models.
+#' 
+#' @param mixture Tells which mixture the data should be retrieved from to write.
+#' 
+#' @param samples The number of samples that should be used when calculating
+#' the posteriors.
+#' 
+#' @return This function has no return value.
+#' 
+#' @description \code{writeParameterToCSV} will obtain the codon specific
+#' parameter data for a given parameter and mixture and write this data
+#' to a csv file.
+#' 
+#' @details \code{writeParameterToCSV} will make the necessary calls
+#' to writeXXXParameterToCSV based off of the parameter given.
+#' 
+writeParameterToCSV <- function(parameter, filename, CSP, mixture, samples){
   UseMethod("writeParameterToCSV", parameter)
 }
 
-writeParameterToCSV.Rcpp_ROCParameter <- function(parameter, filename=NULL, CSP=NULL, mixture = 1, samples = 10)
-{
+
+
+#' Write ROC Parameter To CSV File 
+#' 
+#' @param parameter A parameter object whose type should be "ROC".
+#' 
+#' @param filename A filename where the data will be written to.
+#' This file should end with a "csv" extension. The default value 
+#' is NULL.
+#' 
+#' @param CSP Tells what codon specific parameter should be written to the file.
+#' "Mutation" and "Selection" are the valid arguments. The default value is NULL.
+#' 
+#' @param mixture Tells which mixture the data should be retrieved from to write.
+#' The default value is 1.
+#' 
+#' @param samples The number of samples that should be used when calculating
+#' the posteriors. The default value is 10.
+#' 
+#' @return This function has no return value.
+#' 
+#' @description \code{writeROCParameterToCSV} will obtain the codon specific
+#' parameter data for a given parameter and mixture and write this data
+#' to a csv file. This function should never be called. \code{writeParameterToCSV}
+#' should be called instead.
+#' 
+#' @details \code{writeROCParameterToCSV} For the given CSP, the posterior mean will
+#' be calculated based off the number of samples for each amino acid given. If no
+#' filename is given, the results will be printed to the screen.
+#'  
+writeParameterToCSV.Rcpp_ROCParameter <- function(parameter, filename=NULL, 
+                                            CSP=NULL, mixture = 1, samples = 10){
   names.aa <- aminoAcids()
   Amino_Acid <- c()
   Value <- c()
   Codon <- c()
   Std_Deviation <- c()
-  for(aa in names.aa)
-  {
+  
+  
+  for(aa in names.aa){
     if(aa == "M" || aa == "W" || aa == "X") next
     codons <- AAToCodon(aa, T)
-    for(i in 1:length(codons))
-    {
+    
+    for(i in 1:length(codons)){
       Amino_Acid <- c(Amino_Acid, aa)
       Codon <- c(Codon, codons[i])
-      if(CSP == "Mutation")
-      {
+      
+      
+      if(CSP == "Mutation"){
         Value <- c(Value,parameter$getMutationPosteriorMeanForCodon(mixture, samples, codons[i]))
         Std_Deviation <- c(Std_Deviation, sqrt(parameter$getMutationVarianceForCodon(mixture, samples, codons[i], TRUE)))
       }
-      else if(CSP == "Selection")
-      {
+      else if(CSP == "Selection"){
         Value <- c(Value,parameter$getSelectionPosteriorMeanForCodon(mixture, samples, codons[i]))
         Std_Deviation <- c(Std_Deviation, sqrt(parameter$getSelectionVarianceForCodon(mixture, samples, codons[i], TRUE)))
-      }else 
-      {
+      }
+      else {
         stop("Unknown Parameter type given")
       }
     }
   }
+  
+  
   data <- data.frame(Amino_Acid,Codon,Value, Std_Deviation)
   if(is.null(filename))
   {
@@ -396,8 +609,26 @@ writeParameterToCSV.Rcpp_ROCParameter <- function(parameter, filename=NULL, CSP=
   }
 }
 
-getCodonCountsForAA <- function(aa, genome)
-{
+
+
+#' Get Codon Counts For Each Amino Acid 
+#' 
+#' @param aa A one character representation of an amino acid.
+#' 
+#' @param genome A genome object from which the counts of each
+#' codon can be obtained.
+#' 
+#' @return codonCounts Returns a matrix storing the codonCounts. 
+#' 
+#' @description \code{getCodonCountsForAA} returns a matrix filled with 
+#' the number of times a codon is seen in each gene.
+#' 
+#' @details The returned matrix will have the row corrospond to the
+#' genes in the genome and the columns corrospond to the codons for the 
+#' given aa. The values will the number of times the codon is present in 
+#' that gene.
+#' 
+getCodonCountsForAA <- function(aa, genome){
   # get codon count for aa
   codons <- AAToCodon(aa, F)
   codonCounts <- lapply(codons, function(codon){
@@ -406,6 +637,10 @@ getCodonCountsForAA <- function(aa, genome)
   codonCounts <- do.call("cbind", codonCounts)
   return(codonCounts)
 }
+
+
+
+
 
 getCSPbyLogit <- function(codonCounts, phi, coefstart = NULL, x.arg = FALSE, y.arg = FALSE, qr.arg = FALSE)
 {
@@ -425,6 +660,9 @@ getCSPbyLogit <- function(codonCounts, phi, coefstart = NULL, x.arg = FALSE, y.a
               R = ret@R)
 }
 
+
+
+
 subMatrices <- function(M, r, c)
 {
   rg <- (row(M) - 1) %/% r + 1
@@ -432,6 +670,9 @@ subMatrices <- function(M, r, c)
   rci <- (rg - 1) * max(cg) + cg
   return(rci)
 }
+
+
+
 splitMatrix <- function(M, r, c)
 {
   rci <- subMatrices(M, r, c)
@@ -453,13 +694,12 @@ splitMatrix <- function(M, r, c)
 #' @return This function has no return value.
 #' 
 #' @description \code{writeParameterObject} will call the appropriate followup
-#' call to writeParameterObject based off of the parameter type 
+#' call to writeXXXParameterObject based off of the parameter type 
 #' given.
 #' 
 #' @details For example, if a ROCParameter is passed, the the writeParameterObject
 #' for the ROCParameter will be called. This allows us to not have an if-else
 #' block in the code - making use of the how R handles these situations.
-#' 
 #' 
 writeParameterObject <- function(parameter, file)
 {
@@ -467,8 +707,25 @@ writeParameterObject <- function(parameter, file)
 }
 
 
-extractBaseInfo <- function(parameter)
-{
+
+#' Extract Basic Information From Parameter Object
+#' 
+#' @param parameter A parameter object that corrosponds to
+#' one of the model types, such as "ROC", or "FONSE".
+#' 
+#' @return varList Returns a list of the variables extracted from the parameter
+#' object.
+#' 
+#' @description \code{extractBaseInfo} will extract all of the shared information
+#' between all known parameter object types and store them in R data types. It 
+#' returns a list of these variables.
+#' 
+#' @details This function calls the C++ getter functions to get all of the common
+#' parameter information and store them in R datastructures. The purpose of this
+#' is to be able to use R's save function to serialize objects, which Rcpp does
+#' not support with C++ classes.
+#' 
+extractBaseInfo <- function(parameter){
   trace <- parameter$getTraceObject()
   sPhiTraces <- trace$getSphiTraces()
   sphiAcceptRatTrace <- trace$getSphiAcceptanceRatioTrace()
@@ -500,8 +757,26 @@ extractBaseInfo <- function(parameter)
 }
 
 
-writeParameterObject.Rcpp_ROCParameter <- function(parameter, file)
-{
+
+
+#' Write ROC Parameter Object to a File
+#' 
+#' @param parameter A parameter object that corrosponds to
+#' the ROC model.
+#' 
+#' @param file A filename that where the data will be stored.
+#' The file should end with the extension "Rdat".
+#' 
+#' @return This function has no return value.
+#' 
+#' @description \code{writeROCParameterObject} saves ROC parameter information 
+#' to a file which can be used to re-initialize the object.
+#' 
+#' @details The file is written via R's save function. This function should
+#' never be called; instead, \code{writeParameterObject} should be called
+#' and allowed to make the necessary function call.
+#' 
+writeParameterObject.Rcpp_ROCParameter <- function(parameter, file){
   paramBase <- extractBaseInfo(parameter)
   
   currentMutation <- parameter$currentMutationParameter
@@ -525,8 +800,25 @@ writeParameterObject.Rcpp_ROCParameter <- function(parameter, file)
 }
 
 
-writeParameterObject.Rcpp_RFPParameter <- function(parameter, file)
-{
+
+#' Write RFP Parameter Object to a File
+#' 
+#' @param parameter A parameter object that corrosponds to
+#' the RFP model.
+#' 
+#' @param file A filename that where the data will be stored.
+#' The file should end with the extension "Rdat".
+#' 
+#' @return This function has no return value.
+#' 
+#' @description \code{writeRFPParameterObject} saves RFP parameter information 
+#' to a file which can be used to re-initialize the object.
+#' 
+#' @details The file is written via R's save function. This function should
+#' never be called; instead, \code{writeParameterObject} should be called
+#' and allowed to make the necessary function call.
+#' 
+writeParameterObject.Rcpp_RFPParameter <- function(parameter, file){
   paramBase <- extractBaseInfo(parameter)
   
   currentAlpha <- parameter$currentAlphaParameter
@@ -545,25 +837,52 @@ writeParameterObject.Rcpp_RFPParameter <- function(parameter, file)
 }
 
 
+
+
+#' Write FONSE Parameter Object to a File
+#' 
+#' @param parameter A parameter object that corrosponds to
+#' the RFP model.
+#' 
+#' @param file A filename that where the data will be stored.
+#' The file should end with the extension "Rdat".
+#' 
+#' @return This function has no return value.
+#' 
+#' @description \code{writeFONSEParameterObject} saves FONSE parameter information 
+#' to a file which can be used to re-initialize the object.
+#' 
+#' @details The file is written via R's save function. This function should
+#' never be called; instead, \code{writeParameterObject} should be called
+#' and allowed to make the necessary function call.
+#' 
 writeParameterObject.Rcpp_FONSEParameter <- function(parameter, file)
 {
-  trace <- parameter$getTraceObject()
-  sPhiTraces <- trace$getSphiTraces()
-  sphiAcceptRatTrace <- trace$getSphiAcceptanceRatioTrace()
-  synthRateTrace <- trace$getSynthesisRateTrace()
-  synthAcceptRatTrace <- trace$getSynthesisRateAcceptanceRatioTrace()
-  mixAssignTrace <- trace$getMixutreAssignmentTrace()
-  mixProbTrace <- trace$getMixtureProbabilitiesTrace()
-  cspAcceptRatTrace <- trace$getCspAcceptanceRatioTrace()
-  mutationTrace <- trace$getMutationParameterTrace()
-  selectionTrace <- trace$getSelectionParameterTrace()
-  save(list = c("sPhiTraces", "sphiAcceptRatTrace", "synthRateTrace", "synthAcceptRatTrace", 
-                "mixAssignTrace", "mixProbTrace", "cspAcceptRatTrace", "mutationTrace", "selectionTrace",
-                "loglikeTrace"),
-       file=file)
+  #TODO:
 }
 
 
+
+
+#' Load Parameter Object
+#' 
+#' @param parameter A parameter object that corrosponds to
+#' one of the model types, such as "ROC", or "FONSE".
+#' 
+#' @param file A filename that where the data will be stored.
+#' 
+#' @param model Type of the model. Should corrospond to the parameter type.
+#' 
+#' @return This function has no return value.
+#' 
+#' @description \code{writeParameterObject} will call the appropriate followup
+#' call to writeXXXParameterObject based off of the parameter type 
+#' given.
+#' 
+#' @details For example, if a ROCParameter is passed, the the writeParameterObject
+#' for the ROCParameter will be called. This allows us to not have an if-else
+#' block in the code - making use of the how R handles these situations.
+#' 
 loadParameterObject <- function(parameter, file, model)
 {
   UseMethod("loadParameterObject", parameter)
