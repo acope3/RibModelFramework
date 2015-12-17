@@ -23,11 +23,7 @@ parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssig
                                        mixture.definition = mixDef)
 
 # initialize MCMC object
-<<<<<<< HEAD
-samples <- 30
-=======
 samples <- 10
->>>>>>> 7d2da23b3b23ef26c5bb022fcea657bb9ae5b52d
 thining <- 10
 adaptiveWidth <- 10
 mcmc <- initializeMCMCObject(samples=samples, thining=thining, adaptive.width=adaptiveWidth,

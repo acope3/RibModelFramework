@@ -426,7 +426,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 		}
 
 
-		if( ( (iteration) % (50*adaptiveWidth)) == 0u)
+		/*if( ( (iteration) % (50*adaptiveWidth)) == 0u)
 		{
 			double gewekeScore = calculateGewekeScore(iteration/thining);
 			std::cout << "##################################################" << "\n";
@@ -440,7 +440,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 				model.setLastIteration(iteration/thining);
 				//break;
 			}
-		}
+		}*/
 	} // end MCMC loop
 
 	std::cout << "leaving MCMC loop" << std::endl;

@@ -12,31 +12,31 @@
 #' 
 #' @return This function returns the Genome Rcpp object created.
 #' 
-initializeGenomeObject <- function(file, fasta=TRUE, expression.file=NULL, append=FALSE)
-{
+initializeGenomeObject <- function(file, fasta=TRUE, expression.file=NULL, append=FALSE) {
   genome <- new(Genome)
-  if (fasta == TRUE)
-  {
+  if (fasta == TRUE) {
     genome$readFasta(file, append)
-  }
-  else
-  {
+  } else {
     genome$readRFPFile(file)
   }
-  if(!is.null(expression.file))
-  {
+  if(!is.null(expression.file)) {
     genome$readObservedPhiValues(expression.file, FALSE)
   }
   return(genome)
 }
 
-length.Rcpp_Genome <- function(genome)
-{
+#' Length of Genome
+#' 
+#' \code{length} gives the length of a genome
+#' 
+#' @param genome A genome object initialized with \code{\link{initializeGenomeObject}}.
+#' 
+#' @return returns the number of genes in a genome
+length.Rcpp_Genome <- function(genome) {
   return(genome$getGenomeSize())
 }
 
-summary.Rcpp_Genome <- function(genome)
-{
+summary.Rcpp_Genome <- function(genome) {
   # TODO output stuff like:
   # - no. of genes
   # - avg. gene length
