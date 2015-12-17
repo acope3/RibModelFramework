@@ -68,6 +68,7 @@ plot.Rcpp_FONSEParameter <- function(x, what = "Mutation", samples = 100, ...)
   #pairs(csp.params, upper.panel = upper.panel.plot, lower.panel=NULL, main = ...)
 }
 
+# NOT EXPOSED
 upper.panel.plot <- function(x, y, sd.x=NULL, sd.y=NULL, ...)
 {
   abline(0, 1, col = "blue", lty = 2)
@@ -118,6 +119,8 @@ upper.panel.plot <- function(x, y, sd.x=NULL, sd.y=NULL, ...)
        parse(text = paste("rho == ", sprintf("%.4f", rho), sep = "")),
        pos = 2, cex = 1.0, font = 2)
 }
+
+# NOT EXPOSED
 lower.panel.plot <- function(x, y, ...)
 {
   

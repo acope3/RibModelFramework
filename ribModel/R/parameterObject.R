@@ -197,7 +197,8 @@ initializeParameterObject <- function(genome, sphi, numMixtures, geneAssignment,
 #' no error checking is doen in this function. Additional documentation on 
 #' the mixture.definition.matrix and mixture.definition can
 #' be found in the documentation for \code{initializeParameterObject}.
-#' 
+
+# NOT EXPOSED
 initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignment,
                       expressionValues = NULL, split.serine = TRUE,
                       mixture.definition = "allUnique", 
@@ -331,7 +332,8 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
 #' no error checking is doen in this function. Additional documentation on 
 #' the mixture.definition.matrix and mixture.definition can
 #' be found in the documentation for \code{initializeParameterObject}.
-#' 
+
+# NOT EXPOSED
 initializeRFPParameterObject <- function(genome, sphi, numMixtures, geneAssignment, 
                           expressionValues = NULL, split.serine = TRUE, 
                           mixture.definition = "allUnique", 
@@ -413,7 +415,8 @@ initializeRFPParameterObject <- function(genome, sphi, numMixtures, geneAssignme
 #' no error checking is doen in this function. Additional documentation on 
 #' the mixture.definition.matrix and mixture.definition can
 #' be found in the documentation for \code{initializeParameterObject}.
-#' 
+
+# NOT EXPOSED
 initializeFONSEParameterObject <- function(genome, sphi, numMixtures, 
                         geneAssignment, expressionValues = NULL, split.serine = TRUE,
                         mixture.definition = "allUnique", 
@@ -565,7 +568,9 @@ writeParameterToCSV <- function(parameter, filename, CSP, mixture, samples){
 #' @details \code{writeROCParameterToCSV} For the given CSP, the posterior mean will
 #' be calculated based off the number of samples for each amino acid given. If no
 #' filename is given, the results will be printed to the screen.
-#'  
+#' 
+
+# NOT EXPOSED 
 writeParameterToCSV.Rcpp_ROCParameter <- function(parameter, filename=NULL, 
                                             CSP=NULL, mixture = 1, samples = 10){
   names.aa <- aminoAcids()
@@ -641,7 +646,7 @@ getCodonCountsForAA <- function(aa, genome){
 
 
 
-
+# NOT EXPOSED
 getCSPbyLogit <- function(codonCounts, phi, coefstart = NULL, x.arg = FALSE, y.arg = FALSE, qr.arg = FALSE)
 {
   #avoid cases with 0 aa count
@@ -662,7 +667,7 @@ getCSPbyLogit <- function(codonCounts, phi, coefstart = NULL, x.arg = FALSE, y.a
 
 
 
-
+# NOT EXPOSED
 subMatrices <- function(M, r, c)
 {
   rg <- (row(M) - 1) %/% r + 1
@@ -672,7 +677,7 @@ subMatrices <- function(M, r, c)
 }
 
 
-
+# NOT EXPOSED
 splitMatrix <- function(M, r, c)
 {
   rci <- subMatrices(M, r, c)
@@ -725,6 +730,8 @@ writeParameterObject <- function(parameter, file)
 #' is to be able to use R's save function to serialize objects, which Rcpp does
 #' not support with C++ classes.
 #' 
+
+# NOT EXPOSED
 extractBaseInfo <- function(parameter){
   trace <- parameter$getTraceObject()
   sPhiTraces <- trace$getSphiTraces()
@@ -776,6 +783,8 @@ extractBaseInfo <- function(parameter){
 #' never be called; instead, \code{writeParameterObject} should be called
 #' and allowed to make the necessary function call.
 #' 
+
+# NOT EXPOSED
 writeParameterObject.Rcpp_ROCParameter <- function(parameter, file){
   paramBase <- extractBaseInfo(parameter)
   
@@ -818,6 +827,8 @@ writeParameterObject.Rcpp_ROCParameter <- function(parameter, file){
 #' never be called; instead, \code{writeParameterObject} should be called
 #' and allowed to make the necessary function call.
 #' 
+
+# NOT EXPOSED
 writeParameterObject.Rcpp_RFPParameter <- function(parameter, file){
   paramBase <- extractBaseInfo(parameter)
   
@@ -856,6 +867,8 @@ writeParameterObject.Rcpp_RFPParameter <- function(parameter, file){
 #' never be called; instead, \code{writeParameterObject} should be called
 #' and allowed to make the necessary function call.
 #' 
+
+# NOT EXPOSED
 writeParameterObject.Rcpp_FONSEParameter <- function(parameter, file)
 {
   #TODO:
@@ -888,7 +901,7 @@ loadParameterObject <- function(parameter, file, model)
   UseMethod("loadParameterObject", parameter)
 }
 
-
+# NOT EXPOSED
 setBaseInfo <- function(parameter, file, model)
 {
   tempEnv <- new.env();
@@ -921,7 +934,7 @@ setBaseInfo <- function(parameter, file, model)
   return(parameter)
 }
 
-
+# NOT EXPOSED
 loadParameterObject.Rcpp_ROCParameter <- function(parameter, file, model)
 {
   tempEnv <- new.env();
@@ -943,7 +956,7 @@ loadParameterObject.Rcpp_ROCParameter <- function(parameter, file, model)
   return(parameter) #Because of concerns with R passing arguments, we return explicitly.
 }
 
-
+# NOT EXPOSED
 loadParameterObject.Rcpp_RFPParameter <- function(parameter, file, model)
 {
   tempEnv <- new.env();

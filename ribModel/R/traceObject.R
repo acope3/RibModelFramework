@@ -1,3 +1,4 @@
+# NOT EXPOSED
 convergence.test.Rcpp_ROCTrace <- function(object, nsamples = 10, frac1 = 0.1, frac2 = 0.5, thin = 1, plot = FALSE, what, mixture = 1, ...)
 {
   # TODO: extend to work with multiple chains once we have that capability.

@@ -173,6 +173,7 @@ plot.Rcpp_FONSEModel <- function(x, genome, parameter, samples = 100, mixture = 
   par(opar)
 }
 
+# NOT EXPOSED
 plotSinglePanel <- function(parameter, model, genome, expressionValues, samples, mixture, aa)
 {
   codons <- AAToCodon(aa, T)

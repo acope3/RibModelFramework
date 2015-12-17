@@ -108,6 +108,7 @@ plot.Rcpp_FONSETrace <- function(x, what=c("Mutation", "Selection", "MixtureProb
   }
 }
 
+# NOT EXPOSED
 plotCodonSpecificParameters <- function(trace, mixture, type="mutation", main="Mutation Parameter Traces", ROC=TRUE)
 {
   opar <- par(no.readonly = T) 
@@ -200,11 +201,13 @@ plotCodonSpecificParameters <- function(trace, mixture, type="mutation", main="M
   par(opar)
 } 
 
+# NOT EXPOSED
 plotExpressionTrace <- function(trace, geneIndex)
 {
   plot(log10(trace$getSynthesisRateTraceForGene(geneIndex)), type= "l", xlab = "Sample", ylab = expression("log"[10]~"("~phi~")"))
 }
 
+# NOT EXPOSED
 plotExpectedPhiTrace <- function(trace)
 {
   par(mar=c(5,5,4,2))
@@ -212,6 +215,8 @@ plotExpectedPhiTrace <- function(trace)
        main = expression("Trace of the Expected value of "~phi))
   abline(h=1, col="red", lwd=1.5, lty=2)
 }
+
+# NOT EXPOSED
 plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sepsilon"))
 {
 #  opar <- par(no.readonly = T) 
@@ -278,6 +283,8 @@ plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sep
   }
   #par(opar)
 }
+
+# NOT EXPOSED
 plotMixtureProbability <- function(trace)
 {
   samples <- length(trace$getMixtureProbabilitiesTraceForMixture(1))

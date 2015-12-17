@@ -10,6 +10,8 @@ runMCMC <- function(mcmc, genome, model, ncores = 1, divergence.iteration = 0)
 {
   UseMethod("runMCMC", mcmc)
 }
+
+# NOT EXPOSED
 runMCMC.Rcpp_MCMCAlgorithm <- function(mcmc, genome, model, ncores = 1, divergence.iteration = 0)
 {
   mcmc$run(genome, model, ncores, divergence.iteration)
@@ -18,6 +20,8 @@ setRestartSettings <- function(mcmc, filename, samples, write.multiple=TRUE)
 {
   UseMethod("setRestartSettings", mcmc)
 }
+
+# NOT EXPOSED
 setRestartSettings.Rcpp_MCMCAlgorithm <- function(mcmc, filename, samples, write.multiple=TRUE)
 {
   mcmc$setRestartFileSettings(filename, samples, write.multiple)
@@ -27,6 +31,8 @@ convergence.test <- function(object, nsamples = 10, frac1 = 0.1, frac2 = 0.5, th
 {
   UseMethod("convergence.test", object)
 }
+
+# NOT EXPOSED
 convergence.test.Rcpp_MCMCAlgorithm <- function(object, nsamples = 10, frac1 = 0.1, frac2 = 0.5, thin = 1, plot = FALSE, ...)
 {
   # TODO: extend to work with multiple chains once we have that capability.
