@@ -786,16 +786,16 @@ void RFPParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
 			numAcceptForSynthesisRate[cat][i] = 0u;
 		}
 	}
-	std::cout << "acceptance ratio for synthesis rate:\n";
-	std::cout << "\t acceptance ratio to low: " << acceptanceUnder << "\n";
-	std::cout << "\t acceptance ratio to high: " << acceptanceOver << "\n";
+	std::cout << "acceptance rate for synthesis rate:\n";
+	std::cout << "\t acceptance rate to low: " << acceptanceUnder << "\n";
+	std::cout << "\t acceptance rate to high: " << acceptanceOver << "\n";
 }
 
 
 void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
 {
 
-	std::cout << "acceptance ratio for codon:\n";
+	std::cout << "acceptance rate for codon:\n";
 	for (unsigned i = 0; i < groupList.size(); i++)
 	{
 		std::cout << groupList[i] << "\t";

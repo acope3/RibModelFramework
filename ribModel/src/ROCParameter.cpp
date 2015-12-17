@@ -1180,13 +1180,13 @@ void ROCParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
 		}
 	}
 #ifndef STANDALONE
-	Rprintf("acceptance ratio for synthesis rate:\n");
-	Rprintf("\t acceptance ratio to low: %d\n", acceptanceUnder);
-	Rprintf("\t acceptance ratio to high: %d\n", acceptanceOver);
+	Rprintf("acceptance rate for synthesis rate:\n");
+	Rprintf("\t acceptance rate to low: %d\n", acceptanceUnder);
+	Rprintf("\t acceptance rate to high: %d\n", acceptanceOver);
 #else
-	std::cout << "acceptance ratio for synthesis rate:\n";
-	std::cout << "\t acceptance ratio to low: " << acceptanceUnder << "\n";
-	std::cout << "\t acceptance ratio to high: " << acceptanceOver << "\n";
+	std::cout << "acceptance rate for synthesis rate:\n";
+	std::cout << "\t acceptance rate to low: " << acceptanceUnder << "\n";
+	std::cout << "\t acceptance rate to high: " << acceptanceOver << "\n";
 #endif
 }
 
@@ -1213,11 +1213,11 @@ void ROCParameter::adaptAphiProposalWidth(unsigned adaptationWidth)
 void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
 {
 #ifndef STANDALONE
-	Rprintf("Acceptance Ratio for Codon Specific Parameter\n");
+	Rprintf("Acceptance rate for Codon Specific Parameter\n");
 	Rprintf("AA\tAcc.Rat\tProp.Width\n");
 #else
-	std::cout << "Acceptance Ratio for Codon Specific Parameter\n";
-	std::cout << "AA\tAcc.Rat\tProp.Width\n";
+	std::cout << "Acceptance rate for Codon Specific Parameter\n";
+	std::cout << "AA\tacc.rat\tProp.Width\n";
 #endif
 	for (unsigned i = 0; i < groupList.size(); i++)
 	{

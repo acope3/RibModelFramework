@@ -879,16 +879,16 @@ void FONSEParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
             numAcceptForSynthesisRate[cat][i] = 0u;
         }
     }
-    std::cout << "acceptance ratio for synthesis rate:\n";
-    std::cout << "\t acceptance ratio to low: " << acceptanceUnder << "\n";
-    std::cout << "\t acceptance ratio to high: " << acceptanceOver << "\n";
+    std::cout << "acceptance rate for synthesis rate:\n";
+    std::cout << "\t acceptance rate to low: " << acceptanceUnder << "\n";
+    std::cout << "\t acceptance rate to high: " << acceptanceOver << "\n";
 }
 
 
 void FONSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
 {
     unsigned numCSPsets = numAcceptForMutationAndSelection.size();
-    std::cout << "acceptance ratio for amino acid:\n\t";
+    std::cout << "acceptance rate for amino acid:\n\t";
     for (unsigned i = 0; i < numCSPsets; i++)
     {
         if (i == 21 || i == 10 || i == 18)

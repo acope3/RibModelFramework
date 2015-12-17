@@ -19,8 +19,8 @@ geneAssignment <- sample(c(1,2), size = length(genome), replace = TRUE, prob = c
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
 
 samples <- 500
-thining <- 10
-adaptiveWidth <- 10
+thining <- 50
+adaptiveWidth <- 250000
 divergence.iteration <- 40
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE) 
 
