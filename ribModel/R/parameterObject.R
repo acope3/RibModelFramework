@@ -114,32 +114,26 @@ initializeParameterObject <- function(genome, sphi, numMixtures, geneAssignment,
                             geneAssignment, expressionValues, split.serine, 
                             mixture.definition, mixture.definition.matrix, 
                             mutation_prior_sd)    
-    }
-    else{
+    }else{
       parameter <- new(ROCParameter, restart.file)
     }
-  }
-  else if(model == "FONSE"){
+  }else if(model == "FONSE"){
     if(is.null(restart.file)){
       parameter <- initializeFONSEParameterObject(genome, sphi, numMixtures, 
                             geneAssignment, expressionValues, split.serine, 
                             mixture.definition, mixture.definition.matrix)
-    }
-    else{
+    }else{
       parameter <- new(FONSEParameter, restart.file)
     }
-  }
-  else if(model == "RFP"){
+  }else if(model == "RFP"){
     if(is.null(restart.file)){
       parameter <- initializeRFPParameterObject(genome, sphi, numMixtures, 
                             geneAssignment, expressionValues, split.serine, 
                             mixture.definition, mixture.definition.matrix) 
-    }
-    else{
+    }else{
       parameter <- new(RFPParameter, restart.file)
     }
-  }
-  else{
+  }else{
     stop("Unknown model.")
   }
   
@@ -206,8 +200,7 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
   if(is.null(mixture.definition.matrix)){ 
     # keyword constructor
     parameter <- new(ROCParameter, sphi, numMixtures, geneAssignment, split.serine, mixture.definition)
-  }
-  else{
+  }else{
     #matrix constructor
     mixture.definition <- c(mixture.definition.matrix[, 1], mixture.definition.matrix[, 2])
     parameter <- new(ROCParameter, sphi, numMixtures, geneAssignment, mixture.definition, split.serine)
@@ -217,8 +210,7 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
   # initialize expression values
   if(is.null(expressionValues)){
     parameter$initializeSynthesisRateByGenome(genome, mean(sphi))
-  }
-  else{
+  }else{
     parameter$initializeSynthesisRateByList(expressionValues)
   }
   
@@ -341,8 +333,7 @@ initializeRFPParameterObject <- function(genome, sphi, numMixtures, geneAssignme
   { # keyword constructor
     parameter <- new(RFPParameter, sphi, numMixtures, geneAssignment, 
                      split.serine, mixture.definition)
-  }
-  else{
+  }else{
     #matrix constructor
     mixture.definition <- c(mixture.definition.matrix[, 1], 
                             mixture.definition.matrix[, 2])
@@ -354,8 +345,7 @@ initializeRFPParameterObject <- function(genome, sphi, numMixtures, geneAssignme
   # initialize expression values
   if(is.null(expressionValues)){
     parameter$initializeSynthesisRateByGenome(genome, sphi)
-  }
-  else{
+  }else{
     parameter$initializeSynthesisRateByList(expressionValues)
   }
   
@@ -425,8 +415,7 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
   { # keyword constructor
     parameter <- new(FONSEParameter, sphi, numMixtures, geneAssignment, 
                      split.serine, mixture.definition)
-  }
-  else{
+  }else{
     #matrix constructor
     mixture.definition <- c(mixture.definition.matrix[, 1], 
                             mixture.definition.matrix[, 2])
@@ -438,8 +427,7 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
   # initialize expression values
   if(is.null(expressionValues)){
     parameter$initializeSynthesisRateByGenome(genome, sphi)
-  }
-  else{
+  }else{
     parameter$initializeSynthesisRateByList(expressionValues)
   }
   
@@ -603,8 +591,7 @@ writeParameterToCSV.Rcpp_ROCParameter <- function(parameter, filename=NULL,
   if(is.null(filename))
   {
     print(data)
-  }else 
-  {
+  }else {
     write.csv(data, file = filename, row.names = FALSE, quote=FALSE)
   }
 }
@@ -751,7 +738,9 @@ extractBaseInfo <- function(parameter){
                     numMix = numMix,
                     numMut = numMut,
                     numSel = numSel,
-                    categories = categories
+                    categories = categories,
+                    curMixAssignment = curMixAssignment,
+                    lastIteration = lastIteration
                     )
   return(varList)
 }
@@ -783,6 +772,7 @@ writeParameterObject.Rcpp_ROCParameter <- function(parameter, file){
   currentSelection <- parameter$currentSelectionParameter
   proposedMutation <- parameter$proposedMutationParameter
   proposedSelection <- parameter$proposedSelectionParameter
+  model = "ROC"
   
   trace <- parameter$getTraceObject()
   
@@ -793,7 +783,7 @@ writeParameterObject.Rcpp_ROCParameter <- function(parameter, file){
   sepisolonTrace <- trace$getSepsilonTraces()
   
   save(list = c("paramBase", "currentMutation", "currentSelection",
-                "proposedMutation", "proposedSelection",  
+                "proposedMutation", "proposedSelection", "model",  
                 "mutationTrace", "selectionTrace", 
                 "aphiAcceptRatTrace", "aphiTrace", "sepisolonTrace"),
        file=file)
@@ -825,6 +815,7 @@ writeParameterObject.Rcpp_RFPParameter <- function(parameter, file){
   currentLambdaPrime <- parameter$currentLambdaPrimeParameter
   proposedAlpha <- parameter$proposedAlphaParameter
   proposedLambdaPrime <- parameter$proposedLambdaPrimeParameter
+  model = "RFP"
   
   
   trace <- parameter$getTraceObject()
@@ -832,7 +823,7 @@ writeParameterObject.Rcpp_RFPParameter <- function(parameter, file){
   lambdaPrimeTrace <- trace$getLambdaPrimeParameterTrace()
 
   save(list = c("paramBase", "currentAlpha", "currentLambdaPrime", "proposedAlpha",
-                "proposedLambdaPrime", "alphaTrace", "lambdaPrimeTrace"),
+                "proposedLambdaPrime", "model", "alphaTrace", "lambdaPrimeTrace"),
        file=file)
 }
 
@@ -883,13 +874,28 @@ writeParameterObject.Rcpp_FONSEParameter <- function(parameter, file)
 #' for the ROCParameter will be called. This allows us to not have an if-else
 #' block in the code - making use of the how R handles these situations.
 #' 
-loadParameterObject <- function(parameter, file, model)
+loadParameterObject <- function(file)
 {
-  UseMethod("loadParameterObject", parameter)
+  tempEnv <- new.env();
+  load(file = file, envir = tempEnv)
+  model <- tempEnv$model
+  if (model == "ROC"){
+    parameter <- new(ROCParameter)
+    parameter <- loadROCParameterObject(parameter, file)
+  }else if (model == "RFP") {
+    parameter <- new(RFPParameter)
+    parameter <- loadRFPParameterObject(parameter, file)
+  }else if (model == "FONSE") {
+    parameter <- new(FONSEParameter)
+    parameter <- loadFONSEParameterObject(parameter, file)
+  }else{
+    stop("File data corrupted")
+  }
+  return(parameter)
 }
 
 
-setBaseInfo <- function(parameter, file, model)
+setBaseInfo <- function(parameter, file)
 {
   tempEnv <- new.env();
   load(file = file, envir = tempEnv)
@@ -909,24 +915,24 @@ setBaseInfo <- function(parameter, file, model)
   trace$setMixtureAssignmentTrace(tempEnv$paramBase$mixAssignTrace)
   trace$setMixtureProbabilitiesTrace(tempEnv$paramBase$mixProbTrace)
   trace$setCspAcceptanceRatioTrace(tempEnv$paramBase$cspAcceptRatTrace)
+  
+  model <- tempEnv$model
   if (model == "ROC"){
     parameter$setROCTrace(trace)
-  }
-  else if (model == "RFP"){
+  }else if (model == "RFP"){
     parameter$setRFPTrace(trace)
-  }
-  else if (model == "FONSE"){
+  }else if (model == "FONSE"){
     parameter$setFONSETrace(trace)
   }
   return(parameter)
 }
 
 
-loadParameterObject.Rcpp_ROCParameter <- function(parameter, file, model)
+loadROCParameterObject <- function(parameter, file)
 {
   tempEnv <- new.env();
   load(file = file, envir = tempEnv)
-  setBaseInfo(parameter, file, model)
+  setBaseInfo(parameter, file)
   parameter$currentMutationParameter <- tempEnv$currentMutation
   parameter$currentSelectionParameter <- tempEnv$currentSelection
   parameter$proposedMutationParameter <- tempEnv$proposedMutation
@@ -944,11 +950,11 @@ loadParameterObject.Rcpp_ROCParameter <- function(parameter, file, model)
 }
 
 
-loadParameterObject.Rcpp_RFPParameter <- function(parameter, file, model)
+loadRFPParameterObject <- function(parameter, file)
 {
   tempEnv <- new.env();
   load(file = file, envir = tempEnv)
-  setBaseInfo(parameter, file, model)
+  setBaseInfo(parameter, file)
   parameter$currentAlphaParameter <- tempEnv$currentAlpha
   parameter$proposedAlphaParameter <- tempEnv$proposedAlpha
   parameter$currentLambdaPrimeParameter <- tempEnv$currentLambdaPrime
@@ -960,4 +966,10 @@ loadParameterObject.Rcpp_RFPParameter <- function(parameter, file, model)
   
   parameter$setRFPTrace(trace)
   return(parameter) #R seems to produce copies, not pointers.
+}
+
+
+loadFONSEParameterObject <- function(parameter, file)
+{
+  
 }
