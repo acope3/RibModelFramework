@@ -31,6 +31,8 @@ initializeParameterObject <- function(genome, sphi, numMixtures, geneAssignment,
     {
       parameter <- initializeFONSEParameterObject(genome, sphi, numMixtures, geneAssignment, expressionValues,
                                     split.serine, mixture.definition, mixture.definition.matrix)
+    } else {
+      parameter <- new(FONSEParameter, restart.file)
     }
   }else if(model == "RFP"){
     if(is.null(restart.file))
