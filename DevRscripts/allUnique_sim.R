@@ -19,9 +19,9 @@ geneAssignment <- sample(c(1,2), size = length(genome), replace = TRUE, prob = c
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
 #parameter <- initializeParameterObject(genome, sphi = sphi_init, geneAssignment = geneAssignment, numMixtures = numMixtures, restart.file = "5001_simulated_allUnique.rst")
 
-samples <- 500
+samples <- 8000
 thining <- 10
-adaptiveWidth <- 10000
+adaptiveWidth <- 10
 divergence.iteration <- 0
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE) 
 
@@ -41,9 +41,9 @@ loglik.trace <- mcmc$getLogLikelihoodTrace()[-1]
 acf(loglik.trace) 
 convergence.test(mcmc, n.samples = 500, plot=T) 
 
-trace <- parameter$getTraceObject() 
-plot(trace, what = "MixtureProbability") 
-plot(trace, what = "Sphi") 
+trace <- parameter$getTraceObject()
+plot(trace, what = "MixtureProbability")
+plot(trace, what = "Sphi")
 plot(trace, what = "Mphi") 
 if (with.phi) { 
   plot(trace, what = "Aphi") 
@@ -114,8 +114,8 @@ for(k in 1:numMixtures){
   selection <- c() 
   mutation <- c() 
   codon.storage <- c() 
-  csp.m <- read.table(observed.mutation[k], sep=",", header=T) 
-  csp.e <- read.table(observed.selection[k], sep=",", header=T) 
+  csp.m <- read.table(observed.mutation[mixture], sep=",", header=T) 
+  csp.e <- read.table(observed.selection[mixture], sep=",", header=T) 
   csp <- rbind(csp.m,csp.e) 
   idx.eta <- 41:80 
   idx.mu <- 1:40 
