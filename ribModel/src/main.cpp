@@ -107,7 +107,7 @@ void testCovMatrixOverloading()
 void testWriteRestartFile()
 {
 	Genome genome;
-	genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/fake.fasta", false);
+	genome.readFasta("/Users/roxasoath1/Desktop/RibModelFramework/data/test.fasta", false);
 	std::cout << "------------------ TEST WRITERESTARTFILE ------------------" << std::endl;
 	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
@@ -120,12 +120,12 @@ void testWriteRestartFile()
 	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 	ROCParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 	std::vector<std::string> files(2);
-	files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_mutation0.csv");
-	files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_mutation1.csv");
+	files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/data/twoMixtures/simulated_mutation0.csv");
+	files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/data/twoMixtures/simulated_mutation1.csv");
 	parameter.initMutationCategories(files, parameter.getNumMutationCategories());
 
-	files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_selection0.csv");
-	files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulated_selection1.csv");
+	files[0] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/data/twoMixtures/simulated_selection0.csv");
+	files[1] = std::string("/Users/roxasoath1/Desktop/RibModelFramework/data/twoMixtures/simulated_selection1.csv");
 	parameter.initSelectionCategories(files, parameter.getNumSelectionCategories());
 	parameter.InitializeSynthesisRate(genome, sphi_init[0]);
 	ROCModel model;
@@ -138,7 +138,7 @@ void testWriteRestartFile()
 void testInitFromRestartFile()
 {
 	std::cout << "------------------ TEST INITFROMRESTARTFILE ------------------" << std::endl;
-	ROCParameter parameter("20RestartFile.txt");
+	ROCParameter parameter("RestartFile1.txt");
 	ROCModel model;
 
 	model.setParameter(parameter);
@@ -421,7 +421,7 @@ int main()
 	User user = jeremy;
 	ModelToRun modelToRun = ROC;
 	bool read = false;
-	bool testing = false;
+	bool testing = true;
 	bool withPhi = false;
 	if (testing)
 	{
@@ -431,8 +431,8 @@ int main()
 		//testRandMultiNom(3);
 		//testThetaKMatrix();
 		//testCovMatrixOverloading();
-		//testWriteRestartFile();
-		//testInitFromRestartFile();
+		testWriteRestartFile();
+		testInitFromRestartFile();
 		//testReadRFPFile();
 		//testReadObservedPhis();
 		//simulateRFPData();

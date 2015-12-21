@@ -147,6 +147,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, numMixtures = 
   return(parameter)
 }
 
+
 #Called from initializeParameterObject. 
 initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignment,
                       expressionValues = NULL, split.serine = TRUE,
@@ -155,11 +156,14 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
 
   if(is.null(mixture.definition.matrix)){ 
     # keyword constructor
-    parameter <- new(ROCParameter, sphi, numMixtures, geneAssignment, split.serine, mixture.definition)
+    parameter <- new(ROCParameter, sphi, numMixtures, geneAssignment, 
+                     split.serine, mixture.definition)
   }else{
     #matrix constructor
-    mixture.definition <- c(mixture.definition.matrix[, 1], mixture.definition.matrix[, 2])
-    parameter <- new(ROCParameter, sphi, numMixtures, geneAssignment, mixture.definition, split.serine)
+    mixture.definition <- c(mixture.definition.matrix[, 1], 
+                            mixture.definition.matrix[, 2])
+    parameter <- new(ROCParameter, sphi, numMixtures, geneAssignment, 
+                     mixture.definition, split.serine)
   }
   
   
@@ -176,6 +180,7 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
   
   return(parameter)
 }
+
 
 #Called from initializeParameterObject.
 initializeRFPParameterObject <- function(genome, sphi, numMixtures, geneAssignment, 
@@ -347,6 +352,7 @@ getCodonCountsForAA <- function(aa, genome){
   return(codonCounts)
 }
 
+
 # Uses a multinomial logistic regression to estimate the codon specific parameters for every category.
 # Delta M is the intercept - and Delta eta is the slope of the regression.
 # The package VGAM is used to perform the regression.
@@ -379,6 +385,8 @@ subMatrices <- function(M, r, c){
   return(rci)
 }
 
+
+
 #TODO: Need comments explaining what is going on
 splitMatrix <- function(M, r, c){
   rci <- subMatrices(M, r, c)
@@ -387,6 +395,7 @@ splitMatrix <- function(M, r, c){
   
   return(lapply(1:N, function(i) matrix(cv[[i]], nrow = r)))
 } 
+
 
 
 # Also initializes the mutaiton and selection parameter
@@ -536,6 +545,7 @@ extractBaseInfo <- function(parameter){
 }
 
 
+#called from "writeParameterObject."
 writeParameterObject.Rcpp_ROCParameter <- function(parameter, file){
   paramBase <- extractBaseInfo(parameter)
   
@@ -544,6 +554,7 @@ writeParameterObject.Rcpp_ROCParameter <- function(parameter, file){
   proposedMutation <- parameter$proposedMutationParameter
   proposedSelection <- parameter$proposedSelectionParameter
   model = "ROC"
+  #TODO: add mutation prior
   
   trace <- parameter$getTraceObject()
   
@@ -561,6 +572,7 @@ writeParameterObject.Rcpp_ROCParameter <- function(parameter, file){
 }
 
 
+#called from "writeParameterObject."
 writeParameterObject.Rcpp_RFPParameter <- function(parameter, file){
   paramBase <- extractBaseInfo(parameter)
   
@@ -581,9 +593,10 @@ writeParameterObject.Rcpp_RFPParameter <- function(parameter, file){
 }
 
 
+#called from "writeParameterObject."
 writeParameterObject.Rcpp_FONSEParameter <- function(parameter, file)
 {
-  #TODO:
+  #TODO: implement
 }
 
 
@@ -610,9 +623,12 @@ writeParameterObject.Rcpp_FONSEParameter <- function(parameter, file)
 #' 
 loadParameterObject <- function(file)
 {
+  #A temporary env is set up to stop R errors.
   tempEnv <- new.env();
   load(file = file, envir = tempEnv)
   model <- tempEnv$model
+  
+  
   if (model == "ROC"){
     parameter <- new(ROCParameter)
     parameter <- loadROCParameterObject(parameter, file)
@@ -629,6 +645,7 @@ loadParameterObject <- function(file)
 }
 
 
+#Sets all the common variables in the parameter objects.
 setBaseInfo <- function(parameter, file)
 {
   tempEnv <- new.env();
@@ -662,10 +679,13 @@ setBaseInfo <- function(parameter, file)
 }
 
 
+#Called from "loadParameterObject."
 loadROCParameterObject <- function(parameter, file)
 {
   tempEnv <- new.env();
   load(file = file, envir = tempEnv)
+  
+  
   setBaseInfo(parameter, file)
   parameter$currentMutationParameter <- tempEnv$currentMutation
   parameter$currentSelectionParameter <- tempEnv$currentSelection
@@ -680,13 +700,16 @@ loadROCParameterObject <- function(parameter, file)
   
   
   parameter$setROCTrace(trace)
-  return(parameter) #Because of concerns with R passing arguments, we return explicitly.
+  return(parameter) 
 }
 
+
+#Called from "loadParameterObject."
 loadRFPParameterObject <- function(parameter, file)
 {
   tempEnv <- new.env();
   load(file = file, envir = tempEnv)
+  
   setBaseInfo(parameter, file)
   parameter$currentAlphaParameter <- tempEnv$currentAlpha
   parameter$proposedAlphaParameter <- tempEnv$proposedAlpha
@@ -698,10 +721,11 @@ loadRFPParameterObject <- function(parameter, file)
   trace$setLambdaPrimeParameterTrace(tempEnv$lambdaPrimeTrace)
   
   parameter$setRFPTrace(trace)
-  return(parameter) #R seems to produce copies, not pointers.
+  return(parameter) 
 }
 
 
+#Called from "loadParameterObject."
 loadFONSEParameterObject <- function(parameter, file)
 {
  #TODO: 
