@@ -554,6 +554,7 @@ writeParameterObject.Rcpp_ROCParameter <- function(parameter, file){
   proposedMutation <- parameter$proposedMutationParameter
   proposedSelection <- parameter$proposedSelectionParameter
   model = "ROC"
+  #TODO: add mutation prior
   
   trace <- parameter$getTraceObject()
   

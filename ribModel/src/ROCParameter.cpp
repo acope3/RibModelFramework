@@ -253,6 +253,7 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 					while (iss >> val) {
 						Aphi.push_back(val);
 					}
+					std::cout <<"Aphi has a value\n";
 				}
 				else if (variableName == "Sepsilon")
 				{
@@ -283,6 +284,11 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 					{
 						mat.push_back(val);
 					}
+				}
+				else if (variableName == "mutation_prior_sd")
+				{
+					iss.str(tmp);
+					iss >> mutation_prior_sd;
 				}
 			}
 		}
@@ -348,6 +354,7 @@ void ROCParameter::writeROCRestartFile(std::string filename)
 			else
 				oss << " ";
 		}
+		oss << ">mutation_prior_sd:\n" << mutation_prior_sd << "\n";
 		oss << ">std_Aphi:\n";
 		for (unsigned i = 0; i < std_Aphi.size(); i++)
 		{
