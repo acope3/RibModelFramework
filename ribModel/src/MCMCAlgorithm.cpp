@@ -1,17 +1,20 @@
 #include "include/MCMCAlgorithm.h"
-#include "include/CovarianceMatrix.h"
 
+
+//R runs only
+#ifndef STANDALONE
+#include <Rcpp.h>
+using namespace Rcpp;
+#endif
+
+
+//C++ runs only.
 #ifdef STANDALONE
 #include <random>
 #endif
 
-#include <cstdlib>
-#include <sstream>
-#include <chrono>
-#include <iostream>
-#include <fstream>
-#include <stdlib.h> //can be removed later
 
+//Open MP
 #ifndef __APPLE__
 #include <omp.h>
 #include <thread>
@@ -19,10 +22,16 @@
 
 
 
+
+//--------------------------------------------------//
+// ---------- Constructors & Destructors -----------//
+//--------------------------------------------------//
+
+
 MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * thining), estimateSynthesisRate(true),
 	estimateCodonSpecificParameter(true), estimateHyperParameter(true)
 {
-	MCMCAlgorithm(1000, 1, true, true, true);
+	MCMCAlgorithm(1000, 1, true, true, true); //TODO: should not be calling another constructor.
 	likelihoodTrace.resize(samples);
 	writeRestartFile = false;
 	multipleFiles = false;
@@ -32,23 +41,37 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * 
 	estimateMixtureAssignment = true;
 }
 
-MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thining, unsigned _adaptiveWidth, bool _estimateSynthesisRate, bool _estimateCodonSpecificParameter, bool _estimateHyperParameter)
-: samples(_samples), thining(_thining), adaptiveWidth(_adaptiveWidth * thining), estimateSynthesisRate(_estimateSynthesisRate), estimateCodonSpecificParameter(_estimateCodonSpecificParameter),
-	estimateHyperParameter(_estimateHyperParameter)
+
+MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thining, unsigned _adaptiveWidth, bool _estimateSynthesisRate,
+							 bool _estimateCodonSpecificParameter, bool _estimateHyperParameter) : samples(_samples),
+							 thining(_thining), adaptiveWidth(_adaptiveWidth * thining),
+							 estimateSynthesisRate(_estimateSynthesisRate),
+							 estimateCodonSpecificParameter(_estimateCodonSpecificParameter),
+							 estimateHyperParameter(_estimateHyperParameter)
 {
 	likelihoodTrace.resize(samples);
 	writeRestartFile = false;
 	multipleFiles = false;
 	fileWriteInterval = 1u;
 	lastConvergenceTest = 0u;
-
 	estimateMixtureAssignment = true;
 }
+
 
 MCMCAlgorithm::~MCMCAlgorithm()
 {
 	//dtor
 }
+
+
+
+
+
+
+
+
+
+
 
 double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, Model& model, int iteration)
 {

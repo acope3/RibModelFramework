@@ -4,34 +4,35 @@
 \alias{initializeParameterObject}
 \title{Initialize Parameter}
 \usage{
-initializeParameterObject(genome, sphi, numMixtures, geneAssignment,
-  expressionValues = NULL, model = "ROC", split.serine = TRUE,
-  mixture.definition = "allUnique", mixture.definition.matrix = NULL,
-  restart.file = NULL, mutation_prior_sd = 0.35)
+initializeParameterObject(genome = NULL, sphi = NULL, numMixtures = 1,
+  geneAssignment = NULL, expressionValues = NULL, model = "ROC",
+  split.serine = TRUE, mixture.definition = "allUnique",
+  mixture.definition.matrix = NULL, restart.file = NULL,
+  mutation_prior_sd = 0.35)
 }
 \arguments{
-\item{genome}{A genome object which the parameter use.}
+\item{genome}{An object of type Genome necessary for the initialization of the Parameter object. The default value 
+is NULL.}
 
-\item{sphi}{Initial sphi values that corrosponds with the sphi for
-each mixture. sphi is a vector whose length should equal numMixtures.}
+\item{sphi}{Initial values for sphi. Expected is a vector of length numMixtures.
+The default value is NULL.}
 
-\item{numMixtures}{The number of mixtures the parameter 
-should use with the genome. This should be a positive number.}
+\item{numMixtures}{The number of mixtures elements for the underlying mixture distribution (numMixtures > 0).
+The default value is 1}
 
-\item{geneAssignment}{A vector holding that corrosponds to each
-gene in the genome. The vector size should equal the number of 
-genes in the genome. The assignment is to which mixture the 
-gene initially starts in. Valid values for the vector go from
-1 to numMixtures.}
+\item{geneAssignment}{A vector holding the initial mixture assignment for each gene. 
+The vector length has to equal the number of 
+genes in the genome. Valid values for the vector range from
+1 to numMixtures. It is possible but not advised to leave a mixture element empty. The default Value is NULL.}
 
-\item{expressionValues}{A vector containing the starting phi 
-values. This is an optional argument and is set to null if
-no value is given. If it is provided, the length of the 
-vector should equal the number of genes in the genome.}
+\item{expressionValues}{(Optional) A vector with intial phi values.
+The length of the vector has to equal the number of genes in the Genome object.
+The default value is NULL.}
 
-\item{model}{The string name of the model and parameter type 
-to create. Valid options are "ROC", "RFP", or "FONSE". The default
-value for model is "ROC".}
+\item{model}{Specifies the model used. Valid options are "ROC", "RFP", or "FONSE". The default
+model is "ROC". 
+ROC is described in Gilchrist et al. 2015
+RFP and FONSE are currently unpublished}
 
 \item{split.serine}{Whether serine should be considered as 
 one or two amino acids when running the model. TRUE and FALSE
@@ -54,7 +55,8 @@ for more information.}
 previous parameter object. If given, all other arguments will be ignored.
 The default value for restart.file is NULL.}
 
-\item{mutation_prior_sd}{TODO: Cedric needs to fill this in.}
+\item{mutation_prior_sd}{Controling the standard deviation of the normal 
+prior on the mutation parameters}
 }
 \value{
 parameter Returns an initialized parameter object.
@@ -96,5 +98,8 @@ In this case, the selection category is the same for every mixture. If a matrix
 is given, and it is valid, then the mutation/selection relationship will be
 defined by the given matrix as opposed to the keyword. A matrix should only
 be given in cases where the keywords would not create the desired valid matrix.
+
+If expressionValues is given, then the phi values will be initialized with 
+them. If not, we calculate starting phi values by doing an SCUO caculation.
 }
 
