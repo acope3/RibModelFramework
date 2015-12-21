@@ -73,6 +73,9 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 	logProbabilityRatio[0] = (proposedLogLikelihood - currentLogLikelihood) - (std::log(phiValue) - std::log(phiValue_proposed));
 	logProbabilityRatio[1] = currentLogLikelihood - std::log(phiValue_proposed);
 	logProbabilityRatio[2] = proposedLogLikelihood - std::log(phiValue);
+	logProbabilityRatio[3] = currentLogLikelihood;
+	logProbabilityRatio[4] = proposedLogLikelihood;
+
 }
 
 void ROCModel::calculateCodonProbabilityVector(unsigned numCodons, double mutation[], double selection[], double phi, double codonProb[])

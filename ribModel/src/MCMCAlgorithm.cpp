@@ -89,6 +89,10 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		double* unscaledLogProb_curr = new double[numSynthesisRateCategories]();
 		double* unscaledLogProb_prop = new double[numSynthesisRateCategories]();
 
+		double* unscaledLogPost_curr = new double[numSynthesisRateCategories]();
+		double* unscaledLogPost_prop = new double[numSynthesisRateCategories]();
+
+
 		double* unscaledLogProb_curr_singleMixture = new double[numMixtures]();
 		double* probabilities = new double[numMixtures]();
 
@@ -102,6 +106,8 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		{
 			unscaledLogProb_curr[j] = 0.0;
 			unscaledLogProb_prop[j] = 0.0;
+			unscaledLogPost_curr[j] = 0.0;
+			unscaledLogPost_prop[j] = 0.0;
 		}
 		
 		for(unsigned k = 0u; k < numSynthesisRateCategories; k++)
@@ -112,21 +118,16 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			for(unsigned n = 0u; n < mixtureElements.size(); n++)
 			{
 				unsigned mixtureElement = mixtureElements[n];
-				double logProbabilityRatio[3];
+				double logProbabilityRatio[5];
 				model.calculateLogLikelihoodRatioPerGene(gene, i, mixtureElement, logProbabilityRatio);
 
-/*
-				if (std::isinf(logProbabilityRatio[1])) {
-					std::cout << "logprob1 inf\n";
-				}
-				if (std::isinf(logProbabilityRatio[2])) {
-					std::cout << "logprob2 inf\n";
-				}
-*/
-				unscaledLogProb_curr[k] += logProbabilityRatio[1];
-				unscaledLogProb_prop[k] += logProbabilityRatio[2];
+				// log posterior with and without rev. jump probability
+				unscaledLogProb_curr[k] += logProbabilityRatio[1]; // with rev. jump prob.
+				unscaledLogProb_prop[k] += logProbabilityRatio[2]; // with rev. jump prob.
+				unscaledLogPost_curr[k] += logProbabilityRatio[3]; // without rev. jump prob.
+				unscaledLogPost_prop[k] += logProbabilityRatio[4]; // without rev. jump prob.
 
-				unscaledLogProb_curr_singleMixture[mixtureIndex] = logProbabilityRatio[1];
+				unscaledLogProb_curr_singleMixture[mixtureIndex] = logProbabilityRatio[3];
 				maxValue = unscaledLogProb_curr_singleMixture[mixtureIndex] > maxValue ? unscaledLogProb_curr_singleMixture[mixtureIndex] : maxValue;
 				mixtureIndex++;
 			}
@@ -166,12 +167,12 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				// only count each gene once, not numSynthesigeneIndexsRateCategories times
 				//if(geneSynthCat == k)
 					//logLikelihood += std::log(model.getCategoryProbability(k)) + propLogLike;
-				logLikelihood += probabilities[k] * propLogLike;
+				logLikelihood += probabilities[k] * unscaledLogPost_prop[k];
 			}else{
 				// only count each gene once, not numSynthesisRateCategories times
 				//if(geneSynthCat == k)
 					//logLikelihood += std::log(model.getCategoryProbability(k)) + currLogLike;
-				logLikelihood += probabilities[k] * currLogLike;
+				logLikelihood += probabilities[k] * unscaledLogPost_curr[k];
 			}
 		}
 
