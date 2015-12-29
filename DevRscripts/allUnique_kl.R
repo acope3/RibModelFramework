@@ -23,7 +23,8 @@ samples <- 500
 thining <- 50
 adaptiveWidth <- 10
 divergence.iteration <- 20
-mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE) 
+mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, 
+                             est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE, est.mix = FALSE) 
 
 setRestartSettings(mcmc, paste(task.id, "_kluyveri_full_allUnique.rst", sep=""), adaptiveWidth*50, TRUE) 
 

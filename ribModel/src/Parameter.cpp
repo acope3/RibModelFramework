@@ -989,7 +989,7 @@ unsigned Parameter::getNumMixtureElements()
 }
 
 
-unsigned Parameter::getNumPhiGroupings() 
+unsigned Parameter::getNumObservedPhiSets() 
 { 
 	return phiGroupings;
 }

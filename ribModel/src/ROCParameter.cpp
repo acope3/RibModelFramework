@@ -103,11 +103,11 @@ void ROCParameter::initROCParameterSet()
 
 	phiEpsilon = 0.1;
 	phiEpsilon_proposed = 0.1;
-	for (unsigned i = 0; i < getNumPhiGroupings(); i++) {
-		Aphi[i] = 0.0;
-		Aphi_proposed[i] = 0.0;
+	for (unsigned i = 0; i < getNumObservedPhiSets(); i++) {
+		Aphi[i] = 0.1;
+		Aphi_proposed[i] = 0.1;
 		std_Aphi[i] = 0.1;
-		Sepsilon[i] = 0.0;
+		Sepsilon[i] = 0.1;
 		numAcceptForAphi[i] = 0;
 	}
 
@@ -661,7 +661,7 @@ double ROCParameter::getCurrentAphiProposalWidth(unsigned index)
 
 void ROCParameter::proposeAphi()
 {
-	for (unsigned i = 0; i < getNumPhiGroupings(); i++) {
+	for (unsigned i = 0; i < getNumObservedPhiSets(); i++) {
 		Aphi_proposed[i] = randNorm(Aphi[i], std_Aphi[i]);
 	}
 }
@@ -1200,7 +1200,7 @@ void ROCParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
 
 void ROCParameter::adaptAphiProposalWidth(unsigned adaptationWidth)
 {
-	for (unsigned i = 0; i < getNumPhiGroupings(); i++) {
+	for (unsigned i = 0; i < getNumObservedPhiSets(); i++) {
 		double acceptanceLevel = numAcceptForAphi[i] / (double)adaptationWidth;
 		traces.updateAphiAcceptanceRatioTrace(i, acceptanceLevel);
 		if (acceptanceLevel < 0.2)
@@ -1271,7 +1271,7 @@ void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 // -------------------------------------//
 
 
-void ROCParameter::setNumPhiGroupings(unsigned _phiGroupings)
+void ROCParameter::setNumObservedPhiSets(unsigned _phiGroupings)
 {
 	phiGroupings = _phiGroupings;
 	Aphi.resize(phiGroupings, 0.0);

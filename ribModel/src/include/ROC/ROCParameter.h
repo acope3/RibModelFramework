@@ -153,7 +153,7 @@ class ROCParameter : public Parameter
 
 
 		//Other Functions:
-		virtual void setNumPhiGroupings(unsigned _phiGroupings);
+		virtual void setNumObservedPhiSets(unsigned _phiGroupings);
 		void getParameterForCategory(unsigned category, unsigned parameter, std::string aa, bool proposal, double *returnValue);
 		std::vector<std::vector<double>> calculateSelectionCoefficients(unsigned sample, unsigned mixture);
 

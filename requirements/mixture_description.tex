@@ -105,7 +105,7 @@
   \end{equation}
   A log normal prior ($p(\phi_g|-\frac{s_{\phi}^2}{2}, s_{\phi})$) on $\phi$ is assumed.
   \begin{equation}
-    P_g(\phi_g|\zeta, \Theta_z) = f_g(\phi_g|\zeta, \Theta_z) + \log(p(\phi_g|-\frac{s_{\phi}^2}{2}, s_{\phi})) + \sum_{\iota}^I \log(p(\log{\Phi_{g,\iota}} + {A_{\phi}}_{\iota}| \log{\phi_g}, {s_{\epsilon}}_{\iota}))
+    P_g(\phi_g|\zeta, \Theta_z) = f_g(\phi_g|\zeta, \Theta_z) + \log(p(\phi_g|-\frac{s_{\phi}^2}{2}, s_{\phi})) + \sum_{\iota}^I \log(p(\log{\Phi_{g,\iota}}| \log{\phi_g} + {A_{\phi}}_{\iota}, {s_{\epsilon}}_{\iota}))
     \label{roc_posterior}
   \end{equation}
   All terms $\log(p(\log{\Phi_{g,\iota}} + {A_{\phi}}_{\iota}| \log{\phi_g}, {s_{\epsilon}}_{\iota}))$ are $0$ if no observed $\phi$ values $\Phi$ are available. 

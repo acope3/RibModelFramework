@@ -35,6 +35,6 @@ end <- Sys.time()
 end - start 
 
 
-writeParameterObject(parameter, file=paste(task.id, "_ROCParameter.Rdat", sep=""))
-writeMCMCObject(mcmc, file=paste(task.id, "_MCMCObject.Rdat", sep=""))
+writeParameterObject(parameter, file=paste(task.id, "_ROCParameter.Rda", sep=""))
+writeMCMCObject(mcmc, file=paste(task.id, "_MCMCObject.Rda", sep=""))
 

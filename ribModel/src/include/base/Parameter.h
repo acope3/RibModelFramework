@@ -149,10 +149,10 @@ class Parameter {
 		//Other Functions:
 		unsigned getNumParam();
 		unsigned getNumMixtureElements();
-		unsigned getNumPhiGroupings();
+		unsigned getNumObservedPhiSets();
 		void setMixtureAssignment(unsigned gene, unsigned value);
 		unsigned getMixtureAssignment(unsigned gene);
-		virtual void setNumPhiGroupings(unsigned _phiGroupings) = 0;
+		virtual void setNumObservedPhiSets(unsigned _phiGroupings) = 0;
 
 
 

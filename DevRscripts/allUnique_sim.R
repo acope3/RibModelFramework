@@ -7,7 +7,7 @@ set.seed(446141)
 with.phi <- FALSE
 
 if (with.phi) {
-  genome <- initializeGenomeObject(file = "../data/twoMixtures/simulatedAllUniqueR.fasta", expression.file = "../data/simulatedAllUniqueR_phi.csv") 
+  genome <- initializeGenomeObject(file = "../data/twoMixtures/simulatedAllUniqueR.fasta", expression.file = "../data/twoMixtures/simulatedAllUniqueR_phi_withPhiSet.csv") 
 } else {
   genome <- initializeGenomeObject(file = "../data/twoMixtures/simulatedAllUniqueR.fasta") 
 }
@@ -17,11 +17,11 @@ numMixtures <- 2
 mixDef <- "allUnique"
 geneAssignment <- sample(c(1,2), size = length(genome), replace = TRUE, prob = c(0.3, 0.7)) #c(rep(1,500), rep(2,500))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
-#parameter <- initializeParameterObject(genome, sphi = sphi_init, geneAssignment = geneAssignment, numMixtures = numMixtures, restart.file = "5001_simulated_allUnique.rst")
+#parameter <- initializeParameterObject(restart.file = "5001_simulated_allUnique.rst")
 
-samples <- 8000
-thining <- 10
-adaptiveWidth <- 10
+samples <- 1000
+thining <- 50
+adaptiveWidth <- 10000
 divergence.iteration <- 0
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE) 
 

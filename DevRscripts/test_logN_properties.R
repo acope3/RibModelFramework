@@ -5,7 +5,8 @@ for(repeats in 1:100)
 {
   for(s in 1:10)
   {
-    res[repeats, s] <- mean(rlnorm(n = 10000, meanlog = -(s^2)/2, s))
+    X <- c(rlnorm(n = 10000, meanlog = -(s^2)/2, s), rlnorm(n = 10000, meanlog = -((2*s)^2)/2, 2*s))
+    res[repeats, s] <- mean(X)
   }
 }
 
@@ -22,6 +23,3 @@ for(i in 1:10)
   q <- log10(quantile(res[,i], probs = c(0.025, 0.975)))
   abline(v = q, col="blue")
 }
-
-fit <- MASS::fitdistr(x = rlnorm(n = 10000, meanlog = -(s^2)/2, s), densfun = "log-normal")
-fit

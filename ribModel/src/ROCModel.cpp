@@ -59,10 +59,14 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 
 	// TODO: make this work for more than one phi value, or for genes that don't have phi values
 	if (withPhi) {
-		for (unsigned i = 0; i < parameter->getNumPhiGroupings(); i++) {
+		for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++) {
 			if (gene.observedPhiValues.at(i) != -1) {
-				logPhiProbability += Parameter::densityLogNorm(gene.observedPhiValues.at(i) + getAphi(i), std::log(phiValue), getSepsilon(i), true);
-				logPhiProbability_proposed += Parameter::densityLogNorm(gene.observedPhiValues.at(i) + getAphi(i), std::log(phiValue_proposed), getSepsilon(i), true);
+				//logPhiProbability += Parameter::densityLogNorm(gene.observedPhiValues.at(i) + getAphi(i), std::log(phiValue), getSepsilon(i), true);
+				//logPhiProbability_proposed += Parameter::densityLogNorm(gene.observedPhiValues.at(i) + getAphi(i), std::log(phiValue_proposed), getSepsilon(i), true);
+
+				logPhiProbability += Parameter::densityNorm(std::log(gene.observedPhiValues.at(i)), std::log(phiValue) + getAphi(i), getSepsilon(i), true);
+				logPhiProbability_proposed += Parameter::densityNorm(std::log(gene.observedPhiValues.at(i)), std::log(phiValue_proposed) + getAphi(i), getSepsilon(i), true);
+
 			}
 		}
 	}
@@ -439,7 +443,7 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 
 	if (withPhi)
 	{
-		for (unsigned i = 0; i < parameter->getNumPhiGroupings(); i++) {
+		for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++) {
 			lpr = 0.0;
 			double Aphi = getAphi(i, false);
 			double Aphi_proposed = getAphi(i, true);
@@ -468,8 +472,8 @@ void ROCModel::updateGibbsSampledHyperParameters(Genome &genome)
 {
 	// TODO: Fix this for any numbers of phi values
 	if (withPhi) {
-		double shape = (genome.getGenomeSize() - 1.0) / 2.0;
-		for (unsigned i = 0; i < parameter->getNumPhiGroupings(); i++) {
+		double shape = ((double)genome.getGenomeSize() - 1.0) / 2.0;
+		for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++) {
 			double rate = 0.0;
 			unsigned mixtureAssignment;
 			double aphi = getAphi(i);
@@ -507,7 +511,7 @@ void ROCModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth)
 void ROCModel::updateAllHyperParameter()
 {
 	updateSphi();
-	for (unsigned i = 0; i < parameter->getNumPhiGroupings(); i++) {
+	for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++) {
 		updateAphi(i);
 	}
 }
@@ -525,7 +529,7 @@ void ROCModel::updateHyperParameter(unsigned hp)
 void ROCModel::updateHyperParameterTraces(unsigned sample)
 {
 	updateSphiTrace(sample);
-	for (unsigned i = 0; i < parameter->getNumPhiGroupings(); i++) {
+	for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++) {
 		updateAphiTrace(i, sample);
 		updateSepsilonTrace(i, sample);
 	}

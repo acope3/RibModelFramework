@@ -933,7 +933,7 @@ void FONSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptatio
 // -------------------------------------//
 
 
-void FONSEParameter::setNumPhiGroupings(unsigned _phiGroupings)
+void FONSEParameter::setNumObservedPhiSets(unsigned _phiGroupings)
 {
     phiGroupings = _phiGroupings;
 }

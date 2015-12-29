@@ -826,7 +826,7 @@ void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 // -------------------------------------//
 
 
-void RFPParameter::setNumPhiGroupings(unsigned _phiGroupings)
+void RFPParameter::setNumObservedPhiSets(unsigned _phiGroupings)
 {
 	phiGroupings = _phiGroupings;
 }

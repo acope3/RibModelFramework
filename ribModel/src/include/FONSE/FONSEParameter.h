@@ -122,7 +122,7 @@ class FONSEParameter : public Parameter
 
 
 		//Other functions:
-		virtual void setNumPhiGroupings(unsigned _phiGroupings);
+		virtual void setNumObservedPhiSets(unsigned _phiGroupings);
 		void getParameterForCategory(unsigned category, unsigned paramType, std::string aa, bool proposal, double *returnSet);
 		std::vector <std::vector <double> > calculateSelectionCoefficients(unsigned sample, unsigned mixture);
 		void proposeHyperParameters();
