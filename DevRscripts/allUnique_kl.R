@@ -6,7 +6,7 @@ library(ribModel)
 #set.seed(seeds[task.id])
 set.seed(446141)
 with.phi <- FALSE
-
+  
 if (with.phi) {
   genome <- initializeGenomeObject(file = "../data/realGenomes/Skluyveri.fasta", expression.file = "../data/simulatedAllUniqueR_phi.csv") 
 } else {
