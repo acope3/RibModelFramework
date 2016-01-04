@@ -1,11 +1,5 @@
 #include "include/ROC/ROCParameter.h"
 
-#include <math.h>
-#include <ctime>
-#include <iostream>
-#include <set>
-#include <fstream>
-#include <sstream>
 #ifndef STANDALONE
 #include <Rcpp.h>
 using namespace Rcpp;

@@ -195,6 +195,18 @@ std::string Gene::toAASequence()
 }
 
 
+
+
+
+
+// ---------------------------------------------------------------------------
+// ----------------------------- RCPP STUFF ----------------------------------
+// ---------------------------------------------------------------------------
+#ifndef STANDALONE
+//#include <Rcpp.h>
+//using namespace Rcpp;
+
+
 //---------------------R WRAPPER FUNCTIONS---------------------//
 
 void Gene::cleanSeqR()
@@ -229,15 +241,6 @@ std::vector <unsigned> *Gene::getCodonPositions(std::string codon)
 {
     return geneData.getCodonPositionsForCodonR(codon);
 }
-
-
-
-// ---------------------------------------------------------------------------
-// ----------------------------- RCPP STUFF ----------------------------------
-// ---------------------------------------------------------------------------
-#ifndef STANDALONE
-//#include <Rcpp.h>
-//using namespace Rcpp;
 
 RCPP_EXPOSED_CLASS(Gene) //Exposed because of functions that return a gene.
 RCPP_EXPOSED_CLASS(SequenceSummary)
