@@ -88,25 +88,74 @@ runMCMC.Rcpp_MCMCAlgorithm <- function(mcmc, genome, model, ncores = 1, divergen
 
 
 
-
+#' Set Restart Settings 
+#' 
+#' @param mcmc MCMC object that will run the model fitting algorithm.
+#' 
+#' @param filename Filename for the restart files to be written.
+#' 
+#' @param samples Number of samples that should occur before a file is written.
+#' 
+#' @param write.multiple Boolean that determines if multiple restart files
+#' are written. Default value is TRUE.
+#' 
+#' @return This function has no return value.
+#' 
+#' @description \code{setRestartSettings} sets the needed information (what the file 
+#' is called, how often the file should be written) to write
+#' information to restart the MCMC algorithm from a given point.
+#' 
+#' @details \code{setRestartSettings} writes a restart file every set amount of samples
+#' that occur. Also, if write.multiple is true, instead of overwriting the previous restart
+#' file, the sample number is prepended onto the file name and multiple rerstart files
+#' are generated for a run.
+#' 
 setRestartSettings <- function(mcmc, filename, samples, write.multiple=TRUE)
 {
   UseMethod("setRestartSettings", mcmc)
 }
 
-# NOT EXPOSED
+
 setRestartSettings.Rcpp_MCMCAlgorithm <- function(mcmc, filename, samples, write.multiple=TRUE)
 {
   mcmc$setRestartFileSettings(filename, samples, write.multiple)
 }
+#TODO: Why is this seperated into 2 functions?
 
-convergence.test <- function(object, nsamples = 10, frac1 = 0.1, frac2 = 0.5, thin = 1, plot = FALSE, ...)
+
+
+
+#' Convergence Test
+#' 
+#' @param object
+#' 
+#' @param nsamples
+#' 
+#' @param frac1
+#' 
+#' @param frac2
+#' 
+#' @param thin
+#' 
+#' @param plot
+#' 
+#' @param ...
+#' 
+#' @return This function has no return value.
+#' 
+#' @description \code{convergence.test} 
+#' 
+#' @details \code{convergence.test}
+#' 
+convergence.test <- function(object, nsamples = 10, frac1 = 0.1, frac2 = 0.5, 
+                    thin = 1, plot = FALSE, ...)
 {
   UseMethod("convergence.test", object)
 }
 
-# NOT EXPOSED
-convergence.test.Rcpp_MCMCAlgorithm <- function(object, nsamples = 10, frac1 = 0.1, frac2 = 0.5, thin = 1, plot = FALSE, ...)
+
+convergence.test.Rcpp_MCMCAlgorithm <- function(object, nsamples = 10, frac1 = 0.1, 
+                                       frac2 = 0.5, thin = 1, plot = FALSE, ...)
 {
   # TODO: extend to work with multiple chains once we have that capability.
   
@@ -125,6 +174,20 @@ convergence.test.Rcpp_MCMCAlgorithm <- function(object, nsamples = 10, frac1 = 0
 }
 
 
+#' Write MCMC Object 
+#' 
+#' @param mcmc MCMC object that has run the model fitting algorithm.
+#' 
+#' @param file A filename that where the data will be stored.
+#' The file should end with the extension "Rdat".
+#' 
+#' @return This function has no return value.
+#' 
+#' @description \code{writeMCMCObject} stores the MCMC information from the 
+#' model fitting run in a file.
+#' 
+#' @details None.
+#' 
 writeMCMCObject <- function(mcmc, file)
 {
   loglikeTrace <- mcmc$getLogLikelihoodTrace()
@@ -134,6 +197,19 @@ writeMCMCObject <- function(mcmc, file)
   save(list = c("loglikeTrace", "samples", "thining", "adaptiveWidth"), file=file)
 }
 
+
+#' Load MCMC Object
+#' 
+#' @param file A filename that where the data will be stored.
+#' 
+#' @return This function has no return value.
+#' 
+#' @description \code{loadMCMCObject} creates a new MCMC object and fills it with
+#' the information in the file given.
+#' 
+#' @details This MCMC object is not intended to be used to do another model fitting, only
+#' to graph the stored results.
+#' 
 loadMCMCObject <- function(file)
 {
   mcmc <- new(MCMCAlgorithm)

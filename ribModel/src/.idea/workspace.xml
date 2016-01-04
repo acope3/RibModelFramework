@@ -31,11 +31,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="MCMCAlgorithm.cpp" pinned="false" current-in-tab="false">
+      <file leaf-file-name="MCMCAlgorithm.cpp" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/MCMCAlgorithm.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="883" column="26" selection-start-line="883" selection-start-column="26" selection-end-line="883" selection-end-column="26" />
+            <state vertical-scroll-proportion="0.36811024">
+              <caret line="357" column="33" selection-start-line="357" selection-start-column="20" selection-end-line="357" selection-end-column="33" />
               <folding>
                 <element signature="e#70#109#0" expanded="true" />
                 <element signature="e#6820#6866#0" expanded="true" />
@@ -43,6 +43,7 @@
                 <element signature="e#10588#11003#0" expanded="true" />
                 <element signature="e#15967#16067#0" expanded="true" />
                 <element signature="e#21038#21277#0" expanded="true" />
+                <element signature="e#24884#27089#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -83,11 +84,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MCMCAlgorithm.h" pinned="false" current-in-tab="true">
+      <file leaf-file-name="MCMCAlgorithm.h" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/include/MCMCAlgorithm.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.7677165">
-              <caret line="78" column="52" selection-start-line="78" selection-start-column="52" selection-end-line="78" selection-end-column="52" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="76" column="26" selection-start-line="76" selection-start-column="26" selection-end-line="76" selection-end-column="26" />
               <folding>
                 <element signature="e#49#66#0" expanded="true" />
                 <element signature="e#224#241#0" expanded="true" />
@@ -367,7 +368,7 @@
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Messages" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.37162954" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.37162954" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -793,10 +794,23 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/MCMCAlgorithm.cpp">
+    <entry file="file://$PROJECT_DIR$/include/MCMCAlgorithm.h">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="883" column="26" selection-start-line="883" selection-start-column="26" selection-end-line="883" selection-end-column="26" />
+          <caret line="76" column="26" selection-start-line="76" selection-start-column="26" selection-end-line="76" selection-end-column="26" />
+          <folding>
+            <element signature="e#49#66#0" expanded="true" />
+            <element signature="e#224#241#0" expanded="true" />
+            <element signature="e#250#275#0" expanded="true" />
+            <element signature="e#2473#2784#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MCMCAlgorithm.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.36811024">
+          <caret line="357" column="33" selection-start-line="357" selection-start-column="20" selection-end-line="357" selection-end-column="33" />
           <folding>
             <element signature="e#70#109#0" expanded="true" />
             <element signature="e#6820#6866#0" expanded="true" />
@@ -804,19 +818,7 @@
             <element signature="e#10588#11003#0" expanded="true" />
             <element signature="e#15967#16067#0" expanded="true" />
             <element signature="e#21038#21277#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/include/MCMCAlgorithm.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.7677165">
-          <caret line="78" column="52" selection-start-line="78" selection-start-column="52" selection-end-line="78" selection-end-column="52" />
-          <folding>
-            <element signature="e#49#66#0" expanded="true" />
-            <element signature="e#224#241#0" expanded="true" />
-            <element signature="e#250#275#0" expanded="true" />
-            <element signature="e#2473#2784#0" expanded="true" />
+            <element signature="e#24884#27089#0" expanded="true" />
           </folding>
         </state>
       </provider>

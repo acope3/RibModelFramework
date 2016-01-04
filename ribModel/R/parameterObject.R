@@ -613,11 +613,11 @@ writeParameterObject.Rcpp_FONSEParameter <- function(parameter, file)
 #' 
 #' @return This function has no return value.
 #' 
-#' @description \code{writeParameterObject} will call the appropriate followup
-#' call to writeXXXParameterObject based off of the parameter type 
+#' @description \code{loadParameterObject} will call the appropriate followup
+#' call to loadXXXParameterObject based off of the parameter type 
 #' given.
 #' 
-#' @details For example, if a ROCParameter is passed, the the writeParameterObject
+#' @details For example, if a ROCParameter is passed, the the loadParameterObject
 #' for the ROCParameter will be called. This allows us to not have an if-else
 #' block in the code - making use of the how R handles these situations.
 #' 
