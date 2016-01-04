@@ -4,13 +4,17 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <fstream>
+#include <sstream>
+#include <cmath>
+
+#ifndef STANDALONE
+#include <Rcpp.h>
+#endif
 
 #include "Gene.h"
 
-
 class Model;
-
-
 class Genome
 {
 	private:
@@ -21,13 +25,13 @@ class Genome
 
 	public:
 
-		//Constructors & destructors:
+		//Constructors & Destructors:
 		explicit Genome();
-		virtual ~Genome();
 		Genome& operator=(const Genome& other);
+		virtual ~Genome();
 
 
-		//File I/O functions:
+		//File I/O Functions:
 		void readFasta(std::string filename, bool Append = false);
 		void writeFasta(std::string filename, bool simulated = false);
 		void readRFPFile(std::string filename);
@@ -35,7 +39,7 @@ class Genome
 		void readObservedPhiValues(std::string filename, bool byId = true);
 
 
-		//Gene functions:
+		//Gene Functions:
 		void addGene(const Gene& gene, bool simulated = false);
 		std::vector <Gene> getGenes(bool simulated = false);
 		unsigned getNumGenesWithPhi(unsigned index);
@@ -43,8 +47,7 @@ class Genome
 		Gene& getGene(std::string id, bool simulated = false);
 
 
-		//Other functions:
-		bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);
+		//Other Functions:
 		unsigned getGenomeSize();
 		void clear();
 		Genome getGenomeForGeneIndicies(std::vector <unsigned> indicies, bool simulated = false); //NOTE: If simulated is true, it will return a genome with the simulated genes, but the returned genome's genes vector will contain the simulated genes.
@@ -52,10 +55,16 @@ class Genome
 
 
 
-		//R wrapper functions:
+		//R Section:
+
+#ifndef STANDALONE
+
+		bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);
 		Gene& getGeneByIndex(unsigned index, bool simulated = false);
 		Gene& getGeneById(std::string ID, bool simulated = false);
 		Genome getGenomeForGeneIndiciesR(std::vector <unsigned> indicies, bool simulated = false);
+
+#endif //STANDALONE
 
 	protected:
 };

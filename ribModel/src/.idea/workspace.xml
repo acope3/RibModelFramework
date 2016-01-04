@@ -41,44 +41,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SequenceSummary.cpp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/SequenceSummary.cpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="673" column="0" selection-start-line="673" selection-start-column="0" selection-end-line="673" selection-end-column="0" />
-              <folding>
-                <element signature="e#57#96#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MCMCAlgorithm.cpp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/MCMCAlgorithm.cpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="853" column="0" selection-start-line="853" selection-start-column="0" selection-end-line="853" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Gene.cpp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Gene.cpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="273" column="0" selection-start-line="273" selection-start-column="0" selection-end-line="273" selection-end-column="0" />
-              <folding>
-                <element signature="e#46#85#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ROCParameter.cpp" pinned="false" current-in-tab="true">
+      <file leaf-file-name="ROCParameter.cpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ROCParameter.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="28.16929">
+            <state vertical-scroll-proportion="0.0">
               <caret line="1351" column="0" selection-start-line="1351" selection-start-column="0" selection-end-line="1351" selection-end-column="0" />
               <folding>
                 <element signature="e#58#97#0" expanded="true" />
@@ -88,12 +54,16 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Gene.h" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/include/Gene.h">
+      <file leaf-file-name="Genome.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/include/Genome.h">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="65" column="20" selection-start-line="65" selection-start-column="20" selection-end-line="65" selection-end-column="20" />
-              <folding />
+              <caret line="61" column="8" selection-start-line="61" selection-start-column="8" selection-end-line="61" selection-end-column="8" />
+              <folding>
+                <element signature="e#35#52#0" expanded="true" />
+                <element signature="e#161#178#0" expanded="true" />
+                <element signature="e#1523#1815#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -102,11 +72,25 @@
         <entry file="file://$PROJECT_DIR$/include/ROC/ROCParameter.h">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="164" column="0" selection-start-line="164" selection-start-column="0" selection-end-line="164" selection-end-column="0" />
+              <caret line="162" column="0" selection-start-line="162" selection-start-column="0" selection-end-line="162" selection-end-column="0" />
               <folding>
                 <element signature="e#47#64#0" expanded="true" />
                 <element signature="e#158#175#0" expanded="true" />
+                <element signature="e#184#205#0" expanded="true" />
                 <element signature="e#5268#7297#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Genome.cpp" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Genome.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.38385826">
+              <caret line="262" column="16" selection-start-line="262" selection-start-column="16" selection-end-line="262" selection-end-column="16" />
+              <folding>
+                <element signature="e#48#87#0" expanded="true" />
+                <element signature="e#16527#19387#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -130,8 +114,6 @@
         <option value="$PROJECT_DIR$/RCPP_Model.cpp" />
         <option value="$PROJECT_DIR$/ROCModel.cpp" />
         <option value="$PROJECT_DIR$/include/CodonTable.h" />
-        <option value="$PROJECT_DIR$/Genome.cpp" />
-        <option value="$PROJECT_DIR$/include/Genome.h" />
         <option value="$PROJECT_DIR$/CodonTable.cpp" />
         <option value="$PROJECT_DIR$/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/include/ROC/ROCTrace.h" />
@@ -156,6 +138,8 @@
         <option value="$PROJECT_DIR$/SequenceSummary.cpp" />
         <option value="$PROJECT_DIR$/include/Gene.h" />
         <option value="$PROJECT_DIR$/Gene.cpp" />
+        <option value="$PROJECT_DIR$/include/Genome.h" />
+        <option value="$PROJECT_DIR$/Genome.cpp" />
       </list>
     </option>
   </component>
@@ -421,7 +405,7 @@
           <option name="timeStamp" value="62" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="71" />
+      <option name="time" value="74" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -573,20 +557,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/include/Genome.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.40944883">
-          <caret line="48" column="250" selection-start-line="48" selection-start-column="250" selection-end-line="48" selection-end-column="250" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Genome.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.4055118">
-          <caret line="572" column="26" selection-start-line="572" selection-start-column="26" selection-end-line="572" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/include/CodonTable.h">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -648,6 +618,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="72" column="0" selection-start-line="72" selection-start-column="0" selection-end-line="72" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -783,18 +754,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/include/ROC/ROCParameter.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="164" column="0" selection-start-line="164" selection-start-column="0" selection-end-line="164" selection-end-column="0" />
-          <folding>
-            <element signature="e#47#64#0" expanded="true" />
-            <element signature="e#158#175#0" expanded="true" />
-            <element signature="e#5268#7297#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/SequenceSummary.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -818,7 +777,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="273" column="0" selection-start-line="273" selection-start-column="0" selection-end-line="273" selection-end-column="0" />
           <folding>
-            <element signature="e#46#85#0" expanded="true" />
+            <element signature="e#46#85#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -833,11 +792,47 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/ROCParameter.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="28.16929">
+        <state vertical-scroll-proportion="0.0">
           <caret line="1351" column="0" selection-start-line="1351" selection-start-column="0" selection-end-line="1351" selection-end-column="0" />
           <folding>
             <element signature="e#58#97#0" expanded="true" />
             <element signature="e#39248#46417#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/ROC/ROCParameter.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="162" column="0" selection-start-line="162" selection-start-column="0" selection-end-line="162" selection-end-column="0" />
+          <folding>
+            <element signature="e#47#64#0" expanded="true" />
+            <element signature="e#158#175#0" expanded="true" />
+            <element signature="e#184#205#0" expanded="true" />
+            <element signature="e#5268#7297#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/Genome.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="61" column="8" selection-start-line="61" selection-start-column="8" selection-end-line="61" selection-end-column="8" />
+          <folding>
+            <element signature="e#35#52#0" expanded="true" />
+            <element signature="e#161#178#0" expanded="true" />
+            <element signature="e#1523#1815#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Genome.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.38385826">
+          <caret line="262" column="16" selection-start-line="262" selection-start-column="16" selection-end-line="262" selection-end-column="16" />
+          <folding>
+            <element signature="e#48#87#0" expanded="true" />
+            <element signature="e#16527#19387#0" expanded="true" />
           </folding>
         </state>
       </provider>
