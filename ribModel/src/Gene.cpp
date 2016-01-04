@@ -1,10 +1,15 @@
 #include "include/Gene.h"
+
 #ifndef STANDALONE
 #include <Rcpp.h>
 using namespace Rcpp;
 #endif
 
-#include <iostream>
+
+
+//--------------------------------------------------//
+// ---------- Constructors & Destructors ---------- //
+//--------------------------------------------------//
 
 
 Gene::Gene() : seq(""), id(""), description("")
@@ -31,11 +36,6 @@ Gene::Gene(std::string _seq, std::string _id, std::string _desc) : seq(_seq), id
 	}
 }
 
-Gene::~Gene()
-{
-    //dtor
-}
-
 
 Gene::Gene(const Gene& other)
 {
@@ -58,6 +58,20 @@ Gene& Gene::operator=(const Gene& rhs)
     //assignment operator
     return *this;
 }
+
+
+Gene::~Gene()
+{
+    //dtor
+}
+
+
+
+
+
+//-------------------------------------------------//
+//---------- Data Manipulation Functions ----------//
+//-------------------------------------------------//
 
 
 void Gene::cleanSeq()
@@ -154,6 +168,14 @@ char Gene::getNucleotideAt(unsigned i)
 }
 
 
+
+
+
+//-------------------------------------//
+//---------- Other Functions ----------//
+//-------------------------------------//
+
+
 void Gene::clear()
 {
   seq = "";
@@ -199,15 +221,15 @@ std::string Gene::toAASequence()
 
 
 
-// ---------------------------------------------------------------------------
-// ----------------------------- RCPP STUFF ----------------------------------
-// ---------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------------------------------//
+// ---------------------------------------- R SECTION --------------------------------------------------//
+// -----------------------------------------------------------------------------------------------------//
+
+
+
 #ifndef STANDALONE
-//#include <Rcpp.h>
-//using namespace Rcpp;
 
-
-//---------------------R WRAPPER FUNCTIONS---------------------//
 
 void Gene::cleanSeqR()
 {
@@ -241,6 +263,14 @@ std::vector <unsigned> *Gene::getCodonPositions(std::string codon)
 {
     return geneData.getCodonPositionsForCodonR(codon);
 }
+
+
+
+
+//---------------------------------//
+//---------- RCPP Module ----------//
+//---------------------------------//
+
 
 RCPP_EXPOSED_CLASS(Gene) //Exposed because of functions that return a gene.
 RCPP_EXPOSED_CLASS(SequenceSummary)

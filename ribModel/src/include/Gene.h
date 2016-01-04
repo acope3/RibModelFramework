@@ -23,19 +23,21 @@ class Gene
 
 	public:
 
+
 		SequenceSummary geneData;  //TODO: might make private
 		std::vector<double> observedPhiValues; //TODO: make private
 
 
-		//Constructors & destructors:
+		///Constructors & Destructors:
 		Gene();
 		Gene(std::string _id, std::string _desc, std::string _seq);
-		virtual ~Gene();
 		Gene(const Gene& other);
 		Gene& operator=(const Gene& rhs);
+		virtual ~Gene();
 
 
-		//Stored data functions:
+
+		//Data Manipulation Functions:
 		std::string getId();
 		void setId(std::string _id);
 		std::string getDescription();
@@ -56,13 +58,19 @@ class Gene
 
 
 
-		//R wrapper functions:
+
+		//R Section:
+
+#ifndef STANDALONE
+
+		//R Section:
 		void cleanSeqR();
 		unsigned getAACount(std::string aa);
 		unsigned getCodonCount(std::string& codon);
 		void setRFPObserved(unsigned index, unsigned value); // testthat only
 		unsigned getRFPObserved(std::string codon);
 		std::vector <unsigned> *getCodonPositions(std::string codon);
+#endif
 
 	protected:
 };
