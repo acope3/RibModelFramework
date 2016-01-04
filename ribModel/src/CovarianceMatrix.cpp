@@ -1,17 +1,30 @@
 #include "include/CovarianceMatrix.h"
-#include <iostream>
-#include <cmath>
+
+#ifndef STANDALONE
+#include <Rcpp.h>
+using namespace Rcpp;
+#endif
+
+
+
+//--------------------------------------------------//
+// ---------- Constructors & Destructors ---------- //
+//--------------------------------------------------//
 
 
 CovarianceMatrix::CovarianceMatrix()
 {
-	initCovarianceMatrix(2);
+	initCovarianceMatrix(2); //TODO: should not do this
 
 }
+
+
 CovarianceMatrix::CovarianceMatrix(int _numVariates)
 {
 	initCovarianceMatrix(_numVariates);
 }
+
+
 CovarianceMatrix::CovarianceMatrix(std::vector <double> &matrix)
 {
     numVariates = (int)std::sqrt(matrix.size());
@@ -20,17 +33,14 @@ CovarianceMatrix::CovarianceMatrix(std::vector <double> &matrix)
 }
 
 
-CovarianceMatrix::~CovarianceMatrix()
-{
-    //dtor
-}
-
 CovarianceMatrix::CovarianceMatrix(const CovarianceMatrix& other)
 {
     numVariates = other.numVariates;
     covMatrix = other.covMatrix;
     choleskiMatrix = other.choleskiMatrix;
 }
+
+
 CovarianceMatrix& CovarianceMatrix::operator=(const CovarianceMatrix& rhs)
 {
     if (this == &rhs) return *this; // handle self assignment
@@ -39,6 +49,7 @@ CovarianceMatrix& CovarianceMatrix::operator=(const CovarianceMatrix& rhs)
 		choleskiMatrix = rhs.choleskiMatrix;
     return *this;
 }
+
 
 void CovarianceMatrix::operator*(const double &value)
 {
@@ -56,6 +67,20 @@ void CovarianceMatrix::operator*=(const double &value)
     covMatrix[i] *= value;
   }
 }
+
+
+CovarianceMatrix::~CovarianceMatrix()
+{
+    //dtor
+}
+
+
+
+
+
+//--------------------------------------//
+//---------- Matrix Functions ----------//
+//--------------------------------------//
 
 
 void CovarianceMatrix::initCovarianceMatrix(unsigned _numVariates)
@@ -93,7 +118,93 @@ void CovarianceMatrix::choleskiDecomposition()
 }
 
 
-/*void CovarianceMatrix::calculateCovarianceMatrixFromTraces(std::vector <std::vector <std::vector<double>>> mutationTrace, std::vector <std::vector <std::vector <double>>> selectionTrace,
+void CovarianceMatrix::printCovarianceMatrix()
+{
+
+    for(int i = 0; i < numVariates * numVariates; i++)
+    {
+        if (i % numVariates == 0 && i != 0)
+        {
+#ifndef STANDALONE
+        	Rprintf("\n");
+#else
+            std::cout << std::endl;
+#endif
+        }
+#ifndef STANDALONE
+		Rprintf("%f\t", covMatrix[i]);
+#else
+        std::cout << covMatrix[i] << "\t";
+#endif
+    }
+#ifndef STANDALONE
+		Rprintf("\n");
+#else
+    std::cout << std::endl;
+#endif
+
+
+}
+
+
+void CovarianceMatrix::printCholeskiMatrix()
+{
+    for(int i = 0; i < numVariates * numVariates; i++)
+    {
+        if (i % numVariates == 0 && i != 0)
+        {
+#ifndef STANDALONE
+        	Rprintf("\n");
+#else
+            std::cout << std::endl;
+#endif
+        }
+#ifndef STANDALONE
+		Rprintf("%f\t", choleskiMatrix[i]);
+#else
+        std::cout << choleskiMatrix[i] << "\t";
+#endif
+    }
+#ifndef STANDALONE
+		Rprintf("\n");
+#else
+    std::cout << std::endl;
+#endif
+}
+
+
+std::vector<double>* CovarianceMatrix::getCovMatrix()
+{
+    std::vector<double> *ptr = &covMatrix;
+    return ptr;
+}
+
+
+int CovarianceMatrix::getNumVariates()
+{
+    return numVariates;
+}
+
+
+std::vector<double> CovarianceMatrix::transformIidNumersIntoCovaryingNumbers(std::vector <double> iidnumbers)
+{
+    std::vector<double> covnumbers;
+    for(int i = 0; i < numVariates; i++)
+    {
+        double sum = 0.0;
+        for (int k = 0; k < numVariates; k++)
+        {
+            sum += choleskiMatrix[i * numVariates + k] * iidnumbers[k];
+        }
+
+        covnumbers.push_back(sum);
+    }
+    return covnumbers;
+}
+
+
+/*void CovarianceMatrix::calculateCovarianceMatrixFromTraces(std::vector <std::vector <std::vector<double>>> mutationTrace,
+ *std::vector <std::vector <std::vector <double>>> selectionTrace,
 	unsigned aaIndex, unsigned curSample, unsigned adaptiveWidth)
 {
     // calculate all means
@@ -138,84 +249,22 @@ void CovarianceMatrix::choleskiDecomposition()
 }
 */
 
-std::vector<double> CovarianceMatrix::transformIidNumersIntoCovaryingNumbers(std::vector <double> iidnumbers)
-{
-    std::vector<double> covnumbers;
-    for(int i = 0; i < numVariates; i++)
-    {
-        double sum = 0.0;
-        for (int k = 0; k < numVariates; k++)
-        {
-            sum += choleskiMatrix[i * numVariates + k] * iidnumbers[k];
-        }
-
-        covnumbers.push_back(sum);
-    }
-    return covnumbers;
-}
-
-void CovarianceMatrix::printCovarianceMatrix()
-{
-
-    for(int i = 0; i < numVariates * numVariates; i++)
-    {
-        if (i % numVariates == 0 && i != 0)
-        {
-#ifndef STANDALONE
-        	Rprintf("\n");
-#else
-        	std::cout << std::endl;
-#endif
-        }
-#ifndef STANDALONE
-		Rprintf("%f\t", covMatrix[i]);
-#else
-        std::cout << covMatrix[i] << "\t";
-#endif
-    }
-#ifndef STANDALONE
-		Rprintf("\n");
-#else
-		std::cout << std::endl;
-#endif
 
 
-}
-void CovarianceMatrix::printCholeskiMatrix()
-{
-    for(int i = 0; i < numVariates * numVariates; i++)
-    {
-        if (i % numVariates == 0 && i != 0)
-        {
-#ifndef STANDALONE
-        	Rprintf("\n");
-#else
-        	std::cout << std::endl;
-#endif
-        }
-#ifndef STANDALONE
-		Rprintf("%f\t", choleskiMatrix[i]);
-#else
-        std::cout << choleskiMatrix[i] << "\t";
-#endif
-    }
-#ifndef STANDALONE
-		Rprintf("\n");
-#else
-		std::cout << std::endl;
-#endif
-}
 
 
-std::vector<double>* CovarianceMatrix::getCovMatrix()
-{
-	std::vector<double> *ptr = &covMatrix;
-	return ptr;
-}
+
+
+// -----------------------------------------------------------------------------------------------------//
+// ---------------------------------------- R SECTION --------------------------------------------------//
+// -----------------------------------------------------------------------------------------------------//
+
+
 
 #ifndef STANDALONE
-#include <Rcpp.h>
-using namespace Rcpp;
+
+
+
 void CovarianceMatrix::setCovarianceMatrix(SEXP _matrix)
 {
   std::vector<double> tmp;
@@ -235,13 +284,26 @@ void CovarianceMatrix::setCovarianceMatrix(SEXP _matrix)
     }
   }
 }
-#endif
-#ifndef STANDALONE
+
+
+
+
+
+//----------------------------------//
+//---------- RCPP Module -----------//
+//----------------------------------//
+
 
 RCPP_MODULE(CovarianceMatrix_mod)
 {
   class_<CovarianceMatrix>( "CovarianceMatrix" )
+
+        //Constructors & Destructors:
 		.constructor("Empty Constructor")
+
+
+
+		//Matrix Functions:
 		.method("choleskiDecomposition", &CovarianceMatrix::choleskiDecomposition)
 		.method("printCovarianceMatrix", &CovarianceMatrix::printCovarianceMatrix)
 		.method("printCholeskiMatrix", &CovarianceMatrix::printCholeskiMatrix)

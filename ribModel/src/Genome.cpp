@@ -1,24 +1,20 @@
 #include "include/Genome.h"
+
 #ifndef STANDALONE
 #include <Rcpp.h>
 using namespace Rcpp;
 #endif
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <cmath>
+
+
+//--------------------------------------------------//
+// ---------- Constructors & Destructors ---------- //
+//--------------------------------------------------//
 
 
 Genome::Genome()
 {
 	//ctor
-}
-
-
-Genome::~Genome()
-{
-	//dtor
 }
 
 
@@ -31,6 +27,20 @@ Genome& Genome::operator=(const Genome& rhs)
 	//assignment operator
 	return *this;
 }
+
+
+Genome::~Genome()
+{
+	//dtor
+}
+
+
+
+
+
+//----------------------------------------//
+//---------- File I/O Functions ----------//
+//----------------------------------------//
 
 
 void Genome::readFasta(std::string filename, bool Append) // read Fasta format sequences
@@ -251,7 +261,6 @@ void Genome::readRFPFile(std::string filename)
 	addGene(tmpGene); //add to genome
 
 	Fin.close();
-
 }
 
 
@@ -548,6 +557,14 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 }
 
 
+
+
+
+//------------------------------------//
+//---------- Gene Functions ----------//
+//------------------------------------//
+
+
 void Genome::addGene(const Gene& gene, bool simulated)
 {
 	if (!simulated)
@@ -589,24 +606,12 @@ Gene& Genome::getGene(std::string id, bool simulated)
 }
 
 
-bool Genome::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound)
-{
-	bool check = false;
-	if (lowerbound <= index && index <= upperbound)
-	{
-		check = true;
-	}
-	else
-	{
-#ifndef STANDALONE
-		Rf_error("Index: %d is out of bounds. Index must be between %d & %d\n", index, lowerbound, upperbound);
-#else
-		std::cerr << "Error with the index\nGIVEN: " << index << "\n";
-		std::cerr << "MUST BE BETWEEN:	" << lowerbound << " & " << upperbound << "\n";
-#endif
-	}
-	return check;
-}
+
+
+
+//-------------------------------------//
+//---------- Other Functions ----------//
+//-------------------------------------//
 
 
 unsigned Genome::getGenomeSize()
@@ -650,7 +655,34 @@ std::vector<unsigned> Genome::getCodonCountsPerGene(std::string codon)
 }
 
 
-//---------------------R WRAPPER FUNCTIONS---------------------//
+
+
+
+
+
+// -----------------------------------------------------------------------------------------------------//
+// ---------------------------------------- R SECTION --------------------------------------------------//
+// -----------------------------------------------------------------------------------------------------//
+
+
+
+#ifndef STANDALONE
+
+
+bool Genome::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound)
+{
+	bool check = false;
+	if (lowerbound <= index && index <= upperbound)
+	{
+		check = true;
+	}
+	else
+	{
+		Rf_error("Index: %d is out of bounds. Index must be between %d & %d\n", index, lowerbound, upperbound);
+	}
+	return check;
+}
+
 
 Gene& Genome::getGeneByIndex(unsigned index, bool simulated) //NOTE: This function does the check and performs the function itself because of memory issues.
 {
@@ -694,10 +726,11 @@ Genome Genome::getGenomeForGeneIndiciesR(std::vector <unsigned> indicies, bool s
 
 
 
-// ---------------------------------------------------------------------------
-// ----------------------------- RCPP STUFF ----------------------------------
-// ---------------------------------------------------------------------------
-#ifndef STANDALONE
+
+//---------------------------------//
+//---------- RCPP Module ----------//
+//---------------------------------//
+
 
 RCPP_EXPOSED_CLASS(Gene)
 RCPP_EXPOSED_CLASS(Genome)
@@ -705,24 +738,33 @@ RCPP_EXPOSED_CLASS(Genome)
 RCPP_MODULE(Genome_mod)
 {
 	class_<Genome>("Genome")
+		//Constructors & Destructors:
 		.constructor("empty constructor")
 
+
+		//File I/O Functions:
 		.method("readFasta", &Genome::readFasta, "reads a genome into the object")
 		.method("writeFasta", &Genome::writeFasta, "writes the genome to a fasta file")
 		.method("readRFPFile", &Genome::readRFPFile, "reads RFP data in for the RFP model")
 		.method("writeRFPFile", &Genome::writeRFPFile)
 		.method("readObservedPhiValues", &Genome::readObservedPhiValues)
 
+
+		//Gene Functions:
 		.method("addGene", &Genome::addGene) //TEST THAT ONLY!
 		.method("getGenes", &Genome::getGenes) //TEST THAT ONLY!
 		.method("getNumGenesWithPhi", &Genome::getNumGenesWithPhi) //TEST THAT ONLY!
 
+
+		//Other Functions:
 		.method("checkIndex", &Genome::checkIndex) //TEST THAT ONLY!
 		.method("getGenomeSize", &Genome::getGenomeSize, "returns how many genes are in the genome")
 		.method("clear", &Genome::clear, "clears the genome")
 		.method("getCodonCountsPerGene", &Genome::getCodonCountsPerGene, "returns a vector of codon counts for a given gene")
 
-		//R Wrapper function
+
+
+		//R Section:
 		.method("getGeneByIndex", &Genome::getGeneByIndex, "returns a gene for a given index")
 		.method("getGeneById", &Genome::getGeneById) //TEST THAT ONLY!
 		.method("getGenomeForGeneIndicies", &Genome::getGenomeForGeneIndiciesR, "returns a new genome based on the ones requested in the given vector")
