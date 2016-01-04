@@ -11,13 +11,13 @@
 #include <Rcpp.h>
 #endif
 
-#include "RFPTrace.h"
+#include "../base/Trace.h"
 #include "../base/Parameter.h"
 
 class RFPParameter: public Parameter {
 	private:
 
-		RFPTrace traces;
+		Trace traces;
 
 		std::vector<std::vector<double>> proposedAlphaParameter;
 		std::vector<std::vector<double>> currentAlphaParameter;
@@ -63,7 +63,7 @@ class RFPParameter: public Parameter {
 
 
 		//Trace Functions:
-		RFPTrace& getTraceObject();
+		Trace& getTraceObject();
 		virtual void updateSphiTrace(unsigned sample);
 		virtual void updateSynthesisRateTrace(unsigned sample, unsigned geneIndex);
 		virtual void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex);

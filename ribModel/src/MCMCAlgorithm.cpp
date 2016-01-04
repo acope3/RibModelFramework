@@ -535,10 +535,6 @@ void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned
 	}
 }
 
-<<<<<<< HEAD
-std::vector<std::vector<double>> MCMCAlgorithm::solveToeplitzMatrix(int lr, std::vector<double> r, std::vector<double> g)
-=======
-
 double MCMCAlgorithm::calculateGewekeScore(unsigned current_iteration)
 {
 	double posteriorMean1 = 0.0;
@@ -582,7 +578,6 @@ double MCMCAlgorithm::calculateGewekeScore(unsigned current_iteration)
 
 
 bool MCMCAlgorithm::isEstimateSynthesisRate()
->>>>>>> ghanas/master
 {
 	return estimateSynthesisRate;
 }

@@ -427,7 +427,7 @@ void FONSEParameter::initSelectionCategories(std::vector<std::string> files, uns
 // --------------------------------------//
 
 
-FONSETrace& FONSEParameter::getTraceObject()
+Trace& FONSEParameter::getTraceObject()
 {
 	return traces;
 }
@@ -437,7 +437,7 @@ void FONSEParameter::updateSphiTrace(unsigned sample)
 {
 	for(unsigned i = 0u; i < numSelectionCategories; i++)
 	{
-		traces.updateSphiTrace(sample, Sphi[i], i);
+		traces.updateStdDevSynthesisRateTrace(sample, Sphi[i], i);
 	}
 }
 
@@ -462,7 +462,8 @@ void FONSEParameter::updateMixtureProbabilitiesTrace(unsigned samples)
 
 void FONSEParameter::updateCodonSpecificParameterTrace(unsigned sample, std::string grouping)
 {
-	traces.updateCodonSpecificParameterTrace(sample, grouping, currentMutationParameter, currentSelectionParameter);
+	traces.updateCodonSpecificParameterTrace(sample, grouping, currentMutationParameter, dM);
+	traces.updateCodonSpecificParameterTrace(sample, grouping, currentSelectionParameter, dOmega);
 }
 
 

@@ -11,14 +11,14 @@
 #include <Rcpp.h>
 #endif
 
-#include "ROCTrace.h"
+#include "../base/Trace.h"
 #include "../base/Parameter.h"
 
 class ROCParameter : public Parameter
 {
 	private:
 
-		ROCTrace traces;
+		Trace traces;
 		std::vector<CovarianceMatrix> covarianceMatrix;
 
 		double phiEpsilon_proposed;
@@ -78,7 +78,7 @@ class ROCParameter : public Parameter
 
 
 		//Trace Functions:
-		ROCTrace& getTraceObject();
+		Trace& getTraceObject();
 		virtual void updateSphiTrace(unsigned sample);
 		virtual void updateSynthesisRateTrace(unsigned sample, unsigned geneIndex);
 		virtual void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex);

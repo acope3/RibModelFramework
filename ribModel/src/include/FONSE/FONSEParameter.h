@@ -12,12 +12,12 @@
 #endif
 
 #include "../base/Parameter.h"
-#include "FONSETrace.h"
+#include "../base/Trace.h"
 
 class FONSEParameter : public Parameter
 {
 	private:
-		FONSETrace traces;
+		Trace traces;
 
 		std::vector<CovarianceMatrix> covarianceMatrix;
 
@@ -70,7 +70,7 @@ class FONSEParameter : public Parameter
 
 
 		//Trace Functions:
-		FONSETrace& getTraceObject();
+		Trace& getTraceObject();
 		virtual void updateSphiTrace(unsigned sample);
 		virtual void updateSynthesisRateTrace(unsigned sample, unsigned geneIndex);
 		virtual void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex);

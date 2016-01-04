@@ -429,7 +429,7 @@ void ROCParameter::initFromRestartFile(std::string filename)
 
 void ROCParameter::initAllTraces(unsigned samples, unsigned num_genes)
 {
-	traces.initAllTraces(samples, num_genes, numMutationCategories, numSelectionCategories, numParam,
+	traces.initializeROCTrace(samples, num_genes, numMutationCategories, numSelectionCategories, numParam,
 						 numMixtures, categories, maxGrouping, phiGroupings);
 }
 
@@ -526,7 +526,7 @@ void ROCParameter::initSelectionCategories(std::vector<std::string> files, unsig
 // --------------------------------------//
 
 
-ROCTrace& ROCParameter::getTraceObject()
+Trace& ROCParameter::getTraceObject()
 {
 	return traces;
 }
@@ -536,7 +536,7 @@ void ROCParameter::updateSphiTrace(unsigned sample)
 {
 	for(unsigned i = 0u; i < numSelectionCategories; i++)
 	{
-		traces.updateSphiTrace(sample, Sphi[i], i);
+		traces.updateStdDevSynthesisRateTrace(sample, Sphi[i], i);
 	}
 }
 
@@ -563,7 +563,7 @@ void ROCParameter::updateSepsilonTraces(unsigned sample)
 {
 	for (unsigned i = 0; i < Sepsilon.size(); i++)
 	{
-		traces.updateSepsilonTrace(i, sample, Sepsilon[i]);
+		traces.updateObservedSynthesisNoiseTrace(i, sample, Sepsilon[i]);
 	}
 }
 
@@ -572,14 +572,15 @@ void ROCParameter::updateAphiTraces(unsigned sample)
 {
 	for (unsigned i = 0; i < Aphi.size(); i++)
 	{
-		traces.updateAphiTrace(i, sample, Aphi[i]);
+		traces.updateSynthesisOffsetTrace(i, sample, Aphi[i]);
 	}
 }
 
 
 void ROCParameter::updateCodonSpecificParameterTrace(unsigned sample, std::string grouping)
 {
-	traces.updateCodonSpecificParameterTrace(sample, grouping, currentMutationParameter, currentSelectionParameter);
+	traces.updateCodonSpecificParameterTrace(sample, grouping, currentMutationParameter, dM);
+	traces.updateCodonSpecificParameterTrace(sample, grouping, currentSelectionParameter, dEta);
 }
 
 
@@ -783,7 +784,7 @@ double ROCParameter::getSphiPosteriorMean(unsigned samples, unsigned mixture)
 {
 	double posteriorMean = 0.0;
 	unsigned selectionCategory = getSelectionCategory(mixture);
-	std::vector<double> sPhiTrace = traces.getSphiTrace(selectionCategory);
+	std::vector<double> sPhiTrace = traces.getStdDevSynthesisRateTrace(selectionCategory);
 	unsigned traceLength = lastIteration;
 
 	if (samples > traceLength)
@@ -848,7 +849,7 @@ double ROCParameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned ge
 double ROCParameter::getAphiPosteriorMean(unsigned index, unsigned samples)
 {
 	double posteriorMean = 0.0;
-	std::vector<double> aPhiTrace = traces.getAphiTrace(index);
+	std::vector<double> aPhiTrace = traces.getSynthesisOffsetTrace(index);
 	unsigned traceLength = lastIteration;
 
 	if (samples > traceLength)
@@ -875,8 +876,8 @@ double ROCParameter::getAphiPosteriorMean(unsigned index, unsigned samples)
 double ROCParameter::getMutationPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon)
 {
 	double posteriorMean = 0.0;
-	std::vector<double> mutationParameterTrace = traces.getMutationParameterTraceByMixtureElementForCodon(
-			mixtureElement, codon);
+	std::vector<double> mutationParameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
+			mixtureElement, codon, dM);
 	unsigned traceLength = lastIteration;
 
 	if (samples > traceLength)
@@ -903,8 +904,8 @@ double ROCParameter::getMutationPosteriorMean(unsigned mixtureElement, unsigned 
 double ROCParameter::getSelectionPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon)
 {
 	double posteriorMean = 0.0;
-	std::vector<double> selectionParameterTrace = traces.getSelectionParameterTraceByMixtureElementForCodon(
-			mixtureElement, codon);
+	std::vector<double> selectionParameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
+			mixtureElement, codon, dEta);
 	unsigned traceLength = lastIteration;
 
 	if (samples > traceLength)
@@ -931,7 +932,7 @@ double ROCParameter::getSelectionPosteriorMean(unsigned mixtureElement, unsigned
 double ROCParameter::getSphiVariance(unsigned samples, unsigned mixture, bool unbiased)
 {
 	unsigned selectionCategory = getSelectionCategory(mixture);
-	std::vector<double> sPhiTrace = traces.getSphiTrace(selectionCategory);
+	std::vector<double> sPhiTrace = traces.getStdDevSynthesisRateTrace(selectionCategory);
 	unsigned traceLength = (unsigned)sPhiTrace.size();
 	if (samples > traceLength)
 	{
@@ -999,7 +1000,7 @@ double ROCParameter::getSynthesisRateVariance(unsigned samples, unsigned geneInd
 
 double ROCParameter::getAphiVariance(unsigned index, unsigned samples, bool unbiased)
 {
-	std::vector<double> aPhiTrace = traces.getAphiTrace(index);
+	std::vector<double> aPhiTrace = traces.getSynthesisOffsetTrace(index);
 	unsigned traceLength = lastIteration;
 	if (samples > traceLength)
 	{
@@ -1030,8 +1031,8 @@ double ROCParameter::getAphiVariance(unsigned index, unsigned samples, bool unbi
 
 double ROCParameter::getMutationVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased)
 {
-	std::vector<double> mutationParameterTrace = traces.getMutationParameterTraceByMixtureElementForCodon(
-			mixtureElement, codon);
+	std::vector<double> mutationParameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
+			mixtureElement, codon, dM);
 	unsigned traceLength = lastIteration;
 	if (samples > traceLength)
 	{
@@ -1064,8 +1065,8 @@ double ROCParameter::getMutationVariance(unsigned mixtureElement, unsigned sampl
 
 double ROCParameter::getSelectionVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased)
 {
-	std::vector<double> selectionParameterTrace = traces.getSelectionParameterTraceByMixtureElementForCodon(
-			mixtureElement, codon);
+	std::vector<double> selectionParameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
+			mixtureElement, codon, dEta);
 	unsigned traceLength = lastIteration;
 	if (samples > traceLength)
 	{
@@ -1142,7 +1143,7 @@ std::vector<double> ROCParameter::getEstimatedMixtureAssignmentProbabilities(uns
 void ROCParameter::adaptSphiProposalWidth(unsigned adaptationWidth)
 {
 	double acceptanceLevel = (double) numAcceptForSphi / (double) adaptationWidth;
-	traces.updateSphiAcceptanceRatioTrace(acceptanceLevel);
+	traces.updateStdDevSynthesisRateAcceptanceRatioTrace(acceptanceLevel);
 	if (acceptanceLevel < 0.2)
 	{
 		std_sphi *= 0.8;
@@ -1196,7 +1197,7 @@ void ROCParameter::adaptAphiProposalWidth(unsigned adaptationWidth)
 {
 	for (unsigned i = 0; i < getNumObservedPhiSets(); i++) {
 		double acceptanceLevel = numAcceptForAphi[i] / (double)adaptationWidth;
-		traces.updateAphiAcceptanceRatioTrace(i, acceptanceLevel);
+		traces.updateSynthesisOffsetAcceptanceRatioTrace(i, acceptanceLevel);
 		if (acceptanceLevel < 0.2)
 		{
 			std_Aphi[i] *= 0.8;
@@ -1225,7 +1226,7 @@ void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 		std::string aa = groupList[i];
 		unsigned aaIndex = SequenceSummary::AAToAAIndex(aa);
 		double acceptanceLevel = (double) numAcceptForMutationAndSelection[aaIndex] / (double) adaptationWidth;
-		traces.updateCspAcceptanceRatioTrace(aaIndex, acceptanceLevel);
+		traces.updateCodonSpecificAcceptanceRatioTrace(aaIndex, acceptanceLevel);
 		std::array <unsigned, 2> codonRange = SequenceSummary::AAIndexToCodonRange(aaIndex, true);
 #ifndef STANDALONE
 		Rprintf("\t%s:\t%f\t%f\n", aa.c_str(), acceptanceLevel, std_csp[codonRange[0]]);
