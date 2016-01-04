@@ -64,33 +64,41 @@ class MCMCAlgorithm
 		void varyInitialConditions(Genome& genome, Model& model, unsigned divergenceIterations);
 		double calculateGewekeScore(unsigned current_iteration);
 
-		bool isEstimateSynthesisRate() {return estimateSynthesisRate;}
-		bool isEstimateCodonSpecificParameter() {return estimateCodonSpecificParameter;}
-		bool isEstimateHyperParameter() {return estimateHyperParameter;}
-		bool isEstimateMixtureAssignment() {return estimateMixtureAssignment;}
+		bool isEstimateSynthesisRate();
+		bool isEstimateCodonSpecificParameter();
+		bool isEstimateHyperParameter();
+		bool isEstimateMixtureAssignment();
 
-		void setEstimateSynthesisRate(bool in) {estimateSynthesisRate = in;}
-		void setEstimateCodonSpecificParameter(bool in) {estimateCodonSpecificParameter = in;}
-		void setEstimateHyperParameter(bool in) {estimateHyperParameter = in;}
-		void setEstimateMixtureAssignment(bool in) {estimateMixtureAssignment = in;}
+		void setEstimateSynthesisRate(bool in);
+		void setEstimateCodonSpecificParameter(bool in);
+		void setEstimateHyperParameter(bool in);
+		void setEstimateMixtureAssignment(bool in);
 
 		void setRestartFileSettings(std::string filename, unsigned interval, bool multiple);
 
-		std::vector<double> getLogLikelihoodTrace() {return likelihoodTrace;}
+		std::vector<double> getLogLikelihoodTrace();
 		double getLogLikelihoodPosteriorMean(unsigned samples);
 
 		static std::vector<double> acf(std::vector<double>& x, int nrows, int ncols, int lagmax, bool correlation, bool demean);
 		static std::vector<std::vector<double>> solveToeplitzMatrix(int lr, std::vector<double> r, std::vector<double> g);
-    
-    
-    //R Only:
-    unsigned getSamples();
-    unsigned getThining();
-    unsigned getAdaptiveWidth();
-    void setSamples(unsigned _samples);
-    void setThining(unsigned _thining);
-    void setAdaptiveWidth(unsigned _adaptiveWidth);
-    void setLogLikelihoodTrace(std::vector<double> _likelihoodTrace);
+
+
+
+
+		//R Section:
+
+#ifndef STANDALONE
+
+		//Other Functions:
+    	unsigned getSamples();
+    	unsigned getThining();
+    	unsigned getAdaptiveWidth();
+    	void setSamples(unsigned _samples);
+    	void setThining(unsigned _thining);
+    	void setAdaptiveWidth(unsigned _adaptiveWidth);
+		void setLogLikelihoodTrace(std::vector<double> _likelihoodTrace);
+#endif //STANDALONE
+
 
 	protected:
 };
