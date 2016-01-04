@@ -8,7 +8,11 @@
 #include <cctype>
 #include <vector>
 #include <array>
+#include <iostream>
 
+#ifndef STANDALONE
+#include <Rcpp.h>
+#endif
 
 class SequenceSummary
 {
@@ -19,10 +23,9 @@ class SequenceSummary
 		unsigned naa[22];
 		std::vector <std::vector <unsigned>> codonPositions;
 
-
 	public:
 
-		//Static member variables:
+		//Static Member Variables:
 		static const std::string Ser2;
 		static const std::vector<std::string> AminoAcidArray;
 		static const std::string codonArray[];
@@ -32,15 +35,17 @@ class SequenceSummary
 		static const std::map<std::string, unsigned> codonToIndexWithoutReference;
 
 
-		//Constructors & destructors:
+
+		//Constructors & Destructors:
 		explicit SequenceSummary();
 		SequenceSummary(const std::string& sequence);
-		virtual ~SequenceSummary();
 		SequenceSummary(const SequenceSummary& other);
 		SequenceSummary& operator=(const SequenceSummary& other);
+		virtual ~SequenceSummary(); //TODO:Why is this virtual????
 
 
-		//AA, codon, RFP, & position functions:
+
+		//Data Manipulation Functions:
 		unsigned getAACountForAA(std::string aa);
 		unsigned getAACountForAA(unsigned aaIndex);
 		unsigned getCodonCountForCodon(std::string& codon);
@@ -53,12 +58,12 @@ class SequenceSummary
 
 
 
-		//Functions to manage stored data:
+		//Other Functions:
 		void clear();
 		bool processSequence(const std::string& sequence);  //TODO: WHY return a bool
 
 
-		//Static functions:
+		//Static Functions:
 		static unsigned AAToAAIndex(std::string aa);
 		static std::array<unsigned, 2> AAIndexToCodonRange(unsigned aaIndex, bool forParamVector = false);
 		static std::array<unsigned, 2> AAToCodonRange(std::string aa, bool forParamVector = false);
@@ -74,8 +79,11 @@ class SequenceSummary
 		static std::vector<std::string> codons();
 
 
+		//R Section:
 
-		//R wrapper functions:
+#ifndef STANDALONE
+
+		//Data Manipulation Functions:
 		unsigned getAACountForAAR(std::string aa);
 		unsigned getAACountForAAIndexR(unsigned aaIndex); //TEST THAT ONLY!
 		unsigned getCodonCountForCodonR(std::string& codon);
@@ -84,6 +92,8 @@ class SequenceSummary
 		unsigned getRFPObservedForCodonIndexR(unsigned codonIndex); //TEST THAT ONLY!
 		std::vector <unsigned> *getCodonPositionsForCodonR(std::string codon);
 		std::vector <unsigned> *getCodonPositionsForCodonIndexR(unsigned codonIndex); //TEST THAT ONLY!
+
+#endif //STANDALONE
 
 
 	protected:
