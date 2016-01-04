@@ -68,8 +68,7 @@ initializeMCMCObject <- function(samples, thining=1, adaptive.width=100,
 #' thining given when the mcmc object is initialized. Updates are provided every 100
 #' steps, and the state of the chain is saved every thining steps.
 #' 
-runMCMC <- function(mcmc, genome, model, ncores = 1, divergence.iteration = 0)
-{
+runMCMC <- function(mcmc, genome, model, ncores = 1, divergence.iteration = 0){
   
   #TODO: error check values
   UseMethod("runMCMC", mcmc)
@@ -77,8 +76,8 @@ runMCMC <- function(mcmc, genome, model, ncores = 1, divergence.iteration = 0)
 
 
 #Called from "runMCMC."
-runMCMC.Rcpp_MCMCAlgorithm <- function(mcmc, genome, model, ncores = 1, divergence.iteration = 0)
-{
+runMCMC.Rcpp_MCMCAlgorithm <- function(mcmc, genome, model, ncores = 1, 
+                                       divergence.iteration = 0){
   mcmc$run(genome, model, ncores, divergence.iteration)
 }
 
@@ -110,14 +109,13 @@ runMCMC.Rcpp_MCMCAlgorithm <- function(mcmc, genome, model, ncores = 1, divergen
 #' file, the sample number is prepended onto the file name and multiple rerstart files
 #' are generated for a run.
 #' 
-setRestartSettings <- function(mcmc, filename, samples, write.multiple=TRUE)
-{
+setRestartSettings <- function(mcmc, filename, samples, write.multiple=TRUE){
   UseMethod("setRestartSettings", mcmc)
 }
 
 
-setRestartSettings.Rcpp_MCMCAlgorithm <- function(mcmc, filename, samples, write.multiple=TRUE)
-{
+setRestartSettings.Rcpp_MCMCAlgorithm <- function(mcmc, filename, samples, 
+                                                  write.multiple=TRUE){
   mcmc$setRestartFileSettings(filename, samples, write.multiple)
 }
 #TODO: Why is this seperated into 2 functions?
@@ -141,22 +139,20 @@ setRestartSettings.Rcpp_MCMCAlgorithm <- function(mcmc, filename, samples, write
 #' 
 #' @param ...
 #' 
-#' @return This function has no return value.
+#' @return 
 #' 
 #' @description \code{convergence.test} 
 #' 
 #' @details \code{convergence.test}
 #' 
 convergence.test <- function(object, nsamples = 10, frac1 = 0.1, frac2 = 0.5, 
-                    thin = 1, plot = FALSE, ...)
-{
+                    thin = 1, plot = FALSE, ...){
   UseMethod("convergence.test", object)
 }
 
 
 convergence.test.Rcpp_MCMCAlgorithm <- function(object, nsamples = 10, frac1 = 0.1, 
-                                       frac2 = 0.5, thin = 1, plot = FALSE, ...)
-{
+                                       frac2 = 0.5, thin = 1, plot = FALSE, ...){
   # TODO: extend to work with multiple chains once we have that capability.
   
   loglik.trace <- object$getLogLikelihoodTrace()
@@ -188,8 +184,7 @@ convergence.test.Rcpp_MCMCAlgorithm <- function(object, nsamples = 10, frac1 = 0
 #' 
 #' @details None.
 #' 
-writeMCMCObject <- function(mcmc, file)
-{
+writeMCMCObject <- function(mcmc, file){
   loglikeTrace <- mcmc$getLogLikelihoodTrace()
   samples <- mcmc$getSamples()
   thining <- mcmc$getThining()
@@ -210,8 +205,7 @@ writeMCMCObject <- function(mcmc, file)
 #' @details This MCMC object is not intended to be used to do another model fitting, only
 #' to graph the stored results.
 #' 
-loadMCMCObject <- function(file)
-{
+loadMCMCObject <- function(file){
   mcmc <- new(MCMCAlgorithm)
   tempEnv <- new.env();
   load(file = file, envir = tempEnv)

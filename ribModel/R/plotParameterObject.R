@@ -1,24 +1,38 @@
-plot.Rcpp_ROCParameter <- function(x, what = "Mutation", samples = 100, ...)
-{
+#' Plot ROC Parameter 
+#' 
+#' @param x ROC parameter object.
+#' 
+#' @param what Which aspect of the ROC parameter to plot. Default value is
+#' "Mutation".
+#' 
+#' @param samples Number of samples to plot using the posterior mean. Default
+#' value is 100.
+#' 
+#' @param ... Arguments to be passed to methods, such as graphical parameters.
+#' 
+#' @return This function has no return value.
+#' 
+#' @description \code{plot} graphs the mutation or selection parameter for a ROC
+#' parameter object for each mixture element. 
+#' 
+#' @details Graphs are based off the last # samples for the posterior mean.
+#' 
+plot.Rcpp_ROCParameter <- function(x, what = "Mutation", samples = 100, ...){
   
   numMixtures <- x$numMixtures
   csp.params <- data.frame(matrix(0, ncol=numMixtures, nrow = 40))
   
   names.aa <- aminoAcids()
-  for(mixture in 1:numMixtures)
-  {
+  for(mixture in 1:numMixtures){
     
     param.storage <- vector("numeric", 0)
     param.name.storage <- vector("numeric", 0)
     # get codon specific parameter
-    for(aa in names.aa)
-    {
+    for(aa in names.aa){
       if(aa == "M" || aa == "W" || aa == "X") next
       codons <- AAToCodon(aa, T)
-      for(i in 1:length(codons))
-      {
-        if(what == "Mutation")
-        {
+      for(i in 1:length(codons)){
+        if(what == "Mutation"){
           param.storage <- c(param.storage, x$getMutationPosteriorMeanForCodon(mixture, samples, codons[i]))
         }else{
           param.storage <- c(param.storage, x$getSelectionPosteriorMeanForCodon(mixture, samples, codons[i]))
@@ -33,27 +47,42 @@ plot.Rcpp_ROCParameter <- function(x, what = "Mutation", samples = 100, ...)
   pairs(csp.params, upper.panel = upper.panel.plot, lower.panel=NULL, main = ...)
 }
 
-plot.Rcpp_FONSEParameter <- function(x, what = "Mutation", samples = 100, ...)
-{
+
+#' Plot FONSE Parameter 
+#' 
+#' @param x FONSE parameter object.
+#' 
+#' @param what Which aspect of the FONSE parameter to plot. Default value is
+#' "Mutation".
+#' 
+#' @param samples Number of samples to plot using the posterior mean. Default
+#' value is 100.
+#' 
+#' @param ... Arguments to be passed to methods, such as graphical parameters.
+#' 
+#' @return This function has no return value.
+#' 
+#' @description \code{plot} graphs the mutation or selection parameter for a FONSE
+#' parameter object for each mixture element.
+#' 
+#' @details Graphs are based off the last # samples for the posterior mean.
+#' 
+plot.Rcpp_FONSEParameter <- function(x, what = "Mutation", samples = 100, ...){
   
   numMixtures <- x$numMixtures
   csp.params <- data.frame(matrix(0, ncol=numMixtures, nrow = 40))
   
   names.aa <- aminoAcids()
-  for(mixture in 1:numMixtures)
-  {
+  for(mixture in 1:numMixtures){
     
     param.storage <- vector("numeric", 0)
     param.name.storage <- vector("numeric", 0)
     # get codon specific parameter
-    for(aa in names.aa)
-    {
+    for(aa in names.aa){
       if(aa == "M" || aa == "W" || aa == "X") next
       codons <- AAToCodon(aa, T)
-      for(i in 1:length(codons))
-      {
-        if(what == "Mutation")
-        {
+      for(i in 1:length(codons)){
+        if(what == "Mutation"){
           param.storage <- c(param.storage, x$getMutationPosteriorMeanForCodon(mixture, samples, codons[i]))
         }else{
           param.storage <- c(param.storage, x$getSelectionPosteriorMeanForCodon(mixture, samples, codons[i]))
@@ -68,20 +97,19 @@ plot.Rcpp_FONSEParameter <- function(x, what = "Mutation", samples = 100, ...)
   #pairs(csp.params, upper.panel = upper.panel.plot, lower.panel=NULL, main = ...)
 }
 
-# NOT EXPOSED
-upper.panel.plot <- function(x, y, sd.x=NULL, sd.y=NULL, ...)
-{
+
+#TODO: should RFP's ploting be here as well?
+
+upper.panel.plot <- function(x, y, sd.x=NULL, sd.y=NULL, ...){
   abline(0, 1, col = "blue", lty = 2)
   points(x, y, ...)
-  if(!is.null(sd.y))
-  {
+  if(!is.null(sd.y)){
     y.up <- y + sd.y
     y.low <- y - sd.y
     epsilon <- range(x, na.rm = T) * 0.1
     segments(x, y.low, x, y.up, ...)
   }
-  if(!is.null(sd.x))
-  {
+  if(!is.null(sd.x)){
     x.up <- x + sd.x
     x.low <- x - sd.x
     epsilon <- range(y, na.rm = T) * 0.1
@@ -107,8 +135,7 @@ upper.panel.plot <- function(x, y, sd.x=NULL, sd.y=NULL, ...)
   intercept <- round(summary(lm.line)$coefficients[1], 3)
   t <- (slope - 1)/std.error
   
-  if(t > qt(1-0.05/2, lm.line$df.residual - 1))
-  {
+  if(t > qt(1-0.05/2, lm.line$df.residual - 1)){
     eq <- paste("y = ", sprintf("%.3f", intercept), " + ", sprintf("%.3f", slope), "x *", sep = "")
     text(xlim[1] + width * 0.1, ylim[2] - height * 0.2, eq)
   }else{
@@ -120,7 +147,7 @@ upper.panel.plot <- function(x, y, sd.x=NULL, sd.y=NULL, ...)
        pos = 2, cex = 1.0, font = 2)
 }
 
-# NOT EXPOSED
+
 lower.panel.plot <- function(x, y, ...)
 {
   

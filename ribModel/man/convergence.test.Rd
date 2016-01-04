@@ -23,7 +23,7 @@ convergence.test(object, nsamples = 10, frac1 = 0.1, frac2 = 0.5,
 \item{...}{}
 }
 \value{
-This function has no return value.
+
 }
 \description{
 \code{convergence.test}
