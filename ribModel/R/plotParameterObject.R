@@ -1,7 +1,7 @@
-plot.Rcpp_ROCParameter <- function(parameter, what = "Mutation", samples = 100, ...)
+plot.Rcpp_ROCParameter <- function(x, what = "Mutation", samples = 100, ...)
 {
   
-  numMixtures <- parameter$numMixtures
+  numMixtures <- x$numMixtures
   csp.params <- data.frame(matrix(0, ncol=numMixtures, nrow = 40))
   
   names.aa <- aminoAcids()
@@ -19,9 +19,9 @@ plot.Rcpp_ROCParameter <- function(parameter, what = "Mutation", samples = 100, 
       {
         if(what == "Mutation")
         {
-          param.storage <- c(param.storage, parameter$getMutationPosteriorMeanForCodon(mixture, samples, codons[i]))
+          param.storage <- c(param.storage, x$getMutationPosteriorMeanForCodon(mixture, samples, codons[i]))
         }else{
-          param.storage <- c(param.storage, parameter$getSelectionPosteriorMeanForCodon(mixture, samples, codons[i]))
+          param.storage <- c(param.storage, x$getSelectionPosteriorMeanForCodon(mixture, samples, codons[i]))
         }
         param.name.storage <- c(param.name.storage, paste(aa, codons[i], sep="."))
       }
@@ -33,10 +33,10 @@ plot.Rcpp_ROCParameter <- function(parameter, what = "Mutation", samples = 100, 
   pairs(csp.params, upper.panel = upper.panel.plot, lower.panel=NULL, main = ...)
 }
 
-plot.Rcpp_FONSEParameter <- function(parameter, what = "Mutation", samples = 100, ...)
+plot.Rcpp_FONSEParameter <- function(x, what = "Mutation", samples = 100, ...)
 {
   
-  numMixtures <- parameter$numMixtures
+  numMixtures <- x$numMixtures
   csp.params <- data.frame(matrix(0, ncol=numMixtures, nrow = 40))
   
   names.aa <- aminoAcids()
@@ -54,9 +54,9 @@ plot.Rcpp_FONSEParameter <- function(parameter, what = "Mutation", samples = 100
       {
         if(what == "Mutation")
         {
-          param.storage <- c(param.storage, parameter$getMutationPosteriorMeanForCodon(mixture, samples, codons[i]))
+          param.storage <- c(param.storage, x$getMutationPosteriorMeanForCodon(mixture, samples, codons[i]))
         }else{
-          param.storage <- c(param.storage, parameter$getSelectionPosteriorMeanForCodon(mixture, samples, codons[i]))
+          param.storage <- c(param.storage, x$getSelectionPosteriorMeanForCodon(mixture, samples, codons[i]))
         }
         param.name.storage <- c(param.name.storage, paste(aa, codons[i], sep="."))
       }
@@ -68,6 +68,7 @@ plot.Rcpp_FONSEParameter <- function(parameter, what = "Mutation", samples = 100
   #pairs(csp.params, upper.panel = upper.panel.plot, lower.panel=NULL, main = ...)
 }
 
+# NOT EXPOSED
 upper.panel.plot <- function(x, y, sd.x=NULL, sd.y=NULL, ...)
 {
   abline(0, 1, col = "blue", lty = 2)
@@ -118,6 +119,8 @@ upper.panel.plot <- function(x, y, sd.x=NULL, sd.y=NULL, ...)
        parse(text = paste("rho == ", sprintf("%.4f", rho), sep = "")),
        pos = 2, cex = 1.0, font = 2)
 }
+
+# NOT EXPOSED
 lower.panel.plot <- function(x, y, ...)
 {
   

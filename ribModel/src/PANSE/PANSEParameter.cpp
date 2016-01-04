@@ -13,6 +13,10 @@ using namespace Rcpp;
 PANSEParameter::PANSEParameter() : Parameter()
 {
 	//ctor
+	//phiEpsilon = 0.1;
+	//phiEpsilon_proposed = 0.1;
+	bias_csp = 0;
+	//mutation_prior_sd = 0.35;
 }
 
 

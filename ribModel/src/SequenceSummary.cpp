@@ -1,5 +1,8 @@
 #include "include/SequenceSummary.h"
-
+#ifndef STANDALONE
+#include <Rcpp.h>
+using namespace Rcpp;
+#endif
 
 #include <iostream>
 
@@ -177,7 +180,11 @@ bool SequenceSummary::processSequence(const std::string& sequence)
 		}
 		else
 		{
+#ifndef STANDALONE
+			Rf_warning("Codon %s not recognized!\n Codon will be ignored!\n", codon.c_str());
+#else
 			std::cerr << "WARNING: Codon " << codon << " not recognized!\n Codon will be ignored!\n";
+#endif
 			check = false;
 		}
 	}
@@ -360,7 +367,11 @@ std::array<unsigned, 2> SequenceSummary::AAIndexToCodonRange(unsigned aaIndex, b
 	}
 	else //Invalid AA
 	{
+#ifndef STANDALONE
+		Rf_warning("Invalid Amino Acid given (%s), returning 0,0\n", aa.c_str());
+#else
 		std::cerr << "Invalid aa given, returning 0,0\n";
+#endif
 		startAAIndex = 0;
 		endAAIndex = 0;
 	}
@@ -581,7 +592,11 @@ unsigned SequenceSummary::getCodonCountForCodonR(std::string& codon)
 
 	if (codon.length() != 3)
 	{
-		std::cerr <<"Codon is not 3 characters! Returning 0 for codon counts!\n";
+#ifndef STANDALONE
+		Rf_warning("Codon: %s is not 3 characters! Returning 0 for codon counts!\n", codon.c_str());
+#else
+		std::cerr << "Codon is not 3 characters! Returning 0 for codon counts!\n";
+#endif
 	}
 	else
 	{
@@ -633,8 +648,6 @@ std::vector <unsigned> *SequenceSummary::getCodonPositionsForCodonIndexR(unsigne
 // ----------------------------- RCPP MODULE ---------------------------------
 // ---------------------------------------------------------------------------
 #ifndef STANDALONE
-#include <Rcpp.h>
-using namespace Rcpp;
 RCPP_MODULE(SequenceSummary_mod)
 {
 	class_<SequenceSummary>( "SequenceSummary" )

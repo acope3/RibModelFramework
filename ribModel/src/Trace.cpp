@@ -7,6 +7,7 @@ using namespace Rcpp;
 Trace::Trace()
 {
 	//CTOR
+	categories = NULL;
 }
 
 Trace::~Trace()
@@ -23,7 +24,11 @@ void Trace::initAllTraces(unsigned samples, unsigned num_genes, unsigned numSele
 void Trace::initBaseTraces(unsigned samples, unsigned num_genes, unsigned numSelectionCategories, unsigned numMixtures, 
 		std::vector<mixtureDefinition> &_categories, unsigned maxGrouping)
 {
-	std::cout <<"maxGrouping: " << maxGrouping <<"\n";
+#ifndef STANDALONE
+	Rprintf("maxGrouping: %d\n", maxGrouping);
+#else
+	std::cout << "maxGrouping: " << maxGrouping << "\n";
+#endif
 	//numSelectionCategories always == numSynthesisRateCategories, so only one is passed in for convience
 	initSphiTrace(numSelectionCategories, samples);
 	initSynthesisRateAcceptanceRatioTrace(num_genes, numSelectionCategories);
@@ -45,8 +50,12 @@ bool Trace::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound)
   }
   else
   {
-    std::cerr <<"Error with Index\nINDEX: " << index <<"\n";
-    std::cerr <<"MUST BE BETWEEN " << lowerbound << " & " << upperbound <<"\n";
+#ifndef STANDALONE
+		Rf_error("Index: %d is out of bounds. Index must be between %d & %d\n", index, lowerbound, upperbound);
+#else
+		std::cerr << "Error with the index\nGIVEN: " << index << "\n";
+		std::cerr << "MUST BE BETWEEN:	" << lowerbound << " & " << upperbound << "\n";
+#endif
   }
 
   return check;

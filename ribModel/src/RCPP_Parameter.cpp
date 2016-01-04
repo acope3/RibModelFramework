@@ -50,6 +50,7 @@ RCPP_MODULE(Parameter_mod)
 
 		//Iteration Functions:
 		.method("getLastIteration", &Parameter::getLastIteration) //Not a R wrapper
+		.method("setLastIteration", &Parameter::setLastIteration) //Not a R wrapper
 
 
 
@@ -63,6 +64,7 @@ RCPP_MODULE(Parameter_mod)
 
 		//Other Functions:
 		.method("getMixtureAssignment", &Parameter::getMixtureAssignmentR)
+		.method("setMixtureAssignment", &Parameter::setMixtureAssignmentR)
 		.method("getMixtureAssignmentForGene", &Parameter::getMixtureAssignmentForGeneR)
 		.method("setMixtureAssignmentForGene", &Parameter::setMixtureAssignmentForGene)
 		//setNumMixtureElements it taken care in the properties section below
@@ -104,9 +106,11 @@ RCPP_MODULE(Parameter_mod)
 
 
 
+
 		//CSP Functions:
 		//Listed in the properties section below. NOTE: these getter/setters are ONLY
 		//used in R
+
 
 
 
@@ -202,12 +206,9 @@ RCPP_MODULE(Parameter_mod)
 		//Initialization, Restart, Index Checking:
 		.method("initCovarianceMatrix", &FONSEParameter::initCovarianceMatrix)
 		.method("getCovarianceMatrixForAA", &FONSEParameter::getCovarianceMatrixForAA) //Not an R wrapper
-
-		.method("initSelection", &FONSEParameter::initSelection)
 		.method("initMutation", &FONSEParameter::initMutation)
-		.method("initMutationCategories", &FONSEParameter::initMutationCategories)
-		.method("initSelectionCategories", &FONSEParameter::initSelectionCategories)
-		.method("getTraceObject", &FONSEParameter::getTraceObject)
+		.method("initSelection", &FONSEParameter::initSelection)
+
 
 
 

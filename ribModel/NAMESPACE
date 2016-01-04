@@ -1,9 +1,10 @@
+#loading
+useDynLib(ribModel)
+
 #imports
 importFrom(methods, new)
 importFrom(Rcpp, evalCpp)
 
-#loading
-useDynLib(ribModel)
 
 #exports
 exportPattern("^[[:alpha:]]+") #<- if commented out, only functions explicitly exported will we exposed 

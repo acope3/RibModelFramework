@@ -18,9 +18,8 @@ geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457), rep(1, 3403), rep(3, 500
 #geneAssignment <- c(rep(1,448), rep(1,513), rep(2,457))
 #geneAssignment <- c(rep(1,448), rep(2,457))
 #geneAssignment <- c(rep(1,500), rep(2,500))
-parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
-#parameter <- initializeParameterObject(restart.file = "../ribModel/src/20RestartFile.txt")
-
+#parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
+parameter <- initializeParameterObject(model="ROC", restart.file="30restartFile.rst")
 
 
 # initialize MCMC object

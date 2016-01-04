@@ -29,6 +29,7 @@ const std::string Parameter::mutationShared = "mutationShared";
 
 Parameter::Parameter()
 {
+	lastIteration = 0u;
 	numParam = 0u;
 	phiGroupings = 0u;
 	Sphi.resize(1);
@@ -46,6 +47,7 @@ Parameter::Parameter()
 
 Parameter::Parameter(unsigned _maxGrouping)
 {
+	lastIteration = 0u;
 	numParam = 0u;
 	phiGroupings = 0u;
 	Sphi.resize(1);
@@ -194,182 +196,191 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 	input.open(filename.c_str());
 	if (input.fail())
 	{
-		std::cerr <<"Could not open RestartFile.txt to initialzie base values\n";
-		std::exit(1);
+#ifndef STANDALONE
+		Rf_error("Could not open file: %s to initialize base values\n", filename.c_str());
+#else
+		std::cerr << "Could not open file: " << filename << " to initialize base values\n";
+#endif
 	}
-
-	int cat = 0;
-	std::vector<double> mat;
-	std::string tmp, variableName;
-	while (getline(input, tmp))
+	else
 	{
-		int flag;
-		if (tmp[0] == '>') flag = 1;
-		else if (input.eof()) flag = 2;
-		else if (tmp[0] == '#') flag = 3;
-		else flag = 4;
+		int cat = 0;
+		std::vector<double> mat;
+		std::string tmp, variableName;
+		while (getline(input, tmp))
+		{
+			int flag;
+			if (tmp[0] == '>') flag = 1;
+			else if (input.eof()) flag = 2;
+			else if (tmp[0] == '#') flag = 3;
+			else flag = 4;
 
-		if (flag == 1)
-		{
-			mat.clear();
-			cat = 0;
-			variableName = tmp.substr(1,tmp.size()-2);
-		}
-		else if (flag == 2)
-		{
-		}
-		else if (flag == 3) //user comment, continue
-		{
-			continue;
-		}
-		else //store variable information
-		{
-			std::istringstream iss;
-			if (variableName == "groupList") {
-				std::string val;
-				iss.str(tmp);
-				while (iss >> val) {
-					groupList.push_back(val);
-				}
-			} 
-			else if (variableName == "Sphi")
+			if (flag == 1)
 			{
-				Sphi.resize(0);
-				double val;
-				iss.str(tmp);
-				while (iss >> val)
-				{
-					Sphi.push_back(val);
-				}
+				mat.clear();
+				cat = 0;
+				variableName = tmp.substr(1,tmp.size()-2);
 			}
-			else if (variableName == "numParam") {iss.str(tmp); iss >> numParam;}	
-			else if (variableName == "numMutationCategories") {iss.str(tmp); iss >> numMutationCategories;} 	
-			else if (variableName == "numSelectionCategories") {iss.str(tmp); iss >> numSelectionCategories;}	
-			else if (variableName == "numMixtures") {iss.str(tmp); iss >> numMixtures;}	
-			else if (variableName == "mixtureAssignment") 
+			else if (flag == 2)
 			{
-				unsigned val;
-				iss.str(tmp);
-				while (iss >> val)
-				{
-					mixtureAssignment.push_back(val);
+			}
+			else if (flag == 3) //user comment, continue
+			{
+				continue;
+			}
+			else //store variable information
+			{
+				std::istringstream iss;
+				if (variableName == "groupList") {
+					std::string val;
+					iss.str(tmp);
+					while (iss >> val) {
+						groupList.push_back(val);
+					}
 				}
-			}	
-			else if (variableName == "categories")
-			{
-				iss.str(tmp);
-				mixtureDefinition K;
-				iss >> K.delM;
-				iss >> K.delEta;
-				categories.push_back(K);
-			} 	
-			else if (variableName == "categoryProbabilities")
-			{
-				double val;
-				iss.str(tmp);
-				while (iss >> val)
+				else if (variableName == "Sphi")
 				{
-					categoryProbabilities.push_back(val);
+					Sphi.resize(0);
+					double val;
+					iss.str(tmp);
+					while (iss >> val)
+					{
+						Sphi.push_back(val);
+					}
 				}
-			} 	
-			else if (variableName == "mutationIsInMixture")
-			{
-				if (tmp == "***")
-				{
-					mutationIsInMixture.resize(mutationIsInMixture.size() + 1);
-					cat++;
-				}
-				else
+				else if (variableName == "numParam") {iss.str(tmp); iss >> numParam;}
+				else if (variableName == "numMutationCategories") {iss.str(tmp); iss >> numMutationCategories;}
+				else if (variableName == "numSelectionCategories") {iss.str(tmp); iss >> numSelectionCategories;}
+				else if (variableName == "numMixtures") {iss.str(tmp); iss >> numMixtures;}
+				else if (variableName == "mixtureAssignment")
 				{
 					unsigned val;
 					iss.str(tmp);
 					while (iss >> val)
 					{
-						mutationIsInMixture[cat - 1].push_back(val);
+						mixtureAssignment.push_back(val);
 					}
 				}
-			} 	
-			else if (variableName == "selectionIsInMixture")
-			{
-				if (tmp == "***")
+				else if (variableName == "categories")
 				{
-					selectionIsInMixture.resize(selectionIsInMixture.size() + 1);
-					cat++;
-				}
-				else
-				{
-					unsigned val;
 					iss.str(tmp);
-					while (iss >> val)
-					{
-						selectionIsInMixture[cat - 1].push_back(val);
-					}
+					mixtureDefinition K;
+					iss >> K.delM;
+					iss >> K.delEta;
+					categories.push_back(K);
 				}
-			} 	
-			else if (variableName == "currentSynthesisRateLevel")
-			{
-        		if (tmp == "***")
-				{
-					currentSynthesisRateLevel.resize(currentSynthesisRateLevel.size() + 1);
-          			cat++;
-        		}
-				else
+				else if (variableName == "categoryProbabilities")
 				{
 					double val;
-          			iss.str(tmp);
+					iss.str(tmp);
 					while (iss >> val)
-          			{
-            			currentSynthesisRateLevel[cat - 1].push_back(val);
-          			}
+					{
+						categoryProbabilities.push_back(val);
+					}
+				}
+				else if (variableName == "mutationIsInMixture")
+				{
+					if (tmp == "***")
+					{
+						mutationIsInMixture.resize(mutationIsInMixture.size() + 1);
+						cat++;
+					}
+					else
+					{
+						unsigned val;
+						iss.str(tmp);
+						while (iss >> val)
+						{
+							mutationIsInMixture[cat - 1].push_back(val);
+						}
+					}
+				}
+				else if (variableName == "selectionIsInMixture")
+				{
+					if (tmp == "***")
+					{
+						selectionIsInMixture.resize(selectionIsInMixture.size() + 1);
+						cat++;
+					}
+					else
+					{
+						unsigned val;
+						iss.str(tmp);
+						while (iss >> val)
+						{
+							selectionIsInMixture[cat - 1].push_back(val);
+						}
+					}
+				}
+				else if (variableName == "currentSynthesisRateLevel")
+				{
+					if (tmp == "***")
+					{
+						currentSynthesisRateLevel.resize(currentSynthesisRateLevel.size() + 1);
+						cat++;
+					}
+					else
+					{
+						double val;
+						iss.str(tmp);
+						while (iss >> val)
+						{
+							currentSynthesisRateLevel[cat - 1].push_back(val);
+						}
+					}
+				}
+				else if (variableName == "std_sphi")
+				{
+					iss.str(tmp);
+					iss >> std_sphi;
+				}
+				else if (variableName == "std_phi")
+				{
+					if (tmp == "***")
+					{
+						std_phi.resize(std_phi.size() + 1);
+						cat++;
+					}
+					iss.str(tmp);
+					double val;
+					while (iss >> val)
+					{
+						std_phi[cat - 1].push_back(val);
+					}
 				}
 			}
-			else if (variableName == "std_sphi")
-			{
-				iss.str(tmp);
-				iss >> std_sphi;
-			}
-			else if (variableName == "std_phi")
-			{
-				if (tmp == "***")
-				{
-					std_phi.resize(std_phi.size() + 1);
-					cat++;
-				}
-				iss.str(tmp);
-				double val;
-				while (iss >> val)
-				{
-					std_phi[cat - 1].push_back(val);
-				}
-			} 	
+		}
+	
+		input.close();
+
+		//initialize all the default Parameter values now.
+		Sphi_proposed = Sphi;
+		numAcceptForSphi = 0u;
+		bias_sphi = 0;
+		bias_phi = 0;
+		phiGroupings = 0;
+
+		numAcceptForSynthesisRate.resize(numSelectionCategories);
+		proposedSynthesisRateLevel.resize(numSelectionCategories);
+		for (unsigned i = 0; i < numSelectionCategories; i++)
+		{
+			proposedSynthesisRateLevel[i] = currentSynthesisRateLevel[i];
+			std::vector <double> tmp(currentSynthesisRateLevel[i].size(), 0.1);
+	
+			std::vector <unsigned> tmp2(currentSynthesisRateLevel[i].size(), 0u);
+			numAcceptForSynthesisRate[i] = tmp2;
 		}
 	}
-
-	input.close();
-	
-	//initialize all the default Parameter values now.
-	Sphi_proposed = Sphi;
-	numAcceptForSphi = 0u;
-	bias_sphi = 0;
-	bias_phi = 0;
-	phiGroupings = 0;
-	
-	numAcceptForSynthesisRate.resize(numSelectionCategories);
-	proposedSynthesisRateLevel.resize(numSelectionCategories);
-	for (unsigned i = 0; i < numSelectionCategories; i++)
-	{
-		proposedSynthesisRateLevel[i] = currentSynthesisRateLevel[i];
-		std::vector <double> tmp(currentSynthesisRateLevel[i].size(), 0.1);
-
-		std::vector <unsigned> tmp2(currentSynthesisRateLevel[i].size(), 0u);
-		numAcceptForSynthesisRate[i] = tmp2;
-	}	
 }
 
 
 void Parameter::writeBasicRestartFile(std::string filename)
 {
-	std::cout <<"Writing File\n";
+#ifndef STANDALONE
+	Rprintf("Writing File\n");
+#else
+	std::cout << "Writing File\n";
+#endif
 	std::ofstream out;
 	std::string output = "";
 	std::ostringstream oss;
@@ -377,104 +388,111 @@ void Parameter::writeBasicRestartFile(std::string filename)
 	out.open(filename.c_str());
 	if (out.fail())
 	{
-		std::cerr <<"Could not open restart file for writing\n";
-		std::exit(1);
+#ifndef STANDALONE
+		Rf_error("Could not open restart file %s for writing\n", filename.c_str());
+#else
+		std::cerr << "Could not open restart file for writing\n";
+#endif
 	}
-
-
-	oss << ">groupList:\n";
-	for (i = 0; i < groupList.size(); i++) {
-		oss << groupList[i];
-		if ((i + 1) % 10 == 0) oss << "\n";
-		else oss << " ";
-	}
-	if (i % 10 != 0) oss << "\n";
-	oss <<">Sphi:\n";
-	for (i = 0; i < Sphi.size(); i++)
+	else
 	{
-		oss << Sphi[i];
-		if ((i + 1) % 10 == 0) oss <<"\n";
-		else oss <<" ";
-	}
-	if (i % 10 != 0) oss <<"\n";
-	oss <<">numParam:\n" << numParam <<"\n";
-	oss <<">numMixtures:\n" << numMixtures <<"\n";
-	oss <<">std_sphi:\n" << std_sphi <<"\n";
-	//maybe clear the buffer	
-	oss <<">std_phi:\n";
-	for (i = 0; i < std_phi.size(); i++)
-	{
-		oss <<"***\n";
-		for (j = 0; j < std_phi[i].size(); j++)
+		oss << ">groupList:\n";
+		for (i = 0; i < groupList.size(); i++) {
+			oss << groupList[i];
+			if ((i + 1) % 10 == 0) oss << "\n";
+			else oss << " ";
+		}
+		if (i % 10 != 0) oss << "\n";
+		oss << ">Sphi:\n";
+		for (i = 0; i < Sphi.size(); i++)
 		{
-			oss << std_phi[i][j];
-			if ((j + 1) % 10 == 0) oss <<"\n";
+			oss << Sphi[i];
+			if ((i + 1) % 10 == 0) oss << "\n";
 			else oss <<" ";
 		}
-		if (j % 10 != 0) oss <<"\n";
-	}
-	oss <<">categories:\n";
-	for (i = 0; i < categories.size(); i++)
-	{
-		oss << categories[i].delM <<" " << categories[i].delEta <<"\n";	
-	}
+		if (i % 10 != 0) oss << "\n";
+		oss << ">numParam:\n" << numParam << "\n";
+		oss << ">numMixtures:\n" << numMixtures << "\n";
+		oss << ">std_sphi:\n" << std_sphi << "\n";
+		//maybe clear the buffer
+		oss << ">std_phi:\n";
+		for (i = 0; i < std_phi.size(); i++)
+		{
+			oss << "***\n";
+			for (j = 0; j < std_phi[i].size(); j++)
+			{
+				oss << std_phi[i][j];
+				if ((j + 1) % 10 == 0) oss << "\n";
+				else oss <<" ";
+			}
+			if (j % 10 != 0) oss <<"\n";
+		}
+		oss << ">categories:\n";
+		for (i = 0; i < categories.size(); i++)
+		{
+			oss << categories[i].delM << " " << categories[i].delEta << "\n";
+		}
+
+		oss << ">mixtureAssignment:\n";
+		for (i = 0; i < mixtureAssignment.size(); i++)
+		{
+			oss << mixtureAssignment[i];
+			if ((i + 1) % 50 == 0) oss <<"\n";
+			else oss <<" ";
+		}
+		if (i % 50 != 0) oss <<"\n";
+		oss << ">numMutationCategories:\n" << numMutationCategories << "\n";
+		oss << ">numSelectionCategories:\n" << numSelectionCategories << "\n";
+
+		oss << ">categoryProbabilities:\n";
+		for (i = 0; i < categoryProbabilities.size(); i++)
+		{
+			oss << categoryProbabilities[i];
+			if ((i + 1) % 10 == 0) oss << "\n";
+			else oss <<" ";
+		}
+		if (i % 10 != 0) oss <<"\n";
 	
-	oss <<">mixtureAssignment:\n";
-	for (i = 0; i < mixtureAssignment.size(); i++)
-	{
-		oss << mixtureAssignment[i];
-		if ((i + 1) % 50 == 0) oss <<"\n";
-		else oss <<" ";
-	}
-	if (i % 50 != 0) oss <<"\n";
-	oss <<">numMutationCategories:\n" << numMutationCategories <<"\n";
-	oss <<">numSelectionCategories:\n" << numSelectionCategories <<"\n";
-
-	oss <<">categoryProbabilities:\n";
-	for (i = 0; i < categoryProbabilities.size(); i++)
-	{
-		oss << categoryProbabilities[i];
-		if ((i + 1) % 10 == 0) oss <<"\n";
-		else oss <<" ";
-	}
-	if (i % 10 != 0) oss <<"\n";
-
-	oss <<">selectionIsInMixture:\n";
-	for (i = 0; i < selectionIsInMixture.size(); i++)
-	{
-		oss <<"***\n";
-		for (j = 0; j < selectionIsInMixture[i].size(); j++)
+		oss << ">selectionIsInMixture:\n";
+		for (i = 0; i < selectionIsInMixture.size(); i++)
 		{
-			oss << selectionIsInMixture[i][j] <<" ";
+			oss << "***\n";
+			for (j = 0; j < selectionIsInMixture[i].size(); j++)
+			{
+				oss << selectionIsInMixture[i][j] <<" ";
+			}
+			oss << "\n";
 		}
-		oss <<"\n";
-	}
 
-	oss <<">mutationIsInMixture:\n";
-	for (i = 0; i < mutationIsInMixture.size(); i++)
-	{
-		oss <<"***\n";
-		for (j = 0; j < mutationIsInMixture[i].size(); j++)
+		oss << ">mutationIsInMixture:\n";
+		for (i = 0; i < mutationIsInMixture.size(); i++)
 		{
-			oss << mutationIsInMixture[i][j] <<" ";
+			oss << "***\n";
+			for (j = 0; j < mutationIsInMixture[i].size(); j++)
+			{
+				oss << mutationIsInMixture[i][j] << " ";
+			}
+			oss << "\n";
 		}
-		oss <<"\n";
-	}
 
-	oss <<">currentSynthesisRateLevel:\n";
-	for (i = 0; i < currentSynthesisRateLevel.size(); i++)
-	{
-		oss <<"***\n";
-		for (j = 0; j < currentSynthesisRateLevel[i].size(); j++)
+		oss << ">currentSynthesisRateLevel:\n";
+		for (i = 0; i < currentSynthesisRateLevel.size(); i++)
 		{
-    	oss << currentSynthesisRateLevel[i][j];
-    	if ((j + 1) % 10 == 0) oss <<"\n";
-    	else oss <<" ";
+			oss << "***\n";
+			for (j = 0; j < currentSynthesisRateLevel[i].size(); j++)
+			{
+			oss << currentSynthesisRateLevel[i][j];
+			if ((j + 1) % 10 == 0) oss << "\n";
+			else oss <<" ";
+			}
+			if (j % 10 != 0) oss << "\n";
 		}
-		if (j % 10 != 0) oss <<"\n";
 	}
-
-	std::cout <<"Done writing\n";
+#ifndef STANDALONE
+	Rprintf("Done writing\n");
+#else
+	std::cout << "Done writing\n";
+#endif
 	output += oss.str();
 	out << output;
 	out.close();
@@ -600,25 +618,27 @@ std::vector <double> Parameter::readPhiValues(std::string filename)
 	currentFile.open(filename);
 	if (currentFile.fail())
 	{
-		std::cerr <<"Error opening file\n";
-		std::exit(1);
+#ifndef STANDALONE
+		Rf_error("Error opening file %s\n", filename.c_str());
+#else
+		std::cerr << "Error opening file\n";
+#endif
 	}
-
-	currentFile >> tmpString; //trash the first line, no info given.
-
-
-	while (currentFile >> tmpString)
+	else
 	{
-		pos = tmpString.find(",");
-		pos2 = tmpString.find(",", pos + 1);
-		if (pos != std::string::npos && pos2 != std::string::npos)
+		currentFile >> tmpString; //trash the first line, no info given.
+		while (currentFile >> tmpString)
 		{
-			std::string val = tmpString.substr(pos + 1, pos2 - (pos + 1));
-			//RV.push_back(std::stod(val));
-			RV.push_back(std::atof(val.c_str()));
+			pos = tmpString.find(",");
+			pos2 = tmpString.find(",", pos + 1);
+			if (pos != std::string::npos && pos2 != std::string::npos)
+			{
+				std::string val = tmpString.substr(pos + 1, pos2 - (pos + 1));
+				//RV.push_back(std::stod(val));
+				RV.push_back(std::atof(val.c_str()));
+			}
 		}
 	}
-
 	return RV;
 }
 
@@ -671,7 +691,11 @@ void Parameter::printMixtureDefinitionMatrix()
 {
 	for (unsigned i = 0u; i < numMixtures; i++)
 	{
-		std::cout << categories[i].delM <<"\t" << categories[i].delEta <<"\n";
+#ifndef STANDALONE
+		Rprintf("%d\t%d\n", categories[i].delM, categories[i].delEta);
+#else
+		std::cout << categories[i].delM << "\t" << categories[i].delEta << "\n";
+#endif
 	}
 }
 
@@ -757,7 +781,11 @@ void Parameter::setGroupList(std::vector <std::string> gl)
 	{
 		if (gl[i] == "M" || gl[i] == "W" || gl[i] == "X")
 		{
+#ifndef STANDALONE
+			Rf_error("Warning: Amino Acid %s not recognized in ROC model\n", gl[i].c_str());
+#else
 			std::cerr << "Warning: Amino Acid" << gl[i] << "not recognized in ROC model\n";
+#endif
 		}else{
 			groupList.push_back(gl[i]);
 		}
@@ -961,7 +989,7 @@ unsigned Parameter::getNumMixtureElements()
 }
 
 
-unsigned Parameter::getNumPhiGroupings() 
+unsigned Parameter::getNumObservedPhiSets() 
 { 
 	return phiGroupings;
 }
@@ -1207,7 +1235,7 @@ double Parameter::randGamma(double shape, double rate)
 #ifndef STANDALONE
 	RNGScope scope;
 	NumericVector xx(1);
-	xx = rgamma(1, shape, rate = rate);
+	xx = rgamma(1, shape, rate);
 	rv = xx[0];
 #else
 	std::gamma_distribution<double> distribution(shape, 1 / rate);
@@ -1371,8 +1399,12 @@ bool Parameter::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbo
 	}
 	else
 	{
-		std::cerr <<"Error with Index\nINDEX: " << index <<"\n";
-		std::cerr <<"MUST BE BETWEEN " << lowerbound << " & " << upperbound <<"\n";
+#ifndef STANDALONE
+		Rf_error("Index: %d is out of bounds. Index must be between %d & %d\n", index, lowerbound, upperbound);
+#else
+		std::cerr << "Error with the index\nGIVEN: " << index << "\n";
+		std::cerr << "MUST BE BETWEEN:	" << lowerbound << " & " << upperbound << "\n";
+#endif
 	}
 
 	return check;
@@ -1469,13 +1501,14 @@ std::vector<double> Parameter::getCurrentSynthesisRateForMixture(unsigned mixtur
 	{
 		exprCat = getSynthesisRateCategory(mixture - 1);
 	}else{
+#ifndef STANDALONE
+		Rf_warning("Mixture element %d NOT found. Mixture element 1 is returned instead. \n", mixture);
+#else
 		std::cerr << "WARNING: Mixture element " << mixture << " NOT found. Mixture element 1 is returned instead. \n";
+#endif
 	}
 	return currentSynthesisRateLevel[exprCat];
 }
-
-
-
 
 
 // ------------------------------------------------------------------//
@@ -1541,6 +1574,11 @@ std::vector<unsigned> Parameter::getMixtureAssignmentR()
 	return mixtureAssignment;
 }
 
+void Parameter::setMixtureAssignmentR(std::vector<unsigned> _mixtureAssignment)
+{
+	mixtureAssignment = _mixtureAssignment;
+}
+
 
 unsigned Parameter::getMixtureAssignmentForGeneR(unsigned geneIndex)
 {
@@ -1570,3 +1608,4 @@ void Parameter::setNumMixtureElements(unsigned _numMixtures)
 }
 
 #endif
+

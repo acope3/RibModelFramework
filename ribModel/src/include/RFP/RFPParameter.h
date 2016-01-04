@@ -104,7 +104,7 @@ class RFPParameter: public Parameter {
 
 
 		//Other functions:
-		virtual void setNumPhiGroupings(unsigned _phiGroupings);
+		virtual void setNumObservedPhiSets(unsigned _phiGroupings);
 		double getParameterForCategory(unsigned category, unsigned paramType, std::string codon, bool proposal);
 		void calculateRFPMean(Genome& genome);
 

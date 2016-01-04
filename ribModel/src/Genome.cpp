@@ -1,5 +1,8 @@
 #include "include/Genome.h"
-
+#ifndef STANDALONE
+#include <Rcpp.h>
+using namespace Rcpp;
+#endif
 
 #include <iostream>
 #include <fstream>
@@ -42,7 +45,11 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 		Fin.open(filename.c_str());
 		if (Fin.fail())
 		{
-			std::cerr << "Error in Genome::readFasta: Cannot open input Fasta file " << filename << "\n";
+#ifndef STANDALONE
+			Rf_error("Error in Genome::readFasta: Can not open Fasta file %s\n", filename.c_str());
+#else
+			std::cerr << "Error in Genome::readFasta: Can not open Fasta file " << filename << "\n";
+#endif
 		}
 		else
 		{
@@ -114,7 +121,14 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 			} // end while
 		} // end else
 	} // end try
-	catch(char* pMsg) { std::cerr << std::endl << "Exception:" << pMsg << std::endl; }
+	catch(char* pMsg)
+	{
+#ifndef STANDALONE
+		Rf_error("\nException: %s\n", pMsg);
+#else
+		std::cerr << std::endl << "Exception:" << pMsg << std::endl;
+#endif
+	}
 }
 
 
@@ -125,7 +139,11 @@ void Genome::writeFasta (std::string filename, bool simulated)
 		Fout.open(filename.c_str());
 		if (Fout.fail())
 		{
-			std::cerr <<"Error in Genome::writeFasta: Cannot open output Fasta file " << filename <<"\n";
+#ifndef STANDALONE
+			Rf_error("Error in Genome::writeFasta: Can not open output Fasta file %s\n", filename.c_str());
+#else
+			std::cerr << "Error in Genome::writeFasta: Can not open output Fasta file " << filename << "\n";
+#endif
 		}
 		else
 		{
@@ -158,7 +176,14 @@ void Genome::writeFasta (std::string filename, bool simulated)
 		} // end else
 		Fout.close();
 	} // end try
-	catch(char* pMsg) { std::cerr << std::endl << "Exception:" << pMsg << std::endl; }
+	catch(char* pMsg)
+	{
+#ifndef STANDALONE
+		Rf_error("\nException: %s\n", pMsg);
+#else
+		std::cerr << std::endl << "Exception:" << pMsg << std::endl;
+#endif
+	}
 }
 
 
@@ -168,7 +193,11 @@ void Genome::readRFPFile(std::string filename)
 	Fin.open(filename.c_str());
 	if (Fin.fail())
 	{
-		std::cerr << "Error in Genome::readRFPFile: Cannot open input RFP file " << filename << "\n";
+#ifndef STANDALONE
+			Rf_error("Error in Genome::readRFPFile: Can not open RFP file %s\n", filename.c_str());
+#else
+			std::cerr << "Error in Genome::readRFPFile: Can not open RFP file " << filename << "\n";
+#endif
 	}
 
 	std::string tmp;
@@ -232,7 +261,11 @@ void Genome::writeRFPFile(std::string filename, bool simulated)
 	Fout.open(filename.c_str());
 	if (Fout.fail())
 	{
-		std::cerr <<"Error in Genome::writeRFPFile: Cannot open output RFP file " << filename <<"\n";
+#ifndef STANDALONE
+		Rf_error("Error in Genome::writeRFPFile: Can not open output RFP file %s\n", filename.c_str());
+#else
+		std::cerr <<"Error in Genome::writeRFPFile: Can not open output RFP file " << filename <<"\n";
+#endif
 	}
 
 	Fout <<"ORF,RFP_Counts,Codon_Counts,Codon\n";
@@ -268,201 +301,248 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 	input.open(filename);
 	if (input.fail())
 	{
-		std::cerr <<"Error opening file in readObservedPhiValues\n";
-		std::exit(1);
-	}
-
-	std::getline(input, tmp); //Trash the header line
-
-	if (genes.size() == 0)
-	{
-		std::cerr << "Genome is empty, function will not execute!\n";
+#ifndef STANDALONE
+		Rf_error("Error in Genome::readObservedPhiValues: Can not open file %s\n", filename.c_str());
+#else
+		std::cerr << "Error in Genome::readObservedPhiValues: Can not open file " << filename << "\n";
+#endif
 	}
 	else
 	{
-		if (byId)
-		{
-			//Mapping is done so the genes can be found
-			std::map <std::string, Gene* > genomeMapping;
-			for (unsigned i = 0; i < genes.size(); i++)
-			{
-				genomeMapping.insert(make_pair(genes[i].getId(), &genes[i]));
-			}
+		std::getline(input, tmp); //Trash the header line
 
-			bool first = true;
-			while (std::getline(input, tmp))
+		if (genes.size() == 0)
+		{
+#ifndef STANDALONE
+			Rf_error("Genome is empty, function will not execute!\n");
+#else
+			std::cerr << "Genome is empty, function will not execute!\n";
+#endif
+		}
+		else
+		{
+			if (byId)
 			{
-				std::size_t pos = tmp.find(",");
-				std::string geneID = tmp.substr(0, pos);
-				std::map <std::string, Gene * >::iterator it;
-				it = genomeMapping.find(geneID);
-				if (it == genomeMapping.end()) {
-					std::cerr << "Gene " << geneID << " not found!\n";
-				}
-				else //gene is found
+				//Mapping is done so the genes can be found
+				std::map <std::string, Gene* > genomeMapping;
+				for (unsigned i = 0; i < genes.size(); i++)
 				{
-					unsigned count = 0;
-					std::string val ="";
+					genomeMapping.insert(make_pair(genes[i].getId(), &genes[i]));
+				}
+
+				bool first = true;
+				while (std::getline(input, tmp))
+				{
+					std::size_t pos = tmp.find(",");
+					std::string geneID = tmp.substr(0, pos);
+					std::map <std::string, Gene * >::iterator it;
+					it = genomeMapping.find(geneID);
+					if (it == genomeMapping.end()) {
+#ifndef STANDALONE
+						Rf_warning("Gene %d not found!\n", geneID.c_str());
+#else
+						std::cerr << "Gene " << geneID << " not found!\n";
+#endif
+					}
+					else //gene is found
+					{
+						unsigned count = 0;
+						std::string val ="";
+						bool notDone = true;
+						while (notDone)
+						{
+							std::size_t pos2 = tmp.find(",", pos + 1);
+							if (pos2 == std::string::npos)
+							{
+								val = tmp.substr(pos + 1, tmp.size() + 1);
+								notDone = false;
+								if (first)
+								{
+									first = false;
+									numPhi = (unsigned) it -> second -> observedPhiValues.size() + 1;
+									numGenesWithPhi.resize(numPhi, 0);
+								}
+								else
+								{
+									if (count + 1 != numPhi)
+									{
+#ifndef STANDALONE
+										Rf_error("Gene %d: has a different number of phi values given other genes: \n", geneID.c_str());
+										Rf_error("%d\n", it-> second -> getId().c_str());
+										Rf_error("%d\n", it-> second -> observedPhiValues.size() + 1);
+										Rf_error("Exiting function.\n");
+#else
+										std::cerr << geneID <<": has a different number of phi values given than other genes: ";
+										std::cerr << it-> second -> getId() <<"\n";
+										std::cerr << it-> second -> observedPhiValues.size() + 1 <<". Exiting function.\n";
+#endif
+										exitfunction = true;
+										for (unsigned a = 0; a < getGenomeSize(); a++)
+										{
+											genes[a].observedPhiValues.clear();
+										}
+										break;
+									}
+								}
+							}
+							else {
+								val = tmp.substr(pos + 1, pos2 - (pos + 1));
+							}
+							double value = std::atof(val.c_str());
+							if (value <=  0 || std::isnan(value))
+							{
+								if (value == 0 || std::isnan(value))
+								{
+									value = -1;
+								}
+								else
+								{
+#ifndef STANDALONE
+									Rf_warning("Negative phi value given - values should not be on the log scale. Negative Value stored.");
+#else
+									std::cerr << "WARNING! Negative phi value given - values should not be on the log scale. Negative Value stored.";
+#endif
+								}
+							}
+							else
+							{
+								numGenesWithPhi[count]++;
+							}
+
+							it->second->observedPhiValues.push_back(value); //make vector private again
+							pos = pos2;
+							count++;
+						}
+					}
+					if (exitfunction) break;
+				}
+				if (!exitfunction)
+				{
+					for (unsigned geneIndex = 0; geneIndex < getGenomeSize(); geneIndex++)
+					{
+						if (getGene(geneIndex).observedPhiValues.size() != numPhi)
+						{
+							Gene *gene = &(getGene(geneIndex));
+#ifndef STANDALONE
+							Rf_warning("Gene # %d (%s) does not have any phi values.", geneIndex, gene->getId().c_str());
+							Rf_warning(" Filling with -1's\n");
+#else
+							std::cerr << "Gene # " << geneIndex <<" (" << gene->getId() <<") does not have any phi values.";
+							std::cerr << " Filling with -1's\n";
+#endif
+							gene->observedPhiValues.resize(numPhi, -1);
+						}
+					}
+				}
+
+			} //end of putting in by ID
+			else //doing this by index
+			{
+				unsigned geneIndex = 0;
+				bool first = true;
+				bool firstValue = false;
+				while (std::getline(input, tmp))
+				{
+					if (geneIndex >= genes.size())
+					{
+#ifndef STANDALONE
+						Rf_error("GeneIndex exceeds the number of genes in the genome. Exiting function\n");
+#else
+						std::cerr << "GeneIndex exceeds the number of genes in the genome. Exiting function\n";
+#endif
+						break;
+					}
+					std::size_t pos = tmp.find(",");
 					bool notDone = true;
 					while (notDone)
 					{
 						std::size_t pos2 = tmp.find(",", pos + 1);
 						if (pos2 == std::string::npos)
 						{
-							val = tmp.substr(pos + 1, tmp.size() + 1);
-							notDone = false;
 							if (first)
 							{
 								first = false;
-								numPhi = (unsigned) it -> second -> observedPhiValues.size() + 1;
-								numGenesWithPhi.resize(numPhi, 0);
+								numPhi = (unsigned) genes[geneIndex].observedPhiValues.size() + 1;
+								numGenesWithPhi.resize(numPhi);
+								if (firstValue) numGenesWithPhi[0] = 1;
 							}
-							else
+							notDone = false;
+							if (numPhi != genes[geneIndex].observedPhiValues.size() + 1)
 							{
-								if (count + 1 != numPhi)
+#ifndef STANDALONE
+								Rf_error("Gene %d: has a different number of phi values given than other genes. Exiting function\n", geneIndex);
+#else
+								std::cerr << "Gene " << geneIndex << ": has a different number of phi values given than other genes. Exiting function\n";
+#endif
+								for (unsigned a = 0; a < getGenomeSize(); a++)
 								{
-									std::cerr << geneID <<": has a differnt number of phi values given than other genes: ";
-									std::cerr << it-> second -> getId() <<"\n";
-									std::cerr << it-> second -> observedPhiValues.size() + 1 <<". Exiting function.\n";
-									exitfunction = true;
-									for (unsigned a = 0; a < getGenomeSize(); a++)
-									{
-										genes[a].observedPhiValues.clear();
-									}
-									break;
+									genes[a].observedPhiValues.clear();
 								}
+								exitfunction = true;
+								break;
 							}
 						}
-						else {
-							val = tmp.substr(pos + 1, pos2 - (pos + 1));
-						}
+
+						std::string val = tmp.substr(pos + 1, pos2 - (pos + 1));
+
 						double value = std::atof(val.c_str());
 						if (value <=  0 || std::isnan(value))
 						{
-							if (value == 0 || std::isnan(value))
+							if (value == 0 || std::isnan(value)) value = -1;
+							else
 							{
-								value = -1;
+#ifndef STANDALONE
+								Rf_warning("Negative phi value given - values should not be on the log scale. Negative Value stored.");
+#else
+								std::cerr << "WARNING! Negative phi value given - values should not be on the log scale. Negative Value stored.";
+#endif
+							}
+						}
+						else
+						{
+							if (first) {
+								firstValue = true;
 							}
 							else
 							{
-								std::cerr <<"WARNING! Negative phi value given - values should not be on the log scale. Negative Value stored.";
+								numGenesWithPhi[genes[geneIndex].observedPhiValues.size()]++;
 							}
 						}
-						else 
-						{
-							numGenesWithPhi[count]++;
-						}
-
-						it->second->observedPhiValues.push_back(value); //make vector private again
+						genes[geneIndex].observedPhiValues.push_back(value);
 						pos = pos2;
-						count++;
 					}
-				}
-				if (exitfunction) break;
-			}
-			if (!exitfunction)
-			{
-				for (unsigned geneIndex = 0; geneIndex < getGenomeSize(); geneIndex++)
-				{
-					if (getGene(geneIndex).observedPhiValues.size() != numPhi)
+					geneIndex++;
+					if (exitfunction)
 					{
-						Gene *gene = &(getGene(geneIndex));
-						std::cerr <<"Gene # " << geneIndex <<" (" << gene->getId() <<") does not have any phi values.";
-						std::cerr <<" Filling with -1's\n";
-						gene->observedPhiValues.resize(numPhi, -1);
+						break;
 					}
 				}
-			}
+				if (!exitfunction)
+				{
+					for (unsigned i = 0; i < numPhi; i++) {
 
-		} //end of putting in by ID
-		else //doing this by index
-		{
-			unsigned geneIndex = 0;
-			bool first = true;
-			bool firstValue = false;
-			while (std::getline(input, tmp))
-			{
-				if (geneIndex >= genes.size())
-				{
-					std::cerr <<"GeneIndex exceeds the number of genes in the genome. Exiting function\n";
-					break;
-				}
-				std::size_t pos = tmp.find(",");
-				bool notDone = true;
-				while (notDone)
-				{
-					std::size_t pos2 = tmp.find(",", pos + 1);
-					if (pos2 == std::string::npos)
-					{
-						if (first)
+						if (numGenesWithPhi[i] != getGenomeSize())
 						{
-							first = false;
-							numPhi = (unsigned) genes[geneIndex].observedPhiValues.size() + 1;
-							numGenesWithPhi.resize(numPhi);
-							if (firstValue) numGenesWithPhi[0] = 1;
-						}
-						notDone = false;
-						if (numPhi != genes[geneIndex].observedPhiValues.size() + 1)
-						{
-							std::cerr <<"gene " << geneIndex <<": has a different number of phi values given than other genes, exiting.\n";
-							for (unsigned a = 0; a < getGenomeSize(); a++)
+#ifndef STANDALONE
+							Rf_warning("The last %d genes do not have phi values.", getGenomeSize() - numGenesWithPhi[i]);
+							Rf_warning("Please check your file to make sure every gene has a phi value. Filling empty genes ");
+							Rf_warning("with -1's for calculations.\n");
+#else
+							std::cerr << "The last " << getGenomeSize() - numGenesWithPhi[i] << " genes do not have phi values.";
+							std::cerr << "Please check your file to make sure every gene has a phi value. Filling empty genes";
+							std::cerr << "with -1's for calculations.\n";
+#endif
+
+							for (unsigned a = numGenesWithPhi[i]; a < getGenomeSize(); a++)
 							{
-								genes[a].observedPhiValues.clear();
+								Gene *gene = &(getGene(a));
+								gene->observedPhiValues[i] = -1;
 							}
-							exitfunction = true;
-							break;
-						}
-					}
-
-					std::string val = tmp.substr(pos + 1, pos2 - (pos + 1));
-
-					double value = std::atof(val.c_str());
-					if (value <=  0 || std::isnan(value))
-					{
-						if (value == 0 || std::isnan(value)) value = -1;
-						else
-						{
-							std::cerr <<"WARNING! Negative phi value given - values should not be on the log scale. Negative Value stored.";
-						}
-					}
-					else
-					{
-						if (first) {
-							firstValue = true;
-						}
-						else
-						{
-							numGenesWithPhi[genes[geneIndex].observedPhiValues.size()]++;
-						}
-					}
-					genes[geneIndex].observedPhiValues.push_back(value);
-					pos = pos2;
-				}
-				geneIndex++;
-				if (exitfunction)
-				{
-					break;
-				}
-			}
-			if (!exitfunction)
-			{
-				for (unsigned i = 0; i < numPhi; i++) {
-
-					if (numGenesWithPhi[i] != getGenomeSize())
-					{
-						std::cerr << "The last " << getGenomeSize() - numGenesWithPhi[i] << " genes do not have phi values.";
-						std::cerr << "Please check your file to make sure every gene has a phi value. Filling empty genes";
-						std::cerr << "with -1's for calculations.\n";
-
-						for (unsigned a = numGenesWithPhi[i]; a < getGenomeSize(); a++)
-						{
-							Gene *gene = &(getGene(a));
-							gene->observedPhiValues[i] = -1;
 						}
 					}
 				}
-			}
-		}//end of reading by index
+			}//end of reading by index
+		}
 		input.close();
 	}
 }
@@ -518,8 +598,12 @@ bool Genome::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound
 	}
 	else
 	{
-		std::cerr <<"Error with the index\nGIVEN: " << index <<"\n";
-		std::cerr <<"MUST BE BETWEEN:	" << lowerbound << " & " << upperbound <<"\n";
+#ifndef STANDALONE
+		Rf_error("Index: %d is out of bounds. Index must be between %d & %d\n", index, lowerbound, upperbound);
+#else
+		std::cerr << "Error with the index\nGIVEN: " << index << "\n";
+		std::cerr << "MUST BE BETWEEN:	" << lowerbound << " & " << upperbound << "\n";
+#endif
 	}
 	return check;
 }
@@ -571,7 +655,14 @@ std::vector<unsigned> Genome::getCodonCountsPerGene(std::string codon)
 Gene& Genome::getGeneByIndex(unsigned index, bool simulated) //NOTE: This function does the check and performs the function itself because of memory issues.
 {
 	bool checker = checkIndex(index, 1, (unsigned)genes.size());
-	if (!checker) std::cerr << "Invalid index given, returning gene 1, not simulated\n";
+	if (!checker)
+	{
+#ifndef STANDALONE
+		Rf_warning("Invalid index given, returning gene 1, not simulated\n");
+#else
+		std::cerr << "Invalid index given, returning gene 1, not simulated\n";
+#endif
+	}
 	return checker ? simulated ? simulatedGenes[index - 1] : genes[index - 1] : genes[0];
 }
 
@@ -599,27 +690,6 @@ Genome Genome::getGenomeForGeneIndiciesR(std::vector <unsigned> indicies, bool s
 		}
 	}
 	return check ? getGenomeForGeneIndicies(indicies, simulated) : genome;
-	/*bool bad = false;
-	for (unsigned i = 0; i < indicies.size(); i++)
-	{
-		if (indicies[i] == 0 || indicies[i] > genes.size())
-		{
-			std::cerr << "Problem with index " << indicies[i] << ".\n";
-			std::cerr << "returning an empty genome\n";
-			bad = true;
-			break;
-		}
-		else
-		{
-			indicies[i]--;
-		}
-	}
-	if (!bad)
-	{
-		genome = getGenomeForGeneIndicies(indicies);
-	}
-
-	return genome;*/
 }
 
 
@@ -628,8 +698,6 @@ Genome Genome::getGenomeForGeneIndiciesR(std::vector <unsigned> indicies, bool s
 // ----------------------------- RCPP STUFF ----------------------------------
 // ---------------------------------------------------------------------------
 #ifndef STANDALONE
-#include <Rcpp.h>
-using namespace Rcpp;
 
 RCPP_EXPOSED_CLASS(Gene)
 RCPP_EXPOSED_CLASS(Genome)

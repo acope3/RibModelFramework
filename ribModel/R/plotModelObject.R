@@ -1,7 +1,7 @@
     
 
 
-plot.Rcpp_ROCModel <- function(model, genome, parameter, samples = 100, mixture = 1, 
+plot.Rcpp_ROCModel <- function(x, genome, parameter, samples = 100, mixture = 1, 
                                estim.Expression = TRUE, simulated = FALSE, ...)
 {
   opar <- par(no.readonly = T) 
@@ -47,7 +47,7 @@ plot.Rcpp_ROCModel <- function(model, genome, parameter, samples = 100, mixture 
   for(aa in names.aa)
   {
     if(aa == "M" || aa == "W" || aa == "X") next
-    xlimit <- plotSinglePanel(parameter, model, genome, expressionValues, samples, mixture, aa)
+    xlimit <- plotSinglePanel(parameter, x, genome, expressionValues, samples, mixture, aa)
     box()
     main.aa <- aa #TODO map to three letter code
     text(mean(xlimit), 1, main.aa, cex = 1.5)
@@ -87,7 +87,7 @@ plot.Rcpp_ROCModel <- function(model, genome, parameter, samples = 100, mixture 
   par(opar)
 }
 
-plot.Rcpp_FONSEModel <- function(model, genome, parameter, samples = 100, mixture = 1, 
+plot.Rcpp_FONSEModel <- function(x, genome, parameter, samples = 100, mixture = 1, 
                                estim.Expression = TRUE, simulated = FALSE, ...)
 {
   opar <- par(no.readonly = T) 
@@ -133,7 +133,7 @@ plot.Rcpp_FONSEModel <- function(model, genome, parameter, samples = 100, mixtur
   for(aa in names.aa)
   {
     if(aa == "M" || aa == "W" || aa == "X") next
-    xlimit <- plotSinglePanel(parameter, model, genome, expressionValues, samples, mixture, aa)
+    xlimit <- plotSinglePanel(parameter, x, genome, expressionValues, samples, mixture, aa)
     box()
     main.aa <- aa #TODO map to three letter code
     text(mean(xlimit), 1, main.aa, cex = 1.5)
@@ -173,6 +173,7 @@ plot.Rcpp_FONSEModel <- function(model, genome, parameter, samples = 100, mixtur
   par(opar)
 }
 
+# NOT EXPOSED
 plotSinglePanel <- function(parameter, model, genome, expressionValues, samples, mixture, aa)
 {
   codons <- AAToCodon(aa, T)
@@ -228,9 +229,9 @@ plotSinglePanel <- function(parameter, model, genome, expressionValues, samples,
     for(k in 1:length(codons))
     {
       points(median(expressionValues[tmp.id]), means[k], 
-             col=ribModel:::.codonColors[[ codons[k] ]] , pch=19, cex = 0.5)
+             col=.codonColors[[ codons[k] ]] , pch=19, cex = 0.5)
       lines(rep(median(expressionValues[tmp.id]),2), c(means[k]-std[k], means[k]+std[k]), 
-            col=ribModel:::.codonColors[[ codons[k] ]], lwd=0.8)
+            col=.codonColors[[ codons[k] ]], lwd=0.8)
     }
   }
   
@@ -238,9 +239,9 @@ plotSinglePanel <- function(parameter, model, genome, expressionValues, samples,
   codonProbability <- do.call("rbind", codonProbability)
   for(i in 1:length(codons))
   {
-    lines(phis, codonProbability[, i], col=ribModel:::.codonColors[[ codons[i] ]])
+    lines(phis, codonProbability[, i], col=.codonColors[[ codons[i] ]])
   }
-  colors <- unlist(ribModel:::.codonColors[codons])
+  colors <- unlist(.codonColors[codons])
   
   # add indicator to optimal codon
   optim.codon.index <- which(min(c(selection, 0)) == c(selection, 0))

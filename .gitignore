@@ -27,3 +27,8 @@ Test
 Default
 junk
 *.RData
+*.Rdat
+*.rdat
+*.dat
+*.rda
+*.Rda

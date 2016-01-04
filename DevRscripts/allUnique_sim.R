@@ -7,7 +7,7 @@ set.seed(446141)
 with.phi <- FALSE
 
 if (with.phi) {
-  genome <- initializeGenomeObject(file = "../data/twoMixtures/simulatedAllUniqueR.fasta", expression.file = "../data/simulatedAllUniqueR_phi.csv") 
+  genome <- initializeGenomeObject(file = "../data/twoMixtures/simulatedAllUniqueR.fasta", expression.file = "../data/twoMixtures/simulatedAllUniqueR_phi_withPhiSet.csv") 
 } else {
   genome <- initializeGenomeObject(file = "../data/twoMixtures/simulatedAllUniqueR.fasta") 
 }
@@ -17,11 +17,12 @@ numMixtures <- 2
 mixDef <- "allUnique"
 geneAssignment <- sample(c(1,2), size = length(genome), replace = TRUE, prob = c(0.3, 0.7)) #c(rep(1,500), rep(2,500))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
+#parameter <- initializeParameterObject(restart.file = "5001_simulated_allUnique.rst")
 
-samples <- 500
-thining <- 10
-adaptiveWidth <- 10
-divergence.iteration <- 40
+samples <- 1000
+thining <- 50
+adaptiveWidth <- 10000
+divergence.iteration <- 0
 mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE) 
 
 setRestartSettings(mcmc, paste(task.id, "_simulated_allUnique.rst", sep=""), adaptiveWidth*50, TRUE) 
@@ -40,9 +41,9 @@ loglik.trace <- mcmc$getLogLikelihoodTrace()[-1]
 acf(loglik.trace) 
 convergence.test(mcmc, n.samples = 500, plot=T) 
 
-trace <- parameter$getTraceObject() 
-plot(trace, what = "MixtureProbability") 
-plot(trace, what = "Sphi") 
+trace <- parameter$getTraceObject()
+plot(trace, what = "MixtureProbability")
+plot(trace, what = "Sphi")
 plot(trace, what = "Mphi") 
 if (with.phi) { 
   plot(trace, what = "Aphi") 
@@ -50,8 +51,8 @@ if (with.phi) {
 } 
 plot(trace, what = "ExpectedPhi")
 
-mixtureAssignment <- unlist(lapply(1:genome$getGenomeSize(),  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples*0.1, geneIndex)})) 
-expressionValues <- unlist(lapply(1:genome$getGenomeSize(), function(geneIndex){ 
+mixtureAssignment <- unlist(lapply(1:length(genome),  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples*0.1, geneIndex)})) 
+expressionValues <- unlist(lapply(1:length(genome), function(geneIndex){ 
   expressionCategory <- parameter$getSynthesisRateCategoryForMixture(mixtureAssignment[geneIndex]) 
   parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(samples*0.1, geneIndex, expressionCategory) 
 })) 
@@ -113,8 +114,8 @@ for(k in 1:numMixtures){
   selection <- c() 
   mutation <- c() 
   codon.storage <- c() 
-  csp.m <- read.table(observed.mutation[k], sep=",", header=T) 
-  csp.e <- read.table(observed.selection[k], sep=",", header=T) 
+  csp.m <- read.table(observed.mutation[mixture], sep=",", header=T) 
+  csp.e <- read.table(observed.selection[mixture], sep=",", header=T) 
   csp <- rbind(csp.m,csp.e) 
   idx.eta <- 41:80 
   idx.mu <- 1:40 

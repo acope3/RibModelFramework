@@ -159,10 +159,25 @@ void CovarianceMatrix::printCovarianceMatrix()
 
     for(int i = 0; i < numVariates * numVariates; i++)
     {
-        if (i % numVariates == 0 && i != 0) { std::cout << std::endl; }
-        std::cout << covMatrix[i]<< "\t";
+        if (i % numVariates == 0 && i != 0)
+        {
+#ifndef STANDALONE
+        	Rprintf("\n");
+#else
+        	std::cout << std::endl;
+#endif
+        }
+#ifndef STANDALONE
+		Rprintf("%f\t", covMatrix[i]);
+#else
+        std::cout << covMatrix[i] << "\t";
+#endif
     }
-    std::cout <<"\n";
+#ifndef STANDALONE
+		Rprintf("\n");
+#else
+		std::cout << std::endl;
+#endif
 
 
 }
@@ -170,10 +185,25 @@ void CovarianceMatrix::printCholeskiMatrix()
 {
     for(int i = 0; i < numVariates * numVariates; i++)
     {
-        if (i % numVariates == 0 && i != 0) { std::cout << std::endl; }
-        std::cout << choleskiMatrix[i]<< "\t";
+        if (i % numVariates == 0 && i != 0)
+        {
+#ifndef STANDALONE
+        	Rprintf("\n");
+#else
+        	std::cout << std::endl;
+#endif
+        }
+#ifndef STANDALONE
+		Rprintf("%f\t", choleskiMatrix[i]);
+#else
+        std::cout << choleskiMatrix[i] << "\t";
+#endif
     }
-    std::cout <<"\n";
+#ifndef STANDALONE
+		Rprintf("\n");
+#else
+		std::cout << std::endl;
+#endif
 }
 
 

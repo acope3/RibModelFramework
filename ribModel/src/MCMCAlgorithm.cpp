@@ -1,17 +1,20 @@
 #include "include/MCMCAlgorithm.h"
-#include "include/CovarianceMatrix.h"
 
+
+//R runs only
+#ifndef STANDALONE
+#include <Rcpp.h>
+using namespace Rcpp;
+#endif
+
+
+//C++ runs only.
 #ifdef STANDALONE
 #include <random>
 #endif
 
-#include <cstdlib>
-#include <sstream>
-#include <chrono>
-#include <iostream>
-#include <fstream>
-#include <stdlib.h> //can be removed later
 
+//Open MP
 #ifndef __APPLE__
 #include <omp.h>
 #include <thread>
@@ -19,10 +22,16 @@
 
 
 
+
+//--------------------------------------------------//
+// ---------- Constructors & Destructors -----------//
+//--------------------------------------------------//
+
+
 MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * thining), estimateSynthesisRate(true),
 	estimateCodonSpecificParameter(true), estimateHyperParameter(true)
 {
-	MCMCAlgorithm(1000, 1, true, true, true);
+	MCMCAlgorithm(1000, 1, true, true, true); //TODO: should not be calling another constructor.
 	likelihoodTrace.resize(samples);
 	writeRestartFile = false;
 	multipleFiles = false;
@@ -32,23 +41,237 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * 
 	estimateMixtureAssignment = true;
 }
 
-MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thining, unsigned _adaptiveWidth, bool _estimateSynthesisRate, bool _estimateCodonSpecificParameter, bool _estimateHyperParameter)
-: samples(_samples), thining(_thining), adaptiveWidth(_adaptiveWidth * thining), estimateSynthesisRate(_estimateSynthesisRate), estimateCodonSpecificParameter(_estimateCodonSpecificParameter),
-	estimateHyperParameter(_estimateHyperParameter)
+
+MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thining, unsigned _adaptiveWidth, bool _estimateSynthesisRate,
+							 bool _estimateCodonSpecificParameter, bool _estimateHyperParameter) : samples(_samples),
+							 thining(_thining), adaptiveWidth(_adaptiveWidth * thining),
+							 estimateSynthesisRate(_estimateSynthesisRate),
+							 estimateCodonSpecificParameter(_estimateCodonSpecificParameter),
+							 estimateHyperParameter(_estimateHyperParameter)
 {
 	likelihoodTrace.resize(samples);
 	writeRestartFile = false;
 	multipleFiles = false;
 	fileWriteInterval = 1u;
 	lastConvergenceTest = 0u;
-
 	estimateMixtureAssignment = true;
 }
+
 
 MCMCAlgorithm::~MCMCAlgorithm()
 {
 	//dtor
 }
+
+
+
+
+
+//
+//
+//
+
+
+void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigned divergenceIterations)
+{
+#ifndef __APPLE__
+	omp_set_num_threads(numCores);
+#endif
+
+	// Allows to diverge from initial conditions (divergenceIterations controls the divergence).
+	// This allows for varying initial conditions for better exploration of the parameter space.
+	varyInitialConditions(genome, model, divergenceIterations);
+
+	unsigned maximumIterations = samples * thining;
+	// initialize everything
+
+	model.setNumPhiGroupings(genome.getGene(0).getObservedPhiValues().size());
+	model.initTraces(samples + 1, genome.getGenomeSize()); //Samples + 2 so we can store the starting and ending values.
+	// starting the MCMC
+
+	model.updateTracesWithInitialValues(genome);
+#ifndef STANDALONE
+	Rprintf("entering MCMC loop\n");
+	Rprintf("\tEstimate Codon Specific Parameters? %s \n", (estimateCodonSpecificParameter ? "TRUE" : "FALSE") );
+	Rprintf("\tEstimate Hyper Parameters? %s \n", (estimateCodonSpecificParameter ? "TRUE" : "FALSE") );
+	Rprintf("\tEstimate Synthesis rates? %s \n", (estimateCodonSpecificParameter ? "TRUE" : "FALSE") );
+	Rprintf("\tStarting MCMC with %d iterations\n", maximumIterations);
+
+#else
+	std::cout << "entering MCMC loop" << std::endl;
+	std::cout << "\tEstimate Codon Specific Parameters? " << (estimateCodonSpecificParameter ? "TRUE" : "FALSE") << std::endl;
+	std::cout << "\tEstimate Hyper Parameters? " << (estimateHyperParameter ? "TRUE" : "FALSE") << std::endl;
+	std::cout << "\tEstimate Synthesis rates? " << (estimateSynthesisRate ? "TRUE" : "FALSE") << std::endl;
+	std::cout << "\tStarting MCMC with " << maximumIterations << " iterations\n";
+#endif
+
+
+	// set the last iteration to the max iterations, this way if the MCMC doesn't exit based on Geweke score, it will use the max iteration for posterior means
+	model.setLastIteration(samples);
+	for(unsigned iteration = 1u; iteration <= maximumIterations; iteration++)
+	{
+		if (writeRestartFile)
+		{
+			if ((iteration) % fileWriteInterval  == 0u)
+			{
+#ifndef STANDALONE
+				Rprintf("Writing restart file!\n");
+#else
+				std::cout << "Writing restart file!\n";
+#endif
+				if (multipleFiles)
+				{
+					std::ostringstream oss;
+					oss << (iteration) / thining << file;
+					std::string tmp = oss.str();
+					model.writeRestartFile(tmp);
+				}
+				else
+				{
+					model.writeRestartFile(file);
+				}
+			}
+		}
+		if( (iteration) % 100u == 0u)
+		{
+#ifndef STANDALONE
+			Rprintf("Status at iteration %d \n", iteration);
+			Rprintf("\t current logLikelihood: %f \n", likelihoodTrace[(iteration/thining) - 1] );
+#else
+			std::cout << "Status at iteration " << (iteration) << std::endl;
+			std::cout << "\t current logLikelihood: " << likelihoodTrace[(iteration/thining) - 1] << std::endl;
+#endif
+			model.printHyperParameters();
+			for(unsigned i = 0u; i < model.getNumMixtureElements(); i++)
+			{
+#ifndef STANDALONE
+				Rprintf("\t current Mixture element probability for element %d: %f\n", i, model.getCategoryProbability(i));
+#else
+				std::cout << "\t current Mixture element probability for element " << i << ": " << model.getCategoryProbability(i) << std::endl;
+#endif
+			}
+		}
+		if(estimateCodonSpecificParameter)
+		{
+			model.proposeCodonSpecificParameter();
+			acceptRejectCodonSpecificParameter(genome, model, iteration);
+			if( ( (iteration) % adaptiveWidth) == 0u)
+			{
+				model.adaptCodonSpecificParameterProposalWidth(adaptiveWidth);
+			}
+		}
+		// update hyper parameter
+		if(estimateHyperParameter)
+		{
+			model.updateGibbsSampledHyperParameters(genome);
+			model.proposeHyperParameters();
+			acceptRejectHyperParameter(genome, model, iteration);
+			if( ( (iteration) % adaptiveWidth) == 0u)
+			{
+				model.adaptHyperParameterProposalWidths(adaptiveWidth);
+			}
+		}
+		// update expression level values
+		if(estimateSynthesisRate)
+		{
+			model.proposeSynthesisRateLevels();
+			double logLike = acceptRejectSynthesisRateLevelForAllGenes(genome, model, iteration);
+			if((iteration % thining) == 0u)
+			{
+				likelihoodTrace[iteration/thining] = logLike;
+			}
+			if( ( (iteration) % adaptiveWidth) == 0u)
+			{
+				model.adaptSynthesisRateProposalWidth(adaptiveWidth);
+			}
+		}
+
+
+		if( ( (iteration) % (50*adaptiveWidth)) == 0u)
+		{
+			double gewekeScore = calculateGewekeScore(iteration/thining);
+#ifndef STANDALONE
+			Rprintf("##################################################\n");
+			Rprintf("Geweke Score after %d iterations: %f\n", iteration, gewekeScore);
+			Rprintf("##################################################\n");
+#else
+			std::cout << "##################################################" << "\n";
+			std::cout << "Geweke Score after " << iteration << " iterations: " << gewekeScore << "\n";
+			std::cout << "##################################################" << "\n";
+#endif
+
+			if(std::abs(gewekeScore) < 1.96)
+			{
+#ifndef STANDALONE
+				Rprintf("Stopping run based on convergence after %d iterations\n\n", iteration);
+#else
+				std::cout << "Stopping run based on convergence after " << iteration << " iterations\n" << std::endl;
+#endif
+				// Comment out this break to keep the run from stopping on convergence
+				model.setLastIteration(iteration/thining);
+				//break;
+			}
+		}
+	} // end MCMC loop
+#ifndef STANDALONE
+	Rprintf("leaving MCMC loop\n");
+#else
+	std::cout << "leaving MCMC loop" << std::endl;
+#endif
+
+	//NOTE: The following files used to be written here:
+	//selectionParamTrace_#.csv
+	//phiTrace_nmix_#.csv
+	//mutationParamTrace_#.csv
+	//liklihoodTrace.csv
+	//sphiTrace.csv
+	//expressionLevelTrace.csv
+
+}
+
+
+double MCMCAlgorithm::calculateGewekeScore(unsigned current_iteration)
+{
+	double posteriorMean1 = 0.0;
+	double posteriorMean2 = 0.0;
+	double posteriorVariance1 = 0.0;
+	double posteriorVariance2 = 0.0;
+
+	unsigned end1 = std::round( (current_iteration - lastConvergenceTest) * 0.1) + lastConvergenceTest;
+	unsigned start2 = std::round(current_iteration - (current_iteration * 0.5));
+
+	double numSamples1 = (double) (end1 - lastConvergenceTest);
+	double numSamples2 = (double) std::round(current_iteration * 0.5);
+
+	// calculate mean and and variance of first part of likelihood trace
+	for(unsigned i = lastConvergenceTest; i < end1; i++)
+	{
+		posteriorMean1 += likelihoodTrace[i];
+	}
+	posteriorMean1 = posteriorMean1 / numSamples1;
+	for(unsigned i = lastConvergenceTest; i < end1; i++)
+	{
+		posteriorVariance1 += (likelihoodTrace[i] - posteriorMean1) * (likelihoodTrace[i] - posteriorMean1);
+	}
+	posteriorVariance1 = posteriorVariance1 / numSamples1;
+	// calculate mean and and variance of last part of likelihood trace
+	for(unsigned i = start2; i < current_iteration; i++)
+	{
+		posteriorMean2 += likelihoodTrace[i];
+	}
+	posteriorMean2 = posteriorMean2 / numSamples2;
+	for(unsigned i = start2; i < current_iteration; i++)
+	{
+		posteriorVariance2 += (likelihoodTrace[i] - posteriorMean2) * (likelihoodTrace[i] - posteriorMean2);
+	}
+	posteriorVariance2 = posteriorVariance2 / numSamples2;
+
+	lastConvergenceTest = current_iteration;
+	// Geweke score
+	return (posteriorMean1 - posteriorMean2) / std::sqrt( ( posteriorVariance1 / numSamples1 ) + ( posteriorVariance2 / numSamples2 ) );
+}
+
+
 
 double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, Model& model, int iteration)
 {
@@ -89,6 +312,10 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		double* unscaledLogProb_curr = new double[numSynthesisRateCategories]();
 		double* unscaledLogProb_prop = new double[numSynthesisRateCategories]();
 
+		double* unscaledLogPost_curr = new double[numSynthesisRateCategories]();
+		double* unscaledLogPost_prop = new double[numSynthesisRateCategories]();
+
+
 		double* unscaledLogProb_curr_singleMixture = new double[numMixtures]();
 		double* probabilities = new double[numMixtures]();
 
@@ -102,6 +329,8 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		{
 			unscaledLogProb_curr[j] = 0.0;
 			unscaledLogProb_prop[j] = 0.0;
+			unscaledLogPost_curr[j] = 0.0;
+			unscaledLogPost_prop[j] = 0.0;
 		}
 		
 		for(unsigned k = 0u; k < numSynthesisRateCategories; k++)
@@ -112,28 +341,22 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			for(unsigned n = 0u; n < mixtureElements.size(); n++)
 			{
 				unsigned mixtureElement = mixtureElements[n];
-				double logProbabilityRatio[3];
+				double logProbabilityRatio[5];
 				model.calculateLogLikelihoodRatioPerGene(gene, i, mixtureElement, logProbabilityRatio);
 
-/*
-				if (std::isinf(logProbabilityRatio[1])) {
-					std::cout << "logprob1 inf\n";
-				}
-				if (std::isinf(logProbabilityRatio[2])) {
-					std::cout << "logprob2 inf\n";
-				}
-*/
-				unscaledLogProb_curr[k] += logProbabilityRatio[1];
-				unscaledLogProb_prop[k] += logProbabilityRatio[2];
+				// log posterior with and without rev. jump probability
+				unscaledLogProb_curr[k] += logProbabilityRatio[1]; // with rev. jump prob.
+				unscaledLogProb_prop[k] += logProbabilityRatio[2]; // with rev. jump prob.
+				unscaledLogPost_curr[k] += logProbabilityRatio[3]; // without rev. jump prob.
+				unscaledLogPost_prop[k] += logProbabilityRatio[4]; // without rev. jump prob.
 
-				unscaledLogProb_curr_singleMixture[mixtureIndex] = logProbabilityRatio[1];
+				unscaledLogProb_curr_singleMixture[mixtureIndex] = logProbabilityRatio[3];
 				maxValue = unscaledLogProb_curr_singleMixture[mixtureIndex] > maxValue ? unscaledLogProb_curr_singleMixture[mixtureIndex] : maxValue;
 				mixtureIndex++;
 			}
 		}
 
 		unsigned mixAssign = model.getMixtureAssignment(i);
-		unsigned geneSynthCat = model.getSynthesisRateCategory(mixAssign);
 
 		// adjust the the unscaled probabilities by the constant c
 		// ln(f') = ln(c) + ln(f)
@@ -155,6 +378,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		}
 
 //		unsigned mixtureAssignmentOfGene = model.getMixtureAssignment(i);
+//		unsigned geneSynthCat = model.getSynthesisRateCategory(mixAssign);
 		for(unsigned k = 0u; k < numSynthesisRateCategories; k++)
 		{
 			// We do not need to add std::log(model.getCategoryProbability(k)) since it will cancel in the ratio!
@@ -166,18 +390,22 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				// only count each gene once, not numSynthesigeneIndexsRateCategories times
 				//if(geneSynthCat == k)
 					//logLikelihood += std::log(model.getCategoryProbability(k)) + propLogLike;
-				logLikelihood += probabilities[k] * propLogLike;
+				logLikelihood += probabilities[k] * unscaledLogPost_prop[k];
 			}else{
 				// only count each gene once, not numSynthesisRateCategories times
 				//if(geneSynthCat == k)
 					//logLikelihood += std::log(model.getCategoryProbability(k)) + currLogLike;
-				logLikelihood += probabilities[k] * currLogLike;
+				logLikelihood += probabilities[k] * unscaledLogPost_curr[k];
 			}
 		}
 
 		if (std::isinf(logLikelihood))
 		{
+#ifndef STANDALONE
+			Rprintf("\tInfinity reached (Gene: %d)\n", i);
+#else
 			std::cout << "\tInfinity reached (Gene: " << i << ")\n";
+#endif
 		}
 
 		// Get category in which the gene is placed in.
@@ -228,7 +456,11 @@ void MCMCAlgorithm::acceptRejectHyperParameter(Genome &genome, Model& model, int
 	{
 		if (!std::isfinite(logProbabilityRatios[i]))
 		{
+#ifndef STANDALONE
+			Rprintf("logProbabilityRatio %d not finite!\n", i);
+#else
 			std::cout << "logProbabilityRatio " << i << " not finite!\n";
+#endif
 		}
 
 		if (-Parameter::randExp(1) < logProbabilityRatios[i])
@@ -276,7 +508,11 @@ void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned
 
 
 	// NOTE: IF PRIORS ARE ADDED, TAKE INTO ACCOUNT HERE!
+#ifndef STANDALONE
+	Rprintf("Allowing divergence from initial conditions for %d iterations.\n\n", divergenceIterations);
+#else
 	std::cout << "Allowing divergence from initial conditions for " << divergenceIterations << " iterations.\n" << std::endl;
+#endif
 	// divergence from initial conditions is not stored in trace
 
 	// how many steps do you want to walk "away" from the initial conditions
@@ -330,175 +566,6 @@ void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned
 		model.updateGibbsSampledHyperParameters(genome);
 	}
 }
-
-void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigned divergenceIterations)
-{
-#ifndef __APPLE__
-	omp_set_num_threads(numCores);
-#endif
-
-	// Allows to diverge from initial conditions (divergenceIterations controls the divergence).
-	// This allows for varying initial conditions for better exploration of the parameter space.
-	varyInitialConditions(genome, model, divergenceIterations);
-
-	unsigned maximumIterations = samples * thining;
-	// initialize everything
-
-	model.setNumPhiGroupings(genome.getGene(0).getObservedPhiValues().size());
-	model.initTraces(samples + 1, genome.getGenomeSize()); //Samples + 2 so we can store the starting and ending values.
-	// starting the MCMC
-
-	model.updateTracesWithInitialValues(genome);
-
-
-	std::cout << "entering MCMC loop" << std::endl;
-	std::cout << "\tEstimate Codon Specific Parameters? " << (estimateCodonSpecificParameter ? "TRUE" : "FALSE") << std::endl;
-	std::cout << "\tEstimate Hyper Parameters? " << (estimateHyperParameter ? "TRUE" : "FALSE") << std::endl;
-	std::cout << "\tEstimate SynthesisRate Parameters? " << (estimateSynthesisRate ? "TRUE" : "FALSE") << std::endl;
-
-	// set the last iteration to the max iterations, this way if the MCMC doesn't exit based on Geweke score, it will use the max iteration for posterior means
-	model.setLastIteration(samples);
-	std::cout << "\tStarting MCMC with " << maximumIterations << " iterations\n";
-	//std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
-	for(unsigned iteration = 1u; iteration <= maximumIterations; iteration++)
-	{
-		if (writeRestartFile)
-		{
-			if ((iteration) % fileWriteInterval  == 0u)
-			{
-				std::cout <<"Writing restart file!\n";
-				if (multipleFiles)
-				{
-					std::ostringstream oss;
-					oss << (iteration) / thining << file;
-					std::string tmp = oss.str();
-					model.writeRestartFile(tmp);
-				}
-				else
-				{
-					model.writeRestartFile(file);
-				}
-			}
-		}
-		if( (iteration) % 100u == 0u)
-		{
-			std::cout << "Status at iteration " << (iteration) << std::endl;
-			std::cout << "\t current logLikelihood: " << likelihoodTrace[(iteration/thining) - 1] << std::endl;
-			model.printHyperParameters();
-			for(unsigned i = 0u; i < model.getNumMixtureElements(); i++)
-			{
-				std::cout << "\t current Mixture element probability for element " << i << ": " << model.getCategoryProbability(i) << std::endl;
-			}
-		}
-		if(estimateCodonSpecificParameter) 
-		{
-			model.proposeCodonSpecificParameter();
-			acceptRejectCodonSpecificParameter(genome, model, iteration);
-			if( ( (iteration) % adaptiveWidth) == 0u)
-			{
-				model.adaptCodonSpecificParameterProposalWidth(adaptiveWidth);
-			}
-		}
-		// update hyper parameter
-		if(estimateHyperParameter)
-		{
-			model.updateGibbsSampledHyperParameters(genome);
-			model.proposeHyperParameters();
-			acceptRejectHyperParameter(genome, model, iteration);
-			if( ( (iteration) % adaptiveWidth) == 0u)
-			{
-				model.adaptHyperParameterProposalWidths(adaptiveWidth);
-			}
-		}
-		// update expression level values
-		if(estimateSynthesisRate)
-		{
-			model.proposeSynthesisRateLevels();
-			double logLike = acceptRejectSynthesisRateLevelForAllGenes(genome, model, iteration);
-			if((iteration % thining) == 0u)
-			{
-				likelihoodTrace[iteration/thining] = logLike;
-			}
-			if( ( (iteration) % adaptiveWidth) == 0u)
-			{
-				model.adaptSynthesisRateProposalWidth(adaptiveWidth);
-			}
-		}
-
-
-		/*if( ( (iteration) % (50*adaptiveWidth)) == 0u)
-		{
-			double gewekeScore = calculateGewekeScore(iteration/thining);
-			std::cout << "##################################################" << "\n";
-			std::cout << "Geweke Score after " << iteration << " iterations: " << gewekeScore << "\n";
-			std::cout << "##################################################" << "\n";
-
-			if(std::abs(gewekeScore) < 1.96)
-			{
-				std::cout << "Stopping run based on convergence after " << iteration << " iterations\n" << std::endl;
-				// Comment out this break to keep the run from stopping on convergence
-				model.setLastIteration(iteration/thining);
-				//break;
-			}
-		}*/
-	} // end MCMC loop
-
-	std::cout << "leaving MCMC loop" << std::endl;
-	//std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
-	//std::chrono::duration<int> time_span = std::chrono::duration_cast<std::chrono::duration<int>> (t2 - t1);
-	//std::cout << "The MCMC took " << (unsigned) time_span.count() / 3600 << " hours, " << (unsigned) (time_span.count() / 60) % 60 << 
-		//" minutes, and " << (unsigned) time_span.count() % 60 << " seconds." << std::endl;
-	//NOTE: The following files used to be written here:
-	//selectionParamTrace_#.csv
-	//phiTrace_nmix_#.csv
-	//mutationParamTrace_#.csv
-	//liklihoodTrace.csv
-	//sphiTrace.csv
-	//expressionLevelTrace.csv
-
-}
-
-double MCMCAlgorithm::calculateGewekeScore(unsigned current_iteration)
-{
-	double posteriorMean1 = 0.0;
-	double posteriorMean2 = 0.0;
-	double posteriorVariance1 = 0.0;
-	double posteriorVariance2 = 0.0;
-
-	unsigned end1 = std::round( (current_iteration - lastConvergenceTest) * 0.1) + lastConvergenceTest;
-	unsigned start2 = std::round(current_iteration - (current_iteration * 0.5));
-
-	double numSamples1 = (double) (end1 - lastConvergenceTest);
-	double numSamples2 = (double) std::round(current_iteration * 0.5);
-
-	// calculate mean and and variance of first part of likelihood trace
-	for(unsigned i = lastConvergenceTest; i < end1; i++)
-	{
-		posteriorMean1 += likelihoodTrace[i];
-	}
-	posteriorMean1 = posteriorMean1 / numSamples1;
-	for(unsigned i = lastConvergenceTest; i < end1; i++)
-	{
-		posteriorVariance1 += (likelihoodTrace[i] - posteriorMean1) * (likelihoodTrace[i] - posteriorMean1);
-	}
-	posteriorVariance1 = posteriorVariance1 / numSamples1;
-	// calculate mean and and variance of last part of likelihood trace
-	for(unsigned i = start2; i < current_iteration; i++)
-	{
-		posteriorMean2 += likelihoodTrace[i];
-	}
-	posteriorMean2 = posteriorMean2 / numSamples2;
-	for(unsigned i = start2; i < current_iteration; i++)
-	{
-		posteriorVariance2 += (likelihoodTrace[i] - posteriorMean2) * (likelihoodTrace[i] - posteriorMean2);
-	}
-	posteriorVariance2 = posteriorVariance2 / numSamples2;
-
-	lastConvergenceTest = current_iteration;
-	// Geweke score
-	return (posteriorMean1 - posteriorMean2) / std::sqrt( ( posteriorVariance1 / numSamples1 ) + ( posteriorVariance2 / numSamples2 ) );
-}
-
 
 std::vector<std::vector<double>> MCMCAlgorithm::solveToeplitzMatrix(int lr, std::vector<double> r, std::vector<double> g)
 {
@@ -571,7 +638,7 @@ std::vector<double> MCMCAlgorithm::acf(std::vector<double>& x, int nrows, int nc
 		double sum = 0.0;
 		for(unsigned i = 0u; i < x.size(); i++) sum += x[i];
 		double mean = sum / (double)x.size();
-		for(unsigned i = 0u; i < x.size(); i++) x[i] = mean;
+		for(unsigned i = 0u; i < x.size(); i++) x[i] = x[i] - mean;
 	}
 
 	std::vector<double> acf(lagmax, 1.0);
@@ -630,9 +697,13 @@ double MCMCAlgorithm::getLogLikelihoodPosteriorMean(unsigned _samples)
 
 	if(_samples > traceLength)
 	{
+#ifndef STANDALONE
+		Rf_warning("Warning in MCMCAlgorithm::getLogLikelihoodPosteriorMean throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n", _samples, traceLength);
+#else
 		std::cerr << "Warning in MCMCAlgorithm::getLogLikelihoodPosteriorMean throws: Number of anticipated samples (" <<
 			_samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
 		_samples = traceLength;
+#endif
 	}
 	unsigned start = traceLength - _samples;
 	for(unsigned i = start; i < traceLength; i++)

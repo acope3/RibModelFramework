@@ -24,6 +24,10 @@ const unsigned ROCParameter::dEta = 1;
 ROCParameter::ROCParameter() : Parameter()
 {
 	//CTOR
+	phiEpsilon = 0.1;
+	phiEpsilon_proposed = 0.1;
+	bias_csp = 0;
+	mutation_prior_sd = 0.35;
 }
 
 
@@ -99,11 +103,11 @@ void ROCParameter::initROCParameterSet()
 
 	phiEpsilon = 0.1;
 	phiEpsilon_proposed = 0.1;
-	for (unsigned i = 0; i < getNumPhiGroupings(); i++) {
-		Aphi[i] = 0.0;
-		Aphi_proposed[i] = 0.0;
+	for (unsigned i = 0; i < getNumObservedPhiSets(); i++) {
+		Aphi[i] = 0.1;
+		Aphi_proposed[i] = 0.1;
 		std_Aphi[i] = 0.1;
-		Sepsilon[i] = 0.0;
+		Sepsilon[i] = 0.1;
 		numAcceptForAphi[i] = 0;
 	}
 
@@ -147,128 +151,144 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 	input.open(filename.c_str());
 	if (input.fail())
 	{
-		std::cerr << "Could not open RestartFile.txt to initialzie ROC values\n";
-		std::exit(1);
+#ifndef STANDALONE
+		Rf_error("Error opening file %s to initialize from restart file.\n", filename.c_str());
+#else
+		std::cerr << "Error opening file " << filename << " to initialize from restart file.\n";
+#endif
 	}
-	std::string tmp, variableName;
-	unsigned cat = 0;
-	while (getline(input, tmp))
+	else
 	{
-		int flag;
-		if (tmp[0] == '>')
-			flag = 1;
-		else if (input.eof() || tmp == "\n")
-			flag = 2;
-		else if (tmp[0] == '#')
-			flag = 3;
-		else
-			flag = 4;
+		std::string tmp, variableName;
+		unsigned cat = 0;
+		while (getline(input, tmp))
+		{
+			int flag;
+			if (tmp[0] == '>')
+				flag = 1;
+			else if (input.eof() || tmp == "\n")
+				flag = 2;
+			else if (tmp[0] == '#')
+				flag = 3;
+			else
+				flag = 4;
 
-		if (flag == 1)
-		{
-			mat.clear();
-			cat = 0;
-			variableName = tmp.substr(1,tmp.size()-2);
-			if (variableName == "covarianceMatrix")
+			if (flag == 1)
 			{
-				getline(input,tmp);
-				//char aa = tmp[0];
-				cat = SequenceSummary::AAToAAIndex(tmp); // ????
-			}
-		}
-		else if (flag == 2)
-		{
-			std::cout << "here\n";
-		}
-		else if (flag == 3) //user comment, continue
-		{
-			continue;
-		}
-		else
-		{
-			std::istringstream iss;
-			if (variableName == "currentMutationParameter")
-			{
-				if (tmp == "***")
+				mat.clear();
+				cat = 0;
+				variableName = tmp.substr(1,tmp.size()-2);
+				if (variableName == "covarianceMatrix")
 				{
-					currentMutationParameter.resize(currentMutationParameter.size() + 1);
-					cat++;
+					getline(input,tmp);
+					//char aa = tmp[0];
+					cat = SequenceSummary::AAToAAIndex(tmp); // ????
 				}
-				else if (tmp == "\n")
-					continue;
-				else
+			}
+			else if (flag == 2)
+			{
+#ifndef STANDALONE
+				Rprintf("here\n");
+#else
+				std::cout << "here\n";
+#endif
+			}
+			else if (flag == 3) //user comment, continue
+			{
+				continue;
+			}
+			else
+			{
+				std::istringstream iss;
+				if (variableName == "currentMutationParameter")
 				{
+					if (tmp == "***")
+					{
+						currentMutationParameter.resize(currentMutationParameter.size() + 1);
+						cat++;
+					}
+					else if (tmp == "\n")
+						continue;
+					else
+					{
+						double val;
+						iss.str(tmp);
+						while (iss >> val)
+						{
+							currentMutationParameter[cat - 1].push_back(val);
+						}
+					}
+				}
+				else if (variableName == "currentSelectionParameter")
+				{
+					if (tmp == "***")
+					{
+						currentSelectionParameter.resize(currentSelectionParameter.size() + 1);
+						cat++;
+					}
+					else if (tmp == "\n")
+						continue;
+					else
+					{
+						double val;
+						iss.str(tmp);
+						while (iss >> val)
+						{
+							currentSelectionParameter[cat - 1].push_back(val);
+						}
+					}
+				}
+				else if (variableName == "std_csp")
+				{
+					double val;
+					iss.str(tmp);
+					while (iss >> val) {
+						std_csp.push_back(val);
+					}
+				}
+				else if (variableName == "Aphi")
+				{
+					double val;
+					iss.str(tmp);
+					while (iss >> val) {
+						Aphi.push_back(val);
+					}
+					std::cout <<"Aphi has a value\n";
+				}
+				else if (variableName == "Sepsilon")
+				{
+					double val;
+					iss.str(tmp);
+					while (iss >> val) {
+						Sepsilon.push_back(val);
+					}
+				}
+				else if (variableName == "std_Aphi")
+				{
+					double val;
+					iss.str(tmp);
+					while (iss >> val) {
+						std_Aphi.push_back(val);
+					}
+				}
+				else if (variableName == "covarianceMatrix")
+				{
+					if (tmp == "***") //end of matrix
+					{
+						CovarianceMatrix CM(mat);
+						covarianceMatrix[cat] = CM;
+					}
 					double val;
 					iss.str(tmp);
 					while (iss >> val)
 					{
-						currentMutationParameter[cat - 1].push_back(val);
+						mat.push_back(val);
 					}
 				}
-			}
-			else if (variableName == "currentSelectionParameter")
-			{
-				if (tmp == "***")
+				else if (variableName == "mutation_prior_sd")
 				{
-					currentSelectionParameter.resize(currentSelectionParameter.size() + 1);
-					cat++;
-				}
-				else if (tmp == "\n")
-					continue;
-				else
-				{
-					double val;
 					iss.str(tmp);
-					while (iss >> val)
-					{
-						currentSelectionParameter[cat - 1].push_back(val);
-					}
-				}
-			}
-			else if (variableName == "std_csp")
-			{
-				double val;
-				iss.str(tmp);
-				while (iss >> val) {
-					std_csp.push_back(val);
-				}
-			}
-			else if (variableName == "Aphi")
-			{
-				double val;
-				iss.str(tmp);
-				while (iss >> val) {
-					Aphi.push_back(val);
-				}
-			}
-			else if (variableName == "Sepsilon")
-			{
-				double val;
-				iss.str(tmp);
-				while (iss >> val) {
-					Sepsilon.push_back(val);
-				}
-			}
-			else if (variableName == "std_Aphi")
-			{
-				double val;
-				iss.str(tmp);
-				while (iss >> val) {
-					std_Aphi.push_back(val);
-				}
-			}
-			else if (variableName == "covarianceMatrix")
-			{
-				if (tmp == "***") //end of matrix
-				{
-					CovarianceMatrix CM(mat);
-					covarianceMatrix[cat] = CM;
-				}
-				double val;
-				iss.str(tmp);
-				while (iss >> val)
-				{
-					mat.push_back(val);
+					iss >> mutation_prior_sd;
 				}
 			}
 		}
@@ -306,98 +326,102 @@ void ROCParameter::writeROCRestartFile(std::string filename)
 	out.open(filename.c_str(), std::ofstream::app);
 	if (out.fail())
 	{
-		std::cerr << "Could not open RestartFile.txt to append\n";
-		std::exit(1);
+#ifndef STANDALONE
+		Rf_error("Error opening file %s to write restart file.\n", filename.c_str());
+#else
+		std::cerr << "Error opening file " << filename << " to write restart file.\n";
+#endif
 	}
-
-	std::ostringstream oss;
-	unsigned j;
-	oss << ">Aphi:\n";
-	for (unsigned i = 0; i < Aphi.size(); i++)
+	else
 	{
-		oss << Aphi[i];
-		if ((i + 1) % 10 == 0)
-			oss << "\n";
-		else
-			oss << " ";
-	}
-	oss << ">Sepsilon:\n";
-	for (unsigned i = 0; i < Sepsilon.size(); i++)
-	{
-		oss << Sepsilon[i];
-		if ((i + 1) % 10 == 0)
-			oss << "\n";
-		else
-			oss << " ";
-	}
-	oss << ">std_Aphi:\n";
-	for (unsigned i = 0; i < std_Aphi.size(); i++)
-	{
-		oss << std_Aphi[i];
-		if ((i + 1) % 10 == 0)
-			oss << "\n";
-		else
-			oss << " ";
-	}
-	oss << ">std_csp:\n";
-	for (unsigned i = 0; i < std_csp.size(); i++)
-	{
-		oss << std_csp[i];
-		if ((i + 1) % 10 == 0)
-			oss << "\n";
-		else
-			oss << " ";
-	}
-	oss << ">currentMutationParameter:\n";
-	for (unsigned i = 0; i < currentMutationParameter.size(); i++)
-	{
-		oss << "***\n";
-		for (j = 0; j < currentMutationParameter[i].size(); j++)
+		std::ostringstream oss;
+		unsigned j;
+		oss << ">Aphi:\n";
+		for (unsigned i = 0; i < Aphi.size(); i++)
 		{
-			oss << currentMutationParameter[i][j];
-			if ((j + 1) % 10 == 0)
+			oss << Aphi[i];
+			if ((i + 1) % 10 == 0)
 				oss << "\n";
 			else
 				oss << " ";
 		}
-		if (j % 10 != 0)
-			oss << "\n";
-	}
-
-	oss << ">currentSelectionParameter:\n";
-	for (unsigned i = 0; i < currentSelectionParameter.size(); i++)
-	{
-		oss << "***\n";
-		for (j = 0; j < currentSelectionParameter[i].size(); j++)
+		oss << ">Sepsilon:\n";
+		for (unsigned i = 0; i < Sepsilon.size(); i++)
 		{
-			oss << currentSelectionParameter[i][j];
-			if ((j + 1) % 10 == 0)
+			oss << Sepsilon[i];
+			if ((i + 1) % 10 == 0)
 				oss << "\n";
 			else
 				oss << " ";
 		}
-		if (j % 10 != 0)
-			oss << "\n";
-	}
-
-	for (unsigned i = 0; i < groupList.size(); i++)
-	{
-		std::string aa = groupList[i];
-		oss <<">covarianceMatrix:\n" << aa <<"\n";
-		CovarianceMatrix m = covarianceMatrix[SequenceSummary::AAToAAIndex(aa)];
-		std::vector<double>* tmp = m.getCovMatrix();
-		int size = m.getNumVariates();
-		for(unsigned k = 0; k < size * size; k++)
+		oss << ">mutation_prior_sd:\n" << mutation_prior_sd << "\n";
+		oss << ">std_Aphi:\n";
+		for (unsigned i = 0; i < std_Aphi.size(); i++)
 		{
-			if (k % size == 0 && k != 0) { oss <<"\n"; }
-			oss << tmp->at(k) << "\t";
+			oss << std_Aphi[i];
+			if ((i + 1) % 10 == 0)
+				oss << "\n";
+			else
+				oss << " ";
 		}
-		oss <<"\n***\n";
+		oss << ">std_csp:\n";
+		for (unsigned i = 0; i < std_csp.size(); i++)
+		{
+			oss << std_csp[i];
+			if ((i + 1) % 10 == 0)
+				oss << "\n";
+			else
+				oss << " ";
+		}
+		oss << ">currentMutationParameter:\n";
+		for (unsigned i = 0; i < currentMutationParameter.size(); i++)
+		{
+			oss << "***\n";
+			for (j = 0; j < currentMutationParameter[i].size(); j++)
+			{
+				oss << currentMutationParameter[i][j];
+				if ((j + 1) % 10 == 0)
+					oss << "\n";
+				else
+					oss << " ";
+			}
+			if (j % 10 != 0)
+				oss << "\n";
+		}
+
+		oss << ">currentSelectionParameter:\n";
+		for (unsigned i = 0; i < currentSelectionParameter.size(); i++)
+		{
+			oss << "***\n";
+			for (j = 0; j < currentSelectionParameter[i].size(); j++)
+			{
+				oss << currentSelectionParameter[i][j];
+				if ((j + 1) % 10 == 0)
+					oss << "\n";
+				else
+					oss << " ";
+			}
+			if (j % 10 != 0)
+				oss << "\n";
+		}
+
+		for (unsigned i = 0; i < groupList.size(); i++)
+		{
+			std::string aa = groupList[i];
+			oss << ">covarianceMatrix:\n" << aa << "\n";
+			CovarianceMatrix m = covarianceMatrix[SequenceSummary::AAToAAIndex(aa)];
+			std::vector<double>* tmp = m.getCovMatrix();
+			int size = m.getNumVariates();
+			for(unsigned k = 0; k < size * size; k++)
+			{
+				if (k % size == 0 && k != 0) { oss << "\n"; }
+				oss << tmp->at(k) << "\t";
+			}
+			oss << "\n***\n";
+		}
+		std::string output = oss.str();
+		out << output;
 	}
-
-
-	std::string output = oss.str();
-	out << output;
 	out.close();
 }
 
@@ -425,28 +449,34 @@ void ROCParameter::initMutationCategories(std::vector<std::string> files, unsign
 		currentFile.open(files[category].c_str());
 		if (currentFile.fail())
 		{
+#ifndef STANDALONE
+			Rf_error("Error opening file %d to initialize mutation values.\n", category);
+#else
 			std::cerr << "Error opening file " << category << " to initialize mutation values.\n";
-			std::exit(1);
+#endif
 		}
-
-		std::string tmp;
-		currentFile >> tmp; //The first line is a header (Amino Acid, Codon, Value, Std_deviation)
-
-		while (currentFile >> tmp)
+		else
 		{
-			//Get the Codon and Index
-			std::size_t pos = tmp.find(",", 2); //Amino Acid and a comma will always be the first 2 characters
-			std::string codon = tmp.substr(2, pos - 2);
-			unsigned codonIndex = SequenceSummary::codonToIndex(codon, true);
+			std::string tmp;
+			currentFile >> tmp; //The first line is a header (Amino Acid, Codon, Value, Std_deviation)
 
-			//get the value to store
-			std::size_t pos2 = tmp.find(",", pos + 1);
-			//std::cout << tmp.substr(pos + 1, pos2 - pos - 1 ) <<"\n";
-			double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
+			while (currentFile >> tmp)
+			{
+				//Get the Codon and Index
+				std::size_t pos = tmp.find(",", 2); //Amino Acid and a comma will always be the first 2 characters
+				std::string codon = tmp.substr(2, pos - 2);
+				unsigned codonIndex = SequenceSummary::codonToIndex(codon, true);
 
-			currentMutationParameter[category][codonIndex] = value;
-			proposedMutationParameter[category][codonIndex] = value;
+				//get the value to store
+				std::size_t pos2 = tmp.find(",", pos + 1);
+				//std::cout << tmp.substr(pos + 1, pos2 - pos - 1 ) <<"\n";
+				double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
+
+				currentMutationParameter[category][codonIndex] = value;
+				proposedMutationParameter[category][codonIndex] = value;
+			}
 		}
+
 		currentFile.close();
 	} //END OF A CATEGORY/FILE
 }
@@ -461,28 +491,34 @@ void ROCParameter::initSelectionCategories(std::vector<std::string> files, unsig
 		currentFile.open(files[category].c_str());
 		if (currentFile.fail())
 		{
+#ifndef STANDALONE
+			Rf_error("Error opening file %d to initialize mutation values.\n", category);
+#else
 			std::cerr << "Error opening file " << category << " to initialize mutation values.\n";
-			std::exit(1);
+#endif
 		}
-
-		std::string tmp;
-		currentFile >> tmp; //The first line is a header (Amino Acid, Codon, Value, Std_deviation)
-
-		while (currentFile >> tmp)
+		else
 		{
-			//Get the Codon and Index
-			std::size_t pos = tmp.find(",", 2); //Amino Acid and a comma will always be the first 2 characters
-			std::string codon = tmp.substr(2, pos - 2);
-			unsigned codonIndex = SequenceSummary::codonToIndex(codon, true);
+			std::string tmp;
+			currentFile >> tmp; //The first line is a header (Amino Acid, Codon, Value, Std_deviation)
 
-			//get the value to store
-			std::size_t pos2 = tmp.find(",", pos + 1);
-			//	std::cout << tmp.substr(pos + 1, pos2 - pos - 1 ) <<"\n";
-			double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
+			while (currentFile >> tmp)
+			{
+				//Get the Codon and Index
+				std::size_t pos = tmp.find(",", 2); //Amino Acid and a comma will always be the first 2 characters
+				std::string codon = tmp.substr(2, pos - 2);
+				unsigned codonIndex = SequenceSummary::codonToIndex(codon, true);
 
-			currentSelectionParameter[category][codonIndex] = value;
-			proposedSelectionParameter[category][codonIndex] = value;
+				//get the value to store
+				std::size_t pos2 = tmp.find(",", pos + 1);
+				//	std::cout << tmp.substr(pos + 1, pos2 - pos - 1 ) <<"\n";
+				double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
+
+				currentSelectionParameter[category][codonIndex] = value;
+				proposedSelectionParameter[category][codonIndex] = value;
+			}
 		}
+
 		currentFile.close();
 	} //END OF A CATEGORY/FILE
 }
@@ -625,7 +661,7 @@ double ROCParameter::getCurrentAphiProposalWidth(unsigned index)
 
 void ROCParameter::proposeAphi()
 {
-	for (unsigned i = 0; i < getNumPhiGroupings(); i++) {
+	for (unsigned i = 0; i < getNumObservedPhiSets(); i++) {
 		Aphi_proposed[i] = randNorm(Aphi[i], std_Aphi[i]);
 	}
 }
@@ -754,13 +790,18 @@ double ROCParameter::getSphiPosteriorMean(unsigned samples, unsigned mixture)
 	double posteriorMean = 0.0;
 	unsigned selectionCategory = getSelectionCategory(mixture);
 	std::vector<double> sPhiTrace = traces.getSphiTrace(selectionCategory);
-	unsigned traceLength = (unsigned)sPhiTrace.size();
+	unsigned traceLength = lastIteration;
 
 	if (samples > traceLength)
 	{
-		std::cerr << "Warning in Parameter::getSphiPosteriorMean throws: Number of anticipated samples (" << samples
-		<< ") is greater than the length of the available trace (" << traceLength << ")."
+#ifndef STANDALONE
+		Rf_warning("Warning in ROCParameter::getSphiPosteriorMean throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
+				samples, traceLength);
+#else
+		std::cerr << "Warning in ROCParameter::getSphiPosteriorMean throws: Number of anticipated samples ("
+		<< samples << ") is greater than the length of the available trace (" << traceLength << ")."
 		<< "Whole trace is used for posterior estimate! \n";
+#endif
 		samples = traceLength;
 	}
 	unsigned start = traceLength - samples;
@@ -777,20 +818,25 @@ double ROCParameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned ge
 	unsigned expressionCategory = getSynthesisRateCategory(mixtureElement);
 	double posteriorMean = 0.0;
 	std::vector<double> synthesisRateTrace = traces.getSynthesisRateTraceByMixtureElementForGene(mixtureElement, geneIndex);
-	unsigned traceLength = (unsigned)synthesisRateTrace.size();
+	unsigned traceLength = lastIteration;
 
 	if (samples > lastIteration)
 	{
-		std::cerr << "Warning in Parameter::getSynthesisRatePosteriorMean throws: Number of anticipated samples ("
-		<< samples << ") is greater than the length of the available trace (" << lastIteration << ")."
+#ifndef STANDALONE
+		Rf_warning("Warning in ROCParameter::getSynthesisRatePosteriorMean throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
+				samples, traceLength);
+#else
+		std::cerr << "Warning in ROCParameter::getSynthesisRatePosteriorMean throws: Number of anticipated samples ("
+		<< samples << ") is greater than the length of the available trace (" << traceLength << ")."
 		<< "Whole trace is used for posterior estimate! \n";
-		samples = lastIteration;
+#endif
+		samples = traceLength;
 	}
-	unsigned start = lastIteration - samples;
+	unsigned start = traceLength - samples;
 	unsigned category;
 	unsigned usedSamples = 0u;
 	std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
-	for (unsigned i = start; i < lastIteration; i++)
+	for (unsigned i = start; i < traceLength; i++)
 	{
 		category = mixtureAssignmentTrace[i];
 		category = getSynthesisRateCategory(category);
@@ -813,9 +859,14 @@ double ROCParameter::getAphiPosteriorMean(unsigned index, unsigned samples)
 
 	if (samples > traceLength)
 	{
-		std::cerr << "Warning in Parameter::getAphiPosteriorMean throws: Number of anticipated samples (" << samples
-		<< ") is greater than the length of the available trace (" << traceLength << ")."
+#ifndef STANDALONE
+		Rf_warning("Warning in ROCParameter::getAphiPosteriorMean throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
+				samples, traceLength);
+#else
+		std::cerr << "Warning in ROCParameter::getAphiPosteriorMean throws: Number of anticipated samples ("
+		<< samples << ") is greater than the length of the available trace (" << traceLength << ")."
 		<< "Whole trace is used for posterior estimate! \n";
+#endif
 		samples = traceLength;
 	}
 	unsigned start = traceLength - samples;
@@ -836,9 +887,14 @@ double ROCParameter::getMutationPosteriorMean(unsigned mixtureElement, unsigned 
 
 	if (samples > traceLength)
 	{
+#ifndef STANDALONE
+		Rf_warning("Warning in ROCParameter::getMutationPosteriorMean throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
+				samples, traceLength);
+#else
 		std::cerr << "Warning in ROCParameter::getMutationPosteriorMean throws: Number of anticipated samples ("
 		<< samples << ") is greater than the length of the available trace (" << traceLength << ")."
 		<< "Whole trace is used for posterior estimate! \n";
+#endif
 		samples = traceLength;
 	}
 	unsigned start = traceLength - samples;
@@ -859,9 +915,14 @@ double ROCParameter::getSelectionPosteriorMean(unsigned mixtureElement, unsigned
 
 	if (samples > traceLength)
 	{
+#ifndef STANDALONE
+		Rf_warning("Warning in ROCParameter::getSelectionPosteriorMean throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
+				samples, traceLength);
+#else
 		std::cerr << "Warning in ROCParameter::getSelectionPosteriorMean throws: Number of anticipated samples ("
 		<< samples << ") is greater than the length of the available trace (" << traceLength << ")."
 		<< "Whole trace is used for posterior estimate! \n";
+#endif
 		samples = traceLength;
 	}
 	unsigned start = traceLength - samples;
@@ -880,9 +941,14 @@ double ROCParameter::getSphiVariance(unsigned samples, unsigned mixture, bool un
 	unsigned traceLength = (unsigned)sPhiTrace.size();
 	if (samples > traceLength)
 	{
-		std::cerr << "Warning in Parameter::getSphiVariance throws: Number of anticipated samples (" << samples
+#ifndef STANDALONE
+		Rf_warning("Warning in ROCParameter::getSynthesisRateVariance throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
+				samples, traceLength);
+#else
+		std::cerr << "Warning in Parameter::getSynthesisRateVariance throws: Number of anticipated samples (" << samples
 		<< ") is greater than the length of the available trace (" << traceLength << ")."
 		<< "Whole trace is used for posterior estimate! \n";
+#endif
 		samples = traceLength;
 	}
 	double posteriorMean = getSphiPosteriorMean(samples, mixture);
@@ -908,9 +974,14 @@ double ROCParameter::getSynthesisRateVariance(unsigned samples, unsigned geneInd
 	unsigned traceLength = lastIteration;
 	if (samples > traceLength)
 	{
+#ifndef STANDALONE
+		Rf_warning("Warning in ROCParameter::getSynthesisRateVariance throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
+				samples, traceLength);
+#else
 		std::cerr << "Warning in Parameter::getSynthesisRateVariance throws: Number of anticipated samples (" << samples
 		<< ") is greater than the length of the available trace (" << traceLength << ")."
 		<< "Whole trace is used for posterior estimate! \n";
+#endif
 		samples = traceLength;
 	}
 
@@ -938,9 +1009,14 @@ double ROCParameter::getAphiVariance(unsigned index, unsigned samples, bool unbi
 	unsigned traceLength = lastIteration;
 	if (samples > traceLength)
 	{
-		std::cerr << "Warning in Parameter::getSphiVariance throws: Number of anticipated samples (" << samples
+#ifndef STANDALONE
+		Rf_warning("Warning in ROCParameter::getAphiVariance throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
+				samples, traceLength);
+#else
+		std::cerr << "Warning in Parameter::getAphiVariance throws: Number of anticipated samples (" << samples
 		<< ") is greater than the length of the available trace (" << traceLength << ")."
 		<< "Whole trace is used for posterior estimate! \n";
+#endif
 		samples = traceLength;
 	}
 	double posteriorMean = getAphiPosteriorMean(index, samples);
@@ -965,9 +1041,14 @@ double ROCParameter::getMutationVariance(unsigned mixtureElement, unsigned sampl
 	unsigned traceLength = lastIteration;
 	if (samples > traceLength)
 	{
+#ifndef STANDALONE
+		Rf_warning("Warning in ROCParameter::getMutationVariance throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
+				samples, traceLength);
+#else
 		std::cerr << "Warning in ROCParameter::getMutationVariance throws: Number of anticipated samples (" << samples
 		<< ") is greater than the length of the available trace (" << traceLength << ")."
 		<< "Whole trace is used for posterior estimate! \n";
+#endif
 		samples = traceLength;
 	}
 
@@ -994,9 +1075,14 @@ double ROCParameter::getSelectionVariance(unsigned mixtureElement, unsigned samp
 	unsigned traceLength = lastIteration;
 	if (samples > traceLength)
 	{
+#ifndef STANDALONE
+		Rf_warning("Warning in ROCParameter::getSelectionVariance throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
+				samples, traceLength);
+#else
 		std::cerr << "Warning in ROCParameter::getSelectionVariance throws: Number of anticipated samples (" << samples
 		<< ") is greater than the length of the available trace (" << traceLength << ")."
 		<< "Whole trace is used for posterior estimate! \n";
+#endif
 		samples = traceLength;
 	}
 
@@ -1024,10 +1110,15 @@ std::vector<double> ROCParameter::getEstimatedMixtureAssignmentProbabilities(uns
 
 	if (samples > traceLength)
 	{
+#ifndef STANDALONE
+		Rf_warning("Warning in ROCParameter::getEstimatedMixtureAssignmentProbabilities throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
+				samples, traceLength);
+#else
 		std::cerr
-		<< "Warning in ROCParameter::getMixtureAssignmentPosteriorMean throws: Number of anticipated samples ("
+		<< "Warning in ROCParameter::getEstimatedMixtureAssignmentProbabilities throws: Number of anticipated samples ("
 		<< samples << ") is greater than the length of the available trace (" << traceLength << ")."
 		<< "Whole trace is used for posterior estimate! \n";
+#endif
 		samples = traceLength;
 	}
 
@@ -1095,15 +1186,21 @@ void ROCParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
 			numAcceptForSynthesisRate[cat][i] = 0u;
 		}
 	}
-	std::cout << "acceptance ratio for synthesis rate:\n";
-	std::cout << "\t acceptance ratio to low: " << acceptanceUnder << "\n";
-	std::cout << "\t acceptance ratio to high: " << acceptanceOver << "\n";
+#ifndef STANDALONE
+	Rprintf("acceptance rate for synthesis rate:\n");
+	Rprintf("\t acceptance rate to low: %d\n", acceptanceUnder);
+	Rprintf("\t acceptance rate to high: %d\n", acceptanceOver);
+#else
+	std::cout << "acceptance rate for synthesis rate:\n";
+	std::cout << "\t acceptance rate to low: " << acceptanceUnder << "\n";
+	std::cout << "\t acceptance rate to high: " << acceptanceOver << "\n";
+#endif
 }
 
 
 void ROCParameter::adaptAphiProposalWidth(unsigned adaptationWidth)
 {
-	for (unsigned i = 0; i < getNumPhiGroupings(); i++) {
+	for (unsigned i = 0; i < getNumObservedPhiSets(); i++) {
 		double acceptanceLevel = numAcceptForAphi[i] / (double)adaptationWidth;
 		traces.updateAphiAcceptanceRatioTrace(i, acceptanceLevel);
 		if (acceptanceLevel < 0.2)
@@ -1122,8 +1219,13 @@ void ROCParameter::adaptAphiProposalWidth(unsigned adaptationWidth)
 
 void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
 {
-	std::cout << "Acceptance Ratio for Codon Specific Parameter\n";
-	std::cout << "AA\tAcc.Rat\tProp.Width\n";
+#ifndef STANDALONE
+	Rprintf("Acceptance rate for Codon Specific Parameter\n");
+	Rprintf("AA\tAcc.Rat\tProp.Width\n");
+#else
+	std::cout << "Acceptance rate for Codon Specific Parameter\n";
+	std::cout << "AA\tacc.rat\tProp.Width\n";
+#endif
 	for (unsigned i = 0; i < groupList.size(); i++)
 	{
 		std::string aa = groupList[i];
@@ -1131,7 +1233,11 @@ void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 		double acceptanceLevel = (double) numAcceptForMutationAndSelection[aaIndex] / (double) adaptationWidth;
 		traces.updateCspAcceptanceRatioTrace(aaIndex, acceptanceLevel);
 		std::array <unsigned, 2> codonRange = SequenceSummary::AAIndexToCodonRange(aaIndex, true);
+#ifndef STANDALONE
+		Rprintf("\t%s:\t%f\t%f\n", aa.c_str(), acceptanceLevel, std_csp[codonRange[0]]);
+#else
 		std::cout << "\t" << aa << ":\t" << acceptanceLevel << "\t" << std_csp[codonRange[0]] << "\n";
+#endif
 		for (unsigned k = codonRange[0]; k < codonRange[1]; k++)
 		{
 			if (acceptanceLevel < 0.2)
@@ -1149,7 +1255,11 @@ void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 		}
 		numAcceptForMutationAndSelection[aaIndex] = 0u;
 	}
+#ifndef STANDALONE
+	Rprintf("\n");
+#else
 	std::cout << "\n";
+#endif
 }
 
 
@@ -1161,7 +1271,7 @@ void ROCParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 // -------------------------------------//
 
 
-void ROCParameter::setNumPhiGroupings(unsigned _phiGroupings)
+void ROCParameter::setNumObservedPhiSets(unsigned _phiGroupings)
 {
 	phiGroupings = _phiGroupings;
 	Aphi.resize(phiGroupings, 0.0);
@@ -1186,8 +1296,12 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
 	}
 	else
 	{
-		std::cerr << "Warning in ROCParameter::getParameterForCategory: Unkown parameter type: " << paramType << "\n";
+#ifndef STANDALONE
+		Rf_warning("Warning in ROCParameter::getParameterForCategory: Unknown parameter type: %d\n\tReturning mutation parameter! \n", paramType);
+#else
+		std::cerr << "Warning in ROCParameter::getParameterForCategory: Unknown parameter type: " << paramType << "\n";
 		std::cerr << "\tReturning mutation parameter! \n";
+#endif
 		tempSet = (proposal ? &proposedMutationParameter[category] : &currentMutationParameter[category]);
 	}
 
@@ -1520,29 +1634,6 @@ SEXP ROCParameter::calculateSelectionCoefficientsR(unsigned sample, unsigned mix
 }
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
