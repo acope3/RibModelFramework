@@ -1,11 +1,19 @@
 #include "include/base/Trace.h"
 #include "include/SequenceSummary.h"
+
+
 #ifndef STANDALONE
 #include <Rcpp.h>
 using namespace Rcpp;
 #endif
 
 
+
+//--------------------------------------------------//
+//----------- Constructors & Destructors -----------//
+//--------------------------------------------------//
+ 
+ 
 Trace::Trace()
 {
 	categories = nullptr;
@@ -19,7 +27,10 @@ Trace::~Trace()
 
 
 
+
+//-----------------------------------------------------//
 //----------Private Initialization Functions ----------//
+//-----------------------------------------------------//
 
 
 void Trace::initializeSharedTraces(unsigned samples, unsigned num_genes, unsigned numSelectionCategories, unsigned numMixtures,
@@ -132,7 +143,12 @@ void Trace::initCodonSpecificParameterTrace(unsigned samples, unsigned numCatego
 
 
 
-//ROC
+
+
+//----------------------------------//
+//---------- ROC Specific ----------//
+//----------------------------------//
+
 void Trace::initSynthesisOffsetTrace(unsigned samples, unsigned numPhiGroupings)
 {
 	synthesisOffsetTrace.resize(numPhiGroupings);
@@ -151,6 +167,16 @@ void Trace::initObservedSynthesisNoiseTrace(unsigned samples, unsigned numPhiGro
 		observedSynthesisNoiseTrace[i].resize(samples);
 	}
 }
+
+
+
+
+
+
+//----------------------------------------------------//
+//---------- Model Initialization Functions ----------//
+//----------------------------------------------------//
+
 
 void Trace::initializeRFPTrace(unsigned samples, unsigned num_genes, unsigned numAlphaCategories,
 	unsigned numLambdaPrimeCategories, unsigned numParam, unsigned numMixtures, 
@@ -195,9 +221,9 @@ void Trace::initializePANSETrace(unsigned samples, unsigned num_genes, unsigned 
 	initCodonSpecificParameterTrace(samples, numLambdaPrimeCategories, numParam, 1u);
 }
 
-
-/* ----------------- Getter functions --------------- */
-
+//--------------------------------------//
+// --------- Getter Functions --------- //
+//--------------------------------------//
 std::vector<double> Trace::getStdDevSynthesisRateTrace(unsigned selectionCategory) 
 { 
 	return stdDevSynthesisRateTrace[selectionCategory]; 
@@ -306,6 +332,11 @@ unsigned Trace::getSynthesisRateCategory(unsigned mixtureElement)
 	return categories->at(mixtureElement).delEta;
 }
 
+
+//----------------------------------//
+//---------- ROC Specific ----------//
+//----------------------------------//
+
 std::vector<double> Trace::getCodonSpecificParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon, unsigned paramType)
 {
 	std::vector <double> rv;
@@ -386,7 +417,9 @@ unsigned Trace::getCodonSpecificCategory(unsigned mixtureElement, unsigned param
 	return rv;
 }
 
-/* ------------- Update Functions ------------ */
+//--------------------------------------//
+//---------- Update Functions ----------//
+//--------------------------------------//
 
 void Trace::updateStdDevSynthesisRateTrace(unsigned sample, double Sphi, unsigned synthesisRateCategory)
 {
@@ -435,6 +468,10 @@ void Trace::updateMixtureProbabilitiesTrace(unsigned samples, std::vector<double
 	}
 }
 
+
+//----------------------------------//
+//---------- ROC Specific ----------//
+//----------------------------------//
 void Trace::updateCodonSpecificParameterTrace(unsigned sample, std::string aa, std::vector<std::vector<double>> &curParam, unsigned paramType)
 {
 	switch (paramType) {
@@ -482,9 +519,15 @@ void Trace::updateObservedSynthesisNoiseTrace(unsigned index, unsigned sample, d
 	observedSynthesisNoiseTrace[index][sample] = value;
 }
 
-// R WRAPPER FUNCTIONS
+// -----------------------------------------------------------------------------------------------------//
+// ---------------------------------------- R SECTION --------------------------------------------------//
+// -----------------------------------------------------------------------------------------------------//
 
-//Getter functions
+#ifndef STANDALONE
+
+//--------------------------------------//
+//---------- Getter Functions ----------//
+//--------------------------------------//
 std::vector<double> Trace::getSynthesisRateAcceptanceRatioTraceByMixtureElementForGeneR(unsigned mixtureElement, unsigned geneIndex)
 {
 	std::vector<double> RV;
@@ -558,8 +601,9 @@ unsigned Trace::getNumberOfMixtures()
 	return mixtureProbabilitiesTrace.size();
 }
 
-
-//Only use R:
+//--------------------------------------//
+//---------- Setter Functions ----------//
+//--------------------------------------//
 void Trace::setStdDevSynthesisRateTraces(std::vector<std::vector<double>> _sPhiTrace)
 {
 	stdDevSynthesisRateTrace = _sPhiTrace;
@@ -607,7 +651,9 @@ void Trace::setCategories(std::vector<mixtureDefinition> &_categories)
 	categories = &_categories;
 }
 
-
+//----------------------------------//
+//---------- ROC Specific ----------//
+//----------------------------------//
 std::vector<double> Trace::getCodonSpecificParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon, unsigned paramType)
 {
 	std::vector<double> RV;
@@ -675,13 +721,9 @@ bool Trace::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound)
 	}
 	else
 	{
-#ifndef STANDALONE
-		Rf_error("Index: %d is out of bounds. Index must be between %d & %d\n", index, lowerbound, upperbound);
-#else
-		std::cerr << "Error with the index\nGIVEN: " << index << "\n";
-		std::cerr << "MUST BE BETWEEN:	" << lowerbound << " & " << upperbound << "\n";
-#endif
+                Rf_error("Index: %d is out of bounds. Index must be between %d & %d\n", index, lowerbound, upperbound);
 	}
 
 	return check;
 }
+#endif

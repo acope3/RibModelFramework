@@ -60,6 +60,7 @@ Parameter::Parameter(unsigned _maxGrouping)
 	numMixtures = 0u;
 	std_sphi = 0.1;
 	maxGrouping = _maxGrouping;
+        numAcceptForCodonSpecificParameters.resize(maxGrouping, 0u);
 }
 
 
