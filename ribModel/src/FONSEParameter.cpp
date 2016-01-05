@@ -503,13 +503,6 @@ void FONSEParameter::updateCodonSpecificParameter(std::string grouping)
 // ---------- Other Functions ----------//
 // -------------------------------------//
 
-
-void FONSEParameter::setNumObservedPhiSets(unsigned _phiGroupings)
-{
-    phiGroupings = _phiGroupings;
-}
-
-
 void FONSEParameter::getParameterForCategory(unsigned category, unsigned paramType, std::string aa, bool proposal,
                                              double *returnSet)
 {

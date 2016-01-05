@@ -356,7 +356,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 					else //gene is found
 					{
 						unsigned count = 0;
-						std::string val ="";
+						std::string val = "";
 						bool notDone = true;
 						while (notDone)
 						{

@@ -78,7 +78,6 @@ class FONSEParameter : public Parameter
 		void updateCodonSpecificParameter(std::string grouping);
 
 		//Other functions:
-		virtual void setNumObservedPhiSets(unsigned _phiGroupings);
 		void getParameterForCategory(unsigned category, unsigned paramType, std::string aa, bool proposal, double *returnSet);
 		void proposeHyperParameters();
 

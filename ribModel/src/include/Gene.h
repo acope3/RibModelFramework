@@ -18,7 +18,6 @@ class Gene
 		std::string id;
 		std::string description;
 
-
 		void cleanSeq(); // clean the sequence, remove non "AGCT" characters
 
 	public:
@@ -47,6 +46,8 @@ class Gene
 		SequenceSummary& getSequenceSummary();
 		std::vector<double> getObservedPhiValues();
 		void setObservedPhiValues(std::vector <double> values); //FOR TEST THAT ONLY!
+		double getObservedSynthesisRate(unsigned index);
+		unsigned getNumObservedSynthesisSets();
 		char getNucleotideAt(unsigned i);
 
 

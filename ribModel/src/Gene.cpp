@@ -161,6 +161,15 @@ void Gene::setObservedPhiValues(std::vector <double> values)
     observedPhiValues = values;
 }
 
+double Gene::getObservedSynthesisRate(unsigned index)
+{
+	return observedPhiValues[index];
+}
+
+unsigned Gene::getNumObservedSynthesisSets()
+{
+	return observedPhiValues.size();
+}
 
 char Gene::getNucleotideAt(unsigned i)
 {

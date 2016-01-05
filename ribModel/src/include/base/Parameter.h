@@ -149,7 +149,7 @@ class Parameter {
 		unsigned getNumObservedPhiSets();
 		void setMixtureAssignment(unsigned gene, unsigned value);
 		unsigned getMixtureAssignment(unsigned gene);
-		void setNumObservedPhiSets(unsigned _phiGroupings);
+		virtual void setNumObservedPhiSets(unsigned _phiGroupings);
 		virtual std::vector <std::vector <double> > calculateSelectionCoefficients(unsigned sample, unsigned mixture);
 
 		
@@ -262,7 +262,7 @@ class Parameter {
 
 		unsigned int numParam;
 		unsigned numMixtures;
-		unsigned phiGroupings;
+		unsigned obsPhiSets;
 
 		double bias_phi;
 		std::vector<std::vector<double>> std_phi;

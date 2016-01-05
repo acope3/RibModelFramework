@@ -60,12 +60,13 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 	// TODO: make this work for more than one phi value, or for genes that don't have phi values
 	if (withPhi) {
 		for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++) {
-			if (gene.observedPhiValues.at(i) != -1) {
-				//logPhiProbability += Parameter::densityLogNorm(gene.observedPhiValues.at(i) + getAphi(i), std::log(phiValue), getSepsilon(i), true);
-				//logPhiProbability_proposed += Parameter::densityLogNorm(gene.observedPhiValues.at(i) + getAphi(i), std::log(phiValue_proposed), getSepsilon(i), true);
+			double obsPhi = gene.getObservedSynthesisRate(i);
+			if (obsPhi > -1.0) {
+				//logPhiProbability += Parameter::densityLogNorm(obsPhi + getAphi(i), std::log(phiValue), getSepsilon(i), true);
+				//logPhiProbability_proposed += Parameter::densityLogNorm(obsPhi + getAphi(i), std::log(phiValue_proposed), getSepsilon(i), true);
 
-				logPhiProbability += Parameter::densityNorm(std::log(gene.observedPhiValues.at(i)), std::log(phiValue) + getAphi(i), getSepsilon(i), true);
-				logPhiProbability_proposed += Parameter::densityNorm(std::log(gene.observedPhiValues.at(i)), std::log(phiValue_proposed) + getAphi(i), getSepsilon(i), true);
+				logPhiProbability += Parameter::densityLogNorm(obsPhi, std::log(phiValue) + getAphi(i), getSepsilon(i), true);
+				logPhiProbability_proposed += Parameter::densityLogNorm(obsPhi, std::log(phiValue_proposed) + getAphi(i), getSepsilon(i), true);
 
 			}
 		}
@@ -447,7 +448,6 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 			lpr = 0.0;
 			double Aphi = getAphi(i, false);
 			double Aphi_proposed = getAphi(i, true);
-			//double AphiPropWidth = getCurrentAphiProposalWidth(i);
 			double Sepsilon = getSepsilon(i);
 #ifndef __APPLE__
 //#pragma omp parallel for reduction(+:lpr)
@@ -456,8 +456,9 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 				unsigned mixtureAssignment = getMixtureAssignment(j);
 				mixtureAssignment = getSynthesisRateCategory(mixtureAssignment);
 				double logphi = std::log(getSynthesisRate(j, mixtureAssignment, false));
-				if (genome.getGene(j).observedPhiValues.at(i) != -1) {
-					double logobsPhi = std::log(genome.getGene(j).observedPhiValues.at(i));
+				double obsPhi = genome.getGene(j).getObservedSynthesisRate(i);
+				if (obsPhi > -1.0) {
+					double logobsPhi = std::log(obsPhi);
 					double proposed = Parameter::densityNorm(logobsPhi, logphi + Aphi_proposed, Sepsilon, true);
 					double current = Parameter::densityNorm(logobsPhi, logphi + Aphi, Sepsilon, true);
 					lpr += proposed - current;
@@ -479,8 +480,9 @@ void ROCModel::updateGibbsSampledHyperParameters(Genome &genome)
 			double aphi = getAphi(i);
 			for (unsigned j = 0; j < genome.getGenomeSize(); j++) {
 				mixtureAssignment = getMixtureAssignment(i);
-				if (genome.getGene(i).observedPhiValues.at(i) != -1) {
-					double sum = std::log(genome.getGene(i).observedPhiValues.at(i)) - aphi - std::log(getSynthesisRate(j, mixtureAssignment, false));
+				double obsPhi = genome.getGene(j).getObservedSynthesisRate(i);
+				if (obsPhi > -1.0) {
+					double sum = std::log(obsPhi) - aphi - std::log(getSynthesisRate(j, mixtureAssignment, false));
 					rate += sum * sum;
 				}
 			}

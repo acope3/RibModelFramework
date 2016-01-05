@@ -117,7 +117,7 @@ class ROCParameter : public Parameter
 		void adaptAphiProposalWidth(unsigned adaptationWidth);
 
 		//Other Functions:
-		virtual void setNumObservedPhiSets(unsigned _phiGroupings);
+		void setNumObservedPhiSets(unsigned _phiGroupings);
 		void getParameterForCategory(unsigned category, unsigned parameter, std::string aa, bool proposal, double *returnValue);
 
 

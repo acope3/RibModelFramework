@@ -418,7 +418,7 @@ void ROCParameter::initFromRestartFile(std::string filename)
 void ROCParameter::initAllTraces(unsigned samples, unsigned num_genes)
 {
 	traces.initializeROCTrace(samples, num_genes, numMutationCategories, numSelectionCategories, numParam,
-						 numMixtures, categories, maxGrouping, phiGroupings);
+						 numMixtures, categories, maxGrouping, obsPhiSets);
 }
 
 
@@ -800,12 +800,12 @@ void ROCParameter::adaptAphiProposalWidth(unsigned adaptationWidth)
 
 void ROCParameter::setNumObservedPhiSets(unsigned _phiGroupings)
 {
-	phiGroupings = _phiGroupings;
-	Aphi.resize(phiGroupings, 0.0);
-	Aphi_proposed.resize(phiGroupings, 0.0);
-	std_Aphi.resize(phiGroupings, 0.1);
-	numAcceptForAphi.resize(phiGroupings, 0);
-	Sepsilon.resize(phiGroupings, 0.0);
+	obsPhiSets = _phiGroupings;
+	Aphi.resize(obsPhiSets, 0.0);
+	Aphi_proposed.resize(obsPhiSets, 0.0);
+	std_Aphi.resize(obsPhiSets, 0.1);
+	numAcceptForAphi.resize(obsPhiSets, 0);
+	Sepsilon.resize(obsPhiSets, 0.0);
 }
 
 

@@ -31,7 +31,7 @@ Parameter::Parameter()
 {
 	lastIteration = 0u;
 	numParam = 0u;
-	phiGroupings = 0u;
+	obsPhiSets = 0u;
 	Sphi.resize(1);
 	Sphi_proposed.resize(1);
 	numAcceptForSphi = 0u;
@@ -49,7 +49,7 @@ Parameter::Parameter(unsigned _maxGrouping)
 {
 	lastIteration = 0u;
 	numParam = 0u;
-	phiGroupings = 0u;
+	obsPhiSets = 0u;
 	Sphi.resize(1);
 	Sphi_proposed.resize(1);
 	numAcceptForSphi = 0u;
@@ -77,7 +77,7 @@ Parameter& Parameter::operator=(const Parameter& rhs)
 	}
 
 	numAcceptForSphi = rhs.numAcceptForSphi;
-	phiGroupings = rhs.phiGroupings;
+	obsPhiSets = rhs.obsPhiSets;
 	categories = rhs.categories;
 
   	// proposal bias and std for phi values
@@ -362,7 +362,7 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 		numAcceptForSphi = 0u;
 		bias_sphi = 0;
 		bias_phi = 0;
-		phiGroupings = 0;
+		obsPhiSets = 0;
 
 		numAcceptForSynthesisRate.resize(numSelectionCategories);
 		proposedSynthesisRateLevel.resize(numSelectionCategories);
@@ -973,12 +973,13 @@ unsigned Parameter::getNumMixtureElements()
 
 unsigned Parameter::getNumObservedPhiSets() 
 { 
-	return phiGroupings;
+	return obsPhiSets;
 }
+
 
 void Parameter::setNumObservedPhiSets(unsigned _phiGroupings)
 {
-	phiGroupings = _phiGroupings;
+	obsPhiSets = _phiGroupings;
 }
 
 
