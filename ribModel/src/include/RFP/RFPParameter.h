@@ -101,14 +101,6 @@ class RFPParameter: public Parameter {
 		void initLambdaPrimeR(double lambdaPrimeValue, unsigned mixtureElement, std::string codon);
 		void initMutationSelectionCategoriesR(std::vector<std::string> files, unsigned numCategories, std::string paramType);
 
-
-
-		//Trace Functions:
-		void setTraceObject(RFPTrace _trace);
-		void setCategoriesForTrace();
-
-
-
 		//CSP Functions:
 		std::vector<std::vector<double>> getProposedAlphaParameter();
 		std::vector<std::vector<double>> getProposedLambdaPrimeParameter();

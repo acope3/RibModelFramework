@@ -1941,6 +1941,29 @@ std::vector<double> Parameter::getCurrentSynthesisRateForMixture(unsigned mixtur
 // ---------- Posterior, Variance, and Estimates Functions ----------//
 // ------------------------------------------------------------------//
 
+double Parameter::getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon, unsigned paramType)
+{
+	double rv = -1.0;
+	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	if (check)
+	{
+		rv = getCodonSpecificPosteriorMean(mixtureElement - 1, samples, codon, paramType);
+	}
+	return rv;
+}
+
+
+double Parameter::getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, unsigned paramType, bool unbiased)
+{
+	double rv = -1.0;
+	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	if (check)
+	{
+		rv = getMutationVariance(mixtureElement - 1, samples, codon, paramType, unbiased);
+	}
+	return rv;
+}
+
 
 double Parameter::getSynthesisRatePosteriorMeanByMixtureElementForGene(unsigned samples, unsigned geneIndex, unsigned mixtureElement)
 {

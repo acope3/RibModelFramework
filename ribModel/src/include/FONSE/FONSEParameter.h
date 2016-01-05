@@ -107,25 +107,9 @@ class FONSEParameter : public Parameter
 						std::string paramType);
 
 
-
-		//Trace Functions:
-		void setTraceObject(FONSETrace _trace);
-		void setCategoriesForTrace();
-
-
-
 		//CSP Functions:
 		std::vector< std::vector <double> > getCurrentMutationParameter();
 		std::vector< std::vector <double> > getCurrentSelectionParameter();
-
-
-
-		//Posterior, Variance, and Estimates Functions:
-		double getMutationPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon);
-		double getSelectionPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon);
-		double getMutationVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased);
-		double getSelectionVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased);
-
 
 
 		//Other Functions:

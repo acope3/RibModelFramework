@@ -667,30 +667,6 @@ void RFPParameter::initMutationSelectionCategoriesR(std::vector<std::string> fil
 	}
 }
 
-
-
-
-
-// --------------------------------------//
-// ---------- Trace Functions -----------//
-// --------------------------------------//
-
-
-void RFPParameter::setTraceObject(RFPTrace _trace)
-{
-	traces = _trace;
-}
-
-
-void RFPParameter::setCategoriesForTrace()
-{
-	traces.setCategories(categories);
-}
-
-
-
-
-
 // -----------------------------------//
 // ---------- CSP Functions ----------//
 // -----------------------------------//

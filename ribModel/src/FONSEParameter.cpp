@@ -664,25 +664,6 @@ void FONSEParameter::initSelection(std::vector<double> selectionValues, unsigned
     }
 }
 
-// --------------------------------------//
-// ---------- Trace Functions -----------//
-// --------------------------------------//
-
-
-void FONSEParameter::setTraceObject(FONSETrace _trace)
-{
-    traces = _trace;
-}
-
-
-void FONSEParameter::setCategoriesForTrace()
-{
-    traces.setCategories(categories);
-}
-
-
-
-
 
 // -----------------------------------//
 // ---------- CSP Functions ----------//
@@ -699,63 +680,6 @@ std::vector< std::vector <double> > FONSEParameter::getCurrentSelectionParameter
 {
     return currentSelectionParameter;
 }
-
-
-
-
-
-// ------------------------------------------------------------------//
-// ---------- Posterior, Variance, and Estimates Functions ----------//
-// ------------------------------------------------------------------//
-
-
-double FONSEParameter::getMutationPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
-{
-    double rv = -1.0;
-    bool check = checkIndex(mixtureElement, 1, numMixtures);
-    if (check)
-    {
-        rv = getMutationPosteriorMean(mixtureElement - 1, samples, codon);
-    }
-    return rv;
-}
-
-
-double FONSEParameter::getSelectionPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
-{
-    double rv = -1.0;
-    bool check = checkIndex(mixtureElement, 1, numMixtures);
-    if (check)
-    {
-        rv = getSelectionPosteriorMean(mixtureElement - 1, samples, codon);
-    }
-    return rv;
-}
-
-
-double FONSEParameter::getMutationVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased)
-{
-    double rv = -1.0;
-    bool check = checkIndex(mixtureElement, 1, numMixtures);
-    if (check)
-    {
-        rv = getMutationVariance(mixtureElement - 1, samples, codon, unbiased);
-    }
-    return rv;
-}
-
-
-double FONSEParameter::getSelectionVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased)
-{
-    double rv = -1.0;
-    bool check = checkIndex(mixtureElement, 1, numMixtures);
-    if (check)
-    {
-        rv = getSelectionVariance(mixtureElement - 1, samples, codon, unbiased);
-    }
-    return rv;
-}
-
 
 
 

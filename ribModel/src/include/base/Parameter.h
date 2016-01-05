@@ -213,13 +213,12 @@ class Parameter {
 		//Posterior, Variance, and Estimates Functions:
 		double getSynthesisRatePosteriorMeanByMixtureElementForGene(unsigned samples, unsigned geneIndex,
 																	unsigned mixtureElement);
-
 		double getSynthesisRateVarianceByMixtureElementForGene(unsigned samples, unsigned geneIndex,
 														   unsigned mixtureElement, bool unbiased);
-
 		unsigned getEstimatedMixtureAssignmentForGene(unsigned samples, unsigned geneIndex);
 		std::vector<double> getEstimatedMixtureAssignmentProbabilitiesForGene(unsigned samples, unsigned geneIndex);
-
+		double getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon, unsigned paramType)
+		double getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, unsigned paramType, bool unbiased)
 
 
 		//Other Functions:
