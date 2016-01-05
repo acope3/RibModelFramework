@@ -1944,6 +1944,9 @@ std::vector<double> Parameter::getCurrentSynthesisRateForMixture(unsigned mixtur
 double Parameter::getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon, unsigned paramType)
 {
 	double rv = -1.0;
+	codon[0] = (char)std::toupper(codon[0]);
+	codon[1] = (char)std::toupper(codon[1]);
+	codon[2] = (char)std::toupper(codon[2]);
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
 	if (check)
 	{
@@ -1956,6 +1959,9 @@ double Parameter::getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement,
 double Parameter::getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, unsigned paramType, bool unbiased)
 {
 	double rv = -1.0;
+	codon[0] = (char)std::toupper(codon[0]);
+	codon[1] = (char)std::toupper(codon[1]);
+	codon[2] = (char)std::toupper(codon[2]);
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
 	if (check)
 	{

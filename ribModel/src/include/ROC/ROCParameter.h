@@ -153,14 +153,6 @@ class ROCParameter : public Parameter
 		void setProposedSelectionParameter(std::vector<std::vector<double>> _proposedSelectionParameter);
 		void setCurrentSelectionParameter(std::vector<std::vector<double>> _currentSelectionParameter);
 
-
-
-		//Posterior, Variance, and Estimates Functions:
-		double getMutationPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon);
-		double getSelectionPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon);
-		double getMutationVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased);
-		double getSelectionVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased);
-
 #endif //STADNALONE
 
 	protected:

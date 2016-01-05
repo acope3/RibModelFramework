@@ -11,7 +11,10 @@ Trace::Trace()
 	// TODO: fill this
 }
 
-
+Trace::~Trace()
+{
+	//dtor
+}
 
 
 

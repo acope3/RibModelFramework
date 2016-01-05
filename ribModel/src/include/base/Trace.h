@@ -49,9 +49,11 @@ private:
 	// RFP
 
 public:
-
+	//Constructors & Destructors:
 	Trace();
-	
+	virtual ~Trace();
+
+
 	//Initialization Functions:
 	void initializeRFPTrace(unsigned samples, unsigned num_genes, unsigned numAlphaCategories,
 		unsigned numLambdaPrimeCategories, unsigned numParam, unsigned numMixtures,
