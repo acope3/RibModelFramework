@@ -11,18 +11,12 @@
 #include <Rcpp.h>
 #endif
 
-#include "ROCTrace.h"
+#include "../base/Trace.h"
 #include "../base/Parameter.h"
 
 class ROCParameter : public Parameter
 {
 	private:
-
-		ROCTrace traces;
-		std::vector<CovarianceMatrix> covarianceMatrix;
-
-		double phiEpsilon_proposed;
-		double phiEpsilon;
 
 		std::vector <double> Sepsilon;
 
@@ -35,11 +29,11 @@ class ROCParameter : public Parameter
 		std::vector<std::vector<double>> currentMutationParameter;
 		std::vector<std::vector<double>> proposedSelectionParameter;
 		std::vector<std::vector<double>> currentSelectionParameter;
-		std::vector<unsigned> numAcceptForMutationAndSelection;
+		
 
 
 		double bias_csp;
-		std::vector<double> std_csp;
+		
 		double mutation_prior_sd;
 
 
@@ -78,25 +72,13 @@ class ROCParameter : public Parameter
 
 
 		//Trace Functions:
-		ROCTrace& getTraceObject();
-		virtual void updateSphiTrace(unsigned sample);
-		virtual void updateSynthesisRateTrace(unsigned sample, unsigned geneIndex);
-		virtual void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex);
-		virtual void updateMixtureProbabilitiesTrace(unsigned samples);
 		void updateSepsilonTraces(unsigned sample);
 		void updateAphiTraces(unsigned sample);
 		void updateCodonSpecificParameterTrace(unsigned sample, std::string grouping);
 
 
-
 		//Covariance Functions:
 		CovarianceMatrix& getCovarianceMatrixForAA(std::string aa);
-
-
-
-		// Phi Epsilon Functions:
-		double getPhiEpsilon();
-
 
 
 		//Sepsilon Functions:
@@ -128,34 +110,15 @@ class ROCParameter : public Parameter
 
 
 		//Posterior, Variance, and Estimates Functions:
-		virtual double getSphiPosteriorMean(unsigned samples, unsigned mixture);
-		virtual double getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement);
 		double getAphiPosteriorMean(unsigned index, unsigned samples);
-		double getMutationPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon);
-		double getSelectionPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon);
-
-		virtual double getSphiVariance(unsigned samples, unsigned mixture, bool unbiased = true);
-		virtual double getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement, bool unbiased = true);
 		double getAphiVariance(unsigned index, unsigned samples, bool unbiased = true);
-		double getMutationVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased = true);
-		double getSelectionVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased = true);
-
-		virtual std::vector <double> getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex);
-
-
 
 		//Adaptive Width Functions:
-		virtual void adaptSphiProposalWidth(unsigned adaptationWidth);
-		virtual void adaptSynthesisRateProposalWidth(unsigned adaptationWidth);
 		void adaptAphiProposalWidth(unsigned adaptationWidth);
-		void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth);
-
-
 
 		//Other Functions:
 		virtual void setNumObservedPhiSets(unsigned _phiGroupings);
 		void getParameterForCategory(unsigned category, unsigned parameter, std::string aa, bool proposal, double *returnValue);
-		std::vector<std::vector<double>> calculateSelectionCoefficients(unsigned sample, unsigned mixture);
 
 
 
@@ -173,7 +136,7 @@ class ROCParameter : public Parameter
 
 
 		//Initialization, Restart, Index Checking:
-		void initCovarianceMatrix(SEXP matrix, std::string aa);
+		void initCovarianceMatrix(SEXP matrix, std::string aa);SepsilonTrace[
 		void initMutation(std::vector<double> mutationValues, unsigned mixtureElement, std::string aa);
 		void initSelection(std::vector<double> selectionValues, unsigned mixtureElement, std::string aa);
 

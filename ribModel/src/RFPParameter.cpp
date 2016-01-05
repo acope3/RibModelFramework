@@ -53,7 +53,6 @@ RFPParameter& RFPParameter::operator=(const RFPParameter& rhs)
 	proposedLambdaPrimeParameter = rhs.proposedLambdaPrimeParameter;
 
 	lambdaValues = rhs.lambdaValues;
-	numAcceptForAlphaAndLambdaPrime = rhs.numAcceptForAlphaAndLambdaPrime;
 
 	bias_csp = rhs.bias_csp;
 	std_csp = rhs.std_csp;
@@ -104,7 +103,6 @@ void RFPParameter::initRFPParameterSet()
 		lambdaValues[i] = tmp; //Maybe we don't initialize this one? or we do it differently?
 	}
 
-	numAcceptForAlphaAndLambdaPrime.resize(maxGrouping, 0u);
 	bias_csp = 0;
 	std_csp.resize(numParam, 0.1);
 
@@ -209,7 +207,6 @@ void RFPParameter::initRFPValuesFromFile(std::string filename)
 	input.close();
 
 	bias_csp = 0;
-	numAcceptForAlphaAndLambdaPrime.resize(maxGrouping, 0u);
 	proposedAlphaParameter.resize(numMutationCategories);
 	proposedLambdaPrimeParameter.resize(numSelectionCategories);
 	for (unsigned i = 0; i < numMutationCategories; i++)
@@ -305,7 +302,7 @@ void RFPParameter::initFromRestartFile(std::string filename)
 
 void RFPParameter::initAllTraces(unsigned samples, unsigned num_genes)
 {
-	traces.initAllTraces(samples, num_genes, numMutationCategories, numSelectionCategories, numParam,
+	traces.initializeRFPTrace(samples, num_genes, numMutationCategories, numSelectionCategories, numParam,
 						 numMixtures, categories, (unsigned)groupList.size());
 }
 
@@ -392,42 +389,11 @@ void RFPParameter::initMutationSelectionCategories(std::vector<std::string> file
 // --------------------------------------//
 
 
-RFPTrace& RFPParameter::getTraceObject()
-{
-	return traces;
-}
-
-
-void RFPParameter::updateSphiTrace(unsigned sample)
-{
-	for(unsigned i = 0u; i < numSelectionCategories; i++)
-	{
-		traces.updateSphiTrace(sample, Sphi[i], i);
-	}
-}
-
-
-void RFPParameter::updateSynthesisRateTrace(unsigned sample, unsigned geneIndex)
-{
-	traces.updateSynthesisRateTrace(sample, geneIndex, currentSynthesisRateLevel);
-}
-
-
-void RFPParameter::updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex)
-{
-	traces.updateMixtureAssignmentTrace(sample, geneIndex, mixtureAssignment[geneIndex]);
-}
-
-
-void RFPParameter::updateMixtureProbabilitiesTrace(unsigned samples)
-{
-	traces.updateMixtureProbabilitiesTrace(samples, categoryProbabilities);
-}
-
 
 void RFPParameter::updateCodonSpecificParameterTrace(unsigned sample, std::string codon)
 {
-	traces.updateCodonSpecificParameterTrace(sample, codon, currentAlphaParameter, currentLambdaPrimeParameter);
+	traces.updateCodonSpecificParameterTrace(sample, codon, currentAlphaParameter, alp);
+	traces.updateCodonSpecificParameterTrace(sample, codon, currentLambdaPrimeParameter, lmPri);
 }
 
 
@@ -471,7 +437,7 @@ void RFPParameter::proposeCodonSpecificParameter()
 void RFPParameter::updateCodonSpecificParameter(std::string grouping)
 {
 	unsigned i = SequenceSummary::codonToIndex(grouping);
-	numAcceptForAlphaAndLambdaPrime[i]++;
+	numAcceptForCodonSpecificParameters[i]++;
 
 	for(unsigned k = 0u; k < numMutationCategories; k++)
 	{
@@ -484,313 +450,9 @@ void RFPParameter::updateCodonSpecificParameter(std::string grouping)
 }
 
 
-
-
-
-// ------------------------------------------------------------------//
-// ---------- Posterior, Variance, and Estimates Functions ----------//
-// ------------------------------------------------------------------//
-
-
-//TODO: Traces prevent this from being in the parent class
-double RFPParameter::getSphiPosteriorMean(unsigned samples, unsigned mixture)
-{
-	double posteriorMean = 0.0;
-	unsigned selectionCategory = getSelectionCategory(mixture);
-	std::vector<double> sPhiTrace = traces.getSphiTrace(selectionCategory);
-	unsigned traceLength = (unsigned)sPhiTrace.size();
-
-	if(samples > traceLength)
-	{
-		std::cerr << "Warning in Parameter::getSphiPosteriorMean throws: Number of anticipated samples (" <<
-		samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
-		samples = traceLength;
-	}
-	unsigned start = traceLength - samples;
-	for(unsigned i = start; i < traceLength; i++)
-	{
-		posteriorMean += sPhiTrace[i];
-	}
-	return posteriorMean / (double)samples;
-}
-
-
-//TODO: Traces prevent this from being in the parent class
-double RFPParameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement)
-{
-	unsigned expressionCategory = getSynthesisRateCategory(mixtureElement);
-	double posteriorMean = 0.0;
-	std::vector<double> synthesisRateTrace = traces.getSynthesisRateTraceByMixtureElementForGene(mixtureElement, geneIndex);
-	unsigned traceLength = (unsigned)synthesisRateTrace.size();
-
-
-	if(samples > traceLength)
-	{
-		std::cerr << "Warning in Parameter::getSynthesisRatePosteriorMean throws: Number of anticipated samples (" <<
-		samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
-		samples = traceLength;
-	}
-	unsigned start = traceLength - samples;
-	unsigned category = 0u;
-	unsigned usedSamples = 0u;
-	std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
-	for(unsigned i = start; i < traceLength; i++)
-	{
-		category = mixtureAssignmentTrace[i];
-		category = getSynthesisRateCategory(category);
-		if(category == expressionCategory)
-		{
-			posteriorMean += synthesisRateTrace[i];
-			usedSamples++;
-		}
-	}
-	// Can return NaN if gene was never in category! But that is Ok.
-	return posteriorMean / (double)usedSamples;
-}
-
-
-double RFPParameter::getAlphaPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon)
-{
-	double posteriorMean = 0.0;
-	std::vector<double> alphaParameterTrace = traces.getAlphaParameterTraceByMixtureElementForCodon(mixtureElement, codon);
-	unsigned traceLength = (unsigned)alphaParameterTrace.size();
-
-	if(samples > traceLength)
-	{
-		std::cerr << "Warning in RFPParameter::getAlphaPosteriorMean throws: Number of anticipated samples (" <<
-		samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
-		samples = traceLength;
-	}
-	unsigned start = traceLength - samples;
-	for(unsigned i = start; i < traceLength; i++)
-	{
-		posteriorMean += alphaParameterTrace[i];
-	}
-	return posteriorMean / (double)samples;
-}
-
-
-double RFPParameter::getLambdaPrimePosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon)
-{
-	double posteriorMean = 0.0;
-	std::vector<double> lambdaPrimeParameterTrace = traces.getLambdaPrimeParameterTraceByMixtureElementForCodon(mixtureElement, codon);
-	unsigned traceLength = (unsigned)lambdaPrimeParameterTrace.size();
-
-	if(samples > traceLength)
-	{
-		std::cerr << "Warning in RFPParameter::getLambdaPrimePosteriorMean throws: Number of anticipated samples (" <<
-		samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
-		samples = traceLength;
-	}
-	unsigned start = traceLength - samples;
-	for(unsigned i = start; i < traceLength; i++)
-	{
-		posteriorMean += lambdaPrimeParameterTrace[i];
-	}
-	return posteriorMean / (double)samples;
-}
-
-
-//TODO: Traces prevent this from being in the parent class
-double RFPParameter::getSphiVariance(unsigned samples, unsigned mixture, bool unbiased)
-{
-	unsigned selectionCategory = getSelectionCategory(mixture);
-	std::vector<double> sPhiTrace = traces.getSphiTrace(selectionCategory);
-	unsigned traceLength = (unsigned)sPhiTrace.size();
-	if(samples > traceLength)
-	{
-		std::cerr << "Warning in Parameter::getSphiVariance throws: Number of anticipated samples (" <<
-		samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
-		samples = traceLength;
-	}
-	double posteriorMean = getSphiPosteriorMean(samples, mixture);
-
-	double posteriorVariance = 0.0;
-
-	unsigned start = traceLength - samples;
-	for(unsigned i = start; i < traceLength; i++)
-	{
-		double difference = sPhiTrace[i] - posteriorMean;
-		posteriorVariance += difference * difference;
-	}
-	double normalizationTerm = unbiased ? (1/((double)samples-1.0)) : (1/(double)samples);
-	return normalizationTerm * posteriorVariance;
-}
-
-
-//TODO: Traces prevent this from being in the parent class
-double RFPParameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement, bool unbiased)
-{
-	std::vector<double> synthesisRateTrace = traces.getSynthesisRateTraceByMixtureElementForGene(mixtureElement, geneIndex);
-	unsigned traceLength = (unsigned)synthesisRateTrace.size();
-	if(samples > traceLength)
-	{
-		std::cerr << "Warning in Parameter::getSynthesisRateVariance throws: Number of anticipated samples (" <<
-		samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
-		samples = traceLength;
-	}
-
-	double posteriorMean = getSynthesisRatePosteriorMean(samples, geneIndex, mixtureElement);
-
-	double posteriorVariance = 0.0;
-	if(!std::isnan(posteriorMean))
-	{
-		unsigned start = traceLength - samples;
-		unsigned category = 0u;
-		double difference = 0.0;
-		std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
-		for(unsigned i = start; i < traceLength; i++)
-		{
-			category = mixtureAssignmentTrace[i];
-			category = getSynthesisRateCategory(category);
-			difference = synthesisRateTrace[i] - posteriorMean;
-			posteriorVariance += difference * difference;
-		}
-	}
-	double normalizationTerm = unbiased ? (1/((double)samples-1.0)) : (1/(double)samples);
-	return normalizationTerm * posteriorVariance;
-}
-
-
-double RFPParameter::getAlphaVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased)
-{
-	std::vector<double> alphaParameterTrace = traces.getAlphaParameterTraceByMixtureElementForCodon(mixtureElement, codon);
-	unsigned traceLength = (unsigned)alphaParameterTrace.size();
-	if(samples > traceLength)
-	{
-		std::cerr << "Warning in RFPParameter::getAlphaVariance throws: Number of anticipated samples (" <<
-		samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
-		samples = traceLength;
-	}
-
-	double posteriorMean = getAlphaPosteriorMean(mixtureElement, samples, codon);
-
-	double posteriorVariance = 0.0;
-
-	unsigned start = traceLength - samples;
-	double difference = 0.0;
-	for(unsigned i = start; i < traceLength; i++)
-	{
-		difference = alphaParameterTrace[i] - posteriorMean;
-		posteriorVariance += difference * difference;
-	}
-	double normalizationTerm = unbiased ? (1/((double)samples-1.0)) : (1/(double)samples);
-	return normalizationTerm * posteriorVariance;
-}
-
-
-double RFPParameter::getLambdaPrimeVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased)
-{
-	std::vector<double> lambdaPrimeParameterTrace = traces.getLambdaPrimeParameterTraceByMixtureElementForCodon(mixtureElement, codon);
-	unsigned traceLength = (unsigned)lambdaPrimeParameterTrace.size();
-	if(samples > traceLength)
-	{
-		std::cerr << "Warning in RFPParameter::getSelectionVariance throws: Number of anticipated samples (" <<
-		samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
-		samples = traceLength;
-	}
-
-	double posteriorMean = getLambdaPrimePosteriorMean(mixtureElement, samples, codon);
-
-	double posteriorVariance = 0.0;
-
-	unsigned start = traceLength - samples;
-	double difference = 0.0;
-	for(unsigned i = start; i < traceLength; i++)
-	{
-		difference = lambdaPrimeParameterTrace[i] - posteriorMean;
-		posteriorVariance += difference * difference;
-	}
-	double normalizationTerm = unbiased ? (1/((double)samples-1.0)) : (1/(double)samples);
-	return normalizationTerm * posteriorVariance;
-}
-
-
-//TODO: Use of Trace prevents this from being in the base class
-std::vector <double> RFPParameter::getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex)
-{
-	std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
-	std::vector<double> probabilities(numMixtures, 0.0);
-	unsigned traceLength = (unsigned)mixtureAssignmentTrace.size();
-
-	if (samples > traceLength)
-	{
-		std::cerr << "Warning in RFPParameter::getMixtureAssignmentPosteriorMean throws: Number of anticipated samples (" <<
-		samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
-		samples = traceLength;
-	}
-
-	unsigned start = traceLength - samples;
-	for (unsigned i = start; i < traceLength; i++)
-	{
-		unsigned value = mixtureAssignmentTrace[i];
-		probabilities[value]++;
-	}
-
-	for (unsigned i = 0; i < numMixtures; i++)
-	{
-		probabilities[i] /= (double)samples;
-	}
-	return probabilities;
-}
-
-
-
-
-
 // ----------------------------------------------//
 // ---------- Adaptive Width Functions ----------//
 // ----------------------------------------------//
-
-
-//TODO: The only thing stopping this from moving up to Parameter is the trace stuff. Is there a way around this?
-void RFPParameter::adaptSphiProposalWidth(unsigned adaptationWidth)
-{
-	double acceptanceLevel = (double)numAcceptForSphi / (double)adaptationWidth;
-	traces.updateSphiAcceptanceRatioTrace(acceptanceLevel);
-	if(acceptanceLevel < 0.2)
-	{
-		std_sphi *= 0.8;
-	}
-	if(acceptanceLevel > 0.3)
-	{
-		std_sphi *= 1.2;
-	}
-	numAcceptForSphi = 0u;
-}
-
-
-//TODO: The only thing stopping this from moving up to Parameter is the trace stuff. Is there a way around this?
-void RFPParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
-{
-	unsigned acceptanceUnder = 0u;
-	unsigned acceptanceOver = 0u;
-
-	for(unsigned cat = 0u; cat < numSelectionCategories; cat ++)
-	{
-		unsigned numGenes = numAcceptForSynthesisRate[cat].size();
-		for(unsigned i = 0; i < numGenes; i++)
-		{
-			double acceptanceLevel = (double)numAcceptForSynthesisRate[cat][i] / (double)adaptationWidth;
-			traces.updateSynthesisRateAcceptanceRatioTrace(cat, i, acceptanceLevel);
-			if (acceptanceLevel < 0.225)
-			{
-				std_phi[cat][i] *= 0.8;
-				if (acceptanceLevel < 0.2) acceptanceUnder++;
-			}
-			if (acceptanceLevel > 0.275)
-			{
-				std_phi[cat][i] *= 1.2;
-				if (acceptanceLevel > 0.3) acceptanceOver++;
-			}
-			numAcceptForSynthesisRate[cat][i] = 0u;
-		}
-	}
-	std::cout << "acceptance rate for synthesis rate:\n";
-	std::cout << "\t acceptance rate to low: " << acceptanceUnder << "\n";
-	std::cout << "\t acceptance rate to high: " << acceptanceOver << "\n";
-}
-
 
 void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
 {
@@ -801,9 +463,9 @@ void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 		std::cout << groupList[i] << "\t";
 
 		unsigned codonIndex = SequenceSummary::codonToIndex(groupList[i]);
-		double acceptanceLevel = (double)numAcceptForAlphaAndLambdaPrime[codonIndex] / (double)adaptationWidth;
+		double acceptanceLevel = (double)numAcceptForCodonSpecificParameters[codonIndex] / (double)adaptationWidth;
 		std::cout << acceptanceLevel << " with std_csp = " << std_csp[i] <<"\n";
-		traces.updateCspAcceptanceRatioTrace(codonIndex, acceptanceLevel);
+		traces.updateCodonSpecificAcceptanceRatioTrace(codonIndex, acceptanceLevel);
 		if (acceptanceLevel < 0.2)
 		{
 			std_csp[i] *= 0.8;
@@ -812,25 +474,16 @@ void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 		{
 			std_csp[i] *= 1.2;
 		}
-		numAcceptForAlphaAndLambdaPrime[codonIndex] = 0u;
+		numAcceptForCodonSpecificParameters[codonIndex] = 0u;
 	}
 	std::cout << "\n";
 }
 
 
 
-
-
 // -------------------------------------//
 // ---------- Other Functions ----------//
 // -------------------------------------//
-
-
-void RFPParameter::setNumObservedPhiSets(unsigned _phiGroupings)
-{
-	phiGroupings = _phiGroupings;
-}
-
 
 double RFPParameter::getParameterForCategory(unsigned category, unsigned paramType, std::string codon, bool proposal)
 {

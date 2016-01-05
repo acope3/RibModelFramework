@@ -105,6 +105,9 @@ Parameter& Parameter::operator=(const Parameter& rhs)
 	groupList = rhs.groupList;
 	mixtureAssignment = rhs.mixtureAssignment;
 	categoryProbabilities = rhs.categoryProbabilities;
+	traces = rhs.traces;
+	numAcceptForCodonSpecificParameters = rhs.numAcceptForCodonSpecificParameters;
+	std_csp = rhs.std_csp;
 	return *this;
 }
 
@@ -156,7 +159,8 @@ void Parameter::initParameterSet(std::vector<double> sphi, unsigned _numMixtures
 	std_sphi = 0.1;
 
 	numAcceptForSphi = 0u;
-
+	std_csp.resize(numParam, 0.1);
+	numAcceptForCodonSpecificParameters.resize(maxGrouping, 0u);
 	// proposal bias and std for phi values
 	bias_phi = 0;
 
@@ -945,28 +949,6 @@ void Parameter::setLastIteration(unsigned iteration)
 
 
 
-// ------------------------------------------------------------------//
-// ---------- Posterior, Variance, and Estimates Functions ----------//
-// ------------------------------------------------------------------//
-
-
-unsigned Parameter::getEstimatedMixtureAssignment(unsigned samples, unsigned geneIndex)
-{
-	unsigned rv = 0u;
-	double value = -1.0;
-	std::vector <double> probabilities;
-	probabilities = getEstimatedMixtureAssignmentProbabilities(samples, geneIndex);
-
-	for (unsigned i = 0; i < probabilities.size(); i++)
-	{
-		if (value < probabilities[i])
-		{
-			value = probabilities[i];
-			rv = i;
-		}
-	}
-	return rv;
-}
 
 
 
@@ -994,6 +976,11 @@ unsigned Parameter::getNumObservedPhiSets()
 	return phiGroupings;
 }
 
+void Parameter::setNumObservedPhiSets(unsigned _phiGroupings)
+{
+	phiGroupings = _phiGroupings;
+}
+
 
 void Parameter::setMixtureAssignment(unsigned gene, unsigned value)
 {
@@ -1006,9 +993,433 @@ unsigned Parameter::getMixtureAssignment(unsigned gene)
 	return mixtureAssignment[gene];
 }
 
+std::vector <std::vector <double> > Parameter::calculateSelectionCoefficients(unsigned sample, unsigned mixture)
+{
+	unsigned numGenes = mixtureAssignment.size();
+	std::vector<std::vector<double>> selectionCoefficients;
+	selectionCoefficients.resize(numGenes);
+	for (unsigned i = 0; i < numGenes; i++)
+	{
+		for (unsigned j = 0; j < getGroupListSize(); j++)
+		{
+
+			std::string aa = getGrouping(j);
+			std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(aa, true);
+			std::vector<double> tmp;
+			double minValue = 0.0;
+			for (unsigned k = aaRange[0]; k < aaRange[1]; k++)
+			{
+				std::string codon = SequenceSummary::codonArrayParameter[k];
+				tmp.push_back(getCodonSpecificPosteriorMean(sample, mixture, codon, 1));
+				if (tmp[k] < minValue)
+				{
+					minValue = tmp[k];
+				}
+			}
+			tmp.push_back(0.0);
+			double phi = getSynthesisRatePosteriorMean(sample, i, mixture);
+			for (unsigned k = 0; k < tmp.size(); k++)
+			{
+				tmp[k] -= minValue;
+				selectionCoefficients[i].push_back(phi * tmp[k]);
+			}
+		}
+	}
+	return selectionCoefficients;
+}
+
+// --------------------------------------//
+// ---------- Trace Functions -----------//
+// --------------------------------------//
 
 
+Trace& Parameter::getTraceObject()
+{
+	return traces;
+}
 
+
+void Parameter::updateStdDevSynthesisRateTrace(unsigned sample)
+{
+	for (unsigned i = 0u; i < numSelectionCategories; i++)
+	{
+		traces.updateStdDevSynthesisRateTrace(sample, Sphi[i], i);
+	}
+}
+
+
+void Parameter::updateSynthesisRateTrace(unsigned sample, unsigned geneIndex)
+{
+	traces.updateSynthesisRateTrace(sample, geneIndex, currentSynthesisRateLevel);
+}
+
+
+void Parameter::updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex)
+{
+	traces.updateMixtureAssignmentTrace(sample, geneIndex, mixtureAssignment[geneIndex]);
+}
+
+
+void Parameter::updateMixtureProbabilitiesTrace(unsigned samples)
+{
+	traces.updateMixtureProbabilitiesTrace(samples, categoryProbabilities);
+}
+
+
+// ----------------------------------------------//
+// ---------- Adaptive Width Functions ----------//
+// ----------------------------------------------//
+
+
+void Parameter::adaptSphiProposalWidth(unsigned adaptationWidth)
+{
+	double acceptanceLevel = (double)numAcceptForSphi / (double)adaptationWidth;
+	traces.updateStdDevSynthesisRateAcceptanceRatioTrace(acceptanceLevel);
+	if (acceptanceLevel < 0.2)
+	{
+		std_sphi *= 0.8;
+	}
+	if (acceptanceLevel > 0.3)
+	{
+		std_sphi *= 1.2;
+	}
+	numAcceptForSphi = 0u;
+}
+
+
+void Parameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
+{
+	unsigned acceptanceUnder = 0u;
+	unsigned acceptanceOver = 0u;
+
+	for (unsigned cat = 0u; cat < numSelectionCategories; cat++)
+	{
+		unsigned numGenes = (unsigned)numAcceptForSynthesisRate[cat].size();
+		for (unsigned i = 0; i < numGenes; i++)
+		{
+			double acceptanceLevel = (double)numAcceptForSynthesisRate[cat][i] / (double)adaptationWidth;
+			traces.updateSynthesisRateAcceptanceRatioTrace(cat, i, acceptanceLevel);
+			if (acceptanceLevel < 0.225)
+			{
+				std_phi[cat][i] *= 0.8;
+				if (acceptanceLevel < 0.2) acceptanceUnder++;
+			}
+			if (acceptanceLevel > 0.275)
+			{
+				std_phi[cat][i] *= 1.2;
+				if (acceptanceLevel > 0.3) acceptanceOver++;
+			}
+			numAcceptForSynthesisRate[cat][i] = 0u;
+		}
+	}
+#ifndef STANDALONE
+	Rprintf("acceptance rate for synthesis rate:\n");
+	Rprintf("\t acceptance rate to low: %d\n", acceptanceUnder);
+	Rprintf("\t acceptance rate to high: %d\n", acceptanceOver);
+#else
+	std::cout << "acceptance rate for synthesis rate:\n";
+	std::cout << "\t acceptance rate to low: " << acceptanceUnder << "\n";
+	std::cout << "\t acceptance rate to high: " << acceptanceOver << "\n";
+#endif
+}
+
+void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
+{
+#ifndef STANDALONE
+	Rprintf("Acceptance rate for Codon Specific Parameter\n");
+	Rprintf("AA\tAcc.Rat\tProp.Width\n");
+#else
+	std::cout << "Acceptance rate for Codon Specific Parameter\n";
+	std::cout << "AA\tacc.rat\tProp.Width\n";
+#endif
+	for (unsigned i = 0; i < groupList.size(); i++)
+	{
+		std::string aa = groupList[i];
+		unsigned aaIndex = SequenceSummary::AAToAAIndex(aa);
+		double acceptanceLevel = (double)numAcceptForCodonSpecificParameters[aaIndex] / (double)adaptationWidth;
+		traces.updateCodonSpecificAcceptanceRatioTrace(aaIndex, acceptanceLevel);
+		std::array <unsigned, 2> codonRange = SequenceSummary::AAIndexToCodonRange(aaIndex, true);
+#ifndef STANDALONE
+		Rprintf("\t%s:\t%f\t%f\n", aa.c_str(), acceptanceLevel, std_csp[codonRange[0]]);
+#else
+		std::cout << "\t" << aa << ":\t" << acceptanceLevel << "\t" << std_csp[codonRange[0]] << "\n";
+#endif
+		for (unsigned k = codonRange[0]; k < codonRange[1]; k++)
+		{
+			if (acceptanceLevel < 0.2)
+			{
+				covarianceMatrix[aaIndex] *= 0.8;
+				covarianceMatrix[aaIndex].choleskiDecomposition();
+				std_csp[k] *= 0.8;
+			}
+			if (acceptanceLevel > 0.3)
+			{
+				covarianceMatrix[aaIndex] *= 1.2;
+				covarianceMatrix[aaIndex].choleskiDecomposition();
+				std_csp[k] *= 1.2;
+			}
+		}
+		numAcceptForCodonSpecificParameters[aaIndex] = 0u;
+	}
+#ifndef STANDALONE
+	Rprintf("\n");
+#else
+	std::cout << "\n";
+#endif
+}
+
+// ------------------------------------------------------------------//
+// ---------- Posterior, Variance, and Estimates Functions ----------//
+// ------------------------------------------------------------------//
+
+
+double Parameter::getSphiPosteriorMean(unsigned samples, unsigned mixture)
+{
+	double posteriorMean = 0.0;
+	unsigned selectionCategory = getSelectionCategory(mixture);
+	std::vector<double> sPhiTrace = traces.getStdDevSynthesisRateTrace(selectionCategory);
+	unsigned traceLength = lastIteration;
+
+	if (samples > traceLength)
+	{
+#ifndef STANDALONE
+		Rf_warning("Warning in ROCParameter::getSphiPosteriorMean throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
+			samples, traceLength);
+#else
+		std::cerr << "Warning in ROCParameter::getSphiPosteriorMean throws: Number of anticipated samples ("
+			<< samples << ") is greater than the length of the available trace (" << traceLength << ")."
+			<< "Whole trace is used for posterior estimate! \n";
+#endif
+		samples = traceLength;
+	}
+	unsigned start = traceLength - samples;
+	for (unsigned i = start; i < traceLength; i++)
+	{
+		posteriorMean += sPhiTrace[i];
+	}
+	return posteriorMean / (double)samples;
+}
+
+
+double Parameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement)
+{
+	unsigned expressionCategory = getSynthesisRateCategory(mixtureElement);
+	double posteriorMean = 0.0;
+	std::vector<double> synthesisRateTrace = traces.getSynthesisRateTraceByMixtureElementForGene(mixtureElement, geneIndex);
+	unsigned traceLength = lastIteration;
+
+	if (samples > lastIteration)
+	{
+#ifndef STANDALONE
+		Rf_warning("Warning in ROCParameter::getSynthesisRatePosteriorMean throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
+			samples, traceLength);
+#else
+		std::cerr << "Warning in ROCParameter::getSynthesisRatePosteriorMean throws: Number of anticipated samples ("
+			<< samples << ") is greater than the length of the available trace (" << traceLength << ")."
+			<< "Whole trace is used for posterior estimate! \n";
+#endif
+		samples = traceLength;
+	}
+	unsigned start = traceLength - samples;
+	unsigned category;
+	unsigned usedSamples = 0u;
+	std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
+	for (unsigned i = start; i < traceLength; i++)
+	{
+		category = mixtureAssignmentTrace[i];
+		category = getSynthesisRateCategory(category);
+		if (category == expressionCategory)
+		{
+			posteriorMean += synthesisRateTrace[i];
+			usedSamples++;
+		}
+	}
+	// Can return NaN if gene was never in category! But that is Ok.
+	return posteriorMean / (double)usedSamples;
+}
+
+double Parameter::getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType)
+{
+	double posteriorMean = 0.0;
+	std::vector<double> mutationParameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
+		mixtureElement, codon, paramType);
+	unsigned traceLength = lastIteration;
+
+	if (samples > traceLength)
+	{
+#ifndef STANDALONE
+		Rf_warning("Warning in ROCParameter::getCodonSpecificPosteriorMean throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
+			samples, traceLength);
+#else
+		std::cerr << "Warning in ROCParameter::getCodonSpecificPosteriorMean throws: Number of anticipated samples ("
+			<< samples << ") is greater than the length of the available trace (" << traceLength << ")."
+			<< "Whole trace is used for posterior estimate! \n";
+#endif
+		samples = traceLength;
+	}
+	unsigned start = traceLength - samples;
+	for (unsigned i = start; i < traceLength; i++)
+	{
+		posteriorMean += mutationParameterTrace[i];
+	}
+	return posteriorMean / (double)samples;
+}
+
+
+double Parameter::getSphiVariance(unsigned samples, unsigned mixture, bool unbiased)
+{
+	unsigned selectionCategory = getSelectionCategory(mixture);
+	std::vector<double> sPhiTrace = traces.getStdDevSynthesisRateTrace(selectionCategory);
+	unsigned traceLength = (unsigned)sPhiTrace.size();
+	if (samples > traceLength)
+	{
+#ifndef STANDALONE
+		Rf_warning("Warning in ROCParameter::getSynthesisRateVariance throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
+			samples, traceLength);
+#else
+		std::cerr << "Warning in Parameter::getSynthesisRateVariance throws: Number of anticipated samples (" << samples
+			<< ") is greater than the length of the available trace (" << traceLength << ")."
+			<< "Whole trace is used for posterior estimate! \n";
+#endif
+		samples = traceLength;
+	}
+	double posteriorMean = getSphiPosteriorMean(samples, mixture);
+
+	double posteriorVariance = 0.0;
+
+	unsigned start = traceLength - samples;
+	for (unsigned i = start; i < traceLength; i++)
+	{
+		double difference = sPhiTrace[i] - posteriorMean;
+		posteriorVariance += difference * difference;
+	}
+	double normalizationTerm = unbiased ? (1 / ((double)samples - 1.0)) : (1 / (double)samples);
+	return normalizationTerm * posteriorVariance;
+}
+
+
+double Parameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement,
+	bool unbiased)
+{
+	std::vector<double> synthesisRateTrace = traces.getSynthesisRateTraceByMixtureElementForGene(mixtureElement,
+		geneIndex);
+	unsigned traceLength = lastIteration;
+	if (samples > traceLength)
+	{
+#ifndef STANDALONE
+		Rf_warning("Warning in ROCParameter::getSynthesisRateVariance throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
+			samples, traceLength);
+#else
+		std::cerr << "Warning in Parameter::getSynthesisRateVariance throws: Number of anticipated samples (" << samples
+			<< ") is greater than the length of the available trace (" << traceLength << ")."
+			<< "Whole trace is used for posterior estimate! \n";
+#endif
+		samples = traceLength;
+	}
+
+	double posteriorMean = getSynthesisRatePosteriorMean(samples, geneIndex, mixtureElement);
+
+	double posteriorVariance = 0.0;
+	if (!std::isnan(posteriorMean))
+	{
+		unsigned start = traceLength - samples;
+		double difference;
+		for (unsigned i = start; i < traceLength; i++)
+		{
+			difference = synthesisRateTrace[i] - posteriorMean;
+			posteriorVariance += difference * difference;
+		}
+	}
+	double normalizationTerm = unbiased ? (1 / ((double)samples - 1.0)) : (1 / (double)samples);
+	return normalizationTerm * posteriorVariance;
+}
+
+
+double Parameter::getCodonSpecificVariance(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType, bool unbiased)
+{
+	std::vector<double> parameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
+		mixtureElement, codon, paramType);
+	unsigned traceLength = lastIteration;
+	if (samples > traceLength)
+	{
+#ifndef STANDALONE
+		Rf_warning("Warning in Parameter::getCodonSpecificVariance throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
+			samples, traceLength);
+#else
+		std::cerr << "Warning in Parameter::getCodonSpecificVariance throws: Number of anticipated samples (" << samples
+			<< ") is greater than the length of the available trace (" << traceLength << ")."
+			<< "Whole trace is used for posterior estimate! \n";
+#endif
+		samples = traceLength;
+	}
+
+	double posteriorMean = getCodonSpecificPosteriorMean(mixtureElement, samples, codon, paramType);
+
+	double posteriorVariance = 0.0;
+
+	unsigned start = traceLength - samples;
+	double difference;
+	for (unsigned i = start; i < traceLength; i++)
+	{
+		difference = parameterTrace[i] - posteriorMean;
+		posteriorVariance += difference * difference;
+	}
+	double normalizationTerm = unbiased ? (1 / ((double)samples - 1.0)) : (1 / (double)samples);
+	return normalizationTerm * posteriorVariance;
+}
+
+
+unsigned Parameter::getEstimatedMixtureAssignment(unsigned samples, unsigned geneIndex)
+{
+	unsigned rv = 0u;
+	double value = -1.0;
+	std::vector <double> probabilities;
+	probabilities = getEstimatedMixtureAssignmentProbabilities(samples, geneIndex);
+
+	for (unsigned i = 0; i < probabilities.size(); i++)
+	{
+		if (value < probabilities[i])
+		{
+			value = probabilities[i];
+			rv = i;
+		}
+	}
+	return rv;
+}
+
+std::vector<double> Parameter::getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex)
+{
+	std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
+	std::vector<double> probabilities(numMixtures, 0.0);
+	unsigned traceLength = lastIteration;
+
+	if (samples > traceLength)
+	{
+#ifndef STANDALONE
+		Rf_warning("Warning in ROCParameter::getEstimatedMixtureAssignmentProbabilities throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
+			samples, traceLength);
+#else
+		std::cerr
+			<< "Warning in ROCParameter::getEstimatedMixtureAssignmentProbabilities throws: Number of anticipated samples ("
+			<< samples << ") is greater than the length of the available trace (" << traceLength << ")."
+			<< "Whole trace is used for posterior estimate! \n";
+#endif
+		samples = traceLength;
+	}
+
+	unsigned start = traceLength - samples;
+	for (unsigned i = start; i < traceLength; i++)
+	{
+		unsigned value = mixtureAssignmentTrace[i];
+		probabilities[value]++;
+	}
+
+	for (unsigned i = 0; i < numMixtures; i++)
+	{
+		probabilities[i] /= (double)samples;
+	}
+	return probabilities;
+}
 
 
 // --------------------------------------------------//

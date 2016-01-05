@@ -1,4 +1,4 @@
-
+#' Plot MCMC algorithm
 
 plot.Rcpp_MCMCAlgorithm <- function(x, ...)
 {

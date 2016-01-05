@@ -421,7 +421,7 @@ int main()
 	User user = jeremy;
 	ModelToRun modelToRun = ROC;
 	bool read = false;
-	bool testing = true;
+	bool testing = false;
 	bool withPhi = false;
 	if (testing)
 	{

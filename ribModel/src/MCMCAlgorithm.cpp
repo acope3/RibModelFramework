@@ -535,7 +535,6 @@ void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned
 	}
 }
 
-
 double MCMCAlgorithm::calculateGewekeScore(unsigned current_iteration)
 {
 	double posteriorMean1 = 0.0;

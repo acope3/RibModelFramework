@@ -1,5 +1,9 @@
-# NOT EXPOSED
-convergence.test.Rcpp_ROCTrace <- function(object, nsamples = 10, frac1 = 0.1, frac2 = 0.5, thin = 1, plot = FALSE, what, mixture = 1, ...)
+
+convergence.test <- function(trace, what, mixture = 1, n.samples = 10, frac1 = 0.1, frac2 = 0.5, plot = FALSE)
+{
+  UseMethod("convergence.test", trace)
+}
+convergence.test.Rcpp_ROCTrace <- function(trace, what, mixture, n.samples, frac1, frac2, plot)
 {
   # TODO: extend to work with multiple chains once we have that capability.
   current.trace <- 0
@@ -18,9 +22,9 @@ convergence.test.Rcpp_ROCTrace <- function(object, nsamples = 10, frac1 = 0.1, f
       for(i in 1:length(codons))
       {
         if(what[1] == "Mutation"){
-          cur.trace[[index]] <- object$getMutationParameterTraceByMixtureElementForCodon(mixture, codons[i])
+          cur.trace[[index]] <- trace$getMutationParameterTraceByMixtureElementForCodon(mixture, codons[i])
         }else{
-          cur.trace[[index]] <- object$getSelectionParameterTraceByMixtureElementForCodon(mixture, codons[i])
+          cur.trace[[index]] <- trace$getSelectionParameterTraceByMixtureElementForCodon(mixture, codons[i])
         }
         index <- index + 1
       }
@@ -30,21 +34,21 @@ convergence.test.Rcpp_ROCTrace <- function(object, nsamples = 10, frac1 = 0.1, f
  
   if(what[1] == "MixtureProbability")
   {
-    numMixtures <- object$getNumberOfMixtures()
+    numMixtures <- trace$getNumberOfMixtures()
     cur.trace <- vector("list", numMixtures)
     for(i in 1:numMixtures)
     {
-      cur.trace[[i]] <- object$getMixtureProbabilitiesTraceForMixture(i)
+      cur.trace[[i]] <- trace$getMixtureProbabilitiesTraceForMixture(i)
     }
     current.trace <- do.call("rbind", cur.trace)
   }
   if(what[1] == "Sphi")
   {
-    current.trace <- object$getSPhiTrace()
+    current.trace <- trace$getSPhiTrace()
   }
   if(what[1] == "Mphi") 
   {
-    sphi <- object$getSPhiTrace();
+    sphi <- trace$getSPhiTrace();
     mphi <- -(sphi * sphi) / 2;
     current.trace <- mphi
   }
@@ -68,10 +72,10 @@ convergence.test.Rcpp_ROCTrace <- function(object, nsamples = 10, frac1 = 0.1, f
   trace.length <- length(current.trace)
   start <- max(0, trace.length - nsamples)
   
-  mcmcobj <- coda::mcmc(data=current.trace, start=start, thin=thin)
-  diag <- coda::geweke.diag(mcmcobj, frac1=frac1, frac2=frac2)
+  mcmcobj <- mcmc(data=current.trace, start=start, thin=thin)
+  diag <- geweke.diag(mcmcobj, frac1=frac1, frac2=frac2)
   if(plot){ 
-    coda::geweke.plot(diag, frac1=frac1, frac2=frac2, ...)
+    geweke.plot(diag, frac1=frac1, frac2=frac2)
   }else{
     return(diag)
   }

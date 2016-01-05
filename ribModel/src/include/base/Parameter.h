@@ -22,7 +22,6 @@
 class Parameter {
 	private:
 
-
 		//STATICS - Sorting Functions:
 		void quickSortPair(double a[], int b[], int first, int last);
 		void quickSort(double a[], int first, int last);
@@ -117,32 +116,30 @@ class Parameter {
 		unsigned getLastIteration();
 		void setLastIteration(unsigned iteration);
 
-
-
 		//Trace Functions:
-		virtual void updateSphiTrace(unsigned sample) = 0;
-		virtual void updateSynthesisRateTrace(unsigned sample, unsigned geneIndex) = 0;
-		virtual void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex) = 0;
-		virtual void updateMixtureProbabilitiesTrace(unsigned samples) = 0;
-
-
+		Trace& getTraceObject();
+		void updateStdDevSynthesisRateTrace(unsigned sample);
+		void updateSynthesisRateTrace(unsigned sample, unsigned geneIndex);
+		void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex);
+		void updateMixtureProbabilitiesTrace(unsigned samples);
 
 		//Adaptive Width Functions:
-		virtual void adaptSphiProposalWidth(unsigned adaptationWidth) = 0;
-		virtual void adaptSynthesisRateProposalWidth(unsigned adaptationWidth) = 0;
-
+		void adaptSphiProposalWidth(unsigned adaptationWidth);
+		void adaptSynthesisRateProposalWidth(unsigned adaptationWidth);
+		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth);
 
 
 		//Posterior, Variance, and Estimates Functions:
-		virtual double getSphiPosteriorMean(unsigned samples, unsigned mixture) = 0;
-		virtual double getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement) = 0;
+		double getSphiPosteriorMean(unsigned samples, unsigned mixture);
+		double getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement);
 
-		virtual double getSphiVariance(unsigned samples, unsigned mixture, bool unbiased) = 0;
-		virtual double getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement,
-											bool unbiased = true) = 0;
-
+		double getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType);
+		double getSphiVariance(unsigned samples, unsigned mixture, bool unbiased);
+		double getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement,
+											bool unbiased = true);
+		double getCodonSpecificVariance(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType, bool unbiased);
 		unsigned getEstimatedMixtureAssignment(unsigned samples, unsigned geneIndex);
-		virtual std::vector<double> getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex) = 0;
+		std::vector<double> getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex);
 
 
 
@@ -152,9 +149,10 @@ class Parameter {
 		unsigned getNumObservedPhiSets();
 		void setMixtureAssignment(unsigned gene, unsigned value);
 		unsigned getMixtureAssignment(unsigned gene);
-		virtual void setNumObservedPhiSets(unsigned _phiGroupings) = 0;
+		void setNumObservedPhiSets(unsigned _phiGroupings);
+		virtual std::vector <std::vector <double> > calculateSelectionCoefficients(unsigned sample, unsigned mixture);
 
-
+		
 
 		//Static Functions:
 		static double calculateSCUO(Gene& gene, unsigned maxAA);
@@ -229,12 +227,16 @@ class Parameter {
 #endif
 
 	protected:
+		Trace traces;
+
+		std::vector<CovarianceMatrix> covarianceMatrix;
 		std::vector<mixtureDefinition> categories;
 		std::vector<double> categoryProbabilities;
 		std::vector<std::vector<unsigned>> mutationIsInMixture;
 		std::vector<std::vector<unsigned>> selectionIsInMixture;
 		unsigned numMutationCategories; //TODO Probably needs to be renamed
 		unsigned numSelectionCategories; //TODO Probably needs to be renamed
+		std::vector<unsigned> numAcceptForCodonSpecificParameters;
 		std::string mutationSelectionState; //TODO: Probably needs to be renamed
 
 
@@ -248,6 +250,8 @@ class Parameter {
 		double bias_sphi;
 		double std_sphi;
 		unsigned numAcceptForSphi;
+		std::vector<double> std_csp;
+
 
 
 		std::vector<std::vector<double>> proposedSynthesisRateLevel;
@@ -262,6 +266,7 @@ class Parameter {
 
 		double bias_phi;
 		std::vector<std::vector<double>> std_phi;
+
 };
 
 #endif // PARAMETER_H
