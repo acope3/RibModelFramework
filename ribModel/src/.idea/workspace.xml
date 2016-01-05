@@ -5,7 +5,7 @@
       <config projectName="src" targetName="src" />
     </generated>
   </component>
-  <component name="CMakeSettings" AUTO_RELOAD="false" GENERATION_PASS_SYSTEM_ENVIRONMENT="true">
+  <component name="CMakeSettings" AUTO_RELOAD="true" GENERATION_PASS_SYSTEM_ENVIRONMENT="true">
     <ADDITIONAL_GENERATION_ENVIRONMENT>
       <envs />
     </ADDITIONAL_GENERATION_ENVIRONMENT>
@@ -31,83 +31,56 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="RCPP_Parameter.cpp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/RCPP_Parameter.cpp">
+      <file leaf-file-name="RFPParameter.cpp" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/RFPParameter.cpp">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="26" column="0" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
+              <caret line="394" column="30" selection-start-line="394" selection-start-column="30" selection-end-line="394" selection-end-column="30" />
+              <folding>
+                <element signature="e#14264#19152#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Trace.cpp" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Trace.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="425" column="12" selection-start-line="425" selection-start-column="12" selection-end-line="425" selection-end-column="12" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ROCParameter.cpp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ROCParameter.cpp">
+      <file leaf-file-name="MCMCAlgorithm.cpp" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/MCMCAlgorithm.cpp">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="1351" column="0" selection-start-line="1351" selection-start-column="0" selection-end-line="1351" selection-end-column="0" />
+              <caret line="230" column="30" selection-start-line="230" selection-start-column="30" selection-end-line="230" selection-end-column="30" />
               <folding>
-                <element signature="e#58#97#0" expanded="true" />
-                <element signature="e#39248#46417#0" expanded="true" />
+                <element signature="e#24883#27088#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ROCParameter.h" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/include/ROC/ROCParameter.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-0.53149605">
-              <caret line="55" column="10" selection-start-line="55" selection-start-column="10" selection-end-line="55" selection-end-column="10" />
-              <folding>
-                <element signature="e#47#64#0" expanded="true" />
-                <element signature="e#158#175#0" expanded="true" />
-                <element signature="e#184#205#0" expanded="true" />
-                <element signature="e#5268#7297#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CovarianceMatrix.h" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/include/CovarianceMatrix.h">
+      <file leaf-file-name="RFPModel.cpp" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/RFPModel.cpp">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="38" column="28" selection-start-line="38" selection-start-column="28" selection-end-line="38" selection-end-column="28" />
-              <folding>
-                <element signature="e#55#72#0" expanded="true" />
-                <element signature="e#130#147#0" expanded="true" />
-                <element signature="e#1336#1375#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="FONSETrace.h" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/include/FONSE/FONSETrace.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <caret line="76" column="45" selection-start-line="76" selection-start-column="45" selection-end-line="76" selection-end-column="45" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CovarianceMatrix.cpp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/CovarianceMatrix.cpp">
+      <file leaf-file-name="FONSEModel.cpp" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/FONSEModel.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="182" column="0" selection-start-line="182" selection-start-column="0" selection-end-line="182" selection-end-column="0" />
-              <folding>
-                <element signature="e#58#97#0" expanded="true" />
-                <element signature="e#2910#2924#0" expanded="true" />
-                <element signature="e#3005#3035#0" expanded="true" />
-                <element signature="e#3119#3133#0" expanded="true" />
-                <element signature="e#3371#3385#0" expanded="true" />
-                <element signature="e#3466#3501#0" expanded="true" />
-                <element signature="e#3590#3604#0" expanded="true" />
-                <element signature="e#6244#7393#0" expanded="true" />
-              </folding>
+            <state vertical-scroll-proportion="0.9153543">
+              <caret line="97" column="50" selection-start-line="97" selection-start-column="50" selection-end-line="97" selection-end-column="50" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -120,17 +93,13 @@
         <option value="$PROJECT_DIR$/include/FONSE/FONSEModel.h" />
         <option value="$PROJECT_DIR$/RFPTrace.cpp" />
         <option value="$PROJECT_DIR$/FONSETrace.cpp" />
-        <option value="$PROJECT_DIR$/FONSEModel.cpp" />
-        <option value="$PROJECT_DIR$/RFPModel.cpp" />
         <option value="$PROJECT_DIR$/include/PANSE/PANSEModel.h" />
-        <option value="$PROJECT_DIR$/include/PANSE/PANSETrace.h" />
         <option value="$PROJECT_DIR$/include/PANSE/PANSEParameter.h" />
         <option value="$PROJECT_DIR$/include/ROC/ROCModel.h" />
         <option value="$PROJECT_DIR$/RCPP_Model.cpp" />
         <option value="$PROJECT_DIR$/ROCModel.cpp" />
         <option value="$PROJECT_DIR$/include/CodonTable.h" />
         <option value="$PROJECT_DIR$/CodonTable.cpp" />
-        <option value="$PROJECT_DIR$/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/include/ROC/ROCTrace.h" />
         <option value="$PROJECT_DIR$/ROCTrace.cpp" />
         <option value="$PROJECT_DIR$/RCPP_Trace.cpp" />
@@ -138,14 +107,10 @@
         <option value="$PROJECT_DIR$/PANSE/PANSEParameter.cpp" />
         <option value="$PROJECT_DIR$/include/RFP/RFPModel.h" />
         <option value="$PROJECT_DIR$/include/base/Model.h" />
-        <option value="$PROJECT_DIR$/RFPParameter.cpp" />
         <option value="$PROJECT_DIR$/include/FONSE/FONSEParameter.h" />
         <option value="$PROJECT_DIR$/include/RFP/RFPParameter.h" />
-        <option value="$PROJECT_DIR$/include/ROC/ROCParameter.h" />
         <option value="$PROJECT_DIR$/Parameter.cpp" />
         <option value="$PROJECT_DIR$/FONSEParameter.cpp" />
-        <option value="$PROJECT_DIR$/RCPP_Parameter.cpp" />
-        <option value="$PROJECT_DIR$/main.cpp" />
         <option value="$PROJECT_DIR$/MCMCAlgorithm.cpp" />
         <option value="$PROJECT_DIR$/include/MCMCAlgorithm.h" />
         <option value="$PROJECT_DIR$/ROCParameter.cpp" />
@@ -157,6 +122,14 @@
         <option value="$PROJECT_DIR$/Genome.cpp" />
         <option value="$PROJECT_DIR$/CovarianceMatrix.cpp" />
         <option value="$PROJECT_DIR$/include/CovarianceMatrix.h" />
+        <option value="$PROJECT_DIR$/include/ROC/ROCParameter.h" />
+        <option value="$PROJECT_DIR$/include/PANSE/PANSETrace.h" />
+        <option value="$PROJECT_DIR$/CMakeLists.txt" />
+        <option value="$PROJECT_DIR$/RCPP_Parameter.cpp" />
+        <option value="$PROJECT_DIR$/main.cpp" />
+        <option value="$PROJECT_DIR$/RFPParameter.cpp" />
+        <option value="$PROJECT_DIR$/RFPModel.cpp" />
+        <option value="$PROJECT_DIR$/FONSEModel.cpp" />
       </list>
     </option>
   </component>
@@ -418,15 +391,63 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/ROCModel.cpp</url>
-          <line>440</line>
+          <line>442</line>
           <option name="timeStamp" value="62" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/MCMCAlgorithm.cpp</url>
+          <line>417</line>
+          <option name="timeStamp" value="78" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/MCMCAlgorithm.cpp</url>
+          <line>416</line>
+          <option name="timeStamp" value="79" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/MCMCAlgorithm.cpp</url>
+          <line>243</line>
+          <option name="timeStamp" value="80" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/MCMCAlgorithm.cpp</url>
+          <line>244</line>
+          <option name="timeStamp" value="81" />
+        </line-breakpoint>
       </breakpoints>
-      <option name="time" value="74" />
+      <option name="time" value="82" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/PANSE/PANSETrace.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/CovarianceMatrix.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="38" column="28" selection-start-line="38" selection-start-column="28" selection-end-line="38" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CovarianceMatrix.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="182" column="0" selection-start-line="182" selection-start-column="0" selection-end-line="182" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Parameter.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -469,20 +490,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/FONSETrace.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="85" column="58" selection-start-line="85" selection-start-column="58" selection-end-line="85" selection-end-column="58" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/FONSEModel.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-6.48">
-          <caret line="74" column="84" selection-start-line="74" selection-start-column="84" selection-end-line="74" selection-end-column="84" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/random">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.8285124">
@@ -494,13 +501,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.8545455">
           <caret line="142" column="0" selection-start-line="142" selection-start-column="0" selection-end-line="142" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/include/PANSE/PANSETrace.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.72727275">
-          <caret line="40" column="6" selection-start-line="40" selection-start-column="6" selection-end-line="40" selection-end-column="6" />
         </state>
       </provider>
     </entry>
@@ -518,31 +518,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/RFPTrace.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="77" column="12" selection-start-line="77" selection-start-column="12" selection-end-line="77" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Trace.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.3319672">
-          <caret line="142" column="27" selection-start-line="142" selection-start-column="27" selection-end-line="142" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/vector">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="1509" column="0" selection-start-line="1509" selection-start-column="0" selection-end-line="1509" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/RFPModel.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.030737706">
-          <caret line="156" column="51" selection-start-line="156" selection-start-column="51" selection-end-line="156" selection-end-column="51" />
         </state>
       </provider>
     </entry>
@@ -560,13 +539,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="4" column="31" selection-start-line="4" selection-start-column="31" selection-end-line="4" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/CodonTable.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -574,70 +546,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/include/ROC/ROCTrace.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.6456693">
-          <caret line="55" column="0" selection-start-line="55" selection-start-column="0" selection-end-line="55" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ROCTrace.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.9114173">
-          <caret line="203" column="55" selection-start-line="203" selection-start-column="55" selection-end-line="203" selection-end-column="55" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/RCPP_Trace.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.503937">
-          <caret line="59" column="38" selection-start-line="59" selection-start-column="38" selection-end-line="59" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/PANSE/PANSEParameter.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="960" column="6" selection-start-line="960" selection-start-column="6" selection-end-line="960" selection-end-column="6" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/include/RFP/RFPModel.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="174" column="0" selection-start-line="174" selection-start-column="0" selection-end-line="174" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/include/base/Model.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="72" column="0" selection-start-line="72" selection-start-column="0" selection-end-line="72" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/RFPParameter.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="1163" column="0" selection-start-line="1163" selection-start-column="0" selection-end-line="1163" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#37#0" expanded="false" />
-            <element signature="e#80#119#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/include/RFP/RFPParameter.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.32086614">
-          <caret line="152" column="8" selection-start-line="152" selection-start-column="8" selection-end-line="152" selection-end-column="8" />
-          <folding>
-            <element signature="e#47#64#0" expanded="false" />
-            <element signature="e#142#159#0" expanded="false" />
-            <element signature="e#168#189#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -645,11 +557,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.5570866">
           <caret line="165" column="8" selection-start-line="165" selection-start-column="8" selection-end-line="165" selection-end-column="8" />
-          <folding>
-            <element signature="e#51#68#0" expanded="false" />
-            <element signature="e#146#163#0" expanded="false" />
-            <element signature="e#172#202#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -657,18 +564,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.14545454">
           <caret line="1142" column="0" selection-start-line="1142" selection-start-column="0" selection-end-line="1142" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#41#0" expanded="false" />
-            <element signature="e#170#209#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="434" column="8" selection-start-line="434" selection-start-column="8" selection-end-line="434" selection-end-column="8" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -676,7 +571,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="60" column="11" selection-start-line="60" selection-start-column="10" selection-end-line="60" selection-end-column="11" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -684,7 +578,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-18.037037">
           <caret line="64" column="35" selection-start-line="64" selection-start-column="35" selection-end-line="64" selection-end-column="35" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -700,20 +593,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="46" column="8" selection-start-line="46" selection-start-column="8" selection-end-line="46" selection-end-column="8" />
-          <folding>
-            <element signature="e#41#58#0" expanded="true" />
-            <element signature="e#204#221#0" expanded="true" />
-            <element signature="e#230#252#0" expanded="true" />
-            <element signature="e#6551#8429#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Parameter.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.10909091">
-          <caret line="250" column="53" selection-start-line="250" selection-start-column="53" selection-end-line="250" selection-end-column="53" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -721,20 +600,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="76" column="26" selection-start-line="76" selection-start-column="26" selection-end-line="76" selection-end-column="26" />
-          <folding>
-            <element signature="e#49#66#0" expanded="false" />
-            <element signature="e#224#241#0" expanded="false" />
-            <element signature="e#250#275#0" expanded="false" />
-            <element signature="e#2473#2784#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/RCPP_Parameter.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="26" column="0" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -742,11 +607,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.738189">
           <caret line="60" column="26" selection-start-line="60" selection-start-column="26" selection-end-line="60" selection-end-column="26" />
-          <folding>
-            <element signature="e#54#71#0" expanded="false" />
-            <element signature="e#201#218#0" expanded="false" />
-            <element signature="e#2668#3253#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -754,17 +614,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="673" column="0" selection-start-line="673" selection-start-column="0" selection-end-line="673" selection-end-column="0" />
-          <folding>
-            <element signature="e#57#96#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/MCMCAlgorithm.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="853" column="0" selection-start-line="853" selection-start-column="0" selection-end-line="853" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -772,9 +621,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="273" column="0" selection-start-line="273" selection-start-column="0" selection-end-line="273" selection-end-column="0" />
-          <folding>
-            <element signature="e#46#85#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -782,7 +628,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="65" column="20" selection-start-line="65" selection-start-column="20" selection-end-line="65" selection-end-column="20" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -790,11 +635,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="61" column="8" selection-start-line="61" selection-start-column="8" selection-end-line="61" selection-end-column="8" />
-          <folding>
-            <element signature="e#35#52#0" expanded="false" />
-            <element signature="e#161#178#0" expanded="false" />
-            <element signature="e#1523#1815#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -802,20 +642,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.37992126">
           <caret line="758" column="26" selection-start-line="758" selection-start-column="26" selection-end-line="758" selection-end-column="26" />
-          <folding>
-            <element signature="e#48#87#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ROCParameter.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="1351" column="0" selection-start-line="1351" selection-start-column="0" selection-end-line="1351" selection-end-column="0" />
-          <folding>
-            <element signature="e#58#97#0" expanded="true" />
-            <element signature="e#39248#46417#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -823,16 +649,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="182" column="0" selection-start-line="182" selection-start-column="0" selection-end-line="182" selection-end-column="0" />
-          <folding>
-            <element signature="e#58#97#0" expanded="true" />
-            <element signature="e#2910#2924#0" expanded="true" />
-            <element signature="e#3005#3035#0" expanded="true" />
-            <element signature="e#3119#3133#0" expanded="true" />
-            <element signature="e#3371#3385#0" expanded="true" />
-            <element signature="e#3466#3501#0" expanded="true" />
-            <element signature="e#3590#3604#0" expanded="true" />
-            <element signature="e#6244#7393#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -840,32 +656,139 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="38" column="28" selection-start-line="38" selection-start-column="28" selection-end-line="38" selection-end-column="28" />
-          <folding>
-            <element signature="e#55#72#0" expanded="true" />
-            <element signature="e#130#147#0" expanded="true" />
-            <element signature="e#1336#1375#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/include/FONSE/FONSETrace.h">
+    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+        <state vertical-scroll-proportion="0.70866144">
+          <caret line="24" column="0" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/PANSE/PANSETrace.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.02952756">
+          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/PANSE/PANSETrace.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.46850392">
+          <caret line="31" column="2" selection-start-line="31" selection-start-column="2" selection-end-line="31" selection-end-column="2" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/include/ROC/ROCParameter.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.53149605">
-          <caret line="55" column="10" selection-start-line="55" selection-start-column="10" selection-end-line="55" selection-end-column="10" />
+        <state vertical-scroll-proportion="-0.02952756">
+          <caret line="49" column="10" selection-start-line="49" selection-start-column="10" selection-end-line="49" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ROCParameter.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="843" column="0" selection-start-line="843" selection-start-column="0" selection-end-line="843" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/RFP/RFPParameter.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="134" column="0" selection-start-line="134" selection-start-column="0" selection-end-line="134" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RCPP_Parameter.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="8" column="25" selection-start-line="8" selection-start-column="25" selection-end-line="8" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RCPP_Trace.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="51" column="0" selection-start-line="51" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="130" column="13" selection-start-line="130" selection-start-column="13" selection-end-line="130" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/base/Model.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="72" column="0" selection-start-line="72" selection-start-column="0" selection-end-line="72" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RFPParameter.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="394" column="30" selection-start-line="394" selection-start-column="30" selection-end-line="394" selection-end-column="30" />
           <folding>
-            <element signature="e#47#64#0" expanded="true" />
-            <element signature="e#158#175#0" expanded="true" />
-            <element signature="e#184#205#0" expanded="true" />
-            <element signature="e#5268#7297#0" expanded="true" />
+            <element signature="e#14264#19152#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Trace.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="425" column="12" selection-start-line="425" selection-start-column="12" selection-end-line="425" selection-end-column="12" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Parameter.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="1047" column="16" selection-start-line="1047" selection-start-column="16" selection-end-line="1047" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MCMCAlgorithm.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="230" column="30" selection-start-line="230" selection-start-column="30" selection-end-line="230" selection-end-column="30" />
+          <folding>
+            <element signature="e#24883#27088#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/RFP/RFPModel.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.018181818">
+          <caret line="29" column="23" selection-start-line="29" selection-start-column="23" selection-end-line="29" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RFPModel.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="76" column="45" selection-start-line="76" selection-start-column="45" selection-end-line="76" selection-end-column="45" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/FONSEModel.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.9153543">
+          <caret line="97" column="50" selection-start-line="97" selection-start-column="50" selection-end-line="97" selection-end-column="50" />
+          <folding />
         </state>
       </provider>
     </entry>

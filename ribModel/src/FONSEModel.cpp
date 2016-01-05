@@ -91,6 +91,12 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 	if (std::isinf(logProbabilityRatio[2])) {
 		std::cout << "logprob2 inf\n";
 	}
+
+	//------------NOTE: Jeremy, Cedric changed the reverse jump to where we DON'T include it. I had my RFP
+	//LogLikelihood go to 0 because of now missing terms. I have added the code underneath to where we calculate it---/
+
+	logProbabilityRatio[3] = currentLogLikelihood;
+	logProbabilityRatio[4] = proposedLogLikelihood;
 }
 
 double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grouping, double *mutation, double *selection, double phiValue)

@@ -6,9 +6,7 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-RCPP_EXPOSED_CLASS(ROCTrace)
-RCPP_EXPOSED_CLASS(RFPTrace)
-RCPP_EXPOSED_CLASS(FONSETrace)
+RCPP_EXPOSED_CLASS(Trace)
 RCPP_EXPOSED_CLASS(Genome)
 RCPP_EXPOSED_CLASS(CovarianceMatrix)
 
