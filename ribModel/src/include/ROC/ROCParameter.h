@@ -136,16 +136,9 @@ class ROCParameter : public Parameter
 
 
 		//Initialization, Restart, Index Checking:
-		void initCovarianceMatrix(SEXP matrix, std::string aa);SepsilonTrace[
+		void initCovarianceMatrix(SEXP matrix, std::string aa);
 		void initMutation(std::vector<double> mutationValues, unsigned mixtureElement, std::string aa);
 		void initSelection(std::vector<double> selectionValues, unsigned mixtureElement, std::string aa);
-
-
-
- 		//Trace Functions:
- 		void setTraceObject(ROCTrace _trace);
- 		void setCategoriesForTrace();
-
 
 
 		//CSP Functions:

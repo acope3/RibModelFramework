@@ -118,6 +118,7 @@ class Parameter {
 
 		//Trace Functions:
 		Trace& getTraceObject();
+		void setTraceObject(Trace _trace);
 		void updateStdDevSynthesisRateTrace(unsigned sample);
 		void updateSynthesisRateTrace(unsigned sample, unsigned geneIndex);
 		void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex);
@@ -186,6 +187,10 @@ class Parameter {
 		void initializeSynthesisRateByList(std::vector<double> expression);
 		bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);
 
+
+
+		//Trace Functions:
+		void setCategoriesForTrace();
 
 
 		//Mixture Definition Matrix and Category Functions:

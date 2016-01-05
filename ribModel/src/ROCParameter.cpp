@@ -959,29 +959,6 @@ void ROCParameter::initSelection(std::vector<double> selectionValues, unsigned m
 }
 
 
-
-
-
-// --------------------------------------//
-// ---------- Trace Functions -----------//
-// --------------------------------------//
-
-
-void ROCParameter::setTraceObject(ROCTrace _trace)
-{
-    traces = _trace;
-}
-
-
-void ROCParameter::setCategoriesForTrace()
-{
-	traces.setCategories(categories);
-}
-
-
-
-
-
 // -----------------------------------//
 // ---------- CSP Functions ----------//
 // -----------------------------------//

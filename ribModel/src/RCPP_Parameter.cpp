@@ -40,27 +40,28 @@ RCPP_MODULE(Parameter_mod)
 		//Group List Functions:
 		.method("getGroupList", &Parameter::getGroupList)
 
-
+		//Trace Functions:
+		.method("getTraceObject", &Parameter::getTraceObject) //TODO: only used in R?
+		.method("setTraceObject", &Parameter::setTraceObject)
+		.method("setCategoriesForTrace", &Parameter::setCategoriesForTrace)
 
 		//Synthesis Rate Functions:
 		.method("getSynthesisRate", &Parameter::getSynthesisRateR)
 		.method("getCurrentSynthesisRateForMixture", &Parameter::getCurrentSynthesisRateForMixture)
 
-
-
 		//Iteration Functions:
 		.method("getLastIteration", &Parameter::getLastIteration) //Not a R wrapper
 		.method("setLastIteration", &Parameter::setLastIteration) //Not a R wrapper
-
-
 
 		//Posterior, Variance, and Estimates Functions:
 		.method("getSynthesisRatePosteriorMeanByMixtureElementForGene", &Parameter::getSynthesisRatePosteriorMeanByMixtureElementForGene)
 		.method("getSynthesisRateVarianceByMixtureElementForGene", &Parameter::getSynthesisRateVarianceByMixtureElementForGene)
 		.method("getEstimatedMixtureAssignmentForGene", &Parameter::getEstimatedMixtureAssignmentForGene, "returns the mixture assignment for a given gene")
 		.method("getEstimatedMixtureAssignmentProbabilitiesForGene", &Parameter::getEstimatedMixtureAssignmentProbabilitiesForGene, "returns the probabilities assignment for a given gene")
-
-
+		.method("getSphiPosteriorMean", &ROCParameter::getSphiPosteriorMean)
+		.method("getCodonSpecificPosteriorMean", &ROCParameter::getCodonSpecificPosteriorMean)
+		.method("getSphiVariance", &ROCParameter::getSphiVariance)
+		.method("getCodonSpecificVariance", &ROCParameter::getCodonSpecificVariance)
 
 		//Other Functions:
 		.method("getMixtureAssignment", &Parameter::getMixtureAssignmentR)
@@ -69,7 +70,8 @@ RCPP_MODULE(Parameter_mod)
 		.method("setMixtureAssignmentForGene", &Parameter::setMixtureAssignmentForGene)
 		//setNumMixtureElements it taken care in the properties section below
 
-
+		//Other Functions:
+		.method("calculateSelectionCoefficients", &ROCParameter::calculateSelectionCoefficientsR)
 
 		//Used for getters and setters
 		.property("numMutationCategories", &Parameter::getNumMutationCategories, &Parameter::setNumMutationCategories)
@@ -97,14 +99,9 @@ RCPP_MODULE(Parameter_mod)
 		.method("initSelection", &ROCParameter::initSelection)
 		.method("initMutation", &ROCParameter::initMutation)
 
-
-
-		//Trace Functions:
-		.method("getTraceObject", &ROCParameter::getTraceObject) //TODO: only used in R?
-		.method("setROCTrace", &ROCParameter::setTraceObject)
-		.method("setCategoriesForTrace", &ROCParameter::setCategoriesForTrace)
-
-
+		//Posterior, Variance, and Estimates Functions:
+		.method("getAphiPosteriorMean", &ROCParameter::getAphiPosteriorMean) //TODO: this is not wrapped! May not run correctly
+		.method("getAphiVariance", &ROCParameter::getAphiVariance) //TODO: this is not wrapped! May not run correctly
 
 
 		//CSP Functions:
@@ -114,23 +111,7 @@ RCPP_MODULE(Parameter_mod)
 
 
 
-		//Posterior, Variance, and Estimates Functions:
-		.method("getSphiPosteriorMean", &ROCParameter::getSphiPosteriorMean)
-		//TODO: should we have a posterior mean for synthesis rate?
-		.method("getMutationPosteriorMeanForCodon", &ROCParameter::getMutationPosteriorMeanForCodon)
-		.method("getSelectionPosteriorMeanForCodon", &ROCParameter::getSelectionPosteriorMeanForCodon)
-		.method("getSphiVariance", &ROCParameter::getSphiVariance)
-		//TODO: should we have a variance for synthesis rate?
-		.method("getAphiVariance", &ROCParameter::getAphiVariance) //TODO: this is not wrapped! May not run correctly
-		.method("getMutationVarianceForCodon", &ROCParameter::getMutationVarianceForCodon)
-		.method("getSelectionVarianceForCodon", &ROCParameter::getSelectionVarianceForCodon)
-
-
-
 		//Other Functions:
-		.method("calculateSelectionCoefficients", &ROCParameter::calculateSelectionCoefficientsR)
-
-
 		.property("proposedMutationParameter", &ROCParameter::getProposedMutationParameter, &ROCParameter::setProposedMutationParameter) //R Specific
 		.property("proposedSelectionParameter", &ROCParameter::getProposedSelectionParameter, &ROCParameter::setProposedSelectionParameter) //R Specific
 		.property("currentMutationParameter", &ROCParameter::getCurrentMutationParameter, &ROCParameter::setCurrentMutationParameter) //R Specific
@@ -158,26 +139,9 @@ RCPP_MODULE(Parameter_mod)
 		.method("initMutationSelectionCategories", &RFPParameter::initMutationSelectionCategoriesR)
 
 
-		//Trace Functions:
-		.method("getTraceObject", &RFPParameter::getTraceObject) //TODO: is this only used in R?
-		.method("setRFPTrace", &RFPParameter::setTraceObject)
-        .method("setCategoriesForTrace", &RFPParameter::setCategoriesForTrace)
-
-
-
 		//CSP Functions:
 		//Listed in the properties section below. NOTE: these getter/setters are ONLY
 		//used in R
-
-
-
-		//Posterior, Variance, and Estimates Functions:
-		.method("getAlphaPosteriorMeanForCodon", &RFPParameter::getAlphaPosteriorMeanForCodon)
-		.method("getLambdaPrimePosteriorMeanForCodon", &RFPParameter::getLambdaPrimePosteriorMeanForCodon)
-		.method("getAlphaVarianceForCodon", &RFPParameter::getAlphaVarianceForCodon)
-		.method("getLambdaPrimeVarianceForCodon", &RFPParameter::getLambdaPrimeVarianceForCodon)
-
-
 
 		//Other Functions:
 		.method("getParameterForCategory", &RFPParameter::getParameterForCategoryR)
@@ -208,33 +172,6 @@ RCPP_MODULE(Parameter_mod)
 		.method("getCovarianceMatrixForAA", &FONSEParameter::getCovarianceMatrixForAA) //Not an R wrapper
 		.method("initMutation", &FONSEParameter::initMutation)
 		.method("initSelection", &FONSEParameter::initSelection)
-
-
-
-
-		//Trace Functions:
-		.method("getTraceObject", &FONSEParameter::getTraceObject) //TODO: only used in R?
-        .method("setFONSETrace", &FONSEParameter::setTraceObject)
-        .method("setCategoriesForTrace", &FONSEParameter::setCategoriesForTrace)
-
-
-
-		//CSP Functions:
-
-
-
-
-		//Posterior, Variance, and Estimates Functions:
-		.method("getSphiPosteriorMean", &FONSEParameter::getSphiPosteriorMean)
-		.method("getMutationPosteriorMeanForCodon", &FONSEParameter::getMutationPosteriorMeanForCodon)
-		.method("getSelectionPosteriorMeanForCodon", &FONSEParameter::getSelectionPosteriorMeanForCodon)
-		.method("getSphiVariance", &FONSEParameter::getSphiVariance)
-		.method("getMutationVarianceForCodon", &FONSEParameter::getMutationVarianceForCodon)
-		.method("getSelectionVarianceForCodon", &FONSEParameter::getSelectionVarianceForCodon)
-
-
-		//Other Functions:
-		.method("calculateSelectionCoefficients", &FONSEParameter::calculateSelectionCoefficientsR)
 		;
 }
 #endif

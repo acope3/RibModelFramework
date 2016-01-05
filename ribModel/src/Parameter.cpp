@@ -1039,6 +1039,11 @@ Trace& Parameter::getTraceObject()
 	return traces;
 }
 
+void Parameter::setTraceObject(Trace _trace)
+{
+	traces = _trace;
+}
+
 
 void Parameter::updateStdDevSynthesisRateTrace(unsigned sample)
 {
@@ -1892,6 +1897,15 @@ void Parameter::setNumSelectionCategories(unsigned _numSelectionCategories)
 
 
 
+// --------------------------------------//
+// ---------- Trace Functions -----------//
+// --------------------------------------//
+
+
+void Parameter::setCategoriesForTrace()
+{
+	traces.setCategories(categories);
+}
 
 
 // -----------------------------------------------//
