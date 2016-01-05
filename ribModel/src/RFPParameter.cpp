@@ -122,7 +122,7 @@ void RFPParameter::initRFPValuesFromFile(std::string filename)
 	input.open(filename.c_str());
 	if (input.fail())
 	{
-		std::cerr << "Could not open RestartFile.txt to initialzie ROC values\n";
+		std::cerr << "Could not open RestartFile.txt to initialzie RFP values\n";
 		std::exit(1);
 	}
 	std::string tmp, variableName;
