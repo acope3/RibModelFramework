@@ -56,7 +56,7 @@ class FONSEModel : public Model
 		virtual void updateAllHyperParameter();
 		virtual void updateHyperParameter(unsigned hp);
 		virtual void updateSphi() { parameter->updateSphi(); }
-		virtual void updateSphiTrace(unsigned sample) { parameter->updateSphiTrace(sample); }
+		virtual void updateSphiTrace(unsigned sample) { parameter->updateStdDevSynthesisRateTrace(sample); }
 		virtual void updateHyperParameterTraces(unsigned sample);
 		virtual void adaptSphiProposalWidth(unsigned adaptiveWidth) { parameter->adaptSphiProposalWidth(adaptiveWidth); }
 		virtual void proposeSynthesisRateLevels() { parameter->proposeSynthesisRateLevels(); }

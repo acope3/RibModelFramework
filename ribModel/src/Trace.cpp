@@ -1,4 +1,5 @@
 #include "include/base/Trace.h"
+#include "include/SequenceSummary.h"
 #ifndef STANDALONE
 #include <Rcpp.h>
 using namespace Rcpp;
@@ -130,31 +131,20 @@ void Trace::initCodonSpecificParameterTrace(unsigned samples, unsigned numCatego
 //ROC
 void Trace::initSynthesisOffsetTrace(unsigned samples, unsigned numPhiGroupings)
 {
+	synthesisOffsetTrace.resize(numPhiGroupings);
+	for (unsigned i = 0; i < numPhiGroupings; i++) {
+		synthesisOffsetTrace[i].resize(samples);
+	}
 
+	synthesisOffsetAcceptanceRatioTrace.resize(numPhiGroupings);
 }
 
 
 void Trace::initObservedSynthesisNoiseTrace(unsigned samples, unsigned numPhiGroupings)
 {
-
-}
-
-void Trace::initMixtureAssignmentTrace(unsigned samples, unsigned num_genes)
-{
-	mixtureAssignmentTrace.resize(num_genes);
-	for (unsigned i = 0u; i < num_genes; i++)
-	{
-		mixtureAssignmentTrace[i].resize(samples);
-	}
-}
-
-
-void Trace::initMixtureProbabilitesTrace(unsigned samples, unsigned numMixtures)
-{
-	mixtureProbabilitiesTrace.resize(numMixtures);
-	for (unsigned i = 0u; i < numMixtures; i++)
-	{
-		mixtureProbabilitiesTrace[i].resize(samples, 0.0);
+	observedSynthesisNoiseTrace.resize(numPhiGroupings);
+	for (unsigned i = 0; i < numPhiGroupings; i++) {
+		observedSynthesisNoiseTrace[i].resize(samples);
 	}
 }
 

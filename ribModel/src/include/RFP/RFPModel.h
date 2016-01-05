@@ -111,7 +111,7 @@ class RFPModel: public Model {
 		}
 		virtual void updateSphiTrace(unsigned sample)
 		{
-			parameter->updateSphiTrace(sample);
+			parameter->updateStdDevSynthesisRateTrace(sample);
 		}
 		virtual void updateHyperParameterTraces(unsigned sample);
 		virtual void adaptSphiProposalWidth(unsigned adaptiveWidth)

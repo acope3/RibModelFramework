@@ -25,8 +25,6 @@ const unsigned FONSEParameter::dOmega = 1;
 FONSEParameter::FONSEParameter() : Parameter()
 {
 	//CTOR
-	phiEpsilon = 0.1;
-	phiEpsilon_proposed = 0.1;
 	bias_csp = 0;
 	mutation_prior_sd = 0.35;
 }
@@ -66,12 +64,9 @@ FONSEParameter& FONSEParameter::operator=(const FONSEParameter& rhs)
 	currentSelectionParameter = rhs.currentSelectionParameter;
 	proposedSelectionParameter = rhs.proposedSelectionParameter;
 
-	phiEpsilon = rhs.phiEpsilon;
-	phiEpsilon_proposed = rhs.phiEpsilon_proposed;
 
 	covarianceMatrix = rhs.covarianceMatrix;
 
-	numAcceptForMutationAndSelection = rhs.numAcceptForMutationAndSelection;
 
 	return *this;
 }
@@ -90,10 +85,6 @@ FONSEParameter::FONSEParameter(const FONSEParameter &other) : Parameter(other)
 	currentSelectionParameter = other.currentSelectionParameter;
 	proposedSelectionParameter = other.proposedSelectionParameter;
 
-	phiEpsilon = other.phiEpsilon;
-	phiEpsilon_proposed = other.phiEpsilon_proposed;
-
-	numAcceptForMutationAndSelection = other.numAcceptForMutationAndSelection;
 
 }
 
@@ -119,11 +110,6 @@ void FONSEParameter::initFONSEParameterSet()
 	// proposal bias and std for codon specific parameter
 	bias_csp = 0;
 	std_csp.resize(numParam, 0.1);
-	numAcceptForMutationAndSelection.resize(22, 0u);
-
-	phiEpsilon = 0.1;
-	phiEpsilon_proposed = 0.1;
-
 	//may need getter fcts
 	currentMutationParameter.resize(numMutationCategories);
 	proposedMutationParameter.resize(numMutationCategories);
@@ -248,10 +234,7 @@ void FONSEParameter::initFONSEValuesFromFile(std::string filename)
 	input.close();
 
 	//init other values
-	phiEpsilon = 0.1;
-	phiEpsilon_proposed = 0.1;
 	bias_csp = 0;
-	numAcceptForMutationAndSelection.resize(22, 0u);
 	proposedMutationParameter.resize(numMutationCategories);
 	proposedSelectionParameter.resize(numSelectionCategories);
 	for (unsigned i = 0; i < numMutationCategories; i++)
@@ -342,7 +325,7 @@ void FONSEParameter::initFromRestartFile(std::string filename)
 
 void FONSEParameter::initAllTraces(unsigned samples, unsigned num_genes)
 {
-    traces.initAllTraces(samples, num_genes, numMutationCategories, numSelectionCategories, numParam,
+    traces.initializeFONSETrace(samples, num_genes, numMutationCategories, numSelectionCategories, numParam,
                          numMixtures, categories, maxGrouping);
 }
 
@@ -427,47 +410,11 @@ void FONSEParameter::initSelectionCategories(std::vector<std::string> files, uns
 // --------------------------------------//
 
 
-Trace& FONSEParameter::getTraceObject()
-{
-	return traces;
-}
-
-
-void FONSEParameter::updateSphiTrace(unsigned sample)
-{
-	for(unsigned i = 0u; i < numSelectionCategories; i++)
-	{
-		traces.updateStdDevSynthesisRateTrace(sample, Sphi[i], i);
-	}
-}
-
-
-void FONSEParameter::updateSynthesisRateTrace(unsigned sample, unsigned geneIndex)
-{
-	traces.updateSynthesisRateTrace(sample, geneIndex, currentSynthesisRateLevel);
-}
-
-
-void FONSEParameter::updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex)
-{
-	traces.updateMixtureAssignmentTrace(sample, geneIndex, mixtureAssignment[geneIndex]);
-}
-
-
-void FONSEParameter::updateMixtureProbabilitiesTrace(unsigned samples)
-{
-	traces.updateMixtureProbabilitiesTrace(samples, categoryProbabilities);
-}
-
-
 void FONSEParameter::updateCodonSpecificParameterTrace(unsigned sample, std::string grouping)
 {
 	traces.updateCodonSpecificParameterTrace(sample, grouping, currentMutationParameter, dM);
 	traces.updateCodonSpecificParameterTrace(sample, grouping, currentSelectionParameter, dOmega);
 }
-
-
-
 
 
 // ------------------------------------------//
@@ -481,23 +428,6 @@ CovarianceMatrix& FONSEParameter::getCovarianceMatrixForAA(std::string aa)
     unsigned aaIndex = SequenceSummary::aaToIndex.find(aa)->second;
     return covarianceMatrix[aaIndex];
 }
-
-
-
-
-
-// -------------------------------------------//
-// ---------- Phi Epsilon Functions ----------//
-// -------------------------------------------//
-
-
-double FONSEParameter::getPhiEpsilon()
-{
-    return phiEpsilon;
-}
-
-
-
 
 
 // -----------------------------------//
@@ -551,7 +481,7 @@ void FONSEParameter::updateCodonSpecificParameter(std::string grouping)
 {
     std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(grouping, true);
     unsigned aaIndex = SequenceSummary::aaToIndex.find(grouping)->second;
-    numAcceptForMutationAndSelection[aaIndex]++;
+	numAcceptForCodonSpecificParameters[aaIndex]++;
     
     for (unsigned k = 0u; k < numMutationCategories; k++)
     {
@@ -568,366 +498,6 @@ void FONSEParameter::updateCodonSpecificParameter(std::string grouping)
         }
     }
 }
-
-
-
-
-
-// ------------------------------------------------------------------//
-// ---------- Posterior, Variance, and Estimates Functions ----------//
-// ------------------------------------------------------------------//
-
-
-double FONSEParameter::getSphiPosteriorMean(unsigned samples, unsigned mixture)
-{
-    double posteriorMean = 0.0;
-    unsigned selectionCategory = getSelectionCategory(mixture);
-    std::vector<double> sPhiTrace = traces.getSphiTrace(selectionCategory);
-    unsigned traceLength = sPhiTrace.size();
-    
-    if (samples > traceLength)
-    {
-        std::cerr << "Warning in Parameter::getSphiPosteriorMean throws: Number of anticipated samples (" << samples
-        << ") is greater than the length of the available trace (" << traceLength << ")."
-        << "Whole trace is used for posterior estimate! \n";
-        samples = traceLength;
-    }
-    unsigned start = traceLength - samples;
-    for (unsigned i = start; i < traceLength; i++)
-    {
-        posteriorMean += sPhiTrace[i];
-    }
-    return posteriorMean / (double)samples;
-}
-
-
-double FONSEParameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement)
-{
-    unsigned expressionCategory = getSynthesisRateCategory(mixtureElement);
-    double posteriorMean = 0.0;
-    std::vector<double> synthesisRateTrace = traces.getSynthesisRateTraceByMixtureElementForGene(mixtureElement,
-                                                                                                 geneIndex);
-    unsigned traceLength = synthesisRateTrace.size();
-    
-    if (samples > traceLength)
-    {
-        std::cerr << "Warning in Parameter::getSynthesisRatePosteriorMean throws: Number of anticipated samples ("
-        << samples << ") is greater than the length of the available trace (" << traceLength << ")."
-        << "Whole trace is used for posterior estimate! \n";
-        samples = traceLength;
-    }
-    unsigned start = traceLength - samples;
-    unsigned category = 0u;
-    unsigned usedSamples = 0u;
-    std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
-    for (unsigned i = start; i < traceLength; i++)
-    {
-        category = mixtureAssignmentTrace[i];
-        category = getSynthesisRateCategory(category);
-        if (category == expressionCategory)
-        {
-            posteriorMean += synthesisRateTrace[i];
-            usedSamples++;
-        }
-    }
-    // Can return NaN if gene was never in category! But that is Ok.
-    return posteriorMean / (double)usedSamples;
-}
-
-
-double FONSEParameter::getMutationPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon)
-{
-    double posteriorMean = 0.0;
-    std::vector<double> mutationParameterTrace = traces.getMutationParameterTraceByMixtureElementForCodon(
-                                                                                                          mixtureElement, codon);
-    unsigned traceLength = mutationParameterTrace.size();
-    
-    if (samples > traceLength)
-    {
-        std::cerr << "Warning in FONSEParameter::getMutationPosteriorMean throws: Number of anticipated samples ("
-        << samples << ") is greater than the length of the available trace (" << traceLength << ")."
-        << "Whole trace is used for posterior estimate! \n";
-        samples = traceLength;
-    }
-    unsigned start = traceLength - samples;
-    for (unsigned i = start; i < traceLength; i++)
-    {
-        posteriorMean += mutationParameterTrace[i];
-    }
-    return posteriorMean / (double)samples;
-}
-
-
-double FONSEParameter::getSelectionPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon)
-{
-    double posteriorMean = 0.0;
-    std::vector<double> selectionParameterTrace = traces.getSelectionParameterTraceByMixtureElementForCodon(
-                                                                                                            mixtureElement, codon);
-    unsigned traceLength = selectionParameterTrace.size();
-    
-    if (samples > traceLength)
-    {
-        std::cerr << "Warning in FONSEParameter::getSelectionPosteriorMean throws: Number of anticipated samples ("
-        << samples << ") is greater than the length of the available trace (" << traceLength << ")."
-        << "Whole trace is used for posterior estimate! \n";
-        samples = traceLength;
-    }
-    unsigned start = traceLength - samples;
-    for (unsigned i = start; i < traceLength; i++)
-    {
-        posteriorMean += selectionParameterTrace[i];
-    }
-    return posteriorMean / (double)samples;
-}
-
-
-double FONSEParameter::getSphiVariance(unsigned samples, unsigned mixture, bool unbiased)
-{
-    unsigned selectionCategory = getSelectionCategory(mixture);
-    std::vector<double> sPhiTrace = traces.getSphiTrace(selectionCategory);
-    unsigned traceLength = sPhiTrace.size();
-    if (samples > traceLength)
-    {
-        std::cerr << "Warning in Parameter::getSphiVariance throws: Number of anticipated samples (" << samples
-        << ") is greater than the length of the available trace (" << traceLength << ")."
-        << "Whole trace is used for posterior estimate! \n";
-        samples = traceLength;
-    }
-    double posteriorMean = getSphiPosteriorMean(samples, mixture);
-    
-    double posteriorVariance = 0.0;
-    
-    unsigned start = traceLength - samples;
-    for (unsigned i = start; i < traceLength; i++)
-    {
-        double difference = sPhiTrace[i] - posteriorMean;
-        posteriorVariance += difference * difference;
-    }
-    double normalizationTerm = unbiased ? (1 / ((double)samples - 1.0)) : (1 / (double)samples);
-    return normalizationTerm * posteriorVariance;
-}
-
-
-double FONSEParameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement,
-                                                bool unbiased)
-{
-    std::vector<double> synthesisRateTrace = traces.getSynthesisRateTraceByMixtureElementForGene(mixtureElement,
-                                                                                                 geneIndex);
-    unsigned traceLength = synthesisRateTrace.size();
-    if (samples > traceLength)
-    {
-        std::cerr << "Warning in Parameter::getSynthesisRateVariance throws: Number of anticipated samples (" << samples
-        << ") is greater than the length of the available trace (" << traceLength << ")."
-        << "Whole trace is used for posterior estimate! \n";
-        samples = traceLength;
-    }
-    
-    double posteriorMean = getSynthesisRatePosteriorMean(samples, geneIndex, mixtureElement);
-    
-    double posteriorVariance = 0.0;
-    if (!std::isnan(posteriorMean))
-    {
-        unsigned start = traceLength - samples;
-        unsigned category = 0u;
-        double difference = 0.0;
-        std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
-        for (unsigned i = start; i < traceLength; i++)
-        {
-            category = mixtureAssignmentTrace[i];
-            category = getSynthesisRateCategory(category);
-            difference = synthesisRateTrace[i] - posteriorMean;
-            posteriorVariance += difference * difference;
-        }
-    }
-    double normalizationTerm = unbiased ? (1 / ((double)samples - 1.0)) : (1 / (double)samples);
-    return normalizationTerm * posteriorVariance;
-}
-
-
-double FONSEParameter::getMutationVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased)
-{
-    std::vector<double> mutationParameterTrace = traces.getMutationParameterTraceByMixtureElementForCodon(
-                                                                                                          mixtureElement, codon);
-    unsigned traceLength = mutationParameterTrace.size();
-    if (samples > traceLength)
-    {
-        std::cerr << "Warning in FONSEParameter::getMutationVariance throws: Number of anticipated samples (" << samples
-        << ") is greater than the length of the available trace (" << traceLength << ")."
-        << "Whole trace is used for posterior estimate! \n";
-        samples = traceLength;
-    }
-    
-    double posteriorMean = getMutationPosteriorMean(mixtureElement, samples, codon);
-    
-    double posteriorVariance = 0.0;
-    
-    unsigned start = traceLength - samples;
-    double difference = 0.0;
-    for (unsigned i = start; i < traceLength; i++)
-    {
-        difference = mutationParameterTrace[i] - posteriorMean;
-        posteriorVariance += difference * difference;
-    }
-    double normalizationTerm = unbiased ? (1 / ((double)samples - 1.0)) : (1 / (double)samples);
-    return normalizationTerm * posteriorVariance;
-}
-
-
-double FONSEParameter::getSelectionVariance(unsigned mixtureElement, unsigned samples, std::string &codon, bool unbiased)
-{
-    std::vector<double> selectionParameterTrace = traces.getSelectionParameterTraceByMixtureElementForCodon(
-                                                                                                            mixtureElement, codon);
-    unsigned traceLength = selectionParameterTrace.size();
-    if (samples > traceLength)
-    {
-        std::cerr << "Warning in FONSEParameter::getSelectionVariance throws: Number of anticipated samples (" << samples
-        << ") is greater than the length of the available trace (" << traceLength << ")."
-        << "Whole trace is used for posterior estimate! \n";
-        samples = traceLength;
-    }
-    
-    double posteriorMean = getSelectionPosteriorMean(mixtureElement, samples, codon);
-    
-    double posteriorVariance = 0.0;
-    
-    unsigned start = traceLength - samples;
-    double difference = 0.0;
-    for (unsigned i = start; i < traceLength; i++)
-    {
-        difference = selectionParameterTrace[i] - posteriorMean;
-        posteriorVariance += difference * difference;
-    }
-    double normalizationTerm = unbiased ? (1 / ((double)samples - 1.0)) : (1 / (double)samples);
-    return normalizationTerm * posteriorVariance;
-}
-
-
-std::vector<double> FONSEParameter::getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex)
-{
-    std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
-    std::vector<double> probabilities(numMixtures, 0.0);
-    unsigned traceLength = mixtureAssignmentTrace.size();
-    
-    if (samples > traceLength)
-    {
-        std::cerr
-        << "Warning in FONSEParameter::getMixtureAssignmentPosteriorMean throws: Number of anticipated samples ("
-        << samples << ") is greater than the length of the available trace (" << traceLength << ")."
-        << "Whole trace is used for posterior estimate! \n";
-        samples = traceLength;
-    }
-    
-    unsigned start = traceLength - samples;
-    for (unsigned i = start; i < traceLength; i++)
-    {
-        unsigned value = mixtureAssignmentTrace[i];
-        probabilities[value]++;
-    }
-    
-    for (unsigned i = 0; i < numMixtures; i++)
-    {
-        probabilities[i] /= (double)samples;
-    }
-    return probabilities;
-}
-
-
-
-
-
-// ----------------------------------------------//
-// ---------- Adaptive Width Functions ----------//
-// ----------------------------------------------//
-
-
-void FONSEParameter::adaptSphiProposalWidth(unsigned adaptationWidth)
-{
-    double acceptanceLevel = (double)numAcceptForSphi / (double)adaptationWidth;
-    traces.updateSphiAcceptanceRatioTrace(acceptanceLevel);
-    if (acceptanceLevel < 0.2)
-    {
-        std_sphi *= 0.8;
-    }
-    if (acceptanceLevel > 0.3)
-    {
-        std_sphi *= 1.2;
-    }
-    numAcceptForSphi = 0u;
-}
-
-
-void FONSEParameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
-{
-    unsigned acceptanceUnder = 0u;
-    unsigned acceptanceOver = 0u;
-    for (unsigned cat = 0u; cat < numSelectionCategories; cat++)
-    {
-        unsigned numGenes = numAcceptForSynthesisRate[cat].size();
-        for (unsigned i = 0; i < numGenes; i++)
-        {
-            double acceptanceLevel = (double)numAcceptForSynthesisRate[cat][i] / (double)adaptationWidth;
-            traces.updateSynthesisRateAcceptanceRatioTrace(cat, i, acceptanceLevel);
-            if (acceptanceLevel < 0.225)
-            {
-                std_phi[cat][i] *= 0.8;
-                if (acceptanceLevel < 0.2) acceptanceUnder++;
-            }
-            if (acceptanceLevel > 0.275)
-            {
-                std_phi[cat][i] *= 1.2;
-                if (acceptanceLevel > 0.3) acceptanceOver++;
-            }
-            numAcceptForSynthesisRate[cat][i] = 0u;
-        }
-    }
-    std::cout << "acceptance rate for synthesis rate:\n";
-    std::cout << "\t acceptance rate to low: " << acceptanceUnder << "\n";
-    std::cout << "\t acceptance rate to high: " << acceptanceOver << "\n";
-}
-
-
-void FONSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
-{
-    unsigned numCSPsets = numAcceptForMutationAndSelection.size();
-    std::cout << "acceptance rate for amino acid:\n\t";
-    for (unsigned i = 0; i < numCSPsets; i++)
-    {
-        if (i == 21 || i == 10 || i == 18)
-            continue;
-        std::cout << SequenceSummary::AminoAcidArray[i] << "\t\t";
-    }
-    std::cout << "\n\t";
-    for (unsigned i = 0; i < numCSPsets; i++)
-    {
-        if (i == 21 || i == 10 || i == 18)
-            continue;
-        double acceptanceLevel = (double)numAcceptForMutationAndSelection[i] / (double)adaptationWidth;
-        std::cout << acceptanceLevel << "\t";
-        traces.updateCspAcceptanceRatioTrace(i, acceptanceLevel);
-        std::array <unsigned, 2> codonRange = SequenceSummary::AAIndexToCodonRange(i, true);
-        for (unsigned k = codonRange[0]; k < codonRange[1]; k++)
-        {
-            if (acceptanceLevel < 0.2)
-            {
-                covarianceMatrix[i] *= 0.8;
-                covarianceMatrix[i].choleskiDecomposition();
-                std_csp[k] *= 0.8;
-            }
-            if (acceptanceLevel > 0.3)
-            {
-                covarianceMatrix[i] *= 1.2;
-                covarianceMatrix[i].choleskiDecomposition();
-                std_csp[k] *= 1.2;
-            }
-        }
-        numAcceptForMutationAndSelection[i] = 0u;
-    }
-    std::cout << "\n";
-}
-
-
-
-
 
 // -------------------------------------//
 // ---------- Other Functions ----------//
@@ -965,42 +535,6 @@ void FONSEParameter::getParameterForCategory(unsigned category, unsigned paramTy
     {
         returnSet[j] = tempSet->at(i);
     }
-}
-
-
-std::vector <std::vector <double> > FONSEParameter::calculateSelectionCoefficients(unsigned sample, unsigned mixture)
-{
-    unsigned numGenes = mixtureAssignment.size();
-    std::vector<std::vector<double>> selectionCoefficients;
-    selectionCoefficients.resize(numGenes);
-    for (unsigned i = 0; i < numGenes; i++)
-    {
-        for (unsigned j = 0; j < getGroupListSize(); j++)
-        {
-            
-            std::string aa = getGrouping(j);
-            std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(aa, true);
-            std::vector<double> tmp;
-            double minValue = 0.0;
-            for (unsigned k = aaRange[0]; k < aaRange[1]; k++)
-            {
-                std::string codon = SequenceSummary::codonArrayParameter[k];
-                tmp.push_back(getSelectionPosteriorMean(sample, mixture, codon));
-                if (tmp[k] < minValue)
-                {
-                    minValue = tmp[k];
-                }
-            }
-            tmp.push_back(0.0);
-            double phi = getSynthesisRatePosteriorMean(sample, i, mixture);
-            for (unsigned k = 0; k < tmp.size(); k++)
-            {
-                tmp[k] -= minValue;
-                selectionCoefficients[i].push_back(phi * tmp[k]);
-            }
-        }
-    }
-    return selectionCoefficients;
 }
 
 

@@ -1,8 +1,8 @@
-
+#ifndef TRACE_H
+#define TRACE_H
 #include <iostream>
 #include <vector>
 #include <cctype>
-#include "../SequenceSummary.h"
 #include "../mixtureDefinition.h"
 
 class Trace {
@@ -50,6 +50,8 @@ private:
 
 public:
 
+	Trace();
+	
 	//Initialization Functions:
 	void initializeRFPTrace(unsigned samples, unsigned num_genes, unsigned numAlphaCategories,
 		unsigned numLambdaPrimeCategories, unsigned numParam, unsigned numMixtures,
@@ -121,14 +123,8 @@ public:
 	std::vector<double> getSynthesisRateTraceByMixtureElementForGeneR(unsigned mixtureElement, unsigned geneIndex);//R WRAPPER
 	std::vector<unsigned> getMixtureAssignmentTraceForGeneR(unsigned geneIndex);//R WRAPPER
 	std::vector<double> getMixtureProbabilitiesTraceForMixtureR(unsigned mixtureIndex);//R WRAPPER
-	std::vector<std::vector<double>> getStdDevSynthesisRateTraces()
-	{
-		return stdDevSynthesisRateTrace;
-	}
-	unsigned getNumberOfMixtures()
-	{
-		return mixtureProbabilitiesTrace.size();
-	}
+	std::vector<std::vector<double>> getStdDevSynthesisRateTraces();
+	unsigned getNumberOfMixtures();
 
 
 	//Only use R:
@@ -154,3 +150,4 @@ public:
 
 	bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);
 };
+#endif // TRACE_H
