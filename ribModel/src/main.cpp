@@ -115,20 +115,20 @@ int main()
 	std::cout << "Done!------------------------\n\n\n";
 
 	
-	RFPParameter parameter;
+
 	std::cout << "Initializing RFPParameter object--------------------\n" << std::endl;
 	std::string mixDef = Parameter::selectionShared;
-	RFPParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
+	RFPParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 
 	for (unsigned i = 0u; i < numMixtures; i++)
 	{
-		unsigned selectionCategry = tmp.getSelectionCategory(i);
+		unsigned selectionCategry = parameter.getSelectionCategory(i);
 		std::cout << "Sphi_init for selection category " << selectionCategry << ": " << sphi_init[selectionCategry] << std::endl;
 	}
 	std::cout << "\t# mixtures: " << numMixtures << "\n";
 	std::cout << "\tmixture definition: " << mixDef << "\n";
 
-	tmp.InitializeSynthesisRate(genome, sphi_init[0]);
+	parameter.InitializeSynthesisRate(genome, sphi_init[0]);
 	std::cout << "Done!--------------------------------\n\n\n" << std::endl;
 
 
