@@ -25,11 +25,11 @@ class PANSETrace: public Trace {
 		std::vector<double> getAlphaParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon);
 		std::vector<double> getLambdaPrimeParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon);
 
-		unsigned getAlphaCategory(unsigned mixtureElement)
+	/*	unsigned getAlphaCategory(unsigned mixtureElement)
 		{	return categories->at(mixtureElement).delM;}
 		unsigned getLambdaPrimeCategory(unsigned mixtureElement)
 		{	return categories->at(mixtureElement).delEta;}
-
+*/
 		//Update functions	
 		void updateCodonSpecificParameterTrace(unsigned sample, std::string codon, std::vector<std::vector<double>> &curAlpParam, std::vector<std::vector<double>> &curLmPriParam);
 
