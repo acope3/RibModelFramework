@@ -222,7 +222,7 @@ class Parameter {
 
 
 		//Other Functions:
-		SEXP calculateSelectionCoefficientsR(unsigned sample, unsigned mixture)
+		SEXP calculateSelectionCoefficientsR(unsigned sample, unsigned mixture);
 		std::vector<unsigned> getMixtureAssignmentR();
 		void setMixtureAssignmentR(std::vector<unsigned> _mixtureAssignment);
 		unsigned getMixtureAssignmentForGeneR(unsigned geneIndex);
