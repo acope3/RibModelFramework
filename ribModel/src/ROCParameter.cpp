@@ -1012,60 +1012,12 @@ void ROCParameter::setCurrentSelectionParameter(std::vector<std::vector<double>>
 }
 
 
-
-
-
 // ------------------------------------------------------------------//
 // ---------- Posterior, Variance, and Estimates Functions ----------//
 // ------------------------------------------------------------------//
 
 
-double ROCParameter::getMutationPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
-{
-	double rv = -1.0;
-	bool check = checkIndex(mixtureElement, 1, numMixtures);
-	if (check)
-	{
-		rv = getMutationPosteriorMean(mixtureElement - 1, samples, codon);
-	}
-	return rv;
-}
 
-
-double ROCParameter::getSelectionPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
-{
-	double rv = -1.0;
-	bool check = checkIndex(mixtureElement, 1, numMixtures);
-	if (check)
-	{
-		rv = getSelectionPosteriorMean(mixtureElement - 1, samples, codon);
-	}
-	return rv;
-}
-
-
-double ROCParameter::getMutationVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased)
-{
-	double rv = -1.0;
-	bool check = checkIndex(mixtureElement, 1, numMixtures);
-	if (check)
-	{
-		rv = getMutationVariance(mixtureElement - 1, samples, codon, unbiased);
-	}
-	return rv;
-}
-
-
-double ROCParameter::getSelectionVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased)
-{
-	double rv = -1.0;
-	bool check = checkIndex(mixtureElement, 1, numMixtures);
-	if (check)
-	{
-		rv = getSelectionVariance(mixtureElement - 1, samples, codon, unbiased);
-	}
-	return rv;
-}
 
 
 #endif
