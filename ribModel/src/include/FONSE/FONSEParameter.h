@@ -111,9 +111,6 @@ class FONSEParameter : public Parameter
 		std::vector< std::vector <double> > getCurrentMutationParameter();
 		std::vector< std::vector <double> > getCurrentSelectionParameter();
 
-
-		//Other Functions:
-		SEXP calculateSelectionCoefficientsR(unsigned sample, unsigned mixture);
 #endif //STANDALONE
 
 	protected:

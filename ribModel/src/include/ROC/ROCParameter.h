@@ -161,10 +161,6 @@ class ROCParameter : public Parameter
 		double getMutationVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased);
 		double getSelectionVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased);
 
-
-
-		//Other Functions:
-		SEXP calculateSelectionCoefficientsR(unsigned sample, unsigned mixture);
 #endif //STADNALONE
 
 	protected:

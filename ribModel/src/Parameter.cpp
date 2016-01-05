@@ -1959,7 +1959,7 @@ double Parameter::getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsi
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
 	if (check)
 	{
-		rv = getMutationVariance(mixtureElement - 1, samples, codon, paramType, unbiased);
+		rv = getCodonSpecificVariance(mixtureElement - 1, samples, codon, paramType, unbiased);
 	}
 	return rv;
 }
@@ -2012,10 +2012,30 @@ std::vector<double> Parameter::getEstimatedMixtureAssignmentProbabilitiesForGene
 
 
 
-
 // -------------------------------------//
 // ---------- Other Functions ----------//
 // -------------------------------------//
+
+
+SEXP Parameter::calculateSelectionCoefficientsR(unsigned sample, unsigned mixture)
+{
+	NumericMatrix RSelectionCoefficents(mixtureAssignment.size(), 62); //62 due to stop codons
+	std::vector<std::vector<double>> selectionCoefficients;
+	bool checkMixture = checkIndex(mixture, 1, numMixtures);
+	if (checkMixture)
+	{
+		selectionCoefficients = calculateSelectionCoefficients(sample, mixture - 1);
+		unsigned index = 0;
+		for (unsigned i = 0; i < selectionCoefficients.size(); i++)
+		{
+			for (unsigned j = 0; j < selectionCoefficients[i].size(); j++, index++)
+			{
+				RSelectionCoefficents[index] = selectionCoefficients[i][j];
+			}
+		}
+	}
+	return RSelectionCoefficents;
+}
 
 
 std::vector<unsigned> Parameter::getMixtureAssignmentR()
