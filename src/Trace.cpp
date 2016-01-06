@@ -647,10 +647,8 @@ void Trace::setCodonSpecificAcceptanceRatioTrace(std::vector<std::vector<double>
 }
 
 
-void Trace::setCategories(std::vector<mixtureDefinition> &_categories)
-{
-	categories = &_categories;
-}
+
+
 
 //----------------------------------//
 //---------- ROC Specific ----------//
