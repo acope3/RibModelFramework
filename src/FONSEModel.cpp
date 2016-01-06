@@ -55,6 +55,9 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 	double phiValue = parameter->getSynthesisRate(geneIndex, expressionCategory, false);
 	double phiValue_proposed = parameter->getSynthesisRate(geneIndex, expressionCategory, true);
 
+
+	/* This loop causes a compiler warning because i is an int, but openMP won't compile if I change i to unsigned.
+		Maybe worth looking into? */
 #ifndef __APPLE__
 #pragma omp parallel for private(mutation, selection, positions, curAA) reduction(+:likelihood,likelihood_proposed)
 #endif

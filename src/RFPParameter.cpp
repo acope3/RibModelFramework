@@ -538,7 +538,7 @@ void RFPParameter::calculateRFPMean(Genome& genome)
 			count *= count;
 			squareSum += count;
 		}
-		variance[codonIndex] = squareSum /= genome.getGenomeSize();
+		variance[codonIndex] = squareSum / genome.getGenomeSize();
 	}
 
 	std::cout <<"Variance calculated\n";
