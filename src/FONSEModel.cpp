@@ -247,16 +247,9 @@ void FONSEModel::updateTracesWithInitialValues(Genome & genome)
 		parameter->updateMixtureAssignmentTrace(0, i);
 	}
 
-	unsigned aaStart;
-	unsigned aaEnd;
 	for (unsigned i = 0; i < groupList.size(); i++)
 	{
-		SequenceSummary::AAToCodonRange(groupList[i], aaStart, aaEnd, false);
-		for (unsigned j = aaStart; j < aaEnd; j++)
-		{
-			std::string codon = SequenceSummary::indexToCodon(j, true);
-			parameter->updateCodonSpecificParameterTrace(0, codon);
-		}
+		parameter->updateCodonSpecificParameterTrace(0, getGrouping(i));
 	}
 }
 

@@ -109,6 +109,7 @@ Parameter& Parameter::operator=(const Parameter& rhs)
 	traces = rhs.traces;
 	numAcceptForCodonSpecificParameters = rhs.numAcceptForCodonSpecificParameters;
 	std_csp = rhs.std_csp;
+	covarianceMatrix = rhs.covarianceMatrix;
 	return *this;
 }
 

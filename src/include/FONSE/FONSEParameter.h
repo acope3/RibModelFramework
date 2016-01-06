@@ -18,7 +18,6 @@ class FONSEParameter : public Parameter
 {
 	private:
 
-		std::vector<CovarianceMatrix> covarianceMatrix;
 		std::vector <std::vector <double> > proposedMutationParameter;
 		std::vector <std::vector <double> > currentMutationParameter;
 		std::vector <std::vector <double> > proposedSelectionParameter;

@@ -452,7 +452,7 @@ void FONSEParameter::proposeCodonSpecificParameter()
         std::string aa = getGrouping(k);
 		unsigned aaStart;
 		unsigned aaEnd;
-		SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, false);
+		SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
         unsigned numCodons = aaEnd - aaStart;
         for (unsigned i = 0u; i < numCodons * (numMutationCategories + numSelectionCategories); i++)
         {
