@@ -208,6 +208,14 @@ double ROCModel::calculateAllPriors()
 	{
 		std::string grouping = getGrouping(i);
 		prior += calculateMutationPrior(grouping, false);
+	    if (std::isinf(prior) || !std::isfinite(prior))
+        {
+    #ifndef STANDALONE
+            Rprintf("\tprior not finite after grouping %s!\n", grouping.c_str());
+    #else
+            std::cout << "\tInfinity after adding prior!\n";
+    #endif
+        }        
 	}
 
 	// add more priors if necessary.
@@ -217,7 +225,7 @@ double ROCModel::calculateAllPriors()
 
 double ROCModel::calculateMutationPrior(std::string grouping, bool proposed)
 {
-	unsigned numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
+	unsigned numCodons = SequenceSummary::GetNumCodonsForAA(grouping, true);
 	double mutation[5];
 
 	double priorValue = 0.0;
