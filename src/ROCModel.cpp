@@ -52,7 +52,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 	}
 	unsigned mixture = getMixtureAssignment(geneIndex);
 	mixture = getSynthesisRateCategory(mixture);
-	double sPhi = parameter->getSphi(mixture, false);
+	double sPhi = parameter->getStdDevSynthesisRate(mixture, false);
 	double mPhi = (-(sPhi * sPhi) / 2);
 	double logPhiProbability = Parameter::densityLogNorm(phiValue, mPhi, sPhi, true);
 	double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, mPhi, sPhi, true);
@@ -498,7 +498,7 @@ void ROCModel::updateGibbsSampledHyperParameters(Genome &genome)
 
 void ROCModel::proposeHyperParameters()
 {
-	parameter->proposeSphi();
+	parameter->proposeStdDevSynthesisRate();
 	if (withPhi) {
 		parameter->proposeAphi();
 	}

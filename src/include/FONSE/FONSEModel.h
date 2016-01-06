@@ -36,7 +36,7 @@ class FONSEModel : public Model
 		//Parameter wrapper functions:
 		virtual void initTraces(unsigned samples, unsigned num_genes) { parameter->initAllTraces(samples, num_genes); }
 		virtual void writeRestartFile(std::string filename) { return parameter->writeEntireRestartFile(filename); }
-		virtual double getSphi(unsigned selectionCategory, bool proposed = false) { return parameter->getSphi(selectionCategory, proposed); }
+		virtual double getSphi(unsigned selectionCategory, bool proposed = false) { return parameter->getStdDevSynthesisRate(selectionCategory, proposed); }
 		virtual unsigned getNumPhiGroupings() { return parameter->getNumObservedPhiSets(); }
 		virtual void setNumPhiGroupings(unsigned value) { parameter->setNumObservedPhiSets(value); }
 		virtual unsigned getNumMixtureElements() { return parameter->getNumMixtureElements(); }
@@ -51,14 +51,14 @@ class FONSEModel : public Model
 		virtual unsigned getSelectionCategory(unsigned mixture) { return parameter->getSelectionCategory(mixture); }
 		virtual unsigned getMutationCategory(unsigned mixture)  { return parameter->getMutationCategory(mixture); }
 		virtual double getSynthesisRate(unsigned index, unsigned mixture, bool proposed = false) { return parameter->getSynthesisRate(index, mixture, proposed); }
-		virtual double getCurrentSphiProposalWidth() { return parameter->getCurrentSphiProposalWidth(); }
+		virtual double getCurrentSphiProposalWidth() { return parameter->getCurrentStdDevSynthesisRateProposalWidth(); }
 		virtual void adaptHyperParameterProposalWidths(unsigned adaptiveWidth);
 		virtual void updateAllHyperParameter();
 		virtual void updateHyperParameter(unsigned hp);
-		virtual void updateSphi() { parameter->updateSphi(); }
+		virtual void updateSphi() { parameter->updateStdDevSynthesisRate(); }
 		virtual void updateSphiTrace(unsigned sample) { parameter->updateStdDevSynthesisRateTrace(sample); }
 		virtual void updateHyperParameterTraces(unsigned sample);
-		virtual void adaptSphiProposalWidth(unsigned adaptiveWidth) { parameter->adaptSphiProposalWidth(adaptiveWidth); }
+		virtual void adaptSphiProposalWidth(unsigned adaptiveWidth) { parameter->adaptStdDevSynthesisRateProposalWidth(adaptiveWidth); }
 		virtual void proposeSynthesisRateLevels() { parameter->proposeSynthesisRateLevels(); }
 		virtual unsigned getNumSynthesisRateCategories() { return parameter->getNumSynthesisRateCategories(); }
 		virtual std::vector<unsigned> getMixtureElementsOfSelectionCategory(unsigned k) { return parameter->getMixtureElementsOfSelectionCategory(k); }
