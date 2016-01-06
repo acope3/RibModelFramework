@@ -189,10 +189,6 @@ class Parameter {
 
 
 
-		//Trace Functions:
-		void setCategoriesForTrace();
-
-
 		//Mixture Definition Matrix and Category Functions:
 		unsigned getMutationCategoryForMixture(unsigned mixtureElement);
 		unsigned getSelectionCategoryForMixture(unsigned mixtureElement);

@@ -699,18 +699,19 @@ unsigned SequenceSummary::getRFPObservedForCodonIndexR(unsigned codonIndex)
 }
 
 
-std::vector <unsigned> *SequenceSummary::getCodonPositionsForCodonR(std::string codon)
+std::vector <unsigned> SequenceSummary::getCodonPositionsForCodonR(std::string codon)
 {
+    std::vector <unsigned> RV;
 	codon[0] = (char) std::toupper(codon[0]);
 	codon[1] = (char) std::toupper(codon[1]);
 	codon[2] = (char) std::toupper(codon[2]);
-	return getCodonPositions(codon);
+	return *getCodonPositions(codon);
 }
 
 
-std::vector <unsigned> *SequenceSummary::getCodonPositionsForCodonIndexR(unsigned codonIndex)
+std::vector <unsigned> SequenceSummary::getCodonPositionsForCodonIndexR(unsigned codonIndex)
 {
-	return getCodonPositions(codonIndex);
+	return *getCodonPositions(codonIndex);
 }
 
 

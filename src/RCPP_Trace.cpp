@@ -9,6 +9,17 @@ RCPP_MODULE(Trace_mod)
   class_<Trace>( "Trace" )
   
     //Getter Functions:
+    .method("getStdDevSynthesisRateAcceptanceRatioTrace", &Trace::getStdDevSynthesisRateAcceptanceRatioTrace)
+    .method("getSynthesisRateTrace", &Trace::getSynthesisRateTrace)
+    .method("getSynthesisRateAcceptanceRatioTrace", &Trace::getSynthesisRateAcceptanceRatioTrace)
+    .method("getCodonSpecficAcceptanceRatioTraceForAA", &Trace::getCodonSpecficAcceptanceRatioTraceForAA)
+    .method("getMixutreAssignmentTrace", &Trace::getMixtureAssignmentTrace)
+    .method("getCodonSpecificAcceptanceRatioTrace", &Trace::getCodonSpecificAcceptanceRatioTrace)
+    .method("getMixtureProbabilitiesTrace", &Trace::getMixtureProbabilitiesTrace)
+    .method("getExpectedSynthesisRateTrace", &Trace::getExpectedSynthesisRateTrace)
+    .method("getSynthesisOffsetAcceptanceRatioTrace", &Trace::getSynthesisOffsetAcceptanceRatioTrace)
+    .method("getSynthesisOffsetAcceptanceRatioTraceForIndex", &Trace::getSynthesisOffsetAcceptanceRatioTraceForIndex)
+    .method("getCodonSpecificParameterTrace", &Trace::getCodonSpecificParameterTrace)
     .method("getSynthesisRateAcceptanceRatioTraceByMixtureElementForGene", &Trace::getSynthesisRateAcceptanceRatioTraceByMixtureElementForGeneR)
     .method("getSynthesisRateTraceForGene", &Trace::getSynthesisRateTraceForGeneR)
     .method("getSynthesisRateTraceByMixtureElementForGene", &Trace::getSynthesisRateTraceByMixtureElementForGeneR)
@@ -26,32 +37,19 @@ RCPP_MODULE(Trace_mod)
     .method("setMixtureAssignmentTrace", &Trace::setMixtureAssignmentTrace)
     .method("setMixtureProbabilitiesTrace", &Trace::setMixtureProbabilitiesTrace)
     .method("setCodonSpecificAcceptanceRatioTrace", &Trace::setCodonSpecificAcceptanceRatioTrace)
-    //.method("setCategories", &Trace::setCategories) //TODO: used?    
     
     //ROC Specific:
     .method("getCodonSpecificParameterTraceByMixtureElementForCodon", &Trace::getCodonSpecificParameterTraceByMixtureElementForCodon)
 
-
-    .method("getMixutreAssignmentTrace", &Trace::getMixtureAssignmentTrace)
-    .method("getStdDevSynthesisRateAcceptanceRatioTrace", &Trace::getStdDevSynthesisRateAcceptanceRatioTrace)
-    .method("getCodonSpecficAcceptanceRatioTraceForAA", &Trace::getCodonSpecficAcceptanceRatioTraceForAA)
-    .method("getCodonSpecificAcceptanceRatioTrace", &Trace::getCodonSpecificAcceptanceRatioTrace)
-    
-     //These methods have specific R wrappers
-    .method("getSynthesisRateAcceptanceRatioTrace", &Trace::getSynthesisRateAcceptanceRatioTrace)
-    .method("getSynthesisRateTrace", &Trace::getSynthesisRateTrace)
-    .method("getMixtureProbabilitiesTrace", &Trace::getMixtureProbabilitiesTrace)
-    .method("getExpectedSynthesisRateTrace", &Trace::getExpectedSynthesisRateTrace)   
-    
-    .method("getSynthesisOffsetAcceptanceRatioTrace", &Trace::getSynthesisOffsetAcceptanceRatioTrace)
+    //ROC Specific:
+    .method("getCodonSpecificParameterTraceByMixtureElementForCodon", &Trace::getCodonSpecificParameterTraceByMixtureElementForCodon)
     .method("getSynthesisOffsetTrace", &Trace::getSynthesisOffsetTraceR)
-    .method("getSynthesisOffsetAcceptanceRatioTraceForIndex", &Trace::getSynthesisOffsetAcceptanceRatioTraceForIndex)
     .method("getObservedSynthesisNoiseTrace", &Trace::getObservedSynthesisNoiseTraceR)
     .method("setSynthesisOffsetTrace", &Trace::setSynthesisOffsetTrace)
     .method("setSynthesisOffsetAcceptanceRatioTrace", &Trace::setSynthesisOffsetAcceptanceRatioTrace)
     .method("setObservedSynthesisNoiseTrace", &Trace::setObservedSynthesisNoiseTrace)
     .method("setCodonSpecificParameterTrace", &Trace::setCodonSpecificParameterTrace)
-    .method("getCodonSpecificParameterTrace", &Trace::getCodonSpecificParameterTrace)    
+
     ;
 }
 #endif

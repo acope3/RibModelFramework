@@ -1902,16 +1902,6 @@ void Parameter::setNumSelectionCategories(unsigned _numSelectionCategories)
 
 
 
-// --------------------------------------//
-// ---------- Trace Functions -----------//
-// --------------------------------------//
-
-
-void Parameter::setCategoriesForTrace()
-{
-	traces.setCategories(categories);
-}
-
 
 // -----------------------------------------------//
 // ---------- Synthesis Rate Functions -----------//

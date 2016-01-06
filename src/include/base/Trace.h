@@ -169,8 +169,6 @@ public:
         void setMixtureAssignmentTrace(std::vector<std::vector<unsigned>> _mixtureAssignmentTrace);
         void setMixtureProbabilitiesTrace(std::vector<std::vector<double>> _mixtureProbabilitiesTrace);
         void setCodonSpecificAcceptanceRatioTrace(std::vector<std::vector<double>> _cspAcceptanceRatioTrace);
-        void setCategories(std::vector<mixtureDefinition> &_categories);
-
 
 
         //ROC Specific:

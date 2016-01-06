@@ -41,7 +41,6 @@ RCPP_MODULE(Parameter_mod)
 		//Trace Functions:
 		.method("getTraceObject", &Parameter::getTraceObject) //TODO: only used in R?
 		.method("setTraceObject", &Parameter::setTraceObject)
-		.method("setCategoriesForTrace", &Parameter::setCategoriesForTrace)
 
 		//Synthesis Rate Functions:
 		.method("getSynthesisRate", &Parameter::getSynthesisRateR)

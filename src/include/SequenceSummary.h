@@ -90,8 +90,8 @@ class SequenceSummary
 		unsigned getCodonCountForCodonIndexR(unsigned codonIndex); //TEST THAT ONLY!
 		unsigned getRFPObservedForCodonR(std::string codon);
 		unsigned getRFPObservedForCodonIndexR(unsigned codonIndex); //TEST THAT ONLY!
-		std::vector <unsigned> *getCodonPositionsForCodonR(std::string codon);
-		std::vector <unsigned> *getCodonPositionsForCodonIndexR(unsigned codonIndex); //TEST THAT ONLY!
+		std::vector <unsigned> getCodonPositionsForCodonR(std::string codon);
+		std::vector <unsigned> getCodonPositionsForCodonIndexR(unsigned codonIndex); //TEST THAT ONLY!
 
 #endif //STANDALONE
 
