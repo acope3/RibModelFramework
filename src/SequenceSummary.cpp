@@ -386,7 +386,7 @@ std::vector<std::string> SequenceSummary::AAToCodon(std::string aa, bool forPara
 
 	unsigned aaStart;
 	unsigned aaEnd;
-	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, false);
+	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, forParamVector);
 	if(forParamVector){
 		for (unsigned i = aaStart; i < aaEnd; i++)
 		{

@@ -186,14 +186,8 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			if( -Parameter::randExp(1) < (propLogLike - currLogLike) )
 			{
 				model.updateSynthesisRate(i, k);
-				// only count each gene once, not numSynthesigeneIndexsRateCategories times
-				//if(geneSynthCat == k)
-				//logLikelihood += std::log(model.getCategoryProbability(k)) + propLogLike;
 				logLikelihood += probabilities[k] * unscaledLogPost_prop[k];
 			}else{
-				// only count each gene once, not numSynthesisRateCategories times
-				//if(geneSynthCat == k)
-				//logLikelihood += std::log(model.getCategoryProbability(k)) + currLogLike;
 				logLikelihood += probabilities[k] * unscaledLogPost_curr[k];
 			}
 		}
