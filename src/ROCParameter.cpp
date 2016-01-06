@@ -938,8 +938,10 @@ void ROCParameter::initMutation(std::vector<double> mutationValues, unsigned mix
 
 		unsigned category = getMutationCategory(mixtureElement);
 		aa[0] = (char) std::toupper(aa[0]);
-		std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(aa, true);
-		for (unsigned i = aaRange[0], j = 0; i < aaRange[1]; i++, j++)
+                unsigned aaStart;
+                unsigned aaEnd;
+                SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
+                for (unsigned i = aaStart, j = 0; i < aaEnd; i++, j++)
 		{
 			currentMutationParameter[category][i] = mutationValues[j];
 		}
@@ -958,11 +960,13 @@ void ROCParameter::initSelection(std::vector<double> selectionValues, unsigned m
 		int category = getSelectionCategory(mixtureElement);
 
 		aa[0] = (char) std::toupper(aa[0]);
-		std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(aa, true);
-		for (unsigned i = aaRange[0], j = 0; i < aaRange[1]; i++, j++)
-		{
-			currentSelectionParameter[category][i] = selectionValues[j];
-		}
+                unsigned aaStart;
+                unsigned aaEnd;
+                SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
+                for (unsigned i = aaStart, j = 0; i < aaEnd; i++, j++)
+                {
+                    currentSelectionParameter[category][i] = selectionValues[j];
+                }
 	}
 }
 

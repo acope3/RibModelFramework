@@ -1151,7 +1151,7 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 		unsigned aaEnd;
 		SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
 #ifndef STANDALONE
-		Rprintf("\t%s:\t%f\t%f\n", aa.c_str(), acceptanceLevel, std_csp[codonRange[0]]);
+		Rprintf("\t%s:\t%f\t%f\n", aa.c_str(), acceptanceLevel, std_csp[aaStart]);
 #else
 		std::cout << "\t" << aa << ":\t" << acceptanceLevel << "\t" << std_csp[aaStart] << "\n";
 #endif
