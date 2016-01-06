@@ -223,7 +223,6 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 
 	// take all priors into account
 	logLikelihood += model.calculateAllPriors();
-
 	double *newMixtureProbabilities = new double[numMixtures]();
 	Parameter::randDirichlet(dirichletParameters, numMixtures, newMixtureProbabilities);
 	for(unsigned k = 0u; k < numMixtures; k++)
