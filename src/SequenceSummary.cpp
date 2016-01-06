@@ -93,6 +93,8 @@ SequenceSummary::SequenceSummary(const SequenceSummary& other)
 SequenceSummary& SequenceSummary::operator=(const SequenceSummary& rhs)
 {
 	if (this == &rhs) return *this; // handle self assignment
+
+	// TODO(CEDRIC): shouldn't a simple = do the job? see http://www.cplusplus.com/reference/vector/vector/operator=/
 	codonPositions.resize(rhs.codonPositions.size());
 	for (unsigned i = 0u; i < codonPositions.size(); i++) {
 		codonPositions[i] = rhs.codonPositions[i];
@@ -100,14 +102,11 @@ SequenceSummary& SequenceSummary::operator=(const SequenceSummary& rhs)
 
 	for (unsigned i = 0u; i < 64; i++) {
 		ncodons[i] = rhs.ncodons[i];
+		RFPObserved[i] = rhs.RFPObserved[i];
 	}
 
 	for (unsigned i = 0u; i < 22; i++) {
 		naa[i] = rhs.naa[i];
-	}
-
-	for (unsigned i = 0u; i < 64; i++) {
-		RFPObserved[i] = rhs.RFPObserved[i];
 	}
 
 	return *this;
@@ -258,153 +257,125 @@ unsigned SequenceSummary::AAToAAIndex(std::string aa)
 }
 
 
-std::array<unsigned, 2> SequenceSummary::AAIndexToCodonRange(unsigned aaIndex, bool forParamVector)
+void SequenceSummary::AAIndexToCodonRange(unsigned aaIndex, unsigned& startAAIndex, unsigned& endAAIndex, bool forParamVector)
 {
-	unsigned startAAIndex = 0;
-	unsigned endAAIndex = 0;
 	std::string aa = indexToAA(aaIndex);
+	AAToCodonRange(aa, startAAIndex, endAAIndex, forParamVector);
+}
 
-	if (aa == "A") 
+//std::array<unsigned, 2>
+void SequenceSummary::AAToCodonRange(std::string aa, unsigned& startAAIndex, unsigned& endAAIndex, bool forParamVector)
+{
+	//aa = (char)std::toupper(aa[0]); CEDRIC: commented out for performance. Put back in if necessary!
+	// switch statement is a lot faster than a chain of if else!
+	//unsigned startAAIndex = 0u;
+	//unsigned endAAIndex = 0u;
+	char AA = aa[0];
+	switch (AA)
 	{
-		if (!forParamVector) {startAAIndex = 0; endAAIndex = 4;}
-		else { startAAIndex = 0; endAAIndex = 3;} 
-	}
-	else if (aa == "C") 
-	{
-		if (!forParamVector) {startAAIndex = 4; endAAIndex = 6;}
-		else { startAAIndex = 3; endAAIndex = 4;} 
-	}
-	else if (aa == "D") 
-	{
-		if (!forParamVector) {startAAIndex = 6; endAAIndex = 8;}
-		else { startAAIndex = 4; endAAIndex = 5;} 
-	}
-	else if (aa == "E") 
-	{
-		if (!forParamVector) {startAAIndex = 8; endAAIndex = 10;}
-		else { startAAIndex = 5; endAAIndex = 6;} 
-	}
-	else if (aa == "F") 
-	{
-		if (!forParamVector) {startAAIndex = 10; endAAIndex = 12;}
-		else { startAAIndex = 6; endAAIndex = 7;} 
-	}
-	else if (aa == "G") 
-	{
-		if (!forParamVector) {startAAIndex = 12; endAAIndex = 16;}
-		else { startAAIndex = 7; endAAIndex = 10;} 
-	}
-	else if (aa == "H") 
-	{
-		if (!forParamVector) {startAAIndex = 16; endAAIndex = 18;}
-		else { startAAIndex = 10; endAAIndex = 11;} 
-	}
-	else if (aa == "I") 
-	{
-		if (!forParamVector) {startAAIndex = 18; endAAIndex = 21;}
-		else { startAAIndex = 11; endAAIndex = 13;} 
-	}
-	else if (aa == "K") 
-	{
-		if (!forParamVector) {startAAIndex = 21; endAAIndex = 23;}
-		else { startAAIndex = 13; endAAIndex = 14;} 
-	}
-	else if (aa == "L") 
-	{
-		if (!forParamVector) {startAAIndex = 23; endAAIndex = 29;}
-		else { startAAIndex = 14; endAAIndex = 19;} 
-	}
-	else if (aa == "M") 
-	{
-		if (!forParamVector) {startAAIndex = 29; endAAIndex = 30;}
-		else { startAAIndex = 19; endAAIndex = 19;} 
-	}
-	else if (aa == "N") 
-	{
-		if (!forParamVector) {startAAIndex = 30; endAAIndex = 32;}
-		else { startAAIndex = 19; endAAIndex = 20;} 
-	}
-	else if (aa == "P") 
-	{
-		if (!forParamVector) {startAAIndex = 32; endAAIndex = 36;}
-		else { startAAIndex = 20; endAAIndex = 23;} 
-	}
-	else if (aa == "Q") 
-	{
-		if (!forParamVector) {startAAIndex = 36; endAAIndex = 38;}
-		else { startAAIndex = 23; endAAIndex = 24;} 
-	}
-	else if (aa == "R") 
-	{
-		if (!forParamVector) {startAAIndex = 38; endAAIndex = 44;}
-		else { startAAIndex = 24; endAAIndex = 29;} 
-	}
-	else if (aa == "S") 
-	{
-		if (!forParamVector) {startAAIndex = 44; endAAIndex = 48;}
-		else { startAAIndex = 29; endAAIndex = 32;} 
-	}
-	else if (aa == "T") 
-	{
-		if (!forParamVector) {startAAIndex = 48; endAAIndex = 52;}
-		else { startAAIndex = 32; endAAIndex = 35;} 
-	}
-	else if (aa == "V") 
-	{
-		if (!forParamVector) {startAAIndex = 52; endAAIndex = 56;}
-		else { startAAIndex = 35; endAAIndex = 38;} 
-	}
-	else if (aa == "W") 
-	{
-		if (!forParamVector) {startAAIndex = 56; endAAIndex = 57;}
-		else { startAAIndex = 38; endAAIndex = 38;} 
-	}
-	else if (aa == "Y") 
-	{
-		if (!forParamVector) {startAAIndex = 57; endAAIndex = 59;}
-		else { startAAIndex = 38; endAAIndex = 39;} 
-	}
-	else if (aa == "Z") 
-	{
-		if (!forParamVector) {startAAIndex = 59; endAAIndex = 61;}
-		else { startAAIndex = 39; endAAIndex = 40;} 
-	}
-	else if (aa == "X") 
-	{
-		if (!forParamVector) {startAAIndex = 61; endAAIndex = 64;}
-		else { startAAIndex = 40; endAAIndex = 40;} 
-	}
-	else //Invalid AA
-	{
+	case 'A':
+		if (!forParamVector) { startAAIndex = 0; endAAIndex = 4; }
+		else { startAAIndex = 0; endAAIndex = 3; }
+		break;
+	case 'C':
+		if (!forParamVector) { startAAIndex = 4; endAAIndex = 6; }
+		else { startAAIndex = 3; endAAIndex = 4; }
+		break;
+	case 'D':
+		if (!forParamVector) { startAAIndex = 6; endAAIndex = 8; }
+		else { startAAIndex = 4; endAAIndex = 5; }
+		break;
+	case 'E':
+		if (!forParamVector) { startAAIndex = 8; endAAIndex = 10; }
+		else { startAAIndex = 5; endAAIndex = 6; }
+		break;
+	case 'F':
+		if (!forParamVector) { startAAIndex = 10; endAAIndex = 12; }
+		else { startAAIndex = 6; endAAIndex = 7; }
+		break;
+	case 'G':
+		if (!forParamVector) { startAAIndex = 12; endAAIndex = 16; }
+		else { startAAIndex = 7; endAAIndex = 10; }
+		break;
+	case 'H':
+		if (!forParamVector) { startAAIndex = 16; endAAIndex = 18; }
+		else { startAAIndex = 10; endAAIndex = 11; }
+		break;
+	case 'I':
+		if (!forParamVector) { startAAIndex = 18; endAAIndex = 21; }
+		else { startAAIndex = 11; endAAIndex = 13; }
+		break;
+	case 'K':
+		if (!forParamVector) { startAAIndex = 21; endAAIndex = 23; }
+		else { startAAIndex = 13; endAAIndex = 14; }
+		break;
+	case 'L':
+		if (!forParamVector) { startAAIndex = 23; endAAIndex = 29; }
+		else { startAAIndex = 14; endAAIndex = 19; }
+		break;
+	case 'M':
+		if (!forParamVector) { startAAIndex = 29; endAAIndex = 30; }
+		else { startAAIndex = 19; endAAIndex = 19; }
+		break;
+	case 'N':
+		if (!forParamVector) { startAAIndex = 30; endAAIndex = 32; }
+		else { startAAIndex = 19; endAAIndex = 20; }
+		break;
+	case 'P':
+		if (!forParamVector) { startAAIndex = 32; endAAIndex = 36; }
+		else { startAAIndex = 20; endAAIndex = 23; }
+		break;
+	case 'Q':
+		if (!forParamVector) { startAAIndex = 36; endAAIndex = 38; }
+		else { startAAIndex = 23; endAAIndex = 24; }
+		break;
+	case 'R':
+		if (!forParamVector) { startAAIndex = 38; endAAIndex = 44; }
+		else { startAAIndex = 24; endAAIndex = 29; }
+		break;
+	case 'S':
+		if (!forParamVector) { startAAIndex = 44; endAAIndex = 48; }
+		else { startAAIndex = 29; endAAIndex = 32; }
+		break;
+	case 'T':
+		if (!forParamVector) { startAAIndex = 48; endAAIndex = 52; }
+		else { startAAIndex = 32; endAAIndex = 35; }
+		break;
+	case 'V':
+		if (!forParamVector) { startAAIndex = 52; endAAIndex = 56; }
+		else { startAAIndex = 35; endAAIndex = 38; }
+		break;
+	case 'W':
+		if (!forParamVector) { startAAIndex = 56; endAAIndex = 57; }
+		else { startAAIndex = 38; endAAIndex = 38; }
+		break;
+	case 'Y':
+		if (!forParamVector) { startAAIndex = 57; endAAIndex = 59; }
+		else { startAAIndex = 38; endAAIndex = 39; }
+		break;
+	case 'Z':
+		if (!forParamVector) { startAAIndex = 59; endAAIndex = 61; }
+		else { startAAIndex = 39; endAAIndex = 40; }
+		break;
+	case 'X':
+		if (!forParamVector) { startAAIndex = 61; endAAIndex = 64; }
+		else { startAAIndex = 40; endAAIndex = 40; }
+		break;
+	default: // INVALID AA
+		startAAIndex = 0;
+		endAAIndex = 0;
 #ifndef STANDALONE
 		Rf_warning("Invalid Amino Acid given (%s), returning 0,0\n", aa.c_str());
 #else
 		std::cerr << "Invalid aa given, returning 0,0\n";
 #endif
-		startAAIndex = 0;
-		endAAIndex = 0;
+		break;
 	}
+	//std::array<unsigned, 2> aaRange;
+	//aaRange[0] = startAAIndex;
+	//aaRange[1] = endAAIndex;
 
-	std::array<unsigned, 2> aaRange;
-	aaRange[0] = startAAIndex;
-	aaRange[1] = endAAIndex;
-
-	return aaRange;
-}
-
-
-std::array<unsigned, 2> SequenceSummary::AAToCodonRange(std::string aa, bool forParamVector)
-{
-	std::array <unsigned, 2> aaRange;
-	if (aaToIndex.find(aa) != aaToIndex.end()) {
-		unsigned aaIndex = aaToIndex.find(aa)->second;
-		aaRange = AAIndexToCodonRange(aaIndex, forParamVector);
-	}
-	else {
-		aaRange[0] = 0;
-		aaRange[1] = 0;
-	}
-	return aaRange;
+	//return aaRange;
 }
 
 
@@ -413,14 +384,16 @@ std::vector<std::string> SequenceSummary::AAToCodon(std::string aa, bool forPara
 	std::vector <std::string> RV;
 	aa = (char) std::toupper(aa[0]);
 
-	std::array <unsigned, 2> aaRange = AAToCodonRange(aa, forParamVector);
+	unsigned aaStart;
+	unsigned aaEnd;
+	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, false);
 	if(forParamVector){
-		for (unsigned i = aaRange[0]; i < aaRange[1]; i++)
+		for (unsigned i = aaStart; i < aaEnd; i++)
 		{
 			RV.push_back(codonArrayParameter[i]);
 		}
 	}else{
-		for (unsigned i = aaRange[0]; i < aaRange[1]; i++)
+		for (unsigned i = aaStart; i < aaEnd; i++)
 		{
 			RV.push_back(codonArray[i]);
 		}
@@ -542,14 +515,85 @@ std::string SequenceSummary::indexToCodon(unsigned index, bool forParamVector)
 
 unsigned SequenceSummary::GetNumCodonsForAA(std::string& aa, bool forParamVector)
 {
-	aa[0] = (char) std::toupper(aa[0]);
 	unsigned ncodon = 0;
-	if(aa == "M" || aa == "W") ncodon = 1;
-	else if(aa == "C" || aa == "D" || aa == "E" || aa == "F" || aa == "H" || aa == "K" || aa == "N" || aa == "Q" || aa == Ser2 || aa == "Y") ncodon = 2;
-	else if(aa == "I" || aa == "X") ncodon = 3;
-	else if(aa == "A" || aa == "G" || aa == "P" || aa == "S" || aa == "T" || aa == "V") ncodon = 4;
-	else if(aa == "L" || aa == "R") ncodon = 6;
+	char AA = aa[0];
+	switch (AA)
+	{
+	case 'A':
+		ncodon = 4;
+		break;
+	case 'C':
+		ncodon = 2;
+		break;
+	case 'D':
+		ncodon = 2;
+		break;
+	case 'E':
+		ncodon = 2;
+		break;
+	case 'F':
+		ncodon = 2;
+		break;
+	case 'G':
+		ncodon = 4;
+		break;
+	case 'H':
+		ncodon = 2;
+		break;
+	case 'I':
+		ncodon = 3;
+		break;
+	case 'K':
+		ncodon = 2;
+		break;
+	case 'L':
+		ncodon = 6;
+		break;
+	case 'M':
+		ncodon = 1;
+		break;
+	case 'N':
+		ncodon = 2;
+		break;
+	case 'P':
+		ncodon = 4;
+		break;
+	case 'Q':
+		ncodon = 2;
+		break;
+	case 'R':
+		ncodon = 6;
+		break;
+	case 'S':
+		ncodon = 4;
+		break;
+	case 'T':
+		ncodon = 4;
+		break;
+	case 'V':
+		ncodon = 4;
+		break;
+	case 'W':
+		ncodon = 1;
+		break;
+	case 'Y':
+		ncodon = 2;
+		break;
+	case 'Z':
+		ncodon = 2;
+		break;
+	case 'X':
+		ncodon = 3;
+		break;
+	default: // INVALID AA
 
+#ifndef STANDALONE
+		Rf_warning("Invalid Amino Acid given (%s), returning 0,0\n", aa.c_str());
+#else
+		std::cerr << "Invalid aa given, returning 0\n";
+#endif
+		break;
+	}
 	return (forParamVector ? (ncodon - 1) : ncodon);
 }
 

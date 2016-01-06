@@ -106,7 +106,6 @@ double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grou
 
 	std::vector <unsigned> *positions;
 	double codonProb[6];
-	std::array <unsigned, 2> codonRange = SequenceSummary::AAToCodonRange(grouping);
 
 	unsigned maxIndexVal = 0u;
 	for (int i = 1; i < (numCodons - 1); i++)
@@ -117,7 +116,10 @@ double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grou
 		}
 	}
 
-	for (unsigned i = codonRange[0]; i < codonRange[1]; i++) {
+	unsigned aaStart;
+	unsigned aaEnd;
+	SequenceSummary::AAToCodonRange(grouping, aaStart, aaEnd, false);
+	for (unsigned i = aaStart; i < aaEnd; i++) {
 		positions = gene.geneData.getCodonPositions(i);
 		for (unsigned j = 0; j < positions->size(); j++) {
 			calculateCodonProbabilityVector(numCodons, positions->at(j), maxIndexVal, mutation, selection, phiValue, codonProb);
@@ -242,10 +244,12 @@ void FONSEModel::updateTracesWithInitialValues(Genome & genome)
 		parameter->updateMixtureAssignmentTrace(0, i);
 	}
 
+	unsigned aaStart;
+	unsigned aaEnd;
 	for (unsigned i = 0; i < groupList.size(); i++)
 	{
-		std::array <unsigned, 2> codonRange = SequenceSummary::AAToCodonRange(groupList[i], true);
-		for (unsigned j = codonRange[0]; j < codonRange[1]; j++)
+		SequenceSummary::AAToCodonRange(groupList[i], aaStart, aaEnd, false);
+		for (unsigned j = aaStart; j < aaEnd; j++)
 		{
 			std::string codon = SequenceSummary::indexToCodon(j, true);
 			parameter->updateCodonSpecificParameterTrace(0, codon);
@@ -344,8 +348,10 @@ void FONSEModel::simulateGenome(Genome & genome)
 
 
 			codonIndex = Parameter::randMultinom(codonProb, numCodons);
-			std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(curAA); //need the first spot in the array where the codons for curAA are
-			codon = seqSum.indexToCodon(aaRange[0] + codonIndex);//get the correct codon based off codonIndex
+			unsigned aaStart;
+			unsigned aaEnd;
+			SequenceSummary::AAToCodonRange(curAA, aaStart, aaEnd, false);  //need the first spot in the array where the codons for curAA are
+			codon = seqSum.indexToCodon(aaStart + codonIndex);//get the correct codon based off codonIndex
 			tmpSeq += codon;
 		}
 		std::string codon = seqSum.indexToCodon((unsigned)Parameter::randUnif(61.0, 63.0)); //randomly choose a stop codon, from range 61-63

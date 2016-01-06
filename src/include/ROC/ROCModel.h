@@ -9,7 +9,7 @@ class ROCModel : public Model
     private:
 
 	ROCParameter *parameter;
-	virtual void obtainCodonCount(SequenceSummary& seqsum, std::string curAA, int codonCount[]);
+	virtual void obtainCodonCount(SequenceSummary *seqsum, std::string curAA, int codonCount[]);
 	double calculateMutationPrior(std::string grouping, bool proposed = false); // TODO add to FONSE as well? // cedric
 	double calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codonCount[], double mutation[], double selection[], double phiValue);
 	bool withPhi;

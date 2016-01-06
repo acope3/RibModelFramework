@@ -65,8 +65,8 @@ class SequenceSummary
 
 		//Static Functions:
 		static unsigned AAToAAIndex(std::string aa);
-		static std::array<unsigned, 2> AAIndexToCodonRange(unsigned aaIndex, bool forParamVector = false);
-		static std::array<unsigned, 2> AAToCodonRange(std::string aa, bool forParamVector = false);
+		static void AAIndexToCodonRange(unsigned aaIndex, unsigned& start, unsigned& end, bool forParamVector = false);
+		static void AAToCodonRange(std::string aa, unsigned& start, unsigned& end, bool forParamVector = false);
 		static std::vector<std::string> AAToCodon(std::string aa, bool forParamVector = false);
 		static std::string codonToAA(std::string& codon);
 		static unsigned codonToIndex(std::string& codon, bool forParamVector = false);

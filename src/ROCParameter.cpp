@@ -616,8 +616,10 @@ void ROCParameter::updateAphi(unsigned index)
 
 double ROCParameter::getCurrentCodonSpecificProposalWidth(unsigned aa)
 {
-	std::array <unsigned, 2> codonRange = SequenceSummary::AAIndexToCodonRange(aa, true);
-	return std_csp[codonRange[0]];
+	unsigned aaStart;
+	unsigned aaEnd;
+	SequenceSummary::AAIndexToCodonRange(aa, aaStart, aaEnd, true);
+	return std_csp[aaStart];
 }
 
 
@@ -633,8 +635,10 @@ void ROCParameter::proposeCodonSpecificParameter()
 	{
 		std::vector<double> iidProposed;
 		std::string aa = getGrouping(k);
-		std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(aa, true);
-		unsigned numCodons = aaRange[1] - aaRange[0];
+		unsigned aaStart;
+		unsigned aaEnd;
+		SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
+		unsigned numCodons = aaEnd - aaStart;
 		for (unsigned i = 0u; i < (numCodons * (numMutationCategories + numSelectionCategories)); i++)
 		{
 			iidProposed.push_back(randNorm(0.0, 1.0));
@@ -645,14 +649,14 @@ void ROCParameter::proposeCodonSpecificParameter()
 				iidProposed);
 		for (unsigned i = 0; i < numMutationCategories; i++)
 		{
-			for (unsigned j = i * numCodons, l = aaRange[0]; j < (i * numCodons) + numCodons; j++, l++)
+			for (unsigned j = i * numCodons, l = aaStart; j < (i * numCodons) + numCodons; j++, l++)
 			{
 				proposedMutationParameter[i][l] = currentMutationParameter[i][l] + covaryingNums[j];
 			}
 		}
 		for (unsigned i = 0; i < numSelectionCategories; i++)
 		{
-			for (unsigned j = i * numCodons, l = aaRange[0]; j < (i * numCodons) + numCodons; j++, l++)
+			for (unsigned j = i * numCodons, l = aaStart; j < (i * numCodons) + numCodons; j++, l++)
 			{
 				proposedSelectionParameter[i][l] = currentSelectionParameter[i][l]
 												   + covaryingNums[(numMutationCategories * numCodons) + j];
@@ -664,20 +668,22 @@ void ROCParameter::proposeCodonSpecificParameter()
 
 void ROCParameter::updateCodonSpecificParameter(std::string grouping)
 {
-	std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(grouping, true);
+	unsigned aaStart;
+	unsigned aaEnd;
+	SequenceSummary::AAToCodonRange(grouping, aaStart, aaEnd, true);
 	unsigned aaIndex = SequenceSummary::aaToIndex.find(grouping)->second;
 	numAcceptForCodonSpecificParameters[aaIndex]++;
 
 	for (unsigned k = 0u; k < numMutationCategories; k++)
 	{
-		for (unsigned i = aaRange[0]; i < aaRange[1]; i++)
+		for (unsigned i = aaStart; i < aaEnd; i++)
 		{
 			currentMutationParameter[k][i] = proposedMutationParameter[k][i];
 		}
 	}
 	for (unsigned k = 0u; k < numSelectionCategories; k++)
 	{
-		for (unsigned i = aaRange[0]; i < aaRange[1]; i++)
+		for (unsigned i = aaStart; i < aaEnd; i++)
 		{
 			currentSelectionParameter[k][i] = proposedSelectionParameter[k][i];
 		}
@@ -832,10 +838,12 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
 		tempSet = (proposal ? &proposedMutationParameter[category] : &currentMutationParameter[category]);
 	}
 
-	std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(aa, true);
+	unsigned aaStart;
+	unsigned aaEnd;
+	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
 
 	unsigned j = 0u;
-	for (unsigned i = aaRange[0]; i < aaRange[1]; i++, j++)
+	for (unsigned i = aaStart; i < aaEnd; i++, j++)
 	{
 		returnSet[j] = tempSet->at(i);
 	}

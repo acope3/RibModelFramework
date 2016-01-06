@@ -91,7 +91,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	//initialize parameter's size
 	for(int i = 0; i < numGenes; i++)
 	{
-		Gene gene = genome.getGene(i);
+		Gene *gene = &genome.getGene(i);
 
 		/*
 			 Since some values returned by calculateLogLikelihoodRatioPerGene are veyr small (~ -1100), exponentiation leads to 0.
@@ -141,7 +141,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			{
 				unsigned mixtureElement = mixtureElements[n];
 				double logProbabilityRatio[5];
-				model.calculateLogLikelihoodRatioPerGene(gene, i, mixtureElement, logProbabilityRatio);
+				model.calculateLogLikelihoodRatioPerGene(*gene, i, mixtureElement, logProbabilityRatio);
 
 				// log posterior with and without rev. jump probability
 				unscaledLogProb_curr[k] += logProbabilityRatio[1]; // with rev. jump prob.
@@ -542,8 +542,8 @@ double MCMCAlgorithm::calculateGewekeScore(unsigned current_iteration)
 	double posteriorVariance1 = 0.0;
 	double posteriorVariance2 = 0.0;
 
-	unsigned end1 = std::round( (current_iteration - lastConvergenceTest) * 0.1) + lastConvergenceTest;
-	unsigned start2 = std::round(current_iteration - (current_iteration * 0.5));
+	unsigned end1 = (unsigned)std::round( (current_iteration - lastConvergenceTest) * 0.1) + lastConvergenceTest;
+	unsigned start2 = (unsigned)std::round(current_iteration - (current_iteration * 0.5));
 
 	double numSamples1 = (double) (end1 - lastConvergenceTest);
 	double numSamples2 = (double) std::round(current_iteration * 0.5);

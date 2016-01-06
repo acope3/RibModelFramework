@@ -16,7 +16,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 	double logLikelihood = 0.0;
 	double logLikelihood_proposed = 0.0;
 
-	SequenceSummary seqsum = gene.getSequenceSummary();
+	SequenceSummary *seqsum = &gene.getSequenceSummary();
 
 	// get correct index for everything
 	unsigned mutationCategory = parameter->getMutationCategory(k);
@@ -37,10 +37,10 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 		std::string curAA = getGrouping(i);
 
 		// skip amino acids which do not occur in current gene. Avoid useless calculations and multiplying by 0
-		if(seqsum.getAACountForAA(curAA) == 0) continue;
+		if(seqsum->getAACountForAA(i) == 0) continue;
 
 		// get number of codons for AA (total number not parameter->count)
-		unsigned numCodons = seqsum.GetNumCodonsForAA(curAA);
+		unsigned numCodons = seqsum->GetNumCodonsForAA(curAA);
 		// get mutation and selection parameter->for gene
 		parameter->getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
 		parameter->getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
@@ -103,7 +103,7 @@ void ROCModel::calculateCodonProbabilityVector(unsigned numCodons, double mutati
 	if(selection[minIndexVal] < 0.0)
 	{
 		denominator = 0.0;
-		for(unsigned i = 0; i < (numCodons - 1); i++)
+		for(unsigned i = 0u; i < (numCodons - 1); i++)
 		{
 			codonProb[i] = std::exp( -(mutation[i] - mutation[minIndexVal]) - ((selection[i] - selection[minIndexVal]) * phi) );
 			//codonProb[i] = std::exp( -mutation[i] - (selection[i] * phi) );
@@ -114,7 +114,7 @@ void ROCModel::calculateCodonProbabilityVector(unsigned numCodons, double mutati
 		denominator += codonProb[numCodons - 1];
 	}else{
 		denominator = 1.0;
-		for(unsigned i = 0; i < (numCodons - 1); i++)
+		for(unsigned i = 0u; i < (numCodons - 1); i++)
 		{
 			codonProb[i] = std::exp( -mutation[i] - (selection[i] * phi) );
 			denominator += codonProb[i];
@@ -122,10 +122,12 @@ void ROCModel::calculateCodonProbabilityVector(unsigned numCodons, double mutati
 		// alphabetically last codon is reference codon!
 		codonProb[numCodons - 1] = 1.0;
 	}
+
+	denominator = 1 / denominator; // Multiplication is faster than devition: replace multiple divisions below by one up here.
 	// normalize codon probabilities
-	for(unsigned i = 0; i < numCodons; i++)
+	for(unsigned i = 0u; i < numCodons; i++)
 	{
-		codonProb[i] = codonProb[i] / denominator;
+		codonProb[i] = codonProb[i] * denominator; // denominator is 1/denominator. see above
 	}
 }
 
@@ -156,17 +158,19 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 	double selection[5];
 	double mutation_proposed[5];
 	double selection_proposed[5];
+
 	int codonCount[6];
 	Gene *gene;
 	SequenceSummary *seqsum;
+	unsigned aaIndex = SequenceSummary::AAToAAIndex(grouping);
 #ifndef __APPLE__
-//#pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed, codonCount, gene, seqsum) reduction(+:likelihood,likelihood_proposed)
+#pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed, codonCount, gene, seqsum) reduction(+:likelihood,likelihood_proposed)
 #endif
 	for(int i = 0; i < numGenes; i++)
 	{
 		gene = &genome.getGene(i);
 		seqsum = &gene->getSequenceSummary();
-		if(seqsum->getAACountForAA(grouping) == 0) continue;
+		if(seqsum->getAACountForAA(aaIndex) == 0) continue;
 
 		// which mixture element does this gene belong to
 		unsigned mixtureElement = parameter->getMixtureAssignment(i);
@@ -178,19 +182,13 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 		double phiValue = parameter->getSynthesisRate(i, expressionCategory, false);
 
 		// get current mutation and selection parameter
-		//double* mutation = new double[numCodons - 1]();
 		parameter->getParameterForCategory(mutationCategory, ROCParameter::dM, grouping, false, mutation);
-		//double* selection = new double[numCodons - 1]();
 		parameter->getParameterForCategory(selectionCategory, ROCParameter::dEta, grouping, false, selection);
-
 		// get proposed mutation and selection parameter
-		//double* mutation_proposed = new double[numCodons - 1]();
 		parameter->getParameterForCategory(mutationCategory, ROCParameter::dM, grouping, true, mutation_proposed);
-		//double* selection_proposed = new double[numCodons - 1]();
 		parameter->getParameterForCategory(selectionCategory, ROCParameter::dEta, grouping, true, selection_proposed);
 
-		//int* codonCount = new int[numCodons]();
-		obtainCodonCount(*seqsum, grouping, codonCount);
+		obtainCodonCount(seqsum, grouping, codonCount);
 		likelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
 		likelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation_proposed, selection_proposed, phiValue);
 	}
@@ -237,14 +235,16 @@ double ROCModel::calculateMutationPrior(std::string grouping, bool proposed)
 	return priorValue;
 }
 
-void ROCModel::obtainCodonCount(SequenceSummary& seqsum, std::string curAA, int codonCount[])
+void ROCModel::obtainCodonCount(SequenceSummary *seqsum, std::string curAA, int codonCount[])
 {
-	std::array <unsigned, 2> codonRange = SequenceSummary::AAToCodonRange(curAA);
+	unsigned aaStart;
+	unsigned aaEnd;
+	SequenceSummary::AAToCodonRange(curAA, aaStart, aaEnd, false);
 	// get codon counts for AA
 	unsigned j = 0u;
-	for(unsigned i = codonRange[0]; i < codonRange[1]; i++, j++)
+	for(unsigned i = aaStart; i < aaEnd; i++, j++)
 	{
-		codonCount[j] = seqsum.getCodonCountForCodon(i);
+		codonCount[j] = seqsum->getCodonCountForCodon(i);
 	}
 }
 
@@ -377,8 +377,10 @@ void ROCModel::simulateGenome(Genome &genome)
 
 
 			codonIndex = Parameter::randMultinom(codonProb, numCodons);
-			std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(aa); //need the first spot in the array where the codons for curAA are
-			codon = seqSum.indexToCodon(aaRange[0] + codonIndex);//get the correct codon based off codonIndex
+			unsigned aaStart;
+			unsigned aaEnd;
+			SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, false); //need the first spot in the array where the codons for curAA are
+			codon = seqSum.indexToCodon(aaStart + codonIndex);//get the correct codon based off codonIndex
 			tmpSeq += codon;
 	 	}
 		std::string codon =	seqSum.indexToCodon((unsigned)Parameter::randUnif(61.0, 63.0)); //randomly choose a stop codon, from range 61-63
@@ -549,11 +551,6 @@ void ROCModel::updateTracesWithInitialValues(Genome &genome)
 
 	for (unsigned i = 0; i < groupList.size(); i++)
 	{
-		std::array <unsigned, 2> codonRange = SequenceSummary::AAToCodonRange(groupList[i], true);
-		for (unsigned j = codonRange[0]; j < codonRange[1]; j++)
-		{
-			std::string codon = SequenceSummary::indexToCodon(j, true);
-			parameter->updateCodonSpecificParameterTrace(0, codon);
-		}
+		parameter->updateCodonSpecificParameterTrace(0, getGrouping(i));
 	}
 }

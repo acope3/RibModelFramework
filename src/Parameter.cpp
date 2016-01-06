@@ -1006,10 +1006,12 @@ std::vector <std::vector <double> > Parameter::calculateSelectionCoefficients(un
 		{
 
 			std::string aa = getGrouping(j);
-			std::array <unsigned, 2> aaRange = SequenceSummary::AAToCodonRange(aa, true);
-			std::vector<double> tmp;
+			unsigned aaStart;
+			unsigned aaEnd;
+			SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
+				std::vector<double> tmp;
 			double minValue = 0.0;
-			for (unsigned k = aaRange[0]; k < aaRange[1]; k++)
+			for (unsigned k = aaStart; k < aaEnd; k++)
 			{
 				std::string codon = SequenceSummary::codonArrayParameter[k];
 				tmp.push_back(getCodonSpecificPosteriorMean(sample, mixture, codon, 1));
@@ -1145,13 +1147,15 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 		unsigned aaIndex = SequenceSummary::AAToAAIndex(aa);
 		double acceptanceLevel = (double)numAcceptForCodonSpecificParameters[aaIndex] / (double)adaptationWidth;
 		traces.updateCodonSpecificAcceptanceRatioTrace(aaIndex, acceptanceLevel);
-		std::array <unsigned, 2> codonRange = SequenceSummary::AAIndexToCodonRange(aaIndex, true);
+		unsigned aaStart;
+		unsigned aaEnd;
+		SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
 #ifndef STANDALONE
 		Rprintf("\t%s:\t%f\t%f\n", aa.c_str(), acceptanceLevel, std_csp[codonRange[0]]);
 #else
-		std::cout << "\t" << aa << ":\t" << acceptanceLevel << "\t" << std_csp[codonRange[0]] << "\n";
+		std::cout << "\t" << aa << ":\t" << acceptanceLevel << "\t" << std_csp[aaStart] << "\n";
 #endif
-		for (unsigned k = codonRange[0]; k < codonRange[1]; k++)
+		for (unsigned k = aaStart; k < aaEnd; k++)
 		{
 			if (acceptanceLevel < 0.2)
 			{
@@ -1550,12 +1554,12 @@ double Parameter::calculateSCUO(Gene& gene, unsigned maxAA)
 		double aaCount = (double)seqsum.getAACountForAA(i);
 		if(aaCount == 0) continue;
 
-		std::array<unsigned, 2> codonRange = SequenceSummary::AAIndexToCodonRange(i, false);
+		unsigned start;
+		unsigned endd;
+		SequenceSummary::AAIndexToCodonRange(i, start, endd, false);
 
 		// calculate -sum(pij log(pij))
 		double aaEntropy = 0.0;
-		unsigned start = codonRange[0];
-		unsigned endd = codonRange[1];
 		for(unsigned k = start; k < endd; k++)
 		{
 			int currCodonCount = seqsum.getCodonCountForCodon(k);

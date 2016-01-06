@@ -6,7 +6,7 @@
 int main()
 {
 	std::cout << "Initializing MCMCAlgorithm object---------------" << std::endl;
-	int samples = 100;
+	int samples = 200;
 	int thining = 10;
 	int useSamples = 100;
 	std::cout << "\t# Samples: " << samples << "\n";
@@ -21,11 +21,11 @@ int main()
 	bool withPhi = false;
 
 	Genome genome;
-	genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/data/twoMixtures/simulatedAllUniqueR.fasta");
-	//genome.readFasta("F:/GitHub/RibModelFramework/data/twoMixtures/simulatedAllUniqueR.fasta");
+	//genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/data/twoMixtures/simulatedAllUniqueR.fasta");
+	genome.readFasta("F:/GitHub/RibModelDev/data/twoMixtures/simulatedAllUniqueR.fasta");
 	if(withPhi)
 	{
-		//genome.readObservedPhiValues("F:/GitHub/RibModelFramework/data/twoMixtures/simulatedAllUniqueR_phi.csv", false);
+		genome.readObservedPhiValues("F:/GitHub/RibModelDev/data/twoMixtures/simulatedAllUniqueR_phi.csv", false);
 	}
 
 	std::cout << "Done!-------------------------------\n\n\n";
@@ -59,11 +59,11 @@ int main()
 	std::cout << "\tmixture definition: " << mixDef << "\n";
 
 	std::vector<std::string> files(2);
-	files[0] = std::string("F:/GitHub/RibModelFramework/data/twoMixtures/simulated_mutation0.csv");
-	files[1] = std::string("F:/GitHub/RibModelFramework/data/twoMixtures/simulated_mutation1.csv");
+	files[0] = std::string("F:/GitHub/RibModelDev/data/twoMixtures/simulated_mutation0.csv");
+	files[1] = std::string("F:/GitHub/RibModelDev/data/twoMixtures/simulated_mutation1.csv");
 	parameter.initMutationCategories(files, parameter.getNumMutationCategories());
-	files[0] = std::string("F:/GitHub/RibModelFramework/data/twoMixtures/simulated_selection0.csv");
-	files[1] = std::string("F:/GitHub/RibModelFramework/data/twoMixtures/simulated_selection1.csv");
+	files[0] = std::string("F:/GitHub/RibModelDev/data/twoMixtures/simulated_selection0.csv");
+	files[1] = std::string("F:/GitHub/RibModelDev/data/twoMixtures/simulated_selection1.csv");
 	parameter.initSelectionCategories(files, parameter.getNumSelectionCategories());
 
 	parameter.InitializeSynthesisRate(genome, sphi_init[0]);
