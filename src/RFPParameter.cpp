@@ -1,9 +1,5 @@
 #include "include/RFP/RFPParameter.h"
 
-
-#include <sstream>
-
-
 #ifndef STANDALONE
 #include <Rcpp.h>
 using namespace Rcpp;

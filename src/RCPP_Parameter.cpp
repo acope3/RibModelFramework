@@ -55,9 +55,9 @@ RCPP_MODULE(Parameter_mod)
 		.method("getSynthesisRateVarianceByMixtureElementForGene", &Parameter::getSynthesisRateVarianceByMixtureElementForGene)
 		.method("getEstimatedMixtureAssignmentForGene", &Parameter::getEstimatedMixtureAssignmentForGene, "returns the mixture assignment for a given gene")
 		.method("getEstimatedMixtureAssignmentProbabilitiesForGene", &Parameter::getEstimatedMixtureAssignmentProbabilitiesForGene, "returns the probabilities assignment for a given gene")
-		.method("getSphiPosteriorMean", &Parameter::getSphiPosteriorMean)
+		.method("getStdDevSynthesisRatePosteriorMean", &Parameter::getStdDevSynthesisRatePosteriorMean)
 		.method("getCodonSpecificPosteriorMean", &Parameter::getCodonSpecificPosteriorMeanForCodon)
-		.method("getSphiVariance", &Parameter::getSphiVariance)
+		.method("getStdDevSynthesisRateVariance", &Parameter::getStdDevSynthesisRateVariance)
 		.method("getCodonSpecificVariance", &Parameter::getCodonSpecificVarianceForCodon)
 
 		//Other Functions:

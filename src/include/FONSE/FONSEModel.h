@@ -1,5 +1,3 @@
-// FONSEModel.h
-
 #ifndef FONSEMODEL_H
 #define FONSEMODEL_H
 
@@ -9,79 +7,117 @@
 class FONSEModel : public Model
 {
 	private:
-
 		FONSEParameter *parameter;
+		double calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grouping, double *mutation, double *selection, double phiValue);
 		double calculateMutationPrior(std::string grouping, bool proposed = false);
 
 	public:
-
+		//Constructors & Destructors:
 		explicit FONSEModel();
 		virtual ~FONSEModel();
 
 
-		virtual void simulateGenome(Genome &genome); //TODO: needs implementation
-		void setParameter(FONSEParameter &_parameter);
-		void calculateCodonProbabilityVector(unsigned numCodons, unsigned position, unsigned maxIndexValue, double* mutation, double* selection, double phi, double codonProb[]);
-		// Likelihood ratio functions
+
+		//Likelihood Ratio Functions:
 		virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k, double* logProbabilityRatio);
-		double calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grouping, double *mutation, double *selection, double phiValue);
 		virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures);
 		virtual void calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration, std::vector <double> &logProbabilityRatio);
 
-		virtual double calculateAllPriors(); //TODO(Cedric): implement me, see ROCModel
 
-		virtual void updateGibbsSampledHyperParameters(Genome &genome) {}
 
+		//Initialization and Restart Functions:
+		virtual void initTraces(unsigned samples, unsigned num_genes);
+		virtual void writeRestartFile(std::string filename);
+
+
+
+		//Category Functions:
+		virtual double getCategoryProbability(unsigned i);
+		virtual unsigned getMutationCategory(unsigned mixture);
+		virtual unsigned getSelectionCategory(unsigned mixture);
+		virtual unsigned getSynthesisRateCategory(unsigned mixture);
+		virtual std::vector<unsigned> getMixtureElementsOfSelectionCategory(unsigned k);
+
+
+
+		//Group List Functions:
+		virtual unsigned getGroupListSize(); //TODO: make not hardcoded?
+		virtual std::string getGrouping(unsigned index);
+
+
+
+		//StdDevSynthesisRate Functions:
+		virtual double getStdDevSynthesisRate(unsigned selectionCategory, bool proposed = false);
+		virtual double getCurrentStdDevSynthesisRateProposalWidth();
+		virtual void updateStdDevSynthesisRate();
+
+
+
+		//Synthesis Rate Functions:
+		virtual double getSynthesisRate(unsigned index, unsigned mixture, bool proposed = false);
+		virtual void updateSynthesisRate(unsigned i, unsigned k);
+
+
+
+		//Iteration Functions:
+		virtual unsigned getLastIteration();
+		virtual void setLastIteration(unsigned iteration);
+
+
+
+		//Trace Functions:
+		virtual void updateStdDevSynthesisRateTrace(unsigned sample);
+		virtual void updateSynthesisRateTrace(unsigned sample, unsigned i);
+		virtual void updateMixtureAssignmentTrace(unsigned sample, unsigned i);
+		virtual void updateMixtureProbabilitiesTrace(unsigned sample);
+		virtual void updateCodonSpecificParameterTrace(unsigned sample, std::string grouping);
+		virtual void updateHyperParameterTraces(unsigned sample);
 		virtual void updateTracesWithInitialValues(Genome &genome);
-		//Parameter wrapper functions:
-		virtual void initTraces(unsigned samples, unsigned num_genes) { parameter->initAllTraces(samples, num_genes); }
-		virtual void writeRestartFile(std::string filename) { return parameter->writeEntireRestartFile(filename); }
-		virtual double getSphi(unsigned selectionCategory, bool proposed = false) { return parameter->getSphi(selectionCategory, proposed); }
-		virtual unsigned getNumPhiGroupings() { return parameter->getNumObservedPhiSets(); }
-		virtual void setNumPhiGroupings(unsigned value) { parameter->setNumObservedPhiSets(value); }
-		virtual unsigned getNumMixtureElements() { return parameter->getNumMixtureElements(); }
-		virtual double getCategoryProbability(unsigned i) { return parameter->getCategoryProbability(i); }
-		virtual void proposeCodonSpecificParameter() { parameter->proposeCodonSpecificParameter(); }
-		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth) { parameter->adaptCodonSpecificParameterProposalWidth(adaptiveWidth); }
-		virtual void updateCodonSpecificParameter(std::string grouping) { parameter->updateCodonSpecificParameter(grouping); }
-		virtual void updateCodonSpecificParameterTrace(unsigned sample, std::string grouping) { parameter->updateCodonSpecificParameterTrace(sample, grouping); }
-		virtual void proposeHyperParameters() { parameter->proposeHyperParameters(); }
-		virtual unsigned getMixtureAssignment(unsigned index) { return parameter->getMixtureAssignment(index); }
-		virtual unsigned getSynthesisRateCategory(unsigned mixture) { return parameter->getSynthesisRateCategory(mixture); }
-		virtual unsigned getSelectionCategory(unsigned mixture) { return parameter->getSelectionCategory(mixture); }
-		virtual unsigned getMutationCategory(unsigned mixture)  { return parameter->getMutationCategory(mixture); }
-		virtual double getSynthesisRate(unsigned index, unsigned mixture, bool proposed = false) { return parameter->getSynthesisRate(index, mixture, proposed); }
-		virtual double getCurrentSphiProposalWidth() { return parameter->getCurrentSphiProposalWidth(); }
+
+
+
+		//Adaptive Width Functions:
+		virtual void adaptStdDevSynthesisRateProposalWidth(unsigned adaptiveWidth);
+		virtual void adaptSynthesisRateProposalWidth(unsigned adaptiveWidth);
+		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth);
 		virtual void adaptHyperParameterProposalWidths(unsigned adaptiveWidth);
+
+
+
+		//Other Functions:
+		virtual void proposeCodonSpecificParameter();
+		virtual void proposeHyperParameters();
+		virtual void proposeSynthesisRateLevels();
+
+		virtual unsigned getNumPhiGroupings();
+		virtual unsigned getMixtureAssignment(unsigned index);
+		virtual unsigned getNumMixtureElements();
+		virtual unsigned getNumSynthesisRateCategories();
+
+		virtual void setNumPhiGroupings(unsigned value);
+		virtual void setMixtureAssignment(unsigned i, unsigned catOfGene);
+		virtual void setCategoryProbability(unsigned mixture, double value);
+
+		virtual void updateCodonSpecificParameter(std::string grouping);
+		virtual void updateGibbsSampledHyperParameters(Genome &genome);
 		virtual void updateAllHyperParameter();
 		virtual void updateHyperParameter(unsigned hp);
-		virtual void updateSphi() { parameter->updateSphi(); }
-		virtual void updateSphiTrace(unsigned sample) { parameter->updateStdDevSynthesisRateTrace(sample); }
-		virtual void updateHyperParameterTraces(unsigned sample);
-		virtual void adaptSphiProposalWidth(unsigned adaptiveWidth) { parameter->adaptSphiProposalWidth(adaptiveWidth); }
-		virtual void proposeSynthesisRateLevels() { parameter->proposeSynthesisRateLevels(); }
-		virtual unsigned getNumSynthesisRateCategories() { return parameter->getNumSynthesisRateCategories(); }
-		virtual std::vector<unsigned> getMixtureElementsOfSelectionCategory(unsigned k) { return parameter->getMixtureElementsOfSelectionCategory(k); }
-		virtual void updateSynthesisRate(unsigned i, unsigned k) { parameter->updateSynthesisRate(i, k); }
-		virtual void setMixtureAssignment(unsigned i, unsigned catOfGene) { parameter->setMixtureAssignment(i, catOfGene); }
-		virtual void updateSynthesisRateTrace(unsigned sample, unsigned i) { parameter->updateSynthesisRateTrace(sample, i); }
-		virtual void updateMixtureAssignmentTrace(unsigned sample, unsigned i) { parameter->updateMixtureAssignmentTrace(sample, i); }
-		virtual void setCategoryProbability(unsigned mixture, double value) { parameter->setCategoryProbability(mixture, value); }
-		virtual void updateMixtureProbabilitiesTrace(unsigned sample) { parameter->updateMixtureProbabilitiesTrace(sample); }
-		virtual void adaptSynthesisRateProposalWidth(unsigned adaptiveWidth) { parameter->adaptSynthesisRateProposalWidth(adaptiveWidth); }
-		virtual void getParameterForCategory(unsigned category, unsigned param, std::string aa, bool proposal, double* returnValue)
-		{
-			parameter->getParameterForCategory(category, param, aa, proposal, returnValue);
-		}
-		virtual unsigned getGroupListSize() { return parameter->getGroupListSize(); } //TODO: make not hardcoded?
-		virtual std::string getGrouping(unsigned index) { return parameter->getGrouping(index); }
-		// R wrapper
-		std::vector<double> CalculateProbabilitiesForCodons(std::vector<double> mutation, std::vector<double> selection, double phi);
 
-		virtual void setLastIteration(unsigned iteration) { parameter->setLastIteration(iteration); }
-		virtual unsigned getLastIteration() { return parameter->getLastIteration(); }
-		virtual void updateTmp() {}
+		virtual void simulateGenome(Genome &genome);
 		virtual void printHyperParameters();
+		void setParameter(FONSEParameter &_parameter);
+		virtual double calculateAllPriors();
+		void calculateCodonProbabilityVector(unsigned numCodons, unsigned position, unsigned maxIndexValue,
+											 double* mutation, double* selection, double phi, double codonProb[]);
+		virtual void getParameterForCategory(unsigned category, unsigned param, std::string aa, bool proposal,
+											 double* returnValue);
+
+
+
+		//R Section:
+#ifndef STANDALONE
+		std::vector<double> CalculateProbabilitiesForCodons(std::vector<double> mutation, std::vector<double> selection, double phi);
+#endif
 
 	protected:
 };
