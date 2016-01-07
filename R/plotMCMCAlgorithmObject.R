@@ -6,7 +6,8 @@
 #' 
 #' @return This function has no return value.
 #' 
-#' 
+#' @description This function will plot the logLikelihood trace, and if the Hmisc package is installed, it will 
+#'  plot a subplot of the logLikelihood trace with the first few samples removed.
 plot.Rcpp_MCMCAlgorithm <- function(x, ...)
 {
   loglik.trace <- x$getLogLikelihoodTrace()
