@@ -67,7 +67,6 @@ class Model
 		virtual void setLastIteration(unsigned iteration) = 0;
 
 
-
 		//Trace Functions:
 		virtual void updateStdDevSynthesisRateTrace(unsigned sample) = 0;
 		virtual void updateSynthesisRateTrace(unsigned sample, unsigned i) = 0;
@@ -76,8 +75,6 @@ class Model
 		virtual void updateCodonSpecificParameterTrace(unsigned sample, std::string grouping) = 0;
 		virtual void updateHyperParameterTraces(unsigned sample) = 0;
 		virtual void updateTracesWithInitialValues(Genome &genome) = 0;
-
-
 
 		//Adaptive Width Functions:
 		virtual void adaptStdDevSynthesisRateProposalWidth(unsigned adaptiveWidth) = 0;

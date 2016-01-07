@@ -271,6 +271,7 @@ void SequenceSummary::AAToCodonRange(std::string aa, unsigned& startAAIndex, uns
 	//unsigned startAAIndex = 0u;
 	//unsigned endAAIndex = 0u;
 	char AA = aa[0];
+	
 	switch (AA)
 	{
 	case 'A':
@@ -364,11 +365,12 @@ void SequenceSummary::AAToCodonRange(std::string aa, unsigned& startAAIndex, uns
 	default: // INVALID AA
 		startAAIndex = 0;
 		endAAIndex = 0;
-#ifndef STANDALONE
-		Rf_warning("Invalid Amino Acid given (%s), returning 0,0\n", aa.c_str());
-#else
-		std::cerr << "Invalid aa given, returning 0,0\n";
-#endif
+		std::cout << AA << std::endl;
+//#ifndef STANDALONE
+//		Rf_warning("Invalid Amino Acid given (%s), returning 0,0\n", aa.c_str());
+//#else
+		std::cerr << "Invalid AA given, returning 0,0\n";
+//#endif
 		break;
 	}
 	//std::array<unsigned, 2> aaRange;

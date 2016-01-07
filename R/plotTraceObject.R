@@ -4,6 +4,16 @@
 # additional arguments are geneIndex, and category to index function like
 # getExpressionTraceForGene or plotCodonSpecificParameters
 
+#' Plot Trace Object
+#' @param x An Rcpp trace object initialized with \code{initializeTraceObject}.
+#' @param what A string containing one of the following to graph: \code{Mutation, Selection, MixtureProbability, Sphi,
+#'  Mphi, Aphi, Spesilon, ExpectedPhi, Expression}.
+#' @param geneIndex When plotting expression, the index of the gene to be plotted.
+#' @param mixture The mixture for which to plot values.
+#' 
+#' @return This function has no return value.
+#' 
+#' @description Plots different traces, specified with the \code{what} parameter.
 plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbability" ,"Sphi", "Mphi", "Aphi", "Sepsilon", "ExpectedPhi", "Expression"), 
                                    geneIndex=1, mixture = 1, ...)
 {

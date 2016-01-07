@@ -36,6 +36,11 @@ class Parameter {
 		static const std::string selectionShared;
 		static const std::string mutationShared;
 
+		static const unsigned dM;
+		static const unsigned dEta;
+		static const unsigned dOmega;
+		static const unsigned alp;
+		static const unsigned lmPri;
 
 #ifdef STANDALONE
 		static std::default_random_engine generator; // static to make sure that the same generator is during the runtime.

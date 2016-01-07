@@ -35,8 +35,7 @@ double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grou
 		}
 	}
 
-	unsigned aaStart;
-	unsigned aaEnd;
+	unsigned aaStart, aaEnd;
 	SequenceSummary::AAToCodonRange(grouping, aaStart, aaEnd, false);
 	for (unsigned i = aaStart; i < aaEnd; i++) {
 		positions = gene.geneData.getCodonPositions(i);
@@ -102,6 +101,9 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 	double phiValue = parameter->getSynthesisRate(geneIndex, expressionCategory, false);
 	double phiValue_proposed = parameter->getSynthesisRate(geneIndex, expressionCategory, true);
 
+
+	/* This loop causes a compiler warning because i is an int, but openMP won't compile if I change i to unsigned.
+		Maybe worth looking into? */
 #ifndef __APPLE__
 #pragma omp parallel for private(mutation, selection, positions, curAA) reduction(+:likelihood,likelihood_proposed)
 #endif
@@ -431,16 +433,9 @@ void FONSEModel::updateTracesWithInitialValues(Genome & genome)
 		parameter->updateMixtureAssignmentTrace(0, i);
 	}
 
-	unsigned aaStart;
-	unsigned aaEnd;
 	for (unsigned i = 0; i < groupList.size(); i++)
 	{
-		SequenceSummary::AAToCodonRange(groupList[i], aaStart, aaEnd, false);
-		for (unsigned j = aaStart; j < aaEnd; j++)
-		{
-			std::string codon = SequenceSummary::indexToCodon(j, true);
-			parameter->updateCodonSpecificParameterTrace(0, codon);
-		}
+		parameter->updateCodonSpecificParameterTrace(0, getGrouping(i));
 	}
 }
 

@@ -30,7 +30,6 @@ class ROCModel : public Model
 					std::vector <double> &logProbabilityRatio);
 
 
-
 		//Initialization and Restart Functions:
 		virtual void initTraces(unsigned samples, unsigned num_genes);
 		virtual void writeRestartFile(std::string filename);
