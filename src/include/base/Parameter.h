@@ -92,12 +92,12 @@ class Parameter {
 
 
 
-		//Sphi Functions:
-		double getSphi(unsigned selectionCategory, bool proposed = false);
-		virtual void proposeSphi();
-		void setSphi(double sPhi, unsigned selectionCategory);
-		double getCurrentSphiProposalWidth();
-		void updateSphi();
+		//StdDevSynthesisRate Functions:
+		double getStdDevSynthesisRate(unsigned selectionCategory, bool proposed = false);
+		virtual void proposeStdDevSynthesisRate();
+		void setStdDevSynthesisRate(double StdDevSynthesisRate, unsigned selectionCategory);
+		double getCurrentStdDevSynthesisRateProposalWidth();
+		void updateStdDevSynthesisRate();
 
 
 
@@ -116,6 +116,8 @@ class Parameter {
 		unsigned getLastIteration();
 		void setLastIteration(unsigned iteration);
 
+
+
 		//Trace Functions:
 		Trace& getTraceObject();
 		void setTraceObject(Trace _trace);
@@ -124,18 +126,19 @@ class Parameter {
 		void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex);
 		void updateMixtureProbabilitiesTrace(unsigned samples);
 
+
 		//Adaptive Width Functions:
-		void adaptSphiProposalWidth(unsigned adaptationWidth);
+		void adaptStdDevSynthesisRateProposalWidth(unsigned adaptationWidth);
 		void adaptSynthesisRateProposalWidth(unsigned adaptationWidth);
 		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth);
 
 
 		//Posterior, Variance, and Estimates Functions:
-		double getSphiPosteriorMean(unsigned samples, unsigned mixture);
+		double getStdDevSynthesisRatePosteriorMean(unsigned samples, unsigned mixture);
 		double getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement);
 
 		double getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType);
-		double getSphiVariance(unsigned samples, unsigned mixture, bool unbiased);
+		double getStdDevSynthesisRateVariance(unsigned samples, unsigned mixture, bool unbiased);
 		double getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement,
 											bool unbiased = true);
 		double getCodonSpecificVariance(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType, bool unbiased);
@@ -246,11 +249,11 @@ class Parameter {
 		unsigned maxGrouping;
 
 
-		std::vector<double> Sphi_proposed;
-		std::vector<double> Sphi;
-		double bias_sphi;
-		double std_sphi;
-		unsigned numAcceptForSphi;
+		std::vector<double> stdDevSynthesisRate_proposed;
+		std::vector<double> stdDevSynthesisRate;
+		double bias_stdDevSynthesisRate;
+		double std_stdDevSynthesisRate;
+		unsigned numAcceptForStdDevSynthesisRate;
 		std::vector<double> std_csp;
 
 

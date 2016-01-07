@@ -1,10 +1,58 @@
 #include "include/FONSE/FONSEModel.h"
-#include <vector>
-#include <math.h>
-#include <cfloat>
-#include <iostream>
-#include <array>
-#include <limits.h>
+
+
+//--------------------------------------------------//
+//----------- Constructors & Destructors ---------- //
+//--------------------------------------------------//
+
+
+FONSEModel::FONSEModel() : Model()
+{
+	parameter = 0;
+}
+
+
+FONSEModel::~FONSEModel()
+{
+	//dtor
+}
+
+
+double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grouping, double *mutation, double *selection, double phiValue)
+{
+	int numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
+	double logLikelihood = 0.0;
+
+	std::vector <unsigned> *positions;
+	double codonProb[6];
+
+	unsigned maxIndexVal = 0u;
+	for (int i = 1; i < (numCodons - 1); i++)
+	{
+		if (selection[maxIndexVal] < selection[i])
+		{
+			maxIndexVal = i;
+		}
+	}
+
+	unsigned aaStart;
+	unsigned aaEnd;
+	SequenceSummary::AAToCodonRange(grouping, aaStart, aaEnd, false);
+	for (unsigned i = aaStart; i < aaEnd; i++) {
+		positions = gene.geneData.getCodonPositions(i);
+		for (unsigned j = 0; j < positions->size(); j++) {
+			calculateCodonProbabilityVector(numCodons, positions->at(j), maxIndexVal, mutation, selection, phiValue, codonProb);
+			for (int k = 0; k < numCodons; k++) {
+				if (codonProb[k] == 0) continue;
+				logLikelihood += std::log(codonProb[k]);
+			}
+		}
+		//positions->clear();
+	}
+
+	return logLikelihood;
+}
+
 
 double FONSEModel::calculateMutationPrior(std::string grouping, bool proposed)
 {
@@ -26,15 +74,14 @@ double FONSEModel::calculateMutationPrior(std::string grouping, bool proposed)
 	return priorValue;
 }
 
-FONSEModel::FONSEModel() : Model()
-{
-	parameter = 0;
-}
 
-FONSEModel::~FONSEModel()
-{
-	//dtor
-}
+
+
+
+//------------------------------------------------//
+//---------- Likelihood Ratio Functions ----------//
+//------------------------------------------------//
+
 
 void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k, double* logProbabilityRatio)
 {
@@ -68,10 +115,10 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 		likelihood += calculateLogLikelihoodRatioPerAA(gene, curAA, mutation, selection, phiValue);
 		likelihood_proposed += calculateLogLikelihoodRatioPerAA(gene, curAA, mutation, selection, phiValue_proposed);
 	}
-	
+
 	//std::cout << logLikelihood << " " << logLikelihood_proposed << std::endl;
 
-	double sPhi = parameter->getSphi(false);
+	double sPhi = parameter->getStdDevSynthesisRate(false);
 	double logPhiProbability = Parameter::densityLogNorm(phiValue, (-(sPhi * sPhi) / 2), sPhi, true);
 	double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, (-(sPhi * sPhi) / 2), sPhi, true);
 	double currentLogLikelihood = (likelihood + logPhiProbability);
@@ -99,40 +146,6 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 	logProbabilityRatio[4] = proposedLogLikelihood;
 }
 
-double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grouping, double *mutation, double *selection, double phiValue)
-{
-	int numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
-	double logLikelihood = 0.0;
-
-	std::vector <unsigned> *positions;
-	double codonProb[6];
-
-	unsigned maxIndexVal = 0u;
-	for (int i = 1; i < (numCodons - 1); i++)
-	{
-		if (selection[maxIndexVal] < selection[i])
-		{
-			maxIndexVal = i;
-		}
-	}
-
-	unsigned aaStart;
-	unsigned aaEnd;
-	SequenceSummary::AAToCodonRange(grouping, aaStart, aaEnd, false);
-	for (unsigned i = aaStart; i < aaEnd; i++) {
-		positions = gene.geneData.getCodonPositions(i);
-		for (unsigned j = 0; j < positions->size(); j++) {
-			calculateCodonProbabilityVector(numCodons, positions->at(j), maxIndexVal, mutation, selection, phiValue, codonProb);
-			for (int k = 0; k < numCodons; k++) {
-				if (codonProb[k] == 0) continue;
-				logLikelihood += std::log(codonProb[k]);
-			}
-		} 
-		//positions->clear();
-	}
-
-	return logLikelihood;
-}
 
 void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures)
 {
@@ -185,6 +198,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 	logAcceptanceRatioForAllMixtures = likelihood_proposed - likelihood;
 }
 
+
 void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration, std::vector <double> & logProbabilityRatio)
 {
 	double lpr = 0.0;
@@ -195,9 +209,9 @@ void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 	std::vector<double> proposedMphi(selectionCategory, 0.0);
 	for(unsigned i = 0u; i < selectionCategory; i++)
 	{
-		currentSphi[i] = getSphi(i, false);
+		currentSphi[i] = getStdDevSynthesisRate(i, false);
 		currentMphi[i] = -((currentSphi[i] * currentSphi[i]) / 2);
-		proposedSphi[i] = getSphi(i, true);
+		proposedSphi[i] = getStdDevSynthesisRate(i, true);
 		proposedMphi[i] = -((proposedMphi[i] * proposedMphi[i]) / 2);
 		lpr -= (std::log(currentSphi[i]) - std::log(proposedSphi[i]));
 	}
@@ -213,26 +227,199 @@ void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 		mixture = getSynthesisRateCategory(mixture);
 		double phi = getSynthesisRate(i, mixture, false);
 		lpr += Parameter::densityLogNorm(phi, proposedMphi[mixture], proposedSphi[mixture], true)
-				- Parameter::densityLogNorm(phi, currentMphi[mixture], currentSphi[mixture], true);
+			   - Parameter::densityLogNorm(phi, currentMphi[mixture], currentSphi[mixture], true);
 	}
 	logProbabilityRatio[0] = lpr;
 }
 
-double FONSEModel::calculateAllPriors()
+
+
+
+
+//----------------------------------------------------------//
+//---------- Initialization and Restart Functions ----------//
+//----------------------------------------------------------//
+
+
+void FONSEModel::initTraces(unsigned samples, unsigned num_genes)
 {
-	double priorRatio = 0.0;
-	unsigned size = getGroupListSize();
-
-	for (unsigned i = 0; i < size; i++)
-	{
-		std::string grouping = getGrouping(i);
-		priorRatio += calculateMutationPrior(grouping, false);
-	}
-
-	// add more priors if necessary.
-
-	return priorRatio;
+	parameter->initAllTraces(samples, num_genes);
 }
+
+
+void FONSEModel::writeRestartFile(std::string filename)
+{
+	return parameter->writeEntireRestartFile(filename);
+}
+
+
+
+
+
+//----------------------------------------//
+//---------- Category Functions ----------//
+//----------------------------------------//
+
+
+double FONSEModel::getCategoryProbability(unsigned i)
+{
+	return parameter->getCategoryProbability(i);
+}
+
+
+unsigned FONSEModel::getMutationCategory(unsigned mixture)
+{
+	return parameter->getMutationCategory(mixture);
+}
+
+
+unsigned FONSEModel::getSelectionCategory(unsigned mixture)
+{
+	return parameter->getSelectionCategory(mixture);
+}
+
+
+unsigned FONSEModel::getSynthesisRateCategory(unsigned mixture)
+{
+	return parameter->getSynthesisRateCategory(mixture);
+}
+
+
+std::vector<unsigned> FONSEModel::getMixtureElementsOfSelectionCategory(unsigned k)
+{
+	return parameter->getMixtureElementsOfSelectionCategory(k);
+}
+
+
+
+
+
+//------------------------------------------//
+//---------- Group List Functions ----------//
+//------------------------------------------//
+
+
+unsigned FONSEModel::getGroupListSize()
+{
+	return parameter->getGroupListSize();
+}
+
+
+std::string FONSEModel::getGrouping(unsigned index)
+{
+	return parameter->getGrouping(index);
+}
+
+
+
+
+
+//---------------------------------------------------//
+//---------- StdDevSynthesisRate Functions ----------//
+//---------------------------------------------------//
+
+
+double FONSEModel::getStdDevSynthesisRate(unsigned selectionCategory, bool proposed)
+{
+	return parameter->getStdDevSynthesisRate(selectionCategory, proposed);
+}
+
+
+double FONSEModel::getCurrentStdDevSynthesisRateProposalWidth()
+{
+	return parameter->getCurrentStdDevSynthesisRateProposalWidth();
+}
+
+
+void FONSEModel::updateStdDevSynthesisRate()
+{
+	parameter->updateStdDevSynthesisRate();
+}
+
+
+
+
+
+//----------------------------------------------//
+//---------- Synthesis Rate Functions ----------//
+//----------------------------------------------//
+
+
+double FONSEModel::getSynthesisRate(unsigned index, unsigned mixture, bool proposed)
+{
+	return parameter->getSynthesisRate(index, mixture, proposed);
+}
+
+
+void FONSEModel::updateSynthesisRate(unsigned i, unsigned k)
+{
+	parameter->updateSynthesisRate(i, k);
+}
+
+
+
+
+
+//-----------------------------------------//
+//---------- Iteration Functions ----------//
+//-----------------------------------------//
+
+
+unsigned FONSEModel::getLastIteration()
+{
+	return parameter->getLastIteration();
+}
+
+
+void FONSEModel::setLastIteration(unsigned iteration)
+{
+	parameter->setLastIteration(iteration);
+}
+
+
+
+
+
+//-------------------------------------//
+//---------- Trace Functions ----------//
+//-------------------------------------//
+
+
+void FONSEModel::updateStdDevSynthesisRateTrace(unsigned sample)
+{
+	parameter->updateStdDevSynthesisRateTrace(sample);
+}
+
+
+void FONSEModel::updateSynthesisRateTrace(unsigned sample, unsigned i)
+{
+	parameter->updateSynthesisRateTrace(sample, i);
+}
+
+
+void FONSEModel::updateMixtureAssignmentTrace(unsigned sample, unsigned i)
+{
+	parameter->updateMixtureAssignmentTrace(sample, i);
+}
+
+
+void FONSEModel::updateMixtureProbabilitiesTrace(unsigned sample)
+{
+	parameter->updateMixtureProbabilitiesTrace(sample);
+}
+
+
+void FONSEModel::updateCodonSpecificParameterTrace(unsigned sample, std::string grouping)
+{
+	parameter->updateCodonSpecificParameterTrace(sample, grouping);
+}
+
+
+void FONSEModel::updateHyperParameterTraces(unsigned sample)
+{
+	updateStdDevSynthesisRateTrace(sample);
+}
+
 
 void FONSEModel::updateTracesWithInitialValues(Genome & genome)
 {
@@ -257,39 +444,134 @@ void FONSEModel::updateTracesWithInitialValues(Genome & genome)
 	}
 }
 
+
+
+
+
+//----------------------------------------------//
+//---------- Adaptive Width Functions ----------//
+//----------------------------------------------//
+
+
+void FONSEModel::adaptStdDevSynthesisRateProposalWidth(unsigned adaptiveWidth)
+{
+	parameter->adaptStdDevSynthesisRateProposalWidth(adaptiveWidth);
+}
+
+
+void FONSEModel::adaptSynthesisRateProposalWidth(unsigned adaptiveWidth)
+{
+	parameter->adaptSynthesisRateProposalWidth(adaptiveWidth);
+}
+
+
+void FONSEModel::adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth)
+{
+	parameter->adaptCodonSpecificParameterProposalWidth(adaptiveWidth);
+}
+
+
 void FONSEModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth)
 {
-	adaptSphiProposalWidth(adaptiveWidth);
+	adaptStdDevSynthesisRateProposalWidth(adaptiveWidth);
 }
+
+
+
+
+
+//-------------------------------------//
+//---------- Other Functions ----------//
+//-------------------------------------//
+
+
+void FONSEModel::proposeCodonSpecificParameter()
+{
+	parameter->proposeCodonSpecificParameter();
+}
+
+
+void FONSEModel::proposeHyperParameters()
+{
+	parameter->proposeHyperParameters();
+}
+
+
+void FONSEModel::proposeSynthesisRateLevels()
+{
+	parameter->proposeSynthesisRateLevels();
+}
+
+
+unsigned FONSEModel::getNumPhiGroupings()
+{
+	return parameter->getNumObservedPhiSets();
+}
+
+
+unsigned FONSEModel::getMixtureAssignment(unsigned index)
+{
+	return parameter->getMixtureAssignment(index);
+}
+
+
+unsigned FONSEModel::getNumMixtureElements()
+{
+	return parameter->getNumMixtureElements();
+}
+
+
+unsigned FONSEModel::getNumSynthesisRateCategories()
+{
+	return parameter->getNumSynthesisRateCategories();
+}
+
+
+void FONSEModel::setNumPhiGroupings(unsigned value)
+{
+	parameter->setNumObservedPhiSets(value);
+}
+
+
+void FONSEModel::setMixtureAssignment(unsigned i, unsigned catOfGene)
+{
+	parameter->setMixtureAssignment(i, catOfGene);
+}
+
+
+void FONSEModel::setCategoryProbability(unsigned mixture, double value)
+{
+	parameter->setCategoryProbability(mixture, value);
+}
+
+
+void FONSEModel::updateCodonSpecificParameter(std::string grouping)
+{
+	parameter->updateCodonSpecificParameter(grouping);
+}
+
+
+void FONSEModel::updateGibbsSampledHyperParameters(Genome &genome)
+{
+	//TODO: fill in
+}
+
 
 void FONSEModel::updateAllHyperParameter()
 {
-	updateSphi();
+	updateStdDevSynthesisRate();
 }
 
 void FONSEModel::updateHyperParameter(unsigned hp)
 {
 	// NOTE: when adding additional hyper parameter, also add to updateAllHyperParameter()
 	switch (hp) {
-	case 0:
-		updateSphi();
-		break;
+		case 0:
+			updateStdDevSynthesisRate();
+			break;
 	}
 }
 
-void FONSEModel::updateHyperParameterTraces(unsigned sample)
-{
-	updateSphiTrace(sample);
-}
-
-void FONSEModel::printHyperParameters()
-{
-	for(unsigned i = 0u; i < getNumSynthesisRateCategories(); i++)
-	{
-		std::cout << "Sphi posterior estimate for selection category " << i << ": " << getSphi(i) << std::endl;
-	}
-	std::cout << "\t current Sphi proposal width: " << getCurrentSphiProposalWidth() << std::endl;
-}
 
 void FONSEModel::simulateGenome(Genome & genome)
 {
@@ -361,12 +643,42 @@ void FONSEModel::simulateGenome(Genome & genome)
 	}
 }
 
+
+void FONSEModel::printHyperParameters()
+{
+	for(unsigned i = 0u; i < getNumSynthesisRateCategories(); i++)
+	{
+		std::cout << "Sphi posterior estimate for selection category " << i << ": " << getStdDevSynthesisRate(i) << std::endl;
+	}
+	std::cout << "\t current Sphi proposal width: " << getCurrentStdDevSynthesisRateProposalWidth() << std::endl;
+}
+
+
 void FONSEModel::setParameter(FONSEParameter &_parameter)
 {
 	parameter = &_parameter;
 }
 
-void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned position, unsigned maxIndexValue, double *mutation, double *selection, double phi, double codonProb[])
+
+double FONSEModel::calculateAllPriors()
+{
+	double priorRatio = 0.0;
+	unsigned size = getGroupListSize();
+
+	for (unsigned i = 0; i < size; i++)
+	{
+		std::string grouping = getGrouping(i);
+		priorRatio += calculateMutationPrior(grouping, false);
+	}
+
+	// add more priors if necessary.
+
+	return priorRatio;
+}
+
+
+void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned position, unsigned maxIndexValue,
+												 double *mutation, double *selection, double phi, double codonProb[])
 {
 	double denominator;
 
@@ -400,6 +712,26 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 	}
 }
 
+void FONSEModel::getParameterForCategory(unsigned category, unsigned param, std::string aa, bool proposal, double* returnValue)
+{
+	parameter->getParameterForCategory(category, param, aa, proposal, returnValue);
+}
+
+
+
+
+
+
+
+
+// -----------------------------------------------------------------------------------------------------//
+// ---------------------------------------- R SECTION --------------------------------------------------//
+// -----------------------------------------------------------------------------------------------------//
+
+
+#ifndef STANDALONE
+
+
 /*std::vector<double> FONSEModel::CalculateProbabilitiesForCodons(std::vector<double> mutation, std::vector<double> selection, double phi)
 {
 	unsigned numCodons = mutation.size() + 1;
@@ -410,3 +742,6 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 	std::vector<double> returnVector(codonProb, codonProb + numCodons);
 	return returnVector;
 }*/
+
+
+#endif
