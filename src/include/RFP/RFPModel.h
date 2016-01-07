@@ -7,11 +7,12 @@
 #include "RFPParameter.h"
 
 
-class RFPModel: public Model {
+class RFPModel: public Model
+{
 	private:
 		RFPParameter *parameter;
 
-		virtual double calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
+		double calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
 				unsigned currRFPObserved, unsigned currNumCodonsInMRNA, double phiValue);
 
 
@@ -26,7 +27,8 @@ class RFPModel: public Model {
 				double* logProbabilityRatio);
 		virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
 				double& logAcceptanceRatioForAllMixtures);
-		virtual void calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration, std::vector <double> &logProbabilityRatio);
+		virtual void calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration,
+				std::vector <double> &logProbabilityRatio);
 
 
 

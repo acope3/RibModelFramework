@@ -1,6 +1,6 @@
 #include "include/RFP/RFPModel.h"
 
-
+//R runs only
 #ifndef STANDALONE
 #include <Rcpp.h>
 using namespace Rcpp;

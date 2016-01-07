@@ -1277,7 +1277,7 @@ double Parameter::getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigne
 }
 
 
-double Parameter::getSphiVariance(unsigned samples, unsigned mixture, bool unbiased)
+double Parameter::getStdDevSynthesisRateVariance(unsigned samples, unsigned mixture, bool unbiased)
 {
 	unsigned selectionCategory = getSelectionCategory(mixture);
 	std::vector<double> sPhiTrace = traces.getStdDevSynthesisRateTrace(selectionCategory);
