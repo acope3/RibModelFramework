@@ -32,15 +32,15 @@ Parameter::Parameter()
 	lastIteration = 0u;
 	numParam = 0u;
 	obsPhiSets = 0u;
-	Sphi.resize(1);
-	Sphi_proposed.resize(1);
-	numAcceptForSphi = 0u;
-	bias_sphi = 0.0;
+	stdDevSynthesisRate.resize(1);
+	stdDevSynthesisRate_proposed.resize(1);
+	numAcceptForStdDevSynthesisRate = 0u;
+	bias_stdDevSynthesisRate = 0.0;
 	bias_phi = 0.0;
 	numMutationCategories = 0u;
 	numSelectionCategories = 0u;
 	numMixtures = 0u;
-	std_sphi = 0.1;
+	std_stdDevSynthesisRate = 0.1;
 	maxGrouping = 22;
 }
 
@@ -50,17 +50,17 @@ Parameter::Parameter(unsigned _maxGrouping)
 	lastIteration = 0u;
 	numParam = 0u;
 	obsPhiSets = 0u;
-	Sphi.resize(1);
-	Sphi_proposed.resize(1);
-	numAcceptForSphi = 0u;
-	bias_sphi = 0.0;
+	stdDevSynthesisRate.resize(1);
+	stdDevSynthesisRate_proposed.resize(1);
+	numAcceptForStdDevSynthesisRate = 0u;
+	bias_stdDevSynthesisRate = 0.0;
 	bias_phi = 0.0;
 	numMutationCategories = 0u;
 	numSelectionCategories = 0u;
 	numMixtures = 0u;
-	std_sphi = 0.1;
+	std_stdDevSynthesisRate = 0.1;
 	maxGrouping = _maxGrouping;
-        numAcceptForCodonSpecificParameters.resize(maxGrouping, 0u);
+	numAcceptForCodonSpecificParameters.resize(maxGrouping, 0u);
 }
 
 
@@ -69,21 +69,21 @@ Parameter& Parameter::operator=(const Parameter& rhs)
 	if (this == &rhs) return *this; // handle self assignment
 	numParam = rhs.numParam;
 
-	Sphi.resize(rhs.Sphi.size());
-	Sphi_proposed.resize(rhs.Sphi.size());
-	for(unsigned i = 0u; i < rhs.Sphi.size(); i++)
+	stdDevSynthesisRate.resize(rhs.stdDevSynthesisRate.size());
+	stdDevSynthesisRate_proposed.resize(rhs.stdDevSynthesisRate.size());
+	for(unsigned i = 0u; i < rhs.stdDevSynthesisRate.size(); i++)
 	{
-		Sphi[i] = rhs.Sphi[i];
-		Sphi_proposed[i] = rhs.Sphi_proposed[i];
+		stdDevSynthesisRate[i] = rhs.stdDevSynthesisRate[i];
+		stdDevSynthesisRate_proposed[i] = rhs.stdDevSynthesisRate_proposed[i];
 	}
 
-	numAcceptForSphi = rhs.numAcceptForSphi;
+	numAcceptForStdDevSynthesisRate = rhs.numAcceptForStdDevSynthesisRate;
 	obsPhiSets = rhs.obsPhiSets;
 	categories = rhs.categories;
 
   	// proposal bias and std for phi values
-  	bias_sphi = rhs.bias_sphi;
-  	std_sphi = rhs.std_sphi;
+  	bias_stdDevSynthesisRate = rhs.bias_stdDevSynthesisRate;
+  	std_stdDevSynthesisRate = rhs.std_stdDevSynthesisRate;
 
   	// proposal bias and std for phi values
   	bias_phi = rhs.bias_phi;
@@ -150,17 +150,17 @@ void Parameter::initParameterSet(std::vector<double> sphi, unsigned _numMixtures
 	mutationSelectionState = _mutationSelectionState;
 	numParam = ((splitSer) ? 40 : 41);
 	numMixtures = _numMixtures;
-	Sphi.resize(sphi.size());
-	Sphi_proposed.resize(sphi.size());
+	stdDevSynthesisRate.resize(sphi.size());
+	stdDevSynthesisRate_proposed.resize(sphi.size());
 	for(unsigned i = 0u; i < sphi.size(); i++)
 	{
-		Sphi[i] = sphi[i];
-		Sphi_proposed[i] = sphi[i];
+		stdDevSynthesisRate[i] = sphi[i];
+		stdDevSynthesisRate_proposed[i] = sphi[i];
 	}
-	bias_sphi = 0;
-	std_sphi = 0.1;
+	bias_stdDevSynthesisRate = 0;
+	std_stdDevSynthesisRate = 0.1;
 
-	numAcceptForSphi = 0u;
+	numAcceptForStdDevSynthesisRate = 0u;
 	std_csp.resize(numParam, 0.1);
 	numAcceptForCodonSpecificParameters.resize(maxGrouping, 0u);
 	// proposal bias and std for phi values
@@ -244,14 +244,14 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 						groupList.push_back(val);
 					}
 				}
-				else if (variableName == "Sphi")
+				else if (variableName == "stdDevSynthesisRate")
 				{
-					Sphi.resize(0);
+					stdDevSynthesisRate.resize(0);
 					double val;
 					iss.str(tmp);
 					while (iss >> val)
 					{
-						Sphi.push_back(val);
+						stdDevSynthesisRate.push_back(val);
 					}
 				}
 				else if (variableName == "numParam") {iss.str(tmp); iss >> numParam;}
@@ -338,7 +338,7 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 				else if (variableName == "std_sphi")
 				{
 					iss.str(tmp);
-					iss >> std_sphi;
+					iss >> std_stdDevSynthesisRate;
 				}
 				else if (variableName == "std_phi")
 				{
@@ -360,9 +360,9 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 		input.close();
 
 		//initialize all the default Parameter values now.
-		Sphi_proposed = Sphi;
-		numAcceptForSphi = 0u;
-		bias_sphi = 0;
+		stdDevSynthesisRate_proposed = stdDevSynthesisRate;
+		numAcceptForStdDevSynthesisRate = 0u;
+		bias_stdDevSynthesisRate = 0;
 		bias_phi = 0;
 		obsPhiSets = 0;
 
@@ -409,17 +409,17 @@ void Parameter::writeBasicRestartFile(std::string filename)
 			else oss << " ";
 		}
 		if (i % 10 != 0) oss << "\n";
-		oss << ">Sphi:\n";
-		for (i = 0; i < Sphi.size(); i++)
+		oss << ">stdDevSynthesisRate:\n";
+		for (i = 0; i < stdDevSynthesisRate.size(); i++)
 		{
-			oss << Sphi[i];
+			oss << stdDevSynthesisRate[i];
 			if ((i + 1) % 10 == 0) oss << "\n";
 			else oss <<" ";
 		}
 		if (i % 10 != 0) oss << "\n";
 		oss << ">numParam:\n" << numParam << "\n";
 		oss << ">numMixtures:\n" << numMixtures << "\n";
-		oss << ">std_sphi:\n" << std_sphi << "\n";
+		oss << ">std_sphi:\n" << std_stdDevSynthesisRate << "\n";
 		//maybe clear the buffer
 		oss << ">std_phi:\n";
 		for (i = 0; i < std_phi.size(); i++)
@@ -819,45 +819,45 @@ unsigned Parameter::getGroupListSize()
 
 
 
-// -------------------------------------//
-// ---------- Sphi Functions -----------//
-// -------------------------------------//
+// ----------------------------------------------------//
+// ---------- StdDevSynthesisRate Functions -----------//
+// ----------------------------------------------------//
 
 
-double Parameter::getSphi(unsigned selectionCategory, bool proposed)
+double Parameter::getStdDevSynthesisRate(unsigned selectionCategory, bool proposed)
 {
-	return (proposed ? Sphi_proposed[selectionCategory] : Sphi[selectionCategory]);
+	return (proposed ? stdDevSynthesisRate_proposed[selectionCategory] : stdDevSynthesisRate[selectionCategory]);
 }
 
 
-void Parameter::proposeSphi()
+void Parameter::proposeStdDevSynthesisRate()
 {
 	for(unsigned i = 0u; i < numSelectionCategories; i++)
 	{
-		Sphi_proposed[i] = std::exp(randNorm(std::log(Sphi[i]), std_sphi));
+		stdDevSynthesisRate_proposed[i] = std::exp(randNorm(std::log(stdDevSynthesisRate[i]), std_stdDevSynthesisRate));
 	}
 }
 
 
-void Parameter::setSphi(double sPhi, unsigned selectionCategory)
+void Parameter::setStdDevSynthesisRate(double sPhi, unsigned selectionCategory)
 {
-	Sphi[selectionCategory] = sPhi;
+	stdDevSynthesisRate[selectionCategory] = sPhi;
 }
 
 
-double Parameter::getCurrentSphiProposalWidth()
+double Parameter::getCurrentStdDevSynthesisRateProposalWidth()
 {
-	return std_sphi;
+	return std_stdDevSynthesisRate;
 }
 
 
-void Parameter::updateSphi()
+void Parameter::updateStdDevSynthesisRate()
 {
 	for(unsigned i = 0u; i < numSelectionCategories; i++)
 	{
-		Sphi[i] = Sphi_proposed[i];
+		stdDevSynthesisRate[i] = stdDevSynthesisRate_proposed[i];
 	}
-	numAcceptForSphi++;
+	numAcceptForStdDevSynthesisRate++;
 }
 
 
@@ -1053,7 +1053,7 @@ void Parameter::updateStdDevSynthesisRateTrace(unsigned sample)
 {
 	for (unsigned i = 0u; i < numSelectionCategories; i++)
 	{
-		traces.updateStdDevSynthesisRateTrace(sample, Sphi[i], i);
+		traces.updateStdDevSynthesisRateTrace(sample, stdDevSynthesisRate[i], i);
 	}
 }
 
@@ -1081,19 +1081,19 @@ void Parameter::updateMixtureProbabilitiesTrace(unsigned samples)
 // ----------------------------------------------//
 
 
-void Parameter::adaptSphiProposalWidth(unsigned adaptationWidth)
+void Parameter::adaptStdDevSynthesisRateProposalWidth(unsigned adaptationWidth)
 {
-	double acceptanceLevel = (double)numAcceptForSphi / (double)adaptationWidth;
+	double acceptanceLevel = (double)numAcceptForStdDevSynthesisRate / (double)adaptationWidth;
 	traces.updateStdDevSynthesisRateAcceptanceRatioTrace(acceptanceLevel);
 	if (acceptanceLevel < 0.2)
 	{
-		std_sphi *= 0.8;
+		std_stdDevSynthesisRate *= 0.8;
 	}
 	if (acceptanceLevel > 0.3)
 	{
-		std_sphi *= 1.2;
+		std_stdDevSynthesisRate *= 1.2;
 	}
-	numAcceptForSphi = 0u;
+	numAcceptForStdDevSynthesisRate = 0u;
 }
 
 
@@ -1137,10 +1137,10 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 {
 #ifndef STANDALONE
 	Rprintf("Acceptance rate for Codon Specific Parameter\n");
-	Rprintf("AA\tAcc.Rat\tProp.Width\n");
+	Rprintf("\tAA\tAcc.Rat\tProp.Width\n");
 #else
 	std::cout << "Acceptance rate for Codon Specific Parameter\n";
-	std::cout << "AA\tacc.rat\tProp.Width\n";
+	std::cout << "\tAA\tacc.rat\tProp.Width\n";
 #endif
 	for (unsigned i = 0; i < groupList.size(); i++)
 	{
@@ -1185,20 +1185,20 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 // ------------------------------------------------------------------//
 
 
-double Parameter::getSphiPosteriorMean(unsigned samples, unsigned mixture)
+double Parameter::getStdDevSynthesisRatePosteriorMean(unsigned samples, unsigned mixture)
 {
 	double posteriorMean = 0.0;
 	unsigned selectionCategory = getSelectionCategory(mixture);
-	std::vector<double> sPhiTrace = traces.getStdDevSynthesisRateTrace(selectionCategory);
+	std::vector<double> stdDevSynthesisRateTrace = traces.getStdDevSynthesisRateTrace(selectionCategory);
 	unsigned traceLength = lastIteration;
 
 	if (samples > traceLength)
 	{
 #ifndef STANDALONE
-		Rf_warning("Warning in ROCParameter::getSphiPosteriorMean throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
+		Rf_warning("Warning in ROCParameter::getstdDevSynthesisRatePosteriorMean throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
 			samples, traceLength);
 #else
-		std::cerr << "Warning in ROCParameter::getSphiPosteriorMean throws: Number of anticipated samples ("
+		std::cerr << "Warning in ROCParameter::getstdDevSynthesisRatePosteriorMean throws: Number of anticipated samples ("
 			<< samples << ") is greater than the length of the available trace (" << traceLength << ")."
 			<< "Whole trace is used for posterior estimate! \n";
 #endif
@@ -1207,7 +1207,7 @@ double Parameter::getSphiPosteriorMean(unsigned samples, unsigned mixture)
 	unsigned start = traceLength - samples;
 	for (unsigned i = start; i < traceLength; i++)
 	{
-		posteriorMean += sPhiTrace[i];
+		posteriorMean += stdDevSynthesisRateTrace[i];
 	}
 	return posteriorMean / (double)samples;
 }
@@ -1278,7 +1278,7 @@ double Parameter::getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigne
 }
 
 
-double Parameter::getSphiVariance(unsigned samples, unsigned mixture, bool unbiased)
+double Parameter::getStdDevSynthesisRateVariance(unsigned samples, unsigned mixture, bool unbiased)
 {
 	unsigned selectionCategory = getSelectionCategory(mixture);
 	std::vector<double> sPhiTrace = traces.getStdDevSynthesisRateTrace(selectionCategory);
@@ -1295,7 +1295,7 @@ double Parameter::getSphiVariance(unsigned samples, unsigned mixture, bool unbia
 #endif
 		samples = traceLength;
 	}
-	double posteriorMean = getSphiPosteriorMean(samples, mixture);
+	double posteriorMean = getStdDevSynthesisRatePosteriorMean(samples, mixture);
 
 	double posteriorVariance = 0.0;
 
