@@ -1136,10 +1136,10 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 {
 #ifndef STANDALONE
 	Rprintf("Acceptance rate for Codon Specific Parameter\n");
-	Rprintf("AA\tAcc.Rat\tProp.Width\n");
+	Rprintf("\tAA\tAcc.Rat\tProp.Width\n");
 #else
 	std::cout << "Acceptance rate for Codon Specific Parameter\n";
-	std::cout << "AA\tacc.rat\tProp.Width\n";
+	std::cout << "\tAA\tacc.rat\tProp.Width\n";
 #endif
 	for (unsigned i = 0; i < groupList.size(); i++)
 	{

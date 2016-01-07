@@ -3,10 +3,11 @@
 #include <vector>
 
 #ifdef CEDRIC
+
 int main()
 {
 	std::cout << "Initializing MCMCAlgorithm object---------------" << std::endl;
-	int samples = 200;
+	int samples = 1000;
 	int thining = 10;
 	int useSamples = 100;
 	std::cout << "\t# Samples: " << samples << "\n";
@@ -21,11 +22,11 @@ int main()
 	bool withPhi = false;
 
 	Genome genome;
-	//genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/data/twoMixtures/simulatedAllUniqueR.fasta");
-	genome.readFasta("F:/GitHub/RibModelDev/data/twoMixtures/simulatedAllUniqueR.fasta");
+	//genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/data/twoMixtures/simulatedAllUniqueR_unevenMixtures.fasta");
+	genome.readFasta("F:/GitHub/RibModelDev/data/twoMixtures/simulatedAllUniqueR_unevenMixtures.fasta");
 	if(withPhi)
 	{
-		genome.readObservedPhiValues("F:/GitHub/RibModelDev/data/twoMixtures/simulatedAllUniqueR_phi.csv", false);
+		genome.readObservedPhiValues("F:/GitHub/RibModelDev/data/twoMixtures/simulatedAllUniqueR_phi_unevenMixtures.csv", false);
 	}
 
 	std::cout << "Done!-------------------------------\n\n\n";
@@ -35,13 +36,14 @@ int main()
 	std::cout << "Initializing shared parameter variables---------------\n";
 	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 
-	unsigned numMixtures = 1;
+	unsigned numMixtures = 2;
 	std::vector<double> sphi_init(numMixtures, 1);
 
-	/* For 1 mixture */
+	/* For 2 mixture */
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{
-		geneAssignment[i] = 0u;
+		geneAssignment[i] = ( ((double)rand() / (double)RAND_MAX) < 0.5 ? 0u : 1u );
+
 	}
 	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 	std::cout << "Done!------------------------\n\n\n";
@@ -81,6 +83,8 @@ int main()
 	std::cout << "starting MCMC for ROC" << std::endl;
 	mcmc.run(genome, model, 1, 0);
 	std::cout << std::endl << "Finished MCMC for ROC" << std::endl;
+
+	std::cout << std::endl << "Exiting" << std::endl;
 }
 #endif // CEDRIC
 

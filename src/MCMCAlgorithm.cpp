@@ -32,7 +32,7 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * 
 	estimateCodonSpecificParameter(true), estimateHyperParameter(true)
 {
 	MCMCAlgorithm(1000, 1, true, true, true); //TODO: should not be calling another constructor.
-	likelihoodTrace.resize(samples);
+	likelihoodTrace.resize(samples + 1); // +1 for storing initial evaluation
 	writeRestartFile = false;
 	multipleFiles = false;
 	fileWriteInterval = 1u;
@@ -49,7 +49,7 @@ MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thining, unsigned _ada
 							 estimateCodonSpecificParameter(_estimateCodonSpecificParameter),
 							 estimateHyperParameter(_estimateHyperParameter)
 {
-	likelihoodTrace.resize(samples);
+	likelihoodTrace.resize(samples + 1);// +1 for storing initial evaluation
 	writeRestartFile = false;
 	multipleFiles = false;
 	fileWriteInterval = 1u;
@@ -215,10 +215,12 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			model.updateSynthesisRateTrace(iteration/thining, i);
 			model.updateMixtureAssignmentTrace(iteration/thining, i);
 		}
-		delete [] probabilities;
-		delete [] unscaledLogProb_curr_singleMixture;
-		delete [] unscaledLogProb_prop;
-		delete [] unscaledLogProb_curr;
+		delete[] probabilities;
+		delete[] unscaledLogProb_curr_singleMixture;
+		delete[] unscaledLogProb_prop;
+		delete[] unscaledLogProb_curr;
+		delete[] unscaledLogPost_prop;
+		delete[] unscaledLogPost_curr;
 	}
 
 	// take all priors into account
@@ -233,8 +235,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	{
 		model.updateMixtureProbabilitiesTrace(iteration/thining);
 	}
-	//delete [] dirichletParameters;
-//	delete [] newMixtureProbabilities;
+	delete[] dirichletParameters;
 	return logLikelihood;
 }
 
@@ -407,7 +408,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 			double logLike = acceptRejectSynthesisRateLevelForAllGenes(genome, model, iteration);
 			if((iteration % thining) == 0u)
 			{
-				likelihoodTrace[iteration/thining] = logLike;
+				likelihoodTrace[(iteration / thining)] = logLike;
 			}
 			if( ( (iteration) % adaptiveWidth) == 0u)
 			{
