@@ -19,7 +19,11 @@ const std::string Parameter::allUnique = "allUnique";
 const std::string Parameter::selectionShared = "selectionShared";
 const std::string Parameter::mutationShared = "mutationShared";
 
-
+const unsigned Parameter::dM = 0;
+const unsigned Parameter::dEta = 1;
+const unsigned Parameter::dOmega = 1;
+const unsigned Parameter::alp = 0;
+const unsigned Parameter::lmPri = 1;
 
 
 //--------------------------------------------------//

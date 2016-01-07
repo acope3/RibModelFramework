@@ -5,11 +5,6 @@
 using namespace Rcpp;
 #endif
 
-const unsigned ROCParameter::dM = 0;
-const unsigned ROCParameter::dEta = 1;
-
-
-
 //--------------------------------------------------//
 // ---------- Constructors & Destructors ---------- //
 //--------------------------------------------------//

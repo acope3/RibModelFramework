@@ -18,7 +18,6 @@ ROCModel::~ROCModel()
 	//dtor
 }
 
-
 double ROCModel::calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codonCount[], double mutation[], double selection[], double phiValue)
 {
 	double logLikelihood = 0.0;

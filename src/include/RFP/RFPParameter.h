@@ -27,8 +27,7 @@ class RFPParameter: public Parameter {
 
 
 	public:
-		static const unsigned alp;
-		static const unsigned lmPri;
+		
 
 
 

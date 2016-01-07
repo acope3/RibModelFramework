@@ -12,11 +12,6 @@
 using namespace Rcpp;
 #endif
 
-const unsigned FONSEParameter::dM = 0;
-const unsigned FONSEParameter::dOmega = 1;
-
-
-
 //--------------------------------------------------//
 // ---------- Constructors & Destructors ---------- //
 //--------------------------------------------------//

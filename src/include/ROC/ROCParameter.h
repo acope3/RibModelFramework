@@ -41,8 +41,7 @@ class ROCParameter : public Parameter
 		std::vector<double> propose(std::vector<double> currentParam, double (*proposal)(double a, double b), double A, std::vector<double> B);
 
 	public:
-		static const unsigned dM;
-		static const unsigned dEta;
+		
 
 
 

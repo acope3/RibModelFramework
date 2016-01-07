@@ -31,10 +31,6 @@ class FONSEParameter : public Parameter
 
 
 	public:
-		static const unsigned dM;
-		static const unsigned dOmega;
-
-
 
 		//Constructors & Destructors:
 		FONSEParameter();
