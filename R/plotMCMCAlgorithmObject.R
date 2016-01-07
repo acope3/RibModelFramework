@@ -1,5 +1,12 @@
 #' Plot MCMC algorithm
-
+#' 
+#' @param x An Rcpp_MCMC object initialized with \code{initializeMCMCObject}.
+#' 
+#' @param ... Arguments to be passed to methods, such as graphical parameters.
+#' 
+#' @return This function has no return value.
+#' 
+#' 
 plot.Rcpp_MCMCAlgorithm <- function(x, ...)
 {
   loglik.trace <- x$getLogLikelihoodTrace()
