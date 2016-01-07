@@ -17,6 +17,7 @@ FONSEModel::~FONSEModel()
 	//dtor
 }
 
+
 double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grouping, double *mutation, double *selection, double phiValue)
 {
 	int numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
@@ -34,8 +35,7 @@ double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grou
 		}
 	}
 
-	unsigned aaStart;
-	unsigned aaEnd;
+	unsigned aaStart, aaEnd;
 	SequenceSummary::AAToCodonRange(grouping, aaStart, aaEnd, false);
 	for (unsigned i = aaStart; i < aaEnd; i++) {
 		positions = gene.geneData.getCodonPositions(i);
