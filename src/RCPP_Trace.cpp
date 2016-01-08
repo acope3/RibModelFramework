@@ -38,8 +38,6 @@ RCPP_MODULE(Trace_mod)
     .method("setMixtureProbabilitiesTrace", &Trace::setMixtureProbabilitiesTrace)
     .method("setCodonSpecificAcceptanceRatioTrace", &Trace::setCodonSpecificAcceptanceRatioTrace)
     
-    //ROC Specific:
-    .method("getCodonSpecificParameterTraceByMixtureElementForCodon", &Trace::getCodonSpecificParameterTraceByMixtureElementForCodon)
 
     //ROC Specific:
     .method("getCodonSpecificParameterTraceByMixtureElementForCodon", &Trace::getCodonSpecificParameterTraceByMixtureElementForCodon)

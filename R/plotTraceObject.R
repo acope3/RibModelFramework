@@ -75,7 +75,8 @@ plotCodonSpecificParameters <- function(trace, mixture, type="mutation", main="M
                rep(1, 4), c(2, 8, 8, 8, 8, 8), respect = FALSE)  
   }
   else
-  {    nf <- layout(matrix(c(rep(1, 4), 2:25), nrow = 7, ncol = 4, byrow = TRUE),
+  {    
+    nf <- layout(matrix(c(rep(1, 4), 2:25), nrow = 7, ncol = 4, byrow = TRUE),
                     rep(1, 4), c(2, 8, 8, 8, 8, 8, 8), respect = FALSE) 
   }
   ### Plot title.

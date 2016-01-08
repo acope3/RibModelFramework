@@ -96,6 +96,10 @@ RCPP_MODULE(Parameter_mod)
 		.method("initSelection", &ROCParameter::initSelection)
 		.method("initMutation", &ROCParameter::initMutation)
 
+		//Prior Functions:
+		.method("getMutationPriorStandardDeviation", &ROCParameter::getMutationPriorStandardDeviation)
+		.method("setMutationPriorStandardDeviation", &ROCParameter::setMutationPriorStandardDeviation)
+
 		//Posterior, Variance, and Estimates Functions:
 		.method("getAphiPosteriorMean", &ROCParameter::getAphiPosteriorMean) //TODO: this is not wrapped! May not run correctly
 		.method("getAphiVariance", &ROCParameter::getAphiVariance) //TODO: this is not wrapped! May not run correctly
