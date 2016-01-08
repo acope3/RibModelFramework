@@ -40,7 +40,7 @@ RCPP_MODULE(Trace_mod)
     
 
     //ROC Specific:
-    .method("getCodonSpecificParameterTraceByMixtureElementForCodon", &Trace::getCodonSpecificParameterTraceByMixtureElementForCodon)
+    .method("getCodonSpecificParameterTraceByMixtureElementForCodon", &Trace::getCodonSpecificParameterTraceByMixtureElementForCodonR)
     .method("getSynthesisOffsetTrace", &Trace::getSynthesisOffsetTraceR)
     .method("getObservedSynthesisNoiseTrace", &Trace::getObservedSynthesisNoiseTraceR)
     .method("setSynthesisOffsetTrace", &Trace::setSynthesisOffsetTrace)
