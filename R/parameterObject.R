@@ -513,13 +513,13 @@ writeParameterObject <- function(parameter, file)
 # extracts traces and parameter information from the base class Parameter
 extractBaseInfo <- function(parameter){
   trace <- parameter$getTraceObject()
-  sPhiTraces <- trace$getSphiTraces()
-  sphiAcceptRatTrace <- trace$getSphiAcceptanceRatioTrace()
+  stdDevSynthesisRateTraces <- trace$getStdDevSynthesisRateTraces()
+  stdDevSynthesisRateAcceptRatTrace <- trace$getStdDevSynthesisRateAcceptanceRatioTrace()
   synthRateTrace <- trace$getSynthesisRateTrace()
   synthAcceptRatTrace <- trace$getSynthesisRateAcceptanceRatioTrace()
   mixAssignTrace <- trace$getMixutreAssignmentTrace()
   mixProbTrace <- trace$getMixtureProbabilitiesTrace()
-  cspAcceptRatTrace <- trace$getCspAcceptanceRatioTrace()
+  codonSpecificAcceptRatTrace <- trace$getCodonSpecificAcceptanceRatioTrace()
   numMix <- parameter$numMixtures
   numMut <- parameter$numMutationCategories
   numSel <- parameter$numSelectionCategories
@@ -527,13 +527,13 @@ extractBaseInfo <- function(parameter){
   curMixAssignment <- parameter$getMixtureAssignment()
   lastIteration <- parameter$getLastIteration()
   
-  varList <- list(sPhiTraces = sPhiTraces, 
-                    sphiAcceptRatTrace = sphiAcceptRatTrace,
+  varList <- list(stdDevSynthesisRateTraces = stdDevSynthesisRateTraces, 
+                    stdDevSynthesisRateAcceptRatTrace = stdDevSynthesisRateAcceptRatTrace,
                     synthRateTrace = synthRateTrace,
                     synthAcceptRatTrace = synthAcceptRatTrace,
                     mixAssignTrace = mixAssignTrace,
                     mixProbTrace = mixProbTrace,
-                    cspAcceptRatTrace = cspAcceptRatTrace,
+                    codonSpecificAcceptRatTrace = codonSpecificAcceptRatTrace,
                     numMix = numMix,
                     numMut = numMut,
                     numSel = numSel,
@@ -554,20 +554,21 @@ writeParameterObject.Rcpp_ROCParameter <- function(parameter, file){
   proposedMutation <- parameter$proposedMutationParameter
   proposedSelection <- parameter$proposedSelectionParameter
   model = "ROC"
-  #TODO: add mutation prior
+  mutationPrior <- parameter$getMutationPriorStandardDeviation()
   
   trace <- parameter$getTraceObject()
   
-  mutationTrace <- trace$getMutationParameterTrace()
-  selectionTrace <- trace$getSelectionParameterTrace()
-  aphiAcceptRatTrace <- trace$getAphiAcceptanceRatioTrace()
-  aphiTrace <- trace$getAphiTraces()
-  sepisolonTrace <- trace$getSepsilonTraces()
+  mutationTrace <- trace$getCodonSpecificParameterTrace(0)
+  selectionTrace <- trace$getCodonSpecificParameterTrace(1)
+  synthesisOffsetAcceptRatTrace <- trace$getSynthesisOffsetAcceptanceRatioTrace()
+  synthesisOffsetTrace <- trace$getSynthesisOffsetTrace()
+  observedSynthesisNoiseTrace <- trace$getObservedSynthesisNoiseTrace()
   
   save(list = c("paramBase", "currentMutation", "currentSelection",
                 "proposedMutation", "proposedSelection", "model",  
-                "mutationTrace", "selectionTrace", 
-                "aphiAcceptRatTrace", "aphiTrace", "sepisolonTrace"),
+                "mutationPrior", "mutationTrace", "selectionTrace", 
+                "synthesisOffsetAcceptRatTrace", "synthesisOffsetTrace", 
+                "observedSynthesisNoiseTrace"),
        file=file)
 }
 
@@ -584,8 +585,8 @@ writeParameterObject.Rcpp_RFPParameter <- function(parameter, file){
   
   
   trace <- parameter$getTraceObject()
-  alphaTrace <- trace$getAlphaParameterTrace()
-  lambdaPrimeTrace <- trace$getLambdaPrimeParameterTrace()
+  alphaTrace <- trace$getCodonSpecificParameterTrace(0)
+  lambdaPrimeTrace <- trace$getCodonSpecificParameterTrace(1)
 
   save(list = c("paramBase", "currentAlpha", "currentLambdaPrime", "proposedAlpha",
                 "proposedLambdaPrime", "model", "alphaTrace", "lambdaPrimeTrace"),
@@ -651,7 +652,7 @@ setBaseInfo <- function(parameter, file)
   tempEnv <- new.env();
   load(file = file, envir = tempEnv)
   parameter$setCategories(tempEnv$paramBase$categories)
-  parameter$setCategoriesForTrace()
+  #parameter$setCategoriesForTrace() #TODO: FIX 
   parameter$numMixtures <- tempEnv$paramBase$numMix
   parameter$numMutationCategories <- tempEnv$paramBase$numMut
   parameter$numSelectionCategories <- tempEnv$paramBase$numSel
@@ -659,23 +660,15 @@ setBaseInfo <- function(parameter, file)
   parameter$setLastIteration(tempEnv$paramBase$lastIteration)
   
   trace <- parameter$getTraceObject()
-  trace$setSphiTraces(tempEnv$paramBase$sPhiTraces)
-  trace$setSphiAcceptanceRatioTrace(tempEnv$paramBase$sphiAcceptRatTrace)
+  trace$setStdDevSynthesisRateTraces(tempEnv$paramBase$stdDevSynthesisRateTraces)
+  trace$setStdDevSynthesisRateAcceptanceRatioTrace(tempEnv$paramBase$stdDevSynthesisRateAcceptRatTrace)
   trace$setSynthesisRateTrace(tempEnv$paramBase$synthRateTrace)
   trace$setSynthesisRateAcceptanceRatioTrace(tempEnv$paramBase$synthAcceptRatTrace)
   trace$setMixtureAssignmentTrace(tempEnv$paramBase$mixAssignTrace)
   trace$setMixtureProbabilitiesTrace(tempEnv$paramBase$mixProbTrace)
-  trace$setCspAcceptanceRatioTrace(tempEnv$paramBase$cspAcceptRatTrace)
+  trace$setCodonSpecificAcceptanceRatioTrace(tempEnv$paramBase$codonSpecificAcceptRatTrace)
   
-  model <- tempEnv$model
-  if (model == "ROC"){
-    parameter$setROCTrace(trace)
-  }else if (model == "RFP"){
-    parameter$setRFPTrace(trace)
-  }else if (model == "FONSE"){
-    parameter$setFONSETrace(trace)
-  }
-  return(parameter)
+  parameter$setTraceObject(trace)
 }
 
 
@@ -692,14 +685,14 @@ loadROCParameterObject <- function(parameter, file)
   parameter$proposedMutationParameter <- tempEnv$proposedMutation
   parameter$proposedSelectionParameter <- tempEnv$proposedSelection
   trace <- parameter$getTraceObject()
-  trace$setAphiTrace(tempEnv$aphiTrace)
-  trace$setAphiAcceptanceRatioTrace(tempEnv$aphiAcceptRatTrace)
-  trace$setSepsilonTrace(tempEnv$sepisolonTrace)
-  trace$setMutationParameterTrace(tempEnv$mutationTrace)
-  trace$setSelectionParameterTrace(tempEnv$selectionTrace)
+  trace$setSynthesisOffsetTrace(tempEnv$synthesisOffsetTrace)
+  trace$setSynthesisOffsetAcceptanceRatioTrace(tempEnv$synthesisOffsetAcceptRatTrace)
+  trace$setObservedSynthesisNoiseTrace(tempEnv$observedSynthesisNoiseTrace)
+  trace$setCodonSpecificParameterTrace(tempEnv$mutationTrace, 0)
+  trace$setCodonSpecificParameterTrace(tempEnv$selectionTrace, 1)
   
   
-  parameter$setROCTrace(trace)
+  parameter$setTraceObject(trace)
   return(parameter) 
 }
 
@@ -717,10 +710,10 @@ loadRFPParameterObject <- function(parameter, file)
   parameter$proposedLambdaPrimeParameter <- tempEnv$proposedLambdaPrime
   
   trace <- parameter$getTraceObject()
-  trace$setAlphaParameterTrace(tempEnv$alphaTrace)
-  trace$setLambdaPrimeParameterTrace(tempEnv$lambdaPrimeTrace)
+  trace$setCodonSpecificParameterTrace(tempEnv$alphaTrace, 0)
+  trace$setCodonSpecificParameterTrace(tempEnv$lambdaPrimeTrace, 1)
   
-  parameter$setRFPTrace(trace)
+  parameter$setTraceObject(trace)
   return(parameter) 
 }
 

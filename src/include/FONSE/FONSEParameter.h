@@ -83,9 +83,6 @@ class FONSEParameter : public Parameter
 		//R Section:
 
 #ifndef STANDALONE
-
-
-
 		//Constructors & Destructors:
 		FONSEParameter(std::vector<double> sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix,
 		 				bool splitSer = true);
@@ -105,7 +102,6 @@ class FONSEParameter : public Parameter
 		//CSP Functions:
 		std::vector< std::vector <double> > getCurrentMutationParameter();
 		std::vector< std::vector <double> > getCurrentSelectionParameter();
-
 #endif //STANDALONE
 
 	protected:

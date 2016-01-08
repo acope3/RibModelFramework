@@ -224,6 +224,11 @@ void FONSEParameter::initFONSEValuesFromFile(std::string filename)
 					std_csp.push_back(val);
 				}
 			}
+			else if (variableName == "mutation_prior_sd")
+			{
+				iss.str(tmp);
+				iss >> mutation_prior_sd;
+			}
 		}
 	}
 	input.close();
@@ -265,6 +270,7 @@ void FONSEParameter::writeFONSERestartFile(std::string filename)
     
     std::ostringstream oss;
     unsigned j;
+	oss << ">mutation_prior_sd:\n" << mutation_prior_sd << "\n";
     oss << ">std_csp:\n";
     for (unsigned i = 0; i < std_csp.size(); i++)
     {
@@ -407,8 +413,8 @@ void FONSEParameter::initSelectionCategories(std::vector<std::string> files, uns
 
 void FONSEParameter::updateCodonSpecificParameterTrace(unsigned sample, std::string grouping)
 {
-	traces.updateCodonSpecificParameterTrace(sample, grouping, currentMutationParameter, dM);
-	traces.updateCodonSpecificParameterTrace(sample, grouping, currentSelectionParameter, dOmega);
+	traces.updateCodonSpecificParameterTraceForAA(sample, grouping, currentMutationParameter, dM);
+	traces.updateCodonSpecificParameterTraceForAA(sample, grouping, currentSelectionParameter, dOmega);
 }
 
 

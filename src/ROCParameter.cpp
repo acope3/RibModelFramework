@@ -524,8 +524,8 @@ void ROCParameter::updateAphiTraces(unsigned sample)
 
 void ROCParameter::updateCodonSpecificParameterTrace(unsigned sample, std::string grouping)
 {
-	traces.updateCodonSpecificParameterTrace(sample, grouping, currentMutationParameter, dM);
-	traces.updateCodonSpecificParameterTrace(sample, grouping, currentSelectionParameter, dEta);
+	traces.updateCodonSpecificParameterTraceForAA(sample, grouping, currentMutationParameter, dM);
+	traces.updateCodonSpecificParameterTraceForAA(sample, grouping, currentSelectionParameter, dEta);
 }
 
 

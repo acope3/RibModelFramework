@@ -383,8 +383,8 @@ void RFPParameter::initMutationSelectionCategories(std::vector<std::string> file
 
 void RFPParameter::updateCodonSpecificParameterTrace(unsigned sample, std::string codon)
 {
-	traces.updateCodonSpecificParameterTrace(sample, codon, currentAlphaParameter, alp);
-	traces.updateCodonSpecificParameterTrace(sample, codon, currentLambdaPrimeParameter, lmPri);
+	traces.updateCodonSpecificParameterTraceForCodon(sample, codon, currentAlphaParameter, alp);
+	traces.updateCodonSpecificParameterTraceForCodon(sample, codon, currentLambdaPrimeParameter, lmPri);
 }
 
 
