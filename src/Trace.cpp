@@ -421,6 +421,7 @@ unsigned Trace::getCodonSpecificCategory(unsigned mixtureElement, unsigned param
 //---------- Update Functions ----------//
 //--------------------------------------//
 
+
 void Trace::updateStdDevSynthesisRateTrace(unsigned sample, double Sphi, unsigned synthesisRateCategory)
 {
 	stdDevSynthesisRateTrace[synthesisRateCategory][sample] = Sphi;
@@ -472,7 +473,9 @@ void Trace::updateMixtureProbabilitiesTrace(unsigned samples, std::vector<double
 //----------------------------------//
 //---------- ROC Specific ----------//
 //----------------------------------//
-void Trace::updateCodonSpecificParameterTrace(unsigned sample, std::string aa, std::vector<std::vector<double>> &curParam, unsigned paramType)
+
+
+void Trace::updateCodonSpecificParameterTraceForAA(unsigned sample, std::string aa, std::vector<std::vector<double>> &curParam, unsigned paramType)
 {
 	unsigned aaStart;
 	unsigned aaEnd;
@@ -519,6 +522,39 @@ void Trace::updateObservedSynthesisNoiseTrace(unsigned index, unsigned sample, d
 {
 	observedSynthesisNoiseTrace[index][sample] = value;
 }
+
+
+//-------------------------------------//
+//---------- RFP Specficific ----------//
+//-------------------------------------//
+
+
+void Trace::updateCodonSpecificParameterTraceForCodon(unsigned sample, std::string codon,
+				std::vector<std::vector<double>> &curParam, unsigned paramType)
+{
+	unsigned i = SequenceSummary::codonToIndex(codon);
+	switch (paramType)
+	{
+		case 0:
+			for (unsigned category = 0; category < codonSpecificParameterTraceOne.size(); category++)
+			{
+				codonSpecificParameterTraceOne[category][i][sample] = curParam[category][i];
+			}
+			break;
+		case 1:
+			for (unsigned category = 0; category < codonSpecificParameterTraceTwo.size(); category++)
+			{
+				codonSpecificParameterTraceTwo[category][i][sample] = curParam[category][i];
+			}
+			break;
+		default:
+			std::cerr << "Unknown parameter type\n";
+			break;
+	}
+
+}
+
+
 
 // -----------------------------------------------------------------------------------------------------//
 // ---------------------------------------- R SECTION --------------------------------------------------//

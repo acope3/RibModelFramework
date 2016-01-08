@@ -135,7 +135,7 @@ public:
 
 
         //ROC Specific:
-        void updateCodonSpecificParameterTrace(unsigned sample, std::string aa, std::vector<std::vector<double>> &curParam, unsigned paramType);
+        void updateCodonSpecificParameterTraceForAA(unsigned sample, std::string aa, std::vector<std::vector<double>> &curParam, unsigned paramType);
         void updateSynthesisOffsetTrace(unsigned index, unsigned sample, double value);
         void updateSynthesisOffsetAcceptanceRatioTrace(unsigned index, double value);
         void updateObservedSynthesisNoiseTrace(unsigned index, unsigned sample, double value);
@@ -143,7 +143,7 @@ public:
         //FONSE Specific:
 
         //RFP Specific:
-
+        void updateCodonSpecificParameterTraceForCodon(unsigned sample, std::string codon, std::vector<std::vector<double>> &curParam, unsigned paramType);
 
 
 

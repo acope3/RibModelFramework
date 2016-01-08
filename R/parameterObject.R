@@ -513,8 +513,8 @@ writeParameterObject <- function(parameter, file)
 # extracts traces and parameter information from the base class Parameter
 extractBaseInfo <- function(parameter){
   trace <- parameter$getTraceObject()
-  sPhiTraces <- trace$getSphiTraces()
-  sphiAcceptRatTrace <- trace$getSphiAcceptanceRatioTrace()
+  stdDevSynthesisRateTraces <- trace$getStdDevSynthesisRateTraces()
+  stdDevSynthesisRateAcceptRatTrace <- trace$getStdDevSynthesisRateAcceptanceRatioTrace()
   synthRateTrace <- trace$getSynthesisRateTrace()
   synthAcceptRatTrace <- trace$getSynthesisRateAcceptanceRatioTrace()
   mixAssignTrace <- trace$getMixutreAssignmentTrace()
