@@ -24,11 +24,11 @@ ROCParameter::ROCParameter(std::string filename) : Parameter(22)
 }
 
 
-ROCParameter::ROCParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
+ROCParameter::ROCParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
 		std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer, std::string _mutationSelectionState) :
 		Parameter(22)
 {
-	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
+	initParameterSet(stdDevSynthesisRate, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
 	initROCParameterSet();
 }
 
@@ -51,10 +51,10 @@ ROCParameter& ROCParameter::operator=(const ROCParameter& rhs)
 	currentSelectionParameter = rhs.currentSelectionParameter;
 	proposedSelectionParameter = rhs.proposedSelectionParameter;
 
-	Aphi = rhs.Aphi;
-	Aphi_proposed = rhs.Aphi_proposed;
-	std_Aphi = rhs.std_Aphi;
-	numAcceptForAphi = rhs.numAcceptForAphi;
+	noiseOffset = rhs.noiseOffset;
+	noiseOffset_proposed = rhs.noiseOffset_proposed;
+	std_NoiseOffset = rhs.std_NoiseOffset;
+	numAcceptForNoiseOffset = rhs.numAcceptForNoiseOffset;
 
 	return *this;
 }
@@ -84,11 +84,11 @@ void ROCParameter::initROCParameterSet()
 	
 
 	for (unsigned i = 0; i < getNumObservedPhiSets(); i++) {
-		Aphi[i] = 0.1;
-		Aphi_proposed[i] = 0.1;
-		std_Aphi[i] = 0.1;
-		Sepsilon[i] = 0.1;
-		numAcceptForAphi[i] = 0;
+		noiseOffset[i] = 0.1;
+		noiseOffset_proposed[i] = 0.1;
+		std_NoiseOffset[i] = 0.1;
+		observedSynthesisNoise[i] = 0.1;
+		numAcceptForNoiseOffset[i] = 0;
 	}
 
 	//may need getter fcts
@@ -226,29 +226,29 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 						std_csp.push_back(val);
 					}
 				}
-				else if (variableName == "Aphi")
+				else if (variableName == "noiseOffset")
 				{
 					double val;
 					iss.str(tmp);
 					while (iss >> val) {
-						Aphi.push_back(val);
+						noiseOffset.push_back(val);
 					}
-					std::cout <<"Aphi has a value\n";
+					std::cout <<"noiseOffset has a value\n";
 				}
-				else if (variableName == "Sepsilon")
+				else if (variableName == "observedSynthesisNoise")
 				{
 					double val;
 					iss.str(tmp);
 					while (iss >> val) {
-						Sepsilon.push_back(val);
+						observedSynthesisNoise.push_back(val);
 					}
 				}
-				else if (variableName == "std_Aphi")
+				else if (variableName == "std_NoiseOffset")
 				{
 					double val;
 					iss.str(tmp);
 					while (iss >> val) {
-						std_Aphi.push_back(val);
+						std_NoiseOffset.push_back(val);
 					}
 				}
 				else if (variableName == "covarianceMatrix")
@@ -313,29 +313,29 @@ void ROCParameter::writeROCRestartFile(std::string filename)
 	{
 		std::ostringstream oss;
 		unsigned j;
-		oss << ">Aphi:\n";
-		for (unsigned i = 0; i < Aphi.size(); i++)
+		oss << ">noiseOffset:\n";
+		for (unsigned i = 0; i < noiseOffset.size(); i++)
 		{
-			oss << Aphi[i];
+			oss << noiseOffset[i];
 			if ((i + 1) % 10 == 0)
 				oss << "\n";
 			else
 				oss << " ";
 		}
-		oss << ">Sepsilon:\n";
-		for (unsigned i = 0; i < Sepsilon.size(); i++)
+		oss << ">observedSynthesisNoise:\n";
+		for (unsigned i = 0; i < observedSynthesisNoise.size(); i++)
 		{
-			oss << Sepsilon[i];
+			oss << observedSynthesisNoise[i];
 			if ((i + 1) % 10 == 0)
 				oss << "\n";
 			else
 				oss << " ";
 		}
 		oss << ">mutation_prior_sd:\n" << mutation_prior_sd << "\n";
-		oss << ">std_Aphi:\n";
-		for (unsigned i = 0; i < std_Aphi.size(); i++)
+		oss << ">std_NoiseOffset:\n";
+		for (unsigned i = 0; i < std_NoiseOffset.size(); i++)
 		{
-			oss << std_Aphi[i];
+			oss << std_NoiseOffset[i];
 			if ((i + 1) % 10 == 0)
 				oss << "\n";
 			else
@@ -505,20 +505,20 @@ void ROCParameter::initSelectionCategories(std::vector<std::string> files, unsig
 // ---------- Trace Functions -----------//
 // --------------------------------------//
 
-void ROCParameter::updateSepsilonTraces(unsigned sample)
+void ROCParameter::updateObservedSynthesisNoiseTraces(unsigned sample)
 {
-	for (unsigned i = 0; i < Sepsilon.size(); i++)
+	for (unsigned i = 0; i < observedSynthesisNoise.size(); i++)
 	{
-		traces.updateObservedSynthesisNoiseTrace(i, sample, Sepsilon[i]);
+		traces.updateObservedSynthesisNoiseTrace(i, sample, observedSynthesisNoise[i]);
 	}
 }
 
 
-void ROCParameter::updateAphiTraces(unsigned sample)
+void ROCParameter::updateNoiseOffsetTraces(unsigned sample)
 {
-	for (unsigned i = 0; i < Aphi.size(); i++)
+	for (unsigned i = 0; i < noiseOffset.size(); i++)
 	{
-		traces.updateSynthesisOffsetTrace(i, sample, Aphi[i]);
+		traces.updateSynthesisOffsetTrace(i, sample, noiseOffset[i]);
 	}
 }
 
@@ -543,65 +543,62 @@ CovarianceMatrix& ROCParameter::getCovarianceMatrixForAA(std::string aa)
 }
 
 
-// ----------------------------------------//
-// ---------- Sepsilon Functions ----------//
-// ----------------------------------------//
+// ------------------------------------------------------//
+// ---------- observedSynthesisNoise Functions ----------//
+// ------------------------------------------------------//
 
 
-double ROCParameter::getSepsilon(unsigned index)
+double ROCParameter::getObservedSynthesisNoise(unsigned index)
 {
-	return Sepsilon[index];
+	return observedSynthesisNoise[index];
 }
 
 
-void ROCParameter::setSepsilon(unsigned index, double se)
+void ROCParameter::setObservedSynthesisNoise(unsigned index, double se)
 {
-	Sepsilon[index] = se;
+	observedSynthesisNoise[index] = se;
 }
 
 
 
 
 
-// ------------------------------------//
-// ---------- Aphi Functions ----------//
-// ------------------------------------//
+// -------------------------------------------//
+// ---------- noiseOffset Functions ----------//
+// -------------------------------------------//
 
 
-double ROCParameter::getAphi(unsigned index, bool proposed)
+double ROCParameter::getNoiseOffset(unsigned index, bool proposed)
 {
-	return (proposed ? Aphi_proposed[index] : Aphi[index]);
+	return (proposed ? noiseOffset_proposed[index] : noiseOffset[index]);
 }
 
 
-double ROCParameter::getCurrentAphiProposalWidth(unsigned index)
+double ROCParameter::getCurrentNoiseOffsetProposalWidth(unsigned index)
 {
-	return std_Aphi[index];
+	return std_NoiseOffset[index];
 }
 
 
-void ROCParameter::proposeAphi()
+void ROCParameter::proposeNoiseOffset()
 {
 	for (unsigned i = 0; i < getNumObservedPhiSets(); i++) {
-		Aphi_proposed[i] = randNorm(Aphi[i], std_Aphi[i]);
+		noiseOffset_proposed[i] = randNorm(noiseOffset[i], std_NoiseOffset[i]);
 	}
 }
 
 
-void ROCParameter::setAphi(unsigned index, double aPhi)
+void ROCParameter::setNoiseOffset(unsigned index, double _noiseOffset)
 {
-	Aphi[index] = aPhi;
+	noiseOffset[index] = _noiseOffset;
 }
 
 
-void ROCParameter::updateAphi(unsigned index)
+void ROCParameter::updateNoiseOffset(unsigned index)
 {
-	Aphi[index] = Aphi_proposed[index];
-	numAcceptForAphi[index]++;
+	noiseOffset[index] = noiseOffset_proposed[index];
+	numAcceptForNoiseOffset[index]++;
 }
-
-
-
 
 
 // -----------------------------------//
@@ -715,19 +712,19 @@ void ROCParameter::setMutationPriorStandardDeviation(double _mutation_prior_sd)
 
 
 
-double ROCParameter::getAphiPosteriorMean(unsigned index, unsigned samples)
+double ROCParameter::getNoiseOffsetPosteriorMean(unsigned index, unsigned samples)
 {
 	double posteriorMean = 0.0;
-	std::vector<double> aPhiTrace = traces.getSynthesisOffsetTrace(index);
+	std::vector<double> NoiseOffsetTrace = traces.getSynthesisOffsetTrace(index);
 	unsigned traceLength = lastIteration;
 
 	if (samples > traceLength)
 	{
 #ifndef STANDALONE
-		Rf_warning("Warning in ROCParameter::getAphiPosteriorMean throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
+		Rf_warning("Warning in ROCParameter::getNoiseOffsetPosteriorMean throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
 				samples, traceLength);
 #else
-		std::cerr << "Warning in ROCParameter::getAphiPosteriorMean throws: Number of anticipated samples ("
+		std::cerr << "Warning in ROCParameter::getNoiseOffsetPosteriorMean throws: Number of anticipated samples ("
 		<< samples << ") is greater than the length of the available trace (" << traceLength << ")."
 		<< "Whole trace is used for posterior estimate! \n";
 #endif
@@ -736,36 +733,36 @@ double ROCParameter::getAphiPosteriorMean(unsigned index, unsigned samples)
 	unsigned start = traceLength - samples;
 	for (unsigned i = start; i < traceLength; i++)
 	{
-		posteriorMean += aPhiTrace[i];
+		posteriorMean += NoiseOffsetTrace[i];
 	}
 	return posteriorMean / (double)samples;
 }
 
 
-double ROCParameter::getAphiVariance(unsigned index, unsigned samples, bool unbiased)
+double ROCParameter::getNoiseOffsetVariance(unsigned index, unsigned samples, bool unbiased)
 {
-	std::vector<double> aPhiTrace = traces.getSynthesisOffsetTrace(index);
+	std::vector<double> NoiseOffsetTrace = traces.getSynthesisOffsetTrace(index);
 	unsigned traceLength = lastIteration;
 	if (samples > traceLength)
 	{
 #ifndef STANDALONE
-		Rf_warning("Warning in ROCParameter::getAphiVariance throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
+		Rf_warning("Warning in ROCParameter::getNoiseOffsetVariance throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
 				samples, traceLength);
 #else
-		std::cerr << "Warning in Parameter::getAphiVariance throws: Number of anticipated samples (" << samples
+		std::cerr << "Warning in Parameter::getNoiseOffsetVariance throws: Number of anticipated samples (" << samples
 		<< ") is greater than the length of the available trace (" << traceLength << ")."
 		<< "Whole trace is used for posterior estimate! \n";
 #endif
 		samples = traceLength;
 	}
-	double posteriorMean = getAphiPosteriorMean(index, samples);
+	double posteriorMean = getNoiseOffsetPosteriorMean(index, samples);
 
 	double posteriorVariance = 0.0;
 
 	unsigned start = traceLength - samples;
 	for (unsigned i = start; i < traceLength; i++)
 	{
-		double difference = aPhiTrace[i] - posteriorMean;
+		double difference = NoiseOffsetTrace[i] - posteriorMean;
 		posteriorVariance += difference * difference;
 	}
 	double normalizationTerm = unbiased ? (1 / ((double)samples - 1.0)) : (1 / (double)samples);
@@ -777,20 +774,20 @@ double ROCParameter::getAphiVariance(unsigned index, unsigned samples, bool unbi
 // ---------- Adaptive Width Functions ----------//
 // ----------------------------------------------//
 
-void ROCParameter::adaptAphiProposalWidth(unsigned adaptationWidth)
+void ROCParameter::adaptNoiseOffsetProposalWidth(unsigned adaptationWidth)
 {
 	for (unsigned i = 0; i < getNumObservedPhiSets(); i++) {
-		double acceptanceLevel = numAcceptForAphi[i] / (double)adaptationWidth;
+		double acceptanceLevel = numAcceptForNoiseOffset[i] / (double)adaptationWidth;
 		traces.updateSynthesisOffsetAcceptanceRatioTrace(i, acceptanceLevel);
 		if (acceptanceLevel < 0.2)
 		{
-			std_Aphi[i] *= 0.8;
+			std_NoiseOffset[i] *= 0.8;
 		}
 		if (acceptanceLevel > 0.3)
 		{
-			std_Aphi[i] *= 1.2;
+			std_NoiseOffset[i] *= 1.2;
 		}
-		numAcceptForAphi[i] = 0u;
+		numAcceptForNoiseOffset[i] = 0u;
 	}
 }
 
@@ -802,11 +799,11 @@ void ROCParameter::adaptAphiProposalWidth(unsigned adaptationWidth)
 void ROCParameter::setNumObservedPhiSets(unsigned _phiGroupings)
 {
 	obsPhiSets = _phiGroupings;
-	Aphi.resize(obsPhiSets, 0.0);
-	Aphi_proposed.resize(obsPhiSets, 0.0);
-	std_Aphi.resize(obsPhiSets, 0.1);
-	numAcceptForAphi.resize(obsPhiSets, 0);
-	Sepsilon.resize(obsPhiSets, 0.0);
+	noiseOffset.resize(obsPhiSets, 0.0);
+	noiseOffset_proposed.resize(obsPhiSets, 0.0);
+	std_NoiseOffset.resize(obsPhiSets, 0.1);
+	numAcceptForNoiseOffset.resize(obsPhiSets, 0);
+	observedSynthesisNoise.resize(obsPhiSets, 0.0);
 }
 
 
@@ -858,7 +855,7 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
 //--------------------------------------------------//
 
 
-ROCParameter::ROCParameter(std::vector<double> sphi, std::vector<unsigned> geneAssignment,
+ROCParameter::ROCParameter(std::vector<double> stdDevSynthesisRate, std::vector<unsigned> geneAssignment,
 						std::vector<unsigned> _matrix, bool splitSer) : Parameter(22)
 {
 	unsigned _numMixtures = _matrix.size() / 2;
@@ -873,16 +870,16 @@ ROCParameter::ROCParameter(std::vector<double> sphi, std::vector<unsigned> geneA
 			thetaKMatrix[i].push_back(_matrix[index]);
 		}
 	}
-	initParameterSet(sphi, _matrix.size() / 2, geneAssignment, thetaKMatrix, splitSer);
+	initParameterSet(stdDevSynthesisRate, _matrix.size() / 2, geneAssignment, thetaKMatrix, splitSer);
 	initROCParameterSet();
 
 }
 
-ROCParameter::ROCParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
+ROCParameter::ROCParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
 							bool splitSer, std::string _mutationSelectionState) : Parameter(22)
 {
 	std::vector<std::vector<unsigned>> thetaKMatrix;
-	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
+	initParameterSet(stdDevSynthesisRate, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
 	initROCParameterSet();
 }
 

@@ -47,7 +47,7 @@ class Model
 
 
 
-		//StdDevSynthesisRate Functions:
+		//stdDevSynthesisRate Functions:
 		virtual double getStdDevSynthesisRate(unsigned selectionCategory, bool proposed = false) = 0;
 		//propose function?
 		//set function?

@@ -35,7 +35,7 @@ class FONSEParameter : public Parameter
 		//Constructors & Destructors:
 		FONSEParameter();
 		explicit FONSEParameter(std::string filename);
-		FONSEParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector <unsigned> geneAssignment,
+		FONSEParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector <unsigned> geneAssignment,
 				   std::vector <std::vector <unsigned> > thetaKmatrix, bool splitSer = true,
 				   std::string _mutationSelectionState = "allUnique");
 		FONSEParameter& operator=(const FONSEParameter& rhs);
@@ -84,9 +84,9 @@ class FONSEParameter : public Parameter
 
 #ifndef STANDALONE
 		//Constructors & Destructors:
-		FONSEParameter(std::vector<double> sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix,
+		FONSEParameter(std::vector<double> stdDevSynthesisRate, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix,
 		 				bool splitSer = true);
-		FONSEParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
+		FONSEParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
 						bool splitSer = true, std::string _mutationSelectionState = "allUnique");
 
 

@@ -51,7 +51,7 @@ class ROCModel : public Model
 
 
 
-		//StdDevSynthesisRate Functions:
+		//stdDevSynthesisRate Functions:
 		virtual double getStdDevSynthesisRate(unsigned selectionCategory, bool proposed = false);
 		virtual double getCurrentStdDevSynthesisRateProposalWidth();
 		virtual void updateStdDevSynthesisRate();
@@ -117,13 +117,13 @@ class ROCModel : public Model
 
 
 		//ROC Specific Functions:
-		double getAphi(unsigned index, bool proposed = false);
-		double getSepsilon(unsigned index) ;
-		double getCurrentAphiProposalWidth(unsigned index);
-		void updateAphi(unsigned index);
-		void updateAphiTrace(unsigned index, unsigned sample);
-		void updateSepsilonTrace(unsigned index, unsigned sample);
-		void adaptAphiProposalWidth(unsigned adaptiveWidth);
+		double getNoiseOffset(unsigned index, bool proposed = false);
+		double getObservedSynthesisNoise(unsigned index) ;
+		double getCurrentNoiseOffsetProposalWidth(unsigned index);
+		void updateNoiseOffset(unsigned index);
+		void updateNoiseOffsetTrace(unsigned index, unsigned sample);
+		void updateObservedSynthesisNoiseTrace(unsigned index, unsigned sample);
+		void adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth);
 
 
 

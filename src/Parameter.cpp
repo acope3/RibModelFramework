@@ -131,7 +131,7 @@ Parameter::~Parameter()
 //---------------------------------------------------------------//
 
 
-void Parameter::initParameterSet(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> mixtureDefinitionMatrix, bool splitSer,
+void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> mixtureDefinitionMatrix, bool splitSer,
     std::string _mutationSelectionState)
 {
 	// assign genes to mixture element
@@ -154,12 +154,12 @@ void Parameter::initParameterSet(std::vector<double> sphi, unsigned _numMixtures
 	mutationSelectionState = _mutationSelectionState;
 	numParam = ((splitSer) ? 40 : 41);
 	numMixtures = _numMixtures;
-	stdDevSynthesisRate.resize(sphi.size());
-	stdDevSynthesisRate_proposed.resize(sphi.size());
-	for(unsigned i = 0u; i < sphi.size(); i++)
+	stdDevSynthesisRate.resize(_stdDevSynthesisRate.size());
+	stdDevSynthesisRate_proposed.resize(_stdDevSynthesisRate.size());
+	for(unsigned i = 0u; i < stdDevSynthesisRate.size(); i++)
 	{
-		stdDevSynthesisRate[i] = sphi[i];
-		stdDevSynthesisRate_proposed[i] = sphi[i];
+		stdDevSynthesisRate[i] = _stdDevSynthesisRate[i];
+		stdDevSynthesisRate_proposed[i] = _stdDevSynthesisRate[i];
 	}
 	bias_stdDevSynthesisRate = 0;
 	std_stdDevSynthesisRate = 0.1;
@@ -339,7 +339,7 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 						}
 					}
 				}
-				else if (variableName == "std_sphi")
+				else if (variableName == "std_stdDevSynthesisRate")
 				{
 					iss.str(tmp);
 					iss >> std_stdDevSynthesisRate;
@@ -423,7 +423,7 @@ void Parameter::writeBasicRestartFile(std::string filename)
 		if (i % 10 != 0) oss << "\n";
 		oss << ">numParam:\n" << numParam << "\n";
 		oss << ">numMixtures:\n" << numMixtures << "\n";
-		oss << ">std_sphi:\n" << std_stdDevSynthesisRate << "\n";
+		oss << ">std_stdDevSynthesisRate:\n" << std_stdDevSynthesisRate << "\n";
 		//maybe clear the buffer
 		oss << ">std_phi:\n";
 		for (i = 0; i < std_phi.size(); i++)
@@ -824,7 +824,7 @@ unsigned Parameter::getGroupListSize()
 
 
 // ----------------------------------------------------//
-// ---------- StdDevSynthesisRate Functions -----------//
+// ---------- stdDevSynthesisRate Functions -----------//
 // ----------------------------------------------------//
 
 
@@ -843,9 +843,9 @@ void Parameter::proposeStdDevSynthesisRate()
 }
 
 
-void Parameter::setStdDevSynthesisRate(double sPhi, unsigned selectionCategory)
+void Parameter::setStdDevSynthesisRate(double _stdDevSynthesisRate, unsigned selectionCategory)
 {
-	stdDevSynthesisRate[selectionCategory] = sPhi;
+	stdDevSynthesisRate[selectionCategory] = _stdDevSynthesisRate;
 }
 
 
@@ -1285,8 +1285,8 @@ double Parameter::getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigne
 double Parameter::getStdDevSynthesisRateVariance(unsigned samples, unsigned mixture, bool unbiased)
 {
 	unsigned selectionCategory = getSelectionCategory(mixture);
-	std::vector<double> sPhiTrace = traces.getStdDevSynthesisRateTrace(selectionCategory);
-	unsigned traceLength = (unsigned)sPhiTrace.size();
+	std::vector<double> StdDevSynthesisRateTrace = traces.getStdDevSynthesisRateTrace(selectionCategory);
+	unsigned traceLength = (unsigned)StdDevSynthesisRateTrace.size();
 	if (samples > traceLength)
 	{
 #ifndef STANDALONE
@@ -1306,7 +1306,7 @@ double Parameter::getStdDevSynthesisRateVariance(unsigned samples, unsigned mixt
 	unsigned start = traceLength - samples;
 	for (unsigned i = start; i < traceLength; i++)
 	{
-		double difference = sPhiTrace[i] - posteriorMean;
+		double difference = StdDevSynthesisRateTrace[i] - posteriorMean;
 		posteriorVariance += difference * difference;
 	}
 	double normalizationTerm = unbiased ? (1 / ((double)samples - 1.0)) : (1 / (double)samples);
