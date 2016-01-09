@@ -80,9 +80,9 @@ void RFPModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 		logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue_proposed);
 	}
 
-	double sPhi = parameter->getStdDevSynthesisRate(false);
-	double logPhiProbability = Parameter::densityLogNorm(phiValue, (-(sPhi * sPhi) / 2), sPhi, true);
-	double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, (-(sPhi * sPhi) / 2), sPhi, true);
+	double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(false);
+	double logPhiProbability = Parameter::densityLogNorm(phiValue, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
+	double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
 	double currentLogLikelihood = (logLikelihood + logPhiProbability);
 	double proposedLogLikelihood = (logLikelihood_proposed + logPhiProbability_proposed);
 
@@ -266,7 +266,7 @@ std::string RFPModel::getGrouping(unsigned index)
 
 
 //---------------------------------------------------//
-//---------- StdDevSynthesisRate Functions ----------//
+//---------- stdDevSynthesisRate Functions ----------//
 //---------------------------------------------------//
 
 
@@ -549,9 +549,9 @@ void RFPModel::printHyperParameters()
 {
 	for(unsigned i = 0u; i < getNumSynthesisRateCategories(); i++)
 	{
-		std::cout << "StdDevSynthesisRate posterior estimate for selection category " << i << ": " << parameter -> getStdDevSynthesisRate(i) << std::endl;
+		std::cout << "stdDevSynthesisRate posterior estimate for selection category " << i << ": " << parameter -> getStdDevSynthesisRate(i) << std::endl;
 	}
-	std::cout << "\t current StdDevSynthesisRate proposal width: " << getCurrentStdDevSynthesisRateProposalWidth() << std::endl;
+	std::cout << "\t current stdDevSynthesisRate proposal width: " << getCurrentStdDevSynthesisRateProposalWidth() << std::endl;
 }
 
 

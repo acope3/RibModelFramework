@@ -119,21 +119,21 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 	}
 	unsigned mixture = getMixtureAssignment(geneIndex);
 	mixture = getSynthesisRateCategory(mixture);
-	double sPhi = parameter->getStdDevSynthesisRate(mixture, false);
-	double mPhi = (-(sPhi * sPhi) / 2);
-	double logPhiProbability = Parameter::densityLogNorm(phiValue, mPhi, sPhi, true);
-	double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, mPhi, sPhi, true);
+	double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(mixture, false);
+	double mPhi = (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2);
+	double logPhiProbability = Parameter::densityLogNorm(phiValue, mPhi, stdDevSynthesisRate, true);
+	double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, mPhi, stdDevSynthesisRate, true);
 
 	// TODO: make this work for more than one phi value, or for genes that don't have phi values
 	if (withPhi) {
 		for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++) {
 			double obsPhi = gene.getObservedSynthesisRate(i);
 			if (obsPhi > -1.0) {
-				//logPhiProbability += Parameter::densityLogNorm(obsPhi + getAphi(i), std::log(phiValue), getSepsilon(i), true);
-				//logPhiProbability_proposed += Parameter::densityLogNorm(obsPhi + getAphi(i), std::log(phiValue_proposed), getSepsilon(i), true);
+				//logPhiProbability += Parameter::densityLogNorm(obsPhi + getNoiseOffset(i), std::log(phiValue), getObservedSynthesisNoise(i), true);
+				//logPhiProbability_proposed += Parameter::densityLogNorm(obsPhi + getNoiseOffset(i), std::log(phiValue_proposed), getObservedSynthesisNoise(i), true);
 
-				logPhiProbability += Parameter::densityLogNorm(obsPhi, std::log(phiValue) + getAphi(i), getSepsilon(i), true);
-				logPhiProbability_proposed += Parameter::densityLogNorm(obsPhi, std::log(phiValue_proposed) + getAphi(i), getSepsilon(i), true);
+				logPhiProbability += Parameter::densityLogNorm(obsPhi, std::log(phiValue) + getNoiseOffset(i), getObservedSynthesisNoise(i), true);
+				logPhiProbability_proposed += Parameter::densityLogNorm(obsPhi, std::log(phiValue_proposed) + getNoiseOffset(i), getObservedSynthesisNoise(i), true);
 
 			}
 		}
@@ -208,24 +208,24 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 {
 	double lpr = 0.0;
 	unsigned selectionCategory = getNumSynthesisRateCategories();
-	std::vector<double> currentSphi(selectionCategory, 0.0);
+	std::vector<double> currentStdDevSynthesisRate(selectionCategory, 0.0);
 	std::vector<double> currentMphi(selectionCategory, 0.0);
-	std::vector<double> proposedSphi(selectionCategory, 0.0);
+	std::vector<double> proposedStdDevSynthesisRate(selectionCategory, 0.0);
 	std::vector<double> proposedMphi(selectionCategory, 0.0);
 
 
 	for(unsigned i = 0u; i < selectionCategory; i++)
 	{
-		currentSphi[i] = getStdDevSynthesisRate(i, false);
-		currentMphi[i] = -((currentSphi[i] * currentSphi[i]) / 2);
-		proposedSphi[i] = getStdDevSynthesisRate(i, true);
-		proposedMphi[i] = -((proposedSphi[i] * proposedSphi[i]) / 2);
+		currentStdDevSynthesisRate[i] = getStdDevSynthesisRate(i, false);
+		currentMphi[i] = -((currentStdDevSynthesisRate[i] * currentStdDevSynthesisRate[i]) / 2);
+		proposedStdDevSynthesisRate[i] = getStdDevSynthesisRate(i, true);
+		proposedMphi[i] = -((proposedStdDevSynthesisRate[i] * proposedStdDevSynthesisRate[i]) / 2);
 		// take the jacobian into account for the non-linear transformation from logN to N distribution
-		lpr -= (std::log(currentSphi[i]) - std::log(proposedSphi[i]));
+		lpr -= (std::log(currentStdDevSynthesisRate[i]) - std::log(proposedStdDevSynthesisRate[i]));
 	}
 
 	if (withPhi) {
-		// one for each Aphi, and one for Sphi
+		// one for each noiseOffset, and one for stdDevSynthesisRate
 		logProbabilityRatio.resize(getNumPhiGroupings()+1);
 	}
 	else {
@@ -247,8 +247,8 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 			std::cerr << "phi " << i << " not finite! " << phi << "\n";
 #endif
 		}
-		lpr += Parameter::densityLogNorm(phi, proposedMphi[mixture], proposedSphi[mixture], true)
-			   - Parameter::densityLogNorm(phi, currentMphi[mixture], currentSphi[mixture], true);
+		lpr += Parameter::densityLogNorm(phi, proposedMphi[mixture], proposedStdDevSynthesisRate[mixture], true)
+			   - Parameter::densityLogNorm(phi, currentMphi[mixture], currentStdDevSynthesisRate[mixture], true);
 	}
 
 	// TODO: USE CONSTANTS INSTEAD OF 0
@@ -258,9 +258,9 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 	{
 		for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++) {
 			lpr = 0.0;
-			double Aphi = getAphi(i, false);
-			double Aphi_proposed = getAphi(i, true);
-			double Sepsilon = getSepsilon(i);
+			double noiseOffset = getNoiseOffset(i, false);
+			double noiseOffset_proposed = getNoiseOffset(i, true);
+			double observedSynthesisNoise = getObservedSynthesisNoise(i);
 #ifndef __APPLE__
 //#pragma omp parallel for reduction(+:lpr)
 #endif
@@ -271,8 +271,8 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 				double obsPhi = genome.getGene(j).getObservedSynthesisRate(i);
 				if (obsPhi > -1.0) {
 					double logobsPhi = std::log(obsPhi);
-					double proposed = Parameter::densityNorm(logobsPhi, logphi + Aphi_proposed, Sepsilon, true);
-					double current = Parameter::densityNorm(logobsPhi, logphi + Aphi, Sepsilon, true);
+					double proposed = Parameter::densityNorm(logobsPhi, logphi + noiseOffset_proposed, observedSynthesisNoise, true);
+					double current = Parameter::densityNorm(logobsPhi, logphi + noiseOffset, observedSynthesisNoise, true);
 					lpr += proposed - current;
 				}
 			}
@@ -365,7 +365,7 @@ std::string ROCModel::getGrouping(unsigned index)
 
 
 //---------------------------------------------------//
-//---------- StdDevSynthesisRate Functions ----------//
+//---------- stdDevSynthesisRate Functions ----------//
 //---------------------------------------------------//
 
 
@@ -469,8 +469,8 @@ void ROCModel::updateHyperParameterTraces(unsigned sample)
 {
 	updateStdDevSynthesisRateTrace(sample);
 	for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++) {
-		updateAphiTrace(i, sample);
-		updateSepsilonTrace(i, sample);
+		updateNoiseOffsetTrace(i, sample);
+		updateObservedSynthesisNoiseTrace(i, sample);
 	}
 }
 
@@ -522,7 +522,7 @@ void ROCModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth)
 {
 	adaptStdDevSynthesisRateProposalWidth(adaptiveWidth);
 	if (withPhi) {
-		adaptAphiProposalWidth(adaptiveWidth);
+		adaptNoiseOffsetProposalWidth(adaptiveWidth);
 	}
 }
 
@@ -545,7 +545,7 @@ void ROCModel::proposeHyperParameters()
 {
 	parameter->proposeStdDevSynthesisRate();
 	if (withPhi) {
-		parameter->proposeAphi();
+		parameter->proposeNoiseOffset();
 	}
 }
 
@@ -612,18 +612,18 @@ void ROCModel::updateGibbsSampledHyperParameters(Genome &genome)
 		for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++) {
 			double rate = 0.0;
 			unsigned mixtureAssignment;
-			double aphi = getAphi(i);
+			double noiseOffset = getNoiseOffset(i);
 			for (unsigned j = 0; j < genome.getGenomeSize(); j++) {
 				mixtureAssignment = getMixtureAssignment(i);
 				double obsPhi = genome.getGene(j).getObservedSynthesisRate(i);
 				if (obsPhi > -1.0) {
-					double sum = std::log(obsPhi) - aphi - std::log(getSynthesisRate(j, mixtureAssignment, false));
+					double sum = std::log(obsPhi) - noiseOffset - std::log(getSynthesisRate(j, mixtureAssignment, false));
 					rate += sum * sum;
 				}
 			}
 			rate /= 2;
 			double rand = parameter->randGamma(shape, rate);
-			parameter->setSepsilon(i, std::sqrt(1 / rand));
+			parameter->setObservedSynthesisNoise(i, std::sqrt(1 / rand));
 		}
 	}
 }
@@ -633,7 +633,7 @@ void ROCModel::updateAllHyperParameter()
 {
 	updateStdDevSynthesisRate();
 	for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++) {
-		updateAphi(i);
+		updateNoiseOffset(i);
 	}
 }
 
@@ -644,7 +644,7 @@ void ROCModel::updateHyperParameter(unsigned hp)
 		updateStdDevSynthesisRate();
 	}
 	else {
-		updateAphi(hp - 1);
+		updateNoiseOffset(hp - 1);
 	}
 }
 
@@ -715,55 +715,55 @@ void ROCModel::printHyperParameters()
 	for(unsigned i = 0u; i < getNumSynthesisRateCategories(); i++)
 	{
 #ifndef STANDALONE
-		Rprintf("Current Sphi estimate for selection category %d: %f\n", i, getStdDevSynthesisRate(i, false));
+		Rprintf("Current stdDevSynthesisRate estimate for selection category %d: %f\n", i, getStdDevSynthesisRate(i, false));
 #else
-		std::cout << "Current Sphi estimate for selection category " << i << ": " << getStdDevSynthesisRate(i, false) << std::endl;
+		std::cout << "Current stdDevSynthesisRate estimate for selection category " << i << ": " << getStdDevSynthesisRate(i, false) << std::endl;
 #endif
 	}
 #ifndef STANDALONE
-	Rprintf("\t current Sphi proposal width: %f\n", getCurrentStdDevSynthesisRateProposalWidth());
+	Rprintf("\t current stdDevSynthesisRate proposal width: %f\n", getCurrentStdDevSynthesisRateProposalWidth());
 #else
-	std::cout << "\t current Sphi proposal width: " << getCurrentStdDevSynthesisRateProposalWidth() << std::endl;
+	std::cout << "\t current stdDevSynthesisRate proposal width: " << getCurrentStdDevSynthesisRateProposalWidth() << std::endl;
 #endif
 	if(withPhi)
 	{
 #ifndef STANDALONE
-	Rprintf("\t current Aphi estimates:");
+	Rprintf("\t current noiseOffset estimates:");
 #else
-		std::cout << "\t current Aphi estimates:";
+		std::cout << "\t current noiseOffset estimates:";
 #endif
 		for (unsigned i = 0; i < getNumPhiGroupings(); i++)
 		{
 #ifndef STANDALONE
-			Rprintf(" %f", getAphi(i, false));
+			Rprintf(" %f", getNoiseOffset(i, false));
 #else
-			std::cout << " " << getAphi(i, false);
+			std::cout << " " << getNoiseOffset(i, false);
 #endif
 		}
 #ifndef STANDALONE
-		Rprintf("\n\t current Aphi proposal widths:");
+		Rprintf("\n\t current noiseOffset proposal widths:");
 #else
-		std::cout << "\n\t current Aphi proposal widths:";
+		std::cout << "\n\t current noiseOffset proposal widths:";
 #endif
 		for (unsigned i = 0; i < getNumPhiGroupings(); i++)
 		{
 #ifndef STANDALONE
-			Rprintf(" %f", getCurrentAphiProposalWidth(i));
+			Rprintf(" %f", getCurrentNoiseOffsetProposalWidth(i));
 #else
-			std::cout << " " << getCurrentAphiProposalWidth(i);
+			std::cout << " " << getCurrentNoiseOffsetProposalWidth(i);
 #endif
 		}
 #ifndef STANDALONE
-		Rprintf("\n\t current Sepsilon estimates:");
+		Rprintf("\n\t current observedSynthesisNoise estimates:");
 #else
-		std::cout << "\n\t current Sepsilon estimates:";
+		std::cout << "\n\t current observedSynthesisNoise estimates:";
 #endif
 		for (unsigned i = 0; i < getNumPhiGroupings(); i++)
 		{
 #ifndef STANDALONE
-			Rprintf(" %f", getSepsilon(i));
+			Rprintf(" %f", getObservedSynthesisNoise(i));
 #else
-			std::cout << " " << getSepsilon(i);
+			std::cout << " " << getObservedSynthesisNoise(i);
 #endif
 		}
 #ifndef STANDALONE
@@ -862,45 +862,45 @@ void ROCModel::getParameterForCategory(unsigned category, unsigned param, std::s
 //--------------------------------------------//
 
 
-double ROCModel::getAphi(unsigned index, bool proposed)
+double ROCModel::getNoiseOffset(unsigned index, bool proposed)
 {
-	return parameter->getAphi(index, proposed);
+	return parameter->getNoiseOffset(index, proposed);
 }
 
 
-double ROCModel::getSepsilon(unsigned index)
+double ROCModel::getObservedSynthesisNoise(unsigned index)
 {
-	return parameter->getSepsilon(index);
+	return parameter->getObservedSynthesisNoise(index);
 }
 
 
-double ROCModel::getCurrentAphiProposalWidth(unsigned index)
+double ROCModel::getCurrentNoiseOffsetProposalWidth(unsigned index)
 {
-	return parameter->getCurrentAphiProposalWidth(index);
+	return parameter->getCurrentNoiseOffsetProposalWidth(index);
 }
 
 
-void ROCModel::updateAphi(unsigned index)
+void ROCModel::updateNoiseOffset(unsigned index)
 {
-	parameter->updateAphi(index);
+	parameter->updateNoiseOffset(index);
 }
 
 
-void ROCModel::updateAphiTrace(unsigned index, unsigned sample)
+void ROCModel::updateNoiseOffsetTrace(unsigned index, unsigned sample)
 {
-	parameter->updateAphiTraces(sample);
+	parameter->updateNoiseOffsetTraces(sample);
 }
 
 
-void ROCModel::updateSepsilonTrace(unsigned index, unsigned sample)
+void ROCModel::updateObservedSynthesisNoiseTrace(unsigned index, unsigned sample)
 {
-	parameter->updateSepsilonTraces(sample);
+	parameter->updateObservedSynthesisNoiseTraces(sample);
 }
 
 
-void ROCModel::adaptAphiProposalWidth(unsigned adaptiveWidth)
+void ROCModel::adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth)
 {
-	parameter->adaptAphiProposalWidth(adaptiveWidth);
+	parameter->adaptNoiseOffsetProposalWidth(adaptiveWidth);
 }
 
 

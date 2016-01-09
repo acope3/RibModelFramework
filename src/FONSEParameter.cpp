@@ -31,11 +31,11 @@ FONSEParameter::FONSEParameter(std::string filename) : Parameter(22)
 }
 
 
-FONSEParameter::FONSEParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
+FONSEParameter::FONSEParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
 	std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer, std::string _mutationSelectionState) :
 	Parameter(22)
 {
-	initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
+	initParameterSet(stdDevSynthesisRate, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
 	initFONSEParameterSet();
 }
 
@@ -58,10 +58,6 @@ FONSEParameter& FONSEParameter::operator=(const FONSEParameter& rhs)
 
 	currentSelectionParameter = rhs.currentSelectionParameter;
 	proposedSelectionParameter = rhs.proposedSelectionParameter;
-
-
-	covarianceMatrix = rhs.covarianceMatrix;
-
 
 	return *this;
 }
@@ -141,6 +137,7 @@ void FONSEParameter::initFONSEParameterSet()
 void FONSEParameter::initFONSEValuesFromFile(std::string filename)
 {
 	std::ifstream input;
+	std::vector <double> mat;
 	input.open(filename.c_str());
 	if (input.fail())
 	{
@@ -163,8 +160,15 @@ void FONSEParameter::initFONSEValuesFromFile(std::string filename)
 
 		if (flag == 1)
 		{
+			mat.clear();
 			cat = 0;
 			variableName = tmp.substr(1, tmp.size() - 2);
+			if (variableName == "covarianceMatrix")
+			{
+				getline(input, tmp);
+				//char aa = tmp[0];
+				cat = SequenceSummary::AAToAAIndex(tmp); // ????
+			}
 		}
 		else if (flag == 2)
 		{
@@ -213,6 +217,20 @@ void FONSEParameter::initFONSEValuesFromFile(std::string filename)
 					{
 						currentSelectionParameter[cat - 1].push_back(val);
 					}
+				}
+			}
+			else if (variableName == "covarianceMatrix")
+			{
+				if (tmp == "***") //end of matrix
+				{
+					CovarianceMatrix CM(mat);
+					covarianceMatrix[cat] = CM;
+				}
+				double val;
+				iss.str(tmp);
+				while (iss >> val)
+				{
+					mat.push_back(val);
 				}
 			}
 			else if (variableName == "std_csp")
@@ -311,6 +329,20 @@ void FONSEParameter::writeFONSERestartFile(std::string filename)
         if (j % 10 != 0)
             oss << "\n";
     }
+	for (unsigned i = 0; i < groupList.size(); i++)
+	{
+		std::string aa = groupList[i];
+		oss << ">covarianceMatrix:\n" << aa << "\n";
+		CovarianceMatrix m = covarianceMatrix[SequenceSummary::AAToAAIndex(aa)];
+		std::vector<double>* tmp = m.getCovMatrix();
+		int size = m.getNumVariates();
+		for (unsigned k = 0; k < size * size; k++)
+		{
+			if (k % size == 0 && k != 0) { oss << "\n"; }
+			oss << tmp->at(k) << "\t";
+		}
+		oss << "\n***\n";
+	}
     std::string output = oss.str();
     out << output;
     out.close();
@@ -461,8 +493,7 @@ void FONSEParameter::proposeCodonSpecificParameter()
         }
         
         std::vector<double> covaryingNums;
-        covaryingNums = covarianceMatrix[SequenceSummary::AAToAAIndex(aa)].transformIidNumersIntoCovaryingNumbers(
-                                                                                                                  iidProposed);
+        covaryingNums = covarianceMatrix[SequenceSummary::AAToAAIndex(aa)].transformIidNumersIntoCovaryingNumbers(iidProposed);
         for (unsigned i = 0; i < numMutationCategories; i++)
         {
             for (unsigned j = i * numCodons, l = aaStart; j < (i * numCodons) + numCodons; j++, l++)
@@ -568,7 +599,7 @@ void FONSEParameter::proposeHyperParameters()
 //--------------------------------------------------//
 
 
-FONSEParameter::FONSEParameter(std::vector<double> sphi, std::vector<unsigned> geneAssignment,
+FONSEParameter::FONSEParameter(std::vector<double> stdDevSynthesisRate, std::vector<unsigned> geneAssignment,
                                std::vector<unsigned> _matrix, bool splitSer) : Parameter(22)
 {
     unsigned _numMixtures = _matrix.size() / 2;
@@ -583,17 +614,17 @@ FONSEParameter::FONSEParameter(std::vector<double> sphi, std::vector<unsigned> g
             thetaKMatrix[i].push_back(_matrix[index]);
         }
     }
-    initParameterSet(sphi, _matrix.size() / 2, geneAssignment, thetaKMatrix, splitSer);
+    initParameterSet(stdDevSynthesisRate, _matrix.size() / 2, geneAssignment, thetaKMatrix, splitSer);
     initFONSEParameterSet();
     
 }
 
 
-FONSEParameter::FONSEParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
+FONSEParameter::FONSEParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
                                bool splitSer, std::string _mutationSelectionState) : Parameter(22)
 {
     std::vector<std::vector<unsigned>> thetaKMatrix;
-    initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
+    initParameterSet(stdDevSynthesisRate, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
     initFONSEParameterSet();
 }
 

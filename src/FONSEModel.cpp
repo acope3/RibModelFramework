@@ -120,9 +120,9 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 
 	//std::cout << logLikelihood << " " << logLikelihood_proposed << std::endl;
 
-	double sPhi = parameter->getStdDevSynthesisRate(false);
-	double logPhiProbability = Parameter::densityLogNorm(phiValue, (-(sPhi * sPhi) / 2), sPhi, true);
-	double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, (-(sPhi * sPhi) / 2), sPhi, true);
+	double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(false);
+	double logPhiProbability = Parameter::densityLogNorm(phiValue, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
+	double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
 	double currentLogLikelihood = (likelihood + logPhiProbability);
 	double proposedLogLikelihood = (likelihood_proposed + logPhiProbability_proposed);
 	if (phiValue == 0) {
@@ -205,17 +205,17 @@ void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 {
 	double lpr = 0.0;
 	unsigned selectionCategory = getNumSynthesisRateCategories();
-	std::vector<double> currentSphi(selectionCategory, 0.0);
+	std::vector<double> currentStdDevSynthesisRate(selectionCategory, 0.0);
 	std::vector<double> currentMphi(selectionCategory, 0.0);
-	std::vector<double> proposedSphi(selectionCategory, 0.0);
+	std::vector<double> proposedStdDevSynthesisRate(selectionCategory, 0.0);
 	std::vector<double> proposedMphi(selectionCategory, 0.0);
 	for(unsigned i = 0u; i < selectionCategory; i++)
 	{
-		currentSphi[i] = getStdDevSynthesisRate(i, false);
-		currentMphi[i] = -((currentSphi[i] * currentSphi[i]) / 2);
-		proposedSphi[i] = getStdDevSynthesisRate(i, true);
+		currentStdDevSynthesisRate[i] = getStdDevSynthesisRate(i, false);
+		currentMphi[i] = -((currentStdDevSynthesisRate[i] * currentStdDevSynthesisRate[i]) / 2);
+		proposedStdDevSynthesisRate[i] = getStdDevSynthesisRate(i, true);
 		proposedMphi[i] = -((proposedMphi[i] * proposedMphi[i]) / 2);
-		lpr -= (std::log(currentSphi[i]) - std::log(proposedSphi[i]));
+		lpr -= (std::log(currentStdDevSynthesisRate[i]) - std::log(proposedStdDevSynthesisRate[i]));
 	}
 
 	logProbabilityRatio.resize(1);
@@ -228,8 +228,8 @@ void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 		unsigned mixture = getMixtureAssignment(i);
 		mixture = getSynthesisRateCategory(mixture);
 		double phi = getSynthesisRate(i, mixture, false);
-		lpr += Parameter::densityLogNorm(phi, proposedMphi[mixture], proposedSphi[mixture], true)
-			   - Parameter::densityLogNorm(phi, currentMphi[mixture], currentSphi[mixture], true);
+		lpr += Parameter::densityLogNorm(phi, proposedMphi[mixture], proposedStdDevSynthesisRate[mixture], true)
+			   - Parameter::densityLogNorm(phi, currentMphi[mixture], currentStdDevSynthesisRate[mixture], true);
 	}
 	logProbabilityRatio[0] = lpr;
 }
@@ -317,7 +317,7 @@ std::string FONSEModel::getGrouping(unsigned index)
 
 
 //---------------------------------------------------//
-//---------- StdDevSynthesisRate Functions ----------//
+//---------- stdDevSynthesisRate Functions ----------//
 //---------------------------------------------------//
 
 
@@ -643,9 +643,9 @@ void FONSEModel::printHyperParameters()
 {
 	for(unsigned i = 0u; i < getNumSynthesisRateCategories(); i++)
 	{
-		std::cout << "Sphi posterior estimate for selection category " << i << ": " << getStdDevSynthesisRate(i) << std::endl;
+		std::cout << "stdDevSynthesisRate posterior estimate for selection category " << i << ": " << getStdDevSynthesisRate(i) << std::endl;
 	}
-	std::cout << "\t current Sphi proposal width: " << getCurrentStdDevSynthesisRateProposalWidth() << std::endl;
+	std::cout << "\t current stdDevSynthesisRate proposal width: " << getCurrentStdDevSynthesisRateProposalWidth() << std::endl;
 }
 
 

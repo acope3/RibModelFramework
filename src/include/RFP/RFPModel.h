@@ -53,7 +53,7 @@ class RFPModel: public Model
 
 
 
-		//StdDevSynthesisRate Functions:
+		//stdDevSynthesisRate Functions:
 		virtual double getStdDevSynthesisRate(unsigned selectionCategory, bool proposed = false);
 		virtual double getCurrentStdDevSynthesisRateProposalWidth();
 		virtual void updateStdDevSynthesisRate();
