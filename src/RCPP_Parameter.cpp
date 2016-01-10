@@ -101,8 +101,8 @@ RCPP_MODULE(Parameter_mod)
 		.method("setMutationPriorStandardDeviation", &ROCParameter::setMutationPriorStandardDeviation)
 
 		//Posterior, Variance, and Estimates Functions:
-		.method("getAphiPosteriorMean", &ROCParameter::getAphiPosteriorMean) //TODO: this is not wrapped! May not run correctly
-		.method("getAphiVariance", &ROCParameter::getAphiVariance) //TODO: this is not wrapped! May not run correctly
+		.method("getNoiseOffsetPosteriorMean", &ROCParameter::getNoiseOffsetPosteriorMean) //TODO: this is not wrapped! May not run correctly
+		.method("getNoiseOffsetVariance", &ROCParameter::getNoiseOffsetVariance) //TODO: this is not wrapped! May not run correctly
 
 
 		//CSP Functions:

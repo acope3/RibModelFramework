@@ -422,9 +422,9 @@ unsigned Trace::getCodonSpecificCategory(unsigned mixtureElement, unsigned param
 //--------------------------------------//
 
 
-void Trace::updateStdDevSynthesisRateTrace(unsigned sample, double Sphi, unsigned synthesisRateCategory)
+void Trace::updateStdDevSynthesisRateTrace(unsigned sample, double stdDevSynthesisRate, unsigned synthesisRateCategory)
 {
-	stdDevSynthesisRateTrace[synthesisRateCategory][sample] = Sphi;
+	stdDevSynthesisRateTrace[synthesisRateCategory][sample] = stdDevSynthesisRate;
 }
 
 
@@ -554,8 +554,6 @@ void Trace::updateCodonSpecificParameterTraceForCodon(unsigned sample, std::stri
 
 }
 
-
-
 // -----------------------------------------------------------------------------------------------------//
 // ---------------------------------------- R SECTION --------------------------------------------------//
 // -----------------------------------------------------------------------------------------------------//
@@ -641,15 +639,15 @@ unsigned Trace::getNumberOfMixtures()
 //--------------------------------------//
 //---------- Setter Functions ----------//
 //--------------------------------------//
-void Trace::setStdDevSynthesisRateTraces(std::vector<std::vector<double>> _sPhiTrace)
+void Trace::setStdDevSynthesisRateTraces(std::vector<std::vector<double>> _stdDevSynthesisRateTrace)
 {
-	stdDevSynthesisRateTrace = _sPhiTrace;
+	stdDevSynthesisRateTrace = _stdDevSynthesisRateTrace;
 }
 
 
-void Trace::setStdDevSynthesisRateAcceptanceRatioTrace(std::vector<double> _sphiAcceptanceRatioTrace)
+void Trace::setStdDevSynthesisRateAcceptanceRatioTrace(std::vector<double> _stdDevSynthesisRateAcceptanceRatioTrace)
 {
-	stdDevSynthesisRateAcceptanceRatioTrace = _sphiAcceptanceRatioTrace;
+	stdDevSynthesisRateAcceptanceRatioTrace = _stdDevSynthesisRateAcceptanceRatioTrace;
 }
 
 
@@ -710,21 +708,21 @@ std::vector<std::vector<double>> Trace::getObservedSynthesisNoiseTraceR()
 }
 
 
-void Trace::setSynthesisOffsetTrace(std::vector<std::vector <double> > _AphiTrace)
+void Trace::setSynthesisOffsetTrace(std::vector<std::vector <double> > _NoiseOffsetTrace)
 {
-	synthesisOffsetTrace = _AphiTrace;
+	synthesisOffsetTrace = _NoiseOffsetTrace;
 }
 
 
-void Trace::setSynthesisOffsetAcceptanceRatioTrace(std::vector<std::vector <double> > _AphiAcceptanceRatioTrace)
+void Trace::setSynthesisOffsetAcceptanceRatioTrace(std::vector<std::vector <double> > _NoiseOffsetAcceptanceRatioTrace)
 {
-	synthesisOffsetAcceptanceRatioTrace = _AphiAcceptanceRatioTrace;
+	synthesisOffsetAcceptanceRatioTrace = _NoiseOffsetAcceptanceRatioTrace;
 }
 
 
-void Trace::setObservedSynthesisNoiseTrace(std::vector<std::vector <double> > _SepsilonTrace)
+void Trace::setObservedSynthesisNoiseTrace(std::vector<std::vector <double> > _ObservedSynthesisNoiseTrace)
 {
-	observedSynthesisNoiseTrace = _SepsilonTrace;
+	observedSynthesisNoiseTrace = _ObservedSynthesisNoiseTrace;
 }
 
 

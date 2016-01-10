@@ -34,7 +34,7 @@ class RFPParameter: public Parameter {
 		//Constructors & Destructors:
 		explicit RFPParameter();
 		RFPParameter(std::string filename);
-		RFPParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
+		RFPParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
 				std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer = true,
 				std::string _mutationSelectionState = "allUnique");
 		RFPParameter& operator=(const RFPParameter& rhs);
@@ -88,9 +88,9 @@ class RFPParameter: public Parameter {
 
 
 		//Constructors & Destructors:
-		RFPParameter(std::vector<double> sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix,
+		RFPParameter(std::vector<double> stdDevSynthesisRate, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix,
 			bool splitSer = true);
-		RFPParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer = true,
+		RFPParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer = true,
 			std::string _mutationSelectionState = "allUnique");
 
 

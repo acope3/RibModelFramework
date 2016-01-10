@@ -59,7 +59,7 @@ class Parameter {
 
 
 		//Initialization and Restart Functions:
-		void initParameterSet(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
+		void initParameterSet(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
 							  std::vector<std::vector<unsigned>> mixtureDefinitionMatrix,
 							  bool splitSer = true, std::string _mutationSelectionState = "allUnique");
 		void initBaseValuesFromFile(std::string filename);
@@ -102,10 +102,10 @@ class Parameter {
 
 
 
-		//StdDevSynthesisRate Functions:
+		//stdDevSynthesisRate Functions:
 		double getStdDevSynthesisRate(unsigned selectionCategory, bool proposed = false);
 		virtual void proposeStdDevSynthesisRate();
-		void setStdDevSynthesisRate(double StdDevSynthesisRate, unsigned selectionCategory);
+		void setStdDevSynthesisRate(double stdDevSynthesisRate, unsigned selectionCategory);
 		double getCurrentStdDevSynthesisRateProposalWidth();
 		void updateStdDevSynthesisRate();
 
