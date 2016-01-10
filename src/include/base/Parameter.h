@@ -30,6 +30,8 @@ class Parameter {
 		static void swap(double& a, double& b);
 		static void swap(int& a, int& b);
 
+
+		std::vector<double> codonSpecificPrior;
 	public:
 
 		static const std::string allUnique;
@@ -69,6 +71,9 @@ class Parameter {
 		void InitializeSynthesisRate(std::vector<double> expression);
 		std::vector<double> readPhiValues(std::string filename); //General function, possibly move
 
+
+		//prior functions
+		double getCodonSpecificPriorStdDev(unsigned paramType);
 
 
 		//Mixture Definition Matrix and Category Functions:

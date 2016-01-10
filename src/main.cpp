@@ -23,10 +23,12 @@ int main()
 
 	Genome genome;
 	//genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/data/twoMixtures/simulatedAllUniqueR_unevenMixtures.fasta");
-	genome.readFasta("F:/GitHub/RibModelDev/data/twoMixtures/simulatedAllUniqueR_unevenMixtures.fasta");
+	//genome.readFasta("F:/GitHub/RibModelDev/data/twoMixtures/simulatedAllUniqueR_unevenMixtures.fasta");
+	genome.readFasta("E:/RibosomeModel/RibModelDev/data/twoMixtures/simulatedAllUniqueR_unevenMixtures.fasta");
 	if(withPhi)
 	{
-		genome.readObservedPhiValues("F:/GitHub/RibModelDev/data/twoMixtures/simulatedAllUniqueR_phi_unevenMixtures.csv", false);
+		//genome.readObservedPhiValues("F:/GitHub/RibModelDev/data/twoMixtures/simulatedAllUniqueR_phi_unevenMixtures.csv", false);
+		genome.readObservedPhiValues("E:/RibosomeModel/RibModelDev/data/twoMixtures/simulatedAllUniqueR_phi_unevenMixtures.csv", false);
 	}
 
 	std::cout << "Done!-------------------------------\n\n\n";
@@ -61,11 +63,15 @@ int main()
 	std::cout << "\tmixture definition: " << mixDef << "\n";
 
 	std::vector<std::string> files(2);
-	files[0] = std::string("F:/GitHub/RibModelDev/data/twoMixtures/simulated_mutation0.csv");
-	files[1] = std::string("F:/GitHub/RibModelDev/data/twoMixtures/simulated_mutation1.csv");
+	//files[0] = std::string("F:/GitHub/RibModelDev/data/twoMixtures/simulated_mutation0.csv");
+	//files[1] = std::string("F:/GitHub/RibModelDev/data/twoMixtures/simulated_mutation1.csv");
+	files[0] = std::string("E:/RibosomeModel/RibModelDev/data/twoMixtures/simulated_mutation0.csv");
+	files[1] = std::string("E:/RibosomeModel/RibModelDev/data/twoMixtures/simulated_mutation1.csv");
 	parameter.initMutationCategories(files, parameter.getNumMutationCategories());
-	files[0] = std::string("F:/GitHub/RibModelDev/data/twoMixtures/simulated_selection0.csv");
-	files[1] = std::string("F:/GitHub/RibModelDev/data/twoMixtures/simulated_selection1.csv");
+//	files[0] = std::string("F:/GitHub/RibModelDev/data/twoMixtures/simulated_selection0.csv");
+//	files[1] = std::string("F:/GitHub/RibModelDev/data/twoMixtures/simulated_selection1.csv");
+	files[0] = std::string("E:/RibosomeModel/RibModelDev/data/twoMixtures/simulated_selection0.csv");
+	files[1] = std::string("E:/RibosomeModel/RibModelDev/data/twoMixtures/simulated_selection1.csv");
 	parameter.initSelectionCategories(files, parameter.getNumSelectionCategories());
 
 	parameter.InitializeSynthesisRate(genome, sphi_init[0]);

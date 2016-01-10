@@ -3,12 +3,12 @@
 
 
 #include "../Genome.h"
-
+#include "Parameter.h"
 
 class Model
 {
     private:
-
+		double calculatePriorForCodonSpesificParam(Parameter *parameter, std::string grouping, unsigned paramType, bool proposed = false);
 
     public:
 		//Constructors & Destructors:

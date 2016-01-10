@@ -652,8 +652,14 @@ std::vector <double> Parameter::readPhiValues(std::string filename)
 	return RV;
 }
 
+// ----------------------------------------------------------------------//
+// -------------------------- Prior functions ---------------------------//
+// ----------------------------------------------------------------------//
 
-
+double Parameter::getCodonSpecificPriorStdDev(unsigned paramType)
+{
+	return codonSpecificPrior[paramType];
+}
 
 
 // ----------------------------------------------------------------------//
