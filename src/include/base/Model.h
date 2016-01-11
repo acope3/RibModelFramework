@@ -8,7 +8,7 @@
 class Model
 {
     private:
-		double calculatePriorForCodonSpesificParam(Parameter *parameter, std::string grouping, unsigned paramType, bool proposed = false);
+		double calculatePriorForCodonSpecificParam(Parameter *parameter, std::string grouping, unsigned paramType, bool proposed = false);
 
     public:
 		//Constructors & Destructors:
