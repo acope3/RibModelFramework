@@ -16,7 +16,7 @@ using namespace Rcpp;
  
 Trace::Trace()
 {
-	categories = nullptr;
+	categories = 0;
 	// TODO: fill this
 }
 
