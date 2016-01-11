@@ -138,6 +138,7 @@ void FONSEParameter::initFONSEValuesFromFile(std::string filename)
 {
 	std::ifstream input;
 	std::vector <double> mat;
+	covarianceMatrix.resize(maxGrouping);
 	input.open(filename.c_str());
 	if (input.fail())
 	{
