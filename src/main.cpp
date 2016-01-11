@@ -97,9 +97,9 @@ int main()
 #ifdef GABE
 int main()
 {
-	std::string modelToRun = "RFP"; //can also be ROC or FONSE
+	std::string modelToRun = "FONSE"; //can also be ROC or FONSE
 	bool withPhi = false;
-	bool fromRestart = false;
+	bool fromRestart = true;
 	unsigned numMixtures = 1;
 
 
@@ -276,14 +276,6 @@ int main()
 		mcmc.run(genome, model, 1, 0);
 		std::cout << "Done!----------------------------------\n\n\n" << std::endl;
 
-		Trace trace = parameter.getTraceObject();
-		std::string codon = "ATG";
-		std::vector<double> v;
-		v = trace.getCodonSpecificParameterTraceByMixtureElementForCodon(0, codon, 0);
-		for (int i = 0; i < v.size(); i++)
-		{
-			std::cout <<v[i] <<"\n";
-		}
 	} //END OF RFP
 	else if (modelToRun == "FONSE")
 	{
