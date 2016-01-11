@@ -622,23 +622,30 @@ writeParameterObject.Rcpp_FONSEParameter <- function(parameter, file)
 #' for the ROCParameter will be called. This allows us to not have an if-else
 #' block in the code - making use of the how R handles these situations.
 #' 
-loadParameterObject <- function(file)
+loadParameterObject <- function(files)
 {
   #A temporary env is set up to stop R errors.
-  tempEnv <- new.env();
-  load(file = file, envir = tempEnv)
-  model <- tempEnv$model
-  
+  for (i in length(files)){
+    tempEnv <- new.env();
+    load(file = files[i], envir = tempEnv)
+    if (i == 1){
+      model <- tempEnv$model
+    }else{
+      if (model != tempEnv$model){
+        stop("The models do not match between files")
+      }
+    }
+  }
   
   if (model == "ROC"){
     parameter <- new(ROCParameter)
-    parameter <- loadROCParameterObject(parameter, file)
+    parameter <- loadROCParameterObject(parameter, files)
   }else if (model == "RFP") {
     parameter <- new(RFPParameter)
-    parameter <- loadRFPParameterObject(parameter, file)
+    parameter <- loadRFPParameterObject(parameter, files)
   }else if (model == "FONSE") {
     parameter <- new(FONSEParameter)
-    parameter <- loadFONSEParameterObject(parameter, file)
+    parameter <- loadFONSEParameterObject(parameter, files)
   }else{
     stop("File data corrupted")
   }
@@ -647,63 +654,213 @@ loadParameterObject <- function(file)
 
 
 #Sets all the common variables in the parameter objects.
-setBaseInfo <- function(parameter, file)
+setBaseInfo <- function(parameter, files)
 {
-  tempEnv <- new.env();
-  load(file = file, envir = tempEnv)
-  parameter$setCategories(tempEnv$paramBase$categories)
-  #parameter$setCategoriesForTrace() #TODO: FIX 
-  parameter$numMixtures <- tempEnv$paramBase$numMix
-  parameter$numMutationCategories <- tempEnv$paramBase$numMut
-  parameter$numSelectionCategories <- tempEnv$paramBase$numSel
-  parameter$setMixtureAssignment(tempEnv$paramBase$curMixAssignment)
-  parameter$setLastIteration(tempEnv$paramBase$lastIteration)
+  for (i in 1:length(files)) {
+    tempEnv <- new.env();
+    if (i == 1) {
+      load(file = files[i], envir = tempEnv)
+      categories <- tempEnv$paramBase$categories
+      numMixtures <- tempEnv$paramBase$numMix
+      numMutationCategories <- tempEnv$paramBase$numMut
+      numSelectionCategories <- tempEnv$paramBase$numSel
+      mixtureAssignment <- tempEnv$paramBase$curMixAssignment
+      lastIteration <- tempEnv$paramBase$lastIteration
+      
+      stdDevSynthesisRateTraces <- tempEnv$paramBase$stdDevSynthesisRateTraces
+      stdDevSynthesisRateAcceptanceRatioTrace <- tempEnv$paramBase$stdDevSynthesisRateAcceptRatTrace
+      synthesisRateTrace <- tempEnv$paramBase$synthRateTrace
+      synthesisRateAcceptanceRatioTrace <- tempEnv$paramBase$synthAcceptRatTrace
+      mixtureAssignmentTrace <- tempEnv$paramBase$mixAssignTrace
+      mixtureProbabilitiesTrace <- tempEnv$paramBase$mixProbTrace
+      codonSpecificAcceptanceRatioTrace <- tempEnv$paramBase$codonSpecificAcceptRatTrace
+    } else {
+      if (categories != tempEnv$paramBase$categories){
+        stop("categories is not the same between all files")
+      }
+      if (numMixtures != tempEnv$paramBase$numMix){
+        stop("The number of mixtures is not the same between files")
+      }
+      if (numMutationCategories != tempEnv$paramBase$numMut){
+        stop("The number of mutation categories is not the same between files")
+      }
+      if (numSelectionCategories != tempEnv$paramBase$numSel){
+        stop("The number of selection categories is not the same between files")
+      }
+      if (length(mixtureAssignment) != length(tempEnv$paramBase$curMixAssignment)){
+        stop("The length of the mixture assignment is not the same between files. 
+             Make sure the same genome is used on each run.")
+      }
+      
+      curStdDevSynthesisRateTraces <- tempEnv$paramBase$stdDevSynthesisRateTraces
+      curStdDevSynthesisRateAcceptanceRatioTrace <- tempEnv$paramBase$stdDevSynthesisRateAcceptRatTrace
+      curSynthesisRateTrace <- tempEnv$paramBase$synthRateTrace
+      curSynthesisRateAcceptanceRatioTrace <- tempEnv$paramBase$synthAcceptRatTrace
+      curMixtureAssignmentTrace <- tempEnv$paramBase$mixAssignTrace
+      curMixtureProbabilitiesTrace <- tempEnv$paramBase$mixProbTrace
+      curCodonSpecificAcceptanceRatioTrace <- tempEnv$paramBase$codonSpecificAcceptRatTrace
+      
+      lastIteration <- lastIteration + tempEnv$paramBase$lastIteration
+      
+      
+      #assuming all checks have passed, time to concatanate traces
+      max <- tempEnv$paramBase$lastIteration + 1
+      for (mixture in 1:length(stdDevSynthesisRateTraces))
+      {
+        stdDevSynthesisRateTraces[[mixture]] <- c(stdDevSynthesisRateTraces[[mixture]], 
+                                      stdDevSynthesisRateTraces[[mixture]][2:max])
+      }
+      
+      stdDevSynthesisRateAcceptRatTrace <- c(stdDevSynthesisRateAcceptRatTrace, 
+                                      curStdDevSynthesisRateAcceptRatTrace[2:max])
+      #TODO: should this also be with 2:max?
+      
+      for (size in 1:length(synthesisRateTrace))
+      {
+        for (csp in 1:length(synthesisRateTrace[[size]]))
+        {
+          synthesisRateTrace[[size]][[csp]] <- c(synthesisRateTrace[[size]][[csp]], 
+                                      curSynthesisRateTrace[[size]][[csp]][2:max])
+        }
+      }
+      
+      for (size in 1:length(synthesisRateAcceptanceRatioTrace))
+      {
+        for (csp in 1:length(synthesisRateAcceptanceRatioTrace[[size]]))
+        {
+          synthesisRateAcceptanceRatioTrace[[size]][[csp]] <- 
+                                      c(synthesisRateAcceptanceRatioTrace[[size]][[csp]], 
+                                      curSynthesisRateAcceptanceRatioTrace[[size]][[csp]][2:max])
+        }
+      }
+      
+      for (size in 1:length(mixtureAssignmentTrace))
+      {
+        mixtureAssignmentTrace[[size]]<- c(mixtureAssignmentTrace[[size]], 
+                                      curMixtureAssignmentTrace[[size]][2:max])
+      }
+      
+      for (size in 1:length(mixtureProbabilitiesTrace))
+      {
+        mixtureProbabilitiesTrace[[size]]<- c(mixtureProbabilitiesTrace[[size]], 
+                                      curMixtureProbabilitiesTrace[[size]][2:max])
+      }
+      
+      for (size in 1:length(codonSpecificAcceptanceRatioTrace))
+      {
+        codonSpecificAcceptanceRatioTrace[[size]]<- c(codonSpecificAcceptanceRatioTrace[[size]], 
+                                      curCodonSpecificAcceptanceRatioTrace[[size]][2:max])
+      }
+    }
+  }
+  parameter$setCategories(categories)
+  parameter$setCategoriesForTrace()  
+  parameter$numMixtures <- numMix
+  parameter$numMutationCategories <- numMut
+  parameter$numSelectionCategories <- numSel
+  parameter$setMixtureAssignment(tempEnv$paramBase$curMixAssignment) #want the last in the file sequence
+  parameter$setLastIteration(lastIteration)
   
   trace <- parameter$getTraceObject()
-  trace$setStdDevSynthesisRateTraces(tempEnv$paramBase$stdDevSynthesisRateTraces)
-  trace$setStdDevSynthesisRateAcceptanceRatioTrace(tempEnv$paramBase$stdDevSynthesisRateAcceptRatTrace)
-  trace$setSynthesisRateTrace(tempEnv$paramBase$synthRateTrace)
-  trace$setSynthesisRateAcceptanceRatioTrace(tempEnv$paramBase$synthAcceptRatTrace)
-  trace$setMixtureAssignmentTrace(tempEnv$paramBase$mixAssignTrace)
-  trace$setMixtureProbabilitiesTrace(tempEnv$paramBase$mixProbTrace)
-  trace$setCodonSpecificAcceptanceRatioTrace(tempEnv$paramBase$codonSpecificAcceptRatTrace)
+  trace$setStdDevSynthesisRateTraces(stdDevSynthesisRateTraces)
+  trace$setStdDevSynthesisRateAcceptanceRatioTrace(stdDevSynthesisRateAcceptRatTrace)
+  trace$setSynthesisRateTrace(synthRateTrace)
+  trace$setSynthesisRateAcceptanceRatioTrace(synthAcceptRatTrace)
+  trace$setMixtureAssignmentTrace(mixAssignTrace)
+  trace$setMixtureProbabilitiesTrace(mixProbTrace)
+  trace$setCodonSpecificAcceptanceRatioTrace(codonSpecificAcceptRatTrace)
   
   parameter$setTraceObject(trace)
 }
 
 
 #Called from "loadParameterObject."
-loadROCParameterObject <- function(parameter, file)
+loadROCParameterObject <- function(parameter, files)
 {
-  tempEnv <- new.env();
-  load(file = file, envir = tempEnv)
+  setBaseInfo(parameter, files)
+  for (i in length(files)){
+    tempEnv <- new.env();
+    load(file = files[i], envir = tempEnv)
   
+    if (i == 1){
+      synthesisOffsetTrace <- tempEnv$synthesisOffsetTrace
+      synthesisOffsetAcceptanceRatioTrace <- tempEnv$synthesisOffsetAcceptRatTrace
+      observedSynthesisNoiseTrace <- tempEnv$observedSynthesisNoiseTrace
+      codonSpecificParameterTraceMut <- tempEnv$mutationTrace
+      codonSpecificParameterTraceSel <- tempEnv$selectionTrace
+    }else{
+      curSynthesisOffsetTrace <- tempEnv$synthesisOffsetTrace
+      curSynthesisOffsetAcceptanceRatioTrace <- tempEnv$synthesisOffsetAcceptRatTrace
+      curObservedSynthesisNoiseTrace <- tempEnv$observedSynthesisNoiseTrace
+      curCodonSpecificParameterTraceMut <- tempEnv$mutationTrace
+      curCodonSpecificParameterTraceSel <- tempEnv$selectionTrace
+      
+      max <- tempEnv$paramBase$lastIteration + 1
+      for (size in 1:length(synthesisOffsetTrace))
+      {
+        synthesisOffsetTrace[[size]]<- c(synthesisOffsetTrace[[size]], 
+                                         curSynthesisOffsetTrace[[size]][2:max])
+      }
+      
+      
+      for (size in 1:length(synthesisOffsetAcceptanceRatioTrace))
+      {
+        synthesisOffsetAcceptanceRatioTrace[[size]]<- c(synthesisOffsetAcceptanceRatioTrace[[size]], 
+                                        curSynthesisOffsetAcceptanceRatioTrace[[size]][2:max])
+      }
+      
+      for (size in 1:length(observedSynthesisNoiseTrace))
+      {
+        observedSynthesisNoiseTrace[[size]]<- c(observedSynthesisNoiseTrace[[size]], 
+                                                curObservedSynthesisNoiseTrace[[size]][2:max])
+      }
+      
+      for (size in 1:length(codonSpecificParameterTraceMut))
+      {
+        for (csp in 1:length(codonSpecificParameterTraceMut[[size]]))
+        {
+          codonSpecificParameterTraceMut[[size]][[csp]] <- 
+            c(codonSpecificParameterTraceMut[[size]][[csp]], 
+              curCodonSpecificParameterTraceMut[[size]][[csp]][2:max])
+        }
+      }
+      
+      for (size in 1:length(codonSpecificParameterTraceSel))
+      {
+        for (csp in 1:length(codonSpecificParameterTraceSel[[size]]))
+        {
+          codonSpecificParameterTraceSel[[size]][[csp]] <- 
+            c(codonSpecificParameterTraceSel[[size]][[csp]], 
+              curCodonSpecificParameterTraceSel[[size]][[csp]][2:max])
+        }
+      }
+      
+    }
+  }
   
-  setBaseInfo(parameter, file)
+  trace <- parameter$getTraceObject()
+  trace$setSynthesisOffsetTrace(synthesisOffsetTrace)
+  trace$setSynthesisOffsetAcceptanceRatioTrace(synthesisOffsetAcceptRatTrace)
+  trace$setObservedSynthesisNoiseTrace(observedSynthesisNoiseTrace)
+  trace$setCodonSpecificParameterTrace(codonSpecificParameterTraceMut, 0)
+  trace$setCodonSpecificParameterTrace(codonSpecificParameterTraceSel, 1)
+  
   parameter$currentMutationParameter <- tempEnv$currentMutation
   parameter$currentSelectionParameter <- tempEnv$currentSelection
   parameter$proposedMutationParameter <- tempEnv$proposedMutation
   parameter$proposedSelectionParameter <- tempEnv$proposedSelection
-  trace <- parameter$getTraceObject()
-  trace$setSynthesisOffsetTrace(tempEnv$synthesisOffsetTrace)
-  trace$setSynthesisOffsetAcceptanceRatioTrace(tempEnv$synthesisOffsetAcceptRatTrace)
-  trace$setObservedSynthesisNoiseTrace(tempEnv$observedSynthesisNoiseTrace)
-  trace$setCodonSpecificParameterTrace(tempEnv$mutationTrace, 0)
-  trace$setCodonSpecificParameterTrace(tempEnv$selectionTrace, 1)
-  
-  
   parameter$setTraceObject(trace)
   return(parameter) 
 }
 
 
 #Called from "loadParameterObject."
-loadRFPParameterObject <- function(parameter, file)
+loadRFPParameterObject <- function(parameter, files)
 {
+  setBaseInfo(parameter, files)
   tempEnv <- new.env();
-  load(file = file, envir = tempEnv)
+  load(file = files[i], envir = tempEnv)
   
-  setBaseInfo(parameter, file)
   parameter$currentAlphaParameter <- tempEnv$currentAlpha
   parameter$proposedAlphaParameter <- tempEnv$proposedAlpha
   parameter$currentLambdaPrimeParameter <- tempEnv$currentLambdaPrime

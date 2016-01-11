@@ -1900,6 +1900,12 @@ void Parameter::setCategories(std::vector<std::vector<unsigned>> _categories)
 }
 
 
+void Parameter::setCategoriesForTrace()
+{
+	traces.setCategories(categories);
+}
+
+
 void Parameter::setNumMutationCategories(unsigned _numMutationCategories)
 {
 	numMutationCategories = _numMutationCategories;
