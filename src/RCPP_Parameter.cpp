@@ -30,6 +30,7 @@ RCPP_MODULE(Parameter_mod)
 		.method("getSynthesisRateCategoryForMixture", &Parameter::getSynthesisRateCategoryForMixture)
 		.method("getCategories", &Parameter::getCategories)
         .method("setCategories", &Parameter::setCategories)
+        .method("setCategoriesForTrace", &Parameter::setCategoriesForTrace)
 		//setNumMutationCategories and setNumSelectionCategories are taken care of in the
 		//properties section below.
 

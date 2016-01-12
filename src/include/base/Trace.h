@@ -17,8 +17,9 @@ class Trace {
 private:
     
     
-		std::vector<std::vector<double>> stdDevSynthesisRateTrace; //samples
-		std::vector<double> stdDevSynthesisRateAcceptanceRatioTrace; //samples
+		std::vector<std::vector<double>> stdDevSynthesisRateTrace; //mixture, samples
+		std::vector<double> stdDevSynthesisRateAcceptanceRatioTrace; //samples TODO: Correctly sized for the time being,
+        //however, it will need to be changed at some point when there are some adjustments to hyper parameter acceptance/rejection
 		std::vector<std::vector<std::vector<double>>>synthesisRateAcceptanceRatioTrace; //order: expressionCategory, gene, sample
 		std::vector<std::vector<double>> codonSpecificAcceptanceRatioTrace;//order: codon, sample
 		std::vector<std::vector<std::vector<double>>> synthesisRateTrace;//order: expressioncategoy, gene, samples
@@ -168,6 +169,7 @@ public:
         void setMixtureAssignmentTrace(std::vector<std::vector<unsigned>> _mixtureAssignmentTrace);
         void setMixtureProbabilitiesTrace(std::vector<std::vector<double>> _mixtureProbabilitiesTrace);
         void setCodonSpecificAcceptanceRatioTrace(std::vector<std::vector<double>> _cspAcceptanceRatioTrace);
+        void setCategories(std::vector<mixtureDefinition> &_categories);
 
 
         //ROC Specific:
