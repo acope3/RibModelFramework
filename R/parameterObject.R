@@ -563,12 +563,17 @@ writeParameterObject.Rcpp_ROCParameter <- function(parameter, file){
   synthesisOffsetAcceptRatTrace <- trace$getSynthesisOffsetAcceptanceRatioTrace()
   synthesisOffsetTrace <- trace$getSynthesisOffsetTrace()
   observedSynthesisNoiseTrace <- trace$getObservedSynthesisNoiseTrace()
+  if (length(synthesisOffsetTrace) == 0){
+    withPhi = FALSE
+  }else{
+    withPhi = TRUE
+  }
   
   save(list = c("paramBase", "currentMutation", "currentSelection",
                 "proposedMutation", "proposedSelection", "model",  
                 "mutationPrior", "mutationTrace", "selectionTrace", 
                 "synthesisOffsetAcceptRatTrace", "synthesisOffsetTrace", 
-                "observedSynthesisNoiseTrace"),
+                "observedSynthesisNoiseTrace", "withPhi"),
        file=file)
 }
 
@@ -625,25 +630,26 @@ writeParameterObject.Rcpp_FONSEParameter <- function(parameter, file)
 loadParameterObject <- function(files)
 {
   #A temporary env is set up to stop R errors.
-  for (i in length(files)){
+  firstModel <- "Invalid model"
+  for (i in 1:length(files)){
     tempEnv <- new.env();
     load(file = files[i], envir = tempEnv)
     if (i == 1){
-      model <- tempEnv$model
+      firstModel <- tempEnv$model
     }else{
-      if (model != tempEnv$model){
+      if (firstModel != tempEnv$model){
         stop("The models do not match between files")
-      }
-    }
-  }
+      }#end of error check
+    }#end of if-else
+  }#end of for
   
-  if (model == "ROC"){
+  if (firstModel == "ROC"){
     parameter <- new(ROCParameter)
     parameter <- loadROCParameterObject(parameter, files)
-  }else if (model == "RFP") {
+  }else if (firstModel == "RFP") {
     parameter <- new(RFPParameter)
     parameter <- loadRFPParameterObject(parameter, files)
-  }else if (model == "FONSE") {
+  }else if (firstModel == "FONSE") {
     parameter <- new(FONSEParameter)
     parameter <- loadFONSEParameterObject(parameter, files)
   }else{
@@ -658,9 +664,10 @@ setBaseInfo <- function(parameter, files)
 {
   for (i in 1:length(files)) {
     tempEnv <- new.env();
+    load(file = files[i], envir = tempEnv)
     if (i == 1) {
-      load(file = files[i], envir = tempEnv)
       categories <- tempEnv$paramBase$categories
+      categories.matrix <- do.call("rbind", tempEnv$paramBase$categories)
       numMixtures <- tempEnv$paramBase$numMix
       numMutationCategories <- tempEnv$paramBase$numMut
       numSelectionCategories <- tempEnv$paramBase$numSel
@@ -675,18 +682,22 @@ setBaseInfo <- function(parameter, files)
       mixtureProbabilitiesTrace <- tempEnv$paramBase$mixProbTrace
       codonSpecificAcceptanceRatioTrace <- tempEnv$paramBase$codonSpecificAcceptRatTrace
     } else {
-      if (categories != tempEnv$paramBase$categories){
-        stop("categories is not the same between all files")
-      }
+      if (sum(categories.matrix != do.call("rbind", tempEnv$paramBase$categories)) != 0){
+          stop("categories is not the same between all files")
+      }#end of error check
+
       if (numMixtures != tempEnv$paramBase$numMix){
         stop("The number of mixtures is not the same between files")
       }
+      
       if (numMutationCategories != tempEnv$paramBase$numMut){
         stop("The number of mutation categories is not the same between files")
       }
+      
       if (numSelectionCategories != tempEnv$paramBase$numSel){
         stop("The number of selection categories is not the same between files")
       }
+      
       if (length(mixtureAssignment) != length(tempEnv$paramBase$curMixAssignment)){
         stop("The length of the mixture assignment is not the same between files. 
              Make sure the same genome is used on each run.")
@@ -708,11 +719,11 @@ setBaseInfo <- function(parameter, files)
       for (mixture in 1:length(stdDevSynthesisRateTraces))
       {
         stdDevSynthesisRateTraces[[mixture]] <- c(stdDevSynthesisRateTraces[[mixture]], 
-                                      stdDevSynthesisRateTraces[[mixture]][2:max])
+                                      curStdDevSynthesisRateTraces[[mixture]][2:max])
       }
       
-      stdDevSynthesisRateAcceptRatTrace <- c(stdDevSynthesisRateAcceptRatTrace, 
-                                      curStdDevSynthesisRateAcceptRatTrace[2:max])
+      stdDevSynthesisRateAcceptanceRatioTrace <- c(stdDevSynthesisRateAcceptanceRatioTrace, 
+                                      curStdDevSynthesisRateAcceptanceRatioTrace[2:max])
       #TODO: should this also be with 2:max?
       
       for (size in 1:length(synthesisRateTrace))
@@ -755,30 +766,31 @@ setBaseInfo <- function(parameter, files)
   }
   parameter$setCategories(categories)
   parameter$setCategoriesForTrace()  
-  parameter$numMixtures <- numMix
-  parameter$numMutationCategories <- numMut
-  parameter$numSelectionCategories <- numSel
+  parameter$numMixtures <- numMixtures
+  parameter$numMutationCategories <- numMutationCategories
+  parameter$numSelectionCategories <- numSelectionCategories
   parameter$setMixtureAssignment(tempEnv$paramBase$curMixAssignment) #want the last in the file sequence
   parameter$setLastIteration(lastIteration)
   
   trace <- parameter$getTraceObject()
   trace$setStdDevSynthesisRateTraces(stdDevSynthesisRateTraces)
-  trace$setStdDevSynthesisRateAcceptanceRatioTrace(stdDevSynthesisRateAcceptRatTrace)
-  trace$setSynthesisRateTrace(synthRateTrace)
-  trace$setSynthesisRateAcceptanceRatioTrace(synthAcceptRatTrace)
-  trace$setMixtureAssignmentTrace(mixAssignTrace)
-  trace$setMixtureProbabilitiesTrace(mixProbTrace)
-  trace$setCodonSpecificAcceptanceRatioTrace(codonSpecificAcceptRatTrace)
+  trace$setStdDevSynthesisRateAcceptanceRatioTrace(stdDevSynthesisRateAcceptanceRatioTrace)
+  trace$setSynthesisRateTrace(synthesisRateTrace)
+  trace$setSynthesisRateAcceptanceRatioTrace(synthesisRateAcceptanceRatioTrace)
+  trace$setMixtureAssignmentTrace(mixtureAssignmentTrace)
+  trace$setMixtureProbabilitiesTrace(mixtureProbabilitiesTrace)
+  trace$setCodonSpecificAcceptanceRatioTrace(codonSpecificAcceptanceRatioTrace)
   
   parameter$setTraceObject(trace)
+  return(parameter)
 }
 
 
 #Called from "loadParameterObject."
 loadROCParameterObject <- function(parameter, files)
 {
-  setBaseInfo(parameter, files)
-  for (i in length(files)){
+  parameter <- setBaseInfo(parameter, files)
+  for (i in 1:length(files)){
     tempEnv <- new.env();
     load(file = files[i], envir = tempEnv)
   
@@ -788,33 +800,28 @@ loadROCParameterObject <- function(parameter, files)
       observedSynthesisNoiseTrace <- tempEnv$observedSynthesisNoiseTrace
       codonSpecificParameterTraceMut <- tempEnv$mutationTrace
       codonSpecificParameterTraceSel <- tempEnv$selectionTrace
+      withPhi <- tempEnv$withPhi
     }else{
       curSynthesisOffsetTrace <- tempEnv$synthesisOffsetTrace
       curSynthesisOffsetAcceptanceRatioTrace <- tempEnv$synthesisOffsetAcceptRatTrace
       curObservedSynthesisNoiseTrace <- tempEnv$observedSynthesisNoiseTrace
       curCodonSpecificParameterTraceMut <- tempEnv$mutationTrace
       curCodonSpecificParameterTraceSel <- tempEnv$selectionTrace
+      if (withPhi != tempEnv$withPhi){
+        stop("Runs do not match in concern in with.phi")
+      }
       
       max <- tempEnv$paramBase$lastIteration + 1
-      for (size in 1:length(synthesisOffsetTrace))
-      {
-        synthesisOffsetTrace[[size]]<- c(synthesisOffsetTrace[[size]], 
-                                         curSynthesisOffsetTrace[[size]][2:max])
+      if (withPhi){
+        synthesisOffsetTrace <- combineTwoDimensionalTrace(synthesisOffsetTrace, curSynthesisOffsetTrace, max)
+        synthesisOffsetAcceptanceRatioTrace <- combineTwoDimensionalTrace(synthesisOffsetAcceptanceRatioTrace, curSynthesisOffsetAcceptanceRatioTrace, max)
+      
+        for (size in 1:length(observedSynthesisNoiseTrace))
+        {
+          observedSynthesisNoiseTrace[[size]]<- c(observedSynthesisNoiseTrace[[size]], 
+                                                  curObservedSynthesisNoiseTrace[[size]][2:max])
+        }#end of for
       }
-      
-      
-      for (size in 1:length(synthesisOffsetAcceptanceRatioTrace))
-      {
-        synthesisOffsetAcceptanceRatioTrace[[size]]<- c(synthesisOffsetAcceptanceRatioTrace[[size]], 
-                                        curSynthesisOffsetAcceptanceRatioTrace[[size]][2:max])
-      }
-      
-      for (size in 1:length(observedSynthesisNoiseTrace))
-      {
-        observedSynthesisNoiseTrace[[size]]<- c(observedSynthesisNoiseTrace[[size]], 
-                                                curObservedSynthesisNoiseTrace[[size]][2:max])
-      }
-      
       for (size in 1:length(codonSpecificParameterTraceMut))
       {
         for (csp in 1:length(codonSpecificParameterTraceMut[[size]]))
@@ -823,7 +830,7 @@ loadROCParameterObject <- function(parameter, files)
             c(codonSpecificParameterTraceMut[[size]][[csp]], 
               curCodonSpecificParameterTraceMut[[size]][[csp]][2:max])
         }
-      }
+      }#end of for
       
       for (size in 1:length(codonSpecificParameterTraceSel))
       {
@@ -833,14 +840,14 @@ loadROCParameterObject <- function(parameter, files)
             c(codonSpecificParameterTraceSel[[size]][[csp]], 
               curCodonSpecificParameterTraceSel[[size]][[csp]][2:max])
         }
-      }
+      }#end of for
       
-    }
-  }
+    }#end of if-else
+  }#end of for loop (files)
   
   trace <- parameter$getTraceObject()
   trace$setSynthesisOffsetTrace(synthesisOffsetTrace)
-  trace$setSynthesisOffsetAcceptanceRatioTrace(synthesisOffsetAcceptRatTrace)
+  trace$setSynthesisOffsetAcceptanceRatioTrace(synthesisOffsetAcceptanceRatioTrace)
   trace$setObservedSynthesisNoiseTrace(observedSynthesisNoiseTrace)
   trace$setCodonSpecificParameterTrace(codonSpecificParameterTraceMut, 0)
   trace$setCodonSpecificParameterTrace(codonSpecificParameterTraceSel, 1)
@@ -879,4 +886,13 @@ loadRFPParameterObject <- function(parameter, files)
 loadFONSEParameterObject <- function(parameter, file)
 {
  #TODO: 
+}
+
+
+combineTwoDimensionalTrace <- function(trace1, trace2, max){
+  for (size in 1:length(trace1))
+  {
+    trace1[[size]]<- c(trace1[[size]], trace2[[size]][2:max])
+  }
+  return(trace1)
 }
