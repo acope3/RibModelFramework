@@ -716,52 +716,18 @@ setBaseInfo <- function(parameter, files)
       
       #assuming all checks have passed, time to concatanate traces
       max <- tempEnv$paramBase$lastIteration + 1
-      for (mixture in 1:length(stdDevSynthesisRateTraces))
-      {
-        stdDevSynthesisRateTraces[[mixture]] <- c(stdDevSynthesisRateTraces[[mixture]], 
-                                      curStdDevSynthesisRateTraces[[mixture]][2:max])
-      }
-      
+      stdDevSynthesisRateTraces <- combineTwoDimensionalTrace(stdDevSynthesisRateTraces, curStdDevSynthesisRateTraces, max)
+
       stdDevSynthesisRateAcceptanceRatioTrace <- c(stdDevSynthesisRateAcceptanceRatioTrace, 
                                       curStdDevSynthesisRateAcceptanceRatioTrace[2:max])
-      #TODO: should this also be with 2:max?
+
       
-      for (size in 1:length(synthesisRateTrace))
-      {
-        for (csp in 1:length(synthesisRateTrace[[size]]))
-        {
-          synthesisRateTrace[[size]][[csp]] <- c(synthesisRateTrace[[size]][[csp]], 
-                                      curSynthesisRateTrace[[size]][[csp]][2:max])
-        }
-      }
+      synthesisRateTrace <- combineThreeDimensionalTrace(synthesisRateTrace, curSynthesisRateTrace, max)
+      synthesisRateAcceptanceRatioTrace <- combineThreeDimensionalTrace(synthesisRateAcceptanceRatioTrace, curSynthesisRateAcceptanceRatioTrace, max)
       
-      for (size in 1:length(synthesisRateAcceptanceRatioTrace))
-      {
-        for (csp in 1:length(synthesisRateAcceptanceRatioTrace[[size]]))
-        {
-          synthesisRateAcceptanceRatioTrace[[size]][[csp]] <- 
-                                      c(synthesisRateAcceptanceRatioTrace[[size]][[csp]], 
-                                      curSynthesisRateAcceptanceRatioTrace[[size]][[csp]][2:max])
-        }
-      }
-      
-      for (size in 1:length(mixtureAssignmentTrace))
-      {
-        mixtureAssignmentTrace[[size]]<- c(mixtureAssignmentTrace[[size]], 
-                                      curMixtureAssignmentTrace[[size]][2:max])
-      }
-      
-      for (size in 1:length(mixtureProbabilitiesTrace))
-      {
-        mixtureProbabilitiesTrace[[size]]<- c(mixtureProbabilitiesTrace[[size]], 
-                                      curMixtureProbabilitiesTrace[[size]][2:max])
-      }
-      
-      for (size in 1:length(codonSpecificAcceptanceRatioTrace))
-      {
-        codonSpecificAcceptanceRatioTrace[[size]]<- c(codonSpecificAcceptanceRatioTrace[[size]], 
-                                      curCodonSpecificAcceptanceRatioTrace[[size]][2:max])
-      }
+      mixtureAssignmentTrace <- combineTwoDimensionalTrace(mixtureAssignmentTrace, curMixtureAssignmentTrace, max)
+      mixtureProbabilitiesTrace <- combineTwoDimensionalTrace(mixtureProbabilitiesTrace, curMixtureProbabilitiesTrace, max)
+      codonSpecificAcceptanceRatioTrace <- combineTwoDimensionalTrace(codonSpecificAcceptanceRatioTrace, curCodonSpecificAcceptanceRatioTrace, max)
     }
   }
   parameter$setCategories(categories)
@@ -815,33 +781,11 @@ loadROCParameterObject <- function(parameter, files)
       if (withPhi){
         synthesisOffsetTrace <- combineTwoDimensionalTrace(synthesisOffsetTrace, curSynthesisOffsetTrace, max)
         synthesisOffsetAcceptanceRatioTrace <- combineTwoDimensionalTrace(synthesisOffsetAcceptanceRatioTrace, curSynthesisOffsetAcceptanceRatioTrace, max)
-      
-        for (size in 1:length(observedSynthesisNoiseTrace))
-        {
-          observedSynthesisNoiseTrace[[size]]<- c(observedSynthesisNoiseTrace[[size]], 
-                                                  curObservedSynthesisNoiseTrace[[size]][2:max])
-        }#end of for
+        observedSynthesisNoiseTrace <- combineTwoDimensionalTrace(observedSynthesisNoiseTrace, curObservedSynthesisNoiseTrace, max)
       }
-      for (size in 1:length(codonSpecificParameterTraceMut))
-      {
-        for (csp in 1:length(codonSpecificParameterTraceMut[[size]]))
-        {
-          codonSpecificParameterTraceMut[[size]][[csp]] <- 
-            c(codonSpecificParameterTraceMut[[size]][[csp]], 
-              curCodonSpecificParameterTraceMut[[size]][[csp]][2:max])
-        }
-      }#end of for
       
-      for (size in 1:length(codonSpecificParameterTraceSel))
-      {
-        for (csp in 1:length(codonSpecificParameterTraceSel[[size]]))
-        {
-          codonSpecificParameterTraceSel[[size]][[csp]] <- 
-            c(codonSpecificParameterTraceSel[[size]][[csp]], 
-              curCodonSpecificParameterTraceSel[[size]][[csp]][2:max])
-        }
-      }#end of for
-      
+      codonSpecificParameterTraceMut <- combineThreeDimensionalTrace(codonSpecificParameterTraceMut, curCodonSpecificParameterTraceMut, max)
+      codonSpecificParameterTraceSel <- combineThreeDimensionalTrace(codonSpecificParameterTraceSel, curCodonSpecificParameterTraceSel, max)
     }#end of if-else
   }#end of for loop (files)
   
@@ -864,15 +808,30 @@ loadROCParameterObject <- function(parameter, files)
 #Called from "loadParameterObject."
 loadRFPParameterObject <- function(parameter, files)
 {
-  setBaseInfo(parameter, files)
-  tempEnv <- new.env();
-  load(file = files[i], envir = tempEnv)
+  parameter <- setBaseInfo(parameter, files)
+  
+  for (i in 1:length(files)){
+    tempEnv <- new.env();
+    load(file = files[i], envir = tempEnv)
+  
+    if (i == 1){
+      alphaTrace <- tempEnv$alphaTrace
+      lambdaPrimeTrace <- tempEnv$lambdaPrimeTrace
+    }else{
+      max <- tempEnv$paramBase$lastIteration + 1
+      curAlphaTrace <- tempEnv$alphaTrace
+      curLambdaPrimeTrace <- tempEnv$lambdaPrimeTrace
+      
+      alphaTrace <- combineThreeDimensionalTrace(alphaTrace, curAlphaTrace, max)
+      lambdaPrimeTrace <- combineThreeDimensionalTrace(lambdaPrimeTrace, curLambdaPrimeTrace, max)
+    }
+  }#end of for loop (files)
+  
   
   parameter$currentAlphaParameter <- tempEnv$currentAlpha
   parameter$proposedAlphaParameter <- tempEnv$proposedAlpha
   parameter$currentLambdaPrimeParameter <- tempEnv$currentLambdaPrime
   parameter$proposedLambdaPrimeParameter <- tempEnv$proposedLambdaPrime
-  
   trace <- parameter$getTraceObject()
   trace$setCodonSpecificParameterTrace(tempEnv$alphaTrace, 0)
   trace$setCodonSpecificParameterTrace(tempEnv$lambdaPrimeTrace, 1)
@@ -894,5 +853,18 @@ combineTwoDimensionalTrace <- function(trace1, trace2, max){
   {
     trace1[[size]]<- c(trace1[[size]], trace2[[size]][2:max])
   }
+  return(trace1)
+}
+
+
+combineThreeDimensionalTrace <- function(trace1, trace2, max){
+  
+  for (size in 1:length(trace1)){
+    for (sizeTwo in 1:length(trace1[[size]])){
+      trace1[[size]][[sizeTwo]] <- c(trace1[[size]][[sizeTwo]], 
+                          trace2[[size]][[sizeTwo]][2:max])
+    }
+  }
+  
   return(trace1)
 }
