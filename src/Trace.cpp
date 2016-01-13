@@ -19,6 +19,7 @@ Trace::Trace()
 	categories = 0;
 	numCodonSpecificParamTypes = 2;
 	codonSpecificParameterTrace.resize(numCodonSpecificParamTypes);
+	categories = nullptr;
 	// TODO: fill this
 }
 
