@@ -18,14 +18,8 @@ class FONSEParameter : public Parameter
 {
 	private:
 
-		std::vector <std::vector <double> > proposedMutationParameter;
-		std::vector <std::vector <double> > currentMutationParameter;
-		std::vector <std::vector <double> > proposedSelectionParameter;
-		std::vector <std::vector <double> > currentSelectionParameter;
 		double bias_csp;
 		double mutation_prior_sd;
-
-
 
 		std::vector <double> propose(std::vector <double> currentParam, double(*proposal)(double a, double b), double A, std::vector <double> B);
 

@@ -53,12 +53,6 @@ FONSEParameter& FONSEParameter::operator=(const FONSEParameter& rhs)
 
 	mutation_prior_sd = rhs.mutation_prior_sd;
 
-	currentMutationParameter = rhs.currentMutationParameter;
-	proposedMutationParameter = rhs.proposedMutationParameter;
-
-	currentSelectionParameter = rhs.currentSelectionParameter;
-	proposedSelectionParameter = rhs.proposedSelectionParameter;
-
 	return *this;
 }
 
@@ -69,13 +63,6 @@ FONSEParameter::FONSEParameter(const FONSEParameter &other) : Parameter(other)
 	std_csp = other.std_csp;
 
 	mutation_prior_sd = other.mutation_prior_sd;
-
-	currentMutationParameter = other.currentMutationParameter;
-	proposedMutationParameter = other.proposedMutationParameter;
-
-	currentSelectionParameter = other.currentSelectionParameter;
-	proposedSelectionParameter = other.proposedSelectionParameter;
-
 
 }
 
@@ -102,24 +89,28 @@ void FONSEParameter::initFONSEParameterSet()
 	bias_csp = 0;
 	std_csp.resize(numParam, 0.1);
 	//may need getter fcts
-	currentMutationParameter.resize(numMutationCategories);
-	proposedMutationParameter.resize(numMutationCategories);
+
+	currentCodonSpecificParameter.resize(2);
+	proposedCodonSpecificParameter.resize(2);
+
+	currentCodonSpecificParameter[dM].resize(numMutationCategories);
+	proposedCodonSpecificParameter[dM].resize(numMutationCategories);
 
 	for (unsigned i = 0u; i < numMutationCategories; i++)
 	{
 		std::vector<double> tmp(numParam, 0.0);
-		currentMutationParameter[i] = tmp;
-		proposedMutationParameter[i] = tmp;
+		currentCodonSpecificParameter[dM][i] = tmp;
+		proposedCodonSpecificParameter[dM][i] = tmp;
 	}
 
-	currentSelectionParameter.resize(numSelectionCategories);
-	proposedSelectionParameter.resize(numSelectionCategories);
+	currentCodonSpecificParameter[dOmega].resize(numSelectionCategories);
+	proposedCodonSpecificParameter[dOmega].resize(numSelectionCategories);
 
 	for (unsigned i = 0u; i < numSelectionCategories; i++)
 	{
 		std::vector<double> tmp(numParam, 0.0);
-		proposedSelectionParameter[i] = tmp;
-		currentSelectionParameter[i] = tmp;
+		proposedCodonSpecificParameter[dOmega][i] = tmp;
+		currentCodonSpecificParameter[dOmega][i] = tmp;
 	}
 
 	for (unsigned i = 0; i < maxGrouping; i++)
@@ -186,7 +177,7 @@ void FONSEParameter::initFONSEValuesFromFile(std::string filename)
 			{
 				if (tmp == "***")
 				{
-					currentMutationParameter.resize(currentMutationParameter.size() + 1);
+					currentCodonSpecificParameter[dM].resize(currentCodonSpecificParameter[dM].size() + 1);
 					cat++;
 				}
 				else if (tmp == "\n")
@@ -197,7 +188,7 @@ void FONSEParameter::initFONSEValuesFromFile(std::string filename)
 					iss.str(tmp);
 					while (iss >> val)
 					{
-						currentMutationParameter[cat - 1].push_back(val);
+						currentCodonSpecificParameter[dM][cat - 1].push_back(val);
 					}
 				}
 			}
@@ -205,7 +196,7 @@ void FONSEParameter::initFONSEValuesFromFile(std::string filename)
 			{
 				if (tmp == "***")
 				{
-					currentSelectionParameter.resize(currentSelectionParameter.size() + 1);
+					currentCodonSpecificParameter[dOmega].resize(currentCodonSpecificParameter[dOmega].size() + 1);
 					cat++;
 				}
 				else if (tmp == "\n")
@@ -216,7 +207,7 @@ void FONSEParameter::initFONSEValuesFromFile(std::string filename)
 					iss.str(tmp);
 					while (iss >> val)
 					{
-						currentSelectionParameter[cat - 1].push_back(val);
+						currentCodonSpecificParameter[dOmega][cat - 1].push_back(val);
 					}
 				}
 			}
@@ -254,15 +245,15 @@ void FONSEParameter::initFONSEValuesFromFile(std::string filename)
 
 	//init other values
 	bias_csp = 0;
-	proposedMutationParameter.resize(numMutationCategories);
-	proposedSelectionParameter.resize(numSelectionCategories);
+	proposedCodonSpecificParameter[dM].resize(numMutationCategories);
+	proposedCodonSpecificParameter[dOmega].resize(numSelectionCategories);
 	for (unsigned i = 0; i < numMutationCategories; i++)
 	{
-		proposedMutationParameter[i] = currentMutationParameter[i];
+		proposedCodonSpecificParameter[dM][i] = currentCodonSpecificParameter[dM][i];
 	}
 	for (unsigned i = 0; i < numSelectionCategories; i++)
 	{
-		proposedSelectionParameter[i] = currentSelectionParameter[i];
+		proposedCodonSpecificParameter[dOmega][i] = currentCodonSpecificParameter[dOmega][i];
 	}
 
 	groupList = { "A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "P", "Q", "R", "S", "T", "V", "Y", "Z" };
@@ -300,12 +291,12 @@ void FONSEParameter::writeFONSERestartFile(std::string filename)
             oss << " ";
     }
     oss << ">currentMutationParameter:\n";
-    for (unsigned i = 0; i < currentMutationParameter.size(); i++)
+    for (unsigned i = 0; i < currentCodonSpecificParameter[dM].size(); i++)
     {
         oss << "***\n";
-        for (j = 0; j < currentMutationParameter[i].size(); j++)
+        for (j = 0; j < currentCodonSpecificParameter[dM][i].size(); j++)
         {
-            oss << currentMutationParameter[i][j];
+            oss << currentCodonSpecificParameter[dM][i][j];
             if ((j + 1) % 10 == 0)
                 oss << "\n";
             else
@@ -316,12 +307,12 @@ void FONSEParameter::writeFONSERestartFile(std::string filename)
     }
     
     oss << ">currentSelectionParameter:\n";
-    for (unsigned i = 0; i < currentSelectionParameter.size(); i++)
+    for (unsigned i = 0; i < currentCodonSpecificParameter[dOmega].size(); i++)
     {
         oss << "***\n";
-        for (j = 0; j < currentSelectionParameter[i].size(); j++)
+        for (j = 0; j < currentCodonSpecificParameter[dOmega][i].size(); j++)
         {
-            oss << currentSelectionParameter[i][j];
+            oss << currentCodonSpecificParameter[dOmega][i][j];
             if ((j + 1) % 10 == 0)
                 oss << "\n";
             else
@@ -391,8 +382,8 @@ void FONSEParameter::initMutationCategories(std::vector<std::string> files, unsi
             //std::cout << tmp.substr(pos + 1, pos2 - pos - 1 ) <<"\n";
             double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
             
-            currentMutationParameter[category][codonIndex] = value;
-            proposedMutationParameter[category][codonIndex] = value;
+            currentCodonSpecificParameter[dM][category][codonIndex] = value;
+            proposedCodonSpecificParameter[dM][category][codonIndex] = value;
         }
         currentFile.close();
     } //END OF A CATEGORY/FILE
@@ -427,8 +418,8 @@ void FONSEParameter::initSelectionCategories(std::vector<std::string> files, uns
             //	std::cout << tmp.substr(pos + 1, pos2 - pos - 1 ) <<"\n";
             double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
             
-            currentSelectionParameter[category][codonIndex] = value;
-            proposedSelectionParameter[category][codonIndex] = value;
+            currentCodonSpecificParameter[dOmega][category][codonIndex] = value;
+            proposedCodonSpecificParameter[dOmega][category][codonIndex] = value;
         }
         currentFile.close();
     } //END OF A CATEGORY/FILE
@@ -446,8 +437,8 @@ void FONSEParameter::initSelectionCategories(std::vector<std::string> files, uns
 
 void FONSEParameter::updateCodonSpecificParameterTrace(unsigned sample, std::string grouping)
 {
-	traces.updateCodonSpecificParameterTraceForAA(sample, grouping, currentMutationParameter, dM);
-	traces.updateCodonSpecificParameterTraceForAA(sample, grouping, currentSelectionParameter, dOmega);
+	traces.updateCodonSpecificParameterTraceForAA(sample, grouping, currentCodonSpecificParameter[dM], dM);
+	traces.updateCodonSpecificParameterTraceForAA(sample, grouping, currentCodonSpecificParameter[dOmega], dOmega);
 }
 
 
@@ -499,14 +490,14 @@ void FONSEParameter::proposeCodonSpecificParameter()
         {
             for (unsigned j = i * numCodons, l = aaStart; j < (i * numCodons) + numCodons; j++, l++)
             {
-                proposedMutationParameter[i][l] = currentMutationParameter[i][l] + covaryingNums[j];
+                proposedCodonSpecificParameter[dM][i][l] = currentCodonSpecificParameter[dM][i][l] + covaryingNums[j];
             }
         }
         for (unsigned i = 0; i < numSelectionCategories; i++)
         {
             for (unsigned j = i * numCodons, l = aaStart; j < (i * numCodons) + numCodons; j++, l++)
             {
-                proposedSelectionParameter[i][l] = currentSelectionParameter[i][l]
+                proposedCodonSpecificParameter[dOmega][i][l] = currentCodonSpecificParameter[dOmega][i][l]
                 + covaryingNums[(numMutationCategories * numCodons) + j];
             }
         }
@@ -526,14 +517,14 @@ void FONSEParameter::updateCodonSpecificParameter(std::string grouping)
     {
         for (unsigned i = aaStart; i < aaEnd; i++)
         {
-            currentMutationParameter[k][i] = proposedMutationParameter[k][i];
+            currentCodonSpecificParameter[dM][k][i] = proposedCodonSpecificParameter[dM][k][i];
         }
     }
     for (unsigned k = 0u; k < numSelectionCategories; k++)
     {
         for (unsigned i = aaStart; i < aaEnd; i++)
         {
-            currentSelectionParameter[k][i] = proposedSelectionParameter[k][i];
+            currentCodonSpecificParameter[dOmega][k][i] = proposedCodonSpecificParameter[dOmega][k][i];
         }
     }
 }
@@ -548,17 +539,17 @@ void FONSEParameter::getParameterForCategory(unsigned category, unsigned paramTy
     std::vector<double> *tempSet;
     if (paramType == FONSEParameter::dM)
     {
-        tempSet = (proposal ? &proposedMutationParameter[category] : &currentMutationParameter[category]);
+        tempSet = (proposal ? &proposedCodonSpecificParameter[dM][category] : &currentCodonSpecificParameter[dM][category]);
     }
     else if (paramType == FONSEParameter::dOmega)
     {
-        tempSet = (proposal ? &proposedSelectionParameter[category] : &currentSelectionParameter[category]);
+        tempSet = (proposal ? &proposedCodonSpecificParameter[dOmega][category] : &currentCodonSpecificParameter[dOmega][category]);
     }
     else
     {
         std::cerr << "Warning in FONSEParameter::getParameterForCategory: Unknown parameter type: " << paramType << "\n";
         std::cerr << "\tReturning mutation parameter! \n";
-        tempSet = (proposal ? &proposedMutationParameter[category] : &currentMutationParameter[category]);
+        tempSet = (proposal ? &proposedCodonSpecificParameter[dM][category] : &currentCodonSpecificParameter[dM][category]);
     }
 	unsigned aaStart;
 	unsigned aaEnd;
@@ -681,7 +672,7 @@ void FONSEParameter::initMutation(std::vector<double> mutationValues, unsigned m
 	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
         for (unsigned i = aaStart, j = 0; i < aaEnd; i++, j++)
         {
-            currentMutationParameter[category][i] = mutationValues[j];
+            currentCodonSpecificParameter[dM][category][i] = mutationValues[j];
         }
     }
 }
@@ -704,7 +695,7 @@ void FONSEParameter::initSelection(std::vector<double> selectionValues, unsigned
 	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
         for (unsigned i = aaStart, j = 0; i < aaEnd; i++, j++)
         {
-            currentSelectionParameter[category][i] = selectionValues[j];
+            currentCodonSpecificParameter[dOmega][category][i] = selectionValues[j];
         }
     }
 }
@@ -717,13 +708,13 @@ void FONSEParameter::initSelection(std::vector<double> selectionValues, unsigned
 
 std::vector< std::vector <double> > FONSEParameter::getCurrentMutationParameter()
 {
-    return currentMutationParameter;
+    return currentCodonSpecificParameter[dM];
 }
 
 
 std::vector< std::vector <double> > FONSEParameter::getCurrentSelectionParameter()
 {
-    return currentSelectionParameter;
+    return currentCodonSpecificParameter[dOmega];
 }
 
 #endif

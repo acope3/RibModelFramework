@@ -17,6 +17,8 @@ using namespace Rcpp;
 Trace::Trace()
 {
 	categories = 0;
+	numCodonSpecificParamTypes = 2;
+	codonSpecificParameterTrace.resize(numCodonSpecificParamTypes);
 	// TODO: fill this
 }
 
@@ -25,7 +27,12 @@ Trace::~Trace()
 	//dtor
 }
 
-
+Trace::Trace(unsigned _numCodonSpecificParamTypes)
+{
+	categories = 0;
+	numCodonSpecificParamTypes = _numCodonSpecificParamTypes;
+	codonSpecificParameterTrace.resize(numCodonSpecificParamTypes);
+}
 
 
 //-----------------------------------------------------//
@@ -42,6 +49,7 @@ void Trace::initializeSharedTraces(unsigned samples, unsigned num_genes, unsigne
 	std::cout << "maxGrouping: " << maxGrouping << "\n";
 #endif
 	//numSelectionCategories always == numSynthesisRateCategories, so only one is passed in for convience
+	
 	initStdDevSynthesisRateTrace(numSelectionCategories, samples);
 	initSynthesisRateAcceptanceRatioTrace(num_genes, numSelectionCategories);
 	codonSpecificAcceptanceRatioTrace.resize(maxGrouping);
@@ -128,6 +136,8 @@ void Trace::initCodonSpecificParameterTrace(unsigned samples, unsigned numCatego
 
 
 	//TODO: R output for error message here
+	codonSpecificParameterTrace[paramType] = tmp;
+	/*
 	switch (paramType) {
 	case 0:
 		codonSpecificParameterTraceOne = tmp;
@@ -139,6 +149,7 @@ void Trace::initCodonSpecificParameterTrace(unsigned samples, unsigned numCatego
 		std::cerr << "Invalid paramType given, codon specific parameter trace not initialized.\n";
 		break;
 	}
+	*/
 }
 
 
@@ -184,8 +195,9 @@ void Trace::initializeRFPTrace(unsigned samples, unsigned num_genes, unsigned nu
 {
 	initializeSharedTraces(samples, num_genes, numLambdaPrimeCategories, numMixtures,
 		_categories, maxGrouping);
-	initCodonSpecificParameterTrace(samples, numAlphaCategories,  numParam, 0u);
-	initCodonSpecificParameterTrace(samples, numLambdaPrimeCategories, numParam, 1u);
+	// see initializeROCTrace for detailed comment
+	initCodonSpecificParameterTrace(samples, numAlphaCategories,  numParam, 0u); // alp
+	initCodonSpecificParameterTrace(samples, numLambdaPrimeCategories, numParam, 1u); // lmPri
 }
 
 
@@ -194,8 +206,11 @@ void Trace::initializeROCTrace(unsigned samples, unsigned num_genes, unsigned nu
 	unsigned maxGrouping, unsigned numObservedPhiSets)
 {
 	initializeSharedTraces(samples, num_genes, numSelectionCategories, numMixtures, _categories, maxGrouping);
-	initCodonSpecificParameterTrace(samples, numMutationCategories, numParam, 0u);
-	initCodonSpecificParameterTrace(samples, numSelectionCategories, numParam, 1u);
+	// The last argument specifies the codon specific parameter type (dM and dEta for ROC)
+	// You can check Parameter.cpp to check what the values of dM and dEta are.
+	// The constants aren't used here because they are not available to the Trace object.
+	initCodonSpecificParameterTrace(samples, numMutationCategories, numParam, 0u); // dM
+	initCodonSpecificParameterTrace(samples, numSelectionCategories, numParam, 1u); // dEta
 	initSynthesisOffsetTrace(samples, numObservedPhiSets);
 	initObservedSynthesisNoiseTrace(samples, numObservedPhiSets);
 }
@@ -205,10 +220,11 @@ void Trace::initializeFONSETrace(unsigned samples, unsigned num_genes, unsigned 
 	unsigned numSelectionCategories, unsigned numParam, unsigned numMixtures, 
 	std::vector<mixtureDefinition> &_categories, unsigned maxGrouping)
 {
+	// see initializeROCTrace for detailed comment
 	initializeSharedTraces(samples, num_genes, numSelectionCategories, numMixtures,
 		 _categories, maxGrouping);
-	initCodonSpecificParameterTrace(samples, numMutationCategories, numParam, 0u);
-	initCodonSpecificParameterTrace(samples, numSelectionCategories, numParam, 1u);
+	initCodonSpecificParameterTrace(samples, numMutationCategories, numParam, 0u); // dM
+	initCodonSpecificParameterTrace(samples, numSelectionCategories, numParam, 1u); // dOmega
 }
 
 void Trace::initializePANSETrace(unsigned samples, unsigned num_genes, unsigned numAlphaCategories,
@@ -342,7 +358,8 @@ std::vector<double> Trace::getCodonSpecificParameterTraceByMixtureElementForCodo
 	std::vector <double> rv;
 	unsigned codonIndex = SequenceSummary::codonToIndex(codon, true);
 	unsigned category = getCodonSpecificCategory(mixtureElement, paramType);
-
+	rv = codonSpecificParameterTrace[paramType][category][codonIndex];
+	/*
 	switch (paramType) {
 	case 0:
 		rv = codonSpecificParameterTraceOne[category][codonIndex];
@@ -354,6 +371,7 @@ std::vector<double> Trace::getCodonSpecificParameterTraceByMixtureElementForCodo
 		std::cerr << "Unknown Parameter type\n";
 		break;
 	}
+	*/
 	return rv;
 }
 
@@ -378,6 +396,7 @@ std::vector<double> Trace::getObservedSynthesisNoiseTrace(unsigned index)
 
 std::vector<std::vector<std::vector<double>>> Trace::getCodonSpecificParameterTrace(unsigned paramType)
 {
+	/*
 	std::vector<std::vector<std::vector<double>>> rv;
 	switch (paramType) {
 	case 0:
@@ -390,7 +409,8 @@ std::vector<std::vector<std::vector<double>>> Trace::getCodonSpecificParameterTr
 		std::cerr << "Unknown Parameter type\n";
 		break;
 	}
-	return rv;
+	*/
+	return codonSpecificParameterTrace[paramType];
 }
 
 
@@ -480,6 +500,14 @@ void Trace::updateCodonSpecificParameterTraceForAA(unsigned sample, std::string 
 	unsigned aaStart;
 	unsigned aaEnd;
 	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
+	for (unsigned category = 0; category < codonSpecificParameterTrace[paramType].size(); category++)
+	{
+		for (unsigned i = aaStart; i < aaEnd; i++)
+		{
+			codonSpecificParameterTrace[paramType][category][i][sample] = curParam[category][i];
+		}
+	}
+	/*
 	switch (paramType) {
 	case 0: 
 		for (unsigned category = 0; category < codonSpecificParameterTraceOne.size(); category++)
@@ -503,6 +531,7 @@ void Trace::updateCodonSpecificParameterTraceForAA(unsigned sample, std::string 
 		std::cerr << "Unknown parameter type\n";
 		break;
 	}
+	*/
 }
 
 
@@ -525,7 +554,7 @@ void Trace::updateObservedSynthesisNoiseTrace(unsigned index, unsigned sample, d
 
 
 //-------------------------------------//
-//---------- RFP Specficific ----------//
+//---------- RFP Specific -------------//
 //-------------------------------------//
 
 
@@ -533,6 +562,12 @@ void Trace::updateCodonSpecificParameterTraceForCodon(unsigned sample, std::stri
 				std::vector<std::vector<double>> &curParam, unsigned paramType)
 {
 	unsigned i = SequenceSummary::codonToIndex(codon);
+	for (unsigned category = 0; category < codonSpecificParameterTrace[paramType].size(); category++)
+	{
+		codonSpecificParameterTrace[paramType][category][i][sample] = curParam[category][i];
+	}
+
+	/*
 	switch (paramType)
 	{
 		case 0:
@@ -551,6 +586,7 @@ void Trace::updateCodonSpecificParameterTraceForCodon(unsigned sample, std::stri
 			std::cerr << "Unknown parameter type\n";
 			break;
 	}
+	*/
 
 }
 
@@ -728,6 +764,8 @@ void Trace::setObservedSynthesisNoiseTrace(std::vector<std::vector <double> > _O
 
 void Trace::setCodonSpecificParameterTrace(std::vector<std::vector<std::vector<double>>> _parameterTrace, unsigned paramType)
 {
+	codonSpecificParameterTrace[paramType] = _parameterTrace;
+	/*
 	switch (paramType) {
 	case 0:
 		codonSpecificParameterTraceOne = _parameterTrace;
@@ -739,6 +777,7 @@ void Trace::setCodonSpecificParameterTrace(std::vector<std::vector<std::vector<d
 		std::cerr << "Unknown parameter type.\n";
 		break;
 	}
+	*/
 }
 
 

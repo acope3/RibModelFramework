@@ -253,6 +253,8 @@ class Parameter {
 		std::vector<unsigned> numAcceptForCodonSpecificParameters;
 		std::string mutationSelectionState; //TODO: Probably needs to be renamed
 
+		std::vector<std::vector<std::vector<double>>> proposedCodonSpecificParameter;
+		std::vector<std::vector<std::vector<double>>> currentCodonSpecificParameter;
 
 		std::vector<unsigned> mixtureAssignment;
 		std::vector<std::string> groupList;

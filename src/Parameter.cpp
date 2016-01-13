@@ -100,6 +100,8 @@ Parameter& Parameter::operator=(const Parameter& rhs)
   	numMutationCategories = rhs.numMutationCategories;
   	numSelectionCategories = rhs.numSelectionCategories;
 
+	proposedCodonSpecificParameter = rhs.proposedCodonSpecificParameter;
+	currentCodonSpecificParameter = rhs.currentCodonSpecificParameter;
 
   	numMixtures = rhs.numMixtures;
 
