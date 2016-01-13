@@ -538,6 +538,27 @@ void FONSEParameter::updateCodonSpecificParameter(std::string grouping)
     }
 }
 
+
+
+
+
+// -------------------------------------//
+// ---------- Prior Functions ----------//
+// -------------------------------------//
+double FONSEParameter::getMutationPriorStandardDeviation()
+{
+	return mutation_prior_sd;
+}
+
+
+void FONSEParameter::setMutationPriorStandardDeviation(double _mutation_prior_sd)
+{
+	mutation_prior_sd = _mutation_prior_sd;
+}
+
+
+
+
 // -------------------------------------//
 // ---------- Other Functions ----------//
 // -------------------------------------//
@@ -726,4 +747,15 @@ std::vector< std::vector <double> > FONSEParameter::getCurrentSelectionParameter
     return currentSelectionParameter;
 }
 
+
+void FONSEParameter::setCurrentMutationParameter(std::vector<std::vector<double>> _currentMutationParameter)
+{
+	currentMutationParameter = _currentMutationParameter;
+}
+
+
+void FONSEParameter::setCurrentSelectionParameter(std::vector<std::vector<double>> _currentSelectionParameter)
+{
+	currentSelectionParameter = _currentSelectionParameter;
+}
 #endif
