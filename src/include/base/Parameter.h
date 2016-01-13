@@ -208,6 +208,7 @@ class Parameter {
 		unsigned getSynthesisRateCategoryForMixture(unsigned mixtureElement);
 		std::vector<std::vector<unsigned>> getCategories();
 		void setCategories(std::vector<std::vector<unsigned>> _categories);
+		void setCategoriesForTrace();
 		void setNumMutationCategories(unsigned _numMutationCategories);
 		void setNumSelectionCategories(unsigned _numSelectionCategories);
 

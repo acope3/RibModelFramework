@@ -205,14 +205,23 @@ writeMCMCObject <- function(mcmc, file){
 #' @details This MCMC object is not intended to be used to do another model fitting, only
 #' to graph the stored results.
 #' 
-loadMCMCObject <- function(file){
+loadMCMCObject <- function(files){
   mcmc <- new(MCMCAlgorithm)
-  tempEnv <- new.env();
-  load(file = file, envir = tempEnv)
-  mcmc$setSamples(tempEnv$samples)
-  mcmc$setThining(tempEnv$thining)
-  mcmc$setAdaptiveWidth(tempEnv$adaptiveWidth)
-  mcmc$setLogLikelihoodTrace(tempEnv$loglikeTrace)
+  samples <- 0
+  loglikeTrace <- numeric(0)
+  for (i in 1:length(files)){
+    tempEnv <- new.env();
+    load(file = files[i], envir = tempEnv)
+    samples <- samples + tempEnv$samples
+    max <- tempEnv$samples + 1
+    curLoglikelihoodTrace <- tempEnv$loglikeTrace
+    loglikeTrace <- c(loglikeTrace, curLoglikelihoodTrace[2:max])
+   }
+    mcmc$setSamples(samples)
+    mcmc$setThining(tempEnv$thining) #not needed?
+    mcmc$setAdaptiveWidth(tempEnv$adaptiveWidth) #not needed?
+    mcmc$setLogLikelihoodTrace(loglikeTrace)
+
   return(mcmc)
 }
 

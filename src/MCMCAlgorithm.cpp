@@ -102,7 +102,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			 => ln(f') = ln(c) + ln(f)
 			 => ln(P) = ln( Sum(p_i*f'(...)) )
 			 => ln(P) = ln(P') - ln(c)
-			 Note that we use invere sign because our values of ln(f) and ln(f') are negative.
+			 Note that we use the inverce sign because our values of ln(f) and ln(f') are negative.
 		 */
 
 		double maxValue = -1000000.0;
@@ -166,7 +166,8 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		{
 			unscaledLogProb_curr_singleMixture[k] -= maxValue;
 			//TODO compare log vs non log calculation!
-			probabilities[k] = std::log(model.getCategoryProbability(k)) + unscaledLogProb_curr_singleMixture[k];
+			//probabilities[k] = std::log(model.getCategoryProbability(k)) + unscaledLogProb_curr_singleMixture[k];
+			probabilities[k] = model.getCategoryProbability(k) * unscaledLogProb_curr_singleMixture[k];
 			probabilities[k] = std::exp(probabilities[k]);
 			normalizingProbabilityConstant += probabilities[k];
 		}
@@ -202,7 +203,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		}
 
 		// Get category in which the gene is placed in.
-		// If we use multiple sequence observation (like different mutants) randMultinom needs an parameter N to place N observations in numMixture buckets
+		// If we use multiple sequence observation (like different mutants) randMultinom needs a parameter N to place N observations in numMixture buckets
 		unsigned categoryOfGene = Parameter::randMultinom(probabilities, numMixtures);
 		if(estimateMixtureAssignment)
 		{
@@ -236,6 +237,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		model.updateMixtureProbabilitiesTrace(iteration/thining);
 	}
 	delete[] dirichletParameters;
+	delete[] newMixtureProbabilities;
 	return logLikelihood;
 }
 
