@@ -163,6 +163,7 @@ RCPP_MODULE(Parameter_mod)
 
 
 		//Constructors & Destructors:
+		.constructor()
 		.constructor <std::string>()
 		.constructor <std::vector<double>, std::vector<unsigned>, std::vector<unsigned>, bool>()
 		.constructor <std::vector<double>, unsigned, std::vector<unsigned>, bool, std::string>()
@@ -174,6 +175,15 @@ RCPP_MODULE(Parameter_mod)
 		.method("getCovarianceMatrixForAA", &FONSEParameter::getCovarianceMatrixForAA) //Not an R wrapper
 		.method("initMutation", &FONSEParameter::initMutation)
 		.method("initSelection", &FONSEParameter::initSelection)
+
+
+		//Prior Functions:
+		.method("getMutationPriorStandardDeviation", &FONSEParameter::getMutationPriorStandardDeviation)
+		.method("setMutationPriorStandardDeviation", &FONSEParameter::setMutationPriorStandardDeviation)
+
+		.property("currentMutationParameter", &FONSEParameter::getCurrentMutationParameter, &FONSEParameter::setCurrentMutationParameter) //R Specific
+		.property("currentSelectionParameter", &FONSEParameter::getCurrentSelectionParameter, &FONSEParameter::setCurrentSelectionParameter) //R Specific
+		.property("mutation_prior_sd", &FONSEParameter::getMutationPriorStandardDeviation, &FONSEParameter::setMutationPriorStandardDeviation)
 		;
 }
 #endif

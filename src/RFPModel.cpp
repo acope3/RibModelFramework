@@ -374,7 +374,18 @@ void RFPModel::updateHyperParameterTraces(unsigned sample)
 
 void RFPModel::updateTracesWithInitialValues(Genome & genome)
 {
-	return; //TODO: fill in
+	std::vector <std::string> groupList = parameter->getGroupList();
+
+	for (unsigned i = 0; i < genome.getGenomeSize(); i++)
+	{
+		parameter->updateSynthesisRateTrace(0, i);
+		parameter->updateMixtureAssignmentTrace(0, i);
+	}
+
+	for (unsigned i = 0; i < groupList.size(); i++)
+	{
+		parameter->updateCodonSpecificParameterTrace(0, getGrouping(i));
+	}
 }
 
 
