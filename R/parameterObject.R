@@ -156,13 +156,13 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
 
   if(is.null(mixture.definition.matrix)){ 
     # keyword constructor
-    parameter <- new(ROCParameter, sphi, numMixtures, geneAssignment, 
+    parameter <- new(ROCParameter, as.vector(sphi), numMixtures, geneAssignment, 
                      split.serine, mixture.definition)
   }else{
     #matrix constructor
     mixture.definition <- c(mixture.definition.matrix[, 1], 
                             mixture.definition.matrix[, 2])
-    parameter <- new(ROCParameter, sphi, numMixtures, geneAssignment, 
+    parameter <- new(ROCParameter, as.vector(sphi), numMixtures, geneAssignment, 
                      mixture.definition, split.serine)
   }
   
@@ -190,13 +190,13 @@ initializeRFPParameterObject <- function(genome, sphi, numMixtures, geneAssignme
 
   if(is.null(mixture.definition.matrix))
   { # keyword constructor
-    parameter <- new(RFPParameter, sphi, numMixtures, geneAssignment, 
+    parameter <- new(RFPParameter, as.vector(sphi), numMixtures, geneAssignment, 
                      split.serine, mixture.definition)
   }else{
     #matrix constructor
     mixture.definition <- c(mixture.definition.matrix[, 1], 
                             mixture.definition.matrix[, 2])
-    parameter <- new(RFPParameter, sphi, numMixtures, geneAssignment, 
+    parameter <- new(RFPParameter, as.vector(sphi), numMixtures, geneAssignment, 
                      mixture.definition, split.serine)
   }
   
@@ -217,17 +217,16 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
                         mixture.definition = "allUnique", 
                         mixture.definition.matrix = NULL){
 
-  
   # create parameter object
   if(is.null(mixture.definition.matrix))
   { # keyword constructor
-    parameter <- new(FONSEParameter, sphi, numMixtures, geneAssignment, 
+    parameter <- new(FONSEParameter, as.vector(sphi), numMixtures, geneAssignment, 
                      split.serine, mixture.definition)
   }else{
     #matrix constructor
     mixture.definition <- c(mixture.definition.matrix[, 1], 
                             mixture.definition.matrix[, 2])
-    parameter <- new(FONSEParameter, sphi, numMixtures, geneAssignment, 
+    parameter <- new(FONSEParameter, as.vector(sphi), numMixtures, geneAssignment, 
                      mixture.definition, split.serine)
   }
   

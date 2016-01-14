@@ -17,10 +17,6 @@
 class RFPParameter: public Parameter {
 	private:
 
-		std::vector<std::vector<double>> proposedAlphaParameter;
-		std::vector<std::vector<double>> currentAlphaParameter;
-		std::vector<std::vector<double>> proposedLambdaPrimeParameter;
-		std::vector<std::vector<double>> currentLambdaPrimeParameter;
 		std::vector<std::vector<double>> lambdaValues; //Currently not used.
 		double bias_csp;
 

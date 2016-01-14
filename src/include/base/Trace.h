@@ -14,9 +14,10 @@
 #include "../mixtureDefinition.h"
 
 class Trace {
-private:
+	private:
     
-    
+		unsigned numCodonSpecificParamTypes;
+
 		std::vector<std::vector<double>> stdDevSynthesisRateTrace; //mixture, samples
 		std::vector<double> stdDevSynthesisRateAcceptanceRatioTrace; //samples TODO: Correctly sized for the time being,
         //however, it will need to be changed at some point when there are some adjustments to hyper parameter acceptance/rejection
@@ -25,8 +26,8 @@ private:
 		std::vector<std::vector<std::vector<double>>> synthesisRateTrace;//order: expressioncategoy, gene, samples
 		std::vector<std::vector<unsigned>> mixtureAssignmentTrace;//order: numGenes, samples
 		std::vector<std::vector<double>> mixtureProbabilitiesTrace;//order: numMixtures, samples
-		std::vector<std::vector<std::vector<double>>> codonSpecificParameterTraceOne; //order: category, numparam, samples
-		std::vector<std::vector<std::vector<double>>> codonSpecificParameterTraceTwo; //order: category, numparam, samples
+		std::vector<std::vector<std::vector<std::vector<double>>>> codonSpecificParameterTrace; //order: paramType, category, numparam, samples
+		//std::vector<std::vector<std::vector<double>>> codonSpecificParameterTraceTwo; //order: category, numparam, samples
 		std::vector<mixtureDefinition> *categories;
 
 
@@ -69,6 +70,7 @@ public:
 	//Constructors & Destructors:
 	Trace();
 	virtual ~Trace();
+	Trace(unsigned _numCodonSpecificParamTypes);
 
 
 	//Initialization Functions:

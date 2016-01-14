@@ -38,11 +38,6 @@ RFPParameter& RFPParameter::operator=(const RFPParameter& rhs)
 
 	Parameter::operator=(rhs);
 
-	currentAlphaParameter = rhs.currentAlphaParameter;
-	proposedAlphaParameter = rhs.proposedAlphaParameter;
-	currentLambdaPrimeParameter = rhs.proposedLambdaPrimeParameter;
-	proposedLambdaPrimeParameter = rhs.proposedLambdaPrimeParameter;
-
 	lambdaValues = rhs.lambdaValues;
 
 	bias_csp = rhs.bias_csp;
@@ -73,24 +68,27 @@ void RFPParameter::initRFPParameterSet()
 	unsigned alphaCategories = getNumMutationCategories();
 	unsigned lambdaPrimeCategories = getNumSelectionCategories();
 
-	currentAlphaParameter.resize(alphaCategories);
-	proposedAlphaParameter.resize(alphaCategories);
-	currentLambdaPrimeParameter.resize(lambdaPrimeCategories);
-	proposedLambdaPrimeParameter.resize(lambdaPrimeCategories);
+	currentCodonSpecificParameter.resize(2);
+	proposedCodonSpecificParameter.resize(2);
+
+	currentCodonSpecificParameter[alp].resize(alphaCategories);
+	proposedCodonSpecificParameter[alp].resize(alphaCategories);
+	currentCodonSpecificParameter[lmPri].resize(lambdaPrimeCategories);
+	proposedCodonSpecificParameter[lmPri].resize(lambdaPrimeCategories);
 	lambdaValues.resize(lambdaPrimeCategories);
 	numParam = 61;
 
 	for (unsigned i = 0; i < alphaCategories; i++)
 	{
 		std::vector <double> tmp(numParam,1.0);
-		currentAlphaParameter[i] = tmp;
-		proposedAlphaParameter[i] = tmp;
+		currentCodonSpecificParameter[alp][i] = tmp;
+		proposedCodonSpecificParameter[alp][i] = tmp;
 	}
 	for (unsigned i = 0; i < lambdaPrimeCategories; i++)
 	{
 		std::vector <double> tmp(numParam,1.0);
-		currentLambdaPrimeParameter[i] = tmp;
-		proposedLambdaPrimeParameter[i] = tmp;
+		currentCodonSpecificParameter[lmPri][i] = tmp;
+		proposedCodonSpecificParameter[lmPri][i] = tmp;
 		lambdaValues[i] = tmp; //Maybe we don't initialize this one? or we do it differently?
 	}
 
@@ -150,7 +148,7 @@ void RFPParameter::initRFPValuesFromFile(std::string filename)
 			{
 				if (tmp == "***")
 				{
-					currentAlphaParameter.resize(currentAlphaParameter.size() + 1);
+					currentCodonSpecificParameter[alp].resize(currentCodonSpecificParameter[alp].size() + 1);
 					cat++;
 				}
 				else if (tmp == "\n")
@@ -161,7 +159,7 @@ void RFPParameter::initRFPValuesFromFile(std::string filename)
 					iss.str(tmp);
 					while (iss >> val)
 					{
-						currentAlphaParameter[cat - 1].push_back(val);
+						currentCodonSpecificParameter[alp][cat - 1].push_back(val);
 					}
 				}
 			}
@@ -169,7 +167,7 @@ void RFPParameter::initRFPValuesFromFile(std::string filename)
 			{
 				if (tmp == "***")
 				{
-					currentLambdaPrimeParameter.resize(currentLambdaPrimeParameter.size() + 1);
+					currentCodonSpecificParameter[lmPri].resize(currentCodonSpecificParameter[lmPri].size() + 1);
 					cat++;
 				}
 				else if (tmp == "\n")
@@ -180,7 +178,7 @@ void RFPParameter::initRFPValuesFromFile(std::string filename)
 					iss.str(tmp);
 					while (iss >> val)
 					{
-						currentLambdaPrimeParameter[cat - 1].push_back(val);
+						currentCodonSpecificParameter[lmPri][cat - 1].push_back(val);
 					}
 				}
 			}
@@ -198,15 +196,15 @@ void RFPParameter::initRFPValuesFromFile(std::string filename)
 	input.close();
 
 	bias_csp = 0;
-	proposedAlphaParameter.resize(numMutationCategories);
-	proposedLambdaPrimeParameter.resize(numSelectionCategories);
+	proposedCodonSpecificParameter[alp].resize(numMutationCategories);
+	proposedCodonSpecificParameter[lmPri].resize(numSelectionCategories);
 	for (unsigned i = 0; i < numMutationCategories; i++)
 	{
-		proposedAlphaParameter[i] = currentAlphaParameter[i];
+		proposedCodonSpecificParameter[alp][i] = currentCodonSpecificParameter[alp][i];
 	}
 	for (unsigned i = 0; i < numSelectionCategories; i++)
 	{
-		proposedLambdaPrimeParameter[i] = currentLambdaPrimeParameter[i];
+		proposedCodonSpecificParameter[lmPri][i] = currentCodonSpecificParameter[lmPri][i];
 	}
 }
 
@@ -233,12 +231,12 @@ void RFPParameter::writeRFPRestartFile(std::string filename)
 	}
 
 	oss <<">currentAlphaParameter:\n";
-	for (i = 0; i < currentAlphaParameter.size(); i++)
+	for (i = 0; i < currentCodonSpecificParameter[alp].size(); i++)
 	{
 		oss << "***\n";
-		for (j = 0; j < currentAlphaParameter[i].size(); j++)
+		for (j = 0; j < currentCodonSpecificParameter[alp][i].size(); j++)
 		{
-			oss << currentAlphaParameter[i][j];
+			oss << currentCodonSpecificParameter[alp][i][j];
 			if ((j + 1) % 10 == 0)
 				oss << "\n";
 			else
@@ -249,12 +247,12 @@ void RFPParameter::writeRFPRestartFile(std::string filename)
 	}
 
 	oss <<">currentLambdaPrimeParameter:\n";
-	for (i = 0; i < currentLambdaPrimeParameter.size(); i++)
+	for (i = 0; i < currentCodonSpecificParameter[lmPri].size(); i++)
 	{
 		oss << "***\n";
-		for (j = 0; j < currentLambdaPrimeParameter[i].size(); j++)
+		for (j = 0; j < currentCodonSpecificParameter[lmPri][i].size(); j++)
 		{
-			oss << currentLambdaPrimeParameter[i][j];
+			oss << currentCodonSpecificParameter[lmPri][i][j];
 			if ((j + 1) % 10 == 0)
 				oss << "\n";
 			else
@@ -302,7 +300,7 @@ void RFPParameter::initAlpha(double alphaValue, unsigned mixtureElement, std::st
 {
 	unsigned category = getMutationCategory(mixtureElement);
 	unsigned index = SequenceSummary::codonToIndex(codon);
-	currentAlphaParameter[category][index] = alphaValue;
+	currentCodonSpecificParameter[alp][category][index] = alphaValue;
 }
 
 
@@ -310,7 +308,7 @@ void RFPParameter::initLambdaPrime(double lambdaPrimeValue, unsigned mixtureElem
 {
 	unsigned category = getMutationCategory(mixtureElement);
 	unsigned index = SequenceSummary::codonToIndex(codon);
-	currentLambdaPrimeParameter[category][index] = lambdaPrimeValue;
+	currentCodonSpecificParameter[lmPri][category][index] = lambdaPrimeValue;
 }
 
 
@@ -354,14 +352,14 @@ void RFPParameter::initMutationSelectionCategories(std::vector<std::string> file
 		{
 			if (paramType == RFPParameter::alp && categories[j].delM == i)
 			{
-				currentAlphaParameter[j] = temp;
-				proposedAlphaParameter[j] = temp;
+				currentCodonSpecificParameter[alp][j] = temp;
+				proposedCodonSpecificParameter[alp][j] = temp;
 				altered++;
 			}
 			else if (paramType == RFPParameter::lmPri && categories[j].delEta == i)
 			{
-				currentLambdaPrimeParameter[j] = temp;
-				proposedLambdaPrimeParameter[j] = temp;
+				currentCodonSpecificParameter[lmPri][j] = temp;
+				proposedCodonSpecificParameter[lmPri][j] = temp;
 				altered++;
 			}
 			if (altered == numCategories)
@@ -383,8 +381,8 @@ void RFPParameter::initMutationSelectionCategories(std::vector<std::string> file
 
 void RFPParameter::updateCodonSpecificParameterTrace(unsigned sample, std::string codon)
 {
-	traces.updateCodonSpecificParameterTraceForCodon(sample, codon, currentAlphaParameter, alp);
-	traces.updateCodonSpecificParameterTraceForCodon(sample, codon, currentLambdaPrimeParameter, lmPri);
+	traces.updateCodonSpecificParameterTraceForCodon(sample, codon, currentCodonSpecificParameter[alp], alp);
+	traces.updateCodonSpecificParameterTraceForCodon(sample, codon, currentCodonSpecificParameter[lmPri], lmPri);
 }
 
 
@@ -404,14 +402,14 @@ double RFPParameter::getCurrentCodonSpecificProposalWidth(unsigned index)
 
 void RFPParameter::proposeCodonSpecificParameter()
 {
-	unsigned numAlpha = (unsigned)currentAlphaParameter[0].size();
-	unsigned numLambdaPrime = (unsigned)currentLambdaPrimeParameter[0].size();
+	unsigned numAlpha = (unsigned)currentCodonSpecificParameter[alp][0].size();
+	unsigned numLambdaPrime = (unsigned)currentCodonSpecificParameter[lmPri][0].size();
 
 	for (unsigned i = 0; i < numMutationCategories; i++)
 	{
 		for (unsigned j = 0; j < numAlpha; j++)
 		{
-			proposedAlphaParameter[i][j] = std::exp( randNorm( std::log(currentAlphaParameter[i][j]) , std_csp[j]) );
+			proposedCodonSpecificParameter[alp][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[alp][i][j]) , std_csp[j]) );
 		}
 	}
 
@@ -419,7 +417,7 @@ void RFPParameter::proposeCodonSpecificParameter()
 	{
 		for (unsigned j = 0; j < numLambdaPrime; j++)
 		{
-			proposedLambdaPrimeParameter[i][j] = std::exp( randNorm( std::log(currentLambdaPrimeParameter[i][j]) , std_csp[j]) );
+			proposedCodonSpecificParameter[lmPri][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[lmPri][i][j]) , std_csp[j]) );
 		}
 	}
 }
@@ -432,11 +430,11 @@ void RFPParameter::updateCodonSpecificParameter(std::string grouping)
 
 	for(unsigned k = 0u; k < numMutationCategories; k++)
 	{
-		currentAlphaParameter[k][i] = proposedAlphaParameter[k][i];
+		currentCodonSpecificParameter[alp][k][i] = proposedCodonSpecificParameter[alp][k][i];
 	}
 	for(unsigned k = 0u; k < numSelectionCategories; k++)
 	{
-		currentLambdaPrimeParameter[k][i] = proposedLambdaPrimeParameter[k][i];
+		currentCodonSpecificParameter[lmPri][k][i] = proposedCodonSpecificParameter[lmPri][k][i];
 	}
 }
 
@@ -479,20 +477,7 @@ double RFPParameter::getParameterForCategory(unsigned category, unsigned paramTy
 {
 	double rv;
 	unsigned codonIndex = SequenceSummary::codonToIndex(codon);
-	if (paramType == RFPParameter::alp)
-	{
-		rv = (proposal ? proposedAlphaParameter[category][codonIndex] : currentAlphaParameter[category][codonIndex]);
-	}
-	else if (paramType == RFPParameter::lmPri)
-	{
-		rv = (proposal ? proposedLambdaPrimeParameter[category][codonIndex] : currentLambdaPrimeParameter[category][codonIndex]);
-	}
-	else
-	{
-		std::cerr << "Warning in RFPParameter::getParameterForCategory: Unkown parameter type: " << paramType << "\n";
-		std::cerr << "\tReturning alpha parameter! \n";
-		rv = (proposal ? proposedAlphaParameter[category][codonIndex] : currentAlphaParameter[category][codonIndex]);
-	}
+	rv = (proposal ? proposedCodonSpecificParameter[paramType][category][codonIndex] : currentCodonSpecificParameter[paramType][category][codonIndex]);
 
 	return rv;
 }
@@ -664,49 +649,49 @@ void RFPParameter::initMutationSelectionCategoriesR(std::vector<std::string> fil
 
 std::vector<std::vector<double>> RFPParameter::getProposedAlphaParameter()
 {
-	return proposedAlphaParameter;
+	return proposedCodonSpecificParameter[alp];
 }
 
 
 std::vector<std::vector<double>> RFPParameter::getProposedLambdaPrimeParameter()
 {
-	return proposedLambdaPrimeParameter;
+	return proposedCodonSpecificParameter[lmPri];
 }
 
 
 std::vector<std::vector<double>> RFPParameter::getCurrentAlphaParameter()
 {
-	return currentAlphaParameter;
+	return currentCodonSpecificParameter[alp];
 }
 
 
 std::vector<std::vector<double>> RFPParameter::getCurrentLambdaPrimeParameter()
 {
-	return currentLambdaPrimeParameter;
+	return currentCodonSpecificParameter[lmPri];
 }
 
 
 void RFPParameter::setProposedAlphaParameter(std::vector<std::vector<double>> alpha)
 {
-	proposedAlphaParameter = alpha;
+	proposedCodonSpecificParameter[alp] = alpha;
 }
 
 
 void RFPParameter::setProposedLambdaPrimeParameter(std::vector<std::vector<double>> lambdaPrime)
 {
-	proposedLambdaPrimeParameter = lambdaPrime;
+	proposedCodonSpecificParameter[lmPri] = lambdaPrime;
 }
 
 
 void RFPParameter::setCurrentAlphaParameter(std::vector<std::vector<double>> alpha)
 {
-	currentAlphaParameter = alpha;
+	currentCodonSpecificParameter[alp] = alpha;
 }
 
 
 void RFPParameter::setCurrentLambdaPrimeParameter(std::vector<std::vector<double>> lambdaPrime)
 {
-	currentLambdaPrimeParameter = lambdaPrime;
+	currentCodonSpecificParameter[lmPri] = lambdaPrime;
 }
 
 

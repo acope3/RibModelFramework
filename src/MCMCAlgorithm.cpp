@@ -889,7 +889,7 @@ RCPP_MODULE(MCMCAlgorithm_mod)
 
 
 	//MCMC Functions:
-	function("TestACF", &MCMCAlgorithm::acf); //TEST THAT ONLY!
-	function("solveToeplitzMatrix", &MCMCAlgorithm::solveToeplitzMatrix); //TEST THAT ONLY!
+	//function("TestACF", &MCMCAlgorithm::acf); //TEST THAT ONLY!
+	//function("solveToeplitzMatrix", &MCMCAlgorithm::solveToeplitzMatrix); //TEST THAT ONLY!
 }
 #endif

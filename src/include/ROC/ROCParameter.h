@@ -25,10 +25,7 @@ class ROCParameter : public Parameter
 		std::vector <double> std_NoiseOffset;
 		std::vector <double> numAcceptForNoiseOffset;
 
-		std::vector<std::vector<double>> proposedMutationParameter;
-		std::vector<std::vector<double>> currentMutationParameter;
-		std::vector<std::vector<double>> proposedSelectionParameter;
-		std::vector<std::vector<double>> currentSelectionParameter;
+		
 		
 
 

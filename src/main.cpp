@@ -365,7 +365,7 @@ int main()
 {
 	unsigned index;
 	bool fromRestart = false;
-	std::string modelToRun = "FONSE";
+	std::string modelToRun = "RFP";
 
 
 	

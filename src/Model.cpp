@@ -13,7 +13,7 @@ Model::~Model()
 //Cedric: This functions will repalce calculateMutationPrior in ROC/FONSE model and allows us to more generally use priors on codon specific parameters.
 //			We have to first change how current and proposed csp values are stored to move the function getParameterForCategory up into the base parameter class.
 
-double Model::calculatePriorForCodonSpesificParam(Parameter *parameter, std::string grouping, unsigned paramType, bool proposed)
+double Model::calculatePriorForCodonSpecificParam(Parameter *parameter, std::string grouping, unsigned paramType, bool proposed)
 {
 	unsigned numCodons = SequenceSummary::GetNumCodonsForAA(grouping, true); // TODO(Cedric): renome getNumCodonsForGrouping and have it return 1 if grouping is a codon to make it applicable for RFP
 	double parameterValues[5];
