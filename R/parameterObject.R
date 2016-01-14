@@ -616,7 +616,22 @@ writeParameterObject.Rcpp_RFPParameter <- function(parameter, file){
 #called from "writeParameterObject."
 writeParameterObject.Rcpp_FONSEParameter <- function(parameter, file)
 {
-  #TODO: implement
+  paramBase <- extractBaseInfo(parameter)
+  
+  currentMutation <- parameter$currentMutationParameter
+  currentSelection <- parameter$currentSelectionParameter
+
+  model = "FONSE"
+  mutationPrior <- parameter$getMutationPriorStandardDeviation()
+  
+  trace <- parameter$getTraceObject()
+  
+  mutationTrace <- trace$getCodonSpecificParameterTrace(0)
+  selectionTrace <- trace$getCodonSpecificParameterTrace(1)
+  
+  save(list = c("paramBase", "currentMutation", "currentSelection",
+                "model","mutationPrior", "mutationTrace", "selectionTrace"),
+       file=file)
 }
 
 
@@ -847,8 +862,8 @@ loadRFPParameterObject <- function(parameter, files)
   parameter$currentLambdaPrimeParameter <- tempEnv$currentLambdaPrime
   parameter$proposedLambdaPrimeParameter <- tempEnv$proposedLambdaPrime
   trace <- parameter$getTraceObject()
-  trace$setCodonSpecificParameterTrace(tempEnv$alphaTrace, 0)
-  trace$setCodonSpecificParameterTrace(tempEnv$lambdaPrimeTrace, 1)
+  trace$setCodonSpecificParameterTrace(alphaTrace, 0)
+  trace$setCodonSpecificParameterTrace(lambdaPrimeTrace, 1)
   
   parameter$setTraceObject(trace)
   return(parameter) 
@@ -856,9 +871,35 @@ loadRFPParameterObject <- function(parameter, files)
 
 
 #Called from "loadParameterObject."
-loadFONSEParameterObject <- function(parameter, file)
+loadFONSEParameterObject <- function(parameter, files)
 {
- #TODO: 
+  parameter <- setBaseInfo(parameter, files)
+  for (i in 1:length(files)){
+    tempEnv <- new.env();
+    load(file = files[i], envir = tempEnv)
+    
+    if (i == 1){
+      codonSpecificParameterTraceMut <- tempEnv$mutationTrace
+      codonSpecificParameterTraceSel <- tempEnv$selectionTrace
+    }else{
+      curCodonSpecificParameterTraceMut <- tempEnv$mutationTrace
+      curCodonSpecificParameterTraceSel <- tempEnv$selectionTrace
+
+      max <- tempEnv$paramBase$lastIteration + 1
+      
+      codonSpecificParameterTraceMut <- combineThreeDimensionalTrace(codonSpecificParameterTraceMut, curCodonSpecificParameterTraceMut, max)
+      codonSpecificParameterTraceSel <- combineThreeDimensionalTrace(codonSpecificParameterTraceSel, curCodonSpecificParameterTraceSel, max)
+    }#end of if-else
+  }#end of for loop (files)
+  
+  trace <- parameter$getTraceObject()
+  trace$setCodonSpecificParameterTrace(codonSpecificParameterTraceMut, 0)
+  trace$setCodonSpecificParameterTrace(codonSpecificParameterTraceSel, 1)
+  
+  parameter$currentMutationParameter <- tempEnv$currentMutation
+  parameter$currentSelectionParameter <- tempEnv$currentSelection
+  parameter$setTraceObject(trace)
+  return(parameter)  
 }
 
 
