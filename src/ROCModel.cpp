@@ -129,12 +129,8 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 		for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++) {
 			double obsPhi = gene.getObservedSynthesisRate(i);
 			if (obsPhi > -1.0) {
-				//logPhiProbability += Parameter::densityLogNorm(obsPhi + getNoiseOffset(i), std::log(phiValue), getObservedSynthesisNoise(i), true);
-				//logPhiProbability_proposed += Parameter::densityLogNorm(obsPhi + getNoiseOffset(i), std::log(phiValue_proposed), getObservedSynthesisNoise(i), true);
-
 				logPhiProbability += Parameter::densityLogNorm(obsPhi, std::log(phiValue) + getNoiseOffset(i), getObservedSynthesisNoise(i), true);
 				logPhiProbability_proposed += Parameter::densityLogNorm(obsPhi, std::log(phiValue_proposed) + getNoiseOffset(i), getObservedSynthesisNoise(i), true);
-
 			}
 		}
 	}

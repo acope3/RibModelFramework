@@ -486,6 +486,20 @@ initializeCovarianceMatricies <- function(parameter, genome, numMixtures) {
 }
 
 
+getMixtureAssignmentEstimate <- function(parameter, gene.index, samples)
+{
+  mixtureAssignment <- unlist(lapply(gene.index,  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))
+  return(mixtureAssignment)
+}
+getExpressionEstimatesForMixture <- function(parameter, gene.index, mixtureAssignment, samples)
+{
+  expressionValues <- unlist(lapply(gene.index, function(geneIndex){ 
+    expressionCategory <- parameter$getSynthesisRateCategoryForMixture(mixtureAssignment[geneIndex]) 
+    parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(samples, geneIndex, expressionCategory) 
+  }))
+  return(expressionValues)
+}
+
 #' Write Parameter Object to a File
 #' 
 #' @param parameter A parameter object that corrosponds to
