@@ -809,24 +809,7 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
 										   double *returnSet)
 {
 	std::vector<double> *tempSet;
-	if (paramType == ROCParameter::dM)
-	{
-		tempSet = (proposal ? &proposedCodonSpecificParameter[dM][category] : &currentCodonSpecificParameter[dM][category]);
-	}
-	else if (paramType == ROCParameter::dEta)
-	{
-		tempSet = (proposal ? &proposedCodonSpecificParameter[dEta][category] : &currentCodonSpecificParameter[dEta][category]);
-	}
-	else
-	{
-#ifndef STANDALONE
-		Rf_warning("Warning in ROCParameter::getParameterForCategory: Unknown parameter type: %d\n\tReturning mutation parameter! \n", paramType);
-#else
-		std::cerr << "Warning in ROCParameter::getParameterForCategory: Unknown parameter type: " << paramType << "\n";
-		std::cerr << "\tReturning mutation parameter! \n";
-#endif
-		tempSet = (proposal ? &proposedCodonSpecificParameter[dM][category] : &currentCodonSpecificParameter[dM][category]);
-	}
+	tempSet = (proposal ? &proposedCodonSpecificParameter[paramType][category] : &currentCodonSpecificParameter[paramType][category]);
 
 	unsigned aaStart;
 	unsigned aaEnd;

@@ -477,20 +477,7 @@ double RFPParameter::getParameterForCategory(unsigned category, unsigned paramTy
 {
 	double rv;
 	unsigned codonIndex = SequenceSummary::codonToIndex(codon);
-	if (paramType == RFPParameter::alp)
-	{
-		rv = (proposal ? proposedCodonSpecificParameter[alp][category][codonIndex] : currentCodonSpecificParameter[alp][category][codonIndex]);
-	}
-	else if (paramType == RFPParameter::lmPri)
-	{
-		rv = (proposal ? proposedCodonSpecificParameter[lmPri][category][codonIndex] : currentCodonSpecificParameter[lmPri][category][codonIndex]);
-	}
-	else
-	{
-		std::cerr << "Warning in RFPParameter::getParameterForCategory: Unkown parameter type: " << paramType << "\n";
-		std::cerr << "\tReturning alpha parameter! \n";
-		rv = (proposal ? proposedCodonSpecificParameter[alp][category][codonIndex] : currentCodonSpecificParameter[alp][category][codonIndex]);
-	}
+	rv = (proposal ? proposedCodonSpecificParameter[paramType][category][codonIndex] : currentCodonSpecificParameter[paramType][category][codonIndex]);
 
 	return rv;
 }

@@ -558,20 +558,7 @@ void FONSEParameter::getParameterForCategory(unsigned category, unsigned paramTy
                                              double *returnSet)
 {
     std::vector<double> *tempSet;
-    if (paramType == FONSEParameter::dM)
-    {
-        tempSet = (proposal ? &proposedCodonSpecificParameter[dM][category] : &currentCodonSpecificParameter[dM][category]);
-    }
-    else if (paramType == FONSEParameter::dOmega)
-    {
-        tempSet = (proposal ? &proposedCodonSpecificParameter[dOmega][category] : &currentCodonSpecificParameter[dOmega][category]);
-    }
-    else
-    {
-        std::cerr << "Warning in FONSEParameter::getParameterForCategory: Unknown parameter type: " << paramType << "\n";
-        std::cerr << "\tReturning mutation parameter! \n";
-        tempSet = (proposal ? &proposedCodonSpecificParameter[dM][category] : &currentCodonSpecificParameter[dM][category]);
-    }
+	tempSet = proposal ? &proposedCodonSpecificParameter[paramType][category] : &currentCodonSpecificParameter[paramType][category];
 	unsigned aaStart;
 	unsigned aaEnd;
 	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
@@ -741,12 +728,12 @@ std::vector< std::vector <double> > FONSEParameter::getCurrentSelectionParameter
 
 void FONSEParameter::setCurrentMutationParameter(std::vector<std::vector<double>> _currentMutationParameter)
 {
-	currentMutationParameter = _currentMutationParameter;
+	currentCodonSpecificParameter[dM] = _currentMutationParameter;
 }
 
 
 void FONSEParameter::setCurrentSelectionParameter(std::vector<std::vector<double>> _currentSelectionParameter)
 {
-	currentSelectionParameter = _currentSelectionParameter;
+	currentCodonSpecificParameter[dOmega] = _currentSelectionParameter;
 }
 #endif
