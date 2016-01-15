@@ -797,11 +797,11 @@ void ROCParameter::adaptNoiseOffsetProposalWidth(unsigned adaptationWidth)
 void ROCParameter::setNumObservedPhiSets(unsigned _phiGroupings)
 {
 	obsPhiSets = _phiGroupings;
-	noiseOffset.resize(obsPhiSets, 0.0);
-	noiseOffset_proposed.resize(obsPhiSets, 0.0);
+	noiseOffset.resize(obsPhiSets, 0.1);
+	noiseOffset_proposed.resize(obsPhiSets, 0.1);
 	std_NoiseOffset.resize(obsPhiSets, 0.1);
 	numAcceptForNoiseOffset.resize(obsPhiSets, 0);
-	observedSynthesisNoise.resize(obsPhiSets, 0.0);
+	observedSynthesisNoise.resize(obsPhiSets, 1.0);
 }
 
 

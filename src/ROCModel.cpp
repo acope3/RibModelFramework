@@ -257,6 +257,7 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 			double noiseOffset = getNoiseOffset(i, false);
 			double noiseOffset_proposed = getNoiseOffset(i, true);
 			double observedSynthesisNoise = getObservedSynthesisNoise(i);
+
 #ifndef __APPLE__
 //#pragma omp parallel for reduction(+:lpr)
 #endif
@@ -619,9 +620,11 @@ void ROCModel::updateGibbsSampledHyperParameters(Genome &genome)
 			}
 			rate /= 2;
 			double rand = parameter->randGamma(shape, rate);
-			parameter->setObservedSynthesisNoise(i, std::sqrt(1 / rand));
+			//std::cout << noiseOffset << "\t" << shape << "\t" << rate << "\t" << rand << "\t" << std::sqrt(1 / rand) << "\n";
+			parameter->setObservedSynthesisNoise(i, std::sqrt(1.0 / rand));
 		}
 	}
+	//std::cout << "\n";
 }
 
 

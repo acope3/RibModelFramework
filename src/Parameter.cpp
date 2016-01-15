@@ -1670,10 +1670,10 @@ double Parameter::randGamma(double shape, double rate)
 #ifndef STANDALONE
 	RNGScope scope;
 	NumericVector xx(1);
-	xx = rgamma(1, shape, rate);
+	xx = rgamma(1, shape, 1.0 / rate);
 	rv = xx[0];
 #else
-	std::gamma_distribution<double> distribution(shape, 1 / rate);
+	std::gamma_distribution<double> distribution(shape, 1.0 / rate);
 	rv = distribution(generator);
 #endif
 	return rv;
