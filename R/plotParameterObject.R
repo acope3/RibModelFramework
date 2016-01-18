@@ -60,14 +60,14 @@ upper.panel.plot <- function(x, y, sd.x=NULL, sd.y=NULL, ...){
   abline(0, 1, col = "blue", lty = 2)
   points(x, y, ...)
   if(!is.null(sd.y)){
-    y.up <- y + sd.y
-    y.low <- y - sd.y
+    y.up <- sd.y[,2]
+    y.low <- sd.y[,1]
     epsilon <- range(x, na.rm = T) * 0.1
     segments(x, y.low, x, y.up, ...)
   }
   if(!is.null(sd.x)){
-    x.up <- x + sd.x
-    x.low <- x - sd.x
+    x.up <- sd.x[,2]
+    x.low <- sd.x[,1]
     epsilon <- range(y, na.rm = T) * 0.1
     segments(x.low, y, x.up, y, ...)
   }  
@@ -107,4 +107,39 @@ upper.panel.plot <- function(x, y, sd.x=NULL, sd.y=NULL, ...){
 lower.panel.plot <- function(x, y, ...)
 {
   
+}
+
+
+confidenceInterval.plot <- function(x, y, sd.x=NULL, sd.y=NULL, ...){
+  points(x, y, ...)
+  if(!is.null(sd.y)){
+    y.up <- sd.y[,2]
+    y.low <- sd.y[,1]
+    epsilon <- range(x, na.rm = T) * 0.1
+    segments(x, y.low, x, y.up, ...)
+  }
+  if(!is.null(sd.x)){
+    x.up <- sd.x[,2]
+    x.low <- sd.x[,1]
+    epsilon <- range(y, na.rm = T) * 0.1
+    segments(x.low, y, x.up, y, ...)
+  }  
+  
+  lm.line <- lm(y~x, na.action = "na.exclude")
+  
+  
+  b <- lm.line$coef[2]
+  
+  xlim <- range(x, na.rm = T)
+  ylim <- range(y, na.rm = T)
+  
+  width <- xlim[2] - xlim[1]
+  height <- ylim[2] - ylim[1]
+  
+  std.error <- summary(lm.line)$coefficients[4]
+  slope <- round(summary(lm.line)$coefficients[2], 3)
+  intercept <- round(summary(lm.line)$coefficients[1], 3)
+  t <- (slope - 1)/std.error
+  
+
 }
