@@ -889,6 +889,9 @@ loadFONSEParameterObject <- function(parameter, files)
 }
 
 
+#Intended to combine 2D traces (vector of vectors) read in from C++. The first
+#element of the second trace is ommited since it should be the same as the 
+#last value of the first trace.
 combineTwoDimensionalTrace <- function(trace1, trace2, max){
   for (size in 1:length(trace1))
   {
@@ -898,6 +901,9 @@ combineTwoDimensionalTrace <- function(trace1, trace2, max){
 }
 
 
+#Intended to combine 3D traces (vector of vectors of vectors) read in from C++. The first
+#element of the second trace is ommited since it should be the same as the 
+#last value of the first trace.
 combineThreeDimensionalTrace <- function(trace1, trace2, max){
   
   for (size in 1:length(trace1)){
