@@ -248,29 +248,35 @@ void Gene::cleanSeqR()
 
 unsigned Gene::getAACount(std::string aa)
 {
-    return geneData.getAACountForAAR(aa);
+    return 0;
+    //return geneData.getAACountForAAR(aa);
 }
 
 
 unsigned Gene::getCodonCount(std::string& codon)
 {
-    return geneData.getCodonCountForCodonR(codon);
+    return 0;
+    //return geneData.getCodonCountForCodonR(codon);
 }
 
 void Gene::setRFPObserved(unsigned index, unsigned value)
 {
-	geneData.setRFPObserved(index, value);
+    return;
+	//geneData.setRFPObserved(index, value);
 }
 
 unsigned Gene::getRFPObserved(std::string codon)
 {
-    return geneData.getRFPObservedForCodonR(codon);
+    return 0;
+    //return geneData.getRFPObservedForCodonR(codon);
 }
 
 
 std::vector <unsigned> Gene::getCodonPositions(std::string codon)
 {
-    return geneData.getCodonPositionsForCodonR(codon);
+    std::vector <unsigned> rv;
+    return rv;
+    //return geneData.getCodonPositionsForCodonR(codon);
 }
 
 

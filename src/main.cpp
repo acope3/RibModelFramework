@@ -1,4 +1,5 @@
 #include "include/MCMCAlgorithm.h"
+#include "include/Testing.h"
 #include <iostream>
 #include <vector>
 
@@ -97,6 +98,13 @@ int main()
 #ifdef GABE
 int main()
 {
+
+
+	if (1)
+	{
+		testSequenceSummary();
+		exit(1);
+	}
 	std::string modelToRun = "FONSE"; //can also be ROC or FONSE
 	bool withPhi = false;
 	bool fromRestart = true;
