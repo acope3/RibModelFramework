@@ -59,41 +59,24 @@ class SequenceSummary
 
 
 		//Other Functions:
-		void clear();
-		bool processSequence(const std::string& sequence);  //TODO: WHY return a bool
+		void clear(); //Tested
+		bool processSequence(const std::string& sequence);  //Tested TODO: WHY return a bool
 
 
 		//Static Functions:
-		static unsigned AAToAAIndex(std::string aa);
-		static void AAIndexToCodonRange(unsigned aaIndex, unsigned& start, unsigned& end, bool forParamVector = false);
-		static void AAToCodonRange(std::string aa, unsigned& start, unsigned& end, bool forParamVector = false);
-		static std::vector<std::string> AAToCodon(std::string aa, bool forParamVector = false);
-		static std::string codonToAA(std::string& codon);
-		static unsigned codonToIndex(std::string& codon, bool forParamVector = false);
-		static unsigned codonToAAIndex(std::string& codon);
-		static std::string indexToAA(unsigned aaIndex);
-		static std::string indexToCodon(unsigned index, bool forParamVector = false);
-		static unsigned GetNumCodonsForAA(std::string& aa, bool forParamVector = false);
-		static char complimentNucleotide(char ch);
-		static std::vector<std::string> aminoAcids();
-		static std::vector<std::string> codons();
-
-
-		//R Section:
-
-#ifndef STANDALONE
-
-		//Data Manipulation Functions:
-		unsigned getAACountForAAR(std::string aa);
-		unsigned getAACountForAAIndexR(unsigned aaIndex); //TEST THAT ONLY!
-		unsigned getCodonCountForCodonR(std::string& codon);
-		unsigned getCodonCountForCodonIndexR(unsigned codonIndex); //TEST THAT ONLY!
-		unsigned getRFPObservedForCodonR(std::string codon);
-		unsigned getRFPObservedForCodonIndexR(unsigned codonIndex); //TEST THAT ONLY!
-		std::vector <unsigned> getCodonPositionsForCodonR(std::string codon);
-		std::vector <unsigned> getCodonPositionsForCodonIndexR(unsigned codonIndex); //TEST THAT ONLY!
-
-#endif //STANDALONE
+		static unsigned AAToAAIndex(std::string aa); //Moving to CT
+		static void AAIndexToCodonRange(unsigned aaIndex, unsigned& start, unsigned& end, bool forParamVector = false); //Moving to CT
+		static void AAToCodonRange(std::string aa, unsigned& start, unsigned& end, bool forParamVector = false); //Moving to CT
+		static std::vector<std::string> AAToCodon(std::string aa, bool forParamVector = false); //Moving to CT, but used in R currently
+		static std::string codonToAA(std::string& codon); //Moving to CT
+		static unsigned codonToIndex(std::string& codon, bool forParamVector = false); //Moving to CT
+		static unsigned codonToAAIndex(std::string& codon); //Moving to CT
+		static std::string indexToAA(unsigned aaIndex); //Moving to CT
+		static std::string indexToCodon(unsigned index, bool forParamVector = false); //Moving to CT
+		static unsigned GetNumCodonsForAA(std::string& aa, bool forParamVector = false); //Moving to CT
+		static char complimentNucleotide(char ch); //TODO: Testing (c++)
+		static std::vector<std::string> aminoAcids(); //Moving to CT, but used in R currently
+		static std::vector<std::string> codons(); //Moving to CT, but used in R currently
 
 
 	protected:
@@ -101,11 +84,4 @@ class SequenceSummary
 
 #endif // SequenceSummary_H
 
-/*--------------------------------------------------------------------------------------------------
- *                                   !!!RCPP NOTE!!!
- * All functions are exposed to R. However, some functions are only exposed for the purpose of
- * unit testing (Test That). These functions can be accessed in R, but do not check indices or
- * potential problems with user input (such as codon strings being lower case). The two functions
- * that have R wrappers that only call the C++ function had to be implemented because RCPP cannot
- * deal with overloaded functions.
- -------------------------------------------------------------------------------------------------*/
+
