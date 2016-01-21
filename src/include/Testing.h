@@ -3,9 +3,11 @@
 
 
 #include "SequenceSummary.h"
+#include "Gene.h"
 
 
 void testSequenceSummary();
+void testGene();
 
 
 

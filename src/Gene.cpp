@@ -239,44 +239,58 @@ std::string Gene::toAASequence()
 
 #ifndef STANDALONE
 
-
-void Gene::cleanSeqR()
-{
-    cleanSeq();
-}
-
-
 unsigned Gene::getAACount(std::string aa)
 {
-    return 0;
-    //return geneData.getAACountForAAR(aa);
+    bool error = false;
+    unsigned rv = 0;
+
+    //TODO: more extranious testing on input (capital letters, valid letters) to prevent R crashing (on all fcts below as well).
+    if (aa.size() != 1)
+    {
+        error = true;
+        std::cerr <<"Invalid string given. Returning 0.\n";
+    }
+    if (!error)
+    {
+        rv = geneData.getAACountForAA(aa);
+    }
+    return rv;
 }
 
 
 unsigned Gene::getCodonCount(std::string& codon)
 {
-    return 0;
-    //return geneData.getCodonCountForCodonR(codon);
-}
+    bool error = false;
+    unsigned rv = 0;
+    if (codon.size() != 3)
+    {
+        error = true;
+        std::cerr <<"Invalid codon given. Returning 0.\n";
+    }
 
-void Gene::setRFPObserved(unsigned index, unsigned value)
-{
-    return;
-	//geneData.setRFPObserved(index, value);
+    if(!error)
+    {
+        rv = geneData.getCodonCountForCodon(codon);
+    }
+    return rv;
 }
 
 unsigned Gene::getRFPObserved(std::string codon)
 {
-    return 0;
-    //return geneData.getRFPObservedForCodonR(codon);
+    return geneData.getRFPObserved(codon);
 }
 
 
 std::vector <unsigned> Gene::getCodonPositions(std::string codon)
 {
     std::vector <unsigned> rv;
+    std::vector <unsigned> *tmp;
+    tmp = geneData.getCodonPositions(codon);
+    for (unsigned i = 0; i < tmp -> size(); i++)
+    {
+        rv.push_back(tmp->at(i));
+    }
     return rv;
-    //return geneData.getCodonPositionsForCodonR(codon);
 }
 
 
@@ -287,8 +301,7 @@ std::vector <unsigned> Gene::getCodonPositions(std::string codon)
 //---------------------------------//
 
 
-RCPP_EXPOSED_CLASS(Gene) //Exposed because of functions that return a gene.
-RCPP_EXPOSED_CLASS(SequenceSummary)
+RCPP_EXPOSED_CLASS(SequenceSummary) //TODO: try removing this at the end now.
 
 RCPP_MODULE(Gene_mod)
 {
@@ -297,30 +310,19 @@ RCPP_MODULE(Gene_mod)
 	.constructor("empty constructor")
     .constructor<std::string, std::string, std::string >("Initialize a gene by giving the id, description, and sequence string")
 
-    //Private functions:
-    .method("cleanSeq", &Gene::cleanSeqR) //TEST THAT ONLY!
-
 
 	//Public functions & variables:
-	.field("geneData", &Gene::geneData)
 	.property("id", &Gene::getId, &Gene::setId)
     .property("description", &Gene::getDescription, &Gene::setDescription)
     .property("seq", &Gene::getSequence, &Gene::setSequence)
 
-    .method("getSequenceSummary", &Gene::getSequenceSummary) //TEST THAT ONLY!
     .method("getObservedPhiValues", &Gene::getObservedPhiValues)
-    .method("setObservedPhiValues", &Gene::setObservedPhiValues) //TEST THAT ONLY!
-    .method("getNucleotideAt", &Gene::getNucleotideAt) //TEST THAT ONLY!
-	.method("clear", &Gene::clear, "clears the id, sequence, and description in the object")
     .method("length", &Gene::length, "returns the length of sequence")
-    .method("reverseComplement", &Gene::reverseComplement) //TEST THAT ONLY!
-    .method("toAASequence", &Gene::toAASequence)
 
 
 	.method("getAACount", &Gene::getAACount, "returns the number of amino acids that are in the sequence for a given amino acid")
 	.method("getCodonCount", &Gene::getCodonCount, "returns the number of codons that are in the sequence for a given codon")
 	.method("getRFPObserved", &Gene::getRFPObserved)
-	.method("setRFPObserved", &Gene::setRFPObserved)
 	.method("getCodonPositions", &Gene::getCodonPositions)
   ;
 }

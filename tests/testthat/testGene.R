@@ -20,60 +20,6 @@ test_that("set sequence", {
   expect_equal(g$seq, "ATGCTCATTCTCACTGCTGCCTCGTAG")
 })
 
-ss <- new(SequenceSummary, "ATGCTCATTCTCACTGCTGCCTCGTAG")
-
-test_that("get Sequence Summary", {
-  ss2 <- g$getSequenceSummary()
-  for (codon in codons()){
-    expect_equal(ss$getCodonCountForCodon(codon), ss2$getCodonCountForCodon(codon))
-  }
-  for (codon in codons()) {
-    expect_equal(ss$getRFPObservedForCodon(codon), ss2$getRFPObservedForCodon(codon))
-  }
-  for (aa in aminoAcids()){
-    expect_equal(ss$getAACountForAA(aa), ss2$getAACountForAA(aa))
-  }
-  for (codon in codons()) {
-    expect_equal(ss$getCodonPositionsForCodon(codon), ss2$getCodonPositionsForCodon(codon))
-  }
-}) 
-
-test_that("get Observed Phi Values", {
-  expect_equal(g$getObservedPhiValues(), numeric())
-  g$setObservedPhiValues(c(2.34,3.234,0.123))
-  expect_equal(g$getObservedPhiValues(), c(2.34,3.234,0.123))
-})
-
-
-test_that("get Nucleotide At", {
-  expect_equal(g$getNucleotideAt(0), "A")
-  expect_equal(g$getNucleotideAt(1), "T")
-  expect_equal(g$getNucleotideAt(2), "G")
-  expect_equal(g$getNucleotideAt(3), "C")
-  expect_equal(g$getNucleotideAt(4), "T")
-  expect_equal(g$getNucleotideAt(5), "C")
-  expect_equal(g$getNucleotideAt(6), "A")
-  expect_equal(g$getNucleotideAt(7), "T")
-  expect_equal(g$getNucleotideAt(8), "T")
-  expect_equal(g$getNucleotideAt(9), "C")
-  expect_equal(g$getNucleotideAt(10), "T")
-  expect_equal(g$getNucleotideAt(11), "C")
-  expect_equal(g$getNucleotideAt(12), "A")
-  expect_equal(g$getNucleotideAt(13), "C")
-  expect_equal(g$getNucleotideAt(14), "T")
-  expect_equal(g$getNucleotideAt(15), "G")
-  expect_equal(g$getNucleotideAt(16), "C")
-  expect_equal(g$getNucleotideAt(17), "T")
-  expect_equal(g$getNucleotideAt(18), "G")
-  expect_equal(g$getNucleotideAt(19), "C")
-  expect_equal(g$getNucleotideAt(20), "C")
-  expect_equal(g$getNucleotideAt(21), "T")
-  expect_equal(g$getNucleotideAt(22), "C")
-  expect_equal(g$getNucleotideAt(23), "G")
-  expect_equal(g$getNucleotideAt(24), "T")
-  expect_equal(g$getNucleotideAt(25), "A")
-  expect_equal(g$getNucleotideAt(26), "G")
-})
 
 test_that("Length", {
   expect_equal(g$length(), 27)

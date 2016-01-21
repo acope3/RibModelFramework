@@ -65,10 +65,8 @@ class Gene
 #ifndef STANDALONE
 
 		//R Section:
-		void cleanSeqR();
 		unsigned getAACount(std::string aa);
 		unsigned getCodonCount(std::string& codon);
-		void setRFPObserved(unsigned index, unsigned value); // testthat only
 		unsigned getRFPObserved(std::string codon);
 		std::vector <unsigned> getCodonPositions(std::string codon);
 #endif

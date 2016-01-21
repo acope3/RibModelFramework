@@ -810,3 +810,264 @@ void testSequenceSummary()
         error = 0; //Reset for next function.
     }
 }
+
+
+
+
+void testGene()
+{
+    int error = 0;
+
+    //--------------------------------//
+    //------ getSequenceSummary ------//
+    //--------------------------------//
+
+    Gene testGene("1", "test Gene", "ATGCTCATTCTCACTGCTGCCTCGTAG");
+    SequenceSummary SS("ATGCTCATTCTCACTGCTGCCTCGTAG");
+    SequenceSummary GeneSS = testGene.getSequenceSummary();
+    for (unsigned i = 0; i < 64; i++)
+    {
+        if (SS.getCodonCountForCodon(i) != GeneSS.getCodonCountForCodon(i))
+        {
+            std::cerr <<"Error with getSequenceSummary. Codon counts are incorrect";
+            std::cerr <<" for codon " << i <<".\n";
+            std::cerr <<"Should return " << SS.getCodonCountForCodon(i) <<", but returns" << GeneSS.getCodonCountForCodon(i) <<"\n";
+            error = 1;
+        }
+    }
+
+    for (unsigned i = 0; i < 64; i++)
+    {
+        if (SS.getRFPObserved(i) != GeneSS.getRFPObserved(i))
+        {
+            std::cerr <<"Error with getSequenceSummary. RFP observed is incorrect";
+            std::cerr <<" for codon " << i <<".\n";
+            std::cerr <<"Should return " << SS.getRFPObserved(i) <<", but returns" << GeneSS.getRFPObserved(i) <<"\n";
+            error = 1;
+        }
+    }
+
+    for (unsigned i = 0; i < 64; i++)
+    {
+        if (SS.getCodonPositions(i) != GeneSS.getCodonPositions(i))
+        {
+            std::cerr <<"Error with getSequenceSummary. Codon positions are incorrect";
+            std::cerr <<" for codon " << i <<".\n";
+            std::cerr <<"Should return " << SS.getCodonPositions(i) <<", but returns" << GeneSS.getCodonPositions(i) <<"\n";
+            error = 1;
+        }
+    }
+
+
+    unsigned AAListSize = (unsigned)SequenceSummary::aminoAcids().size();
+    for (unsigned i = 0; i < AAListSize; i++)
+    {
+        if (SS.getAACountForAA(i) != GeneSS.getAACountForAA(i))
+        {
+            std::cerr <<"Error with getSequenceSummary. AA counts are incorrect";
+            std::cerr <<" for amino acid " << i <<".\n";
+            std::cerr <<"Should return " << SS.getAACountForAA(i) <<", but returns" << GeneSS.getAACountForAA(i) <<"\n";
+            error = 1;
+        }
+    }
+
+    if (!error)
+    {
+        std::cout <<"Gene getSequenceSummary --- Pass\n";
+    }
+    else
+    {
+        error = 0; //Reset for next function.
+    }
+
+    //-----------------------------------------------//
+    //------ get/setObservedPhiValues Function ------//
+    //-----------------------------------------------//
+
+    std::vector <double> tmp;
+    tmp = testGene.getObservedPhiValues();
+
+    if (0 != tmp.size())
+    {
+        std::cerr <<"Error with getObservedPhiValues. Function should return an empty vector but returns:\n";
+        for (unsigned i = 0; i < tmp.size(); i++)
+        {
+            std::cerr << tmp[i] <<"\n";
+        }
+        error = 1;
+    }
+    tmp.resize(3);
+    tmp[0] = 2.34;
+    tmp[1] = 3.234;
+    tmp[2] = 0.123;
+    testGene.setObservedPhiValues(tmp);
+    tmp = testGene.getObservedPhiValues();
+    if (3 != tmp.size() || 2.34 != tmp[0] || 3.234 != tmp[1] || 0.123 != tmp[2])
+    {
+        std::cerr <<"Error with getObservedPhiValues. Function should return 2.34, 3.234, 0.123, but returns:\n";
+        for (unsigned i = 0; i < tmp.size(); i++)
+        {
+            std::cerr << tmp[i] <<"\n";
+        }
+        error = 1;
+    }
+
+    if (!error)
+    {
+        std::cout <<"Gene get/setObservedPhiValues --- Pass\n";
+    }
+    else
+    {
+        error = 0; //Reset for next function.
+    }
+
+
+    //-----------------------------------------------//
+    //------ getObservedSynthesisRate Function ------//
+    //-----------------------------------------------//
+
+
+    //TODO: What should be done here?
+
+    //--------------------------------------------------//
+    //------ getNumObservedSynthesisSets Function ------//
+    //--------------------------------------------------//
+
+    //TODO: What should be done here?
+
+    //--------------------------------------//
+    //------ getNucleotideAt Function ------//
+    //--------------------------------------//
+
+
+    if ('A' != testGene.getNucleotideAt(0))
+    {
+        std::cerr <<"Error with getNucleotideAt. At index 0, the return value should be 'A', but is ";
+        std::cerr << testGene.getNucleotideAt(0) <<"\n";
+        error = 1;
+    }
+    if ('T' != testGene.getNucleotideAt(1))
+    {
+        std::cerr <<"Error with getNucleotideAt. At index 1, the return value should be 'T', but is ";
+        std::cerr << testGene.getNucleotideAt(1) <<"\n";
+        error = 1;
+    }
+    if ('G' != testGene.getNucleotideAt(2))
+    {
+        std::cerr <<"Error with getNucleotideAt. At index 2, the return value should be 'G', but is ";
+        std::cerr << testGene.getNucleotideAt(2) <<"\n";
+        error = 1;
+    }
+    if ('C' != testGene.getNucleotideAt(3))
+    {
+        std::cerr <<"Error with getNucleotideAt. At index 3, the return value should be 'C', but is ";
+        std::cerr << testGene.getNucleotideAt(3) <<"\n";
+        error = 1;
+    }
+    if ('T' != testGene.getNucleotideAt(10))
+    {
+        std::cerr <<"Error with getNucleotideAt. At index 10, the return value should be 'T', but is ";
+        std::cerr << testGene.getNucleotideAt(10) <<"\n";
+        error = 1;
+    }
+    if ('G' != testGene.getNucleotideAt(23))
+    {
+        std::cerr <<"Error with getNucleotideAt. At index 23, the return value should be 'G', but is ";
+        std::cerr << testGene.getNucleotideAt(23) <<"\n";
+        error = 1;
+    }
+    if ('G' != testGene.getNucleotideAt(26))
+    {
+        std::cerr <<"Error with getNucleotideAt. At index 26, the return value should be 'G', but is ";
+        std::cerr << testGene.getNucleotideAt(26) <<"\n";
+        error = 1;
+    }
+    if (!error)
+    {
+        std::cout <<"Gene getNucleotideAt --- Pass\n";
+    }
+    else
+    {
+        error = 0; //Reset for next function.
+    }
+
+    //Todo: consider out of range test case?
+
+
+    //-------------------------------//
+    //------ reverseComplement ------//
+    //-------------------------------//
+
+    Gene tmpGene;
+    tmpGene = testGene.reverseComplement();
+    if ("CTACGAGGCAGCAGTGAGAATGAGCAT" != tmpGene.getSequence())
+    {
+        std::cerr <<"Error with reverseComplement. Should return \"CTACGAGGCAGCAGTGAGAATGAGCAT\" but returns: ";
+        std::cerr << tmpGene.getSequence() <<"\n";
+        error = 1;
+    }
+    if (!error)
+    {
+        std::cout <<"Gene reverseComplement --- Pass\n";
+    }
+    else
+    {
+        error = 0; //Reset for next function.
+    }
+
+    //-----------------------------------//
+    //------ toAASequence Function ------//
+    //-----------------------------------//
+
+    if ("MLILTAASX" != testGene.toAASequence())
+    {
+        std::cerr <<"Error with toAASequence. Should return \"MLILTAASX\", but returns:" << testGene.toAASequence() <<"\n";
+        error = 1;
+    }
+
+    if (!error)
+    {
+        std::cout <<"Gene toAASequence --- Pass\n";
+    }
+    else
+    {
+        error = 0; //Reset for next function.
+    }
+
+
+
+    //----------------------------//
+    //------ clear Function ------//
+    //----------------------------//
+
+    testGene.clear();
+    if ("" != testGene.getId())
+    {
+        std::cerr <<"Error with clear. Gene Id should be blank, but is " << testGene.getId() <<".\n";
+        error = 1;
+    }
+    if ("" != testGene.getDescription())
+    {
+        std::cerr <<"Error with clear. Gene description should be blank, but is " << testGene.getDescription() <<".\n";
+        error = 1;
+    }
+    if ("" != testGene.getSequence())
+    {
+        std::cerr <<"Error with clear. Gene sequence should be blank, but is " << testGene.getSequence() <<".\n";
+        error = 1;
+    }
+
+    if (!error)
+    {
+        std::cout <<"Gene clear --- Pass\n";
+    }
+    else
+    {
+        error = 0; //Reset for next function.
+    }
+
+
+
+
+            //------ cleanSequence Function ------//
+}
