@@ -91,7 +91,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 	double mutation[5];
 	double selection[5];
 
-	SequenceSummary seqsum = gene.getSequenceSummary();
+	SequenceSummary *seqsum = gene.getSequenceSummary();
 
 	// get correct index for everything
 	unsigned mutationCategory = parameter->getMutationCategory(k);
@@ -172,7 +172,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 	for (int i = 0; i < numGenes; i++)
 	{
 		gene = &genome.getGene(i);
-		seqsum = &gene->getSequenceSummary();
+		seqsum = gene->getSequenceSummary();
 		if (seqsum->getAACountForAA(grouping) == 0) continue;
 
 		// which mixture element does this gene belong to

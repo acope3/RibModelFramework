@@ -43,7 +43,7 @@ class Gene
 		void setDescription(std::string _desc);
 		std::string getSequence();
 		void setSequence(std::string _seq);
-		SequenceSummary& getSequenceSummary();
+		SequenceSummary *getSequenceSummary();
 		std::vector<double> getObservedPhiValues();
 		void setObservedPhiValues(std::vector <double> values); //FOR TEST THAT ONLY!
 		double getObservedSynthesisRate(unsigned index);

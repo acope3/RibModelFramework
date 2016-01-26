@@ -1545,26 +1545,26 @@ void Parameter::swap(int& a, int& b)
 // http://www.tandfonline.com/doi/pdf/10.1080/03081070500502967
 double Parameter::calculateSCUO(Gene& gene, unsigned maxAA)
 {
-	SequenceSummary seqsum = gene.getSequenceSummary();
+	SequenceSummary *seqsum = gene.getSequenceSummary();
 
 	double totalDegenerateAACount = 0.0;
 	for(unsigned i = 0; i < maxAA; i++)
 	{
-		std::string curAA = seqsum.AminoAcidArray[i];
+		std::string curAA = SequenceSummary::AminoAcidArray[i];
 		// skip amino acids with only one codon or stop codons
 		if(curAA == "X" || curAA == "M" || curAA == "W") continue;
-		totalDegenerateAACount += (double)seqsum.getAACountForAA(i);
+		totalDegenerateAACount += (double)seqsum->getAACountForAA(i);
 	}
 
 	double scuoValue = 0.0;
 	for(unsigned i = 0; i < maxAA; i++)
 	{
-		std::string curAA = seqsum.AminoAcidArray[i];
+		std::string curAA = SequenceSummary::AminoAcidArray[i];
 		// skip amino acids with only one codon or stop codons
 		if(curAA == "X" || curAA == "M" || curAA == "W") continue;
 		double numDegenerateCodons = SequenceSummary::GetNumCodonsForAA(curAA);
 
-		double aaCount = (double)seqsum.getAACountForAA(i);
+		double aaCount = (double)seqsum->getAACountForAA(i);
 		if(aaCount == 0) continue;
 
 		unsigned start;
@@ -1575,7 +1575,7 @@ double Parameter::calculateSCUO(Gene& gene, unsigned maxAA)
 		double aaEntropy = 0.0;
 		for(unsigned k = start; k < endd; k++)
 		{
-			int currCodonCount = seqsum.getCodonCountForCodon(k);
+			int currCodonCount = seqsum->getCodonCountForCodon(k);
 			if(currCodonCount == 0) continue;
 			double codonProportion = (double)currCodonCount / aaCount;
 			aaEntropy += codonProportion*std::log(codonProportion);

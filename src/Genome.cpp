@@ -648,8 +648,8 @@ std::vector<unsigned> Genome::getCodonCountsPerGene(std::string codon)
 	for(unsigned i = 0u; i < genes.size(); i++)
 	{
 		Gene gene = genes[i];
-		SequenceSummary seqsum = gene.getSequenceSummary();
-		codonCounts[i] = seqsum.getCodonCountForCodon(codonIndex);
+		SequenceSummary *seqsum = gene.getSequenceSummary();
+		codonCounts[i] = seqsum -> getCodonCountForCodon(codonIndex);
 	}
 	return codonCounts;
 }

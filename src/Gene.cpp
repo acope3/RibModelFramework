@@ -23,7 +23,7 @@ Gene::Gene(std::string _seq, std::string _id, std::string _desc) : seq(_seq), id
     cleanSeq();
 	if (seq.length() % 3 == 0)
 	{
-		geneData.processSequence(seq);
+		geneData.processSequence(_seq);
 	}
 	else 
 	{
@@ -144,9 +144,10 @@ void Gene::setSequence(std::string _seq)
 }
 
 
-SequenceSummary& Gene::getSequenceSummary()
+SequenceSummary *Gene::getSequenceSummary()
 {
-    return geneData;
+    SequenceSummary *rv = &geneData;
+    return rv;
 }
 
 
