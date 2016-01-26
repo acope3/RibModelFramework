@@ -25,36 +25,9 @@ test_that("Length", {
   expect_equal(g$length(), 27)
 })
 
-test_that("Reverse Complement", {
-  expect_equal(g$reverseComplement()$seq, "CTACGAGGCAGCAGTGAGAATGAGCAT")
-})
-
-test_that("AA Sequence", {
-  expect_equal(g$toAASequence(), "MLILTAASX")
-})
-
-test_that("clear", {
-  g$clear()
-  expect_equal(g$id, "")
-  expect_equal(g$description, "")
-  expect_equal(g$seq, "")
-})
-
-
-test_that("clean Sequence", {
-  g$seq <- "ATGGTAACTTAG"
-  g$cleanSeq()
-  expect_equal(g$seq, "ATGGTAACTTAG")
-  
-#  g$seq <- "ATGGTAACTNNNQQQTAG"
-#  g$cleanSeq()
-#  expect_equal(g$seq, "ATGGTAACTNNNTAG")
-})
-
-g$clear()
-
-g$seq <- "ATGCTCATTCTCACTGCTGCCTCGTAG"
-
+g <- new(Gene, "ATGCTCATTCTCACTGCTGCCTCGTAG", "2", "New Test Gene")
+#TODO: problem. This used to say g$seq <- "kjdklsjfkdj" (string). It
+#does set the string correctly, but the values in SS are NOT CLEARED.
 test_that("get AA Count", {
   expect_equal(g$getAACount("M"), 1)
   expect_equal(g$getAACount("L"), 2)
@@ -79,13 +52,9 @@ test_that("get Codon Counts", {
 })
 
 test_that("get RFP Observed", {
-  g$setRFPObserved(4, 35)
-  g$setRFPObserved(16, 45)
-  g$setRFPObserved(54, 2)
-  g$setRFPObserved(45, 0)
-  expect_equal(g$getRFPObserved("TGC"), 35)
-  expect_equal(g$getRFPObserved("CAC"), 45)
-  expect_equal(g$getRFPObserved("GTG"),2)
+  expect_equal(g$getRFPObserved("TGC"), 0)
+  expect_equal(g$getRFPObserved("CAC"), 0)
+  expect_equal(g$getRFPObserved("GTG"),0)
   expect_equal(g$getRFPObserved("TCC"), 0)
 })
 

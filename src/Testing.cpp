@@ -822,39 +822,57 @@ void testGene()
     //------ getSequenceSummary ------//
     //--------------------------------//
 
-    Gene testGene("1", "test Gene", "ATGCTCATTCTCACTGCTGCCTCGTAG");
+    Gene testGene("ATGCTCATTCTCACTGCTGCCTCGTAG", "1", "test Gene");
     SequenceSummary SS("ATGCTCATTCTCACTGCTGCCTCGTAG");
-    SequenceSummary GeneSS = testGene.getSequenceSummary();
+    SequenceSummary *GeneSS = testGene.getSequenceSummary();
     for (unsigned i = 0; i < 64; i++)
     {
-        if (SS.getCodonCountForCodon(i) != GeneSS.getCodonCountForCodon(i))
+        if (SS.getCodonCountForCodon(i) != GeneSS->getCodonCountForCodon(i))
         {
             std::cerr <<"Error with getSequenceSummary. Codon counts are incorrect";
-            std::cerr <<" for codon " << i <<".\n";
-            std::cerr <<"Should return " << SS.getCodonCountForCodon(i) <<", but returns" << GeneSS.getCodonCountForCodon(i) <<"\n";
+            std::cerr <<" for codon " << i <<", " << SequenceSummary::codonArray[i] <<".\n";
+            std::cerr <<"Should return " << SS.getCodonCountForCodon(i) <<", but returns" << GeneSS->getCodonCountForCodon(i) <<"\n";
             error = 1;
         }
     }
 
+
     for (unsigned i = 0; i < 64; i++)
     {
-        if (SS.getRFPObserved(i) != GeneSS.getRFPObserved(i))
+        if (SS.getRFPObserved(i) != GeneSS->getRFPObserved(i))
         {
             std::cerr <<"Error with getSequenceSummary. RFP observed is incorrect";
             std::cerr <<" for codon " << i <<".\n";
-            std::cerr <<"Should return " << SS.getRFPObserved(i) <<", but returns" << GeneSS.getRFPObserved(i) <<"\n";
+            std::cerr <<"Should return " << SS.getRFPObserved(i) <<", but returns" << GeneSS->getRFPObserved(i) <<"\n";
             error = 1;
         }
     }
 
+    //This fails because this returns pointers to vectors and they need to be compared differently.
+    std::vector <unsigned> *SSvec;
+    std::vector <unsigned> *Gvec;
     for (unsigned i = 0; i < 64; i++)
     {
-        if (SS.getCodonPositions(i) != GeneSS.getCodonPositions(i))
+        SSvec = SS.getCodonPositions(i);
+        Gvec = GeneSS->getCodonPositions(i);
+        if (SSvec->size() != Gvec->size())
         {
-            std::cerr <<"Error with getSequenceSummary. Codon positions are incorrect";
-            std::cerr <<" for codon " << i <<".\n";
-            std::cerr <<"Should return " << SS.getCodonPositions(i) <<", but returns" << GeneSS.getCodonPositions(i) <<"\n";
+            std::cerr <<"Error with getSequenceSummary. Codon positions are incorrect.\n";
+            std::cerr <<"Information in compared vectors are not of equal size.\n";
             error = 1;
+        }
+        else
+        {
+            for (unsigned j = 0; j < SSvec->size(); j++)
+            {
+                if (SSvec->at(j) != Gvec->at(j))
+                {
+                    std::cerr << "Error with getSequenceSummary. Codon positions are incorrect";
+                    std::cerr << " for codon " << i << ".\n";
+                    std::cerr << "Should return " << SSvec->at(j) << ", but returns" << Gvec->at(j) << "\n";
+                    error = 1;
+                }
+            }
         }
     }
 
@@ -862,15 +880,14 @@ void testGene()
     unsigned AAListSize = (unsigned)SequenceSummary::aminoAcids().size();
     for (unsigned i = 0; i < AAListSize; i++)
     {
-        if (SS.getAACountForAA(i) != GeneSS.getAACountForAA(i))
+        if (SS.getAACountForAA(i) != GeneSS->getAACountForAA(i))
         {
             std::cerr <<"Error with getSequenceSummary. AA counts are incorrect";
             std::cerr <<" for amino acid " << i <<".\n";
-            std::cerr <<"Should return " << SS.getAACountForAA(i) <<", but returns" << GeneSS.getAACountForAA(i) <<"\n";
+            std::cerr <<"Should return " << SS.getAACountForAA(i) <<", but returns" << GeneSS->getAACountForAA(i) <<"\n";
             error = 1;
         }
     }
-
     if (!error)
     {
         std::cout <<"Gene getSequenceSummary --- Pass\n";
@@ -883,7 +900,6 @@ void testGene()
     //-----------------------------------------------//
     //------ get/setObservedPhiValues Function ------//
     //-----------------------------------------------//
-
     std::vector <double> tmp;
     tmp = testGene.getObservedPhiValues();
 
@@ -1065,7 +1081,6 @@ void testGene()
     {
         error = 0; //Reset for next function.
     }
-
 
 
 

@@ -102,7 +102,8 @@ int main()
 
 	if (1)
 	{
-		testSequenceSummary();
+		//testSequenceSummary();
+		testGene();
 		exit(1);
 	}
 	std::string modelToRun = "FONSE"; //can also be ROC or FONSE
