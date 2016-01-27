@@ -214,6 +214,7 @@ bool SequenceSummary::processSequence(const std::string& sequence)
 	std::string codon;
 
 	codonPositions.resize(64);
+
 	for (unsigned i = 0u; i < sequence.length(); i += 3)
 	{
 		codon = sequence.substr(i, 3);
