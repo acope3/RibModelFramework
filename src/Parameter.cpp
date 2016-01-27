@@ -642,10 +642,9 @@ std::vector <double> Parameter::readPhiValues(std::string filename)
 		while (currentFile >> tmpString)
 		{
 			pos = tmpString.find(",");
-			pos2 = tmpString.find(",", pos + 1);
-			if (pos != std::string::npos && pos2 != std::string::npos)
+			if (pos != std::string::npos)
 			{
-				std::string val = tmpString.substr(pos + 1, pos2 - (pos + 1));
+				std::string val = tmpString.substr(pos + 1);
 				//RV.push_back(std::stod(val));
 				RV.push_back(std::atof(val.c_str()));
 			}

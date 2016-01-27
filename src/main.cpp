@@ -373,12 +373,12 @@ int main()
 {
 	unsigned index;
 	bool fromRestart = false;
-	std::string modelToRun = "RFP";
+	std::string modelToRun = "FONSE";
 
 
 	
 	std::cout << "Initializing MCMCAlgorithm object---------------" << std::endl;
-	int samples = 10;
+	int samples = 100;
 	int thining = 10;
 	int useSamples = 100;
 	unsigned numMixtures = 1;
@@ -392,7 +392,7 @@ int main()
 	if (modelToRun == "FONSE") {
 		std::cout << "initialize Genome object--------------------------" << std::endl;
 		Genome genome;
-		genome.readFasta("C:/Users/Jeremy/Documents/GitHub/RibModelDev/data/FONSE/genome_2000.fasta");
+		genome.readFasta("C:/Users/Jeremy/Documents/GitHub/RibModelDev/data/FONSE/nse2000.fasta");
 		std::cout << "Done!-------------------------------\n\n\n";
 
 
@@ -412,7 +412,7 @@ int main()
 		//ROCParameter parameter;
 		FONSEParameter parameter;
 		std::cout << "initialize Parameter object" << std::endl;
-		std::string mixDef = ROCParameter::selectionShared;
+		std::string mixDef = Parameter::allUnique;
 		if (fromRestart)
 		{
 			FONSEParameter tmp("C:/Users/Jeremy/Documents/GitHub/RibModelDev/DevRScripts/10restartfile.rst");
@@ -420,7 +420,7 @@ int main()
 		}
 		else
 		{
-			//ROCParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
+			//ROCParameter tmp(sphi_init, nu/mMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 			FONSEParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 
 			for (unsigned i = 0u; i < numMixtures; i++)
@@ -431,12 +431,12 @@ int main()
 			std::cout << "\t# mixtures: " << numMixtures << "\n";
 			std::cout << "\tmixture definition: " << mixDef << "\n";
 
-			std::vector<std::string> files(1);
-			files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelDev/data/FONSE/genome_2000.mutation.csv");
-			tmp.initMutationCategories(files, tmp.getNumMutationCategories());
-			tmp.InitializeSynthesisRate(genome, sphi_init[0]);
-			//std::vector<double> phiVals = parameter.readPhiValues("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrCleft_phi_est.csv");
-			//parameter.InitializeSynthesisRate(phiVals);
+			//std::vector<std::string> files(1);
+			//files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelDev/data/FONSE/Scereviciae.mut.csv");
+			//tmp.initMutationCategories(files, tmp.getNumMutationCategories());
+			//tmp.InitializeSynthesisRate(genome, sphi_init[0]);
+			std::vector<double> phiVals = parameter.readPhiValues("C:/Users/Jeremy/Documents/GitHub/RibModelDev/data/FONSE/nse2000.phi.csv");
+			tmp.InitializeSynthesisRate(phiVals);
 			parameter = tmp;
 		}
 		std::cout << "done initialize Parameter object" << std::endl;
