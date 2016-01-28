@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 
 class Gene
@@ -45,7 +46,7 @@ class Gene
 		void setSequence(std::string _seq);
 		SequenceSummary *getSequenceSummary();
 		std::vector<double> getObservedPhiValues();
-		void setObservedPhiValues(std::vector <double> values); //FOR TEST THAT ONLY!
+		void setObservedPhiValues(std::vector <double> values); //Only for unit testing.
 		double getObservedSynthesisRate(unsigned index);
 		unsigned getNumObservedSynthesisSets();
 		char getNucleotideAt(unsigned i);

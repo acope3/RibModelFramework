@@ -1084,5 +1084,7 @@ void testGene()
 
 
 
-            //------ cleanSequence Function ------//
+    //------ cleanSequence Function ------//
+    testGene.setSequence("AAATTTNGCYRNKROTTN");
+    std::cout <<testGene.getSequence() <<"\n";
 }
