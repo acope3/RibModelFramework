@@ -1120,3 +1120,12 @@ void testGene()
   //  testGene.setSequence("AAATTTNGCYRNKROTTN");
    // std::cout <<testGene.getSequence() <<"\n";
 }
+
+
+void testGenome()
+{
+    //--------------------------------//
+    //------ readFasta Function ------//
+    //--------------------------------//
+    
+}
