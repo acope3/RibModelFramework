@@ -41,6 +41,7 @@ class SequenceSummary
 		SequenceSummary(const std::string& sequence);
 		SequenceSummary(const SequenceSummary& other);
 		SequenceSummary& operator=(const SequenceSummary& other);
+		bool operator==(const SequenceSummary& other) const;
 		virtual ~SequenceSummary(); //TODO:Why is this virtual????
 
 
