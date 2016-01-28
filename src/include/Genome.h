@@ -28,6 +28,7 @@ class Genome
 		//Constructors & Destructors:
 		explicit Genome();
 		Genome& operator=(const Genome& other);
+		bool operator==(const Genome& other) const;
 		virtual ~Genome();
 
 

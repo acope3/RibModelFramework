@@ -35,6 +35,17 @@ Genome::~Genome()
 }
 
 
+bool Genome::operator==(const Genome& other) const
+{
+	bool match = true;
+
+	if(!(this->genes == other.genes)) { match = false;} //Do a ! operation because only the gene comparison is implemented,
+	//not the != operator.
+	if(this->simulatedGenes != other.genes) { match = false;}
+	if(this->numGenesWithPhi != other.numGenesWithPhi) { match = false;}
+
+	return match;
+}
 
 
 

@@ -60,6 +60,19 @@ Gene& Gene::operator=(const Gene& rhs)
 }
 
 
+bool Gene::operator==(const Gene& other) const
+{
+    bool match = true;
+
+    if(this->seq != other.seq) { match = false;}
+    if(this->id != other.id) { match = false;}
+    if(this->description != other.description) { match = false;}
+    if(this->observedSynthesisRateValues != other.observedSynthesisRateValues) { match = false;}
+    if(!(this->geneData == other.geneData)) { match = false;} //if structures aren't equal, genes aren't equal.
+
+    return match;
+}
+
 Gene::~Gene()
 {
     //dtor

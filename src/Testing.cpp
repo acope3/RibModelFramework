@@ -1122,10 +1122,34 @@ void testGene()
 }
 
 
-void testGenome()
+void testGenome(std::string testFileDir)
 {
+
+    int error = 0;
     //--------------------------------//
     //------ readFasta Function ------//
     //--------------------------------//
-    
+
+
+    Genome genome;
+    std::string file = testFileDir + "/" + "test.fasta";
+    genome.readFasta(file, false);
+
+    Gene g1("TEST001", "TEST001 Test Gene", "ATGGCCACTATTGGGTCTTAG");
+    Gene g2("TEST002", "TEST002 Test Gene", "ATGACCGTAATTTTTTACTAG");
+    Gene g3("TEST003", "TEST003 Test Gene", "ATGGTCTACTTTCTGACATAG");
+
+    Genome testGenome;
+    testGenome.addGene(g1, false);
+    testGenome.addGene(g2, false);
+    testGenome.addGene(g3, false);
+
+    if(genome == testGenome)
+    {
+        std::cout <<"Genome readFasta --- Pass\n";
+    }
+    else
+    {
+        std::cerr <<"Error in readFasta. Genomes are not equivelant.\n";
+    }
 }
