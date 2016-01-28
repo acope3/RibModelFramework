@@ -25,7 +25,7 @@ class Gene
 
 
 		SequenceSummary geneData;  //TODO: might make private
-		std::vector<double> observedPhiValues; //TODO: make private
+		std::vector<double> observedSynthesisRateValues; //TODO: make private
 
 
 		///Constructors & Destructors:
@@ -45,8 +45,8 @@ class Gene
 		std::string getSequence();
 		void setSequence(std::string _seq);
 		SequenceSummary *getSequenceSummary();
-		std::vector<double> getObservedPhiValues();
-		void setObservedPhiValues(std::vector <double> values); //Only for unit testing.
+		std::vector<double> getObservedSynthesisRateValues();
+		void setObservedSynthesisRateValues(std::vector <double> values); //Only for unit testing.
 		double getObservedSynthesisRate(unsigned index);
 		unsigned getNumObservedSynthesisSets();
 		char getNucleotideAt(unsigned i);

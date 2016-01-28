@@ -43,7 +43,7 @@ Gene::Gene(const Gene& other)
     id = other.id;
     description = other.description;
     geneData = other.geneData;
-	observedPhiValues = other.observedPhiValues;
+	observedSynthesisRateValues = other.observedSynthesisRateValues;
 }
 
 
@@ -54,7 +54,7 @@ Gene& Gene::operator=(const Gene& rhs)
     id = rhs.id;
     description = rhs.description;
     geneData = rhs.geneData;
-	observedPhiValues = rhs.observedPhiValues;
+    observedSynthesisRateValues = rhs.observedSynthesisRateValues;
     //assignment operator
     return *this;
 }
@@ -151,25 +151,25 @@ SequenceSummary *Gene::getSequenceSummary()
 }
 
 
-std::vector<double> Gene::getObservedPhiValues()
+std::vector<double> Gene::getObservedSynthesisRateValues()
 {
-    return observedPhiValues;
+    return observedSynthesisRateValues;
 }
 
 
-void Gene::setObservedPhiValues(std::vector <double> values)
+void Gene::setObservedSynthesisRateValues(std::vector <double> values)
 {
-    observedPhiValues = values;
+    observedSynthesisRateValues = values;
 }
 
 double Gene::getObservedSynthesisRate(unsigned index)
 {
-	return observedPhiValues[index];
+	return observedSynthesisRateValues[index];
 }
 
 unsigned Gene::getNumObservedSynthesisSets()
 {
-	return observedPhiValues.size();
+	return observedSynthesisRateValues.size();
 }
 
 char Gene::getNucleotideAt(unsigned i)
@@ -332,7 +332,7 @@ RCPP_MODULE(Gene_mod)
     .property("description", &Gene::getDescription, &Gene::setDescription)
     .property("seq", &Gene::getSequence, &Gene::setSequence)
 
-    .method("getObservedPhiValues", &Gene::getObservedPhiValues)
+    .method("getObservedSynthesisRateValues", &Gene::getObservedSynthesisRateValues)
     .method("length", &Gene::length, "returns the length of sequence")
 
 

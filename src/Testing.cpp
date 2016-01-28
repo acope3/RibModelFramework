@@ -901,7 +901,7 @@ void testGene()
     //------ get/setObservedPhiValues Function ------//
     //-----------------------------------------------//
     std::vector <double> tmp;
-    tmp = testGene.getObservedPhiValues();
+    tmp = testGene.getObservedSynthesisRateValues();
 
     if (0 != tmp.size())
     {
@@ -916,8 +916,8 @@ void testGene()
     tmp[0] = 2.34;
     tmp[1] = 3.234;
     tmp[2] = 0.123;
-    testGene.setObservedPhiValues(tmp);
-    tmp = testGene.getObservedPhiValues();
+    testGene.setObservedSynthesisRateValues(tmp);
+    tmp = testGene.getObservedSynthesisRateValues();
     if (3 != tmp.size() || 2.34 != tmp[0] || 3.234 != tmp[1] || 0.123 != tmp[2])
     {
         std::cerr <<"Error with getObservedPhiValues. Function should return 2.34, 3.234, 0.123, but returns:\n";
@@ -938,18 +938,50 @@ void testGene()
     }
 
 
-    //-----------------------------------------------//
-    //------ getObservedSynthesisRate Function ------//
-    //-----------------------------------------------//
-
-
-    //TODO: What should be done here?
-
     //--------------------------------------------------//
     //------ getNumObservedSynthesisSets Function ------//
     //--------------------------------------------------//
 
-    //TODO: What should be done here?
+    if (3 != testGene.getNumObservedSynthesisSets())
+    {
+        std::cerr <<"Error with getNumObservedSynthesisSets. Function should return 3, but returns ";
+        std::cerr << testGene.getNumObservedSynthesisSets() <<".\n";
+    }
+    else
+    {
+        std::cout <<"Gene getNumObservedSynthesisSets --- Pass\n";
+    }
+
+
+
+
+    //-----------------------------------------------//
+    //------ getObservedSynthesisRate Function ------//
+    //-----------------------------------------------//
+
+    tmp = testGene.getObservedSynthesisRateValues();
+    double trueValues[3] = {2.34, 3.234, 0.123};
+    for (unsigned i = 0; i < 3; i++)
+    {
+        if (tmp[i] != trueValues[i])
+        {
+            std::cerr <<"Error with getObservedSynthesisRate. Function should return " << trueValues[i] <<"at index";
+            std::cerr << i <<", but returns " << tmp[i] <<".\n";
+            error = 1;
+        }
+    }
+
+    if (!error)
+    {
+        std::cout <<"Gene getObservedSynthesisRate --- Pass\n";
+    }
+    else
+    {
+        error = 0; //Reset for next function.
+    }
+
+
+
 
     //--------------------------------------//
     //------ getNucleotideAt Function ------//
@@ -1085,6 +1117,6 @@ void testGene()
 
 
     //------ cleanSequence Function ------//
-    testGene.setSequence("AAATTTNGCYRNKROTTN");
-    std::cout <<testGene.getSequence() <<"\n";
+  //  testGene.setSequence("AAATTTNGCYRNKROTTN");
+   // std::cout <<testGene.getSequence() <<"\n";
 }

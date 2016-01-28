@@ -5,17 +5,17 @@ context("Gene")
 
 g <- new(Gene)
 
-test_that("set ID", {
+test_that("set & get ID", {
   g$id = "blah"
   expect_equal(g$id, "blah")
 })
 
-test_that("set description", {
+test_that("set & get description", {
   g$description = "blah blah"
   expect_equal(g$description, "blah blah")
 })
 
-test_that("set sequence", {
+test_that("set & get sequence", {
   g$seq = "ATGCTCATTCTCACTGCTGCCTCGTAG"
   expect_equal(g$seq, "ATGCTCATTCTCACTGCTGCCTCGTAG")
 })
