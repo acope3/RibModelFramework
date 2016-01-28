@@ -8,6 +8,7 @@
 
 void testSequenceSummary();
 void testGene();
+void testGenome();
 
 
 

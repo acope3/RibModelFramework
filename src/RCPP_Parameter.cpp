@@ -71,11 +71,27 @@ RCPP_MODULE(Parameter_mod)
 		//Other Functions:
 		.method("calculateSelectionCoefficients", &ROCParameter::calculateSelectionCoefficientsR)
 
+
+
+
+
+
 		//Used for getters and setters
 		.property("numMutationCategories", &Parameter::getNumMutationCategories, &Parameter::setNumMutationCategories)
 		.property("numSelectionCategories", &Parameter::getNumSelectionCategories, &Parameter::setNumSelectionCategories)
 		.property("numMixtures", &Parameter::getNumMixtureElements, &Parameter::setNumMixtureElements)
-		;
+;
+
+
+
+		//only temporary testing
+		function("randNorm", &Parameter::randNorm);
+		function("randLogNorm", &Parameter::randLogNorm);
+		function("randExp", &Parameter::randExp);
+		function("randGamma", &Parameter::randGamma);
+		function("randUnif", &Parameter::randUnif);
+		function("densityNorm", &Parameter::densityNorm);
+		function("densityLogNorm", &Parameter::densityLogNorm);
 
 
 	class_<ROCParameter>( "ROCParameter" )
