@@ -23,7 +23,7 @@ Gene::Gene(std::string _seq, std::string _id, std::string _desc) : seq(_seq), id
     cleanSeq();
 	if (seq.length() % 3 == 0)
 	{
-		geneData.processSequence(seq);
+		geneData.processSequence(_seq);
 	}
 	else 
 	{
@@ -43,7 +43,7 @@ Gene::Gene(const Gene& other)
     id = other.id;
     description = other.description;
     geneData = other.geneData;
-	observedPhiValues = other.observedPhiValues;
+	observedSynthesisRateValues = other.observedSynthesisRateValues;
 }
 
 
@@ -54,11 +54,24 @@ Gene& Gene::operator=(const Gene& rhs)
     id = rhs.id;
     description = rhs.description;
     geneData = rhs.geneData;
-	observedPhiValues = rhs.observedPhiValues;
+    observedSynthesisRateValues = rhs.observedSynthesisRateValues;
     //assignment operator
     return *this;
 }
 
+
+bool Gene::operator==(const Gene& other) const
+{
+    bool match = true;
+
+    if(this->seq != other.seq) { match = false;}
+    if(this->id != other.id) { match = false;}
+    if(this->description != other.description) { match = false;}
+    if(this->observedSynthesisRateValues != other.observedSynthesisRateValues) { match = false;}
+    if(!(this->geneData == other.geneData)) { match = false;} //if structures aren't equal, genes aren't equal.
+
+    return match;
+}
 
 Gene::~Gene()
 {
@@ -144,31 +157,32 @@ void Gene::setSequence(std::string _seq)
 }
 
 
-SequenceSummary& Gene::getSequenceSummary()
+SequenceSummary *Gene::getSequenceSummary()
 {
-    return geneData;
+    SequenceSummary *rv = &geneData;
+    return rv;
 }
 
 
-std::vector<double> Gene::getObservedPhiValues()
+std::vector<double> Gene::getObservedSynthesisRateValues()
 {
-    return observedPhiValues;
+    return observedSynthesisRateValues;
 }
 
 
-void Gene::setObservedPhiValues(std::vector <double> values)
+void Gene::setObservedSynthesisRateValues(std::vector <double> values)
 {
-    observedPhiValues = values;
+    observedSynthesisRateValues = values;
 }
 
 double Gene::getObservedSynthesisRate(unsigned index)
 {
-	return observedPhiValues[index];
+	return observedSynthesisRateValues[index];
 }
 
 unsigned Gene::getNumObservedSynthesisSets()
 {
-	return observedPhiValues.size();
+	return observedSynthesisRateValues.size();
 }
 
 char Gene::getNucleotideAt(unsigned i)
@@ -241,18 +255,15 @@ std::string Gene::toAASequence()
 
 unsigned Gene::getAACount(std::string aa)
 {
-    bool error = false;
     unsigned rv = 0;
 
-    //TODO: more extranious testing on input (capital letters, valid letters) to prevent R crashing (on all fcts below as well).
-    if (aa.size() != 1)
-    {
-        error = true;
-        std::cerr <<"Invalid string given. Returning 0.\n";
-    }
-    if (!error)
+    if (SequenceSummary::aaToIndex.end() != SequenceSummary::aaToIndex.find(aa))
     {
         rv = geneData.getAACountForAA(aa);
+    }
+    else
+    {
+        Rprintf("Invalid string given. Returning 0.\n");
     }
     return rv;
 }
@@ -260,24 +271,32 @@ unsigned Gene::getAACount(std::string aa)
 
 unsigned Gene::getCodonCount(std::string& codon)
 {
-    bool error = false;
     unsigned rv = 0;
-    if (codon.size() != 3)
-    {
-        error = true;
-        std::cerr <<"Invalid codon given. Returning 0.\n";
-    }
 
-    if(!error)
+    if (SequenceSummary::codonToIndexWithReference.end() != SequenceSummary::codonToIndexWithReference.find(codon))
     {
         rv = geneData.getCodonCountForCodon(codon);
+    }
+    else
+    {
+        Rprintf("Invalid codon given. Returning 0.\n");
     }
     return rv;
 }
 
 unsigned Gene::getRFPObserved(std::string codon)
 {
-    return geneData.getRFPObserved(codon);
+    unsigned rv = 0;
+
+    if (SequenceSummary::codonToIndexWithReference.end() != SequenceSummary::codonToIndexWithReference.find(codon))
+    {
+        rv = geneData.getRFPObserved(codon);
+    }
+    else
+    {
+        Rprintf("Invalid codon given. Returning 0.\n");
+    }
+    return rv;
 }
 
 
@@ -285,7 +304,19 @@ std::vector <unsigned> Gene::getCodonPositions(std::string codon)
 {
     std::vector <unsigned> rv;
     std::vector <unsigned> *tmp;
-    tmp = geneData.getCodonPositions(codon);
+    tmp = &rv; //So if an invalid codon is given, tmp will point to an empty vector.
+
+
+    if (SequenceSummary::codonToIndexWithReference.end() != SequenceSummary::codonToIndexWithReference.find(codon))
+    {
+        tmp = geneData.getCodonPositions(codon);
+    }
+    else
+    {
+        Rprintf("Invalid codon given. Returning empty vector.\n");
+    }
+
+
     for (unsigned i = 0; i < tmp -> size(); i++)
     {
         rv.push_back(tmp->at(i));
@@ -301,8 +332,6 @@ std::vector <unsigned> Gene::getCodonPositions(std::string codon)
 //---------------------------------//
 
 
-RCPP_EXPOSED_CLASS(SequenceSummary) //TODO: try removing this at the end now.
-
 RCPP_MODULE(Gene_mod)
 {
   class_<Gene>( "Gene" )
@@ -316,7 +345,7 @@ RCPP_MODULE(Gene_mod)
     .property("description", &Gene::getDescription, &Gene::setDescription)
     .property("seq", &Gene::getSequence, &Gene::setSequence)
 
-    .method("getObservedPhiValues", &Gene::getObservedPhiValues)
+    .method("getObservedSynthesisRateValues", &Gene::getObservedSynthesisRateValues)
     .method("length", &Gene::length, "returns the length of sequence")
 
 

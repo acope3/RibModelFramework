@@ -113,6 +113,19 @@ SequenceSummary& SequenceSummary::operator=(const SequenceSummary& rhs)
 }
 
 
+bool SequenceSummary::operator==(const SequenceSummary& other) const
+{
+	bool match = true;
+
+	if (this->naa != other.naa) { match = false;}
+	if (this->ncodons != other.ncodons) { match = false;}
+	if (this->codonPositions != other.codonPositions) { match = false;}
+	if (this->RFPObserved != other.RFPObserved) { match = false;}
+
+	return match;
+}
+
+
 SequenceSummary::~SequenceSummary()
 {
 	//dtor
@@ -214,6 +227,7 @@ bool SequenceSummary::processSequence(const std::string& sequence)
 	std::string codon;
 
 	codonPositions.resize(64);
+
 	for (unsigned i = 0u; i < sequence.length(); i += 3)
 	{
 		codon = sequence.substr(i, 3);

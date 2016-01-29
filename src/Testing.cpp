@@ -822,39 +822,57 @@ void testGene()
     //------ getSequenceSummary ------//
     //--------------------------------//
 
-    Gene testGene("1", "test Gene", "ATGCTCATTCTCACTGCTGCCTCGTAG");
+    Gene testGene("ATGCTCATTCTCACTGCTGCCTCGTAG", "1", "test Gene");
     SequenceSummary SS("ATGCTCATTCTCACTGCTGCCTCGTAG");
-    SequenceSummary GeneSS = testGene.getSequenceSummary();
+    SequenceSummary *GeneSS = testGene.getSequenceSummary();
     for (unsigned i = 0; i < 64; i++)
     {
-        if (SS.getCodonCountForCodon(i) != GeneSS.getCodonCountForCodon(i))
+        if (SS.getCodonCountForCodon(i) != GeneSS->getCodonCountForCodon(i))
         {
             std::cerr <<"Error with getSequenceSummary. Codon counts are incorrect";
-            std::cerr <<" for codon " << i <<".\n";
-            std::cerr <<"Should return " << SS.getCodonCountForCodon(i) <<", but returns" << GeneSS.getCodonCountForCodon(i) <<"\n";
+            std::cerr <<" for codon " << i <<", " << SequenceSummary::codonArray[i] <<".\n";
+            std::cerr <<"Should return " << SS.getCodonCountForCodon(i) <<", but returns" << GeneSS->getCodonCountForCodon(i) <<"\n";
             error = 1;
         }
     }
 
+
     for (unsigned i = 0; i < 64; i++)
     {
-        if (SS.getRFPObserved(i) != GeneSS.getRFPObserved(i))
+        if (SS.getRFPObserved(i) != GeneSS->getRFPObserved(i))
         {
             std::cerr <<"Error with getSequenceSummary. RFP observed is incorrect";
             std::cerr <<" for codon " << i <<".\n";
-            std::cerr <<"Should return " << SS.getRFPObserved(i) <<", but returns" << GeneSS.getRFPObserved(i) <<"\n";
+            std::cerr <<"Should return " << SS.getRFPObserved(i) <<", but returns" << GeneSS->getRFPObserved(i) <<"\n";
             error = 1;
         }
     }
 
+    //This fails because this returns pointers to vectors and they need to be compared differently.
+    std::vector <unsigned> *SSvec;
+    std::vector <unsigned> *Gvec;
     for (unsigned i = 0; i < 64; i++)
     {
-        if (SS.getCodonPositions(i) != GeneSS.getCodonPositions(i))
+        SSvec = SS.getCodonPositions(i);
+        Gvec = GeneSS->getCodonPositions(i);
+        if (SSvec->size() != Gvec->size())
         {
-            std::cerr <<"Error with getSequenceSummary. Codon positions are incorrect";
-            std::cerr <<" for codon " << i <<".\n";
-            std::cerr <<"Should return " << SS.getCodonPositions(i) <<", but returns" << GeneSS.getCodonPositions(i) <<"\n";
+            std::cerr <<"Error with getSequenceSummary. Codon positions are incorrect.\n";
+            std::cerr <<"Information in compared vectors are not of equal size.\n";
             error = 1;
+        }
+        else
+        {
+            for (unsigned j = 0; j < SSvec->size(); j++)
+            {
+                if (SSvec->at(j) != Gvec->at(j))
+                {
+                    std::cerr << "Error with getSequenceSummary. Codon positions are incorrect";
+                    std::cerr << " for codon " << i << ".\n";
+                    std::cerr << "Should return " << SSvec->at(j) << ", but returns" << Gvec->at(j) << "\n";
+                    error = 1;
+                }
+            }
         }
     }
 
@@ -862,15 +880,14 @@ void testGene()
     unsigned AAListSize = (unsigned)SequenceSummary::aminoAcids().size();
     for (unsigned i = 0; i < AAListSize; i++)
     {
-        if (SS.getAACountForAA(i) != GeneSS.getAACountForAA(i))
+        if (SS.getAACountForAA(i) != GeneSS->getAACountForAA(i))
         {
             std::cerr <<"Error with getSequenceSummary. AA counts are incorrect";
             std::cerr <<" for amino acid " << i <<".\n";
-            std::cerr <<"Should return " << SS.getAACountForAA(i) <<", but returns" << GeneSS.getAACountForAA(i) <<"\n";
+            std::cerr <<"Should return " << SS.getAACountForAA(i) <<", but returns" << GeneSS->getAACountForAA(i) <<"\n";
             error = 1;
         }
     }
-
     if (!error)
     {
         std::cout <<"Gene getSequenceSummary --- Pass\n";
@@ -883,9 +900,8 @@ void testGene()
     //-----------------------------------------------//
     //------ get/setObservedPhiValues Function ------//
     //-----------------------------------------------//
-
     std::vector <double> tmp;
-    tmp = testGene.getObservedPhiValues();
+    tmp = testGene.getObservedSynthesisRateValues();
 
     if (0 != tmp.size())
     {
@@ -900,8 +916,8 @@ void testGene()
     tmp[0] = 2.34;
     tmp[1] = 3.234;
     tmp[2] = 0.123;
-    testGene.setObservedPhiValues(tmp);
-    tmp = testGene.getObservedPhiValues();
+    testGene.setObservedSynthesisRateValues(tmp);
+    tmp = testGene.getObservedSynthesisRateValues();
     if (3 != tmp.size() || 2.34 != tmp[0] || 3.234 != tmp[1] || 0.123 != tmp[2])
     {
         std::cerr <<"Error with getObservedPhiValues. Function should return 2.34, 3.234, 0.123, but returns:\n";
@@ -922,18 +938,50 @@ void testGene()
     }
 
 
-    //-----------------------------------------------//
-    //------ getObservedSynthesisRate Function ------//
-    //-----------------------------------------------//
-
-
-    //TODO: What should be done here?
-
     //--------------------------------------------------//
     //------ getNumObservedSynthesisSets Function ------//
     //--------------------------------------------------//
 
-    //TODO: What should be done here?
+    if (3 != testGene.getNumObservedSynthesisSets())
+    {
+        std::cerr <<"Error with getNumObservedSynthesisSets. Function should return 3, but returns ";
+        std::cerr << testGene.getNumObservedSynthesisSets() <<".\n";
+    }
+    else
+    {
+        std::cout <<"Gene getNumObservedSynthesisSets --- Pass\n";
+    }
+
+
+
+
+    //-----------------------------------------------//
+    //------ getObservedSynthesisRate Function ------//
+    //-----------------------------------------------//
+
+    tmp = testGene.getObservedSynthesisRateValues();
+    double trueValues[3] = {2.34, 3.234, 0.123};
+    for (unsigned i = 0; i < 3; i++)
+    {
+        if (tmp[i] != trueValues[i])
+        {
+            std::cerr <<"Error with getObservedSynthesisRate. Function should return " << trueValues[i] <<"at index";
+            std::cerr << i <<", but returns " << tmp[i] <<".\n";
+            error = 1;
+        }
+    }
+
+    if (!error)
+    {
+        std::cout <<"Gene getObservedSynthesisRate --- Pass\n";
+    }
+    else
+    {
+        error = 0; //Reset for next function.
+    }
+
+
+
 
     //--------------------------------------//
     //------ getNucleotideAt Function ------//
@@ -1068,6 +1116,40 @@ void testGene()
 
 
 
+    //------ cleanSequence Function ------//
+  //  testGene.setSequence("AAATTTNGCYRNKROTTN");
+   // std::cout <<testGene.getSequence() <<"\n";
+}
 
-            //------ cleanSequence Function ------//
+
+void testGenome(std::string testFileDir)
+{
+
+    int error = 0;
+    //--------------------------------//
+    //------ readFasta Function ------//
+    //--------------------------------//
+
+
+    Genome genome;
+    std::string file = testFileDir + "/" + "test.fasta";
+    genome.readFasta(file, false);
+
+    Gene g1("TEST001", "TEST001 Test Gene", "ATGGCCACTATTGGGTCTTAG");
+    Gene g2("TEST002", "TEST002 Test Gene", "ATGACCGTAATTTTTTACTAG");
+    Gene g3("TEST003", "TEST003 Test Gene", "ATGGTCTACTTTCTGACATAG");
+
+    Genome testGenome;
+    testGenome.addGene(g1, false);
+    testGenome.addGene(g2, false);
+    testGenome.addGene(g3, false);
+
+    if(genome == testGenome)
+    {
+        std::cout <<"Genome readFasta --- Pass\n";
+    }
+    else
+    {
+        std::cerr <<"Error in readFasta. Genomes are not equivelant.\n";
+    }
 }

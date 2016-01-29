@@ -83,7 +83,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 	double logLikelihood = 0.0;
 	double logLikelihood_proposed = 0.0;
 
-	SequenceSummary *seqsum = &gene.getSequenceSummary();
+	SequenceSummary *seqsum = gene.getSequenceSummary();
 
 	// get correct index for everything
 	unsigned mutationCategory = parameter->getMutationCategory(k);
@@ -169,7 +169,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 	for(int i = 0; i < numGenes; i++)
 	{
 		gene = &genome.getGene(i);
-		seqsum = &gene->getSequenceSummary();
+		seqsum = gene->getSequenceSummary();
 		if(seqsum->getAACountForAA(aaIndex) == 0) continue;
 
 		// which mixture element does this gene belong to

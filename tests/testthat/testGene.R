@@ -5,17 +5,17 @@ context("Gene")
 
 g <- new(Gene)
 
-test_that("set ID", {
+test_that("set & get ID", {
   g$id = "blah"
   expect_equal(g$id, "blah")
 })
 
-test_that("set description", {
+test_that("set & get description", {
   g$description = "blah blah"
   expect_equal(g$description, "blah blah")
 })
 
-test_that("set sequence", {
+test_that("set & get sequence", {
   g$seq = "ATGCTCATTCTCACTGCTGCCTCGTAG"
   expect_equal(g$seq, "ATGCTCATTCTCACTGCTGCCTCGTAG")
 })
@@ -25,36 +25,9 @@ test_that("Length", {
   expect_equal(g$length(), 27)
 })
 
-test_that("Reverse Complement", {
-  expect_equal(g$reverseComplement()$seq, "CTACGAGGCAGCAGTGAGAATGAGCAT")
-})
-
-test_that("AA Sequence", {
-  expect_equal(g$toAASequence(), "MLILTAASX")
-})
-
-test_that("clear", {
-  g$clear()
-  expect_equal(g$id, "")
-  expect_equal(g$description, "")
-  expect_equal(g$seq, "")
-})
-
-
-test_that("clean Sequence", {
-  g$seq <- "ATGGTAACTTAG"
-  g$cleanSeq()
-  expect_equal(g$seq, "ATGGTAACTTAG")
-  
-#  g$seq <- "ATGGTAACTNNNQQQTAG"
-#  g$cleanSeq()
-#  expect_equal(g$seq, "ATGGTAACTNNNTAG")
-})
-
-g$clear()
-
-g$seq <- "ATGCTCATTCTCACTGCTGCCTCGTAG"
-
+g <- new(Gene, "ATGCTCATTCTCACTGCTGCCTCGTAG", "2", "New Test Gene")
+#TODO: problem. This used to say g$seq <- "kjdklsjfkdj" (string). It
+#does set the string correctly, but the values in SS are NOT CLEARED.
 test_that("get AA Count", {
   expect_equal(g$getAACount("M"), 1)
   expect_equal(g$getAACount("L"), 2)
@@ -64,6 +37,10 @@ test_that("get AA Count", {
   expect_equal(g$getAACount("S"), 1)
   expect_equal(g$getAACount("X"), 1)
   expect_equal(g$getAACount("G"), 0)
+  
+  #Checking invalid cases
+  expect_equal(g$getAACount("g"), 0)
+  expect_equal(g$getAACount("AA"), 0)
 })
 
 test_that("get Codon Counts", {
@@ -76,17 +53,21 @@ test_that("get Codon Counts", {
   expect_equal(g$getCodonCount("TCG"), 1)
   expect_equal(g$getCodonCount("TAG"), 1)
   expect_equal(g$getCodonCount("AAA"), 0)
+  
+  #Checking invalid cases
+  expect_equal(g$getCodonCount("atg"), 0)
+  expect_equal(g$getCodonCount("ATGG"), 0)
 })
 
 test_that("get RFP Observed", {
-  g$setRFPObserved(4, 35)
-  g$setRFPObserved(16, 45)
-  g$setRFPObserved(54, 2)
-  g$setRFPObserved(45, 0)
-  expect_equal(g$getRFPObserved("TGC"), 35)
-  expect_equal(g$getRFPObserved("CAC"), 45)
-  expect_equal(g$getRFPObserved("GTG"),2)
+  expect_equal(g$getRFPObserved("TGC"), 0)
+  expect_equal(g$getRFPObserved("CAC"), 0)
+  expect_equal(g$getRFPObserved("GTG"),0)
   expect_equal(g$getRFPObserved("TCC"), 0)
+  
+  #Checking invalid cases
+  expect_equal(g$getRFPObserved("atg"), 0)
+  expect_equal(g$getRFPObserved("ATGG"), 0)
 })
 
 test_that("get Codon Positions", {
@@ -99,6 +80,13 @@ test_that("get Codon Positions", {
   expect_equal(g$getCodonPositions("TCG"), c(7))
   expect_equal(g$getCodonPositions("TAG"), c(8))
   expect_equal(g$getCodonPositions("GTG"), numeric(0))
+  
+  #Checking invalid cases
+  expect_equal(g$getCodonPositions("atg"), numeric(0))
+  expect_equal(g$getCodonPositions("ATGG"), numeric(0))
 })
 
 
+#TODO NOTE:
+#See if there is a way to expect error messages instead of retrun values, or 
+#if you can check for both.

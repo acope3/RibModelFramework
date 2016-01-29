@@ -4,10 +4,12 @@
 
 #include "SequenceSummary.h"
 #include "Gene.h"
+#include "Genome.h"
 
 
 void testSequenceSummary();
 void testGene();
+void testGenome(std::string testFileDir);
 
 
 
