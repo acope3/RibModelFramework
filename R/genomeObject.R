@@ -45,3 +45,10 @@ summary.Rcpp_Genome <- function(genome) {
   # - ...
   summary(object, ...)
 }
+
+getNames <- function(genome, simulated = FALSE)
+{
+  genes <- genome$getGenes(simulated)
+  gene.names <- unlist(lapply(1:length(genes), function(i){return(genes[[i]]$id)}))
+  return(gene.names)
+}
