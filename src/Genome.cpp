@@ -591,7 +591,7 @@ std::vector <Gene> Genome::getGenes(bool simulated)
 }
 
 
-unsigned Genome::getNumGenesWithPhi(unsigned index)
+unsigned Genome::getNumGenesWithPhiForIndex(unsigned index)
 {
 	return numGenesWithPhi[index];
 }
@@ -625,9 +625,9 @@ Gene& Genome::getGene(std::string id, bool simulated)
 //-------------------------------------//
 
 
-unsigned Genome::getGenomeSize()
+unsigned Genome::getGenomeSize(bool simulated)
 {
-	return (unsigned)genes.size();
+	return simulated ? (unsigned)simulatedGenes.size() : (unsigned)genes.size();
 }
 
 
@@ -667,6 +667,17 @@ std::vector<unsigned> Genome::getCodonCountsPerGene(std::string codon)
 
 
 
+
+
+//---------------------------------------//
+//---------- Testing Functions ----------//
+//---------------------------------------//
+
+
+std::vector<unsigned> Genome::getNumGenesWithPhi()
+{
+	return numGenesWithPhi;
+}
 
 
 
