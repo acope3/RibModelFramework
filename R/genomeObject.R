@@ -33,7 +33,7 @@ initializeGenomeObject <- function(file, fasta=TRUE, expression.file=NULL, appen
 #' 
 #' @return returns the number of genes in a genome
 length.Rcpp_Genome <- function(x) {
-  return(x$getGenomeSize())
+  return(x$getGenomeSize(F))
 }
 
 summary.Rcpp_Genome <- function(genome) {
