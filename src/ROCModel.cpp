@@ -620,7 +620,7 @@ void ROCModel::updateGibbsSampledHyperParameters(Genome &genome)
 			}
 			rate /= 2;
 			double rand = parameter->randGamma(shape, rate);
-			parameter->setObservedSynthesisNoise(i, std::sqrt(1 / rand));
+			parameter->setObservedSynthesisNoise(i, 1/rand);
 		}
 	}
 }

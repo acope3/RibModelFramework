@@ -326,7 +326,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 #else
 		std::cerr << "Error in Genome::readObservedPhiValues: Can not open file " << filename << "\n";
 #endif
-	}
+	} //End of opening a file and it resulting in a failure.
 	else
 	{
 		std::getline(input, tmp); //Trash the header line
@@ -338,7 +338,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 #else
 			std::cerr << "Genome is empty, function will not execute!\n";
 #endif
-		}
+		} //end of checking size constraint.
 		else
 		{
 			if (byId)
