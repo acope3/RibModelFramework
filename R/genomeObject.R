@@ -33,7 +33,7 @@ initializeGenomeObject <- function(file, fasta=TRUE, expression.file=NULL, appen
 #' 
 #' @return returns the number of genes in a genome
 length.Rcpp_Genome <- function(x) {
-  return(x$getGenomeSize())
+  return(x$getGenomeSize(F))
 }
 
 summary.Rcpp_Genome <- function(genome) {
@@ -44,4 +44,11 @@ summary.Rcpp_Genome <- function(genome) {
   # - avg. AA composition
   # - ...
   summary(object, ...)
+}
+
+getNames <- function(genome, simulated = FALSE)
+{
+  genes <- genome$getGenes(simulated)
+  gene.names <- unlist(lapply(1:length(genes), function(i){return(genes[[i]]$id)}))
+  return(gene.names)
 }

@@ -28,6 +28,7 @@ class Genome
 		//Constructors & Destructors:
 		explicit Genome();
 		Genome& operator=(const Genome& other);
+		bool operator==(const Genome& other) const;
 		virtual ~Genome();
 
 
@@ -42,16 +43,20 @@ class Genome
 		//Gene Functions:
 		void addGene(const Gene& gene, bool simulated = false);
 		std::vector <Gene> getGenes(bool simulated = false);
-		unsigned getNumGenesWithPhi(unsigned index);
+		unsigned getNumGenesWithPhiForIndex(unsigned index);
 		Gene& getGene(unsigned index, bool simulated = false);
 		Gene& getGene(std::string id, bool simulated = false);
 
 
 		//Other Functions:
-		unsigned getGenomeSize();
+		unsigned getGenomeSize(bool simulated = false);
 		void clear();
 		Genome getGenomeForGeneIndicies(std::vector <unsigned> indicies, bool simulated = false); //NOTE: If simulated is true, it will return a genome with the simulated genes, but the returned genome's genes vector will contain the simulated genes.
 		std::vector<unsigned> getCodonCountsPerGene(std::string codon);
+
+
+		//Testing Functions:
+		std::vector <unsigned> getNumGenesWithPhi();
 
 
 

@@ -20,11 +20,11 @@
 #' 
 plot.Rcpp_ROCParameter <- function(x, what = "Mutation", samples = 100, ...)
 {
-  plotParameterObject(x, what = "Mutation", samples = 100, ...)
+  plotParameterObject(x, what = what, samples = 100, ...)
 }
 plot.Rcpp_FONSEParameter <- function(x, what = "Mutation", samples = 100, ...)
 {
-  plotParameterObject(x, what = "Mutation", samples = 100, ...)
+  plotParameterObject(x, what = what, samples = 100, ...)
 }
 
 plotParameterObject <- function(x, what = "Mutation", samples = 100, ...){
@@ -34,6 +34,7 @@ plotParameterObject <- function(x, what = "Mutation", samples = 100, ...){
   
   names.aa <- aminoAcids()
   paramType <- ifelse(what == "Mutation", 0, 1)
+  cat("ParamType: ", paramType, "\n")
   for(mixture in 1:numMixtures){
     param.storage <- vector("numeric", 0)
     param.name.storage <- vector("numeric", 0)
@@ -47,9 +48,9 @@ plotParameterObject <- function(x, what = "Mutation", samples = 100, ...){
     }
     csp.params[, mixture] <- param.storage
   }
-  rownames(csp.params) <- param.name.storage
+  #rownames(csp.params) <- param.name.storage
   colnames(csp.params) <- paste("Mixture\nElement", 1:numMixtures)
-  pairs(csp.params, upper.panel = upper.panel.plot, lower.panel=NULL, main = ...)
+  pairs(csp.params, upper.panel = upper.panel.plot, lower.panel=NULL)
 }
 
 
