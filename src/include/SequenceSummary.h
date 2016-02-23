@@ -13,14 +13,15 @@
 #ifndef STANDALONE
 #include <Rcpp.h>
 #endif
+#include <array>
 
 class SequenceSummary
 {
 	private:
 
-		unsigned ncodons[64];
-		unsigned RFPObserved[64];
-		unsigned naa[22];
+		std::array<unsigned, 64> ncodons;
+		std::array<unsigned, 64> RFPObserved;
+		std::array<unsigned, 22> naa;
 		std::vector <std::vector <unsigned>> codonPositions;
 
 	public:
