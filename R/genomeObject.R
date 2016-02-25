@@ -14,6 +14,7 @@
 #' 
 initializeGenomeObject <- function(file, fasta=TRUE, expression.file=NULL, append=FALSE) {
   genome <- new(Genome)
+  #genome <- new(Genome, 1, "ROC", TRUE) #CT ONLY
   if (fasta == TRUE) {
     genome$readFasta(file, append)
   } else {

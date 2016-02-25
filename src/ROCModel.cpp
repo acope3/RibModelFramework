@@ -610,7 +610,7 @@ void ROCModel::updateGibbsSampledHyperParameters(Genome &genome)
 			unsigned mixtureAssignment;
 			double noiseOffset = getNoiseOffset(i);
 			for (unsigned j = 0; j < genome.getGenomeSize(); j++) {
-				mixtureAssignment = getMixtureAssignment(i);
+				mixtureAssignment = getMixtureAssignment(j);
 				double obsPhi = genome.getGene(j).getObservedSynthesisRate(i);
 				if (obsPhi > -1.0) {
 					double sum = std::log(obsPhi) - noiseOffset - std::log(getSynthesisRate(j, mixtureAssignment, false));

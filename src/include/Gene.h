@@ -30,7 +30,7 @@ class Gene
 
 		///Constructors & Destructors:
 		Gene();
-		Gene(std::string _id, std::string _desc, std::string _seq);
+		Gene(std::string _seq, std::string _id, std::string _desc);
 		Gene(const Gene& other);
 		Gene& operator=(const Gene& rhs);
 		bool operator==(const Gene& other) const;

@@ -103,7 +103,8 @@ int main()
 	if (1)
 	{
 		//testSequenceSummary();
-		testGene();
+		//testGene();
+		testGenome("/Users/roxasoath1/Desktop/RibModelDevScripts/RibModelDev/data/UnitTestingData");
 		exit(1);
 	}
 	std::string modelToRun = "FONSE"; //can also be ROC or FONSE

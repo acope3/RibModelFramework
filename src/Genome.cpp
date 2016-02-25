@@ -409,20 +409,25 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 								val = tmp.substr(pos + 1, pos2 - (pos + 1));
 							}
 							double value = std::atof(val.c_str());
-							if (value <=  0 || std::isnan(value))
+
+							//If the value is negative, we set it and throw a warning message.
+							//If the value is nan or 0, we set it -1 and throw a warning message.
+							if (value <=  0)
 							{
-								if (value == 0 || std::isnan(value))
-								{
-									value = -1;
-								}
-								else
-								{
 #ifndef STANDALONE
-									Rf_warning("Negative phi value given - values should not be on the log scale. Negative Value stored.");
+								Rf_warning("Negative phi value given - values should not be on the log scale. Negative Value stored.");
 #else
-									std::cerr << "WARNING! Negative phi value given - values should not be on the log scale. Negative Value stored.";
+								std::cerr << "WARNING! Negative phi value given - values should not be on the log scale. Negative Value stored.";
 #endif
-								}
+							}
+							else if (value == 0 || std::isnan(value))
+							{
+								value = -1;
+#ifndef STANDALONE
+								Rf_warning("WARNING! Invalid or 0 phi value read - storing -1.");
+#else
+								std::cerr <<"WARNING! Invalid or 0 phi value read - storing -1.";
+#endif
 							}
 							else
 							{
