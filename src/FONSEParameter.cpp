@@ -22,6 +22,8 @@ FONSEParameter::FONSEParameter() : Parameter()
 	//CTOR
 	bias_csp = 0;
 	mutation_prior_sd = 0.35;
+	currentCodonSpecificParameter.resize(2);
+	proposedCodonSpecificParameter.resize(2);
 }
 
 
