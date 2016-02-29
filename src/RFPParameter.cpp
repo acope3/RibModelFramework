@@ -14,6 +14,8 @@ RFPParameter::RFPParameter() : Parameter()
 {
 	//ctor
 	bias_csp = 0;
+	currentCodonSpecificParameter.resize(2);
+	proposedCodonSpecificParameter.resize(2);
 }
 
 

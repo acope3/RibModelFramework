@@ -37,14 +37,12 @@ double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grou
 
 	unsigned aaStart, aaEnd;
 	SequenceSummary::AAToCodonRange(grouping, aaStart, aaEnd, false);
-	for (unsigned i = aaStart; i < aaEnd; i++) {
+	for (unsigned i = aaStart, k = 0; i < aaEnd; i++, k++) {
 		positions = gene.geneData.getCodonPositions(i);
 		for (unsigned j = 0; j < positions->size(); j++) {
 			calculateCodonProbabilityVector(numCodons, positions->at(j), maxIndexVal, mutation, selection, phiValue, codonProb);
-			for (int k = 0; k < numCodons; k++) {
-				if (codonProb[k] == 0) continue;
-				logLikelihood += std::log(codonProb[k]);
-			}
+			if (codonProb[k] == 0) continue;
+			logLikelihood += std::log(codonProb[k]);
 		}
 		//positions->clear();
 	}
