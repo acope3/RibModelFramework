@@ -190,7 +190,10 @@ RCPP_MODULE(Parameter_mod)
 		.method("initCovarianceMatrix", &FONSEParameter::initCovarianceMatrix)
 		.method("getCovarianceMatrixForAA", &FONSEParameter::getCovarianceMatrixForAA) //Not an R wrapper
 		.method("initMutation", &FONSEParameter::initMutation)
+		.method("initMutationCategories", &FONSEParameter::initMutationCategories)
 		.method("initSelection", &FONSEParameter::initSelection)
+		.method("initSelectionCategories", &FONSEParameter::initSelectionCategories)
+
 
 
 		//Prior Functions:
