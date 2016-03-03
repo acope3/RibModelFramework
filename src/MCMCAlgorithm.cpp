@@ -165,10 +165,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		for(unsigned k = 0u; k < numMixtures; k++)
 		{
 			unscaledLogProb_curr_singleMixture[k] -= maxValue;
-			//TODO compare log vs non log calculation!
-			//probabilities[k] = std::log(model.getCategoryProbability(k)) + unscaledLogProb_curr_singleMixture[k];
-			probabilities[k] = model.getCategoryProbability(k) * unscaledLogProb_curr_singleMixture[k];
-			probabilities[k] = std::exp(probabilities[k]);
+			probabilities[k] = model.getCategoryProbability(k) * std::exp(unscaledLogProb_curr_singleMixture[k]);
 			normalizingProbabilityConstant += probabilities[k];
 		}
 		// normalize probabilities
