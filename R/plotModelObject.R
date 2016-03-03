@@ -36,7 +36,7 @@ plot.Rcpp_ROCModel <- function(x, genome, parameter, samples = 100, mixture = 1,
   text(0.5, 0.6, main)
   text(0.5, 0.4, date(), cex = 0.6)
   
-  num.genes <- genome$getGenomeSize()
+  num.genes <- length(genome)
   
   mixtureAssignment <- unlist(lapply(1:num.genes,  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))
   genes.in.mixture <- which(mixtureAssignment == mixture)
