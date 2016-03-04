@@ -44,7 +44,7 @@ class ROCParameter : public Parameter
 
 
 		//Constructors & Destructors:
-		ROCParameter();
+		explicit ROCParameter();
 		explicit ROCParameter(std::string filename);
 		ROCParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures,
 					std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix,
