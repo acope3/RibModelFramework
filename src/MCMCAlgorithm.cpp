@@ -351,7 +351,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 				if (multipleFiles)
 				{
 					std::ostringstream oss;
-					oss << (iteration) / thining << file;
+					oss << (iteration) / thining << "_" << file;
 					std::string tmp = oss.str();
 					model.writeRestartFile(tmp);
 				}
