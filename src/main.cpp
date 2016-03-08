@@ -100,12 +100,11 @@ int main()
 {
 
 
-	if (1)
+	if (0)
 	{
 		//testSequenceSummary();
 		//testGene();
 		//testGenome("/Users/roxasoath1/Desktop/RibModelDevScripts/RibModelDev/data/UnitTestingData");
-		
 
 		Genome genome;
 		genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelDevScripts/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
@@ -139,7 +138,7 @@ int main()
 
 		exit(1);
 	}
-	std::string modelToRun = "FONSE"; //can also be ROC or FONSE
+	std::string modelToRun = "RFP"; //can also be ROC or FONSE
 	bool withPhi = false;
 	bool fromRestart = true;
 	unsigned numMixtures = 1;
@@ -284,7 +283,7 @@ int main()
 
 		if (fromRestart)
 		{
-			RFPParameter tmp("/Users/roxasoath1/Desktop/RibModelFramework/DevRscripts/10restartFile.rst");
+			RFPParameter tmp("/Users/roxasoath1/Desktop/RibModelFramework/10_restartFile.rst");
 			parameter = tmp;
 		}
 		else
