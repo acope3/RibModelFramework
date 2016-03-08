@@ -21,6 +21,8 @@ RFPParameter::RFPParameter() : Parameter()
 
 RFPParameter::RFPParameter(std::string filename) : Parameter(64)
 {
+	currentCodonSpecificParameter.resize(2);
+	proposedCodonSpecificParameter.resize(2);
 	initFromRestartFile(filename);
 	numParam = 61;
 }

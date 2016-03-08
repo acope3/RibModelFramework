@@ -22,6 +22,8 @@ ROCParameter::ROCParameter() : Parameter()
 
 ROCParameter::ROCParameter(std::string filename) : Parameter(22)
 {
+	currentCodonSpecificParameter.resize(2);
+	proposedCodonSpecificParameter.resize(2);
 	initFromRestartFile(filename);
 }
 

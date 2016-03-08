@@ -100,14 +100,45 @@ int main()
 {
 
 
-	if (1)
+	if (0)
 	{
 		//testSequenceSummary();
 		//testGene();
-		testGenome("/Users/roxasoath1/Desktop/RibModelDevScripts/RibModelDev/data/UnitTestingData");
+		//testGenome("/Users/roxasoath1/Desktop/RibModelDevScripts/RibModelDev/data/UnitTestingData");
+
+		Genome genome;
+		genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelDevScripts/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
+		for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+		{
+			geneAssignment[i] = 0u;
+		}
+		unsigned numMixtures = 1;
+		std::vector<double> sphi_init(numMixtures, 2);
+		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
+		RFPParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
+
+		std::vector<std::string> files;
+		files.push_back("/Users/roxasoath1/Desktop/devRscripts/RFPAlphaValues.csv");
+		tmp.initMutationSelectionCategories(files, 1, RFPParameter::alp);
+		files[0] = "/Users/roxasoath1/Desktop/devRscripts/RFPLambdaPrimeValues.csv";
+		tmp.initMutationSelectionCategories(files, 1, RFPParameter::lmPri);
+		std::vector<double> phi = tmp.readPhiValues("/Users/roxasoath1/Desktop/devRscripts/RFPPhiValues.csv");
+		tmp.InitializeSynthesisRate(phi);
+
+
+		RFPModel model;
+
+		model.setParameter(tmp);
+
+		std::cout <<"init done\n";
+		model.simulateGenome(genome);
+		std::cout <<"writing file\n";
+		genome.writeRFPFile("/Users/roxasoath1/Desktop/devRscripts/simulatedRFPData1.csv", true);
+
 		exit(1);
 	}
-	std::string modelToRun = "FONSE"; //can also be ROC or FONSE
+	std::string modelToRun = "RFP"; //can also be ROC or FONSE
 	bool withPhi = false;
 	bool fromRestart = true;
 	unsigned numMixtures = 1;
@@ -252,7 +283,7 @@ int main()
 
 		if (fromRestart)
 		{
-			RFPParameter tmp("/Users/roxasoath1/Desktop/RibModelFramework/DevRscripts/10restartFile.rst");
+			RFPParameter tmp("/Users/roxasoath1/Desktop/RibModelFramework/10_restartFile.rst");
 			parameter = tmp;
 		}
 		else
