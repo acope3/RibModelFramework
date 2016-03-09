@@ -184,9 +184,9 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			if( -Parameter::randExp(1) < (propLogLike - currLogLike) )
 			{
 				model.updateSynthesisRate(i, k);
-				logLikelihood += probabilities[k] * unscaledLogPost_prop[k];
+				logLikelihood += model.getCategoryProbability(k) * unscaledLogPost_prop[k];
 			}else{
-				logLikelihood += probabilities[k] * unscaledLogPost_curr[k];
+				logLikelihood += model.getCategoryProbability(k) * unscaledLogPost_curr[k];
 			}
 		}
 
