@@ -1261,11 +1261,13 @@ double Parameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned geneI
 	return posteriorMean / (double)usedSamples;
 }
 
-double Parameter::getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType)
+double Parameter::getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType,
+	bool withoutReference)
 {
 	double posteriorMean = 0.0;
 	std::vector<double> mutationParameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
-		mixtureElement, codon, paramType);
+		mixtureElement, codon, paramType, withoutReference);
+
 	unsigned traceLength = lastIteration;
 
 	if (samples > traceLength)
@@ -1358,10 +1360,11 @@ double Parameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex,
 }
 
 
-double Parameter::getCodonSpecificVariance(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType, bool unbiased)
+double Parameter::getCodonSpecificVariance(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType, bool unbiased,
+	bool withoutReference)
 {
 	std::vector<double> parameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
-		mixtureElement, codon, paramType);
+		mixtureElement, codon, paramType, withoutReference);
 	unsigned traceLength = lastIteration;
 	if (samples > traceLength)
 	{
@@ -1954,7 +1957,8 @@ std::vector<double> Parameter::getCurrentSynthesisRateForMixture(unsigned mixtur
 // ---------- Posterior, Variance, and Estimates Functions ----------//
 // ------------------------------------------------------------------//
 
-double Parameter::getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon, unsigned paramType)
+double Parameter::getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon, unsigned paramType,
+	bool withoutReference)
 {
 	double rv = -1.0;
 	codon[0] = (char)std::toupper(codon[0]);
@@ -1963,13 +1967,14 @@ double Parameter::getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement,
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
 	if (check)
 	{
-		rv = getCodonSpecificPosteriorMean(mixtureElement - 1, samples, codon, paramType);
+		rv = getCodonSpecificPosteriorMean(mixtureElement - 1, samples, codon, paramType, withoutReference);
 	}
 	return rv;
 }
 
 
-double Parameter::getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, unsigned paramType, bool unbiased)
+double Parameter::getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, unsigned paramType, bool unbiased,
+	bool withoutReference)
 {
 	double rv = -1.0;
 	codon[0] = (char)std::toupper(codon[0]);
@@ -1978,7 +1983,7 @@ double Parameter::getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsi
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
 	if (check)
 	{
-		rv = getCodonSpecificVariance(mixtureElement - 1, samples, codon, paramType, unbiased);
+		rv = getCodonSpecificVariance(mixtureElement - 1, samples, codon, paramType, unbiased, withoutReference);
 	}
 	return rv;
 }
