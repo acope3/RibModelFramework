@@ -437,7 +437,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 				std::cout << "Stopping run based on convergence after " << iteration << " iterations\n" << std::endl;
 #endif
 				// Comment out this break to keep the run from stopping on convergence
-				model.setLastIteration(iteration/thining);
+				//model.setLastIteration(iteration/thining);
 				//break;
 			}
 		}
