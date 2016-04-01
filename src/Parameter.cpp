@@ -1201,7 +1201,7 @@ double Parameter::getStdDevSynthesisRatePosteriorMean(unsigned samples, unsigned
 	double posteriorMean = 0.0;
 	unsigned selectionCategory = getSelectionCategory(mixture);
 	std::vector<double> stdDevSynthesisRateTrace = traces.getStdDevSynthesisRateTrace(selectionCategory);
-	unsigned traceLength = lastIteration;
+	unsigned traceLength = lastIteration + 1;
 
 	if (samples > traceLength)
 	{
@@ -1229,7 +1229,7 @@ double Parameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned geneI
 	unsigned expressionCategory = getSynthesisRateCategory(mixtureElement);
 	double posteriorMean = 0.0;
 	std::vector<double> synthesisRateTrace = traces.getSynthesisRateTraceByMixtureElementForGene(mixtureElement, geneIndex);
-	unsigned traceLength = lastIteration;
+	unsigned traceLength = lastIteration + 1;
 
 	if (samples > lastIteration)
 	{
@@ -1268,7 +1268,7 @@ double Parameter::getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigne
 	std::vector<double> mutationParameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
 		mixtureElement, codon, paramType, withoutReference);
 
-	unsigned traceLength = lastIteration;
+	unsigned traceLength = lastIteration + 1;
 
 	if (samples > traceLength)
 	{
@@ -1328,7 +1328,7 @@ double Parameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex,
 {
 	std::vector<double> synthesisRateTrace = traces.getSynthesisRateTraceByMixtureElementForGene(mixtureElement,
 		geneIndex);
-	unsigned traceLength = lastIteration;
+	unsigned traceLength = lastIteration + 1;
 	if (samples > traceLength)
 	{
 #ifndef STANDALONE
@@ -1365,7 +1365,7 @@ double Parameter::getCodonSpecificVariance(unsigned mixtureElement, unsigned sam
 {
 	std::vector<double> parameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
 		mixtureElement, codon, paramType, withoutReference);
-	unsigned traceLength = lastIteration;
+	unsigned traceLength = lastIteration + 1;
 	if (samples > traceLength)
 	{
 #ifndef STANDALONE
@@ -1417,7 +1417,7 @@ std::vector<double> Parameter::getEstimatedMixtureAssignmentProbabilities(unsign
 {
 	std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
 	std::vector<double> probabilities(numMixtures, 0.0);
-	unsigned traceLength = lastIteration;
+	unsigned traceLength = lastIteration + 1;
 
 	if (samples > traceLength)
 	{
