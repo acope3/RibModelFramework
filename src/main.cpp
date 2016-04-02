@@ -104,8 +104,9 @@ int main()
 	{
 		//testSequenceSummary();
 		//testGene();
-		//testGenome("/Users/roxasoath1/Desktop/RibModelDevScripts/RibModelDev/data/UnitTestingData");
+		testGenome("/Users/roxasoath1/Desktop/RibModelDevScripts/RibModelDev/data/UnitTestingData");
 
+		/*
 		Genome genome;
 		genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelDevScripts/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
@@ -135,7 +136,7 @@ int main()
 		model.simulateGenome(genome);
 		std::cout <<"writing file\n";
 		genome.writeRFPFile("/Users/roxasoath1/Desktop/RibModelDevScripts/RibModelDev/data/rfp/simulatedRFPData.csv", true);
-
+*/
 		exit(1);
 	}
 	std::string modelToRun = "RFP"; //can also be ROC or FONSE
