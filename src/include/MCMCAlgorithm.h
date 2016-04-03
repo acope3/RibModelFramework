@@ -25,6 +25,7 @@ class MCMCAlgorithm
 		unsigned thining;
 		unsigned adaptiveWidth;
 		unsigned lastConvergenceTest;
+		int stepsToAdapt;
 
 
 		bool estimateSynthesisRate;
@@ -75,6 +76,8 @@ class MCMCAlgorithm
 		void setEstimateMixtureAssignment(bool in);
 
 		void setRestartFileSettings(std::string filename, unsigned interval, bool multiple);
+		void setStepsToAdapt(unsigned steps);
+		int getStepsToAdapt();
 
 		std::vector<double> getLogLikelihoodTrace();
 		double getLogLikelihoodPosteriorMean(unsigned samples);
