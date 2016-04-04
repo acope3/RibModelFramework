@@ -138,9 +138,9 @@ class Parameter {
 
 
 		//Adaptive Width Functions:
-		void adaptStdDevSynthesisRateProposalWidth(unsigned adaptationWidth);
-		void adaptSynthesisRateProposalWidth(unsigned adaptationWidth);
-		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth);
+		void adaptStdDevSynthesisRateProposalWidth(unsigned adaptationWidth, bool adapt);
+		void adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool adapt);
+		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, bool adapt);
 
 
 		//Posterior, Variance, and Estimates Functions:
