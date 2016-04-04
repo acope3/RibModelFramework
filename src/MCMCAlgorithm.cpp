@@ -400,9 +400,9 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 		{
 			model.proposeCodonSpecificParameter();
 			acceptRejectCodonSpecificParameter(genome, model, iteration);
-			if(iteration <= stepsToAdapt && ( (iteration) % adaptiveWidth) == 0u)
+			if(( (iteration) % adaptiveWidth) == 0u)
 			{
-				model.adaptCodonSpecificParameterProposalWidth(adaptiveWidth);
+				model.adaptCodonSpecificParameterProposalWidth(adaptiveWidth, iteration <= stepsToAdapt);
 			}
 		}
 		// update hyper parameter
@@ -411,9 +411,9 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 			model.updateGibbsSampledHyperParameters(genome);
 			model.proposeHyperParameters();
 			acceptRejectHyperParameter(genome, model, iteration);
-			if(iteration <= stepsToAdapt && ( (iteration) % adaptiveWidth) == 0u)
+			if(( (iteration) % adaptiveWidth) == 0u)
 			{
-				model.adaptHyperParameterProposalWidths(adaptiveWidth);
+				model.adaptHyperParameterProposalWidths(adaptiveWidth, iteration <= stepsToAdapt);
 			}
 		}
 		// update expression level values
@@ -425,9 +425,9 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 			{
 				likelihoodTrace[(iteration / thining)] = logLike;
 			}
-			if(iteration <= stepsToAdapt && ( (iteration) % adaptiveWidth) == 0u)
+			if(( (iteration) % adaptiveWidth) == 0u)
 			{
-				model.adaptSynthesisRateProposalWidth(adaptiveWidth);
+				model.adaptSynthesisRateProposalWidth(adaptiveWidth, iteration <= stepsToAdapt);
 			}
 		}
 

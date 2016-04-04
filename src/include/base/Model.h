@@ -77,10 +77,10 @@ class Model
 		virtual void updateTracesWithInitialValues(Genome &genome) = 0;
 
 		//Adaptive Width Functions:
-		virtual void adaptStdDevSynthesisRateProposalWidth(unsigned adaptiveWidth) = 0;
-		virtual void adaptSynthesisRateProposalWidth(unsigned adaptiveWidth) = 0;
-		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth) = 0;
-		virtual void adaptHyperParameterProposalWidths(unsigned adaptiveWidth) = 0;
+		virtual void adaptStdDevSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt) = 0;
+		virtual void adaptSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt) = 0;
+		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, bool adapt) = 0;
+		virtual void adaptHyperParameterProposalWidths(unsigned adaptiveWidth, bool adapt) = 0;
 
 
 

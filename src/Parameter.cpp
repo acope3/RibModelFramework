@@ -1092,23 +1092,23 @@ void Parameter::updateMixtureProbabilitiesTrace(unsigned samples)
 // ----------------------------------------------//
 
 
-void Parameter::adaptStdDevSynthesisRateProposalWidth(unsigned adaptationWidth)
+void Parameter::adaptStdDevSynthesisRateProposalWidth(unsigned adaptationWidth, bool adapt)
 {
 	double acceptanceLevel = (double)numAcceptForStdDevSynthesisRate / (double)adaptationWidth;
 	traces.updateStdDevSynthesisRateAcceptanceRatioTrace(acceptanceLevel);
-	if (acceptanceLevel < 0.2)
-	{
-		std_stdDevSynthesisRate *= 0.8;
-	}
-	if (acceptanceLevel > 0.3)
-	{
-		std_stdDevSynthesisRate *= 1.2;
+	if (adapt) {
+		if (acceptanceLevel < 0.2) {
+			std_stdDevSynthesisRate *= 0.8;
+		}
+		if (acceptanceLevel > 0.3) {
+			std_stdDevSynthesisRate *= 1.2;
+		}
 	}
 	numAcceptForStdDevSynthesisRate = 0u;
 }
 
 
-void Parameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
+void Parameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool adapt)
 {
 	unsigned acceptanceUnder = 0u;
 	unsigned acceptanceOver = 0u;
@@ -1120,15 +1120,15 @@ void Parameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
 		{
 			double acceptanceLevel = (double)numAcceptForSynthesisRate[cat][i] / (double)adaptationWidth;
 			traces.updateSynthesisRateAcceptanceRatioTrace(cat, i, acceptanceLevel);
-			if (acceptanceLevel < 0.225)
-			{
-				std_phi[cat][i] *= 0.8;
-				if (acceptanceLevel < 0.2) acceptanceUnder++;
-			}
-			if (acceptanceLevel > 0.275)
-			{
-				std_phi[cat][i] *= 1.2;
-				if (acceptanceLevel > 0.3) acceptanceOver++;
+			if (adapt) {
+				if (acceptanceLevel < 0.225) {
+					std_phi[cat][i] *= 0.8;
+					if (acceptanceLevel < 0.2) acceptanceUnder++;
+				}
+				if (acceptanceLevel > 0.275) {
+					std_phi[cat][i] *= 1.2;
+					if (acceptanceLevel > 0.3) acceptanceOver++;
+				}
 			}
 			numAcceptForSynthesisRate[cat][i] = 0u;
 		}
@@ -1144,7 +1144,7 @@ void Parameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth)
 #endif
 }
 
-void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
+void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, bool adapt)
 {
 #ifndef STANDALONE
 	Rprintf("Acceptance rate for Codon Specific Parameter\n");
@@ -1159,27 +1159,27 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 		unsigned aaIndex = SequenceSummary::AAToAAIndex(aa);
 		double acceptanceLevel = (double)numAcceptForCodonSpecificParameters[aaIndex] / (double)adaptationWidth;
 		traces.updateCodonSpecificAcceptanceRatioTrace(aaIndex, acceptanceLevel);
-		unsigned aaStart;
-		unsigned aaEnd;
-		SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
+		if (adapt)
+		{
+			unsigned aaStart;
+			unsigned aaEnd;
+			SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
 #ifndef STANDALONE
 		Rprintf("\t%s:\t%f\t%f\n", aa.c_str(), acceptanceLevel, std_csp[aaStart]);
 #else
-		std::cout << "\t" << aa << ":\t" << acceptanceLevel << "\t" << std_csp[aaStart] << "\n";
+			std::cout << "\t" << aa << ":\t" << acceptanceLevel << "\t" << std_csp[aaStart] << "\n";
 #endif
-		for (unsigned k = aaStart; k < aaEnd; k++)
-		{
-			if (acceptanceLevel < 0.2)
-			{
-				covarianceMatrix[aaIndex] *= 0.8;
-				covarianceMatrix[aaIndex].choleskiDecomposition();
-				std_csp[k] *= 0.8;
-			}
-			if (acceptanceLevel > 0.3)
-			{
-				covarianceMatrix[aaIndex] *= 1.2;
-				covarianceMatrix[aaIndex].choleskiDecomposition();
-				std_csp[k] *= 1.2;
+			for (unsigned k = aaStart; k < aaEnd; k++) {
+				if (acceptanceLevel < 0.2) {
+					covarianceMatrix[aaIndex] *= 0.8;
+					covarianceMatrix[aaIndex].choleskiDecomposition();
+					std_csp[k] *= 0.8;
+				}
+				if (acceptanceLevel > 0.3) {
+					covarianceMatrix[aaIndex] *= 1.2;
+					covarianceMatrix[aaIndex].choleskiDecomposition();
+					std_csp[k] *= 1.2;
+				}
 			}
 		}
 		numAcceptForCodonSpecificParameters[aaIndex] = 0u;

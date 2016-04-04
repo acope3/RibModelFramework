@@ -785,20 +785,20 @@ double ROCParameter::getNoiseOffsetVariance(unsigned index, unsigned samples, bo
 // ---------- Adaptive Width Functions ----------//
 // ----------------------------------------------//
 
-void ROCParameter::adaptNoiseOffsetProposalWidth(unsigned adaptationWidth)
+void ROCParameter::adaptNoiseOffsetProposalWidth(unsigned adaptationWidth, bool adapt)
 {
 	for (unsigned i = 0; i < getNumObservedPhiSets(); i++) {
 		double acceptanceLevel = numAcceptForNoiseOffset[i] / (double)adaptationWidth;
 		traces.updateSynthesisOffsetAcceptanceRatioTrace(i, acceptanceLevel);
-		if (acceptanceLevel < 0.2)
-		{
-			std_NoiseOffset[i] *= 0.8;
+		if (adapt) {
+			if (acceptanceLevel < 0.2) {
+				std_NoiseOffset[i] *= 0.8;
+			}
+			if (acceptanceLevel > 0.3) {
+				std_NoiseOffset[i] *= 1.2;
+			}
+			numAcceptForNoiseOffset[i] = 0u;
 		}
-		if (acceptanceLevel > 0.3)
-		{
-			std_NoiseOffset[i] *= 1.2;
-		}
-		numAcceptForNoiseOffset[i] = 0u;
 	}
 }
 
