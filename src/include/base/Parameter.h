@@ -138,20 +138,22 @@ class Parameter {
 
 
 		//Adaptive Width Functions:
-		void adaptStdDevSynthesisRateProposalWidth(unsigned adaptationWidth);
-		void adaptSynthesisRateProposalWidth(unsigned adaptationWidth);
-		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth);
+		void adaptStdDevSynthesisRateProposalWidth(unsigned adaptationWidth, bool adapt);
+		void adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool adapt);
+		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, bool adapt);
 
 
 		//Posterior, Variance, and Estimates Functions:
 		double getStdDevSynthesisRatePosteriorMean(unsigned samples, unsigned mixture);
 		double getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement);
 
-		double getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType);
+		double getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType,
+			bool withoutReference = true);
 		double getStdDevSynthesisRateVariance(unsigned samples, unsigned mixture, bool unbiased);
 		double getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement,
 											bool unbiased = true);
-		double getCodonSpecificVariance(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType, bool unbiased);
+		double getCodonSpecificVariance(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType, bool unbiased,
+			bool withoutReference = true);
 		unsigned getEstimatedMixtureAssignment(unsigned samples, unsigned geneIndex);
 		std::vector<double> getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex);
 
@@ -227,8 +229,10 @@ class Parameter {
 														   unsigned mixtureElement, bool unbiased);
 		unsigned getEstimatedMixtureAssignmentForGene(unsigned samples, unsigned geneIndex);
 		std::vector<double> getEstimatedMixtureAssignmentProbabilitiesForGene(unsigned samples, unsigned geneIndex);
-		double getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon, unsigned paramType);
-		double getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, unsigned paramType, bool unbiased);
+		double getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon, unsigned paramType,
+			bool withoutReference);
+		double getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, unsigned paramType, bool unbiased,
+			bool withoutReference);
 
 
 		//Other Functions:

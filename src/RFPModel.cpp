@@ -397,27 +397,27 @@ void RFPModel::updateTracesWithInitialValues(Genome & genome)
 //----------------------------------------------//
 
 
-void RFPModel::adaptStdDevSynthesisRateProposalWidth(unsigned adaptiveWidth)
+void RFPModel::adaptStdDevSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt)
 {
-	parameter->adaptStdDevSynthesisRateProposalWidth(adaptiveWidth);
+	parameter->adaptStdDevSynthesisRateProposalWidth(adaptiveWidth, adapt);
 }
 
 
-void RFPModel::adaptSynthesisRateProposalWidth(unsigned adaptiveWidth)
+void RFPModel::adaptSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt)
 {
-	parameter->adaptSynthesisRateProposalWidth(adaptiveWidth);
+	parameter->adaptSynthesisRateProposalWidth(adaptiveWidth, adapt);
 }
 
 
-void RFPModel::adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth)
+void RFPModel::adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, bool adapt)
 {
-	parameter->adaptCodonSpecificParameterProposalWidth(adaptiveWidth);
+	parameter->adaptCodonSpecificParameterProposalWidth(adaptiveWidth, adapt);
 }
 
 
-void RFPModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth)
+void RFPModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth, bool adapt)
 {
-	adaptStdDevSynthesisRateProposalWidth(adaptiveWidth);
+	adaptStdDevSynthesisRateProposalWidth(adaptiveWidth, adapt);
 }
 
 

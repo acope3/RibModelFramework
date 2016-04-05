@@ -447,7 +447,7 @@ void RFPParameter::updateCodonSpecificParameter(std::string grouping)
 // ---------- Adaptive Width Functions ----------//
 // ----------------------------------------------//
 
-void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
+void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, bool adapt)
 {
 	std::cout << "acceptance rate for codon:\n";
 	for (unsigned i = 0; i < groupList.size(); i++)
@@ -456,15 +456,15 @@ void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 
 		unsigned codonIndex = SequenceSummary::codonToIndex(groupList[i]);
 		double acceptanceLevel = (double)numAcceptForCodonSpecificParameters[codonIndex] / (double)adaptationWidth;
-		std::cout << acceptanceLevel << " with std_csp = " << std_csp[i] <<"\n";
 		traces.updateCodonSpecificAcceptanceRatioTrace(codonIndex, acceptanceLevel);
-		if (acceptanceLevel < 0.2)
-		{
-			std_csp[i] *= 0.8;
-		}
-		if (acceptanceLevel > 0.3)
-		{
-			std_csp[i] *= 1.2;
+		if (adapt) {
+			std::cout << acceptanceLevel << " with std_csp = " << std_csp[i] << "\n";
+			if (acceptanceLevel < 0.2) {
+				std_csp[i] *= 0.8;
+			}
+			if (acceptanceLevel > 0.3) {
+				std_csp[i] *= 1.2;
+			}
 		}
 		numAcceptForCodonSpecificParameters[codonIndex] = 0u;
 	}

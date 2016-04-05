@@ -114,7 +114,8 @@ public:
 
 
         //ROC Specific:
-        std::vector<double> getCodonSpecificParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon, unsigned paramType);
+        std::vector<double> getCodonSpecificParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon, unsigned paramType,
+                bool withoutReference = true);
         std::vector<double> getSynthesisOffsetTrace(unsigned index);
         std::vector<double> getSynthesisOffsetAcceptanceRatioTraceForIndex(unsigned index);
         std::vector<double> getObservedSynthesisNoiseTrace(unsigned index);
@@ -175,7 +176,8 @@ public:
 
 
         //ROC Specific:
-		std::vector<double> getCodonSpecificParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon, unsigned paramType);
+		std::vector<double> getCodonSpecificParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon, unsigned paramType,
+		        bool withoutReference);
         std::vector<std::vector<double>> getSynthesisOffsetTraceR();
         std::vector<std::vector<double>> getObservedSynthesisNoiseTraceR();
 

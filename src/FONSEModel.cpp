@@ -446,27 +446,27 @@ void FONSEModel::updateTracesWithInitialValues(Genome & genome)
 //----------------------------------------------//
 
 
-void FONSEModel::adaptStdDevSynthesisRateProposalWidth(unsigned adaptiveWidth)
+void FONSEModel::adaptStdDevSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt)
 {
-	parameter->adaptStdDevSynthesisRateProposalWidth(adaptiveWidth);
+	parameter->adaptStdDevSynthesisRateProposalWidth(adaptiveWidth, adapt);
 }
 
 
-void FONSEModel::adaptSynthesisRateProposalWidth(unsigned adaptiveWidth)
+void FONSEModel::adaptSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt)
 {
-	parameter->adaptSynthesisRateProposalWidth(adaptiveWidth);
+	parameter->adaptSynthesisRateProposalWidth(adaptiveWidth, adapt);
 }
 
 
-void FONSEModel::adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth)
+void FONSEModel::adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, bool adapt)
 {
-	parameter->adaptCodonSpecificParameterProposalWidth(adaptiveWidth);
+	parameter->adaptCodonSpecificParameterProposalWidth(adaptiveWidth, adapt);
 }
 
 
-void FONSEModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth)
+void FONSEModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth, bool adapt)
 {
-	adaptStdDevSynthesisRateProposalWidth(adaptiveWidth);
+	adaptStdDevSynthesisRateProposalWidth(adaptiveWidth, adapt);
 }
 
 

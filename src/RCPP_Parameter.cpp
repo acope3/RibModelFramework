@@ -15,6 +15,7 @@ RCPP_MODULE(Parameter_mod)
 {
 	class_<Parameter>("Parameter")
 
+		.constructor()
 		//Initialization and Restart Functions:
 		.method("initializeSynthesisRateByGenome", &Parameter::initializeSynthesisRateByGenome)
 		.method("initializeSynthesisRateByList", &Parameter::initializeSynthesisRateByList)

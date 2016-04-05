@@ -44,7 +44,7 @@ class ROCParameter : public Parameter
 
 
 		//Constructors & Destructors:
-		ROCParameter();
+		explicit ROCParameter();
 		explicit ROCParameter(std::string filename);
 		ROCParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures,
 					std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix,
@@ -110,7 +110,7 @@ class ROCParameter : public Parameter
 		double getNoiseOffsetVariance(unsigned index, unsigned samples, bool unbiased = true);
 
 		//Adaptive Width Functions:
-		void adaptNoiseOffsetProposalWidth(unsigned adaptationWidth);
+		void adaptNoiseOffsetProposalWidth(unsigned adaptationWidth, bool adapt);
 
 		//Other Functions:
 		void setNumObservedPhiSets(unsigned _phiGroupings);

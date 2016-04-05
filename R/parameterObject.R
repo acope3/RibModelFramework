@@ -704,8 +704,9 @@ setBaseInfo <- function(parameter, files)
       numSelectionCategories <- tempEnv$paramBase$numSel
       mixtureAssignment <- tempEnv$paramBase$curMixAssignment
       lastIteration <- tempEnv$paramBase$lastIteration
+      max <- tempEnv$paramBase$lastIteration + 1
       
-      stdDevSynthesisRateTraces <- tempEnv$paramBase$stdDevSynthesisRateTraces
+      stdDevSynthesisRateTraces <- tempEnv$paramBase$stdDevSynthesisRateTraces[1:max]
       stdDevSynthesisRateAcceptanceRatioTrace <- tempEnv$paramBase$stdDevSynthesisRateAcceptRatTrace
       synthesisRateTrace <- tempEnv$paramBase$synthRateTrace
       synthesisRateAcceptanceRatioTrace <- tempEnv$paramBase$synthAcceptRatTrace

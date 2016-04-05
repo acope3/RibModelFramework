@@ -22,6 +22,8 @@ ROCParameter::ROCParameter() : Parameter()
 
 ROCParameter::ROCParameter(std::string filename) : Parameter(22)
 {
+	currentCodonSpecificParameter.resize(2);
+	proposedCodonSpecificParameter.resize(2);
 	initFromRestartFile(filename);
 }
 
@@ -233,7 +235,6 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 					while (iss >> val) {
 						noiseOffset.push_back(val);
 					}
-					std::cout <<"noiseOffset has a value\n";
 				}
 				else if (variableName == "observedSynthesisNoise")
 				{
@@ -314,42 +315,52 @@ void ROCParameter::writeROCRestartFile(std::string filename)
 		std::ostringstream oss;
 		unsigned j;
 		oss << ">noiseOffset:\n";
-		for (unsigned i = 0; i < noiseOffset.size(); i++)
+		for (j = 0; j < noiseOffset.size(); j++)
 		{
-			oss << noiseOffset[i];
-			if ((i + 1) % 10 == 0)
+			oss << noiseOffset[j];
+			if ((j + 1) % 10 == 0)
 				oss << "\n";
 			else
 				oss << " ";
 		}
+		if (j % 10 != 0)
+			oss << "\n";
+
 		oss << ">observedSynthesisNoise:\n";
-		for (unsigned i = 0; i < observedSynthesisNoise.size(); i++)
+		for (j = 0; j < observedSynthesisNoise.size(); j++)
 		{
-			oss << observedSynthesisNoise[i];
-			if ((i + 1) % 10 == 0)
+			oss << observedSynthesisNoise[j];
+			if ((j + 1) % 10 == 0)
 				oss << "\n";
 			else
 				oss << " ";
 		}
+		if (j % 10 != 0)
+			oss << "\n";
+
 		oss << ">mutation_prior_sd:\n" << mutation_prior_sd << "\n";
 		oss << ">std_NoiseOffset:\n";
-		for (unsigned i = 0; i < std_NoiseOffset.size(); i++)
+		for (j = 0; j < std_NoiseOffset.size(); j++)
 		{
-			oss << std_NoiseOffset[i];
-			if ((i + 1) % 10 == 0)
+			oss << std_NoiseOffset[j];
+			if ((j + 1) % 10 == 0)
 				oss << "\n";
 			else
 				oss << " ";
 		}
+		if (j % 10 != 0)
+			oss << "\n";
 		oss << ">std_csp:\n";
-		for (unsigned i = 0; i < std_csp.size(); i++)
+		for (j = 0; j < std_csp.size(); j++)
 		{
-			oss << std_csp[i];
-			if ((i + 1) % 10 == 0)
+			oss << std_csp[j];
+			if ((j + 1) % 10 == 0)
 				oss << "\n";
 			else
 				oss << " ";
 		}
+		if (j % 10 != 0)
+			oss << "\n";
 		oss << ">currentMutationParameter:\n";
 		for (unsigned i = 0; i < currentCodonSpecificParameter[dM].size(); i++)
 		{
@@ -774,20 +785,20 @@ double ROCParameter::getNoiseOffsetVariance(unsigned index, unsigned samples, bo
 // ---------- Adaptive Width Functions ----------//
 // ----------------------------------------------//
 
-void ROCParameter::adaptNoiseOffsetProposalWidth(unsigned adaptationWidth)
+void ROCParameter::adaptNoiseOffsetProposalWidth(unsigned adaptationWidth, bool adapt)
 {
 	for (unsigned i = 0; i < getNumObservedPhiSets(); i++) {
 		double acceptanceLevel = numAcceptForNoiseOffset[i] / (double)adaptationWidth;
 		traces.updateSynthesisOffsetAcceptanceRatioTrace(i, acceptanceLevel);
-		if (acceptanceLevel < 0.2)
-		{
-			std_NoiseOffset[i] *= 0.8;
+		if (adapt) {
+			if (acceptanceLevel < 0.2) {
+				std_NoiseOffset[i] *= 0.8;
+			}
+			if (acceptanceLevel > 0.3) {
+				std_NoiseOffset[i] *= 1.2;
+			}
+			numAcceptForNoiseOffset[i] = 0u;
 		}
-		if (acceptanceLevel > 0.3)
-		{
-			std_NoiseOffset[i] *= 1.2;
-		}
-		numAcceptForNoiseOffset[i] = 0u;
 	}
 }
 

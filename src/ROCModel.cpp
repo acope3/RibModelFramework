@@ -496,29 +496,29 @@ void ROCModel::updateTracesWithInitialValues(Genome &genome)
 //----------------------------------------------//
 
 
-void ROCModel::adaptStdDevSynthesisRateProposalWidth(unsigned adaptiveWidth)
+void ROCModel::adaptStdDevSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt)
 {
-	parameter->adaptStdDevSynthesisRateProposalWidth(adaptiveWidth);
+	parameter->adaptStdDevSynthesisRateProposalWidth(adaptiveWidth, adapt);
 }
 
 
-void ROCModel::adaptSynthesisRateProposalWidth(unsigned adaptiveWidth)
+void ROCModel::adaptSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt)
 {
-	parameter->adaptSynthesisRateProposalWidth(adaptiveWidth);
+	parameter->adaptSynthesisRateProposalWidth(adaptiveWidth, adapt);
 }
 
 
-void ROCModel::adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth)
+void ROCModel::adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, bool adapt)
 {
-	parameter->adaptCodonSpecificParameterProposalWidth(adaptiveWidth);
+	parameter->adaptCodonSpecificParameterProposalWidth(adaptiveWidth, adapt);
 }
 
 
-void ROCModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth)
+void ROCModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth, bool adapt)
 {
-	adaptStdDevSynthesisRateProposalWidth(adaptiveWidth);
+	adaptStdDevSynthesisRateProposalWidth(adaptiveWidth, adapt);
 	if (withPhi) {
-		adaptNoiseOffsetProposalWidth(adaptiveWidth);
+		adaptNoiseOffsetProposalWidth(adaptiveWidth, adapt);
 	}
 }
 
@@ -895,9 +895,9 @@ void ROCModel::updateObservedSynthesisNoiseTrace(unsigned index, unsigned sample
 }
 
 
-void ROCModel::adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth)
+void ROCModel::adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt)
 {
-	parameter->adaptNoiseOffsetProposalWidth(adaptiveWidth);
+	parameter->adaptNoiseOffsetProposalWidth(adaptiveWidth, adapt);
 }
 
 
