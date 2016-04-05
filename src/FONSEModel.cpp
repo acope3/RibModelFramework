@@ -575,7 +575,7 @@ void FONSEModel::simulateGenome(Genome & genome)
 
 	for (unsigned geneIndex = 0; geneIndex < genome.getGenomeSize(); geneIndex++) //loop over all genes in the genome
 	{
-		std::cout << "Simulating Gene " << geneIndex << std::endl;
+		if (geneIndex % 100 == 0) std::cout << "Simulating Gene " << geneIndex << std::endl;
 		Gene gene = genome.getGene(geneIndex);
 		SequenceSummary seqSum = gene.geneData;
 		std::string tmpSeq = "ATG"; //Always will have the start amino acid
