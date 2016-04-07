@@ -110,7 +110,7 @@ class ROCParameter : public Parameter
 		double getNoiseOffsetVariance(unsigned index, unsigned samples, bool unbiased = true);
 
 		//Adaptive Width Functions:
-		void adaptNoiseOffsetProposalWidth(unsigned adaptationWidth);
+		void adaptNoiseOffsetProposalWidth(unsigned adaptationWidth, bool adapt);
 
 		//Other Functions:
 		void setNumObservedPhiSets(unsigned _phiGroupings);

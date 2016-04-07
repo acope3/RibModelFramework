@@ -73,8 +73,7 @@ plotCodonSpecificParameters <- function(trace, mixture, type="mutation", main="M
   {
     nf <- layout(matrix(c(rep(1, 4), 2:21), nrow = 6, ncol = 4, byrow = TRUE),
                rep(1, 4), c(2, 8, 8, 8, 8, 8), respect = FALSE)  
-  }
-  else
+  }else
   {    
     nf <- layout(matrix(c(rep(1, 4), 2:25), nrow = 7, ncol = 4, byrow = TRUE),
                     rep(1, 4), c(2, 8, 8, 8, 8, 8, 8), respect = FALSE) 
@@ -82,8 +81,7 @@ plotCodonSpecificParameters <- function(trace, mixture, type="mutation", main="M
   ### Plot title.
   if (ROC){
   par(mar = c(0, 0, 0, 0))
-  }
-  else{
+  }else{
     par(mar = c(1,1,1,1))
   }
   plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
@@ -93,15 +91,11 @@ plotCodonSpecificParameters <- function(trace, mixture, type="mutation", main="M
   
   # TODO change to groupList -> checks for ROC like model is not necessary!
   names.aa <- aminoAcids()
+  with.ref.codon <- ifelse(ROC, TRUE, FALSE)
+  
   for(aa in names.aa)
   { 
-    if (ROC)
-    {
-      codons <- AAToCodon(aa, T)
-    }
-    else{
-      codons <- AAToCodon(aa, F)
-    }
+    codons <- AAToCodon(aa, with.ref.codon)
     if(length(codons) == 0) next
     if (!ROC){
       if(aa == "X") next
@@ -125,7 +119,7 @@ plotCodonSpecificParameters <- function(trace, mixture, type="mutation", main="M
     }
     for(i in 1:length(codons))
     {
-      cur.trace[[i]] <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], paramType)
+      cur.trace[[i]] <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], paramType, with.ref.codon)
     }      
 
     cur.trace <- do.call("cbind", cur.trace)
