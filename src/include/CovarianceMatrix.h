@@ -16,6 +16,7 @@ class CovarianceMatrix
         std::vector<double> choleskiMatrix;
         int numVariates; //make static const again
 
+		double sampleMean(std::vector<double> sampleVector, unsigned samples, unsigned lastIteration);
 
     public:
         //Constructors & Destructors:
@@ -32,15 +33,14 @@ class CovarianceMatrix
 
         //Matrix Functions:
 	    void initCovarianceMatrix(unsigned _numVariates);
+		void setDiag(double val);
         void choleskiDecomposition();
 	    void printCovarianceMatrix();
         void printCholeskiMatrix();
         std::vector<double>* getCovMatrix();
         int getNumVariates();
         std::vector<double> transformIidNumersIntoCovaryingNumbers(std::vector<double> iidnumbers);
-        void calculateCovarianceMatrixFromTraces(std::vector<std::vector <std::vector<double>>> trace, unsigned
-            geneIndex, unsigned curSample, unsigned adaptiveWidte);
-
+		void calculateSampleCovariance(std::vector<std::vector<std::vector<std::vector<double>>>> codonSpecificParameterTrace, std::string aa, unsigned samples, unsigned lastIteration);
 
 #ifndef STANDALONE
     void setCovarianceMatrix(SEXP _matrix);

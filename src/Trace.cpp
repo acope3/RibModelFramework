@@ -348,6 +348,11 @@ unsigned Trace::getSynthesisRateCategory(unsigned mixtureElement)
 	return categories->at(mixtureElement).delEta;
 }
 
+std::vector<std::vector<std::vector<std::vector<double>>>>* Trace::getCodonSpecificParameterTrace() 
+{
+	return &codonSpecificParameterTrace;
+}
+
 
 //----------------------------------//
 //---------- ROC Specific ----------//

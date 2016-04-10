@@ -1,4 +1,5 @@
 #include "include/CovarianceMatrix.h"
+#include "include/SequenceSummary.h"
 
 #ifndef STANDALONE
 #include <Rcpp.h>
@@ -97,6 +98,13 @@ void CovarianceMatrix::initCovarianceMatrix(unsigned _numVariates)
     }
 }
 
+void CovarianceMatrix::setDiag(double val)
+{
+	for (unsigned i = 0u; i < covMatrix.size(); i++)
+	{
+		covMatrix[i] = (i % (numVariates + 1) ? 0.0 : val);
+	}
+}
 
 // addaptatoin of http://en.wikipedia.org/wiki/Cholesky_decomposition
 // http://rosettacode.org/wiki/Cholesky_decomposition#C
@@ -194,7 +202,8 @@ std::vector<double> CovarianceMatrix::transformIidNumersIntoCovaryingNumbers(std
         double sum = 0.0;
         for (int k = 0; k < numVariates; k++)
         {
-            sum += choleskiMatrix[i * numVariates + k] * iidnumbers[k];
+			// testing if [i * numVariates + k] or [k * numVariates + i], first option was default
+            sum += choleskiMatrix[k * numVariates + i] * iidnumbers[k];
         }
 
         covnumbers.push_back(sum);
@@ -202,54 +211,58 @@ std::vector<double> CovarianceMatrix::transformIidNumersIntoCovaryingNumbers(std
     return covnumbers;
 }
 
-
-/*void CovarianceMatrix::calculateCovarianceMatrixFromTraces(std::vector <std::vector <std::vector<double>>> mutationTrace,
- *std::vector <std::vector <std::vector <double>>> selectionTrace,
-	unsigned aaIndex, unsigned curSample, unsigned adaptiveWidth)
+void CovarianceMatrix::calculateSampleCovariance(std::vector<std::vector<std::vector<std::vector<double>>>> codonSpecificParameterTrace, std::string aa, unsigned samples, unsigned lastIteration)
 {
-    // calculate all means
-    unsigned numMutation = mutationTrace.size();
-	unsigned numSelection = selectionTrace.size();// <- number of mixture elements or number of selection categories
-    double* mutationMeans = new double[numMutation]();
-	double* selectionMeans = new double[numSelection]();
-	std::array <unsigned, 2> *codonRange;
-    unsigned start = curSample - adaptiveWidth;
-    // calculate all means from trace
-	//codonRange = &SequenceSummary::
-    for(unsigned i = 0u; i < numMutation; i++)
-    {
-        for(unsigned j = start; j < curSample; j++)
-        {
-            mutationMeans[i] += mutationTrace[i][j][j];
-        }
-        mutationMeans[i] /= adaptiveWidth;
-    }
+	//order of codonSpecificParameterTrace: paramType, category, numparam, samples
+	unsigned numParamTypesInModel = codonSpecificParameterTrace.size();
+	unsigned numCategoriesInModel = codonSpecificParameterTrace[0].size();
 
-	for (unsigned i = 0u; i < numSelection; i++)
+	unsigned start = lastIteration - samples;
+	
+	unsigned aaStart;
+	unsigned aaEnd;
+	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
+
+	unsigned IDX = 0;
+	for (unsigned paramType1 = 0; paramType1 < numParamTypesInModel; paramType1++)
 	{
-		for (unsigned j = start; j < curSample; j++) {
-			selectionMeans[i] += mutationTrace[i][j][geneIndex];
+		for (unsigned category1 = 0; category1 < numCategoriesInModel; category1++)
+		{
+			for (unsigned param1 = aaStart; param1 < aaEnd; param1++)
+			{
+				double mean1 = sampleMean(codonSpecificParameterTrace[paramType1][category1][param1], samples, lastIteration);
+				for (unsigned paramType2 = 0; paramType2 < numParamTypesInModel; paramType2++)
+				{
+					for (unsigned category2 = 0; category2 < numCategoriesInModel; category2++)
+					{
+						for (unsigned param2 = aaStart; param2 < aaEnd; param2++)
+						{
+							double mean2 = sampleMean(codonSpecificParameterTrace[paramType2][category2][param2], samples, lastIteration);
+							double unscaledSampleCov = 0.0;
+							for (unsigned i = start; i < lastIteration; i++)
+							{
+								unscaledSampleCov += (codonSpecificParameterTrace[paramType1][category1][param1][i] - mean1) * (codonSpecificParameterTrace[paramType2][category2][param2][i] - mean2);
+							}
+							covMatrix[IDX] = unscaledSampleCov / (samples - 1);
+							IDX++;
+						}
+					}
+				}
+			}
 		}
 	}
-
-
-    for(unsigned i = 0u; i < _numVariates; i++)
-    {
-        for (unsigned k = 0u; k < _numVariates; k++)
-        {
-            double nonNormalizedCovariance = 0.0; // missing term 1/(n-1)
-            for(unsigned j = start; j < curSample; j++)
-            {
-                nonNormalizedCovariance += (trace[i][j][geneIndex] - means[i]) * (trace[k][j][geneIndex] - means[k]);
-            }
-            covMatrix[i * _numVariates + k] = (1.0/(adaptiveWidth - 1.0)) * nonNormalizedCovariance;
-        }
-
-    }
 }
-*/
 
-
+double CovarianceMatrix::sampleMean(std::vector<double> sampleVector, unsigned samples, unsigned lastIteration)
+{
+	double posteriorMean = 0.0;
+	unsigned start = lastIteration - samples;
+	for (unsigned i = start; i < lastIteration; i++)
+	{
+		posteriorMean += sampleVector[i];
+	}
+	return posteriorMean / (double)samples;
+}
 
 
 

@@ -458,9 +458,9 @@ void FONSEModel::adaptSynthesisRateProposalWidth(unsigned adaptiveWidth, bool ad
 }
 
 
-void FONSEModel::adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, bool adapt)
+void FONSEModel::adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, unsigned lastIteration, bool adapt)
 {
-	parameter->adaptCodonSpecificParameterProposalWidth(adaptiveWidth, adapt);
+	parameter->adaptCodonSpecificParameterProposalWidth(adaptiveWidth, lastIteration, adapt);
 }
 
 

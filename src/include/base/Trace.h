@@ -111,7 +111,7 @@ public:
         std::vector<std::vector<double>> getCodonSpecificAcceptanceRatioTrace();
         unsigned getSynthesisRateCategory(unsigned mixtureElement);
         unsigned getCodonSpecificCategory(unsigned mixtureElement, unsigned paramType);
-
+		std::vector<std::vector<std::vector<std::vector<double>>>>* getCodonSpecificParameterTrace();
 
         //ROC Specific:
         std::vector<double> getCodonSpecificParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon, unsigned paramType,

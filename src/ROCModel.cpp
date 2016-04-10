@@ -508,9 +508,9 @@ void ROCModel::adaptSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adap
 }
 
 
-void ROCModel::adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, bool adapt)
+void ROCModel::adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, unsigned lastIteration, bool adapt)
 {
-	parameter->adaptCodonSpecificParameterProposalWidth(adaptiveWidth, adapt);
+	parameter->adaptCodonSpecificParameterProposalWidth(adaptiveWidth, lastIteration, adapt);
 }
 
 

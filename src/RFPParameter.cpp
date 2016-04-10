@@ -447,7 +447,7 @@ void RFPParameter::updateCodonSpecificParameter(std::string grouping)
 // ---------- Adaptive Width Functions ----------//
 // ----------------------------------------------//
 
-void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, bool adapt)
+void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastIteration, bool adapt)
 {
 	std::cout << "acceptance rate for codon:\n";
 	for (unsigned i = 0; i < groupList.size(); i++)

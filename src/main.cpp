@@ -8,13 +8,13 @@
 int main()
 {
 	std::cout << "Initializing MCMCAlgorithm object---------------" << std::endl;
-	int samples = 5000;
+	int samples = 10000;
 	int thining = 10;
 	int useSamples = 100;
 	std::cout << "\t# Samples: " << samples << "\n";
 	std::cout << "\tThining: " << thining << "\n";
 	std::cout << "\t# Samples used: " << useSamples << "\n";
-	MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, 10, true, true, true);
+	MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, 100, true, true, true);
 	//mcmc.setRestartFileSettings("RestartFile.txt", 20, true);
 	std::cout << "Done!-------------------------------\n\n\n";
 
