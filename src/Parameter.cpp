@@ -1152,7 +1152,7 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 
 #ifndef STANDALONE
 	Rprintf("Acceptance rate for Codon Specific Parameter\n");
-	Rprintf("\tAA\tAcc.Rat\tProp.Width\n");
+	Rprintf("\tAA\tAcc.Rat\n");
 #else
 	std::cout << "Acceptance rate for Codon Specific Parameter\n";
 	std::cout << "\tAA\tacc.rat\n"; //Prop.Width\n";
@@ -1169,13 +1169,14 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 			unsigned aaEnd;
 			SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
 #ifndef STANDALONE
-		Rprintf("\t%s:\t%f\t%f\n", aa.c_str(), acceptanceLevel, std_csp[aaStart]);
+		Rprintf("\t%s:\t%f\n", aa.c_str(), acceptanceLevel);
 #else
 			std::cout << "\t" << aa << ":\t" << acceptanceLevel << "\n";// "\t" << std_csp[aaStart] << "\n";
 #endif
 			if (acceptanceLevel < 0.2) {
-				if(acceptanceLevel < 0.05)
-					covarianceMatrix[aaIndex] *= 0.8;
+				if(acceptanceLevel < 0.1)
+                    for (unsigned k = aaStart; k < aaEnd; k++)
+					   covarianceMatrix[aaIndex] *= 0.8;
 				else 
 					covarianceMatrix[aaIndex].calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
 

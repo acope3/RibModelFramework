@@ -400,7 +400,7 @@ std::vector<double> Trace::getObservedSynthesisNoiseTrace(unsigned index)
 }
 
 
-std::vector<std::vector<std::vector<double>>> Trace::getCodonSpecificParameterTrace(unsigned paramType)
+std::vector<std::vector<std::vector<double>>> Trace::getCodonSpecificParameterTraceByParamType(unsigned paramType)
 {
 	/*
 	std::vector<std::vector<std::vector<double>>> rv;

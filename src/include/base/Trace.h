@@ -119,7 +119,7 @@ public:
         std::vector<double> getSynthesisOffsetTrace(unsigned index);
         std::vector<double> getSynthesisOffsetAcceptanceRatioTraceForIndex(unsigned index);
         std::vector<double> getObservedSynthesisNoiseTrace(unsigned index);
-        std::vector<std::vector<std::vector<double>>> getCodonSpecificParameterTrace(unsigned paramType);
+        std::vector<std::vector<std::vector<double>>> getCodonSpecificParameterTraceByParamType(unsigned paramType);
         std::vector<std::vector<double>> getSynthesisOffsetAcceptanceRatioTrace();
 
         //FONSE Specific:
