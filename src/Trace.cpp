@@ -348,6 +348,11 @@ unsigned Trace::getSynthesisRateCategory(unsigned mixtureElement)
 	return categories->at(mixtureElement).delEta;
 }
 
+std::vector<std::vector<std::vector<std::vector<double>>>>* Trace::getCodonSpecificParameterTrace() 
+{
+	return &codonSpecificParameterTrace;
+}
+
 
 //----------------------------------//
 //---------- ROC Specific ----------//
@@ -395,7 +400,7 @@ std::vector<double> Trace::getObservedSynthesisNoiseTrace(unsigned index)
 }
 
 
-std::vector<std::vector<std::vector<double>>> Trace::getCodonSpecificParameterTrace(unsigned paramType)
+std::vector<std::vector<std::vector<double>>> Trace::getCodonSpecificParameterTraceByParamType(unsigned paramType)
 {
 	/*
 	std::vector<std::vector<std::vector<double>>> rv;

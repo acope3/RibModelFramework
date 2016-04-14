@@ -30,6 +30,9 @@ class Parameter {
 		static void swap(double& a, double& b);
 		static void swap(int& a, int& b);
 
+		unsigned adaptiveStepPrev = 0;
+		unsigned adaptiveStepCurr = 0;
+
 
 		std::vector<double> codonSpecificPrior;
 	public:
@@ -140,7 +143,7 @@ class Parameter {
 		//Adaptive Width Functions:
 		void adaptStdDevSynthesisRateProposalWidth(unsigned adaptationWidth, bool adapt);
 		void adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool adapt);
-		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, bool adapt);
+		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastIteration, bool adapt);
 
 
 		//Posterior, Variance, and Estimates Functions:
