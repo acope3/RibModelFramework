@@ -711,7 +711,7 @@ setBaseInfo <- function(parameter, files)
         stdDevSynthesisRateTraces[[j]] <- tempEnv$paramBase$stdDevSynthesisRateTraces[[j]][1:max]
       }
       stdDevSynthesisRateAcceptanceRatioTrace <- tempEnv$paramBase$stdDevSynthesisRateAcceptRatTrace
-      synthesisRateTrace <- c()
+      synthesisRateTrace <- vector('list', 3)
       for (j in 1:numMixtures) {
         for (k in 1:length(tempEnv$paramBase$synthRateTrace[[j]])){
           synthesisRateTrace[[j]][[k]] <- tempEnv$paramBase$synthRateTrace[[j]][[k]][1:max]
@@ -811,12 +811,18 @@ loadROCParameterObject <- function(parameter, files)
   
     max <- tempEnv$paramBase$lastIteration + 1
     if (i == 1){
-      synthesisOffsetTrace <- tempEnv$synthesisOffsetTrace[1:max]
-      synthesisOffsetAcceptanceRatioTrace <- tempEnv$synthesisOffsetAcceptRatTrace
-      observedSynthesisNoiseTrace <- tempEnv$observedSynthesisNoiseTrace[1:max]
+      withPhi <- tempEnv$withPhi
+      if (withPhi){
+        synthesisOffsetTrace <- tempEnv$synthesisOffsetTrace[1:max]
+        synthesisOffsetAcceptanceRatioTrace <- tempEnv$synthesisOffsetAcceptRatTrace
+        observedSynthesisNoiseTrace <- tempEnv$observedSynthesisNoiseTrace[1:max]
+      }else {
+        synthesisOffsetTrace <- c()
+        synthesisOffsetAcceptanceRatioTrace <- c()
+        observedSynthesisNoiseTrace <- c()
+      }
       codonSpecificParameterTraceMut <- tempEnv$mutationTrace[1:max]
       codonSpecificParameterTraceSel <- tempEnv$selectionTrace[1:max]
-      withPhi <- tempEnv$withPhi
     }else{
       curSynthesisOffsetTrace <- tempEnv$synthesisOffsetTrace
       curSynthesisOffsetAcceptanceRatioTrace <- tempEnv$synthesisOffsetAcceptRatTrace
