@@ -711,7 +711,7 @@ setBaseInfo <- function(parameter, files)
         stdDevSynthesisRateTraces[[j]] <- tempEnv$paramBase$stdDevSynthesisRateTraces[[j]][1:max]
       }
       stdDevSynthesisRateAcceptanceRatioTrace <- tempEnv$paramBase$stdDevSynthesisRateAcceptRatTrace
-      synthesisRateTrace <- vector('list', 3)
+      synthesisRateTrace <- c()
       for (j in 1:numMixtures) {
         for (k in 1:length(tempEnv$paramBase$synthRateTrace[[j]])){
           synthesisRateTrace[[j]][[k]] <- tempEnv$paramBase$synthRateTrace[[j]][[k]][1:max]
@@ -720,7 +720,7 @@ setBaseInfo <- function(parameter, files)
       synthesisRateAcceptanceRatioTrace <- tempEnv$paramBase$synthAcceptRatTrace
       mixtureAssignmentTrace <- c()
       for (j in 1:length(tempEnv$paramBase$mixAssignTrace)){
-        mixtureAssignmentTrace <- tempEnv$paramBase$mixAssignTrace[1:max]
+        mixtureAssignmentTrace[[j]] <- tempEnv$paramBase$mixAssignTrace[[j]][1:max]
       }
       mixtureProbabilitiesTrace <- c()
       for (j in 1:numMixtures) {
@@ -872,9 +872,20 @@ loadRFPParameterObject <- function(parameter, files)
     load(file = files[i], envir = tempEnv)
   
     max <- tempEnv$paramBase$lastIteration + 1
+    numMixtures <- tempEnv$paramBase$numMix
     if (i == 1){
-      alphaTrace <- tempEnv$alphaTrace[1:max]
-      lambdaPrimeTrace <- tempEnv$lambdaPrimeTrace[1:max]
+      alphaTrace <-c()
+      for (j in 1:numMixtures) {
+        for (k in 1:length(tempEnv$alphaTrace[[j]])){
+          alphaTrace[[j]][[k]] <- tempEnv$alphaTrace[[j]][[k]][1:max]
+        }
+      }
+      lambdaPrimeTrace <- c()
+      for (j in 1:numMixtures) {
+        for (k in 1:length(tempEnv$lambdaPrimeTrace[[j]])){
+          lambdaPrimeTrace[[j]][[k]] <- tempEnv$lambdaPrimeTrace[[j]][[k]][1:max]
+        }
+      }
     }else{
       
       curAlphaTrace <- tempEnv$alphaTrace
