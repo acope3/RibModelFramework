@@ -21,7 +21,8 @@ class Genome
 
 		std::vector<Gene> genes;
 		std::vector<Gene> simulatedGenes;
-		std::vector <unsigned> numGenesWithPhi;
+		std::vector <unsigned> numGenesWithPhi; //Number of phi sets is vector size, value is number of genes
+												//with a phi value for that set. Values should currently be equal.
 
 	public:
 
