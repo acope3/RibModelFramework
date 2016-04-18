@@ -43,7 +43,7 @@ plotParameterObject <- function(x, what = "Mutation", samples = 100, ...){
       if(aa == "M" || aa == "W" || aa == "X") next
       codons <- AAToCodon(aa, T)
       for(i in 1:length(codons)){
-        param.storage <- c(param.storage, x$getCodonSpecificPosteriorMean(mixture, samples, codons[i], paramType))
+        param.storage <- c(param.storage, x$getCodonSpecificPosteriorMean(mixture, samples, codons[i], paramType, TRUE))
       }
     }
     csp.params[, mixture] <- param.storage
@@ -92,16 +92,22 @@ upper.panel.plot <- function(x, y, sd.x=NULL, sd.y=NULL, ...){
   intercept <- round(summary(lm.line)$coefficients[1], 3)
   t <- (slope - 1)/std.error
   
-  if(t > qt(1-0.05/2, lm.line$df.residual - 1)){
+  if(t > qt(1-(0.05/2), lm.line$df.residual - 1)){
     eq <- paste("y = ", sprintf("%.3f", intercept), " + ", sprintf("%.3f", slope), "x *", sep = "")
     text(xlim[1] + width * 0.1, ylim[2] - height * 0.2, eq)
   }else{
     eq <- paste("y = ", sprintf("%.3f", intercept), " + ", sprintf("%.3f", slope), "x", sep = "")
     text(xlim[1] + width * 0.1, ylim[2] - height * 0.2, eq)
   } 
-  text(xlim[2] - width * 0.04, ylim[1] + height * 0.05,
-       parse(text = paste("rho == ", sprintf("%.4f", rho), sep = "")),
-       pos = 2, cex = 1.0, font = 2)
+  if(b > 0){
+    text(xlim[2] - width * 0.04, ylim[1] + height * 0.05,
+         parse(text = paste("rho == ", sprintf("%.4f", rho), sep = "")),
+         pos = 2, cex = 1.0, font = 2)
+  }else{
+    text(xlim[2] - width * 0.04, ylim[2] - height * 0.05,
+         parse(text = paste("rho == ", sprintf("%.4f", rho), sep = "")),
+         pos = 2, cex = 1.0, font = 2)
+  }
 }
 
 

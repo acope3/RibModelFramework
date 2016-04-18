@@ -1186,31 +1186,11 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 			}
 			if (acceptanceLevel > 0.3) {
 				//covarianceMatrix[aaIndex].calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
-				covarianceMatrix[aaIndex] *= 1.2;
-				covarianceMatrix[aaIndex].choleskiDecomposition();
-				for (unsigned k = aaStart; k < aaEnd; k++)
+				for (unsigned k = aaStart; k < aaEnd; k++){
 					std_csp[k] *= 1.2;
-			}
-			// resetting cov matrix
-			if (std_csp[aaStart] < 0.00001)
-			{
-				std::vector<double> t = traces.getCodonSpecficAcceptanceRatioTraceForAA(aa);
-				unsigned end = t.size();
-				// only reset covariance matrix if no improvement in acceptance ratio is observed!
-				if (t.at(end - 2) > t.at(end - 1)) {
-					unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa, true);
-					CovarianceMatrix m((numMutationCategories + numSelectionCategories) * numCodons);
-					m.setDiag(0.01);
-					m.choleskiDecomposition();
-					covarianceMatrix[aaIndex] = m;
-#ifndef STANDALONE
-					Rprintf("Reseting covariance matrix!\n");
-#else
-					std::cout << "Reseting covariance matrix!\n";
-#endif
-				}
-				for (unsigned k = aaStart; k < aaEnd; k++)
-					std_csp[k] = 0.01;
+    				covarianceMatrix[aaIndex] *= 1.2;                    
+                }
+				covarianceMatrix[aaIndex].choleskiDecomposition();
 			}
 		}
 		numAcceptForCodonSpecificParameters[aaIndex] = 0u;
