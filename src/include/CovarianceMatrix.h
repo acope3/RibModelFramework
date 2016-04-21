@@ -25,7 +25,8 @@ class CovarianceMatrix
         CovarianceMatrix(std::vector <double> &matrix);
         CovarianceMatrix(const CovarianceMatrix& other);
         CovarianceMatrix& operator=(const CovarianceMatrix& other);
-        void operator*(const double &value);
+		CovarianceMatrix& operator+(const CovarianceMatrix& rhs);
+		CovarianceMatrix& operator*(const double &value);
         void operator*=(const double &value);
         virtual ~CovarianceMatrix();
 

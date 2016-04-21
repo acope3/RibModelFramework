@@ -47,17 +47,28 @@ CovarianceMatrix& CovarianceMatrix::operator=(const CovarianceMatrix& rhs)
     if (this == &rhs) return *this; // handle self assignment
     numVariates = rhs.numVariates;
     covMatrix = rhs.covMatrix;
-		choleskiMatrix = rhs.choleskiMatrix;
+	choleskiMatrix = rhs.choleskiMatrix;
     return *this;
 }
 
 
-void CovarianceMatrix::operator*(const double &value)
+CovarianceMatrix& CovarianceMatrix::operator+(const CovarianceMatrix& rhs)
+{
+	std::vector<double> cov = rhs.covMatrix;
+	for (unsigned i = 0; i < covMatrix.size(); i++)
+	{
+		covMatrix[i] += cov[i];
+	}
+	return *this;
+}
+
+CovarianceMatrix& CovarianceMatrix::operator*(const double &value)
 {
 	for (unsigned i = 0; i < covMatrix.size(); i++)
 	{
 		covMatrix[i] *= value;
 	}
+	return *this;
 }
 
 
@@ -91,9 +102,10 @@ void CovarianceMatrix::initCovarianceMatrix(unsigned _numVariates)
     covMatrix.resize(vectorLength);
     choleskiMatrix.resize(vectorLength);
 
+	double diag_const = 0.01 / (double)numVariates;
     for(unsigned i = 0u; i < vectorLength; i++)
     {
-        covMatrix[i] = (i % (numVariates + 1) ? 0.0 : 0.1);
+        covMatrix[i] = (i % (numVariates + 1) ? 0.0 : diag_const);
         choleskiMatrix[i] = 0.0;
     }
 }

@@ -196,7 +196,7 @@ void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsig
 		std::vector<unsigned> tempAccExpr(numGenes, 0u);
 		numAcceptForSynthesisRate[i] = tempAccExpr;
 
-		std::vector<double> tempStdPhi(numGenes, 1.0);
+		std::vector<double> tempStdPhi(numGenes, 0.1);
 		std_phi[i] = tempStdPhi;
 	}
 }
@@ -1174,11 +1174,19 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 			std::cout << "\t" << aa << ":\t" << acceptanceLevel << "\n";// "\t" << std_csp[aaStart] << "\n";
 #endif
 			if (acceptanceLevel < 0.2) {
-				if(acceptanceLevel < 0.1)
-                    for (unsigned k = aaStart; k < aaEnd; k++)
-					   covarianceMatrix[aaIndex] *= 0.8;
-				else 
+				if (acceptanceLevel < 0.1)
+					for (unsigned k = aaStart; k < aaEnd; k++)
+						covarianceMatrix[aaIndex] *= 0.8;
+				else {
+					//CovarianceMatrix covcurr(covarianceMatrix[aaIndex].getNumVariates());
+					//covcurr.calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
+					//CovarianceMatrix covprev = covarianceMatrix[aaIndex];
+					//covprev = (covprev*0.4);
+					//covcurr = (covcurr*0.6);
+					//covarianceMatrix[aaIndex] = covprev + covcurr;
 					covarianceMatrix[aaIndex].calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
+				}
+				
 
 				covarianceMatrix[aaIndex].choleskiDecomposition();
 				for (unsigned k = aaStart; k < aaEnd; k++)
