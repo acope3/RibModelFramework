@@ -711,7 +711,7 @@ setBaseInfo <- function(parameter, files)
         stdDevSynthesisRateTraces[[j]] <- tempEnv$paramBase$stdDevSynthesisRateTraces[[j]][1:max]
       }
       stdDevSynthesisRateAcceptanceRatioTrace <- tempEnv$paramBase$stdDevSynthesisRateAcceptRatTrace
-      synthesisRateTrace <- c()
+      synthesisRateTrace <- vector("list", length=numMixtures)
       for (j in 1:numMixtures) {
         for (k in 1:length(tempEnv$paramBase$synthRateTrace[[j]])){
           synthesisRateTrace[[j]][[k]] <- tempEnv$paramBase$synthRateTrace[[j]][[k]][1:max]
@@ -762,21 +762,21 @@ setBaseInfo <- function(parameter, files)
       
       #assuming all checks have passed, time to concatanate traces
       max <- tempEnv$paramBase$lastIteration + 1
-      stdDevSynthesisRateTraces <- combineTwoDimensionalTrace(stdDevSynthesisRateTraces, curStdDevSynthesisRateTraces, max)
+      combineTwoDimensionalTrace(stdDevSynthesisRateTraces, curStdDevSynthesisRateTraces, max)
 
       size <- length(curStdDevSynthesisRateAcceptanceRatioTrace)
       stdDevSynthesisRateAcceptanceRatioTrace <- c(stdDevSynthesisRateAcceptanceRatioTrace, 
                                       curStdDevSynthesisRateAcceptanceRatioTrace[2:size])
 
       
-      synthesisRateTrace <- combineThreeDimensionalTrace(synthesisRateTrace, curSynthesisRateTrace, max)
+      combineThreeDimensionalTrace(synthesisRateTrace, curSynthesisRateTrace, max)
       size <- length(curSynthesisRateAcceptanceRatioTrace)
-      synthesisRateAcceptanceRatioTrace <- combineThreeDimensionalTrace(synthesisRateAcceptanceRatioTrace, curSynthesisRateAcceptanceRatioTrace, size)
+      combineThreeDimensionalTrace(synthesisRateAcceptanceRatioTrace, curSynthesisRateAcceptanceRatioTrace, size)
       
-      mixtureAssignmentTrace <- combineTwoDimensionalTrace(mixtureAssignmentTrace, curMixtureAssignmentTrace, max)
-      mixtureProbabilitiesTrace <- combineTwoDimensionalTrace(mixtureProbabilitiesTrace, curMixtureProbabilitiesTrace, max)
+      combineTwoDimensionalTrace(mixtureAssignmentTrace, curMixtureAssignmentTrace, max)
+      combineTwoDimensionalTrace(mixtureProbabilitiesTrace, curMixtureProbabilitiesTrace, max)
       size <- length(curCodonSpecificAcceptanceRatioTrace)
-      codonSpecificAcceptanceRatioTrace <- combineTwoDimensionalTrace(codonSpecificAcceptanceRatioTrace, curCodonSpecificAcceptanceRatioTrace, size)
+      combineTwoDimensionalTrace(codonSpecificAcceptanceRatioTrace, curCodonSpecificAcceptanceRatioTrace, size)
     }
   }
   parameter$setCategories(categories)
@@ -821,8 +821,15 @@ loadROCParameterObject <- function(parameter, files)
         synthesisOffsetAcceptanceRatioTrace <- c()
         observedSynthesisNoiseTrace <- c()
       }
-      codonSpecificParameterTraceMut <- tempEnv$mutationTrace[1:max]
-      codonSpecificParameterTraceSel <- tempEnv$selectionTrace[1:max]
+      
+      codonSpecificParameterTraceMut <- vector("list", length=parameter$numMixtures)
+      codonSpecificParameterTraceSel <- vector("list", length=parameter$numMixtures)
+      for (j in 1:parameter$numMixtures) {
+        for (k in 1:length(tempEnv$mutationTrace[[j]])){
+          codonSpecificParameterTraceMut[[j]][[k]] <- tempEnv$mutationTrace[[j]][[k]][1:max]
+          codonSpecificParameterTraceSel[[j]][[k]] <- tempEnv$selectionTrace[[j]][[k]][1:max]
+        }
+      }
     }else{
       curSynthesisOffsetTrace <- tempEnv$synthesisOffsetTrace
       curSynthesisOffsetAcceptanceRatioTrace <- tempEnv$synthesisOffsetAcceptRatTrace
@@ -835,14 +842,14 @@ loadROCParameterObject <- function(parameter, files)
       
       
       if (withPhi){
-        synthesisOffsetTrace <- combineTwoDimensionalTrace(synthesisOffsetTrace, curSynthesisOffsetTrace, max)
+        combineTwoDimensionalTrace(synthesisOffsetTrace, curSynthesisOffsetTrace, max)
         size <- length(curSynthesisOffsetAcceptanceRatioTrace)
-        synthesisOffsetAcceptanceRatioTrace <- combineTwoDimensionalTrace(synthesisOffsetAcceptanceRatioTrace, curSynthesisOffsetAcceptanceRatioTrace, size)
-        observedSynthesisNoiseTrace <- combineTwoDimensionalTrace(observedSynthesisNoiseTrace, curObservedSynthesisNoiseTrace, max)
+        combineTwoDimensionalTrace(synthesisOffsetAcceptanceRatioTrace, curSynthesisOffsetAcceptanceRatioTrace, size)
+        combineTwoDimensionalTrace(observedSynthesisNoiseTrace, curObservedSynthesisNoiseTrace, max)
       }
       
-      codonSpecificParameterTraceMut <- combineThreeDimensionalTrace(codonSpecificParameterTraceMut, curCodonSpecificParameterTraceMut, max)
-      codonSpecificParameterTraceSel <- combineThreeDimensionalTrace(codonSpecificParameterTraceSel, curCodonSpecificParameterTraceSel, max)
+      combineThreeDimensionalTrace(codonSpecificParameterTraceMut, curCodonSpecificParameterTraceMut, max)
+      combineThreeDimensionalTrace(codonSpecificParameterTraceSel, curCodonSpecificParameterTraceSel, max)
     }#end of if-else
   }#end of for loop (files)
   
@@ -874,6 +881,9 @@ loadRFPParameterObject <- function(parameter, files)
     max <- tempEnv$paramBase$lastIteration + 1
     numMixtures <- tempEnv$paramBase$numMix
     if (i == 1){
+      #for future use: This may break if RFP is ran with more than
+      #one mixture, in this case just follow the format of the 
+      #ROC CSP parameters.
       alphaTrace <-c()
       for (j in 1:numMixtures) {
         for (k in 1:length(tempEnv$alphaTrace[[j]])){
@@ -891,8 +901,8 @@ loadRFPParameterObject <- function(parameter, files)
       curAlphaTrace <- tempEnv$alphaTrace
       curLambdaPrimeTrace <- tempEnv$lambdaPrimeTrace
       
-      alphaTrace <- combineThreeDimensionalTrace(alphaTrace, curAlphaTrace, max)
-      lambdaPrimeTrace <- combineThreeDimensionalTrace(lambdaPrimeTrace, curLambdaPrimeTrace, max)
+      combineThreeDimensionalTrace(alphaTrace, curAlphaTrace, max)
+      combineThreeDimensionalTrace(lambdaPrimeTrace, curLambdaPrimeTrace, max)
     }
   }#end of for loop (files)
   
@@ -920,15 +930,22 @@ loadFONSEParameterObject <- function(parameter, files)
     
     max <- tempEnv$paramBase$lastIteration + 1
     if (i == 1){
-      codonSpecificParameterTraceMut <- tempEnv$mutationTrace[1:max]
-      codonSpecificParameterTraceSel <- tempEnv$selectionTrace[1:max]
+      
+      codonSpecificParameterTraceMut <- vector("list", length=parameter$numMixtures)
+      codonSpecificParameterTraceSel <- vector("list", length=parameter$numMixtures)
+      for (j in 1:parameter$numMixtures) {
+        for (k in 1:length(tempEnv$mutationTrace[[j]])){
+          codonSpecificParameterTraceMut[[j]][[k]] <- tempEnv$mutationTrace[[j]][[k]][1:max]
+          codonSpecificParameterTraceSel[[j]][[k]] <- tempEnv$selectionTrace[[j]][[k]][1:max]
+        }
+      }
     }else{
       curCodonSpecificParameterTraceMut <- tempEnv$mutationTrace
       curCodonSpecificParameterTraceSel <- tempEnv$selectionTrace
 
       
-      codonSpecificParameterTraceMut <- combineThreeDimensionalTrace(codonSpecificParameterTraceMut, curCodonSpecificParameterTraceMut, max)
-      codonSpecificParameterTraceSel <- combineThreeDimensionalTrace(codonSpecificParameterTraceSel, curCodonSpecificParameterTraceSel, max)
+      combineThreeDimensionalTrace(codonSpecificParameterTraceMut, curCodonSpecificParameterTraceMut, max)
+      combineThreeDimensionalTrace(codonSpecificParameterTraceSel, curCodonSpecificParameterTraceSel, max)
     }#end of if-else
   }#end of for loop (files)
   
@@ -951,7 +968,6 @@ combineTwoDimensionalTrace <- function(trace1, trace2, max){
   {
     trace1[[size]]<- c(trace1[[size]], trace2[[size]][2:max])
   }
-  return(trace1)
 }
 
 
@@ -966,6 +982,4 @@ combineThreeDimensionalTrace <- function(trace1, trace2, max){
                           trace2[[size]][[sizeTwo]][2:max])
     }
   }
-  
-  return(trace1)
 }
