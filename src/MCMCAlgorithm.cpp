@@ -440,6 +440,11 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 			if((iteration % thining) == 0u)
 			{
 				likelihoodTrace[(iteration / thining)] = logLike;
+				if (std::isnan(logLike)) {
+					std::cerr << "Log likelihood is NaN, exiting at iteration " << iteration << std::endl;
+					model.setLastIteration(iteration / thining);
+					return;
+				}
 			}
 			if(( (iteration) % adaptiveWidth) == 0u)
 			{

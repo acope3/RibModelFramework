@@ -26,6 +26,7 @@ const unsigned Parameter::alp = 0;
 const unsigned Parameter::lmPri = 1;
 
 
+
 //--------------------------------------------------//
 // ---------- Constructors & Destructors -----------//
 //--------------------------------------------------//
@@ -36,6 +37,8 @@ Parameter::Parameter()
 	lastIteration = 0u;
 	numParam = 0u;
 	obsPhiSets = 0u;
+	adaptiveStepPrev = 0;
+	adaptiveStepCurr = 0;
 	stdDevSynthesisRate.resize(1);
 	stdDevSynthesisRate_proposed.resize(1);
 	numAcceptForStdDevSynthesisRate = 0u;

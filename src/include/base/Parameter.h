@@ -30,8 +30,8 @@ class Parameter {
 		static void swap(double& a, double& b);
 		static void swap(int& a, int& b);
 
-		unsigned adaptiveStepPrev = 0;
-		unsigned adaptiveStepCurr = 0;
+		unsigned adaptiveStepPrev;
+		unsigned adaptiveStepCurr;
 
 
 		std::vector<double> codonSpecificPrior;
