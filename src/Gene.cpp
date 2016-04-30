@@ -12,12 +12,21 @@ using namespace Rcpp;
 //--------------------------------------------------//
 
 
+//Blank constructor for Gene class. Sets the private fields
+//to empty strings.
+//*********************************************************
+//RCPP EXPOSED
 Gene::Gene() : seq(""), id(""), description("")
 {
     //ctor
 }
 
 
+//Gene constructor that will set the sequence, id, and description strings in the Gene class. It will
+//then generate the sequence summary object for the gene based off the gene as long as the sequence
+//is a multiple of three (three is needed because of the size of codons).
+//****************************************************************************************************
+//RCPP EXPOSED
 Gene::Gene(std::string _seq, std::string _id, std::string _desc) : seq(_seq), id(_id), description(_desc)
 {
     cleanSeq();
@@ -37,6 +46,10 @@ Gene::Gene(std::string _seq, std::string _id, std::string _desc) : seq(_seq), id
 }
 
 
+//Copy constructor for gene. All fields, public and private, will be set for the
+//given gene.
+//******************************************************************************
+//NOT EXPOSED TO RCPP
 Gene::Gene(const Gene& other)
 {
     seq = other.seq;
@@ -47,6 +60,7 @@ Gene::Gene(const Gene& other)
 }
 
 
+//Eqaulity 
 Gene& Gene::operator=(const Gene& rhs)
 {
     if (this == &rhs) return *this; // handle self assignment

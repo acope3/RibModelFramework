@@ -19,9 +19,9 @@ class SequenceSummary
 {
 	private:
 
-		std::array<unsigned, 64> ncodons;
-		std::array<unsigned, 64> RFPObserved;
-		std::array<unsigned, 22> naa;
+		std::array<unsigned, 64> ncodons; //64 for the number of codons.
+		std::array<unsigned, 64> RFPObserved; //64 for the number of codons.
+		std::array<unsigned, 22> naa; //22 for the number of amino acids.
 		std::vector <std::vector <unsigned>> codonPositions;
 
 	public:
