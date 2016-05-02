@@ -813,9 +813,14 @@ loadROCParameterObject <- function(parameter, files)
     if (i == 1){
       withPhi <- tempEnv$withPhi
       if (withPhi){
-        synthesisOffsetTrace <- tempEnv$synthesisOffsetTrace[1:max]
+        for (j in 1:parameter$numMixtures) {
+          synthesisOffsetTrace[[j]] <- tempEnv$synthesisOffsetTrace[[j]][1:max]
+        }
         synthesisOffsetAcceptanceRatioTrace <- tempEnv$synthesisOffsetAcceptRatTrace
-        observedSynthesisNoiseTrace <- tempEnv$observedSynthesisNoiseTrace[1:max]
+        for (j in 1:parameter$numMixtures) {
+          observedSynthesisNoiseTrace[[j]] <- tempEnv$observedSynthesisNoiseTrace[[j]][1:max]
+        }
+        #need number of phi groups, not the number of mixtures apparently.
       }else {
         synthesisOffsetTrace <- c()
         synthesisOffsetAcceptanceRatioTrace <- c()

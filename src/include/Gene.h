@@ -19,7 +19,7 @@ class Gene
 		std::string id; //Gene id: Ex: "YALOC001"
 		std::string description; //Additional information about the gene.
 
-		void cleanSeq(); // clean the sequence, remove non "AGCT" characters
+		void cleanSeq();
 
 	public:
 
