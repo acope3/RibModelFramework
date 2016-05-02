@@ -28,10 +28,13 @@ using namespace Rcpp;
 //--------------------------------------------------//
 
 
+//MCMCAlgorithm constructor (RCPP EXPOSED)
+//Arguments: None
+//Sets up the object with the specified default values. Every step is a sample in
+//this case, so every iteration trace values will be stored. All parameters are estimated.
 MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * thining), estimateSynthesisRate(true),
 	estimateCodonSpecificParameter(true), estimateHyperParameter(true)
 {
-	MCMCAlgorithm(1000, 1, true, true, true); //TODO: should not be calling another constructor.
 	likelihoodTrace.resize(samples + 1); // +1 for storing initial evaluation
 	writeRestartFile = false;
 	multipleFiles = false;
@@ -42,7 +45,11 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * 
 	stepsToAdapt = -1;
 }
 
-
+//MCMCAlgorithm constructor (RCPP EXPOSED)
+//Arguments: number of samples wanted, thining of iterations to get samples, how many iterations adaptive witdth
+//can be changed, bool for where the synthesis rate, codon specific, and hyper paramters are estimated (respectively)
+//Sets up the object with the given parameters. Adaptive with is actually set to adaptive width * thining. NOTE:
+//hyper parameters normally affect synthesis rate parameters, so either both should be turned on or neither.
 MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thining, unsigned _adaptiveWidth, bool _estimateSynthesisRate,
 							 bool _estimateCodonSpecificParameter, bool _estimateHyperParameter) : samples(_samples),
 							 thining(_thining), adaptiveWidth(_adaptiveWidth * thining),
@@ -60,6 +67,9 @@ MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thining, unsigned _ada
 }
 
 
+//MCMCAlgorithm destructor (NOT EXPOSED)
+//Arguments: None
+//Standard destructor for the object.
 MCMCAlgorithm::~MCMCAlgorithm()
 {
 	//dtor
@@ -73,7 +83,9 @@ MCMCAlgorithm::~MCMCAlgorithm()
 //---------- Acceptance Rejection Functions ----------//
 //----------------------------------------------------//
 
-
+//acceptRejectSynthesisRateLevelForAllGenes
+//Arguments: reference to a genome and a model. which iteration (step) is currently being estimated
+//
 double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, Model& model, int iteration)
 {
     //FILE * pFile;
@@ -87,6 +99,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	unsigned numSynthesisRateCategories = model.getNumSynthesisRateCategories();
 	unsigned numMixtures = model.getNumMixtureElements();
 	double* dirichletParameters = new double[numMixtures]();
+	//TODO: why is this not just a vector?
 
 
 	for (unsigned i = 0u; i < numMixtures; i++) {
@@ -107,7 +120,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			 => ln(f') = ln(c) + ln(f)
 			 => ln(P) = ln( Sum(p_i*f'(...)) )
 			 => ln(P) = ln(P') - ln(c)
-			 Note that we use the inverce sign because our values of ln(f) and ln(f') are negative.
+			 Note that we use the inverse sign because our values of ln(f) and ln(f') are negative.
 		 */
 
 		double maxValue = -1000000.0;
