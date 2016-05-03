@@ -39,10 +39,10 @@ bool Genome::operator==(const Genome& other) const
 {
 	bool match = true;
 
-	if(!(this->genes == other.genes)) { match = false; } //Do a ! operation because only the gene comparison is implemented,
+	if(!(this->genes == other.genes)) { match = false; std::cerr<<"fail1";} //Do a ! operation because only the gene comparison is implemented,
 	//not the != operator.
 	if(!(this->simulatedGenes == other.simulatedGenes)) { match = false; }
-	if(this->numGenesWithPhi != other.numGenesWithPhi) { match = false; }
+	if(this->numGenesWithPhi != other.numGenesWithPhi) { match = false; std::cerr<<"fail2";}
 
 	return match;
 }
@@ -207,6 +207,13 @@ void Genome::writeFasta (std::string filename, bool simulated)
 	}
 }
 
+// readPANSEFile
+// Arguments: string filename
+/*
+// Read in a PANSE-formatted file: GeneID,Codon,Position (1-indexed),rfp_count
+// The positions are not necessarily in the right order.
+*/
+
 void Genome::readPANSEFile(std::string filename)
 {
 	std::ifstream Fin;
@@ -280,7 +287,6 @@ void Genome::readPANSEFile(std::string filename)
 			tmpGene.addRFP_count(RFP_counts);
 			addGene(tmpGene); //add to genome
 			tmpGene.clear();
-			std::cerr << prevID << " " << seq << "\n";
 			seq = "";
 
 			git = genes.find(ID);
@@ -420,13 +426,14 @@ void Genome::writeRFPFile(std::string filename, bool simulated)
 	Fout.close();
 }
 
-//readObservedPhiValues
-//Arguments: string filename, bool byId
+// readObservedPhiValues
+// Arguments: string filename, bool byId
 /*
-//User may choose to store Phi values either by ID (if byId is true) or by index (if false).
-//In by index, each gene read in should correspond numerically to the genome.
-//Values that less than or equal to 0 or not a number will be converted to -1 and not
+// User may choose to store Phi values either by ID (if byId is true) or by index (if false).
+// In by index, each gene read in should correspond numerically to the genome.
+// Values that less than or equal to 0 or not a number will be converted to -1 and not
 // counted as a phi value.
+// NOTE: IF AN ERROR FILE IS READ IN, numGenesWithPhi IS STILL INITIALIZED WITH 0'S.
 */
 void Genome::readObservedPhiValues(std::string filename, bool byId)
 {
@@ -529,17 +536,16 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 							numPhi = (unsigned) it->second->observedSynthesisRateValues.size();
 							numGenesWithPhi.resize(numPhi, 0);
 						}
-						else if (it->second->observedSynthesisRateValues.size() != numGenesWithPhi.size())
+						else if (it->second->observedSynthesisRateValues.size() != numPhi)
 						{
 #ifndef STANDALONE
-                            Rf_error("Gene %d: has a different number of phi values given other genes: \n", geneID.c_str());
-                            Rf_error("%d\n", it-> second -> getId().c_str());
-                            Rf_error("%d\n", it-> second -> observedSynthesisRateValues.size() + 1);
-                            Rf_error("Exiting function.\n");
+                            Rf_error("Gene %d has a different number of phi values given other genes: \n", geneID.c_str());
+                            Rf_error("Gene %d has %d ", geneID.c_str(), it -> second -> observedSynthesisRateValues.size());
+                            Rf_error(" while others have %d\n. Exiting function.\n", numPhi);
 #else
-							std::cerr << geneID << ": has a different number of phi values given than other genes: ";
-							std::cerr << it->second->getId() << "\n";
-							std::cerr << it->second->observedSynthesisRateValues.size() + 1 << ". Exiting function.\n";
+							std::cerr << "Gene " << geneID << " has a different number of phi values given than other genes: \n";
+							std::cerr << "Gene " << geneID << " has " << it->second->observedSynthesisRateValues.size();
+							std::cerr << " while others have " << numPhi << ". Exiting function.\n";
 #endif
 							exitfunction = true;
 							for (unsigned a = 0; a < getGenomeSize(); a++) {
@@ -594,7 +600,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 #ifndef STANDALONE
 						Rf_error("GeneIndex exceeds the number of genes in the genome. Exiting function\n");
 #else
-						std::cerr << "GeneIndex exceeds the number of genes in the genome. Exiting function\n";
+						std::cerr << "GeneIndex exceeds the number of genes in the genome. Exiting function.\n";
 #endif
 						break;
 					}
@@ -645,14 +651,13 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 					else if (numPhi != genes[geneIndex].observedSynthesisRateValues.size())
 					{
 #ifndef STANDALONE
-						Rf_error("Gene %d: has a different number of phi values given other genes: \n", geneIndex);
-                                Rf_error("%d\n", genes[geneIndex].observedSynthesisRateValues.size() + 1);
-                                Rf_error("Exiting function.\n");
+                        Rf_error("Gene %d has a different number of phi values given other genes: \n", geneIndex);
+                        Rf_error("Gene %d has %d ", geneIndex, genes[geneIndex].observedSynthesisRateValues.size());
+                        Rf_error(" while others have %d\n. Exiting function.\n", numPhi);
 #else
-						std::cerr << "Gene " << geneIndex <<
-						": has a different number of phi values given than other genes: \n";
-						std::cerr << genes[geneIndex].observedSynthesisRateValues.size() + 1 <<
-						". Exiting function\n";
+						std::cerr << "Gene " << geneIndex << ": has a different number of phi values given than other genes: \n";
+						std::cerr << "Gene " << geneIndex << " has " << genes[geneIndex].observedSynthesisRateValues.size();
+						std::cerr << " while others have " << numPhi << ". Exiting function.\n";
 #endif
 						exitfunction = true;
 						for (unsigned a = 0; a < getGenomeSize(); a++)
