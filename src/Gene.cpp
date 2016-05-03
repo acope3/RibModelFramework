@@ -65,11 +65,11 @@ bool Gene::operator==(const Gene& other) const
     bool match = true;
 
 
-    if(this->seq != other.seq) { match = false; std::cerr<<"faila\n";}
-    if(this->id != other.id) { match = false; std::cerr<<"failb\n";}
-    if(this->description != other.description) { match = false; std::cerr<<"failc\n";}
-    if(this->observedSynthesisRateValues != other.observedSynthesisRateValues) { match = false; std::cerr<<"faild\n";}
-    if(!(this->geneData == other.geneData)) { match = false; std::cerr<<"faile\n";} //if structures aren't equal, genes aren't equal.
+    if(this->seq != other.seq) { match = false; }
+    if(this->id != other.id) { match = false; }
+    if(this->description != other.description) { match = false; }
+    if(this->observedSynthesisRateValues != other.observedSynthesisRateValues) { match = false; }
+    if(!(this->geneData == other.geneData)) { match = false; } //if structures aren't equal, genes aren't equal.
 
     return match;
 }
@@ -155,6 +155,10 @@ void Gene::setSequence(std::string _seq)
 				"\nGene data is NOT processed! \nValid characters are A,C,T,G, and N \n";
 #endif
 	}
+}
+
+void Gene::addRFP_count(std::vector <unsigned> RFP_counts) {
+    geneData.setRFP_count(RFP_counts);
 }
 
 

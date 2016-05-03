@@ -39,10 +39,10 @@ bool Genome::operator==(const Genome& other) const
 {
 	bool match = true;
 
-	if(!(this->genes == other.genes)) { match = false; std::cerr<<"fail1\n";} //Do a ! operation because only the gene comparison is implemented,
+	if(!(this->genes == other.genes)) { match = false; } //Do a ! operation because only the gene comparison is implemented,
 	//not the != operator.
-	if(!(this->simulatedGenes == other.simulatedGenes)) { match = false; std::cerr<<"fail2\n"; }
-	if(this->numGenesWithPhi != other.numGenesWithPhi) { match = false; std::cerr<<"fail3\n";}
+	if(!(this->simulatedGenes == other.simulatedGenes)) { match = false; }
+	if(this->numGenesWithPhi != other.numGenesWithPhi) { match = false; }
 
 	return match;
 }
@@ -245,22 +245,19 @@ void Genome::readPANSEFile(std::string filename)
 		if (ID != prevID)
 		{
 			genes[prevID] *= 3; //multiply by three since codons
-			//std::cerr << "size of gene " << prevID << " is " << genes[prevID] << "\n";
 			genes[ID] = 0; //initialize the new genes[ID]
 		}
 		prevID = ID;
 		genes[ID]++;
 	}
 	genes[prevID] *= 3; //multiply by three since codons
-	//std::cerr << "size of gene " << prevID << " is " << genes[prevID] << "\n";
 	Fin.close();
-
-	//std::cerr << "Re-traversing\n";
 
 	Fin.open(filename.c_str());
 	std::getline(Fin, tmp); //retrash first line
 	prevID = "";
 	first = true;
+	std::vector <unsigned> RFP_counts;
 
 	//Now for each line associated with a gene ID, set the string appropriately
 	while (std::getline(Fin,tmp))
@@ -279,8 +276,8 @@ void Genome::readPANSEFile(std::string filename)
 		{
 			tmpGene.setId(prevID);
 			tmpGene.setDescription("No description for PANSE Model");
-			//tmpGene.setDescription(prevID + " Test Gene");
 			tmpGene.setSequence(seq);
+			tmpGene.addRFP_count(RFP_counts);
 			addGene(tmpGene); //add to genome
 			tmpGene.clear();
 			std::cerr << prevID << " " << seq << "\n";
@@ -288,9 +285,9 @@ void Genome::readPANSEFile(std::string filename)
 
 			git = genes.find(ID);
 			seq.resize(git->second);
+			RFP_counts.clear();
 		}
 		// PANSE file format: GeneID,Codon,Position (1-indexed),rfp_count
-
 		std::size_t pos2 = tmp.find(",", pos + 1);
 
 		// Each codon is guaranteed to be of size 3
@@ -299,10 +296,10 @@ void Genome::readPANSEFile(std::string filename)
 		// Make pos find next comma to find position integer
 		pos = tmp.find(",", pos2 + 1);
 		unsigned position = (unsigned)std::atoi(tmp.substr(pos2 + 1, pos - (pos2 + 1)).c_str()) - 1;
-		//std::cerr << "position is " << position << " for codon " << codon << "\n";
 
 		// Get rfp_count from last comma-separated value
-		unsigned rfp_count = (unsigned)std::atoi(tmp.substr(pos + 1).c_str());
+		unsigned RFP_count = (unsigned)std::atoi(tmp.substr(pos + 1).c_str());
+		RFP_counts.push_back(RFP_count);
 
 		// Now add codon to appropriate place in sequence
 		seq[position * 3] = codon[0];
@@ -310,19 +307,14 @@ void Genome::readPANSEFile(std::string filename)
 		seq[position * 3 + 2] = codon[2];
 
 		prevID = ID;
-
-		// Not sure what these do in context of PANSE
-		//unsigned index = SequenceSummary::codonToIndex(codon);
-		//tmpGene.geneData.setRFPObserved(index, tmpRFP);
 	}
 
 	tmpGene.setId(prevID);
 	tmpGene.setDescription("No description for PANSE Model");
-	//tmpGene.setDescription(prevID + " Test Gene");
 	tmpGene.setSequence(seq);
+	tmpGene.addRFP_count(RFP_counts);
 
 	addGene(tmpGene); //add to genome
-	std::cerr << prevID << " " << seq << "\n";
 
 	Fin.close();
 }
@@ -428,7 +420,14 @@ void Genome::writeRFPFile(std::string filename, bool simulated)
 	Fout.close();
 }
 
-
+//readObservedPhiValues
+//Arguments: string filename, bool byId
+/*
+//User may choose to store Phi values either by ID (if byId is true) or by index (if false).
+//In by index, each gene read in should correspond numerically to the genome.
+//Values that less than or equal to 0 or not a number will be converted to -1 and not
+// counted as a phi value.
+*/
 void Genome::readObservedPhiValues(std::string filename, bool byId)
 {
 	std::ifstream input;
@@ -461,12 +460,12 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 		{
 			if (byId)
 			{
-                //Mapping is done so the genes can be found
-                std::map<std::string, Gene *> genomeMapping;
-                for (unsigned i = 0; i < genes.size(); i++)
+				//Mapping is done so the genes can be found
+				std::map<std::string, Gene *> genomeMapping;
+				for (unsigned i = 0; i < genes.size(); i++)
 				{
-                    genomeMapping.insert(make_pair(genes[i].getId(), &genes[i]));
-                }
+					genomeMapping.insert(make_pair(genes[i].getId(), &genes[i]));
+				}
 
                 bool first = true;
                 while (std::getline(input, tmp))
@@ -475,6 +474,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
                     std::string geneID = tmp.substr(0, pos);
                     std::map<std::string, Gene *>::iterator it;
                     it = genomeMapping.find(geneID);
+
                     if (it == genomeMapping.end())
 					{
 #ifndef STANDALONE
@@ -490,10 +490,12 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
                         bool notDone = true;
 						double dval;
 
+						// Loop over each comma-separated value
                         while (notDone)
 						{
 							std::size_t pos2 = tmp.find(",", pos + 1);
 
+							// End of string, end loop
 							if (pos2 == std::string::npos)
 							{
 								val = tmp.substr(pos + 1, tmp.size() + 1);
@@ -514,12 +516,13 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 								Rf_warning("WARNING! Invalid, negative, or 0 phi value given; values should not be on the log scale. Negative Value stored.");
 #else
 								std::cerr <<
-								"WARNING! Invalid, negative, or 0 phi value given; values should not be on the log scale. Negative Value stored.\"";
+								"WARNING! Invalid, negative, or 0 phi value given; values should not be on the log scale. Negative Value stored.\n";
 #endif
 							}
 							it->second->observedSynthesisRateValues.push_back(dval);
 						}
 
+						// If this is the first value, initialize the size of numGenesWithPhi
 						if (first)
 						{
 							first = false;
@@ -529,7 +532,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 						else if (it->second->observedSynthesisRateValues.size() != numGenesWithPhi.size())
 						{
 #ifndef STANDALONE
-							Rf_error("Gene %d: has a different number of phi values given other genes: \n", geneID.c_str());
+                            Rf_error("Gene %d: has a different number of phi values given other genes: \n", geneID.c_str());
                             Rf_error("%d\n", it-> second -> getId().c_str());
                             Rf_error("%d\n", it-> second -> observedSynthesisRateValues.size() + 1);
                             Rf_error("Exiting function.\n");
@@ -547,56 +550,45 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
                     }
                     if (exitfunction) break;
                 }
+				// If number of phi values match those of other given genes, execution continues normally.
+				// Proceed to increment numGenesWithPhi.
                 if (!exitfunction)
 				{
-                    for (unsigned geneIndex = 0; geneIndex < getGenomeSize(); geneIndex++)
+                    for (unsigned i = 0; i < getGenomeSize(); i++)
 					{
-						Gene *gene = &(getGene(geneIndex));
-                        if (getGene(geneIndex).observedSynthesisRateValues.size() != numPhi)
+						Gene *gene = &(getGene(i));
+                        if (getGene(i).observedSynthesisRateValues.size() != numPhi)
 						{
 #ifndef STANDALONE
-                            Rf_warning("Gene # %d (%s) does not have any phi values.", geneIndex, gene->getId().c_str());
-                            Rf_warning(" Filling with -1's\n");
+							Rf_warning("Gene # %d (%s) does not have any phi values. ", geneIndex, gene->getId().c_str());
+                            Rf_warning("Please check your file to make sure every gene has a phi value. Filling empty genes ");
+                            Rf_warning("with -1's for calculations.\n");
 #else
-                            std::cerr << "Gene # " << geneIndex << " (" << gene->getId() <<
-                            ") does not have any phi values.";
-                            std::cerr << " Filling with -1's\n";
+							std::cerr << "Gene # " << i << " (" << gene->getId() <<
+							") does not have any phi values. ";
+							std::cerr << "Please check your file to make sure every gene has a phi value. Filling empty genes ";
+							std::cerr << "with -1's for calculations.\n";
 #endif
                             gene->observedSynthesisRateValues.resize(numPhi, -1);
                         }
 
-						for (unsigned i = 0; i < numPhi; i++)
+						// Finally increment numGenesWithPhi based on stored observedSynthesisRateValues
+						for (unsigned j = 0; j < numPhi; j++)
 						{
-							if (gene->observedSynthesisRateValues[i] != -1)
-							{
-								numGenesWithPhi[i]++;
-								std::cerr << "For index i = " << i << " numGenesWithPhi[i] is " << numGenesWithPhi[i]
-									<< "\n";
-							}
+							if (gene->observedSynthesisRateValues[j] != -1)
+								numGenesWithPhi[j]++;
 						}
                     }
                 }
             }
-                //
-                //
-                //end of putting in by ID
-			    //
-                //
-            else //doing this by index
+				// By index
+            else
 			{
 				unsigned geneIndex = 0;
 				bool first = true;
-				bool firstValue = false;
+
 				while (std::getline(input, tmp))
 				{
-					// HOLLIS TODO: Let's change it to a vector-based setup like
-					// In byID.
-
-					//std::size_t pos = tmp.find(",");
-
-
-					// Begin old code
-
 					if (geneIndex >= genes.size())
 					{
 #ifndef STANDALONE
@@ -606,85 +598,52 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 #endif
 						break;
 					}
-					std::size_t pos = tmp.find(",");
 
+					std::size_t pos = tmp.find(",");
 					std::string val = "";
 					bool notDone = true;
 					double dval;
 
+					// Loop over each comma-separated value
 					while (notDone)
 					{
 						std::size_t pos2 = tmp.find(",", pos + 1);
 
+						// End of string, end loop
 						if (pos2 == std::string::npos)
 						{
 							val = tmp.substr(pos + 1, tmp.size() + 1);
 							notDone = false;
-
-							//I think this code is in the wrong place. Moving down.
-
-							if (first)
-							{
-								first = false;
-								numPhi = (unsigned) genes[geneIndex].observedSynthesisRateValues.size() + 1;
-								numGenesWithPhi.resize(numPhi);
-								//What does this do? It just means first value
-								//Is initialized at 1 more than the rest.
-								//if (firstValue) numGenesWithPhi[0] = 1;
-							}
-							else if (numPhi != genes[geneIndex].observedSynthesisRateValues.size() + 1)
-							{
-#ifndef STANDALONE
-                                Rf_error("Gene %d: has a different number of phi values given other genes: \n", geneIndex);
-                                Rf_error("%d\n", genes[geneIndex].observedSynthesisRateValues.size() + 1);
-                                Rf_error("Exiting function.\n");
-#else
-								std::cerr << "Gene " << geneIndex <<
-								": has a different number of phi values given than other genes: \n";
-								std::cerr << genes[geneIndex].observedSynthesisRateValues.size() + 1 <<
-								". Exiting function\n";
-#endif
-								exitfunction = true;
-								for (unsigned a = 0; a < getGenomeSize(); a++)
-								{
-									genes[a].observedSynthesisRateValues.clear();
-								}
-								break;
-							}
-
 						}
 						else
 						{
 							val = tmp.substr(pos + 1, pos2 - (pos + 1));
-							//pos = pos2;
+							pos = pos2;
 						}
 						dval = std::atof(val.c_str());
 
 						//If the value is negative, nan, or 0, we set it to -1 and throw a warning message.
-						if (dval <= 0 || std::isnan(dval))
-						{
+						if (dval <= 0 || std::isnan(dval)) {
 							dval = -1;
 #ifndef STANDALONE
 							Rf_warning("WARNING! Invalid, negative, or 0 phi value given; values should not be on the log scale. Negative Value stored.");
 #else
 							std::cerr <<
-							"WARNING! Invalid, negative, or 0 phi value given; values should not be on the log scale. Negative Value stored.\"";
+							"WARNING! Invalid, negative, or 0 phi value given; values should not be on the log scale. Negative Value stored.\n";
 #endif
 						}
-						//genes[geneIndex].observedSynthesisRateValues.push_back(dval);
-					//}
-
-					//HOLLIS TODO: is this shit even right
-					/*
-					if (first) {
-						first = false;
-						numPhi = (unsigned) genes[geneIndex].observedSynthesisRateValues.size() + 1;
-						numGenesWithPhi.resize(numPhi);
-						//What does this do? It just means first value
-						//Is initialized at 1 more than the rest.
-						//if (firstValue) numGenesWithPhi[0] = 1;
+						genes[geneIndex].observedSynthesisRateValues.push_back(dval);
 					}
-					else if (numPhi != genes[geneIndex].observedSynthesisRateValues.size() + 1) {
+
+					// If this is the first value, initialize the size of numGenesWithPhi
+					if (first)
+					{
+						first = false;
+						numPhi = (unsigned) genes[geneIndex].observedSynthesisRateValues.size();
+						numGenesWithPhi.resize(numPhi, 0);
+					}
+					else if (numPhi != genes[geneIndex].observedSynthesisRateValues.size())
+					{
 #ifndef STANDALONE
 						Rf_error("Gene %d: has a different number of phi values given other genes: \n", geneIndex);
                                 Rf_error("%d\n", genes[geneIndex].observedSynthesisRateValues.size() + 1);
@@ -696,70 +655,47 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 						". Exiting function\n";
 #endif
 						exitfunction = true;
-						for (unsigned a = 0; a < getGenomeSize(); a++) {
+						for (unsigned a = 0; a < getGenomeSize(); a++)
+						{
 							genes[a].observedSynthesisRateValues.clear();
 						}
 						break;
-					} else{
-						numGenesWithPhi[genes[geneIndex].observedSynthesisRateValues.size()]++;
 					}
-					 */
-
-						else
-						{
-							if (first)
-							{
-								firstValue = true;
-							}
-							else
-							{
-								numGenesWithPhi[genes[geneIndex].observedSynthesisRateValues.size()]++;
-							}
-						}
-
-						genes[geneIndex].observedSynthesisRateValues.push_back(dval);
-						pos = pos2;
-					}
-
 					geneIndex++;
 					if (exitfunction) break;
 				}
-
-				//POSSIBLE TODO: Parallelize this with byID's code for readability.
-				//Current syntax is ambiguous.
+				// If number of phi values match those of other given genes, execution continues normally.
+				// Proceed to increment numGenesWithPhi.
 				if (!exitfunction)
 				{
-					for (unsigned i = 0; i < numPhi; i++)
+					for (unsigned i = 0; i < getGenomeSize(); i++)
 					{
-
-						if (numGenesWithPhi[i] != getGenomeSize())
+						Gene *gene = &(getGene(i));
+						if (getGene(i).observedSynthesisRateValues.size() != numPhi)
 						{
 #ifndef STANDALONE
-                            Rf_warning("The last %d genes do not have phi values.", getGenomeSize() - numGenesWithPhi[i]);
+                            Rf_warning("Gene # %d (%s) does not have any phi values. ", i, gene->getId().c_str());
                             Rf_warning("Please check your file to make sure every gene has a phi value. Filling empty genes ");
                             Rf_warning("with -1's for calculations.\n");
 #else
-							std::cerr << "The last " << getGenomeSize() - numGenesWithPhi[i] <<
-							" genes do not have phi values.";
+							std::cerr << "Gene # " << i << " (" << gene->getId() <<
+							") does not have any phi values. ";
 							std::cerr <<
 							"Please check your file to make sure every gene has a phi value. Filling empty genes ";
 							std::cerr << "with -1's for calculations.\n";
 #endif
-
-							for (unsigned a = numGenesWithPhi[i]; a < getGenomeSize(); a++)
-							{
-								Gene *gene = &(getGene(a));
-								gene->observedSynthesisRateValues[i] = -1;
-							}
+							gene->observedSynthesisRateValues.resize(numPhi, -1);
 						}
 
-						//Did I add this here?
-						std::cerr << "For index i = " << i << " numGenesWithPhi[i] is " << numGenesWithPhi[i]
-						<< "\n";
-						//
+						// Finally increment numGenesWithPhi based on stored observedSynthesisRateValues
+						for (unsigned j = 0; j < numPhi; j++)
+						{
+							if (gene->observedSynthesisRateValues[j] != -1)
+								numGenesWithPhi[j]++;
+						}
 					}
 				}
-			}//end of reading by index
+			}
 		}
 		input.close();
 	}
@@ -872,12 +808,14 @@ std::vector<unsigned> Genome::getCodonCountsPerGene(std::string codon)
 //---------------------------------------//
 
 
-std::vector<unsigned> Genome::getNumGenesWithPhi()
+std::vector <unsigned> Genome::getNumGenesWithPhi()
 {
 	return numGenesWithPhi;
 }
 
-
+void Genome::setNumGenesWithPhi(std::vector <unsigned> newVector){
+	this->numGenesWithPhi = newVector;
+}
 
 
 // -----------------------------------------------------------------------------------------------------//

@@ -58,6 +58,7 @@ class Genome
 
 		//Testing Functions:
 		std::vector <unsigned> getNumGenesWithPhi();
+		void setNumGenesWithPhi(std::vector <unsigned> newVector);
 
 
 
