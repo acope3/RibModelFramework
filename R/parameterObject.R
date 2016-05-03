@@ -245,7 +245,7 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
 
 
 
-#' Write Parameter To CSV File 
+#' Return Codon Specific Paramters (or write to csv) estimates as data.frame
 #' 
 #' @param parameter A parameter object that corrosponds to
 #' one of the model types. Valid values are "ROC", "RFP", and
@@ -271,20 +271,19 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
 #' @details \code{writeParameterToCSV} will make the necessary calls
 #' to writeXXXParameterToCSV based off of the parameter given.
 #' 
-writeParameterToCSV <- function(parameter, filename, CSP, mixture, samples){
-  UseMethod("writeParameterToCSV", parameter)
+getCSPEstimates <- function(parameter, filename, CSP, mixture, samples){
+  UseMethod("getCSPEstimates", parameter)
 }
 
 
-#Called from writeParameterToCSV
-writeParameterToCSV.Rcpp_ROCParameter <- function(parameter, filename=NULL, 
-                                            CSP=NULL, mixture = 1, samples = 10){
+#Called from getCSPEstimates
+getCSPEstimates.Rcpp_ROCParameter <- function(parameter, filename=NULL, 
+                                              CSP="Mutation", mixture = 1, samples = 10){
   names.aa <- aminoAcids()
   Amino_Acid <- c()
   Value <- c()
   Codon <- c()
-  Std_Deviation <- c()
-  
+  Std_Deviation <- vector("list")
   
   for(aa in names.aa){
     if(aa == "M" || aa == "W" || aa == "X") next
@@ -294,32 +293,31 @@ writeParameterToCSV.Rcpp_ROCParameter <- function(parameter, filename=NULL,
       Amino_Acid <- c(Amino_Acid, aa)
       Codon <- c(Codon, codons[i])
       
-      
       if(CSP == "Mutation"){
-        Value <- c(Value,parameter$getMutationPosteriorMeanForCodon(mixture, samples, codons[i]))
-        Std_Deviation <- c(Std_Deviation, sqrt(parameter$getMutationVarianceForCodon(mixture, samples, codons[i], TRUE)))
+        Value <- c(Value, parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 0, TRUE))
+        Std_Deviation <- c(Std_Deviation, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 0, c(0.025, 0.975), TRUE))
       }
       else if(CSP == "Selection"){
-        Value <- c(Value,parameter$getSelectionPosteriorMeanForCodon(mixture, samples, codons[i]))
-        Std_Deviation <- c(Std_Deviation, sqrt(parameter$getSelectionVarianceForCodon(mixture, samples, codons[i], TRUE)))
+        Value <- c(Value, parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 1, TRUE))
+        Std_Deviation <- c(Std_Deviation, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 1, c(0.025, 0.975), TRUE))
       }
       else {
         stop("Unknown Parameter type given")
       }
     }
   }
-  
-  
-  data <- data.frame(Amino_Acid,Codon,Value, Std_Deviation)
+  Std_Deviation <- matrix(unlist(Std_Deviation), nrow = 2)
+  data <- data.frame(Amino_Acid, Codon, Value, Lower=Std_Deviation[1,], Upper=Std_Deviation[2,])
+  colnames(data) <- c("AA", "Codon", "Posterior", "0.025%", "0.975%")
   if(is.null(filename))
   {
-    print(data)
+    return(data)
   }else {
     write.csv(data, file = filename, row.names = FALSE, quote=FALSE)
   }
 }
 
-#TODO: implement writeCSV for RFP and FONSE
+#TODO: implement getCSPEstimates for RFP and FONSE
 
 
 

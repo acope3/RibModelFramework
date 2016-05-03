@@ -157,6 +157,8 @@ class Parameter {
 											bool unbiased = true);
 		double getCodonSpecificVariance(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType, bool unbiased,
 			bool withoutReference = true);
+        std::vector<double> getCodonSpecificQuantile(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType, std::vector<double> probs,
+	       bool withoutReference);
 		unsigned getEstimatedMixtureAssignment(unsigned samples, unsigned geneIndex);
 		std::vector<double> getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex);
 
@@ -236,6 +238,8 @@ class Parameter {
 			bool withoutReference);
 		double getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, unsigned paramType, bool unbiased,
 			bool withoutReference);
+        std::vector<double> getCodonSpecificQuantileForCodon(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType, std::vector<double> probs,
+	       bool withoutReference);
 
 
 		//Other Functions:

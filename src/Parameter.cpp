@@ -1416,6 +1416,41 @@ double Parameter::getCodonSpecificVariance(unsigned mixtureElement, unsigned sam
 	return normalizationTerm * posteriorVariance;
 }
 
+std::vector<double> Parameter::getCodonSpecificQuantile(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType, std::vector<double> probs,
+	bool withoutReference)
+{
+ 	std::vector<double> parameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
+		mixtureElement, codon, paramType, withoutReference);
+    
+    unsigned traceLength = lastIteration + 1;
+    unsigned traceEnd = parameterTrace.size() - (parameterTrace.size() - lastIteration);
+	if (samples > traceLength)
+	{
+#ifndef STANDALONE
+		Rf_warning("Warning in Parameter::getCodonSpecificQuantile throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
+			samples, traceLength);
+#else
+		std::cerr << "Warning in Parameter::getCodonSpecificQuantile throws: Number of anticipated samples (" << samples
+			<< ") is greater than the length of the available trace (" << traceLength << ")."
+			<< "Whole trace is used for posterior estimate! \n";
+#endif
+		samples = traceLength;
+	}
+    
+    std::vector<double> samplesTrace(parameterTrace.end() - (traceEnd + samples), parameterTrace.end() - traceEnd);
+    std::sort(samplesTrace.begin(), samplesTrace.end());
+    std::vector<double> retVec(probs.size());
+    for(int i = 0; i < probs.size(); i++)
+    {
+        double h = (1.0+(samplesTrace.size()-1.0)*probs[i]);
+        int low = (int)h;
+        retVec[i] = samplesTrace[low] + (h - low)*(samplesTrace[low+1] - samplesTrace[low]);
+    }
+    
+    return retVec;
+}
+
+
 
 unsigned Parameter::getEstimatedMixtureAssignment(unsigned samples, unsigned geneIndex)
 {
@@ -2010,6 +2045,20 @@ double Parameter::getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsi
 	return rv;
 }
 
+std::vector<double> Parameter::getCodonSpecificQuantileForCodon(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType, std::vector<double> probs,
+	bool withoutReference)
+{
+	std::vector<double> rv;
+	codon[0] = (char)std::toupper(codon[0]);
+	codon[1] = (char)std::toupper(codon[1]);
+	codon[2] = (char)std::toupper(codon[2]);
+	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	if (check)
+	{
+        rv = getCodonSpecificQuantile(mixtureElement - 1, samples, codon, paramType, probs, withoutReference);
+    }
+    return rv;     
+}
 
 double Parameter::getSynthesisRatePosteriorMeanByMixtureElementForGene(unsigned samples, unsigned geneIndex, unsigned mixtureElement)
 {
