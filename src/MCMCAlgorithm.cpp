@@ -85,7 +85,9 @@ MCMCAlgorithm::~MCMCAlgorithm()
 
 //acceptRejectSynthesisRateLevelForAllGenes
 //Arguments: reference to a genome and a model. which iteration (step) is currently being estimated
-//
+//Based on the logliklihood probabilities proposed for a gene (with and without reverse jump), it is decided
+//whether or not a synthesis rate is accepted for that gene or not. Mixture assignment is also updated when
+//applicable.
 double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, Model& model, int iteration)
 {
     //FILE * pFile;
@@ -173,7 +175,6 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			}
 		}
 
-		//unsigned mixAssign = model.getMixtureAssignment(i);
 
 		// adjust the the unscaled probabilities by the constant c
 		// ln(f') = ln(c) + ln(f)
@@ -192,8 +193,6 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			probabilities[k] = probabilities[k] / normalizingProbabilityConstant;
 		}
 
-//		unsigned mixtureAssignmentOfGene = model.getMixtureAssignment(i);
-//		unsigned geneSynthCat = model.getSynthesisRateCategory(mixAssign);
 		for(unsigned k = 0u; k < numSynthesisRateCategories; k++)
 		{
 			// We do not need to add std::log(model.getCategoryProbability(k)) since it will cancel in the ratio!
@@ -201,19 +200,14 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			double propLogLike = unscaledLogProb_prop[k];
 			if( -Parameter::randExp(1) < (propLogLike - currLogLike) )
 			{
-                if((iteration % thining) == 0)
-                    //fprintf (pFile, "%f\t%s\n",(propLogLike - currLogLike), "TRUE");
                 if(estimateSynthesisRate){
 				    model.updateSynthesisRate(i, k);
-                    //logLikelihood += model.getCategoryProbability(k) * unscaledLogPost_prop[k];
-                    logLikelihood += probabilities[k] * unscaledLogPost_prop[k];                    
+                    logLikelihood += probabilities[k] * unscaledLogPost_prop[k];
                 }else{
                     logLikelihood += probabilities[k] * unscaledLogPost_curr[k]; // if phi is not estimatedd, it will always stay curr!    
                 }
 			}else{
                 if((iteration % thining) == 0)
-                   // fprintf (pFile, "%f\t%s\n",(propLogLike - currLogLike), "FALSE");
-				//logLikelihood += model.getCategoryProbability(k) * unscaledLogPost_curr[k];
                 logLikelihood += probabilities[k] * unscaledLogPost_curr[k];
 			}
 		}
@@ -260,10 +254,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	if((iteration % thining) == 0)
 	{
 		model.updateMixtureProbabilitiesTrace(iteration/thining);
-        //std::cout << "Likelihoods:\t" << logLikelihood << "\t" << logLikelihood2 << std::endl;
-        //fprintf (pFile, "%f\t%f\n",logLikelihood,logLikelihood2);
 	}
-    //fclose (pFile);
 	delete[] dirichletParameters;
 	delete[] newMixtureProbabilities;
 	return logLikelihood;
