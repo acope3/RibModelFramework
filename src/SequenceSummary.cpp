@@ -109,6 +109,8 @@ SequenceSummary& SequenceSummary::operator=(const SequenceSummary& rhs)
 		naa[i] = rhs.naa[i];
 	}
 
+	RFP_count = rhs.RFP_count;
+
 	return *this;
 }
 
@@ -121,6 +123,7 @@ bool SequenceSummary::operator==(const SequenceSummary& other) const
 	if (this->ncodons != other.ncodons) { match = false;}
 	if (this->codonPositions != other.codonPositions) { match = false;}
 	if (this->RFPObserved != other.RFPObserved) { match = false;}
+	if (this->RFP_count != other.RFP_count) {match = false;}
 
 	return match;
 }
@@ -194,8 +197,15 @@ std::vector <unsigned> *SequenceSummary::getCodonPositions(unsigned index)
 	return &codonPositions[index];
 }
 
+std::vector <unsigned> SequenceSummary::getRFP_count()
+{
+	return RFP_count;
+}
 
-
+void SequenceSummary::setRFP_count(std::vector <unsigned> arg)
+{
+	RFP_count = arg;
+}
 
 
 //------------------------------------//
@@ -206,6 +216,7 @@ std::vector <unsigned> *SequenceSummary::getCodonPositions(unsigned index)
 void SequenceSummary::clear()
 {
 	codonPositions.clear();
+	RFP_count.clear();
 	for(unsigned k = 0; k < 64; k++)
 	{
 		ncodons[k] = 0;

@@ -6,18 +6,15 @@
 using namespace Rcpp;
 #endif
 
-
 //--------------------------------------------------//
 //----------- Constructors & Destructors ---------- //
 //--------------------------------------------------//
-
 
 RFPModel::RFPModel() : Model()
 {
 	parameter = 0;
 	//ctor
 }
-
 
 RFPModel::~RFPModel()
 {
@@ -33,8 +30,8 @@ double RFPModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double 
 													   unsigned currRFPObserved, unsigned currNumCodonsInMRNA, double phiValue)
 {
 	double logLikelihood = ((std::lgamma((currNumCodonsInMRNA * currAlpha) + currRFPObserved)) - (std::lgamma(currNumCodonsInMRNA * currAlpha)))
-						   + (currRFPObserved * (std::log(phiValue) - std::log(currLambdaPrime + phiValue))) + ((currNumCodonsInMRNA * currAlpha) * (std::log(currLambdaPrime) -
-																																					 std::log(currLambdaPrime + phiValue)));
+						   + (currRFPObserved * (std::log(phiValue) - std::log(currLambdaPrime + phiValue)))
+						   + ((currNumCodonsInMRNA * currAlpha) * (std::log(currLambdaPrime) - std::log(currLambdaPrime + phiValue)));
 
 	return logLikelihood;
 }

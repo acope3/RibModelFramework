@@ -15,11 +15,11 @@ class Gene
 
 	private:
 
-		std::string seq;
-		std::string id;
-		std::string description;
+		std::string seq; //Gene sequence. Ex: "AATTCAGCT..."
+		std::string id; //Gene id: Ex: "YALOC001"
+		std::string description; //Additional information about the gene.
 
-		void cleanSeq(); // clean the sequence, remove non "AGCT" characters
+		void cleanSeq();
 
 	public:
 
@@ -43,8 +43,9 @@ class Gene
 		void setId(std::string _id);
 		std::string getDescription();
 		void setDescription(std::string _desc);
-		std::string getSequence();
 		void setSequence(std::string _seq);
+		void addRFP_count(std::vector <unsigned> RFP_counts);
+		std::string getSequence();
 		SequenceSummary *getSequenceSummary();
 		std::vector<double> getObservedSynthesisRateValues();
 		void setObservedSynthesisRateValues(std::vector <double> values); //Only for unit testing.
