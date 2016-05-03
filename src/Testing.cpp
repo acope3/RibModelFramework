@@ -1135,7 +1135,6 @@ void testGenome(std::string testFileDir)
     Gene g1("ATGGCCACTATTGGGTCTTAG", "TEST001", "TEST001 Test Gene");
     genome.addGene(g1, false);
 
-
     Gene test = genome.getGene("TEST001", false);
     Gene test2 = genome.getGene(0, false);
 
@@ -1209,16 +1208,97 @@ void testGenome(std::string testFileDir)
         error = 0; //Reset for next function.
     }
 
-
     //--------------------------------------------//
     //------ readObservedPhiValues Function ------//
     //--------------------------------------------//
 
-    std::string file = testFileDir + "/" + "readObservedPhiValues.csv";
+    //Before doing the steps below, set up genomes for 4 genes (not currently implemented)
+
+    Genome testGenome1; // For the non-error file
+    Genome testGenome2; // For the error file
+
+    // The ObservedSynthesisRateValues are the same for both genomes except for Gene g3
+    g1.setObservedSynthesisRateValues({1, 2, 3, 4});
+    testGenome1.addGene(g1, false);
+    testGenome2.addGene(g1, false);
+
+    Gene g2("TGGGATTACCAA", "TEST002", "TEST002 Test Gene");
+    genome.addGene(g2, false);
+    g2.setObservedSynthesisRateValues({4, 3, 2, 1});
+    testGenome1.addGene(g2, false);
+    testGenome2.addGene(g2, false);
+
+    Gene g3("TTGGAAACCACA", "TEST003", "TEST003 Test Gene");
+    genome.addGene(g3, false);
+    g3.setObservedSynthesisRateValues({-1, -1, 4, 2});
+    testGenome1.addGene(g3, false);
+    g3.setObservedSynthesisRateValues({4, 0, 4});
+    testGenome2.addGene(g3, false);
+
+    Gene g4("TGGGATTACCCC", "TEST004", "TEST004 Test Gene");
+    genome.addGene(g4, false);
+    g4.setObservedSynthesisRateValues({2, 1, 4, -1});
+    testGenome1.addGene(g4, false);
+    testGenome2.addGene(g4, false);
+
+    testGenome1.setNumGenesWithPhi({3, 3, 4, 3});
+    testGenome2.setNumGenesWithPhi({4, 3, 4, 3});
+
+    // Test set one: Test if non-error file is correct by ID and by index.
+    /*std::string file = testFileDir + "/" + "readObservedPhiValues.csv";
+    genome.readObservedPhiValues(file, true);
+
+    if (!(genome == testGenome1))
+    {
+        std::cerr << "Error comparing genomes: readObservedPhiValues.csv ";
+        std::cerr << "by ID produces a different genome than expected.\n";
+        error = 1;
+    }
     genome.readObservedPhiValues(file, false);
+    if (!(genome == testGenome1))
+    {
+        std::cerr << "Error comparing genomes: readObservedPhiValues.csv ";
+        std::cerr << "by index produces a different genome than expected.\n";
+        error = 1;
+    }*/
 
+    // Test set two: Test if error file is correct by ID and by index.
+    std::string file = testFileDir + "/" + "readObservedPhiValuesError.csv";
+    /*genome.readObservedPhiValues(file, true);
 
-/*
+    if (!(genome == testGenome2))
+    {
+        std::cerr << "Error comparing genomes: readObservedPhiValuesError.csv ";
+        std::cerr << "by ID produces a different genome than expected.\n";
+        error = 1;
+    }*/
+    genome.readObservedPhiValues(file, false);
+    if (!(genome == testGenome2))
+    {
+        std::cerr << "Error comparing genomes: readObservedPhiValuesError.csv ";
+        std::cerr << "by index produces a different genome than expected.\n";
+        error = 1;
+    }
+
+    // If any errors are produced, reset variable for next function
+    if (!error)
+    {
+        std::cout << "Genome readObservedPhiValues --- Pass\n";
+    }
+    else
+    {
+        error = 0; //Reset for next function.
+    }
+
+    //After that we will try it with the error file
+    //Then it will be like the same comparisons
+    //Then we will need to do the same thing again but with byID equal false
+    //That's it.
+
+    //Currently as of 4/8/16, I am trying to move into multiple genes atm.
+    //Compare with .getGenomeSize()
+
+ /*
 
     //----------------------------//
     //------ clear Function ------//
@@ -1272,5 +1352,38 @@ void testGenome(std::string testFileDir)
     {
         std::cerr <<"Error in readFasta. Genomes are not equivelant.\n";
     }
-*/
+
+    //--------------------------------//
+    //---- readPANSEFile Function ----//
+    //--------------------------------//
+
+    //const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &thisFile =
+    //        testFileDir + "/" + "test.fasta";
+
+    genome.clear();
+    std::string file = testFileDir + "/" + "readPANSE.csv";
+    genome.readPANSEFile(file);
+
+    Gene g2("CTTGCTATTTTT", "TEST001", "No description for PANSE Model");
+    Gene g3("CCTGTAATTTGG", "TEST002", "No description for PANSE Model");
+
+    std::vector <unsigned> tmp1 = {0, 2, 0, 0};
+    std::vector <unsigned> tmp2 = {0, 0, 1, 1};
+
+    g2.addRFP_count(tmp1);
+    g3.addRFP_count(tmp2);
+
+    Genome testGenome;
+    testGenome.addGene(g2, false);
+    testGenome.addGene(g3, false);
+
+    if(genome == testGenome)
+    {
+        std::cout <<"Genome readPANSE --- Pass\n";
+    }
+    else
+    {
+        std::cerr <<"Error in readPANSE. Genomes are not equivalent.\n";
+    }
+    */
 }

@@ -43,8 +43,9 @@ class Gene
 		void setId(std::string _id);
 		std::string getDescription();
 		void setDescription(std::string _desc);
-		std::string getSequence();
 		void setSequence(std::string _seq);
+		void addRFP_count(std::vector <unsigned> RFP_counts);
+		std::string getSequence();
 		SequenceSummary *getSequenceSummary();
 		std::vector<double> getObservedSynthesisRateValues();
 		void setObservedSynthesisRateValues(std::vector <double> values); //Only for unit testing.

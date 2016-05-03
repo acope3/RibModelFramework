@@ -23,6 +23,7 @@ class SequenceSummary
 		std::array<unsigned, 64> RFPObserved; //64 for the number of codons.
 		std::array<unsigned, 22> naa; //22 for the number of amino acids.
 		std::vector <std::vector <unsigned>> codonPositions;
+		std::vector <unsigned> RFP_count; //index is number of position
 
 	public:
 
@@ -57,7 +58,8 @@ class SequenceSummary
 		void setRFPObserved(unsigned codonIndex, unsigned value);
 		std::vector <unsigned> *getCodonPositions(std::string codon);
 		std::vector <unsigned> *getCodonPositions(unsigned index);
-
+		std::vector <unsigned> getRFP_count();
+		void setRFP_count(std::vector <unsigned> arg);
 
 
 		//Other Functions:

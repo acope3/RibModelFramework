@@ -37,6 +37,7 @@ class Genome
 		void readFasta(std::string filename, bool Append = false);
 		void writeFasta(std::string filename, bool simulated = false);
 		void readRFPFile(std::string filename);
+		void readPANSEFile(std::string filename);
 		void writeRFPFile(std::string filename, bool simulated = false);
 		void readObservedPhiValues(std::string filename, bool byId = true);
 
@@ -58,6 +59,7 @@ class Genome
 
 		//Testing Functions:
 		std::vector <unsigned> getNumGenesWithPhi();
+		void setNumGenesWithPhi(std::vector <unsigned> newVector);
 
 
 
