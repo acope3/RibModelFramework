@@ -1437,7 +1437,7 @@ std::vector<double> Parameter::getCodonSpecificQuantile(unsigned mixtureElement,
 		samples = traceLength;
 	}
     
-    std::vector<double> samplesTrace(parameterTrace.end() - (traceEnd + samples), parameterTrace.end() - traceEnd);
+    std::vector<double> samplesTrace(parameterTrace.begin() + (lastIteration - samples) + 1, (parameterTrace.begin() + lastIteration + 1));
     std::sort(samplesTrace.begin(), samplesTrace.end());
     std::vector<double> retVec(probs.size());
     for(int i = 0; i < probs.size(); i++)
