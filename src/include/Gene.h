@@ -43,9 +43,9 @@ class Gene
 		void setId(std::string _id);
 		std::string getDescription();
 		void setDescription(std::string _desc);
+		std::string getSequence();
 		void setSequence(std::string _seq);
 		void addRFP_count(std::vector <unsigned> RFP_counts);
-		std::string getSequence();
 		SequenceSummary *getSequenceSummary();
 		std::vector<double> getObservedSynthesisRateValues();
 		void setObservedSynthesisRateValues(std::vector <double> values); //Only for unit testing.
@@ -61,6 +61,10 @@ class Gene
 		std::string toAASequence();
 
 
+		//TODO: Possibly change category of new getRFP_count function from
+		//Testing to Data Manipulation function for consistency
+		//Testing function:
+		std::vector <unsigned> getRFP_count();
 
 
 		//R Section:

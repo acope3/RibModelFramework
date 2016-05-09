@@ -119,11 +119,11 @@ bool SequenceSummary::operator==(const SequenceSummary& other) const
 {
 	bool match = true;
 
-	if (this->naa != other.naa) { match = false;}
-	if (this->ncodons != other.ncodons) { match = false;}
-	if (this->codonPositions != other.codonPositions) { match = false;}
-	if (this->RFPObserved != other.RFPObserved) { match = false;}
-	if (this->RFP_count != other.RFP_count) {match = false;}
+	if (this->naa != other.naa) { match = false; }
+	if (this->ncodons != other.ncodons) { match = false; }
+	if (this->codonPositions != other.codonPositions) { match = false; }
+	if (this->RFPObserved != other.RFPObserved) { match = false; }
+	if (this->RFP_count != other.RFP_count) {match = false; }
 
 	return match;
 }

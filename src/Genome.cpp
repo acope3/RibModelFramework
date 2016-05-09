@@ -7,6 +7,8 @@ using namespace Rcpp;
 
 
 
+
+
 //--------------------------------------------------//
 // ---------- Constructors & Destructors ---------- //
 //--------------------------------------------------//
@@ -49,6 +51,8 @@ bool Genome::operator==(const Genome& other) const
 
 
 
+
+
 //----------------------------------------//
 //---------- File I/O Functions ----------//
 //----------------------------------------//
@@ -74,11 +78,9 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 		}
 		else
 		{
-
 			bool fastaFormat = false;
 			std::string buf;
 			int newLine;
-
 
 			Gene tmpGene;
 			std::string tempSeq = "";
@@ -141,6 +143,7 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 				}
 			} // end while
 		} // end else
+		Fin.close();
 	} // end try
 	catch(char* pMsg)
 	{
@@ -207,124 +210,6 @@ void Genome::writeFasta (std::string filename, bool simulated)
 	}
 }
 
-// readPANSEFile
-// Arguments: string filename
-/*
-// Read in a PANSE-formatted file: GeneID,Codon,Position (1-indexed),rfp_count
-// The positions are not necessarily in the right order.
-*/
-
-void Genome::readPANSEFile(std::string filename)
-{
-	std::ifstream Fin;
-	Fin.open(filename.c_str());
-	if (Fin.fail())
-	{
-#ifndef STANDALONE
-		Rf_error("Error in Genome::readPANSEFile: Can not open PANSE file %s\n", filename.c_str());
-#else
-		std::cerr << "Error in Genome::readPANSEFile: Can not open PANSE file " << filename << "\n";
-#endif
-	}
-
-	std::string tmp;
-	std::getline(Fin, tmp); //trash the first line
-	std::string prevID = "";
-	Gene tmpGene;
-	bool first = true;
-	std::string seq = "";
-
-	std::map <std::string, unsigned> genes;
-	std::map <std::string, unsigned>::iterator git;
-
-	//First pass: For each gene name, count its size.
-	while (std::getline(Fin,tmp))
-	{
-		std::size_t pos = tmp.find(",");
-		std::string ID = tmp.substr(0, pos);
-
-		if (first)
-		{
-			prevID = ID;
-			first = false;
-			genes[ID] = 0;
-		}
-		if (ID != prevID)
-		{
-			genes[prevID] *= 3; //multiply by three since codons
-			genes[ID] = 0; //initialize the new genes[ID]
-		}
-		prevID = ID;
-		genes[ID]++;
-	}
-	genes[prevID] *= 3; //multiply by three since codons
-	Fin.close();
-
-	Fin.open(filename.c_str());
-	std::getline(Fin, tmp); //retrash first line
-	prevID = "";
-	first = true;
-	std::vector <unsigned> RFP_counts;
-
-	//Now for each line associated with a gene ID, set the string appropriately
-	while (std::getline(Fin,tmp))
-	{
-		std::size_t pos = tmp.find(",");
-		std::string ID = tmp.substr(0, pos);
-
-		if (first)
-		{
-			prevID = ID;
-			first = false;
-			git = genes.find(ID);
-			seq.resize(git->second);
-		}
-		if (ID != prevID)
-		{
-			tmpGene.setId(prevID);
-			tmpGene.setDescription("No description for PANSE Model");
-			tmpGene.setSequence(seq);
-			tmpGene.addRFP_count(RFP_counts);
-			addGene(tmpGene); //add to genome
-			tmpGene.clear();
-			seq = "";
-
-			git = genes.find(ID);
-			seq.resize(git->second);
-			RFP_counts.clear();
-		}
-		// PANSE file format: GeneID,Codon,Position (1-indexed),rfp_count
-		std::size_t pos2 = tmp.find(",", pos + 1);
-
-		// Each codon is guaranteed to be of size 3
-		std::string codon = tmp.substr(pos + 1, 3);
-
-		// Make pos find next comma to find position integer
-		pos = tmp.find(",", pos2 + 1);
-		unsigned position = (unsigned)std::atoi(tmp.substr(pos2 + 1, pos - (pos2 + 1)).c_str()) - 1;
-
-		// Get rfp_count from last comma-separated value
-		unsigned RFP_count = (unsigned)std::atoi(tmp.substr(pos + 1).c_str());
-		RFP_counts.push_back(RFP_count);
-
-		// Now add codon to appropriate place in sequence
-		seq[position * 3] = codon[0];
-		seq[position * 3 + 1] = codon[1];
-		seq[position * 3 + 2] = codon[2];
-
-		prevID = ID;
-	}
-
-	tmpGene.setId(prevID);
-	tmpGene.setDescription("No description for PANSE Model");
-	tmpGene.setSequence(seq);
-	tmpGene.addRFP_count(RFP_counts);
-
-	addGene(tmpGene); //add to genome
-
-	Fin.close();
-}
-
 
 void Genome::readRFPFile(std::string filename)
 {
@@ -359,7 +244,7 @@ void Genome::readRFPFile(std::string filename)
 		if (ID != prevID)
 		{
 			tmpGene.setId(prevID);
-			//tmpGene.setDescription("No description for RFP Model");
+			tmpGene.setDescription("No description for RFP Model");
 			tmpGene.setSequence(seq);
 			addGene(tmpGene); //add to genome
 			tmpGene.clear();
@@ -426,14 +311,144 @@ void Genome::writeRFPFile(std::string filename, bool simulated)
 	Fout.close();
 }
 
-// readObservedPhiValues
-// Arguments: string filename, bool byId
-/*
-// User may choose to store Phi values either by ID (if byId is true) or by index (if false).
-// In by index, each gene read in should correspond numerically to the genome.
-// Values that less than or equal to 0 or not a number will be converted to -1 and not
-// counted as a phi value.
-// NOTE: IF AN ERROR FILE IS READ IN, numGenesWithPhi IS STILL INITIALIZED WITH 0'S.
+
+/* readPANSEFile
+ * Arguments: string filename
+ *
+ * Read in a PANSE-formatted file: GeneID,Codon,Position (1-indexed),rfp_count
+ * The positions are not necessarily in the right order.
+*/
+void Genome::readPANSEFile(std::string filename, bool Append)
+{
+	try {
+		if (!Append)
+		{
+			clear();
+		}
+		std::ifstream Fin;
+		Fin.open(filename.c_str());
+		if (Fin.fail()) {
+#ifndef STANDALONE
+			Rf_error("Error in Genome::readPANSEFile: Can not open PANSE file %s\n", filename.c_str());
+#else
+			std::cerr << "Error in Genome::readPANSEFile: Can not open PANSE file " << filename << "\n";
+#endif
+		}
+		else
+		{
+			std::string tmp;
+			std::getline(Fin, tmp); //trash the first line
+			std::string prevID = "";
+			Gene tmpGene;
+			bool first = true;
+			std::string seq = "";
+
+			std::map<std::string, unsigned> genes;
+			std::map<std::string, unsigned>::iterator git;
+
+			//First pass: For each gene name, count its size.
+			while (std::getline(Fin, tmp)) {
+				std::size_t pos = tmp.find(",");
+				std::string ID = tmp.substr(0, pos);
+
+				if (first) {
+					prevID = ID;
+					first = false;
+					genes[ID] = 0;
+				}
+				if (ID != prevID) {
+					genes[prevID] *= 3; //multiply by three since codons
+					genes[ID] = 0; //initialize the new genes[ID]
+				}
+				prevID = ID;
+				genes[ID]++;
+			}
+			genes[prevID] *= 3; //multiply by three since codons
+			Fin.close();
+
+			Fin.open(filename.c_str());
+			std::getline(Fin, tmp); //retrash first line
+			prevID = "";
+			first = true;
+			std::vector<unsigned> RFP_counts;
+
+			//Now for each line associated with a gene ID, set the string appropriately
+			while (std::getline(Fin, tmp)) {
+				std::size_t pos = tmp.find(",");
+				std::string ID = tmp.substr(0, pos);
+
+				if (first) {
+					prevID = ID;
+					first = false;
+					git = genes.find(ID);
+					seq.resize(git->second);
+				}
+				if (ID != prevID) {
+					tmpGene.setId(prevID);
+					tmpGene.setDescription("No description for PANSE Model");
+					tmpGene.setSequence(seq);
+					tmpGene.addRFP_count(RFP_counts);
+					addGene(tmpGene); //add to genome
+					tmpGene.clear();
+					seq = "";
+
+					git = genes.find(ID);
+					seq.resize(git->second);
+					RFP_counts.clear();
+				}
+				// PANSE file format: GeneID,Codon,Position (1-indexed),rfp_count
+				std::size_t pos2 = tmp.find(",", pos + 1);
+
+				// Each codon is guaranteed to be of size 3
+				std::string codon = tmp.substr(pos + 1, 3);
+
+				// Make pos find next comma to find position integer
+				pos = tmp.find(",", pos2 + 1);
+				unsigned position = (unsigned) std::atoi(tmp.substr(pos2 + 1, pos - (pos2 + 1)).c_str()) - 1;
+
+				// Get rfp_count from last comma-separated value
+				unsigned RFP_count = (unsigned) std::atoi(tmp.substr(pos + 1).c_str());
+				RFP_counts.push_back(RFP_count);
+
+				// Now add codon to appropriate place in sequence
+				seq[position * 3] = codon[0];
+				seq[position * 3 + 1] = codon[1];
+				seq[position * 3 + 2] = codon[2];
+
+				prevID = ID;
+			}
+
+			tmpGene.setId(prevID);
+			tmpGene.setDescription("No description for PANSE Model");
+			tmpGene.setSequence(seq);
+			tmpGene.addRFP_count(RFP_counts);
+
+			addGene(tmpGene); //add to genome
+		} // end else
+		Fin.close();
+	} // end try
+	catch(char* pMsg)
+	{
+#ifndef STANDALONE
+		Rf_error("\nException: %s\n", pMsg);
+#else
+		std::cerr << std::endl << "Exception:" << pMsg << std::endl;
+#endif
+	}
+}
+
+
+//TODO: Add writePANSEFile function here
+
+
+/* readObservedPhiValues
+ * Arguments: string filename, bool byId
+ *
+ * User may choose to store Phi values either by ID (if byId is true) or by index (if false).
+ * In by index, each gene read in should correspond numerically to the genome.
+ * Values that less than or equal to 0 or not a number will be converted to -1 and not
+ * counted as a phi value.
+ * NOTE: IF AN ERROR FILE IS READ IN, numGenesWithPhi IS STILL INITIALIZED WITH 0'S.
 */
 void Genome::readObservedPhiValues(std::string filename, bool byId)
 {
@@ -784,7 +799,7 @@ Genome Genome::getGenomeForGeneIndicies(std::vector <unsigned> indicies, bool si
 
 	for (unsigned i = 0; i < indicies.size(); i++)
 	{
-		simulated ? genome.addGene(simulatedGenes[indicies[i]]) : genome.addGene(genes[indicies[i]]);
+		simulated ? genome.addGene(simulatedGenes[indicies[i]], true) : genome.addGene(genes[indicies[i]], false);
 	}
 
 	return genome;
@@ -818,7 +833,8 @@ std::vector <unsigned> Genome::getNumGenesWithPhi()
 	return numGenesWithPhi;
 }
 
-void Genome::setNumGenesWithPhi(std::vector <unsigned> newVector){
+void Genome::setNumGenesWithPhi(std::vector <unsigned> newVector)
+{
 	this->numGenesWithPhi = newVector;
 }
 

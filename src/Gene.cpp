@@ -85,7 +85,6 @@ bool Gene::operator==(const Gene& other) const
 {
     bool match = true;
 
-
     if(this->seq != other.seq) { match = false; }
     if(this->id != other.id) { match = false; }
     if(this->description != other.description) { match = false; }
@@ -322,12 +321,13 @@ Gene Gene::reverseComplement()
 }
 
 
-//toAASequence (NOT EXPOSED)
-//Arguments: None
-//Returns a string of amino acids corresponding to the gene's
-//sequence string. The string is looked at as codons and the codons
-//are then mapped to their respective amino acid. NOTE: This could crash if
-//the stored seq string is not of length three.
+/* toAASequence (NOT EXPOSED)
+ * Arguments: None
+ * Returns a string of amino acids corresponding to the gene's
+ * sequence string. The string is looked at as codons and the codons
+ * are then mapped to their respective amino acid. NOTE: This could crash if
+ * the stored seq string is not of length three.
+*/
 std::string Gene::toAASequence()
 {
     std::string aaseq = "";
@@ -343,7 +343,17 @@ std::string Gene::toAASequence()
 
 
 
+//--------------------------------------//
+//---------- Testing Function ----------//
+//--------------------------------------//
 
+
+//TODO: Possibly change category of new getRFP_count function from
+//Testing to Data Manipulation function for consistency
+std::vector <unsigned> Gene::getRFP_count()
+{
+    return geneData.getRFP_count();
+}
 
 // -----------------------------------------------------------------------------------------------------//
 // ---------------------------------------- R SECTION --------------------------------------------------//

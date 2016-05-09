@@ -812,38 +812,94 @@ void testSequenceSummary()
 }
 
 
-
-
 void testGene()
 {
+    Gene testGene;
     int error = 0;
+
+    //--------------------------------//
+    //------ get/setId Function ------//
+    //--------------------------------//
+    testGene.setId("testGene");
+
+    if (testGene.getId() != "testGene")
+    {
+        std::cerr << "Error in either setId or getId.\n";
+    }
+    else
+    {
+        std::cout << "Gene get/setId --- Pass\n";
+    }
+
+    //-----------------------------------------//
+    //------ get/setDescription Function ------//
+    //-----------------------------------------//
+    testGene.setDescription("Test Gene for Unit Testing");
+
+    if (testGene.getDescription() != "Test Gene for Unit Testing")
+    {
+        std::cerr << "Error in either setDescription or getDescription.\n";
+    }
+    else
+    {
+        std::cout << "Gene get/setDescription --- Pass\n";
+    }
+
+    //--------------------------------------//
+    //------ get/setSequence Function ------//
+    //--------------------------------------//
+    testGene.setSequence("ATGCTCATTCTCACTGCTGCCTCGTAG");
+
+    if (testGene.getSequence() != "ATGCTCATTCTCACTGCTGCCTCGTAG")
+    {
+        std::cerr << "Error in either setSequence or getSequence.\n";
+    }
+    else
+    {
+        std::cout << "Gene get/setSequence --- Pass\n";
+    }
+
+    //---------------------------------------//
+    //------ get/addRFP_count Function ------//
+    //---------------------------------------//
+
+    //TODO: Possibly change category of new getRFP_count function from
+    //Testing to Data Manipulation function for consistency
+    std::vector <unsigned> rfp_counts = {0, 1, 1};
+
+    testGene.addRFP_count(rfp_counts);
+    if (testGene.getRFP_count() != rfp_counts)
+    {
+        std::cerr << "Error in either getRFP_count or addRFP_count.\n";
+    }
+    else
+    {
+        std::cout << "Gene get/addRFP_count --- Pass\n";
+    }
 
     //--------------------------------//
     //------ getSequenceSummary ------//
     //--------------------------------//
-
-    Gene testGene("ATGCTCATTCTCACTGCTGCCTCGTAG", "1", "test Gene");
     SequenceSummary SS("ATGCTCATTCTCACTGCTGCCTCGTAG");
     SequenceSummary *GeneSS = testGene.getSequenceSummary();
     for (unsigned i = 0; i < 64; i++)
     {
         if (SS.getCodonCountForCodon(i) != GeneSS->getCodonCountForCodon(i))
         {
-            std::cerr <<"Error with getSequenceSummary. Codon counts are incorrect";
-            std::cerr <<" for codon " << i <<", " << SequenceSummary::codonArray[i] <<".\n";
-            std::cerr <<"Should return " << SS.getCodonCountForCodon(i) <<", but returns" << GeneSS->getCodonCountForCodon(i) <<"\n";
+            std::cerr << "Error with getSequenceSummary. Codon counts are incorrect";
+            std::cerr << " for codon " << i <<", " << SequenceSummary::codonArray[i] <<".\n";
+            std::cerr << "Should return " << SS.getCodonCountForCodon(i) <<", but returns" << GeneSS->getCodonCountForCodon(i) <<"\n";
             error = 1;
         }
     }
-
 
     for (unsigned i = 0; i < 64; i++)
     {
         if (SS.getRFPObserved(i) != GeneSS->getRFPObserved(i))
         {
-            std::cerr <<"Error with getSequenceSummary. RFP observed is incorrect";
-            std::cerr <<" for codon " << i <<".\n";
-            std::cerr <<"Should return " << SS.getRFPObserved(i) <<", but returns" << GeneSS->getRFPObserved(i) <<"\n";
+            std::cerr << "Error with getSequenceSummary. RFP observed is incorrect";
+            std::cerr << " for codon " << i <<".\n";
+            std::cerr << "Should return " << SS.getRFPObserved(i) <<", but returns" << GeneSS->getRFPObserved(i) <<"\n";
             error = 1;
         }
     }
@@ -857,8 +913,8 @@ void testGene()
         Gvec = GeneSS->getCodonPositions(i);
         if (SSvec->size() != Gvec->size())
         {
-            std::cerr <<"Error with getSequenceSummary. Codon positions are incorrect.\n";
-            std::cerr <<"Information in compared vectors are not of equal size.\n";
+            std::cerr << "Error with getSequenceSummary. Codon positions are incorrect.\n";
+            std::cerr << "Information in compared vectors are not of equal size.\n";
             error = 1;
         }
         else
@@ -876,21 +932,20 @@ void testGene()
         }
     }
 
-
     unsigned AAListSize = (unsigned)SequenceSummary::aminoAcids().size();
     for (unsigned i = 0; i < AAListSize; i++)
     {
         if (SS.getAACountForAA(i) != GeneSS->getAACountForAA(i))
         {
-            std::cerr <<"Error with getSequenceSummary. AA counts are incorrect";
-            std::cerr <<" for amino acid " << i <<".\n";
-            std::cerr <<"Should return " << SS.getAACountForAA(i) <<", but returns" << GeneSS->getAACountForAA(i) <<"\n";
+            std::cerr << "Error with getSequenceSummary. AA counts are incorrect";
+            std::cerr << " for amino acid " << i <<".\n";
+            std::cerr << "Should return " << SS.getAACountForAA(i) <<", but returns" << GeneSS->getAACountForAA(i) <<"\n";
             error = 1;
         }
     }
     if (!error)
     {
-        std::cout <<"Gene getSequenceSummary --- Pass\n";
+        std::cout << "Gene getSequenceSummary --- Pass\n";
     }
     else
     {
@@ -905,13 +960,14 @@ void testGene()
 
     if (0 != tmp.size())
     {
-        std::cerr <<"Error with getObservedPhiValues. Function should return an empty vector but returns:\n";
+        std::cerr << "Error with getObservedPhiValues. Function should return an empty vector but returns:\n";
         for (unsigned i = 0; i < tmp.size(); i++)
         {
             std::cerr << tmp[i] <<"\n";
         }
         error = 1;
     }
+
     tmp.resize(3);
     tmp[0] = 2.34;
     tmp[1] = 3.234;
@@ -920,7 +976,7 @@ void testGene()
     tmp = testGene.getObservedSynthesisRateValues();
     if (3 != tmp.size() || 2.34 != tmp[0] || 3.234 != tmp[1] || 0.123 != tmp[2])
     {
-        std::cerr <<"Error with getObservedPhiValues. Function should return 2.34, 3.234, 0.123, but returns:\n";
+        std::cerr << "Error in getObservedPhiValues or setObservedPhiValues. Function should return 2.34, 3.234, 0.123, but returns:\n";
         for (unsigned i = 0; i < tmp.size(); i++)
         {
             std::cerr << tmp[i] <<"\n";
@@ -930,42 +986,36 @@ void testGene()
 
     if (!error)
     {
-        std::cout <<"Gene get/setObservedPhiValues --- Pass\n";
+        std::cout << "Gene get/setObservedPhiValues --- Pass\n";
     }
     else
     {
         error = 0; //Reset for next function.
     }
 
-
     //--------------------------------------------------//
     //------ getNumObservedSynthesisSets Function ------//
     //--------------------------------------------------//
-
     if (3 != testGene.getNumObservedSynthesisSets())
     {
-        std::cerr <<"Error with getNumObservedSynthesisSets. Function should return 3, but returns ";
+        std::cerr << "Error with getNumObservedSynthesisSets. Function should return 3, but returns ";
         std::cerr << testGene.getNumObservedSynthesisSets() <<".\n";
     }
     else
     {
-        std::cout <<"Gene getNumObservedSynthesisSets --- Pass\n";
+        std::cout << "Gene getNumObservedSynthesisSets --- Pass\n";
     }
-
-
-
 
     //-----------------------------------------------//
     //------ getObservedSynthesisRate Function ------//
     //-----------------------------------------------//
-
     tmp = testGene.getObservedSynthesisRateValues();
     double trueValues[3] = {2.34, 3.234, 0.123};
     for (unsigned i = 0; i < 3; i++)
     {
         if (tmp[i] != trueValues[i])
         {
-            std::cerr <<"Error with getObservedSynthesisRate. Function should return " << trueValues[i] <<"at index";
+            std::cerr << "Error with getObservedSynthesisRate. Function should return " << trueValues[i] <<"at index";
             std::cerr << i <<", but returns " << tmp[i] <<".\n";
             error = 1;
         }
@@ -973,66 +1023,61 @@ void testGene()
 
     if (!error)
     {
-        std::cout <<"Gene getObservedSynthesisRate --- Pass\n";
+        std::cout << "Gene getObservedSynthesisRate --- Pass\n";
     }
     else
     {
         error = 0; //Reset for next function.
     }
 
-
-
-
     //--------------------------------------//
     //------ getNucleotideAt Function ------//
     //--------------------------------------//
-
-
     if ('A' != testGene.getNucleotideAt(0))
     {
-        std::cerr <<"Error with getNucleotideAt. At index 0, the return value should be 'A', but is ";
-        std::cerr << testGene.getNucleotideAt(0) <<"\n";
+        std::cerr << "Error with getNucleotideAt. At index 0, the return value should be 'A', but is ";
+        std::cerr << testGene.getNucleotideAt(0) << "\n";
         error = 1;
     }
     if ('T' != testGene.getNucleotideAt(1))
     {
-        std::cerr <<"Error with getNucleotideAt. At index 1, the return value should be 'T', but is ";
-        std::cerr << testGene.getNucleotideAt(1) <<"\n";
+        std::cerr << "Error with getNucleotideAt. At index 1, the return value should be 'T', but is ";
+        std::cerr << testGene.getNucleotideAt(1) << "\n";
         error = 1;
     }
     if ('G' != testGene.getNucleotideAt(2))
     {
-        std::cerr <<"Error with getNucleotideAt. At index 2, the return value should be 'G', but is ";
-        std::cerr << testGene.getNucleotideAt(2) <<"\n";
+        std::cerr << "Error with getNucleotideAt. At index 2, the return value should be 'G', but is ";
+        std::cerr << testGene.getNucleotideAt(2) << "\n";
         error = 1;
     }
     if ('C' != testGene.getNucleotideAt(3))
     {
-        std::cerr <<"Error with getNucleotideAt. At index 3, the return value should be 'C', but is ";
-        std::cerr << testGene.getNucleotideAt(3) <<"\n";
+        std::cerr << "Error with getNucleotideAt. At index 3, the return value should be 'C', but is ";
+        std::cerr << testGene.getNucleotideAt(3) << "\n";
         error = 1;
     }
     if ('T' != testGene.getNucleotideAt(10))
     {
-        std::cerr <<"Error with getNucleotideAt. At index 10, the return value should be 'T', but is ";
-        std::cerr << testGene.getNucleotideAt(10) <<"\n";
+        std::cerr << "Error with getNucleotideAt. At index 10, the return value should be 'T', but is ";
+        std::cerr << testGene.getNucleotideAt(10) << "\n";
         error = 1;
     }
     if ('G' != testGene.getNucleotideAt(23))
     {
-        std::cerr <<"Error with getNucleotideAt. At index 23, the return value should be 'G', but is ";
-        std::cerr << testGene.getNucleotideAt(23) <<"\n";
+        std::cerr << "Error with getNucleotideAt. At index 23, the return value should be 'G', but is ";
+        std::cerr << testGene.getNucleotideAt(23) << "\n";
         error = 1;
     }
     if ('G' != testGene.getNucleotideAt(26))
     {
-        std::cerr <<"Error with getNucleotideAt. At index 26, the return value should be 'G', but is ";
-        std::cerr << testGene.getNucleotideAt(26) <<"\n";
+        std::cerr << "Error with getNucleotideAt. At index 26, the return value should be 'G', but is ";
+        std::cerr << testGene.getNucleotideAt(26) << "\n";
         error = 1;
     }
     if (!error)
     {
-        std::cout <<"Gene getNucleotideAt --- Pass\n";
+        std::cout << "Gene getNucleotideAt --- Pass\n";
     }
     else
     {
@@ -1041,210 +1086,493 @@ void testGene()
 
     //Todo: consider out of range test case?
 
-
-    //-------------------------------//
-    //------ reverseComplement ------//
-    //-------------------------------//
-
-    Gene tmpGene;
-    tmpGene = testGene.reverseComplement();
-    if ("CTACGAGGCAGCAGTGAGAATGAGCAT" != tmpGene.getSequence())
+    //-----------------------------//
+    //------ length Function ------//
+    //-----------------------------//
+    if (testGene.length() == strlen("ATGCTCATTCTCACTGCTGCCTCGTAG"))
     {
-        std::cerr <<"Error with reverseComplement. Should return \"CTACGAGGCAGCAGTGAGAATGAGCAT\" but returns: ";
-        std::cerr << tmpGene.getSequence() <<"\n";
-        error = 1;
-    }
-    if (!error)
-    {
-        std::cout <<"Gene reverseComplement --- Pass\n";
+        std::cout << "Gene length --- Pass\n";
     }
     else
     {
-        error = 0; //Reset for next function.
+        std::cerr << "Error with length. Should return ";
+        std::cerr << strlen("ATGCTCATTCTCACTGCTGCCTCGTAG") << " but returns: ";
+        std::cerr << testGene.length() << "\n";
+    }
+
+    //----------------------------------------//
+    //------ reverseComplement Function ------//
+    //----------------------------------------//
+    Gene tmpGene;
+    tmpGene = testGene.reverseComplement();
+    if ("CTACGAGGCAGCAGTGAGAATGAGCAT" == tmpGene.getSequence())
+    {
+        std::cout << "Gene reverseComplement --- Pass\n";
+    }
+    else
+    {
+        std::cerr << "Error with reverseComplement. Should return \"CTACGAGGCAGCAGTGAGAATGAGCAT\" but returns: ";
+        std::cerr << tmpGene.getSequence() << "\n";
     }
 
     //-----------------------------------//
     //------ toAASequence Function ------//
     //-----------------------------------//
-
-    if ("MLILTAASX" != testGene.toAASequence())
+    if ("MLILTAASX" == testGene.toAASequence())
     {
-        std::cerr <<"Error with toAASequence. Should return \"MLILTAASX\", but returns:" << testGene.toAASequence() <<"\n";
-        error = 1;
-    }
-
-    if (!error)
-    {
-        std::cout <<"Gene toAASequence --- Pass\n";
+        std::cout << "Gene toAASequence --- Pass\n";
     }
     else
     {
-        error = 0; //Reset for next function.
+        std::cerr << "Error with toAASequence. Should return \"MLILTAASX\", but returns:" << testGene.toAASequence() <<"\n";
     }
-
-
 
     //----------------------------//
     //------ clear Function ------//
     //----------------------------//
-
     testGene.clear();
     if ("" != testGene.getId())
     {
-        std::cerr <<"Error with clear. Gene Id should be blank, but is " << testGene.getId() <<".\n";
+        std::cerr << "Error with clear. Gene Id should be blank, but is " << testGene.getId() <<".\n";
         error = 1;
     }
     if ("" != testGene.getDescription())
     {
-        std::cerr <<"Error with clear. Gene description should be blank, but is " << testGene.getDescription() <<".\n";
+        std::cerr << "Error with clear. Gene description should be blank, but is " << testGene.getDescription() <<".\n";
         error = 1;
     }
     if ("" != testGene.getSequence())
     {
-        std::cerr <<"Error with clear. Gene sequence should be blank, but is " << testGene.getSequence() <<".\n";
+        std::cerr << "Error with clear. Gene sequence should be blank, but is " << testGene.getSequence() <<".\n";
         error = 1;
     }
 
     if (!error)
     {
-        std::cout <<"Gene clear --- Pass\n";
+        std::cout << "Gene clear --- Pass\n";
     }
     else
     {
         error = 0; //Reset for next function.
     }
-
-
-
-    //------ cleanSequence Function ------//
-  //  testGene.setSequence("AAATTTNGCYRNKROTTN");
-   // std::cout <<testGene.getSequence() <<"\n";
 }
 
 
 void testGenome(std::string testFileDir)
 {
-
+    Genome genome;
+    Genome testGenome;
+    Gene g1("ATGGCCACTATTGGGTCTTAG", "TEST001", "TEST001 Test Gene");
+    Gene g2("TGGGATTACCAA", "TEST002", "TEST002 Test Gene");
+    Gene g3("TTGGAAACCACA", "TEST003", "TEST003 Test Gene");
+    Gene g4("TGGGATTACCCC", "TEST004", "TEST004 Test Gene");
+    Gene s1("TGGGATTACCAA", "TEST011", "TEST011 Test Gene"); //simulated gene
     int error = 0;
+
+    /* Section 1:
+     * Testing / Gene / Other Functions:
+     * addGene, getGene, getGenes,
+     * setNumGenesWithPhi, getNumGenesWithPhi, getNumGenesWithPhiForIndex,
+     * getGenomeSize, getCodonCountsPerGene, clear
+    */
+
+    //TODO: should improper input be given (bad id/index)?
 
     //-----------------------------------------//
     //------ addGene & getGene Functions ------//
     //-----------------------------------------//
-    Genome genome;
-
-    Gene g1("ATGGCCACTATTGGGTCTTAG", "TEST001", "TEST001 Test Gene");
     genome.addGene(g1, false);
+    genome.addGene(s1, true); //add the simulated gene s1
 
     Gene test = genome.getGene("TEST001", false);
     Gene test2 = genome.getGene(0, false);
+    Gene test3 = genome.getGene("TEST011", true);
+    Gene test4 = genome.getGene(0, true);
 
-    if (test == g1 && test2 == g1) //checking both by string and index
+    if (!(test == g1 && test2 == g1)) //checking both by string and index
     {
-        std::cout <<"Genome addGene & getGene --- Pass\n";
+        std::cerr << "Error in either addGene or getGene with genes.\n";
+        error = 1;
+    }
+
+    if (!(test3 == s1 && test4 == s1)) //checking both by string and index
+    {
+        std::cerr << "Error in either addGene or getGene with simulated genes.\n";
+        error = 1;
+    }
+
+    if (!error)
+    {
+        std::cout <<  "Genome addGene & getGene --- Pass\n";
     }
     else
     {
-        std::cerr <<"Error in either addGene or getGene\n";
+        error = 0; //Reset for next function.
     }
 
-    //TODO: should I be testing the simulated feild with true?
-    //TODO: also, should improper input be given (bad id/index).
+    //-------------------------------//
+    //------ getGenes Function ------//
+    //-------------------------------//
+    std::vector<Gene> testVec;
+    testVec.push_back(g1);
+
+    if (!(testVec == genome.getGenes(false)))
+    {
+        std::cerr << "Error in getGenes(false).\n";
+        error = 1;
+    }
+
+    testVec.clear();
+    testVec.push_back(s1);
+
+    if (!(testVec == genome.getGenes(true)))
+    {
+        std::cerr << "Error in getGenes(true).\n";
+        error = 1;
+    }
+
+    if (!error)
+    {
+        std::cout << "Genome getGenes --- Pass\n";
+    }
+    else
+    {
+        error = 0; //Reset for next function.
+    }
+
+    //---------------------------------------------------------------//
+    //------ setNumGenesWithPhi & getNumGenesWithPhi Functions ------//
+    //---------------------------------------------------------------//
+    genome.setNumGenesWithPhi({0, 1, 2, 3});
+
+    std::vector <unsigned> uVector = {0, 1, 2, 3};
+
+    if (genome.getNumGenesWithPhi() == uVector)
+    {
+        std::cout << "Genome setNumGenesWithPhi & getNumGenesWithPhi --- Pass\n";
+    }
+    else
+    {
+        std::cerr << "Error in either setNumGenesWithPhi or getNumGenesWithPhi.\n";
+    }
+
+    //-------------------------------------------------//
+    //------ getNumGenesWithPhiForIndex Function ------//
+    //-------------------------------------------------//
+    for (unsigned i = 1; i < 4; i ++)
+    {
+        if (genome.getNumGenesWithPhiForIndex(i) != i)
+        {
+            std::cerr << "Error in getNumGenesWithPhiForIndex with index ";
+            std::cerr << i << ". Should return " << i << ", returns ";
+            std::cerr << genome.getNumGenesWithPhiForIndex(i) <<".\n";
+            error = 1;
+        }
+    }
+
+    if (!error)
+    {
+        std::cout << "Genome getNumGenesWithPhiForIndex --- Pass\n";
+    }
+    else
+    {
+        error = 0; //Reset for next function.
+    }
 
     //------------------------------------//
     //------ getGenomeSize Function ------//
     //------------------------------------//
-
     if (1 != genome.getGenomeSize(false))
     {
-        std::cerr <<"Error with getGenomesize(false). Should return 1, returns ";
+        std::cerr << "Error in getGenomesize(false). Should return 1, returns ";
         std::cerr << genome.getGenomeSize(false) <<".\n";
         error = 1;
     }
 
-    if (0 != genome.getGenomeSize(true))
+    if (1 != genome.getGenomeSize(true))
     {
-        std::cerr <<"Error with getGenomesize(true). Should return 0, returns ";
+        std::cerr << "Error in getGenomesize(true). Should return 1, returns ";
         std::cerr << genome.getGenomeSize(true) <<".\n";
         error = 1;
     }
 
     if (!error)
     {
-        std::cout <<"Genome getGenomeSize --- Pass\n";
+        std::cout << "Genome getGenomeSize --- Pass\n";
     }
     else
     {
         error = 0; //Reset for next function.
     }
 
+    //--------------------------------------------//
+    //------ getCodonCountsPerGene Function ------//
+    //--------------------------------------------//
 
-    //-------------------------------//
-    //------ getGenes Function ------//
-    //-------------------------------//
-
-    std::vector<Gene> testVec;
-    testVec.push_back(g1);
-
-    if(!(testVec == genome.getGenes(false)))
+    //reuse generic vector of unsigned integers
+    uVector = {1};
+    if (uVector != genome.getCodonCountsPerGene("ATG"))
     {
-        std::cerr <<"Error with getGenes(false).\n";
+        std::cerr << "Error in getCodonCountsPerGene with a single gene.\n";
         error = 1;
     }
 
-    testVec.clear();
+    genome.addGene(g2);
+    genome.addGene(g4);
 
-    if(!(testVec == genome.getGenes(true)))
+    uVector = {0, 1, 1};
+
+    if (uVector != genome.getCodonCountsPerGene("GAT"))
     {
-        std::cerr <<"Error with getGenes(true).\n";
+        std::cerr << "Error in getCodonCountsPerGene with three genes.\n";
         error = 1;
     }
 
     if (!error)
     {
-        std::cout <<"Genome getGenes --- Pass\n";
+        std::cout << "Genome getCodonCountsPerGene --- Pass\n";
     }
     else
     {
         error = 0; //Reset for next function.
     }
 
-    //--------------------------------------------//
-    //------------ Clear Function ----------------//
-    //--------------------------------------------//
+    //----------------------------//
+    //------ Clear Function ------//
+    //----------------------------//
 
     // Empty Genome as a control variable
     Genome empty;
 
     // Test adding ObservedSynthesisRateValues
-    Gene clear1("TGGGATTACCAA", "TEST002", "TEST002 Test Gene");
+    Gene clear1("TTGATCGGGCAT", "TEST005", "TEST005 Test Gene");
     clear1.setObservedSynthesisRateValues({1, 2, 3, 4});
     genome.addGene(clear1, false);
 
-    // Test adding a simulated gene
-    Gene clear2("TTGGAAACCACA", "TEST003", "TEST003 Test Gene");
-    genome.addGene(clear2, true);
-
-    // Test adding NumGenesWithPhi
-    genome.setNumGenesWithPhi({3, 3, 4, 3});
-
     genome.clear();
 
-    if(genome == empty)
+    if (genome == empty)
     {
-        std::cout <<"Genome clear --- Pass\n";
+        std::cout << "Genome clear --- Pass\n";
     }
     else
     {
-        std::cerr <<"Error in clear. Genome is not empty.\n";
+        std::cerr << "Error in clear. Genome is not empty.\n";
     }
 
+    /* Section 2:
+     * Other and File I/O Functions:
+     * getGenomeForGeneIndicies
+     * readFasta
+     * readPANSEFile
+     * readObservedPhiValues
+    */
+
+    //-----------------------------------------------//
+    //------ getGenomeForGeneIndicies Function ------//
+    //-----------------------------------------------//
+
+    // add more simulated and non-simulated genes
+    genome.addGene(g1, false);
+    genome.addGene(g2, false);
+    genome.addGene(g3, false);
+    genome.addGene(g4, false);
+
+    //reuse generic vector of unsigned integers
+    uVector = {0, 1, 2, 3};
+
+    if (!(genome == genome.getGenomeForGeneIndicies(uVector, false)))
+    {
+        std::cerr << "Error in getGenomeForGeneIndicies with genes.\n";
+        error = 1;
+    }
+
+    genome.clear();
+
+    Gene s2("TAGCATGATCCA", "TEST012", "TEST002 Test Gene"); //simulated gene
+    Gene s3("TCATCAGGATTC", "TEST013", "TEST002 Test Gene"); //simulated gene
+    Gene s4("AAACATGTCACG", "TEST014", "TEST002 Test Gene"); //simulated gene
+
+    genome.addGene(s1, true);
+    genome.addGene(s2, true);
+    genome.addGene(s3, true);
+    genome.addGene(s4, true);
+
+    if (!(genome == genome.getGenomeForGeneIndicies(uVector, true)))
+    {
+        std::cerr << "Error in getGenomeForGeneIndicies with simulated genes.\n";
+        error = 1;
+    }
+
+    if (!error)
+    {
+        std::cout << "Genome getGenomeForGeneIndicies --- Pass\n";
+    }
+    else
+    {
+        error = 0; //Reset for next function.
+    }
+
+    //--------------------------------//
+    //------ readFasta Function ------//
+    //--------------------------------//
+    genome.clear();
+    std::string file = testFileDir + "/" + "test.fasta";
+    genome.readFasta(file, false);
+
+    Gene fasta1("ATGACCGTAATTTTTTACTAG", "TEST002", "TEST002 Test Gene");
+    Gene fasta2("ATGGTCTACTTTCTGACATAG", "TEST003", "TEST003 Test Gene");
+
+    testGenome.addGene(g1, false);
+    testGenome.addGene(fasta1, false);
+    testGenome.addGene(fasta2, false);
+
+    if (genome == testGenome)
+    {
+        std::cout << "Genome readFasta --- Pass\n";
+    }
+    else
+    {
+        std::cerr << "Error in readFasta. Genomes are not equivalent.\n";
+    }
+
+    //---------------------------------//
+    //------ writeFasta Function ------//
+    //---------------------------------//
+
+    // Now write a genome described above in readFasta to a file, read it in
+    // again, and then compare its validity again.
+    testGenome.clear();
+
+    file = testFileDir + "/" + "testWrite.fasta";
+    genome.writeFasta(file, false);
+    testGenome.readFasta(file, false);
+
+    if (genome == testGenome)
+    {
+        std::cout << "Genome writeFasta --- Pass\n";
+    }
+    else
+    {
+        std::cerr << "Error in writeFasta. Genomes are not equivalent.\n";
+    }
+
+    //TODO: ReadRPF, WriteRFP, WritePANSE
+    // We are currently failing to match genes -> sequence summaries don't match
+    // -> observedRFP's don't match.
+    /*
+    //----------------------------------//
+    //------ readRFPFile Function ------//
+    //----------------------------------//
+    genome.clear();
+    testGenome.clear();
+
+    file = testFileDir + "/" + "testReadRFP.csv";
+    genome.readRFPFile(file);
+
+    Gene rfp1("GCAGCC", "TEST001", "No description for RFP Model");
+    Gene rfp2("GCGTTTTTT", "TEST002", "No description for RFP Model");
+    Gene rfp3("GCTATGATGATGATGATG", "TEST003", "No description for RFP Model");
+
+    // need to access the public SequenceSummary of a gene to access codonIndex
+    // in order to use then modify setRFPObserved
+    // TODO: More elegant way?
+    // Also, need to use constant strings -- can't simply write "GCA" in parens.
+    std::string codon = "GCA";
+    unsigned index = SequenceSummary::codonToIndex(codon);
+    rfp1.geneData.setRFPObserved(index, 0);
+    //rfp1.addRFP_count({rfp11, 0});
+
+    codon = "GCC";
+    index = SequenceSummary::codonToIndex(codon);
+    rfp1.geneData.setRFPObserved(index, 5);
+    //rfp1.addRFP_count({rfp12, 5});
+
+    codon = "GCG";
+    index = SequenceSummary::codonToIndex(codon);
+    rfp1.geneData.setRFPObserved(index, 2);
+    //rfp2.addRFP_count({rfp21, 2});
+
+    codon = "TTT";
+    index = SequenceSummary::codonToIndex(codon);
+    rfp1.geneData.setRFPObserved(index, 4);
+    //rfp2.addRFP_count({rfp22, 4});
+
+    codon = "GCT";
+    index = SequenceSummary::codonToIndex(codon);
+    rfp1.geneData.setRFPObserved(index, 0);
+    //rfp3.addRFP_count({rfp31, 0});
+
+    codon = "ATG";
+    index = SequenceSummary::codonToIndex(codon);
+    rfp1.geneData.setRFPObserved(index, 13);
+    //rfp3.addRFP_count({rfp32, 13});
+
+    testGenome.addGene(rfp1, false);
+    testGenome.addGene(rfp2, false);
+    testGenome.addGene(rfp3, false);
+
+    if (genome == testGenome)
+    {
+        std::cout << "Genome readRFPFile --- Pass\n";
+    }
+    else
+    {
+        std::cerr << "Error in readRFPFile. Genomes are not equivalent.\n";
+    }
+    */
+
+    //-----------------------------------//
+    //------ writeRFPFile Function ------//
+    //-----------------------------------//
+
+    //------------------------------------//
+    //------ readPANSEFile Function ------//
+    //------------------------------------//
+    genome.clear();
+    testGenome.clear();
+
+    file = testFileDir + "/" + "readPANSE.csv";
+    genome.readPANSEFile(file);
+
+    Gene panse1("CTTGCTATTTTT", "TEST001", "No description for PANSE Model");
+    Gene panse2("CCTGTAATTTGG", "TEST002", "No description for PANSE Model");
+
+    std::vector <unsigned> tmp1 = {0, 2, 0, 0};
+    std::vector <unsigned> tmp2 = {0, 0, 1, 1};
+
+    panse1.addRFP_count(tmp1);
+    panse2.addRFP_count(tmp2);
+
+    testGenome.addGene(panse1, false);
+    testGenome.addGene(panse2, false);
+
+    if (genome == testGenome)
+    {
+        std::cout << "Genome readPANSE --- Pass\n";
+    }
+    else
+    {
+        std::cerr << "Error in readPANSE. Genomes are not equivalent.\n";
+    }
+
+    //-------------------------------------//
+    //------ writePANSEFile Function ------//
+    //-------------------------------------//
+
+    /* readObservedPhiValues Testing Function
+     *
+     * Compares a genome with the readObservedPhiValues function's created genome.
+     * Reads in "readObservedPhiValues.csv" and "readObservedPhiValuesError.csv" twice each,
+     * once for byID and once for byIndex.
+     *
+     * Significant standard error output is produced by design: both files exhibit some errors.
+    */
     //--------------------------------------------//
     //------ readObservedPhiValues Function ------//
     //--------------------------------------------//
-    Genome testGenome;
-    Gene g2("TGGGATTACCAA", "TEST002", "TEST002 Test Gene");
-    Gene g3("TTGGAAACCACA", "TEST003", "TEST003 Test Gene");
-    Gene g4("TGGGATTACCCC", "TEST004", "TEST004 Test Gene");
+    genome.clear();
+    testGenome.clear();
     std::vector <double> emptyVec; // Empty vector used to clear ObservedSynthesisRateValues
 
     // Test 1: Test non-error file vs by ID readObservedPhiValues function
@@ -1266,7 +1594,7 @@ void testGenome(std::string testFileDir)
 
     testGenome.setNumGenesWithPhi({3, 3, 4, 3});
 
-    std::string file = testFileDir + "/" + "readObservedPhiValues.csv";
+    file = testFileDir + "/" + "readObservedPhiValues.csv";
     genome.readObservedPhiValues(file, true);
 
     if (!(genome == testGenome))
@@ -1352,63 +1680,5 @@ void testGenome(std::string testFileDir)
     else
     {
         error = 0; //Reset for next function.
-    }
-
- /*
-    //--------------------------------//
-    //------ readFasta Function ------//
-    //--------------------------------//
-
-
-    file = testFileDir + "/" + "test.fasta";
-    genome.readFasta(file, false);
-
-    Gene g2("TEST002", "TEST002 Test Gene", "ATGACCGTAATTTTTTACTAG");
-    Gene g3("TEST003", "TEST003 Test Gene", "ATGGTCTACTTTCTGACATAG");
-
-    Genome testGenome;
-    testGenome.addGene(g1, false);
-    testGenome.addGene(g2, false);
-    testGenome.addGene(g3, false);
-
-    if(genome == testGenome)
-    {
-        std::cout <<"Genome readFasta --- Pass\n";
-    }
-    else
-    {
-        std::cerr <<"Error in readFasta. Genomes are not equivelant.\n";
-    }
-*/
-
-    //--------------------------------//
-    //---- readPANSEFile Function ----//
-    //--------------------------------//
-
-    genome.clear();
-    testGenome.clear();
-
-    file = testFileDir + "/" + "readPANSE.csv";
-    genome.readPANSEFile(file);
-
-    Gene p1("CTTGCTATTTTT", "TEST001", "No description for PANSE Model");
-    Gene p2("CCTGTAATTTGG", "TEST002", "No description for PANSE Model");
-
-    std::vector <unsigned> tmp1 = {0, 2, 0, 0};
-    std::vector <unsigned> tmp2 = {0, 0, 1, 1};
-
-    p1.addRFP_count(tmp1);
-    p2.addRFP_count(tmp2);
-
-    testGenome.addGene(p1, false);
-    testGenome.addGene(p2, false);
-
-    if (genome == testGenome)
-    {
-        std::cout <<"Genome readPANSE --- Pass\n";
-    }
-    else
-    {
-        std::cerr <<"Error in readPANSE. Genomes are not equivalent.\n";
     }
 }
