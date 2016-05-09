@@ -9,7 +9,10 @@ using namespace Rcpp;
 // ---------- Constructors & Destructors ---------- //
 //--------------------------------------------------//
 
-
+/* RFPParameter Constructor (RCPP EXPOSED)
+ * Arguments: None
+ * Initialize the object with the default values
+*/
 RFPParameter::RFPParameter() : Parameter()
 {
 	//ctor
@@ -19,6 +22,10 @@ RFPParameter::RFPParameter() : Parameter()
 }
 
 
+/* RFPParameter Constructor (RCPP EXPOSED)
+ * Arguments: filename
+ * Initialize the object with values from a restart file.
+*/
 RFPParameter::RFPParameter(std::string filename) : Parameter(64)
 {
 	currentCodonSpecificParameter.resize(2);
@@ -28,6 +35,12 @@ RFPParameter::RFPParameter(std::string filename) : Parameter(64)
 }
 
 
+/* RFPParameter Constructor (NOT EXPOSED)
+ * Arguments: synthesis rate values (vector), number of mixtures, vector containing gene assignments, vector of vector
+ * representation of a category matrix, boolean to tell if ser should be split, keyword for mutation/selection state.
+ * Initializes the object from given values. If thetaK matrix is null or empty, the mutationselectionState keyword
+ * is used to generate the matrix.
+*/
 RFPParameter::RFPParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix,
 		bool splitSer, std::string _mutationSelectionState) : Parameter(64)
 {
@@ -36,6 +49,10 @@ RFPParameter::RFPParameter(std::vector<double> stdDevSynthesisRate, unsigned _nu
 }
 
 
+/* RFPParameter Assignment operator (NOT EXPOSED)
+ * Arguments: RFPParameter object
+ * Assign the given RFPParameter object to another.
+*/
 RFPParameter& RFPParameter::operator=(const RFPParameter& rhs)
 {
 	if (this == &rhs) return *this; // handle self assignment
@@ -51,10 +68,14 @@ RFPParameter& RFPParameter::operator=(const RFPParameter& rhs)
 }
 
 
+/* RFPParameter Deconstructor (NOT EXPOSED)
+ * Arguments: None
+ * Standard deconstructor.
+*/
 RFPParameter::~RFPParameter()
 {
 	//dtor 
-	//TODO: Need to call Parameter's deconstructor
+	//TODO: Need to call Parameter's deconstructor?
 }
 
 
@@ -65,7 +86,11 @@ RFPParameter::~RFPParameter()
 // ---------- Initialization, Restart, Index Checking ---------- //
 //---------------------------------------------------------------//
 
-
+/* initRFPParameterSet (NOT EXPOSED)
+ * Arguments: None
+ * Initializes the variables that are specific to the RFP Parameter object. The group list is set to all codons from
+ * table 1 minus the stop codons. This will be corrected in CodonTable.
+*/
 void RFPParameter::initRFPParameterSet()
 {
 
@@ -109,13 +134,17 @@ void RFPParameter::initRFPParameterSet()
 }
 
 
+/* initRFPValuesFromFile (NOT EXPOSED)
+ * Arguments: filename
+ * Opens a restart file to initialize RFP specific values.
+ */
 void RFPParameter::initRFPValuesFromFile(std::string filename)
 {
 	std::ifstream input;
 	input.open(filename.c_str());
 	if (input.fail())
 	{
-		std::cerr << "Could not open RestartFile.txt to initialzie RFP values\n";
+		std::cerr << "Could not open file to initialzie RFP values\n";
 		std::exit(1);
 	}
 	std::string tmp, variableName;
@@ -213,6 +242,10 @@ void RFPParameter::initRFPValuesFromFile(std::string filename)
 }
 
 
+/* writeEntireRestartFile (NOT EXPOSED)
+ * Arguments: filename
+ * Takes a filename and passes it to the write functions for a restart file (basic and model specific functions).
+ */
 void RFPParameter::writeEntireRestartFile(std::string filename)
 {
 	writeBasicRestartFile(filename);
@@ -220,6 +253,11 @@ void RFPParameter::writeEntireRestartFile(std::string filename)
 }
 
 
+/* writeRFPRestartFile (NOT EXPOSED)
+ * Arguments: filename
+ * Appends the RFP specific values to a restart file. writeBasicRestartFile should be called previous to this by calling
+ * writeEntireRestartFile.
+ */
 void RFPParameter::writeRFPRestartFile(std::string filename)
 {
 
@@ -286,6 +324,10 @@ void RFPParameter::writeRFPRestartFile(std::string filename)
 }
 
 
+/* initFromRestartFile (NOT EXPOSED)
+ * Arguments: filename
+ * Load Parameter values in from a restart file by calling initialization functions (basic and model specific).
+ */
 void RFPParameter::initFromRestartFile(std::string filename)
 {
 	initBaseValuesFromFile(filename);
@@ -293,6 +335,10 @@ void RFPParameter::initFromRestartFile(std::string filename)
 }
 
 
+/* initAllTraces (NOT EXPOSED)
+ * Arguments: number of samples, number of genes
+ * Initializes all traces, base traces and those specific to RFP.
+ */
 void RFPParameter::initAllTraces(unsigned samples, unsigned num_genes)
 {
 	traces.initializeRFPTrace(samples, num_genes, numMutationCategories, numSelectionCategories, numParam,
@@ -300,6 +346,11 @@ void RFPParameter::initAllTraces(unsigned samples, unsigned num_genes)
 }
 
 
+/* initAlpha (RCPP EXPOSED VIA WRAPPER)
+ * Arguments: alpha value, mixture element, codon string (all caps)
+ * Gets the category and index to index into the alpha vector by looking at the mixtureElement and codon resprectively.
+ * Puts the alphaValue into the indexed location.
+ */
 void RFPParameter::initAlpha(double alphaValue, unsigned mixtureElement, std::string codon)
 {
 	unsigned category = getMutationCategory(mixtureElement);
@@ -308,6 +359,11 @@ void RFPParameter::initAlpha(double alphaValue, unsigned mixtureElement, std::st
 }
 
 
+/* initLambdaPrime (RCPP EXPOSED VIA WRAPPER)
+ * Arguments: lambda prime value, mixture element, codon string (all caps)
+ * Gets the category and index to index into the alpha vector by looking at the mixtureElement and codon resprectively.
+ * Puts the lambdaPrimeValue into the indexed location.
+ */
 void RFPParameter::initLambdaPrime(double lambdaPrimeValue, unsigned mixtureElement, std::string codon)
 {
 	unsigned category = getMutationCategory(mixtureElement);
