@@ -566,7 +566,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
                         if (getGene(i).observedSynthesisRateValues.size() != numPhi)
 						{
 #ifndef STANDALONE
-							Rf_warning("Gene # %d (%s) does not have any phi values. ", geneIndex, gene->getId().c_str());
+							Rf_warning("Gene # %d (%s) does not have any phi values. ", i, gene->getId().c_str());
                             Rf_warning("Please check your file to make sure every gene has a phi value. Filling empty genes ");
                             Rf_warning("with -1's for calculations.\n");
 #else

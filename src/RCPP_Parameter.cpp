@@ -61,6 +61,7 @@ RCPP_MODULE(Parameter_mod)
 		.method("getCodonSpecificPosteriorMean", &Parameter::getCodonSpecificPosteriorMeanForCodon)
 		.method("getStdDevSynthesisRateVariance", &Parameter::getStdDevSynthesisRateVariance)
 		.method("getCodonSpecificVariance", &Parameter::getCodonSpecificVarianceForCodon)
+        .method("getCodonSpecificQuantile", &Parameter::getCodonSpecificQuantileForCodon)
 
 		//Other Functions:
 		.method("getMixtureAssignment", &Parameter::getMixtureAssignmentR)

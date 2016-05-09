@@ -8,7 +8,7 @@
 int main()
 {
 	std::cout << "Initializing MCMCAlgorithm object---------------" << std::endl;
-	int samples = 10000;
+	int samples = 500;
 	int thining = 10;
 	int useSamples = 100;
 	std::cout << "\t# Samples: " << samples << "\n";
@@ -90,6 +90,9 @@ int main()
 	std::cout << "starting MCMC for ROC" << std::endl;
 	mcmc.run(genome, model, 1, 0);
 	std::cout << std::endl << "Finished MCMC for ROC" << std::endl;
+	double temp[] = { 0.025, 0.5, 0.975 };
+	std::vector<double> probs(temp, temp + sizeof(temp) / sizeof(double));
+	std::vector<double> quants = parameter.getCodonSpecificQuantile(1, 100, std::string("GCA"), 0, probs, true);
 
 	std::cout << std::endl << "Exiting" << std::endl;
 }

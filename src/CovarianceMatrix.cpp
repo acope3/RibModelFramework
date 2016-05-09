@@ -114,7 +114,7 @@ void CovarianceMatrix::setDiag(double val)
 {
 	for (unsigned i = 0u; i < covMatrix.size(); i++)
 	{
-		covMatrix[i] = (i % (numVariates + 1) ? 0.0 : val);
+		covMatrix[i] = (i % (numVariates + 1) ? covMatrix[i] : val);
 	}
 }
 
