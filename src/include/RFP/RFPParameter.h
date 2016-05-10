@@ -72,7 +72,6 @@ class RFPParameter: public Parameter {
 
 		//Other functions:
 		double getParameterForCategory(unsigned category, unsigned paramType, std::string codon, bool proposal);
-		void calculateRFPMean(Genome& genome);
 
 
 
