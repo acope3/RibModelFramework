@@ -173,26 +173,26 @@ void Genome::writeFasta (std::string filename, bool simulated)
 		{
 			if (simulated)
 			{
-				for(unsigned i = 0u; i < simulatedGenes.size(); i++)
+				for (unsigned i = 0u; i < simulatedGenes.size(); i++)
 				{
 					Fout << ">" << simulatedGenes[i].getDescription() <<"\n";
-					for(unsigned j = 0u; j < simulatedGenes[i].length(); j++)
+					for (unsigned j = 0u; j < simulatedGenes[i].length(); j++)
 					{
 						Fout << simulatedGenes[i].getNucleotideAt(j);
-						if((j + 1) % 60 == 0) Fout << std::endl;
+						if ((j + 1) % 60 == 0) Fout << std::endl;
 					}
 					Fout << std::endl;
 				}
 			}
 			else
 			{
-				for(unsigned i = 0u; i < genes.size(); i++)
+				for (unsigned i = 0u; i < genes.size(); i++)
 				{
 					Fout << ">" << genes[i].getDescription() << std::endl;
-					for(unsigned j = 0u; j < genes[i].length(); j++)
+					for (unsigned j = 0u; j < genes[i].length(); j++)
 					{
 						Fout << genes[i].getNucleotideAt(j);
-						if((j + 1) % 60 == 0) Fout << std::endl;
+						if ((j + 1) % 60 == 0) Fout << std::endl;
 					}
 					Fout << std::endl;
 				}
@@ -285,27 +285,23 @@ void Genome::writeRFPFile(std::string filename, bool simulated)
 #ifndef STANDALONE
 		Rf_error("Error in Genome::writeRFPFile: Can not open output RFP file %s\n", filename.c_str());
 #else
-		std::cerr <<"Error in Genome::writeRFPFile: Can not open output RFP file " << filename <<"\n";
+		std::cerr << "Error in Genome::writeRFPFile: Can not open output RFP file " << filename << "\n";
 #endif
 	}
 
-	Fout <<"ORF,RFP_Counts,Codon_Counts,Codon\n";
-	for (unsigned geneIndex = 0; geneIndex < genes.size(); geneIndex++)
+	Fout << "ORF,RFP_Counts,Codon_Counts,Codon\n";
+	unsigned sized = simulated ? simulatedGenes.size() : genes.size();
+
+	for (unsigned geneIndex = 0; geneIndex < sized; geneIndex++)
 	{
-		Gene *currentGene;
-		if (simulated)
-			currentGene = &simulatedGenes[geneIndex];
-		else
-			currentGene = &genes[geneIndex];
+		Gene *currentGene = simulated ? &simulatedGenes[geneIndex] : &genes[geneIndex];
 
-
-		for (unsigned codonIndex = 0; codonIndex < 64; codonIndex++)
-		{
+		for (unsigned codonIndex = 0; codonIndex < 64; codonIndex++) {
 			std::string codon = SequenceSummary::codonArray[codonIndex];
 
-			Fout << currentGene->getId() <<",";
-			Fout << currentGene->geneData.getRFPObserved(codonIndex) <<",";
-			Fout << currentGene->geneData.getCodonCountForCodon(codonIndex) <<"," << codon <<"\n";
+			Fout << currentGene->getId() << ",";
+			Fout << currentGene->geneData.getRFPObserved(codonIndex) << ",";
+			Fout << currentGene->geneData.getCodonCountForCodon(codonIndex) << "," << codon << "\n";
 		}
 	}
 	Fout.close();
