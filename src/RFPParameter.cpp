@@ -372,6 +372,11 @@ void RFPParameter::initLambdaPrime(double lambdaPrimeValue, unsigned mixtureElem
 }
 
 
+/* initMutationSelectionCategories (RCPP EXPOSED VIA WRAPPER)
+ * Arguments: vector of file names, number of categories, parameter type to initialize
+ * From a file, initialize the alpha or lambda prime values for all categories. The files vector length should
+ * be the same number as numCategories.
+*/
 void RFPParameter::initMutationSelectionCategories(std::vector<std::string> files, unsigned numCategories, unsigned paramType)
 {
 	std::ifstream currentFile;
@@ -384,7 +389,7 @@ void RFPParameter::initMutationSelectionCategories(std::vector<std::string> file
 	else
 		type = "lambda";
 
-
+	//TODO: Might consider doing a size check before going through all of this.
 	for (unsigned i = 0; i < numCategories; i++)
 	{
 		std::vector<double> temp(numParam, 0.0);
@@ -423,7 +428,7 @@ void RFPParameter::initMutationSelectionCategories(std::vector<std::string> file
 				altered++;
 			}
 			if (altered == numCategories)
-				break; //to not access indicies out of bounds.
+				break; //to not access indices out of bounds.
 		}
 		currentFile.close();
 	}
@@ -438,7 +443,11 @@ void RFPParameter::initMutationSelectionCategories(std::vector<std::string> file
 // --------------------------------------//
 
 
-
+/* updateCodonSpecificParameterTrace (NOT EXPOSED)
+ * Arguments: sample index to update, codon given as a string
+ * Takes a sample as an index into the trace and will eventually convert the codon into
+ * an index into the trace as well.
+*/
 void RFPParameter::updateCodonSpecificParameterTrace(unsigned sample, std::string codon)
 {
 	traces.updateCodonSpecificParameterTraceForCodon(sample, codon, currentCodonSpecificParameter[alp], alp);
@@ -454,12 +463,21 @@ void RFPParameter::updateCodonSpecificParameterTrace(unsigned sample, std::strin
 // -----------------------------------//
 
 
+/* getCurrentCodonSpecificProposalWidth (NOT EXPOSED)
+ * Arguments: index into the vector
+ * Returns the current codon specific proposal width for the given index.
+*/
 double RFPParameter::getCurrentCodonSpecificProposalWidth(unsigned index)
 {
 	return std_csp[index];
 }
 
 
+
+/* proposeCodonSpecificParameter (NOT EXPOSED)
+ * Arguments: None
+ * Proposes a new alpha and lambda prime value for every category and codon.
+*/
 void RFPParameter::proposeCodonSpecificParameter()
 {
 	unsigned numAlpha = (unsigned)currentCodonSpecificParameter[alp][0].size();
@@ -483,6 +501,11 @@ void RFPParameter::proposeCodonSpecificParameter()
 }
 
 
+/* updateCodonSpecificParameter (NOT EXPOSED)
+ * Arguments: string representation of a grouping (amino acid, codon...)
+ * Updates the count of accepted values for codon specific parameters and updates
+ * the current value to the accepted proposed value for all codon specific parameters.
+*/
 void RFPParameter::updateCodonSpecificParameter(std::string grouping)
 {
 	unsigned i = SequenceSummary::codonToIndex(grouping);
@@ -503,6 +526,12 @@ void RFPParameter::updateCodonSpecificParameter(std::string grouping)
 // ---------- Adaptive Width Functions ----------//
 // ----------------------------------------------//
 
+
+/* adaptCodonSpecificParameterProposalWidth (NOT EXPOSED)
+ * Arguments: adaptionWidth, last iteration (NOT USED), adapt (bool)
+ * Calculates the acceptance level for each codon in the group list and updates the ratio trace. If adapt is turned on,
+ * meaning true, then if the acceptance level is in a certain range we change the width.
+*/
 void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastIteration, bool adapt)
 {
 	std::cout << "acceptance rate for codon:\n";
@@ -533,6 +562,12 @@ void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 // ---------- Other Functions ----------//
 // -------------------------------------//
 
+
+/* getParameterForCategory (RCPP EXPOSED VIA WRAPPER)
+ * Arguments: category, parameter typer, codon (as a string), where or not proposed or current
+ * Gets the value for a given codon specific parameter type and codon based off of if the value needed is the
+ * proposed or current one.
+*/
 double RFPParameter::getParameterForCategory(unsigned category, unsigned paramType, std::string codon, bool proposal)
 {
 	double rv;
@@ -541,50 +576,6 @@ double RFPParameter::getParameterForCategory(unsigned category, unsigned paramTy
 
 	return rv;
 }
-
-
-void RFPParameter::calculateRFPMean(Genome& genome)
-{
-	std::vector<unsigned> RFPSums(61,0);
-	std::vector <unsigned> Means(61, 0);
-	for(unsigned geneIndex = 0; geneIndex < genome.getGenomeSize(); geneIndex++)
-	{
-		Gene *gene = &genome.getGene(geneIndex);
-		for (unsigned codonIndex = 0; codonIndex < 61; codonIndex++)
-		{
-			RFPSums[codonIndex] += gene -> geneData.getRFPObserved(codonIndex);
-		}
-	}
-
-	std::cout <<"Means calculated\n";
-	for (unsigned codonIndex = 0; codonIndex < 61; codonIndex++)
-	{
-		Means[codonIndex] = RFPSums[codonIndex] / genome.getGenomeSize();
-	}
-
-	std::vector <unsigned> variance(61, 0);
-	for (unsigned codonIndex = 0; codonIndex < 61; codonIndex++)
-	{
-		long long squareSum = 0;
-		for (unsigned geneIndex = 0; geneIndex < genome.getGenomeSize(); geneIndex++)
-		{
-			Gene *gene = &genome.getGene(geneIndex);
-			long long count = gene -> geneData.getRFPObserved(codonIndex);
-			count -= Means[codonIndex];
-			count *= count;
-			squareSum += count;
-		}
-		variance[codonIndex] = squareSum / genome.getGenomeSize();
-	}
-
-	std::cout <<"Variance calculated\n";
-	for (unsigned codonIndex = 0; codonIndex < 61; codonIndex++)
-	{
-		std::cout << SequenceSummary::indexToCodon(codonIndex) <<" Mean:" << Means[codonIndex];
-		std::cout <<"\tVariance:" << variance[codonIndex] <<"\n";
-	}
-}
-
 
 
 
