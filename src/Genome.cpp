@@ -41,10 +41,10 @@ bool Genome::operator==(const Genome& other) const
 {
 	bool match = true;
 
-	if(!(this->genes == other.genes)) { match = false; } //Do a ! operation because only the gene comparison is implemented,
+	if (!(this->genes == other.genes)) { match = false; } //Do a ! operation because only the gene comparison is implemented,
 	//not the != operator.
-	if(!(this->simulatedGenes == other.simulatedGenes)) { match = false; }
-	if(this->numGenesWithPhi != other.numGenesWithPhi) { match = false; }
+	if (!(this->simulatedGenes == other.simulatedGenes)) { match = false; }
+	if (this->numGenesWithPhi != other.numGenesWithPhi) { match = false; }
 
 	return match;
 }
@@ -96,13 +96,13 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 					 3. End of file, detected by function eof().
 				 */
 
-				if(buf[0] == '>' ) newLine=1;
-				else if(Fin.eof()) newLine=3;
+				if (buf[0] == '>' ) newLine=1;
+				else if (Fin.eof()) newLine=3;
 				else newLine=2;
 
-				if( newLine == 1 )
+				if ( newLine == 1 )
 				{ // this is a start of a new chain.
-					if(!fastaFormat)
+					if (!fastaFormat)
 					{
 						// if it is the first chain, just build a new chain object
 						tmpGene.clear();
@@ -122,15 +122,15 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 					tmpGene.setId( buf.substr(1,pos) );
 				}
 
-				if( newLine == 2 && fastaFormat )
+				if ( newLine == 2 && fastaFormat )
 				{ // sequence line
 					tempSeq.append(buf);
 					//tmpGene.seq.append(buf);
 				}
 
-				if( newLine == 3 )
+				if ( newLine == 3 )
 				{ // end of file
-					if( !fastaFormat ) throw std::string("Genome::readFasta throws: ") + std::string(filename) + std::string(" is not in Fasta format.");
+					if ( !fastaFormat ) throw std::string("Genome::readFasta throws: ") + std::string(filename) + std::string(" is not in Fasta format.");
 					else
 					{
 						// otherwise, need to store the old chain first, then to
@@ -155,7 +155,6 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 	}
 }
 
-
 void Genome::writeFasta (std::string filename, bool simulated)
 {
 	try {
@@ -171,31 +170,19 @@ void Genome::writeFasta (std::string filename, bool simulated)
 		}
 		else
 		{
-			if (simulated)
+			unsigned sized = simulated ? simulatedGenes.size() : genes.size();
+
+			for (unsigned i = 0u; i < sized; i++)
 			{
-				for (unsigned i = 0u; i < simulatedGenes.size(); i++)
+				Gene *currentGene = simulated ? &simulatedGenes[i] : &genes[i];
+
+				Fout << ">" << currentGene->getDescription() << "\n";
+				for (unsigned j = 0u; j < currentGene->length(); j++)
 				{
-					Fout << ">" << simulatedGenes[i].getDescription() <<"\n";
-					for (unsigned j = 0u; j < simulatedGenes[i].length(); j++)
-					{
-						Fout << simulatedGenes[i].getNucleotideAt(j);
-						if ((j + 1) % 60 == 0) Fout << std::endl;
-					}
-					Fout << std::endl;
+					Fout << currentGene->getNucleotideAt(j);
+					if ((j + 1) % 60 == 0) Fout << std::endl;
 				}
-			}
-			else
-			{
-				for (unsigned i = 0u; i < genes.size(); i++)
-				{
-					Fout << ">" << genes[i].getDescription() << std::endl;
-					for (unsigned j = 0u; j < genes[i].length(); j++)
-					{
-						Fout << genes[i].getNucleotideAt(j);
-						if ((j + 1) % 60 == 0) Fout << std::endl;
-					}
-					Fout << std::endl;
-				}
+				Fout << std::endl;
 			}
 		} // end else
 		Fout.close();

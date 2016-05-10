@@ -37,7 +37,6 @@ class Gene
 		virtual ~Gene();
 
 
-
 		//Data Manipulation Functions:
 		std::string getId();
 		void setId(std::string _id);
@@ -45,6 +44,7 @@ class Gene
 		void setDescription(std::string _desc);
 		std::string getSequence();
 		void setSequence(std::string _seq);
+		std::vector <unsigned> getRFP_count(); //Only for unit testing.
 		void addRFP_count(std::vector <unsigned> RFP_counts);
 		SequenceSummary *getSequenceSummary();
 		std::vector<double> getObservedSynthesisRateValues();
@@ -61,17 +61,10 @@ class Gene
 		std::string toAASequence();
 
 
-		//TODO: Possibly change category of new getRFP_count function from
-		//Testing to Data Manipulation function for consistency
-		//Testing function:
-		std::vector <unsigned> getRFP_count();
-
-
 		//R Section:
 
 #ifndef STANDALONE
 
-		//R Section:
 		unsigned getAACount(std::string aa);
 		unsigned getCodonCount(std::string& codon);
 		unsigned getRFPObserved(std::string codon);

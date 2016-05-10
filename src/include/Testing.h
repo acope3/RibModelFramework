@@ -7,9 +7,9 @@
 #include "Genome.h"
 
 
-void testSequenceSummary();
-void testGene();
-void testGenome(std::string testFileDir);
+int testSequenceSummary();
+int testGene();
+int testGenome(std::string testFileDir);
 
 
 

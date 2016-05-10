@@ -7,13 +7,9 @@ test_that("general gene functions", {
   expect_equal(testGene(), 0)
 })
 
-#g <- new(Gene, "TTTGGGAAAATG", "1", "Gabriel")
-#g$seq
-#g$seq <- "kjdklsjfkAAA"
-#g$seq
-#g$getCodonCount("AAA")
+#g <- new(Gene, "kjdklsjfkdj", "1", "Gabriel sucks")
+#g$seq <- "kjdklsjfkdj"
 #expect_equal(g$getAACount("M"), 1)
-#expect_equal(g$getAACount("M"), 0)
 
 g <- new(Gene, "ATGCTCATTCTCACTGCTGCCTCGTAG", "2", "New Test Gene")
 #TODO: problem. This used to say g$seq <- "kjdklsjfkdj" (string). It

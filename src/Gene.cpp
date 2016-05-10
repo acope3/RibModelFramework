@@ -208,6 +208,13 @@ void Gene::setSequence(std::string _seq)
 	}
 }
 
+
+std::vector <unsigned> Gene::getRFP_count()
+{
+    return geneData.getRFP_count();
+}
+
+
 void Gene::addRFP_count(std::vector <unsigned> RFP_counts) {
     geneData.setRFP_count(RFP_counts);
 }
@@ -343,18 +350,6 @@ std::string Gene::toAASequence()
 
 
 
-//--------------------------------------//
-//---------- Testing Function ----------//
-//--------------------------------------//
-
-
-//TODO: Possibly change category of new getRFP_count function from
-//Testing to Data Manipulation function for consistency
-std::vector <unsigned> Gene::getRFP_count()
-{
-    return geneData.getRFP_count();
-}
-
 // -----------------------------------------------------------------------------------------------------//
 // ---------------------------------------- R SECTION --------------------------------------------------//
 // -----------------------------------------------------------------------------------------------------//
@@ -454,6 +449,16 @@ RCPP_MODULE(Gene_mod)
 	.property("id", &Gene::getId, &Gene::setId)
     .property("description", &Gene::getDescription, &Gene::setDescription)
     .property("seq", &Gene::getSequence, &Gene::setSequence)
+
+    //TODO: Implement/fix?
+    /*
+    .method("getId", &Gene::getId)
+    .method("setId", &Gene::setId)
+    .method("getDescription", &Gene::getDescription)
+    .method("setDescription", &Gene::setDescription)
+    .method("setSequence", &Gene::setSequence)
+    .method("getSequence", &Gene::getSequence)
+    */
 
     .method("getObservedSynthesisRateValues", &Gene::getObservedSynthesisRateValues)
     .method("length", &Gene::length, "returns the length of sequence")
