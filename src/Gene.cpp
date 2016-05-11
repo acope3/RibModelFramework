@@ -122,9 +122,6 @@ void Gene::cleanSeq()
     std::string valid = "ACGTN";
     for (unsigned i = 0; i < seq.length(); i++) {
         if (valid.find(seq[i]) == std::string::npos) {
-#ifndef STANDALONE
-            Rf_warning("Erasing %c\n", seq[i]);
-#endif
             seq.erase(i);
         }
     }

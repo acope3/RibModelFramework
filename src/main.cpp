@@ -1,5 +1,6 @@
 #include "include/MCMCAlgorithm.h"
 #include "include/Testing.h"
+#include "include/Utility.h"
 #include <iostream>
 #include <vector>
 
@@ -666,8 +667,9 @@ int main()
 	if (1)
 	{
 		//testSequenceSummary();
-		testGene();
+		//testGene();
 		//testGenome("/Users/hollisbui/RibModelDev/data/UnitTestingData");
+		testUtility();
 		exit(1);
 	}
 	std::string modelToRun = "RFP"; //can also be ROC or FONSE

@@ -255,11 +255,7 @@ bool SequenceSummary::processSequence(const std::string& sequence)
 		}
 		else
 		{
-#ifndef STANDALONE
-			Rf_warning("Codon %s not recognized!\n Codon will be ignored!\n", codon.c_str());
-#else
-			std::cerr << "WARNING: Codon " << codon << " not recognized!\n Codon will be ignored!\n";
-#endif
+			my_printError("WARNING: Codon % not recognized!\n Codon will be ignored!\n", codon);
 			check = false;
 		}
 	}
@@ -389,19 +385,10 @@ void SequenceSummary::AAToCodonRange(std::string aa, unsigned& startAAIndex, uns
 	default: // INVALID AA
 		startAAIndex = 0;
 		endAAIndex = 0;
-		std::cout << AA << std::endl;
-//#ifndef STANDALONE
-//		Rf_warning("Invalid Amino Acid given (%s), returning 0,0\n", aa.c_str());
-//#else
-		std::cerr << "Invalid AA given, returning 0,0\n";
-//#endif
+		my_print("%\n", AA);
+		my_printError("Invalid AA given, returning 0,0\n");
 		break;
 	}
-	//std::array<unsigned, 2> aaRange;
-	//aaRange[0] = startAAIndex;
-	//aaRange[1] = endAAIndex;
-
-	//return aaRange;
 }
 
 
@@ -611,13 +598,12 @@ unsigned SequenceSummary::GetNumCodonsForAA(std::string& aa, bool forParamVector
 	case 'X':
 		ncodon = 3;
 		break;
-	default: // INVALID AA
+		default: // INVALID AA
 
-#ifndef STANDALONE
-		Rf_warning("Invalid Amino Acid given (%s), returning 0,0\n", aa.c_str());
-#else
-		std::cerr << "Invalid aa given, returning 0\n";
-#endif
+
+		my_printError("WARNING: Invalid Amino Acid given (%), returning 0,0\n", aa);
+
+
 		break;
 	}
 	return (forParamVector ? (ncodon - 1) : ncodon);

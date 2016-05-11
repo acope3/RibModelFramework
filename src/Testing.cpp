@@ -1181,7 +1181,8 @@ int testGene()
 }
 
 
-int testGenome(std::string testFileDir) {
+int testGenome(std::string testFileDir)
+{
     Genome genome;
     Genome testGenome;
     Gene g1("ATGGCCACTATTGGGTCTTAG", "TEST001", "TEST001 Test Gene");
@@ -1748,6 +1749,17 @@ int testGenome(std::string testFileDir) {
     return globalError;
 }
 
+
+int testUtility()
+{
+    my_print("Product: %, Qty: %, Price is %", "Shampoo", 5, 100);
+    std::cout <<"\n";
+    my_printError("Product: %, Qty: %, Price is %", "Shampoo", 5, 100);
+
+    return 0;
+}
+
+
 // -----------------------------------------------------------------------------------------------------//
 // ---------------------------------------- R SECTION --------------------------------------------------//
 // -----------------------------------------------------------------------------------------------------//
@@ -1762,5 +1774,6 @@ RCPP_MODULE(Test_mod)
 	function("testSequenceSummary", &testSequenceSummary);
 	function("testGene", &testGene);
 	function("testGenome", &testGenome);
+	function("testUtility", &testUtility);
 }
 #endif

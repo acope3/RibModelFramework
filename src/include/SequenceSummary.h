@@ -9,6 +9,7 @@
 #include <vector>
 #include <array>
 #include <iostream>
+#include "Utility.h"
 
 #ifndef STANDALONE
 #include <Rcpp.h>
