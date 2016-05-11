@@ -7,7 +7,7 @@ context("Sequence Summary")
 #removed processSequence from testThat
 
 test_that("general sequence summary functions", {
-  expect_equal(testSequenceSummary(), 1)
+  expect_equal(testSequenceSummary(), 0)
 })
 
 #Used to test AAToCodonRange, but that is now returned by

@@ -490,7 +490,6 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
                     }
                     else //gene is found
                     {
-                        unsigned phiGrouping = 0;
                         std::string val = "";
                         bool notDone = true;
 						double dval;

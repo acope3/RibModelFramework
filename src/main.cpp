@@ -665,9 +665,9 @@ int main()
 
 	if (1)
 	{
-		testSequenceSummary();
+		//testSequenceSummary();
 		//testGene();
-		//testGenome("/Users/hollisbui/RibModelDev/data/UnitTestingData");
+		testGenome("/Users/hollisbui/RibModelDev/data/UnitTestingData");
 		exit(1);
 	}
 	std::string modelToRun = "RFP"; //can also be ROC or FONSE
