@@ -36,12 +36,7 @@ Gene::Gene(std::string _seq, std::string _id, std::string _desc) : seq(_seq), id
 	}
 	else 
 	{
-#ifndef STANDALONE
-		Rf_warning("Gene: %s has sequence length NOT multiple of 3 after cleaning of the sequence!\nGene data is NOT processed! \nValid characters are A,C,T,G, and N \n", id.c_str());
-#else
-		std::cerr << "Gene: " << id << " has sequence length NOT multiple of 3 after cleaning of the sequence!" <<
-				"\nGene data is NOT processed! \nValid characters are A,C,T,G, and N \n";
-#endif
+		my_printError("WARNING: Gene: % has sequence length NOT multiple of 3 after cleaning of the sequence!\nGene data is NOT processed!\nValid characters are A,C,T,G, and N \n", id);
 	}
 }
 
@@ -192,21 +187,12 @@ void Gene::setSequence(std::string _seq)
 		bool check = geneData.processSequence(seq);
 		if (!check)
 		{
-#ifndef STANDALONE
-			Rf_warning("Error with gene %s\nBad codons found!\n", id.c_str());
-#else
-			std::cerr << "Error with gene " << id << "\nBad codons found!\n";
-#endif
+			my_printError("WARNING: Error with gene %\nBad codons found!\n", id);
 		}
 	}
 	else
 	{
-#ifndef STANDALONE
-		Rf_warning("Gene: %s has sequence length NOT multiple of 3 after cleaning of the sequence!\nGene data is NOT processed! \nValid characters are A,C,T,G, and N \n", id.c_str());
-#else
-		std::cerr << "Gene: " << id << " has sequence length NOT multiple of 3 after cleaning of the sequence!" <<
-				"\nGene data is NOT processed! \nValid characters are A,C,T,G, and N \n";
-#endif
+		my_printError("WARNING: Gene: % has sequence length NOT multiple of 3 after cleaning of the sequence!\nGene data is NOT processed!\nValid characters are A,C,T,G, and N \n", id);
 	}
 }
 
