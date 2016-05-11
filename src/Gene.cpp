@@ -85,7 +85,6 @@ bool Gene::operator==(const Gene& other) const
 {
     bool match = true;
 
-
     if(this->seq != other.seq) { match = false; }
     if(this->id != other.id) { match = false; }
     if(this->description != other.description) { match = false; }
@@ -179,10 +178,12 @@ std::string Gene::getSequence()
 //Arguments: sequence
 //Takes the specified sequence string and cleans it. Provided it
 //that the remaining string length is a multiple of 3, the string
-//is processed and set. NOTE: The string will still be set, even
-//if it is invalid.
+//is processed and set.
+//NOTE: The string will still be set, even if it is invalid.
+//NOTE: As part of changing the sequence, the sequence summary is also cleared.
 void Gene::setSequence(std::string _seq)
 {
+    geneData.clear();
     std::transform(_seq.begin(), _seq.end(), _seq.begin(), ::toupper);
     seq = _seq;
     cleanSeq();
@@ -208,6 +209,13 @@ void Gene::setSequence(std::string _seq)
 #endif
 	}
 }
+
+
+std::vector <unsigned> Gene::getRFP_count()
+{
+    return geneData.getRFP_count();
+}
+
 
 void Gene::addRFP_count(std::vector <unsigned> RFP_counts) {
     geneData.setRFP_count(RFP_counts);
@@ -322,12 +330,13 @@ Gene Gene::reverseComplement()
 }
 
 
-//toAASequence (NOT EXPOSED)
-//Arguments: None
-//Returns a string of amino acids corresponding to the gene's
-//sequence string. The string is looked at as codons and the codons
-//are then mapped to their respective amino acid. NOTE: This could crash if
-//the stored seq string is not of length three.
+/* toAASequence (NOT EXPOSED)
+ * Arguments: None
+ * Returns a string of amino acids corresponding to the gene's
+ * sequence string. The string is looked at as codons and the codons
+ * are then mapped to their respective amino acid. NOTE: This could crash if
+ * the stored seq string is not of length three.
+*/
 std::string Gene::toAASequence()
 {
     std::string aaseq = "";
@@ -338,8 +347,6 @@ std::string Gene::toAASequence()
     }
     return aaseq;
 }
-
-
 
 
 

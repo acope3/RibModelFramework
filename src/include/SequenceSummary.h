@@ -9,6 +9,7 @@
 #include <vector>
 #include <array>
 #include <iostream>
+#include "Utility.h"
 
 #ifndef STANDALONE
 #include <Rcpp.h>
@@ -37,7 +38,6 @@ class SequenceSummary
 		static const std::map<std::string, unsigned> codonToIndexWithoutReference;
 
 
-
 		//Constructors & Destructors:
 		explicit SequenceSummary();
 		SequenceSummary(const std::string& sequence);
@@ -45,7 +45,6 @@ class SequenceSummary
 		SequenceSummary& operator=(const SequenceSummary& other);
 		bool operator==(const SequenceSummary& other) const;
 		virtual ~SequenceSummary(); //TODO:Why is this virtual????
-
 
 
 		//Data Manipulation Functions:

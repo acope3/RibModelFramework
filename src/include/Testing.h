@@ -5,14 +5,13 @@
 #include "SequenceSummary.h"
 #include "Gene.h"
 #include "Genome.h"
+#include "Utility.h"
 
 
-void testSequenceSummary();
-void testGene();
-void testGenome(std::string testFileDir);
-
-
-
+int testSequenceSummary();
+int testGene();
+int testGenome(std::string testFileDir);
+int testUtility();
 
 //Blank header
 #endif // Testing_H

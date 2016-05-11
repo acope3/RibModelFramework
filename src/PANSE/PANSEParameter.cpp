@@ -1,37 +1,53 @@
-#include "../include/PANSE/PANSEParameter.h"
-
-
-#include <sstream>
-
+#include "include/PANSE/PANSEParameter.h"
 
 #ifndef STANDALONE
 #include <Rcpp.h>
 using namespace Rcpp;
 #endif
 
+//--------------------------------------------------//
+// ---------- Constructors & Destructors ---------- //
+//--------------------------------------------------//
+
 
 PANSEParameter::PANSEParameter() : Parameter()
 {
 	//ctor
-	//phiEpsilon = 0.1;
-	//phiEpsilon_proposed = 0.1;
 	bias_csp = 0;
-	//mutation_prior_sd = 0.35;
+	currentCodonSpecificParameter.resize(2);
+	proposedCodonSpecificParameter.resize(2);
 }
 
 
 PANSEParameter::PANSEParameter(std::string filename) : Parameter(64)
 {
+	currentCodonSpecificParameter.resize(2);
+	proposedCodonSpecificParameter.resize(2);
 	initFromRestartFile(filename);
 	numParam = 61;
 }
 
 
-PANSEParameter::PANSEParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix,
+PANSEParameter::PANSEParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix,
 		bool splitSer, std::string _mutationSelectionState) : Parameter(64)
 {
-	initParameterSet(sphi, numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
+	initParameterSet(stdDevSynthesisRate, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
 	initPANSEParameterSet();
+}
+
+
+PANSEParameter& PANSEParameter::operator=(const PANSEParameter& rhs)
+{
+	if (this == &rhs) return *this; // handle self assignment
+
+	Parameter::operator=(rhs);
+
+	lambdaValues = rhs.lambdaValues;
+
+	bias_csp = rhs.bias_csp;
+	std_csp = rhs.std_csp;
+
+	return *this;
 }
 
 
@@ -42,25 +58,12 @@ PANSEParameter::~PANSEParameter()
 }
 
 
-PANSEParameter& PANSEParameter::operator=(const PANSEParameter& rhs)
-{
-	if (this == &rhs) return *this; // handle self assignment
 
-	Parameter::operator=(rhs);
 
-	currentAlphaParameter = rhs.currentAlphaParameter;
-	proposedAlphaParameter = rhs.proposedAlphaParameter;
-	currentLambdaPrimeParameter = rhs.proposedLambdaPrimeParameter;
-	proposedLambdaPrimeParameter = rhs.proposedLambdaPrimeParameter;
 
-	lambdaValues = rhs.lambdaValues;
-	numAcceptForAlphaAndLambdaPrime = rhs.numAcceptForAlphaAndLambdaPrime;
-
-	bias_csp = rhs.bias_csp;
-	std_csp = rhs.std_csp;
-
-	return *this;
-}
+//---------------------------------------------------------------//
+// ---------- Initialization, Restart, Index Checking ---------- //
+//---------------------------------------------------------------//
 
 
 void PANSEParameter::initPANSEParameterSet()
@@ -69,28 +72,30 @@ void PANSEParameter::initPANSEParameterSet()
 	unsigned alphaCategories = getNumMutationCategories();
 	unsigned lambdaPrimeCategories = getNumSelectionCategories();
 
-	currentAlphaParameter.resize(alphaCategories);
-	proposedAlphaParameter.resize(alphaCategories);
-	currentLambdaPrimeParameter.resize(lambdaPrimeCategories);
-	proposedLambdaPrimeParameter.resize(lambdaPrimeCategories);
+	currentCodonSpecificParameter.resize(2);
+	proposedCodonSpecificParameter.resize(2);
+
+	currentCodonSpecificParameter[alp].resize(alphaCategories);
+	proposedCodonSpecificParameter[alp].resize(alphaCategories);
+	currentCodonSpecificParameter[lmPri].resize(lambdaPrimeCategories);
+	proposedCodonSpecificParameter[lmPri].resize(lambdaPrimeCategories);
 	lambdaValues.resize(lambdaPrimeCategories);
 	numParam = 61;
 
 	for (unsigned i = 0; i < alphaCategories; i++)
 	{
 		std::vector <double> tmp(numParam,1.0);
-		currentAlphaParameter[i] = tmp;
-		proposedAlphaParameter[i] = tmp;
+		currentCodonSpecificParameter[alp][i] = tmp;
+		proposedCodonSpecificParameter[alp][i] = tmp;
 	}
 	for (unsigned i = 0; i < lambdaPrimeCategories; i++)
 	{
 		std::vector <double> tmp(numParam,1.0);
-		currentLambdaPrimeParameter[i] = tmp;
-		proposedLambdaPrimeParameter[i] = tmp;
+		currentCodonSpecificParameter[lmPri][i] = tmp;
+		proposedCodonSpecificParameter[lmPri][i] = tmp;
 		lambdaValues[i] = tmp; //Maybe we don't initialize this one? or we do it differently?
 	}
 
-	numAcceptForAlphaAndLambdaPrime.resize(maxGrouping, 0u);
 	bias_csp = 0;
 	std_csp.resize(numParam, 0.1);
 
@@ -104,11 +109,202 @@ void PANSEParameter::initPANSEParameterSet()
 }
 
 
+void PANSEParameter::initPANSEValuesFromFile(std::string filename)
+{
+	std::ifstream input;
+	input.open(filename.c_str());
+	if (input.fail())
+	{
+		std::cerr << "Could not open RestartFile.txt to initialzie PANSE values\n";
+		std::exit(1);
+	}
+	std::string tmp, variableName;
+	unsigned cat = 0;
+	while (getline(input, tmp))
+	{
+		int flag;
+		if (tmp[0] == '>')
+			flag = 1;
+		else if (input.eof() || tmp == "\n")
+			flag = 2;
+		else if (tmp[0] == '#')
+			flag = 3;
+		else
+			flag = 4;
+
+		if (flag == 1)
+		{
+			cat = 0;
+			variableName = tmp.substr(1, tmp.size() - 2);
+		}
+		else if (flag == 2)
+		{
+			std::cout << "here\n";
+		}
+		else if (flag == 3) //user comment, continue
+		{
+			continue;
+		}
+		else
+		{
+			std::istringstream iss;
+			if (variableName == "currentAlphaParameter")
+			{
+				if (tmp == "***")
+				{
+					currentCodonSpecificParameter[alp].resize(currentCodonSpecificParameter[alp].size() + 1);
+					cat++;
+				}
+				else if (tmp == "\n")
+					continue;
+				else
+				{
+					double val;
+					iss.str(tmp);
+					while (iss >> val)
+					{
+						currentCodonSpecificParameter[alp][cat - 1].push_back(val);
+					}
+				}
+			}
+			else if (variableName == "currentLambdaPrimeParameter")
+			{
+				if (tmp == "***")
+				{
+					currentCodonSpecificParameter[lmPri].resize(currentCodonSpecificParameter[lmPri].size() + 1);
+					cat++;
+				}
+				else if (tmp == "\n")
+					continue;
+				else
+				{
+					double val;
+					iss.str(tmp);
+					while (iss >> val)
+					{
+						currentCodonSpecificParameter[lmPri][cat - 1].push_back(val);
+					}
+				}
+			}
+			else if (variableName == "std_csp")
+			{
+				double val;
+				iss.str(tmp);
+				while (iss >> val)
+				{
+					std_csp.push_back(val);
+				}
+			}
+		}
+	}
+	input.close();
+
+	bias_csp = 0;
+	proposedCodonSpecificParameter[alp].resize(numMutationCategories);
+	proposedCodonSpecificParameter[lmPri].resize(numSelectionCategories);
+	for (unsigned i = 0; i < numMutationCategories; i++)
+	{
+		proposedCodonSpecificParameter[alp][i] = currentCodonSpecificParameter[alp][i];
+	}
+	for (unsigned i = 0; i < numSelectionCategories; i++)
+	{
+		proposedCodonSpecificParameter[lmPri][i] = currentCodonSpecificParameter[lmPri][i];
+	}
+}
+
+
+void PANSEParameter::writeEntireRestartFile(std::string filename)
+{
+	writeBasicRestartFile(filename);
+	writePANSERestartFile(filename);
+}
+
+
+void PANSEParameter::writePANSERestartFile(std::string filename)
+{
+
+	std::ofstream out;
+	std::string output = "";
+	std::ostringstream oss;
+	unsigned i, j;
+	out.open(filename.c_str(), std::ofstream::app);
+	if (out.fail())
+	{
+		std::cerr <<"Could not open restart file for writing\n";
+		std::exit(1);
+	}
+
+	oss <<">currentAlphaParameter:\n";
+	for (i = 0; i < currentCodonSpecificParameter[alp].size(); i++)
+	{
+		oss << "***\n";
+		for (j = 0; j < currentCodonSpecificParameter[alp][i].size(); j++)
+		{
+			oss << currentCodonSpecificParameter[alp][i][j];
+			if ((j + 1) % 10 == 0)
+				oss << "\n";
+			else
+				oss << " ";
+		}
+		if (j % 10 != 0)
+			oss << "\n";
+	}
+
+	oss <<">currentLambdaPrimeParameter:\n";
+	for (i = 0; i < currentCodonSpecificParameter[lmPri].size(); i++)
+	{
+		oss << "***\n";
+		for (j = 0; j < currentCodonSpecificParameter[lmPri][i].size(); j++)
+		{
+			oss << currentCodonSpecificParameter[lmPri][i][j];
+			if ((j + 1) % 10 == 0)
+				oss << "\n";
+			else
+				oss << " ";
+		}
+		if (j % 10 != 0)
+			oss << "\n";
+	}
+
+	oss << ">std_csp:\n";
+	std::cout << std_csp.size() <<"\n";
+	for (i = 0; i < std_csp.size(); i++)
+	{
+		oss << std_csp[i];
+		if ((i + 1) % 10 == 0)
+			oss << "\n";
+		else
+			oss << " ";
+	}
+	if (i % 10 != 0)
+		oss << "\n";
+
+	output = oss.str();
+	out << output;
+	out.close();
+
+}
+
+
+void PANSEParameter::initFromRestartFile(std::string filename)
+{
+	initBaseValuesFromFile(filename);
+	initPANSEValuesFromFile(filename);
+}
+
+
+void PANSEParameter::initAllTraces(unsigned samples, unsigned num_genes)
+{
+	traces.initializePANSETrace(samples, num_genes, numMutationCategories, numSelectionCategories, numParam,
+						 numMixtures, categories, (unsigned)groupList.size());
+}
+
+
 void PANSEParameter::initAlpha(double alphaValue, unsigned mixtureElement, std::string codon)
 {
 	unsigned category = getMutationCategory(mixtureElement);
 	unsigned index = SequenceSummary::codonToIndex(codon);
-	currentAlphaParameter[category][index] = alphaValue;
+	currentCodonSpecificParameter[alp][category][index] = alphaValue;
 }
 
 
@@ -116,7 +312,7 @@ void PANSEParameter::initLambdaPrime(double lambdaPrimeValue, unsigned mixtureEl
 {
 	unsigned category = getMutationCategory(mixtureElement);
 	unsigned index = SequenceSummary::codonToIndex(codon);
-	currentLambdaPrimeParameter[category][index] = lambdaPrimeValue;
+	currentCodonSpecificParameter[lmPri][category][index] = lambdaPrimeValue;
 }
 
 
@@ -160,14 +356,14 @@ void PANSEParameter::initMutationSelectionCategories(std::vector<std::string> fi
 		{
 			if (paramType == PANSEParameter::alp && categories[j].delM == i)
 			{
-				currentAlphaParameter[j] = temp;
-				proposedAlphaParameter[j] = temp;
+				currentCodonSpecificParameter[alp][j] = temp;
+				proposedCodonSpecificParameter[alp][j] = temp;
 				altered++;
 			}
 			else if (paramType == PANSEParameter::lmPri && categories[j].delEta == i)
 			{
-				currentLambdaPrimeParameter[j] = temp;
-				proposedLambdaPrimeParameter[j] = temp;
+				currentCodonSpecificParameter[lmPri][j] = temp;
+				proposedCodonSpecificParameter[lmPri][j] = temp;
 				altered++;
 			}
 			if (altered == numCategories)
@@ -178,219 +374,28 @@ void PANSEParameter::initMutationSelectionCategories(std::vector<std::string> fi
 }
 
 
-void PANSEParameter::writeEntireRestartFile(std::string filename)
-{
-	writeBasicRestartFile(filename);
-	writePANSERestartFile(filename);
-}
 
 
-void PANSEParameter::writePANSERestartFile(std::string filename)
-{
 
-	std::ofstream out;
-	std::string output = "";
-	std::ostringstream oss;
-	unsigned i, j;
-	out.open(filename.c_str(), std::ofstream::app);
-	if (out.fail())
-	{
-		std::cerr <<"Could not open restart file for writing\n";
-		std::exit(1);
-	}
+// --------------------------------------//
+// ---------- Trace Functions -----------//
+// --------------------------------------//
 
-	oss <<">currentAlphaParameter:\n";
-	for (i = 0; i < currentAlphaParameter.size(); i++)
-	{
-		oss << "***\n";
-		for (j = 0; j < currentAlphaParameter[i].size(); j++)
-		{
-			oss << currentAlphaParameter[i][j];
-			if ((j + 1) % 10 == 0)
-				oss << "\n";
-			else
-				oss << " ";
-		}
-		if (j % 10 != 0)
-			oss << "\n";
-	}
-
-	oss <<">currentLambdaPrimeParameter:\n";
-	for (i = 0; i < currentLambdaPrimeParameter.size(); i++)
-	{
-		oss << "***\n";
-		for (j = 0; j < currentLambdaPrimeParameter[i].size(); j++)
-		{
-			oss << currentLambdaPrimeParameter[i][j];
-			if ((j + 1) % 10 == 0)
-				oss << "\n";
-			else
-				oss << " ";
-		}
-		if (j % 10 != 0)
-			oss << "\n";
-	}
-
-	oss << ">std_csp:\n";
-	std::cout << std_csp.size() <<"\n";
-	for (i = 0; i < std_csp.size(); i++)
-	{
-		oss << std_csp[i];
-		if ((i + 1) % 10 == 0)
-			oss << "\n";
-		else
-			oss << " ";
-	}
-	if (i % 10 != 0)
-		oss << "\n";
-
-	output = oss.str();
-	out << output;
-	out.close();
-
-}
-
-
-void PANSEParameter::initFromRestartFile(std::string filename)
-{
-	initBaseValuesFromFile(filename);
-	initPANSEValuesFromFile(filename);
-}
-
-
-void PANSEParameter::initPANSEValuesFromFile(std::string filename)
-{
-	std::ifstream input;
-	input.open(filename.c_str());
-	if (input.fail())
-	{
-		std::cerr << "Could not open RestartFile.txt to initialzie ROC values\n";
-		std::exit(1);
-	}
-	std::string tmp, variableName;
-	unsigned cat = 0;
-	while (getline(input, tmp))
-	{
-		int flag;
-		if (tmp[0] == '>')
-			flag = 1;
-		else if (input.eof() || tmp == "\n")
-			flag = 2;
-		else if (tmp[0] == '#')
-			flag = 3;
-		else
-			flag = 4;
-
-		if (flag == 1)
-		{
-			cat = 0;
-			variableName = tmp.substr(1, tmp.size() - 2);
-		}
-		else if (flag == 2)
-		{
-			std::cout << "here\n";
-		}
-		else if (flag == 3) //user comment, continue
-		{
-			continue;
-		}
-		else
-		{
-			std::istringstream iss;
-			if (variableName == "currentAlphaParameter")
-			{
-				if (tmp == "***")
-				{
-					currentAlphaParameter.resize(currentAlphaParameter.size() + 1);
-					cat++;
-				}
-				else if (tmp == "\n")
-					continue;
-				else
-				{
-					double val;
-					iss.str(tmp);
-					while (iss >> val)
-					{
-						currentAlphaParameter[cat - 1].push_back(val);
-					}
-				}
-			}
-			else if (variableName == "currentLambdaPrimeParameter")
-			{
-				if (tmp == "***")
-				{
-					currentLambdaPrimeParameter.resize(currentLambdaPrimeParameter.size() + 1);
-					cat++;
-				}
-				else if (tmp == "\n")
-					continue;
-				else
-				{
-					double val;
-					iss.str(tmp);
-					while (iss >> val)
-					{
-						currentLambdaPrimeParameter[cat - 1].push_back(val);
-					}
-				}
-			}
-			else if (variableName == "std_csp")
-			{
-				double val;
-				iss.str(tmp);
-				while (iss >> val)
-				{
-					std_csp.push_back(val);
-				}
-			}
-		}
-	}
-	input.close();
-
-	bias_csp = 0;
-	numAcceptForAlphaAndLambdaPrime.resize(maxGrouping, 0u);
-	proposedAlphaParameter.resize(numMutationCategories);
-	proposedLambdaPrimeParameter.resize(numSelectionCategories);
-	for (unsigned i = 0; i < numMutationCategories; i++)
-	{
-		proposedAlphaParameter[i] = currentAlphaParameter[i];
-	}
-	for (unsigned i = 0; i < numSelectionCategories; i++)
-	{
-		proposedLambdaPrimeParameter[i] = currentLambdaPrimeParameter[i];
-	}
-}
-
-
-void PANSEParameter::initAllTraces(unsigned samples, unsigned num_genes)
-{
-	traces.initializePANSETrace(samples, num_genes, numMutationCategories, numSelectionCategories, numParam,
-						 numMixtures, categories, (unsigned)groupList.size());
-}
 
 
 void PANSEParameter::updateCodonSpecificParameterTrace(unsigned sample, std::string codon)
 {
-	traces.updateCodonSpecificParameterTrace(sample, codon, currentAlphaParameter, alp);
-	traces.updateCodonSpecificParameterTrace(sample, codon, currentLambdaPrimeParameter, lmPri);
+	traces.updateCodonSpecificParameterTraceForCodon(sample, codon, currentCodonSpecificParameter[alp], alp);
+	traces.updateCodonSpecificParameterTraceForCodon(sample, codon, currentCodonSpecificParameter[lmPri], lmPri);
 }
 
 
-void PANSEParameter::updateCodonSpecificParameter(std::string grouping)
-{
-	unsigned i = SequenceSummary::codonToIndex(grouping);
-	numAcceptForAlphaAndLambdaPrime[i]++;
 
-	for(unsigned k = 0u; k < numMutationCategories; k++)
-	{
-		currentAlphaParameter[k][i] = proposedAlphaParameter[k][i];
-	}
-	for(unsigned k = 0u; k < numSelectionCategories; k++)
-	{
-		currentLambdaPrimeParameter[k][i] = proposedLambdaPrimeParameter[k][i];
-	}
-}
+
+
+// -----------------------------------//
+// ---------- CSP Functions ----------//
+// -----------------------------------//
 
 
 double PANSEParameter::getCurrentCodonSpecificProposalWidth(unsigned index)
@@ -399,28 +404,16 @@ double PANSEParameter::getCurrentCodonSpecificProposalWidth(unsigned index)
 }
 
 
-std::vector<std::vector<double>> PANSEParameter::getCurrentAlphaParameter()
-{
-	return currentAlphaParameter;
-}
-
-
-std::vector<std::vector<double>> PANSEParameter::getCurrentLambdaPrimeParameter()
-{
-	return currentLambdaPrimeParameter;
-}
-
-
 void PANSEParameter::proposeCodonSpecificParameter()
 {
-	unsigned numAlpha = (unsigned)currentAlphaParameter[0].size();
-	unsigned numLambdaPrime = (unsigned)currentLambdaPrimeParameter[0].size();
+	unsigned numAlpha = (unsigned)currentCodonSpecificParameter[alp][0].size();
+	unsigned numLambdaPrime = (unsigned)currentCodonSpecificParameter[lmPri][0].size();
 
 	for (unsigned i = 0; i < numMutationCategories; i++)
 	{
 		for (unsigned j = 0; j < numAlpha; j++)
 		{
-			proposedAlphaParameter[i][j] = std::exp( randNorm( std::log(currentAlphaParameter[i][j]) , std_csp[j]) );
+			proposedCodonSpecificParameter[alp][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[alp][i][j]) , std_csp[j]) );
 		}
 	}
 
@@ -428,13 +421,33 @@ void PANSEParameter::proposeCodonSpecificParameter()
 	{
 		for (unsigned j = 0; j < numLambdaPrime; j++)
 		{
-			proposedLambdaPrimeParameter[i][j] = std::exp( randNorm( std::log(currentLambdaPrimeParameter[i][j]) , std_csp[j]) );
+			proposedCodonSpecificParameter[lmPri][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[lmPri][i][j]) , std_csp[j]) );
 		}
 	}
 }
 
 
-void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth)
+void PANSEParameter::updateCodonSpecificParameter(std::string grouping)
+{
+	unsigned i = SequenceSummary::codonToIndex(grouping);
+	numAcceptForCodonSpecificParameters[i]++;
+
+	for(unsigned k = 0u; k < numMutationCategories; k++)
+	{
+		currentCodonSpecificParameter[alp][k][i] = proposedCodonSpecificParameter[alp][k][i];
+	}
+	for(unsigned k = 0u; k < numSelectionCategories; k++)
+	{
+		currentCodonSpecificParameter[lmPri][k][i] = proposedCodonSpecificParameter[lmPri][k][i];
+	}
+}
+
+
+// ----------------------------------------------//
+// ---------- Adaptive Width Functions ----------//
+// ----------------------------------------------//
+
+void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastIteration, bool adapt)
 {
 	std::cout << "acceptance rate for codon:\n";
 	for (unsigned i = 0; i < groupList.size(); i++)
@@ -443,15 +456,15 @@ void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptatio
 
 		unsigned codonIndex = SequenceSummary::codonToIndex(groupList[i]);
 		double acceptanceLevel = (double)numAcceptForCodonSpecificParameters[codonIndex] / (double)adaptationWidth;
-		std::cout << acceptanceLevel << " with std_csp = " << std_csp[i] <<"\n";
 		traces.updateCodonSpecificAcceptanceRatioTrace(codonIndex, acceptanceLevel);
-		if (acceptanceLevel < 0.2)
-		{
-			std_csp[i] *= 0.8;
-		}
-		if (acceptanceLevel > 0.3)
-		{
-			std_csp[i] *= 1.2;
+		if (adapt) {
+			std::cout << acceptanceLevel << " with std_csp = " << std_csp[i] << "\n";
+			if (acceptanceLevel < 0.2) {
+				std_csp[i] *= 0.8;
+			}
+			if (acceptanceLevel > 0.3) {
+				std_csp[i] *= 1.2;
+			}
 		}
 		numAcceptForCodonSpecificParameters[codonIndex] = 0u;
 	}
@@ -460,67 +473,118 @@ void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptatio
 
 
 
+// -------------------------------------//
+// ---------- Other Functions ----------//
+// -------------------------------------//
+
 double PANSEParameter::getParameterForCategory(unsigned category, unsigned paramType, std::string codon, bool proposal)
 {
 	double rv;
 	unsigned codonIndex = SequenceSummary::codonToIndex(codon);
-	if (paramType == PANSEParameter::alp)
-	{
-		rv = (proposal ? proposedAlphaParameter[category][codonIndex] : currentAlphaParameter[category][codonIndex]);
-	}
-	else if (paramType == PANSEParameter::lmPri)
-	{
-		rv = (proposal ? proposedLambdaPrimeParameter[category][codonIndex] : currentLambdaPrimeParameter[category][codonIndex]);
-	}
-	else
-	{
-		std::cerr << "Warning in PANSEParameter::getParameterForCategory: Unkown parameter type: " << paramType << "\n";
-		std::cerr << "\tReturning alpha parameter! \n";
-		rv = (proposal ? proposedAlphaParameter[category][codonIndex] : currentAlphaParameter[category][codonIndex]);
-	}
+	rv = (proposal ? proposedCodonSpecificParameter[paramType][category][codonIndex] : currentCodonSpecificParameter[paramType][category][codonIndex]);
 
 	return rv;
 }
 
 
-//TODO: Use of Trace prevents this from being in the base class
-std::vector <double> PANSEParameter::getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex)
+void PANSEParameter::calculatePANSEMean(Genome& genome)
 {
-	std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
-	std::vector<double> probabilities(numMixtures, 0.0);
-	unsigned traceLength = (unsigned)mixtureAssignmentTrace.size();
-
-	if (samples > traceLength)
+	std::vector<unsigned> PANSESums(61,0);
+	std::vector <unsigned> Means(61, 0);
+	for(unsigned geneIndex = 0; geneIndex < genome.getGenomeSize(); geneIndex++)
 	{
-		std::cerr << "Warning in PANSEParameter::getMixtureAssignmentPosteriorMean throws: Number of anticipated samples (" <<
-			samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
-		samples = traceLength;
+		Gene *gene = &genome.getGene(geneIndex);
+		for (unsigned codonIndex = 0; codonIndex < 61; codonIndex++)
+		{
+			PANSESums[codonIndex] += gene -> geneData.getPANSEObserved(codonIndex);
+		}
 	}
 
-	unsigned start = traceLength - samples;
-	for (unsigned i = start; i < traceLength; i++)
+	std::cout <<"Means calculated\n";
+	for (unsigned codonIndex = 0; codonIndex < 61; codonIndex++)
 	{
-		unsigned value = mixtureAssignmentTrace[i];
-		probabilities[value]++;
+		Means[codonIndex] = PANSESums[codonIndex] / genome.getGenomeSize();
 	}
 
-	for (unsigned i = 0; i < numMixtures; i++)
+	std::vector <unsigned> variance(61, 0);
+	for (unsigned codonIndex = 0; codonIndex < 61; codonIndex++)
 	{
-		probabilities[i] /= (double)samples;
+		long long squareSum = 0;
+		for (unsigned geneIndex = 0; geneIndex < genome.getGenomeSize(); geneIndex++)
+		{
+			Gene *gene = &genome.getGene(geneIndex);
+			long long count = gene -> geneData.getPANSEObserved(codonIndex);
+			count -= Means[codonIndex];
+			count *= count;
+			squareSum += count;
+		}
+		variance[codonIndex] = squareSum / genome.getGenomeSize();
 	}
-	return probabilities;
+
+	std::cout <<"Variance calculated\n";
+	for (unsigned codonIndex = 0; codonIndex < 61; codonIndex++)
+	{
+		std::cout << SequenceSummary::indexToCodon(codonIndex) <<" Mean:" << Means[codonIndex];
+		std::cout <<"\tVariance:" << variance[codonIndex] <<"\n";
+	}
 }
 
 
-//---------------------STATIC VARIABLE DECLARATIONS---------------------//
-
-const unsigned PANSEParameter::alp = 0u;
-const unsigned PANSEParameter::lmPri = 1u;
 
 
-//---------------------R WRAPPER FUNCTIONS---------------------//
+
+
+
+// -----------------------------------------------------------------------------------------------------//
+// ---------------------------------------- R SECTION --------------------------------------------------//
+// -----------------------------------------------------------------------------------------------------//
+
 
 #ifndef STANDALONE
+
+
+//--------------------------------------------------//
+// ---------- Constructors & Destructors ---------- //
+//--------------------------------------------------//
+
+
+PANSEParameter::PANSEParameter(std::vector<double> stdDevSynthesisRate, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter(64)
+{
+  unsigned _numMixtures = _matrix.size() / 2;
+  std::vector<std::vector<unsigned>> thetaKMatrix;
+  thetaKMatrix.resize(_numMixtures);
+
+  unsigned index = 0;
+  for (unsigned i = 0; i < _numMixtures; i++)
+  {
+    for (unsigned j = 0; j < 2; j++, index++)
+    {
+      thetaKMatrix[i].push_back(_matrix[index]);
+    }
+  }
+  initParameterSet(stdDevSynthesisRate, _matrix.size() / 2, geneAssignment, thetaKMatrix, splitSer);
+  initPANSEParameterSet();
+
+}
+
+
+PANSEParameter::PANSEParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState) :
+Parameter(64)
+{
+  std::vector<std::vector<unsigned>> thetaKMatrix;
+  initParameterSet(stdDevSynthesisRate, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
+  initPANSEParameterSet();
+}
+
+
+
+
+
+//---------------------------------------------------------------//
+// ---------- Initialization, Restart, Index Checking ---------- //
+//---------------------------------------------------------------//
+
+
 void PANSEParameter::initAlphaR(double alphaValue, unsigned mixtureElement, std::string codon)
 {
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
@@ -550,32 +614,6 @@ void PANSEParameter::initLambdaPrimeR(double lambdaPrimeValue, unsigned mixtureE
 	}
 }
 
-
-double PANSEParameter::getParameterForCategoryR(unsigned mixtureElement, unsigned paramType, std::string codon, bool proposal)
-{
-	double rv = 0.0;
-	bool check = checkIndex(mixtureElement, 1, numMixtures);
-	if (check)
-	{
-		mixtureElement--;
-		unsigned category = 0;
-		codon[0] = (char)std::toupper(codon[0]);
-		codon[1] = (char)std::toupper(codon[1]);
-		codon[2] = (char)std::toupper(codon[2]);
-		if (paramType == PANSEParameter::alp)
-		{
-			//THIS NEEDS TO CHANGE!!!!
-			category = getMutationCategory(mixtureElement); //really alpha here
-		}
-		else if (paramType == PANSEParameter::lmPri)
-		{
-			category = getSelectionCategory(mixtureElement);
-		}
-		rv = getParameterForCategory(category, paramType, codon, proposal);
-	}
-	return rv;
-}
-#endif
 
 void PANSEParameter::initMutationSelectionCategoriesR(std::vector<std::string> files, unsigned numCategories,
 													std::string paramType)
@@ -608,92 +646,103 @@ void PANSEParameter::initMutationSelectionCategoriesR(std::vector<std::string> f
 	}
 }
 
-#ifndef STANDALONE
-double PANSEParameter::getAlphaPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
+// -----------------------------------//
+// ---------- CSP Functions ----------//
+// -----------------------------------//
+
+
+std::vector<std::vector<double>> PANSEParameter::getProposedAlphaParameter()
 {
-	double rv = -1.0;
+	return proposedCodonSpecificParameter[alp];
+}
+
+
+std::vector<std::vector<double>> PANSEParameter::getProposedLambdaPrimeParameter()
+{
+	return proposedCodonSpecificParameter[lmPri];
+}
+
+
+std::vector<std::vector<double>> PANSEParameter::getCurrentAlphaParameter()
+{
+	return currentCodonSpecificParameter[alp];
+}
+
+
+std::vector<std::vector<double>> PANSEParameter::getCurrentLambdaPrimeParameter()
+{
+	return currentCodonSpecificParameter[lmPri];
+}
+
+
+void PANSEParameter::setProposedAlphaParameter(std::vector<std::vector<double>> alpha)
+{
+	proposedCodonSpecificParameter[alp] = alpha;
+}
+
+
+void PANSEParameter::setProposedLambdaPrimeParameter(std::vector<std::vector<double>> lambdaPrime)
+{
+	proposedCodonSpecificParameter[lmPri] = lambdaPrime;
+}
+
+
+void PANSEParameter::setCurrentAlphaParameter(std::vector<std::vector<double>> alpha)
+{
+	currentCodonSpecificParameter[alp] = alpha;
+}
+
+
+void PANSEParameter::setCurrentLambdaPrimeParameter(std::vector<std::vector<double>> lambdaPrime)
+{
+	currentCodonSpecificParameter[lmPri] = lambdaPrime;
+}
+
+
+// -------------------------------------//
+// ---------- Other Functions ----------//
+// -------------------------------------//
+
+
+double PANSEParameter::getParameterForCategoryR(unsigned mixtureElement, unsigned paramType, std::string codon, bool proposal)
+{
+	double rv = 0.0;
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
-	codon[0] = (char) std::toupper(codon[0]);
-	codon[1] = (char) std::toupper(codon[1]);
-	codon[2] = (char) std::toupper(codon[2]);
 	if (check)
 	{
-		rv = getAlphaPosteriorMean(mixtureElement - 1, samples, codon);
+		mixtureElement--;
+		unsigned category = 0;
+		codon[0] = (char)std::toupper(codon[0]);
+		codon[1] = (char)std::toupper(codon[1]);
+		codon[2] = (char)std::toupper(codon[2]);
+		if (paramType == PANSEParameter::alp)
+		{
+			//TODO THIS NEEDS TO CHANGE, NAMING!!!!
+			category = getMutationCategory(mixtureElement); //really alpha here
+		}
+		else if (paramType == PANSEParameter::lmPri)
+		{
+			category = getSelectionCategory(mixtureElement);
+		}
+		rv = getParameterForCategory(category, paramType, codon, proposal);
 	}
 	return rv;
 }
 
-double PANSEParameter::getLambdaPrimePosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon)
-{
-	double rv = -1.0;
-	codon[0] = (char) std::toupper(codon[0]);
-	codon[1] = (char) std::toupper(codon[1]);
-	codon[2] = (char) std::toupper(codon[2]);
-	bool check = checkIndex(mixtureElement, 1, numMixtures);
-	if (check)
-	{
-		rv = getLambdaPrimePosteriorMean(mixtureElement - 1, samples, codon);
-	}
-	return rv;
-}
-
-
-double PANSEParameter::getAlphaVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased)
-{
-	double rv = -1.0;
-	codon[0] = (char) std::toupper(codon[0]);
-	codon[1] = (char) std::toupper(codon[1]);
-	codon[2] = (char) std::toupper(codon[2]);
-	bool check = checkIndex(mixtureElement, 1, numMixtures);
-	if (check)
-	{
-		rv = getAlphaVariance(mixtureElement - 1, samples, codon, unbiased);
-	}
-	return rv;
-}
-
-
-double PANSEParameter::getLambdaPrimeVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, bool unbiased)
-{
-	double rv = -1.0;
-	codon[0] = (char) std::toupper(codon[0]);
-	codon[1] = (char) std::toupper(codon[1]);
-	codon[2] = (char) std::toupper(codon[2]);
-	bool check = checkIndex(mixtureElement, 1, numMixtures);
-	if (check)
-	{
-		rv = getLambdaPrimeVariance(mixtureElement - 1, samples, codon, unbiased);
-	}
-	return rv;
-}
 #endif
 
 
-#ifndef STANDALONE
-PANSEParameter::PANSEParameter(std::vector<double> sphi, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter(64)
-{
-  unsigned _numMixtures = _matrix.size() / 2;
-  std::vector<std::vector<unsigned>> thetaKMatrix;
-  thetaKMatrix.resize(_numMixtures);
 
-  unsigned index = 0;
-  for (unsigned i = 0; i < _numMixtures; i++)
-  {
-    for (unsigned j = 0; j < 2; j++, index++)
-    {
-      thetaKMatrix[i].push_back(_matrix[index]);
-    }
-  }
-  initParameterSet(sphi, _matrix.size() / 2, geneAssignment, thetaKMatrix, splitSer);
-  initPANSEParameterSet();
 
-}
 
-PANSEParameter::PANSEParameter(std::vector<double> sphi, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState) :
-Parameter(64)
-{
-  std::vector<std::vector<unsigned>> thetaKMatrix;
-  initParameterSet(sphi, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
-  initPANSEParameterSet();
-}
-#endif
+
+
+
+
+
+
+
+
+
+
+
