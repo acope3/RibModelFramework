@@ -5,7 +5,6 @@
 #include <cstdlib>
 #include <sstream>
 #include <chrono>
-#include <iostream>
 #include <fstream>
 #include <stdlib.h> //can be removed later
 #ifndef STANDALONE

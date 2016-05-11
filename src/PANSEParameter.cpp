@@ -9,7 +9,10 @@ using namespace Rcpp;
 // ---------- Constructors & Destructors ---------- //
 //--------------------------------------------------//
 
-
+/* PANSEParameter Constructor (RCPP EXPOSED)
+ * Arguments: None
+ * Initialize the object with the default values
+*/
 PANSEParameter::PANSEParameter() : Parameter()
 {
 	//ctor
@@ -19,6 +22,10 @@ PANSEParameter::PANSEParameter() : Parameter()
 }
 
 
+/* PANSEParameter Constructor (RCPP EXPOSED)
+ * Arguments: filename
+ * Initialize the object with values from a restart file.
+*/
 PANSEParameter::PANSEParameter(std::string filename) : Parameter(64)
 {
 	currentCodonSpecificParameter.resize(2);
@@ -28,6 +35,12 @@ PANSEParameter::PANSEParameter(std::string filename) : Parameter(64)
 }
 
 
+/* PANSEParameter Constructor (NOT EXPOSED)
+ * Arguments: synthesis rate values (vector), number of mixtures, vector containing gene assignments, vector of vector
+ * representation of a category matrix, boolean to tell if ser should be split, keyword for mutation/selection state.
+ * Initializes the object from given values. If thetaK matrix is null or empty, the mutationselectionState keyword
+ * is used to generate the matrix.
+*/
 PANSEParameter::PANSEParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix,
 		bool splitSer, std::string _mutationSelectionState) : Parameter(64)
 {
@@ -36,6 +49,10 @@ PANSEParameter::PANSEParameter(std::vector<double> stdDevSynthesisRate, unsigned
 }
 
 
+/* PANSEParameter Assignment operator (NOT EXPOSED)
+ * Arguments: PANSEParameter object
+ * Assign the given PANSEParameter object to another.
+*/
 PANSEParameter& PANSEParameter::operator=(const PANSEParameter& rhs)
 {
 	if (this == &rhs) return *this; // handle self assignment
@@ -51,10 +68,14 @@ PANSEParameter& PANSEParameter::operator=(const PANSEParameter& rhs)
 }
 
 
+/* PANSEParameter Deconstructor (NOT EXPOSED)
+ * Arguments: None
+ * Standard deconstructor.
+*/
 PANSEParameter::~PANSEParameter()
 {
 	//dtor 
-	//TODO: Need to call Parameter's deconstructor
+	//TODO: Need to call Parameter's deconstructor?
 }
 
 
@@ -65,7 +86,11 @@ PANSEParameter::~PANSEParameter()
 // ---------- Initialization, Restart, Index Checking ---------- //
 //---------------------------------------------------------------//
 
-
+/* initPANSEParameterSet (NOT EXPOSED)
+ * Arguments: None
+ * Initializes the variables that are specific to the PANSE Parameter object. The group list is set to all codons from
+ * table 1 minus the stop codons. This will be corrected in CodonTable.
+*/
 void PANSEParameter::initPANSEParameterSet()
 {
 
@@ -109,13 +134,17 @@ void PANSEParameter::initPANSEParameterSet()
 }
 
 
+/* initPANSEValuesFromFile (NOT EXPOSED)
+ * Arguments: filename
+ * Opens a restart file to initialize PANSE specific values.
+ */
 void PANSEParameter::initPANSEValuesFromFile(std::string filename)
 {
 	std::ifstream input;
 	input.open(filename.c_str());
 	if (input.fail())
 	{
-		std::cerr << "Could not open RestartFile.txt to initialzie PANSE values\n";
+		std::cerr << "Could not open file to initialize PANSE values\n";
 		std::exit(1);
 	}
 	std::string tmp, variableName;
@@ -213,6 +242,10 @@ void PANSEParameter::initPANSEValuesFromFile(std::string filename)
 }
 
 
+/* writeEntireRestartFile (NOT EXPOSED)
+ * Arguments: filename
+ * Takes a filename and passes it to the write functions for a restart file (basic and model specific functions).
+ */
 void PANSEParameter::writeEntireRestartFile(std::string filename)
 {
 	writeBasicRestartFile(filename);
@@ -220,6 +253,11 @@ void PANSEParameter::writeEntireRestartFile(std::string filename)
 }
 
 
+/* writePANSERestartFile (NOT EXPOSED)
+ * Arguments: filename
+ * Appends the PANSE specific values to a restart file. writeBasicRestartFile should be called previous to this by calling
+ * writeEntireRestartFile.
+ */
 void PANSEParameter::writePANSERestartFile(std::string filename)
 {
 
@@ -286,6 +324,10 @@ void PANSEParameter::writePANSERestartFile(std::string filename)
 }
 
 
+/* initFromRestartFile (NOT EXPOSED)
+ * Arguments: filename
+ * Load Parameter values in from a restart file by calling initialization functions (basic and model specific).
+ */
 void PANSEParameter::initFromRestartFile(std::string filename)
 {
 	initBaseValuesFromFile(filename);
@@ -293,6 +335,10 @@ void PANSEParameter::initFromRestartFile(std::string filename)
 }
 
 
+/* initAllTraces (NOT EXPOSED)
+ * Arguments: number of samples, number of genes
+ * Initializes all traces, base traces and those specific to PANSE.
+ */
 void PANSEParameter::initAllTraces(unsigned samples, unsigned num_genes)
 {
 	traces.initializePANSETrace(samples, num_genes, numMutationCategories, numSelectionCategories, numParam,
@@ -300,6 +346,11 @@ void PANSEParameter::initAllTraces(unsigned samples, unsigned num_genes)
 }
 
 
+/* initAlpha (RCPP EXPOSED VIA WRAPPER)
+ * Arguments: alpha value, mixture element, codon string (all caps)
+ * Gets the category and index to index into the alpha vector by looking at the mixtureElement and codon resprectively.
+ * Puts the alphaValue into the indexed location.
+ */
 void PANSEParameter::initAlpha(double alphaValue, unsigned mixtureElement, std::string codon)
 {
 	unsigned category = getMutationCategory(mixtureElement);
@@ -308,6 +359,11 @@ void PANSEParameter::initAlpha(double alphaValue, unsigned mixtureElement, std::
 }
 
 
+/* initLambdaPrime (RCPP EXPOSED VIA WRAPPER)
+ * Arguments: lambda prime value, mixture element, codon string (all caps)
+ * Gets the category and index to index into the alpha vector by looking at the mixtureElement and codon resprectively.
+ * Puts the lambdaPrimeValue into the indexed location.
+ */
 void PANSEParameter::initLambdaPrime(double lambdaPrimeValue, unsigned mixtureElement, std::string codon)
 {
 	unsigned category = getMutationCategory(mixtureElement);
@@ -316,6 +372,11 @@ void PANSEParameter::initLambdaPrime(double lambdaPrimeValue, unsigned mixtureEl
 }
 
 
+/* initMutationSelectionCategories (RCPP EXPOSED VIA WRAPPER)
+ * Arguments: vector of file names, number of categories, parameter type to initialize
+ * From a file, initialize the alpha or lambda prime values for all categories. The files vector length should
+ * be the same number as numCategories.
+*/
 void PANSEParameter::initMutationSelectionCategories(std::vector<std::string> files, unsigned numCategories, unsigned paramType)
 {
 	std::ifstream currentFile;
@@ -328,7 +389,7 @@ void PANSEParameter::initMutationSelectionCategories(std::vector<std::string> fi
 	else
 		type = "lambda";
 
-
+	//TODO: Might consider doing a size check before going through all of this.
 	for (unsigned i = 0; i < numCategories; i++)
 	{
 		std::vector<double> temp(numParam, 0.0);
@@ -367,7 +428,7 @@ void PANSEParameter::initMutationSelectionCategories(std::vector<std::string> fi
 				altered++;
 			}
 			if (altered == numCategories)
-				break; //to not access indicies out of bounds.
+				break; //to not access indices out of bounds.
 		}
 		currentFile.close();
 	}
@@ -382,7 +443,11 @@ void PANSEParameter::initMutationSelectionCategories(std::vector<std::string> fi
 // --------------------------------------//
 
 
-
+/* updateCodonSpecificParameterTrace (NOT EXPOSED)
+ * Arguments: sample index to update, codon given as a string
+ * Takes a sample as an index into the trace and will eventually convert the codon into
+ * an index into the trace as well.
+*/
 void PANSEParameter::updateCodonSpecificParameterTrace(unsigned sample, std::string codon)
 {
 	traces.updateCodonSpecificParameterTraceForCodon(sample, codon, currentCodonSpecificParameter[alp], alp);
@@ -398,12 +463,21 @@ void PANSEParameter::updateCodonSpecificParameterTrace(unsigned sample, std::str
 // -----------------------------------//
 
 
+/* getCurrentCodonSpecificProposalWidth (NOT EXPOSED)
+ * Arguments: index into the vector
+ * Returns the current codon specific proposal width for the given index.
+*/
 double PANSEParameter::getCurrentCodonSpecificProposalWidth(unsigned index)
 {
 	return std_csp[index];
 }
 
 
+
+/* proposeCodonSpecificParameter (NOT EXPOSED)
+ * Arguments: None
+ * Proposes a new alpha and lambda prime value for every category and codon.
+*/
 void PANSEParameter::proposeCodonSpecificParameter()
 {
 	unsigned numAlpha = (unsigned)currentCodonSpecificParameter[alp][0].size();
@@ -427,6 +501,11 @@ void PANSEParameter::proposeCodonSpecificParameter()
 }
 
 
+/* updateCodonSpecificParameter (NOT EXPOSED)
+ * Arguments: string representation of a grouping (amino acid, codon...)
+ * Updates the count of accepted values for codon specific parameters and updates
+ * the current value to the accepted proposed value for all codon specific parameters.
+*/
 void PANSEParameter::updateCodonSpecificParameter(std::string grouping)
 {
 	unsigned i = SequenceSummary::codonToIndex(grouping);
@@ -447,6 +526,12 @@ void PANSEParameter::updateCodonSpecificParameter(std::string grouping)
 // ---------- Adaptive Width Functions ----------//
 // ----------------------------------------------//
 
+
+/* adaptCodonSpecificParameterProposalWidth (NOT EXPOSED)
+ * Arguments: adaptionWidth, last iteration (NOT USED), adapt (bool)
+ * Calculates the acceptance level for each codon in the group list and updates the ratio trace. If adapt is turned on,
+ * meaning true, then if the acceptance level is in a certain range we change the width.
+*/
 void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastIteration, bool adapt)
 {
 	std::cout << "acceptance rate for codon:\n";
@@ -477,6 +562,12 @@ void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptatio
 // ---------- Other Functions ----------//
 // -------------------------------------//
 
+
+/* getParameterForCategory (RCPP EXPOSED VIA WRAPPER)
+ * Arguments: category, parameter typer, codon (as a string), where or not proposed or current
+ * Gets the value for a given codon specific parameter type and codon based off of if the value needed is the
+ * proposed or current one.
+*/
 double PANSEParameter::getParameterForCategory(unsigned category, unsigned paramType, std::string codon, bool proposal)
 {
 	double rv;
@@ -485,50 +576,6 @@ double PANSEParameter::getParameterForCategory(unsigned category, unsigned param
 
 	return rv;
 }
-
-
-void PANSEParameter::calculatePANSEMean(Genome& genome)
-{
-	std::vector<unsigned> PANSESums(61,0);
-	std::vector <unsigned> Means(61, 0);
-	for(unsigned geneIndex = 0; geneIndex < genome.getGenomeSize(); geneIndex++)
-	{
-		Gene *gene = &genome.getGene(geneIndex);
-		for (unsigned codonIndex = 0; codonIndex < 61; codonIndex++)
-		{
-			PANSESums[codonIndex] += gene -> geneData.getPANSEObserved(codonIndex);
-		}
-	}
-
-	std::cout <<"Means calculated\n";
-	for (unsigned codonIndex = 0; codonIndex < 61; codonIndex++)
-	{
-		Means[codonIndex] = PANSESums[codonIndex] / genome.getGenomeSize();
-	}
-
-	std::vector <unsigned> variance(61, 0);
-	for (unsigned codonIndex = 0; codonIndex < 61; codonIndex++)
-	{
-		long long squareSum = 0;
-		for (unsigned geneIndex = 0; geneIndex < genome.getGenomeSize(); geneIndex++)
-		{
-			Gene *gene = &genome.getGene(geneIndex);
-			long long count = gene -> geneData.getPANSEObserved(codonIndex);
-			count -= Means[codonIndex];
-			count *= count;
-			squareSum += count;
-		}
-		variance[codonIndex] = squareSum / genome.getGenomeSize();
-	}
-
-	std::cout <<"Variance calculated\n";
-	for (unsigned codonIndex = 0; codonIndex < 61; codonIndex++)
-	{
-		std::cout << SequenceSummary::indexToCodon(codonIndex) <<" Mean:" << Means[codonIndex];
-		std::cout <<"\tVariance:" << variance[codonIndex] <<"\n";
-	}
-}
-
 
 
 

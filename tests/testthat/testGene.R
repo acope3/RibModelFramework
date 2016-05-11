@@ -8,8 +8,6 @@ test_that("general gene functions", {
 })
 
 g <- new(Gene, "ATGCTCATTCTCACTGCTGCCTCGTAG", "2", "New Test Gene")
-#TODO: problem. This used to say g$seq <- "kjdklsjfkdj" (string). It
-#does set the string correctly, but the values in SS are NOT CLEARED.
 test_that("get AA Count", {
   expect_equal(g$getAACount("M"), 1)
   expect_equal(g$getAACount("L"), 2)

@@ -144,7 +144,7 @@ void RFPParameter::initRFPValuesFromFile(std::string filename)
 	input.open(filename.c_str());
 	if (input.fail())
 	{
-		std::cerr << "Could not open file to initialzie RFP values\n";
+		std::cerr << "Could not open file to initialize RFP values\n";
 		std::exit(1);
 	}
 	std::string tmp, variableName;

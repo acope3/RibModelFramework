@@ -58,8 +58,7 @@ inline void my_print(const char *s, T value, Args... args)
     //throw std::logic_error("extra arguments provided to printf");
 }
 
-
-// This template handles general printing between C++ and R
+// This template handles error printing between C++ and R
 inline void my_printError(const char *s)
 {
     while (*s) {

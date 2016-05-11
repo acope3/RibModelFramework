@@ -8,7 +8,6 @@
 #include <cctype>
 #include <vector>
 #include <array>
-#include <iostream>
 #include "Utility.h"
 
 #ifndef STANDALONE
