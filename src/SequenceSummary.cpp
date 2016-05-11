@@ -225,7 +225,6 @@ void SequenceSummary::clear()
 	for(unsigned k = 0; k < 22; k++) { naa[k] = 0; }
 }
 
-
 bool SequenceSummary::processSequence(const std::string& sequence)
 {
 	//NOTE! Clear() cannot be called in this function because of the RFP model.

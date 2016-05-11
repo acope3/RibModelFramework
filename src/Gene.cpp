@@ -122,6 +122,9 @@ void Gene::cleanSeq()
     std::string valid = "ACGTN";
     for (unsigned i = 0; i < seq.length(); i++) {
         if (valid.find(seq[i]) == std::string::npos) {
+#ifndef STANDALONE
+            Rf_warning("Erasing %c\n", seq[i]);
+#endif
             seq.erase(i);
         }
     }
@@ -178,10 +181,12 @@ std::string Gene::getSequence()
 //Arguments: sequence
 //Takes the specified sequence string and cleans it. Provided it
 //that the remaining string length is a multiple of 3, the string
-//is processed and set. NOTE: The string will still be set, even
-//if it is invalid.
+//is processed and set.
+//NOTE: The string will still be set, even if it is invalid.
+//NOTE: As part of changing the sequence, the sequence summary is also cleared.
 void Gene::setSequence(std::string _seq)
 {
+    geneData.clear();
     std::transform(_seq.begin(), _seq.end(), _seq.begin(), ::toupper);
     seq = _seq;
     cleanSeq();
@@ -449,16 +454,6 @@ RCPP_MODULE(Gene_mod)
 	.property("id", &Gene::getId, &Gene::setId)
     .property("description", &Gene::getDescription, &Gene::setDescription)
     .property("seq", &Gene::getSequence, &Gene::setSequence)
-
-    //TODO: Implement/fix?
-    /*
-    .method("getId", &Gene::getId)
-    .method("setId", &Gene::setId)
-    .method("getDescription", &Gene::getDescription)
-    .method("setDescription", &Gene::setDescription)
-    .method("setSequence", &Gene::setSequence)
-    .method("getSequence", &Gene::getSequence)
-    */
 
     .method("getObservedSynthesisRateValues", &Gene::getObservedSynthesisRateValues)
     .method("length", &Gene::length, "returns the length of sequence")
