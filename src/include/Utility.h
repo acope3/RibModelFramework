@@ -10,18 +10,20 @@ using namespace Rcpp;
 
 
 // This template handles general printing between C++ and R
-inline void my_print(const char *s)
+// Returns 0 if no errors in formatting detected.
+inline int my_print(const char *s)
 {
-    while (*s) {
-        if (*s == '%') {
-            if (*(s + 1) == '%') {
+    int rv = 0; // By default, assume success
+
+    while (*s)
+    {
+        if (*s == '%')
+        {
+            if (*(s + 1) == '%')
                 ++s;
-            }
-            /*
-               else {
-               throw std::runtime_error("invalid format string: missing arguments");
-               }
-             */
+            else
+               //throw std::runtime_error("invalid format string: missing arguments");
+               rv = 1;
         }
 #ifndef STANDALONE
         Rcpp::Rcout << *s++;
@@ -29,24 +31,30 @@ inline void my_print(const char *s)
         std::cout << *s++;
 #endif
     }
+
+    return rv;
 }
 
 template<typename T, typename... Args>
-inline void my_print(const char *s, T value, Args... args)
+inline int my_print(const char *s, T value, Args... args)
 {
-    while (*s) {
-        if (*s == '%') {
-            if (*(s + 1) == '%') {
+    int rv = 0;
+
+    while (*s)
+    {
+        if (*s == '%')
+        {
+            if (*(s + 1) == '%')
                 ++s;
-            }
-            else {
+            else
+            {
 #ifndef STANDALONE
                 Rcpp::Rcout << value;
 #else
                 std::cout << value;
 #endif
-                my_print(s + 1, args...); // call even when *s == 0 to detect extra arguments
-                return;
+                rv = my_print(s + 1, args...); // call even when *s == 0 to detect extra arguments
+                return rv;
             }
         }
 #ifndef STANDALONE
@@ -55,22 +63,25 @@ inline void my_print(const char *s, T value, Args... args)
         std::cout << *s++;
 #endif
     }
-    //throw std::logic_error("extra arguments provided to printf");
+    //throw std::logic_error("extra arguments provided to my_print");
+    return 1;
 }
 
 // This template handles error printing between C++ and R
-inline void my_printError(const char *s)
+// Returns 0 if no errors in formatting detected.
+inline int my_printError(const char *s)
 {
-    while (*s) {
-        if (*s == '%') {
-            if (*(s + 1) == '%') {
+    int rv = 0;
+
+    while (*s)
+    {
+        if (*s == '%')
+        {
+            if (*(s + 1) == '%')
                 ++s;
-            }
-            /*
-               else {
-               throw std::runtime_error("invalid format string: missing arguments");
-               }
-             */
+            else
+                //throw std::runtime_error("invalid format string: missing arguments");
+                rv = 1;
         }
 #ifndef STANDALONE
         Rcpp::Rcerr << *s++;
@@ -78,24 +89,30 @@ inline void my_printError(const char *s)
         std::cerr << *s++;
 #endif
     }
+
+    return rv;
 }
 
 template<typename T, typename... Args>
-inline void my_printError(const char *s, T value, Args... args)
+inline int my_printError(const char *s, T value, Args... args)
 {
-    while (*s) {
-        if (*s == '%') {
-            if (*(s + 1) == '%') {
+    int rv = 0;
+
+    while (*s)
+    {
+        if (*s == '%')
+        {
+            if (*(s + 1) == '%')
                 ++s;
-            }
-            else {
+            else
+            {
 #ifndef STANDALONE
                 Rcpp::Rcerr << value;
 #else
                 std::cerr << value;
 #endif
-                my_printError(s + 1, args...); // call even when *s == 0 to detect extra arguments
-                return;
+                rv = my_printError(s + 1, args...); // call even when *s == 0 to detect extra arguments
+                return rv;
             }
         }
 #ifndef STANDALONE
@@ -104,7 +121,8 @@ inline void my_printError(const char *s, T value, Args... args)
         std::cerr << *s++;
 #endif
     }
-    //throw std::logic_error("extra arguments provided to printf");
+    //throw std::logic_error("extra arguments provided to my_print");
+    return 1;
 }
 
 //Blank header

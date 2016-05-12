@@ -4,7 +4,6 @@
 using namespace Rcpp;
 #endif
 
-#include <iostream>
 
 //---- OPERATOR AND CONSTRUCTOR ------
 CodonTable::CodonTable()
@@ -16,14 +15,10 @@ CodonTable::CodonTable()
 
 CodonTable::CodonTable(unsigned _tableId, bool _splitAA) : tableId(_tableId), splitAA(_splitAA)
 {
-	if(tableId == 7 || tableId == 8 || tableId == 15 || tableId == 17 || tableId == 18 || tableId == 19 || tableId == 20 || tableId > 25 || tableId < 1)
+	if (tableId == 7 || tableId == 8 || tableId == 15 || tableId == 17 || tableId == 18 || tableId == 19 || tableId == 20 || tableId > 25 || tableId < 1)
 	{
 		tableId = 1; //standard codon table by NCBI
-#ifndef STANDALONE
-		Rf_warning("Invalid codon table: %d using default codon table (NCBI codon table 1)\n", tableId);
-#else
-		std::cerr << "Invalid codon table: " << tableId << " using default codon table (NCBI codon table 1)\n";
-#endif
+		my_printError("Warning: Invalid codon table: % using default codon table (NCBI codon table 1)\n", tableId);
 	}
 }
 

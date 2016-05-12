@@ -78,7 +78,7 @@ Parameter& Parameter::operator=(const Parameter& rhs)
 
 	stdDevSynthesisRate.resize(rhs.stdDevSynthesisRate.size());
 	stdDevSynthesisRate_proposed.resize(rhs.stdDevSynthesisRate.size());
-	for(unsigned i = 0u; i < rhs.stdDevSynthesisRate.size(); i++)
+	for (unsigned i = 0u; i < rhs.stdDevSynthesisRate.size(); i++)
 	{
 		stdDevSynthesisRate[i] = rhs.stdDevSynthesisRate[i];
 		stdDevSynthesisRate_proposed[i] = rhs.stdDevSynthesisRate_proposed[i];
@@ -145,12 +145,12 @@ void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsig
 #ifndef STANDALONE
 	//TODO:need to check index are correct, consecutive, and don't exceed numMixtures
 	//possibly just use a set?
-	for(unsigned i = 0u; i < numGenes; i++)
+	for (unsigned i = 0u; i < numGenes; i++)
 	{
 		mixtureAssignment[i] = geneAssignment[i] - 1;
 	}
 #else
-	for(unsigned i = 0u; i < numGenes; i++)
+	for (unsigned i = 0u; i < numGenes; i++)
 	{
 		mixtureAssignment[i] = geneAssignment[i];
 	}
@@ -161,7 +161,7 @@ void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsig
 	numMixtures = _numMixtures;
 	stdDevSynthesisRate.resize(_stdDevSynthesisRate.size());
 	stdDevSynthesisRate_proposed.resize(_stdDevSynthesisRate.size());
-	for(unsigned i = 0u; i < stdDevSynthesisRate.size(); i++)
+	for (unsigned i = 0u; i < stdDevSynthesisRate.size(); i++)
 	{
 		stdDevSynthesisRate[i] = _stdDevSynthesisRate[i];
 		stdDevSynthesisRate_proposed[i] = _stdDevSynthesisRate[i];
@@ -210,13 +210,7 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 	std::ifstream input;
 	input.open(filename.c_str());
 	if (input.fail())
-	{
-#ifndef STANDALONE
-		Rf_error("Could not open file: %s to initialize base values\n", filename.c_str());
-#else
-		std::cerr << "Could not open file: " << filename << " to initialize base values\n";
-#endif
-	}
+		my_printError("Could not open file: % to initialize base values\n", filename.c_str());
 	else
 	{
 		int cat = 0;
@@ -391,24 +385,15 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 
 void Parameter::writeBasicRestartFile(std::string filename)
 {
-#ifndef STANDALONE
-	Rprintf("Writing File\n");
-#else
-	std::cout << "Writing File\n";
-#endif
+	my_print("Writing File\n");
+
 	std::ofstream out;
 	std::string output = "";
 	std::ostringstream oss;
 	unsigned i, j;
 	out.open(filename.c_str());
 	if (out.fail())
-	{
-#ifndef STANDALONE
-		Rf_error("Could not open restart file %s for writing\n", filename.c_str());
-#else
-		std::cerr << "Could not open restart file for writing\n";
-#endif
-	}
+		my_printError("Error: Could not open restart file % for writing\n", filename.c_str());
 	else
 	{
 		oss << ">groupList:\n";
@@ -503,11 +488,8 @@ void Parameter::writeBasicRestartFile(std::string filename)
 			if (j % 10 != 0) oss << "\n";
 		}
 	}
-#ifndef STANDALONE
-	Rprintf("Done writing\n");
-#else
-	std::cout << "Done writing\n";
-#endif
+	my_print("Done writing\n");
+
 	output += oss.str();
 	out << output;
 	out.close();
@@ -632,13 +614,7 @@ std::vector <double> Parameter::readPhiValues(std::string filename)
 
 	currentFile.open(filename);
 	if (currentFile.fail())
-	{
-#ifndef STANDALONE
-		Rf_error("Error opening file %s\n", filename.c_str());
-#else
-		std::cerr << "Error opening file\n";
-#endif
-	}
+		my_printError("Error opening file %\n", filename.c_str());
 	else
 	{
 		currentFile >> tmpString; //trash the first line, no info given.
@@ -710,13 +686,7 @@ void Parameter::setNumMutationSelectionValues(std::string _mutationSelectionStat
 void Parameter::printMixtureDefinitionMatrix()
 {
 	for (unsigned i = 0u; i < numMixtures; i++)
-	{
-#ifndef STANDALONE
-		Rprintf("%d\t%d\n", categories[i].delM, categories[i].delEta);
-#else
-		std::cout << categories[i].delM << "\t" << categories[i].delEta << "\n";
-#endif
-	}
+		my_print("%\t%\n", categories[i].delM, categories[i].delEta);
 }
 
 
@@ -800,15 +770,9 @@ void Parameter::setGroupList(std::vector <std::string> gl)
 	for (unsigned i = 0; i < gl.size(); i++)
 	{
 		if (gl[i] == "M" || gl[i] == "W" || gl[i] == "X")
-		{
-#ifndef STANDALONE
-			Rf_error("Warning: Amino Acid %s not recognized in ROC model\n", gl[i].c_str());
-#else
-			std::cerr << "Warning: Amino Acid" << gl[i] << "not recognized in ROC model\n";
-#endif
-		}else{
+			my_printError("Warning: Amino Acid % not recognized in ROC model\n", gl[i].c_str());
+		else
 			groupList.push_back(gl[i]);
-		}
 	}
 }
 
@@ -1100,12 +1064,11 @@ void Parameter::adaptStdDevSynthesisRateProposalWidth(unsigned adaptationWidth, 
 	double acceptanceLevel = (double)numAcceptForStdDevSynthesisRate / (double)adaptationWidth;
 	traces.updateStdDevSynthesisRateAcceptanceRatioTrace(acceptanceLevel);
 	if (adapt) {
-		if (acceptanceLevel < 0.2) {
+		if (acceptanceLevel < 0.2)
 			std_stdDevSynthesisRate *= 0.8;
-		}
-		if (acceptanceLevel > 0.3) {
+
+		if (acceptanceLevel > 0.3)
 			std_stdDevSynthesisRate *= 1.2;
-		}
 	}
 	numAcceptForStdDevSynthesisRate = 0u;
 }
@@ -1136,15 +1099,10 @@ void Parameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool a
 			numAcceptForSynthesisRate[cat][i] = 0u;
 		}
 	}
-#ifndef STANDALONE
-	Rprintf("acceptance rate for synthesis rate:\n");
-	Rprintf("\t acceptance rate to low: %d\n", acceptanceUnder);
-	Rprintf("\t acceptance rate to high: %d\n", acceptanceOver);
-#else
-	std::cout << "acceptance rate for synthesis rate:\n";
-	std::cout << "\t acceptance rate to low: " << acceptanceUnder << "\n";
-	std::cout << "\t acceptance rate to high: " << acceptanceOver << "\n";
-#endif
+
+	my_print("acceptance rate for synthesis rate:\n");
+	my_print("\t acceptance rate to low: %\n", acceptanceUnder);
+	my_print("\t acceptance rate to high: %\n", acceptanceOver);
 }
 
 void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastIteration, bool adapt)
@@ -1153,13 +1111,9 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 	adaptiveStepCurr = lastIteration;
 	unsigned samples = adaptiveStepCurr - adaptiveStepPrev;
 
-#ifndef STANDALONE
-	Rprintf("Acceptance rate for Codon Specific Parameter\n");
-	Rprintf("\tAA\tAcc.Rat\n");
-#else
-	std::cout << "Acceptance rate for Codon Specific Parameter\n";
-	std::cout << "\tAA\tacc.rat\n"; //Prop.Width\n";
-#endif
+	my_print("Acceptance rate for Codon Specific Parameter\n");
+	my_print("\tAA\tAcc.Rat\n"); //Prop.Width\n";
+
 	for (unsigned i = 0; i < groupList.size(); i++)
 	{
 		std::string aa = groupList[i];
@@ -1171,16 +1125,14 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 			unsigned aaStart;
 			unsigned aaEnd;
 			SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
-#ifndef STANDALONE
-		Rprintf("\t%s:\t%f\n", aa.c_str(), acceptanceLevel);
-#else
-			std::cout << "\t" << aa << ":\t" << acceptanceLevel << "\n";// "\t" << std_csp[aaStart] << "\n";
-#endif
+			my_print("\t%:\t%\n", aa.c_str(), acceptanceLevel);
+
 			if (acceptanceLevel < 0.2) {
 				if (acceptanceLevel < 0.1)
 					for (unsigned k = aaStart; k < aaEnd; k++)
 						covarianceMatrix[aaIndex] *= 0.8;
-				else {
+				else
+				{
 					//CovarianceMatrix covcurr(covarianceMatrix[aaIndex].getNumVariates());
 					//covcurr.calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
 					//CovarianceMatrix covprev = covarianceMatrix[aaIndex];
@@ -1206,11 +1158,7 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 		}
 		numAcceptForCodonSpecificParameters[aaIndex] = 0u;
 	}
-#ifndef STANDALONE
-	Rprintf("\n");
-#else
-	std::cout << "\n";
-#endif
+	my_print("\n");
 }
 
 // ------------------------------------------------------------------//
@@ -1227,21 +1175,16 @@ double Parameter::getStdDevSynthesisRatePosteriorMean(unsigned samples, unsigned
 
 	if (samples > traceLength)
 	{
-#ifndef STANDALONE
-		Rf_warning("Warning in ROCParameter::getstdDevSynthesisRatePosteriorMean throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
-			samples, traceLength);
-#else
-		std::cerr << "Warning in ROCParameter::getstdDevSynthesisRatePosteriorMean throws: Number of anticipated samples ("
-			<< samples << ") is greater than the length of the available trace (" << traceLength << ")."
-			<< "Whole trace is used for posterior estimate! \n";
-#endif
+		my_printError("Warning in ROCParameter::getstdDevSynthesisRatePosteriorMean throws: Number of anticipated samples");
+		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n", samples, traceLength);
+
 		samples = traceLength;
 	}
 	unsigned start = traceLength - samples;
+
 	for (unsigned i = start; i < traceLength; i++)
-	{
 		posteriorMean += stdDevSynthesisRateTrace[i];
-	}
+
 	return posteriorMean / (double)samples;
 }
 
@@ -1255,14 +1198,9 @@ double Parameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned geneI
 
 	if (samples > lastIteration)
 	{
-#ifndef STANDALONE
-		Rf_warning("Warning in ROCParameter::getSynthesisRatePosteriorMean throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
-			samples, traceLength);
-#else
-		std::cerr << "Warning in ROCParameter::getSynthesisRatePosteriorMean throws: Number of anticipated samples ("
-			<< samples << ") is greater than the length of the available trace (" << traceLength << ")."
-			<< "Whole trace is used for posterior estimate! \n";
-#endif
+		my_printError("Warning in ROCParameter::getSynthesisRatePosteriorMean throws: Number of anticipated samples");
+		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n", samples, traceLength);
+
 		samples = traceLength;
 	}
 	unsigned start = traceLength - samples;
@@ -1294,21 +1232,16 @@ double Parameter::getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigne
 
 	if (samples > traceLength)
 	{
-#ifndef STANDALONE
-		Rf_warning("Warning in ROCParameter::getCodonSpecificPosteriorMean throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
-			samples, traceLength);
-#else
-		std::cerr << "Warning in ROCParameter::getCodonSpecificPosteriorMean throws: Number of anticipated samples ("
-			<< samples << ") is greater than the length of the available trace (" << traceLength << ")."
-			<< "Whole trace is used for posterior estimate! \n";
-#endif
+		my_printError("Warning in ROCParameter::getCodonSpecificPosteriorMean throws: Number of anticipated samples ");
+		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n", samples, traceLength);
+
 		samples = traceLength;
 	}
 	unsigned start = traceLength - samples;
+
 	for (unsigned i = start; i < traceLength; i++)
-	{
 		posteriorMean += mutationParameterTrace[i];
-	}
+
 	return posteriorMean / (double)samples;
 }
 
@@ -1320,14 +1253,9 @@ double Parameter::getStdDevSynthesisRateVariance(unsigned samples, unsigned mixt
 	unsigned traceLength = (unsigned)StdDevSynthesisRateTrace.size();
 	if (samples > traceLength)
 	{
-#ifndef STANDALONE
-		Rf_warning("Warning in ROCParameter::getSynthesisRateVariance throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
-			samples, traceLength);
-#else
-		std::cerr << "Warning in Parameter::getSynthesisRateVariance throws: Number of anticipated samples (" << samples
-			<< ") is greater than the length of the available trace (" << traceLength << ")."
-			<< "Whole trace is used for posterior estimate! \n";
-#endif
+		my_printError("Warning in ROCParameter::getSynthesisRateVariance throws: Number of anticipated samples ");
+		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n", samples, traceLength);
+
 		samples = traceLength;
 	}
 	double posteriorMean = getStdDevSynthesisRatePosteriorMean(samples, mixture);
@@ -1353,14 +1281,9 @@ double Parameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex,
 	unsigned traceLength = lastIteration + 1;
 	if (samples > traceLength)
 	{
-#ifndef STANDALONE
-		Rf_warning("Warning in ROCParameter::getSynthesisRateVariance throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
-			samples, traceLength);
-#else
-		std::cerr << "Warning in Parameter::getSynthesisRateVariance throws: Number of anticipated samples (" << samples
-			<< ") is greater than the length of the available trace (" << traceLength << ")."
-			<< "Whole trace is used for posterior estimate! \n";
-#endif
+		my_printError("Warning in ROCParameter::getSynthesisRateVariance throws: Number of anticipated samples ");
+		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n", samples, traceLength);
+
 		samples = traceLength;
 	}
 
@@ -1390,14 +1313,9 @@ double Parameter::getCodonSpecificVariance(unsigned mixtureElement, unsigned sam
 	unsigned traceLength = lastIteration + 1;
 	if (samples > traceLength)
 	{
-#ifndef STANDALONE
-		Rf_warning("Warning in Parameter::getCodonSpecificVariance throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
-			samples, traceLength);
-#else
-		std::cerr << "Warning in Parameter::getCodonSpecificVariance throws: Number of anticipated samples (" << samples
-			<< ") is greater than the length of the available trace (" << traceLength << ")."
-			<< "Whole trace is used for posterior estimate! \n";
-#endif
+		my_printError("Warning in Parameter::getCodonSpecificVariance throws: Number of anticipated samples ");
+		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n", samples, traceLength);
+
 		samples = traceLength;
 	}
 
@@ -1426,14 +1344,9 @@ std::vector<double> Parameter::getCodonSpecificQuantile(unsigned mixtureElement,
     unsigned traceEnd = parameterTrace.size() - (parameterTrace.size() - lastIteration);
 	if (samples > traceLength)
 	{
-#ifndef STANDALONE
-		Rf_warning("Warning in Parameter::getCodonSpecificQuantile throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
-			samples, traceLength);
-#else
-		std::cerr << "Warning in Parameter::getCodonSpecificQuantile throws: Number of anticipated samples (" << samples
-			<< ") is greater than the length of the available trace (" << traceLength << ")."
-			<< "Whole trace is used for posterior estimate! \n";
-#endif
+		my_printError("Warning in Parameter::getCodonSpecificQuantile throws: Number of anticipated samples ");
+		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n", samples, traceLength);
+
 		samples = traceLength;
 	}
     
@@ -1478,15 +1391,9 @@ std::vector<double> Parameter::getEstimatedMixtureAssignmentProbabilities(unsign
 
 	if (samples > traceLength)
 	{
-#ifndef STANDALONE
-		Rf_warning("Warning in ROCParameter::getEstimatedMixtureAssignmentProbabilities throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
-			samples, traceLength);
-#else
-		std::cerr
-			<< "Warning in ROCParameter::getEstimatedMixtureAssignmentProbabilities throws: Number of anticipated samples ("
-			<< samples << ") is greater than the length of the available trace (" << traceLength << ")."
-			<< "Whole trace is used for posterior estimate! \n";
-#endif
+		my_printError("Warning in ROCParameter::getEstimatedMixtureAssignmentProbabilities throws: Number of anticipated samples ");
+		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n", samples, traceLength);
+
 		samples = traceLength;
 	}
 
@@ -1498,9 +1405,8 @@ std::vector<double> Parameter::getEstimatedMixtureAssignmentProbabilities(unsign
 	}
 
 	for (unsigned i = 0; i < numMixtures; i++)
-	{
 		probabilities[i] /= (double)samples;
-	}
+
 	return probabilities;
 }
 
@@ -1517,7 +1423,7 @@ void Parameter::quickSortPair(double a[], int b[], int first, int last)
 {
 	int pivotElement;
 
-	if(first < last)
+	if (first < last)
 	{
 		pivotElement = pivotPair(a, b, first, last);
 		quickSortPair(a, b, first, pivotElement);
@@ -1531,7 +1437,7 @@ void Parameter::quickSort(double a[], int first, int last)
 {
 	int pivotElement;
 
-	if(first < last)
+	if (first < last)
 	{
 		pivotElement = pivot(a, first, last);
 		quickSort(a, first, pivotElement);
@@ -1545,10 +1451,10 @@ int Parameter::pivotPair(double a[], int b[], int first, int last)
 	int p = first;
 	double pivotElement = a[first];
 
-	for(int i = (first + 1) ; i < last ; i++)
+	for (int i = (first + 1) ; i < last ; i++)
 	{
 		/* If you want to sort the list in the other order, change "<=" to ">" */
-		if(a[i] <= pivotElement)
+		if (a[i] <= pivotElement)
 		{
 			p++;
 			swap(a[i], a[p]);
@@ -1567,7 +1473,7 @@ int Parameter::pivot(double a[], int first, int last)
 	int p = first;
 	double pivotElement = a[first];
 
-	for(int i = (first + 1) ; i < last ; i++)
+	for (int i = (first + 1) ; i < last ; i++)
 	{
 		/* If you want to sort the list in the other order, change "<=" to ">" */
 		if(a[i] <= pivotElement)
@@ -1607,24 +1513,24 @@ double Parameter::calculateSCUO(Gene& gene, unsigned maxAA)
 	SequenceSummary *seqsum = gene.getSequenceSummary();
 
 	double totalDegenerateAACount = 0.0;
-	for(unsigned i = 0; i < maxAA; i++)
+	for (unsigned i = 0; i < maxAA; i++)
 	{
 		std::string curAA = SequenceSummary::AminoAcidArray[i];
 		// skip amino acids with only one codon or stop codons
-		if(curAA == "X" || curAA == "M" || curAA == "W") continue;
+		if (curAA == "X" || curAA == "M" || curAA == "W") continue;
 		totalDegenerateAACount += (double)seqsum->getAACountForAA(i);
 	}
 
 	double scuoValue = 0.0;
-	for(unsigned i = 0; i < maxAA; i++)
+	for (unsigned i = 0; i < maxAA; i++)
 	{
 		std::string curAA = SequenceSummary::AminoAcidArray[i];
 		// skip amino acids with only one codon or stop codons
-		if(curAA == "X" || curAA == "M" || curAA == "W") continue;
+		if (curAA == "X" || curAA == "M" || curAA == "W") continue;
 		double numDegenerateCodons = SequenceSummary::GetNumCodonsForAA(curAA);
 
 		double aaCount = (double)seqsum->getAACountForAA(i);
-		if(aaCount == 0) continue;
+		if (aaCount == 0) continue;
 
 		unsigned start;
 		unsigned endd;
@@ -1632,10 +1538,10 @@ double Parameter::calculateSCUO(Gene& gene, unsigned maxAA)
 
 		// calculate -sum(pij log(pij))
 		double aaEntropy = 0.0;
-		for(unsigned k = start; k < endd; k++)
+		for (unsigned k = start; k < endd; k++)
 		{
 			int currCodonCount = seqsum->getCodonCountForCodon(k);
-			if(currCodonCount == 0) continue;
+			if (currCodonCount == 0) continue;
 			double codonProportion = (double)currCodonCount / aaCount;
 			aaEntropy += codonProportion*std::log(codonProportion);
 		}
@@ -1656,19 +1562,15 @@ double Parameter::calculateSCUO(Gene& gene, unsigned maxAA)
 
 void Parameter::drawIidRandomVector(unsigned draws, double mean, double sd, double (*proposal)(double a, double b), double* randomNumbers)
 {
-	for(unsigned i = 0u; i < draws; i++)
-	{
+	for (unsigned i = 0u; i < draws; i++)
 		randomNumbers[i] = (*proposal)(mean, sd);
-	}
 }
 
 
 void Parameter::drawIidRandomVector(unsigned draws, double r, double (*proposal)(double r), double* randomNumbers)
 {
-	for(unsigned i = 0u; i < draws; i++)
-	{
+	for (unsigned i = 0u; i < draws; i++)
 		randomNumbers[i] = (*proposal)(r);
-	}
 }
 
 
@@ -1755,14 +1657,14 @@ void Parameter::randDirichlet(double *input, unsigned numElements, double *outpu
 		sumTotal += xx[0];
 	}
 #else
-	for(unsigned i = 0; i < numElements; i++)
+	for (unsigned i = 0; i < numElements; i++)
 	{
 		std::gamma_distribution<double> distribution(input[i], 1);
 		output[i] = distribution(generator);
 		sumTotal += output[i];
 	}
 #endif
-	for(unsigned i = 0; i < numElements; i++)
+	for (unsigned i = 0; i < numElements; i++)
 	{
 		output[i] = output[i] / sumTotal;
 	}
@@ -1792,7 +1694,7 @@ unsigned Parameter::randMultinom(double* probabilities, unsigned mixtureElements
 	//std::vector<double> cumsum(groups);
 	cumsum[0] = probabilities[0];
 
-	for(unsigned i = 1u; i < mixtureElements; i++)
+	for (unsigned i = 1u; i < mixtureElements; i++)
 	{
 		cumsum[i] = cumsum[i-1u] + probabilities[i];
 	}
@@ -1836,7 +1738,7 @@ double Parameter::densityLogNorm(double x, double mean, double sd, bool log)
 {
 	double returnValue = 0.0;
 	// logN is only defined for x > 0 => all values less or equal to zero have probability 0
-	if(x > 0.0)
+	if (x > 0.0)
 	{
 		const double inv_sqrt_2pi = 0.3989422804014327;
 		const double log_sqrt_2pi = 0.9189385332046727;
