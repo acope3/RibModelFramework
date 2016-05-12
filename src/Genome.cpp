@@ -70,11 +70,7 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 		Fin.open(filename.c_str());
 		if (Fin.fail())
 		{
-#ifndef STANDALONE
-			Rf_error("Error in Genome::readFasta: Can not open Fasta file %s\n", filename.c_str());
-#else
-			std::cerr << "Error in Genome::readFasta: Can not open Fasta file " << filename << "\n";
-#endif
+			my_printError("ERROR: Error in Genome::readFasta: Can not open Fasta file %\n", filename);
 		}
 		else
 		{
@@ -147,11 +143,7 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 	} // end try
 	catch(char* pMsg)
 	{
-#ifndef STANDALONE
-		Rf_error("\nException: %s\n", pMsg);
-#else
-		std::cerr << std::endl << "Exception:" << pMsg << std::endl;
-#endif
+		my_printError("\nException: %\n", pMsg);
 	}
 }
 
@@ -162,11 +154,7 @@ void Genome::writeFasta (std::string filename, bool simulated)
 		Fout.open(filename.c_str());
 		if (Fout.fail())
 		{
-#ifndef STANDALONE
-			Rf_error("Error in Genome::writeFasta: Can not open output Fasta file %s\n", filename.c_str());
-#else
-			std::cerr << "Error in Genome::writeFasta: Can not open output Fasta file " << filename << "\n";
-#endif
+			my_printError("Error in Genome::writeFasta: Can not open output Fasta file %\n", filename);
 		}
 		else
 		{
@@ -189,11 +177,7 @@ void Genome::writeFasta (std::string filename, bool simulated)
 	} // end try
 	catch(char* pMsg)
 	{
-#ifndef STANDALONE
-		Rf_error("\nException: %s\n", pMsg);
-#else
-		std::cerr << std::endl << "Exception:" << pMsg << std::endl;
-#endif
+		my_printError("\nException: %\n", pMsg);
 	}
 }
 
@@ -204,11 +188,7 @@ void Genome::readRFPFile(std::string filename)
 	Fin.open(filename.c_str());
 	if (Fin.fail())
 	{
-#ifndef STANDALONE
-			Rf_error("Error in Genome::readRFPFile: Can not open RFP file %s\n", filename.c_str());
-#else
-			std::cerr << "Error in Genome::readRFPFile: Can not open RFP file " << filename << "\n";
-#endif
+			("Error in Genome::readRFPFile: Can not open RFP file %\n", filename);
 	}
 
 	std::string tmp;
@@ -269,11 +249,7 @@ void Genome::writeRFPFile(std::string filename, bool simulated)
 	Fout.open(filename.c_str());
 	if (Fout.fail())
 	{
-#ifndef STANDALONE
-		Rf_error("Error in Genome::writeRFPFile: Can not open output RFP file %s\n", filename.c_str());
-#else
-		std::cerr << "Error in Genome::writeRFPFile: Can not open output RFP file " << filename << "\n";
-#endif
+		my_printError("Error in Genome::writeRFPFile: Can not open output RFP file %\n", filename);
 	}
 
 	Fout << "ORF,RFP_Counts,Codon_Counts,Codon\n";
@@ -311,11 +287,7 @@ void Genome::readPANSEFile(std::string filename, bool Append)
 		std::ifstream Fin;
 		Fin.open(filename.c_str());
 		if (Fin.fail()) {
-#ifndef STANDALONE
-			Rf_error("Error in Genome::readPANSEFile: Can not open PANSE file %s\n", filename.c_str());
-#else
-			std::cerr << "Error in Genome::readPANSEFile: Can not open PANSE file " << filename << "\n";
-#endif
+			my_printError("Error in Genome::readPANSEFile: Can not open PANSE file %\n", filename);
 		}
 		else
 		{
@@ -412,11 +384,7 @@ void Genome::readPANSEFile(std::string filename, bool Append)
 	} // end try
 	catch(char* pMsg)
 	{
-#ifndef STANDALONE
-		Rf_error("\nException: %s\n", pMsg);
-#else
-		std::cerr << std::endl << "Exception:" << pMsg << std::endl;
-#endif
+		my_printError("\nException: %\n", pMsg);
 	}
 }
 
@@ -443,11 +411,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 	input.open(filename);
 	if (input.fail())
 	{
-#ifndef STANDALONE
-		Rf_error("Error in Genome::readObservedPhiValues: Can not open file %s\n", filename.c_str());
-#else
-		std::cerr << "Error in Genome::readObservedPhiValues: Can not open file " << filename << "\n";
-#endif
+		my_printError("Error in Genome::readObservedPhiValues: Can not open file %\n", filename);
 	} //End of opening a file and it resulting in a failure.
 	else
 	{
@@ -455,11 +419,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 
 		if (genes.size() == 0)
 		{
-#ifndef STANDALONE
-			Rf_error("Genome is empty, function will not execute!\n");
-#else
-			std::cerr << "Genome is empty, function will not execute!\n";
-#endif
+			my_printError("Genome is empty, function will not execute!\n");
 		} //end of checking size constraint.
 		else
 		{
@@ -482,11 +442,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 
                     if (it == genomeMapping.end())
 					{
-#ifndef STANDALONE
-                        Rf_warning("Gene %d not found!\n", geneID.c_str());
-#else
-                        std::cerr << "Gene " << geneID << " not found!\n";
-#endif
+                        my_printError("WARNING: Gene % not found!\n", geneID);
                     }
                     else //gene is found
                     {
@@ -516,12 +472,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 							if (dval <=  0 || std::isnan(dval))
 							{
 								dval = -1;
-#ifndef STANDALONE
-								Rf_warning("WARNING! Invalid, negative, or 0 phi value given; values should not be on the log scale. Negative Value stored.");
-#else
-								std::cerr <<
-								"WARNING! Invalid, negative, or 0 phi value given; values should not be on the log scale. Negative Value stored.\n";
-#endif
+								my_printError("WARNING! Invalid, negative, or 0 phi value given; values should not be on the log scale. Negative Value stored.");
 							}
 							it->second->observedSynthesisRateValues.push_back(dval);
 						}
@@ -535,15 +486,9 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 						}
 						else if (it->second->observedSynthesisRateValues.size() != numPhi)
 						{
-#ifndef STANDALONE
-                            Rf_error("Gene %d has a different number of phi values given other genes: \n", geneID.c_str());
-                            Rf_error("Gene %d has %d ", geneID.c_str(), it -> second -> observedSynthesisRateValues.size());
-                            Rf_error(" while others have %d\n. Exiting function.\n", numPhi);
-#else
-							std::cerr << "Gene " << geneID << " has a different number of phi values given than other genes: \n";
-							std::cerr << "Gene " << geneID << " has " << it->second->observedSynthesisRateValues.size();
-							std::cerr << " while others have " << numPhi << ". Exiting function.\n";
-#endif
+                            my_printError("Gene % has a different number of phi values given other genes: \n", geneID);
+                            my_printError("Gene % has % ", geneID, it -> second -> observedSynthesisRateValues.size());
+                            my_printError(" while others have %\n. Exiting function.\n", numPhi);
 							exitfunction = true;
 							for (unsigned a = 0; a < getGenomeSize(); a++) {
 								genes[a].observedSynthesisRateValues.clear();
@@ -562,16 +507,9 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 						Gene *gene = &(getGene(i));
                         if (getGene(i).observedSynthesisRateValues.size() != numPhi)
 						{
-#ifndef STANDALONE
-							Rf_warning("Gene # %d (%s) does not have any phi values. ", i, gene->getId().c_str());
-                            Rf_warning("Please check your file to make sure every gene has a phi value. Filling empty genes ");
-                            Rf_warning("with -1's for calculations.\n");
-#else
-							std::cerr << "Gene # " << i << " (" << gene->getId() <<
-							") does not have any phi values. ";
-							std::cerr << "Please check your file to make sure every gene has a phi value. Filling empty genes ";
-							std::cerr << "with -1's for calculations.\n";
-#endif
+							my_printError("WARNING: Gene # % (%) does not have any phi values. ", i, gene->getId());
+                            my_printError("Please check your file to make sure every gene has a phi value. Filling empty genes ");
+                            my_printError("with -1's for calculations.\n");
                             gene->observedSynthesisRateValues.resize(numPhi, -1);
                         }
 
@@ -594,11 +532,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 				{
 					if (geneIndex >= genes.size())
 					{
-#ifndef STANDALONE
-						Rf_error("GeneIndex exceeds the number of genes in the genome. Exiting function\n");
-#else
-						std::cerr << "GeneIndex exceeds the number of genes in the genome. Exiting function.\n";
-#endif
+						my_printError("GeneIndex exceeds the number of genes in the genome. Exiting function\n");
 						break;
 					}
 
@@ -628,12 +562,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 						//If the value is negative, nan, or 0, we set it to -1 and throw a warning message.
 						if (dval <= 0 || std::isnan(dval)) {
 							dval = -1;
-#ifndef STANDALONE
-							Rf_warning("WARNING! Invalid, negative, or 0 phi value given; values should not be on the log scale. Negative Value stored.");
-#else
-							std::cerr <<
-							"WARNING! Invalid, negative, or 0 phi value given; values should not be on the log scale. Negative Value stored.\n";
-#endif
+							my_printError("WARNING! Invalid, negative, or 0 phi value given; values should not be on the log scale. Negative Value stored.");
 						}
 						genes[geneIndex].observedSynthesisRateValues.push_back(dval);
 					}
@@ -647,15 +576,9 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 					}
 					else if (numPhi != genes[geneIndex].observedSynthesisRateValues.size())
 					{
-#ifndef STANDALONE
-                        Rf_error("Gene %d has a different number of phi values given other genes: \n", geneIndex);
-                        Rf_error("Gene %d has %d ", geneIndex, genes[geneIndex].observedSynthesisRateValues.size());
-                        Rf_error(" while others have %d\n. Exiting function.\n", numPhi);
-#else
-						std::cerr << "Gene " << geneIndex << ": has a different number of phi values given than other genes: \n";
-						std::cerr << "Gene " << geneIndex << " has " << genes[geneIndex].observedSynthesisRateValues.size();
-						std::cerr << " while others have " << numPhi << ". Exiting function.\n";
-#endif
+                        my_printError("Gene % has a different number of phi values given other genes: \n", geneIndex);
+                        my_printError("Gene % has % ", geneIndex, genes[geneIndex].observedSynthesisRateValues.size());
+                        my_printError(" while others have %\n. Exiting function.\n", numPhi);
 						exitfunction = true;
 						for (unsigned a = 0; a < getGenomeSize(); a++)
 						{
@@ -675,17 +598,9 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 						Gene *gene = &(getGene(i));
 						if (getGene(i).observedSynthesisRateValues.size() != numPhi)
 						{
-#ifndef STANDALONE
-                            Rf_warning("Gene # %d (%s) does not have any phi values. ", i, gene->getId().c_str());
-                            Rf_warning("Please check your file to make sure every gene has a phi value. Filling empty genes ");
-                            Rf_warning("with -1's for calculations.\n");
-#else
-							std::cerr << "Gene # " << i << " (" << gene->getId() <<
-							") does not have any phi values. ";
-							std::cerr <<
-							"Please check your file to make sure every gene has a phi value. Filling empty genes ";
-							std::cerr << "with -1's for calculations.\n";
-#endif
+                            my_printError("WARNING: Gene # % (%) does not have any phi values. ", i, gene->getId());
+                            my_printError("Please check your file to make sure every gene has a phi value. Filling empty genes ");
+                            my_printError("with -1's for calculations.\n");
 							gene->observedSynthesisRateValues.resize(numPhi, -1);
 						}
 
