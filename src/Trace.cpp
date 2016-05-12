@@ -43,11 +43,8 @@ Trace::Trace(unsigned _numCodonSpecificParamTypes)
 void Trace::initializeSharedTraces(unsigned samples, unsigned num_genes, unsigned numSelectionCategories, unsigned numMixtures,
 	std::vector<mixtureDefinition> &_categories, unsigned maxGrouping)
 {
-#ifndef STANDALONE
-	Rprintf("maxGrouping: %d\n", maxGrouping);
-#else
-	std::cout << "maxGrouping: " << maxGrouping << "\n";
-#endif
+	my_print("maxGrouping: %\n", maxGrouping);
+
 	//numSelectionCategories always == numSynthesisRateCategories, so only one is passed in for convience
 	
 	initStdDevSynthesisRateTrace(numSelectionCategories, samples);
@@ -802,7 +799,7 @@ bool Trace::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound)
 	}
 	else
 	{
-                Rf_error("Index: %d is out of bounds. Index must be between %d & %d\n", index, lowerbound, upperbound);
+		Rf_error("Index: %d is out of bounds. Index must be between %d & %d\n", index, lowerbound, upperbound);
 	}
 
 	return check;

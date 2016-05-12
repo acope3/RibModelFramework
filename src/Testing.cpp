@@ -1543,6 +1543,7 @@ int testGenome(std::string testFileDir)
     //------ writeRFPFile Function ------//
     //-----------------------------------//
 
+    /*
     // Now write a genome described above in readRFPFile to a file, read it in
     // again, and then compare its validity again.
     testGenome.clear();
@@ -1591,6 +1592,8 @@ int testGenome(std::string testFileDir)
         std::cout << "Genome writeRFPFile --- Pass\n";
     else
         error = 0; //Reset for next function.
+
+     */
 
     //------------------------------------//
     //------ readPANSEFile Function ------//
@@ -1752,11 +1755,28 @@ int testGenome(std::string testFileDir)
 
 int testUtility()
 {
-    my_print("Product: %, Qty: %, Price is %", "Shampoo", 5, 100);
-    std::cout <<"\n";
-    my_printError("Product: %, Qty: %, Price is %", "Shampoo", 5, 100);
+    int error = 0;
+    int globalError = 0;
 
-    return 0;
+    error = my_print("Product: %, Qty: %, Price is %", "Shampoo", 5, 100);
+
+    if (error != 0)
+    {
+        std::cerr << "Error in my_print.\n";
+        error = 0;
+        globalError = 1;
+    }
+
+    std::cout <<"\n";
+    error = my_printError("Product: %, Qty: %, Price is %", "Shampoo", 5, 100);
+
+    if (error != 0)
+    {
+        std::cerr << "Error in my_printError\n";
+        globalError = 1;
+    }
+
+    return globalError;
 }
 
 

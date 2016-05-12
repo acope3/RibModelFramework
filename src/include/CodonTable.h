@@ -7,6 +7,7 @@
 #include <cctype>
 #include <vector>
 #include <array>
+#include "Utility.h"
 
 class CodonTable
 {

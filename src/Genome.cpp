@@ -63,15 +63,11 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 	try
 	{
 		if (!Append)
-		{
 			clear();
-		}
 		std::ifstream Fin;
 		Fin.open(filename.c_str());
 		if (Fin.fail())
-		{
 			my_printError("ERROR: Error in Genome::readFasta: Can not open Fasta file %\n", filename);
-		}
 		else
 		{
 			bool fastaFormat = false;
@@ -153,9 +149,7 @@ void Genome::writeFasta (std::string filename, bool simulated)
 		std::ofstream Fout;
 		Fout.open(filename.c_str());
 		if (Fout.fail())
-		{
 			my_printError("Error in Genome::writeFasta: Can not open output Fasta file %\n", filename);
-		}
 		else
 		{
 			unsigned sized = simulated ? simulatedGenes.size() : genes.size();
@@ -181,15 +175,15 @@ void Genome::writeFasta (std::string filename, bool simulated)
 	}
 }
 
-
+// TODO: Bug with reading in. RFPs and Indices are successfully extracted
+// But are not added to the genome correctly with RFP preserved
+// TODO: Bug found. Setting sequence after setting genedata currently clears gene data.
 void Genome::readRFPFile(std::string filename)
 {
 	std::ifstream Fin;
 	Fin.open(filename.c_str());
 	if (Fin.fail())
-	{
-			("Error in Genome::readRFPFile: Can not open RFP file %\n", filename);
-	}
+		my_printError("Error in Genome::readRFPFile: Can not open RFP file %\n", filename);
 
 	std::string tmp;
 	std::getline(Fin, tmp); //trash the first line
@@ -198,7 +192,7 @@ void Genome::readRFPFile(std::string filename)
 	bool first = true;
 	std::string seq = "";
 
-	while (std::getline(Fin,tmp))
+	while (std::getline(Fin, tmp))
 	{
 		std::size_t pos = tmp.find(",");
 		std::string ID = tmp.substr(0, pos);
@@ -213,7 +207,7 @@ void Genome::readRFPFile(std::string filename)
 			tmpGene.setId(prevID);
 			tmpGene.setDescription("No description for RFP Model");
 			tmpGene.setSequence(seq);
-			addGene(tmpGene); //add to genome
+			addGene(tmpGene, false); //add to genome
 			tmpGene.clear();
 			seq = "";
 		}
@@ -231,13 +225,14 @@ void Genome::readRFPFile(std::string filename)
 		prevID = ID;
 		unsigned index = SequenceSummary::codonToIndex(codon);
 		tmpGene.geneData.setRFPObserved(index, tmpRFP);
+		//std::cerr<< "This set RFP is " << tmpGene.geneData.getRFPObserved(index) << " at index "<< index << "\n";
 	}
 
 	tmpGene.setId(prevID);
 	tmpGene.setDescription("No description for RFP Model");
 	tmpGene.setSequence(seq);
 
-	addGene(tmpGene); //add to genome
+	addGene(tmpGene, false); //add to genome
 
 	Fin.close();
 }
@@ -248,9 +243,7 @@ void Genome::writeRFPFile(std::string filename, bool simulated)
 	std::ofstream Fout;
 	Fout.open(filename.c_str());
 	if (Fout.fail())
-	{
 		my_printError("Error in Genome::writeRFPFile: Can not open output RFP file %\n", filename);
-	}
 
 	Fout << "ORF,RFP_Counts,Codon_Counts,Codon\n";
 	unsigned sized = simulated ? simulatedGenes.size() : genes.size();
@@ -259,7 +252,8 @@ void Genome::writeRFPFile(std::string filename, bool simulated)
 	{
 		Gene *currentGene = simulated ? &simulatedGenes[geneIndex] : &genes[geneIndex];
 
-		for (unsigned codonIndex = 0; codonIndex < 64; codonIndex++) {
+		for (unsigned codonIndex = 0; codonIndex < 64; codonIndex++)
+		{
 			std::string codon = SequenceSummary::codonArray[codonIndex];
 
 			Fout << currentGene->getId() << ",";
@@ -281,14 +275,11 @@ void Genome::readPANSEFile(std::string filename, bool Append)
 {
 	try {
 		if (!Append)
-		{
 			clear();
-		}
 		std::ifstream Fin;
 		Fin.open(filename.c_str());
-		if (Fin.fail()) {
+		if (Fin.fail())
 			my_printError("Error in Genome::readPANSEFile: Can not open PANSE file %\n", filename);
-		}
 		else
 		{
 			std::string tmp;
@@ -343,7 +334,7 @@ void Genome::readPANSEFile(std::string filename, bool Append)
 					tmpGene.setDescription("No description for PANSE Model");
 					tmpGene.setSequence(seq);
 					tmpGene.addRFP_count(RFP_counts);
-					addGene(tmpGene); //add to genome
+					addGene(tmpGene, false); //add to genome
 					tmpGene.clear();
 					seq = "";
 
@@ -378,7 +369,7 @@ void Genome::readPANSEFile(std::string filename, bool Append)
 			tmpGene.setSequence(seq);
 			tmpGene.addRFP_count(RFP_counts);
 
-			addGene(tmpGene); //add to genome
+			addGene(tmpGene, false); //add to genome
 		} // end else
 		Fin.close();
 	} // end try
@@ -410,17 +401,13 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 
 	input.open(filename);
 	if (input.fail())
-	{
 		my_printError("Error in Genome::readObservedPhiValues: Can not open file %\n", filename);
-	} //End of opening a file and it resulting in a failure.
 	else
 	{
 		std::getline(input, tmp); //Trash the header line
 
 		if (genes.size() == 0)
-		{
 			my_printError("Genome is empty, function will not execute!\n");
-		} //end of checking size constraint.
 		else
 		{
 			if (byId)
@@ -441,9 +428,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
                     it = genomeMapping.find(geneID);
 
                     if (it == genomeMapping.end())
-					{
                         my_printError("WARNING: Gene % not found!\n", geneID);
-                    }
                     else //gene is found
                     {
                         std::string val = "";
@@ -472,7 +457,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 							if (dval <=  0 || std::isnan(dval))
 							{
 								dval = -1;
-								my_printError("WARNING! Invalid, negative, or 0 phi value given; values should not be on the log scale. Negative Value stored.");
+								my_printError("WARNING! Invalid, negative, or 0 phi value given; values should not be on the log scale. Negative Value stored.\n");
 							}
 							it->second->observedSynthesisRateValues.push_back(dval);
 						}
@@ -488,7 +473,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 						{
                             my_printError("Gene % has a different number of phi values given other genes: \n", geneID);
                             my_printError("Gene % has % ", geneID, it -> second -> observedSynthesisRateValues.size());
-                            my_printError(" while others have %\n. Exiting function.\n", numPhi);
+                            my_printError("while others have %. Exiting function.\n", numPhi);
 							exitfunction = true;
 							for (unsigned a = 0; a < getGenomeSize(); a++) {
 								genes[a].observedSynthesisRateValues.clear();
@@ -532,7 +517,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 				{
 					if (geneIndex >= genes.size())
 					{
-						my_printError("GeneIndex exceeds the number of genes in the genome. Exiting function\n");
+						my_printError("GeneIndex exceeds the number of genes in the genome. Exiting function.\n");
 						break;
 					}
 
@@ -560,9 +545,10 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 						dval = std::atof(val.c_str());
 
 						//If the value is negative, nan, or 0, we set it to -1 and throw a warning message.
-						if (dval <= 0 || std::isnan(dval)) {
+						if (dval <= 0 || std::isnan(dval))
+						{
 							dval = -1;
-							my_printError("WARNING! Invalid, negative, or 0 phi value given; values should not be on the log scale. Negative Value stored.");
+							my_printError("WARNING! Invalid, negative, or 0 phi value given; values should not be on the log scale. Negative Value stored.\n");
 						}
 						genes[geneIndex].observedSynthesisRateValues.push_back(dval);
 					}
@@ -578,7 +564,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 					{
                         my_printError("Gene % has a different number of phi values given other genes: \n", geneIndex);
                         my_printError("Gene % has % ", geneIndex, genes[geneIndex].observedSynthesisRateValues.size());
-                        my_printError(" while others have %\n. Exiting function.\n", numPhi);
+                        my_printError("while others have %. Exiting function.\n", numPhi);
 						exitfunction = true;
 						for (unsigned a = 0; a < getGenomeSize(); a++)
 						{
@@ -695,9 +681,7 @@ Genome Genome::getGenomeForGeneIndicies(std::vector <unsigned> indicies, bool si
 	Genome genome;
 
 	for (unsigned i = 0; i < indicies.size(); i++)
-	{
 		simulated ? genome.addGene(simulatedGenes[indicies[i]], true) : genome.addGene(genes[indicies[i]], false);
-	}
 
 	return genome;
 }
@@ -707,7 +691,7 @@ std::vector<unsigned> Genome::getCodonCountsPerGene(std::string codon)
 {
 	std::vector<unsigned> codonCounts(genes.size());
 	unsigned codonIndex = SequenceSummary::codonToIndex(codon);
-	for(unsigned i = 0u; i < genes.size(); i++)
+	for (unsigned i = 0u; i < genes.size(); i++)
 	{
 		Gene gene = genes[i];
 		SequenceSummary *seqsum = gene.getSequenceSummary();

@@ -31,13 +31,9 @@ Gene::Gene(std::string _seq, std::string _id, std::string _desc) : seq(_seq), id
 {
     //cleanSeq();
 	if (seq.length() % 3 == 0)
-	{
 		geneData.processSequence(_seq);
-	}
-	else 
-	{
+	else
 		my_printError("WARNING: Gene: % has sequence length NOT multiple of 3 after cleaning of the sequence!\nGene data is NOT processed!\nValid characters are A,C,T,G, and N \n", id);
-	}
 }
 
 
@@ -118,9 +114,8 @@ void Gene::cleanSeq()
 {
     std::string valid = "ACGTN";
     for (unsigned i = 0; i < seq.length(); i++) {
-        if (valid.find(seq[i]) == std::string::npos) {
+        if (valid.find(seq[i]) == std::string::npos)
             seq.erase(i);
-        }
     }
 }
 
@@ -180,6 +175,7 @@ std::string Gene::getSequence()
 //NOTE: As part of changing the sequence, the sequence summary is also cleared.
 void Gene::setSequence(std::string _seq)
 {
+    // TODO: Solve bug! Causes error with readRFP, which holds geneData BEFORE setting sequence
     geneData.clear();
     std::transform(_seq.begin(), _seq.end(), _seq.begin(), ::toupper);
     seq = _seq;
@@ -188,14 +184,10 @@ void Gene::setSequence(std::string _seq)
 	{
 		bool check = geneData.processSequence(seq);
 		if (!check)
-		{
 			my_printError("WARNING: Error with gene %\nBad codons found!\n", id);
-		}
 	}
 	else
-	{
 		my_printError("WARNING: Gene: % has sequence length NOT multiple of 3 after cleaning of the sequence!\nGene data is NOT processed!\nValid characters are A,C,T,G, and N \n", id);
-	}
 }
 
 

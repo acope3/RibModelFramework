@@ -2,7 +2,6 @@
 #define COVARIANCEMATRIX_H
 
 #include <vector>
-#include <iostream>
 #include <cmath>
 
 #ifndef STANDALONE

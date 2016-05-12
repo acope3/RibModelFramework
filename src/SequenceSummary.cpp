@@ -72,21 +72,17 @@ SequenceSummary::SequenceSummary(const std::string& sequence)
 SequenceSummary::SequenceSummary(const SequenceSummary& other)
 {
 	codonPositions.resize(other.codonPositions.size());
-	for (unsigned i = 0u; i < codonPositions.size(); i++) {
+	for (unsigned i = 0u; i < codonPositions.size(); i++)
 		codonPositions[i] = other.codonPositions[i];
-	}
 
-	for (unsigned i = 0u; i < 64; i++) {
+	for (unsigned i = 0u; i < 64; i++)
 		ncodons[i] = other.ncodons[i];
-	}
 
-	for (unsigned i = 0u; i < 22; i++) {
+	for (unsigned i = 0u; i < 22; i++)
 		naa[i] = other.naa[i];
-	}
 
-	for (unsigned i = 0u; i < 64; i++) {
+	for (unsigned i = 0u; i < 64; i++)
 		RFPObserved[i] = other.RFPObserved[i];
-	}
 }
 
 
@@ -96,18 +92,17 @@ SequenceSummary& SequenceSummary::operator=(const SequenceSummary& rhs)
 
 	// TODO(CEDRIC): shouldn't a simple = do the job? see http://www.cplusplus.com/reference/vector/vector/operator=/
 	codonPositions.resize(rhs.codonPositions.size());
-	for (unsigned i = 0u; i < codonPositions.size(); i++) {
+	for (unsigned i = 0u; i < codonPositions.size(); i++)
 		codonPositions[i] = rhs.codonPositions[i];
-	}
 
-	for (unsigned i = 0u; i < 64; i++) {
+	for (unsigned i = 0u; i < 64; i++)
+	{
 		ncodons[i] = rhs.ncodons[i];
 		RFPObserved[i] = rhs.RFPObserved[i];
 	}
 
-	for (unsigned i = 0u; i < 22; i++) {
+	for (unsigned i = 0u; i < 22; i++)
 		naa[i] = rhs.naa[i];
-	}
 
 	RFP_count = rhs.RFP_count;
 
@@ -217,12 +212,12 @@ void SequenceSummary::clear()
 {
 	codonPositions.clear();
 	RFP_count.clear();
-	for(unsigned k = 0; k < 64; k++)
+	for (unsigned k = 0; k < 64; k++)
 	{
 		ncodons[k] = 0;
 		RFPObserved[k] = 0;
 	}
-	for(unsigned k = 0; k < 22; k++) { naa[k] = 0; }
+	for (unsigned k = 0; k < 22; k++) { naa[k] = 0; }
 }
 
 bool SequenceSummary::processSequence(const std::string& sequence)
@@ -400,12 +395,15 @@ std::vector<std::string> SequenceSummary::AAToCodon(std::string aa, bool forPara
 	unsigned aaStart;
 	unsigned aaEnd;
 	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, forParamVector);
-	if(forParamVector){
+	if (forParamVector)
+	{
 		for (unsigned i = aaStart; i < aaEnd; i++)
 		{
 			RV.push_back(codonArrayParameter[i]);
 		}
-	}else{
+	}
+	else
+	{
 		for (unsigned i = aaStart; i < aaEnd; i++)
 		{
 			RV.push_back(codonArray[i]);
@@ -496,12 +494,10 @@ unsigned SequenceSummary::codonToIndex(std::string& codon, bool forParamVector)
 	}
 	else 
 	{
-		if(forParamVector)
-		{
+		if (forParamVector)
 			i = SequenceSummary::codonToIndexWithoutReference.find(codon) -> second;
-		}else{
+		else
 			i = SequenceSummary::codonToIndexWithReference.find(codon) -> second;
-		}
 	}
 	return i;
 }

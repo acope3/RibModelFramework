@@ -103,7 +103,7 @@ void CovarianceMatrix::initCovarianceMatrix(unsigned _numVariates)
     choleskiMatrix.resize(vectorLength);
 
 	double diag_const = 0.01 / (double)numVariates;
-    for(unsigned i = 0u; i < vectorLength; i++)
+    for (unsigned i = 0u; i < vectorLength; i++)
     {
         covMatrix[i] = (i % (numVariates + 1) ? 0.0 : diag_const);
         choleskiMatrix[i] = 0.0;
@@ -118,16 +118,16 @@ void CovarianceMatrix::setDiag(double val)
 	}
 }
 
-// addaptatoin of http://en.wikipedia.org/wiki/Cholesky_decomposition
+// adaptation of http://en.wikipedia.org/wiki/Cholesky_decomposition
 // http://rosettacode.org/wiki/Cholesky_decomposition#C
 void CovarianceMatrix::choleskiDecomposition()
 {
-    for(int i = 0; i < numVariates; i++)
+    for (int i = 0; i < numVariates; i++)
     {
-        for(int j = 0; j < (i + 1); j++)
+        for (int j = 0; j < (i + 1); j++)
         {
             double LsubstractSum = 0.0;
-            for(int k = 0; k < j; k++)
+            for (int k = 0; k < j; k++)
             {
                 LsubstractSum += choleskiMatrix[i * numVariates + k] * choleskiMatrix[j * numVariates + k];
             }
@@ -141,55 +141,27 @@ void CovarianceMatrix::choleskiDecomposition()
 void CovarianceMatrix::printCovarianceMatrix()
 {
 
-    for(int i = 0; i < numVariates * numVariates; i++)
+    for (int i = 0; i < numVariates * numVariates; i++)
     {
         if (i % numVariates == 0 && i != 0)
-        {
-#ifndef STANDALONE
-        	Rprintf("\n");
-#else
-            std::cout << std::endl;
-#endif
-        }
-#ifndef STANDALONE
-		Rprintf("%f\t", covMatrix[i]);
-#else
-        std::cout << covMatrix[i] << "\t";
-#endif
+            my_print("\n");
+        my_print("%\t", covMatrix[i]);
     }
-#ifndef STANDALONE
-		Rprintf("\n");
-#else
-    std::cout << std::endl;
-#endif
 
-
+    my_print("\n");
 }
 
 
 void CovarianceMatrix::printCholeskiMatrix()
 {
-    for(int i = 0; i < numVariates * numVariates; i++)
+    for (int i = 0; i < numVariates * numVariates; i++)
     {
         if (i % numVariates == 0 && i != 0)
-        {
-#ifndef STANDALONE
-        	Rprintf("\n");
-#else
-            std::cout << std::endl;
-#endif
-        }
-#ifndef STANDALONE
-		Rprintf("%f\t", choleskiMatrix[i]);
-#else
-        std::cout << choleskiMatrix[i] << "\t";
-#endif
+            my_print("\n");
+        my_print("%\t", choleskiMatrix[i]);
     }
-#ifndef STANDALONE
-		Rprintf("\n");
-#else
-    std::cout << std::endl;
-#endif
+
+    my_print("\n");
 }
 
 
@@ -209,7 +181,7 @@ int CovarianceMatrix::getNumVariates()
 std::vector<double> CovarianceMatrix::transformIidNumersIntoCovaryingNumbers(std::vector <double> iidnumbers)
 {
     std::vector<double> covnumbers;
-    for(int i = 0; i < numVariates; i++)
+    for (int i = 0; i < numVariates; i++)
     {
         double sum = 0.0;
         for (int k = 0; k < numVariates; k++)

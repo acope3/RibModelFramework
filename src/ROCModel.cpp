@@ -26,7 +26,7 @@ double ROCModel::calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codo
 	calculateCodonProbabilityVector(numCodons, mutation, selection, phiValue, codonProbabilities);
 
 	// calculate likelihood for current AA for this combination of selection and mutation category
-	for(unsigned i = 0; i < numCodons; i++)
+	for (unsigned i = 0; i < numCodons; i++)
 	{
 		if (codonCount[i] == 0) continue;
 		logLikelihood += std::log(codonProbabilities[i]) * codonCount[i];
@@ -44,13 +44,11 @@ double ROCModel::calculateMutationPrior(std::string grouping, bool proposed)
 
 	unsigned numMutCat = parameter->getNumMutationCategories();
 	double mutation_prior_sd = parameter->getMutationPriorStandardDeviation();
-	for(unsigned i = 0u; i < numMutCat; i++)
+	for (unsigned i = 0u; i < numMutCat; i++)
 	{
 		parameter->getParameterForCategory(i, ROCParameter::dM, grouping, proposed, mutation);
-		for(unsigned k = 0u; k < numCodons; k++)
-		{
+		for (unsigned k = 0u; k < numCodons; k++)
 			priorValue += Parameter::densityNorm(mutation[k], 0.0, mutation_prior_sd, true);
-		}
 	}
 	return priorValue;
 }
@@ -63,10 +61,8 @@ void ROCModel::obtainCodonCount(SequenceSummary *seqsum, std::string curAA, int 
 	SequenceSummary::AAToCodonRange(curAA, aaStart, aaEnd, false);
 	// get codon counts for AA
 	unsigned j = 0u;
-	for(unsigned i = aaStart; i < aaEnd; i++, j++)
-	{
+	for (unsigned i = aaStart; i < aaEnd; i++, j++)
 		codonCount[j] = seqsum->getCodonCountForCodon(i);
-	}
 }
 
 
@@ -99,12 +95,12 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 #ifndef __APPLE__
 #pragma omp parallel for private(mutation, selection, codonCount) reduction(+:logLikelihood,logLikelihood_proposed)
 #endif
-	for(int i = 0; i < getGroupListSize(); i++)
+	for (int i = 0; i < getGroupListSize(); i++)
 	{
 		std::string curAA = getGrouping(i);
 
 		// skip amino acids which do not occur in current gene. Avoid useless calculations and multiplying by 0
-		if(seqsum->getAACountForAA(i) == 0) continue;
+		if (seqsum->getAACountForAA(i) == 0) continue;
 
 		// get number of codons for AA (total number not parameter->count)
 		unsigned numCodons = seqsum->GetNumCodonsForAA(curAA);
@@ -125,10 +121,13 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 	double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, mPhi, stdDevSynthesisRate, true);
 
 	// TODO: make this work for more than one phi value, or for genes that don't have phi values
-	if (withPhi) {
-		for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++) {
+	if (withPhi)
+	{
+		for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++)
+		{
 			double obsPhi = gene.getObservedSynthesisRate(i);
-			if (obsPhi > -1.0) {
+			if (obsPhi > -1.0)
+			{
 				logPhiProbability += Parameter::densityLogNorm(obsPhi, std::log(phiValue) + getNoiseOffset(i), getObservedSynthesisNoise(i), true);
 				logPhiProbability_proposed += Parameter::densityLogNorm(obsPhi, std::log(phiValue_proposed) + getNoiseOffset(i), getObservedSynthesisNoise(i), true);
 			}
@@ -166,7 +165,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 #ifndef __APPLE__
 #pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed, codonCount, gene, seqsum) reduction(+:likelihood,likelihood_proposed)
 #endif
-	for(int i = 0; i < numGenes; i++)
+	for (int i = 0; i < numGenes; i++)
 	{
 		gene = &genome.getGene(i);
 		seqsum = gene->getSequenceSummary();
@@ -210,7 +209,7 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 	std::vector<double> proposedMphi(selectionCategory, 0.0);
 
 
-	for(unsigned i = 0u; i < selectionCategory; i++)
+	for (unsigned i = 0u; i < selectionCategory; i++)
 	{
 		currentStdDevSynthesisRate[i] = getStdDevSynthesisRate(i, false);
 		currentMphi[i] = -((currentStdDevSynthesisRate[i] * currentStdDevSynthesisRate[i]) * 0.5);
@@ -220,13 +219,14 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 		lpr -= (std::log(currentStdDevSynthesisRate[i]) - std::log(proposedStdDevSynthesisRate[i]));
 	}
 
-	if (withPhi) {
+	if (withPhi)
+	{
 		// one for each noiseOffset, and one for stdDevSynthesisRate
-		logProbabilityRatio.resize(getNumPhiGroupings()+1);
+		logProbabilityRatio.resize(getNumPhiGroupings() + 1);
 	}
-	else {
+	else
 		logProbabilityRatio.resize(1);
-	}
+
 #ifndef __APPLE__
 //#pragma omp parallel for reduction(+:lpr)
 #endif
@@ -236,13 +236,8 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 		mixture = getSynthesisRateCategory(mixture);
 		double phi = getSynthesisRate(i, mixture, false);
 		if (!std::isfinite(phi))
-		{
-#ifndef STANDALONE
-			Rf_error("Phi value for gene %d is not finite (%f)!", i, phi);
-#else
-			std::cerr << "phi " << i << " not finite! " << phi << "\n";
-#endif
-		}
+			my_printError("Error: Phi value for gene % is not finite (%)!", i, phi);
+
 		lpr += Parameter::densityLogNorm(phi, proposedMphi[mixture], proposedStdDevSynthesisRate[mixture], true)
 			   - Parameter::densityLogNorm(phi, currentMphi[mixture], currentStdDevSynthesisRate[mixture], true);
 	}
@@ -252,7 +247,8 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 
 	if (withPhi)
 	{
-		for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++) {
+		for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++)
+		{
 			lpr = 0.0;
 			double noiseOffset = getNoiseOffset(i, false);
 			double noiseOffset_proposed = getNoiseOffset(i, true);
@@ -260,12 +256,14 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 #ifndef __APPLE__
 //#pragma omp parallel for reduction(+:lpr)
 #endif
-			for (int j = 0; j < genome.getGenomeSize(); j++) {
+			for (int j = 0; j < genome.getGenomeSize(); j++)
+			{
 				unsigned mixtureAssignment = getMixtureAssignment(j);
 				mixtureAssignment = getSynthesisRateCategory(mixtureAssignment);
 				double logphi = std::log(getSynthesisRate(j, mixtureAssignment, false));
 				double obsPhi = genome.getGene(j).getObservedSynthesisRate(i);
-				if (obsPhi > -1.0) {
+				if (obsPhi > -1.0)
+				{
 					double logobsPhi = std::log(obsPhi);
 					double proposed = Parameter::densityNorm(logobsPhi, logphi + noiseOffset_proposed, observedSynthesisNoise, true);
 					double current = Parameter::densityNorm(logobsPhi, logphi + noiseOffset, observedSynthesisNoise, true);
@@ -464,7 +462,8 @@ void ROCModel::updateCodonSpecificParameterTrace(unsigned sample, std::string gr
 void ROCModel::updateHyperParameterTraces(unsigned sample)
 {
 	updateStdDevSynthesisRateTrace(sample);
-	for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++) {
+	for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++)
+	{
 		updateNoiseOffsetTrace(i, sample);
 		updateObservedSynthesisNoiseTrace(i, sample);
 	}
@@ -482,9 +481,7 @@ void ROCModel::updateTracesWithInitialValues(Genome &genome)
 	}
 
 	for (unsigned i = 0; i < groupList.size(); i++)
-	{
 		parameter->updateCodonSpecificParameterTrace(0, getGrouping(i));
-	}
 }
 
 
@@ -517,9 +514,8 @@ void ROCModel::adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, 
 void ROCModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth, bool adapt)
 {
 	adaptStdDevSynthesisRateProposalWidth(adaptiveWidth, adapt);
-	if (withPhi) {
+	if (withPhi)
 		adaptNoiseOffsetProposalWidth(adaptiveWidth, adapt);
-	}
 }
 
 
@@ -540,9 +536,8 @@ void ROCModel::proposeCodonSpecificParameter()
 void ROCModel::proposeHyperParameters()
 {
 	parameter->proposeStdDevSynthesisRate();
-	if (withPhi) {
+	if (withPhi)
 		parameter->proposeNoiseOffset();
-	}
 }
 
 
@@ -603,16 +598,20 @@ void ROCModel::updateCodonSpecificParameter(std::string grouping)
 void ROCModel::updateGibbsSampledHyperParameters(Genome &genome)
 {
 	// TODO: Fix this for any numbers of phi values
-	if (withPhi) {
+	if (withPhi)
+	{
 		double shape = ((double)genome.getGenomeSize() - 1.0) / 2.0;
-		for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++) {
+		for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++)
+		{
 			double rate = 0.0;
 			unsigned mixtureAssignment;
 			double noiseOffset = getNoiseOffset(i);
-			for (unsigned j = 0; j < genome.getGenomeSize(); j++) {
+			for (unsigned j = 0; j < genome.getGenomeSize(); j++)
+			{
 				mixtureAssignment = getMixtureAssignment(j);
 				double obsPhi = genome.getGene(j).getObservedSynthesisRate(i);
-				if (obsPhi > -1.0) {
+				if (obsPhi > -1.0)
+				{
 					double sum = std::log(obsPhi) - noiseOffset - std::log(getSynthesisRate(j, mixtureAssignment, false));
 					//double sum = std::log(obsPhi) - std::log(getSynthesisRate(j, mixtureAssignment, false));
 					rate += sum * sum;
@@ -629,20 +628,17 @@ void ROCModel::updateGibbsSampledHyperParameters(Genome &genome)
 void ROCModel::updateAllHyperParameter()
 {
 	updateStdDevSynthesisRate();
-	for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++) {
+	for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++)
 		updateNoiseOffset(i);
-	}
 }
 
 
 void ROCModel::updateHyperParameter(unsigned hp)
 {
-	if (hp == 0) {
+	if (hp == 0)
 		updateStdDevSynthesisRate();
-	}
-	else {
+	else
 		updateNoiseOffset(hp - 1);
-	}
 }
 
 
@@ -681,9 +677,7 @@ void ROCModel::simulateGenome(Genome &genome)
 
 
 			if (aa == "M" || aa == "W")
-			{
 				codonProb[0] = 1;
-			}
 			else
 			{
 				getParameterForCategory(mutationCategory, ROCParameter::dM, aa, false, mutation);
@@ -709,65 +703,29 @@ void ROCModel::simulateGenome(Genome &genome)
 
 void ROCModel::printHyperParameters()
 {
-	for(unsigned i = 0u; i < getNumSynthesisRateCategories(); i++)
+	for (unsigned i = 0u; i < getNumSynthesisRateCategories(); i++)
+		my_print("Current stdDevSynthesisRate estimate for selection category %: %\n", i, getStdDevSynthesisRate(i, false));
+
+	my_print("\t current stdDevSynthesisRate proposal width: %\n", getCurrentStdDevSynthesisRateProposalWidth());
+
+	if (withPhi)
 	{
-#ifndef STANDALONE
-		Rprintf("Current stdDevSynthesisRate estimate for selection category %d: %f\n", i, getStdDevSynthesisRate(i, false));
-#else
-		std::cout << "Current stdDevSynthesisRate estimate for selection category " << i << ": " << getStdDevSynthesisRate(i, false) << std::endl;
-#endif
-	}
-#ifndef STANDALONE
-	Rprintf("\t current stdDevSynthesisRate proposal width: %f\n", getCurrentStdDevSynthesisRateProposalWidth());
-#else
-	std::cout << "\t current stdDevSynthesisRate proposal width: " << getCurrentStdDevSynthesisRateProposalWidth() << std::endl;
-#endif
-	if(withPhi)
-	{
-#ifndef STANDALONE
-	Rprintf("\t current noiseOffset estimates:");
-#else
-		std::cout << "\t current noiseOffset estimates:";
-#endif
+		my_print("\t current noiseOffset estimates:");
+
 		for (unsigned i = 0; i < getNumPhiGroupings(); i++)
-		{
-#ifndef STANDALONE
-			Rprintf(" %f", getNoiseOffset(i, false));
-#else
-			std::cout << " " << getNoiseOffset(i, false);
-#endif
-		}
-#ifndef STANDALONE
-		Rprintf("\n\t current noiseOffset proposal widths:");
-#else
-		std::cout << "\n\t current noiseOffset proposal widths:";
-#endif
+			my_print(" f", getNoiseOffset(i, false));
+
+		my_print("\n\t current noiseOffset proposal widths:");
+
 		for (unsigned i = 0; i < getNumPhiGroupings(); i++)
-		{
-#ifndef STANDALONE
-			Rprintf(" %f", getCurrentNoiseOffsetProposalWidth(i));
-#else
-			std::cout << " " << getCurrentNoiseOffsetProposalWidth(i);
-#endif
-		}
-#ifndef STANDALONE
-		Rprintf("\n\t current observedSynthesisNoise estimates:");
-#else
-		std::cout << "\n\t current observedSynthesisNoise estimates:";
-#endif
+			my_print(" %", getCurrentNoiseOffsetProposalWidth(i));
+
+		my_print("\n\t current observedSynthesisNoise estimates:");
+
 		for (unsigned i = 0; i < getNumPhiGroupings(); i++)
-		{
-#ifndef STANDALONE
-			Rprintf(" %f", getObservedSynthesisNoise(i));
-#else
-			std::cout << " " << getObservedSynthesisNoise(i);
-#endif
-		}
-#ifndef STANDALONE
-		Rprintf("\n");
-#else
-		std::cout << std::endl;
-#endif
+			my_print(" %", getObservedSynthesisNoise(i));
+
+		my_print("\n");
 	}
 }
 
@@ -783,7 +741,7 @@ double ROCModel::calculateAllPriors()
 	double prior = 0.0;
 	unsigned size = getGroupListSize();
 
-	for(unsigned i = 0; i < size; i++)
+	for (unsigned i = 0; i < size; i++)
 	{
 		std::string grouping = getGrouping(i);
 		prior += calculateMutationPrior(grouping, false);
@@ -803,19 +761,17 @@ void ROCModel::calculateCodonProbabilityVector(unsigned numCodons, double mutati
 	for (unsigned i = 1u; i < (numCodons - 1); i++)
 	{
 		if (selection[minIndexVal] > selection[i])
-		{
 			minIndexVal = i;
-		}
 	}
 
 	// if the min(selection) is less than zero than we have to adjust the reference codon.
 	// if the reference codon is the min value (0) than we do not have to adjust the reference codon.
 	// This is necessary to deal with very large phi values (> 10^4) and avoid producing Inf which then
 	// causes the denominator to be Inf (Inf / Inf = NaN).
-	if(selection[minIndexVal] < 0.0)
+	if (selection[minIndexVal] < 0.0)
 	{
 		denominator = 0.0;
-		for(unsigned i = 0u; i < (numCodons - 1); i++)
+		for (unsigned i = 0u; i < (numCodons - 1); i++)
 		{
 			codonProb[i] = std::exp( -(mutation[i] - mutation[minIndexVal]) - ((selection[i] - selection[minIndexVal]) * phi) );
 			//codonProb[i] = std::exp( -mutation[i] - (selection[i] * phi) );
@@ -824,9 +780,11 @@ void ROCModel::calculateCodonProbabilityVector(unsigned numCodons, double mutati
 		// alphabetically last codon is reference codon!
 		codonProb[numCodons - 1] = std::exp(mutation[minIndexVal] + selection[minIndexVal] * phi);
 		denominator += codonProb[numCodons - 1];
-	}else{
+	}
+	else
+	{
 		denominator = 1.0;
-		for(unsigned i = 0u; i < (numCodons - 1); i++)
+		for (unsigned i = 0u; i < (numCodons - 1); i++)
 		{
 			codonProb[i] = std::exp( -mutation[i] - (selection[i] * phi) );
 			denominator += codonProb[i];
@@ -837,10 +795,8 @@ void ROCModel::calculateCodonProbabilityVector(unsigned numCodons, double mutati
 
 	denominator = 1 / denominator; // Multiplication is faster than devition: replace multiple divisions below by one up here.
 	// normalize codon probabilities
-	for(unsigned i = 0u; i < numCodons; i++)
-	{
+	for (unsigned i = 0u; i < numCodons; i++)
 		codonProb[i] = codonProb[i] * denominator; // denominator is 1/denominator. see above
-	}
 }
 
 
