@@ -28,10 +28,11 @@ using namespace Rcpp;
 //--------------------------------------------------//
 
 
-//MCMCAlgorithm constructor (RCPP EXPOSED)
-//Arguments: None
-//Sets up the object with the specified default values. Every step is a sample in
-//this case, so every iteration trace values will be stored. All parameters are estimated.
+/*MCMCAlgorithm constructor (RCPP EXPOSED)
+* Arguments: None
+* Sets up the object with the specified default values. Every step is a sample in
+* this case, so every iteration trace values will be stored. All parameters are estimated.
+*/
 MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * thining), estimateSynthesisRate(true),
 	estimateCodonSpecificParameter(true), estimateHyperParameter(true)
 {
@@ -45,11 +46,12 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * 
 	stepsToAdapt = -1;
 }
 
-//MCMCAlgorithm constructor (RCPP EXPOSED)
-//Arguments: number of samples wanted, thining of iterations to get samples, how many iterations adaptive witdth
-//can be changed, bool for where the synthesis rate, codon specific, and hyper paramters are estimated (respectively)
-//Sets up the object with the given parameters. Adaptive with is actually set to adaptive width * thining. NOTE:
-//hyper parameters normally affect synthesis rate parameters, so either both should be turned on or neither.
+/* MCMCAlgorithm constructor (RCPP EXPOSED)
+* Arguments: number of samples wanted, thining of iterations to get samples, how many iterations adaptive witdth
+* can be changed, bool for where the synthesis rate, codon specific, and hyper paramters are estimated (respectively)
+* Sets up the object with the given parameters. Adaptive with is actually set to adaptive width * thining. NOTE:
+* hyper parameters normally affect synthesis rate parameters, so either both should be turned on or neither.
+*/
 MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thining, unsigned _adaptiveWidth, bool _estimateSynthesisRate,
 							 bool _estimateCodonSpecificParameter, bool _estimateHyperParameter) : samples(_samples),
 							 thining(_thining), adaptiveWidth(_adaptiveWidth * thining),
@@ -67,9 +69,10 @@ MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thining, unsigned _ada
 }
 
 
-//MCMCAlgorithm destructor (NOT EXPOSED)
-//Arguments: None
-//Standard destructor for the object.
+/* MCMCAlgorithm destructor (NOT EXPOSED)
+* Arguments: None
+* Standard destructor for the object.
+*/
 MCMCAlgorithm::~MCMCAlgorithm()
 {
 	//dtor
@@ -83,11 +86,12 @@ MCMCAlgorithm::~MCMCAlgorithm()
 //---------- Acceptance Rejection Functions ----------//
 //----------------------------------------------------//
 
-//acceptRejectSynthesisRateLevelForAllGenes
-//Arguments: reference to a genome and a model. which iteration (step) is currently being estimated
-//Based on the logliklihood probabilities proposed for a gene (with and without reverse jump), it is decided
-//whether or not a synthesis rate is accepted for that gene or not. Mixture assignment is also updated when
-//applicable.
+/* acceptRejectSynthesisRateLevelForAllGenes (NOT EXPOSED)
+* Arguments: reference to a genome and a model. which iteration (step) is currently being estimated
+* Based on the logliklihood probabilities proposed for a gene (with and without reverse jump), it is decided
+* whether or not a synthesis rate is accepted for that gene or not. Mixture assignment is also updated when
+* applicable.
+*/
 double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, Model& model, int iteration)
 {
     //FILE * pFile;
@@ -260,7 +264,12 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	return logLikelihood;
 }
 
-
+/* acceptRejectCodonSpecificParameter (NOT EXPOSED)
+ * Arguments: reference to a genome and a model. which iteration (step) is currently being estimated
+ * Calculates the logLikelihood for each grouping based on codon specific parameters. If this is greater
+ * than a random number from the exponential distribution we update the parameters from proposed to
+ * current. Update the trace when applicable.
+*/
 void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& model, int iteration)
 {
 	double acceptanceRatioForAllMixtures = 0.0;
@@ -284,7 +293,11 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 	}
 }
 
-
+/* acceptRejectHyperParameter (NOT EXPOSED)
+ * Arguments: reference to a genome and a model. which iteration (step) is currently being estimated
+ * Calculates the logLikelihood for hyper parameters. If the calculated value is greater than a random number
+ * from the exponential distribution we update the parameters from proposed to current. Update the trace when applicable.
+*/
 void MCMCAlgorithm::acceptRejectHyperParameter(Genome &genome, Model& model, int iteration)
 {
 	std::vector <double> logProbabilityRatios;
@@ -322,7 +335,12 @@ void MCMCAlgorithm::acceptRejectHyperParameter(Genome &genome, Model& model, int
 //---------- MCMC Functions ----------//
 //------------------------------------//
 
-
+/* run (RCPP EXPOSED)
+ * Arguments: reference to a genome and a model. number of cores to run on (unless running on a MAC). Number of
+ * iterations to allow initial conditions to vary.
+ * Runs the MCMC algorithm for the set number of iterations. Run can terminate early if GWEKE score meets
+ * the set criteria.
+*/
 void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigned divergenceIterations)
 {
 #ifndef __APPLE__
@@ -488,22 +506,18 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 #else
 	std::cout << "leaving MCMC loop" << std::endl;
 #endif
-
-	//NOTE: The following files used to be written here:
-	//selectionParamTrace_#.csv
-	//phiTrace_nmix_#.csv
-	//mutationParamTrace_#.csv
-	//liklihoodTrace.csv
-	//sphiTrace.csv
-	//expressionLevelTrace.csv
-
 }
 
 
-// Allows to diverge from initial conditions (divergenceIterations controls the divergence).
-// This allows for varying initial conditions for better exploration of the parameter space.
-// This functions does not take the likelihood into account, the random walk is only constrained by the prior
-// for each parameter. If no prior (flat prior) is present, an unconstrained random walk is performed.
+
+/* varyInitialConditions (NOT EXPOSED)
+ * Arguments: reference to a genome and a model. Number of iterations that the model can diverge from initial
+ * conditions.
+ * Allows to diverge from initial conditions (divergenceIterations controls the divergence).
+ * This allows for varying initial conditions for better exploration of the parameter space.
+ * This functions does not take the likelihood into account, the random walk is only constrained by the prior
+ * for each parameter. If no prior (flat prior) is present, an unconstrained random walk is performed.
+*/
 void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned divergenceIterations)
 {
 	// TODO THIS FUNCTON THROWS THE ACCEPTANCE COUNTER OFF!
@@ -569,6 +583,12 @@ void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned
 	}
 }
 
+
+/* calculateGewekeScore (NOT EXPOSED)
+ * Arguments: current iteration
+ * Calculate the Geweke score based of the last test and the posterior means. If this is the first
+ * convergence test, lastConvergenceTest should be equal to 0.
+*/
 double MCMCAlgorithm::calculateGewekeScore(unsigned current_iteration)
 {
 	double posteriorMean1 = 0.0;
@@ -593,6 +613,9 @@ double MCMCAlgorithm::calculateGewekeScore(unsigned current_iteration)
 		posteriorVariance1 += (likelihoodTrace[i] - posteriorMean1) * (likelihoodTrace[i] - posteriorMean1);
 	}
 	posteriorVariance1 = posteriorVariance1 / numSamples1;
+
+
+
 	// calculate mean and and variance of last part of likelihood trace
 	for(unsigned i = start2; i < current_iteration; i++)
 	{
@@ -610,55 +633,89 @@ double MCMCAlgorithm::calculateGewekeScore(unsigned current_iteration)
 	return (posteriorMean1 - posteriorMean2) / std::sqrt( ( posteriorVariance1 / numSamples1 ) + ( posteriorVariance2 / numSamples2 ) );
 }
 
-
+/* isEstimateSynthesisRate (NOT EXPOSED)
+ * Arguments: None
+ * Return the boolean value for if synthesis rate should be estimated in this run.
+*/
 bool MCMCAlgorithm::isEstimateSynthesisRate()
 {
 	return estimateSynthesisRate;
 }
 
-
+/* isEstimateCodonSpecificParameter (NOT EXPOSED)
+ * Arguments: None
+ * Return the boolean value for if codon specific parameters should be estimated in this run.
+*/
 bool MCMCAlgorithm::isEstimateCodonSpecificParameter()
 {
 	return estimateCodonSpecificParameter;
 }
 
 
+/* isEstimateHyperParameter (NOT EXPOSED)
+ * Arguments: None
+ * Return the boolean value for if hyper parameters should be estimated in this run.
+*/
 bool MCMCAlgorithm::isEstimateHyperParameter()
 {
 	return estimateHyperParameter;
 }
 
 
+/* isEstimateMixtureAssignment (NOT EXPOSED)
+ * Arguments: None
+ * Return the boolean value for if mixture assignment should be estimated in this run.
+*/
 bool MCMCAlgorithm::isEstimateMixtureAssignment()
 {
 	return estimateMixtureAssignment;
 }
 
-
+/* setEstimateSynthesisRate (NOT EXPOSED)
+ * Arguments: boolean describing if the parameter should be estimated.
+ * Sets estimateSynthesisRate to the specified value.
+*/
 void MCMCAlgorithm::setEstimateSynthesisRate(bool in)
 {
 	estimateSynthesisRate = in;
 }
 
 
+/* setEstimateCodonSpecificParameter (NOT EXPOSED)
+ * Arguments: boolean describing if the parameter should be estimated.
+ * Sets estimateCodonSpecificParameter to the specified value.
+*/
 void MCMCAlgorithm::setEstimateCodonSpecificParameter(bool in)
 {
 	estimateCodonSpecificParameter = in;
 }
 
 
+/* setEstimateHyperParameter (NOT EXPOSED)
+ * Arguments: boolean describing if the parameter should be estimated.
+ * Sets estimateHyperParameter to the specified value.
+*/
 void MCMCAlgorithm::setEstimateHyperParameter(bool in)
 {
 	estimateHyperParameter = in;
 }
 
-
+/* setEstimateMixtureAssignment (RCPP EXPOSED)
+ * Arguments: boolean describing if the parameter should be estimated.
+ * Sets estimateMixtureAssignment to the specified value.
+*/
 void MCMCAlgorithm::setEstimateMixtureAssignment(bool in)
 {
 	estimateMixtureAssignment = in;
 }
 
 
+/* setRestartFileSettings (RCPP EXPOSED)
+ * Arguments: base of filename to write to, interval to write file, bool telling if one or many files should be written.
+ * Filename is the base of the file name to be written to. The interval will be placed in front to specify the step
+ * it was written at and allow for multiple files to be written if multiple is set to true. The file write interval
+ * is actually the interval specified times the thining.
+*/
 void MCMCAlgorithm::setRestartFileSettings(std::string filename, unsigned interval, bool multiple)
 {
 	file = filename;
@@ -667,6 +724,12 @@ void MCMCAlgorithm::setRestartFileSettings(std::string filename, unsigned interv
 	writeRestartFile = true;
 }
 
+
+/* setStepsToAdapt (RCPP EXPOSED)
+ * Arguments: steps (unsigned)
+ * Will set the specified steps to adapt for the run if the value is less than samples * thining (aka, the number
+ * of steps the run will last).
+*/
 void MCMCAlgorithm::setStepsToAdapt(unsigned steps)
 {
 	if (steps <= samples * thining)
@@ -679,17 +742,32 @@ void MCMCAlgorithm::setStepsToAdapt(unsigned steps)
 	}
 }
 
+
+/* getStepsToAdapt (RCPP EXPOSED)
+ * Argumetns: None
+ * Return the value of stepsToAdapt
+*/
 int MCMCAlgorithm::getStepsToAdapt()
 {
 	return stepsToAdapt;
 }
 
+
+/* getLogLikelihoodTrace (RCPP EXPOSED)
+ * Arguments: None
+ * Return the liklihood trace.
+*/
 std::vector<double> MCMCAlgorithm::getLogLikelihoodTrace()
 {
 	return likelihoodTrace;
 }
 
 
+/* getLogLikelihoodPosteriorMean (RCPP EXPOSED)
+ * Arguments: number of samples to use to calculate the posterior.
+ * Calculates the mean for the specified number of samples from the end of the trace
+ * for the loglikelihood trace.
+*/
 double MCMCAlgorithm::getLogLikelihoodPosteriorMean(unsigned _samples)
 {
 	double posteriorMean = 0.0;
@@ -716,6 +794,11 @@ double MCMCAlgorithm::getLogLikelihoodPosteriorMean(unsigned _samples)
 }
 
 
+
+/* acf (NOT EXPOSED)
+ * Arguments:
+ *
+*/
 std::vector<double> MCMCAlgorithm::acf(std::vector<double>& x, int nrows, int ncols, int lagmax, bool correlation, bool demean)
 {
 	if(demean)
@@ -774,6 +857,10 @@ std::vector<double> MCMCAlgorithm::acf(std::vector<double>& x, int nrows, int nc
 }
 
 
+/* solveToeplitzMatrix (NOT EXPOSED)
+ * Arguments:
+ *
+*/
 std::vector<std::vector<double>> MCMCAlgorithm::solveToeplitzMatrix(int lr, std::vector<double> r, std::vector<double> g)
 {
 // TODO switch f from 2d index to 1d index

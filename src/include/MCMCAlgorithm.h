@@ -5,7 +5,6 @@
 #include <cstdlib>
 #include <sstream>
 #include <chrono>
-#include <iostream>
 #include <fstream>
 #include <stdlib.h> //can be removed later
 #ifndef STANDALONE
@@ -107,3 +106,11 @@ class MCMCAlgorithm
 };
 
 #endif // MCMCALGORITHM_H
+
+
+/* ----------------------------- RCPP NOTE !!!!! -------------------------------------------- */
+//                                                                                            //
+// The functions declared and defined in the standalone block could be moved up to the C++    //
+// side. These are R specific because of how RCPP deals with constructors, but having these   //
+// functions in C++ would not affect the framework.                                           //
+/* ----------------------------- RCPP NOTE !!!!! -------------------------------------------- */

@@ -1,6 +1,6 @@
 #include "include/MCMCAlgorithm.h"
 #include "include/Testing.h"
-#include <iostream>
+#include "include/Utility.h"
 #include <vector>
 
 #ifdef CEDRIC
@@ -666,8 +666,9 @@ int main()
 	if (1)
 	{
 		//testSequenceSummary();
-		//testGene();
-		testGenome("/Users/hollisbui/RibModelDev/data/UnitTestingData");
+		testGene();
+		//testGenome("/Users/hollisbui/RibModelDev/data/UnitTestingData");
+		testUtility();
 		exit(1);
 	}
 	std::string modelToRun = "RFP"; //can also be ROC or FONSE

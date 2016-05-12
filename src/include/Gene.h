@@ -37,15 +37,15 @@ class Gene
 		virtual ~Gene();
 
 
-
 		//Data Manipulation Functions:
 		std::string getId();
 		void setId(std::string _id);
 		std::string getDescription();
 		void setDescription(std::string _desc);
-		void setSequence(std::string _seq);
-		void addRFP_count(std::vector <unsigned> RFP_counts);
 		std::string getSequence();
+		void setSequence(std::string _seq);
+		std::vector <unsigned> getRFP_count(); //Only for unit testing.
+		void addRFP_count(std::vector <unsigned> RFP_counts);
 		SequenceSummary *getSequenceSummary();
 		std::vector<double> getObservedSynthesisRateValues();
 		void setObservedSynthesisRateValues(std::vector <double> values); //Only for unit testing.
@@ -61,13 +61,10 @@ class Gene
 		std::string toAASequence();
 
 
-
-
 		//R Section:
 
 #ifndef STANDALONE
 
-		//R Section:
 		unsigned getAACount(std::string aa);
 		unsigned getCodonCount(std::string& codon);
 		unsigned getRFPObserved(std::string codon);
