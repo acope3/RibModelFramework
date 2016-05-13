@@ -1496,19 +1496,30 @@ int testGenome(std::string testFileDir)
     file = testFileDir + "/" + "testReadRFP.csv";
     genome.readRFPFile(file);
 
+    /*
     Gene rfp1("GCAGCC", "TEST001", "No description for RFP Model");
     Gene rfp2("GCGTTTTTT", "TEST002", "No description for RFP Model");
     Gene rfp3("GCTATGATGATGATGATG", "TEST003", "No description for RFP Model");
+    */
+
+    // These sequences are composed of those codons with RFPObserved values > 0
+    // Each repetition of a codon denotes an incrementation in RFPObserved for that codon
+
+    Gene rfp1("GCCGCCGCCGCCGCC", "TEST001", "No description for RFP Model");
+    Gene rfp2("GCGGCGTTTTTTTTTTTT", "TEST002", "No description for RFP Model");
+    Gene rfp3("ATGATGATGATGATGATGATGATGATGATGATGATGATG", "TEST003", "No description for RFP Model");
 
     // need to access the public SequenceSummary of a gene to access codonIndex
     // in order to use then modify setRFPObserved
     // Also, need to use constant strings -- can't simply write "GCA" in parens.
-    std::string codon = "GCA";
-    unsigned index = SequenceSummary::codonToIndex(codon);
-    rfp1.geneData.setRFPObserved(index, 0);
 
-    codon = "GCC";
-    index = SequenceSummary::codonToIndex(codon);
+    //std::string codon = "GCA";
+    //unsigned index = SequenceSummary::codonToIndex(codon);
+    //rfp1.geneData.setRFPObserved(index, 0);
+
+    /*
+    std::string codon = "GCC";
+    unsigned index = SequenceSummary::codonToIndex(codon);
     rfp1.geneData.setRFPObserved(index, 5);
 
     codon = "GCG";
@@ -1519,13 +1530,14 @@ int testGenome(std::string testFileDir)
     index = SequenceSummary::codonToIndex(codon);
     rfp2.geneData.setRFPObserved(index, 4);
 
-    codon = "GCT";
-    index = SequenceSummary::codonToIndex(codon);
-    rfp3.geneData.setRFPObserved(index, 0);
+    //codon = "GCT";
+    //index = SequenceSummary::codonToIndex(codon);
+    //rfp3.geneData.setRFPObserved(index, 0);
 
     codon = "ATG";
     index = SequenceSummary::codonToIndex(codon);
     rfp3.geneData.setRFPObserved(index, 13);
+    */
 
     testGenome.addGene(rfp1, false);
     testGenome.addGene(rfp2, false);
@@ -1543,7 +1555,6 @@ int testGenome(std::string testFileDir)
     //------ writeRFPFile Function ------//
     //-----------------------------------//
 
-    /*
     // Now write a genome described above in readRFPFile to a file, read it in
     // again, and then compare its validity again.
     testGenome.clear();
@@ -1592,8 +1603,6 @@ int testGenome(std::string testFileDir)
         std::cout << "Genome writeRFPFile --- Pass\n";
     else
         error = 0; //Reset for next function.
-
-     */
 
     //------------------------------------//
     //------ readPANSEFile Function ------//
