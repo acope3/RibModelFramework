@@ -175,9 +175,15 @@ void Genome::writeFasta (std::string filename, bool simulated)
 	}
 }
 
-// TODO: Bug with reading in. RFPs and Indices are successfully extracted
-// But are not added to the genome correctly with RFP preserved
-// TODO: Bug found. Setting sequence after setting genedata currently clears gene data.
+/* New implementation:
+ * This function reads in ONLY based on RFP_Counts > 0.
+ * When this occurs, a sequence is made that is based on the number of RFP_Counts there are.
+ * This is because in RFP calculations, the sequence and number of codons is technically irrelevant.
+ * What is relevant is the RFP_Counts for certain codons, and an arbitrary sequence is constructed to
+ * represent this.
+ *
+ * See also the documentation on process_sequence in SequenceSummary.cpp
+ */
 void Genome::readRFPFile(std::string filename)
 {
 	std::ifstream Fin;
@@ -213,19 +219,13 @@ void Genome::readRFPFile(std::string filename)
 		}
 		std::size_t pos2 = tmp.find(",", pos + 1);
 		std::string value = tmp.substr(pos + 1, pos2 - (pos + 1));
-		unsigned tmpRFP = (unsigned)std::atoi(value.c_str());
-		pos = tmp.find(",", pos2 + 1);
-		value = tmp.substr(pos2 + 1, pos - (pos2 + 1));
 		unsigned counts = (unsigned)std::atoi(value.c_str());
-
+		pos = tmp.find(",", pos2 + 1);
 		std::string codon = tmp.substr(pos + 1, 3);
 		for (unsigned i = 0; i < counts; i++)
 			seq += codon;
 
 		prevID = ID;
-		unsigned index = SequenceSummary::codonToIndex(codon);
-		tmpGene.geneData.setRFPObserved(index, tmpRFP);
-		//std::cerr<< "This set RFP is " << tmpGene.geneData.getRFPObserved(index) << " at index "<< index << "\n";
 	}
 
 	tmpGene.setId(prevID);
@@ -237,7 +237,9 @@ void Genome::readRFPFile(std::string filename)
 	Fin.close();
 }
 
-
+// Note: As the ncodons is not preserved when the RFP file is read in or RFP is otherwise processed,
+// NA is returned for the number of codons. This still preserves functionality for future
+// readRFPFile calls, as only the RFP_Counts is important.
 void Genome::writeRFPFile(std::string filename, bool simulated)
 {
 	std::ofstream Fout;
@@ -258,7 +260,7 @@ void Genome::writeRFPFile(std::string filename, bool simulated)
 
 			Fout << currentGene->getId() << ",";
 			Fout << currentGene->geneData.getRFPObserved(codonIndex) << ",";
-			Fout << currentGene->geneData.getCodonCountForCodon(codonIndex) << "," << codon << "\n";
+			Fout << "NA," << codon << "\n";
 		}
 	}
 	Fout.close();

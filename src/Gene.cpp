@@ -175,7 +175,6 @@ std::string Gene::getSequence()
 //NOTE: As part of changing the sequence, the sequence summary is also cleared.
 void Gene::setSequence(std::string _seq)
 {
-    // TODO: Solve bug! Causes error with readRFP, which holds geneData BEFORE setting sequence
     geneData.clear();
     std::transform(_seq.begin(), _seq.end(), _seq.begin(), ::toupper);
     seq = _seq;

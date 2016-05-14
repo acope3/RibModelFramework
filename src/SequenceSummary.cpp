@@ -220,6 +220,17 @@ void SequenceSummary::clear()
 	for (unsigned k = 0; k < 22; k++) { naa[k] = 0; }
 }
 
+
+/* IMPORTANT NOTE
+ * ncodons and RFPObserved are mutually exclusive in model implementation.
+ * Thus, a gene written using ncodons will have RFP_Observed values that are irrelevant
+ * or untrue, but this will not affect the model itself.
+ * The converse is also true: an RFP model does not depend on any codons that do not have RFP_Counts
+ * and in general can ignore ncodons.
+ *
+ * This implementation choice significantly eases the input of RFP data.
+ * A possible implementation in the future would be to only change one of these values.
+ */
 bool SequenceSummary::processSequence(const std::string& sequence)
 {
 	//NOTE! Clear() cannot be called in this function because of the RFP model.
@@ -245,6 +256,7 @@ bool SequenceSummary::processSequence(const std::string& sequence)
 		{
 			aaID = codonToAAIndex(codon);
 			ncodons[codonID]++;
+			RFPObserved[codonID]++; // See documentation
 			naa[aaID]++;
 			codonPositions[codonID].push_back(i / 3);
 		}
