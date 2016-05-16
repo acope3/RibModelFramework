@@ -212,7 +212,8 @@ void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 		currentStdDevSynthesisRate[i] = getStdDevSynthesisRate(i, false);
 		currentMphi[i] = -((currentStdDevSynthesisRate[i] * currentStdDevSynthesisRate[i]) / 2);
 		proposedStdDevSynthesisRate[i] = getStdDevSynthesisRate(i, true);
-		proposedMphi[i] = -((proposedMphi[i] * proposedMphi[i]) / 2);
+		//NOTE: Right side of equals changed from proposedMphi to proposedStdDevSynthesisRate
+		proposedMphi[i] = -((proposedStdDevSynthesisRate[i] * proposedStdDevSynthesisRate[i]) / 2);
 		lpr -= (std::log(currentStdDevSynthesisRate[i]) - std::log(proposedStdDevSynthesisRate[i]));
 	}
 
@@ -610,7 +611,7 @@ void FONSEModel::simulateGenome(Genome & genome)
 			{
 				unsigned maxIndexVal = 0u;
 				for (unsigned i = 1; i < (numCodons - 1); i++)
-				{
+				{	//THE ELEMENTS OF SELECTION ARE UNINITIALIZED AT THIS POINT. ASK JEREMY ABOUT THIS.
 					if (selection[maxIndexVal] < selection[i])
 					{
 						maxIndexVal = i;
