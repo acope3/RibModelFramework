@@ -109,6 +109,8 @@ class FONSEModel : public Model
 		virtual double calculateAllPriors();
 		void calculateCodonProbabilityVector(unsigned numCodons, unsigned position, unsigned maxIndexValue,
 											 double* mutation, double* selection, double phi, double codonProb[]);
+		void calculateCodonProbabilityVector(unsigned numCodons, unsigned position, double* mutation, double* selection, 
+												double phi, double codonProb[]);
 		virtual void getParameterForCategory(unsigned category, unsigned param, std::string aa, bool proposal,
 											 double* returnValue);
 
