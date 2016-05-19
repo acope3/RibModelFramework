@@ -666,8 +666,8 @@ int main()
 	if (1)
 	{
 		//testSequenceSummary();
-		//testGene();
-		testGenome("/Users/hollisbui/RibModelDev/data/UnitTestingData");
+		testGene();
+		//testGenome("/Users/hollisbui/RibModelDev/data/UnitTestingData");
 		//testUtility();
 		exit(1);
 	}

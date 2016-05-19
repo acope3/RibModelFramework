@@ -231,6 +231,7 @@ void SequenceSummary::clear()
  * This implementation choice significantly eases the input of RFP data.
  * A possible implementation in the future would be to only change one of these values.
  */
+// Returns a bool for error checking purposes related to setSequence in Gene.cpp
 bool SequenceSummary::processSequence(const std::string& sequence)
 {
 	//NOTE! Clear() cannot be called in this function because of the RFP model.
@@ -284,6 +285,7 @@ unsigned SequenceSummary::AAToAAIndex(std::string aa)
 }
 
 
+//TODO: test this function. See note in testSequenceSummary.R.
 void SequenceSummary::AAIndexToCodonRange(unsigned aaIndex, unsigned& startAAIndex, unsigned& endAAIndex, bool forParamVector)
 {
 	std::string aa = indexToAA(aaIndex);
@@ -620,9 +622,9 @@ unsigned SequenceSummary::GetNumCodonsForAA(std::string& aa, bool forParamVector
 
 char SequenceSummary::complimentNucleotide(char ch)
 {
-	if( ch == 'A' ) return 'T';
-	else if( ch == 'T' ) return 'A';
-	else if( ch == 'C' ) return 'G';
+	if ( ch == 'A' ) return 'T';
+	else if ( ch == 'T' ) return 'A';
+	else if ( ch == 'C' ) return 'G';
 	else return 'C';
 }
 

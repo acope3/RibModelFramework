@@ -810,7 +810,7 @@ double Parameter::getStdDevSynthesisRate(unsigned selectionCategory, bool propos
 
 void Parameter::proposeStdDevSynthesisRate()
 {
-	for(unsigned i = 0u; i < numSelectionCategories; i++)
+	for (unsigned i = 0u; i < numSelectionCategories; i++)
 	{
 		stdDevSynthesisRate_proposed[i] = std::exp(randNorm(std::log(stdDevSynthesisRate[i]), std_stdDevSynthesisRate));
 	}
@@ -831,7 +831,7 @@ double Parameter::getCurrentStdDevSynthesisRateProposalWidth()
 
 void Parameter::updateStdDevSynthesisRate()
 {
-	for(unsigned i = 0u; i < numSelectionCategories; i++)
+	for (unsigned i = 0u; i < numSelectionCategories; i++)
 	{
 		stdDevSynthesisRate[i] = stdDevSynthesisRate_proposed[i];
 	}
@@ -870,9 +870,9 @@ double Parameter::getSynthesisRateProposalWidth(unsigned geneIndex, unsigned mix
 void Parameter::proposeSynthesisRateLevels()
 {
 	unsigned numSynthesisRateLevels = (unsigned) currentSynthesisRateLevel[0].size();
-	for(unsigned category = 0; category < numSelectionCategories; category++)
+	for (unsigned category = 0; category < numSelectionCategories; category++)
 	{
-		for(unsigned i = 0u; i < numSynthesisRateLevels; i++)
+		for (unsigned i = 0u; i < numSynthesisRateLevels; i++)
 		{
 			// avoid adjusting probabilities for asymmetry of distribution
 			proposedSynthesisRateLevel[category][i] = std::exp( randNorm( std::log(currentSynthesisRateLevel[category][i]) , std_phi[category][i]) );
@@ -890,7 +890,7 @@ void Parameter::setSynthesisRate(double phi, unsigned geneIndex, unsigned mixtur
 
 void Parameter::updateSynthesisRate(unsigned geneIndex)
 {
-	for(unsigned category = 0; category < numSelectionCategories; category++)
+	for (unsigned category = 0; category < numSelectionCategories; category++)
 	{
 		numAcceptForSynthesisRate[category][geneIndex]++;
 		currentSynthesisRateLevel[category][geneIndex] = proposedSynthesisRateLevel[category][geneIndex];
@@ -1364,7 +1364,6 @@ std::vector<double> Parameter::getCodonSpecificQuantile(unsigned mixtureElement,
 }
 
 
-
 unsigned Parameter::getEstimatedMixtureAssignment(unsigned samples, unsigned geneIndex)
 {
 	unsigned rv = 0u;
@@ -1382,6 +1381,7 @@ unsigned Parameter::getEstimatedMixtureAssignment(unsigned samples, unsigned gen
 	}
 	return rv;
 }
+
 
 std::vector<double> Parameter::getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex)
 {
