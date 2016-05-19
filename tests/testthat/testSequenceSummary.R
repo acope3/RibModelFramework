@@ -3,9 +3,6 @@ library(ribModel)
 
 context("Sequence Summary")
 
-#removed clear from testThat
-#removed processSequence from testThat
-
 test_that("general sequence summary functions", {
   expect_equal(testSequenceSummary(), 0)
 })
@@ -14,7 +11,6 @@ test_that("general sequence summary functions", {
 #reference and cannot deal with that in R. Since this will
 #change with codonTable being completed, the tests have been
 #ommitted for the time being.
-
 
 #this function will be moved to CodonTable when it is finished.
 test_that("AA To Codon", {

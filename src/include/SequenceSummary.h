@@ -46,7 +46,7 @@ class SequenceSummary
 		virtual ~SequenceSummary(); //TODO:Why is this virtual????
 
 
-		//Data Manipulation Functions:
+		//Data Manipulation Functions (All tested):
 		unsigned getAACountForAA(std::string aa);
 		unsigned getAACountForAA(unsigned aaIndex);
 		unsigned getCodonCountForCodon(std::string& codon);
@@ -60,9 +60,9 @@ class SequenceSummary
 		void setRFP_count(std::vector <unsigned> arg);
 
 
-		//Other Functions:
-		void clear(); //Tested
-		bool processSequence(const std::string& sequence);  //Tested TODO: WHY return a bool
+		//Other Functions (All tested):
+		void clear();
+		bool processSequence(const std::string& sequence);
 
 
 		//Static Functions:
@@ -76,7 +76,7 @@ class SequenceSummary
 		static std::string indexToAA(unsigned aaIndex); //Moving to CT
 		static std::string indexToCodon(unsigned index, bool forParamVector = false); //Moving to CT
 		static unsigned GetNumCodonsForAA(std::string& aa, bool forParamVector = false); //Moving to CT
-		static char complimentNucleotide(char ch); //TODO: Testing (c++)
+		static char complimentNucleotide(char ch); //Tested
 		static std::vector<std::string> aminoAcids(); //Moving to CT, but used in R currently
 		static std::vector<std::string> codons(); //Moving to CT, but used in R currently
 
