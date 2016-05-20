@@ -175,7 +175,7 @@ void Genome::writeFasta (std::string filename, bool simulated)
 	}
 }
 
-/* New implementation:
+/*
  * This function reads in ONLY based on RFP_Counts > 0.
  * When this occurs, a sequence is made that is based on the number of RFP_Counts there are.
  * This is because in RFP calculations, the sequence and number of codons is technically irrelevant.
@@ -403,13 +403,13 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 
 	input.open(filename);
 	if (input.fail())
-		my_printError("Error in Genome::readObservedPhiValues: Can not open file %\n", filename);
+		my_printError("ERROR in Genome::readObservedPhiValues: Can not open file %\n", filename);
 	else
 	{
 		std::getline(input, tmp); //Trash the header line
 
 		if (genes.size() == 0)
-			my_printError("Genome is empty, function will not execute!\n");
+			my_printError("ERROR: Genome is empty, function will not execute!\n");
 		else
 		{
 			if (byId)
@@ -473,7 +473,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 						}
 						else if (it->second->observedSynthesisRateValues.size() != numPhi)
 						{
-                            my_printError("Gene % has a different number of phi values given other genes: \n", geneID);
+                            my_printError("ERROR: Gene % has a different number of phi values given other genes: \n", geneID);
                             my_printError("Gene % has % ", geneID, it -> second -> observedSynthesisRateValues.size());
                             my_printError("while others have %. Exiting function.\n", numPhi);
 							exitfunction = true;
@@ -519,7 +519,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 				{
 					if (geneIndex >= genes.size())
 					{
-						my_printError("GeneIndex exceeds the number of genes in the genome. Exiting function.\n");
+						my_printError("ERROR: GeneIndex exceeds the number of genes in the genome. Exiting function.\n");
 						break;
 					}
 
@@ -564,7 +564,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 					}
 					else if (numPhi != genes[geneIndex].observedSynthesisRateValues.size())
 					{
-                        my_printError("Gene % has a different number of phi values given other genes: \n", geneIndex);
+                        my_printError("ERROR: Gene % has a different number of phi values given other genes: \n", geneIndex);
                         my_printError("Gene % has % ", geneIndex, genes[geneIndex].observedSynthesisRateValues.size());
                         my_printError("while others have %. Exiting function.\n", numPhi);
 						exitfunction = true;
@@ -678,12 +678,12 @@ void Genome::clear()
 }
 
 
-Genome Genome::getGenomeForGeneIndicies(std::vector <unsigned> indicies, bool simulated)
+Genome Genome::getGenomeForGeneIndices(std::vector <unsigned> indices, bool simulated)
 {
 	Genome genome;
 
-	for (unsigned i = 0; i < indicies.size(); i++)
-		simulated ? genome.addGene(simulatedGenes[indicies[i]], true) : genome.addGene(genes[indicies[i]], false);
+	for (unsigned i = 0; i < indices.size(); i++)
+		simulated ? genome.addGene(simulatedGenes[indices[i]], true) : genome.addGene(genes[indices[i]], false);
 
 	return genome;
 }
@@ -740,22 +740,18 @@ bool Genome::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound
 	}
 	else
 	{
-		Rf_error("Index: %d is out of bounds. Index must be between %d & %d\n", index, lowerbound, upperbound);
+		my_printError("ERROR: Index % is out of bounds. Index must be between % & %\n", index, lowerbound, upperbound);
 	}
 	return check;
 }
 
-
+// TODO: checkIndex does NOT check for simulated genes!!
 Gene& Genome::getGeneByIndex(unsigned index, bool simulated) //NOTE: This function does the check and performs the function itself because of memory issues.
 {
 	bool checker = checkIndex(index, 1, (unsigned)genes.size());
 	if (!checker)
 	{
-#ifndef STANDALONE
-		Rf_warning("Invalid index given, returning gene 1, not simulated\n");
-#else
-		std::cerr << "Invalid index given, returning gene 1, not simulated\n";
-#endif
+		my_printError("Warning: Invalid index given, returning gene 1, not simulated\n");
 	}
 	return checker ? simulated ? simulatedGenes[index - 1] : genes[index - 1] : genes[0];
 }
@@ -767,23 +763,23 @@ Gene& Genome::getGeneById(std::string ID, bool simulated)
 }
 
 
-Genome Genome::getGenomeForGeneIndiciesR(std::vector <unsigned> indicies, bool simulated)
+Genome Genome::getGenomeForGeneIndicesR(std::vector <unsigned> indices, bool simulated)
 {
 	Genome genome;
 	bool check = true;
-	for (unsigned i = 0; i < indicies.size(); i++)
+	for (unsigned i = 0; i < indices.size(); i++)
 	{
-		if (indicies[i] < 1 || indicies[i] > getGenomeSize())
+		if (indices[i] < 1 || indices[i] > getGenomeSize())
 		{
 			check = false;
 			break;
 		}
 		else
 		{
-			indicies[i] -= 1;
+			indices[i] -= 1;
 		}
 	}
-	return check ? getGenomeForGeneIndicies(indicies, simulated) : genome;
+	return check ? getGenomeForGeneIndices(indices, simulated) : genome;
 }
 
 
@@ -829,7 +825,7 @@ RCPP_MODULE(Genome_mod)
 		//R Section:
 		.method("getGeneByIndex", &Genome::getGeneByIndex, "returns a gene for a given index")
 		.method("getGeneById", &Genome::getGeneById) //TEST THAT ONLY!
-		.method("getGenomeForGeneIndicies", &Genome::getGenomeForGeneIndiciesR, "returns a new genome based on the ones requested in the given vector")
+		.method("getGenomeForGeneIndices", &Genome::getGenomeForGeneIndicesR, "returns a new genome based on the ones requested in the given vector")
 		;
 }
 #endif

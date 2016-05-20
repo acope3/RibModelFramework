@@ -1014,15 +1014,15 @@ int testGene()
     else
         error = 0; //Reset for next function.
 
-    //-----------------------------------------------//
-    //------ get/setObservedPhiValues Function ------//
-    //-----------------------------------------------//
+    //---------------------------------------------------------//
+    //------ get/setObservedSynthesisRateValues Function ------//
+    //---------------------------------------------------------//
     std::vector <double> tmp;
     tmp = testGene.getObservedSynthesisRateValues();
 
     if (0 != tmp.size())
     {
-        std::cerr << "Error with getObservedPhiValues. Function should return an empty vector but returns:\n";
+        std::cerr << "Error with getObservedSynthesisRateValues. Function should return an empty vector but returns:\n";
         for (unsigned i = 0; i < tmp.size(); i++)
         {
             std::cerr << tmp[i] << "\n";
@@ -1036,7 +1036,7 @@ int testGene()
 
     if (testGene.getObservedSynthesisRateValues() != tmp)
     {
-        std::cerr << "Error in getObservedPhiValues or setObservedPhiValues. Function should return 2.34, 3.234, 0.123, but returns:\n";
+        std::cerr << "Error in getObservedSynthesisRateValues or setObservedSynthesisRateValues. Function should return 2.34, 3.234, 0.123, but returns:\n";
         for (unsigned i = 0; i < tmp.size(); i++)
         {
             std::cerr << tmp[i] << "\n";
@@ -1046,7 +1046,7 @@ int testGene()
     }
 
     if (!error)
-        std::cout << "Gene get/setObservedPhiValues --- Pass\n";
+        std::cout << "Gene get/setObservedSynthesisRateValues --- Pass\n";
     else
         error = 0; //Reset for next function.
 
@@ -1234,9 +1234,9 @@ int testGenome(std::string testFileDir)
 
     //TODO: should improper input be given (bad id/index)?
 
-    //-----------------------------------------//
-    //------ addGene & getGene Functions ------//
-    //-----------------------------------------//
+    //-----------------------------------//
+    //------ get/addGene Functions ------//
+    //-----------------------------------//
     genome.addGene(g1, false);
     genome.addGene(s1, true); //add the simulated gene s1
 
@@ -1260,7 +1260,7 @@ int testGenome(std::string testFileDir)
     }
 
     if (!error)
-        std::cout << "Genome addGene & getGene --- Pass\n";
+        std::cout << "Genome get/addGene --- Pass\n";
     else
         error = 0; //Reset for next function.
 
@@ -1397,14 +1397,14 @@ int testGenome(std::string testFileDir)
 
     /* Section 2:
      * Other and File I/O Functions:
-     * getGenomeForGeneIndicies
+     * getGenomeForGeneIndices
      * readFasta
      * readPANSEFile
      * readObservedPhiValues
     */
 
     //-----------------------------------------------//
-    //------ getGenomeForGeneIndicies Function ------//
+    //------ getGenomeForGeneIndices Function ------//
     //-----------------------------------------------//
 
     // add more simulated and non-simulated genes
@@ -1416,8 +1416,8 @@ int testGenome(std::string testFileDir)
     //reuse generic vector of unsigned integers
     uVector = {0, 1, 2, 3};
 
-    if (!(genome == genome.getGenomeForGeneIndicies(uVector, false))) {
-        std::cerr << "Error in getGenomeForGeneIndicies with genes.\n";
+    if (!(genome == genome.getGenomeForGeneIndices(uVector, false))) {
+        std::cerr << "Error in getGenomeForGeneIndices with genes.\n";
         error = 1;
         globalError = 1;
     }
@@ -1433,14 +1433,14 @@ int testGenome(std::string testFileDir)
     genome.addGene(s3, true);
     genome.addGene(s4, true);
 
-    if (!(genome == genome.getGenomeForGeneIndicies(uVector, true))) {
-        std::cerr << "Error in getGenomeForGeneIndicies with simulated genes.\n";
+    if (!(genome == genome.getGenomeForGeneIndices(uVector, true))) {
+        std::cerr << "Error in getGenomeForGeneIndices with simulated genes.\n";
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        std::cout << "Genome getGenomeForGeneIndicies --- Pass\n";
+        std::cout << "Genome getGenomeForGeneIndices --- Pass\n";
     else
         error = 0; //Reset for next function.
 
@@ -1768,7 +1768,6 @@ int testUtility()
     if (error != 0)
     {
         std::cerr << "Error in my_print.\n";
-        error = 0;
         globalError = 1;
     }
 
@@ -1780,6 +1779,95 @@ int testUtility()
         std::cerr << "Error in my_printError\n";
         globalError = 1;
     }
+
+    return globalError;
+}
+
+
+int testCovarianceMatrix()
+{
+    CovarianceMatrix covM; //Default constructor sets numVariates to 2.
+    int globalError = 0;
+
+    //----------------------------------------------------------//
+    //------ getCovMatrix & initCovarianceMatrix Function ------//
+    //----------------------------------------------------------//
+
+    // Currently, we can assume initCovarianceMatrix works since it is used in the default constructor.
+    // TODO: Change this.
+
+    std::vector <double> covM2 = {0.0025, 0, 0, 0, \
+                                  0, 0.0025, 0, 0, \
+                                  0, 0, 0.0025, 0, \
+                                  0, 0, 0, 0.0025};
+    std::vector <double> *covM2star = &covM2;
+
+    covM.initCovarianceMatrix(4);
+
+    // TODO: Should it really return a pointer?
+    /*
+    if (!(covM.getCovMatrix() == covM2star)) {
+        std::cerr << "Error in getCovMatrix or initCovarianceMatrix.\n";
+        globalError = 1;
+    }
+    else
+        std::cout << "CovarianceMatrix getCovMatrix & initCovarianceMatrix --- Pass\n";
+    */
+
+    //------------------------------//
+    //------ setDiag Function ------//
+    //------------------------------//
+    covM.setDiag(3.14);
+
+    covM2 = {3.14, 0, 0, 0, \
+             0, 3.14, 0, 0, \
+             0, 0, 3.14, 0, \
+             0, 0, 0, 3.14};
+
+    /*
+    if (!(covM.getCovMatrix() == covM2star)) {
+        std::cerr << "Error in getCovMatrix or initCovarianceMatrix.\n";
+        globalError = 1;
+    }
+    else
+        std::cout << "CovarianceMatrix getCovMatrix & initCovarianceMatrix --- Pass\n";
+    */
+
+    // TODO: Write function to extract choleski matrix similar to covMatrix above
+    //--------------------------------------------//
+    //------ choleskiDecomposition Function ------//
+    //--------------------------------------------//
+
+    // TODO: Test print functions somehow
+    //--------------------------------------------//
+    //------ printCovarianceMatrix Function ------//
+    //--------------------------------------------//
+    //covM.printCovarianceMatrix();
+
+    //------------------------------------------//
+    //------ printCholeskiMatrix Function ------//
+    //------------------------------------------//
+    //covM.printCholeskiMatrix();
+
+    //-------------------------------------//
+    //------ getNumVariates Function ------//
+    //-------------------------------------//
+    covM.getNumVariates();
+
+    if (covM.getNumVariates() != 4) {
+        std::cerr << "Error in getNumVariates. Function should return 4, but returns " << covM.getNumVariates() << ".\n";
+        globalError = 1;
+    }
+    else
+        std::cout << "CovarianceMatrix getNumVariates --- Pass\n";
+
+    //-------------------------------------------------------------//
+    //------ transformIidNumersIntoCovaryingNumbers Function ------//
+    //-------------------------------------------------------------//
+
+    //------------------------------------------------//
+    //------ calculateSampleCovariance Function ------//
+    //------------------------------------------------//
 
     return globalError;
 }
@@ -1800,5 +1888,6 @@ RCPP_MODULE(Test_mod)
 	function("testGene", &testGene);
 	function("testGenome", &testGenome);
 	function("testUtility", &testUtility);
+	function("testCovarianceMatrix", &testCovarianceMatrix);
 }
 #endif

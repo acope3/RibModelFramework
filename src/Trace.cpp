@@ -799,7 +799,7 @@ bool Trace::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound)
 	}
 	else
 	{
-		Rf_error("Index: %d is out of bounds. Index must be between %d & %d\n", index, lowerbound, upperbound);
+		my_printError("ERROR: Index: % is out of bounds. Index must be between % & %\n", index, lowerbound, upperbound);
 	}
 
 	return check;

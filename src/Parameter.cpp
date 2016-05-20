@@ -1795,12 +1795,7 @@ bool Parameter::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbo
 	}
 	else
 	{
-#ifndef STANDALONE
-		Rf_error("Index: %d is out of bounds. Index must be between %d & %d\n", index, lowerbound, upperbound);
-#else
-		std::cerr << "Error with the index\nGIVEN: " << index << "\n";
-		std::cerr << "MUST BE BETWEEN:	" << lowerbound << " & " << upperbound << "\n";
-#endif
+		my_printError("Error: Index % is out of bounds. Index must be between % & %\n", index, lowerbound, upperbound);
 	}
 
 	return check;
@@ -1898,15 +1893,13 @@ std::vector<double> Parameter::getCurrentSynthesisRateForMixture(unsigned mixtur
 {
 	bool checkMixture = checkIndex(mixture, 1, numMixtures);
 	unsigned exprCat = 0u;
-	if(checkMixture)
+	if (checkMixture)
 	{
 		exprCat = getSynthesisRateCategory(mixture - 1);
-	}else{
-#ifndef STANDALONE
-		Rf_warning("Mixture element %d NOT found. Mixture element 1 is returned instead. \n", mixture);
-#else
-		std::cerr << "WARNING: Mixture element " << mixture << " NOT found. Mixture element 1 is returned instead. \n";
-#endif
+	}
+	else
+	{
+		my_printError("WARNING: Mixture element % NOT found. Mixture element 1 is returned instead.\n", mixture);
 	}
 	return currentSynthesisRateLevel[exprCat];
 }

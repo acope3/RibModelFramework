@@ -16,7 +16,6 @@ using namespace Rcpp;
 CovarianceMatrix::CovarianceMatrix()
 {
 	initCovarianceMatrix(2); //TODO: should not do this
-
 }
 
 
@@ -62,6 +61,7 @@ CovarianceMatrix& CovarianceMatrix::operator+(const CovarianceMatrix& rhs)
 	return *this;
 }
 
+
 CovarianceMatrix& CovarianceMatrix::operator*(const double &value)
 {
 	for (unsigned i = 0; i < covMatrix.size(); i++)
@@ -78,6 +78,18 @@ void CovarianceMatrix::operator*=(const double &value)
   {
     covMatrix[i] *= value;
   }
+}
+
+
+bool CovarianceMatrix::operator==(const CovarianceMatrix& other) const
+{
+    bool match = true;
+
+    if(this->covMatrix != other.covMatrix) { match = false; }
+    if(this->choleskiMatrix != other.choleskiMatrix) { match = false; }
+    if(this->numVariates != other.numVariates) { match = false; }
+
+    return match;
 }
 
 
@@ -110,6 +122,7 @@ void CovarianceMatrix::initCovarianceMatrix(unsigned _numVariates)
     }
 }
 
+
 void CovarianceMatrix::setDiag(double val)
 {
 	for (unsigned i = 0u; i < covMatrix.size(); i++)
@@ -117,6 +130,7 @@ void CovarianceMatrix::setDiag(double val)
 		covMatrix[i] = (i % (numVariates + 1) ? covMatrix[i] : val);
 	}
 }
+
 
 // adaptation of http://en.wikipedia.org/wiki/Cholesky_decomposition
 // http://rosettacode.org/wiki/Cholesky_decomposition#C
@@ -195,6 +209,7 @@ std::vector<double> CovarianceMatrix::transformIidNumersIntoCovaryingNumbers(std
     return covnumbers;
 }
 
+
 void CovarianceMatrix::calculateSampleCovariance(std::vector<std::vector<std::vector<std::vector<double>>>> codonSpecificParameterTrace, std::string aa, unsigned samples, unsigned lastIteration)
 {
 	//order of codonSpecificParameterTrace: paramType, category, numparam, samples
@@ -237,6 +252,7 @@ void CovarianceMatrix::calculateSampleCovariance(std::vector<std::vector<std::ve
 	}
 }
 
+
 double CovarianceMatrix::sampleMean(std::vector<double> sampleVector, unsigned samples, unsigned lastIteration)
 {
 	double posteriorMean = 0.0;
@@ -260,15 +276,13 @@ double CovarianceMatrix::sampleMean(std::vector<double> sampleVector, unsigned s
 
 #ifndef STANDALONE
 
-
-
 void CovarianceMatrix::setCovarianceMatrix(SEXP _matrix)
 {
   std::vector<double> tmp;
   NumericMatrix matrix(_matrix);
   unsigned numRows = matrix.nrow();
   covMatrix.resize(numRows * numRows, 0.0);
-	numVariates = numRows;
+  numVariates = numRows;
  
   //NumericMatrix stores the matrix by column, not by row. The loop
   //below transposes the matrix when it stores it.
