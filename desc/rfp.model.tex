@@ -209,7 +209,7 @@ Assuming independence in \wgi between positions,
 \begin{align}
   \sigmag(i) &=  \exp\left[\sum_{j=1}^i \lambdaj \vgj\right]  \prod_{j=1}^{i} E_{\alphaj}\left(\lambdaj \vgj\right)
 \end{align}
-Note that these \lambdaj terms are equivalent as \lambdac, but not \lambdacprime.
+Note that these \lambdaj terms are equivalent as \lambdac (but not \lambdacprime, which is used below).
 
 Noting that the reasoning which led to equations \ref{eq:defPgi} and \ref{eq:defZtheta} for the pausing time model should still apply if we use Equation (\ref{eq:defpgiNse}) for \pgi, rather than Equation (\ref{eq:defpgi}). 
 As a result,
@@ -220,7 +220,9 @@ As a result,
   \left(\frac{\psig \sigmag(i-1)}{\lambdaiprime + \psig \sigmag(i-1)}\right)^\Ygi \left(1-\frac{\psig\sigmag(i-1)}{\lambdaiprime + \psig \sigmag(i-1)}\right)^\alphai\\
 \end{align}
 where \ng is the number of amino acids encoded in gene $g$, i.e.~$\ng \ \sum_c \ngc$.
-For completeness, we define $\phig$ as the target production rate of the functionality produced by a complete, error free protein, i.e. $\phig = \psig \sigmag(\ng)$.
+As before, $\lambdacprime = \lambdac \Ztheta/\Ytotal$.
+Thus, in this model we have both $\lambdac$ and $\lambdacprime$, thus we have an additional, genome wide parameter to estimate $U = \Ztheta/\Ytotal$.
+For completeness, we  define $\phig$ as the target production rate of the functionality produced by a complete, error free protein, i.e. $\phig = \psig \sigmag(\ng)$.
 Thus, in the absence of translation errors, $\phig$ is equal to the total synthesis rate protein $g$, $\psig$.
 In contrast, in the presence of translation errors, $\psig > \phig$ since the translation initiation rate must be elevated to compensate for the reduction in protein functionality due to translation errors.
 Furthermore, while the NSE model requires the likelihood for each position be calculated separately, the underlying terms for $\sigmag(i-1)$ need only be calculated once per parameter evaluation since it is only how these terms are combined that varies between codons at different positions.
