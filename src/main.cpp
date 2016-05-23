@@ -661,24 +661,21 @@ int main()
 #ifdef HOLLIS
 int main()
 {
+	// UNIT TESTING
+	//testSequenceSummary();
+	//testGene();
+	//testGenome("/Users/hollisbui/RibModelFramework/tests/testthat/UnitTestingData");
+	//testUtility();
+	//testCovarianceMatrix();
+	//exit(1);
 
-
-	if (1)
-	{
-		//testSequenceSummary();
-		//testGene();
-		testGenome("/Users/hollisbui/RibModelFramework/tests/testthat/UnitTestingData");
-		testUtility();
-		//testCovarianceMatrix();
-		exit(1);
-	}
-	std::string modelToRun = "RFP"; //can also be ROC or FONSE
+	std::string modelToRun = "ROC"; //can be RFP, ROC or FONSE
 	bool withPhi = false;
-	bool fromRestart = true;
+	bool fromRestart = false;
 	unsigned numMixtures = 1;
 
 
-	std::cout << "Initializing MCMCAlgorithm object---------------" << std::endl;
+	std::cout << "Initializing MCMCAlgorithm object---------------\n";
 	int samples = 10;
 	int thining = 10;
 	int useSamples = 100;
@@ -686,20 +683,19 @@ int main()
 	std::cout << "\tThining: " << thining << "\n";
 	std::cout << "\t # Samples used: " << useSamples << "\n";
 	MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, 10, true, true, true);
-	mcmc.setRestartFileSettings("RestartFile.txt", 20, true);
+	//mcmc.setRestartFileSettings("RestartFile.txt", 20, true);
 	std::cout << "Done!-------------------------------\n\n\n";
-
 
 
 
 	if (modelToRun == "ROC")
 	{
-		std::cout << "Initializing Genome object--------------------------" << std::endl;
+		std::cout << "Initializing Genome object--------------------------\n";
 		Genome genome;
-		genome.readFasta("/Users/roxasoath1/Desktop/RibModelDevScripts/RibModelDev/data/twoMixtures/simulatedAllUniqueR.fasta");
+		genome.readFasta("/Users/hollisbui/RibModelDev/data/twoMixtures/simulatedAllUniqueR.fasta");
 		if (withPhi)
 		{
-			genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv", false);
+			genome.readObservedPhiValues("/Users/hollisbui/RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv", false);
 		}
 		std::cout << "Done!-------------------------------\n\n\n";
 
@@ -730,12 +726,12 @@ int main()
 
 
 
-		std::cout << "Initializing ROCParameter object--------------------\n" << std::endl;
+		std::cout << "Initializing ROCParameter object--------------------\n\n";
 		ROCParameter parameter;
 
 		if (fromRestart)
 		{
-			ROCParameter tmp("/Users/roxasoath1/Desktop/RibModelFramework/DevRscripts/10restartFile.rst");
+			ROCParameter tmp("/Users/hollisbui/RibModelFramework/DevRscripts/10restartFile.rst");
 			parameter = tmp;
 		}
 		else
@@ -752,37 +748,37 @@ int main()
 			std::cout << "\tmixture definition: " << mixDef << "\n";
 
 			std::vector<std::string> files(2);
-			files[0] = std::string("F:/GitHub/RibModelDev/data/twoMixtures/simulated_mutation0.csv");
-			files[1] = std::string("F:/GitHub/RibModelDev/data/twoMixtures/simulated_mutation1.csv");
+			files[0] = std::string("/Users/hollisbui/RibModelDev/data/twoMixtures/simulated_mutation0.csv");
+			files[1] = std::string("/Users/hollisbui/RibModelDev/data/twoMixtures/simulated_mutation1.csv");
 			tmp.initMutationCategories(files, tmp.getNumMutationCategories());
-			files[0] = std::string("F:/GitHub/RibModelDev/data/twoMixtures/simulated_selection0.csv");
-			files[1] = std::string("F:/GitHub/RibModelDev/data/twoMixtures/simulated_selection1.csv");
+			files[0] = std::string("/Users/hollisbui/RibModelDev/data/twoMixtures/simulated_selection0.csv");
+			files[1] = std::string("/Users/hollisbui/RibModelDev/data/twoMixtures/simulated_selection1.csv");
 			tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
 
 			tmp.InitializeSynthesisRate(genome, sphi_init[0]);
 			//std::vector<double> phiVals = parameter.readPhiValues("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrCleft_phi_est.csv");
 			//parameter.InitializeSynthesisRate(phiVals);
 		}
-		std::cout << "Done!--------------------------------\n\n\n" << std::endl;
+		std::cout << "Done!--------------------------------\n\n\n";
 
 
 
 		std::cout << "Initializing ROCModel object--------------------------\n";
-
 		ROCModel model;
 		model.setParameter(parameter);
-		std::cout << "Done!----------------------------------\n\n\n" << std::endl;
+		std::cout << "Done!----------------------------------\n\n\n";
+
 
 
 		std::cout << "Running MCMC.............\n" << std::endl;
 		mcmc.run(genome, model, 1, 0);
-		std::cout << "Done!----------------------------------\n\n\n" << std::endl;
+		std::cout << "Done!----------------------------------\n\n\n";
 	} //END OF ROC
 	else if (modelToRun == "RFP")
 	{
-		std::cout << "Initializing Genome object--------------------------" << std::endl;
+		std::cout << "Initializing Genome object--------------------------\n";
 		Genome genome;
-		genome.readRFPFile("/Users/roxasoath1/Desktop/RibModelDevScripts/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+		genome.readRFPFile("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 		std::cout << "Done!-------------------------------\n\n\n";
 
 
@@ -812,12 +808,12 @@ int main()
 
 
 
-		std::cout << "Initializing RFPParameter object--------------------\n" << std::endl;
+		std::cout << "Initializing RFPParameter object--------------------\n\n";
 		RFPParameter parameter;
 
 		if (fromRestart)
 		{
-			RFPParameter tmp("/Users/roxasoath1/Desktop/RibModelFramework/10_restartFile.rst");
+			RFPParameter tmp("/Users/hollisbui/RibModelFramework/10_restartFile.rst");
 			parameter = tmp;
 		}
 		else
@@ -836,27 +832,27 @@ int main()
 			tmp.InitializeSynthesisRate(genome, sphi_init[0]);
 			parameter = tmp;
 		}
-		std::cout << "Done!--------------------------------\n\n\n" << std::endl;
+		std::cout << "Done!--------------------------------\n\n\n";
 
 
 
 		std::cout << "Initializing RFPModel object--------------------------\n";
-
 		RFPModel model;
 		model.setParameter(parameter);
-		std::cout << "Done!----------------------------------\n\n\n" << std::endl;
+		std::cout << "Done!----------------------------------\n\n\n";
+
 
 
 		std::cout << "Running MCMC.............\n" << std::endl;
 		mcmc.run(genome, model, 1, 0);
-		std::cout << "Done!----------------------------------\n\n\n" << std::endl;
+		std::cout << "Done!----------------------------------\n\n\n";
 
 	} //END OF RFP
 	else if (modelToRun == "FONSE")
 	{
-		std::cout << "initialize Genome object--------------------------" << std::endl;
+		std::cout << "initialize Genome object--------------------------\n";
 		Genome genome;
-		genome.readFasta("/Users/roxasoath1/Desktop/RibModelDevScripts/RibModelDev/data/FONSE/genome_2000.fasta");
+		genome.readFasta("/Users/hollisbui/RibModelDev/data/FONSE/genome_2000.fasta");
 		std::cout << "Done!-------------------------------\n\n\n";
 
 
@@ -887,10 +883,10 @@ int main()
 
 
 		FONSEParameter parameter;
-		std::cout << "initialize Parameter object" << std::endl;
+		std::cout << "initialize Parameter object\n";
 		if (fromRestart)
 		{
-			FONSEParameter tmp("/Users/roxasoath1/Desktop/RibModelDevScripts/RibModelDev/DevRscripts/10restartFile.rst");
+			FONSEParameter tmp("/Users/hollisbui/RibModelDev/DevRscripts/10restartFile.rst");
 			parameter = tmp;
 		}
 		else
@@ -908,25 +904,26 @@ int main()
 
 			std::vector<std::string> files(1);
 			files[0] = std::string(
-					"/Users/roxasoath1/Desktop/RibModelDevScripts/RibModelDev/data/FONSE/genome_2000.mutation.csv");
+					"/Users/hollisbui/RibModelDev/data/FONSE/genome_2000.mutation.csv");
 			tmp.initMutationCategories(files, tmp.getNumMutationCategories());
 			tmp.InitializeSynthesisRate(genome, sphi_init[0]);
 			//std::vector<double> phiVals = parameter.readPhiValues("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrCleft_phi_est.csv");
 			//parameter.InitializeSynthesisRate(phiVals);
 			parameter = tmp;
-			std::cout << "done initialize Parameter object" << std::endl;
+			std::cout << "done initialize Parameter object\n";
 		}
 
 
 		std::cout << "Initializing Model object\n";
-
 		FONSEModel model;
 		model.setParameter(parameter);
+		std::cout << "Done!------------------------\n\n\n";
 
 
-		std::cout << "starting MCMC for ROC" << std::endl;
+
+		std::cout << "starting MCMC for ROC\n";
 		mcmc.run(genome, model, 4, 0);
-		std::cout << std::endl << "Finished MCMC for ROC" << std::endl;
+		std::cout << std::endl << "Finished MCMC for ROC\n";
 
 	}
 }

@@ -13,7 +13,6 @@
 #ifndef STANDALONE
 #include <Rcpp.h>
 #endif
-#include <array>
 
 class SequenceSummary
 {

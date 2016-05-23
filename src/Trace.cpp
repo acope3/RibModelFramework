@@ -115,7 +115,6 @@ void Trace::initMixtureProbabilitesTrace(unsigned samples, unsigned numMixtures)
 }
 
 
-
 void Trace::initCodonSpecificParameterTrace(unsigned samples, unsigned numCategories, unsigned numParam, unsigned paramType)
 {
 	std::vector <std::vector <std::vector <double>>> tmp;

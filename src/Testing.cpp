@@ -1853,12 +1853,12 @@ int testCovarianceMatrix()
         error = 0; //Reset for next function.
 
     //-----------------------------------------------------------------//
-    //------ getCholeskiMatrix & choleskiDecomposition Functions ------//
+    //------ getCholeskyMatrix & choleskyDecomposition Functions ------//
     //-----------------------------------------------------------------//
-    covM.choleskiDecomposition();
+    covM.choleskyDecomposition();
 
-    // Perform Choleski decomposition on covM2
-    // (This should be the same code as used in Choleski decomposition in CovarianceMatrix.cpp)
+    // Perform Cholesky decomposition on covM2
+    // (This should be the same code as used in Cholesky decomposition in CovarianceMatrix.cpp)
     for (int i = 0; i < 4; i++)
     {
         for (int j = 0; j < (i + 1); j++)
@@ -1876,19 +1876,19 @@ int testCovarianceMatrix()
     for (unsigned i = 0u; i < 16; i++)
     {
         // Compare, for each position of the vector of doubles, if the statically created covM2
-        // equals the set covM for its Choleski matrix
-        if (covM2[i] != covM.getCholeskiMatrix()->at(i))
+        // equals the set covM for its Cholesky matrix
+        if (covM2[i] != covM.getCholeskyMatrix()->at(i))
         {
-            std::cerr << "Error in getCholeskiMatrix or choleskiDecomposition:";
+            std::cerr << "Error in getCholeskyMatrix or choleskyDecomposition:";
             std::cerr << " at index " << i << " matrix extracted should return " << covM2[i];
-            std::cerr << " but instead returns " << covM.getCholeskiMatrix()->at(i) << ".\n";
+            std::cerr << " but instead returns " << covM.getCholeskyMatrix()->at(i) << ".\n";
             error = 1;
             globalError = 1;
         }
     }
 
     if (!error)
-        std::cout << "CovarianceMatrix getCholeskiMatrix & choleskiDecomposition --- Pass\n";
+        std::cout << "CovarianceMatrix getCholeskyMatrix & choleskyDecomposition --- Pass\n";
     else
         error = 0; //Reset for next function.
 
@@ -1904,9 +1904,12 @@ int testCovarianceMatrix()
     else
         std::cout << "CovarianceMatrix getNumVariates --- Pass\n";
 
+    //TODO: Test these final two functions.
     //-------------------------------------------------------------//
     //------ transformIidNumersIntoCovaryingNumbers Function ------//
     //-------------------------------------------------------------//
+
+    //covM.transformIidNumersIntoCovaryingNumbers(iidTest);
 
     //------------------------------------------------//
     //------ calculateSampleCovariance Function ------//

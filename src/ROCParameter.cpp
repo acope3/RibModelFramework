@@ -119,7 +119,7 @@ void ROCParameter::initROCParameterSet()
     std::string aa = SequenceSummary::AminoAcidArray[i];
     unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa, true);
     CovarianceMatrix m((numMutationCategories + numSelectionCategories) * numCodons);
-    m.choleskiDecomposition();
+    m.choleskyDecomposition();
     covarianceMatrix.push_back(m);
   }
 }
@@ -598,7 +598,7 @@ double ROCParameter::getCurrentCodonSpecificProposalWidth(unsigned aa)
 // 1. It is a symmetric distribution and you therefore do not have to account for the unsymmetry in jump probabilities
 // 2. The one log and exp operation that have to be performed per parameter are cheaper than the operations necessary to draw from a lognormal
 // 3. phi has to be on a non log scale for the likelihood evaluation thus it does not help to keep phi on th elog scale all the time
-// 4. the adjusment of the likelihood by the jacobian that arises from this transformation is cheap and by grouping everything in one class it takes place more or less at the same place
+// 4. the adjustment of the likelihood by the jacobian that arises from this transformation is cheap and by grouping everything in one class it takes place more or less at the same place
 void ROCParameter::proposeCodonSpecificParameter()
 {
 
@@ -867,7 +867,7 @@ void ROCParameter::initCovarianceMatrix(SEXP _matrix, std::string aa)
 		}
 	}
 	CovarianceMatrix m(covMatrix);
-	m.choleskiDecomposition();
+	m.choleskyDecomposition();
 	covarianceMatrix[aaIndex] = m;
 }
 

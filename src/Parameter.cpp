@@ -1143,7 +1143,7 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 				}
 				
 
-				covarianceMatrix[aaIndex].choleskiDecomposition();
+				covarianceMatrix[aaIndex].choleskyDecomposition();
 				for (unsigned k = aaStart; k < aaEnd; k++)
 					std_csp[k] *= 0.8;
 			}
@@ -1153,7 +1153,7 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 					std_csp[k] *= 1.2;
     				covarianceMatrix[aaIndex] *= 1.2;                    
                 }
-				covarianceMatrix[aaIndex].choleskiDecomposition();
+				covarianceMatrix[aaIndex].choleskyDecomposition();
 			}
 		}
 		numAcceptForCodonSpecificParameters[aaIndex] = 0u;
