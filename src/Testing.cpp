@@ -1765,7 +1765,7 @@ int testUtility()
 
     error = my_print("Product: %, Qty: %, Price is %", "Shampoo", 5, 100);
 
-    if (!error)
+    if (error)
     {
         std::cerr << "Error in my_print.\n";
         globalError = 1;
@@ -1774,7 +1774,7 @@ int testUtility()
     std::cout <<"\n";
     error = my_printError("Product: %, Qty: %, Price is %", "Shampoo", 5, 100);
 
-    if (!error)
+    if (error)
     {
         std::cerr << "Error in my_printError\n";
         globalError = 1;
