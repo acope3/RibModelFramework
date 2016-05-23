@@ -58,10 +58,8 @@ test_that("get Gene By Id", {
   expect_equal(g$getGeneById("TEST003", FALSE), g3)
   expect_equal(g$getGeneById("TEST004", FALSE), g4)
   expect_equal(g$getGeneById("TEST011", TRUE), s1)
-  
-  # TODO: Ask if invalid cases unit checking includes obvious R errors
 })
-
+  
 # Create two slices of genomes:
 # t1, containing indices from 0 to 3
 # t2, containing indices from 1 to 2 with one simulated gene
