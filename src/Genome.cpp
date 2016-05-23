@@ -745,15 +745,30 @@ bool Genome::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound
 	return check;
 }
 
-// TODO: checkIndex does NOT check for simulated genes!!
 Gene& Genome::getGeneByIndex(unsigned index, bool simulated) //NOTE: This function does the check and performs the function itself because of memory issues.
 {
-	bool checker = checkIndex(index, 1, (unsigned)genes.size());
-	if (!checker)
+	if (simulated)
 	{
-		my_printError("Warning: Invalid index given, returning gene 1, not simulated\n");
+		bool checker = checkIndex(index, 1, (unsigned)simulatedGenes.size());
+
+		if (!checker)
+		{
+			my_printError("Warning: Invalid index given for simulated genes, returning simulated gene 1.\n");
+		}
+
+		return checker ? simulatedGenes[index - 1] : simulatedGenes[0];
 	}
-	return checker ? simulated ? simulatedGenes[index - 1] : genes[index - 1] : genes[0];
+	else
+	{
+		bool checker = checkIndex(index, 1, (unsigned)genes.size());
+
+		if (!checker)
+		{
+			my_printError("Warning: Invalid index given for genes, returning gene 1.\n");
+		}
+
+		return checker ? genes[index - 1] : genes[0];
+	}
 }
 
 

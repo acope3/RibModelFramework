@@ -40,16 +40,10 @@ test_that("get Gene By Index", {
   expect_equal(g$getGeneByIndex(4, FALSE), g4)
   expect_equal(g$getGeneByIndex(1, TRUE), s1)
   
-  #Checking invalid cases: invalid indices
-  # TODO: checkIndex does NOT check for simulated genes!!
-  # This causes a memory error from accessing a nonexistant index in this line
-  # expect_equal(g$getGeneByIndex(2, TRUE), g1)
+  #Checking invalid cases: invalid indices, therefore returning first gene
+  #First check is on simulated genes
+  expect_equal(g$getGeneByIndex(2, TRUE), s1)
   expect_equal(g$getGeneByIndex(6, FALSE), g1)
-  # expect_equal(g$getGeneByIndex(6, FALSE), g2) returns R errors
-  
-  #Checking invalid cases: wrong genes returned, returning R errors
-  #expect_equal(g$getGeneByIndex(1, FALSE), g2)
-  #expect_equal(g$getGeneByIndex(1, TRUE), g1)
 })
 
 test_that("get Gene By Id", {
