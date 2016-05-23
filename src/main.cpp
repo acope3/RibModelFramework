@@ -667,9 +667,9 @@ int main()
 	{
 		//testSequenceSummary();
 		//testGene();
-		testGenome("/Users/hollisbui/RibModelDev/data/UnitTestingData");
+		//testGenome("/Users/hollisbui/RibModelDev/data/UnitTestingData");
 		//testUtility();
-		//testCovarianceMatrix();
+		testCovarianceMatrix();
 		exit(1);
 	}
 	std::string modelToRun = "RFP"; //can also be ROC or FONSE

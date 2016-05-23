@@ -1765,7 +1765,7 @@ int testUtility()
 
     error = my_print("Product: %, Qty: %, Price is %", "Shampoo", 5, 100);
 
-    if (error != 0)
+    if (!error)
     {
         std::cerr << "Error in my_print.\n";
         globalError = 1;
@@ -1774,7 +1774,7 @@ int testUtility()
     std::cout <<"\n";
     error = my_printError("Product: %, Qty: %, Price is %", "Shampoo", 5, 100);
 
-    if (error != 0)
+    if (!error)
     {
         std::cerr << "Error in my_printError\n";
         globalError = 1;
@@ -1787,6 +1787,7 @@ int testUtility()
 int testCovarianceMatrix()
 {
     CovarianceMatrix covM; //Default constructor sets numVariates to 2.
+    int error = 0;
     int globalError = 0;
 
     //----------------------------------------------------------//
@@ -1794,25 +1795,33 @@ int testCovarianceMatrix()
     //----------------------------------------------------------//
 
     // Currently, we can assume initCovarianceMatrix works since it is used in the default constructor.
-    // TODO: Change this.
+    // TODO: Change this fact.
 
     std::vector <double> covM2 = {0.0025, 0, 0, 0, \
                                   0, 0.0025, 0, 0, \
                                   0, 0, 0.0025, 0, \
                                   0, 0, 0, 0.0025};
-    std::vector <double> *covM2star = &covM2;
 
     covM.initCovarianceMatrix(4);
 
-    // TODO: Should it really return a pointer?
-    /*
-    if (!(covM.getCovMatrix() == covM2star)) {
-        std::cerr << "Error in getCovMatrix or initCovarianceMatrix.\n";
-        globalError = 1;
+    for (unsigned i = 0u; i < 16; i++)
+    {
+        // Compare, for each position of the vector of doubles, if the statically created covM2
+        // equals the initialized and extracted covM
+        if (covM2[i] != covM.getCovMatrix()->at(i))
+        {
+            std::cerr << "Error in getCovMatrix or initCovarianceMatrix:";
+            std::cerr << " at index " << i << " matrix extracted should return " << covM2[i];
+            std::cerr << " but instead returns " << covM.getCovMatrix()->at(i) << ".\n";
+            error = 1;
+            globalError = 1;
+        }
     }
-    else
+
+    if (!error)
         std::cout << "CovarianceMatrix getCovMatrix & initCovarianceMatrix --- Pass\n";
-    */
+    else
+        error = 0; //Reset for next function.
 
     //------------------------------//
     //------ setDiag Function ------//
@@ -1824,30 +1833,64 @@ int testCovarianceMatrix()
              0, 0, 3.14, 0, \
              0, 0, 0, 3.14};
 
-    /*
-    if (!(covM.getCovMatrix() == covM2star)) {
-        std::cerr << "Error in getCovMatrix or initCovarianceMatrix.\n";
-        globalError = 1;
+    for (unsigned i = 0u; i < 16; i++)
+    {
+        // Compare, for each position of the vector of doubles, if the statically created covM2
+        // equals the set covM
+        if (covM2[i] != covM.getCovMatrix()->at(i))
+        {
+            std::cerr << "Error in setDiag:";
+            std::cerr << " at index " << i << " matrix extracted should return " << covM2[i];
+            std::cerr << " but instead returns " << covM.getCovMatrix()->at(i) << ".\n";
+            error = 1;
+            globalError = 1;
+        }
     }
+
+    if (!error)
+        std::cout << "CovarianceMatrix setDiag --- Pass\n";
     else
-        std::cout << "CovarianceMatrix getCovMatrix & initCovarianceMatrix --- Pass\n";
-    */
+        error = 0; //Reset for next function.
 
-    // TODO: Write function to extract choleski matrix similar to covMatrix above
-    //--------------------------------------------//
-    //------ choleskiDecomposition Function ------//
-    //--------------------------------------------//
+    //-----------------------------------------------------------------//
+    //------ getCholeskiMatrix & choleskiDecomposition Functions ------//
+    //-----------------------------------------------------------------//
+    covM.choleskiDecomposition();
 
-    // TODO: Test print functions somehow
-    //--------------------------------------------//
-    //------ printCovarianceMatrix Function ------//
-    //--------------------------------------------//
-    //covM.printCovarianceMatrix();
+    // Perform Choleski decomposition on covM2
+    // (This should be the same code as used in Choleski decomposition in CovarianceMatrix.cpp)
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < (i + 1); j++)
+        {
+            double LsubstractSum = 0.0;
+            for (int k = 0; k < j; k++)
+            {
+                LsubstractSum += covM2[i * 4 + k] * covM2[j * 4 + k];
+            }
+            covM2[i * 4 + j] = (i == j) ? std::sqrt(covM2[i * 4 + i] - LsubstractSum) :
+                               (1.0 / covM2[j * 4 + j]) * (covM2[i * 4 + j] - LsubstractSum);
+        }
+    }
 
-    //------------------------------------------//
-    //------ printCholeskiMatrix Function ------//
-    //------------------------------------------//
-    //covM.printCholeskiMatrix();
+    for (unsigned i = 0u; i < 16; i++)
+    {
+        // Compare, for each position of the vector of doubles, if the statically created covM2
+        // equals the set covM for its Choleski matrix
+        if (covM2[i] != covM.getCholeskiMatrix()->at(i))
+        {
+            std::cerr << "Error in getCholeskiMatrix or choleskiDecomposition:";
+            std::cerr << " at index " << i << " matrix extracted should return " << covM2[i];
+            std::cerr << " but instead returns " << covM.getCholeskiMatrix()->at(i) << ".\n";
+            error = 1;
+            globalError = 1;
+        }
+    }
+
+    if (!error)
+        std::cout << "CovarianceMatrix getCholeskiMatrix & choleskiDecomposition --- Pass\n";
+    else
+        error = 0; //Reset for next function.
 
     //-------------------------------------//
     //------ getNumVariates Function ------//

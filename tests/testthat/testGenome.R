@@ -3,8 +3,9 @@ library(ribModel)
 
 context("Genome")
 
+# Must navigate out of /RibModelFramework/tests/testthat
 test_that("general genome functions", {
-  expect_equal(testGenome("/Users/hollisbui/RibModelDev/data/UnitTestingData"), 0)
+  expect_equal(testGenome("../../../RibModelDev/data/UnitTestingData"), 0)
 })
 
 g <- new(Genome)

@@ -186,6 +186,13 @@ std::vector<double>* CovarianceMatrix::getCovMatrix()
 }
 
 
+std::vector<double>* CovarianceMatrix::getCholeskiMatrix()
+{
+    std::vector<double> *ptr = &choleskiMatrix;
+    return ptr;
+}
+
+
 int CovarianceMatrix::getNumVariates()
 {
     return numVariates;

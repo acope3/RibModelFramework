@@ -39,6 +39,7 @@ class CovarianceMatrix
 	    void printCovarianceMatrix();
         void printCholeskiMatrix();
         std::vector<double>* getCovMatrix();
+		std::vector<double>* getCholeskiMatrix(); //Only for unit testing.
         int getNumVariates();
         std::vector<double> transformIidNumersIntoCovaryingNumbers(std::vector<double> iidnumbers);
 		void calculateSampleCovariance(std::vector<std::vector<std::vector<std::vector<double>>>> codonSpecificParameterTrace, std::string aa, unsigned samples, unsigned lastIteration);
