@@ -19,7 +19,7 @@ class Gene
 		std::string id; //Gene id: Ex: "YALOC001"
 		std::string description; //Additional information about the gene.
 
-		void cleanSeq();
+		void cleanSeq(); //deprecated; TODO: remove
 
 	public:
 
@@ -47,7 +47,7 @@ class Gene
 		std::vector <unsigned> getRFP_count(); //Only for unit testing.
 		void addRFP_count(std::vector <unsigned> RFP_counts);
 		SequenceSummary *getSequenceSummary();
-		std::vector<double> getObservedSynthesisRateValues();
+		std::vector<double> getObservedSynthesisRateValues(); //exposed to RCPP, tested in C++
 		void setObservedSynthesisRateValues(std::vector <double> values); //Only for unit testing.
 		double getObservedSynthesisRate(unsigned index);
 		unsigned getNumObservedSynthesisSets();
@@ -56,7 +56,7 @@ class Gene
 
 		//Other functions:
 		void clear(); // clear the content of object
-		unsigned length();
+		unsigned length(); //exposed to RCPP, tested in C++
 		Gene reverseComplement(); // return the reverse compliment
 		std::string toAASequence();
 

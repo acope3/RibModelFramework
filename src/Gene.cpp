@@ -349,7 +349,7 @@ unsigned Gene::getAACount(std::string aa)
     }
     else
     {
-        Rprintf("Invalid string given. Returning 0.\n");
+        my_print("Invalid string given. Returning 0.\n");
     }
     return rv;
 }
@@ -365,7 +365,7 @@ unsigned Gene::getCodonCount(std::string& codon)
     }
     else
     {
-        Rprintf("Invalid codon given. Returning 0.\n");
+        my_print("Invalid codon given. Returning 0.\n");
     }
     return rv;
 }
@@ -380,7 +380,7 @@ unsigned Gene::getRFPObserved(std::string codon)
     }
     else
     {
-        Rprintf("Invalid codon given. Returning 0.\n");
+        my_print("Invalid codon given. Returning 0.\n");
     }
     return rv;
 }
@@ -399,7 +399,7 @@ std::vector <unsigned> Gene::getCodonPositions(std::string codon)
     }
     else
     {
-        Rprintf("Invalid codon given. Returning empty vector.\n");
+        my_print("Invalid codon given. Returning empty vector.\n");
     }
 
 

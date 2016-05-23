@@ -54,7 +54,7 @@ class Genome
 		//Other Functions:
 		unsigned getGenomeSize(bool simulated = false);
 		void clear();
-		Genome getGenomeForGeneIndicies(std::vector <unsigned> indicies, bool simulated = false); //NOTE: If simulated is true, it will return a genome with the simulated genes, but the returned genome's genes vector will contain the simulated genes.
+		Genome getGenomeForGeneIndices(std::vector <unsigned> indices, bool simulated = false); //NOTE: If simulated is true, it will return a genome with the simulated genes, but the returned genome's genes vector will contain the simulated genes.
 		std::vector<unsigned> getCodonCountsPerGene(std::string codon);
 
 
@@ -70,7 +70,7 @@ class Genome
 		bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);
 		Gene& getGeneByIndex(unsigned index, bool simulated = false);
 		Gene& getGeneById(std::string ID, bool simulated = false);
-		Genome getGenomeForGeneIndiciesR(std::vector <unsigned> indicies, bool simulated = false);
+		Genome getGenomeForGeneIndicesR(std::vector <unsigned> indices, bool simulated = false);
 
 #endif //STANDALONE
 
