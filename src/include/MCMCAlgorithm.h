@@ -47,7 +47,7 @@ class MCMCAlgorithm
 		//Acceptance Rejection Functions:
 		double acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, Model& model, int iteration);
 		void acceptRejectCodonSpecificParameter(Genome& genome, Model& model, int iteration);
-		void acceptRejectHyperParameter(Genome &genome, Model& model, int iteration);
+		void acceptRejectHyperParameter(Genome &genome, Model& model, unsigned iteration);
 
 	public:
 
@@ -60,9 +60,9 @@ class MCMCAlgorithm
 	
 
 		//MCMC Functions:
-		void run(Genome& genome, Model& model, unsigned numCores = 1u, unsigned divergenceIterations = 0u);
-		void varyInitialConditions(Genome& genome, Model& model, unsigned divergenceIterations);
-		double calculateGewekeScore(unsigned current_iteration);
+		void run(Genome& genome, Model& model, unsigned numCores = 1u, unsigned divergenceIterations = 0u); //TODO: UNTESTED
+		void varyInitialConditions(Genome& genome, Model& model, unsigned divergenceIterations); //TODO: UNTESTED
+		double calculateGewekeScore(unsigned current_iteration); //TODO: UNTESTED
 
 		bool isEstimateSynthesisRate();
 		bool isEstimateCodonSpecificParameter();
@@ -74,15 +74,15 @@ class MCMCAlgorithm
 		void setEstimateHyperParameter(bool in);
 		void setEstimateMixtureAssignment(bool in);
 
-		void setRestartFileSettings(std::string filename, unsigned interval, bool multiple);
+		void setRestartFileSettings(std::string filename, unsigned interval, bool multiple); //TODO: UNTESTED
 		void setStepsToAdapt(unsigned steps);
 		int getStepsToAdapt();
 
 		std::vector<double> getLogLikelihoodTrace();
-		double getLogLikelihoodPosteriorMean(unsigned samples);
+		double getLogLikelihoodPosteriorMean(unsigned samples); //TODO: UNTESTED
 
-		static std::vector<double> acf(std::vector<double>& x, int nrows, int ncols, int lagmax, bool correlation, bool demean);
-		static std::vector<std::vector<double>> solveToeplitzMatrix(int lr, std::vector<double> r, std::vector<double> g);
+		static std::vector<double> acf(std::vector<double>& x, int nrows, int ncols, int lagmax, bool correlation, bool demean); //TODO: UNTESTED
+		static std::vector<std::vector<double>> solveToeplitzMatrix(int lr, std::vector<double> r, std::vector<double> g); //TODO: UNTESTED
 
 
 

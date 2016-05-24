@@ -20,7 +20,7 @@ class CovarianceMatrix
 
     public:
         //Constructors & Destructors:
-        CovarianceMatrix(); //TODO: Currently defaults to initCovarianceMatrix(2)
+        CovarianceMatrix(); //Defaults to initCovarianceMatrix(2)
         CovarianceMatrix(int _numVariates);
         CovarianceMatrix(std::vector <double> &matrix);
         CovarianceMatrix(const CovarianceMatrix& other);

@@ -108,7 +108,7 @@ Gene::~Gene()
 //Removes any characters not specified in the valid string
 //defined (ACGTN). Prevents non-nucleotide characters from
 //being found in the gene sequence.
-//Note: Deprecated! See SequenceSummary.cpp -> procesSequence.
+//Note: Deprecated! See SequenceSummary.cpp -> processSequence.
 //We should not tamper with individual erroneous characters.
 void Gene::cleanSeq()
 {

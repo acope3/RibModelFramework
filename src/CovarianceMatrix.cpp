@@ -15,7 +15,17 @@ using namespace Rcpp;
 
 CovarianceMatrix::CovarianceMatrix()
 {
-	initCovarianceMatrix(2); //TODO: should not do this
+    /* Initialize with numVariates = 2.
+    // Equivalent to calling initCovarianceMatrix(2) */
+    numVariates = 2;
+    covMatrix.resize(4);
+    choleskyMatrix.resize(4);
+
+    for (unsigned i = 0u; i < 4; i++)
+    {
+        covMatrix[i] = i % 3 ? 0.0 : 0.01 / 2.0;
+        choleskyMatrix[i] = 0.0;
+    }
 }
 
 

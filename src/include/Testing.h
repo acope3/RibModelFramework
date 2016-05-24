@@ -16,8 +16,9 @@ int testGene();
 int testGenome(std::string testFileDir);
 int testUtility();
 int testCovarianceMatrix();
+int testParameter();
 int testMCMCAlgorithm();
-int testTrace();
+//int testTrace();
 
 //Blank header
 #endif // Testing_H

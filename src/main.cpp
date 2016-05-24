@@ -663,10 +663,12 @@ int main()
 	// UNIT TESTING
 	//testSequenceSummary();
 	//testGene();
-	testGenome("/Users/hollisbui/RibModelFramework/tests/testthat/UnitTestingData");
+	//testGenome("/Users/hollisbui/RibModelFramework/tests/testthat/UnitTestingData");
 	//testUtility();
 	//testCovarianceMatrix();
+	testParameter();
 	//testTrace();
+	testMCMCAlgorithm();
 	exit(0);
 
 	std::string modelToRun = "ROC"; //can be RFP, ROC or FONSE
@@ -676,8 +678,8 @@ int main()
 
 
 	std::cout << "Initializing MCMCAlgorithm object---------------\n";
-	int samples = 10;
-	int thining = 10;
+	unsigned samples = 10;
+	unsigned thining = 10;
 	int useSamples = 100;
 	std::cout << "\t# Samples: " << samples << "\n";
 	std::cout << "\tThining: " << thining << "\n";
