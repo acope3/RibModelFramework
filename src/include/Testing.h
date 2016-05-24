@@ -7,6 +7,8 @@
 #include "Genome.h"
 #include "Utility.h"
 #include "CovarianceMatrix.h"
+#include "MCMCAlgorithm.h"
+#include "base/Trace.h"
 
 
 int testSequenceSummary();
@@ -14,6 +16,8 @@ int testGene();
 int testGenome(std::string testFileDir);
 int testUtility();
 int testCovarianceMatrix();
+int testMCMCAlgorithm();
+int testTrace();
 
 //Blank header
 #endif // Testing_H

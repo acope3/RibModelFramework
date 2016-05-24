@@ -1,6 +1,7 @@
 #ifndef COVARIANCEMATRIX_H
 #define COVARIANCEMATRIX_H
 
+
 #include <vector>
 #include <cmath>
 

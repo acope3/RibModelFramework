@@ -1,21 +1,22 @@
 #ifndef MCMCALGORITHM_H
 #define MCMCALGORITHM_H
 
-#include <vector>
-#include <cstdlib>
-#include <sstream>
-#include <chrono>
-#include <fstream>
-#include <stdlib.h> //can be removed later
-#ifndef STANDALONE
-#include <Rcpp.h>
-#endif
 
 #include "ROC/ROCModel.h"
 #include "RFP/RFPModel.h"
 #include "FONSE/FONSEModel.h"
 
 
+#include <vector>
+#include <cstdlib>
+#include <sstream>
+#include <chrono>
+#include <fstream>
+#include <stdlib.h> //can be removed later
+
+#ifndef STANDALONE
+#include <Rcpp.h>
+#endif
 
 class MCMCAlgorithm
 {
@@ -57,7 +58,6 @@ class MCMCAlgorithm
 					  bool _estimateHyperParameter = true);
 		virtual ~MCMCAlgorithm();
 	
-
 
 		//MCMC Functions:
 		void run(Genome& genome, Model& model, unsigned numCores = 1u, unsigned divergenceIterations = 0u);

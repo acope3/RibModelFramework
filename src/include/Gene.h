@@ -9,7 +9,6 @@
 #include <vector>
 #include <map>
 
-
 class Gene
 {
 

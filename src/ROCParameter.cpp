@@ -68,7 +68,7 @@ ROCParameter::~ROCParameter()
 
 
 //---------------------------------------------------------------//
-// ---------- Initialization, Restart, Index Checking ---------- //
+//----------- Initialization, Restart, Index Checking -----------//
 //---------------------------------------------------------------//
 
 
@@ -480,9 +480,9 @@ void ROCParameter::initSelectionCategories(std::vector<std::string> files, unsig
 }
 
 
-// --------------------------------------//
-// ---------- Trace Functions -----------//
-// --------------------------------------//
+//--------------------------------------//
+//---------- Trace Functions -----------//
+//--------------------------------------//
 
 void ROCParameter::updateObservedSynthesisNoiseTraces(unsigned sample)
 {
@@ -509,9 +509,9 @@ void ROCParameter::updateCodonSpecificParameterTrace(unsigned sample, std::strin
 
 
 
-// ------------------------------------------//
-// ---------- Covariance Functions ----------//
-// ------------------------------------------//
+//------------------------------------------//
+//---------- Covariance Functions ----------//
+//------------------------------------------//
 
 
 CovarianceMatrix& ROCParameter::getCovarianceMatrixForAA(std::string aa)
@@ -522,9 +522,9 @@ CovarianceMatrix& ROCParameter::getCovarianceMatrixForAA(std::string aa)
 }
 
 
-// ------------------------------------------------------//
-// ---------- observedSynthesisNoise Functions ----------//
-// ------------------------------------------------------//
+//------------------------------------------------------//
+//---------- observedSynthesisNoise Functions ----------//
+//------------------------------------------------------//
 
 
 double ROCParameter::getObservedSynthesisNoise(unsigned index)
@@ -542,9 +542,9 @@ void ROCParameter::setObservedSynthesisNoise(unsigned index, double se)
 
 
 
-// -------------------------------------------//
-// ---------- noiseOffset Functions ----------//
-// -------------------------------------------//
+//-------------------------------------------//
+//---------- noiseOffset Functions ----------//
+//-------------------------------------------//
 
 
 double ROCParameter::getNoiseOffset(unsigned index, bool proposed)
@@ -580,9 +580,9 @@ void ROCParameter::updateNoiseOffset(unsigned index)
 }
 
 
-// -----------------------------------//
-// ---------- CSP Functions ----------//
-// -----------------------------------//
+//-----------------------------------//
+//---------- CSP Functions ----------//
+//-----------------------------------//
 
 
 double ROCParameter::getCurrentCodonSpecificProposalWidth(unsigned aa)
@@ -665,9 +665,11 @@ void ROCParameter::updateCodonSpecificParameter(std::string grouping)
 
 
 
-// -------------------------------------//
-// ---------- Prior Functions ----------//
-// -------------------------------------//
+//-------------------------------------//
+//---------- Prior Functions ----------//
+//-------------------------------------//
+
+
 double ROCParameter::getMutationPriorStandardDeviation()
 {
 	return mutation_prior_sd;
@@ -683,9 +685,9 @@ void ROCParameter::setMutationPriorStandardDeviation(double _mutation_prior_sd)
 
 
 
-// ------------------------------------------------------------------//
-// ---------- Posterior, Variance, and Estimates Functions ----------//
-// ------------------------------------------------------------------//
+//------------------------------------------------------------------//
+//---------- Posterior, Variance, and Estimates Functions ----------//
+//------------------------------------------------------------------//
 
 
 
@@ -739,9 +741,9 @@ double ROCParameter::getNoiseOffsetVariance(unsigned index, unsigned samples, bo
 }
 
 
-// ----------------------------------------------//
-// ---------- Adaptive Width Functions ----------//
-// ----------------------------------------------//
+//----------------------------------------------//
+//---------- Adaptive Width Functions ----------//
+//----------------------------------------------//
 
 void ROCParameter::adaptNoiseOffsetProposalWidth(unsigned adaptationWidth, bool adapt)
 {
@@ -761,9 +763,9 @@ void ROCParameter::adaptNoiseOffsetProposalWidth(unsigned adaptationWidth, bool 
 	}
 }
 
-// -------------------------------------//
-// ---------- Other Functions ----------//
-// -------------------------------------//
+//-------------------------------------//
+//---------- Other Functions ----------//
+//-------------------------------------//
 
 
 void ROCParameter::setNumObservedPhiSets(unsigned _phiGroupings)
@@ -794,9 +796,9 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
 	}
 }
 
-// -----------------------------------------------------------------------------------------------------//
-// ---------------------------------------- R SECTION --------------------------------------------------//
-// -----------------------------------------------------------------------------------------------------//
+//-----------------------------------------------------------------------------------------------------//
+//---------------------------------------- R SECTION --------------------------------------------------//
+//-----------------------------------------------------------------------------------------------------//
 
 
 

@@ -1919,9 +1919,77 @@ int testCovarianceMatrix()
 }
 
 
-// -----------------------------------------------------------------------------------------------------//
-// ---------------------------------------- R SECTION --------------------------------------------------//
-// -----------------------------------------------------------------------------------------------------//
+/* UNIMPLEMENTED
+int testTrace()
+{
+    Trace RFP; //initialize with 0 categories, 2 codon-specific parameter types
+    Trace ROC;
+    Trace FONSE;
+    Trace PANSE;
+    //int samples = 10;
+    //int thining = 10;
+    //int useSamples = 100;
+    int globalError = 0;
+
+    //-----------------------------------------//
+    //------ initializeRFPTrace Function ------//
+    //-----------------------------------------//
+    //RFP.initializeRFPTrace();
+
+    //-----------------------------------------//
+    //------ initializeROCTrace Function ------//
+    //-----------------------------------------//
+    //ROC.initializeROCTrace();
+
+    //-------------------------------------------//
+    //------ initializeFONSETrace Function ------//
+    //-------------------------------------------//
+    //FONSE.initializeFONSETrace();
+
+    //-------------------------------------------//
+    //------ initializePANSETrace Function ------//
+    //-------------------------------------------//
+    //PANSE.initializePANSETrace();
+
+    return globalError;
+}
+
+
+
+int testParameter()
+{
+    int globalError = 0;
+
+    return globalError;
+}
+
+
+int testROCParameter()
+{
+    int globalError = 0;
+
+
+    return globalError;
+}
+
+*/
+int testMCMCAlgorithm()
+{
+	int samples = 10;
+	int thining = 10;
+	int useSamples = 100;
+    int globalError = 0;
+
+    MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, 10, true, true, true);
+
+    return globalError;
+}
+
+
+
+//-----------------------------------------------------------------------------------------------------//
+//---------------------------------------- R SECTION --------------------------------------------------//
+//-----------------------------------------------------------------------------------------------------//
 
 #ifndef STANDALONE
 //---------------------------------//

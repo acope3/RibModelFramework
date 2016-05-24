@@ -1,6 +1,10 @@
 #ifndef GENOME_H
 #define GENOME_H
 
+
+#include "Gene.h"
+
+
 #include <vector>
 #include <string>
 #include <map>
@@ -11,8 +15,6 @@
 #ifndef STANDALONE
 #include <Rcpp.h>
 #endif
-
-#include "Gene.h"
 
 class Model;
 class Genome

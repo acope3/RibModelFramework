@@ -1,6 +1,5 @@
 #include "include/MCMCAlgorithm.h"
 #include "include/Testing.h"
-#include "include/Utility.h"
 #include <vector>
 
 #ifdef CEDRIC
@@ -664,10 +663,11 @@ int main()
 	// UNIT TESTING
 	//testSequenceSummary();
 	//testGene();
-	//testGenome("/Users/hollisbui/RibModelFramework/tests/testthat/UnitTestingData");
+	testGenome("/Users/hollisbui/RibModelFramework/tests/testthat/UnitTestingData");
 	//testUtility();
 	//testCovarianceMatrix();
-	//exit(1);
+	//testTrace();
+	exit(0);
 
 	std::string modelToRun = "ROC"; //can be RFP, ROC or FONSE
 	bool withPhi = false;
@@ -758,7 +758,9 @@ int main()
 			tmp.InitializeSynthesisRate(genome, sphi_init[0]);
 			//std::vector<double> phiVals = parameter.readPhiValues("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrCleft_phi_est.csv");
 			//parameter.InitializeSynthesisRate(phiVals);
+			parameter = tmp;
 		}
+		//parameter = tmp;
 		std::cout << "Done!--------------------------------\n\n\n";
 
 
