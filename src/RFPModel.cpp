@@ -168,12 +168,12 @@ void RFPModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 		mixture = getSynthesisRateCategory(mixture);
 		double phi = getSynthesisRate(i, mixture, false);
 		if (i == 0) {
-	//	std::cout <<"proposed: " << Parameter::densityLogNorm(phi, proposedMPhi[mixture], proposedStdDevSynthesisRate[mixture], false) <<"\n";
-		//std::cout <<"current: " << Parameter::densityLogNorm(phi, currentMPhi, currentStdDevSynthesisRate, false) <<"\n";
+	//	my_print("proposed: %\n", Parameter::densityLogNorm(phi, proposedMPhi[mixture], proposedStdDevSynthesisRate[mixture], false));
+		//my_print("current: %\n", Parameter::densityLogNorm(phi, currentMPhi, currentStdDevSynthesisRate, false));
 		}
 		lpr += Parameter::densityLogNorm(phi, proposedMphi[mixture], proposedStdDevSynthesisRate[mixture], true) -
 				Parameter::densityLogNorm(phi, currentMphi[mixture], currentStdDevSynthesisRate[mixture], true);
-		//std::cout <<"LPR: " << lpr <<"\n";
+		//my_print("LPR: %\n", lpr);
 	}
 
 	logProbabilityRatio[0] = lpr;
@@ -555,11 +555,11 @@ void RFPModel::simulateGenome(Genome &genome)
 
 void RFPModel::printHyperParameters()
 {
-	for(unsigned i = 0u; i < getNumSynthesisRateCategories(); i++)
+	for (unsigned i = 0u; i < getNumSynthesisRateCategories(); i++)
 	{
-		std::cout << "stdDevSynthesisRate posterior estimate for selection category " << i << ": " << parameter -> getStdDevSynthesisRate(i) << std::endl;
+		my_print("stdDevSynthesisRate posterior estimate for selection category %: %\n", i, parameter->getStdDevSynthesisRate(i));
 	}
-	std::cout << "\t current stdDevSynthesisRate proposal width: " << getCurrentStdDevSynthesisRateProposalWidth() << std::endl;
+	my_print("\t current stdDevSynthesisRate proposal width: %\n", getCurrentStdDevSynthesisRateProposalWidth());
 }
 
 

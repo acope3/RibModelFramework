@@ -11,10 +11,10 @@
 #include "base/Trace.h"
 
 
+int testUtility();
 int testSequenceSummary();
 int testGene();
 int testGenome(std::string testFileDir);
-int testUtility();
 int testCovarianceMatrix();
 int testParameter();
 int testMCMCAlgorithm();

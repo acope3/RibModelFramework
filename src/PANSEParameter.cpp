@@ -144,7 +144,7 @@ void PANSEParameter::initPANSEValuesFromFile(std::string filename)
 	input.open(filename.c_str());
 	if (input.fail())
 	{
-		std::cerr << "Could not open file to initialize PANSE values\n";
+		my_printError("Could not open file to initialize PANSE values\n");
 		std::exit(1);
 	}
 	std::string tmp, variableName;
@@ -168,7 +168,7 @@ void PANSEParameter::initPANSEValuesFromFile(std::string filename)
 		}
 		else if (flag == 2)
 		{
-			std::cout << "here\n";
+			my_print("here\n");
 		}
 		else if (flag == 3) //user comment, continue
 		{
@@ -268,7 +268,7 @@ void PANSEParameter::writePANSERestartFile(std::string filename)
 	out.open(filename.c_str(), std::ofstream::app);
 	if (out.fail())
 	{
-		std::cerr <<"Could not open restart file for writing\n";
+		my_printError("Could not open restart file for writing\n");
 		std::exit(1);
 	}
 
@@ -305,7 +305,7 @@ void PANSEParameter::writePANSERestartFile(std::string filename)
 	}
 
 	oss << ">std_csp:\n";
-	std::cout << std_csp.size() <<"\n";
+	my_print("%\n", std_csp.size());
 	for (i = 0; i < std_csp.size(); i++)
 	{
 		oss << std_csp[i];
@@ -398,7 +398,7 @@ void PANSEParameter::initMutationSelectionCategories(std::vector<std::string> fi
 		currentFile.open(files[i].c_str());
 		if (currentFile.fail())
 		{
-			std::cerr << "Error opening file " << i << " in the file vector.\n";
+			my_printError("Error opening file % in the file vector.\n", i);
 			std::exit(1);
 		}
 		currentFile >> tmpString; //trash the first line, no info given.
@@ -534,16 +534,16 @@ void PANSEParameter::updateCodonSpecificParameter(std::string grouping)
 */
 void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastIteration, bool adapt)
 {
-	std::cout << "acceptance rate for codon:\n";
+	my_print("acceptance rate for codon:\n");
 	for (unsigned i = 0; i < groupList.size(); i++)
 	{
-		std::cout << groupList[i] << "\t";
+		my_print("%\t", groupList[i]);
 
 		unsigned codonIndex = SequenceSummary::codonToIndex(groupList[i]);
 		double acceptanceLevel = (double)numAcceptForCodonSpecificParameters[codonIndex] / (double)adaptationWidth;
 		traces.updateCodonSpecificAcceptanceRatioTrace(codonIndex, acceptanceLevel);
 		if (adapt) {
-			std::cout << acceptanceLevel << " with std_csp = " << std_csp[i] << "\n";
+			my_print("% with std csp = %\n", acceptanceLevel, std_csp[i]);
 			if (acceptanceLevel < 0.2) {
 				std_csp[i] *= 0.8;
 			}
@@ -553,7 +553,7 @@ void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptatio
 		}
 		numAcceptForCodonSpecificParameters[codonIndex] = 0u;
 	}
-	std::cout << "\n";
+	my_print("\n");
 }
 
 
@@ -677,13 +677,12 @@ void PANSEParameter::initMutationSelectionCategoriesR(std::vector<std::string> f
 	}
 	else
 	{
-		std::cerr << "Bad paramType given. Expected \"Alpha\" or \"LambdaPrime\".\nFunction not being executed!\n";
+		my_printError("Bad paramType given. Expected \"Alpha\" or \"LambdaPrime\".\nFunction not being executed!\n");
 		check = false;
 	}
 	if (files.size() != numCategories) //we have different sizes and need to stop
 	{
-		std::cerr
-		<< "The number of files given and the number of categories given differ. Function will not be executed!\n";
+		my_printError("The number of files given and the number of categories given differ. Function will not be executed!\n");
 		check = false;
 	}
 
