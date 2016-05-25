@@ -137,7 +137,7 @@ void FONSEParameter::initFONSEValuesFromFile(std::string filename)
 	input.open(filename.c_str());
 	if (input.fail())
 	{
-		std::cerr << "Could not open RestartFile.txt to initialize FONSE values\n";
+		my_printError("ERROR: Could not open RestartFile.txt to initialize FONSE values\n");
 		std::exit(1);
 	}
 	std::string tmp, variableName;
@@ -168,7 +168,7 @@ void FONSEParameter::initFONSEValuesFromFile(std::string filename)
 		}
 		else if (flag == 2)
 		{
-			std::cout << "here\n";
+			my_print("here\n");
 		}
 		else if (flag == 3) //user comment, continue
 		{
@@ -278,7 +278,7 @@ void FONSEParameter::writeFONSERestartFile(std::string filename)
     out.open(filename.c_str(), std::ofstream::app);
     if (out.fail())
     {
-        std::cerr << "Could not open RestartFile.txt to append\n";
+        my_printError("ERROR: Could not open RestartFile.txt to append\n");
         std::exit(1);
     }
     
@@ -367,7 +367,7 @@ void FONSEParameter::initMutationCategories(std::vector<std::string> files, unsi
         currentFile.open(files[category].c_str());
         if (currentFile.fail())
         {
-            std::cerr << "Error opening file " << category << " to initialize mutation values.\n";
+            my_printError("Error opening file % to initialize mutation values.\n", category);
             std::exit(1);
         }
         
@@ -383,7 +383,7 @@ void FONSEParameter::initMutationCategories(std::vector<std::string> files, unsi
             
             //get the value to store
             std::size_t pos2 = tmp.find(",", pos + 1);
-            //std::cout << tmp.substr(pos + 1, pos2 - pos - 1 ) <<"\n";
+            //my_print("%\n", tmp.substr(pos + 1, pos2 - pos - 1 ));
             double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
             
             currentCodonSpecificParameter[dM][category][codonIndex] = value;
@@ -403,7 +403,7 @@ void FONSEParameter::initSelectionCategories(std::vector<std::string> files, uns
         currentFile.open(files[category].c_str());
         if (currentFile.fail())
         {
-            std::cerr << "Error opening file " << category << " to initialize mutation values.\n";
+            my_printError("Error opening file % to initialize mutation values.\n", category);
             std::exit(1);
         }
         
@@ -419,7 +419,7 @@ void FONSEParameter::initSelectionCategories(std::vector<std::string> files, uns
             
             //get the value to store
             std::size_t pos2 = tmp.find(",", pos + 1);
-            //	std::cout << tmp.substr(pos + 1, pos2 - pos - 1 ) <<"\n";
+            //	my_print("%\n", tmp.substr(pos + 1, pos2 - pos - 1 ));
             double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
             
             currentCodonSpecificParameter[dOmega][category][codonIndex] = value;

@@ -661,10 +661,10 @@ int main()
 int main()
 {
 	// UNIT TESTING
+	//testUtility();
 	//testSequenceSummary();
 	//testGene();
 	//testGenome("/Users/hollisbui/RibModelFramework/tests/testthat/UnitTestingData");
-	//testUtility();
 	//testCovarianceMatrix();
 	testParameter();
 	//testTrace();

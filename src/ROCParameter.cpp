@@ -431,7 +431,7 @@ void ROCParameter::initMutationCategories(std::vector<std::string> files, unsign
 
 				//get the value to store
 				std::size_t pos2 = tmp.find(",", pos + 1);
-				//std::cout << tmp.substr(pos + 1, pos2 - pos - 1 ) <<"\n";
+				//my_print("%\n", tmp.substr(pos + 1, pos2 - pos - 1 ));
 				double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
 
 				currentCodonSpecificParameter[dM][category][codonIndex] = value;
@@ -467,7 +467,7 @@ void ROCParameter::initSelectionCategories(std::vector<std::string> files, unsig
 
 				//get the value to store
 				std::size_t pos2 = tmp.find(",", pos + 1);
-				//	std::cout << tmp.substr(pos + 1, pos2 - pos - 1 ) <<"\n";
+				//	my_print("%\n", tmp.substr(pos + 1, pos2 - pos - 1 ));
 				double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
 
 				currentCodonSpecificParameter[dEta][category][codonIndex] = value;

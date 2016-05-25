@@ -145,7 +145,7 @@ void Trace::initCodonSpecificParameterTrace(unsigned samples, unsigned numCatego
 		codonSpecificParameterTraceTwo = tmp;
 		break;
 	default:
-		std::cerr << "Invalid paramType given, codon specific parameter trace not initialized.\n";
+		my_printError("ERROR: Invalid paramType given, codon specific parameter trace not initialized.\n");
 		break;
 	}
 	*/
@@ -375,7 +375,7 @@ std::vector<double> Trace::getCodonSpecificParameterTraceByMixtureElementForCodo
 		rv = codonSpecificParameterTraceTwo[category][codonIndex];
 		break;
 	default:
-		std::cerr << "Unknown Parameter type\n";
+		my_printError("ERROR: Unknown Parameter type in getCodonSpecificParameterTraceByMixtureElementForCodon\n");
 		break;
 	}
 	*/
@@ -413,7 +413,7 @@ std::vector<std::vector<std::vector<double>>> Trace::getCodonSpecificParameterTr
 		rv = codonSpecificParameterTraceTwo;
 		break;
 	default:
-		std::cerr << "Unknown Parameter type\n";
+		my_printError("ERROR: Unknown Parameter type in getCodonSpecificParameterTraceByParamType\n";
 		break;
 	}
 	*/
@@ -438,7 +438,7 @@ unsigned Trace::getCodonSpecificCategory(unsigned mixtureElement, unsigned param
 		rv = categories->at(mixtureElement).delEta;
 		break;
 	default:
-		std::cerr << "Unknown parameter type in getCodonSpecificCategory\n";
+		my_printError("ERROR: Unknown parameter type in getCodonSpecificCategory\n");
 		break;
 	}
 	return rv;
@@ -535,7 +535,7 @@ void Trace::updateCodonSpecificParameterTraceForAA(unsigned sample, std::string 
 		}
 		break;
 	default:
-		std::cerr << "Unknown parameter type\n";
+		my_printError("ERROR: Unknown parameter type in updateCodonSpecificParameterTraceForAA\n");
 		break;
 	}
 	*/
@@ -590,7 +590,7 @@ void Trace::updateCodonSpecificParameterTraceForCodon(unsigned sample, std::stri
 			}
 			break;
 		default:
-			std::cerr << "Unknown parameter type\n";
+			my_printError("ERROR: Unknown parameter type in updateCodonSpecificParameterTraceForCodon\n");
 			break;
 	}
 	*/
@@ -788,7 +788,7 @@ void Trace::setCodonSpecificParameterTrace(std::vector<std::vector<std::vector<d
 		codonSpecificParameterTraceTwo = _parameterTrace;
 		break;
 	default:
-		std::cerr << "Unknown parameter type.\n";
+		my_printError("ERROR: Unknown parameter type in setCodonSpecificParameterTrace.\n");
 		break;
 	}
 	*/

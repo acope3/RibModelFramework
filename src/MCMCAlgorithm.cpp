@@ -416,7 +416,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 			{
 				likelihoodTrace[(iteration / thining)] = logLike;
 				if (std::isnan(logLike)) {
-					std::cerr << "Log likelihood is NaN, exiting at iteration " << iteration << std::endl;
+					my_printError("ERROR: Log likelihood is NaN, exiting at iteration %\n", iteration);
 					model.setLastIteration(iteration / thining);
 					return;
 				}
@@ -670,7 +670,7 @@ void MCMCAlgorithm::setStepsToAdapt(unsigned steps)
 	if (steps <= samples * thining)
 		stepsToAdapt = steps;
 	else
-		std::cerr <<"Cannot set steps - value must be smaller than samples times thining (maxIterations)\n";
+		my_printError("ERROR: Cannot set steps - value must be smaller than samples times thining (maxIterations)\n");
 }
 
 

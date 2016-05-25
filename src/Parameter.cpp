@@ -549,7 +549,7 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 	double* expression = new double[genomeSize]();
 	int* index = new int[genomeSize]();
 
-	for(unsigned i = 0u; i < genomeSize; i++)
+	for (unsigned i = 0u; i < genomeSize; i++)
 	{
 		index[i] = i;
 		scuoValues[i] = calculateSCUO( genome.getGene(i), 22 ); //This used to be maxGrouping, but RFP model will not work that way
@@ -558,12 +558,12 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 	quickSortPair(scuoValues, index, 0, genomeSize);
 	quickSort(expression, 0, genomeSize);
 
-	for(unsigned category = 0u; category < numSelectionCategories; category++)
+	for (unsigned category = 0u; category < numSelectionCategories; category++)
 	{
-		for(unsigned j = 0u; j < genomeSize; j++)
+		for (unsigned j = 0u; j < genomeSize; j++)
 		{
 			currentSynthesisRateLevel[category][index[j]] = expression[j];
-			//std::cout << currentSynthesisRateLevel[category][j] <<"\n";
+			//my_print("%\n", currentSynthesisRateLevel[category][j]);
 			std_phi[category][j] = 0.1;
 			numAcceptForSynthesisRate[category][j] = 0u;
 		}

@@ -1,9 +1,38 @@
 #include "include/Testing.h"
 
+
+#include <iostream>
+
 #ifndef STANDALONE
 #include <Rcpp.h>
 using namespace Rcpp;
 #endif
+
+// This should be the only function besides those in Testing.h that uses cout and cerr.
+int testUtility()
+{
+    int error = 0;
+    int globalError = 0;
+
+    error = my_print("Product: %, Qty: %, Price is %", "Shampoo\n", 5, 100);
+
+    if (error)
+    {
+        std::cerr << "Error in my_print.\n";
+        globalError = 1;
+    }
+
+    error = my_printError("Product: %, Qty: %, Price is %", "Shampoo\n", 5, 100);
+
+    if (error)
+    {
+        std::cerr << "Error in my_printError\n";
+        globalError = 1;
+    }
+
+    return globalError;
+}
+
 
 int testSequenceSummary()
 {
@@ -19,8 +48,8 @@ int testSequenceSummary()
     {
         if (0 != SS.getCodonCountForCodon(i))
         {
-            std::cerr << "Problem with Sequence Summary \"clear\" function.\n";
-            std::cerr << "Problem at codon index" << i << "\n";
+            my_printError("Problem with Sequence Summary \"clear\" function.\n");
+            my_printError("Problem at codon index %\n.", i);
             error = 1;
             globalError = 1;
         }
@@ -29,15 +58,15 @@ int testSequenceSummary()
     {
         if (0 != SS.getAACountForAA(i))
         {
-            std::cerr << "Problem with Sequence Summary \"clear\" function.\n";
-            std::cerr << "Problem at amino acid index" << i << "\n";
+            my_printError("Problem with Sequence Summary \"clear\" function.\n");
+            my_printError("Problem at amino acid index i\n");
             error = 1;
             globalError = 1;
         }
     }
 
     if (!error)
-        std::cout << "Sequence Summary clear --- Pass\n";
+        my_print("Sequence Summary clear --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -48,18 +77,18 @@ int testSequenceSummary()
 
     if (1 != SS.getAACountForAA("I"))
     {
-        std::cerr << "Problem with Sequence Summary \"processSequence\" function.\n";
-        std::cerr << "Problem with amino acid \"I\".";
-        std::cerr << "I is in the sequence once, but is returning " << SS.getAACountForAA("I") << "\n";
+        my_printError("Problem with Sequence Summary \"processSequence\" function.\n");
+        my_printError("Problem with amino acid \"I\".");
+        my_printError("I is in the sequence once, but is returning %\n", SS.getAACountForAA("I"));
         error = 1;
         globalError = 1;
     }
 
     if (1 != SS.getAACountForAA("T"))
     {
-        std::cerr << "Problem with Sequence Summary \"processSequence\" function.\n";
-        std::cerr << "Problem with amino acid \"T\".";
-        std::cerr << "T is in the sequence once, but is returning " << SS.getAACountForAA("T") << "\n";
+        my_printError("Problem with Sequence Summary \"processSequence\" function.\n");
+        my_printError("Problem with amino acid \"T\".");
+        my_printError("T is in the sequence once, but is returning %\n", SS.getAACountForAA("T"));
         error = 1;
         globalError = 1;
     }
@@ -67,9 +96,9 @@ int testSequenceSummary()
     std::string codon = "ATT";
     if (1 != SS.getCodonCountForCodon(codon))
     {
-        std::cerr << "Problem with Sequence Summary \"processSequence\" function.\n";
-        std::cerr << "Problem with codon \"ATT\".";
-        std::cerr << "ATT is in the sequence once, but is returning " << SS.getCodonCountForCodon(codon) << "\n";
+        my_printError("Problem with Sequence Summary \"processSequence\" function.\n");
+        my_printError("Problem with codon \"ATT\".");
+        my_printError("ATT is in the sequence once, but is returning %\n", SS.getCodonCountForCodon(codon));
         error = 1;
         globalError = 1;
     }
@@ -77,9 +106,9 @@ int testSequenceSummary()
     codon = "ACT";
     if (1 != SS.getCodonCountForCodon(codon))
     {
-        std::cerr << "Problem with Sequence Summary \"processSequence\" function.\n";
-        std::cerr << "Problem with codon \"ACT\".";
-        std::cerr << "ACT is in the sequence once, but is returning " << SS.getCodonCountForCodon(codon) << "\n";
+        my_printError("Problem with Sequence Summary \"processSequence\" function.\n");
+        my_printError("Problem with codon \"ACT\".");
+        my_printError("ACT is in the sequence once, but is returning %\n", SS.getCodonCountForCodon(codon));
         error = 1;
         globalError = 1;
     }
@@ -87,9 +116,9 @@ int testSequenceSummary()
     codon = "GCT";
     if (1 != SS.getCodonCountForCodon(codon))
     {
-        std::cerr << "Problem with Sequence Summary \"processSequence\" function.\n";
-        std::cerr << "Problem with codon \"GCT\".";
-        std::cerr << "GCT is in the sequence once, but is returning " << SS.getCodonCountForCodon(codon) << "\n";
+        my_printError("Problem with Sequence Summary \"processSequence\" function.\n");
+        my_printError("Problem with codon \"GCT\".");
+        my_printError("GCT is in the sequence once, but is returning %\n", SS.getCodonCountForCodon(codon));
         error = 1;
         globalError = 1;
     }
@@ -97,9 +126,9 @@ int testSequenceSummary()
     codon = "GCC";
     if (1 != SS.getCodonCountForCodon(codon))
     {
-        std::cerr << "Problem with Sequence Summary \"processSequence\" function.\n";
-        std::cerr << "Problem with codon \"GCC\".";
-        std::cerr << "GCC is in the sequence once, but is returning " << SS.getCodonCountForCodon(codon) << "\n";
+        my_printError("Problem with Sequence Summary \"processSequence\" function.\n");
+        my_printError("Problem with codon \"GCC\".");
+        my_printError("GCC is in the sequence once, but is returning %\n", SS.getCodonCountForCodon(codon));
         error = 1;
         globalError = 1;
     }
@@ -108,11 +137,11 @@ int testSequenceSummary()
     tmp = SS.getCodonPositions("CTC");
     if ((1 != tmp -> at(0)) && (3 != tmp -> at(1)))
     {
-        std::cerr << "Codon CTC should be found at position 1 and 3(zero indexed), but is";
-        std::cerr << "found at these locations:\n";
+        my_printError("Codon CTC should be found at position 1 and 3(zero indexed), but is");
+        my_printError("found at these locations:\n");
         for (unsigned i = 0; i < tmp -> size(); i++)
         {
-            std::cerr << tmp -> at(i) << "\n";
+            my_printError("%\n", tmp -> at(i));
         }
         error = 1;
         globalError = 1;
@@ -121,18 +150,18 @@ int testSequenceSummary()
     tmp = SS.getCodonPositions("ATT");
     if (2 != tmp -> at(0))
     {
-        std::cerr << "Codon ATT should be found at position 2(zero indexed), but is";
-        std::cerr << "found at these locations:\n";
+        my_printError("Codon ATT should be found at position 2(zero indexed), but is");
+        my_printError("found at these locations:\n");
         for (unsigned i = 0; i < tmp -> size(); i++)
         {
-            std::cerr << tmp -> at(i) << "\n";
+            my_printError("%\n", tmp -> at(i));
         }
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        std::cout << "Sequence Summary processSequence --- Pass\n";
+        my_print("Sequence Summary processSequence --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -142,41 +171,41 @@ int testSequenceSummary()
 
     if ('T' != SequenceSummary::complimentNucleotide('A'))
     {
-        std::cerr << "The compliment of A should be T\n";
+        my_printError("The compliment of A should be T\n");
         error = 1;
         globalError = 1;
     }
 
     if ('A' != SequenceSummary::complimentNucleotide('T'))
     {
-        std::cerr << "The compliment of T should be A\n";
+        my_printError("The compliment of T should be A\n");
         error = 1;
         globalError = 1;
     }
 
     if ('G' != SequenceSummary::complimentNucleotide('C'))
     {
-        std::cerr << "The compliment of C should be G\n";
+        my_printError("The compliment of C should be G\n");
         error = 1;
         globalError = 1;
     }
 
     if ('C' != SequenceSummary::complimentNucleotide('G'))
     {
-        std::cerr << "The compliment of G should be C\n";
+        my_printError("The compliment of G should be C\n");
         error = 1;
         globalError = 1;
     }
 
     if ('C' != SequenceSummary::complimentNucleotide('Q'))
     {
-        std::cerr << "The compliment of Q should be C\n";
+        my_printError("The compliment of Q should be C\n");
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        std::cout << "Sequence Summary complimentNucleotide --- Pass\n";
+        my_print("Sequence Summary complimentNucleotide --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -186,70 +215,70 @@ int testSequenceSummary()
 
     if (1 != SS.getAACountForAA("M"))
     {
-        std::cerr << "Error with getAACountForAA(string) for amino acid M.\n";
-        std::cerr << "Should return 1, returns " << SS.getAACountForAA("M") << "\n";
+        my_printError("Error with getAACountForAA(string) for amino acid M.\n");
+        my_printError("Should return 1, returns %\n", SS.getAACountForAA("M"));
         error = 1;
         globalError = 1;
     }
 
     if (2 != SS.getAACountForAA("L"))
     {
-        std::cerr << "Error with getAACountForAA(string) for amino acid L.\n";
-        std::cerr << "Should return 2, returns " << SS.getAACountForAA("L") << "\n";
+        my_printError("Error with getAACountForAA(string) for amino acid L.\n");
+        my_printError("Should return 2, returns %\n", SS.getAACountForAA("L"));
         error = 1;
         globalError = 1;
     }
 
     if (1 != SS.getAACountForAA("I"))
     {
-        std::cerr << "Error with getAACountForAA(string) for amino acid I.\n";
-        std::cerr << "Should return 1, returns " << SS.getAACountForAA("I") << "\n";
+        my_printError("Error with getAACountForAA(string) for amino acid I.\n");
+        my_printError("Should return 1, returns %\n", SS.getAACountForAA("I"));
         error = 1;
         globalError = 1;
     }
 
     if (1 != SS.getAACountForAA("T"))
     {
-        std::cerr << "Error with getAACountForAA(string) for amino acid T.\n";
-        std::cerr << "Should return 1, returns " << SS.getAACountForAA("T") << "\n";
+        my_printError("Error with getAACountForAA(string) for amino acid T.\n");
+        my_printError("Should return 1, returns %\n", SS.getAACountForAA("T"));
         error = 1;
         globalError = 1;
     }
 
     if (2 != SS.getAACountForAA("A"))
     {
-        std::cerr << "Error with getAACountForAA(string) for amino acid A.\n";
-        std::cerr << "Should return 2, returns " << SS.getAACountForAA("A") << "\n";
+        my_printError("Error with getAACountForAA(string) for amino acid A.\n");
+        my_printError("Should return 2, returns %\n", SS.getAACountForAA("A"));
         error = 1;
         globalError = 1;
     }
 
     if (1 != SS.getAACountForAA("S"))
     {
-        std::cerr << "Error with getAACountForAA(string) for amino acid S.\n";
-        std::cerr << "Should return 1, returns " << SS.getAACountForAA("S") << "\n";
+        my_printError("Error with getAACountForAA(string) for amino acid S.\n");
+        my_printError("Should return 1, returns %\n", SS.getAACountForAA("S"));
         error = 1;
         globalError = 1;
     }
 
     if (1 != SS.getAACountForAA("X"))
     {
-        std::cerr << "Error with getAACountForAA(string) for amino acid X.\n";
-        std::cerr << "Should return 1, returns " << SS.getAACountForAA("X") << "\n";
+        my_printError("Error with getAACountForAA(string) for amino acid X.\n");
+        my_printError("Should return 1, returns %\n", SS.getAACountForAA("X"));
         error = 1;
         globalError = 1;
     }
 
     if (0 != SS.getAACountForAA("G"))
     {
-        std::cerr << "Error with getAACountForAA(string) for amino acid G.\n";
-        std::cerr << "Should return 0, returns " << SS.getAACountForAA("G") << "\n";
+        my_printError("Error with getAACountForAA(string) for amino acid G.\n");
+        my_printError("Should return 0, returns %\n", SS.getAACountForAA("G"));
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        std::cout << "Sequence Summary getAACountForAA(string) --- Pass\n";
+        my_print("Sequence Summary getAACountForAA(string) --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -258,70 +287,70 @@ int testSequenceSummary()
     //---------------------------------------------//
     if (1 != SS.getAACountForAA(10))
     {
-        std::cerr << "Error with getAACountForAA(index) for amino acid M (index 10).\n";
-        std::cerr << "Should return 1, returns " << SS.getAACountForAA(10) << "\n";
+        my_printError("Error with getAACountForAA(index) for amino acid M (index 10).\n");
+        my_printError("Should return 1, returns %\n", SS.getAACountForAA(10));
         error = 1;
         globalError = 1;
     }
 
     if (2 != SS.getAACountForAA(9))
     {
-        std::cerr << "Error with getAACountForAA(index) for amino acid L (index 9).\n";
-        std::cerr << "Should return 2, returns " << SS.getAACountForAA(9) << "\n";
+        my_printError("Error with getAACountForAA(index) for amino acid L (index 9).\n");
+        my_printError("Should return 2, returns %\n", SS.getAACountForAA(9));
         error = 1;
         globalError = 1;
     }
 
     if (1 != SS.getAACountForAA(7))
     {
-        std::cerr << "Error with getAACountForAA(index) for amino acid I (index 7).\n";
-        std::cerr << "Should return 1, returns " << SS.getAACountForAA(7) << "\n";
+        my_printError("Error with getAACountForAA(index) for amino acid I (index 7).\n");
+        my_printError("Should return 1, returns %\n", SS.getAACountForAA(7));
         error = 1;
         globalError = 1;
     }
 
     if (1 != SS.getAACountForAA(16))
     {
-        std::cerr << "Error with getAACountForAA(index) for amino acid T (index 16).\n";
-        std::cerr << "Should return 1, returns " << SS.getAACountForAA(16) << "\n";
+        my_printError("Error with getAACountForAA(index) for amino acid T (index 16).\n");
+        my_printError("Should return 1, returns %\n", SS.getAACountForAA(16));
         error = 1;
         globalError = 1;
     }
 
     if (2 != SS.getAACountForAA(0))
     {
-        std::cerr << "Error with getAACountForAA(index) for amino acid A (index 0).\n";
-        std::cerr << "Should return 2, returns " << SS.getAACountForAA(0) << "\n";
+        my_printError("Error with getAACountForAA(index) for amino acid A (index 0).\n");
+        my_printError("Should return 2, returns %\n", SS.getAACountForAA(0));
         error = 1;
         globalError = 1;
     }
 
     if (1 != SS.getAACountForAA(15))
     {
-        std::cerr << "Error with getAACountForAA(index) for amino acid S (index 15).\n";
-        std::cerr << "Should return 1, returns " << SS.getAACountForAA(15) << "\n";
+        my_printError("Error with getAACountForAA(index) for amino acid S (index 15).\n");
+        my_printError("Should return 1, returns %\n", SS.getAACountForAA(15));
         error = 1;
         globalError = 1;
     }
 
     if (1 != SS.getAACountForAA(21))
     {
-        std::cerr << "Error with getAACountForAA(index) for amino acid X (index 21).\n";
-        std::cerr << "Should return 1, returns " << SS.getAACountForAA(21) << "\n";
+        my_printError("Error with getAACountForAA(index) for amino acid X (index 21).\n");
+        my_printError("Should return 1, returns %\n", SS.getAACountForAA(21));
         error = 1;
         globalError = 1;
     }
 
     if (0 != SS.getAACountForAA(2))
     {
-        std::cerr << "Error with getAACountForAA(index) for amino acid D (index 2).\n";
-        std::cerr << "Should return 0, returns " << SS.getAACountForAA(2) << "\n";
+        my_printError("Error with getAACountForAA(index) for amino acid D (index 2).\n");
+        my_printError("Should return 0, returns %\n", SS.getAACountForAA(2));
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        std::cout << "Sequence Summary getAACountForAA(index) --- Pass\n";
+        my_print("Sequence Summary getAACountForAA(index) --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -332,8 +361,8 @@ int testSequenceSummary()
     codon = "ATG";
     if (1 != SS.getCodonCountForCodon(codon))
     {
-        std::cerr << "Error with getCodonCountForCodon(string) for " << codon << ".\n";
-        std::cerr << "Should return 1, but returns " << SS.getCodonCountForCodon(codon) << "\n";
+        my_printError("Error with getCodonCountForCodon(string) for %.\n", codon);
+        my_printError("Should return 1, but returns %\n", SS.getCodonCountForCodon(codon));
         error = 1;
         globalError = 1;
     }
@@ -341,8 +370,8 @@ int testSequenceSummary()
     codon = "CTC";
     if (2 != SS.getCodonCountForCodon(codon))
     {
-        std::cerr << "Error with getCodonCountForCodon(string) for " << codon << ".\n";
-        std::cerr << "Should return 2, but returns " << SS.getCodonCountForCodon(codon) << "\n";
+        my_printError("Error with getCodonCountForCodon(string) for %.\n", codon);
+        my_printError("Should return 2, but returns %\n", SS.getCodonCountForCodon(codon));
         error = 1;
         globalError = 1;
     }
@@ -350,8 +379,8 @@ int testSequenceSummary()
     codon = "ATT";
     if (1 != SS.getCodonCountForCodon(codon))
     {
-        std::cerr << "Error with getCodonCountForCodon(string) for " << codon << ".\n";
-        std::cerr << "Should return 1, but returns " << SS.getCodonCountForCodon(codon) << "\n";
+        my_printError("Error with getCodonCountForCodon(string) for %.\n", codon);
+        my_printError("Should return 1, but returns %\n", SS.getCodonCountForCodon(codon));
         error = 1;
         globalError = 1;
     }
@@ -359,8 +388,8 @@ int testSequenceSummary()
     codon = "ACT";
     if (1 != SS.getCodonCountForCodon(codon))
     {
-        std::cerr << "Error with getCodonCountForCodon(string) for " << codon << ".\n";
-        std::cerr << "Should return 1, but returns " << SS.getCodonCountForCodon(codon) << "\n";
+        my_printError("Error with getCodonCountForCodon(string) for %.\n", codon);
+        my_printError("Should return 1, but returns %\n", SS.getCodonCountForCodon(codon));
         error = 1;
         globalError = 1;
     }
@@ -368,8 +397,8 @@ int testSequenceSummary()
     codon = "GCT";
     if (1 != SS.getCodonCountForCodon(codon))
     {
-        std::cerr << "Error with getCodonCountForCodon(string) for " << codon << ".\n";
-        std::cerr << "Should return 1, but returns " << SS.getCodonCountForCodon(codon) << "\n";
+        my_printError("Error with getCodonCountForCodon(string) for %.\n", codon);
+        my_printError("Should return 1, but returns %\n", SS.getCodonCountForCodon(codon));
         error = 1;
         globalError = 1;
     }
@@ -377,8 +406,8 @@ int testSequenceSummary()
     codon = "GCC";
     if (1 != SS.getCodonCountForCodon(codon))
     {
-        std::cerr << "Error with getCodonCountForCodon(string) for " << codon << ".\n";
-        std::cerr << "Should return 1, but returns " << SS.getCodonCountForCodon(codon) << "\n";
+        my_printError("Error with getCodonCountForCodon(string) for %.\n", codon);
+        my_printError("Should return 1, but returns %\n", SS.getCodonCountForCodon(codon));
         error = 1;
         globalError = 1;
     }
@@ -386,8 +415,8 @@ int testSequenceSummary()
     codon = "TCG";
     if (1 != SS.getCodonCountForCodon(codon))
     {
-        std::cerr << "Error with getCodonCountForCodon(string) for " << codon << ".\n";
-        std::cerr << "Should return 1, but returns " << SS.getCodonCountForCodon(codon) << "\n";
+        my_printError("Error with getCodonCountForCodon(string) for %.\n", codon);
+        my_printError("Should return 1, but returns %\n", SS.getCodonCountForCodon(codon));
         error = 1;
         globalError = 1;
     }
@@ -395,8 +424,8 @@ int testSequenceSummary()
     codon = "TAG";
     if (1 != SS.getCodonCountForCodon(codon))
     {
-        std::cerr << "Error with getCodonCountForCodon(string) for " << codon << ".\n";
-        std::cerr << "Should return 1, but returns " << SS.getCodonCountForCodon(codon) << "\n";
+        my_printError("Error with getCodonCountForCodon(string) for %.\n", codon);
+        my_printError("Should return 1, but returns %\n", SS.getCodonCountForCodon(codon));
         error = 1;
         globalError = 1;
     }
@@ -404,14 +433,14 @@ int testSequenceSummary()
     codon = "AAA";
     if (0 != SS.getCodonCountForCodon(codon))
     {
-        std::cerr << "Error with getCodonCountForCodon(string) for " << codon << ".\n";
-        std::cerr << "Should return 0, but returns " << SS.getCodonCountForCodon(codon) << "\n";
+        my_printError("Error with getCodonCountForCodon(string) for %.\n", codon);
+        my_printError("Should return 0, but returns %\n", SS.getCodonCountForCodon(codon));
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        std::cout << "Sequence Summary getCodonCountsForCodon(string) --- Pass\n";
+        my_print("Sequence Summary getCodonCountsForCodon(string) --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -421,78 +450,78 @@ int testSequenceSummary()
 
     if (1 != SS.getCodonCountForCodon(29))
     {
-        std::cerr << "Error with getCodonCountForCodon(index) for codon \"ATG\" (index 29).\n";
-        std::cerr << "Should return 1, but returns " << SS.getCodonCountForCodon(29) << "\n";
+        my_printError("Error with getCodonCountForCodon(index) for codon \"ATG\" (index 29).\n");
+        my_printError("Should return 1, but returns %\n", SS.getCodonCountForCodon(29));
         error = 1;
         globalError = 1;
     }
 
     if (2 != SS.getCodonCountForCodon(24))
     {
-        std::cerr << "Error with getCodonCountForCodon(index) for codon \"CTC\" (index 24).\n";
-        std::cerr << "Should return 2, but returns " << SS.getCodonCountForCodon(24) << "\n";
+        my_printError("Error with getCodonCountForCodon(index) for codon \"CTC\" (index 24).\n");
+        my_printError("Should return 2, but returns %\n", SS.getCodonCountForCodon(24));
         error = 1;
         globalError = 1;
     }
 
     if (1 != SS.getCodonCountForCodon(20))
     {
-        std::cerr << "Error with getCodonCountForCodon(index) for codon \"ATT\" (index 20).\n";
-        std::cerr << "Should return 1, but returns " << SS.getCodonCountForCodon(20) << "\n";
+        my_printError("Error with getCodonCountForCodon(index) for codon \"ATT\" (index 20).\n");
+        my_printError("Should return 1, but returns %\n", SS.getCodonCountForCodon(20));
         error = 1;
         globalError = 1;
     }
 
     if (1 != SS.getCodonCountForCodon(51))
     {
-        std::cerr << "Error with getCodonCountForCodon(index) for codon \"ACT\" (index 51).\n";
-        std::cerr << "Should return 1, but returns " << SS.getCodonCountForCodon(51) << "\n";
+        my_printError("Error with getCodonCountForCodon(index) for codon \"ACT\" (index 51).\n");
+        my_printError("Should return 1, but returns %\n", SS.getCodonCountForCodon(51));
         error = 1;
         globalError = 1;
     }
 
     if (1 != SS.getCodonCountForCodon(3))
     {
-        std::cerr << "Error with getCodonCountForCodon(index) for codon \"GCT\" (index 3).\n";
-        std::cerr << "Should return 1, but returns " << SS.getCodonCountForCodon(3) << "\n";
+        my_printError("Error with getCodonCountForCodon(index) for codon \"GCT\" (index 3).\n");
+        my_printError("Should return 1, but returns %\n", SS.getCodonCountForCodon(3));
         error = 1;
         globalError = 1;
     }
 
     if (1 != SS.getCodonCountForCodon(1))
     {
-        std::cerr << "Error with getCodonCountForCodon(index) for codon \"GCC\" (index 1).\n";
-        std::cerr << "Should return 1, but returns " << SS.getCodonCountForCodon(1) << "\n";
+        my_printError("Error with getCodonCountForCodon(index) for codon \"GCC\" (index 1).\n");
+        my_printError("Should return 1, but returns %\n", SS.getCodonCountForCodon(1));
         error = 1;
         globalError = 1;
     }
 
     if (1 != SS.getCodonCountForCodon(46))
     {
-        std::cerr << "Error with getCodonCountForCodon(index) for codon \"TCG\" (index 46).\n";
-        std::cerr << "Should return 1, but returns " << SS.getCodonCountForCodon(46) << "\n";
+        my_printError("Error with getCodonCountForCodon(index) for codon \"TCG\" (index 46).\n");
+        my_printError("Should return 1, but returns %\n", SS.getCodonCountForCodon(46));
         error = 1;
         globalError = 1;
     }
 
     if (1 != SS.getCodonCountForCodon(62))
     {
-        std::cerr << "Error with getCodonCountForCodon(index) for codon \"TAG\" (index 62).\n";
-        std::cerr << "Should return 1, but returns " << SS.getCodonCountForCodon(62) << "\n";
+        my_printError("Error with getCodonCountForCodon(index) for codon \"TAG\" (index 62).\n");
+        my_printError("Should return 1, but returns %\n", SS.getCodonCountForCodon(62));
         error = 1;
         globalError = 1;
     }
 
     if (0 != SS.getCodonCountForCodon(2))
     {
-        std::cerr << "Error with getCodonCountForCodon(index) for codon \"AAA\" (index 2).\n";
-        std::cerr << "Should return 1, but returns " << SS.getCodonCountForCodon(2) << "\n";
+        my_printError("Error with getCodonCountForCodon(index) for codon \"AAA\" (index 2).\n");
+        my_printError("Should return 1, but returns %\n", SS.getCodonCountForCodon(2));
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        std::cout << "Sequence Summary getCodonCountsForCodon(index) --- Pass\n";
+        my_print("Sequence Summary getCodonCountsForCodon(index) --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -507,38 +536,38 @@ int testSequenceSummary()
 
     if (35 != SS.getRFPObserved("TGC"))
     {
-        std::cerr << "Error in getRFPObserved(string) or setRFPObserved for codon \"TGC\".\n";
-        std::cerr << "should return 35, but returns " << SS.getRFPObserved("TGC") << "\n";
+        my_printError("Error in getRFPObserved(string) or setRFPObserved for codon \"TGC\".\n");
+        my_printError("should return 35, but returns %\n", SS.getRFPObserved("TGC"));
         error = 1;
         globalError = 1;
     }
 
     if (45 != SS.getRFPObserved("CAC"))
     {
-        std::cerr << "Error in getRFPObserved(string) or setRFPObserved for codon \"CAC\".\n";
-        std::cerr << "should return 45, but returns " << SS.getRFPObserved("CAC") << "\n";
+        my_printError("Error in getRFPObserved(string) or setRFPObserved for codon \"CAC\".\n");
+        my_printError("should return 45, but returns %\n", SS.getRFPObserved("CAC"));
         error = 1;
         globalError = 1;
     }
 
     if (2 != SS.getRFPObserved("GTG"))
     {
-        std::cerr << "Error in getRFPObserved(string) or set RFPObserved for codon \"GTG\".\n";
-        std::cerr << "should return 2, but returns " << SS.getRFPObserved("GTG") << "\n";
+        my_printError("Error in getRFPObserved(string) or set RFPObserved for codon \"GTG\".\n");
+        my_printError("should return 2, but returns %\n", SS.getRFPObserved("GTG"));
         error = 1;
         globalError = 1;
     }
 
     if (0 != SS.getRFPObserved("TCC"))
     {
-        std::cerr << "Error in getRFPObserved(string) or setRFPObserved for codon \"TCC\".\n";
-        std::cerr << "should return 0, but returns " << SS.getRFPObserved("TCC") << "\n";
+        my_printError("Error in getRFPObserved(string) or setRFPObserved for codon \"TCC\".\n");
+        my_printError("should return 0, but returns %\n", SS.getRFPObserved("TCC"));
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        std::cout << "Sequence Summary getRFPObserved(string) & setRFPObserved --- Pass\n";
+        my_print("Sequence Summary getRFPObserved(string) & setRFPObserved --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -553,38 +582,38 @@ int testSequenceSummary()
 
     if (45 != SS.getRFPObserved(0))
     {
-        std::cerr << "Error with getRFPObserved(index) for codon index 0.\n";
-        std::cerr << "should return 45, but returns " << SS.getRFPObserved(0) << "\n";
+        my_printError("Error with getRFPObserved(index) for codon index 0.\n");
+        my_printError("should return 45, but returns %\n", SS.getRFPObserved(0));
         error = 1;
         globalError = 1;
     }
 
     if (52 != SS.getRFPObserved(1))
     {
-        std::cerr << "Error with getRFPObserved(index) for codon index 1.\n";
-        std::cerr << "should return 52, but returns " << SS.getRFPObserved(1) << "\n";
+        my_printError("Error with getRFPObserved(index) for codon index 1.\n");
+        my_printError("should return 52, but returns %\n", SS.getRFPObserved(1));
         error = 1;
         globalError = 1;
     }
 
     if (63 != SS.getRFPObserved(2))
     {
-        std::cerr << "Error with getRFPObserved(index) for codon index 2.\n";
-        std::cerr << "should return 63, but returns " << SS.getRFPObserved(2) << "\n";
+        my_printError("Error with getRFPObserved(index) for codon index 2.\n");
+        my_printError("should return 63, but returns %\n", SS.getRFPObserved(2));
         error = 1;
         globalError = 1;
     }
 
     if (23 != SS.getRFPObserved(60))
     {
-        std::cerr << "Error with getRFPObserved(index) for codon index 60.\n";
-        std::cerr << "should return 23, but returns " << SS.getRFPObserved(60) << "\n";
+        my_printError("Error with getRFPObserved(index) for codon index 60.\n");
+        my_printError("should return 23, but returns %\n", SS.getRFPObserved(60));
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        std::cout << "Sequence Summary getRFPObserved(index) --- Pass\n";
+        my_print("Sequence Summary getRFPObserved(index) --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -595,11 +624,11 @@ int testSequenceSummary()
     tmp = SS.getCodonPositions("ATG");
     if (tmp -> at(0) != 0 || tmp -> size() != 1)
     {
-        std::cerr << "Error with getCodonPositions(string) for codon \"ATG\".\n";
-        std::cerr << "Should return 0, but returns:\n";
+        my_printError("Error with getCodonPositions(string) for codon \"ATG\".\n");
+        my_printError("Should return 0, but returns:\n");
         for (unsigned i = 0; i < tmp -> size(); i++)
         {
-            std::cerr << tmp -> at(i) << "\n";
+            my_printError("%\n", tmp -> at(i));
         }
         error = 1;
         globalError = 1;
@@ -608,11 +637,11 @@ int testSequenceSummary()
     tmp = SS.getCodonPositions("CTC");
     if (tmp -> at(0) != 1 || tmp -> at(1) != 3|| tmp -> size() != 2)
     {
-        std::cerr << "Error with getCodonPositions(string) for codon \"CTC\".\n";
-        std::cerr << "Should return 1 and 3, but returns:\n";
+        my_printError("Error with getCodonPositions(string) for codon \"CTC\".\n");
+        my_printError("Should return 1 and 3, but returns:\n");
         for (unsigned i = 0; i < tmp -> size(); i++)
         {
-            std::cerr << tmp -> at(i) << "\n";
+            my_printError("%\n", tmp -> at(i));
         }
         error = 1;
         globalError = 1;
@@ -621,11 +650,11 @@ int testSequenceSummary()
     tmp = SS.getCodonPositions("ATT");
     if (tmp -> at(0) != 2 || tmp -> size() != 1)
     {
-        std::cerr << "Error with getCodonPositions(string) for codon \"ATT\".\n";
-        std::cerr << "Should return 2, but returns:\n";
+        my_printError("Error with getCodonPositions(string) for codon \"ATT\".\n");
+        my_printError("Should return 2, but returns:\n");
         for (unsigned i = 0; i < tmp -> size(); i++)
         {
-            std::cerr << tmp -> at(i) << "\n";
+            my_printError("%\n", tmp -> at(i));
         }
         error = 1;
         globalError = 1;
@@ -634,11 +663,11 @@ int testSequenceSummary()
     tmp = SS.getCodonPositions("ACT");
     if (tmp -> at(0) != 4 || tmp -> size() != 1)
     {
-        std::cerr << "Error with getCodonPositions(string) for codon \"ACT\".\n";
-        std::cerr << "Should return 4, but returns:\n";
+        my_printError("Error with getCodonPositions(string) for codon \"ACT\".\n");
+        my_printError("Should return 4, but returns:\n");
         for (unsigned i = 0; i < tmp -> size(); i++)
         {
-            std::cerr << tmp -> at(i) << "\n";
+            my_printError("%\n", tmp -> at(i));
         }
         error = 1;
         globalError = 1;
@@ -648,11 +677,11 @@ int testSequenceSummary()
     tmp = SS.getCodonPositions("GCT");
     if (tmp -> at(0) != 5 || tmp -> size() != 1)
     {
-        std::cerr << "Error with getCodonPositions(string) for codon \"GCT\".\n";
-        std::cerr << "Should return 5, but returns:\n";
+        my_printError("Error with getCodonPositions(string) for codon \"GCT\".\n");
+        my_printError("Should return 5, but returns:\n");
         for (unsigned i = 0; i < tmp -> size(); i++)
         {
-            std::cerr << tmp -> at(i) << "\n";
+            my_printError("%\n", tmp -> at(i));
         }
         error = 1;
         globalError = 1;
@@ -661,11 +690,11 @@ int testSequenceSummary()
     tmp = SS.getCodonPositions("GCC");
     if (tmp -> at(0) != 6 || tmp -> size() != 1)
     {
-        std::cerr << "Error with getCodonPositions(string) for codon \"GCC\".\n";
-        std::cerr << "Should return 6, but returns:\n";
+        my_printError("Error with getCodonPositions(string) for codon \"GCC\".\n");
+        my_printError("Should return 6, but returns:\n");
         for (unsigned i = 0; i < tmp -> size(); i++)
         {
-            std::cerr << tmp -> at(i) << "\n";
+            my_printError("%\n", tmp -> at(i));
         }
         error = 1;
         globalError = 1;
@@ -674,11 +703,11 @@ int testSequenceSummary()
     tmp = SS.getCodonPositions("TCG");
     if (tmp -> at(0) != 7 || tmp -> size() != 1)
     {
-        std::cerr << "Error with getCodonPositions(string) for codon \"TCG\".\n";
-        std::cerr << "Should return 7, but returns:\n";
+        my_printError("Error with getCodonPositions(string) for codon \"TCG\".\n");
+        my_printError("Should return 7, but returns:\n");
         for (unsigned i = 0; i < tmp -> size(); i++)
         {
-            std::cerr << tmp -> at(i) << "\n";
+            my_printError("%\n", tmp -> at(i));
         }
         error = 1;
         globalError = 1;
@@ -687,11 +716,11 @@ int testSequenceSummary()
     tmp = SS.getCodonPositions("TAG");
     if (tmp -> at(0) != 8 || tmp -> size() != 1)
     {
-        std::cerr << "Error with getCodonPositions(string) for codon \"TAG\".\n";
-        std::cerr << "Should return 8, but returns:\n";
+        my_printError("Error with getCodonPositions(string) for codon \"TAG\".\n");
+        my_printError("Should return 8, but returns:\n");
         for (unsigned i = 0; i < tmp -> size(); i++)
         {
-            std::cerr << tmp -> at(i) << "\n";
+            my_printError("%\n", tmp -> at(i));
         }
         error = 1;
         globalError = 1;
@@ -700,18 +729,18 @@ int testSequenceSummary()
     tmp = SS.getCodonPositions("GTG");
     if (tmp -> size() != 0)
     {
-        std::cerr << "Error with getCodonPositions(string) for codon \"GTG\".\n";
-        std::cerr << "Should return an empty vector, but returns:\n";
+        my_printError("Error with getCodonPositions(string) for codon \"GTG\".\n");
+        my_printError("Should return an empty vector, but returns:\n");
         for (unsigned i = 0; i < tmp -> size(); i++)
         {
-            std::cerr << tmp -> at(i) << "\n";
+            my_printError("%\n", tmp -> at(i));
         }
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        std::cout << "Sequence Summary getCodonPositions(string) --- Pass\n";
+        my_print("Sequence Summary getCodonPositions(string) --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -722,11 +751,11 @@ int testSequenceSummary()
     tmp = SS.getCodonPositions(29);
     if (tmp -> at(0) != 0 || tmp -> size() != 1)
     {
-        std::cerr << "Error with getCodonPositions(index) for codon index 29.\n";
-        std::cerr << "Should return 0, but returns:\n";
+        my_printError("Error with getCodonPositions(index) for codon index 29.\n");
+        my_printError("Should return 0, but returns:\n");
         for (unsigned i = 0; i < tmp -> size(); i++)
         {
-            std::cerr << tmp -> at(i) << "\n";
+            my_printError("%\n", tmp -> at(i));
         }
         error = 1;
         globalError = 1;
@@ -735,11 +764,11 @@ int testSequenceSummary()
     tmp = SS.getCodonPositions(24);
     if (tmp -> at(0) != 1 || tmp -> at(1) != 3 || tmp -> size() != 2)
     {
-        std::cerr << "Error with getCodonPositions(index) for codon index 24.\n";
-        std::cerr << "Should return 1 and 3, but returns:\n";
+        my_printError("Error with getCodonPositions(index) for codon index 24.\n");
+        my_printError("Should return 1 and 3, but returns:\n");
         for (unsigned i = 0; i < tmp -> size(); i++)
         {
-            std::cerr << tmp -> at(i) << "\n";
+            my_printError("%\n", tmp -> at(i));
         }
         error = 1;
         globalError = 1;
@@ -748,11 +777,11 @@ int testSequenceSummary()
     tmp = SS.getCodonPositions(20);
     if (tmp -> at(0) != 2 || tmp -> size() != 1)
     {
-        std::cerr << "Error with getCodonPositions(index) for codon index 20.\n";
-        std::cerr << "Should return 2, but returns:\n";
+        my_printError("Error with getCodonPositions(index) for codon index 20.\n");
+        my_printError("Should return 2, but returns:\n");
         for (unsigned i = 0; i < tmp -> size(); i++)
         {
-            std::cerr << tmp -> at(i) << "\n";
+            my_printError("%\n", tmp -> at(i));
         }
         error = 1;
         globalError = 1;
@@ -761,11 +790,11 @@ int testSequenceSummary()
     tmp = SS.getCodonPositions(51);
     if (tmp -> at(0) != 4 || tmp -> size() != 1)
     {
-        std::cerr << "Error with getCodonPositions(index) for codon index 51.\n";
-        std::cerr << "Should return 4, but returns:\n";
+        my_printError("Error with getCodonPositions(index) for codon index 51.\n");
+        my_printError("Should return 4, but returns:\n");
         for (unsigned i = 0; i < tmp -> size(); i++)
         {
-            std::cerr << tmp -> at(i) << "\n";
+            my_printError("%\n", tmp -> at(i));
         }
         error = 1;
         globalError = 1;
@@ -774,11 +803,11 @@ int testSequenceSummary()
     tmp = SS.getCodonPositions(3);
     if (tmp -> at(0) != 5 || tmp -> size() != 1)
     {
-        std::cerr << "Error with getCodonPositions(index) for codon index 3.\n";
-        std::cerr << "Should return 4, but returns:\n";
+        my_printError("Error with getCodonPositions(index) for codon index 3.\n");
+        my_printError("Should return 4, but returns:\n");
         for (unsigned i = 0; i < tmp -> size(); i++)
         {
-            std::cerr << tmp -> at(i) << "\n";
+            my_printError("%\n", tmp -> at(i));
         }
         error = 1;
         globalError = 1;
@@ -787,11 +816,11 @@ int testSequenceSummary()
     tmp = SS.getCodonPositions(1);
     if (tmp -> at(0) != 6 || tmp -> size() != 1)
     {
-        std::cerr << "Error with getCodonPositions(index) for codon index 1.\n";
-        std::cerr << "Should return 4, but returns:\n";
+        my_printError("Error with getCodonPositions(index) for codon index 1.\n");
+        my_printError("Should return 4, but returns:\n");
         for (unsigned i = 0; i < tmp -> size(); i++)
         {
-            std::cerr << tmp -> at(i) << "\n";
+            my_printError("%\n", tmp -> at(i));
         }
         error = 1;
         globalError = 1;
@@ -800,11 +829,11 @@ int testSequenceSummary()
     tmp = SS.getCodonPositions(46);
     if (tmp -> at(0) != 7 || tmp -> size() != 1)
     {
-        std::cerr << "Error with getCodonPositions(index) for codon index 46.\n";
-        std::cerr << "Should return 7, but returns:\n";
+        my_printError("Error with getCodonPositions(index) for codon index 46.\n");
+        my_printError("Should return 7, but returns:\n");
         for (unsigned i = 0; i < tmp -> size(); i++)
         {
-            std::cerr << tmp -> at(i) << "\n";
+            my_printError("%\n", tmp -> at(i));
         }
         error = 1;
         globalError = 1;
@@ -813,11 +842,11 @@ int testSequenceSummary()
     tmp = SS.getCodonPositions(62);
     if (tmp -> at(0) != 8 || tmp -> size() != 1)
     {
-        std::cerr << "Error with getCodonPositions(index) for codon index 62.\n";
-        std::cerr << "Should return 8, but returns:\n";
+        my_printError("Error with getCodonPositions(index) for codon index 62.\n");
+        my_printError("Should return 8, but returns:\n");
         for (unsigned i = 0; i < tmp -> size(); i++)
         {
-            std::cerr << tmp -> at(i) << "\n";
+            my_printError("%\n", tmp -> at(i));
         }
         error = 1;
         globalError = 1;
@@ -826,18 +855,18 @@ int testSequenceSummary()
     tmp = SS.getCodonPositions(54);
     if (tmp -> size() != 0)
     {
-        std::cerr << "Error with getCodonPositions(index) for codon index 54.\n";
-        std::cerr << "Should return an empty vector, but returns:\n";
+        my_printError("Error with getCodonPositions(index) for codon index 54.\n");
+        my_printError("Should return an empty vector, but returns:\n");
         for (unsigned i = 0; i < tmp -> size(); i++)
         {
-            std::cerr << tmp -> at(i) << "\n";
+            my_printError("%\n", tmp -> at(i));
         }
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        std::cout << "Sequence Summary getCodonPositions(index) --- Pass\n";
+        my_print("Sequence Summary getCodonPositions(index) --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -848,10 +877,10 @@ int testSequenceSummary()
 
     if (0 != tmp2.size())
     {
-        std::cerr << "Error with getRFP_count. Function should return an empty vector but returns:\n";
+        my_printError("Error with getRFP_count. Function should return an empty vector but returns:\n");
         for (unsigned i = 0; i < tmp2.size(); i++)
         {
-            std::cerr << tmp2[i] << "\n";
+            my_printError("%\n", tmp2[i]);
         }
         error = 1;
         globalError = 1;
@@ -862,17 +891,17 @@ int testSequenceSummary()
 
     if (SS.getRFP_count() != tmp2)
     {
-        std::cerr << "Error in getRFP_count or setRFP_count. Function should return 1, 2, 3, 4, 5, but returns:\n";
+        my_printError("Error in getRFP_count or setRFP_count. Function should return 1, 2, 3, 4, 5, but returns:\n");
         for (unsigned i = 0; i < tmp2.size(); i++)
         {
-            std::cerr << tmp2[i] << "\n";
+            my_printError("%\n", tmp2[i]);
         }
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        std::cout << "Sequence Summary get/setRFP_count --- Pass\n";
+        my_print("Sequence Summary get/setRFP_count --- Pass\n");
 
     // No need to reset error
 
@@ -892,11 +921,11 @@ int testGene()
     testGene.setId("testGene");
 
     if (testGene.getId() != "testGene") {
-        std::cerr << "Error in setId or getId.\n";
+        my_printError("Error in setId or getId.\n");
         globalError = 1;
     }
     else
-        std::cout << "Gene get/setId --- Pass\n";
+        my_print("Gene get/setId --- Pass\n");
 
     //------------------------------------------//
     //------ get/setDescription Functions ------//
@@ -905,11 +934,11 @@ int testGene()
 
     if (testGene.getDescription() != "Test Gene for Unit Testing")
     {
-        std::cerr << "Error in setDescription or getDescription.\n";
+        my_printError("Error in setDescription or getDescription.\n");
         globalError = 1;
     }
     else
-        std::cout << "Gene get/setDescription --- Pass\n";
+        my_print("Gene get/setDescription --- Pass\n");
 
     //---------------------------------------//
     //------ get/setSequence Functions ------//
@@ -918,11 +947,11 @@ int testGene()
 
     if (testGene.getSequence() != "ATGCTCATTCTCACTGCTGCCTCGTAG")
     {
-        std::cerr << "Error in setSequence or getSequence.\n";
+        my_printError("Error in setSequence or getSequence.\n");
         globalError = 1;
     }
     else
-        std::cout << "Gene get/setSequence --- Pass\n";
+        my_print("Gene get/setSequence --- Pass\n");
 
     //----------------------------------------//
     //------ get/addRFP_count Functions ------//
@@ -932,11 +961,11 @@ int testGene()
     testGene.addRFP_count(rfp_counts);
     if (testGene.getRFP_count() != rfp_counts)
     {
-        std::cerr << "Error in getRFP_count or addRFP_count.\n";
+        my_printError("Error in getRFP_count or addRFP_count.\n");
         globalError = 1;
     }
     else
-        std::cout << "Gene get/addRFP_count --- Pass\n";
+        my_print("Gene get/addRFP_count --- Pass\n");
 
     //-----------------------------------------//
     //------ getSequenceSummary Function ------//
@@ -947,9 +976,9 @@ int testGene()
     {
         if (SS.getCodonCountForCodon(i) != GeneSS->getCodonCountForCodon(i))
         {
-            std::cerr << "Error with getSequenceSummary. Codon counts are incorrect";
-            std::cerr << " for codon " << i << ", " << SequenceSummary::codonArray[i] << ".\n";
-            std::cerr << "Should return " << SS.getCodonCountForCodon(i) << ", but returns" << GeneSS->getCodonCountForCodon(i) << "\n";
+            my_printError("Error with getSequenceSummary. Codon counts are incorrect");
+            my_printError(" for codon %, %.\n", i, SequenceSummary::codonArray[i]);
+            my_printError("Should return %, but returns %\n", SS.getCodonCountForCodon(i), GeneSS->getCodonCountForCodon(i));
             error = 1;
             globalError = 1;
         }
@@ -959,9 +988,9 @@ int testGene()
     {
         if (SS.getRFPObserved(i) != GeneSS->getRFPObserved(i))
         {
-            std::cerr << "Error with getSequenceSummary. RFP observed is incorrect";
-            std::cerr << " for codon " << i << ".\n";
-            std::cerr << "Should return " << SS.getRFPObserved(i) << ", but returns" << GeneSS->getRFPObserved(i) << "\n";
+            my_printError("Error with getSequenceSummary. RFP observed is incorrect");
+            my_printError(" for codon %.\n", i);
+            my_printError("Should return %, but reutrns %\n", SS.getRFPObserved(i), GeneSS->getRFPObserved(i));
             error = 1;
             globalError = 1;
         }
@@ -976,8 +1005,8 @@ int testGene()
         Gvec = GeneSS->getCodonPositions(i);
         if (SSvec->size() != Gvec->size())
         {
-            std::cerr << "Error with getSequenceSummary. Codon positions are incorrect.\n";
-            std::cerr << "Information in compared vectors are not of equal size.\n";
+            my_printError("Error with getSequenceSummary. Codon positions are incorrect.\n");
+            my_printError("Information in compared vectors are not of equal size.\n");
             error = 1;
             globalError = 1;
         }
@@ -987,9 +1016,9 @@ int testGene()
             {
                 if (SSvec->at(j) != Gvec->at(j))
                 {
-                    std::cerr << "Error with getSequenceSummary. Codon positions are incorrect";
-                    std::cerr << " for codon " << i << ".\n";
-                    std::cerr << "Should return " << SSvec->at(j) << ", but returns" << Gvec->at(j) << "\n";
+                    my_printError("Error with getSequenceSummary. Codon positions are incorrect");
+                    my_printError(" for codon %.\n", i);
+                    my_printError("Should return %, but returns %\n", SSvec->at(j), Gvec->at(j));
                     error = 1;
                     globalError = 1;
                 }
@@ -1002,15 +1031,15 @@ int testGene()
     {
         if (SS.getAACountForAA(i) != GeneSS->getAACountForAA(i))
         {
-            std::cerr << "Error with getSequenceSummary. AA counts are incorrect";
-            std::cerr << " for amino acid " << i << ".\n";
-            std::cerr << "Should return " << SS.getAACountForAA(i) << ", but returns" << GeneSS->getAACountForAA(i) << "\n";
+            my_printError("Error with getSequenceSummary. AA counts are incorrect");
+            my_printError(" for amino acid %.\n", i);
+            my_printError("Should return %, but returns %\n", SS.getAACountForAA(i), GeneSS->getAACountForAA(i));
             error = 1;
             globalError = 1;
         }
     }
     if (!error)
-        std::cout << "Gene getSequenceSummary --- Pass\n";
+        my_print("Gene getSequenceSummary --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -1022,10 +1051,10 @@ int testGene()
 
     if (0 != tmp.size())
     {
-        std::cerr << "Error with getObservedSynthesisRateValues. Function should return an empty vector but returns:\n";
+        my_printError("Error with getObservedSynthesisRateValues. Function should return an empty vector but returns:\n");
         for (unsigned i = 0; i < tmp.size(); i++)
         {
-            std::cerr << tmp[i] << "\n";
+            my_printError("%\n", tmp[i]);
         }
         error = 1;
         globalError = 1;
@@ -1036,17 +1065,17 @@ int testGene()
 
     if (testGene.getObservedSynthesisRateValues() != tmp)
     {
-        std::cerr << "Error in getObservedSynthesisRateValues or setObservedSynthesisRateValues. Function should return 2.34, 3.234, 0.123, but returns:\n";
+        my_printError("Error in getObservedSynthesisRateValues or setObservedSynthesisRateValues. Function should return 2.34, 3.234, 0.123, but returns:\n");
         for (unsigned i = 0; i < tmp.size(); i++)
         {
-            std::cerr << tmp[i] << "\n";
+            my_printError("%\n", tmp[i]);
         }
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        std::cout << "Gene get/setObservedSynthesisRateValues --- Pass\n";
+        my_print("Gene get/setObservedSynthesisRateValues --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -1055,12 +1084,12 @@ int testGene()
     //--------------------------------------------------//
     if (3 != testGene.getNumObservedSynthesisSets())
     {
-        std::cerr << "Error with getNumObservedSynthesisSets. Function should return 3, but returns ";
-        std::cerr << testGene.getNumObservedSynthesisSets() << ".\n";
+        my_printError("Error with getNumObservedSynthesisSets. Function should return 3, but returns ");
+        my_printError("%.\n", testGene.getNumObservedSynthesisSets());
         globalError = 1;
     }
     else
-        std::cout << "Gene getNumObservedSynthesisSets --- Pass\n";
+        my_print("Gene getNumObservedSynthesisSets --- Pass\n");
 
     //-----------------------------------------------//
     //------ getObservedSynthesisRate Function ------//
@@ -1072,15 +1101,15 @@ int testGene()
     {
         if (testGene.getObservedSynthesisRate(i) != tmp[i])
         {
-            std::cerr << "Error with getObservedSynthesisRate. Function should return " << tmp[i] << "at index";
-            std::cerr << i << ", but returns " << testGene.getObservedSynthesisRate(i) << ".\n";
+            my_printError("Error with getObservedSynthesisRate. Function should return % at index", tmp[i]);
+            my_printError("%, but returns %.\n", i, testGene.getObservedSynthesisRate(i));
             error = 1;
             globalError = 1;
         }
     }
 
     if (!error)
-        std::cout << "Gene getObservedSynthesisRate --- Pass\n";
+        my_print("Gene getObservedSynthesisRate --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -1089,55 +1118,55 @@ int testGene()
     //--------------------------------------//
     if ('A' != testGene.getNucleotideAt(0))
     {
-        std::cerr << "Error with getNucleotideAt. At index 0, the return value should be 'A', but is ";
-        std::cerr << testGene.getNucleotideAt(0) << "\n";
+        my_printError("Error with getNucleotideAt. At index 0, the return value should be 'A', but is ");
+        my_printError("%\n", testGene.getNucleotideAt(0));
         error = 1;
         globalError = 1;
     }
     if ('T' != testGene.getNucleotideAt(1))
     {
-        std::cerr << "Error with getNucleotideAt. At index 1, the return value should be 'T', but is ";
-        std::cerr << testGene.getNucleotideAt(1) << "\n";
+        my_printError("Error with getNucleotideAt. At index 1, the return value should be 'T', but is ");
+        my_printError("%\n", testGene.getNucleotideAt(1));
         error = 1;
         globalError = 1;
     }
     if ('G' != testGene.getNucleotideAt(2))
     {
-        std::cerr << "Error with getNucleotideAt. At index 2, the return value should be 'G', but is ";
-        std::cerr << testGene.getNucleotideAt(2) << "\n";
+        my_printError("Error with getNucleotideAt. At index 2, the return value should be 'G', but is ");
+        my_printError("%\n", testGene.getNucleotideAt(2));
         error = 1;
         globalError = 1;
     }
     if ('C' != testGene.getNucleotideAt(3))
     {
-        std::cerr << "Error with getNucleotideAt. At index 3, the return value should be 'C', but is ";
-        std::cerr << testGene.getNucleotideAt(3) << "\n";
+        my_printError("Error with getNucleotideAt. At index 3, the return value should be 'C', but is ");
+        my_printError("%\n", testGene.getNucleotideAt(3));
         error = 1;
         globalError = 1;
     }
     if ('T' != testGene.getNucleotideAt(10))
     {
-        std::cerr << "Error with getNucleotideAt. At index 10, the return value should be 'T', but is ";
-        std::cerr << testGene.getNucleotideAt(10) << "\n";
+        my_printError("Error with getNucleotideAt. At index 10, the return value should be 'T', but is ");
+        my_printError("%\n", testGene.getNucleotideAt(10));
         error = 1;
         globalError = 1;
     }
     if ('G' != testGene.getNucleotideAt(23))
     {
-        std::cerr << "Error with getNucleotideAt. At index 23, the return value should be 'G', but is ";
-        std::cerr << testGene.getNucleotideAt(23) << "\n";
+        my_printError("Error with getNucleotideAt. At index 23, the return value should be 'G', but is ");
+        my_printError("%\n", testGene.getNucleotideAt(23));
         error = 1;
         globalError = 1;
     }
     if ('G' != testGene.getNucleotideAt(26))
     {
-        std::cerr << "Error with getNucleotideAt. At index 26, the return value should be 'G', but is ";
-        std::cerr << testGene.getNucleotideAt(26) << "\n";
+        my_printError("Error with getNucleotideAt. At index 26, the return value should be 'G', but is ");
+        my_printError("%\n", testGene.getNucleotideAt(26));
         error = 1;
         globalError = 1;
     }
     if (!error)
-        std::cout << "Gene getNucleotideAt --- Pass\n";
+        my_print("Gene getNucleotideAt --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -1147,12 +1176,11 @@ int testGene()
     //------ length Function ------//
     //-----------------------------//
     if (testGene.length() == strlen("ATGCTCATTCTCACTGCTGCCTCGTAG"))
-        std::cout << "Gene length --- Pass\n";
+        my_print("Gene length --- Pass\n");
     else
     {
-        std::cerr << "Error with length. Should return ";
-        std::cerr << strlen("ATGCTCATTCTCACTGCTGCCTCGTAG") << " but returns: ";
-        std::cerr << testGene.length() << "\n";
+        my_printError("Error with length. Should return ");
+        my_printError("% but returns: %\n", strlen("ATGCTCATTCTCACTGCTGCCTCGTAG"), testGene.length());
         globalError = 1;
     }
 
@@ -1162,11 +1190,11 @@ int testGene()
     Gene tmpGene;
     tmpGene = testGene.reverseComplement();
     if ("CTACGAGGCAGCAGTGAGAATGAGCAT" == tmpGene.getSequence())
-        std::cout << "Gene reverseComplement --- Pass\n";
+        my_print("Gene reverseComplement --- Pass\n");
     else
     {
-        std::cerr << "Error with reverseComplement. Should return \"CTACGAGGCAGCAGTGAGAATGAGCAT\" but returns: ";
-        std::cerr << tmpGene.getSequence() << "\n";
+        my_printError("Error with reverseComplement. Should return \"CTACGAGGCAGCAGTGAGAATGAGCAT\" but returns: ");
+        my_printError("%\n", tmpGene.getSequence());
         globalError = 1;
     }
 
@@ -1174,11 +1202,10 @@ int testGene()
     //------ toAASequence Function ------//
     //-----------------------------------//
     if ("MLILTAASX" == testGene.toAASequence())
-        std::cout << "Gene toAASequence --- Pass\n";
+        my_print("Gene toAASequence --- Pass\n");
     else
     {
-        std::cerr << "Error with toAASequence. Should return \"MLILTAASX\", but returns:" << testGene.toAASequence() <<
-        "\n";
+        my_printError("Error with toAASequence. Should return \"MLILTAASX\", but returns: %\n", testGene.toAASequence());
         globalError = 1;
     }
 
@@ -1188,25 +1215,25 @@ int testGene()
     testGene.clear();
     if ("" != testGene.getId())
     {
-        std::cerr << "Error with clear. Gene Id should be blank, but is " << testGene.getId() << ".\n";
+        my_printError("Error with clear. Gene Id should be blank, but is %.\n", testGene.getId());
         error = 1;
         globalError = 1;
     }
     if ("" != testGene.getDescription())
     {
-        std::cerr << "Error with clear. Gene description should be blank, but is " << testGene.getDescription() << ".\n";
+        my_printError("Error with clear. Gene description should be blank, but is %.\n", testGene.getDescription());
         error = 1;
         globalError = 1;
     }
     if ("" != testGene.getSequence())
     {
-        std::cerr << "Error with clear. Gene sequence should be blank, but is " << testGene.getSequence() << ".\n";
+        my_printError("Error with clear. Gene sequence should be blank, but is %.\n", testGene.getSequence());
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        std::cout << "Gene clear --- Pass\n";
+        my_print("Gene clear --- Pass\n");
     // No need to reset error
 
     return globalError;
@@ -1247,20 +1274,20 @@ int testGenome(std::string testFileDir)
 
     if (!(test == g1 && test2 == g1)) //checking both by string and index
     {
-        std::cerr << "Error in addGene or getGene with genes.\n";
+        my_printError("Error in addGene or getGene with genes.\n");
         error = 1;
         globalError = 1;
     }
 
     if (!(test3 == s1 && test4 == s1)) //checking both by string and index
     {
-        std::cerr << "Error in addGene or getGene with simulated genes.\n";
+        my_printError("Error in addGene or getGene with simulated genes.\n");
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        std::cout << "Genome get/addGene --- Pass\n";
+        my_print("Genome get/addGene --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -1271,7 +1298,7 @@ int testGenome(std::string testFileDir)
     testVec.push_back(g1);
 
     if (!(testVec == genome.getGenes(false))) {
-        std::cerr << "Error in getGenes(false).\n";
+        my_printError("Error in getGenes(false).\n");
         error = 1;
         globalError = 1;
     }
@@ -1280,13 +1307,13 @@ int testGenome(std::string testFileDir)
     testVec.push_back(s1);
 
     if (!(testVec == genome.getGenes(true))) {
-        std::cerr << "Error in getGenes(true).\n";
+        my_printError("Error in getGenes(true).\n");
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        std::cout << "Genome getGenes --- Pass\n";
+        my_print("Genome getGenes --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -1298,10 +1325,10 @@ int testGenome(std::string testFileDir)
     std::vector<unsigned> uVector = {0, 1, 2, 3};
 
     if (genome.getNumGenesWithPhi() == uVector)
-        std::cout << "Genome get/setNumGenesWithPhi --- Pass\n";
+        my_print("Genome get/setNumGenesWithPhi --- Pass\n");
     else
     {
-        std::cerr << "Error in setNumGenesWithPhi or getNumGenesWithPhi.\n";
+        my_printError("Error in setNumGenesWithPhi or getNumGenesWithPhi.\n");
         globalError = 1;
     }
 
@@ -1310,16 +1337,15 @@ int testGenome(std::string testFileDir)
     //-------------------------------------------------//
     for (unsigned i = 1; i < 4; i++) {
         if (genome.getNumGenesWithPhiForIndex(i) != i) {
-            std::cerr << "Error in getNumGenesWithPhiForIndex with index ";
-            std::cerr << i << ". Should return " << i << ", returns ";
-            std::cerr << genome.getNumGenesWithPhiForIndex(i) << ".\n";
+            my_printError("Error in getNumGenesWithPhiForIndex with index %.", i);
+            my_printError("Should return %, but returns %.\n", i, genome.getNumGenesWithPhiForIndex(i));
             error = 1;
             globalError = 1;
         }
     }
 
     if (!error)
-        std::cout << "Genome getNumGenesWithPhiForIndex --- Pass\n";
+        my_print("Genome getNumGenesWithPhiForIndex --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -1327,21 +1353,19 @@ int testGenome(std::string testFileDir)
     //------ getGenomeSize Function ------//
     //------------------------------------//
     if (1 != genome.getGenomeSize(false)) {
-        std::cerr << "Error in getGenomesize(false). Should return 1, returns ";
-        std::cerr << genome.getGenomeSize(false) << ".\n";
+        my_printError("Error in getGenomesize(false). Should return 1, but returns %.\n", genome.getGenomeSize(false));
         error = 1;
         globalError = 1;
     }
 
     if (1 != genome.getGenomeSize(true)) {
-        std::cerr << "Error in getGenomesize(true). Should return 1, returns ";
-        std::cerr << genome.getGenomeSize(true) << ".\n";
+        my_printError("Error in getGenomesize(true). Should return 1, but returns %.\n", genome.getGenomeSize(true));
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        std::cout << "Genome getGenomeSize --- Pass\n";
+        my_print("Genome getGenomeSize --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -1352,7 +1376,7 @@ int testGenome(std::string testFileDir)
     //reuse generic vector of unsigned integers
     uVector = {1};
     if (uVector != genome.getCodonCountsPerGene("ATG")) {
-        std::cerr << "Error in getCodonCountsPerGene with a single gene.\n";
+        my_printError("Error in getCodonCountsPerGene with a single gene.\n");
         error = 1;
         globalError = 1;
     }
@@ -1363,13 +1387,13 @@ int testGenome(std::string testFileDir)
     uVector = {0, 1, 1};
 
     if (uVector != genome.getCodonCountsPerGene("GAT")) {
-        std::cerr << "Error in getCodonCountsPerGene with three genes.\n";
+        my_printError("Error in getCodonCountsPerGene with three genes.\n");
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        std::cout << "Genome getCodonCountsPerGene --- Pass\n";
+        my_print("Genome getCodonCountsPerGene --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -1388,10 +1412,10 @@ int testGenome(std::string testFileDir)
     genome.clear();
 
     if (genome == empty)
-        std::cout << "Genome clear --- Pass\n";
+        my_print("Genome clear --- Pass\n");
     else
     {
-        std::cerr << "Error in clear. Genome is not empty.\n";
+        my_printError("Error in clear. Genome is not empty.\n");
         globalError = 1;
     }
 
@@ -1417,7 +1441,7 @@ int testGenome(std::string testFileDir)
     uVector = {0, 1, 2, 3};
 
     if (!(genome == genome.getGenomeForGeneIndices(uVector, false))) {
-        std::cerr << "Error in getGenomeForGeneIndices with genes.\n";
+        my_printError("Error in getGenomeForGeneIndices with genes.\n");
         error = 1;
         globalError = 1;
     }
@@ -1434,13 +1458,13 @@ int testGenome(std::string testFileDir)
     genome.addGene(s4, true);
 
     if (!(genome == genome.getGenomeForGeneIndices(uVector, true))) {
-        std::cerr << "Error in getGenomeForGeneIndices with simulated genes.\n";
+        my_printError("Error in getGenomeForGeneIndices with simulated genes.\n");
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        std::cout << "Genome getGenomeForGeneIndices --- Pass\n";
+        my_print("Genome getGenomeForGeneIndices --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -1459,10 +1483,10 @@ int testGenome(std::string testFileDir)
     testGenome.addGene(fasta2, false);
 
     if (genome == testGenome)
-        std::cout << "Genome readFasta --- Pass\n";
+        my_print("Genome readFasta --- Pass\n");
     else
     {
-        std::cerr << "Error in readFasta. Genomes are not equivalent.\n";
+        my_printError("Error in readFasta. Genomes are not equivalent.\n");
         globalError = 1;
     }
 
@@ -1480,7 +1504,7 @@ int testGenome(std::string testFileDir)
 
     if (!(genome == testGenome))
     {
-        std::cerr << "Error in writeFasta with genes. Genomes are not equivalent.\n";
+        my_printError("Error in writeFasta with genes. Genomes are not equivalent.\n");
         error = 1;
         globalError = 1;
     }
@@ -1509,13 +1533,13 @@ int testGenome(std::string testFileDir)
 
     if (!(genome == testGenome))
     {
-        std::cerr << "Error in writeFasta with simulated genes. Genomes are not equivalent.\n";
+        my_printError("Error in writeFasta with simulated genes. Genomes are not equivalent.\n");
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        std::cout << "Genome writeFasta --- Pass\n";
+        my_print("Genome writeFasta --- Pass\n");
     else
         error = 0; //Reset for next function. 
 
@@ -1540,10 +1564,10 @@ int testGenome(std::string testFileDir)
     testGenome.addGene(rfp3, false);
 
     if (genome == testGenome)
-        std::cout << "Genome readRFPFile --- Pass\n";
+        my_print("Genome readRFPFile --- Pass\n");
     else
     {
-        std::cerr << "Error in readRFPFile. Genomes are not equivalent.\n";
+        my_printError("Error in readRFPFile. Genomes are not equivalent.\n");
         globalError = 1;
     }
 
@@ -1561,7 +1585,7 @@ int testGenome(std::string testFileDir)
 
     if (!(genome == testGenome))
     {
-        std::cerr << "Error in writeRFPFile with genes. Genomes are not equivalent.\n";
+        my_printError("Error in writeRFPFile with genes. Genomes are not equivalent.\n");
         error = 1;
         globalError = 1;
     }
@@ -1590,13 +1614,13 @@ int testGenome(std::string testFileDir)
 
     if (!(genome == testGenome))
     {
-        std::cerr << "Error in writeRFPFile with simulated genes. Genomes are not equivalent.\n";
+        my_printError("Error in writeRFPFile with simulated genes. Genomes are not equivalent.\n");
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        std::cout << "Genome writeRFPFile --- Pass\n";
+        my_print("Genome writeRFPFile --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -1622,10 +1646,10 @@ int testGenome(std::string testFileDir)
     testGenome.addGene(panse2, false);
 
     if (genome == testGenome)
-        std::cout << "Genome readPANSE --- Pass\n";
+        my_print("Genome readPANSE --- Pass\n");
     else
     {
-        std::cerr << "Error in readPANSE. Genomes are not equivalent.\n";
+        my_printError("Error in readPANSE. Genomes are not equivalent.\n");
         globalError = 1;
     }
 
@@ -1672,8 +1696,8 @@ int testGenome(std::string testFileDir)
 
     if (!(genome == testGenome))
     {
-        std::cerr << "Error comparing genomes: readObservedPhiValues.csv ";
-        std::cerr << "by ID produces a different genome than expected.\n";
+        my_printError("Error comparing genomes: readObservedPhiValues.csv ");
+        my_printError("by ID produces a different genome than expected.\n");
         error = 1;
         globalError = 1;
     }
@@ -1694,8 +1718,8 @@ int testGenome(std::string testFileDir)
 
     if (!(genome == testGenome))
     {
-        std::cerr << "Error comparing genomes: readObservedPhiValues.csv ";
-        std::cerr << "by index produces a different genome than expected.\n";
+        my_printError("Error comparing genomes: readObservedPhiValues.csv ");
+        my_printError("by index produces a different genome than expected.\n");
         error = 1;
         globalError = 1;
     }
@@ -1724,8 +1748,8 @@ int testGenome(std::string testFileDir)
 
     if (!(genome == testGenome))
     {
-        std::cerr << "Error comparing genomes: readObservedPhiValuesError.csv ";
-        std::cerr << "by ID produces a different genome than expected.\n";
+        my_printError("Error comparing genomes: readObservedPhiValuesError.csv ");
+        my_printError("by ID produces a different genome than expected.\n");
         error = 1;
         globalError = 1;
     }
@@ -1743,42 +1767,16 @@ int testGenome(std::string testFileDir)
 
     if (!(genome == testGenome))
     {
-        std::cerr << "Error comparing genomes: readObservedPhiValuesError.csv ";
-        std::cerr << "by index produces a different genome than expected.\n";
+        my_printError("Error comparing genomes: readObservedPhiValuesError.csv ");
+        my_printError("by index produces a different genome than expected.\n");
         error = 1;
         globalError = 1;
     }
 
     // If any errors are produced, reset variable for next function
     if (!error)
-        std::cout << "Genome readObservedPhiValues --- Pass\n";
+        my_print("Genome readObservedPhiValues --- Pass\n");
     // No need to reset error
-
-    return globalError;
-}
-
-
-int testUtility()
-{
-    int error = 0;
-    int globalError = 0;
-
-    error = my_print("Product: %, Qty: %, Price is %", "Shampoo", 5, 100);
-
-    if (error)
-    {
-        std::cerr << "Error in my_print.\n";
-        globalError = 1;
-    }
-
-    std::cout <<"\n";
-    error = my_printError("Product: %, Qty: %, Price is %", "Shampoo", 5, 100);
-
-    if (error)
-    {
-        std::cerr << "Error in my_printError\n";
-        globalError = 1;
-    }
 
     return globalError;
 }
@@ -1807,16 +1805,16 @@ int testCovarianceMatrix()
         // equals the initialized and extracted covM
         if (covM2[i] != covM.getCovMatrix()->at(i))
         {
-            std::cerr << "Error in getCovMatrix or initCovarianceMatrix:";
-            std::cerr << " at index " << i << " matrix extracted should return " << covM2[i];
-            std::cerr << " but instead returns " << covM.getCovMatrix()->at(i) << ".\n";
+            my_printError("Error in getCovMatrix or initCovarianceMatrix:");
+            my_printError(" at index % matrix extracted should return %", i, covM2[i]);
+            my_printError(" but instead returns %.\n", covM.getCovMatrix()->at(i));
             error = 1;
             globalError = 1;
         }
     }
 
     if (!error)
-        std::cout << "CovarianceMatrix getCovMatrix & initCovarianceMatrix --- Pass\n";
+        my_print("CovarianceMatrix getCovMatrix & initCovarianceMatrix --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -1836,16 +1834,16 @@ int testCovarianceMatrix()
         // equals the set covM
         if (covM2[i] != covM.getCovMatrix()->at(i))
         {
-            std::cerr << "Error in setDiag:";
-            std::cerr << " at index " << i << " matrix extracted should return " << covM2[i];
-            std::cerr << " but instead returns " << covM.getCovMatrix()->at(i) << ".\n";
+            my_printError("Error in setDiag:");
+            my_printError(" at index % matrix extracted should return %", i, covM2[i]);
+            my_printError(" but instead returns %.\n", covM.getCovMatrix()->at(i));
             error = 1;
             globalError = 1;
         }
     }
 
     if (!error)
-        std::cout << "CovarianceMatrix setDiag --- Pass\n";
+        my_print("CovarianceMatrix setDiag --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -1876,16 +1874,16 @@ int testCovarianceMatrix()
         // equals the set covM for its Cholesky matrix
         if (covM2[i] != covM.getCholeskyMatrix()->at(i))
         {
-            std::cerr << "Error in getCholeskyMatrix or choleskyDecomposition:";
-            std::cerr << " at index " << i << " matrix extracted should return " << covM2[i];
-            std::cerr << " but instead returns " << covM.getCholeskyMatrix()->at(i) << ".\n";
+            my_printError("Error in getCholeskyMatrix or choleskyDecomposition:");
+            my_printError(" at index % matrix extracted should return %", i, covM2[i]);
+            my_printError(" but instead returns %.\n", covM.getCholeskyMatrix()->at(i));
             error = 1;
             globalError = 1;
         }
     }
 
     if (!error)
-        std::cout << "CovarianceMatrix getCholeskyMatrix & choleskyDecomposition --- Pass\n";
+        my_print("CovarianceMatrix getCholeskyMatrix & choleskyDecomposition --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -1895,11 +1893,11 @@ int testCovarianceMatrix()
     covM.getNumVariates();
 
     if (covM.getNumVariates() != 4) {
-        std::cerr << "Error in getNumVariates. Function should return 4, but returns " << covM.getNumVariates() << ".\n";
+        my_printError("Error in getNumVariates. Function should return 4, but returns %.\n", covM.getNumVariates());
         globalError = 1;
     }
     else
-        std::cout << "CovarianceMatrix getNumVariates --- Pass\n";
+        my_print("CovarianceMatrix getNumVariates --- Pass\n");
 
     //TODO: Test these final two functions.
     //-------------------------------------------------------------//
@@ -2000,30 +1998,30 @@ int testMCMCAlgorithm()
     //------ is/setEstimateSynthesisRate Functions ------//
     //---------------------------------------------------//
     if (!mcmc.isEstimateSynthesisRate()) {
-        std::cerr << "Error in isEstimateSynthesisRate.";
-        std::cerr << " Function should return true, but returns false.\n";
+        my_printError("Error in isEstimateSynthesisRate.");
+        my_printError(" Function should return true, but returns false.\n");
         error = 1;
         globalError = 1;
     }
 
     mcmc.setEstimateSynthesisRate(false);
     if (mcmc.isEstimateSynthesisRate()) {
-        std::cerr << "Error in isEstimateSynthesisRate or setEstimateSynthesisRate.";
-        std::cerr << " Function should return false, but returns true.\n";
+        my_printError("Error in isEstimateSynthesisRate or setEstimateSynthesisRate.");
+        my_printError(" Function should return false, but returns true.\n");
         error = 1;
         globalError = 1;
     }
 
     mcmc.setEstimateSynthesisRate(true);
     if (!mcmc.isEstimateSynthesisRate()) {
-        std::cerr << "Error in isEstimateSynthesisRate or setEstimateSynthesisRate.";
-        std::cerr << " Function should return true, but returns false.\n";
+        my_printError("Error in isEstimateSynthesisRate or setEstimateSynthesisRate.");
+        my_printError(" Function should return true, but returns false.\n");
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        std::cout << "MCMCAlgorithm is/setEstimateSynthesisRate --- Pass\n";
+        my_print("MCMCAlgorithm is/setEstimateSynthesisRate --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -2031,30 +2029,30 @@ int testMCMCAlgorithm()
     //------ is/setEstimateCodonSpecificParameter Functions ------//
     //------------------------------------------------------------//
     if (!mcmc.isEstimateCodonSpecificParameter()) {
-        std::cerr << "Error in isEstimateCodonSpecificParameter.";
-        std::cerr << " Function should return true, but returns false.\n";
+        my_printError("Error in isEstimateCodonSpecificParameter.");
+        my_printError(" Function should return true, but returns false.\n");
         error = 1;
         globalError = 1;
     }
 
     mcmc.setEstimateCodonSpecificParameter(false);
     if (mcmc.isEstimateCodonSpecificParameter()) {
-        std::cerr << "Error in isEstimateCodonSpecificParameter or setEstimateCodonSpecificParameter.";
-        std::cerr << " Function should return false, but returns true.\n";
+        my_printError("Error in isEstimateCodonSpecificParameter or setEstimateCodonSpecificParameter.");
+        my_printError(" Function should return false, but returns true.\n");
         error = 1;
         globalError = 1;
     }
 
     mcmc.setEstimateCodonSpecificParameter(true);
     if (!mcmc.isEstimateCodonSpecificParameter()) {
-        std::cerr << "Error in isEstimateCodonSpecificParameter or setEstimateCodonSpecificParameter.";
-        std::cerr << " Function should return true, but returns false.\n";
+        my_printError("Error in isEstimateCodonSpecificParameter or setEstimateCodonSpecificParameter.");
+        my_printError(" Function should return true, but returns false.\n");
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        std::cout << "MCMCAlgorithm is/setEstimateCodonSpecificParameter --- Pass\n";
+        my_print("MCMCAlgorithm is/setEstimateCodonSpecificParameter --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -2062,30 +2060,30 @@ int testMCMCAlgorithm()
     //------ is/setEstimateHyperParameter Functions ------//
     //----------------------------------------------------//
     if (!mcmc.isEstimateHyperParameter()) {
-        std::cerr << "Error in isEstimateHyperParameter.";
-        std::cerr << " Function should return true, but returns false.\n";
+        my_printError("Error in isEstimateHyperParameter.");
+        my_printError(" Function should return true, but returns false.\n");
         error = 1;
         globalError = 1;
     }
 
     mcmc.setEstimateHyperParameter(false);
     if (mcmc.isEstimateHyperParameter()) {
-        std::cerr << "Error in isEstimateHyperParameter or setEstimateHyperParameter.";
-        std::cerr << " Function should return false, but returns true.\n";
+        my_printError("Error in isEstimateHyperParameter or setEstimateHyperParameter.");
+        my_printError(" Function should return false, but returns true.\n");
         error = 1;
         globalError = 1;
     }
 
     mcmc.setEstimateHyperParameter(true);
     if (!mcmc.isEstimateHyperParameter()) {
-        std::cerr << "Error in isEstimateHyperParameter or setEstimateHyperParameter.";
-        std::cerr << " Function should return true, but returns false.\n";
+        my_printError("Error in isEstimateHyperParameter or setEstimateHyperParameter.");
+        my_printError(" Function should return true, but returns false.\n");
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        std::cout << "MCMCAlgorithm is/setEstimateHyperParameter --- Pass\n";
+        my_print("MCMCAlgorithm is/setEstimateHyperParameter --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -2097,30 +2095,30 @@ int testMCMCAlgorithm()
     // although it is not one of the arguments. */
 
     if (!mcmc.isEstimateMixtureAssignment()) {
-        std::cerr << "Error in isEstimateMixtureAssignment.";
-        std::cerr << " Function should return true, but returns false.\n";
+        my_printError("Error in isEstimateMixtureAssignment.");
+        my_printError(" Function should return true, but returns false.\n");
         error = 1;
         globalError = 1;
     }
 
     mcmc.setEstimateMixtureAssignment(false);
     if (mcmc.isEstimateMixtureAssignment()) {
-        std::cerr << "Error in isEstimateMixtureAssignment or setEstimateMixtureAssignment.";
-        std::cerr << " Function should return false, but returns true.\n";
+        my_printError("Error in isEstimateMixtureAssignment or setEstimateMixtureAssignment.");
+        my_printError(" Function should return false, but returns true.\n");
         error = 1;
         globalError = 1;
     }
 
     mcmc.setEstimateMixtureAssignment(true);
     if (!mcmc.isEstimateMixtureAssignment()) {
-        std::cerr << "Error in isEstimateMixtureAssignment or setEstimateMixtureAssignment.";
-        std::cerr << " Function should return true, but returns false.\n";
+        my_printError("Error in isEstimateMixtureAssignment or setEstimateMixtureAssignment.");
+        my_printError(" Function should return true, but returns false.\n");
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        std::cout << "MCMCAlgorithm is/setEstimateMixtureAssignment --- Pass\n";
+        my_print("MCMCAlgorithm is/setEstimateMixtureAssignment --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -2130,16 +2128,16 @@ int testMCMCAlgorithm()
 
     // NOTE: By default, both constructors initialize stepsToAdapt to -1
     if (mcmc.getStepsToAdapt() != -1) {
-        std::cerr << "Error in getStepsToAdapt.";
-        std::cerr << " Function should return -1, but returns " << mcmc.getStepsToAdapt() << ".\n";
+        my_printError("Error in getStepsToAdapt.");
+        my_printError(" Function should return -1, but returns %.\n", mcmc.getStepsToAdapt());
         error = 1;
         globalError = 1;
     }
 
     mcmc.setStepsToAdapt(52);
     if (mcmc.getStepsToAdapt() != 52) {
-        std::cerr << "Error in getStepsToAdapt or setStepsToAdapt.";
-        std::cerr << " Function should return 52, but returns " << mcmc.getStepsToAdapt() << ".\n";
+        my_printError("Error in getStepsToAdapt or setStepsToAdapt.");
+        my_printError(" Function should return 52, but returns %.\n", mcmc.getStepsToAdapt());
         error = 1;
         globalError = 1;
     }
@@ -2147,14 +2145,14 @@ int testMCMCAlgorithm()
     // Intentional error checking: Should print an error message with no change to stepsToAdapt
     mcmc.setStepsToAdapt(101);
     if (mcmc.getStepsToAdapt() != 52) {
-        std::cerr << "Error in getStepsToAdapt or setStepsToAdapt.";
-        std::cerr << " Function should return 52, with no change, but returns " << mcmc.getStepsToAdapt() << ".\n";
+        my_printError("Error in getStepsToAdapt or setStepsToAdapt.");
+        my_printError(" Function should return 52, with no change, but returns %.\n", mcmc.getStepsToAdapt());
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        std::cout << "MCMCAlgorithm get/setStepsToAdapt --- Pass\n";
+        my_print("MCMCAlgorithm get/setStepsToAdapt --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -2170,11 +2168,11 @@ int testMCMCAlgorithm()
 
     if (tmp != likelihoodTrace)
     {
-        std::cerr << "Error in getLogLikelihoodTrace. Function should return a vector of " << samples << " + 1 zeroes.\n";
+        my_printError("Error in getLogLikelihoodTrace. Function should return a vector of % + 1 zeroes.\n", samples);
         globalError = 1;
     }
     else
-        std::cout << "MCMCAlgorithm getLogLikelihoodTrace --- Pass\n";
+        my_print("MCMCAlgorithm getLogLikelihoodTrace --- Pass\n");
 
     //----------------------------------------------------//
     //------ getLogLikelihoodPosteriorMean Function ------//
@@ -2182,9 +2180,9 @@ int testMCMCAlgorithm()
     //TODO
     //unsigned traceLength = likelihoodTrace.size();
 
-    //std::cout << mcmc.getLogLikelihoodPosteriorMean(10) << "\n";
-    //std::cout << mcmc.getLogLikelihoodPosteriorMean(5) << "\n";
-    //std::cout << mcmc.getLogLikelihoodPosteriorMean(15) << "\n";
+    //my_print(mcmc.getLogLikelihoodPosteriorMean(10) << "\n");
+    //my_print(mcmc.getLogLikelihoodPosteriorMean(5) << "\n");
+    //my_print(mcmc.getLogLikelihoodPosteriorMean(15) << "\n");
 
 
     return globalError;
@@ -2208,5 +2206,6 @@ RCPP_MODULE(Test_mod)
 	function("testGenome", &testGenome);
 	function("testUtility", &testUtility);
 	function("testCovarianceMatrix", &testCovarianceMatrix);
+	function("testMCMCAlgorithm", &testMCMCAlgorithm);
 }
 #endif

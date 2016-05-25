@@ -116,7 +116,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 		likelihood_proposed += calculateLogLikelihoodRatioPerAA(gene, curAA, mutation, selection, phiValue_proposed);
 	}
 
-	//std::cout << logLikelihood << " " << logLikelihood_proposed << std::endl;
+	//my_print("% %\n", logLikelihood, logLikelihood_proposed);
 
 	double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(false);
 	double logPhiProbability = Parameter::densityLogNorm(phiValue, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
@@ -124,19 +124,19 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 	double currentLogLikelihood = (likelihood + logPhiProbability);
 	double proposedLogLikelihood = (likelihood_proposed + logPhiProbability_proposed);
 	if (phiValue == 0) {
-		std::cout << "phiValue is 0\n";
+		my_print("phiValue is 0\n");
 	}
 	if (phiValue_proposed == 0) {
-		std::cout << "phiValue_prop is 0\n";
+		my_print("phiValue_prop is 0\n");
 	}
 	logProbabilityRatio[0] = (proposedLogLikelihood - currentLogLikelihood) - (std::log(phiValue) - std::log(phiValue_proposed));
 	logProbabilityRatio[1] = currentLogLikelihood - std::log(phiValue_proposed);
 	if (std::isinf(logProbabilityRatio[1])) {
-		std::cout << "logprob1 inf\n";
+		my_print("logprob1 inf\n");
 	}
 	logProbabilityRatio[2] = proposedLogLikelihood - std::log(phiValue);
 	if (std::isinf(logProbabilityRatio[2])) {
-		std::cout << "logprob2 inf\n";
+		my_print("logprob2 inf\n");
 	}
 
 	//------------NOTE: Jeremy, Cedric changed the reverse jump to where we DON'T include it. I had my RFP
@@ -575,7 +575,7 @@ void FONSEModel::simulateGenome(Genome & genome)
 
 	for (unsigned geneIndex = 0; geneIndex < genome.getGenomeSize(); geneIndex++) //loop over all genes in the genome
 	{
-		if (geneIndex % 100 == 0) std::cout << "Simulating Gene " << geneIndex << std::endl;
+		if (geneIndex % 100 == 0) my_print("Simulating Gene %\n", geneIndex);
 		Gene gene = genome.getGene(geneIndex);
 		SequenceSummary seqSum = gene.geneData;
 		std::string tmpSeq = "ATG"; //Always will have the start amino acid
@@ -639,11 +639,11 @@ void FONSEModel::simulateGenome(Genome & genome)
 
 void FONSEModel::printHyperParameters()
 {
-	for(unsigned i = 0u; i < getNumSynthesisRateCategories(); i++)
+	for (unsigned i = 0u; i < getNumSynthesisRateCategories(); i++)
 	{
-		std::cout << "stdDevSynthesisRate posterior estimate for selection category " << i << ": " << getStdDevSynthesisRate(i) << std::endl;
+		my_print("stdDevSynthesisRate posterior estimate for selection category %: %\n", i, getStdDevSynthesisRate(i));
 	}
-	std::cout << "\t current stdDevSynthesisRate proposal width: " << getCurrentStdDevSynthesisRateProposalWidth() << std::endl;
+	my_print("\t current stdDevSynthesisRate proposal width: %\n", getCurrentStdDevSynthesisRateProposalWidth());
 }
 
 

@@ -91,7 +91,7 @@ class MCMCAlgorithm
 
 #ifndef STANDALONE
 
-		//Other Functions:
+		//Other Functions (All tested):
     	unsigned getSamples();
     	unsigned getThining();
     	unsigned getAdaptiveWidth();
