@@ -1,7 +1,9 @@
-
-
 #ifndef TRACE_H
 #define TRACE_H
+
+
+#include "../mixtureDefinition.h"
+
 
 #include <iostream>
 #include <vector>
@@ -11,7 +13,6 @@
 #include <Rcpp.h>
 #endif
 
-#include "../mixtureDefinition.h"
 
 class Trace {
 	private:
@@ -23,7 +24,7 @@ class Trace {
         //however, it will need to be changed at some point when there are some adjustments to hyper parameter acceptance/rejection
 		std::vector<std::vector<std::vector<double>>>synthesisRateAcceptanceRatioTrace; //order: expressionCategory, gene, sample
 		std::vector<std::vector<double>> codonSpecificAcceptanceRatioTrace;//order: codon, sample
-		std::vector<std::vector<std::vector<double>>> synthesisRateTrace;//order: expressioncategoy, gene, samples
+		std::vector<std::vector<std::vector<double>>> synthesisRateTrace;//order: expressioncategory, gene, samples
 		std::vector<std::vector<unsigned>> mixtureAssignmentTrace;//order: numGenes, samples
 		std::vector<std::vector<double>> mixtureProbabilitiesTrace;//order: numMixtures, samples
 		std::vector<std::vector<std::vector<std::vector<double>>>> codonSpecificParameterTrace; //order: paramType, category, numparam, samples
@@ -31,20 +32,20 @@ class Trace {
 		std::vector<mixtureDefinition> *categories;
 
 
-
 		//ROC Trace:
 		std::vector<std::vector <double>> synthesisOffsetTrace;
 		std::vector<std::vector <double>> synthesisOffsetAcceptanceRatioTrace;
 		std::vector<std::vector <double>> observedSynthesisNoiseTrace;
 
-		//FONSE Trace:
 
+		//FONSE Trace:
 
 
 		//RFP Trace:
 
-
-		//Initialization Functions:
+		//--------------------------------------//
+		//------ Initialization Functions ------//
+		//--------------------------------------//
 		void initializeSharedTraces(unsigned samples, unsigned num_genes, unsigned numSelectionCategories, unsigned numMixtures,
 			std::vector<mixtureDefinition> &_categories, unsigned maxGrouping);
 
@@ -52,7 +53,7 @@ class Trace {
 		void initSynthesisRateAcceptanceRatioTrace(unsigned num_genes, unsigned numExpressionCategories);
 		void initSynthesisRateTrace(unsigned samples, unsigned num_genes, unsigned numExpressionCategories);
 		void initMixtureAssignmentTrace(unsigned samples, unsigned num_genes);
-		void initMixtureProbabilitesTrace(unsigned samples, unsigned numMixtures);
+		void initMixtureProbabilitiesTrace(unsigned samples, unsigned numMixtures);
 		void initCodonSpecificParameterTrace(unsigned samples, unsigned numMutationCategories, unsigned numParam, unsigned paramType);
 
 
@@ -66,42 +67,45 @@ class Trace {
 
 		//RFP Specific:
 
-public:
-	//Constructors & Destructors:
-	Trace();
-	virtual ~Trace();
-	Trace(unsigned _numCodonSpecificParamTypes);
+
+	public:
+		//Constructors & Destructors:
+		Trace();
+		virtual ~Trace();
+		Trace(unsigned _numCodonSpecificParamTypes);
 
 
-	//Initialization Functions:
-	void initializeRFPTrace(unsigned samples, unsigned num_genes, unsigned numAlphaCategories,
-		unsigned numLambdaPrimeCategories, unsigned numParam, unsigned numMixtures,
-		std::vector<mixtureDefinition> &_categories, unsigned maxGrouping);
+		//Initialization Functions:
+		void initializeRFPTrace(unsigned samples, unsigned num_genes, unsigned numAlphaCategories,
+			unsigned numLambdaPrimeCategories, unsigned numParam, unsigned numMixtures,
+			std::vector<mixtureDefinition> &_categories, unsigned maxGrouping);
         
         
-	void initializeROCTrace(unsigned samples, unsigned num_genes, unsigned numMutationCategories,
-		unsigned numSelectionCategories, unsigned numParam, unsigned numMixtures, std::vector<mixtureDefinition> &_categories,
-		unsigned maxGrouping, unsigned numObservedPhiSets);
+		void initializeROCTrace(unsigned samples, unsigned num_genes, unsigned numMutationCategories,
+			unsigned numSelectionCategories, unsigned numParam, unsigned numMixtures, std::vector<mixtureDefinition> &_categories,
+			unsigned maxGrouping, unsigned numObservedPhiSets);
         
         
-	void initializeFONSETrace(unsigned samples, unsigned num_genes, unsigned numMutationCategories,
-		unsigned numSelectionCategories, unsigned numParam, unsigned numMixtures,
-		std::vector<mixtureDefinition> &_categories, unsigned maxGrouping);
+		void initializeFONSETrace(unsigned samples, unsigned num_genes, unsigned numMutationCategories,
+			unsigned numSelectionCategories, unsigned numParam, unsigned numMixtures,
+			std::vector<mixtureDefinition> &_categories, unsigned maxGrouping);
         
         
-	void initializePANSETrace(unsigned samples, unsigned num_genes, unsigned numAlphaCategories,
-		unsigned numLambdaPrimeCategories, unsigned numParam, unsigned numMixtures,
-		std::vector<mixtureDefinition> &_categories, unsigned maxGrouping);
+		void initializePANSETrace(unsigned samples, unsigned num_genes, unsigned numAlphaCategories,
+			unsigned numLambdaPrimeCategories, unsigned numParam, unsigned numMixtures,
+			std::vector<mixtureDefinition> &_categories, unsigned maxGrouping);
 
 
-        //Getter Functions:
+		//------------------------------//
+		//------ Getter Functions ------//
+		//------------------------------//
         std::vector<double> getStdDevSynthesisRateTrace(unsigned selectionCategory);
         std::vector<double> getExpectedSynthesisRateTrace();
         std::vector<double> getStdDevSynthesisRateAcceptanceRatioTrace();
         std::vector<std::vector<std::vector<double>>> getSynthesisRateTrace();
         std::vector<double> getSynthesisRateAcceptanceRatioTraceByMixtureElementForGene(unsigned mixtureElement, unsigned geneIndex);
         std::vector<std::vector<std::vector<double>>> getSynthesisRateAcceptanceRatioTrace();
-        std::vector<double> getCodonSpecficAcceptanceRatioTraceForAA(std::string aa);
+        std::vector<double> getCodonSpecificAcceptanceRatioTraceForAA(std::string aa);
         std::vector<double> getSynthesisRateTraceForGene(unsigned geneIndex); //will build the trace appropriately based on what cat you are in
         std::vector<double> getSynthesisRateTraceByMixtureElementForGene(unsigned mixtureElement, unsigned geneIndex);
         std::vector<unsigned> getMixtureAssignmentTraceForGene(unsigned geneIndex);
@@ -113,22 +117,26 @@ public:
         unsigned getCodonSpecificCategory(unsigned mixtureElement, unsigned paramType);
 		std::vector<std::vector<std::vector<std::vector<double>>>>* getCodonSpecificParameterTrace();
 
+
         //ROC Specific:
-        std::vector<double> getCodonSpecificParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon, unsigned paramType,
-                bool withoutReference = true);
+        std::vector<double> getCodonSpecificParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon,
+                unsigned paramType, bool withoutReference = true);
         std::vector<double> getSynthesisOffsetTrace(unsigned index);
         std::vector<double> getSynthesisOffsetAcceptanceRatioTraceForIndex(unsigned index);
         std::vector<double> getObservedSynthesisNoiseTrace(unsigned index);
         std::vector<std::vector<std::vector<double>>> getCodonSpecificParameterTraceByParamType(unsigned paramType);
         std::vector<std::vector<double>> getSynthesisOffsetAcceptanceRatioTrace();
 
+
         //FONSE Specific:
+
 
         //RFP Specific:
 
 
-
-        //Update Functions:
+		//------------------------------//
+		//------ Update Functions ------//
+		//------------------------------//
         void updateStdDevSynthesisRateTrace(unsigned sample, double stdDevSynthesisRate, unsigned synthesisRateCategory);
         void updateStdDevSynthesisRateAcceptanceRatioTrace(double acceptanceLevel);
         void updateSynthesisRateAcceptanceRatioTrace(unsigned category, unsigned geneIndex, double acceptanceLevel);
@@ -144,7 +152,9 @@ public:
         void updateSynthesisOffsetAcceptanceRatioTrace(unsigned index, double value);
         void updateObservedSynthesisNoiseTrace(unsigned index, unsigned sample, double value);
 
+
         //FONSE Specific:
+
 
         //RFP Specific:
         void updateCodonSpecificParameterTraceForCodon(unsigned sample, std::string codon, std::vector<std::vector<double>> &curParam, unsigned paramType);

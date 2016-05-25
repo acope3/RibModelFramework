@@ -22,10 +22,12 @@ Trace::Trace()
 	// TODO: fill this
 }
 
+
 Trace::~Trace()
 {
 	//dtor
 }
+
 
 Trace::Trace(unsigned _numCodonSpecificParamTypes)
 {
@@ -52,7 +54,7 @@ void Trace::initializeSharedTraces(unsigned samples, unsigned num_genes, unsigne
 	codonSpecificAcceptanceRatioTrace.resize(maxGrouping);
 	initSynthesisRateTrace(samples, num_genes, numSelectionCategories);
 	initMixtureAssignmentTrace(samples, num_genes);
-	initMixtureProbabilitesTrace(samples, numMixtures);
+	initMixtureProbabilitiesTrace(samples, numMixtures);
 
 	categories = &_categories;
 }
@@ -95,6 +97,7 @@ void Trace::initSynthesisRateTrace(unsigned samples, unsigned num_genes, unsigne
 	}
 }
 
+
 void Trace::initMixtureAssignmentTrace(unsigned samples, unsigned num_genes)
 {
 	mixtureAssignmentTrace.resize(num_genes);
@@ -105,7 +108,7 @@ void Trace::initMixtureAssignmentTrace(unsigned samples, unsigned num_genes)
 }
 
 
-void Trace::initMixtureProbabilitesTrace(unsigned samples, unsigned numMixtures)
+void Trace::initMixtureProbabilitiesTrace(unsigned samples, unsigned numMixtures)
 {
 	mixtureProbabilitiesTrace.resize(numMixtures);
 	for (unsigned i = 0u; i < numMixtures; i++)
@@ -113,7 +116,6 @@ void Trace::initMixtureProbabilitesTrace(unsigned samples, unsigned numMixtures)
 		mixtureProbabilitiesTrace[i].resize(samples, 0.0);
 	}
 }
-
 
 
 void Trace::initCodonSpecificParameterTrace(unsigned samples, unsigned numCategories, unsigned numParam, unsigned paramType)
@@ -180,7 +182,6 @@ void Trace::initObservedSynthesisNoiseTrace(unsigned samples, unsigned numPhiGro
 
 
 
-
 //----------------------------------------------------//
 //---------- Model Initialization Functions ----------//
 //----------------------------------------------------//
@@ -203,9 +204,9 @@ void Trace::initializeROCTrace(unsigned samples, unsigned num_genes, unsigned nu
 	unsigned maxGrouping, unsigned numObservedPhiSets)
 {
 	initializeSharedTraces(samples, num_genes, numSelectionCategories, numMixtures, _categories, maxGrouping);
-	// The last argument specifies the codon specific parameter type (dM and dEta for ROC)
+	/* The last argument specifies the codon specific parameter type (dM and dEta for ROC)
 	// You can check Parameter.cpp to check what the values of dM and dEta are.
-	// The constants aren't used here because they are not available to the Trace object.
+	// The constants aren't used here because they are not available to the Trace object. */
 	initCodonSpecificParameterTrace(samples, numMutationCategories, numParam, 0u); // dM
 	initCodonSpecificParameterTrace(samples, numSelectionCategories, numParam, 1u); // dEta
 	initSynthesisOffsetTrace(samples, numObservedPhiSets);
@@ -234,9 +235,12 @@ void Trace::initializePANSETrace(unsigned samples, unsigned num_genes, unsigned 
 	initCodonSpecificParameterTrace(samples, numLambdaPrimeCategories, numParam, 1u);
 }
 
+
 //--------------------------------------//
-// --------- Getter Functions --------- //
+//---------- Getter Functions ----------//
 //--------------------------------------//
+
+
 std::vector<double> Trace::getStdDevSynthesisRateTrace(unsigned selectionCategory) 
 { 
 	return stdDevSynthesisRateTrace[selectionCategory]; 
@@ -287,7 +291,7 @@ std::vector<std::vector<std::vector<double>>> Trace::getSynthesisRateAcceptanceR
 }
 
 
-std::vector<double> Trace::getCodonSpecficAcceptanceRatioTraceForAA(std::string aa)
+std::vector<double> Trace::getCodonSpecificAcceptanceRatioTraceForAA(std::string aa)
 {
 	aa[0] = (char)std::toupper(aa[0]);
 	unsigned aaIndex = SequenceSummary::aaToIndex.find(aa)->second;
@@ -593,6 +597,7 @@ void Trace::updateCodonSpecificParameterTraceForCodon(unsigned sample, std::stri
 
 }
 
+
 // -----------------------------------------------------------------------------------------------------//
 // ---------------------------------------- R SECTION --------------------------------------------------//
 // -----------------------------------------------------------------------------------------------------//
@@ -799,7 +804,7 @@ bool Trace::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound)
 	}
 	else
 	{
-		Rf_error("Index: %d is out of bounds. Index must be between %d & %d\n", index, lowerbound, upperbound);
+		my_printError("ERROR: Index: % is out of bounds. Index must be between % & %\n", index, lowerbound, upperbound);
 	}
 
 	return check;

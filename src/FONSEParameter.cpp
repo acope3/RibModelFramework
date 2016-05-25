@@ -122,7 +122,7 @@ void FONSEParameter::initFONSEParameterSet()
 		std::string aa = SequenceSummary::AminoAcidArray[i];
 		unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa, true);
 		CovarianceMatrix m((numMutationCategories + numSelectionCategories) * numCodons);
-		m.choleskiDecomposition();
+		m.choleskyDecomposition();
 		covarianceMatrix.push_back(m);
 	}
 
@@ -663,7 +663,7 @@ void FONSEParameter::initCovarianceMatrix(SEXP _matrix, std::string aa)
         }
     }
     CovarianceMatrix m(covMatrix);
-    m.choleskiDecomposition();
+    m.choleskyDecomposition();
     covarianceMatrix[aaIndex] = m;
 }
 

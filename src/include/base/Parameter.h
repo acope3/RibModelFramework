@@ -1,6 +1,10 @@
 #ifndef PARAMETER_H
 #define PARAMETER_H
 
+#include "../Genome.h"
+#include "../CovarianceMatrix.h"
+#include "Trace.h"
+
 #include <vector>
 #include <random>
 #include <string>
@@ -12,12 +16,6 @@
 #ifndef STANDALONE
 #include <Rcpp.h>
 #endif
-
-#include "../Genome.h"
-#include "../CovarianceMatrix.h"
-#include "Trace.h"
-
-
 
 class Parameter {
 	private:
@@ -60,7 +58,6 @@ class Parameter {
 		virtual ~Parameter();
 
 
-
 		//Initialization and Restart Functions:
 		void initParameterSet(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
 							  std::vector<std::vector<unsigned>> mixtureDefinitionMatrix,
@@ -89,12 +86,11 @@ class Parameter {
 		unsigned getNumSelectionCategories();
 		unsigned getNumSynthesisRateCategories();
 		unsigned getMutationCategory(unsigned mixtureElement);
-		unsigned getSelectionCategory(unsigned mixtureElement); //TODO: Add comments explaining reasonsing here for same function
+		unsigned getSelectionCategory(unsigned mixtureElement); //TODO: Add comments explaining reasoning here for same function
 		unsigned getSynthesisRateCategory(unsigned mixtureElement);
 		std::vector<unsigned> getMixtureElementsOfMutationCategory(unsigned category);
 		std::vector<unsigned> getMixtureElementsOfSelectionCategory(unsigned category);
 		std::string getMutationSelectionState();
-
 
 
 		//Group List Functions:
@@ -104,14 +100,12 @@ class Parameter {
 		unsigned getGroupListSize();
 
 
-
 		//stdDevSynthesisRate Functions:
 		double getStdDevSynthesisRate(unsigned selectionCategory, bool proposed = false);
 		virtual void proposeStdDevSynthesisRate();
 		void setStdDevSynthesisRate(double stdDevSynthesisRate, unsigned selectionCategory);
 		double getCurrentStdDevSynthesisRateProposalWidth();
 		void updateStdDevSynthesisRate();
-
 
 
 		//Synthesis Rate Functions:
@@ -124,11 +118,9 @@ class Parameter {
 		void updateSynthesisRate(unsigned geneIndex, unsigned mixtureElement);
 
 
-
 		//Iteration Functions:
 		unsigned getLastIteration();
 		void setLastIteration(unsigned iteration);
-
 
 
 		//Trace Functions:
@@ -163,7 +155,6 @@ class Parameter {
 		std::vector<double> getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex);
 
 
-
 		//Other Functions:
 		unsigned getNumParam();
 		unsigned getNumMixtureElements();
@@ -173,7 +164,6 @@ class Parameter {
 		virtual void setNumObservedPhiSets(unsigned _phiGroupings);
 		virtual std::vector <std::vector <double> > calculateSelectionCoefficients(unsigned sample, unsigned mixture);
 
-		
 
 		//Static Functions:
 		static double calculateSCUO(Gene& gene, unsigned maxAA);
@@ -190,8 +180,6 @@ class Parameter {
 		static double densityNorm(double x, double mean, double sd, bool log = false);
 		static double densityLogNorm(double x, double mean, double sd, bool log = false);
 		//double getMixtureAssignmentPosteriorMean(unsigned samples, unsigned geneIndex); // TODO: implement variance function, fix Mean function (won't work with 3 groups)
-
-
 
 
 

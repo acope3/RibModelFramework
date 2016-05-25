@@ -531,7 +531,7 @@ extractBaseInfo <- function(parameter){
   stdDevSynthesisRateAcceptRatTrace <- trace$getStdDevSynthesisRateAcceptanceRatioTrace()
   synthRateTrace <- trace$getSynthesisRateTrace()
   synthAcceptRatTrace <- trace$getSynthesisRateAcceptanceRatioTrace()
-  mixAssignTrace <- trace$getMixutreAssignmentTrace()
+  mixAssignTrace <- trace$getMixtureAssignmentTrace()
   mixProbTrace <- trace$getMixtureProbabilitiesTrace()
   codonSpecificAcceptRatTrace <- trace$getCodonSpecificAcceptanceRatioTrace()
   numMix <- parameter$numMixtures

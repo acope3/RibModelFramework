@@ -1,13 +1,13 @@
 #ifndef Utility_H
 #define Utility_H
-#include <iostream>
 
+
+#include <iostream>
 
 #ifndef STANDALONE
 #include <Rcpp.h>
 using namespace Rcpp;
 #endif
-
 
 // This template handles general printing between C++ and R
 // Returns 0 if no errors in formatting detected.

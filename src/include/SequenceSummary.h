@@ -2,18 +2,19 @@
 #define SequenceSummary_H
 
 
+#include "Utility.h"
+
+
 #include <string>
 #include <map>
 #include <algorithm>
 #include <cctype>
 #include <vector>
 #include <array>
-#include "Utility.h"
 
 #ifndef STANDALONE
 #include <Rcpp.h>
 #endif
-#include <array>
 
 class SequenceSummary
 {

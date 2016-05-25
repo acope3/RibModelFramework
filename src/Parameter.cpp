@@ -27,9 +27,9 @@ const unsigned Parameter::lmPri = 1;
 
 
 
-//--------------------------------------------------//
-// ---------- Constructors & Destructors -----------//
-//--------------------------------------------------//
+//-------------------------------------------------//
+//---------- Constructors & Destructors -----------//
+//-------------------------------------------------//
 
 
 Parameter::Parameter()
@@ -131,9 +131,9 @@ Parameter::~Parameter()
 
 
 
-//---------------------------------------------------------------//
-// ---------- Initialization and Restart Functions --------------//
-//---------------------------------------------------------------//
+//--------------------------------------------------------------//
+//---------- Initialization and Restart Functions --------------//
+//--------------------------------------------------------------//
 
 
 void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> mixtureDefinitionMatrix, bool splitSer,
@@ -632,9 +632,11 @@ std::vector <double> Parameter::readPhiValues(std::string filename)
 	return RV;
 }
 
-// ----------------------------------------------------------------------//
-// -------------------------- Prior functions ---------------------------//
-// ----------------------------------------------------------------------//
+
+//----------------------------------------------------------------------//
+//-------------------------- Prior functions ---------------------------//
+//----------------------------------------------------------------------//
+
 
 double Parameter::getCodonSpecificPriorStdDev(unsigned paramType)
 {
@@ -642,9 +644,9 @@ double Parameter::getCodonSpecificPriorStdDev(unsigned paramType)
 }
 
 
-// ----------------------------------------------------------------------//
-// ---------- Mixture Definition Matrix and Category Functions ----------//
-// ----------------------------------------------------------------------//
+//----------------------------------------------------------------------//
+//---------- Mixture Definition Matrix and Category Functions ----------//
+//----------------------------------------------------------------------//
 
 
 void Parameter::setNumMutationSelectionValues(std::string _mutationSelectionState, std::vector<std::vector<unsigned>> mixtureDefinitionMatrix)
@@ -797,9 +799,9 @@ unsigned Parameter::getGroupListSize()
 
 
 
-// ----------------------------------------------------//
-// ---------- stdDevSynthesisRate Functions -----------//
-// ----------------------------------------------------//
+//----------------------------------------------------//
+//---------- stdDevSynthesisRate Functions -----------//
+//----------------------------------------------------//
 
 
 double Parameter::getStdDevSynthesisRate(unsigned selectionCategory, bool proposed)
@@ -842,9 +844,9 @@ void Parameter::updateStdDevSynthesisRate()
 
 
 
-// -----------------------------------------------//
-// ---------- Synthesis Rate Functions -----------//
-// -----------------------------------------------//
+//-----------------------------------------------//
+//---------- Synthesis Rate Functions -----------//
+//-----------------------------------------------//
 
 
 double Parameter::getSynthesisRate(unsigned geneIndex, unsigned mixtureElement, bool proposed)
@@ -909,9 +911,9 @@ void Parameter::updateSynthesisRate(unsigned geneIndex, unsigned mixtureElement)
 
 
 
-// ------------------------------------------//
-// ---------- Iteration Functions -----------//
-// ------------------------------------------//
+//------------------------------------------//
+//---------- Iteration Functions -----------//
+//------------------------------------------//
 
 
 unsigned Parameter::getLastIteration()
@@ -929,14 +931,9 @@ void Parameter::setLastIteration(unsigned iteration)
 
 
 
-
-
-
-
-
-// -------------------------------------//
-// ---------- Other Functions ----------//
-// -------------------------------------//
+//-------------------------------------//
+//---------- Other Functions ----------//
+//-------------------------------------//
 
 
 unsigned Parameter::getNumParam()
@@ -973,6 +970,7 @@ unsigned Parameter::getMixtureAssignment(unsigned gene)
 {
 	return mixtureAssignment[gene];
 }
+
 
 std::vector <std::vector <double> > Parameter::calculateSelectionCoefficients(unsigned sample, unsigned mixture)
 {
@@ -1011,15 +1009,17 @@ std::vector <std::vector <double> > Parameter::calculateSelectionCoefficients(un
 	return selectionCoefficients;
 }
 
-// --------------------------------------//
-// ---------- Trace Functions -----------//
-// --------------------------------------//
+
+//--------------------------------------//
+//---------- Trace Functions -----------//
+//--------------------------------------//
 
 
 Trace& Parameter::getTraceObject()
 {
 	return traces;
 }
+
 
 void Parameter::setTraceObject(Trace _trace)
 {
@@ -1054,9 +1054,9 @@ void Parameter::updateMixtureProbabilitiesTrace(unsigned samples)
 }
 
 
-// ----------------------------------------------//
-// ---------- Adaptive Width Functions ----------//
-// ----------------------------------------------//
+//----------------------------------------------//
+//---------- Adaptive Width Functions ----------//
+//----------------------------------------------//
 
 
 void Parameter::adaptStdDevSynthesisRateProposalWidth(unsigned adaptationWidth, bool adapt)
@@ -1105,6 +1105,7 @@ void Parameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool a
 	my_print("\t acceptance rate to high: %\n", acceptanceOver);
 }
 
+
 void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastIteration, bool adapt)
 {
 	adaptiveStepPrev = adaptiveStepCurr;
@@ -1143,7 +1144,7 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 				}
 				
 
-				covarianceMatrix[aaIndex].choleskiDecomposition();
+				covarianceMatrix[aaIndex].choleskyDecomposition();
 				for (unsigned k = aaStart; k < aaEnd; k++)
 					std_csp[k] *= 0.8;
 			}
@@ -1153,7 +1154,7 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 					std_csp[k] *= 1.2;
     				covarianceMatrix[aaIndex] *= 1.2;                    
                 }
-				covarianceMatrix[aaIndex].choleskiDecomposition();
+				covarianceMatrix[aaIndex].choleskyDecomposition();
 			}
 		}
 		numAcceptForCodonSpecificParameters[aaIndex] = 0u;
@@ -1161,9 +1162,10 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 	my_print("\n");
 }
 
-// ------------------------------------------------------------------//
-// ---------- Posterior, Variance, and Estimates Functions ----------//
-// ------------------------------------------------------------------//
+
+//------------------------------------------------------------------//
+//---------- Posterior, Variance, and Estimates Functions ----------//
+//------------------------------------------------------------------//
 
 
 double Parameter::getStdDevSynthesisRatePosteriorMean(unsigned samples, unsigned mixture)
@@ -1220,6 +1222,7 @@ double Parameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned geneI
 	// Can return NaN if gene was never in category! But that is Ok.
 	return posteriorMean / (double)usedSamples;
 }
+
 
 double Parameter::getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType,
 	bool withoutReference)
@@ -1334,6 +1337,7 @@ double Parameter::getCodonSpecificVariance(unsigned mixtureElement, unsigned sam
 	return normalizationTerm * posteriorVariance;
 }
 
+
 std::vector<double> Parameter::getCodonSpecificQuantile(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType, std::vector<double> probs,
 	bool withoutReference)
 {
@@ -1411,14 +1415,14 @@ std::vector<double> Parameter::getEstimatedMixtureAssignmentProbabilities(unsign
 }
 
 
-// --------------------------------------------------//
-// ---------- STATICS - Sorting Functions -----------//
-// --------------------------------------------------//
+//--------------------------------------------------//
+//---------- STATICS - Sorting Functions -----------//
+//--------------------------------------------------//
 
 
-// sort array interval from first (included) to last (excluded)!!
+/* sort array interval from first (included) to last (excluded)!!
 // quick sort, sorting arrays a and b by a.
-// Elements in b corespond to a, a will be sorted and it will be assured that b will be sorted by a
+// Elements in b corespond to a, a will be sorted and it will be assured that b will be sorted by a */
 void Parameter::quickSortPair(double a[], int b[], int first, int last)
 {
 	int pivotElement;
@@ -1504,10 +1508,10 @@ void Parameter::swap(int& a, int& b)
 }
 
 
-// calculate SCUO values according to
+/* calculate SCUO values according to
 // Wan et al. CodonO: a new informatics method for measuring synonymous codon usage bias within and across genomes
 // International Journal of General Systems, Vol. 35, No. 1, February 2006, 109–125
-// http://www.tandfonline.com/doi/pdf/10.1080/03081070500502967
+// http://www.tandfonline.com/doi/pdf/10.1080/03081070500502967 */
 double Parameter::calculateSCUO(Gene& gene, unsigned maxAA)
 {
 	SequenceSummary *seqsum = gene.getSequenceSummary();
@@ -1622,9 +1626,9 @@ double Parameter::randExp(double r)
 }
 
 
-//The R version and C++ differ because C++ uses the 
-//shape and scale parameter version while R uses the 
-//shape and rate.
+/* The R version and C++ differ because C++ uses the
+// shape and scale parameter version while R uses the
+// shape and rate. */
 double Parameter::randGamma(double shape, double rate)
 {
 	double rv;
@@ -1639,6 +1643,7 @@ double Parameter::randGamma(double shape, double rate)
 #endif
 	return rv;
 }
+
 
 // TODO: CHANGE THIS BACK TO DOUBLE*
 void Parameter::randDirichlet(double *input, unsigned numElements, double *output)
@@ -1752,20 +1757,15 @@ double Parameter::densityLogNorm(double x, double mean, double sd, bool log)
 
 
 
-
-
-
-
-
-// -----------------------------------------------------------------------------------------------------//
-// ---------------------------------------- R SECTION --------------------------------------------------//
-// -----------------------------------------------------------------------------------------------------//
+//-----------------------------------------------------------------------------------------------------//
+//---------------------------------------- R SECTION --------------------------------------------------//
+//-----------------------------------------------------------------------------------------------------//
 
 #ifndef STANDALONE
 
-//---------------------------------------------------------------//
-// ---------- Initialization and Restart Functions --------------//
-//---------------------------------------------------------------//
+//--------------------------------------------------------------//
+//---------- Initialization and Restart Functions --------------//
+//--------------------------------------------------------------//
 
 
 void Parameter::initializeSynthesisRateByGenome(Genome& genome, double sd_phi)
@@ -1795,12 +1795,7 @@ bool Parameter::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbo
 	}
 	else
 	{
-#ifndef STANDALONE
-		Rf_error("Index: %d is out of bounds. Index must be between %d & %d\n", index, lowerbound, upperbound);
-#else
-		std::cerr << "Error with the index\nGIVEN: " << index << "\n";
-		std::cerr << "MUST BE BETWEEN:	" << lowerbound << " & " << upperbound << "\n";
-#endif
+		my_printError("Error: Index % is out of bounds. Index must be between % & %\n", index, lowerbound, upperbound);
 	}
 
 	return check;
@@ -1810,9 +1805,9 @@ bool Parameter::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbo
 
 
 
-// ----------------------------------------------------------------------//
-// ---------- Mixture Definition Matrix and Category Functions ----------//
-// ----------------------------------------------------------------------//
+//----------------------------------------------------------------------//
+//---------- Mixture Definition Matrix and Category Functions ----------//
+//----------------------------------------------------------------------//
 
 
 unsigned Parameter::getMutationCategoryForMixture(unsigned mixtureElement)
@@ -1883,9 +1878,9 @@ void Parameter::setNumSelectionCategories(unsigned _numSelectionCategories)
 
 
 
-// -----------------------------------------------//
-// ---------- Synthesis Rate Functions -----------//
-// -----------------------------------------------//
+//-----------------------------------------------//
+//---------- Synthesis Rate Functions -----------//
+//-----------------------------------------------//
 
 
 std::vector<std::vector<double>> Parameter::getSynthesisRateR()
@@ -1898,23 +1893,21 @@ std::vector<double> Parameter::getCurrentSynthesisRateForMixture(unsigned mixtur
 {
 	bool checkMixture = checkIndex(mixture, 1, numMixtures);
 	unsigned exprCat = 0u;
-	if(checkMixture)
+	if (checkMixture)
 	{
 		exprCat = getSynthesisRateCategory(mixture - 1);
-	}else{
-#ifndef STANDALONE
-		Rf_warning("Mixture element %d NOT found. Mixture element 1 is returned instead. \n", mixture);
-#else
-		std::cerr << "WARNING: Mixture element " << mixture << " NOT found. Mixture element 1 is returned instead. \n";
-#endif
+	}
+	else
+	{
+		my_printError("WARNING: Mixture element % NOT found. Mixture element 1 is returned instead.\n", mixture);
 	}
 	return currentSynthesisRateLevel[exprCat];
 }
 
 
-// ------------------------------------------------------------------//
-// ---------- Posterior, Variance, and Estimates Functions ----------//
-// ------------------------------------------------------------------//
+//------------------------------------------------------------------//
+//---------- Posterior, Variance, and Estimates Functions ----------//
+//------------------------------------------------------------------//
 
 double Parameter::getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon, unsigned paramType,
 	bool withoutReference)
@@ -2009,9 +2002,9 @@ std::vector<double> Parameter::getEstimatedMixtureAssignmentProbabilitiesForGene
 
 
 
-// -------------------------------------//
-// ---------- Other Functions ----------//
-// -------------------------------------//
+//-------------------------------------//
+//---------- Other Functions ----------//
+//-------------------------------------//
 
 
 SEXP Parameter::calculateSelectionCoefficientsR(unsigned sample, unsigned mixture)

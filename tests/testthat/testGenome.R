@@ -1,73 +1,76 @@
 library(testthat)
 library(ribModel)
 
-context("Gene")
+context("Genome")
 
-test_that("general gene functions", {
-  expect_equal(testGene(), 0)
+# Must navigate out of /testthat
+test_that("general genome functions", {
+  expect_equal(testGenome("UnitTestingData"), 0)
 })
 
-#g <- new(Gene, "kjdklsjfkdj", "1", "Gabriel sucks")
-#g$seq <- "kjdklsjfkdj"
-#expect_equal(g$getAACount("M"), 1)
+g <- new(Genome)
 
-g <- new(Gene, "ATGCTCATTCTCACTGCTGCCTCGTAG", "2", "New Test Gene")
-#TODO: problem. This used to say g$seq <- "kjdklsjfkdj" (string). It
-#does set the string correctly, but the values in SS are NOT CLEARED.
-test_that("get AA Count", {
-  expect_equal(g$getAACount("M"), 1)
-  expect_equal(g$getAACount("L"), 2)
-  expect_equal(g$getAACount("I"), 1)
-  expect_equal(g$getAACount("T"), 1)
-  expect_equal(g$getAACount("A"), 2)
-  expect_equal(g$getAACount("S"), 1)
-  expect_equal(g$getAACount("X"), 1)
-  expect_equal(g$getAACount("G"), 0)
+test_that("check Index", {
+  expect_equal(g$checkIndex(2, 1, 10), TRUE)
+  expect_equal(g$checkIndex(5, 1, 10), TRUE)
+  expect_equal(g$checkIndex(20, 1, 30), TRUE)
+  expect_equal(g$checkIndex(5, 4, 6), TRUE)
   
   #Checking invalid cases
-  expect_equal(g$getAACount("g"), 0)
-  expect_equal(g$getAACount("AA"), 0)
+  expect_equal(g$checkIndex(11, 3, 10), FALSE)
+  expect_equal(g$checkIndex(5, 6, 11), FALSE)
 })
 
-test_that("get Codon Counts", {
-  expect_equal(g$getCodonCount("ATG"), 1)
-  expect_equal(g$getCodonCount("CTC"), 2)
-  expect_equal(g$getCodonCount("ATT"), 1)
-  expect_equal(g$getCodonCount("ACT"), 1)
-  expect_equal(g$getCodonCount("GCT"), 1)
-  expect_equal(g$getCodonCount("GCC"), 1)
-  expect_equal(g$getCodonCount("TCG"), 1)
-  expect_equal(g$getCodonCount("TAG"), 1)
-  expect_equal(g$getCodonCount("AAA"), 0)
+g1 <- new(Gene, "ATGGCCACTATTGGGTCTTAG", "TEST001", "TEST001 Test Gene")
+g2 <- new(Gene, "TGGGATTACCAA", "TEST002", "TEST002 Test Gene")
+g3 <- new(Gene, "TTGGAAACCACA", "TEST003", "TEST003 Test Gene");
+g4 <- new(Gene, "TGGGATTACCCC", "TEST004", "TEST004 Test Gene");
+s1 <- new(Gene, "TGGGATTACCAA", "TEST011", "TEST011 Test Gene");
+#simulated gene
+
+g$addGene(g1, FALSE)
+g$addGene(g2, FALSE)
+g$addGene(g3, FALSE)
+g$addGene(g4, FALSE)
+g$addGene(s1, TRUE)
+
+test_that("get Gene By Index", {
+  expect_equal(g$getGeneByIndex(1, FALSE), g1)
+  expect_equal(g$getGeneByIndex(2, FALSE), g2)
+  expect_equal(g$getGeneByIndex(3, FALSE), g3)
+  expect_equal(g$getGeneByIndex(4, FALSE), g4)
+  expect_equal(g$getGeneByIndex(1, TRUE), s1)
   
-  #Checking invalid cases
-  expect_equal(g$getCodonCount("atg"), 0)
-  expect_equal(g$getCodonCount("ATGG"), 0)
+  #Checking invalid cases: invalid indices, therefore returning first gene
+  #First check is on simulated genes
+  expect_equal(g$getGeneByIndex(2, TRUE), s1)
+  expect_equal(g$getGeneByIndex(6, FALSE), g1)
 })
 
-test_that("get RFP Observed", {
-  expect_equal(g$getRFPObserved("TGC"), 0)
-  expect_equal(g$getRFPObserved("CAC"), 0)
-  expect_equal(g$getRFPObserved("GTG"), 0)
-  expect_equal(g$getRFPObserved("TCC"), 0)
-  
-  #Checking invalid cases
-  expect_equal(g$getRFPObserved("atg"), 0)
-  expect_equal(g$getRFPObserved("ATGG"), 0)
+test_that("get Gene By Id", {
+  expect_equal(g$getGeneById("TEST001", FALSE), g1)
+  expect_equal(g$getGeneById("TEST002", FALSE), g2)
+  expect_equal(g$getGeneById("TEST003", FALSE), g3)
+  expect_equal(g$getGeneById("TEST004", FALSE), g4)
+  expect_equal(g$getGeneById("TEST011", TRUE), s1)
 })
-
-test_that("get Codon Positions", {
-  expect_equal(g$getCodonPositions("ATG"), c(0))
-  expect_equal(g$getCodonPositions("CTC"), c(1,3))
-  expect_equal(g$getCodonPositions("ATT"), c(2))
-  expect_equal(g$getCodonPositions("ACT"), c(4))
-  expect_equal(g$getCodonPositions("GCT"), c(5))
-  expect_equal(g$getCodonPositions("GCC"), c(6))
-  expect_equal(g$getCodonPositions("TCG"), c(7))
-  expect_equal(g$getCodonPositions("TAG"), c(8))
-  expect_equal(g$getCodonPositions("GTG"), numeric(0))
   
-  #Checking invalid cases
-  expect_equal(g$getCodonPositions("atg"), numeric(0))
-  expect_equal(g$getCodonPositions("ATGG"), numeric(0))
+# Create two slices of genomes:
+# t1, containing indices from 0 to 3
+# t2, containing indices from 1 to 2 with one simulated gene
+t1 <- new(Genome)
+t2 <- new(Genome)
+
+t1$addGene(g1, FALSE)
+t1$addGene(g2, FALSE)
+t1$addGene(g3, FALSE)
+
+t2$addGene(g2, FALSE)
+t2$addGene(g3, FALSE)
+t2$addGene(s1, TRUE)
+
+test_that("get Genome For Gene Indices R", {
+  expect_equal(g$getGenomeForGeneIndices(c(0,1,2), FALSE), t1)
+  expect_equal(g$getGenomeForGeneIndices(c(1,2), FALSE), t2)
+  expect_equal(g$getGenomeForGeneIndices(c(0), TRUE), t2)
 })

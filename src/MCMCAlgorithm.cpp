@@ -46,9 +46,10 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * 
 	stepsToAdapt = -1;
 }
 
+
 /* MCMCAlgorithm constructor (RCPP EXPOSED)
-* Arguments: number of samples wanted, thining of iterations to get samples, how many iterations adaptive witdth
-* can be changed, bool for where the synthesis rate, codon specific, and hyper paramters are estimated (respectively)
+* Arguments: number of samples wanted, thining of iterations to get samples, how many iterations adaptive width
+* can be changed, bool for where the synthesis rate, codon specific, and hyper parameters are estimated (respectively)
 * Sets up the object with the given parameters. Adaptive with is actually set to adaptive width * thining. NOTE:
 * hyper parameters normally affect synthesis rate parameters, so either both should be turned on or neither.
 */
@@ -95,8 +96,8 @@ MCMCAlgorithm::~MCMCAlgorithm()
 double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, Model& model, int iteration)
 {
     //FILE * pFile;
-    //pFile = fopen ("/home/clandere/Desktop/myfile.txt","a");
-	// TODO move the likelihood calculation out off here. make it a void function again.
+    //pFile = fopen("/home/clandere/Desktop/myfile.txt","a");
+	// TODO move the likelihood calculation out of here. make it a void function again.
 
 	double logLikelihood = 0.0;
     double logLikelihood2 = 0.0;
@@ -113,7 +114,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	}
 
 	//initialize parameter's size
-	for(int i = 0; i < numGenes; i++)
+	for (unsigned i = 0u; i < numGenes; i++)
 	{
 		Gene *gene = &genome.getGene(i);
 
@@ -259,6 +260,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	return logLikelihood;
 }
 
+
 /* acceptRejectCodonSpecificParameter (NOT EXPOSED)
  * Arguments: reference to a genome and a model. which iteration (step) is currently being estimated
  * Calculates the logLikelihood for each grouping based on codon specific parameters. If this is greater
@@ -288,12 +290,13 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 	}
 }
 
+
 /* acceptRejectHyperParameter (NOT EXPOSED)
  * Arguments: reference to a genome and a model. which iteration (step) is currently being estimated
  * Calculates the logLikelihood for hyper parameters. If the calculated value is greater than a random number
  * from the exponential distribution we update the parameters from proposed to current. Update the trace when applicable.
 */
-void MCMCAlgorithm::acceptRejectHyperParameter(Genome &genome, Model& model, int iteration)
+void MCMCAlgorithm::acceptRejectHyperParameter(Genome &genome, Model& model, unsigned iteration)
 {
 	std::vector <double> logProbabilityRatios;
 
@@ -446,7 +449,6 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 }
 
 
-
 /* varyInitialConditions (NOT EXPOSED)
  * Arguments: reference to a genome and a model. Number of iterations that the model can diverge from initial
  * conditions.
@@ -486,9 +488,8 @@ void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned
 		// prior on phi values -> take prior into account, but only the prior no likelihood
 		int numGenes = genome.getGenomeSize();
 		unsigned numSynthesisRateCategories = model.getNumSynthesisRateCategories();
-		for (int i = 0; i < numGenes; i++)
+		for (unsigned i = 0u; i < numGenes; i++)
 		{
-
 			for (unsigned k = 0u; k < numSynthesisRateCategories; k++)
 			{
 				// map from mixture to category and obtain corresponding phi value
@@ -546,7 +547,6 @@ double MCMCAlgorithm::calculateGewekeScore(unsigned current_iteration)
 	posteriorVariance1 = posteriorVariance1 / numSamples1;
 
 
-
 	// calculate mean and and variance of last part of likelihood trace
 	for (unsigned i = start2; i < current_iteration; i++)
 	{
@@ -564,6 +564,7 @@ double MCMCAlgorithm::calculateGewekeScore(unsigned current_iteration)
 	return (posteriorMean1 - posteriorMean2) / std::sqrt( ( posteriorVariance1 / numSamples1 ) + ( posteriorVariance2 / numSamples2 ) );
 }
 
+
 /* isEstimateSynthesisRate (NOT EXPOSED)
  * Arguments: None
  * Return the boolean value for if synthesis rate should be estimated in this run.
@@ -572,6 +573,7 @@ bool MCMCAlgorithm::isEstimateSynthesisRate()
 {
 	return estimateSynthesisRate;
 }
+
 
 /* isEstimateCodonSpecificParameter (NOT EXPOSED)
  * Arguments: None
@@ -602,6 +604,7 @@ bool MCMCAlgorithm::isEstimateMixtureAssignment()
 	return estimateMixtureAssignment;
 }
 
+
 /* setEstimateSynthesisRate (NOT EXPOSED)
  * Arguments: boolean describing if the parameter should be estimated.
  * Sets estimateSynthesisRate to the specified value.
@@ -630,6 +633,7 @@ void MCMCAlgorithm::setEstimateHyperParameter(bool in)
 {
 	estimateHyperParameter = in;
 }
+
 
 /* setEstimateMixtureAssignment (RCPP EXPOSED)
  * Arguments: boolean describing if the parameter should be estimated.
@@ -671,7 +675,7 @@ void MCMCAlgorithm::setStepsToAdapt(unsigned steps)
 
 
 /* getStepsToAdapt (RCPP EXPOSED)
- * Argumetns: None
+ * Arguments: None
  * Return the value of stepsToAdapt
 */
 int MCMCAlgorithm::getStepsToAdapt()
@@ -682,7 +686,7 @@ int MCMCAlgorithm::getStepsToAdapt()
 
 /* getLogLikelihoodTrace (RCPP EXPOSED)
  * Arguments: None
- * Return the liklihood trace.
+ * Return the likelihood trace.
 */
 std::vector<double> MCMCAlgorithm::getLogLikelihoodTrace()
 {
@@ -700,7 +704,6 @@ double MCMCAlgorithm::getLogLikelihoodPosteriorMean(unsigned _samples)
 	double posteriorMean = 0.0;
 	unsigned traceLength = likelihoodTrace.size();
 
-
 	if (_samples > traceLength)
 	{
 		my_printError("Warning in MCMCAlgorithm::getLogLikelihoodPosteriorMean throws: Number of anticipated samples");
@@ -714,7 +717,6 @@ double MCMCAlgorithm::getLogLikelihoodPosteriorMean(unsigned _samples)
 
 	return posteriorMean / (double)_samples;
 }
-
 
 
 /* acf (NOT EXPOSED)
@@ -786,7 +788,7 @@ std::vector<double> MCMCAlgorithm::acf(std::vector<double>& x, int nrows, int nc
 std::vector<std::vector<double>> MCMCAlgorithm::solveToeplitzMatrix(int lr, std::vector<double> r, std::vector<double> g)
 {
 // TODO switch f from 2d index to 1d index
-	//choleskiMatrix[i * numVariates + k]
+	//choleskyMatrix[i * numVariates + k]
 	//      solves Toeplitz matrix equation toep(r)f=g(1+.)
 	//		by Levinson's algorithm
 	//      a is a workspace of size lr, the number of equations
@@ -845,8 +847,6 @@ std::vector<std::vector<double>> MCMCAlgorithm::solveToeplitzMatrix(int lr, std:
 	returnVec[1] = var;
 	return returnVec;
 }
-
-
 
 
 

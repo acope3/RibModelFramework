@@ -15,8 +15,17 @@ using namespace Rcpp;
 
 CovarianceMatrix::CovarianceMatrix()
 {
-	initCovarianceMatrix(2); //TODO: should not do this
+    /* Initialize with numVariates = 2.
+    // Equivalent to calling initCovarianceMatrix(2) */
+    numVariates = 2;
+    covMatrix.resize(4);
+    choleskyMatrix.resize(4);
 
+    for (unsigned i = 0u; i < 4; i++)
+    {
+        covMatrix[i] = i % 3 ? 0.0 : 0.01 / 2.0;
+        choleskyMatrix[i] = 0.0;
+    }
 }
 
 
@@ -30,7 +39,7 @@ CovarianceMatrix::CovarianceMatrix(std::vector <double> &matrix)
 {
     numVariates = (int)std::sqrt(matrix.size());
     covMatrix = matrix;
-    choleskiMatrix.resize(matrix.size(), 0.0);
+    choleskyMatrix.resize(matrix.size(), 0.0);
 }
 
 
@@ -38,7 +47,7 @@ CovarianceMatrix::CovarianceMatrix(const CovarianceMatrix& other)
 {
     numVariates = other.numVariates;
     covMatrix = other.covMatrix;
-    choleskiMatrix = other.choleskiMatrix;
+    choleskyMatrix = other.choleskyMatrix;
 }
 
 
@@ -47,7 +56,7 @@ CovarianceMatrix& CovarianceMatrix::operator=(const CovarianceMatrix& rhs)
     if (this == &rhs) return *this; // handle self assignment
     numVariates = rhs.numVariates;
     covMatrix = rhs.covMatrix;
-	choleskiMatrix = rhs.choleskiMatrix;
+	choleskyMatrix = rhs.choleskyMatrix;
     return *this;
 }
 
@@ -61,6 +70,7 @@ CovarianceMatrix& CovarianceMatrix::operator+(const CovarianceMatrix& rhs)
 	}
 	return *this;
 }
+
 
 CovarianceMatrix& CovarianceMatrix::operator*(const double &value)
 {
@@ -100,15 +110,16 @@ void CovarianceMatrix::initCovarianceMatrix(unsigned _numVariates)
     numVariates = _numVariates;
     unsigned vectorLength = numVariates * numVariates;
     covMatrix.resize(vectorLength);
-    choleskiMatrix.resize(vectorLength);
+    choleskyMatrix.resize(vectorLength);
 
 	double diag_const = 0.01 / (double)numVariates;
     for (unsigned i = 0u; i < vectorLength; i++)
     {
         covMatrix[i] = (i % (numVariates + 1) ? 0.0 : diag_const);
-        choleskiMatrix[i] = 0.0;
+        choleskyMatrix[i] = 0.0;
     }
 }
+
 
 void CovarianceMatrix::setDiag(double val)
 {
@@ -118,9 +129,10 @@ void CovarianceMatrix::setDiag(double val)
 	}
 }
 
+
 // adaptation of http://en.wikipedia.org/wiki/Cholesky_decomposition
 // http://rosettacode.org/wiki/Cholesky_decomposition#C
-void CovarianceMatrix::choleskiDecomposition()
+void CovarianceMatrix::choleskyDecomposition()
 {
     for (int i = 0; i < numVariates; i++)
     {
@@ -129,10 +141,10 @@ void CovarianceMatrix::choleskiDecomposition()
             double LsubstractSum = 0.0;
             for (int k = 0; k < j; k++)
             {
-                LsubstractSum += choleskiMatrix[i * numVariates + k] * choleskiMatrix[j * numVariates + k];
+                LsubstractSum += choleskyMatrix[i * numVariates + k] * choleskyMatrix[j * numVariates + k];
             }
-            choleskiMatrix[i * numVariates + j] = (i == j) ? std::sqrt(covMatrix[i * numVariates + i] - LsubstractSum) :
-                (1.0 / choleskiMatrix[j * numVariates + j]) * (covMatrix[i * numVariates + j] - LsubstractSum);
+            choleskyMatrix[i * numVariates + j] = (i == j) ? std::sqrt(covMatrix[i * numVariates + i] - LsubstractSum) :
+                (1.0 / choleskyMatrix[j * numVariates + j]) * (covMatrix[i * numVariates + j] - LsubstractSum);
         }
     }
 }
@@ -152,13 +164,13 @@ void CovarianceMatrix::printCovarianceMatrix()
 }
 
 
-void CovarianceMatrix::printCholeskiMatrix()
+void CovarianceMatrix::printCholeskyMatrix()
 {
     for (int i = 0; i < numVariates * numVariates; i++)
     {
         if (i % numVariates == 0 && i != 0)
             my_print("\n");
-        my_print("%\t", choleskiMatrix[i]);
+        my_print("%\t", choleskyMatrix[i]);
     }
 
     my_print("\n");
@@ -168,6 +180,13 @@ void CovarianceMatrix::printCholeskiMatrix()
 std::vector<double>* CovarianceMatrix::getCovMatrix()
 {
     std::vector<double> *ptr = &covMatrix;
+    return ptr;
+}
+
+
+std::vector<double>* CovarianceMatrix::getCholeskyMatrix()
+{
+    std::vector<double> *ptr = &choleskyMatrix;
     return ptr;
 }
 
@@ -187,13 +206,14 @@ std::vector<double> CovarianceMatrix::transformIidNumersIntoCovaryingNumbers(std
         for (int k = 0; k < numVariates; k++)
         {
 			// testing if [i * numVariates + k] or [k * numVariates + i], first option was default
-            sum += choleskiMatrix[k * numVariates + i] * iidnumbers[k];
+            sum += choleskyMatrix[k * numVariates + i] * iidnumbers[k];
         }
 
         covnumbers.push_back(sum);
     }
     return covnumbers;
 }
+
 
 void CovarianceMatrix::calculateSampleCovariance(std::vector<std::vector<std::vector<std::vector<double>>>> codonSpecificParameterTrace, std::string aa, unsigned samples, unsigned lastIteration)
 {
@@ -237,6 +257,7 @@ void CovarianceMatrix::calculateSampleCovariance(std::vector<std::vector<std::ve
 	}
 }
 
+
 double CovarianceMatrix::sampleMean(std::vector<double> sampleVector, unsigned samples, unsigned lastIteration)
 {
 	double posteriorMean = 0.0;
@@ -260,15 +281,13 @@ double CovarianceMatrix::sampleMean(std::vector<double> sampleVector, unsigned s
 
 #ifndef STANDALONE
 
-
-
 void CovarianceMatrix::setCovarianceMatrix(SEXP _matrix)
 {
   std::vector<double> tmp;
   NumericMatrix matrix(_matrix);
   unsigned numRows = matrix.nrow();
   covMatrix.resize(numRows * numRows, 0.0);
-	numVariates = numRows;
+  numVariates = numRows;
  
   //NumericMatrix stores the matrix by column, not by row. The loop
   //below transposes the matrix when it stores it.
@@ -301,9 +320,9 @@ RCPP_MODULE(CovarianceMatrix_mod)
 
 
 		//Matrix Functions:
-		.method("choleskiDecomposition", &CovarianceMatrix::choleskiDecomposition)
+		.method("choleskyDecomposition", &CovarianceMatrix::choleskyDecomposition)
 		.method("printCovarianceMatrix", &CovarianceMatrix::printCovarianceMatrix)
-		.method("printCholeskiMatrix", &CovarianceMatrix::printCholeskiMatrix)
+		.method("printCholeskyMatrix", &CovarianceMatrix::printCholeskyMatrix)
 		.method("setCovarianceMatrix", &CovarianceMatrix::setCovarianceMatrix)
 		;
 }

@@ -496,9 +496,9 @@ int testSequenceSummary()
     else
         error = 0; //Reset for next function.
 
-    //--------------------------------------------------------------//
-    //------ getRFPObserved(string) & setRFPObserved Function ------//
-    //--------------------------------------------------------------//
+    //---------------------------------------------------------------//
+    //------ getRFPObserved(string) & setRFPObserved Functions ------//
+    //---------------------------------------------------------------//
 
     SS.setRFPObserved(4, 35);
     SS.setRFPObserved(16,45);
@@ -841,9 +841,9 @@ int testSequenceSummary()
     else
         error = 0; //Reset for next function.
 
-    //---------------------------------------//
-    //------ get/setRFP_count Function ------//
-    //---------------------------------------//
+    //----------------------------------------//
+    //------ get/setRFP_count Functions ------//
+    //----------------------------------------//
     std::vector <unsigned> tmp2 = SS.getRFP_count();
 
     if (0 != tmp2.size())
@@ -886,9 +886,9 @@ int testGene()
     int error = 0;
     int globalError = 0;
 
-    //--------------------------------//
-    //------ get/setId Function ------//
-    //--------------------------------//
+    //---------------------------------//
+    //------ get/setId Functions ------//
+    //---------------------------------//
     testGene.setId("testGene");
 
     if (testGene.getId() != "testGene") {
@@ -898,9 +898,9 @@ int testGene()
     else
         std::cout << "Gene get/setId --- Pass\n";
 
-    //-----------------------------------------//
-    //------ get/setDescription Function ------//
-    //-----------------------------------------//
+    //------------------------------------------//
+    //------ get/setDescription Functions ------//
+    //------------------------------------------//
     testGene.setDescription("Test Gene for Unit Testing");
 
     if (testGene.getDescription() != "Test Gene for Unit Testing")
@@ -911,9 +911,9 @@ int testGene()
     else
         std::cout << "Gene get/setDescription --- Pass\n";
 
-    //--------------------------------------//
-    //------ get/setSequence Function ------//
-    //--------------------------------------//
+    //---------------------------------------//
+    //------ get/setSequence Functions ------//
+    //---------------------------------------//
     testGene.setSequence("ATGCTCATTCTCACTGCTGCCTCGTAG");
 
     if (testGene.getSequence() != "ATGCTCATTCTCACTGCTGCCTCGTAG")
@@ -924,9 +924,9 @@ int testGene()
     else
         std::cout << "Gene get/setSequence --- Pass\n";
 
-    //---------------------------------------//
-    //------ get/addRFP_count Function ------//
-    //---------------------------------------//
+    //----------------------------------------//
+    //------ get/addRFP_count Functions ------//
+    //----------------------------------------//
     std::vector <unsigned> rfp_counts = {0, 1, 1};
 
     testGene.addRFP_count(rfp_counts);
@@ -938,9 +938,9 @@ int testGene()
     else
         std::cout << "Gene get/addRFP_count --- Pass\n";
 
-    //--------------------------------//
-    //------ getSequenceSummary ------//
-    //--------------------------------//
+    //-----------------------------------------//
+    //------ getSequenceSummary Function ------//
+    //-----------------------------------------//
     SequenceSummary SS("ATGCTCATTCTCACTGCTGCCTCGTAG");
     SequenceSummary *GeneSS = testGene.getSequenceSummary();
     for (unsigned i = 0; i < 64; i++)
@@ -1014,15 +1014,15 @@ int testGene()
     else
         error = 0; //Reset for next function.
 
-    //-----------------------------------------------//
-    //------ get/setObservedPhiValues Function ------//
-    //-----------------------------------------------//
+    //----------------------------------------------------------//
+    //------ get/setObservedSynthesisRateValues Functions ------//
+    //----------------------------------------------------------//
     std::vector <double> tmp;
     tmp = testGene.getObservedSynthesisRateValues();
 
     if (0 != tmp.size())
     {
-        std::cerr << "Error with getObservedPhiValues. Function should return an empty vector but returns:\n";
+        std::cerr << "Error with getObservedSynthesisRateValues. Function should return an empty vector but returns:\n";
         for (unsigned i = 0; i < tmp.size(); i++)
         {
             std::cerr << tmp[i] << "\n";
@@ -1036,7 +1036,7 @@ int testGene()
 
     if (testGene.getObservedSynthesisRateValues() != tmp)
     {
-        std::cerr << "Error in getObservedPhiValues or setObservedPhiValues. Function should return 2.34, 3.234, 0.123, but returns:\n";
+        std::cerr << "Error in getObservedSynthesisRateValues or setObservedSynthesisRateValues. Function should return 2.34, 3.234, 0.123, but returns:\n";
         for (unsigned i = 0; i < tmp.size(); i++)
         {
             std::cerr << tmp[i] << "\n";
@@ -1046,7 +1046,7 @@ int testGene()
     }
 
     if (!error)
-        std::cout << "Gene get/setObservedPhiValues --- Pass\n";
+        std::cout << "Gene get/setObservedSynthesisRateValues --- Pass\n";
     else
         error = 0; //Reset for next function.
 
@@ -1234,9 +1234,9 @@ int testGenome(std::string testFileDir)
 
     //TODO: should improper input be given (bad id/index)?
 
-    //-----------------------------------------//
-    //------ addGene & getGene Functions ------//
-    //-----------------------------------------//
+    //-----------------------------------//
+    //------ get/addGene Functions ------//
+    //-----------------------------------//
     genome.addGene(g1, false);
     genome.addGene(s1, true); //add the simulated gene s1
 
@@ -1260,7 +1260,7 @@ int testGenome(std::string testFileDir)
     }
 
     if (!error)
-        std::cout << "Genome addGene & getGene --- Pass\n";
+        std::cout << "Genome get/addGene --- Pass\n";
     else
         error = 0; //Reset for next function.
 
@@ -1397,14 +1397,14 @@ int testGenome(std::string testFileDir)
 
     /* Section 2:
      * Other and File I/O Functions:
-     * getGenomeForGeneIndicies
+     * getGenomeForGeneIndices
      * readFasta
      * readPANSEFile
      * readObservedPhiValues
     */
 
     //-----------------------------------------------//
-    //------ getGenomeForGeneIndicies Function ------//
+    //------ getGenomeForGeneIndices Function ------//
     //-----------------------------------------------//
 
     // add more simulated and non-simulated genes
@@ -1416,8 +1416,8 @@ int testGenome(std::string testFileDir)
     //reuse generic vector of unsigned integers
     uVector = {0, 1, 2, 3};
 
-    if (!(genome == genome.getGenomeForGeneIndicies(uVector, false))) {
-        std::cerr << "Error in getGenomeForGeneIndicies with genes.\n";
+    if (!(genome == genome.getGenomeForGeneIndices(uVector, false))) {
+        std::cerr << "Error in getGenomeForGeneIndices with genes.\n";
         error = 1;
         globalError = 1;
     }
@@ -1433,14 +1433,14 @@ int testGenome(std::string testFileDir)
     genome.addGene(s3, true);
     genome.addGene(s4, true);
 
-    if (!(genome == genome.getGenomeForGeneIndicies(uVector, true))) {
-        std::cerr << "Error in getGenomeForGeneIndicies with simulated genes.\n";
+    if (!(genome == genome.getGenomeForGeneIndices(uVector, true))) {
+        std::cerr << "Error in getGenomeForGeneIndices with simulated genes.\n";
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        std::cout << "Genome getGenomeForGeneIndicies --- Pass\n";
+        std::cout << "Genome getGenomeForGeneIndices --- Pass\n";
     else
         error = 0; //Reset for next function.
 
@@ -1551,8 +1551,8 @@ int testGenome(std::string testFileDir)
     //------ writeRFPFile Function ------//
     //-----------------------------------//
 
-    // Now write a genome described above in readRFPFile to a file, read it in
-    // again, and then compare its validity again.
+    /* Now write a genome described above in readRFPFile to a file, read it in
+    // again, and then compare its validity again. */
     testGenome.clear();
 
     file = testFileDir + "/" + "testWriteRFP.csv";
@@ -1576,10 +1576,10 @@ int testGenome(std::string testFileDir)
 
     genome.writeRFPFile(file, true);
 
-    // Note that while these genes were originally simulated, they are printed
+    /* Note that while these genes were originally simulated, they are printed
     // as non-simulated genes.
     // It is up to the user to know that they were simulated, but they will
-    // now be read in as non-simulated genes (and Unit Testing will compare their validity as such)
+    // now be read in as non-simulated genes (and Unit Testing will compare their validity as such) */
 
     genome.clear();
     genome.addGene(rfp1, false);
@@ -1765,17 +1765,16 @@ int testUtility()
 
     error = my_print("Product: %, Qty: %, Price is %", "Shampoo", 5, 100);
 
-    if (error != 0)
+    if (error)
     {
         std::cerr << "Error in my_print.\n";
-        error = 0;
         globalError = 1;
     }
 
     std::cout <<"\n";
     error = my_printError("Product: %, Qty: %, Price is %", "Shampoo", 5, 100);
 
-    if (error != 0)
+    if (error)
     {
         std::cerr << "Error in my_printError\n";
         globalError = 1;
@@ -1785,9 +1784,417 @@ int testUtility()
 }
 
 
-// -----------------------------------------------------------------------------------------------------//
-// ---------------------------------------- R SECTION --------------------------------------------------//
-// -----------------------------------------------------------------------------------------------------//
+int testCovarianceMatrix()
+{
+    CovarianceMatrix covM; //Default constructor sets numVariates to 2.
+    int error = 0;
+    int globalError = 0;
+
+    //-----------------------------------------------------------//
+    //------ getCovMatrix & initCovarianceMatrix Functions ------//
+    //-----------------------------------------------------------//
+
+    std::vector <double> covM2 = {0.0025, 0, 0, 0, \
+                                  0, 0.0025, 0, 0, \
+                                  0, 0, 0.0025, 0, \
+                                  0, 0, 0, 0.0025};
+
+    covM.initCovarianceMatrix(4);
+
+    for (unsigned i = 0u; i < 16; i++)
+    {
+        // Compare, for each position of the vector of doubles, if the statically created covM2
+        // equals the initialized and extracted covM
+        if (covM2[i] != covM.getCovMatrix()->at(i))
+        {
+            std::cerr << "Error in getCovMatrix or initCovarianceMatrix:";
+            std::cerr << " at index " << i << " matrix extracted should return " << covM2[i];
+            std::cerr << " but instead returns " << covM.getCovMatrix()->at(i) << ".\n";
+            error = 1;
+            globalError = 1;
+        }
+    }
+
+    if (!error)
+        std::cout << "CovarianceMatrix getCovMatrix & initCovarianceMatrix --- Pass\n";
+    else
+        error = 0; //Reset for next function.
+
+    //------------------------------//
+    //------ setDiag Function ------//
+    //------------------------------//
+    covM.setDiag(3.14);
+
+    covM2 = {3.14, 0, 0, 0, \
+             0, 3.14, 0, 0, \
+             0, 0, 3.14, 0, \
+             0, 0, 0, 3.14};
+
+    for (unsigned i = 0u; i < 16; i++)
+    {
+        // Compare, for each position of the vector of doubles, if the statically created covM2
+        // equals the set covM
+        if (covM2[i] != covM.getCovMatrix()->at(i))
+        {
+            std::cerr << "Error in setDiag:";
+            std::cerr << " at index " << i << " matrix extracted should return " << covM2[i];
+            std::cerr << " but instead returns " << covM.getCovMatrix()->at(i) << ".\n";
+            error = 1;
+            globalError = 1;
+        }
+    }
+
+    if (!error)
+        std::cout << "CovarianceMatrix setDiag --- Pass\n";
+    else
+        error = 0; //Reset for next function.
+
+    //-----------------------------------------------------------------//
+    //------ getCholeskyMatrix & choleskyDecomposition Functions ------//
+    //-----------------------------------------------------------------//
+    covM.choleskyDecomposition();
+
+    // Perform Cholesky decomposition on covM2
+    // (This should be the same code as used in Cholesky decomposition in CovarianceMatrix.cpp)
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < (i + 1); j++)
+        {
+            double LsubstractSum = 0.0;
+            for (int k = 0; k < j; k++)
+            {
+                LsubstractSum += covM2[i * 4 + k] * covM2[j * 4 + k];
+            }
+            covM2[i * 4 + j] = (i == j) ? std::sqrt(covM2[i * 4 + i] - LsubstractSum) :
+                               (1.0 / covM2[j * 4 + j]) * (covM2[i * 4 + j] - LsubstractSum);
+        }
+    }
+
+    for (unsigned i = 0u; i < 16; i++)
+    {
+        // Compare, for each position of the vector of doubles, if the statically created covM2
+        // equals the set covM for its Cholesky matrix
+        if (covM2[i] != covM.getCholeskyMatrix()->at(i))
+        {
+            std::cerr << "Error in getCholeskyMatrix or choleskyDecomposition:";
+            std::cerr << " at index " << i << " matrix extracted should return " << covM2[i];
+            std::cerr << " but instead returns " << covM.getCholeskyMatrix()->at(i) << ".\n";
+            error = 1;
+            globalError = 1;
+        }
+    }
+
+    if (!error)
+        std::cout << "CovarianceMatrix getCholeskyMatrix & choleskyDecomposition --- Pass\n";
+    else
+        error = 0; //Reset for next function.
+
+    //-------------------------------------//
+    //------ getNumVariates Function ------//
+    //-------------------------------------//
+    covM.getNumVariates();
+
+    if (covM.getNumVariates() != 4) {
+        std::cerr << "Error in getNumVariates. Function should return 4, but returns " << covM.getNumVariates() << ".\n";
+        globalError = 1;
+    }
+    else
+        std::cout << "CovarianceMatrix getNumVariates --- Pass\n";
+
+    //TODO: Test these final two functions.
+    //-------------------------------------------------------------//
+    //------ transformIidNumersIntoCovaryingNumbers Function ------//
+    //-------------------------------------------------------------//
+
+    //covM.transformIidNumersIntoCovaryingNumbers(iidTest);
+
+    //------------------------------------------------//
+    //------ calculateSampleCovariance Function ------//
+    //------------------------------------------------//
+
+    return globalError;
+}
+
+
+/* UNIMPLEMENTED
+int testTrace()
+{
+    Trace RFP; //initialize with 0 categories, 2 codon-specific parameter types
+    Trace ROC;
+    Trace FONSE;
+    Trace PANSE;
+    //int samples = 10;
+    //int thining = 10;
+    //int useSamples = 100;
+    int globalError = 0;
+
+    //-----------------------------------------//
+    //------ initializeRFPTrace Function ------//
+    //-----------------------------------------//
+    //RFP.initializeRFPTrace();
+
+    //-----------------------------------------//
+    //------ initializeROCTrace Function ------//
+    //-----------------------------------------//
+    //ROC.initializeROCTrace();
+
+    //-------------------------------------------//
+    //------ initializeFONSETrace Function ------//
+    //-------------------------------------------//
+    //FONSE.initializeFONSETrace();
+
+    //-------------------------------------------//
+    //------ initializePANSETrace Function ------//
+    //-------------------------------------------//
+    //PANSE.initializePANSETrace();
+
+    return globalError;
+}
+*/
+
+
+int testParameter()
+{
+    Parameter p;
+    int globalError = 0;
+
+    return globalError;
+}
+
+/*
+int testROCParameter()
+{
+    int globalError = 0;
+
+
+    return globalError;
+}
+
+*/
+int testMCMCAlgorithm()
+{
+	unsigned samples = 10;
+	unsigned thining = 10;
+    int error = 0;
+    int globalError = 0;
+
+    MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, 10, true, true, true);
+
+    //--------------------------------------------//
+    //------ varyInitialConditions Function ------//
+    //--------------------------------------------//
+
+    //TODO: must be done before run, etc.
+    //Requires running with models: ROC, RFP, FONSE.
+    //Thus, unit testing can only be done after those models are unit tested.
+
+    //--------------------------//
+    //------ run Function ------//
+    //--------------------------//
+
+    //-------------------------------------------//
+    //------ calculateGewekeScore Function ------//
+    //-------------------------------------------//
+
+    //---------------------------------------------------//
+    //------ is/setEstimateSynthesisRate Functions ------//
+    //---------------------------------------------------//
+    if (!mcmc.isEstimateSynthesisRate()) {
+        std::cerr << "Error in isEstimateSynthesisRate.";
+        std::cerr << " Function should return true, but returns false.\n";
+        error = 1;
+        globalError = 1;
+    }
+
+    mcmc.setEstimateSynthesisRate(false);
+    if (mcmc.isEstimateSynthesisRate()) {
+        std::cerr << "Error in isEstimateSynthesisRate or setEstimateSynthesisRate.";
+        std::cerr << " Function should return false, but returns true.\n";
+        error = 1;
+        globalError = 1;
+    }
+
+    mcmc.setEstimateSynthesisRate(true);
+    if (!mcmc.isEstimateSynthesisRate()) {
+        std::cerr << "Error in isEstimateSynthesisRate or setEstimateSynthesisRate.";
+        std::cerr << " Function should return true, but returns false.\n";
+        error = 1;
+        globalError = 1;
+    }
+
+    if (!error)
+        std::cout << "MCMCAlgorithm is/setEstimateSynthesisRate --- Pass\n";
+    else
+        error = 0; //Reset for next function.
+
+    //------------------------------------------------------------//
+    //------ is/setEstimateCodonSpecificParameter Functions ------//
+    //------------------------------------------------------------//
+    if (!mcmc.isEstimateCodonSpecificParameter()) {
+        std::cerr << "Error in isEstimateCodonSpecificParameter.";
+        std::cerr << " Function should return true, but returns false.\n";
+        error = 1;
+        globalError = 1;
+    }
+
+    mcmc.setEstimateCodonSpecificParameter(false);
+    if (mcmc.isEstimateCodonSpecificParameter()) {
+        std::cerr << "Error in isEstimateCodonSpecificParameter or setEstimateCodonSpecificParameter.";
+        std::cerr << " Function should return false, but returns true.\n";
+        error = 1;
+        globalError = 1;
+    }
+
+    mcmc.setEstimateCodonSpecificParameter(true);
+    if (!mcmc.isEstimateCodonSpecificParameter()) {
+        std::cerr << "Error in isEstimateCodonSpecificParameter or setEstimateCodonSpecificParameter.";
+        std::cerr << " Function should return true, but returns false.\n";
+        error = 1;
+        globalError = 1;
+    }
+
+    if (!error)
+        std::cout << "MCMCAlgorithm is/setEstimateCodonSpecificParameter --- Pass\n";
+    else
+        error = 0; //Reset for next function.
+
+    //----------------------------------------------------//
+    //------ is/setEstimateHyperParameter Functions ------//
+    //----------------------------------------------------//
+    if (!mcmc.isEstimateHyperParameter()) {
+        std::cerr << "Error in isEstimateHyperParameter.";
+        std::cerr << " Function should return true, but returns false.\n";
+        error = 1;
+        globalError = 1;
+    }
+
+    mcmc.setEstimateHyperParameter(false);
+    if (mcmc.isEstimateHyperParameter()) {
+        std::cerr << "Error in isEstimateHyperParameter or setEstimateHyperParameter.";
+        std::cerr << " Function should return false, but returns true.\n";
+        error = 1;
+        globalError = 1;
+    }
+
+    mcmc.setEstimateHyperParameter(true);
+    if (!mcmc.isEstimateHyperParameter()) {
+        std::cerr << "Error in isEstimateHyperParameter or setEstimateHyperParameter.";
+        std::cerr << " Function should return true, but returns false.\n";
+        error = 1;
+        globalError = 1;
+    }
+
+    if (!error)
+        std::cout << "MCMCAlgorithm is/setEstimateHyperParameter --- Pass\n";
+    else
+        error = 0; //Reset for next function.
+
+    //-------------------------------------------------------//
+    //------ is/setEstimateMixtureAssignment Functions ------//
+    //-------------------------------------------------------//
+
+    /* NOTE: By default, both constructors initialize estimateMixtureAssignment to true,
+    // although it is not one of the arguments. */
+
+    if (!mcmc.isEstimateMixtureAssignment()) {
+        std::cerr << "Error in isEstimateMixtureAssignment.";
+        std::cerr << " Function should return true, but returns false.\n";
+        error = 1;
+        globalError = 1;
+    }
+
+    mcmc.setEstimateMixtureAssignment(false);
+    if (mcmc.isEstimateMixtureAssignment()) {
+        std::cerr << "Error in isEstimateMixtureAssignment or setEstimateMixtureAssignment.";
+        std::cerr << " Function should return false, but returns true.\n";
+        error = 1;
+        globalError = 1;
+    }
+
+    mcmc.setEstimateMixtureAssignment(true);
+    if (!mcmc.isEstimateMixtureAssignment()) {
+        std::cerr << "Error in isEstimateMixtureAssignment or setEstimateMixtureAssignment.";
+        std::cerr << " Function should return true, but returns false.\n";
+        error = 1;
+        globalError = 1;
+    }
+
+    if (!error)
+        std::cout << "MCMCAlgorithm is/setEstimateMixtureAssignment --- Pass\n";
+    else
+        error = 0; //Reset for next function.
+
+    //-------------------------------------------//
+    //------ get/setStepsToAdapt Functions ------//
+    //-------------------------------------------//
+
+    // NOTE: By default, both constructors initialize stepsToAdapt to -1
+    if (mcmc.getStepsToAdapt() != -1) {
+        std::cerr << "Error in getStepsToAdapt.";
+        std::cerr << " Function should return -1, but returns " << mcmc.getStepsToAdapt() << ".\n";
+        error = 1;
+        globalError = 1;
+    }
+
+    mcmc.setStepsToAdapt(52);
+    if (mcmc.getStepsToAdapt() != 52) {
+        std::cerr << "Error in getStepsToAdapt or setStepsToAdapt.";
+        std::cerr << " Function should return 52, but returns " << mcmc.getStepsToAdapt() << ".\n";
+        error = 1;
+        globalError = 1;
+    }
+
+    // Intentional error checking: Should print an error message with no change to stepsToAdapt
+    mcmc.setStepsToAdapt(101);
+    if (mcmc.getStepsToAdapt() != 52) {
+        std::cerr << "Error in getStepsToAdapt or setStepsToAdapt.";
+        std::cerr << " Function should return 52, with no change, but returns " << mcmc.getStepsToAdapt() << ".\n";
+        error = 1;
+        globalError = 1;
+    }
+
+    if (!error)
+        std::cout << "MCMCAlgorithm get/setStepsToAdapt --- Pass\n";
+    else
+        error = 0; //Reset for next function.
+
+    //--------------------------------------------//
+    //------ getLogLikelihoodTrace Function ------//
+    //--------------------------------------------//
+
+    // NOTE: By default, both constructors initialize likelihoodTrace to a vector with
+    // a size of samples + 1 zeroes.
+    std::vector <double> likelihoodTrace = mcmc.getLogLikelihoodTrace();
+    std::vector <double> tmp;
+    tmp.resize(samples+1);
+
+    if (tmp != likelihoodTrace)
+    {
+        std::cerr << "Error in getLogLikelihoodTrace. Function should return a vector of " << samples << " + 1 zeroes.\n";
+        globalError = 1;
+    }
+    else
+        std::cout << "MCMCAlgorithm getLogLikelihoodTrace --- Pass\n";
+
+    //----------------------------------------------------//
+    //------ getLogLikelihoodPosteriorMean Function ------//
+    //----------------------------------------------------//
+    //TODO
+    //unsigned traceLength = likelihoodTrace.size();
+
+    //std::cout << mcmc.getLogLikelihoodPosteriorMean(10) << "\n";
+    //std::cout << mcmc.getLogLikelihoodPosteriorMean(5) << "\n";
+    //std::cout << mcmc.getLogLikelihoodPosteriorMean(15) << "\n";
+
+
+    return globalError;
+}
+
+
+
+//-----------------------------------------------------------------------------------------------------//
+//---------------------------------------- R SECTION --------------------------------------------------//
+//-----------------------------------------------------------------------------------------------------//
 
 #ifndef STANDALONE
 //---------------------------------//
@@ -1800,5 +2207,6 @@ RCPP_MODULE(Test_mod)
 	function("testGene", &testGene);
 	function("testGenome", &testGenome);
 	function("testUtility", &testUtility);
+	function("testCovarianceMatrix", &testCovarianceMatrix);
 }
 #endif
