@@ -1782,6 +1782,86 @@ int testGenome(std::string testFileDir)
 }
 
 
+int testParameter()
+{
+    Parameter parameter;
+    int globalError = 0;
+
+    //---------------------------------------//
+    //------ initParameterSet Function ------//
+    //---------------------------------------//
+
+    /* Initialize parameter p:
+    // Arguments: vector <double> stdDevSynthesisRate, unsigned numMixtures, vector <unsigned> geneAssignment,
+    //           vector <vector <unsigned>> mixtureDefinitionMatrix, bool splitSer, string mutationSelectionState
+    //
+    // Thus, let: */
+    unsigned numMixtures = 1;
+    std::vector <double> stdDev(numMixtures, 1);
+    unsigned numGenes = 1000;
+    std::vector <unsigned> geneAssignment(numGenes);
+    for (unsigned i = 0u; i < numGenes; i++) {
+        geneAssignment[i] = 0u;
+    }
+    std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
+    bool splitSer = true;
+    std::string mutationSelectionState = Parameter::allUnique;
+
+    parameter.initParameterSet(stdDev, numMixtures, geneAssignment, mixtureDefinitionMatrix, splitSer, mutationSelectionState);
+    // This call changes many variables in parameter that must now be checked.
+    // Thus, unit testing is done in order of variable changed. See initParameterSet in Parameter.cpp.
+
+    //-----------------------------------------------//
+    //------ get/setMixtureAssignment Functions------//
+    //-----------------------------------------------//
+
+    //------------------------------------------------//
+    //------ getMutationSelectionState Function ------//
+    //------------------------------------------------//
+    if (parameter.getMutationSelectionState() != mutationSelectionState) {
+        my_printError("Error in initParameterSet or getMutationSelectionState.\n");
+        globalError = 1;
+    }
+    else
+        my_print("Gene getMutationSelectionState --- Pass\n");
+
+    void setMixtureAssignment(unsigned gene, unsigned value);
+    unsigned getMixtureAssignment(unsigned gene);
+    /*
+    //Genome genome;
+    //genome.readFasta("/Users/hollisbui/RibModelDev/data/twoMixtures/simulatedAllUniqueR.fasta");
+
+    ROCParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
+
+    for (unsigned i = 0u; i < numMixtures; i++)
+    {
+        unsigned selectionCategry = tmp.getSelectionCategory(i);
+        //std::cout << "Sphi_init for selection category " << selectionCategry << ": " << sphi_init[selectionCategry] << std::endl;
+    }
+    //std::cout << "\t# mixtures: " << numMixtures << "\n";
+    //std::cout << "\tmixture definition: " << mixDef << "\n";
+
+    std::vector<std::string> files(2);
+    files[0] = std::string("/Users/hollisbui/RibModelDev/data/twoMixtures/simulated_mutation0.csv");
+    files[1] = std::string("/Users/hollisbui/RibModelDev/data/twoMixtures/simulated_mutation1.csv");
+    tmp.initMutationCategories(files, tmp.getNumMutationCategories());
+    files[0] = std::string("/Users/hollisbui/RibModelDev/data/twoMixtures/simulated_selection0.csv");
+    files[1] = std::string("/Users/hollisbui/RibModelDev/data/twoMixtures/simulated_selection1.csv");
+    tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
+
+    tmp.InitializeSynthesisRate(genome, sphi_init[0]);
+    //std::vector<double> phiVals = parameter.readPhiValues("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrCleft_phi_est.csv");
+    //parameter.InitializeSynthesisRate(phiVals);
+    p = tmp;
+    */
+
+    parameter.printMixtureDefinitionMatrix();
+
+
+    return globalError;
+}
+
+
 int testCovarianceMatrix()
 {
     CovarianceMatrix covM; //Default constructor sets numVariates to 2.
@@ -1903,7 +1983,10 @@ int testCovarianceMatrix()
     //-------------------------------------------------------------//
     //------ transformIidNumersIntoCovaryingNumbers Function ------//
     //-------------------------------------------------------------//
+    //TODO: Should implement Parameter unit testing for RandNorm before doing this!
 
+    //Size is numCodons * (numMutationCategories + numSelectionCategories for ROCParameter
+    //Each value is based on randNorm(0.0, 1.0)
     //covM.transformIidNumersIntoCovaryingNumbers(iidTest);
 
     //------------------------------------------------//
@@ -1949,15 +2032,6 @@ int testTrace()
     return globalError;
 }
 */
-
-
-int testParameter()
-{
-    Parameter p;
-    int globalError = 0;
-
-    return globalError;
-}
 
 /*
 int testROCParameter()
@@ -2201,10 +2275,10 @@ int testMCMCAlgorithm()
 
 RCPP_MODULE(Test_mod)
 {
+	function("testUtility", &testUtility);
 	function("testSequenceSummary", &testSequenceSummary);
 	function("testGene", &testGene);
 	function("testGenome", &testGenome);
-	function("testUtility", &testUtility);
 	function("testCovarianceMatrix", &testCovarianceMatrix);
 	function("testMCMCAlgorithm", &testMCMCAlgorithm);
 }

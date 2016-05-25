@@ -2,21 +2,22 @@
 #define Testing_H
 
 
+#include "Utility.h"
 #include "SequenceSummary.h"
 #include "Gene.h"
 #include "Genome.h"
-#include "Utility.h"
+#include "base/Parameter.h"
 #include "CovarianceMatrix.h"
 #include "MCMCAlgorithm.h"
-#include "base/Trace.h"
+//#include "base/Trace.h"
 
 
 int testUtility();
 int testSequenceSummary();
 int testGene();
 int testGenome(std::string testFileDir);
-int testCovarianceMatrix();
 int testParameter();
+int testCovarianceMatrix();
 int testMCMCAlgorithm();
 //int testTrace();
 
