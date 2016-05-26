@@ -60,12 +60,12 @@ class Parameter {
 
 		//Initialization and Restart Functions:
 		void initParameterSet(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
-							  std::vector<std::vector<unsigned>> mixtureDefinitionMatrix,
-							  bool splitSer = true, std::string _mutationSelectionState = "allUnique");
+			std::vector<std::vector<unsigned>> mixtureDefinitionMatrix,
+			bool splitSer = true, std::string _mutationSelectionState = "allUnique"); //Partially tested; TODO caveats
 		void initBaseValuesFromFile(std::string filename);
 		void writeBasicRestartFile(std::string filename);
 		void initCategoryDefinitions(std::string mutationSelectionState,
-								 std::vector<std::vector<unsigned>> mixtureDefinitionMatrix);
+			std::vector<std::vector<unsigned>> mixtureDefinitionMatrix);
 		void InitializeSynthesisRate(Genome& genome, double sd_phi);
 		void InitializeSynthesisRate(double sd_phi);
 		void InitializeSynthesisRate(std::vector<double> expression);
@@ -78,19 +78,19 @@ class Parameter {
 
 		//Mixture Definition Matrix and Category Functions:
 		void setNumMutationSelectionValues(std::string mutationSelectionState,
-									   std::vector<std::vector<unsigned>> mixtureDefinitionMatrix);
+			std::vector<std::vector<unsigned>> mixtureDefinitionMatrix);
 		void printMixtureDefinitionMatrix();
 		double getCategoryProbability(unsigned mixtureElement);
 		void setCategoryProbability(unsigned mixtureElement, double value);
-		unsigned getNumMutationCategories();
-		unsigned getNumSelectionCategories();
+		unsigned getNumMutationCategories(); //Tested; TODO caveat
+		unsigned getNumSelectionCategories(); //Tested; TODO caveat
 		unsigned getNumSynthesisRateCategories();
 		unsigned getMutationCategory(unsigned mixtureElement);
 		unsigned getSelectionCategory(unsigned mixtureElement); //TODO: Add comments explaining reasoning here for same function
 		unsigned getSynthesisRateCategory(unsigned mixtureElement);
-		std::vector<unsigned> getMixtureElementsOfMutationCategory(unsigned category);
-		std::vector<unsigned> getMixtureElementsOfSelectionCategory(unsigned category);
-		std::string getMutationSelectionState();
+		std::vector<unsigned> getMixtureElementsOfMutationCategory(unsigned category); //Tested; TODO caveat
+		std::vector<unsigned> getMixtureElementsOfSelectionCategory(unsigned category); //Tested; TODO caveat
+		std::string getMutationSelectionState(); //Tested
 
 
 		//Group List Functions:
@@ -101,10 +101,11 @@ class Parameter {
 
 
 		//stdDevSynthesisRate Functions:
-		double getStdDevSynthesisRate(unsigned selectionCategory, bool proposed = false);
+		double getStdDevSynthesisRate(unsigned selectionCategory, bool proposed = false); //Tested
 		virtual void proposeStdDevSynthesisRate();
-		void setStdDevSynthesisRate(double stdDevSynthesisRate, unsigned selectionCategory);
-		double getCurrentStdDevSynthesisRateProposalWidth();
+		void setStdDevSynthesisRate(double stdDevSynthesisRate, unsigned selectionCategory); //Tested
+		double getCurrentStdDevSynthesisRateProposalWidth(); //Tested
+		unsigned getNumAcceptForStdDevSynthesisRate(); //Tested; only for unit testing.
 		void updateStdDevSynthesisRate();
 
 
@@ -146,21 +147,21 @@ class Parameter {
 			bool withoutReference = true);
 		double getStdDevSynthesisRateVariance(unsigned samples, unsigned mixture, bool unbiased);
 		double getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement,
-											bool unbiased = true);
-		double getCodonSpecificVariance(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType, bool unbiased,
-			bool withoutReference = true);
-        std::vector<double> getCodonSpecificQuantile(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType, std::vector<double> probs,
-	       bool withoutReference);
+			bool unbiased = true);
+		double getCodonSpecificVariance(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType,
+			bool unbiased, bool withoutReference = true);
+        std::vector<double> getCodonSpecificQuantile(unsigned mixtureElement, unsigned samples, std::string &codon,
+			unsigned paramType, std::vector<double> probs, bool withoutReference);
 		unsigned getEstimatedMixtureAssignment(unsigned samples, unsigned geneIndex);
 		std::vector<double> getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex);
 
 
 		//Other Functions:
-		unsigned getNumParam();
-		unsigned getNumMixtureElements();
+		unsigned getNumParam(); //Tested; TODO caveat
+		unsigned getNumMixtureElements(); //Tested //TODO style question: Why call it getNumMixtureElements instead of simply getNumMixtures? Alternatively, change name of variable.
 		unsigned getNumObservedPhiSets();
-		void setMixtureAssignment(unsigned gene, unsigned value);
-		unsigned getMixtureAssignment(unsigned gene);
+		void setMixtureAssignment(unsigned gene, unsigned value); //Tested
+		unsigned getMixtureAssignment(unsigned gene); //Tested
 		virtual void setNumObservedPhiSets(unsigned _phiGroupings);
 		virtual std::vector <std::vector <double> > calculateSelectionCoefficients(unsigned sample, unsigned mixture);
 
@@ -168,7 +169,7 @@ class Parameter {
 		//Static Functions:
 		static double calculateSCUO(Gene& gene, unsigned maxAA);
 		static void drawIidRandomVector(unsigned draws, double mean, double sd, double (*proposal)(double a, double b),
-				double* randomNumbers);
+			double* randomNumbers);
 		static void drawIidRandomVector(unsigned draws, double r, double (*proposal)(double r), double* randomNumber);
 		static double randNorm(double mean, double sd);
 		static double randLogNorm(double m, double s);
@@ -263,7 +264,7 @@ class Parameter {
 
 		std::vector<double> stdDevSynthesisRate_proposed;
 		std::vector<double> stdDevSynthesisRate;
-		double bias_stdDevSynthesisRate;
+		double bias_stdDevSynthesisRate; //NOTE: Currently, this value is always set to 0.0
 		double std_stdDevSynthesisRate;
 		unsigned numAcceptForStdDevSynthesisRate;
 		std::vector<double> std_csp;
@@ -280,7 +281,7 @@ class Parameter {
 		unsigned numMixtures;
 		unsigned obsPhiSets;
 
-		double bias_phi;
+		double bias_phi; //NOTE: Currently, this value is always set to 0.0
 		std::vector<std::vector<double>> std_phi;
 
 };

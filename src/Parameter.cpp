@@ -136,7 +136,8 @@ Parameter::~Parameter()
 //--------------------------------------------------------------//
 
 
-void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> mixtureDefinitionMatrix, bool splitSer,
+void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsigned _numMixtures,
+	std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> mixtureDefinitionMatrix, bool splitSer,
     std::string _mutationSelectionState)
 {
 	// assign genes to mixture element
@@ -159,6 +160,11 @@ void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsig
 	mutationSelectionState = _mutationSelectionState;
 	numParam = ((splitSer) ? 40 : 41);
 	numMixtures = _numMixtures;
+
+	//TODO: Why not just vector assign stdDevSynthesisRate_proposed and sydDevSynthesisRate to equal _stdDevSynthesisRate?
+	//stdDevSynthesisRate = _stdDevSynthesisRate;
+	//stdDevSynthesisRate_proposed = _stdDevSynthesisRate;
+
 	stdDevSynthesisRate.resize(_stdDevSynthesisRate.size());
 	stdDevSynthesisRate_proposed.resize(_stdDevSynthesisRate.size());
 	for (unsigned i = 0u; i < stdDevSynthesisRate.size(); i++)
@@ -183,15 +189,16 @@ void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsig
 
 	categoryProbabilities.resize(numMixtures, 1.0/(double)numMixtures);
 
+	//Set up vector of vectors:
 	currentSynthesisRateLevel.resize(numSelectionCategories);
 	proposedSynthesisRateLevel.resize(numSelectionCategories);
 
 	numAcceptForSynthesisRate.resize(numSelectionCategories);
+
 	std_phi.resize(numSelectionCategories);
 
 	for (unsigned i = 0u; i < numSelectionCategories; i++)
 	{
-
 		std::vector<double> tempExpr(numGenes, 0.0);
 		currentSynthesisRateLevel[i] = tempExpr;
 		proposedSynthesisRateLevel[i] = tempExpr;
@@ -610,7 +617,7 @@ std::vector <double> Parameter::readPhiValues(std::string filename)
 	std::size_t pos, pos2;
 	std::ifstream currentFile;
 	std::string tmpString;
-	std::vector<double> RV;
+	std::vector <double> RV;
 
 	currentFile.open(filename);
 	if (currentFile.fail())
@@ -828,6 +835,12 @@ void Parameter::setStdDevSynthesisRate(double _stdDevSynthesisRate, unsigned sel
 double Parameter::getCurrentStdDevSynthesisRateProposalWidth()
 {
 	return std_stdDevSynthesisRate;
+}
+
+// For unit testing only.
+unsigned Parameter::getNumAcceptForStdDevSynthesisRate()
+{
+	return numAcceptForStdDevSynthesisRate;
 }
 
 
@@ -1338,8 +1351,8 @@ double Parameter::getCodonSpecificVariance(unsigned mixtureElement, unsigned sam
 }
 
 
-std::vector<double> Parameter::getCodonSpecificQuantile(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType, std::vector<double> probs,
-	bool withoutReference)
+std::vector<double> Parameter::getCodonSpecificQuantile(unsigned mixtureElement, unsigned samples, std::string &codon,
+	unsigned paramType, std::vector<double> probs, bool withoutReference)
 {
  	std::vector<double> parameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
 		mixtureElement, codon, paramType, withoutReference);

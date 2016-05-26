@@ -668,7 +668,7 @@ int main()
 	//testCovarianceMatrix();
 	testParameter();
 	//testTrace();
-	testMCMCAlgorithm();
+	//testMCMCAlgorithm();
 	exit(0);
 
 	std::string modelToRun = "ROC"; //can be RFP, ROC or FONSE
@@ -762,7 +762,6 @@ int main()
 			//parameter.InitializeSynthesisRate(phiVals);
 			parameter = tmp;
 		}
-		//parameter = tmp;
 		std::cout << "Done!--------------------------------\n\n\n";
 
 
