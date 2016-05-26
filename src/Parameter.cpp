@@ -161,8 +161,7 @@ void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsig
 	numParam = ((splitSer) ? 40 : 41);
 	numMixtures = _numMixtures;
 
-	//TODO: Why not just vector assign stdDevSynthesisRate_proposed and sydDevSynthesisRate
-	//to equal _stdDevSynthesisRate?
+	//TODO: Why not just vector assign stdDevSynthesisRate_proposed and sydDevSynthesisRate to equal _stdDevSynthesisRate?
 	//stdDevSynthesisRate = _stdDevSynthesisRate;
 	//stdDevSynthesisRate_proposed = _stdDevSynthesisRate;
 
@@ -190,15 +189,16 @@ void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsig
 
 	categoryProbabilities.resize(numMixtures, 1.0/(double)numMixtures);
 
+	//Set up vector of vectors:
 	currentSynthesisRateLevel.resize(numSelectionCategories);
 	proposedSynthesisRateLevel.resize(numSelectionCategories);
 
 	numAcceptForSynthesisRate.resize(numSelectionCategories);
+
 	std_phi.resize(numSelectionCategories);
 
 	for (unsigned i = 0u; i < numSelectionCategories; i++)
 	{
-
 		std::vector<double> tempExpr(numGenes, 0.0);
 		currentSynthesisRateLevel[i] = tempExpr;
 		proposedSynthesisRateLevel[i] = tempExpr;
@@ -835,6 +835,12 @@ void Parameter::setStdDevSynthesisRate(double _stdDevSynthesisRate, unsigned sel
 double Parameter::getCurrentStdDevSynthesisRateProposalWidth()
 {
 	return std_stdDevSynthesisRate;
+}
+
+// For unit testing only.
+unsigned Parameter::getNumAcceptForStdDevSynthesisRate()
+{
+	return numAcceptForStdDevSynthesisRate;
 }
 
 
