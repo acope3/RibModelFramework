@@ -1,8 +1,6 @@
 #include "include/Testing.h"
 
 
-#include <iostream>
-
 #ifndef STANDALONE
 #include <Rcpp.h>
 using namespace Rcpp;
@@ -1811,7 +1809,8 @@ int testParameter()
     std::vector <double> stdDev(numMixtures, 1);
     unsigned numGenes = 1000;
     std::vector <unsigned> geneAssignment(numGenes);
-    for (unsigned i = 0u; i < numGenes; i++) {
+    for (unsigned i = 0u; i < numGenes; i++)
+    {
         geneAssignment[i] = 0u;
     }
     std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
@@ -2106,33 +2105,49 @@ int testParameter()
     if (!initParameterSetError)
         my_print("Parameter initParameterSet --- Pass\n");
 
+    /* Section 2:
+     * InitializeSynthesisRate Function
+     */
+
+    //----------------------------------------------//
+    //------ InitializeSynthesisRate Function ------//
+    //----------------------------------------------//
+
+    Genome genome;
+    genome.readFasta("/Users/hollisbui/RibModelDev/data/twoMixtures/simulatedAllUniqueR.fasta");
+    std::vector<double> sphi_init(numMixtures, 1);
+
+    parameter.InitializeSynthesisRate(genome, sphi_init[0]);
     /*
-    //Genome genome;
-    //genome.readFasta("/Users/hollisbui/RibModelDev/data/twoMixtures/simulatedAllUniqueR.fasta");
+    std::chrono::time_point<std::chrono::steady_clock> start, end;
+    std::chrono::duration<double> elapsed_seconds;
+    double avg_time = 0.0;
 
-    ROCParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
+    std::ofstream Fout;
+    Fout.open("/Users/hollisbui/Gilchrist/initializeSynthesisRateTest.csv");
+    if (Fout.fail())
+        my_printError("Error in initializeSynthesisRateTest: Can not open file.\n");
 
-    for (unsigned i = 0u; i < numMixtures; i++)
+
+    for (unsigned i = 0u; i < 1; i++)
     {
-        unsigned selectionCategry = tmp.getSelectionCategory(i);
-        //std::cout << "Sphi_init for selection category " << selectionCategry << ": " << sphi_init[selectionCategry] << std::endl;
+        start = std::chrono::steady_clock::now();
+        parameter.InitializeSynthesisRate(genome, sphi_init[0]);
+        end = std::chrono::steady_clock::now();
+
+        elapsed_seconds = end - start;
+        avg_time += elapsed_seconds.count();
+        //my_print("Time taken: %\n", elapsed_seconds.count());
+        Fout << i << "," << elapsed_seconds.count() << "\n";
     }
-    //std::cout << "\t# mixtures: " << numMixtures << "\n";
-    //std::cout << "\tmixture definition: " << mixDef << "\n";
+    avg_time /= 1;
 
-    std::vector<std::string> files(2);
-    files[0] = std::string("/Users/hollisbui/RibModelDev/data/twoMixtures/simulated_mutation0.csv");
-    files[1] = std::string("/Users/hollisbui/RibModelDev/data/twoMixtures/simulated_mutation1.csv");
-    tmp.initMutationCategories(files, tmp.getNumMutationCategories());
-    files[0] = std::string("/Users/hollisbui/RibModelDev/data/twoMixtures/simulated_selection0.csv");
-    files[1] = std::string("/Users/hollisbui/RibModelDev/data/twoMixtures/simulated_selection1.csv");
-    tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
+    my_print("Time taken average: %\n", avg_time);
 
-    tmp.InitializeSynthesisRate(genome, sphi_init[0]);
-    //std::vector<double> phiVals = parameter.readPhiValues("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrCleft_phi_est.csv");
-    //parameter.InitializeSynthesisRate(phiVals);
-    p = tmp;
+    Fout.close();
     */
+
+    //ROCParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 
     return globalError;
 }
@@ -2527,13 +2542,8 @@ int testMCMCAlgorithm()
     //----------------------------------------------------//
     //------ getLogLikelihoodPosteriorMean Function ------//
     //----------------------------------------------------//
-    //TODO
-    //unsigned traceLength = likelihoodTrace.size();
-
-    //my_print(mcmc.getLogLikelihoodPosteriorMean(10) << "\n");
-    //my_print(mcmc.getLogLikelihoodPosteriorMean(5) << "\n");
-    //my_print(mcmc.getLogLikelihoodPosteriorMean(15) << "\n");
-
+    //TODO. LikelihoodTrace is *not* set in this file, and therefore testing will
+    //require implementation of models beforehand.
 
     return globalError;
 }

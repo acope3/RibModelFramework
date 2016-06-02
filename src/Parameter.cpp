@@ -556,29 +556,94 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 	double* expression = new double[genomeSize]();
 	int* index = new int[genomeSize]();
 
+	//TODO: Verify that vectors < dynamic arrays before removing
+	/*
+	std::vector <double *> scuoValues(genomeSize);
+	std::vector <double *> expression(genomeSize);
+	std::vector <int *> index(genomeSize);
+	std::vector <double *> empty1;
+	std::vector <int *> empty2;
+	*/
+
 	for (unsigned i = 0u; i < genomeSize; i++)
 	{
+
 		index[i] = i;
 		scuoValues[i] = calculateSCUO( genome.getGene(i), 22 ); //This used to be maxGrouping, but RFP model will not work that way
 		expression[i] = Parameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
+
+		/*
+		index[i] = new int;
+		*index[i] = i;
+		scuoValues[i] = new double;
+		*scuoValues[i] = calculateSCUO( genome.getGene(i), 22 ); //This used to be maxGrouping, but RFP model will not work that way
+		expression[i] = new double;
+		*expression[i] = Parameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
+		*/
 	}
+
+	/*
+	for (unsigned i = 0u; i < genomeSize; i++)
+	{
+		//my_print("% ", scuoValues[i]);
+		//my_print("% ", *scuoValues[i]);
+		//my_print("% ", *expression[i]);
+		my_print("% ", expression[i]);
+	}
+	my_print("\n");
+	*/
+
 	quickSortPair(scuoValues, index, 0, genomeSize);
+	//quickSortPairVector(scuoValues, index, 0, genomeSize);
+
 	quickSort(expression, 0, genomeSize);
+	//std::sort(expression, expression + genomeSize);
+
+	//quickSortVector(expression, 0, genomeSize);
+	//std::sort(expression.begin(), expression.end(), sortHelper);
+
+	/*
+	for (unsigned i = 0u; i < genomeSize; i++)
+	{
+		//my_print("% ", scuoValues[i]);
+		//my_print("% ", *scuoValues[i]);
+		//my_print("% ", *expression[i]);
+		my_print("% ", expression[i]);
+	}
+	my_print("\n");
+	*/
 
 	for (unsigned category = 0u; category < numSelectionCategories; category++)
 	{
 		for (unsigned j = 0u; j < genomeSize; j++)
 		{
 			currentSynthesisRateLevel[category][index[j]] = expression[j];
+			//currentSynthesisRateLevel[category][*index[j]] = *expression[j];
 			//my_print("%\n", currentSynthesisRateLevel[category][j]);
 			std_phi[category][j] = 0.1;
 			numAcceptForSynthesisRate[category][j] = 0u;
 		}
 	}
 
+	// must clear actual elements
+	/*
+	for (unsigned i = 0u; i < genomeSize; i++)
+	{
+		delete scuoValues[i];
+		delete expression[i];
+		delete index[i];
+	}
+	*/
+
 	delete [] scuoValues;
 	delete [] expression;
 	delete [] index;
+
+	/*
+	scuoValues.swap(empty1);
+	expression.swap(empty1);
+	index.swap(empty2);
+	*/
 }
 
 
@@ -600,9 +665,9 @@ void Parameter::InitializeSynthesisRate(double sd_phi)
 void Parameter::InitializeSynthesisRate(std::vector<double> expression)
 {
 	unsigned numGenes = currentSynthesisRateLevel[0].size();
-	for(unsigned category = 0u; category < numSelectionCategories; category++)
+	for (unsigned category = 0u; category < numSelectionCategories; category++)
 	{
-		for(unsigned i = 0u; i < numGenes; i++)
+		for (unsigned i = 0u; i < numGenes; i++)
 		{
 			currentSynthesisRateLevel[category][i] = expression[i];
 			std_phi[category][i] = 0.1;
@@ -1432,10 +1497,16 @@ std::vector<double> Parameter::getEstimatedMixtureAssignmentProbabilities(unsign
 //---------- STATICS - Sorting Functions -----------//
 //--------------------------------------------------//
 
+/*
+bool Parameter::sortHelper(double *a, double *b)
+{
+	return (*a < *b);
+}
+*/
 
 /* sort array interval from first (included) to last (excluded)!!
 // quick sort, sorting arrays a and b by a.
-// Elements in b corespond to a, a will be sorted and it will be assured that b will be sorted by a */
+// Elements in b correspond to a, a will be sorted and it will be assured that b will be sorted by a */
 void Parameter::quickSortPair(double a[], int b[], int first, int last)
 {
 	int pivotElement;
@@ -1448,6 +1519,22 @@ void Parameter::quickSortPair(double a[], int b[], int first, int last)
 	}
 }
 
+/*
+// sort vector interval from first (included) to last (excluded)!!
+// quick sort, sorting vector a and b by a.
+// Elements in b correspond to a, a will be sorted and it will be assured that b will be sorted by a
+void Parameter::quickSortPairVector(std::vector <double *> a, std::vector <int *> b, int first, int last)
+{
+	int pivotElement;
+
+	if (first < last)
+	{
+		pivotElement = pivotPairVector(a, b, first, last);
+		quickSortPairVector(a, b, first, pivotElement);
+		quickSortPairVector(a, b, pivotElement + 1, last);
+	}
+}
+*/
 
 // sort array interval from first (included) to last (excluded)!!
 void Parameter::quickSort(double a[], int first, int last)
@@ -1462,6 +1549,20 @@ void Parameter::quickSort(double a[], int first, int last)
 	}
 }
 
+/*
+// sort vector interval from first (included) to last (excluded)!!
+void Parameter::quickSortVector(std::vector <double *> a, int first, int last)
+{
+	int pivotElement;
+
+	if (first < last)
+	{
+		pivotElement = pivotVector(a, first, last);
+		quickSortVector(a, first, pivotElement);
+		quickSortVector(a, pivotElement + 1, last);
+	}
+}
+*/
 
 int Parameter::pivotPair(double a[], int b[], int first, int last)
 {
@@ -1484,6 +1585,28 @@ int Parameter::pivotPair(double a[], int b[], int first, int last)
 	return p;
 }
 
+/*
+int Parameter::pivotPairVector(std::vector <double *> a, std::vector <int *> b, int first, int last)
+{
+	int p = first;
+	double pivotElement = *a[first];
+
+	for (int i = (first + 1) ; i < last ; i++)
+	{
+		// If you want to sort the list in the other order, change "<=" to ">"
+		if (*a[i] <= pivotElement)
+		{
+			p++;
+			swap(*a[i], *a[p]);
+			swap(*b[i], *b[p]);
+		}
+	}
+	swap(*a[p], *a[first]);
+	swap(*b[p], *b[first]);
+
+	return p;
+}
+*/
 
 int Parameter::pivot(double a[], int first, int last)
 {
@@ -1493,7 +1616,7 @@ int Parameter::pivot(double a[], int first, int last)
 	for (int i = (first + 1) ; i < last ; i++)
 	{
 		/* If you want to sort the list in the other order, change "<=" to ">" */
-		if(a[i] <= pivotElement)
+		if (a[i] <= pivotElement)
 		{
 			p++;
 			swap(a[i], a[p]);
@@ -1504,7 +1627,32 @@ int Parameter::pivot(double a[], int first, int last)
 	return p;
 }
 
+/*
+int Parameter::pivotVector(std::vector <double *> a, int first, int last)
+{
+	int p = first;
+	double pivotElement = *a[first];
 
+	for (int i = (first + 1) ; i < last ; i++)
+	{
+		// If you want to sort the list in the other order, change "<=" to ">"
+		if (*a[i] <= pivotElement)
+		{
+			p++;
+			swap(*a[i], *a[p]);
+		}
+	}
+	swap(*a[p], *a[first]);
+
+	return p;
+}
+*/
+
+/* swap (doubles) (NOT EXPOSED)
+ * Arguments: The pointers to two doubles designated by pivoting in quicksort
+ * Switches the pointer locations of these doubles, effectively swapping values.
+ * Used in pivotting in quicksort when sorting scuo values and expression values.
+*/
 void Parameter::swap(double& a, double& b)
 {
 	double temp = a;
@@ -1513,6 +1661,11 @@ void Parameter::swap(double& a, double& b)
 }
 
 
+/* swap (integers) (NOT EXPOSED)
+ * Arguments: The pointers to two integers designated by pivoting in quicksort
+ * Switches the pointer locations of these integers, effectively swapping values.
+ * Used in pivotting in quicksort when sorting scuo indices.
+*/
 void Parameter::swap(int& a, int& b)
 {
 	int temp = a;
@@ -1707,7 +1860,7 @@ double Parameter::randUnif(double minVal, double maxVal)
 
 unsigned Parameter::randMultinom(double* probabilities, unsigned mixtureElements)
 {
-	// calculate cummulative sum to determine group boundaries
+	// calculate cumulative sum to determine group boundaries
 	double* cumsum = new double[mixtureElements]();
 	//std::vector<double> cumsum(groups);
 	cumsum[0] = probabilities[0];
