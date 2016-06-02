@@ -650,9 +650,9 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 void Parameter::InitializeSynthesisRate(double sd_phi)
 {
 	unsigned numGenes = currentSynthesisRateLevel[1].size();
-	for(unsigned category = 0u; category < numSelectionCategories; category++)
+	for (unsigned category = 0u; category < numSelectionCategories; category++)
 	{
-		for(unsigned i = 0u; i < numGenes; i++)
+		for (unsigned i = 0u; i < numGenes; i++)
 		{
 			currentSynthesisRateLevel[category][i] = Parameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
 			std_phi[category][i] = 0.1;
@@ -1435,7 +1435,7 @@ std::vector<double> Parameter::getCodonSpecificQuantile(unsigned mixtureElement,
     std::vector<double> samplesTrace(parameterTrace.begin() + (lastIteration - samples) + 1, (parameterTrace.begin() + lastIteration + 1));
     std::sort(samplesTrace.begin(), samplesTrace.end());
     std::vector<double> retVec(probs.size());
-    for(int i = 0; i < probs.size(); i++)
+    for (int i = 0; i < probs.size(); i++)
     {
         double h = (1.0+(samplesTrace.size()-1.0)*probs[i]);
         int low = (int)h;
@@ -1821,7 +1821,7 @@ void Parameter::randDirichlet(double *input, unsigned numElements, double *outpu
 #ifndef STANDALONE
 	RNGScope scope;
 	NumericVector xx(1);
-	for(unsigned i = 0; i < numElements; i++)
+	for (unsigned i = 0; i < numElements; i++)
 	{
 		xx = rgamma(1, input[i], 1);
 		output[i] = xx[0];
