@@ -163,7 +163,7 @@ unsigned CodonTable::getNumCodons(unsigned aa)
 void CodonTable::setupCodonTable()
 {
 	unsigned numAA = 21;
-	if(tableId >= 1 && tableId <= 6  && !splitAA) numAA = 20; //If not splitting AAs, tables 1-6 all have 20 AA, excluding stop codes
+	if (tableId >= 1 && tableId <= 6  && !splitAA) numAA = 20; //If not splitting AAs, tables 1-6 all have 20 AA, excluding stop codes
     else if (tableId >= 9 && tableId <= 14  && !splitAA) numAA = 20;
     else if (tableId == 16 && !splitAA) numAA = 20;
     else if (tableId >= 21 && tableId <= 25 && !splitAA) numAA = 20;
@@ -381,7 +381,7 @@ void CodonTable::setupCodonTable()
             }
             else if (aaIndex == 16) //Ser1
             {
-                if(splitAA)
+                if (splitAA)
                 {
                     codon_mapping[filled].push_back(25); //table 12
                 }
@@ -416,14 +416,14 @@ void CodonTable::setupCodonTable()
             {
                 if (tableId != 22)
                 {
-                    for(unsigned i = 44; i < 48; i++)
+                    for (unsigned i = 44; i < 48; i++)
                     {
                         codon_mapping[filled].push_back(i);
                     }
                 }
                 else
                 {
-                    for(unsigned i = 45; i < 48; i++)
+                    for (unsigned i = 45; i < 48; i++)
                     {
                         codon_mapping[filled].push_back(i);
                     }

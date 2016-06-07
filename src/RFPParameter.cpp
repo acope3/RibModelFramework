@@ -473,7 +473,6 @@ double RFPParameter::getCurrentCodonSpecificProposalWidth(unsigned index)
 }
 
 
-
 /* proposeCodonSpecificParameter (NOT EXPOSED)
  * Arguments: None
  * Proposes a new alpha and lambda prime value for every category and codon.
@@ -511,15 +510,18 @@ void RFPParameter::updateCodonSpecificParameter(std::string grouping)
 	unsigned i = SequenceSummary::codonToIndex(grouping);
 	numAcceptForCodonSpecificParameters[i]++;
 
-	for(unsigned k = 0u; k < numMutationCategories; k++)
+	for (unsigned k = 0u; k < numMutationCategories; k++)
 	{
 		currentCodonSpecificParameter[alp][k][i] = proposedCodonSpecificParameter[alp][k][i];
 	}
-	for(unsigned k = 0u; k < numSelectionCategories; k++)
+	for (unsigned k = 0u; k < numSelectionCategories; k++)
 	{
 		currentCodonSpecificParameter[lmPri][k][i] = proposedCodonSpecificParameter[lmPri][k][i];
 	}
 }
+
+
+
 
 
 // ----------------------------------------------//
@@ -558,6 +560,8 @@ void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 
 
 
+
+
 // -------------------------------------//
 // ---------- Other Functions ----------//
 // -------------------------------------//
@@ -576,7 +580,6 @@ double RFPParameter::getParameterForCategory(unsigned category, unsigned paramTy
 
 	return rv;
 }
-
 
 
 
@@ -776,19 +779,4 @@ double RFPParameter::getParameterForCategoryR(unsigned mixtureElement, unsigned 
 }
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

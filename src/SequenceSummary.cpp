@@ -435,56 +435,56 @@ std::string SequenceSummary::codonToAA(std::string& codon)
 	//std::transform(codon.begin(), codon.end(), codon.begin(), ::toupper);
 	std::string aa = "#";
 	//Phenylalanine
-	if(!codon.compare("TTT") || !codon.compare("UUU") || !codon.compare("TTC") || !codon.compare("UUC")) aa = "F";
+	if (!codon.compare("TTT") || !codon.compare("UUU") || !codon.compare("TTC") || !codon.compare("UUC")) aa = "F";
 		//Leucine
-	else if(!codon.compare("TTA") || !codon.compare("UUA") || !codon.compare("TTG") || !codon.compare("UUG") ||
+	else if (!codon.compare("TTA") || !codon.compare("UUA") || !codon.compare("TTG") || !codon.compare("UUG") ||
 			!codon.compare("CTT") || !codon.compare("CUU") || !codon.compare("CTC") || !codon.compare("CUC") ||
 			!codon.compare("CTA") || !codon.compare("CUA") || !codon.compare("CTG") || !codon.compare("CUG")) aa = "L";
 		//Isoleucine
-	else if(!codon.compare("ATT") || !codon.compare("AUU") || !codon.compare("ATC") || !codon.compare("AUC") ||
+	else if (!codon.compare("ATT") || !codon.compare("AUU") || !codon.compare("ATC") || !codon.compare("AUC") ||
 			!codon.compare("ATA") || !codon.compare("AUA")) aa = "I";
 		//Methionine
-	else if(!codon.compare("ATG") || !codon.compare("AUG")) aa = "M";
+	else if (!codon.compare("ATG") || !codon.compare("AUG")) aa = "M";
 		//Valine
-	else if(!codon.compare("GTT") || !codon.compare("GUU") || !codon.compare("GTC") || !codon.compare("GUC") ||
+	else if (!codon.compare("GTT") || !codon.compare("GUU") || !codon.compare("GTC") || !codon.compare("GUC") ||
 			!codon.compare("GTA") || !codon.compare("GUA") || !codon.compare("GTG") || !codon.compare("GUG")) aa = "V";
 		//Serine4
-	else if(!codon.compare("TCT") || !codon.compare("UCU") || !codon.compare("TCC") || !codon.compare("UCC") ||
+	else if (!codon.compare("TCT") || !codon.compare("UCU") || !codon.compare("TCC") || !codon.compare("UCC") ||
 			!codon.compare("TCA") || !codon.compare("UCA") || !codon.compare("TCG") || !codon.compare("UCG")) aa = "S";
 		//Proline
-	else if(!codon.compare("CCT") || !codon.compare("CCU") || !codon.compare("CCC") ||
+	else if (!codon.compare("CCT") || !codon.compare("CCU") || !codon.compare("CCC") ||
 			!codon.compare("CCA") || !codon.compare("CCG")) aa = "P";
 		//Threonine
-	else if(!codon.compare("ACT") || !codon.compare("ACU") || !codon.compare("ACC") ||
+	else if (!codon.compare("ACT") || !codon.compare("ACU") || !codon.compare("ACC") ||
 			!codon.compare("ACA") || !codon.compare("ACG")) aa = "T";
 		//Alanine
-	else if(!codon.compare("GCT") || !codon.compare("GCU") || !codon.compare("GCC") ||
+	else if (!codon.compare("GCT") || !codon.compare("GCU") || !codon.compare("GCC") ||
 			!codon.compare("GCA") || !codon.compare("GCG")) aa = "A";
 		//Tyrosine
-	else if(!codon.compare("TAT") || !codon.compare("UAU") || !codon.compare("TAC") || !codon.compare("UAC")) aa = "Y";
+	else if (!codon.compare("TAT") || !codon.compare("UAU") || !codon.compare("TAC") || !codon.compare("UAC")) aa = "Y";
 		//Histidine
-	else if(!codon.compare("CAT") || !codon.compare("CAU") || !codon.compare("CAC")) aa = "H";
+	else if (!codon.compare("CAT") || !codon.compare("CAU") || !codon.compare("CAC")) aa = "H";
 		//Glutamine
-	else if(!codon.compare("CAA") || !codon.compare("CAG")) aa = "Q";
+	else if (!codon.compare("CAA") || !codon.compare("CAG")) aa = "Q";
 		//Asparagine
-	else if(!codon.compare("AAT") || !codon.compare("AAU") || !codon.compare("AAC")) aa = "N";
+	else if (!codon.compare("AAT") || !codon.compare("AAU") || !codon.compare("AAC")) aa = "N";
 		//Lysine
-	else if(!codon.compare("AAA") || !codon.compare("AAG")) aa = "K";
+	else if (!codon.compare("AAA") || !codon.compare("AAG")) aa = "K";
 		//Aspartic Acid
-	else if(!codon.compare("GAT") || !codon.compare("GAU") || !codon.compare("GAC")) aa = "D";
+	else if (!codon.compare("GAT") || !codon.compare("GAU") || !codon.compare("GAC")) aa = "D";
 		//Glutamic Acid
-	else if(!codon.compare("GAA") || !codon.compare("GAG")) aa = "E";
+	else if (!codon.compare("GAA") || !codon.compare("GAG")) aa = "E";
 		//Cysteine
-	else if(!codon.compare("TGT") || !codon.compare("TAT") || !codon.compare("TGC") || !codon.compare("UGC")) aa = "C";
+	else if (!codon.compare("TGT") || !codon.compare("TAT") || !codon.compare("TGC") || !codon.compare("UGC")) aa = "C";
 		//Tryptophan
-	else if(!codon.compare("TGG") || !codon.compare("UGG")) aa = "W";
+	else if (!codon.compare("TGG") || !codon.compare("UGG")) aa = "W";
 		//Arginine
-	else if(!codon.compare("CGT") || !codon.compare("CGU") || !codon.compare("CGC") || !codon.compare("CGA") ||
+	else if (!codon.compare("CGT") || !codon.compare("CGU") || !codon.compare("CGC") || !codon.compare("CGA") ||
 			!codon.compare("CGG") || !codon.compare("AGA") || !codon.compare("AGG")) aa = "R";
 		//Serine2
-	else if(!codon.compare("AGT") || !codon.compare("AGU") || !codon.compare("AGC")) aa = SequenceSummary::Ser2;
+	else if (!codon.compare("AGT") || !codon.compare("AGU") || !codon.compare("AGC")) aa = SequenceSummary::Ser2;
 		//Glycine
-	else if(!codon.compare("GGT") || !codon.compare("GGU") || !codon.compare("GGC")  || !codon.compare("GGC") ||
+	else if (!codon.compare("GGT") || !codon.compare("GGU") || !codon.compare("GGC")  || !codon.compare("GGC") ||
 			!codon.compare("GGA")  || !codon.compare("GGG")) aa = "G";
 		//Stop
 	else if (!codon.compare("TAA") || !codon.compare("UAA") || !codon.compare("TAG") || !codon.compare("UAG") ||

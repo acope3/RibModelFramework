@@ -246,21 +246,23 @@ void Genome::writeRFPFile(std::string filename, bool simulated)
 	Fout.open(filename.c_str());
 	if (Fout.fail())
 		my_printError("Error in Genome::writeRFPFile: Can not open output RFP file %\n", filename);
-
-	Fout << "ORF,RFP_Counts,Codon_Counts,Codon\n";
-	unsigned sized = simulated ? simulatedGenes.size() : genes.size();
-
-	for (unsigned geneIndex = 0; geneIndex < sized; geneIndex++)
+	else
 	{
-		Gene *currentGene = simulated ? &simulatedGenes[geneIndex] : &genes[geneIndex];
+		Fout << "ORF,RFP_Counts,Codon_Counts,Codon\n";
+		unsigned sized = simulated ? simulatedGenes.size() : genes.size();
 
-		for (unsigned codonIndex = 0; codonIndex < 64; codonIndex++)
+		for (unsigned geneIndex = 0; geneIndex < sized; geneIndex++)
 		{
-			std::string codon = SequenceSummary::codonArray[codonIndex];
+			Gene *currentGene = simulated ? &simulatedGenes[geneIndex] : &genes[geneIndex];
 
-			Fout << currentGene->getId() << ",";
-			Fout << currentGene->geneData.getRFPObserved(codonIndex) << ",";
-			Fout << "NA," << codon << "\n";
+			for (unsigned codonIndex = 0; codonIndex < 64; codonIndex++)
+			{
+				std::string codon = SequenceSummary::codonArray[codonIndex];
+
+				Fout << currentGene->getId() << ",";
+				Fout << currentGene->geneData.getRFPObserved(codonIndex) << ",";
+				Fout << "NA," << codon << "\n";
+			}
 		}
 	}
 	Fout.close();

@@ -562,6 +562,7 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 		scuoValues[i] = calculateSCUO( genome.getGene(i), 22 ); //This used to be maxGrouping, but RFP model will not work that way
 		expression[i] = Parameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
 	}
+
 	quickSortPair(scuoValues, index, 0, genomeSize);
 	quickSort(expression, 0, genomeSize);
 
@@ -570,7 +571,6 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 		for (unsigned j = 0u; j < genomeSize; j++)
 		{
 			currentSynthesisRateLevel[category][index[j]] = expression[j];
-			//my_print("%\n", currentSynthesisRateLevel[category][j]);
 			std_phi[category][j] = 0.1;
 			numAcceptForSynthesisRate[category][j] = 0u;
 		}
@@ -585,9 +585,9 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 void Parameter::InitializeSynthesisRate(double sd_phi)
 {
 	unsigned numGenes = currentSynthesisRateLevel[1].size();
-	for(unsigned category = 0u; category < numSelectionCategories; category++)
+	for (unsigned category = 0u; category < numSelectionCategories; category++)
 	{
-		for(unsigned i = 0u; i < numGenes; i++)
+		for (unsigned i = 0u; i < numGenes; i++)
 		{
 			currentSynthesisRateLevel[category][i] = Parameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
 			std_phi[category][i] = 0.1;
@@ -600,9 +600,9 @@ void Parameter::InitializeSynthesisRate(double sd_phi)
 void Parameter::InitializeSynthesisRate(std::vector<double> expression)
 {
 	unsigned numGenes = currentSynthesisRateLevel[0].size();
-	for(unsigned category = 0u; category < numSelectionCategories; category++)
+	for (unsigned category = 0u; category < numSelectionCategories; category++)
 	{
-		for(unsigned i = 0u; i < numGenes; i++)
+		for (unsigned i = 0u; i < numGenes; i++)
 		{
 			currentSynthesisRateLevel[category][i] = expression[i];
 			std_phi[category][i] = 0.1;
@@ -1370,7 +1370,7 @@ std::vector<double> Parameter::getCodonSpecificQuantile(unsigned mixtureElement,
     std::vector<double> samplesTrace(parameterTrace.begin() + (lastIteration - samples) + 1, (parameterTrace.begin() + lastIteration + 1));
     std::sort(samplesTrace.begin(), samplesTrace.end());
     std::vector<double> retVec(probs.size());
-    for(int i = 0; i < probs.size(); i++)
+    for (int i = 0; i < probs.size(); i++)
     {
         double h = (1.0+(samplesTrace.size()-1.0)*probs[i]);
         int low = (int)h;
@@ -1435,7 +1435,7 @@ std::vector<double> Parameter::getEstimatedMixtureAssignmentProbabilities(unsign
 
 /* sort array interval from first (included) to last (excluded)!!
 // quick sort, sorting arrays a and b by a.
-// Elements in b corespond to a, a will be sorted and it will be assured that b will be sorted by a */
+// Elements in b correspond to a, a will be sorted and it will be assured that b will be sorted by a */
 void Parameter::quickSortPair(double a[], int b[], int first, int last)
 {
 	int pivotElement;
@@ -1493,7 +1493,7 @@ int Parameter::pivot(double a[], int first, int last)
 	for (int i = (first + 1) ; i < last ; i++)
 	{
 		/* If you want to sort the list in the other order, change "<=" to ">" */
-		if(a[i] <= pivotElement)
+		if (a[i] <= pivotElement)
 		{
 			p++;
 			swap(a[i], a[p]);
@@ -1505,6 +1505,11 @@ int Parameter::pivot(double a[], int first, int last)
 }
 
 
+/* swap (doubles) (NOT EXPOSED)
+ * Arguments: The pointers to two doubles designated by pivoting in quicksort
+ * Switches the pointer locations of these doubles, effectively swapping values.
+ * Used in pivotting in quicksort when sorting scuo values and expression values.
+*/
 void Parameter::swap(double& a, double& b)
 {
 	double temp = a;
@@ -1513,6 +1518,11 @@ void Parameter::swap(double& a, double& b)
 }
 
 
+/* swap (integers) (NOT EXPOSED)
+ * Arguments: The pointers to two integers designated by pivoting in quicksort
+ * Switches the pointer locations of these integers, effectively swapping values.
+ * Used in pivotting in quicksort when sorting scuo indices.
+*/
 void Parameter::swap(int& a, int& b)
 {
 	int temp = a;
@@ -1668,7 +1678,7 @@ void Parameter::randDirichlet(double *input, unsigned numElements, double *outpu
 #ifndef STANDALONE
 	RNGScope scope;
 	NumericVector xx(1);
-	for(unsigned i = 0; i < numElements; i++)
+	for (unsigned i = 0; i < numElements; i++)
 	{
 		xx = rgamma(1, input[i], 1);
 		output[i] = xx[0];
@@ -1707,7 +1717,7 @@ double Parameter::randUnif(double minVal, double maxVal)
 
 unsigned Parameter::randMultinom(double* probabilities, unsigned mixtureElements)
 {
-	// calculate cummulative sum to determine group boundaries
+	// calculate cumulative sum to determine group boundaries
 	double* cumsum = new double[mixtureElements]();
 	//std::vector<double> cumsum(groups);
 	cumsum[0] = probabilities[0];

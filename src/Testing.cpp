@@ -1,8 +1,6 @@
 #include "include/Testing.h"
 
 
-#include <iostream>
-
 #ifndef STANDALONE
 #include <Rcpp.h>
 using namespace Rcpp;
@@ -18,7 +16,11 @@ int testUtility()
 
     if (error)
     {
+#ifndef STANDALONE
+        Rcpp::Rcerr << "Error in my_print.\n";
+#else
         std::cerr << "Error in my_print.\n";
+#endif
         globalError = 1;
     }
 
@@ -26,7 +28,11 @@ int testUtility()
 
     if (error)
     {
+#ifndef STANDALONE
+        Rcpp::Rcerr << "Error in my_printError\n";
+#else
         std::cerr << "Error in my_printError\n";
+#endif
         globalError = 1;
     }
 
@@ -1811,7 +1817,8 @@ int testParameter()
     std::vector <double> stdDev(numMixtures, 1);
     unsigned numGenes = 1000;
     std::vector <unsigned> geneAssignment(numGenes);
-    for (unsigned i = 0u; i < numGenes; i++) {
+    for (unsigned i = 0u; i < numGenes; i++)
+    {
         geneAssignment[i] = 0u;
     }
     std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
@@ -2106,33 +2113,21 @@ int testParameter()
     if (!initParameterSetError)
         my_print("Parameter initParameterSet --- Pass\n");
 
-    /*
-    //Genome genome;
-    //genome.readFasta("/Users/hollisbui/RibModelDev/data/twoMixtures/simulatedAllUniqueR.fasta");
+    /* Section 2:
+     * InitializeSynthesisRate Function
+     */
 
-    ROCParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
+    //----------------------------------------------//
+    //------ InitializeSynthesisRate Function ------//
+    //----------------------------------------------//
 
-    for (unsigned i = 0u; i < numMixtures; i++)
-    {
-        unsigned selectionCategry = tmp.getSelectionCategory(i);
-        //std::cout << "Sphi_init for selection category " << selectionCategry << ": " << sphi_init[selectionCategry] << std::endl;
-    }
-    //std::cout << "\t# mixtures: " << numMixtures << "\n";
-    //std::cout << "\tmixture definition: " << mixDef << "\n";
+    Genome genome;
+    genome.readFasta("/Users/hollisbui/RibModelDev/data/twoMixtures/simulatedAllUniqueR.fasta");
+    std::vector<double> sphi_init(numMixtures, 1);
 
-    std::vector<std::string> files(2);
-    files[0] = std::string("/Users/hollisbui/RibModelDev/data/twoMixtures/simulated_mutation0.csv");
-    files[1] = std::string("/Users/hollisbui/RibModelDev/data/twoMixtures/simulated_mutation1.csv");
-    tmp.initMutationCategories(files, tmp.getNumMutationCategories());
-    files[0] = std::string("/Users/hollisbui/RibModelDev/data/twoMixtures/simulated_selection0.csv");
-    files[1] = std::string("/Users/hollisbui/RibModelDev/data/twoMixtures/simulated_selection1.csv");
-    tmp.initSelectionCategories(files, tmp.getNumSelectionCategories());
+    parameter.InitializeSynthesisRate(genome, sphi_init[0]);
 
-    tmp.InitializeSynthesisRate(genome, sphi_init[0]);
-    //std::vector<double> phiVals = parameter.readPhiValues("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/ribModel/data/Skluyveri_ChrA_ChrCleft_phi_est.csv");
-    //parameter.InitializeSynthesisRate(phiVals);
-    p = tmp;
-    */
+    //ROCParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 
     return globalError;
 }
@@ -2527,13 +2522,8 @@ int testMCMCAlgorithm()
     //----------------------------------------------------//
     //------ getLogLikelihoodPosteriorMean Function ------//
     //----------------------------------------------------//
-    //TODO
-    //unsigned traceLength = likelihoodTrace.size();
-
-    //my_print(mcmc.getLogLikelihoodPosteriorMean(10) << "\n");
-    //my_print(mcmc.getLogLikelihoodPosteriorMean(5) << "\n");
-    //my_print(mcmc.getLogLikelihoodPosteriorMean(15) << "\n");
-
+    //TODO. LikelihoodTrace is *not* set in this file, and therefore testing will
+    //require implementation of models beforehand.
 
     return globalError;
 }

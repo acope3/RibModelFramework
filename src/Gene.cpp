@@ -76,11 +76,11 @@ bool Gene::operator==(const Gene& other) const
 {
     bool match = true;
 
-    if(this->seq != other.seq) { match = false; }
-    if(this->id != other.id) { match = false; }
-    if(this->description != other.description) { match = false; }
-    if(this->observedSynthesisRateValues != other.observedSynthesisRateValues) { match = false; }
-    if(!(this->geneData == other.geneData)) { match = false; } //if structures aren't equal, genes aren't equal.
+    if (this->seq != other.seq) { match = false; }
+    if (this->id != other.id) { match = false; }
+    if (this->description != other.description) { match = false; }
+    if (this->observedSynthesisRateValues != other.observedSynthesisRateValues) { match = false; }
+    if (!(this->geneData == other.geneData)) { match = false; } //if structures aren't equal, genes aren't equal.
 
     return match;
 }
@@ -319,7 +319,7 @@ Gene Gene::reverseComplement()
 std::string Gene::toAASequence()
 {
     std::string aaseq = "";
-    for(unsigned i = 0; i < seq.length(); i+=3)
+    for (unsigned i = 0; i < seq.length(); i+=3)
     {
         std::string codon = seq.substr(i, 3);
         aaseq += SequenceSummary::codonToAA(codon);

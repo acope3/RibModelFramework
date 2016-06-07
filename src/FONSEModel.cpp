@@ -207,7 +207,7 @@ void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 	std::vector<double> currentMphi(selectionCategory, 0.0);
 	std::vector<double> proposedStdDevSynthesisRate(selectionCategory, 0.0);
 	std::vector<double> proposedMphi(selectionCategory, 0.0);
-	for(unsigned i = 0u; i < selectionCategory; i++)
+	for (unsigned i = 0u; i < selectionCategory; i++)
 	{
 		currentStdDevSynthesisRate[i] = getStdDevSynthesisRate(i, false);
 		currentMphi[i] = -((currentStdDevSynthesisRate[i] * currentStdDevSynthesisRate[i]) / 2);
