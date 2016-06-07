@@ -294,7 +294,7 @@ void CovarianceMatrix::setCovarianceMatrix(SEXP _matrix)
   unsigned index = 0;
   for (unsigned i = 0; i < numRows; i++)
   {
-    for(unsigned j = i; j < numRows * numRows; j += numRows, index++)
+    for (unsigned j = i; j < numRows * numRows; j += numRows, index++)
     {
       covMatrix[index] = matrix[j];
     }

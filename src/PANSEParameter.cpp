@@ -143,7 +143,7 @@ void PANSEParameter::initPANSEValuesFromFile(std::string filename)
 	std::ifstream input;
 	input.open(filename.c_str());
 	if (input.fail()){
-		my_printError("Could not open file to initialize PANSE values\n");
+		my_printError("ERROR: Could not open file to initialize PANSE values\n");
 	}
 	else {
 		std::string tmp, variableName;
@@ -472,7 +472,6 @@ double PANSEParameter::getCurrentCodonSpecificProposalWidth(unsigned index)
 }
 
 
-
 /* proposeCodonSpecificParameter (NOT EXPOSED)
  * Arguments: None
  * Proposes a new alpha and lambda prime value for every category and codon.
@@ -510,15 +509,18 @@ void PANSEParameter::updateCodonSpecificParameter(std::string grouping)
 	unsigned i = SequenceSummary::codonToIndex(grouping);
 	numAcceptForCodonSpecificParameters[i]++;
 
-	for(unsigned k = 0u; k < numMutationCategories; k++)
+	for (unsigned k = 0u; k < numMutationCategories; k++)
 	{
 		currentCodonSpecificParameter[alp][k][i] = proposedCodonSpecificParameter[alp][k][i];
 	}
-	for(unsigned k = 0u; k < numSelectionCategories; k++)
+	for (unsigned k = 0u; k < numSelectionCategories; k++)
 	{
 		currentCodonSpecificParameter[lmPri][k][i] = proposedCodonSpecificParameter[lmPri][k][i];
 	}
 }
+
+
+
 
 
 // ----------------------------------------------//
@@ -554,6 +556,8 @@ void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptatio
 	}
 	my_print("\n");
 }
+
+
 
 
 
@@ -775,19 +779,4 @@ double PANSEParameter::getParameterForCategoryR(unsigned mixtureElement, unsigne
 }
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

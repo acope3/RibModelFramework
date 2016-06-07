@@ -16,14 +16,12 @@ RFPModel::RFPModel() : Model()
 	//ctor
 }
 
+
 RFPModel::~RFPModel()
 {
 	//dtor
 	//TODO: call Parent's deconstructor
 }
-
-
-
 
 
 double RFPModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
@@ -142,7 +140,7 @@ void RFPModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 	std::vector<double> currentMphi(selectionCategory, 0.0);
 	std::vector<double> proposedStdDevSynthesisRate(selectionCategory, 0.0);
 	std::vector<double> proposedMphi(selectionCategory, 0.0);
-	for(unsigned i = 0u; i < selectionCategory; i++)
+	for (unsigned i = 0u; i < selectionCategory; i++)
 	{
 		currentStdDevSynthesisRate[i] = getStdDevSynthesisRate(i, false);
 		currentMphi[i] = -((currentStdDevSynthesisRate[i] * currentStdDevSynthesisRate[i]) / 2);
@@ -154,8 +152,6 @@ void RFPModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 		//TODO(Cedric): make sure you can control that prior from R
 		lpr -= Parameter::densityNorm(currentStdDevSynthesisRate[i], 1.0, 0.1, true) - Parameter::densityNorm(proposedStdDevSynthesisRate[i], 1.0, 0.1, true);
 	}
-
-
 
 
 	logProbabilityRatio.resize(1);
@@ -198,7 +194,6 @@ void RFPModel::writeRestartFile(std::string filename)
 {
 	return parameter->writeEntireRestartFile(filename);
 }
-
 
 
 
@@ -521,13 +516,13 @@ void RFPModel::simulateGenome(Genome &genome)
 	{
 		unsigned mixtureElement = getMixtureAssignment(geneIndex);
 		Gene gene = genome.getGene(geneIndex);
-		double phi = parameter -> getSynthesisRate(geneIndex, mixtureElement, false);
+		double phi = parameter->getSynthesisRate(geneIndex, mixtureElement, false);
 		Gene tmpGene = gene;
 		for (unsigned codonIndex = 0; codonIndex < 61; codonIndex++)
 		{
 			std::string codon = SequenceSummary::codonArray[codonIndex];
-			unsigned alphaCat = parameter -> getMutationCategory(mixtureElement);
-			unsigned lambdaPrimeCat = parameter -> getSelectionCategory(mixtureElement);
+			unsigned alphaCat = parameter->getMutationCategory(mixtureElement);
+			unsigned lambdaPrimeCat = parameter->getSelectionCategory(mixtureElement);
 
 			double alpha = getParameterForCategory(alphaCat, RFPParameter::alp, codon, false);
 			double lambdaPrime = getParameterForCategory(lambdaPrimeCat, RFPParameter::lmPri, codon, false);
@@ -540,7 +535,7 @@ void RFPModel::simulateGenome(Genome &genome)
 				xx = rgamma(1, alphaPrime, 1.0/lambdaPrime);
 				xx = rpois(1, xx[0] * phi);
 				tmpGene.geneData.setRFPObserved(codonIndex, xx[0]);
-			#else
+#else
 			std::gamma_distribution<double> GDistribution(alphaPrime,1.0/lambdaPrime);
 			double tmp = GDistribution(Parameter::generator);
 			std::poisson_distribution<unsigned> PDistribution(phi * tmp);
@@ -579,11 +574,4 @@ double RFPModel::getParameterForCategory(unsigned category, unsigned param, std:
 {
 	return parameter->getParameterForCategory(category, param, codon, proposal);
 }
-
-
-
-
-
-
-
 

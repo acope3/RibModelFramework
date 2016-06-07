@@ -23,9 +23,6 @@ PANSEModel::~PANSEModel()
 }
 
 
-
-
-
 double PANSEModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
 													   unsigned currRFPObserved, unsigned currNumCodonsInMRNA, double phiValue)
 {
@@ -153,7 +150,7 @@ void PANSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 	std::vector<double> currentMphi(selectionCategory, 0.0);
 	std::vector<double> proposedStdDevSynthesisRate(selectionCategory, 0.0);
 	std::vector<double> proposedMphi(selectionCategory, 0.0);
-	for(unsigned i = 0u; i < selectionCategory; i++)
+	for (unsigned i = 0u; i < selectionCategory; i++)
 	{
 		currentStdDevSynthesisRate[i] = getStdDevSynthesisRate(i, false);
 		currentMphi[i] = -((currentStdDevSynthesisRate[i] * currentStdDevSynthesisRate[i]) / 2);
@@ -165,8 +162,6 @@ void PANSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 		//TODO(Cedric): make sure you can control that prior from R
 		lpr -= Parameter::densityNorm(currentStdDevSynthesisRate[i], 1.0, 0.1, true) - Parameter::densityNorm(proposedStdDevSynthesisRate[i], 1.0, 0.1, true);
 	}
-
-
 
 
 	logProbabilityRatio.resize(1);
@@ -209,7 +204,6 @@ void PANSEModel::writeRestartFile(std::string filename)
 {
 	return parameter->writeEntireRestartFile(filename);
 }
-
 
 
 
@@ -590,11 +584,4 @@ double PANSEModel::getParameterForCategory(unsigned category, unsigned param, st
 {
 	return parameter->getParameterForCategory(category, param, codon, proposal);
 }
-
-
-
-
-
-
-
 

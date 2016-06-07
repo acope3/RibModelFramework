@@ -157,12 +157,12 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			unscaledLogPost_prop[j] = 0.0;
 		}
 
-		for(unsigned k = 0u; k < numSynthesisRateCategories; k++)
+		for (unsigned k = 0u; k < numSynthesisRateCategories; k++)
 		{
 			// logProbabilityRatio contains the logProbabilityRatio in element 0,
 			// the current unscaled probability in element 1 and the proposed unscaled probability in element 2
 			std::vector<unsigned> mixtureElements = model.getMixtureElementsOfSelectionCategory(k);
-			for(unsigned n = 0u; n < mixtureElements.size(); n++)
+			for (unsigned n = 0u; n < mixtureElements.size(); n++)
 			{
 				unsigned mixtureElement = mixtureElements[n];
 				double logProbabilityRatio[5];
@@ -186,7 +186,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		// calculate ln(P) = ln( Sum(p_i*f'(...)) ) and obtain normalizing constant for new p_i
 		double normalizingProbabilityConstant = 0.0;
 
-		for(unsigned k = 0u; k < numMixtures; k++)
+		for (unsigned k = 0u; k < numMixtures; k++)
 		{
 			unscaledLogProb_curr_singleMixture[k] -= maxValue;
 			probabilities[k] = model.getCategoryProbability(k) * std::exp(unscaledLogProb_curr_singleMixture[k]);
@@ -359,7 +359,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 
 	// set the last iteration to the max iterations, this way if the MCMC doesn't exit based on Geweke score, it will use the max iteration for posterior means
 	model.setLastIteration(samples);
-	for(unsigned iteration = 1u; iteration <= maximumIterations; iteration++)
+	for (unsigned iteration = 1u; iteration <= maximumIterations; iteration++)
 	{
 		if (writeRestartFile)
 		{
@@ -732,9 +732,9 @@ std::vector<double> MCMCAlgorithm::acf(std::vector<double>& x, int nrows, int nc
 	if (demean)
 	{
 		double sum = 0.0;
-		for(unsigned i = 0u; i < x.size(); i++) sum += x[i];
+		for (unsigned i = 0u; i < x.size(); i++) sum += x[i];
 		double mean = sum / (double)x.size();
-		for(unsigned i = 0u; i < x.size(); i++) x[i] = x[i] - mean;
+		for (unsigned i = 0u; i < x.size(); i++) x[i] = x[i] - mean;
 	}
 
 	std::vector<double> acf(lagmax, 1.0);
@@ -757,8 +757,8 @@ std::vector<double> MCMCAlgorithm::acf(std::vector<double>& x, int nrows, int nc
 		}
 	}
 	if (correlation) {
-		if(nrows == 1) {
-			for(int u = 0; u < ncols; u++)
+		if (nrows == 1) {
+			for (int u = 0; u < ncols; u++)
 			{
 				acf[0 + d1*u + d2*u] = 1.0;
 			}

@@ -577,7 +577,7 @@ void FONSEParameter::getParameterForCategory(unsigned category, unsigned paramTy
 
 void FONSEParameter::proposeHyperParameters()
 {
-    for(unsigned i = 0u; i < numSelectionCategories; i++)
+    for (unsigned i = 0u; i < numSelectionCategories; i++)
     {
 		stdDevSynthesisRate_proposed[i] = std::exp(randNorm(std::log(stdDevSynthesisRate[i]), std_stdDevSynthesisRate));
     }

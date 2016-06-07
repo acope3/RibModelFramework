@@ -666,12 +666,12 @@ int main()
 	//testGene();
 	//testGenome("/Users/hollisbui/RibModelFramework/tests/testthat/UnitTestingData");
 	//testCovarianceMatrix();
-	testParameter();
+	//testParameter();
 	//testTrace();
 	//testMCMCAlgorithm();
-	exit(0);
+	//exit(0);
 
-	std::string modelToRun = "ROC"; //can be RFP, ROC or FONSE
+	std::string modelToRun = "RFP"; //can be RFP, ROC or FONSE
 	bool withPhi = false;
 	bool fromRestart = false;
 	unsigned numMixtures = 1;
