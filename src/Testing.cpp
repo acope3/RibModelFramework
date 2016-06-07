@@ -16,7 +16,11 @@ int testUtility()
 
     if (error)
     {
+#ifndef STANDALONE
+        Rcpp::Rcerr << "Error in my_print.\n";
+#else
         std::cerr << "Error in my_print.\n";
+#endif
         globalError = 1;
     }
 
@@ -24,7 +28,11 @@ int testUtility()
 
     if (error)
     {
+#ifndef STANDALONE
+        Rcpp::Rcerr << "Error in my_printError\n";
+#else
         std::cerr << "Error in my_printError\n";
+#endif
         globalError = 1;
     }
 
@@ -2118,34 +2126,6 @@ int testParameter()
     std::vector<double> sphi_init(numMixtures, 1);
 
     parameter.InitializeSynthesisRate(genome, sphi_init[0]);
-    /*
-    std::chrono::time_point<std::chrono::steady_clock> start, end;
-    std::chrono::duration<double> elapsed_seconds;
-    double avg_time = 0.0;
-
-    std::ofstream Fout;
-    Fout.open("/Users/hollisbui/Gilchrist/initializeSynthesisRateTest.csv");
-    if (Fout.fail())
-        my_printError("Error in initializeSynthesisRateTest: Can not open file.\n");
-
-
-    for (unsigned i = 0u; i < 1; i++)
-    {
-        start = std::chrono::steady_clock::now();
-        parameter.InitializeSynthesisRate(genome, sphi_init[0]);
-        end = std::chrono::steady_clock::now();
-
-        elapsed_seconds = end - start;
-        avg_time += elapsed_seconds.count();
-        //my_print("Time taken: %\n", elapsed_seconds.count());
-        Fout << i << "," << elapsed_seconds.count() << "\n";
-    }
-    avg_time /= 1;
-
-    my_print("Time taken average: %\n", avg_time);
-
-    Fout.close();
-    */
 
     //ROCParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 
