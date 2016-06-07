@@ -68,7 +68,7 @@ ROCParameter::~ROCParameter()
 
 
 //---------------------------------------------------------------//
-// ---------- Initialization, Restart, Index Checking ---------- //
+//----------- Initialization, Restart, Index Checking -----------//
 //---------------------------------------------------------------//
 
 
@@ -119,7 +119,7 @@ void ROCParameter::initROCParameterSet()
     std::string aa = SequenceSummary::AminoAcidArray[i];
     unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa, true);
     CovarianceMatrix m((numMutationCategories + numSelectionCategories) * numCodons);
-    m.choleskiDecomposition();
+    m.choleskyDecomposition();
     covarianceMatrix.push_back(m);
   }
 }
@@ -132,13 +132,7 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 	std::vector <double> mat;
 	input.open(filename.c_str());
 	if (input.fail())
-	{
-#ifndef STANDALONE
-		Rf_error("Error opening file %s to initialize from restart file.\n", filename.c_str());
-#else
-		std::cerr << "Error opening file " << filename << " to initialize from restart file.\n";
-#endif
-	}
+		my_printError("Error opening file % to initialize from restart file.\n", filename.c_str());
 	else
 	{
 		std::string tmp, variableName;
@@ -168,17 +162,9 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 				}
 			}
 			else if (flag == 2)
-			{
-#ifndef STANDALONE
-				Rprintf("here\n");
-#else
-				std::cout << "here\n";
-#endif
-			}
+				my_print("here\n");
 			else if (flag == 3) //user comment, continue
-			{
 				continue;
-			}
 			else
 			{
 				std::istringstream iss;
@@ -303,13 +289,7 @@ void ROCParameter::writeROCRestartFile(std::string filename)
 	std::ofstream out;
 	out.open(filename.c_str(), std::ofstream::app);
 	if (out.fail())
-	{
-#ifndef STANDALONE
-		Rf_error("Error opening file %s to write restart file.\n", filename.c_str());
-#else
-		std::cerr << "Error opening file " << filename << " to write restart file.\n";
-#endif
-	}
+		my_printError("Error opening file % to write restart file.\n", filename.c_str());
 	else
 	{
 		std::ostringstream oss;
@@ -436,13 +416,7 @@ void ROCParameter::initMutationCategories(std::vector<std::string> files, unsign
 		std::ifstream currentFile;
 		currentFile.open(files[category].c_str());
 		if (currentFile.fail())
-		{
-#ifndef STANDALONE
-			Rf_error("Error opening file %d to initialize mutation values.\n", category);
-#else
-			std::cerr << "Error opening file " << category << " to initialize mutation values.\n";
-#endif
-		}
+			my_printError("Error opening file % to initialize mutation values.\n", category);
 		else
 		{
 			std::string tmp;
@@ -457,7 +431,7 @@ void ROCParameter::initMutationCategories(std::vector<std::string> files, unsign
 
 				//get the value to store
 				std::size_t pos2 = tmp.find(",", pos + 1);
-				//std::cout << tmp.substr(pos + 1, pos2 - pos - 1 ) <<"\n";
+				//my_print("%\n", tmp.substr(pos + 1, pos2 - pos - 1 ));
 				double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
 
 				currentCodonSpecificParameter[dM][category][codonIndex] = value;
@@ -478,13 +452,7 @@ void ROCParameter::initSelectionCategories(std::vector<std::string> files, unsig
 		std::ifstream currentFile;
 		currentFile.open(files[category].c_str());
 		if (currentFile.fail())
-		{
-#ifndef STANDALONE
-			Rf_error("Error opening file %d to initialize mutation values.\n", category);
-#else
-			std::cerr << "Error opening file " << category << " to initialize mutation values.\n";
-#endif
-		}
+			my_printError("Error opening file % to initialize mutation values.\n", category);
 		else
 		{
 			std::string tmp;
@@ -499,7 +467,7 @@ void ROCParameter::initSelectionCategories(std::vector<std::string> files, unsig
 
 				//get the value to store
 				std::size_t pos2 = tmp.find(",", pos + 1);
-				//	std::cout << tmp.substr(pos + 1, pos2 - pos - 1 ) <<"\n";
+				//	my_print("%\n", tmp.substr(pos + 1, pos2 - pos - 1 ));
 				double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
 
 				currentCodonSpecificParameter[dEta][category][codonIndex] = value;
@@ -512,9 +480,9 @@ void ROCParameter::initSelectionCategories(std::vector<std::string> files, unsig
 }
 
 
-// --------------------------------------//
-// ---------- Trace Functions -----------//
-// --------------------------------------//
+//--------------------------------------//
+//---------- Trace Functions -----------//
+//--------------------------------------//
 
 void ROCParameter::updateObservedSynthesisNoiseTraces(unsigned sample)
 {
@@ -541,9 +509,9 @@ void ROCParameter::updateCodonSpecificParameterTrace(unsigned sample, std::strin
 
 
 
-// ------------------------------------------//
-// ---------- Covariance Functions ----------//
-// ------------------------------------------//
+//------------------------------------------//
+//---------- Covariance Functions ----------//
+//------------------------------------------//
 
 
 CovarianceMatrix& ROCParameter::getCovarianceMatrixForAA(std::string aa)
@@ -554,9 +522,9 @@ CovarianceMatrix& ROCParameter::getCovarianceMatrixForAA(std::string aa)
 }
 
 
-// ------------------------------------------------------//
-// ---------- observedSynthesisNoise Functions ----------//
-// ------------------------------------------------------//
+//------------------------------------------------------//
+//---------- observedSynthesisNoise Functions ----------//
+//------------------------------------------------------//
 
 
 double ROCParameter::getObservedSynthesisNoise(unsigned index)
@@ -574,9 +542,9 @@ void ROCParameter::setObservedSynthesisNoise(unsigned index, double se)
 
 
 
-// -------------------------------------------//
-// ---------- noiseOffset Functions ----------//
-// -------------------------------------------//
+//-------------------------------------------//
+//---------- noiseOffset Functions ----------//
+//-------------------------------------------//
 
 
 double ROCParameter::getNoiseOffset(unsigned index, bool proposed)
@@ -612,9 +580,9 @@ void ROCParameter::updateNoiseOffset(unsigned index)
 }
 
 
-// -----------------------------------//
-// ---------- CSP Functions ----------//
-// -----------------------------------//
+//-----------------------------------//
+//---------- CSP Functions ----------//
+//-----------------------------------//
 
 
 double ROCParameter::getCurrentCodonSpecificProposalWidth(unsigned aa)
@@ -630,7 +598,7 @@ double ROCParameter::getCurrentCodonSpecificProposalWidth(unsigned aa)
 // 1. It is a symmetric distribution and you therefore do not have to account for the unsymmetry in jump probabilities
 // 2. The one log and exp operation that have to be performed per parameter are cheaper than the operations necessary to draw from a lognormal
 // 3. phi has to be on a non log scale for the likelihood evaluation thus it does not help to keep phi on th elog scale all the time
-// 4. the adjusment of the likelihood by the jacobian that arises from this transformation is cheap and by grouping everything in one class it takes place more or less at the same place
+// 4. the adjustment of the likelihood by the jacobian that arises from this transformation is cheap and by grouping everything in one class it takes place more or less at the same place
 void ROCParameter::proposeCodonSpecificParameter()
 {
 
@@ -697,9 +665,11 @@ void ROCParameter::updateCodonSpecificParameter(std::string grouping)
 
 
 
-// -------------------------------------//
-// ---------- Prior Functions ----------//
-// -------------------------------------//
+//-------------------------------------//
+//---------- Prior Functions ----------//
+//-------------------------------------//
+
+
 double ROCParameter::getMutationPriorStandardDeviation()
 {
 	return mutation_prior_sd;
@@ -715,9 +685,9 @@ void ROCParameter::setMutationPriorStandardDeviation(double _mutation_prior_sd)
 
 
 
-// ------------------------------------------------------------------//
-// ---------- Posterior, Variance, and Estimates Functions ----------//
-// ------------------------------------------------------------------//
+//------------------------------------------------------------------//
+//---------- Posterior, Variance, and Estimates Functions ----------//
+//------------------------------------------------------------------//
 
 
 
@@ -731,21 +701,16 @@ double ROCParameter::getNoiseOffsetPosteriorMean(unsigned index, unsigned sample
 
 	if (samples > traceLength)
 	{
-#ifndef STANDALONE
-		Rf_warning("Warning in ROCParameter::getNoiseOffsetPosteriorMean throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
-				samples, traceLength);
-#else
-		std::cerr << "Warning in ROCParameter::getNoiseOffsetPosteriorMean throws: Number of anticipated samples ("
-		<< samples << ") is greater than the length of the available trace (" << traceLength << ")."
-		<< "Whole trace is used for posterior estimate! \n";
-#endif
+		my_printError("Warning in ROCParameter::getNoiseOffsetPosteriorMean throws: Number of anticipated samples ");
+		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n", samples, traceLength);
+
 		samples = traceLength;
 	}
 	unsigned start = traceLength - samples;
+
 	for (unsigned i = start; i < traceLength; i++)
-	{
 		posteriorMean += NoiseOffsetTrace[i];
-	}
+
 	return posteriorMean / (double)samples;
 }
 
@@ -756,14 +721,9 @@ double ROCParameter::getNoiseOffsetVariance(unsigned index, unsigned samples, bo
 	unsigned traceLength = lastIteration;
 	if (samples > traceLength)
 	{
-#ifndef STANDALONE
-		Rf_warning("Warning in ROCParameter::getNoiseOffsetVariance throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n",
-				samples, traceLength);
-#else
-		std::cerr << "Warning in Parameter::getNoiseOffsetVariance throws: Number of anticipated samples (" << samples
-		<< ") is greater than the length of the available trace (" << traceLength << ")."
-		<< "Whole trace is used for posterior estimate! \n";
-#endif
+		my_printError("Warning in ROCParameter::getNoiseOffsetVariance throws: Number of anticipated samples ");
+		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n", samples, traceLength);
+
 		samples = traceLength;
 	}
 	double posteriorMean = getNoiseOffsetPosteriorMean(index, samples);
@@ -781,30 +741,31 @@ double ROCParameter::getNoiseOffsetVariance(unsigned index, unsigned samples, bo
 }
 
 
-// ----------------------------------------------//
-// ---------- Adaptive Width Functions ----------//
-// ----------------------------------------------//
+//----------------------------------------------//
+//---------- Adaptive Width Functions ----------//
+//----------------------------------------------//
 
 void ROCParameter::adaptNoiseOffsetProposalWidth(unsigned adaptationWidth, bool adapt)
 {
-	for (unsigned i = 0; i < getNumObservedPhiSets(); i++) {
+	for (unsigned i = 0; i < getNumObservedPhiSets(); i++)
+	{
 		double acceptanceLevel = numAcceptForNoiseOffset[i] / (double)adaptationWidth;
 		traces.updateSynthesisOffsetAcceptanceRatioTrace(i, acceptanceLevel);
-		if (adapt) {
-			if (acceptanceLevel < 0.2) {
+		if (adapt)
+		{
+			if (acceptanceLevel < 0.2)
 				std_NoiseOffset[i] *= 0.8;
-			}
-			if (acceptanceLevel > 0.3) {
+			if (acceptanceLevel > 0.3)
 				std_NoiseOffset[i] *= 1.2;
-			}
+
 			numAcceptForNoiseOffset[i] = 0u;
 		}
 	}
 }
 
-// -------------------------------------//
-// ---------- Other Functions ----------//
-// -------------------------------------//
+//-------------------------------------//
+//---------- Other Functions ----------//
+//-------------------------------------//
 
 
 void ROCParameter::setNumObservedPhiSets(unsigned _phiGroupings)
@@ -835,9 +796,9 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
 	}
 }
 
-// -----------------------------------------------------------------------------------------------------//
-// ---------------------------------------- R SECTION --------------------------------------------------//
-// -----------------------------------------------------------------------------------------------------//
+//-----------------------------------------------------------------------------------------------------//
+//---------------------------------------- R SECTION --------------------------------------------------//
+//-----------------------------------------------------------------------------------------------------//
 
 
 
@@ -908,7 +869,7 @@ void ROCParameter::initCovarianceMatrix(SEXP _matrix, std::string aa)
 		}
 	}
 	CovarianceMatrix m(covMatrix);
-	m.choleskiDecomposition();
+	m.choleskyDecomposition();
 	covarianceMatrix[aaIndex] = m;
 }
 

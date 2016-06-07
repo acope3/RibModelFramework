@@ -29,20 +29,11 @@ Gene::Gene() : seq(""), id(""), description("")
 //is a multiple of three (three is needed because of the size of codons).
 Gene::Gene(std::string _seq, std::string _id, std::string _desc) : seq(_seq), id(_id), description(_desc)
 {
-    cleanSeq();
+    //cleanSeq();
 	if (seq.length() % 3 == 0)
-	{
 		geneData.processSequence(_seq);
-	}
-	else 
-	{
-#ifndef STANDALONE
-		Rf_warning("Gene: %s has sequence length NOT multiple of 3 after cleaning of the sequence!\nGene data is NOT processed! \nValid characters are A,C,T,G, and N \n", id.c_str());
-#else
-		std::cerr << "Gene: " << id << " has sequence length NOT multiple of 3 after cleaning of the sequence!" <<
-				"\nGene data is NOT processed! \nValid characters are A,C,T,G, and N \n";
-#endif
-	}
+	else
+		my_printError("WARNING: Gene: % has sequence length NOT multiple of 3 after cleaning of the sequence!\nGene data is NOT processed!\nValid characters are A,C,T,G, and N \n", id);
 }
 
 
@@ -85,7 +76,6 @@ bool Gene::operator==(const Gene& other) const
 {
     bool match = true;
 
-
     if(this->seq != other.seq) { match = false; }
     if(this->id != other.id) { match = false; }
     if(this->description != other.description) { match = false; }
@@ -118,13 +108,14 @@ Gene::~Gene()
 //Removes any characters not specified in the valid string
 //defined (ACGTN). Prevents non-nucleotide characters from
 //being found in the gene sequence.
+//Note: Deprecated! See SequenceSummary.cpp -> processSequence.
+//We should not tamper with individual erroneous characters.
 void Gene::cleanSeq()
 {
     std::string valid = "ACGTN";
     for (unsigned i = 0; i < seq.length(); i++) {
-        if (valid.find(seq[i]) == std::string::npos) {
+        if (valid.find(seq[i]) == std::string::npos)
             seq.erase(i);
-        }
     }
 }
 
@@ -177,37 +168,33 @@ std::string Gene::getSequence()
 
 //setSequence (RCPP EXPOSED)
 //Arguments: sequence
-//Takes the specified sequence string and cleans it. Provided it
-//that the remaining string length is a multiple of 3, the string
-//is processed and set. NOTE: The string will still be set, even
-//if it is invalid.
+//Takes the specified sequence string, clearing the current sequence summary. Provided
+//that the new string length is a multiple of 3, the string
+//is processed and set. If not, it is not processed.
+//NOTE: The seq string will still be set, even if it is invalid.
+//NOTE: As part of changing the sequence, the sequence summary is also cleared.
 void Gene::setSequence(std::string _seq)
 {
+    geneData.clear();
     std::transform(_seq.begin(), _seq.end(), _seq.begin(), ::toupper);
     seq = _seq;
-    cleanSeq();
+    //cleanSeq();
 	if (seq.length() % 3 == 0)
 	{
 		bool check = geneData.processSequence(seq);
 		if (!check)
-		{
-#ifndef STANDALONE
-			Rf_warning("Error with gene %s\nBad codons found!\n", id.c_str());
-#else
-			std::cerr << "Error with gene " << id << "\nBad codons found!\n";
-#endif
-		}
+			my_printError("WARNING: Error with gene %\nBad codons found!\n", id);
 	}
 	else
-	{
-#ifndef STANDALONE
-		Rf_warning("Gene: %s has sequence length NOT multiple of 3 after cleaning of the sequence!\nGene data is NOT processed! \nValid characters are A,C,T,G, and N \n", id.c_str());
-#else
-		std::cerr << "Gene: " << id << " has sequence length NOT multiple of 3 after cleaning of the sequence!" <<
-				"\nGene data is NOT processed! \nValid characters are A,C,T,G, and N \n";
-#endif
-	}
+		my_printError("WARNING: Gene: % has sequence length NOT multiple of 3 after cleaning of the sequence!\nGene data is NOT processed!\nValid characters are A,C,T,G, and N \n", id);
 }
+
+
+std::vector <unsigned> Gene::getRFP_count()
+{
+    return geneData.getRFP_count();
+}
+
 
 void Gene::addRFP_count(std::vector <unsigned> RFP_counts) {
     geneData.setRFP_count(RFP_counts);
@@ -322,12 +309,13 @@ Gene Gene::reverseComplement()
 }
 
 
-//toAASequence (NOT EXPOSED)
-//Arguments: None
-//Returns a string of amino acids corresponding to the gene's
-//sequence string. The string is looked at as codons and the codons
-//are then mapped to their respective amino acid. NOTE: This could crash if
-//the stored seq string is not of length three.
+/* toAASequence (NOT EXPOSED)
+ * Arguments: None
+ * Returns a string of amino acids corresponding to the gene's
+ * sequence string. The string is looked at as codons and the codons
+ * are then mapped to their respective amino acid. NOTE: This could crash if
+ * the stored seq string is not of length three.
+*/
 std::string Gene::toAASequence()
 {
     std::string aaseq = "";
@@ -338,8 +326,6 @@ std::string Gene::toAASequence()
     }
     return aaseq;
 }
-
-
 
 
 
@@ -363,7 +349,7 @@ unsigned Gene::getAACount(std::string aa)
     }
     else
     {
-        Rprintf("Invalid string given. Returning 0.\n");
+        my_print("Invalid string given. Returning 0.\n");
     }
     return rv;
 }
@@ -379,7 +365,7 @@ unsigned Gene::getCodonCount(std::string& codon)
     }
     else
     {
-        Rprintf("Invalid codon given. Returning 0.\n");
+        my_print("Invalid codon given. Returning 0.\n");
     }
     return rv;
 }
@@ -394,7 +380,7 @@ unsigned Gene::getRFPObserved(std::string codon)
     }
     else
     {
-        Rprintf("Invalid codon given. Returning 0.\n");
+        my_print("Invalid codon given. Returning 0.\n");
     }
     return rv;
 }
@@ -413,7 +399,7 @@ std::vector <unsigned> Gene::getCodonPositions(std::string codon)
     }
     else
     {
-        Rprintf("Invalid codon given. Returning empty vector.\n");
+        my_print("Invalid codon given. Returning empty vector.\n");
     }
 
 

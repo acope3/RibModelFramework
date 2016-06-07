@@ -1,22 +1,22 @@
 #ifndef MCMCALGORITHM_H
 #define MCMCALGORITHM_H
 
-#include <vector>
-#include <cstdlib>
-#include <sstream>
-#include <chrono>
-#include <iostream>
-#include <fstream>
-#include <stdlib.h> //can be removed later
-#ifndef STANDALONE
-#include <Rcpp.h>
-#endif
 
 #include "ROC/ROCModel.h"
 #include "RFP/RFPModel.h"
 #include "FONSE/FONSEModel.h"
 
 
+#include <vector>
+#include <cstdlib>
+#include <sstream>
+#include <chrono>
+#include <fstream>
+#include <stdlib.h> //can be removed later
+
+#ifndef STANDALONE
+#include <Rcpp.h>
+#endif
 
 class MCMCAlgorithm
 {
@@ -47,7 +47,7 @@ class MCMCAlgorithm
 		//Acceptance Rejection Functions:
 		double acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, Model& model, int iteration);
 		void acceptRejectCodonSpecificParameter(Genome& genome, Model& model, int iteration);
-		void acceptRejectHyperParameter(Genome &genome, Model& model, int iteration);
+		void acceptRejectHyperParameter(Genome &genome, Model& model, unsigned iteration);
 
 	public:
 
@@ -59,11 +59,10 @@ class MCMCAlgorithm
 		virtual ~MCMCAlgorithm();
 	
 
-
 		//MCMC Functions:
-		void run(Genome& genome, Model& model, unsigned numCores = 1u, unsigned divergenceIterations = 0u);
-		void varyInitialConditions(Genome& genome, Model& model, unsigned divergenceIterations);
-		double calculateGewekeScore(unsigned current_iteration);
+		void run(Genome& genome, Model& model, unsigned numCores = 1u, unsigned divergenceIterations = 0u); //TODO: UNTESTED
+		void varyInitialConditions(Genome& genome, Model& model, unsigned divergenceIterations); //TODO: UNTESTED
+		double calculateGewekeScore(unsigned current_iteration); //TODO: UNTESTED
 
 		bool isEstimateSynthesisRate();
 		bool isEstimateCodonSpecificParameter();
@@ -75,15 +74,15 @@ class MCMCAlgorithm
 		void setEstimateHyperParameter(bool in);
 		void setEstimateMixtureAssignment(bool in);
 
-		void setRestartFileSettings(std::string filename, unsigned interval, bool multiple);
+		void setRestartFileSettings(std::string filename, unsigned interval, bool multiple); //TODO: UNTESTED
 		void setStepsToAdapt(unsigned steps);
 		int getStepsToAdapt();
 
 		std::vector<double> getLogLikelihoodTrace();
-		double getLogLikelihoodPosteriorMean(unsigned samples);
+		double getLogLikelihoodPosteriorMean(unsigned samples); //TODO: UNTESTED
 
-		static std::vector<double> acf(std::vector<double>& x, int nrows, int ncols, int lagmax, bool correlation, bool demean);
-		static std::vector<std::vector<double>> solveToeplitzMatrix(int lr, std::vector<double> r, std::vector<double> g);
+		static std::vector<double> acf(std::vector<double>& x, int nrows, int ncols, int lagmax, bool correlation, bool demean); //TODO: UNTESTED
+		static std::vector<std::vector<double>> solveToeplitzMatrix(int lr, std::vector<double> r, std::vector<double> g); //TODO: UNTESTED
 
 
 
@@ -92,7 +91,7 @@ class MCMCAlgorithm
 
 #ifndef STANDALONE
 
-		//Other Functions:
+		//Other Functions (All tested):
     	unsigned getSamples();
     	unsigned getThining();
     	unsigned getAdaptiveWidth();
@@ -107,3 +106,11 @@ class MCMCAlgorithm
 };
 
 #endif // MCMCALGORITHM_H
+
+
+/* ----------------------------- RCPP NOTE !!!!! -------------------------------------------- */
+//                                                                                            //
+// The functions declared and defined in the standalone block could be moved up to the C++    //
+// side. These are R specific because of how RCPP deals with constructors, but having these   //
+// functions in C++ would not affect the framework.                                           //
+/* ----------------------------- RCPP NOTE !!!!! -------------------------------------------- */

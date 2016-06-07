@@ -1,6 +1,10 @@
 #ifndef GENOME_H
 #define GENOME_H
 
+
+#include "Gene.h"
+
+
 #include <vector>
 #include <string>
 #include <map>
@@ -11,8 +15,6 @@
 #ifndef STANDALONE
 #include <Rcpp.h>
 #endif
-
-#include "Gene.h"
 
 class Model;
 class Genome
@@ -37,8 +39,9 @@ class Genome
 		void readFasta(std::string filename, bool Append = false);
 		void writeFasta(std::string filename, bool simulated = false);
 		void readRFPFile(std::string filename);
-		void readPANSEFile(std::string filename);
 		void writeRFPFile(std::string filename, bool simulated = false);
+		void readPANSEFile(std::string filename, bool Append = false);
+		//TODO: Add writePANSEFile function
 		void readObservedPhiValues(std::string filename, bool byId = true);
 
 
@@ -53,14 +56,13 @@ class Genome
 		//Other Functions:
 		unsigned getGenomeSize(bool simulated = false);
 		void clear();
-		Genome getGenomeForGeneIndicies(std::vector <unsigned> indicies, bool simulated = false); //NOTE: If simulated is true, it will return a genome with the simulated genes, but the returned genome's genes vector will contain the simulated genes.
+		Genome getGenomeForGeneIndices(std::vector <unsigned> indices, bool simulated = false);
 		std::vector<unsigned> getCodonCountsPerGene(std::string codon);
 
 
 		//Testing Functions:
 		std::vector <unsigned> getNumGenesWithPhi();
 		void setNumGenesWithPhi(std::vector <unsigned> newVector);
-
 
 
 		//R Section:
@@ -70,7 +72,7 @@ class Genome
 		bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);
 		Gene& getGeneByIndex(unsigned index, bool simulated = false);
 		Gene& getGeneById(std::string ID, bool simulated = false);
-		Genome getGenomeForGeneIndiciesR(std::vector <unsigned> indicies, bool simulated = false);
+		Genome getGenomeForGeneIndicesR(std::vector <unsigned> indices, bool simulated = false);
 
 #endif //STANDALONE
 

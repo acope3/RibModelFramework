@@ -72,21 +72,17 @@ SequenceSummary::SequenceSummary(const std::string& sequence)
 SequenceSummary::SequenceSummary(const SequenceSummary& other)
 {
 	codonPositions.resize(other.codonPositions.size());
-	for (unsigned i = 0u; i < codonPositions.size(); i++) {
+	for (unsigned i = 0u; i < codonPositions.size(); i++)
 		codonPositions[i] = other.codonPositions[i];
-	}
 
-	for (unsigned i = 0u; i < 64; i++) {
+	for (unsigned i = 0u; i < 64; i++)
 		ncodons[i] = other.ncodons[i];
-	}
 
-	for (unsigned i = 0u; i < 22; i++) {
+	for (unsigned i = 0u; i < 22; i++)
 		naa[i] = other.naa[i];
-	}
 
-	for (unsigned i = 0u; i < 64; i++) {
+	for (unsigned i = 0u; i < 64; i++)
 		RFPObserved[i] = other.RFPObserved[i];
-	}
 }
 
 
@@ -96,18 +92,17 @@ SequenceSummary& SequenceSummary::operator=(const SequenceSummary& rhs)
 
 	// TODO(CEDRIC): shouldn't a simple = do the job? see http://www.cplusplus.com/reference/vector/vector/operator=/
 	codonPositions.resize(rhs.codonPositions.size());
-	for (unsigned i = 0u; i < codonPositions.size(); i++) {
+	for (unsigned i = 0u; i < codonPositions.size(); i++)
 		codonPositions[i] = rhs.codonPositions[i];
-	}
 
-	for (unsigned i = 0u; i < 64; i++) {
+	for (unsigned i = 0u; i < 64; i++)
+	{
 		ncodons[i] = rhs.ncodons[i];
 		RFPObserved[i] = rhs.RFPObserved[i];
 	}
 
-	for (unsigned i = 0u; i < 22; i++) {
+	for (unsigned i = 0u; i < 22; i++)
 		naa[i] = rhs.naa[i];
-	}
 
 	RFP_count = rhs.RFP_count;
 
@@ -119,11 +114,11 @@ bool SequenceSummary::operator==(const SequenceSummary& other) const
 {
 	bool match = true;
 
-	if (this->naa != other.naa) { match = false;}
-	if (this->ncodons != other.ncodons) { match = false;}
-	if (this->codonPositions != other.codonPositions) { match = false;}
-	if (this->RFPObserved != other.RFPObserved) { match = false;}
-	if (this->RFP_count != other.RFP_count) {match = false;}
+	if (this->naa != other.naa) { match = false; }
+	if (this->ncodons != other.ncodons) { match = false; }
+	if (this->codonPositions != other.codonPositions) { match = false; }
+	if (this->RFPObserved != other.RFPObserved) { match = false; }
+	if (this->RFP_count != other.RFP_count) {match = false; }
 
 	return match;
 }
@@ -217,15 +212,26 @@ void SequenceSummary::clear()
 {
 	codonPositions.clear();
 	RFP_count.clear();
-	for(unsigned k = 0; k < 64; k++)
+	for (unsigned k = 0; k < 64; k++)
 	{
 		ncodons[k] = 0;
 		RFPObserved[k] = 0;
 	}
-	for(unsigned k = 0; k < 22; k++) { naa[k] = 0; }
+	for (unsigned k = 0; k < 22; k++) { naa[k] = 0; }
 }
 
 
+/* IMPORTANT NOTE
+ * ncodons and RFPObserved are mutually exclusive in model implementation.
+ * Thus, a gene written using ncodons will have RFP_Observed values that are irrelevant
+ * or untrue, but this will not affect the model itself.
+ * The converse is also true: an RFP model does not depend on any codons that do not have RFP_Counts
+ * and in general can ignore ncodons.
+ *
+ * This implementation choice significantly eases the input of RFP data.
+ * A possible implementation in the future would be to only change one of these values.
+ */
+// Returns a bool for error checking purposes related to setSequence in Gene.cpp
 bool SequenceSummary::processSequence(const std::string& sequence)
 {
 	//NOTE! Clear() cannot be called in this function because of the RFP model.
@@ -251,16 +257,13 @@ bool SequenceSummary::processSequence(const std::string& sequence)
 		{
 			aaID = codonToAAIndex(codon);
 			ncodons[codonID]++;
+			RFPObserved[codonID]++; // See documentation
 			naa[aaID]++;
 			codonPositions[codonID].push_back(i / 3);
 		}
 		else
 		{
-#ifndef STANDALONE
-			Rf_warning("Codon %s not recognized!\n Codon will be ignored!\n", codon.c_str());
-#else
-			std::cerr << "WARNING: Codon " << codon << " not recognized!\n Codon will be ignored!\n";
-#endif
+			my_printError("WARNING: Codon % not recognized!\n Codon will be ignored!\n", codon);
 			check = false;
 		}
 	}
@@ -282,6 +285,7 @@ unsigned SequenceSummary::AAToAAIndex(std::string aa)
 }
 
 
+//TODO: test this function. See note in testSequenceSummary.R.
 void SequenceSummary::AAIndexToCodonRange(unsigned aaIndex, unsigned& startAAIndex, unsigned& endAAIndex, bool forParamVector)
 {
 	std::string aa = indexToAA(aaIndex);
@@ -390,19 +394,10 @@ void SequenceSummary::AAToCodonRange(std::string aa, unsigned& startAAIndex, uns
 	default: // INVALID AA
 		startAAIndex = 0;
 		endAAIndex = 0;
-		std::cout << AA << std::endl;
-//#ifndef STANDALONE
-//		Rf_warning("Invalid Amino Acid given (%s), returning 0,0\n", aa.c_str());
-//#else
-		std::cerr << "Invalid AA given, returning 0,0\n";
-//#endif
+		my_print("%\n", AA);
+		my_printError("Invalid AA given, returning 0,0\n");
 		break;
 	}
-	//std::array<unsigned, 2> aaRange;
-	//aaRange[0] = startAAIndex;
-	//aaRange[1] = endAAIndex;
-
-	//return aaRange;
 }
 
 
@@ -414,12 +409,15 @@ std::vector<std::string> SequenceSummary::AAToCodon(std::string aa, bool forPara
 	unsigned aaStart;
 	unsigned aaEnd;
 	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, forParamVector);
-	if(forParamVector){
+	if (forParamVector)
+	{
 		for (unsigned i = aaStart; i < aaEnd; i++)
 		{
 			RV.push_back(codonArrayParameter[i]);
 		}
-	}else{
+	}
+	else
+	{
 		for (unsigned i = aaStart; i < aaEnd; i++)
 		{
 			RV.push_back(codonArray[i]);
@@ -510,12 +508,10 @@ unsigned SequenceSummary::codonToIndex(std::string& codon, bool forParamVector)
 	}
 	else 
 	{
-		if(forParamVector)
-		{
+		if (forParamVector)
 			i = SequenceSummary::codonToIndexWithoutReference.find(codon) -> second;
-		}else{
+		else
 			i = SequenceSummary::codonToIndexWithReference.find(codon) -> second;
-		}
 	}
 	return i;
 }
@@ -612,13 +608,12 @@ unsigned SequenceSummary::GetNumCodonsForAA(std::string& aa, bool forParamVector
 	case 'X':
 		ncodon = 3;
 		break;
-	default: // INVALID AA
+		default: // INVALID AA
 
-#ifndef STANDALONE
-		Rf_warning("Invalid Amino Acid given (%s), returning 0,0\n", aa.c_str());
-#else
-		std::cerr << "Invalid aa given, returning 0\n";
-#endif
+
+		my_printError("WARNING: Invalid Amino Acid given (%), returning 0,0\n", aa);
+
+
 		break;
 	}
 	return (forParamVector ? (ncodon - 1) : ncodon);
@@ -627,9 +622,9 @@ unsigned SequenceSummary::GetNumCodonsForAA(std::string& aa, bool forParamVector
 
 char SequenceSummary::complimentNucleotide(char ch)
 {
-	if( ch == 'A' ) return 'T';
-	else if( ch == 'T' ) return 'A';
-	else if( ch == 'C' ) return 'G';
+	if ( ch == 'A' ) return 'T';
+	else if ( ch == 'T' ) return 'A';
+	else if ( ch == 'C' ) return 'G';
 	else return 'C';
 }
 

@@ -1,4 +1,4 @@
-#include "include/RFP/RFPModel.h"
+#include "include/PANSE/PANSEModel.h"
 
 //R runs only
 #ifndef STANDALONE
@@ -10,13 +10,13 @@ using namespace Rcpp;
 //----------- Constructors & Destructors ---------- //
 //--------------------------------------------------//
 
-RFPModel::RFPModel() : Model()
+PANSEModel::PANSEModel() : Model()
 {
 	parameter = 0;
 	//ctor
 }
 
-RFPModel::~RFPModel()
+PANSEModel::~PANSEModel()
 {
 	//dtor
 	//TODO: call Parent's deconstructor
@@ -26,12 +26,23 @@ RFPModel::~RFPModel()
 
 
 
-double RFPModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
+double PANSEModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
 													   unsigned currRFPObserved, unsigned currNumCodonsInMRNA, double phiValue)
 {
+	//RFP Calc
 	double logLikelihood = ((std::lgamma((currNumCodonsInMRNA * currAlpha) + currRFPObserved)) - (std::lgamma(currNumCodonsInMRNA * currAlpha)))
 						   + (currRFPObserved * (std::log(phiValue) - std::log(currLambdaPrime + phiValue)))
 						   + ((currNumCodonsInMRNA * currAlpha) * (std::log(currLambdaPrime) - std::log(currLambdaPrime + phiValue)));
+
+
+	//TODO: (Hollis) Need to translate little sigma sub g * (i - 1) into something useful
+	//unsigned newVar = 0;
+
+	/* TODO: PANSE calc
+	double logLikelihood = ((std::lgamma((currNumCodonsInMRNA * currAlpha) + currRFPObserved)) - (std::lgamma(currNumCodonsInMRNA * currAlpha)))
+						   + (currRFPObserved * (std::log(phiValue * newVar) - std::log(currLambdaPrime + phiValue * newVar)))
+						   + ((currNumCodonsInMRNA * currAlpha) * (std::log(currLambdaPrime * newVar) - std::log(currLambdaPrime + phiValue * newVar)));
+	*/
 
 	return logLikelihood;
 }
@@ -45,7 +56,7 @@ double RFPModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double 
 //------------------------------------------------//
 
 
-void RFPModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k, double* logProbabilityRatio)
+void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k, double* logProbabilityRatio)
 {
 
 	double logLikelihood = 0.0;
@@ -66,8 +77,8 @@ void RFPModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 	{
 		std::string codon = getGrouping(index);
 
-		double currAlpha = getParameterForCategory(alphaCategory, RFPParameter::alp, codon, false);
-		double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, RFPParameter::lmPri, codon, false);
+		double currAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, false);
+		double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PANSEParameter::lmPri, codon, false);
 		unsigned currRFPObserved = gene.geneData.getRFPObserved(index);
 
 		unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(index);
@@ -91,7 +102,7 @@ void RFPModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 }
 
 
-void RFPModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures)
+void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures)
 {
 	double logLikelihood = 0.0;
 	double logLikelihood_proposed = 0.0;
@@ -118,11 +129,11 @@ void RFPModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 		if (currNumCodonsInMRNA == 0) continue;
 
 
-		double currAlpha = getParameterForCategory(alphaCategory, RFPParameter::alp, grouping, false);
-		double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, RFPParameter::lmPri, grouping, false);
+		double currAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, grouping, false);
+		double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PANSEParameter::lmPri, grouping, false);
 
-		double propAlpha = getParameterForCategory(alphaCategory, RFPParameter::alp, grouping, true);
-		double propLambdaPrime = getParameterForCategory(lambdaPrimeCategory, RFPParameter::lmPri, grouping, true);
+		double propAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, grouping, true);
+		double propLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PANSEParameter::lmPri, grouping, true);
 
 
 		logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
@@ -132,7 +143,7 @@ void RFPModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 }
 
 
-void RFPModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration, std::vector <double> & logProbabilityRatio)
+void PANSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration, std::vector <double> & logProbabilityRatio)
 {
 
 	double lpr = 0.0; // this variable is only needed because OpenMP doesn't allow variables in reduction clause to be reference
@@ -188,13 +199,13 @@ void RFPModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 //----------------------------------------------------------//
 
 
-void RFPModel::initTraces(unsigned samples, unsigned num_genes)
+void PANSEModel::initTraces(unsigned samples, unsigned num_genes)
 {
 	parameter->initAllTraces(samples, num_genes);
 }
 
 
-void RFPModel::writeRestartFile(std::string filename)
+void PANSEModel::writeRestartFile(std::string filename)
 {
 	return parameter->writeEntireRestartFile(filename);
 }
@@ -209,31 +220,31 @@ void RFPModel::writeRestartFile(std::string filename)
 //----------------------------------------//
 
 
-double RFPModel::getCategoryProbability(unsigned i)
+double PANSEModel::getCategoryProbability(unsigned i)
 {
 	return parameter->getCategoryProbability(i);
 }
 
 
-unsigned RFPModel::getMutationCategory(unsigned mixture)
+unsigned PANSEModel::getMutationCategory(unsigned mixture)
 {
 	return parameter->getMutationCategory(mixture);
 }
 
 
-unsigned RFPModel::getSelectionCategory(unsigned mixture)
+unsigned PANSEModel::getSelectionCategory(unsigned mixture)
 {
 	return parameter->getSelectionCategory(mixture);
 }
 
 
-unsigned RFPModel::getSynthesisRateCategory(unsigned mixture)
+unsigned PANSEModel::getSynthesisRateCategory(unsigned mixture)
 {
 	return parameter->getSynthesisRateCategory(mixture);
 }
 
 
-std::vector<unsigned> RFPModel::getMixtureElementsOfSelectionCategory(unsigned k)
+std::vector<unsigned> PANSEModel::getMixtureElementsOfSelectionCategory(unsigned k)
 {
 	return parameter->getMixtureElementsOfSelectionCategory(k);
 }
@@ -247,13 +258,13 @@ std::vector<unsigned> RFPModel::getMixtureElementsOfSelectionCategory(unsigned k
 //------------------------------------------//
 
 
-unsigned RFPModel::getGroupListSize()
+unsigned PANSEModel::getGroupListSize()
 {
 	return parameter->getGroupListSize();
 }
 
 
-std::string RFPModel::getGrouping(unsigned index)
+std::string PANSEModel::getGrouping(unsigned index)
 {
 	return parameter->getGrouping(index);
 }
@@ -267,19 +278,19 @@ std::string RFPModel::getGrouping(unsigned index)
 //---------------------------------------------------//
 
 
-double RFPModel::getStdDevSynthesisRate(unsigned selectionCategory, bool proposed)
+double PANSEModel::getStdDevSynthesisRate(unsigned selectionCategory, bool proposed)
 {
 	return parameter->getStdDevSynthesisRate(selectionCategory, proposed);
 }
 
 
-double RFPModel::getCurrentStdDevSynthesisRateProposalWidth()
+double PANSEModel::getCurrentStdDevSynthesisRateProposalWidth()
 {
 	return parameter->getCurrentStdDevSynthesisRateProposalWidth();
 }
 
 
-void RFPModel::updateStdDevSynthesisRate()
+void PANSEModel::updateStdDevSynthesisRate()
 {
 	parameter->updateStdDevSynthesisRate();
 }
@@ -293,13 +304,13 @@ void RFPModel::updateStdDevSynthesisRate()
 //----------------------------------------------//
 
 
-double RFPModel::getSynthesisRate(unsigned index, unsigned mixture, bool proposed)
+double PANSEModel::getSynthesisRate(unsigned index, unsigned mixture, bool proposed)
 {
 	return parameter->getSynthesisRate(index, mixture, proposed);
 }
 
 
-void RFPModel::updateSynthesisRate(unsigned i, unsigned k)
+void PANSEModel::updateSynthesisRate(unsigned i, unsigned k)
 {
 	parameter->updateSynthesisRate(i, k);
 }
@@ -313,13 +324,13 @@ void RFPModel::updateSynthesisRate(unsigned i, unsigned k)
 //-----------------------------------------//
 
 
-unsigned RFPModel::getLastIteration()
+unsigned PANSEModel::getLastIteration()
 {
 	return parameter->getLastIteration();
 }
 
 
-void RFPModel::setLastIteration(unsigned iteration)
+void PANSEModel::setLastIteration(unsigned iteration)
 {
 	parameter->setLastIteration(iteration);
 }
@@ -333,43 +344,43 @@ void RFPModel::setLastIteration(unsigned iteration)
 //-------------------------------------//
 
 
-void RFPModel::updateStdDevSynthesisRateTrace(unsigned sample)
+void PANSEModel::updateStdDevSynthesisRateTrace(unsigned sample)
 {
 	parameter->updateStdDevSynthesisRateTrace(sample);
 }
 
 
-void RFPModel::updateSynthesisRateTrace(unsigned sample, unsigned i)
+void PANSEModel::updateSynthesisRateTrace(unsigned sample, unsigned i)
 {
 	parameter->updateSynthesisRateTrace(sample, i);
 }
 
 
-void RFPModel::updateMixtureAssignmentTrace(unsigned sample, unsigned i)
+void PANSEModel::updateMixtureAssignmentTrace(unsigned sample, unsigned i)
 {
 	parameter->updateMixtureAssignmentTrace(sample, i);
 }
 
 
-void RFPModel::updateMixtureProbabilitiesTrace(unsigned sample)
+void PANSEModel::updateMixtureProbabilitiesTrace(unsigned sample)
 {
 	parameter->updateMixtureProbabilitiesTrace(sample);
 }
 
 
-void RFPModel::updateCodonSpecificParameterTrace(unsigned sample, std::string codon)
+void PANSEModel::updateCodonSpecificParameterTrace(unsigned sample, std::string codon)
 {
 	parameter->updateCodonSpecificParameterTrace(sample, codon);
 }
 
 
-void RFPModel::updateHyperParameterTraces(unsigned sample)
+void PANSEModel::updateHyperParameterTraces(unsigned sample)
 {
 	updateStdDevSynthesisRateTrace(sample);
 }
 
 
-void RFPModel::updateTracesWithInitialValues(Genome & genome)
+void PANSEModel::updateTracesWithInitialValues(Genome & genome)
 {
 	std::vector <std::string> groupList = parameter->getGroupList();
 
@@ -394,25 +405,25 @@ void RFPModel::updateTracesWithInitialValues(Genome & genome)
 //----------------------------------------------//
 
 
-void RFPModel::adaptStdDevSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt)
+void PANSEModel::adaptStdDevSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt)
 {
 	parameter->adaptStdDevSynthesisRateProposalWidth(adaptiveWidth, adapt);
 }
 
 
-void RFPModel::adaptSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt)
+void PANSEModel::adaptSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt)
 {
 	parameter->adaptSynthesisRateProposalWidth(adaptiveWidth, adapt);
 }
 
 
-void RFPModel::adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, unsigned lastIteration, bool adapt)
+void PANSEModel::adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, unsigned lastIteration, bool adapt)
 {
 	parameter->adaptCodonSpecificParameterProposalWidth(adaptiveWidth, lastIteration, adapt);
 }
 
 
-void RFPModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth, bool adapt)
+void PANSEModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth, bool adapt)
 {
 	adaptStdDevSynthesisRateProposalWidth(adaptiveWidth, adapt);
 }
@@ -426,85 +437,85 @@ void RFPModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth, bool ad
 //-------------------------------------//
 
 
-void RFPModel::proposeCodonSpecificParameter()
+void PANSEModel::proposeCodonSpecificParameter()
 {
 	parameter->proposeCodonSpecificParameter();
 }
 
 
-void RFPModel::proposeHyperParameters()
+void PANSEModel::proposeHyperParameters()
 {
 	parameter->proposeStdDevSynthesisRate();
 }
 
 
-void RFPModel::proposeSynthesisRateLevels()
+void PANSEModel::proposeSynthesisRateLevels()
 {
 	parameter->proposeSynthesisRateLevels();
 }
 
 
-unsigned RFPModel::getNumPhiGroupings()
+unsigned PANSEModel::getNumPhiGroupings()
 {
 	return parameter->getNumObservedPhiSets();
 }
 
 
-unsigned RFPModel::getMixtureAssignment(unsigned index)
+unsigned PANSEModel::getMixtureAssignment(unsigned index)
 {
 	return parameter->getMixtureAssignment(index);
 }
 
 
-unsigned RFPModel::getNumMixtureElements()
+unsigned PANSEModel::getNumMixtureElements()
 {
 	return parameter->getNumMixtureElements();
 }
 
 
-unsigned RFPModel::getNumSynthesisRateCategories()
+unsigned PANSEModel::getNumSynthesisRateCategories()
 {
 	return parameter->getNumSynthesisRateCategories();
 }
 
 
-void RFPModel::setNumPhiGroupings(unsigned value)
+void PANSEModel::setNumPhiGroupings(unsigned value)
 {
 	parameter->setNumObservedPhiSets(value);
 }
 
 
-void RFPModel::setMixtureAssignment(unsigned i, unsigned catOfGene)
+void PANSEModel::setMixtureAssignment(unsigned i, unsigned catOfGene)
 {
 	parameter->setMixtureAssignment(i, catOfGene);
 }
 
 
-void RFPModel::setCategoryProbability(unsigned mixture, double value)
+void PANSEModel::setCategoryProbability(unsigned mixture, double value)
 {
 	parameter->setCategoryProbability(mixture, value);
 }
 
 
-void RFPModel::updateCodonSpecificParameter(std::string aa)
+void PANSEModel::updateCodonSpecificParameter(std::string aa)
 {
 	parameter->updateCodonSpecificParameter(aa);
 }
 
 
-void RFPModel::updateGibbsSampledHyperParameters(Genome &genome)
+void PANSEModel::updateGibbsSampledHyperParameters(Genome &genome)
 {
 	//TODO: fill in
 }
 
 
-void RFPModel::updateAllHyperParameter()
+void PANSEModel::updateAllHyperParameter()
 {
 	updateStdDevSynthesisRate();
 }
 
 
-void RFPModel::updateHyperParameter(unsigned hp)
+void PANSEModel::updateHyperParameter(unsigned hp)
 {
 	// NOTE: when adding additional hyper parameter, also add to updateAllHyperParameter()
 	switch (hp) {
@@ -515,22 +526,22 @@ void RFPModel::updateHyperParameter(unsigned hp)
 }
 
 
-void RFPModel::simulateGenome(Genome &genome)
+void PANSEModel::simulateGenome(Genome &genome)
 {
 	for (unsigned geneIndex = 0; geneIndex < genome.getGenomeSize(); geneIndex++)
 	{
 		unsigned mixtureElement = getMixtureAssignment(geneIndex);
 		Gene gene = genome.getGene(geneIndex);
-		double phi = parameter -> getSynthesisRate(geneIndex, mixtureElement, false);
+		double phi = parameter->getSynthesisRate(geneIndex, mixtureElement, false);
 		Gene tmpGene = gene;
 		for (unsigned codonIndex = 0; codonIndex < 61; codonIndex++)
 		{
 			std::string codon = SequenceSummary::codonArray[codonIndex];
-			unsigned alphaCat = parameter -> getMutationCategory(mixtureElement);
-			unsigned lambdaPrimeCat = parameter -> getSelectionCategory(mixtureElement);
+			unsigned alphaCat = parameter->getMutationCategory(mixtureElement);
+			unsigned lambdaPrimeCat = parameter->getSelectionCategory(mixtureElement);
 
-			double alpha = getParameterForCategory(alphaCat, RFPParameter::alp, codon, false);
-			double lambdaPrime = getParameterForCategory(lambdaPrimeCat, RFPParameter::lmPri, codon, false);
+			double alpha = getParameterForCategory(alphaCat, PANSEParameter::alp, codon, false);
+			double lambdaPrime = getParameterForCategory(lambdaPrimeCat, PANSEParameter::lmPri, codon, false);
 
 			double alphaPrime = alpha * gene.geneData.getCodonCountForCodon(codon);
 
@@ -540,7 +551,7 @@ void RFPModel::simulateGenome(Genome &genome)
 				xx = rgamma(1, alphaPrime, 1.0/lambdaPrime);
 				xx = rpois(1, xx[0] * phi);
 				tmpGene.geneData.setRFPObserved(codonIndex, xx[0]);
-			#else
+#else
 			std::gamma_distribution<double> GDistribution(alphaPrime,1.0/lambdaPrime);
 			double tmp = GDistribution(Parameter::generator);
 			std::poisson_distribution<unsigned> PDistribution(phi * tmp);
@@ -553,7 +564,7 @@ void RFPModel::simulateGenome(Genome &genome)
 }
 
 
-void RFPModel::printHyperParameters()
+void PANSEModel::printHyperParameters()
 {
 	for (unsigned i = 0u; i < getNumSynthesisRateCategories(); i++)
 	{
@@ -563,19 +574,19 @@ void RFPModel::printHyperParameters()
 }
 
 
-void RFPModel::setParameter(RFPParameter &_parameter)
+void PANSEModel::setParameter(PANSEParameter &_parameter)
 {
 	parameter = &_parameter;
 }
 
 
-double RFPModel::calculateAllPriors()
+double PANSEModel::calculateAllPriors()
 {
 	return 0.0; //TODO(Cedric): implement me, see ROCModel
 }
 
 
-double RFPModel::getParameterForCategory(unsigned category, unsigned param, std::string codon, bool proposal)
+double PANSEModel::getParameterForCategory(unsigned category, unsigned param, std::string codon, bool proposal)
 {
 	return parameter->getParameterForCategory(category, param, codon, proposal);
 }

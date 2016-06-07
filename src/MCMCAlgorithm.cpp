@@ -28,10 +28,11 @@ using namespace Rcpp;
 //--------------------------------------------------//
 
 
-//MCMCAlgorithm constructor (RCPP EXPOSED)
-//Arguments: None
-//Sets up the object with the specified default values. Every step is a sample in
-//this case, so every iteration trace values will be stored. All parameters are estimated.
+/*MCMCAlgorithm constructor (RCPP EXPOSED)
+* Arguments: None
+* Sets up the object with the specified default values. Every step is a sample in
+* this case, so every iteration trace values will be stored. All parameters are estimated.
+*/
 MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * thining), estimateSynthesisRate(true),
 	estimateCodonSpecificParameter(true), estimateHyperParameter(true)
 {
@@ -45,11 +46,13 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * 
 	stepsToAdapt = -1;
 }
 
-//MCMCAlgorithm constructor (RCPP EXPOSED)
-//Arguments: number of samples wanted, thining of iterations to get samples, how many iterations adaptive witdth
-//can be changed, bool for where the synthesis rate, codon specific, and hyper paramters are estimated (respectively)
-//Sets up the object with the given parameters. Adaptive with is actually set to adaptive width * thining. NOTE:
-//hyper parameters normally affect synthesis rate parameters, so either both should be turned on or neither.
+
+/* MCMCAlgorithm constructor (RCPP EXPOSED)
+* Arguments: number of samples wanted, thining of iterations to get samples, how many iterations adaptive width
+* can be changed, bool for where the synthesis rate, codon specific, and hyper parameters are estimated (respectively)
+* Sets up the object with the given parameters. Adaptive with is actually set to adaptive width * thining. NOTE:
+* hyper parameters normally affect synthesis rate parameters, so either both should be turned on or neither.
+*/
 MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thining, unsigned _adaptiveWidth, bool _estimateSynthesisRate,
 							 bool _estimateCodonSpecificParameter, bool _estimateHyperParameter) : samples(_samples),
 							 thining(_thining), adaptiveWidth(_adaptiveWidth * thining),
@@ -67,9 +70,10 @@ MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thining, unsigned _ada
 }
 
 
-//MCMCAlgorithm destructor (NOT EXPOSED)
-//Arguments: None
-//Standard destructor for the object.
+/* MCMCAlgorithm destructor (NOT EXPOSED)
+* Arguments: None
+* Standard destructor for the object.
+*/
 MCMCAlgorithm::~MCMCAlgorithm()
 {
 	//dtor
@@ -83,16 +87,17 @@ MCMCAlgorithm::~MCMCAlgorithm()
 //---------- Acceptance Rejection Functions ----------//
 //----------------------------------------------------//
 
-//acceptRejectSynthesisRateLevelForAllGenes
-//Arguments: reference to a genome and a model. which iteration (step) is currently being estimated
-//Based on the logliklihood probabilities proposed for a gene (with and without reverse jump), it is decided
-//whether or not a synthesis rate is accepted for that gene or not. Mixture assignment is also updated when
-//applicable.
+/* acceptRejectSynthesisRateLevelForAllGenes (NOT EXPOSED)
+* Arguments: reference to a genome and a model. which iteration (step) is currently being estimated
+* Based on the logliklihood probabilities proposed for a gene (with and without reverse jump), it is decided
+* whether or not a synthesis rate is accepted for that gene or not. Mixture assignment is also updated when
+* applicable.
+*/
 double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, Model& model, int iteration)
 {
     //FILE * pFile;
-    //pFile = fopen ("/home/clandere/Desktop/myfile.txt","a");
-	// TODO move the likelihood calculation out off here. make it a void function again.
+    //pFile = fopen("/home/clandere/Desktop/myfile.txt","a");
+	// TODO move the likelihood calculation out of here. make it a void function again.
 
 	double logLikelihood = 0.0;
     double logLikelihood2 = 0.0;
@@ -109,7 +114,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	}
 
 	//initialize parameter's size
-	for(int i = 0; i < numGenes; i++)
+	for (unsigned i = 0u; i < numGenes; i++)
 	{
 		Gene *gene = &genome.getGene(i);
 
@@ -193,44 +198,39 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			probabilities[k] = probabilities[k] / normalizingProbabilityConstant;
 		}
 
-		for(unsigned k = 0u; k < numSynthesisRateCategories; k++)
+		for (unsigned k = 0u; k < numSynthesisRateCategories; k++)
 		{
 			// We do not need to add std::log(model.getCategoryProbability(k)) since it will cancel in the ratio!
 			double currLogLike = unscaledLogProb_curr[k];
 			double propLogLike = unscaledLogProb_prop[k];
-			if( -Parameter::randExp(1) < (propLogLike - currLogLike) )
+			if ( -Parameter::randExp(1) < (propLogLike - currLogLike) )
 			{
-                if(estimateSynthesisRate){
+                if (estimateSynthesisRate)
+				{
 				    model.updateSynthesisRate(i, k);
                     logLikelihood += probabilities[k] * unscaledLogPost_prop[k];
-                }else{
-                    logLikelihood += probabilities[k] * unscaledLogPost_curr[k]; // if phi is not estimatedd, it will always stay curr!    
                 }
-			}else{
-                if((iteration % thining) == 0)
-                logLikelihood += probabilities[k] * unscaledLogPost_curr[k];
+				else
+                    logLikelihood += probabilities[k] * unscaledLogPost_curr[k]; // if phi is not estimatedd, it will always stay curr!    
+			}
+			else
+			{
+                if ((iteration % thining) == 0)
+                	logLikelihood += probabilities[k] * unscaledLogPost_curr[k];
 			}
 		}
 
 		if (std::isinf(logLikelihood))
-		{
-#ifndef STANDALONE
-			Rprintf("\tInfinity reached (Gene: %d)\n", i);
-#else
-			std::cout << "\tInfinity reached (Gene: " << i << ")\n";
-#endif
-		}
+            my_print("\tInfinity reached (Gene: %)\n", i);
 
 		// Get category in which the gene is placed in.
 		// If we use multiple sequence observation (like different mutants) randMultinom needs a parameter N to place N observations in numMixture buckets
 		unsigned categoryOfGene = Parameter::randMultinom(probabilities, numMixtures);
-		if(estimateMixtureAssignment)
-		{
+		if (estimateMixtureAssignment)
 			model.setMixtureAssignment(i, categoryOfGene);
-		}
 
 		dirichletParameters[categoryOfGene] += 1;
-		if((iteration % thining) == 0)
+		if ((iteration % thining) == 0)
 		{
 			model.updateSynthesisRateTrace(iteration/thining, i);
 			model.updateMixtureAssignmentTrace(iteration/thining, i);
@@ -247,11 +247,11 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	logLikelihood += model.calculateAllPriors();
 	double *newMixtureProbabilities = new double[numMixtures]();
 	Parameter::randDirichlet(dirichletParameters, numMixtures, newMixtureProbabilities);
-	for(unsigned k = 0u; k < numMixtures; k++)
+	for (unsigned k = 0u; k < numMixtures; k++)
 	{
 		model.setCategoryProbability(k, newMixtureProbabilities[k]);
 	}
-	if((iteration % thining) == 0)
+	if ((iteration % thining) == 0)
 	{
 		model.updateMixtureProbabilitiesTrace(iteration/thining);
 	}
@@ -261,23 +261,29 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 }
 
 
+/* acceptRejectCodonSpecificParameter (NOT EXPOSED)
+ * Arguments: reference to a genome and a model. which iteration (step) is currently being estimated
+ * Calculates the logLikelihood for each grouping based on codon specific parameters. If this is greater
+ * than a random number from the exponential distribution we update the parameters from proposed to
+ * current. Update the trace when applicable.
+*/
 void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& model, int iteration)
 {
 	double acceptanceRatioForAllMixtures = 0.0;
 	unsigned size = model.getGroupListSize();
 
-	for(unsigned i = 0; i < size; i++)
+	for (unsigned i = 0; i < size; i++)
 	{
 		std::string grouping = model.getGrouping(i);
 
 		// calculate likelihood ratio for every Category for current AA
 		model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures);
-		if( -Parameter::randExp(1) < acceptanceRatioForAllMixtures )
+		if ( -Parameter::randExp(1) < acceptanceRatioForAllMixtures )
 		{
 			// moves proposed codon specific parameters to current codon specific parameters
 			model.updateCodonSpecificParameter(grouping);
 		}
-		if((iteration % thining) == 0)
+		if ((iteration % thining) == 0)
 		{
 			model.updateCodonSpecificParameterTrace(iteration/thining, grouping);
 		}
@@ -285,7 +291,12 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 }
 
 
-void MCMCAlgorithm::acceptRejectHyperParameter(Genome &genome, Model& model, int iteration)
+/* acceptRejectHyperParameter (NOT EXPOSED)
+ * Arguments: reference to a genome and a model. which iteration (step) is currently being estimated
+ * Calculates the logLikelihood for hyper parameters. If the calculated value is greater than a random number
+ * from the exponential distribution we update the parameters from proposed to current. Update the trace when applicable.
+*/
+void MCMCAlgorithm::acceptRejectHyperParameter(Genome &genome, Model& model, unsigned iteration)
 {
 	std::vector <double> logProbabilityRatios;
 
@@ -294,24 +305,14 @@ void MCMCAlgorithm::acceptRejectHyperParameter(Genome &genome, Model& model, int
 	for (unsigned i = 0; i < logProbabilityRatios.size(); i++)
 	{
 		if (!std::isfinite(logProbabilityRatios[i]))
-		{
-#ifndef STANDALONE
-			Rprintf("logProbabilityRatio %d not finite!\n", i);
-#else
-			std::cout << "logProbabilityRatio " << i << " not finite!\n";
-#endif
-		}
+            my_print("logProbabilityRatio % not finite!\n", i);
 
 		if (-Parameter::randExp(1) < logProbabilityRatios[i])
-		{
 			model.updateHyperParameter(i);
-		}
 	}
 
-	if((iteration % thining) == 0)
-	{
+	if ((iteration % thining) == 0)
 		model.updateHyperParameterTraces(iteration/thining);
-	}
 }
 
 
@@ -322,7 +323,12 @@ void MCMCAlgorithm::acceptRejectHyperParameter(Genome &genome, Model& model, int
 //---------- MCMC Functions ----------//
 //------------------------------------//
 
-
+/* run (RCPP EXPOSED)
+ * Arguments: reference to a genome and a model. number of cores to run on (unless running on a MAC). Number of
+ * iterations to allow initial conditions to vary.
+ * Runs the MCMC algorithm for the set number of iterations. Run can terminate early if GWEKE score meets
+ * the set criteria.
+*/
 void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigned divergenceIterations)
 {
 #ifndef __APPLE__
@@ -342,26 +348,14 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 
 	model.updateTracesWithInitialValues(genome);
 	if (stepsToAdapt == -1)
-	{
 		stepsToAdapt = maximumIterations;
-	}
-#ifndef STANDALONE
-	Rprintf("entering MCMC loop\n");
-	Rprintf("\tEstimate Codon Specific Parameters? %s \n", (estimateCodonSpecificParameter ? "TRUE" : "FALSE") );
-	Rprintf("\tEstimate Hyper Parameters? %s \n", (estimateCodonSpecificParameter ? "TRUE" : "FALSE") );
-	Rprintf("\tEstimate Synthesis rates? %s \n", (estimateCodonSpecificParameter ? "TRUE" : "FALSE") );
-	Rprintf("\tStarting MCMC with %d iterations\n", maximumIterations);
-	Rprintf("\tAdapting will stop after %d steps\n", stepsToAdapt);
 
-#else
-	std::cout << "entering MCMC loop" << std::endl;
-	std::cout << "\tEstimate Codon Specific Parameters? " << (estimateCodonSpecificParameter ? "TRUE" : "FALSE") << std::endl;
-	std::cout << "\tEstimate Hyper Parameters? " << (estimateHyperParameter ? "TRUE" : "FALSE") << std::endl;
-	std::cout << "\tEstimate Synthesis rates? " << (estimateSynthesisRate ? "TRUE" : "FALSE") << std::endl;
-	std::cout << "\tStarting MCMC with " << maximumIterations << " iterations\n";
-	std::cout << "\tAdapting will stop after " << stepsToAdapt << " steps\n";
-#endif
-
+	my_print("entering MCMC loop\n");
+	my_print("\tEstimate Codon Specific Parameters? % \n", (estimateCodonSpecificParameter ? "TRUE" : "FALSE") );
+	my_print("\tEstimate Hyper Parameters? % \n", (estimateCodonSpecificParameter ? "TRUE" : "FALSE") );
+	my_print("\tEstimate Synthesis rates? % \n", (estimateCodonSpecificParameter ? "TRUE" : "FALSE") );
+	my_print("\tStarting MCMC with % iterations\n", maximumIterations);
+	my_print("\tAdapting will stop after % steps\n", stepsToAdapt);
 
 	// set the last iteration to the max iterations, this way if the MCMC doesn't exit based on Geweke score, it will use the max iteration for posterior means
 	model.setLastIteration(samples);
@@ -371,11 +365,8 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 		{
 			if ((iteration) % fileWriteInterval  == 0u)
 			{
-#ifndef STANDALONE
-				Rprintf("Writing restart file!\n");
-#else
-				std::cout << "Writing restart file!\n";
-#endif
+				my_print("Writing restart file!\n");
+
 				if (multipleFiles)
 				{
 					std::ostringstream oss;
@@ -384,141 +375,103 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 					model.writeRestartFile(tmp);
 				}
 				else
-				{
 					model.writeRestartFile(file);
-				}
 			}
 		}
-		if( (iteration) % 100u == 0u)
+		if ((iteration) % 100u == 0u)
 		{
-#ifndef STANDALONE
-			Rprintf("Status at iteration %d \n", iteration);
-			Rprintf("\t current logLikelihood: %f \n", likelihoodTrace[(iteration/thining) - 1] );
+            #ifndef STANDALONE
+            Rcpp::checkUserInterrupt();
+            #endif
+            
+			my_print("Status at iteration % \n", iteration);
+			my_print("\t current logLikelihood: % \n", likelihoodTrace[(iteration/thining) - 1] );
 			if (iteration > stepsToAdapt)
-			{
-				Rprintf("No longer adapting\n");
-			}
-#else
-			std::cout << "Status at iteration " << (iteration) << std::endl;
-			std::cout << "\t current logLikelihood: " << likelihoodTrace[(iteration/thining) - 1] << std::endl;
-			if (iteration > stepsToAdapt)
-			{
-				std::cout <<"No longer adapting\n";
-			}
-#endif
+				my_print("No longer adapting\n");
+
 			model.printHyperParameters();
-			for(unsigned i = 0u; i < model.getNumMixtureElements(); i++)
+			for (unsigned i = 0u; i < model.getNumMixtureElements(); i++)
 			{
-#ifndef STANDALONE
-				Rprintf("\t current Mixture element probability for element %d: %f\n", i, model.getCategoryProbability(i));
-#else
-				std::cout << "\t current Mixture element probability for element " << i << ": " << model.getCategoryProbability(i) << std::endl;
-#endif
+				my_print("\t current Mixture element probability for element %: %\n", i, model.getCategoryProbability(i));
 			}
 		}
-		if(estimateCodonSpecificParameter)
+		if (estimateCodonSpecificParameter)
 		{
 			model.proposeCodonSpecificParameter();
 			acceptRejectCodonSpecificParameter(genome, model, iteration);
-			if(( (iteration) % adaptiveWidth) == 0u)
-			{
+			if ((iteration % adaptiveWidth) == 0u)
 				model.adaptCodonSpecificParameterProposalWidth(adaptiveWidth, iteration / thining, iteration <= stepsToAdapt);
-			}
 		}
 		// update hyper parameter
-		if(estimateHyperParameter)
+		if (estimateHyperParameter)
 		{
 			model.updateGibbsSampledHyperParameters(genome);
 			model.proposeHyperParameters();
 			acceptRejectHyperParameter(genome, model, iteration);
-			if(( (iteration) % adaptiveWidth) == 0u)
-			{
+			if ((iteration % adaptiveWidth) == 0u)
 				model.adaptHyperParameterProposalWidths(adaptiveWidth, iteration <= stepsToAdapt);
-			}
 		}
 		// update expression level values
-		if(estimateSynthesisRate || estimateMixtureAssignment)
+		if (estimateSynthesisRate || estimateMixtureAssignment)
 		{
 			model.proposeSynthesisRateLevels();
 			double logLike = acceptRejectSynthesisRateLevelForAllGenes(genome, model, iteration);
-			if((iteration % thining) == 0u)
+			if ((iteration % thining) == 0u)
 			{
 				likelihoodTrace[(iteration / thining)] = logLike;
 				if (std::isnan(logLike)) {
-					std::cerr << "Log likelihood is NaN, exiting at iteration " << iteration << std::endl;
+					my_printError("ERROR: Log likelihood is NaN, exiting at iteration %\n", iteration);
 					model.setLastIteration(iteration / thining);
 					return;
 				}
 			}
-			if(( (iteration) % adaptiveWidth) == 0u)
-			{
+			if ((iteration % adaptiveWidth) == 0u)
 				model.adaptSynthesisRateProposalWidth(adaptiveWidth, iteration <= stepsToAdapt);
-			}
 		}
 
 
-		if( ( (iteration) % (50*adaptiveWidth)) == 0u)
+		if ((iteration % (50*adaptiveWidth)) == 0u)
 		{
 			double gewekeScore = calculateGewekeScore(iteration/thining);
-#ifndef STANDALONE
-			Rprintf("##################################################\n");
-			Rprintf("Geweke Score after %d iterations: %f\n", iteration, gewekeScore);
-			Rprintf("##################################################\n");
-#else
-			std::cout << "##################################################" << "\n";
-			std::cout << "Geweke Score after " << iteration << " iterations: " << gewekeScore << "\n";
-			std::cout << "##################################################" << "\n";
-#endif
 
-			if(std::abs(gewekeScore) < 1.96)
+			my_print("##################################################\n");
+			my_print("Geweke Score after % iterations: %\n", iteration, gewekeScore);
+			my_print("##################################################\n");
+
+			if (std::abs(gewekeScore) < 1.96)
 			{
-#ifndef STANDALONE
-				Rprintf("Stopping run based on convergence after %d iterations\n\n", iteration);
-#else
-				std::cout << "Stopping run based on convergence after " << iteration << " iterations\n" << std::endl;
-#endif
+				my_print("Stopping run based on convergence after % iterations\n\n", iteration);
+
 				// Comment out this break to keep the run from stopping on convergence
 				//model.setLastIteration(iteration/thining);
 				//break;
 			}
 		}
 	} // end MCMC loop
-#ifndef STANDALONE
-	Rprintf("leaving MCMC loop\n");
-#else
-	std::cout << "leaving MCMC loop" << std::endl;
-#endif
 
-	//NOTE: The following files used to be written here:
-	//selectionParamTrace_#.csv
-	//phiTrace_nmix_#.csv
-	//mutationParamTrace_#.csv
-	//liklihoodTrace.csv
-	//sphiTrace.csv
-	//expressionLevelTrace.csv
-
+	my_print("leaving MCMC loop\n");
 }
 
 
-// Allows to diverge from initial conditions (divergenceIterations controls the divergence).
-// This allows for varying initial conditions for better exploration of the parameter space.
-// This functions does not take the likelihood into account, the random walk is only constrained by the prior
-// for each parameter. If no prior (flat prior) is present, an unconstrained random walk is performed.
+/* varyInitialConditions (NOT EXPOSED)
+ * Arguments: reference to a genome and a model. Number of iterations that the model can diverge from initial
+ * conditions.
+ * Allows to diverge from initial conditions (divergenceIterations controls the divergence).
+ * This allows for varying initial conditions for better exploration of the parameter space.
+ * This functions does not take the likelihood into account, the random walk is only constrained by the prior
+ * for each parameter. If no prior (flat prior) is present, an unconstrained random walk is performed.
+*/
 void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned divergenceIterations)
 {
-	// TODO THIS FUNCTON THROWS THE ACCEPTANCE COUNTER OFF!
+	// TODO THIS FUNCTION THROWS THE ACCEPTANCE COUNTER OFF!
 
 
 	// NOTE: IF PRIORS ARE ADDED, TAKE INTO ACCOUNT HERE!
-#ifndef STANDALONE
-	Rprintf("Allowing divergence from initial conditions for %d iterations.\n\n", divergenceIterations);
-#else
-	std::cout << "Allowing divergence from initial conditions for " << divergenceIterations << " iterations.\n" << std::endl;
-#endif
+	my_print("Allowing divergence from initial conditions for % iterations.\n\n", divergenceIterations);
 	// divergence from initial conditions is not stored in trace
 
 	// how many steps do you want to walk "away" from the initial conditions
-	for(unsigned iteration = 0u; iteration < divergenceIterations; iteration++)
+	for (unsigned iteration = 0u; iteration < divergenceIterations; iteration++)
 	{
 		// propose all parameters
 		model.proposeCodonSpecificParameter();
@@ -527,7 +480,7 @@ void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned
 
 		// no prior on codon specific parameters -> just accept everything
 		unsigned size = model.getGroupListSize();
-		for(unsigned i = 0; i < size; i++)
+		for (unsigned i = 0; i < size; i++)
 		{
 			std::string grouping = model.getGrouping(i);
 			model.updateCodonSpecificParameter(grouping);
@@ -539,10 +492,9 @@ void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned
 		// prior on phi values -> take prior into account, but only the prior no likelihood
 		int numGenes = genome.getGenomeSize();
 		unsigned numSynthesisRateCategories = model.getNumSynthesisRateCategories();
-		for(int i = 0; i < numGenes; i++)
+		for (unsigned i = 0u; i < numGenes; i++)
 		{
-
-			for(unsigned k = 0u; k < numSynthesisRateCategories; k++)
+			for (unsigned k = 0u; k < numSynthesisRateCategories; k++)
 			{
 				// map from mixture to category and obtain corresponding phi value
 				unsigned expressionCategory = model.getSynthesisRateCategory(k);
@@ -557,10 +509,8 @@ void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned
 				// accept/ reject based on prior ratio
 				double logPhiProbability = Parameter::densityLogNorm(phiValue, mPhi, stdDevSynthesisRate, true);
 				double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, mPhi, stdDevSynthesisRate, true);
-				if( -Parameter::randExp(1) < (logPhiProbability_proposed - logPhiProbability) )
-				{
+				if ( -Parameter::randExp(1) < (logPhiProbability_proposed - logPhiProbability) )
 					model.updateSynthesisRate(i, k);
-				}
 			}
 		}
 
@@ -569,6 +519,12 @@ void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned
 	}
 }
 
+
+/* calculateGewekeScore (NOT EXPOSED)
+ * Arguments: current iteration
+ * Calculate the Geweke score based of the last test and the posterior means. If this is the first
+ * convergence test, lastConvergenceTest should be equal to 0.
+*/
 double MCMCAlgorithm::calculateGewekeScore(unsigned current_iteration)
 {
 	double posteriorMean1 = 0.0;
@@ -583,23 +539,25 @@ double MCMCAlgorithm::calculateGewekeScore(unsigned current_iteration)
 	double numSamples2 = (double) std::round(current_iteration * 0.5);
 
 	// calculate mean and and variance of first part of likelihood trace
-	for(unsigned i = lastConvergenceTest; i < end1; i++)
+	for (unsigned i = lastConvergenceTest; i < end1; i++)
 	{
 		posteriorMean1 += likelihoodTrace[i];
 	}
 	posteriorMean1 = posteriorMean1 / numSamples1;
-	for(unsigned i = lastConvergenceTest; i < end1; i++)
+	for (unsigned i = lastConvergenceTest; i < end1; i++)
 	{
 		posteriorVariance1 += (likelihoodTrace[i] - posteriorMean1) * (likelihoodTrace[i] - posteriorMean1);
 	}
 	posteriorVariance1 = posteriorVariance1 / numSamples1;
+
+
 	// calculate mean and and variance of last part of likelihood trace
-	for(unsigned i = start2; i < current_iteration; i++)
+	for (unsigned i = start2; i < current_iteration; i++)
 	{
 		posteriorMean2 += likelihoodTrace[i];
 	}
 	posteriorMean2 = posteriorMean2 / numSamples2;
-	for(unsigned i = start2; i < current_iteration; i++)
+	for (unsigned i = start2; i < current_iteration; i++)
 	{
 		posteriorVariance2 += (likelihoodTrace[i] - posteriorMean2) * (likelihoodTrace[i] - posteriorMean2);
 	}
@@ -611,54 +569,92 @@ double MCMCAlgorithm::calculateGewekeScore(unsigned current_iteration)
 }
 
 
+/* isEstimateSynthesisRate (NOT EXPOSED)
+ * Arguments: None
+ * Return the boolean value for if synthesis rate should be estimated in this run.
+*/
 bool MCMCAlgorithm::isEstimateSynthesisRate()
 {
 	return estimateSynthesisRate;
 }
 
 
+/* isEstimateCodonSpecificParameter (NOT EXPOSED)
+ * Arguments: None
+ * Return the boolean value for if codon specific parameters should be estimated in this run.
+*/
 bool MCMCAlgorithm::isEstimateCodonSpecificParameter()
 {
 	return estimateCodonSpecificParameter;
 }
 
 
+/* isEstimateHyperParameter (NOT EXPOSED)
+ * Arguments: None
+ * Return the boolean value for if hyper parameters should be estimated in this run.
+*/
 bool MCMCAlgorithm::isEstimateHyperParameter()
 {
 	return estimateHyperParameter;
 }
 
 
+/* isEstimateMixtureAssignment (NOT EXPOSED)
+ * Arguments: None
+ * Return the boolean value for if mixture assignment should be estimated in this run.
+*/
 bool MCMCAlgorithm::isEstimateMixtureAssignment()
 {
 	return estimateMixtureAssignment;
 }
 
 
+/* setEstimateSynthesisRate (NOT EXPOSED)
+ * Arguments: boolean describing if the parameter should be estimated.
+ * Sets estimateSynthesisRate to the specified value.
+*/
 void MCMCAlgorithm::setEstimateSynthesisRate(bool in)
 {
 	estimateSynthesisRate = in;
 }
 
 
+/* setEstimateCodonSpecificParameter (NOT EXPOSED)
+ * Arguments: boolean describing if the parameter should be estimated.
+ * Sets estimateCodonSpecificParameter to the specified value.
+*/
 void MCMCAlgorithm::setEstimateCodonSpecificParameter(bool in)
 {
 	estimateCodonSpecificParameter = in;
 }
 
 
+/* setEstimateHyperParameter (NOT EXPOSED)
+ * Arguments: boolean describing if the parameter should be estimated.
+ * Sets estimateHyperParameter to the specified value.
+*/
 void MCMCAlgorithm::setEstimateHyperParameter(bool in)
 {
 	estimateHyperParameter = in;
 }
 
 
+/* setEstimateMixtureAssignment (RCPP EXPOSED)
+ * Arguments: boolean describing if the parameter should be estimated.
+ * Sets estimateMixtureAssignment to the specified value.
+*/
 void MCMCAlgorithm::setEstimateMixtureAssignment(bool in)
 {
 	estimateMixtureAssignment = in;
 }
 
 
+/* setRestartFileSettings (RCPP EXPOSED)
+ * Arguments: base of filename to write to, interval to write file, bool telling if one or many files should be written.
+ * Filename is the base of the file name to be written to. The interval will be placed in front to specify the step
+ * it was written at and allow for multiple files to be written if multiple is set to true. The file write interval
+ * is actually the interval specified times the thining.
+*/
 void MCMCAlgorithm::setRestartFileSettings(std::string filename, unsigned interval, bool multiple)
 {
 	file = filename;
@@ -667,47 +663,58 @@ void MCMCAlgorithm::setRestartFileSettings(std::string filename, unsigned interv
 	writeRestartFile = true;
 }
 
+
+/* setStepsToAdapt (RCPP EXPOSED)
+ * Arguments: steps (unsigned)
+ * Will set the specified steps to adapt for the run if the value is less than samples * thining (aka, the number
+ * of steps the run will last).
+*/
 void MCMCAlgorithm::setStepsToAdapt(unsigned steps)
 {
 	if (steps <= samples * thining)
-	{
 		stepsToAdapt = steps;
-	}
 	else
-	{
-		std::cerr <<"Cannot set steps - value must be smaller than samples times thining (maxIterations)\n";
-	}
+		my_printError("ERROR: Cannot set steps - value must be smaller than samples times thining (maxIterations)\n");
 }
 
+
+/* getStepsToAdapt (RCPP EXPOSED)
+ * Arguments: None
+ * Return the value of stepsToAdapt
+*/
 int MCMCAlgorithm::getStepsToAdapt()
 {
 	return stepsToAdapt;
 }
 
+
+/* getLogLikelihoodTrace (RCPP EXPOSED)
+ * Arguments: None
+ * Return the likelihood trace.
+*/
 std::vector<double> MCMCAlgorithm::getLogLikelihoodTrace()
 {
 	return likelihoodTrace;
 }
 
 
+/* getLogLikelihoodPosteriorMean (RCPP EXPOSED)
+ * Arguments: number of samples to use to calculate the posterior.
+ * Calculates the mean for the specified number of samples from the end of the trace
+ * for the loglikelihood trace.
+*/
 double MCMCAlgorithm::getLogLikelihoodPosteriorMean(unsigned _samples)
 {
 	double posteriorMean = 0.0;
 	unsigned traceLength = likelihoodTrace.size();
 
-
-	if(_samples > traceLength)
+	if (_samples > traceLength)
 	{
-#ifndef STANDALONE
-		Rf_warning("Warning in MCMCAlgorithm::getLogLikelihoodPosteriorMean throws: Number of anticipated samples (%d) is greater than the length of the available trace (%d). Whole trace is used for posterior estimate! \n", _samples, traceLength);
-#else
-		std::cerr << "Warning in MCMCAlgorithm::getLogLikelihoodPosteriorMean throws: Number of anticipated samples (" <<
-		_samples << ") is greater than the length of the available trace (" << traceLength << ")." << "Whole trace is used for posterior estimate! \n";
-		_samples = traceLength;
-#endif
+		my_printError("Warning in MCMCAlgorithm::getLogLikelihoodPosteriorMean throws: Number of anticipated samples");
+		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n", _samples, traceLength);
 	}
 	unsigned start = traceLength - _samples;
-	for(unsigned i = start; i < traceLength; i++)
+	for (unsigned i = start; i < traceLength; i++)
 	{
 		posteriorMean += likelihoodTrace[i];
 	}
@@ -716,9 +723,13 @@ double MCMCAlgorithm::getLogLikelihoodPosteriorMean(unsigned _samples)
 }
 
 
+/* acf (NOT EXPOSED)
+ * Arguments:
+ *
+*/
 std::vector<double> MCMCAlgorithm::acf(std::vector<double>& x, int nrows, int ncols, int lagmax, bool correlation, bool demean)
 {
-	if(demean)
+	if (demean)
 	{
 		double sum = 0.0;
 		for(unsigned i = 0u; i < x.size(); i++) sum += x[i];
@@ -729,14 +740,14 @@ std::vector<double> MCMCAlgorithm::acf(std::vector<double>& x, int nrows, int nc
 	std::vector<double> acf(lagmax, 1.0);
 	int d1 = lagmax + 1, d2 = ncols*d1;
 
-	for(int u = 0; u < ncols; u++)
+	for (int u = 0; u < ncols; u++)
 	{
-		for(int v = 0; v < ncols; v++)
+		for (int v = 0; v < ncols; v++)
 		{
-			for(int lag = 0; lag <= lagmax; lag++)
+			for (int lag = 0; lag <= lagmax; lag++)
 			{
 				double sum = 0.0; int nu = 0;
-				for(int i = 0; i < nrows-lag; i++)
+				for (int i = 0; i < nrows-lag; i++)
 				{
 					nu++;
 					sum += x[i + lag + nrows*u] * x[i + nrows*v];
@@ -745,7 +756,7 @@ std::vector<double> MCMCAlgorithm::acf(std::vector<double>& x, int nrows, int nc
 			}
 		}
 	}
-	if(correlation) {
+	if (correlation) {
 		if(nrows == 1) {
 			for(int u = 0; u < ncols; u++)
 			{
@@ -753,15 +764,15 @@ std::vector<double> MCMCAlgorithm::acf(std::vector<double>& x, int nrows, int nc
 			}
 		} else {
 			double *se = new double[ncols]();
-			for(int u = 0; u < ncols; u++)
+			for (int u = 0; u < ncols; u++)
 			{
 				se[u] = sqrt(acf[0 + d1*u + d2*u]);
 			}
-			for(int u = 0; u < ncols; u++)
+			for (int u = 0; u < ncols; u++)
 			{
-				for(int v = 0; v < ncols; v++)
+				for (int v = 0; v < ncols; v++)
 				{
-					for(int lag = 0; lag <= lagmax; lag++) // ensure correlations remain in  [-1,1] :
+					for (int lag = 0; lag <= lagmax; lag++) // ensure correlations remain in  [-1,1] :
 					{
 						double a = acf[lag + d1*u + d2*v] / (se[u]*se[v]);
 						acf[lag + d1*u + d2*v] = (a > 1.) ? 1. : ((a < -1.) ? -1. : a);
@@ -774,10 +785,14 @@ std::vector<double> MCMCAlgorithm::acf(std::vector<double>& x, int nrows, int nc
 }
 
 
+/* solveToeplitzMatrix (NOT EXPOSED)
+ * Arguments:
+ *
+*/
 std::vector<std::vector<double>> MCMCAlgorithm::solveToeplitzMatrix(int lr, std::vector<double> r, std::vector<double> g)
 {
 // TODO switch f from 2d index to 1d index
-	//choleskiMatrix[i * numVariates + k]
+	//choleskyMatrix[i * numVariates + k]
 	//      solves Toeplitz matrix equation toep(r)f=g(1+.)
 	//		by Levinson's algorithm
 	//      a is a workspace of size lr, the number of equations
@@ -797,14 +812,14 @@ std::vector<std::vector<double>> MCMCAlgorithm::solveToeplitzMatrix(int lr, std:
 	var[0] = (1 - f[0]*f[0])*r[0];
 
 	if (lr == 1) return returnVec;
-	for(unsigned l = 1; l < lr; l++)
+	for (unsigned l = 1; l < lr; l++)
 	{
 		a[l] = -d/v;
 		if (l > 1)
 		{
 			l1 = (l - 2)/2;
 			l2 = l1 + 1;
-			for(unsigned j = 1; j < l2; j++)
+			for (unsigned j = 1; j < l2; j++)
 			{
 				hold = a[j];
 				k = l - j + 1;
@@ -815,7 +830,7 @@ std::vector<std::vector<double>> MCMCAlgorithm::solveToeplitzMatrix(int lr, std:
 		}
 		v = v + a[l]*d;
 		f[l*lr + l] = (g[l+1] - q)/v;
-		for(unsigned j = 0; j < (l-1); j++)
+		for (unsigned j = 0; j < (l-1); j++)
 		{
 			f[l*lr + j] = f[(l-1)*lr +j] + f[l*lr + l]*a[l-j+1];
 		}
@@ -824,7 +839,7 @@ std::vector<std::vector<double>> MCMCAlgorithm::solveToeplitzMatrix(int lr, std:
 		if (l == lr) return returnVec;
 		d = 0.0;
 		q = 0.0;
-		for(unsigned i = 0; i < l; i++)
+		for (unsigned i = 0; i < l; i++)
 		{
 			k = l-i+2;
 			d = d + a[i]*r[k];
@@ -836,8 +851,6 @@ std::vector<std::vector<double>> MCMCAlgorithm::solveToeplitzMatrix(int lr, std:
 	returnVec[1] = var;
 	return returnVec;
 }
-
-
 
 
 

@@ -3,17 +3,14 @@ library(ribModel)
 
 context("Sequence Summary")
 
-#removed clear from testThat
-#removed processSequence from testThat
-
-
-
+test_that("general sequence summary functions", {
+  expect_equal(testSequenceSummary(), 0)
+})
 
 #Used to test AAToCodonRange, but that is now returned by
 #reference and cannot deal with that in R. Since this will
 #change with codonTable being completed, the tests have been
 #ommitted for the time being.
-
 
 #this function will be moved to CodonTable when it is finished.
 test_that("AA To Codon", {
@@ -62,8 +59,6 @@ test_that("AA To Codon", {
   expect_equal(AAToCodon("Z", TRUE), c("AGC"))
   expect_equal(AAToCodon("X", TRUE), character(0))
 })
-
-
 
 test_that("Amino Acid Vector", {
   expect_equal(aminoAcids(), c(

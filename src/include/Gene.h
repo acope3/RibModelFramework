@@ -9,7 +9,6 @@
 #include <vector>
 #include <map>
 
-
 class Gene
 {
 
@@ -19,7 +18,7 @@ class Gene
 		std::string id; //Gene id: Ex: "YALOC001"
 		std::string description; //Additional information about the gene.
 
-		void cleanSeq();
+		void cleanSeq(); //deprecated; TODO: remove
 
 	public:
 
@@ -37,17 +36,17 @@ class Gene
 		virtual ~Gene();
 
 
-
 		//Data Manipulation Functions:
 		std::string getId();
 		void setId(std::string _id);
 		std::string getDescription();
 		void setDescription(std::string _desc);
-		void setSequence(std::string _seq);
-		void addRFP_count(std::vector <unsigned> RFP_counts);
 		std::string getSequence();
+		void setSequence(std::string _seq);
+		std::vector <unsigned> getRFP_count(); //Only for unit testing.
+		void addRFP_count(std::vector <unsigned> RFP_counts);
 		SequenceSummary *getSequenceSummary();
-		std::vector<double> getObservedSynthesisRateValues();
+		std::vector<double> getObservedSynthesisRateValues(); //exposed to RCPP, tested in C++
 		void setObservedSynthesisRateValues(std::vector <double> values); //Only for unit testing.
 		double getObservedSynthesisRate(unsigned index);
 		unsigned getNumObservedSynthesisSets();
@@ -56,18 +55,15 @@ class Gene
 
 		//Other functions:
 		void clear(); // clear the content of object
-		unsigned length();
+		unsigned length(); //exposed to RCPP, tested in C++
 		Gene reverseComplement(); // return the reverse compliment
 		std::string toAASequence();
-
-
 
 
 		//R Section:
 
 #ifndef STANDALONE
 
-		//R Section:
 		unsigned getAACount(std::string aa);
 		unsigned getCodonCount(std::string& codon);
 		unsigned getRFPObserved(std::string codon);
