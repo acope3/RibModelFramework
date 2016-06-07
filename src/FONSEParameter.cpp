@@ -135,113 +135,113 @@ void FONSEParameter::initFONSEValuesFromFile(std::string filename)
 	std::vector <double> mat;
 	covarianceMatrix.resize(maxGrouping);
 	input.open(filename.c_str());
-	if (input.fail())
-	{
+	if (input.fail()) {
 		my_printError("ERROR: Could not open RestartFile.txt to initialize FONSE values\n");
-		std::exit(1);
 	}
-	std::string tmp, variableName;
-	unsigned cat = 0;
-	while (getline(input, tmp))
-	{
-		int flag;
-		if (tmp[0] == '>')
-			flag = 1;
-		else if (input.eof() || tmp == "\n")
-			flag = 2;
-		else if (tmp[0] == '#')
-			flag = 3;
-		else
-			flag = 4;
+	else {
+		std::string tmp, variableName;
+		unsigned cat = 0;
+		while (getline(input, tmp))
+		{
+			int flag;
+			if (tmp[0] == '>')
+				flag = 1;
+			else if (input.eof() || tmp == "\n")
+				flag = 2;
+			else if (tmp[0] == '#')
+				flag = 3;
+			else
+				flag = 4;
 
-		if (flag == 1)
-		{
-			mat.clear();
-			cat = 0;
-			variableName = tmp.substr(1, tmp.size() - 2);
-			if (variableName == "covarianceMatrix")
+			if (flag == 1)
 			{
-				getline(input, tmp);
-				//char aa = tmp[0];
-				cat = SequenceSummary::AAToAAIndex(tmp); // ????
-			}
-		}
-		else if (flag == 2)
-		{
-			my_print("here\n");
-		}
-		else if (flag == 3) //user comment, continue
-		{
-			continue;
-		}
-		else
-		{
-			std::istringstream iss;
-			if (variableName == "currentMutationParameter")
-			{
-				if (tmp == "***")
+				mat.clear();
+				cat = 0;
+				variableName = tmp.substr(1, tmp.size() - 2);
+				if (variableName == "covarianceMatrix")
 				{
-					currentCodonSpecificParameter[dM].resize(currentCodonSpecificParameter[dM].size() + 1);
-					cat++;
+					getline(input, tmp);
+					//char aa = tmp[0];
+					cat = SequenceSummary::AAToAAIndex(tmp); // ????
 				}
-				else if (tmp == "\n")
-					continue;
-				else
+			}
+			else if (flag == 2)
+			{
+				my_print("here\n");
+			}
+			else if (flag == 3) //user comment, continue
+			{
+				continue;
+			}
+			else
+			{
+				std::istringstream iss;
+				if (variableName == "currentMutationParameter")
+				{
+					if (tmp == "***")
+					{
+						currentCodonSpecificParameter[dM].resize(currentCodonSpecificParameter[dM].size() + 1);
+						cat++;
+					}
+					else if (tmp == "\n")
+						continue;
+					else
+					{
+						double val;
+						iss.str(tmp);
+						while (iss >> val)
+						{
+							currentCodonSpecificParameter[dM][cat - 1].push_back(val);
+						}
+					}
+				}
+				else if (variableName == "currentSelectionParameter")
+				{
+					if (tmp == "***")
+					{
+						currentCodonSpecificParameter[dOmega].resize(currentCodonSpecificParameter[dOmega].size() + 1);
+						cat++;
+					}
+					else if (tmp == "\n")
+						continue;
+					else
+					{
+						double val;
+						iss.str(tmp);
+						while (iss >> val)
+						{
+							currentCodonSpecificParameter[dOmega][cat - 1].push_back(val);
+						}
+					}
+				}
+				else if (variableName == "covarianceMatrix")
+				{
+					if (tmp == "***") //end of matrix
+					{
+						CovarianceMatrix CM(mat);
+						covarianceMatrix[cat] = CM;
+					}
+					double val;
+					iss.str(tmp);
+					while (iss >> val)
+					{
+						mat.push_back(val);
+					}
+				}
+				else if (variableName == "std_csp")
 				{
 					double val;
 					iss.str(tmp);
 					while (iss >> val)
 					{
-						currentCodonSpecificParameter[dM][cat - 1].push_back(val);
+						std_csp.push_back(val);
 					}
 				}
-			}
-			else if (variableName == "currentSelectionParameter")
-			{
-				if (tmp == "***")
+				else if (variableName == "mutation_prior_sd")
 				{
-					currentCodonSpecificParameter[dOmega].resize(currentCodonSpecificParameter[dOmega].size() + 1);
-					cat++;
-				}
-				else if (tmp == "\n")
-					continue;
-				else
-				{
-					double val;
 					iss.str(tmp);
-					while (iss >> val)
-					{
-						currentCodonSpecificParameter[dOmega][cat - 1].push_back(val);
-					}
+					iss >> mutation_prior_sd;
 				}
-			}
-			else if (variableName == "covarianceMatrix")
-			{
-				if (tmp == "***") //end of matrix
-				{
-					CovarianceMatrix CM(mat);
-					covarianceMatrix[cat] = CM;
-				}
-				double val;
-				iss.str(tmp);
-				while (iss >> val)
-				{
-					mat.push_back(val);
-				}
-			}
-			else if (variableName == "std_csp")
-			{
-				double val;
-				iss.str(tmp);
-				while (iss >> val)
-				{
-					std_csp.push_back(val);
-				}
-			}
-			else if (variableName == "mutation_prior_sd")
-			{
-				iss.str(tmp);
-				iss >> mutation_prior_sd;
 			}
 		}
 	}
@@ -276,71 +276,71 @@ void FONSEParameter::writeFONSERestartFile(std::string filename)
 {
     std::ofstream out;
     out.open(filename.c_str(), std::ofstream::app);
-    if (out.fail())
-    {
+    if (out.fail()){
         my_printError("ERROR: Could not open RestartFile.txt to append\n");
-        std::exit(1);
-    }
-    
-    std::ostringstream oss;
-    unsigned j;
-	oss << ">mutation_prior_sd:\n" << mutation_prior_sd << "\n";
-    oss << ">std_csp:\n";
-    for (unsigned i = 0; i < std_csp.size(); i++)
-    {
-        oss << std_csp[i];
-        if ((i + 1) % 10 == 0)
-            oss << "\n";
-        else
-            oss << " ";
-    }
-    oss << ">currentMutationParameter:\n";
-    for (unsigned i = 0; i < currentCodonSpecificParameter[dM].size(); i++)
-    {
-        oss << "***\n";
-        for (j = 0; j < currentCodonSpecificParameter[dM][i].size(); j++)
-        {
-            oss << currentCodonSpecificParameter[dM][i][j];
-            if ((j + 1) % 10 == 0)
-                oss << "\n";
-            else
-                oss << " ";
-        }
-        if (j % 10 != 0)
-            oss << "\n";
-    }
-    
-    oss << ">currentSelectionParameter:\n";
-    for (unsigned i = 0; i < currentCodonSpecificParameter[dOmega].size(); i++)
-    {
-        oss << "***\n";
-        for (j = 0; j < currentCodonSpecificParameter[dOmega][i].size(); j++)
-        {
-            oss << currentCodonSpecificParameter[dOmega][i][j];
-            if ((j + 1) % 10 == 0)
-                oss << "\n";
-            else
-                oss << " ";
-        }
-        if (j % 10 != 0)
-            oss << "\n";
-    }
-	for (unsigned i = 0; i < groupList.size(); i++)
-	{
-		std::string aa = groupList[i];
-		oss << ">covarianceMatrix:\n" << aa << "\n";
-		CovarianceMatrix m = covarianceMatrix[SequenceSummary::AAToAAIndex(aa)];
-		std::vector<double>* tmp = m.getCovMatrix();
-		int size = m.getNumVariates();
-		for (unsigned k = 0; k < size * size; k++)
-		{
-			if (k % size == 0 && k != 0) { oss << "\n"; }
-			oss << tmp->at(k) << "\t";
-		}
-		oss << "\n***\n";
 	}
-    std::string output = oss.str();
-    out << output;
+	else {
+
+		std::ostringstream oss;
+		unsigned j;
+		oss << ">mutation_prior_sd:\n" << mutation_prior_sd << "\n";
+		oss << ">std_csp:\n";
+		for (unsigned i = 0; i < std_csp.size(); i++)
+		{
+			oss << std_csp[i];
+			if ((i + 1) % 10 == 0)
+				oss << "\n";
+			else
+				oss << " ";
+		}
+		oss << ">currentMutationParameter:\n";
+		for (unsigned i = 0; i < currentCodonSpecificParameter[dM].size(); i++)
+		{
+			oss << "***\n";
+			for (j = 0; j < currentCodonSpecificParameter[dM][i].size(); j++)
+			{
+				oss << currentCodonSpecificParameter[dM][i][j];
+				if ((j + 1) % 10 == 0)
+					oss << "\n";
+				else
+					oss << " ";
+			}
+			if (j % 10 != 0)
+				oss << "\n";
+		}
+
+		oss << ">currentSelectionParameter:\n";
+		for (unsigned i = 0; i < currentCodonSpecificParameter[dOmega].size(); i++)
+		{
+			oss << "***\n";
+			for (j = 0; j < currentCodonSpecificParameter[dOmega][i].size(); j++)
+			{
+				oss << currentCodonSpecificParameter[dOmega][i][j];
+				if ((j + 1) % 10 == 0)
+					oss << "\n";
+				else
+					oss << " ";
+			}
+			if (j % 10 != 0)
+				oss << "\n";
+		}
+		for (unsigned i = 0; i < groupList.size(); i++)
+		{
+			std::string aa = groupList[i];
+			oss << ">covarianceMatrix:\n" << aa << "\n";
+			CovarianceMatrix m = covarianceMatrix[SequenceSummary::AAToAAIndex(aa)];
+			std::vector<double>* tmp = m.getCovMatrix();
+			int size = m.getNumVariates();
+			for (unsigned k = 0; k < size * size; k++)
+			{
+				if (k % size == 0 && k != 0) { oss << "\n"; }
+				oss << tmp->at(k) << "\t";
+			}
+			oss << "\n***\n";
+		}
+		std::string output = oss.str();
+		out << output;
+	}
     out.close();
 }
 
@@ -365,30 +365,30 @@ void FONSEParameter::initMutationCategories(std::vector<std::string> files, unsi
         //Open the file for the category
         std::ifstream currentFile;
         currentFile.open(files[category].c_str());
-        if (currentFile.fail())
-        {
+        if (currentFile.fail()){
             my_printError("Error opening file % to initialize mutation values.\n", category);
-            std::exit(1);
-        }
-        
-        std::string tmp;
-        currentFile >> tmp; //The first line is a header (Amino Acid, Codon, Value, Std_deviation)
-        
-        while (currentFile >> tmp)
-        {
-            //Get the Codon and Index
-            std::size_t pos = tmp.find(",", 2); //Amino Acid and a comma will always be the first 2 characters
-            std::string codon = tmp.substr(2, pos - 2);
-            unsigned codonIndex = SequenceSummary::codonToIndex(codon, true);
-            
-            //get the value to store
-            std::size_t pos2 = tmp.find(",", pos + 1);
-            //my_print("%\n", tmp.substr(pos + 1, pos2 - pos - 1 ));
-            double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
-            
-            currentCodonSpecificParameter[dM][category][codonIndex] = value;
-            proposedCodonSpecificParameter[dM][category][codonIndex] = value;
-        }
+		}
+		else {
+
+			std::string tmp;
+			currentFile >> tmp; //The first line is a header (Amino Acid, Codon, Value, Std_deviation)
+
+			while (currentFile >> tmp)
+			{
+				//Get the Codon and Index
+				std::size_t pos = tmp.find(",", 2); //Amino Acid and a comma will always be the first 2 characters
+				std::string codon = tmp.substr(2, pos - 2);
+				unsigned codonIndex = SequenceSummary::codonToIndex(codon, true);
+
+				//get the value to store
+				std::size_t pos2 = tmp.find(",", pos + 1);
+				//my_print("%\n", tmp.substr(pos + 1, pos2 - pos - 1 ));
+				double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
+
+				currentCodonSpecificParameter[dM][category][codonIndex] = value;
+				proposedCodonSpecificParameter[dM][category][codonIndex] = value;
+			}
+		}
         currentFile.close();
     } //END OF A CATEGORY/FILE
 }
@@ -401,30 +401,30 @@ void FONSEParameter::initSelectionCategories(std::vector<std::string> files, uns
         //Open the file for the category
         std::ifstream currentFile;
         currentFile.open(files[category].c_str());
-        if (currentFile.fail())
-        {
+        if (currentFile.fail()){
             my_printError("Error opening file % to initialize mutation values.\n", category);
-            std::exit(1);
-        }
-        
-        std::string tmp;
-        currentFile >> tmp; //The first line is a header (Amino Acid, Codon, Value, Std_deviation)
-        
-        while (currentFile >> tmp)
-        {
-            //Get the Codon and Index
-            std::size_t pos = tmp.find(",", 2); //Amino Acid and a comma will always be the first 2 characters
-            std::string codon = tmp.substr(2, pos - 2);
-            unsigned codonIndex = SequenceSummary::codonToIndex(codon, true);
-            
-            //get the value to store
-            std::size_t pos2 = tmp.find(",", pos + 1);
-            //	my_print("%\n", tmp.substr(pos + 1, pos2 - pos - 1 ));
-            double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
-            
-            currentCodonSpecificParameter[dOmega][category][codonIndex] = value;
-            proposedCodonSpecificParameter[dOmega][category][codonIndex] = value;
-        }
+		}
+		else {
+
+			std::string tmp;
+			currentFile >> tmp; //The first line is a header (Amino Acid, Codon, Value, Std_deviation)
+
+			while (currentFile >> tmp)
+			{
+				//Get the Codon and Index
+				std::size_t pos = tmp.find(",", 2); //Amino Acid and a comma will always be the first 2 characters
+				std::string codon = tmp.substr(2, pos - 2);
+				unsigned codonIndex = SequenceSummary::codonToIndex(codon, true);
+
+				//get the value to store
+				std::size_t pos2 = tmp.find(",", pos + 1);
+				//	my_print("%\n", tmp.substr(pos + 1, pos2 - pos - 1 ));
+				double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
+
+				currentCodonSpecificParameter[dOmega][category][codonIndex] = value;
+				proposedCodonSpecificParameter[dOmega][category][codonIndex] = value;
+			}
+		}
         currentFile.close();
     } //END OF A CATEGORY/FILE
 }
