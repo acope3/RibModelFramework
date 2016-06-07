@@ -37,13 +37,13 @@ double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grou
 
 	unsigned aaStart, aaEnd;
 	SequenceSummary::AAToCodonRange(grouping, aaStart, aaEnd, false);
-	for (unsigned i = aaStart, k = 0; i < aaEnd; i++, k++) {
-		positions = gene.geneData.getCodonPositions(i);
-		for (unsigned j = 0; j < positions->size(); j++) {
-			calculateCodonProbabilityVector(numCodons, positions->at(j), maxIndexVal, mutation, selection, phiValue, codonProb);
-			if (codonProb[k] == 0) continue;
-			logLikelihood += std::log(codonProb[k]);
-		}
+	for (unsigned i = aaStart, k = 0; i < aaEnd; i++, k++) { 
+		positions = gene.geneData.getCodonPositions(i); 
+		for (unsigned j = 0; j < positions->size(); j++) { 
+			calculateCodonProbabilityVector(numCodons, positions->at(j), maxIndexVal, mutation, selection, phiValue, codonProb); 
+			if (codonProb[k] == 0) continue; 
+			logLikelihood += std::log(codonProb[k]); 
+		} 
 		//positions->clear();
 	}
 
@@ -212,7 +212,6 @@ void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 		currentStdDevSynthesisRate[i] = getStdDevSynthesisRate(i, false);
 		currentMphi[i] = -((currentStdDevSynthesisRate[i] * currentStdDevSynthesisRate[i]) / 2);
 		proposedStdDevSynthesisRate[i] = getStdDevSynthesisRate(i, true);
-		//NOTE: Right side of equals changed from proposedMphi to proposedStdDevSynthesisRate
 		proposedMphi[i] = -((proposedStdDevSynthesisRate[i] * proposedStdDevSynthesisRate[i]) / 2);
 		lpr -= (std::log(currentStdDevSynthesisRate[i]) - std::log(proposedStdDevSynthesisRate[i]));
 	}
