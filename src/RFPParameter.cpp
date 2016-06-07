@@ -142,86 +142,86 @@ void RFPParameter::initRFPValuesFromFile(std::string filename)
 {
 	std::ifstream input;
 	input.open(filename.c_str());
-	if (input.fail())
-	{
+	if (input.fail()) {
 		my_printError("ERROR: Could not open file to initialize RFP values\n");
-		std::exit(1);
 	}
-	std::string tmp, variableName;
-	unsigned cat = 0;
-	while (getline(input, tmp))
-	{
-		int flag;
-		if (tmp[0] == '>')
-			flag = 1;
-		else if (input.eof() || tmp == "\n")
-			flag = 2;
-		else if (tmp[0] == '#')
-			flag = 3;
-		else
-			flag = 4;
+	else {
+		std::string tmp, variableName;
+		unsigned cat = 0;
+		while (getline(input, tmp))
+		{
+			int flag;
+			if (tmp[0] == '>')
+				flag = 1;
+			else if (input.eof() || tmp == "\n")
+				flag = 2;
+			else if (tmp[0] == '#')
+				flag = 3;
+			else
+				flag = 4;
 
-		if (flag == 1)
-		{
-			cat = 0;
-			variableName = tmp.substr(1, tmp.size() - 2);
-		}
-		else if (flag == 2)
-		{
-			my_print("here\n");
-		}
-		else if (flag == 3) //user comment, continue
-		{
-			continue;
-		}
-		else
-		{
-			std::istringstream iss;
-			if (variableName == "currentAlphaParameter")
+			if (flag == 1)
 			{
-				if (tmp == "***")
+				cat = 0;
+				variableName = tmp.substr(1, tmp.size() - 2);
+			}
+			else if (flag == 2)
+			{
+				my_print("here\n");
+			}
+			else if (flag == 3) //user comment, continue
+			{
+				continue;
+			}
+			else
+			{
+				std::istringstream iss;
+				if (variableName == "currentAlphaParameter")
 				{
-					currentCodonSpecificParameter[alp].resize(currentCodonSpecificParameter[alp].size() + 1);
-					cat++;
+					if (tmp == "***")
+					{
+						currentCodonSpecificParameter[alp].resize(currentCodonSpecificParameter[alp].size() + 1);
+						cat++;
+					}
+					else if (tmp == "\n")
+						continue;
+					else
+					{
+						double val;
+						iss.str(tmp);
+						while (iss >> val)
+						{
+							currentCodonSpecificParameter[alp][cat - 1].push_back(val);
+						}
+					}
 				}
-				else if (tmp == "\n")
-					continue;
-				else
+				else if (variableName == "currentLambdaPrimeParameter")
+				{
+					if (tmp == "***")
+					{
+						currentCodonSpecificParameter[lmPri].resize(currentCodonSpecificParameter[lmPri].size() + 1);
+						cat++;
+					}
+					else if (tmp == "\n")
+						continue;
+					else
+					{
+						double val;
+						iss.str(tmp);
+						while (iss >> val)
+						{
+							currentCodonSpecificParameter[lmPri][cat - 1].push_back(val);
+						}
+					}
+				}
+				else if (variableName == "std_csp")
 				{
 					double val;
 					iss.str(tmp);
 					while (iss >> val)
 					{
-						currentCodonSpecificParameter[alp][cat - 1].push_back(val);
+						std_csp.push_back(val);
 					}
-				}
-			}
-			else if (variableName == "currentLambdaPrimeParameter")
-			{
-				if (tmp == "***")
-				{
-					currentCodonSpecificParameter[lmPri].resize(currentCodonSpecificParameter[lmPri].size() + 1);
-					cat++;
-				}
-				else if (tmp == "\n")
-					continue;
-				else
-				{
-					double val;
-					iss.str(tmp);
-					while (iss >> val)
-					{
-						currentCodonSpecificParameter[lmPri][cat - 1].push_back(val);
-					}
-				}
-			}
-			else if (variableName == "std_csp")
-			{
-				double val;
-				iss.str(tmp);
-				while (iss >> val)
-				{
-					std_csp.push_back(val);
 				}
 			}
 		}
@@ -266,59 +266,59 @@ void RFPParameter::writeRFPRestartFile(std::string filename)
 	std::ostringstream oss;
 	unsigned i, j;
 	out.open(filename.c_str(), std::ofstream::app);
-	if (out.fail())
-	{
+	if (out.fail()){
 		my_printError("ERROR: Could not open restart file for writing\n");
-		std::exit(1);
 	}
+	else {
 
-	oss <<">currentAlphaParameter:\n";
-	for (i = 0; i < currentCodonSpecificParameter[alp].size(); i++)
-	{
-		oss << "***\n";
-		for (j = 0; j < currentCodonSpecificParameter[alp][i].size(); j++)
+		oss << ">currentAlphaParameter:\n";
+		for (i = 0; i < currentCodonSpecificParameter[alp].size(); i++)
 		{
-			oss << currentCodonSpecificParameter[alp][i][j];
-			if ((j + 1) % 10 == 0)
+			oss << "***\n";
+			for (j = 0; j < currentCodonSpecificParameter[alp][i].size(); j++)
+			{
+				oss << currentCodonSpecificParameter[alp][i][j];
+				if ((j + 1) % 10 == 0)
+					oss << "\n";
+				else
+					oss << " ";
+			}
+			if (j % 10 != 0)
+				oss << "\n";
+		}
+
+		oss << ">currentLambdaPrimeParameter:\n";
+		for (i = 0; i < currentCodonSpecificParameter[lmPri].size(); i++)
+		{
+			oss << "***\n";
+			for (j = 0; j < currentCodonSpecificParameter[lmPri][i].size(); j++)
+			{
+				oss << currentCodonSpecificParameter[lmPri][i][j];
+				if ((j + 1) % 10 == 0)
+					oss << "\n";
+				else
+					oss << " ";
+			}
+			if (j % 10 != 0)
+				oss << "\n";
+		}
+
+		oss << ">std_csp:\n";
+		my_print("%\n", std_csp.size());
+		for (i = 0; i < std_csp.size(); i++)
+		{
+			oss << std_csp[i];
+			if ((i + 1) % 10 == 0)
 				oss << "\n";
 			else
 				oss << " ";
 		}
-		if (j % 10 != 0)
+		if (i % 10 != 0)
 			oss << "\n";
-	}
 
-	oss <<">currentLambdaPrimeParameter:\n";
-	for (i = 0; i < currentCodonSpecificParameter[lmPri].size(); i++)
-	{
-		oss << "***\n";
-		for (j = 0; j < currentCodonSpecificParameter[lmPri][i].size(); j++)
-		{
-			oss << currentCodonSpecificParameter[lmPri][i][j];
-			if ((j + 1) % 10 == 0)
-				oss << "\n";
-			else
-				oss << " ";
-		}
-		if (j % 10 != 0)
-			oss << "\n";
+		output = oss.str();
+		out << output;
 	}
-
-	oss << ">std_csp:\n";
-	my_print("%\n", std_csp.size());
-	for (i = 0; i < std_csp.size(); i++)
-	{
-		oss << std_csp[i];
-		if ((i + 1) % 10 == 0)
-			oss << "\n";
-		else
-			oss << " ";
-	}
-	if (i % 10 != 0)
-		oss << "\n";
-
-	output = oss.str();
-	out << output;
 	out.close();
 
 }
@@ -396,39 +396,39 @@ void RFPParameter::initMutationSelectionCategories(std::vector<std::string> file
 
 		//open the file, make sure it opens
 		currentFile.open(files[i].c_str());
-		if (currentFile.fail())
-		{
+		if (currentFile.fail()) {
 			my_printError("Error opening file % in the file vector.\n", i);
-			std::exit(1);
 		}
-		currentFile >> tmpString; //trash the first line, no info given.
+		else {
+			currentFile >> tmpString; //trash the first line, no info given.
 
-		//expecting CTG,3.239 as the current format
-		while (currentFile >> tmpString)
-		{
-			std::string codon = tmpString.substr(0, 3);
-			std::size_t pos = tmpString.find(",", 3);
-			std::string val = tmpString.substr(pos + 1, std::string::npos);
-			unsigned index = SequenceSummary::codonToIndex(codon, false);
-			temp[index] = std::atof(val.c_str());
-		}
-		unsigned altered = 0u;
-		for (unsigned j = 0; j < categories.size(); j++)
-		{
-			if (paramType == RFPParameter::alp && categories[j].delM == i)
+			//expecting CTG,3.239 as the current format
+			while (currentFile >> tmpString)
 			{
-				currentCodonSpecificParameter[alp][j] = temp;
-				proposedCodonSpecificParameter[alp][j] = temp;
-				altered++;
+				std::string codon = tmpString.substr(0, 3);
+				std::size_t pos = tmpString.find(",", 3);
+				std::string val = tmpString.substr(pos + 1, std::string::npos);
+				unsigned index = SequenceSummary::codonToIndex(codon, false);
+				temp[index] = std::atof(val.c_str());
 			}
-			else if (paramType == RFPParameter::lmPri && categories[j].delEta == i)
+			unsigned altered = 0u;
+			for (unsigned j = 0; j < categories.size(); j++)
 			{
-				currentCodonSpecificParameter[lmPri][j] = temp;
-				proposedCodonSpecificParameter[lmPri][j] = temp;
-				altered++;
+				if (paramType == RFPParameter::alp && categories[j].delM == i)
+				{
+					currentCodonSpecificParameter[alp][j] = temp;
+					proposedCodonSpecificParameter[alp][j] = temp;
+					altered++;
+				}
+				else if (paramType == RFPParameter::lmPri && categories[j].delEta == i)
+				{
+					currentCodonSpecificParameter[lmPri][j] = temp;
+					proposedCodonSpecificParameter[lmPri][j] = temp;
+					altered++;
+				}
+				if (altered == numCategories)
+					break; //to not access indices out of bounds.
 			}
-			if (altered == numCategories)
-				break; //to not access indices out of bounds.
 		}
 		currentFile.close();
 	}
