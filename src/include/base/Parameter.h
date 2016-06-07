@@ -21,15 +21,10 @@ class Parameter {
 	private:
 
 		//STATICS - Sorting Functions:
-		//static bool sortHelper (double *a, double *b);
 		void quickSortPair(double a[], int b[], int first, int last);
-		//void quickSortPairVector(std::vector <double *> a, std::vector <int *> b, int first, int last);
 		void quickSort(double a[], int first, int last);
-		//void quickSortVector(std::vector <double *> a, int first, int last);
 		static int pivotPair(double a[], int b[], int first, int last);
-		//static int pivotPairVector(std::vector <double *> a, std::vector <int *> b, int first, int last);
 		static int pivot(double a[], int first, int last);
-		//static int pivotVector(std::vector <double *> a, int first, int last);
 		static void swap(double& a, double& b);
 		static void swap(int& a, int& b);
 
