@@ -80,17 +80,18 @@ class Parameter {
 		void setNumMutationSelectionValues(std::string mutationSelectionState,
 			std::vector<std::vector<unsigned>> mixtureDefinitionMatrix);
 		void printMixtureDefinitionMatrix();
-		double getCategoryProbability(unsigned mixtureElement);
-		void setCategoryProbability(unsigned mixtureElement, double value);
+		double getCategoryProbability(unsigned mixtureElement); //Tested
+		void setCategoryProbability(unsigned mixtureElement, double value); //Tested
 		unsigned getNumMutationCategories(); //Tested; TODO caveat
 		unsigned getNumSelectionCategories(); //Tested; TODO caveat
 		unsigned getNumSynthesisRateCategories();
-		unsigned getMutationCategory(unsigned mixtureElement);
-		unsigned getSelectionCategory(unsigned mixtureElement); //TODO: Add comments explaining reasoning here for same function
+		unsigned getMutationCategory(unsigned mixtureElement); //Tested
+		unsigned getSelectionCategory(unsigned mixtureElement); //Tested; TODO: Add comments explaining reasoning here for same function
 		unsigned getSynthesisRateCategory(unsigned mixtureElement);
 		std::vector<unsigned> getMixtureElementsOfMutationCategory(unsigned category); //Tested; TODO caveat
 		std::vector<unsigned> getMixtureElementsOfSelectionCategory(unsigned category); //Tested; TODO caveat
 		std::string getMutationSelectionState(); //Tested
+		unsigned getNumAcceptForCspForIndex(unsigned i); //Tested; only for unit testing.
 
 
 		//Group List Functions:
@@ -107,14 +108,15 @@ class Parameter {
 		double getCurrentStdDevSynthesisRateProposalWidth(); //Tested
 		unsigned getNumAcceptForStdDevSynthesisRate(); //Tested; only for unit testing.
 		void updateStdDevSynthesisRate();
+		double getStdCspForIndex(unsigned i); //Tested; only for unit testing.
 
 
 		//Synthesis Rate Functions:
-		double getSynthesisRate(unsigned geneIndex, unsigned mixtureElement, bool proposed = false);
+		double getSynthesisRate(unsigned geneIndex, unsigned mixtureElement, bool proposed = false); //Tested
 		double getCurrentSynthesisRateProposalWidth(unsigned expressionCategory, unsigned geneIndex);
 		double getSynthesisRateProposalWidth(unsigned geneIndex, unsigned mixtureElement);
 		void proposeSynthesisRateLevels();
-		void setSynthesisRate(double phi, unsigned geneIndex, unsigned mixtureElement);
+		void setSynthesisRate(double phi, unsigned geneIndex, unsigned mixtureElement); //Tested
 		void updateSynthesisRate(unsigned geneIndex);
 		void updateSynthesisRate(unsigned geneIndex, unsigned mixtureElement);
 
@@ -157,7 +159,7 @@ class Parameter {
 
 
 		//Other Functions:
-		unsigned getNumParam(); //Tested; TODO caveat
+		unsigned getNumParam(); //Tested
 		unsigned getNumMixtureElements(); //Tested //TODO style question: Why call it getNumMixtureElements instead of simply getNumMixtures? Alternatively, change name of variable.
 		unsigned getNumObservedPhiSets();
 		void setMixtureAssignment(unsigned gene, unsigned value); //Tested
@@ -268,7 +270,6 @@ class Parameter {
 		double std_stdDevSynthesisRate;
 		unsigned numAcceptForStdDevSynthesisRate;
 		std::vector<double> std_csp;
-
 
 
 		std::vector<std::vector<double>> proposedSynthesisRateLevel;

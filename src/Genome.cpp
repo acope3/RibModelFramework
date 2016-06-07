@@ -84,7 +84,7 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 					 to one of the following cases:
 
 					 1. New sequence line, which starts with "> ".
-					 2. Sequence line, which starts with any charactor except for ">"
+					 2. Sequence line, which starts with any character except for ">"
 					 3. End of file, detected by function eof().
 				 */
 

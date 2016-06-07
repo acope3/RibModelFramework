@@ -131,6 +131,7 @@ Parameter::~Parameter()
 
 
 
+
 //--------------------------------------------------------------//
 //---------- Initialization and Restart Functions --------------//
 //--------------------------------------------------------------//
@@ -161,17 +162,9 @@ void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsig
 	numParam = ((splitSer) ? 40 : 41);
 	numMixtures = _numMixtures;
 
-	//TODO: Why not just vector assign stdDevSynthesisRate_proposed and sydDevSynthesisRate to equal _stdDevSynthesisRate?
-	//stdDevSynthesisRate = _stdDevSynthesisRate;
-	//stdDevSynthesisRate_proposed = _stdDevSynthesisRate;
+	stdDevSynthesisRate = _stdDevSynthesisRate;
+	stdDevSynthesisRate_proposed = _stdDevSynthesisRate;
 
-	stdDevSynthesisRate.resize(_stdDevSynthesisRate.size());
-	stdDevSynthesisRate_proposed.resize(_stdDevSynthesisRate.size());
-	for (unsigned i = 0u; i < stdDevSynthesisRate.size(); i++)
-	{
-		stdDevSynthesisRate[i] = _stdDevSynthesisRate[i];
-		stdDevSynthesisRate_proposed[i] = _stdDevSynthesisRate[i];
-	}
 	bias_stdDevSynthesisRate = 0;
 	std_stdDevSynthesisRate = 0.1;
 
@@ -192,7 +185,6 @@ void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsig
 	//Set up vector of vectors:
 	currentSynthesisRateLevel.resize(numSelectionCategories);
 	proposedSynthesisRateLevel.resize(numSelectionCategories);
-
 	numAcceptForSynthesisRate.resize(numSelectionCategories);
 
 	std_phi.resize(numSelectionCategories);
@@ -488,9 +480,9 @@ void Parameter::writeBasicRestartFile(std::string filename)
 			oss << "***\n";
 			for (j = 0; j < currentSynthesisRateLevel[i].size(); j++)
 			{
-			oss << currentSynthesisRateLevel[i][j];
-			if ((j + 1) % 10 == 0) oss << "\n";
-			else oss <<" ";
+				oss << currentSynthesisRateLevel[i][j];
+				if ((j + 1) % 10 == 0) oss << "\n";
+				else oss <<" ";
 			}
 			if (j % 10 != 0) oss << "\n";
 		}
@@ -508,7 +500,7 @@ void Parameter::initCategoryDefinitions(std::string _mutationSelectionState, std
 	std::set<unsigned> delMCounter;
 	std::set<unsigned> delEtaCounter;
 
-	for (unsigned i = 0; i < numMixtures; i++)
+	for (unsigned i = 0u; i < numMixtures; i++)
 	{
 		categories.push_back(mixtureDefinition()); //push a blank mixtureDefinition on the vector, then alter.
 		if (!mixtureDefinitionMatrix.empty())
@@ -741,6 +733,7 @@ unsigned Parameter::getSelectionCategory(unsigned mixtureElement)
 }
 
 
+// TODO: Why is this the exact same as the function above? Still not explained in header file -- June 7, 2016.
 unsigned Parameter::getSynthesisRateCategory(unsigned mixtureElement)
 {
 	return categories[mixtureElement].delEta;
@@ -765,6 +758,13 @@ std::string Parameter::getMutationSelectionState()
 }
 
 
+// For unit testing only.
+unsigned Parameter::getNumAcceptForCspForIndex(unsigned i)
+{
+	return numAcceptForCodonSpecificParameters[i];
+}
+
+
 
 
 
@@ -784,6 +784,7 @@ void Parameter::setGroupList(std::vector <std::string> gl)
 			groupList.push_back(gl[i]);
 	}
 }
+
 
 std::string Parameter::getGrouping(unsigned index)
 {
@@ -837,6 +838,7 @@ double Parameter::getCurrentStdDevSynthesisRateProposalWidth()
 	return std_stdDevSynthesisRate;
 }
 
+
 // For unit testing only.
 unsigned Parameter::getNumAcceptForStdDevSynthesisRate()
 {
@@ -851,6 +853,13 @@ void Parameter::updateStdDevSynthesisRate()
 		stdDevSynthesisRate[i] = stdDevSynthesisRate_proposed[i];
 	}
 	numAcceptForStdDevSynthesisRate++;
+}
+
+
+// For unit testing only.
+double Parameter::getStdCspForIndex(unsigned i)
+{
+	return std_csp[i];
 }
 
 
