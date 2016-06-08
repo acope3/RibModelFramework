@@ -1799,10 +1799,14 @@ int testParameter()
      * and related get/set functions as a consequence of the function setup:
      * get/setMixtureAssignment,
      * getMutationSelectionState, getNumParam, getNumMixtureElements
-     * get/setStdDevSynthesisRate, getCurrentStdDevSynthesisRateProposalWidth, getNumAcceptForStdDevSynthesisRate
+     * get/setStdDevSynthesisRate, getCurrentStdDevSynthesisRateProposalWidth
+     * getNumAcceptForStdDevSynthesisRate, getStdCspForIndex, getNumAcceptForCspForIndex
      * getNumMutationCategories, getNumSelectionCategories
+     * getMutationCategory, getSelectionCategory
      * getMixtureElementsOfMutationCategory, getMixtureElementsOfSelectionCategory
-    */
+     * get/setCategoryProbability
+     * get/setSynthesisRate, getSynthesisRateProposalWidth
+     */
 
     //---------------------------------------//
     //------ initParameterSet Function ------//
@@ -1890,13 +1894,12 @@ int testParameter()
     //------ getNumParam Function ------//
     //----------------------------------//
 
-    // Because splitSer is true, by initParameterSet the numParam should be = 40.
-    // TODO: Make this more dynamic / tested with other splitSer settings?
+    unsigned int numParam = ((splitSer) ? 40 : 41);
 
-    if (parameter.getNumParam() != 40)
+    if (parameter.getNumParam() != numParam)
     {
         my_printError("Error in initParameterSet or getNumParam.");
-        my_printError(" Value should be %, but is instead %.\n", 40, parameter.getNumParam());
+        my_printError(" Value should be %, but is instead %.\n", numParam, parameter.getNumParam());
         globalError = 1;
         initParameterSetError = 1;
     }
@@ -1951,6 +1954,7 @@ int testParameter()
     else
         error = 0; //Reset for next function.
 
+    // Not part of initParameterSet, but added here for convenience.
     //--------------------------------------------//
     //------ setStdDevSynthesisRate Function------//
     //--------------------------------------------//
@@ -2002,11 +2006,55 @@ int testParameter()
     else
         my_print("Parameter getNumAcceptForStdDevSynthesisRate --- Pass\n");
 
+    // For unit testing only.
+    //----------------------------------------//
+    //------ getStdCspForIndex Function ------//
+    //----------------------------------------//
+    std::vector <double> tmpStd_Csp(numParam, 0.1);
 
-    //TODO: Write getter function to unit test std_csp
+    for (unsigned i = 0u; i < numParam; i++)
+    {
+        if (parameter.getStdCspForIndex(i) != tmpStd_Csp[i])
+        {
+            my_printError("Error in initParameterSet or getStdCspForIndex for index %.", i);
+            my_printError(" Value should be %, but is instead %.\n", tmpStd_Csp[i], parameter.getStdCspForIndex(i));
+            error = 1;
+            globalError = 1;
+            initParameterSetError = 1;
+        }
+    }
 
-    //TODO: Write getter function to unit test numAcceptForCodonSpecificParameters
+    if (!error)
+        my_print("Parameter getStdCspForIndex --- Pass\n");
+    else
+        error = 0; //Reset for next function.
 
+    // For unit testing only.
+    //-------------------------------------------------//
+    //------ getNumAcceptForCspForIndex Function ------//
+    //-------------------------------------------------//
+
+    // Because default constructor was used, maxGrouping is = 22.
+    // TODO: Make this more dynamic / tested with other settings?
+    unsigned maxGrouping = 22;
+    std::vector <unsigned> tmpNumAcceptForCsp(maxGrouping, 0u);
+
+    for (unsigned i = 0u; i < maxGrouping; i++)
+    {
+        if (parameter.getNumAcceptForCspForIndex(i) != tmpNumAcceptForCsp[i])
+        {
+            my_printError("Error in initParameterSet or getNumAcceptForCspForIndex for index %.", i);
+            my_printError(" Value should be %, but is instead %.\n", tmpNumAcceptForCsp[i], parameter.getNumAcceptForCspForIndex(i));
+            error = 1;
+            globalError = 1;
+            initParameterSetError = 1;
+        }
+    }
+
+    if (!error)
+        my_print("Parameter getNumAcceptForCspForIndex --- Pass\n");
+    else
+        error = 0; //Reset for next function.
 
     /* TODO NOTE: setNumMutationSelectionValues is accessed in initParameterSet
     // and through this function numMutationCategories and numSelectionCategories is changed.
@@ -2045,14 +2093,69 @@ int testParameter()
         my_print("Parameter getNumSelectionCategories --- Pass\n");
 
     /* TODO NOTE: initCategoryDefinitions is accessed in initParameterSet
-    // and through this function mutationIsInMixture and selectionIsInMixture is changed.
+    // and through this function categories.delM, categories.delEta,
+    // mutationIsInMixture, and selectionIsInMixture are changed.
     // This function may itself need to be tested as a middleman function.*/
+
+    // TODO: While the categories' .delM and .delEta values are checked,
+    // The categories variable itself is not checked.
+
+    //-----------------------------------------//
+    //------ getMutationCategory Function------//
+    //-----------------------------------------//
+
+    // Because mutationSelectionState is allUnique,
+    // by initParameterSet each category's delM = numMixtures
+    // TODO: Make this more dynamic / tested with other settings?
+
+    for (unsigned i = 0u; i < numMixtures; i++)
+    {
+        if (parameter.getMutationCategory(i) != i)
+        {
+            my_printError("Error in initParameterSet or getMutationCategory for index %.", i);
+            my_printError(" Value should be %, but is instead %.\n", i, parameter.getMutationCategory(i));
+            error = 1;
+            globalError = 1;
+            initParameterSetError = 1;
+        }
+    }
+
+    if (!error)
+        my_print("Parameter getMutationCategory --- Pass\n");
+    else
+        error = 0; //Reset for next function.
+
+    //------------------------------------------//
+    //------ getSelectionCategory Function------//
+    //------------------------------------------//
+
+    // Because mutationSelectionState is allUnique,
+    // by initParameterSet each category's delEta = numMixtures
+    // TODO: Make this more dynamic / tested with other settings?
+
+    for (unsigned i = 0u; i < numMixtures; i++)
+    {
+        if (parameter.getSelectionCategory(i) != i)
+        {
+            my_printError("Error in initParameterSet or getSelectionCategory for index %.", i);
+            my_printError(" Value should be %, but is instead %.\n", i, parameter.getSelectionCategory(i));
+            error = 1;
+            globalError = 1;
+            initParameterSetError = 1;
+        }
+    }
+
+    if (!error)
+        my_print("Parameter getSelectionCategory --- Pass\n");
+    else
+        error = 0; //Reset for next function.
 
     //----------------------------------------------------------//
     //------ getMixtureElementsOfMutationCategory Function------//
     //----------------------------------------------------------//
 
-    // Because mutationSelectionState is allUnique, by initParameterSet the mutationIsInMixture should be a single vector = tmp.
+    // Because mutationSelectionState is allUnique and numMixtures = 1,
+    // by initParameterSet the mutationIsInMixture should be a single vector = tmp.
     // TODO: Make this more dynamic / tested with other settings?
     std::vector <unsigned> tmp;
 
@@ -2081,7 +2184,8 @@ int testParameter()
     //------ getMixtureElementsOfSelectionCategory Function------//
     //-----------------------------------------------------------//
 
-    // Because mutationSelectionState is allUnique, by initParameterSet the selectionIsInMixture should be a single vector = tmp.
+    // Because mutationSelectionState is allUnique and numMixtures = 1,
+    // by initParameterSet the selectionIsInMixture should be a single vector = tmp.
     // TODO: Make this more dynamic / tested with other settings?
 
     // Reuse tmp vector of unsigned integers defined above
@@ -2102,14 +2206,171 @@ int testParameter()
     else
         error = 0; //Reset for next function.
 
+    //--------------------------------------------//
+    //------ getCategoryProbability Function------//
+    //--------------------------------------------//
 
-    //TODO: Check modifications to category (a vector of MixtureDefinitions) somehow
+    // Each value is initialized to 1.0 / numMixtures in initParameterSet.
+    for (unsigned i = 0u; i < numMixtures; i++)
+    {
+        if (parameter.getCategoryProbability(i) != 1.0/(double)numMixtures)
+        {
+            my_printError("Error in initParameterSet or getCategoryProbability for index %.", i);
+            my_printError(" Value should be %, but is instead %.\n", 1.0/(double)numMixtures, parameter.getCategoryProbability(i));
+            error = 1;
+            globalError = 1;
+            initParameterSetError = 1;
+        }
+    }
 
-    //TODO: Check the final four vectors of vectors that are modified in initParameterSet
+    if (!error)
+        my_print("Parameter getCategoryProbability --- Pass\n");
+    else
+        error = 0; //Reset for next function.
+
+    // Not part of initParameterSet, but added here for convenience.
+    //--------------------------------------------//
+    //------ setCategoryProbability Function------//
+    //--------------------------------------------//
+    for (unsigned i = 0u; i < numMixtures; i++)
+    {
+        parameter.setCategoryProbability(i, (double)i/(double)numMixtures);
+        if (parameter.getCategoryProbability(i) != (double)i/(double)numMixtures)
+        {
+            my_printError("Error in setCategoryProbability for index %.", i);
+            my_printError(" Value should be %, but is instead %.\n", (double)i/(double)numMixtures, parameter.getCategoryProbability(i));
+            error = 1;
+            globalError = 1;
+        }
+    }
+
+    if (!error)
+        my_print("Parameter setCategoryProbability --- Pass\n");
+    else
+        error = 0; //Reset for next function.
+
+    //--------------------------------------//
+    //------ getSynthesisRate Function------//
+    //--------------------------------------//
+
+    // Each value is initialized to 0.0 in initParameterSet.
+    // Note that numSelectionCategories = numMixtures since allUnique; therefore,
+    // the outer loop only iterates once.
+
+    // Check proposed SynthesisRate
+    for (unsigned i = 0u; i < parameter.getNumSelectionCategories(); i++)
+    {
+        for (unsigned j = 0u; j < numGenes; j++)
+        {
+            if (parameter.getSynthesisRate(j, i, 1) != 0.0)
+            {
+                my_printError("Error in initParameterSet or getSynthesisRate(proposed) for index % of mixture %.", j, i);
+                my_printError(" Value should be %, but is instead %.\n", 0.0, parameter.getSynthesisRate(j, i, 1));
+                error = 1;
+                globalError = 1;
+                initParameterSetError = 1;
+            }
+        }
+    }
+
+    // Check non-proposed SynthesisRate
+    for (unsigned i = 0u; i < parameter.getNumSelectionCategories(); i++)
+    {
+        for (unsigned j = 0u; j < numGenes; j++)
+        {
+            if (parameter.getSynthesisRate(j, i, 0) != 0.0)
+            {
+                my_printError("Error in initParameterSet or getSynthesisRate(non-proposed) for index % of mixture %.", j, i);
+                my_printError(" Value should be %, but is instead %.\n", 0.0, parameter.getSynthesisRate(j, i, 0));
+                error = 1;
+                globalError = 1;
+                initParameterSetError = 1;
+            }
+        }
+    }
+
+    if (!error)
+        my_print("Parameter getSynthesisRate --- Pass\n");
+    else
+        error = 0; //Reset for next function.
+
+    // Not part of initParameterSet, but added here for convenience.
+    //--------------------------------------//
+    //------ setSynthesisRate Function------//
+    //--------------------------------------//
+
+    for (unsigned i = 0u; i < parameter.getNumSelectionCategories(); i++)
+    {
+        for (unsigned j = 0u; j < numGenes; j++)
+        {
+            parameter.setSynthesisRate(j, j, i);
+            if (parameter.getSynthesisRate(j, i, 0) != j)
+            {
+                my_printError("Error in setSynthesisRate for index % of mixture %.", j, i);
+                my_printError(" Value should be %, but is instead %.\n", j, parameter.getSynthesisRate(j, i, 0));
+                error = 1;
+                globalError = 1;
+            }
+        }
+    }
+
+    if (!error)
+        my_print("Parameter setSynthesisRate --- Pass\n");
+    else
+        error = 0; //Reset for next function.
+
+
+    //TODO: numAcceptForSynthesisRate seems to have no getter function
+
+    //TODO: Check std_phi with these functions
+    //---------------------------------------------------//
+    //------ getSynthesisRateProposalWidth Function------//
+    //---------------------------------------------------//
+
+    // Each value is initialized to 0.1 in initParameterSet.
+    // Note that numSelectionCategories = numMixtures since allUnique; therefore,
+    // the outer loop only iterates once.
+    for (unsigned i = 0u; i < parameter.getNumSelectionCategories(); i++)
+    {
+        for (unsigned j = 0u; j < numGenes; j++)
+        {
+            if (parameter.getSynthesisRateProposalWidth(j, i) != 0.1)
+            {
+                my_printError("Error in initParameterSet or getSynthesisRate(proposed) for index % of mixture %.", j, i);
+                my_printError(" Value should be %, but is instead %.\n", 0.0, parameter.getSynthesisRateProposalWidth(j, i));
+                error = 1;
+                globalError = 1;
+                initParameterSetError = 1;
+            }
+        }
+    }
+
+    if (!error)
+        my_print("Parameter getSynthesisRateProposalWidth --- Pass\n");
+    else
+        error = 0; //Reset for next function.
+
+    // TODO: Then, test getCurrentSynthesisRateProposalWidth, which in turn requires testing getSynthesisRateCategory first
+    //----------------------------------------------//
+    //------ getSynthesisRateCategory Function------//
+    //----------------------------------------------//
+    // TODO: Need explanation about difference between this function and the other one.
+    /*
+    double Parameter::getCurrentSynthesisRateProposalWidth(unsigned expressionCategory, unsigned geneIndex)
+    {
+        return std_phi[expressionCategory][geneIndex];
+    }
+     */
+
+    //TODO: Test commenting/uncommenting this to see why final print statement
+    //Doesn't work.
+    my_print("%\n", initParameterSetError);
 
     //------------------------------------------------------------------------//
     //------ End of Unit Testing for initParameterSet-related Functions ------//
     //------------------------------------------------------------------------//
+    //TODO: Why isn't this printing sometimes...?
+
     if (!initParameterSetError)
         my_print("Parameter initParameterSet --- Pass\n");
 
@@ -2121,11 +2382,13 @@ int testParameter()
     //------ InitializeSynthesisRate Function ------//
     //----------------------------------------------//
 
+    /*
     Genome genome;
     genome.readFasta("/Users/hollisbui/RibModelDev/data/twoMixtures/simulatedAllUniqueR.fasta");
-    std::vector<double> sphi_init(numMixtures, 1);
+    std::vector <double> sphi_init(numMixtures, 1);
 
     parameter.InitializeSynthesisRate(genome, sphi_init[0]);
+    */
 
     //ROCParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 
@@ -2303,6 +2566,7 @@ int testTrace()
     return globalError;
 }
 */
+
 
 /*
 int testROCParameter()
@@ -2527,6 +2791,8 @@ int testMCMCAlgorithm()
 
     return globalError;
 }
+
+
 
 
 
