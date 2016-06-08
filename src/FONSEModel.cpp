@@ -692,9 +692,13 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 		codonProb[numCodons - 1] = 1.0;
 	}
 
-	for (unsigned i = 0; i < numCodons; i++) {
-		codonProb[i] /= denominator;
-	}
+	//As is found in ROCModel.cpp, multiplication is a faster operation than division so we 
+	//save time here by dividing once and then muliplying numCodons times instead of dividing
+	//numCodons times.
+	denominator = 1 / denominator
+		for (unsigned i = 0; i < numCodons; i++) {
+			codonProb[i] *= denominator;
+		}
 }
 
 void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned position,
@@ -737,8 +741,12 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 		codonProb[numCodons - 1] = 1.0;
 	}
 
+	//As is found in ROCModel.cpp, multiplication is a faster operation than division so we 
+	//save time here by dividing once and then muliplying numCodons times instead of dividing
+	//numCodons times.
+	denominator = 1/denominator
 	for (unsigned i = 0; i < numCodons; i++) {
-		codonProb[i] /= denominator;
+		codonProb[i] *= denominator;
 	}
 }
 
