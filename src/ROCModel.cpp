@@ -793,7 +793,7 @@ void ROCModel::calculateCodonProbabilityVector(unsigned numCodons, double mutati
 		codonProb[numCodons - 1] = 1.0;
 	}
 
-	denominator = 1 / denominator; // Multiplication is faster than devition: replace multiple divisions below by one up here.
+	denominator = 1 / denominator; // Multiplication is faster than division: replace multiple divisions below by one up here.
 	// normalize codon probabilities
 	for (unsigned i = 0u; i < numCodons; i++)
 		codonProb[i] = codonProb[i] * denominator; // denominator is 1/denominator. see above
