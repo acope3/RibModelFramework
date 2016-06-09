@@ -41,8 +41,9 @@ RFPParameter::RFPParameter(std::string filename) : Parameter(64)
  * Initializes the object from given values. If thetaK matrix is null or empty, the mutationselectionState keyword
  * is used to generate the matrix.
 */
-RFPParameter::RFPParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix,
-		bool splitSer, std::string _mutationSelectionState) : Parameter(64)
+RFPParameter::RFPParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures,
+		std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer,
+		std::string _mutationSelectionState) : Parameter(64)
 {
 	initParameterSet(stdDevSynthesisRate, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
 	initRFPParameterSet();
@@ -93,7 +94,6 @@ RFPParameter::~RFPParameter()
 */
 void RFPParameter::initRFPParameterSet()
 {
-
 	unsigned alphaCategories = getNumMutationCategories();
 	unsigned lambdaPrimeCategories = getNumSelectionCategories();
 

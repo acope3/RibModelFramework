@@ -100,7 +100,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	// TODO move the likelihood calculation out of here. make it a void function again.
 
 	double logLikelihood = 0.0;
-    double logLikelihood2 = 0.0;
+    //double logLikelihood2 = 0.0; //currently unused
 	int numGenes = genome.getGenomeSize();
 
 	unsigned numSynthesisRateCategories = model.getNumSynthesisRateCategories();
@@ -326,7 +326,7 @@ void MCMCAlgorithm::acceptRejectHyperParameter(Genome &genome, Model& model, uns
 /* run (RCPP EXPOSED)
  * Arguments: reference to a genome and a model. number of cores to run on (unless running on a MAC). Number of
  * iterations to allow initial conditions to vary.
- * Runs the MCMC algorithm for the set number of iterations. Run can terminate early if GWEKE score meets
+ * Runs the MCMC algorithm for the set number of iterations. Run can terminate early if Geweke score meets
  * the set criteria.
 */
 void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigned divergenceIterations)

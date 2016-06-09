@@ -607,7 +607,8 @@ void Parameter::InitializeSynthesisRate(std::vector<double> expression)
 
 std::vector <double> Parameter::readPhiValues(std::string filename)
 {
-	std::size_t pos, pos2;
+	std::size_t pos;
+	std::size_t pos2; //currently unused
 	std::ifstream currentFile;
 	std::string tmpString;
 	std::vector <double> RV;
@@ -692,12 +693,20 @@ void Parameter::printMixtureDefinitionMatrix()
 }
 
 
+/* getCategoryProbability (NOT EXPOSED)
+ * Arguments: A number representing a mixture element
+ * Returns the category probability of the mixture element given.
+*/
 double Parameter::getCategoryProbability(unsigned mixtureElement)
 {
 	return categoryProbabilities[mixtureElement];
 }
 
 
+/* setCategoryProbability (NOT EXPOSED)
+ * Arguments: A number representing a mixture element, a double representing a probability
+ * Sets the probability for the category of the mixture element to the value given.
+*/
 void Parameter::setCategoryProbability(unsigned mixtureElement, double value)
 {
 	categoryProbabilities[mixtureElement] = value;
@@ -795,6 +804,10 @@ unsigned Parameter::getNumAcceptForCspForIndex(unsigned i)
 // -------------------------------------------//
 
 
+/* setGroupList (NOT EXPOSED)
+ * Arguments: vector of strings representing a group list
+ * Sets the group list to the argument after clearing the group list, adding elements only if they have no errors.
+*/
 void Parameter::setGroupList(std::vector <std::string> gl)
 {
 	groupList.clear();
@@ -808,18 +821,30 @@ void Parameter::setGroupList(std::vector <std::string> gl)
 }
 
 
+/* getGrouping (NOT EXPOSED)
+ * Arguments: index of a group list element to be returned
+ * Returns the group list element at the given index.
+*/
 std::string Parameter::getGrouping(unsigned index)
 {
 	return groupList[index];
 }
 
 
+/* getGroupList (NOT EXPOSED)
+ * Arguments: None
+ * Returns the group list as a vector of strings.
+*/
 std::vector<std::string> Parameter::getGroupList()
 {
 	return groupList;
 }
 
 
+/* getGroupListSize (NOT EXPOSED)
+ * Arguments: None
+ * Returns the size of the group list.
+*/
 unsigned Parameter::getGroupListSize()
 {
 	return (unsigned) groupList.size();
@@ -1425,7 +1450,7 @@ std::vector<double> Parameter::getCodonSpecificQuantile(unsigned mixtureElement,
 		mixtureElement, codon, paramType, withoutReference);
     
     unsigned traceLength = lastIteration + 1;
-    unsigned traceEnd = parameterTrace.size() - (parameterTrace.size() - lastIteration);
+    //unsigned traceEnd = parameterTrace.size() - (parameterTrace.size() - lastIteration); //currently unused
 	if (samples > traceLength)
 	{
 		my_printError("Warning in Parameter::getCodonSpecificQuantile throws: Number of anticipated samples ");

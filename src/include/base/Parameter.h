@@ -1,9 +1,11 @@
 #ifndef PARAMETER_H
 #define PARAMETER_H
 
+
 #include "../Genome.h"
 #include "../CovarianceMatrix.h"
 #include "Trace.h"
+
 
 #include <vector>
 #include <random>
@@ -101,7 +103,7 @@ class Parameter {
 		unsigned getNumAcceptForCspForIndex(unsigned i); //Tested; only for unit testing.
 
 
-		//Group List Functions:
+		//Group List Functions: All tested
 		void setGroupList(std::vector<std::string> gl);
 		std::string getGrouping(unsigned index);
 		std::vector<std::string> getGroupList();
