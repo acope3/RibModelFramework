@@ -17,6 +17,13 @@
 #include <Rcpp.h>
 #endif
 
+/* Note 1) -- on getSelectionCategory and getSynthesisRateCategory
+ * These two functions are technically the same for readability.
+ * Selection and Synthesis Rate are directly related even if they are not known
+ * and thus are represented by the same variable. By splitting this
+ * into Selection and Synthesis, avoids confusing the two, however.
+*/
+
 class Parameter {
 	private:
 
@@ -61,7 +68,7 @@ class Parameter {
 		//Initialization and Restart Functions:
 		void initParameterSet(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
 			std::vector<std::vector<unsigned>> mixtureDefinitionMatrix,
-			bool splitSer = true, std::string _mutationSelectionState = "allUnique"); //Partially tested; TODO caveats
+			bool splitSer = true, std::string _mutationSelectionState = "allUnique"); //Mostly tested; TODO caveats
 		void initBaseValuesFromFile(std::string filename);
 		void writeBasicRestartFile(std::string filename);
 		void initCategoryDefinitions(std::string mutationSelectionState,
@@ -86,8 +93,8 @@ class Parameter {
 		unsigned getNumSelectionCategories(); //Tested; TODO caveat
 		unsigned getNumSynthesisRateCategories();
 		unsigned getMutationCategory(unsigned mixtureElement); //Tested
-		unsigned getSelectionCategory(unsigned mixtureElement); //Tested; TODO: Add comments explaining reasoning here for same function
-		unsigned getSynthesisRateCategory(unsigned mixtureElement);
+		unsigned getSelectionCategory(unsigned mixtureElement); //Tested; see Note 1) at top of file.
+		unsigned getSynthesisRateCategory(unsigned mixtureElement); //Tested; see Note 1) at top of file.
 		std::vector<unsigned> getMixtureElementsOfMutationCategory(unsigned category); //Tested; TODO caveat
 		std::vector<unsigned> getMixtureElementsOfSelectionCategory(unsigned category); //Tested; TODO caveat
 		std::string getMutationSelectionState(); //Tested
@@ -113,12 +120,13 @@ class Parameter {
 
 		//Synthesis Rate Functions:
 		double getSynthesisRate(unsigned geneIndex, unsigned mixtureElement, bool proposed = false); //Tested
-		double getCurrentSynthesisRateProposalWidth(unsigned expressionCategory, unsigned geneIndex);
-		double getSynthesisRateProposalWidth(unsigned geneIndex, unsigned mixtureElement);
+		double getCurrentSynthesisRateProposalWidth(unsigned expressionCategory, unsigned geneIndex); //Tested
+		double getSynthesisRateProposalWidth(unsigned geneIndex, unsigned mixtureElement); //Tested
 		void proposeSynthesisRateLevels();
 		void setSynthesisRate(double phi, unsigned geneIndex, unsigned mixtureElement); //Tested
 		void updateSynthesisRate(unsigned geneIndex);
 		void updateSynthesisRate(unsigned geneIndex, unsigned mixtureElement);
+		unsigned getNumAcceptForSynthesisRate(unsigned expressionCategory, unsigned geneIndex); //Tested; only for unit testing
 
 
 		//Iteration Functions:

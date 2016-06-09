@@ -551,7 +551,8 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 	for (unsigned i = 0u; i < genomeSize; i++)
 	{
 		index[i] = i;
-		scuoValues[i] = calculateSCUO( genome.getGene(i), 22 ); //This used to be maxGrouping, but RFP model will not work that way
+		//This used to be maxGrouping instead of 22, but RFP model will not work that way
+		scuoValues[i] = calculateSCUO( genome.getGene(i), 22 );
 		expression[i] = Parameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
 	}
 
@@ -727,13 +728,30 @@ unsigned Parameter::getMutationCategory(unsigned mixtureElement)
 }
 
 
+/* Note 1) -- on getSelectionCategory and getSynthesisRateCategory
+ * These two functions are technically the same for readability.
+ * Selection and synthesis rate are directly related even if they are not known
+ * and thus are represented by the same variable. By splitting this
+ * into selection and synthesis, we avoid confusion when otherwise
+ * we may ask why one is used in the place of another.
+*/
+
+/* getSelectionCategory (RCPP EXPOSED VIA WRAPPER)
+ * Arguments: A number representing a mixture element
+ * Returns the selection category of the mixture element chosen.
+ * See Note 1) above.
+ */
 unsigned Parameter::getSelectionCategory(unsigned mixtureElement)
 {
 	return categories[mixtureElement].delEta;
 }
 
 
-// TODO: Why is this the exact same as the function above? Still not explained in header file -- June 7, 2016.
+/* getSynthesisRateCategory (RCPP EXPOSED VIA WRAPPER)
+ * Arguments: A number representing a mixture element
+ * Returns the synthesis rate category of the mixture element chosen.
+ * See Note 1) above.
+ */
 unsigned Parameter::getSynthesisRateCategory(unsigned mixtureElement)
 {
 	return categories[mixtureElement].delEta;
@@ -758,7 +776,11 @@ std::string Parameter::getMutationSelectionState()
 }
 
 
-// For unit testing only.
+/* getNumAcceptForCspForIndex (NOT EXPOSED)
+ * Arguments: index of numAcceptForCodonSpecificParameters to be returned
+ * Returns the numAcceptForCodonSpecificParameters at the index given.
+ * Note: Used in unit testing only.
+*/
 unsigned Parameter::getNumAcceptForCspForIndex(unsigned i)
 {
 	return numAcceptForCodonSpecificParameters[i];
@@ -839,7 +861,11 @@ double Parameter::getCurrentStdDevSynthesisRateProposalWidth()
 }
 
 
-// For unit testing only.
+/* getNumAcceptForStdDevSynthesisRate (NOT EXPOSED)
+ * Arguments: None
+ * Returns the numAcceptForStdDevSynthesisRate.
+ * Note: Used in unit testing only.
+*/
 unsigned Parameter::getNumAcceptForStdDevSynthesisRate()
 {
 	return numAcceptForStdDevSynthesisRate;
@@ -856,7 +882,11 @@ void Parameter::updateStdDevSynthesisRate()
 }
 
 
-// For unit testing only.
+/* getStdCspForIndex (NOT EXPOSED)
+ * Arguments: index of std_csp to be returned
+ * Returns the std_csp at the index given.
+ * Note: Used in unit testing only.
+*/
 double Parameter::getStdCspForIndex(unsigned i)
 {
 	return std_csp[i];
@@ -878,12 +908,29 @@ double Parameter::getSynthesisRate(unsigned geneIndex, unsigned mixtureElement, 
 }
 
 
+/* Note 2) -- on getCurrentSynthesisRateProposalWidth and getSynthesisRateProposalWidth
+ * These two functions should perform the same action if properly used.
+ * Similar to Note 1), these functions are based on how
+ * synthesis rate category and selection category are directly related
+ * but for readability two separated functions are created.
+*/
+
+/* getCurrentSynthesisRateProposalWidth (NOT EXPOSED)
+ * Arguments: index of a gene in the genome, number representing the selected category
+ * Returns the current synthesis rate proposal width of the category of the mixture element for the gene indexed.
+ * See Note 2) above.
+*/
 double Parameter::getCurrentSynthesisRateProposalWidth(unsigned expressionCategory, unsigned geneIndex)
 {
 	return std_phi[expressionCategory][geneIndex];
 }
 
 
+/* getSynthesisRateProposalWidth (NOT EXPOSED)
+ * Arguments: index of a gene in the genome, number representing a mixture element
+ * Returns the synthesis rate proposal width of the category of the mixture element for the gene indexed.
+ * See Note 2) above.
+*/
 double Parameter::getSynthesisRateProposalWidth(unsigned geneIndex, unsigned mixtureElement)
 {
 	unsigned category = getSelectionCategory(mixtureElement);
@@ -927,6 +974,17 @@ void Parameter::updateSynthesisRate(unsigned geneIndex, unsigned mixtureElement)
 	unsigned category = getSelectionCategory(mixtureElement);
 	numAcceptForSynthesisRate[category][geneIndex]++;
 	currentSynthesisRateLevel[category][geneIndex] = proposedSynthesisRateLevel[category][geneIndex];
+}
+
+
+/* getNumAcceptForSynthesisRate (NOT EXPOSED)
+ * Arguments: index of a gene in the genome, number representing the selected category
+ * Returns the numAcceptForSynthesisRate of the category of the mixture element for the gene indexed.
+ * Note: Used in unit testing only.
+*/
+unsigned Parameter::getNumAcceptForSynthesisRate(unsigned expressionCategory, unsigned geneIndex)
+{
+	return numAcceptForSynthesisRate[expressionCategory][geneIndex];
 }
 
 
@@ -1246,8 +1304,8 @@ double Parameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned geneI
 }
 
 
-double Parameter::getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType,
-	bool withoutReference)
+double Parameter::getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon,
+	unsigned paramType, bool withoutReference)
 {
 	double posteriorMean = 0.0;
 	std::vector<double> mutationParameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
@@ -1330,8 +1388,8 @@ double Parameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex,
 }
 
 
-double Parameter::getCodonSpecificVariance(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType, bool unbiased,
-	bool withoutReference)
+double Parameter::getCodonSpecificVariance(unsigned mixtureElement, unsigned samples, std::string &codon,
+	unsigned paramType, bool unbiased, bool withoutReference)
 {
 	std::vector<double> parameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
 		mixtureElement, codon, paramType, withoutReference);
