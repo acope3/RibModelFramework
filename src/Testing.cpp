@@ -2943,19 +2943,19 @@ int testMCMCAlgorithm()
     int error = 0;
     int globalError = 0;
 
-    std::cout << "Initializing MCMCAlgorithm object---------------\n";
-    std::cout << "\t# Samples: " << samples << "\n";
-    std::cout << "\tThining: " << thining << "\n";
-    std::cout << "\t # Samples used: " << 100 << "\n";
+    my_print("Initializing MCMCAlgorithm object---------------\n");
+    my_print("\t# Samples: %\n", samples);
+    my_print("\tThining: %\n", thining);
+    my_print("\t # Samples used: %\n", 100);
 
     MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, 10, true, true, true);
-    std::cout << "Done!-------------------------------\n\n\n";
+    my_print("Done!-------------------------------\n\n\n");
 
-    std::cout << "Initializing Genome object--------------------------\n";
+    my_print("Initializing Genome object--------------------------\n");
     Genome genome;
     genome.readRFPFile("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
-    std::cout << "Done!-------------------------------\n\n\n";
-    std::cout << "Initializing shared parameter variables---------------\n";
+    my_print("Done!-------------------------------\n\n\n");
+    my_print("Initializing shared parameter variables---------------\n");
     unsigned numMixtures = 1;
     std::vector <double> stdDev(numMixtures, 1);
     unsigned numGenes = genome.getGenomeSize();
@@ -2979,31 +2979,30 @@ int testMCMCAlgorithm()
     std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
     bool splitSer = true;
     std::string mutationSelectionState = Parameter::allUnique;
-    std::cout << "Done!------------------------\n\n\n";
+    my_print("Done!------------------------\n\n\n");
 
 
-    std::cout << "Initializing RFPParameter object--------------------\n\n";
+    my_print("Initializing RFPParameter object--------------------\n\n");
     RFPParameter parameter(stdDev, numMixtures, geneAssignment, mixtureDefinitionMatrix, splitSer, mutationSelectionState);
     for (unsigned i = 0u; i < numMixtures; i++) {
-        unsigned selectionCategry = parameter.getSelectionCategory(i);
-        std::cout << "Sphi_init for selection category " << selectionCategry << ": " <<
-        stdDev[selectionCategry] << std::endl;
+        unsigned selectionCategory = parameter.getSelectionCategory(i);
+        my_print("Sphi_init for selection category %: %\n", selectionCategory, stdDev[selectionCategory]);
     }
-    std::cout << "\t# mixtures: " << numMixtures << "\n";
-    std::cout << "\tmixture definition: " << mutationSelectionState << "\n";
+    my_print("\t# mixtures: %\n", numMixtures);
+    my_print("\tmixture definition: %\n", mutationSelectionState);
 
     parameter.InitializeSynthesisRate(genome, stdDev[0]);
 
-    std::cout << "Done!--------------------------------\n\n\n";
+    my_print("Done!--------------------------------\n\n\n");
 
-    std::cout << "Initializing RFPModel object--------------------------\n";
+    my_print("Initializing RFPModel object--------------------------\n");
     RFPModel model;
     model.setParameter(parameter);
-    std::cout << "Done!----------------------------------\n\n\n";
+    my_print("Done!----------------------------------\n\n\n");
 
-    std::cout << "Running MCMC.............\n" << std::endl;
+    my_print("Running MCMC.............\n\n");
     mcmc.run(genome, model, 1, 0);
-    std::cout << "Done!----------------------------------\n\n\n";
+    my_print("Done!----------------------------------\n\n\n");
 
     //--------------------------------------------//
     //------ varyInitialConditions Function ------//

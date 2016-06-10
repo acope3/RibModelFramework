@@ -89,7 +89,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 	double mutation[5];
 	double selection[5];
 
-	//SequenceSummary *seqsum = gene.getSequenceSummary(); //currently used
+	//SequenceSummary *seqsum = gene.getSequenceSummary(); //currently unused
 
 	// get correct index for everything
 	unsigned mutationCategory = parameter->getMutationCategory(k);

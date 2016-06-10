@@ -695,17 +695,17 @@ int main()
 
 	if (modelToRun == "ROC")
 	{
-		std::cout << "Initializing Genome object--------------------------\n";
+		my_print("Initializing Genome object--------------------------\n");
 		Genome genome;
 		genome.readFasta(pathBegin + "RibModelDev/data/twoMixtures/simulatedAllUniqueR.fasta");
 		if (withPhi)
 		{
 			genome.readObservedPhiValues(pathBegin + "RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv", false);
 		}
-		std::cout << "Done!-------------------------------\n\n\n";
+		my_print("Done!-------------------------------\n\n\n");
 
 
-		std::cout << "Initializing shared parameter variables---------------\n";
+		my_print("Initializing shared parameter variables---------------\n");
 		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 		std::vector<double> sphi_init(numMixtures, 1);
 
@@ -726,10 +726,10 @@ int main()
 			}
 		}
 		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
-		std::cout << "Done!------------------------\n\n\n";
+		my_print("Done!------------------------\n\n\n");
 
 
-		std::cout << "Initializing ROCParameter object--------------------\n\n";
+		my_print("Initializing ROCParameter object--------------------\n\n");
 		ROCParameter parameter;
 
 		if (fromRestart)
@@ -745,11 +745,10 @@ int main()
 			for (unsigned i = 0u; i < numMixtures; i++)
 			{
 				unsigned selectionCategry = tmp.getSelectionCategory(i);
-				std::cout << "Sphi_init for selection category " << selectionCategry << ": "
-				<< sphi_init[selectionCategry] << std::endl;
+				my_print("Sphi_init for selection category %: %\n", selectionCategry, sphi_init[selectionCategry]);
 			}
-			std::cout << "\t# mixtures: " << numMixtures << "\n";
-			std::cout << "\tmixture definition: " << mixDef << "\n";
+			my_print("\t# mixtures: %\n", numMixtures);
+			my_print("\tmixture definition: %\n", mixDef);
 
 			std::vector<std::string> files(2);
 			files[0] = std::string(pathBegin + "RibModelDev/data/twoMixtures/simulated_mutation0.csv");
@@ -765,28 +764,28 @@ int main()
 			//parameter.InitializeSynthesisRate(phiVals);
 			parameter = tmp;
 		}
-		std::cout << "Done!--------------------------------\n\n\n";
+		my_print("Done!--------------------------------\n\n\n");
 
 
-		std::cout << "Initializing ROCModel object--------------------------\n";
+		my_print("Initializing ROCModel object--------------------------\n");
 		ROCModel model;
 		model.setParameter(parameter);
-		std::cout << "Done!----------------------------------\n\n\n";
+		my_print("Done!----------------------------------\n\n\n");
 
 
-		std::cout << "Running MCMC.............\n" << std::endl;
+		my_print("Running MCMC.............\n\n");
 		mcmc.run(genome, model, 1, 0);
-		std::cout << "Done!----------------------------------\n\n\n";
+		my_print("Done!----------------------------------\n\n\n");
 	} //END OF ROC
 	else if (modelToRun == "RFP")
 	{
-		std::cout << "Initializing Genome object--------------------------\n";
+		my_print("Initializing Genome object--------------------------\n");
 		Genome genome;
 		genome.readRFPFile(pathBegin + "RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
-		std::cout << "Done!-------------------------------\n\n\n";
+		my_print("Done!-------------------------------\n\n\n");
 
 
-		std::cout << "Initializing shared parameter variables---------------\n";
+		my_print("Initializing shared parameter variables---------------\n");
 		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 		std::vector<double> sphi_init(numMixtures, 1);
 
@@ -807,10 +806,10 @@ int main()
 			}
 		}
 		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
-		std::cout << "Done!------------------------\n\n\n";
+		my_print("Done!------------------------\n\n\n");
 
 
-		std::cout << "Initializing RFPParameter object--------------------\n\n";
+		my_print("Initializing RFPParameter object--------------------\n\n");
 		RFPParameter parameter;
 
 		if (fromRestart)
@@ -825,38 +824,37 @@ int main()
 
 			for (unsigned i = 0u; i < numMixtures; i++) {
 				unsigned selectionCategry = tmp.getSelectionCategory(i);
-				std::cout << "Sphi_init for selection category " << selectionCategry << ": " <<
-				sphi_init[selectionCategry] << std::endl;
+				my_print("Sphi_init for selection category %: %\n", selectionCategry, sphi_init[selectionCategry]);
 			}
-			std::cout << "\t# mixtures: " << numMixtures << "\n";
-			std::cout << "\tmixture definition: " << mixDef << "\n";
+			my_print("\t# mixtures: %\n", numMixtures);
+			my_print("\tmixture definition: %\n", mixDef);
 
 			tmp.InitializeSynthesisRate(genome, sphi_init[0]);
 			parameter = tmp;
 		}
-		std::cout << "Done!--------------------------------\n\n\n";
+		my_print("Done!--------------------------------\n\n\n");
 
 
-		std::cout << "Initializing RFPModel object--------------------------\n";
+		my_print("Initializing RFPModel object--------------------------\n");
 		RFPModel model;
 		model.setParameter(parameter);
-		std::cout << "Done!----------------------------------\n\n\n";
+		my_print("Done!----------------------------------\n\n\n");
 
 
-		std::cout << "Running MCMC.............\n" << std::endl;
+		my_print("Running MCMC.............\n\n");
 		mcmc.run(genome, model, 1, 0);
-		std::cout << "Done!----------------------------------\n\n\n";
+		my_print("Done!----------------------------------\n\n\n");
 
 	} //END OF RFP
 	else if (modelToRun == "FONSE")
 	{
-		std::cout << "initialize Genome object--------------------------\n";
+		my_print("initialize Genome object--------------------------\n");
 		Genome genome;
 		genome.readFasta(pathBegin + "RibModelDev/data/singleMixture/genome_2000.fasta");
-		std::cout << "Done!-------------------------------\n\n\n";
+		my_print("Done!-------------------------------\n\n\n");
 
 
-		std::cout << "Initializing shared parameter variables---------------\n";
+		my_print("Initializing shared parameter variables---------------\n");
 		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 		std::vector<double> sphi_init(numMixtures, 1);
 
@@ -877,11 +875,11 @@ int main()
 			}
 		}
 		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
-		std::cout << "Done!------------------------\n\n\n";
+		my_print("Done!------------------------\n\n\n");
 
 
 		FONSEParameter parameter;
-		std::cout << "initialize Parameter object\n";
+		my_print("initialize Parameter object\n");
 		if (fromRestart)
 		{
 			FONSEParameter tmp(pathBegin + "RibModelDev/DevRscripts/10restartFile.rst");
@@ -893,12 +891,11 @@ int main()
 			FONSEParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 
 			for (unsigned i = 0u; i < numMixtures; i++) {
-				unsigned selectionCategry = tmp.getSelectionCategory(i);
-				std::cout << "Sphi_init for selection category " << selectionCategry << ": " <<
-				sphi_init[selectionCategry] << std::endl;
+				unsigned selectionCategory = tmp.getSelectionCategory(i);
+				my_print("Sphi_init for selection category %: %\n", selectionCategory, sphi_init[selectionCategory]);
 			}
-			std::cout << "\t# mixtures: " << numMixtures << "\n";
-			std::cout << "\tmixture definition: " << mixDef << "\n";
+			my_print("\t# mixtures: %\n", numMixtures);
+			my_print("\tmixture definition: %\n", mixDef);
 
 			std::vector<std::string> files(1);
 			files[0] = std::string(pathBegin + "RibModelDev/data/singleMixture/genome_2000.mutation.csv");
@@ -908,19 +905,19 @@ int main()
 			// pathBegin + "RibModelDev/data/realGenomes/Skluyveri_ChrA_ChrCleft_phi_est.csv");
 			//parameter.InitializeSynthesisRate(phiVals);
 			parameter = tmp;
-			std::cout << "done initialize Parameter object\n";
+			my_print("done initialize Parameter object\n");
 		}
 
 
-		std::cout << "Initializing Model object\n";
+		my_print("Initializing Model object\n");
 		FONSEModel model;
 		model.setParameter(parameter);
-		std::cout << "Done!------------------------\n\n\n";
+		my_print("Done!------------------------\n\n\n");
 
 
-		std::cout << "starting MCMC for ROC\n";
+		my_print("starting MCMC for ROC\n");
 		mcmc.run(genome, model, 4, 0);
-		std::cout << std::endl << "Finished MCMC for ROC\n";
+		my_print("\nFinished MCMC for ROC\n");
 
 	}
 }
