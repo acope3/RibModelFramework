@@ -663,15 +663,16 @@ int main()
 	std::string pathBegin = "/Users/hollisbui/";
 
 	// UNIT TESTING
-	testUtility();
-	testSequenceSummary();
-	testGene();
-	testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
-	testCovarianceMatrix();
+	//testUtility();
+	//testSequenceSummary();
+	//testGene();
+	//testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
+	//testCovarianceMatrix();
 	testParameter();
+	//testParameterWithFile("/Users/hollisbui/HollisFile.txt");
 	//testTrace();
-	testRFPParameter();
-	testMCMCAlgorithm();
+	//testRFPParameter();
+	//testMCMCAlgorithm();
 	exit(0);
 
 

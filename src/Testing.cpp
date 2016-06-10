@@ -1843,7 +1843,7 @@ int testParameter()
      * getMutationSelectionState, getNumParam, getNumMixtureElements
      * get/setStdDevSynthesisRate, getCurrentStdDevSynthesisRateProposalWidth
      * getNumAcceptForStdDevSynthesisRate, getStdCspForIndex, getNumAcceptForCspForIndex
-     * getNumMutationCategories, getNumSelectionCategories
+     * getNumMutationCategories, getNumSelectionCategories, getNumSynthesisRateCategories
      * getMutationCategory, getSelectionCategory
      * getMixtureElementsOfMutationCategory, getMixtureElementsOfSelectionCategory
      * get/setCategoryProbability
@@ -1862,8 +1862,8 @@ int testParameter()
      * Thus, let:
     */
     Genome genome;
-    genome.readFasta("/Users/hollisbui/RibModelDev/data/twoMixtures/simulatedAllUniqueR.fasta");
-    //genome.readRFPFile("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+    //genome.readFasta("/Users/hollisbui/RibModelDev/data/twoMixtures/simulatedAllUniqueR.fasta");
+    genome.readRFPFile("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 
     unsigned numMixtures = 3;
     std::vector<double> stdDev(numMixtures, 1);
@@ -2158,6 +2158,21 @@ int testParameter()
     else
         my_print("Parameter getNumSelectionCategories --- Pass\n");
 
+    //----------------------------------------------------//
+    //------ getNumSynthesisRateCategories Function ------//
+    //----------------------------------------------------//
+
+    // Because mutationSelectionState is allUnique, by initParameterSet the numSynthesisRateCategories should be = numMixtures.
+    // TODO: Make this more dynamic / tested with other settings?
+    if (parameter.getNumSynthesisRateCategories() != numMixtures)
+    {
+        my_printError("Error in initParameterSet or getNumSynthesisRateCategories.");
+        my_printError(" Value should be %, but is instead %.\n", numMixtures, parameter.getNumSynthesisRateCategories());
+        globalError = 1;
+        initParameterSetError = 1;
+    }
+    else
+        my_print("Parameter getNumSynthesisRateCategories--- Pass\n");
 
     /* TODO NOTE: initCategoryDefinitions is accessed in initParameterSet
      * and through this function categories.delM, categories.delEta,
@@ -2599,7 +2614,7 @@ int testParameter()
     //----------------------------------------------//
     //------ InitializeSynthesisRate Function ------//
     //----------------------------------------------//
-    parameter.InitializeSynthesisRate(genome, stdDev[0]);
+    //parameter.InitializeSynthesisRate(genome, stdDev[0]);
 
     // TODO: Check the following functions:
      // calculateSCUO
@@ -2648,16 +2663,77 @@ int testParameter()
         error = 0; //Reset for next function.
 
     /* Section 4:
-     *  functions:  functions tested in total.
-     * get/setGroupList, getGroupListSize, getGrouping
+     * Other functions: 4 functions tested in total.
+     * get/setLastIteration, get/setNumObservedPhiSets
     */
 
-    //----------------------------------------------//
-    //------ InitializeSynthesisRate Function ------//
-    //----------------------------------------------//
+    //--------------------------------------------//
+    //------ get/setLastIteration Functions ------//
+    //--------------------------------------------//
 
+    //lastIteration should be initialized to 0 in the constructor.
+    if (parameter.getLastIteration() != 0)
+    {
+        my_printError("Error in getLastIteration.");
+        my_printError(" Value should be 0, but is instead %.\n", parameter.getLastIteration());
+        error = 1;
+        globalError = 1;
+    }
+
+    parameter.setLastIteration(9);
+    if (parameter.getLastIteration() != 9)
+    {
+        my_printError("Error in setLastIteration or getLastIteration.");
+        my_printError(" Value should be 9, but is instead %.\n", parameter.getLastIteration());
+        error = 1;
+        globalError = 1;
+    }
+
+    if (!error)
+        my_print("Parameter get/setLastIteration --- Pass\n");
+    else
+        error = 0; //Reset for next function.
+
+    //-------------------------------------------------//
+    //------ get/setNumObservedPhiSets Functions ------//
+    //-------------------------------------------------//
+
+    //obsPhiSets should be initialized to 0 in the constructor.
+    if (parameter.getNumObservedPhiSets() != 0)
+    {
+        my_printError("Error in getNumObservedPhiSets.");
+        my_printError(" Value should be 0, but is instead %.\n", parameter.getNumObservedPhiSets());
+        error = 1;
+        globalError = 1;
+    }
+
+    parameter.setNumObservedPhiSets(22);
+    if (parameter.getNumObservedPhiSets() != 22)
+    {
+        my_printError("Error in setNumObservedPhiSets or getNumObservedPhiSets.");
+        my_printError(" Value should be 22, but is instead %.\n", parameter.getNumObservedPhiSets());
+        error = 1;
+        globalError = 1;
+    }
+
+    if (!error)
+        my_print("Parameter get/setNumObservedPhiSets --- Pass\n");
+    else
+        error = 0; //Reset for next function.
+
+    //parameter.writeBasicRestartFile("/Users/hollisbui/HollisFile.txt");
 
     return globalError;
+}
+
+
+int testParameterWithFile(std::string filename)
+{
+    Parameter parameter;
+
+    parameter.initBaseValuesFromFile(filename);
+
+    return 0;
 }
 
 
@@ -2887,9 +2963,6 @@ int testRFPParameter()
     std::string mutationSelectionState = Parameter::allUnique;
 
     RFPParameter parameter(stdDev, numMixtures, geneAssignment, mixtureDefinitionMatrix, splitSer, mutationSelectionState);
-    unsigned initRFPParameterSetError = 0;
-
-    unsigned numSelectionCategories = parameter.getNumSelectionCategories();
 
     /* This constructor in turn calls two functions: initParameterSet() and initRFPParameterSet().
      * initParameterSet should have been tested in testParameter(), above, but we must now
@@ -2913,7 +2986,7 @@ int testRFPParameter()
 
     // TODO: check the changed:
     // currentCodonSpecificParameter
-    // proposedCodonSpectificParameter
+    // proposedCodonSpecificParameter
 
     // std_csp is set to 0.1 for each index in initRFPParameterSet.
     for (unsigned i = 0u; i < numParam; i++)
@@ -2947,6 +3020,9 @@ int testRFPParameter()
         my_print("RFPParameter initRFPParameterSet --- Pass\n");
     else
         error = 0; //Reset for next function.
+
+    //parameter.InitializeSynthesisRate(genome, stdDev[0]);
+    //parameter.writeBasicRestartFile("/Users/hollisbui/HollisFile2.txt");
 
     return globalError;
 }

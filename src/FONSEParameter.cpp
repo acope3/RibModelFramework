@@ -278,8 +278,8 @@ void FONSEParameter::writeFONSERestartFile(std::string filename)
     out.open(filename.c_str(), std::ofstream::app);
     if (out.fail())
         my_printError("ERROR: Could not open RestartFile.txt to append\n");
-	else {
-
+	else
+	{
 		std::ostringstream oss;
 		unsigned j;
 		oss << ">mutation_prior_sd:\n" << mutation_prior_sd << "\n";

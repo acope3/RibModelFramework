@@ -120,7 +120,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		Gene *gene = &genome.getGene(i);
 
 		/*
-			 Since some values returned by calculateLogLikelihoodRatioPerGene are veyr small (~ -1100), exponentiation leads to 0.
+			 Since some values returned by calculateLogLikelihoodRatioPerGene are very small (~ -1100), exponentiation leads to 0.
 			 To solve this problem, we adjust the value by a constant c. I choose to use the average value across all mixtures.
 			 We justify this by
 			 P = Sum(p_i*f(...))

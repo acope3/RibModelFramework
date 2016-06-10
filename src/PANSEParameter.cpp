@@ -142,10 +142,10 @@ void PANSEParameter::initPANSEValuesFromFile(std::string filename)
 {
 	std::ifstream input;
 	input.open(filename.c_str());
-	if (input.fail()){
+	if (input.fail())
 		my_printError("ERROR: Could not open file to initialize PANSE values\n");
-	}
-	else {
+	else
+	{
 		std::string tmp, variableName;
 		unsigned cat = 0;
 		while (getline(input, tmp))
@@ -395,10 +395,10 @@ void PANSEParameter::initMutationSelectionCategories(std::vector<std::string> fi
 
 		//open the file, make sure it opens
 		currentFile.open(files[i].c_str());
-		if (currentFile.fail()){
+		if (currentFile.fail())
 			my_printError("Error opening file % in the file vector.\n", i);
-		}
-		else {
+		else
+		{
 			currentFile >> tmpString; //trash the first line, no info given.
 
 			//expecting CTG,3.239 as the current format

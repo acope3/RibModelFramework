@@ -59,7 +59,6 @@ class Parameter {
 #endif
 
 
-
 		//Constructors & Destructors:
 		Parameter();
 		Parameter(unsigned maxGrouping);
@@ -93,7 +92,7 @@ class Parameter {
 		void setCategoryProbability(unsigned mixtureElement, double value); //Tested
 		unsigned getNumMutationCategories(); //Tested; TODO caveat
 		unsigned getNumSelectionCategories(); //Tested; TODO caveat
-		unsigned getNumSynthesisRateCategories();
+		unsigned getNumSynthesisRateCategories(); //Tested; TODO caveat
 		unsigned getMutationCategory(unsigned mixtureElement); //Tested
 		unsigned getSelectionCategory(unsigned mixtureElement); //Tested; see Note 1) at top of file.
 		unsigned getSynthesisRateCategory(unsigned mixtureElement); //Tested; see Note 1) at top of file.
@@ -132,8 +131,8 @@ class Parameter {
 
 
 		//Iteration Functions:
-		unsigned getLastIteration();
-		void setLastIteration(unsigned iteration);
+		unsigned getLastIteration(); //Tested
+		void setLastIteration(unsigned iteration); //Tested
 
 
 		//Trace Functions:
@@ -171,10 +170,10 @@ class Parameter {
 		//Other Functions:
 		unsigned getNumParam(); //Tested
 		unsigned getNumMixtureElements(); //Tested //TODO style question: Why call it getNumMixtureElements instead of simply getNumMixtures? Alternatively, change name of variable.
-		unsigned getNumObservedPhiSets();
+		unsigned getNumObservedPhiSets(); //Tested
 		void setMixtureAssignment(unsigned gene, unsigned value); //Tested
 		unsigned getMixtureAssignment(unsigned gene); //Tested
-		virtual void setNumObservedPhiSets(unsigned _phiGroupings);
+		virtual void setNumObservedPhiSets(unsigned _phiGroupings); //Tested
 		virtual std::vector <std::vector <double> > calculateSelectionCoefficients(unsigned sample, unsigned mixture);
 
 

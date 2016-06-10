@@ -392,6 +392,7 @@ void Parameter::writeBasicRestartFile(std::string filename)
 	std::string output = "";
 	std::ostringstream oss;
 	unsigned i, j;
+
 	out.open(filename.c_str());
 	if (out.fail())
 		my_printError("Error: Could not open restart file % for writing\n", filename.c_str());
@@ -416,7 +417,7 @@ void Parameter::writeBasicRestartFile(std::string filename)
 		oss << ">numParam:\n" << numParam << "\n";
 		oss << ">numMixtures:\n" << numMixtures << "\n";
 		oss << ">std_stdDevSynthesisRate:\n" << std_stdDevSynthesisRate << "\n";
-		//maybe clear the buffer
+		//TODO: maybe clear the buffer
 		oss << ">std_phi:\n";
 		for (i = 0; i < std_phi.size(); i++)
 		{
@@ -1024,12 +1025,20 @@ unsigned Parameter::getNumAcceptForSynthesisRate(unsigned expressionCategory, un
 //------------------------------------------//
 
 
+/* setLastIteration (NOT EXPOSED)
+ * Arguments: None
+ * Returns the last iteration.
+*/
 unsigned Parameter::getLastIteration()
 {
 	return lastIteration;
 }
 
 
+/* setLastIteration (NOT EXPOSED)
+ * Arguments: unsigned value representing an iteration
+ * Sets the last iteration to the argument given.
+*/
 void Parameter::setLastIteration(unsigned iteration)
 {
 	lastIteration = iteration;
@@ -1056,12 +1065,20 @@ unsigned Parameter::getNumMixtureElements()
 }
 
 
-unsigned Parameter::getNumObservedPhiSets() 
-{ 
+/* getNumObservedPhiSets (NOT EXPOSED)
+ * Arguments: None
+ * Returns the observed number of phi sets.
+*/
+unsigned Parameter::getNumObservedPhiSets()
+{
 	return obsPhiSets;
 }
 
 
+/* setNumObservedPhiSets (NOT EXPOSED)
+ * Arguments: unsigned value representing a new number of phi set groupings
+ * Sets the observed number of phi sets to the argument given.
+*/
 void Parameter::setNumObservedPhiSets(unsigned _phiGroupings)
 {
 	obsPhiSets = _phiGroupings;
