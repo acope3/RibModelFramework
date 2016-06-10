@@ -944,7 +944,8 @@ int testGene()
     //---------------------------------//
     testGene.setId("testGene");
 
-    if (testGene.getId() != "testGene") {
+    if (testGene.getId() != "testGene")
+    {
         my_printError("Error in setId or getId.\n");
         globalError = 1;
     }
@@ -1328,7 +1329,8 @@ int testGenome(std::string testFileDir)
     std::vector<Gene> testVec;
     testVec.push_back(g1);
 
-    if (!(testVec == genome.getGenes(false))) {
+    if (!(testVec == genome.getGenes(false)))
+    {
         my_printError("Error in getGenes(false).\n");
         error = 1;
         globalError = 1;
@@ -1337,7 +1339,8 @@ int testGenome(std::string testFileDir)
     testVec.clear();
     testVec.push_back(s1);
 
-    if (!(testVec == genome.getGenes(true))) {
+    if (!(testVec == genome.getGenes(true)))
+    {
         my_printError("Error in getGenes(true).\n");
         error = 1;
         globalError = 1;
@@ -1366,8 +1369,10 @@ int testGenome(std::string testFileDir)
     //-------------------------------------------------//
     //------ getNumGenesWithPhiForIndex Function ------//
     //-------------------------------------------------//
-    for (unsigned i = 1; i < 4; i++) {
-        if (genome.getNumGenesWithPhiForIndex(i) != i) {
+    for (unsigned i = 1; i < 4; i++)
+    {
+        if (genome.getNumGenesWithPhiForIndex(i) != i)
+        {
             my_printError("Error in getNumGenesWithPhiForIndex with index %.", i);
             my_printError("Should return %, but returns %.\n", i, genome.getNumGenesWithPhiForIndex(i));
             error = 1;
@@ -1383,13 +1388,15 @@ int testGenome(std::string testFileDir)
     //------------------------------------//
     //------ getGenomeSize Function ------//
     //------------------------------------//
-    if (1 != genome.getGenomeSize(false)) {
+    if (1 != genome.getGenomeSize(false))
+    {
         my_printError("Error in getGenomesize(false). Should return 1, but returns %.\n", genome.getGenomeSize(false));
         error = 1;
         globalError = 1;
     }
 
-    if (1 != genome.getGenomeSize(true)) {
+    if (1 != genome.getGenomeSize(true))
+    {
         my_printError("Error in getGenomesize(true). Should return 1, but returns %.\n", genome.getGenomeSize(true));
         error = 1;
         globalError = 1;
@@ -1406,7 +1413,8 @@ int testGenome(std::string testFileDir)
 
     //reuse generic vector of unsigned integers
     uVector = {1};
-    if (uVector != genome.getCodonCountsPerGene("ATG")) {
+    if (uVector != genome.getCodonCountsPerGene("ATG"))
+    {
         my_printError("Error in getCodonCountsPerGene with a single gene.\n");
         error = 1;
         globalError = 1;
@@ -1417,7 +1425,8 @@ int testGenome(std::string testFileDir)
 
     uVector = {0, 1, 1};
 
-    if (uVector != genome.getCodonCountsPerGene("GAT")) {
+    if (uVector != genome.getCodonCountsPerGene("GAT"))
+    {
         my_printError("Error in getCodonCountsPerGene with three genes.\n");
         error = 1;
         globalError = 1;
@@ -1471,7 +1480,8 @@ int testGenome(std::string testFileDir)
     //reuse generic vector of unsigned integers
     uVector = {0, 1, 2, 3};
 
-    if (!(genome == genome.getGenomeForGeneIndices(uVector, false))) {
+    if (!(genome == genome.getGenomeForGeneIndices(uVector, false)))
+    {
         my_printError("Error in getGenomeForGeneIndices with genes.\n");
         error = 1;
         globalError = 1;
@@ -1488,7 +1498,8 @@ int testGenome(std::string testFileDir)
     genome.addGene(s3, true);
     genome.addGene(s4, true);
 
-    if (!(genome == genome.getGenomeForGeneIndices(uVector, true))) {
+    if (!(genome == genome.getGenomeForGeneIndices(uVector, true)))
+    {
         my_printError("Error in getGenomeForGeneIndices with simulated genes.\n");
         error = 1;
         globalError = 1;
@@ -2636,6 +2647,16 @@ int testParameter()
     else
         error = 0; //Reset for next function.
 
+    /* Section 4:
+     *  functions:  functions tested in total.
+     * get/setGroupList, getGroupListSize, getGrouping
+    */
+
+    //----------------------------------------------//
+    //------ InitializeSynthesisRate Function ------//
+    //----------------------------------------------//
+
+
     return globalError;
 }
 
@@ -2756,7 +2777,8 @@ int testCovarianceMatrix()
     //-------------------------------------//
     covM.getNumVariates();
 
-    if (covM.getNumVariates() != 4) {
+    if (covM.getNumVariates() != 4)
+    {
         my_printError("Error in getNumVariates. Function should return 4, but returns %.\n", covM.getNumVariates());
         globalError = 1;
     }
@@ -2943,6 +2965,8 @@ int testMCMCAlgorithm()
     int error = 0;
     int globalError = 0;
 
+    MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, 10, true, true, true);
+    /*
     my_print("Initializing MCMCAlgorithm object---------------\n");
     my_print("\t# Samples: %\n", samples);
     my_print("\tThining: %\n", thining);
@@ -2984,7 +3008,8 @@ int testMCMCAlgorithm()
 
     my_print("Initializing RFPParameter object--------------------\n\n");
     RFPParameter parameter(stdDev, numMixtures, geneAssignment, mixtureDefinitionMatrix, splitSer, mutationSelectionState);
-    for (unsigned i = 0u; i < numMixtures; i++) {
+    for (unsigned i = 0u; i < numMixtures; i++)
+    {
         unsigned selectionCategory = parameter.getSelectionCategory(i);
         my_print("Sphi_init for selection category %: %\n", selectionCategory, stdDev[selectionCategory]);
     }
@@ -3003,6 +3028,7 @@ int testMCMCAlgorithm()
     my_print("Running MCMC.............\n\n");
     mcmc.run(genome, model, 1, 0);
     my_print("Done!----------------------------------\n\n\n");
+    */
 
     //--------------------------------------------//
     //------ varyInitialConditions Function ------//
@@ -3023,7 +3049,8 @@ int testMCMCAlgorithm()
     //---------------------------------------------------//
     //------ is/setEstimateSynthesisRate Functions ------//
     //---------------------------------------------------//
-    if (!mcmc.isEstimateSynthesisRate()) {
+    if (!mcmc.isEstimateSynthesisRate())
+    {
         my_printError("Error in isEstimateSynthesisRate.");
         my_printError(" Function should return true, but returns false.\n");
         error = 1;
@@ -3031,7 +3058,8 @@ int testMCMCAlgorithm()
     }
 
     mcmc.setEstimateSynthesisRate(false);
-    if (mcmc.isEstimateSynthesisRate()) {
+    if (mcmc.isEstimateSynthesisRate())
+    {
         my_printError("Error in isEstimateSynthesisRate or setEstimateSynthesisRate.");
         my_printError(" Function should return false, but returns true.\n");
         error = 1;
@@ -3039,7 +3067,8 @@ int testMCMCAlgorithm()
     }
 
     mcmc.setEstimateSynthesisRate(true);
-    if (!mcmc.isEstimateSynthesisRate()) {
+    if (!mcmc.isEstimateSynthesisRate())
+    {
         my_printError("Error in isEstimateSynthesisRate or setEstimateSynthesisRate.");
         my_printError(" Function should return true, but returns false.\n");
         error = 1;
@@ -3054,7 +3083,8 @@ int testMCMCAlgorithm()
     //------------------------------------------------------------//
     //------ is/setEstimateCodonSpecificParameter Functions ------//
     //------------------------------------------------------------//
-    if (!mcmc.isEstimateCodonSpecificParameter()) {
+    if (!mcmc.isEstimateCodonSpecificParameter())
+    {
         my_printError("Error in isEstimateCodonSpecificParameter.");
         my_printError(" Function should return true, but returns false.\n");
         error = 1;
@@ -3062,7 +3092,8 @@ int testMCMCAlgorithm()
     }
 
     mcmc.setEstimateCodonSpecificParameter(false);
-    if (mcmc.isEstimateCodonSpecificParameter()) {
+    if (mcmc.isEstimateCodonSpecificParameter())
+    {
         my_printError("Error in isEstimateCodonSpecificParameter or setEstimateCodonSpecificParameter.");
         my_printError(" Function should return false, but returns true.\n");
         error = 1;
@@ -3070,7 +3101,8 @@ int testMCMCAlgorithm()
     }
 
     mcmc.setEstimateCodonSpecificParameter(true);
-    if (!mcmc.isEstimateCodonSpecificParameter()) {
+    if (!mcmc.isEstimateCodonSpecificParameter())
+    {
         my_printError("Error in isEstimateCodonSpecificParameter or setEstimateCodonSpecificParameter.");
         my_printError(" Function should return true, but returns false.\n");
         error = 1;
@@ -3085,7 +3117,8 @@ int testMCMCAlgorithm()
     //----------------------------------------------------//
     //------ is/setEstimateHyperParameter Functions ------//
     //----------------------------------------------------//
-    if (!mcmc.isEstimateHyperParameter()) {
+    if (!mcmc.isEstimateHyperParameter())
+    {
         my_printError("Error in isEstimateHyperParameter.");
         my_printError(" Function should return true, but returns false.\n");
         error = 1;
@@ -3093,7 +3126,8 @@ int testMCMCAlgorithm()
     }
 
     mcmc.setEstimateHyperParameter(false);
-    if (mcmc.isEstimateHyperParameter()) {
+    if (mcmc.isEstimateHyperParameter())
+    {
         my_printError("Error in isEstimateHyperParameter or setEstimateHyperParameter.");
         my_printError(" Function should return false, but returns true.\n");
         error = 1;
@@ -3101,7 +3135,8 @@ int testMCMCAlgorithm()
     }
 
     mcmc.setEstimateHyperParameter(true);
-    if (!mcmc.isEstimateHyperParameter()) {
+    if (!mcmc.isEstimateHyperParameter())
+    {
         my_printError("Error in isEstimateHyperParameter or setEstimateHyperParameter.");
         my_printError(" Function should return true, but returns false.\n");
         error = 1;
@@ -3120,7 +3155,8 @@ int testMCMCAlgorithm()
     /* NOTE: By default, both constructors initialize estimateMixtureAssignment to true,
     // although it is not one of the arguments. */
 
-    if (!mcmc.isEstimateMixtureAssignment()) {
+    if (!mcmc.isEstimateMixtureAssignment())
+    {
         my_printError("Error in isEstimateMixtureAssignment.");
         my_printError(" Function should return true, but returns false.\n");
         error = 1;
@@ -3128,7 +3164,8 @@ int testMCMCAlgorithm()
     }
 
     mcmc.setEstimateMixtureAssignment(false);
-    if (mcmc.isEstimateMixtureAssignment()) {
+    if (mcmc.isEstimateMixtureAssignment())
+    {
         my_printError("Error in isEstimateMixtureAssignment or setEstimateMixtureAssignment.");
         my_printError(" Function should return false, but returns true.\n");
         error = 1;
@@ -3136,7 +3173,8 @@ int testMCMCAlgorithm()
     }
 
     mcmc.setEstimateMixtureAssignment(true);
-    if (!mcmc.isEstimateMixtureAssignment()) {
+    if (!mcmc.isEstimateMixtureAssignment())
+    {
         my_printError("Error in isEstimateMixtureAssignment or setEstimateMixtureAssignment.");
         my_printError(" Function should return true, but returns false.\n");
         error = 1;
@@ -3153,7 +3191,8 @@ int testMCMCAlgorithm()
     //-------------------------------------------//
 
     // NOTE: By default, both constructors initialize stepsToAdapt to -1
-    if (mcmc.getStepsToAdapt() != -1) {
+    if (mcmc.getStepsToAdapt() != -1)
+    {
         my_printError("Error in getStepsToAdapt.");
         my_printError(" Function should return -1, but returns %.\n", mcmc.getStepsToAdapt());
         error = 1;
@@ -3161,7 +3200,8 @@ int testMCMCAlgorithm()
     }
 
     mcmc.setStepsToAdapt(52);
-    if (mcmc.getStepsToAdapt() != 52) {
+    if (mcmc.getStepsToAdapt() != 52)
+    {
         my_printError("Error in getStepsToAdapt or setStepsToAdapt.");
         my_printError(" Function should return 52, but returns %.\n", mcmc.getStepsToAdapt());
         error = 1;
@@ -3170,7 +3210,8 @@ int testMCMCAlgorithm()
 
     // Intentional error checking: Should print an error message with no change to stepsToAdapt
     mcmc.setStepsToAdapt(101);
-    if (mcmc.getStepsToAdapt() != 52) {
+    if (mcmc.getStepsToAdapt() != 52)
+    {
         my_printError("Error in getStepsToAdapt or setStepsToAdapt.");
         my_printError(" Function should return 52, with no change, but returns %.\n", mcmc.getStepsToAdapt());
         error = 1;

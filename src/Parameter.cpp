@@ -239,10 +239,12 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 			else //store variable information
 			{
 				std::istringstream iss;
-				if (variableName == "groupList") {
+				if (variableName == "groupList")
+				{
 					std::string val;
 					iss.str(tmp);
-					while (iss >> val) {
+					while (iss >> val)
+					{
 						groupList.push_back(val);
 					}
 				}
@@ -396,7 +398,8 @@ void Parameter::writeBasicRestartFile(std::string filename)
 	else
 	{
 		oss << ">groupList:\n";
-		for (i = 0; i < groupList.size(); i++) {
+		for (i = 0; i < groupList.size(); i++)
+		{
 			oss << groupList[i];
 			if ((i + 1) % 10 == 0) oss << "\n";
 			else oss << " ";
@@ -608,7 +611,7 @@ void Parameter::InitializeSynthesisRate(std::vector<double> expression)
 std::vector <double> Parameter::readPhiValues(std::string filename)
 {
 	std::size_t pos;
-	std::size_t pos2; //currently unused
+	//std::size_t pos2; //currently unused
 	std::ifstream currentFile;
 	std::string tmpString;
 	std::vector <double> RV;
@@ -1168,7 +1171,8 @@ void Parameter::adaptStdDevSynthesisRateProposalWidth(unsigned adaptationWidth, 
 {
 	double acceptanceLevel = (double)numAcceptForStdDevSynthesisRate / (double)adaptationWidth;
 	traces.updateStdDevSynthesisRateAcceptanceRatioTrace(acceptanceLevel);
-	if (adapt) {
+	if (adapt)
+	{
 		if (acceptanceLevel < 0.2)
 			std_stdDevSynthesisRate *= 0.8;
 
@@ -1191,12 +1195,15 @@ void Parameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool a
 		{
 			double acceptanceLevel = (double)numAcceptForSynthesisRate[cat][i] / (double)adaptationWidth;
 			traces.updateSynthesisRateAcceptanceRatioTrace(cat, i, acceptanceLevel);
-			if (adapt) {
-				if (acceptanceLevel < 0.225) {
+			if (adapt)
+			{
+				if (acceptanceLevel < 0.225)
+				{
 					std_phi[cat][i] *= 0.8;
 					if (acceptanceLevel < 0.2) acceptanceUnder++;
 				}
-				if (acceptanceLevel > 0.275) {
+				if (acceptanceLevel > 0.275)
+				{
 					std_phi[cat][i] *= 1.2;
 					if (acceptanceLevel > 0.3) acceptanceOver++;
 				}
@@ -1233,7 +1240,8 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 			SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
 			my_print("\t%:\t%\n", aa.c_str(), acceptanceLevel);
 
-			if (acceptanceLevel < 0.2) {
+			if (acceptanceLevel < 0.2)
+			{
 				if (acceptanceLevel < 0.1)
 					for (unsigned k = aaStart; k < aaEnd; k++)
 						covarianceMatrix[aaIndex] *= 0.8;
@@ -1253,9 +1261,11 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 				for (unsigned k = aaStart; k < aaEnd; k++)
 					std_csp[k] *= 0.8;
 			}
-			if (acceptanceLevel > 0.3) {
+			if (acceptanceLevel > 0.3)
+			{
 				//covarianceMatrix[aaIndex].calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
-				for (unsigned k = aaStart; k < aaEnd; k++){
+				for (unsigned k = aaStart; k < aaEnd; k++)
+				{
 					std_csp[k] *= 1.2;
     				covarianceMatrix[aaIndex] *= 1.2;                    
                 }

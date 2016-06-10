@@ -663,14 +663,14 @@ int main()
 	std::string pathBegin = "/Users/hollisbui/";
 
 	// UNIT TESTING
-	//testUtility();
-	//testSequenceSummary();
-	//testGene();
-	//testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
-	//testCovarianceMatrix();
-	//testParameter();
+	testUtility();
+	testSequenceSummary();
+	testGene();
+	testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
+	testCovarianceMatrix();
+	testParameter();
 	//testTrace();
-	//testRFPParameter();
+	testRFPParameter();
 	testMCMCAlgorithm();
 	exit(0);
 
@@ -822,7 +822,8 @@ int main()
 			std::string mixDef = Parameter::allUnique;
 			RFPParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 
-			for (unsigned i = 0u; i < numMixtures; i++) {
+			for (unsigned i = 0u; i < numMixtures; i++)
+			{
 				unsigned selectionCategry = tmp.getSelectionCategory(i);
 				my_print("Sphi_init for selection category %: %\n", selectionCategry, sphi_init[selectionCategry]);
 			}
@@ -890,7 +891,8 @@ int main()
 			std::string mixDef = ROCParameter::allUnique;
 			FONSEParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 
-			for (unsigned i = 0u; i < numMixtures; i++) {
+			for (unsigned i = 0u; i < numMixtures; i++)
+			{
 				unsigned selectionCategory = tmp.getSelectionCategory(i);
 				my_print("Sphi_init for selection category %: %\n", selectionCategory, sphi_init[selectionCategory]);
 			}

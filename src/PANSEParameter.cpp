@@ -266,10 +266,10 @@ void PANSEParameter::writePANSERestartFile(std::string filename)
 	std::ostringstream oss;
 	unsigned i, j;
 	out.open(filename.c_str(), std::ofstream::app);
-	if (out.fail()) {
+	if (out.fail())
 		my_printError("Could not open restart file for writing\n");
-	}
-	else {
+	else
+	{
 		oss << ">currentAlphaParameter:\n";
 		for (i = 0; i < currentCodonSpecificParameter[alp].size(); i++)
 		{
@@ -543,14 +543,13 @@ void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptatio
 		unsigned codonIndex = SequenceSummary::codonToIndex(groupList[i]);
 		double acceptanceLevel = (double)numAcceptForCodonSpecificParameters[codonIndex] / (double)adaptationWidth;
 		traces.updateCodonSpecificAcceptanceRatioTrace(codonIndex, acceptanceLevel);
-		if (adapt) {
+		if (adapt)
+		{
 			my_print("% with std csp = %\n", acceptanceLevel, std_csp[i]);
-			if (acceptanceLevel < 0.2) {
+			if (acceptanceLevel < 0.2)
 				std_csp[i] *= 0.8;
-			}
-			if (acceptanceLevel > 0.3) {
+			if (acceptanceLevel > 0.3)
 				std_csp[i] *= 1.2;
-			}
 		}
 		numAcceptForCodonSpecificParameters[codonIndex] = 0u;
 	}

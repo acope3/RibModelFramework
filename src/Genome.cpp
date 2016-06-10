@@ -297,16 +297,19 @@ void Genome::readPANSEFile(std::string filename, bool Append)
 			std::map<std::string, unsigned>::iterator git;
 
 			//First pass: For each gene name, count its size.
-			while (std::getline(Fin, tmp)) {
+			while (std::getline(Fin, tmp))
+			{
 				std::size_t pos = tmp.find(",");
 				std::string ID = tmp.substr(0, pos);
 
-				if (first) {
+				if (first)
+				{
 					prevID = ID;
 					first = false;
 					genes[ID] = 0;
 				}
-				if (ID != prevID) {
+				if (ID != prevID)
+				{
 					genes[prevID] *= 3; //multiply by three since codons
 					genes[ID] = 0; //initialize the new genes[ID]
 				}
@@ -323,17 +326,20 @@ void Genome::readPANSEFile(std::string filename, bool Append)
 			std::vector<unsigned> RFP_counts;
 
 			//Now for each line associated with a gene ID, set the string appropriately
-			while (std::getline(Fin, tmp)) {
+			while (std::getline(Fin, tmp))
+			{
 				std::size_t pos = tmp.find(",");
 				std::string ID = tmp.substr(0, pos);
 
-				if (first) {
+				if (first)
+				{
 					prevID = ID;
 					first = false;
 					git = genes.find(ID);
 					seq.resize(git->second);
 				}
-				if (ID != prevID) {
+				if (ID != prevID)
+				{
 					tmpGene.setId(prevID);
 					tmpGene.setDescription("No description for PANSE Model");
 					tmpGene.setSequence(seq);
@@ -479,7 +485,8 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
                             my_printError("Gene % has % ", geneID, it -> second -> observedSynthesisRateValues.size());
                             my_printError("while others have %. Exiting function.\n", numPhi);
 							exitfunction = true;
-							for (unsigned a = 0; a < getGenomeSize(); a++) {
+							for (unsigned a = 0; a < getGenomeSize(); a++)
+							{
 								genes[a].observedSynthesisRateValues.clear();
 							}
 							break;

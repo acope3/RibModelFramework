@@ -89,7 +89,7 @@ MCMCAlgorithm::~MCMCAlgorithm()
 
 /* acceptRejectSynthesisRateLevelForAllGenes (NOT EXPOSED)
 * Arguments: reference to a genome and a model. which iteration (step) is currently being estimated
-* Based on the logliklihood probabilities proposed for a gene (with and without reverse jump), it is decided
+* Based on the loglikelihood probabilities proposed for a gene (with and without reverse jump), it is decided
 * whether or not a synthesis rate is accepted for that gene or not. Mixture assignment is also updated when
 * applicable.
 */
@@ -109,7 +109,8 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	//TODO: why is this not just a vector?
 
 
-	for (unsigned i = 0u; i < numMixtures; i++) {
+	for (unsigned i = 0u; i < numMixtures; i++)
+	{
 		dirichletParameters[i] = 0.0;
 	}
 
@@ -419,7 +420,8 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 			if ((iteration % thining) == 0u)
 			{
 				likelihoodTrace[(iteration / thining)] = logLike;
-				if (std::isnan(logLike)) {
+				if (std::isnan(logLike))
+				{
 					my_printError("ERROR: Log likelihood is NaN, exiting at iteration %\n", iteration);
 					model.setLastIteration(iteration / thining);
 					return;
@@ -756,13 +758,17 @@ std::vector<double> MCMCAlgorithm::acf(std::vector<double>& x, int nrows, int nc
 			}
 		}
 	}
-	if (correlation) {
-		if (nrows == 1) {
+	if (correlation)
+	{
+		if (nrows == 1)
+		{
 			for (int u = 0; u < ncols; u++)
 			{
 				acf[0 + d1*u + d2*u] = 1.0;
 			}
-		} else {
+		}
+		else
+		{
 			double *se = new double[ncols]();
 			for (int u = 0; u < ncols; u++)
 			{

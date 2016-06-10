@@ -209,7 +209,8 @@ std::vector <unsigned> Gene::getRFP_count()
 }
 
 
-void Gene::addRFP_count(std::vector <unsigned> RFP_counts) {
+void Gene::addRFP_count(std::vector <unsigned> RFP_counts)
+{
     geneData.setRFP_count(RFP_counts);
 }
 
