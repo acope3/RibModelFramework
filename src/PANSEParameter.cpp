@@ -142,10 +142,10 @@ void PANSEParameter::initPANSEValuesFromFile(std::string filename)
 {
 	std::ifstream input;
 	input.open(filename.c_str());
-	if (input.fail()){
+	if (input.fail())
 		my_printError("ERROR: Could not open file to initialize PANSE values\n");
-	}
-	else {
+	else
+	{
 		std::string tmp, variableName;
 		unsigned cat = 0;
 		while (getline(input, tmp))
@@ -266,10 +266,10 @@ void PANSEParameter::writePANSERestartFile(std::string filename)
 	std::ostringstream oss;
 	unsigned i, j;
 	out.open(filename.c_str(), std::ofstream::app);
-	if (out.fail()) {
+	if (out.fail())
 		my_printError("Could not open restart file for writing\n");
-	}
-	else {
+	else
+	{
 		oss << ">currentAlphaParameter:\n";
 		for (i = 0; i < currentCodonSpecificParameter[alp].size(); i++)
 		{
@@ -395,10 +395,10 @@ void PANSEParameter::initMutationSelectionCategories(std::vector<std::string> fi
 
 		//open the file, make sure it opens
 		currentFile.open(files[i].c_str());
-		if (currentFile.fail()){
+		if (currentFile.fail())
 			my_printError("Error opening file % in the file vector.\n", i);
-		}
-		else {
+		else
+		{
 			currentFile >> tmpString; //trash the first line, no info given.
 
 			//expecting CTG,3.239 as the current format
@@ -543,14 +543,13 @@ void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptatio
 		unsigned codonIndex = SequenceSummary::codonToIndex(groupList[i]);
 		double acceptanceLevel = (double)numAcceptForCodonSpecificParameters[codonIndex] / (double)adaptationWidth;
 		traces.updateCodonSpecificAcceptanceRatioTrace(codonIndex, acceptanceLevel);
-		if (adapt) {
+		if (adapt)
+		{
 			my_print("% with std csp = %\n", acceptanceLevel, std_csp[i]);
-			if (acceptanceLevel < 0.2) {
+			if (acceptanceLevel < 0.2)
 				std_csp[i] *= 0.8;
-			}
-			if (acceptanceLevel > 0.3) {
+			if (acceptanceLevel > 0.3)
 				std_csp[i] *= 1.2;
-			}
 		}
 		numAcceptForCodonSpecificParameters[codonIndex] = 0u;
 	}

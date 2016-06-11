@@ -81,7 +81,8 @@ void ROCParameter::initROCParameterSet()
 	bias_csp = 0;
 	
 
-	for (unsigned i = 0; i < getNumObservedPhiSets(); i++) {
+	for (unsigned i = 0; i < getNumObservedPhiSets(); i++)
+	{
 		noiseOffset[i] = 0.1;
 		noiseOffset_proposed[i] = 0.1;
 		std_NoiseOffset[i] = 0.1;
@@ -210,7 +211,8 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 				{
 					double val;
 					iss.str(tmp);
-					while (iss >> val) {
+					while (iss >> val)
+					{
 						std_csp.push_back(val);
 					}
 				}
@@ -218,7 +220,8 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 				{
 					double val;
 					iss.str(tmp);
-					while (iss >> val) {
+					while (iss >> val)
+					{
 						noiseOffset.push_back(val);
 					}
 				}
@@ -226,7 +229,8 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 				{
 					double val;
 					iss.str(tmp);
-					while (iss >> val) {
+					while (iss >> val)
+					{
 						observedSynthesisNoise.push_back(val);
 					}
 				}
@@ -234,7 +238,8 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 				{
 					double val;
 					iss.str(tmp);
-					while (iss >> val) {
+					while (iss >> val)
+					{
 						std_NoiseOffset.push_back(val);
 					}
 				}
@@ -561,7 +566,8 @@ double ROCParameter::getCurrentNoiseOffsetProposalWidth(unsigned index)
 
 void ROCParameter::proposeNoiseOffset()
 {
-	for (unsigned i = 0; i < getNumObservedPhiSets(); i++) {
+	for (unsigned i = 0; i < getNumObservedPhiSets(); i++)
+	{
 		noiseOffset_proposed[i] = randNorm(noiseOffset[i], std_NoiseOffset[i]);
 	}
 }
