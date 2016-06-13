@@ -785,6 +785,7 @@ std::vector<double> MCMCAlgorithm::acf(std::vector<double>& x, int nrows, int nc
 					}
 				}
 			}
+			// delete [] se; //TODO: add once testable
 		}
 	}
 	return acf;
@@ -852,6 +853,7 @@ std::vector<std::vector<double>> MCMCAlgorithm::solveToeplitzMatrix(int lr, std:
 			q = q + f[l*lr + i]*r[k];
 		}
 	}
+	//delete [] a; //TODO: add once testable
 
 	returnVec[0] = f;
 	returnVec[1] = var;

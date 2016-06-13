@@ -667,13 +667,13 @@ int main()
 	//testSequenceSummary();
 	//testGene();
 	//testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
-	//testCovarianceMatrix();
+	testCovarianceMatrix();
 	//testParameter();
 	//testParameterWithFile("/Users/hollisbui/HollisFile.txt");
 	//testTrace();
 	//testRFPParameter();
 	//testMCMCAlgorithm();
-	//exit(0);
+	exit(0);
 
 
 	std::string modelToRun = "RFP"; //can be RFP, ROC or FONSE

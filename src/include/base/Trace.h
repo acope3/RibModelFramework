@@ -13,7 +13,6 @@
 #include <Rcpp.h>
 #endif
 
-
 class Trace {
 	private:
     
