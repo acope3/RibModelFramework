@@ -131,6 +131,7 @@ Parameter::~Parameter()
 
 
 
+
 //--------------------------------------------------------------//
 //---------- Initialization and Restart Functions --------------//
 //--------------------------------------------------------------//
@@ -161,17 +162,9 @@ void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsig
 	numParam = ((splitSer) ? 40 : 41);
 	numMixtures = _numMixtures;
 
-	//TODO: Why not just vector assign stdDevSynthesisRate_proposed and sydDevSynthesisRate to equal _stdDevSynthesisRate?
-	//stdDevSynthesisRate = _stdDevSynthesisRate;
-	//stdDevSynthesisRate_proposed = _stdDevSynthesisRate;
+	stdDevSynthesisRate = _stdDevSynthesisRate;
+	stdDevSynthesisRate_proposed = _stdDevSynthesisRate;
 
-	stdDevSynthesisRate.resize(_stdDevSynthesisRate.size());
-	stdDevSynthesisRate_proposed.resize(_stdDevSynthesisRate.size());
-	for (unsigned i = 0u; i < stdDevSynthesisRate.size(); i++)
-	{
-		stdDevSynthesisRate[i] = _stdDevSynthesisRate[i];
-		stdDevSynthesisRate_proposed[i] = _stdDevSynthesisRate[i];
-	}
 	bias_stdDevSynthesisRate = 0;
 	std_stdDevSynthesisRate = 0.1;
 
@@ -192,7 +185,6 @@ void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsig
 	//Set up vector of vectors:
 	currentSynthesisRateLevel.resize(numSelectionCategories);
 	proposedSynthesisRateLevel.resize(numSelectionCategories);
-
 	numAcceptForSynthesisRate.resize(numSelectionCategories);
 
 	std_phi.resize(numSelectionCategories);
@@ -247,10 +239,12 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 			else //store variable information
 			{
 				std::istringstream iss;
-				if (variableName == "groupList") {
+				if (variableName == "groupList")
+				{
 					std::string val;
 					iss.str(tmp);
-					while (iss >> val) {
+					while (iss >> val)
+					{
 						groupList.push_back(val);
 					}
 				}
@@ -398,13 +392,15 @@ void Parameter::writeBasicRestartFile(std::string filename)
 	std::string output = "";
 	std::ostringstream oss;
 	unsigned i, j;
+
 	out.open(filename.c_str());
 	if (out.fail())
 		my_printError("Error: Could not open restart file % for writing\n", filename.c_str());
 	else
 	{
 		oss << ">groupList:\n";
-		for (i = 0; i < groupList.size(); i++) {
+		for (i = 0; i < groupList.size(); i++)
+		{
 			oss << groupList[i];
 			if ((i + 1) % 10 == 0) oss << "\n";
 			else oss << " ";
@@ -421,7 +417,7 @@ void Parameter::writeBasicRestartFile(std::string filename)
 		oss << ">numParam:\n" << numParam << "\n";
 		oss << ">numMixtures:\n" << numMixtures << "\n";
 		oss << ">std_stdDevSynthesisRate:\n" << std_stdDevSynthesisRate << "\n";
-		//maybe clear the buffer
+		//TODO: maybe clear the buffer
 		oss << ">std_phi:\n";
 		for (i = 0; i < std_phi.size(); i++)
 		{
@@ -488,9 +484,9 @@ void Parameter::writeBasicRestartFile(std::string filename)
 			oss << "***\n";
 			for (j = 0; j < currentSynthesisRateLevel[i].size(); j++)
 			{
-			oss << currentSynthesisRateLevel[i][j];
-			if ((j + 1) % 10 == 0) oss << "\n";
-			else oss <<" ";
+				oss << currentSynthesisRateLevel[i][j];
+				if ((j + 1) % 10 == 0) oss << "\n";
+				else oss <<" ";
 			}
 			if (j % 10 != 0) oss << "\n";
 		}
@@ -508,7 +504,7 @@ void Parameter::initCategoryDefinitions(std::string _mutationSelectionState, std
 	std::set<unsigned> delMCounter;
 	std::set<unsigned> delEtaCounter;
 
-	for (unsigned i = 0; i < numMixtures; i++)
+	for (unsigned i = 0u; i < numMixtures; i++)
 	{
 		categories.push_back(mixtureDefinition()); //push a blank mixtureDefinition on the vector, then alter.
 		if (!mixtureDefinitionMatrix.empty())
@@ -559,7 +555,8 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 	for (unsigned i = 0u; i < genomeSize; i++)
 	{
 		index[i] = i;
-		scuoValues[i] = calculateSCUO( genome.getGene(i), 22 ); //This used to be maxGrouping, but RFP model will not work that way
+		//This used to be maxGrouping instead of 22, but RFP model will not work that way
+		scuoValues[i] = calculateSCUO( genome.getGene(i), 22 );
 		expression[i] = Parameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
 	}
 
@@ -614,7 +611,8 @@ void Parameter::InitializeSynthesisRate(std::vector<double> expression)
 
 std::vector <double> Parameter::readPhiValues(std::string filename)
 {
-	std::size_t pos, pos2;
+	std::size_t pos;
+	//std::size_t pos2; //currently unused
 	std::ifstream currentFile;
 	std::string tmpString;
 	std::vector <double> RV;
@@ -699,12 +697,20 @@ void Parameter::printMixtureDefinitionMatrix()
 }
 
 
+/* getCategoryProbability (NOT EXPOSED)
+ * Arguments: A number representing a mixture element
+ * Returns the category probability of the mixture element given.
+*/
 double Parameter::getCategoryProbability(unsigned mixtureElement)
 {
 	return categoryProbabilities[mixtureElement];
 }
 
 
+/* setCategoryProbability (NOT EXPOSED)
+ * Arguments: A number representing a mixture element, a double representing a probability
+ * Sets the probability for the category of the mixture element to the value given.
+*/
 void Parameter::setCategoryProbability(unsigned mixtureElement, double value)
 {
 	categoryProbabilities[mixtureElement] = value;
@@ -735,12 +741,30 @@ unsigned Parameter::getMutationCategory(unsigned mixtureElement)
 }
 
 
+/* Note 1) -- on getSelectionCategory and getSynthesisRateCategory
+ * These two functions are technically the same for readability.
+ * Selection and synthesis rate are directly related even if they are not known
+ * and thus are represented by the same variable. By splitting this
+ * into selection and synthesis, we avoid confusion when otherwise
+ * we may ask why one is used in the place of another.
+*/
+
+/* getSelectionCategory (RCPP EXPOSED VIA WRAPPER)
+ * Arguments: A number representing a mixture element
+ * Returns the selection category of the mixture element chosen.
+ * See Note 1) above.
+ */
 unsigned Parameter::getSelectionCategory(unsigned mixtureElement)
 {
 	return categories[mixtureElement].delEta;
 }
 
 
+/* getSynthesisRateCategory (RCPP EXPOSED VIA WRAPPER)
+ * Arguments: A number representing a mixture element
+ * Returns the synthesis rate category of the mixture element chosen.
+ * See Note 1) above.
+ */
 unsigned Parameter::getSynthesisRateCategory(unsigned mixtureElement)
 {
 	return categories[mixtureElement].delEta;
@@ -765,6 +789,17 @@ std::string Parameter::getMutationSelectionState()
 }
 
 
+/* getNumAcceptForCspForIndex (NOT EXPOSED)
+ * Arguments: index of numAcceptForCodonSpecificParameters to be returned
+ * Returns the numAcceptForCodonSpecificParameters at the index given.
+ * Note: Used in unit testing only.
+*/
+unsigned Parameter::getNumAcceptForCspForIndex(unsigned i)
+{
+	return numAcceptForCodonSpecificParameters[i];
+}
+
+
 
 
 
@@ -773,6 +808,10 @@ std::string Parameter::getMutationSelectionState()
 // -------------------------------------------//
 
 
+/* setGroupList (NOT EXPOSED)
+ * Arguments: vector of strings representing a group list
+ * Sets the group list to the argument after clearing the group list, adding elements only if they have no errors.
+*/
 void Parameter::setGroupList(std::vector <std::string> gl)
 {
 	groupList.clear();
@@ -785,18 +824,31 @@ void Parameter::setGroupList(std::vector <std::string> gl)
 	}
 }
 
+
+/* getGrouping (NOT EXPOSED)
+ * Arguments: index of a group list element to be returned
+ * Returns the group list element at the given index.
+*/
 std::string Parameter::getGrouping(unsigned index)
 {
 	return groupList[index];
 }
 
 
+/* getGroupList (NOT EXPOSED)
+ * Arguments: None
+ * Returns the group list as a vector of strings.
+*/
 std::vector<std::string> Parameter::getGroupList()
 {
 	return groupList;
 }
 
 
+/* getGroupListSize (NOT EXPOSED)
+ * Arguments: None
+ * Returns the size of the group list.
+*/
 unsigned Parameter::getGroupListSize()
 {
 	return (unsigned) groupList.size();
@@ -837,7 +889,12 @@ double Parameter::getCurrentStdDevSynthesisRateProposalWidth()
 	return std_stdDevSynthesisRate;
 }
 
-// For unit testing only.
+
+/* getNumAcceptForStdDevSynthesisRate (NOT EXPOSED)
+ * Arguments: None
+ * Returns the numAcceptForStdDevSynthesisRate.
+ * Note: Used in unit testing only.
+*/
 unsigned Parameter::getNumAcceptForStdDevSynthesisRate()
 {
 	return numAcceptForStdDevSynthesisRate;
@@ -851,6 +908,17 @@ void Parameter::updateStdDevSynthesisRate()
 		stdDevSynthesisRate[i] = stdDevSynthesisRate_proposed[i];
 	}
 	numAcceptForStdDevSynthesisRate++;
+}
+
+
+/* getStdCspForIndex (NOT EXPOSED)
+ * Arguments: index of std_csp to be returned
+ * Returns the std_csp at the index given.
+ * Note: Used in unit testing only.
+*/
+double Parameter::getStdCspForIndex(unsigned i)
+{
+	return std_csp[i];
 }
 
 
@@ -869,12 +937,29 @@ double Parameter::getSynthesisRate(unsigned geneIndex, unsigned mixtureElement, 
 }
 
 
+/* Note 2) -- on getCurrentSynthesisRateProposalWidth and getSynthesisRateProposalWidth
+ * These two functions should perform the same action if properly used.
+ * Similar to Note 1), these functions are based on how
+ * synthesis rate category and selection category are directly related
+ * but for readability two separated functions are created.
+*/
+
+/* getCurrentSynthesisRateProposalWidth (NOT EXPOSED)
+ * Arguments: index of a gene in the genome, number representing the selected category
+ * Returns the current synthesis rate proposal width of the category of the mixture element for the gene indexed.
+ * See Note 2) above.
+*/
 double Parameter::getCurrentSynthesisRateProposalWidth(unsigned expressionCategory, unsigned geneIndex)
 {
 	return std_phi[expressionCategory][geneIndex];
 }
 
 
+/* getSynthesisRateProposalWidth (NOT EXPOSED)
+ * Arguments: index of a gene in the genome, number representing a mixture element
+ * Returns the synthesis rate proposal width of the category of the mixture element for the gene indexed.
+ * See Note 2) above.
+*/
 double Parameter::getSynthesisRateProposalWidth(unsigned geneIndex, unsigned mixtureElement)
 {
 	unsigned category = getSelectionCategory(mixtureElement);
@@ -921,6 +1006,17 @@ void Parameter::updateSynthesisRate(unsigned geneIndex, unsigned mixtureElement)
 }
 
 
+/* getNumAcceptForSynthesisRate (NOT EXPOSED)
+ * Arguments: index of a gene in the genome, number representing the selected category
+ * Returns the numAcceptForSynthesisRate of the category of the mixture element for the gene indexed.
+ * Note: Used in unit testing only.
+*/
+unsigned Parameter::getNumAcceptForSynthesisRate(unsigned expressionCategory, unsigned geneIndex)
+{
+	return numAcceptForSynthesisRate[expressionCategory][geneIndex];
+}
+
+
 
 
 
@@ -929,12 +1025,20 @@ void Parameter::updateSynthesisRate(unsigned geneIndex, unsigned mixtureElement)
 //------------------------------------------//
 
 
+/* setLastIteration (NOT EXPOSED)
+ * Arguments: None
+ * Returns the last iteration.
+*/
 unsigned Parameter::getLastIteration()
 {
 	return lastIteration;
 }
 
 
+/* setLastIteration (NOT EXPOSED)
+ * Arguments: unsigned value representing an iteration
+ * Sets the last iteration to the argument given.
+*/
 void Parameter::setLastIteration(unsigned iteration)
 {
 	lastIteration = iteration;
@@ -961,12 +1065,20 @@ unsigned Parameter::getNumMixtureElements()
 }
 
 
-unsigned Parameter::getNumObservedPhiSets() 
-{ 
+/* getNumObservedPhiSets (NOT EXPOSED)
+ * Arguments: None
+ * Returns the observed number of phi sets.
+*/
+unsigned Parameter::getNumObservedPhiSets()
+{
 	return obsPhiSets;
 }
 
 
+/* setNumObservedPhiSets (NOT EXPOSED)
+ * Arguments: unsigned value representing a new number of phi set groupings
+ * Sets the observed number of phi sets to the argument given.
+*/
 void Parameter::setNumObservedPhiSets(unsigned _phiGroupings)
 {
 	obsPhiSets = _phiGroupings;
@@ -1076,7 +1188,8 @@ void Parameter::adaptStdDevSynthesisRateProposalWidth(unsigned adaptationWidth, 
 {
 	double acceptanceLevel = (double)numAcceptForStdDevSynthesisRate / (double)adaptationWidth;
 	traces.updateStdDevSynthesisRateAcceptanceRatioTrace(acceptanceLevel);
-	if (adapt) {
+	if (adapt)
+	{
 		if (acceptanceLevel < 0.2)
 			std_stdDevSynthesisRate *= 0.8;
 
@@ -1099,12 +1212,15 @@ void Parameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool a
 		{
 			double acceptanceLevel = (double)numAcceptForSynthesisRate[cat][i] / (double)adaptationWidth;
 			traces.updateSynthesisRateAcceptanceRatioTrace(cat, i, acceptanceLevel);
-			if (adapt) {
-				if (acceptanceLevel < 0.225) {
+			if (adapt)
+			{
+				if (acceptanceLevel < 0.225)
+				{
 					std_phi[cat][i] *= 0.8;
 					if (acceptanceLevel < 0.2) acceptanceUnder++;
 				}
-				if (acceptanceLevel > 0.275) {
+				if (acceptanceLevel > 0.275)
+				{
 					std_phi[cat][i] *= 1.2;
 					if (acceptanceLevel > 0.3) acceptanceOver++;
 				}
@@ -1141,7 +1257,8 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 			SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
 			my_print("\t%:\t%\n", aa.c_str(), acceptanceLevel);
 
-			if (acceptanceLevel < 0.2) {
+			if (acceptanceLevel < 0.2)
+			{
 				if (acceptanceLevel < 0.1)
 					for (unsigned k = aaStart; k < aaEnd; k++)
 						covarianceMatrix[aaIndex] *= 0.8;
@@ -1161,9 +1278,11 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 				for (unsigned k = aaStart; k < aaEnd; k++)
 					std_csp[k] *= 0.8;
 			}
-			if (acceptanceLevel > 0.3) {
+			if (acceptanceLevel > 0.3)
+			{
 				//covarianceMatrix[aaIndex].calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
-				for (unsigned k = aaStart; k < aaEnd; k++){
+				for (unsigned k = aaStart; k < aaEnd; k++)
+				{
 					std_csp[k] *= 1.2;
     				covarianceMatrix[aaIndex] *= 1.2;                    
                 }
@@ -1237,8 +1356,8 @@ double Parameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned geneI
 }
 
 
-double Parameter::getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType,
-	bool withoutReference)
+double Parameter::getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon,
+	unsigned paramType, bool withoutReference)
 {
 	double posteriorMean = 0.0;
 	std::vector<double> mutationParameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
@@ -1321,8 +1440,8 @@ double Parameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex,
 }
 
 
-double Parameter::getCodonSpecificVariance(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType, bool unbiased,
-	bool withoutReference)
+double Parameter::getCodonSpecificVariance(unsigned mixtureElement, unsigned samples, std::string &codon,
+	unsigned paramType, bool unbiased, bool withoutReference)
 {
 	std::vector<double> parameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
 		mixtureElement, codon, paramType, withoutReference);
@@ -1358,7 +1477,7 @@ std::vector<double> Parameter::getCodonSpecificQuantile(unsigned mixtureElement,
 		mixtureElement, codon, paramType, withoutReference);
     
     unsigned traceLength = lastIteration + 1;
-    unsigned traceEnd = parameterTrace.size() - (parameterTrace.size() - lastIteration);
+    //unsigned traceEnd = parameterTrace.size() - (parameterTrace.size() - lastIteration); //currently unused
 	if (samples > traceLength)
 	{
 		my_printError("Warning in Parameter::getCodonSpecificQuantile throws: Number of anticipated samples ");

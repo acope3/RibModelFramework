@@ -6,7 +6,13 @@
 using namespace Rcpp;
 #endif
 
-// This should be the only function besides those in Testing.h that uses cout and cerr.
+
+/* testUtility (RCPP EXPOSED)
+ * Arguments: None
+ * Performs Unit Testing on functions within Utility.h
+ * Returns 0 if successful, 1 if error found.
+ * Note: This should be the only function besides those in Utility.h that uses cout and cerr.
+*/
 int testUtility()
 {
     int error = 0;
@@ -40,6 +46,12 @@ int testUtility()
 }
 
 
+/* testSequenceSummary (RCPP EXPOSED)
+ * Arguments: None
+ * Performs Unit Testing on functions within SequenceSummary.cpp
+ * that are not exposed to RCPP already.
+ * Returns 0 if successful, 1 if error found.
+*/
 int testSequenceSummary()
 {
     SequenceSummary SS("ATGCTCATTCTCACTGCTGCCTCGTAG");
@@ -915,6 +927,12 @@ int testSequenceSummary()
 }
 
 
+/* testGene (RCPP EXPOSED)
+ * Arguments: None
+ * Performs Unit Testing on functions within Gene.cpp
+ * that are not exposed to RCPP already.
+ * Returns 0 if successful, 1 if error found.
+*/
 int testGene()
 {
     Gene testGene;
@@ -926,7 +944,8 @@ int testGene()
     //---------------------------------//
     testGene.setId("testGene");
 
-    if (testGene.getId() != "testGene") {
+    if (testGene.getId() != "testGene")
+    {
         my_printError("Error in setId or getId.\n");
         globalError = 1;
     }
@@ -1246,6 +1265,13 @@ int testGene()
 }
 
 
+/* testGenome (RCPP EXPOSED)
+ * Arguments: string of the name of the directory in which testing files are found
+ *            for reading and writing files
+ * Performs Unit Testing on functions within Genome.cpp
+ * that are not exposed to RCPP already.
+ * Returns 0 if successful, 1 if error found.
+*/
 int testGenome(std::string testFileDir)
 {
     Genome genome;
@@ -1303,7 +1329,8 @@ int testGenome(std::string testFileDir)
     std::vector<Gene> testVec;
     testVec.push_back(g1);
 
-    if (!(testVec == genome.getGenes(false))) {
+    if (!(testVec == genome.getGenes(false)))
+    {
         my_printError("Error in getGenes(false).\n");
         error = 1;
         globalError = 1;
@@ -1312,7 +1339,8 @@ int testGenome(std::string testFileDir)
     testVec.clear();
     testVec.push_back(s1);
 
-    if (!(testVec == genome.getGenes(true))) {
+    if (!(testVec == genome.getGenes(true)))
+    {
         my_printError("Error in getGenes(true).\n");
         error = 1;
         globalError = 1;
@@ -1341,8 +1369,10 @@ int testGenome(std::string testFileDir)
     //-------------------------------------------------//
     //------ getNumGenesWithPhiForIndex Function ------//
     //-------------------------------------------------//
-    for (unsigned i = 1; i < 4; i++) {
-        if (genome.getNumGenesWithPhiForIndex(i) != i) {
+    for (unsigned i = 1; i < 4; i++)
+    {
+        if (genome.getNumGenesWithPhiForIndex(i) != i)
+        {
             my_printError("Error in getNumGenesWithPhiForIndex with index %.", i);
             my_printError("Should return %, but returns %.\n", i, genome.getNumGenesWithPhiForIndex(i));
             error = 1;
@@ -1358,13 +1388,15 @@ int testGenome(std::string testFileDir)
     //------------------------------------//
     //------ getGenomeSize Function ------//
     //------------------------------------//
-    if (1 != genome.getGenomeSize(false)) {
+    if (1 != genome.getGenomeSize(false))
+    {
         my_printError("Error in getGenomesize(false). Should return 1, but returns %.\n", genome.getGenomeSize(false));
         error = 1;
         globalError = 1;
     }
 
-    if (1 != genome.getGenomeSize(true)) {
+    if (1 != genome.getGenomeSize(true))
+    {
         my_printError("Error in getGenomesize(true). Should return 1, but returns %.\n", genome.getGenomeSize(true));
         error = 1;
         globalError = 1;
@@ -1381,7 +1413,8 @@ int testGenome(std::string testFileDir)
 
     //reuse generic vector of unsigned integers
     uVector = {1};
-    if (uVector != genome.getCodonCountsPerGene("ATG")) {
+    if (uVector != genome.getCodonCountsPerGene("ATG"))
+    {
         my_printError("Error in getCodonCountsPerGene with a single gene.\n");
         error = 1;
         globalError = 1;
@@ -1392,7 +1425,8 @@ int testGenome(std::string testFileDir)
 
     uVector = {0, 1, 1};
 
-    if (uVector != genome.getCodonCountsPerGene("GAT")) {
+    if (uVector != genome.getCodonCountsPerGene("GAT"))
+    {
         my_printError("Error in getCodonCountsPerGene with three genes.\n");
         error = 1;
         globalError = 1;
@@ -1446,7 +1480,8 @@ int testGenome(std::string testFileDir)
     //reuse generic vector of unsigned integers
     uVector = {0, 1, 2, 3};
 
-    if (!(genome == genome.getGenomeForGeneIndices(uVector, false))) {
+    if (!(genome == genome.getGenomeForGeneIndices(uVector, false)))
+    {
         my_printError("Error in getGenomeForGeneIndices with genes.\n");
         error = 1;
         globalError = 1;
@@ -1463,7 +1498,8 @@ int testGenome(std::string testFileDir)
     genome.addGene(s3, true);
     genome.addGene(s4, true);
 
-    if (!(genome == genome.getGenomeForGeneIndices(uVector, true))) {
+    if (!(genome == genome.getGenomeForGeneIndices(uVector, true)))
+    {
         my_printError("Error in getGenomeForGeneIndices with simulated genes.\n");
         error = 1;
         globalError = 1;
@@ -1788,50 +1824,80 @@ int testGenome(std::string testFileDir)
 }
 
 
+/* testParameter (RCPP EXPOSED)
+ * Arguments: None
+ * Performs Unit Testing on functions within Parameter.cpp
+ * that are not exposed to RCPP already.
+ * Returns 0 if successful, 1 if error found.
+*/
 int testParameter()
 {
     Parameter parameter;
     int error = 0;
     int globalError = 0;
 
-    /* Section 1:
+    /* Section 1: 26 functions tested in total.
      * initParameterSet Function
      * and related get/set functions as a consequence of the function setup:
      * get/setMixtureAssignment,
      * getMutationSelectionState, getNumParam, getNumMixtureElements
-     * get/setStdDevSynthesisRate, getCurrentStdDevSynthesisRateProposalWidth, getNumAcceptForStdDevSynthesisRate
-     * getNumMutationCategories, getNumSelectionCategories
+     * get/setStdDevSynthesisRate, getCurrentStdDevSynthesisRateProposalWidth
+     * getNumAcceptForStdDevSynthesisRate, getStdCspForIndex, getNumAcceptForCspForIndex
+     * getNumMutationCategories, getNumSelectionCategories, getNumSynthesisRateCategories
+     * getMutationCategory, getSelectionCategory
      * getMixtureElementsOfMutationCategory, getMixtureElementsOfSelectionCategory
+     * get/setCategoryProbability
+     * get/setSynthesisRate, getSynthesisRateCategory
+     * getNumAcceptForSynthesisRate, getSynthesisRateProposalWidth, getCurrentSynthesisRateProposalWidth
     */
 
     //---------------------------------------//
     //------ initParameterSet Function ------//
     //---------------------------------------//
 
-    /* Initialize parameter p:
-    // Arguments: vector <double> stdDevSynthesisRate, unsigned numMixtures, vector <unsigned> geneAssignment,
-    //           vector <vector <unsigned>> mixtureDefinitionMatrix, bool splitSer, string mutationSelectionState
-    //
-    // Thus, let: */
-    unsigned numMixtures = 1;
-    std::vector <double> stdDev(numMixtures, 1);
-    unsigned numGenes = 1000;
-    std::vector <unsigned> geneAssignment(numGenes);
-    for (unsigned i = 0u; i < numGenes; i++)
+    /* Initialize parameter:
+     * Arguments: vector <double> stdDevSynthesisRate, unsigned numMixtures, vector <unsigned> geneAssignment,
+     *           vector <vector <unsigned>> mixtureDefinitionMatrix, bool splitSer, string mutationSelectionState
+     *
+     * Thus, let:
+    */
+    Genome genome;
+    //genome.readFasta("/Users/hollisbui/RibModelDev/data/twoMixtures/simulatedAllUniqueR.fasta");
+    genome.readRFPFile("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+
+    unsigned numMixtures = 3;
+    std::vector<double> stdDev(numMixtures, 1);
+    unsigned numGenes = genome.getGenomeSize();
+    std::vector<unsigned> geneAssignment(numGenes);
+    if (numMixtures == 1)
     {
-        geneAssignment[i] = 0u;
+        for (unsigned i = 0u; i < numGenes; i++)
+        {
+            geneAssignment[i] = 0u;
+        }
+    }
+    else if (numMixtures == 3)
+    {
+        for (unsigned i = 0u; i < numGenes; i++)
+        {
+            if (i < 961) geneAssignment[i] = 0u;
+            else if (i < 1418) geneAssignment[i] = 1u;
+            else geneAssignment[i] = 0u;
+        }
     }
     std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
     bool splitSer = true;
     std::string mutationSelectionState = Parameter::allUnique;
 
     parameter.initParameterSet(stdDev, numMixtures, geneAssignment, mixtureDefinitionMatrix, splitSer, mutationSelectionState);
-    int initParameterSetError = 0;
+    unsigned initParameterSetError = 0;
 
     /* This call changes many variables in parameter that must now be checked.
-    // Thus, unit testing is done in order of variable changed. See initParameterSet in Parameter.cpp or the table of contents above.
-    // This also introduces a level of uncertainty in what may be wrong, and thus an error in the following
-    // unit testing checks may be a result of the checking function or initParameterSet. */
+     * Thus, unit testing is done in order of variable changed.
+     * See initParameterSet in Parameter.cpp or the table of contents above.
+     * This also introduces a level of uncertainty in what may be wrong, and thus an error in the following
+     * unit testing checks may be a result of the checking function or initParameterSet.
+    */
 
     //------------------------------------------//
     //------ getMixtureAssignment Function------//
@@ -1890,13 +1956,12 @@ int testParameter()
     //------ getNumParam Function ------//
     //----------------------------------//
 
-    // Because splitSer is true, by initParameterSet the numParam should be = 40.
-    // TODO: Make this more dynamic / tested with other splitSer settings?
+    unsigned int numParam = ((splitSer) ? 40 : 41);
 
-    if (parameter.getNumParam() != 40)
+    if (parameter.getNumParam() != numParam)
     {
         my_printError("Error in initParameterSet or getNumParam.");
-        my_printError(" Value should be %, but is instead %.\n", 40, parameter.getNumParam());
+        my_printError(" Value should be %, but is instead %.\n", numParam, parameter.getNumParam());
         globalError = 1;
         initParameterSetError = 1;
     }
@@ -1951,6 +2016,7 @@ int testParameter()
     else
         error = 0; //Reset for next function.
 
+    // Not part of initParameterSet, but added here for convenience.
     //--------------------------------------------//
     //------ setStdDevSynthesisRate Function------//
     //--------------------------------------------//
@@ -1979,7 +2045,7 @@ int testParameter()
     if (parameter.getCurrentStdDevSynthesisRateProposalWidth() != 0.1)
     {
         my_printError("Error in initParameterSet or getCurrentStdDevSynthesisRateProposalWidth.");
-        my_printError(" Value should be %, but is instead %.\n", 0.1, parameter.getCurrentStdDevSynthesisRateProposalWidth());
+        my_printError(" Value should be 0.1, but is instead %.\n", parameter.getCurrentStdDevSynthesisRateProposalWidth());
         globalError = 1;
         initParameterSetError = 1;
     }
@@ -1995,22 +2061,67 @@ int testParameter()
     if (parameter.getNumAcceptForStdDevSynthesisRate() != 0)
     {
         my_printError("Error in initParameterSet or getNumAcceptForStdDevSynthesisRate.");
-        my_printError(" Value should be %, but is instead %.\n", 0, parameter.getNumAcceptForStdDevSynthesisRate());
+        my_printError(" Value should be 0, but is instead %.\n", parameter.getNumAcceptForStdDevSynthesisRate());
         globalError = 1;
         initParameterSetError = 1;
     }
     else
         my_print("Parameter getNumAcceptForStdDevSynthesisRate --- Pass\n");
 
+    // For unit testing only.
+    //----------------------------------------//
+    //------ getStdCspForIndex Function ------//
+    //----------------------------------------//
+    std::vector <double> tmpStd_Csp(numParam, 0.1);
 
-    //TODO: Write getter function to unit test std_csp
+    for (unsigned i = 0u; i < numParam; i++)
+    {
+        if (parameter.getStdCspForIndex(i) != tmpStd_Csp[i])
+        {
+            my_printError("Error in initParameterSet or getStdCspForIndex for index %.", i);
+            my_printError(" Value should be %, but is instead %.\n", tmpStd_Csp[i], parameter.getStdCspForIndex(i));
+            error = 1;
+            globalError = 1;
+            initParameterSetError = 1;
+        }
+    }
 
-    //TODO: Write getter function to unit test numAcceptForCodonSpecificParameters
+    if (!error)
+        my_print("Parameter getStdCspForIndex --- Pass\n");
+    else
+        error = 0; //Reset for next function.
 
+    // For unit testing only.
+    //-------------------------------------------------//
+    //------ getNumAcceptForCspForIndex Function ------//
+    //-------------------------------------------------//
+
+    // Because default constructor was used, maxGrouping is = 22.
+    // TODO: Make this more dynamic / tested with other settings?
+    unsigned maxGrouping = 22;
+    std::vector <unsigned> tmpNumAcceptForCsp(maxGrouping, 0u);
+
+    for (unsigned i = 0u; i < maxGrouping; i++)
+    {
+        if (parameter.getNumAcceptForCspForIndex(i) != tmpNumAcceptForCsp[i])
+        {
+            my_printError("Error in initParameterSet or getNumAcceptForCspForIndex for index %.", i);
+            my_printError(" Value should be %, but is instead %.\n", tmpNumAcceptForCsp[i], parameter.getNumAcceptForCspForIndex(i));
+            error = 1;
+            globalError = 1;
+            initParameterSetError = 1;
+        }
+    }
+
+    if (!error)
+        my_print("Parameter getNumAcceptForCspForIndex --- Pass\n");
+    else
+        error = 0; //Reset for next function.
 
     /* TODO NOTE: setNumMutationSelectionValues is accessed in initParameterSet
-    // and through this function numMutationCategories and numSelectionCategories is changed.
-    // This function may itself need to be tested as a middleman function.*/
+     * and through this function numMutationCategories and numSelectionCategories is changed.
+     * This function may itself need to be tested as a middleman function.
+    */
 
     //-----------------------------------------------//
     //------ getNumMutationCategories Function ------//
@@ -2032,38 +2143,115 @@ int testParameter()
     //------ getNumSelectionCategories Function ------//
     //------------------------------------------------//
 
+    // For use in future unit testing as well
+    unsigned numSelectionCategories = parameter.getNumSelectionCategories();
+
     // Because mutationSelectionState is allUnique, by initParameterSet the numSelectionCategories should be = numMixtures.
     // TODO: Make this more dynamic / tested with other settings?
-    if (parameter.getNumSelectionCategories() != numMixtures)
+    if (numSelectionCategories != numMixtures)
     {
         my_printError("Error in initParameterSet or getNumSelectionCategories.");
-        my_printError(" Value should be %, but is instead %.\n", numMixtures, parameter.getNumSelectionCategories());
+        my_printError(" Value should be %, but is instead %.\n", numMixtures, numSelectionCategories);
         globalError = 1;
         initParameterSetError = 1;
     }
     else
         my_print("Parameter getNumSelectionCategories --- Pass\n");
 
+    //----------------------------------------------------//
+    //------ getNumSynthesisRateCategories Function ------//
+    //----------------------------------------------------//
+
+    // Because mutationSelectionState is allUnique, by initParameterSet the numSynthesisRateCategories should be = numMixtures.
+    // TODO: Make this more dynamic / tested with other settings?
+    if (parameter.getNumSynthesisRateCategories() != numMixtures)
+    {
+        my_printError("Error in initParameterSet or getNumSynthesisRateCategories.");
+        my_printError(" Value should be %, but is instead %.\n", numMixtures, parameter.getNumSynthesisRateCategories());
+        globalError = 1;
+        initParameterSetError = 1;
+    }
+    else
+        my_print("Parameter getNumSynthesisRateCategories--- Pass\n");
+
     /* TODO NOTE: initCategoryDefinitions is accessed in initParameterSet
-    // and through this function mutationIsInMixture and selectionIsInMixture is changed.
-    // This function may itself need to be tested as a middleman function.*/
+     * and through this function categories.delM, categories.delEta,
+     * mutationIsInMixture, and selectionIsInMixture are changed.
+     * This function may itself need to be tested as a middleman function.
+    */
+
+    // TODO: While the categories' .delM and .delEta values are checked,
+    // The categories variable itself is not checked.
+
+    //-----------------------------------------//
+    //------ getMutationCategory Function------//
+    //-----------------------------------------//
+
+    // Because mutationSelectionState is allUnique,
+    // by initParameterSet each category's delM = numMixtures
+    // TODO: Make this more dynamic / tested with other settings?
+
+    for (unsigned i = 0u; i < numMixtures; i++)
+    {
+        if (parameter.getMutationCategory(i) != i)
+        {
+            my_printError("Error in initParameterSet or getMutationCategory for index %.", i);
+            my_printError(" Value should be %, but is instead %.\n", i, parameter.getMutationCategory(i));
+            error = 1;
+            globalError = 1;
+            initParameterSetError = 1;
+        }
+    }
+
+    if (!error)
+        my_print("Parameter getMutationCategory --- Pass\n");
+    else
+        error = 0; //Reset for next function.
+
+    //------------------------------------------//
+    //------ getSelectionCategory Function------//
+    //------------------------------------------//
+
+    // Because mutationSelectionState is allUnique,
+    // by initParameterSet each category's delEta = numMixtures
+    // TODO: Make this more dynamic / tested with other settings?
+
+    for (unsigned i = 0u; i < numMixtures; i++)
+    {
+        if (parameter.getSelectionCategory(i) != i)
+        {
+            my_printError("Error in initParameterSet or getSelectionCategory for index %.", i);
+            my_printError(" Value should be %, but is instead %.\n", i, parameter.getSelectionCategory(i));
+            error = 1;
+            globalError = 1;
+            initParameterSetError = 1;
+        }
+    }
+
+    if (!error)
+        my_print("Parameter getSelectionCategory --- Pass\n");
+    else
+        error = 0; //Reset for next function.
 
     //----------------------------------------------------------//
     //------ getMixtureElementsOfMutationCategory Function------//
     //----------------------------------------------------------//
 
-    // Because mutationSelectionState is allUnique, by initParameterSet the mutationIsInMixture should be a single vector = tmp.
+    /* Because mutationSelectionState is allUnique, by initParameterSet
+     * the mutationIsInMixture should be equal to a corresponding vector of unsigned integers
+     * defined in the loop below -- but not for other mutation selection states.
+    */
     // TODO: Make this more dynamic / tested with other settings?
-    std::vector <unsigned> tmp;
+    std::vector <std::vector <unsigned> > tmp(numMixtures);
 
     for (unsigned i = 0u; i < numMixtures; i++)
     {
-        tmp.push_back(i);
+        tmp[i].push_back(i);
     }
 
     for (unsigned i = 0u; i < numMixtures; i++)
     {
-        if (parameter.getMixtureElementsOfMutationCategory(i) != tmp)
+        if (parameter.getMixtureElementsOfMutationCategory(i) != tmp[i])
         {
             my_printError("Error in initParameterSet or getMixtureElementsOfMutationCategory for index %.\n", i);
             error = 1;
@@ -2081,14 +2269,15 @@ int testParameter()
     //------ getMixtureElementsOfSelectionCategory Function------//
     //-----------------------------------------------------------//
 
-    // Because mutationSelectionState is allUnique, by initParameterSet the selectionIsInMixture should be a single vector = tmp.
+    /* Because mutationSelectionState is allUnique, by initParameterSet
+     * the mutationIsInMixture should be equal to the vector of unsigned integers
+     * defined above -- but not for other mutation selection states.
+    */
     // TODO: Make this more dynamic / tested with other settings?
-
-    // Reuse tmp vector of unsigned integers defined above
 
     for (unsigned i = 0u; i < numMixtures; i++)
     {
-        if (parameter.getMixtureElementsOfSelectionCategory(i) != tmp)
+        if (parameter.getMixtureElementsOfSelectionCategory(i) != tmp[i])
         {
             my_printError("Error in initParameterSet or getMixtureElementsOfSelectionCategory for index %.\n", i);
             error = 1;
@@ -2102,37 +2291,458 @@ int testParameter()
     else
         error = 0; //Reset for next function.
 
+    //--------------------------------------------//
+    //------ getCategoryProbability Function------//
+    //--------------------------------------------//
 
-    //TODO: Check modifications to category (a vector of MixtureDefinitions) somehow
+    // Each value is initialized to 1.0 / numMixtures in initParameterSet.
+    for (unsigned i = 0u; i < numMixtures; i++)
+    {
+        if (parameter.getCategoryProbability(i) != 1.0/(double)numMixtures)
+        {
+            my_printError("Error in initParameterSet or getCategoryProbability for index %.", i);
+            my_printError(" Value should be %, but is instead %.\n", 1.0/(double)numMixtures, parameter.getCategoryProbability(i));
+            error = 1;
+            globalError = 1;
+            initParameterSetError = 1;
+        }
+    }
 
-    //TODO: Check the final four vectors of vectors that are modified in initParameterSet
+    if (!error)
+        my_print("Parameter getCategoryProbability --- Pass\n");
+    else
+        error = 0; //Reset for next function.
+
+    // Not part of initParameterSet, but added here for convenience.
+    //--------------------------------------------//
+    //------ setCategoryProbability Function------//
+    //--------------------------------------------//
+    for (unsigned i = 0u; i < numMixtures; i++)
+    {
+        parameter.setCategoryProbability(i, (double)i/(double)numMixtures);
+        if (parameter.getCategoryProbability(i) != (double)i/(double)numMixtures)
+        {
+            my_printError("Error in setCategoryProbability for index %.", i);
+            my_printError(" Value should be %, but is instead %.\n", (double)i/(double)numMixtures, parameter.getCategoryProbability(i));
+            error = 1;
+            globalError = 1;
+        }
+    }
+
+    if (!error)
+        my_print("Parameter setCategoryProbability --- Pass\n");
+    else
+        error = 0; //Reset for next function.
+
+    //--------------------------------------//
+    //------ getSynthesisRate Function------//
+    //--------------------------------------//
+
+    /* Each value is initialized to 0.0 in initParameterSet.
+     * Note that numSelectionCategories = numMixtures since allUnique; therefore,
+     * the outer loop only iterates once.
+    */
+
+    // Check proposed SynthesisRate
+    for (unsigned i = 0u; i < numSelectionCategories; i++)
+    {
+        for (unsigned j = 0u; j < numGenes; j++)
+        {
+            if (parameter.getSynthesisRate(j, i, 1) != 0.0)
+            {
+                my_printError("Error in initParameterSet or getSynthesisRate(proposed) for index % of mixture %.", j, i);
+                my_printError(" Value should be 0.0, but is instead %.\n", parameter.getSynthesisRate(j, i, 1));
+                error = 1;
+                globalError = 1;
+                initParameterSetError = 1;
+            }
+        }
+    }
+
+    // Check non-proposed SynthesisRate
+    for (unsigned i = 0u; i < numSelectionCategories; i++)
+    {
+        for (unsigned j = 0u; j < numGenes; j++)
+        {
+            if (parameter.getSynthesisRate(j, i, 0) != 0.0)
+            {
+                my_printError("Error in initParameterSet or getSynthesisRate(non-proposed) for index % of mixture %.", j, i);
+                my_printError(" Value should be 0.0, but is instead %.\n", parameter.getSynthesisRate(j, i, 0));
+                error = 1;
+                globalError = 1;
+                initParameterSetError = 1;
+            }
+        }
+    }
+
+    if (!error)
+        my_print("Parameter getSynthesisRate --- Pass\n");
+    else
+        error = 0; //Reset for next function.
+
+    // Not part of initParameterSet, but added here for convenience.
+    //--------------------------------------//
+    //------ setSynthesisRate Function------//
+    //--------------------------------------//
+
+    for (unsigned i = 0u; i < numSelectionCategories; i++)
+    {
+        for (unsigned j = 0u; j < numGenes; j++)
+        {
+            parameter.setSynthesisRate(j, j, i);
+            if (parameter.getSynthesisRate(j, i, 0) != j)
+            {
+                my_printError("Error in setSynthesisRate for index % of mixture %.", j, i);
+                my_printError(" Value should be %, but is instead %.\n", j, parameter.getSynthesisRate(j, i, 0));
+                error = 1;
+                globalError = 1;
+            }
+        }
+    }
+
+    if (!error)
+        my_print("Parameter setSynthesisRate --- Pass\n");
+    else
+        error = 0; //Reset for next function.
+
+    //----------------------------------------------//
+    //------ getSynthesisRateCategory Function------//
+    //----------------------------------------------//
+
+    // Because mutationSelectionState is allUnique,
+    // by initParameterSet each category's delEta = numMixtures
+    // TODO: Make this more dynamic / tested with other settings?
+
+    for (unsigned i = 0u; i < numMixtures; i++)
+    {
+        if (parameter.getSynthesisRateCategory(i) != i)
+        {
+            my_printError("Error in initParameterSet or getSynthesisRateCategory for index %.", i);
+            my_printError(" Value should be %, but is instead %.\n", i, parameter.getSynthesisRateCategory(i));
+            error = 1;
+            globalError = 1;
+            initParameterSetError = 1;
+        }
+    }
+
+    if (!error)
+        my_print("Parameter getSynthesisRateCategory --- Pass\n");
+    else
+        error = 0; //Reset for next function.
+
+    //--------------------------------------------------//
+    //------ getNumAcceptForSynthesisRate Function------//
+    //--------------------------------------------------//
+
+    // Each value is initialized to 0 in initParameterSet.
+
+    for (unsigned i = 0u; i < numMixtures; i++)
+    {
+        unsigned expressionCategory = parameter.getSynthesisRateCategory(i);
+        for (unsigned j = 0u; j < numGenes; j++)
+        {
+            if (parameter.getNumAcceptForSynthesisRate(expressionCategory, j) != 0)
+            {
+                my_printError("Error in initParameterSet or getNumAcceptForSynthesisRate");
+                my_printError(" for index % of expression category %.", j, expressionCategory);
+                my_printError(" Value should be 0, but is instead");
+                my_printError(" %.\n", parameter.getNumAcceptForSynthesisRate(expressionCategory, j));
+                error = 1;
+                globalError = 1;
+                initParameterSetError = 1;
+            }
+        }
+    }
+
+    if (!error)
+        my_print("Parameter getNumAcceptForSynthesisRate --- Pass\n");
+    else
+        error = 0; //Reset for next function.
+
+    //---------------------------------------------------//
+    //------ getSynthesisRateProposalWidth Function------//
+    //---------------------------------------------------//
+
+    /* Each value is initialized to 0.1 in initParameterSet.
+     * Note that numSelectionCategories = numMixtures since allUnique; therefore,
+     * the outer loop only iterates once.
+    */
+    for (unsigned i = 0u; i < numSelectionCategories; i++)
+    {
+        for (unsigned j = 0u; j < numGenes; j++)
+        {
+            if (parameter.getSynthesisRateProposalWidth(j, i) != 0.1)
+            {
+                my_printError("Error in initParameterSet or getSynthesisRateProposalWidth for index % of mixture %.", j, i);
+                my_printError(" Value should be 0.1, but is instead %.\n", parameter.getSynthesisRateProposalWidth(j, i));
+                error = 1;
+                globalError = 1;
+                initParameterSetError = 1;
+            }
+        }
+    }
+
+    if (!error)
+        my_print("Parameter getSynthesisRateProposalWidth --- Pass\n");
+    else
+        error = 0; //Reset for next function.
+
+    //----------------------------------------------------------//
+    //------ getCurrentSynthesisRateProposalWidth Function------//
+    //----------------------------------------------------------//
+
+    // Each value is initialized to 0.1 in initParameterSet.
+
+    for (unsigned i = 0u; i < numMixtures; i++)
+    {
+        unsigned expressionCategory = parameter.getSynthesisRateCategory(i);
+        for (unsigned j = 0u; j < numGenes; j++)
+        {
+            if (parameter.getCurrentSynthesisRateProposalWidth(expressionCategory, j) != 0.1)
+            {
+                my_printError("Error in initParameterSet or getCurrentSynthesisRateProposalWidth");
+                my_printError(" for index % of expression category %.", j, expressionCategory);
+                my_printError(" Value should be 0.1, but is instead");
+                my_printError(" %.\n", parameter.getCurrentSynthesisRateProposalWidth(expressionCategory, j));
+                error = 1;
+                globalError = 1;
+                initParameterSetError = 1;
+            }
+        }
+    }
+
+    if (!error)
+        my_print("Parameter getCurrentSynthesisRateProposalWidth --- Pass\n");
+    else
+        error = 0; //Reset for next function.
 
     //------------------------------------------------------------------------//
     //------ End of Unit Testing for initParameterSet-related Functions ------//
     //------------------------------------------------------------------------//
+
     if (!initParameterSetError)
         my_print("Parameter initParameterSet --- Pass\n");
 
     /* Section 2:
+     * Group List functions: 4 functions tested in total.
+     * get/setGroupList, getGroupListSize, getGrouping
+    */
+
+    std::vector <std::string> tmpGroupList = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
+                 "TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT", "ATA", "ATC",
+                 "ATT", "AAA", "AAG", "CTA", "CTC", "CTG", "CTT", "TTA", "TTG", "ATG",
+                 "AAC", "AAT", "CCA", "CCC", "CCG", "CCT", "CAA", "CAG", "AGA", "AGG",
+                 "CGA", "CGC", "CGG", "CGT", "TCA", "TCC", "TCG", "TCT", "ACA", "ACC",
+                 "ACG", "ACT", "GTA", "GTC", "GTG", "GTT", "TGG", "TAC", "TAT", "AGC",
+                 "AGT"};
+
+    //----------------------------------------//
+    //------ get/setGroupList Functions ------//
+    //----------------------------------------//
+    parameter.setGroupList(tmpGroupList);
+
+    if (parameter.getGroupList() != tmpGroupList)
+    {
+        my_printError("Error in setGroupList or getGroupList.\n");
+        globalError = 1;
+    }
+    else
+        my_print("Parameter get/setGroupList --- Pass\n");
+
+    //----------------------------------------//
+    //------ getGroupListSize Functions ------//
+    //----------------------------------------//
+    if (parameter.getGroupListSize() != 61)
+    {
+        my_printError("Error in getGroupListSize. Size should be 61, but is instead %.\n", parameter.getGroupListSize());
+        globalError = 1;
+    }
+    else
+        my_print("Parameter getGroupListSize --- Pass\n");
+
+    //-----------------------------------//
+    //------ getGrouping Functions ------//
+    //-----------------------------------//
+    // We will only test 6 indices
+
+    if (parameter.getGrouping(0) != "GCA")
+    {
+        my_printError("Error in getGrouping at index 0. Value should be GCA, but is instead %.\n", parameter.getGrouping(0));
+        error = 1;
+        globalError = 1;
+    }
+    if (parameter.getGrouping(9) != "GAG")
+    {
+        my_printError("Error in getGrouping at index 9. Value should be GAG, but is instead %.\n", parameter.getGrouping(9));
+        error = 1;
+        globalError = 1;
+    }
+    if (parameter.getGrouping(14) != "GGG")
+    {
+        my_printError("Error in getGrouping at index 14. Value should be GGG, but is instead %.\n", parameter.getGrouping(14));
+        error = 1;
+        globalError = 1;
+    }
+    if (parameter.getGrouping(28) != "TTG")
+    {
+        my_printError("Error in getGrouping at index 28. Value should be TTG, but is instead %.\n", parameter.getGrouping(28));
+        error = 1;
+        globalError = 1;
+    }
+    if (parameter.getGrouping(31) != "AAT")
+    {
+        my_printError("Error in getGrouping at index 31. Value should be AAT, but is instead %.\n", parameter.getGrouping(31));
+        error = 1;
+        globalError = 1;
+    }
+    if (parameter.getGrouping(60) != "AGT")
+    {
+        my_printError("Error in getGrouping at index 60. Value should be AGT, but is instead %.\n", parameter.getGrouping(60));
+        error = 1;
+        globalError = 1;
+    }
+
+    if (!error)
+        my_print("Parameter getGrouping --- Pass\n");
+    else
+        error = 0; //Reset for next function.
+
+    /* Section 3:
      * InitializeSynthesisRate Function
      */
 
     //----------------------------------------------//
     //------ InitializeSynthesisRate Function ------//
     //----------------------------------------------//
+    //parameter.InitializeSynthesisRate(genome, stdDev[0]);
 
-    Genome genome;
-    genome.readFasta("/Users/hollisbui/RibModelDev/data/twoMixtures/simulatedAllUniqueR.fasta");
-    std::vector<double> sphi_init(numMixtures, 1);
+    // TODO: Check the following functions:
+     // calculateSCUO
+     // Parameter::randLogNorm
+     // quickSortPair
+     // quickSort
+     // pivotPair
+     // pivot
+     // swap (doubles)
+     // swap (ints)
 
-    parameter.InitializeSynthesisRate(genome, sphi_init[0]);
+    // This call changes currentSynthesisRateLevel, std_phi, and numAcceptForSynthesisRate.
+    // These functions must now be checked.
+    for (unsigned category = 0u; category < numSelectionCategories; category++)
+    {
+        for (unsigned j = 0u; j < numGenes; j++)
+        {
+            // Check if std_phi = 0.1 as set in InitializeSynthesisRate
+            if (parameter.getCurrentSynthesisRateProposalWidth(category, j) != 0.1)
+            {
+                my_printError("Error in InitializeSynthesisRate -- std_phi is not set correctly.\n");
+                my_printError(" Value at index % of expression category %", j, category);
+                my_printError(" should be 0.1, but is instead %.\n", parameter.getCurrentSynthesisRateProposalWidth(category, j));
+                error = 1;
+                globalError = 1;
+            }
 
-    //ROCParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
+            //Check if numAcceptForSynthesisRate = 0 as set in InitializeSynthesisRate
+            if (parameter.getNumAcceptForSynthesisRate(category, j) != 0)
+            {
+                my_printError("Error in InitializeSynthesisRate -- numAcceptForSynthesisRate is not set correctly.\n");
+                my_printError(" Value at index % of expression category %", j, category);
+                my_printError(" should be 0, but is instead %.\n", parameter.getNumAcceptForSynthesisRate(category, j));
+                error = 1;
+                globalError = 1;
+            }
+
+            // TODO: Check if currentSynthesisRateLevel is set correctly
+            // currentSynthesisRateLevel[category][index[j]] = expression[j];
+        }
+    }
+
+    if (!error)
+        my_print("Parameter InitializeSynthesisRate --- Pass\n");
+    else
+        error = 0; //Reset for next function.
+
+    /* Section 4:
+     * Other functions: 4 functions tested in total.
+     * get/setLastIteration, get/setNumObservedPhiSets
+    */
+
+    //--------------------------------------------//
+    //------ get/setLastIteration Functions ------//
+    //--------------------------------------------//
+
+    //lastIteration should be initialized to 0 in the constructor.
+    if (parameter.getLastIteration() != 0)
+    {
+        my_printError("Error in getLastIteration.");
+        my_printError(" Value should be 0, but is instead %.\n", parameter.getLastIteration());
+        error = 1;
+        globalError = 1;
+    }
+
+    parameter.setLastIteration(9);
+    if (parameter.getLastIteration() != 9)
+    {
+        my_printError("Error in setLastIteration or getLastIteration.");
+        my_printError(" Value should be 9, but is instead %.\n", parameter.getLastIteration());
+        error = 1;
+        globalError = 1;
+    }
+
+    if (!error)
+        my_print("Parameter get/setLastIteration --- Pass\n");
+    else
+        error = 0; //Reset for next function.
+
+    //-------------------------------------------------//
+    //------ get/setNumObservedPhiSets Functions ------//
+    //-------------------------------------------------//
+
+    //obsPhiSets should be initialized to 0 in the constructor.
+    if (parameter.getNumObservedPhiSets() != 0)
+    {
+        my_printError("Error in getNumObservedPhiSets.");
+        my_printError(" Value should be 0, but is instead %.\n", parameter.getNumObservedPhiSets());
+        error = 1;
+        globalError = 1;
+    }
+
+    parameter.setNumObservedPhiSets(22);
+    if (parameter.getNumObservedPhiSets() != 22)
+    {
+        my_printError("Error in setNumObservedPhiSets or getNumObservedPhiSets.");
+        my_printError(" Value should be 22, but is instead %.\n", parameter.getNumObservedPhiSets());
+        error = 1;
+        globalError = 1;
+    }
+
+    if (!error)
+        my_print("Parameter get/setNumObservedPhiSets --- Pass\n");
+    else
+        error = 0; //Reset for next function.
+
+    //parameter.writeBasicRestartFile("/Users/hollisbui/HollisFile.txt");
 
     return globalError;
 }
 
 
+int testParameterWithFile(std::string filename)
+{
+    Parameter parameter;
+
+    parameter.initBaseValuesFromFile(filename);
+
+    return 0;
+}
+
+
+/* testCovarianceMatrix (RCPP EXPOSED)
+ * Arguments: None
+ * Performs Unit Testing on functions within CovarianceMatrix.cpp
+ * that are not exposed to RCPP already.
+ * Returns 0 if successful, 1 if error found.
+*/
 int testCovarianceMatrix()
 {
     CovarianceMatrix covM; //Default constructor sets numVariates to 2.
@@ -2243,7 +2853,8 @@ int testCovarianceMatrix()
     //-------------------------------------//
     covM.getNumVariates();
 
-    if (covM.getNumVariates() != 4) {
+    if (covM.getNumVariates() != 4)
+    {
         my_printError("Error in getNumVariates. Function should return 4, but returns %.\n", covM.getNumVariates());
         globalError = 1;
     }
@@ -2304,15 +2915,124 @@ int testTrace()
 }
 */
 
-/*
-int testROCParameter()
+
+int testRFPParameter()
 {
+    int error = 0;
     int globalError = 0;
 
+    /* Section 1: 1 function tested in total.
+     * initRFPParameterSet Function
+     * and related get/set functions as a consequence of the function setup:
+    */
+
+    //------------------------------------------//
+    //------ initRFPParameterSet Function ------//
+    //------------------------------------------//
+
+    /* Initialize parameter:
+     * Arguments: vector <double> stdDevSynthesisRate, unsigned numMixtures, vector <unsigned> geneAssignment,
+     *           vector <vector <unsigned>> mixtureDefinitionMatrix, bool splitSer, string mutationSelectionState
+     *
+     * Thus, let:
+    */
+    Genome genome;
+    genome.readRFPFile("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+    unsigned numMixtures = 3;
+    std::vector <double> stdDev(numMixtures, 1);
+    unsigned numGenes = genome.getGenomeSize();
+    std::vector <unsigned> geneAssignment(numGenes);
+    if (numMixtures == 1)
+    {
+        for (unsigned i = 0u; i < numGenes; i++)
+        {
+            geneAssignment[i] = 0u;
+        }
+    }
+    else if (numMixtures == 3)
+    {
+        for (unsigned i = 0u; i < numGenes; i++)
+        {
+            if (i < 961) geneAssignment[i] = 0u;
+            else if (i < 1418) geneAssignment[i] = 1u;
+            else geneAssignment[i] = 0u;
+        }
+    }
+    std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
+    bool splitSer = true;
+    std::string mutationSelectionState = Parameter::allUnique;
+
+    RFPParameter parameter(stdDev, numMixtures, geneAssignment, mixtureDefinitionMatrix, splitSer, mutationSelectionState);
+
+    /* This constructor in turn calls two functions: initParameterSet() and initRFPParameterSet().
+     * initParameterSet should have been tested in testParameter(), above, but we must now
+     * test initRFPParameterSet
+     *
+     * Thus, unit testing is done in order of variable changed:
+     * numParam, currentCodonSpecificParameter, proposedCodonSpecificParameter, std_csp, and groupList.
+     * This also introduces a level of uncertainty in what may be wrong, and thus an error in the following
+     * unit testing checks may be a result of the checking function or initParameterSet.
+    */
+
+    // numParam is set to 61 in initRFPParameterSet.
+    unsigned numParam = parameter.getNumParam();
+    if (numParam != 61)
+    {
+        my_printError("Error in initRFPParameterSet -- numParam is not set correctly.");
+        my_printError(" Value should be 61 but is instead %.\n", numParam);
+        error = 1;
+        globalError = 1;
+    }
+
+    // TODO: check the changed:
+    // currentCodonSpecificParameter
+    // proposedCodonSpecificParameter
+
+    // std_csp is set to 0.1 for each index in initRFPParameterSet.
+    for (unsigned i = 0u; i < numParam; i++)
+    {
+        if (parameter.getStdCspForIndex(i) != 0.1)
+        {
+            my_printError("Error in InitializeSynthesisRate -- std_csp is not set correctly.");
+            my_printError(" Value at index % should be 0.1, but is instead %.\n", i, parameter.getStdCspForIndex(i));
+            error = 1;
+            globalError = 1;
+        }
+    }
+
+    // groupList is set to the same as this temporary group list in initRFPParameterSet.
+    std::vector <std::string> tmpGroupList = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
+                                              "TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT", "ATA", "ATC",
+                                              "ATT", "AAA", "AAG", "CTA", "CTC", "CTG", "CTT", "TTA", "TTG", "ATG",
+                                              "AAC", "AAT", "CCA", "CCC", "CCG", "CCT", "CAA", "CAG", "AGA", "AGG",
+                                              "CGA", "CGC", "CGG", "CGT", "TCA", "TCC", "TCG", "TCT", "ACA", "ACC",
+                                              "ACG", "ACT", "GTA", "GTC", "GTG", "GTT", "TGG", "TAC", "TAT", "AGC",
+                                              "AGT"};
+
+    if (parameter.getGroupList() != tmpGroupList)
+    {
+        my_printError("Error in initRFPParameterSet -- groupList is not set correctly.\n");
+        error = 1;
+        globalError = 1;
+    }
+
+    if (!error)
+        my_print("RFPParameter initRFPParameterSet --- Pass\n");
+    else
+        error = 0; //Reset for next function.
+
+    //parameter.InitializeSynthesisRate(genome, stdDev[0]);
+    //parameter.writeBasicRestartFile("/Users/hollisbui/HollisFile2.txt");
 
     return globalError;
 }
 
+
+/* testMCMCAlgorithm (RCPP EXPOSED)
+ * Arguments: None
+ * Performs Unit Testing on functions within MCMCAlgorithm.cpp
+ * that are not exposed to RCPP already.
+ * Returns 0 if successful, 1 if error found.
 */
 int testMCMCAlgorithm()
 {
@@ -2322,6 +3042,69 @@ int testMCMCAlgorithm()
     int globalError = 0;
 
     MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, 10, true, true, true);
+    /*
+    my_print("Initializing MCMCAlgorithm object---------------\n");
+    my_print("\t# Samples: %\n", samples);
+    my_print("\tThining: %\n", thining);
+    my_print("\t # Samples used: %\n", 100);
+
+    MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, 10, true, true, true);
+    my_print("Done!-------------------------------\n\n\n");
+
+    my_print("Initializing Genome object--------------------------\n");
+    Genome genome;
+    genome.readRFPFile("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+    my_print("Done!-------------------------------\n\n\n");
+    my_print("Initializing shared parameter variables---------------\n");
+    unsigned numMixtures = 1;
+    std::vector <double> stdDev(numMixtures, 1);
+    unsigned numGenes = genome.getGenomeSize();
+    std::vector <unsigned> geneAssignment(numGenes);
+    if (numMixtures == 1)
+    {
+        for (unsigned i = 0u; i < numGenes; i++)
+        {
+            geneAssignment[i] = 0u;
+        }
+    }
+    else if (numMixtures == 3)
+    {
+        for (unsigned i = 0u; i < numGenes; i++)
+        {
+            if (i < 961) geneAssignment[i] = 0u;
+            else if (i < 1418) geneAssignment[i] = 1u;
+            else geneAssignment[i] = 0u;
+        }
+    }
+    std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
+    bool splitSer = true;
+    std::string mutationSelectionState = Parameter::allUnique;
+    my_print("Done!------------------------\n\n\n");
+
+
+    my_print("Initializing RFPParameter object--------------------\n\n");
+    RFPParameter parameter(stdDev, numMixtures, geneAssignment, mixtureDefinitionMatrix, splitSer, mutationSelectionState);
+    for (unsigned i = 0u; i < numMixtures; i++)
+    {
+        unsigned selectionCategory = parameter.getSelectionCategory(i);
+        my_print("Sphi_init for selection category %: %\n", selectionCategory, stdDev[selectionCategory]);
+    }
+    my_print("\t# mixtures: %\n", numMixtures);
+    my_print("\tmixture definition: %\n", mutationSelectionState);
+
+    parameter.InitializeSynthesisRate(genome, stdDev[0]);
+
+    my_print("Done!--------------------------------\n\n\n");
+
+    my_print("Initializing RFPModel object--------------------------\n");
+    RFPModel model;
+    model.setParameter(parameter);
+    my_print("Done!----------------------------------\n\n\n");
+
+    my_print("Running MCMC.............\n\n");
+    mcmc.run(genome, model, 1, 0);
+    my_print("Done!----------------------------------\n\n\n");
+    */
 
     //--------------------------------------------//
     //------ varyInitialConditions Function ------//
@@ -2342,7 +3125,8 @@ int testMCMCAlgorithm()
     //---------------------------------------------------//
     //------ is/setEstimateSynthesisRate Functions ------//
     //---------------------------------------------------//
-    if (!mcmc.isEstimateSynthesisRate()) {
+    if (!mcmc.isEstimateSynthesisRate())
+    {
         my_printError("Error in isEstimateSynthesisRate.");
         my_printError(" Function should return true, but returns false.\n");
         error = 1;
@@ -2350,7 +3134,8 @@ int testMCMCAlgorithm()
     }
 
     mcmc.setEstimateSynthesisRate(false);
-    if (mcmc.isEstimateSynthesisRate()) {
+    if (mcmc.isEstimateSynthesisRate())
+    {
         my_printError("Error in isEstimateSynthesisRate or setEstimateSynthesisRate.");
         my_printError(" Function should return false, but returns true.\n");
         error = 1;
@@ -2358,7 +3143,8 @@ int testMCMCAlgorithm()
     }
 
     mcmc.setEstimateSynthesisRate(true);
-    if (!mcmc.isEstimateSynthesisRate()) {
+    if (!mcmc.isEstimateSynthesisRate())
+    {
         my_printError("Error in isEstimateSynthesisRate or setEstimateSynthesisRate.");
         my_printError(" Function should return true, but returns false.\n");
         error = 1;
@@ -2373,7 +3159,8 @@ int testMCMCAlgorithm()
     //------------------------------------------------------------//
     //------ is/setEstimateCodonSpecificParameter Functions ------//
     //------------------------------------------------------------//
-    if (!mcmc.isEstimateCodonSpecificParameter()) {
+    if (!mcmc.isEstimateCodonSpecificParameter())
+    {
         my_printError("Error in isEstimateCodonSpecificParameter.");
         my_printError(" Function should return true, but returns false.\n");
         error = 1;
@@ -2381,7 +3168,8 @@ int testMCMCAlgorithm()
     }
 
     mcmc.setEstimateCodonSpecificParameter(false);
-    if (mcmc.isEstimateCodonSpecificParameter()) {
+    if (mcmc.isEstimateCodonSpecificParameter())
+    {
         my_printError("Error in isEstimateCodonSpecificParameter or setEstimateCodonSpecificParameter.");
         my_printError(" Function should return false, but returns true.\n");
         error = 1;
@@ -2389,7 +3177,8 @@ int testMCMCAlgorithm()
     }
 
     mcmc.setEstimateCodonSpecificParameter(true);
-    if (!mcmc.isEstimateCodonSpecificParameter()) {
+    if (!mcmc.isEstimateCodonSpecificParameter())
+    {
         my_printError("Error in isEstimateCodonSpecificParameter or setEstimateCodonSpecificParameter.");
         my_printError(" Function should return true, but returns false.\n");
         error = 1;
@@ -2404,7 +3193,8 @@ int testMCMCAlgorithm()
     //----------------------------------------------------//
     //------ is/setEstimateHyperParameter Functions ------//
     //----------------------------------------------------//
-    if (!mcmc.isEstimateHyperParameter()) {
+    if (!mcmc.isEstimateHyperParameter())
+    {
         my_printError("Error in isEstimateHyperParameter.");
         my_printError(" Function should return true, but returns false.\n");
         error = 1;
@@ -2412,7 +3202,8 @@ int testMCMCAlgorithm()
     }
 
     mcmc.setEstimateHyperParameter(false);
-    if (mcmc.isEstimateHyperParameter()) {
+    if (mcmc.isEstimateHyperParameter())
+    {
         my_printError("Error in isEstimateHyperParameter or setEstimateHyperParameter.");
         my_printError(" Function should return false, but returns true.\n");
         error = 1;
@@ -2420,7 +3211,8 @@ int testMCMCAlgorithm()
     }
 
     mcmc.setEstimateHyperParameter(true);
-    if (!mcmc.isEstimateHyperParameter()) {
+    if (!mcmc.isEstimateHyperParameter())
+    {
         my_printError("Error in isEstimateHyperParameter or setEstimateHyperParameter.");
         my_printError(" Function should return true, but returns false.\n");
         error = 1;
@@ -2439,7 +3231,8 @@ int testMCMCAlgorithm()
     /* NOTE: By default, both constructors initialize estimateMixtureAssignment to true,
     // although it is not one of the arguments. */
 
-    if (!mcmc.isEstimateMixtureAssignment()) {
+    if (!mcmc.isEstimateMixtureAssignment())
+    {
         my_printError("Error in isEstimateMixtureAssignment.");
         my_printError(" Function should return true, but returns false.\n");
         error = 1;
@@ -2447,7 +3240,8 @@ int testMCMCAlgorithm()
     }
 
     mcmc.setEstimateMixtureAssignment(false);
-    if (mcmc.isEstimateMixtureAssignment()) {
+    if (mcmc.isEstimateMixtureAssignment())
+    {
         my_printError("Error in isEstimateMixtureAssignment or setEstimateMixtureAssignment.");
         my_printError(" Function should return false, but returns true.\n");
         error = 1;
@@ -2455,7 +3249,8 @@ int testMCMCAlgorithm()
     }
 
     mcmc.setEstimateMixtureAssignment(true);
-    if (!mcmc.isEstimateMixtureAssignment()) {
+    if (!mcmc.isEstimateMixtureAssignment())
+    {
         my_printError("Error in isEstimateMixtureAssignment or setEstimateMixtureAssignment.");
         my_printError(" Function should return true, but returns false.\n");
         error = 1;
@@ -2472,7 +3267,8 @@ int testMCMCAlgorithm()
     //-------------------------------------------//
 
     // NOTE: By default, both constructors initialize stepsToAdapt to -1
-    if (mcmc.getStepsToAdapt() != -1) {
+    if (mcmc.getStepsToAdapt() != -1)
+    {
         my_printError("Error in getStepsToAdapt.");
         my_printError(" Function should return -1, but returns %.\n", mcmc.getStepsToAdapt());
         error = 1;
@@ -2480,7 +3276,8 @@ int testMCMCAlgorithm()
     }
 
     mcmc.setStepsToAdapt(52);
-    if (mcmc.getStepsToAdapt() != 52) {
+    if (mcmc.getStepsToAdapt() != 52)
+    {
         my_printError("Error in getStepsToAdapt or setStepsToAdapt.");
         my_printError(" Function should return 52, but returns %.\n", mcmc.getStepsToAdapt());
         error = 1;
@@ -2489,7 +3286,8 @@ int testMCMCAlgorithm()
 
     // Intentional error checking: Should print an error message with no change to stepsToAdapt
     mcmc.setStepsToAdapt(101);
-    if (mcmc.getStepsToAdapt() != 52) {
+    if (mcmc.getStepsToAdapt() != 52)
+    {
         my_printError("Error in getStepsToAdapt or setStepsToAdapt.");
         my_printError(" Function should return 52, with no change, but returns %.\n", mcmc.getStepsToAdapt());
         error = 1;
@@ -2530,6 +3328,8 @@ int testMCMCAlgorithm()
 
 
 
+
+
 //-----------------------------------------------------------------------------------------------------//
 //---------------------------------------- R SECTION --------------------------------------------------//
 //-----------------------------------------------------------------------------------------------------//
@@ -2545,7 +3345,9 @@ RCPP_MODULE(Test_mod)
 	function("testSequenceSummary", &testSequenceSummary);
 	function("testGene", &testGene);
 	function("testGenome", &testGenome);
+	function("testParameter", &testParameter);
 	function("testCovarianceMatrix", &testCovarianceMatrix);
+	function("testRFPParameter", &testRFPParameter);
 	function("testMCMCAlgorithm", &testMCMCAlgorithm);
 }
 #endif

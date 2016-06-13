@@ -17,7 +17,9 @@ int testSequenceSummary();
 int testGene();
 int testGenome(std::string testFileDir);
 int testParameter();
+int testParameterWithFile(std::string filename); //temporary
 int testCovarianceMatrix();
+int testRFPParameter();
 int testMCMCAlgorithm();
 //int testTrace();
 

@@ -9,8 +9,12 @@
 using namespace Rcpp;
 #endif
 
-// This template handles general printing between C++ and R
-// Returns 0 if no errors in formatting detected.
+/* my_print single (RCPP EXPOSED)
+ * Arguments: one C-style string
+ * This is the base-case for recursively printing a variable
+ * number of string arguments between C++ and R to stdout.
+ * Returns 0 if no errors in formatting detected.
+*/
 inline int my_print(const char *s)
 {
     int rv = 0; // By default, assume success
@@ -35,6 +39,13 @@ inline int my_print(const char *s)
     return rv;
 }
 
+
+/* my_print multiple (RCPP EXPOSED)
+ * Arguments: a variable number of C-style strings
+ * This is the recursive function to print a variable number of
+ * string arguments between C++ and R to stdout.
+ * Returns 0 if no errors in formatting detected.
+*/
 template<typename T, typename... Args>
 inline int my_print(const char *s, T value, Args... args)
 {
@@ -67,8 +78,13 @@ inline int my_print(const char *s, T value, Args... args)
     return 1;
 }
 
-// This template handles error printing between C++ and R
-// Returns 0 if no errors in formatting detected.
+
+/* my_printError single (RCPP EXPOSED)
+ * Arguments: one C-style string
+ * This is the base-case for recursively printing a variable
+ * number of string arguments between C++ and R to stderr.
+ * Returns 0 if no errors in formatting detected.
+*/
 inline int my_printError(const char *s)
 {
     int rv = 0;
@@ -93,6 +109,13 @@ inline int my_printError(const char *s)
     return rv;
 }
 
+
+/* my_printError multiple (RCPP EXPOSED)
+ * Arguments: a variable number of C-style strings
+ * This is the recursive function to print a variable number of
+ * string arguments between C++ and R to stderr.
+ * Returns 0 if no errors in formatting detected.
+*/
 template<typename T, typename... Args>
 inline int my_printError(const char *s, T value, Args... args)
 {

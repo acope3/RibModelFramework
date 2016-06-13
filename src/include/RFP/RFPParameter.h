@@ -1,18 +1,19 @@
 #ifndef RFPPARAMETER_H
 #define RFPPARAMETER_H
 
+
+#include "../base/Trace.h"
+#include "../base/Parameter.h"
+
+
 #include <vector>
 #include <random>
 #include <string>
 #include <iostream>
 
-
 #ifndef STANDALONE
 #include <Rcpp.h>
 #endif
-
-#include "../base/Trace.h"
-#include "../base/Parameter.h"
 
 class RFPParameter: public Parameter {
 	private:
@@ -20,12 +21,7 @@ class RFPParameter: public Parameter {
 		std::vector<std::vector<double>> lambdaValues; //Currently not used.
 		double bias_csp;
 
-
-
 	public:
-		
-
-
 
 		//Constructors & Destructors:
 		explicit RFPParameter();
@@ -35,7 +31,6 @@ class RFPParameter: public Parameter {
 				std::string _mutationSelectionState = "allUnique");
 		RFPParameter& operator=(const RFPParameter& rhs);
 		virtual ~RFPParameter();
-
 
 
 		//Initialization, Restart, Index Checking:
@@ -52,10 +47,8 @@ class RFPParameter: public Parameter {
 				unsigned paramType); //TODO: function needs to be changed
 
 
-
 		//Trace Functions:
 		void updateCodonSpecificParameterTrace(unsigned sample, std::string codon);
-
 
 
 		//CSP Functions:
@@ -64,10 +57,8 @@ class RFPParameter: public Parameter {
 		void updateCodonSpecificParameter(std::string grouping);
 
 
-
 		//Adaptive Width Functions:
 		void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastIteration, bool adapt); //may make virtual
-
 
 
 		//Other functions:
@@ -80,7 +71,6 @@ class RFPParameter: public Parameter {
 		//R Section:
 
 #ifndef STANDALONE
-
 
 		//Constructors & Destructors:
 		RFPParameter(std::vector<double> stdDevSynthesisRate, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix,
