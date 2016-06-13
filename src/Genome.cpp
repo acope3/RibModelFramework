@@ -626,10 +626,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 
 void Genome::addGene(const Gene& gene, bool simulated)
 {
-	if (!simulated)
-		genes.push_back(gene);
-	else
-		simulatedGenes.push_back(gene);
+	simulated ? simulatedGenes.push_back(gene) : genes.push_back(gene);
 }
 
 
@@ -757,6 +754,7 @@ bool Genome::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound
 	return check;
 }
 
+
 Gene& Genome::getGeneByIndex(unsigned index, bool simulated) //NOTE: This function does the check and performs the function itself because of memory issues.
 {
 	if (simulated)
@@ -808,6 +806,7 @@ Genome Genome::getGenomeForGeneIndicesR(std::vector <unsigned> indices, bool sim
 	}
 	return check ? getGenomeForGeneIndices(indices, simulated) : genome;
 }
+
 
 
 

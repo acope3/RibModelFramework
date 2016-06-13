@@ -31,11 +31,7 @@ class Parameter {
 
 		//STATICS - Sorting Functions:
 		void quickSortPair(double a[], int b[], int first, int last);
-		void quickSort(double a[], int first, int last);
 		static int pivotPair(double a[], int b[], int first, int last);
-		static int pivot(double a[], int first, int last);
-		static void swap(double& a, double& b);
-		static void swap(int& a, int& b);
 
 		unsigned adaptiveStepPrev;
 		unsigned adaptiveStepCurr;

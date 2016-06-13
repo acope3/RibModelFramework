@@ -893,6 +893,7 @@ unsigned MCMCAlgorithm::getAdaptiveWidth()
     return adaptiveWidth;
 }
 
+
 void MCMCAlgorithm::setSamples(unsigned _samples)
 {
     samples = _samples;
@@ -910,10 +911,12 @@ void MCMCAlgorithm::setAdaptiveWidth(unsigned _adaptiveWidth)
     adaptiveWidth = _adaptiveWidth;
 }
 
+
 void MCMCAlgorithm::setLogLikelihoodTrace(std::vector<double> _likelihoodTrace)
 {
     likelihoodTrace = _likelihoodTrace;
 }
+
 
 
 

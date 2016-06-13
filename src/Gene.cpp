@@ -393,6 +393,7 @@ unsigned Gene::getCodonCount(std::string& codon)
     return rv;
 }
 
+
 unsigned Gene::getRFPObserved(std::string codon)
 {
     unsigned rv = 0;
@@ -432,6 +433,7 @@ std::vector <unsigned> Gene::getCodonPositions(std::string codon)
     }
     return rv;
 }
+
 
 
 

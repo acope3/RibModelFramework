@@ -668,12 +668,12 @@ int main()
 	//testGene();
 	//testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
 	//testCovarianceMatrix();
-	testParameter();
+	//testParameter();
 	//testParameterWithFile("/Users/hollisbui/HollisFile.txt");
 	//testTrace();
 	//testRFPParameter();
 	//testMCMCAlgorithm();
-	exit(0);
+	//exit(0);
 
 
 	std::string modelToRun = "RFP"; //can be RFP, ROC or FONSE
