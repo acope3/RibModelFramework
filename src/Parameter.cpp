@@ -144,6 +144,8 @@ void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsig
 	// assign genes to mixture element
 	unsigned numGenes = geneAssignment.size();
 	mixtureAssignment.resize(numGenes, 0);
+
+	// Note: This section of code is because vectors in R are 1-indexed
 #ifndef STANDALONE
 	//TODO:need to check index are correct, consecutive, and don't exceed numMixtures
 	//possibly just use a set?
@@ -375,8 +377,6 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 		for (unsigned i = 0; i < numSelectionCategories; i++)
 		{
 			proposedSynthesisRateLevel[i] = currentSynthesisRateLevel[i];
-			std::vector <double> tmp(currentSynthesisRateLevel[i].size(), 0.1);
-	
 			std::vector <unsigned> tmp2(currentSynthesisRateLevel[i].size(), 0u);
 			numAcceptForSynthesisRate[i] = tmp2;
 		}
@@ -561,7 +561,7 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 	}
 
 	quickSortPair(scuoValues, index, 0, genomeSize);
-	quickSort(expression, 0, genomeSize);
+	std::sort(expression, expression + genomeSize);
 
 	for (unsigned category = 0u; category < numSelectionCategories; category++)
 	{
@@ -612,7 +612,6 @@ void Parameter::InitializeSynthesisRate(std::vector<double> expression)
 std::vector <double> Parameter::readPhiValues(std::string filename)
 {
 	std::size_t pos;
-	//std::size_t pos2; //currently unused
 	std::ifstream currentFile;
 	std::string tmpString;
 	std::vector <double> RV;
@@ -1568,20 +1567,6 @@ void Parameter::quickSortPair(double a[], int b[], int first, int last)
 }
 
 
-// sort array interval from first (included) to last (excluded)!!
-void Parameter::quickSort(double a[], int first, int last)
-{
-	int pivotElement;
-
-	if (first < last)
-	{
-		pivotElement = pivot(a, first, last);
-		quickSort(a, first, pivotElement);
-		quickSort(a, pivotElement + 1, last);
-	}
-}
-
-
 int Parameter::pivotPair(double a[], int b[], int first, int last)
 {
 	int p = first;
@@ -1593,62 +1578,15 @@ int Parameter::pivotPair(double a[], int b[], int first, int last)
 		if (a[i] <= pivotElement)
 		{
 			p++;
-			swap(a[i], a[p]);
-			swap(b[i], b[p]);
+			std::swap(a[i], a[p]);
+			std::swap(b[i], b[p]);
 		}
 	}
-	swap(a[p], a[first]);
-	swap(b[p], b[first]);
+	std::swap(a[p], a[first]);
+	std::swap(b[p], b[first]);
 
 	return p;
 }
-
-
-int Parameter::pivot(double a[], int first, int last)
-{
-	int p = first;
-	double pivotElement = a[first];
-
-	for (int i = (first + 1) ; i < last ; i++)
-	{
-		/* If you want to sort the list in the other order, change "<=" to ">" */
-		if (a[i] <= pivotElement)
-		{
-			p++;
-			swap(a[i], a[p]);
-		}
-	}
-	swap(a[p], a[first]);
-
-	return p;
-}
-
-
-/* swap (doubles) (NOT EXPOSED)
- * Arguments: The pointers to two doubles designated by pivoting in quicksort
- * Switches the pointer locations of these doubles, effectively swapping values.
- * Used in pivotting in quicksort when sorting scuo values and expression values.
-*/
-void Parameter::swap(double& a, double& b)
-{
-	double temp = a;
-	a = b;
-	b = temp;
-}
-
-
-/* swap (integers) (NOT EXPOSED)
- * Arguments: The pointers to two integers designated by pivoting in quicksort
- * Switches the pointer locations of these integers, effectively swapping values.
- * Used in pivotting in quicksort when sorting scuo indices.
-*/
-void Parameter::swap(int& a, int& b)
-{
-	int temp = a;
-	a = b;
-	b = temp;
-}
-
 
 /* calculate SCUO values according to
 // Wan et al. CodonO: a new informatics method for measuring synonymous codon usage bias within and across genomes
@@ -2020,6 +1958,7 @@ void Parameter::setNumSelectionCategories(unsigned _numSelectionCategories)
 
 
 
+
 //-----------------------------------------------//
 //---------- Synthesis Rate Functions -----------//
 //-----------------------------------------------//
@@ -2051,6 +1990,7 @@ std::vector<double> Parameter::getCurrentSynthesisRateForMixture(unsigned mixtur
 //---------- Posterior, Variance, and Estimates Functions ----------//
 //------------------------------------------------------------------//
 
+
 double Parameter::getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon, unsigned paramType,
 	bool withoutReference)
 {
@@ -2081,6 +2021,7 @@ double Parameter::getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsi
 	}
 	return rv;
 }
+
 
 std::vector<double> Parameter::getCodonSpecificQuantileForCodon(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType, std::vector<double> probs,
 	bool withoutReference)
@@ -2144,6 +2085,7 @@ std::vector<double> Parameter::getEstimatedMixtureAssignmentProbabilitiesForGene
 
 
 
+
 //-------------------------------------//
 //---------- Other Functions ----------//
 //-------------------------------------//
@@ -2174,6 +2116,7 @@ std::vector<unsigned> Parameter::getMixtureAssignmentR()
 {
 	return mixtureAssignment;
 }
+
 
 void Parameter::setMixtureAssignmentR(std::vector<unsigned> _mixtureAssignment)
 {
@@ -2207,6 +2150,7 @@ void Parameter::setNumMixtureElements(unsigned _numMixtures)
 {
     numMixtures = _numMixtures;
 }
+
 
 #endif
 

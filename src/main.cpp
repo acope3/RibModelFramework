@@ -667,8 +667,8 @@ int main()
 	//testSequenceSummary();
 	//testGene();
 	//testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
-	//testCovarianceMatrix();
-	testParameter();
+	testCovarianceMatrix();
+	//testParameter();
 	//testParameterWithFile("/Users/hollisbui/HollisFile.txt");
 	//testTrace();
 	//testRFPParameter();

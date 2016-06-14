@@ -1899,6 +1899,7 @@ int testParameter()
      * unit testing checks may be a result of the checking function or initParameterSet.
     */
 
+    /* TODO: Make R-side complaint. See Parameter.cpp's initParameterSet caveat.
     //------------------------------------------//
     //------ getMixtureAssignment Function------//
     //------------------------------------------//
@@ -1918,6 +1919,7 @@ int testParameter()
         my_print("Parameter getMixtureAssignment --- Pass\n");
     else
         error = 0; //Reset for next function.
+    */
 
     //-------------------------------------------//
     //------ setMixtureAssignment Functions------//
@@ -2180,8 +2182,9 @@ int testParameter()
      * This function may itself need to be tested as a middleman function.
     */
 
-    // TODO: While the categories' .delM and .delEta values are checked,
-    // The categories variable itself is not checked.
+    /* Note: While the categories' .delM and .delEta values are checked,
+     * The categories variable itself is not checked. Possible TODO.
+    */
 
     //-----------------------------------------//
     //------ getMutationCategory Function------//
@@ -2620,11 +2623,7 @@ int testParameter()
      // calculateSCUO
      // Parameter::randLogNorm
      // quickSortPair
-     // quickSort
      // pivotPair
-     // pivot
-     // swap (doubles)
-     // swap (ints)
 
     // This call changes currentSynthesisRateLevel, std_phi, and numAcceptForSynthesisRate.
     // These functions must now be checked.
