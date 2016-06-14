@@ -120,8 +120,10 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		Gene *gene = &genome.getGene(i);
 
 		/*
-			 Since some values returned by calculateLogLikelihoodRatioPerGene are very small (~ -1100), exponentiation leads to 0.
-			 To solve this problem, we adjust the value by a constant c. I choose to use the average value across all mixtures.
+			 Since some values returned by calculateLogLikelihoodRatioPerGene are very small (~ -1100),
+			 exponentiation leads to 0.
+			 To solve this problem, we adjust the value by a constant c.
+			 I choose to use the average value across all mixtures.
 			 We justify this by
 			 P = Sum(p_i*f(...))
 			 => f' = c*f
@@ -176,7 +178,8 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				unscaledLogPost_prop[k] += logProbabilityRatio[4]; // without rev. jump prob.
 
 				unscaledLogProb_curr_singleMixture[mixtureIndex] = logProbabilityRatio[3];
-				maxValue = unscaledLogProb_curr_singleMixture[mixtureIndex] > maxValue ? unscaledLogProb_curr_singleMixture[mixtureIndex] : maxValue;
+				maxValue = unscaledLogProb_curr_singleMixture[mixtureIndex] > maxValue ?
+						   unscaledLogProb_curr_singleMixture[mixtureIndex] : maxValue;
 				mixtureIndex++;
 			}
 		}
@@ -212,7 +215,10 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
                     logLikelihood += probabilities[k] * unscaledLogPost_prop[k];
                 }
 				else
-                    logLikelihood += probabilities[k] * unscaledLogPost_curr[k]; // if phi is not estimatedd, it will always stay curr!    
+				{
+					// if phi is not estimated, it will always stay curr!
+					logLikelihood += probabilities[k] * unscaledLogPost_curr[k];
+				}
 			}
 			else
 			{
@@ -225,7 +231,8 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
             my_print("\tInfinity reached (Gene: %)\n", i);
 
 		// Get category in which the gene is placed in.
-		// If we use multiple sequence observation (like different mutants) randMultinom needs a parameter N to place N observations in numMixture buckets
+		// If we use multiple sequence observation (like different mutants),
+		// randMultinom needs a parameter N to place N observations in numMixture buckets
 		unsigned categoryOfGene = Parameter::randMultinom(probabilities, numMixtures);
 		if (estimateMixtureAssignment)
 			model.setMixtureAssignment(i, categoryOfGene);
@@ -358,7 +365,8 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	my_print("\tStarting MCMC with % iterations\n", maximumIterations);
 	my_print("\tAdapting will stop after % steps\n", stepsToAdapt);
 
-	// set the last iteration to the max iterations, this way if the MCMC doesn't exit based on Geweke score, it will use the max iteration for posterior means
+	// set the last iteration to the max iterations,
+	// this way if the MCMC doesn't exit based on Geweke score, it will use the max iteration for posterior means
 	model.setLastIteration(samples);
 	for (unsigned iteration = 1u; iteration <= maximumIterations; iteration++)
 	{
