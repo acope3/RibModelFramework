@@ -41,8 +41,8 @@ bool Genome::operator==(const Genome& other) const
 {
 	bool match = true;
 
-	if (!(this->genes == other.genes)) { match = false; } //Do a ! operation because only the gene comparison is implemented,
-	//not the != operator.
+ 	//Do a ! operation because only the gene comparison is implemented, not the != operator.
+	if (!(this->genes == other.genes)) { match = false; }
 	if (!(this->simulatedGenes == other.simulatedGenes)) { match = false; }
 	if (this->numGenesWithPhi != other.numGenesWithPhi) { match = false; }
 
@@ -99,11 +99,11 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 						// if it is the first chain, just build a new chain object
 						tmpGene.clear();
 						fastaFormat = true;
-					} else
+					}
+					else
 					{
 						// otherwise, need to store the old chain first, then build a new chain
 						tmpGene.setSequence(tempSeq);
-						//tmpGene.cleanSeq();
 						addGene(tmpGene);
 
 						tmpGene.clear();
@@ -117,18 +117,18 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 				if ( newLine == 2 && fastaFormat )
 				{ // sequence line
 					tempSeq.append(buf);
-					//tmpGene.seq.append(buf);
 				}
 
 				if ( newLine == 3 )
 				{ // end of file
-					if ( !fastaFormat ) throw std::string("Genome::readFasta throws: ") + std::string(filename) + std::string(" is not in Fasta format.");
+					if ( !fastaFormat )
+						throw std::string("Genome::readFasta throws: ") + std::string(filename)
+							  + std::string(" is not in Fasta format.");
 					else
 					{
 						// otherwise, need to store the old chain first, then to
 						// build a new chain
 						tmpGene.setSequence(tempSeq);
-						//tmpGene.cleanSeq();
 						addGene(tmpGene);
 						break;
 					}
@@ -754,8 +754,8 @@ bool Genome::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound
 	return check;
 }
 
-
-Gene& Genome::getGeneByIndex(unsigned index, bool simulated) //NOTE: This function does the check and performs the function itself because of memory issues.
+//NOTE: This function does the check and performs the function itself because of memory issues.
+Gene& Genome::getGeneByIndex(unsigned index, bool simulated)
 {
 	if (simulated)
 	{
@@ -844,14 +844,16 @@ RCPP_MODULE(Genome_mod)
 		.method("checkIndex", &Genome::checkIndex) //TEST THAT ONLY!
 		.method("getGenomeSize", &Genome::getGenomeSize, "returns how many genes are in the genome")
 		.method("clear", &Genome::clear, "clears the genome")
-		.method("getCodonCountsPerGene", &Genome::getCodonCountsPerGene, "returns a vector of codon counts for a given gene")
+		.method("getCodonCountsPerGene", &Genome::getCodonCountsPerGene,
+			"returns a vector of codon counts for a given gene")
 
 
 
 		//R Section:
 		.method("getGeneByIndex", &Genome::getGeneByIndex, "returns a gene for a given index")
 		.method("getGeneById", &Genome::getGeneById) //TEST THAT ONLY!
-		.method("getGenomeForGeneIndices", &Genome::getGenomeForGeneIndicesR, "returns a new genome based on the ones requested in the given vector")
+		.method("getGenomeForGeneIndices", &Genome::getGenomeForGeneIndicesR,
+			"returns a new genome based on the ones requested in the given vector")
 		;
 }
 #endif

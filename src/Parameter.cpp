@@ -142,11 +142,11 @@ void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsig
 
 	for (unsigned i = 0u; i < numGenes; i++)
 	{
-		// Note: This section of code is because vectors in R are 1-indexed
+		// Note: This section of code is because vectors in R are 1-indexed (i.e. for mixtureAssignment)
 		//TODO:need to check index are correct, consecutive, and don't exceed numMixtures
 		//possibly just use a set?
 #ifndef STANDALONE
-		mixtureAssignment[i] = geneAssignment[i] - 1;
+		mixtureAssignment[i + 1] = geneAssignment[i];
 #else
 		mixtureAssignment[i] = geneAssignment[i];
 #endif
@@ -491,7 +491,8 @@ void Parameter::writeBasicRestartFile(std::string filename)
 }
 
 
-void Parameter::initCategoryDefinitions(std::string _mutationSelectionState, std::vector<std::vector<unsigned>> mixtureDefinitionMatrix)
+void Parameter::initCategoryDefinitions(std::string _mutationSelectionState,
+										std::vector<std::vector<unsigned>> mixtureDefinitionMatrix)
 {
 	std::set<unsigned> delMCounter;
 	std::set<unsigned> delEtaCounter;
@@ -645,7 +646,8 @@ double Parameter::getCodonSpecificPriorStdDev(unsigned paramType)
 //----------------------------------------------------------------------//
 
 
-void Parameter::setNumMutationSelectionValues(std::string _mutationSelectionState, std::vector<std::vector<unsigned>> mixtureDefinitionMatrix)
+void Parameter::setNumMutationSelectionValues(std::string _mutationSelectionState,
+											  std::vector<std::vector<unsigned>> mixtureDefinitionMatrix)
 {
 	if (!mixtureDefinitionMatrix.empty())
 	{
@@ -1301,7 +1303,8 @@ double Parameter::getStdDevSynthesisRatePosteriorMean(unsigned samples, unsigned
 	if (samples > traceLength)
 	{
 		my_printError("Warning in ROCParameter::getstdDevSynthesisRatePosteriorMean throws: Number of anticipated samples");
-		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n", samples, traceLength);
+		my_printError("(%) is greater than the length of the available trace (%).", samples, traceLength);
+		my_printError("Whole trace is used for posterior estimate!\n");
 
 		samples = traceLength;
 	}
@@ -1637,7 +1640,8 @@ double Parameter::calculateSCUO(Gene& gene, unsigned maxAA)
 }
 
 
-void Parameter::drawIidRandomVector(unsigned draws, double mean, double sd, double (*proposal)(double a, double b), double* randomNumbers)
+void Parameter::drawIidRandomVector(unsigned draws, double mean, double sd, double (*proposal)(double a, double b),
+									double* randomNumbers)
 {
 	for (unsigned i = 0u; i < draws; i++)
 		randomNumbers[i] = (*proposal)(mean, sd);
@@ -1984,8 +1988,8 @@ std::vector<double> Parameter::getCurrentSynthesisRateForMixture(unsigned mixtur
 //------------------------------------------------------------------//
 
 
-double Parameter::getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon, unsigned paramType,
-	bool withoutReference)
+double Parameter::getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon,
+	unsigned paramType, bool withoutReference)
 {
 	double rv = -1.0;
 	codon[0] = (char)std::toupper(codon[0]);
@@ -2000,8 +2004,8 @@ double Parameter::getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement,
 }
 
 
-double Parameter::getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, unsigned paramType, bool unbiased,
-	bool withoutReference)
+double Parameter::getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon,
+	unsigned paramType, bool unbiased, bool withoutReference)
 {
 	double rv = -1.0;
 	codon[0] = (char)std::toupper(codon[0]);
@@ -2016,8 +2020,8 @@ double Parameter::getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsi
 }
 
 
-std::vector<double> Parameter::getCodonSpecificQuantileForCodon(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType, std::vector<double> probs,
-	bool withoutReference)
+std::vector<double> Parameter::getCodonSpecificQuantileForCodon(unsigned mixtureElement, unsigned samples,
+	std::string &codon, unsigned paramType, std::vector<double> probs, bool withoutReference)
 {
 	std::vector<double> rv;
 	codon[0] = (char)std::toupper(codon[0]);
@@ -2031,7 +2035,8 @@ std::vector<double> Parameter::getCodonSpecificQuantileForCodon(unsigned mixture
     return rv;     
 }
 
-double Parameter::getSynthesisRatePosteriorMeanByMixtureElementForGene(unsigned samples, unsigned geneIndex, unsigned mixtureElement)
+double Parameter::getSynthesisRatePosteriorMeanByMixtureElementForGene(unsigned samples, unsigned geneIndex,
+	unsigned mixtureElement)
 {
 	double rv = -1.0;
 	bool checkGene = checkIndex(geneIndex, 1, (unsigned) mixtureAssignment.size());
@@ -2044,7 +2049,8 @@ double Parameter::getSynthesisRatePosteriorMeanByMixtureElementForGene(unsigned 
 }
 
 
-double Parameter::getSynthesisRateVarianceByMixtureElementForGene(unsigned samples, unsigned geneIndex, unsigned mixtureElement, bool unbiased)
+double Parameter::getSynthesisRateVarianceByMixtureElementForGene(unsigned samples, unsigned geneIndex,
+	unsigned mixtureElement, bool unbiased)
 {
 	double rv = -1.0;
 	bool checkGene = checkIndex(geneIndex, 1, (unsigned) mixtureAssignment.size());

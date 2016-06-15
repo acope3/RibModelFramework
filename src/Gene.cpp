@@ -31,7 +31,6 @@ Gene::Gene() : seq(""), id(""), description("")
 */
 Gene::Gene(std::string _seq, std::string _id, std::string _desc) : seq(_seq), id(_id), description(_desc)
 {
-    //cleanSeq();
 	if (seq.length() % 3 == 0)
 		geneData.processSequence(_seq);
 	else
@@ -109,24 +108,6 @@ Gene::~Gene()
 //-------------------------------------------------//
 
 
-//cleanSeq (NOT EXPOSED)
-//Arguments: None
-//Removes any characters not specified in the valid string
-//defined (ACGTN). Prevents non-nucleotide characters from
-//being found in the gene sequence.
-//Note: Deprecated! See SequenceSummary.cpp -> processSequence.
-//We should not tamper with individual erroneous characters.
-void Gene::cleanSeq()
-{
-    std::string valid = "ACGTN";
-    for (unsigned i = 0; i < seq.length(); i++)
-    {
-        if (valid.find(seq[i]) == std::string::npos)
-            seq.erase(i);
-    }
-}
-
-
 /* getId (RCPP EXPOSED)
  * Arguments: None
  * Returns the gene's id.
@@ -191,7 +172,6 @@ void Gene::setSequence(std::string _seq)
     geneData.clear();
     std::transform(_seq.begin(), _seq.end(), _seq.begin(), ::toupper);
     seq = _seq;
-    //cleanSeq();
 	if (seq.length() % 3 == 0)
 	{
 		bool check = geneData.processSequence(seq);
