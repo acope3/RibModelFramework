@@ -632,7 +632,7 @@ void Genome::addGene(const Gene& gene, bool simulated)
 
 std::vector <Gene> Genome::getGenes(bool simulated)
 {
-	return  !simulated ? genes : simulatedGenes;
+	return !simulated ? genes : simulatedGenes;
 }
 
 

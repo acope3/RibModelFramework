@@ -34,7 +34,10 @@ Gene::Gene(std::string _seq, std::string _id, std::string _desc) : seq(_seq), id
 	if (seq.length() % 3 == 0)
 		geneData.processSequence(_seq);
 	else
-		my_printError("WARNING: Gene: % has sequence length NOT multiple of 3 after cleaning of the sequence!\nGene data is NOT processed!\nValid characters are A,C,T,G, and N \n", id);
+    {
+        my_printError("WARNING: Gene: % has sequence length NOT multiple of 3 after cleaning of the sequence!\n");
+        my_printError("Gene data is NOT processed!\nValid characters are A,C,T,G, and N \n", id);
+    }
 }
 
 
@@ -179,7 +182,10 @@ void Gene::setSequence(std::string _seq)
 			my_printError("WARNING: Error with gene %\nBad codons found!\n", id);
 	}
 	else
-		my_printError("WARNING: Gene: % has sequence length NOT multiple of 3 after cleaning of the sequence!\nGene data is NOT processed!\nValid characters are A,C,T,G, and N \n", id);
+    {
+		my_printError("WARNING: Gene: % has sequence length NOT multiple of 3 after cleaning of the sequence!\n");
+        my_printError("Gene data is NOT processed!\nValid characters are A,C,T,G, and N \n", id);
+    }
 }
 
 
