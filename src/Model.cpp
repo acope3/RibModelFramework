@@ -5,6 +5,8 @@ Model::Model()
 //ctor
 }
 
+// TODO: Rule of Three dictates we may need a copy assignment operator as well (operator=)
+
 Model::~Model()
 {
 //dtor

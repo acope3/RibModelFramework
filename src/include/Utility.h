@@ -26,8 +26,10 @@ inline int my_print(const char *s)
             if (*(s + 1) == '%')
                 ++s;
             else
-               //throw std::runtime_error("invalid format string: missing arguments");
-               rv = 1;
+            {
+                //throw std::runtime_error("invalid format string: missing arguments");
+                rv = 1;
+            }
         }
 #ifndef STANDALONE
         Rcpp::Rcout << *s++;
@@ -35,6 +37,12 @@ inline int my_print(const char *s)
         std::cout << *s++;
 #endif
     }
+
+#ifndef STANDALONE
+    Rcpp::Rcout.flush();
+#else
+    std::cout.flush();
+#endif
 
     return rv;
 }
@@ -65,6 +73,13 @@ inline int my_print(const char *s, T value, Args... args)
                 std::cout << value;
 #endif
                 rv = my_print(s + 1, args...); // call even when *s == 0 to detect extra arguments
+
+                // TODO note: this may be an extraneous flush.
+#ifndef STANDALONE
+                Rcpp::Rcout.flush();
+#else
+                std::cout.flush();
+#endif
                 return rv;
             }
         }
@@ -96,8 +111,10 @@ inline int my_printError(const char *s)
             if (*(s + 1) == '%')
                 ++s;
             else
+            {
                 //throw std::runtime_error("invalid format string: missing arguments");
                 rv = 1;
+            }
         }
 #ifndef STANDALONE
         Rcpp::Rcerr << *s++;
@@ -105,6 +122,12 @@ inline int my_printError(const char *s)
         std::cerr << *s++;
 #endif
     }
+
+#ifndef STANDALONE
+    Rcpp::Rcerr.flush();
+#else
+    std::cerr.flush();
+#endif
 
     return rv;
 }
@@ -135,6 +158,13 @@ inline int my_printError(const char *s, T value, Args... args)
                 std::cerr << value;
 #endif
                 rv = my_printError(s + 1, args...); // call even when *s == 0 to detect extra arguments
+
+                // TODO note: this may be an extraneous flush.
+#ifndef STANDALONE
+                Rcpp::Rcerr.flush();
+#else
+                std::cerr.flush();
+#endif
                 return rv;
             }
         }

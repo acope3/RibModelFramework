@@ -76,13 +76,8 @@ Parameter& Parameter::operator=(const Parameter& rhs)
 	if (this == &rhs) return *this; // handle self assignment
 	numParam = rhs.numParam;
 
-	stdDevSynthesisRate.resize(rhs.stdDevSynthesisRate.size());
-	stdDevSynthesisRate_proposed.resize(rhs.stdDevSynthesisRate.size());
-	for (unsigned i = 0u; i < rhs.stdDevSynthesisRate.size(); i++)
-	{
-		stdDevSynthesisRate[i] = rhs.stdDevSynthesisRate[i];
-		stdDevSynthesisRate_proposed[i] = rhs.stdDevSynthesisRate_proposed[i];
-	}
+	stdDevSynthesisRate = rhs.stdDevSynthesisRate;
+	stdDevSynthesisRate_proposed = rhs.stdDevSynthesisRate_proposed;
 
 	numAcceptForStdDevSynthesisRate = rhs.numAcceptForStdDevSynthesisRate;
 	obsPhiSets = rhs.obsPhiSets;
@@ -145,20 +140,17 @@ void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsig
 	unsigned numGenes = geneAssignment.size();
 	mixtureAssignment.resize(numGenes, 0);
 
-	// Note: This section of code is because vectors in R are 1-indexed
+	for (unsigned i = 0u; i < numGenes; i++)
+	{
+		// Note: This section of code is because vectors in R are 1-indexed
+		//TODO:need to check index are correct, consecutive, and don't exceed numMixtures
+		//possibly just use a set?
 #ifndef STANDALONE
-	//TODO:need to check index are correct, consecutive, and don't exceed numMixtures
-	//possibly just use a set?
-	for (unsigned i = 0u; i < numGenes; i++)
-	{
 		mixtureAssignment[i] = geneAssignment[i] - 1;
-	}
 #else
-	for (unsigned i = 0u; i < numGenes; i++)
-	{
 		mixtureAssignment[i] = geneAssignment[i];
-	}
 #endif
+	}
 
 	mutationSelectionState = _mutationSelectionState;
 	numParam = ((splitSer) ? 40 : 41);
@@ -1587,6 +1579,7 @@ int Parameter::pivotPair(double a[], int b[], int first, int last)
 
 	return p;
 }
+
 
 /* calculate SCUO values according to
 // Wan et al. CodonO: a new informatics method for measuring synonymous codon usage bias within and across genomes

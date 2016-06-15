@@ -17,30 +17,94 @@ int testUtility()
 {
     int error = 0;
     int globalError = 0;
+    int outError = 0;
+    int errError = 0;
 
-    error = my_print("Product: %, Qty: %, Price is %", "Shampoo\n", 5, 100);
-
-    if (error)
-    {
-#ifndef STANDALONE
-        Rcpp::Rcerr << "Error in my_print.\n";
-#else
-        std::cerr << "Error in my_print.\n";
-#endif
-        globalError = 1;
-    }
-
-    error = my_printError("Product: %, Qty: %, Price is %", "Shampoo\n", 5, 100);
+    error = my_print("Testing my_print, no argument.\n");
 
     if (error)
     {
 #ifndef STANDALONE
-        Rcpp::Rcerr << "Error in my_printError\n";
+        Rcpp::Rcerr << "Error in my_print, no argument.\n";
 #else
-        std::cerr << "Error in my_printError\n";
+        std::cerr << "Error in my_print, no argument.\n";
 #endif
+        outError = 1;
         globalError = 1;
     }
+
+    error = my_print("Testing my_print, one argument: %.\n", 0);
+
+    if (error)
+    {
+#ifndef STANDALONE
+        Rcpp::Rcerr << "Error in my_print, single argument.\n";
+#else
+        std::cerr << "Error in my_print, single argument.\n";
+#endif
+        outError = 1;
+        globalError = 1;
+    }
+
+    error = my_print("Testing my_print, multiple arguments: %, %, %.\n", "String", 0, 0.5);
+
+    if (error)
+    {
+#ifndef STANDALONE
+        Rcpp::Rcerr << "Error in my_print, multiple arguments.\n";
+#else
+        std::cerr << "Error in my_print, multiple arguments.\n";
+#endif
+        outError = 1;
+        globalError = 1;
+    }
+
+    if (!outError)
+        my_print("\nUtility my_print --- Pass\n");
+
+    error = my_printError("Testing my_printError, no argument.\n");
+
+    if (error)
+    {
+#ifndef STANDALONE
+        Rcpp::Rcerr << "Error in my_printError, no argument.\n";
+#else
+        std::cerr << "Error in my_printError, no argument.\n";
+#endif
+        errError = 1;
+        globalError = 1;
+    }
+
+    error = my_printError("Testing my_printError, one argument: %.\n", 0);
+
+    if (error)
+    {
+#ifndef STANDALONE
+        Rcpp::Rcerr << "Error in my_printError, single argument.\n";
+#else
+        std::cerr << "Error in my_printError, single argument.\n";
+#endif
+        errError = 1;
+        globalError = 1;
+    }
+
+    error = my_printError("Testing my_printError, multiple arguments: %, %, %.\n", "String", 0, 0.5);
+
+    if (error)
+    {
+#ifndef STANDALONE
+        Rcpp::Rcerr << "Error in my_printError, multiple arguments.\n";
+#else
+        std::cerr << "Error in my_printError, multiple arguments.\n";
+#endif
+        errError = 1;
+        globalError = 1;
+    }
+
+    // Possible TODO: Create intentional errors involving number of arguments (%), error check.
+
+    if (!errError)
+        my_print("Utility my_printError --- Pass\n");
 
     return globalError;
 }
@@ -2617,13 +2681,7 @@ int testParameter()
     //----------------------------------------------//
     //------ InitializeSynthesisRate Function ------//
     //----------------------------------------------//
-    //parameter.InitializeSynthesisRate(genome, stdDev[0]);
-
-    // TODO: Check the following functions:
-     // calculateSCUO
-     // Parameter::randLogNorm
-     // quickSortPair
-     // pivotPair
+    parameter.InitializeSynthesisRate(genome, stdDev[0]);
 
     // This call changes currentSynthesisRateLevel, std_phi, and numAcceptForSynthesisRate.
     // These functions must now be checked.
@@ -2631,6 +2689,10 @@ int testParameter()
     {
         for (unsigned j = 0u; j < numGenes; j++)
         {
+            // TODO: Check if currentSynthesisRateLevel is set correctly
+            // TODO: Check the follow functions: calculateSCUO, Parameter::randLogNorm, quickSortPair, pivotPair
+            // currentSynthesisRateLevel[category][index[j]] = expression[j];
+
             // Check if std_phi = 0.1 as set in InitializeSynthesisRate
             if (parameter.getCurrentSynthesisRateProposalWidth(category, j) != 0.1)
             {
@@ -2650,9 +2712,6 @@ int testParameter()
                 error = 1;
                 globalError = 1;
             }
-
-            // TODO: Check if currentSynthesisRateLevel is set correctly
-            // currentSynthesisRateLevel[category][index[j]] = expression[j];
         }
     }
 
@@ -2878,8 +2937,8 @@ int testCovarianceMatrix()
 }
 
 
-/* UNIMPLEMENTED
-int testTrace()
+/*
+int testRFPTrace()
 {
     Trace RFP; //initialize with 0 categories, 2 codon-specific parameter types
     Trace ROC;
