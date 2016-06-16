@@ -26,6 +26,7 @@ double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grou
 	std::vector <unsigned> *positions;
 	double codonProb[6];
 
+	//Find the maximum index
 	unsigned maxIndexVal = 0u;
 	for (int i = 1; i < (numCodons - 1); i++)
 	{
@@ -217,6 +218,7 @@ void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 		currentMphi[i] = -((currentStdDevSynthesisRate[i] * currentStdDevSynthesisRate[i]) / 2);
 		proposedStdDevSynthesisRate[i] = getStdDevSynthesisRate(i, true);
 		proposedMphi[i] = -((proposedStdDevSynthesisRate[i] * proposedStdDevSynthesisRate[i]) / 2);
+		// take the jacobian into account for the non-linear transformation from logN to N distribution
 		lpr -= (std::log(currentStdDevSynthesisRate[i]) - std::log(proposedStdDevSynthesisRate[i]));
 	}
 
@@ -678,12 +680,17 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 	 * them hyperparameters in the future, since they are constant for the      *
 	 * entire genome.                                                           */
 
+	 // If the max(selection) is greater than zero than we have to adjust the reference codon.
+	 // If the reference codon is the max value then we do not have to adjust the reference codon.
+	 // This is necessary to deal with very large phi values (> 10^4) and avoid producing Inf which then
+	 // causes the denominator to be Inf (Inf / Inf = NaN).
 	if (selection[maxIndexValue] > 0.0) {
 		denominator = 0.0;
 		for (unsigned i = 0u; i < (numCodons - 1); i++) {
 			codonProb[i] = std::exp(((mutation[i] - mutation[maxIndexValue])) + (phi * (4.0 + (4.0 * position)) * (selection[i] - selection[maxIndexValue])));
 			denominator += codonProb[i];
 		}
+		//Alphabetically, the last codon is the reference codon.
 		codonProb[numCodons - 1] = std::exp((-1.0 * mutation[maxIndexValue]) - (phi * (4.0 + (4.0 * position)) * selection[maxIndexValue]));
 		denominator += codonProb[numCodons - 1];
 	}
@@ -693,6 +700,7 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 			codonProb[i] = std::exp((mutation[i]) + (phi * (4.0 + (4.0 * position)) * selection[i]));
 			denominator += codonProb[i];
 		}
+		//Again, the last codon is the reference codon
 		codonProb[numCodons - 1] = 1.0;
 	}
 
@@ -705,6 +713,9 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 		}
 }
 
+
+//A version of calculateCodonProbabilityVector that is called without
+//a maxIndexValue and instead calculates it inside of the function.
 void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned position,
 													double *mutation, double *selection, double phi, double codonProb[])
 {
@@ -726,13 +737,17 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 	* entire genome.                                                           */
 
 
-
-	if (selection[maxIndexValue] > 0.0) {
+	// If the max(selection) is greater than zero than we have to adjust the reference codon.
+	// If the reference codon is the max value then we do not have to adjust the reference codon.
+	// This is necessary to deal with very large phi values (> 10^4) and avoid producing Inf which then
+	// causes the denominator to be Inf (Inf / Inf = NaN).
+	if (selection[maxIndexValu e] > 0.0) {
 		denominator = 0.0;
 		for (unsigned i = 0u; i < (numCodons - 1); i++) {
 			codonProb[i] = std::exp(((mutation[i] - mutation[maxIndexValue])) + (phi * (4.0 + (4.0 * position)) * (selection[i] - selection[maxIndexValue])));
 			denominator += codonProb[i];
 		}
+		//Alphabetically, the last codon is the reference codon.
 		codonProb[numCodons - 1] = std::exp((-1.0 * mutation[maxIndexValue]) - (phi * (4.0 + (4.0 * position)) * selection[maxIndexValue]));
 		denominator += codonProb[numCodons - 1];
 	}
@@ -742,6 +757,7 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 			codonProb[i] = std::exp((mutation[i]) + (phi * (4.0 + (4.0 * position)) * selection[i]));
 			denominator += codonProb[i];
 		}
+		//Again, the last codon is the reference codon
 		codonProb[numCodons - 1] = 1.0;
 	}
 
