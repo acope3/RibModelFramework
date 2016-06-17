@@ -30,21 +30,30 @@ initializeGenomeObject <- function(file, fasta=TRUE, expression.file=NULL, appen
 #' 
 #' \code{length} gives the length of a genome
 #' 
-#' @param genome A genome object initialized with \code{\link{initializeGenomeObject}}.
+#' @param x A genome object initialized with \code{\link{initializeGenomeObject}}.
 #' 
 #' @return returns the number of genes in a genome
-length.Rcpp_Genome <- function(genome) {
-  return(genome$getGenomeSize(F))
+length.Rcpp_Genome <- function(x) {
+  return(x$getGenomeSize(F))
 }
 
-summary.Rcpp_Genome <- function(genome) {
+#' Summary of Genome
+#' 
+#' \code{summary} summarizes the description of a genome, such as number of genes and average gene length.
+#' 
+#' @param object A genome object initialized with \code{\link{initializeGenomeObject}}.
+#' 
+#' @param ... 
+#' 
+#' @return This function returns by default an object of class c("summaryDefault", table").
+summary.Rcpp_Genome <- function(object, ...) {
   # TODO output stuff like:
   # - no. of genes
   # - avg. gene length
   # - avg. A,C,G,T content
   # - avg. AA composition
   # - ...
-  summary(genome)
+  summary(object)
 }
 
 getNames <- function(genome, simulated = FALSE)

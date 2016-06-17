@@ -2,12 +2,13 @@
 #' 
 #' @param x An Rcpp model object initialized with \code{initializeModelObject}.
 #' @param genome An Rcpp genome object initialized with \code{initializeGenomeObject}.
-#' @param parameter 
+#' @param parameter An Rcpp parameter object.
 #' @param samples The number of samples in the trace
 #' @param mixture The mixture for which to graph values.
 #' @param estim.Expression A boolean value that says whether to use estimated expression
 #'  values or empirical values.   
 #' @param simulated A boolean value that determines whether to use the simulated genome.
+#' @param ... 
 #'  
 #' @return This function has no return value.
 #'  
@@ -101,6 +102,18 @@ plot.Rcpp_ROCModel <- function(x, genome, parameter, samples = 100, mixture = 1,
 
 #' Plot Model Object
 #' 
+#' @param x An Rcpp model object initialized with \code{initializeModelObject}.
+#' @param genome An Rcpp genome object initialized with \code{initializeGenomeObject}.
+#' @param parameter An Rcpp parameter object.
+#' @param samples The number of samples in the trace
+#' @param mixture The mixture for which to graph values.
+#' @param estim.Expression A boolean value that says whether to use estimated expression
+#'  values or empirical values.   
+#' @param simulated A boolean value that determines whether to use the simulated genome.
+#' @param ... 
+#'  
+#' @return This function has no return value.
+#'
 #' @description See \code{plot.Rcpp_ROCModel}
 plot.Rcpp_FONSEModel <- function(x, genome, parameter, samples = 100, mixture = 1, 
                                estim.Expression = TRUE, simulated = FALSE, ...)
