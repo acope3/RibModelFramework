@@ -748,7 +748,7 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 	// If the reference codon is the max value then we do not have to adjust the reference codon.
 	// This is necessary to deal with very large phi values (> 10^4) and avoid producing Inf which then
 	// causes the denominator to be Inf (Inf / Inf = NaN).
-	if (selection[maxIndexValu e] > 0.0) {
+	if (selection[maxIndexValue] > 0.0) {
 		denominator = 0.0;
 		for (unsigned i = 0u; i < (numCodons - 1); i++)
 		{
