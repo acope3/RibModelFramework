@@ -33,8 +33,8 @@ initializeGenomeObject <- function(file, fasta=TRUE, expression.file=NULL, appen
 #' @param genome A genome object initialized with \code{\link{initializeGenomeObject}}.
 #' 
 #' @return returns the number of genes in a genome
-length.Rcpp_Genome <- function(x) {
-  return(x$getGenomeSize(F))
+length.Rcpp_Genome <- function(genome) {
+  return(genome$getGenomeSize(F))
 }
 
 summary.Rcpp_Genome <- function(genome) {
@@ -44,7 +44,7 @@ summary.Rcpp_Genome <- function(genome) {
   # - avg. A,C,G,T content
   # - avg. AA composition
   # - ...
-  summary(object, ...)
+  summary(genome)
 }
 
 getNames <- function(genome, simulated = FALSE)
