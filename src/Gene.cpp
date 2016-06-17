@@ -31,11 +31,13 @@ Gene::Gene() : seq(""), id(""), description("")
 */
 Gene::Gene(std::string _seq, std::string _id, std::string _desc) : seq(_seq), id(_id), description(_desc)
 {
-    //cleanSeq();
 	if (seq.length() % 3 == 0)
 		geneData.processSequence(_seq);
 	else
-		my_printError("WARNING: Gene: % has sequence length NOT multiple of 3 after cleaning of the sequence!\nGene data is NOT processed!\nValid characters are A,C,T,G, and N \n", id);
+    {
+        my_printError("WARNING: Gene: % has sequence length NOT multiple of 3 after cleaning of the sequence!\n");
+        my_printError("Gene data is NOT processed!\nValid characters are A,C,T,G, and N \n", id);
+    }
 }
 
 
@@ -109,24 +111,6 @@ Gene::~Gene()
 //-------------------------------------------------//
 
 
-//cleanSeq (NOT EXPOSED)
-//Arguments: None
-//Removes any characters not specified in the valid string
-//defined (ACGTN). Prevents non-nucleotide characters from
-//being found in the gene sequence.
-//Note: Deprecated! See SequenceSummary.cpp -> processSequence.
-//We should not tamper with individual erroneous characters.
-void Gene::cleanSeq()
-{
-    std::string valid = "ACGTN";
-    for (unsigned i = 0; i < seq.length(); i++)
-    {
-        if (valid.find(seq[i]) == std::string::npos)
-            seq.erase(i);
-    }
-}
-
-
 /* getId (RCPP EXPOSED)
  * Arguments: None
  * Returns the gene's id.
@@ -191,7 +175,6 @@ void Gene::setSequence(std::string _seq)
     geneData.clear();
     std::transform(_seq.begin(), _seq.end(), _seq.begin(), ::toupper);
     seq = _seq;
-    //cleanSeq();
 	if (seq.length() % 3 == 0)
 	{
 		bool check = geneData.processSequence(seq);
@@ -199,7 +182,10 @@ void Gene::setSequence(std::string _seq)
 			my_printError("WARNING: Error with gene %\nBad codons found!\n", id);
 	}
 	else
-		my_printError("WARNING: Gene: % has sequence length NOT multiple of 3 after cleaning of the sequence!\nGene data is NOT processed!\nValid characters are A,C,T,G, and N \n", id);
+    {
+		my_printError("WARNING: Gene: % has sequence length NOT multiple of 3 after cleaning of the sequence!\n");
+        my_printError("Gene data is NOT processed!\nValid characters are A,C,T,G, and N \n", id);
+    }
 }
 
 
@@ -393,6 +379,7 @@ unsigned Gene::getCodonCount(std::string& codon)
     return rv;
 }
 
+
 unsigned Gene::getRFPObserved(std::string codon)
 {
     unsigned rv = 0;
@@ -432,6 +419,7 @@ std::vector <unsigned> Gene::getCodonPositions(std::string codon)
     }
     return rv;
 }
+
 
 
 

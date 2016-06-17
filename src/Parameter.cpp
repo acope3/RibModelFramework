@@ -76,13 +76,8 @@ Parameter& Parameter::operator=(const Parameter& rhs)
 	if (this == &rhs) return *this; // handle self assignment
 	numParam = rhs.numParam;
 
-	stdDevSynthesisRate.resize(rhs.stdDevSynthesisRate.size());
-	stdDevSynthesisRate_proposed.resize(rhs.stdDevSynthesisRate.size());
-	for (unsigned i = 0u; i < rhs.stdDevSynthesisRate.size(); i++)
-	{
-		stdDevSynthesisRate[i] = rhs.stdDevSynthesisRate[i];
-		stdDevSynthesisRate_proposed[i] = rhs.stdDevSynthesisRate_proposed[i];
-	}
+	stdDevSynthesisRate = rhs.stdDevSynthesisRate;
+	stdDevSynthesisRate_proposed = rhs.stdDevSynthesisRate_proposed;
 
 	numAcceptForStdDevSynthesisRate = rhs.numAcceptForStdDevSynthesisRate;
 	obsPhiSets = rhs.obsPhiSets;
@@ -144,19 +139,18 @@ void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsig
 	// assign genes to mixture element
 	unsigned numGenes = geneAssignment.size();
 	mixtureAssignment.resize(numGenes, 0);
+
+	for (unsigned i = 0u; i < numGenes; i++)
+	{
+		// Note: This section of code is because vectors in R are 1-indexed (i.e. for mixtureAssignment)
+		//TODO:need to check index are correct, consecutive, and don't exceed numMixtures
+		//possibly just use a set?
 #ifndef STANDALONE
-	//TODO:need to check index are correct, consecutive, and don't exceed numMixtures
-	//possibly just use a set?
-	for (unsigned i = 0u; i < numGenes; i++)
-	{
-		mixtureAssignment[i] = geneAssignment[i] - 1;
-	}
+		mixtureAssignment[i + 1] = geneAssignment[i];
 #else
-	for (unsigned i = 0u; i < numGenes; i++)
-	{
 		mixtureAssignment[i] = geneAssignment[i];
-	}
 #endif
+	}
 
 	mutationSelectionState = _mutationSelectionState;
 	numParam = ((splitSer) ? 40 : 41);
@@ -375,8 +369,6 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 		for (unsigned i = 0; i < numSelectionCategories; i++)
 		{
 			proposedSynthesisRateLevel[i] = currentSynthesisRateLevel[i];
-			std::vector <double> tmp(currentSynthesisRateLevel[i].size(), 0.1);
-	
 			std::vector <unsigned> tmp2(currentSynthesisRateLevel[i].size(), 0u);
 			numAcceptForSynthesisRate[i] = tmp2;
 		}
@@ -499,7 +491,8 @@ void Parameter::writeBasicRestartFile(std::string filename)
 }
 
 
-void Parameter::initCategoryDefinitions(std::string _mutationSelectionState, std::vector<std::vector<unsigned>> mixtureDefinitionMatrix)
+void Parameter::initCategoryDefinitions(std::string _mutationSelectionState,
+										std::vector<std::vector<unsigned>> mixtureDefinitionMatrix)
 {
 	std::set<unsigned> delMCounter;
 	std::set<unsigned> delEtaCounter;
@@ -561,7 +554,7 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 	}
 
 	quickSortPair(scuoValues, index, 0, genomeSize);
-	quickSort(expression, 0, genomeSize);
+	std::sort(expression, expression + genomeSize);
 
 	for (unsigned category = 0u; category < numSelectionCategories; category++)
 	{
@@ -612,7 +605,6 @@ void Parameter::InitializeSynthesisRate(std::vector<double> expression)
 std::vector <double> Parameter::readPhiValues(std::string filename)
 {
 	std::size_t pos;
-	//std::size_t pos2; //currently unused
 	std::ifstream currentFile;
 	std::string tmpString;
 	std::vector <double> RV;
@@ -654,7 +646,8 @@ double Parameter::getCodonSpecificPriorStdDev(unsigned paramType)
 //----------------------------------------------------------------------//
 
 
-void Parameter::setNumMutationSelectionValues(std::string _mutationSelectionState, std::vector<std::vector<unsigned>> mixtureDefinitionMatrix)
+void Parameter::setNumMutationSelectionValues(std::string _mutationSelectionState,
+											  std::vector<std::vector<unsigned>> mixtureDefinitionMatrix)
 {
 	if (!mixtureDefinitionMatrix.empty())
 	{
@@ -1310,7 +1303,8 @@ double Parameter::getStdDevSynthesisRatePosteriorMean(unsigned samples, unsigned
 	if (samples > traceLength)
 	{
 		my_printError("Warning in ROCParameter::getstdDevSynthesisRatePosteriorMean throws: Number of anticipated samples");
-		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n", samples, traceLength);
+		my_printError("(%) is greater than the length of the available trace (%).", samples, traceLength);
+		my_printError("Whole trace is used for posterior estimate!\n");
 
 		samples = traceLength;
 	}
@@ -1568,20 +1562,6 @@ void Parameter::quickSortPair(double a[], int b[], int first, int last)
 }
 
 
-// sort array interval from first (included) to last (excluded)!!
-void Parameter::quickSort(double a[], int first, int last)
-{
-	int pivotElement;
-
-	if (first < last)
-	{
-		pivotElement = pivot(a, first, last);
-		quickSort(a, first, pivotElement);
-		quickSort(a, pivotElement + 1, last);
-	}
-}
-
-
 int Parameter::pivotPair(double a[], int b[], int first, int last)
 {
 	int p = first;
@@ -1593,60 +1573,14 @@ int Parameter::pivotPair(double a[], int b[], int first, int last)
 		if (a[i] <= pivotElement)
 		{
 			p++;
-			swap(a[i], a[p]);
-			swap(b[i], b[p]);
+			std::swap(a[i], a[p]);
+			std::swap(b[i], b[p]);
 		}
 	}
-	swap(a[p], a[first]);
-	swap(b[p], b[first]);
+	std::swap(a[p], a[first]);
+	std::swap(b[p], b[first]);
 
 	return p;
-}
-
-
-int Parameter::pivot(double a[], int first, int last)
-{
-	int p = first;
-	double pivotElement = a[first];
-
-	for (int i = (first + 1) ; i < last ; i++)
-	{
-		/* If you want to sort the list in the other order, change "<=" to ">" */
-		if (a[i] <= pivotElement)
-		{
-			p++;
-			swap(a[i], a[p]);
-		}
-	}
-	swap(a[p], a[first]);
-
-	return p;
-}
-
-
-/* swap (doubles) (NOT EXPOSED)
- * Arguments: The pointers to two doubles designated by pivoting in quicksort
- * Switches the pointer locations of these doubles, effectively swapping values.
- * Used in pivotting in quicksort when sorting scuo values and expression values.
-*/
-void Parameter::swap(double& a, double& b)
-{
-	double temp = a;
-	a = b;
-	b = temp;
-}
-
-
-/* swap (integers) (NOT EXPOSED)
- * Arguments: The pointers to two integers designated by pivoting in quicksort
- * Switches the pointer locations of these integers, effectively swapping values.
- * Used in pivotting in quicksort when sorting scuo indices.
-*/
-void Parameter::swap(int& a, int& b)
-{
-	int temp = a;
-	a = b;
-	b = temp;
 }
 
 
@@ -1706,7 +1640,8 @@ double Parameter::calculateSCUO(Gene& gene, unsigned maxAA)
 }
 
 
-void Parameter::drawIidRandomVector(unsigned draws, double mean, double sd, double (*proposal)(double a, double b), double* randomNumbers)
+void Parameter::drawIidRandomVector(unsigned draws, double mean, double sd, double (*proposal)(double a, double b),
+									double* randomNumbers)
 {
 	for (unsigned i = 0u; i < draws; i++)
 		randomNumbers[i] = (*proposal)(mean, sd);
@@ -2020,6 +1955,7 @@ void Parameter::setNumSelectionCategories(unsigned _numSelectionCategories)
 
 
 
+
 //-----------------------------------------------//
 //---------- Synthesis Rate Functions -----------//
 //-----------------------------------------------//
@@ -2051,8 +1987,9 @@ std::vector<double> Parameter::getCurrentSynthesisRateForMixture(unsigned mixtur
 //---------- Posterior, Variance, and Estimates Functions ----------//
 //------------------------------------------------------------------//
 
-double Parameter::getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon, unsigned paramType,
-	bool withoutReference)
+
+double Parameter::getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon,
+	unsigned paramType, bool withoutReference)
 {
 	double rv = -1.0;
 	codon[0] = (char)std::toupper(codon[0]);
@@ -2067,8 +2004,8 @@ double Parameter::getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement,
 }
 
 
-double Parameter::getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, unsigned paramType, bool unbiased,
-	bool withoutReference)
+double Parameter::getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon,
+	unsigned paramType, bool unbiased, bool withoutReference)
 {
 	double rv = -1.0;
 	codon[0] = (char)std::toupper(codon[0]);
@@ -2082,8 +2019,9 @@ double Parameter::getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsi
 	return rv;
 }
 
-std::vector<double> Parameter::getCodonSpecificQuantileForCodon(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType, std::vector<double> probs,
-	bool withoutReference)
+
+std::vector<double> Parameter::getCodonSpecificQuantileForCodon(unsigned mixtureElement, unsigned samples,
+	std::string &codon, unsigned paramType, std::vector<double> probs, bool withoutReference)
 {
 	std::vector<double> rv;
 	codon[0] = (char)std::toupper(codon[0]);
@@ -2097,7 +2035,8 @@ std::vector<double> Parameter::getCodonSpecificQuantileForCodon(unsigned mixture
     return rv;     
 }
 
-double Parameter::getSynthesisRatePosteriorMeanByMixtureElementForGene(unsigned samples, unsigned geneIndex, unsigned mixtureElement)
+double Parameter::getSynthesisRatePosteriorMeanByMixtureElementForGene(unsigned samples, unsigned geneIndex,
+	unsigned mixtureElement)
 {
 	double rv = -1.0;
 	bool checkGene = checkIndex(geneIndex, 1, (unsigned) mixtureAssignment.size());
@@ -2110,7 +2049,8 @@ double Parameter::getSynthesisRatePosteriorMeanByMixtureElementForGene(unsigned 
 }
 
 
-double Parameter::getSynthesisRateVarianceByMixtureElementForGene(unsigned samples, unsigned geneIndex, unsigned mixtureElement, bool unbiased)
+double Parameter::getSynthesisRateVarianceByMixtureElementForGene(unsigned samples, unsigned geneIndex,
+	unsigned mixtureElement, bool unbiased)
 {
 	double rv = -1.0;
 	bool checkGene = checkIndex(geneIndex, 1, (unsigned) mixtureAssignment.size());
@@ -2140,6 +2080,7 @@ std::vector<double> Parameter::getEstimatedMixtureAssignmentProbabilitiesForGene
 	}
 	return probabilities;
 }
+
 
 
 
@@ -2175,6 +2116,7 @@ std::vector<unsigned> Parameter::getMixtureAssignmentR()
 	return mixtureAssignment;
 }
 
+
 void Parameter::setMixtureAssignmentR(std::vector<unsigned> _mixtureAssignment)
 {
 	mixtureAssignment = _mixtureAssignment;
@@ -2207,6 +2149,7 @@ void Parameter::setNumMixtureElements(unsigned _numMixtures)
 {
     numMixtures = _numMixtures;
 }
+
 
 #endif
 

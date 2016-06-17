@@ -1,6 +1,11 @@
 #ifndef ROCPARAMETER_H
 #define ROCPARAMETER_H
 
+
+#include "../base/Trace.h"
+#include "../base/Parameter.h"
+
+
 #include <vector>
 #include <random>
 #include <string>
@@ -10,9 +15,6 @@
 #ifndef STANDALONE
 #include <Rcpp.h>
 #endif
-
-#include "../base/Trace.h"
-#include "../base/Parameter.h"
 
 class ROCParameter : public Parameter
 {
@@ -24,9 +26,6 @@ class ROCParameter : public Parameter
 		std::vector <double> noiseOffset;
 		std::vector <double> std_NoiseOffset;
 		std::vector <double> numAcceptForNoiseOffset;
-
-		
-		
 
 
 		double bias_csp;

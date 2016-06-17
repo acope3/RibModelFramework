@@ -47,7 +47,7 @@ void Trace::initializeSharedTraces(unsigned samples, unsigned num_genes, unsigne
 {
 	my_print("maxGrouping: %\n", maxGrouping);
 
-	//numSelectionCategories always == numSynthesisRateCategories, so only one is passed in for convience
+	//numSelectionCategories always == numSynthesisRateCategories, so only one is passed in for convenience
 	
 	initStdDevSynthesisRateTrace(numSelectionCategories, samples);
 	initSynthesisRateAcceptanceRatioTrace(num_genes, numSelectionCategories);
@@ -90,7 +90,6 @@ void Trace::initSynthesisRateTrace(unsigned samples, unsigned num_genes, unsigne
 		synthesisRateTrace[category].resize(num_genes);
 		for (unsigned i = 0; i < num_genes; i++)
 		{
-			synthesisRateTrace[category][i].resize(samples);
 			std::vector<double> tempExpr(samples, 0.0);
 			synthesisRateTrace[category][i] = tempExpr;
 		}
@@ -127,7 +126,6 @@ void Trace::initCodonSpecificParameterTrace(unsigned samples, unsigned numCatego
 		tmp[category].resize(numParam);
 		for (unsigned i = 0; i < numParam; i++)
 		{
-			tmp[category][i].resize(samples);
 			std::vector <double> temp(samples, 0.0);
 			tmp[category][i] = temp;
 		}
@@ -188,6 +186,11 @@ void Trace::initObservedSynthesisNoiseTrace(unsigned samples, unsigned numPhiGro
 //---------- Model Initialization Functions ----------//
 //----------------------------------------------------//
 
+/* Note 1) -- on these Model Initialization Functions' initCodonSpecificParameterTrace functions
+ * The last argument specifies the codon specific parameter type (dM and dEta for ROC)
+ * You can check Parameter.cpp to check what the values of dM and dEta are.
+ * The constants aren't used here because they are not available to the Trace object.
+*/
 
 void Trace::initializeRFPTrace(unsigned samples, unsigned num_genes, unsigned numAlphaCategories,
 	unsigned numLambdaPrimeCategories, unsigned numParam, unsigned numMixtures, 
@@ -195,7 +198,8 @@ void Trace::initializeRFPTrace(unsigned samples, unsigned num_genes, unsigned nu
 {
 	initializeSharedTraces(samples, num_genes, numLambdaPrimeCategories, numMixtures,
 		_categories, maxGrouping);
-	// see initializeROCTrace for detailed comment
+
+	// See Note 1) above.
 	initCodonSpecificParameterTrace(samples, numAlphaCategories,  numParam, 0u); // alp
 	initCodonSpecificParameterTrace(samples, numLambdaPrimeCategories, numParam, 1u); // lmPri
 }
@@ -206,11 +210,11 @@ void Trace::initializeROCTrace(unsigned samples, unsigned num_genes, unsigned nu
 	unsigned maxGrouping, unsigned numObservedPhiSets)
 {
 	initializeSharedTraces(samples, num_genes, numSelectionCategories, numMixtures, _categories, maxGrouping);
-	/* The last argument specifies the codon specific parameter type (dM and dEta for ROC)
-	// You can check Parameter.cpp to check what the values of dM and dEta are.
-	// The constants aren't used here because they are not available to the Trace object. */
+
+	// See Note 1) above.
 	initCodonSpecificParameterTrace(samples, numMutationCategories, numParam, 0u); // dM
 	initCodonSpecificParameterTrace(samples, numSelectionCategories, numParam, 1u); // dEta
+
 	initSynthesisOffsetTrace(samples, numObservedPhiSets);
 	initObservedSynthesisNoiseTrace(samples, numObservedPhiSets);
 }
@@ -220,12 +224,14 @@ void Trace::initializeFONSETrace(unsigned samples, unsigned num_genes, unsigned 
 	unsigned numSelectionCategories, unsigned numParam, unsigned numMixtures, 
 	std::vector<mixtureDefinition> &_categories, unsigned maxGrouping)
 {
-	// see initializeROCTrace for detailed comment
 	initializeSharedTraces(samples, num_genes, numSelectionCategories, numMixtures,
 		 _categories, maxGrouping);
+
+	// See Note 1) above.
 	initCodonSpecificParameterTrace(samples, numMutationCategories, numParam, 0u); // dM
 	initCodonSpecificParameterTrace(samples, numSelectionCategories, numParam, 1u); // dOmega
 }
+
 
 void Trace::initializePANSETrace(unsigned samples, unsigned num_genes, unsigned numAlphaCategories,
 	unsigned numLambdaPrimeCategories, unsigned numParam, unsigned numMixtures,
@@ -233,8 +239,10 @@ void Trace::initializePANSETrace(unsigned samples, unsigned num_genes, unsigned 
 {
 	initializeSharedTraces(samples, num_genes, numLambdaPrimeCategories, numMixtures,
 		_categories, maxGrouping);
-	initCodonSpecificParameterTrace(samples, numAlphaCategories,  numParam, 0u);
-	initCodonSpecificParameterTrace(samples, numLambdaPrimeCategories, numParam, 1u);
+
+	// See Note 1) above.
+	initCodonSpecificParameterTrace(samples, numAlphaCategories,  numParam, 0u); //alp
+	initCodonSpecificParameterTrace(samples, numLambdaPrimeCategories, numParam, 1u); //lmPri
 }
 
 
@@ -445,6 +453,10 @@ unsigned Trace::getCodonSpecificCategory(unsigned mixtureElement, unsigned param
 	}
 	return rv;
 }
+
+
+
+
 
 //--------------------------------------//
 //---------- Update Functions ----------//

@@ -669,7 +669,7 @@ int main()
 	//testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
 	//testCovarianceMatrix();
 	testParameter();
-	//testParameterWithFile("/Users/hollisbui/HollisFile.txt");
+	//testParameterWithFile(pathBegin + "HollisFile.txt");
 	//testTrace();
 	//testRFPParameter();
 	//testMCMCAlgorithm();
@@ -690,7 +690,7 @@ int main()
 	my_print("\tThining: %\n", thining);
 	my_print("\t # Samples used: %\n", useSamples);
 	MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, 10, true, true, true);
-	//mcmc.setRestartFileSettings("RestartFile.txt", 20, true);
+	//mcmc.setRestartFileSettings(pathBegin + "RestartFile.txt", 20, true);
 	my_print("Done!-------------------------------\n\n\n");
 
 
