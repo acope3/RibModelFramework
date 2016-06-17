@@ -765,7 +765,7 @@ void ROCModel::calculateCodonProbabilityVector(unsigned numCodons, double mutati
 	}
 
 	// if the min(selection) is less than zero than we have to adjust the reference codon.
-	// if the reference codon is the min value (0) than we do not have to adjust the reference codon.
+	// if the reference codon is the min value (0) then we do not have to adjust the reference codon.
 	// This is necessary to deal with very large phi values (> 10^4) and avoid producing Inf which then
 	// causes the denominator to be Inf (Inf / Inf = NaN).
 	if (selection[minIndexVal] < 0.0)
