@@ -1,11 +1,23 @@
 NAMESPACE <- environment()
-.onLoad <- function(libname, pkgname){
+# NOTE: Rcpp::loadRcppModules() is deprecated. Discuss replacing with
+# Rcpp::loadModule(module, what = , loadNow, env =). Exposure with what argument.
+Rcpp::loadModule("Test_mod", TRUE)
+Rcpp::loadModule("Trace_mod", TRUE)
+Rcpp::loadModule("CovarianceMatrix_mod", TRUE)
+Rcpp::loadModule("MCMCAlgorithm_mod", TRUE)
+Rcpp::loadModule("Model_mod", TRUE)
+Rcpp::loadModule("Parameter_mod", TRUE)
+Rcpp::loadModule("Genome_mod", TRUE)
+Rcpp::loadModule("Gene_mod", TRUE)
+Rcpp::loadModule("SequenceSummary_mod", TRUE)
+
+#.onLoad <- function(libname, pkgname){
   #library.dynam("ribModel", pkgname, libname)
 
-  Rcpp::loadRcppModules()
+#  Rcpp::loadRcppModules()
   
 #  invisible()
-} # End of .onLoad().
+#} # End of .onLoad().
 
 #.onUnload <- function(libpath){
 #  library.dynam.unload("ribModel", libpath)

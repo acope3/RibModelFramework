@@ -2,10 +2,9 @@
 #'  
 #'  \code{initializeModelObject} initializes the Rcpp Model Object
 #'  
-#'  @param parameter An Rcpp parameter object
-#'  @param model A string containing the model to run (currently ROC, FONSE, or 
-#'    RFP)
-#'  @param with.phi A boolean that determines whether or not to use empirical
+#' @param parameter An Rcpp parameter object
+#' @param model A string containing the model to run (currently ROC, FONSE, or RFP)
+#' @param with.phi A boolean that determines whether or not to use empirical
 #'    phi values (expression rates) for the calculations. Currently, this is
 #'    only implemented for the ROC model.
 #'    

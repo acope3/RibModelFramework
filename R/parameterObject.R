@@ -642,7 +642,7 @@ writeParameterObject.Rcpp_FONSEParameter <- function(parameter, file)
 #' @param parameter A parameter object that corrosponds to
 #' one of the model types, such as "ROC", or "FONSE".
 #' 
-#' @param file A filename that where the data will be stored.
+#' @param files The filenames where the data will be stored.
 #' 
 #' @param model Type of the model. Should corrospond to the parameter type.
 #' 

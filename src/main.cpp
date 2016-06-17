@@ -668,12 +668,12 @@ int main()
 	//testGene();
 	//testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
 	//testCovarianceMatrix();
-	testParameter();
+	//testParameter();
 	//testParameterWithFile(pathBegin + "HollisFile.txt");
 	//testTrace();
 	//testRFPParameter();
 	//testMCMCAlgorithm();
-	exit(0);
+	//exit(0);
 
 
 	std::string modelToRun = "RFP"; //can be RFP, ROC or FONSE
@@ -812,6 +812,7 @@ int main()
 
 		my_print("Initializing RFPParameter object--------------------\n\n");
 		RFPParameter parameter;
+		//parameter.writeBasicRestartFile("/Users/hollisbui/HollisFile.txt");
 
 		if (fromRestart)
 		{
@@ -833,6 +834,7 @@ int main()
 
 			tmp.InitializeSynthesisRate(genome, sphi_init[0]);
 			parameter = tmp;
+			//parameter.writeEntireRestartFile("/Users/hollisbui/HollisFile2.txt");
 		}
 		my_print("Done!--------------------------------\n\n\n");
 

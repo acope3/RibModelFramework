@@ -4,21 +4,21 @@
 \alias{convergence.test}
 \title{Convergence Test}
 \usage{
-convergence.test(object, nsamples = 10, frac1 = 0.1, frac2 = 0.5,
-  thin = 1, plot = FALSE, ...)
+convergence.test(trace, what, mixture = 1, n.samples = 10, frac1 = 0.1,
+  frac2 = 0.5, plot = FALSE)
 }
 \arguments{
-\item{object}{}
-
-\item{nsamples}{}
-
 \item{frac1}{}
 
 \item{frac2}{}
 
-\item{thin}{}
-
 \item{plot}{}
+
+\item{object}{}
+
+\item{nsamples}{}
+
+\item{thin}{}
 
 \item{...}{}
 }
