@@ -121,19 +121,21 @@ setRestartSettings.Rcpp_MCMCAlgorithm <- function(mcmc, filename, samples,
 #TODO: Why is this seperated into 2 functions?
 
 
-
-
+# TODO: Have someone who knows what's going on document this.
+# The true method is found in traceObject.R
 #' Convergence Test
 #' 
-#' @param object
+#' @param trace
 #' 
-#' @param nsamples
+#' @param what
+#' 
+#' @param mixture
+#' 
+#' @param n.samples
 #' 
 #' @param frac1
 #' 
 #' @param frac2
-#' 
-#' @param thin
 #' 
 #' @param plot
 #' 
@@ -151,8 +153,8 @@ convergence.test <- function(object, nsamples = 10, frac1 = 0.1, frac2 = 0.5,
 }
 
 
-convergence.test.Rcpp_MCMCAlgorithm <- function(object, nsamples = 10, frac1 = 0.1, 
-                                       frac2 = 0.5, thin = 1, plot = FALSE, ...){
+convergence.test.Rcpp_MCMCAlgorithm <- function(trace, what, mixture, n.samples = 10, frac1 = 0.1, 
+                                       frac2 = 0.5, plot = FALSE, ...){
   # TODO: extend to work with multiple chains once we have that capability.
   
   loglik.trace <- object$getLogLikelihoodTrace()

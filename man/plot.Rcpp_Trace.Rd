@@ -17,6 +17,8 @@ Mphi, Aphi, Spesilon, ExpectedPhi, Expression}.}
 \item{geneIndex}{When plotting expression, the index of the gene to be plotted.}
 
 \item{mixture}{The mixture for which to plot values.}
+
+\item{...}{}
 }
 \value{
 This function has no return value.

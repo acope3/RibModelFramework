@@ -175,7 +175,7 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
   }
   
   parameter$mutation_prior_sd <- (mutation_prior_sd)
-  parameter <- initializeCovarianceMatricies(parameter, genome, numMixtures)
+  parameter <- initializeCovarianceMatricies(parameter, genome, numMixtures, geneAssignment)
   
   
   return(parameter)
@@ -238,7 +238,7 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
     parameter$initializeSynthesisRateByList(expressionValues)
   }
   
-  parameter <- initializeCovarianceMatricies(parameter, genome, numMixtures)
+  parameter <- initializeCovarianceMatricies(parameter, genome, numMixtures, geneAssignment)
   
   return(parameter)
 }
@@ -396,7 +396,7 @@ splitMatrix <- function(M, r, c){
 
 
 # Also initializes the mutaiton and selection parameter
-initializeCovarianceMatricies <- function(parameter, genome, numMixtures) {
+initializeCovarianceMatricies <- function(parameter, genome, numMixtures, geneAssignment) {
   numMutationCategory <- parameter$numMutationCategories
   numSelectionCategory <- parameter$numSelectionCategories
   
@@ -638,13 +638,8 @@ writeParameterObject.Rcpp_FONSEParameter <- function(parameter, file)
 
 
 #' Load Parameter Object
-#' 
-#' @param parameter A parameter object that corrosponds to
-#' one of the model types, such as "ROC", or "FONSE".
-#' 
+#'  
 #' @param files The filenames where the data will be stored.
-#' 
-#' @param model Type of the model. Should corrospond to the parameter type.
 #' 
 #' @return This function has no return value.
 #' 

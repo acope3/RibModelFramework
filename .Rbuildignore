@@ -1,0 +1,11 @@
+# Files added here will not be included in the built R package.
+
+## Ignore travis config file
+^\.travis\.yml$
+
+## Ignore CMakeLists
+^src\/CMakeLists\.txt$
+
+## Ignore IDE setting folders
+^src\/\.idea$
+^src\/\.vscode$

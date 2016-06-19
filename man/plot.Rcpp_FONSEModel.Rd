@@ -7,6 +7,27 @@
 \method{plot}{Rcpp_FONSEModel}(x, genome, parameter, samples = 100,
   mixture = 1, estim.Expression = TRUE, simulated = FALSE, ...)
 }
+\arguments{
+\item{x}{An Rcpp model object initialized with \code{initializeModelObject}.}
+
+\item{genome}{An Rcpp genome object initialized with \code{initializeGenomeObject}.}
+
+\item{parameter}{An Rcpp parameter object.}
+
+\item{samples}{The number of samples in the trace}
+
+\item{mixture}{The mixture for which to graph values.}
+
+\item{estim.Expression}{A boolean value that says whether to use estimated expression
+values or empirical values.}
+
+\item{simulated}{A boolean value that determines whether to use the simulated genome.}
+
+\item{...}{}
+}
+\value{
+This function has no return value.
+}
 \description{
 See \code{plot.Rcpp_ROCModel}
 }

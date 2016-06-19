@@ -4,10 +4,10 @@
 \alias{length.Rcpp_Genome}
 \title{Length of Genome}
 \usage{
-\method{length}{Rcpp_Genome}(genome)
+\method{length}{Rcpp_Genome}(x)
 }
 \arguments{
-\item{genome}{A genome object initialized with \code{\link{initializeGenomeObject}}.}
+\item{x}{A genome object initialized with \code{\link{initializeGenomeObject}}.}
 }
 \value{
 returns the number of genes in a genome

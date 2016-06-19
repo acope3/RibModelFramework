@@ -12,7 +12,7 @@
 
 \item{genome}{An Rcpp genome object initialized with \code{initializeGenomeObject}.}
 
-\item{parameter}{}
+\item{parameter}{An Rcpp parameter object.}
 
 \item{samples}{The number of samples in the trace}
 
@@ -22,6 +22,8 @@
 values or empirical values.}
 
 \item{simulated}{A boolean value that determines whether to use the simulated genome.}
+
+\item{...}{}
 }
 \value{
 This function has no return value.

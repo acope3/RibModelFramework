@@ -1,6 +1,5 @@
 NAMESPACE <- environment()
-# NOTE: Rcpp::loadRcppModules() is deprecated. Discuss replacing with
-# Rcpp::loadModule(module, what = , loadNow, env =). Exposure with what argument.
+# TODO: Test with exposure and what doesn't need to be exposed to R
 Rcpp::loadModule("Test_mod", TRUE)
 Rcpp::loadModule("Trace_mod", TRUE)
 Rcpp::loadModule("CovarianceMatrix_mod", TRUE)
@@ -12,10 +11,7 @@ Rcpp::loadModule("Gene_mod", TRUE)
 Rcpp::loadModule("SequenceSummary_mod", TRUE)
 
 #.onLoad <- function(libname, pkgname){
-  #library.dynam("ribModel", pkgname, libname)
-
-#  Rcpp::loadRcppModules()
-  
+  #library.dynam("ribModel", pkgname, libname) 
 #  invisible()
 #} # End of .onLoad().
 
