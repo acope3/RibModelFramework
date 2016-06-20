@@ -1,0 +1,32 @@
+
+\documentclass[letter,10pt]{article}
+\usepackage[utf8]{inputenc}
+
+%opening
+\title{ribModel Code specifications}
+
+
+\begin{document}
+\maketitle
+
+
+\begin{enumerate}
+ \item new function should contain a description above the implementation that state purpose of function and explains parameter. Note if function is exposed to R or not.
+ \item create a test case for new functions in class Testing.
+ \item use speaking variable names
+ \item if you copy code, mention source so code can be double checked later.
+ \item ensure that constructors create a VALID object. That does not necessary mean all information has to be placed, but all members have to be properly initialized. 
+ \item document/describe parts of code/functions that are not self-explenatory (Can you come back to it a month later and still know what the code does).
+ \item functions are only defined in headers, but never implemented.
+ \item avoid invinite loop structures ( for(;;), while(true), ... ) that break under various conditions.
+ \item new classes should follow naming convention [MODEL]Parameter, [MODEL]Model. That should be generally applied for inhereted classes.
+ \item avoid dynamic allocated arrays and use vectors instead if possible. dynamic allocated arrays seem to cause problems with openmp.
+ \item all log output should use the wrapper functions ``my\_print'', ``my\_printError'', ``my\_printWarning''
+ \item Rcpp modules are used to expose classes and member functions. Member functions and static functions are exposed using a different syntax (see code). 
+ \item Constructors can not have more than 6 arguments. That causes us to use setter functions in cases where more arguments are needed. Adjustment can be made once Rcpp can handle more arguments.
+ \item stick to the google style guide for R
+\end{enumerate}
+
+
+\end{document}
+
