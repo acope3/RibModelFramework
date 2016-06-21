@@ -79,6 +79,7 @@ Parameter& Parameter::operator=(const Parameter& rhs)
 // TODO(Cedric, June-21-2016): understand why simple copy doe not work!
 	//stdDevSynthesisRate = rhs.stdDevSynthesisRate;
 	//stdDevSynthesisRate_proposed = rhs.stdDevSynthesisRate_proposed;
+    /*
     stdDevSynthesisRate.resize(rhs.stdDevSynthesisRate.size());
  	stdDevSynthesisRate_proposed.resize(rhs.stdDevSynthesisRate.size());
  	for (unsigned i = 0u; i < rhs.stdDevSynthesisRate.size(); i++)		
@@ -86,7 +87,7 @@ Parameter& Parameter::operator=(const Parameter& rhs)
      	stdDevSynthesisRate[i] = rhs.stdDevSynthesisRate[i];		
  		stdDevSynthesisRate_proposed[i] = rhs.stdDevSynthesisRate_proposed[i];		
     }
-
+*/
 
 	numAcceptForStdDevSynthesisRate = rhs.numAcceptForStdDevSynthesisRate;
 	obsPhiSets = rhs.obsPhiSets;
@@ -155,7 +156,8 @@ void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsig
 		//TODO:need to check index are correct, consecutive, and don't exceed numMixtures
 		//possibly just use a set?
 #ifndef STANDALONE
-		mixtureAssignment[i + 1] = geneAssignment[i];
+        mixtureAssignment[i] = geneAssignment[i] - 1;
+		//mixtureAssignment[i + 1] = geneAssignment[i];
 #else
 		mixtureAssignment[i] = geneAssignment[i];
 #endif
