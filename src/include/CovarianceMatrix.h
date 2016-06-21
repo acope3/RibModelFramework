@@ -32,7 +32,6 @@ class CovarianceMatrix
         virtual ~CovarianceMatrix();
 
 
-
         //Matrix Functions:
 	    void initCovarianceMatrix(unsigned _numVariates);
 		void setDiag(double val);

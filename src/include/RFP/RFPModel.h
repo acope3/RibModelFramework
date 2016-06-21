@@ -1,11 +1,11 @@
 #ifndef RFPMODEL_H
 #define RFPMODEL_H
 
-#include <sstream>
 
 #include "../base/Model.h"
 #include "RFPParameter.h"
 
+#include <sstream>
 
 class RFPModel: public Model
 {
@@ -31,11 +31,9 @@ class RFPModel: public Model
 				std::vector <double> &logProbabilityRatio);
 
 
-
 		//Initialization and Restart Functions:
 		virtual void initTraces(unsigned samples, unsigned num_genes);
 		virtual void writeRestartFile(std::string filename);
-
 
 
 		//Category Functions:
@@ -46,11 +44,9 @@ class RFPModel: public Model
 		virtual std::vector<unsigned> getMixtureElementsOfSelectionCategory(unsigned k);
 
 
-
 		//Group List Functions:
 		virtual unsigned getGroupListSize();
 		virtual std::string getGrouping(unsigned index);
-
 
 
 		//stdDevSynthesisRate Functions:
@@ -59,17 +55,14 @@ class RFPModel: public Model
 		virtual void updateStdDevSynthesisRate();
 
 
-
 		//Synthesis Rate Functions:
 		virtual double getSynthesisRate(unsigned index, unsigned mixture, bool proposed = false);
 		virtual void updateSynthesisRate(unsigned i, unsigned k);
 
 
-
 		//Iteration Functions:
 		virtual unsigned getLastIteration();
 		virtual void setLastIteration(unsigned iteration);
-
 
 
 		//Trace Functions:
@@ -82,13 +75,11 @@ class RFPModel: public Model
 		virtual void updateTracesWithInitialValues(Genome &genome);
 
 
-
 		//Adaptive Width Functions:
 		virtual void adaptStdDevSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt = true);
 		virtual void adaptSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt = true);
 		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, unsigned lastIteration, bool adapt = true);
 		virtual void adaptHyperParameterProposalWidths(unsigned adaptiveWidth, bool adapt = true);
-
 
 
 		//Other Functions:

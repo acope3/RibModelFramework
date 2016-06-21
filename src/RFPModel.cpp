@@ -16,14 +16,12 @@ RFPModel::RFPModel() : Model()
 	//ctor
 }
 
+
 RFPModel::~RFPModel()
 {
 	//dtor
 	//TODO: call Parent's deconstructor
 }
-
-
-
 
 
 double RFPModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
@@ -142,7 +140,7 @@ void RFPModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 	std::vector<double> currentMphi(selectionCategory, 0.0);
 	std::vector<double> proposedStdDevSynthesisRate(selectionCategory, 0.0);
 	std::vector<double> proposedMphi(selectionCategory, 0.0);
-	for(unsigned i = 0u; i < selectionCategory; i++)
+	for (unsigned i = 0u; i < selectionCategory; i++)
 	{
 		currentStdDevSynthesisRate[i] = getStdDevSynthesisRate(i, false);
 		currentMphi[i] = -((currentStdDevSynthesisRate[i] * currentStdDevSynthesisRate[i]) / 2);
@@ -156,8 +154,6 @@ void RFPModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 	}
 
 
-
-
 	logProbabilityRatio.resize(1);
 #ifndef __APPLE__
 #pragma omp parallel for reduction(+:lpr)
@@ -167,9 +163,10 @@ void RFPModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 		unsigned mixture = getMixtureAssignment(i);
 		mixture = getSynthesisRateCategory(mixture);
 		double phi = getSynthesisRate(i, mixture, false);
-		if (i == 0) {
-	//	my_print("proposed: %\n", Parameter::densityLogNorm(phi, proposedMPhi[mixture], proposedStdDevSynthesisRate[mixture], false));
-		//my_print("current: %\n", Parameter::densityLogNorm(phi, currentMPhi, currentStdDevSynthesisRate, false));
+		if (i == 0)
+		{
+			//my_print("proposed: %\n", Parameter::densityLogNorm(phi, proposedMPhi[mixture], proposedStdDevSynthesisRate[mixture], false));
+			//my_print("current: %\n", Parameter::densityLogNorm(phi, currentMPhi, currentStdDevSynthesisRate, false));
 		}
 		lpr += Parameter::densityLogNorm(phi, proposedMphi[mixture], proposedStdDevSynthesisRate[mixture], true) -
 				Parameter::densityLogNorm(phi, currentMphi[mixture], currentStdDevSynthesisRate[mixture], true);
@@ -198,7 +195,6 @@ void RFPModel::writeRestartFile(std::string filename)
 {
 	return parameter->writeEntireRestartFile(filename);
 }
-
 
 
 
@@ -507,7 +503,8 @@ void RFPModel::updateAllHyperParameter()
 void RFPModel::updateHyperParameter(unsigned hp)
 {
 	// NOTE: when adding additional hyper parameter, also add to updateAllHyperParameter()
-	switch (hp) {
+	switch (hp)
+	{
 		case 0:
 			updateStdDevSynthesisRate();
 			break;
@@ -521,13 +518,13 @@ void RFPModel::simulateGenome(Genome &genome)
 	{
 		unsigned mixtureElement = getMixtureAssignment(geneIndex);
 		Gene gene = genome.getGene(geneIndex);
-		double phi = parameter -> getSynthesisRate(geneIndex, mixtureElement, false);
+		double phi = parameter->getSynthesisRate(geneIndex, mixtureElement, false);
 		Gene tmpGene = gene;
 		for (unsigned codonIndex = 0; codonIndex < 61; codonIndex++)
 		{
 			std::string codon = SequenceSummary::codonArray[codonIndex];
-			unsigned alphaCat = parameter -> getMutationCategory(mixtureElement);
-			unsigned lambdaPrimeCat = parameter -> getSelectionCategory(mixtureElement);
+			unsigned alphaCat = parameter->getMutationCategory(mixtureElement);
+			unsigned lambdaPrimeCat = parameter->getSelectionCategory(mixtureElement);
 
 			double alpha = getParameterForCategory(alphaCat, RFPParameter::alp, codon, false);
 			double lambdaPrime = getParameterForCategory(lambdaPrimeCat, RFPParameter::lmPri, codon, false);
@@ -540,7 +537,7 @@ void RFPModel::simulateGenome(Genome &genome)
 				xx = rgamma(1, alphaPrime, 1.0/lambdaPrime);
 				xx = rpois(1, xx[0] * phi);
 				tmpGene.geneData.setRFPObserved(codonIndex, xx[0]);
-			#else
+#else
 			std::gamma_distribution<double> GDistribution(alphaPrime,1.0/lambdaPrime);
 			double tmp = GDistribution(Parameter::generator);
 			std::poisson_distribution<unsigned> PDistribution(phi * tmp);
@@ -579,11 +576,4 @@ double RFPModel::getParameterForCategory(unsigned category, unsigned param, std:
 {
 	return parameter->getParameterForCategory(category, param, codon, proposal);
 }
-
-
-
-
-
-
-
 

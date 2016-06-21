@@ -89,7 +89,7 @@ MCMCAlgorithm::~MCMCAlgorithm()
 
 /* acceptRejectSynthesisRateLevelForAllGenes (NOT EXPOSED)
 * Arguments: reference to a genome and a model. which iteration (step) is currently being estimated
-* Based on the logliklihood probabilities proposed for a gene (with and without reverse jump), it is decided
+* Based on the loglikelihood probabilities proposed for a gene (with and without reverse jump), it is decided
 * whether or not a synthesis rate is accepted for that gene or not. Mixture assignment is also updated when
 * applicable.
 */
@@ -100,7 +100,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	// TODO move the likelihood calculation out of here. make it a void function again.
 
 	double logLikelihood = 0.0;
-    double logLikelihood2 = 0.0;
+    //double logLikelihood2 = 0.0; //currently unused
 	int numGenes = genome.getGenomeSize();
 
 	unsigned numSynthesisRateCategories = model.getNumSynthesisRateCategories();
@@ -109,7 +109,8 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	//TODO: why is this not just a vector?
 
 
-	for (unsigned i = 0u; i < numMixtures; i++) {
+	for (unsigned i = 0u; i < numMixtures; i++)
+	{
 		dirichletParameters[i] = 0.0;
 	}
 
@@ -119,8 +120,10 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		Gene *gene = &genome.getGene(i);
 
 		/*
-			 Since some values returned by calculateLogLikelihoodRatioPerGene are veyr small (~ -1100), exponentiation leads to 0.
-			 To solve this problem, we adjust the value by a constant c. I choose to use the average value across all mixtures.
+			 Since some values returned by calculateLogLikelihoodRatioPerGene are very small (~ -1100),
+			 exponentiation leads to 0.
+			 To solve this problem, we adjust the value by a constant c.
+			 I choose to use the average value across all mixtures.
 			 We justify this by
 			 P = Sum(p_i*f(...))
 			 => f' = c*f
@@ -157,12 +160,12 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			unscaledLogPost_prop[j] = 0.0;
 		}
 
-		for(unsigned k = 0u; k < numSynthesisRateCategories; k++)
+		for (unsigned k = 0u; k < numSynthesisRateCategories; k++)
 		{
 			// logProbabilityRatio contains the logProbabilityRatio in element 0,
 			// the current unscaled probability in element 1 and the proposed unscaled probability in element 2
 			std::vector<unsigned> mixtureElements = model.getMixtureElementsOfSelectionCategory(k);
-			for(unsigned n = 0u; n < mixtureElements.size(); n++)
+			for (unsigned n = 0u; n < mixtureElements.size(); n++)
 			{
 				unsigned mixtureElement = mixtureElements[n];
 				double logProbabilityRatio[5];
@@ -175,7 +178,8 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				unscaledLogPost_prop[k] += logProbabilityRatio[4]; // without rev. jump prob.
 
 				unscaledLogProb_curr_singleMixture[mixtureIndex] = logProbabilityRatio[3];
-				maxValue = unscaledLogProb_curr_singleMixture[mixtureIndex] > maxValue ? unscaledLogProb_curr_singleMixture[mixtureIndex] : maxValue;
+				maxValue = unscaledLogProb_curr_singleMixture[mixtureIndex] > maxValue ?
+						   unscaledLogProb_curr_singleMixture[mixtureIndex] : maxValue;
 				mixtureIndex++;
 			}
 		}
@@ -186,7 +190,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		// calculate ln(P) = ln( Sum(p_i*f'(...)) ) and obtain normalizing constant for new p_i
 		double normalizingProbabilityConstant = 0.0;
 
-		for(unsigned k = 0u; k < numMixtures; k++)
+		for (unsigned k = 0u; k < numMixtures; k++)
 		{
 			unscaledLogProb_curr_singleMixture[k] -= maxValue;
 			probabilities[k] = model.getCategoryProbability(k) * std::exp(unscaledLogProb_curr_singleMixture[k]);
@@ -211,7 +215,10 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
                     logLikelihood += probabilities[k] * unscaledLogPost_prop[k];
                 }
 				else
-                    logLikelihood += probabilities[k] * unscaledLogPost_curr[k]; // if phi is not estimatedd, it will always stay curr!    
+				{
+					// if phi is not estimated, it will always stay curr!
+					logLikelihood += probabilities[k] * unscaledLogPost_curr[k];
+				}
 			}
 			else
 			{
@@ -224,7 +231,8 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
             my_print("\tInfinity reached (Gene: %)\n", i);
 
 		// Get category in which the gene is placed in.
-		// If we use multiple sequence observation (like different mutants) randMultinom needs a parameter N to place N observations in numMixture buckets
+		// If we use multiple sequence observation (like different mutants),
+		// randMultinom needs a parameter N to place N observations in numMixture buckets
 		unsigned categoryOfGene = Parameter::randMultinom(probabilities, numMixtures);
 		if (estimateMixtureAssignment)
 			model.setMixtureAssignment(i, categoryOfGene);
@@ -326,7 +334,7 @@ void MCMCAlgorithm::acceptRejectHyperParameter(Genome &genome, Model& model, uns
 /* run (RCPP EXPOSED)
  * Arguments: reference to a genome and a model. number of cores to run on (unless running on a MAC). Number of
  * iterations to allow initial conditions to vary.
- * Runs the MCMC algorithm for the set number of iterations. Run can terminate early if GWEKE score meets
+ * Runs the MCMC algorithm for the set number of iterations. Run can terminate early if Geweke score meets
  * the set criteria.
 */
 void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigned divergenceIterations)
@@ -357,9 +365,10 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	my_print("\tStarting MCMC with % iterations\n", maximumIterations);
 	my_print("\tAdapting will stop after % steps\n", stepsToAdapt);
 
-	// set the last iteration to the max iterations, this way if the MCMC doesn't exit based on Geweke score, it will use the max iteration for posterior means
+	// set the last iteration to the max iterations,
+	// this way if the MCMC doesn't exit based on Geweke score, it will use the max iteration for posterior means
 	model.setLastIteration(samples);
-	for(unsigned iteration = 1u; iteration <= maximumIterations; iteration++)
+	for (unsigned iteration = 1u; iteration <= maximumIterations; iteration++)
 	{
 		if (writeRestartFile)
 		{
@@ -419,7 +428,8 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 			if ((iteration % thining) == 0u)
 			{
 				likelihoodTrace[(iteration / thining)] = logLike;
-				if (std::isnan(logLike)) {
+				if (std::isnan(logLike))
+				{
 					my_printError("ERROR: Log likelihood is NaN, exiting at iteration %\n", iteration);
 					model.setLastIteration(iteration / thining);
 					return;
@@ -732,9 +742,9 @@ std::vector<double> MCMCAlgorithm::acf(std::vector<double>& x, int nrows, int nc
 	if (demean)
 	{
 		double sum = 0.0;
-		for(unsigned i = 0u; i < x.size(); i++) sum += x[i];
+		for (unsigned i = 0u; i < x.size(); i++) sum += x[i];
 		double mean = sum / (double)x.size();
-		for(unsigned i = 0u; i < x.size(); i++) x[i] = x[i] - mean;
+		for (unsigned i = 0u; i < x.size(); i++) x[i] = x[i] - mean;
 	}
 
 	std::vector<double> acf(lagmax, 1.0);
@@ -756,13 +766,17 @@ std::vector<double> MCMCAlgorithm::acf(std::vector<double>& x, int nrows, int nc
 			}
 		}
 	}
-	if (correlation) {
-		if(nrows == 1) {
-			for(int u = 0; u < ncols; u++)
+	if (correlation)
+	{
+		if (nrows == 1)
+		{
+			for (int u = 0; u < ncols; u++)
 			{
 				acf[0 + d1*u + d2*u] = 1.0;
 			}
-		} else {
+		}
+		else
+		{
 			double *se = new double[ncols]();
 			for (int u = 0; u < ncols; u++)
 			{
@@ -779,6 +793,7 @@ std::vector<double> MCMCAlgorithm::acf(std::vector<double>& x, int nrows, int nc
 					}
 				}
 			}
+			// delete [] se; //TODO: add once testable
 		}
 	}
 	return acf;
@@ -846,6 +861,7 @@ std::vector<std::vector<double>> MCMCAlgorithm::solveToeplitzMatrix(int lr, std:
 			q = q + f[l*lr + i]*r[k];
 		}
 	}
+	//delete [] a; //TODO: add once testable
 
 	returnVec[0] = f;
 	returnVec[1] = var;
@@ -887,6 +903,7 @@ unsigned MCMCAlgorithm::getAdaptiveWidth()
     return adaptiveWidth;
 }
 
+
 void MCMCAlgorithm::setSamples(unsigned _samples)
 {
     samples = _samples;
@@ -904,10 +921,12 @@ void MCMCAlgorithm::setAdaptiveWidth(unsigned _adaptiveWidth)
     adaptiveWidth = _adaptiveWidth;
 }
 
+
 void MCMCAlgorithm::setLogLikelihoodTrace(std::vector<double> _likelihoodTrace)
 {
     likelihoodTrace = _likelihoodTrace;
 }
+
 
 
 

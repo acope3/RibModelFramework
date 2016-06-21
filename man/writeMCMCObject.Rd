@@ -9,7 +9,7 @@ writeMCMCObject(mcmc, file)
 \arguments{
 \item{mcmc}{MCMC object that has run the model fitting algorithm.}
 
-\item{file}{A filename that where the data will be stored.
+\item{file}{A filename where the data will be stored.
 The file should end with the extension "Rdat".}
 }
 \value{

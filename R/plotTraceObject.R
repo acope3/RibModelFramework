@@ -10,6 +10,7 @@
 #'  Mphi, Aphi, Spesilon, ExpectedPhi, Expression}.
 #' @param geneIndex When plotting expression, the index of the gene to be plotted.
 #' @param mixture The mixture for which to plot values.
+#' @param ...
 #' 
 #' @return This function has no return value.
 #' 

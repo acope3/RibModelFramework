@@ -38,9 +38,11 @@ double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grou
 
 	unsigned aaStart, aaEnd;
 	SequenceSummary::AAToCodonRange(grouping, aaStart, aaEnd, false);
-	for (unsigned i = aaStart, k = 0; i < aaEnd; i++, k++) { 
+	for (unsigned i = aaStart, k = 0; i < aaEnd; i++, k++)
+	{
 		positions = gene.geneData.getCodonPositions(i); 
-		for (unsigned j = 0; j < positions->size(); j++) { 
+		for (unsigned j = 0; j < positions->size(); j++)
+		{
 			calculateCodonProbabilityVector(numCodons, positions->at(j), maxIndexVal, mutation, selection, phiValue, codonProb); 
 			if (codonProb[k] == 0) continue; 
 			logLikelihood += std::log(codonProb[k]); 
@@ -90,7 +92,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 	double mutation[5];
 	double selection[5];
 
-	SequenceSummary *seqsum = gene.getSequenceSummary();
+	//SequenceSummary *seqsum = gene.getSequenceSummary(); //currently unused
 
 	// get correct index for everything
 	unsigned mutationCategory = parameter->getMutationCategory(k);
@@ -212,7 +214,7 @@ void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 	std::vector<double> currentMphi(selectionCategory, 0.0);
 	std::vector<double> proposedStdDevSynthesisRate(selectionCategory, 0.0);
 	std::vector<double> proposedMphi(selectionCategory, 0.0);
-	for(unsigned i = 0u; i < selectionCategory; i++)
+	for (unsigned i = 0u; i < selectionCategory; i++)
 	{
 		currentStdDevSynthesisRate[i] = getStdDevSynthesisRate(i, false);
 		currentMphi[i] = -((currentStdDevSynthesisRate[i] * currentStdDevSynthesisRate[i]) / 2);
@@ -564,7 +566,8 @@ void FONSEModel::updateAllHyperParameter()
 void FONSEModel::updateHyperParameter(unsigned hp)
 {
 	// NOTE: when adding additional hyper parameter, also add to updateAllHyperParameter()
-	switch (hp) {
+	switch (hp)
+	{
 		case 0:
 			updateStdDevSynthesisRate();
 			break;
@@ -686,7 +689,8 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 	 // causes the denominator to be Inf (Inf / Inf = NaN).
 	if (selection[maxIndexValue] > 0.0) {
 		denominator = 0.0;
-		for (unsigned i = 0u; i < (numCodons - 1); i++) {
+		for (unsigned i = 0u; i < (numCodons - 1); i++)
+		{
 			codonProb[i] = std::exp(((mutation[i] - mutation[maxIndexValue])) + (phi * (4.0 + (4.0 * position)) * (selection[i] - selection[maxIndexValue])));
 			denominator += codonProb[i];
 		}
@@ -694,9 +698,11 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 		codonProb[numCodons - 1] = std::exp((-1.0 * mutation[maxIndexValue]) - (phi * (4.0 + (4.0 * position)) * selection[maxIndexValue]));
 		denominator += codonProb[numCodons - 1];
 	}
-	else {
+	else
+	{
 		denominator = 1.0;
-		for (unsigned i = 0u; i < (numCodons - 1); i++) {
+		for (unsigned i = 0u; i < (numCodons - 1); i++)
+		{
 			codonProb[i] = std::exp((mutation[i]) + (phi * (4.0 + (4.0 * position)) * selection[i]));
 			denominator += codonProb[i];
 		}
@@ -708,9 +714,10 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 	//save time here by dividing once and then muliplying numCodons times instead of dividing
 	//numCodons times.
 	denominator = 1 / denominator;
-		for (unsigned i = 0; i < numCodons; i++) {
-			codonProb[i] *= denominator;
-		}
+	for (unsigned i = 0; i < numCodons; i++)
+	{
+		codonProb[i] *= denominator;
+	}
 }
 
 
@@ -741,9 +748,10 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 	// If the reference codon is the max value then we do not have to adjust the reference codon.
 	// This is necessary to deal with very large phi values (> 10^4) and avoid producing Inf which then
 	// causes the denominator to be Inf (Inf / Inf = NaN).
-	if (selection[maxIndexValu e] > 0.0) {
+	if (selection[maxIndexValue] > 0.0) {
 		denominator = 0.0;
-		for (unsigned i = 0u; i < (numCodons - 1); i++) {
+		for (unsigned i = 0u; i < (numCodons - 1); i++)
+		{
 			codonProb[i] = std::exp(((mutation[i] - mutation[maxIndexValue])) + (phi * (4.0 + (4.0 * position)) * (selection[i] - selection[maxIndexValue])));
 			denominator += codonProb[i];
 		}
@@ -751,9 +759,11 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 		codonProb[numCodons - 1] = std::exp((-1.0 * mutation[maxIndexValue]) - (phi * (4.0 + (4.0 * position)) * selection[maxIndexValue]));
 		denominator += codonProb[numCodons - 1];
 	}
-	else {
+	else
+	{
 		denominator = 1.0;
-		for (unsigned i = 0u; i < (numCodons - 1); i++) {
+		for (unsigned i = 0u; i < (numCodons - 1); i++)
+		{
 			codonProb[i] = std::exp((mutation[i]) + (phi * (4.0 + (4.0 * position)) * selection[i]));
 			denominator += codonProb[i];
 		}

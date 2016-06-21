@@ -18,8 +18,6 @@ class Gene
 		std::string id; //Gene id: Ex: "YALOC001"
 		std::string description; //Additional information about the gene.
 
-		void cleanSeq(); //deprecated; TODO: remove
-
 	public:
 
 

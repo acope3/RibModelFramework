@@ -169,7 +169,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 	{
 		gene = &genome.getGene(i);
 		seqsum = gene->getSequenceSummary();
-		if(seqsum->getAACountForAA(aaIndex) == 0) continue;
+		if (seqsum->getAACountForAA(aaIndex) == 0) continue;
 
 		// which mixture element does this gene belong to
 		unsigned mixtureElement = parameter->getMixtureAssignment(i);
@@ -713,7 +713,7 @@ void ROCModel::printHyperParameters()
 		my_print("\t current noiseOffset estimates:");
 
 		for (unsigned i = 0; i < getNumPhiGroupings(); i++)
-			my_print(" f", getNoiseOffset(i, false));
+			my_print(" %", getNoiseOffset(i, false));
 
 		my_print("\n\t current noiseOffset proposal widths:");
 

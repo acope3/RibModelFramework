@@ -81,7 +81,8 @@ void ROCParameter::initROCParameterSet()
 	bias_csp = 0;
 	
 
-	for (unsigned i = 0; i < getNumObservedPhiSets(); i++) {
+	for (unsigned i = 0; i < getNumObservedPhiSets(); i++)
+	{
 		noiseOffset[i] = 0.1;
 		noiseOffset_proposed[i] = 0.1;
 		std_NoiseOffset[i] = 0.1;
@@ -210,7 +211,8 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 				{
 					double val;
 					iss.str(tmp);
-					while (iss >> val) {
+					while (iss >> val)
+					{
 						std_csp.push_back(val);
 					}
 				}
@@ -218,7 +220,8 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 				{
 					double val;
 					iss.str(tmp);
-					while (iss >> val) {
+					while (iss >> val)
+					{
 						noiseOffset.push_back(val);
 					}
 				}
@@ -226,7 +229,8 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 				{
 					double val;
 					iss.str(tmp);
-					while (iss >> val) {
+					while (iss >> val)
+					{
 						observedSynthesisNoise.push_back(val);
 					}
 				}
@@ -234,7 +238,8 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 				{
 					double val;
 					iss.str(tmp);
-					while (iss >> val) {
+					while (iss >> val)
+					{
 						std_NoiseOffset.push_back(val);
 					}
 				}
@@ -380,7 +385,7 @@ void ROCParameter::writeROCRestartFile(std::string filename)
 			CovarianceMatrix m = covarianceMatrix[SequenceSummary::AAToAAIndex(aa)];
 			std::vector<double>* tmp = m.getCovMatrix();
 			int size = m.getNumVariates();
-			for(unsigned k = 0; k < size * size; k++)
+			for (unsigned k = 0; k < size * size; k++)
 			{
 				if (k % size == 0 && k != 0) { oss << "\n"; }
 				oss << tmp->at(k) << "\t";
@@ -561,7 +566,8 @@ double ROCParameter::getCurrentNoiseOffsetProposalWidth(unsigned index)
 
 void ROCParameter::proposeNoiseOffset()
 {
-	for (unsigned i = 0; i < getNumObservedPhiSets(); i++) {
+	for (unsigned i = 0; i < getNumObservedPhiSets(); i++)
+	{
 		noiseOffset_proposed[i] = randNorm(noiseOffset[i], std_NoiseOffset[i]);
 	}
 }
@@ -852,7 +858,7 @@ void ROCParameter::initCovarianceMatrix(SEXP _matrix, std::string aa)
 	std::vector<double> tmp;
 	NumericMatrix matrix(_matrix);
 
-	for(unsigned i = 0u; i < aa.length(); i++)	aa[i] = (char)std::toupper(aa[i]);
+	for (unsigned i = 0u; i < aa.length(); i++)	aa[i] = (char)std::toupper(aa[i]);
 
 	unsigned aaIndex = SequenceSummary::aaToIndex.find(aa) -> second;
 	unsigned numRows = matrix.nrow();
@@ -863,7 +869,7 @@ void ROCParameter::initCovarianceMatrix(SEXP _matrix, std::string aa)
 	unsigned index = 0;
 	for (unsigned i = 0; i < numRows; i++)
 	{
-		for(unsigned j = i; j < numRows * numRows; j += numRows, index++)
+		for (unsigned j = i; j < numRows * numRows; j += numRows, index++)
 		{
 			covMatrix[index] = matrix[j];
 		}

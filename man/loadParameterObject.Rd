@@ -4,15 +4,10 @@
 \alias{loadParameterObject}
 \title{Load Parameter Object}
 \usage{
-loadParameterObject(file)
+loadParameterObject(files)
 }
 \arguments{
-\item{file}{A filename that where the data will be stored.}
-
-\item{parameter}{A parameter object that corrosponds to
-one of the model types, such as "ROC", or "FONSE".}
-
-\item{model}{Type of the model. Should corrospond to the parameter type.}
+\item{files}{The filenames where the data will be stored.}
 }
 \value{
 This function has no return value.

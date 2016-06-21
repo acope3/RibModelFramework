@@ -41,8 +41,9 @@ RFPParameter::RFPParameter(std::string filename) : Parameter(64)
  * Initializes the object from given values. If thetaK matrix is null or empty, the mutationselectionState keyword
  * is used to generate the matrix.
 */
-RFPParameter::RFPParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix,
-		bool splitSer, std::string _mutationSelectionState) : Parameter(64)
+RFPParameter::RFPParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures,
+		std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer,
+		std::string _mutationSelectionState) : Parameter(64)
 {
 	initParameterSet(stdDevSynthesisRate, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
 	initRFPParameterSet();
@@ -93,7 +94,6 @@ RFPParameter::~RFPParameter()
 */
 void RFPParameter::initRFPParameterSet()
 {
-
 	unsigned alphaCategories = getNumMutationCategories();
 	unsigned lambdaPrimeCategories = getNumSelectionCategories();
 
@@ -142,10 +142,10 @@ void RFPParameter::initRFPValuesFromFile(std::string filename)
 {
 	std::ifstream input;
 	input.open(filename.c_str());
-	if (input.fail()) {
+	if (input.fail())
 		my_printError("ERROR: Could not open file to initialize RFP values\n");
-	}
-	else {
+	else
+	{
 		std::string tmp, variableName;
 		unsigned cat = 0;
 		while (getline(input, tmp))
@@ -266,11 +266,10 @@ void RFPParameter::writeRFPRestartFile(std::string filename)
 	std::ostringstream oss;
 	unsigned i, j;
 	out.open(filename.c_str(), std::ofstream::app);
-	if (out.fail()){
+	if (out.fail())
 		my_printError("ERROR: Could not open restart file for writing\n");
-	}
-	else {
-
+	else
+	{
 		oss << ">currentAlphaParameter:\n";
 		for (i = 0; i < currentCodonSpecificParameter[alp].size(); i++)
 		{
@@ -396,10 +395,10 @@ void RFPParameter::initMutationSelectionCategories(std::vector<std::string> file
 
 		//open the file, make sure it opens
 		currentFile.open(files[i].c_str());
-		if (currentFile.fail()) {
+		if (currentFile.fail())
 			my_printError("Error opening file % in the file vector.\n", i);
-		}
-		else {
+		else
+		{
 			currentFile >> tmpString; //trash the first line, no info given.
 
 			//expecting CTG,3.239 as the current format
@@ -473,7 +472,6 @@ double RFPParameter::getCurrentCodonSpecificProposalWidth(unsigned index)
 }
 
 
-
 /* proposeCodonSpecificParameter (NOT EXPOSED)
  * Arguments: None
  * Proposes a new alpha and lambda prime value for every category and codon.
@@ -511,15 +509,18 @@ void RFPParameter::updateCodonSpecificParameter(std::string grouping)
 	unsigned i = SequenceSummary::codonToIndex(grouping);
 	numAcceptForCodonSpecificParameters[i]++;
 
-	for(unsigned k = 0u; k < numMutationCategories; k++)
+	for (unsigned k = 0u; k < numMutationCategories; k++)
 	{
 		currentCodonSpecificParameter[alp][k][i] = proposedCodonSpecificParameter[alp][k][i];
 	}
-	for(unsigned k = 0u; k < numSelectionCategories; k++)
+	for (unsigned k = 0u; k < numSelectionCategories; k++)
 	{
 		currentCodonSpecificParameter[lmPri][k][i] = proposedCodonSpecificParameter[lmPri][k][i];
 	}
 }
+
+
+
 
 
 // ----------------------------------------------//
@@ -531,7 +532,8 @@ void RFPParameter::updateCodonSpecificParameter(std::string grouping)
  * Arguments: adaptionWidth, last iteration (NOT USED), adapt (bool)
  * Calculates the acceptance level for each codon in the group list and updates the ratio trace. If adapt is turned on,
  * meaning true, then if the acceptance level is in a certain range we change the width.
-*/
+ * NOTE: This function extends Parameter's adaptCodonSpecificParameterProposalWidth function!
+ */
 void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastIteration, bool adapt)
 {
 	my_print("acceptance rate for codon:\n");
@@ -542,19 +544,20 @@ void RFPParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationW
 		unsigned codonIndex = SequenceSummary::codonToIndex(groupList[i]);
 		double acceptanceLevel = (double)numAcceptForCodonSpecificParameters[codonIndex] / (double)adaptationWidth;
 		traces.updateCodonSpecificAcceptanceRatioTrace(codonIndex, acceptanceLevel);
-		if (adapt) {
+		if (adapt)
+		{
 			my_print("% with std csp = %\n", acceptanceLevel, std_csp[i]);
-			if (acceptanceLevel < 0.2) {
+			if (acceptanceLevel < 0.2)
 				std_csp[i] *= 0.8;
-			}
-			if (acceptanceLevel > 0.3) {
+			if (acceptanceLevel > 0.3)
 				std_csp[i] *= 1.2;
-			}
 		}
 		numAcceptForCodonSpecificParameters[codonIndex] = 0u;
 	}
 	my_print("\n");
 }
+
+
 
 
 
@@ -576,7 +579,6 @@ double RFPParameter::getParameterForCategory(unsigned category, unsigned paramTy
 
 	return rv;
 }
-
 
 
 
@@ -776,19 +778,4 @@ double RFPParameter::getParameterForCategoryR(unsigned mixtureElement, unsigned 
 }
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

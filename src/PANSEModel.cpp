@@ -23,9 +23,6 @@ PANSEModel::~PANSEModel()
 }
 
 
-
-
-
 double PANSEModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
 													   unsigned currRFPObserved, unsigned currNumCodonsInMRNA, double phiValue)
 {
@@ -153,7 +150,7 @@ void PANSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 	std::vector<double> currentMphi(selectionCategory, 0.0);
 	std::vector<double> proposedStdDevSynthesisRate(selectionCategory, 0.0);
 	std::vector<double> proposedMphi(selectionCategory, 0.0);
-	for(unsigned i = 0u; i < selectionCategory; i++)
+	for (unsigned i = 0u; i < selectionCategory; i++)
 	{
 		currentStdDevSynthesisRate[i] = getStdDevSynthesisRate(i, false);
 		currentMphi[i] = -((currentStdDevSynthesisRate[i] * currentStdDevSynthesisRate[i]) / 2);
@@ -167,8 +164,6 @@ void PANSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 	}
 
 
-
-
 	logProbabilityRatio.resize(1);
 #ifndef __APPLE__
 #pragma omp parallel for reduction(+:lpr)
@@ -178,9 +173,10 @@ void PANSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 		unsigned mixture = getMixtureAssignment(i);
 		mixture = getSynthesisRateCategory(mixture);
 		double phi = getSynthesisRate(i, mixture, false);
-		if (i == 0) {
-	//	my_print("proposed: %\n", Parameter::densityLogNorm(phi, proposedMPhi[mixture], proposedStdDevSynthesisRate[mixture], false));
-		//my_print("current: %\n", Parameter::densityLogNorm(phi, currentMPhi, currentStdDevSynthesisRate, false));
+		if (i == 0)
+		{
+			//my_print("proposed: %\n", Parameter::densityLogNorm(phi, proposedMPhi[mixture], proposedStdDevSynthesisRate[mixture], false));
+			//my_print("current: %\n", Parameter::densityLogNorm(phi, currentMPhi, currentStdDevSynthesisRate, false));
 		}
 		lpr += Parameter::densityLogNorm(phi, proposedMphi[mixture], proposedStdDevSynthesisRate[mixture], true) -
 				Parameter::densityLogNorm(phi, currentMphi[mixture], currentStdDevSynthesisRate[mixture], true);
@@ -209,7 +205,6 @@ void PANSEModel::writeRestartFile(std::string filename)
 {
 	return parameter->writeEntireRestartFile(filename);
 }
-
 
 
 
@@ -518,7 +513,8 @@ void PANSEModel::updateAllHyperParameter()
 void PANSEModel::updateHyperParameter(unsigned hp)
 {
 	// NOTE: when adding additional hyper parameter, also add to updateAllHyperParameter()
-	switch (hp) {
+	switch (hp)
+	{
 		case 0:
 			updateStdDevSynthesisRate();
 			break;
@@ -590,11 +586,4 @@ double PANSEModel::getParameterForCategory(unsigned category, unsigned param, st
 {
 	return parameter->getParameterForCategory(category, param, codon, proposal);
 }
-
-
-
-
-
-
-
 

@@ -135,10 +135,10 @@ void FONSEParameter::initFONSEValuesFromFile(std::string filename)
 	std::vector <double> mat;
 	covarianceMatrix.resize(maxGrouping);
 	input.open(filename.c_str());
-	if (input.fail()) {
+	if (input.fail())
 		my_printError("ERROR: Could not open RestartFile.txt to initialize FONSE values\n");
-	}
-	else {
+	else
+	{
 		std::string tmp, variableName;
 		unsigned cat = 0;
 		while (getline(input, tmp))
@@ -276,11 +276,10 @@ void FONSEParameter::writeFONSERestartFile(std::string filename)
 {
     std::ofstream out;
     out.open(filename.c_str(), std::ofstream::app);
-    if (out.fail()){
+    if (out.fail())
         my_printError("ERROR: Could not open RestartFile.txt to append\n");
-	}
-	else {
-
+	else
+	{
 		std::ostringstream oss;
 		unsigned j;
 		oss << ">mutation_prior_sd:\n" << mutation_prior_sd << "\n";
@@ -365,11 +364,10 @@ void FONSEParameter::initMutationCategories(std::vector<std::string> files, unsi
         //Open the file for the category
         std::ifstream currentFile;
         currentFile.open(files[category].c_str());
-        if (currentFile.fail()){
+        if (currentFile.fail())
             my_printError("Error opening file % to initialize mutation values.\n", category);
-		}
-		else {
-
+		else
+		{
 			std::string tmp;
 			currentFile >> tmp; //The first line is a header (Amino Acid, Codon, Value, Std_deviation)
 
@@ -401,11 +399,10 @@ void FONSEParameter::initSelectionCategories(std::vector<std::string> files, uns
         //Open the file for the category
         std::ifstream currentFile;
         currentFile.open(files[category].c_str());
-        if (currentFile.fail()){
+        if (currentFile.fail())
             my_printError("Error opening file % to initialize mutation values.\n", category);
-		}
-		else {
-
+		else
+		{
 			std::string tmp;
 			currentFile >> tmp; //The first line is a header (Amino Acid, Codon, Value, Std_deviation)
 
@@ -577,7 +574,7 @@ void FONSEParameter::getParameterForCategory(unsigned category, unsigned paramTy
 
 void FONSEParameter::proposeHyperParameters()
 {
-    for(unsigned i = 0u; i < numSelectionCategories; i++)
+    for (unsigned i = 0u; i < numSelectionCategories; i++)
     {
 		stdDevSynthesisRate_proposed[i] = std::exp(randNorm(std::log(stdDevSynthesisRate[i]), std_stdDevSynthesisRate));
     }

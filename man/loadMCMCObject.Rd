@@ -4,10 +4,10 @@
 \alias{loadMCMCObject}
 \title{Load MCMC Object}
 \usage{
-loadMCMCObject(file)
+loadMCMCObject(files)
 }
 \arguments{
-\item{file}{A filename that where the data will be stored.}
+\item{files}{The filenames where the data will be stored.}
 }
 \value{
 This function has no return value.

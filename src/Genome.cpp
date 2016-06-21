@@ -41,8 +41,8 @@ bool Genome::operator==(const Genome& other) const
 {
 	bool match = true;
 
-	if (!(this->genes == other.genes)) { match = false; } //Do a ! operation because only the gene comparison is implemented,
-	//not the != operator.
+ 	//Do a ! operation because only the gene comparison is implemented, not the != operator.
+	if (!(this->genes == other.genes)) { match = false; }
 	if (!(this->simulatedGenes == other.simulatedGenes)) { match = false; }
 	if (this->numGenesWithPhi != other.numGenesWithPhi) { match = false; }
 
@@ -84,7 +84,7 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 					 to one of the following cases:
 
 					 1. New sequence line, which starts with "> ".
-					 2. Sequence line, which starts with any charactor except for ">"
+					 2. Sequence line, which starts with any character except for ">"
 					 3. End of file, detected by function eof().
 				 */
 
@@ -99,11 +99,11 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 						// if it is the first chain, just build a new chain object
 						tmpGene.clear();
 						fastaFormat = true;
-					} else
+					}
+					else
 					{
 						// otherwise, need to store the old chain first, then build a new chain
 						tmpGene.setSequence(tempSeq);
-						//tmpGene.cleanSeq();
 						addGene(tmpGene);
 
 						tmpGene.clear();
@@ -117,18 +117,18 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 				if ( newLine == 2 && fastaFormat )
 				{ // sequence line
 					tempSeq.append(buf);
-					//tmpGene.seq.append(buf);
 				}
 
 				if ( newLine == 3 )
 				{ // end of file
-					if ( !fastaFormat ) throw std::string("Genome::readFasta throws: ") + std::string(filename) + std::string(" is not in Fasta format.");
+					if ( !fastaFormat )
+						throw std::string("Genome::readFasta throws: ") + std::string(filename)
+							  + std::string(" is not in Fasta format.");
 					else
 					{
 						// otherwise, need to store the old chain first, then to
 						// build a new chain
 						tmpGene.setSequence(tempSeq);
-						//tmpGene.cleanSeq();
 						addGene(tmpGene);
 						break;
 					}
@@ -246,21 +246,23 @@ void Genome::writeRFPFile(std::string filename, bool simulated)
 	Fout.open(filename.c_str());
 	if (Fout.fail())
 		my_printError("Error in Genome::writeRFPFile: Can not open output RFP file %\n", filename);
-
-	Fout << "ORF,RFP_Counts,Codon_Counts,Codon\n";
-	unsigned sized = simulated ? simulatedGenes.size() : genes.size();
-
-	for (unsigned geneIndex = 0; geneIndex < sized; geneIndex++)
+	else
 	{
-		Gene *currentGene = simulated ? &simulatedGenes[geneIndex] : &genes[geneIndex];
+		Fout << "ORF,RFP_Counts,Codon_Counts,Codon\n";
+		unsigned sized = simulated ? simulatedGenes.size() : genes.size();
 
-		for (unsigned codonIndex = 0; codonIndex < 64; codonIndex++)
+		for (unsigned geneIndex = 0; geneIndex < sized; geneIndex++)
 		{
-			std::string codon = SequenceSummary::codonArray[codonIndex];
+			Gene *currentGene = simulated ? &simulatedGenes[geneIndex] : &genes[geneIndex];
 
-			Fout << currentGene->getId() << ",";
-			Fout << currentGene->geneData.getRFPObserved(codonIndex) << ",";
-			Fout << "NA," << codon << "\n";
+			for (unsigned codonIndex = 0; codonIndex < 64; codonIndex++)
+			{
+				std::string codon = SequenceSummary::codonArray[codonIndex];
+
+				Fout << currentGene->getId() << ",";
+				Fout << currentGene->geneData.getRFPObserved(codonIndex) << ",";
+				Fout << "NA," << codon << "\n";
+			}
 		}
 	}
 	Fout.close();
@@ -295,16 +297,19 @@ void Genome::readPANSEFile(std::string filename, bool Append)
 			std::map<std::string, unsigned>::iterator git;
 
 			//First pass: For each gene name, count its size.
-			while (std::getline(Fin, tmp)) {
+			while (std::getline(Fin, tmp))
+			{
 				std::size_t pos = tmp.find(",");
 				std::string ID = tmp.substr(0, pos);
 
-				if (first) {
+				if (first)
+				{
 					prevID = ID;
 					first = false;
 					genes[ID] = 0;
 				}
-				if (ID != prevID) {
+				if (ID != prevID)
+				{
 					genes[prevID] *= 3; //multiply by three since codons
 					genes[ID] = 0; //initialize the new genes[ID]
 				}
@@ -321,17 +326,20 @@ void Genome::readPANSEFile(std::string filename, bool Append)
 			std::vector<unsigned> RFP_counts;
 
 			//Now for each line associated with a gene ID, set the string appropriately
-			while (std::getline(Fin, tmp)) {
+			while (std::getline(Fin, tmp))
+			{
 				std::size_t pos = tmp.find(",");
 				std::string ID = tmp.substr(0, pos);
 
-				if (first) {
+				if (first)
+				{
 					prevID = ID;
 					first = false;
 					git = genes.find(ID);
 					seq.resize(git->second);
 				}
-				if (ID != prevID) {
+				if (ID != prevID)
+				{
 					tmpGene.setId(prevID);
 					tmpGene.setDescription("No description for PANSE Model");
 					tmpGene.setSequence(seq);
@@ -477,7 +485,8 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
                             my_printError("Gene % has % ", geneID, it -> second -> observedSynthesisRateValues.size());
                             my_printError("while others have %. Exiting function.\n", numPhi);
 							exitfunction = true;
-							for (unsigned a = 0; a < getGenomeSize(); a++) {
+							for (unsigned a = 0; a < getGenomeSize(); a++)
+							{
 								genes[a].observedSynthesisRateValues.clear();
 							}
 							break;
@@ -617,16 +626,13 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 
 void Genome::addGene(const Gene& gene, bool simulated)
 {
-	if (!simulated)
-		genes.push_back(gene);
-	else
-		simulatedGenes.push_back(gene);
+	simulated ? simulatedGenes.push_back(gene) : genes.push_back(gene);
 }
 
 
 std::vector <Gene> Genome::getGenes(bool simulated)
 {
-	return  !simulated ? genes : simulatedGenes;
+	return !simulated ? genes : simulatedGenes;
 }
 
 
@@ -748,7 +754,8 @@ bool Genome::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound
 	return check;
 }
 
-Gene& Genome::getGeneByIndex(unsigned index, bool simulated) //NOTE: This function does the check and performs the function itself because of memory issues.
+//NOTE: This function does the check and performs the function itself because of memory issues.
+Gene& Genome::getGeneByIndex(unsigned index, bool simulated)
 {
 	if (simulated)
 	{
@@ -803,6 +810,7 @@ Genome Genome::getGenomeForGeneIndicesR(std::vector <unsigned> indices, bool sim
 
 
 
+
 //---------------------------------//
 //---------- RCPP Module ----------//
 //---------------------------------//
@@ -836,14 +844,16 @@ RCPP_MODULE(Genome_mod)
 		.method("checkIndex", &Genome::checkIndex) //TEST THAT ONLY!
 		.method("getGenomeSize", &Genome::getGenomeSize, "returns how many genes are in the genome")
 		.method("clear", &Genome::clear, "clears the genome")
-		.method("getCodonCountsPerGene", &Genome::getCodonCountsPerGene, "returns a vector of codon counts for a given gene")
+		.method("getCodonCountsPerGene", &Genome::getCodonCountsPerGene,
+			"returns a vector of codon counts for a given gene")
 
 
 
 		//R Section:
 		.method("getGeneByIndex", &Genome::getGeneByIndex, "returns a gene for a given index")
 		.method("getGeneById", &Genome::getGeneById) //TEST THAT ONLY!
-		.method("getGenomeForGeneIndices", &Genome::getGenomeForGeneIndicesR, "returns a new genome based on the ones requested in the given vector")
+		.method("getGenomeForGeneIndices", &Genome::getGenomeForGeneIndicesR,
+			"returns a new genome based on the ones requested in the given vector")
 		;
 }
 #endif

@@ -1,9 +1,11 @@
 #ifndef PARAMETER_H
 #define PARAMETER_H
 
+
 #include "../Genome.h"
 #include "../CovarianceMatrix.h"
 #include "Trace.h"
+
 
 #include <vector>
 #include <random>
@@ -17,16 +19,19 @@
 #include <Rcpp.h>
 #endif
 
+/* Note 1) -- on getSelectionCategory and getSynthesisRateCategory
+ * These two functions are technically the same for readability.
+ * Selection and Synthesis Rate are directly related even if they are not known
+ * and thus are represented by the same variable. By splitting this
+ * into Selection and Synthesis, avoids confusing the two, however.
+*/
+
 class Parameter {
 	private:
 
 		//STATICS - Sorting Functions:
 		void quickSortPair(double a[], int b[], int first, int last);
-		void quickSort(double a[], int first, int last);
 		static int pivotPair(double a[], int b[], int first, int last);
-		static int pivot(double a[], int first, int last);
-		static void swap(double& a, double& b);
-		static void swap(int& a, int& b);
 
 		unsigned adaptiveStepPrev;
 		unsigned adaptiveStepCurr;
@@ -50,7 +55,6 @@ class Parameter {
 #endif
 
 
-
 		//Constructors & Destructors:
 		Parameter();
 		Parameter(unsigned maxGrouping);
@@ -58,10 +62,10 @@ class Parameter {
 		virtual ~Parameter();
 
 
-		//Initialization and Restart Functions:
+		//Initialization and Restart Functions: TODO: test
 		void initParameterSet(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
 			std::vector<std::vector<unsigned>> mixtureDefinitionMatrix,
-			bool splitSer = true, std::string _mutationSelectionState = "allUnique"); //Partially tested; TODO caveats
+			bool splitSer = true, std::string _mutationSelectionState = "allUnique"); //Mostly tested; TODO caveats
 		void initBaseValuesFromFile(std::string filename);
 		void writeBasicRestartFile(std::string filename);
 		void initCategoryDefinitions(std::string mutationSelectionState,
@@ -72,59 +76,62 @@ class Parameter {
 		std::vector<double> readPhiValues(std::string filename); //General function, possibly move
 
 
-		//prior functions
+		//Prior functions: TODO: test
 		double getCodonSpecificPriorStdDev(unsigned paramType);
 
 
-		//Mixture Definition Matrix and Category Functions:
+		//Mixture Definition Matrix and Category Functions: Mostly tested, see comments
 		void setNumMutationSelectionValues(std::string mutationSelectionState,
-			std::vector<std::vector<unsigned>> mixtureDefinitionMatrix);
-		void printMixtureDefinitionMatrix();
+			std::vector<std::vector<unsigned>> mixtureDefinitionMatrix); //TODO: test
+		void printMixtureDefinitionMatrix(); //Untested
 		double getCategoryProbability(unsigned mixtureElement);
 		void setCategoryProbability(unsigned mixtureElement, double value);
-		unsigned getNumMutationCategories(); //Tested; TODO caveat
-		unsigned getNumSelectionCategories(); //Tested; TODO caveat
-		unsigned getNumSynthesisRateCategories();
+		unsigned getNumMutationCategories(); //TODO caveat
+		unsigned getNumSelectionCategories(); //TODO caveat
+		unsigned getNumSynthesisRateCategories(); //TODO caveat
 		unsigned getMutationCategory(unsigned mixtureElement);
-		unsigned getSelectionCategory(unsigned mixtureElement); //TODO: Add comments explaining reasoning here for same function
-		unsigned getSynthesisRateCategory(unsigned mixtureElement);
-		std::vector<unsigned> getMixtureElementsOfMutationCategory(unsigned category); //Tested; TODO caveat
-		std::vector<unsigned> getMixtureElementsOfSelectionCategory(unsigned category); //Tested; TODO caveat
-		std::string getMutationSelectionState(); //Tested
+		unsigned getSelectionCategory(unsigned mixtureElement); //see Note 1) at top of file.
+		unsigned getSynthesisRateCategory(unsigned mixtureElement); //see Note 1) at top of file.
+		std::vector<unsigned> getMixtureElementsOfMutationCategory(unsigned category); //TODO caveat
+		std::vector<unsigned> getMixtureElementsOfSelectionCategory(unsigned category); //TODO caveat
+		std::string getMutationSelectionState();
+		unsigned getNumAcceptForCspForIndex(unsigned i); //Only for unit testing.
 
 
-		//Group List Functions:
+		//Group List Functions: All tested
 		void setGroupList(std::vector<std::string> gl);
 		std::string getGrouping(unsigned index);
 		std::vector<std::string> getGroupList();
 		unsigned getGroupListSize();
 
 
-		//stdDevSynthesisRate Functions:
-		double getStdDevSynthesisRate(unsigned selectionCategory, bool proposed = false); //Tested
-		virtual void proposeStdDevSynthesisRate();
-		void setStdDevSynthesisRate(double stdDevSynthesisRate, unsigned selectionCategory); //Tested
-		double getCurrentStdDevSynthesisRateProposalWidth(); //Tested
-		unsigned getNumAcceptForStdDevSynthesisRate(); //Tested; only for unit testing.
-		void updateStdDevSynthesisRate();
+		//stdDevSynthesisRate Functions: Mostly tested, see comments.
+		double getStdDevSynthesisRate(unsigned selectionCategory, bool proposed = false);
+		virtual void proposeStdDevSynthesisRate(); //TODO: test
+		void setStdDevSynthesisRate(double stdDevSynthesisRate, unsigned selectionCategory);
+		double getCurrentStdDevSynthesisRateProposalWidth();
+		unsigned getNumAcceptForStdDevSynthesisRate(); //Only for unit testing.
+		void updateStdDevSynthesisRate(); //TODO: test
+		double getStdCspForIndex(unsigned i); //Only for unit testing.
 
 
-		//Synthesis Rate Functions:
+		//Synthesis Rate Functions: Mostly tested, see comments
 		double getSynthesisRate(unsigned geneIndex, unsigned mixtureElement, bool proposed = false);
 		double getCurrentSynthesisRateProposalWidth(unsigned expressionCategory, unsigned geneIndex);
 		double getSynthesisRateProposalWidth(unsigned geneIndex, unsigned mixtureElement);
-		void proposeSynthesisRateLevels();
+		void proposeSynthesisRateLevels(); //TODO: test
 		void setSynthesisRate(double phi, unsigned geneIndex, unsigned mixtureElement);
-		void updateSynthesisRate(unsigned geneIndex);
-		void updateSynthesisRate(unsigned geneIndex, unsigned mixtureElement);
+		void updateSynthesisRate(unsigned geneIndex); //TODO: test
+		void updateSynthesisRate(unsigned geneIndex, unsigned mixtureElement); //TODO: test
+		unsigned getNumAcceptForSynthesisRate(unsigned expressionCategory, unsigned geneIndex); //Only for unit testing
 
 
-		//Iteration Functions:
+		//Iteration Functions: All tested
 		unsigned getLastIteration();
 		void setLastIteration(unsigned iteration);
 
 
-		//Trace Functions:
+		//Trace Functions: TODO: test
 		Trace& getTraceObject();
 		void setTraceObject(Trace _trace);
 		void updateStdDevSynthesisRateTrace(unsigned sample);
@@ -133,13 +140,13 @@ class Parameter {
 		void updateMixtureProbabilitiesTrace(unsigned samples);
 
 
-		//Adaptive Width Functions:
+		//Adaptive Width Functions: TODO: test
 		void adaptStdDevSynthesisRateProposalWidth(unsigned adaptationWidth, bool adapt);
 		void adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool adapt);
 		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastIteration, bool adapt);
 
 
-		//Posterior, Variance, and Estimates Functions:
+		//Posterior, Variance, and Estimates Functions: TODO: test
 		double getStdDevSynthesisRatePosteriorMean(unsigned samples, unsigned mixture);
 		double getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement);
 
@@ -156,17 +163,17 @@ class Parameter {
 		std::vector<double> getEstimatedMixtureAssignmentProbabilities(unsigned samples, unsigned geneIndex);
 
 
-		//Other Functions:
-		unsigned getNumParam(); //Tested; TODO caveat
-		unsigned getNumMixtureElements(); //Tested //TODO style question: Why call it getNumMixtureElements instead of simply getNumMixtures? Alternatively, change name of variable.
+		//Other Functions: Mostly tested, see comments
+		unsigned getNumParam();
+		unsigned getNumMixtureElements();
 		unsigned getNumObservedPhiSets();
-		void setMixtureAssignment(unsigned gene, unsigned value); //Tested
-		unsigned getMixtureAssignment(unsigned gene); //Tested
+		void setMixtureAssignment(unsigned gene, unsigned value);
+		unsigned getMixtureAssignment(unsigned gene);
 		virtual void setNumObservedPhiSets(unsigned _phiGroupings);
-		virtual std::vector <std::vector <double> > calculateSelectionCoefficients(unsigned sample, unsigned mixture);
+		virtual std::vector <std::vector <double> > calculateSelectionCoefficients(unsigned sample, unsigned mixture); //TODO: test
 
 
-		//Static Functions:
+		//Static Functions: TODO: test
 		static double calculateSCUO(Gene& gene, unsigned maxAA);
 		static void drawIidRandomVector(unsigned draws, double mean, double sd, double (*proposal)(double a, double b),
 			double* randomNumbers);
@@ -268,7 +275,6 @@ class Parameter {
 		double std_stdDevSynthesisRate;
 		unsigned numAcceptForStdDevSynthesisRate;
 		std::vector<double> std_csp;
-
 
 
 		std::vector<std::vector<double>> proposedSynthesisRateLevel;
