@@ -19,7 +19,7 @@ int main()
 
 
 	std::cout << "initialize Genome object--------------------------" << std::endl;
-	bool withPhi = true;
+	bool withPhi = false;
 
 	Genome genome;
 	//genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/data/twoMixtures/simulatedAllUniqueR_unevenMixtures.fasta");

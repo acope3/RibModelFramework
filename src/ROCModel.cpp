@@ -713,7 +713,7 @@ void ROCModel::printHyperParameters()
 		my_print("\t current noiseOffset estimates:");
 
 		for (unsigned i = 0; i < getNumPhiGroupings(); i++)
-			my_print(" f", getNoiseOffset(i, false));
+			my_print(" %", getNoiseOffset(i, false));
 
 		my_print("\n\t current noiseOffset proposal widths:");
 
