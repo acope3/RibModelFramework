@@ -76,18 +76,8 @@ Parameter& Parameter::operator=(const Parameter& rhs)
 	if (this == &rhs) return *this; // handle self assignment
 	numParam = rhs.numParam;
 
-// TODO(Cedric, June-21-2016): understand why simple copy doe not work!
-	//stdDevSynthesisRate = rhs.stdDevSynthesisRate;
-	//stdDevSynthesisRate_proposed = rhs.stdDevSynthesisRate_proposed;
-    /*
-    stdDevSynthesisRate.resize(rhs.stdDevSynthesisRate.size());
- 	stdDevSynthesisRate_proposed.resize(rhs.stdDevSynthesisRate.size());
- 	for (unsigned i = 0u; i < rhs.stdDevSynthesisRate.size(); i++)		
- 	{		
-     	stdDevSynthesisRate[i] = rhs.stdDevSynthesisRate[i];		
- 		stdDevSynthesisRate_proposed[i] = rhs.stdDevSynthesisRate_proposed[i];		
-    }
-*/
+	stdDevSynthesisRate = rhs.stdDevSynthesisRate;
+	stdDevSynthesisRate_proposed = rhs.stdDevSynthesisRate_proposed;
 
 	numAcceptForStdDevSynthesisRate = rhs.numAcceptForStdDevSynthesisRate;
 	obsPhiSets = rhs.obsPhiSets;
