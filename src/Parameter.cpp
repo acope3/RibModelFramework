@@ -146,7 +146,8 @@ void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsig
 		//TODO:need to check index are correct, consecutive, and don't exceed numMixtures
 		//possibly just use a set?
 #ifndef STANDALONE
-		mixtureAssignment[i + 1] = geneAssignment[i];
+        mixtureAssignment[i] = geneAssignment[i] - 1;
+		//mixtureAssignment[i + 1] = geneAssignment[i];
 #else
 		mixtureAssignment[i] = geneAssignment[i];
 #endif
