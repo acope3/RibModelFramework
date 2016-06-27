@@ -1948,7 +1948,7 @@ int testParameter()
     {
         // Note: This section of code is because vectors in R are 1-indexed (i.e. for getMixtureAssignment)
 #ifndef STANDALONE
-        if (parameter.getMixtureAssignment(i + 1) != geneAssignment[i])
+        if (parameter.getMixtureAssignment(i) != geneAssignment[i] - 1)
         {
             my_printError("Error in initParameterSet or getMixtureAssignment for index %.", i);
             my_printError(" Value should be %, but is instead %.\n", geneAssignment[i], parameter.getMixtureAssignment(i + 1));
