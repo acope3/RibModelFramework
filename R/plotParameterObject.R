@@ -20,11 +20,11 @@
 #' 
 plot.Rcpp_ROCParameter <- function(x, what = "Mutation", samples = 100, ...)
 {
-  plotParameterObject(x, what = what, samples = 100, ...)
+  plotParameterObject(x, what = what, samples, ...)
 }
 plot.Rcpp_FONSEParameter <- function(x, what = "Mutation", samples = 100, ...)
 {
-  plotParameterObject(x, what = what, samples = 100, ...)
+  plotParameterObject(x, what = what, samples, ...)
 }
 
 plotParameterObject <- function(x, what = "Mutation", samples = 100, ...){
@@ -35,14 +35,14 @@ plotParameterObject <- function(x, what = "Mutation", samples = 100, ...){
   names.aa <- aminoAcids()
   paramType <- ifelse(what == "Mutation", 0, 1)
   cat("ParamType: ", paramType, "\n")
-  for(mixture in 1:numMixtures){
+  for (mixture in 1:numMixtures) {
     param.storage <- vector("numeric", 0)
     param.name.storage <- vector("numeric", 0)
     # get codon specific parameter
-    for(aa in names.aa){
-      if(aa == "M" || aa == "W" || aa == "X") next
+    for (aa in names.aa) {
+      if (aa == "M" || aa == "W" || aa == "X") next
       codons <- AAToCodon(aa, T)
-      for(i in 1:length(codons)){
+      for (i in 1:length(codons)) {
         param.storage <- c(param.storage, x$getCodonSpecificPosteriorMean(mixture, samples, codons[i], paramType, TRUE))
       }
     }
