@@ -54,7 +54,7 @@ plot.Rcpp_ROCModel <- function(x, genome, parameter, samples = 100, mixture = 1,
     
   }
   expressionValues <- log10(expressionValues)
-  genome <- genome$getGenomeForGeneIndicies(genes.in.mixture, simulated)
+  genome <- genome$getGenomeForGeneIndices(genes.in.mixture, simulated)
   
   names.aa <- aminoAcids()
   for(aa in names.aa)
@@ -155,7 +155,7 @@ plot.Rcpp_FONSEModel <- function(x, genome, parameter, samples = 100, mixture = 
     
   }
   expressionValues <- log10(expressionValues)
-  genome <- genome$getGenomeForGeneIndicies(genes.in.mixture, simulated)
+  genome <- genome$getGenomeForGeneIndices(genes.in.mixture, simulated)
   
   names.aa <- aminoAcids()
   for(aa in names.aa)
@@ -209,7 +209,7 @@ plotSinglePanel <- function(parameter, model, genome, expressionValues, samples,
   # get codon specific parameter
   selection <- vector("numeric", length(codons))
   mutation <- vector("numeric", length(codons))
-  for(i in 1:length(codons))
+  for (i in 1:length(codons))
   {
     selection[i] <- parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 1)
     mutation[i] <- parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 0)
