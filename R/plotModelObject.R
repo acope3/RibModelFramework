@@ -211,8 +211,8 @@ plotSinglePanel <- function(parameter, model, genome, expressionValues, samples,
   mutation <- vector("numeric", length(codons))
   for (i in 1:length(codons))
   {
-    selection[i] <- parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 1)
-    mutation[i] <- parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 0)
+    selection[i] <- parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 1, T)
+    mutation[i] <- parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 0, T)
   }
   
   # calculate codon probabilities with respect to phi
