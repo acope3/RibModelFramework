@@ -199,8 +199,8 @@ void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 
 	}
 
-	likelihood_proposed = likelihood_proposed + calculateMutationPrior(grouping, true);
-	likelihood = likelihood + calculateMutationPrior(grouping, false);
+	//likelihood_proposed = likelihood_proposed + calculateMutationPrior(grouping, true);
+	//likelihood = likelihood + calculateMutationPrior(grouping, false);
 
 	logAcceptanceRatioForAllMixtures = likelihood_proposed - likelihood;
 }
