@@ -1490,12 +1490,14 @@ std::vector<double> Parameter::getCodonSpecificQuantile(unsigned mixtureElement,
 	if (samples > traceLength)
 	{
 		my_printError("Warning in Parameter::getCodonSpecificQuantile throws: Number of anticipated samples ");
-		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n", samples, traceLength);
+		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n",
+					  samples, traceLength);
 
 		samples = traceLength;
 	}
     
-    std::vector<double> samplesTrace(parameterTrace.begin() + (lastIteration - samples) + 1, (parameterTrace.begin() + lastIteration + 1));
+    std::vector<double> samplesTrace(parameterTrace.begin() + (lastIteration - samples) + 1, (parameterTrace.begin()
+																							  + lastIteration + 1));
     std::sort(samplesTrace.begin(), samplesTrace.end());
     std::vector<double> retVec(probs.size());
     for (int i = 0; i < probs.size(); i++)

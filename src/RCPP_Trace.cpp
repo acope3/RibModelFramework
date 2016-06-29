@@ -20,7 +20,8 @@ RCPP_MODULE(Trace_mod)
     .method("getSynthesisOffsetAcceptanceRatioTrace", &Trace::getSynthesisOffsetAcceptanceRatioTrace)
     .method("getSynthesisOffsetAcceptanceRatioTraceForIndex", &Trace::getSynthesisOffsetAcceptanceRatioTraceForIndex)
     .method("getCodonSpecificParameterTrace", &Trace::getCodonSpecificParameterTraceByParamType)
-    .method("getSynthesisRateAcceptanceRatioTraceByMixtureElementForGene", &Trace::getSynthesisRateAcceptanceRatioTraceByMixtureElementForGeneR)
+    .method("getSynthesisRateAcceptanceRatioTraceByMixtureElementForGene",
+            &Trace::getSynthesisRateAcceptanceRatioTraceByMixtureElementForGeneR)
     .method("getSynthesisRateTraceForGene", &Trace::getSynthesisRateTraceForGeneR)
     .method("getSynthesisRateTraceByMixtureElementForGene", &Trace::getSynthesisRateTraceByMixtureElementForGeneR)
     .method("getMixtureAssignmentTraceForGene", &Trace::getMixtureAssignmentTraceForGeneR)
@@ -40,7 +41,8 @@ RCPP_MODULE(Trace_mod)
 
 
     //ROC Specific:
-    .method("getCodonSpecificParameterTraceByMixtureElementForCodon", &Trace::getCodonSpecificParameterTraceByMixtureElementForCodonR)
+    .method("getCodonSpecificParameterTraceByMixtureElementForCodon",
+            &Trace::getCodonSpecificParameterTraceByMixtureElementForCodonR)
     .method("getSynthesisOffsetTrace", &Trace::getSynthesisOffsetTraceR)
     .method("getObservedSynthesisNoiseTrace", &Trace::getObservedSynthesisNoiseTraceR)
     .method("setSynthesisOffsetTrace", &Trace::setSynthesisOffsetTrace)
