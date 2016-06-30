@@ -1738,7 +1738,7 @@ double Parameter::randGamma(double shape, double rate)
 
 
 // TODO: CHANGE THIS BACK TO DOUBLE*
-void Parameter::randDirichlet(double *input, unsigned numElements, double *output)
+void Parameter::randDirichlet(std::vector <double> input, unsigned numElements, std::vector <double> output)
 {
 	// draw y_i from Gamma(a_i, 1)
 	// normalize y_i such that x_i = y_i / sum(y_i)
