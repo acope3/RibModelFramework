@@ -266,6 +266,12 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		delete[] unscaledLogPost_prop;
 		delete[] unscaledLogPost_curr;
 		***************************************************/
+		probabilities.clear();
+		unscaledLogProb_curr.clear();
+		unscaledLogProb_prop.clear();
+		unscaledLogProb_curr_singleMixture.clear();
+		unscaledLogPost_curr.clear();
+		unscaledLogPost_prop.clear();
 	}
 
 	// take all priors into account
@@ -283,6 +289,8 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	}
 	//delete[] dirichletParameters;
 	//delete[] newMixtureProbabilities;
+	dirichletParameters.clear();
+	newMixtureProbabilities.clear();
 	return logLikelihood;
 }
 
