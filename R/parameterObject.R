@@ -488,12 +488,12 @@ initializeCovarianceMatricies <- function(parameter, genome, numMixtures, geneAs
 
 getMixtureAssignmentEstimate <- function(parameter, gene.index, samples)
 {
-  mixtureAssignment <- unlist(lapply(gene.index,  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))
+  mixtureAssignment <- unlist(lapply(1:gene.index,  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))
   return(mixtureAssignment)
 }
 getExpressionEstimatesForMixture <- function(parameter, gene.index, mixtureAssignment, samples)
 {
-  expressionValues <- unlist(lapply(gene.index, function(geneIndex){ 
+  expressionValues <- unlist(lapply(1:gene.index, function(geneIndex){ 
     expressionCategory <- parameter$getSynthesisRateCategoryForMixture(mixtureAssignment[geneIndex]) 
     parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(samples, geneIndex, expressionCategory) 
   }))

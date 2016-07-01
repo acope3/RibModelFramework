@@ -175,7 +175,7 @@ plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sep
     {
       lines(sphi[-1,i], col = .mixtureColors[i])
     }
-    legend("topleft", legend = paste("Mixture Element", 1:numMixtures), 
+    legend("topleft", legend = paste0("Mixture Element", 1:numMixtures), 
            col = .mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")
   }
   if (what[1] == "Mphi")
@@ -191,7 +191,7 @@ plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sep
     {
       lines(mphi[-1,i], col= .mixtureColors[i])
     }
-    legend("topleft", legend = paste("Mixture Element", 1:numMixtures), 
+    legend("topleft", legend = paste0("Mixture Element", 1:numMixtures), 
            col = .mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")    
 
   }
@@ -206,7 +206,7 @@ plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sep
     {
       lines(aphi[-1,i], col = .mixtureColors[i])
     }
-    legend("topleft", legend = paste("Observed Data", 1:numMixtures), 
+    legend("topleft", legend = paste0("Observed Data", 1:numMixtures), 
            col = .mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")        
   }
   if (what[1] == "Sepsilon")
@@ -220,7 +220,7 @@ plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sep
     {
       lines(sepsilon[-1,i], col = .mixtureColors[i])
     }
-    legend("topleft", legend = paste("Observed Data", 1:numMixtures), 
+    legend("topleft", legend = paste0("Observed Data", 1:numMixtures), 
            col = .mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")  
   }
   #par(opar)
@@ -237,6 +237,6 @@ plotMixtureProbability <- function(trace)
   {
     lines(trace$getMixtureProbabilitiesTraceForMixture(i)[-1], col = .mixtureColors[i])    
   }
-  legend("topleft", legend = paste("Mixture Element", 1:numMixtures), 
+  legend("topleft", legend = paste0("Mixture Element", 1:numMixtures), 
          col = .mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")
 }

@@ -969,7 +969,8 @@ void Parameter::proposeSynthesisRateLevels()
 		for (unsigned i = 0u; i < numSynthesisRateLevels; i++)
 		{
 			// avoid adjusting probabilities for asymmetry of distribution
-			proposedSynthesisRateLevel[category][i] = std::exp( randNorm( std::log(currentSynthesisRateLevel[category][i]) , std_phi[category][i]) );
+			proposedSynthesisRateLevel[category][i] = std::exp( randNorm( std::log(currentSynthesisRateLevel[category][i]),
+																		  std_phi[category][i]) );
 		}
 	}
 }
@@ -1259,12 +1260,14 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 				else
 				{
 					//CovarianceMatrix covcurr(covarianceMatrix[aaIndex].getNumVariates());
-					//covcurr.calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
+					//covcurr.calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples,
+					// adaptiveStepCurr);
 					//CovarianceMatrix covprev = covarianceMatrix[aaIndex];
 					//covprev = (covprev*0.4);
 					//covcurr = (covcurr*0.6);
 					//covarianceMatrix[aaIndex] = covprev + covcurr;
-					covarianceMatrix[aaIndex].calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
+					covarianceMatrix[aaIndex].calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa,
+																		samples, adaptiveStepCurr);
 				}
 				
 
@@ -1274,7 +1277,8 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 			}
 			if (acceptanceLevel > 0.3)
 			{
-				//covarianceMatrix[aaIndex].calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
+				//covarianceMatrix[aaIndex].calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa,
+				// samples, adaptiveStepCurr);
 				for (unsigned k = aaStart; k < aaEnd; k++)
 				{
 					std_csp[k] *= 1.2;
@@ -1303,7 +1307,7 @@ double Parameter::getStdDevSynthesisRatePosteriorMean(unsigned samples, unsigned
 
 	if (samples > traceLength)
 	{
-		my_printError("Warning in ROCParameter::getstdDevSynthesisRatePosteriorMean throws: Number of anticipated samples");
+		my_printError("Warning in ROCParameter::getStdDevSynthesisRatePosteriorMean throws: Number of anticipated samples");
 		my_printError("(%) is greater than the length of the available trace (%).", samples, traceLength);
 		my_printError("Whole trace is used for posterior estimate!\n");
 
@@ -1328,7 +1332,8 @@ double Parameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned geneI
 	if (samples > lastIteration)
 	{
 		my_printError("Warning in ROCParameter::getSynthesisRatePosteriorMean throws: Number of anticipated samples");
-		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n", samples, traceLength);
+		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n",
+					  samples, traceLength);
 
 		samples = traceLength;
 	}
@@ -1363,7 +1368,8 @@ double Parameter::getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigne
 	if (samples > traceLength)
 	{
 		my_printError("Warning in ROCParameter::getCodonSpecificPosteriorMean throws: Number of anticipated samples ");
-		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n", samples, traceLength);
+		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n",
+					  samples, traceLength);
 
 		samples = traceLength;
 	}
@@ -1438,18 +1444,26 @@ double Parameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex,
 double Parameter::getCodonSpecificVariance(unsigned mixtureElement, unsigned samples, std::string &codon,
 	unsigned paramType, bool unbiased, bool withoutReference)
 {
+	if (unbiased && samples == 1)
+	{
+		my_printError("Warning in Parameter::getCodonSpecificVariance throws: sample size is too small ");
+		my_printError("to be considered unbiased (samples == 1). Setting as biased variance!\n");
+		unbiased = false;
+	}
+
 	std::vector<double> parameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
 		mixtureElement, codon, paramType, withoutReference);
 	unsigned traceLength = lastIteration + 1;
 	if (samples > traceLength)
 	{
 		my_printError("Warning in Parameter::getCodonSpecificVariance throws: Number of anticipated samples ");
-		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n", samples, traceLength);
+		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n",
+					  samples, traceLength);
 
 		samples = traceLength;
 	}
 
-	double posteriorMean = getCodonSpecificPosteriorMean(mixtureElement, samples, codon, paramType);
+	double posteriorMean = getCodonSpecificPosteriorMean(mixtureElement, samples, codon, paramType, withoutReference);
 
 	double posteriorVariance = 0.0;
 
@@ -1476,12 +1490,14 @@ std::vector<double> Parameter::getCodonSpecificQuantile(unsigned mixtureElement,
 	if (samples > traceLength)
 	{
 		my_printError("Warning in Parameter::getCodonSpecificQuantile throws: Number of anticipated samples ");
-		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n", samples, traceLength);
+		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n",
+					  samples, traceLength);
 
 		samples = traceLength;
 	}
     
-    std::vector<double> samplesTrace(parameterTrace.begin() + (lastIteration - samples) + 1, (parameterTrace.begin() + lastIteration + 1));
+    std::vector<double> samplesTrace(parameterTrace.begin() + (lastIteration - samples) + 1, (parameterTrace.begin()
+																							  + lastIteration + 1));
     std::sort(samplesTrace.begin(), samplesTrace.end());
     std::vector<double> retVec(probs.size());
     for (int i = 0; i < probs.size(); i++)
@@ -1806,41 +1822,6 @@ unsigned Parameter::randMultinom(double* probabilities, unsigned mixtureElements
 	return returnValue;
 }
 
-unsigned Parameter::randMultinom(std::vector <double> probabilities, unsigned mixtureElements)
-{
-	// calculate cumulative sum to determine group boundaries
-	double* cumsum = new double[mixtureElements]();
-	//std::vector<double> cumsum(groups);
-	cumsum[0] = probabilities[0];
-
-	for (unsigned i = 1u; i < mixtureElements; i++)
-	{
-		cumsum[i] = cumsum[i - 1u] + probabilities[i];
-	}
-	// draw random number from U(0,1)
-	double referenceValue;
-#ifndef STANDALONE
-	RNGScope scope;
-	NumericVector xx(1);
-	xx = runif(1, 0, 1);
-	referenceValue = xx[0];
-#else
-	std::uniform_real_distribution<double> distribution(0, 1);
-	referenceValue = distribution(generator);
-#endif
-	// check in which category the element falls
-	unsigned returnValue = 0u;
-	for (unsigned i = 0u; i < mixtureElements; i++)
-	{
-		if (referenceValue <= cumsum[i])
-		{
-			returnValue = i;
-			break;
-		}
-	}
-	delete[] cumsum;
-	return returnValue;
-}
 
 double Parameter::densityNorm(double x, double mean, double sd, bool log)
 {

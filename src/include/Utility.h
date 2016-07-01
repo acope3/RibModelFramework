@@ -9,6 +9,10 @@
 using namespace Rcpp;
 #endif
 
+/* All code is based on
+ * http://www.codeproject.com/articles/514443/debug-print-in-variadic-template-style
+*/
+
 /* my_print single (RCPP EXPOSED)
  * Arguments: one C-style string
  * This is the base-case for recursively printing a variable

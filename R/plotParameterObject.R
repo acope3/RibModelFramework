@@ -20,11 +20,11 @@
 #' 
 plot.Rcpp_ROCParameter <- function(x, what = "Mutation", samples = 100, ...)
 {
-  plotParameterObject(x, what = what, samples = 100, ...)
+  plotParameterObject(x, what = what, samples, ...)
 }
 plot.Rcpp_FONSEParameter <- function(x, what = "Mutation", samples = 100, ...)
 {
-  plotParameterObject(x, what = what, samples = 100, ...)
+  plotParameterObject(x, what = what, samples, ...)
 }
 
 plotParameterObject <- function(x, what = "Mutation", samples = 100, ...){
@@ -35,21 +35,21 @@ plotParameterObject <- function(x, what = "Mutation", samples = 100, ...){
   names.aa <- aminoAcids()
   paramType <- ifelse(what == "Mutation", 0, 1)
   cat("ParamType: ", paramType, "\n")
-  for(mixture in 1:numMixtures){
+  for (mixture in 1:numMixtures) {
     param.storage <- vector("numeric", 0)
     param.name.storage <- vector("numeric", 0)
     # get codon specific parameter
-    for(aa in names.aa){
-      if(aa == "M" || aa == "W" || aa == "X") next
+    for (aa in names.aa) {
+      if (aa == "M" || aa == "W" || aa == "X") next
       codons <- AAToCodon(aa, T)
-      for(i in 1:length(codons)){
+      for (i in 1:length(codons)) {
         param.storage <- c(param.storage, x$getCodonSpecificPosteriorMean(mixture, samples, codons[i], paramType, TRUE))
       }
     }
     csp.params[, mixture] <- param.storage
   }
   #rownames(csp.params) <- param.name.storage
-  colnames(csp.params) <- paste("Mixture\nElement", 1:numMixtures)
+  colnames(csp.params) <- paste0("Mixture\nElement", 1:numMixtures)
   pairs(csp.params, upper.panel = upper.panel.plot, lower.panel=NULL)
 }
 
@@ -93,19 +93,19 @@ upper.panel.plot <- function(x, y, sd.x=NULL, sd.y=NULL, ...){
   t <- (slope - 1)/std.error
   
   if(t > qt(1-(0.05/2), lm.line$df.residual - 1)){
-    eq <- paste("y = ", sprintf("%.3f", intercept), " + ", sprintf("%.3f", slope), "x *", sep = "")
+    eq <- paste0("y = ", sprintf("%.3f", intercept), " + ", sprintf("%.3f", slope), "x *")
     text(xlim[1] + width * 0.1, ylim[2] - height * 0.2, eq)
   }else{
-    eq <- paste("y = ", sprintf("%.3f", intercept), " + ", sprintf("%.3f", slope), "x", sep = "")
+    eq <- paste0("y = ", sprintf("%.3f", intercept), " + ", sprintf("%.3f", slope), "x")
     text(xlim[1] + width * 0.1, ylim[2] - height * 0.2, eq)
   } 
   if(b > 0){
     text(xlim[2] - width * 0.04, ylim[1] + height * 0.05,
-         parse(text = paste("rho == ", sprintf("%.4f", rho), sep = "")),
+         parse(text = paste0("rho == ", sprintf("%.4f", rho))),
          pos = 2, cex = 1.0, font = 2)
   }else{
     text(xlim[2] - width * 0.04, ylim[2] - height * 0.05,
-         parse(text = paste("rho == ", sprintf("%.4f", rho), sep = "")),
+         parse(text = paste0("rho == ", sprintf("%.4f", rho))),
          pos = 2, cex = 1.0, font = 2)
   }
 }
