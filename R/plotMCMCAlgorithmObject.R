@@ -27,16 +27,13 @@ plot.Rcpp_MCMCAlgorithm <- function(x, zoom.window = NULL, ...)
   # TODO (Cedric): get rid of that line once problem with first element beeing 0 is solved
   loglik.trace <- loglik.trace[-1]
   
-  if(!(is.null(zoom.window))) {
-    zoomStart <- zoom.window[1]
-    zoomEnd <- zoom.window[2]
-  }
-  else{
-    print("No window was given, zooming in at last tenth of trace")
+  if(zoom.window != NULL) {
+    zoomStart <- round(zoom.window[1] * trace.length)
+    zoomEnd <- round(zoom.window[2] * trace.length)
   }
   
   Hmisc::subplot(
     plot(zoomStart:zoomEnd, loglik.trace[zoomStart:zoomEnd], type="l", xlab=NA, ylab=NA, las=2, cex.axis=0.55), 
-    0.8*(round(0.9*trace.length)), (min(loglik.trace, na.rm = T)+max(loglik.trace, na.rm = T))/2, size=c(3,2))
+    0.8*zoomStart, (min(loglik.trace, na.rm = T)+max(loglik.trace, na.rm = T))/2, size=c(3,2))
 }
 
