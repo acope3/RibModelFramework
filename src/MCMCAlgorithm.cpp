@@ -94,9 +94,6 @@ MCMCAlgorithm::~MCMCAlgorithm()
 * whether or not a synthesis rate is accepted for that gene or not. Mixture assignment is also updated when
 * applicable.
 */
-
-//Alan June 30, 2016. Noticed multiple arrays of doubles that could be changed to vectors to increase efficiency.
-//Commented out the old code until I can run enough tests to be certain on the effect on run speed.
 double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, Model& model, int iteration)
 {
     //FILE * pFile;
@@ -143,23 +140,16 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		double maxValue = -1000000.0;
 		unsigned mixtureIndex = 0u;
 
-		//double* unscaledLogProb_curr = new double[numSynthesisRateCategories]();
-		//double* unscaledLogProb_prop = new double[numSynthesisRateCategories]();
-		std::vector <double> unscaledLogProb_curr(numSynthesisRateCategories, 0);
-		std::vector <double> unscaledLogProb_prop(numSynthesisRateCategories, 0);
+		double* unscaledLogProb_curr = new double[numSynthesisRateCategories]();
+		double* unscaledLogProb_prop = new double[numSynthesisRateCategories]();
 
-		//double* unscaledLogPost_curr = new double[numSynthesisRateCategories]();
-		//double* unscaledLogPost_prop = new double[numSynthesisRateCategories]();
-		std::vector <double> unscaledLogPost_curr(numSynthesisRateCategories, 0);
-		std::vector <double> unscaledLogPost_prop(numSynthesisRateCategories, 0);
+		double* unscaledLogPost_curr = new double[numSynthesisRateCategories]();
+		double* unscaledLogPost_prop = new double[numSynthesisRateCategories]();
 
 
-		//double* unscaledLogProb_curr_singleMixture = new double[numMixtures]();
-		//double* probabilities = new double[numMixtures]();
-		std::vector <double> unscaledLogProb_curr_singleMixture(numMixtures, 0);
-		std::vector <double> probabilities(numMixtures, 0);
+		double* unscaledLogProb_curr_singleMixture = new double[numMixtures]();
+		double* probabilities = new double[numMixtures]();
 
-		/****************************************************************
 		for (unsigned j = 0u; j < numMixtures; j++)
 		{
 			probabilities[j] = 0.0;
@@ -173,7 +163,6 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			unscaledLogPost_curr[j] = 0.0;
 			unscaledLogPost_prop[j] = 0.0;
 		}
-		*****************************************************************/
 
 		for (unsigned k = 0u; k < numSynthesisRateCategories; k++)
 		{
@@ -258,14 +247,12 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			model.updateSynthesisRateTrace(iteration/thining, i);
 			model.updateMixtureAssignmentTrace(iteration/thining, i);
 		}
-		/*************************************************
 		delete[] probabilities;
 		delete[] unscaledLogProb_curr_singleMixture;
 		delete[] unscaledLogProb_prop;
 		delete[] unscaledLogProb_curr;
 		delete[] unscaledLogPost_prop;
 		delete[] unscaledLogPost_curr;
-		***************************************************/
 	}
 
 	// take all priors into account
