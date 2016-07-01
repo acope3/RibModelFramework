@@ -1806,6 +1806,41 @@ unsigned Parameter::randMultinom(double* probabilities, unsigned mixtureElements
 	return returnValue;
 }
 
+unsigned Parameter::randMultinom(std::vector <double> probabilities, unsigned mixtureElements)
+{
+	// calculate cumulative sum to determine group boundaries
+	double* cumsum = new double[mixtureElements]();
+	//std::vector<double> cumsum(groups);
+	cumsum[0] = probabilities[0];
+
+	for (unsigned i = 1u; i < mixtureElements; i++)
+	{
+		cumsum[i] = cumsum[i - 1u] + probabilities[i];
+	}
+	// draw random number from U(0,1)
+	double referenceValue;
+#ifndef STANDALONE
+	RNGScope scope;
+	NumericVector xx(1);
+	xx = runif(1, 0, 1);
+	referenceValue = xx[0];
+#else
+	std::uniform_real_distribution<double> distribution(0, 1);
+	referenceValue = distribution(generator);
+#endif
+	// check in which category the element falls
+	unsigned returnValue = 0u;
+	for (unsigned i = 0u; i < mixtureElements; i++)
+	{
+		if (referenceValue <= cumsum[i])
+		{
+			returnValue = i;
+			break;
+		}
+	}
+	delete[] cumsum;
+	return returnValue;
+}
 
 double Parameter::densityNorm(double x, double mean, double sd, bool log)
 {
