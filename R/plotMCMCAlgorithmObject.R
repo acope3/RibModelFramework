@@ -20,7 +20,7 @@ plot.Rcpp_MCMCAlgorithm <- function(x, zoom.window = NULL, ...)
   zoomEnd <- trace.length
   logL <- mean(loglik.trace[zoomStart:trace.length])
   #TODO change main title
-  plot(loglik.trace, type="l", main=paste("logPP:", logL), xlab="Sample", ylab="log(Posterior Probability)")
+  plot(loglik.trace, type="l", main=paste0("logPP:", logL), xlab="Sample", ylab="log(Posterior Probability)")
   grid (NULL,NULL, lty = 6, col = "cornsilk2")
   loglik.trace[loglik.trace == -Inf] <- NA
   

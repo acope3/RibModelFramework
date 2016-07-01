@@ -49,7 +49,7 @@ plotParameterObject <- function(x, what = "Mutation", samples = 100, ...){
     csp.params[, mixture] <- param.storage
   }
   #rownames(csp.params) <- param.name.storage
-  colnames(csp.params) <- paste("Mixture\nElement", 1:numMixtures)
+  colnames(csp.params) <- paste0("Mixture\nElement", 1:numMixtures)
   pairs(csp.params, upper.panel = upper.panel.plot, lower.panel=NULL)
 }
 
@@ -93,19 +93,19 @@ upper.panel.plot <- function(x, y, sd.x=NULL, sd.y=NULL, ...){
   t <- (slope - 1)/std.error
   
   if(t > qt(1-(0.05/2), lm.line$df.residual - 1)){
-    eq <- paste("y = ", sprintf("%.3f", intercept), " + ", sprintf("%.3f", slope), "x *", sep = "")
+    eq <- paste0("y = ", sprintf("%.3f", intercept), " + ", sprintf("%.3f", slope), "x *")
     text(xlim[1] + width * 0.1, ylim[2] - height * 0.2, eq)
   }else{
-    eq <- paste("y = ", sprintf("%.3f", intercept), " + ", sprintf("%.3f", slope), "x", sep = "")
+    eq <- paste0("y = ", sprintf("%.3f", intercept), " + ", sprintf("%.3f", slope), "x")
     text(xlim[1] + width * 0.1, ylim[2] - height * 0.2, eq)
   } 
   if(b > 0){
     text(xlim[2] - width * 0.04, ylim[1] + height * 0.05,
-         parse(text = paste("rho == ", sprintf("%.4f", rho), sep = "")),
+         parse(text = paste0("rho == ", sprintf("%.4f", rho))),
          pos = 2, cex = 1.0, font = 2)
   }else{
     text(xlim[2] - width * 0.04, ylim[2] - height * 0.05,
-         parse(text = paste("rho == ", sprintf("%.4f", rho), sep = "")),
+         parse(text = paste0("rho == ", sprintf("%.4f", rho))),
          pos = 2, cex = 1.0, font = 2)
   }
 }

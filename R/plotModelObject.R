@@ -273,7 +273,7 @@ plotSinglePanel <- function(parameter, model, genome, expressionValues, samples,
   
   # add indicator to optimal codon
   optim.codon.index <- which(min(c(selection, 0)) == c(selection, 0))
-  codons[optim.codon.index] <- paste(codons[optim.codon.index], "*", sep="")
+  codons[optim.codon.index] <- paste0(codons[optim.codon.index], "*") 
   legend("topleft", legend = codons, col=colors, bty = "n", lty=1, cex=0.75)
   
   return(xlimit)
