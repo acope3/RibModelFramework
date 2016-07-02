@@ -1624,7 +1624,8 @@ int testGenome(std::string testFileDir)
     if (!error)
         my_print("Genome writeFasta --- Pass\n");
     else
-        error = 0; //Reset for next function. 
+        error = 0; //Reset for next function.
+
 
     //----------------------------------//
     //------ readRFPFile Function ------//

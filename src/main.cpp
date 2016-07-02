@@ -409,7 +409,7 @@ int main()
 {
 	unsigned index;
 	bool fromRestart = false;
-	std::string modelToRun = "ROC";
+	std::string modelToRun = "FONSE";
 	bool withPhi = false;
 
 	
@@ -428,7 +428,8 @@ int main()
 	if (modelToRun == "FONSE") {
 		std::cout << "initialize Genome object--------------------------" << std::endl;
 		Genome genome;
-		genome.readFasta("C:/Users/Jeremy/Documents/GitHub/RibModelDev/data/FONSE/nse2000.fasta");
+		std::cout << "Reading fasta file\n";
+		genome.readFasta("C:/Users/Alan/Documents/GitHub/RibModelDev/data/FONSE/nse2000.fasta");
 		std::cout << "Done!-------------------------------\n\n\n";
 
 
@@ -451,7 +452,7 @@ int main()
 		std::string mixDef = Parameter::allUnique;
 		if (fromRestart)
 		{
-			FONSEParameter tmp("C:/Users/Jeremy/Documents/GitHub/RibModelDev/DevRScripts/10restartfile.rst");
+			FONSEParameter tmp("C:/Users/Alan/Documents/GitHub/RibModelDev/DevRScripts/10restartfile.rst");
 			parameter = tmp;
 		}
 		else
@@ -471,7 +472,7 @@ int main()
 			//files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelDev/data/FONSE/Scereviciae.mut.csv");
 			//tmp.initMutationCategories(files, tmp.getNumMutationCategories());
 			//tmp.InitializeSynthesisRate(genome, sphi_init[0]);
-			std::vector<double> phiVals = parameter.readPhiValues("C:/Users/Jeremy/Documents/GitHub/RibModelDev/data/FONSE/nse2000.phi.csv");
+			std::vector<double> phiVals = parameter.readPhiValues("C:/Users/Alan/Documents/GitHub/RibModelDev/data/FONSE/nse2000.phi.csv");
 			tmp.InitializeSynthesisRate(phiVals);
 			parameter = tmp;
 		}
@@ -486,9 +487,9 @@ int main()
 		model.setParameter(parameter);
 
 
-		std::cout << "starting MCMC for ROC" << std::endl;
+		std::cout << "starting MCMC for FONSE" << std::endl;
 		mcmc.run(genome, model, 4, 0);
-		std::cout << std::endl << "Finished MCMC for ROC" << std::endl;
+		std::cout << std::endl << "Finished MCMC for FONSE" << std::endl;
 	}
 	else if (modelToRun == "RFP")
 	{

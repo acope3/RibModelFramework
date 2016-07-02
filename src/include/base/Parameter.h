@@ -182,7 +182,7 @@ class Parameter {
 		static double randLogNorm(double m, double s);
 		static double randExp(double r);
 		static double randGamma(double shape, double rate);
-		static void randDirichlet(std::vector <double> input, unsigned numElements, std::vector <double> output);
+		static void randDirichlet(double* input, unsigned numElements, double* output);
 		static double randUnif(double minVal, double maxVal);
 		static unsigned randMultinom(double* probabilities, unsigned mixtureElements);
 		static double densityNorm(double x, double mean, double sd, bool log = false);

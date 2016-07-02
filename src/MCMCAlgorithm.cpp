@@ -106,17 +106,17 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 
 	unsigned numSynthesisRateCategories = model.getNumSynthesisRateCategories();
 	unsigned numMixtures = model.getNumMixtureElements();
-	std::vector <double> dirichletParameters(numMixtures, 0);
-	//double* dirichletParameters = new double[numMixtures]();
+	//std::vector <double> dirichletParameters(numMixtures, 0);
+	double* dirichletParameters = new double[numMixtures]();
 	//TODO: why is this not just a vector?
 
 
-	/*
+	
 	for (unsigned i = 0u; i < numMixtures; i++)
 	{
 		dirichletParameters[i] = 0.0;
 	}
-	*/
+
 	
 	//initialize parameter's size
 	for (unsigned i = 0u; i < numGenes; i++)
@@ -257,8 +257,8 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 
 	// take all priors into account
 	logLikelihood += model.calculateAllPriors();
-	std::vector <double> newMixtureProbabilities(numMixtures, 0);
-	//double *newMixtureProbabilities = new double[numMixtures]();
+	//std::vector <double> newMixtureProbabilities(numMixtures, 0);
+	double *newMixtureProbabilities = new double[numMixtures]();
 	Parameter::randDirichlet(dirichletParameters, numMixtures, newMixtureProbabilities);
 	for (unsigned k = 0u; k < numMixtures; k++)
 	{
