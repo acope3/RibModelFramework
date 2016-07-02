@@ -268,8 +268,8 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	{
 		model.updateMixtureProbabilitiesTrace(iteration/thining);
 	}
-	//delete[] dirichletParameters;
-	//delete[] newMixtureProbabilities;
+	delete[] dirichletParameters;
+	delete[] newMixtureProbabilities;
 	return logLikelihood;
 }
 
