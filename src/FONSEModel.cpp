@@ -691,11 +691,11 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 		denominator = 0.0;
 		for (unsigned i = 0u; i < (numCodons - 1); i++)
 		{
-			codonProb[i] = std::exp( -(mutation[i] - mutation[maxIndexValue]) - (phi * (4.0 + (4.0 * position)) * (selection[i] - selection[maxIndexValue])));
+			codonProb[i] = std::exp(((mutation[i] - mutation[maxIndexValue])) + (phi * (4.0 + (4.0 * position)) * (selection[i] - selection[maxIndexValue])));
 			denominator += codonProb[i];
 		}
 		//Alphabetically, the last codon is the reference codon.
-		codonProb[numCodons - 1] = std::exp((mutation[maxIndexValue]) + (phi * (4.0 + (4.0 * position)) * selection[maxIndexValue]));
+		codonProb[numCodons - 1] = std::exp((-1.0 * mutation[maxIndexValue]) - (phi * (4.0 + (4.0 * position)) * selection[maxIndexValue]));
 		denominator += codonProb[numCodons - 1];
 	}
 	else
@@ -703,7 +703,7 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 		denominator = 1.0;
 		for (unsigned i = 0u; i < (numCodons - 1); i++)
 		{
-			codonProb[i] = std::exp( -(mutation[i]) - (phi * (4.0 + (4.0 * position)) * selection[i]));
+			codonProb[i] = std::exp((mutation[i]) + (phi * (4.0 + (4.0 * position)) * selection[i]));
 			denominator += codonProb[i];
 		}
 		//Again, the last codon is the reference codon
