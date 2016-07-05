@@ -52,9 +52,16 @@ sink(file2)
 runMCMC(mcmc, genome, model, 4, divergence.iteration)
 sink()
 
-corpus1 <- paste0(readLines(file1), collapse=" ")
-corpus2 <- paste0(readLines(file2), collapse=" ")
+knownLogLikelihood <- -825482
+testLogLikelihood <- mcmc$getLogLikelihoodTrace()[10]
 
-test_that("identical MCMC-ROC output same seed", {
-  expect_equal(corpus1, corpus2)
+#corpus1 <- paste0(readLines(file1), collapse=" ")
+#corpus2 <- paste0(readLines(file2), collapse=" ")
+
+#test_that("identical MCMC-ROC output same seed", {
+#  expect_equal(corpus1, corpus2)
+#})
+
+test_that("identical MCMC-ROC output same log likelihood", {
+  expect_equal(knownLogLikelihood, testLogLikelihood)
 })
