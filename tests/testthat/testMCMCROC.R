@@ -64,7 +64,7 @@ sink()
 
 knownLogLikelihood <- -825482
 testLogLikelihood <- mcmc$getLogLikelihoodTrace()[10]
-
+testLogLikelihood
 #corpus1 <- paste0(readLines(file1), collapse=" ")
 #corpus2 <- paste0(readLines(file2), collapse=" ")
 
