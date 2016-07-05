@@ -21,6 +21,16 @@ fileName = file.path("UnitTestingData", "testROCModelFiles", "simulatedAllUnique
 expressionFile = file.path("UnitTestingData", "testROCModelFiles", "simulatedAllUniqueR_phi_withPhiSet.csv")
 phiFile = file.path("UnitTestingData", "testROCModelFiles", "simulatedAllUniqueR_phi.csv")
 
+test_that("file exists: simulatedAllUniqueR.fasta", {
+  expect_equal(file.exists(fileName), T)
+})
+test_that("file exists: simulatedAllUniqueR_phi_withPhiSet.csv", {
+  expect_equal(file.exists(expressionFile), T)
+})
+test_that("file exists: simulatedAllUniqueR_phi.csv", {
+  expect_equal(file.exists(phiFile), T)
+})
+
 set.seed(446141)
 
 with.phi <- TRUE # FALSE
