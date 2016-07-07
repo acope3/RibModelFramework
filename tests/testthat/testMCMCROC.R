@@ -63,7 +63,7 @@ runMCMC(mcmc, genome, model, 4, divergence.iteration)
 sink()
 
 knownLogLikelihood <- -825482
-testLogLikelihood <- round(mcmc$getLogLikelihoodTrace()[10])
+testLogLikelihood <- mcmc$getLogLikelihoodTrace()[10]
 print(testLogLikelihood)
 #corpus1 <- paste0(readLines(file1), collapse=" ")
 #corpus2 <- paste0(readLines(file2), collapse=" ")
