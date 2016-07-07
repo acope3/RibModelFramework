@@ -1,19 +1,36 @@
-*~
-*.*~
-*.o
-*.d
-*.so
-*.gz
-*.out
-*.txt
-*.swp
-*.pdf
+# R stuff
+*.RData
 *.rst
-*.mk
-*.Rcheck
-*.history
+*.Rda
+*.Rdat
+*.rda
+*.rdat
 *.Rhistory
+*.Rcheck
+
+# LaTeX Stuff
+*.aux
+*.log
+*.toc
+
+# Compiled Object files
+*.o
+
+# Compiled Dynamic libraries
+*.so
+
+# Executables
+*.out
+
+# Mac stuff
 *.DS_Store
+
+# Junk folders
+Test
+Default
+junk
+
+# IDE files
 .autotools
 .project
 .cproject
@@ -22,12 +39,18 @@
 .launch
 .idea
 .externalToolBuilders
-Test
-Default
-junk
-*.RData
-*.Rdat
-*.rdat
+
+# .swp files
+*.swp
+
+# Misc
+*~
+*.*~
+*.d
+*.gz
+*.txt
+*.pdf
+*.mk
+*.history
 *.dat
-*.rda
-*.Rda
+
