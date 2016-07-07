@@ -70,6 +70,7 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 			my_printError("ERROR: Error in Genome::readFasta: Can not open Fasta file %\n", filename);
 		else
 		{
+			std::cout << "File opened\n";
 			bool fastaFormat = false;
 			std::string buf;
 			int newLine;
@@ -121,6 +122,7 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 
 				if ( newLine == 3 )
 				{ // end of file
+					std::cout << "EOF reached\n";
 					if ( !fastaFormat )
 						throw std::string("Genome::readFasta throws: ") + std::string(filename)
 							  + std::string(" is not in Fasta format.");

@@ -111,12 +111,12 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	//TODO: why is this not just a vector?
 
 
-	/*
-	for (unsigned i = 0u; i < numMixtures; i++)
-	{
-		dirichletParameters[i] = 0.0;
-	}
-	*/
+	
+	//for (unsigned i = 0u; i < numMixtures; i++)
+	//{
+	//	dirichletParameters[i] = 0.0;
+	//}
+
 	
 	//initialize parameter's size
 	for (unsigned i = 0u; i < numGenes; i++)
@@ -140,16 +140,17 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		double maxValue = -1000000.0;
 		unsigned mixtureIndex = 0u;
 
-		double* unscaledLogProb_curr = new double[numSynthesisRateCategories]();
-		double* unscaledLogProb_prop = new double[numSynthesisRateCategories]();
+		std::vector <double> unscaledLogProb_curr(numSynthesisRateCategories, 0);
+		std::vector <double> unscaledLogProb_prop(numSynthesisRateCategories, 0);
 
-		double* unscaledLogPost_curr = new double[numSynthesisRateCategories]();
-		double* unscaledLogPost_prop = new double[numSynthesisRateCategories]();
+		std::vector <double> unscaledLogPost_curr(numSynthesisRateCategories, 0);
+		std::vector <double> unscaledLogPost_prop(numSynthesisRateCategories, 0);
 
 
-		double* unscaledLogProb_curr_singleMixture = new double[numMixtures]();
-		double* probabilities = new double[numMixtures]();
+		std::vector <double> unscaledLogProb_curr_singleMixture(numMixtures, 0);
+		std::vector <double> probabilities(numMixtures, 0);
 
+		/***************************************************************
 		for (unsigned j = 0u; j < numMixtures; j++)
 		{
 			probabilities[j] = 0.0;
@@ -163,6 +164,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			unscaledLogPost_curr[j] = 0.0;
 			unscaledLogPost_prop[j] = 0.0;
 		}
+		****************************************************************/
 
 		for (unsigned k = 0u; k < numSynthesisRateCategories; k++)
 		{
@@ -247,12 +249,14 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			model.updateSynthesisRateTrace(iteration/thining, i);
 			model.updateMixtureAssignmentTrace(iteration/thining, i);
 		}
+		/*****************************************************
 		delete[] probabilities;
 		delete[] unscaledLogProb_curr_singleMixture;
 		delete[] unscaledLogProb_prop;
 		delete[] unscaledLogProb_curr;
 		delete[] unscaledLogPost_prop;
 		delete[] unscaledLogPost_curr;
+		******************************************************/
 	}
 
 	// take all priors into account
