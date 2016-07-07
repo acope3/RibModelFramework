@@ -56,6 +56,17 @@ summary.Rcpp_Genome <- function(object, ...) {
   summary(object)
 }
 
+#' Gene Names of Genome
+#' 
+#' \code{getNames} prints the names of the genes within the genome specified.
+#' 
+#' @param genome A genome object initialized with \code{\link{initializeGenomeObject}}.
+#' 
+#' @param simulated A logical value denoting if the gene names to be listed are simulated or not.
+#' The default value is FALSE.
+#' 
+#' @return returns the names of the genes as a vector of strings.
+#' 
 getNames <- function(genome, simulated = FALSE)
 {
   genes <- genome$getGenes(simulated)

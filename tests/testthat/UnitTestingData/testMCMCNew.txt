@@ -1,0 +1,9 @@
+Allowing divergence from initial conditions for 0 iterations.
+
+maxGrouping: 22
+entering MCMC loop
+	Estimate Codon Specific Parameters? TRUE 
+	Estimate Hyper Parameters? TRUE 
+	Estimate Synthesis rates? TRUE 
+	Starting MCMC with 100 iterations
+	Adapting will stop after 100 steps
