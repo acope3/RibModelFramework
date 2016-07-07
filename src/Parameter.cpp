@@ -1740,7 +1740,7 @@ double Parameter::randGamma(double shape, double rate)
 
 
 // TODO: CHANGE THIS BACK TO DOUBLE*
-void Parameter::randDirichlet(double* input, unsigned numElements, double* output)
+void Parameter::randDirichlet(std::vector <double> &input, unsigned numElements, std::vector <double> &output)
 {
 	// draw y_i from Gamma(a_i, 1)
 	// normalize y_i such that x_i = y_i / sum(y_i)
@@ -1766,6 +1766,7 @@ void Parameter::randDirichlet(double* input, unsigned numElements, double* outpu
 	for (unsigned i = 0; i < numElements; i++)
 	{
 		output[i] = output[i] / sumTotal;
+		int nothing = 0;
 	}
 }
 
@@ -1786,7 +1787,7 @@ double Parameter::randUnif(double minVal, double maxVal)
 }
 
 
-unsigned Parameter::randMultinom(double* probabilities, unsigned mixtureElements)
+unsigned Parameter::randMultinom(std::vector <double> &probabilities, unsigned mixtureElements)
 {
 	// calculate cumulative sum to determine group boundaries
 	double* cumsum = new double[mixtureElements]();
@@ -1822,6 +1823,41 @@ unsigned Parameter::randMultinom(double* probabilities, unsigned mixtureElements
 	return returnValue;
 }
 
+unsigned Parameter::randMultinom(double *probabilities, unsigned mixtureElements)
+{
+	// calculate cumulative sum to determine group boundaries
+	double* cumsum = new double[mixtureElements]();
+	//std::vector<double> cumsum(groups);
+	cumsum[0] = probabilities[0];
+
+	for (unsigned i = 1u; i < mixtureElements; i++)
+	{
+		cumsum[i] = cumsum[i - 1u] + probabilities[i];
+	}
+	// draw random number from U(0,1)
+	double referenceValue;
+#ifndef STANDALONE
+	RNGScope scope;
+	NumericVector xx(1);
+	xx = runif(1, 0, 1);
+	referenceValue = xx[0];
+#else
+	std::uniform_real_distribution<double> distribution(0, 1);
+	referenceValue = distribution(generator);
+#endif
+	// check in which category the element falls
+	unsigned returnValue = 0u;
+	for (unsigned i = 0u; i < mixtureElements; i++)
+	{
+		if (referenceValue <= cumsum[i])
+		{
+			returnValue = i;
+			break;
+		}
+	}
+	delete[] cumsum;
+	return returnValue;
+}
 
 double Parameter::densityNorm(double x, double mean, double sd, bool log)
 {
