@@ -62,13 +62,13 @@ model <- initializeModelObject(parameter, "ROC", with.phi = with.phi)
 
 #file1 = file.path("UnitTestingData", "testMCMC.txt")
 #file2 = file.path("UnitTestingData", "testMCMCNew.txt")
-outFile = file.path("UnitTestingOut", "testMCMCROCLog.txt")
+#outFile = file.path("UnitTestingOut", "testMCMCROCLog.txt")
 
 #sink(file2)
 
-sink(outFile)
+#sink(outFile)
 runMCMC(mcmc, genome, model, 4, divergence.iteration)
-sink()
+#sink()
 
 knownLogLikelihood <- -825482
 testLogLikelihood <- round(mcmc$getLogLikelihoodTrace()[10])
