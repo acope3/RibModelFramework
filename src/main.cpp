@@ -669,11 +669,11 @@ int main()
 	//testGene();
 	//testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
 	//testCovarianceMatrix();
-	testParameter();
+	//testParameter();
 	//testParameterWithFile(pathBegin + "HollisFile.txt");
 	//testTrace();
 	//testRFPParameter();
-	//testMCMCAlgorithm();
+	testMCMCAlgorithm();
 	exit(0);
 
 
