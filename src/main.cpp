@@ -488,7 +488,7 @@ int main()
 
 
 		std::cout << "starting MCMC for FONSE" << std::endl;
-		mcmc.run(genome, model, 4, 0);
+		mcmc.run(genome, model, 1, 0);
 		std::cout << std::endl << "Finished MCMC for FONSE" << std::endl;
 	}
 	else if (modelToRun == "RFP")
@@ -568,7 +568,7 @@ int main()
 	{
 		std::cout << "Initializing Genome object--------------------------" << std::endl;
 		Genome genome;
-		genome.readFasta("C:/Users/Jeremy/Documents/GitHub/RibModelDev/data/realGenomes/Skluyveri.fasta");
+		genome.readFasta("C:/Users/Alan/Documents/GitHub/RibModelDev/data/realGenomes/Skluyveri.fasta");
 		if (withPhi)
 		{
 			genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv", false);
