@@ -153,7 +153,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures)
 {
 	int numGenes = genome.getGenomeSize();
-//	int numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
+	//int numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
 	double likelihood = 0.0;
 	double likelihood_proposed = 0.0;
 
@@ -166,6 +166,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 
 	Gene *gene;
 	SequenceSummary *seqsum;
+	unsigned aaIndex = SequenceSummary::AAToAAIndex(grouping);
 
 #ifndef __APPLE__
 	#pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed, curAA, gene, seqsum) reduction(+:likelihood,likelihood_proposed)
@@ -174,7 +175,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 	{
 		gene = &genome.getGene(i);
 		seqsum = gene->getSequenceSummary();
-		if (seqsum->getAACountForAA(grouping) == 0) continue;
+		if (seqsum->getAACountForAA(aaIndex) == 0) continue;
 
 		// which mixture element does this gene belong to
 		unsigned mixtureElement = parameter->getMixtureAssignment(i);
@@ -202,7 +203,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 	//likelihood_proposed = likelihood_proposed + calculateMutationPrior(grouping, true);
 	//likelihood = likelihood + calculateMutationPrior(grouping, false);
 
-	logAcceptanceRatioForAllMixtures = likelihood_proposed - likelihood;
+	logAcceptanceRatioForAllMixtures = (likelihood_proposed - likelihood);
 }
 
 

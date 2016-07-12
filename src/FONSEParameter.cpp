@@ -480,7 +480,7 @@ void FONSEParameter::proposeCodonSpecificParameter()
 		unsigned aaEnd;
 		SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
         unsigned numCodons = aaEnd - aaStart;
-        for (unsigned i = 0u; i < numCodons * (numMutationCategories + numSelectionCategories); i++)
+        for (unsigned i = 0u; i < (numCodons * (numMutationCategories + numSelectionCategories)); i++)
         {
             iidProposed.push_back(randNorm(0.0, 1.0));
         }
