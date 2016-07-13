@@ -67,7 +67,7 @@ model <- initializeModelObject(parameter, "ROC", with.phi = with.phi)
 #sink(file2)
 
 #sink(outFile)
-runMCMC(mcmc, genome, model, 4, divergence.iteration)
+runMCMC(mcmc, genome, model, 1, divergence.iteration)
 #sink()
 
 knownLogLikelihood <- -825482
