@@ -3,31 +3,18 @@ library(ribModel)
 
 context("MCMC with ROC")
 
-# This file current checks the logLikelihood recorded at iteration 100, between an old, hard-coded test and a current Unit Test.
-# TODO: Remove the old legacy code described below once comfortable with current implementation.
+# This file currently checks the logLikelihood recorded at iteration 100, between an old, hard-coded test and a current Unit Test.
 
-
-###### OLD CODE DESCRIPTION
-# This filed used to check an entire outputting format, checking not only logLikelihood but also
-# other variables (good, if errors occur there) 
-# in a set formatted corpus (bad, this means future edits to the printing will result in testthat errors!)
-#
-# If no tampering is done to the correct variables,
-# a correct loglikelihood with the same seed should be equal, disregarding other variables.
-#
-# Thus, in the future, simply take the logLikelihood value and hard code it here, and compare via
+# Possible implementation change: take the logLikelihood value and hard code it here, and compare via
 # mcmc$getLogLikelihoodTrace(), which returns a vector. Get the average of these values
 # and compare it with the hard-coded average of logLikelihoodTrace.
-# This is currently not implemented due to laziness and mild helpfulness, and it is currently working.
-# Once it breaks, it should be converted.
-###### OLD CODE DESCRIPTION END
 
 
 # In R, file.path is faster than paste
-fileName = file.path("UnitTestingData", "testROCModelFiles", "simulatedAllUniqueR.fasta")
-expressionFile = file.path("UnitTestingData", "testROCModelFiles", "simulatedAllUniqueR_phi_withPhiSet.csv")
+fileName = file.path("UnitTestingData", "testMCMCROCFiles", "simulatedAllUniqueR.fasta")
+expressionFile = file.path("UnitTestingData", "testMCMCROCFiles", "simulatedAllUniqueR_phi_withPhiSet.csv")
 
-# Ensure the files exist.
+# Ensure the input files exist.
 test_that("file exists: simulatedAllUniqueR.fasta", {
   expect_equal(file.exists(fileName), T)
 })
@@ -56,30 +43,19 @@ samples <- 10
 thining <- 10
 adaptiveWidth <- 10
 divergence.iteration <- 0
-mcmc <- initializeMCMCObject(samples, thining, adaptive.width=adaptiveWidth, est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE) 
+mcmc <- initializeMCMCObject(samples = samples, thining = thining, adaptive.width = adaptiveWidth, 
+                             est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE) 
 
 model <- initializeModelObject(parameter, "ROC", with.phi = with.phi) 
 
-#file1 = file.path("UnitTestingData", "testMCMC.txt")
-#file2 = file.path("UnitTestingData", "testMCMCNew.txt")
 #outFile = file.path("UnitTestingOut", "testMCMCROCLog.txt")
-
-#sink(file2)
 
 #sink(outFile)
 runMCMC(mcmc, genome, model, 1, divergence.iteration)
 #sink()
 
-knownLogLikelihood <- -825482
-testLogLikelihood <- round(mcmc$getLogLikelihoodTrace()[10])
-
-#corpus1 <- paste0(readLines(file1), collapse=" ")
-#corpus2 <- paste0(readLines(file2), collapse=" ")
-
-#test_that("identical MCMC-ROC output same seed", {
-#  expect_equal(corpus1, corpus2)
-#})
-
-test_that("identical MCMC-ROC output same log likelihood", {
+test_that("identical MCMC-ROC input, same log likelihood", {
+  knownLogLikelihood <- -825482
+  testLogLikelihood <- round(mcmc$getLogLikelihoodTrace()[10])
   expect_equal(knownLogLikelihood, testLogLikelihood)
 })

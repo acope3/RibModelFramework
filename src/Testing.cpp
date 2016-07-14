@@ -1555,7 +1555,7 @@ int testGenome(std::string testFileDir)
     //------ readFasta Function ------//
     //--------------------------------//
     genome.clear();
-    std::string file = testFileDir + "/" + "test.fasta";
+    std::string file = testFileDir + "/" + "readFasta.fasta";
     genome.readFasta(file, false);
 
     Gene fasta1("ATGACCGTAATTTTTTACTAG", "TEST002", "TEST002 Test Gene");
@@ -1581,7 +1581,7 @@ int testGenome(std::string testFileDir)
     // again, and then compare its validity again.
     testGenome.clear();
 
-    file = testFileDir + "/" + "testWrite.fasta";
+    file = testFileDir + "/" + "writeFasta.fasta";
     genome.writeFasta(file, false);
     testGenome.readFasta(file, false);
 
@@ -1633,7 +1633,7 @@ int testGenome(std::string testFileDir)
     genome.clear();
     testGenome.clear();
 
-    file = testFileDir + "/" + "testReadRFP.csv";
+    file = testFileDir + "/" + "readRFP.csv";
     genome.readRFPFile(file);
 
     // These sequences are composed of those codons with RFPObserved values > 0
@@ -1663,7 +1663,7 @@ int testGenome(std::string testFileDir)
     // again, and then compare its validity again. */
     testGenome.clear();
 
-    file = testFileDir + "/" + "testWriteRFP.csv";
+    file = testFileDir + "/" + "writeRFP.csv";
     genome.writeRFPFile(file, false);
     testGenome.readRFPFile(file);
 
