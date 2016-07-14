@@ -288,6 +288,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 {
 	double acceptanceRatioForAllMixtures = 0.0;
 	unsigned size = model.getGroupListSize();
+	bool accepted = 0;
 
 	for (unsigned i = 0; i < size; i++)
 	{
@@ -298,11 +299,14 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 		if ( -Parameter::randExp(1) < acceptanceRatioForAllMixtures )
 		{
 			// moves proposed codon specific parameters to current codon specific parameters
+			accepted = 1;
 			model.updateCodonSpecificParameter(grouping);
 		}
 		if ((iteration % thining) == 0)
 		{
+			//if (accepted) std::cout << "Acceptance Ratio = " << acceptanceRatioForAllMixtures << std::endl;
 			model.updateCodonSpecificParameterTrace(iteration/thining, grouping);
+			accepted = 0;
 		}
 	}
 }

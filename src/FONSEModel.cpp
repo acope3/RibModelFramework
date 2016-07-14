@@ -49,7 +49,6 @@ double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grou
 		} 
 		//positions->clear();
 	}
-
 	return logLikelihood;
 }
 
@@ -195,11 +194,17 @@ void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 		parameter->getParameterForCategory(mutationCategory, FONSEParameter::dM, grouping, true, mutation_proposed);
 		parameter->getParameterForCategory(selectionCategory, FONSEParameter::dOmega, grouping, true, selection_proposed);
 
+		int count = 0;
+		for (int j = 0; j < 5; j++) {
+			if (mutation[j] == mutation_proposed[j] || selection[j] == selection_proposed[j]) count++;
+		}
+		std::cout << count << " similarities\n";
+		
 		likelihood += calculateLogLikelihoodRatioPerAA(*gene, grouping, mutation, selection, phiValue);
 		likelihood_proposed += calculateLogLikelihoodRatioPerAA(*gene, grouping, mutation_proposed, selection_proposed, phiValue);
 
 	}
-
+	//if (likelihood == likelihood_proposed) std::cout << "EQUAL LIKELIHOODS!!!\n";
 	//likelihood_proposed = likelihood_proposed + calculateMutationPrior(grouping, true);
 	//likelihood = likelihood + calculateMutationPrior(grouping, false);
 
