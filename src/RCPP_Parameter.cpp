@@ -53,10 +53,14 @@ RCPP_MODULE(Parameter_mod)
 		.method("setLastIteration", &Parameter::setLastIteration) //Not a R wrapper
 
 		//Posterior, Variance, and Estimates Functions:
-		.method("getSynthesisRatePosteriorMeanByMixtureElementForGene", &Parameter::getSynthesisRatePosteriorMeanByMixtureElementForGene)
-		.method("getSynthesisRateVarianceByMixtureElementForGene", &Parameter::getSynthesisRateVarianceByMixtureElementForGene)
-		.method("getEstimatedMixtureAssignmentForGene", &Parameter::getEstimatedMixtureAssignmentForGene, "returns the mixture assignment for a given gene")
-		.method("getEstimatedMixtureAssignmentProbabilitiesForGene", &Parameter::getEstimatedMixtureAssignmentProbabilitiesForGene, "returns the probabilities assignment for a given gene")
+		.method("getSynthesisRatePosteriorMeanByMixtureElementForGene",
+		        &Parameter::getSynthesisRatePosteriorMeanByMixtureElementForGene)
+		.method("getSynthesisRateVarianceByMixtureElementForGene",
+		        &Parameter::getSynthesisRateVarianceByMixtureElementForGene)
+		.method("getEstimatedMixtureAssignmentForGene", &Parameter::getEstimatedMixtureAssignmentForGene,
+		        "returns the mixture assignment for a given gene")
+		.method("getEstimatedMixtureAssignmentProbabilitiesForGene", &Parameter::getEstimatedMixtureAssignmentProbabilitiesForGene,
+		        "returns the probabilities assignment for a given gene")
 		.method("getStdDevSynthesisRatePosteriorMean", &Parameter::getStdDevSynthesisRatePosteriorMean)
 		.method("getCodonSpecificPosteriorMean", &Parameter::getCodonSpecificPosteriorMeanForCodon)
 		.method("getStdDevSynthesisRateVariance", &Parameter::getStdDevSynthesisRateVariance)
@@ -120,8 +124,9 @@ RCPP_MODULE(Parameter_mod)
 		.method("setMutationPriorStandardDeviation", &ROCParameter::setMutationPriorStandardDeviation)
 
 		//Posterior, Variance, and Estimates Functions:
-		.method("getNoiseOffsetPosteriorMean", &ROCParameter::getNoiseOffsetPosteriorMean) //TODO: this is not wrapped! May not run correctly
-		.method("getNoiseOffsetVariance", &ROCParameter::getNoiseOffsetVariance) //TODO: this is not wrapped! May not run correctly
+		//TODO: these functions are not wrapped! May not run correctly
+		.method("getNoiseOffsetPosteriorMean", &ROCParameter::getNoiseOffsetPosteriorMean)
+		.method("getNoiseOffsetVariance", &ROCParameter::getNoiseOffsetVariance)
 
 
 		//CSP Functions:
@@ -132,11 +137,16 @@ RCPP_MODULE(Parameter_mod)
 
 
 		//Other Functions:
-		.property("proposedMutationParameter", &ROCParameter::getProposedMutationParameter, &ROCParameter::setProposedMutationParameter) //R Specific
-		.property("proposedSelectionParameter", &ROCParameter::getProposedSelectionParameter, &ROCParameter::setProposedSelectionParameter) //R Specific
-		.property("currentMutationParameter", &ROCParameter::getCurrentMutationParameter, &ROCParameter::setCurrentMutationParameter) //R Specific
-		.property("currentSelectionParameter", &ROCParameter::getCurrentSelectionParameter, &ROCParameter::setCurrentSelectionParameter) //R Specific
-		.property("mutation_prior_sd", &ROCParameter::getMutationPriorStandardDeviation, &ROCParameter::setMutationPriorStandardDeviation)
+		.property("proposedMutationParameter", &ROCParameter::getProposedMutationParameter,
+		        &ROCParameter::setProposedMutationParameter) //R Specific
+		.property("proposedSelectionParameter", &ROCParameter::getProposedSelectionParameter,
+		        &ROCParameter::setProposedSelectionParameter) //R Specific
+		.property("currentMutationParameter", &ROCParameter::getCurrentMutationParameter,
+		        &ROCParameter::setCurrentMutationParameter) //R Specific
+		.property("currentSelectionParameter", &ROCParameter::getCurrentSelectionParameter,
+		        &ROCParameter::setCurrentSelectionParameter) //R Specific
+		.property("mutation_prior_sd", &ROCParameter::getMutationPriorStandardDeviation,
+		        &ROCParameter::setMutationPriorStandardDeviation)
 		;
 
 
@@ -168,10 +178,14 @@ RCPP_MODULE(Parameter_mod)
 
 
 
-		.property("proposedAlphaParameter", &RFPParameter::getProposedAlphaParameter, &RFPParameter::setProposedAlphaParameter) //R Specific
-		.property("proposedLambdaPrimeParameter", &RFPParameter::getProposedLambdaPrimeParameter, &RFPParameter::setProposedLambdaPrimeParameter) //R Specific
-		.property("currentAlphaParameter", &RFPParameter::getCurrentAlphaParameter, &RFPParameter::setCurrentAlphaParameter) //R Specific
-		.property("currentLambdaPrimeParameter", &RFPParameter::getCurrentLambdaPrimeParameter, &RFPParameter::setCurrentLambdaPrimeParameter) //R Specific
+		.property("proposedAlphaParameter", &RFPParameter::getProposedAlphaParameter,
+		        &RFPParameter::setProposedAlphaParameter) //R Specific
+		.property("proposedLambdaPrimeParameter", &RFPParameter::getProposedLambdaPrimeParameter,
+		        &RFPParameter::setProposedLambdaPrimeParameter) //R Specific
+		.property("currentAlphaParameter", &RFPParameter::getCurrentAlphaParameter,
+		        &RFPParameter::setCurrentAlphaParameter) //R Specific
+		.property("currentLambdaPrimeParameter", &RFPParameter::getCurrentLambdaPrimeParameter,
+		        &RFPParameter::setCurrentLambdaPrimeParameter) //R Specific
 		;
 
 
@@ -202,9 +216,12 @@ RCPP_MODULE(Parameter_mod)
 		.method("getMutationPriorStandardDeviation", &FONSEParameter::getMutationPriorStandardDeviation)
 		.method("setMutationPriorStandardDeviation", &FONSEParameter::setMutationPriorStandardDeviation)
 
-		.property("currentMutationParameter", &FONSEParameter::getCurrentMutationParameter, &FONSEParameter::setCurrentMutationParameter) //R Specific
-		.property("currentSelectionParameter", &FONSEParameter::getCurrentSelectionParameter, &FONSEParameter::setCurrentSelectionParameter) //R Specific
-		.property("mutation_prior_sd", &FONSEParameter::getMutationPriorStandardDeviation, &FONSEParameter::setMutationPriorStandardDeviation)
+		.property("currentMutationParameter", &FONSEParameter::getCurrentMutationParameter,
+		        &FONSEParameter::setCurrentMutationParameter) //R Specific
+		.property("currentSelectionParameter", &FONSEParameter::getCurrentSelectionParameter,
+		        &FONSEParameter::setCurrentSelectionParameter) //R Specific
+		.property("mutation_prior_sd", &FONSEParameter::getMutationPriorStandardDeviation,
+		        &FONSEParameter::setMutationPriorStandardDeviation)
 		;
 }
 #endif

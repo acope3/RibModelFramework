@@ -17,7 +17,9 @@ RCPP_MODULE(Model_mod)
 	class_<ROCModel>( "ROCModel" )
 		.derives<Model>("Model")
 		.constructor<bool>()
-		.method("CalculateProbabilitiesForCodons", &ROCModel::CalculateProbabilitiesForCodons, "Calculated codon probabilities. Input is one element shorter than output")
+		.method("CalculateProbabilitiesForCodons", &ROCModel::CalculateProbabilitiesForCodons,
+		        "Calculated codon probabilities. Input is one element shorter than output")
+  		.method("getParameter", &ROCModel::getParameter)
   		.method("setParameter", &ROCModel::setParameter)
   		.method("simulateGenome", &ROCModel::simulateGenome)
 		;
@@ -25,12 +27,14 @@ RCPP_MODULE(Model_mod)
 	class_<RFPModel>("RFPModel")
 		.derives<Model>("Model")
 		.constructor()
+  		.method("getParameter", &RFPModel::getParameter)
 		.method("setParameter", &RFPModel::setParameter)
 		;
 
 	class_<FONSEModel>("FONSEModel")
 		.derives<Model>("Model")
 		.constructor()
+  		.method("getParameter", &FONSEModel::getParameter)
 		.method("setParameter", &FONSEModel::setParameter)
 		.method("simulateGenome", &FONSEModel::simulateGenome)
 		;

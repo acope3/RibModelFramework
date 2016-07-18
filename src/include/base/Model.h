@@ -8,7 +8,8 @@
 class Model
 {
     private:
-		double calculatePriorForCodonSpecificParam(Parameter *parameter, std::string grouping, unsigned paramType, bool proposed = false);
+		double calculatePriorForCodonSpecificParam(Parameter *parameter, std::string grouping, unsigned paramType,
+					bool proposed = false);
 
     public:
 		//Constructors & Destructors:
@@ -18,10 +19,12 @@ class Model
 
 
         //Likelihood Ratio Functions:
-        virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k, double* logProbabilityRatio) = 0;
+        virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k,
+					double* logProbabilityRatio) = 0;
         virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
         		double& logAcceptanceRatioForAllMixtures) = 0;
-		virtual void calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration, std::vector <double> &logProbabilityRatio) = 0;
+		virtual void calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration,
+					std::vector <double> &logProbabilityRatio) = 0;
 
 		virtual double calculateAllPriors() = 0;
 
@@ -80,7 +83,8 @@ class Model
 		//Adaptive Width Functions:
 		virtual void adaptStdDevSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt) = 0;
 		virtual void adaptSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt) = 0;
-		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, unsigned lastIteration, bool adapt) = 0;
+		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, unsigned lastIteration,
+					bool adapt) = 0;
 		virtual void adaptHyperParameterProposalWidths(unsigned adaptiveWidth, bool adapt) = 0;
 
 

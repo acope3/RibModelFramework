@@ -1,8 +1,7 @@
 #' Plot Model Object
 #' 
 #' @param x An Rcpp model object initialized with \code{initializeModelObject}.
-#' @param genome An Rcpp genome object initialized with \code{initializeGenomeObject}.
-#' @param parameter An Rcpp parameter object.
+#' @param genome An Rcpp genome object initialized with \code{initializeGenomeObject}.#
 #' @param samples The number of samples in the trace
 #' @param mixture The mixture for which to graph values.
 #' @param estim.Expression A boolean value that says whether to use estimated expression
@@ -14,7 +13,7 @@
 #'  
 #' @description Plots traces from the model object such as synthesis rates for each gene. 
 
-plot.Rcpp_ROCModel <- function(x, genome, parameter, samples = 100, mixture = 1, 
+plot.Rcpp_ROCModel <- function(x, genome, samples = 100, mixture = 1, 
                                estim.Expression = TRUE, simulated = FALSE, ...)
 {
   opar <- par(no.readonly = T) 
@@ -39,7 +38,8 @@ plot.Rcpp_ROCModel <- function(x, genome, parameter, samples = 100, mixture = 1,
   text(0.5, 0.4, date(), cex = 0.6)
   
   num.genes <- length(genome)
-  
+  parameter <- x$getParameter()
+
   mixtureAssignment <- unlist(lapply(1:num.genes,  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))
   genes.in.mixture <- which(mixtureAssignment == mixture)
   expressionCategory <- parameter$getSynthesisRateCategoryForMixture(mixture)

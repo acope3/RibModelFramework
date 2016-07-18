@@ -10,7 +10,8 @@ class ROCModel : public Model
 		ROCParameter *parameter;
 		bool withPhi;
 
-		double calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codonCount[], double mutation[], double selection[], double phiValue);
+		double calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codonCount[], double mutation[],
+					double selection[], double phiValue);
 		double calculateMutationPrior(std::string grouping, bool proposed = false); // TODO add to FONSE as well? // cedric
 		void obtainCodonCount(SequenceSummary *seqsum, std::string curAA, int codonCount[]);
 
@@ -18,7 +19,6 @@ class ROCModel : public Model
 		//Constructors & Destructors:
 		ROCModel(bool _withPhi = false);
 		virtual ~ROCModel();
-
 
 
 		//Likelihood Ratio Functions:
@@ -84,7 +84,8 @@ class ROCModel : public Model
 		//Adaptive Width Functions:
 		virtual void adaptStdDevSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt = true);
 		virtual void adaptSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt = true);
-		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, unsigned lastIteration, bool adapt = true);
+		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, unsigned lastIteration,
+					bool adapt = true);
 		virtual void adaptHyperParameterProposalWidths(unsigned adaptiveWidth, bool adapt = true);
 
 
@@ -110,10 +111,13 @@ class ROCModel : public Model
 
 		void simulateGenome(Genome &genome);
 		virtual void printHyperParameters();
+		ROCParameter getParameter();
 		void setParameter(ROCParameter &_parameter);
 		virtual double calculateAllPriors();
-		void calculateCodonProbabilityVector(unsigned numCodons, double mutation[], double selection[], double phi, double codonProb[]);
-		virtual void getParameterForCategory(unsigned category, unsigned param, std::string aa, bool proposal, double* returnValue);
+		void calculateCodonProbabilityVector(unsigned numCodons, double mutation[], double selection[], double phi,
+					double codonProb[]);
+		virtual void getParameterForCategory(unsigned category, unsigned param, std::string aa, bool proposal,
+					double* returnValue);
 
 
 		//ROC Specific Functions:

@@ -215,7 +215,7 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 		currentMphi[i] = -((currentStdDevSynthesisRate[i] * currentStdDevSynthesisRate[i]) * 0.5);
 		proposedStdDevSynthesisRate[i] = getStdDevSynthesisRate(i, true);
 		proposedMphi[i] = -((proposedStdDevSynthesisRate[i] * proposedStdDevSynthesisRate[i]) * 0.5);
-		// take the jacobian into account for the non-linear transformation from logN to N distribution
+		// take the Jacobian into account for the non-linear transformation from logN to N distribution
 		lpr -= (std::log(currentStdDevSynthesisRate[i]) - std::log(proposedStdDevSynthesisRate[i]));
 	}
 
@@ -727,6 +727,16 @@ void ROCModel::printHyperParameters()
 
 		my_print("\n");
 	}
+}
+
+/* getParameter (RCPP EXPOSED)
+ * Arguments: None
+ *
+ * Returns the ROCParameter of the model.
+*/
+ROCParameter ROCModel::getParameter()
+{
+	return *parameter;
 }
 
 
