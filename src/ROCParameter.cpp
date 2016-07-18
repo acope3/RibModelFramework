@@ -882,7 +882,7 @@ void ROCParameter::initCovarianceMatrix(SEXP _matrix, std::string aa)
 
 void ROCParameter::initMutation(std::vector<double> mutationValues, unsigned mixtureElement, std::string aa)
 {
-	//TODO: seperate out the R wrapper functionality and make the wrapper
+	//TODO: separate out the R wrapper functionality and make the wrapper
 	//currentMutationParameter
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
 	if (check)
@@ -904,7 +904,7 @@ void ROCParameter::initMutation(std::vector<double> mutationValues, unsigned mix
 
 void ROCParameter::initSelection(std::vector<double> selectionValues, unsigned mixtureElement, std::string aa)
 {
-	//TODO: seperate out the R wrapper functionality and make the wrapper
+	//TODO: separate out the R wrapper functionality and make the wrapper
 	//currentSelectionParameter
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
 	if (check)
