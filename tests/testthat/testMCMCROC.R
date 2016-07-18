@@ -44,11 +44,11 @@ parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssig
 
 model <- initializeModelObject(parameter, "ROC", with.phi = TRUE) 
 
-#outFile = file.path("UnitTestingOut", "testMCMCROCLog.txt")
+outFile = file.path("UnitTestingOut", "testMCMCROCLogPhi.txt")
 
-#sink(outFile)
+sink(outFile)
 runMCMC(mcmc, genome, model, 1, divergence.iteration)
-#sink()
+sink()
 
 test_that("identical MCMC-ROC input with Phi, same log likelihood", {
   knownLogLikelihood <- -825482
@@ -66,11 +66,11 @@ parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssig
 
 model <- initializeModelObject(parameter, "ROC", with.phi = FALSE) 
 
-#outFile = file.path("UnitTestingOut", "testMCMCROCLog.txt")
+outFile = file.path("UnitTestingOut", "testMCMCROCLogWithoutPhi.txt")
 
-#sink(outFile)
+sink(outFile)
 runMCMC(mcmc, genome, model, 1, divergence.iteration)
-#sink()
+sink()
 
 test_that("identical MCMC-ROC input without Phi, same log likelihood", {
   knownLogLikelihood <- -825693
