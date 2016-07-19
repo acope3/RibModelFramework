@@ -11,7 +11,7 @@
 #' @param geneIndex When plotting expression, the index of the gene to be plotted.
 #' @param mixture The mixture for which to plot values.
 #' @param ... Optional, additional arguments.
-#' @param For this function, a possible title for the plot in the form of a list if set with "main".
+#' For this function, a possible title for the plot in the form of a list if set with "main".
 #' 
 #' @return This function has no return value.
 #' 

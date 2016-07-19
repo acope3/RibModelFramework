@@ -4,10 +4,13 @@
 \alias{summary.Rcpp_Genome}
 \title{Summary of Genome}
 \usage{
-\method{summary}{Rcpp_Genome}(object)
+\method{summary}{Rcpp_Genome}(object, ...)
 }
 \arguments{
 \item{object}{A genome object initialized with \code{\link{initializeGenomeObject}}.}
+
+\item{...}{Optional, additional arguments to be passed to the main summary function 
+that affect the summary produced.}
 }
 \value{
 This function returns by default an object of class c("summaryDefault", table").

@@ -18,9 +18,8 @@ Mphi, Aphi, Spesilon, ExpectedPhi, Expression}.}
 
 \item{mixture}{The mixture for which to plot values.}
 
-\item{...}{Optional, additional arguments.}
-
-\item{For}{this function, a possible title for the plot in the form of a list if set with "main".}
+\item{...}{Optional, additional arguments.
+For this function, a possible title for the plot in the form of a list if set with "main".}
 }
 \value{
 This function has no return value.
