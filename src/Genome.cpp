@@ -691,7 +691,20 @@ Genome Genome::getGenomeForGeneIndices(std::vector <unsigned> indices, bool simu
 	Genome genome;
 
 	for (unsigned i = 0; i < indices.size(); i++)
-		simulated ? genome.addGene(simulatedGenes[indices[i]], true) : genome.addGene(genes[indices[i]], false);
+	{
+		if (indices[i] > getGenomeSize(simulated))
+		{
+			my_printError("Error in Genome::getGenomeForGeneIndices. An index specified is out of bounds for the genome!\n");
+			my_printError("The index % is greater than the size of the genome (%).\n", indices[i], getGenomeSize());
+			my_printError("Returning empty Genome.\n");
+			genome.clear();
+			return genome;
+		}
+		else
+		{
+			simulated ? genome.addGene(simulatedGenes[indices[i]], true) : genome.addGene(genes[indices[i]], false);
+		}
+	}
 
 	return genome;
 }
@@ -793,20 +806,23 @@ Gene& Genome::getGeneById(std::string ID, bool simulated)
 Genome Genome::getGenomeForGeneIndicesR(std::vector <unsigned> indices, bool simulated)
 {
 	Genome genome;
-	bool check = true;
+
 	for (unsigned i = 0; i < indices.size(); i++)
 	{
-		if (indices[i] < 1 || indices[i] > getGenomeSize())
+		if (indices[i] < 1 || indices[i] > getGenomeSize(simulated))
 		{
-			check = false;
-			break;
+			my_printError("Error in Genome::getGenomeForGeneIndices. An index specified is out of bounds for the genome!");
+			my_printError("Returning empty Genome.");
+			genome.clear();
+			return genome;
 		}
 		else
 		{
-			indices[i] -= 1;
+			simulated ? genome.addGene(simulatedGenes[indices[i]], true) : genome.addGene(genes[indices[i]], false);
 		}
 	}
-	return check ? getGenomeForGeneIndices(indices, simulated) : genome;
+
+	return genome;
 }
 
 
