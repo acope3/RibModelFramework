@@ -43,15 +43,18 @@ length.Rcpp_Genome <- function(x) {
 #' 
 #' @param object A genome object initialized with \code{\link{initializeGenomeObject}}.
 #' 
+#' @param ... Optional, additional arguments to be passed to the main summary function 
+#' that affect the summary produced.
+#'
 #' @return This function returns by default an object of class c("summaryDefault", table").
-summary.Rcpp_Genome <- function(object) {
+summary.Rcpp_Genome <- function(object, ...) {
   # TODO output stuff like:
   # - no. of genes
   # - avg. gene length
   # - avg. A,C,G,T content
   # - avg. AA composition
   # - ...
-  summary(object)
+  summary(object, ...)
 }
 
 #' Gene Names of Genome
