@@ -25,10 +25,11 @@
 # Mac stuff
 *.DS_Store
 
-# Junk folders
+# Junk or Output folders
 Test
 Default
 junk
+UnitTestingOut
 
 # IDE files
 .autotools

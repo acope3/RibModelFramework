@@ -7,7 +7,8 @@
 #' @param estim.Expression A boolean value that says whether to use estimated expression
 #'  values or empirical values.   
 #' @param simulated A boolean value that determines whether to use the simulated genome.
-#' @param ... 
+#' @param ... Optional, additional arguments.
+#' For this function, a possible title for the plot in the form of a list if set with "main".
 #'  
 #' @return This function has no return value.
 #'  
@@ -84,7 +85,7 @@ plot.Rcpp_ROCModel <- function(x, genome, samples = 100, mixture = 1,
   
   ## adding a histogram of phi values to plot
   hist.values <- hist(expressionValues, plot=FALSE, nclass=30)
-  plot(hist.values, axes = FALSE, main="", xlab = "", ylab = "")
+  plot(hist.values, axes = FALSE, main, xlab = "", ylab = "")
   axis(1)
   axis(4, las=1)
   
@@ -104,18 +105,18 @@ plot.Rcpp_ROCModel <- function(x, genome, samples = 100, mixture = 1,
 #' 
 #' @param x An Rcpp model object initialized with \code{initializeModelObject}.
 #' @param genome An Rcpp genome object initialized with \code{initializeGenomeObject}.
-#' @param parameter An Rcpp parameter object.
 #' @param samples The number of samples in the trace
 #' @param mixture The mixture for which to graph values.
 #' @param estim.Expression A boolean value that says whether to use estimated expression
 #'  values or empirical values.   
 #' @param simulated A boolean value that determines whether to use the simulated genome.
-#' @param ... 
+#' @param ... Optional, additional arguments.
+#' For this function, a possible title for the plot in the form of a list if set with "main".
 #'  
 #' @return This function has no return value.
 #'
 #' @description See \code{plot.Rcpp_ROCModel}
-plot.Rcpp_FONSEModel <- function(x, genome, parameter, samples = 100, mixture = 1, 
+plot.Rcpp_FONSEModel <- function(x, genome, samples = 100, mixture = 1, 
                                estim.Expression = TRUE, simulated = FALSE, ...)
 {
   opar <- par(no.readonly = T) 
@@ -140,6 +141,7 @@ plot.Rcpp_FONSEModel <- function(x, genome, parameter, samples = 100, mixture = 
   text(0.5, 0.4, date(), cex = 0.6)
   
   num.genes <- genome$getGenomeSize()
+  parameter <- x$getParameter()
   
   mixtureAssignment <- unlist(lapply(1:num.genes,  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))
   genes.in.mixture <- which(mixtureAssignment == mixture)
@@ -185,7 +187,7 @@ plot.Rcpp_FONSEModel <- function(x, genome, parameter, samples = 100, mixture = 
   
   ## adding a histogram of phi values to plot
   hist.values <- hist(expressionValues, plot=FALSE, nclass=30)
-  plot(hist.values, axes = FALSE, main="", xlab = "", ylab = "")
+  plot(hist.values, axes = FALSE, main, xlab = "", ylab = "")
   axis(1)
   axis(4, las=1)
   

@@ -13,7 +13,7 @@ getNames(genome, simulated = FALSE)
 The default value is FALSE.}
 }
 \value{
-returns the names of the genes as a vector of strings.
+gene.names Returns the names of the genes as a vector of strings.
 }
 \description{
 \code{getNames} prints the names of the genes within the genome specified.
