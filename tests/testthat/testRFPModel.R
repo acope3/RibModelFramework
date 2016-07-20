@@ -5,7 +5,7 @@ context("RFP Model")
 
 test_that("RFP Model testing simulated versus actual accuracy", {
   # Skip unless manually run or changed
-  #if (F)
+  if (F)
     skip("RFP Model testing is optional.")
   
   fileName = file.path("UnitTestingData", "testRFPModelFiles", "testRFPModel.csv")
@@ -28,7 +28,7 @@ test_that("RFP Model testing simulated versus actual accuracy", {
   geneAssignment <- c(rep(1, length(genome))) 
   parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, model= "RFP", split.serine = TRUE, mixture.definition = mixDef)
   
-  samples <- 10
+  samples <- 50000
   thining <- 10
   adaptiveWidth <- 10
   mcmc <- initializeMCMCObject(samples = samples, thining = thining, adaptive.width = adaptiveWidth, 
@@ -37,7 +37,13 @@ test_that("RFP Model testing simulated versus actual accuracy", {
   model <- initializeModelObject(parameter, "RFP")
   #setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth, TRUE)
   
-  runMCMC(mcmc, genome, model, 8)
+  outFile = file.path("UnitTestingOut", "testRFPModelLog50000.txt")
+  
+  sink(outFile)
+  system.time(
+    runMCMC(mcmc, genome, model, 1)
+  )
+  sink()
   
   # plots different aspects of trace
   trace <- parameter$getTraceObject()
@@ -53,8 +59,8 @@ test_that("RFP Model testing simulated versus actual accuracy", {
   # The primary reason for doing this is the "jump" that throws the scale of the graph
   # at the beginning is removed by taking out the beginning values.
   loglik.trace <- mcmc$getLogLikelihoodTrace()
-  start <- length(loglik.trace) * 0.5 # the multiplier determines how much of the beginning trace is 
-  # eliminated.
+  start <- length(loglik.trace) * 0.7 
+  # the multiplier (currently 0.7) determines how much of the beginning trace is eliminated.
   
   logL <- logL <- mean(loglik.trace[start:length(loglik.trace)]) #get the mean for the subset
   plot(loglik.trace[start:length(loglik.trace)], type="l", main=paste("logL:", logL), xlab="Sample", ylab="log(Likelihood)")
@@ -140,8 +146,8 @@ test_that("RFP Model testing simulated versus actual accuracy", {
   axis(1, tck = 0.02, labels = codonList[1:61], at=1:61, las=2, cex.axis=.6)
   
   
-  # correlation between RFPModel and Premal's wait rates
-  # load Premal's data
+  # correlation between RFPModel and Pop's wait rates
+  # load Pop's data
   X <- read.csv(fileTable)
   X <- X[order(X[,1]) , ]
   XM <- matrix(c(X[,1], X[,2]), ncol = 2, byrow = FALSE)
@@ -153,7 +159,7 @@ test_that("RFP Model testing simulated versus actual accuracy", {
   
   
   plot(NULL, NULL, xlim=range(XM[,2], na.rm = T), ylim=range(Y[,2]), 
-       main = "Correlation Between Premal and RFP Model Pausing Time Rates", xlab = "Premal's Rates", ylab = "RFP's Rates")
+       main = "Correlation Between Pop and RFP Model Pausing Time Rates", xlab = "Pop's Rates", ylab = "RFP's Rates")
   upper.panel.plot(XM[,2], Y[,2])
   dev.off()
   

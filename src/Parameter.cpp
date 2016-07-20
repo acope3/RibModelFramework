@@ -812,7 +812,8 @@ void Parameter::setGroupList(std::vector <std::string> gl)
 	for (unsigned i = 0; i < gl.size(); i++)
 	{
 		if (gl[i] == "M" || gl[i] == "W" || gl[i] == "X")
-			my_printError("Warning: Amino Acid % not recognized in ROC model\n", gl[i].c_str());
+		    // TODO: print only with ROC and FONSE models, somehow.
+			my_printError("Warning: Amino Acid % not recognized in ROC or FONSE model.\n", gl[i].c_str());
 		else
 			groupList.push_back(gl[i]);
 	}
