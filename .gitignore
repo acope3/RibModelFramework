@@ -29,10 +29,6 @@
 Test
 Default
 junk
-#UnitTestingOut # Cannot exclude: Causes errors with sinking folders.
-
-# Output files
-RFP*.csv
 
 # IDE files
 .autotools
