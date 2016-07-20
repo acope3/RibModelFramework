@@ -2,6 +2,8 @@
 # Thus, this .gitignore's primary purpose is to cause this directory to be indexed in the repo
 # to allow output files to be produced (without keeping the output files in the directory).
 # This file will also list the output files that are expected to be produced (and ignore them).
+# 
+# The reason why this is needed is because the Travis server cannot write to non-existent files.
 #
 # Note that there is some redundancy in what is ignored compared to the overall package as
 # a result.
@@ -11,10 +13,10 @@ testMCMCROCLogPhi.txt
 testMCMCROCLogWithoutPhi.txt
 
 # testRFPModel files
-RFPAlphaValues.csv
+#RFPAlphaValues.csv
 RFPConfidenceIntervalsForAlphaAndLambdaPrime.pdf
-RFPLambdaPrimeValues.csv
-RFPPsiValues.csv
+#RFPLambdaPrimeValues.csv
+#RFPPsiValues.csv
 RFP_CSP_Values_Mixture1.pdf
 RFP_Genome_allUnique_startCSP_startPhi_adaptSphi_true.pdf
 testRFPModelLog.txt
