@@ -5,7 +5,7 @@ context("RFP Model")
 
 test_that("RFP Model testing simulated versus actual accuracy", {
   # Skip unless manually run or changed
-  if (F)
+  #if (F)
     skip("RFP Model testing is optional.")
   
   fileName = file.path("UnitTestingData", "testRFPModelFiles", "testRFPModel.csv")

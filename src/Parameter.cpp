@@ -1767,7 +1767,6 @@ void Parameter::randDirichlet(std::vector <double> &input, unsigned numElements,
 	for (unsigned i = 0; i < numElements; i++)
 	{
 		output[i] = output[i] / sumTotal;
-		int nothing = 0;
 	}
 }
 

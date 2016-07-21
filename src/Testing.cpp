@@ -2582,33 +2582,48 @@ int testParameter()
      * get/setGroupList, getGroupListSize, getGrouping
     */
 
-    std::vector <std::string> tmpGroupList = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
-                 "TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT", "ATA", "ATC",
-                 "ATT", "AAA", "AAG", "CTA", "CTC", "CTG", "CTT", "TTA", "TTG", "ATG",
-                 "AAC", "AAT", "CCA", "CCC", "CCG", "CCT", "CAA", "CAG", "AGA", "AGG",
-                 "CGA", "CGC", "CGG", "CGT", "TCA", "TCC", "TCG", "TCT", "ACA", "ACC",
-                 "ACG", "ACT", "GTA", "GTC", "GTG", "GTT", "TGG", "TAC", "TAT", "AGC",
-                 "AGT"};
+    std::vector <std::string> fullGroupList = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
+                                               "TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT", "ATA", "ATC",
+                                               "ATT", "AAA", "AAG", "CTA", "CTC", "CTG", "CTT", "TTA", "TTG", "ATG",
+                                               "AAC", "AAT", "CCA", "CCC", "CCG", "CCT", "CAA", "CAG", "AGA", "AGG",
+                                               "CGA", "CGC", "CGG", "CGT", "TCA", "TCC", "TCG", "TCT", "ACA", "ACC",
+                                               "ACG", "ACT", "GTA", "GTC", "GTG", "GTT", "TGG", "TAC", "TAT", "AGC",
+                                               "AGT"};
+
+    std::vector <std::string> twoCodonGroupList = {"TTT", "TTC", "TGT", "TGC", "TAT", "TAC", "CAA", "CAG", "AAT",
+                                                   "AAC", "CAT", "CAC", "GAA", "GAG", "GAT", "GAC", "AAA", "AAG"};
 
     //----------------------------------------//
     //------ get/setGroupList Functions ------//
     //----------------------------------------//
-    parameter.setGroupList(tmpGroupList);
+    parameter.setGroupList(fullGroupList);
 
-    if (parameter.getGroupList() != tmpGroupList)
+    if (parameter.getGroupList() != fullGroupList)
     {
-        my_printError("Error in setGroupList or getGroupList.\n");
+        my_printError("Error in setGroupList or getGroupList with a full group list.\n");
+        error = 1;
         globalError = 1;
     }
-    else
+
+    parameter.setGroupList(twoCodonGroupList);
+    if (parameter.getGroupList() != twoCodonGroupList)
+    {
+        my_printError("Error in setGroupList or getGroupList with only two-codon AAs in the group list.\n");
+        error = 1;
+        globalError = 1;
+    }
+
+    if (!error)
         my_print("Parameter get/setGroupList --- Pass\n");
+    else
+        error = 0; //Reset for next function.
 
     //----------------------------------------//
     //------ getGroupListSize Functions ------//
     //----------------------------------------//
-    if (parameter.getGroupListSize() != 61)
+    if (parameter.getGroupListSize() != 18)
     {
-        my_printError("Error in getGroupListSize. Size should be 61, but is instead %.\n", parameter.getGroupListSize());
+        my_printError("Error in getGroupListSize. Size should be 18, but is instead %.\n", parameter.getGroupListSize());
         globalError = 1;
     }
     else
@@ -2619,39 +2634,39 @@ int testParameter()
     //-----------------------------------//
     // We will only test 6 indices
 
-    if (parameter.getGrouping(0) != "GCA")
+    if (parameter.getGrouping(0) != "TTT")
     {
-        my_printError("Error in getGrouping at index 0. Value should be GCA, but is instead %.\n", parameter.getGrouping(0));
+        my_printError("Error in getGrouping at index 0. Value should be TTT, but is instead %.\n", parameter.getGrouping(0));
         error = 1;
         globalError = 1;
     }
-    if (parameter.getGrouping(9) != "GAG")
+    if (parameter.getGrouping(9) != "AAC")
     {
-        my_printError("Error in getGrouping at index 9. Value should be GAG, but is instead %.\n", parameter.getGrouping(9));
+        my_printError("Error in getGrouping at index 9. Value should be AAC, but is instead %.\n", parameter.getGrouping(9));
         error = 1;
         globalError = 1;
     }
-    if (parameter.getGrouping(14) != "GGG")
+    if (parameter.getGrouping(14) != "GAT")
     {
-        my_printError("Error in getGrouping at index 14. Value should be GGG, but is instead %.\n", parameter.getGrouping(14));
+        my_printError("Error in getGrouping at index 14. Value should be GAT, but is instead %.\n", parameter.getGrouping(14));
         error = 1;
         globalError = 1;
     }
-    if (parameter.getGrouping(28) != "TTG")
+    if (parameter.getGrouping(4) != "TAT")
     {
-        my_printError("Error in getGrouping at index 28. Value should be TTG, but is instead %.\n", parameter.getGrouping(28));
+        my_printError("Error in getGrouping at index 4. Value should be TAT, but is instead %.\n", parameter.getGrouping(28));
         error = 1;
         globalError = 1;
     }
-    if (parameter.getGrouping(31) != "AAT")
+    if (parameter.getGrouping(17) != "AAG")
     {
-        my_printError("Error in getGrouping at index 31. Value should be AAT, but is instead %.\n", parameter.getGrouping(31));
+        my_printError("Error in getGrouping at index 17. Value should be AAG, but is instead %.\n", parameter.getGrouping(31));
         error = 1;
         globalError = 1;
     }
-    if (parameter.getGrouping(60) != "AGT")
+    if (parameter.getGrouping(1) != "TTC")
     {
-        my_printError("Error in getGrouping at index 60. Value should be AGT, but is instead %.\n", parameter.getGrouping(60));
+        my_printError("Error in getGrouping at index 1. Value should be TTC, but is instead %.\n", parameter.getGrouping(60));
         error = 1;
         globalError = 1;
     }
