@@ -20,8 +20,8 @@ codonCounts Returns a matrix storing the codonCounts.
 the number of times a codon is seen in each gene.
 }
 \details{
-The returned matrix will have the row corrospond to the
-genes in the genome and the columns corrospond to the codons for the 
+The returned matrix will have the row correspond to the
+genes in the genome and the columns correspond to the codons for the 
 given aa. The values will the number of times the codon is present in 
 that gene.
 }

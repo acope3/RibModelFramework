@@ -7,8 +7,8 @@
 writeParameterObject(parameter, file)
 }
 \arguments{
-\item{parameter}{A parameter object that corrosponds to
-one of the model types, such as "ROC", or "FONSE".}
+\item{parameter}{A Parameter object that corresponds to one of the model types.
+Valid values are "ROC", "RFP", and "FONSE".}
 
 \item{file}{A filename that where the data will be stored.
 The file should end with the extension "Rdat".}

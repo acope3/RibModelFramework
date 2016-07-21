@@ -7,9 +7,8 @@
 getCSPEstimates(parameter, filename, CSP, mixture, samples)
 }
 \arguments{
-\item{parameter}{A parameter object that corrosponds to
-one of the model types. Valid values are "ROC", "RFP", and
-"FONSE".}
+\item{parameter}{A Parameter object that corresponds to one of the model types.
+Valid values are "ROC", "RFP", and "FONSE".}
 
 \item{filename}{A filename where the data will be written to.
 This file should end with a "csv" extension.}

@@ -9,7 +9,8 @@
 \arguments{
 \item{object}{A genome object initialized with \code{\link{initializeGenomeObject}}.}
 
-\item{...}{}
+\item{...}{Optional, additional arguments to be passed to the main summary function 
+that affect the summary produced.}
 }
 \value{
 This function returns by default an object of class c("summaryDefault", table").
