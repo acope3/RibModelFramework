@@ -11,55 +11,58 @@ initializeParameterObject(genome = NULL, sphi = NULL, numMixtures = 1,
   mutation_prior_sd = 0.35)
 }
 \arguments{
-\item{genome}{An object of type Genome necessary for the initialization of the Parameter object. The default value 
-is NULL.}
+\item{genome}{An object of type Genome necessary for the initialization of the Parameter object.
+The default value is NULL.}
 
 \item{sphi}{Initial values for sphi. Expected is a vector of length numMixtures.
 The default value is NULL.}
 
 \item{numMixtures}{The number of mixtures elements for the underlying mixture distribution (numMixtures > 0).
-The default value is 1}
+The default value is 1.}
 
 \item{geneAssignment}{A vector holding the initial mixture assignment for each gene. 
-The vector length has to equal the number of 
-genes in the genome. Valid values for the vector range from
-1 to numMixtures. It is possible but not advised to leave a mixture element empty. The default Value is NULL.}
+The vector length has to equal the number of genes in the genome.
+Valid values for the vector range from 1 to numMixtures. 
+It is possible but not advised to leave a mixture element empty.
+The default Value is NULL.}
 
 \item{expressionValues}{(Optional) A vector with intial phi values.
 The length of the vector has to equal the number of genes in the Genome object.
 The default value is NULL.}
 
-\item{model}{Specifies the model used. Valid options are "ROC", "RFP", or "FONSE". The default
-model is "ROC". 
-ROC is described in Gilchrist et al. 2015
-RFP and FONSE are currently unpublished}
+\item{model}{Specifies the model used. Valid options are "ROC", "RFP", or "FONSE".
+The default model is "ROC".
+ROC is described in Gilchrist et al. 2015.
+RFP and FONSE are currently unpublished.}
 
 \item{split.serine}{Whether serine should be considered as 
-one or two amino acids when running the model. TRUE and FALSE
-are the only valid values. The default value for split.serine is
-TRUE.}
+one or two amino acids when running the model.
+TRUE and FALSE are the only valid values.
+The default value for split.serine is TRUE.}
 
 \item{mixture.definition}{A string describing how each mixture should
-be treated with respect to mutation and selection. Valid values consist
-of "allUnique", "mutationShared", and "selectionShared". The default value
-for mixture.definition is "allUnique". See details for more information.}
+be treated with respect to mutation and selection.
+Valid values consist of "allUnique", "mutationShared", and "selectionShared".
+The default value for mixture.definition is "allUnique".
+See details for more information.}
 
 \item{mixture.definition.matrix}{A matrix representation of how
-the mutation and selection categories corrospond to the mixtures.
-The default value for mixture.definition.matrix is NULL. If provided,
-the model will use the matrix to initialize the mutation and selection
-categories instead of the definition listed directly above. See details
-for more information.}
+the mutation and selection categories correspond to the mixtures.
+The default value for mixture.definition.matrix is NULL.
+If provided, the model will use the matrix to initialize the mutation and selection
+categories instead of the definition listed directly above.
+See details for more information.}
 
 \item{restart.file}{File name containing information to reinitialize a 
-previous parameter object. If given, all other arguments will be ignored.
+previous Parameter object.
+If given, all other arguments will be ignored.
 The default value for restart.file is NULL.}
 
-\item{mutation_prior_sd}{Controling the standard deviation of the normal 
+\item{mutation_prior_sd}{Controlling the standard deviation of the normal 
 prior on the mutation parameters}
 }
 \value{
-parameter Returns an initialized parameter object.
+parameter Returns an initialized Parameter object.
 }
 \description{
 \code{initializeParameterObject} will call the appropriate followup
@@ -67,9 +70,9 @@ call to writeXXXParameterObject based off of the value of model and restart.file
 }
 \details{
 \code{initializeParameterObject} checks the values of the arguments 
-given to insure the values are valid. Additionally, if a restart file is given,
-no follow up function calls are made - a new call is made instead which calls
-the C++ constructor that only takes a file name.
+given to insure the values are valid.
+Additionally, if a restart file is given, no follow up function calls are made - 
+a new call is made instead which calls the C++ constructor that only takes a file name.
 
 The mixture definition and mixture definition matrix describe how the mutation
 and selection categories are set up with respect to the number of mixtures. For
@@ -83,8 +86,8 @@ representation would be as follows:
 3 3
 
 where each row represents a mixture, the first column represents the mutation
-category, and the second column represents the selection category. Another 
-example would be mixture.definition = "selectionShared" and numMixtures = 4.
+category, and the second column represents the selection category.
+Another example would be mixture.definition = "selectionShared" and numMixtures = 4.
 
 1 1
 

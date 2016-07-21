@@ -21,7 +21,8 @@ values or empirical values.}
 
 \item{simulated}{A boolean value that determines whether to use the simulated genome.}
 
-\item{...}{}
+\item{...}{Optional, additional arguments.
+For this function, a possible title for the plot in the form of a list if set with "main".}
 }
 \value{
 This function has no return value.

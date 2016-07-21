@@ -9,7 +9,7 @@
 \arguments{
 \item{x}{An Rcpp_MCMC object initialized with \code{initializeMCMCObject}.}
 
-\item{zoom.window}{}
+\item{zoom.window}{A vector describing the start and end of the zoom window.}
 
 \item{...}{Arguments to be passed to methods, such as graphical parameters.}
 }

@@ -43,8 +43,9 @@ length.Rcpp_Genome <- function(x) {
 #' 
 #' @param object A genome object initialized with \code{\link{initializeGenomeObject}}.
 #' 
-#' @param ... 
-#' 
+#' @param ... Optional, additional arguments to be passed to the main summary function 
+#' that affect the summary produced.
+#'
 #' @return This function returns by default an object of class c("summaryDefault", table").
 summary.Rcpp_Genome <- function(object, ...) {
   # TODO output stuff like:
@@ -53,7 +54,7 @@ summary.Rcpp_Genome <- function(object, ...) {
   # - avg. A,C,G,T content
   # - avg. AA composition
   # - ...
-  summary(object)
+  summary(object, ...)
 }
 
 #' Gene Names of Genome
@@ -65,7 +66,7 @@ summary.Rcpp_Genome <- function(object, ...) {
 #' @param simulated A logical value denoting if the gene names to be listed are simulated or not.
 #' The default value is FALSE.
 #' 
-#' @return returns the names of the genes as a vector of strings.
+#' @return gene.names Returns the names of the genes as a vector of strings.
 #' 
 getNames <- function(genome, simulated = FALSE)
 {
