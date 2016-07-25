@@ -19,7 +19,7 @@ Mphi, Aphi, Spesilon, ExpectedPhi, Expression}.}
 \item{mixture}{The mixture for which to plot values.}
 
 \item{...}{Optional, additional arguments.
-For this function, a possible title for the plot in the form of a list if set with "main".}
+For this function, may be a logical value determining if the trace is ROC-based or not.}
 }
 \value{
 This function has no return value.

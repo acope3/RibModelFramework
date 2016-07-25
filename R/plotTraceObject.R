@@ -11,11 +11,12 @@
 #' @param geneIndex When plotting expression, the index of the gene to be plotted.
 #' @param mixture The mixture for which to plot values.
 #' @param ... Optional, additional arguments.
-#' For this function, a possible title for the plot in the form of a list if set with "main".
-#' 
+#' For this function, may be a logical value determining if the trace is ROC-based or not.
+#'
 #' @return This function has no return value.
 #' 
 #' @description Plots different traces, specified with the \code{what} parameter.
+#'
 plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbability" ,"Sphi", "Mphi", "Aphi", "Sepsilon", "ExpectedPhi", "Expression"), 
                                    geneIndex=1, mixture = 1, ...)
 {
@@ -41,7 +42,7 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
   }
   if(what[1] == "Sphi")
   {
-    plotHyperParameterTrace(x, what = what[1])
+    plotHyperParameterTrace(x, what = what[1]) 
   }
   if(what[1] == "Mphi") 
   {
@@ -65,7 +66,24 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
   }
 }
 
+# Called from Plot Trace Object (plot for trace)
 # NOT EXPOSED
+# 
+#' Plot Codon Specific Parameter
+#' @param trace An Rcpp trace object initialized with \code{initializeTraceObject}.
+#'
+#' @param mixture The mixture for which to plot values.
+#'
+#' @param type A string containing one of the following to graph: \code{mutation, selection, alpha, lambdaPrime}. 
+#'
+#' @param main The title of the plot.
+#'
+#' @param ROC A logical value determining if the Parameter was ROC or not.
+#'
+#' @return This function has no return value.
+#' 
+#' @description Plots a codon-specific set of traces, specified with the \code{type} parameter.
+#'
 plotCodonSpecificParameters <- function(trace, mixture, type="mutation", main="Mutation Parameter Traces", ROC=TRUE)
 {
   opar <- par(no.readonly = T) 
@@ -160,18 +178,25 @@ plotExpectedPhiTrace <- function(trace)
 }
 
 # NOT EXPOSED
+# Currently can only be one of Sphi, Mphi, Aphi, and Sepsilon.
 plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sepsilon"))
 {
 #  opar <- par(no.readonly = T) 
 #  par(oma=c(1,1,2,1), mgp=c(2,1,0), mar = c(3,4,2,1), mfrow=c(2, 1))
+  xlab <- "Sample"
+  
   if (what[1] == "Sphi")
   {
     sphi <- trace$getStdDevSynthesisRateTraces();
     numMixtures <- length(sphi)
     sphi <- do.call("cbind", sphi)
+    
     ylimit <- range(sphi) + c(-0.1, 0.1)
     xlimit <- c(1, nrow(sphi))
-    plot(NULL, NULL, type="l", xlab = "Sample", ylab = expression("s"[phi]), xlim  = xlimit, ylim = ylimit)
+    ylab <- expression("s"[phi])
+    main <- expression("s"[phi]*"Trace")
+    plot(NULL, NULL, type="l", xlab = xlab, ylab = ylab, xlim = xlimit, ylim = ylimit, main = main)
+    
     for(i in 1:ncol(sphi))
     {
       lines(sphi[-1,i], col = .mixtureColors[i])
@@ -179,15 +204,19 @@ plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sep
     legend("topleft", legend = paste0("Mixture Element", 1:numMixtures), 
            col = .mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")
   }
-  if (what[1] == "Mphi")
+  else if (what[1] == "Mphi")
   {
     sphi <- trace$getStdDevSynthesisRateTraces();
     numMixtures <- length(sphi)
     sphi <- do.call("cbind", sphi)
     mphi <- -(sphi * sphi) / 2;
+
     ylimit <- range(mphi) + c(-0.1, 0.1)
     xlimit <- c(1, nrow(mphi))
-    plot(NULL, NULL, type="l", xlab = "Sample", ylab = expression("m"[phi]), xlim  = xlimit, ylim = ylimit)
+    ylab <- expression("m"[phi])
+    main <- expression("m"[phi]*"Trace")
+    plot(NULL, NULL, type="l", xlab = xlab, ylab = ylab, xlim  = xlimit, ylim = ylimit, main = main)
+    
     for(i in 1:ncol(mphi))
     {
       lines(mphi[-1,i], col= .mixtureColors[i])
@@ -196,13 +225,17 @@ plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sep
            col = .mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")    
 
   }
-  if (what[1] == "Aphi") 
+  else if (what[1] == "Aphi") 
   {
     aphi <- trace$getSynthesisOffsetTrace();
     aphi <- do.call("cbind", aphi)
+    
     ylimit <- range(aphi) + c(-0.1, 0.1)
     xlimit <- c(1, nrow(aphi))
-    plot(NULL, NULL, type="l", xlab = "Sample", ylab = expression("A"[phi]), xlim  = xlimit, ylim = ylimit)
+    ylab <- expression("A"[phi])
+    main <- expression("A"[phi]*"Trace")
+    plot(NULL, NULL, type="l", xlab = xlab, ylab = ylab, xlim  = xlimit, ylim = ylimit, main = main)
+    
     for(i in 1:ncol(aphi))
     {
       lines(aphi[-1,i], col = .mixtureColors[i])
@@ -210,13 +243,17 @@ plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sep
     legend("topleft", legend = paste0("Observed Data", 1:numMixtures), 
            col = .mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")        
   }
-  if (what[1] == "Sepsilon")
+  else if (what[1] == "Sepsilon")
   {
     sepsilon <- trace$getObservedSynthesisNoiseTrace();
     sepsilon <- do.call("cbind", sepsilon)
+
     ylimit <- range(sepsilon) + c(-0.1, 0.1)
     xlimit <- c(1, nrow(sepsilon))
-    plot(NULL, NULL, type="l", xlab = "Sample", ylab = expression("s"[epsilon]), xlim  = xlimit, ylim = ylimit)
+    ylab <- expression("s"[epsilon])
+    main <- expression("s"[epsilon]*"Trace")
+    plot(NULL, NULL, type="l", xlab = xlab, ylab = ylab, xlim  = xlimit, ylim = ylimit, main = main)
+
     for(i in 1:ncol(sepsilon))
     {
       lines(sepsilon[-1,i], col = .mixtureColors[i])
@@ -233,8 +270,8 @@ plotMixtureProbability <- function(trace)
   samples <- length(trace$getMixtureProbabilitiesTraceForMixture(1))
   numMixtures <- trace$getNumberOfMixtures()
   
-  plot(NULL, NULL, xlim = c(0, samples), ylim=c(0, 1), xlab = "Samples", ylab="Mixture Probability")
-  for(i in 1:numMixtures)
+  plot(NULL, NULL, xlim = c(0, samples), ylim=c(0, 1), xlab = "Samples", ylab = "Mixture Probability", main = "Mixture Probability")
+  for (i in 1:numMixtures)
   {
     lines(trace$getMixtureProbabilitiesTraceForMixture(i)[-1], col = .mixtureColors[i])    
   }
