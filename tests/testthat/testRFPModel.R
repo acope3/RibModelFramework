@@ -8,11 +8,16 @@ test_that("RFP Model testing simulated versus actual accuracy", {
   #if (F)
     skip("RFP Model testing is optional.")
   
-  fileName = file.path("UnitTestingData", "testRFPModelFiles", "testRFPModel.csv")
+  #####################
+  ### Initial Setup ###
+  #####################
+
+  # Test with only 1500 genes
+  fileName = file.path("UnitTestingData", "testRFPModelFiles", "rand1500.csv")
   fileTable = file.path("UnitTestingData", "testRFPModelFiles", "codonTranslationRates.csv")
   
   # Ensure the input files exist.
-  test_that("file exists: testRFPModel.csv", {
+  test_that("file exists: rand1500.csv", {
     expect_equal(file.exists(fileName), T)
   })
   
@@ -28,31 +33,35 @@ test_that("RFP Model testing simulated versus actual accuracy", {
   geneAssignment <- c(rep(1, length(genome))) 
   parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, model= "RFP", split.serine = TRUE, mixture.definition = mixDef)
   
-  samples <- 50000
+  samples <- 20000
   thining <- 10
   adaptiveWidth <- 10
   mcmc <- initializeMCMCObject(samples = samples, thining = thining, adaptive.width = adaptiveWidth, 
                                est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
   
   model <- initializeModelObject(parameter, "RFP")
-  #setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth, TRUE)
+  setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth, TRUE)
   
-  outFile = file.path("UnitTestingOut", "testRFPModelLog50000.txt")
+  outFile = file.path("UnitTestingOut", "testRFPModelLog20000.txt")
   
   sink(outFile)
   system.time(
-    runMCMC(mcmc, genome, model, 1)
+    runMCMC(mcmc, genome, model, 9)
   )
   sink()
   
+  #########################################################################################
+  ### Output File 1: MCMC, Loglikelihood, Mixture Probability, Mphi, Sphi, Expected Phi ###
+  #########################################################################################
+  
   # plots different aspects of trace
   trace <- parameter$getTraceObject()
-  #writeParameterObject(parameter, file = file.path("UnitTestingOut", "RFPObject.Rdat"))
-  #writeMCMCObject(mcmc, file = file.path("UnitTestingOut", "MCMCObject.Rdat"))
+  writeParameterObject(parameter, file = file.path("UnitTestingOut", "RFPObject.Rdat"))
+  writeMCMCObject(mcmc, file = file.path("UnitTestingOut", "MCMCObject.Rdat"))
   
   
   pdf(file.path("UnitTestingOut", "RFP_Genome_allUnique_startCSP_startPhi_adaptSphi_true.pdf"))
-  plot(mcmc) #plots the whole loglikelihood trace
+  plot(mcmc, main = "MCMC Trace") #plots the whole loglikelihood trace
   
   
   # take a subset of the trace values for the logliklihood trace and plot them.
@@ -67,16 +76,19 @@ test_that("RFP Model testing simulated versus actual accuracy", {
   grid (NULL,NULL, lty = 6, col = "cornsilk2")
   
   
-  plot(trace, what = "MixtureProbability")
-  plot(trace, what = "Mphi")
-  plot(trace, what = "Sphi")
-  plot(trace, what = "ExpectedPhi")
+  plot(trace, what = "MixtureProbability", main = "Mixture Probability")
+  plot(trace, what = "Mphi", main = "Mphi")
+  plot(trace, what = "Sphi", main = "Sphi")
+  plot(trace, what = "ExpectedPhi", main = "Expected Phi")
   
   #loglik.trace <- mcmc$getLogLikelihoodTrace()
   #acf(loglik.trace)
   #acf(loglik.trace[start:length(loglik.trace)])
   dev.off()
   
+  #################################
+  ### Output File 2: CSP Traces ###
+  #################################
   
   pdf(file.path("UnitTestingOut", "RFP_CSP_Values_Mixture1.pdf"), width = 11, height = 20)
   #plot(trace, what = "Expression", geneIndex = 905) #used to make sure gene stabalized, not really needed now
@@ -84,6 +96,9 @@ test_that("RFP Model testing simulated versus actual accuracy", {
   plot(trace, what = "LambdaPrime", mixture = 1)
   dev.off()
   
+  #####################
+  ### Output File 3 ###
+  #####################
   
   pdf(file.path("UnitTestingOut", "RFPConfidenceIntervalsForAlphaAndLambdaPrime.pdf"))
   
@@ -161,9 +176,22 @@ test_that("RFP Model testing simulated versus actual accuracy", {
   plot(NULL, NULL, xlim=range(XM[,2], na.rm = T), ylim=range(Y[,2]), 
        main = "Correlation Between Pop and RFP Model Pausing Time Rates", xlab = "Pop's Rates", ylab = "RFP's Rates")
   upper.panel.plot(XM[,2], Y[,2])
+  
+  # correlation between RFPModel WAIT RATES (inverse) and Pop's wait rates
+  Y <- data.frame(codonList[-c(62,63,64)], waitingTimes)
+  colnames(Y) <- c("Codon", "WaitingTimeRates")
+  Y <- Y[order(Y[,1]) , ]
+  
+  
+  plot(NULL, NULL, xlim=range(XM[,2], na.rm = T), ylim=range(Y[,2]), 
+       main = "Correlation Between Pop and RFP Model Waiting Times", xlab = "Pop's Rates", ylab = "RFP's Waiting Times")
+  upper.panel.plot(XM[,2], Y[,2])
+
   dev.off()
   
-  
+  #################
+  ### CSV Files ###
+  #################
   # Will write csv files based off posterior for alpha, lambda prime, and psi
   m <- matrix(c(codonList[-c(62,63,64)], alphaList), ncol = 2, byrow = FALSE)
   colnames(m) <- c("Codon", "Alpha")
