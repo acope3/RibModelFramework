@@ -429,7 +429,7 @@ int main()
 		std::cout << "initialize Genome object--------------------------" << std::endl;
 		Genome genome;
 		std::cout << "Reading fasta file\n";
-		genome.readFasta("C:/Users/Alan/Documents/GitHub/RibModelDev/data/FONSE/nse2000.fasta");
+		genome.readFasta("C:/Users/Alan/Documents/GitHub/RibModelDev/data/FONSE/sim_data/simulatedFONSE_phiScaled10000_b-0.001.fasta");
 		std::cout << "Done!-------------------------------\n\n\n";
 
 
@@ -468,11 +468,13 @@ int main()
 			std::cout << "\t# mixtures: " << numMixtures << "\n";
 			std::cout << "\tmixture definition: " << mixDef << "\n";
 
-			//std::vector<std::string> files(1);
-			//files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelDev/data/FONSE/Scereviciae.mut.csv");
-			//tmp.initMutationCategories(files, tmp.getNumMutationCategories());
+			std::vector<std::string> files(1);
+			files[0] = std::string("C:/Users/Alan/Documents/GitHub/RibModelDev/data/FONSE/sim_data/S.cer.mut.ref.csv");
+			tmp.initMutationCategories(files, tmp.getNumMutationCategories());
+			files[0] = std::string("C:/Users/Alan/Documents/GitHub/RibModelDev/data/FONSE/sim_data/deltaomega_b-0.001.csv");
+			tmp.initSelectionCategories(files, tmp.getNumMutationCategories());
 			//tmp.InitializeSynthesisRate(genome, sphi_init[0]);
-			std::vector<double> phiVals = parameter.readPhiValues("C:/Users/Alan/Documents/GitHub/RibModelDev/data/FONSE/nse2000.phi.csv");
+			std::vector<double> phiVals = parameter.readPhiValues("C:/Users/Alan/Documents/GitHub/RibModelDev/data/FONSE/sim_data/simFONSE_scaled10000.phi.csv");
 			tmp.InitializeSynthesisRate(phiVals);
 			parameter = tmp;
 		}
@@ -568,7 +570,7 @@ int main()
 	{
 		std::cout << "Initializing Genome object--------------------------" << std::endl;
 		Genome genome;
-		genome.readFasta("C:/Users/Alan/Documents/GitHub/RibModelDev/data/realGenomes/Skluyveri.fasta");
+		genome.readFasta("C:/Users/Alan/Documents/GitHub/RibModelDev/data/realGenomes/Scereviciae.fasta");
 		if (withPhi)
 		{
 			genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv", false);

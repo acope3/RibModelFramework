@@ -192,8 +192,8 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 		likelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation_proposed, selection_proposed, phiValue);
 	}
 
-	likelihood_proposed = likelihood_proposed + calculateMutationPrior(grouping, true);
-	likelihood = likelihood + calculateMutationPrior(grouping, false);
+	//likelihood_proposed = likelihood_proposed + calculateMutationPrior(grouping, true);
+	//likelihood = likelihood + calculateMutationPrior(grouping, false);
 
 	logAcceptanceRatioForAllMixtures = (likelihood_proposed - likelihood);
 }
@@ -667,7 +667,10 @@ void ROCModel::simulateGenome(Genome &genome)
 			std::string codon = geneSeq.substr((position * 3), 3);
 			std::string aa = SequenceSummary::codonToAA(codon);
 
-			if (aa == "X") continue;
+			if (aa == "X") {
+				if (position < (geneSeq.size() / 3) - 1) my_print("Warning: Internal stop codon found in gene % at position %. Ignoring and moving on.\n", gene.getId(), position);
+				continue;
+			}
 
 			unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa);
 
@@ -693,7 +696,7 @@ void ROCModel::simulateGenome(Genome &genome)
 			codon = seqSum.indexToCodon(aaStart + codonIndex);//get the correct codon based off codonIndex
 			tmpSeq += codon;
 		}
-		std::string codon =	seqSum.indexToCodon((unsigned)Parameter::randUnif(61.0, 63.0)); //randomly choose a stop codon, from range 61-63
+		std::string codon =	seqSum.indexToCodon((unsigned)Parameter::randUnif(61.0, 64.0)); //randomly choose a stop codon, from range 61-63
 		tmpSeq += codon;
 		Gene simulatedGene(tmpSeq, tmpDesc, gene.getId());
 		genome.addGene(simulatedGene, true);
@@ -797,6 +800,51 @@ void ROCModel::calculateCodonProbabilityVector(unsigned numCodons, double mutati
 	// normalize codon probabilities
 	for (unsigned i = 0u; i < numCodons; i++)
 		codonProb[i] = codonProb[i] * denominator; // denominator is 1/denominator. see above
+}
+
+void ROCModel::calculateLogCodonProbabilityVector(unsigned numCodons, double mutation[], double selection[], double phi, double codonProb[])
+{
+	// calculate numerator and denominator for codon probabilities
+	unsigned minIndexVal = 0u;
+	double denominator;
+	for (unsigned i = 1u; i < (numCodons - 1); i++)
+	{
+		if (selection[minIndexVal] > selection[i])
+			minIndexVal = i;
+	}
+
+	// if the min(selection) is less than zero than we have to adjust the reference codon.
+	// if the reference codon is the min value (0) then we do not have to adjust the reference codon.
+	// This is necessary to deal with very large phi values (> 10^4) and avoid producing Inf which then
+	// causes the denominator to be Inf (Inf / Inf = NaN).
+	if (selection[minIndexVal] < 0.0)
+	{
+		denominator = 0.0;
+		for (unsigned i = 0u; i < (numCodons - 1); i++)
+		{
+			codonProb[i] = -(mutation[i] - mutation[minIndexVal]) - ((selection[i] - selection[minIndexVal]) * phi);
+			//codonProb[i] = std::exp( -mutation[i] - (selection[i] * phi) );
+			denominator += std::exp(codonProb[i]);
+		}
+		// alphabetically last codon is reference codon!
+		codonProb[numCodons - 1] = mutation[minIndexVal] + selection[minIndexVal] * phi;
+		denominator += std::exp(codonProb[numCodons - 1]);
+	}
+	else
+	{
+		denominator = 1.0;
+		for (unsigned i = 0u; i < (numCodons - 1); i++)
+		{
+			codonProb[i] = -mutation[i] - (selection[i] * phi);
+			denominator += std::exp(codonProb[i]);
+		}
+		// alphabetically last codon is reference codon!
+		codonProb[numCodons - 1] = 1.0;
+	}
+
+	denominator = std::log(denominator);
+	for (unsigned i = 0u; i < numCodons; i++)
+		codonProb[i] = codonProb[i] - denominator; // denominator is 1/denominator. see above
 }
 
 

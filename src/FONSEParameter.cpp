@@ -403,6 +403,7 @@ void FONSEParameter::initSelectionCategories(std::vector<std::string> files, uns
             my_printError("Error opening file % to initialize mutation values.\n", category);
 		else
 		{
+			std::cout << "Opened Selection File\n";
 			std::string tmp;
 			currentFile >> tmp; //The first line is a header (Amino Acid, Codon, Value, Std_deviation)
 
@@ -420,6 +421,7 @@ void FONSEParameter::initSelectionCategories(std::vector<std::string> files, uns
 
 				currentCodonSpecificParameter[dOmega][category][codonIndex] = value;
 				proposedCodonSpecificParameter[dOmega][category][codonIndex] = value;
+				//std::cout << "Value = " << value << std::endl;
 			}
 		}
         currentFile.close();
@@ -563,6 +565,12 @@ void FONSEParameter::getParameterForCategory(unsigned category, unsigned paramTy
 	unsigned aaStart;
 	unsigned aaEnd;
 	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
+
+	if (!(proposal)) {
+		
+		int count = 0;
+		for (int i = 0; i < tempSet->size(); i++) if (tempSet->at(i) == 0) count++;
+	}
     
     unsigned j = 0u;
     for (unsigned i = aaStart; i < aaEnd; i++, j++)
