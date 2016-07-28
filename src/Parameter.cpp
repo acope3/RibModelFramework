@@ -539,6 +539,9 @@ void Parameter::initCategoryDefinitions(std::string _mutationSelectionState,
 }
 
 
+/* InitializeSynthesisRate (by genome) (RCPP EXPOSED VIA WRAPPER)
+ * Arguments: //TODO
+*/
 void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 {
 	unsigned genomeSize = genome.getGenomeSize();
@@ -573,6 +576,9 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 }
 
 
+/* InitializeSynthesisRate (by random) (RCPP EXPOSED VIA WRAPPER)
+ * Arguments: //TODO
+*/
 void Parameter::InitializeSynthesisRate(double sd_phi)
 {
 	unsigned numGenes = currentSynthesisRateLevel[1].size();
@@ -588,6 +594,9 @@ void Parameter::InitializeSynthesisRate(double sd_phi)
 }
 
 
+/* InitializeSynthesisRate (by list) (RCPP EXPOSED VIA WRAPPER)
+ * Arguments: //TODO
+*/
 void Parameter::InitializeSynthesisRate(std::vector<double> expression)
 {
 	unsigned numGenes = currentSynthesisRateLevel[0].size();
@@ -735,6 +744,7 @@ unsigned Parameter::getMutationCategory(unsigned mixtureElement)
 }
 
 
+//TODO: Considering renaming so that the two sides of the function match more than they currently do.
 /* Note 1) -- on getSelectionCategory and getSynthesisRateCategory
  * These two functions are technically the same for readability.
  * Selection and synthesis rate are directly related even if they are not known
@@ -747,6 +757,7 @@ unsigned Parameter::getMutationCategory(unsigned mixtureElement)
  * Arguments: A number representing a mixture element
  * Returns the selection category of the mixture element chosen.
  * See Note 1) above.
+ * Wrapped by getSelectionCategoryForMixture on the R-side.
  */
 unsigned Parameter::getSelectionCategory(unsigned mixtureElement)
 {
@@ -754,10 +765,12 @@ unsigned Parameter::getSelectionCategory(unsigned mixtureElement)
 }
 
 
+//TODO: Considering renaming so that the two sides of the function match more than they currently do.
 /* getSynthesisRateCategory (RCPP EXPOSED VIA WRAPPER)
  * Arguments: A number representing a mixture element
  * Returns the synthesis rate category of the mixture element chosen.
  * See Note 1) above.
+ * Wrapped by getSynthesisRateCategoryForMixture on the R-side.
  */
 unsigned Parameter::getSynthesisRateCategory(unsigned mixtureElement)
 {
@@ -802,6 +815,7 @@ unsigned Parameter::getNumAcceptForCspForIndex(unsigned i)
 // -------------------------------------------//
 
 
+//TODO: Expose this to allow for testing with only specific codons.
 /* setGroupList (NOT EXPOSED)
  * Arguments: vector of strings representing a group list
  * Sets the group list to the argument after clearing the group list, adding elements only if they have no errors.
@@ -830,7 +844,7 @@ std::string Parameter::getGrouping(unsigned index)
 }
 
 
-/* getGroupList (NOT EXPOSED)
+/* getGroupList (RCPP EXPOSED)
  * Arguments: None
  * Returns the group list as a vector of strings.
 */
@@ -1021,7 +1035,7 @@ unsigned Parameter::getNumAcceptForSynthesisRate(unsigned expressionCategory, un
 //------------------------------------------//
 
 
-/* setLastIteration (NOT EXPOSED)
+/* setLastIteration (RCPP EXPOSED)
  * Arguments: None
  * Returns the last iteration.
 */
@@ -1031,7 +1045,7 @@ unsigned Parameter::getLastIteration()
 }
 
 
-/* setLastIteration (NOT EXPOSED)
+/* setLastIteration (RCPP EXPOSED)
  * Arguments: unsigned value representing an iteration
  * Sets the last iteration to the argument given.
 */
@@ -1299,6 +1313,12 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 //------------------------------------------------------------------//
 
 
+/* getStdDevSynthesisRatePosteriorMean (RCPP EXPOSED)
+ * Arguments: the number of samples from the end of the trace to examine, and the mixture element, both as unsigned values
+ * Returns the standard deviation synthesis rate posterior mean of the mixture element.
+ * This is calculated by simply gathering a number of traces from the end of the entire trace (up to all of it) to the end
+ * of the standard deviation synthesis rate trace, and then getting the mean of these values.
+*/
 double Parameter::getStdDevSynthesisRatePosteriorMean(unsigned samples, unsigned mixture)
 {
 	double posteriorMean = 0.0;
@@ -1323,6 +1343,15 @@ double Parameter::getStdDevSynthesisRatePosteriorMean(unsigned samples, unsigned
 }
 
 
+//TODO: Considering renaming so that the two sides of the function match more than they currently do.
+/* getSynthesisRatePosteriorMean (RCPP EXPOSED VIA WRAPPER)
+ * Arguments: the number of samples from the end of the trace to examine, the gene to examine, and the mixture element.
+ * Returns the posterior mean of the synthesis rate of the mixture element for a given gene.
+ * This is calculated by simply gathering a number of traces from the end of the entire trace (up to all of it) to the end
+ * of the gene's synthesis rate trace, and then getting the mean of these values.
+ * Note: May return NaN if the gene was never in the category (expected resulted, OK).
+ * Wrapped by getSynthesisRatePosteriorMeanByMixtureElementForGene on the R-side.
+*/
 double Parameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement)
 {
 	unsigned expressionCategory = getSynthesisRateCategory(mixtureElement);
@@ -1352,11 +1381,18 @@ double Parameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned geneI
 			usedSamples++;
 		}
 	}
-	// Can return NaN if gene was never in category! But that is Ok.
 	return posteriorMean / (double)usedSamples;
 }
 
 
+/* getCodonSpecificPosteriorMean (RCPP EXPOSED VIA WRAPPER)
+ * Arguments: the mixture element, the number of samples from the end of the trace to examine, the codon to examine,
+ * 			  the parameter type to examine, and whether or not it is with reference.
+ * Returns the posterior mean of a codon-specific parameter of the mixture element.
+ * This is calculated by simply gathering a number of traces from the end of the entire trace (up to all of it) to the end
+ * of the codon-specific parameter's trace, and then getting the mean of these values.
+ * Wrapped by getCodonSpecificPosteriorMeanForCodon on the R-side.
+*/
 double Parameter::getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon,
 	unsigned paramType, bool withoutReference)
 {
@@ -1391,7 +1427,8 @@ double Parameter::getStdDevSynthesisRateVariance(unsigned samples, unsigned mixt
 	if (samples > traceLength)
 	{
 		my_printError("Warning in ROCParameter::getSynthesisRateVariance throws: Number of anticipated samples ");
-		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n", samples, traceLength);
+		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n",
+					  samples, traceLength);
 
 		samples = traceLength;
 	}
@@ -1419,7 +1456,8 @@ double Parameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex,
 	if (samples > traceLength)
 	{
 		my_printError("Warning in ROCParameter::getSynthesisRateVariance throws: Number of anticipated samples ");
-		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n", samples, traceLength);
+		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n",
+					  samples, traceLength);
 
 		samples = traceLength;
 	}
@@ -1540,7 +1578,8 @@ std::vector<double> Parameter::getEstimatedMixtureAssignmentProbabilities(unsign
 	if (samples > traceLength)
 	{
 		my_printError("Warning in ROCParameter::getEstimatedMixtureAssignmentProbabilities throws: Number of anticipated samples ");
-		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n", samples, traceLength);
+		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n",
+					  samples, traceLength);
 
 		samples = traceLength;
 	}
@@ -1947,6 +1986,13 @@ unsigned Parameter::getMutationCategoryForMixture(unsigned mixtureElement)
 }
 
 
+/* getSelectionCategoryForMixture
+ * Arguments: A number representing a mixture element
+ * Returns the selection category of the mixture element chosen.
+ * See Note 1) above.
+ * To implement the R version of this function, the index is also checked.
+ * This is the R-wrapper for the C-side function "getSelectionCategory".
+ */
 unsigned Parameter::getSelectionCategoryForMixture(unsigned mixtureElement)
 {
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
@@ -1954,6 +2000,13 @@ unsigned Parameter::getSelectionCategoryForMixture(unsigned mixtureElement)
 }
 
 
+/* getSynthesisRateCategoryForMixture
+ * Arguments: A number representing a mixture element
+ * Returns the synthesis rate category of the mixture element chosen.
+ * See Note 1) above.
+ * To implement the R version of this function, the index is also checked.
+ * This is the R-wrapper for the C-side function "getSynthesisRateCategory".
+ */
 unsigned Parameter::getSynthesisRateCategoryForMixture(unsigned mixtureElement)
 {
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
@@ -2041,6 +2094,15 @@ std::vector<double> Parameter::getCurrentSynthesisRateForMixture(unsigned mixtur
 //------------------------------------------------------------------//
 
 
+/* getCodonSpecificPosteriorMeanForCodon
+ * Arguments: the mixture element, the number of samples from the end of the trace to examine, the codon to examine,
+ * 			  the parameter type to examine, and whether or not it is with reference.
+ * Returns the posterior mean of a codon-specific parameter of the mixture element.
+ * This is calculated by simply gathering a number of traces from the end of the entire trace (up to all of it) to the end
+ * of the codon-specific parameter's trace, and then getting the mean of these values.
+ * To implement the R version of this function, the index is also checked.
+ * This is the R-wrapper for the C-side function "getCodonSpecificPosteriorMean".
+*/
 double Parameter::getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon,
 	unsigned paramType, bool withoutReference)
 {
@@ -2088,6 +2150,15 @@ std::vector<double> Parameter::getCodonSpecificQuantileForCodon(unsigned mixture
     return rv;     
 }
 
+
+/* getSynthesisRatePosteriorMeanByMixtureElementForGene
+ * Arguments: the number of samples from the end of the trace to examine, the gene to examine, and the mixture element.
+ * Returns the posterior mean of the synthesis rate of the mixture element for a given gene.
+ * This is calculated by simply gathering a number of traces from the end of the entire trace (up to all of it) to the end
+ * of the gene's synthesis rate trace, and then getting the mean of these values.
+ * To implement the R version of this function, the index is also checked.
+ * This is the R-wrapper for the C-side function "getSynthesisRatePosteriorMean".
+*/
 double Parameter::getSynthesisRatePosteriorMeanByMixtureElementForGene(unsigned samples, unsigned geneIndex,
 	unsigned mixtureElement)
 {

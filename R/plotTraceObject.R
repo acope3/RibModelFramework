@@ -6,8 +6,8 @@
 
 #' Plot Trace Object
 #' @param x An Rcpp trace object initialized with \code{initializeTraceObject}.
-#' @param what A string containing one of the following to graph: \code{Mutation, Selection, MixtureProbability, Sphi,
-#'  Mphi, Aphi, Spesilon, ExpectedPhi, Expression}.
+#' @param what A string containing one of the following to graph: \code{Mutation, Selection, Alpha, LambdaPrime, MeanWaitingTime, VarWaitingTime
+#' MixtureProbability, Sphi, Mphi, Aphi, Spesilon, ExpectedPhi, Expression}.
 #' @param geneIndex When plotting expression, the index of the gene to be plotted.
 #' @param mixture The mixture for which to plot values.
 #' @param ... Optional, additional arguments.
@@ -22,19 +22,27 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
 {
   if(what[1] == "Mutation")
   {
-    plotCodonSpecificParameters(x, mixture, "mutation", main="Mutation Parameter Traces")
+    plotCodonSpecificParameters(x, mixture, "Mutation", main="Mutation Parameter Traces")
   }
   if(what[1] == "Selection")
   {
-    plotCodonSpecificParameters(x, mixture, "selection", main="Selection Parameter Traces")
+    plotCodonSpecificParameters(x, mixture, "Selection", main="Selection Parameter Traces")
   }
   if(what[1] == "Alpha")
   {
-    plotCodonSpecificParameters(x, mixture, "alpha", main="Alpha Parameter Traces", ROC=FALSE)
+    plotCodonSpecificParameters(x, mixture, "Alpha", main="Alpha Parameter Traces", ROC=FALSE)
   }
   if(what[1] == "LambdaPrime")
   {
-    plotCodonSpecificParameters(x, mixture, "lambdaPrime", main="LambdaPrime Parameter Traces", ROC=FALSE)
+    plotCodonSpecificParameters(x, mixture, "LambdaPrime", main="LambdaPrime Parameter Traces", ROC=FALSE)
+  }  
+  if(what[1] == "MeanWaitingTime")
+  {
+    plotCodonSpecificParameters(x, mixture, "MeanWaitingTime", main="Mean Waiting Time Parameter Traces", ROC=FALSE)
+  }  
+  if(what[1] == "VarWaitingTime")
+  {
+    plotCodonSpecificParameters(x, mixture, "VarWaitingTime", main="Variance Waiting Time Parameter Traces", ROC=FALSE)
   }  
   if(what[1] == "MixtureProbability")
   {
@@ -74,7 +82,7 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
 #'
 #' @param mixture The mixture for which to plot values.
 #'
-#' @param type A string containing one of the following to graph: \code{mutation, selection, alpha, lambdaPrime}. 
+#' @param type A string containing one of the following to graph: \code{Mutation, Selection, Alpha, LambdaPrime, MeanWaitingTime, VarWaitingTime}. 
 #'
 #' @param main The title of the plot.
 #'
@@ -84,7 +92,7 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
 #' 
 #' @description Plots a codon-specific set of traces, specified with the \code{type} parameter.
 #'
-plotCodonSpecificParameters <- function(trace, mixture, type="mutation", main="Mutation Parameter Traces", ROC=TRUE)
+plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="Mutation Parameter Traces", ROC=TRUE)
 {
   opar <- par(no.readonly = T) 
   
@@ -122,25 +130,47 @@ plotCodonSpecificParameters <- function(trace, mixture, type="mutation", main="M
     }
     cur.trace <- vector("list", length(codons))
     paramType <- 0
-    if(type == "mutation"){
+    if(type == "Mutation"){
       ylab <- expression(Delta~"M")
       paramType <- 0
-    }else if (type == "selection"){
+      special <- FALSE
+    }else if (type == "Selection"){
       ylab <- expression(Delta~eta)
       paramType <- 1
-    }else if (type == "alpha"){
+      special <- FALSE
+    }else if (type == "Alpha"){
       ylab <- expression(alpha)
       paramType <- 0
-    }else if (type == "lambdaPrime"){
+      special <- FALSE
+    }else if (type == "LambdaPrime"){
       ylab <- expression(lambda~"'")
       paramType <- 1
+      special <- FALSE
+    }else if (type == "MeanWaitingTime"){
+      ylab <- expression(alpha/lambda~"'")
+      special <- TRUE
+    }else if (type == "VarWaitingTime"){
+      ylab <- expression(alpha/lambda~"'"^"2")
+      special <- TRUE
     }else{
-      stop("parameter type not recognized")
+      stop("Parameter 'type' not recognized! Must be one of: 'Mutation', 'Selection', 'Alpha', 'LambdaPrime'.")
     }
-    for(i in 1:length(codons))
-    {
-      cur.trace[[i]] <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], paramType, with.ref.codon)
-    }      
+
+    for(i in 1:length(codons)){
+      if(special){
+        tmpAlpha <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], 0, with.ref.codon)
+        tmpLambdaPrime <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], 1, with.ref.codon)
+        
+        if (type == "MeanWaitingTime"){          
+          cur.trace[[i]] <- tmpAlpha / tmpLambdaPrime
+        }else if (type == "VarWaitingTime"){
+          cur.trace[[i]] <- tmpAlpha / (tmpLambdaPrime * tmpLambdaPrime)
+        }
+      }
+      else{
+        cur.trace[[i]] <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], paramType, with.ref.codon)
+      }
+    }
 
     cur.trace <- do.call("cbind", cur.trace)
     if(length(cur.trace) == 0) next
