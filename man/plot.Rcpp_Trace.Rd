@@ -11,8 +11,8 @@
 \arguments{
 \item{x}{An Rcpp trace object initialized with \code{initializeTraceObject}.}
 
-\item{what}{A string containing one of the following to graph: \code{Mutation, Selection, MixtureProbability, Sphi,
-Mphi, Aphi, Spesilon, ExpectedPhi, Expression}.}
+\item{what}{A string containing one of the following to graph: \code{Mutation, Selection, Alpha, LambdaPrime, MeanWaitingTime, VarWaitingTime
+MixtureProbability, Sphi, Mphi, Aphi, Spesilon, ExpectedPhi, Expression}.}
 
 \item{geneIndex}{When plotting expression, the index of the gene to be plotted.}
 

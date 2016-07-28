@@ -51,7 +51,7 @@ class Parameter {
 		static const unsigned lmPri;
 
 #ifdef STANDALONE
-		static std::default_random_engine generator; // static to make sure that the same generator is during the runtime.
+		static std::default_random_engine generator; // static to make sure that the same generator is used during the runtime.
 #endif
 
 
@@ -63,8 +63,8 @@ class Parameter {
 
 
 		//Initialization and Restart Functions: TODO: test
-		void initParameterSet(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
-			std::vector<std::vector<unsigned>> mixtureDefinitionMatrix,
+		void initParameterSet(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures,
+			std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> mixtureDefinitionMatrix,
 			bool splitSer = true, std::string _mutationSelectionState = "allUnique"); //Mostly tested; TODO caveats
 		void initBaseValuesFromFile(std::string filename);
 		void writeBasicRestartFile(std::string filename);
@@ -150,13 +150,13 @@ class Parameter {
 		double getStdDevSynthesisRatePosteriorMean(unsigned samples, unsigned mixture);
 		double getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement);
 
-		double getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType,
-			bool withoutReference = true);
+		double getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon,
+			unsigned paramType, bool withoutReference = true);
 		double getStdDevSynthesisRateVariance(unsigned samples, unsigned mixture, bool unbiased);
 		double getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement,
 			bool unbiased = true);
-		double getCodonSpecificVariance(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType,
-			bool unbiased, bool withoutReference = true);
+		double getCodonSpecificVariance(unsigned mixtureElement, unsigned samples, std::string &codon,
+			unsigned paramType, bool unbiased, bool withoutReference = true);
         std::vector<double> getCodonSpecificQuantile(unsigned mixtureElement, unsigned samples, std::string &codon,
 			unsigned paramType, std::vector<double> probs, bool withoutReference);
 		unsigned getEstimatedMixtureAssignment(unsigned samples, unsigned geneIndex);
@@ -188,7 +188,8 @@ class Parameter {
 		static unsigned randMultinom(std::vector <double> &probabilites, unsigned mixtureElements);
 		static double densityNorm(double x, double mean, double sd, bool log = false);
 		static double densityLogNorm(double x, double mean, double sd, bool log = false);
-		//double getMixtureAssignmentPosteriorMean(unsigned samples, unsigned geneIndex); // TODO: implement variance function, fix Mean function (won't work with 3 groups)
+		//double getMixtureAssignmentPosteriorMean(unsigned samples, unsigned geneIndex);
+		// TODO: implement variance function, fix Mean function (won't work with 3 groups)
 
 
 
@@ -226,17 +227,19 @@ class Parameter {
 
 		//Posterior, Variance, and Estimates Functions:
 		double getSynthesisRatePosteriorMeanByMixtureElementForGene(unsigned samples, unsigned geneIndex,
-																	unsigned mixtureElement);
+			unsigned mixtureElement);
 		double getSynthesisRateVarianceByMixtureElementForGene(unsigned samples, unsigned geneIndex,
-														   unsigned mixtureElement, bool unbiased);
+			unsigned mixtureElement, bool unbiased);
 		unsigned getEstimatedMixtureAssignmentForGene(unsigned samples, unsigned geneIndex);
+
 		std::vector<double> getEstimatedMixtureAssignmentProbabilitiesForGene(unsigned samples, unsigned geneIndex);
-		double getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon, unsigned paramType,
-			bool withoutReference);
-		double getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon, unsigned paramType, bool unbiased,
-			bool withoutReference);
-        std::vector<double> getCodonSpecificQuantileForCodon(unsigned mixtureElement, unsigned samples, std::string &codon, unsigned paramType, std::vector<double> probs,
-	       bool withoutReference);
+
+		double getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon,
+			unsigned paramType, bool withoutReference);
+		double getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon,
+			unsigned paramType, bool unbiased, bool withoutReference);
+        std::vector<double> getCodonSpecificQuantileForCodon(unsigned mixtureElement, unsigned samples,
+        	std::string &codon, unsigned paramType, std::vector<double> probs, bool withoutReference);
 
 
 		//Other Functions:

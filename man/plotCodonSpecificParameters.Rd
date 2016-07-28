@@ -4,7 +4,7 @@
 \alias{plotCodonSpecificParameters}
 \title{Plot Codon Specific Parameter}
 \usage{
-plotCodonSpecificParameters(trace, mixture, type = "mutation",
+plotCodonSpecificParameters(trace, mixture, type = "Mutation",
   main = "Mutation Parameter Traces", ROC = TRUE)
 }
 \arguments{
@@ -12,7 +12,7 @@ plotCodonSpecificParameters(trace, mixture, type = "mutation",
 
 \item{mixture}{The mixture for which to plot values.}
 
-\item{type}{A string containing one of the following to graph: \code{mutation, selection, alpha, lambdaPrime}.}
+\item{type}{A string containing one of the following to graph: \code{Mutation, Selection, Alpha, LambdaPrime, MeanWaitingTime, VarWaitingTime}.}
 
 \item{main}{The title of the plot.}
 
