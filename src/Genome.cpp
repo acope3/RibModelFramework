@@ -239,9 +239,10 @@ void Genome::readRFPFile(std::string filename)
 	Fin.close();
 }
 
-// Note: As the ncodons is not preserved when the RFP file is read in or RFP is otherwise processed,
-// NA is returned for the number of codons. This still preserves functionality for future
-// readRFPFile calls, as only the RFP_Counts is important.
+/* Note: As the ncodons is not preserved when the RFP file is read in or RFP is otherwise processed,
+ * NA is returned for the number of codons. This still preserves functionality for future
+ * readRFPFile calls, as only the RFP_Counts is important.
+*/
 void Genome::writeRFPFile(std::string filename, bool simulated)
 {
 	std::ofstream Fout;

@@ -663,6 +663,38 @@ int main()
 {
 	std::string pathBegin = "/Users/hollisbui/";
 
+	Genome genome;
+	//genome.readFasta(pathBegin + "HollisTestingData/s288c.genome.fasta");
+	genome.readRFPFile(pathBegin + "HollisTestingData/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
+	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+	{
+		geneAssignment[i] = 0u;
+	}
+	unsigned numMixtures = 1;
+	std::vector<double> sphi_init(numMixtures, 2);
+	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
+
+	RFPParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
+
+	std::vector<std::string> files;
+	files.push_back(pathBegin + "HollisTestingData/RFPAlphaValues.csv");
+	parameter.initMutationSelectionCategories(files, 1, RFPParameter::alp);
+	files[0] = pathBegin + "HollisTestingData/RFPLambdaPrimeValues.csv";
+	parameter.initMutationSelectionCategories(files, 1, RFPParameter::lmPri);
+
+	std::vector<double> phi = parameter.readPhiValues(pathBegin + "HollisTestingData/RFPPhiValues.csv");
+	//std::vector<double> phi = tmp.readPhiValues("/Users/roxasoath1/Desktop/TONEWTON/RFPPsiValues.csv");
+	parameter.InitializeSynthesisRate(phi);
+
+	RFPModel model;
+
+	model.setParameter(parameter);
+
+	model.simulateGenome(genome);
+	genome.writeRFPFile(pathBegin + "HollisTestingOut/HollisSimulatedGenome2.csv", true);
+	exit(1);
+
 	// UNIT TESTING
 	//testUtility();
 	//testSequenceSummary();
@@ -680,7 +712,6 @@ int main()
 	std::string modelToRun = "RFP"; //can be RFP, ROC or FONSE
 	bool withPhi = false;
 	bool fromRestart = false;
-	unsigned numMixtures = 1;
 
 
 	my_print("Initializing MCMCAlgorithm object---------------\n");

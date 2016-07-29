@@ -321,8 +321,48 @@ getCSPEstimates.Rcpp_ROCParameter <- function(parameter, filename=NULL,
 
 #TODO: implement getCSPEstimates for RFP and FONSE
 
-
-
+### TODO
+#Called from getCSPEstimates
+# getCSPEstimates.Rcpp_RFPParameter <- function(parameter, filename=NULL, 
+#                                               CSP="Alpha", mixture = 1, samples = 10){
+#   names.aa <- aminoAcids()
+#   Amino_Acid <- c()
+#   Value <- c()
+#   Codon <- c()
+#   Std_Deviation <- vector("list")
+#   
+#   for(aa in names.aa){
+#     if(aa == "M" || aa == "W" || aa == "X") next
+#     codons <- AAToCodon(aa, T)
+#     
+#     for(i in 1:length(codons)){
+#       Amino_Acid <- c(Amino_Acid, aa)
+#       Codon <- c(Codon, codons[i])
+#       
+#       if(CSP == "Alpha"){
+#         Value <- c(Value, parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 0, TRUE))
+#         Std_Deviation <- c(Std_Deviation, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 0, c(0.025, 0.975), TRUE))
+#       }
+#       else if(CSP == "Lambda Prime"){
+#         Value <- c(Value, parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 1, TRUE))
+#         Std_Deviation <- c(Std_Deviation, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 1, c(0.025, 0.975), TRUE))
+#       }
+#       else {
+#         stop("Unknown Parameter type given")
+#       }
+#     }
+#   }
+#   Std_Deviation <- matrix(unlist(Std_Deviation), nrow = 2)
+#   data <- data.frame(Amino_Acid, Codon, Value, Lower=Std_Deviation[1,], Upper=Std_Deviation[2,])
+#   colnames(data) <- c("AA", "Codon", "Posterior", "0.025%", "0.975%")
+#   if(is.null(filename))
+#   {
+#     return(data)
+#   }else {
+#     write.csv(data, file = filename, row.names = FALSE, quote=FALSE)
+#   }
+# }
+### TODO
 
 #' Get Codon Counts For Each Amino Acid 
 #' 
@@ -1010,7 +1050,8 @@ loadFONSEParameterObject <- function(parameter, files)
 #' @param trace2 A trace read in from C++ in the form of a vector of vectors.
 #' The first value of this trace should be equal to the last value of the first trace.
 #' 
-#' @param max 
+#' @param max The maximum amount of the trace of the second trace to be concatenated with 
+#' the first trace.
 #' 
 #' @return This function has no return value.
 #'
@@ -1035,7 +1076,8 @@ combineTwoDimensionalTrace <- function(trace1, trace2, max){
 #' @param trace2 A trace read in from C++ in the form of a vector of vectors of vectors.
 #' The first value of this trace should be equal to the last value of the first trace.
 #' 
-#' @param max 
+#' @param max The maximum amount of the trace of the second trace to be concatenated with 
+#' the first trace.
 #' 
 #' @return This function has no return value.
 #'
