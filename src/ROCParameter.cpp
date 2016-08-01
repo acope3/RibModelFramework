@@ -485,6 +485,9 @@ void ROCParameter::initSelectionCategories(std::vector<std::string> files, unsig
 }
 
 
+
+
+
 //--------------------------------------//
 //---------- Trace Functions -----------//
 //--------------------------------------//
@@ -514,6 +517,8 @@ void ROCParameter::updateCodonSpecificParameterTrace(unsigned sample, std::strin
 
 
 
+
+
 //------------------------------------------//
 //---------- Covariance Functions ----------//
 //------------------------------------------//
@@ -525,6 +530,9 @@ CovarianceMatrix& ROCParameter::getCovarianceMatrixForAA(std::string aa)
 	unsigned aaIndex = SequenceSummary::aaToIndex.find(aa) -> second;
 	return covarianceMatrix[aaIndex];
 }
+
+
+
 
 
 //------------------------------------------------------//
@@ -586,6 +594,9 @@ void ROCParameter::updateNoiseOffset(unsigned index)
 }
 
 
+
+
+
 //-----------------------------------//
 //---------- CSP Functions ----------//
 //-----------------------------------//
@@ -600,11 +611,12 @@ double ROCParameter::getCurrentCodonSpecificProposalWidth(unsigned aa)
 }
 
 
-// Cedric: I decided to use a normal distribution to propose Sphi and phi instead of a lognormal because:
-// 1. It is a symmetric distribution and you therefore do not have to account for the unsymmetry in jump probabilities
-// 2. The one log and exp operation that have to be performed per parameter are cheaper than the operations necessary to draw from a lognormal
-// 3. phi has to be on a non log scale for the likelihood evaluation thus it does not help to keep phi on th elog scale all the time
-// 4. the adjustment of the likelihood by the jacobian that arises from this transformation is cheap and by grouping everything in one class it takes place more or less at the same place
+/* Cedric: I decided to use a normal distribution to propose Sphi and phi instead of a lognormal because:
+ * 1. It is a symmetric distribution and you therefore do not have to account for the unsymmetry in jump probabilities
+ * 2. The one log and exp operation that have to be performed per parameter are cheaper than the operations necessary to draw from a lognormal
+ * 3. phi has to be on a non log scale for the likelihood evaluation thus it does not help to keep phi on th elog scale all the time
+ * 4. the adjustment of the likelihood by the jacobian that arises from this transformation is cheap and by grouping everything in one class it takes place more or less at the same place
+*/
 void ROCParameter::proposeCodonSpecificParameter()
 {
 
@@ -696,9 +708,6 @@ void ROCParameter::setMutationPriorStandardDeviation(double _mutation_prior_sd)
 //------------------------------------------------------------------//
 
 
-
-
-
 double ROCParameter::getNoiseOffsetPosteriorMean(unsigned index, unsigned samples)
 {
 	double posteriorMean = 0.0;
@@ -747,9 +756,13 @@ double ROCParameter::getNoiseOffsetVariance(unsigned index, unsigned samples, bo
 }
 
 
+
+
+
 //----------------------------------------------//
 //---------- Adaptive Width Functions ----------//
 //----------------------------------------------//
+
 
 void ROCParameter::adaptNoiseOffsetProposalWidth(unsigned adaptationWidth, bool adapt)
 {
@@ -768,6 +781,10 @@ void ROCParameter::adaptNoiseOffsetProposalWidth(unsigned adaptationWidth, bool 
 		}
 	}
 }
+
+
+
+
 
 //-------------------------------------//
 //---------- Other Functions ----------//
@@ -801,6 +818,10 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
 		returnSet[j] = tempSet->at(i);
 	}
 }
+
+
+
+
 
 //-----------------------------------------------------------------------------------------------------//
 //---------------------------------------- R SECTION --------------------------------------------------//
@@ -982,9 +1003,6 @@ void ROCParameter::setCurrentSelectionParameter(std::vector<std::vector<double>>
 // ------------------------------------------------------------------//
 
 
-
-
-
 #endif
 
 
@@ -1002,9 +1020,3 @@ std::vector<double> ROCParameter::propose(std::vector<double> currentParam, doub
 	}
 	return proposedParam;
 }
-
-
-
-
-
-

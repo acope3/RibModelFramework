@@ -73,10 +73,10 @@ class RFPParameter: public Parameter {
 #ifndef STANDALONE
 
 		//Constructors & Destructors:
-		RFPParameter(std::vector<double> stdDevSynthesisRate, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix,
-			bool splitSer = true);
-		RFPParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer = true,
-			std::string _mutationSelectionState = "allUnique");
+		RFPParameter(std::vector<double> stdDevSynthesisRate, std::vector<unsigned> geneAssignment,
+			std::vector<unsigned> _matrix, bool splitSer = true);
+		RFPParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
+			bool splitSer = true, std::string _mutationSelectionState = "allUnique");
 
 
 

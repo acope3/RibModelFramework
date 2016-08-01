@@ -153,7 +153,7 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
       ylab <- expression(alpha/lambda~"'"^"2")
       special <- TRUE
     }else{
-      stop("Parameter 'type' not recognized! Must be one of: 'Mutation', 'Selection', 'Alpha', 'LambdaPrime'.")
+      stop("Parameter 'type' not recognized! Must be one of: 'Mutation', 'Selection', 'Alpha', 'LambdaPrime', 'MeanWaitingTime', 'VarWaitingTime'.")
     }
 
     for(i in 1:length(codons)){

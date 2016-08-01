@@ -29,6 +29,7 @@ RCPP_MODULE(Model_mod)
 		.constructor()
   		.method("getParameter", &RFPModel::getParameter)
 		.method("setParameter", &RFPModel::setParameter)
+		.method("simulateGenome", &RFPModel::simulateGenome) //TODO: Debug this. Does NOT work in R (unknown crash).
 		;
 
 	class_<FONSEModel>("FONSEModel")
