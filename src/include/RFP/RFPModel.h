@@ -103,6 +103,7 @@ class RFPModel: public Model
 
 		virtual void simulateGenome(Genome &genome);
 		virtual void printHyperParameters();
+		RFPParameter getParameter();
 		void setParameter(RFPParameter &_parameter);
 		virtual double calculateAllPriors();
 		virtual double getParameterForCategory(unsigned category, unsigned param, std::string codon, bool proposal);

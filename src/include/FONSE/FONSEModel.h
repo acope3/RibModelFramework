@@ -8,7 +8,7 @@ class FONSEModel : public Model
 {
 	private:
 		FONSEParameter *parameter;
-		double calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grouping, double *mutation, double *selection, double phiValue, bool proposed);
+		double calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grouping, double *mutation, double *selection, double phiValue);
 		double calculateMutationPrior(std::string grouping, bool proposed = false);
 
 	public:
@@ -105,10 +105,11 @@ class FONSEModel : public Model
 
 		virtual void simulateGenome(Genome &genome);
 		virtual void printHyperParameters();
+		FONSEParameter getParameter();
 		void setParameter(FONSEParameter &_parameter);
 		virtual double calculateAllPriors();
-		void calculateLogCodonProbabilityVector(unsigned numCodons, unsigned position, unsigned minIndexValue,
-											 double* mutation, double* selection, double phi, std::vector <double> &codonProb);
+		void calculateCodonProbabilityVector(unsigned numCodons, unsigned position, unsigned maxIndexValue,
+											 double* mutation, double* selection, double phi, double codonProb[]);
 		void calculateCodonProbabilityVector(unsigned numCodons, unsigned position, double* mutation, double* selection, 
 												double phi, double codonProb[]);
 		virtual void getParameterForCategory(unsigned category, unsigned param, std::string aa, bool proposal,

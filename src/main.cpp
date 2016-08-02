@@ -429,7 +429,7 @@ int main()
 		std::cout << "initialize Genome object--------------------------" << std::endl;
 		Genome genome;
 		std::cout << "Reading fasta file\n";
-		genome.readFasta("C:/Users/Alan/Documents/GitHub/RibModelDev/data/FONSE/sim_S.cer.fasta");
+		genome.readFasta("C:/Users/Alan/Documents/GitHub/RibModelDev/data/FONSE/nse2000.fasta");
 		std::cout << "Done!-------------------------------\n\n\n";
 
 
@@ -468,13 +468,11 @@ int main()
 			std::cout << "\t# mixtures: " << numMixtures << "\n";
 			std::cout << "\tmixture definition: " << mixDef << "\n";
 
-			std::vector<std::string> files(1);
-			files[0] = std::string("C:/Users/Alan/Documents/GitHub/RibModelDev/data/FONSE/Scereviciae.mut.csv");
-			tmp.initMutationCategories(files, tmp.getNumMutationCategories());
-			files[0] = std::string("C:/Users/Alan/Documents/GitHub/RibModelDev/data/FONSE/Scereviciae.sel.csv");
-			tmp.initSelectionCategories(files, tmp.getNumMutationCategories());
+			//std::vector<std::string> files(1);
+			//files[0] = std::string("C:/Users/Jeremy/Documents/GitHub/RibModelDev/data/FONSE/Scereviciae.mut.csv");
+			//tmp.initMutationCategories(files, tmp.getNumMutationCategories());
 			//tmp.InitializeSynthesisRate(genome, sphi_init[0]);
-			std::vector<double> phiVals = parameter.readPhiValues("C:/Users/Alan/Documents/GitHub/RibModelDev/data/FONSE/Scereviciae.phi.csv");
+			std::vector<double> phiVals = parameter.readPhiValues("C:/Users/Alan/Documents/GitHub/RibModelDev/data/FONSE/nse2000.phi.csv");
 			tmp.InitializeSynthesisRate(phiVals);
 			parameter = tmp;
 		}
@@ -570,7 +568,7 @@ int main()
 	{
 		std::cout << "Initializing Genome object--------------------------" << std::endl;
 		Genome genome;
-		genome.readFasta("C:/Users/Alan/Documents/GitHub/RibModelDev/data/realGenomes/Scereviciae.fasta");
+		genome.readFasta("C:/Users/Alan/Documents/GitHub/RibModelDev/data/realGenomes/Skluyveri.fasta");
 		if (withPhi)
 		{
 			genome.readObservedPhiValues("/Users/roxasoath1/Desktop/RibModelFramework/ribModel/data/simulatedAllUniqueR_phi.csv", false);
@@ -665,13 +663,45 @@ int main()
 {
 	std::string pathBegin = "/Users/hollisbui/";
 
+	Genome genome;
+	//genome.readFasta(pathBegin + "HollisTestingData/s288c.genome.fasta");
+	genome.readRFPFile(pathBegin + "HollisTestingData/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
+	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+	{
+		geneAssignment[i] = 0u;
+	}
+	unsigned numMixtures = 1;
+	std::vector<double> sphi_init(numMixtures, 2);
+	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
+
+	RFPParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
+
+	std::vector<std::string> files;
+	files.push_back(pathBegin + "HollisTestingData/RFPAlphaValues.csv");
+	parameter.initMutationSelectionCategories(files, 1, RFPParameter::alp);
+	files[0] = pathBegin + "HollisTestingData/RFPLambdaPrimeValues.csv";
+	parameter.initMutationSelectionCategories(files, 1, RFPParameter::lmPri);
+
+	std::vector<double> phi = parameter.readPhiValues(pathBegin + "HollisTestingData/RFPPhiValues.csv");
+	//std::vector<double> phi = tmp.readPhiValues("/Users/roxasoath1/Desktop/TONEWTON/RFPPsiValues.csv");
+	parameter.InitializeSynthesisRate(phi);
+
+	RFPModel model;
+
+	model.setParameter(parameter);
+
+	model.simulateGenome(genome);
+	genome.writeRFPFile(pathBegin + "HollisTestingOut/HollisSimulatedGenome2.csv", true);
+	exit(1);
+
 	// UNIT TESTING
 	//testUtility();
 	//testSequenceSummary();
 	//testGene();
-	//testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
+	testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
 	//testCovarianceMatrix();
-	testParameter();
+	//testParameter();
 	//testParameterWithFile(pathBegin + "HollisFile.txt");
 	//testTrace();
 	//testRFPParameter();
@@ -682,7 +712,6 @@ int main()
 	std::string modelToRun = "RFP"; //can be RFP, ROC or FONSE
 	bool withPhi = false;
 	bool fromRestart = false;
-	unsigned numMixtures = 1;
 
 
 	my_print("Initializing MCMCAlgorithm object---------------\n");

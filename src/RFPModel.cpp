@@ -560,6 +560,17 @@ void RFPModel::printHyperParameters()
 }
 
 
+/* getParameter (RCPP EXPOSED)
+ * Arguments: None
+ *
+ * Returns the RFPParameter of the model.
+*/
+RFPParameter RFPModel::getParameter()
+{
+	return *parameter;
+}
+
+
 void RFPModel::setParameter(RFPParameter &_parameter)
 {
 	parameter = &_parameter;

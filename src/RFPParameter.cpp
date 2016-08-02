@@ -401,7 +401,7 @@ void RFPParameter::initMutationSelectionCategories(std::vector<std::string> file
 		{
 			currentFile >> tmpString; //trash the first line, no info given.
 
-			//expecting CTG,3.239 as the current format
+			//expecting Codon,paramType Value as the current format
 			while (currentFile >> tmpString)
 			{
 				std::string codon = tmpString.substr(0, 3);

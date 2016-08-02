@@ -101,7 +101,6 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	// TODO move the likelihood calculation out of here. make it a void function again.
 
 	double logLikelihood = 0.0;
-	double tmp;
     //double logLikelihood2 = 0.0; //currently unused
 	int numGenes = genome.getGenomeSize();
 
@@ -185,7 +184,6 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				unscaledLogPost_prop[k] += logProbabilityRatio[4]; // without rev. jump prob.
 
 				unscaledLogProb_curr_singleMixture[mixtureIndex] = logProbabilityRatio[3];
-				tmp = logProbabilityRatio[3];
 				maxValue = unscaledLogProb_curr_singleMixture[mixtureIndex] > maxValue ?
 						   unscaledLogProb_curr_singleMixture[mixtureIndex] : maxValue;
 				mixtureIndex++;
@@ -202,7 +200,6 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		{
 			unscaledLogProb_curr_singleMixture[k] -= maxValue;
 			probabilities[k] = model.getCategoryProbability(k) * std::exp(unscaledLogProb_curr_singleMixture[k]);
-			tmp = model.getCategoryProbability(k);
 			normalizingProbabilityConstant += probabilities[k];
 		}
 		// normalize probabilities
@@ -291,7 +288,6 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 {
 	double acceptanceRatioForAllMixtures = 0.0;
 	unsigned size = model.getGroupListSize();
-	bool accepted = 0;
 
 	for (unsigned i = 0; i < size; i++)
 	{
@@ -302,14 +298,11 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 		if ( -Parameter::randExp(1) < acceptanceRatioForAllMixtures )
 		{
 			// moves proposed codon specific parameters to current codon specific parameters
-			accepted = 1;
 			model.updateCodonSpecificParameter(grouping);
 		}
 		if ((iteration % thining) == 0)
 		{
-			//if (accepted) std::cout << "Acceptance Ratio = " << acceptanceRatioForAllMixtures << std::endl;
 			model.updateCodonSpecificParameterTrace(iteration/thining, grouping);
-			accepted = 0;
 		}
 	}
 }
