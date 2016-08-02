@@ -101,6 +101,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	// TODO move the likelihood calculation out of here. make it a void function again.
 
 	double logLikelihood = 0.0;
+	double tmp;
     //double logLikelihood2 = 0.0; //currently unused
 	int numGenes = genome.getGenomeSize();
 
@@ -184,6 +185,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				unscaledLogPost_prop[k] += logProbabilityRatio[4]; // without rev. jump prob.
 
 				unscaledLogProb_curr_singleMixture[mixtureIndex] = logProbabilityRatio[3];
+				tmp = logProbabilityRatio[3];
 				maxValue = unscaledLogProb_curr_singleMixture[mixtureIndex] > maxValue ?
 						   unscaledLogProb_curr_singleMixture[mixtureIndex] : maxValue;
 				mixtureIndex++;
@@ -200,6 +202,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		{
 			unscaledLogProb_curr_singleMixture[k] -= maxValue;
 			probabilities[k] = model.getCategoryProbability(k) * std::exp(unscaledLogProb_curr_singleMixture[k]);
+			tmp = model.getCategoryProbability(k);
 			normalizingProbabilityConstant += probabilities[k];
 		}
 		// normalize probabilities

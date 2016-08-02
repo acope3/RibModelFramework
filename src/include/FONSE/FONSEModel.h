@@ -107,7 +107,7 @@ class FONSEModel : public Model
 		virtual void printHyperParameters();
 		void setParameter(FONSEParameter &_parameter);
 		virtual double calculateAllPriors();
-		void calculateCodonProbabilityVector(unsigned numCodons, unsigned position, unsigned minIndexValue,
+		void calculateLogCodonProbabilityVector(unsigned numCodons, unsigned position, unsigned minIndexValue,
 											 double* mutation, double* selection, double phi, std::vector <double> &codonProb);
 		void calculateCodonProbabilityVector(unsigned numCodons, unsigned position, double* mutation, double* selection, 
 												double phi, double codonProb[]);

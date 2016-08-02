@@ -429,7 +429,7 @@ int main()
 		std::cout << "initialize Genome object--------------------------" << std::endl;
 		Genome genome;
 		std::cout << "Reading fasta file\n";
-		genome.readFasta("C:/Users/Alan/Documents/GitHub/RibModelDev/data/FONSE/sim_data/simulatedFONSE_phiScaled10000_b-0.001.fasta");
+		genome.readFasta("C:/Users/Alan/Documents/GitHub/RibModelDev/data/FONSE/sim_S.cer.fasta");
 		std::cout << "Done!-------------------------------\n\n\n";
 
 
@@ -469,12 +469,12 @@ int main()
 			std::cout << "\tmixture definition: " << mixDef << "\n";
 
 			std::vector<std::string> files(1);
-			files[0] = std::string("C:/Users/Alan/Documents/GitHub/RibModelDev/data/FONSE/sim_data/S.cer.mut.ref.csv");
+			files[0] = std::string("C:/Users/Alan/Documents/GitHub/RibModelDev/data/FONSE/Scereviciae.mut.csv");
 			tmp.initMutationCategories(files, tmp.getNumMutationCategories());
-			files[0] = std::string("C:/Users/Alan/Documents/GitHub/RibModelDev/data/FONSE/sim_data/deltaomega_b-0.001.csv");
+			files[0] = std::string("C:/Users/Alan/Documents/GitHub/RibModelDev/data/FONSE/Scereviciae.sel.csv");
 			tmp.initSelectionCategories(files, tmp.getNumMutationCategories());
 			//tmp.InitializeSynthesisRate(genome, sphi_init[0]);
-			std::vector<double> phiVals = parameter.readPhiValues("C:/Users/Alan/Documents/GitHub/RibModelDev/data/FONSE/sim_data/simFONSE_scaled10000.phi.csv");
+			std::vector<double> phiVals = parameter.readPhiValues("C:/Users/Alan/Documents/GitHub/RibModelDev/data/FONSE/Scereviciae.phi.csv");
 			tmp.InitializeSynthesisRate(phiVals);
 			parameter = tmp;
 		}

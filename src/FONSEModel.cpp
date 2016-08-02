@@ -43,9 +43,9 @@ double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grou
 		positions = gene.geneData.getCodonPositions(i); 
 		for (unsigned j = 0; j < positions->size(); j++)
 		{
-			calculateCodonProbabilityVector(numCodons, positions->at(j), minIndexVal, mutation, selection, phiValue, codonProb); 
+			calculateLogCodonProbabilityVector(numCodons, positions->at(j), minIndexVal, mutation, selection, phiValue, codonProb); 
 			if (codonProb[k] == 0) continue;
-			logLikelihood += std::log(codonProb[k]);
+			logLikelihood += codonProb[k];
 		} 
 		//positions->clear();
 	}
@@ -675,7 +675,7 @@ double FONSEModel::calculateAllPriors()
 }
 
 
-void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned position, unsigned minIndexValue,
+void FONSEModel::calculateLogCodonProbabilityVector(unsigned numCodons, unsigned position, unsigned minIndexValue,
 												 double *mutation, double *selection, double phi, std::vector <double> &codonProb)
 {
 	double denominator;
@@ -691,6 +691,67 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 	 // If the reference codon is the max value then we do not have to adjust the reference codon.
 	 // This is necessary to deal with very large phi values (> 10^4) and avoid producing Inf which then
 	 // causes the denominator to be Inf (Inf / Inf = NaN).
+	if (selection[minIndexValue] < 0.0) {
+		denominator = 0.0;
+		for (unsigned i = 0u; i < (numCodons - 1); i++)
+		{
+			codonProb[i] = -(mutation[i] - mutation[minIndexValue]) - (phi * (4.0 + (4.0 * position)) * (selection[i] - selection[minIndexValue]));
+			denominator += std::exp(codonProb[i]);
+		}
+		//Alphabetically, the last codon is the reference codon.
+		codonProb[numCodons - 1] = (mutation[minIndexValue]) + (phi * (4.0 + (4.0 * position)) * selection[minIndexValue]);
+		denominator += std::exp(codonProb[numCodons - 1]);
+	}
+	else
+	{
+		denominator = 1.0;
+		for (unsigned i = 0u; i < (numCodons - 1); i++)
+		{
+			codonProb[i] = -(mutation[i]) - (phi * (4.0 + (4.0 * position)) * selection[i]);
+			denominator += std::exp(codonProb[i]);
+		}
+		//Again, the last codon is the reference codon
+		codonProb[numCodons - 1] = 1.0;
+	}
+
+	//As is found in ROCModel.cpp, multiplication is a faster operation than division so we 
+	//save time here by dividing once and then muliplying numCodons times instead of dividing
+	//numCodons times.
+	denominator = std::log(denominator);
+	for (unsigned i = 0; i < numCodons; i++)
+	{
+		codonProb[i] = codonProb[i] - denominator;
+	}
+}
+
+
+//A version of calculateCodonProbabilityVector that is called without
+//a maxIndexValue and instead calculates it inside of the function.
+void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned position,
+													double *mutation, double *selection, double phi, double codonProb[])
+{
+	double denominator;
+	unsigned minIndexValue = 0u;
+	for (unsigned i = 1; i < (numCodons - 1); i++)
+	{
+		if (selection[minIndexValue] < selection[i])
+		{
+			minIndexValue = i;
+		}
+	}
+
+	/* c_i = exp[\Delta M - (\phi * \beta(i) * \Delta \omega)],                 *
+	* where \beta(i) = a_1 + (i * a_2)                                         *
+	*                                                                          *
+	* Right now a_1 and a_2 are set to 4.0. However, we are planning on making *
+	* them hyperparameters in the future, since they are constant for the      *
+	* entire genome.                                                           */
+
+
+	// If the max(selection) is greater than zero than we have to adjust the reference codon.
+	// If the reference codon is the max value then we do not have to adjust the reference codon.
+	// This is necessary to deal with very large phi values (> 10^4) and avoid producing Inf which then
+	// causes the denominator to be Inf (Inf / Inf = NaN).
 	if (selection[minIndexValue] < 0.0) {
 		denominator = 0.0;
 		for (unsigned i = 0u; i < (numCodons - 1); i++)
@@ -720,66 +781,6 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 	denominator = 1 / denominator;
 	for (unsigned i = 0; i < numCodons; i++)
 	{
-		codonProb[i] *= denominator;
-	}
-}
-
-
-//A version of calculateCodonProbabilityVector that is called without
-//a maxIndexValue and instead calculates it inside of the function.
-void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned position,
-													double *mutation, double *selection, double phi, double codonProb[])
-{
-	double denominator;
-	unsigned maxIndexValue = 0u;
-	for (unsigned i = 1; i < (numCodons - 1); i++)
-	{
-		if (selection[maxIndexValue] < selection[i])
-		{
-			maxIndexValue = i;
-		}
-	}
-
-	/* c_i = exp[\Delta M - (\phi * \beta(i) * \Delta \omega)],                 *
-	* where \beta(i) = a_1 + (i * a_2)                                         *
-	*                                                                          *
-	* Right now a_1 and a_2 are set to 4.0. However, we are planning on making *
-	* them hyperparameters in the future, since they are constant for the      *
-	* entire genome.                                                           */
-
-
-	// If the max(selection) is greater than zero than we have to adjust the reference codon.
-	// If the reference codon is the max value then we do not have to adjust the reference codon.
-	// This is necessary to deal with very large phi values (> 10^4) and avoid producing Inf which then
-	// causes the denominator to be Inf (Inf / Inf = NaN).
-	if (selection[maxIndexValue] > 0.0) {
-		denominator = 0.0;
-		for (unsigned i = 0u; i < (numCodons - 1); i++)
-		{
-			codonProb[i] = std::exp(((mutation[i] - mutation[maxIndexValue])) + (phi * (4.0 + (4.0 * position)) * (selection[i] - selection[maxIndexValue])));
-			denominator += codonProb[i];
-		}
-		//Alphabetically, the last codon is the reference codon.
-		codonProb[numCodons - 1] = std::exp((-1.0 * mutation[maxIndexValue]) - (phi * (4.0 + (4.0 * position)) * selection[maxIndexValue]));
-		denominator += codonProb[numCodons - 1];
-	}
-	else
-	{
-		denominator = 1.0;
-		for (unsigned i = 0u; i < (numCodons - 1); i++)
-		{
-			codonProb[i] = std::exp((mutation[i]) + (phi * (4.0 + (4.0 * position)) * selection[i]));
-			denominator += codonProb[i];
-		}
-		//Again, the last codon is the reference codon
-		codonProb[numCodons - 1] = 1.0;
-	}
-
-	//As is found in ROCModel.cpp, multiplication is a faster operation than division so we 
-	//save time here by dividing once and then muliplying numCodons times instead of dividing
-	//numCodons times.
-	denominator = 1 / denominator;
-	for (unsigned i = 0; i < numCodons; i++) {
 		codonProb[i] *= denominator;
 	}
 }
