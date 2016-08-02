@@ -4,10 +4,12 @@
 \alias{plot.Rcpp_MCMCAlgorithm}
 \title{Plot MCMC algorithm}
 \usage{
-\method{plot}{Rcpp_MCMCAlgorithm}(x, ...)
+\method{plot}{Rcpp_MCMCAlgorithm}(x, zoom.window = NULL, ...)
 }
 \arguments{
 \item{x}{An Rcpp_MCMC object initialized with \code{initializeMCMCObject}.}
+
+\item{zoom.window}{A vector describing the start and end of the zoom window.}
 
 \item{...}{Arguments to be passed to methods, such as graphical parameters.}
 }

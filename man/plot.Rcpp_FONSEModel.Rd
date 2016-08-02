@@ -4,15 +4,13 @@
 \alias{plot.Rcpp_FONSEModel}
 \title{Plot Model Object}
 \usage{
-\method{plot}{Rcpp_FONSEModel}(x, genome, parameter, samples = 100,
-  mixture = 1, estim.Expression = TRUE, simulated = FALSE, ...)
+\method{plot}{Rcpp_FONSEModel}(x, genome, samples = 100, mixture = 1,
+  estim.Expression = TRUE, simulated = FALSE, ...)
 }
 \arguments{
 \item{x}{An Rcpp model object initialized with \code{initializeModelObject}.}
 
 \item{genome}{An Rcpp genome object initialized with \code{initializeGenomeObject}.}
-
-\item{parameter}{An Rcpp parameter object.}
 
 \item{samples}{The number of samples in the trace}
 
@@ -23,7 +21,8 @@ values or empirical values.}
 
 \item{simulated}{A boolean value that determines whether to use the simulated genome.}
 
-\item{...}{}
+\item{...}{Optional, additional arguments.
+For this function, a possible title for the plot in the form of a list if set with "main".}
 }
 \value{
 This function has no return value.

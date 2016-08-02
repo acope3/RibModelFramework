@@ -7,7 +7,7 @@ importFrom(Rcpp, evalCpp)
 
 
 #exports
-exportPattern("^[[:alpha:]]+") #<- if commented out, only functions explicitly exported will we exposed 
+exportPattern("^[[:alpha:]]+") #<- if commented out, only functions explicitly exported will be exposed 
 
 
 

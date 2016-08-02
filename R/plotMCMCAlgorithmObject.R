@@ -2,6 +2,8 @@
 #' 
 #' @param x An Rcpp_MCMC object initialized with \code{initializeMCMCObject}.
 #' 
+#' @param zoom.window A vector describing the start and end of the zoom window.
+#' 
 #' @param ... Arguments to be passed to methods, such as graphical parameters.
 #' 
 #' @return This function has no return value.

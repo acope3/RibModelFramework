@@ -11,14 +11,15 @@
 \arguments{
 \item{x}{An Rcpp trace object initialized with \code{initializeTraceObject}.}
 
-\item{what}{A string containing one of the following to graph: \code{Mutation, Selection, MixtureProbability, Sphi,
-Mphi, Aphi, Spesilon, ExpectedPhi, Expression}.}
+\item{what}{A string containing one of the following to graph: \code{Mutation, Selection, Alpha, LambdaPrime, MeanWaitingTime, VarWaitingTime
+MixtureProbability, Sphi, Mphi, Aphi, Spesilon, ExpectedPhi, Expression}.}
 
 \item{geneIndex}{When plotting expression, the index of the gene to be plotted.}
 
 \item{mixture}{The mixture for which to plot values.}
 
-\item{...}{}
+\item{...}{Optional, additional arguments.
+For this function, may be a logical value determining if the trace is ROC-based or not.}
 }
 \value{
 This function has no return value.
