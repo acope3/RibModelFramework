@@ -5,6 +5,11 @@ useDynLib(ribModel)
 importFrom(methods, new)
 importFrom(Rcpp, evalCpp)
 
+importFrom(graphics, abline, axis, box, grid, hist,
+      layout, legend, lines, pairs, par, plot,
+      points, segments, text)
+importFrom(stats, lm, median, qt, quantile, sd)
+importFrom(utils, write.csv)
 
 #exports
 exportPattern("^[[:alpha:]]+") #<- if commented out, only functions explicitly exported will be exposed 

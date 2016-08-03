@@ -3,7 +3,7 @@
 #' @param samples Number of samples that should be produced when running the 
 #' MCMC algorithm. No default value.
 #' 
-#' @param thining Number that the samples should be thinned by. If set to 
+#' @param thinning Number that the samples should be thinned by. If set to 
 #' 1, every step would be saved as a sample. Default value is 1.
 #' 
 #' @param adaptive.width Number that determines how often the acceptance/rejection
@@ -31,12 +31,12 @@
 #' It is important to note that est.expression and est.hyper will affect one another
 #' negatively if their values differ.
 #' 
-initializeMCMCObject <- function(samples, thining=1, adaptive.width=100, 
+initializeMCMCObject <- function(samples, thinning=1, adaptive.width=100, 
                                  est.expression=TRUE, est.csp=TRUE, 
                                  est.hyper=TRUE, est.mix=TRUE){
   
   #TODO: error check given values.
-  mcmc <- new(MCMCAlgorithm, samples, thining, adaptive.width, est.expression, 
+  mcmc <- new(MCMCAlgorithm, samples, thinning, adaptive.width, est.expression, 
               est.csp, est.hyper)
   mcmc$setEstimateMixtureAssignment(est.mix)
   return(mcmc)
@@ -65,8 +65,8 @@ initializeMCMCObject <- function(samples, thining=1, adaptive.width=100,
 #' for the given mcmc, genome, and model objects to perform a model fitting.
 #' 
 #' @details \code{runMCMC} will run for the number of samples times the number
-#' thining given when the mcmc object is initialized. Updates are provided every 100
-#' steps, and the state of the chain is saved every thining steps.
+#' thinning given when the mcmc object is initialized. Updates are provided every 100
+#' steps, and the state of the chain is saved every thinning steps.
 #' 
 runMCMC <- function(mcmc, genome, model, ncores = 1, divergence.iteration = 0){
   
@@ -189,9 +189,9 @@ convergence.test.Rcpp_MCMCAlgorithm <- function(trace, what, mixture, n.samples 
 writeMCMCObject <- function(mcmc, file){
   loglikeTrace <- mcmc$getLogLikelihoodTrace()
   samples <- mcmc$getSamples()
-  thining <- mcmc$getThining()
+  thinning <- mcmc$getThinning()
   adaptiveWidth <- mcmc$getAdaptiveWidth()
-  save(list = c("loglikeTrace", "samples", "thining", "adaptiveWidth"), file=file)
+  save(list = c("loglikeTrace", "samples", "thinning", "adaptiveWidth"), file=file)
 }
 
 
@@ -220,7 +220,7 @@ loadMCMCObject <- function(files){
     loglikeTrace <- c(loglikeTrace, curLoglikelihoodTrace[2:max])
    }
     mcmc$setSamples(samples)
-    mcmc$setThining(tempEnv$thining) #not needed?
+    mcmc$setThinning(tempEnv$thinning) #not needed?
     mcmc$setAdaptiveWidth(tempEnv$adaptiveWidth) #not needed?
     mcmc$setLogLikelihoodTrace(loglikeTrace)
 

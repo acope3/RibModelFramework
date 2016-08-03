@@ -34,7 +34,7 @@ using namespace Rcpp;
 * Sets up the object with the specified default values. Every step is a sample in
 * this case, so every iteration trace values will be stored. All parameters are estimated.
 */
-MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * thining), estimateSynthesisRate(true),
+MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thinning(1), adaptiveWidth(100 * thinning), estimateSynthesisRate(true),
 	estimateCodonSpecificParameter(true), estimateHyperParameter(true)
 {
 	likelihoodTrace.resize(samples + 1); // +1 for storing initial evaluation
@@ -49,14 +49,14 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thining(1), adaptiveWidth(100 * 
 
 
 /* MCMCAlgorithm constructor (RCPP EXPOSED)
-* Arguments: number of samples wanted, thining of iterations to get samples, how many iterations adaptive width
+* Arguments: number of samples wanted, thinning of iterations to get samples, how many iterations adaptive width
 * can be changed, bool for where the synthesis rate, codon specific, and hyper parameters are estimated (respectively)
-* Sets up the object with the given parameters. Adaptive with is actually set to adaptive width * thining. NOTE:
+* Sets up the object with the given parameters. Adaptive with is actually set to adaptive width * thinning. NOTE:
 * hyper parameters normally affect synthesis rate parameters, so either both should be turned on or neither.
 */
-MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thining, unsigned _adaptiveWidth, bool _estimateSynthesisRate,
+MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thinning, unsigned _adaptiveWidth, bool _estimateSynthesisRate,
 							 bool _estimateCodonSpecificParameter, bool _estimateHyperParameter) : samples(_samples),
-							 thining(_thining), adaptiveWidth(_adaptiveWidth * thining),
+							 thinning(_thinning), adaptiveWidth(_adaptiveWidth * thinning),
 							 estimateSynthesisRate(_estimateSynthesisRate),
 							 estimateCodonSpecificParameter(_estimateCodonSpecificParameter),
 							 estimateHyperParameter(_estimateHyperParameter)
@@ -228,7 +228,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			}
 			else
 			{
-                if ((iteration % thining) == 0)
+                if ((iteration % thinning) == 0)
                 	logLikelihood += probabilities[k] * unscaledLogPost_curr[k];
 			}
 		}
@@ -244,10 +244,10 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			model.setMixtureAssignment(i, categoryOfGene);
 
 		dirichletParameters[categoryOfGene] += 1;
-		if ((iteration % thining) == 0)
+		if ((iteration % thinning) == 0)
 		{
-			model.updateSynthesisRateTrace(iteration/thining, i);
-			model.updateMixtureAssignmentTrace(iteration/thining, i);
+			model.updateSynthesisRateTrace(iteration/thinning, i);
+			model.updateMixtureAssignmentTrace(iteration/thinning, i);
 		}
 		/*****************************************************
 		delete[] probabilities;
@@ -268,9 +268,9 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	{
 		model.setCategoryProbability(k, newMixtureProbabilities[k]);
 	}
-	if ((iteration % thining) == 0)
+	if ((iteration % thinning) == 0)
 	{
-		model.updateMixtureProbabilitiesTrace(iteration/thining);
+		model.updateMixtureProbabilitiesTrace(iteration/thinning);
 	}
 	//delete[] dirichletParameters;
 	//delete[] newMixtureProbabilities;
@@ -300,9 +300,9 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 			// moves proposed codon specific parameters to current codon specific parameters
 			model.updateCodonSpecificParameter(grouping);
 		}
-		if ((iteration % thining) == 0)
+		if ((iteration % thinning) == 0)
 		{
-			model.updateCodonSpecificParameterTrace(iteration/thining, grouping);
+			model.updateCodonSpecificParameterTrace(iteration/thinning, grouping);
 		}
 	}
 }
@@ -328,8 +328,8 @@ void MCMCAlgorithm::acceptRejectHyperParameter(Genome &genome, Model& model, uns
 			model.updateHyperParameter(i);
 	}
 
-	if ((iteration % thining) == 0)
-		model.updateHyperParameterTraces(iteration/thining);
+	if ((iteration % thinning) == 0)
+		model.updateHyperParameterTraces(iteration/thinning);
 }
 
 
@@ -356,7 +356,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	// This allows for varying initial conditions for better exploration of the parameter space.
 	varyInitialConditions(genome, model, divergenceIterations);
 
-	unsigned maximumIterations = samples * thining;
+	unsigned maximumIterations = samples * thinning;
 	// initialize everything
 
 	model.setNumPhiGroupings(genome.getGene(0).getObservedSynthesisRateValues().size());
@@ -388,7 +388,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 				if (multipleFiles)
 				{
 					std::ostringstream oss;
-					oss << (iteration) / thining << "_" << file;
+					oss << (iteration) / thinning << "_" << file;
 					std::string tmp = oss.str();
 					model.writeRestartFile(tmp);
 				}
@@ -403,7 +403,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
             #endif
             
 			my_print("Status at iteration % \n", iteration);
-			my_print("\t current logLikelihood: % \n", likelihoodTrace[(iteration/thining) - 1] );
+			my_print("\t current logLikelihood: % \n", likelihoodTrace[(iteration/thinning) - 1] );
 			if (iteration > stepsToAdapt)
 				my_print("No longer adapting\n");
 
@@ -418,7 +418,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 			model.proposeCodonSpecificParameter();
 			acceptRejectCodonSpecificParameter(genome, model, iteration);
 			if ((iteration % adaptiveWidth) == 0u)
-				model.adaptCodonSpecificParameterProposalWidth(adaptiveWidth, iteration / thining, iteration <= stepsToAdapt);
+				model.adaptCodonSpecificParameterProposalWidth(adaptiveWidth, iteration / thinning, iteration <= stepsToAdapt);
 		}
 		// update hyper parameter
 		if (estimateHyperParameter)
@@ -434,13 +434,13 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 		{
 			model.proposeSynthesisRateLevels();
 			double logLike = acceptRejectSynthesisRateLevelForAllGenes(genome, model, iteration);
-			if ((iteration % thining) == 0u)
+			if ((iteration % thinning) == 0u)
 			{
-				likelihoodTrace[(iteration / thining)] = logLike;
+				likelihoodTrace[(iteration / thinning)] = logLike;
 				if (std::isnan(logLike))
 				{
 					my_printError("ERROR: Log likelihood is NaN, exiting at iteration %\n", iteration);
-					model.setLastIteration(iteration / thining);
+					model.setLastIteration(iteration / thinning);
 					return;
 				}
 			}
@@ -451,7 +451,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 
 		if ((iteration % (50*adaptiveWidth)) == 0u)
 		{
-			double gewekeScore = calculateGewekeScore(iteration/thining);
+			double gewekeScore = calculateGewekeScore(iteration/thinning);
 
 			my_print("##################################################\n");
 			my_print("Geweke Score after % iterations: %\n", iteration, gewekeScore);
@@ -462,7 +462,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 				my_print("Stopping run based on convergence after % iterations\n\n", iteration);
 
 				// Comment out this break to keep the run from stopping on convergence
-				//model.setLastIteration(iteration/thining);
+				//model.setLastIteration(iteration/thinning);
 				//break;
 			}
 		}
@@ -672,12 +672,12 @@ void MCMCAlgorithm::setEstimateMixtureAssignment(bool in)
  * Arguments: base of filename to write to, interval to write file, bool telling if one or many files should be written.
  * Filename is the base of the file name to be written to. The interval will be placed in front to specify the step
  * it was written at and allow for multiple files to be written if multiple is set to true. The file write interval
- * is actually the interval specified times the thining.
+ * is actually the interval specified times the thinning.
 */
 void MCMCAlgorithm::setRestartFileSettings(std::string filename, unsigned interval, bool multiple)
 {
 	file = filename;
-	fileWriteInterval = interval * thining;
+	fileWriteInterval = interval * thinning;
 	multipleFiles = multiple;
 	writeRestartFile = true;
 }
@@ -685,15 +685,15 @@ void MCMCAlgorithm::setRestartFileSettings(std::string filename, unsigned interv
 
 /* setStepsToAdapt (RCPP EXPOSED)
  * Arguments: steps (unsigned)
- * Will set the specified steps to adapt for the run if the value is less than samples * thining (aka, the number
+ * Will set the specified steps to adapt for the run if the value is less than samples * thinning (aka, the number
  * of steps the run will last).
 */
 void MCMCAlgorithm::setStepsToAdapt(unsigned steps)
 {
-	if (steps <= samples * thining)
+	if (steps <= samples * thinning)
 		stepsToAdapt = steps;
 	else
-		my_printError("ERROR: Cannot set steps - value must be smaller than samples times thining (maxIterations)\n");
+		my_printError("ERROR: Cannot set steps - value must be smaller than samples times thinning (maxIterations)\n");
 }
 
 
@@ -901,9 +901,9 @@ unsigned MCMCAlgorithm::getSamples()
 }
 
 
-unsigned MCMCAlgorithm::getThining()
+unsigned MCMCAlgorithm::getThinning()
 {
-    return thining;
+    return thinning;
 }
 
 
@@ -919,9 +919,9 @@ void MCMCAlgorithm::setSamples(unsigned _samples)
 }
 
 
-void MCMCAlgorithm::setThining(unsigned _thining)
+void MCMCAlgorithm::setThinning(unsigned _thinning)
 {
-    thining = _thining;
+    thinning = _thinning;
 }
 
 
@@ -972,10 +972,10 @@ RCPP_MODULE(MCMCAlgorithm_mod)
 
 		//Other Functions:
         .method("getSamples", &MCMCAlgorithm::getSamples)
-        .method("getThining", &MCMCAlgorithm::getThining)
+        .method("getThinning", &MCMCAlgorithm::getThinning)
         .method("getAdaptiveWidth", &MCMCAlgorithm::getAdaptiveWidth)
         .method("setSamples", &MCMCAlgorithm::setSamples)
-        .method("setThining", &MCMCAlgorithm::setThining)
+        .method("setThinning", &MCMCAlgorithm::setThinning)
         .method("setAdaptiveWidth", &MCMCAlgorithm::setAdaptiveWidth)
         .method("setLogLikelihoodTrace", &MCMCAlgorithm::setLogLikelihoodTrace)
         .method("setStepsToAdapt", &MCMCAlgorithm::setStepsToAdapt)
