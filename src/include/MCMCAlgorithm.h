@@ -22,7 +22,7 @@ class MCMCAlgorithm
 {
 	private:
 		unsigned samples;
-		unsigned thining;
+		unsigned thinning;
 		unsigned adaptiveWidth;
 		unsigned lastConvergenceTest;
 		int stepsToAdapt;
@@ -53,7 +53,7 @@ class MCMCAlgorithm
 
 		//Constructors & Destructors:
 		explicit MCMCAlgorithm();
-		MCMCAlgorithm(unsigned samples, unsigned thining, unsigned _adaptiveWidth = 100,
+		MCMCAlgorithm(unsigned samples, unsigned thinning, unsigned _adaptiveWidth = 100,
 					  bool _estimateSynthesisRate = true, bool _estimateCodonSpecificParameter = true,
 					  bool _estimateHyperParameter = true);
 		virtual ~MCMCAlgorithm();
@@ -94,10 +94,10 @@ class MCMCAlgorithm
 
 		//Other Functions (All tested):
     	unsigned getSamples();
-    	unsigned getThining();
+    	unsigned getThinning();
     	unsigned getAdaptiveWidth();
     	void setSamples(unsigned _samples);
-    	void setThining(unsigned _thining);
+    	void setThinning(unsigned _thinning);
     	void setAdaptiveWidth(unsigned _adaptiveWidth);
 		void setLogLikelihoodTrace(std::vector<double> _likelihoodTrace);
 #endif //STANDALONE

@@ -4,7 +4,7 @@
 \alias{initializeMCMCObject}
 \title{Initialize MCMC}
 \usage{
-initializeMCMCObject(samples, thining = 1, adaptive.width = 100,
+initializeMCMCObject(samples, thinning = 1, adaptive.width = 100,
   est.expression = TRUE, est.csp = TRUE, est.hyper = TRUE,
   est.mix = TRUE)
 }
@@ -12,7 +12,7 @@ initializeMCMCObject(samples, thining = 1, adaptive.width = 100,
 \item{samples}{Number of samples that should be produced when running the 
 MCMC algorithm. No default value.}
 
-\item{thining}{Number that the samples should be thinned by. If set to 
+\item{thinning}{Number that the samples should be thinned by. If set to 
 1, every step would be saved as a sample. Default value is 1.}
 
 \item{adaptive.width}{Number that determines how often the acceptance/rejection

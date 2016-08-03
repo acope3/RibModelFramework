@@ -8,12 +8,12 @@ int main()
 {
 	std::cout << "Initializing MCMCAlgorithm object---------------" << std::endl;
 	int samples = 500;
-	int thining = 10;
+	int thinning = 10;
 	int useSamples = 100;
 	std::cout << "\t# Samples: " << samples << "\n";
-	std::cout << "\tThining: " << thining << "\n";
+	std::cout << "\tThinning: " << thinning << "\n";
 	std::cout << "\t# Samples used: " << useSamples << "\n";
-	MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, 100, true, true, true);
+	MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thinning, 100, true, true, true);
 	//mcmc.setRestartFileSettings("RestartFile.txt", 20, true);
 	std::cout << "Done!-------------------------------\n\n\n";
 
@@ -149,12 +149,12 @@ int main()
 
 	std::cout << "Initializing MCMCAlgorithm object---------------" << std::endl;
 	int samples = 10;
-	int thining = 10;
+	int thinning = 10;
 	int useSamples = 100;
 	std::cout << "\t# Samples: " << samples << "\n";
-	std::cout << "\tThining: " << thining << "\n";
+	std::cout << "\tThinning: " << thinning << "\n";
 	std::cout << "\t # Samples used: " << useSamples << "\n";
-	MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, 10, true, true, true);
+	MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thinning, 10, true, true, true);
 	mcmc.setRestartFileSettings("RestartFile.txt", 20, true);
 	std::cout << "Done!-------------------------------\n\n\n";
 
@@ -415,13 +415,13 @@ int main()
 	
 	std::cout << "Initializing MCMCAlgorithm object---------------" << std::endl;
 	int samples = 100;
-	int thining = 10;
+	int thinning = 10;
 	int useSamples = 100;
 	unsigned numMixtures = 1;
 	std::cout << "\t# Samples: " << samples << "\n";
-	std::cout << "\tThining: " << thining << "\n";
+	std::cout << "\tThinning: " << thinning << "\n";
 	std::cout << "\t # Samples used: " << useSamples << "\n";
-	MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, 10, true, true, true);
+	MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thinning, 10, true, true, true);
 	mcmc.setRestartFileSettings("RestartFile.txt", 20, true);
 	std::cout << "Done!-------------------------------\n\n\n";
 
@@ -716,12 +716,12 @@ int main()
 
 	my_print("Initializing MCMCAlgorithm object---------------\n");
 	unsigned samples = 10;
-	unsigned thining = 10;
+	unsigned thinning = 10;
 	int useSamples = 100;
 	my_print("\t# Samples: %\n", samples);
-	my_print("\tThining: %\n", thining);
+	my_print("\tThinning: %\n", thinning);
 	my_print("\t # Samples used: %\n", useSamples);
-	MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, 10, true, true, true);
+	MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thinning, 10, true, true, true);
 	//mcmc.setRestartFileSettings(pathBegin + "RestartFile.txt", 20, true);
 	my_print("Done!-------------------------------\n\n\n");
 
