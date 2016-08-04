@@ -105,11 +105,10 @@ class FONSEModel : public Model
 
 		virtual void simulateGenome(Genome &genome);
 		virtual void printHyperParameters();
-		FONSEParameter getParameter();
 		void setParameter(FONSEParameter &_parameter);
 		virtual double calculateAllPriors();
-		void calculateCodonProbabilityVector(unsigned numCodons, unsigned position, unsigned maxIndexValue,
-											 double* mutation, double* selection, double phi, double codonProb[]);
+		void calculateLogCodonProbabilityVector(unsigned numCodons, unsigned position, unsigned minIndexValue,
+											 double* mutation, double* selection, double phi, std::vector <double> &codonProb);
 		void calculateCodonProbabilityVector(unsigned numCodons, unsigned position, double* mutation, double* selection, 
 												double phi, double codonProb[]);
 		virtual void getParameterForCategory(unsigned category, unsigned param, std::string aa, bool proposal,
