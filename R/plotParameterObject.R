@@ -17,16 +17,56 @@
 #' 
 #' @details Graphs are based off the last # samples for the posterior mean.
 #' 
-#' 
 plot.Rcpp_ROCParameter <- function(x, what = "Mutation", samples = 100, ...)
 {
   plotParameterObject(x, what = what, samples, ...)
 }
+
+
+#' Plot FONSE Parameter 
+#' 
+#' @param x FONSE parameter object.
+#' 
+#' @param what Which aspect of the FONSE parameter to plot. Default value is
+#' "Mutation".
+#' 
+#' @param samples Number of samples to plot using the posterior mean. Default
+#' value is 100.
+#' 
+#' @param ... Arguments to be passed to methods, such as graphical parameters.
+#' 
+#' @return This function has no return value.
+#' 
+#' @description \code{plot} graphs the mutation or selection parameter for a FONSE
+#' parameter object for each mixture element.
+#' 
+#' @details Graphs are based off the last # samples for the posterior mean.
+#' 
 plot.Rcpp_FONSEParameter <- function(x, what = "Mutation", samples = 100, ...)
 {
   plotParameterObject(x, what = what, samples, ...)
 }
 
+#' Plot Parameter 
+#' 
+#' @param x A parameter object, specified by superfunctions: \code{plot.Rcpp_ROCParameter}
+#' and \code{plot.Rcpp.FONSEParameter}.
+#' 
+#' @param what Which aspect of the parameter to plot. Default value is
+#' "Mutation".
+#' 
+#' @param samples Number of samples to plot using the posterior mean. Default
+#' value is 100.
+#' 
+#' @param ... Arguments to be passed to methods, such as graphical parameters.
+#' 
+#' @return This function has no return value.
+#' 
+#' @description \code{plot} graphs the mutation or selection parameter for a ROC or FONSE
+#' parameter object for each mixture element.
+#' 
+#' @details Graphs are based off the last # samples for the posterior mean.
+#' 
 plotParameterObject <- function(x, what = "Mutation", samples = 100, ...){
   
   numMixtures <- x$numMixtures

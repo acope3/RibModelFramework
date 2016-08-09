@@ -104,18 +104,25 @@ plot.Rcpp_ROCModel <- function(x, genome, samples = 100, mixture = 1,
 #' Plot Model Object
 #' 
 #' @param x An Rcpp model object initialized with \code{initializeModelObject}.
+#'
 #' @param genome An Rcpp genome object initialized with \code{initializeGenomeObject}.
+#'
 #' @param samples The number of samples in the trace
+#'
 #' @param mixture The mixture for which to graph values.
+#'
 #' @param estim.Expression A boolean value that says whether to use estimated expression
 #'  values or empirical values.   
+#'
 #' @param simulated A boolean value that determines whether to use the simulated genome.
+#'
 #' @param ... Optional, additional arguments.
 #' For this function, a possible title for the plot in the form of a list if set with "main".
 #'  
 #' @return This function has no return value.
 #'
 #' @description See \code{plot.Rcpp_ROCModel}
+#'
 plot.Rcpp_FONSEModel <- function(x, genome, samples = 100, mixture = 1, 
                                estim.Expression = TRUE, simulated = FALSE, ...)
 {
@@ -140,7 +147,7 @@ plot.Rcpp_FONSEModel <- function(x, genome, samples = 100, mixture = 1,
   text(0.5, 0.6, main)
   text(0.5, 0.4, date(), cex = 0.6)
   
-  num.genes <- genome$getGenomeSize()
+  num.genes <- length(genome)
   parameter <- x$getParameter()
   
   mixtureAssignment <- unlist(lapply(1:num.genes,  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))
@@ -280,3 +287,4 @@ plotSinglePanel <- function(parameter, model, genome, expressionValues, samples,
   
   return(xlimit)
 }
+
