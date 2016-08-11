@@ -154,7 +154,7 @@ void Genome::writeFasta (std::string filename, bool simulated)
 			my_printError("Error in Genome::writeFasta: Can not open output Fasta file %\n", filename);
 		else
 		{
-			unsigned sized = simulated ? simulatedGenes.size() : genes.size();
+			unsigned sized = simulated ? (unsigned)simulatedGenes.size() : (unsigned)genes.size();
 
 			for (unsigned i = 0u; i < sized; i++)
 			{
@@ -252,7 +252,7 @@ void Genome::writeRFPFile(std::string filename, bool simulated)
 	else
 	{
 		Fout << "ORF,RFP_Counts,Codon_Counts,Codon\n";
-		unsigned sized = simulated ? simulatedGenes.size() : genes.size();
+		unsigned sized = simulated ? (unsigned)simulatedGenes.size() : (unsigned)genes.size();
 
 		for (unsigned geneIndex = 0; geneIndex < sized; geneIndex++)
 		{
@@ -272,30 +272,38 @@ void Genome::writeRFPFile(std::string filename, bool simulated)
 }
 
 
-/* readPANSEFile
- * Arguments: string filename
- *
- * Read in a PANSE-formatted file: GeneID,Codon,Position (1-indexed),rfp_count
+/* readPAFile (TODO: RCPP EXPOSE VIA WRAPPER)
+ * Arguments: string filename, boolean to determine if we are appending to the existing genome
+ * (if not set to true, will default to clearing genome data; defaults to false)
+ * Read in a PA-formatted file: GeneID,Codon,Position (1-indexed),rfp_count(s) (may be multiple)
  * The positions are not necessarily in the right order.
+ * There may be more than one rfp_count, and thus the header is important.
+ * TODO: Wrapped by "function name" on the R-side.
 */
-void Genome::readPANSEFile(std::string filename, bool Append)
+void Genome::readPAFile(std::string filename, bool Append)
 {
 	try {
-		if (!Append)
-			clear();
+		if (!Append) clear();
+
 		std::ifstream Fin;
 		Fin.open(filename.c_str());
+
 		if (Fin.fail())
-			my_printError("Error in Genome::readPANSEFile: Can not open PANSE file %\n", filename);
+			my_printError("Error in Genome::readPAFile: Can not open PA file %\n", filename);
 		else
 		{
 			std::string tmp;
-			std::getline(Fin, tmp); //trash the first line
+
+			// Analyze the header line
+			std::getline(Fin, tmp);
+			//Temporary
+			unsigned numCategories = 1;
+			unsigned categoryIndex = 0;
+
 			std::string prevID = "";
 			Gene tmpGene;
 			bool first = true;
 			std::string seq = "";
-
 			std::map<std::string, unsigned> genes;
 			std::map<std::string, unsigned>::iterator git;
 
@@ -322,6 +330,7 @@ void Genome::readPANSEFile(std::string filename, bool Append)
 			genes[prevID] *= 3; //multiply by three since codons
 			Fin.close();
 
+			//Second pass: Now for each rfp_count category, record it.
 			Fin.open(filename.c_str());
 			std::getline(Fin, tmp); //retrash first line
 			prevID = "";
@@ -346,7 +355,10 @@ void Genome::readPANSEFile(std::string filename, bool Append)
 					tmpGene.setId(prevID);
 					tmpGene.setDescription("No description for PANSE Model");
 					tmpGene.setSequence(seq);
-					tmpGene.addRFP_count(RFP_counts);
+					// Based on the header line, initialize the number of RFP_count categories
+					// REMINDER: Modifying the sequence summary must come after setting the sequence!
+					tmpGene.initRFP_count(numCategories);
+					tmpGene.setRFP_count(categoryIndex, RFP_counts);
 					addGene(tmpGene, false); //add to genome
 					tmpGene.clear();
 					seq = "";
@@ -355,7 +367,7 @@ void Genome::readPANSEFile(std::string filename, bool Append)
 					seq.resize(git->second);
 					RFP_counts.clear();
 				}
-				// PANSE file format: GeneID,Codon,Position (1-indexed),rfp_count
+				// PANSE file format: GeneID,Codon,Position (1-indexed),rfp_count(s)
 				std::size_t pos2 = tmp.find(",", pos + 1);
 
 				// Each codon is guaranteed to be of size 3
@@ -380,8 +392,10 @@ void Genome::readPANSEFile(std::string filename, bool Append)
 			tmpGene.setId(prevID);
 			tmpGene.setDescription("No description for PANSE Model");
 			tmpGene.setSequence(seq);
-			tmpGene.addRFP_count(RFP_counts);
-
+			// Based on the header line, initialize the number of RFP_count categories
+			// REMINDER: Modifying the sequence summary must come after setting the sequence!
+			tmpGene.initRFP_count(numCategories);
+			tmpGene.setRFP_count(categoryIndex, RFP_counts);
 			addGene(tmpGene, false); //add to genome
 		} // end else
 		Fin.close();
@@ -655,10 +669,11 @@ Gene& Genome::getGene(std::string id, bool simulated)
 {
 	Gene tempGene;
 	unsigned geneIndex;
+
 	for (geneIndex = 0; geneIndex < getGenomeSize(); geneIndex++)
 	{
-		if (!simulated) tempGene = genes[geneIndex];
-		else tempGene = simulatedGenes[geneIndex];
+		tempGene = simulated ? simulatedGenes[geneIndex] : genes[geneIndex];
+
 		if (tempGene.getId().compare(id) == 0) break;
 	}
 	return simulated ? simulatedGenes[geneIndex] : genes[geneIndex];
@@ -737,6 +752,7 @@ std::vector <unsigned> Genome::getNumGenesWithPhi()
 {
 	return numGenesWithPhi;
 }
+
 
 void Genome::setNumGenesWithPhi(std::vector <unsigned> newVector)
 {

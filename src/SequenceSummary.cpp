@@ -192,15 +192,51 @@ std::vector <unsigned> *SequenceSummary::getCodonPositions(unsigned index)
 	return &codonPositions[index];
 }
 
-std::vector <unsigned> SequenceSummary::getRFP_count()
+
+
+
+
+//-----------------------------------//
+//---------- RFP Functions ----------//
+//-----------------------------------//
+
+
+/* initRFP_count (NOT EXPOSED)
+ * Arguments: A number representing the number of RFP categories.
+ * Initializes the vector of vectors that describes, for each category, the RFP_count vector.
+ * Note: When programming in C, this function MUST be called before setRFP_count.
+ * Reminder: It must be called after setting the sequence, since that function
+ * resets the sequence summary, including the RFP_count.
+ */
+void SequenceSummary::initRFP_count(unsigned numCategories)
 {
-	return RFP_count;
+	RFP_count.resize(numCategories);
 }
 
-void SequenceSummary::setRFP_count(std::vector <unsigned> arg)
+
+/* getRFP_count (NOT EXPOSED)
+ * Arguments: A number representing the RFP category to return
+ * Returns the RFP_count vector for the category index specified.
+ */
+std::vector <unsigned> SequenceSummary::getRFP_count(unsigned categoryIndex)
 {
-	RFP_count = arg;
+	//TODO: Add error checking if user forgets to initRFP_count?
+	return RFP_count[categoryIndex];
 }
+
+
+/* setRFP_count (NOT EXPOSED)
+ * Arguments: A number representing the RFP category to modify, a vector argument to set the RFP category's RFP_count to
+ * Sets the RFP_count vector for the category index specified to the vector argument given.
+ */
+void SequenceSummary::setRFP_count(unsigned categoryIndex, std::vector <unsigned> arg)
+{
+	//TODO: Add error checking if user forgets to initRFP_count?
+	RFP_count[categoryIndex] = arg;
+}
+
+
+
 
 
 //------------------------------------//

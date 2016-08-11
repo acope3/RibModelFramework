@@ -169,6 +169,8 @@ std::string Gene::getSequence()
  * is processed and set. If not, it is not processed.
  * NOTE: The seq string will still be set, even if it is invalid.
  * NOTE: As part of changing the sequence, the sequence summary is also cleared.
+ * IMPORTANT NOTE: When programming in C as a result, always modify the sequence summary AFTER setting
+ * the Sequence.
 */
 void Gene::setSequence(std::string _seq)
 {
@@ -186,18 +188,6 @@ void Gene::setSequence(std::string _seq)
 		my_printError("WARNING: Gene: % has sequence length NOT multiple of 3 after cleaning of the sequence!\n");
         my_printError("Gene data is NOT processed!\nValid characters are A,C,T,G, and N \n", id);
     }
-}
-
-
-std::vector <unsigned> Gene::getRFP_count()
-{
-    return geneData.getRFP_count();
-}
-
-
-void Gene::addRFP_count(std::vector <unsigned> RFP_counts)
-{
-    geneData.setRFP_count(RFP_counts);
 }
 
 
@@ -250,7 +240,7 @@ double Gene::getObservedSynthesisRate(unsigned index)
 */
 unsigned Gene::getNumObservedSynthesisSets()
 {
-	return observedSynthesisRateValues.size();
+	return (unsigned)observedSynthesisRateValues.size();
 }
 
 
@@ -262,6 +252,50 @@ unsigned Gene::getNumObservedSynthesisSets()
 char Gene::getNucleotideAt(unsigned i)
 {
     return seq[i];
+}
+
+
+
+
+
+//-----------------------------------//
+//---------- RFP Functions ----------//
+//-----------------------------------//
+
+
+/* initRFP_count (NOT EXPOSED)
+ * Arguments: A number representing the number of RFP categories.
+ * Initializes the vector of vectors that describes, for each category, the RFP_count vector.
+ * Note: When programming in C, this function MUST be called before setRFP_count.
+ * Reminder: It must be called after setting the sequence, since that function
+ * resets the sequence summary, including the RFP_count.
+ */
+void Gene::initRFP_count(unsigned numCategories)
+{
+    geneData.initRFP_count(numCategories);
+}
+
+
+/* getRFP_count (NOT EXPOSED)
+ * Arguments: A number representing the RFP category to return
+ * Returns the RFP_count vector for the category index specified.
+ * For unit testing only.
+ */
+std::vector <unsigned> Gene::getRFP_count(unsigned categoryIndex)
+{
+    //TODO: Add error checking if user forgets to initRFP_count?
+    return geneData.getRFP_count(categoryIndex);
+}
+
+
+/* setRFP_count (NOT EXPOSED)
+ * Arguments: A number representing the RFP category to modify, a vector argument to set the RFP category's RFP_count to
+ * Sets the RFP_count vector for the category index specified to the vector argument given.
+ */
+void Gene::setRFP_count(unsigned categoryIndex, std::vector <unsigned> RFP_counts)
+{
+    //TODO: Add error checking if user forgets to initRFP_count?
+    geneData.setRFP_count(categoryIndex, RFP_counts);
 }
 
 
