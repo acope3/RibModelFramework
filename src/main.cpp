@@ -701,8 +701,8 @@ int main()
 
 	// UNIT TESTING
 	//testUtility();
-	testSequenceSummary();
-	testGene();
+	//testSequenceSummary();
+	//testGene();
 	testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
 	//testCovarianceMatrix();
 	//testParameter();

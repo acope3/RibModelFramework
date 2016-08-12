@@ -279,6 +279,7 @@ void Genome::writeRFPFile(std::string filename, bool simulated)
  * The positions are not necessarily in the right order.
  * There may be more than one rfp_count, and thus the header is important.
  * TODO: Wrapped by "function name" on the R-side.
+ * TODO: Should we associate RFP_count with the position? Currently, it is based on order read in.
 */
 void Genome::readPAFile(std::string filename, bool Append)
 {
@@ -296,9 +297,21 @@ void Genome::readPAFile(std::string filename, bool Append)
 
 			// Analyze the header line
 			std::getline(Fin, tmp);
-			//Temporary
-			unsigned numCategories = 1;
-			unsigned categoryIndex = 0;
+
+			// Ignore first 3 commas: ID, position, codon
+			std::size_t pos = tmp.find(",");
+			pos = tmp.find(",", pos + 1);
+			pos = tmp.find(",", pos + 1);
+
+			// While there are more commas, there are more categories of RFP counts
+			unsigned numCategories = 0;
+			std::size_t pos2;
+			while (pos != std::string::npos)
+			{
+				numCategories++;
+				pos2 = tmp.find(",", pos + 1);
+				pos = pos2;
+			}
 
 			std::string prevID = "";
 			Gene tmpGene;
@@ -310,7 +323,7 @@ void Genome::readPAFile(std::string filename, bool Append)
 			//First pass: For each gene name, count its size.
 			while (std::getline(Fin, tmp))
 			{
-				std::size_t pos = tmp.find(",");
+				pos = tmp.find(",");
 				std::string ID = tmp.substr(0, pos);
 
 				if (first)
@@ -335,12 +348,12 @@ void Genome::readPAFile(std::string filename, bool Append)
 			std::getline(Fin, tmp); //retrash first line
 			prevID = "";
 			first = true;
-			std::vector<unsigned> RFP_counts;
+			std::vector <std::vector <unsigned>> RFP_counts(numCategories);
 
 			//Now for each line associated with a gene ID, set the string appropriately
 			while (std::getline(Fin, tmp))
 			{
-				std::size_t pos = tmp.find(",");
+				pos = tmp.find(",");
 				std::string ID = tmp.substr(0, pos);
 
 				if (first)
@@ -358,17 +371,22 @@ void Genome::readPAFile(std::string filename, bool Append)
 					// Based on the header line, initialize the number of RFP_count categories
 					// REMINDER: Modifying the sequence summary must come after setting the sequence!
 					tmpGene.initRFP_count(numCategories);
-					tmpGene.setRFP_count(categoryIndex, RFP_counts);
+
+					for (unsigned i = 0; i < numCategories; i++)
+						tmpGene.setRFP_count(i, RFP_counts[i]);
+
 					addGene(tmpGene, false); //add to genome
 					tmpGene.clear();
 					seq = "";
 
 					git = genes.find(ID);
 					seq.resize(git->second);
-					RFP_counts.clear();
+
+					for (unsigned i = 0; i < numCategories; i++)
+						RFP_counts[i].clear();
 				}
 				// PANSE file format: GeneID,Codon,Position (1-indexed),rfp_count(s)
-				std::size_t pos2 = tmp.find(",", pos + 1);
+				pos2 = tmp.find(",", pos + 1);
 
 				// Each codon is guaranteed to be of size 3
 				std::string codon = tmp.substr(pos + 1, 3);
@@ -377,9 +395,16 @@ void Genome::readPAFile(std::string filename, bool Append)
 				pos = tmp.find(",", pos2 + 1);
 				unsigned position = (unsigned) std::atoi(tmp.substr(pos2 + 1, pos - (pos2 + 1)).c_str()) - 1;
 
-				// Get rfp_count from last comma-separated value
-				unsigned RFP_count = (unsigned) std::atoi(tmp.substr(pos + 1).c_str());
-				RFP_counts.push_back(RFP_count);
+				// While there are more commas, there are more categories of RFP counts
+				unsigned categoryIndex = 0;
+				while (pos != std::string::npos)
+				{
+					pos2 = tmp.find(",", pos + 1);
+					unsigned RFP_count = (unsigned) std::atoi(tmp.substr(pos + 1, pos2 - (pos + 1)).c_str());
+					RFP_counts[categoryIndex].push_back(RFP_count);
+					pos = pos2;
+					categoryIndex++;
+				}
 
 				// Now add codon to appropriate place in sequence
 				seq[position * 3] = codon[0];
@@ -395,7 +420,10 @@ void Genome::readPAFile(std::string filename, bool Append)
 			// Based on the header line, initialize the number of RFP_count categories
 			// REMINDER: Modifying the sequence summary must come after setting the sequence!
 			tmpGene.initRFP_count(numCategories);
-			tmpGene.setRFP_count(categoryIndex, RFP_counts);
+
+			for (unsigned i = 0; i < numCategories; i++)
+				tmpGene.setRFP_count(i, RFP_counts[i]);
+
 			addGene(tmpGene, false); //add to genome
 		} // end else
 		Fin.close();

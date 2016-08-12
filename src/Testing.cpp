@@ -1708,7 +1708,7 @@ int testGenome(std::string testFileDir)
     genome.clear();
     testGenome.clear();
 
-    file = testFileDir + "/" + "readPA.pa";
+    file = testFileDir + "/" + "readPAMulti.pa";
     genome.readPAFile(file);
 
     Gene panse1("CTTGCTATTTTT", "TEST001", "No description for PANSE Model");
@@ -1716,11 +1716,15 @@ int testGenome(std::string testFileDir)
 
     std::vector <unsigned> tmp1 = {0, 2, 0, 0};
     std::vector <unsigned> tmp2 = {0, 0, 1, 1};
+    std::vector <unsigned> tmp3 = {1, 0, 0, 17};
+    std::vector <unsigned> tmp4 = {3, 2, 2, 0};
 
-    panse1.initRFP_count(1);
-    panse2.initRFP_count(1);
+    panse1.initRFP_count(2);
+    panse2.initRFP_count(2);
     panse1.setRFP_count(0, tmp1);
     panse2.setRFP_count(0, tmp2);
+    panse1.setRFP_count(1, tmp3);
+    panse2.setRFP_count(1, tmp4);
 
     testGenome.addGene(panse1, false);
     testGenome.addGene(panse2, false);
