@@ -275,7 +275,7 @@ void Genome::writeRFPFile(std::string filename, bool simulated)
 /* readPAFile (TODO: RCPP EXPOSE VIA WRAPPER)
  * Arguments: string filename, boolean to determine if we are appending to the existing genome
  * (if not set to true, will default to clearing genome data; defaults to false)
- * Read in a PA-formatted file: GeneID,Codon,Position (1-indexed),rfp_count(s) (may be multiple)
+ * Read in a PA-formatted file: GeneID,Position (1-indexed),Codon,rfp_count(s) (may be multiple)
  * The positions are not necessarily in the right order.
  * There may be more than one rfp_count, and thus the header is important.
  * TODO: Wrapped by "function name" on the R-side.
@@ -316,29 +316,40 @@ void Genome::readPAFile(std::string filename, bool Append)
 			std::string prevID = "";
 			Gene tmpGene;
 			bool first = true;
+			//int position;
 			std::string seq = "";
 			std::map<std::string, unsigned> genes;
 			std::map<std::string, unsigned>::iterator git;
 
 			//First pass: For each gene name, count its size.
+			//For each gene, count all the RFPs
 			while (std::getline(Fin, tmp))
 			{
 				pos = tmp.find(",");
 				std::string ID = tmp.substr(0, pos);
 
-				if (first)
+				// Position integer: Ensure that if position is negative, ignore the codon.
+				pos2 = tmp.find(",", pos + 1);
+
+				// Set to 0-indexed value for convenience of vector calculation
+				int position = std::atoi(tmp.substr(pos + 1, pos2 - (pos + 1)).c_str()) - 1;
+
+				if (position > -1) // for convenience of calculation; ambiguous positions are marked by -1.
 				{
+					if (first)
+                    {
+						prevID = ID;
+						first = false;
+						genes[ID] = 0;
+					}
+					if (ID != prevID)
+                    {
+						genes[prevID] *= 3; //multiply by three since codons
+						genes[ID] = 0; //initialize the new genes[ID]
+					}
 					prevID = ID;
-					first = false;
-					genes[ID] = 0;
+					genes[ID]++;
 				}
-				if (ID != prevID)
-				{
-					genes[prevID] *= 3; //multiply by three since codons
-					genes[ID] = 0; //initialize the new genes[ID]
-				}
-				prevID = ID;
-				genes[ID]++;
 			}
 			genes[prevID] *= 3; //multiply by three since codons
 			Fin.close();
@@ -351,67 +362,69 @@ void Genome::readPAFile(std::string filename, bool Append)
 			std::vector <std::vector <unsigned>> RFP_counts(numCategories);
 
 			//Now for each line associated with a gene ID, set the string appropriately
-			while (std::getline(Fin, tmp))
-			{
+			while (std::getline(Fin, tmp)) {
 				pos = tmp.find(",");
 				std::string ID = tmp.substr(0, pos);
 
-				if (first)
-				{
-					prevID = ID;
-					first = false;
-					git = genes.find(ID);
-					seq.resize(git->second);
-				}
-				if (ID != prevID)
-				{
-					tmpGene.setId(prevID);
-					tmpGene.setDescription("No description for PANSE Model");
-					tmpGene.setSequence(seq);
-					// Based on the header line, initialize the number of RFP_count categories
-					// REMINDER: Modifying the sequence summary must come after setting the sequence!
-					tmpGene.initRFP_count(numCategories);
-
-					for (unsigned i = 0; i < numCategories; i++)
-						tmpGene.setRFP_count(i, RFP_counts[i]);
-
-					addGene(tmpGene, false); //add to genome
-					tmpGene.clear();
-					seq = "";
-
-					git = genes.find(ID);
-					seq.resize(git->second);
-
-					for (unsigned i = 0; i < numCategories; i++)
-						RFP_counts[i].clear();
-				}
-				// PANSE file format: GeneID,Codon,Position (1-indexed),rfp_count(s)
+				// Make pos2 find next comma to find position integer
 				pos2 = tmp.find(",", pos + 1);
+				// Set to 0-indexed value for convenience of vector calculation
+				int position = std::atoi(tmp.substr(pos + 1, pos2 - (pos + 1)).c_str()) - 1;
 
-				// Each codon is guaranteed to be of size 3
-				std::string codon = tmp.substr(pos + 1, 3);
-
-				// Make pos find next comma to find position integer
-				pos = tmp.find(",", pos2 + 1);
-				unsigned position = (unsigned) std::atoi(tmp.substr(pos2 + 1, pos - (pos2 + 1)).c_str()) - 1;
-
-				// While there are more commas, there are more categories of RFP counts
-				unsigned categoryIndex = 0;
-				while (pos != std::string::npos)
+				// Position integer: Ensure that if position is negative, ignore the codon.
+				if (position > -1) // for convenience of calculation; ambiguous positions are marked by -1.
 				{
-					pos2 = tmp.find(",", pos + 1);
-					unsigned RFP_count = (unsigned) std::atoi(tmp.substr(pos + 1, pos2 - (pos + 1)).c_str());
-					RFP_counts[categoryIndex].push_back(RFP_count);
-					pos = pos2;
-					categoryIndex++;
+					if (first)
+					{
+						prevID = ID;
+						first = false;
+						git = genes.find(ID);
+						seq.resize(git->second); //multiply by three since codons
+					}
+					if (ID != prevID)
+					{
+						tmpGene.setId(prevID);
+						tmpGene.setDescription("No description for PANSE Model");
+						tmpGene.setSequence(seq);
+						// Based on the header line, initialize the number of RFP_count categories
+						// REMINDER: Modifying the sequence summary must come after setting the sequence!
+						tmpGene.initRFP_count(numCategories);
+
+						for (unsigned i = 0; i < numCategories; i++)
+							tmpGene.setRFP_count(i, RFP_counts[i]);
+
+						addGene(tmpGene, false); //add to genome
+						tmpGene.clear();
+						seq = "";
+
+						git = genes.find(ID);
+						seq.resize(git->second); //multiply by three since codons
+
+						for (unsigned i = 0; i < numCategories; i++)
+							RFP_counts[i].clear();
+					}
+					// Now find codon value: Follows prior comma, guaranteed to be of size 3
+					std::string codon = tmp.substr(pos2 + 1, 3);
+
+					// Skip to end rfp_count(s), if any
+					pos = tmp.find(",", pos2 + 1);
+					// While there are more commas, there are more categories of RFP counts
+					unsigned categoryIndex = 0;
+					while (pos != std::string::npos) {
+						pos2 = tmp.find(",", pos + 1);
+						unsigned RFP_count = (unsigned) std::atoi(tmp.substr(pos + 1, pos2 - (pos + 1)).c_str());
+						RFP_counts[categoryIndex].push_back(RFP_count);
+						pos = pos2;
+						categoryIndex++;
+					}
+
+					// Now add codon to appropriate place in sequence
+					seq[position * 3] = codon[0];
+					seq[position * 3 + 1] = codon[1];
+					seq[position * 3 + 2] = codon[2];
+
+					prevID = ID;
 				}
-
-				// Now add codon to appropriate place in sequence
-				seq[position * 3] = codon[0];
-				seq[position * 3 + 1] = codon[1];
-				seq[position * 3 + 2] = codon[2];
-
-				prevID = ID;
 			}
 
 			tmpGene.setId(prevID);

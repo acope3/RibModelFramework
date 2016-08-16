@@ -1739,7 +1739,7 @@ int testGenome(std::string testFileDir)
 
     //TODO
     //-------------------------------------//
-    //------ writePANSEFile Function ------//
+    //------ writePAFile Function ------//
     //-------------------------------------//
 
     /* readObservedPhiValues Testing Function
@@ -1750,7 +1750,7 @@ int testGenome(std::string testFileDir)
      *
      * Significant standard error output is produced by design: both files exhibit some errors.
     */
-    /*
+
     //--------------------------------------------//
     //------ readObservedPhiValues Function ------//
     //--------------------------------------------//
@@ -1863,7 +1863,6 @@ int testGenome(std::string testFileDir)
     if (!error)
         my_print("Genome readObservedPhiValues --- Pass\n");
     // No need to reset error
-    */
 
     return globalError;
 }

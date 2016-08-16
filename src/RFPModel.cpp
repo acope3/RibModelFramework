@@ -60,7 +60,7 @@ void RFPModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 #ifndef __APPLE__
 #pragma omp parallel for reduction(+:logLikelihood,logLikelihood_proposed)
 #endif
-	for (int index = 0; index < getGroupListSize(); index++) //number of codons, without the stop codons
+	for (unsigned index = 0; index < getGroupListSize(); index++) //number of codons, without the stop codons
 	{
 		std::string codon = getGrouping(index);
 
@@ -75,7 +75,7 @@ void RFPModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 		logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue_proposed);
 	}
 
-	double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(false);
+	double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(lambdaPrimeCategory, false);
 	double logPhiProbability = Parameter::densityLogNorm(phiValue, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
 	double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
 	double currentLogLikelihood = (logLikelihood + logPhiProbability);
@@ -100,7 +100,7 @@ void RFPModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 #ifndef __APPLE__
 #pragma omp parallel for private(gene) reduction(+:logLikelihood,logLikelihood_proposed)
 #endif
-	for (int i = 0u; i < genome.getGenomeSize(); i++)
+	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{
 		gene = &genome.getGene(i);
 		// which mixture element does this gene belong to
@@ -146,7 +146,7 @@ void RFPModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 		currentMphi[i] = -((currentStdDevSynthesisRate[i] * currentStdDevSynthesisRate[i]) / 2);
 		proposedStdDevSynthesisRate[i] = getStdDevSynthesisRate(i, true);
 		proposedMphi[i] = -((proposedStdDevSynthesisRate[i] * proposedStdDevSynthesisRate[i]) / 2);
-		// take the jacobian into account for the non-linear transformation from logN to N distribution
+		// take the Jacobian into account for the non-linear transformation from logN to N distribution
 		lpr -= (std::log(currentStdDevSynthesisRate[i]) - std::log(proposedStdDevSynthesisRate[i]));
 		// take prior into account
 		//TODO(Cedric): make sure you can control that prior from R
@@ -158,7 +158,7 @@ void RFPModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 #ifndef __APPLE__
 #pragma omp parallel for reduction(+:lpr)
 #endif
-	for (int i = 0u; i < genome.getGenomeSize(); i++)
+	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{
 		unsigned mixture = getMixtureAssignment(i);
 		mixture = getSynthesisRateCategory(mixture);
@@ -506,6 +506,9 @@ void RFPModel::updateHyperParameter(unsigned hp)
 	switch (hp)
 	{
 		case 0:
+			updateStdDevSynthesisRate();
+			break;
+		default:
 			updateStdDevSynthesisRate();
 			break;
 	}
