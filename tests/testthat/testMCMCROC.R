@@ -27,11 +27,11 @@ numMixtures <- 2
 mixDef <- "allUnique"
 
 samples <- 10
-thining <- 10
+thinning <- 10
 adaptiveWidth <- 10
 divergence.iteration <- 0
 
-mcmc <- initializeMCMCObject(samples = samples, thining = thining, adaptive.width = adaptiveWidth, 
+mcmc <- initializeMCMCObject(samples = samples, thinning = thinning, adaptive.width = adaptiveWidth, 
                              est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
 
 ### With Phi

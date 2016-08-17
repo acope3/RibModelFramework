@@ -30,7 +30,7 @@ for the given mcmc, genome, and model objects to perform a model fitting.
 }
 \details{
 \code{runMCMC} will run for the number of samples times the number
-thining given when the mcmc object is initialized. Updates are provided every 100
-steps, and the state of the chain is saved every thining steps.
+thinning given when the mcmc object is initialized. Updates are provided every 100
+steps, and the state of the chain is saved every thinning steps.
 }
 

@@ -2945,7 +2945,7 @@ int testRFPTrace()
     Trace FONSE;
     Trace PANSE;
     //int samples = 10;
-    //int thining = 10;
+    //int thinning = 10;
     //int useSamples = 100;
     int globalError = 0;
 
@@ -3095,18 +3095,18 @@ int testRFPParameter()
 int testMCMCAlgorithm()
 {
 	unsigned samples = 10;
-	unsigned thining = 10;
+	unsigned thinning = 10;
     int error = 0;
     int globalError = 0;
 
-    MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, 10, true, true, true);
+    MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thinning, 10, true, true, true);
     /*
     my_print("Initializing MCMCAlgorithm object---------------\n");
     my_print("\t# Samples: %\n", samples);
-    my_print("\tThining: %\n", thining);
+    my_print("\tThinning: %\n", thinning);
     my_print("\t # Samples used: %\n", 100);
 
-    MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thining, 10, true, true, true);
+    MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thinning, 10, true, true, true);
     my_print("Done!-------------------------------\n\n\n");
 
     my_print("Initializing Genome object--------------------------\n");

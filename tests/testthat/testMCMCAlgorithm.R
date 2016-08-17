@@ -8,16 +8,16 @@ test_that("general MCMCAlgorithm functions", {
 })
 
 samples <- 1000
-thining <- 1
+thinning <- 1
 adaptiveWidth <- 100
-mcmc <- new(MCMCAlgorithm, samples, thining, adaptiveWidth, TRUE, TRUE, TRUE)
+mcmc <- new(MCMCAlgorithm, samples, thinning, adaptiveWidth, TRUE, TRUE, TRUE)
 
 test_that("get Samples", {
   expect_equal(mcmc$getSamples(), samples)
 })
 
-test_that("get Thining", {
-  expect_equal(mcmc$getThining(), thining)
+test_that("get Thinning", {
+  expect_equal(mcmc$getThinning(), thinning)
 })
 
 test_that("get Adaptive Width", {
@@ -29,9 +29,9 @@ test_that("set Samples", {
   expect_equal(mcmc$getSamples(), 10)
 })
 
-test_that("set Thining", {
-  mcmc$setThining(10)
-  expect_equal(mcmc$getThining(), 10)
+test_that("set Thinning", {
+  mcmc$setThinning(10)
+  expect_equal(mcmc$getThinning(), 10)
 })
 
 test_that("set Adaptive Width", {

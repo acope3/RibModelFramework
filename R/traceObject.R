@@ -3,6 +3,8 @@ convergence.test <- function(trace, what, mixture = 1, n.samples = 10, frac1 = 0
 {
   UseMethod("convergence.test", trace)
 }
+
+
 convergence.test.Rcpp_ROCTrace <- function(trace, what, mixture, n.samples, frac1, frac2, plot)
 {
   # TODO: extend to work with multiple chains once we have that capability.
