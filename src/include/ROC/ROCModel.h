@@ -118,6 +118,7 @@ class ROCModel : public Model
 					double codonProb[]);
 		virtual void getParameterForCategory(unsigned category, unsigned param, std::string aa, bool proposal,
 					double* returnValue);
+		void calculateLogCodonProbabilityVector(unsigned numCodons, double mutation[], double selection[], double phi, double codonProb[]);
 
 
 		//ROC Specific Functions:
