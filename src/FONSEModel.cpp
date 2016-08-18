@@ -651,17 +651,6 @@ void FONSEModel::printHyperParameters()
 }
 
 
-/* getParameter (RCPP EXPOSED)
- * Arguments: None
- *
- * Returns the FONSEParameter of the model.
-*/
-FONSEParameter FONSEModel::getParameter()
-{
-	return *parameter;
-}
-
-
 void FONSEModel::setParameter(FONSEParameter &_parameter)
 {
 	parameter = &_parameter;
