@@ -851,7 +851,7 @@ void ROCModel::calculateLogCodonProbabilityVector(unsigned numCodons, double mut
 			denominator += std::exp(codonProb[i]);
 		}
 		// alphabetically last codon is reference codon!
-		codonProb[numCodons - 1] = 1.0;
+		codonProb[numCodons - 1] = 0.0;
 	}
 
 	denominator = std::log(denominator);

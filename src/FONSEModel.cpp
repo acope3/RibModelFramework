@@ -720,7 +720,7 @@ void FONSEModel::calculateLogCodonProbabilityVector(unsigned numCodons, unsigned
 			denominator += std::exp(codonProb[i]);
 		}
 		//Again, the last codon is the reference codon
-		codonProb[numCodons - 1] = 1.0;
+		codonProb[numCodons - 1] = 0.0;
 	}
 
 	//Here we take the log of the denominator (the summation term) so that we can finish calculating 
