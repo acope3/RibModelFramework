@@ -85,7 +85,7 @@ plot.Rcpp_ROCModel <- function(x, genome, samples = 100, mixture = 1,
   
   ## adding a histogram of phi values to plot
   hist.values <- hist(expressionValues, plot=FALSE, nclass=30)
-  plot(hist.values, axes = FALSE, main, xlab = "", ylab = "")
+  plot(hist.values, axes = FALSE, main = main, xlab = "", ylab = "")
   axis(1)
   axis(4, las=1)
   
