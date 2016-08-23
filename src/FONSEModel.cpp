@@ -689,7 +689,7 @@ void FONSEModel::calculateLogCodonProbabilityVector(unsigned numCodons, unsigned
 {
 	double denominator;
 
-	/* c_i = exp[\Delta M - (\phi * \beta(i) * \Delta \omega)],                 *
+	/* log(c_i) = \Delta M - (\phi * \beta(i) * \Delta \omega),                 *
 	 * where \beta(i) = a_1 + (i * a_2)                                         *
 	 *                                                                          *
 	 * Right now a_1 and a_2 are set to 4.0. However, we are planning on making *
