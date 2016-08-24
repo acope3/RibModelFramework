@@ -190,6 +190,29 @@ void Gene::setSequence(std::string _seq)
     }
 }
 
+// TODO NOTES
+void Gene::setPASequence(std::vector<std::vector<unsigned>> table)
+{
+    geneData.clear();
+    // Table format: Each line of input from a .csv (.pa) file, ordered:
+    // unknown size table (nRows, aka table.size()), each row a vector:
+    // position, codon, category1, ... (may be more than one category)
+
+    unsigned nRows = (unsigned)table.size();
+
+    std::string _seq(nRows * 3, '0'); //multiply by three since codons, default character to be reassigned is '0'
+    for (unsigned i = 0; i < nRows; i ++)
+    {
+        std::string codon = SequenceSummary::indexToCodon(table[i][1]);
+        my_print("Extracted codon %\n", codon);
+        _seq.replace(i * 3, 3, codon);
+    }
+
+    seq = _seq;
+    //TODO: Now call processPA
+    my_print("The sequence, size %, just created is: %\n", nRows * 3, seq);
+}
+
 
 /* getSequenceSummary (NOT EXPOSED)
  * Arguments: None

@@ -20,7 +20,6 @@ class Gene
 
 	public:
 
-
 		SequenceSummary geneData;  //TODO: might make private
 		std::vector<double> observedSynthesisRateValues; //TODO: make private
 
@@ -41,6 +40,7 @@ class Gene
 		void setDescription(std::string _desc);
 		std::string getSequence();
 		void setSequence(std::string _seq);
+        void setPASequence(std::vector <std::vector <unsigned>> table);
 		SequenceSummary *getSequenceSummary();
 		std::vector<double> getObservedSynthesisRateValues(); //exposed to RCPP, tested in C++
 		void setObservedSynthesisRateValues(std::vector <double> values); //Only for unit testing.

@@ -293,9 +293,8 @@ void Genome::readPAFile(std::string filename, bool Append)
 			my_printError("Error in Genome::readPAFile: Can not open PA file %\n", filename);
 		else
 		{
-			std::string tmp;
-
 			// Analyze the header line
+			std::string tmp;
 			std::getline(Fin, tmp);
 
 			// Ignore first 3 commas: ID, position, codon
@@ -312,17 +311,22 @@ void Genome::readPAFile(std::string filename, bool Append)
 				pos2 = tmp.find(",", pos + 1);
 				pos = pos2;
 			}
+			unsigned tableWidth = 2 + numCategories; // Table size: position + codonID + each category
 
 			std::string prevID = "";
 			Gene tmpGene;
 			bool first = true;
-			//int position;
-			std::string seq = "";
-			std::map<std::string, unsigned> genes;
-			std::map<std::string, unsigned>::iterator git;
+			int position;
+			//std::string seq = "";
+
+			/*
+			std::vector <unsigned> geneSizes; // Index = gene order, value = size
+			unsigned geneSize = 0;
+
+			//std::map<std::string, unsigned> genes;
+			//std::map<std::string, unsigned>::iterator git;
 
 			//First pass: For each gene name, count its size.
-			//For each gene, count all the RFPs
 			while (std::getline(Fin, tmp))
 			{
 				pos = tmp.find(",");
@@ -332,7 +336,7 @@ void Genome::readPAFile(std::string filename, bool Append)
 				pos2 = tmp.find(",", pos + 1);
 
 				// Set to 0-indexed value for convenience of vector calculation
-				int position = std::atoi(tmp.substr(pos + 1, pos2 - (pos + 1)).c_str()) - 1;
+				position = std::atoi(tmp.substr(pos + 1, pos2 - (pos + 1)).c_str()) - 1;
 
 				if (position > -1) // for convenience of calculation; ambiguous positions are marked by -1.
 				{
@@ -340,102 +344,140 @@ void Genome::readPAFile(std::string filename, bool Append)
                     {
 						prevID = ID;
 						first = false;
-						genes[ID] = 0;
+						//genes[ID] = 0;
+						//geneSize = 0;
 					}
 					if (ID != prevID)
                     {
-						genes[prevID] *= 3; //multiply by three since codons
-						genes[ID] = 0; //initialize the new genes[ID]
+						geneSizes.push_back(geneSize * 3);
+						geneSize = 0;
+
+						//genes[prevID] *= 3; //multiply by three since codons
+						//genes[ID] = 0; //initialize the new genes[ID]
 					}
 					prevID = ID;
-					genes[ID]++;
+					//genes[ID]++;
+					geneSize++;
 				}
 			}
-			genes[prevID] *= 3; //multiply by three since codons
+			geneSizes.push_back(geneSize * 3);
+			//genes[prevID] *= 3; //multiply by three since codons
 			Fin.close();
+			 */
 
-			//Second pass: Now for each rfp_count category, record it.
-			Fin.open(filename.c_str());
-			std::getline(Fin, tmp); //retrash first line
+			// ---------------------------------------------------------------------//
+			// ----- Second pass: Now for each rfp_count category, record it. ----- //
+			// ----- Second pass: Treat data as a table: push back vectors of size tableWidth. ----- //
+			// ---------------------------------------------------------------------//
+			//Fin.open(filename.c_str());
+			//std::getline(Fin, tmp); //retrash first line
 			prevID = "";
 			first = true;
-			std::vector <std::vector <unsigned>> RFP_counts(numCategories);
+			//unsigned geneSizesIndex = 0;
+			//std::vector <std::vector <unsigned>> RFP_counts(numCategories);
+
+			std::vector <std::vector <unsigned>> table; // Dimensions: nRows of tableWidth-sized vectors
 
 			//Now for each line associated with a gene ID, set the string appropriately
-			while (std::getline(Fin, tmp)) {
+			while (std::getline(Fin, tmp))
+			{
 				pos = tmp.find(",");
 				std::string ID = tmp.substr(0, pos);
 
 				// Make pos2 find next comma to find position integer
 				pos2 = tmp.find(",", pos + 1);
+
 				// Set to 0-indexed value for convenience of vector calculation
-				int position = std::atoi(tmp.substr(pos + 1, pos2 - (pos + 1)).c_str()) - 1;
+				position = std::atoi(tmp.substr(pos + 1, pos2 - (pos + 1)).c_str()) - 1;
 
 				// Position integer: Ensure that if position is negative, ignore the codon.
 				if (position > -1) // for convenience of calculation; ambiguous positions are marked by -1.
 				{
+					std::vector <unsigned> tableRow(tableWidth);
+					unsigned tableIndex = 0;
+					tableRow[tableIndex] = (unsigned)position;
+
 					if (first)
 					{
 						prevID = ID;
 						first = false;
-						git = genes.find(ID);
-						seq.resize(git->second); //multiply by three since codons
+						//git = genes.find(ID);
+						//seq.resize(git->second); //multiply by three since codons
 					}
 					if (ID != prevID)
 					{
 						tmpGene.setId(prevID);
 						tmpGene.setDescription("No description for PANSE Model");
-						tmpGene.setSequence(seq);
+						//tmpGene.setSequence(seq);
+						tmpGene.setPASequence(table);
 						// Based on the header line, initialize the number of RFP_count categories
 						// REMINDER: Modifying the sequence summary must come after setting the sequence!
-						tmpGene.initRFP_count(numCategories);
+						//tmpGene.initRFP_count(numCategories);
 
+						/*
 						for (unsigned i = 0; i < numCategories; i++)
 							tmpGene.setRFP_count(i, RFP_counts[i]);
+						*/
 
 						addGene(tmpGene, false); //add to genome
 						tmpGene.clear();
-						seq = "";
+						table.clear();
+						//seq = "";
 
-						git = genes.find(ID);
-						seq.resize(git->second); //multiply by three since codons
+						//git = genes.find(ID);
+						//seq.resize(git->second); //multiply by three since codons
 
+						/*
 						for (unsigned i = 0; i < numCategories; i++)
 							RFP_counts[i].clear();
+						 */
 					}
 					// Now find codon value: Follows prior comma, guaranteed to be of size 3
 					std::string codon = tmp.substr(pos2 + 1, 3);
 
+					tableIndex ++;
+					tableRow[tableIndex] = SequenceSummary::codonToIndex(codon);
+					my_print("Codon is %\n", codon);
+
 					// Skip to end rfp_count(s), if any
 					pos = tmp.find(",", pos2 + 1);
+					tableIndex ++;
+
 					// While there are more commas, there are more categories of RFP counts
-					unsigned categoryIndex = 0;
-					while (pos != std::string::npos) {
+					while (pos != std::string::npos)
+					{
 						pos2 = tmp.find(",", pos + 1);
-						unsigned RFP_count = (unsigned) std::atoi(tmp.substr(pos + 1, pos2 - (pos + 1)).c_str());
-						RFP_counts[categoryIndex].push_back(RFP_count);
+						tableRow[tableIndex] = (unsigned) std::atoi(tmp.substr(pos + 1, pos2 - (pos + 1)).c_str());
+						//unsigned RFP_count = (unsigned) std::atoi(tmp.substr(pos + 1, pos2 - (pos + 1)).c_str());
+						//RFP_counts[categoryIndex].push_back(RFP_count);
 						pos = pos2;
-						categoryIndex++;
+						tableIndex++;
 					}
 
 					// Now add codon to appropriate place in sequence
+					/*
 					seq[position * 3] = codon[0];
 					seq[position * 3 + 1] = codon[1];
 					seq[position * 3 + 2] = codon[2];
+					*/
 
 					prevID = ID;
+					table.push_back(tableRow);
 				}
 			}
 
 			tmpGene.setId(prevID);
 			tmpGene.setDescription("No description for PANSE Model");
-			tmpGene.setSequence(seq);
+			//tmpGene.setSequence(seq);
+			tmpGene.setPASequence(table);
 			// Based on the header line, initialize the number of RFP_count categories
 			// REMINDER: Modifying the sequence summary must come after setting the sequence!
-			tmpGene.initRFP_count(numCategories);
+			//tmpGene.initRFP_count(numCategories);
 
+			/*
 			for (unsigned i = 0; i < numCategories; i++)
 				tmpGene.setRFP_count(i, RFP_counts[i]);
+			*/
 
 			addGene(tmpGene, false); //add to genome
 		} // end else

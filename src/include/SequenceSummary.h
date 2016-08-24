@@ -70,6 +70,7 @@ class SequenceSummary
 		//Other Functions (All tested):
 		void clear();
 		bool processSequence(const std::string& sequence);
+        void processPA(std::vector <std::vector <unsigned>> table);
 
 
 		//Static Functions:

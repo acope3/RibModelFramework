@@ -71,18 +71,11 @@ SequenceSummary::SequenceSummary(const std::string& sequence)
 
 SequenceSummary::SequenceSummary(const SequenceSummary& other)
 {
-	codonPositions.resize(other.codonPositions.size());
-	for (unsigned i = 0u; i < codonPositions.size(); i++)
-		codonPositions[i] = other.codonPositions[i];
-
-	for (unsigned i = 0u; i < 64; i++)
-		ncodons[i] = other.ncodons[i];
-
-	for (unsigned i = 0u; i < 22; i++)
-		naa[i] = other.naa[i];
-
-	for (unsigned i = 0u; i < 64; i++)
-		RFPObserved[i] = other.RFPObserved[i];
+	codonPositions = other.codonPositions;
+	ncodons = other.ncodons;
+	RFPObserved = other.RFPObserved;
+	naa = other.naa;
+	RFP_count = other.RFP_count;
 }
 
 
@@ -90,20 +83,10 @@ SequenceSummary& SequenceSummary::operator=(const SequenceSummary& rhs)
 {
 	if (this == &rhs) return *this; // handle self assignment
 
-	// TODO(CEDRIC): shouldn't a simple = do the job? see http://www.cplusplus.com/reference/vector/vector/operator=/
-	codonPositions.resize(rhs.codonPositions.size());
-	for (unsigned i = 0u; i < codonPositions.size(); i++)
-		codonPositions[i] = rhs.codonPositions[i];
-
-	for (unsigned i = 0u; i < 64; i++)
-	{
-		ncodons[i] = rhs.ncodons[i];
-		RFPObserved[i] = rhs.RFPObserved[i];
-	}
-
-	for (unsigned i = 0u; i < 22; i++)
-		naa[i] = rhs.naa[i];
-
+	codonPositions = rhs.codonPositions;
+    ncodons = rhs.ncodons;
+    RFPObserved = rhs.RFPObserved;
+    naa = rhs.naa;
 	RFP_count = rhs.RFP_count;
 
 	return *this;
@@ -248,12 +231,16 @@ void SequenceSummary::clear()
 {
 	codonPositions.clear();
 	RFP_count.clear();
-	for (unsigned k = 0; k < 64; k++)
+	for (unsigned i = 0; i < 64; i++)
 	{
-		ncodons[k] = 0;
-		RFPObserved[k] = 0;
+		ncodons[i] = 0;
+		RFPObserved[i] = 0;
 	}
-	for (unsigned k = 0; k < 22; k++) { naa[k] = 0; }
+
+	for (unsigned i = 0; i < 22; i++)
+	{
+		naa[i] = 0;
+	}
 }
 
 
@@ -304,6 +291,12 @@ bool SequenceSummary::processSequence(const std::string& sequence)
 		}
 	}
 	return check;
+}
+
+
+void SequenceSummary::processPA(std::vector<std::vector<unsigned>> table)
+{
+    my_print("TODO BLAME HOLLIS\n");
 }
 
 
