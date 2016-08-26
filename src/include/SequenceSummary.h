@@ -23,8 +23,12 @@ class SequenceSummary
 		std::array<unsigned, 64> ncodons; //64 for the number of codons.
 		std::array<unsigned, 64> RFPObserved; //64 for the number of codons.
 		std::array<unsigned, 22> naa; //22 for the number of amino acids.
-		std::vector <std::vector <unsigned>> codonPositions;
-		std::vector <std::vector <unsigned>> RFP_count;
+		std::vector <std::vector <unsigned>> codonPositions; // used in FONSEModel.
+        // index is the codonID, size of 64 for number of codons
+        // subindex is the position of each occurrence of the codonID specified.
+
+        // TODO: Probably remove
+        std::vector <std::vector <unsigned>> RFP_count;
 		//index is the RFP_count for the category specified via index
 		//subindex is number of position
 
@@ -70,7 +74,7 @@ class SequenceSummary
 		//Other Functions (All tested):
 		void clear();
 		bool processSequence(const std::string& sequence);
-        void processPA(std::vector <std::vector <unsigned>> table);
+        bool processPA(std::vector <std::vector <unsigned>> table);
 
 
 		//Static Functions:

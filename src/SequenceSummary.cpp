@@ -262,23 +262,19 @@ bool SequenceSummary::processSequence(const std::string& sequence)
 	//the values to be zero during the MCMC.
 
 	bool check = true;
-	int codonID;
-	int aaID;
-	std::string codon;
-
 	codonPositions.resize(64);
 
 	for (unsigned i = 0u; i < sequence.length(); i += 3)
 	{
-		codon = sequence.substr(i, 3);
+		std::string codon = sequence.substr(i, 3);
 		codon[0] = (char)std::toupper(codon[0]);
 		codon[1] = (char)std::toupper(codon[1]);
 		codon[2] = (char)std::toupper(codon[2]);
 
-		codonID = codonToIndex(codon);
+		unsigned codonID = codonToIndex(codon);
 		if (codonID != 64) // if codon id == 64 => codon not found. Ignore, probably N 
 		{
-			aaID = codonToAAIndex(codon);
+			int aaID = codonToAAIndex(codon);
 			ncodons[codonID]++;
 			RFPObserved[codonID]++; // See documentation
 			naa[aaID]++;
@@ -294,9 +290,31 @@ bool SequenceSummary::processSequence(const std::string& sequence)
 }
 
 
-void SequenceSummary::processPA(std::vector<std::vector<unsigned>> table)
+bool SequenceSummary::processPA(std::vector<std::vector<unsigned>> table)
 {
-    my_print("TODO BLAME HOLLIS\n");
+	bool check = true;
+	codonPositions.resize(64);
+	unsigned nRows = (unsigned)table.size();
+
+	for (unsigned i = 0; i < nRows; i++)
+	{
+		unsigned codonID = table[i][1];
+		std::string codon = indexToCodon(codonID); // TODO: Maybe directly convert codonID to aaID
+		if (codonID != 64) // if codon id == 64 => codon not found. Ignore, probably N
+		{
+			int aaID = codonToAAIndex(codon);
+			ncodons[codonID]++;
+			naa[aaID]++;
+			codonPositions[codonID].push_back(table[i][0]);
+		}
+		else
+		{
+			my_printError("WARNING: Codon % not recognized!\n Codon will be ignored!\n", codon);
+			check = false;
+		}
+	}
+
+	return check;
 }
 
 

@@ -434,9 +434,13 @@ void Genome::readPAFile(std::string filename, bool Append)
 					}
 					// Now find codon value: Follows prior comma, guaranteed to be of size 3
 					std::string codon = tmp.substr(pos2 + 1, 3);
+					codon[0] = (char)std::toupper(codon[0]);
+					codon[1] = (char)std::toupper(codon[1]);
+					codon[2] = (char)std::toupper(codon[2]);
 
 					tableIndex ++;
 					tableRow[tableIndex] = SequenceSummary::codonToIndex(codon);
+					// Note: May be an invalid Codon read in, but this is resolved when the sequence is set and processed.
 					my_print("Codon is %\n", codon);
 
 					// Skip to end rfp_count(s), if any

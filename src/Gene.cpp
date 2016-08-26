@@ -200,17 +200,17 @@ void Gene::setPASequence(std::vector<std::vector<unsigned>> table)
 
     unsigned nRows = (unsigned)table.size();
 
-    std::string _seq(nRows * 3, '0'); //multiply by three since codons, default character to be reassigned is '0'
-    for (unsigned i = 0; i < nRows; i ++)
+    seq.resize(nRows * 3); //multiply by three since codons
+    for (unsigned i = 0; i < nRows; i++)
     {
         std::string codon = SequenceSummary::indexToCodon(table[i][1]);
-        my_print("Extracted codon %\n", codon);
-        _seq.replace(i * 3, 3, codon);
+        seq.replace(table[i][0] * 3, 3, codon);
     }
-
-    seq = _seq;
-    //TODO: Now call processPA
     my_print("The sequence, size %, just created is: %\n", nRows * 3, seq);
+
+    // Call processPA with a checking error statement printed if needed.
+    if (!geneData.processPA(table))
+        my_printError("WARNING: Error with gene %\nBad codons found!\n", id);
 }
 
 
