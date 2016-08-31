@@ -733,15 +733,14 @@ void ROCModel::printHyperParameters()
 }
 
 /* getParameter (RCPP EXPOSED)
- * Arguments: None
- *
- * Returns the ROCParameter of the model.
+* Arguments: None
+*
+* Returns the ROCParameter of the model.
 */
 ROCParameter ROCModel::getParameter()
 {
 	return *parameter;
 }
-
 
 void ROCModel::setParameter(ROCParameter &_parameter)
 {
