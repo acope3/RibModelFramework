@@ -1714,27 +1714,26 @@ int testGenome(std::string testFileDir)
     Gene panse1("CTTGCTATTTTTTTT", "TEST001", "No description for PANSE Model");
     Gene panse2("CCTGTAATTTGGTGG", "TEST002", "No description for PANSE Model");
 
-    // RFP_Count category one for TEST001 and TEST002, respectively
-    //std::vector <unsigned> tmp1 = {1, 2, 0, 0};
-    //std::vector <unsigned> tmp2 = {1, 0, 1, 1};
-    std::vector <unsigned> tmp1 = {0, 0, 2, 1};
-    std::vector <unsigned> tmp2 = {1, 0, 1, 1};
+    // RFP_Count for TEST001: value[position] = RFP_count
+    std::vector <unsigned> test1Cat1 = {0, 0, 2, 0, 1};
+    std::vector <unsigned> test1Cat2 = {0, 17, 0, 1, 4};
 
-    // RFP_Count category two for TEST001 and TEST002, respectively
-    std::vector <unsigned> tmp3 = {5, 0, 0, 17};
-    std::vector <unsigned> tmp4 = {9, 2, 2, 0};
+    // RFP_Count for TEST002: value[position] = RFP_count
+    std::vector <unsigned> test2Cat1 = {1, 1, 0, 0, 1};
+    std::vector <unsigned> test2Cat2 = {2, 0, 2, 3, 6};
 
     panse1.initRFP_count(2);
     panse2.initRFP_count(2);
-    panse1.setRFP_count(0, tmp1);
-    panse2.setRFP_count(0, tmp2);
-    panse1.setRFP_count(1, tmp3);
-    panse2.setRFP_count(1, tmp4);
+    //panse1.initSumRFP_count(2);
+    //panse2.initSumRFP_count(2);
+    panse1.setRFP_count(0, test1Cat1);
+    panse1.setRFP_count(1, test1Cat2);
+    panse2.setRFP_count(0, test2Cat1);
+    panse2.setRFP_count(1, test2Cat2);
 
     testGenome.addGene(panse1, false);
     testGenome.addGene(panse2, false);
 
-    /*
     if (genome == testGenome)
         my_print("Genome readPA --- Pass\n");
     else
@@ -1742,7 +1741,6 @@ int testGenome(std::string testFileDir)
         my_printError("Error in readPA. Genomes are not equivalent.\n");
         globalError = 1;
     }
-    */
 
     //TODO
     //-------------------------------------//

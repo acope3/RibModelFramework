@@ -194,7 +194,9 @@ void Genome::readRFPFile(std::string filename)
 		my_printError("Error in Genome::readRFPFile: Can not open RFP file %\n", filename);
 
 	std::string tmp;
-	std::getline(Fin, tmp); //trash the first line
+	//trash the first line
+	if (!std::getline(Fin, tmp))
+		my_printError("Error in Genome::readRFPFile: RFP file % has no header.\n", filename);
 	std::string prevID = "";
 	Gene tmpGene;
 	bool first = true;
@@ -295,7 +297,10 @@ void Genome::readPAFile(std::string filename, bool Append)
 		{
 			// Analyze the header line
 			std::string tmp;
-			std::getline(Fin, tmp);
+			//std::getline(Fin, tmp);
+
+            if (!std::getline(Fin, tmp))
+                my_printError("Error in Genome::readPAFile: PA file % has no header.\n", filename);
 
 			// Ignore first 3 commas: ID, position, codon
 			std::size_t pos = tmp.find(",");
@@ -470,20 +475,24 @@ void Genome::readPAFile(std::string filename, bool Append)
 				}
 			}
 
-			tmpGene.setId(prevID);
-			tmpGene.setDescription("No description for PANSE Model");
-			//tmpGene.setSequence(seq);
-			tmpGene.setPASequence(table);
-			// Based on the header line, initialize the number of RFP_count categories
-			// REMINDER: Modifying the sequence summary must come after setting the sequence!
-			//tmpGene.initRFP_count(numCategories);
+            // Ensure that at least one entry was read in
+            if (prevID != "")
+            {
+                tmpGene.setId(prevID);
+                tmpGene.setDescription("No description for PANSE Model");
+                //tmpGene.setSequence(seq);
+                tmpGene.setPASequence(table);
+                // Based on the header line, initialize the number of RFP_count categories
+                // REMINDER: Modifying the sequence summary must come after setting the sequence!
+                //tmpGene.initRFP_count(numCategories);
 
-			/*
-			for (unsigned i = 0; i < numCategories; i++)
-				tmpGene.setRFP_count(i, RFP_counts[i]);
-			*/
+                /*
+                for (unsigned i = 0; i < numCategories; i++)
+                    tmpGene.setRFP_count(i, RFP_counts[i]);
+                */
 
-			addGene(tmpGene, false); //add to genome
+                addGene(tmpGene, false); //add to genome
+            }
 		} // end else
 		Fin.close();
 	} // end try
@@ -518,7 +527,9 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 		my_printError("ERROR in Genome::readObservedPhiValues: Can not open file %\n", filename);
 	else
 	{
-		std::getline(input, tmp); //Trash the header line
+		//Trash the header line
+		if (!std::getline(input, tmp))
+			my_printError("Error in Genome::readObservedPhiValues File: File % has no header.\n", filename);
 
 		if (genes.size() == 0)
 			my_printError("ERROR: Genome is empty, function will not execute!\n");

@@ -322,6 +322,42 @@ void Gene::setRFP_count(unsigned categoryIndex, std::vector <unsigned> RFP_count
 }
 
 
+/* initSumRFP_count (NOT EXPOSED)
+ * Arguments: A number representing the number of RFP categories.
+ * Initializes the vector of arrays that describes, for each category, the sumRFP_count vector.
+ * Note: When programming in C, this function MUST be called before setSumRFP_count.
+ * Reminder: It must be called after setting the sequence, since that function
+ * resets the sequence summary, including the sumRFP_count.
+ */
+void Gene::initSumRFP_count(unsigned numCategories)
+{
+    geneData.initSumRFP_count(numCategories);
+}
+
+
+/* getSumRFP_count (NOT EXPOSED)
+ * Arguments: A number representing the RFP category to return
+ * Returns the sumRFP_count vector for the category index specified.
+ * For unit testing only.
+ */
+std::array <unsigned, 64> Gene::getSumRFP_count(unsigned categoryIndex)
+{
+    //TODO: Add error checking if user forgets to initSumRFP_count?
+    return geneData.getSumRFP_count(categoryIndex);
+}
+
+
+/* setSumRFP_count (NOT EXPOSED)
+ * Arguments: A number representing the RFP category to modify, an array argument to set the RFP category's RFP_count to
+ * Sets the sumRFP_count array for the category index specified to the vector argument given.
+ */
+void Gene::setSumRFP_count(unsigned categoryIndex, std::array <unsigned, 64> sumRFP_counts)
+{
+    //TODO: Add error checking if user forgets to initSumRFP_count?
+    geneData.setSumRFP_count(categoryIndex, sumRFP_counts);
+}
+
+
 
 
 

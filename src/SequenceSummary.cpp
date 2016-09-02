@@ -219,6 +219,41 @@ void SequenceSummary::setRFP_count(unsigned categoryIndex, std::vector <unsigned
 }
 
 
+/* initSumRFP_count (NOT EXPOSED)
+ * Arguments: A number representing the number of RFP categories.
+ * Initializes the vector of arrays that describes, for each category, the sumRFP_count vector.
+ * Note: When programming in C, this function MUST be called before setSumRFP_count.
+ * Reminder: It must be called after setting the sequence, since that function
+ * resets the sequence summary, including the sumRFP_count.
+ */
+void SequenceSummary::initSumRFP_count(unsigned numCategories)
+{
+	sumRFP_count.resize(numCategories);
+}
+
+
+/* getSumRFP_count (NOT EXPOSED)
+ * Arguments: A number representing the RFP category to return
+ * Returns the sumRFP_count array of size 64 for the category index specified.
+ */
+std::array <unsigned, 64> SequenceSummary::getSumRFP_count(unsigned categoryIndex)
+{
+	//TODO: Add error checking if user forgets to initSumRFP_count?
+	return sumRFP_count[categoryIndex];
+}
+
+
+/* setSumRFP_count (NOT EXPOSED)
+ * Arguments: A number representing the RFP category to modify, an array argument to set the RFP category's RFP_count to
+ * Sets the sumRFP_count vector for the category index specified to the vector argument given.
+ */
+void SequenceSummary::setSumRFP_count(unsigned categoryIndex, std::array <unsigned, 64> arg)
+{
+	//TODO: Add error checking if user forgets to initSumRFP_count?
+	sumRFP_count[categoryIndex] = arg;
+}
+
+
 
 
 
@@ -292,20 +327,51 @@ bool SequenceSummary::processSequence(const std::string& sequence)
 
 bool SequenceSummary::processPA(std::vector<std::vector<unsigned>> table)
 {
+    // Table format: Each line of input from a .csv (.pa) file, ordered:
+    // unknown size table (nRows, aka table.size()), each row a vector:
+    // position, codon, category1, ... (may be more than one category)
+
 	bool check = true;
 	codonPositions.resize(64);
 	unsigned nRows = (unsigned)table.size();
+	positionCodonID.resize(nRows);
+
+	// There should be at least 1 table entry to get to this point, so this should be a valid operation
+    unsigned numCats = (unsigned)table[0].size() - 2; // numCats = after position, codon.
+	initRFP_count(numCats);
+	sumRFP_count.resize(numCats);
+
+	for (unsigned j = 0; j < numCats; j++)
+	{
+		RFP_count[j].resize(nRows);
+		sumRFP_count[j].fill(0);
+	}
 
 	for (unsigned i = 0; i < nRows; i++)
 	{
-		unsigned codonID = table[i][1];
-		std::string codon = indexToCodon(codonID); // TODO: Maybe directly convert codonID to aaID
+		std::vector <unsigned> row = table[i];
+
+		unsigned codonID = row[1];
+		std::string codon = indexToCodon(codonID);
+		/* Note: Don't bother writing a function to convert codonIndex to aaIndex
+		 * Would just perform the exact same steps anyway; redundant code.
+		 */
 		if (codonID != 64) // if codon id == 64 => codon not found. Ignore, probably N
 		{
 			int aaID = codonToAAIndex(codon);
 			ncodons[codonID]++;
 			naa[aaID]++;
-			codonPositions[codonID].push_back(table[i][0]);
+			RFPObserved[codonID]++; // See documentation
+			codonPositions[codonID].push_back(row[0]);
+			positionCodonID[row[0]] = codonID;
+
+			for (unsigned j = 0; j < numCats; j++)
+			{
+				// Category j has an RFP_count at the position e0]qual to the 2-indexed (after position, codon) value of j.
+				RFP_count[j][row[0]] = row[j + 2];
+				sumRFP_count[j][codonID] += row[j + 2];
+				my_print("RFP_count: % at position [%][%]\n", RFP_count[j][row[0]], j, row[0]);
+			}
 		}
 		else
 		{
@@ -567,7 +633,7 @@ unsigned SequenceSummary::codonToIndex(std::string& codon, bool forParamVector)
 unsigned SequenceSummary::codonToAAIndex(std::string& codon)
 {
 	std::string aa = codonToAA(codon);
-	return SequenceSummary::aaToIndex.find(aa) -> second;
+	return aaToIndex.find(aa) -> second;
 }
 
 

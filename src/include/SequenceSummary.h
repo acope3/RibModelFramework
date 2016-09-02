@@ -21,16 +21,23 @@ class SequenceSummary
 	private:
 
 		std::array<unsigned, 64> ncodons; //64 for the number of codons.
-		std::array<unsigned, 64> RFPObserved; //64 for the number of codons.
+		std::array<unsigned, 64> RFPObserved; //64 for the number of codons. //TODO: remove
 		std::array<unsigned, 22> naa; //22 for the number of amino acids.
 		std::vector <std::vector <unsigned>> codonPositions; // used in FONSEModel.
         // index is the codonID, size of 64 for number of codons
         // subindex is the position of each occurrence of the codonID specified.
 
-        // TODO: Probably remove
         std::vector <std::vector <unsigned>> RFP_count;
 		//index is the RFP_count for the category specified via index
 		//subindex is number of position
+
+		std::vector <std::array <unsigned, 64>> sumRFP_count;
+		//index is the RFP_count for the category specified via index
+		// 64 for the number of codons
+
+		std::vector <unsigned> positionCodonID;
+		// index is the number of position, where a value (codonID) is set
+
 
 	public:
 
@@ -66,9 +73,13 @@ class SequenceSummary
 
 
 		//RFP Functions (for PA and PANSE models) (All tested):
-		std::vector <unsigned> getRFP_count(unsigned categoryIndex);
 		void initRFP_count(unsigned numCategories);
+		std::vector <unsigned> getRFP_count(unsigned categoryIndex);
 		void setRFP_count(unsigned categoryIndex, std::vector <unsigned> arg);
+		// TODO: TEST THE FOLLOWING
+		void initSumRFP_count(unsigned numCategories);
+		std::array <unsigned, 64> getSumRFP_count(unsigned categoryIndex);
+		void setSumRFP_count(unsigned categoryIndex, std::array <unsigned, 64> arg);
 
 
 		//Other Functions (All tested):
