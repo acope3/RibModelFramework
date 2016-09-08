@@ -193,10 +193,9 @@ void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 		// get proposed mutation and selection parameter
 		parameter->getParameterForCategory(mutationCategory, FONSEParameter::dM, grouping, true, mutation_proposed);
 		parameter->getParameterForCategory(selectionCategory, FONSEParameter::dOmega, grouping, true, selection_proposed);
-
+		
 		likelihood += calculateLogLikelihoodRatioPerAA(*gene, grouping, mutation, selection, phiValue);
 		likelihood_proposed += calculateLogLikelihoodRatioPerAA(*gene, grouping, mutation_proposed, selection_proposed, phiValue);
-
 	}
 	//likelihood_proposed = likelihood_proposed + calculateMutationPrior(grouping, true);
 	//likelihood = likelihood + calculateMutationPrior(grouping, false);
@@ -689,7 +688,7 @@ void FONSEModel::calculateLogCodonProbabilityVector(unsigned numCodons, unsigned
 {
 	double denominator;
 
-	/* c_i = exp[\Delta M - (\phi * \beta(i) * \Delta \omega)],                 *
+	/* log(c_i) = \Delta M - (\phi * \beta(i) * \Delta \omega),                 *
 	 * where \beta(i) = a_1 + (i * a_2)                                         *
 	 *                                                                          *
 	 * Right now a_1 and a_2 are set to 4.0. However, we are planning on making *
