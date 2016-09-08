@@ -31,7 +31,7 @@
 #' It is important to note that est.expression and est.hyper will affect one another
 #' negatively if their values differ.
 #' 
-initializeMCMCObject <- function(samples, thinning=1, adaptive.width=100, 
+initializeMCMCObject <- function(samples, thining=1, adaptive.width=100, 
                                  est.expression=TRUE, est.csp=TRUE, 
                                  est.hyper=TRUE, est.mix=TRUE){
   
