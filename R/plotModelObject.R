@@ -14,7 +14,7 @@
 #'  
 #' @description Plots traces from the model object such as synthesis rates for each gene. 
 
-plot.Rcpp_ROCModel <- function(x, genome, samples = 100, mixture = 1, 
+plot.Rcpp_ROCModel <- function(x, genome = NULL, samples = 100, mixture = 1, 
                                estim.Expression = TRUE, simulated = FALSE, ...)
 {
   opar <- par(no.readonly = T) 
