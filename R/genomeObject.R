@@ -12,7 +12,7 @@
 #' 
 #' @return This function returns the Genome Rcpp object created.
 #' 
-initializeGenomeObject <- function(file, fasta=TRUE, expression.file=NULL, append=FALSE) {
+initializeGenomeObject <- function(file, expression.file=NULL, append=FALSE, fasta=TRUE, match.expression.by.id=FALSE) {
   genome <- new(Genome)
   #genome <- new(Genome, 1, "ROC", TRUE) #CT ONLY
   if (fasta == TRUE) {
@@ -21,7 +21,7 @@ initializeGenomeObject <- function(file, fasta=TRUE, expression.file=NULL, appen
     genome$readRFPFile(file)
   }
   if(!is.null(expression.file)) {
-    genome$readObservedPhiValues(expression.file, FALSE)
+    genome$readObservedPhiValues(expression.file, match.expression.by.id)
   }
   return(genome)
 }
