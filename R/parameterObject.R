@@ -42,10 +42,10 @@
 #' categories instead of the definition listed directly above.
 #' See details for more information.
 #' 
-#' @param restart.file File name containing information to reinitialize a 
+#' @param init.with.restart.file File name containing information to reinitialize a 
 #' previous Parameter object.
 #' If given, all other arguments will be ignored.
-#' The default value for restart.file is NULL.
+#' The default value for init.with.restart.file is NULL.
 #' 
 #' @param mutation_prior_sd Controlling the standard deviation of the normal 
 #' prior on the mutation parameters
@@ -53,7 +53,7 @@
 #' @return parameter Returns an initialized Parameter object.
 #' 
 #' @description \code{initializeParameterObject} will call the appropriate followup
-#' call to writeXXXParameterObject based off of the value of model and restart.file.
+#' call to writeXXXParameterObject based off of the value of model and init.with.restart.file.
 #' 
 #' @details \code{initializeParameterObject} checks the values of the arguments 
 #' given to insure the values are valid.
@@ -96,9 +96,9 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, numMixtures = 
                                     model = "ROC", split.serine = TRUE, 
                                     mixture.definition = "allUnique", 
                                     mixture.definition.matrix = NULL,
-                                    restart.file = NULL, mutation_prior_sd = 0.35){
+                                    init.with.restart.file = NULL, mutation_prior_sd = 0.35){
   # check input integrity
-  if(is.null(restart.file)){
+  if(is.null(init.with.restart.file)){
     if(length(sphi) != numMixtures){
       stop("Not all mixtures have an Sphi value assigned!\n")
     }
@@ -119,29 +119,29 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, numMixtures = 
   
   
   if(model == "ROC"){
-    if(is.null(restart.file)){
+    if(is.null(init.with.restart.file)){
       parameter <- initializeROCParameterObject(genome, sphi, numMixtures, 
                             geneAssignment, expressionValues, split.serine, 
                             mixture.definition, mixture.definition.matrix, 
                             mutation_prior_sd)    
     }else{
-      parameter <- new(ROCParameter, restart.file)
+      parameter <- new(ROCParameter, init.with.restart.file)
     }
   }else if(model == "FONSE"){
-    if(is.null(restart.file)){
+    if(is.null(init.with.restart.file)){
       parameter <- initializeFONSEParameterObject(genome, sphi, numMixtures, 
                             geneAssignment, expressionValues, split.serine, 
                             mixture.definition, mixture.definition.matrix)
     }else{
-      parameter <- new(FONSEParameter, restart.file)
+      parameter <- new(FONSEParameter, init.with.restart.file)
     }
   }else if(model == "RFP"){
-    if(is.null(restart.file)){
+    if(is.null(init.with.restart.file)){
       parameter <- initializeRFPParameterObject(genome, sphi, numMixtures, 
                             geneAssignment, expressionValues, split.serine, 
                             mixture.definition, mixture.definition.matrix) 
     }else{
-      parameter <- new(RFPParameter, restart.file)
+      parameter <- new(RFPParameter, init.with.restart.file)
     }
   }else{
     stop("Unknown model.")
