@@ -470,7 +470,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 							if (dval <=  0 || std::isnan(dval))
 							{
 								dval = -1;
-								my_printError("WARNING! Invalid, negative, or 0 phi value given; values should not be on the log scale. Negative Value stored.\n");
+								my_printError("WARNING! Invalid, negative, or 0 phi value given; values should not be on the log scale. Missing value flag stored.\n");
 							}
 							it->second->observedSynthesisRateValues.push_back(dval);
 						}
@@ -508,7 +508,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 						{
 							my_printError("WARNING: Gene # % (%) does not have any phi values. ", i, gene->getId());
                             my_printError("Please check your file to make sure every gene has a phi value. Filling empty genes ");
-                            my_printError("with -1's for calculations.\n");
+                            my_printError("with Missing Value Flag for calculations.\n");
                             gene->observedSynthesisRateValues.resize(numPhi, -1);
                         }
 
@@ -562,7 +562,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 						if (dval <= 0 || std::isnan(dval))
 						{
 							dval = -1;
-							my_printError("WARNING! Invalid, negative, or 0 phi value given; values should not be on the log scale. Negative Value stored.\n");
+							my_printError("WARNING! Invalid, negative, or 0 phi value given; values should not be on the log scale. Missing value flag stored.\n");
 						}
 						genes[geneIndex].observedSynthesisRateValues.push_back(dval);
 					}
@@ -600,7 +600,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 						{
                             my_printError("WARNING: Gene # % (%) does not have any phi values. ", i, gene->getId());
                             my_printError("Please check your file to make sure every gene has a phi value. Filling empty genes ");
-                            my_printError("with -1's for calculations.\n");
+                            my_printError("with Missing Value Flag for calculations.\n");
 							gene->observedSynthesisRateValues.resize(numPhi, -1);
 						}
 
