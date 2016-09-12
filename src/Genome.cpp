@@ -504,7 +504,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
                     for (unsigned i = 0; i < getGenomeSize(); i++)
 					{
 						Gene *gene = &(getGene(i));
-                        if (getGene(i).observedSynthesisRateValues.size() != numPhi)
+                        if (gene->observedSynthesisRateValues.size() != numPhi)
 						{
 							my_printError("WARNING: Gene # % (%) does not have any phi values. ", i, gene->getId());
                             my_printError("Please check your file to make sure every gene has a phi value. Filling empty genes ");
@@ -596,7 +596,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 					for (unsigned i = 0; i < getGenomeSize(); i++)
 					{
 						Gene *gene = &(getGene(i));
-						if (getGene(i).observedSynthesisRateValues.size() != numPhi)
+						if (gene->observedSynthesisRateValues.size() != numPhi)
 						{
                             my_printError("WARNING: Gene # % (%) does not have any phi values. ", i, gene->getId());
                             my_printError("Please check your file to make sure every gene has a phi value. Filling empty genes ");
