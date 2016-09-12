@@ -1913,7 +1913,7 @@ double Parameter::densityNorm(double x, double mean, double sd, bool log)
 
 double Parameter::densityLogNorm(double x, double mean, double sd, bool log)
 {
-	double returnValue = 0.0;
+	double returnValue = log ? -DBL_MAX : 0.0; // if log scale, instead of returning -Inf, -maximum possible double value
 	// logN is only defined for x > 0 => all values less or equal to zero have probability 0
 	if (x > 0.0)
 	{
