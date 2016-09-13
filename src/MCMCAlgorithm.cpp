@@ -137,7 +137,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			 Note that we use the inverse sign because our values of ln(f) and ln(f') are negative.
 		 */
 
-		double maxValue = -1000000000.0;
+		double maxValue = -1.0e+20;
 		unsigned mixtureIndex = 0u;
 
 		std::vector <double> unscaledLogProb_curr(numSynthesisRateCategories, 0.0);
@@ -201,6 +201,18 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			unscaledLogProb_curr_singleMixture[k] -= maxValue;
 			probabilities[k] = model.getCategoryProbability(k) * std::exp(unscaledLogProb_curr_singleMixture[k]);
 			normalizingProbabilityConstant += probabilities[k];
+            if (std::isnan(probabilities[k]))
+            {
+                my_print("\n\n\n");
+                my_print("Gene: %, %\n", i, gene->getId());
+                my_print("Mixture: %\n", k);
+                my_print("unscaled Mix. Prop. of gene: %\n", probabilities[k]);
+                my_print("Mix. cat. prob.: %\n", model.getCategoryProbability(k));
+                my_print("curr logLik - maxVal: %\n", unscaledLogProb_curr_singleMixture[k]);
+                my_print("exp(curr logLik - maxVal): %\n", std::exp(unscaledLogProb_curr_singleMixture[k]));
+                my_print("Max Val. %\n", maxValue);
+                my_print("\n\n\n");
+            }
 		}
 		// normalize probabilities
 		for (unsigned k = 0u; k < numMixtures; k++)
@@ -233,17 +245,17 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
                 	logLikelihood += probabilities[k] * unscaledLogPost_curr[k];
 			}
 
-            if (std::isnan(logLikelihood))
+/*            if (std::isnan(logLikelihood))
             {
                 my_print("\n\n\n");
-                my_print("Gene: %\n", i);
+                my_print("Gene: %, %\n", i, gene->getId());
                 my_print("Mixture: %\n", k);
                 my_print("Mix. Prop.: %\n", probabilities[k]);
                 my_print("cur logLik: %\n", unscaledLogPost_curr[k]);
                 my_print("prop logLik: %\n", unscaledLogPost_prop[k]);
-                my_print("Accepted?: % < % , %\n", alpha, propLogLike - currLogLike, alpha < (propLogLike - currLogLike));
+                my_print("Accepted?: % < % , %\n", alpha, (propLogLike - currLogLike), alpha < (propLogLike - currLogLike));
                 my_print("\n\n\n");
-            }
+            }*/
 		}
         
 
