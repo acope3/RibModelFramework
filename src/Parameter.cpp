@@ -1277,24 +1277,31 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 
 			if (acceptanceLevel < 0.2)
 			{
-				if (acceptanceLevel < 0.1)
+			  //true keeps you from using cov. matrix
+			  if (acceptanceLevel < 0.1 || true)
 					for (unsigned k = aaStart; k < aaEnd; k++)
 						covarianceMatrix[aaIndex] *= 0.8;
 				else
 				{
-					//CovarianceMatrix covcurr(covarianceMatrix[aaIndex].getNumVariates());
-					//covcurr.calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples,
-					// adaptiveStepCurr);
-					//CovarianceMatrix covprev = covarianceMatrix[aaIndex];
-					//covprev = (covprev*0.4);
-					//covcurr = (covcurr*0.6);
-					//covarianceMatrix[aaIndex] = covprev + covcurr;
-					covarianceMatrix[aaIndex].calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa,
-																		samples, adaptiveStepCurr);
+				  //Update cov matrix based on previous window
+				  CovarianceMatrix covcurr(covarianceMatrix[aaIndex].getNumVariates());
+				  covcurr.calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples,
+								    adaptiveStepCurr);
+				  CovarianceMatrix covprev = covarianceMatrix[aaIndex];
+				  covprev = (covprev*0.6);
+				  covcurr = (covcurr*0.4);
+				  covarianceMatrix[aaIndex] = covprev + covcurr;
+				  //replace cov matrix based on previous window
+				  //The is approach was commented out and above code uncommented to replace it 
+				  //covarianceMatrix[aaIndex].calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
 				}
 				
-
+			//Decomposing of cov matrix to convert iid samples to covarying samples using matrix decomposition
+			//The decompsed matrix is used in the proposal of new samples
 				covarianceMatrix[aaIndex].choleskyDecomposition();
+
+				//Adjust proposal width if for codon specific parameters
+				//These values are used when you are not using a cov to propose new parameter values.
 				for (unsigned k = aaStart; k < aaEnd; k++)
 					std_csp[k] *= 0.8;
 			}
