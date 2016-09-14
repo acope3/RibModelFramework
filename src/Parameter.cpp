@@ -1,5 +1,5 @@
 #include "include/base/Parameter.h"
-
+#include <cfloat>
 
 //R runs only
 #ifndef STANDALONE
@@ -57,6 +57,8 @@ Parameter::Parameter(unsigned _maxGrouping)
 	lastIteration = 0u;
 	numParam = 0u;
 	obsPhiSets = 0u;
+	adaptiveStepPrev = 0;
+	adaptiveStepCurr = 0;
 	stdDevSynthesisRate.resize(1);
 	stdDevSynthesisRate_proposed.resize(1);
 	numAcceptForStdDevSynthesisRate = 0u;
@@ -82,6 +84,9 @@ Parameter& Parameter::operator=(const Parameter& rhs)
 	numAcceptForStdDevSynthesisRate = rhs.numAcceptForStdDevSynthesisRate;
 	obsPhiSets = rhs.obsPhiSets;
 	categories = rhs.categories;
+
+	adaptiveStepPrev = rhs.adaptiveStepPrev;
+	adaptiveStepCurr = rhs.adaptiveStepCurr;
 
   	// proposal bias and std for phi values
   	bias_stdDevSynthesisRate = rhs.bias_stdDevSynthesisRate;

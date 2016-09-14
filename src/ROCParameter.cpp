@@ -457,7 +457,7 @@ void ROCParameter::initSelectionCategories(std::vector<std::string> files, unsig
 		std::ifstream currentFile;
 		currentFile.open(files[category].c_str());
 		if (currentFile.fail())
-			my_printError("Error opening file % to initialize mutation values.\n", category);
+			my_printError("Error opening file % to initialize selection values.\n", category);
 		else
 		{
 			std::string tmp;

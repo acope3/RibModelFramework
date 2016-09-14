@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <cmath>
+#include <string>
 
 #ifndef STANDALONE
 #include <Rcpp.h>
