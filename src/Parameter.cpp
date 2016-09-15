@@ -1275,10 +1275,13 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 			SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
 			my_print("\t%:\t%\n", aa.c_str(), acceptanceLevel);
 
+			//Gelman BDA 3rd Edition suggests a target acceptance rate of 0.23
+			// for high dimensional problems
+			//Adjust proposal variance to try and get within this range
 			if (acceptanceLevel < 0.2)
 			{
-			  //true keeps you from using cov. matrix
-			  if (acceptanceLevel < 0.1 || true)
+			  
+			  if (acceptanceLevel < 0.1)
 					for (unsigned k = aaStart; k < aaEnd; k++)
 						covarianceMatrix[aaIndex] *= 0.8;
 				else
