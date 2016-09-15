@@ -198,7 +198,7 @@ void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsig
 		std::vector<unsigned> tempAccExpr(numGenes, 0u);
 		numAcceptForSynthesisRate[i] = tempAccExpr;
 
-		std::vector<double> tempStdPhi(numGenes, 0.1);
+		std::vector<double> tempStdPhi(numGenes, 5);
 		std_phi[i] = tempStdPhi;
 	}
 }
