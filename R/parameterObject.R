@@ -19,6 +19,9 @@
 #' The length of the vector has to equal the number of genes in the Genome object.
 #' The default value is NULL.
 #' 
+#' @param init.csp.variance specifies the initial proposal width for codon specific parameter. The proposal width adapts during the 
+#' runtime to reach a taget acceptance rate of ~0.25 
+#' 
 #' @param model Specifies the model used. Valid options are "ROC", "RFP", or "FONSE".
 #' The default model is "ROC".
 #' ROC is described in Gilchrist et al. 2015.
@@ -96,7 +99,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, numMixtures = 
                                     model = "ROC", split.serine = TRUE, 
                                     mixture.definition = "allUnique", 
                                     mixture.definition.matrix = NULL,
-                                    init.with.restart.file = NULL, mutation_prior_sd = 0.35){
+                                    init.with.restart.file = NULL, mutation_prior_sd = 0.35, init.csp.variance = 0.0025){
   # check input integrity
   if(is.null(init.with.restart.file)){
     if(length(sphi) != numMixtures){
@@ -123,7 +126,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, numMixtures = 
       parameter <- initializeROCParameterObject(genome, sphi, numMixtures, 
                             geneAssignment, expressionValues, split.serine, 
                             mixture.definition, mixture.definition.matrix, 
-                            mutation_prior_sd)    
+                            mutation_prior_sd, init.csp.variance)    
     }else{
       parameter <- new(ROCParameter, init.with.restart.file)
     }
@@ -131,7 +134,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, numMixtures = 
     if(is.null(init.with.restart.file)){
       parameter <- initializeFONSEParameterObject(genome, sphi, numMixtures, 
                             geneAssignment, expressionValues, split.serine, 
-                            mixture.definition, mixture.definition.matrix)
+                            mixture.definition, mixture.definition.matrix, init.csp.variance)
     }else{
       parameter <- new(FONSEParameter, init.with.restart.file)
     }
@@ -139,7 +142,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, numMixtures = 
     if(is.null(init.with.restart.file)){
       parameter <- initializeRFPParameterObject(genome, sphi, numMixtures, 
                             geneAssignment, expressionValues, split.serine, 
-                            mixture.definition, mixture.definition.matrix) 
+                            mixture.definition, mixture.definition.matrix, init.csp.variance) 
     }else{
       parameter <- new(RFPParameter, init.with.restart.file)
     }
@@ -155,7 +158,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, numMixtures = 
 initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignment,
                       expressionValues = NULL, split.serine = TRUE,
                       mixture.definition = "allUnique", 
-                      mixture.definition.matrix = NULL, mutation_prior_sd = 0.35){
+                      mixture.definition.matrix = NULL, mutation_prior_sd = 0.35, init.csp.variance){
 
   if(is.null(mixture.definition.matrix)){ 
     # keyword constructor
@@ -178,7 +181,7 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
   }
   
   parameter$mutation_prior_sd <- (mutation_prior_sd)
-  parameter <- initializeCovarianceMatrices(parameter, genome, numMixtures, geneAssignment)
+  parameter <- initializeCovarianceMatrices(parameter, genome, numMixtures, geneAssignment, init.csp.variance)
   
   
   return(parameter)
@@ -189,7 +192,7 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
 initializeRFPParameterObject <- function(genome, sphi, numMixtures, geneAssignment, 
                           expressionValues = NULL, split.serine = TRUE, 
                           mixture.definition = "allUnique", 
-                          mixture.definition.matrix = NULL){
+                          mixture.definition.matrix = NULL, init.csp.variance){
 
   if(is.null(mixture.definition.matrix))
   { # keyword constructor
@@ -211,6 +214,8 @@ initializeRFPParameterObject <- function(genome, sphi, numMixtures, geneAssignme
     parameter$initializeSynthesisRateByList(expressionValues)
   }
   
+  ## TODO (Cedric): use init.csp.variance to set initial proposal width for CSP parameters
+  
   return (parameter)
 }
 
@@ -218,7 +223,7 @@ initializeRFPParameterObject <- function(genome, sphi, numMixtures, geneAssignme
 initializeFONSEParameterObject <- function(genome, sphi, numMixtures, 
                         geneAssignment, expressionValues = NULL, split.serine = TRUE,
                         mixture.definition = "allUnique", 
-                        mixture.definition.matrix = NULL){
+                        mixture.definition.matrix = NULL, init.csp.variance){
 
   # create Parameter object
   if(is.null(mixture.definition.matrix))
@@ -241,7 +246,7 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
     parameter$initializeSynthesisRateByList(expressionValues)
   }
   
-  parameter <- initializeCovarianceMatrices(parameter, genome, numMixtures, geneAssignment)
+  parameter <- initializeCovarianceMatrices(parameter, genome, numMixtures, geneAssignment, init.csp.variance)
   
   return(parameter)
 }
@@ -454,7 +459,7 @@ splitMatrix <- function(M, r, c){
 #' 
 
 # Also initializes the mutaiton and selection parameter
-initializeCovarianceMatrices <- function(parameter, genome, numMixtures, geneAssignment) {
+initializeCovarianceMatrices <- function(parameter, genome, numMixtures, geneAssignment, init.csp.variance) {
   numMutationCategory <- parameter$numMutationCategories
   numSelectionCategory <- parameter$numSelectionCategories
   
@@ -484,7 +489,7 @@ initializeCovarianceMatrices <- function(parameter, genome, numMixtures, geneAss
     
     # One covariance matrix for all mixtures.
     # Currently only variances used.
-    compl.covMat <- diag((numMutationCategory + numSelectionCategory) * numCodons) * 0.0025
+    compl.covMat <- diag((numMutationCategory + numSelectionCategory) * numCodons) * init.csp.variance
     parameter$initCovarianceMatrix(compl.covMat, aa)
   }
   
