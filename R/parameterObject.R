@@ -484,7 +484,7 @@ initializeCovarianceMatrices <- function(parameter, genome, numMixtures, geneAss
     
     # One covariance matrix for all mixtures.
     # Currently only variances used.
-    compl.covMat <- diag((numMutationCategory + numSelectionCategory) * numCodons) * 0.05
+    compl.covMat <- diag((numMutationCategory + numSelectionCategory) * numCodons) * 0.0025
     parameter$initCovarianceMatrix(compl.covMat, aa)
   }
   
