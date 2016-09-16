@@ -6,16 +6,16 @@
 #' @param sphi Initial values for sphi. Expected is a vector of length numMixtures.
 #' The default value is NULL.
 #' 
-#' @param numMixtures The number of mixtures elements for the underlying mixture distribution (numMixtures > 0).
+#' @param num.mixtures The number of mixtures elements for the underlying mixture distribution (numMixtures > 0).
 #' The default value is 1.
 #' 
-#' @param geneAssignment A vector holding the initial mixture assignment for each gene. 
+#' @param gene.assignment A vector holding the initial mixture assignment for each gene. 
 #' The vector length has to equal the number of genes in the genome.
 #' Valid values for the vector range from 1 to numMixtures. 
 #' It is possible but not advised to leave a mixture element empty.
 #' The default Value is NULL.
 #' 
-#' @param expressionValues (Optional) A vector with intial phi values.
+#' @param initial.expression.values (Optional) A vector with intial phi values.
 #' The length of the vector has to equal the number of genes in the Genome object.
 #' The default value is NULL.
 #' 
@@ -50,7 +50,7 @@
 #' If given, all other arguments will be ignored.
 #' The default value for init.with.restart.file is NULL.
 #' 
-#' @param mutation_prior_sd Controlling the standard deviation of the normal 
+#' @param mutation.prior.sd Controlling the standard deviation of the normal 
 #' prior on the mutation parameters
 #' 
 #' @return parameter Returns an initialized Parameter object.
@@ -94,23 +94,23 @@
 #' If expressionValues is given, then the phi values will be initialized with 
 #' them. If not, we calculate starting phi values by doing an SCUO caculation.
 #' 
-initializeParameterObject <- function(genome = NULL, sphi = NULL, numMixtures = 1, 
-                                    geneAssignment = NULL, expressionValues = NULL,
+initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures = 1, 
+                                    gene.assignment = NULL, initial.expression.values = NULL,
                                     model = "ROC", split.serine = TRUE, 
                                     mixture.definition = "allUnique", 
                                     mixture.definition.matrix = NULL,
-                                    init.with.restart.file = NULL, mutation_prior_sd = 0.35, init.csp.variance = 0.0025){
+                                    init.with.restart.file = NULL, mutation.prior.sd = 0.35, init.csp.variance = 0.0025){
   # check input integrity
   if(is.null(init.with.restart.file)){
-    if(length(sphi) != numMixtures){
+    if(length(sphi) != num.mixtures){
       stop("Not all mixtures have an Sphi value assigned!\n")
     }
   
-    if(length(genome) != length(geneAssignment)){
+    if(length(genome) != length(gene.assignment)){
       stop("Not all Genes have a mixture assignment!\n")
     }
   
-    if(max(geneAssignment) > numMixtures){
+    if(max(gene.assignment) > num.mixtures){
       stop("Gene is assigned to non existing mixture!\n")
     }
     
@@ -123,25 +123,25 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, numMixtures = 
   
   if(model == "ROC"){
     if(is.null(init.with.restart.file)){
-      parameter <- initializeROCParameterObject(genome, sphi, numMixtures, 
-                            geneAssignment, expressionValues, split.serine, 
+      parameter <- initializeROCParameterObject(genome, sphi, num.mixtures, 
+                                                gene.assignment, initial.expression.values, split.serine, 
                             mixture.definition, mixture.definition.matrix, 
-                            mutation_prior_sd, init.csp.variance)    
+                            mutation.prior.sd, init.csp.variance)    
     }else{
       parameter <- new(ROCParameter, init.with.restart.file)
     }
   }else if(model == "FONSE"){
     if(is.null(init.with.restart.file)){
-      parameter <- initializeFONSEParameterObject(genome, sphi, numMixtures, 
-                            geneAssignment, expressionValues, split.serine, 
+      parameter <- initializeFONSEParameterObject(genome, sphi, num.mixtures, 
+                                                  gene.assignment, initial.expression.values, split.serine, 
                             mixture.definition, mixture.definition.matrix, init.csp.variance)
     }else{
       parameter <- new(FONSEParameter, init.with.restart.file)
     }
   }else if(model == "RFP"){
     if(is.null(init.with.restart.file)){
-      parameter <- initializeRFPParameterObject(genome, sphi, numMixtures, 
-                            geneAssignment, expressionValues, split.serine, 
+      parameter <- initializeRFPParameterObject(genome, sphi, num.mixtures, 
+                                                gene.assignment, initial.expression.values, split.serine, 
                             mixture.definition, mixture.definition.matrix, init.csp.variance) 
     }else{
       parameter <- new(RFPParameter, init.with.restart.file)
