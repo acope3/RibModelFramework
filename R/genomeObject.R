@@ -22,7 +22,7 @@ initializeGenomeObject <- function(file, observed.expression.file=NULL, append=F
   } else {
     genome$readRFPFile(file)
   }
-  if(!is.null(expression.file)) {
+  if(!is.null(observed.expression.file)) {
     genome$readObservedPhiValues(observed.expression.file, match.expression.by.id)
   }
   return(genome)
