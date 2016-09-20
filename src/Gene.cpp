@@ -36,7 +36,7 @@ Gene::Gene(std::string _seq, std::string _id, std::string _desc) : seq(_seq), id
 	else
     {
         my_printError("WARNING: Gene: % has sequence length NOT multiple of 3 after cleaning of the sequence!\n", id);
-        my_printError("Gene data is NOT processed!\nValid characters are A,C,T,G, and N \n");
+        my_printError("Gene data is NOT processed!\nValid characters are A,C,T,G\n\n");
     }
 }
 
@@ -183,8 +183,8 @@ void Gene::setSequence(std::string _seq)
 	}
 	else
     {
-		my_printError("WARNING: Gene: % has sequence length NOT multiple of 3!\n");
-        my_printError("Gene data is NOT processed!\nValid characters are A,C,T,G, and N \n", id);
+		my_printError("WARNING: Gene: % has sequence length NOT multiple of 3!\n", id);
+        my_printError("Gene data is NOT processed!\nValid characters are A,C,T,G\n\n");
     }
 }
 

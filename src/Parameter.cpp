@@ -1,5 +1,5 @@
 #include "include/base/Parameter.h"
-
+#include <cfloat>
 
 //R runs only
 #ifndef STANDALONE
@@ -57,6 +57,8 @@ Parameter::Parameter(unsigned _maxGrouping)
 	lastIteration = 0u;
 	numParam = 0u;
 	obsPhiSets = 0u;
+	adaptiveStepPrev = 0;
+	adaptiveStepCurr = 0;
 	stdDevSynthesisRate.resize(1);
 	stdDevSynthesisRate_proposed.resize(1);
 	numAcceptForStdDevSynthesisRate = 0u;
@@ -82,6 +84,9 @@ Parameter& Parameter::operator=(const Parameter& rhs)
 	numAcceptForStdDevSynthesisRate = rhs.numAcceptForStdDevSynthesisRate;
 	obsPhiSets = rhs.obsPhiSets;
 	categories = rhs.categories;
+
+	adaptiveStepPrev = rhs.adaptiveStepPrev;
+	adaptiveStepCurr = rhs.adaptiveStepCurr;
 
   	// proposal bias and std for phi values
   	bias_stdDevSynthesisRate = rhs.bias_stdDevSynthesisRate;
@@ -193,7 +198,7 @@ void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsig
 		std::vector<unsigned> tempAccExpr(numGenes, 0u);
 		numAcceptForSynthesisRate[i] = tempAccExpr;
 
-		std::vector<double> tempStdPhi(numGenes, 0.1);
+		std::vector<double> tempStdPhi(numGenes, 5);
 		std_phi[i] = tempStdPhi;
 	}
 }
@@ -1272,24 +1277,31 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 
 			if (acceptanceLevel < 0.2)
 			{
-				if (acceptanceLevel < 0.1)
+			  //true keeps you from using cov. matrix
+			  if (acceptanceLevel < 0.1 || true)
 					for (unsigned k = aaStart; k < aaEnd; k++)
 						covarianceMatrix[aaIndex] *= 0.8;
 				else
 				{
-					//CovarianceMatrix covcurr(covarianceMatrix[aaIndex].getNumVariates());
-					//covcurr.calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples,
-					// adaptiveStepCurr);
-					//CovarianceMatrix covprev = covarianceMatrix[aaIndex];
-					//covprev = (covprev*0.4);
-					//covcurr = (covcurr*0.6);
-					//covarianceMatrix[aaIndex] = covprev + covcurr;
-					covarianceMatrix[aaIndex].calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa,
-																		samples, adaptiveStepCurr);
+				  //Update cov matrix based on previous window
+				  CovarianceMatrix covcurr(covarianceMatrix[aaIndex].getNumVariates());
+				  covcurr.calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples,
+								    adaptiveStepCurr);
+				  CovarianceMatrix covprev = covarianceMatrix[aaIndex];
+				  covprev = (covprev*0.6);
+				  covcurr = (covcurr*0.4);
+				  covarianceMatrix[aaIndex] = covprev + covcurr;
+				  //replace cov matrix based on previous window
+				  //The is approach was commented out and above code uncommented to replace it 
+				  //covarianceMatrix[aaIndex].calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
 				}
 				
-
+			//Decomposing of cov matrix to convert iid samples to covarying samples using matrix decomposition
+			//The decompsed matrix is used in the proposal of new samples
 				covarianceMatrix[aaIndex].choleskyDecomposition();
+
+				//Adjust proposal width if for codon specific parameters
+				//These values are used when you are not using a cov to propose new parameter values.
 				for (unsigned k = aaStart; k < aaEnd; k++)
 					std_csp[k] *= 0.8;
 			}
@@ -1913,7 +1925,7 @@ double Parameter::densityNorm(double x, double mean, double sd, bool log)
 
 double Parameter::densityLogNorm(double x, double mean, double sd, bool log)
 {
-	double returnValue = 0.0;
+	double returnValue = log ? -DBL_MAX : 0.0; // if log scale, instead of returning -Inf, -maximum possible double value
 	// logN is only defined for x > 0 => all values less or equal to zero have probability 0
 	if (x > 0.0)
 	{

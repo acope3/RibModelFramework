@@ -14,7 +14,7 @@
 #'  
 #' @description Plots traces from the model object such as synthesis rates for each gene. 
 
-plot.Rcpp_ROCModel <- function(x, genome, samples = 100, mixture = 1, 
+plot.Rcpp_ROCModel <- function(x, genome = NULL, samples = 100, mixture = 1, 
                                estim.Expression = TRUE, simulated = FALSE, ...)
 {
   opar <- par(no.readonly = T) 
@@ -187,7 +187,7 @@ plot.Rcpp_FONSEModel <- function(x, genome, samples = 100, mixture = 1,
   
   ## adding a histogram of phi values to plot
   hist.values <- hist(expressionValues, plot=FALSE, nclass=30)
-  plot(hist.values, axes = FALSE, main, xlab = "", ylab = "")
+  plot(hist.values, axes = FALSE, main = main, xlab = "", ylab = "")
   axis(1)
   axis(4, las=1)
   

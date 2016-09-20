@@ -219,7 +219,13 @@ void CovarianceMatrix::calculateSampleCovariance(std::vector<std::vector<std::ve
 {
 	//order of codonSpecificParameterTrace: paramType, category, numparam, samples
 	unsigned numParamTypesInModel = codonSpecificParameterTrace.size();
-	unsigned numCategoriesInModel = codonSpecificParameterTrace[0].size();
+	std::vector<unsigned> numCategoriesInModelPerParamType(numParamTypesInModel);
+	// number of categories can vary between parameter types, see selection shared, mutation shared
+	for (unsigned paramType = 0; paramType < numParamTypesInModel; paramType++)
+	{
+		numCategoriesInModelPerParamType[paramType] = codonSpecificParameterTrace[paramType].size();
+	}
+
 
 	unsigned start = lastIteration - samples;
 	
@@ -230,14 +236,16 @@ void CovarianceMatrix::calculateSampleCovariance(std::vector<std::vector<std::ve
 	unsigned IDX = 0;
 	for (unsigned paramType1 = 0; paramType1 < numParamTypesInModel; paramType1++)
 	{
-		for (unsigned category1 = 0; category1 < numCategoriesInModel; category1++)
+		unsigned numCategoriesInModel1 = numCategoriesInModelPerParamType[paramType1];
+		for (unsigned category1 = 0; category1 < numCategoriesInModel1; category1++)
 		{
 			for (unsigned param1 = aaStart; param1 < aaEnd; param1++)
 			{
 				double mean1 = sampleMean(codonSpecificParameterTrace[paramType1][category1][param1], samples, lastIteration);
 				for (unsigned paramType2 = 0; paramType2 < numParamTypesInModel; paramType2++)
 				{
-					for (unsigned category2 = 0; category2 < numCategoriesInModel; category2++)
+					unsigned numCategoriesInModel2 = numCategoriesInModelPerParamType[paramType2];
+					for (unsigned category2 = 0; category2 < numCategoriesInModel2; category2++)
 					{
 						for (unsigned param2 = aaStart; param2 < aaEnd; param2++)
 						{

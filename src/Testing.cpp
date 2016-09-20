@@ -1,5 +1,5 @@
 #include "include/Testing.h"
-
+#include <cstring>
 
 #ifndef STANDALONE
 #include <Rcpp.h>

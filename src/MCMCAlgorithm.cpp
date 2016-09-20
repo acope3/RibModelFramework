@@ -137,18 +137,18 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			 Note that we use the inverse sign because our values of ln(f) and ln(f') are negative.
 		 */
 
-		double maxValue = -1000000.0;
+		double maxValue = -1.0e+20;
 		unsigned mixtureIndex = 0u;
 
-		std::vector <double> unscaledLogProb_curr(numSynthesisRateCategories, 0);
-		std::vector <double> unscaledLogProb_prop(numSynthesisRateCategories, 0);
+		std::vector <double> unscaledLogProb_curr(numSynthesisRateCategories, 0.0);
+		std::vector <double> unscaledLogProb_prop(numSynthesisRateCategories, 0.0);
 
-		std::vector <double> unscaledLogPost_curr(numSynthesisRateCategories, 0);
-		std::vector <double> unscaledLogPost_prop(numSynthesisRateCategories, 0);
+		std::vector <double> unscaledLogPost_curr(numSynthesisRateCategories, 0.0);
+		std::vector <double> unscaledLogPost_prop(numSynthesisRateCategories, 0.0);
 
 
-		std::vector <double> unscaledLogProb_curr_singleMixture(numMixtures, 0);
-		std::vector <double> probabilities(numMixtures, 0);
+		std::vector <double> unscaledLogProb_curr_singleMixture(numMixtures, 0.0);
+		std::vector <double> probabilities(numMixtures, 0.0);
 
 		/***************************************************************
 		for (unsigned j = 0u; j < numMixtures; j++)
@@ -201,6 +201,18 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			unscaledLogProb_curr_singleMixture[k] -= maxValue;
 			probabilities[k] = model.getCategoryProbability(k) * std::exp(unscaledLogProb_curr_singleMixture[k]);
 			normalizingProbabilityConstant += probabilities[k];
+            if (std::isnan(probabilities[k]))
+            {
+                my_print("\n\n\n");
+                my_print("Gene: %, %\n", i, gene->getId());
+                my_print("Mixture: %\n", k);
+                my_print("unscaled Mix. Prop. of gene: %\n", probabilities[k]);
+                my_print("Mix. cat. prob.: %\n", model.getCategoryProbability(k));
+                my_print("curr logLik - maxVal: %\n", unscaledLogProb_curr_singleMixture[k]);
+                my_print("exp(curr logLik - maxVal): %\n", std::exp(unscaledLogProb_curr_singleMixture[k]));
+                my_print("Max Val. %\n", maxValue);
+                my_print("\n\n\n");
+            }
 		}
 		// normalize probabilities
 		for (unsigned k = 0u; k < numMixtures; k++)
@@ -213,7 +225,8 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			// We do not need to add std::log(model.getCategoryProbability(k)) since it will cancel in the ratio!
 			double currLogLike = unscaledLogProb_curr[k];
 			double propLogLike = unscaledLogProb_prop[k];
-			if ( -Parameter::randExp(1) < (propLogLike - currLogLike) )
+            double alpha = -Parameter::randExp(1);
+			if ( alpha < (propLogLike - currLogLike) )
 			{
                 if (estimateSynthesisRate)
 				{
@@ -231,7 +244,20 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
                 if ((iteration % thinning) == 0)
                 	logLikelihood += probabilities[k] * unscaledLogPost_curr[k];
 			}
+
+/*            if (std::isnan(logLikelihood))
+            {
+                my_print("\n\n\n");
+                my_print("Gene: %, %\n", i, gene->getId());
+                my_print("Mixture: %\n", k);
+                my_print("Mix. Prop.: %\n", probabilities[k]);
+                my_print("cur logLik: %\n", unscaledLogPost_curr[k]);
+                my_print("prop logLik: %\n", unscaledLogPost_prop[k]);
+                my_print("Accepted?: % < % , %\n", alpha, (propLogLike - currLogLike), alpha < (propLogLike - currLogLike));
+                my_print("\n\n\n");
+            }*/
 		}
+        
 
 		if (std::isinf(logLikelihood))
             my_print("\tInfinity reached (Gene: %)\n", i);
@@ -261,6 +287,12 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 
 	// take all priors into account
 	logLikelihood += model.calculateAllPriors();
+    if (std::isnan(logLikelihood))
+    {
+        my_print("\n\n\n");
+        my_print("logLikelihood NaN after addition of prior values!\n");
+        my_print("\n\n\n");
+    }
 	std::vector <double> newMixtureProbabilities(numMixtures, 0);
 	//double *newMixtureProbabilities = new double[numMixtures]();
 	Parameter::randDirichlet(dirichletParameters, numMixtures, newMixtureProbabilities);
@@ -402,7 +434,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
             Rcpp::checkUserInterrupt();
             #endif
             
-			my_print("Status at iteration % \n", iteration);
+			my_print("Status at iteration (sample): % (%)\n", iteration, (iteration / thinning));
 			my_print("\t current logLikelihood: % \n", likelihoodTrace[(iteration/thinning) - 1] );
 			if (iteration > stepsToAdapt)
 				my_print("No longer adapting\n");
