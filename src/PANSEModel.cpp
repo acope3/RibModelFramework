@@ -20,6 +20,7 @@ PANSEModel::~PANSEModel()
 {
 	//dtor
 	//TODO: call Parent's deconstructor
+	delete parameter;
 }
 
 

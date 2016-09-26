@@ -16,6 +16,7 @@ ROCModel::ROCModel(bool _withPhi) : Model()
 ROCModel::~ROCModel()
 {
 	//dtor
+	delete parameter;
 }
 
 double ROCModel::calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codonCount[], double mutation[], double selection[], double phiValue)

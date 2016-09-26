@@ -15,6 +15,7 @@ FONSEModel::FONSEModel() : Model()
 FONSEModel::~FONSEModel()
 {
 	//dtor
+	delete parameter;
 }
 
 

@@ -4,6 +4,14 @@
 #include "include/FONSE/FONSEModel.h"
 #include <Rcpp.h>
 using namespace Rcpp;
+
+/*
+void roc_finalizer(ROCModel* m)
+{
+	delete m;
+}
+*/
+
 RCPP_EXPOSED_CLASS(ROCParameter)
 RCPP_EXPOSED_CLASS(RFPParameter)
 RCPP_EXPOSED_CLASS(FONSEParameter)
@@ -17,6 +25,7 @@ RCPP_MODULE(Model_mod)
 	class_<ROCModel>( "ROCModel" )
 		.derives<Model>("Model")
 		.constructor<bool>()
+		//.finalizer(&roc_finalizer)
 		.method("CalculateProbabilitiesForCodons", &ROCModel::CalculateProbabilitiesForCodons,
 		        "Calculated codon probabilities. Input is one element shorter than output")
   		.method("getParameter", &ROCModel::getParameter)
