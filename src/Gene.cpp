@@ -206,7 +206,6 @@ void Gene::setPASequence(std::vector<std::vector<unsigned>> table)
         std::string codon = SequenceSummary::indexToCodon(table[i][1]);
         seq.replace(table[i][0] * 3, 3, codon);
     }
-    my_print("The sequence, size %, just created is: %\n", nRows * 3, seq);
 
     // Call processPA with a checking error statement printed if needed.
     if (!geneData.processPA(table))
@@ -337,7 +336,7 @@ void Gene::initSumRFP_count(unsigned numCategories)
 
 /* getSumRFP_count (NOT EXPOSED)
  * Arguments: A number representing the RFP category to return
- * Returns the sumRFP_count vector for the category index specified.
+ * Returns the sumRFP_count array of size 64 for the category index specified.
  * For unit testing only.
  */
 std::array <unsigned, 64> Gene::getSumRFP_count(unsigned categoryIndex)
@@ -348,8 +347,8 @@ std::array <unsigned, 64> Gene::getSumRFP_count(unsigned categoryIndex)
 
 
 /* setSumRFP_count (NOT EXPOSED)
- * Arguments: A number representing the RFP category to modify, an array argument to set the RFP category's RFP_count to
- * Sets the sumRFP_count array for the category index specified to the vector argument given.
+ * Arguments: A number representing the RFP category to modify, an array argument to set the RFP category's sumRFP_count to
+ * Sets the sumRFP_count array for the category index specified to the array argument given.
  */
 void Gene::setSumRFP_count(unsigned categoryIndex, std::array <unsigned, 64> sumRFP_counts)
 {

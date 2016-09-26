@@ -281,7 +281,6 @@ void Genome::writeRFPFile(std::string filename, bool simulated)
  * The positions are not necessarily in the right order.
  * There may be more than one rfp_count, and thus the header is important.
  * TODO: Wrapped by "function name" on the R-side.
- * TODO: Should we associate RFP_count with the position? Currently, it is based on order read in.
 */
 void Genome::readPAFile(std::string filename, bool Append)
 {
@@ -297,7 +296,6 @@ void Genome::readPAFile(std::string filename, bool Append)
 		{
 			// Analyze the header line
 			std::string tmp;
-			//std::getline(Fin, tmp);
 
             if (!std::getline(Fin, tmp))
                 my_printError("Error in Genome::readPAFile: PA file % has no header.\n", filename);
@@ -318,68 +316,15 @@ void Genome::readPAFile(std::string filename, bool Append)
 			}
 			unsigned tableWidth = 2 + numCategories; // Table size: position + codonID + each category
 
+			// -------------------------------------------------------------------------//
+			// -------------- Now for each rfp_count category, record it. ------------- //
+			// ----- Treat data as a table: push back vectors of size tableWidth. ----- //
+			// -------------------------------------------------------------------------//
 			std::string prevID = "";
 			Gene tmpGene;
-			bool first = true;
 			int position;
-			//std::string seq = "";
-
-			/*
-			std::vector <unsigned> geneSizes; // Index = gene order, value = size
-			unsigned geneSize = 0;
-
-			//std::map<std::string, unsigned> genes;
-			//std::map<std::string, unsigned>::iterator git;
-
-			//First pass: For each gene name, count its size.
-			while (std::getline(Fin, tmp))
-			{
-				pos = tmp.find(",");
-				std::string ID = tmp.substr(0, pos);
-
-				// Position integer: Ensure that if position is negative, ignore the codon.
-				pos2 = tmp.find(",", pos + 1);
-
-				// Set to 0-indexed value for convenience of vector calculation
-				position = std::atoi(tmp.substr(pos + 1, pos2 - (pos + 1)).c_str()) - 1;
-
-				if (position > -1) // for convenience of calculation; ambiguous positions are marked by -1.
-				{
-					if (first)
-                    {
-						prevID = ID;
-						first = false;
-						//genes[ID] = 0;
-						//geneSize = 0;
-					}
-					if (ID != prevID)
-                    {
-						geneSizes.push_back(geneSize * 3);
-						geneSize = 0;
-
-						//genes[prevID] *= 3; //multiply by three since codons
-						//genes[ID] = 0; //initialize the new genes[ID]
-					}
-					prevID = ID;
-					//genes[ID]++;
-					geneSize++;
-				}
-			}
-			geneSizes.push_back(geneSize * 3);
-			//genes[prevID] *= 3; //multiply by three since codons
-			Fin.close();
-			 */
-
-			// ---------------------------------------------------------------------//
-			// ----- Second pass: Now for each rfp_count category, record it. ----- //
-			// ----- Second pass: Treat data as a table: push back vectors of size tableWidth. ----- //
-			// ---------------------------------------------------------------------//
-			//Fin.open(filename.c_str());
-			//std::getline(Fin, tmp); //retrash first line
 			prevID = "";
-			first = true;
-			//unsigned geneSizesIndex = 0;
-			//std::vector <std::vector <unsigned>> RFP_counts(numCategories);
+			bool first = true;
 
 			std::vector <std::vector <unsigned>> table; // Dimensions: nRows of tableWidth-sized vectors
 
@@ -406,36 +351,15 @@ void Genome::readPAFile(std::string filename, bool Append)
 					{
 						prevID = ID;
 						first = false;
-						//git = genes.find(ID);
-						//seq.resize(git->second); //multiply by three since codons
 					}
 					if (ID != prevID)
 					{
 						tmpGene.setId(prevID);
 						tmpGene.setDescription("No description for PANSE Model");
-						//tmpGene.setSequence(seq);
 						tmpGene.setPASequence(table);
-						// Based on the header line, initialize the number of RFP_count categories
-						// REMINDER: Modifying the sequence summary must come after setting the sequence!
-						//tmpGene.initRFP_count(numCategories);
-
-						/*
-						for (unsigned i = 0; i < numCategories; i++)
-							tmpGene.setRFP_count(i, RFP_counts[i]);
-						*/
-
 						addGene(tmpGene, false); //add to genome
 						tmpGene.clear();
 						table.clear();
-						//seq = "";
-
-						//git = genes.find(ID);
-						//seq.resize(git->second); //multiply by three since codons
-
-						/*
-						for (unsigned i = 0; i < numCategories; i++)
-							RFP_counts[i].clear();
-						 */
 					}
 					// Now find codon value: Follows prior comma, guaranteed to be of size 3
 					std::string codon = tmp.substr(pos2 + 1, 3);
@@ -446,7 +370,6 @@ void Genome::readPAFile(std::string filename, bool Append)
 					tableIndex ++;
 					tableRow[tableIndex] = SequenceSummary::codonToIndex(codon);
 					// Note: May be an invalid Codon read in, but this is resolved when the sequence is set and processed.
-					my_print("Codon is %\n", codon);
 
 					// Skip to end rfp_count(s), if any
 					pos = tmp.find(",", pos2 + 1);
@@ -457,18 +380,9 @@ void Genome::readPAFile(std::string filename, bool Append)
 					{
 						pos2 = tmp.find(",", pos + 1);
 						tableRow[tableIndex] = (unsigned) std::atoi(tmp.substr(pos + 1, pos2 - (pos + 1)).c_str());
-						//unsigned RFP_count = (unsigned) std::atoi(tmp.substr(pos + 1, pos2 - (pos + 1)).c_str());
-						//RFP_counts[categoryIndex].push_back(RFP_count);
 						pos = pos2;
 						tableIndex++;
 					}
-
-					// Now add codon to appropriate place in sequence
-					/*
-					seq[position * 3] = codon[0];
-					seq[position * 3 + 1] = codon[1];
-					seq[position * 3 + 2] = codon[2];
-					*/
 
 					prevID = ID;
 					table.push_back(tableRow);
@@ -480,17 +394,7 @@ void Genome::readPAFile(std::string filename, bool Append)
             {
                 tmpGene.setId(prevID);
                 tmpGene.setDescription("No description for PANSE Model");
-                //tmpGene.setSequence(seq);
                 tmpGene.setPASequence(table);
-                // Based on the header line, initialize the number of RFP_count categories
-                // REMINDER: Modifying the sequence summary must come after setting the sequence!
-                //tmpGene.initRFP_count(numCategories);
-
-                /*
-                for (unsigned i = 0; i < numCategories; i++)
-                    tmpGene.setRFP_count(i, RFP_counts[i]);
-                */
-
                 addGene(tmpGene, false); //add to genome
             }
 		} // end else

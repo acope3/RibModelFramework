@@ -1153,9 +1153,9 @@ std::vector <std::vector <double> > Parameter::calculateSelectionCoefficients(un
 //--------------------------------------//
 
 
-Trace& Parameter::getTraceObject()
+Trace* Parameter::getTraceObject()
 {
-	return traces;
+	return &traces;
 }
 
 

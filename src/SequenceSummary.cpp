@@ -88,6 +88,7 @@ SequenceSummary& SequenceSummary::operator=(const SequenceSummary& rhs)
     RFPObserved = rhs.RFPObserved;
     naa = rhs.naa;
 	RFP_count = rhs.RFP_count;
+	sumRFP_count = rhs.sumRFP_count;
 
 	return *this;
 }
@@ -102,6 +103,7 @@ bool SequenceSummary::operator==(const SequenceSummary& other) const
 	if (this->codonPositions != other.codonPositions) { match = false; }
 	if (this->RFPObserved != other.RFPObserved) { match = false; }
 	if (this->RFP_count != other.RFP_count) {match = false; }
+    if (this->sumRFP_count != other.sumRFP_count) {match = false; }
 
 	return match;
 }
@@ -229,6 +231,10 @@ void SequenceSummary::setRFP_count(unsigned categoryIndex, std::vector <unsigned
 void SequenceSummary::initSumRFP_count(unsigned numCategories)
 {
 	sumRFP_count.resize(numCategories);
+	for (unsigned i = 0; i < numCategories; i++)
+	{
+		sumRFP_count[i].fill(0);
+	}
 }
 
 
@@ -245,7 +251,7 @@ std::array <unsigned, 64> SequenceSummary::getSumRFP_count(unsigned categoryInde
 
 /* setSumRFP_count (NOT EXPOSED)
  * Arguments: A number representing the RFP category to modify, an array argument to set the RFP category's RFP_count to
- * Sets the sumRFP_count vector for the category index specified to the vector argument given.
+ * Sets the sumRFP_count vector for the category index specified to the array argument given.
  */
 void SequenceSummary::setSumRFP_count(unsigned categoryIndex, std::array <unsigned, 64> arg)
 {
@@ -370,7 +376,6 @@ bool SequenceSummary::processPA(std::vector<std::vector<unsigned>> table)
 				// Category j has an RFP_count at the position e0]qual to the 2-indexed (after position, codon) value of j.
 				RFP_count[j][row[0]] = row[j + 2];
 				sumRFP_count[j][codonID] += row[j + 2];
-				my_print("RFP_count: % at position [%][%]\n", RFP_count[j][row[0]], j, row[0]);
 			}
 		}
 		else
