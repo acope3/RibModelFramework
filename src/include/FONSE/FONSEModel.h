@@ -105,7 +105,7 @@ class FONSEModel : public Model
 
 		virtual void simulateGenome(Genome &genome);
 		virtual void printHyperParameters();
-		FONSEParameter getParameter();
+		FONSEParameter* getParameter();
 		void setParameter(FONSEParameter &_parameter);
 		virtual double calculateAllPriors();
 		void calculateLogCodonProbabilityVector(unsigned numCodons, unsigned position, unsigned minIndexValue,
