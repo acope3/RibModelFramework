@@ -12,16 +12,60 @@ importFrom(stats, lm, median, qt, quantile, sd)
 importFrom(utils, write.csv)
 
 #exports
-exportPattern("^[[:alpha:]]+") #<- if commented out, only functions explicitly exported will be exposed 
+#exportPattern("^[[:alpha:]]+") #<- if commented out, only functions explicitly exported will be exposed 
 
 
-
-
-#export(
+export(
 # Ploting
 ## Parameter object
+
 
 ## Model object
 
 ## Genome object
-#)
+
+## MCMC object
+
+## Trace object
+
+#Objects
+## Parameter object
+"initializeParameterObject",
+"getCSPEstimates",
+"getMixtureAssignmentEstimate",
+"getExpressionEstimatesForMixture",
+"writeParameterObject",
+"loadParameterObject",
+
+## Model object
+"initializeModelObject",
+
+## Genome object
+"initializeGenomeObject",
+"getCodonCountsForAA",
+"getNames",
+
+## MCMC object
+"initializeMCMCObject",
+"runMCMC",
+"setRestartSettings",
+"convergence.test",
+"writeMCMCObject",
+"loadMCMCObject",
+
+## Trace object
+
+
+#Static C++ functions
+"AAToCodon",
+"aminoAcids",
+"codonToAA",
+"codons"
+
+
+)
+
+
+
+
+

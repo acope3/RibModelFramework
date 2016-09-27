@@ -19,9 +19,6 @@
 #' The length of the vector has to equal the number of genes in the Genome object.
 #' The default value is NULL.
 #' 
-#' @param init.csp.variance specifies the initial proposal width for codon specific parameter. The proposal width adapts during the 
-#' runtime to reach a taget acceptance rate of ~0.25 
-#' 
 #' @param model Specifies the model used. Valid options are "ROC", "RFP", or "FONSE".
 #' The default model is "ROC".
 #' ROC is described in Gilchrist et al. 2015.
@@ -53,7 +50,8 @@
 #' @param mutation.prior.sd Controlling the standard deviation of the normal 
 #' prior on the mutation parameters
 #' 
-#' @param init.csp.variance initial proposal variance for codon specific parameter, default is 0.0025
+#' @param init.csp.variance specifies the initial proposal width for codon specific parameter (default is 0.0025). 
+#' The proposal width adapts during the runtime to reach a taget acceptance rate of ~0.25
 #' 
 #' @return parameter Returns an initialized Parameter object.
 #' 
@@ -399,32 +397,7 @@ getCSPEstimates.Rcpp_Parameter <- function(parameter, filename=NULL,
 # }
 ### TODO
 
-#' Get Codon Counts For Each Amino Acid 
-#' 
-#' @param aa A one character representation of an amino acid.
-#' 
-#' @param genome A genome object from which the counts of each
-#' codon can be obtained.
-#' 
-#' @return codonCounts Returns a matrix storing the codonCounts. 
-#' 
-#' @description \code{getCodonCountsForAA} returns a matrix filled with 
-#' the number of times a codon is seen in each gene.
-#' 
-#' @details The returned matrix will have the row correspond to the
-#' genes in the genome and the columns correspond to the codons for the 
-#' given aa. The values will the number of times the codon is present in 
-#' that gene.
-#' 
-getCodonCountsForAA <- function(aa, genome){
-  # get codon count for aa
-  codons <- AAToCodon(aa, F)
-  codonCounts <- lapply(codons, function(codon){
-    codonCounts <- genome$getCodonCountsPerGene(codon)
-  })
-  codonCounts <- do.call("cbind", codonCounts)
-  return(codonCounts)
-}
+
 
 
 # Uses a multinomial logistic regression to estimate the codon specific parameters for every category.
@@ -505,7 +478,7 @@ initializeCovarianceMatrices <- function(parameter, genome, numMixtures, geneAss
     if(aa == "M" || aa == "W" || aa == "X") next
     #should go away when CT is up and running
     
-    codonCounts <- getCodonCountsForAA(aa, genome)
+    codonCounts <- getCodonCountsForAA(genome, aa)
     numCodons <- dim(codonCounts)[2] - 1
     #-----------------------------------------
     # TODO WORKS CURRENTLY ONLY FOR ALLUNIQUE!
@@ -531,7 +504,7 @@ initializeCovarianceMatrices <- function(parameter, genome, numMixtures, geneAss
   # if(aa == "M" || aa == "W" || aa == "X") next
   #should go away when CT is up and running
   
-  #codonCounts <- getCodonCountsForAA(aa, genome)
+  #codonCounts <- getCodonCountsForAA(genome, aa)
   #numCodons <- dim(codonCounts)[2] - 1
   #-----------------------------------------
   # TODO WORKS CURRENTLY ONLY FOR ALLUNIQUE!

@@ -125,23 +125,21 @@ setRestartSettings.Rcpp_MCMCAlgorithm <- function(mcmc, filename, samples,
 # The true method is found in traceObject.R
 #' Convergence Test
 #' 
-#' @param trace
+#' @param object an object of either class Trace or MCMC
 #' 
-#' @param what
+#' @param n.samples number of samples at the end of the trace used to determine convergence (< length of trace)
 #' 
-#' @param mixture
+#' @param frac1 TODO
 #' 
-#' @param n.samples
+#' @param frac2 TODO
 #' 
-#' @param frac1
+#' @param thin TODO
 #' 
-#' @param frac2
+#' @param plot (logical) plot result instead of returning an object
 #' 
-#' @param plot
+#' @param ... TODO describe what and mixture parameter
 #' 
-#' @param ...
-#' 
-#' @return 
+#' @return geweke score object
 #' 
 #' @description \code{convergence.test} 
 #' 
