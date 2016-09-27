@@ -284,35 +284,63 @@ getCSPEstimates <- function(parameter, filename, CSP, mixture, samples){
 
 
 #Called from getCSPEstimates
-getCSPEstimates.Rcpp_ROCParameter <- function(parameter, filename=NULL, 
+getCSPEstimates.Rcpp_Parameter <- function(parameter, filename=NULL, 
                                               CSP="Mutation", mixture = 1, samples = 10){
-  names.aa <- aminoAcids()
   Amino_Acid <- c()
   Value <- c()
   Codon <- c()
   Std_Deviation <- vector("list")
   
-  for(aa in names.aa){
-    if(aa == "M" || aa == "W" || aa == "X") next
-    codons <- AAToCodon(aa, T)
+  if (parameter == "ROC" || parameter == "FONSE"){
+    names.aa <- aminoAcids()
     
-    for(i in 1:length(codons)){
-      Amino_Acid <- c(Amino_Acid, aa)
-      Codon <- c(Codon, codons[i])
+    for(aa in names.aa){
+      if(aa == "M" || aa == "W" || aa == "X") next
+      codons <- AAToCodon(aa, T)
+    
+      for(i in 1:length(codons)){
+        Amino_Acid <- c(Amino_Acid, aa)
+        Codon <- c(Codon, codons[i])
       
-      if(CSP == "Mutation"){
-        Value <- c(Value, parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 0, TRUE))
-        Std_Deviation <- c(Std_Deviation, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 0, c(0.025, 0.975), TRUE))
-      }
-      else if(CSP == "Selection"){
-        Value <- c(Value, parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 1, TRUE))
-        Std_Deviation <- c(Std_Deviation, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 1, c(0.025, 0.975), TRUE))
-      }
-      else {
-        stop("Unknown Parameter type given")
+        if(CSP == "Mutation"){
+          Value <- c(Value, parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 0, TRUE))
+          Std_Deviation <- c(Std_Deviation, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 0, c(0.025, 0.975), TRUE))
+        }
+        else if(CSP == "Selection"){
+          Value <- c(Value, parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 1, TRUE))
+          Std_Deviation <- c(Std_Deviation, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 1, c(0.025, 0.975), TRUE))
+        }
+        else {
+          stop("Unknown CSP type given")
+        }
       }
     }
   }
+  else if (parameter == "RFP"){
+    groupList <- parameter$getGroupList()
+
+    for(i in 1:length(groupList)){
+      aa <- codonToAA(groupList[i])
+      Codon <- c(Codon, groupList[i])
+      Amino_Acid <- c(Amino_Acid, aa)
+       
+      if(CSP == "Alpha"){
+        Value <- c(Value, parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 0, FALSE))
+        Std_Deviation <- c(Std_Deviation, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 0, c(0.025, 0.975), FALSE))
+        }
+      else if(CSP == "Lambda Prime"){
+        Value <- c(Value, parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 1, FALSE))
+        Std_Deviation <- c(Std_Deviation, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 1, c(0.025, 0.975), FALSE))
+      }
+      else {
+        stop("Unknown CSP type given")
+      }
+    }
+  }
+  else{
+    stop("Unknown Parameter type given")
+  }
+
   Std_Deviation <- matrix(unlist(Std_Deviation), nrow = 2)
   data <- data.frame(Amino_Acid, Codon, Value, Lower=Std_Deviation[1,], Upper=Std_Deviation[2,])
   colnames(data) <- c("AA", "Codon", "Posterior", "0.025%", "0.975%")
@@ -538,7 +566,7 @@ initializeCovarianceMatrices <- function(parameter, genome, numMixtures, geneAss
   #  compl.covMat[matrix.positions == matrix.positions[mut.seq[i], ofdiag.seq[i]]] <- unlist(covmat[[i]][2])
   # compl.covMat[matrix.positions == matrix.positions[ofdiag.seq[i], mut.seq[i]]] <- unlist(covmat[[i]][3])
   #}
-  #for testing - in actuallity this is used, it is currently overwriting 
+  #for testing - in actuality this is used, it is currently overwriting 
   #previous steps.
   #compl.covMat <- diag((numMutationCategory + numSelectionCategory) * numCodons) * 0.05
   #compl.covMat / max(compl.covMat)
@@ -554,6 +582,8 @@ getMixtureAssignmentEstimate <- function(parameter, gene.index, samples)
   mixtureAssignment <- unlist(lapply(gene.index,  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))
   return(mixtureAssignment)
 }
+
+
 getExpressionEstimatesForMixture <- function(parameter, gene.index, mixtureAssignment, samples)
 {
   expressionValues <- unlist(lapply(gene.index, function(geneIndex){ 
@@ -712,7 +742,7 @@ writeParameterObject.Rcpp_FONSEParameter <- function(parameter, file)
 #'  
 #' @param files The filenames where the data will be stored.
 #' 
-#' @return This function has no return value.
+#' @return parameter Returns an initialized Parameter object depending on the parameter type given.
 #' 
 #' @description \code{loadParameterObject} will call the appropriate followup
 #' call to loadXXXParameterObject based off of the parameter type 

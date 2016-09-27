@@ -246,7 +246,6 @@ int testSequenceSummary()
     //------------------------------------------//
     //------ complimentNucleotide Function------//
     //------------------------------------------//
-
     if ('T' != SequenceSummary::complimentNucleotide('A'))
     {
         my_printError("The compliment of A should be T\n");
@@ -290,7 +289,6 @@ int testSequenceSummary()
     //----------------------------------------------//
     //------ getAACountForAA(string) Function ------//
     //----------------------------------------------//
-
     if (1 != SS.getAACountForAA("M"))
     {
         my_printError("Error with getAACountForAA(string) for amino acid M. Should return 1, returns %.\n",
@@ -435,7 +433,6 @@ int testSequenceSummary()
     //--------------------------------------------//
     //------ getCodonCountsForCodon(string) ------//
     //--------------------------------------------//
-
     codon = "ATG";
     if (1 != SS.getCodonCountForCodon(codon))
     {
@@ -525,7 +522,6 @@ int testSequenceSummary()
     //----------------------------------------------------//
     //------ getCodonCountsForCodon(index) Function ------//
     //----------------------------------------------------//
-
     if (1 != SS.getCodonCountForCodon(29))
     {
         my_printError("Error with getCodonCountForCodon(index) for codon \"ATG\" (index 29).\n");
@@ -606,7 +602,6 @@ int testSequenceSummary()
     //---------------------------------------------------------------//
     //------ getRFPObserved(string) & setRFPObserved Functions ------//
     //---------------------------------------------------------------//
-
     SS.setRFPObserved(4, 35);
     SS.setRFPObserved(16,45);
     SS.setRFPObserved(54,2);
@@ -652,7 +647,6 @@ int testSequenceSummary()
     //--------------------------------------------//
     //------ getRFPObserved(index) Function ------//
     //--------------------------------------------//
-
     SS.setRFPObserved(0,45);
     SS.setRFPObserved(1,52);
     SS.setRFPObserved(2,63);
@@ -698,7 +692,6 @@ int testSequenceSummary()
     //------------------------------------------------//
     //------ getCodonPositions(string) Function ------//
     //------------------------------------------------//
-
     tmp = SS.getCodonPositions("ATG");
     if (tmp -> at(0) != 0 || tmp -> size() != 1)
     {
@@ -817,7 +810,6 @@ int testSequenceSummary()
     //-----------------------------------------------//
     //------ getCodonPositions(index) Function ------//
     //-----------------------------------------------//
-
     tmp = SS.getCodonPositions(29);
     if (tmp -> at(0) != 0 || tmp -> size() != 1)
     {
@@ -932,14 +924,15 @@ int testSequenceSummary()
     else
         error = 0; //Reset for next function.
 
-    //----------------------------------------//
-    //------ get/setRFP_count Functions ------//
-    //----------------------------------------//
-    std::vector <unsigned> tmp2 = SS.getRFP_count();
+    //---------------------------------------------//
+    //------ init/get/setRFP_count Functions ------//
+    //---------------------------------------------//
+    SS.initRFP_count(1);
+    std::vector <unsigned> tmp2 = SS.getRFP_count(0);
 
     if (0 != tmp2.size())
     {
-        my_printError("Error with getRFP_count. Function should return an empty vector but returns:\n");
+        my_printError("Error with initRFP_count or getRFP_count. Function should return an empty vector but returns:\n");
         for (unsigned i = 0; i < tmp2.size(); i++)
         {
             my_printError("%\n", tmp2[i]);
@@ -949,11 +942,12 @@ int testSequenceSummary()
     }
 
     tmp2 = {1, 2, 3, 4, 5};
-    SS.setRFP_count(tmp2);
+    SS.setRFP_count(0, tmp2);
 
-    if (SS.getRFP_count() != tmp2)
+    if (SS.getRFP_count(0) != tmp2)
     {
-        my_printError("Error in getRFP_count or setRFP_count. Function should return 1, 2, 3, 4, 5, but returns:\n");
+        my_printError("Error in initRFP_count, getRFP_count or setRFP_count.\n");
+        my_printError("Function should return 1, 2, 3, 4, 5, but returns:\n");
         for (unsigned i = 0; i < tmp2.size(); i++)
         {
             my_printError("%\n", tmp2[i]);
@@ -963,8 +957,53 @@ int testSequenceSummary()
     }
 
     if (!error)
-        my_print("Sequence Summary get/setRFP_count --- Pass\n");
+        my_print("Sequence Summary init/get/setRFP_count --- Pass\n");
+    else
+        error = 0; //Reset for next function.
 
+    //------------------------------------------------//
+    //------ init/get/setSumRFP_count Functions ------//
+    //------------------------------------------------//
+    SS.initSumRFP_count(1);
+    std::array <unsigned, 64> tmp3 = SS.getSumRFP_count(0);
+    std::array <unsigned, 64> empty;
+    empty.fill(0);
+
+    if (tmp3 != empty)
+    {
+        my_printError("Error with initSumRFP_count or getSumRFP_count.\n");
+        my_printError("Function should return an array filled with zeroes but returns:\n");
+        for (unsigned i = 0; i < tmp3.size(); i++)
+        {
+            if (tmp3[i] != 0) my_printError("For index %, value %\n", i, tmp3[i]);
+        }
+        error = 1;
+        globalError = 1;
+    }
+
+    tmp3[4] = 5;
+    tmp3[16] = 9;
+    tmp3[24] = 6;
+    tmp3[18] = 2;
+    tmp3[47] = 0;
+
+    SS.setSumRFP_count(0, tmp3);
+
+    if (SS.getSumRFP_count(0) != tmp3)
+    {
+        my_printError("Error in initSumRFP_count, getSumRFP_count or setSumRFP_count\n.");
+        my_printError("Function should return the index, value pairs: 4, 5; 16, 9; 24, 6; 18, 2; 47, 0 but returns:\n");
+        my_printError("4, %\n", tmp3[4]);
+        my_printError("16, %\n", tmp3[16]);
+        my_printError("24, %\n", tmp3[24]);
+        my_printError("18, %\n", tmp3[18]);
+        my_printError("27, %\n", tmp3[47]);
+        error = 1;
+        globalError = 1;
+    }
+
+    if (!error)
+        my_print("Sequence Summary init/get/setSumRFP_count --- Pass\n");
     // No need to reset error
 
     return globalError;
@@ -990,7 +1029,7 @@ int testGene()
 
     if (testGene.getId() != "testGene")
     {
-        my_printError("Error in setId or getId.\n");
+        my_printError("Error in testGene: setId or getId.\n");
         globalError = 1;
     }
     else
@@ -1003,7 +1042,7 @@ int testGene()
 
     if (testGene.getDescription() != "Test Gene for Unit Testing")
     {
-        my_printError("Error in setDescription or getDescription.\n");
+        my_printError("Error in testGene: setDescription or getDescription.\n");
         globalError = 1;
     }
     else
@@ -1016,25 +1055,93 @@ int testGene()
 
     if (testGene.getSequence() != "ATGCTCATTCTCACTGCTGCCTCGTAG")
     {
-        my_printError("Error in setSequence or getSequence.\n");
+        my_printError("Error in testGene: setSequence or getSequence.\n");
         globalError = 1;
     }
     else
         my_print("Gene get/setSequence --- Pass\n");
 
-    //----------------------------------------//
-    //------ get/addRFP_count Functions ------//
-    //----------------------------------------//
-    std::vector <unsigned> rfp_counts = {0, 1, 1};
+    //---------------------------------------------//
+    //------ init/get/setRFP_count Functions ------//
+    //---------------------------------------------//
+    testGene.initRFP_count(1);
+    std::vector <unsigned> rfp_counts = testGene.getRFP_count(0);
 
-    testGene.addRFP_count(rfp_counts);
-    if (testGene.getRFP_count() != rfp_counts)
+    if (0 != rfp_counts.size())
     {
-        my_printError("Error in getRFP_count or addRFP_count.\n");
+        my_printError("Error in testGene: initRFP_count or getRFP_count.\n");
+        my_printError("Function should return an empty vector but returns:\n");
+        for (unsigned i = 0; i < rfp_counts.size(); i++)
+        {
+            my_printError("%\n", rfp_counts[i]);
+        }
+        error = 1;
         globalError = 1;
     }
+
+    rfp_counts = {0, 1, 1};
+    testGene.setRFP_count(0, rfp_counts);
+
+    if (testGene.getRFP_count(0) != rfp_counts)
+    {
+        my_printError("Error in testGene: initRFP_count, getRFP_count or setRFP_count.\n");
+        my_printError("Function should return 0, 1, 1, but returns:\n");
+        for (unsigned i = 0; i < rfp_counts.size(); i++)
+        {
+            my_printError("%\n", rfp_counts[i]);
+        }
+        error = 1;
+        globalError = 1;
+    }
+
+    if (!error)
+        my_print("Gene init/get/setRFP_count --- Pass\n");
     else
-        my_print("Gene get/addRFP_count --- Pass\n");
+        error = 0; //Reset for next function.
+
+    //------------------------------------------------//
+    //------ init/get/setSumRFP_count Functions ------//
+    //------------------------------------------------//
+    testGene.initSumRFP_count(1);
+    std::array <unsigned, 64> sumRFP_counts = testGene.getSumRFP_count(0);
+    std::array <unsigned, 64> empty;
+    empty.fill(0);
+
+    if (sumRFP_counts != empty)
+    {
+        my_printError("Error in testGene: initSumRFP_count or getSumRFP_count.\n");
+        my_printError("Function should return an array filled with zeroes but returns:\n");
+        for (unsigned i = 0; i < sumRFP_counts.size(); i++)
+        {
+            if (sumRFP_counts[i] != 0) my_printError("For index %, value %\n", i, sumRFP_counts[i]);
+        }
+        error = 1;
+        globalError = 1;
+    }
+
+    sumRFP_counts[4] = 5;
+    sumRFP_counts[16] = 9;
+    sumRFP_counts[24] = 6;
+    sumRFP_counts[18] = 2;
+    sumRFP_counts[47] = 0;
+
+    testGene.setSumRFP_count(0, sumRFP_counts);
+
+    if (testGene.getSumRFP_count(0) != sumRFP_counts)
+    {
+        my_printError("Error in testGene: initSumRFP_count, getSumRFP_count or setSumRFP_count\n.");
+        my_printError("Function should return the index, value pairs: 4, 5; 16, 9; 24, 6; 18, 2; 47, 0 but returns:\n");
+        my_printError("4, %\n", sumRFP_counts[4]);
+        my_printError("16, %\n", sumRFP_counts[16]);
+        my_printError("24, %\n", sumRFP_counts[24]);
+        my_printError("18, %\n", sumRFP_counts[18]);
+        my_printError("27, %\n", sumRFP_counts[47]);
+        error = 1;
+        globalError = 1;
+    }
+
+    if (!error)
+        my_print("Gene init/get/setSumRFP_count --- Pass\n");
 
     //-----------------------------------------//
     //------ getSequenceSummary Function ------//
@@ -1045,7 +1152,7 @@ int testGene()
     {
         if (SS.getCodonCountForCodon(i) != GeneSS->getCodonCountForCodon(i))
         {
-            my_printError("Error with getSequenceSummary. Codon counts are incorrect for codon %, %.\n",
+            my_printError("Error in testGene: getSequenceSummary. Codon counts are incorrect for codon %, %.\n",
                           i, SequenceSummary::codonArray[i]);
             my_printError("Should return %, but returns %\n", SS.getCodonCountForCodon(i), GeneSS->getCodonCountForCodon(i));
             error = 1;
@@ -1057,7 +1164,7 @@ int testGene()
     {
         if (SS.getRFPObserved(i) != GeneSS->getRFPObserved(i))
         {
-            my_printError("Error with getSequenceSummary. RFP observed is incorrect for codon %.\n", i);
+            my_printError("Error in testGene: getSequenceSummary. RFP observed is incorrect for codon %.\n", i);
             my_printError("Should return %, but returns %\n", SS.getRFPObserved(i), GeneSS->getRFPObserved(i));
             error = 1;
             globalError = 1;
@@ -1073,7 +1180,7 @@ int testGene()
         Gvec = GeneSS->getCodonPositions(i);
         if (SSvec->size() != Gvec->size())
         {
-            my_printError("Error with getSequenceSummary. Codon positions are incorrect.\n");
+            my_printError("Error in testGene: getSequenceSummary. Codon positions are incorrect.\n");
             my_printError("Information in compared vectors are not of equal size.\n");
             error = 1;
             globalError = 1;
@@ -1084,7 +1191,7 @@ int testGene()
             {
                 if (SSvec->at(j) != Gvec->at(j))
                 {
-                    my_printError("Error with getSequenceSummary. Codon positions are incorrect for codon %.\n", i);
+                    my_printError("Error in testGene: getSequenceSummary. Codon positions are incorrect for codon %.\n", i);
                     my_printError("Should return %, but returns %\n", SSvec->at(j), Gvec->at(j));
                     error = 1;
                     globalError = 1;
@@ -1098,7 +1205,7 @@ int testGene()
     {
         if (SS.getAACountForAA(i) != GeneSS->getAACountForAA(i))
         {
-            my_printError("Error with getSequenceSummary. AA counts are incorrect for amino acid %.\n", i);
+            my_printError("Error in testGene: getSequenceSummary. AA counts are incorrect for amino acid %.\n", i);
             my_printError("Should return %, but returns %\n", SS.getAACountForAA(i), GeneSS->getAACountForAA(i));
             error = 1;
             globalError = 1;
@@ -1117,7 +1224,8 @@ int testGene()
 
     if (0 != tmp.size())
     {
-        my_printError("Error with getObservedSynthesisRateValues. Function should return an empty vector but returns:\n");
+        my_printError("Error in testGene: getObservedSynthesisRateValues.\n");
+        my_printError("Function should return an empty vector but returns:\n");
         for (unsigned i = 0; i < tmp.size(); i++)
         {
             my_printError("%\n", tmp[i]);
@@ -1131,7 +1239,8 @@ int testGene()
 
     if (testGene.getObservedSynthesisRateValues() != tmp)
     {
-        my_printError("Error in getObservedSynthesisRateValues or setObservedSynthesisRateValues. Function should return 2.34, 3.234, 0.123, but returns:\n");
+        my_printError("Error in testGene: getObservedSynthesisRateValues or setObservedSynthesisRateValues.\n");
+        my_printError("Function should return 2.34, 3.234, 0.123, but returns:\n");
         for (unsigned i = 0; i < tmp.size(); i++)
         {
             my_printError("%\n", tmp[i]);
@@ -1150,7 +1259,7 @@ int testGene()
     //--------------------------------------------------//
     if (3 != testGene.getNumObservedSynthesisSets())
     {
-        my_printError("Error with getNumObservedSynthesisSets. Function should return 3, but returns %.\n",
+        my_printError("Error in testGene: getNumObservedSynthesisSets. Function should return 3, but returns %.\n",
                       testGene.getNumObservedSynthesisSets());
         globalError = 1;
     }
@@ -1167,7 +1276,7 @@ int testGene()
     {
         if (testGene.getObservedSynthesisRate(i) != tmp[i])
         {
-            my_printError("Error with getObservedSynthesisRate. Function should return % at index %, but returns %.\n",
+            my_printError("Error in testGene: getObservedSynthesisRate. Function should return % at index %, but returns %.\n",
                           tmp[i], i, testGene.getObservedSynthesisRate(i));
             error = 1;
             globalError = 1;
@@ -1184,49 +1293,49 @@ int testGene()
     //--------------------------------------//
     if ('A' != testGene.getNucleotideAt(0))
     {
-        my_printError("Error with getNucleotideAt. At index 0, the return value should be 'A', but is %.\n",
+        my_printError("Error in testGene: getNucleotideAt. At index 0, the return value should be 'A', but is %.\n",
                       testGene.getNucleotideAt(0));
         error = 1;
         globalError = 1;
     }
     if ('T' != testGene.getNucleotideAt(1))
     {
-        my_printError("Error with getNucleotideAt. At index 1, the return value should be 'T', but is %.\n",
+        my_printError("Error in testGene: getNucleotideAt. At index 1, the return value should be 'T', but is %.\n",
                       testGene.getNucleotideAt(1));
         error = 1;
         globalError = 1;
     }
     if ('G' != testGene.getNucleotideAt(2))
     {
-        my_printError("Error with getNucleotideAt. At index 2, the return value should be 'G', but is %.\n",
+        my_printError("Error in testGene: getNucleotideAt. At index 2, the return value should be 'G', but is %.\n",
                       testGene.getNucleotideAt(2));
         error = 1;
         globalError = 1;
     }
     if ('C' != testGene.getNucleotideAt(3))
     {
-        my_printError("Error with getNucleotideAt. At index 3, the return value should be 'C', but is %.\n",
+        my_printError("Error in testGene: getNucleotideAt. At index 3, the return value should be 'C', but is %.\n",
                       testGene.getNucleotideAt(3));
         error = 1;
         globalError = 1;
     }
     if ('T' != testGene.getNucleotideAt(10))
     {
-        my_printError("Error with getNucleotideAt. At index 10, the return value should be 'T', but is %.\n",
+        my_printError("Error in testGene: getNucleotideAt. At index 10, the return value should be 'T', but is %.\n",
                       testGene.getNucleotideAt(10));
         error = 1;
         globalError = 1;
     }
     if ('G' != testGene.getNucleotideAt(23))
     {
-        my_printError("Error with getNucleotideAt. At index 23, the return value should be 'G', but is %.\n",
+        my_printError("Error in testGene: getNucleotideAt. At index 23, the return value should be 'G', but is %.\n",
                       testGene.getNucleotideAt(23));
         error = 1;
         globalError = 1;
     }
     if ('G' != testGene.getNucleotideAt(26))
     {
-        my_printError("Error with getNucleotideAt. At index 26, the return value should be 'G', but is %.\n",
+        my_printError("Error in testGene: getNucleotideAt. At index 26, the return value should be 'G', but is %.\n",
                       testGene.getNucleotideAt(26));
         error = 1;
         globalError = 1;
@@ -1245,7 +1354,7 @@ int testGene()
         my_print("Gene length --- Pass\n");
     else
     {
-        my_printError("Error with length. Should return % but returns: %.\n",
+        my_printError("Error in testGene: length. Should return % but returns: %.\n",
                       strlen("ATGCTCATTCTCACTGCTGCCTCGTAG"), testGene.length());
         globalError = 1;
     }
@@ -1259,7 +1368,7 @@ int testGene()
         my_print("Gene reverseComplement --- Pass\n");
     else
     {
-        my_printError("Error with reverseComplement. Should return \"CTACGAGGCAGCAGTGAGAATGAGCAT\" but returns: %.\n",
+        my_printError("Error in testGene: reverseComplement. Should return \"CTACGAGGCAGCAGTGAGAATGAGCAT\" but returns: %.\n",
                       tmpGene.getSequence());
         globalError = 1;
     }
@@ -1271,7 +1380,8 @@ int testGene()
         my_print("Gene toAASequence --- Pass\n");
     else
     {
-        my_printError("Error with toAASequence. Should return \"MLILTAASX\", but returns: %\n", testGene.toAASequence());
+        my_printError("Error in testGene: toAASequence. Should return \"MLILTAASX\", but returns: %\n",
+                      testGene.toAASequence());
         globalError = 1;
     }
 
@@ -1281,19 +1391,20 @@ int testGene()
     testGene.clear();
     if ("" != testGene.getId())
     {
-        my_printError("Error with clear. Gene Id should be blank, but is %.\n", testGene.getId());
+        my_printError("Error in testGene: clear. Gene Id should be blank, but is %.\n", testGene.getId());
         error = 1;
         globalError = 1;
     }
     if ("" != testGene.getDescription())
     {
-        my_printError("Error with clear. Gene description should be blank, but is %.\n", testGene.getDescription());
+        my_printError("Error in testGene: clear. Gene description should be blank, but is %.\n",
+                      testGene.getDescription());
         error = 1;
         globalError = 1;
     }
     if ("" != testGene.getSequence())
     {
-        my_printError("Error with clear. Gene sequence should be blank, but is %.\n", testGene.getSequence());
+        my_printError("Error in testGene: clear. Gene sequence should be blank, but is %.\n", testGene.getSequence());
         error = 1;
         globalError = 1;
     }
@@ -1312,7 +1423,7 @@ int testGene()
  * Performs Unit Testing on functions within Genome.cpp
  * that are not exposed to RCPP already.
  * Returns 0 if successful, 1 if error found.
-*/
+ */
 int testGenome(std::string testFileDir)
 {
     Genome genome;
@@ -1347,14 +1458,14 @@ int testGenome(std::string testFileDir)
 
     if (!(test == g1 && test2 == g1)) //checking both by string and index
     {
-        my_printError("Error in addGene or getGene with genes.\n");
+        my_printError("Error in testGenome: addGene or getGene with genes.\n");
         error = 1;
         globalError = 1;
     }
 
     if (!(test3 == s1 && test4 == s1)) //checking both by string and index
     {
-        my_printError("Error in addGene or getGene with simulated genes.\n");
+        my_printError("Error in testGenome: addGene or getGene with simulated genes.\n");
         error = 1;
         globalError = 1;
     }
@@ -1372,7 +1483,7 @@ int testGenome(std::string testFileDir)
 
     if (!(testVec == genome.getGenes(false)))
     {
-        my_printError("Error in getGenes(false).\n");
+        my_printError("Error in testGenome: getGenes(false).\n");
         error = 1;
         globalError = 1;
     }
@@ -1382,7 +1493,7 @@ int testGenome(std::string testFileDir)
 
     if (!(testVec == genome.getGenes(true)))
     {
-        my_printError("Error in getGenes(true).\n");
+        my_printError("Error in testGenome: getGenes(true).\n");
         error = 1;
         globalError = 1;
     }
@@ -1403,7 +1514,7 @@ int testGenome(std::string testFileDir)
         my_print("Genome get/setNumGenesWithPhi --- Pass\n");
     else
     {
-        my_printError("Error in setNumGenesWithPhi or getNumGenesWithPhi.\n");
+        my_printError("Error in testGenome: setNumGenesWithPhi or getNumGenesWithPhi.\n");
         globalError = 1;
     }
 
@@ -1414,7 +1525,7 @@ int testGenome(std::string testFileDir)
     {
         if (genome.getNumGenesWithPhiForIndex(i) != i)
         {
-            my_printError("Error in getNumGenesWithPhiForIndex with index %. Should return %, but instead returns %.\n",
+            my_printError("Error in testGenome: getNumGenesWithPhiForIndex with index %. Should return %, but instead returns %.\n",
                           i, i, genome.getNumGenesWithPhiForIndex(i));
             error = 1;
             globalError = 1;
@@ -1431,14 +1542,16 @@ int testGenome(std::string testFileDir)
     //------------------------------------//
     if (1 != genome.getGenomeSize(false))
     {
-        my_printError("Error in getGenomesize(false). Should return 1, but returns %.\n", genome.getGenomeSize(false));
+        my_printError("Error in testGenome: getGenomesize(false). Should return 1, but returns %.\n",
+                      genome.getGenomeSize(false));
         error = 1;
         globalError = 1;
     }
 
     if (1 != genome.getGenomeSize(true))
     {
-        my_printError("Error in getGenomesize(true). Should return 1, but returns %.\n", genome.getGenomeSize(true));
+        my_printError("Error in testGenome: getGenomesize(true). Should return 1, but returns %.\n",
+                      genome.getGenomeSize(true));
         error = 1;
         globalError = 1;
     }
@@ -1456,7 +1569,7 @@ int testGenome(std::string testFileDir)
     uVector = {1};
     if (uVector != genome.getCodonCountsPerGene("ATG"))
     {
-        my_printError("Error in getCodonCountsPerGene with a single gene.\n");
+        my_printError("Error in testGenome: getCodonCountsPerGene with a single gene.\n");
         error = 1;
         globalError = 1;
     }
@@ -1468,7 +1581,7 @@ int testGenome(std::string testFileDir)
 
     if (uVector != genome.getCodonCountsPerGene("GAT"))
     {
-        my_printError("Error in getCodonCountsPerGene with three genes.\n");
+        my_printError("Error in testGenome: getCodonCountsPerGene with three genes.\n");
         error = 1;
         globalError = 1;
     }
@@ -1496,7 +1609,7 @@ int testGenome(std::string testFileDir)
         my_print("Genome clear --- Pass\n");
     else
     {
-        my_printError("Error in clear. Genome is not empty.\n");
+        my_printError("Error in testGenome: clear. Genome is not empty.\n");
         globalError = 1;
     }
 
@@ -1504,9 +1617,9 @@ int testGenome(std::string testFileDir)
      * Other and File I/O Functions:
      * getGenomeForGeneIndices
      * readFasta
-     * readPANSEFile
+     * readPAFile
      * readObservedPhiValues
-    */
+     */
 
     //-----------------------------------------------//
     //------ getGenomeForGeneIndices Function ------//
@@ -1523,7 +1636,7 @@ int testGenome(std::string testFileDir)
 
     if (!(genome == genome.getGenomeForGeneIndices(uVector, false)))
     {
-        my_printError("Error in getGenomeForGeneIndices with genes.\n");
+        my_printError("Error in testGenome: getGenomeForGeneIndices with genes.\n");
         error = 1;
         globalError = 1;
     }
@@ -1541,7 +1654,7 @@ int testGenome(std::string testFileDir)
 
     if (!(genome == genome.getGenomeForGeneIndices(uVector, true)))
     {
-        my_printError("Error in getGenomeForGeneIndices with simulated genes.\n");
+        my_printError("Error in testGenome: getGenomeForGeneIndices with simulated genes.\n");
         error = 1;
         globalError = 1;
     }
@@ -1569,7 +1682,7 @@ int testGenome(std::string testFileDir)
         my_print("Genome readFasta --- Pass\n");
     else
     {
-        my_printError("Error in readFasta. Genomes are not equivalent.\n");
+        my_printError("Error in testGenome: readFasta. Genomes are not equivalent.\n");
         globalError = 1;
     }
 
@@ -1577,8 +1690,7 @@ int testGenome(std::string testFileDir)
     //------ writeFasta Function ------//
     //---------------------------------//
 
-    // Now write a genome described above in readFasta to a file, read it in
-    // again, and then compare its validity again.
+    // Now write a genome described above in readFasta to a file, read it in again, and then compare its validity again.
     testGenome.clear();
 
     file = testFileDir + "/" + "writeFasta.fasta";
@@ -1587,7 +1699,7 @@ int testGenome(std::string testFileDir)
 
     if (!(genome == testGenome))
     {
-        my_printError("Error in writeFasta with genes. Genomes are not equivalent.\n");
+        my_printError("Error in testGenome: writeFasta with genes. Genomes are not equivalent.\n");
         error = 1;
         globalError = 1;
     }
@@ -1602,11 +1714,11 @@ int testGenome(std::string testFileDir)
 
     genome.writeFasta(file, true);
 
-    // Note that while these genes were originally simulated, they are printed
-    // as non-simulated genes.
-    // It is up to the user to know that they were simulated, but they will
-    // now be read in as non-simulated genes (and Unit Testing will compare their validity as such)
-
+    /* Note that while these genes were originally simulated, they are printed
+     * as non-simulated genes.
+     * It is up to the user to know that they were simulated, but they will
+     * now be read in as non-simulated genes (and Unit Testing will compare their validity as such)
+     */
     testGenome.readFasta(file, true);
 
     genome.clear();
@@ -1616,7 +1728,7 @@ int testGenome(std::string testFileDir)
 
     if (!(genome == testGenome))
     {
-        my_printError("Error in writeFasta with simulated genes. Genomes are not equivalent.\n");
+        my_printError("Error in testGenome: writeFasta with simulated genes. Genomes are not equivalent.\n");
         error = 1;
         globalError = 1;
     }
@@ -1651,7 +1763,7 @@ int testGenome(std::string testFileDir)
         my_print("Genome readRFPFile --- Pass\n");
     else
     {
-        my_printError("Error in readRFPFile. Genomes are not equivalent.\n");
+        my_printError("Error in testGenome: readRFPFile. Genomes are not equivalent.\n");
         globalError = 1;
     }
 
@@ -1659,8 +1771,7 @@ int testGenome(std::string testFileDir)
     //------ writeRFPFile Function ------//
     //-----------------------------------//
 
-    /* Now write a genome described above in readRFPFile to a file, read it in
-    // again, and then compare its validity again. */
+    // Now write a genome described above in readRFPFile to a file, read it in again, and then compare its validity again.
     testGenome.clear();
 
     file = testFileDir + "/" + "writeRFP.csv";
@@ -1669,7 +1780,7 @@ int testGenome(std::string testFileDir)
 
     if (!(genome == testGenome))
     {
-        my_printError("Error in writeRFPFile with genes. Genomes are not equivalent.\n");
+        my_printError("Error in testGenome: writeRFPFile with genes. Genomes are not equivalent.\n");
         error = 1;
         globalError = 1;
     }
@@ -1685,9 +1796,10 @@ int testGenome(std::string testFileDir)
     genome.writeRFPFile(file, true);
 
     /* Note that while these genes were originally simulated, they are printed
-    // as non-simulated genes.
-    // It is up to the user to know that they were simulated, but they will
-    // now be read in as non-simulated genes (and Unit Testing will compare their validity as such) */
+     * as non-simulated genes.
+     * It is up to the user to know that they were simulated, but they will
+     * now be read in as non-simulated genes (and Unit Testing will compare their validity as such)
+     */
 
     genome.clear();
     genome.addGene(rfp1, false);
@@ -1698,7 +1810,7 @@ int testGenome(std::string testFileDir)
 
     if (!(genome == testGenome))
     {
-        my_printError("Error in writeRFPFile with simulated genes. Genomes are not equivalent.\n");
+        my_printError("Error in testGenome: writeRFPFile with simulated genes. Genomes are not equivalent.\n");
         error = 1;
         globalError = 1;
     }
@@ -1708,37 +1820,101 @@ int testGenome(std::string testFileDir)
     else
         error = 0; //Reset for next function.
 
-    //------------------------------------//
-    //------ readPANSEFile Function ------//
-    //------------------------------------//
+    //TODO: Distinguish this as PANSE only
+    //---------------------------------//
+    //------ readPAFile Function ------//
+    //---------------------------------//
     genome.clear();
     testGenome.clear();
 
-    file = testFileDir + "/" + "readPANSE.csv";
-    genome.readPANSEFile(file);
+    file = testFileDir + "/" + "readPAMulti.pa";
+    genome.readPAFile(file);
 
-    Gene panse1("CTTGCTATTTTT", "TEST001", "No description for PANSE Model");
-    Gene panse2("CCTGTAATTTGG", "TEST002", "No description for PANSE Model");
+    Gene panse1("CTTGCTATTTTTTTT", "TEST001", "No description for PANSE Model");
+    Gene panse2("CCTGTAATTTGGTGG", "TEST002", "No description for PANSE Model");
 
-    std::vector <unsigned> tmp1 = {0, 2, 0, 0};
-    std::vector <unsigned> tmp2 = {0, 0, 1, 1};
+    // RFP_Count for TEST001: value[position] = RFP_count
+    std::vector <unsigned> test1Cat1 = {0, 0, 2, 0, 1};
+    std::vector <unsigned> test1Cat2 = {0, 17, 0, 1, 4};
 
-    panse1.addRFP_count(tmp1);
-    panse2.addRFP_count(tmp2);
+    // RFP_Count for TEST002: value[position] = RFP_count
+    std::vector <unsigned> test2Cat1 = {1, 1, 0, 0, 1};
+    std::vector <unsigned> test2Cat2 = {2, 0, 2, 3, 6};
+
+    std::string codon;
+    int index;
+
+    // sumRFP_Count for TEST001
+    std::array <unsigned, 64> sumTest1Cat1;
+    std::array <unsigned, 64> sumTest1Cat2;
+    sumTest1Cat1.fill(0);
+    sumTest1Cat2.fill(0);
+
+    // sumRFP_Count for TEST002
+    std::array <unsigned, 64> sumTest2Cat1;
+    std::array <unsigned, 64> sumTest2Cat2;
+    sumTest2Cat1.fill(0);
+    sumTest2Cat2.fill(0);
+
+    // hard-coded values derived from summing readPAMulti.pa
+    codon = "GCT";
+    index = SequenceSummary::codonToIndex(codon);
+    sumTest1Cat2[index] = 17;
+
+    codon = "ATT";
+    index = SequenceSummary::codonToIndex(codon);
+    sumTest1Cat1[index] = 2;
+    sumTest2Cat2[index] = 2;
+
+    codon = "TTT";
+    index = SequenceSummary::codonToIndex(codon);
+    sumTest1Cat1[index] = 1;
+    sumTest1Cat2[index] = 5;
+
+    codon = "CCT";
+    index = SequenceSummary::codonToIndex(codon);
+    sumTest2Cat1[index] = 1;
+    sumTest2Cat2[index] = 2;
+
+    codon = "GTA";
+    index = SequenceSummary::codonToIndex(codon);
+    sumTest2Cat1[index] = 1;
+
+    codon = "TGG";
+    index = SequenceSummary::codonToIndex(codon);
+    sumTest2Cat1[index] = 1;
+    sumTest2Cat2[index] = 9;
+
+    panse1.initRFP_count(2);
+    panse2.initRFP_count(2);
+
+    panse1.initSumRFP_count(2);
+    panse2.initSumRFP_count(2);
+
+    panse1.setRFP_count(0, test1Cat1);
+    panse1.setRFP_count(1, test1Cat2);
+    panse2.setRFP_count(0, test2Cat1);
+    panse2.setRFP_count(1, test2Cat2);
+
+    panse1.setSumRFP_count(0, sumTest1Cat1);
+    panse1.setSumRFP_count(1, sumTest1Cat2);
+    panse2.setSumRFP_count(0, sumTest2Cat1);
+    panse2.setSumRFP_count(1, sumTest2Cat2);
 
     testGenome.addGene(panse1, false);
     testGenome.addGene(panse2, false);
 
     if (genome == testGenome)
-        my_print("Genome readPANSE --- Pass\n");
+        my_print("Genome readPA --- Pass\n");
     else
     {
-        my_printError("Error in readPANSE. Genomes are not equivalent.\n");
+        my_printError("Error in testGenome: readPA. Genomes are not equivalent.\n");
         globalError = 1;
     }
 
+    //TODO
     //-------------------------------------//
-    //------ writePANSEFile Function ------//
+    //------ writePAFile Function ------//
     //-------------------------------------//
 
     /* readObservedPhiValues Testing Function
@@ -1748,7 +1924,13 @@ int testGenome(std::string testFileDir)
      * once for byID and once for byIndex.
      *
      * Significant standard error output is produced by design: both files exhibit some errors.
-    */
+     */
+
+    /* TODO NOTE: This testing function has been disabled for tester convenience.
+     * It purposefully spits out a half-dozen glaring red error messages, which may
+     * be confusing when checking for actual red error messages.
+     */
+    /*
     //--------------------------------------------//
     //------ readObservedPhiValues Function ------//
     //--------------------------------------------//
@@ -1780,7 +1962,7 @@ int testGenome(std::string testFileDir)
 
     if (!(genome == testGenome))
     {
-        my_printError("Error comparing genomes: readObservedPhiValues.csv ");
+        my_printError("Error in testGenome comparing genomes: readObservedPhiValues.csv ");
         my_printError("by ID produces a different genome than expected.\n");
         error = 1;
         globalError = 1;
@@ -1802,7 +1984,7 @@ int testGenome(std::string testFileDir)
 
     if (!(genome == testGenome))
     {
-        my_printError("Error comparing genomes: readObservedPhiValues.csv ");
+        my_printError("Error in testGenome comparing genomes: readObservedPhiValues.csv ");
         my_printError("by index produces a different genome than expected.\n");
         error = 1;
         globalError = 1;
@@ -1832,7 +2014,7 @@ int testGenome(std::string testFileDir)
 
     if (!(genome == testGenome))
     {
-        my_printError("Error comparing genomes: readObservedPhiValuesError.csv ");
+        my_printError("Error in testGenome comparing genomes: readObservedPhiValuesError.csv ");
         my_printError("by ID produces a different genome than expected.\n");
         error = 1;
         globalError = 1;
@@ -1851,7 +2033,7 @@ int testGenome(std::string testFileDir)
 
     if (!(genome == testGenome))
     {
-        my_printError("Error comparing genomes: readObservedPhiValuesError.csv ");
+        my_printError("Error in testGenome comparing genomes: readObservedPhiValuesError.csv ");
         my_printError("by index produces a different genome than expected.\n");
         error = 1;
         globalError = 1;
@@ -1861,6 +2043,7 @@ int testGenome(std::string testFileDir)
     if (!error)
         my_print("Genome readObservedPhiValues --- Pass\n");
     // No need to reset error
+     */
 
     return globalError;
 }

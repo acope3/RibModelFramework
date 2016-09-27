@@ -40,7 +40,7 @@ class Genome
 		void writeFasta(std::string filename, bool simulated = false);
 		void readRFPFile(std::string filename);
 		void writeRFPFile(std::string filename, bool simulated = false);
-		void readPANSEFile(std::string filename, bool Append = false);
+		void readPAFile(std::string filename, bool Append = false);
 		//TODO: Add writePANSEFile function
 		void readObservedPhiValues(std::string filename, bool byId = true);
 

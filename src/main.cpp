@@ -666,6 +666,12 @@ int main()
 {
 	std::string pathBegin = "/Users/hollisbui/";
 
+	unsigned numMixtures = 1;
+	std::vector<double> sphi_init(numMixtures, 2);
+	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
+
+	// SIMULATE GENOME: RFP
+	/*
 	Genome genome;
 	//genome.readFasta(pathBegin + "HollisTestingData/s288c.genome.fasta");
 	genome.readRFPFile(pathBegin + "HollisTestingData/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
@@ -674,9 +680,6 @@ int main()
 	{
 		geneAssignment[i] = 0u;
 	}
-	unsigned numMixtures = 1;
-	std::vector<double> sphi_init(numMixtures, 2);
-	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 
 	RFPParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
 
@@ -697,6 +700,7 @@ int main()
 	model.simulateGenome(genome);
 	genome.writeRFPFile(pathBegin + "HollisTestingOut/HollisSimulatedGenome2.csv", true);
 	exit(1);
+	*/
 
 	// UNIT TESTING
 	//testUtility();

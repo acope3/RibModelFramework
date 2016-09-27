@@ -169,6 +169,8 @@ std::string Gene::getSequence()
  * is processed and set. If not, it is not processed.
  * NOTE: The seq string will still be set, even if it is invalid.
  * NOTE: As part of changing the sequence, the sequence summary is also cleared.
+ * IMPORTANT NOTE: When programming in C as a result, always modify the sequence summary AFTER setting
+ * the Sequence.
 */
 void Gene::setSequence(std::string _seq)
 {
@@ -188,16 +190,26 @@ void Gene::setSequence(std::string _seq)
     }
 }
 
-
-std::vector <unsigned> Gene::getRFP_count()
+// TODO NOTES
+void Gene::setPASequence(std::vector<std::vector<unsigned>> table)
 {
-    return geneData.getRFP_count();
-}
+    geneData.clear();
+    // Table format: Each line of input from a .csv (.pa) file, ordered:
+    // unknown size table (nRows, aka table.size()), each row a vector:
+    // position, codon, category1, ... (may be more than one category)
 
+    unsigned nRows = (unsigned)table.size();
 
-void Gene::addRFP_count(std::vector <unsigned> RFP_counts)
-{
-    geneData.setRFP_count(RFP_counts);
+    seq.resize(nRows * 3); //multiply by three since codons
+    for (unsigned i = 0; i < nRows; i++)
+    {
+        std::string codon = SequenceSummary::indexToCodon(table[i][1]);
+        seq.replace(table[i][0] * 3, 3, codon);
+    }
+
+    // Call processPA with a checking error statement printed if needed.
+    if (!geneData.processPA(table))
+        my_printError("WARNING: Error with gene %\nBad codons found!\n", id);
 }
 
 
@@ -250,7 +262,7 @@ double Gene::getObservedSynthesisRate(unsigned index)
 */
 unsigned Gene::getNumObservedSynthesisSets()
 {
-	return observedSynthesisRateValues.size();
+	return (unsigned)observedSynthesisRateValues.size();
 }
 
 
@@ -262,6 +274,86 @@ unsigned Gene::getNumObservedSynthesisSets()
 char Gene::getNucleotideAt(unsigned i)
 {
     return seq[i];
+}
+
+
+
+
+
+//-----------------------------------//
+//---------- RFP Functions ----------//
+//-----------------------------------//
+
+
+/* initRFP_count (NOT EXPOSED)
+ * Arguments: A number representing the number of RFP categories.
+ * Initializes the vector of vectors that describes, for each category, the RFP_count vector.
+ * Note: When programming in C, this function MUST be called before setRFP_count.
+ * Reminder: It must be called after setting the sequence, since that function
+ * resets the sequence summary, including the RFP_count.
+ */
+void Gene::initRFP_count(unsigned numCategories)
+{
+    geneData.initRFP_count(numCategories);
+}
+
+
+/* getRFP_count (NOT EXPOSED)
+ * Arguments: A number representing the RFP category to return
+ * Returns the RFP_count vector for the category index specified.
+ * For unit testing only.
+ */
+std::vector <unsigned> Gene::getRFP_count(unsigned categoryIndex)
+{
+    //TODO: Add error checking if user forgets to initRFP_count?
+    return geneData.getRFP_count(categoryIndex);
+}
+
+
+/* setRFP_count (NOT EXPOSED)
+ * Arguments: A number representing the RFP category to modify, a vector argument to set the RFP category's RFP_count to
+ * Sets the RFP_count vector for the category index specified to the vector argument given.
+ */
+void Gene::setRFP_count(unsigned categoryIndex, std::vector <unsigned> RFP_counts)
+{
+    //TODO: Add error checking if user forgets to initRFP_count?
+    geneData.setRFP_count(categoryIndex, RFP_counts);
+}
+
+
+/* initSumRFP_count (NOT EXPOSED)
+ * Arguments: A number representing the number of RFP categories.
+ * Initializes the vector of arrays that describes, for each category, the sumRFP_count vector.
+ * Note: When programming in C, this function MUST be called before setSumRFP_count.
+ * Reminder: It must be called after setting the sequence, since that function
+ * resets the sequence summary, including the sumRFP_count.
+ */
+void Gene::initSumRFP_count(unsigned numCategories)
+{
+    geneData.initSumRFP_count(numCategories);
+}
+
+
+/* getSumRFP_count (NOT EXPOSED)
+ * Arguments: A number representing the RFP category to return
+ * Returns the sumRFP_count array of size 64 for the category index specified.
+ * For unit testing only.
+ */
+std::array <unsigned, 64> Gene::getSumRFP_count(unsigned categoryIndex)
+{
+    //TODO: Add error checking if user forgets to initSumRFP_count?
+    return geneData.getSumRFP_count(categoryIndex);
+}
+
+
+/* setSumRFP_count (NOT EXPOSED)
+ * Arguments: A number representing the RFP category to modify, an array argument to set the RFP category's sumRFP_count to
+ * Sets the sumRFP_count array for the category index specified to the array argument given.
+ */
+void Gene::setSumRFP_count(unsigned categoryIndex, std::array <unsigned, 64> sumRFP_counts)
+{
+    //TODO: Add error checking if user forgets to initSumRFP_count?
+    geneData.setSumRFP_count(categoryIndex, sumRFP_counts);
 }
 
 
