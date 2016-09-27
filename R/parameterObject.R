@@ -53,6 +53,8 @@
 #' @param mutation.prior.sd Controlling the standard deviation of the normal 
 #' prior on the mutation parameters
 #' 
+#' @param init.csp.variance initial proposal variance for codon specific parameter, default is 0.0025
+#' 
 #' @return parameter Returns an initialized Parameter object.
 #' 
 #' @description \code{initializeParameterObject} will call the appropriate followup
@@ -483,11 +485,13 @@ splitMatrix <- function(M, r, c){
 #' Valid values for the vector range from 1 to numMixtures.
 #' It is possible but not advised to leave a mixture element empty.
 #' 
+#' @param init.csp.variance initial proposal variance for codon specific parameter, default is 0.0025.
+#' 
 #' @return parameter Returns the Parameter argument, now modified with initialized mutation, selection, and covariance matrices.
 #' 
 
 # Also initializes the mutaiton and selection parameter
-initializeCovarianceMatrices <- function(parameter, genome, numMixtures, geneAssignment, init.csp.variance) {
+initializeCovarianceMatrices <- function(parameter, genome, numMixtures, geneAssignment, init.csp.variance = 0.0025) {
   numMutationCategory <- parameter$numMutationCategories
   numSelectionCategory <- parameter$numSelectionCategories
   

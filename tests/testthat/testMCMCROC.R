@@ -73,7 +73,7 @@ runMCMC(mcmc, genome, model, 1, divergence.iteration)
 sink()
 
 test_that("identical MCMC-ROC input without Phi, same log likelihood", {
-  knownLogLikelihood <- -830292
+  knownLogLikelihood <- -831329
   testLogLikelihood <- round(mcmc$getLogLikelihoodTrace()[10])
   expect_equal(knownLogLikelihood, testLogLikelihood)
 })

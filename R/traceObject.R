@@ -1,14 +1,35 @@
 
-convergence.test <- function(trace, what, mixture = 1, n.samples = 10, frac1 = 0.1, frac2 = 0.5, plot = FALSE)
-{
-  UseMethod("convergence.test", trace)
-}
-
-
-convergence.test.Rcpp_ROCTrace <- function(trace, what, mixture, n.samples, frac1, frac2, plot)
+convergence.test.Rcpp_ROCTrace <- function(object, n.samples = 10, frac1 = 0.1, 
+                                           frac2 = 0.5, thin = 1, plot = FALSE, ...)
 {
   # TODO: extend to work with multiple chains once we have that capability.
   current.trace <- 0
+  
+  input_list <- as.list(list(...))
+  
+  if("what" %in% names(input_list)){
+    what <- input_list$what
+    input_list$what <- NULL
+  }else{
+    what <- "Mutation"
+    warning("No trace (what) specified, using default argument (Mutation) for convergence check\n
+            valis options for \"what\" are:\n
+            - Mutation\n
+            - Selection\n
+            - MixtureProbability\n
+            - Sphi\n
+            - Mphi\n
+            - ExpectedPhi\n")
+  }
+  if("mixture" %in% names(input_list)){
+    mixture <- input_list$mixture
+    input_list$mixture <- NULL
+  }else{
+    mixture <- 1
+    warning("Argument \"mixture\" not defined, default mixture (1) used.\n")
+  }  
+  
+  
   
   if(what[1] == "Mutation" || what[1] == "Selection")
   {
@@ -24,9 +45,9 @@ convergence.test.Rcpp_ROCTrace <- function(trace, what, mixture, n.samples, frac
       for(i in 1:length(codons))
       {
         if(what[1] == "Mutation"){
-          cur.trace[[index]] <- trace$getMutationParameterTraceByMixtureElementForCodon(mixture, codons[i])
+          cur.trace[[index]] <- object$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], 0, FALSE)
         }else{
-          cur.trace[[index]] <- trace$getSelectionParameterTraceByMixtureElementForCodon(mixture, codons[i])
+          cur.trace[[index]] <- object$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], 1, FALSE)
         }
         index <- index + 1
       }
@@ -36,21 +57,21 @@ convergence.test.Rcpp_ROCTrace <- function(trace, what, mixture, n.samples, frac
  
   if(what[1] == "MixtureProbability")
   {
-    numMixtures <- trace$getNumberOfMixtures()
+    numMixtures <- object$getNumberOfMixtures()
     cur.trace <- vector("list", numMixtures)
     for(i in 1:numMixtures)
     {
-      cur.trace[[i]] <- trace$getMixtureProbabilitiesTraceForMixture(i)
+      cur.trace[[i]] <- object$getMixtureProbabilitiesTraceForMixture(i)
     }
     current.trace <- do.call("rbind", cur.trace)
   }
   if(what[1] == "Sphi")
   {
-    current.trace <- trace$getSPhiTrace()
+    current.trace <- object$getSPhiTrace()
   }
   if(what[1] == "Mphi") 
   {
-    sphi <- trace$getSPhiTrace();
+    sphi <- object$getSPhiTrace();
     mphi <- -(sphi * sphi) / 2;
     current.trace <- mphi
   }
@@ -64,7 +85,7 @@ convergence.test.Rcpp_ROCTrace <- function(trace, what, mixture, n.samples, frac
   }
   if(what[1] == "ExpectedPhi")
   {
-    current.trace <- trace$getExpectedPhiTrace()
+    current.trace <- object$getExpectedPhiTrace()
   }
   if(what[1] == "Expression")
   {
@@ -72,12 +93,12 @@ convergence.test.Rcpp_ROCTrace <- function(trace, what, mixture, n.samples, frac
   } 
 
   trace.length <- length(current.trace)
-  start <- max(0, trace.length - nsamples)
+  start <- max(0, trace.length - n.samples)
   
-  mcmcobj <- mcmc(data=current.trace, start=start, thin=thin)
-  diag <- geweke.diag(mcmcobj, frac1=frac1, frac2=frac2)
+  mcmcobj <- coda::mcmc(data=current.trace, start=start, thin=thin)
+  diag <- coda::geweke.diag(mcmcobj, frac1=frac1, frac2=frac2)
   if(plot){ 
-    geweke.plot(diag, frac1=frac1, frac2=frac2)
+    coda::geweke.plot(diag, frac1=frac1, frac2=frac2)
   }else{
     return(diag)
   }

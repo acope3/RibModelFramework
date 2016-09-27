@@ -147,19 +147,19 @@ setRestartSettings.Rcpp_MCMCAlgorithm <- function(mcmc, filename, samples,
 #' 
 #' @details \code{convergence.test}
 #' 
-convergence.test <- function(object, nsamples = 10, frac1 = 0.1, frac2 = 0.5, 
+convergence.test <- function(object, n.samples = 10, frac1 = 0.1, frac2 = 0.5, 
                     thin = 1, plot = FALSE, ...){
   UseMethod("convergence.test", object)
 }
 
 
-convergence.test.Rcpp_MCMCAlgorithm <- function(trace, what, mixture, n.samples = 10, frac1 = 0.1, 
-                                       frac2 = 0.5, plot = FALSE, ...){
+convergence.test.Rcpp_MCMCAlgorithm <- function(object, n.samples = 10, frac1 = 0.1, 
+                                       frac2 = 0.5, thin = 1, plot = FALSE, ...){
   # TODO: extend to work with multiple chains once we have that capability.
   
   loglik.trace <- object$getLogLikelihoodTrace()
   trace.length <- length(loglik.trace)
-  start <- max(1, trace.length - nsamples)
+  start <- max(1, trace.length - n.samples)
   
   # the start and end parameter do NOT work, using subsetting to achieve goal
   mcmcobj <- coda::mcmc(data=loglik.trace[start:trace.length], thin = thin)
