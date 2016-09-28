@@ -248,6 +248,7 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 					if (tmp == "***") //end of matrix
 					{
 						CovarianceMatrix CM(mat);
+						CM.choleskyDecomposition();
 						covarianceMatrix[cat] = CM;
 					}
 					double val;
