@@ -34,7 +34,7 @@ plot.Rcpp_MCMCAlgorithm <- function(x, zoom.window = NULL, ...)
     zoomEnd <- zoom.window[2]
   }
   else{
-    print("No window was given, zooming in at last tenth of trace")
+    print("No window was given, zooming in at last 10% of trace")
   }
   
   Hmisc::subplot(

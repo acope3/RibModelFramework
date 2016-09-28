@@ -215,7 +215,7 @@ std::vector<double> CovarianceMatrix::transformIidNumersIntoCovaryingNumbers(std
 }
 
 
-void CovarianceMatrix::calculateSampleCovariance(std::vector<std::vector<std::vector<std::vector<double>>>> codonSpecificParameterTrace, std::string aa, unsigned samples, unsigned lastIteration)
+void CovarianceMatrix::calculateSampleCovariance(std::vector<std::vector<std::vector<std::vector<float>>>> codonSpecificParameterTrace, std::string aa, unsigned samples, unsigned lastIteration)
 {
 	//order of codonSpecificParameterTrace: paramType, category, numparam, samples
 	unsigned numParamTypesInModel = codonSpecificParameterTrace.size();
@@ -255,7 +255,7 @@ void CovarianceMatrix::calculateSampleCovariance(std::vector<std::vector<std::ve
 							{
 								unscaledSampleCov += (codonSpecificParameterTrace[paramType1][category1][param1][i] - mean1) * (codonSpecificParameterTrace[paramType2][category2][param2][i] - mean2);
 							}
-							covMatrix[IDX] = unscaledSampleCov / (samples - 1);
+							covMatrix[IDX] = unscaledSampleCov / ((double)samples - 1.0);
 							IDX++;
 						}
 					}
@@ -266,7 +266,7 @@ void CovarianceMatrix::calculateSampleCovariance(std::vector<std::vector<std::ve
 }
 
 
-double CovarianceMatrix::sampleMean(std::vector<double> sampleVector, unsigned samples, unsigned lastIteration)
+double CovarianceMatrix::sampleMean(std::vector<float> sampleVector, unsigned samples, unsigned lastIteration)
 {
 	double posteriorMean = 0.0;
 	unsigned start = lastIteration - samples;

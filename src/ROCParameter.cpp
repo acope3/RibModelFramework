@@ -770,7 +770,7 @@ void ROCParameter::adaptNoiseOffsetProposalWidth(unsigned adaptationWidth, bool 
 	for (unsigned i = 0; i < getNumObservedPhiSets(); i++)
 	{
 		double acceptanceLevel = numAcceptForNoiseOffset[i] / (double)adaptationWidth;
-		traces.updateSynthesisOffsetAcceptanceRatioTrace(i, acceptanceLevel);
+		traces.updateSynthesisOffsetAcceptanceRateTrace(i, acceptanceLevel);
 		if (adapt)
 		{
 			if (acceptanceLevel < 0.2)

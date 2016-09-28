@@ -1205,7 +1205,7 @@ void Parameter::updateMixtureProbabilitiesTrace(unsigned samples)
 void Parameter::adaptStdDevSynthesisRateProposalWidth(unsigned adaptationWidth, bool adapt)
 {
 	double acceptanceLevel = (double)numAcceptForStdDevSynthesisRate / (double)adaptationWidth;
-	traces.updateStdDevSynthesisRateAcceptanceRatioTrace(acceptanceLevel);
+	traces.updateStdDevSynthesisRateAcceptanceRateTrace(acceptanceLevel);
 	if (adapt)
 	{
 		if (acceptanceLevel < 0.2)
@@ -1229,7 +1229,7 @@ void Parameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool a
 		for (unsigned i = 0; i < numGenes; i++)
 		{
 			double acceptanceLevel = (double)numAcceptForSynthesisRate[cat][i] / (double)adaptationWidth;
-			traces.updateSynthesisRateAcceptanceRatioTrace(cat, i, acceptanceLevel);
+			traces.updateSynthesisRateAcceptanceRateTrace(cat, i, acceptanceLevel);
 			if (adapt)
 			{
 				if (acceptanceLevel < 0.225)
@@ -1267,7 +1267,7 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 		std::string aa = groupList[i];
 		unsigned aaIndex = SequenceSummary::AAToAAIndex(aa);
 		double acceptanceLevel = (double)numAcceptForCodonSpecificParameters[aaIndex] / (double)adaptationWidth;
-		traces.updateCodonSpecificAcceptanceRatioTrace(aaIndex, acceptanceLevel);
+		traces.updateCodonSpecificAcceptanceRateTrace(aaIndex, acceptanceLevel);
 		if (adapt)
 		{
 			unsigned aaStart;
@@ -1373,8 +1373,8 @@ double Parameter::getStdDevSynthesisRatePosteriorMean(unsigned samples, unsigned
 double Parameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, unsigned mixtureElement)
 {
 	unsigned expressionCategory = getSynthesisRateCategory(mixtureElement);
-	double posteriorMean = 0.0;
-	std::vector<double> synthesisRateTrace = traces.getSynthesisRateTraceByMixtureElementForGene(mixtureElement, geneIndex);
+	float posteriorMean = 0.0;
+	std::vector<float> synthesisRateTrace = traces.getSynthesisRateTraceByMixtureElementForGene(mixtureElement, geneIndex);
 	unsigned traceLength = lastIteration + 1;
 
 	if (samples > lastIteration)
@@ -1415,7 +1415,7 @@ double Parameter::getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigne
 	unsigned paramType, bool withoutReference)
 {
 	double posteriorMean = 0.0;
-	std::vector<double> mutationParameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
+	std::vector<float> mutationParameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
 		mixtureElement, codon, paramType, withoutReference);
 
 	unsigned traceLength = lastIteration + 1;
@@ -1468,7 +1468,7 @@ double Parameter::getStdDevSynthesisRateVariance(unsigned samples, unsigned mixt
 double Parameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex, unsigned mixtureElement,
 	bool unbiased)
 {
-	std::vector<double> synthesisRateTrace = traces.getSynthesisRateTraceByMixtureElementForGene(mixtureElement,
+	std::vector<float> synthesisRateTrace = traces.getSynthesisRateTraceByMixtureElementForGene(mixtureElement,
 		geneIndex);
 	unsigned traceLength = lastIteration + 1;
 	if (samples > traceLength)
@@ -1480,9 +1480,9 @@ double Parameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex,
 		samples = traceLength;
 	}
 
-	double posteriorMean = getSynthesisRatePosteriorMean(samples, geneIndex, mixtureElement);
+	float posteriorMean = getSynthesisRatePosteriorMean(samples, geneIndex, mixtureElement);
 
-	double posteriorVariance = 0.0;
+	float posteriorVariance = 0.0;
 	if (!std::isnan(posteriorMean))
 	{
 		unsigned start = traceLength - samples;
@@ -1508,7 +1508,7 @@ double Parameter::getCodonSpecificVariance(unsigned mixtureElement, unsigned sam
 		unbiased = false;
 	}
 
-	std::vector<double> parameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
+	std::vector<float> parameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
 		mixtureElement, codon, paramType, withoutReference);
 	unsigned traceLength = lastIteration + 1;
 	if (samples > traceLength)
@@ -1539,7 +1539,7 @@ double Parameter::getCodonSpecificVariance(unsigned mixtureElement, unsigned sam
 std::vector<double> Parameter::getCodonSpecificQuantile(unsigned mixtureElement, unsigned samples, std::string &codon,
 	unsigned paramType, std::vector<double> probs, bool withoutReference)
 {
- 	std::vector<double> parameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
+ 	std::vector<float> parameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
 		mixtureElement, codon, paramType, withoutReference);
     
     unsigned traceLength = lastIteration + 1;

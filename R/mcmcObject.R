@@ -69,22 +69,9 @@ initializeMCMCObject <- function(samples, thinning=1, adaptive.width=100,
 #' steps, and the state of the chain is saved every thinning steps.
 #' 
 runMCMC <- function(mcmc, genome, model, ncores = 1, divergence.iteration = 0){
-  
-  #TODO: error check values
-  UseMethod("runMCMC", mcmc)
-}
-
-
-#Called from "runMCMC."
-runMCMC.Rcpp_MCMCAlgorithm <- function(mcmc, genome, model, ncores = 1, 
-                                       divergence.iteration = 0){
+  if(class(mcmc) != "Rcpp_MCMCAlgorithm") stop("mcmc is not of class Rcpp_Algorithm")
   mcmc$run(genome, model, ncores, divergence.iteration)
 }
-
-
-
-
-
 
 
 #' Set Restart Settings 

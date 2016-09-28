@@ -18,15 +18,20 @@ importFrom(utils, write.csv)
 export(
 # Ploting
 ## Parameter object
-
+"plot.Rcpp_ROCParameter",
+"plot.Rcpp_FONSEParameter",
 
 ## Model object
+"plot.Rcpp_ROCModel",
+"plot.Rcpp_FONSEModel",
 
 ## Genome object
 
 ## MCMC object
+"plot.Rcpp_MCMCAlgorithm",
 
 ## Trace object
+"plot.Rcpp_Trace",
 
 #Objects
 ## Parameter object
@@ -44,17 +49,20 @@ export(
 "initializeGenomeObject",
 "getCodonCountsForAA",
 "getNames",
+"length.Rcpp_Genome",
 
 ## MCMC object
 "initializeMCMCObject",
 "runMCMC",
 "setRestartSettings",
-"convergence.test",
 "writeMCMCObject",
 "loadMCMCObject",
 
 ## Trace object
 
+## shared functions
+"convergence.test",
+"convergence.test.Rcpp_MCMCAlgorithm",
 
 #Static C++ functions
 "AAToCodon",
