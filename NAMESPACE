@@ -40,6 +40,9 @@ export(
 "getMixtureAssignmentEstimate",
 "getExpressionEstimatesForMixture",
 "writeParameterObject",
+"writeParameterObject.Rcpp_ROCParameter",
+"writeParameterObject.Rcpp_RFPParameter",
+"writeParameterObject.Rcpp_FONSEParameter",
 "loadParameterObject",
 
 ## Model object
