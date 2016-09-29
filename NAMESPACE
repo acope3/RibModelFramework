@@ -11,6 +11,22 @@ importFrom(graphics, abline, axis, box, grid, hist,
 importFrom(stats, lm, median, qt, quantile, sd)
 importFrom(utils, write.csv)
 
+S3method(length, Rcpp_Genome)
+S3method(summary, Rcpp_Genome)
+S3method(writeParameterObject, Rcpp_ROCParameter)
+S3method(writeParameterObject, Rcpp_RFPParameter)
+S3method(writeParameterObject, Rcpp_FONSEParameter)
+S3method(convergence.test, Rcpp_MCMCAlgorithm)
+S3method(convergence.test, Rcpp_Trace)
+
+S3method(plot, Rcpp_ROCParameter)
+S3method(plot, Rcpp_FONSEParameter)
+S3method(plot, Rcpp_ROCModel)
+S3method(plot, Rcpp_FONSEModel)
+S3method(plot, Rcpp_MCMCAlgorithm)
+S3method(plot, Rcpp_Trace)
+
+
 #exports
 #exportPattern("^[[:alpha:]]+") #<- if commented out, only functions explicitly exported will be exposed 
 
@@ -18,20 +34,20 @@ importFrom(utils, write.csv)
 export(
 # Ploting
 ## Parameter object
-"plot.Rcpp_ROCParameter",
-"plot.Rcpp_FONSEParameter",
+#"plot.Rcpp_ROCParameter",
+#"plot.Rcpp_FONSEParameter",
 
 ## Model object
-"plot.Rcpp_ROCModel",
-"plot.Rcpp_FONSEModel",
+#"plot.Rcpp_ROCModel",
+#"plot.Rcpp_FONSEModel",
 
 ## Genome object
 
 ## MCMC object
-"plot.Rcpp_MCMCAlgorithm",
+#"plot.Rcpp_MCMCAlgorithm",
 
 ## Trace object
-"plot.Rcpp_Trace",
+#"plot.Rcpp_Trace",
 
 #Objects
 ## Parameter object
@@ -40,9 +56,9 @@ export(
 "getMixtureAssignmentEstimate",
 "getExpressionEstimatesForMixture",
 "writeParameterObject",
-"writeParameterObject.Rcpp_ROCParameter",
-"writeParameterObject.Rcpp_RFPParameter",
-"writeParameterObject.Rcpp_FONSEParameter",
+#"writeParameterObject.Rcpp_ROCParameter",
+#"writeParameterObject.Rcpp_RFPParameter",
+#"writeParameterObject.Rcpp_FONSEParameter",
 "loadParameterObject",
 
 ## Model object
@@ -52,7 +68,6 @@ export(
 "initializeGenomeObject",
 "getCodonCountsForAA",
 "getNames",
-"length.Rcpp_Genome",
 
 ## MCMC object
 "initializeMCMCObject",
@@ -65,7 +80,7 @@ export(
 
 ## shared functions
 "convergence.test",
-"convergence.test.Rcpp_MCMCAlgorithm",
+#"convergence.test.Rcpp_MCMCAlgorithm",
 
 #Static C++ functions
 "AAToCodon",

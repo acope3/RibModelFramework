@@ -606,12 +606,12 @@ writeParameterObject <- function(parameter, file)
 extractBaseInfo <- function(parameter){
   trace <- parameter$getTraceObject()
   stdDevSynthesisRateTraces <- trace$getStdDevSynthesisRateTraces()
-  stdDevSynthesisRateAcceptRatTrace <- trace$getStdDevSynthesisRateAcceptanceRatioTrace()
+  stdDevSynthesisRateAcceptRatTrace <- trace$getStdDevSynthesisRateAcceptanceRateTrace()
   synthRateTrace <- trace$getSynthesisRateTrace()
-  synthAcceptRatTrace <- trace$getSynthesisRateAcceptanceRatioTrace()
+  synthAcceptRatTrace <- trace$getSynthesisRateAcceptanceRateTrace()
   mixAssignTrace <- trace$getMixtureAssignmentTrace()
   mixProbTrace <- trace$getMixtureProbabilitiesTrace()
-  codonSpecificAcceptRatTrace <- trace$getCodonSpecificAcceptanceRatioTrace()
+  codonSpecificAcceptRatTrace <- trace$getCodonSpecificAcceptanceRateTrace()
   numMix <- parameter$numMixtures
   numMut <- parameter$numMutationCategories
   numSel <- parameter$numSelectionCategories
@@ -652,7 +652,7 @@ writeParameterObject.Rcpp_ROCParameter <- function(parameter, file){
   
   mutationTrace <- trace$getCodonSpecificParameterTrace(0)
   selectionTrace <- trace$getCodonSpecificParameterTrace(1)
-  synthesisOffsetAcceptRatTrace <- trace$getSynthesisOffsetAcceptanceRatioTrace()
+  synthesisOffsetAcceptRatTrace <- trace$getSynthesisOffsetAcceptanceRateTrace()
   synthesisOffsetTrace <- trace$getSynthesisOffsetTrace()
   observedSynthesisNoiseTrace <- trace$getObservedSynthesisNoiseTrace()
   if (length(synthesisOffsetTrace) == 0){
@@ -717,7 +717,8 @@ writeParameterObject.Rcpp_FONSEParameter <- function(parameter, file)
 
 #' Load Parameter Object
 #'  
-#' @param files The filenames where the data will be stored.
+#' @param files A list of parameter filenames to be loaded. If multiple files are given, 
+#' the parameter objects will be concatenated in the order provided
 #' 
 #' @return parameter Returns an initialized Parameter object depending on the parameter type given.
 #' 
@@ -791,14 +792,14 @@ setBaseInfo <- function(parameter, files)
       for (j in 1:numMixtures) {
         stdDevSynthesisRateTraces[[j]] <- tempEnv$paramBase$stdDevSynthesisRateTraces[[j]][1:max]
       }
-      stdDevSynthesisRateAcceptanceRatioTrace <- tempEnv$paramBase$stdDevSynthesisRateAcceptRatTrace
+      stdDevSynthesisRateAcceptanceRateTrace <- tempEnv$paramBase$stdDevSynthesisRateAcceptRatTrace
       synthesisRateTrace <- vector("list", length=numMixtures)
       for (j in 1:numMixtures) {
         for (k in 1:length(tempEnv$paramBase$synthRateTrace[[j]])){
           synthesisRateTrace[[j]][[k]] <- tempEnv$paramBase$synthRateTrace[[j]][[k]][1:max]
         }
       }
-      synthesisRateAcceptanceRatioTrace <- tempEnv$paramBase$synthAcceptRatTrace
+      synthesisRateAcceptanceRateTrace <- tempEnv$paramBase$synthAcceptRatTrace
       mixtureAssignmentTrace <- c()
       for (j in 1:length(tempEnv$paramBase$mixAssignTrace)){
         mixtureAssignmentTrace[[j]] <- tempEnv$paramBase$mixAssignTrace[[j]][1:max]
@@ -807,7 +808,7 @@ setBaseInfo <- function(parameter, files)
       for (j in 1:numMixtures) {
         mixtureProbabilitiesTrace[[j]] <- tempEnv$paramBase$mixProbTrace[[j]][1:max]
       }
-      codonSpecificAcceptanceRatioTrace <- tempEnv$paramBase$codonSpecificAcceptRatTrace
+      codonSpecificAcceptanceRateTrace <- tempEnv$paramBase$codonSpecificAcceptRatTrace
     } else {
       if (sum(categories.matrix != do.call("rbind", tempEnv$paramBase$categories)) != 0){
           stop("categories is not the same between all files")
@@ -831,12 +832,12 @@ setBaseInfo <- function(parameter, files)
       }
       
       curStdDevSynthesisRateTraces <- tempEnv$paramBase$stdDevSynthesisRateTraces
-      curStdDevSynthesisRateAcceptanceRatioTrace <- tempEnv$paramBase$stdDevSynthesisRateAcceptRatTrace
+      curStdDevSynthesisRateAcceptanceRateTrace <- tempEnv$paramBase$stdDevSynthesisRateAcceptRatTrace
       curSynthesisRateTrace <- tempEnv$paramBase$synthRateTrace
-      curSynthesisRateAcceptanceRatioTrace <- tempEnv$paramBase$synthAcceptRatTrace
+      curSynthesisRateAcceptanceRateTrace <- tempEnv$paramBase$synthAcceptRatTrace
       curMixtureAssignmentTrace <- tempEnv$paramBase$mixAssignTrace
       curMixtureProbabilitiesTrace <- tempEnv$paramBase$mixProbTrace
-      curCodonSpecificAcceptanceRatioTrace <- tempEnv$paramBase$codonSpecificAcceptRatTrace
+      curCodonSpecificAcceptanceRateTrace <- tempEnv$paramBase$codonSpecificAcceptRatTrace
       
       lastIteration <- lastIteration + tempEnv$paramBase$lastIteration
       
@@ -845,19 +846,19 @@ setBaseInfo <- function(parameter, files)
       max <- tempEnv$paramBase$lastIteration + 1
       combineTwoDimensionalTrace(stdDevSynthesisRateTraces, curStdDevSynthesisRateTraces, max)
 
-      size <- length(curStdDevSynthesisRateAcceptanceRatioTrace)
-      stdDevSynthesisRateAcceptanceRatioTrace <- c(stdDevSynthesisRateAcceptanceRatioTrace, 
-                                      curStdDevSynthesisRateAcceptanceRatioTrace[2:size])
+      size <- length(curStdDevSynthesisRateAcceptanceRateTrace)
+      stdDevSynthesisRateAcceptanceRateTrace <- c(stdDevSynthesisRateAcceptanceRateTrace, 
+                                      curStdDevSynthesisRateAcceptanceRateTrace[2:size])
 
       
       combineThreeDimensionalTrace(synthesisRateTrace, curSynthesisRateTrace, max)
-      size <- length(curSynthesisRateAcceptanceRatioTrace)
-      combineThreeDimensionalTrace(synthesisRateAcceptanceRatioTrace, curSynthesisRateAcceptanceRatioTrace, size)
+      size <- length(curSynthesisRateAcceptanceRateTrace)
+      combineThreeDimensionalTrace(synthesisRateAcceptanceRateTrace, curSynthesisRateAcceptanceRateTrace, size)
       
       combineTwoDimensionalTrace(mixtureAssignmentTrace, curMixtureAssignmentTrace, max)
       combineTwoDimensionalTrace(mixtureProbabilitiesTrace, curMixtureProbabilitiesTrace, max)
-      size <- length(curCodonSpecificAcceptanceRatioTrace)
-      combineTwoDimensionalTrace(codonSpecificAcceptanceRatioTrace, curCodonSpecificAcceptanceRatioTrace, size)
+      size <- length(curCodonSpecificAcceptanceRateTrace)
+      combineTwoDimensionalTrace(codonSpecificAcceptanceRateTrace, curCodonSpecificAcceptanceRateTrace, size)
     }
   }
   parameter$setCategories(categories)
@@ -870,12 +871,12 @@ setBaseInfo <- function(parameter, files)
   
   trace <- parameter$getTraceObject()
   trace$setStdDevSynthesisRateTraces(stdDevSynthesisRateTraces)
-  trace$setStdDevSynthesisRateAcceptanceRatioTrace(stdDevSynthesisRateAcceptanceRatioTrace)
+  trace$setStdDevSynthesisRateAcceptanceRateTrace(stdDevSynthesisRateAcceptanceRateTrace)
   trace$setSynthesisRateTrace(synthesisRateTrace)
-  trace$setSynthesisRateAcceptanceRatioTrace(synthesisRateAcceptanceRatioTrace)
+  trace$setSynthesisRateAcceptanceRateTrace(synthesisRateAcceptanceRateTrace)
   trace$setMixtureAssignmentTrace(mixtureAssignmentTrace)
   trace$setMixtureProbabilitiesTrace(mixtureProbabilitiesTrace)
-  trace$setCodonSpecificAcceptanceRatioTrace(codonSpecificAcceptanceRatioTrace)
+  trace$setCodonSpecificAcceptanceRateTrace(codonSpecificAcceptanceRateTrace)
   
   parameter$setTraceObject(trace)
   return(parameter)
@@ -901,7 +902,7 @@ loadROCParameterObject <- function(parameter, files)
         }
         
         
-        synthesisOffsetAcceptanceRatioTrace <- tempEnv$synthesisOffsetAcceptRatTrace
+        synthesisOffsetAcceptanceRateTrace <- tempEnv$synthesisOffsetAcceptRatTrace
         
         
         observedSynthesisNoiseTrace <- c()
@@ -911,7 +912,7 @@ loadROCParameterObject <- function(parameter, files)
         #need number of phi groups, not the number of mixtures apparently.
       }else {
         synthesisOffsetTrace <- c()
-        synthesisOffsetAcceptanceRatioTrace <- c()
+        synthesisOffsetAcceptanceRateTrace <- c()
         observedSynthesisNoiseTrace <- c()
       }
       
@@ -925,7 +926,7 @@ loadROCParameterObject <- function(parameter, files)
       }
     }else{
       curSynthesisOffsetTrace <- tempEnv$synthesisOffsetTrace
-      curSynthesisOffsetAcceptanceRatioTrace <- tempEnv$synthesisOffsetAcceptRatTrace
+      curSynthesisOffsetAcceptanceRateTrace <- tempEnv$synthesisOffsetAcceptRatTrace
       curObservedSynthesisNoiseTrace <- tempEnv$observedSynthesisNoiseTrace
       curCodonSpecificParameterTraceMut <- tempEnv$mutationTrace
       curCodonSpecificParameterTraceSel <- tempEnv$selectionTrace
@@ -936,8 +937,8 @@ loadROCParameterObject <- function(parameter, files)
       
       if (withPhi){
         combineTwoDimensionalTrace(synthesisOffsetTrace, curSynthesisOffsetTrace, max)
-        size <- length(curSynthesisOffsetAcceptanceRatioTrace)
-        combineTwoDimensionalTrace(synthesisOffsetAcceptanceRatioTrace, curSynthesisOffsetAcceptanceRatioTrace, size)
+        size <- length(curSynthesisOffsetAcceptanceRateTrace)
+        combineTwoDimensionalTrace(synthesisOffsetAcceptanceRateTrace, curSynthesisOffsetAcceptanceRateTrace, size)
         combineTwoDimensionalTrace(observedSynthesisNoiseTrace, curObservedSynthesisNoiseTrace, max)
       }
       
@@ -948,7 +949,7 @@ loadROCParameterObject <- function(parameter, files)
   
   trace <- parameter$getTraceObject()
   trace$setSynthesisOffsetTrace(synthesisOffsetTrace)
-  trace$setSynthesisOffsetAcceptanceRatioTrace(synthesisOffsetAcceptanceRatioTrace)
+  trace$setSynthesisOffsetAcceptanceRateTrace(synthesisOffsetAcceptanceRateTrace)
   trace$setObservedSynthesisNoiseTrace(observedSynthesisNoiseTrace)
   trace$setCodonSpecificParameterTrace(codonSpecificParameterTraceMut, 0)
   trace$setCodonSpecificParameterTrace(codonSpecificParameterTraceSel, 1)
