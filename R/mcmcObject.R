@@ -97,15 +97,9 @@ runMCMC <- function(mcmc, genome, model, ncores = 1, divergence.iteration = 0){
 #' are generated for a run.
 #' 
 setRestartSettings <- function(mcmc, filename, samples, write.multiple=TRUE){
-  UseMethod("setRestartSettings", mcmc)
-}
-
-
-setRestartSettings.Rcpp_MCMCAlgorithm <- function(mcmc, filename, samples, 
-                                                  write.multiple=TRUE){
+  if(class(mcmc) != "Rcpp_MCMCAlgorithm") stop("mcmc is not of class Rcpp_Algorithm")
   mcmc$setRestartFileSettings(filename, samples, write.multiple)
 }
-#TODO: Why is this seperated into 2 functions?
 
 
 # TODO: Have someone who knows what's going on document this.
