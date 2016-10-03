@@ -420,12 +420,14 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 				if (multipleFiles)
 				{
 					std::ostringstream oss;
-					oss << (iteration) / thinning << "_" << file;
+					oss << file << "_" << (iteration) / thinning;
 					std::string tmp = oss.str();
 					model.writeRestartFile(tmp);
 				}
 				else
+				{
 					model.writeRestartFile(file);
+				}
 			}
 		}
 		if ((iteration) % 100u == 0u)
@@ -499,6 +501,11 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 			}
 		}
 	} // end MCMC loop
+
+	std::ostringstream oss;
+	oss << file << "_final";
+	std::string tmp = oss.str();
+	model.writeRestartFile(tmp);
 
 	my_print("leaving MCMC loop\n");
 }
@@ -708,7 +715,8 @@ void MCMCAlgorithm::setEstimateMixtureAssignment(bool in)
 */
 void MCMCAlgorithm::setRestartFileSettings(std::string filename, unsigned interval, bool multiple)
 {
-	file = filename;
+	file = filename.substr(0,  filename.find_last_of("."));
+	file = file + ".rst";
 	fileWriteInterval = interval * thinning;
 	multipleFiles = multiple;
 	writeRestartFile = true;

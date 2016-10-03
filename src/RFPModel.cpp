@@ -21,6 +21,7 @@ RFPModel::~RFPModel()
 {
 	//dtor
 	//TODO: call Parent's deconstructor
+	delete parameter;
 }
 
 
@@ -565,9 +566,9 @@ void RFPModel::printHyperParameters()
  *
  * Returns the RFPParameter of the model.
 */
-RFPParameter RFPModel::getParameter()
+RFPParameter* RFPModel::getParameter()
 {
-	return *parameter;
+	return parameter;
 }
 
 

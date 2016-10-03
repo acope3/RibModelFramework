@@ -15,6 +15,7 @@ FONSEModel::FONSEModel() : Model()
 FONSEModel::~FONSEModel()
 {
 	//dtor
+	delete parameter;
 }
 
 
@@ -655,9 +656,9 @@ void FONSEModel::printHyperParameters()
 *
 * Returns the FONSEParameter of the model.
 */
-FONSEParameter FONSEModel::getParameter()
+FONSEParameter* FONSEModel::getParameter()
 {
-	return *parameter;
+	return parameter;
 }
 
 void FONSEModel::setParameter(FONSEParameter &_parameter)
