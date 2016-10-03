@@ -132,7 +132,7 @@ class Parameter {
 
 
 		//Trace Functions: TODO: test
-		Trace* getTraceObject();
+		Trace& getTraceObject();
 		void setTraceObject(Trace _trace);
 		void updateStdDevSynthesisRateTrace(unsigned sample);
 		void updateSynthesisRateTrace(unsigned sample, unsigned geneIndex);
