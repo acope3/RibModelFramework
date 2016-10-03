@@ -18,19 +18,14 @@ CovarianceMatrix::CovarianceMatrix()
     /* Initialize with numVariates = 2.
     // Equivalent to calling initCovarianceMatrix(2) */
     numVariates = 2;
-    covMatrix.resize(4);
-    choleskyMatrix.resize(4);
 
-    for (unsigned i = 0u; i < 4; i++)
-    {
-        covMatrix[i] = i % 3 ? 0.0 : 0.01 / 2.0;
-        choleskyMatrix[i] = 0.0;
-    }
+    initCovarianceMatrix(numVariates);
 }
 
 
 CovarianceMatrix::CovarianceMatrix(int _numVariates)
 {
+	numVariates = _numVariates;
 	initCovarianceMatrix(_numVariates);
 }
 
@@ -108,7 +103,7 @@ CovarianceMatrix::~CovarianceMatrix()
 void CovarianceMatrix::initCovarianceMatrix(unsigned _numVariates)
 {
     numVariates = _numVariates;
-    unsigned vectorLength = numVariates * numVariates;
+    int vectorLength = numVariates * numVariates;
     covMatrix.resize(vectorLength);
     choleskyMatrix.resize(vectorLength);
 
@@ -116,7 +111,7 @@ void CovarianceMatrix::initCovarianceMatrix(unsigned _numVariates)
     for (unsigned i = 0u; i < vectorLength; i++)
     {
         covMatrix[i] = (i % (numVariates + 1) ? 0.0 : diag_const);
-        choleskyMatrix[i] = 0.0;
+        choleskyMatrix[i] = covMatrix[i];
     }
 }
 

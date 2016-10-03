@@ -32,33 +32,12 @@ S3method(plot, Rcpp_Trace)
 
 
 export(
-# Ploting
-## Parameter object
-#"plot.Rcpp_ROCParameter",
-#"plot.Rcpp_FONSEParameter",
-
-## Model object
-#"plot.Rcpp_ROCModel",
-#"plot.Rcpp_FONSEModel",
-
-## Genome object
-
-## MCMC object
-#"plot.Rcpp_MCMCAlgorithm",
-
-## Trace object
-#"plot.Rcpp_Trace",
-
-#Objects
 ## Parameter object
 "initializeParameterObject",
 "getCSPEstimates",
 "getMixtureAssignmentEstimate",
 "getExpressionEstimatesForMixture",
 "writeParameterObject",
-#"writeParameterObject.Rcpp_ROCParameter",
-#"writeParameterObject.Rcpp_RFPParameter",
-#"writeParameterObject.Rcpp_FONSEParameter",
 "loadParameterObject",
 
 ## Model object
@@ -80,15 +59,12 @@ export(
 
 ## shared functions
 "convergence.test",
-#"convergence.test.Rcpp_MCMCAlgorithm",
 
 #Static C++ functions
 "AAToCodon",
 "aminoAcids",
 "codonToAA",
 "codons"
-
-
 )
 
 

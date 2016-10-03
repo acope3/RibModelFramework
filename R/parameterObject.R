@@ -746,6 +746,7 @@ loadParameterObject <- function(files)
     }#end of if-else
   }#end of for
   
+#  browser()
   if (firstModel == "ROC"){
     parameter <- new(ROCParameter)
     parameter <- loadROCParameterObject(parameter, files)
@@ -861,6 +862,8 @@ setBaseInfo <- function(parameter, files)
       combineTwoDimensionalTrace(codonSpecificAcceptanceRateTrace, curCodonSpecificAcceptanceRateTrace, size)
     }
   }
+
+#browser()
   parameter$setCategories(categories)
   parameter$setCategoriesForTrace()  
   parameter$numMixtures <- numMixtures
