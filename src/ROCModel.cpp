@@ -614,13 +614,14 @@ void ROCModel::updateGibbsSampledHyperParameters(Genome &genome)
 				if (obsPhi > -1.0)
 				{
 					double sum = std::log(obsPhi) - noiseOffset - std::log(getSynthesisRate(j, mixtureAssignment, false));
-					//double sum = std::log(obsPhi) - std::log(getSynthesisRate(j, mixtureAssignment, false));
-					rate += sum * sum;
+					rate += (sum * sum);
+				}else{
+					shape -= 0.5; // reduce shape due to missing observation
 				}
 			}
-			rate /= 2;
+			rate /= 2.0;
 			double rand = parameter->randGamma(shape, rate);
-			parameter->setObservedSynthesisNoise(i, 1/rand);
+			parameter->setObservedSynthesisNoise(i, 1.0/rand);
 		}
 	}
 }
