@@ -245,7 +245,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
                 	logLikelihood += probabilities[k] * unscaledLogPost_curr[k];
 			}
 
-/*            if (std::isnan(logLikelihood))
+            if (std::isnan(logLikelihood))
             {
                 my_print("\n\n\n");
                 my_print("Gene: %, %\n", i, gene->getId());
@@ -255,7 +255,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
                 my_print("prop logLik: %\n", unscaledLogPost_prop[k]);
                 my_print("Accepted?: % < % , %\n", alpha, (propLogLike - currLogLike), alpha < (propLogLike - currLogLike));
                 my_print("\n\n\n");
-            }*/
+            }
 		}
         
 

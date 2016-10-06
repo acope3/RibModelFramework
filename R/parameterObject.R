@@ -789,19 +789,19 @@ setBaseInfo <- function(parameter, files)
       lastIteration <- tempEnv$paramBase$lastIteration
       max <- tempEnv$paramBase$lastIteration + 1
       
-      stdDevSynthesisRateTraces <- c()
-      for (j in 1:numMixtures) {
+      stdDevSynthesisRateTraces <- vector("list", length = numSelectionCategories)
+      for (j in 1:numSelectionCategories) {
         stdDevSynthesisRateTraces[[j]] <- tempEnv$paramBase$stdDevSynthesisRateTraces[[j]][1:max]
       }
       stdDevSynthesisRateAcceptanceRateTrace <- tempEnv$paramBase$stdDevSynthesisRateAcceptRatTrace
-      synthesisRateTrace <- vector("list", length=numMixtures)
-      for (j in 1:numMixtures) {
+      synthesisRateTrace <- vector("list", length = numSelectionCategories)
+      for (j in 1:numSelectionCategories) {
         for (k in 1:length(tempEnv$paramBase$synthRateTrace[[j]])){
           synthesisRateTrace[[j]][[k]] <- tempEnv$paramBase$synthRateTrace[[j]][[k]][1:max]
         }
       }
       synthesisRateAcceptanceRateTrace <- tempEnv$paramBase$synthAcceptRatTrace
-      mixtureAssignmentTrace <- c()
+      mixtureAssignmentTrace <- vector("list", length = length(tempEnv$paramBase$mixAssignTrace))
       for (j in 1:length(tempEnv$paramBase$mixAssignTrace)){
         mixtureAssignmentTrace[[j]] <- tempEnv$paramBase$mixAssignTrace[[j]][1:max]
       }
@@ -893,8 +893,11 @@ loadROCParameterObject <- function(parameter, files)
   for (i in 1:length(files)){
     tempEnv <- new.env();
     load(file = files[i], envir = tempEnv)
-  
+
+    numMutationCategories <- tempEnv$paramBase$numMut
+    numSelectionCategories <- tempEnv$paramBase$numSel
     max <- tempEnv$paramBase$lastIteration + 1
+  
     if (i == 1){
       withPhi <- tempEnv$withPhi
       if (withPhi){
@@ -919,11 +922,20 @@ loadROCParameterObject <- function(parameter, files)
         observedSynthesisNoiseTrace <- c()
       }
       
-      codonSpecificParameterTraceMut <- vector("list", length=parameter$numMixtures)
-      codonSpecificParameterTraceSel <- vector("list", length=parameter$numMixtures)
-      for (j in 1:parameter$numMixtures) {
+      codonSpecificParameterTraceMut <- vector("list", length=numMutationCategories)
+      for (j in 1:numMutationCategories) {
+	codonSpecificParameterTraceMut[[j]] <- vector("list", length=length(tempEnv$mutationTrace[[j]]))
         for (k in 1:length(tempEnv$mutationTrace[[j]])){
           codonSpecificParameterTraceMut[[j]][[k]] <- tempEnv$mutationTrace[[j]][[k]][1:max]
+          #codonSpecificParameterTraceSel[[j]][[k]] <- tempEnv$selectionTrace[[j]][[k]][1:max]
+        }
+      }
+
+      codonSpecificParameterTraceSel <- vector("list", length=numSelectionCategories)
+      for (j in 1:numSelectionCategories) {
+	codonSpecificParameterTraceSel[[j]] <- vector("list", length=length(tempEnv$selectionTrace[[j]]))
+        for (k in 1:length(tempEnv$selectionTrace[[j]])){
+          #codonSpecificParameterTraceMut[[j]][[k]] <- tempEnv$mutationTrace[[j]][[k]][1:max]
           codonSpecificParameterTraceSel[[j]][[k]] <- tempEnv$selectionTrace[[j]][[k]][1:max]
         }
       }
@@ -977,18 +989,21 @@ loadRFPParameterObject <- function(parameter, files)
   
     max <- tempEnv$paramBase$lastIteration + 1
     numMixtures <- tempEnv$paramBase$numMix
+    numMutationCategories <- tempEnv$paramBase$numMut
+    numSelectionCategories <- tempEnv$paramBase$numSel
+
     if (i == 1){
       #for future use: This may break if RFP is ran with more than
       #one mixture, in this case just follow the format of the 
       #ROC CSP parameters.
-      alphaTrace <-c()
-      for (j in 1:numMixtures) {
+      alphaTrace <- vector("list", length=numMutationCategories)
+      for (j in 1:numMutationCategories) {
         for (k in 1:length(tempEnv$alphaTrace[[j]])){
           alphaTrace[[j]][[k]] <- tempEnv$alphaTrace[[j]][[k]][1:max]
         }
       }
-      lambdaPrimeTrace <- c()
-      for (j in 1:numMixtures) {
+      lambdaPrimeTrace <- vector("list", length=numSelectionCategories)
+      for (j in 1:numSelectionCategories) {
         for (k in 1:length(tempEnv$lambdaPrimeTrace[[j]])){
           lambdaPrimeTrace[[j]][[k]] <- tempEnv$lambdaPrimeTrace[[j]][[k]][1:max]
         }
@@ -1025,17 +1040,30 @@ loadFONSEParameterObject <- function(parameter, files)
     tempEnv <- new.env();
     load(file = files[i], envir = tempEnv)
     
+    numMutationCategories <- tempEnv$paramBase$numMut
+    numSelectionCategories <- tempEnv$paramBase$numSel
     max <- tempEnv$paramBase$lastIteration + 1
+
     if (i == 1){
       
-      codonSpecificParameterTraceMut <- vector("list", length=parameter$numMixtures)
-      codonSpecificParameterTraceSel <- vector("list", length=parameter$numMixtures)
-      for (j in 1:parameter$numMixtures) {
+      codonSpecificParameterTraceMut <- vector("list", length=numMutationCategories)
+      for (j in 1:numMutationCategories) {
+	codonSpecificParameterTraceMut[[j]] <- vector("list", length=length(tempEnv$mutationTrace[[j]]))
         for (k in 1:length(tempEnv$mutationTrace[[j]])){
           codonSpecificParameterTraceMut[[j]][[k]] <- tempEnv$mutationTrace[[j]][[k]][1:max]
+          #codonSpecificParameterTraceSel[[j]][[k]] <- tempEnv$selectionTrace[[j]][[k]][1:max]
+        }
+      }
+
+      codonSpecificParameterTraceSel <- vector("list", length=numSelectionCategories)
+      for (j in 1:numSelectionCategories) {
+	codonSpecificParameterTraceSel[[j]] <- vector("list", length=length(tempEnv$selectionTrace[[j]]))
+        for (k in 1:length(tempEnv$selectionTrace[[j]])){
+          #codonSpecificParameterTraceMut[[j]][[k]] <- tempEnv$mutationTrace[[j]][[k]][1:max]
           codonSpecificParameterTraceSel[[j]][[k]] <- tempEnv$selectionTrace[[j]][[k]][1:max]
         }
       }
+
     }else{
       curCodonSpecificParameterTraceMut <- tempEnv$mutationTrace
       curCodonSpecificParameterTraceSel <- tempEnv$selectionTrace

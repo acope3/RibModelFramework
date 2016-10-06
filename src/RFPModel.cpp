@@ -21,7 +21,7 @@ RFPModel::~RFPModel()
 {
 	//dtor
 	//TODO: call Parent's deconstructor
-	delete parameter;
+	//delete parameter;
 }
 
 
