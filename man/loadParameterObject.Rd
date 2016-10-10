@@ -10,7 +10,7 @@ loadParameterObject(files)
 \item{files}{The filenames where the data will be stored.}
 }
 \value{
-This function has no return value.
+parameter Returns an initialized Parameter object depending on the parameter type given.
 }
 \description{
 \code{loadParameterObject} will call the appropriate followup

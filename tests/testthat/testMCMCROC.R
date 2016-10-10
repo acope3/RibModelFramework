@@ -37,7 +37,7 @@ mcmc <- initializeMCMCObject(samples = samples, thinning = thinning, adaptive.wi
 ### With Phi
 set.seed(446141)
 
-genome <- initializeGenomeObject(file = fileName, expression.file = expressionFile)
+genome <- initializeGenomeObject(file = fileName, observed.expression.file = expressionFile, match.expression.by.id=FALSE)
 
 geneAssignment <- sample(c(1,2), size = length(genome), replace = TRUE, prob = c(0.3, 0.7)) #c(rep(1,500), rep(2,500))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
@@ -51,7 +51,7 @@ runMCMC(mcmc, genome, model, 1, divergence.iteration)
 sink()
 
 test_that("identical MCMC-ROC input with Phi, same log likelihood", {
-  knownLogLikelihood <- -825482
+  knownLogLikelihood <- -827733
   testLogLikelihood <- round(mcmc$getLogLikelihoodTrace()[10])
   expect_equal(knownLogLikelihood, testLogLikelihood)
 })
@@ -73,7 +73,7 @@ runMCMC(mcmc, genome, model, 1, divergence.iteration)
 sink()
 
 test_that("identical MCMC-ROC input without Phi, same log likelihood", {
-  knownLogLikelihood <- -825693
+  knownLogLikelihood <- -831329
   testLogLikelihood <- round(mcmc$getLogLikelihoodTrace()[10])
   expect_equal(knownLogLikelihood, testLogLikelihood)
 })

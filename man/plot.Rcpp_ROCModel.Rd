@@ -4,7 +4,7 @@
 \alias{plot.Rcpp_ROCModel}
 \title{Plot Model Object}
 \usage{
-\method{plot}{Rcpp_ROCModel}(x, genome, samples = 100, mixture = 1,
+\method{plot}{Rcpp_ROCModel}(x, genome = NULL, samples = 100, mixture = 1,
   estim.Expression = TRUE, simulated = FALSE, ...)
 }
 \arguments{

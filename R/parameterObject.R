@@ -19,9 +19,6 @@
 #' The length of the vector has to equal the number of genes in the Genome object.
 #' The default value is NULL.
 #' 
-#' @param init.csp.variance specifies the initial proposal width for codon specific parameter. The proposal width adapts during the 
-#' runtime to reach a taget acceptance rate of ~0.25 
-#' 
 #' @param model Specifies the model used. Valid options are "ROC", "RFP", or "FONSE".
 #' The default model is "ROC".
 #' ROC is described in Gilchrist et al. 2015.
@@ -52,6 +49,9 @@
 #' 
 #' @param mutation.prior.sd Controlling the standard deviation of the normal 
 #' prior on the mutation parameters
+#' 
+#' @param init.csp.variance specifies the initial proposal width for codon specific parameter (default is 0.0025). 
+#' The proposal width adapts during the runtime to reach a taget acceptance rate of ~0.25
 #' 
 #' @return parameter Returns an initialized Parameter object.
 #' 
@@ -284,35 +284,63 @@ getCSPEstimates <- function(parameter, filename, CSP, mixture, samples){
 
 
 #Called from getCSPEstimates
-getCSPEstimates.Rcpp_ROCParameter <- function(parameter, filename=NULL, 
+getCSPEstimates.Rcpp_Parameter <- function(parameter, filename=NULL, 
                                               CSP="Mutation", mixture = 1, samples = 10){
-  names.aa <- aminoAcids()
   Amino_Acid <- c()
   Value <- c()
   Codon <- c()
   Std_Deviation <- vector("list")
   
-  for(aa in names.aa){
-    if(aa == "M" || aa == "W" || aa == "X") next
-    codons <- AAToCodon(aa, T)
+  if (parameter == "ROC" || parameter == "FONSE"){
+    names.aa <- aminoAcids()
     
-    for(i in 1:length(codons)){
-      Amino_Acid <- c(Amino_Acid, aa)
-      Codon <- c(Codon, codons[i])
+    for(aa in names.aa){
+      if(aa == "M" || aa == "W" || aa == "X") next
+      codons <- AAToCodon(aa, T)
+    
+      for(i in 1:length(codons)){
+        Amino_Acid <- c(Amino_Acid, aa)
+        Codon <- c(Codon, codons[i])
       
-      if(CSP == "Mutation"){
-        Value <- c(Value, parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 0, TRUE))
-        Std_Deviation <- c(Std_Deviation, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 0, c(0.025, 0.975), TRUE))
-      }
-      else if(CSP == "Selection"){
-        Value <- c(Value, parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 1, TRUE))
-        Std_Deviation <- c(Std_Deviation, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 1, c(0.025, 0.975), TRUE))
-      }
-      else {
-        stop("Unknown Parameter type given")
+        if(CSP == "Mutation"){
+          Value <- c(Value, parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 0, TRUE))
+          Std_Deviation <- c(Std_Deviation, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 0, c(0.025, 0.975), TRUE))
+        }
+        else if(CSP == "Selection"){
+          Value <- c(Value, parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 1, TRUE))
+          Std_Deviation <- c(Std_Deviation, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 1, c(0.025, 0.975), TRUE))
+        }
+        else {
+          stop("Unknown CSP type given")
+        }
       }
     }
   }
+  else if (parameter == "RFP"){
+    groupList <- parameter$getGroupList()
+
+    for(i in 1:length(groupList)){
+      aa <- codonToAA(groupList[i])
+      Codon <- c(Codon, groupList[i])
+      Amino_Acid <- c(Amino_Acid, aa)
+       
+      if(CSP == "Alpha"){
+        Value <- c(Value, parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 0, FALSE))
+        Std_Deviation <- c(Std_Deviation, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 0, c(0.025, 0.975), FALSE))
+        }
+      else if(CSP == "Lambda Prime"){
+        Value <- c(Value, parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 1, FALSE))
+        Std_Deviation <- c(Std_Deviation, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 1, c(0.025, 0.975), FALSE))
+      }
+      else {
+        stop("Unknown CSP type given")
+      }
+    }
+  }
+  else{
+    stop("Unknown Parameter type given")
+  }
+
   Std_Deviation <- matrix(unlist(Std_Deviation), nrow = 2)
   data <- data.frame(Amino_Acid, Codon, Value, Lower=Std_Deviation[1,], Upper=Std_Deviation[2,])
   colnames(data) <- c("AA", "Codon", "Posterior", "0.025%", "0.975%")
@@ -369,32 +397,7 @@ getCSPEstimates.Rcpp_ROCParameter <- function(parameter, filename=NULL,
 # }
 ### TODO
 
-#' Get Codon Counts For Each Amino Acid 
-#' 
-#' @param aa A one character representation of an amino acid.
-#' 
-#' @param genome A genome object from which the counts of each
-#' codon can be obtained.
-#' 
-#' @return codonCounts Returns a matrix storing the codonCounts. 
-#' 
-#' @description \code{getCodonCountsForAA} returns a matrix filled with 
-#' the number of times a codon is seen in each gene.
-#' 
-#' @details The returned matrix will have the row correspond to the
-#' genes in the genome and the columns correspond to the codons for the 
-#' given aa. The values will the number of times the codon is present in 
-#' that gene.
-#' 
-getCodonCountsForAA <- function(aa, genome){
-  # get codon count for aa
-  codons <- AAToCodon(aa, F)
-  codonCounts <- lapply(codons, function(codon){
-    codonCounts <- genome$getCodonCountsPerGene(codon)
-  })
-  codonCounts <- do.call("cbind", codonCounts)
-  return(codonCounts)
-}
+
 
 
 # Uses a multinomial logistic regression to estimate the codon specific parameters for every category.
@@ -455,11 +458,13 @@ splitMatrix <- function(M, r, c){
 #' Valid values for the vector range from 1 to numMixtures.
 #' It is possible but not advised to leave a mixture element empty.
 #' 
+#' @param init.csp.variance initial proposal variance for codon specific parameter, default is 0.0025.
+#' 
 #' @return parameter Returns the Parameter argument, now modified with initialized mutation, selection, and covariance matrices.
 #' 
 
 # Also initializes the mutaiton and selection parameter
-initializeCovarianceMatrices <- function(parameter, genome, numMixtures, geneAssignment, init.csp.variance) {
+initializeCovarianceMatrices <- function(parameter, genome, numMixtures, geneAssignment, init.csp.variance = 0.0025) {
   numMutationCategory <- parameter$numMutationCategories
   numSelectionCategory <- parameter$numSelectionCategories
   
@@ -473,7 +478,7 @@ initializeCovarianceMatrices <- function(parameter, genome, numMixtures, geneAss
     if(aa == "M" || aa == "W" || aa == "X") next
     #should go away when CT is up and running
     
-    codonCounts <- getCodonCountsForAA(aa, genome)
+    codonCounts <- getCodonCountsForAA(genome, aa)
     numCodons <- dim(codonCounts)[2] - 1
     #-----------------------------------------
     # TODO WORKS CURRENTLY ONLY FOR ALLUNIQUE!
@@ -499,7 +504,7 @@ initializeCovarianceMatrices <- function(parameter, genome, numMixtures, geneAss
   # if(aa == "M" || aa == "W" || aa == "X") next
   #should go away when CT is up and running
   
-  #codonCounts <- getCodonCountsForAA(aa, genome)
+  #codonCounts <- getCodonCountsForAA(genome, aa)
   #numCodons <- dim(codonCounts)[2] - 1
   #-----------------------------------------
   # TODO WORKS CURRENTLY ONLY FOR ALLUNIQUE!
@@ -538,7 +543,7 @@ initializeCovarianceMatrices <- function(parameter, genome, numMixtures, geneAss
   #  compl.covMat[matrix.positions == matrix.positions[mut.seq[i], ofdiag.seq[i]]] <- unlist(covmat[[i]][2])
   # compl.covMat[matrix.positions == matrix.positions[ofdiag.seq[i], mut.seq[i]]] <- unlist(covmat[[i]][3])
   #}
-  #for testing - in actuallity this is used, it is currently overwriting 
+  #for testing - in actuality this is used, it is currently overwriting 
   #previous steps.
   #compl.covMat <- diag((numMutationCategory + numSelectionCategory) * numCodons) * 0.05
   #compl.covMat / max(compl.covMat)
@@ -554,6 +559,8 @@ getMixtureAssignmentEstimate <- function(parameter, gene.index, samples)
   mixtureAssignment <- unlist(lapply(gene.index,  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))
   return(mixtureAssignment)
 }
+
+
 getExpressionEstimatesForMixture <- function(parameter, gene.index, mixtureAssignment, samples)
 {
   expressionValues <- unlist(lapply(gene.index, function(geneIndex){ 
@@ -599,12 +606,12 @@ writeParameterObject <- function(parameter, file)
 extractBaseInfo <- function(parameter){
   trace <- parameter$getTraceObject()
   stdDevSynthesisRateTraces <- trace$getStdDevSynthesisRateTraces()
-  stdDevSynthesisRateAcceptRatTrace <- trace$getStdDevSynthesisRateAcceptanceRatioTrace()
+  stdDevSynthesisRateAcceptRatTrace <- trace$getStdDevSynthesisRateAcceptanceRateTrace()
   synthRateTrace <- trace$getSynthesisRateTrace()
-  synthAcceptRatTrace <- trace$getSynthesisRateAcceptanceRatioTrace()
+  synthAcceptRatTrace <- trace$getSynthesisRateAcceptanceRateTrace()
   mixAssignTrace <- trace$getMixtureAssignmentTrace()
   mixProbTrace <- trace$getMixtureProbabilitiesTrace()
-  codonSpecificAcceptRatTrace <- trace$getCodonSpecificAcceptanceRatioTrace()
+  codonSpecificAcceptRatTrace <- trace$getCodonSpecificAcceptanceRateTrace()
   numMix <- parameter$numMixtures
   numMut <- parameter$numMutationCategories
   numSel <- parameter$numSelectionCategories
@@ -645,7 +652,7 @@ writeParameterObject.Rcpp_ROCParameter <- function(parameter, file){
   
   mutationTrace <- trace$getCodonSpecificParameterTrace(0)
   selectionTrace <- trace$getCodonSpecificParameterTrace(1)
-  synthesisOffsetAcceptRatTrace <- trace$getSynthesisOffsetAcceptanceRatioTrace()
+  synthesisOffsetAcceptRatTrace <- trace$getSynthesisOffsetAcceptanceRateTrace()
   synthesisOffsetTrace <- trace$getSynthesisOffsetTrace()
   observedSynthesisNoiseTrace <- trace$getObservedSynthesisNoiseTrace()
   if (length(synthesisOffsetTrace) == 0){
@@ -710,9 +717,10 @@ writeParameterObject.Rcpp_FONSEParameter <- function(parameter, file)
 
 #' Load Parameter Object
 #'  
-#' @param files The filenames where the data will be stored.
+#' @param files A list of parameter filenames to be loaded. If multiple files are given, 
+#' the parameter objects will be concatenated in the order provided
 #' 
-#' @return This function has no return value.
+#' @return parameter Returns an initialized Parameter object depending on the parameter type given.
 #' 
 #' @description \code{loadParameterObject} will call the appropriate followup
 #' call to loadXXXParameterObject based off of the parameter type 
@@ -738,6 +746,7 @@ loadParameterObject <- function(files)
     }#end of if-else
   }#end of for
   
+#  browser()
   if (firstModel == "ROC"){
     parameter <- new(ROCParameter)
     parameter <- loadROCParameterObject(parameter, files)
@@ -780,19 +789,19 @@ setBaseInfo <- function(parameter, files)
       lastIteration <- tempEnv$paramBase$lastIteration
       max <- tempEnv$paramBase$lastIteration + 1
       
-      stdDevSynthesisRateTraces <- c()
-      for (j in 1:numMixtures) {
+      stdDevSynthesisRateTraces <- vector("list", length = numSelectionCategories)
+      for (j in 1:numSelectionCategories) {
         stdDevSynthesisRateTraces[[j]] <- tempEnv$paramBase$stdDevSynthesisRateTraces[[j]][1:max]
       }
-      stdDevSynthesisRateAcceptanceRatioTrace <- tempEnv$paramBase$stdDevSynthesisRateAcceptRatTrace
-      synthesisRateTrace <- vector("list", length=numMixtures)
-      for (j in 1:numMixtures) {
+      stdDevSynthesisRateAcceptanceRateTrace <- tempEnv$paramBase$stdDevSynthesisRateAcceptRatTrace
+      synthesisRateTrace <- vector("list", length = numSelectionCategories)
+      for (j in 1:numSelectionCategories) {
         for (k in 1:length(tempEnv$paramBase$synthRateTrace[[j]])){
           synthesisRateTrace[[j]][[k]] <- tempEnv$paramBase$synthRateTrace[[j]][[k]][1:max]
         }
       }
-      synthesisRateAcceptanceRatioTrace <- tempEnv$paramBase$synthAcceptRatTrace
-      mixtureAssignmentTrace <- c()
+      synthesisRateAcceptanceRateTrace <- tempEnv$paramBase$synthAcceptRatTrace
+      mixtureAssignmentTrace <- vector("list", length = length(tempEnv$paramBase$mixAssignTrace))
       for (j in 1:length(tempEnv$paramBase$mixAssignTrace)){
         mixtureAssignmentTrace[[j]] <- tempEnv$paramBase$mixAssignTrace[[j]][1:max]
       }
@@ -800,7 +809,7 @@ setBaseInfo <- function(parameter, files)
       for (j in 1:numMixtures) {
         mixtureProbabilitiesTrace[[j]] <- tempEnv$paramBase$mixProbTrace[[j]][1:max]
       }
-      codonSpecificAcceptanceRatioTrace <- tempEnv$paramBase$codonSpecificAcceptRatTrace
+      codonSpecificAcceptanceRateTrace <- tempEnv$paramBase$codonSpecificAcceptRatTrace
     } else {
       if (sum(categories.matrix != do.call("rbind", tempEnv$paramBase$categories)) != 0){
           stop("categories is not the same between all files")
@@ -824,12 +833,12 @@ setBaseInfo <- function(parameter, files)
       }
       
       curStdDevSynthesisRateTraces <- tempEnv$paramBase$stdDevSynthesisRateTraces
-      curStdDevSynthesisRateAcceptanceRatioTrace <- tempEnv$paramBase$stdDevSynthesisRateAcceptRatTrace
+      curStdDevSynthesisRateAcceptanceRateTrace <- tempEnv$paramBase$stdDevSynthesisRateAcceptRatTrace
       curSynthesisRateTrace <- tempEnv$paramBase$synthRateTrace
-      curSynthesisRateAcceptanceRatioTrace <- tempEnv$paramBase$synthAcceptRatTrace
+      curSynthesisRateAcceptanceRateTrace <- tempEnv$paramBase$synthAcceptRatTrace
       curMixtureAssignmentTrace <- tempEnv$paramBase$mixAssignTrace
       curMixtureProbabilitiesTrace <- tempEnv$paramBase$mixProbTrace
-      curCodonSpecificAcceptanceRatioTrace <- tempEnv$paramBase$codonSpecificAcceptRatTrace
+      curCodonSpecificAcceptanceRateTrace <- tempEnv$paramBase$codonSpecificAcceptRatTrace
       
       lastIteration <- lastIteration + tempEnv$paramBase$lastIteration
       
@@ -838,21 +847,23 @@ setBaseInfo <- function(parameter, files)
       max <- tempEnv$paramBase$lastIteration + 1
       combineTwoDimensionalTrace(stdDevSynthesisRateTraces, curStdDevSynthesisRateTraces, max)
 
-      size <- length(curStdDevSynthesisRateAcceptanceRatioTrace)
-      stdDevSynthesisRateAcceptanceRatioTrace <- c(stdDevSynthesisRateAcceptanceRatioTrace, 
-                                      curStdDevSynthesisRateAcceptanceRatioTrace[2:size])
+      size <- length(curStdDevSynthesisRateAcceptanceRateTrace)
+      stdDevSynthesisRateAcceptanceRateTrace <- c(stdDevSynthesisRateAcceptanceRateTrace, 
+                                      curStdDevSynthesisRateAcceptanceRateTrace[2:size])
 
       
       combineThreeDimensionalTrace(synthesisRateTrace, curSynthesisRateTrace, max)
-      size <- length(curSynthesisRateAcceptanceRatioTrace)
-      combineThreeDimensionalTrace(synthesisRateAcceptanceRatioTrace, curSynthesisRateAcceptanceRatioTrace, size)
+      size <- length(curSynthesisRateAcceptanceRateTrace)
+      combineThreeDimensionalTrace(synthesisRateAcceptanceRateTrace, curSynthesisRateAcceptanceRateTrace, size)
       
       combineTwoDimensionalTrace(mixtureAssignmentTrace, curMixtureAssignmentTrace, max)
       combineTwoDimensionalTrace(mixtureProbabilitiesTrace, curMixtureProbabilitiesTrace, max)
-      size <- length(curCodonSpecificAcceptanceRatioTrace)
-      combineTwoDimensionalTrace(codonSpecificAcceptanceRatioTrace, curCodonSpecificAcceptanceRatioTrace, size)
+      size <- length(curCodonSpecificAcceptanceRateTrace)
+      combineTwoDimensionalTrace(codonSpecificAcceptanceRateTrace, curCodonSpecificAcceptanceRateTrace, size)
     }
   }
+
+#browser()
   parameter$setCategories(categories)
   parameter$setCategoriesForTrace()  
   parameter$numMixtures <- numMixtures
@@ -863,12 +874,12 @@ setBaseInfo <- function(parameter, files)
   
   trace <- parameter$getTraceObject()
   trace$setStdDevSynthesisRateTraces(stdDevSynthesisRateTraces)
-  trace$setStdDevSynthesisRateAcceptanceRatioTrace(stdDevSynthesisRateAcceptanceRatioTrace)
+  trace$setStdDevSynthesisRateAcceptanceRateTrace(stdDevSynthesisRateAcceptanceRateTrace)
   trace$setSynthesisRateTrace(synthesisRateTrace)
-  trace$setSynthesisRateAcceptanceRatioTrace(synthesisRateAcceptanceRatioTrace)
+  trace$setSynthesisRateAcceptanceRateTrace(synthesisRateAcceptanceRateTrace)
   trace$setMixtureAssignmentTrace(mixtureAssignmentTrace)
   trace$setMixtureProbabilitiesTrace(mixtureProbabilitiesTrace)
-  trace$setCodonSpecificAcceptanceRatioTrace(codonSpecificAcceptanceRatioTrace)
+  trace$setCodonSpecificAcceptanceRateTrace(codonSpecificAcceptanceRateTrace)
   
   parameter$setTraceObject(trace)
   return(parameter)
@@ -882,8 +893,11 @@ loadROCParameterObject <- function(parameter, files)
   for (i in 1:length(files)){
     tempEnv <- new.env();
     load(file = files[i], envir = tempEnv)
-  
+
+    numMutationCategories <- tempEnv$paramBase$numMut
+    numSelectionCategories <- tempEnv$paramBase$numSel
     max <- tempEnv$paramBase$lastIteration + 1
+  
     if (i == 1){
       withPhi <- tempEnv$withPhi
       if (withPhi){
@@ -894,7 +908,7 @@ loadROCParameterObject <- function(parameter, files)
         }
         
         
-        synthesisOffsetAcceptanceRatioTrace <- tempEnv$synthesisOffsetAcceptRatTrace
+        synthesisOffsetAcceptanceRateTrace <- tempEnv$synthesisOffsetAcceptRatTrace
         
         
         observedSynthesisNoiseTrace <- c()
@@ -904,21 +918,30 @@ loadROCParameterObject <- function(parameter, files)
         #need number of phi groups, not the number of mixtures apparently.
       }else {
         synthesisOffsetTrace <- c()
-        synthesisOffsetAcceptanceRatioTrace <- c()
+        synthesisOffsetAcceptanceRateTrace <- c()
         observedSynthesisNoiseTrace <- c()
       }
       
-      codonSpecificParameterTraceMut <- vector("list", length=parameter$numMixtures)
-      codonSpecificParameterTraceSel <- vector("list", length=parameter$numMixtures)
-      for (j in 1:parameter$numMixtures) {
+      codonSpecificParameterTraceMut <- vector("list", length=numMutationCategories)
+      for (j in 1:numMutationCategories) {
+	codonSpecificParameterTraceMut[[j]] <- vector("list", length=length(tempEnv$mutationTrace[[j]]))
         for (k in 1:length(tempEnv$mutationTrace[[j]])){
           codonSpecificParameterTraceMut[[j]][[k]] <- tempEnv$mutationTrace[[j]][[k]][1:max]
+          #codonSpecificParameterTraceSel[[j]][[k]] <- tempEnv$selectionTrace[[j]][[k]][1:max]
+        }
+      }
+
+      codonSpecificParameterTraceSel <- vector("list", length=numSelectionCategories)
+      for (j in 1:numSelectionCategories) {
+	codonSpecificParameterTraceSel[[j]] <- vector("list", length=length(tempEnv$selectionTrace[[j]]))
+        for (k in 1:length(tempEnv$selectionTrace[[j]])){
+          #codonSpecificParameterTraceMut[[j]][[k]] <- tempEnv$mutationTrace[[j]][[k]][1:max]
           codonSpecificParameterTraceSel[[j]][[k]] <- tempEnv$selectionTrace[[j]][[k]][1:max]
         }
       }
     }else{
       curSynthesisOffsetTrace <- tempEnv$synthesisOffsetTrace
-      curSynthesisOffsetAcceptanceRatioTrace <- tempEnv$synthesisOffsetAcceptRatTrace
+      curSynthesisOffsetAcceptanceRateTrace <- tempEnv$synthesisOffsetAcceptRatTrace
       curObservedSynthesisNoiseTrace <- tempEnv$observedSynthesisNoiseTrace
       curCodonSpecificParameterTraceMut <- tempEnv$mutationTrace
       curCodonSpecificParameterTraceSel <- tempEnv$selectionTrace
@@ -929,8 +952,8 @@ loadROCParameterObject <- function(parameter, files)
       
       if (withPhi){
         combineTwoDimensionalTrace(synthesisOffsetTrace, curSynthesisOffsetTrace, max)
-        size <- length(curSynthesisOffsetAcceptanceRatioTrace)
-        combineTwoDimensionalTrace(synthesisOffsetAcceptanceRatioTrace, curSynthesisOffsetAcceptanceRatioTrace, size)
+        size <- length(curSynthesisOffsetAcceptanceRateTrace)
+        combineTwoDimensionalTrace(synthesisOffsetAcceptanceRateTrace, curSynthesisOffsetAcceptanceRateTrace, size)
         combineTwoDimensionalTrace(observedSynthesisNoiseTrace, curObservedSynthesisNoiseTrace, max)
       }
       
@@ -941,7 +964,7 @@ loadROCParameterObject <- function(parameter, files)
   
   trace <- parameter$getTraceObject()
   trace$setSynthesisOffsetTrace(synthesisOffsetTrace)
-  trace$setSynthesisOffsetAcceptanceRatioTrace(synthesisOffsetAcceptanceRatioTrace)
+  trace$setSynthesisOffsetAcceptanceRateTrace(synthesisOffsetAcceptanceRateTrace)
   trace$setObservedSynthesisNoiseTrace(observedSynthesisNoiseTrace)
   trace$setCodonSpecificParameterTrace(codonSpecificParameterTraceMut, 0)
   trace$setCodonSpecificParameterTrace(codonSpecificParameterTraceSel, 1)
@@ -966,18 +989,21 @@ loadRFPParameterObject <- function(parameter, files)
   
     max <- tempEnv$paramBase$lastIteration + 1
     numMixtures <- tempEnv$paramBase$numMix
+    numMutationCategories <- tempEnv$paramBase$numMut
+    numSelectionCategories <- tempEnv$paramBase$numSel
+
     if (i == 1){
       #for future use: This may break if RFP is ran with more than
       #one mixture, in this case just follow the format of the 
       #ROC CSP parameters.
-      alphaTrace <-c()
-      for (j in 1:numMixtures) {
+      alphaTrace <- vector("list", length=numMutationCategories)
+      for (j in 1:numMutationCategories) {
         for (k in 1:length(tempEnv$alphaTrace[[j]])){
           alphaTrace[[j]][[k]] <- tempEnv$alphaTrace[[j]][[k]][1:max]
         }
       }
-      lambdaPrimeTrace <- c()
-      for (j in 1:numMixtures) {
+      lambdaPrimeTrace <- vector("list", length=numSelectionCategories)
+      for (j in 1:numSelectionCategories) {
         for (k in 1:length(tempEnv$lambdaPrimeTrace[[j]])){
           lambdaPrimeTrace[[j]][[k]] <- tempEnv$lambdaPrimeTrace[[j]][[k]][1:max]
         }
@@ -1014,17 +1040,30 @@ loadFONSEParameterObject <- function(parameter, files)
     tempEnv <- new.env();
     load(file = files[i], envir = tempEnv)
     
+    numMutationCategories <- tempEnv$paramBase$numMut
+    numSelectionCategories <- tempEnv$paramBase$numSel
     max <- tempEnv$paramBase$lastIteration + 1
+
     if (i == 1){
       
-      codonSpecificParameterTraceMut <- vector("list", length=parameter$numMixtures)
-      codonSpecificParameterTraceSel <- vector("list", length=parameter$numMixtures)
-      for (j in 1:parameter$numMixtures) {
+      codonSpecificParameterTraceMut <- vector("list", length=numMutationCategories)
+      for (j in 1:numMutationCategories) {
+	codonSpecificParameterTraceMut[[j]] <- vector("list", length=length(tempEnv$mutationTrace[[j]]))
         for (k in 1:length(tempEnv$mutationTrace[[j]])){
           codonSpecificParameterTraceMut[[j]][[k]] <- tempEnv$mutationTrace[[j]][[k]][1:max]
+          #codonSpecificParameterTraceSel[[j]][[k]] <- tempEnv$selectionTrace[[j]][[k]][1:max]
+        }
+      }
+
+      codonSpecificParameterTraceSel <- vector("list", length=numSelectionCategories)
+      for (j in 1:numSelectionCategories) {
+	codonSpecificParameterTraceSel[[j]] <- vector("list", length=length(tempEnv$selectionTrace[[j]]))
+        for (k in 1:length(tempEnv$selectionTrace[[j]])){
+          #codonSpecificParameterTraceMut[[j]][[k]] <- tempEnv$mutationTrace[[j]][[k]][1:max]
           codonSpecificParameterTraceSel[[j]][[k]] <- tempEnv$selectionTrace[[j]][[k]][1:max]
         }
       }
+
     }else{
       curCodonSpecificParameterTraceMut <- tempEnv$mutationTrace
       curCodonSpecificParameterTraceSel <- tempEnv$selectionTrace

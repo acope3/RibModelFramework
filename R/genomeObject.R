@@ -28,6 +28,34 @@ initializeGenomeObject <- function(file, observed.expression.file=NULL, append=F
   return(genome)
 }
 
+#' Get Codon Counts For Each Amino Acid 
+#' @param genome A genome object from which the counts of each
+#' codon can be obtained.
+#'  
+#' @param aa A one character representation of an amino acid.
+#' 
+#' @return codonCounts Returns a matrix storing the codonCounts. 
+#' 
+#' @description \code{getCodonCountsForAA} returns a matrix filled with 
+#' the number of times a codon is seen in each gene.
+#' 
+#' @details The returned matrix will have the row correspond to the
+#' genes in the genome and the columns correspond to the codons for the 
+#' given aa. The values will the number of times the codon is present in 
+#' that gene.
+#' 
+getCodonCountsForAA <- function(genome, aa){
+  # get codon count for aa
+  codons <- AAToCodon(aa, F)
+  codonCounts <- lapply(codons, function(codon){
+    codonCounts <- genome$getCodonCountsPerGene(codon)
+  })
+  codonCounts <- do.call("cbind", codonCounts)
+  return(codonCounts)
+}
+
+
+
 #' Length of Genome
 #' 
 #' \code{length} gives the length of a genome

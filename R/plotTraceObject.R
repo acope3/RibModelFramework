@@ -108,7 +108,7 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
   }
   ### Plot title.
   if (ROC){
-  par(mar = c(0, 0, 0, 0))
+    par(mar = c(0, 0, 0, 0))
   }else{
     par(mar = c(1,1,1,1))
   }

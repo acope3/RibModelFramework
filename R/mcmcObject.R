@@ -69,22 +69,9 @@ initializeMCMCObject <- function(samples, thinning=1, adaptive.width=100,
 #' steps, and the state of the chain is saved every thinning steps.
 #' 
 runMCMC <- function(mcmc, genome, model, ncores = 1, divergence.iteration = 0){
-  
-  #TODO: error check values
-  UseMethod("runMCMC", mcmc)
-}
-
-
-#Called from "runMCMC."
-runMCMC.Rcpp_MCMCAlgorithm <- function(mcmc, genome, model, ncores = 1, 
-                                       divergence.iteration = 0){
+  if(class(mcmc) != "Rcpp_MCMCAlgorithm") stop("mcmc is not of class Rcpp_Algorithm")
   mcmc$run(genome, model, ncores, divergence.iteration)
 }
-
-
-
-
-
 
 
 #' Set Restart Settings 
@@ -110,56 +97,48 @@ runMCMC.Rcpp_MCMCAlgorithm <- function(mcmc, genome, model, ncores = 1,
 #' are generated for a run.
 #' 
 setRestartSettings <- function(mcmc, filename, samples, write.multiple=TRUE){
-  UseMethod("setRestartSettings", mcmc)
-}
-
-
-setRestartSettings.Rcpp_MCMCAlgorithm <- function(mcmc, filename, samples, 
-                                                  write.multiple=TRUE){
+  if(class(mcmc) != "Rcpp_MCMCAlgorithm") stop("mcmc is not of class Rcpp_Algorithm")
   mcmc$setRestartFileSettings(filename, samples, write.multiple)
 }
-#TODO: Why is this seperated into 2 functions?
 
 
 # TODO: Have someone who knows what's going on document this.
 # The true method is found in traceObject.R
 #' Convergence Test
 #' 
-#' @param trace
+#' @param object an object of either class Trace or MCMC
 #' 
-#' @param what
+#' @param n.samples number of samples at the end of the trace used to determine convergence (< length of trace)
 #' 
-#' @param mixture
+#' @param frac1 TODO
 #' 
-#' @param n.samples
+#' @param frac2 TODO
 #' 
-#' @param frac1
+#' @param thin TODO
 #' 
-#' @param frac2
+#' @param plot (logical) plot result instead of returning an object
 #' 
-#' @param plot
+#' @param ... TODO describe what and mixture parameter
 #' 
-#' @param ...
-#' 
-#' @return 
+#' @return geweke score object
 #' 
 #' @description \code{convergence.test} 
 #' 
 #' @details \code{convergence.test}
 #' 
-convergence.test <- function(object, nsamples = 10, frac1 = 0.1, frac2 = 0.5, 
+convergence.test <- function(object, n.samples = 10, frac1 = 0.1, frac2 = 0.5, 
                     thin = 1, plot = FALSE, ...){
   UseMethod("convergence.test", object)
 }
 
 
-convergence.test.Rcpp_MCMCAlgorithm <- function(trace, what, mixture, n.samples = 10, frac1 = 0.1, 
-                                       frac2 = 0.5, plot = FALSE, ...){
+convergence.test.Rcpp_MCMCAlgorithm <- function(object, n.samples = 10, frac1 = 0.1, 
+                                       frac2 = 0.5, thin = 1, plot = FALSE, ...){
   # TODO: extend to work with multiple chains once we have that capability.
   
   loglik.trace <- object$getLogLikelihoodTrace()
   trace.length <- length(loglik.trace)
-  start <- max(1, trace.length - nsamples)
+  start <- max(1, trace.length - n.samples)
   
   # the start and end parameter do NOT work, using subsetting to achieve goal
   mcmcobj <- coda::mcmc(data=loglik.trace[start:trace.length], thin = thin)

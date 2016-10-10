@@ -4,7 +4,8 @@
 \alias{initializeCovarianceMatrices}
 \title{Initialize Covariance Matrices}
 \usage{
-initializeCovarianceMatrices(parameter, genome, numMixtures, geneAssignment)
+initializeCovarianceMatrices(parameter, genome, numMixtures, geneAssignment,
+  init.csp.variance = 0.0025)
 }
 \arguments{
 \item{parameter}{A Parameter object that corresponds to one of the model types. 
@@ -18,6 +19,8 @@ Valid values are "ROC", "RFP", and "FONSE".}
 The vector length has to equal the number of genes in the genome.
 Valid values for the vector range from 1 to numMixtures.
 It is possible but not advised to leave a mixture element empty.}
+
+\item{init.csp.variance}{initial proposal variance for codon specific parameter, default is 0.0025.}
 }
 \value{
 parameter Returns the Parameter argument, now modified with initialized mutation, selection, and covariance matrices.

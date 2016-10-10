@@ -17,7 +17,7 @@ class CovarianceMatrix
         std::vector<double> choleskyMatrix;
         int numVariates; //make static const again
 
-		double sampleMean(std::vector<double> sampleVector, unsigned samples, unsigned lastIteration);
+		double sampleMean(std::vector<float> sampleVector, unsigned samples, unsigned lastIteration);
 
     public:
         //Constructors & Destructors:
@@ -43,7 +43,7 @@ class CovarianceMatrix
 		std::vector<double>* getCholeskyMatrix(); //Only for unit testing.
         int getNumVariates();
         std::vector<double> transformIidNumersIntoCovaryingNumbers(std::vector<double> iidnumbers);
-		void calculateSampleCovariance(std::vector<std::vector<std::vector<std::vector<double>>>> codonSpecificParameterTrace, std::string aa, unsigned samples, unsigned lastIteration);
+		void calculateSampleCovariance(std::vector<std::vector<std::vector<std::vector<float>>>> codonSpecificParameterTrace, std::string aa, unsigned samples, unsigned lastIteration);
 
 #ifndef STANDALONE
     void setCovarianceMatrix(SEXP _matrix);

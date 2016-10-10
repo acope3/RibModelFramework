@@ -4,11 +4,11 @@
 \alias{initializeParameterObject}
 \title{Initialize Parameter}
 \usage{
-initializeParameterObject(genome = NULL, sphi = NULL, numMixtures = 1,
-  geneAssignment = NULL, expressionValues = NULL, model = "ROC",
+initializeParameterObject(genome = NULL, sphi = NULL, num.mixtures = 1,
+  gene.assignment = NULL, initial.expression.values = NULL, model = "ROC",
   split.serine = TRUE, mixture.definition = "allUnique",
-  mixture.definition.matrix = NULL, restart.file = NULL,
-  mutation_prior_sd = 0.35)
+  mixture.definition.matrix = NULL, init.with.restart.file = NULL,
+  mutation.prior.sd = 0.35, init.csp.variance = 0.0025)
 }
 \arguments{
 \item{genome}{An object of type Genome necessary for the initialization of the Parameter object.
@@ -17,16 +17,16 @@ The default value is NULL.}
 \item{sphi}{Initial values for sphi. Expected is a vector of length numMixtures.
 The default value is NULL.}
 
-\item{numMixtures}{The number of mixtures elements for the underlying mixture distribution (numMixtures > 0).
+\item{num.mixtures}{The number of mixtures elements for the underlying mixture distribution (numMixtures > 0).
 The default value is 1.}
 
-\item{geneAssignment}{A vector holding the initial mixture assignment for each gene. 
+\item{gene.assignment}{A vector holding the initial mixture assignment for each gene. 
 The vector length has to equal the number of genes in the genome.
 Valid values for the vector range from 1 to numMixtures. 
 It is possible but not advised to leave a mixture element empty.
 The default Value is NULL.}
 
-\item{expressionValues}{(Optional) A vector with intial phi values.
+\item{initial.expression.values}{(Optional) A vector with intial phi values.
 The length of the vector has to equal the number of genes in the Genome object.
 The default value is NULL.}
 
@@ -53,20 +53,23 @@ If provided, the model will use the matrix to initialize the mutation and select
 categories instead of the definition listed directly above.
 See details for more information.}
 
-\item{restart.file}{File name containing information to reinitialize a 
+\item{init.with.restart.file}{File name containing information to reinitialize a 
 previous Parameter object.
 If given, all other arguments will be ignored.
-The default value for restart.file is NULL.}
+The default value for init.with.restart.file is NULL.}
 
-\item{mutation_prior_sd}{Controlling the standard deviation of the normal 
+\item{mutation.prior.sd}{Controlling the standard deviation of the normal 
 prior on the mutation parameters}
+
+\item{init.csp.variance}{specifies the initial proposal width for codon specific parameter (default is 0.0025). 
+The proposal width adapts during the runtime to reach a taget acceptance rate of ~0.25}
 }
 \value{
 parameter Returns an initialized Parameter object.
 }
 \description{
 \code{initializeParameterObject} will call the appropriate followup
-call to writeXXXParameterObject based off of the value of model and restart.file.
+call to writeXXXParameterObject based off of the value of model and init.with.restart.file.
 }
 \details{
 \code{initializeParameterObject} checks the values of the arguments 

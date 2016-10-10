@@ -20,7 +20,6 @@ class Gene
 
 	public:
 
-
 		SequenceSummary geneData;  //TODO: might make private
 		std::vector<double> observedSynthesisRateValues; //TODO: make private
 
@@ -41,14 +40,25 @@ class Gene
 		void setDescription(std::string _desc);
 		std::string getSequence();
 		void setSequence(std::string _seq);
-		std::vector <unsigned> getRFP_count(); //Only for unit testing.
-		void addRFP_count(std::vector <unsigned> RFP_counts);
+        void setPASequence(std::vector <std::vector <unsigned>> table);
 		SequenceSummary *getSequenceSummary();
 		std::vector<double> getObservedSynthesisRateValues(); //exposed to RCPP, tested in C++
 		void setObservedSynthesisRateValues(std::vector <double> values); //Only for unit testing.
 		double getObservedSynthesisRate(unsigned index);
 		unsigned getNumObservedSynthesisSets();
 		char getNucleotideAt(unsigned i);
+
+
+		//RFP Functions (for PA and PANSE models) (All tested):
+		void initRFP_count(unsigned numCategories); // Wraps SequenceSummary:initRFP_count()
+		std::vector <unsigned> getRFP_count(unsigned categoryIndex); //Only for unit testing.
+																	 // Wraps SequenceSummary::getRFP_count()
+		void setRFP_count(unsigned categoryIndex, std::vector <unsigned> RFP_counts); // Wraps SequenceSummary:setRFP_count()
+		// TODO: TEST THE FOLLOWING
+		void initSumRFP_count(unsigned numCategories); // Wraps SequenceSummary:initSumRFP_count()
+		std::array <unsigned, 64> getSumRFP_count(unsigned categoryIndex); //Only for unit testing.
+																		// Wraps SequenceSummary::getSumRFP_count()
+		void setSumRFP_count(unsigned categoryIndex, std::array <unsigned, 64> sumRFP_counts); // Wraps SequenceSummary:setSumRFP_count()
 
 
 		//Other functions:

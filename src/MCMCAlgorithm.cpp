@@ -245,7 +245,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
                 	logLikelihood += probabilities[k] * unscaledLogPost_curr[k];
 			}
 
-/*            if (std::isnan(logLikelihood))
+            if (std::isnan(logLikelihood))
             {
                 my_print("\n\n\n");
                 my_print("Gene: %, %\n", i, gene->getId());
@@ -255,7 +255,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
                 my_print("prop logLik: %\n", unscaledLogPost_prop[k]);
                 my_print("Accepted?: % < % , %\n", alpha, (propLogLike - currLogLike), alpha < (propLogLike - currLogLike));
                 my_print("\n\n\n");
-            }*/
+            }
 		}
         
 
@@ -401,8 +401,8 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 
 	my_print("entering MCMC loop\n");
 	my_print("\tEstimate Codon Specific Parameters? % \n", (estimateCodonSpecificParameter ? "TRUE" : "FALSE") );
-	my_print("\tEstimate Hyper Parameters? % \n", (estimateCodonSpecificParameter ? "TRUE" : "FALSE") );
-	my_print("\tEstimate Synthesis rates? % \n", (estimateCodonSpecificParameter ? "TRUE" : "FALSE") );
+	my_print("\tEstimate Hyper Parameters? % \n", (estimateHyperParameter ? "TRUE" : "FALSE") );
+	my_print("\tEstimate Synthesis rates? % \n", (estimateSynthesisRate ? "TRUE" : "FALSE") );
 	my_print("\tStarting MCMC with % iterations\n", maximumIterations);
 	my_print("\tAdapting will stop after % steps\n", stepsToAdapt);
 
@@ -502,11 +502,13 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 		}
 	} // end MCMC loop
 
-	std::ostringstream oss;
-	oss << file << "_final";
-	std::string tmp = oss.str();
-	model.writeRestartFile(tmp);
-
+	if (writeRestartFile)
+	{
+		std::ostringstream oss;
+		oss << file << "_final";
+		std::string tmp = oss.str();
+		model.writeRestartFile(tmp);
+	}
 	my_print("leaving MCMC loop\n");
 }
 

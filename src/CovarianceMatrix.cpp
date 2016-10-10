@@ -18,19 +18,14 @@ CovarianceMatrix::CovarianceMatrix()
     /* Initialize with numVariates = 2.
     // Equivalent to calling initCovarianceMatrix(2) */
     numVariates = 2;
-    covMatrix.resize(4);
-    choleskyMatrix.resize(4);
 
-    for (unsigned i = 0u; i < 4; i++)
-    {
-        covMatrix[i] = i % 3 ? 0.0 : 0.01 / 2.0;
-        choleskyMatrix[i] = 0.0;
-    }
+    initCovarianceMatrix(numVariates);
 }
 
 
 CovarianceMatrix::CovarianceMatrix(int _numVariates)
 {
+	numVariates = _numVariates;
 	initCovarianceMatrix(_numVariates);
 }
 
@@ -108,7 +103,7 @@ CovarianceMatrix::~CovarianceMatrix()
 void CovarianceMatrix::initCovarianceMatrix(unsigned _numVariates)
 {
     numVariates = _numVariates;
-    unsigned vectorLength = numVariates * numVariates;
+    int vectorLength = numVariates * numVariates;
     covMatrix.resize(vectorLength);
     choleskyMatrix.resize(vectorLength);
 
@@ -116,7 +111,7 @@ void CovarianceMatrix::initCovarianceMatrix(unsigned _numVariates)
     for (unsigned i = 0u; i < vectorLength; i++)
     {
         covMatrix[i] = (i % (numVariates + 1) ? 0.0 : diag_const);
-        choleskyMatrix[i] = 0.0;
+        choleskyMatrix[i] = covMatrix[i];
     }
 }
 
@@ -215,7 +210,7 @@ std::vector<double> CovarianceMatrix::transformIidNumersIntoCovaryingNumbers(std
 }
 
 
-void CovarianceMatrix::calculateSampleCovariance(std::vector<std::vector<std::vector<std::vector<double>>>> codonSpecificParameterTrace, std::string aa, unsigned samples, unsigned lastIteration)
+void CovarianceMatrix::calculateSampleCovariance(std::vector<std::vector<std::vector<std::vector<float>>>> codonSpecificParameterTrace, std::string aa, unsigned samples, unsigned lastIteration)
 {
 	//order of codonSpecificParameterTrace: paramType, category, numparam, samples
 	unsigned numParamTypesInModel = codonSpecificParameterTrace.size();
@@ -255,7 +250,7 @@ void CovarianceMatrix::calculateSampleCovariance(std::vector<std::vector<std::ve
 							{
 								unscaledSampleCov += (codonSpecificParameterTrace[paramType1][category1][param1][i] - mean1) * (codonSpecificParameterTrace[paramType2][category2][param2][i] - mean2);
 							}
-							covMatrix[IDX] = unscaledSampleCov / (samples - 1);
+							covMatrix[IDX] = unscaledSampleCov / ((double)samples - 1.0);
 							IDX++;
 						}
 					}
@@ -266,7 +261,7 @@ void CovarianceMatrix::calculateSampleCovariance(std::vector<std::vector<std::ve
 }
 
 
-double CovarianceMatrix::sampleMean(std::vector<double> sampleVector, unsigned samples, unsigned lastIteration)
+double CovarianceMatrix::sampleMean(std::vector<float> sampleVector, unsigned samples, unsigned lastIteration)
 {
 	double posteriorMean = 0.0;
 	unsigned start = lastIteration - samples;

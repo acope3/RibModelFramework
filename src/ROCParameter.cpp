@@ -248,6 +248,7 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 					if (tmp == "***") //end of matrix
 					{
 						CovarianceMatrix CM(mat);
+						CM.choleskyDecomposition();
 						covarianceMatrix[cat] = CM;
 					}
 					double val;
@@ -769,7 +770,7 @@ void ROCParameter::adaptNoiseOffsetProposalWidth(unsigned adaptationWidth, bool 
 	for (unsigned i = 0; i < getNumObservedPhiSets(); i++)
 	{
 		double acceptanceLevel = numAcceptForNoiseOffset[i] / (double)adaptationWidth;
-		traces.updateSynthesisOffsetAcceptanceRatioTrace(i, acceptanceLevel);
+		traces.updateSynthesisOffsetAcceptanceRateTrace(i, acceptanceLevel);
 		if (adapt)
 		{
 			if (acceptanceLevel < 0.2)

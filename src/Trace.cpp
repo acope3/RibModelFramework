@@ -50,8 +50,8 @@ void Trace::initializeSharedTraces(unsigned samples, unsigned num_genes, unsigne
 	//numSelectionCategories always == numSynthesisRateCategories, so only one is passed in for convenience
 	
 	initStdDevSynthesisRateTrace(numSelectionCategories, samples);
-	initSynthesisRateAcceptanceRatioTrace(num_genes, numSelectionCategories);
-	codonSpecificAcceptanceRatioTrace.resize(maxGrouping);
+	initSynthesisRateAcceptanceRateTrace(num_genes, numSelectionCategories);
+	codonSpecificAcceptanceRateTrace.resize(maxGrouping);
 	initSynthesisRateTrace(samples, num_genes, numSelectionCategories);
 	initMixtureAssignmentTrace(samples, num_genes);
 	initMixtureProbabilitiesTrace(samples, numMixtures);
@@ -71,12 +71,12 @@ void Trace::initStdDevSynthesisRateTrace(unsigned numSelectionCategories, unsign
 }
 
 
-void Trace::initSynthesisRateAcceptanceRatioTrace(unsigned num_genes, unsigned numSynthesisRateCategories)
+void Trace::initSynthesisRateAcceptanceRateTrace(unsigned num_genes, unsigned numSynthesisRateCategories)
 {
-	synthesisRateAcceptanceRatioTrace.resize(numSynthesisRateCategories);
+	synthesisRateAcceptanceRateTrace.resize(numSynthesisRateCategories);
 	for (unsigned category = 0; category < numSynthesisRateCategories; category++)
 	{
-		synthesisRateAcceptanceRatioTrace[category].resize(num_genes);
+		synthesisRateAcceptanceRateTrace[category].resize(num_genes);
 	}
 	//NOTE: this is not sized to samples because push_back takes care of the initialization
 }
@@ -90,7 +90,7 @@ void Trace::initSynthesisRateTrace(unsigned samples, unsigned num_genes, unsigne
 		synthesisRateTrace[category].resize(num_genes);
 		for (unsigned i = 0; i < num_genes; i++)
 		{
-			std::vector<double> tempExpr(samples, 0.0);
+			std::vector<float> tempExpr(samples, 0.0);
 			synthesisRateTrace[category][i] = tempExpr;
 		}
 	}
@@ -119,14 +119,14 @@ void Trace::initMixtureProbabilitiesTrace(unsigned samples, unsigned numMixtures
 
 void Trace::initCodonSpecificParameterTrace(unsigned samples, unsigned numCategories, unsigned numParam, unsigned paramType)
 {
-	std::vector <std::vector <std::vector <double>>> tmp;
+	std::vector <std::vector <std::vector <float>>> tmp;
 	tmp.resize(numCategories);
 	for (unsigned category = 0; category < numCategories; category++)
 	{
 		tmp[category].resize(numParam);
 		for (unsigned i = 0; i < numParam; i++)
 		{
-			std::vector <double> temp(samples, 0.0);
+			std::vector <float> temp(samples, 0.0);
 			tmp[category][i] = temp;
 		}
 	}
@@ -165,7 +165,7 @@ void Trace::initSynthesisOffsetTrace(unsigned samples, unsigned numPhiGroupings)
 		synthesisOffsetTrace[i].resize(samples);
 	}
 
-	synthesisOffsetAcceptanceRatioTrace.resize(numPhiGroupings);
+	synthesisOffsetAcceptanceRateTrace.resize(numPhiGroupings);
 }
 
 
@@ -276,37 +276,37 @@ std::vector<double> Trace::getExpectedSynthesisRateTrace()
 }
 
 
-std::vector<double> Trace::getStdDevSynthesisRateAcceptanceRatioTrace()
+std::vector<double> Trace::getStdDevSynthesisRateAcceptanceRateTrace()
 {
-	return stdDevSynthesisRateAcceptanceRatioTrace;
+	return stdDevSynthesisRateAcceptanceRateTrace;
 }
 
 
-std::vector<std::vector<std::vector<double>>> Trace::getSynthesisRateTrace()
+std::vector<std::vector<std::vector<float>>> Trace::getSynthesisRateTrace()
 {
 	return synthesisRateTrace;
 }
 
 
-std::vector<double> Trace::getSynthesisRateAcceptanceRatioTraceByMixtureElementForGene(unsigned mixtureElement,
+std::vector<double> Trace::getSynthesisRateAcceptanceRateTraceByMixtureElementForGene(unsigned mixtureElement,
 	unsigned geneIndex)
 {
 	unsigned category = getSynthesisRateCategory(mixtureElement);
-	return synthesisRateAcceptanceRatioTrace[category][geneIndex];
+	return synthesisRateAcceptanceRateTrace[category][geneIndex];
 }
 
 
-std::vector<std::vector<std::vector<double>>> Trace::getSynthesisRateAcceptanceRatioTrace()
+std::vector<std::vector<std::vector<double>>> Trace::getSynthesisRateAcceptanceRateTrace()
 {
-	return synthesisRateAcceptanceRatioTrace;
+	return synthesisRateAcceptanceRateTrace;
 }
 
 
-std::vector<double> Trace::getCodonSpecificAcceptanceRatioTraceForAA(std::string aa)
+std::vector<double> Trace::getCodonSpecificAcceptanceRateTraceForAA(std::string aa)
 {
 	aa[0] = (char)std::toupper(aa[0]);
 	unsigned aaIndex = SequenceSummary::aaToIndex.find(aa)->second;
-	return codonSpecificAcceptanceRatioTrace[aaIndex];
+	return codonSpecificAcceptanceRateTrace[aaIndex];
 }
 
 
@@ -325,7 +325,7 @@ std::vector<double> Trace::getSynthesisRateTraceForGene(unsigned geneIndex)
 }
 
 
-std::vector<double> Trace::getSynthesisRateTraceByMixtureElementForGene(unsigned mixtureElement, unsigned geneIndex)
+std::vector<float> Trace::getSynthesisRateTraceByMixtureElementForGene(unsigned mixtureElement, unsigned geneIndex)
 {
 	unsigned category = getSynthesisRateCategory(mixtureElement);
 	return synthesisRateTrace[category][geneIndex];
@@ -356,9 +356,9 @@ std::vector<std::vector<double>> Trace::getMixtureProbabilitiesTrace()
 }
 
 
-std::vector<std::vector<double>> Trace::getCodonSpecificAcceptanceRatioTrace()
+std::vector<std::vector<double>> Trace::getCodonSpecificAcceptanceRateTrace()
 {
-	return codonSpecificAcceptanceRatioTrace;
+	return codonSpecificAcceptanceRateTrace;
 }
 
 
@@ -368,7 +368,7 @@ unsigned Trace::getSynthesisRateCategory(unsigned mixtureElement)
 }
 
 
-std::vector<std::vector<std::vector<std::vector<double>>>>* Trace::getCodonSpecificParameterTrace() 
+std::vector<std::vector<std::vector<std::vector<float>>>>* Trace::getCodonSpecificParameterTrace()
 {
 	return &codonSpecificParameterTrace;
 }
@@ -378,10 +378,10 @@ std::vector<std::vector<std::vector<std::vector<double>>>>* Trace::getCodonSpeci
 //---------- ROC Specific ----------//
 //----------------------------------//
 
-std::vector<double> Trace::getCodonSpecificParameterTraceByMixtureElementForCodon(unsigned mixtureElement,
+std::vector<float> Trace::getCodonSpecificParameterTraceByMixtureElementForCodon(unsigned mixtureElement,
 	std::string& codon, unsigned paramType, bool withoutReference)
 {
-	std::vector <double> rv;
+	std::vector <float> rv;
 	unsigned codonIndex = SequenceSummary::codonToIndex(codon, withoutReference);
 	unsigned category = getCodonSpecificCategory(mixtureElement, paramType);
 	rv = codonSpecificParameterTrace[paramType][category][codonIndex];
@@ -408,9 +408,9 @@ std::vector<double> Trace::getSynthesisOffsetTrace(unsigned index)
 }
 
 
-std::vector<double> Trace::getSynthesisOffsetAcceptanceRatioTraceForIndex(unsigned index)
+std::vector<double> Trace::getSynthesisOffsetAcceptanceRateTraceForIndex(unsigned index)
 {
-	return synthesisOffsetAcceptanceRatioTrace[index];
+	return synthesisOffsetAcceptanceRateTrace[index];
 }
 
 
@@ -420,7 +420,7 @@ std::vector<double> Trace::getObservedSynthesisNoiseTrace(unsigned index)
 }
 
 
-std::vector<std::vector<std::vector<double>>> Trace::getCodonSpecificParameterTraceByParamType(unsigned paramType)
+std::vector<std::vector<std::vector<float>>> Trace::getCodonSpecificParameterTraceByParamType(unsigned paramType)
 {
 	/*
 	std::vector<std::vector<std::vector<double>>> rv;
@@ -440,9 +440,9 @@ std::vector<std::vector<std::vector<double>>> Trace::getCodonSpecificParameterTr
 }
 
 
-std::vector<std::vector<double>> Trace::getSynthesisOffsetAcceptanceRatioTrace()
+std::vector<std::vector<double>> Trace::getSynthesisOffsetAcceptanceRateTrace()
 {
-	return synthesisOffsetAcceptanceRatioTrace;
+	return synthesisOffsetAcceptanceRateTrace;
 }
 
 
@@ -478,21 +478,21 @@ void Trace::updateStdDevSynthesisRateTrace(unsigned sample, double stdDevSynthes
 }
 
 
-void Trace::updateStdDevSynthesisRateAcceptanceRatioTrace(double acceptanceLevel)
+void Trace::updateStdDevSynthesisRateAcceptanceRateTrace(double acceptanceLevel)
 {
-	stdDevSynthesisRateAcceptanceRatioTrace.push_back(acceptanceLevel);
+	stdDevSynthesisRateAcceptanceRateTrace.push_back(acceptanceLevel);
 }
 
 
-void Trace::updateSynthesisRateAcceptanceRatioTrace(unsigned category, unsigned geneIndex, double acceptanceLevel)
+void Trace::updateSynthesisRateAcceptanceRateTrace(unsigned category, unsigned geneIndex, double acceptanceLevel)
 {
-	synthesisRateAcceptanceRatioTrace[category][geneIndex].push_back(acceptanceLevel);
+	synthesisRateAcceptanceRateTrace[category][geneIndex].push_back(acceptanceLevel);
 }
 
 
-void Trace::updateCodonSpecificAcceptanceRatioTrace(unsigned codonIndex, double acceptanceLevel)
+void Trace::updateCodonSpecificAcceptanceRateTrace(unsigned codonIndex, double acceptanceLevel)
 {
-	codonSpecificAcceptanceRatioTrace[codonIndex].push_back(acceptanceLevel);
+	codonSpecificAcceptanceRateTrace[codonIndex].push_back(acceptanceLevel);
 }
 
 
@@ -573,9 +573,9 @@ void Trace::updateSynthesisOffsetTrace(unsigned index, unsigned sample, double v
 }
 
 
-void Trace::updateSynthesisOffsetAcceptanceRatioTrace(unsigned index, double value)
+void Trace::updateSynthesisOffsetAcceptanceRateTrace(unsigned index, double value)
 {
-	synthesisOffsetAcceptanceRatioTrace[index].push_back(value);
+	synthesisOffsetAcceptanceRateTrace[index].push_back(value);
 }
 
 
@@ -632,15 +632,15 @@ void Trace::updateCodonSpecificParameterTraceForCodon(unsigned sample, std::stri
 //--------------------------------------//
 //---------- Getter Functions ----------//
 //--------------------------------------//
-std::vector<double> Trace::getSynthesisRateAcceptanceRatioTraceByMixtureElementForGeneR(unsigned mixtureElement,
+std::vector<double> Trace::getSynthesisRateAcceptanceRateTraceByMixtureElementForGeneR(unsigned mixtureElement,
 	unsigned geneIndex)
 {
 	std::vector<double> RV;
-	bool checkGene = checkIndex(geneIndex, 1, synthesisRateAcceptanceRatioTrace.size());
+	bool checkGene = checkIndex(geneIndex, 1, synthesisRateAcceptanceRateTrace.size());
 	bool checkMixtureElement = checkIndex(mixtureElement, 1, mixtureProbabilitiesTrace.size());
 	if (checkGene && checkMixtureElement)
 	{
-		RV = getSynthesisRateAcceptanceRatioTraceByMixtureElementForGene(mixtureElement - 1, geneIndex - 1);
+		RV = getSynthesisRateAcceptanceRateTraceByMixtureElementForGene(mixtureElement - 1, geneIndex - 1);
 	}
 	return RV;
 }
@@ -658,9 +658,9 @@ std::vector<double> Trace::getSynthesisRateTraceForGeneR(unsigned geneIndex)
 }
 
 
-std::vector<double> Trace::getSynthesisRateTraceByMixtureElementForGeneR(unsigned mixtureElement, unsigned geneIndex)
+std::vector<float> Trace::getSynthesisRateTraceByMixtureElementForGeneR(unsigned mixtureElement, unsigned geneIndex)
 {
-	std::vector<double> RV;
+	std::vector<float> RV;
 	bool checkMixtureElement = checkIndex(mixtureElement, 1, mixtureProbabilitiesTrace.size());
 	bool checkGene = checkIndex(geneIndex, 1, synthesisRateTrace[0].size());
 	if (checkMixtureElement && checkGene)
@@ -715,21 +715,21 @@ void Trace::setStdDevSynthesisRateTraces(std::vector<std::vector<double>> _stdDe
 }
 
 
-void Trace::setStdDevSynthesisRateAcceptanceRatioTrace(std::vector<double> _stdDevSynthesisRateAcceptanceRatioTrace)
+void Trace::setStdDevSynthesisRateAcceptanceRateTrace(std::vector<double> _stdDevSynthesisRateAcceptanceRateTrace)
 {
-	stdDevSynthesisRateAcceptanceRatioTrace = _stdDevSynthesisRateAcceptanceRatioTrace;
+	stdDevSynthesisRateAcceptanceRateTrace = _stdDevSynthesisRateAcceptanceRateTrace;
 }
 
 
-void Trace::setSynthesisRateTrace(std::vector<std::vector<std::vector<double>>> _synthesisRateTrace)
+void Trace::setSynthesisRateTrace(std::vector<std::vector<std::vector<float>>> _synthesisRateTrace)
 {
 	synthesisRateTrace = _synthesisRateTrace;
 }
 
 
-void Trace::setSynthesisRateAcceptanceRatioTrace(std::vector<std::vector<std::vector<double>>>_synthesisRateAcceptanceRatioTrace)
+void Trace::setSynthesisRateAcceptanceRateTrace(std::vector<std::vector<std::vector<double>>>_synthesisRateAcceptanceRateTrace)
 {
-	synthesisRateAcceptanceRatioTrace = _synthesisRateAcceptanceRatioTrace;
+	synthesisRateAcceptanceRateTrace = _synthesisRateAcceptanceRateTrace;
 }
 
 
@@ -745,9 +745,9 @@ void Trace::setMixtureProbabilitiesTrace(std::vector<std::vector<double>> _mixtu
 }
 
 
-void Trace::setCodonSpecificAcceptanceRatioTrace(std::vector<std::vector<double>> _cspAcceptanceRatioTrace)
+void Trace::setCodonSpecificAcceptanceRateTrace(std::vector<std::vector<double>> _cspAcceptanceRateTrace)
 {
-	codonSpecificAcceptanceRatioTrace = _cspAcceptanceRatioTrace;
+	codonSpecificAcceptanceRateTrace = _cspAcceptanceRateTrace;
 }
 
 
@@ -759,10 +759,10 @@ void Trace::setCategories(std::vector<mixtureDefinition> &_categories)
 //----------------------------------//
 //---------- ROC Specific ----------//
 //----------------------------------//
-std::vector<double> Trace::getCodonSpecificParameterTraceByMixtureElementForCodonR(unsigned mixtureElement,
+std::vector<float> Trace::getCodonSpecificParameterTraceByMixtureElementForCodonR(unsigned mixtureElement,
 	std::string& codon, unsigned paramType, bool withoutReference)
 {
-	std::vector<double> RV;
+	std::vector<float> RV;
 	bool checkMixtureElement = checkIndex(mixtureElement, 1, getNumberOfMixtures());
 	if (checkMixtureElement)
 	{
@@ -790,9 +790,9 @@ void Trace::setSynthesisOffsetTrace(std::vector<std::vector <double> > _NoiseOff
 }
 
 
-void Trace::setSynthesisOffsetAcceptanceRatioTrace(std::vector<std::vector <double> > _NoiseOffsetAcceptanceRatioTrace)
+void Trace::setSynthesisOffsetAcceptanceRateTrace(std::vector<std::vector <double> > _NoiseOffsetAcceptanceRateTrace)
 {
-	synthesisOffsetAcceptanceRatioTrace = _NoiseOffsetAcceptanceRatioTrace;
+	synthesisOffsetAcceptanceRateTrace = _NoiseOffsetAcceptanceRateTrace;
 }
 
 
@@ -802,7 +802,7 @@ void Trace::setObservedSynthesisNoiseTrace(std::vector<std::vector <double> > _O
 }
 
 
-void Trace::setCodonSpecificParameterTrace(std::vector<std::vector<std::vector<double>>> _parameterTrace, unsigned paramType)
+void Trace::setCodonSpecificParameterTrace(std::vector<std::vector<std::vector<float>>> _parameterTrace, unsigned paramType)
 {
 	codonSpecificParameterTrace[paramType] = _parameterTrace;
 	/*

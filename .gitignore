@@ -40,8 +40,9 @@ junk
 .idea
 .externalToolBuilders
 
-# .swp files
+# .swp/swo files
 *.swp
+*.swo
 
 # Misc
 *~

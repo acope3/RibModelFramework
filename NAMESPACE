@@ -11,17 +11,63 @@ importFrom(graphics, abline, axis, box, grid, hist,
 importFrom(stats, lm, median, qt, quantile, sd)
 importFrom(utils, write.csv)
 
+S3method(length, Rcpp_Genome)
+S3method(summary, Rcpp_Genome)
+S3method(writeParameterObject, Rcpp_ROCParameter)
+S3method(writeParameterObject, Rcpp_RFPParameter)
+S3method(writeParameterObject, Rcpp_FONSEParameter)
+S3method(convergence.test, Rcpp_MCMCAlgorithm)
+S3method(convergence.test, Rcpp_Trace)
+
+S3method(plot, Rcpp_ROCParameter)
+S3method(plot, Rcpp_FONSEParameter)
+S3method(plot, Rcpp_ROCModel)
+S3method(plot, Rcpp_FONSEModel)
+S3method(plot, Rcpp_MCMCAlgorithm)
+S3method(plot, Rcpp_Trace)
+
+
 #exports
-exportPattern("^[[:alpha:]]+") #<- if commented out, only functions explicitly exported will be exposed 
+#exportPattern("^[[:alpha:]]+") #<- if commented out, only functions explicitly exported will be exposed 
 
 
-
-
-#export(
-# Ploting
+export(
 ## Parameter object
+"initializeParameterObject",
+"getCSPEstimates",
+"getMixtureAssignmentEstimate",
+"getExpressionEstimatesForMixture",
+"writeParameterObject",
+"loadParameterObject",
 
 ## Model object
+"initializeModelObject",
 
 ## Genome object
-#)
+"initializeGenomeObject",
+"getCodonCountsForAA",
+"getNames",
+
+## MCMC object
+"initializeMCMCObject",
+"runMCMC",
+"setRestartSettings",
+"writeMCMCObject",
+"loadMCMCObject",
+
+## Trace object
+
+## shared functions
+"convergence.test",
+
+#Static C++ functions
+"AAToCodon",
+"aminoAcids",
+"codonToAA",
+"codons"
+)
+
+
+
+
+

@@ -4,28 +4,26 @@
 \alias{convergence.test}
 \title{Convergence Test}
 \usage{
-convergence.test(trace, what, mixture = 1, n.samples = 10, frac1 = 0.1,
-  frac2 = 0.5, plot = FALSE)
+convergence.test(object, n.samples = 10, frac1 = 0.1, frac2 = 0.5,
+  thin = 1, plot = FALSE, ...)
 }
 \arguments{
-\item{trace}{}
+\item{object}{an object of either class Trace or MCMC}
 
-\item{what}{}
+\item{n.samples}{number of samples at the end of the trace used to determine convergence (< length of trace)}
 
-\item{mixture}{}
+\item{frac1}{TODO}
 
-\item{n.samples}{}
+\item{frac2}{TODO}
 
-\item{frac1}{}
+\item{thin}{TODO}
 
-\item{frac2}{}
+\item{plot}{(logical) plot result instead of returning an object}
 
-\item{plot}{}
-
-\item{...}{}
+\item{...}{TODO describe what and mixture parameter}
 }
 \value{
-
+geweke score object
 }
 \description{
 \code{convergence.test}
