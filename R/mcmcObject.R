@@ -136,7 +136,7 @@ convergence.test.Rcpp_MCMCAlgorithm <- function(object, n.samples = 10, frac1 = 
                                        frac2 = 0.5, thin = 1, plot = FALSE, ...){
   # TODO: extend to work with multiple chains once we have that capability.
   
-  loglik.trace <- object$getLogLikelihoodTrace()
+  loglik.trace <- object$getLogPosteriorTrace()
   trace.length <- length(loglik.trace)
   start <- max(1, trace.length - n.samples)
   
@@ -166,7 +166,7 @@ convergence.test.Rcpp_MCMCAlgorithm <- function(object, n.samples = 10, frac1 = 
 #' @details None.
 #' 
 writeMCMCObject <- function(mcmc, file){
-  loglikeTrace <- mcmc$getLogLikelihoodTrace()
+  loglikeTrace <- mcmc$getLogPosteriorTrace()
   samples <- mcmc$getSamples()
   thinning <- mcmc$getThinning()
   adaptiveWidth <- mcmc$getAdaptiveWidth()
@@ -201,7 +201,7 @@ loadMCMCObject <- function(files){
     mcmc$setSamples(samples)
     mcmc$setThinning(tempEnv$thinning) #not needed?
     mcmc$setAdaptiveWidth(tempEnv$adaptiveWidth) #not needed?
-    mcmc$setLogLikelihoodTrace(loglikeTrace)
+    mcmc$setLogPosteriorTrace(loglikeTrace)
 
   return(mcmc)
 }

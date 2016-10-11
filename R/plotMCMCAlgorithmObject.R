@@ -12,7 +12,7 @@
 #'  plot a subplot of the logLikelihood trace with the first few samples removed.
 plot.Rcpp_MCMCAlgorithm <- function(x, zoom.window = NULL, ...)
 {
-  loglik.trace <- x$getLogLikelihoodTrace()
+  loglik.trace <- x$getLogPosteriorTrace()
   
   loglik.trace <- loglik.trace[-1]
   
@@ -34,7 +34,7 @@ plot.Rcpp_MCMCAlgorithm <- function(x, zoom.window = NULL, ...)
     zoomEnd <- zoom.window[2]
   }
   else{
-    print("No window was given, zooming in at last 10% of trace")
+    warning("No window was given, zooming in at last 10% of trace")
   }
   
   Hmisc::subplot(

@@ -1007,8 +1007,8 @@ RCPP_MODULE(MCMCAlgorithm_mod)
 		.method("run", &MCMCAlgorithm::run)
 		.method("setEstimateMixtureAssignment", &MCMCAlgorithm::setEstimateMixtureAssignment)
 		.method("setRestartFileSettings", &MCMCAlgorithm::setRestartFileSettings)
-		.method("getLogLikelihoodTrace", &MCMCAlgorithm::getLogLikelihoodTrace)
-		.method("getLogLikelihoodPosteriorMean", &MCMCAlgorithm::getLogLikelihoodPosteriorMean)
+		.method("getLogPosteriorTrace", &MCMCAlgorithm::getLogLikelihoodTrace)
+		.method("getLogPosteriorMean", &MCMCAlgorithm::getLogLikelihoodPosteriorMean)
 
 
 
@@ -1019,7 +1019,7 @@ RCPP_MODULE(MCMCAlgorithm_mod)
         .method("setSamples", &MCMCAlgorithm::setSamples)
         .method("setThinning", &MCMCAlgorithm::setThinning)
         .method("setAdaptiveWidth", &MCMCAlgorithm::setAdaptiveWidth)
-        .method("setLogLikelihoodTrace", &MCMCAlgorithm::setLogLikelihoodTrace)
+        .method("setLogPosteriorTrace", &MCMCAlgorithm::setLogLikelihoodTrace)
         .method("setStepsToAdapt", &MCMCAlgorithm::setStepsToAdapt)
         .method("getStepsToAdapt", &MCMCAlgorithm::getStepsToAdapt)
 		;
