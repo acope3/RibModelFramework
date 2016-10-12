@@ -90,7 +90,7 @@ plotParameterObject <- function(x, what = "Mutation", samples = 100, ...){
   }
   #rownames(csp.params) <- param.name.storage
   colnames(csp.params) <- paste0("Mixture\nElement", 1:numMixtures)
-  pairs(csp.params, upper.panel = upper.panel.plot, lower.panel=NULL)
+  pairs(csp.params, upper.panel = upper.panel.plot, lower.panel=NULL, ... = ...)
 }
 
 
