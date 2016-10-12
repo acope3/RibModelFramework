@@ -39,8 +39,8 @@ test_that("set Adaptive Width", {
   expect_equal(mcmc$getAdaptiveWidth(), 10)
 })
 
-test_that("set Log Likelihood Trace", {
+test_that("set Log Posterior Trace", {
   vect <- c(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
-  mcmc$setLogLikelihoodTrace(vect)
-  expect_equal(mcmc$getLogLikelihoodTrace(), vect)
+  mcmc$setLogPosteriorTrace(vect)
+  expect_equal(mcmc$getLogPosteriorTrace(), vect)
 })

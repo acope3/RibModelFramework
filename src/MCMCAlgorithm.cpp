@@ -749,11 +749,11 @@ int MCMCAlgorithm::getStepsToAdapt()
 }
 
 
-/* getLogLikelihoodTrace (RCPP EXPOSED)
+/* getLogPosteriorTrace (RCPP EXPOSED)
  * Arguments: None
- * Return the likelihood trace.
+ * Return the log posterior trace.
 */
-std::vector<double> MCMCAlgorithm::getLogLikelihoodTrace()
+std::vector<double> MCMCAlgorithm::getLogPosteriorTrace()
 {
 	return likelihoodTrace;
 }
@@ -973,9 +973,9 @@ void MCMCAlgorithm::setAdaptiveWidth(unsigned _adaptiveWidth)
 }
 
 
-void MCMCAlgorithm::setLogLikelihoodTrace(std::vector<double> _likelihoodTrace)
+void MCMCAlgorithm::setLogPosteriorTrace(std::vector<double> _posteriorTrace)
 {
-    likelihoodTrace = _likelihoodTrace;
+    likelihoodTrace = _posteriorTrace;
 }
 
 
@@ -1007,7 +1007,7 @@ RCPP_MODULE(MCMCAlgorithm_mod)
 		.method("run", &MCMCAlgorithm::run)
 		.method("setEstimateMixtureAssignment", &MCMCAlgorithm::setEstimateMixtureAssignment)
 		.method("setRestartFileSettings", &MCMCAlgorithm::setRestartFileSettings)
-		.method("getLogPosteriorTrace", &MCMCAlgorithm::getLogLikelihoodTrace)
+		.method("getLogPosteriorTrace", &MCMCAlgorithm::getLogPosteriorTrace)
 		.method("getLogPosteriorMean", &MCMCAlgorithm::getLogLikelihoodPosteriorMean)
 
 
@@ -1019,7 +1019,7 @@ RCPP_MODULE(MCMCAlgorithm_mod)
         .method("setSamples", &MCMCAlgorithm::setSamples)
         .method("setThinning", &MCMCAlgorithm::setThinning)
         .method("setAdaptiveWidth", &MCMCAlgorithm::setAdaptiveWidth)
-        .method("setLogPosteriorTrace", &MCMCAlgorithm::setLogLikelihoodTrace)
+        .method("setLogPosteriorTrace", &MCMCAlgorithm::setLogPosteriorTrace)
         .method("setStepsToAdapt", &MCMCAlgorithm::setStepsToAdapt)
         .method("getStepsToAdapt", &MCMCAlgorithm::getStepsToAdapt)
 		;
