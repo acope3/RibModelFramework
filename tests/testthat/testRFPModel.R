@@ -52,7 +52,7 @@ test_that("RFP Model testing simulated versus actual accuracy", {
   sink()
   
   #########################################################################################
-  ### Output File 1: MCMC, Loglikelihood, Mixture Probability, Mphi, Sphi, Expected Phi ###
+  ### Output File 1: MCMC, Log Posterior, Mixture Probability, Mphi, Sphi, Expected Phi ###
   #########################################################################################
   
   # plots different aspects of trace
@@ -62,18 +62,18 @@ test_that("RFP Model testing simulated versus actual accuracy", {
   
   
   pdf(file.path("UnitTestingOut", "RFP_Genome_allUnique_startCSP_startPhi_adaptSphi_true.pdf"))
-  plot(mcmc, main = "MCMC Trace") #plots the whole loglikelihood trace
+  plot(mcmc, main = "MCMC Trace") #plots the whole log posterior trace
   
   
-  # take a subset of the trace values for the logliklihood trace and plot them.
+  # take a subset of the trace values for the log posterior trace and plot them.
   # The primary reason for doing this is the "jump" that throws the scale of the graph
   # at the beginning is removed by taking out the beginning values.
-  loglik.trace <- mcmc$getLogLikelihoodTrace()
-  start <- length(loglik.trace) * 0.7 
+  logPost.trace <- mcmc$getLogPosteriorTrace()
+  start <- length(logPost.trace) * 0.7 
   # the multiplier (currently 0.7) determines how much of the beginning trace is eliminated.
   
-  logL <- logL <- mean(loglik.trace[start:length(loglik.trace)]) #get the mean for the subset
-  plot(loglik.trace[start:length(loglik.trace)], type="l", main=paste("logL:", logL), xlab="Sample", ylab="log(Likelihood)")
+  logL <- logL <- mean(logPost.trace[start:length(logPost.trace)]) #get the mean for the subset
+  plot(logPost.trace[start:length(logPost.trace)], type="l", main=paste("logL:", logL), xlab="Sample", ylab="log(Posterior)")
   grid (NULL,NULL, lty = 6, col = "cornsilk2")
   
   
@@ -82,9 +82,9 @@ test_that("RFP Model testing simulated versus actual accuracy", {
   plot(trace, what = "Sphi", main = "Sphi")
   plot(trace, what = "ExpectedPhi", main = "Expected Phi")
   
-  #loglik.trace <- mcmc$getLogLikelihoodTrace()
-  #acf(loglik.trace)
-  #acf(loglik.trace[start:length(loglik.trace)])
+  #logPost.trace <- mcmc$getLogPosteriorTrace()
+  #acf(logPost.trace)
+  #acf(logPost.trace[start:length(logPost.trace)])
   dev.off()
   
   #################################

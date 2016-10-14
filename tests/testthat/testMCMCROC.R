@@ -3,12 +3,12 @@ library(ribModel)
 
 context("MCMC with ROC")
 
-# This file currently checks the logLikelihood recorded at iteration 100, between an old, hard-coded test and a current Unit Test.
+# This file currently checks the logPosterior recorded at iteration 100, between an old, hard-coded test and a current Unit Test.
 # Two tests are run: one with Phi, one without Phi. The existence of the relevant input files is also checked.
 
-# Possible implementation change: take the logLikelihood value and hard code it here, and compare via
-# mcmc$getLogLikelihoodTrace(), which returns a vector. Get the average of these values
-# and compare it with the hard-coded average of logLikelihoodTrace.
+# Possible implementation change: take the logPosterior value and hard code it here, and compare via
+# mcmc$getLogPosteriorTrace(), which returns a vector. Get the average of these values
+# and compare it with the hard-coded average of logPosteriorTrace.
 
 # In R, file.path is faster than paste
 fileName = file.path("UnitTestingData", "testMCMCROCFiles", "simulatedAllUniqueR.fasta")
@@ -50,10 +50,10 @@ sink(outFile)
 runMCMC(mcmc, genome, model, 1, divergence.iteration)
 sink()
 
-test_that("identical MCMC-ROC input with Phi, same log likelihood", {
-  knownLogLikelihood <- -827733
-  testLogLikelihood <- round(mcmc$getLogLikelihoodTrace()[10])
-  expect_equal(knownLogLikelihood, testLogLikelihood)
+test_that("identical MCMC-ROC input with Phi, same log posterior", {
+  knownLogPosterior <- -827733
+  testLogPosterior <- round(mcmc$getLogPosteriorTrace()[10])
+  expect_equal(knownLogPosterior, testLogPosterior)
 })
 
 ### Without Phi
@@ -72,9 +72,9 @@ sink(outFile)
 runMCMC(mcmc, genome, model, 1, divergence.iteration)
 sink()
 
-test_that("identical MCMC-ROC input without Phi, same log likelihood", {
-  knownLogLikelihood <- -831329
-  testLogLikelihood <- round(mcmc$getLogLikelihoodTrace()[10])
-  expect_equal(knownLogLikelihood, testLogLikelihood)
+test_that("identical MCMC-ROC input without Phi, same log posterior", {
+  knownLogPosterior <- -831329
+  testLogPosterior <- round(mcmc$getLogPosteriorTrace()[10])
+  expect_equal(knownLogPosterior, testLogPosterior)
 })
 
