@@ -739,9 +739,9 @@ void ROCModel::printHyperParameters()
 *
 * Returns the ROCParameter of the model.
 */
-ROCParameter* ROCModel::getParameter()
+ROCParameter ROCModel::getParameter()
 {
-	return parameter;
+	return *parameter;
 }
 
 void ROCModel::setParameter(ROCParameter &_parameter)

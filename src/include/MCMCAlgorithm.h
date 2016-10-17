@@ -78,7 +78,7 @@ class MCMCAlgorithm
 		void setStepsToAdapt(unsigned steps);
 		int getStepsToAdapt();
 
-		std::vector<double> getLogLikelihoodTrace();
+		std::vector<double> getLogPosteriorTrace();
 		double getLogLikelihoodPosteriorMean(unsigned samples); //TODO: UNTESTED
 
 		static std::vector<double> acf(std::vector<double>& x, int nrows, int ncols, int lagmax, bool correlation, bool demean); //Currently unused. TODO: UNTESTED
@@ -99,7 +99,7 @@ class MCMCAlgorithm
     	void setSamples(unsigned _samples);
     	void setThinning(unsigned _thinning);
     	void setAdaptiveWidth(unsigned _adaptiveWidth);
-		void setLogLikelihoodTrace(std::vector<double> _likelihoodTrace);
+		void setLogPosteriorTrace(std::vector<double> _posteriorTrace);
 #endif //STANDALONE
 
 

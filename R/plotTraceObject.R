@@ -263,15 +263,16 @@ plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sep
     ylimit <- range(aphi) + c(-0.1, 0.1)
     xlimit <- c(1, nrow(aphi))
     ylab <- expression("A"[phi])
-    main <- expression("A"[phi]*"Trace")
+    main <- expression("A"[phi]~"Trace")
     plot(NULL, NULL, type="l", xlab = xlab, ylab = ylab, xlim  = xlimit, ylim = ylimit, main = main)
     
-    for(i in 1:ncol(aphi))
+    num.obs.data <- ncol(aphi)
+    for(i in 1:num.obs.data)
     {
       lines(aphi[-1,i], col = .mixtureColors[i])
     }
-    legend("topleft", legend = paste0("Observed Data", 1:numMixtures), 
-           col = .mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")        
+    legend("topleft", legend = paste0("Observed Data", 1:num.obs.data), 
+           col = .mixtureColors[1:num.obs.data], lty = rep(1, num.obs.data), bty = "n")        
   }
   else if (what[1] == "Sepsilon")
   {
@@ -281,15 +282,16 @@ plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sep
     ylimit <- range(sepsilon) + c(-0.1, 0.1)
     xlimit <- c(1, nrow(sepsilon))
     ylab <- expression("s"[epsilon])
-    main <- expression("s"[epsilon]*"Trace")
+    main <- expression("s"[epsilon]~"Trace")
     plot(NULL, NULL, type="l", xlab = xlab, ylab = ylab, xlim  = xlimit, ylim = ylimit, main = main)
 
-    for(i in 1:ncol(sepsilon))
+    num.obs.data <- ncol(sepsilon)
+    for(i in 1:num.obs.data)
     {
       lines(sepsilon[-1,i], col = .mixtureColors[i])
     }
-    legend("topleft", legend = paste0("Observed Data", 1:numMixtures), 
-           col = .mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")  
+    legend("topleft", legend = paste0("Observed Data", 1:num.obs.data), 
+           col = .mixtureColors[1:num.obs.data], lty = rep(1, num.obs.data), bty = "n")  
   }
   #par(opar)
 }

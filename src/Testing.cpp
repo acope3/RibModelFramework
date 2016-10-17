@@ -2087,8 +2087,8 @@ int testParameter()
      * Thus, let:
     */
     Genome genome;
-    //genome.readFasta("/Users/hollisbui/RibModelDev/data/twoMixtures/simulatedAllUniqueR.fasta");
-    genome.readRFPFile("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+    genome.readFasta("/Users/hollisbui/RibModelDev/data/twoMixtures/simulatedAllUniqueR.fasta");
+    //genome.readRFPFile("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 
     unsigned numMixtures = 3;
     std::vector<double> stdDev(numMixtures, 1);
@@ -2701,7 +2701,7 @@ int testParameter()
     //------ getSynthesisRateProposalWidth Function------//
     //---------------------------------------------------//
 
-    /* Each value is initialized to 0.1 in initParameterSet.
+    /* Each value is initialized to 5 in initParameterSet.
      * Note that numSelectionCategories = numMixtures since allUnique; therefore,
      * the outer loop only iterates once.
     */
@@ -2709,10 +2709,10 @@ int testParameter()
     {
         for (unsigned j = 0u; j < numGenes; j++)
         {
-            if (parameter.getSynthesisRateProposalWidth(j, i) != 0.1)
+            if (parameter.getSynthesisRateProposalWidth(j, i) != 5)
             {
                 my_printError("Error in initParameterSet or getSynthesisRateProposalWidth for index % of mixture %.", j, i);
-                my_printError(" Value should be 0.1, but is instead %.\n", parameter.getSynthesisRateProposalWidth(j, i));
+                my_printError(" Value should be 5, but is instead %.\n", parameter.getSynthesisRateProposalWidth(j, i));
                 error = 1;
                 globalError = 1;
                 initParameterSetError = 1;
@@ -2729,17 +2729,17 @@ int testParameter()
     //------ getCurrentSynthesisRateProposalWidth Function------//
     //----------------------------------------------------------//
 
-    // Each value is initialized to 0.1 in initParameterSet.
+    // Each value is initialized to 5 in initParameterSet.
 
     for (unsigned i = 0u; i < numMixtures; i++)
     {
         unsigned expressionCategory = parameter.getSynthesisRateCategory(i);
         for (unsigned j = 0u; j < numGenes; j++)
         {
-            if (parameter.getCurrentSynthesisRateProposalWidth(expressionCategory, j) != 0.1)
+            if (parameter.getCurrentSynthesisRateProposalWidth(expressionCategory, j) != 5)
             {
                 my_printError("Error in initParameterSet or getCurrentSynthesisRateProposalWidth");
-                my_printError(" for index % of expression category %. Value should be 0.1, but is instead %.\n",
+                my_printError(" for index % of expression category %. Value should be 5, but is instead %.\n",
                               j, expressionCategory, parameter.getCurrentSynthesisRateProposalWidth(expressionCategory, j));
                 error = 1;
                 globalError = 1;
@@ -3535,23 +3535,23 @@ int testMCMCAlgorithm()
     else
         error = 0; //Reset for next function.
 
-    //--------------------------------------------//
-    //------ getLogLikelihoodTrace Function ------//
-    //--------------------------------------------//
+    //-------------------------------------------//
+    //------ getLogPosteriorTrace Function ------//
+    //-------------------------------------------//
 
     // NOTE: By default, both constructors initialize likelihoodTrace to a vector with
     // a size of samples + 1 zeroes.
-    std::vector <double> likelihoodTrace = mcmc.getLogLikelihoodTrace();
+    std::vector <double> posteriorTrace = mcmc.getLogPosteriorTrace();
     std::vector <double> tmp;
     tmp.resize(samples+1);
 
-    if (tmp != likelihoodTrace)
+    if (tmp != posteriorTrace)
     {
-        my_printError("Error in getLogLikelihoodTrace. Function should return a vector of % + 1 zeroes.\n", samples);
+        my_printError("Error in getLogPosteriorTrace. Function should return a vector of % + 1 zeroes.\n", samples);
         globalError = 1;
     }
     else
-        my_print("MCMCAlgorithm getLogLikelihoodTrace --- Pass\n");
+        my_print("MCMCAlgorithm getLogPosteriorTrace --- Pass\n");
 
     //----------------------------------------------------//
     //------ getLogLikelihoodPosteriorMean Function ------//

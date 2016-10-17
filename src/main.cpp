@@ -712,9 +712,9 @@ int main()
 	//testUtility();
 	//testSequenceSummary();
 	//testGene();
-	testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
+	//testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
 	//testCovarianceMatrix();
-	//testParameter();
+	testParameter();
 	//testParameterWithFile(pathBegin + "HollisFile.txt");
 	//testTrace();
 	//testRFPParameter();

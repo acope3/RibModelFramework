@@ -138,6 +138,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		 */
 
 		double maxValue = -1.0e+20;
+		double maxValue2 = -1.0e+20;
 		unsigned mixtureIndex = 0u;
 
 		std::vector <double> unscaledLogProb_curr(numSynthesisRateCategories, 0.0);
@@ -184,12 +185,17 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				unscaledLogPost_prop[k] += logProbabilityRatio[4]; // without rev. jump prob.
 
 				unscaledLogProb_curr_singleMixture[mixtureIndex] = logProbabilityRatio[3];
+
 				maxValue = unscaledLogProb_curr_singleMixture[mixtureIndex] > maxValue ?
 						   unscaledLogProb_curr_singleMixture[mixtureIndex] : maxValue;
+
+				maxValue2 = unscaledLogPost_prop[k] > maxValue2 ?
+						unscaledLogPost_prop[k] : maxValue2;
+
 				mixtureIndex++;
 			}
 		}
-
+		maxValue2 = maxValue > maxValue2 ? maxValue : maxValue2;
 
 		// adjust the the unscaled probabilities by the constant c
 		// ln(f') = ln(c) + ln(f)
@@ -220,29 +226,24 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			probabilities[k] = probabilities[k] / normalizingProbabilityConstant;
 		}
 
+		double currGeneLogLik = 0.0;
 		for (unsigned k = 0u; k < numSynthesisRateCategories; k++)
 		{
+			// that we loop over numSynthesisRateCategories instead of numMixtures is not a problem
+			// in the case of selectionShared, since we sum above over each mixture sharing a category.
+
 			// We do not need to add std::log(model.getCategoryProbability(k)) since it will cancel in the ratio!
 			double currLogLike = unscaledLogProb_curr[k];
 			double propLogLike = unscaledLogProb_prop[k];
             double alpha = -Parameter::randExp(1);
-			if ( alpha < (propLogLike - currLogLike) )
+			if ( (alpha < (propLogLike - currLogLike)) && estimateSynthesisRate )
 			{
-                if (estimateSynthesisRate)
-				{
-				    model.updateSynthesisRate(i, k);
-                    logLikelihood += probabilities[k] * unscaledLogPost_prop[k];
-                }
-				else
-				{
-					// if phi is not estimated, it will always stay curr!
-					logLikelihood += probabilities[k] * unscaledLogPost_curr[k];
-				}
+			    model.updateSynthesisRate(i, k);
+			    currGeneLogLik += probabilities[k] * std::exp(unscaledLogPost_prop[k] - maxValue2);
 			}
 			else
 			{
-                if ((iteration % thinning) == 0)
-                	logLikelihood += probabilities[k] * unscaledLogPost_curr[k];
+				currGeneLogLik += probabilities[k] * std::exp(unscaledLogPost_curr[k] - maxValue2);
 			}
 
             if (std::isnan(logLikelihood))
@@ -257,7 +258,8 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
                 my_print("\n\n\n");
             }
 		}
-        
+		logLikelihood += std::log(currGeneLogLik) + maxValue2;
+
 
 		if (std::isinf(logLikelihood))
             my_print("\tInfinity reached (Gene: %)\n", i);
@@ -749,11 +751,11 @@ int MCMCAlgorithm::getStepsToAdapt()
 }
 
 
-/* getLogLikelihoodTrace (RCPP EXPOSED)
+/* getLogPosteriorTrace (RCPP EXPOSED)
  * Arguments: None
- * Return the likelihood trace.
+ * Return the log posterior trace.
 */
-std::vector<double> MCMCAlgorithm::getLogLikelihoodTrace()
+std::vector<double> MCMCAlgorithm::getLogPosteriorTrace()
 {
 	return likelihoodTrace;
 }
@@ -973,9 +975,9 @@ void MCMCAlgorithm::setAdaptiveWidth(unsigned _adaptiveWidth)
 }
 
 
-void MCMCAlgorithm::setLogLikelihoodTrace(std::vector<double> _likelihoodTrace)
+void MCMCAlgorithm::setLogPosteriorTrace(std::vector<double> _posteriorTrace)
 {
-    likelihoodTrace = _likelihoodTrace;
+    likelihoodTrace = _posteriorTrace;
 }
 
 
@@ -1007,8 +1009,8 @@ RCPP_MODULE(MCMCAlgorithm_mod)
 		.method("run", &MCMCAlgorithm::run)
 		.method("setEstimateMixtureAssignment", &MCMCAlgorithm::setEstimateMixtureAssignment)
 		.method("setRestartFileSettings", &MCMCAlgorithm::setRestartFileSettings)
-		.method("getLogLikelihoodTrace", &MCMCAlgorithm::getLogLikelihoodTrace)
-		.method("getLogLikelihoodPosteriorMean", &MCMCAlgorithm::getLogLikelihoodPosteriorMean)
+		.method("getLogPosteriorTrace", &MCMCAlgorithm::getLogPosteriorTrace)
+		.method("getLogPosteriorMean", &MCMCAlgorithm::getLogLikelihoodPosteriorMean)
 
 
 
@@ -1019,7 +1021,7 @@ RCPP_MODULE(MCMCAlgorithm_mod)
         .method("setSamples", &MCMCAlgorithm::setSamples)
         .method("setThinning", &MCMCAlgorithm::setThinning)
         .method("setAdaptiveWidth", &MCMCAlgorithm::setAdaptiveWidth)
-        .method("setLogLikelihoodTrace", &MCMCAlgorithm::setLogLikelihoodTrace)
+        .method("setLogPosteriorTrace", &MCMCAlgorithm::setLogPosteriorTrace)
         .method("setStepsToAdapt", &MCMCAlgorithm::setStepsToAdapt)
         .method("getStepsToAdapt", &MCMCAlgorithm::getStepsToAdapt)
 		;

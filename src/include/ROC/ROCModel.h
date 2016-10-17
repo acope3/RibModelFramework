@@ -110,7 +110,7 @@ class ROCModel : public Model
 
 		void simulateGenome(Genome &genome);
 		virtual void printHyperParameters();
-		ROCParameter* getParameter();
+		ROCParameter getParameter();
 		void setParameter(ROCParameter &_parameter);
 		virtual double calculateAllPriors();
 		void calculateCodonProbabilityVector(unsigned numCodons, double mutation[], double selection[], double phi, double codonProb[]);
