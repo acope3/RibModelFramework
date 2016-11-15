@@ -67,7 +67,7 @@ plot.Rcpp_FONSEParameter <- function(x, what = "Mutation", samples = 100, ...)
 #' 
 #' @details Graphs are based off the last # samples for the posterior mean.
 #' 
-plotParameterObject <- function(x, what = "Mutation", samples = 100, ...){
+plotParameterObject <- function(x, what = "Mutation", samples = 100, mixture.name = NULL, ...){
   
   numMixtures <- x$numMixtures
   csp.params <- data.frame(matrix(0, ncol=numMixtures, nrow = 40))
@@ -89,7 +89,11 @@ plotParameterObject <- function(x, what = "Mutation", samples = 100, ...){
     csp.params[, mixture] <- param.storage
   }
   #rownames(csp.params) <- param.name.storage
-  colnames(csp.params) <- paste0("Mixture\nElement", 1:numMixtures)
+  if(is.null(mixture.name)){
+    colnames(csp.params) <- paste0("Mixture\nElement", 1:numMixtures)
+  }else{
+    colnames(csp.params) <- mixture.name
+  }
   pairs(csp.params, upper.panel = upper.panel.plot, lower.panel=NULL, ... = ...)
 }
 
