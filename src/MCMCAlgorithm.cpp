@@ -438,7 +438,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
             Rcpp::checkUserInterrupt();
             #endif
             
-			my_print("Status at iteration (sample): % (%)\n", iteration, (iteration / thinning));
+	    my_print("Status at thinned sample (iteration): % (%)\n",  (iteration / thinning), iteration);
 			my_print("\t current logLikelihood: % \n", likelihoodTrace[(iteration/thinning) - 1] );
 			if (iteration > stepsToAdapt)
 				my_print("No longer adapting\n");
