@@ -1787,32 +1787,13 @@ double Parameter::randGamma(double shape, double rate)
 #ifndef STANDALONE
 	RNGScope scope;
 	NumericVector xx(1);
-	//xx = rgamma(1, shape, 1.0 / rate);//mikeg: This is incorrect!
-	//C.f. the text above the function declaration, looking at the R documentation, and simulating values.
-	//However, it seems like there's another error because overall the code is behaving
-	// as we might expect.
-	// Specifically, as the sum of square deviation between the parameter estimate
-	// and the observed values go to zero, I'd expect my estimate of \sepsilon to also
-	// go to zero.  This *is* what we observe when the incorrect code is used.
-	// This makes me think the supporting materials is wrong.
-	// Yet, Gelman clearly states that the Inverse gamma is the conjugate for the normal
-	// variance.  So this seems consistent with the text in the supporting materials.
-	// However, with the incorrect code above, xx should be very large, and thus 1/xx,
-	// as it's used later should be very small.  Perhaps I'm confused because
-	// I'm not thinking about alpha.
-	//
-	// Either that or STANDALONE is defined when calling code from R
-	// Either way, this error could have been caught earlier or avoided altogether
-	// if the parameter names had been explicitly used in the function.
-	// Further, why use R to sample from the gamma when using C++ is presumably
-	// faster?
-	xx = rgamma(1, shape, rate);//mikeg: correct
+	xx = rgamma(1, shape, 1.0 / rate);
 	rv = xx[0];
 #else
-	//Looking at the definition of std::gamma_distribution at
-	//  http://www.cplusplus.com/reference/random/gamma_distribution/
+	// Looking at the definition of std::gamma_distribution at
+	// http://www.cplusplus.com/reference/random/gamma_distribution/
 	// to verify this is correct.
-	//It does appear correct and that std::gamma_distribution(shape, scale)
+	// It does appear correct and that std::gamma_distribution(shape, scale)
 	// This is despite the documentation using alpha and beta to represent these
 	// parameters.
 	std::gamma_distribution<double> distribution(shape, 1.0 / rate);
