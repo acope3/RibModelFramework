@@ -430,7 +430,7 @@ int main()
 	std::cout << "\t# Samples: " << samples << "\n";
 	std::cout << "\tThinning: " << thinning << "\n";
 	std::cout << "\t # Samples used: " << useSamples << "\n";
-	MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thinning, 10, true, true, true);
+	MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thinning, 10, true, true, false);
 	mcmc.setRestartFileSettings("RestartFile.txt", 20, true);
 	std::cout << "Done!-------------------------------\n\n\n";
 
