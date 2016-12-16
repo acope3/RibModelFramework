@@ -598,49 +598,60 @@ void ROCModel::updateCodonSpecificParameter(std::string grouping)
 
 void ROCModel::updateGibbsSampledHyperParameters(Genome &genome)
 {
-  double fixedSepsilon = 0.5; //value to use if not being estimated.
-  bool estSepsilon = true //flag for whether or not to estimate Sepsilon
-    //ultimately want to make the flag and fixedSepsilon values that can be set by the user.  
-    //estimate s_epsilon by sampling from a gamma distribution
-    
-    // TODO: Fix this for any numbers of phi values-- mikeg:what's broken here?
-    if (withPhi)
-      {
-	if(estSepsilon)
-	  {
-	    double shape = ((double)genome.getGenomeSize() - 1.0) / 2.0;
-	    for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++)
-	      {
-		double rate = 0.0; //Prior on s_epsilon goes here?
-		unsigned mixtureAssignment;
-		double noiseOffset = getNoiseOffset(i);
-		for (unsigned j = 0; j < genome.getGenomeSize(); j++)
-		  {
-		    mixtureAssignment = getMixtureAssignment(j);
-		    double obsPhi = genome.getGene(j).getObservedSynthesisRate(i);
-		    if (obsPhi > -1.0)
-		      {
-			double sum = std::log(obsPhi) - noiseOffset - std::log(getSynthesisRate(j, mixtureAssignment, false));
-			rate += (sum * sum);
-		      }else{
-		      // missing observation.
-		      // We need to reduce shape because initial calculation
-		      // assumes there are no missing observations
+  unsigned numObservedPhiSets = parameter->getNumObservedPhiSets();
+  double fixedSepsilon = 0.5;
+  double sepsilon;
+  unsigned i;
+  
+  //set fixed values to use if not being estimated.
+  std::vector<double> fixedSepsilonVec(numObservedPhiSets, fixedSepsilon);
 
-		      shape -= 0.5; 
-		    }
+  //flag for whether or not to estimate Sepsilon
+  bool estSepsilon = true; 
+  //ultimately want to make the flag and fixedSepsilon values that can be set by the user.  
+  //estimate s_epsilon by sampling from a gamma distribution
+    
+  // TODO: Fix this for any numbers of phi values-- mikeg:Is this comment still relevant?
+  if (withPhi)
+    {
+      double shape = ((double)genome.getGenomeSize() - 1.0) / 2.0; //prior on sEpsilon shape goes here?
+      for (i = 0; i < numObservedPhiSets; i++)
+	{
+	  if(estSepsilon)
+	    {
+	      double rate = 0.0; //Prior on s_epsilon rate goes here?
+	      unsigned mixtureAssignment;
+	      double noiseOffset = getNoiseOffset(i);
+	      for (unsigned j = 0; j < genome.getGenomeSize(); j++)
+		{
+		  mixtureAssignment = getMixtureAssignment(j);
+		  double obsPhi = genome.getGene(j).getObservedSynthesisRate(i);
+		  if (obsPhi > -1.0)
+		    {
+		      double sum = std::log(obsPhi) - noiseOffset - std::log(getSynthesisRate(j, mixtureAssignment, false));
+		      rate += (sum * sum);
+		    }else{
+		    // missing observation.
+		    // We need to reduce shape because initial calculation
+		    // assumes there are no missing observations
+
+		    shape -= 0.5; 
 		  }
-		rate /= 2.0;//prior on sEpsilon goes here as well?
-		double rand = parameter->randGamma(shape, rate);
-		double sepsilon = std::sqrt(1.0/rand);
-	      }
-	  }else
-	  { //don't estimate Sepsilon
-	    sepsilon = fixedSepsilon;
-	  }
-	parameter->setObservedSynthesisNoise(i, sepsilon);//Correct
-      }
+		}
+	      rate /= 2.0;
+	      double rand = parameter->randGamma(shape, rate);
+	      sepsilon = std::sqrt(1.0/rand);
+	    }
+	  else
+	    { //don't estimate Sepsilon
+	      sepsilon = fixedSepsilonVec[i];
+	    }
+	  //update parameter for dataset i
+	  parameter->setObservedSynthesisNoise(i, sepsilon);//Correct
+	}
+    }
 }
+
 
 
 
