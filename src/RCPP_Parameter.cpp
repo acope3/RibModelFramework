@@ -128,7 +128,11 @@ RCPP_MODULE(Parameter_mod)
 		.method("getNoiseOffsetPosteriorMean", &ROCParameter::getNoiseOffsetPosteriorMean)
 		.method("getNoiseOffsetVariance", &ROCParameter::getNoiseOffsetVariance)
 
+		// Noise
+		.method("setInitialValuesForSepsilon", &ROCParameter::setInitialValuesForSepsilon)//Not a R wrapper
 
+
+		.method("setNumObservedSynthesisRateSets", &ROCParameter::setNumObservedPhiSets)//Not a R wrapper
 		//CSP Functions:
 		//Listed in the properties section below. NOTE: these getter/setters are ONLY
 		//used in R
