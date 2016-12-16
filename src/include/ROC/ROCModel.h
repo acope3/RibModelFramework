@@ -9,6 +9,7 @@ class ROCModel : public Model
     private:
 		ROCParameter *parameter;
 		bool withPhi;
+		bool fix_sEpsilon;
 
 		double calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codonCount[], double mutation[], double selection[], double phiValue);
 		double calculateMutationPrior(std::string grouping, bool proposed = false); // TODO add to FONSE as well? // cedric
@@ -16,7 +17,7 @@ class ROCModel : public Model
 
     public:
 		//Constructors & Destructors:
-		ROCModel(bool _withPhi = false);
+		ROCModel(bool _withPhi = false, bool _fix_sEpsilon = false);
 		virtual ~ROCModel();
 
 

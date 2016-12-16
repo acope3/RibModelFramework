@@ -595,7 +595,22 @@ void ROCParameter::updateNoiseOffset(unsigned index)
 }
 
 
+//-----------------------------------//
+//---------- Noise Functions --------//
+//-----------------------------------//
 
+void ROCParameter::setInitialValuesForSepsilon(std::vector<double> seps)
+{
+	if(seps.size() == observedSynthesisNoise.size()){
+		for (unsigned i = 0; i < observedSynthesisNoise.size(); i++)
+		{
+			observedSynthesisNoise[i] = seps[i];
+		}
+	}
+	else{
+		my_printError("ROCParameter::setInitialValuesForSepsilon number of initial values (%) does not match number of expression sets (%)", seps.size(), observedSynthesisNoise.size());
+	}
+}
 
 
 //-----------------------------------//

@@ -104,3 +104,13 @@ getNames <- function(genome, simulated = FALSE)
   gene.names <- unlist(lapply(1:length(genes), function(i){return(genes[[i]]$id)}))
   return(gene.names)
 }
+
+getObservedSynthesisRateSet <- function(genome, simulated = FALSE)
+{
+  genes <- genome$getGenes(simulated)
+  expression <- lapply(1:length(genes), function(i){return(genes[[i]]$getObservedSynthesisRateValues())})
+  
+  return(do.call(rbind, expression))
+}
+
+

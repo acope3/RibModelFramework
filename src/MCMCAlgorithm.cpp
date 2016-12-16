@@ -393,7 +393,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	unsigned maximumIterations = samples * thinning;
 	// initialize everything
 
-	model.setNumPhiGroupings(genome.getGene(0).getObservedSynthesisRateValues().size());
+	//model.setNumPhiGroupings(genome.getGene(0).getObservedSynthesisRateValues().size());
 	model.initTraces(samples + 1, genome.getGenomeSize()); //Samples + 2 so we can store the starting and ending values.
 	// starting the MCMC
 

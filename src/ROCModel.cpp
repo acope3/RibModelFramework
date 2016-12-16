@@ -6,10 +6,11 @@
 //--------------------------------------------------//
 
 
-ROCModel::ROCModel(bool _withPhi) : Model()
+ROCModel::ROCModel(bool _withPhi, bool _fix_sEpsilon) : Model()
 {
 	parameter = 0;
 	withPhi = _withPhi;
+	fix_sEpsilon = _fix_sEpsilon;
 }
 
 
@@ -598,54 +599,40 @@ void ROCModel::updateCodonSpecificParameter(std::string grouping)
 
 void ROCModel::updateGibbsSampledHyperParameters(Genome &genome)
 {
-  //estimate s_epsilon by sampling from a gamma distribution
-	// TODO: Fix this for any numbers of phi values
+  // estimate s_epsilon by sampling from a gamma distribution and transforming it into an inverse gamma sample
+
 	if (withPhi)
 	{
-		double shape = ((double)genome.getGenomeSize() - 1.0) / 2.0;
-		for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++)
-		{
-			double rate = 0.0; //Prior on s_epsilon goes here?
-			unsigned mixtureAssignment;
-			double noiseOffset = getNoiseOffset(i);
-			for (unsigned j = 0; j < genome.getGenomeSize(); j++)
+		if(!fix_sEpsilon){
+			double shape = ((double)genome.getGenomeSize() - 1.0) / 2.0;
+			for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++)
 			{
-				mixtureAssignment = getMixtureAssignment(j);
-				double obsPhi = genome.getGene(j).getObservedSynthesisRate(i);
-				if (obsPhi > -1.0)
+				double rate = 0.0; //Prior on s_epsilon goes here?
+				unsigned mixtureAssignment;
+				double noiseOffset = getNoiseOffset(i);
+				for (unsigned j = 0; j < genome.getGenomeSize(); j++)
 				{
-					double sum = std::log(obsPhi) - noiseOffset - std::log(getSynthesisRate(j, mixtureAssignment, false));
-					rate += (sum * sum);
-				}else{
-				        // missing observation.
-					shape -= 0.5; 
-					//Reduce shape because initial estimate assumes there are no missing observations
+					mixtureAssignment = getMixtureAssignment(j);
+					double obsPhi = genome.getGene(j).getObservedSynthesisRate(i);
+					if (obsPhi > -1.0)
+					{
+						double sum = std::log(obsPhi) - noiseOffset - std::log(getSynthesisRate(j, mixtureAssignment, false));
+						rate += (sum * sum);
+					}else{
+						// missing observation.
+						shape -= 0.5;
+						//Reduce shape because initial estimate assumes there are no missing observations
+					}
 				}
-			}
-			rate /= 2.0;
-			double rand = parameter->randGamma(shape, rate);
-			//mikeg: There appears to be an error when using R
-			// that is when #ifndef STANDALONE evaluates true
-			// see note in Parameter.cpp: randGamma
-			// There it effectively uses: T \sim rgamma(1, shape, rate=1.0 / rate)
-			//
-			// Note, using Gelman BDA 3rd Ed as a guide,
-			// If $T\sim\text{Gamma(\alpha, \beta)}, then
-			// $1/T \sim \text{Inv-Gamma}(\alpha, \beta) $
-			// Where $\beta$ is the rate term in the Gamma.
+				rate /= 2.0;
+				double rand = parameter->randGamma(shape, rate);
 
-			
-			// Below the gamma sample is transformed into an inverse gamma sample
-			// However, according to Gilchrist et al (2015) Supporting Materials p. S6
-			// The sample 1/T is supposed to be equal to $s_\epsilon^2$,
-			// but here we appear to be setting $s_\epsilon = 1/T$.
-			// Thus we are off by a factor of $\sqrt{1/T}$.
-			// I've checked the function parameter::densityNorm() and it takes the sd
-			// not the variance
-			// parameter->setObservedSynthesisNoise(i, 1.0/rand);//INCORRECT
-			
-			double sepsilon = std::sqrt(1.0/rand);
-			parameter->setObservedSynthesisNoise(i, sepsilon);//Correct
+				// Below the gamma sample is transformed into an inverse gamma sample
+				// According to Gilchrist et al (2015) Supporting Materials p. S6
+				// The sample 1/T is supposed to be equal to $s_\epsilon^2$.
+				double sepsilon = std::sqrt(1.0/rand);
+				parameter->setObservedSynthesisNoise(i, sepsilon);
+			}
 		}
 	}
 }
