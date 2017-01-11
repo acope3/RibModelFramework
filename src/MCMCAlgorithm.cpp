@@ -56,10 +56,10 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thinning(1), adaptiveWidth(100 *
 */
 MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thinning, unsigned _adaptiveWidth, bool _estimateSynthesisRate,
 							 bool _estimateCodonSpecificParameter, bool _estimateHyperParameter) : samples(_samples),
-							 thinning(thinning), adaptiveWidth(adaptiveWidth * thinning),
-							 estimateSynthesisRate(estimateSynthesisRate),
-							 estimateCodonSpecificParameter(estimateCodonSpecificParameter),
-							 estimateHyperParameter(estimateHyperParameter)
+							 thinning(_thinning), adaptiveWidth(_adaptiveWidth * thinning),
+							 estimateSynthesisRate(_estimateSynthesisRate),
+							 estimateCodonSpecificParameter(_estimateCodonSpecificParameter),
+							 estimateHyperParameter(_estimateHyperParameter)
 {
 	likelihoodTrace.resize(samples + 1);// +1 for storing initial evaluation
 	writeRestartFile = false;
@@ -403,7 +403,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	if (stepsToAdapt == -1)
 		stepsToAdapt = maximumIterations;
 
-	my_print("entering MCMC loop\n");
+	my_print("Starting MCMC\n");
 	my_print("\tEstimate Codon Specific Parameters? % \n", (estimateCodonSpecificParameter ? "TRUE" : "FALSE") );
 	my_print("\tEstimate Hyper Parameters? % \n", (estimateHyperParameter ? "TRUE" : "FALSE") );
 	my_print("\tEstimate Synthesis rates? % \n", (estimateSynthesisRate ? "TRUE" : "FALSE") );
@@ -417,7 +417,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	{
 		if (writeRestartFile)
 		{
-			if ((iteration) % fileWriteInterval  == 0u)
+			if ((iteration) % fileWriteInterval == 0u)
 			{
 				my_print("Writing restart file!\n");
 
