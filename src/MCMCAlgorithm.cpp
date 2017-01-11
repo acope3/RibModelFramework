@@ -56,10 +56,10 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thinning(1), adaptiveWidth(100 *
 */
 MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thinning, unsigned _adaptiveWidth, bool _estimateSynthesisRate,
 							 bool _estimateCodonSpecificParameter, bool _estimateHyperParameter) : samples(_samples),
-							 thinning(_thinning), adaptiveWidth(_adaptiveWidth * thinning),
-							 estimateSynthesisRate(_estimateSynthesisRate),
-							 estimateCodonSpecificParameter(_estimateCodonSpecificParameter),
-							 estimateHyperParameter(_estimateHyperParameter)
+							 thinning(thinning), adaptiveWidth(adaptiveWidth * thinning),
+							 estimateSynthesisRate(estimateSynthesisRate),
+							 estimateCodonSpecificParameter(estimateCodonSpecificParameter),
+							 estimateHyperParameter(estimateHyperParameter)
 {
 	likelihoodTrace.resize(samples + 1);// +1 for storing initial evaluation
 	writeRestartFile = false;
@@ -386,6 +386,8 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	omp_set_num_threads(numCores);
 #endif
 
+	unsigned reportStep = (100u < thinning) ? thinning : 100u;
+
 	// Allows to diverge from initial conditions (divergenceIterations controls the divergence).
 	// This allows for varying initial conditions for better exploration of the parameter space.
 	varyInitialConditions(genome, model, divergenceIterations);
@@ -432,7 +434,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 				}
 			}
 		}
-		if ((iteration) % 100u == 0u)
+		if ((iteration) % reportStep == 0u)
 		{
             #ifndef STANDALONE
             Rcpp::checkUserInterrupt();

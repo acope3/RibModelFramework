@@ -7,8 +7,8 @@
 int main()
 {
 	std::cout << "Initializing MCMCAlgorithm object---------------" << std::endl;
-	int samples = 200;
-	int thinning = 10;
+	int samples = 2000;
+	int thinning = 1000;
 	int useSamples = 100;
 	std::cout << "\t# Samples: " << samples << "\n";
 	std::cout << "\tThinning: " << thinning << "\n";
@@ -21,15 +21,15 @@ int main()
 
 
 	std::cout << "initialize Genome object--------------------------" << std::endl;
-	bool withPhi = false;
+	bool withPhi = true;
 
 	Genome genome;
-	genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelDev/data/twoMixtures/simulatedMutationSharedR.fasta");
+	genome.readFasta("/home/clandere/CodonUsageBias/R_roctest/bioinf_test_data/second_run/genome1/sim_oneMix_id_1_csp_-1_1_sphi_0.5.fasta");
 	//genome.readFasta("F:/GitHub/RibModelDev/data/twoMixtures/simulatedAllUniqueR.fasta");
 	//genome.readFasta("E:/RibosomeModel/RibModelDev/data/twoMixtures/simulatedAllUniqueR_unevenMixtures.fasta");
 	if(withPhi)
 	{
-		genome.readObservedPhiValues("F:/GitHub/RibModelDev/data/twoMixtures/simulatedAllUniqueR_phi_withPhiSet.csv", false);
+		genome.readObservedPhiValues("/home/clandere/CodonUsageBias/R_roctest/bioinf_test_data/second_run/genome1/sim_oneMix_id_1_sphi_0.5_aphi_1_seps_1.csv", false);
 		//genome.readObservedPhiValues("E:/RibosomeModel/RibModelDev/data/twoMixtures/simulatedAllUniqueR_phi_unevenMixtures.csv", false);
 	}
 
@@ -40,20 +40,21 @@ int main()
 	std::cout << "Initializing shared parameter variables---------------\n";
 	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 
-	unsigned numMixtures = 2;
+	unsigned numMixtures = 1;
 	std::vector<double> sphi_init(numMixtures, 1);
 
 	/* For 2 mixture */
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{
-		geneAssignment[i] = ( ((double)rand() / (double)RAND_MAX) < 0.5 ? 0u : 1u );
+		//geneAssignment[i] = ( ((double)rand() / (double)RAND_MAX) < 0.5 ? 0u : 1u );
+		geneAssignment[i] = 0u;
 
 	}
 	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 	std::cout << "Done!------------------------\n\n\n";
 
 	std::cout << "initialize ROCParameter object" << std::endl;
-	std::string mixDef = ROCParameter::mutationShared;
+	std::string mixDef = ROCParameter::allUnique;
 	ROCParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 
 	for (unsigned i = 0u; i < numMixtures; i++)
@@ -67,14 +68,14 @@ int main()
 	std::vector<std::string> files(1);
 	//files[0] = std::string("F:/GitHub/RibModelDev/data/twoMixtures/simulated_mutation0.csv");
 	//files[1] = std::string("F:/GitHub/RibModelDev/data/twoMixtures/simulated_mutation1.csv");
-	files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelDev/data/twoMixtures/simulated_mutation0.csv");
+	files[0] = std::string("/home/clandere/CodonUsageBias/R_roctest/bioinf_test_data/second_run/genome1/sim_oneMix_mutation_id_1_csp_-1_1_sphi_0.5.csv");
 	//files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelDev/data/twoMixtures/simulated_mutation1.csv");
 	parameter.initMutationCategories(files, parameter.getNumMutationCategories());
-	files.resize(2);
+	files.resize(1);
 	//files[0] = std::string("F:/GitHub/RibModelDev/data/twoMixtures/simulated_selection0.csv");
 	//files[1] = std::string("F:/GitHub/RibModelDev/data/twoMixtures/simulated_selection1.csv");
-	files[0] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelDev/data/twoMixtures/simulated_selection0.csv");
-	files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelDev/data/twoMixtures/simulated_selection1.csv");
+	files[0] = std::string("/home/clandere/CodonUsageBias/R_roctest/bioinf_test_data/second_run/genome1/sim_oneMix_selection_id_1_csp_-1_1_sphi_0.5.csv");
+	//files[1] = std::string("/home/clandere/CodonUsageBias/RibosomeModel/RibModelDev/data/twoMixtures/simulated_selection1.csv");
 	parameter.initSelectionCategories(files, parameter.getNumSelectionCategories());
 
 	parameter.InitializeSynthesisRate(genome, sphi_init[0]);
@@ -92,15 +93,7 @@ int main()
 	std::cout << "starting MCMC for ROC" << std::endl;
 	mcmc.run(genome, model, 1, 0);
 	std::cout << std::endl << "Finished MCMC for ROC" << std::endl;
-	double temp[] = { 0.025, 0.5, 0.975 };
-	std::vector<double> probs(temp, temp + sizeof(temp) / sizeof(double));
-	//std::vector<double> quants = parameter.getCodonSpecificQuantile(1, 100, std::string("GCA"), 0, probs, true);
 
-	std::string codon = std::string("TTT");
-	double a = parameter.getCodonSpecificPosteriorMean(0u, 50u, codon, 0u, true);
-	double b = parameter.getCodonSpecificPosteriorMean(0u, 50u, codon, 1u, true);
-	double c = parameter.getCodonSpecificPosteriorMean(1u, 50u, codon, 0u, true);
-	double d = parameter.getCodonSpecificPosteriorMean(1u, 50u, codon, 1u, true);
 
 	std::cout << std::endl << "Exiting" << std::endl;
 }

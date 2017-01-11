@@ -1,8 +1,8 @@
 Package: ribModel
 Type: Package
 Title: What the package does (short line)
-Version: 1.0.16
-Date: 2016-12-16
+Version: 1.0.17
+Date: 2017-01-10
 Authors@R: c(person("Cedric", "Landerer", role = c("aut", "cre"), email
         = "cedric.landerer@gmail.com"), person("Gabriel", "Hanas", role
         = "ctb"), person("Jeremy", "Rogers", role = "ctb"))
