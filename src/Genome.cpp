@@ -837,7 +837,7 @@ Genome Genome::getGenomeForGeneIndicesR(std::vector <unsigned> indices, bool sim
 		}
 		else
 		{
-			simulated ? genome.addGene(simulatedGenes[indices[i]], true) : genome.addGene(genes[indices[i]], false);
+			simulated ? genome.addGene(simulatedGenes[indices[i]-1], true) : genome.addGene(genes[indices[i]-1], false);
 		}
 	}
 
