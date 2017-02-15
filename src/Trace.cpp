@@ -1,6 +1,6 @@
 #include "include/base/Trace.h"
 #include "include/SequenceSummary.h"
-
+#include <assert.h>
 
 #ifndef STANDALONE
 #include <Rcpp.h>
@@ -43,7 +43,8 @@ Trace::Trace(unsigned _numCodonSpecificParamTypes)
 
 
 void Trace::initializeSharedTraces(unsigned samples, unsigned num_genes, unsigned numSelectionCategories,
-	unsigned numMixtures, std::vector<mixtureDefinition> &_categories, unsigned maxGrouping)
+	unsigned numMixtures, std::vector<mixtureDefinition> &_categories, unsigned maxGrouping, std::vector<double> init_phi,
+	std::vector<unsigned> init_mix_assign)
 {
 	my_print("maxGrouping: %\n", maxGrouping);
 
@@ -52,8 +53,8 @@ void Trace::initializeSharedTraces(unsigned samples, unsigned num_genes, unsigne
 	initStdDevSynthesisRateTrace(numSelectionCategories, samples);
 	initSynthesisRateAcceptanceRateTrace(num_genes, numSelectionCategories);
 	codonSpecificAcceptanceRateTrace.resize(maxGrouping);
-	initSynthesisRateTrace(samples, num_genes, numSelectionCategories);
-	initMixtureAssignmentTrace(samples, num_genes);
+	initSynthesisRateTrace(samples, num_genes, numSelectionCategories,init_phi);
+	initMixtureAssignmentTrace(samples, num_genes,init_mix_assign);
 	initMixtureProbabilitiesTrace(samples, numMixtures);
 
 	categories = &_categories;
@@ -82,7 +83,7 @@ void Trace::initSynthesisRateAcceptanceRateTrace(unsigned num_genes, unsigned nu
 }
 
 
-void Trace::initSynthesisRateTrace(unsigned samples, unsigned num_genes, unsigned numSynthesisRateCategories)
+void Trace::initSynthesisRateTrace(unsigned samples, unsigned num_genes, unsigned numSynthesisRateCategories,std::vector<double> init_phi)
 {
 	synthesisRateTrace.resize(numSynthesisRateCategories);
 	for (unsigned category = 0; category < numSynthesisRateCategories; category++)
@@ -90,19 +91,20 @@ void Trace::initSynthesisRateTrace(unsigned samples, unsigned num_genes, unsigne
 		synthesisRateTrace[category].resize(num_genes);
 		for (unsigned i = 0; i < num_genes; i++)
 		{
-			std::vector<float> tempExpr(samples, 0.0);
+			std::vector<float> tempExpr(samples, init_phi[i]);
 			synthesisRateTrace[category][i] = tempExpr;
 		}
 	}
 }
 
 
-void Trace::initMixtureAssignmentTrace(unsigned samples, unsigned num_genes)
+void Trace::initMixtureAssignmentTrace(unsigned samples, unsigned num_genes, std::vector<unsigned> init_mix_assign)
 {
 	mixtureAssignmentTrace.resize(num_genes);
+	assert(init_mix_assign.size() == num_genes);
 	for (unsigned i = 0u; i < num_genes; i++)
 	{
-		mixtureAssignmentTrace[i].resize(samples);
+		mixtureAssignmentTrace[i].resize(samples,init_mix_assign[i]);
 	}
 }
 
@@ -113,6 +115,7 @@ void Trace::initMixtureProbabilitiesTrace(unsigned samples, unsigned numMixtures
 	for (unsigned i = 0u; i < numMixtures; i++)
 	{
 		mixtureProbabilitiesTrace[i].resize(samples, 0.0);
+
 	}
 }
 
@@ -194,10 +197,11 @@ void Trace::initObservedSynthesisNoiseTrace(unsigned samples, unsigned numPhiGro
 
 void Trace::initializeRFPTrace(unsigned samples, unsigned num_genes, unsigned numAlphaCategories,
 	unsigned numLambdaPrimeCategories, unsigned numParam, unsigned numMixtures,
-	std::vector<mixtureDefinition> &_categories, unsigned maxGrouping)
+	std::vector<mixtureDefinition> &_categories, unsigned maxGrouping, std::vector<double> init_phi,
+	std::vector<unsigned> init_mix_assign)
 {
 	initializeSharedTraces(samples, num_genes, numLambdaPrimeCategories, numMixtures,
-		_categories, maxGrouping);
+		_categories, maxGrouping,init_phi,init_mix_assign);
 
 	// See Note 1) above.
 	initCodonSpecificParameterTrace(samples, numAlphaCategories,  numParam, 0u); // alp
@@ -207,9 +211,10 @@ void Trace::initializeRFPTrace(unsigned samples, unsigned num_genes, unsigned nu
 
 void Trace::initializeROCTrace(unsigned samples, unsigned num_genes, unsigned numMutationCategories,
 	unsigned numSelectionCategories, unsigned numParam, unsigned numMixtures,
-	std::vector<mixtureDefinition> &_categories, unsigned maxGrouping, unsigned numObservedPhiSets)
+	std::vector<mixtureDefinition> &_categories, unsigned maxGrouping, unsigned numObservedPhiSets,std::vector<double> init_phi,
+	std::vector<unsigned> init_mix_assign)
 {
-	initializeSharedTraces(samples, num_genes, numSelectionCategories, numMixtures, _categories, maxGrouping);
+	initializeSharedTraces(samples, num_genes, numSelectionCategories, numMixtures, _categories, maxGrouping,init_phi,init_mix_assign);
 
 	// See Note 1) above.
 	initCodonSpecificParameterTrace(samples, numMutationCategories, numParam, 0u); // dM
@@ -222,10 +227,11 @@ void Trace::initializeROCTrace(unsigned samples, unsigned num_genes, unsigned nu
 
 void Trace::initializeFONSETrace(unsigned samples, unsigned num_genes, unsigned numMutationCategories,
 	unsigned numSelectionCategories, unsigned numParam, unsigned numMixtures,
-	std::vector<mixtureDefinition> &_categories, unsigned maxGrouping)
+	std::vector<mixtureDefinition> &_categories, unsigned maxGrouping, std::vector<double> init_phi,
+	std::vector<unsigned> init_mix_assign)
 {
 	initializeSharedTraces(samples, num_genes, numSelectionCategories, numMixtures,
-		 _categories, maxGrouping);
+		 _categories, maxGrouping,init_phi,init_mix_assign);
 
 	// See Note 1) above.
 	initCodonSpecificParameterTrace(samples, numMutationCategories, numParam, 0u); // dM
@@ -235,10 +241,11 @@ void Trace::initializeFONSETrace(unsigned samples, unsigned num_genes, unsigned 
 
 void Trace::initializePANSETrace(unsigned samples, unsigned num_genes, unsigned numAlphaCategories,
 	unsigned numLambdaPrimeCategories, unsigned numParam, unsigned numMixtures,
-	std::vector<mixtureDefinition> &_categories, unsigned maxGrouping)
+	std::vector<mixtureDefinition> &_categories, unsigned maxGrouping, std::vector<double> init_phi,
+	std::vector<unsigned> init_mix_assign)
 {
 	initializeSharedTraces(samples, num_genes, numLambdaPrimeCategories, numMixtures,
-		_categories, maxGrouping);
+		_categories, maxGrouping,init_phi,init_mix_assign);
 
 	// See Note 1) above.
 	initCodonSpecificParameterTrace(samples, numAlphaCategories,  numParam, 0u); //alp
@@ -674,7 +681,7 @@ std::vector<float> Trace::getSynthesisRateTraceByMixtureElementForGeneR(unsigned
 std::vector<unsigned> Trace::getMixtureAssignmentTraceForGeneR(unsigned geneIndex)
 {
 	std::vector <unsigned> RV;
-	bool checkGene = checkIndex(geneIndex, 1, mixtureAssignmentTrace[0].size());
+	bool checkGene = checkIndex(geneIndex, 1, mixtureAssignmentTrace.size());
 	if (checkGene)
 	{
 		RV = getMixtureAssignmentTraceForGene(geneIndex - 1);

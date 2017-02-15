@@ -166,11 +166,12 @@ convergence.test.Rcpp_MCMCAlgorithm <- function(object, n.samples = 10, frac1 = 
 #' @details None.
 #' 
 writeMCMCObject <- function(mcmc, file){
-  loglikeTrace <- mcmc$getLogPosteriorTrace()
+  logPostTrace <- mcmc$getLogPosteriorTrace()
+  logLikeTrace <- mcmc$getLogLikelihoodTrace()
   samples <- mcmc$getSamples()
   thinning <- mcmc$getThinning()
   adaptiveWidth <- mcmc$getAdaptiveWidth()
-  save(list = c("loglikeTrace", "samples", "thinning", "adaptiveWidth"), file=file)
+  save(list = c("logPostTrace","logLikeTrace", "samples", "thinning", "adaptiveWidth"), file=file)
 }
 
 
@@ -189,19 +190,23 @@ writeMCMCObject <- function(mcmc, file){
 loadMCMCObject <- function(files){
   mcmc <- new(MCMCAlgorithm)
   samples <- 0
-  loglikeTrace <- numeric(0)
+  logPostTrace <- numeric(0)
+  logLikeTrace <- numeric(0)
   for (i in 1:length(files)){
     tempEnv <- new.env();
     load(file = files[i], envir = tempEnv)
     samples <- samples + tempEnv$samples
     max <- tempEnv$samples + 1
-    curLoglikelihoodTrace <- tempEnv$loglikeTrace
-    loglikeTrace <- c(loglikeTrace, curLoglikelihoodTrace[2:max])
+    curLogPostTrace <- tempEnv$logPostTrace
+    curLoglikelihoodTrace <- tempEnv$logLikeTrace
+    logPostTrace <- c(logPostTrace, curLogPostTrace[2:max])
+    logLikeTrace <- c(logLikeTrace, curLoglikelihoodTrace[2:max])
    }
     mcmc$setSamples(samples)
     mcmc$setThinning(tempEnv$thinning) #not needed?
     mcmc$setAdaptiveWidth(tempEnv$adaptiveWidth) #not needed?
-    mcmc$setLogPosteriorTrace(loglikeTrace)
+    mcmc$setLogPosteriorTrace(logPostTrace)
+    mcmc$setLogLikelihoodTrace(logLikeTrace)
 
   return(mcmc)
 }

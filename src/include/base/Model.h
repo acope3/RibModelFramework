@@ -22,7 +22,7 @@ class Model
         virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k,
 					double* logProbabilityRatio) = 0;
         virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
-        		double& logAcceptanceRatioForAllMixtures) = 0;
+        		std::vector<double> &logAcceptanceRatioForAllMixtures) = 0;
 		virtual void calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration,
 					std::vector <double> &logProbabilityRatio) = 0;
 

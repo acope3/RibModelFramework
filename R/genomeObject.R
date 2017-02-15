@@ -14,8 +14,12 @@
 #' 
 #' @return This function returns the Genome Rcpp object created.
 #' 
-initializeGenomeObject <- function(file, observed.expression.file=NULL, append=FALSE, fasta=TRUE, match.expression.by.id=TRUE) {
-  genome <- new(Genome)
+initializeGenomeObject <- function(file, observed.expression.file=NULL, append=FALSE, fasta=TRUE, match.expression.by.id=TRUE,previous.genome=NULL) {
+  if (is.null(previous.genome)){ 
+    genome <- new(Genome)
+  }else{
+    genome <- previous.genome
+  }
   #genome <- new(Genome, 1, "ROC", TRUE) #CT ONLY
   if (fasta == TRUE) {
     genome$readFasta(file, append)

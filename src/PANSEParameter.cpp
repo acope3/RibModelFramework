@@ -341,7 +341,7 @@ void PANSEParameter::initFromRestartFile(std::string filename)
 void PANSEParameter::initAllTraces(unsigned samples, unsigned num_genes)
 {
 	traces.initializePANSETrace(samples, num_genes, numMutationCategories, numSelectionCategories, numParam,
-						 numMixtures, categories, (unsigned)groupList.size());
+						 numMixtures, categories, (unsigned)groupList.size(),currentSynthesisRateLevel[0],mixtureAssignment);
 }
 
 

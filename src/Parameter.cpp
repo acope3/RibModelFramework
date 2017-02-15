@@ -1248,8 +1248,8 @@ void Parameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool a
 	}
 
 	my_print("acceptance rate for synthesis rate:\n");
-	my_print("\t acceptance rate to low: %\n", acceptanceUnder);
-	my_print("\t acceptance rate to high: %\n", acceptanceOver);
+	my_print("\t acceptance rate too low: %\n", acceptanceUnder);
+	my_print("\t acceptance rate too high: %\n", acceptanceOver);
 }
 
 
