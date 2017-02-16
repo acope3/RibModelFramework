@@ -99,7 +99,8 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
                                     model = "ROC", split.serine = TRUE, 
                                     mixture.definition = "allUnique", 
                                     mixture.definition.matrix = NULL,
-                                    init.with.restart.file = NULL, mutation.prior.sd = 0.35, init.csp.variance = 0.0025){
+                                    init.with.restart.file = NULL, mutation.prior.sd = 0.35, 
+				    init.csp.variance = 0.0025, init.sepsilon = 0.1){
   # check input integrity
   if(is.null(init.with.restart.file)){
     if(length(sphi) != num.mixtures){
@@ -126,7 +127,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
       parameter <- initializeROCParameterObject(genome, sphi, num.mixtures, 
                                                 gene.assignment, initial.expression.values, split.serine, 
                             mixture.definition, mixture.definition.matrix, 
-                            mutation.prior.sd, init.csp.variance)    
+                            mutation.prior.sd, init.csp.variance, init.sepsilon)    
     }else{
       parameter <- new(ROCParameter, init.with.restart.file)
     }
@@ -158,7 +159,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
 initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignment,
                       expressionValues = NULL, split.serine = TRUE,
                       mixture.definition = "allUnique", 
-                      mixture.definition.matrix = NULL, mutation_prior_sd = 0.35, init.csp.variance){
+                      mixture.definition.matrix = NULL, mutation_prior_sd = 0.35, init.csp.variance = 0.0025, init.sepsilon = 0.1){
 
   if(is.null(mixture.definition.matrix)){ 
     # keyword constructor
@@ -180,7 +181,11 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
     parameter$initializeSynthesisRateByList(expressionValues)
   }
   
-  parameter$mutation_prior_sd <- (mutation_prior_sd)
+  n.obs.phi.sets <- ncol(getObservedSynthesisRateSet(genome))
+  parameter$setNumObservedSynthesisRateSets(n.obs.phi.sets)
+
+  parameter$mutation_prior_sd <- mutation_prior_sd
+  parameter$setInitialValuesForSepsilon(as.vector(init.sepsilon))
   parameter <- initializeCovarianceMatrices(parameter, genome, numMixtures, geneAssignment, init.csp.variance)
   
   

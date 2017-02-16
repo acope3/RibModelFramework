@@ -386,6 +386,8 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	omp_set_num_threads(numCores);
 #endif
 
+	unsigned reportStep = (100u < thinning) ? thinning : 100u;
+
 	// Allows to diverge from initial conditions (divergenceIterations controls the divergence).
 	// This allows for varying initial conditions for better exploration of the parameter space.
 	varyInitialConditions(genome, model, divergenceIterations);
@@ -393,7 +395,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	unsigned maximumIterations = samples * thinning;
 	// initialize everything
 
-	model.setNumPhiGroupings(genome.getGene(0).getObservedSynthesisRateValues().size());
+	//model.setNumPhiGroupings(genome.getGene(0).getObservedSynthesisRateValues().size());
 	model.initTraces(samples + 1, genome.getGenomeSize()); //Samples + 2 so we can store the starting and ending values.
 	// starting the MCMC
 
@@ -401,7 +403,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	if (stepsToAdapt == -1)
 		stepsToAdapt = maximumIterations;
 
-	my_print("entering MCMC loop\n");
+	my_print("Starting MCMC\n");
 	my_print("\tEstimate Codon Specific Parameters? % \n", (estimateCodonSpecificParameter ? "TRUE" : "FALSE") );
 	my_print("\tEstimate Hyper Parameters? % \n", (estimateHyperParameter ? "TRUE" : "FALSE") );
 	my_print("\tEstimate Synthesis rates? % \n", (estimateSynthesisRate ? "TRUE" : "FALSE") );
@@ -415,7 +417,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	{
 		if (writeRestartFile)
 		{
-			if ((iteration) % fileWriteInterval  == 0u)
+			if ((iteration) % fileWriteInterval == 0u)
 			{
 				my_print("Writing restart file!\n");
 
@@ -432,13 +434,13 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 				}
 			}
 		}
-		if ((iteration) % 100u == 0u)
+		if ((iteration) % reportStep == 0u)
 		{
             #ifndef STANDALONE
             Rcpp::checkUserInterrupt();
             #endif
             
-			my_print("Status at iteration (sample): % (%)\n", iteration, (iteration / thinning));
+	    my_print("Status at thinned sample (iteration): % (%)\n",  (iteration / thinning), iteration);
 			my_print("\t current logLikelihood: % \n", likelihoodTrace[(iteration/thinning) - 1] );
 			if (iteration > stepsToAdapt)
 				my_print("No longer adapting\n");

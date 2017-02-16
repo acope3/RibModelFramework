@@ -70,7 +70,7 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 			my_printError("ERROR: Error in Genome::readFasta: Can not open Fasta file %\n", filename);
 		else
 		{
-			my_print("File opened\n");
+			//my_print("File opened\n");
 			bool fastaFormat = false;
 			std::string buf;
 			int newLine;
@@ -122,7 +122,7 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 
 				if ( newLine == 3 )
 				{ // end of file
-					my_print("EOF reached\n");
+					//my_print("EOF reached\n");
 					if ( !fastaFormat )
 						throw std::string("Genome::readFasta throws: ") + std::string(filename)
 							  + std::string(" is not in Fasta format.");
@@ -869,7 +869,7 @@ Genome Genome::getGenomeForGeneIndicesR(std::vector <unsigned> indices, bool sim
 		}
 		else
 		{
-			simulated ? genome.addGene(simulatedGenes[indices[i]], true) : genome.addGene(genes[indices[i]], false);
+			simulated ? genome.addGene(simulatedGenes[indices[i]-1], true) : genome.addGene(genes[indices[i]-1], false);
 		}
 	}
 

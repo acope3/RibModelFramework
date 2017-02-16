@@ -66,6 +66,7 @@ class ROCParameter : public Parameter
 
 
 
+
 		//Trace Functions:
 		void updateObservedSynthesisNoiseTraces(unsigned sample);
 		void updateNoiseOffsetTraces(unsigned sample);
@@ -89,6 +90,8 @@ class ROCParameter : public Parameter
 		void setNoiseOffset(unsigned index, double _NoiseOffset);
 		void updateNoiseOffset(unsigned index);
 
+		// noise Functions:
+		void setInitialValuesForSepsilon(std::vector<double> seps);
 
 
 		//CSP Functions:

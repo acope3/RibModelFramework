@@ -1790,6 +1790,12 @@ double Parameter::randGamma(double shape, double rate)
 	xx = rgamma(1, shape, 1.0 / rate);
 	rv = xx[0];
 #else
+	// Looking at the definition of std::gamma_distribution at
+	// http://www.cplusplus.com/reference/random/gamma_distribution/
+	// to verify this is correct.
+	// It does appear correct and that std::gamma_distribution(shape, scale)
+	// This is despite the documentation using alpha and beta to represent these
+	// parameters.
 	std::gamma_distribution<double> distribution(shape, 1.0 / rate);
 	rv = distribution(generator);
 #endif
