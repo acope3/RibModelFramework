@@ -73,9 +73,9 @@ SequenceSummary::SequenceSummary(const SequenceSummary& other)
 {
 	codonPositions = other.codonPositions;
 	ncodons = other.ncodons;
-	RFPObserved = other.RFPObserved;
 	naa = other.naa;
-	RFP_count = other.RFP_count;
+	RFPCount = other.RFPCount;
+	sumRFPCount = other.sumRFPCount;
 }
 
 
@@ -85,10 +85,9 @@ SequenceSummary& SequenceSummary::operator=(const SequenceSummary& rhs)
 
 	codonPositions = rhs.codonPositions;
     ncodons = rhs.ncodons;
-    RFPObserved = rhs.RFPObserved;
     naa = rhs.naa;
-	RFP_count = rhs.RFP_count;
-	sumRFP_count = rhs.sumRFP_count;
+	RFPCount = rhs.RFPCount;
+	sumRFPCount = rhs.sumRFPCount;
 
 	return *this;
 }
@@ -101,9 +100,8 @@ bool SequenceSummary::operator==(const SequenceSummary& other) const
 	if (this->naa != other.naa) { match = false; }
 	if (this->ncodons != other.ncodons) { match = false; }
 	if (this->codonPositions != other.codonPositions) { match = false; }
-	if (this->RFPObserved != other.RFPObserved) { match = false; }
-	if (this->RFP_count != other.RFP_count) {match = false; }
-    if (this->sumRFP_count != other.sumRFP_count) {match = false; }
+	if (this->RFPCount != other.RFPCount) {match = false; }
+    if (this->sumRFPCount != other.sumRFPCount) {match = false; }
 
 	return match;
 }
@@ -147,24 +145,6 @@ unsigned SequenceSummary::getCodonCountForCodon(unsigned codonIndex)
 }
 
 
-unsigned SequenceSummary::getRFPObserved(std::string codon)
-{
-	return RFPObserved[codonToIndex(codon)];
-}
-
-
-unsigned SequenceSummary::getRFPObserved(unsigned codonIndex)
-{
-	return RFPObserved[codonIndex];
-}
-
-
-void SequenceSummary::setRFPObserved(unsigned codonIndex, unsigned value)
-{
-	RFPObserved[codonIndex] = value;
-}
-
-
 std::vector <unsigned> *SequenceSummary::getCodonPositions(std::string codon)
 {
 	unsigned codonIndex = codonToIndex(codon);
@@ -186,77 +166,110 @@ std::vector <unsigned> *SequenceSummary::getCodonPositions(unsigned index)
 //-----------------------------------//
 
 
-/* initRFP_count (NOT EXPOSED)
+/* initRFPCount (NOT EXPOSED)
  * Arguments: A number representing the number of RFP categories.
- * Initializes the vector of vectors that describes, for each category, the RFP_count vector.
- * Note: When programming in C, this function MUST be called before setRFP_count.
+ * Initializes the vector of vectors that describes, for each category, the RFPCount vector.
+ * Note: When programming in C, this function should be called before manipulating RFPCount.
  * Reminder: It must be called after setting the sequence, since that function
- * resets the sequence summary, including the RFP_count.
+ * resets the sequence summary, including the RFPCount.
  */
-void SequenceSummary::initRFP_count(unsigned numCategories)
+void SequenceSummary::initRFPCount(unsigned numCategories)
 {
-	RFP_count.resize(numCategories);
+	RFPCount.resize(numCategories);
 }
 
 
-/* getRFP_count (NOT EXPOSED)
+/* getRFPCount (NOT EXPOSED)
  * Arguments: A number representing the RFP category to return
- * Returns the RFP_count vector for the category index specified.
+ * Returns the RFPCount vector for the category index specified.
  */
-std::vector <unsigned> SequenceSummary::getRFP_count(unsigned categoryIndex)
+std::vector <unsigned> SequenceSummary::getRFPCount(unsigned categoryIndex)
 {
-	//TODO: Add error checking if user forgets to initRFP_count?
-	return RFP_count[categoryIndex];
+	// Note: If the user forgets to initRFPCount manually, this statement is executed but returns an empty vector.
+	if (RFPCount.size() < categoryIndex + 1) initRFPCount(categoryIndex + 1);
+	return RFPCount[categoryIndex];
 }
 
 
-/* setRFP_count (NOT EXPOSED)
- * Arguments: A number representing the RFP category to modify, a vector argument to set the RFP category's RFP_count to
- * Sets the RFP_count vector for the category index specified to the vector argument given.
+/* setRFPCount (NOT EXPOSED)
+ * Arguments: A number representing the RFP category to modify, a vector argument to set the RFP category's RFPCount to
+ * Sets the RFPCount vector for the category index specified to the vector argument given.
  */
-void SequenceSummary::setRFP_count(unsigned categoryIndex, std::vector <unsigned> arg)
+void SequenceSummary::setRFPCount(unsigned categoryIndex, std::vector <unsigned> arg)
 {
-	//TODO: Add error checking if user forgets to initRFP_count?
-	RFP_count[categoryIndex] = arg;
+	if (RFPCount.size() < categoryIndex + 1) initRFPCount(categoryIndex + 1);
+	RFPCount[categoryIndex] = arg;
 }
 
 
-/* initSumRFP_count (NOT EXPOSED)
+/* initSumRFPCount (NOT EXPOSED)
  * Arguments: A number representing the number of RFP categories.
- * Initializes the vector of arrays that describes, for each category, the sumRFP_count vector.
- * Note: When programming in C, this function MUST be called before setSumRFP_count.
+ * Initializes the vector of arrays that describes, for each category, the sumRFPCount vector.
+ * Note: When programming in C, this function should be called before manipulating sumRFPCount.
  * Reminder: It must be called after setting the sequence, since that function
- * resets the sequence summary, including the sumRFP_count.
+ * resets the sequence summary, including the sumRFPCount.
  */
-void SequenceSummary::initSumRFP_count(unsigned numCategories)
+void SequenceSummary::initSumRFPCount(unsigned numCategories)
 {
-	sumRFP_count.resize(numCategories);
+	sumRFPCount.resize(numCategories);
 	for (unsigned i = 0; i < numCategories; i++)
 	{
-		sumRFP_count[i].fill(0);
+		sumRFPCount[i].fill(0);
 	}
 }
 
 
-/* getSumRFP_count (NOT EXPOSED)
+/* getSumRFPCount (NOT EXPOSED)
  * Arguments: A number representing the RFP category to return
- * Returns the sumRFP_count array of size 64 for the category index specified.
+ * Returns the sumRFPCount array of size 64 for the category index specified.
+ * Note: If initSumRFPCount is not called beforehand, it is called now to return an array of 0s.
  */
-std::array <unsigned, 64> SequenceSummary::getSumRFP_count(unsigned categoryIndex)
+std::array <unsigned, 64> SequenceSummary::getSumRFPCount(unsigned categoryIndex)
 {
-	//TODO: Add error checking if user forgets to initSumRFP_count?
-	return sumRFP_count[categoryIndex];
+	if (sumRFPCount.size() < categoryIndex + 1) initSumRFPCount(categoryIndex + 1);
+	return sumRFPCount[categoryIndex];
 }
 
 
-/* setSumRFP_count (NOT EXPOSED)
- * Arguments: A number representing the RFP category to modify, an array argument to set the RFP category's RFP_count to
- * Sets the sumRFP_count vector for the category index specified to the array argument given.
+/* setSumRFPCount (NOT EXPOSED)
+ * Arguments: A number representing the RFP category to modify, an array argument to set the RFP category's RFPCount to
+ * Sets the sumRFPCount vector for the category index specified to the array argument given.
+ * Note: If initSumRFPCount is not called beforehand, it is called now.
  */
-void SequenceSummary::setSumRFP_count(unsigned categoryIndex, std::array <unsigned, 64> arg)
+void SequenceSummary::setSumRFPCount(unsigned categoryIndex, std::array <unsigned, 64> arg)
 {
-	//TODO: Add error checking if user forgets to initSumRFP_count?
-	sumRFP_count[categoryIndex] = arg;
+	if (sumRFPCount.size() < categoryIndex + 1) initSumRFPCount(categoryIndex + 1);
+	sumRFPCount[categoryIndex] = arg;
+}
+
+
+/* getRFPValue (by codon string) (RCPP EXPOSED VIA WRAPPER)
+ * Arguments: A three-character codon string to get the RFP value of, a number representing the RFP category to return
+ * Returns the RFP value of the codon string for the category index specified.
+ * Note: If initSumRFPCount is not called beforehand, it is called now to return a value of 0.
+ * Wrapped by Gene::getRFPObserved on the R-side.
+ */
+unsigned SequenceSummary::getRFPValue(std::string codon, unsigned categoryIndex){
+	if (sumRFPCount.size() < categoryIndex + 1) initSumRFPCount(categoryIndex + 1);
+	return sumRFPCount[categoryIndex][codonToIndex(codon)];
+}
+
+
+/* getRFPValue (by codon index) (NOT EXPOSED)
+ * Arguments: A codon index to get the RFP value of, a number representing the RFP category to return
+ * Returns the RFP value at the codon index for the category index specified.
+ * Note: If initSumRFPCount is not called beforehand, it is called now to return a value of 0.
+ */
+unsigned SequenceSummary::getRFPValue(unsigned codonIndex, unsigned categoryIndex){
+	if (sumRFPCount.size() < categoryIndex + 1) initSumRFPCount(categoryIndex + 1);
+    return sumRFPCount[categoryIndex][codonIndex];
+}
+
+
+void SequenceSummary::setRFPValue(unsigned codonIndex, unsigned value, unsigned categoryIndex)
+{
+    if (sumRFPCount.size() < categoryIndex + 1) initSumRFPCount(categoryIndex + 1);
+    sumRFPCount[categoryIndex][codonIndex] = value;
 }
 
 
@@ -271,11 +284,11 @@ void SequenceSummary::setSumRFP_count(unsigned categoryIndex, std::array <unsign
 void SequenceSummary::clear()
 {
 	codonPositions.clear();
-	RFP_count.clear();
+	RFPCount.clear();
+	sumRFPCount.clear();
 	for (unsigned i = 0; i < 64; i++)
 	{
 		ncodons[i] = 0;
-		RFPObserved[i] = 0;
 	}
 
 	for (unsigned i = 0; i < 22; i++)
@@ -285,23 +298,9 @@ void SequenceSummary::clear()
 }
 
 
-/* IMPORTANT NOTE
- * ncodons and RFPObserved are mutually exclusive in model implementation.
- * Thus, a gene written using ncodons will have RFP_Observed values that are irrelevant
- * or untrue, but this will not affect the model itself.
- * The converse is also true: an RFP model does not depend on any codons that do not have RFP_Counts
- * and in general can ignore ncodons.
- *
- * This implementation choice significantly eases the input of RFP data.
- * A possible implementation in the future would be to only change one of these values.
- */
 // Returns a bool for error checking purposes related to setSequence in Gene.cpp
 bool SequenceSummary::processSequence(const std::string& sequence)
 {
-	//NOTE! Clear() cannot be called in this function because of the RFP model.
-	//RFP sets RFPObserved by codon, and not by setting the sequence. This causes
-	//the values to be zero during the MCMC.
-
 	bool check = true;
 	codonPositions.resize(64);
 
@@ -317,7 +316,6 @@ bool SequenceSummary::processSequence(const std::string& sequence)
 		{
 			int aaID = codonToAAIndex(codon);
 			ncodons[codonID]++;
-			RFPObserved[codonID]++; // See documentation
 			naa[aaID]++;
 			codonPositions[codonID].push_back(i / 3);
 		}
@@ -344,13 +342,13 @@ bool SequenceSummary::processPA(std::vector<std::vector<unsigned>> table)
 
 	// There should be at least 1 table entry to get to this point, so this should be a valid operation
     unsigned numCats = (unsigned)table[0].size() - 2; // numCats = after position, codon.
-	initRFP_count(numCats);
-	sumRFP_count.resize(numCats);
+	initRFPCount(numCats);
+	sumRFPCount.resize(numCats);
 
 	for (unsigned j = 0; j < numCats; j++)
 	{
-		RFP_count[j].resize(nRows);
-		sumRFP_count[j].fill(0);
+		RFPCount[j].resize(nRows);
+		sumRFPCount[j].fill(0);
 	}
 
 	for (unsigned i = 0; i < nRows; i++)
@@ -367,15 +365,14 @@ bool SequenceSummary::processPA(std::vector<std::vector<unsigned>> table)
 			int aaID = codonToAAIndex(codon);
 			ncodons[codonID]++;
 			naa[aaID]++;
-			RFPObserved[codonID]++; // See documentation
 			codonPositions[codonID].push_back(row[0]);
 			positionCodonID[row[0]] = codonID;
 
 			for (unsigned j = 0; j < numCats; j++)
 			{
-				// Category j has an RFP_count at the position e0]qual to the 2-indexed (after position, codon) value of j.
-				RFP_count[j][row[0]] = row[j + 2];
-				sumRFP_count[j][codonID] += row[j + 2];
+				// Category j has an RFPCount at the position e0]qual to the 2-indexed (after position, codon) value of j.
+				RFPCount[j][row[0]] = row[j + 2];
+				sumRFPCount[j][codonID] += row[j + 2];
 			}
 		}
 		else
@@ -404,6 +401,7 @@ unsigned SequenceSummary::AAToAAIndex(std::string aa)
 
 
 //TODO: test this function. See note in testSequenceSummary.R.
+// Note: From function definition in header, default forParamVector is false.
 void SequenceSummary::AAIndexToCodonRange(unsigned aaIndex, unsigned& startAAIndex, unsigned& endAAIndex, bool forParamVector)
 {
 	std::string aa = indexToAA(aaIndex);
@@ -411,6 +409,7 @@ void SequenceSummary::AAIndexToCodonRange(unsigned aaIndex, unsigned& startAAInd
 }
 
 //std::array<unsigned, 2>
+// Note: From function definition in header, default forParamVector is false.
 void SequenceSummary::AAToCodonRange(std::string aa, unsigned& startAAIndex, unsigned& endAAIndex, bool forParamVector)
 {
 	//aa = (char)std::toupper(aa[0]); CEDRIC: commented out for performance. Put back in if necessary!
@@ -519,6 +518,7 @@ void SequenceSummary::AAToCodonRange(std::string aa, unsigned& startAAIndex, uns
 }
 
 
+// Note: From function definition in header, default category is 0.
 std::vector<std::string> SequenceSummary::AAToCodon(std::string aa, bool forParamVector)
 {
 	std::vector <std::string> RV;
@@ -612,6 +612,7 @@ std::string SequenceSummary::codonToAA(std::string& codon)
 }
 
 
+// Note: From function definition in header, default category is 0.
 unsigned SequenceSummary::codonToIndex(std::string& codon, bool forParamVector)
 {
 	unsigned i = 0;
@@ -648,12 +649,14 @@ std::string SequenceSummary::indexToAA(unsigned aaIndex)
 }
 
 
+// Note: From function definition in header, default category is 0.
 std::string SequenceSummary::indexToCodon(unsigned index, bool forParamVector)
 {
 	return forParamVector ? codonArrayParameter[index] : codonArray[index];
 }
 
 
+// Note: From function definition in header, default category is 0.
 unsigned SequenceSummary::GetNumCodonsForAA(std::string& aa, bool forParamVector)
 {
 	unsigned ncodon = 0;
@@ -728,9 +731,7 @@ unsigned SequenceSummary::GetNumCodonsForAA(std::string& aa, bool forParamVector
 		break;
 		default: // INVALID AA
 
-
 		my_printError("WARNING: Invalid Amino Acid given (%), returning 0,0\n", aa);
-
 
 		break;
 	}

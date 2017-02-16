@@ -599,96 +599,6 @@ int testSequenceSummary()
     else
         error = 0; //Reset for next function.
 
-    //---------------------------------------------------------------//
-    //------ getRFPObserved(string) & setRFPObserved Functions ------//
-    //---------------------------------------------------------------//
-    SS.setRFPObserved(4, 35);
-    SS.setRFPObserved(16,45);
-    SS.setRFPObserved(54,2);
-    SS.setRFPObserved(45,0);
-
-    if (35 != SS.getRFPObserved("TGC"))
-    {
-        my_printError("Error in getRFPObserved(string) or setRFPObserved for codon \"TGC\".\n");
-        my_printError("Should return 35, but returns %\n", SS.getRFPObserved("TGC"));
-        error = 1;
-        globalError = 1;
-    }
-
-    if (45 != SS.getRFPObserved("CAC"))
-    {
-        my_printError("Error in getRFPObserved(string) or setRFPObserved for codon \"CAC\".\n");
-        my_printError("Should return 45, but returns %\n", SS.getRFPObserved("CAC"));
-        error = 1;
-        globalError = 1;
-    }
-
-    if (2 != SS.getRFPObserved("GTG"))
-    {
-        my_printError("Error in getRFPObserved(string) or set RFPObserved for codon \"GTG\".\n");
-        my_printError("Should return 2, but returns %\n", SS.getRFPObserved("GTG"));
-        error = 1;
-        globalError = 1;
-    }
-
-    if (0 != SS.getRFPObserved("TCC"))
-    {
-        my_printError("Error in getRFPObserved(string) or setRFPObserved for codon \"TCC\".\n");
-        my_printError("Should return 0, but returns %\n", SS.getRFPObserved("TCC"));
-        error = 1;
-        globalError = 1;
-    }
-
-    if (!error)
-        my_print("Sequence Summary getRFPObserved(string) & setRFPObserved --- Pass\n");
-    else
-        error = 0; //Reset for next function.
-
-    //--------------------------------------------//
-    //------ getRFPObserved(index) Function ------//
-    //--------------------------------------------//
-    SS.setRFPObserved(0,45);
-    SS.setRFPObserved(1,52);
-    SS.setRFPObserved(2,63);
-    SS.setRFPObserved(60,23);
-
-    if (45 != SS.getRFPObserved(0))
-    {
-        my_printError("Error with getRFPObserved(index) for codon index 0.\n Should return 45, but returns %\n",
-                      SS.getRFPObserved(0));
-        error = 1;
-        globalError = 1;
-    }
-
-    if (52 != SS.getRFPObserved(1))
-    {
-        my_printError("Error with getRFPObserved(index) for codon index 1.\n Should return 52, but returns %\n",
-                      SS.getRFPObserved(1));
-        error = 1;
-        globalError = 1;
-    }
-
-    if (63 != SS.getRFPObserved(2))
-    {
-        my_printError("Error with getRFPObserved(index) for codon index 2.\n Should return 63, but returns %\n",
-                      SS.getRFPObserved(2));
-        error = 1;
-        globalError = 1;
-    }
-
-    if (23 != SS.getRFPObserved(60))
-    {
-        my_printError("Error with getRFPObserved(index) for codon index 60.\n should return 23, but returns %\n",
-                      SS.getRFPObserved(60));
-        error = 1;
-        globalError = 1;
-    }
-
-    if (!error)
-        my_print("Sequence Summary getRFPObserved(index) --- Pass\n");
-    else
-        error = 0; //Reset for next function.
-
     //------------------------------------------------//
     //------ getCodonPositions(string) Function ------//
     //------------------------------------------------//
@@ -924,15 +834,15 @@ int testSequenceSummary()
     else
         error = 0; //Reset for next function.
 
-    //---------------------------------------------//
-    //------ init/get/setRFP_count Functions ------//
-    //---------------------------------------------//
-    SS.initRFP_count(1);
-    std::vector <unsigned> tmp2 = SS.getRFP_count(0);
+    //--------------------------------------------//
+    //------ init/get/setRFPCount Functions ------//
+    //--------------------------------------------//
+    SS.initRFPCount(1);
+    std::vector <unsigned> tmp2 = SS.getRFPCount(0);
 
     if (0 != tmp2.size())
     {
-        my_printError("Error with initRFP_count or getRFP_count. Function should return an empty vector but returns:\n");
+        my_printError("Error with initRFPCount or getRFPCount. Function should return an empty vector but returns:\n");
         for (unsigned i = 0; i < tmp2.size(); i++)
         {
             my_printError("%\n", tmp2[i]);
@@ -942,11 +852,11 @@ int testSequenceSummary()
     }
 
     tmp2 = {1, 2, 3, 4, 5};
-    SS.setRFP_count(0, tmp2);
+    SS.setRFPCount(0, tmp2);
 
-    if (SS.getRFP_count(0) != tmp2)
+    if (SS.getRFPCount(0) != tmp2)
     {
-        my_printError("Error in initRFP_count, getRFP_count or setRFP_count.\n");
+        my_printError("Error in initRFPCount, getRFPCount or setRFPCount.\n");
         my_printError("Function should return 1, 2, 3, 4, 5, but returns:\n");
         for (unsigned i = 0; i < tmp2.size(); i++)
         {
@@ -957,21 +867,21 @@ int testSequenceSummary()
     }
 
     if (!error)
-        my_print("Sequence Summary init/get/setRFP_count --- Pass\n");
+        my_print("Sequence Summary init/get/setRFPCount --- Pass\n");
     else
         error = 0; //Reset for next function.
 
-    //------------------------------------------------//
-    //------ init/get/setSumRFP_count Functions ------//
-    //------------------------------------------------//
-    SS.initSumRFP_count(1);
-    std::array <unsigned, 64> tmp3 = SS.getSumRFP_count(0);
+    //-----------------------------------------------//
+    //------ init/get/setSumRFPCount Functions ------//
+    //-----------------------------------------------//
+    SS.initSumRFPCount(1);
+    std::array <unsigned, 64> tmp3 = SS.getSumRFPCount(0);
     std::array <unsigned, 64> empty;
     empty.fill(0);
 
     if (tmp3 != empty)
     {
-        my_printError("Error with initSumRFP_count or getSumRFP_count.\n");
+        my_printError("Error with initSumRFPCount or getSumRFPCount.\n");
         my_printError("Function should return an array filled with zeroes but returns:\n");
         for (unsigned i = 0; i < tmp3.size(); i++)
         {
@@ -987,11 +897,11 @@ int testSequenceSummary()
     tmp3[18] = 2;
     tmp3[47] = 0;
 
-    SS.setSumRFP_count(0, tmp3);
+    SS.setSumRFPCount(0, tmp3);
 
-    if (SS.getSumRFP_count(0) != tmp3)
+    if (SS.getSumRFPCount(0) != tmp3)
     {
-        my_printError("Error in initSumRFP_count, getSumRFP_count or setSumRFP_count\n.");
+        my_printError("Error in initSumRFPCount, getSumRFPCount or setSumRFPCount\n.");
         my_printError("Function should return the index, value pairs: 4, 5; 16, 9; 24, 6; 18, 2; 47, 0 but returns:\n");
         my_printError("4, %\n", tmp3[4]);
         my_printError("16, %\n", tmp3[16]);
@@ -1003,7 +913,97 @@ int testSequenceSummary()
     }
 
     if (!error)
-        my_print("Sequence Summary init/get/setSumRFP_count --- Pass\n");
+        my_print("Sequence Summary init/get/setSumRFPCount --- Pass\n");
+    else
+        error = 0; //Reset for next function.
+
+    //---------------------------------------------------------//
+    //------ getRFPValue(string) / setRFPValue Functions ------//
+    //---------------------------------------------------------//
+    SS.setRFPValue(4, 35);
+    SS.setRFPValue(16,45);
+    SS.setRFPValue(54,2);
+    SS.setRFPValue(45,0);
+
+    if (35 != SS.getRFPValue("TGC"))
+    {
+        my_printError("Error in getRFPValue(string) or setRFPValue for codon \"TGC\".\n");
+        my_printError("Should return 35, but returns %\n", SS.getRFPValue("TGC"));
+        error = 1;
+        globalError = 1;
+    }
+
+    if (45 != SS.getRFPValue("CAC"))
+    {
+        my_printError("Error in getRFPValue(string) or setRFPValue for codon \"CAC\".\n");
+        my_printError("Should return 45, but returns %\n", SS.getRFPValue("CAC"));
+        error = 1;
+        globalError = 1;
+    }
+
+    if (2 != SS.getRFPValue("GTG"))
+    {
+        my_printError("Error in getRFPValue(string) or set RFPValue for codon \"GTG\".\n");
+        my_printError("Should return 2, but returns %\n", SS.getRFPValue("GTG"));
+        error = 1;
+        globalError = 1;
+    }
+
+    if (0 != SS.getRFPValue("TCC"))
+    {
+        my_printError("Error in getRFPValue(string) or setRFPValue for codon \"TCC\".\n");
+        my_printError("Should return 0, but returns %\n", SS.getRFPValue("TCC"));
+        error = 1;
+        globalError = 1;
+    }
+
+    if (!error)
+        my_print("Sequence Summary getRFPValue(string) / setRFPValue --- Pass\n");
+    else
+        error = 0; //Reset for next function.
+
+    //-----------------------------------------//
+    //------ getRFPValue(index) Function ------//
+    //-----------------------------------------//
+    SS.setRFPValue(0,45);
+    SS.setRFPValue(1,52);
+    SS.setRFPValue(2,63);
+    SS.setRFPValue(60,23);
+
+    if (45 != SS.getRFPValue(0))
+    {
+        my_printError("Error with getRFPValue(index) for codon index 0.\n Should return 45, but returns %\n",
+                      SS.getRFPValue(0));
+        error = 1;
+        globalError = 1;
+    }
+
+    if (52 != SS.getRFPValue(1))
+    {
+        my_printError("Error with getRFPValue(index) for codon index 1.\n Should return 52, but returns %\n",
+                      SS.getRFPValue(1));
+        error = 1;
+        globalError = 1;
+    }
+
+    if (63 != SS.getRFPValue(2))
+    {
+        my_printError("Error with getRFPValue(index) for codon index 2.\n Should return 63, but returns %\n",
+                      SS.getRFPValue(2));
+        error = 1;
+        globalError = 1;
+    }
+
+    if (23 != SS.getRFPValue(60))
+    {
+        my_printError("Error with getRFPValue(index) for codon index 60.\n should return 23, but returns %\n",
+                      SS.getRFPValue(60));
+        error = 1;
+        globalError = 1;
+    }
+
+    if (!error)
+        my_print("Sequence Summary getRFPValue(index) --- Pass\n");
     // No need to reset error
 
     return globalError;
@@ -1062,86 +1062,86 @@ int testGene()
         my_print("Gene get/setSequence --- Pass\n");
 
     //---------------------------------------------//
-    //------ init/get/setRFP_count Functions ------//
+    //------ init/get/setRFPCount Functions ------//
     //---------------------------------------------//
-    testGene.initRFP_count(1);
-    std::vector <unsigned> rfp_counts = testGene.getRFP_count(0);
+    testGene.initRFPCount(1);
+    std::vector <unsigned> RFPCounts = testGene.getRFPCount(0);
 
-    if (0 != rfp_counts.size())
+    if (0 != RFPCounts.size())
     {
-        my_printError("Error in testGene: initRFP_count or getRFP_count.\n");
+        my_printError("Error in testGene: initRFPCount or getRFPCount.\n");
         my_printError("Function should return an empty vector but returns:\n");
-        for (unsigned i = 0; i < rfp_counts.size(); i++)
+        for (unsigned i = 0; i < RFPCounts.size(); i++)
         {
-            my_printError("%\n", rfp_counts[i]);
+            my_printError("%\n", RFPCounts[i]);
         }
         error = 1;
         globalError = 1;
     }
 
-    rfp_counts = {0, 1, 1};
-    testGene.setRFP_count(0, rfp_counts);
+    RFPCounts = {0, 1, 1};
+    testGene.setRFPCount(0, RFPCounts);
 
-    if (testGene.getRFP_count(0) != rfp_counts)
+    if (testGene.getRFPCount(0) != RFPCounts)
     {
-        my_printError("Error in testGene: initRFP_count, getRFP_count or setRFP_count.\n");
+        my_printError("Error in testGene: initRFPCount, getRFPCount or setRFPCount.\n");
         my_printError("Function should return 0, 1, 1, but returns:\n");
-        for (unsigned i = 0; i < rfp_counts.size(); i++)
+        for (unsigned i = 0; i < RFPCounts.size(); i++)
         {
-            my_printError("%\n", rfp_counts[i]);
+            my_printError("%\n", RFPCounts[i]);
         }
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        my_print("Gene init/get/setRFP_count --- Pass\n");
+        my_print("Gene init/get/setRFPCount --- Pass\n");
     else
         error = 0; //Reset for next function.
 
     //------------------------------------------------//
-    //------ init/get/setSumRFP_count Functions ------//
+    //------ init/get/setSumRFPCount Functions ------//
     //------------------------------------------------//
-    testGene.initSumRFP_count(1);
-    std::array <unsigned, 64> sumRFP_counts = testGene.getSumRFP_count(0);
+    testGene.initSumRFPCount(1);
+    std::array <unsigned, 64> sumRFPCounts = testGene.getSumRFPCount(0);
     std::array <unsigned, 64> empty;
     empty.fill(0);
 
-    if (sumRFP_counts != empty)
+    if (sumRFPCounts != empty)
     {
-        my_printError("Error in testGene: initSumRFP_count or getSumRFP_count.\n");
+        my_printError("Error in testGene: initSumRFPCount or getSumRFPCount.\n");
         my_printError("Function should return an array filled with zeroes but returns:\n");
-        for (unsigned i = 0; i < sumRFP_counts.size(); i++)
+        for (unsigned i = 0; i < sumRFPCounts.size(); i++)
         {
-            if (sumRFP_counts[i] != 0) my_printError("For index %, value %\n", i, sumRFP_counts[i]);
+            if (sumRFPCounts[i] != 0) my_printError("For index %, value %\n", i, sumRFPCounts[i]);
         }
         error = 1;
         globalError = 1;
     }
 
-    sumRFP_counts[4] = 5;
-    sumRFP_counts[16] = 9;
-    sumRFP_counts[24] = 6;
-    sumRFP_counts[18] = 2;
-    sumRFP_counts[47] = 0;
+    sumRFPCounts[4] = 5;
+    sumRFPCounts[16] = 9;
+    sumRFPCounts[24] = 6;
+    sumRFPCounts[18] = 2;
+    sumRFPCounts[47] = 0;
 
-    testGene.setSumRFP_count(0, sumRFP_counts);
+    testGene.setSumRFPCount(0, sumRFPCounts);
 
-    if (testGene.getSumRFP_count(0) != sumRFP_counts)
+    if (testGene.getSumRFPCount(0) != sumRFPCounts)
     {
-        my_printError("Error in testGene: initSumRFP_count, getSumRFP_count or setSumRFP_count\n.");
+        my_printError("Error in testGene: initSumRFPCount, getSumRFPCount or setSumRFPCount\n.");
         my_printError("Function should return the index, value pairs: 4, 5; 16, 9; 24, 6; 18, 2; 47, 0 but returns:\n");
-        my_printError("4, %\n", sumRFP_counts[4]);
-        my_printError("16, %\n", sumRFP_counts[16]);
-        my_printError("24, %\n", sumRFP_counts[24]);
-        my_printError("18, %\n", sumRFP_counts[18]);
-        my_printError("27, %\n", sumRFP_counts[47]);
+        my_printError("4, %\n", sumRFPCounts[4]);
+        my_printError("16, %\n", sumRFPCounts[16]);
+        my_printError("24, %\n", sumRFPCounts[24]);
+        my_printError("18, %\n", sumRFPCounts[18]);
+        my_printError("27, %\n", sumRFPCounts[47]);
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        my_print("Gene init/get/setSumRFP_count --- Pass\n");
+        my_print("Gene init/get/setSumRFPCount --- Pass\n");
 
     //-----------------------------------------//
     //------ getSequenceSummary Function ------//
@@ -1160,16 +1160,18 @@ int testGene()
         }
     }
 
+    /*
     for (unsigned i = 0; i < 64; i++)
     {
-        if (SS.getRFPObserved(i) != GeneSS->getRFPObserved(i))
+        if (SS.getRFPValue(i) != GeneSS->getRFPValue(i))
         {
             my_printError("Error in testGene: getSequenceSummary. RFP observed is incorrect for codon %.\n", i);
-            my_printError("Should return %, but returns %\n", SS.getRFPObserved(i), GeneSS->getRFPObserved(i));
+            my_printError("Should return %, but returns %\n", SS.getRFPValue(i), GeneSS->getRFPValue(i));
             error = 1;
             globalError = 1;
         }
     }
+     */
 
     //This fails because this returns pointers to vectors and they need to be compared differently.
     std::vector <unsigned> *SSvec;
@@ -1739,6 +1741,7 @@ int testGenome(std::string testFileDir)
         error = 0; //Reset for next function.
 
 
+    /*
     //----------------------------------//
     //------ readRFPFile Function ------//
     //----------------------------------//
@@ -1748,8 +1751,8 @@ int testGenome(std::string testFileDir)
     file = testFileDir + "/" + "readRFP.csv";
     genome.readRFPFile(file);
 
-    // These sequences are composed of those codons with RFPObserved values > 0
-    // Each repetition of a codon denotes an incrementation in RFPObserved for that codon
+    // These sequences are composed of those codons with RFPValue values > 0
+    // Each repetition of a codon denotes an incrementation in RFPValue for that codon
 
     Gene rfp1("GCCGCCGCCGCCGCC", "TEST001", "No description for RFP Model");
     Gene rfp2("GCGGCGTTTTTTTTTTTT", "TEST002", "No description for RFP Model");
@@ -1795,11 +1798,10 @@ int testGenome(std::string testFileDir)
 
     genome.writeRFPFile(file, true);
 
-    /* Note that while these genes were originally simulated, they are printed
-     * as non-simulated genes.
-     * It is up to the user to know that they were simulated, but they will
-     * now be read in as non-simulated genes (and Unit Testing will compare their validity as such)
-     */
+    // Note that while these genes were originally simulated, they are printed
+    // as non-simulated genes.
+    // It is up to the user to know that they were simulated, but they will
+    // now be read in as non-simulated genes (and Unit Testing will compare their validity as such)
 
     genome.clear();
     genome.addGene(rfp1, false);
@@ -1819,8 +1821,8 @@ int testGenome(std::string testFileDir)
         my_print("Genome writeRFPFile --- Pass\n");
     else
         error = 0; //Reset for next function.
+    */
 
-    //TODO: Distinguish this as PANSE only
     //---------------------------------//
     //------ readPAFile Function ------//
     //---------------------------------//
@@ -1833,24 +1835,24 @@ int testGenome(std::string testFileDir)
     Gene panse1("CTTGCTATTTTTTTT", "TEST001", "No description for PANSE Model");
     Gene panse2("CCTGTAATTTGGTGG", "TEST002", "No description for PANSE Model");
 
-    // RFP_Count for TEST001: value[position] = RFP_count
+    // RFPCount for TEST001: value[position] = RFPCount
     std::vector <unsigned> test1Cat1 = {0, 0, 2, 0, 1};
     std::vector <unsigned> test1Cat2 = {0, 17, 0, 1, 4};
 
-    // RFP_Count for TEST002: value[position] = RFP_count
+    // RFPCount for TEST002: value[position] = RFPCount
     std::vector <unsigned> test2Cat1 = {1, 1, 0, 0, 1};
     std::vector <unsigned> test2Cat2 = {2, 0, 2, 3, 6};
 
     std::string codon;
     int index;
 
-    // sumRFP_Count for TEST001
+    // sumRFPCount for TEST001
     std::array <unsigned, 64> sumTest1Cat1;
     std::array <unsigned, 64> sumTest1Cat2;
     sumTest1Cat1.fill(0);
     sumTest1Cat2.fill(0);
 
-    // sumRFP_Count for TEST002
+    // sumRFPCount for TEST002
     std::array <unsigned, 64> sumTest2Cat1;
     std::array <unsigned, 64> sumTest2Cat2;
     sumTest2Cat1.fill(0);
@@ -1885,21 +1887,21 @@ int testGenome(std::string testFileDir)
     sumTest2Cat1[index] = 1;
     sumTest2Cat2[index] = 9;
 
-    panse1.initRFP_count(2);
-    panse2.initRFP_count(2);
+    panse1.initRFPCount(2);
+    panse2.initRFPCount(2);
 
-    panse1.initSumRFP_count(2);
-    panse2.initSumRFP_count(2);
+    panse1.initSumRFPCount(2);
+    panse2.initSumRFPCount(2);
 
-    panse1.setRFP_count(0, test1Cat1);
-    panse1.setRFP_count(1, test1Cat2);
-    panse2.setRFP_count(0, test2Cat1);
-    panse2.setRFP_count(1, test2Cat2);
+    panse1.setRFPCount(0, test1Cat1);
+    panse1.setRFPCount(1, test1Cat2);
+    panse2.setRFPCount(0, test2Cat1);
+    panse2.setRFPCount(1, test2Cat2);
 
-    panse1.setSumRFP_count(0, sumTest1Cat1);
-    panse1.setSumRFP_count(1, sumTest1Cat2);
-    panse2.setSumRFP_count(0, sumTest2Cat1);
-    panse2.setSumRFP_count(1, sumTest2Cat2);
+    panse1.setSumRFPCount(0, sumTest1Cat1);
+    panse1.setSumRFPCount(1, sumTest1Cat2);
+    panse2.setSumRFPCount(0, sumTest2Cat1);
+    panse2.setSumRFPCount(1, sumTest2Cat2);
 
     testGenome.addGene(panse1, false);
     testGenome.addGene(panse2, false);
@@ -1913,9 +1915,9 @@ int testGenome(std::string testFileDir)
     }
 
     //TODO
-    //-------------------------------------//
+    //----------------------------------//
     //------ writePAFile Function ------//
-    //-------------------------------------//
+    //----------------------------------//
 
     /* readObservedPhiValues Testing Function
      *
