@@ -136,25 +136,27 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 		}
 	}
 
-	double currentLogLikelihood = (logLikelihood + logPhiProbability);
-	double proposedLogLikelihood = (logLikelihood_proposed + logPhiProbability_proposed);
+	double currentLogPosterior = (logLikelihood + logPhiProbability);
+	double proposedLogPosterior = (logLikelihood_proposed + logPhiProbability_proposed);
 
-	logProbabilityRatio[0] = (proposedLogLikelihood - currentLogLikelihood) - (std::log(phiValue) - std::log(phiValue_proposed));
-	logProbabilityRatio[1] = currentLogLikelihood - std::log(phiValue_proposed);
-	logProbabilityRatio[2] = proposedLogLikelihood - std::log(phiValue);
-	logProbabilityRatio[3] = currentLogLikelihood;
-	logProbabilityRatio[4] = proposedLogLikelihood;
+	logProbabilityRatio[0] = (proposedLogPosterior - currentLogPosterior) - (std::log(phiValue) - std::log(phiValue_proposed));
+	logProbabilityRatio[1] = currentLogPosterior - std::log(phiValue_proposed);
+	logProbabilityRatio[2] = proposedLogPosterior - std::log(phiValue);
+	logProbabilityRatio[3] = currentLogPosterior;
+	logProbabilityRatio[4] = proposedLogPosterior;
+	logProbabilityRatio[5] = logLikelihood;
+	logProbabilityRatio[6] = logLikelihood_proposed;
 
 }
 
-
-void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures)
+ 
+void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, std::vector<double> &logAcceptanceRatioForAllMixtures)
 {
 	int numGenes = genome.getGenomeSize();
 	int numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
 	double likelihood = 0.0;
 	double likelihood_proposed = 0.0;
-
+	double posterior, posterior_proposed;
 	double mutation[5];
 	double selection[5];
 	double mutation_proposed[5];
@@ -194,10 +196,14 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 		likelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation_proposed, selection_proposed, phiValue);
 	}
 
-	likelihood_proposed = likelihood_proposed + calculateMutationPrior(grouping, true);
-	likelihood = likelihood + calculateMutationPrior(grouping, false);
+	posterior_proposed = likelihood_proposed + calculateMutationPrior(grouping, true);
+	posterior = likelihood + calculateMutationPrior(grouping, false);
 
-	logAcceptanceRatioForAllMixtures = (likelihood_proposed - likelihood);
+	logAcceptanceRatioForAllMixtures[0] = (posterior_proposed - posterior);
+	logAcceptanceRatioForAllMixtures[1] = likelihood;
+	logAcceptanceRatioForAllMixtures[2] = likelihood_proposed;
+	logAcceptanceRatioForAllMixtures[3] = posterior;
+	logAcceptanceRatioForAllMixtures[4] = posterior_proposed;
 }
 
 
@@ -476,11 +482,11 @@ void ROCModel::updateTracesWithInitialValues(Genome &genome)
 {
 	std::vector <std::string> groupList = parameter->getGroupList();
 
-	for (unsigned i = 0; i < genome.getGenomeSize(); i++)
-	{
-		parameter->updateSynthesisRateTrace(0, i);
-		parameter->updateMixtureAssignmentTrace(0, i);
-	}
+	// for (unsigned i = 0; i < genome.getGenomeSize(); i++)
+	// {
+	// 	parameter->updateSynthesisRateTrace(0, i);
+	// 	parameter->updateMixtureAssignmentTrace(0, i);
+	// }
 
 	for (unsigned i = 0; i < groupList.size(); i++)
 		parameter->updateCodonSpecificParameterTrace(0, getGrouping(i));
@@ -720,7 +726,7 @@ void ROCModel::simulateGenome(Genome &genome)
 void ROCModel::printHyperParameters()
 {
 	for (unsigned i = 0u; i < getNumSynthesisRateCategories(); i++)
-		my_print("Current stdDevSynthesisRate estimate for selection category %: %\n", i, getStdDevSynthesisRate(i, false));
+		my_print("\t Current stdDevSynthesisRate estimate for selection category %: %\n", i, getStdDevSynthesisRate(i, false));
 
 	my_print("\t current stdDevSynthesisRate proposal width: %\n", getCurrentStdDevSynthesisRateProposalWidth());
 

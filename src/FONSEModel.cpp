@@ -150,7 +150,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 }
 
 
-void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, double& logAcceptanceRatioForAllMixtures)
+void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, std::vector<double> &logAcceptanceRatioForAllMixtures)
 {
 	int numGenes = genome.getGenomeSize();
 	//int numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
@@ -201,7 +201,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 	//likelihood_proposed = likelihood_proposed + calculateMutationPrior(grouping, true);
 	//likelihood = likelihood + calculateMutationPrior(grouping, false);
 
-	logAcceptanceRatioForAllMixtures = (likelihood_proposed - likelihood);
+	logAcceptanceRatioForAllMixtures[0] = (likelihood_proposed - likelihood);
 }
 
 

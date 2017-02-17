@@ -410,7 +410,7 @@ void ROCParameter::initFromRestartFile(std::string filename)
 void ROCParameter::initAllTraces(unsigned samples, unsigned num_genes)
 {
 	traces.initializeROCTrace(samples, num_genes, numMutationCategories, numSelectionCategories, numParam,
-						 numMixtures, categories, maxGrouping, obsPhiSets);
+						 numMixtures, categories, maxGrouping, obsPhiSets,currentSynthesisRateLevel[0],mixtureAssignment);
 }
 
 

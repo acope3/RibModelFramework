@@ -23,7 +23,7 @@ class ROCParameter : public Parameter
 		std::vector <double> observedSynthesisNoise;
 
 		std::vector <double> noiseOffset_proposed;
-		std::vector <double> noiseOffset;
+		std::vector <double> noiseOffset; //A_Phi
 		std::vector <double> std_NoiseOffset;
 		std::vector <double> numAcceptForNoiseOffset;
 

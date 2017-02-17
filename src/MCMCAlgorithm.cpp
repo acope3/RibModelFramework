@@ -37,7 +37,8 @@ using namespace Rcpp;
 MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thinning(1), adaptiveWidth(100 * thinning), estimateSynthesisRate(true),
 	estimateCodonSpecificParameter(true), estimateHyperParameter(true)
 {
-	likelihoodTrace.resize(samples + 1); // +1 for storing initial evaluation
+	posteriorTrace.resize(samples + 1); // +1 for storing initial evaluation
+	likelihoodTrace.resize(samples + 1);
 	writeRestartFile = false;
 	multipleFiles = false;
 	fileWriteInterval = 1u;
@@ -61,7 +62,8 @@ MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thinning, unsigned _ad
 							 estimateCodonSpecificParameter(_estimateCodonSpecificParameter),
 							 estimateHyperParameter(_estimateHyperParameter)
 {
-	likelihoodTrace.resize(samples + 1);// +1 for storing initial evaluation
+	posteriorTrace.resize(samples + 1);// +1 for storing initial evaluation
+	likelihoodTrace.resize(samples + 1);
 	writeRestartFile = false;
 	multipleFiles = false;
 	fileWriteInterval = 1u;
@@ -100,23 +102,14 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
     //pFile = fopen("/home/clandere/Desktop/myfile.txt","a");
 	// TODO move the likelihood calculation out of here. make it a void function again.
 
-	double logLikelihood = 0.0;
-    //double logLikelihood2 = 0.0; //currently unused
+	double loglikelihood;
+	double logPosterior = 0.0;
+    //double logPosterior2 = 0.0; //currently unused
 	int numGenes = genome.getGenomeSize();
 
 	unsigned numSynthesisRateCategories = model.getNumSynthesisRateCategories();
 	unsigned numMixtures = model.getNumMixtureElements();
 	std::vector <double> dirichletParameters(numMixtures, 0);
-	//double* dirichletParameters = new double[numMixtures]();
-	//TODO: why is this not just a vector?
-
-
-	
-	//for (unsigned i = 0u; i < numMixtures; i++)
-	//{
-	//	dirichletParameters[i] = 0.0;
-	//}
-
 	
 	//initialize parameter's size
 	for (unsigned i = 0u; i < numGenes; i++)
@@ -124,7 +117,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		Gene *gene = &genome.getGene(i);
 
 		/*
-			 Since some values returned by calculateLogLikelihoodRatioPerGene are very small (~ -1100),
+			 Since some values returned by calculatelogPosteriorRatioPerGene are very small (~ -1100),
 			 exponentiation leads to 0.
 			 To solve this problem, we adjust the value by a constant c.
 			 I choose to use the average value across all mixtures.
@@ -144,28 +137,16 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		std::vector <double> unscaledLogProb_curr(numSynthesisRateCategories, 0.0);
 		std::vector <double> unscaledLogProb_prop(numSynthesisRateCategories, 0.0);
 
+		//Added by Alex
+		std::vector<double> unscaledLogLike_curr(numSynthesisRateCategories,0.0);
+		std::vector<double> unscaledLogLike_prop(numSynthesisRateCategories,0.0);
+
 		std::vector <double> unscaledLogPost_curr(numSynthesisRateCategories, 0.0);
 		std::vector <double> unscaledLogPost_prop(numSynthesisRateCategories, 0.0);
 
 
 		std::vector <double> unscaledLogProb_curr_singleMixture(numMixtures, 0.0);
 		std::vector <double> probabilities(numMixtures, 0.0);
-
-		/***************************************************************
-		for (unsigned j = 0u; j < numMixtures; j++)
-		{
-			probabilities[j] = 0.0;
-			unscaledLogProb_curr_singleMixture[j] = 0.0;
-		}
-
-		for (unsigned j = 0u; j < numSynthesisRateCategories; j++)
-		{
-			unscaledLogProb_curr[j] = 0.0;
-			unscaledLogProb_prop[j] = 0.0;
-			unscaledLogPost_curr[j] = 0.0;
-			unscaledLogPost_prop[j] = 0.0;
-		}
-		****************************************************************/
 
 		for (unsigned k = 0u; k < numSynthesisRateCategories; k++)
 		{
@@ -175,14 +156,16 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			for (unsigned n = 0u; n < mixtureElements.size(); n++)
 			{
 				unsigned mixtureElement = mixtureElements[n];
-				double logProbabilityRatio[5];
-				model.calculateLogLikelihoodRatioPerGene(*gene, i, mixtureElement, logProbabilityRatio);
+				double logProbabilityRatio[7];
+				model.calculateLogLikelihoodRatioPerGene(*gene, i, mixtureElement, logProbabilityRatio); //has to return likelihood, not just ratio, no priors
 
 				// log posterior with and without rev. jump probability
 				unscaledLogProb_curr[k] += logProbabilityRatio[1]; // with rev. jump prob.
 				unscaledLogProb_prop[k] += logProbabilityRatio[2]; // with rev. jump prob.
 				unscaledLogPost_curr[k] += logProbabilityRatio[3]; // without rev. jump prob.
 				unscaledLogPost_prop[k] += logProbabilityRatio[4]; // without rev. jump prob.
+				unscaledLogLike_curr[k] += logProbabilityRatio[5]; //current logLikelihood
+				unscaledLogLike_prop[k] += logProbabilityRatio[6]; //proposed logLikelihood
 
 				unscaledLogProb_curr_singleMixture[mixtureIndex] = logProbabilityRatio[3];
 
@@ -226,27 +209,27 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			probabilities[k] = probabilities[k] / normalizingProbabilityConstant;
 		}
 
-		double currGeneLogLik = 0.0;
+		double currGeneLogPost = 0.0;
 		for (unsigned k = 0u; k < numSynthesisRateCategories; k++)
 		{
 			// that we loop over numSynthesisRateCategories instead of numMixtures is not a problem
 			// in the case of selectionShared, since we sum above over each mixture sharing a category.
 
 			// We do not need to add std::log(model.getCategoryProbability(k)) since it will cancel in the ratio!
-			double currLogLike = unscaledLogProb_curr[k];
-			double propLogLike = unscaledLogProb_prop[k];
+			double currLogPost = unscaledLogProb_curr[k];
+			double propLogPost = unscaledLogProb_prop[k];
             double alpha = -Parameter::randExp(1);
-			if ( (alpha < (propLogLike - currLogLike)) && estimateSynthesisRate )
+			if ( (alpha < (propLogPost - currLogPost)) && estimateSynthesisRate )
 			{
 			    model.updateSynthesisRate(i, k);
-			    currGeneLogLik += probabilities[k] * std::exp(unscaledLogPost_prop[k] - maxValue2);
+			    currGeneLogPost += probabilities[k] * std::exp(unscaledLogPost_prop[k] - maxValue2);
 			}
 			else
 			{
-				currGeneLogLik += probabilities[k] * std::exp(unscaledLogPost_curr[k] - maxValue2);
+				currGeneLogPost += probabilities[k] * std::exp(unscaledLogPost_curr[k] - maxValue2);
 			}
 
-            if (std::isnan(logLikelihood))
+            if (std::isnan(logPosterior))
             {
                 my_print("\n\n\n");
                 my_print("Gene: %, %\n", i, gene->getId());
@@ -254,14 +237,14 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
                 my_print("Mix. Prop.: %\n", probabilities[k]);
                 my_print("cur logLik: %\n", unscaledLogPost_curr[k]);
                 my_print("prop logLik: %\n", unscaledLogPost_prop[k]);
-                my_print("Accepted?: % < % , %\n", alpha, (propLogLike - currLogLike), alpha < (propLogLike - currLogLike));
+                my_print("Accepted?: % < % , %\n", alpha, (propLogPost - currLogPost), alpha < (propLogPost - currLogPost));
                 my_print("\n\n\n");
             }
 		}
-		logLikelihood += std::log(currGeneLogLik) + maxValue2;
+		logPosterior += std::log(currGeneLogPost) + maxValue2;
 
 
-		if (std::isinf(logLikelihood))
+		if (std::isinf(logPosterior))
             my_print("\tInfinity reached (Gene: %)\n", i);
 
 		// Get category in which the gene is placed in.
@@ -277,26 +260,19 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			model.updateSynthesisRateTrace(iteration/thinning, i);
 			model.updateMixtureAssignmentTrace(iteration/thinning, i);
 		}
-		/*****************************************************
-		delete[] probabilities;
-		delete[] unscaledLogProb_curr_singleMixture;
-		delete[] unscaledLogProb_prop;
-		delete[] unscaledLogProb_curr;
-		delete[] unscaledLogPost_prop;
-		delete[] unscaledLogPost_curr;
-		******************************************************/
+		
 	}
 
 	// take all priors into account
-	logLikelihood += model.calculateAllPriors();
-    if (std::isnan(logLikelihood))
+	loglikelihood = logPosterior;
+	logPosterior += model.calculateAllPriors();
+    if (std::isnan(logPosterior))
     {
         my_print("\n\n\n");
-        my_print("logLikelihood NaN after addition of prior values!\n");
+        my_print("logPosterior NaN after addition of prior values!\n");
         my_print("\n\n\n");
     }
 	std::vector <double> newMixtureProbabilities(numMixtures, 0);
-	//double *newMixtureProbabilities = new double[numMixtures]();
 	Parameter::randDirichlet(dirichletParameters, numMixtures, newMixtureProbabilities);
 	for (unsigned k = 0u; k < numMixtures; k++)
 	{
@@ -305,10 +281,9 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	if ((iteration % thinning) == 0)
 	{
 		model.updateMixtureProbabilitiesTrace(iteration/thinning);
+		likelihoodTrace[iteration/thinning] = loglikelihood;
 	}
-	//delete[] dirichletParameters;
-	//delete[] newMixtureProbabilities;
-	return logLikelihood;
+	return logPosterior;
 }
 
 
@@ -320,7 +295,9 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 */
 void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& model, int iteration)
 {
-	double acceptanceRatioForAllMixtures = 0.0;
+	//double acceptanceRatioForAllMixtures = 0.0;
+	double posterior;
+	std::vector<double> acceptanceRatioForAllMixtures(5,0.0);
 	unsigned size = model.getGroupListSize();
 
 	for (unsigned i = 0; i < size; i++)
@@ -329,16 +306,35 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 
 		// calculate likelihood ratio for every Category for current AA
 		model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures);
-		if ( -Parameter::randExp(1) < acceptanceRatioForAllMixtures )
+		//logPosterior += model.calculateAllPriors();
+		if ( -Parameter::randExp(1) < acceptanceRatioForAllMixtures[0])
 		{
 			// moves proposed codon specific parameters to current codon specific parameters
+			posterior = acceptanceRatioForAllMixtures[4];
 			model.updateCodonSpecificParameter(grouping);
+			if ((iteration % thinning) == 0)
+			{
+				likelihoodTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[2];
+				posteriorTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[4];
+			}
+		}
+		else
+		{
+			posterior = acceptanceRatioForAllMixtures[3];
+			if ((iteration % thinning) == 0)
+			{
+				likelihoodTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[1];
+				posteriorTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[3];
+				
+			}
 		}
 		if ((iteration % thinning) == 0)
 		{
 			model.updateCodonSpecificParameterTrace(iteration/thinning, grouping);
 		}
 	}
+	//return posterior
+
 }
 
 
@@ -441,7 +437,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
             #endif
             
 	    my_print("Status at thinned sample (iteration): % (%)\n",  (iteration / thinning), iteration);
-			my_print("\t current logLikelihood: % \n", likelihoodTrace[(iteration/thinning) - 1] );
+			my_print("\t current logPosterior: % \n", posteriorTrace[(iteration/thinning) - 1] );
 			if (iteration > stepsToAdapt)
 				my_print("No longer adapting\n");
 
@@ -471,11 +467,11 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 		if (estimateSynthesisRate || estimateMixtureAssignment)
 		{
 			model.proposeSynthesisRateLevels();
-			double logLike = acceptRejectSynthesisRateLevelForAllGenes(genome, model, iteration);
+			double logPost= acceptRejectSynthesisRateLevelForAllGenes(genome, model, iteration);
 			if ((iteration % thinning) == 0u)
 			{
-				likelihoodTrace[(iteration / thinning)] = logLike;
-				if (std::isnan(logLike))
+				posteriorTrace[(iteration / thinning)] = logPost;
+				if (std::isnan(logPost))
 				{
 					my_printError("ERROR: Log likelihood is NaN, exiting at iteration %\n", iteration);
 					model.setLastIteration(iteration / thinning);
@@ -527,8 +523,8 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 */
 void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned divergenceIterations)
 {
-	// TODO THIS FUNCTION THROWS THE ACCEPTANCE COUNTER OFF!
-
+	double previous_post = 0.0;
+	double current_post = 0.0;
 
 	// NOTE: IF PRIORS ARE ADDED, TAKE INTO ACCOUNT HERE!
 	my_print("Allowing divergence from initial conditions for % iterations.\n\n", divergenceIterations);
@@ -537,49 +533,66 @@ void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned
 	// how many steps do you want to walk "away" from the initial conditions
 	for (unsigned iteration = 0u; iteration < divergenceIterations; iteration++)
 	{
-		// propose all parameters
-		model.proposeCodonSpecificParameter();
-		model.proposeHyperParameters();
-		model.proposeSynthesisRateLevels();
-
-		// no prior on codon specific parameters -> just accept everything
-		unsigned size = model.getGroupListSize();
-		for (unsigned i = 0; i < size; i++)
+		if (estimateCodonSpecificParameter)
 		{
-			std::string grouping = model.getGrouping(i);
-			model.updateCodonSpecificParameter(grouping);
+			model.proposeCodonSpecificParameter();
 		}
-
-		// no prior on hyper parameters -> just accept everything
-		model.updateAllHyperParameter();
-
-		// prior on phi values -> take prior into account, but only the prior no likelihood
-		int numGenes = genome.getGenomeSize();
-		unsigned numSynthesisRateCategories = model.getNumSynthesisRateCategories();
-		for (unsigned i = 0u; i < numGenes; i++)
+		if (estimateHyperParameter)
 		{
-			for (unsigned k = 0u; k < numSynthesisRateCategories; k++)
+			model.proposeHyperParameters();
+		}
+		if (estimateSynthesisRate)
+		{
+			model.proposeSynthesisRateLevels();
+		}
+		// no prior on codon specific parameters -> just accept everything
+		if (estimateCodonSpecificParameter)
+		{
+			unsigned size = model.getGroupListSize();
+			for (unsigned i = 0; i < size; i++)
 			{
-				// map from mixture to category and obtain corresponding phi value
-				unsigned expressionCategory = model.getSynthesisRateCategory(k);
-				double phiValue = model.getSynthesisRate(i, expressionCategory, false);
-				double phiValue_proposed = model.getSynthesisRate(i, expressionCategory, true);
-
-				unsigned mixture = model.getMixtureAssignment(k);
-				mixture = model.getSynthesisRateCategory(mixture);
-				double stdDevSynthesisRate = model.getStdDevSynthesisRate(mixture, false);
-				double mPhi = (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2);
-
-				// accept/ reject based on prior ratio
-				double logPhiProbability = Parameter::densityLogNorm(phiValue, mPhi, stdDevSynthesisRate, true);
-				double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, mPhi, stdDevSynthesisRate, true);
-				if ( -Parameter::randExp(1) < (logPhiProbability_proposed - logPhiProbability) )
-					model.updateSynthesisRate(i, k);
+				std::string grouping = model.getGrouping(i);
+				model.updateCodonSpecificParameter(grouping);
 			}
 		}
+		// no prior on hyper parameters -> just accept everything
+		if (estimateHyperParameter)
+		{
+			model.updateAllHyperParameter();
+		}
+		// prior on phi values -> take prior into account, but only the prior no likelihood
+		if (estimateSynthesisRate)
+		{
+			int numGenes = genome.getGenomeSize();
+			unsigned numSynthesisRateCategories = model.getNumSynthesisRateCategories();
+			for (unsigned i = 0u; i < numGenes; i++)
+			{
+				for (unsigned k = 0u; k < numSynthesisRateCategories; k++)
+				{
+					// map from mixture to category and obtain corresponding phi value
+					unsigned expressionCategory = model.getSynthesisRateCategory(k);
+					double phiValue = model.getSynthesisRate(i, expressionCategory, false);
+					double phiValue_proposed = model.getSynthesisRate(i, expressionCategory, true);
 
+					unsigned mixture = model.getMixtureAssignment(k);
+					mixture = model.getSynthesisRateCategory(mixture);
+					double stdDevSynthesisRate = model.getStdDevSynthesisRate(mixture, false);
+					double mPhi = (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2);
+
+					// accept/ reject based on prior ratio
+					double logPhiProbability = Parameter::densityLogNorm(phiValue, mPhi, stdDevSynthesisRate, true);
+					double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, mPhi, stdDevSynthesisRate, true);
+					if ( -Parameter::randExp(1) < (logPhiProbability_proposed - logPhiProbability) )
+						model.updateSynthesisRate(i, k);
+				}
+			}
+		}
+	
 		// update Gibbs sampled parameter.
-		model.updateGibbsSampledHyperParameters(genome);
+		if (estimateHyperParameter)
+		{
+			model.updateGibbsSampledHyperParameters(genome);
+		}
 	}
 }
 
@@ -605,12 +618,12 @@ double MCMCAlgorithm::calculateGewekeScore(unsigned current_iteration)
 	// calculate mean and and variance of first part of likelihood trace
 	for (unsigned i = lastConvergenceTest; i < end1; i++)
 	{
-		posteriorMean1 += likelihoodTrace[i];
+		posteriorMean1 += posteriorTrace[i];
 	}
 	posteriorMean1 = posteriorMean1 / numSamples1;
 	for (unsigned i = lastConvergenceTest; i < end1; i++)
 	{
-		posteriorVariance1 += (likelihoodTrace[i] - posteriorMean1) * (likelihoodTrace[i] - posteriorMean1);
+		posteriorVariance1 += (posteriorTrace[i] - posteriorMean1) * (posteriorTrace[i] - posteriorMean1);
 	}
 	posteriorVariance1 = posteriorVariance1 / numSamples1;
 
@@ -618,12 +631,12 @@ double MCMCAlgorithm::calculateGewekeScore(unsigned current_iteration)
 	// calculate mean and and variance of last part of likelihood trace
 	for (unsigned i = start2; i < current_iteration; i++)
 	{
-		posteriorMean2 += likelihoodTrace[i];
+		posteriorMean2 += posteriorTrace[i];
 	}
 	posteriorMean2 = posteriorMean2 / numSamples2;
 	for (unsigned i = start2; i < current_iteration; i++)
 	{
-		posteriorVariance2 += (likelihoodTrace[i] - posteriorMean2) * (likelihoodTrace[i] - posteriorMean2);
+		posteriorVariance2 += (posteriorTrace[i] - posteriorMean2) * (posteriorTrace[i] - posteriorMean2);
 	}
 	posteriorVariance2 = posteriorVariance2 / numSamples2;
 
@@ -759,19 +772,24 @@ int MCMCAlgorithm::getStepsToAdapt()
 */
 std::vector<double> MCMCAlgorithm::getLogPosteriorTrace()
 {
-	return likelihoodTrace;
+	return posteriorTrace;
 }
 
+
+std::vector<double> MCMCAlgorithm::getLogLikelihoodTrace()
+{
+	return likelihoodTrace;
+}
 
 /* getLogLikelihoodPosteriorMean (RCPP EXPOSED)
  * Arguments: number of samples to use to calculate the posterior.
  * Calculates the mean for the specified number of samples from the end of the trace
  * for the loglikelihood trace.
 */
-double MCMCAlgorithm::getLogLikelihoodPosteriorMean(unsigned _samples)
+double MCMCAlgorithm::getLogPosteriorMean(unsigned _samples)
 {
 	double posteriorMean = 0.0;
-	unsigned traceLength = likelihoodTrace.size();
+	unsigned traceLength = posteriorTrace.size();
 
 	if (_samples > traceLength)
 	{
@@ -781,7 +799,7 @@ double MCMCAlgorithm::getLogLikelihoodPosteriorMean(unsigned _samples)
 	unsigned start = traceLength - _samples;
 	for (unsigned i = start; i < traceLength; i++)
 	{
-		posteriorMean += likelihoodTrace[i];
+		posteriorMean += posteriorTrace[i];
 	}
 
 	return posteriorMean / (double)_samples;
@@ -979,11 +997,14 @@ void MCMCAlgorithm::setAdaptiveWidth(unsigned _adaptiveWidth)
 
 void MCMCAlgorithm::setLogPosteriorTrace(std::vector<double> _posteriorTrace)
 {
-    likelihoodTrace = _posteriorTrace;
+    posteriorTrace = _posteriorTrace;
 }
 
 
-
+void MCMCAlgorithm::setLogLikelihoodTrace(std::vector<double> _likelihoodTrace)
+{
+	likelihoodTrace = _likelihoodTrace;
+}
 
 
 //---------------------------------//
@@ -1012,7 +1033,8 @@ RCPP_MODULE(MCMCAlgorithm_mod)
 		.method("setEstimateMixtureAssignment", &MCMCAlgorithm::setEstimateMixtureAssignment)
 		.method("setRestartFileSettings", &MCMCAlgorithm::setRestartFileSettings)
 		.method("getLogPosteriorTrace", &MCMCAlgorithm::getLogPosteriorTrace)
-		.method("getLogPosteriorMean", &MCMCAlgorithm::getLogLikelihoodPosteriorMean)
+		.method("getLogLikelihoodTrace", &MCMCAlgorithm::getLogLikelihoodTrace)
+		.method("getLogPosteriorMean", &MCMCAlgorithm::getLogPosteriorMean)
 
 
 
@@ -1024,6 +1046,7 @@ RCPP_MODULE(MCMCAlgorithm_mod)
         .method("setThinning", &MCMCAlgorithm::setThinning)
         .method("setAdaptiveWidth", &MCMCAlgorithm::setAdaptiveWidth)
         .method("setLogPosteriorTrace", &MCMCAlgorithm::setLogPosteriorTrace)
+        .method("setLogLikelihoodTrace", &MCMCAlgorithm::setLogLikelihoodTrace)
         .method("setStepsToAdapt", &MCMCAlgorithm::setStepsToAdapt)
         .method("getStepsToAdapt", &MCMCAlgorithm::getStepsToAdapt)
 		;
