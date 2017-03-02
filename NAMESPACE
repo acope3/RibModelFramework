@@ -64,7 +64,12 @@ export(
 "AAToCodon",
 "aminoAcids",
 "codonToAA",
-"codons"
+"codons",
+
+##
+"mcmcACF",
+"cspACF"
+
 )
 
 

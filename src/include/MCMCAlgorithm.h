@@ -35,6 +35,7 @@ class MCMCAlgorithm
 		bool writeRestartFile;
 
 
+		std::vector<double> posteriorTrace;
 		std::vector<double> likelihoodTrace;
 		std::vector<double> tmp;
 
@@ -79,7 +80,8 @@ class MCMCAlgorithm
 		int getStepsToAdapt();
 
 		std::vector<double> getLogPosteriorTrace();
-		double getLogLikelihoodPosteriorMean(unsigned samples); //TODO: UNTESTED
+		std::vector<double> getLogLikelihoodTrace();
+		double getLogPosteriorMean(unsigned samples); //TODO: UNTESTED
 
 		static std::vector<double> acf(std::vector<double>& x, int nrows, int ncols, int lagmax, bool correlation, bool demean); //Currently unused. TODO: UNTESTED
 		static std::vector<std::vector<double>> solveToeplitzMatrix(int lr, std::vector<double> r, std::vector<double> g); //Currently unused. TODO: UNTESTED
@@ -100,6 +102,7 @@ class MCMCAlgorithm
     	void setThinning(unsigned _thinning);
     	void setAdaptiveWidth(unsigned _adaptiveWidth);
 		void setLogPosteriorTrace(std::vector<double> _posteriorTrace);
+		void setLogLikelihoodTrace(std::vector<double> _likelihoodTrace);
 #endif //STANDALONE
 
 

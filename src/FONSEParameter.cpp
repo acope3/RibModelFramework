@@ -355,7 +355,7 @@ void FONSEParameter::initFromRestartFile(std::string filename)
 void FONSEParameter::initAllTraces(unsigned samples, unsigned num_genes)
 {
     traces.initializeFONSETrace(samples, num_genes, numMutationCategories, numSelectionCategories, numParam,
-                         numMixtures, categories, maxGrouping);
+                         numMixtures, categories, maxGrouping,currentSynthesisRateLevel[0],mixtureAssignment);
 }
 
 void FONSEParameter::initMutationCategories(std::vector<std::string> files, unsigned numCategories)

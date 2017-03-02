@@ -10,24 +10,32 @@
 #' 
 #' @description This function will plot the logLikelihood trace, and if the Hmisc package is installed, it will 
 #'  plot a subplot of the logLikelihood trace with the first few samples removed.
-plot.Rcpp_MCMCAlgorithm <- function(x, zoom.window = NULL, ...)
+plot.Rcpp_MCMCAlgorithm <- function(x, what=c("LogPosterior","LogLikelihood"),zoom.window = NULL, ...)
 {
-  loglik.trace <- x$getLogPosteriorTrace()
+  if(what[1] == "LogPosterior")
+  {
+    trace <- x$getLogPosteriorTrace()
+    ylab= "log(Posterior Probability)"
+  }
+  else if(what[1] == "LogLikelihood")
+  {
+    trace <- x$getLogLikelihoodTrace()
+    ylab= "log(Likelihood Probability)"
+  }
+  trace <- trace[-1]
   
-  loglik.trace <- loglik.trace[-1]
-  
-  trace.length <- length(loglik.trace)
+  trace.length <- length(trace)
   
   zoomStart <- round(0.9*trace.length)
   zoomEnd <- trace.length
-  logL <- mean(loglik.trace[zoomStart:trace.length])
+  logL <- mean(trace[zoomStart:trace.length])
   #TODO change main title
-  plot(loglik.trace, type="l", main=paste0("logPP:", logL), xlab="Sample", ylab="log(Posterior Probability)")
+  plot(trace, type="l", main=paste0("logPP:", logL), xlab="Sample", ylab=ylab)
   grid (NULL,NULL, lty = 6, col = "cornsilk2")
-  loglik.trace[loglik.trace == -Inf] <- NA
+  trace[trace == -Inf] <- NA
   
   # TODO (Cedric): get rid of that line once problem with first element beeing 0 is solved
-  loglik.trace <- loglik.trace[-1]
+  trace <- trace[-1]
   
   if(!(is.null(zoom.window))) {
     zoomStart <- zoom.window[1]
@@ -38,7 +46,27 @@ plot.Rcpp_MCMCAlgorithm <- function(x, zoom.window = NULL, ...)
   }
   
   Hmisc::subplot(
-    plot(zoomStart:zoomEnd, loglik.trace[zoomStart:zoomEnd], type="l", xlab=NA, ylab=NA, las=2, cex.axis=0.55), 
-    0.8*(round(0.9*trace.length)), (min(loglik.trace, na.rm = T)+max(loglik.trace, na.rm = T))/2, size=c(3,2))
+    plot(zoomStart:zoomEnd, trace[zoomStart:zoomEnd], type="l", xlab=NA, ylab=NA, las=2, cex.axis=0.55), 
+    0.8*(round(0.9*trace.length)), (min(trace, na.rm = T)+max(trace, na.rm = T))/2, size=c(3,2))
 }
 
+#' Plots ACF for MCMC traces
+#' @param mcmc object of class MCMC
+#' @param type "LogPosterior" or "LogLikelihood", defaults to "LogPosterior"
+#' @param samples number of samples to calculate ACF for,
+#' Ex) if samples == 300 and hae 1000 samples total, ACF will be calculated from samples 700 to 1000
+#' @param lag.max Maximum amount of lag to calculate ACF
+
+mcmcACF <- function(mcmc,type="LogPosterior",samples=500,lag.max = 40)
+{
+  if(type == "Posterior")
+  {
+    trace <- mcmc$getLogPosteriorTrace()
+  }else{
+    trace <- mcmc$getLogLikelihoodTrace()
+  }
+  trace <- trace[length(trace)-samples:length(trace)]
+  trace.acf <- acf(x = trace,lag.max = lag.max,plot = FALSE)
+  header <- paste(type,"Trace Autocorrelation",sep=" ")
+  plot(x = trace.acf,xlab = "Lag time",ylab = "Autocorrelation",main = header)
+}

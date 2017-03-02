@@ -46,12 +46,12 @@ class Trace {
 		//------ Initialization Functions ------//
 		//--------------------------------------//
 		void initializeSharedTraces(unsigned samples, unsigned num_genes, unsigned numSelectionCategories, unsigned numMixtures,
-			std::vector<mixtureDefinition> &_categories, unsigned maxGrouping);
+			std::vector<mixtureDefinition> &_categories, unsigned maxGrouping,std::vector<double> init_phi, std::vector<unsigned> init_mix_assign);
 
 		void initStdDevSynthesisRateTrace(unsigned numSelectionCategories, unsigned samples);
 		void initSynthesisRateAcceptanceRateTrace(unsigned num_genes, unsigned numExpressionCategories);
-		void initSynthesisRateTrace(unsigned samples, unsigned num_genes, unsigned numExpressionCategories);
-		void initMixtureAssignmentTrace(unsigned samples, unsigned num_genes);
+		void initSynthesisRateTrace(unsigned samples, unsigned num_genes, unsigned numExpressionCategories,std::vector<double> init_phi);
+		void initMixtureAssignmentTrace(unsigned samples, unsigned num_genes,std::vector<unsigned> init_mix_assign);
 		void initMixtureProbabilitiesTrace(unsigned samples, unsigned numMixtures);
 		void initCodonSpecificParameterTrace(unsigned samples, unsigned numMutationCategories, unsigned numParam, unsigned paramType);
 
@@ -77,22 +77,26 @@ class Trace {
 		//Initialization Functions:
 		void initializeRFPTrace(unsigned samples, unsigned num_genes, unsigned numAlphaCategories,
 			unsigned numLambdaPrimeCategories, unsigned numParam, unsigned numMixtures,
-			std::vector<mixtureDefinition> &_categories, unsigned maxGrouping);
+			std::vector<mixtureDefinition> &_categories, unsigned maxGrouping, std::vector<double> init_phi, 
+                        std::vector<unsigned> init_mix_asssign);
         
         
 		void initializeROCTrace(unsigned samples, unsigned num_genes, unsigned numMutationCategories,
 			unsigned numSelectionCategories, unsigned numParam, unsigned numMixtures, std::vector<mixtureDefinition> &_categories,
-			unsigned maxGrouping, unsigned numObservedPhiSets);
+			unsigned maxGrouping, unsigned numObservedPhiSets,std::vector<double> init_phi, 
+                        std::vector<unsigned> init_mix_asssign);
         
         
 		void initializeFONSETrace(unsigned samples, unsigned num_genes, unsigned numMutationCategories,
 			unsigned numSelectionCategories, unsigned numParam, unsigned numMixtures,
-			std::vector<mixtureDefinition> &_categories, unsigned maxGrouping);
+			std::vector<mixtureDefinition> &_categories, unsigned maxGrouping,std::vector<double> init_phi, 
+                        std::vector<unsigned> init_mix_asssign);
         
         
 		void initializePANSETrace(unsigned samples, unsigned num_genes, unsigned numAlphaCategories,
 			unsigned numLambdaPrimeCategories, unsigned numParam, unsigned numMixtures,
-			std::vector<mixtureDefinition> &_categories, unsigned maxGrouping);
+			std::vector<mixtureDefinition> &_categories, unsigned maxGrouping,std::vector<double> init_phi, 
+                        std::vector<unsigned> init_mix_asssign);
 
 
 		//------------------------------//

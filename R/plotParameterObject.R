@@ -57,6 +57,9 @@ plot.Rcpp_FONSEParameter <- function(x, what = "Mutation", samples = 100, ...)
 #' 
 #' @param samples Number of samples to plot using the posterior mean. Default
 #' value is 100.
+#'
+#' @param with.ci Plot with or without confidence intervals. Default value
+#' is TRUE
 #' 
 #' @param ... Arguments to be passed to methods, such as graphical parameters.
 #' 
@@ -67,34 +70,68 @@ plot.Rcpp_FONSEParameter <- function(x, what = "Mutation", samples = 100, ...)
 #' 
 #' @details Graphs are based off the last # samples for the posterior mean.
 #' 
-plotParameterObject <- function(x, what = "Mutation", samples = 100, mixture.name = NULL, ...){
+plotParameterObject <- function(x, what = "Mutation", samples = 100, mixture.name = NULL, with.ci = TRUE, ...){
   
   numMixtures <- x$numMixtures
-  csp.params <- data.frame(matrix(0, ncol=numMixtures, nrow = 40))
-  
+  means <- data.frame(matrix(0,ncol=numMixtures,nrow=40))
+  sd.values <- data.frame(matrix(0,ncol=numMixtures*2,nrow=40))
   names.aa <- aminoAcids()
   paramType <- ifelse(what == "Mutation", 0, 1)
   cat("ParamType: ", paramType, "\n")
   for (mixture in 1:numMixtures) {
-    param.storage <- vector("numeric", 0)
-    param.name.storage <- vector("numeric", 0)
     # get codon specific parameter
+    count <- 1
     for (aa in names.aa) {
       if (aa == "M" || aa == "W" || aa == "X") next
       codons <- AAToCodon(aa, T)
-      for (i in 1:length(codons)) {
-        param.storage <- c(param.storage, x$getCodonSpecificPosteriorMean(mixture, samples, codons[i], paramType, TRUE))
+      for (i in 1:length(codons)){
+        means[count,mixture] <- x$getCodonSpecificPosteriorMean(mixture, samples, codons[i], paramType, TRUE)
+        if (with.ci){
+          tmp <- x$getCodonSpecificQuantile(mixture, samples, codons[i], paramType, c(0.025, 0.975), TRUE)
+        } else{
+          tmp <- c(means[count,mixture],means[count,mixture])
+        }
+        ## This approach to storing the quantiles may seem unconventional, but I actually found it to be the most straight forward approach
+        ## for plotting later.
+        sd.values[count,mixture] <- tmp[1]
+        sd.values[count,mixture+numMixtures] <- tmp[2]
+        count <- count + 1
       }
     }
-    csp.params[, mixture] <- param.storage
   }
-  #rownames(csp.params) <- param.name.storage
-  if(is.null(mixture.name)){
-    colnames(csp.params) <- paste0("Mixture\nElement", 1:numMixtures)
-  }else{
-    colnames(csp.params) <- mixture.name
+  ## Begin graphing
+  mat <- matrix(rep(0,numMixtures*numMixtures),
+                nrow = numMixtures, ncol = numMixtures, byrow = TRUE)
+  count <- 1
+  for(i in 1:numMixtures){
+    for(j in 1:numMixtures){
+      if(i<=j){
+        mat[i,j] <-count
+        count <- count + 1
+      }
+    }
   }
-  pairs(csp.params, upper.panel = upper.panel.plot, lower.panel=NULL, ... = ...)
+  nf <- layout(mat,widths=c(rep(5,numMixtures)),heights=c(rep(5,numMixtures)),respect=FALSE)
+  par(mar=c(1,1,1,1))
+  for(i in 1:numMixtures){
+    for(j in 1:numMixtures){
+      if(i==j)
+      {
+        plot(NULL, xlim=c(0,1), ylim=c(0,1), ylab="", xlab="",xaxt='n',yaxt='n',ann=FALSE)
+        if(is.null(mixture.name)){
+          text(x = 0.5, y = 0.5, paste0("Mixture\nElement",i), 
+               cex = 1.6, col = "black")
+        }else{
+          text(x = 0.5, y = 0.5, mixture.name[i], 
+               cex = 1.6, col = "black")
+        }
+      } else if(i<j){
+          plot(means[,j],means[,i],ann=FALSE)
+          upper.panel.plot(means[,j],means[,i],sd.x=cbind(sd.values[,j],sd.values[,j+numMixtures]),sd.y=cbind(sd.values[,i],sd.values[,i+numMixtures]))
+    
+      }
+    }
+  }
 }
 
 
@@ -192,5 +229,42 @@ confidenceInterval.plot <- function(x, y, sd.x=NULL, sd.y=NULL, ...){
   intercept <- round(summary(lm.line)$coefficients[1], 3)
   t <- (slope - 1)/std.error
   
-
 }
+
+
+#' Plots ACF for CSP traces
+#' @param parameter object of class Parameter
+#' @param csp "Selection" or "Mutation", defaults to "Mutation"
+#' @param numMixtures indicates the number of CSP mixtures used
+#' @param samples number of samples to calculate ACF for,
+#' Ex) if samples == 300 and hae 1000 samples total, ACF will be calculated from samples 700 to 1000
+#' @param lag.max Maximum amount of lag to calculate ACF
+
+cspACF <- function(parameter,csp="Mutation",numMixtures=1,samples=500,lag.max=40)
+{
+  paramType <- 0
+  if (csp == "Selection" )
+  {
+    paramType <- 1
+  }
+  names.aa <- aminoAcids()
+  trace <- parameter$getTraceObject()
+  for (aa in names.aa)
+  {
+    if (aa == "M" || aa == "W" || aa == "X")
+      next
+    codons <- AAToCodon(aa,TRUE)
+    for (i in 1:length(codons))
+    {
+      for (j in 1:numMixtures)
+      {
+        csp.trace <-trace$getCodonSpecificParameterTraceByMixtureElementForCodon(j,codons[i],paramType,TRUE)
+        csp.trace <- csp.trace[length(csp.trace)-samples:length(csp.trace)]
+        csp.acf <- acf(x = csp.trace,lag.max = lag.max,plot = FALSE)
+        header <- paste(csp,aa,codons[i],"Mixture:",j,sep = " ")
+        plot(x = csp.acf,xlab = "Lag time",ylab = "Autocorrelation",main = header)
+      }
+    }
+  }
+}
+
