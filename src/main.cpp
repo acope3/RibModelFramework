@@ -705,11 +705,10 @@ int main()
 	//testUtility();
 	//testSequenceSummary();
 	//testGene();
-	//testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
+	testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
 	//testCovarianceMatrix();
-	testParameter();
+	//testParameter();
 	//testParameterWithFile(pathBegin + "HollisFile.txt");
-	//testTrace();
 	//testRFPParameter();
 	//testMCMCAlgorithm();
 	exit(0);
@@ -820,7 +819,7 @@ int main()
 	{
 		my_print("Initializing Genome object--------------------------\n");
 		Genome genome;
-		genome.readRFPFile(pathBegin + "RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+		//genome.readRFPFile(pathBegin + "RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 		my_print("Done!-------------------------------\n\n\n");
 
 

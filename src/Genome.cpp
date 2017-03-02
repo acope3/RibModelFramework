@@ -178,10 +178,11 @@ void Genome::writeFasta (std::string filename, bool simulated)
 }
 
 /*
- * This function reads in ONLY based on RFP_Counts > 0.
- * When this occurs, a sequence is made that is based on the number of RFP_Counts there are.
+ * TODO: REMOVE. Old readPAFile function
+ * This function reads in ONLY based on RFPCounts > 0.
+ * When this occurs, a sequence is made that is based on the number of RFPCounts there are.
  * This is because in RFP calculations, the sequence and number of codons is technically irrelevant.
- * What is relevant is the RFP_Counts for certain codons, and an arbitrary sequence is constructed to
+ * What is relevant is the RFPCounts for certain codons, and an arbitrary sequence is constructed to
  * represent this.
  *
  * See also the documentation on process_sequence in SequenceSummary.cpp
@@ -241,9 +242,10 @@ void Genome::readRFPFile(std::string filename)
 	Fin.close();
 }
 
-/* Note: As the ncodons is not preserved when the RFP file is read in or RFP is otherwise processed,
+/* TODO: REMOVE once writePAFile is completed
+ * Note: As the ncodons is not preserved when the RFP file is read in or RFP is otherwise processed,
  * NA is returned for the number of codons. This still preserves functionality for future
- * readRFPFile calls, as only the RFP_Counts is important.
+ * readRFPFile calls, as only the RFPCounts is important.
 */
 void Genome::writeRFPFile(std::string filename, bool simulated)
 {
@@ -253,7 +255,7 @@ void Genome::writeRFPFile(std::string filename, bool simulated)
 		my_printError("Error in Genome::writeRFPFile: Can not open output RFP file %\n", filename);
 	else
 	{
-		Fout << "ORF,RFP_Counts,Codon_Counts,Codon\n";
+		Fout << "ORF,RFPCounts,Codon_Counts,Codon\n";
 		unsigned sized = simulated ? (unsigned)simulatedGenes.size() : (unsigned)genes.size();
 
 		for (unsigned geneIndex = 0; geneIndex < sized; geneIndex++)
@@ -265,7 +267,7 @@ void Genome::writeRFPFile(std::string filename, bool simulated)
 				std::string codon = SequenceSummary::codonArray[codonIndex];
 
 				Fout << currentGene->getId() << ",";
-				Fout << currentGene->geneData.getRFPObserved(codonIndex) << ",";
+				Fout << currentGene->geneData.getRFPValue(codonIndex) << ",";
 				Fout << "NA," << codon << "\n";
 			}
 		}
@@ -277,10 +279,9 @@ void Genome::writeRFPFile(std::string filename, bool simulated)
 /* readPAFile (TODO: RCPP EXPOSE VIA WRAPPER)
  * Arguments: string filename, boolean to determine if we are appending to the existing genome
  * (if not set to true, will default to clearing genome data; defaults to false)
- * Read in a PA-formatted file: GeneID,Position (1-indexed),Codon,rfp_count(s) (may be multiple)
+ * Read in a PA-formatted file: GeneID,Position (1-indexed),Codon,RFPCount(s) (may be multiple)
  * The positions are not necessarily in the right order.
- * There may be more than one rfp_count, and thus the header is important.
- * TODO: Wrapped by "function name" on the R-side.
+ * There may be more than one RFPCount, and thus the header is important.
 */
 void Genome::readPAFile(std::string filename, bool Append)
 {
@@ -317,7 +318,7 @@ void Genome::readPAFile(std::string filename, bool Append)
 			unsigned tableWidth = 2 + numCategories; // Table size: position + codonID + each category
 
 			// -------------------------------------------------------------------------//
-			// -------------- Now for each rfp_count category, record it. ------------- //
+			// --------------- Now for each RFPCount category, record it. ------------- //
 			// ----- Treat data as a table: push back vectors of size tableWidth. ----- //
 			// -------------------------------------------------------------------------//
 			std::string prevID = "";
@@ -371,7 +372,7 @@ void Genome::readPAFile(std::string filename, bool Append)
 					tableRow[tableIndex] = SequenceSummary::codonToIndex(codon);
 					// Note: May be an invalid Codon read in, but this is resolved when the sequence is set and processed.
 
-					// Skip to end rfp_count(s), if any
+					// Skip to end RFPCount(s), if any
 					pos = tmp.find(",", pos2 + 1);
 					tableIndex ++;
 
@@ -407,7 +408,38 @@ void Genome::readPAFile(std::string filename, bool Append)
 }
 
 
-//TODO: Add writePANSEFile function here
+//TODO: Add writePAFile function here
+//TODO: Complete
+void writePAFile(std::string filename, bool simulated)
+{
+	std::ofstream Fout;
+	Fout.open(filename.c_str());
+	if (Fout.fail())
+		my_printError("Error in Genome::writePAFile: Can not open output RFP file %\n", filename);
+	else
+	{
+		/*
+		Fout << "GeneID,Position,Codon";
+		unsigned sized = simulated ? (unsigned)simulatedGenes.size() : (unsigned)genes.size();
+
+		for (unsigned geneIndex = 0; geneIndex < sized; geneIndex++)
+		{
+			Gene *currentGene = simulated ? &simulatedGenes[geneIndex] : &genes[geneIndex];
+
+			for (unsigned codonIndex = 0; codonIndex < 64; codonIndex++)
+			{
+				std::string codon = SequenceSummary::codonArray[codonIndex];
+
+				Fout << currentGene->getId() << ",";
+				Fout << currentGene->geneData.getRFPValue(codonIndex) << ",";
+				Fout << "NA," << codon << "\n";
+			}
+		}
+		 */
+	}
+	Fout.close();
+}
+
 
 
 /* readObservedPhiValues
@@ -866,8 +898,8 @@ RCPP_MODULE(Genome_mod)
 		//File I/O Functions:
 		.method("readFasta", &Genome::readFasta, "reads a genome into the object")
 		.method("writeFasta", &Genome::writeFasta, "writes the genome to a fasta file")
-		.method("readRFPFile", &Genome::readRFPFile, "reads RFP data in for the RFP model")
-		.method("writeRFPFile", &Genome::writeRFPFile)
+		.method("readPAFile", &Genome::readPAFile, "reads RFP data in for the RFP models")
+		//.method("writePAfile", &Genome::writePAFile)
 		.method("readObservedPhiValues", &Genome::readObservedPhiValues)
 
 
