@@ -1,62 +1,14 @@
-#' Plot ROC Parameter 
-#' 
-#' @param x ROC parameter object.
-#' 
-#' @param what Which aspect of the ROC parameter to plot. Default value is
-#' "Mutation".
-#' 
-#' @param samples Number of samples to plot using the posterior mean. Default
-#' value is 100.
-#' 
-#' @param ... Arguments to be passed to methods, such as graphical parameters.
-#' 
-#' @return This function has no return value.
-#' 
-#' @description \code{plot} graphs the mutation or selection parameter for a ROC
-#' parameter object for each mixture element. 
-#' 
-#' @details Graphs are based off the last # samples for the posterior mean.
-#' 
-plot.Rcpp_ROCParameter <- function(x, what = "Mutation", samples = 100, ...)
-{
-  plotParameterObject(x, what = what, samples, ...)
-}
-
-
-#' Plot FONSE Parameter 
-#' 
-#' @param x FONSE parameter object.
-#' 
-#' @param what Which aspect of the FONSE parameter to plot. Default value is
-#' "Mutation".
-#' 
-#' @param samples Number of samples to plot using the posterior mean. Default
-#' value is 100.
-#' 
-#' @param ... Arguments to be passed to methods, such as graphical parameters.
-#' 
-#' @return This function has no return value.
-#' 
-#' @description \code{plot} graphs the mutation or selection parameter for a FONSE
-#' parameter object for each mixture element.
-#' 
-#' @details Graphs are based off the last # samples for the posterior mean.
-#' 
-plot.Rcpp_FONSEParameter <- function(x, what = "Mutation", samples = 100, ...)
-{
-  plotParameterObject(x, what = what, samples, ...)
-}
-
 #' Plot Parameter 
 #' 
-#' @param x A parameter object, specified by superfunctions: \code{plot.Rcpp_ROCParameter}
-#' and \code{plot.Rcpp.FONSEParameter}.
+#' @param x A parameter object
 #' 
 #' @param what Which aspect of the parameter to plot. Default value is
 #' "Mutation".
 #' 
 #' @param samples Number of samples to plot using the posterior mean. Default
 #' value is 100.
+#'
+#' @param mixture.name a vector with names/descriptions of the mixture distributions in the parameter object
 #'
 #' @param with.ci Plot with or without confidence intervals. Default value
 #' is TRUE
@@ -70,6 +22,42 @@ plot.Rcpp_FONSEParameter <- function(x, what = "Mutation", samples = 100, ...)
 #' 
 #' @details Graphs are based off the last # samples for the posterior mean.
 #' 
+plot.Rcpp_ROCParameter <- function(x, what = "Mutation", samples = 100, mixture.name = NULL, with.ci = TRUE, ...)
+{
+  plotParameterObject(x, what = what, samples, ...)
+}
+
+
+#' Plot Parameter 
+#' 
+#' @param x A parameter object
+#' 
+#' @param what Which aspect of the parameter to plot. Default value is
+#' "Mutation".
+#' 
+#' @param samples Number of samples to plot using the posterior mean. Default
+#' value is 100.
+#'
+#' @param mixture.name a vector with names/descriptions of the mixture distributions in the parameter object
+#'
+#' @param with.ci Plot with or without confidence intervals. Default value
+#' is TRUE
+#' 
+#' @param ... Arguments to be passed to methods, such as graphical parameters.
+#' 
+#' @return This function has no return value.
+#' 
+#' @description \code{plot} graphs the mutation or selection parameter for a ROC or FONSE
+#' parameter object for each mixture element.
+#' 
+#' @details Graphs are based off the last # samples for the posterior mean.
+#' 
+plot.Rcpp_FONSEParameter <- function(x, what = "Mutation", samples = 100, mixture.name = NULL, with.ci = TRUE, ...)
+{
+  plotParameterObject(x, what = what, samples, ...)
+}
+
+### NOT EXPOSED
 plotParameterObject <- function(x, what = "Mutation", samples = 100, mixture.name = NULL, with.ci = TRUE, ...){
   
   numMixtures <- x$numMixtures
@@ -77,7 +65,8 @@ plotParameterObject <- function(x, what = "Mutation", samples = 100, mixture.nam
   sd.values <- data.frame(matrix(0,ncol=numMixtures*2,nrow=40))
   names.aa <- aminoAcids()
   paramType <- ifelse(what == "Mutation", 0, 1)
-  cat("ParamType: ", paramType, "\n")
+  #cat("ParamType: ", paramType, "\n")
+  
   for (mixture in 1:numMixtures) {
     # get codon specific parameter
     count <- 1
@@ -232,37 +221,45 @@ confidenceInterval.plot <- function(x, y, sd.x=NULL, sd.y=NULL, ...){
 }
 
 
-#' Plots ACF for CSP traces
+#' Plots ACF for codon specific parameter traces
+#' 
 #' @param parameter object of class Parameter
 #' @param csp "Selection" or "Mutation", defaults to "Mutation"
 #' @param numMixtures indicates the number of CSP mixtures used
-#' @param samples number of samples to calculate ACF for,
-#' Ex) if samples == 300 and hae 1000 samples total, ACF will be calculated from samples 700 to 1000
-#' @param lag.max Maximum amount of lag to calculate ACF
+#' @param samples number of samples at the end of the trace used to calculate the acf
+#' @param lag.max Maximum amount of lag to calculate acf. Default is 10*log10(N), where N i the number of observations.
+#' @param plot logical. If TRUE (default) a plot of the acf is created
+#' 
+#' @description The function calculates and by defaults plots the acf and estimates the autocorrelation in the trace.
+#' 
+#' @seealso \code{\link{acfMCMC}}
 
-cspACF <- function(parameter,csp="Mutation",numMixtures=1,samples=500,lag.max=40)
+acfCSP <- function(parameter, csp = "Mutation", numMixtures = 1, samples = NULL, lag.max = 40, plot=TRUE)
 {
   paramType <- 0
   if (csp == "Selection" )
   {
     paramType <- 1
   }
+  if(is.null(samples)){ samples <- round(10*log10(length(trace))) }
+  
+  
   names.aa <- aminoAcids()
   trace <- parameter$getTraceObject()
   for (aa in names.aa)
   {
     if (aa == "M" || aa == "W" || aa == "X")
       next
-    codons <- AAToCodon(aa,TRUE)
+    codons <- AAToCodon(aa, TRUE)
     for (i in 1:length(codons))
     {
       for (j in 1:numMixtures)
       {
-        csp.trace <-trace$getCodonSpecificParameterTraceByMixtureElementForCodon(j,codons[i],paramType,TRUE)
-        csp.trace <- csp.trace[length(csp.trace)-samples:length(csp.trace)]
-        csp.acf <- acf(x = csp.trace,lag.max = lag.max,plot = FALSE)
-        header <- paste(csp,aa,codons[i],"Mixture:",j,sep = " ")
-        plot(x = csp.acf,xlab = "Lag time",ylab = "Autocorrelation",main = header)
+        csp.trace <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(j, codons[i], paramType, TRUE)
+        csp.trace <- csp.trace[(length(csp.trace)-samples):length(csp.trace)]
+        csp.acf <- acf(x = csp.trace, lag.max = lag.max, plot = FALSE)
+        header <- paste(csp, aa, codons[i], "Mixture:", j, sep = " ")
+        plot(x = csp.acf, xlab = "Lag time", ylab = "Autocorrelation", main = header)
       }
     }
   }

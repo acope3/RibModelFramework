@@ -13,16 +13,12 @@ codon can be obtained.}
 \item{aa}{A one character representation of an amino acid.}
 }
 \value{
-codonCounts Returns a matrix storing the codonCounts.
+Returns a matrix storing the codonCounts for the given amino acid.
 }
 \description{
-\code{getCodonCountsForAA} returns a matrix filled with 
-the number of times a codon is seen in each gene.
+provides the codon counts for a fiven amino acid across all genes
 }
 \details{
-The returned matrix will have the row correspond to the
-genes in the genome and the columns correspond to the codons for the 
-given aa. The values will the number of times the codon is present in 
-that gene.
+The returned matrix containes a row for each gene and a coloumn for each codon.
 }
 

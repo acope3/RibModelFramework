@@ -9,14 +9,14 @@ initializeMCMCObject(samples, thinning = 1, adaptive.width = 100,
   est.mix = TRUE)
 }
 \arguments{
-\item{samples}{Number of samples that should be produced when running the 
+\item{samples}{Number of samples to be produced when running the 
 MCMC algorithm. No default value.}
 
-\item{thinning}{Number that the samples should be thinned by. If set to 
-1, every step would be saved as a sample. Default value is 1.}
+\item{thinning}{The thinning interval between consecutive observations. If set to 
+1, every step will be saved as a sample. Default value is 1.}
 
 \item{adaptive.width}{Number that determines how often the acceptance/rejection
-window should be altered. Default value is 100.}
+window should be altered. Default value is 100 samples.}
 
 \item{est.expression}{Boolean that tells whether or not synthesis rate values
 should be estimated in the MCMC algorithm run. Default value is TRUE.}

@@ -19,10 +19,10 @@
 #' The length of the vector has to equal the number of genes in the Genome object.
 #' The default value is NULL.
 #' 
-#' @param model Specifies the model used. Valid options are "ROC", "RFP", or "FONSE".
+#' @param model Specifies the model used. Valid options are "ROC", "RFP", "PANSE", or "FONSE".
 #' The default model is "ROC".
 #' ROC is described in Gilchrist et al. 2015.
-#' RFP and FONSE are currently unpublished.
+#' RFP, PANSE and FONSE are currently unpublished.
 #' 
 #' @param split.serine Whether serine should be considered as 
 #' one or two amino acids when running the model.
@@ -53,47 +53,28 @@
 #' @param init.csp.variance specifies the initial proposal width for codon specific parameter (default is 0.0025). 
 #' The proposal width adapts during the runtime to reach a taget acceptance rate of ~0.25
 #' 
+#' @param init.sepsilon specifies the initial value for sepsilon. default is 0.1
+#' 
 #' @return parameter Returns an initialized Parameter object.
 #' 
-#' @description \code{initializeParameterObject} will call the appropriate followup
-#' call to writeXXXParameterObject based off of the value of model and init.with.restart.file.
+#' @description \code{initializeParameterObject} initializes a new parameter object or reconstructs one from a restart file
 #' 
 #' @details \code{initializeParameterObject} checks the values of the arguments 
 #' given to insure the values are valid.
-#' Additionally, if a restart file is given, no follow up function calls are made - 
-#' a new call is made instead which calls the C++ constructor that only takes a file name.
 #' 
-#' The mixture definition and mixture definition matrix describe how the mutation
+#' The mixture definition and mixture definition matrix describes how the mutation
 #' and selection categories are set up with respect to the number of mixtures. For
 #' example, if mixture.definition = "allUnique" and numMixtures = 3, a matrix
-#' representation would be as follows:
-#' 
-#' 1 1
-#' 
-#' 2 2
-#' 
-#' 3 3
-#' 
+#' representation would be \code{matrix(c(1,2,3,1,2,3), ncol=2)}
 #' where each row represents a mixture, the first column represents the mutation
 #' category, and the second column represents the selection category.
-#' Another example would be mixture.definition = "selectionShared" and numMixtures = 4.
-#' 
-#' 1 1
-#' 
-#' 2 1
-#' 
-#' 3 1
-#' 
-#' 4 1
-#' 
+#' Another example would be mixture.definition = "selectionShared" and numMixtures = 4 (
+#' \code{matrix(c(1,2,3, 4,1,1,1,1), ncol=2)}).
 #' In this case, the selection category is the same for every mixture. If a matrix
 #' is given, and it is valid, then the mutation/selection relationship will be
-#' defined by the given matrix as opposed to the keyword. A matrix should only
-#' be given in cases where the keywords would not create the desired valid matrix.
-#' 
-#' If expressionValues is given, then the phi values will be initialized with 
-#' them. If not, we calculate starting phi values by doing an SCUO caculation.
-#' 
+#' defined by the given matrix and the keyword will be ignored. A matrix should only
+#' be given in cases where the keywords would not create the desired matrix.
+
 initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures = 1, 
                                     gene.assignment = NULL, initial.expression.values = NULL,
                                     model = "ROC", split.serine = TRUE, 
@@ -106,15 +87,15 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
     if(length(sphi) != num.mixtures){
       stop("Not all mixtures have an Sphi value assigned!\n")
     }
-  
     if(length(genome) != length(gene.assignment)){
       stop("Not all Genes have a mixture assignment!\n")
     }
-  
     if(max(gene.assignment) > num.mixtures){
       stop("Gene is assigned to non existing mixture!\n")
     }
-    
+    if(num.mixtures < 1){
+      stop("num. mixture has to be a positive non-zero value!\n")
+    }    
     #TODO: should we check integraty of other values, such as numMixtures being
     #positive?
   }
@@ -260,28 +241,22 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
 
 #' Return Codon Specific Paramters (or write to csv) estimates as data.frame
 #' 
-#' @param parameter A Parameter object that corresponds to one of the model types.
-#' Valid values are "ROC", "RFP", and "FONSE".
+#' @param parameter parameter on object created by \code{initializeParameterObject}.
 #' 
-#' @param filename A filename where the data will be written to.
-#' This file should end with a "csv" extension.
+#' @param filename Posterior estimates will be written to file instead of returned if specified (format: csv).
 #' 
-#' @param CSP Tells what codon specific parameter should be written to the file.
-#' This will vary between models.
+#' @param CSP which type of codon specific parameter should be returned (mutation (default) or selection)
 #' 
-#' @param mixture Tells which mixture the data should be retrieved from to write.
+#' @param mixture estimates for which mixture should be returned
 #' 
-#' @param samples The number of samples that should be used when calculating
-#' the posteriors.
+#' @param samples The number of samples used for the posterior estimates.
 #' 
-#' @return This function has no return value.
+#' @return returns a data.frame with the posterior estimates of the models 
+#' codon specific parameters or writes it directly to a csv file if \code{filename} is specified
 #' 
-#' @description \code{writeParameterToCSV} will obtain the codon specific
-#' parameter data for a given parameter and mixture and write this data
-#' to a csv file.
+#' @description \code{getCSPEstimates} returns the codon specific
+#' parameter estimates for a given parameter and mixture or write it to a csv file.
 #' 
-#' @details \code{writeParameterToCSV} will make the necessary calls
-#' to writeXXXParameterToCSV based off of the parameter given.
 #' 
 getCSPEstimates <- function(parameter, filename, CSP, mixture, samples){
   UseMethod("getCSPEstimates", parameter)
@@ -289,14 +264,13 @@ getCSPEstimates <- function(parameter, filename, CSP, mixture, samples){
 
 
 #Called from getCSPEstimates
-getCSPEstimates.Rcpp_Parameter <- function(parameter, filename=NULL, 
-                                              CSP="Mutation", mixture = 1, samples = 10){
+getCSPEstimates.Rcpp_Parameter <- function(parameter, filename=NULL, CSP="Mutation", mixture = 1, samples = 10){
   Amino_Acid <- c()
   Value <- c()
   Codon <- c()
   Std_Deviation <- vector("list")
   
-  if (parameter == "ROC" || parameter == "FONSE"){
+  if (class(parameter) == "Rcpp_ROCParameter" || class(parameter) == "Rcpp_FONSEParameter"){
     names.aa <- aminoAcids()
     
     for(aa in names.aa){
@@ -321,7 +295,7 @@ getCSPEstimates.Rcpp_Parameter <- function(parameter, filename=NULL,
       }
     }
   }
-  else if (parameter == "RFP"){
+  else if (class(parameter) == "Rcpp_RFPParameter"){
     groupList <- parameter$getGroupList()
 
     for(i in 1:length(groupList)){
@@ -356,52 +330,6 @@ getCSPEstimates.Rcpp_Parameter <- function(parameter, filename=NULL,
     write.csv(data, file = filename, row.names = FALSE, quote=FALSE)
   }
 }
-
-#TODO: implement getCSPEstimates for RFP and FONSE
-
-### TODO
-#Called from getCSPEstimates
-# getCSPEstimates.Rcpp_RFPParameter <- function(parameter, filename=NULL, 
-#                                               CSP="Alpha", mixture = 1, samples = 10){
-#   names.aa <- aminoAcids()
-#   Amino_Acid <- c()
-#   Value <- c()
-#   Codon <- c()
-#   Std_Deviation <- vector("list")
-#   
-#   for(aa in names.aa){
-#     if(aa == "M" || aa == "W" || aa == "X") next
-#     codons <- AAToCodon(aa, T)
-#     
-#     for(i in 1:length(codons)){
-#       Amino_Acid <- c(Amino_Acid, aa)
-#       Codon <- c(Codon, codons[i])
-#       
-#       if(CSP == "Alpha"){
-#         Value <- c(Value, parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 0, TRUE))
-#         Std_Deviation <- c(Std_Deviation, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 0, c(0.025, 0.975), TRUE))
-#       }
-#       else if(CSP == "Lambda Prime"){
-#         Value <- c(Value, parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 1, TRUE))
-#         Std_Deviation <- c(Std_Deviation, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 1, c(0.025, 0.975), TRUE))
-#       }
-#       else {
-#         stop("Unknown Parameter type given")
-#       }
-#     }
-#   }
-#   Std_Deviation <- matrix(unlist(Std_Deviation), nrow = 2)
-#   data <- data.frame(Amino_Acid, Codon, Value, Lower=Std_Deviation[1,], Upper=Std_Deviation[2,])
-#   colnames(data) <- c("AA", "Codon", "Posterior", "0.025%", "0.975%")
-#   if(is.null(filename))
-#   {
-#     return(data)
-#   }else {
-#     write.csv(data, file = filename, row.names = FALSE, quote=FALSE)
-#   }
-# }
-### TODO
-
 
 
 
@@ -449,6 +377,10 @@ splitMatrix <- function(M, r, c){
 } 
 
 
+
+#######
+### CURRENTLY NOT EXPOSED
+#######
 #' Initialize Covariance Matrices
 #' 
 #' @param parameter A Parameter object that corresponds to one of the model types. 
@@ -559,12 +491,65 @@ initializeCovarianceMatrices <- function(parameter, genome, numMixtures, geneAss
 }
 
 
+#' Returns mixture assignment estimates for each gene
+#' 
+#' @param parameter on object created by \code{initializeParameterObject}
+#' 
+#' @param gene.index a integer or vector of integers representing the gene(s) of interesst.
+#' 
+#' @param samples number of samples for the posterior estimate
+#' 
+#' @return returns a vector with the mixture assignment of each gene corresbonding to \code{gene.index} in the same order as the genome. 
+#'
+#' @description Posterior estimates for the mixture assignment of specified genes
+#' 
+#' @details The returned vector is unnamed as gene ids are only stored in the \code{genome} object, 
+#' but the \code{gene.index} vector can be used to match the assignment to the genome.
+#' 
+#' @examples 
+#' \dontrun{
+#' # get the mixture assignment for all genes
+#' getMixtureAssignmentEstimate(parameter, 1:length(genome), 1000)
+#' 
+#' # get the mixture assignment for a subsample
+#' getMixtureAssignmentEstimate(parameter, 5:100, 1000)
+#' # or
+#' getMixtureAssignmentEstimate(parameter, c(10, 30:50, 3, 90), 1000)
+#' }
+
 getMixtureAssignmentEstimate <- function(parameter, gene.index, samples)
 {
   mixtureAssignment <- unlist(lapply(gene.index,  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))
   return(mixtureAssignment)
 }
 
+
+#' Returns the estimated phi posterior for a gene
+#' 
+#' @param parameter on object created by \code{initializeParameterObject}.
+#' 
+#' @param gene.index a integer or vector of integers representing the gene(s) of interesst.
+#' 
+#' @param mixtureAssignment a vector with the same length as \code{gene.index} decsribing the mixture assignment of the gene
+#' 
+#' @param samples number of samples for the posterior estimate
+#' 
+#' @return returns a vector with the mixture assignment of each gene corresbonding to \code{gene.index} in the same order as the genome. 
+#'
+#' @description Posterior estimates for the phi value of specified genes
+#' 
+#' @details The returned vector is unnamed as gene ids are only stored in the \code{genome} object, 
+#' but the \code{gene.index} vector can be used to match the assignment to the genome.
+#' 
+#' @examples 
+#' \dontrun{
+#' # get the estimated phi values for all genes assuming they are in mixture 1
+#' getExpressionEstimatesForMixture(parameter, 1:length(genome), rep(1, length(genome), 1000)
+#' 
+#' # get the estimated phi values for all genes for the estimated mixture element
+#' mix.assign <- getMixtureAssignmentEstimate(parameter, 1:length(genome), 1000)
+#' getExpressionEstimatesForMixture(parameter, 1:length(genome), mix.assign, 1000)
+#' }
 
 getExpressionEstimatesForMixture <- function(parameter, gene.index, mixtureAssignment, samples)
 {
@@ -577,35 +562,27 @@ getExpressionEstimatesForMixture <- function(parameter, gene.index, mixtureAssig
 
 #' Write Parameter Object to a File
 #' 
-#' @param parameter A Parameter object that corresponds to one of the model types.
-#' Valid values are "ROC", "RFP", and "FONSE".
+#' @param parameter parameter on object created by \code{initializeParameterObject}.
 #' 
 #' @param file A filename that where the data will be stored.
-#' The file should end with the extension "Rdat".
 #' 
 #' @return This function has no return value.
 #' 
-#' @description \code{writeParameterObject} will call the appropriate followup
-#' call to writeXXXParameterObject based off of the parameter type 
-#' given.
+#' @description \code{writeParameterObject} will write the parameter object as binary to the filesystem
 #' 
-#' @details For example, if a ROCParameter is passed, the the writeParameterObject
-#' for the ROCParameter will be called. This allows us to not have an if-else
-#' block in the code - making use of the how R handles these situations.
+#' @details As Rcpp object are not serializable with the default R \code{save} function, 
+#' therefore this custom save function is provided (see \link{loadParameterObject}).
+#' 
+#' @examples 
+#' \dontrun{
+#' writeParameterObject(parameter, "file.Rda")
+#' }
 #' 
 writeParameterObject <- function(parameter, file)
 {
   UseMethod("writeParameterObject", parameter)
 }
 
-
-#' Extract Base Info
-#' 
-#' @param parameter A Parameter object that corresponds to one of the model types.
-#' Valid values are "ROC", "RFP", and "FONSE".
-#'
-#' @return varlist A list containing various attributes of the Parameter base class.
-#'
 
 # extracts traces and parameter information from the base class Parameter
 extractBaseInfo <- function(parameter){
@@ -722,19 +699,26 @@ writeParameterObject.Rcpp_FONSEParameter <- function(parameter, file)
 
 #' Load Parameter Object
 #'  
-#' @param files A list of parameter filenames to be loaded. If multiple files are given, 
+#' @param files A list of parameter filenames to be loaded. If multiple files are given,
 #' the parameter objects will be concatenated in the order provided
 #' 
-#' @return parameter Returns an initialized Parameter object depending on the parameter type given.
+#' @return Returns an initialized Parameter object.
 #' 
-#' @description \code{loadParameterObject} will call the appropriate followup
-#' call to loadXXXParameterObject based off of the parameter type 
-#' given.
+#' @description \code{loadParameterObject} will load a parameter object from the filesystem
 #' 
-#' @details For example, if a ROCParameter is passed, the the loadParameterObject
-#' for the ROCParameter will be called. This allows us to not have an if-else
-#' block in the code - making use of the how R handles these situations.
+#' @details The function loads one or multiple files. In the case of multiple file, e.g. due to the use of check pointing, the files will
+#' be concatenated to one parameter object. See \link{writeParameterObject} for the writing of parameter objects
 #' 
+#' @examples 
+#' \dontrun{
+#' # load a single parameter object
+#' parameter <- loadParameterObject("path/to/rda/file.Rda")
+#' 
+#' # load and concatenate multiple parameter object
+#' parameter <- loadParameterObject(c("path/to/rda/file.Rda", "path/to/rda/file2.Rda"))
+#' }
+#' 
+
 loadParameterObject <- function(files)
 {
   #A temporary env is set up to stop R errors.
@@ -766,17 +750,6 @@ loadParameterObject <- function(files)
   }
   return(parameter)
 }
-
-
-#' Set Base Info
-#' 
-#' @param parameter A Parameter object that corresponds to one of the model types.
-#' Valid values are "ROC", "RFP", and "FONSE".
-#'
-#' @param files A set of files that are loaded to initialize the Parameter object.
-#'
-#' @return parameter Returns an initialized Parameter object.
-#'
 
 #Sets all the common variables in the Parameter objects.
 setBaseInfo <- function(parameter, files)
@@ -868,7 +841,6 @@ setBaseInfo <- function(parameter, files)
     }
   }
 
-#browser()
   parameter$setCategories(categories)
   parameter$setCategoriesForTrace()  
   parameter$numMixtures <- numMixtures
@@ -1090,21 +1062,6 @@ loadFONSEParameterObject <- function(parameter, files)
 }
 
 
-#' Combine Two-Dimensional Trace
-#' 
-#' @param trace1 A trace read in from C++ in the form of a vector of vectors.
-#' The last value of this trace should be equal to the first value of the second trace.
-#' Once this function has executed, this is the trace that should be modified.
-#'
-#' @param trace2 A trace read in from C++ in the form of a vector of vectors.
-#' The first value of this trace should be equal to the last value of the first trace.
-#' 
-#' @param max The maximum amount of the trace of the second trace to be concatenated with 
-#' the first trace.
-#' 
-#' @return This function has no return value.
-#'
-
 #Intended to combine 2D traces (vector of vectors) read in from C++. The first
 #element of the second trace is omited since it should be the same as the 
 #last value of the first trace.
@@ -1115,21 +1072,6 @@ combineTwoDimensionalTrace <- function(trace1, trace2, max){
   }
 }
 
-
-#' Combine Three-Dimensional Trace
-#' 
-#' @param trace1 A trace read in from C++ in the form of a vector of vectors of vectors.
-#' The last value of this trace should be equal to the first value of the second trace.
-#' Once this function has executed, this is the trace that should be modified.
-#'
-#' @param trace2 A trace read in from C++ in the form of a vector of vectors of vectors.
-#' The first value of this trace should be equal to the last value of the first trace.
-#' 
-#' @param max The maximum amount of the trace of the second trace to be concatenated with 
-#' the first trace.
-#' 
-#' @return This function has no return value.
-#'
 
 #Intended to combine 3D traces (vector of vectors of vectors) read in from C++. The first
 #element of the second trace is omited since it should be the same as the 

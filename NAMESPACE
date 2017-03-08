@@ -8,11 +8,12 @@ importFrom(Rcpp, evalCpp)
 importFrom(graphics, abline, axis, box, grid, hist,
       layout, legend, lines, pairs, par, plot,
       points, segments, text)
-importFrom(stats, lm, median, qt, quantile, sd)
+importFrom(stats, lm, median, qt, quantile, sd, acf)
 importFrom(utils, write.csv)
 
 S3method(length, Rcpp_Genome)
 S3method(summary, Rcpp_Genome)
+S3method(getCSPEstimates, Rcpp_Parameter)
 S3method(writeParameterObject, Rcpp_ROCParameter)
 S3method(writeParameterObject, Rcpp_RFPParameter)
 S3method(writeParameterObject, Rcpp_FONSEParameter)
@@ -67,8 +68,8 @@ export(
 "codons",
 
 ##
-"mcmcACF",
-"cspACF"
+"acfMCMC",
+"acfCSP"
 
 )
 

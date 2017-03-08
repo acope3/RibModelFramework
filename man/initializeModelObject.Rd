@@ -2,26 +2,31 @@
 % Please edit documentation in R/modelObject.R
 \name{initializeModelObject}
 \alias{initializeModelObject}
-\title{Model Initialization
- 
- \code{initializeModelObject} initializes the Rcpp Model Object}
+\title{Model Initialization}
 \usage{
-initializeModelObject(parameter, model = "ROC", with.phi = FALSE)
+initializeModelObject(parameter, model = "ROC", with.phi = FALSE,
+  fix.observation.noise = FALSE)
 }
 \arguments{
-\item{parameter}{An Rcpp parameter object}
+\item{parameter}{An object created with \code{initializeParameterObject}.}
 
-\item{model}{A string containing the model to run (currently ROC, FONSE, or RFP)}
+\item{model}{A string containing the model to run (ROC, FONSE, or RFP), has to match parameter object.}
 
-\item{with.phi}{A boolean that determines whether or not to use empirical
-  phi values (expression rates) for the calculations. Currently, this is
-  only implemented for the ROC model.
-  
-@return This function returns the model object created.}
+\item{with.phi}{(ROC only) A boolean that determines whether or not to include empirical
+phi values (expression rates) for the calculations.}
+
+\item{fix.observation.noise}{(ROC only) Allows to fix the noise in the observed expression dataset to the initial condition.
+The initial condition for the observed expression noise can be set in the parameter object.}
+}
+\value{
+This function returns the model object created.
 }
 \description{
-Model Initialization
- 
- \code{initializeModelObject} initializes the Rcpp Model Object
+initializes the model object.
+}
+\details{
+initializeModelObject initializes a model. The type of model is determined based on the string passed to the \code{model} argument.
+ The Parameter object has to match the model that is initialized. E.g. to initialize a ROC model, 
+ it is required that a ROC parameter object is passed to the function.
 }
 

@@ -33,4 +33,23 @@ for the given mcmc, genome, and model objects to perform a model fitting.
 thinning given when the mcmc object is initialized. Updates are provided every 100
 steps, and the state of the chain is saved every thinning steps.
 }
+\examples{
+\dontrun{
+#fitting a model to a genome using the runMCMC function
+
+genome <- initializeGenomeObject(file = "genome.fasta")
+sphi_init <- c(1,1)
+numMixtures <- 2
+geneAssignment <- sample(1:2, length(genome) # random gene assignment to mixtures
+parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, mixture.definition = "allUnique")
+samples <- 2500
+thinning <- 50
+adaptiveWidth <- 25
+mcmc <- initializeMCMCObject(samples, thinning, adaptive.width=adaptiveWidth, 
+                             est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE, est.mix = TRUE) 
+divergence.iteration <- 10
+runMCMC(mcmc, genome, model, 4, divergence.iteration)
+}
+
+}
 

@@ -122,7 +122,12 @@ plot.Rcpp_ROCModel <- function(x, genome = NULL, samples = 100, mixture = 1,
 #'  
 #' @return This function has no return value.
 #'
-#' @description See \code{plot.Rcpp_ROCModel}
+#' @description Plots traces from the model object such as synthesis rates for each gene.
+#' Will work regardless of whether or not expression/synthesis rate levels are being
+#' estimated. If you wish to plot observed/empirical values, these values MUST be set
+#' using the initial.expression.values parameter found in initializeParameterObject.
+#' Otherwise, the expression values plotted will just be SCUO values estimated upon
+#' initialization of the Parameter object.
 #'
 plot.Rcpp_FONSEModel <- function(x, genome, samples = 100, mixture = 1, 
                                estim.Expression = TRUE, simulated = FALSE, ...)

@@ -7,30 +7,22 @@
 getCSPEstimates(parameter, filename, CSP, mixture, samples)
 }
 \arguments{
-\item{parameter}{A Parameter object that corresponds to one of the model types.
-Valid values are "ROC", "RFP", and "FONSE".}
+\item{parameter}{parameter on object created by \code{initializeParameterObject}.}
 
-\item{filename}{A filename where the data will be written to.
-This file should end with a "csv" extension.}
+\item{filename}{Posterior estimates will be written to file instead of returned if specified (format: csv).}
 
-\item{CSP}{Tells what codon specific parameter should be written to the file.
-This will vary between models.}
+\item{CSP}{which type of codon specific parameter should be returned (mutation (default) or selection)}
 
-\item{mixture}{Tells which mixture the data should be retrieved from to write.}
+\item{mixture}{estimates for which mixture should be returned}
 
-\item{samples}{The number of samples that should be used when calculating
-the posteriors.}
+\item{samples}{The number of samples used for the posterior estimates.}
 }
 \value{
-This function has no return value.
+returns a data.frame with the posterior estimates of the models 
+codon specific parameters or writes it directly to a csv file if \code{filename} is specified
 }
 \description{
-\code{writeParameterToCSV} will obtain the codon specific
-parameter data for a given parameter and mixture and write this data
-to a csv file.
-}
-\details{
-\code{writeParameterToCSV} will make the necessary calls
-to writeXXXParameterToCSV based off of the parameter given.
+\code{getCSPEstimates} returns the codon specific
+parameter estimates for a given parameter and mixture or write it to a csv file.
 }
 

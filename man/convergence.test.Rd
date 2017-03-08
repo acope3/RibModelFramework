@@ -5,22 +5,25 @@
 \title{Convergence Test}
 \usage{
 convergence.test(object, n.samples = 10, frac1 = 0.1, frac2 = 0.5,
-  thin = 1, plot = FALSE, ...)
+  thin = 1, plot = FALSE, what = "Mutation", mixture = 1)
 }
 \arguments{
 \item{object}{an object of either class Trace or MCMC}
 
 \item{n.samples}{number of samples at the end of the trace used to determine convergence (< length of trace)}
 
-\item{frac1}{TODO}
+\item{frac1}{fraction to use from beginning of chain}
 
-\item{frac2}{TODO}
+\item{frac2}{fraction to use from end of chain}
 
-\item{thin}{TODO}
+\item{thin}{the thinning interval between consecutive observations}
 
 \item{plot}{(logical) plot result instead of returning an object}
 
-\item{...}{TODO describe what and mixture parameter}
+\item{what}{Character describing which trace should be tested for convergence (only for trace object). Valid options are
+Mutation, Selection, MixtureProbability, Sphi, Mphi, ExpectedPhi, or Expression}
+
+\item{mixture}{Integer determining for which mixture disribution the convergence test should be applied (only for trace object).}
 }
 \value{
 geweke score object
