@@ -76,11 +76,13 @@ class SequenceSummary
         void initSumRFPCount(unsigned numCategories); 
 		std::array <unsigned, 64> getSumRFPCount(unsigned categoryIndex); 
 		void setSumRFPCount(unsigned categoryIndex, std::array <unsigned, 64> arg); 
-		
+
+		std::vector <unsigned> getPositionCodonID();
+		void setPositionCodonID(std::vector <unsigned> arg);
+
         unsigned getRFPValue(std::string codon, unsigned categoryIndex = 0);
         unsigned getRFPValue(unsigned codonIndex, unsigned categoryIndex = 0);
         void setRFPValue(unsigned codonIndex, unsigned value, unsigned categoryIndex = 0);
-
 
 		//Other Functions (All tested):
 		void clear();

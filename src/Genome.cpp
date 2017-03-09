@@ -26,6 +26,7 @@ Genome& Genome::operator=(const Genome& rhs)
 	genes = rhs.genes;
 	simulatedGenes = rhs.simulatedGenes;
 	numGenesWithPhi = rhs.numGenesWithPhi;
+	RFPCategoryNames = rhs.RFPCategoryNames;
 	//assignment operator
 	return *this;
 }
@@ -45,6 +46,7 @@ bool Genome::operator==(const Genome& other) const
 	if (!(this->genes == other.genes)) { match = false; }
 	if (!(this->simulatedGenes == other.simulatedGenes)) { match = false; }
 	if (this->numGenesWithPhi != other.numGenesWithPhi) { match = false; }
+	if (this->RFPCategoryNames != other.RFPCategoryNames) { match = false; }
 
 	return match;
 }
@@ -313,6 +315,7 @@ void Genome::readPAFile(std::string filename, bool Append)
 			{
 				numCategories++;
 				pos2 = tmp.find(",", pos + 1);
+				addRFPCategoryName(tmp.substr(pos + 1, pos2 - (pos + 1)));
 				pos = pos2;
 			}
 			unsigned tableWidth = 2 + numCategories; // Table size: position + codonID + each category
@@ -408,9 +411,8 @@ void Genome::readPAFile(std::string filename, bool Append)
 }
 
 
-//TODO: Add writePAFile function here
 //TODO: Complete
-void writePAFile(std::string filename, bool simulated)
+void Genome::writePAFile(std::string filename, bool simulated)
 {
 	std::ofstream Fout;
 	Fout.open(filename.c_str());
@@ -418,14 +420,46 @@ void writePAFile(std::string filename, bool simulated)
 		my_printError("Error in Genome::writePAFile: Can not open output RFP file %\n", filename);
 	else
 	{
-		/*
 		Fout << "GeneID,Position,Codon";
-		unsigned sized = simulated ? (unsigned)simulatedGenes.size() : (unsigned)genes.size();
 
-		for (unsigned geneIndex = 0; geneIndex < sized; geneIndex++)
+		// For each category name, print for header
+		std::vector <std::string> RFPCategoryNames = getRFPCategoryNames();
+		unsigned numCategories = (unsigned)RFPCategoryNames.size();
+		for (unsigned category = 0; category < numCategories; category++)
+		{
+			Fout << ",";
+			Fout << RFPCategoryNames[category];
+		}
+
+		Fout << "\n";
+
+		unsigned numGenes = simulated ? (unsigned)simulatedGenes.size() : (unsigned)genes.size();
+
+		for (unsigned geneIndex = 0; geneIndex < numGenes; geneIndex++)
 		{
 			Gene *currentGene = simulated ? &simulatedGenes[geneIndex] : &genes[geneIndex];
+			std::vector <unsigned> positionCodonID = currentGene->geneData.getPositionCodonID();
+			unsigned numPositions = (unsigned)positionCodonID.size();
 
+			my_print("%\n", numPositions);
+
+			for (unsigned position = 0; position < numPositions; position++)
+			{
+				unsigned codonID = positionCodonID[position];
+				std::string codon = SequenceSummary::codonArray[codonID];
+
+				Fout << currentGene->getId() << "," << position << "," << codon;
+
+				for (unsigned category = 0; category < numCategories; category++)
+				{
+					Fout << ",";
+					Fout << currentGene->geneData.getRFPValue(codonID, category);
+				}
+
+				Fout << "\n";
+			}
+
+			/*
 			for (unsigned codonIndex = 0; codonIndex < 64; codonIndex++)
 			{
 				std::string codon = SequenceSummary::codonArray[codonIndex];
@@ -434,8 +468,8 @@ void writePAFile(std::string filename, bool simulated)
 				Fout << currentGene->geneData.getRFPValue(codonIndex) << ",";
 				Fout << "NA," << codon << "\n";
 			}
+			 */
 		}
-		 */
 	}
 	Fout.close();
 }
@@ -733,6 +767,7 @@ void Genome::clear()
 	genes.clear();
 	simulatedGenes.clear();
 	numGenesWithPhi.clear();
+	RFPCategoryNames.clear();
 }
 
 
@@ -773,6 +808,24 @@ std::vector<unsigned> Genome::getCodonCountsPerGene(std::string codon)
 	return codonCounts;
 }
 
+/* getRFPCategoryName (NOT EXPOSED)
+ * Arguments: None
+ * Returns the vector of RFPCategoryNames.
+*/
+std::vector <std::string> Genome::getRFPCategoryNames()
+{
+	return RFPCategoryNames;
+}
+
+
+/* addRFPCategoryName (NOT EXPOSED)
+ * Arguments: string categoryName
+ * Adds the name of an RFP category to the RFPCategoryNames vector.
+*/
+void Genome::addRFPCategoryName(std::string categoryName)
+{
+	RFPCategoryNames.push_back(categoryName);
+}
 
 
 

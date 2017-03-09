@@ -76,6 +76,7 @@ SequenceSummary::SequenceSummary(const SequenceSummary& other)
 	naa = other.naa;
 	RFPCount = other.RFPCount;
 	sumRFPCount = other.sumRFPCount;
+	positionCodonID = other.positionCodonID;
 }
 
 
@@ -88,6 +89,7 @@ SequenceSummary& SequenceSummary::operator=(const SequenceSummary& rhs)
     naa = rhs.naa;
 	RFPCount = rhs.RFPCount;
 	sumRFPCount = rhs.sumRFPCount;
+	positionCodonID = rhs.positionCodonID;
 
 	return *this;
 }
@@ -102,6 +104,7 @@ bool SequenceSummary::operator==(const SequenceSummary& other) const
 	if (this->codonPositions != other.codonPositions) { match = false; }
 	if (this->RFPCount != other.RFPCount) {match = false; }
     if (this->sumRFPCount != other.sumRFPCount) {match = false; }
+	if (this->positionCodonID != other.positionCodonID) { match = false; }
 
 	return match;
 }
@@ -243,6 +246,26 @@ void SequenceSummary::setSumRFPCount(unsigned categoryIndex, std::array <unsigne
 }
 
 
+/* getPositionCodonID (NOT EXPOSED)
+ * Arguments: None.
+ * Returns the vector of codon IDs for each position.
+ */
+std::vector <unsigned> SequenceSummary::getPositionCodonID()
+{
+	return positionCodonID;
+}
+
+
+/* setPositionCodonID (NOT EXPOSED)
+ * Arguments: An vector to be set as the vector of codonIDs for each position.
+ * Sets the positionCodonID vector specified to the vector argument given.
+ */
+void SequenceSummary::setPositionCodonID(std::vector <unsigned> arg)
+{
+    positionCodonID = arg;
+}
+
+
 /* getRFPValue (by codon string) (RCPP EXPOSED VIA WRAPPER)
  * Arguments: A three-character codon string to get the RFP value of, a number representing the RFP category to return
  * Returns the RFP value of the codon string for the category index specified.
@@ -370,7 +393,7 @@ bool SequenceSummary::processPA(std::vector<std::vector<unsigned>> table)
 
 			for (unsigned j = 0; j < numCats; j++)
 			{
-				// Category j has an RFPCount at the position e0]qual to the 2-indexed (after position, codon) value of j.
+				// Category j has an RFPCount at the position equal to the 2-indexed (after position, codon) value of j.
 				RFPCount[j][row[0]] = row[j + 2];
 				sumRFPCount[j][codonID] += row[j + 2];
 			}
