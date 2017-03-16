@@ -523,8 +523,9 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 */
 void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned divergenceIterations)
 {
-	double previous_post = 0.0;
-	double current_post = 0.0;
+	// Currently unused variables
+	//double previous_post = 0.0;
+	//double current_post = 0.0;
 
 	// NOTE: IF PRIORS ARE ADDED, TAKE INTO ACCOUNT HERE!
 	my_print("Allowing divergence from initial conditions for % iterations.\n\n", divergenceIterations);
