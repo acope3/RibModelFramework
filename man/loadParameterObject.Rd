@@ -7,7 +7,8 @@
 loadParameterObject(files)
 }
 \arguments{
-\item{files}{The filenames where the data will be stored.}
+\item{files}{A list of parameter filenames to be loaded. If multiple files are given, 
+the parameter objects will be concatenated in the order provided}
 }
 \value{
 parameter Returns an initialized Parameter object depending on the parameter type given.

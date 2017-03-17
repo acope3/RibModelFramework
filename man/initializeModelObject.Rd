@@ -6,18 +6,22 @@
  
  \code{initializeModelObject} initializes the Rcpp Model Object}
 \usage{
-initializeModelObject(parameter, model = "ROC", with.phi = FALSE)
+initializeModelObject(parameter, model = "ROC", with.phi = FALSE,
+  fix.observation.noise = FALSE)
 }
 \arguments{
 \item{parameter}{An Rcpp parameter object}
 
-\item{model}{A string containing the model to run (currently ROC, FONSE, or RFP)}
+\item{model}{A string containing the model to run (ROC, FONSE, or RFP)}
 
-\item{with.phi}{A boolean that determines whether or not to use empirical
-  phi values (expression rates) for the calculations. Currently, this is
-  only implemented for the ROC model.
-  
-@return This function returns the model object created.}
+\item{with.phi}{(ROC only) A boolean that determines whether or not to use empirical
+phi values (expression rates) for the calculations.}
+
+\item{fix.observation.noise}{(ROC only) Allows to fix the noise in the observed expression dataset to the initial condition.
+The initial condition for the observed expression noise can be set in the parameter object.}
+}
+\value{
+This function returns the model object created.
 }
 \description{
 Model Initialization

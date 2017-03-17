@@ -8,7 +8,8 @@ initializeParameterObject(genome = NULL, sphi = NULL, num.mixtures = 1,
   gene.assignment = NULL, initial.expression.values = NULL, model = "ROC",
   split.serine = TRUE, mixture.definition = "allUnique",
   mixture.definition.matrix = NULL, init.with.restart.file = NULL,
-  mutation.prior.sd = 0.35, init.csp.variance = 0.0025)
+  mutation.prior.sd = 0.35, init.csp.variance = 0.0025,
+  init.sepsilon = 0.1)
 }
 \arguments{
 \item{genome}{An object of type Genome necessary for the initialization of the Parameter object.

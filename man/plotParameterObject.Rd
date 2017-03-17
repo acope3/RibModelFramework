@@ -4,7 +4,8 @@
 \alias{plotParameterObject}
 \title{Plot Parameter}
 \usage{
-plotParameterObject(x, what = "Mutation", samples = 100, ...)
+plotParameterObject(x, what = "Mutation", samples = 100,
+  mixture.name = NULL, with.ci = TRUE, ...)
 }
 \arguments{
 \item{x}{A parameter object, specified by superfunctions: \code{plot.Rcpp_ROCParameter}
@@ -15,6 +16,9 @@ and \code{plot.Rcpp.FONSEParameter}.}
 
 \item{samples}{Number of samples to plot using the posterior mean. Default
 value is 100.}
+
+\item{with.ci}{Plot with or without confidence intervals. Default value
+is TRUE}
 
 \item{...}{Arguments to be passed to methods, such as graphical parameters.}
 }

@@ -5,7 +5,7 @@
 \title{Plot Model Object}
 \usage{
 \method{plot}{Rcpp_ROCModel}(x, genome = NULL, samples = 100, mixture = 1,
-  estim.Expression = TRUE, simulated = FALSE, ...)
+  simulated = FALSE, ...)
 }
 \arguments{
 \item{x}{An Rcpp model object initialized with \code{initializeModelObject}.}
@@ -15,9 +15,6 @@
 \item{samples}{The number of samples in the trace}
 
 \item{mixture}{The mixture for which to graph values.}
-
-\item{estim.Expression}{A boolean value that says whether to use estimated expression
-values or empirical values.}
 
 \item{simulated}{A boolean value that determines whether to use the simulated genome.}
 
@@ -29,5 +26,10 @@ This function has no return value.
 }
 \description{
 Plots traces from the model object such as synthesis rates for each gene.
+Will work regardless of whether or not expression/synthesis rate levels are being
+estimated. If you wish to plot observed/empirical values, these values MUST be set
+using the initial.expression.values parameter found in initializeParameterObject.
+Otherwise, the expression values plotted will just be SCUO values estimated upon
+initialization of the Parameter object.
 }
 

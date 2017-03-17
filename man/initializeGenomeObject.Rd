@@ -5,7 +5,8 @@
 \title{Genome Initialization}
 \usage{
 initializeGenomeObject(file, observed.expression.file = NULL,
-  append = FALSE, fasta = TRUE, match.expression.by.id = TRUE)
+  append = FALSE, fasta = TRUE, match.expression.by.id = TRUE,
+  previous.genome = NULL)
 }
 \arguments{
 \item{file}{A string containing the location of the input file.}

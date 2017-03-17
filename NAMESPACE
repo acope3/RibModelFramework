@@ -8,7 +8,7 @@ importFrom(Rcpp, evalCpp)
 importFrom(graphics, abline, axis, box, grid, hist,
       layout, legend, lines, pairs, par, plot,
       points, segments, text)
-importFrom(stats, lm, median, qt, quantile, sd)
+importFrom(stats, lm, median, qt, quantile, sd, acf)
 importFrom(utils, write.csv)
 
 S3method(length, Rcpp_Genome)
