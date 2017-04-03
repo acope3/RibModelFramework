@@ -111,9 +111,6 @@ plot.Rcpp_ROCModel <- function(x, genome = NULL, samples = 100, mixture = 1,
 #'
 #' @param mixture The mixture for which to graph values.
 #'
-#' @param estim.Expression A boolean value that says whether to use estimated expression
-#'  values or empirical values.   
-#'
 #' @param simulated A boolean value that determines whether to use the simulated genome.
 #'
 #' @param ... Optional, additional arguments.
