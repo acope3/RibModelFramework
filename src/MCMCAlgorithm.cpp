@@ -110,7 +110,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	unsigned numSynthesisRateCategories = model.getNumSynthesisRateCategories();
 	unsigned numMixtures = model.getNumMixtureElements();
 	std::vector <double> dirichletParameters(numMixtures, 0);
-	
+
 	//initialize parameter's size
 	for (unsigned i = 0u; i < numGenes; i++)
 	{
@@ -260,7 +260,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			model.updateSynthesisRateTrace(iteration/thinning, i);
 			model.updateMixtureAssignmentTrace(iteration/thinning, i);
 		}
-		
+
 	}
 
 	// take all priors into account
@@ -325,7 +325,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 			{
 				likelihoodTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[1];
 				posteriorTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[3];
-				
+
 			}
 		}
 		if ((iteration % thinning) == 0)
@@ -435,7 +435,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
             #ifndef STANDALONE
             Rcpp::checkUserInterrupt();
             #endif
-            
+
 	    my_print("Status at thinned sample (iteration): % (%)\n",  (iteration / thinning), iteration);
 			my_print("\t current logPosterior: % \n", posteriorTrace[(iteration/thinning) - 1] );
 			if (iteration > stepsToAdapt)
@@ -587,7 +587,7 @@ void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned
 				}
 			}
 		}
-	
+
 		// update Gibbs sampled parameter.
 		if (estimateHyperParameter)
 		{
@@ -776,6 +776,10 @@ std::vector<double> MCMCAlgorithm::getLogPosteriorTrace()
 }
 
 
+/* getLogLikelihoodTrace (RCPP EXPOSED)
+ * Arguments: None
+ * Return the log likelihoodTrace trace.
+*/
 std::vector<double> MCMCAlgorithm::getLogLikelihoodTrace()
 {
 	return likelihoodTrace;
@@ -959,48 +963,80 @@ std::vector<std::vector<double>> MCMCAlgorithm::solveToeplitzMatrix(int lr, std:
 //-------------------------------------//
 
 
+/* getSamples (RCPP EXPOSED)
+ * Arguments: None
+ * Return samples.
+*/
 unsigned MCMCAlgorithm::getSamples()
 {
     return samples;
 }
 
 
+/* getThinning (RCPP EXPOSED)
+ * Arguments: None
+ * Return thinning.
+*/
 unsigned MCMCAlgorithm::getThinning()
 {
     return thinning;
 }
 
 
+/* getAdaptiveWidth (RCPP EXPOSED)
+ * Arguments: None
+ * Return adaptiveWidth.
+*/
 unsigned MCMCAlgorithm::getAdaptiveWidth()
 {
     return adaptiveWidth;
 }
 
 
+/* setSamples (RCPP EXPOSED)
+ * Arguments: None
+ * Change samples.
+*/
 void MCMCAlgorithm::setSamples(unsigned _samples)
 {
     samples = _samples;
 }
 
 
+/* setThinning(RCPP EXPOSED)
+ * Arguments: None
+ * Change thinning.
+*/
 void MCMCAlgorithm::setThinning(unsigned _thinning)
 {
     thinning = _thinning;
 }
 
 
+/* setAdaptiveWidth (RCPP EXPOSED)
+ * Arguments: None
+ * Change adaptiveWidth.
+*/
 void MCMCAlgorithm::setAdaptiveWidth(unsigned _adaptiveWidth)
 {
     adaptiveWidth = _adaptiveWidth;
 }
 
 
+/* setLogPosteriorTrace (RCPP EXPOSED)
+ * Arguments: None
+ * Change log poster trace.
+*/
 void MCMCAlgorithm::setLogPosteriorTrace(std::vector<double> _posteriorTrace)
 {
     posteriorTrace = _posteriorTrace;
 }
 
 
+/* setLogLikelihoodTrace (RCPP EXPOSED)
+ * Arguments: None
+ * Change log likelihood trace.
+*/
 void MCMCAlgorithm::setLogLikelihoodTrace(std::vector<double> _likelihoodTrace)
 {
 	likelihoodTrace = _likelihoodTrace;

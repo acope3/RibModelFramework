@@ -526,7 +526,7 @@ std::vector <unsigned> Gene::getCodonPositions(std::string codon)
 RCPP_MODULE(Gene_mod)
 {
   class_<Gene>( "Gene" )
-    
+
 	.constructor("empty constructor")
     .constructor<std::string, std::string, std::string >("Initialize a gene by giving the id, description, and sequence string")
 
@@ -547,5 +547,3 @@ RCPP_MODULE(Gene_mod)
   ;
 }
 #endif
-
-
