@@ -689,18 +689,32 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 //------------------------------------//
 
 
+/* Gene constructor (RCPP EXPOSED)
+ * Arguments: gene to add, boolean if it was simulated.
+ * Depeneding on whether a gene was simulated appends to
+ * genes or simulated genes.
+*/
 void Genome::addGene(const Gene& gene, bool simulated)
 {
 	simulated ? simulatedGenes.push_back(gene) : genes.push_back(gene);
 }
 
-
+/* getGenes (RCPP EXPOSED)
+ * Arguments: boolean if simulated genes should be returned.
+ * Returns depending on the argument the genes or
+ * simulated genes vector.
+*/
 std::vector <Gene> Genome::getGenes(bool simulated)
 {
 	return !simulated ? genes : simulatedGenes;
 }
 
 
+/* getNumGenesWithPhiForIndex (RCPP EXPOSED)
+ * Arguments: index number.
+ * Returns the number of genes with the given Phi
+ * expressed as an index.
+*/
 unsigned Genome::getNumGenesWithPhiForIndex(unsigned index)
 {
 	return numGenesWithPhi[index];
@@ -736,12 +750,22 @@ Gene& Genome::getGene(std::string id, bool simulated)
 //-------------------------------------//
 
 
+/* getGenomeSize (RCPP EXPOSED)
+ * Arguments: boolean if requesting
+ * size of simulated genes.
+ * Returns the size of requested genes structure
+*/
 unsigned Genome::getGenomeSize(bool simulated)
 {
 	return simulated ? (unsigned)simulatedGenes.size() : (unsigned)genes.size();
 }
 
 
+/* clear (RCPP EXPOSED)
+ * Arguments: None.
+ * clears all data structure containing
+ * gene information.
+*/
 void Genome::clear()
 {
 	genes.clear();
@@ -774,6 +798,11 @@ Genome Genome::getGenomeForGeneIndices(std::vector <unsigned> indices, bool simu
 }
 
 
+/* getCodonCountsPerGene (RCPP EXPOSED)
+ * Arguments: a string which is the
+ * codon sequence concerning the user.
+ * Returns the number of times the sequence occurs.
+*/
 std::vector<unsigned> Genome::getCodonCountsPerGene(std::string codon)
 {
 	std::vector<unsigned> codonCounts(genes.size());
