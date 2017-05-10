@@ -13,7 +13,11 @@ using namespace Rcpp;
 // ---------- Constructors & Destructors ---------- //
 //--------------------------------------------------//
 
-
+/* Gen constructor (RCPP EXPOSED)
+ * Arguments: None
+ * Blank constructor for Gene class. Sets the sequence, id, and
+ * description fields to empty strings.
+*/
 Genome::Genome()
 {
 	//ctor
@@ -57,7 +61,11 @@ bool Genome::operator==(const Genome& other) const
 //---------- File I/O Functions ----------//
 //----------------------------------------//
 
-
+/* readFasta (RCPP EXPOSED)
+ * Arguments: filname to read Fasta sequence, boolean
+ * whether the Fasta sequence should be appended.
+ * Takes input in Fasta format from file and saves to genome.
+*/
 void Genome::readFasta(std::string filename, bool Append) // read Fasta format sequences
 {
 	try
@@ -145,6 +153,12 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 	}
 }
 
+
+/* writeFasta (RCPP EXPOSED)
+ * Arguments: filname to write to,
+ * boolean on if the genome is simulated.
+ * Writes a genome in Fasta format to given file
+*/
 void Genome::writeFasta (std::string filename, bool simulated)
 {
 	try {
