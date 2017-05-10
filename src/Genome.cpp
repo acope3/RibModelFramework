@@ -774,6 +774,10 @@ void Genome::clear()
 }
 
 
+/* getGenomeForGeneIndices (RCPP EXPOSED)
+ * Arguments: vector of indices, boolean if simulated.
+ * Returns a genome of genes at indices.
+*/
 Genome Genome::getGenomeForGeneIndices(std::vector <unsigned> indices, bool simulated)
 {
 	Genome genome;
