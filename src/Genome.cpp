@@ -721,12 +721,20 @@ unsigned Genome::getNumGenesWithPhiForIndex(unsigned index)
 }
 
 
+/* getNumGenesWithPhiForIndex (RCPP EXPOSED)
+ * Arguments: index number, simulated
+ * Returns the gene from the requested set at index
+*/
 Gene& Genome::getGene(unsigned index, bool simulated)
 {
 	return simulated ? simulatedGenes[index] : genes[index];
 }
 
 
+/* getNumGenesWithPhiForIndex (RCPP EXPOSED)
+ * Arguments: id, simulated
+ * Returns the gene from the requested set with the id
+*/
 Gene& Genome::getGene(std::string id, bool simulated)
 {
 	Gene tempGene;
