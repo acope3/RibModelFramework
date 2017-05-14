@@ -76,7 +76,8 @@ initializeMCMCObject <- function(samples, thinning=1, adaptive.width=100,
 #' sphi_init <- c(1,1)
 #' numMixtures <- 2
 #' geneAssignment <- sample(1:2, length(genome) # random gene assignment to mixtures
-#' parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, mixture.definition = "allUnique")
+#' parameter <- initializeParameterObject(genome, sphi_init, 
+#'	numMixtures, geneAssignment, "allUnique")
 #' samples <- 2500
 #' thinning <- 50
 #' adaptiveWidth <- 25

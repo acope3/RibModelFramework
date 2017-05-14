@@ -1,5 +1,5 @@
 #loading
-useDynLib(ribModel)
+useDynLib(ribModel, .registration = TRUE)
 
 #imports
 importFrom(methods, new)
