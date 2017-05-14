@@ -18,4 +18,3 @@ gene.names Returns the names of the genes as a vector of strings.
 \description{
 returns the identifiers of the genes within the genome specified.
 }
-

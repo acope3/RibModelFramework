@@ -105,7 +105,8 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 
 	/* This loop causes a compiler warning because i is an int, but openMP won't compile if I change i to unsigned.
 		Maybe worth looking into? */
-#ifndef __APPLE__
+#ifdef _OPENMP
+//#ifndef __APPLE__
 #pragma omp parallel for private(mutation, selection, positions, curAA) reduction(+:likelihood,likelihood_proposed)
 #endif
 	for (int i = 0; i < getGroupListSize(); i++)
@@ -168,7 +169,8 @@ void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 	SequenceSummary *seqsum;
 	unsigned aaIndex = SequenceSummary::AAToAAIndex(grouping);
 
-#ifndef __APPLE__
+#ifdef _OPENMP
+//#ifndef __APPLE__
 	#pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed, curAA, gene, seqsum) reduction(+:likelihood,likelihood_proposed)
 #endif
 	for (int i = 0; i < numGenes; i++)
@@ -225,7 +227,8 @@ void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 
 	logProbabilityRatio.resize(1);
 
-#ifndef __APPLE__
+#ifdef _OPENMP
+//#ifndef __APPLE__
 #pragma omp parallel for reduction(+:lpr)
 #endif
 	for (int i = 0u; i < genome.getGenomeSize(); i++)

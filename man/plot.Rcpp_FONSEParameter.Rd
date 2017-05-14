@@ -33,4 +33,3 @@ parameter object for each mixture element.
 \details{
 Graphs are based off the last # samples for the posterior mean.
 }
-

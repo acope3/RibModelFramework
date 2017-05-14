@@ -34,4 +34,3 @@ geweke score object
 \details{
 \code{convergence.test}
 }
-

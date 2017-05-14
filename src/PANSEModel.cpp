@@ -68,7 +68,8 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 	double phiValue = parameter->getSynthesisRate(geneIndex, synthesisRateCategory, false);
 	double phiValue_proposed = parameter->getSynthesisRate(geneIndex, synthesisRateCategory, true);
 
-#ifndef __APPLE__
+#ifdef _OPENMP
+//#ifndef __APPLE__
 #pragma omp parallel for reduction(+:logLikelihood,logLikelihood_proposed)
 #endif
 	for (int index = 0; index < getGroupListSize(); index++) //number of codons, without the stop codons
@@ -108,7 +109,8 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 	unsigned index = SequenceSummary::codonToIndex(grouping);
 
 
-#ifndef __APPLE__
+#ifdef _OPENMP
+//#ifndef __APPLE__
 #pragma omp parallel for private(gene) reduction(+:logLikelihood,logLikelihood_proposed)
 #endif
 	for (int i = 0u; i < genome.getGenomeSize(); i++)
@@ -166,7 +168,8 @@ void PANSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 
 
 	logProbabilityRatio.resize(1);
-#ifndef __APPLE__
+#ifdef _OPENMP
+//#ifndef __APPLE__
 #pragma omp parallel for reduction(+:lpr)
 #endif
 	for (int i = 0u; i < genome.getGenomeSize(); i++)

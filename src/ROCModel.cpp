@@ -94,7 +94,8 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 	double mutation[5];
 	double selection[5];
 	int codonCount[6];
-#ifndef __APPLE__
+#ifdef _OPENMP
+//#ifndef __APPLE__
 #pragma omp parallel for private(mutation, selection, codonCount) reduction(+:logLikelihood,logLikelihood_proposed)
 #endif
 	for (int i = 0; i < getGroupListSize(); i++)
@@ -166,7 +167,8 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 	Gene *gene;
 	SequenceSummary *seqsum;
 	unsigned aaIndex = SequenceSummary::AAToAAIndex(grouping);
-#ifndef __APPLE__
+#ifdef _OPENMP
+//#ifndef __APPLE__
 #pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed, codonCount, gene, seqsum) reduction(+:likelihood,likelihood_proposed)
 #endif
 	for (int i = 0; i < numGenes; i++)
@@ -235,7 +237,8 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 	else
 		logProbabilityRatio.resize(1);
 
-#ifndef __APPLE__
+#ifdef _OPENMP
+//#ifndef __APPLE__
 //#pragma omp parallel for reduction(+:lpr)
 #endif
 	for (int i = 0; i < genome.getGenomeSize(); i++)
@@ -261,7 +264,8 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 			double noiseOffset = getNoiseOffset(i, false);
 			double noiseOffset_proposed = getNoiseOffset(i, true);
 			double observedSynthesisNoise = getObservedSynthesisNoise(i);
-#ifndef __APPLE__
+#ifdef _OPENMP
+//#ifndef __APPLE__
 //#pragma omp parallel for reduction(+:lpr)
 #endif
 			for (int j = 0; j < genome.getGenomeSize(); j++)
