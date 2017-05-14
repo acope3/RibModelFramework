@@ -1,7 +1,7 @@
 Package: ribModel
 Type: Package
 Title: Analysis of Genomic Data under Stationarity
-Version: 0.0.4
+Version: 0.0.5
 Date: 2017-05-14
 Authors@R: c(person("Cedric", "Landerer", role = c("aut", "cre"), email
         = "cedric.landerer@gmail.com"), person("Gabriel", "Hanas", role
