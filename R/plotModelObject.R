@@ -50,11 +50,9 @@ plot.Rcpp_ROCModel <- function(x, genome = NULL, samples = 100, mixture = 1,
   
   # need expression values to know range
   num.genes <- length(genes.in.mixture)
-  
   expressionValues <- unlist(lapply(genes.in.mixture, function(geneIndex){
     parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(samples, geneIndex, expressionCategory)
     }))  
-
   expressionValues <- log10(expressionValues)
   genome <- genome$getGenomeForGeneIndices(genes.in.mixture, simulated)
   
@@ -112,9 +110,6 @@ plot.Rcpp_ROCModel <- function(x, genome = NULL, samples = 100, mixture = 1,
 #'
 #' @param mixture The mixture for which to graph values.
 #'
-#' @param estim.Expression A boolean value that says whether to use estimated expression
-#'  values or empirical values.   
-#'
 #' @param simulated A boolean value that determines whether to use the simulated genome.
 #'
 #' @param ... Optional, additional arguments.
@@ -130,7 +125,7 @@ plot.Rcpp_ROCModel <- function(x, genome = NULL, samples = 100, mixture = 1,
 #' initialization of the Parameter object.
 #'
 plot.Rcpp_FONSEModel <- function(x, genome, samples = 100, mixture = 1, 
-                               estim.Expression = TRUE, simulated = FALSE, ...)
+                               simulated = FALSE, ...)
 {
   opar <- par(no.readonly = T) 
   

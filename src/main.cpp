@@ -414,7 +414,7 @@ int main()
 	std::string modelToRun = "FONSE";
 	bool withPhi = false;
 
-	
+
 	std::cout << "Initializing MCMCAlgorithm object---------------" << std::endl;
 	int samples = 100;
 	int thinning = 10;

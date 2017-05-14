@@ -24,7 +24,7 @@
 #' 
 plot.Rcpp_ROCParameter <- function(x, what = "Mutation", samples = 100, mixture.name = NULL, with.ci = TRUE, ...)
 {
-  plotParameterObject(x, what = what, samples, ...)
+  plotParameterObject(x, what = what, samples= samples, mixture.name=mixture.name, with.ci=with.ci, ...)
 }
 
 
@@ -54,7 +54,7 @@ plot.Rcpp_ROCParameter <- function(x, what = "Mutation", samples = 100, mixture.
 #' 
 plot.Rcpp_FONSEParameter <- function(x, what = "Mutation", samples = 100, mixture.name = NULL, with.ci = TRUE, ...)
 {
-  plotParameterObject(x, what = what, samples, ...)
+  plotParameterObject(x, what = what, samples=samples,mixture.name = mixture.name, with.ci=with.ci, ...)
 }
 
 ### NOT EXPOSED
@@ -74,12 +74,9 @@ plotParameterObject <- function(x, what = "Mutation", samples = 100, mixture.nam
       if (aa == "M" || aa == "W" || aa == "X") next
       codons <- AAToCodon(aa, T)
       for (i in 1:length(codons)){
-        means[count,mixture] <- x$getCodonSpecificPosteriorMean(mixture, samples, codons[i], paramType, TRUE)
-        if (with.ci){
-          tmp <- x$getCodonSpecificQuantile(mixture, samples, codons[i], paramType, c(0.025, 0.975), TRUE)
-        } else{
-          tmp <- c(means[count,mixture],means[count,mixture])
-        }
+       means[count,mixture] <- x$getCodonSpecificPosteriorMean(mixture, samples, codons[i], paramType, TRUE)
+        tmp <- x$getCodonSpecificQuantile(mixture, samples, codons[i], paramType, c(0.025, 0.975), TRUE)
+        
         ## This approach to storing the quantiles may seem unconventional, but I actually found it to be the most straight forward approach
         ## for plotting later.
         sd.values[count,mixture] <- tmp[1]
@@ -115,13 +112,18 @@ plotParameterObject <- function(x, what = "Mutation", samples = 100, mixture.nam
                cex = 1.6, col = "black")
         }
       } else if(i<j){
-          plot(means[,j],means[,i],ann=FALSE)
-          upper.panel.plot(means[,j],means[,i],sd.x=cbind(sd.values[,j],sd.values[,j+numMixtures]),sd.y=cbind(sd.values[,i],sd.values[,i+numMixtures]))
-    
+          if(with.ci){
+            plot(means[,j],means[,i],ann=FALSE,xlim=range(cbind(sd.values[,j],sd.values[,j+numMixtures])),ylim=range(cbind(sd.values[,i],sd.values[,i+numMixtures])))
+            upper.panel.plot(means[,j],means[,i],sd.x=cbind(sd.values[,j],sd.values[,j+numMixtures]),sd.y=cbind(sd.values[,i],sd.values[,i+numMixtures]))
+          } else{
+            plot(means[,j],means[,i],ann=FALSE,xlim=range(means[,j]),ylim=range(means[,i]))
+            upper.panel.plot(means[,j],means[,i])
+          }
+        }
       }
     }
   }
-}
+
 
 
 
@@ -151,8 +153,19 @@ upper.panel.plot <- function(x, y, sd.x=NULL, sd.y=NULL, ...){
   b <- lm.line$coef[2]
   rho <- ifelse(b > 0, sqrt(R2), -sqrt(R2)) #make sure rho has correct sign
   
-  xlim <- range(x, na.rm = T)
-  ylim <- range(y, na.rm = T)
+
+  if(!is.null(sd.x))
+  {
+    xlim <- range(sd.x, na.rm = T)
+  }else{
+    xlim <- range(x,na.rm = T)
+  }
+  if(!is.null(sd.y))
+  {
+    ylim <- range(sd.y, na.rm = T)
+  }else{
+    ylim <- range(y,na.rm=T)
+  }
   
   width <- xlim[2] - xlim[1]
   height <- ylim[2] - ylim[1]
