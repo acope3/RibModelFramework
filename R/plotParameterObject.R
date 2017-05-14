@@ -164,19 +164,19 @@ upper.panel.plot <- function(x, y, sd.x=NULL, sd.y=NULL, ...){
   
   if(t > qt(1-(0.05/2), lm.line$df.residual - 1)){
     eq <- paste0("y = ", sprintf("%.3f", intercept), " + ", sprintf("%.3f", slope), "x *")
-    text(xlim[1] + width * 0.1, ylim[2] - height * 0.2, eq)
+    text(xlim[1] + width * 0.01, ylim[2] - height * 0.2, eq, pos = 4, cex = 1.5)
   }else{
     eq <- paste0("y = ", sprintf("%.3f", intercept), " + ", sprintf("%.3f", slope), "x")
-    text(xlim[1] + width * 0.1, ylim[2] - height * 0.2, eq)
+    text(xlim[1] + width * 0.01, ylim[2] - height * 0.2, eq, pos = 4, cex = 1.5)
   } 
   if(b > 0){
     text(xlim[2] - width * 0.04, ylim[1] + height * 0.05,
          parse(text = paste0("rho == ", sprintf("%.4f", rho))),
-         pos = 2, cex = 1.0, font = 2)
+         pos = 2, cex = 1.5, font = 2)
   }else{
     text(xlim[2] - width * 0.04, ylim[2] - height * 0.05,
          parse(text = paste0("rho == ", sprintf("%.4f", rho))),
-         pos = 2, cex = 1.0, font = 2)
+         pos = 2, cex = 1.5, font = 2)
   }
 }
 
