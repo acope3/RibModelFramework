@@ -58,7 +58,8 @@ void RFPModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 	double phiValue = parameter->getSynthesisRate(geneIndex, synthesisRateCategory, false);
 	double phiValue_proposed = parameter->getSynthesisRate(geneIndex, synthesisRateCategory, true);
 
-#ifndef __APPLE__
+#ifdef _OPENMP
+//#ifndef __APPLE__
 #pragma omp parallel for reduction(+:logLikelihood,logLikelihood_proposed)
 #endif
 	for (unsigned index = 0; index < getGroupListSize(); index++) //number of codons, without the stop codons
@@ -98,7 +99,8 @@ void RFPModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 	unsigned index = SequenceSummary::codonToIndex(grouping);
 
 
-#ifndef __APPLE__
+#ifdef _OPENMP
+//#ifndef __APPLE__
 #pragma omp parallel for private(gene) reduction(+:logLikelihood,logLikelihood_proposed)
 #endif
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
@@ -156,7 +158,8 @@ void RFPModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 
 
 	logProbabilityRatio.resize(1);
-#ifndef __APPLE__
+#ifdef _OPENMP
+//#ifndef __APPLE__
 #pragma omp parallel for reduction(+:lpr)
 #endif
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)

@@ -24,4 +24,3 @@ This function has no return value.
 \description{
 Plots a codon-specific set of traces, specified with the \code{type} parameter.
 }
-

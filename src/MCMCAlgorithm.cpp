@@ -16,7 +16,8 @@ using namespace Rcpp;
 
 
 //Open MP
-#ifndef __APPLE__
+#ifdef _OPENMP
+//#ifndef __APPLE__
 #include <omp.h>
 #include <thread>
 #endif
@@ -378,7 +379,8 @@ void MCMCAlgorithm::acceptRejectHyperParameter(Genome &genome, Model& model, uns
 */
 void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigned divergenceIterations)
 {
-#ifndef __APPLE__
+#ifdef _OPENMP
+//#ifndef __APPLE__
 	omp_set_num_threads(numCores);
 #endif
 

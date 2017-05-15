@@ -5,7 +5,7 @@
 \title{Plot Model Object}
 \usage{
 \method{plot}{Rcpp_FONSEModel}(x, genome, samples = 100, mixture = 1,
-  estim.Expression = TRUE, simulated = FALSE, ...)
+  simulated = FALSE, ...)
 }
 \arguments{
 \item{x}{An Rcpp model object initialized with \code{initializeModelObject}.}
@@ -15,9 +15,6 @@
 \item{samples}{The number of samples in the trace}
 
 \item{mixture}{The mixture for which to graph values.}
-
-\item{estim.Expression}{A boolean value that says whether to use estimated expression
-values or empirical values.}
 
 \item{simulated}{A boolean value that determines whether to use the simulated genome.}
 
@@ -35,4 +32,3 @@ using the initial.expression.values parameter found in initializeParameterObject
 Otherwise, the expression values plotted will just be SCUO values estimated upon
 initialization of the Parameter object.
 }
-

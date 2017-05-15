@@ -30,4 +30,3 @@ parameter <- loadParameterObject(c("path/to/rda/file.Rda", "path/to/rda/file2.Rd
 }
 
 }
-
