@@ -4,18 +4,16 @@
 \alias{initializeGenomeObject}
 \title{Genome Initialization}
 \usage{
-initializeGenomeObject(file, observed.expression.file = NULL,
-  append = FALSE, fasta = TRUE, match.expression.by.id = TRUE,
-  previous.genome = NULL)
+initializeGenomeObject(file, genome = NULL, observed.expression.file = NULL,
+  fasta = TRUE, match.expression.by.id = TRUE)
 }
 \arguments{
-\item{file}{A string containing the location of the input file.}
+\item{file}{A file of coding sequences in fasta or RFP format}
+
+\item{genome}{A genome object can be passed in to concatenate the input file to it (optional).}
 
 \item{observed.expression.file}{A string containing the location of a file containing
-empirical expression rates, if needed.}
-
-\item{append}{A boolean value that states whether the genes should be appended
-to the end of the genome}
+empirical expression rates (optional).}
 
 \item{fasta}{A boolean value which decides whether to initialize with a
 fasta file or an RFP value file. (TRUE for fasta, FALSE for RFP)}
@@ -24,9 +22,8 @@ fasta file or an RFP value file. (TRUE for fasta, FALSE for RFP)}
 If FALSE observed expression values will be assigned by order}
 }
 \value{
-This function returns the Genome Rcpp object created.
+This function returns the initialized Genome object.
 }
 \description{
 \code{initializeGenomeObject} initializes the Rcpp Genome object
 }
-

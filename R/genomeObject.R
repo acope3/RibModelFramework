@@ -2,27 +2,28 @@
 #' 
 #' \code{initializeGenomeObject} initializes the Rcpp Genome object
 #' 
-#' @param file A string containing the location of the input file.
+#' @param file A file of coding sequences in fasta or RFP format
+#' 
+#' @param genome A genome object can be passed in to concatenate the input file to it (optional).
+#' 
+#' @param observed.expression.file A string containing the location of a file containing
+#'  empirical expression rates (optional).
+#' 
 #' @param fasta A boolean value which decides whether to initialize with a
 #'  fasta file or an RFP value file. (TRUE for fasta, FALSE for RFP)
-#' @param observed.expression.file A string containing the location of a file containing
-#'  empirical expression rates, if needed.
-#' @param append A boolean value that states whether the genes should be appended
-#'  to the end of the genome
+#'  
 #' @param match.expression.by.id If TRUE (default) observed expression values will be assigned by matching sequence identifier.
 #' If FALSE observed expression values will be assigned by order
 #' 
-#' @return This function returns the Genome Rcpp object created.
+#' @return This function returns the initialized Genome object.
 #' 
-initializeGenomeObject <- function(file, observed.expression.file=NULL, append=FALSE, fasta=TRUE, match.expression.by.id=TRUE,previous.genome=NULL) {
-  if (is.null(previous.genome)){ 
+initializeGenomeObject <- function(file, genome=NULL, observed.expression.file=NULL, fasta=TRUE, match.expression.by.id=TRUE) {
+  if (is.null(genome)){ 
     genome <- new(Genome)
-  }else{
-    genome <- previous.genome
   }
-  #genome <- new(Genome, 1, "ROC", TRUE) #CT ONLY
+
   if (fasta == TRUE) {
-    genome$readFasta(file, append)
+    genome$readFasta(file, TRUE)
   } else {
     genome$readRFPFile(file)
   }
@@ -32,21 +33,19 @@ initializeGenomeObject <- function(file, observed.expression.file=NULL, append=F
   return(genome)
 }
 
+
 #' Get Codon Counts For Each Amino Acid 
+#' 
 #' @param genome A genome object from which the counts of each
 #' codon can be obtained.
 #'  
 #' @param aa A one character representation of an amino acid.
 #' 
-#' @return codonCounts Returns a matrix storing the codonCounts. 
+#' @return Returns a matrix storing the codonCounts for the given amino acid. 
 #' 
-#' @description \code{getCodonCountsForAA} returns a matrix filled with 
-#' the number of times a codon is seen in each gene.
+#' @description provides the codon counts for a fiven amino acid across all genes
 #' 
-#' @details The returned matrix will have the row correspond to the
-#' genes in the genome and the columns correspond to the codons for the 
-#' given aa. The values will the number of times the codon is present in 
-#' that gene.
+#' @details The returned matrix containes a row for each gene and a coloumn for each codon.
 #' 
 getCodonCountsForAA <- function(genome, aa){
   # get codon count for aa
@@ -93,12 +92,13 @@ summary.Rcpp_Genome <- function(object, ...) {
 
 #' Gene Names of Genome
 #' 
-#' \code{getNames} prints the names of the genes within the genome specified.
 #' 
 #' @param genome A genome object initialized with \code{\link{initializeGenomeObject}}.
 #' 
 #' @param simulated A logical value denoting if the gene names to be listed are simulated or not.
 #' The default value is FALSE.
+#' 
+#' @description returns the identifiers of the genes within the genome specified.
 #' 
 #' @return gene.names Returns the names of the genes as a vector of strings.
 #' 
@@ -109,6 +109,39 @@ getNames <- function(genome, simulated = FALSE)
   return(gene.names)
 }
 
+
+#' Add gene observed synthesis rates
+#' 
+#' \code{addObservedSynthesisRateSet} returns the observed synthesis rates of the genes within the genome specified.
+#' 
+#' @param genome A genome object initialized with \code{\link{initializeGenomeObject}} to add observed expression data.
+#' 
+#' @param observed.expression.file A string containing the location of a file containing
+#'  empirical expression rates (optional).
+#' 
+#' @param match.expression.by.id If TRUE (default) observed expression values will be assigned by matching sequence identifier.
+#' If FALSE observed expression values will be assigned by order
+#' 
+#' @return gene.names Returns the names of the genes as a vector of strings.
+#' 
+addObservedSynthesisRateSet <- function(genome, observed.expression.file, match.expression.by.id=TRUE)
+{
+  genome$readObservedPhiValues(observed.expression.file, match.expression.by.id)
+  return(genome)
+}
+
+
+#' Get gene observed synthesis rates
+#' 
+#' \code{getObservedSynthesisRateSet} returns the observed synthesis rates of the genes within the genome specified.
+#' 
+#' @param genome A genome object initialized with \code{\link{initializeGenomeObject}}.
+#' 
+#' @param simulated A logical value denoting if the synthesis rates to be listed are simulated or not.
+#' The default value is FALSE.
+#' 
+#' @return gene.names Returns the names of the genes as a vector of strings.
+#' 
 getObservedSynthesisRateSet <- function(genome, simulated = FALSE)
 {
   genes <- genome$getGenes(simulated)

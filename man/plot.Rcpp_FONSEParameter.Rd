@@ -2,18 +2,24 @@
 % Please edit documentation in R/plotParameterObject.R
 \name{plot.Rcpp_FONSEParameter}
 \alias{plot.Rcpp_FONSEParameter}
-\title{Plot FONSE Parameter}
+\title{Plot Parameter}
 \usage{
-\method{plot}{Rcpp_FONSEParameter}(x, what = "Mutation", samples = 100, ...)
+\method{plot}{Rcpp_FONSEParameter}(x, what = "Mutation", samples = 100,
+  mixture.name = NULL, with.ci = TRUE, ...)
 }
 \arguments{
-\item{x}{FONSE parameter object.}
+\item{x}{A parameter object}
 
-\item{what}{Which aspect of the FONSE parameter to plot. Default value is
+\item{what}{Which aspect of the parameter to plot. Default value is
 "Mutation".}
 
 \item{samples}{Number of samples to plot using the posterior mean. Default
 value is 100.}
+
+\item{mixture.name}{a vector with names/descriptions of the mixture distributions in the parameter object}
+
+\item{with.ci}{Plot with or without confidence intervals. Default value
+is TRUE}
 
 \item{...}{Arguments to be passed to methods, such as graphical parameters.}
 }
@@ -21,10 +27,9 @@ value is 100.}
 This function has no return value.
 }
 \description{
-\code{plot} graphs the mutation or selection parameter for a FONSE
+\code{plot} graphs the mutation or selection parameter for a ROC or FONSE
 parameter object for each mixture element.
 }
 \details{
 Graphs are based off the last # samples for the posterior mean.
 }
-

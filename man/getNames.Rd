@@ -16,6 +16,5 @@ The default value is FALSE.}
 gene.names Returns the names of the genes as a vector of strings.
 }
 \description{
-\code{getNames} prints the names of the genes within the genome specified.
+returns the identifiers of the genes within the genome specified.
 }
-

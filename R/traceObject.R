@@ -1,36 +1,14 @@
 
+
+
+#### TODO, lets move it into parameterObject.R and use a parameter instead of trace. thats how it is done for the acf function
+
+# see mcmc Object.R convergence.test function for documentation
 convergence.test.Rcpp_Trace <- function(object, n.samples = 10, frac1 = 0.1, 
-                                           frac2 = 0.5, thin = 1, plot = FALSE, ...)
+                                           frac2 = 0.5, thin = 1, plot = FALSE, what = "Mutation", mixture = 1)
 {
-  # TODO: extend to work with multiple chains once we have that capability.
   current.trace <- 0
-  
-  input_list <- as.list(list(...))
-  
-  if("what" %in% names(input_list)){
-    what <- input_list$what
-    input_list$what <- NULL
-  }else{
-    what <- "Mutation"
-    warning("No trace (what) specified, using default argument (Mutation) for convergence check\n
-            valis options for \"what\" are:\n
-            - Mutation\n
-            - Selection\n
-            - MixtureProbability\n
-            - Sphi\n
-            - Mphi\n
-            - ExpectedPhi\n")
-  }
-  if("mixture" %in% names(input_list)){
-    mixture <- input_list$mixture
-    input_list$mixture <- NULL
-  }else{
-    mixture <- 1
-    warning("Argument \"mixture\" not defined, default mixture (1) used.\n")
-  }  
-  
-  
-  
+
   if(what[1] == "Mutation" || what[1] == "Selection")
   {
     names.aa <- aminoAcids()

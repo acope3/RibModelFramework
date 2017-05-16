@@ -7,23 +7,23 @@
 writeParameterObject(parameter, file)
 }
 \arguments{
-\item{parameter}{A Parameter object that corresponds to one of the model types.
-Valid values are "ROC", "RFP", and "FONSE".}
+\item{parameter}{parameter on object created by \code{initializeParameterObject}.}
 
-\item{file}{A filename that where the data will be stored.
-The file should end with the extension "Rdat".}
+\item{file}{A filename that where the data will be stored.}
 }
 \value{
 This function has no return value.
 }
 \description{
-\code{writeParameterObject} will call the appropriate followup
-call to writeXXXParameterObject based off of the parameter type 
-given.
+\code{writeParameterObject} will write the parameter object as binary to the filesystem
 }
 \details{
-For example, if a ROCParameter is passed, the the writeParameterObject
-for the ROCParameter will be called. This allows us to not have an if-else
-block in the code - making use of the how R handles these situations.
+As Rcpp object are not serializable with the default R \code{save} function, 
+therefore this custom save function is provided (see \link{loadParameterObject}).
+}
+\examples{
+\dontrun{
+writeParameterObject(parameter, "file.Rda")
 }
 
+}

@@ -50,11 +50,9 @@ plot.Rcpp_ROCModel <- function(x, genome = NULL, samples = 100, mixture = 1,
   
   # need expression values to know range
   num.genes <- length(genes.in.mixture)
-  
   expressionValues <- unlist(lapply(genes.in.mixture, function(geneIndex){
     parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(samples, geneIndex, expressionCategory)
     }))  
-
   expressionValues <- log10(expressionValues)
   genome <- genome$getGenomeForGeneIndices(genes.in.mixture, simulated)
   
@@ -112,9 +110,6 @@ plot.Rcpp_ROCModel <- function(x, genome = NULL, samples = 100, mixture = 1,
 #'
 #' @param mixture The mixture for which to graph values.
 #'
-#' @param estim.Expression A boolean value that says whether to use estimated expression
-#'  values or empirical values.   
-#'
 #' @param simulated A boolean value that determines whether to use the simulated genome.
 #'
 #' @param ... Optional, additional arguments.
@@ -122,10 +117,15 @@ plot.Rcpp_ROCModel <- function(x, genome = NULL, samples = 100, mixture = 1,
 #'  
 #' @return This function has no return value.
 #'
-#' @description See \code{plot.Rcpp_ROCModel}
+#' @description Plots traces from the model object such as synthesis rates for each gene.
+#' Will work regardless of whether or not expression/synthesis rate levels are being
+#' estimated. If you wish to plot observed/empirical values, these values MUST be set
+#' using the initial.expression.values parameter found in initializeParameterObject.
+#' Otherwise, the expression values plotted will just be SCUO values estimated upon
+#' initialization of the Parameter object.
 #'
 plot.Rcpp_FONSEModel <- function(x, genome, samples = 100, mixture = 1, 
-                               estim.Expression = TRUE, simulated = FALSE, ...)
+                               simulated = FALSE, ...)
 {
   opar <- par(no.readonly = T) 
   

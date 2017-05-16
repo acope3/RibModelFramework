@@ -1,13 +1,13 @@
 #' Initialize MCMC 
 #' 
-#' @param samples Number of samples that should be produced when running the 
+#' @param samples Number of samples to be produced when running the 
 #' MCMC algorithm. No default value.
 #' 
-#' @param thinning Number that the samples should be thinned by. If set to 
-#' 1, every step would be saved as a sample. Default value is 1.
+#' @param thinning The thinning interval between consecutive observations. If set to 
+#' 1, every step will be saved as a sample. Default value is 1.
 #' 
 #' @param adaptive.width Number that determines how often the acceptance/rejection
-#' window should be altered. Default value is 100.
+#' window should be altered. Default value is 100 samples.
 #' 
 #' @param est.expression Boolean that tells whether or not synthesis rate values
 #' should be estimated in the MCMC algorithm run. Default value is TRUE.
@@ -68,6 +68,25 @@ initializeMCMCObject <- function(samples, thinning=1, adaptive.width=100,
 #' thinning given when the mcmc object is initialized. Updates are provided every 100
 #' steps, and the state of the chain is saved every thinning steps.
 #' 
+#' @examples 
+#' \dontrun{
+#' #fitting a model to a genome using the runMCMC function
+#' 
+#' genome <- initializeGenomeObject(file = "genome.fasta")
+#' sphi_init <- c(1,1)
+#' numMixtures <- 2
+#' geneAssignment <- sample(1:2, length(genome) # random gene assignment to mixtures
+#' parameter <- initializeParameterObject(genome, sphi_init, 
+#'	numMixtures, geneAssignment, "allUnique")
+#' samples <- 2500
+#' thinning <- 50
+#' adaptiveWidth <- 25
+#' mcmc <- initializeMCMCObject(samples, thinning, adaptive.width=adaptiveWidth, 
+#'                              est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE, est.mix = TRUE) 
+#' divergence.iteration <- 10
+#' runMCMC(mcmc, genome, model, 4, divergence.iteration)
+#' }
+#' 
 runMCMC <- function(mcmc, genome, model, ncores = 1, divergence.iteration = 0){
   if(class(mcmc) != "Rcpp_MCMCAlgorithm") stop("mcmc is not of class Rcpp_Algorithm")
   mcmc$run(genome, model, ncores, divergence.iteration)
@@ -110,15 +129,18 @@ setRestartSettings <- function(mcmc, filename, samples, write.multiple=TRUE){
 #' 
 #' @param n.samples number of samples at the end of the trace used to determine convergence (< length of trace)
 #' 
-#' @param frac1 TODO
+#' @param frac1 fraction to use from beginning of chain
 #' 
-#' @param frac2 TODO
+#' @param frac2 fraction to use from end of chain
 #' 
-#' @param thin TODO
+#' @param thin the thinning interval between consecutive observations
 #' 
 #' @param plot (logical) plot result instead of returning an object
 #' 
-#' @param ... TODO describe what and mixture parameter
+#' @param what Character describing which trace should be tested for convergence (only for trace object). Valid options are
+#' Mutation, Selection, MixtureProbability, Sphi, Mphi, ExpectedPhi, or Expression
+#' 
+#' @param mixture Integer determining for which mixture disribution the convergence test should be applied (only for trace object).
 #' 
 #' @return geweke score object
 #' 
@@ -127,13 +149,13 @@ setRestartSettings <- function(mcmc, filename, samples, write.multiple=TRUE){
 #' @details \code{convergence.test}
 #' 
 convergence.test <- function(object, n.samples = 10, frac1 = 0.1, frac2 = 0.5, 
-                    thin = 1, plot = FALSE, ...){
+                    thin = 1, plot = FALSE, what = "Mutation", mixture = 1){
   UseMethod("convergence.test", object)
 }
 
 
 convergence.test.Rcpp_MCMCAlgorithm <- function(object, n.samples = 10, frac1 = 0.1, 
-                                       frac2 = 0.5, thin = 1, plot = FALSE, ...){
+                                       frac2 = 0.5, thin = 1, plot = FALSE, what = "Mutation", mixture = 1){
   # TODO: extend to work with multiple chains once we have that capability.
   
   loglik.trace <- object$getLogPosteriorTrace()
@@ -144,7 +166,7 @@ convergence.test.Rcpp_MCMCAlgorithm <- function(object, n.samples = 10, frac1 = 
   mcmcobj <- coda::mcmc(data=loglik.trace[start:trace.length], thin = thin)
   diag <- coda::geweke.diag(mcmcobj, frac1=frac1, frac2=frac2)
   if(plot){ 
-    coda::geweke.plot(mcmcobj, frac1=frac1, frac2=frac2, ...)
+    coda::geweke.plot(mcmcobj, frac1=frac1, frac2=frac2)
   }else{
     return(diag)
   }

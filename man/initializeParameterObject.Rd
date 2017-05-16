@@ -31,10 +31,10 @@ The default Value is NULL.}
 The length of the vector has to equal the number of genes in the Genome object.
 The default value is NULL.}
 
-\item{model}{Specifies the model used. Valid options are "ROC", "RFP", or "FONSE".
+\item{model}{Specifies the model used. Valid options are "ROC", "RFP", "PANSE", or "FONSE".
 The default model is "ROC".
 ROC is described in Gilchrist et al. 2015.
-RFP and FONSE are currently unpublished.}
+RFP, PANSE and FONSE are currently unpublished.}
 
 \item{split.serine}{Whether serine should be considered as 
 one or two amino acids when running the model.
@@ -64,49 +64,29 @@ prior on the mutation parameters}
 
 \item{init.csp.variance}{specifies the initial proposal width for codon specific parameter (default is 0.0025). 
 The proposal width adapts during the runtime to reach a taget acceptance rate of ~0.25}
+
+\item{init.sepsilon}{specifies the initial value for sepsilon. default is 0.1}
 }
 \value{
 parameter Returns an initialized Parameter object.
 }
 \description{
-\code{initializeParameterObject} will call the appropriate followup
-call to writeXXXParameterObject based off of the value of model and init.with.restart.file.
+\code{initializeParameterObject} initializes a new parameter object or reconstructs one from a restart file
 }
 \details{
 \code{initializeParameterObject} checks the values of the arguments 
 given to insure the values are valid.
-Additionally, if a restart file is given, no follow up function calls are made - 
-a new call is made instead which calls the C++ constructor that only takes a file name.
 
-The mixture definition and mixture definition matrix describe how the mutation
+The mixture definition and mixture definition matrix describes how the mutation
 and selection categories are set up with respect to the number of mixtures. For
 example, if mixture.definition = "allUnique" and numMixtures = 3, a matrix
-representation would be as follows:
-
-1 1
-
-2 2
-
-3 3
-
+representation would be \code{matrix(c(1,2,3,1,2,3), ncol=2)}
 where each row represents a mixture, the first column represents the mutation
 category, and the second column represents the selection category.
-Another example would be mixture.definition = "selectionShared" and numMixtures = 4.
-
-1 1
-
-2 1
-
-3 1
-
-4 1
-
+Another example would be mixture.definition = "selectionShared" and numMixtures = 4 (
+\code{matrix(c(1,2,3, 4,1,1,1,1), ncol=2)}).
 In this case, the selection category is the same for every mixture. If a matrix
 is given, and it is valid, then the mutation/selection relationship will be
-defined by the given matrix as opposed to the keyword. A matrix should only
-be given in cases where the keywords would not create the desired valid matrix.
-
-If expressionValues is given, then the phi values will be initialized with 
-them. If not, we calculate starting phi values by doing an SCUO caculation.
+defined by the given matrix and the keyword will be ignored. A matrix should only
+be given in cases where the keywords would not create the desired matrix.
 }
-

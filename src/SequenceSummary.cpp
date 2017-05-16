@@ -830,10 +830,10 @@ RCPP_MODULE(SequenceSummary_mod)
 	class_<SequenceSummary>( "SequenceSummary" );
 
 		//Static Functions:
-		Rcpp::function("AAToCodon", &SequenceSummary::AAToCodon, List::create(_["aa"], _["forParamVector"] = false),
+		Rcpp::function("AAToCodon", &SequenceSummary::AAToCodon, List::create(_["aa"], _["focal"] = false),
 				"returns a vector of codons for a given amino acid"); //Used, but will move into Codon Table
 
-		Rcpp::function("codonToAA", &SequenceSummary::codonToAA, "returns an amino acid string for a given codon string");
+		Rcpp::function("codonToAA", &SequenceSummary::codonToAA, List::create(_["codon"]), "returns an amino acid string for a given codon string");
 		// Note: Unlike AAToCodon, this function works with individual components rather than an entire vector
 
 		Rcpp::function("aminoAcids", &SequenceSummary::aminoAcids, "returns all Amino Acids as one letter code");

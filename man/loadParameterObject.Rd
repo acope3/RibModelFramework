@@ -7,20 +7,27 @@
 loadParameterObject(files)
 }
 \arguments{
-\item{files}{A list of parameter filenames to be loaded. If multiple files are given, 
+\item{files}{A list of parameter filenames to be loaded. If multiple files are given,
 the parameter objects will be concatenated in the order provided}
 }
 \value{
-parameter Returns an initialized Parameter object depending on the parameter type given.
+Returns an initialized Parameter object.
 }
 \description{
-\code{loadParameterObject} will call the appropriate followup
-call to loadXXXParameterObject based off of the parameter type 
-given.
+\code{loadParameterObject} will load a parameter object from the filesystem
 }
 \details{
-For example, if a ROCParameter is passed, the the loadParameterObject
-for the ROCParameter will be called. This allows us to not have an if-else
-block in the code - making use of the how R handles these situations.
+The function loads one or multiple files. In the case of multiple file, e.g. due to the use of check pointing, the files will
+be concatenated to one parameter object. See \link{writeParameterObject} for the writing of parameter objects
+}
+\examples{
+\dontrun{
+# load a single parameter object
+parameter <- loadParameterObject("path/to/rda/file.Rda")
+
+# load and concatenate multiple parameter object
+parameter <- loadParameterObject(c("path/to/rda/file.Rda", "path/to/rda/file2.Rda"))
+}
+
 }
 

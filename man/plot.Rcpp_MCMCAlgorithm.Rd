@@ -4,11 +4,14 @@
 \alias{plot.Rcpp_MCMCAlgorithm}
 \title{Plot MCMC algorithm}
 \usage{
-\method{plot}{Rcpp_MCMCAlgorithm}(x, what = c("LogPosterior",
-  "LogLikelihood"), zoom.window = NULL, ...)
+\method{plot}{Rcpp_MCMCAlgorithm}(x, what = "LogPosterior",
+  zoom.window = NULL, ...)
 }
 \arguments{
 \item{x}{An Rcpp_MCMC object initialized with \code{initializeMCMCObject}.}
+
+\item{what}{character defining if log(Posterior) (Default) or log(Likelihood) 
+options are: LogPosterior or logLikelihood}
 
 \item{zoom.window}{A vector describing the start and end of the zoom window.}
 

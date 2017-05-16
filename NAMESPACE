@@ -1,5 +1,5 @@
 #loading
-useDynLib(ribModel)
+useDynLib(ribModel, .registration = TRUE)
 
 #imports
 importFrom(methods, new)
@@ -13,6 +13,7 @@ importFrom(utils, write.csv)
 
 S3method(length, Rcpp_Genome)
 S3method(summary, Rcpp_Genome)
+S3method(getCSPEstimates, Rcpp_Parameter)
 S3method(writeParameterObject, Rcpp_ROCParameter)
 S3method(writeParameterObject, Rcpp_RFPParameter)
 S3method(writeParameterObject, Rcpp_FONSEParameter)
@@ -67,8 +68,8 @@ export(
 "codons",
 
 ##
-"mcmcACF",
-"cspACF"
+"acfMCMC",
+"acfCSP"
 
 )
 
