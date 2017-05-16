@@ -441,19 +441,18 @@ void Genome::writePAFile(std::string filename, bool simulated)
 			std::vector <unsigned> positionCodonID = currentGene->geneData.getPositionCodonID();
 			unsigned numPositions = (unsigned)positionCodonID.size();
 
-			my_print("%\n", numPositions);
-
 			for (unsigned position = 0; position < numPositions; position++)
 			{
 				unsigned codonID = positionCodonID[position];
 				std::string codon = SequenceSummary::codonArray[codonID];
 
-				Fout << currentGene->getId() << "," << position << "," << codon;
+				// Print position + 1 because it's externally one-indexed
+				Fout << currentGene->getId() << "," << position + 1 << "," << codon;
 
 				for (unsigned category = 0; category < numCategories; category++)
-				{
+                {
 					Fout << ",";
-					Fout << currentGene->geneData.getRFPValue(codonID, category);
+					Fout << currentGene->geneData.getSingleRFPCount(category, position);
 				}
 
 				Fout << "\n";
