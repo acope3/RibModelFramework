@@ -34,3 +34,4 @@ getMixtureAssignmentEstimate(parameter, 5:100, 1000)
 getMixtureAssignmentEstimate(parameter, c(10, 30:50, 3, 90), 1000)
 }
 }
+

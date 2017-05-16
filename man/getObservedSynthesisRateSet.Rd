@@ -18,3 +18,4 @@ gene.names Returns the names of the genes as a vector of strings.
 \description{
 \code{getObservedSynthesisRateSet} returns the observed synthesis rates of the genes within the genome specified.
 }
+

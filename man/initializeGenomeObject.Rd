@@ -27,3 +27,4 @@ This function returns the initialized Genome object.
 \description{
 \code{initializeGenomeObject} initializes the Rcpp Genome object
 }
+
