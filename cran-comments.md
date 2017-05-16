@@ -19,9 +19,16 @@ There was 1 NOTE:
 
 On Windows
 
+* checking CRAN incoming feasibility ... NOTE
+  Maintainer: 'Cedric Landerer <cedric.landerer@gmail.com>'
 
+  New submission
 
+  Possibly mis-spelled words in DESCRIPTION:
+    Genomic (3:20)
+    Stationarity (3:39)
 
+  Words are correclty spelled and Maintainer is Cedric Landerer
 
 ## Downstream dependencies
 There are no downstream depencies as this is a first submission.

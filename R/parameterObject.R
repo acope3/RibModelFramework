@@ -268,7 +268,7 @@ getCSPEstimates.Rcpp_Parameter <- function(parameter, filename=NULL, CSP="Mutati
   Amino_Acid <- c()
   Value <- c()
   Codon <- c()
-  Std_Deviation <- vector("list")
+  quantile_list <- vector("list")
   
   if (class(parameter) == "Rcpp_ROCParameter" || class(parameter) == "Rcpp_FONSEParameter"){
     names.aa <- aminoAcids()
@@ -283,14 +283,14 @@ getCSPEstimates.Rcpp_Parameter <- function(parameter, filename=NULL, CSP="Mutati
       
         if(CSP == "Mutation"){
           Value <- c(Value, parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 0, TRUE))
-          Std_Deviation <- c(Std_Deviation, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 0, c(0.025, 0.975), TRUE))
+          quantile_list <- c(quantile_list, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 0, c(0.025, 0.975), TRUE))
         }
         else if(CSP == "Selection"){
           Value <- c(Value, parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 1, TRUE))
-          Std_Deviation <- c(Std_Deviation, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 1, c(0.025, 0.975), TRUE))
+          quantile_list <- c(quantile_list, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 1, c(0.025, 0.975), TRUE))
         }
         else {
-          stop("Unknown CSP type given")
+          stop("Unknown parameter type given with argument: CSP")
         }
       }
     }
@@ -305,23 +305,23 @@ getCSPEstimates.Rcpp_Parameter <- function(parameter, filename=NULL, CSP="Mutati
        
       if(CSP == "Alpha"){
         Value <- c(Value, parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 0, FALSE))
-        Std_Deviation <- c(Std_Deviation, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 0, c(0.025, 0.975), FALSE))
+        quantile_list <- c(quantile_list, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 0, c(0.025, 0.975), FALSE))
         }
       else if(CSP == "Lambda Prime"){
         Value <- c(Value, parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 1, FALSE))
-        Std_Deviation <- c(Std_Deviation, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 1, c(0.025, 0.975), FALSE))
+        quantile_list <- c(quantile_list, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 1, c(0.025, 0.975), FALSE))
       }
       else {
-        stop("Unknown CSP type given")
+        stop("Unknown parameter type given with argument: CSP")
       }
     }
   }
   else{
-    stop("Unknown Parameter type given")
+    stop("Unknown object provided with argument: parameter")
   }
 
-  Std_Deviation <- matrix(unlist(Std_Deviation), nrow = 2)
-  data <- data.frame(Amino_Acid, Codon, Value, Lower=Std_Deviation[1,], Upper=Std_Deviation[2,])
+  quantile_list <- matrix(unlist(quantile_list), nrow = 2)
+  data <- data.frame(Amino_Acid, Codon, Value, Lower=quantile_list[1,], Upper=quantile_list[2,])
   colnames(data) <- c("AA", "Codon", "Posterior", "0.025%", "0.975%")
   if(is.null(filename))
   {
@@ -557,7 +557,15 @@ getExpressionEstimatesForMixture <- function(parameter, gene.index, mixtureAssig
     expressionCategory <- parameter$getSynthesisRateCategoryForMixture(mixtureAssignment[geneIndex]) 
     parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(samples, geneIndex, expressionCategory) 
   }))
-  return(expressionValues)
+  
+  expressionStdErr <- sqrt(unlist(lapply(gene.index, function(geneIndex){ 
+    expressionCategory <- parameter$getSynthesisRateCategoryForMixture(mixtureAssignment[geneIndex]) 
+    parameter$getSynthesisRateVarianceByMixtureElementForGene(samples, geneIndex, expressionCategory) 
+  }))) / samples
+  
+  expr.mat <- cbind(expressionValues, expressionStdErr)
+  colnames(expr.mat) <- c("PHI", "Std_Error")
+  return(expr.mat)
 }
 
 #' Write Parameter Object to a File
