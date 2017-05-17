@@ -21,10 +21,11 @@ class Genome
 {
 	private:
 
-		std::vector<Gene> genes;
-		std::vector<Gene> simulatedGenes;
+		std::vector <Gene> genes;
+		std::vector <Gene> simulatedGenes;
 		std::vector <unsigned> numGenesWithPhi; //Number of phi sets is vector size, value is number of genes
 												//with a phi value for that set. Values should currently be equal.
+        std::vector<std::string> RFPCategoryNames;
 
 	public:
 
@@ -38,11 +39,10 @@ class Genome
 		//File I/O Functions:
 		void readFasta(std::string filename, bool Append = false);
 		void writeFasta(std::string filename, bool simulated = false);
-		void readRFPFile(std::string filename);
-		void writeRFPFile(std::string filename, bool simulated = false);
+		void readRFPFile(std::string filename); //TODO: Remove
+		void writeRFPFile(std::string filename, bool simulated = false); //TODO: Remove
 		void readPAFile(std::string filename, bool Append = false);
-		void writePAFile(std::string filename, bool simulated = false);
-		//TODO: Add writePAFile function
+		void writePAFile(std::string filename, bool simulated = false); //TODO: Complete
 		void readObservedPhiValues(std::string filename, bool byId = true);
 
 
@@ -58,8 +58,9 @@ class Genome
 		unsigned getGenomeSize(bool simulated = false);
 		void clear();
 		Genome getGenomeForGeneIndices(std::vector <unsigned> indices, bool simulated = false);
-		std::vector<unsigned> getCodonCountsPerGene(std::string codon);
-
+		std::vector <unsigned> getCodonCountsPerGene(std::string codon);
+        std::vector <std::string> getRFPCategoryNames();
+		void addRFPCategoryName(std::string categoryName);
 
 		//Testing Functions:
 		std::vector <unsigned> getNumGenesWithPhi();

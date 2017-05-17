@@ -27,3 +27,4 @@ This function has no return value.
 \description{
 Plots different traces, specified with the \code{what} parameter.
 }
+

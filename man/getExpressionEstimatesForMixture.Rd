@@ -36,3 +36,4 @@ mix.assign <- getMixtureAssignmentEstimate(parameter, 1:length(genome), 1000)
 getExpressionEstimatesForMixture(parameter, 1:length(genome), mix.assign, 1000)
 }
 }
+

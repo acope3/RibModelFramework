@@ -834,9 +834,9 @@ int testSequenceSummary()
     else
         error = 0; //Reset for next function.
 
-    //--------------------------------------------//
-    //------ init/get/setRFPCount Functions ------//
-    //--------------------------------------------//
+    //----------------------------------------------------------------//
+    //------ init/get/setRFPCount / getSingleRFPCount Functions ------//
+    //----------------------------------------------------------------//
     SS.initRFPCount(1);
     std::vector <unsigned> tmp2 = SS.getRFPCount(0);
 
@@ -866,8 +866,20 @@ int testSequenceSummary()
         globalError = 1;
     }
 
+    for (unsigned i = 0; i < 5; i++)
+    {
+        unsigned tmp3 = SS.getSingleRFPCount(0, i);
+        if (tmp2[i] != tmp3)
+        {
+            my_printError("Error in initRFPCount, getSingleRFPCount or setRFPCount.\n");
+            my_printError("Function should return %, but returns %\n", tmp2[i], tmp3);
+            error = 1;
+            globalError = 1;
+        }
+    }
+
     if (!error)
-        my_print("Sequence Summary init/get/setRFPCount --- Pass\n");
+        my_print("Sequence Summary init/get/setRFPCount / getSingleRFPCount --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -914,6 +926,42 @@ int testSequenceSummary()
 
     if (!error)
         my_print("Sequence Summary init/get/setSumRFPCount --- Pass\n");
+    else
+        error = 0; //Reset for next function.
+
+    //----------------------------------------------//
+    //------ get/setPositionCodonID Functions ------//
+    //----------------------------------------------//
+    tmp2 = SS.getPositionCodonID();
+
+    if (0 != tmp2.size())
+    {
+        my_printError("Error with getPositionCodonID. Function should return an empty vector but returns:\n");
+        for (unsigned i = 0; i < tmp2.size(); i++)
+        {
+            my_printError("%\n", tmp2[i]);
+        }
+        error = 1;
+        globalError = 1;
+    }
+
+    tmp2 = {4, 7, 16, 32};
+    SS.setPositionCodonID(tmp2);
+
+    if (SS.getPositionCodonID() != tmp2)
+    {
+        my_printError("Error in getPositionCodonID or setPositionCodonID.\n");
+        my_printError("Function should return 4, 7, 16, 32, but returns:\n");
+        for (unsigned i = 0; i < tmp2.size(); i++)
+        {
+            my_printError("%\n", tmp2[i]);
+        }
+        error = 1;
+        globalError = 1;
+    }
+
+    if (!error)
+        my_print("Sequence Summary get/setPositionCodonID --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -1419,17 +1467,108 @@ int testGene()
 }
 
 
+/* testGenomePAHelper (NOT EXPOSED)
+ * Arguments: The genome to add hard-coded PA-formatted genes into, a boolean signifying if genes are simulated or not
+ * Creates and adds the hard-coded PA-formatted genes (simulated or not) into the genome specified by the argument
+ * Used in testGenome for convenience.
+ */
+void testGenomePAHelper(Genome* genome, bool simulated)
+{
+    // All values here are derived from readPAMulti.pa's hardcoded values.
+
+    Gene panse1("CTTGCTATTTTTTTT", "TEST001", "No description for PANSE Model");
+    Gene panse2("CCTGTAATTTGGTGG", "TEST002", "No description for PANSE Model");
+
+    // RFPCount for TEST001: value[position] = RFPCount
+    std::vector <unsigned> test1Cat1 = {0, 0, 2, 0, 1};
+    std::vector <unsigned> test1Cat2 = {0, 17, 0, 1, 4};
+
+    // RFPCount for TEST002: value[position] = RFPCount
+    std::vector <unsigned> test2Cat1 = {1, 1, 0, 0, 1};
+    std::vector <unsigned> test2Cat2 = {2, 0, 2, 3, 6};
+
+    std::string codon;
+    unsigned index1, index2, index3, index4, index5, index6, index7;
+
+    // sumRFPCount for TEST001
+    std::array <unsigned, 64> sumTest1Cat1;
+    std::array <unsigned, 64> sumTest1Cat2;
+    sumTest1Cat1.fill(0);
+    sumTest1Cat2.fill(0);
+
+    // sumRFPCount for TEST002
+    std::array <unsigned, 64> sumTest2Cat1;
+    std::array <unsigned, 64> sumTest2Cat2;
+    sumTest2Cat1.fill(0);
+    sumTest2Cat2.fill(0);
+
+    codon = "CTT";
+    index1 = SequenceSummary::codonToIndex(codon);
+
+    codon = "GCT";
+    index2 = SequenceSummary::codonToIndex(codon);
+    sumTest1Cat2[index2] = 17;
+
+    codon = "ATT";
+    index3 = SequenceSummary::codonToIndex(codon);
+    sumTest1Cat1[index3] = 2;
+    sumTest2Cat2[index3] = 2;
+
+    codon = "TTT";
+    index4 = SequenceSummary::codonToIndex(codon);
+    sumTest1Cat1[index4] = 1;
+    sumTest1Cat2[index4] = 5;
+
+    codon = "CCT";
+    index5 = SequenceSummary::codonToIndex(codon);
+    sumTest2Cat1[index5] = 1;
+    sumTest2Cat2[index5] = 2;
+
+    codon = "GTA";
+    index6 = SequenceSummary::codonToIndex(codon);
+    sumTest2Cat1[index6] = 1;
+
+    codon = "TGG";
+    index7 = SequenceSummary::codonToIndex(codon);
+    sumTest2Cat1[index7] = 1;
+    sumTest2Cat2[index7] = 9;
+
+    panse1.geneData.setPositionCodonID({index1, index2, index3, index4, index4});
+    panse2.geneData.setPositionCodonID({index5, index6, index3, index7, index7});
+
+    panse1.initRFPCount(2);
+    panse2.initRFPCount(2);
+
+    panse1.initSumRFPCount(2);
+    panse2.initSumRFPCount(2);
+
+    panse1.setRFPCount(0, test1Cat1);
+    panse1.setRFPCount(1, test1Cat2);
+    panse2.setRFPCount(0, test2Cat1);
+    panse2.setRFPCount(1, test2Cat2);
+
+    panse1.setSumRFPCount(0, sumTest1Cat1);
+    panse1.setSumRFPCount(1, sumTest1Cat2);
+    panse2.setSumRFPCount(0, sumTest2Cat1);
+    panse2.setSumRFPCount(1, sumTest2Cat2);
+
+    genome->addGene(panse1, simulated);
+    genome->addGene(panse2, simulated);
+    genome->addRFPCategoryName("short");
+    genome->addRFPCategoryName("long");
+}
+
+
 /* testGenome (RCPP EXPOSED)
- * Arguments: string of the name of the directory in which testing files are found
- *            for reading and writing files
+ * Arguments: string of the name of the directory in which testing files are found for reading and writing files
  * Performs Unit Testing on functions within Genome.cpp
  * that are not exposed to RCPP already.
  * Returns 0 if successful, 1 if error found.
  */
 int testGenome(std::string testFileDir)
 {
-    Genome genome;
-    Genome testGenome;
+    Genome genome1;
+    Genome genome2;
     Gene g1("ATGGCCACTATTGGGTCTTAG", "TEST001", "TEST001 Test Gene");
     Gene g2("TGGGATTACCAA", "TEST002", "TEST002 Test Gene");
     Gene g3("TTGGAAACCACA", "TEST003", "TEST003 Test Gene");
@@ -1440,9 +1579,9 @@ int testGenome(std::string testFileDir)
 
     /* Section 1:
      * Testing / Gene / Other Functions:
-     * addGene, getGene, getGenes,
-     * setNumGenesWithPhi, getNumGenesWithPhi, getNumGenesWithPhiForIndex,
-     * getGenomeSize, getCodonCountsPerGene, clear
+     * getGene, addGene, getGenes,
+     * getNumGenesWithPhi, setNumGenesWithPhi, getNumGenesWithPhiForIndex,
+     * getGenomeSize, getCodonCountsPerGene, get/addRFPCategoryNames, clear
     */
 
     //TODO: should improper input be given (bad id/index)?
@@ -1450,13 +1589,13 @@ int testGenome(std::string testFileDir)
     //-----------------------------------//
     //------ get/addGene Functions ------//
     //-----------------------------------//
-    genome.addGene(g1, false);
-    genome.addGene(s1, true); //add the simulated gene s1
+    genome1.addGene(g1, false);
+    genome1.addGene(s1, true); //add the simulated gene s1
 
-    Gene test = genome.getGene("TEST001", false);
-    Gene test2 = genome.getGene(0, false);
-    Gene test3 = genome.getGene("TEST011", true);
-    Gene test4 = genome.getGene(0, true);
+    Gene test = genome1.getGene("TEST001", false);
+    Gene test2 = genome1.getGene(0, false);
+    Gene test3 = genome1.getGene("TEST011", true);
+    Gene test4 = genome1.getGene(0, true);
 
     if (!(test == g1 && test2 == g1)) //checking both by string and index
     {
@@ -1483,7 +1622,7 @@ int testGenome(std::string testFileDir)
     std::vector<Gene> testVec;
     testVec.push_back(g1);
 
-    if (!(testVec == genome.getGenes(false)))
+    if (!(testVec == genome1.getGenes(false)))
     {
         my_printError("Error in testGenome: getGenes(false).\n");
         error = 1;
@@ -1493,7 +1632,7 @@ int testGenome(std::string testFileDir)
     testVec.clear();
     testVec.push_back(s1);
 
-    if (!(testVec == genome.getGenes(true)))
+    if (!(testVec == genome1.getGenes(true)))
     {
         my_printError("Error in testGenome: getGenes(true).\n");
         error = 1;
@@ -1508,11 +1647,11 @@ int testGenome(std::string testFileDir)
     //----------------------------------------------//
     //------ get/setNumGenesWithPhi Functions ------//
     //----------------------------------------------//
-    genome.setNumGenesWithPhi({0, 1, 2, 3});
+    genome1.setNumGenesWithPhi({0, 1, 2, 3});
 
     std::vector<unsigned> uVector = {0, 1, 2, 3};
 
-    if (genome.getNumGenesWithPhi() == uVector)
+    if (genome1.getNumGenesWithPhi() == uVector)
         my_print("Genome get/setNumGenesWithPhi --- Pass\n");
     else
     {
@@ -1525,10 +1664,10 @@ int testGenome(std::string testFileDir)
     //-------------------------------------------------//
     for (unsigned i = 1; i < 4; i++)
     {
-        if (genome.getNumGenesWithPhiForIndex(i) != i)
+        if (genome1.getNumGenesWithPhiForIndex(i) != i)
         {
             my_printError("Error in testGenome: getNumGenesWithPhiForIndex with index %. Should return %, but instead returns %.\n",
-                          i, i, genome.getNumGenesWithPhiForIndex(i));
+                          i, i, genome1.getNumGenesWithPhiForIndex(i));
             error = 1;
             globalError = 1;
         }
@@ -1542,18 +1681,18 @@ int testGenome(std::string testFileDir)
     //------------------------------------//
     //------ getGenomeSize Function ------//
     //------------------------------------//
-    if (1 != genome.getGenomeSize(false))
+    if (1 != genome1.getGenomeSize(false))
     {
         my_printError("Error in testGenome: getGenomesize(false). Should return 1, but returns %.\n",
-                      genome.getGenomeSize(false));
+                      genome1.getGenomeSize(false));
         error = 1;
         globalError = 1;
     }
 
-    if (1 != genome.getGenomeSize(true))
+    if (1 != genome1.getGenomeSize(true))
     {
         my_printError("Error in testGenome: getGenomesize(true). Should return 1, but returns %.\n",
-                      genome.getGenomeSize(true));
+                      genome1.getGenomeSize(true));
         error = 1;
         globalError = 1;
     }
@@ -1569,19 +1708,19 @@ int testGenome(std::string testFileDir)
 
     //reuse generic vector of unsigned integers
     uVector = {1};
-    if (uVector != genome.getCodonCountsPerGene("ATG"))
+    if (uVector != genome1.getCodonCountsPerGene("ATG"))
     {
         my_printError("Error in testGenome: getCodonCountsPerGene with a single gene.\n");
         error = 1;
         globalError = 1;
     }
 
-    genome.addGene(g2);
-    genome.addGene(g4);
+    genome1.addGene(g2);
+    genome1.addGene(g4);
 
     uVector = {0, 1, 1};
 
-    if (uVector != genome.getCodonCountsPerGene("GAT"))
+    if (uVector != genome1.getCodonCountsPerGene("GAT"))
     {
         my_printError("Error in testGenome: getCodonCountsPerGene with three genes.\n");
         error = 1;
@@ -1590,6 +1729,45 @@ int testGenome(std::string testFileDir)
 
     if (!error)
         my_print("Genome getCodonCountsPerGene --- Pass\n");
+    else
+        error = 0; //Reset for next function.
+
+    //----------------------------------------------//
+    //------ get/addRFPCategoryNames Function ------//
+    //----------------------------------------------//
+
+    std::vector <std::string> sVector = genome1.getRFPCategoryNames();
+
+    if (sVector.size() != 0)
+    {
+        my_printError("Error in testGenome: getRFPCategoryNames. Function should return an empty vector but returns:\n");
+        for (unsigned i = 0; i < sVector.size(); i++)
+        {
+            my_printError("%\n", sVector[i]);
+        }
+        error = 1;
+        globalError = 1;
+    }
+
+    genome1.addRFPCategoryName("short");
+    genome1.addRFPCategoryName("long");
+
+    sVector = genome1.getRFPCategoryNames();
+    std::vector <std::string> sVector2 = {"short", "long"};
+
+    if (sVector != sVector2)
+    {
+        my_printError("Error in testGenome: getRFPCategoryNames or addRFPCategoryNames. Function should return 'short', 'long', but returns:\n");
+        for (unsigned i = 0; i < sVector.size(); i++)
+        {
+            my_printError("%\n", sVector[i]);
+        }
+        error = 1;
+        globalError = 1;
+    }
+
+    if (!error)
+        my_print("Genome get/addRFPCategoryNames --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -1603,11 +1781,11 @@ int testGenome(std::string testFileDir)
     // Test adding ObservedSynthesisRateValues
     Gene clear1("TTGATCGGGCAT", "TEST005", "TEST005 Test Gene");
     clear1.setObservedSynthesisRateValues({1, 2, 3, 4});
-    genome.addGene(clear1, false);
+    genome1.addGene(clear1, false);
 
-    genome.clear();
+    genome1.clear();
 
-    if (genome == empty)
+    if (genome1 == empty)
         my_print("Genome clear --- Pass\n");
     else
     {
@@ -1628,33 +1806,33 @@ int testGenome(std::string testFileDir)
     //-----------------------------------------------//
 
     // add more simulated and non-simulated genes
-    genome.addGene(g1, false);
-    genome.addGene(g2, false);
-    genome.addGene(g3, false);
-    genome.addGene(g4, false);
+    genome1.addGene(g1, false);
+    genome1.addGene(g2, false);
+    genome1.addGene(g3, false);
+    genome1.addGene(g4, false);
 
     //reuse generic vector of unsigned integers
     uVector = {0, 1, 2, 3};
 
-    if (!(genome == genome.getGenomeForGeneIndices(uVector, false)))
+    if (!(genome1 == genome1.getGenomeForGeneIndices(uVector, false)))
     {
         my_printError("Error in testGenome: getGenomeForGeneIndices with genes.\n");
         error = 1;
         globalError = 1;
     }
 
-    genome.clear();
+    genome1.clear();
 
     Gene s2("TAGCATGATCCA", "TEST012", "TEST002 Test Gene"); //simulated gene
     Gene s3("TCATCAGGATTC", "TEST013", "TEST002 Test Gene"); //simulated gene
     Gene s4("AAACATGTCACG", "TEST014", "TEST002 Test Gene"); //simulated gene
 
-    genome.addGene(s1, true);
-    genome.addGene(s2, true);
-    genome.addGene(s3, true);
-    genome.addGene(s4, true);
+    genome1.addGene(s1, true);
+    genome1.addGene(s2, true);
+    genome1.addGene(s3, true);
+    genome1.addGene(s4, true);
 
-    if (!(genome == genome.getGenomeForGeneIndices(uVector, true)))
+    if (!(genome1 == genome1.getGenomeForGeneIndices(uVector, true)))
     {
         my_printError("Error in testGenome: getGenomeForGeneIndices with simulated genes.\n");
         error = 1;
@@ -1669,18 +1847,17 @@ int testGenome(std::string testFileDir)
     //--------------------------------//
     //------ readFasta Function ------//
     //--------------------------------//
-    genome.clear();
     std::string file = testFileDir + "/" + "readFasta.fasta";
-    genome.readFasta(file, false);
+    genome1.readFasta(file, false);
 
     Gene fasta1("ATGACCGTAATTTTTTACTAG", "TEST002", "TEST002 Test Gene");
     Gene fasta2("ATGGTCTACTTTCTGACATAG", "TEST003", "TEST003 Test Gene");
 
-    testGenome.addGene(g1, false);
-    testGenome.addGene(fasta1, false);
-    testGenome.addGene(fasta2, false);
+    genome2.addGene(g1, false);
+    genome2.addGene(fasta1, false);
+    genome2.addGene(fasta2, false);
 
-    if (genome == testGenome)
+    if (genome1 == genome2)
         my_print("Genome readFasta --- Pass\n");
     else
     {
@@ -1693,13 +1870,11 @@ int testGenome(std::string testFileDir)
     //---------------------------------//
 
     // Now write a genome described above in readFasta to a file, read it in again, and then compare its validity again.
-    testGenome.clear();
-
     file = testFileDir + "/" + "writeFasta.fasta";
-    genome.writeFasta(file, false);
-    testGenome.readFasta(file, false);
+    genome1.writeFasta(file, false);
+    genome2.readFasta(file, false);
 
-    if (!(genome == testGenome))
+    if (!(genome1 == genome2))
     {
         my_printError("Error in testGenome: writeFasta with genes. Genomes are not equivalent.\n");
         error = 1;
@@ -1707,28 +1882,27 @@ int testGenome(std::string testFileDir)
     }
 
     // Now, re-do writing check but with simulated genes.
-    testGenome.clear();
-    genome.clear();
+    genome1.clear();
 
-    genome.addGene(g1, true);
-    genome.addGene(fasta1, true);
-    genome.addGene(fasta2, true);
+    genome1.addGene(g1, true);
+    genome1.addGene(fasta1, true);
+    genome1.addGene(fasta2, true);
 
-    genome.writeFasta(file, true);
+    genome1.writeFasta(file, true);
 
     /* Note that while these genes were originally simulated, they are printed
      * as non-simulated genes.
      * It is up to the user to know that they were simulated, but they will
      * now be read in as non-simulated genes (and Unit Testing will compare their validity as such)
      */
-    testGenome.readFasta(file, true);
+    genome2.readFasta(file, false);
 
-    genome.clear();
-    genome.addGene(g1, false);
-    genome.addGene(fasta1, false);
-    genome.addGene(fasta2, false);
+    genome1.clear();
+    genome1.addGene(g1, false);
+    genome1.addGene(fasta1, false);
+    genome1.addGene(fasta2, false);
 
-    if (!(genome == testGenome))
+    if (!(genome1 == genome2))
     {
         my_printError("Error in testGenome: writeFasta with simulated genes. Genomes are not equivalent.\n");
         error = 1;
@@ -1826,87 +2000,14 @@ int testGenome(std::string testFileDir)
     //---------------------------------//
     //------ readPAFile Function ------//
     //---------------------------------//
-    genome.clear();
-    testGenome.clear();
+    genome2.clear();
 
     file = testFileDir + "/" + "readPAMulti.pa";
-    genome.readPAFile(file);
+    genome1.readPAFile(file, false);
 
-    Gene panse1("CTTGCTATTTTTTTT", "TEST001", "No description for PANSE Model");
-    Gene panse2("CCTGTAATTTGGTGG", "TEST002", "No description for PANSE Model");
+    testGenomePAHelper(&genome2, false);
 
-    // RFPCount for TEST001: value[position] = RFPCount
-    std::vector <unsigned> test1Cat1 = {0, 0, 2, 0, 1};
-    std::vector <unsigned> test1Cat2 = {0, 17, 0, 1, 4};
-
-    // RFPCount for TEST002: value[position] = RFPCount
-    std::vector <unsigned> test2Cat1 = {1, 1, 0, 0, 1};
-    std::vector <unsigned> test2Cat2 = {2, 0, 2, 3, 6};
-
-    std::string codon;
-    int index;
-
-    // sumRFPCount for TEST001
-    std::array <unsigned, 64> sumTest1Cat1;
-    std::array <unsigned, 64> sumTest1Cat2;
-    sumTest1Cat1.fill(0);
-    sumTest1Cat2.fill(0);
-
-    // sumRFPCount for TEST002
-    std::array <unsigned, 64> sumTest2Cat1;
-    std::array <unsigned, 64> sumTest2Cat2;
-    sumTest2Cat1.fill(0);
-    sumTest2Cat2.fill(0);
-
-    // hard-coded values derived from summing readPAMulti.pa
-    codon = "GCT";
-    index = SequenceSummary::codonToIndex(codon);
-    sumTest1Cat2[index] = 17;
-
-    codon = "ATT";
-    index = SequenceSummary::codonToIndex(codon);
-    sumTest1Cat1[index] = 2;
-    sumTest2Cat2[index] = 2;
-
-    codon = "TTT";
-    index = SequenceSummary::codonToIndex(codon);
-    sumTest1Cat1[index] = 1;
-    sumTest1Cat2[index] = 5;
-
-    codon = "CCT";
-    index = SequenceSummary::codonToIndex(codon);
-    sumTest2Cat1[index] = 1;
-    sumTest2Cat2[index] = 2;
-
-    codon = "GTA";
-    index = SequenceSummary::codonToIndex(codon);
-    sumTest2Cat1[index] = 1;
-
-    codon = "TGG";
-    index = SequenceSummary::codonToIndex(codon);
-    sumTest2Cat1[index] = 1;
-    sumTest2Cat2[index] = 9;
-
-    panse1.initRFPCount(2);
-    panse2.initRFPCount(2);
-
-    panse1.initSumRFPCount(2);
-    panse2.initSumRFPCount(2);
-
-    panse1.setRFPCount(0, test1Cat1);
-    panse1.setRFPCount(1, test1Cat2);
-    panse2.setRFPCount(0, test2Cat1);
-    panse2.setRFPCount(1, test2Cat2);
-
-    panse1.setSumRFPCount(0, sumTest1Cat1);
-    panse1.setSumRFPCount(1, sumTest1Cat2);
-    panse2.setSumRFPCount(0, sumTest2Cat1);
-    panse2.setSumRFPCount(1, sumTest2Cat2);
-
-    testGenome.addGene(panse1, false);
-    testGenome.addGene(panse2, false);
-
-    if (genome == testGenome)
+    if (genome1 == genome2)
         my_print("Genome readPA --- Pass\n");
     else
     {
@@ -1914,10 +2015,51 @@ int testGenome(std::string testFileDir)
         globalError = 1;
     }
 
-    //TODO
     //----------------------------------//
     //------ writePAFile Function ------//
     //----------------------------------//
+
+    // Now write a genome described above in readPAFile to file2, read it in again, and then compare its validity again.
+
+    std::string file2 = testFileDir + "/" + "writePA.pa";
+
+    genome1.writePAFile(file2, false);
+    genome2.readPAFile(file2, false);
+
+    if (!(genome1 == genome2))
+    {
+        my_printError("Error in testGenome: writePAFile with genes. Genomes are not equivalent.\n");
+        error = 1;
+        globalError = 1;
+    }
+
+    // Now re-do writing check but with simulated genes.
+    genome1.clear();
+    testGenomePAHelper(&genome1, true);
+    genome1.writePAFile(file2, true);
+
+    // Note that while these genes were originally simulated, they are printed
+    // as non-simulated genes.
+    // It is up to the user to know that they were simulated, but they will
+    // now be read in as non-simulated genes (and Unit Testing will compare their validity as such)
+
+    genome2.readPAFile(file2);
+
+    genome1.clear();
+    testGenomePAHelper(&genome1, false);
+
+    if (!(genome1 == genome2))
+    {
+        my_printError("Error in testGenome: writePAFile with simulated genes. Genomes are not equivalent.\n");
+        error = 1;
+        globalError = 1;
+    }
+
+    if (!error)
+        my_print("Genome writePAFile --- Pass\n");
+    else
+        error = 0; //Reset for next function.
+
 
     /* readObservedPhiValues Testing Function
      *
@@ -1936,85 +2078,85 @@ int testGenome(std::string testFileDir)
     //--------------------------------------------//
     //------ readObservedPhiValues Function ------//
     //--------------------------------------------//
-    genome.clear();
-    testGenome.clear();
+    genome1.clear();
+    genome2.clear();
     std::vector <double> emptyVec; // Empty vector used to clear ObservedSynthesisRateValues
 
     // Test 1: Test non-error file vs by ID readObservedPhiValues function
-    genome.addGene(g1, false);
+    genome1.addGene(g1, false);
     g1.setObservedSynthesisRateValues({1, 2, 3, 4});
-    testGenome.addGene(g1, false);
+    genome2.addGene(g1, false);
 
-    genome.addGene(g2, false);
+    genome1.addGene(g2, false);
     g2.setObservedSynthesisRateValues({4, 3, 2, 1});
-    testGenome.addGene(g2, false);
+    genome2.addGene(g2, false);
 
-    genome.addGene(g3, false);
+    genome1.addGene(g3, false);
     g3.setObservedSynthesisRateValues({-1, -1, 4, 2});
-    testGenome.addGene(g3, false);
+    genome2.addGene(g3, false);
 
-    genome.addGene(g4, false);
+    genome1.addGene(g4, false);
     g4.setObservedSynthesisRateValues({2, 1, 4, -1});
-    testGenome.addGene(g4, false);
+    genome2.addGene(g4, false);
 
-    testGenome.setNumGenesWithPhi({3, 3, 4, 3});
+    genome2.setNumGenesWithPhi({3, 3, 4, 3});
 
     file = testFileDir + "/" + "readObservedPhiValues.csv";
-    genome.readObservedPhiValues(file, true);
+    genome1.readObservedPhiValues(file, true);
 
-    if (!(genome == testGenome))
+    if (!(genome1 == genome2))
     {
         my_printError("Error in testGenome comparing genomes: readObservedPhiValues.csv ");
         my_printError("by ID produces a different genome than expected.\n");
         error = 1;
         globalError = 1;
     }
-    genome.clear();
+    genome1.clear();
 
     // Test 2: Test non-error file vs by index readObservedPhiValues function
     // Re-input genome as it was in the previous test, then run it by index instead
     g1.setObservedSynthesisRateValues(emptyVec);
-    genome.addGene(g1, false);
+    genome1.addGene(g1, false);
     g2.setObservedSynthesisRateValues(emptyVec);
-    genome.addGene(g2, false);
+    genome1.addGene(g2, false);
     g3.setObservedSynthesisRateValues(emptyVec);
-    genome.addGene(g3, false);
+    genome1.addGene(g3, false);
     g4.setObservedSynthesisRateValues(emptyVec);
-    genome.addGene(g4, false);
+    genome1.addGene(g4, false);
 
-    genome.readObservedPhiValues(file, false);
+    genome1.readObservedPhiValues(file, false);
 
-    if (!(genome == testGenome))
+    if (!(genome1 == genome2))
     {
         my_printError("Error in testGenome comparing genomes: readObservedPhiValues.csv ");
         my_printError("by index produces a different genome than expected.\n");
         error = 1;
         globalError = 1;
     }
-    genome.clear();
-    testGenome.clear();
+    genome1.clear();
+    genome2.clear();
 
     // Test 3: Test error file vs by ID readObservedPhiValues function
     // Since this file has an error in number of phi values, the ObservedSynthesisRateValues are cleared
-    genome.addGene(g1, false);
-    testGenome.addGene(g1, false);
+    genome1.addGene(g1, false);
+    genome2.addGene(g1, false);
 
-    genome.addGene(g2, false);
-    testGenome.addGene(g2, false);
+    genome1.addGene(g2, false);
+    genome2.addGene(g2, false);
 
-    genome.addGene(g3, false);
-    testGenome.addGene(g3, false);
+    genome1.addGene(g3, false);
+    genome2.addGene(g3, false);
 
-    genome.addGene(g4, false);
-    testGenome.addGene(g4, false);
+    genome1.addGene(g4, false);
+    genome2.addGene(g4, false);
 
     // As discussed in the documentation, however, NumGenesWithPhi is still initialized with 0's despite the error
-    testGenome.setNumGenesWithPhi({0, 0, 0, 0});
+    genome2.setNumGenesWithPhi({0, 0, 0, 0});
 
     file = testFileDir + "/" + "readObservedPhiValuesError.csv";
-    genome.readObservedPhiValues(file, true);
+    genome1.readObservedPhiValues(file, true);
 
-    if (!(genome == testGenome))
+    if (!(genome1 == genome2))
     {
         my_printError("Error in testGenome comparing genomes: readObservedPhiValuesError.csv ");
         my_printError("by ID produces a different genome than expected.\n");
@@ -2022,18 +2164,18 @@ int testGenome(std::string testFileDir)
         globalError = 1;
     }
 
-    genome.clear();
+    genome1.clear();
 
     // Test 4: Test error file vs by index readObservedPhiValues function
     // Re-input genome as it was in the previous test, then run it by index instead
-    genome.addGene(g1, false);
-    genome.addGene(g2, false);
-    genome.addGene(g3, false);
-    genome.addGene(g4, false);
+    genome1.addGene(g1, false);
+    genome1.addGene(g2, false);
+    genome1.addGene(g3, false);
+    genome1.addGene(g4, false);
 
-    genome.readObservedPhiValues(file, false);
+    genome1.readObservedPhiValues(file, false);
 
-    if (!(genome == testGenome))
+    if (!(genome1 == genome2))
     {
         my_printError("Error in testGenome comparing genomes: readObservedPhiValuesError.csv ");
         my_printError("by index produces a different genome than expected.\n");
@@ -2045,7 +2187,7 @@ int testGenome(std::string testFileDir)
     if (!error)
         my_print("Genome readObservedPhiValues --- Pass\n");
     // No need to reset error
-     */
+    */
 
     return globalError;
 }

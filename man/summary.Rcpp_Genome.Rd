@@ -18,3 +18,4 @@ This function returns by default an object of class c("summaryDefault", table").
 \description{
 \code{summary} summarizes the description of a genome, such as number of genes and average gene length.
 }
+

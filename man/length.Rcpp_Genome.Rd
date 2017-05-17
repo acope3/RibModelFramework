@@ -15,3 +15,4 @@ returns the number of genes in a genome
 \description{
 \code{length} gives the length of a genome
 }
+

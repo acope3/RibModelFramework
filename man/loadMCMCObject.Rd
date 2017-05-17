@@ -20,3 +20,4 @@ the information in the file given.
 This MCMC object is not intended to be used to do another model fitting, only
 to graph the stored results.
 }
+

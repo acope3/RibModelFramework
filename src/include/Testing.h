@@ -15,6 +15,7 @@
 int testUtility();
 int testSequenceSummary();
 int testGene();
+void testGenomePAHelper(Genome* genome, bool simulated);
 int testGenome(std::string testFileDir);
 int testParameter();
 int testParameterWithFile(std::string filename); //temporary
