@@ -41,8 +41,9 @@ PANSEParameter::PANSEParameter(std::string filename) : Parameter(64)
  * Initializes the object from given values. If thetaK matrix is null or empty, the mutationselectionState keyword
  * is used to generate the matrix.
 */
-PANSEParameter::PANSEParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix,
-		bool splitSer, std::string _mutationSelectionState) : Parameter(64)
+PANSEParameter::PANSEParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures,
+		std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer,
+		std::string _mutationSelectionState) : Parameter(64)
 {
 	initParameterSet(stdDevSynthesisRate, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
 	initPANSEParameterSet();
@@ -93,7 +94,6 @@ PANSEParameter::~PANSEParameter()
 */
 void PANSEParameter::initPANSEParameterSet()
 {
-
 	unsigned alphaCategories = getNumMutationCategories();
 	unsigned lambdaPrimeCategories = getNumSelectionCategories();
 
@@ -267,7 +267,7 @@ void PANSEParameter::writePANSERestartFile(std::string filename)
 	unsigned i, j;
 	out.open(filename.c_str(), std::ofstream::app);
 	if (out.fail())
-		my_printError("Could not open restart file for writing\n");
+		my_printError("ERROR: Could not open restart file for writing\n");
 	else
 	{
 		oss << ">currentAlphaParameter:\n";
@@ -401,7 +401,7 @@ void PANSEParameter::initMutationSelectionCategories(std::vector<std::string> fi
 		{
 			currentFile >> tmpString; //trash the first line, no info given.
 
-			//expecting CTG,3.239 as the current format
+			//expecting Codon,paramType Value as the current format
 			while (currentFile >> tmpString)
 			{
 				std::string codon = tmpString.substr(0, 3);
@@ -532,7 +532,8 @@ void PANSEParameter::updateCodonSpecificParameter(std::string grouping)
  * Arguments: adaptionWidth, last iteration (NOT USED), adapt (bool)
  * Calculates the acceptance level for each codon in the group list and updates the ratio trace. If adapt is turned on,
  * meaning true, then if the acceptance level is in a certain range we change the width.
-*/
+ * NOTE: This function extends Parameter's adaptCodonSpecificParameterProposalWidth function!
+ */
 void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastIteration, bool adapt)
 {
 	my_print("acceptance rate for codon:\n");
@@ -578,7 +579,6 @@ double PANSEParameter::getParameterForCategory(unsigned category, unsigned param
 
 	return rv;
 }
-
 
 
 

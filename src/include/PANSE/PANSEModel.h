@@ -1,11 +1,11 @@
 #ifndef PANSEMODEL_H
 #define PANSEMODEL_H
 
-#include <sstream>
 
 #include "../base/Model.h"
 #include "PANSEParameter.h"
 
+#include <sstream>
 
 class PANSEModel: public Model
 {
@@ -13,7 +13,7 @@ class PANSEModel: public Model
 		PANSEParameter *parameter;
 
 		double calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
-				unsigned currRFPObserved, unsigned currNumCodonsInMRNA, double phiValue);
+				unsigned currPANSEObserved, unsigned currNumCodonsInMRNA, double phiValue);
 
 
 	public:
@@ -31,11 +31,9 @@ class PANSEModel: public Model
 				std::vector <double> &logProbabilityRatio);
 
 
-
 		//Initialization and Restart Functions:
 		virtual void initTraces(unsigned samples, unsigned num_genes);
 		virtual void writeRestartFile(std::string filename);
-
 
 
 		//Category Functions:
@@ -46,11 +44,9 @@ class PANSEModel: public Model
 		virtual std::vector<unsigned> getMixtureElementsOfSelectionCategory(unsigned k);
 
 
-
 		//Group List Functions:
 		virtual unsigned getGroupListSize();
 		virtual std::string getGrouping(unsigned index);
-
 
 
 		//stdDevSynthesisRate Functions:
@@ -59,17 +55,14 @@ class PANSEModel: public Model
 		virtual void updateStdDevSynthesisRate();
 
 
-
 		//Synthesis Rate Functions:
 		virtual double getSynthesisRate(unsigned index, unsigned mixture, bool proposed = false);
 		virtual void updateSynthesisRate(unsigned i, unsigned k);
 
 
-
 		//Iteration Functions:
 		virtual unsigned getLastIteration();
 		virtual void setLastIteration(unsigned iteration);
-
 
 
 		//Trace Functions:
@@ -82,13 +75,11 @@ class PANSEModel: public Model
 		virtual void updateTracesWithInitialValues(Genome &genome);
 
 
-
 		//Adaptive Width Functions:
 		virtual void adaptStdDevSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt = true);
 		virtual void adaptSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt = true);
 		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, unsigned lastIteration, bool adapt = true);
 		virtual void adaptHyperParameterProposalWidths(unsigned adaptiveWidth, bool adapt = true);
-
 
 
 		//Other Functions:
@@ -112,6 +103,7 @@ class PANSEModel: public Model
 
 		virtual void simulateGenome(Genome &genome);
 		virtual void printHyperParameters();
+		PANSEParameter* getParameter();
 		void setParameter(PANSEParameter &_parameter);
 		virtual double calculateAllPriors();
 		virtual double getParameterForCategory(unsigned category, unsigned param, std::string codon, bool proposal);
