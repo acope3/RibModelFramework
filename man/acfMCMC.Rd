@@ -24,3 +24,4 @@ The function calculates and by defaults plots the acf and estimates the autocorr
 \seealso{
 \code{\link{acfCSP}}
 }
+

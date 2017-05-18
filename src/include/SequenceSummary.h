@@ -23,16 +23,16 @@ class SequenceSummary
 		std::array<unsigned, 64> ncodons; //64 for the number of codons.
 		std::array<unsigned, 22> naa; //22 for the number of amino acids.
 		std::vector <std::vector <unsigned>> codonPositions; // used in FONSEModel.
-        // index is the codonID, size of 64 for number of codons
-        // subindex is the position of each occurrence of the codonID specified.
+        // outer index is the codonID, size of 64 for number of codons
+        // inner index is the position of each occurrence of the codonID specified.
 
         std::vector <std::vector <unsigned>> RFPCount;
-		//index is the RFPCount for the category specified via index
-		//subindex is number of position
+		// outer index is the RFPCount for the category specified via index
+		// inner index is number of position
 
 		std::vector <std::array <unsigned, 64>> sumRFPCount;
-		//index is the RFPCount for the category specified via index
-		// 64 for the number of codons
+		// outer index is the RFPCount for the category specified via index
+		// inner index, 64, is the number of codons
 
 		std::vector <unsigned> positionCodonID;
 		// index is the number of position, where a value (codonID) is set
@@ -71,16 +71,19 @@ class SequenceSummary
 		//RFP Functions (for PA and PANSE models) (All tested):
 		void initRFPCount(unsigned numCategories);
 		std::vector <unsigned> getRFPCount(unsigned categoryIndex);
+		unsigned getSingleRFPCount(unsigned categoryIndex, unsigned position);
 		void setRFPCount(unsigned categoryIndex, std::vector <unsigned> arg);
 		
         void initSumRFPCount(unsigned numCategories); 
 		std::array <unsigned, 64> getSumRFPCount(unsigned categoryIndex); 
 		void setSumRFPCount(unsigned categoryIndex, std::array <unsigned, 64> arg); 
-		
+
+		std::vector <unsigned> getPositionCodonID();
+		void setPositionCodonID(std::vector <unsigned> arg);
+
         unsigned getRFPValue(std::string codon, unsigned categoryIndex = 0);
         unsigned getRFPValue(unsigned codonIndex, unsigned categoryIndex = 0);
-        void setRFPValue(unsigned codonIndex, unsigned value, unsigned categoryIndex = 0);
-
+        void setRFPValue(unsigned codonIndex, unsigned value, unsigned categoryIndex = 0); // Only for unit testing.
 
 		//Other Functions (All tested):
 		void clear();

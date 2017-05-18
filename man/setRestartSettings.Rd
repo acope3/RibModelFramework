@@ -30,3 +30,4 @@ that occur. Also, if write.multiple is true, instead of overwriting the previous
 file, the sample number is prepended onto the file name and multiple rerstart files
 are generated for a run.
 }
+
