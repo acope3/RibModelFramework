@@ -1,18 +1,19 @@
 #ifndef PANSEPARAMETER_H
 #define PANSEPARAMETER_H
 
+
+#include "../base/Trace.h"
+#include "../base/Parameter.h"
+
+
 #include <vector>
 #include <random>
 #include <string>
 #include <iostream>
 
-
 #ifndef STANDALONE
 #include <Rcpp.h>
 #endif
-
-#include "../base/Trace.h"
-#include "../base/Parameter.h"
 
 class PANSEParameter: public Parameter {
 	private:
@@ -20,12 +21,7 @@ class PANSEParameter: public Parameter {
 		std::vector<std::vector<double>> lambdaValues; //Currently not used.
 		double bias_csp;
 
-
-
 	public:
-		
-
-
 
 		//Constructors & Destructors:
 		explicit PANSEParameter();
@@ -35,7 +31,6 @@ class PANSEParameter: public Parameter {
 				std::string _mutationSelectionState = "allUnique");
 		PANSEParameter& operator=(const PANSEParameter& rhs);
 		virtual ~PANSEParameter();
-
 
 
 		//Initialization, Restart, Index Checking:
@@ -52,10 +47,8 @@ class PANSEParameter: public Parameter {
 				unsigned paramType); //TODO: function needs to be changed
 
 
-
 		//Trace Functions:
 		void updateCodonSpecificParameterTrace(unsigned sample, std::string codon);
-
 
 
 		//CSP Functions:
@@ -64,10 +57,8 @@ class PANSEParameter: public Parameter {
 		void updateCodonSpecificParameter(std::string grouping);
 
 
-
 		//Adaptive Width Functions:
 		void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastIteration, bool adapt); //may make virtual
-
 
 
 		//Other functions:
@@ -81,12 +72,11 @@ class PANSEParameter: public Parameter {
 
 #ifndef STANDALONE
 
-
 		//Constructors & Destructors:
-		PANSEParameter(std::vector<double> stdDevSynthesisRate, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix,
-			bool splitSer = true);
-		PANSEParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer = true,
-			std::string _mutationSelectionState = "allUnique");
+		PANSEParameter(std::vector<double> stdDevSynthesisRate, std::vector<unsigned> geneAssignment,
+			std::vector<unsigned> _matrix, bool splitSer = true);
+		PANSEParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
+			bool splitSer = true, std::string _mutationSelectionState = "allUnique");
 
 
 
