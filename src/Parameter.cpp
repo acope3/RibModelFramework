@@ -1778,13 +1778,14 @@ double Parameter::randExp(double r)
 }
 
 
-/* The R version and C++ differ because C++ uses the
-// shape and scale parameter version while R uses the
-// shape and rate. */
 double Parameter::randGamma(double shape, double rate)
 {
 	double rv;
 #ifndef STANDALONE
+	/* Note that the rgamma() function called with Rcpp uses
+	// shape and scale parameters.  This is different from how 
+	// rgamma() behaves within an R session which uses shape and rate
+	*/
 	RNGScope scope;
 	NumericVector xx(1);
 	xx = rgamma(1, shape, 1.0 / rate);
