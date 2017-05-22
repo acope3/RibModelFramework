@@ -36,8 +36,8 @@ RFPParameter::RFPParameter(std::string filename) : Parameter(64)
 
 
 /* RFPParameter Constructor (NOT EXPOSED)
- * Arguments: synthesis rate values (vector), number of mixtures, vector containing gene assignments, vector of vector
- * representation of a category matrix, boolean to tell if ser should be split, keyword for mutation/selection state.
+ * Arguments: synthesis rate values (vector), number of mixtures, vector containing gene assignments, vector of vectors
+ *   representation of a category matrix, boolean to tell if ser should be split, keyword for mutation/selection state.
  * Initializes the object from given values. If thetaK matrix is null or empty, the mutationselectionState keyword
  * is used to generate the matrix.
 */

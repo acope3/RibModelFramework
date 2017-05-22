@@ -29,4 +29,3 @@ initializeModelObject initializes a model. The type of model is determined based
  The Parameter object has to match the model that is initialized. E.g. to initialize a ROC model, 
  it is required that a ROC parameter object is passed to the function.
 }
-
