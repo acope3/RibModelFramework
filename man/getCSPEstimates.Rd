@@ -25,4 +25,3 @@ codon specific parameters or writes it directly to a csv file if \code{filename}
 \code{getCSPEstimates} returns the codon specific
 parameter estimates for a given parameter and mixture or write it to a csv file.
 }
-

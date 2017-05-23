@@ -39,6 +39,8 @@ junk
 .launch
 .idea
 .externalToolBuilders
+src/cmake-build-debug/
+autom4te.cache
 
 # .swp/swo files
 *.swp

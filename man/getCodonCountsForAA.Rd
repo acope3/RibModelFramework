@@ -21,4 +21,3 @@ provides the codon counts for a fiven amino acid across all genes
 \details{
 The returned matrix containes a row for each gene and a coloumn for each codon.
 }
-

@@ -43,4 +43,3 @@ perform a model fitting for a parameter and model object.
 It is important to note that est.expression and est.hyper will affect one another
 negatively if their values differ.
 }
-
