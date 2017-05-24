@@ -1474,7 +1474,7 @@ int testGene()
  */
 void testGenomePAHelper(Genome* genome, bool simulated)
 {
-    // All values here are derived from readPAMulti.pa's hardcoded values.
+    // All values here are derived from readPA.csv's hardcoded values.
 
     Gene panse1("CTTGCTATTTTTTTT", "TEST001", "No description for PANSE Model");
     Gene panse2("CCTGTAATTTGGTGG", "TEST002", "No description for PANSE Model");
@@ -1919,7 +1919,7 @@ int testGenome(std::string testFileDir)
     //---------------------------------//
     genome2.clear();
 
-    file = testFileDir + "/" + "readPAMulti.pa";
+    file = testFileDir + "/" + "readPA.csv";
     genome1.readPAFile(file, false);
 
     testGenomePAHelper(&genome2, false);
@@ -1938,7 +1938,7 @@ int testGenome(std::string testFileDir)
 
     // Now write a genome described above in readPAFile to file2, read it in again, and then compare its validity again.
 
-    std::string file2 = testFileDir + "/" + "writePA.pa";
+    std::string file2 = testFileDir + "/" + "writePA.csv";
 
     genome1.writePAFile(file2, false);
     genome2.readPAFile(file2, false);

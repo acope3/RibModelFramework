@@ -260,7 +260,6 @@ void RFPParameter::writeEntireRestartFile(std::string filename)
  */
 void RFPParameter::writeRFPRestartFile(std::string filename)
 {
-
 	std::ofstream out;
 	std::string output = "";
 	std::ostringstream oss;
@@ -381,7 +380,6 @@ void RFPParameter::initMutationSelectionCategories(std::vector<std::string> file
 	std::ifstream currentFile;
 	std::string tmpString;
 	std::string type;
-
 
 	if (paramType == RFPParameter::alp)
 		type = "alpha";
