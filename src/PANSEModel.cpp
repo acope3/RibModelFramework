@@ -26,10 +26,10 @@ PANSEModel::~PANSEModel()
 
 
 double PANSEModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
-													   unsigned currPANSEObserved, unsigned currNumCodonsInMRNA, double phiValue)
+													   unsigned currRFPObserved, unsigned currNumCodonsInMRNA, double phiValue)
 {
-	double logLikelihood = ((std::lgamma((currNumCodonsInMRNA * currAlpha) + currPANSEObserved)) - (std::lgamma(currNumCodonsInMRNA * currAlpha)))
-						   + (currPANSEObserved * (std::log(phiValue) - std::log(currLambdaPrime + phiValue)))
+	double logLikelihood = ((std::lgamma((currNumCodonsInMRNA * currAlpha) + currRFPObserved)) - (std::lgamma(currNumCodonsInMRNA * currAlpha)))
+						   + (currRFPObserved * (std::log(phiValue) - std::log(currLambdaPrime + phiValue)))
 						   + ((currNumCodonsInMRNA * currAlpha) * (std::log(currLambdaPrime) - std::log(currLambdaPrime + phiValue)));
 
 	return logLikelihood;
@@ -68,13 +68,13 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 
 		double currAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, false);
 		double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PANSEParameter::lmPri, codon, false);
-		unsigned currPANSEObserved = gene.geneData.getRFPValue(index);
+		unsigned currRFPObserved = gene.geneData.getRFPValue(index);
 
 		unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(index);
 		if (currNumCodonsInMRNA == 0) continue;
 
-		logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currPANSEObserved, currNumCodonsInMRNA, phiValue);
-		logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currPANSEObserved, currNumCodonsInMRNA, phiValue_proposed);
+		logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
+		logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue_proposed);
 	}
 
 	double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(lambdaPrimeCategory, false);
@@ -114,7 +114,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 		unsigned synthesisRateCategory = parameter->getSynthesisRateCategory(mixtureElement);
 		// get non codon specific values, calculate likelihood conditional on these
 		double phiValue = parameter->getSynthesisRate(i, synthesisRateCategory, false);
-		unsigned currPANSEObserved = gene->geneData.getRFPValue(index);
+		unsigned currRFPObserved = gene->geneData.getRFPValue(index);
 		unsigned currNumCodonsInMRNA = gene->geneData.getCodonCountForCodon(index);
 		if (currNumCodonsInMRNA == 0) continue;
 
@@ -126,8 +126,8 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 		double propLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PANSEParameter::lmPri, grouping, true);
 
 
-		logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currPANSEObserved, currNumCodonsInMRNA, phiValue);
-		logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambdaPrime, currPANSEObserved, currNumCodonsInMRNA, phiValue);
+		logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
+		logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
 	}
 	logAcceptanceRatioForAllMixtures[0] = logLikelihood_proposed - logLikelihood;
 }
@@ -549,7 +549,7 @@ void PANSEModel::simulateGenome(Genome &genome)
 			double tmp = GDistribution(Parameter::generator);
 			std::poisson_distribution<unsigned> PDistribution(phi * tmp);
 			unsigned simulatedValue = PDistribution(Parameter::generator);
-			tmpGene.geneData.setPANSEValue(codonIndex, simulatedValue);
+			tmpGene.geneData.setRFPValue(codonIndex, simulatedValue);
 #endif
 		}
 		genome.addGene(tmpGene, true);
@@ -595,3 +595,73 @@ double PANSEModel::getParameterForCategory(unsigned category, unsigned param, st
 	return parameter->getParameterForCategory(category, param, codon, proposal);
 }
 
+double PANSEModel::l_gamma_norm(double s, double x)
+{
+    double a;
+    double arg;
+    double c;
+    double e = 1.0E-09;
+    double f;
+    double uflo = 1.0E-37;
+    double value;
+
+    if (x <= 0)
+    {
+        value = 0;
+        return value;
+    }
+
+    if (s <= 0)
+    {
+        value = 0;
+        return value;
+    }
+
+    arg = s * std::log(x) - std::lgamma(s + 1.0) - x;
+
+    if (arg < std::log(uflo))
+    {
+        value = 0;
+        return value;
+    }
+
+    f = std::exp(arg);
+
+    if (f == 0)
+    {
+        value = 0;
+        return value;
+    }
+
+    c = 1.0;
+    value = 1.0;
+    a = s;
+
+    while(true)
+    {
+        a = a + 1.0;
+        c = c * x / a;
+        value = value + c;
+
+        if ( c <= e * value ) break;
+    }
+
+    value = value * f;
+    return value;
+}
+
+double PANSEModel::u_gamma(double s, double x)
+{
+    double rv;
+
+    rv = std::tgamma(s) * (1 - l_gamma_norm(s, x));
+    return rv;
+}
+
+double PANSEModel::u_gamma_log(double s, double x)
+{
+    double rv;
+
+    rv = std::tgamma(s) * (1 - l_gamma_norm(s, x));
+    return std::log(rv);
+}

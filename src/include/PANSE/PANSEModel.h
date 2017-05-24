@@ -13,7 +13,7 @@ class PANSEModel: public Model
 		PANSEParameter *parameter;
 
 		double calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
-				unsigned currPANSEObserved, unsigned currNumCodonsInMRNA, double phiValue);
+				unsigned currRFPObserved, unsigned currNumCodonsInMRNA, double phiValue);
 
 
 	public:
@@ -104,9 +104,14 @@ class PANSEModel: public Model
 		virtual void simulateGenome(Genome &genome);
 		virtual void printHyperParameters();
 		PANSEParameter* getParameter();
+
 		void setParameter(PANSEParameter &_parameter);
 		virtual double calculateAllPriors();
 		virtual double getParameterForCategory(unsigned category, unsigned param, std::string codon, bool proposal);
+		double l_gamma_norm(double s, double x);
+
+		double u_gamma(double s, double x);
+		double u_gamma_log(double s, double x);
 
 	protected:
 };
