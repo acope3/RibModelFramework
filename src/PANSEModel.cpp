@@ -595,3 +595,73 @@ double PANSEModel::getParameterForCategory(unsigned category, unsigned param, st
 	return parameter->getParameterForCategory(category, param, codon, proposal);
 }
 
+double PANSEModel::l_gamma_norm(double s, double x)
+{
+    double a;
+    double arg;
+    double c;
+    double e = 1.0E-09;
+    double f;
+    double uflo = 1.0E-37;
+    double value;
+
+    if (x <= 0)
+    {
+        value = 0;
+        return value;
+    }
+
+    if (s <= 0)
+    {
+        value = 0;
+        return value;
+    }
+
+    arg = s * std::log(x) - std::lgamma(s + 1.0) - x;
+
+    if (arg < std::log(uflo))
+    {
+        value = 0;
+        return value;
+    }
+
+    f = std::exp(arg);
+
+    if (f == 0)
+    {
+        value = 0;
+        return value;
+    }
+
+    c = 1.0;
+    value = 1.0;
+    a = s;
+
+    while(true)
+    {
+        a = a + 1.0;
+        c = c * x / a;
+        value = value + c;
+
+        if ( c <= e * value ) break;
+    }
+
+    value = value * f;
+    return value;
+}
+
+double PANSEModel::u_gamma(double s, double x)
+{
+    double rv;
+
+    rv = std::tgamma(s) * (1 - l_gamma_norm(s, x));
+    return rv;
+}
+
+double PANSEModel::u_gamma_log(double s, double x)
+{
+    double rv;
+
+    rv = std::tgamma(s) * (1 - l_gamma_norm(s, x));
+    return std::log(rv);
+}
