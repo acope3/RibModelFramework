@@ -24,4 +24,3 @@ This function has no return value.
 This function will plot the logLikelihood trace, and if the Hmisc package is installed, it will 
  plot a subplot of the logLikelihood trace with the first few samples removed.
 }
-
