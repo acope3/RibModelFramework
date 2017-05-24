@@ -3,7 +3,6 @@
 #include <vector>
 
 #ifdef CEDRIC
-
 int main()
 {
 	std::cout << "Initializing MCMCAlgorithm object---------------" << std::endl;
@@ -97,6 +96,7 @@ int main()
 
 	std::cout << std::endl << "Exiting" << std::endl;
 }
+
 #endif // CEDRIC
 
 #ifdef GABE
@@ -404,8 +404,6 @@ int main()
 
 #endif // GABE
 
-
-
 #ifdef JEREMY
 int main()
 {
@@ -659,7 +657,6 @@ int main()
 
 #endif // JEREMY
 
-
 #ifdef HOLLIS
 int main()
 {
@@ -672,8 +669,8 @@ int main()
 	// SIMULATE GENOME: RFP
 	/*
 	Genome genome;
-	//genome.readFasta(pathBegin + "HollisTestingData/s288c.genome.fasta");
-	genome.readRFPFile(pathBegin + "HollisTestingData/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+	//genome.readFasta(pathBegin + "miscGilchrist/runMe/HollisTestingData/s288c.genome.fasta");
+	genome.readRFPFile(pathBegin + "miscGilchrist/runMe/HollisTestingData/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{
@@ -705,7 +702,7 @@ int main()
 	//testUtility();
 	//testSequenceSummary();
 	//testGene();
-	testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
+	//testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
 	//testCovarianceMatrix();
 	//testParameter();
 	//testParameterWithFile(pathBegin + "HollisFile.txt");

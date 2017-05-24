@@ -64,11 +64,11 @@ bool Genome::operator==(const Genome& other) const
 //----------------------------------------//
 
 /* readFasta (RCPP EXPOSED)
- * Arguments: filname to read Fasta sequence, boolean
+ * Arguments: filename to read Fasta sequence, boolean specifying
  * whether the Fasta sequence should be appended.
  * Takes input in Fasta format from file and saves to genome.
 */
-void Genome::readFasta(std::string filename, bool Append) // read Fasta format sequences
+void Genome::readFasta(std::string filename, bool Append)
 {
 	try
 	{
@@ -157,8 +157,8 @@ void Genome::readFasta(std::string filename, bool Append) // read Fasta format s
 
 
 /* writeFasta (RCPP EXPOSED)
- * Arguments: filname to write to,
- * boolean on if the genome is simulated.
+ * Arguments: filename to write to,
+ * boolean specifying if the genome is simulated.
  * Writes a genome in Fasta format to given file
 */
 void Genome::writeFasta (std::string filename, bool simulated)
@@ -193,9 +193,8 @@ void Genome::writeFasta (std::string filename, bool simulated)
 	}
 }
 
-/*
- * TODO: REMOVE. Old readPAFile function
- * This function reads in ONLY based on RFPCounts > 0.
+
+/* This function reads in ONLY based on RFPCounts > 0.
  * When this occurs, a sequence is made that is based on the number of RFPCounts there are.
  * This is because in RFP calculations, the sequence and number of codons is technically irrelevant.
  * What is relevant is the RFPCounts for certain codons, and an arbitrary sequence is constructed to
@@ -203,94 +202,12 @@ void Genome::writeFasta (std::string filename, bool simulated)
  *
  * See also the documentation on process_sequence in SequenceSummary.cpp
  */
-void Genome::readRFPFile(std::string filename)
-{
-	std::ifstream Fin;
-	Fin.open(filename.c_str());
-	if (Fin.fail())
-		my_printError("Error in Genome::readRFPFile: Can not open RFP file %\n", filename);
 
-	std::string tmp;
-	//trash the first line
-	if (!std::getline(Fin, tmp))
-		my_printError("Error in Genome::readRFPFile: RFP file % has no header.\n", filename);
-	std::string prevID = "";
-	Gene tmpGene;
-	bool first = true;
-	std::string seq = "";
-
-	while (std::getline(Fin, tmp))
-	{
-		std::size_t pos = tmp.find(",");
-		std::string ID = tmp.substr(0, pos);
-
-		if (first)
-		{
-			prevID = ID;
-			first = false;
-		}
-		if (ID != prevID)
-		{
-			tmpGene.setId(prevID);
-			tmpGene.setDescription("No description for RFP Model");
-			tmpGene.setSequence(seq);
-			addGene(tmpGene, false); //add to genome
-			tmpGene.clear();
-			seq = "";
-		}
-		std::size_t pos2 = tmp.find(",", pos + 1);
-		std::string value = tmp.substr(pos + 1, pos2 - (pos + 1));
-		unsigned counts = (unsigned)std::atoi(value.c_str());
-		pos = tmp.find(",", pos2 + 1);
-		std::string codon = tmp.substr(pos + 1, 3);
-		for (unsigned i = 0; i < counts; i++)
-			seq += codon;
-
-		prevID = ID;
-	}
-
-	tmpGene.setId(prevID);
-	tmpGene.setDescription("No description for RFP Model");
-	tmpGene.setSequence(seq);
-
-	addGene(tmpGene, false); //add to genome
-
-	Fin.close();
-}
-
-/* TODO: REMOVE once writePAFile is completed
+/*
  * Note: As the ncodons is not preserved when the RFP file is read in or RFP is otherwise processed,
  * NA is returned for the number of codons. This still preserves functionality for future
  * readRFPFile calls, as only the RFPCounts is important.
 */
-void Genome::writeRFPFile(std::string filename, bool simulated)
-{
-	std::ofstream Fout;
-	Fout.open(filename.c_str());
-	if (Fout.fail())
-		my_printError("Error in Genome::writeRFPFile: Can not open output RFP file %\n", filename);
-	else
-	{
-		Fout << "ORF,RFPCounts,Codon_Counts,Codon\n";
-		unsigned sized = simulated ? (unsigned)simulatedGenes.size() : (unsigned)genes.size();
-
-		for (unsigned geneIndex = 0; geneIndex < sized; geneIndex++)
-		{
-			Gene *currentGene = simulated ? &simulatedGenes[geneIndex] : &genes[geneIndex];
-
-			for (unsigned codonIndex = 0; codonIndex < 64; codonIndex++)
-			{
-				std::string codon = SequenceSummary::codonArray[codonIndex];
-
-				Fout << currentGene->getId() << ",";
-				Fout << currentGene->geneData.getRFPValue(codonIndex) << ",";
-				Fout << "NA," << codon << "\n";
-			}
-		}
-	}
-	Fout.close();
-}
-
 
 /* readPAFile (TODO: RCPP EXPOSE VIA WRAPPER)
  * Arguments: string filename, boolean to determine if we are appending to the existing genome
@@ -425,7 +342,6 @@ void Genome::readPAFile(std::string filename, bool Append)
 }
 
 
-//TODO: Complete
 void Genome::writePAFile(std::string filename, bool simulated)
 {
 	std::ofstream Fout;
@@ -486,7 +402,6 @@ void Genome::writePAFile(std::string filename, bool simulated)
 	}
 	Fout.close();
 }
-
 
 
 /* readObservedPhiValues
@@ -724,13 +639,14 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 
 /* Gene constructor (RCPP EXPOSED)
  * Arguments: gene to add, boolean if it was simulated.
- * Depeneding on whether a gene was simulated appends to
+ * Depending on whether a gene was simulated, appends to
  * genes or simulated genes.
 */
 void Genome::addGene(const Gene& gene, bool simulated)
 {
 	simulated ? simulatedGenes.push_back(gene) : genes.push_back(gene);
 }
+
 
 /* getGenes (RCPP EXPOSED)
  * Arguments: boolean if simulated genes should be returned.
@@ -754,7 +670,7 @@ unsigned Genome::getNumGenesWithPhiForIndex(unsigned index)
 }
 
 
-/* getNumGenesWithPhiForIndex (RCPP EXPOSED)
+/* getGene (unsigned index) (RCPP EXPOSED)
  * Arguments: index number, simulated
  * Returns the gene from the requested set at index
 */
@@ -764,9 +680,9 @@ Gene& Genome::getGene(unsigned index, bool simulated)
 }
 
 
-/* getNumGenesWithPhiForIndex (RCPP EXPOSED)
+/* getGene (string id) (RCPP EXPOSED)
  * Arguments: id, simulated
- * Returns the gene from the requested set with the id
+ * Returns the gene from the requested set with the id given
 */
 Gene& Genome::getGene(std::string id, bool simulated)
 {
@@ -861,6 +777,7 @@ std::vector<unsigned> Genome::getCodonCountsPerGene(std::string codon)
 	}
 	return codonCounts;
 }
+
 
 /* getRFPCategoryName (NOT EXPOSED)
  * Arguments: None
@@ -1005,8 +922,8 @@ RCPP_MODULE(Genome_mod)
 		//File I/O Functions:
 		.method("readFasta", &Genome::readFasta, "reads a genome into the object")
 		.method("writeFasta", &Genome::writeFasta, "writes the genome to a fasta file")
-		.method("readPAFile", &Genome::readPAFile, "reads RFP data in for the RFP models")
-		//.method("writePAfile", &Genome::writePAFile)
+		.method("readPAFile", &Genome::readPAFile, "reads RFP data to be used in PA(NSE) models")
+		.method("writePAfile", &Genome::writePAFile, "writes RFP data used in PA(NSE) models")
 		.method("readObservedPhiValues", &Genome::readObservedPhiValues)
 
 

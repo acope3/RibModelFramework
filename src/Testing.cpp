@@ -1914,89 +1914,6 @@ int testGenome(std::string testFileDir)
     else
         error = 0; //Reset for next function.
 
-
-    /*
-    //----------------------------------//
-    //------ readRFPFile Function ------//
-    //----------------------------------//
-    genome.clear();
-    testGenome.clear();
-
-    file = testFileDir + "/" + "readRFP.csv";
-    genome.readRFPFile(file);
-
-    // These sequences are composed of those codons with RFPValue values > 0
-    // Each repetition of a codon denotes an incrementation in RFPValue for that codon
-
-    Gene rfp1("GCCGCCGCCGCCGCC", "TEST001", "No description for RFP Model");
-    Gene rfp2("GCGGCGTTTTTTTTTTTT", "TEST002", "No description for RFP Model");
-    Gene rfp3("ATGATGATGATGATGATGATGATGATGATGATGATGATG", "TEST003", "No description for RFP Model");
-
-    testGenome.addGene(rfp1, false);
-    testGenome.addGene(rfp2, false);
-    testGenome.addGene(rfp3, false);
-
-    if (genome == testGenome)
-        my_print("Genome readRFPFile --- Pass\n");
-    else
-    {
-        my_printError("Error in testGenome: readRFPFile. Genomes are not equivalent.\n");
-        globalError = 1;
-    }
-
-    //-----------------------------------//
-    //------ writeRFPFile Function ------//
-    //-----------------------------------//
-
-    // Now write a genome described above in readRFPFile to a file, read it in again, and then compare its validity again.
-    testGenome.clear();
-
-    file = testFileDir + "/" + "writeRFP.csv";
-    genome.writeRFPFile(file, false);
-    testGenome.readRFPFile(file);
-
-    if (!(genome == testGenome))
-    {
-        my_printError("Error in testGenome: writeRFPFile with genes. Genomes are not equivalent.\n");
-        error = 1;
-        globalError = 1;
-    }
-
-    // Now re-do writing check but with simulated genes.
-    testGenome.clear();
-    genome.clear();
-
-    genome.addGene(rfp1, true);
-    genome.addGene(rfp2, true);
-    genome.addGene(rfp3, true);
-
-    genome.writeRFPFile(file, true);
-
-    // Note that while these genes were originally simulated, they are printed
-    // as non-simulated genes.
-    // It is up to the user to know that they were simulated, but they will
-    // now be read in as non-simulated genes (and Unit Testing will compare their validity as such)
-
-    genome.clear();
-    genome.addGene(rfp1, false);
-    genome.addGene(rfp2, false);
-    genome.addGene(rfp3, false);
-
-    testGenome.readRFPFile(file);
-
-    if (!(genome == testGenome))
-    {
-        my_printError("Error in testGenome: writeRFPFile with simulated genes. Genomes are not equivalent.\n");
-        error = 1;
-        globalError = 1;
-    }
-
-    if (!error)
-        my_print("Genome writeRFPFile --- Pass\n");
-    else
-        error = 0; //Reset for next function.
-    */
-
     //---------------------------------//
     //------ readPAFile Function ------//
     //---------------------------------//
@@ -3113,6 +3030,7 @@ int testParameter()
 }
 
 
+/* TODO: Rework or remove!
 int testParameterWithFile(std::string filename)
 {
     Parameter parameter;
@@ -3121,6 +3039,7 @@ int testParameterWithFile(std::string filename)
 
     return 0;
 }
+*/
 
 
 /* testCovarianceMatrix (RCPP EXPOSED)
@@ -3264,7 +3183,7 @@ int testCovarianceMatrix()
 }
 
 
-/*
+/* TODO: Rework or remove!
 int testRFPTrace()
 {
     Trace RFP; //initialize with 0 categories, 2 codon-specific parameter types
@@ -3301,6 +3220,7 @@ int testRFPTrace()
 */
 
 
+/* TODO: Rework or remove!
 int testRFPParameter()
 {
     int error = 0;
@@ -3309,20 +3229,21 @@ int testRFPParameter()
     /* Section 1: 1 function tested in total.
      * initRFPParameterSet Function
      * and related get/set functions as a consequence of the function setup:
-    */
+
 
     //------------------------------------------//
     //------ initRFPParameterSet Function ------//
     //------------------------------------------//
 
-    /* Initialize parameter:
+     * Initialize parameter:
      * Arguments: vector <double> stdDevSynthesisRate, unsigned numMixtures, vector <unsigned> geneAssignment,
      *           vector <vector <unsigned>> mixtureDefinitionMatrix, bool splitSer, string mutationSelectionState
      *
      * Thus, let:
-    */
+
+
     Genome genome;
-    genome.readRFPFile("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+    //genome.readRFPFile("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
     unsigned numMixtures = 3;
     std::vector <double> stdDev(numMixtures, 1);
     unsigned numGenes = genome.getGenomeSize();
@@ -3357,7 +3278,7 @@ int testRFPParameter()
      * numParam, currentCodonSpecificParameter, proposedCodonSpecificParameter, std_csp, and groupList.
      * This also introduces a level of uncertainty in what may be wrong, and thus an error in the following
      * unit testing checks may be a result of the checking function or initParameterSet.
-    */
+
 
     // numParam is set to 61 in initRFPParameterSet.
     unsigned numParam = parameter.getNumParam();
@@ -3411,6 +3332,7 @@ int testRFPParameter()
 
     return globalError;
 }
+*/
 
 
 /* testMCMCAlgorithm (RCPP EXPOSED)
