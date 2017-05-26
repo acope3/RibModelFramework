@@ -3649,7 +3649,7 @@ RCPP_MODULE(Test_mod)
 	function("testGenome", &testGenome);
 	function("testParameter", &testParameter);
 	function("testCovarianceMatrix", &testCovarianceMatrix);
-	function("testRFPParameter", &testRFPParameter);
+	//function("testRFPParameter", &testRFPParameter);
 	function("testMCMCAlgorithm", &testMCMCAlgorithm);
 }
 #endif
