@@ -2,7 +2,7 @@
 #'
 #' @param parameter An object created with \code{initializeParameterObject}. 
 #'  
-#' @param model A string containing the model to run (ROC, FONSE, or RFP), has to match parameter object. 
+#' @param model A string containing the model to run (ROC, FONSE, or PA), has to match parameter object. 
 #'  
 #' @param with.phi (ROC only) A boolean that determines whether or not to include empirical
 #'    phi values (expression rates) for the calculations. 
@@ -23,8 +23,8 @@ initializeModelObject <- function(parameter, model = "ROC", with.phi = FALSE, fi
     c.model <- new(ROCModel, with.phi, fix.observation.noise)
   } else if(model == "FONSE") {
     c.model = new(FONSEModel)
-  } else if (model == "RFP") {
-    c.model <- new(RFPModel)
+  } else if (model == "PA") {
+    c.model <- new(PAModel)
   } else {
     stop("Unknown model.")
   }

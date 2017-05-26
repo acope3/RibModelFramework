@@ -19,10 +19,10 @@
 #' The length of the vector has to equal the number of genes in the Genome object.
 #' The default value is NULL.
 #' 
-#' @param model Specifies the model used. Valid options are "ROC", "RFP", "PANSE", or "FONSE".
+#' @param model Specifies the model used. Valid options are "ROC", "PA", "PANSE", or "FONSE".
 #' The default model is "ROC".
 #' ROC is described in Gilchrist et al. 2015.
-#' RFP, PANSE and FONSE are currently unpublished.
+#' PA, PANSE and FONSE are currently unpublished.
 #' 
 #' @param split.serine Whether serine should be considered as 
 #' one or two amino acids when running the model.
@@ -120,13 +120,13 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
     }else{
       parameter <- new(FONSEParameter, init.with.restart.file)
     }
-  }else if(model == "RFP"){
+  }else if(model == "PA"){
     if(is.null(init.with.restart.file)){
-      parameter <- initializeRFPParameterObject(genome, sphi, num.mixtures, 
+      parameter <- initializePAParameterObject(genome, sphi, num.mixtures, 
                                                 gene.assignment, initial.expression.values, split.serine, 
                             mixture.definition, mixture.definition.matrix, init.csp.variance) 
     }else{
-      parameter <- new(RFPParameter, init.with.restart.file)
+      parameter <- new(PAParameter, init.with.restart.file)
     }
   }else{
     stop("Unknown model.")
@@ -175,20 +175,20 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
 
 
 #Called from initializeParameterObject.
-initializeRFPParameterObject <- function(genome, sphi, numMixtures, geneAssignment, 
+initializePAParameterObject <- function(genome, sphi, numMixtures, geneAssignment, 
                           expressionValues = NULL, split.serine = TRUE, 
                           mixture.definition = "allUnique", 
                           mixture.definition.matrix = NULL, init.csp.variance){
 
   if(is.null(mixture.definition.matrix))
   { # keyword constructor
-    parameter <- new(RFPParameter, as.vector(sphi), numMixtures, geneAssignment, 
+    parameter <- new(PAParameter, as.vector(sphi), numMixtures, geneAssignment, 
                      split.serine, mixture.definition)
   }else{
     #matrix constructor
     mixture.definition <- c(mixture.definition.matrix[, 1], 
                             mixture.definition.matrix[, 2])
-    parameter <- new(RFPParameter, as.vector(sphi), numMixtures, geneAssignment, 
+    parameter <- new(PAParameter, as.vector(sphi), numMixtures, geneAssignment, 
                      mixture.definition, split.serine)
   }
   
@@ -295,7 +295,7 @@ getCSPEstimates.Rcpp_Parameter <- function(parameter, filename=NULL, CSP="Mutati
       }
     }
   }
-  else if (class(parameter) == "Rcpp_RFPParameter"){
+  else if (class(parameter) == "Rcpp_PAParameter"){
     groupList <- parameter$getGroupList()
 
     for(i in 1:length(groupList)){
@@ -384,7 +384,7 @@ splitMatrix <- function(M, r, c){
 #' Initialize Covariance Matrices
 #' 
 #' @param parameter A Parameter object that corresponds to one of the model types. 
-#' Valid values are "ROC", "RFP", and "FONSE".
+#' Valid values are "ROC", "PA", and "FONSE".
 #' 
 #' @param genome An object of type Genome necessary for the initialization of the Parameter object. 
 #' 
@@ -661,14 +661,14 @@ writeParameterObject.Rcpp_ROCParameter <- function(parameter, file){
 
 
 #called from "writeParameterObject."
-writeParameterObject.Rcpp_RFPParameter <- function(parameter, file){
+writeParameterObject.Rcpp_PAParameter <- function(parameter, file){
   paramBase <- extractBaseInfo(parameter)
   
   currentAlpha <- parameter$currentAlphaParameter
   currentLambdaPrime <- parameter$currentLambdaPrimeParameter
   proposedAlpha <- parameter$proposedAlphaParameter
   proposedLambdaPrime <- parameter$proposedLambdaPrimeParameter
-  model = "RFP"
+  model = "PA"
   
   
   trace <- parameter$getTraceObject()
@@ -747,9 +747,9 @@ loadParameterObject <- function(files)
   if (firstModel == "ROC"){
     parameter <- new(ROCParameter)
     parameter <- loadROCParameterObject(parameter, files)
-  }else if (firstModel == "RFP") {
-    parameter <- new(RFPParameter)
-    parameter <- loadRFPParameterObject(parameter, files)
+  }else if (firstModel == "PA") {
+    parameter <- new(PAParameter)
+    parameter <- loadPAParameterObject(parameter, files)
   }else if (firstModel == "FONSE") {
     parameter <- new(FONSEParameter)
     parameter <- loadFONSEParameterObject(parameter, files)
@@ -964,7 +964,7 @@ loadROCParameterObject <- function(parameter, files)
 
 
 #Called from "loadParameterObject."
-loadRFPParameterObject <- function(parameter, files)
+loadPAParameterObject <- function(parameter, files)
 {
   parameter <- setBaseInfo(parameter, files)
   
@@ -978,7 +978,7 @@ loadRFPParameterObject <- function(parameter, files)
     numSelectionCategories <- tempEnv$paramBase$numSel
 
     if (i == 1){
-      #for future use: This may break if RFP is ran with more than
+      #for future use: This may break if PA is ran with more than
       #one mixture, in this case just follow the format of the 
       #ROC CSP parameters.
       alphaTrace <- vector("list", length=numMutationCategories)

@@ -121,18 +121,18 @@ int main()
 		unsigned numMixtures = 1;
 		std::vector<double> sphi_init(numMixtures, 2);
 		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
-		RFPParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
+		PAParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
 
 		std::vector<std::string> files;
 		files.push_back("/Users/roxasoath1/Desktop/TONEWTON/RFPAlphaValues.csv");
-		tmp.initMutationSelectionCategories(files, 1, RFPParameter::alp);
+		tmp.initMutationSelectionCategories(files, 1, PAParameter::alp);
 		files[0] = "/Users/roxasoath1/Desktop/TONEWTON/RFPLambdaPrimeValues.csv";
-		tmp.initMutationSelectionCategories(files, 1, RFPParameter::lmPri);
+		tmp.initMutationSelectionCategories(files, 1, PAParameter::lmPri);
 		std::vector<double> phi = tmp.readPhiValues("/Users/roxasoath1/Desktop/TONEWTON/RFPPsiValues.csv");
 		tmp.InitializeSynthesisRate(phi);
 
 
-		RFPModel model;
+		PAModel model;
 
 		model.setParameter(tmp);
 
@@ -283,18 +283,18 @@ int main()
 
 
 
-		std::cout << "Initializing RFPParameter object--------------------\n" << std::endl;
-		RFPParameter parameter;
+		std::cout << "Initializing PAParameter object--------------------\n" << std::endl;
+		PAParameter parameter;
 
 		if (fromRestart)
 		{
-			RFPParameter tmp("/Users/roxasoath1/Desktop/RibModelFramework/10_restartFile.rst");
+			PAParameter tmp("/Users/roxasoath1/Desktop/RibModelFramework/10_restartFile.rst");
 			parameter = tmp;
 		}
 		else
 		{
 			std::string mixDef = Parameter::allUnique;
-			RFPParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
+			PAParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 
 			for (unsigned i = 0u; i < numMixtures; i++) {
 				unsigned selectionCategry = tmp.getSelectionCategory(i);
@@ -311,9 +311,9 @@ int main()
 
 
 
-		std::cout << "Initializing RFPModel object--------------------------\n";
+		std::cout << "Initializing PAModel object--------------------------\n";
 
-		RFPModel model;
+		PAModel model;
 		model.setParameter(parameter);
 		std::cout << "Done!----------------------------------\n\n\n" << std::endl;
 
@@ -525,18 +525,18 @@ int main()
 
 
 
-		std::cout << "Initializing RFPParameter object--------------------\n" << std::endl;
-		RFPParameter parameter;
+		std::cout << "Initializing PAParameter object--------------------\n" << std::endl;
+		PAParameter parameter;
 
 		if (fromRestart)
 		{
-			RFPParameter tmp("/Users/roxasoath1/Desktop/RibModelFramework/DevRscripts/10restartFile.rst");
+			PAParameter tmp("/Users/roxasoath1/Desktop/RibModelFramework/DevRscripts/10restartFile.rst");
 			parameter = tmp;
 		}
 		else
 		{
 			std::string mixDef = Parameter::allUnique;
-			RFPParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
+			PAParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 
 			for (unsigned i = 0u; i < numMixtures; i++) {
 				unsigned selectionCategry = tmp.getSelectionCategory(i);
@@ -553,9 +553,9 @@ int main()
 
 
 
-		std::cout << "Initializing RFPModel object--------------------------\n";
+		std::cout << "Initializing PAModel object--------------------------\n";
 
-		RFPModel model;
+		PAModel model;
 		model.setParameter(parameter);
 		std::cout << "Done!----------------------------------\n\n\n" << std::endl;
 
@@ -677,19 +677,19 @@ int main()
 		geneAssignment[i] = 0u;
 	}
 
-	RFPParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
+	PAParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
 
 	std::vector<std::string> files;
 	files.push_back(pathBegin + "HollisTestingData/RFPAlphaValues.csv");
-	parameter.initMutationSelectionCategories(files, 1, RFPParameter::alp);
+	parameter.initMutationSelectionCategories(files, 1, PAParameter::alp);
 	files[0] = pathBegin + "HollisTestingData/RFPLambdaPrimeValues.csv";
-	parameter.initMutationSelectionCategories(files, 1, RFPParameter::lmPri);
+	parameter.initMutationSelectionCategories(files, 1, PAParameter::lmPri);
 
 	std::vector<double> phi = parameter.readPhiValues(pathBegin + "HollisTestingData/RFPPhiValues.csv");
 	//std::vector<double> phi = tmp.readPhiValues("/Users/roxasoath1/Desktop/TONEWTON/RFPPsiValues.csv");
 	parameter.InitializeSynthesisRate(phi);
 
-	RFPModel model;
+	PAModel model;
 
 	model.setParameter(parameter);
 
@@ -699,15 +699,15 @@ int main()
 	*/
 
 	// UNIT TESTING
-	//testUtility();
-	//testSequenceSummary();
-	//testGene();
-	//testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
-	//testCovarianceMatrix();
-	//testParameter();
+	testUtility();
+	testSequenceSummary();
+	testGene();
+	testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
+	testCovarianceMatrix();
+	testParameter();
 	//testParameterWithFile(pathBegin + "HollisFile.txt");
-	//testRFPParameter();
-	//testMCMCAlgorithm();
+	//testPAParameter();
+	testMCMCAlgorithm();
 	exit(0);
 
 
@@ -844,19 +844,19 @@ int main()
 		my_print("Done!------------------------\n\n\n");
 
 
-		my_print("Initializing RFPParameter object--------------------\n\n");
-		RFPParameter parameter;
+		my_print("Initializing PAParameter object--------------------\n\n");
+		PAParameter parameter;
 		//parameter.writeBasicRestartFile("/Users/hollisbui/HollisFile.txt");
 
 		if (fromRestart)
 		{
-			RFPParameter tmp(pathBegin + "RibModelFramework/10_restartFile.rst");
+			PAParameter tmp(pathBegin + "RibModelFramework/10_restartFile.rst");
 			parameter = tmp;
 		}
 		else
 		{
 			std::string mixDef = Parameter::allUnique;
-			RFPParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
+			PAParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 
 			for (unsigned i = 0u; i < numMixtures; i++)
 			{
@@ -873,8 +873,8 @@ int main()
 		my_print("Done!--------------------------------\n\n\n");
 
 
-		my_print("Initializing RFPModel object--------------------------\n");
-		RFPModel model;
+		my_print("Initializing PAModel object--------------------------\n");
+		PAModel model;
 		model.setParameter(parameter);
 		my_print("Done!----------------------------------\n\n\n");
 
@@ -983,19 +983,19 @@ int main()
 		geneAssignment[i] = 0u;
 	}
 
-	RFPParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
+	PAParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
 
 	std::vector<std::string> files;
 	files.push_back(pathBegin + "HollisTestingData/RFPAlphaValues.csv");
-	parameter.initMutationSelectionCategories(files, 1, RFPParameter::alp);
+	parameter.initMutationSelectionCategories(files, 1, PAParameter::alp);
 	files[0] = pathBegin + "HollisTestingData/RFPLambdaPrimeValues.csv";
-	parameter.initMutationSelectionCategories(files, 1, RFPParameter::lmPri);
+	parameter.initMutationSelectionCategories(files, 1, PAParameter::lmPri);
 
 	std::vector<double> phi = parameter.readPhiValues(pathBegin + "HollisTestingData/RFPPhiValues.csv");
 	//std::vector<double> phi = tmp.readPhiValues("/Users/roxasoath1/Desktop/TONEWTON/RFPPsiValues.csv");
 	parameter.InitializeSynthesisRate(phi);
 
-	RFPModel model;
+	PAModel model;
 
 	model.setParameter(parameter);
 
@@ -1012,7 +1012,7 @@ int main()
 	//testCovarianceMatrix();
 	//testParameter();
 	//testParameterWithFile(pathBegin + "HollisFile.txt");
-	//testRFPParameter();
+	//testPAParameter();
 	//testMCMCAlgorithm();
 	exit(0);
 
@@ -1150,19 +1150,19 @@ int main()
 		my_print("Done!------------------------\n\n\n");
 
 
-		my_print("Initializing RFPParameter object--------------------\n\n");
-		RFPParameter parameter;
+		my_print("Initializing PAParameter object--------------------\n\n");
+		PAParameter parameter;
 		//parameter.writeBasicRestartFile("/Users/hollisbui/HollisFile.txt");
 
 		if (fromRestart)
 		{
-			RFPParameter tmp(pathBegin + "RibModelFramework/10_restartFile.rst");
+			PAParameter tmp(pathBegin + "RibModelFramework/10_restartFile.rst");
 			parameter = tmp;
 		}
 		else
 		{
 			std::string mixDef = Parameter::allUnique;
-			RFPParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
+			PAParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 
 			for (unsigned i = 0u; i < numMixtures; i++)
 			{
@@ -1179,8 +1179,8 @@ int main()
 		my_print("Done!--------------------------------\n\n\n");
 
 
-		my_print("Initializing RFPModel object--------------------------\n");
-		RFPModel model;
+		my_print("Initializing PAModel object--------------------------\n");
+		PAModel model;
 		model.setParameter(parameter);
 		my_print("Done!----------------------------------\n\n\n");
 

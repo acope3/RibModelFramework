@@ -1,20 +1,20 @@
 library(testthat)
 library(ribModel)
 
-context("RFP Model")
+context("PA Model")
 
-test_that("RFP Model testing simulated versus actual accuracy", {
+test_that("PA Model testing simulated versus actual accuracy", {
   # Skip unless manually run or changed
   #if (F)
-    skip("RFP Model testing is optional.")
+    skip("PA Model testing is optional.")
   
   #####################
   ### Initial Setup ###
   #####################
 
   # Test with only 1500 genes
-  fileName = file.path("UnitTestingData", "testRFPModelFiles", "rand1500.csv")
-  fileTable = file.path("UnitTestingData", "testRFPModelFiles", "codonTranslationRates.csv")
+  fileName = file.path("UnitTestingData", "testPAModelFiles", "rand1500.csv")
+  fileTable = file.path("UnitTestingData", "testPAModelFiles", "codonTranslationRates.csv")
   
   # Ensure the input files exist.
   test_that("file exists: rand1500.csv", {
@@ -43,7 +43,7 @@ test_that("RFP Model testing simulated versus actual accuracy", {
   model <- initializeModelObject(parameter, "RFP")
   setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth, TRUE)
   
-  outFile = file.path("UnitTestingOut", "testRFPModelLog20000.txt")
+  outFile = file.path("UnitTestingOut", "testPAModelLog20000.txt")
   
   sink(outFile)
   system.time(
@@ -155,7 +155,7 @@ test_that("RFP Model testing simulated versus actual accuracy", {
   axis(1, tck = 0.02, labels = codonList[1:61], at=1:61, las=2, cex.axis=.6)
   
   
-  # correlation between RFPModel and Pop's wait rates
+  # correlation between PAModel and Pop's wait rates
   # load Pop's data
   X <- read.csv(fileTable)
   X <- X[order(X[,1]) , ]
@@ -168,17 +168,17 @@ test_that("RFP Model testing simulated versus actual accuracy", {
   
   
   plot(NULL, NULL, xlim=range(XM[,2], na.rm = T), ylim=range(Y[,2]), 
-       main = "Correlation Between Pop and RFP Model Pausing Time Rates", xlab = "Pop's Rates", ylab = "RFP's Rates")
+       main = "Correlation Between Pop and PA Model Pausing Time Rates", xlab = "Pop's Rates", ylab = "RFP's Rates")
   upper.panel.plot(XM[,2], Y[,2])
   
-  # correlation between RFPModel WAIT RATES (inverse) and Pop's wait rates
+  # correlation between PAModel WAIT RATES (inverse) and Pop's wait rates
   Y <- data.frame(codonList[-c(62,63,64)], waitingTimes)
   colnames(Y) <- c("Codon", "WaitingTimeRates")
   Y <- Y[order(Y[,1]) , ]
   
   
   plot(NULL, NULL, xlim=range(XM[,2], na.rm = T), ylim=range(Y[,2]), 
-       main = "Correlation Between Pop and RFP Model Waiting Times", xlab = "Pop's Rates", ylab = "RFP's Waiting Times")
+       main = "Correlation Between Pop and PA Model Waiting Times", xlab = "Pop's Rates", ylab = "RFP's Waiting Times")
   upper.panel.plot(XM[,2], Y[,2])
 
   dev.off()

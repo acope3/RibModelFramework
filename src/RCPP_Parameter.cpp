@@ -1,7 +1,7 @@
 #ifndef STANDALONE
 #include "include/base/Parameter.h"
 #include "include/ROC/ROCParameter.h"
-#include "include/RFP/RFPParameter.h"
+#include "include/PA/PAParameter.h"
 #include "include/FONSE/FONSEParameter.h"
 #include <Rcpp.h>
 using namespace Rcpp;
@@ -154,7 +154,7 @@ RCPP_MODULE(Parameter_mod)
 		;
 
 
-	class_<RFPParameter>("RFPParameter")
+	class_<PAParameter>("PAParameter")
 		.derives<Parameter>("Parameter")
 
 
@@ -168,9 +168,9 @@ RCPP_MODULE(Parameter_mod)
 
 
 		//Initialization, Restart, Index Checking:
-		.method("initAlpha", &RFPParameter::initAlphaR)
-		.method("initLambdaPrime", &RFPParameter::initLambdaPrimeR)
-		.method("initMutationSelectionCategories", &RFPParameter::initMutationSelectionCategoriesR)
+		.method("initAlpha", &PAParameter::initAlphaR)
+		.method("initLambdaPrime", &PAParameter::initLambdaPrimeR)
+		.method("initMutationSelectionCategories", &PAParameter::initMutationSelectionCategoriesR)
 
 
 		//CSP Functions:
@@ -178,18 +178,18 @@ RCPP_MODULE(Parameter_mod)
 		//used in R
 
 		//Other Functions:
-		.method("getParameterForCategory", &RFPParameter::getParameterForCategoryR)
+		.method("getParameterForCategory", &PAParameter::getParameterForCategoryR)
 
 
 
-		.property("proposedAlphaParameter", &RFPParameter::getProposedAlphaParameter,
-		        &RFPParameter::setProposedAlphaParameter) //R Specific
-		.property("proposedLambdaPrimeParameter", &RFPParameter::getProposedLambdaPrimeParameter,
-		        &RFPParameter::setProposedLambdaPrimeParameter) //R Specific
-		.property("currentAlphaParameter", &RFPParameter::getCurrentAlphaParameter,
-		        &RFPParameter::setCurrentAlphaParameter) //R Specific
-		.property("currentLambdaPrimeParameter", &RFPParameter::getCurrentLambdaPrimeParameter,
-		        &RFPParameter::setCurrentLambdaPrimeParameter) //R Specific
+		.property("proposedAlphaParameter", &PAParameter::getProposedAlphaParameter,
+		        &PAParameter::setProposedAlphaParameter) //R Specific
+		.property("proposedLambdaPrimeParameter", &PAParameter::getProposedLambdaPrimeParameter,
+		        &PAParameter::setProposedLambdaPrimeParameter) //R Specific
+		.property("currentAlphaParameter", &PAParameter::getCurrentAlphaParameter,
+		        &PAParameter::setCurrentAlphaParameter) //R Specific
+		.property("currentLambdaPrimeParameter", &PAParameter::getCurrentLambdaPrimeParameter,
+		        &PAParameter::setCurrentLambdaPrimeParameter) //R Specific
 		;
 
 

@@ -19,7 +19,7 @@ int testGenome(std::string testFileDir);
 int testParameter();
 //int testParameterWithFile(std::string filename); //TODO: Rework or remove
 int testCovarianceMatrix();
-//int testRFPParameter(); //TODO: Rework or remove
+//int testPAParameter(); //TODO: Rework or remove
 int testMCMCAlgorithm();
 
 //Blank header

@@ -3184,7 +3184,7 @@ int testCovarianceMatrix()
 
 
 /* TODO: Rework or remove!
-int testRFPTrace()
+int testPATrace()
 {
     Trace RFP; //initialize with 0 categories, 2 codon-specific parameter types
     Trace ROC;
@@ -3196,9 +3196,9 @@ int testRFPTrace()
     int globalError = 0;
 
     //-----------------------------------------//
-    //------ initializeRFPTrace Function ------//
+    //------ initializePATrace Function ------//
     //-----------------------------------------//
-    //RFP.initializeRFPTrace();
+    //RFP.initializePATrace();
 
     //-----------------------------------------//
     //------ initializeROCTrace Function ------//
@@ -3221,18 +3221,18 @@ int testRFPTrace()
 
 
 /* TODO: Rework or remove!
-int testRFPParameter()
+int testPAParameter()
 {
     int error = 0;
     int globalError = 0;
 
-    /* Section 1: 1 function tested in total.
-     * initRFPParameterSet Function
+     * Section 1: 1 function tested in total.
+     * initPAParameterSet Function
      * and related get/set functions as a consequence of the function setup:
 
 
     //------------------------------------------//
-    //------ initRFPParameterSet Function ------//
+    //------ initPAParameterSet Function ------//
     //------------------------------------------//
 
      * Initialize parameter:
@@ -3268,11 +3268,11 @@ int testRFPParameter()
     bool splitSer = true;
     std::string mutationSelectionState = Parameter::allUnique;
 
-    RFPParameter parameter(stdDev, numMixtures, geneAssignment, mixtureDefinitionMatrix, splitSer, mutationSelectionState);
+    PAParameter parameter(stdDev, numMixtures, geneAssignment, mixtureDefinitionMatrix, splitSer, mutationSelectionState);
 
-    /* This constructor in turn calls two functions: initParameterSet() and initRFPParameterSet().
+     * This constructor in turn calls two functions: initParameterSet() and initPAParameterSet().
      * initParameterSet should have been tested in testParameter(), above, but we must now
-     * test initRFPParameterSet
+     * test initPAParameterSet
      *
      * Thus, unit testing is done in order of variable changed:
      * numParam, currentCodonSpecificParameter, proposedCodonSpecificParameter, std_csp, and groupList.
@@ -3280,11 +3280,11 @@ int testRFPParameter()
      * unit testing checks may be a result of the checking function or initParameterSet.
 
 
-    // numParam is set to 61 in initRFPParameterSet.
+    // numParam is set to 61 in initPAParameterSet.
     unsigned numParam = parameter.getNumParam();
     if (numParam != 61)
     {
-        my_printError("Error in initRFPParameterSet -- numParam is not set correctly.");
+        my_printError("Error in initPAParameterSet -- numParam is not set correctly.");
         my_printError(" Value should be 61 but is instead %.\n", numParam);
         error = 1;
         globalError = 1;
@@ -3294,7 +3294,7 @@ int testRFPParameter()
     // currentCodonSpecificParameter
     // proposedCodonSpecificParameter
 
-    // std_csp is set to 0.1 for each index in initRFPParameterSet.
+    // std_csp is set to 0.1 for each index in initPAParameterSet.
     for (unsigned i = 0u; i < numParam; i++)
     {
         if (parameter.getStdCspForIndex(i) != 0.1)
@@ -3306,7 +3306,7 @@ int testRFPParameter()
         }
     }
 
-    // groupList is set to the same as this temporary group list in initRFPParameterSet.
+    // groupList is set to the same as this temporary group list in initPAParameterSet.
     std::vector <std::string> tmpGroupList = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
                                               "TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT", "ATA", "ATC",
                                               "ATT", "AAA", "AAG", "CTA", "CTC", "CTG", "CTT", "TTA", "TTG", "ATG",
@@ -3317,13 +3317,13 @@ int testRFPParameter()
 
     if (parameter.getGroupList() != tmpGroupList)
     {
-        my_printError("Error in initRFPParameterSet -- groupList is not set correctly.\n");
+        my_printError("Error in initPAParameterSet -- groupList is not set correctly.\n");
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        my_print("RFPParameter initRFPParameterSet --- Pass\n");
+        my_print("PAParameter initPAParameterSet --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -3389,8 +3389,8 @@ int testMCMCAlgorithm()
     my_print("Done!------------------------\n\n\n");
 
 
-    my_print("Initializing RFPParameter object--------------------\n\n");
-    RFPParameter parameter(stdDev, numMixtures, geneAssignment, mixtureDefinitionMatrix, splitSer, mutationSelectionState);
+    my_print("Initializing PAParameter object--------------------\n\n");
+    PAParameter parameter(stdDev, numMixtures, geneAssignment, mixtureDefinitionMatrix, splitSer, mutationSelectionState);
     for (unsigned i = 0u; i < numMixtures; i++)
     {
         unsigned selectionCategory = parameter.getSelectionCategory(i);
@@ -3403,8 +3403,8 @@ int testMCMCAlgorithm()
 
     my_print("Done!--------------------------------\n\n\n");
 
-    my_print("Initializing RFPModel object--------------------------\n");
-    RFPModel model;
+    my_print("Initializing PAModel object--------------------------\n");
+    PAModel model;
     model.setParameter(parameter);
     my_print("Done!----------------------------------\n\n\n");
 
@@ -3649,7 +3649,7 @@ RCPP_MODULE(Test_mod)
 	function("testGenome", &testGenome);
 	function("testParameter", &testParameter);
 	function("testCovarianceMatrix", &testCovarianceMatrix);
-	//function("testRFPParameter", &testRFPParameter);
+	//function("testPAParameter", &testPAParameter);
 	function("testMCMCAlgorithm", &testMCMCAlgorithm);
 }
 #endif

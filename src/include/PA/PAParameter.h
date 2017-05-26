@@ -1,5 +1,5 @@
-#ifndef RFPPARAMETER_H
-#define RFPPARAMETER_H
+#ifndef PAParameter_H
+#define PAParameter_H
 
 
 #include "../base/Trace.h"
@@ -15,7 +15,7 @@
 #include <Rcpp.h>
 #endif
 
-class RFPParameter: public Parameter {
+class PAParameter: public Parameter {
 	private:
 
 		std::vector<std::vector<double>> lambdaValues; //Currently not used.
@@ -24,20 +24,20 @@ class RFPParameter: public Parameter {
 	public:
 
 		//Constructors & Destructors:
-		explicit RFPParameter();
-		RFPParameter(std::string filename);
-		RFPParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
+		explicit PAParameter();
+		PAParameter(std::string filename);
+		PAParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
 				std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer = true,
 				std::string _mutationSelectionState = "allUnique");
-		RFPParameter& operator=(const RFPParameter& rhs);
-		virtual ~RFPParameter();
+		PAParameter& operator=(const PAParameter& rhs);
+		virtual ~PAParameter();
 
 
 		//Initialization, Restart, Index Checking:
-		void initRFPParameterSet();
+		void initPAParameterSet();
 		void initRFPValuesFromFile(std::string filename);
 		void writeEntireRestartFile(std::string filename);
-		void writeRFPRestartFile(std::string filename);
+		void writePARestartFile(std::string filename);
 		void initFromRestartFile(std::string filename);
 
 		void initAllTraces(unsigned samples, unsigned num_genes);
@@ -73,9 +73,9 @@ class RFPParameter: public Parameter {
 #ifndef STANDALONE
 
 		//Constructors & Destructors:
-		RFPParameter(std::vector<double> stdDevSynthesisRate, std::vector<unsigned> geneAssignment,
+		PAParameter(std::vector<double> stdDevSynthesisRate, std::vector<unsigned> geneAssignment,
 			std::vector<unsigned> _matrix, bool splitSer = true);
-		RFPParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
+		PAParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
 			bool splitSer = true, std::string _mutationSelectionState = "allUnique");
 
 
@@ -115,4 +115,4 @@ class RFPParameter: public Parameter {
 
 };
 
-#endif // RFPPARAMETER_H
+#endif // PAParameter_H
