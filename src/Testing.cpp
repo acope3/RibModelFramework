@@ -1481,7 +1481,7 @@ void testGenomePAHelper(Genome* genome, bool simulated)
 
     // RFPCount for TEST001: value[position] = RFPCount
     std::vector <unsigned> test1Cat1 = {0, 0, 2, 0, 1};
-    std::vector <unsigned> test1Cat2 = {0, 17, 0, 1, 4};
+    std::vector <unsigned> test1Cat2 = {0, 17, 0, 1, 0};
 
     // RFPCount for TEST002: value[position] = RFPCount
     std::vector <unsigned> test2Cat1 = {1, 1, 0, 0, 1};
@@ -1517,7 +1517,7 @@ void testGenomePAHelper(Genome* genome, bool simulated)
     codon = "TTT";
     index4 = SequenceSummary::codonToIndex(codon);
     sumTest1Cat1[index4] = 1;
-    sumTest1Cat2[index4] = 5;
+    sumTest1Cat2[index4] = 1;
 
     codon = "CCT";
     index5 = SequenceSummary::codonToIndex(codon);
@@ -2149,7 +2149,7 @@ int testParameter()
     */
     Genome genome;
     genome.readFasta("/Users/hollisbui/RibModelDev/data/twoMixtures/simulatedAllUniqueR.fasta");
-    //genome.readRFPFile("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+    //genome.readPAFile("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 
     unsigned numMixtures = 3;
     std::vector<double> stdDev(numMixtures, 1);
@@ -3243,7 +3243,7 @@ int testPAParameter()
 
 
     Genome genome;
-    //genome.readRFPFile("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+    //genome.readPAFile("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
     unsigned numMixtures = 3;
     std::vector <double> stdDev(numMixtures, 1);
     unsigned numGenes = genome.getGenomeSize();
@@ -3360,7 +3360,7 @@ int testMCMCAlgorithm()
 
     my_print("Initializing Genome object--------------------------\n");
     Genome genome;
-    genome.readRFPFile("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+    genome.readPAFile("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
     my_print("Done!-------------------------------\n\n\n");
     my_print("Initializing shared parameter variables---------------\n");
     unsigned numMixtures = 1;

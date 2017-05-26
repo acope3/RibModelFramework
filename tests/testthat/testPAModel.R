@@ -31,8 +31,8 @@ test_that("PA Model testing simulated versus actual accuracy", {
   numMixtures <- 1
   mixDef <- "allUnique"
   geneAssignment <- c(rep(1, length(genome))) 
-  parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, model= "RFP", split.serine = TRUE, mixture.definition = mixDef)
-  #parameter <- initializeParameterObject(model="RFP", restart.file="30restartFile.rst")
+  parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, model= "PA", split.serine = TRUE, mixture.definition = mixDef)
+  #parameter <- initializeParameterObject(model="PA", restart.file="30restartFile.rst")
   
   samples <- 20000
   thinning <- 10
@@ -40,7 +40,7 @@ test_that("PA Model testing simulated versus actual accuracy", {
   mcmc <- initializeMCMCObject(samples = samples, thinning = thinning, adaptive.width = adaptiveWidth, 
                                est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
   
-  model <- initializeModelObject(parameter, "RFP")
+  model <- initializeModelObject(parameter, "PA")
   setRestartSettings(mcmc, "restartFile.rst", adaptiveWidth, TRUE)
   
   outFile = file.path("UnitTestingOut", "testPAModelLog20000.txt")
@@ -57,7 +57,7 @@ test_that("PA Model testing simulated versus actual accuracy", {
   
   # plots different aspects of trace
   trace <- parameter$getTraceObject()
-  writeParameterObject(parameter, file = file.path("UnitTestingOut", "RFPObject.Rdat"))
+  writeParameterObject(parameter, file = file.path("UnitTestingOut", "PAObject.Rdat"))
   writeMCMCObject(mcmc, file = file.path("UnitTestingOut", "MCMCObject.Rdat"))
   
   
@@ -168,7 +168,7 @@ test_that("PA Model testing simulated versus actual accuracy", {
   
   
   plot(NULL, NULL, xlim=range(XM[,2], na.rm = T), ylim=range(Y[,2]), 
-       main = "Correlation Between Pop and PA Model Pausing Time Rates", xlab = "Pop's Rates", ylab = "RFP's Rates")
+       main = "Correlation Between Pop and PA Model Pausing Time Rates", xlab = "Pop's Rates", ylab = "PA's Rates")
   upper.panel.plot(XM[,2], Y[,2])
   
   # correlation between PAModel WAIT RATES (inverse) and Pop's wait rates
@@ -178,7 +178,7 @@ test_that("PA Model testing simulated versus actual accuracy", {
   
   
   plot(NULL, NULL, xlim=range(XM[,2], na.rm = T), ylim=range(Y[,2]), 
-       main = "Correlation Between Pop and PA Model Waiting Times", xlab = "Pop's Rates", ylab = "RFP's Waiting Times")
+       main = "Correlation Between Pop and PA Model Waiting Times", xlab = "Pop's Rates", ylab = "PA's Waiting Times")
   upper.panel.plot(XM[,2], Y[,2])
 
   dev.off()

@@ -89,7 +89,7 @@ PAParameter::~PAParameter()
 
 /* initPAParameterSet (NOT EXPOSED)
  * Arguments: None
- * Initializes the variables that are specific to the RFP Parameter object. The group list is set to all codons from
+ * Initializes the variables that are specific to the PA Parameter object. The group list is set to all codons from
  * table 1 minus the stop codons. This will be corrected in CodonTable.
 */
 void PAParameter::initPAParameterSet()

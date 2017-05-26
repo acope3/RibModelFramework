@@ -12,11 +12,11 @@
 testMCMCROCLogPhi.txt
 testMCMCROCLogWithoutPhi.txt
 
-# testRFPModel files
+# testPAModel files
 #RFPAlphaValues.csv
 RFPConfidenceIntervalsForAlphaAndLambdaPrime.pdf
 #RFPLambdaPrimeValues.csv
 #RFPPsiValues.csv
 RFP_CSP_Values_Mixture1.pdf
 RFP_Genome_allUnique_startCSP_startPhi_adaptSphi_true.pdf
-testRFPModelLog.txt
+testPAModelLog.txt

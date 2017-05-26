@@ -143,7 +143,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 		my_print("logprob2 inf\n");
 	}
 
-	//------------NOTE: Jeremy, Cedric changed the reverse jump to where we DON'T include it. I had my RFP
+	//------------NOTE: Jeremy, Cedric changed the reverse jump to where we DON'T include it. I had my PA
 	//LogLikelihood go to 0 because of now missing terms. I have added the code underneath to where we calculate it---/
 
 	logProbabilityRatio[3] = currentLogLikelihood;

@@ -330,15 +330,8 @@ void SequenceSummary::clear()
 	codonPositions.clear();
 	RFPCount.clear();
 	sumRFPCount.clear();
-	for (unsigned i = 0; i < 64; i++)
-	{
-		ncodons[i] = 0;
-	}
-
-	for (unsigned i = 0; i < 22; i++)
-	{
-		naa[i] = 0;
-	}
+	ncodons.fill(0);
+	naa.fill(0);
 }
 
 
@@ -401,9 +394,8 @@ bool SequenceSummary::processPA(std::vector<std::vector<unsigned>> table)
 
 		unsigned codonID = row[1];
 		std::string codon = indexToCodon(codonID);
-		/* Note: Don't bother writing a function to convert codonIndex to aaIndex
-		 * Would just perform the exact same steps anyway; redundant code.
-		 */
+		// Note: Don't bother writing a function to convert codonIndex to aaIndex
+        // Would just perform the exact same steps anyway; redundant code.
 		if (codonID != 64) // if codon id == 64 => codon not found. Ignore, probably N
 		{
 			int aaID = codonToAAIndex(codon);
@@ -568,8 +560,7 @@ std::vector<std::string> SequenceSummary::AAToCodon(std::string aa, bool forPara
 	std::vector <std::string> RV;
 	aa = (char) std::toupper(aa[0]);
 
-	unsigned aaStart;
-	unsigned aaEnd;
+	unsigned aaStart, aaEnd;
 	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, forParamVector);
 	if (forParamVector)
 	{
