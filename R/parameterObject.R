@@ -166,10 +166,13 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
   parameter$setNumObservedSynthesisRateSets(n.obs.phi.sets)
 
   parameter$mutation_prior_sd <- mutation_prior_sd
-  parameter$setInitialValuesForSepsilon(as.vector(init.sepsilon))
+
+  if (n.obs.phi.sets != 0){
+   parameter$setInitialValuesForSepsilon(as.vector(init.sepsilon))
+  }
+
   parameter <- initializeCovarianceMatrices(parameter, genome, numMixtures, geneAssignment, init.csp.variance)
-  
-  
+   
   return(parameter)
 }
 

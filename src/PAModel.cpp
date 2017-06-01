@@ -156,7 +156,6 @@ void PAModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsi
 		lpr -= Parameter::densityNorm(currentStdDevSynthesisRate[i], 1.0, 0.1, true) - Parameter::densityNorm(proposedStdDevSynthesisRate[i], 1.0, 0.1, true);
 	}
 
-
 	logProbabilityRatio.resize(1);
 #ifdef _OPENMP
 //#ifndef __APPLE__
