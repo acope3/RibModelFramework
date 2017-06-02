@@ -108,7 +108,7 @@ class PANSEModel: public Model
 		void setParameter(PANSEParameter &_parameter);
 		virtual double calculateAllPriors();
 		virtual double getParameterForCategory(unsigned category, unsigned param, std::string codon, bool proposal);
-		double l_gamma_norm(double s, double x);
+		double u_gamma_helper(double s, double x);
 
 		double u_gamma(double s, double x);
 		double u_gamma_log(double s, double x);
