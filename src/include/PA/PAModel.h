@@ -1,16 +1,16 @@
-#ifndef RFPMODEL_H
-#define RFPMODEL_H
+#ifndef PAMODEL_H
+#define PAMODEL_H
 
 
 #include "../base/Model.h"
-#include "RFPParameter.h"
+#include "PAParameter.h"
 
 #include <sstream>
 
-class RFPModel: public Model
+class PAModel: public Model
 {
 	private:
-		RFPParameter *parameter;
+		PAParameter *parameter;
 
 		double calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
 				unsigned currRFPObserved, unsigned currNumCodonsInMRNA, double phiValue);
@@ -18,8 +18,8 @@ class RFPModel: public Model
 
 	public:
 		//Constructors & Destructors:
-		explicit RFPModel();
-		virtual ~RFPModel();
+		explicit PAModel();
+		virtual ~PAModel();
 
 
 		//Likelihood Ratio Functions:
@@ -103,12 +103,12 @@ class RFPModel: public Model
 
 		virtual void simulateGenome(Genome &genome);
 		virtual void printHyperParameters();
-		RFPParameter* getParameter();
-		void setParameter(RFPParameter &_parameter);
+		PAParameter* getParameter();
+		void setParameter(PAParameter &_parameter);
 		virtual double calculateAllPriors();
 		virtual double getParameterForCategory(unsigned category, unsigned param, std::string codon, bool proposal);
 
 	protected:
 };
 
-#endif // RFPMODEL_H
+#endif // PAModel_H

@@ -1,18 +1,35 @@
-# File originally spawned from calling autoscan.
-# Process this file with autoconf to produce a configure script.
-# Code adapted from ARTP2's configure.ac file.
+dnl To recreate this configure.ac file and produce a configure file:
+dnl  call autoscan
+dnl  use the code from ARTP2's configure.ac file to create a system-dependent Makevars file
+dnl Additional code from https://stackoverflow.com/a/42281495.
+dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([ribModel], [0.0.6], [cedric.landerer@gmail.com])
-#AC_CONFIG_SRCDIR([ribModel.Rcheck/00_pkg_src/ribModel/src/CodonTable.cpp])
 
-CXX1X=`"${R_HOME}/bin/R" CMD config CXX1X`
-CXX1XSTD=`"${R_HOME}/bin/R" CMD config CXX1XSTD`
+AC_INIT([ribModel], m4_esyscmd_s([awk '/^Version:/ {print $2}' DESCRIPTION]), [cedric.landerer@gmail.com])
+
+## Determine install location of R
+: ${R_HOME=$(R RHOME)}
+if test -z "${R_HOME}"; then
+    AC_MSG_ERROR([Could not determine R_HOME.])
+fi
+
+RBIN="${R_HOME}/bin/R"
+CXX1X=`"${RBIN}" CMD config CXX1X`
+CXX1XSTD=`"${RBIN}" CMD config CXX1XSTD`
 CXX="${CXX1X} ${CXX1XSTD}"
-CXXFLAGS=`"${R_HOME}/bin/R" CMD config CXX1XFLAGS`
+CXXFLAGS=`"${RBIN}" CMD config CXX1XFLAGS`
 
+## Package requires C++
 AC_LANG(C++)
+AC_REQUIRE_CPP
+
+# Checks for programs.
+AC_PROG_CXX
+AC_PROG_CC
+
 dnl this the meat of R's m4/openmp.m4
+dnl copied from ARTP2's configure.ac file
   OPENMP_[]_AC_LANG_PREFIX[]FLAGS=
   AC_ARG_ENABLE([openmp],
     [AS_HELP_STRING([--disable-openmp], [do not use OpenMP])])
@@ -43,12 +60,6 @@ dnl this the meat of R's m4/openmp.m4
     esac
   fi
 
-# Checks for programs.
-#AC_PROG_CXX
-#AC_PROG_CC
-
-# Checks for libraries.
-
 # Checks for header files.
 AC_CHECK_HEADERS([stdlib.h])
 if test "${ac_cv_header_stdlib_h}" = no; then
@@ -56,15 +67,14 @@ if test "${ac_cv_header_stdlib_h}" = no; then
 fi
 
 # Checks for typedefs, structures, and compiler characteristics.
-#AC_CHECK_HEADER_STDBOOL
-#AC_C_INLINE
-#AC_TYPE_SIZE_T
+AC_CHECK_HEADER_STDBOOL
+AC_C_INLINE
+AC_TYPE_SIZE_T
 
 # Checks for library functions.
-#AC_CHECK_FUNCS([sqrt])
+AC_CHECK_FUNCS([sqrt])
 
 AC_SUBST(OPENMP_CXXFLAGS)
 AC_CONFIG_FILES([src/Makevars])
-#AC_CONFIG_HEADERS([config.h])
 
 AC_OUTPUT

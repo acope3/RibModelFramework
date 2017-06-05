@@ -195,7 +195,7 @@ void Trace::initObservedSynthesisNoiseTrace(unsigned samples, unsigned numPhiGro
  * The constants aren't used here because they are not available to the Trace object.
 */
 
-void Trace::initializeRFPTrace(unsigned samples, unsigned num_genes, unsigned numAlphaCategories,
+void Trace::initializePATrace(unsigned samples, unsigned num_genes, unsigned numAlphaCategories,
 	unsigned numLambdaPrimeCategories, unsigned numParam, unsigned numMixtures,
 	std::vector<mixtureDefinition> &_categories, unsigned maxGrouping, std::vector<double> init_phi,
 	std::vector<unsigned> init_mix_assign)

@@ -40,7 +40,7 @@ class Trace {
 		//FONSE Trace:
 
 
-		//RFP Trace:
+		//PA Trace:
 
 		//--------------------------------------//
 		//------ Initialization Functions ------//
@@ -64,7 +64,7 @@ class Trace {
 		//FONSE Specific:
 
 
-		//RFP Specific:
+		//PA Specific:
 
 
 	public:
@@ -75,7 +75,7 @@ class Trace {
 
 
 		//Initialization Functions:
-		void initializeRFPTrace(unsigned samples, unsigned num_genes, unsigned numAlphaCategories,
+		void initializePATrace(unsigned samples, unsigned num_genes, unsigned numAlphaCategories,
 			unsigned numLambdaPrimeCategories, unsigned numParam, unsigned numMixtures,
 			std::vector<mixtureDefinition> &_categories, unsigned maxGrouping, std::vector<double> init_phi, 
                         std::vector<unsigned> init_mix_asssign);
@@ -134,7 +134,7 @@ class Trace {
         //FONSE Specific:
 
 
-        //RFP Specific:
+        //PA Specific:
 
 
 		//------------------------------//
@@ -159,7 +159,7 @@ class Trace {
         //FONSE Specific:
 
 
-        //RFP Specific:
+        //PA Specific:
         void updateCodonSpecificParameterTraceForCodon(unsigned sample, std::string codon, std::vector<std::vector<double>> &curParam, unsigned paramType);
 
 

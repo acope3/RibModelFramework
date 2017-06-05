@@ -27,6 +27,6 @@
 .ribModelConstants <- list(
                     #FONSE/ROC "constants"
                     deltaM = "Mutation", deltaEta = "Selection", deltaOmega = "Selection",
-                    #RFP "constants
+                    #PA "constants
                     alpha = "Alpha",lambdaPrime = "LambdaPrime")
 

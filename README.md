@@ -28,14 +28,14 @@ model <- initializeModelObject(parameter = parameter, model = "FONSE")
 runMCMC(mcmc = mcmc, genome = genome, model = model)
 ```
 
-## Example 3: Using codon data in the form of Ribosome footprints with one mixture (RFP)
-The following example illustrates how you would estimates parameters under the RFP model of a given set of protein coding genes, assuming the same mutation and selection regime for all genes.
+## Example 3: Using codon data in the form of Ribosome footprints with one mixture (PA)
+The following example illustrates how you would estimates parameters under the PA model of a given set of protein coding genes, assuming the same mutation and selection regime for all genes.
 
 ```{r, echo = FALSE}
 genome <- initializeGenomeObject(file = "rfpcounts.tsv", fasta = FALSE)
 parameter <- initializeParameterObject(genome = genome, sphi = 1, num.mixtures = 1, geneAssignment = rep(1, length(genome)))
 mcmc <- initializeMCMCObject(samples = 5000, thinning = 10, adaptive.width=50)
-model <- initializeModelObject(parameter = parameter, model = "RFP")
+model <- initializeModelObject(parameter = parameter, model = "PA")
 runMCMC(mcmc = mcmc, genome = genome, model = model)
 ```
 

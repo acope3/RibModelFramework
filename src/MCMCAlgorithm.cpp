@@ -788,6 +788,7 @@ std::vector<double> MCMCAlgorithm::getLogLikelihoodTrace()
 	return likelihoodTrace;
 }
 
+
 /* getLogLikelihoodPosteriorMean (RCPP EXPOSED)
  * Arguments: number of samples to use to calculate the posterior.
  * Calculates the mean for the specified number of samples from the end of the trace
