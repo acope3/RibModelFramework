@@ -108,10 +108,15 @@ class PANSEModel: public Model
 		void setParameter(PANSEParameter &_parameter);
 		virtual double calculateAllPriors();
 		virtual double getParameterForCategory(unsigned category, unsigned param, std::string codon, bool proposal);
-		double l_gamma_norm(double s, double x);
+		double u_gamma_helper(double s, double x);
 
 		double u_gamma(double s, double x);
 		double u_gamma_log(double s, double x);
+        double generalized_integral(double p, double z);
+
+        double generalized_integral_log(double p, double z);
+        double prob_elongation(double curralpha, double currlambda, double currv);
+        double prob_elongation_log(double curralpha, double currlambda, double currv);
 
 	protected:
 };
