@@ -112,9 +112,11 @@ class PANSEModel: public Model
 
 		double u_gamma(double s, double x);
 		double u_gamma_log(double s, double x);
-        double generalized_integral(double p, z);
+        double generalized_integral(double p, double z);
 
-        double generalized_integral_log(double p, z);
+        double generalized_integral_log(double p, double z);
+        double prob_elongation(double curralpha, double currlambda, double currv);
+        double prob_elongation_log(double curralpha, double currlambda, double currv);
 
 	protected:
 };

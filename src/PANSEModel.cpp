@@ -618,7 +618,7 @@ double PANSEModel::u_gamma(double s, double x)
 
     rv = pow(x, s) * exp(0 - x);
 
-    d = u_gamma_helper(s, x);/
+    d = PANSEModel::u_gamma_helper(s, x);
 
     return rv/d;
 
@@ -627,10 +627,10 @@ double PANSEModel::u_gamma(double s, double x)
 //log of upper incomplete gamma function
 double PANSEModel::u_gamma_log(double s, double x)
 {
-    double rv;
+    double rv, d;
 
     rv = s * std::log(x) - x;
-    d = std::log(u_gamma_helper(s, x));
+    d = std::log(PANSEModel::u_gamma_helper(s, x));
     
     return rv - d;
 
@@ -638,7 +638,7 @@ double PANSEModel::u_gamma_log(double s, double x)
 
 //Generalized integral function
 double PANSEModel::generalized_integral(double p, double z){
-    return pow(z, p - 1.0) * u_gamma(1.0 - p, z);
+    return std::pow(z, p - 1.0) * PANSEModel::u_gamma(1.0 - p, z);
 }
 
 //Log of generalized integral function
@@ -646,7 +646,19 @@ double PANSEModel::generalized_integral_log(double p, double z){
     double co;
 
     co = p - 1.0;
-    return co * log(z) + ugamma_log(1.0 - p, z);
+    return co * std::log(z) + PANSEModel::u_gamma_log(1.0 - p, z);
 }
 
 
+double PANSEModel::prob_elongation(double curralpha, double currlambda, double currv){
+    return std::exp(currlambda * currv) * PANSEModel::generalized_integral(curralpha, currlambda * currv);
+}
+
+double PANSEModel::prob_elongation_log(double curralpha, double currlambda, double currv){
+    double val1, val2;
+
+    val1 = currlambda * currv;
+    val2 = PANSEModel::generalized_integral_log(curralpha, currlambda * currv);
+
+    return val1 + val2;
+}
