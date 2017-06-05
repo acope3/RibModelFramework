@@ -127,7 +127,7 @@ plotParameterObject <- function(x, what = "Mutation", samples = 100, mixture.nam
 
 
 
-#TODO: should RFP's ploting be here as well?
+#TODO: should PA's ploting be here as well?
 
 upper.panel.plot <- function(x, y, sd.x=NULL, sd.y=NULL, ...){
   abline(0, 1, col = "blue", lty = 2)

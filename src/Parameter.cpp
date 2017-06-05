@@ -557,7 +557,7 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 	for (unsigned i = 0u; i < genomeSize; i++)
 	{
 		index[i] = i;
-		//This used to be maxGrouping instead of 22, but RFP model will not work that way
+		//This used to be maxGrouping instead of 22, but PA model will not work that way
 		scuoValues[i] = calculateSCUO( genome.getGene(i), 22 );
 		expression[i] = Parameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
 	}

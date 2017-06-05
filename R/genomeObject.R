@@ -2,7 +2,7 @@
 #' 
 #' \code{initializeGenomeObject} initializes the Rcpp Genome object
 #' 
-#' @param file A file of coding sequences in fasta or RFP format
+#' @param file A file of coding sequences in fasta or PA format
 #' 
 #' @param genome A genome object can be passed in to concatenate the input file to it (optional).
 #' 
@@ -10,7 +10,7 @@
 #'  empirical expression rates (optional).
 #' 
 #' @param fasta A boolean value which decides whether to initialize with a
-#'  fasta file or an RFP value file. (TRUE for fasta, FALSE for RFP)
+#'  fasta file or an PA value file. (TRUE for fasta, FALSE for PA)
 #'  
 #' @param match.expression.by.id If TRUE (default) observed expression values will be assigned by matching sequence identifier.
 #' If FALSE observed expression values will be assigned by order
@@ -25,7 +25,7 @@ initializeGenomeObject <- function(file, genome=NULL, observed.expression.file=N
   if (fasta == TRUE) {
     genome$readFasta(file, TRUE)
   } else {
-    genome$readRFPFile(file)
+    genome$readPAFile(file)
   }
   if(!is.null(observed.expression.file)) {
     genome$readObservedPhiValues(observed.expression.file, match.expression.by.id)

@@ -567,7 +567,7 @@ void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptatio
 
 
 /* getParameterForCategory (RCPP EXPOSED VIA WRAPPER)
- * Arguments: category, parameter typer, codon (as a string), where or not proposed or current
+ * Arguments: category, parameter type, codon (as a string), where or not proposed or current
  * Gets the value for a given codon specific parameter type and codon based off of if the value needed is the
  * proposed or current one.
 */

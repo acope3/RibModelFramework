@@ -1474,14 +1474,14 @@ int testGene()
  */
 void testGenomePAHelper(Genome* genome, bool simulated)
 {
-    // All values here are derived from readPAMulti.pa's hardcoded values.
+    // All values here are derived from readPA.csv's hardcoded values.
 
     Gene panse1("CTTGCTATTTTTTTT", "TEST001", "No description for PANSE Model");
     Gene panse2("CCTGTAATTTGGTGG", "TEST002", "No description for PANSE Model");
 
     // RFPCount for TEST001: value[position] = RFPCount
     std::vector <unsigned> test1Cat1 = {0, 0, 2, 0, 1};
-    std::vector <unsigned> test1Cat2 = {0, 17, 0, 1, 4};
+    std::vector <unsigned> test1Cat2 = {0, 17, 0, 1, 0};
 
     // RFPCount for TEST002: value[position] = RFPCount
     std::vector <unsigned> test2Cat1 = {1, 1, 0, 0, 1};
@@ -1517,7 +1517,7 @@ void testGenomePAHelper(Genome* genome, bool simulated)
     codon = "TTT";
     index4 = SequenceSummary::codonToIndex(codon);
     sumTest1Cat1[index4] = 1;
-    sumTest1Cat2[index4] = 5;
+    sumTest1Cat2[index4] = 1;
 
     codon = "CCT";
     index5 = SequenceSummary::codonToIndex(codon);
@@ -1914,95 +1914,12 @@ int testGenome(std::string testFileDir)
     else
         error = 0; //Reset for next function.
 
-
-    /*
-    //----------------------------------//
-    //------ readRFPFile Function ------//
-    //----------------------------------//
-    genome.clear();
-    testGenome.clear();
-
-    file = testFileDir + "/" + "readRFP.csv";
-    genome.readRFPFile(file);
-
-    // These sequences are composed of those codons with RFPValue values > 0
-    // Each repetition of a codon denotes an incrementation in RFPValue for that codon
-
-    Gene rfp1("GCCGCCGCCGCCGCC", "TEST001", "No description for RFP Model");
-    Gene rfp2("GCGGCGTTTTTTTTTTTT", "TEST002", "No description for RFP Model");
-    Gene rfp3("ATGATGATGATGATGATGATGATGATGATGATGATGATG", "TEST003", "No description for RFP Model");
-
-    testGenome.addGene(rfp1, false);
-    testGenome.addGene(rfp2, false);
-    testGenome.addGene(rfp3, false);
-
-    if (genome == testGenome)
-        my_print("Genome readRFPFile --- Pass\n");
-    else
-    {
-        my_printError("Error in testGenome: readRFPFile. Genomes are not equivalent.\n");
-        globalError = 1;
-    }
-
-    //-----------------------------------//
-    //------ writeRFPFile Function ------//
-    //-----------------------------------//
-
-    // Now write a genome described above in readRFPFile to a file, read it in again, and then compare its validity again.
-    testGenome.clear();
-
-    file = testFileDir + "/" + "writeRFP.csv";
-    genome.writeRFPFile(file, false);
-    testGenome.readRFPFile(file);
-
-    if (!(genome == testGenome))
-    {
-        my_printError("Error in testGenome: writeRFPFile with genes. Genomes are not equivalent.\n");
-        error = 1;
-        globalError = 1;
-    }
-
-    // Now re-do writing check but with simulated genes.
-    testGenome.clear();
-    genome.clear();
-
-    genome.addGene(rfp1, true);
-    genome.addGene(rfp2, true);
-    genome.addGene(rfp3, true);
-
-    genome.writeRFPFile(file, true);
-
-    // Note that while these genes were originally simulated, they are printed
-    // as non-simulated genes.
-    // It is up to the user to know that they were simulated, but they will
-    // now be read in as non-simulated genes (and Unit Testing will compare their validity as such)
-
-    genome.clear();
-    genome.addGene(rfp1, false);
-    genome.addGene(rfp2, false);
-    genome.addGene(rfp3, false);
-
-    testGenome.readRFPFile(file);
-
-    if (!(genome == testGenome))
-    {
-        my_printError("Error in testGenome: writeRFPFile with simulated genes. Genomes are not equivalent.\n");
-        error = 1;
-        globalError = 1;
-    }
-
-    if (!error)
-        my_print("Genome writeRFPFile --- Pass\n");
-    else
-        error = 0; //Reset for next function.
-    */
-
     //---------------------------------//
     //------ readPAFile Function ------//
     //---------------------------------//
     genome2.clear();
 
-    file = testFileDir + "/" + "readPAMulti.pa";
+    file = testFileDir + "/" + "readPA.csv";
     genome1.readPAFile(file, false);
 
     testGenomePAHelper(&genome2, false);
@@ -2021,7 +1938,7 @@ int testGenome(std::string testFileDir)
 
     // Now write a genome described above in readPAFile to file2, read it in again, and then compare its validity again.
 
-    std::string file2 = testFileDir + "/" + "writePA.pa";
+    std::string file2 = testFileDir + "/" + "writePA.csv";
 
     genome1.writePAFile(file2, false);
     genome2.readPAFile(file2, false);
@@ -2232,7 +2149,7 @@ int testParameter()
     */
     Genome genome;
     genome.readFasta("/Users/hollisbui/RibModelDev/data/twoMixtures/simulatedAllUniqueR.fasta");
-    //genome.readRFPFile("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+    //genome.readPAFile("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 
     unsigned numMixtures = 3;
     std::vector<double> stdDev(numMixtures, 1);
@@ -3113,6 +3030,7 @@ int testParameter()
 }
 
 
+/* TODO: Rework or remove!
 int testParameterWithFile(std::string filename)
 {
     Parameter parameter;
@@ -3121,6 +3039,7 @@ int testParameterWithFile(std::string filename)
 
     return 0;
 }
+*/
 
 
 /* testCovarianceMatrix (RCPP EXPOSED)
@@ -3264,8 +3183,8 @@ int testCovarianceMatrix()
 }
 
 
-/*
-int testRFPTrace()
+/* TODO: Rework or remove!
+int testPATrace()
 {
     Trace RFP; //initialize with 0 categories, 2 codon-specific parameter types
     Trace ROC;
@@ -3277,9 +3196,9 @@ int testRFPTrace()
     int globalError = 0;
 
     //-----------------------------------------//
-    //------ initializeRFPTrace Function ------//
+    //------ initializePATrace Function ------//
     //-----------------------------------------//
-    //RFP.initializeRFPTrace();
+    //RFP.initializePATrace();
 
     //-----------------------------------------//
     //------ initializeROCTrace Function ------//
@@ -3301,28 +3220,30 @@ int testRFPTrace()
 */
 
 
-int testRFPParameter()
+/* TODO: Rework or remove!
+int testPAParameter()
 {
     int error = 0;
     int globalError = 0;
 
-    /* Section 1: 1 function tested in total.
-     * initRFPParameterSet Function
+     * Section 1: 1 function tested in total.
+     * initPAParameterSet Function
      * and related get/set functions as a consequence of the function setup:
-    */
+
 
     //------------------------------------------//
-    //------ initRFPParameterSet Function ------//
+    //------ initPAParameterSet Function ------//
     //------------------------------------------//
 
-    /* Initialize parameter:
+     * Initialize parameter:
      * Arguments: vector <double> stdDevSynthesisRate, unsigned numMixtures, vector <unsigned> geneAssignment,
      *           vector <vector <unsigned>> mixtureDefinitionMatrix, bool splitSer, string mutationSelectionState
      *
      * Thus, let:
-    */
+
+
     Genome genome;
-    genome.readRFPFile("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+    //genome.readPAFile("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
     unsigned numMixtures = 3;
     std::vector <double> stdDev(numMixtures, 1);
     unsigned numGenes = genome.getGenomeSize();
@@ -3347,23 +3268,23 @@ int testRFPParameter()
     bool splitSer = true;
     std::string mutationSelectionState = Parameter::allUnique;
 
-    RFPParameter parameter(stdDev, numMixtures, geneAssignment, mixtureDefinitionMatrix, splitSer, mutationSelectionState);
+    PAParameter parameter(stdDev, numMixtures, geneAssignment, mixtureDefinitionMatrix, splitSer, mutationSelectionState);
 
-    /* This constructor in turn calls two functions: initParameterSet() and initRFPParameterSet().
+     * This constructor in turn calls two functions: initParameterSet() and initPAParameterSet().
      * initParameterSet should have been tested in testParameter(), above, but we must now
-     * test initRFPParameterSet
+     * test initPAParameterSet
      *
      * Thus, unit testing is done in order of variable changed:
      * numParam, currentCodonSpecificParameter, proposedCodonSpecificParameter, std_csp, and groupList.
      * This also introduces a level of uncertainty in what may be wrong, and thus an error in the following
      * unit testing checks may be a result of the checking function or initParameterSet.
-    */
 
-    // numParam is set to 61 in initRFPParameterSet.
+
+    // numParam is set to 61 in initPAParameterSet.
     unsigned numParam = parameter.getNumParam();
     if (numParam != 61)
     {
-        my_printError("Error in initRFPParameterSet -- numParam is not set correctly.");
+        my_printError("Error in initPAParameterSet -- numParam is not set correctly.");
         my_printError(" Value should be 61 but is instead %.\n", numParam);
         error = 1;
         globalError = 1;
@@ -3373,7 +3294,7 @@ int testRFPParameter()
     // currentCodonSpecificParameter
     // proposedCodonSpecificParameter
 
-    // std_csp is set to 0.1 for each index in initRFPParameterSet.
+    // std_csp is set to 0.1 for each index in initPAParameterSet.
     for (unsigned i = 0u; i < numParam; i++)
     {
         if (parameter.getStdCspForIndex(i) != 0.1)
@@ -3385,7 +3306,7 @@ int testRFPParameter()
         }
     }
 
-    // groupList is set to the same as this temporary group list in initRFPParameterSet.
+    // groupList is set to the same as this temporary group list in initPAParameterSet.
     std::vector <std::string> tmpGroupList = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
                                               "TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT", "ATA", "ATC",
                                               "ATT", "AAA", "AAG", "CTA", "CTC", "CTG", "CTT", "TTA", "TTG", "ATG",
@@ -3396,13 +3317,13 @@ int testRFPParameter()
 
     if (parameter.getGroupList() != tmpGroupList)
     {
-        my_printError("Error in initRFPParameterSet -- groupList is not set correctly.\n");
+        my_printError("Error in initPAParameterSet -- groupList is not set correctly.\n");
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        my_print("RFPParameter initRFPParameterSet --- Pass\n");
+        my_print("PAParameter initPAParameterSet --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -3411,6 +3332,7 @@ int testRFPParameter()
 
     return globalError;
 }
+*/
 
 
 /* testMCMCAlgorithm (RCPP EXPOSED)
@@ -3438,7 +3360,7 @@ int testMCMCAlgorithm()
 
     my_print("Initializing Genome object--------------------------\n");
     Genome genome;
-    genome.readRFPFile("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+    genome.readPAFile("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
     my_print("Done!-------------------------------\n\n\n");
     my_print("Initializing shared parameter variables---------------\n");
     unsigned numMixtures = 1;
@@ -3467,8 +3389,8 @@ int testMCMCAlgorithm()
     my_print("Done!------------------------\n\n\n");
 
 
-    my_print("Initializing RFPParameter object--------------------\n\n");
-    RFPParameter parameter(stdDev, numMixtures, geneAssignment, mixtureDefinitionMatrix, splitSer, mutationSelectionState);
+    my_print("Initializing PAParameter object--------------------\n\n");
+    PAParameter parameter(stdDev, numMixtures, geneAssignment, mixtureDefinitionMatrix, splitSer, mutationSelectionState);
     for (unsigned i = 0u; i < numMixtures; i++)
     {
         unsigned selectionCategory = parameter.getSelectionCategory(i);
@@ -3481,8 +3403,8 @@ int testMCMCAlgorithm()
 
     my_print("Done!--------------------------------\n\n\n");
 
-    my_print("Initializing RFPModel object--------------------------\n");
-    RFPModel model;
+    my_print("Initializing PAModel object--------------------------\n");
+    PAModel model;
     model.setParameter(parameter);
     my_print("Done!----------------------------------\n\n\n");
 
@@ -3727,7 +3649,7 @@ RCPP_MODULE(Test_mod)
 	function("testGenome", &testGenome);
 	function("testParameter", &testParameter);
 	function("testCovarianceMatrix", &testCovarianceMatrix);
-	function("testRFPParameter", &testRFPParameter);
+	//function("testPAParameter", &testPAParameter);
 	function("testMCMCAlgorithm", &testMCMCAlgorithm);
 }
 #endif
