@@ -635,3 +635,18 @@ double PANSEModel::u_gamma_log(double s, double x)
     return rv - d;
 
 }
+
+//Generalized integral function
+double PANSEModel::generalized_integral(double p, double z){
+    return pow(z, p - 1.0) * u_gamma(1.0 - p, z);
+}
+
+//Log of generalized integral function
+double PANSEModel::generalized_integral_log(double p, double z){
+    double co;
+
+    co = p - 1.0;
+    return co * log(z) + ugamma_log(1.0 - p, z);
+}
+
+
