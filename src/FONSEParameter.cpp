@@ -100,15 +100,15 @@ void FONSEParameter::initFONSEParameterSet()
 	currentCodonSpecificParameter[dM].resize(numMutationCategories);
 	proposedCodonSpecificParameter[dM].resize(numMutationCategories);
 
-	for (unsigned i = 0u; i < numMutationCategories; i++)
+	currentCodonSpecificParameter[dOmega].resize(numSelectionCategories);
+	proposedCodonSpecificParameter[dOmega].resize(numSelectionCategories);
+
+/*	for (unsigned i = 0u; i < numMutationCategories; i++)
 	{
 		std::vector<double> tmp(numParam, 0.0);
 		currentCodonSpecificParameter[dM][i] = tmp;
 		proposedCodonSpecificParameter[dM][i] = tmp;
 	}
-
-	currentCodonSpecificParameter[dOmega].resize(numSelectionCategories);
-	proposedCodonSpecificParameter[dOmega].resize(numSelectionCategories);
 
 	for (unsigned i = 0u; i < numSelectionCategories; i++)
 	{
@@ -117,7 +117,7 @@ void FONSEParameter::initFONSEParameterSet()
 		currentCodonSpecificParameter[dOmega][i] = tmp;
 	}
 
-	for (unsigned i = 0; i < maxGrouping; i++)
+	for (unsigned i = 0u; i < maxGrouping; i++)
 	{
 		std::string aa = SequenceSummary::AminoAcidArray[i];
 		unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa, true);
@@ -125,7 +125,31 @@ void FONSEParameter::initFONSEParameterSet()
 		m.choleskyDecomposition();
 		covarianceMatrix.push_back(m);
 	}
-
+*/
+	unsigned biggestCat = std::max(std::max(numMutationCategories, numSelectionCategories), maxGrouping);
+	for(unsigned i = 0u; i < biggestCat; i++)
+	{
+		std::vector<double> tmp(numParam, 0.0);
+		if(i < numMutationCategories)
+		{
+			currentCodonSpecificParameter[dM][i] = tmp;
+			proposedCodonSpecificParameter[dM][i] = tmp;
+		}
+		if(i < numSelectionCategories)
+		{
+			proposedCodonSpecificParameter[dOmega][i] = tmp;
+			currentCodonSpecificParameter[dOmega][i] = tmp;
+		}
+		if(i < maxGrouping)
+		{
+			std::string aa = SequenceSummary::AminoAcidArray[i];
+			//TODO: Explain this
+			unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa, true);
+			CovarianceMatrix m((numMutationCategories + numSelectionCategories) * numCodons);
+			m.choleskyDecomposition();
+			covarianceMatrix.push_back(m);
+		}
+	}
 }
 
 
@@ -162,7 +186,7 @@ void FONSEParameter::initFONSEValuesFromFile(std::string filename)
 				{
 					getline(input, tmp);
 					//char aa = tmp[0];
-					cat = SequenceSummary::AAToAAIndex(tmp); // ????
+					cat = SequenceSummary::AAToAAIndex(tmp); //getting the index value of the amino acid
 				}
 			}
 			else if (flag == 2)
@@ -219,7 +243,7 @@ void FONSEParameter::initFONSEValuesFromFile(std::string filename)
 					if (tmp == "***") //end of matrix
 					{
 						CovarianceMatrix CM(mat);
-						CM.choleskyDecomposition();
+						CM.choleskyDecomposition();//Solving a system of equations
 						covarianceMatrix[cat] = CM;
 					}
 					double val;
@@ -252,7 +276,7 @@ void FONSEParameter::initFONSEValuesFromFile(std::string filename)
 	bias_csp = 0;
 	proposedCodonSpecificParameter[dM].resize(numMutationCategories);
 	//looping through the bigger of the two categories
-	unsigned biggerCat = (numMutationCategories > numSelectionCategories) ? numMutationCategories : numSelectionCategories;
+	unsigned biggerCat = std::max(numMutationCategories, numSelectionCategories);
 	for (unsigned i = 0; i < biggerCat; i++)
 	{
 		//making sure not going out of bounds on either of the vectors
