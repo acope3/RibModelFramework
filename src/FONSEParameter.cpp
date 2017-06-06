@@ -251,14 +251,16 @@ void FONSEParameter::initFONSEValuesFromFile(std::string filename)
 	//init other values
 	bias_csp = 0;
 	proposedCodonSpecificParameter[dM].resize(numMutationCategories);
-	proposedCodonSpecificParameter[dOmega].resize(numSelectionCategories);
-	for (unsigned i = 0; i < numMutationCategories; i++)
+	//looping through the bigger of the two categories
+	unsigned biggerCat = (numMutationCategories > numSelectionCategories) ?
+												numMutationCategories : numSelectionCategories;
+	for (unsigned i = 0; i < biggerCat; i++)
 	{
-		proposedCodonSpecificParameter[dM][i] = currentCodonSpecificParameter[dM][i];
-	}
-	for (unsigned i = 0; i < numSelectionCategories; i++)
-	{
-		proposedCodonSpecificParameter[dOmega][i] = currentCodonSpecificParameter[dOmega][i];
+		//making sure not going out of bounds on either of the vectors
+		if(i < numMutationCategories)
+			proposedCodonSpecificParameter[dM][i] = currentCodonSpecificParameter[dM][i];
+		if(i < numSelectionCategories)
+			proposedCodonSpecificParameter[dOmega][i] = currentCodonSpecificParameter[dOmega][i];
 	}
 
 	groupList = { "A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "P", "Q", "R", "S", "T", "V", "Y", "Z" };
@@ -485,7 +487,7 @@ void FONSEParameter::proposeCodonSpecificParameter()
         {
             iidProposed.push_back(randNorm(0.0, 1.0));
         }
-        
+
         std::vector<double> covaryingNums;
         covaryingNums = covarianceMatrix[SequenceSummary::AAToAAIndex(aa)].transformIidNumersIntoCovaryingNumbers(iidProposed);
         for (unsigned i = 0; i < numMutationCategories; i++)
@@ -514,7 +516,7 @@ void FONSEParameter::updateCodonSpecificParameter(std::string grouping)
 	SequenceSummary::AAToCodonRange(grouping, aaStart, aaEnd, true);
     unsigned aaIndex = SequenceSummary::aaToIndex.find(grouping)->second;
 	numAcceptForCodonSpecificParameters[aaIndex]++;
-    
+
     for (unsigned k = 0u; k < numMutationCategories; k++)
     {
         for (unsigned i = aaStart; i < aaEnd; i++)
@@ -564,7 +566,7 @@ void FONSEParameter::getParameterForCategory(unsigned category, unsigned paramTy
 	unsigned aaStart;
 	unsigned aaEnd;
 	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
-    
+
     unsigned j = 0u;
     for (unsigned i = aaStart; i < aaEnd; i++, j++)
     {
@@ -607,7 +609,7 @@ FONSEParameter::FONSEParameter(std::vector<double> stdDevSynthesisRate, std::vec
     unsigned _numMixtures = _matrix.size() / 2;
     std::vector<std::vector<unsigned>> thetaKMatrix;
     thetaKMatrix.resize(_numMixtures);
-    
+
     unsigned index = 0;
     for (unsigned i = 0; i < _numMixtures; i++)
     {
@@ -618,7 +620,7 @@ FONSEParameter::FONSEParameter(std::vector<double> stdDevSynthesisRate, std::vec
     }
     initParameterSet(stdDevSynthesisRate, _matrix.size() / 2, geneAssignment, thetaKMatrix, splitSer);
     initFONSEParameterSet();
-    
+
 }
 
 
@@ -643,13 +645,13 @@ void FONSEParameter::initCovarianceMatrix(SEXP _matrix, std::string aa)
 {
     std::vector<double> tmp;
     NumericMatrix matrix(_matrix);
-    
+
     for (unsigned i = 0u; i < aa.length(); i++)	aa[i] = (char)std::toupper(aa[i]);
-    
+
     unsigned aaIndex = SequenceSummary::aaToIndex.find(aa)->second;
     unsigned numRows = matrix.nrow();
     std::vector<double> covMatrix(numRows * numRows);
-    
+
     //NumericMatrix stores the matrix by column, not by row. The loop
     //below transposes the matrix when it stores it.
     unsigned index = 0;
@@ -673,8 +675,8 @@ void FONSEParameter::initMutation(std::vector<double> mutationValues, unsigned m
     if (check)
     {
         mixtureElement--;
-        
-        
+
+
         unsigned category = getMutationCategory(mixtureElement);
         aa[0] = (char)std::toupper(aa[0]);
 	unsigned aaStart;
@@ -696,9 +698,9 @@ void FONSEParameter::initSelection(std::vector<double> selectionValues, unsigned
     if (check)
     {
         mixtureElement--;
-        
+
         int category = getSelectionCategory(mixtureElement);
-        
+
         aa[0] = (char)std::toupper(aa[0]);
 	unsigned aaStart;
 	unsigned aaEnd;
