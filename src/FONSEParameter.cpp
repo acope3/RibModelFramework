@@ -103,29 +103,6 @@ void FONSEParameter::initFONSEParameterSet()
 	currentCodonSpecificParameter[dOmega].resize(numSelectionCategories);
 	proposedCodonSpecificParameter[dOmega].resize(numSelectionCategories);
 
-/*	for (unsigned i = 0u; i < numMutationCategories; i++)
-	{
-		std::vector<double> tmp(numParam, 0.0);
-		currentCodonSpecificParameter[dM][i] = tmp;
-		proposedCodonSpecificParameter[dM][i] = tmp;
-	}
-
-	for (unsigned i = 0u; i < numSelectionCategories; i++)
-	{
-		std::vector<double> tmp(numParam, 0.0);
-		proposedCodonSpecificParameter[dOmega][i] = tmp;
-		currentCodonSpecificParameter[dOmega][i] = tmp;
-	}
-
-	for (unsigned i = 0u; i < maxGrouping; i++)
-	{
-		std::string aa = SequenceSummary::AminoAcidArray[i];
-		unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa, true);
-		CovarianceMatrix m((numMutationCategories + numSelectionCategories) * numCodons);
-		m.choleskyDecomposition();
-		covarianceMatrix.push_back(m);
-	}
-*/
 	unsigned biggestCat = std::max(std::max(numMutationCategories, numSelectionCategories), maxGrouping);
 	for(unsigned i = 0u; i < biggestCat; i++)
 	{
@@ -300,10 +277,10 @@ void FONSEParameter::writeEntireRestartFile(std::string filename)
 
 void FONSEParameter::writeFONSERestartFile(std::string filename)
 {
-    std::ofstream out;
-    out.open(filename.c_str(), std::ofstream::app);
-    if (out.fail())
-        my_printError("ERROR: Could not open RestartFile.txt to append\n");
+  std::ofstream out(filename.c_str(), std::ofstream::app);
+  //out.open(filename.c_str(), std::ofstream::app);
+  if (out.fail())
+      my_printError("ERROR: Could not open RestartFile.txt to append\n");
 	else
 	{
 		std::ostringstream oss;
@@ -363,8 +340,7 @@ void FONSEParameter::writeFONSERestartFile(std::string filename)
 			}
 			oss << "\n***\n";
 		}
-		std::string output = oss.str();
-		out << output;
+		out << oss.str();
 	}
     out.close();
 }
