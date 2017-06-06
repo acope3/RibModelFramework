@@ -252,8 +252,7 @@ void FONSEParameter::initFONSEValuesFromFile(std::string filename)
 	bias_csp = 0;
 	proposedCodonSpecificParameter[dM].resize(numMutationCategories);
 	//looping through the bigger of the two categories
-	unsigned biggerCat = (numMutationCategories > numSelectionCategories) ?
-												numMutationCategories : numSelectionCategories;
+	unsigned biggerCat = (numMutationCategories > numSelectionCategories) ? numMutationCategories : numSelectionCategories;
 	for (unsigned i = 0; i < biggerCat; i++)
 	{
 		//making sure not going out of bounds on either of the vectors
