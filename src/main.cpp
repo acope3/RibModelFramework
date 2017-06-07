@@ -139,7 +139,7 @@ int main()
 		std::cout <<"init done\n";
 		model.simulateGenome(genome);
 		std::cout <<"writing file\n";
-		genome.writePAFile("/Users/roxasoath1/Desktop/RibModelDevScripts/RibModelDev/data/rfp/simulatedRFPData.csv", true);
+		genome.writePA("/Users/roxasoath1/Desktop/RibModelDevScripts/RibModelDev/data/rfp/simulatedRFPData.csv", true);
 */
 		exit(1);
 	}
@@ -666,26 +666,24 @@ int main()
 	std::vector<double> sphi_init(numMixtures, 2);
 	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 
-	// SIMULATE GENOME: RFP
-	/*
+    /*
+	// SIMULATE GENOME: PA
+
 	Genome genome;
-	//genome.readFasta(pathBegin + "miscGilchrist/runMe/HollisTestingData/s288c.genome.fasta");
-	genome.readPAFile(pathBegin + "miscGilchrist/runMe/HollisTestingData/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+	genome.readPAFile(pathBegin + "TODO");
 	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
-	{
 		geneAssignment[i] = 0u;
-	}
 
 	PAParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
 
 	std::vector<std::string> files;
-	files.push_back(pathBegin + "HollisTestingData/RFPAlphaValues.csv");
+	files.push_back(pathBegin + "miscGilchrist/runMe/HollisTestingData/RFPAlphaValues.csv");
 	parameter.initMutationSelectionCategories(files, 1, PAParameter::alp);
-	files[0] = pathBegin + "HollisTestingData/RFPLambdaPrimeValues.csv";
+	files[0] = pathBegin + "miscGilchrist/runMe/HollisTestingData/RFPLambdaPrimeValues.csv";
 	parameter.initMutationSelectionCategories(files, 1, PAParameter::lmPri);
 
-	std::vector<double> phi = parameter.readPhiValues(pathBegin + "HollisTestingData/RFPPhiValues.csv");
+	std::vector<double> phi = parameter.readPhiValues(pathBegin + "miscGilchrist/runMe/HollisTestingData/RFPPhiValues.csv");
 	//std::vector<double> phi = tmp.readPhiValues("/Users/roxasoath1/Desktop/TONEWTON/RFPPsiValues.csv");
 	parameter.InitializeSynthesisRate(phi);
 
@@ -694,9 +692,9 @@ int main()
 	model.setParameter(parameter);
 
 	model.simulateGenome(genome);
-	genome.writePAFile(pathBegin + "HollisTestingOut/HollisSimulatedGenome2.csv", true);
+	genome.writePA(pathBegin + "miscGilchrist/runMe/HollisTestingOut/hbuiSimGenome5.30.17.csv", true);
 	exit(1);
-	*/
+    */
 
 	// UNIT TESTING
 	testUtility();
@@ -705,8 +703,6 @@ int main()
 	testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
 	//testCovarianceMatrix();
 	//testParameter();
-	//testParameterWithFile(pathBegin + "HollisFile.txt");
-	//testPAParameter();
 	//testMCMCAlgorithm();
 	exit(0);
 
@@ -1000,7 +996,7 @@ int main()
 	model.setParameter(parameter);
 
 	model.simulateGenome(genome);
-	genome.writePAFile(pathBegin + "HollisTestingOut/HollisSimulatedGenome2.csv", true);
+	genome.writePA(pathBegin + "HollisTestingOut/HollisSimulatedGenome2.csv", true);
 	exit(1);
 	*/
 

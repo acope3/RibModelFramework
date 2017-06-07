@@ -11,22 +11,23 @@ class PAModel: public Model
 {
 	private:
 		PAParameter *parameter;
+		unsigned RFPCountColumn;
 
 		double calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
-				unsigned currRFPObserved, unsigned currNumCodonsInMRNA, double phiValue);
+				unsigned currRFPValue, unsigned currNumCodonsInMRNA, double phiValue);
 
 
 	public:
 		//Constructors & Destructors:
-		explicit PAModel();
+		explicit PAModel(unsigned RFPCountColumn = 0u); // TODO: Ask why this was explicit (just added unsigned parameter)
 		virtual ~PAModel();
 
 
 		//Likelihood Ratio Functions:
 		virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k,
-				double* logProbabilityRatio);
+				double* logProbabilityRatio); // Depends on RFPCountColumn
 		virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
-				std::vector<double> &logAcceptanceRatioForAllMixtures);
+				std::vector<double> &logAcceptanceRatioForAllMixtures); // Depends on RFPCountColumn
 		virtual void calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration,
 				std::vector <double> &logProbabilityRatio);
 
@@ -101,7 +102,7 @@ class PAModel: public Model
 		virtual void updateAllHyperParameter();
 		virtual void updateHyperParameter(unsigned hp);
 
-		virtual void simulateGenome(Genome &genome);
+		virtual void simulateGenome(Genome &genome); // Depends on RFPCountColumn
 		virtual void printHyperParameters();
 		PAParameter* getParameter();
 		void setParameter(PAParameter &_parameter);

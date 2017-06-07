@@ -8,7 +8,7 @@ initializeGenomeObject(file, genome = NULL, observed.expression.file = NULL,
   fasta = TRUE, match.expression.by.id = TRUE)
 }
 \arguments{
-\item{file}{A file of coding sequences in fasta or RFP format}
+\item{file}{A file of coding sequences in fasta or PA format}
 
 \item{genome}{A genome object can be passed in to concatenate the input file to it (optional).}
 
@@ -16,7 +16,7 @@ initializeGenomeObject(file, genome = NULL, observed.expression.file = NULL,
 empirical expression rates (optional).}
 
 \item{fasta}{A boolean value which decides whether to initialize with a
-fasta file or an RFP value file. (TRUE for fasta, FALSE for RFP)}
+fasta file or an PA value file. (TRUE for fasta, FALSE for PA)}
 
 \item{match.expression.by.id}{If TRUE (default) observed expression values will be assigned by matching sequence identifier.
 If FALSE observed expression values will be assigned by order}

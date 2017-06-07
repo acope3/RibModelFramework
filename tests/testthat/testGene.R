@@ -39,15 +39,15 @@ test_that("get Codon Counts", {
   expect_equal(g$getCodonCount("ATGG"), 0)
 })
 
-test_that("get RFP Observed", {
-  expect_equal(g$getRFPObserved("TGC", 1), 0)
-  expect_equal(g$getRFPObserved("CAC", 1), 0)
-  expect_equal(g$getRFPObserved("GTG", 1), 0)
-  expect_equal(g$getRFPObserved("TCC", 1), 0)
+test_that("get RFP Value", {
+  expect_equal(g$getRFPValue("TGC", 1), 0)
+  expect_equal(g$getRFPValue("CAC", 1), 0)
+  expect_equal(g$getRFPValue("GTG", 1), 0)
+  expect_equal(g$getRFPValue("TCC", 1), 0)
   
   #Checking invalid cases
-  expect_equal(g$getRFPObserved("atg", 1), 0)
-  expect_equal(g$getRFPObserved("ATGG", 1), 0)
+  expect_equal(g$getRFPValue("atg", 1), 0)
+  expect_equal(g$getRFPValue("ATGG", 1), 0)
 })
 
 test_that("get Codon Positions", {

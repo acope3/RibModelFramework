@@ -248,7 +248,7 @@ void Genome::readPAFile(std::string filename, bool append)
 			prevID = "";
 			bool first = true;
 
-			std::vector <std::vector <unsigned>> table; // Dimensions: nRows of tableWidth-sized vectors
+			std::vector <std::vector <int>> table; // Dimensions: nRows of tableWidth-sized vectors
 
 			//Now for each line associated with a gene ID, set the string appropriately
 			while (std::getline(Fin, tmp))
@@ -260,14 +260,16 @@ void Genome::readPAFile(std::string filename, bool append)
 				pos2 = tmp.find(",", pos + 1);
 
 				// Set to 0-indexed value for convenience of vector calculation
+				// Error-checking note: Of course, atoi function returns 0 if not an integer
+				// -> leads to 0 - 1 == -1 -> codon ignored.
 				position = std::atoi(tmp.substr(pos + 1, pos2 - (pos + 1)).c_str()) - 1;
 
 				// Position integer: Ensure that if position is negative, ignore the codon.
 				if (position > -1) // for convenience of calculation; ambiguous positions are marked by -1.
 				{
-					std::vector <unsigned> tableRow(tableWidth);
+					std::vector <int> tableRow(tableWidth);
 					unsigned tableIndex = 0;
-					tableRow[tableIndex] = (unsigned)position;
+					tableRow[tableIndex] = position;
 
 					if (first)
 					{
@@ -301,9 +303,17 @@ void Genome::readPAFile(std::string filename, bool append)
 					while (pos != std::string::npos)
 					{
 						pos2 = tmp.find(",", pos + 1);
-						// If the RFPCount is < 0, it is assumed to be a typo and 0 is input instead.
-						possValue = std::atoi(tmp.substr(pos + 1, pos2 - (pos + 1)).c_str());
-						tableRow[tableIndex] = possValue < 0 ? 0u : (unsigned)possValue;
+
+						// RFPCount is input as either its integer value (> -1) or as -1 (stored, not calculated).
+						// Also accounts for if the value is "NA" or a string (converted to -1).
+						if (sscanf(tmp.substr(pos + 1, pos2 - (pos + 1)).c_str(), "%d", &possValue) == 1)
+						{
+							if (possValue > -1) tableRow[tableIndex] = possValue;
+							else tableRow[tableIndex] = -1;
+						}
+                        else
+							tableRow[tableIndex] = -1;
+
 						pos = pos2;
 						tableIndex++;
 					}
@@ -331,17 +341,17 @@ void Genome::readPAFile(std::string filename, bool append)
 }
 
 
-/* writePAFile (RCPP EXPOSED)
+/* writePA (RCPP EXPOSED)
  * Arguments: string filename, boolean to specify if we are printing simulated genes or not (default non-simulated)
  * Write a PA-formatted file: GeneID,Position (1-indexed),Codon,RFPCount(s) (may be multiple)
  * The positions will be printed in ascending order.
 */
-void Genome::writePAFile(std::string filename, bool simulated)
+void Genome::writePA(std::string filename, bool simulated)
 {
 	std::ofstream Fout;
 	Fout.open(filename.c_str());
 	if (Fout.fail())
-		my_printError("Error in Genome::writePAFile: Can not open output RFP data file %\n", filename);
+		my_printError("Error in Genome::writePA: Can not open output RFP data file %\n", filename);
 	else
 	{
 		Fout << "GeneID,Position,Codon";
@@ -371,7 +381,7 @@ void Genome::writePAFile(std::string filename, bool simulated)
 				Fout << currentGene->getId() << "," << position + 1 << "," << codon;
 
 				for (unsigned category = 0; category < numCategories; category++)
-					Fout << "," << currentGene->geneData.getSingleRFPCount(category, position);
+					Fout << "," << currentGene->geneData.getSingleRFPCount(position, category);
 
 				Fout << "\n";
 			}
@@ -395,7 +405,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 	std::ifstream input;
 	std::string tmp;
 	unsigned numPhi = 0;
-	bool exitfunction = false;
+	bool exitFunction = false;
 
 	input.open(filename);
 	if (input.fail())
@@ -474,7 +484,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
                             my_printError("ERROR: Gene % has a different number of phi values given other genes: \n", geneID);
                             my_printError("Gene % has % ", geneID, it -> second -> observedSynthesisRateValues.size());
                             my_printError("while others have %. Exiting function.\n", numPhi);
-							exitfunction = true;
+							exitFunction = true;
 							for (unsigned a = 0; a < getGenomeSize(); a++)
 							{
 								genes[a].observedSynthesisRateValues.clear();
@@ -482,11 +492,11 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 							break;
 						}
                     }
-                    if (exitfunction) break;
+                    if (exitFunction) break;
                 }
 				// If number of phi values match those of other given genes, execution continues normally.
 				// Proceed to increment numGenesWithPhi.
-                if (!exitfunction)
+                if (!exitFunction)
 				{
                     for (unsigned i = 0; i < getGenomeSize(); i++)
 					{
@@ -566,7 +576,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
                         my_printError("ERROR: Gene % has a different number of phi values given other genes: \n", geneIndex);
                         my_printError("Gene % has % ", geneIndex, genes[geneIndex].observedSynthesisRateValues.size());
                         my_printError("while others have %. Exiting function.\n", numPhi);
-						exitfunction = true;
+						exitFunction = true;
 						for (unsigned a = 0; a < getGenomeSize(); a++)
 						{
 							genes[a].observedSynthesisRateValues.clear();
@@ -574,11 +584,11 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 						break;
 					}
 					geneIndex++;
-					if (exitfunction) break;
+					if (exitFunction) break;
 				}
 				// If number of phi values match those of other given genes, execution continues normally.
 				// Proceed to increment numGenesWithPhi.
-				if (!exitfunction)
+				if (!exitFunction)
 				{
 					for (unsigned i = 0; i < getGenomeSize(); i++)
 					{
@@ -900,7 +910,7 @@ RCPP_MODULE(Genome_mod)
 		.method("readFasta", &Genome::readFasta, "reads a genome into the object")
 		.method("writeFasta", &Genome::writeFasta, "writes the genome to a fasta file")
 		.method("readPAFile", &Genome::readPAFile, "reads RFP data to be used in PA(NSE) models")
-		.method("writePAfile", &Genome::writePAFile, "writes RFP data used in PA(NSE) models")
+		.method("writePA", &Genome::writePA, "writes RFP data used in PA(NSE) models")
 		.method("readObservedPhiValues", &Genome::readObservedPhiValues)
 
 

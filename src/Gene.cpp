@@ -190,21 +190,26 @@ void Gene::setSequence(std::string _seq)
     }
 }
 
-// TODO NOTES
-void Gene::setPASequence(std::vector<std::vector<unsigned>> table)
+/* setPASequence (NOT EXPOSED)
+ * Arguments: A table-styled vector (based on lines of input) of integer vectors (storing actual values).
+ * The argument is intended to be derived from solely Genome::readPAFile,
+ * which creates a PA-formatted table indexed: Position,Codon,RFPCount(s) (may be multiple)
+ * Thus, each vector is from a .csv file, and the table size is variable per file read in.
+ * This function builds the sequence based on the second element of each vector (the codon) and then
+ * transfers the table to sequenceSummary::processPA.
+ * NOTE: As part of changing the sequence, the sequence summary is also cleared.
+*/
+void Gene::setPASequence(std::vector<std::vector<int>> table)
 {
     geneData.clear();
-    // Table format: Each line of input from a .csv (.pa) file, ordered:
-    // unknown size table (nRows, aka table.size()), each row a vector:
-    // position, codon, category1, ... (may be more than one category)
 
     unsigned nRows = (unsigned)table.size();
 
     seq.resize(nRows * 3); //multiply by three since codons
     for (unsigned i = 0; i < nRows; i++)
     {
-        std::string codon = SequenceSummary::indexToCodon(table[i][1]);
-        seq.replace(table[i][0] * 3, 3, codon);
+        std::string codon = SequenceSummary::indexToCodon((unsigned) table[i][1]);
+        seq.replace((unsigned) table[i][0] * 3, 3, codon);
     }
 
     // Call processPA with a checking error statement printed if needed.
@@ -300,23 +305,23 @@ void Gene::initRFPCount(unsigned numCategories)
 
 
 /* getRFPCount (NOT EXPOSED)
- * Arguments: A number representing the RFP category to return
+ * Arguments: A number representing the RFP category to return (default 0)
  * Returns the RFPCount vector for the category index specified.
  * For unit testing only.
  */
-std::vector <unsigned> Gene::getRFPCount(unsigned categoryIndex)
+std::vector <int> Gene::getRFPCount(unsigned RFPCountColumn)
 {
-    return geneData.getRFPCount(categoryIndex);
+    return geneData.getRFPCount(RFPCountColumn);
 }
 
 
 /* setRFPCount (NOT EXPOSED)
- * Arguments: A number representing the RFP category to modify, a vector argument to set the RFP category's RFPCount to
+ * Arguments: A vector argument to set the RFP category's RFPCount to, a number representing the RFP category to modify (default 0)
  * Sets the RFPCount vector for the category index specified to the vector argument given.
  */
-void Gene::setRFPCount(unsigned categoryIndex, std::vector <unsigned> RFPCounts)
+void Gene::setRFPCount(std::vector <int> RFPCounts, unsigned RFPCountColumn)
 {
-    geneData.setRFPCount(categoryIndex, RFPCounts);
+    geneData.setRFPCount(RFPCounts, RFPCountColumn);
 }
 
 
@@ -334,23 +339,23 @@ void Gene::initSumRFPCount(unsigned numCategories)
 
 
 /* getSumRFPCount (NOT EXPOSED)
- * Arguments: A number representing the RFP category to return
+ * Arguments: A number representing the RFP category to return (default 0)
  * Returns the sumRFPCount array of size 64 for the category index specified.
  * For unit testing only.
  */
-std::array <unsigned, 64> Gene::getSumRFPCount(unsigned categoryIndex)
+std::array <unsigned, 64> Gene::getSumRFPCount(unsigned RFPCountColumn)
 {
-    return geneData.getSumRFPCount(categoryIndex);
+    return geneData.getSumRFPCount(RFPCountColumn);
 }
 
 
 /* setSumRFPCount (NOT EXPOSED)
- * Arguments: A number representing the RFP category to modify, an array argument to set the RFP category's sumRFPCount to
+ * Arguments: An array argument to set the RFP category's sumRFPCount to, a number representing the RFP category to modify (default 0)
  * Sets the sumRFPCount array for the category index specified to the array argument given.
  */
-void Gene::setSumRFPCount(unsigned categoryIndex, std::array <unsigned, 64> sumRFPCounts)
+void Gene::setSumRFPCount(std::array <unsigned, 64> sumRFPCounts, unsigned RFPCountColumn)
 {
-    geneData.setSumRFPCount(categoryIndex, sumRFPCounts);
+    geneData.setSumRFPCount(sumRFPCounts, RFPCountColumn);
 }
 
 
@@ -473,14 +478,14 @@ unsigned Gene::getCodonCount(std::string& codon)
  * This is the R-wrapper for the C-side function "SequenceSummary::getRFPValue".
 */
 // Note: From function definition in header, default category is 1.
-unsigned Gene::getRFPObserved(std::string codon, unsigned categoryIndex)
+unsigned Gene::getRFPValue(std::string codon, unsigned RFPCountColumn)
 {
     unsigned rv = 0;
 
     if (SequenceSummary::codonToIndexWithReference.end() != SequenceSummary::codonToIndexWithReference.find(codon))
     {
-        // Convert categoryIndex to 0-indexing internally
-        rv = geneData.getRFPValue(codon, categoryIndex - 1);
+        // Convert RFPCountColumn to 0-indexing internally
+        rv = geneData.getRFPValue(codon, RFPCountColumn - 1);
     }
     else
     {
@@ -542,7 +547,7 @@ RCPP_MODULE(Gene_mod)
 
 	.method("getAACount", &Gene::getAACount, "returns the number of amino acids that are in the sequence for a given amino acid")
 	.method("getCodonCount", &Gene::getCodonCount, "returns the number of codons that are in the sequence for a given codon")
-	.method("getRFPObserved", &Gene::getRFPObserved)
+	.method("getRFPValue", &Gene::getRFPValue, "returns the total RFP for a category, default 1, for a codon in a sequence")
 	.method("getCodonPositions", &Gene::getCodonPositions)
   ;
 }

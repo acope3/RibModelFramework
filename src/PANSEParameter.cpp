@@ -38,7 +38,7 @@ PANSEParameter::PANSEParameter(std::string filename) : Parameter(64)
 /* PANSEParameter Constructor (NOT EXPOSED)
  * Arguments: synthesis rate values (vector), number of mixtures, vector containing gene assignments, vector of vector
  * representation of a category matrix, boolean to tell if ser should be split, keyword for mutation/selection state.
- * Initializes the object from given values. If thetaK matrix is null or empty, the mutationselectionState keyword
+ * Initializes the object from given values. If thetaK matrix is null or empty, the mutationSelectionState keyword
  * is used to generate the matrix.
 */
 PANSEParameter::PANSEParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures,
@@ -347,7 +347,7 @@ void PANSEParameter::initAllTraces(unsigned samples, unsigned num_genes)
 
 /* initAlpha (RCPP EXPOSED VIA WRAPPER)
  * Arguments: alpha value, mixture element, codon string (all caps)
- * Gets the category and index to index into the alpha vector by looking at the mixtureElement and codon resprectively.
+ * Gets the category and index to index into the alpha vector by looking at the mixtureElement and codon respectively.
  * Puts the alphaValue into the indexed location.
  */
 void PANSEParameter::initAlpha(double alphaValue, unsigned mixtureElement, std::string codon)
@@ -360,7 +360,7 @@ void PANSEParameter::initAlpha(double alphaValue, unsigned mixtureElement, std::
 
 /* initLambdaPrime (RCPP EXPOSED VIA WRAPPER)
  * Arguments: lambda prime value, mixture element, codon string (all caps)
- * Gets the category and index to index into the alpha vector by looking at the mixtureElement and codon resprectively.
+ * Gets the category and index to index into the alpha vector by looking at the mixtureElement and codon respectively.
  * Puts the lambdaPrimeValue into the indexed location.
  */
 void PANSEParameter::initLambdaPrime(double lambdaPrimeValue, unsigned mixtureElement, std::string codon)

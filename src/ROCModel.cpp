@@ -98,7 +98,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 //#ifndef __APPLE__
 #pragma omp parallel for private(mutation, selection, codonCount) reduction(+:logLikelihood,logLikelihood_proposed)
 #endif
-	for (int i = 0; i < getGroupListSize(); i++)
+	for (unsigned i = 0u; i < getGroupListSize(); i++)
 	{
 		std::string curAA = getGrouping(i);
 
@@ -110,7 +110,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 		// get mutation and selection parameter->for gene
 		parameter->getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
 		parameter->getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
-		// get codon occurence in sequence
+		// get codon occurrence in sequence
 		obtainCodonCount(seqsum, curAA, codonCount);
 
 		logLikelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
@@ -154,7 +154,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, std::vector<double> &logAcceptanceRatioForAllMixtures)
 {
 	int numGenes = genome.getGenomeSize();
-	int numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
+	unsigned numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
 	double likelihood = 0.0;
 	double likelihood_proposed = 0.0;
 	double posterior, posterior_proposed;
@@ -171,7 +171,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 //#ifndef __APPLE__
 #pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed, codonCount, gene, seqsum) reduction(+:likelihood,likelihood_proposed)
 #endif
-	for (int i = 0; i < numGenes; i++)
+	for (unsigned i = 0u; i < numGenes; i++)
 	{
 		gene = &genome.getGene(i);
 		seqsum = gene->getSequenceSummary();
@@ -241,7 +241,7 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 //#ifndef __APPLE__
 //#pragma omp parallel for reduction(+:lpr)
 #endif
-	for (int i = 0; i < genome.getGenomeSize(); i++)
+	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{
 		unsigned mixture = getMixtureAssignment(i);
 		mixture = getSynthesisRateCategory(mixture);
@@ -268,7 +268,7 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 //#ifndef __APPLE__
 //#pragma omp parallel for reduction(+:lpr)
 #endif
-			for (int j = 0; j < genome.getGenomeSize(); j++)
+			for (unsigned j = 0u; j < genome.getGenomeSize(); j++)
 			{
 				unsigned mixtureAssignment = getMixtureAssignment(j);
 				mixtureAssignment = getSynthesisRateCategory(mixtureAssignment);

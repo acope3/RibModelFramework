@@ -10,6 +10,8 @@
 #' @param fix.observation.noise (ROC only) Allows to fix the noise in the observed expression dataset to the initial condition.
 #'	The initial condition for the observed expression noise can be set in the parameter object. 
 #'  
+#' @param rfp.count.column (PA and PANSE only) A number representing the RFP count column to use.
+#'  
 #' @return This function returns the model object created. 
 #'  
 #' @description initializes the model object. 
@@ -18,13 +20,13 @@
 #'  The Parameter object has to match the model that is initialized. E.g. to initialize a ROC model, 
 #'  it is required that a ROC parameter object is passed to the function.
 #'        
-initializeModelObject <- function(parameter, model = "ROC", with.phi = FALSE, fix.observation.noise = FALSE) {  
+initializeModelObject <- function(parameter, model = "ROC", with.phi = FALSE, fix.observation.noise = FALSE, rfp.count.column = 1) {
   if(model == "ROC") {
     c.model <- new(ROCModel, with.phi, fix.observation.noise)
   } else if(model == "FONSE") {
     c.model = new(FONSEModel)
   } else if (model == "PA") {
-    c.model <- new(PAModel)
+    c.model <- new(PAModel, rfp.count.column)
   } else {
     stop("Unknown model.")
   }
