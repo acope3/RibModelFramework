@@ -31,10 +31,10 @@ The default Value is NULL.}
 The length of the vector has to equal the number of genes in the Genome object.
 The default value is NULL.}
 
-\item{model}{Specifies the model used. Valid options are "ROC", "RFP", "PANSE", or "FONSE".
+\item{model}{Specifies the model used. Valid options are "ROC", "PA", "PANSE", or "FONSE".
 The default model is "ROC".
 ROC is described in Gilchrist et al. 2015.
-RFP, PANSE and FONSE are currently unpublished.}
+PA, PANSE and FONSE are currently unpublished.}
 
 \item{split.serine}{Whether serine should be considered as 
 one or two amino acids when running the model.

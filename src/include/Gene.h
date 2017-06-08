@@ -40,7 +40,7 @@ class Gene
 		void setDescription(std::string _desc);
 		std::string getSequence();
 		void setSequence(std::string _seq);
-        void setPASequence(std::vector <std::vector <unsigned>> table);
+        void setPASequence(std::vector <std::vector <int>> table);
 		SequenceSummary *getSequenceSummary();
 		std::vector<double> getObservedSynthesisRateValues(); //exposed to RCPP, tested in C++
 		void setObservedSynthesisRateValues(std::vector <double> values); //Only for unit testing.
@@ -51,13 +51,13 @@ class Gene
 
 		//RFP Functions (for PA and PANSE models) (All tested):
 		void initRFPCount(unsigned numCategories); // Wraps SequenceSummary:initRFPCount()
-		std::vector <unsigned> getRFPCount(unsigned categoryIndex); //Only for unit testing.
+		std::vector <int> getRFPCount(unsigned RFPCountColumn = 0u); //Only for unit testing.
 																	 // Wraps SequenceSummary::getRFPCount()
-		void setRFPCount(unsigned categoryIndex, std::vector <unsigned> RFPCounts); // Wraps SequenceSummary:setRFPCount()
+		void setRFPCount(std::vector <int> RFPCounts, unsigned RFPCountColumn = 0u); // Wraps SequenceSummary:setRFPCount()
 		void initSumRFPCount(unsigned numCategories); // Wraps SequenceSummary:initSumRFPCount()
-		std::array <unsigned, 64> getSumRFPCount(unsigned categoryIndex); //Only for unit testing.
+		std::array <unsigned, 64> getSumRFPCount(unsigned RFPCountColumn = 0u); //Only for unit testing.
 																		// Wraps SequenceSummary::getSumRFPCount()
-		void setSumRFPCount(unsigned categoryIndex, std::array <unsigned, 64> sumRFPCounts); // Wraps SequenceSummary:setSumRFPCount()
+		void setSumRFPCount(std::array <unsigned, 64> sumRFPCounts, unsigned RFPCountColumn = 0u); // Wraps SequenceSummary:setSumRFPCount()
 
 
 		//Other functions:
@@ -73,7 +73,7 @@ class Gene
 
 		unsigned getAACount(std::string aa);
 		unsigned getCodonCount(std::string& codon);
-		unsigned getRFPObserved(std::string codon, unsigned categoryIndex = 1);
+		unsigned getRFPValue(std::string codon, unsigned RFPCountColumn = 1);
 		std::vector <unsigned> getCodonPositions(std::string codon);
 #endif
 

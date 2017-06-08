@@ -1123,8 +1123,7 @@ std::vector <std::vector <double> > Parameter::calculateSelectionCoefficients(un
 		{
 
 			std::string aa = getGrouping(j);
-			unsigned aaStart;
-			unsigned aaEnd;
+			unsigned aaStart, aaEnd;
 			SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
 				std::vector<double> tmp;
 			double minValue = 0.0;
@@ -1270,8 +1269,7 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 		traces.updateCodonSpecificAcceptanceRateTrace(aaIndex, acceptanceLevel);
 		if (adapt)
 		{
-			unsigned aaStart;
-			unsigned aaEnd;
+			unsigned aaStart, aaEnd;
 			SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
 			my_print("\t%:\t%\n", aa.c_str(), acceptanceLevel);
 
@@ -1300,7 +1298,7 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 				}
 				
 			//Decomposing of cov matrix to convert iid samples to covarying samples using matrix decomposition
-			//The decompsed matrix is used in the proposal of new samples
+			//The decomposed matrix is used in the proposal of new samples
 				covarianceMatrix[aaIndex].choleskyDecomposition();
 
 				//Adjust proposal width if for codon specific parameters
@@ -1687,13 +1685,12 @@ double Parameter::calculateSCUO(Gene& gene, unsigned maxAA)
 		double aaCount = (double)seqsum->getAACountForAA(i);
 		if (aaCount == 0) continue;
 
-		unsigned start;
-		unsigned endd;
-		SequenceSummary::AAIndexToCodonRange(i, start, endd, false);
+		unsigned start, end;
+		SequenceSummary::AAIndexToCodonRange(i, start, end, false);
 
 		// calculate -sum(pij log(pij))
 		double aaEntropy = 0.0;
-		for (unsigned k = start; k < endd; k++)
+		for (unsigned k = start; k < end; k++)
 		{
 			int currCodonCount = seqsum->getCodonCountForCodon(k);
 			if (currCodonCount == 0) continue;

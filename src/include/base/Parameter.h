@@ -184,8 +184,8 @@ class Parameter {
 		static double randGamma(double shape, double rate);
 		static void randDirichlet(std::vector <double> &input, unsigned numElements, std::vector <double> &output);
 		static double randUnif(double minVal, double maxVal);
-		static unsigned randMultinom(double *probabilites, unsigned mixtureElements);
-		static unsigned randMultinom(std::vector <double> &probabilites, unsigned mixtureElements);
+		static unsigned randMultinom(double *probabilities, unsigned mixtureElements);
+		static unsigned randMultinom(std::vector <double> &probabilities, unsigned mixtureElements);
 		static double densityNorm(double x, double mean, double sd, bool log = false);
 		static double densityLogNorm(double x, double mean, double sd, bool log = false);
 		//double getMixtureAssignmentPosteriorMean(unsigned samples, unsigned geneIndex);

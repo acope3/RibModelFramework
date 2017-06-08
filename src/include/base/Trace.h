@@ -78,25 +78,25 @@ class Trace {
 		void initializePATrace(unsigned samples, unsigned num_genes, unsigned numAlphaCategories,
 			unsigned numLambdaPrimeCategories, unsigned numParam, unsigned numMixtures,
 			std::vector<mixtureDefinition> &_categories, unsigned maxGrouping, std::vector<double> init_phi, 
-                        std::vector<unsigned> init_mix_asssign);
+                        std::vector<unsigned> init_mix_assign);
         
         
 		void initializeROCTrace(unsigned samples, unsigned num_genes, unsigned numMutationCategories,
 			unsigned numSelectionCategories, unsigned numParam, unsigned numMixtures, std::vector<mixtureDefinition> &_categories,
 			unsigned maxGrouping, unsigned numObservedPhiSets,std::vector<double> init_phi, 
-                        std::vector<unsigned> init_mix_asssign);
+                        std::vector<unsigned> init_mix_assign);
         
         
 		void initializeFONSETrace(unsigned samples, unsigned num_genes, unsigned numMutationCategories,
 			unsigned numSelectionCategories, unsigned numParam, unsigned numMixtures,
 			std::vector<mixtureDefinition> &_categories, unsigned maxGrouping,std::vector<double> init_phi, 
-                        std::vector<unsigned> init_mix_asssign);
+                        std::vector<unsigned> init_mix_assign);
         
         
 		void initializePANSETrace(unsigned samples, unsigned num_genes, unsigned numAlphaCategories,
 			unsigned numLambdaPrimeCategories, unsigned numParam, unsigned numMixtures,
 			std::vector<mixtureDefinition> &_categories, unsigned maxGrouping,std::vector<double> init_phi, 
-                        std::vector<unsigned> init_mix_asssign);
+                        std::vector<unsigned> init_mix_assign);
 
 
 		//------------------------------//
