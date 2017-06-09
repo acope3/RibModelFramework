@@ -10,9 +10,10 @@ using namespace Rcpp;
 //----------- Constructors & Destructors ---------- //
 //--------------------------------------------------//
 
-PAModel::PAModel() : Model()
+PAModel::PAModel(unsigned _RFPCountColumn) : Model()
 {
 	parameter = 0;
+	RFPCountColumn = _RFPCountColumn;
 	//ctor
 }
 
@@ -25,11 +26,11 @@ PAModel::~PAModel()
 }
 
 
-double PAModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
-													   unsigned currRFPObserved, unsigned currNumCodonsInMRNA, double phiValue)
+double PAModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime, unsigned currRFPValue,
+                                                      unsigned currNumCodonsInMRNA, double phiValue)
 {
-	double logLikelihood = ((std::lgamma((currNumCodonsInMRNA * currAlpha) + currRFPObserved)) - (std::lgamma(currNumCodonsInMRNA * currAlpha)))
-						   + (currRFPObserved * (std::log(phiValue) - std::log(currLambdaPrime + phiValue)))
+	double logLikelihood = ((std::lgamma((currNumCodonsInMRNA * currAlpha) + currRFPValue)) - (std::lgamma(currNumCodonsInMRNA * currAlpha)))
+						   + (currRFPValue * (std::log(phiValue) - std::log(currLambdaPrime + phiValue)))
 						   + ((currNumCodonsInMRNA * currAlpha) * (std::log(currLambdaPrime) - std::log(currLambdaPrime + phiValue)));
 
 	return logLikelihood;
@@ -46,7 +47,6 @@ double PAModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double c
 
 void PAModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k, double* logProbabilityRatio)
 {
-
 	double logLikelihood = 0.0;
 	double logLikelihood_proposed = 0.0;
 
@@ -68,13 +68,13 @@ void PAModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex,
 
 		double currAlpha = getParameterForCategory(alphaCategory, PAParameter::alp, codon, false);
 		double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, codon, false);
-		unsigned currRFPObserved = gene.geneData.getRFPValue(index);
+		unsigned currRFPValue = gene.geneData.getRFPValue(index, RFPCountColumn);
 
 		unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(index);
 		if (currNumCodonsInMRNA == 0) continue;
 
-		logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
-		logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue_proposed);
+		logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPValue, currNumCodonsInMRNA, phiValue);
+		logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPValue, currNumCodonsInMRNA, phiValue_proposed);
 	}
 
 	double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(lambdaPrimeCategory, false);
@@ -91,13 +91,13 @@ void PAModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex,
 }
 
 
-void PAModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, std::vector<double> &logAcceptanceRatioForAllMixtures)
+void PAModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
+                                                                std::vector<double> &logAcceptanceRatioForAllMixtures)
 {
 	double logLikelihood = 0.0;
 	double logLikelihood_proposed = 0.0;
 	Gene *gene;
 	unsigned index = SequenceSummary::codonToIndex(grouping);
-
 
 #ifdef _OPENMP
 //#ifndef __APPLE__
@@ -114,7 +114,7 @@ void PAModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grou
 		unsigned synthesisRateCategory = parameter->getSynthesisRateCategory(mixtureElement);
 		// get non codon specific values, calculate likelihood conditional on these
 		double phiValue = parameter->getSynthesisRate(i, synthesisRateCategory, false);
-		unsigned currRFPObserved = gene->geneData.getRFPValue(index);
+		unsigned currRFPValue = gene->geneData.getRFPValue(index, RFPCountColumn);
 		unsigned currNumCodonsInMRNA = gene->geneData.getCodonCountForCodon(index);
 		if (currNumCodonsInMRNA == 0) continue;
 
@@ -126,8 +126,8 @@ void PAModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grou
 		double propLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, grouping, true);
 
 
-		logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
-		logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
+		logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPValue, currNumCodonsInMRNA, phiValue);
+		logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambdaPrime, currRFPValue, currNumCodonsInMRNA, phiValue);
 	}
 	logAcceptanceRatioForAllMixtures[0] = logLikelihood_proposed - logLikelihood;
 }
@@ -542,13 +542,13 @@ void PAModel::simulateGenome(Genome &genome)
 				NumericVector xx(1);
 				xx = rgamma(1, alphaPrime, 1.0/lambdaPrime);
 				xx = rpois(1, xx[0] * phi);
-				tmpGene.geneData.setRFPValue(codonIndex, xx[0]);
+				tmpGene.geneData.setRFPValue(codonIndex, xx[0], RFPCountColumn);
 #else
-			std::gamma_distribution<double> GDistribution(alphaPrime,1.0/lambdaPrime);
+			std::gamma_distribution<double> GDistribution(alphaPrime, 1.0/lambdaPrime);
 			double tmp = GDistribution(Parameter::generator);
 			std::poisson_distribution<unsigned> PDistribution(phi * tmp);
 			unsigned simulatedValue = PDistribution(Parameter::generator);
-			tmpGene.geneData.setRFPValue(codonIndex, simulatedValue);
+			tmpGene.geneData.setRFPValue(codonIndex, simulatedValue, RFPCountColumn);
 #endif
 		}
 		genome.addGene(tmpGene, true);

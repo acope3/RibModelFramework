@@ -119,6 +119,9 @@ int testUtility()
 int testSequenceSummary()
 {
     SequenceSummary SS("ATGCTCATTCTCACTGCTGCCTCGTAG");
+    std::vector <unsigned> *uVectStar;
+    std::vector <int> iVect;
+    std::vector <unsigned> uVect;
     int error = 0;
     int globalError = 0;
 
@@ -213,26 +216,25 @@ int testSequenceSummary()
         globalError = 1;
     }
 
-    std::vector <unsigned> *tmp;
-    tmp = SS.getCodonPositions("CTC");
-    if ((1 != tmp -> at(0)) && (3 != tmp -> at(1)))
+    uVectStar = SS.getCodonPositions("CTC");
+    if ((1 != uVectStar -> at(0)) && (3 != uVectStar -> at(1)))
     {
         my_printError("Codon CTC should be found at position 1 and 3(zero indexed), but is found at these locations:\n");
-        for (unsigned i = 0; i < tmp -> size(); i++)
+        for (unsigned i = 0; i < uVectStar -> size(); i++)
         {
-            my_printError("%\n", tmp -> at(i));
+            my_printError("%\n", uVectStar -> at(i));
         }
         error = 1;
         globalError = 1;
     }
 
-    tmp = SS.getCodonPositions("ATT");
-    if (2 != tmp -> at(0))
+    uVectStar= SS.getCodonPositions("ATT");
+    if (2 != uVectStar -> at(0))
     {
         my_printError("Codon ATT should be found at position 2(zero indexed), but is found at these locations:\n");
-        for (unsigned i = 0; i < tmp -> size(); i++)
+        for (unsigned i = 0; i < uVectStar -> size(); i++)
         {
-            my_printError("%\n", tmp -> at(i));
+            my_printError("%\n", uVectStar -> at(i));
         }
         error = 1;
         globalError = 1;
@@ -602,111 +604,111 @@ int testSequenceSummary()
     //------------------------------------------------//
     //------ getCodonPositions(string) Function ------//
     //------------------------------------------------//
-    tmp = SS.getCodonPositions("ATG");
-    if (tmp -> at(0) != 0 || tmp -> size() != 1)
+    uVectStar = SS.getCodonPositions("ATG");
+    if (uVectStar -> at(0) != 0 || uVectStar -> size() != 1)
     {
         my_printError("Error with getCodonPositions(string) for codon \"ATG\".\n Should return 0, but returns:\n");
-        for (unsigned i = 0; i < tmp -> size(); i++)
+        for (unsigned i = 0; i < uVectStar -> size(); i++)
         {
-            my_printError("%\n", tmp -> at(i));
+            my_printError("%\n", uVectStar -> at(i));
         }
         error = 1;
         globalError = 1;
     }
 
-    tmp = SS.getCodonPositions("CTC");
-    if (tmp -> at(0) != 1 || tmp -> at(1) != 3|| tmp -> size() != 2)
+    uVectStar = SS.getCodonPositions("CTC");
+    if (uVectStar -> at(0) != 1 || uVectStar -> at(1) != 3|| uVectStar -> size() != 2)
     {
         my_printError("Error with getCodonPositions(string) for codon \"CTC\".\n Should return 1 and 3, but returns:\n");
-        for (unsigned i = 0; i < tmp -> size(); i++)
+        for (unsigned i = 0; i < uVectStar -> size(); i++)
         {
-            my_printError("%\n", tmp -> at(i));
+            my_printError("%\n", uVectStar -> at(i));
         }
         error = 1;
         globalError = 1;
     }
 
-    tmp = SS.getCodonPositions("ATT");
-    if (tmp -> at(0) != 2 || tmp -> size() != 1)
+    uVectStar = SS.getCodonPositions("ATT");
+    if (uVectStar -> at(0) != 2 || uVectStar -> size() != 1)
     {
         my_printError("Error with getCodonPositions(string) for codon \"ATT\".\n Should return 2, but returns:\n");
-        for (unsigned i = 0; i < tmp -> size(); i++)
+        for (unsigned i = 0; i < uVectStar -> size(); i++)
         {
-            my_printError("%\n", tmp -> at(i));
+            my_printError("%\n", uVectStar -> at(i));
         }
         error = 1;
         globalError = 1;
     }
 
-    tmp = SS.getCodonPositions("ACT");
-    if (tmp -> at(0) != 4 || tmp -> size() != 1)
+    uVectStar = SS.getCodonPositions("ACT");
+    if (uVectStar -> at(0) != 4 || uVectStar -> size() != 1)
     {
         my_printError("Error with getCodonPositions(string) for codon \"ACT\".\n Should return 4, but returns:\n");
-        for (unsigned i = 0; i < tmp -> size(); i++)
+        for (unsigned i = 0; i < uVectStar -> size(); i++)
         {
-            my_printError("%\n", tmp -> at(i));
+            my_printError("%\n", uVectStar -> at(i));
         }
         error = 1;
         globalError = 1;
     }
 
 
-    tmp = SS.getCodonPositions("GCT");
-    if (tmp -> at(0) != 5 || tmp -> size() != 1)
+    uVectStar = SS.getCodonPositions("GCT");
+    if (uVectStar -> at(0) != 5 || uVectStar -> size() != 1)
     {
         my_printError("Error with getCodonPositions(string) for codon \"GCT\".\n Should return 5, but returns:\n");
-        for (unsigned i = 0; i < tmp -> size(); i++)
+        for (unsigned i = 0; i < uVectStar -> size(); i++)
         {
-            my_printError("%\n", tmp -> at(i));
+            my_printError("%\n", uVectStar -> at(i));
         }
         error = 1;
         globalError = 1;
     }
 
-    tmp = SS.getCodonPositions("GCC");
-    if (tmp -> at(0) != 6 || tmp -> size() != 1)
+    uVectStar = SS.getCodonPositions("GCC");
+    if (uVectStar -> at(0) != 6 || uVectStar -> size() != 1)
     {
         my_printError("Error with getCodonPositions(string) for codon \"GCC\".\n Should return 6, but returns:\n");
-        for (unsigned i = 0; i < tmp -> size(); i++)
+        for (unsigned i = 0; i < uVectStar -> size(); i++)
         {
-            my_printError("%\n", tmp -> at(i));
+            my_printError("%\n", uVectStar -> at(i));
         }
         error = 1;
         globalError = 1;
     }
 
-    tmp = SS.getCodonPositions("TCG");
-    if (tmp -> at(0) != 7 || tmp -> size() != 1)
+    uVectStar = SS.getCodonPositions("TCG");
+    if (uVectStar -> at(0) != 7 || uVectStar -> size() != 1)
     {
         my_printError("Error with getCodonPositions(string) for codon \"TCG\".\n Should return 7, but returns:\n");
-        for (unsigned i = 0; i < tmp -> size(); i++)
+        for (unsigned i = 0; i < uVectStar -> size(); i++)
         {
-            my_printError("%\n", tmp -> at(i));
+            my_printError("%\n", uVectStar -> at(i));
         }
         error = 1;
         globalError = 1;
     }
 
-    tmp = SS.getCodonPositions("TAG");
-    if (tmp -> at(0) != 8 || tmp -> size() != 1)
+    uVectStar = SS.getCodonPositions("TAG");
+    if (uVectStar -> at(0) != 8 || uVectStar -> size() != 1)
     {
         my_printError("Error with getCodonPositions(string) for codon \"TAG\".\n Should return 8, but returns:\n");
-        for (unsigned i = 0; i < tmp -> size(); i++)
+        for (unsigned i = 0; i < uVectStar -> size(); i++)
         {
-            my_printError("%\n", tmp -> at(i));
+            my_printError("%\n", uVectStar -> at(i));
         }
         error = 1;
         globalError = 1;
     }
 
-    tmp = SS.getCodonPositions("GTG");
-    if (tmp -> size() != 0)
+    uVectStar = SS.getCodonPositions("GTG");
+    if (uVectStar -> size() != 0)
     {
         my_printError("Error with getCodonPositions(string) for codon \"GTG\".\n");
         my_printError("Should return an empty vector, but returns:\n");
-        for (unsigned i = 0; i < tmp -> size(); i++)
+        for (unsigned i = 0; i < uVectStar -> size(); i++)
         {
-            my_printError("%\n", tmp -> at(i));
+            my_printError("%\n", uVectStar -> at(i));
         }
         error = 1;
         globalError = 1;
@@ -720,110 +722,110 @@ int testSequenceSummary()
     //-----------------------------------------------//
     //------ getCodonPositions(index) Function ------//
     //-----------------------------------------------//
-    tmp = SS.getCodonPositions(29);
-    if (tmp -> at(0) != 0 || tmp -> size() != 1)
+    uVectStar = SS.getCodonPositions(29);
+    if (uVectStar -> at(0) != 0 || uVectStar -> size() != 1)
     {
         my_printError("Error with getCodonPositions(index) for codon index 29.\n Should return 0, but returns:\n");
-        for (unsigned i = 0; i < tmp -> size(); i++)
+        for (unsigned i = 0; i < uVectStar -> size(); i++)
         {
-            my_printError("%\n", tmp -> at(i));
+            my_printError("%\n", uVectStar -> at(i));
         }
         error = 1;
         globalError = 1;
     }
 
-    tmp = SS.getCodonPositions(24);
-    if (tmp -> at(0) != 1 || tmp -> at(1) != 3 || tmp -> size() != 2)
+    uVectStar = SS.getCodonPositions(24);
+    if (uVectStar -> at(0) != 1 || uVectStar -> at(1) != 3 || uVectStar -> size() != 2)
     {
         my_printError("Error with getCodonPositions(index) for codon index 24.\n Should return 1 and 3, but returns:\n");
-        for (unsigned i = 0; i < tmp -> size(); i++)
+        for (unsigned i = 0; i < uVectStar -> size(); i++)
         {
-            my_printError("%\n", tmp -> at(i));
+            my_printError("%\n", uVectStar -> at(i));
         }
         error = 1;
         globalError = 1;
     }
 
-    tmp = SS.getCodonPositions(20);
-    if (tmp -> at(0) != 2 || tmp -> size() != 1)
+    uVectStar = SS.getCodonPositions(20);
+    if (uVectStar -> at(0) != 2 || uVectStar -> size() != 1)
     {
         my_printError("Error with getCodonPositions(index) for codon index 20.\n Should return 2, but returns:\n");
-        for (unsigned i = 0; i < tmp -> size(); i++)
+        for (unsigned i = 0; i < uVectStar -> size(); i++)
         {
-            my_printError("%\n", tmp -> at(i));
+            my_printError("%\n", uVectStar -> at(i));
         }
         error = 1;
         globalError = 1;
     }
 
-    tmp = SS.getCodonPositions(51);
-    if (tmp -> at(0) != 4 || tmp -> size() != 1)
+    uVectStar = SS.getCodonPositions(51);
+    if (uVectStar -> at(0) != 4 || uVectStar -> size() != 1)
     {
         my_printError("Error with getCodonPositions(index) for codon index 51.\n Should return 4, but returns:\n");
-        for (unsigned i = 0; i < tmp -> size(); i++)
+        for (unsigned i = 0; i < uVectStar -> size(); i++)
         {
-            my_printError("%\n", tmp -> at(i));
+            my_printError("%\n", uVectStar -> at(i));
         }
         error = 1;
         globalError = 1;
     }
 
-    tmp = SS.getCodonPositions(3);
-    if (tmp -> at(0) != 5 || tmp -> size() != 1)
+    uVectStar = SS.getCodonPositions(3);
+    if (uVectStar -> at(0) != 5 || uVectStar -> size() != 1)
     {
         my_printError("Error with getCodonPositions(index) for codon index 3.\n Should return 4, but returns:\n");
-        for (unsigned i = 0; i < tmp -> size(); i++)
+        for (unsigned i = 0; i < uVectStar -> size(); i++)
         {
-            my_printError("%\n", tmp -> at(i));
+            my_printError("%\n", uVectStar -> at(i));
         }
         error = 1;
         globalError = 1;
     }
 
-    tmp = SS.getCodonPositions(1);
-    if (tmp -> at(0) != 6 || tmp -> size() != 1)
+    uVectStar = SS.getCodonPositions(1);
+    if (uVectStar -> at(0) != 6 || uVectStar -> size() != 1)
     {
         my_printError("Error with getCodonPositions(index) for codon index 1.\n Should return 4, but returns:\n");
-        for (unsigned i = 0; i < tmp -> size(); i++)
+        for (unsigned i = 0; i < uVectStar -> size(); i++)
         {
-            my_printError("%\n", tmp -> at(i));
+            my_printError("%\n", uVectStar -> at(i));
         }
         error = 1;
         globalError = 1;
     }
 
-    tmp = SS.getCodonPositions(46);
-    if (tmp -> at(0) != 7 || tmp -> size() != 1)
+    uVectStar = SS.getCodonPositions(46);
+    if (uVectStar -> at(0) != 7 || uVectStar -> size() != 1)
     {
         my_printError("Error with getCodonPositions(index) for codon index 46.\n Should return 7, but returns:\n");
-        for (unsigned i = 0; i < tmp -> size(); i++)
+        for (unsigned i = 0; i < uVectStar -> size(); i++)
         {
-            my_printError("%\n", tmp -> at(i));
+            my_printError("%\n", uVectStar -> at(i));
         }
         error = 1;
         globalError = 1;
     }
 
-    tmp = SS.getCodonPositions(62);
-    if (tmp -> at(0) != 8 || tmp -> size() != 1)
+    uVectStar = SS.getCodonPositions(62);
+    if (uVectStar -> at(0) != 8 || uVectStar -> size() != 1)
     {
         my_printError("Error with getCodonPositions(index) for codon index 62.\n Should return 8, but returns:\n");
-        for (unsigned i = 0; i < tmp -> size(); i++)
+        for (unsigned i = 0; i < uVectStar -> size(); i++)
         {
-            my_printError("%\n", tmp -> at(i));
+            my_printError("%\n", uVectStar -> at(i));
         }
         error = 1;
         globalError = 1;
     }
 
-    tmp = SS.getCodonPositions(54);
-    if (tmp -> size() != 0)
+    uVectStar = SS.getCodonPositions(54);
+    if (uVectStar -> size() != 0)
     {
         my_printError("Error with getCodonPositions(index) for codon index 54.\n");
         my_printError("Should return an empty vector, but returns:\n");
-        for (unsigned i = 0; i < tmp -> size(); i++)
+        for (unsigned i = 0; i < uVectStar -> size(); i++)
         {
-            my_printError("%\n", tmp -> at(i));
+            my_printError("%\n", uVectStar -> at(i));
         }
         error = 1;
         globalError = 1;
@@ -838,29 +840,29 @@ int testSequenceSummary()
     //------ init/get/setRFPCount / getSingleRFPCount Functions ------//
     //----------------------------------------------------------------//
     SS.initRFPCount(1);
-    std::vector <unsigned> tmp2 = SS.getRFPCount(0);
+    iVect = SS.getRFPCount(0);
 
-    if (0 != tmp2.size())
+    if (0 != iVect.size())
     {
         my_printError("Error with initRFPCount or getRFPCount. Function should return an empty vector but returns:\n");
-        for (unsigned i = 0; i < tmp2.size(); i++)
+        for (unsigned i = 0; i < iVect.size(); i++)
         {
-            my_printError("%\n", tmp2[i]);
+            my_printError("%\n", iVect[i]);
         }
         error = 1;
         globalError = 1;
     }
 
-    tmp2 = {1, 2, 3, 4, 5};
-    SS.setRFPCount(0, tmp2);
+    iVect = {1, 2, 3, 4, 5};
+    SS.setRFPCount(iVect, 0);
 
-    if (SS.getRFPCount(0) != tmp2)
+    if (SS.getRFPCount(0) != iVect)
     {
         my_printError("Error in initRFPCount, getRFPCount or setRFPCount.\n");
         my_printError("Function should return 1, 2, 3, 4, 5, but returns:\n");
-        for (unsigned i = 0; i < tmp2.size(); i++)
+        for (unsigned i = 0; i < iVect.size(); i++)
         {
-            my_printError("%\n", tmp2[i]);
+            my_printError("%\n", iVect[i]);
         }
         error = 1;
         globalError = 1;
@@ -868,11 +870,11 @@ int testSequenceSummary()
 
     for (unsigned i = 0; i < 5; i++)
     {
-        unsigned tmp3 = SS.getSingleRFPCount(0, i);
-        if (tmp2[i] != tmp3)
+        int tmp = SS.getSingleRFPCount(i, 0);
+        if (iVect[i] != tmp)
         {
             my_printError("Error in initRFPCount, getSingleRFPCount or setRFPCount.\n");
-            my_printError("Function should return %, but returns %\n", tmp2[i], tmp3);
+            my_printError("Function should return %, but returns %\n", iVect[i], tmp);
             error = 1;
             globalError = 1;
         }
@@ -887,39 +889,39 @@ int testSequenceSummary()
     //------ init/get/setSumRFPCount Functions ------//
     //-----------------------------------------------//
     SS.initSumRFPCount(1);
-    std::array <unsigned, 64> tmp3 = SS.getSumRFPCount(0);
+    std::array <unsigned, 64> u64Array = SS.getSumRFPCount(0);
     std::array <unsigned, 64> empty;
     empty.fill(0);
 
-    if (tmp3 != empty)
+    if (u64Array != empty)
     {
         my_printError("Error with initSumRFPCount or getSumRFPCount.\n");
         my_printError("Function should return an array filled with zeroes but returns:\n");
-        for (unsigned i = 0; i < tmp3.size(); i++)
+        for (unsigned i = 0; i < u64Array.size(); i++)
         {
-            if (tmp3[i] != 0) my_printError("For index %, value %\n", i, tmp3[i]);
+            if (u64Array[i] != 0) my_printError("For index %, value %\n", i, u64Array[i]);
         }
         error = 1;
         globalError = 1;
     }
 
-    tmp3[4] = 5;
-    tmp3[16] = 9;
-    tmp3[24] = 6;
-    tmp3[18] = 2;
-    tmp3[47] = 0;
+    u64Array[4] = 5;
+    u64Array[16] = 9;
+    u64Array[24] = 6;
+    u64Array[18] = 2;
+    u64Array[47] = 0;
 
-    SS.setSumRFPCount(0, tmp3);
+    SS.setSumRFPCount(u64Array, 0);
 
-    if (SS.getSumRFPCount(0) != tmp3)
+    if (SS.getSumRFPCount(0) != u64Array)
     {
         my_printError("Error in initSumRFPCount, getSumRFPCount or setSumRFPCount\n.");
         my_printError("Function should return the index, value pairs: 4, 5; 16, 9; 24, 6; 18, 2; 47, 0 but returns:\n");
-        my_printError("4, %\n", tmp3[4]);
-        my_printError("16, %\n", tmp3[16]);
-        my_printError("24, %\n", tmp3[24]);
-        my_printError("18, %\n", tmp3[18]);
-        my_printError("27, %\n", tmp3[47]);
+        my_printError("4, %\n", u64Array[4]);
+        my_printError("16, %\n", u64Array[16]);
+        my_printError("24, %\n", u64Array[24]);
+        my_printError("18, %\n", u64Array[18]);
+        my_printError("27, %\n", u64Array[47]);
         error = 1;
         globalError = 1;
     }
@@ -932,29 +934,29 @@ int testSequenceSummary()
     //----------------------------------------------//
     //------ get/setPositionCodonID Functions ------//
     //----------------------------------------------//
-    tmp2 = SS.getPositionCodonID();
+    uVect = SS.getPositionCodonID();
 
-    if (0 != tmp2.size())
+    if (0 != uVect.size())
     {
         my_printError("Error with getPositionCodonID. Function should return an empty vector but returns:\n");
-        for (unsigned i = 0; i < tmp2.size(); i++)
+        for (unsigned i = 0; i < uVect.size(); i++)
         {
-            my_printError("%\n", tmp2[i]);
+            my_printError("%\n", uVect[i]);
         }
         error = 1;
         globalError = 1;
     }
 
-    tmp2 = {4, 7, 16, 32};
-    SS.setPositionCodonID(tmp2);
+    uVect = {4, 7, 16, 32};
+    SS.setPositionCodonID(uVect);
 
-    if (SS.getPositionCodonID() != tmp2)
+    if (SS.getPositionCodonID() != uVect)
     {
         my_printError("Error in getPositionCodonID or setPositionCodonID.\n");
         my_printError("Function should return 4, 7, 16, 32, but returns:\n");
-        for (unsigned i = 0; i < tmp2.size(); i++)
+        for (unsigned i = 0; i < uVect.size(); i++)
         {
-            my_printError("%\n", tmp2[i]);
+            my_printError("%\n", uVect[i]);
         }
         error = 1;
         globalError = 1;
@@ -973,34 +975,38 @@ int testSequenceSummary()
     SS.setRFPValue(54,2);
     SS.setRFPValue(45,0);
 
-    if (35 != SS.getRFPValue("TGC"))
+    unsigned tmp = SS.getRFPValue("TGC");
+    if (35 != tmp)
     {
         my_printError("Error in getRFPValue(string) or setRFPValue for codon \"TGC\".\n");
-        my_printError("Should return 35, but returns %\n", SS.getRFPValue("TGC"));
+        my_printError("Should return 35, but returns %\n", tmp);
         error = 1;
         globalError = 1;
     }
 
-    if (45 != SS.getRFPValue("CAC"))
+    tmp = SS.getRFPValue("CAC");
+    if (45 != tmp)
     {
         my_printError("Error in getRFPValue(string) or setRFPValue for codon \"CAC\".\n");
-        my_printError("Should return 45, but returns %\n", SS.getRFPValue("CAC"));
+        my_printError("Should return 45, but returns %\n", tmp);
         error = 1;
         globalError = 1;
     }
 
-    if (2 != SS.getRFPValue("GTG"))
+    tmp = SS.getRFPValue("GTG");
+    if (2 != tmp)
     {
         my_printError("Error in getRFPValue(string) or set RFPValue for codon \"GTG\".\n");
-        my_printError("Should return 2, but returns %\n", SS.getRFPValue("GTG"));
+        my_printError("Should return 2, but returns %\n", tmp);
         error = 1;
         globalError = 1;
     }
 
-    if (0 != SS.getRFPValue("TCC"))
+    tmp = SS.getRFPValue("TCC");
+    if (0 != tmp)
     {
         my_printError("Error in getRFPValue(string) or setRFPValue for codon \"TCC\".\n");
-        my_printError("Should return 0, but returns %\n", SS.getRFPValue("TCC"));
+        my_printError("Should return 0, but returns %\n", tmp);
         error = 1;
         globalError = 1;
     }
@@ -1018,34 +1024,34 @@ int testSequenceSummary()
     SS.setRFPValue(2,63);
     SS.setRFPValue(60,23);
 
-    if (45 != SS.getRFPValue(0))
+    tmp = SS.getRFPValue(0);
+    if (45 != tmp)
     {
-        my_printError("Error with getRFPValue(index) for codon index 0.\n Should return 45, but returns %\n",
-                      SS.getRFPValue(0));
+        my_printError("Error with getRFPValue(index) for codon index 0.\n Should return 45, but returns %\n", tmp);
         error = 1;
         globalError = 1;
     }
 
-    if (52 != SS.getRFPValue(1))
+    tmp = SS.getRFPValue(1);
+    if (52 != tmp)
     {
-        my_printError("Error with getRFPValue(index) for codon index 1.\n Should return 52, but returns %\n",
-                      SS.getRFPValue(1));
+        my_printError("Error with getRFPValue(index) for codon index 1.\n Should return 52, but returns %\n", tmp);
         error = 1;
         globalError = 1;
     }
 
-    if (63 != SS.getRFPValue(2))
+    tmp = SS.getRFPValue(2);
+    if (63 != tmp)
     {
-        my_printError("Error with getRFPValue(index) for codon index 2.\n Should return 63, but returns %\n",
-                      SS.getRFPValue(2));
+        my_printError("Error with getRFPValue(index) for codon index 2.\n Should return 63, but returns %\n", tmp);
         error = 1;
         globalError = 1;
     }
 
-    if (23 != SS.getRFPValue(60))
+    tmp = SS.getRFPValue(60);
+    if (23 != tmp)
     {
-        my_printError("Error with getRFPValue(index) for codon index 60.\n should return 23, but returns %\n",
-                      SS.getRFPValue(60));
+        my_printError("Error with getRFPValue(index) for codon index 60.\n should return 23, but returns %\n", tmp);
         error = 1;
         globalError = 1;
     }
@@ -1113,7 +1119,7 @@ int testGene()
     //------ init/get/setRFPCount Functions ------//
     //---------------------------------------------//
     testGene.initRFPCount(1);
-    std::vector <unsigned> RFPCounts = testGene.getRFPCount(0);
+    std::vector <int> RFPCounts = testGene.getRFPCount(0);
 
     if (0 != RFPCounts.size())
     {
@@ -1128,7 +1134,7 @@ int testGene()
     }
 
     RFPCounts = {0, 1, 1};
-    testGene.setRFPCount(0, RFPCounts);
+    testGene.setRFPCount(RFPCounts, 0);
 
     if (testGene.getRFPCount(0) != RFPCounts)
     {
@@ -1173,7 +1179,7 @@ int testGene()
     sumRFPCounts[18] = 2;
     sumRFPCounts[47] = 0;
 
-    testGene.setSumRFPCount(0, sumRFPCounts);
+    testGene.setSumRFPCount(sumRFPCounts, 0);
 
     if (testGene.getSumRFPCount(0) != sumRFPCounts)
     {
@@ -1476,19 +1482,19 @@ void testGenomePAHelper(Genome* genome, bool simulated)
 {
     // All values here are derived from readPA.csv's hardcoded values.
 
-    Gene panse1("CTTGCTATTTTTTTT", "TEST001", "No description for PANSE Model");
+    Gene panse1("CTTGCTATTTTTTTTGGG", "TEST001", "No description for PANSE Model");
     Gene panse2("CCTGTAATTTGGTGG", "TEST002", "No description for PANSE Model");
 
     // RFPCount for TEST001: value[position] = RFPCount
-    std::vector <unsigned> test1Cat1 = {0, 0, 2, 0, 1};
-    std::vector <unsigned> test1Cat2 = {0, 17, 0, 1, 0};
+    std::vector <int> test1Cat1 = {0, 0, 2, 0, 1, 1};
+    std::vector <int> test1Cat2 = {0, 17, 0, 1, -1, -1};
 
     // RFPCount for TEST002: value[position] = RFPCount
-    std::vector <unsigned> test2Cat1 = {1, 1, 0, 0, 1};
-    std::vector <unsigned> test2Cat2 = {2, 0, 2, 3, 6};
+    std::vector <int> test2Cat1 = {1, 1, 0, 0, 1};
+    std::vector <int> test2Cat2 = {2, 0, 2, 3, 6};
 
     std::string codon;
-    unsigned index1, index2, index3, index4, index5, index6, index7;
+    unsigned index1, index2, index3, index4, index5, index6, index7, index8;
 
     // sumRFPCount for TEST001
     std::array <unsigned, 64> sumTest1Cat1;
@@ -1533,7 +1539,11 @@ void testGenomePAHelper(Genome* genome, bool simulated)
     sumTest2Cat1[index7] = 1;
     sumTest2Cat2[index7] = 9;
 
-    panse1.geneData.setPositionCodonID({index1, index2, index3, index4, index4});
+    codon = "GGG";
+    index8 = SequenceSummary::codonToIndex(codon);
+    sumTest1Cat1[index8] = 1;
+
+    panse1.geneData.setPositionCodonID({index1, index2, index3, index4, index4, index8});
     panse2.geneData.setPositionCodonID({index5, index6, index3, index7, index7});
 
     panse1.initRFPCount(2);
@@ -1542,15 +1552,15 @@ void testGenomePAHelper(Genome* genome, bool simulated)
     panse1.initSumRFPCount(2);
     panse2.initSumRFPCount(2);
 
-    panse1.setRFPCount(0, test1Cat1);
-    panse1.setRFPCount(1, test1Cat2);
-    panse2.setRFPCount(0, test2Cat1);
-    panse2.setRFPCount(1, test2Cat2);
+    panse1.setRFPCount(test1Cat1, 0);
+    panse1.setRFPCount(test1Cat2, 1);
+    panse2.setRFPCount(test2Cat1, 0);
+    panse2.setRFPCount(test2Cat2, 1);
 
-    panse1.setSumRFPCount(0, sumTest1Cat1);
-    panse1.setSumRFPCount(1, sumTest1Cat2);
-    panse2.setSumRFPCount(0, sumTest2Cat1);
-    panse2.setSumRFPCount(1, sumTest2Cat2);
+    panse1.setSumRFPCount(sumTest1Cat1, 0);
+    panse1.setSumRFPCount(sumTest1Cat2, 1);
+    panse2.setSumRFPCount(sumTest2Cat1, 0);
+    panse2.setSumRFPCount(sumTest2Cat2, 1);
 
     genome->addGene(panse1, simulated);
     genome->addGene(panse2, simulated);
@@ -1683,7 +1693,7 @@ int testGenome(std::string testFileDir)
     //------------------------------------//
     if (1 != genome1.getGenomeSize(false))
     {
-        my_printError("Error in testGenome: getGenomesize(false). Should return 1, but returns %.\n",
+        my_printError("Error in testGenome: getGenomeSize(false). Should return 1, but returns %.\n",
                       genome1.getGenomeSize(false));
         error = 1;
         globalError = 1;
@@ -1691,7 +1701,7 @@ int testGenome(std::string testFileDir)
 
     if (1 != genome1.getGenomeSize(true))
     {
-        my_printError("Error in testGenome: getGenomesize(true). Should return 1, but returns %.\n",
+        my_printError("Error in testGenome: getGenomeSize(true). Should return 1, but returns %.\n",
                       genome1.getGenomeSize(true));
         error = 1;
         globalError = 1;
@@ -1932,20 +1942,20 @@ int testGenome(std::string testFileDir)
         globalError = 1;
     }
 
-    //----------------------------------//
-    //------ writePAFile Function ------//
-    //----------------------------------//
+    //------------------------------//
+    //------ writePA Function ------//
+    //------------------------------//
 
     // Now write a genome described above in readPAFile to file2, read it in again, and then compare its validity again.
 
     std::string file2 = testFileDir + "/" + "writePA.csv";
 
-    genome1.writePAFile(file2, false);
+    genome1.writePA(file2, false);
     genome2.readPAFile(file2, false);
 
     if (!(genome1 == genome2))
     {
-        my_printError("Error in testGenome: writePAFile with genes. Genomes are not equivalent.\n");
+        my_printError("Error in testGenome: writePA with genes. Genomes are not equivalent.\n");
         error = 1;
         globalError = 1;
     }
@@ -1953,7 +1963,7 @@ int testGenome(std::string testFileDir)
     // Now re-do writing check but with simulated genes.
     genome1.clear();
     testGenomePAHelper(&genome1, true);
-    genome1.writePAFile(file2, true);
+    genome1.writePA(file2, true);
 
     // Note that while these genes were originally simulated, they are printed
     // as non-simulated genes.
@@ -1967,13 +1977,13 @@ int testGenome(std::string testFileDir)
 
     if (!(genome1 == genome2))
     {
-        my_printError("Error in testGenome: writePAFile with simulated genes. Genomes are not equivalent.\n");
+        my_printError("Error in testGenome: writePA with simulated genes. Genomes are not equivalent.\n");
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        my_print("Genome writePAFile --- Pass\n");
+        my_print("Genome writePA --- Pass\n");
     else
         error = 0; //Reset for next function.
 

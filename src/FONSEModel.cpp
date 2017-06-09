@@ -109,7 +109,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 //#ifndef __APPLE__
 #pragma omp parallel for private(mutation, selection, positions, curAA) reduction(+:likelihood,likelihood_proposed)
 #endif
-	for (int i = 0; i < getGroupListSize(); i++)
+	for (unsigned i = 0u; i < getGroupListSize(); i++)
 	{
 		curAA = getGrouping(i);
 
@@ -173,7 +173,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 //#ifndef __APPLE__
 	#pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed, curAA, gene, seqsum) reduction(+:likelihood,likelihood_proposed)
 #endif
-	for (int i = 0; i < numGenes; i++)
+	for (unsigned i = 0u; i < numGenes; i++)
 	{
 		gene = &genome.getGene(i);
 		seqsum = gene->getSequenceSummary();
@@ -231,7 +231,7 @@ void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 //#ifndef __APPLE__
 #pragma omp parallel for reduction(+:lpr)
 #endif
-	for (int i = 0u; i < genome.getGenomeSize(); i++)
+	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{
 		unsigned mixture = getMixtureAssignment(i);
 		mixture = getSynthesisRateCategory(mixture);
@@ -686,7 +686,7 @@ double FONSEModel::calculateAllPriors()
 	return priorRatio;
 }
 
-//Caculates the log probability of each codon for an amino acid and puts them in a vector.
+//Calculates the log probability of each codon for an amino acid and puts them in a vector.
 void FONSEModel::calculateLogCodonProbabilityVector(unsigned numCodons, unsigned position, unsigned minIndexValue,
 												 double *mutation, double *selection, double phi, std::vector <double> &codonProb)
 {
@@ -787,7 +787,7 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 	}
 
 	//As is found in ROCModel.cpp, multiplication is a faster operation than division so we 
-	//save time here by dividing once and then muliplying numCodons times instead of dividing
+	//save time here by dividing once and then multiplying numCodons times instead of dividing
 	//numCodons times.
 	denominator = 1 / denominator;
 	for (unsigned i = 0; i < numCodons; i++)

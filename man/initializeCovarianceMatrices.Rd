@@ -9,7 +9,7 @@ initializeCovarianceMatrices(parameter, genome, numMixtures, geneAssignment,
 }
 \arguments{
 \item{parameter}{A Parameter object that corresponds to one of the model types. 
-Valid values are "ROC", "RFP", and "FONSE".}
+Valid values are "ROC", "PA", and "FONSE".}
 
 \item{genome}{An object of type Genome necessary for the initialization of the Parameter object.}
 

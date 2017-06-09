@@ -109,11 +109,11 @@ class FONSEModel : public Model
 		void setParameter(FONSEParameter &_parameter);
 		virtual double calculateAllPriors();
 		void calculateLogCodonProbabilityVector(unsigned numCodons, unsigned position, unsigned minIndexValue,
-											 double* mutation, double* selection, double phi, std::vector <double> &codonProb);
+					double* mutation, double* selection, double phi, std::vector <double> &codonProb);
 		void calculateCodonProbabilityVector(unsigned numCodons, unsigned position, double* mutation, double* selection, 
-												double phi, double codonProb[]);
+					double phi, double codonProb[]);
 		virtual void getParameterForCategory(unsigned category, unsigned param, std::string aa, bool proposal,
-											 double* returnValue);
+					double* returnValue);
 
 
 

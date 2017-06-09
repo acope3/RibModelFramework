@@ -26,7 +26,7 @@ class SequenceSummary
         // outer index is the codonID, size of 64 for number of codons
         // inner index is the position of each occurrence of the codonID specified.
 
-        std::vector <std::vector <unsigned>> RFPCount;
+        std::vector <std::vector <int>> RFPCount;
 		// outer index is the RFPCount for the category specified via index
 		// inner index is number of position
 
@@ -70,25 +70,25 @@ class SequenceSummary
 
 		//RFP Functions (for PA and PANSE models) (All tested):
 		void initRFPCount(unsigned numCategories);
-		std::vector <unsigned> getRFPCount(unsigned categoryIndex);
-		unsigned getSingleRFPCount(unsigned categoryIndex, unsigned position);
-		void setRFPCount(unsigned categoryIndex, std::vector <unsigned> arg);
+		std::vector <int> getRFPCount(unsigned RFPCountColumn = 0u);
+		int getSingleRFPCount(unsigned position, unsigned RFPCountColumn = 0u);
+		void setRFPCount(std::vector <int> arg, unsigned RFPCountColumn = 0u);
 		
         void initSumRFPCount(unsigned numCategories); 
-		std::array <unsigned, 64> getSumRFPCount(unsigned categoryIndex); 
-		void setSumRFPCount(unsigned categoryIndex, std::array <unsigned, 64> arg); 
+		std::array <unsigned, 64> getSumRFPCount(unsigned RFPCountColumn = 0u);
+		void setSumRFPCount(std::array <unsigned, 64> arg, unsigned RFPCountColumn = 0u);
 
 		std::vector <unsigned> getPositionCodonID();
 		void setPositionCodonID(std::vector <unsigned> arg);
 
-        unsigned getRFPValue(std::string codon, unsigned categoryIndex = 0);
-        unsigned getRFPValue(unsigned codonIndex, unsigned categoryIndex = 0);
-        void setRFPValue(unsigned codonIndex, unsigned value, unsigned categoryIndex = 0); // Only for unit testing.
+        unsigned getRFPValue(std::string codon, unsigned RFPCountColumn = 0u);
+        unsigned getRFPValue(unsigned codonIndex, unsigned RFPCountColumn = 0u);
+        void setRFPValue(unsigned codonIndex, unsigned value, unsigned RFPCountColumn = 0u);
 
 		//Other Functions (All tested):
 		void clear();
 		bool processSequence(const std::string& sequence);
-        bool processPA(std::vector <std::vector <unsigned>> table);
+        bool processPA(std::vector <std::vector <int>> table);
 
 
 		//Static Functions:
