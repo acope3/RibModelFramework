@@ -87,7 +87,7 @@ void Genome::readFasta(std::string filename, bool append)
 
 			Gene tmpGene;
 			std::string tempSeq = "";
-			for (;;)
+			while (1)
 			{
 				// read a new line in every cycle
 				std::getline(Fin, buf);

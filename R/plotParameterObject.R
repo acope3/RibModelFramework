@@ -215,8 +215,7 @@ confidenceInterval.plot <- function(x, y, sd.x=NULL, sd.y=NULL, ...){
     segments(x.low, y, x.up, y, ...)
   }  
   
-  lm.line <- lm(y~x, na.action = "na.exclude")
-  
+  lm.line <- lm(y~x, na.action = "na.exclude") 
   
   b <- lm.line$coef[2]
   
@@ -230,7 +229,6 @@ confidenceInterval.plot <- function(x, y, sd.x=NULL, sd.y=NULL, ...){
   slope <- round(summary(lm.line)$coefficients[2], 3)
   intercept <- round(summary(lm.line)$coefficients[1], 3)
   t <- (slope - 1)/std.error
-  
 }
 
 
