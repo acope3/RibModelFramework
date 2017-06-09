@@ -5,7 +5,7 @@
 \title{Genome Initialization}
 \usage{
 initializeGenomeObject(file, genome = NULL, observed.expression.file = NULL,
-  fasta = TRUE, match.expression.by.id = TRUE)
+  fasta = TRUE, match.expression.by.id = TRUE, append = FALSE)
 }
 \arguments{
 \item{file}{A file of coding sequences in fasta or PA format}
@@ -18,8 +18,11 @@ empirical expression rates (optional).}
 \item{fasta}{A boolean value which decides whether to initialize with a
 fasta file or an PA value file. (TRUE for fasta, FALSE for PA)}
 
-\item{match.expression.by.id}{If TRUE (default) observed expression values will be assigned by matching sequence identifier.
-If FALSE observed expression values will be assigned by order}
+\item{match.expression.by.id}{If TRUE (default), observed expression values will be assigned by matching sequence identifier.
+If FALSE, observed expression values will be assigned by order.}
+
+\item{append}{If TRUE (FALSE is default), function will read in additional genome data to append to an existing genome.
+If FALSE, genome data is cleared before reading in data (no preexisting data).}
 }
 \value{
 This function returns the initialized Genome object.
