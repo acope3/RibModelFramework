@@ -19,7 +19,7 @@ class PAModel: public Model
 
 	public:
 		//Constructors & Destructors:
-		explicit PAModel(unsigned RFPCountColumn = 0u); // TODO: Ask why this was explicit (just added unsigned parameter)
+		explicit PAModel(unsigned RFPCountColumn = 0u);
 		virtual ~PAModel();
 
 
