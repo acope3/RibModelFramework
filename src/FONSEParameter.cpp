@@ -467,6 +467,7 @@ double FONSEParameter::getCurrentCodonSpecificProposalWidth(unsigned aa)
 {
 	unsigned aaStart;
 	unsigned aaEnd;
+	//Gets the codon range based on the Amino Acid
 	SequenceSummary::AAIndexToCodonRange(aa, aaStart, aaEnd, false);
   return std_csp[aaStart];
 }
@@ -484,7 +485,7 @@ void FONSEParameter::proposeCodonSpecificParameter()
     unsigned numCodons = aaEnd - aaStart;
     for (unsigned i = 0u; i < (numCodons * (numMutationCategories + numSelectionCategories)); i++)
     {
-      iidProposed.push_back(randNorm(0.0, 1.0));
+      iidProposed.push_back(randNorm(0.0, 1.0)); //Random distribution
     }
 
     std::vector<double> covaryingNums;
