@@ -485,11 +485,25 @@ void FONSEParameter::proposeCodonSpecificParameter()
     unsigned numCodons = aaEnd - aaStart;
     for (unsigned i = 0u; i < (numCodons * (numMutationCategories + numSelectionCategories)); i++)
     {
-      iidProposed.push_back(randNorm(0.0, 1.0)); //Random distribution
+      iidProposed.push_back(randNorm(0.0, 1.0)); //Random distribution between 0 and 1
     }
 
     std::vector<double> covaryingNums;
     covaryingNums = covarianceMatrix[SequenceSummary::AAToAAIndex(aa)].transformIidNumersIntoCovaryingNumbers(iidProposed);
+		unsigned biggestCat = max(numMutationCategories, numSelectionCategories);
+
+		for (unsigned i = 0; i < biggestCat; i++)
+    {
+      for (unsigned j = i * numCodons, l = aaStart; j < (i * numCodons) + numCodons; j++, l++)
+      {
+				if(i < numMutationCategories)
+        	proposedCodonSpecificParameter[dM][i][l] = currentCodonSpecificParameter[dM][i][l] + covaryingNums[j];
+				if(i < numSelectionCategories)
+					proposedCodonSpecificParameter[dOmega][i][l] = currentCodonSpecificParameter[dOmega][i][l]
+					+ covaryingNums[(numMutationCategories * numCodons) + j];
+      }
+    }
+		/*
     for (unsigned i = 0; i < numMutationCategories; i++)
     {
       for (unsigned j = i * numCodons, l = aaStart; j < (i * numCodons) + numCodons; j++, l++)
@@ -505,6 +519,7 @@ void FONSEParameter::proposeCodonSpecificParameter()
         + covaryingNums[(numMutationCategories * numCodons) + j];
       }
     }
+		*/
   }
 }
 
