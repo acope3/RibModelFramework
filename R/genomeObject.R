@@ -11,21 +11,24 @@
 #' 
 #' @param fasta A boolean value which decides whether to initialize with a
 #'  fasta file or an PA value file. (TRUE for fasta, FALSE for PA)
-#'  
-#' @param match.expression.by.id If TRUE (default) observed expression values will be assigned by matching sequence identifier.
-#' If FALSE observed expression values will be assigned by order
+#' 
+#' @param match.expression.by.id If TRUE (default), observed expression values will be assigned by matching sequence identifier.
+#' If FALSE, observed expression values will be assigned by order.
+#' 
+#' @param append If TRUE (FALSE is default), function will read in additional genome data to append to an existing genome.
+#' If FALSE, genome data is cleared before reading in data (no preexisting data). 
 #' 
 #' @return This function returns the initialized Genome object.
 #' 
-initializeGenomeObject <- function(file, genome=NULL, observed.expression.file=NULL, fasta=TRUE, match.expression.by.id=TRUE) {
+initializeGenomeObject <- function(file, genome=NULL, observed.expression.file=NULL, fasta=TRUE, match.expression.by.id=TRUE, append=FALSE) {
   if (is.null(genome)){ 
     genome <- new(Genome)
   }
 
   if (fasta == TRUE) {
-    genome$readFasta(file, TRUE)
+    genome$readFasta(file, append)
   } else {
-    genome$readPAFile(file)
+    genome$readPAFile(file, append)
   }
   if(!is.null(observed.expression.file)) {
     genome$readObservedPhiValues(observed.expression.file, match.expression.by.id)
