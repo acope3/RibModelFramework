@@ -503,23 +503,6 @@ void FONSEParameter::proposeCodonSpecificParameter()
 					+ covaryingNums[(numMutationCategories * numCodons) + j];
       }
     }
-		/*
-    for (unsigned i = 0; i < numMutationCategories; i++)
-    {
-      for (unsigned j = i * numCodons, l = aaStart; j < (i * numCodons) + numCodons; j++, l++)
-      {
-        proposedCodonSpecificParameter[dM][i][l] = currentCodonSpecificParameter[dM][i][l] + covaryingNums[j];
-      }
-    }
-    for (unsigned i = 0; i < numSelectionCategories; i++)
-    {
-      for (unsigned j = i * numCodons, l = aaStart; j < (i * numCodons) + numCodons; j++, l++)
-      {
-        proposedCodonSpecificParameter[dOmega][i][l] = currentCodonSpecificParameter[dOmega][i][l]
-        + covaryingNums[(numMutationCategories * numCodons) + j];
-      }
-    }
-		*/
   }
 }
 
