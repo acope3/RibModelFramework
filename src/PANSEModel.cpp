@@ -664,3 +664,15 @@ double PANSEModel::prob_elongation_log(double curralpha, double currlambda, doub
     return val1 + val2;
 }
 
+//Probability that a ribosome reaches current codon at index i in gene g
+double delta_g_log(int i, int g, double *lambdas, double *vs, double *alphas){
+    int j;
+    double sum = 0;
+
+    for(j = 0; j < i; j++){
+        sum += lambdas[j] * vs[g][j] + prob_elongation_log(alphas[j], lambdas[j], vs[g][j]);
+    }
+
+    return sum;
+}
+
