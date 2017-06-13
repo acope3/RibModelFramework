@@ -708,3 +708,16 @@ double PANSEModel::prob_Y_g(double curralpha, int sample_size, double lambda_pri
 
     return term2 * term3 * term1;
 }
+
+double PANSEModel::prob_Y_g_log(double curralpha, int sample_size, double lambda_prime, double psi, double prevdelta){
+    double term1, term2, term3;
+
+    term1 = std::lgamma(curralpha + sample_size) - lgamma(curralpha);
+    term2 = std::log(psi) + std::log(prevdelta) - std::log(lambda_prime + (psi * prevdelta));
+    term3 = std::log(lambda_prime) - std::log(lambda_prime + (psi * prevdelta));
+
+    term2 *= sample_size;
+    term3 *= curralpha;
+
+    return term1 + term2 + term3;
+}
