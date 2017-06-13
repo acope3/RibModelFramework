@@ -663,3 +663,61 @@ double PANSEModel::prob_elongation_log(double curralpha, double currlambda, doub
 
     return val1 + val2;
 }
+
+double PANSEModel::delta_g(int i, int g, double *lambda, double *v_g, double *alpha){
+    int j;
+    double sum = 0;
+    double product = 1;
+
+    for(j = 0; j < i; j++){
+        sum += lambda[j] * v_g[j];
+    }
+
+    for(j = 0; j < i; j++){
+        product *= PANSEModel::generalized_integral(lambda[j], v_g[j]);
+    }
+
+    return std::exp(sum) * product;
+}
+
+double PANSEModel::delta_g_log(int i, int g, double *lambda, double *v_g, double *alpha){
+    int j;
+    double sum = 0;
+    double product = 0;
+
+    for(j = 0; j < i; j++){
+        sum += lambda[j] * v_g[j];
+    }
+
+    for(j = 0; j < i; j++){
+        product += PANSEModel::generalized_integral_log(lambda[j], v_g[j]);
+    }
+
+    return sum + product;
+}
+
+double PANSEModel::prob_Y_g(double curralpha, int sample_size, double lambda_prime, double psi, double prevdelta){
+    double term1, term2, term3;
+
+    term1 = std::tgamma(curralpha + sample_size) / std::tgamma(curralpha);
+    term2 = psi * prevdelta / (lambda_prime + (psi * prevdelta));
+    term3 = lambda_prime / (lambda_prime + (psi * prevdelta));
+    
+    term2 = pow(term2, sample_size);
+    term3 = pow(term3, curralpha);
+
+    return term2 * term3 * term1;
+}
+
+double PANSEModel::prob_Y_g_log(double curralpha, int sample_size, double lambda_prime, double psi, double prevdelta){
+    double term1, term2, term3;
+
+    term1 = std::lgamma(curralpha + sample_size) - lgamma(curralpha);
+    term2 = std::log(psi) + std::log(prevdelta) - std::log(lambda_prime + (psi * prevdelta));
+    term3 = std::log(lambda_prime) - std::log(lambda_prime + (psi * prevdelta));
+
+    term2 *= sample_size;
+    term3 *= curralpha;
+
+    return term1 + term2 + term3;
+}
