@@ -650,12 +650,12 @@ double PANSEModel::generalized_integral_log(double p, double z){
 }
 
 //Calculation of the probability of elongation at current codon
-double PANSEModel::exponential_integral(double curralpha, double currlambda, double currv){
+double PANSEModel::prob_elongation(double curralpha, double currlambda, double currv){
     return std::exp(currlambda * currv) * PANSEModel::generalized_integral(curralpha, currlambda * currv);
 }
 
 //Log probability of elongation at current codon
-double PANSEModel::exponential_integral_log(double curralpha, double currlambda, double currv){
+double PANSEModel::prob_elongation_log(double curralpha, double currlambda, double currv){
     double val1, val2;
 
     val1 = currlambda * currv;
@@ -663,5 +663,3 @@ double PANSEModel::exponential_integral_log(double curralpha, double currlambda,
 
     return val1 + val2;
 }
-
-double PANSEModel::
