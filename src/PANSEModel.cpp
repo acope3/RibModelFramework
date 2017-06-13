@@ -663,3 +663,35 @@ double PANSEModel::prob_elongation_log(double curralpha, double currlambda, doub
 
     return val1 + val2;
 }
+
+double PANSEModel::delta_g(int i, int g, double *lambda, double *v_g, double *alpha){
+    int j;
+    double sum = 0;
+    double product = 1;
+
+    for(j = 0; j < i; j++){
+        sum += lambda[j] * v_g[j];
+    }
+
+    for(j = 0; j < i; j++){
+        product *= PANSEModel::generalized_integral(lambda[j], v_g[j]);
+    }
+
+    return std::exp(sum) * product;
+}
+
+double PANSEModel::delta_g_log(int i, int g, double *lambda, double *v_g, double *alpha){
+    int j;
+    double sum = 0;
+    double product = 0;
+
+    for(j = 0; j < i; j++){
+        sum += lambda[j] * v_g[j];
+    }
+
+    for(j = 0; j < i; j++){
+        product += PANSEModel::generalized_integral_log(lambda[j], v_g[j]);
+    }
+
+    return sum + product;
+}
