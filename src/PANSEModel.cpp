@@ -613,7 +613,7 @@ double PANSEModel::u_gamma_helper(double s, double x)
 //Upper incomplete gamma function
 double PANSEModel::u_gamma(double s, double x)
 {
-    int i;
+    //int i;
     double d, rv;
 
     rv = pow(x, s) * exp(0 - x);
@@ -631,7 +631,7 @@ double PANSEModel::u_gamma_log(double s, double x)
 
     rv = s * std::log(x) - x;
     d = std::log(PANSEModel::u_gamma_helper(s, x));
-    
+
     return rv - d;
 
 }
@@ -663,4 +663,3 @@ double PANSEModel::prob_elongation_log(double curralpha, double currlambda, doub
 
     return val1 + val2;
 }
-
