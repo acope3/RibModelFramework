@@ -115,8 +115,8 @@ class PANSEModel: public Model
         double generalized_integral(double p, double z);
 
         double generalized_integral_log(double p, double z);
-        double prob_elongation(double curralpha, double currlambda, double currv);
-        double prob_elongation_log(double curralpha, double currlambda, double currv);
+        double exponential_integral(double curralpha, double currlambda, double currv);
+        double exponential_integral_log(double curralpha, double currlambda, double currv);
 
 	protected:
 };
