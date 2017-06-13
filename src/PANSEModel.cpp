@@ -695,3 +695,16 @@ double PANSEModel::delta_g_log(int i, int g, double *lambda, double *v_g, double
 
     return sum + product;
 }
+
+double PANSEModel::prob_Y_g(double curralpha, int sample_size, double lambda_prime, double psi, double prevdelta){
+    double term1, term2, term3;
+
+    term1 = std::tgamma(curralpha + sample_size) / std::tgamma(curralpha);
+    term2 = psi * prevdelta / (lambda_prime + (psi * prevdelta));
+    term3 = lambda_prime / (lambda_prime + (psi * prevdelta));
+    
+    term2 = pow(term2, sample_size);
+    term3 = pow(term3, curralpha);
+
+    return term2 * term3 * term1;
+}
