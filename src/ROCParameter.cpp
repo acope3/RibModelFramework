@@ -922,15 +922,15 @@ void ROCParameter::initMutation(std::vector<double> mutationValues, unsigned mix
 	{
 		mixtureElement--;
 
-		unsigned category = getMutationCategory(mixtureElement);
-		aa[0] = (char) std::toupper(aa[0]);
+        unsigned category = getMutationCategory(mixtureElement);
+        aa[0] = (char) std::toupper(aa[0]);
 
         unsigned aaStart, aaEnd;
         SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
         for (unsigned i = aaStart, j = 0; i < aaEnd; i++, j++)
-		{
-			currentCodonSpecificParameter[dM][category][i] = mutationValues[j];
-		}
+        {
+            currentCodonSpecificParameter[dM][category][i] = mutationValues[j];
+        }
 	}
 }
 
@@ -942,10 +942,10 @@ void ROCParameter::initSelection(std::vector<double> selectionValues, unsigned m
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
 	if (check)
 	{
-		mixtureElement--;
-		int category = getSelectionCategory(mixtureElement);
+        mixtureElement--;
+        int category = getSelectionCategory(mixtureElement);
 
-		aa[0] = (char) std::toupper(aa[0]);
+        aa[0] = (char) std::toupper(aa[0]);
 
         unsigned aaStart, aaEnd;
         SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
@@ -953,7 +953,7 @@ void ROCParameter::initSelection(std::vector<double> selectionValues, unsigned m
         {
             currentCodonSpecificParameter[dEta][category][i] = selectionValues[j];
         }
-	}
+    }
 }
 
 
