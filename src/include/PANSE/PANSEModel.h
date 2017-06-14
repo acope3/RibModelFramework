@@ -117,6 +117,11 @@ class PANSEModel: public Model
         double generalized_integral_log(double p, double z);
         double prob_elongation(double curralpha, double currlambda, double currv);
         double prob_elongation_log(double curralpha, double currlambda, double currv);
+        double delta_g(int i, int g, double *lambda, double *v_g, double *alpha);
+        
+        double delta_g_log(int i, int g, double *lambda, double *v_g, double *alpha);
+        double prob_Y_g(double curralpha, int sample_size, double lambda_prime, double psi, double prevdelta);
+        double prob_Y_g_log(double curralpha, int sample_size, double lambda_prime, double psi, double prevdelta);
 
 	protected:
 };

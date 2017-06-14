@@ -347,7 +347,7 @@ bool SequenceSummary::processSequence(const std::string& sequence)
 		codon[2] = (char)std::toupper(codon[2]);
 
 		unsigned codonID = codonToIndex(codon);
-		if (codonID != 64) // if codon id == 64 => codon not found. Ignore, probably N 
+		if (codonID != 64) // if codon id == 64 => codon not found. Ignore, probably N
 		{
 			int aaID = codonToAAIndex(codon);
 			ncodons[codonID]++;
@@ -453,7 +453,7 @@ void SequenceSummary::AAToCodonRange(std::string aa, unsigned& startAAIndex, uns
 	//unsigned startAAIndex = 0u;
 	//unsigned endAAIndex = 0u;
 	char AA = aa[0];
-	
+
 	switch (AA)
 	{
 	case 'A':
@@ -660,7 +660,7 @@ unsigned SequenceSummary::codonToIndex(std::string& codon, bool forParamVector)
 	{
 		i = 64;
 	}
-	else 
+	else
 	{
 		if (forParamVector)
 			i = SequenceSummary::codonToIndexWithoutReference.find(codon) -> second;
@@ -764,10 +764,8 @@ unsigned SequenceSummary::GetNumCodonsForAA(std::string& aa, bool forParamVector
 	case 'X':
 		ncodon = 3;
 		break;
-		default: // INVALID AA
-
+	default: // INVALID AA
 		my_printError("WARNING: Invalid Amino Acid given (%), returning 0,0\n", aa);
-
 		break;
 	}
 	return (forParamVector ? (ncodon - 1) : ncodon);
@@ -831,4 +829,3 @@ RCPP_MODULE(SequenceSummary_mod)
 
 }
 #endif
-
