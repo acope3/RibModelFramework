@@ -1480,7 +1480,7 @@ int testGene()
  */
 void testGenomePAHelper(Genome* genome, bool simulated)
 {
-    // All values here are derived from readPA.csv's hardcoded values.
+    // All values here are derived from readRFPData.csv's hardcoded values.
 
     Gene panse1("CTTGCTATTTTTTTTGGG", "TEST001", "No description for PANSE Model");
     Gene panse2("CCTGTAATTTGGTGG", "TEST002", "No description for PANSE Model");
@@ -1807,7 +1807,7 @@ int testGenome(std::string testFileDir)
      * Other and File I/O Functions:
      * getGenomeForGeneIndices
      * readFasta
-     * readPAFile
+     * readRFPData
      * readObservedPhiValues
      */
 
@@ -1924,38 +1924,38 @@ int testGenome(std::string testFileDir)
     else
         error = 0; //Reset for next function.
 
-    //---------------------------------//
-    //------ readPAFile Function ------//
-    //---------------------------------//
+    //----------------------------------//
+    //------ readRFPData Function ------//
+    //----------------------------------//
     genome2.clear();
 
-    file = testFileDir + "/" + "readPA.csv";
-    genome1.readPAFile(file, false);
+    file = testFileDir + "/" + "readRFPData.csv";
+    genome1.readRFPData(file, false);
 
     testGenomePAHelper(&genome2, false);
 
     if (genome1 == genome2)
-        my_print("Genome readPA --- Pass\n");
+        my_print("Genome readRFPData --- Pass\n");
     else
     {
-        my_printError("Error in testGenome: readPA. Genomes are not equivalent.\n");
+        my_printError("Error in testGenome: readRFPData. Genomes are not equivalent.\n");
         globalError = 1;
     }
 
-    //------------------------------//
-    //------ writePA Function ------//
-    //------------------------------//
+    //-----------------------------------//
+    //------ writeRFPData Function ------//
+    //-----------------------------------//
 
-    // Now write a genome described above in readPAFile to file2, read it in again, and then compare its validity again.
+    // Now write a genome described above in readRFPData to file2, read it in again, and then compare its validity again.
 
-    std::string file2 = testFileDir + "/" + "writePA.csv";
+    std::string file2 = testFileDir + "/" + "writeRFPData.csv";
 
-    genome1.writePA(file2, false);
-    genome2.readPAFile(file2, false);
+    genome1.writeRFPData(file2, false);
+    genome2.readRFPData(file2, false);
 
     if (!(genome1 == genome2))
     {
-        my_printError("Error in testGenome: writePA with genes. Genomes are not equivalent.\n");
+        my_printError("Error in testGenome: writeRFPData with genes. Genomes are not equivalent.\n");
         error = 1;
         globalError = 1;
     }
@@ -1963,27 +1963,27 @@ int testGenome(std::string testFileDir)
     // Now re-do writing check but with simulated genes.
     genome1.clear();
     testGenomePAHelper(&genome1, true);
-    genome1.writePA(file2, true);
+    genome1.writeRFPData(file2, true);
 
     // Note that while these genes were originally simulated, they are printed
     // as non-simulated genes.
     // It is up to the user to know that they were simulated, but they will
     // now be read in as non-simulated genes (and Unit Testing will compare their validity as such)
 
-    genome2.readPAFile(file2);
+    genome2.readRFPData(file2);
 
     genome1.clear();
     testGenomePAHelper(&genome1, false);
 
     if (!(genome1 == genome2))
     {
-        my_printError("Error in testGenome: writePA with simulated genes. Genomes are not equivalent.\n");
+        my_printError("Error in testGenome: writeRFPData with simulated genes. Genomes are not equivalent.\n");
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        my_print("Genome writePA --- Pass\n");
+        my_print("Genome writeRFPData --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -2159,7 +2159,7 @@ int testParameter()
     */
     Genome genome;
     genome.readFasta("/Users/hollisbui/RibModelDev/data/twoMixtures/simulatedAllUniqueR.fasta");
-    //genome.readPAFile("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+    //genome.readRFPData("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 
     unsigned numMixtures = 3;
     std::vector<double> stdDev(numMixtures, 1);
@@ -3253,7 +3253,7 @@ int testPAParameter()
 
 
     Genome genome;
-    //genome.readPAFile("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+    //genome.readRFPData("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
     unsigned numMixtures = 3;
     std::vector <double> stdDev(numMixtures, 1);
     unsigned numGenes = genome.getGenomeSize();
@@ -3370,7 +3370,7 @@ int testMCMCAlgorithm()
 
     my_print("Initializing Genome object--------------------------\n");
     Genome genome;
-    genome.readPAFile("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+    genome.readRFPData("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
     my_print("Done!-------------------------------\n\n\n");
     my_print("Initializing shared parameter variables---------------\n");
     unsigned numMixtures = 1;

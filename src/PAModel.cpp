@@ -520,13 +520,13 @@ void PAModel::updateHyperParameter(unsigned hp)
 
 void PAModel::simulateGenome(Genome &genome)
 {
-	for (unsigned geneIndex = 0; geneIndex < genome.getGenomeSize(); geneIndex++)
+	for (unsigned geneIndex = 0u; geneIndex < genome.getGenomeSize(); geneIndex++)
 	{
 		unsigned mixtureElement = getMixtureAssignment(geneIndex);
 		Gene gene = genome.getGene(geneIndex);
 		double phi = parameter->getSynthesisRate(geneIndex, mixtureElement, false);
 		Gene tmpGene = gene;
-		for (unsigned codonIndex = 0; codonIndex < 61; codonIndex++)
+		for (unsigned codonIndex = 0u; codonIndex < 61; codonIndex++)
 		{
 			std::string codon = SequenceSummary::codonArray[codonIndex];
 			unsigned alphaCat = parameter->getMutationCategory(mixtureElement);

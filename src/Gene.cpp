@@ -192,7 +192,7 @@ void Gene::setSequence(std::string _seq)
 
 /* setPASequence (NOT EXPOSED)
  * Arguments: A table-styled vector (based on lines of input) of integer vectors (storing actual values).
- * The argument is intended to be derived from solely Genome::readPAFile,
+ * The argument is intended to be derived from solely Genome::readRFPData,
  * which creates a PA-formatted table indexed: Position,Codon,RFPCount(s) (may be multiple)
  * Thus, each vector is from a .csv file, and the table size is variable per file read in.
  * This function builds the sequence based on the second element of each vector (the codon) and then
@@ -478,7 +478,7 @@ unsigned Gene::getCodonCount(std::string& codon)
  * This is the R-wrapper for the C-side function "SequenceSummary::getRFPValue".
 */
 // Note: From function definition in header, default category is 1.
-unsigned Gene::getRFPValue(std::string codon, unsigned RFPCountColumn)
+unsigned Gene::getSumRFPCountForCodon(std::string codon, unsigned RFPCountColumn)
 {
     unsigned rv = 0;
 
@@ -547,7 +547,7 @@ RCPP_MODULE(Gene_mod)
 
 	.method("getAACount", &Gene::getAACount, "returns the number of amino acids that are in the sequence for a given amino acid")
 	.method("getCodonCount", &Gene::getCodonCount, "returns the number of codons that are in the sequence for a given codon")
-	.method("getRFPValue", &Gene::getRFPValue, "returns the total RFP for a category, default 1, for a codon in a sequence")
+	.method("getSumRFPCountForCodon", &Gene::getSumRFPCountForCodon, "returns the total RFP Count for a category, default 1, for a codon in a sequence")
 	.method("getCodonPositions", &Gene::getCodonPositions)
   ;
 }

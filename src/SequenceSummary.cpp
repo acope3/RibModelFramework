@@ -282,7 +282,7 @@ void SequenceSummary::setPositionCodonID(std::vector <unsigned> arg)
  * Arguments: A three-character codon string to get the RFP value of, a number representing the RFP category to return (default 0)
  * Returns the RFP value of the codon string for the category index specified.
  * Note: If initSumRFPCount is not called beforehand, it is called now to return a value of 0.
- * Wrapped by Gene::getRFPValue on the R-side.
+ * Wrapped by Gene::getSumRFPCountForCodon on the R-side.
  */
 unsigned SequenceSummary::getRFPValue(std::string codon, unsigned RFPCountColumn)
 {
@@ -793,8 +793,6 @@ std::vector<std::string> SequenceSummary::codons()
 	for (unsigned i = 0; i < 64; i++) RV.push_back(codonArray[i]);
 	return RV;
 }
-
-
 
 
 

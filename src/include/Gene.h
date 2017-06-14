@@ -73,7 +73,7 @@ class Gene
 
 		unsigned getAACount(std::string aa);
 		unsigned getCodonCount(std::string& codon);
-		unsigned getRFPValue(std::string codon, unsigned RFPCountColumn = 1);
+		unsigned getSumRFPCountForCodon(std::string codon, unsigned RFPCountColumn = 1);
 		std::vector <unsigned> getCodonPositions(std::string codon);
 #endif
 
