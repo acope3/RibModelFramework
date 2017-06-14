@@ -121,8 +121,6 @@ setRestartSettings <- function(mcmc, filename, samples, write.multiple=TRUE){
 }
 
 
-# TODO: Have someone who knows what's going on document this.
-# The true method is found in traceObject.R
 #' Convergence Test
 #' 
 #' @param object an object of either class Trace or MCMC

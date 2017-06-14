@@ -464,8 +464,7 @@ CovarianceMatrix& FONSEParameter::getCovarianceMatrixForAA(std::string aa)
 
 double FONSEParameter::getCurrentCodonSpecificProposalWidth(unsigned aa)
 {
-	unsigned aaStart;
-	unsigned aaEnd;
+	unsigned aaStart, aaEnd;
 	SequenceSummary::AAIndexToCodonRange(aa, aaStart, aaEnd, false);
     return std_csp[aaStart];
 }
@@ -477,8 +476,7 @@ void FONSEParameter::proposeCodonSpecificParameter()
     {
         std::vector<double> iidProposed;
         std::string aa = getGrouping(k);
-		unsigned aaStart;
-		unsigned aaEnd;
+		unsigned aaStart, aaEnd;
 		SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
         unsigned numCodons = aaEnd - aaStart;
         for (unsigned i = 0u; i < (numCodons * (numMutationCategories + numSelectionCategories)); i++)
@@ -509,8 +507,7 @@ void FONSEParameter::proposeCodonSpecificParameter()
 
 void FONSEParameter::updateCodonSpecificParameter(std::string grouping)
 {
-	unsigned aaStart;
-	unsigned aaEnd;
+	unsigned aaStart, aaEnd;
 	SequenceSummary::AAToCodonRange(grouping, aaStart, aaEnd, true);
     unsigned aaIndex = SequenceSummary::aaToIndex.find(grouping)->second;
 	numAcceptForCodonSpecificParameters[aaIndex]++;
@@ -561,8 +558,7 @@ void FONSEParameter::getParameterForCategory(unsigned category, unsigned paramTy
 {
     std::vector<double> *tempSet;
 	tempSet = proposal ? &proposedCodonSpecificParameter[paramType][category] : &currentCodonSpecificParameter[paramType][category];
-	unsigned aaStart;
-	unsigned aaEnd;
+	unsigned aaStart, aaEnd;
 	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
     
     unsigned j = 0u;
@@ -673,13 +669,12 @@ void FONSEParameter::initMutation(std::vector<double> mutationValues, unsigned m
     if (check)
     {
         mixtureElement--;
-        
-        
+         
         unsigned category = getMutationCategory(mixtureElement);
         aa[0] = (char)std::toupper(aa[0]);
-	unsigned aaStart;
-	unsigned aaEnd;
-	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
+	    
+        unsigned aaStart, aaEnd;
+	    SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
         for (unsigned i = aaStart, j = 0; i < aaEnd; i++, j++)
         {
             currentCodonSpecificParameter[dM][category][i] = mutationValues[j];
@@ -700,9 +695,9 @@ void FONSEParameter::initSelection(std::vector<double> selectionValues, unsigned
         int category = getSelectionCategory(mixtureElement);
         
         aa[0] = (char)std::toupper(aa[0]);
-	unsigned aaStart;
-	unsigned aaEnd;
-	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
+	    
+        unsigned aaStart, aaEnd;
+	    SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
         for (unsigned i = aaStart, j = 0; i < aaEnd; i++, j++)
         {
             currentCodonSpecificParameter[dOmega][category][i] = selectionValues[j];

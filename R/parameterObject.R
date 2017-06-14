@@ -96,7 +96,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
     if(num.mixtures < 1){
       stop("num. mixture has to be a positive non-zero value!\n")
     }    
-    #TODO: should we check integraty of other values, such as numMixtures being
+    #TODO: should we check integrity of other values, such as numMixtures being
     #positive?
   }
 

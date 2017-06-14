@@ -620,8 +620,7 @@ void ROCParameter::setInitialValuesForSepsilon(std::vector<double> seps)
 
 double ROCParameter::getCurrentCodonSpecificProposalWidth(unsigned aa)
 {
-	unsigned aaStart;
-	unsigned aaEnd;
+	unsigned aaStart, aaEnd;
 	SequenceSummary::AAIndexToCodonRange(aa, aaStart, aaEnd, true);
 	return std_csp[aaStart];
 }
@@ -640,8 +639,7 @@ void ROCParameter::proposeCodonSpecificParameter()
 	{
 		std::vector<double> iidProposed;
 		std::string aa = getGrouping(k);
-		unsigned aaStart;
-		unsigned aaEnd;
+		unsigned aaStart, aaEnd;
 		SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
 		unsigned numCodons = aaEnd - aaStart;
 		for (unsigned i = 0u; i < (numCodons * (numMutationCategories + numSelectionCategories)); i++)
@@ -673,8 +671,7 @@ void ROCParameter::proposeCodonSpecificParameter()
 
 void ROCParameter::updateCodonSpecificParameter(std::string grouping)
 {
-	unsigned aaStart;
-	unsigned aaEnd;
+	unsigned aaStart, aaEnd;
 	SequenceSummary::AAToCodonRange(grouping, aaStart, aaEnd, true);
 	unsigned aaIndex = SequenceSummary::aaToIndex.find(grouping)->second;
 	numAcceptForCodonSpecificParameters[aaIndex]++;
@@ -824,8 +821,7 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
 	std::vector<double> *tempSet;
 	tempSet = (proposal ? &proposedCodonSpecificParameter[paramType][category] : &currentCodonSpecificParameter[paramType][category]);
 
-	unsigned aaStart;
-	unsigned aaEnd;
+	unsigned aaStart, aaEnd;
 	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
 
 	unsigned j = 0u;
@@ -928,10 +924,10 @@ void ROCParameter::initMutation(std::vector<double> mutationValues, unsigned mix
 
 		unsigned category = getMutationCategory(mixtureElement);
 		aa[0] = (char) std::toupper(aa[0]);
-                unsigned aaStart;
-                unsigned aaEnd;
-                SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
-                for (unsigned i = aaStart, j = 0; i < aaEnd; i++, j++)
+
+        unsigned aaStart, aaEnd;
+        SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
+        for (unsigned i = aaStart, j = 0; i < aaEnd; i++, j++)
 		{
 			currentCodonSpecificParameter[dM][category][i] = mutationValues[j];
 		}
@@ -950,13 +946,13 @@ void ROCParameter::initSelection(std::vector<double> selectionValues, unsigned m
 		int category = getSelectionCategory(mixtureElement);
 
 		aa[0] = (char) std::toupper(aa[0]);
-                unsigned aaStart;
-                unsigned aaEnd;
-                SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
-                for (unsigned i = aaStart, j = 0; i < aaEnd; i++, j++)
-                {
-                    currentCodonSpecificParameter[dEta][category][i] = selectionValues[j];
-                }
+
+        unsigned aaStart, aaEnd;
+        SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
+        for (unsigned i = aaStart, j = 0; i < aaEnd; i++, j++)
+        {
+            currentCodonSpecificParameter[dEta][category][i] = selectionValues[j];
+        }
 	}
 }
 
