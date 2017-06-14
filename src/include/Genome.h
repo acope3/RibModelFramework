@@ -39,8 +39,8 @@ class Genome
 		//File I/O Functions:
 		void readFasta(std::string filename, bool append = false);
 		void writeFasta(std::string filename, bool simulated = false);
-		void readPAFile(std::string filename, bool append = false);
-		void writePA(std::string filename, bool simulated = false);
+		void readRFPData(std::string filename, bool append = false);
+		void writeRFPData(std::string filename, bool simulated = false);
 		void readObservedPhiValues(std::string filename, bool byId = true);
 
 

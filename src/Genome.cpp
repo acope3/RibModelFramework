@@ -194,7 +194,7 @@ void Genome::writeFasta (std::string filename, bool simulated)
 }
 
 
-/* readPAFile (RCPP EXPOSED)
+/* readRFPData (RCPP EXPOSED)
  * Arguments: string filename, boolean to determine if we are appending to the existing genome
  * (if not set to true, will default to clearing genome data; defaults to false)
  * Read in a PA-formatted file: GeneID,Position (1-indexed),Codon,RFPCount(s) (may be multiple)
@@ -203,7 +203,7 @@ void Genome::writeFasta (std::string filename, bool simulated)
  * Bad RFPCounts that are less than zero are assumed to be typos, and are set to 0.
  * There may be more than one RFPCount, and thus the header is important.
 */
-void Genome::readPAFile(std::string filename, bool append)
+void Genome::readRFPData(std::string filename, bool append)
 {
 	try {
 		if (!append) clear();
@@ -212,14 +212,14 @@ void Genome::readPAFile(std::string filename, bool append)
 		Fin.open(filename.c_str());
 
 		if (Fin.fail())
-			my_printError("Error in Genome::readPAFile: Can not open PA file %\n", filename);
+			my_printError("Error in Genome::readRFPData: Can not open RFPData file %\n", filename);
 		else
 		{
 			// Analyze the header line
 			std::string tmp;
 
             if (!std::getline(Fin, tmp))
-                my_printError("Error in Genome::readPAFile: PA file % has no header.\n", filename);
+                my_printError("Error in Genome::readRFPData: RFPData file % has no header.\n", filename);
 
 			// Ignore first 3 commas: ID, position, codon
 			std::size_t pos = tmp.find(",");
@@ -341,17 +341,17 @@ void Genome::readPAFile(std::string filename, bool append)
 }
 
 
-/* writePA (RCPP EXPOSED)
+/* writeRFPData (RCPP EXPOSED)
  * Arguments: string filename, boolean to specify if we are printing simulated genes or not (default non-simulated)
  * Write a PA-formatted file: GeneID,Position (1-indexed),Codon,RFPCount(s) (may be multiple)
  * The positions will be printed in ascending order.
 */
-void Genome::writePA(std::string filename, bool simulated)
+void Genome::writeRFPData(std::string filename, bool simulated)
 {
 	std::ofstream Fout;
 	Fout.open(filename.c_str());
 	if (Fout.fail())
-		my_printError("Error in Genome::writePA: Can not open output RFP data file %\n", filename);
+		my_printError("Error in Genome::writeRFPData: Can not open output RFPData file %\n", filename);
 	else
 	{
 		Fout << "GeneID,Position,Codon";
@@ -909,8 +909,8 @@ RCPP_MODULE(Genome_mod)
 		//File I/O Functions:
 		.method("readFasta", &Genome::readFasta, "reads a genome into the object")
 		.method("writeFasta", &Genome::writeFasta, "writes the genome to a fasta file")
-		.method("readPAFile", &Genome::readPAFile, "reads RFP data to be used in PA(NSE) models")
-		.method("writePA", &Genome::writePA, "writes RFP data used in PA(NSE) models")
+		.method("readRFPData", &Genome::readRFPData, "reads RFPData to be used in PA(NSE) models")
+		.method("writeRFPData", &Genome::writeRFPData, "writes RFPData used in PA(NSE) models")
 		.method("readObservedPhiValues", &Genome::readObservedPhiValues)
 
 

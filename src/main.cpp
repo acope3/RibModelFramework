@@ -112,7 +112,7 @@ int main()
 
 		/*
 		Genome genome;
-		genome.readPAFile("/Users/roxasoath1/Desktop/RibModelDevScripts/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+		genome.readRFPData("/Users/roxasoath1/Desktop/RibModelDevScripts/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 		std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 		for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		{
@@ -139,7 +139,7 @@ int main()
 		std::cout <<"init done\n";
 		model.simulateGenome(genome);
 		std::cout <<"writing file\n";
-		genome.writePA("/Users/roxasoath1/Desktop/RibModelDevScripts/RibModelDev/data/rfp/simulatedRFPData.csv", true);
+		genome.writeRFPData("/Users/roxasoath1/Desktop/RibModelDevScripts/RibModelDev/data/rfp/simulatedRFPData.csv", true);
 */
 		exit(1);
 	}
@@ -253,7 +253,7 @@ int main()
 	{
 		std::cout << "Initializing Genome object--------------------------" << std::endl;
 		Genome genome;
-		genome.readPAFile("/Users/roxasoath1/Desktop/RibModelDevScripts/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+		genome.readRFPData("/Users/roxasoath1/Desktop/RibModelDevScripts/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 		std::cout << "Done!-------------------------------\n\n\n";
 
 
@@ -495,7 +495,7 @@ int main()
 	{
 		std::cout << "Initializing Genome object--------------------------" << std::endl;
 		Genome genome;
-		genome.readPAFile("C:/Users/Jeremy/Documents/GitHub/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+		genome.readRFPData("C:/Users/Jeremy/Documents/GitHub/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 		std::cout << "Done!-------------------------------\n\n\n";
 
 
@@ -670,7 +670,7 @@ int main()
 	// SIMULATE GENOME: PA
 
 	Genome genome;
-	genome.readPAFile(pathBegin + "TODO");
+	genome.readRFPData(pathBegin + "TODO");
 	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 		geneAssignment[i] = 0u;
@@ -692,7 +692,7 @@ int main()
 	model.setParameter(parameter);
 
 	model.simulateGenome(genome);
-	genome.writePA(pathBegin + "miscGilchrist/runMe/HollisTestingOut/hbuiSimGenome5.30.17.csv", true);
+	genome.writeRFPData(pathBegin + "miscGilchrist/runMe/HollisTestingOut/hbuiSimGenome5.30.17.csv", true);
 	exit(1);
     */
 
@@ -812,7 +812,7 @@ int main()
 	{
 		my_print("Initializing Genome object--------------------------\n");
 		Genome genome;
-		//genome.readPAFile(pathBegin + "RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+		//genome.readRFPData(pathBegin + "RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 		my_print("Done!-------------------------------\n\n\n");
 
 
@@ -972,7 +972,7 @@ int main()
 	/*
 	Genome genome;
 	//genome.readFasta(pathBegin + "HollisTestingData/s288c.genome.fasta");
-	genome.readPAFile(pathBegin + "HollisTestingData/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+	genome.readRFPData(pathBegin + "HollisTestingData/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{
@@ -996,7 +996,7 @@ int main()
 	model.setParameter(parameter);
 
 	model.simulateGenome(genome);
-	genome.writePA(pathBegin + "HollisTestingOut/HollisSimulatedGenome2.csv", true);
+	genome.writeRFPData(pathBegin + "HollisTestingOut/HollisSimulatedGenome2.csv", true);
 	exit(1);
 	*/
 
@@ -1118,7 +1118,7 @@ int main()
 	{
 		my_print("Initializing Genome object--------------------------\n");
 		Genome genome;
-		//genome.readPAFile(pathBegin + "RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+		//genome.readRFPData(pathBegin + "RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 		my_print("Done!-------------------------------\n\n\n");
 
 
