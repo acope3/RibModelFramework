@@ -58,8 +58,7 @@ double ROCModel::calculateMutationPrior(std::string grouping, bool proposed)
 
 void ROCModel::obtainCodonCount(SequenceSummary *seqsum, std::string curAA, int codonCount[])
 {
-	unsigned aaStart;
-	unsigned aaEnd;
+	unsigned aaStart, aaEnd;
 	SequenceSummary::AAToCodonRange(curAA, aaStart, aaEnd, false);
 	// get codon counts for AA
 	unsigned j = 0u;
@@ -713,8 +712,7 @@ void ROCModel::simulateGenome(Genome &genome)
 
 
 			codonIndex = Parameter::randMultinom(codonProb, numCodons);
-			unsigned aaStart;
-			unsigned aaEnd;
+			unsigned aaStart, aaEnd;
 			SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, false); //need the first spot in the array where the codons for curAA are
 			codon = seqSum.indexToCodon(aaStart + codonIndex);//get the correct codon based off codonIndex
 			tmpSeq += codon;

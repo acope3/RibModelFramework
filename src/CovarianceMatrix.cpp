@@ -224,8 +224,7 @@ void CovarianceMatrix::calculateSampleCovariance(std::vector<std::vector<std::ve
 
 	unsigned start = lastIteration - samples;
 	
-	unsigned aaStart;
-	unsigned aaEnd;
+	unsigned aaStart, aaEnd;
 	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
 
 	unsigned IDX = 0;

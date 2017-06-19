@@ -536,8 +536,7 @@ void Trace::updateMixtureProbabilitiesTrace(unsigned samples, std::vector<double
 void Trace::updateCodonSpecificParameterTraceForAA(unsigned sample, std::string aa,
 	std::vector<std::vector<double>> &curParam, unsigned paramType)
 {
-	unsigned aaStart;
-	unsigned aaEnd;
+	unsigned aaStart, aaEnd;
 	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
 	for (unsigned category = 0; category < codonSpecificParameterTrace[paramType].size(); category++)
 	{
