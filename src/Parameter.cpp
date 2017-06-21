@@ -142,7 +142,7 @@ void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsig
     std::string _mutationSelectionState)
 {
 	// assign genes to mixture element
-	unsigned numGenes = geneAssignment.size();
+	unsigned numGenes = (unsigned)geneAssignment.size();
 	mixtureAssignment.resize(numGenes, 0);
 
 	for (unsigned i = 0u; i < numGenes; i++)
@@ -586,7 +586,7 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 */
 void Parameter::InitializeSynthesisRate(double sd_phi)
 {
-	unsigned numGenes = currentSynthesisRateLevel[1].size();
+	unsigned numGenes = (unsigned)currentSynthesisRateLevel[1].size();
 	for (unsigned category = 0u; category < numSelectionCategories; category++)
 	{
 		for (unsigned i = 0u; i < numGenes; i++)
@@ -604,7 +604,7 @@ void Parameter::InitializeSynthesisRate(double sd_phi)
 */
 void Parameter::InitializeSynthesisRate(std::vector<double> expression)
 {
-	unsigned numGenes = currentSynthesisRateLevel[0].size();
+	unsigned numGenes = (unsigned)currentSynthesisRateLevel[0].size();
 	for (unsigned category = 0u; category < numSelectionCategories; category++)
 	{
 		for (unsigned i = 0u; i < numGenes; i++)
@@ -677,8 +677,8 @@ void Parameter::setNumMutationSelectionValues(std::string _mutationSelectionStat
 			delMCounter.insert(mixtureDefinitionMatrix[i][0] - 1);
 			delEtaCounter.insert(mixtureDefinitionMatrix[i][1] - 1);
 		}
-		numMutationCategories = delMCounter.size();
-		numSelectionCategories = delEtaCounter.size();
+		numMutationCategories = (unsigned)delMCounter.size();
+		numSelectionCategories = (unsigned)delEtaCounter.size();
 	}
 	else if (_mutationSelectionState == selectionShared)
 	{
@@ -1114,7 +1114,7 @@ unsigned Parameter::getMixtureAssignment(unsigned gene)
 
 std::vector <std::vector <double> > Parameter::calculateSelectionCoefficients(unsigned sample, unsigned mixture)
 {
-	unsigned numGenes = mixtureAssignment.size();
+	unsigned numGenes = (unsigned)mixtureAssignment.size();
 	std::vector<std::vector<double>> selectionCoefficients;
 	selectionCoefficients.resize(numGenes);
 	for (unsigned i = 0; i < numGenes; i++)

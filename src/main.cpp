@@ -666,7 +666,7 @@ int main()
 	std::vector<double> sphi_init(numMixtures, 2);
 	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 
-    /*
+	/*
 	// SIMULATE GENOME: PA
 
 	Genome genome;
@@ -694,7 +694,7 @@ int main()
 	model.simulateGenome(genome);
 	genome.writeRFPData(pathBegin + "miscGilchrist/runMe/HollisTestingOut/hbuiSimGenome5.30.17.csv", true);
 	exit(1);
-    */
+	 */
 
 	// UNIT TESTING
 	testUtility();
@@ -775,8 +775,8 @@ int main()
 
 			for (unsigned i = 0u; i < numMixtures; i++)
 			{
-				unsigned selectionCategry = tmp.getSelectionCategory(i);
-				my_print("Sphi_init for selection category %: %\n", selectionCategry, sphi_init[selectionCategry]);
+				unsigned selectionCategory = tmp.getSelectionCategory(i);
+				my_print("Sphi_init for selection category %: %\n", selectionCategory, sphi_init[selectionCategory]);
 			}
 			my_print("\t# mixtures: %\n", numMixtures);
 			my_print("\tmixture definition: %\n", mixDef);
@@ -856,8 +856,8 @@ int main()
 
 			for (unsigned i = 0u; i < numMixtures; i++)
 			{
-				unsigned selectionCategry = tmp.getSelectionCategory(i);
-				my_print("Sphi_init for selection category %: %\n", selectionCategry, sphi_init[selectionCategry]);
+				unsigned selectionCategory = tmp.getSelectionCategory(i);
+				my_print("Sphi_init for selection category %: %\n", selectionCategory, sphi_init[selectionCategory]);
 			}
 			my_print("\t# mixtures: %\n", numMixtures);
 			my_print("\tmixture definition: %\n", mixDef);
