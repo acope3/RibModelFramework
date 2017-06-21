@@ -1004,8 +1004,8 @@ int main()
 	//testUtility();
 	//testSequenceSummary();
 	//testGene();
-	testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
-	//testCovarianceMatrix();
+	//testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
+	testCovarianceMatrix();
 	//testParameter();
 	//testParameterWithFile(pathBegin + "HollisFile.txt");
 	//testPAParameter();

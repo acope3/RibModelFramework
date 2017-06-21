@@ -3061,6 +3061,7 @@ int testParameterWithFile(std::string filename)
 int testCovarianceMatrix()
 {
     CovarianceMatrix covM; //Default constructor sets numVariates to 2.
+    CovarianceMatrix covMcp; //Default constructor sets numVariates to 2.
     int error = 0;
     int globalError = 0;
 
@@ -3094,6 +3095,10 @@ int testCovarianceMatrix()
     else
         error = 0; //Reset for next function.
 
+    covMcp = covM;
+
+    if(covMcp == covM) my_print("CovarianceMatrix == --- Pass\n");
+    else  my_print("CovarianceMatrix == --- Fail\n");
     //------------------------------//
     //------ setDiag Function ------//
     //------------------------------//
