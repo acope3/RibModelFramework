@@ -962,50 +962,52 @@ int main()
 #ifdef DENIZHAN
 int main()
 {
-	std::string pathBegin = "/Users/hollisbui/";
+	std::string pathBegin = "home/nax/Work/biolab/";
 
 	unsigned numMixtures = 1;
 	std::vector<double> sphi_init(numMixtures, 2);
-	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
+	std::vector<std::vector<unsigned> > mixtureDefinitionMatrix;
 
 	// SIMULATE GENOME: RFP
-	/*
+	
 	Genome genome;
-	//genome.readFasta(pathBegin + "HollisTestingData/s288c.genome.fasta");
-	genome.readRFPData(pathBegin + "HollisTestingData/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+	genome.readFasta(pathBegin + "RibModelDev/data/singleMixture/genome_2000.fasta", false);
+	//genome.readRFPData(pathBegin + "HollisTestingData/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{
 		geneAssignment[i] = 0u;
 	}
 
-	PAParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
+	ROCParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
 
-	std::vector<std::string> files;
+	/*std::vector<std::string> files;
 	files.push_back(pathBegin + "HollisTestingData/RFPAlphaValues.csv");
 	parameter.initMutationSelectionCategories(files, 1, PAParameter::alp);
 	files[0] = pathBegin + "HollisTestingData/RFPLambdaPrimeValues.csv";
 	parameter.initMutationSelectionCategories(files, 1, PAParameter::lmPri);
+    
 
 	std::vector<double> phi = parameter.readPhiValues(pathBegin + "HollisTestingData/RFPPhiValues.csv");
 	//std::vector<double> phi = tmp.readPhiValues("/Users/roxasoath1/Desktop/TONEWTON/RFPPsiValues.csv");
 	parameter.InitializeSynthesisRate(phi);
+    */
 
-	PAModel model;
+	ROCModel model;
 
 	model.setParameter(parameter);
 
 	model.simulateGenome(genome);
-	genome.writeRFPData(pathBegin + "HollisTestingOut/HollisSimulatedGenome2.csv", true);
+	genome.writeRFPData(pathBegin + "labboks/Denizhan.Pak/", true);
 	exit(1);
-	*/
+	
 
 	// UNIT TESTING
 	//testUtility();
 	//testSequenceSummary();
 	//testGene();
 	//testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
-	testCovarianceMatrix();
+	//testCovarianceMatrix();
 	//testParameter();
 	//testParameterWithFile(pathBegin + "HollisFile.txt");
 	//testPAParameter();
