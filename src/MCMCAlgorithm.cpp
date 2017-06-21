@@ -616,7 +616,7 @@ double MCMCAlgorithm::calculateGewekeScore(unsigned current_iteration)
 	unsigned start2 = (unsigned)std::round(current_iteration - (current_iteration * 0.5));
 
 	double numSamples1 = (double) (end1 - lastConvergenceTest);
-	double numSamples2 = (double) std::round(current_iteration * 0.5);
+	double numSamples2 = std::round(current_iteration * 0.5);
 
 	// calculate mean and and variance of first part of likelihood trace
 	for (unsigned i = lastConvergenceTest; i < end1; i++)
@@ -797,7 +797,7 @@ std::vector<double> MCMCAlgorithm::getLogLikelihoodTrace()
 double MCMCAlgorithm::getLogPosteriorMean(unsigned _samples)
 {
 	double posteriorMean = 0.0;
-	unsigned traceLength = posteriorTrace.size();
+	unsigned traceLength = (unsigned)posteriorTrace.size();
 
 	if (_samples > traceLength)
 	{

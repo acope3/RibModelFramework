@@ -266,8 +266,8 @@ std::vector<double> Trace::getStdDevSynthesisRateTrace(unsigned selectionCategor
 
 std::vector<double> Trace::getExpectedSynthesisRateTrace()
 {
-	unsigned numGenes = synthesisRateTrace[0].size(); //number of genes
-	unsigned samples = synthesisRateTrace[0][0].size(); //number of samples
+	unsigned numGenes = (unsigned)synthesisRateTrace[0].size(); //number of genes
+	unsigned samples = (unsigned)synthesisRateTrace[0][0].size(); //number of samples
 	std::vector<double> RV(samples, 0.0);
 	for (unsigned sample = 0; sample < samples; sample++)
 	{
@@ -319,7 +319,7 @@ std::vector<double> Trace::getCodonSpecificAcceptanceRateTraceForAA(std::string 
 
 std::vector<double> Trace::getSynthesisRateTraceForGene(unsigned geneIndex)
 {
-	unsigned traceLength = synthesisRateTrace[0][0].size();
+	unsigned traceLength = (unsigned)synthesisRateTrace[0][0].size();
 
 	std::vector<double> returnVector(traceLength, 0.0);
 	for (unsigned i = 0u; i < traceLength; i++)

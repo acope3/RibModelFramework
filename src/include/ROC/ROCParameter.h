@@ -151,7 +151,7 @@ class ROCParameter : public Parameter
 		void setProposedSelectionParameter(std::vector<std::vector<double>> _proposedSelectionParameter);
 		void setCurrentSelectionParameter(std::vector<std::vector<double>> _currentSelectionParameter);
 
-#endif //STADNALONE
+#endif //STANDALONE
 
 	protected:
 };
