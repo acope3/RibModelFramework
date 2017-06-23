@@ -21,7 +21,7 @@ FONSEModel::~FONSEModel()
 
 double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grouping, double *mutation, double *selection, double phiValue)
 {
-	int numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
+	unsigned numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
 	double logLikelihood = 0.0;
 
 	std::vector <unsigned> *positions;
@@ -29,7 +29,7 @@ double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grou
 
 	//Find the maximum index
 	unsigned minIndexVal = 0u;
-	for (int i = 1; i < (numCodons - 1); i++)
+	for (unsigned i = 1; i < (numCodons - 1); i++)
 	{
 		if (selection[minIndexVal] > selection[i])
 		{
@@ -103,7 +103,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 	double phiValue_proposed = parameter->getSynthesisRate(geneIndex, expressionCategory, true);
 
 
-	/* This loop causes a compiler warning because i is an int, but openMP won't compile if I change i to unsigned.
+	/* TODO: This loop causes a compiler warning because i is an int, but openMP won't compile if I change i to unsigned.
 		Maybe worth looking into? */
 #ifdef _OPENMP
 //#ifndef __APPLE__
@@ -122,7 +122,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 
 	//my_print("% %\n", logLikelihood, logLikelihood_proposed);
 
-	double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(false);
+	double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(selectionCategory, false);
 	double logPhiProbability = Parameter::densityLogNorm(phiValue, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
 	double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
 	double currentLogLikelihood = (likelihood + logPhiProbability);
@@ -571,6 +571,9 @@ void FONSEModel::updateHyperParameter(unsigned hp)
 	switch (hp)
 	{
 		case 0:
+			updateStdDevSynthesisRate();
+			break;
+		default:
 			updateStdDevSynthesisRate();
 			break;
 	}

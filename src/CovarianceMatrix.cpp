@@ -79,10 +79,10 @@ CovarianceMatrix& CovarianceMatrix::operator*(const double &value)
 
 void CovarianceMatrix::operator*=(const double &value)
 {
-  for (unsigned i = 0; i < covMatrix.size(); i++)
-  {
-    covMatrix[i] *= value;
-  }
+    for (unsigned i = 0; i < covMatrix.size(); i++)
+    {
+        covMatrix[i] *= value;
+    }
 }
 
 
@@ -221,12 +221,12 @@ std::vector<double> CovarianceMatrix::transformIidNumersIntoCovaryingNumbers(std
 void CovarianceMatrix::calculateSampleCovariance(std::vector<std::vector<std::vector<std::vector<float>>>> codonSpecificParameterTrace, std::string aa, unsigned samples, unsigned lastIteration)
 {
 	//order of codonSpecificParameterTrace: paramType, category, numparam, samples
-	unsigned numParamTypesInModel = codonSpecificParameterTrace.size();
+	unsigned numParamTypesInModel = (unsigned)codonSpecificParameterTrace.size();
 	std::vector<unsigned> numCategoriesInModelPerParamType(numParamTypesInModel);
 	// number of categories can vary between parameter types, see selection shared, mutation shared
 	for (unsigned paramType = 0; paramType < numParamTypesInModel; paramType++)
 	{
-		numCategoriesInModelPerParamType[paramType] = codonSpecificParameterTrace[paramType].size();
+		numCategoriesInModelPerParamType[paramType] = (unsigned)codonSpecificParameterTrace[paramType].size();
 	}
 
 
