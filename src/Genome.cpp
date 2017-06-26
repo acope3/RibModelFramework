@@ -83,27 +83,17 @@ void Genome::readFasta(std::string filename, bool append)
 			//my_print("File opened\n");
 			bool fastaFormat = false;
 			std::string buf;
-			int newLine;
-
 			Gene tmpGene;
 			std::string tempSeq = "";
-			while (1)
+			while (std::getline(Fin, buf))
 			{
-				// read a new line in every cycle
-				std::getline(Fin, buf);
-				/* The new line is marked with an integer, which corresponds
-					 to one of the following cases:
-
+				/*
 					 1. New sequence line, which starts with "> ".
 					 2. Sequence line, which starts with any character except for ">"
 					 3. End of file, detected by function eof().
 				 */
 
-				if (buf[0] == '>' ) newLine=1;
-				else if (Fin.eof()) newLine=3;
-				else newLine=2;
-
-				if ( newLine == 1 )
+				if (buf[0] == '>' )
 				{ // this is a start of a new chain.
 					if (!fastaFormat)
 					{
@@ -124,18 +114,11 @@ void Genome::readFasta(std::string filename, bool append)
 					std::size_t pos = buf.find(" ") - 1;
 					tmpGene.setId( buf.substr(1,pos) );
 				}
-
-				if ( newLine == 2 && fastaFormat )
-				{ // sequence line
-					tempSeq.append(buf);
-				}
-
-				if ( newLine == 3 )
-				{ // end of file
-					//my_print("EOF reached\n");
+				else if (Fin.eof())
+				{
 					if ( !fastaFormat )
 						throw std::string("Genome::readFasta throws: ") + std::string(filename)
-							  + std::string(" is not in Fasta format.");
+								+ std::string(" is not in Fasta format.");
 					else
 					{
 						// otherwise, need to store the old chain first, then to
@@ -145,6 +128,7 @@ void Genome::readFasta(std::string filename, bool append)
 						break;
 					}
 				}
+				else if (fastaFormat) tempSeq.append(buf);
 			} // end while
 		} // end else
 		Fin.close();
