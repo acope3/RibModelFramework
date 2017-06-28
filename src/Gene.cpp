@@ -208,9 +208,11 @@ void Gene::setPASequence(std::vector<std::vector<int>> table)
     seq.resize(nRows * 3); //multiply by three since codons
     for (unsigned i = 0; i < nRows; i++)
     {
+    std::cout << "A suprise to be sure\n";
         std::string codon = SequenceSummary::indexToCodon((unsigned) table[i][1]);
         seq.replace((unsigned) table[i][0] * 3, 3, codon);
     }
+    std::cout << "But a welcome one\n";
 
     // Call processPA with a checking error statement printed if needed.
     if (!geneData.processPA(table))

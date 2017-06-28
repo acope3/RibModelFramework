@@ -316,6 +316,7 @@ void Genome::readRFPData(std::string filename, bool append)
 
 						pos = pos2;
 						tableIndex++;
+                        std::cout << "Hello There\n";
 					}
 
 					prevID = ID;

@@ -969,9 +969,10 @@ int main()
 	std::vector<std::vector<unsigned> > mixtureDefinitionMatrix;
 
 	// SIMULATE GENOME: RFP
-	
 	Genome genome;
 	genome.readRFPData(pathBegin + "/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv", false);
+	exit(1);
+	
 	//genome.readRFPData(pathBegin + "HollisTestingData/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
@@ -998,7 +999,7 @@ int main()
 	model.setParameter(parameter);
 
 	model.simulateGenome(genome);
-	genome.writeRFPData("../../labboks/Denizhan.Pak/", true);
+	genome.writeRFPData("../../labboks/Denizhan.Pak/", false);
 	exit(1);
 	
 
