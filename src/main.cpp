@@ -962,7 +962,7 @@ int main()
 #ifdef DENIZHAN
 int main()
 {
-	std::string pathBegin = "home/nax/Work/biolab/";
+	std::string pathBegin = "/home/nax/Desktop/Work/biolab/RibModelDev/data";
 
 	unsigned numMixtures = 1;
 	std::vector<double> sphi_init(numMixtures, 2);
@@ -971,7 +971,7 @@ int main()
 	// SIMULATE GENOME: RFP
 	
 	Genome genome;
-	genome.readFasta(pathBegin + "RibModelDev/data/singleMixture/genome_2000.fasta", false);
+	genome.readRFPData(pathBegin + "/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv", false);
 	//genome.readRFPData(pathBegin + "HollisTestingData/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
@@ -979,7 +979,7 @@ int main()
 		geneAssignment[i] = 0u;
 	}
 
-	ROCParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
+	PAParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
 
 	/*std::vector<std::string> files;
 	files.push_back(pathBegin + "HollisTestingData/RFPAlphaValues.csv");
@@ -993,12 +993,12 @@ int main()
 	parameter.InitializeSynthesisRate(phi);
     */
 
-	ROCModel model;
+	PAModel model;
 
 	model.setParameter(parameter);
 
 	model.simulateGenome(genome);
-	genome.writeRFPData(pathBegin + "labboks/Denizhan.Pak/", true);
+	genome.writeRFPData("../../labboks/Denizhan.Pak/", true);
 	exit(1);
 	
 
