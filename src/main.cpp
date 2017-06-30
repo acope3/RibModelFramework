@@ -962,7 +962,7 @@ int main()
 #ifdef DENIZHAN
 int main()
 {
-	std::string pathBegin = "/home/nax/Desktop/Work/biolab/RibModelDev/data";
+	std::string pathBegin = "/home/nax/Desktop/Work/biolab/";
 
 	unsigned numMixtures = 1;
 	std::vector<double> sphi_init(numMixtures, 2);
@@ -970,10 +970,9 @@ int main()
 
 	// SIMULATE GENOME: RFP
 	Genome genome;
-	genome.readRFPData(pathBegin + "/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv", false);
-	exit(1);
+	genome.readRFPData(pathBegin + "RibModelDev/data/rfp/PopPAData.csv", false);
+	//genome.readFasta(pathBegin + "RibModelDev/data/singleMixture/genome_2000.fasta", false);
 	
-	//genome.readRFPData(pathBegin + "HollisTestingData/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{
@@ -981,25 +980,16 @@ int main()
 	}
 
 	PAParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
-
-	/*std::vector<std::string> files;
-	files.push_back(pathBegin + "HollisTestingData/RFPAlphaValues.csv");
-	parameter.initMutationSelectionCategories(files, 1, PAParameter::alp);
-	files[0] = pathBegin + "HollisTestingData/RFPLambdaPrimeValues.csv";
-	parameter.initMutationSelectionCategories(files, 1, PAParameter::lmPri);
-    
-
-	std::vector<double> phi = parameter.readPhiValues(pathBegin + "HollisTestingData/RFPPhiValues.csv");
-	//std::vector<double> phi = tmp.readPhiValues("/Users/roxasoath1/Desktop/TONEWTON/RFPPsiValues.csv");
-	parameter.InitializeSynthesisRate(phi);
-    */
-
 	PAModel model;
+	
+    //ROCParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
+	//ROCModel model;
 
 	model.setParameter(parameter);
 
 	model.simulateGenome(genome);
-	genome.writeRFPData("../../labboks/Denizhan.Pak/", false);
+	genome.writeRFPData(pathBegin + "labbooks/Denizhan.Pak/Log_Files/sim_genomes/PASim.csv", true);
+	genome.writeRFPData(pathBegin + "labbooks/Denizhan.Pak/Log_Files/sim_genomes/PANotSim.csv", false);
 	exit(1);
 	
 

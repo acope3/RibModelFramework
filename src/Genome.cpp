@@ -316,7 +316,6 @@ void Genome::readRFPData(std::string filename, bool append)
 
 						pos = pos2;
 						tableIndex++;
-                        std::cout << "Hello There\n";
 					}
 
 					prevID = ID;
@@ -330,6 +329,7 @@ void Genome::readRFPData(std::string filename, bool append)
                 tmpGene.setId(prevID);
                 tmpGene.setDescription("No description for PANSE Model");
                 tmpGene.setPASequence(table);
+
                 addGene(tmpGene, false); //add to genome
             }
 		} // end else
