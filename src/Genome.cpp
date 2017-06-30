@@ -13,7 +13,7 @@ using namespace Rcpp;
 // ---------- Constructors & Destructors ---------- //
 //--------------------------------------------------//
 
-/* Gen constructor (RCPP EXPOSED)
+/* Gene constructor (RCPP EXPOSED)
  * Arguments: None
  * Blank constructor for Gene class. Sets the sequence, id, and
  * description fields to empty strings.
@@ -30,7 +30,7 @@ Genome& Genome::operator=(const Genome& rhs)
 	genes = rhs.genes;
 	simulatedGenes = rhs.simulatedGenes;
 	numGenesWithPhi = rhs.numGenesWithPhi;
-	RFPCategoryNames = rhs.RFPCategoryNames;
+	RFPCountColumnNames = rhs.RFPCountColumnNames;
 	//assignment operator
 	return *this;
 }
@@ -50,7 +50,7 @@ bool Genome::operator==(const Genome& other) const
 	if (!(this->genes == other.genes)) { match = false; }
 	if (!(this->simulatedGenes == other.simulatedGenes)) { match = false; }
 	if (this->numGenesWithPhi != other.numGenesWithPhi) { match = false; }
-	if (this->RFPCategoryNames != other.RFPCategoryNames) { match = false; }
+	if (this->RFPCountColumnNames != other.RFPCountColumnNames) { match = false; }
 
 	return match;
 }
@@ -194,13 +194,95 @@ void Genome::writeFasta (std::string filename, bool simulated)
 }
 
 
+// Recall: Because this is simulated genome data from PAModel's simulateGenome function, it will read in data that
+// disregards position. Codon counts are summed up when setSequence calls processSequence.
+void Genome::readSimulatedGenomeFromPAModel(std::string filename)
+{
+	std::ifstream Fin;
+	Fin.open(filename.c_str());
+	if (Fin.fail())
+		my_printError("Error in Genome::readSimulatedGenomeFromPAModel: Can not open file %\n", filename);
+
+	std::string tmp;
+	// Trash the first line, but we know it is in a simulatedGenomeFromPAModel format: GeneID,Codon,Codon_Count,RFPCount
+	if (!std::getline(Fin, tmp))
+		my_printError("Error in Genome::readSimulatedGenomeFromPAModel: RFP file % has no header.\n", filename);
+
+	std::string prevID = "";
+	Gene tmpGene;
+	bool first = true;
+	std::string seq = "";
+
+	while (std::getline(Fin, tmp))
+	{
+		// Find the GeneID
+		std::size_t pos = tmp.find(",");
+		std::string ID = tmp.substr(0, pos);
+
+		if (first)
+		{
+			prevID = ID;
+			first = false;
+		}
+		if (ID != prevID)
+		{
+			//my_print("I am clearing the Gene sequence!\n");
+			tmpGene.setId(prevID);
+			tmpGene.setDescription("No description for PA(NSE) Model");
+			tmpGene.setSequence(seq);
+			addGene(tmpGene, true); //add to genome
+			tmpGene.clear();
+			seq = "";
+		}
+
+		// Now find codon string: Follows prior comma, guaranteed to be of size 3
+		std::string codon = tmp.substr(pos + 1, 3);
+		codon[0] = (char)std::toupper(codon[0]);
+		codon[1] = (char)std::toupper(codon[1]);
+		codon[2] = (char)std::toupper(codon[2]);
+
+		// Next, find the Codon_Count
+		pos += 4;
+		std::size_t pos2 = tmp.find(",", pos + 1);
+		std::string value = tmp.substr(pos + 1, pos2 - (pos + 1));
+		unsigned count = (unsigned)std::atoi(value.c_str());
+
+		// Concatenate the sequence based on this number of codons
+		for (unsigned i = 0u; i < count; i++)
+			seq.append(codon);
+
+		// Finally, get the RFPCount: substring from pos2 + 1 to the end, convert to an unsigned number
+		value = tmp.substr(pos2 + 1);
+		count = (unsigned)std::atoi(value.c_str());
+		unsigned codonIndex = SequenceSummary::codonToIndex(codon);
+		//my_print("So I'm setting at codon index % the count as %\n", codonIndex, count);
+		tmpGene.geneData.setRFPValue(codonIndex, count, 0);
+		/*
+		for (int i = 0; i < 64; i++)
+		{
+			my_print("% ", tmpGene.geneData.getRFPValue(i, 0));
+		}
+		my_print("\n");
+		 */
+		prevID = ID;
+	}
+
+	tmpGene.setId(prevID);
+	tmpGene.setDescription("No description for PA(NSE) Model");
+	tmpGene.setSequence(seq);
+	addGene(tmpGene, true); //add to genome
+
+	Fin.close();
+}
+
+
 /* readRFPData (RCPP EXPOSED)
  * Arguments: string filename, boolean to determine if we are appending to the existing genome
  * (if not set to true, will default to clearing genome data; defaults to false)
  * Read in a PA-formatted file: GeneID,Position (1-indexed),Codon,RFPCount(s) (may be multiple)
  * The positions are not necessarily in the right order.
  * Ignores ambiguously-positioned codons (marked with negative position).
- * Bad RFPCounts that are less than zero are assumed to be typos, and are set to 0.
+ * RFPCounts are not given as a positive number are set to -1 and are stored, but not used in calculation.
  * There may be more than one RFPCount, and thus the header is important.
 */
 void Genome::readRFPData(std::string filename, bool append)
@@ -233,7 +315,7 @@ void Genome::readRFPData(std::string filename, bool append)
 			{
 				numCategories++;
 				pos2 = tmp.find(",", pos + 1);
-				addRFPCategoryName(tmp.substr(pos + 1, pos2 - (pos + 1)));
+				addRFPCountColumnName(tmp.substr(pos + 1, pos2 - (pos + 1)));
 				pos = pos2;
 			}
 			unsigned tableWidth = 2 + numCategories; // Table size: position + codonID + each category
@@ -279,13 +361,13 @@ void Genome::readRFPData(std::string filename, bool append)
 					if (ID != prevID)
 					{
 						tmpGene.setId(prevID);
-						tmpGene.setDescription("No description for PANSE Model");
+						tmpGene.setDescription("No description for PA(NSE) Model");
 						tmpGene.setPASequence(table);
 						addGene(tmpGene, false); //add to genome
 						tmpGene.clear();
 						table.clear();
 					}
-					// Now find codon value: Follows prior comma, guaranteed to be of size 3
+					// Now find codon string: Follows prior comma, guaranteed to be of size 3
 					std::string codon = tmp.substr(pos2 + 1, 3);
 					codon[0] = (char)std::toupper(codon[0]);
 					codon[1] = (char)std::toupper(codon[1]);
@@ -327,7 +409,7 @@ void Genome::readRFPData(std::string filename, bool append)
             if (prevID != "")
             {
                 tmpGene.setId(prevID);
-                tmpGene.setDescription("No description for PANSE Model");
+                tmpGene.setDescription("No description for PA(NSE) Model");
                 tmpGene.setPASequence(table);
 
                 addGene(tmpGene, false); //add to genome
@@ -355,36 +437,62 @@ void Genome::writeRFPData(std::string filename, bool simulated)
 		my_printError("Error in Genome::writeRFPData: Can not open output RFPData file %\n", filename);
 	else
 	{
-		Fout << "GeneID,Position,Codon";
-
-		// For each category name, print for header
-		std::vector <std::string> RFPCategoryNames = getRFPCategoryNames();
-		unsigned numCategories = (unsigned)RFPCategoryNames.size();
-		for (unsigned category = 0; category < numCategories; category++)
-			Fout << "," << RFPCategoryNames[category];
-
-		Fout << "\n";
-
 		unsigned numGenes = simulated ? (unsigned)simulatedGenes.size() : (unsigned)genes.size();
 
-		for (unsigned geneIndex = 0; geneIndex < numGenes; geneIndex++)
+		if (!simulated)
 		{
-			Gene *currentGene = simulated ? &simulatedGenes[geneIndex] : &genes[geneIndex];
-			std::vector <unsigned> positionCodonID = currentGene->geneData.getPositionCodonID();
-			unsigned numPositions = (unsigned)positionCodonID.size();
+			Fout << "GeneID,Position,Codon";
 
-			for (unsigned position = 0; position < numPositions; position++)
+			// For each category name, print for header
+			std::vector<std::string> RFPCountColumnNames = getRFPCountColumnNames();
+			unsigned numCategories = (unsigned)RFPCountColumnNames.size();
+			for (unsigned category = 0u; category < numCategories; category++)
+				Fout << "," << RFPCountColumnNames[category];
+
+			Fout << "\n";
+
+			for (unsigned geneIndex = 0u; geneIndex < numGenes; geneIndex++)
 			{
-				unsigned codonID = positionCodonID[position];
-				std::string codon = SequenceSummary::codonArray[codonID];
+				Gene *currentGene = &genes[geneIndex];
+				std::vector<unsigned> positionCodonID = currentGene->geneData.getPositionCodonID();
+				unsigned numPositions = (unsigned) positionCodonID.size();
 
-				// Print position + 1 because it's externally one-indexed
-				Fout << currentGene->getId() << "," << position + 1 << "," << codon;
+				for (unsigned position = 0u; position < numPositions; position++)
+				{
+					unsigned codonID = positionCodonID[position];
+					std::string codon = SequenceSummary::codonArray[codonID];
 
-				for (unsigned category = 0; category < numCategories; category++)
-					Fout << "," << currentGene->geneData.getSingleRFPCount(position, category);
+					// Print position + 1 because it's externally one-indexed
+					Fout << currentGene->getId() << "," << position + 1 << "," << codon;
 
-				Fout << "\n";
+					for (unsigned category = 0; category < numCategories; category++)
+						Fout << "," << currentGene->geneData.getSingleRFPCount(position, category);
+
+					Fout << "\n";
+				}
+			}
+		}
+		else
+		{
+			Fout << "GeneID,Codon,Codon_Count,RFPCount\n";
+
+			for (unsigned geneIndex = 0u; geneIndex < numGenes; geneIndex++)
+			{
+				Gene *currentGene = &simulatedGenes[geneIndex];
+
+				for (unsigned codonIndex = 0u; codonIndex < 64; codonIndex++)
+				{
+					std::string codon = SequenceSummary::codonArray[codonIndex];
+
+					Fout << currentGene->getId() << "," << codon << ",";
+
+					SequenceSummary *seqsum = currentGene->getSequenceSummary();
+					unsigned codonCount = seqsum -> getCodonCountForCodon(codonIndex);
+					Fout << codonCount << ",";
+
+					// Simulated sum RFP counts will only print one column! So, we default to column = 0.
+					Fout << currentGene->geneData.getRFPValue(codonIndex, 0) << "\n";
+				}
 			}
 		}
 	}
@@ -716,7 +824,7 @@ void Genome::clear()
 	genes.clear();
 	simulatedGenes.clear();
 	numGenesWithPhi.clear();
-	RFPCategoryNames.clear();
+	RFPCountColumnNames.clear();
 }
 
 
@@ -767,23 +875,23 @@ std::vector<unsigned> Genome::getCodonCountsPerGene(std::string codon)
 }
 
 
-/* getRFPCategoryName (NOT EXPOSED)
+/* getRFPCountColumnName (NOT EXPOSED)
  * Arguments: None
- * Returns the vector of RFPCategoryNames.
+ * Returns the vector of RFPCountColumnNames.
 */
-std::vector <std::string> Genome::getRFPCategoryNames()
+std::vector <std::string> Genome::getRFPCountColumnNames()
 {
-	return RFPCategoryNames;
+	return RFPCountColumnNames;
 }
 
 
-/* addRFPCategoryName (NOT EXPOSED)
+/* addRFPCountColumnName (NOT EXPOSED)
  * Arguments: string categoryName
- * Adds the name of an RFP category to the RFPCategoryNames vector.
+ * Adds the name of an RFP category to the RFPCountColumnNames vector.
 */
-void Genome::addRFPCategoryName(std::string categoryName)
+void Genome::addRFPCountColumnName(std::string categoryName)
 {
-	RFPCategoryNames.push_back(categoryName);
+	RFPCountColumnNames.push_back(categoryName);
 }
 
 
