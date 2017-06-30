@@ -174,7 +174,7 @@ std::string Gene::getSequence()
 */
 void Gene::setSequence(std::string _seq)
 {
-    geneData.clear();
+    //geneData.clear();
     std::transform(_seq.begin(), _seq.end(), _seq.begin(), ::toupper);
     seq = _seq;
 	if (seq.length() % 3 == 0)

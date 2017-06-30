@@ -1,4 +1,4 @@
-GeneID,Position,Codon,short,long
+GeneID,Position,Codon,long,short
 TEST001,4,TTT,0,1
 TEST001,3,ATT,2,0
 TEST001,1,CTT,0,0

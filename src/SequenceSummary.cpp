@@ -99,12 +99,25 @@ bool SequenceSummary::operator==(const SequenceSummary& other) const
 {
 	bool match = true;
 
-	if (this->naa != other.naa) { match = false; }
-	if (this->ncodons != other.ncodons) { match = false; }
-	if (this->codonPositions != other.codonPositions) { match = false; }
-	if (this->RFPCount != other.RFPCount) {match = false; }
-    if (this->sumRFPCount != other.sumRFPCount) {match = false; }
-	if (this->positionCodonID != other.positionCodonID) { match = false; }
+	if (this->naa != other.naa) { match = false; my_print("crap1\n"); }
+	if (this->ncodons != other.ncodons) { match = false; my_print("crap2\n"); }
+	if (this->codonPositions != other.codonPositions) { match = false; my_print("crap3\n"); }
+	if (this->RFPCount != other.RFPCount) {match = false; my_print("crap4\n"); }
+    if (this->sumRFPCount != other.sumRFPCount) {match = false; my_print("crap5\n");
+        for (int i = 0; i < 64; i++)
+        {
+            my_print("% ", this->sumRFPCount[0][i]);
+
+		}
+		my_print("\n");
+		my_print("Size of other.SumRFPCount is %\n", other.sumRFPCount.size());
+		for (int i = 0; i < 64; i++)
+		{
+			my_print("% ", other.sumRFPCount[0][i]);
+		}
+		my_print("I survived the loop!\n");
+    }
+	if (this->positionCodonID != other.positionCodonID) { match = false; my_print("crap6\n"); }
 
 	return match;
 }
@@ -229,6 +242,7 @@ void SequenceSummary::setRFPCount(std::vector <int> arg, unsigned RFPCountColumn
 void SequenceSummary::initSumRFPCount(unsigned numCategories)
 {
 	sumRFPCount.resize(numCategories);
+	my_print("sumRFPCount resized to %\n", sumRFPCount.size());
 	for (unsigned i = 0; i < numCategories; i++)
 		sumRFPCount[i].fill(0);
 }
@@ -647,7 +661,7 @@ std::string SequenceSummary::codonToAA(std::string& codon)
 }
 
 
-// Note: From function definition in header, default category is 0.
+// Note: From function definition in header, default forParamVector is false.
 unsigned SequenceSummary::codonToIndex(std::string& codon, bool forParamVector)
 {
 	unsigned i = 0;
@@ -684,14 +698,14 @@ std::string SequenceSummary::indexToAA(unsigned aaIndex)
 }
 
 
-// Note: From function definition in header, default category is 0.
+// Note: From function definition in header, default forParamVector is false.
 std::string SequenceSummary::indexToCodon(unsigned index, bool forParamVector)
 {
 	return forParamVector ? codonArrayParameter[index] : codonArray[index];
 }
 
 
-// Note: From function definition in header, default category is 0.
+// Note: From function definition in header, default forParamVector is false.
 unsigned SequenceSummary::GetNumCodonsForAA(std::string& aa, bool forParamVector)
 {
 	unsigned ncodon = 0;
