@@ -103,7 +103,7 @@ bool SequenceSummary::operator==(const SequenceSummary& other) const
 	if (this->ncodons != other.ncodons) { match = false; }
 	if (this->codonPositions != other.codonPositions) { match = false; }
 	if (this->RFPCount != other.RFPCount) {match = false; }
-    if (this->sumRFPCount != other.sumRFPCount) {match = false; }
+	if (this->sumRFPCount != other.sumRFPCount) {match = false; }
 	if (this->positionCodonID != other.positionCodonID) { match = false; }
 
 	return match;
@@ -647,7 +647,7 @@ std::string SequenceSummary::codonToAA(std::string& codon)
 }
 
 
-// Note: From function definition in header, default category is 0.
+// Note: From function definition in header, default forParamVector is false.
 unsigned SequenceSummary::codonToIndex(std::string& codon, bool forParamVector)
 {
 	unsigned i = 0;
@@ -684,14 +684,14 @@ std::string SequenceSummary::indexToAA(unsigned aaIndex)
 }
 
 
-// Note: From function definition in header, default category is 0.
+// Note: From function definition in header, default forParamVector is false.
 std::string SequenceSummary::indexToCodon(unsigned index, bool forParamVector)
 {
 	return forParamVector ? codonArrayParameter[index] : codonArray[index];
 }
 
 
-// Note: From function definition in header, default category is 0.
+// Note: From function definition in header, default forParamVector is false.
 unsigned SequenceSummary::GetNumCodonsForAA(std::string& aa, bool forParamVector)
 {
 	unsigned ncodon = 0;

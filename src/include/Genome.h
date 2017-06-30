@@ -25,7 +25,7 @@ class Genome
 		std::vector <Gene> simulatedGenes;
 		std::vector <unsigned> numGenesWithPhi; //Number of phi sets is vector size, value is number of genes
 												//with a phi value for that set. Values should currently be equal.
-        std::vector<std::string> RFPCategoryNames;
+        std::vector<std::string> RFPCountColumnNames;
 
 	public:
 
@@ -42,6 +42,7 @@ class Genome
 		void readRFPData(std::string filename, bool append = false);
 		void writeRFPData(std::string filename, bool simulated = false);
 		void readObservedPhiValues(std::string filename, bool byId = true);
+        void readSimulatedGenomeFromPAModel(std::string filename);
 
 
 		//Gene Functions:
@@ -57,8 +58,8 @@ class Genome
 		void clear();
 		Genome getGenomeForGeneIndices(std::vector <unsigned> indices, bool simulated = false);
 		std::vector <unsigned> getCodonCountsPerGene(std::string codon);
-        std::vector <std::string> getRFPCategoryNames();
-		void addRFPCategoryName(std::string categoryName);
+        std::vector <std::string> getRFPCountColumnNames();
+		void addRFPCountColumnName(std::string categoryName);
 
 		//Testing Functions:
 		std::vector <unsigned> getNumGenesWithPhi();
