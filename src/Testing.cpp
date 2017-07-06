@@ -3389,6 +3389,22 @@ int testPAParameter()
  * that are not exposed to RCPP already.
  * Returns 0 if successful, 1 if error found.
 */
+
+bool testEqualityGenome(Genome object, Genome other){
+    int i, j;
+    std::vector <Gene> genes1, genes2;
+    
+    genes1 = object.getGenes(false);
+    genes2 = other.getGenes(false);
+
+    if(genes1.size() != genes2.size()) return false;
+
+    for (i = 0; i < genes1.size(); i++){
+    }
+    
+    return false;
+}
+
 int testMCMCAlgorithm()
 {
 	unsigned samples = 10;
