@@ -970,6 +970,11 @@ int main()
 
 	// SIMULATE GENOME: RFP
 	Genome genome;
+    /*if(testEqualityGenome(genome, genome)){
+        my_print("So far so good\n");
+    }
+    exit(1);
+        
 	genome.readRFPData(pathBegin + "RibModelDev/data/rfp/PopPAData.csv", false);
 	//genome.readFasta(pathBegin + "RibModelDev/data/singleMixture/genome_2000.fasta", false);
 	
@@ -990,14 +995,14 @@ int main()
 	model.simulateGenome(genome);
 	genome.writeRFPData(pathBegin + "labbooks/Denizhan.Pak/Log_Files/sim_genomes/PASim.csv", true);
 	genome.writeRFPData(pathBegin + "labbooks/Denizhan.Pak/Log_Files/sim_genomes/PANotSim.csv", false);
-	exit(1);
+	exit(1);*/
 	
 
 	// UNIT TESTING
 	//testUtility();
 	//testSequenceSummary();
 	//testGene();
-	//testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
+	testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
 	//testCovarianceMatrix();
 	//testParameter();
 	//testParameterWithFile(pathBegin + "HollisFile.txt");

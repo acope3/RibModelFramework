@@ -1991,7 +1991,7 @@ int testGenome(std::string testFileDir) {
     genome2.clear();
     genome2.readSimulatedGenomeFromPAModel(file2);
 
-    if (!(genome1 == genome2))
+    if (!(testEqualityGenome(genome1, genome2)))
     {
         my_printError("Error in testGenome: readSimulatedGenomeFromPAModel. Genome written is not equivalent to what is read.\n");
         error = 1;
@@ -3400,9 +3400,22 @@ bool testEqualityGenome(Genome object, Genome other){
     if(genes1.size() != genes2.size()) return false;
 
     for (i = 0; i < genes1.size(); i++){
+        SequenceSummary seq1 = genes1[i].geneData;
+        SequenceSummary seq2 = genes2[i].geneData;
+        std::array <unsigned, 64> sumRFP1 = seq1.getSumRFPCount();
+        std::array <unsigned, 64> sumRFP2 = seq2.getSumRFPCount();
+
+        for(j = 0; j < sumRFP1.size(); j++){
+            if(sumRFP1[j] != sumRFP2[j]){
+                return false;
+            }
+            if(seq1.getCodonCountForCodon(j) != seq2.getCodonCountForCodon(j)){
+                return false;
+            }
+        }
     }
     
-    return false;
+    return true;
 }
 
 int testMCMCAlgorithm()
