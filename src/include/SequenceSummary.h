@@ -81,6 +81,7 @@ class SequenceSummary
 		std::vector <unsigned> getPositionCodonID();
 		void setPositionCodonID(std::vector <unsigned> arg);
 
+        //TODO: Adjust naming for getRFPValue and sumRFPCount
         unsigned getRFPValue(std::string codon, unsigned RFPCountColumn = 0u);
         unsigned getRFPValue(unsigned codonIndex, unsigned RFPCountColumn = 0u);
         void setRFPValue(unsigned codonIndex, unsigned value, unsigned RFPCountColumn = 0u);

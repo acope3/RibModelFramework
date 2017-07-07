@@ -411,6 +411,7 @@ void Genome::readRFPData(std::string filename, bool append)
                 tmpGene.setId(prevID);
                 tmpGene.setDescription("No description for PA(NSE) Model");
                 tmpGene.setPASequence(table);
+
                 addGene(tmpGene, false); //add to genome
             }
 		} // end else

@@ -6,6 +6,7 @@
 ## Ignore CMakeLists
 ^src\/CMakeLists\.txt$
 ^src\/cmake-build-debug$
+^src\/CMake*$
 
 ## Ignore IDE setting folders
 ^src\/\.idea$

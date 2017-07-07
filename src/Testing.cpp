@@ -1991,7 +1991,7 @@ int testGenome(std::string testFileDir) {
     genome2.clear();
     genome2.readSimulatedGenomeFromPAModel(file2);
 
-    if (!(genome1 == genome2))
+    if (!(testEqualityGenome(genome1, genome2)))
     {
         my_printError("Error in testGenome: readSimulatedGenomeFromPAModel. Genome written is not equivalent to what is read.\n");
         error = 1;
@@ -2003,6 +2003,13 @@ int testGenome(std::string testFileDir) {
     genome2.writeRFPData(file3, true);
     genome1.clear();
     genome1.readSimulatedGenomeFromPAModel(file3);
+    
+    if (!(testEqualityGenome(genome1, genome2)))
+    {
+        my_printError("Error in testGenome: readSimulatedGenomeFromPAModel. Genome written is not equivalent to what is read.\n");
+        error = 1;
+        globalError = 1;
+    }
 
     /* NOTE: Not working! TODO: Fix; idea: position of codons is unneeded, and writeRFPData writes all codons even with
      * 0 counts. When readSimulatedGenomeFromPAModel is called, it should happily ignore these ncodon = 0 codons, and we can
@@ -3094,6 +3101,7 @@ int testParameterWithFile(std::string filename)
 int testCovarianceMatrix()
 {
     CovarianceMatrix covM; //Default constructor sets numVariates to 2.
+    CovarianceMatrix covMcp; //Default constructor sets numVariates to 2.
     int error = 0;
     int globalError = 0;
 
@@ -3127,6 +3135,10 @@ int testCovarianceMatrix()
     else
         error = 0; //Reset for next function.
 
+    covMcp = covM;
+
+    if(covMcp == covM) my_print("CovarianceMatrix == --- Pass\n");
+    else  my_print("CovarianceMatrix == --- Fail\n");
     //------------------------------//
     //------ setDiag Function ------//
     //------------------------------//
@@ -3384,6 +3396,35 @@ int testPAParameter()
  * that are not exposed to RCPP already.
  * Returns 0 if successful, 1 if error found.
 */
+
+bool testEqualityGenome(Genome object, Genome other){
+    int i, j;
+    std::vector <Gene> genes1, genes2;
+    
+    genes1 = object.getGenes(false);
+    genes2 = other.getGenes(false);
+
+    if(genes1.size() != genes2.size()) return false;
+
+    for (i = 0; i < genes1.size(); i++){
+        SequenceSummary seq1 = genes1[i].geneData;
+        SequenceSummary seq2 = genes2[i].geneData;
+        std::array <unsigned, 64> sumRFP1 = seq1.getSumRFPCount();
+        std::array <unsigned, 64> sumRFP2 = seq2.getSumRFPCount();
+
+        for(j = 0; j < sumRFP1.size(); j++){
+            if(sumRFP1[j] != sumRFP2[j]){
+                return false;
+            }
+            if(seq1.getCodonCountForCodon(j) != seq2.getCodonCountForCodon(j)){
+                return false;
+            }
+        }
+    }
+    
+    return true;
+}
+
 int testMCMCAlgorithm()
 {
 	unsigned samples = 10;
