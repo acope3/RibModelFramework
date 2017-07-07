@@ -2003,6 +2003,13 @@ int testGenome(std::string testFileDir) {
     genome2.writeRFPData(file3, true);
     genome1.clear();
     genome1.readSimulatedGenomeFromPAModel(file3);
+    
+    if (!(testEqualityGenome(genome1, genome2)))
+    {
+        my_printError("Error in testGenome: readSimulatedGenomeFromPAModel. Genome written is not equivalent to what is read.\n");
+        error = 1;
+        globalError = 1;
+    }
 
     /* NOTE: Not working! TODO: Fix; idea: position of codons is unneeded, and writeRFPData writes all codons even with
      * 0 counts. When readSimulatedGenomeFromPAModel is called, it should happily ignore these ncodon = 0 codons, and we can

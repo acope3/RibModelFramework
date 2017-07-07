@@ -21,6 +21,7 @@ int testParameter();
 int testCovarianceMatrix();
 //int testPAParameter(); //TODO: Rework or remove
 int testMCMCAlgorithm();
+bool testEqualityGenome(Genome object, Genome other);
 
 //Blank header
 #endif // Testing_H
