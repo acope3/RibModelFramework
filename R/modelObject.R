@@ -23,7 +23,7 @@
 initializeModelObject <- function(parameter, model = "ROC", with.phi = FALSE, fix.observation.noise = FALSE, rfp.count.column = 1) {
   if(model == "ROC") {
     c.model <- new(ROCModel, with.phi, fix.observation.noise)
-  } else if(model == "FONSE") {
+  } else if (model == "FONSE") {
     c.model = new(FONSEModel)
   } else if (model == "PA") {
     c.model <- new(PAModel, rfp.count.column)
