@@ -35,10 +35,10 @@ RCPP_MODULE(Model_mod)
 	
 	class_<PAModel>("PAModel")
 		.derives<Model>("Model")
-		.constructor()
+		.constructor<unsigned>()
   		.method("getParameter", &PAModel::getParameter)
 		.method("setParameter", &PAModel::setParameter)
-		.method("simulateGenome", &PAModel::simulateGenome) //TODO: Debug this. Does NOT work in R (unknown crash).
+		.method("simulateGenome", &PAModel::simulateGenome)
 		;
 
 	class_<FONSEModel>("FONSEModel")
