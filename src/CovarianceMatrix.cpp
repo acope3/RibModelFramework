@@ -86,21 +86,25 @@ void CovarianceMatrix::operator*=(const double &value)
 }
 
 
+bool CovarianceMatrix::operator==(const CovarianceMatrix& other) const 
+{
+    bool match = true;
+
+    if (this->covMatrix != other.covMatrix) { match = false; }
+    if (this->choleskyMatrix != other.choleskyMatrix) { match = false; }
+    if (this->numVariates != other.numVariates) { match = false; }
+
+    return match;
+}
+
+
 CovarianceMatrix::~CovarianceMatrix()
 {
     //dtor
 }
 
-bool CovarianceMatrix::operator==(const CovarianceMatrix& other) const 
-{
-    bool match = true;
 
-    if(this->covMatrix != other.covMatrix) { match = false; }
-    if(this->choleskyMatrix != other.choleskyMatrix) { match = false; }
-    if(this->numVariates != other.numVariates) { match = false; }
 
-    return match;
-}
 
 
 //--------------------------------------//
