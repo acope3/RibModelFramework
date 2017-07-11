@@ -33,7 +33,7 @@ The following example illustrates how you would estimates parameters under the P
 
 ```{r, echo = FALSE}
 genome <- initializeGenomeObject(file = "rfpcounts.tsv", fasta = FALSE)
-parameter <- initializeParameterObject(genome = genome, sphi = 1, num.mixtures = 1, geneAssignment = rep(1, length(genome)))
+parameter <- initializeParameterObject(genome = genome, sphi = 1, num.mixtures = 1, gene.assignment = rep(1, length(genome)))
 mcmc <- initializeMCMCObject(samples = 5000, thinning = 10, adaptive.width=50)
 model <- initializeModelObject(parameter = parameter, model = "PA")
 runMCMC(mcmc = mcmc, genome = genome, model = model)

@@ -38,7 +38,7 @@ RCPP_MODULE(Model_mod)
 		.constructor<unsigned>()
   		.method("getParameter", &PAModel::getParameter)
 		.method("setParameter", &PAModel::setParameter)
-		.method("simulateGenome", &PAModel::simulateGenome) //TODO: Debug this. Does NOT work in R (unknown crash).
+		.method("simulateGenome", &PAModel::simulateGenome)
 		;
 
 	class_<FONSEModel>("FONSEModel")
