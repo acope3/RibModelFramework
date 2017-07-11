@@ -544,7 +544,7 @@ void Parameter::initCategoryDefinitions(std::string _mutationSelectionState,
 }
 
 
-/* InitializeSynthesisRate (by genome) (RCPP EXPOSED VIA WRAPPER)
+/* InitializeSynthesisRate (using SCUO per genome) (RCPP EXPOSED VIA WRAPPER)
  * Arguments: //TODO
 */
 void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
@@ -1666,7 +1666,7 @@ double Parameter::calculateSCUO(Gene& gene, unsigned maxAA)
 	SequenceSummary *seqsum = gene.getSequenceSummary();
 
 	double totalDegenerateAACount = 0.0;
-	for (unsigned i = 0; i < maxAA; i++)
+	for (unsigned i = 0u; i < maxAA; i++)
 	{
 		std::string curAA = SequenceSummary::AminoAcidArray[i];
 		// skip amino acids with only one codon or stop codons
@@ -1675,7 +1675,7 @@ double Parameter::calculateSCUO(Gene& gene, unsigned maxAA)
 	}
 
 	double scuoValue = 0.0;
-	for (unsigned i = 0; i < maxAA; i++)
+	for (unsigned i = 0u; i < maxAA; i++)
 	{
 		std::string curAA = SequenceSummary::AminoAcidArray[i];
 		// skip amino acids with only one codon or stop codons

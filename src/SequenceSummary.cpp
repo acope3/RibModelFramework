@@ -99,9 +99,9 @@ bool SequenceSummary::operator==(const SequenceSummary& other) const
 {
 	bool match = true;
 
-	if (this->naa != other.naa) { match = false; }
-	if (this->ncodons != other.ncodons) { match = false; }
 	if (this->codonPositions != other.codonPositions) { match = false; }
+	if (this->ncodons != other.ncodons) { match = false; }
+	if (this->naa != other.naa) { match = false; }
 	if (this->RFPCount != other.RFPCount) {match = false; }
 	if (this->sumRFPCount != other.sumRFPCount) {match = false; }
 	if (this->positionCodonID != other.positionCodonID) { match = false; }
