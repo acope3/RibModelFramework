@@ -44,7 +44,7 @@ class PAParameter: public Parameter {
 		void initAlpha(double alphaValue, unsigned mixtureElement, std::string codon); //R?
 		void initLambdaPrime(double lambdaPrimeValue, unsigned mixtureElement, std::string codon); //R?
 		void initMutationSelectionCategories(std::vector<std::string> files, unsigned numCategories,
-				unsigned paramType); //TODO: function needs to be changed
+				unsigned paramType); //TODO: function needs to be renamed
 
 
 		//Trace Functions:
