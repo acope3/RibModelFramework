@@ -444,6 +444,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 				my_print("No longer adapting\n");
 
 			model.printHyperParameters();
+			my_print("hey there\n");
 			for (unsigned i = 0u; i < model.getNumMixtureElements(); i++)
 			{
 				my_print("\t current Mixture element probability for element %: %\n", i, model.getCategoryProbability(i));

@@ -41,13 +41,13 @@ double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grou
 	SequenceSummary::AAToCodonRange(grouping, aaStart, aaEnd, false);
 	for (unsigned i = aaStart, k = 0; i < aaEnd; i++, k++)
 	{
-		positions = gene.geneData.getCodonPositions(i); 
+		positions = gene.geneData.getCodonPositions(i);
 		for (unsigned j = 0; j < positions->size(); j++)
 		{
-			calculateLogCodonProbabilityVector(numCodons, positions->at(j), minIndexVal, mutation, selection, phiValue, codonProb); 
-			if (codonProb[k] == 0) continue;
+			calculateLogCodonProbabilityVector(numCodons, positions->at(j), minIndexVal, mutation, selection, phiValue, codonProb);
+			if (codonProb[k] == 0) continue; //TODO: Why is this continue statement needed? If it's zero you can still add it and not change the value
 			logLikelihood += codonProb[k];
-		} 
+		}
 		//positions->clear();
 	}
  	return logLikelihood;
@@ -196,7 +196,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 		// get proposed mutation and selection parameter
 		parameter->getParameterForCategory(mutationCategory, FONSEParameter::dM, grouping, true, mutation_proposed);
 		parameter->getParameterForCategory(selectionCategory, FONSEParameter::dOmega, grouping, true, selection_proposed);
-		
+
 		likelihood += calculateLogLikelihoodRatioPerAA(*gene, grouping, mutation, selection, phiValue);
 		likelihood_proposed += calculateLogLikelihoodRatioPerAA(*gene, grouping, mutation_proposed, selection_proposed, phiValue);
 	}
@@ -694,7 +694,7 @@ void FONSEModel::calculateLogCodonProbabilityVector(unsigned numCodons, unsigned
 {
 	double denominator;
 
-	/* log(c_i) = \Delta M - (\phi * \beta(i) * \Delta \omega),                 *
+	/* log(Pr(c_i| \theta)) = \Delta M - (\phi * \beta(i) * \Delta \omega),                 *
 	 * where \beta(i) = a_1 + (i * a_2)                                         *
 	 *                                                                          *
 	 * Right now a_1 and a_2 are set to 4.0. However, we are planning on making *
@@ -728,7 +728,7 @@ void FONSEModel::calculateLogCodonProbabilityVector(unsigned numCodons, unsigned
 		codonProb[numCodons - 1] = 0.0;
 	}
 
-	//Here we take the log of the denominator (the summation term) so that we can finish calculating 
+	//Here we take the log of the denominator (the summation term) so that we can finish calculating
 	//the log probabilities simple by subtracting the log of the denominator from each element.
 	denominator = std::log(denominator);
 	for (unsigned i = 0; i < numCodons; i++)
@@ -788,7 +788,7 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 		codonProb[numCodons - 1] = 1.0;
 	}
 
-	//As is found in ROCModel.cpp, multiplication is a faster operation than division so we 
+	//As is found in ROCModel.cpp, multiplication is a faster operation than division so we
 	//save time here by dividing once and then multiplying numCodons times instead of dividing
 	//numCodons times.
 	denominator = 1 / denominator;
