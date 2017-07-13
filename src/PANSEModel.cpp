@@ -28,11 +28,22 @@ PANSEModel::~PANSEModel()
 double PANSEModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
         unsigned currRFPObserved, unsigned currNumCodonsInMRNA, double phiValue)
 {
-    double logLikelihood = ((std::lgamma((currNumCodonsInMRNA * currAlpha) + currRFPObserved)) - (std::lgamma(currNumCodonsInMRNA * currAlpha)))
+/*    double logLikelihood = ((std::lgamma((currNumCodonsInMRNA * currAlpha) + currRFPObserved)) - (std::lgamma(currNumCodonsInMRNA * currAlpha)))
         + (currRFPObserved * (std::log(phiValue) - std::log(currLambdaPrime + phiValue)))
         + ((currNumCodonsInMRNA * currAlpha) * (std::log(currLambdaPrime) - std::log(currLambdaPrime + phiValue)));
 
     return logLikelihood;
+    double term1, term2, term3;*/
+    double prevdelta = 1;
+    
+    term1 = std::lgamma(currAlpha + currRFPObserved) - lgamma(currAlpha);
+    term2 = std::log(phi) + std::log(prevdelta) - std::log(currLambdaPrime + (phi * prevdelta));
+    term3 = std::log(currLambdaPrime) - std::log(currLambdaPrime + (phi * prevdelta));
+
+    term2 *= currRFPObserved;
+    term3 *= currAlpha;
+
+    return term1 + term2 + term3;
 }
 
 
@@ -88,6 +99,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
     logProbabilityRatio[2] = proposedLogLikelihood - std::log(phiValue);
     logProbabilityRatio[3] = currentLogLikelihood;
     logProbabilityRatio[4] = proposedLogLikelihood;
+    //5 and 6 are used in ROC for trace and should be added
 }
 
 
