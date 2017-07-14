@@ -36,9 +36,9 @@ double PANSEModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, doubl
     double term1, term2, term3;*/
     double prevdelta = 1;
     
-    term1 = std::lgamma(currAlpha + currRFPObserved) - lgamma(currAlpha);
-    term2 = std::log(phi) + std::log(prevdelta) - std::log(currLambdaPrime + (phi * prevdelta));
-    term3 = std::log(currLambdaPrime) - std::log(currLambdaPrime + (phi * prevdelta));
+    double term1 = std::lgamma(currAlpha + currRFPObserved) - lgamma(currAlpha);
+    double term2 = std::log(phiValue) + std::log(prevdelta) - std::log(currLambdaPrime + (phiValue * prevdelta));
+    double term3 = std::log(currLambdaPrime) - std::log(currLambdaPrime + (phiValue * prevdelta));
 
     term2 *= currRFPObserved;
     term3 *= currAlpha;
@@ -73,7 +73,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
     //#ifndef __APPLE__
 #pragma omp parallel for reduction(+:logLikelihood,logLikelihood_proposed)
 #endif
-    for (unsigned index = 0; index < getGroupListSize(); index++) //number of codons, without the stop codons
+    /*for (unsigned index = 0; index < getGroupListSize(); index++) //number of codons, without the stop codons
     {
         std::string codon = getGrouping(index);
 
@@ -86,7 +86,11 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 
         logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
         logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue_proposed);
-    }
+    }*/
+
+    SequenceSummary geneData = gene.geneData;
+
+        //for (unsigned index = 0; index < pa
 
     double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(lambdaPrimeCategory, false);
     double logPhiProbability = Parameter::densityLogNorm(phiValue, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
