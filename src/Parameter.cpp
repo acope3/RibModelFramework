@@ -182,6 +182,7 @@ void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsig
 
 	categoryProbabilities.resize(numMixtures, 1.0/(double)numMixtures);
 
+
 	//Set up vector of vectors:
 	currentSynthesisRateLevel.resize(numSelectionCategories);
 	proposedSynthesisRateLevel.resize(numSelectionCategories);

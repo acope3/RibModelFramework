@@ -4,6 +4,7 @@
 
 #include "../base/Trace.h"
 #include "../base/Parameter.h"
+#include "../SequenceSummary.h"
 
 
 #include <vector>

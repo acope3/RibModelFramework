@@ -4,6 +4,7 @@
 
 #include "../base/Model.h"
 #include "PANSEParameter.h"
+#include "../SequenceSummary.h"
 
 #include <sstream>
 

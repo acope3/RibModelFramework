@@ -88,9 +88,20 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
         logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue_proposed);
     }*/
 
-    SequenceSummary geneData = gene.geneData;
+    std::vector <unsigned> positions = gene.geneData.getPositionCodonID();
 
-        //for (unsigned index = 0; index < pa
+        for (unsigned index = 0; index < positions.size(); index++){
+            std::string codon = gene.geneData.indexToCodon(positions[index]);
+        double currAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, false);
+        double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PANSEParameter::lmPri, codon, false);
+        unsigned currRFPObserved = gene.geneData.getRFPValue(index);
+
+        unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(index);
+        if (currNumCodonsInMRNA == 0) continue;
+
+        logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
+        logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue_proposed);
+        }
 
     double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(lambdaPrimeCategory, false);
     double logPhiProbability = Parameter::densityLogNorm(phiValue, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
