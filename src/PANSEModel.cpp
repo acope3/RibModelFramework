@@ -68,12 +68,12 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 
     double phiValue = parameter->getSynthesisRate(geneIndex, synthesisRateCategory, false);
     double phiValue_proposed = parameter->getSynthesisRate(geneIndex, synthesisRateCategory, true);
-
+/*
 #ifdef _OPENMP
     //#ifndef __APPLE__
 #pragma omp parallel for reduction(+:logLikelihood,logLikelihood_proposed)
 #endif
-    /*for (unsigned index = 0; index < getGroupListSize(); index++) //number of codons, without the stop codons
+    for (unsigned index = 0; index < getGroupListSize(); index++) //number of codons, without the stop codons
     {
         std::string codon = getGrouping(index);
 
@@ -545,7 +545,7 @@ void PANSEModel::updateHyperParameter(unsigned hp)
     }
 }
 
-
+//TODO: Account for position
 void PANSEModel::simulateGenome(Genome &genome)
 {
     for (unsigned geneIndex = 0; geneIndex < genome.getGenomeSize(); geneIndex++)
@@ -570,13 +570,13 @@ void PANSEModel::simulateGenome(Genome &genome)
             NumericVector xx(1);
             xx = rgamma(1, alphaPrime, 1.0/lambdaPrime);
             xx = rpois(1, xx[0] * phi);
-            tmpGene.geneData.setRFPValue(codonIndex, xx[0]);
+            tmpGene.geneData.setRFPValue(codonIndex, xx[0], RFPCountColumn);
 #else
             std::gamma_distribution<double> GDistribution(alphaPrime,1.0/lambdaPrime);
             double tmp = GDistribution(Parameter::generator);
             std::poisson_distribution<unsigned> PDistribution(phi * tmp);
             unsigned simulatedValue = PDistribution(Parameter::generator);
-            tmpGene.geneData.setRFPValue(codonIndex, simulatedValue);
+            tmpGene.geneData.setRFPValue(codonIndex, simulatedValue, RFPCountColumn);
 #endif
         }
         genome.addGene(tmpGene, true);
