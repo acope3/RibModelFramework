@@ -5,7 +5,7 @@ context("PA Model")
 
 test_that("PA Model testing simulated versus actual accuracy", {
   # Skip unless manually run or changed
-  #if (F)
+  if (F)
     skip("PA Model testing is optional.")
   
   #####################
@@ -13,11 +13,11 @@ test_that("PA Model testing simulated versus actual accuracy", {
   #####################
 
   # Test with only 1500 genes
-  fileName = file.path("UnitTestingData", "testPAModelFiles", "rand1500.csv")
+  fileName = file.path("UnitTestingData", "testPAModelFiles", "testPAModel.csv")
   fileTable = file.path("UnitTestingData", "testPAModelFiles", "codonTranslationRates.csv")
   
   # Ensure the input files exist.
-  test_that("file exists: rand1500.csv", {
+  test_that("file exists: testPAModel.csv", {
     expect_equal(file.exists(fileName), T)
   })
   
@@ -25,7 +25,7 @@ test_that("PA Model testing simulated versus actual accuracy", {
     expect_equal(file.exists(fileTable), T)
   })
   
-  genome <- initializeGenomeObject(file = fileName, FALSE)
+  genome <- initializeGenomeObject(file = fileName, fasta=FALSE, FALSE)
   
   sphi_init <- c(2)
   numMixtures <- 1

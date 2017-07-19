@@ -962,7 +962,7 @@ int main()
 #ifdef DENIZHAN
 int main()
 {
-	std::string pathBegin = "/home/nax/Work/biolab/";
+	std::string pathBegin = "/home/nax/Work/biolab/TestingIn/";
 
 	unsigned numMixtures = 1;
 	std::vector<double> sphi_init(numMixtures, 2);
@@ -1024,7 +1024,7 @@ int main()
 	my_print("\tThinning: %\n", thinning);
 	my_print("\t # Samples used: %\n", useSamples);
 	MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thinning, 10, true, true, true);
-	//mcmc.setRestartFileSettings(pathBegin + "RestartFile.txt", 20, true);
+	mcmc.setRestartFileSettings(pathBegin + "RestartFile.txt", 20, true);
 	my_print("Done!-------------------------------\n\n\n");
 
 
