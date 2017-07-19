@@ -128,6 +128,14 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
     }else{
       parameter <- new(PAParameter, init.with.restart.file)
     }
+  }else if(model == "PANSE"){
+    if(is.null(init.with.restart.file)){
+      parameter <- initializePANSEParameterObject(genome, sphi, num.mixtures, 
+                                                gene.assignment, initial.expression.values, split.serine, 
+                            mixture.definition, mixture.definition.matrix, init.csp.variance) 
+    }else{
+      parameter <- new(PANSEParameter, init.with.restart.file)
+    }
   }else{
     stop("Unknown model.")
   }
@@ -204,6 +212,35 @@ initializePAParameterObject <- function(genome, sphi, numMixtures, geneAssignmen
   }
   
   ## TODO (Cedric): use init.csp.variance to set initial proposal width for CSP parameters
+  
+  return (parameter)
+}
+
+#Called from initializeParameterObject.
+initializePANSEParameterObject <- function(genome, sphi, numMixtures, geneAssignment, 
+                          expressionValues = NULL, split.serine = TRUE, 
+                          mixture.definition = "allUnique", 
+                          mixture.definition.matrix = NULL, init.csp.variance){
+
+  if(is.null(mixture.definition.matrix))
+  { # keyword constructor
+    parameter <- new(PANSEParameter, as.vector(sphi), numMixtures, geneAssignment, 
+                     split.serine, mixture.definition)
+  }else{
+    #matrix constructor
+    mixture.definition <- c(mixture.definition.matrix[, 1], 
+                            mixture.definition.matrix[, 2])
+    parameter <- new(PANSEParameter, as.vector(sphi), numMixtures, geneAssignment, 
+                     mixture.definition, split.serine)
+  }
+  
+  
+  # initialize expression values
+  if(is.null(expressionValues)){
+    parameter$initializeSynthesisRateByGenome(genome, sphi)
+  }else{
+    parameter$initializeSynthesisRateByList(expressionValues)
+  }
   
   return (parameter)
 }
@@ -299,6 +336,27 @@ getCSPEstimates.Rcpp_Parameter <- function(parameter, filename=NULL, CSP="Mutati
     }
   }
   else if (class(parameter) == "Rcpp_PAParameter"){
+    groupList <- parameter$getGroupList()
+
+    for(i in 1:length(groupList)){
+      aa <- codonToAA(groupList[i])
+      Codon <- c(Codon, groupList[i])
+      Amino_Acid <- c(Amino_Acid, aa)
+       
+      if(CSP == "Alpha"){
+        Value <- c(Value, parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 0, FALSE))
+        quantile_list <- c(quantile_list, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 0, c(0.025, 0.975), FALSE))
+        }
+      else if(CSP == "Lambda Prime"){
+        Value <- c(Value, parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 1, FALSE))
+        quantile_list <- c(quantile_list, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 1, c(0.025, 0.975), FALSE))
+      }
+      else {
+        stop("Unknown parameter type given with argument: CSP")
+      }
+    }
+  }
+  else if (class(parameter) == "Rcpp_PANSEParameter"){
     groupList <- parameter$getGroupList()
 
     for(i in 1:length(groupList)){
@@ -683,6 +741,25 @@ writeParameterObject.Rcpp_PAParameter <- function(parameter, file){
        file=file)
 }
 
+writeParameterObject.Rcpp_PANSEParameter <- function(parameter, file){
+  paramBase <- extractBaseInfo(parameter)
+  
+  currentAlpha <- parameter$currentAlphaParameter
+  currentLambdaPrime <- parameter$currentLambdaPrimeParameter
+  proposedAlpha <- parameter$proposedAlphaParameter
+  proposedLambdaPrime <- parameter$proposedLambdaPrimeParameter
+  model = "PANSE"
+  
+  
+  trace <- parameter$getTraceObject()
+  alphaTrace <- trace$getCodonSpecificParameterTrace(0)
+  lambdaPrimeTrace <- trace$getCodonSpecificParameterTrace(1)
+
+  save(list = c("paramBase", "currentAlpha", "currentLambdaPrime", "proposedAlpha",
+                "proposedLambdaPrime", "model", "alphaTrace", "lambdaPrimeTrace"),
+       file=file)
+}
+
 
 #called from "writeParameterObject."
 writeParameterObject.Rcpp_FONSEParameter <- function(parameter, file)
@@ -753,6 +830,9 @@ loadParameterObject <- function(files)
   }else if (firstModel == "PA") {
     parameter <- new(PAParameter)
     parameter <- loadPAParameterObject(parameter, files)
+  }else if (firstModel == "PANSE") {
+    parameter <- new(PANSEParameter)
+    parameter <- loadPANSEParameterObject(parameter, files)
   }else if (firstModel == "FONSE") {
     parameter <- new(FONSEParameter)
     parameter <- loadFONSEParameterObject(parameter, files)
@@ -982,6 +1062,58 @@ loadPAParameterObject <- function(parameter, files)
 
     if (i == 1){
       #for future use: This may break if PA is ran with more than
+      #one mixture, in this case just follow the format of the 
+      #ROC CSP parameters.
+      alphaTrace <- vector("list", length=numMutationCategories)
+      for (j in 1:numMutationCategories) {
+        for (k in 1:length(tempEnv$alphaTrace[[j]])){
+          alphaTrace[[j]][[k]] <- tempEnv$alphaTrace[[j]][[k]][1:max]
+        }
+      }
+      lambdaPrimeTrace <- vector("list", length=numSelectionCategories)
+      for (j in 1:numSelectionCategories) {
+        for (k in 1:length(tempEnv$lambdaPrimeTrace[[j]])){
+          lambdaPrimeTrace[[j]][[k]] <- tempEnv$lambdaPrimeTrace[[j]][[k]][1:max]
+        }
+      }
+    }else{
+      
+      curAlphaTrace <- tempEnv$alphaTrace
+      curLambdaPrimeTrace <- tempEnv$lambdaPrimeTrace
+      
+      combineThreeDimensionalTrace(alphaTrace, curAlphaTrace, max)
+      combineThreeDimensionalTrace(lambdaPrimeTrace, curLambdaPrimeTrace, max)
+    }
+  }#end of for loop (files)
+  
+  
+  parameter$currentAlphaParameter <- tempEnv$currentAlpha
+  parameter$proposedAlphaParameter <- tempEnv$proposedAlpha
+  parameter$currentLambdaPrimeParameter <- tempEnv$currentLambdaPrime
+  parameter$proposedLambdaPrimeParameter <- tempEnv$proposedLambdaPrime
+  trace <- parameter$getTraceObject()
+  trace$setCodonSpecificParameterTrace(alphaTrace, 0)
+  trace$setCodonSpecificParameterTrace(lambdaPrimeTrace, 1)
+  
+  parameter$setTraceObject(trace)
+  return(parameter) 
+}
+
+loadPANSEParameterObject <- function(parameter, files)
+{
+  parameter <- setBaseInfo(parameter, files)
+  
+  for (i in 1:length(files)){
+    tempEnv <- new.env();
+    load(file = files[i], envir = tempEnv)
+  
+    max <- tempEnv$paramBase$lastIteration + 1
+    numMixtures <- tempEnv$paramBase$numMix
+    numMutationCategories <- tempEnv$paramBase$numMut
+    numSelectionCategories <- tempEnv$paramBase$numSel
+
+    if (i == 1){
+      #for future use: This may break if PANSE is ran with more than
       #one mixture, in this case just follow the format of the 
       #ROC CSP parameters.
       alphaTrace <- vector("list", length=numMutationCategories)

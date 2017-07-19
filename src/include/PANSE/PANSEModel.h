@@ -12,6 +12,7 @@ class PANSEModel: public Model
 {
 	private:
 		PANSEParameter *parameter;
+        unsigned RFPCountColumn;
 
 		double calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
 				unsigned currRFPObserved, unsigned currNumCodonsInMRNA, double phiValue);
@@ -19,7 +20,7 @@ class PANSEModel: public Model
 
 	public:
 		//Constructors & Destructors:
-		explicit PANSEModel();
+		explicit PANSEModel(unsigned RFPCountColumn = 0u);
 		virtual ~PANSEModel();
 
 

@@ -27,6 +27,8 @@ initializeModelObject <- function(parameter, model = "ROC", with.phi = FALSE, fi
     c.model = new(FONSEModel)
   } else if (model == "PA") {
     c.model <- new(PAModel, rfp.count.column)
+  } else if (model == "PANSE") {
+    c.model <- new(PANSEModel, rfp.count.column)
   } else {
     stop("Unknown model.")
   }

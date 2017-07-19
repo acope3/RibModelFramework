@@ -2,6 +2,7 @@
 #include "include/base/Parameter.h"
 #include "include/ROC/ROCParameter.h"
 #include "include/PA/PAParameter.h"
+#include "include/PANSE/PANSEParameter.h"
 #include "include/FONSE/FONSEParameter.h"
 #include <Rcpp.h>
 using namespace Rcpp;
@@ -192,6 +193,43 @@ RCPP_MODULE(Parameter_mod)
 		        &PAParameter::setCurrentLambdaPrimeParameter) //R Specific
 		;
 
+	class_<PANSEParameter>("PANSEParameter")
+		.derives<Parameter>("Parameter")
+
+
+
+		//Constructors & Destructors:
+        .constructor()
+		.constructor <std::string>()
+		.constructor <std::vector<double>, std::vector<unsigned>, std::vector<unsigned>, bool>()
+		.constructor <std::vector<double>, unsigned, std::vector<unsigned>, bool, std::string>()
+
+
+
+		//Initialization, Restart, Index Checking:
+		.method("initAlpha", &PANSEParameter::initAlphaR)
+		.method("initLambdaPrime", &PANSEParameter::initLambdaPrimeR)
+		.method("initMutationSelectionCategories", &PANSEParameter::initMutationSelectionCategoriesR)
+
+
+		//CSP Functions:
+		//Listed in the properties section below. NOTE: these getter/setters are ONLY
+		//used in R
+
+		//Other Functions:
+		.method("getParameterForCategory", &PANSEParameter::getParameterForCategoryR)
+
+
+
+		.property("proposedAlphaParameter", &PANSEParameter::getProposedAlphaParameter,
+		        &PANSEParameter::setProposedAlphaParameter) //R Specific
+		.property("proposedLambdaPrimeParameter", &PANSEParameter::getProposedLambdaPrimeParameter,
+		        &PANSEParameter::setProposedLambdaPrimeParameter) //R Specific
+		.property("currentAlphaParameter", &PANSEParameter::getCurrentAlphaParameter,
+		        &PANSEParameter::setCurrentAlphaParameter) //R Specific
+		.property("currentLambdaPrimeParameter", &PANSEParameter::getCurrentLambdaPrimeParameter,
+		        &PANSEParameter::setCurrentLambdaPrimeParameter) //R Specific
+		;
 
 	class_<FONSEParameter>("FONSEParameter")
 		.derives<Parameter>("Parameter")

@@ -10,9 +10,10 @@ using namespace Rcpp;
 //----------- Constructors & Destructors ---------- //
 //--------------------------------------------------//
 
-PANSEModel::PANSEModel() : Model()
+PANSEModel::PANSEModel(unsigned _RFPCountColumn) : Model()
 {
     parameter = 0;
+    RFPCountColumn = _RFPCountColumn;
     //ctor
 }
 
@@ -42,6 +43,8 @@ double PANSEModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, doubl
 
     term2 *= currRFPObserved;
     term3 *= currAlpha;
+
+    my_print("term1 = %f\nterm2 = %f\nterm3 = %f\nalpha = %f\nlambda = %f\nphi = %f\n", term1, term2, term3, currAlpha, currLambdaPrime, phiValue);
 
     return term1 + term2 + term3;
 }

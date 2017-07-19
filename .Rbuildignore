@@ -7,6 +7,7 @@
 ^src\/CMakeLists\.txt$
 ^src\/cmake-build-debug$
 ^src\/CMake*$
+^src\/Makefile$
 
 ## Ignore compiled src file
 ^src\/src$
