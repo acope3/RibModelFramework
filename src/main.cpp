@@ -970,13 +970,14 @@ int main()
 
 	// SIMULATE GENOME: RFP
 	Genome genome;
-    /*if(testEqualityGenome(genome, genome)){
-        my_print("So far so good\n");
-    }
-    exit(1);
+    //if(testEqualityGenome(genome, genome)){
+      //  my_print("So far so good\n");
+    //}
+    //exit(1);
         
-	genome.readRFPData(pathBegin + "RibModelDev/data/rfp/PopPAData.csv", false);
-	//genome.readFasta(pathBegin + "RibModelDev/data/singleMixture/genome_2000.fasta", false);
+	genome.readRFPData(pathBegin + "rfp_file_20codons_20genes.csv", false);
+    exit(0);
+	/*genome.readFasta(pathBegin + "RibModelDev/data/singleMixture/genome_2000.fasta", false);
 	
 	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)

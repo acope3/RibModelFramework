@@ -206,8 +206,11 @@ void Gene::setPASequence(std::vector<std::vector<int>> table)
     unsigned nRows = (unsigned)table.size();
 
     seq.resize(nRows * 3); //multiply by three since codons
+    
+    std::cout << "nRows = " << nRows << "\n";
     for (unsigned i = 0; i < nRows; i++)
     {
+        std::cout << i << "\n";
         std::string codon = SequenceSummary::indexToCodon((unsigned) table[i][1]);
         seq.replace((unsigned) table[i][0] * 3, 3, codon);
     }
