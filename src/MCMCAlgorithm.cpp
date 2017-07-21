@@ -139,12 +139,11 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		std::vector <double> unscaledLogProb_prop(numSynthesisRateCategories, 0.0);
 
 		//Added by Alex
-		std::vector<double> unscaledLogLike_curr(numSynthesisRateCategories,0.0);
-		std::vector<double> unscaledLogLike_prop(numSynthesisRateCategories,0.0);
+		std::vector <double> unscaledLogLike_curr(numSynthesisRateCategories, 0.0);
+		std::vector <double> unscaledLogLike_prop(numSynthesisRateCategories, 0.0);
 
 		std::vector <double> unscaledLogPost_curr(numSynthesisRateCategories, 0.0);
 		std::vector <double> unscaledLogPost_prop(numSynthesisRateCategories, 0.0);
-
 
 		std::vector <double> unscaledLogProb_curr_singleMixture(numMixtures, 0.0);
 		std::vector <double> probabilities(numMixtures, 0.0);
@@ -485,7 +484,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 		}
 
 
-		if ((iteration % (50*adaptiveWidth)) == 0u)
+		if ((iteration % (50 * adaptiveWidth)) == 0u)
 		{
 			double gewekeScore = calculateGewekeScore(iteration/thinning);
 
