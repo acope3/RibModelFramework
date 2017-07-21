@@ -962,7 +962,7 @@ int main()
 #ifdef DENIZHAN
 int main()
 {
-	std::string pathBegin = "/home/nax/Desktop/Work/biolab/";
+	std::string pathBegin = "/home/nax/Work/biolab/TestingIn/";
 
 	unsigned numMixtures = 1;
 	std::vector<double> sphi_init(numMixtures, 2);
@@ -970,13 +970,14 @@ int main()
 
 	// SIMULATE GENOME: RFP
 	Genome genome;
-    /*if(testEqualityGenome(genome, genome)){
-        my_print("So far so good\n");
-    }
-    exit(1);
+    //if(testEqualityGenome(genome, genome)){
+      //  my_print("So far so good\n");
+    //}
+    //exit(1);
         
-	genome.readRFPData(pathBegin + "RibModelDev/data/rfp/PopPAData.csv", false);
-	//genome.readFasta(pathBegin + "RibModelDev/data/singleMixture/genome_2000.fasta", false);
+	genome.readRFPData(pathBegin + "rfp_file_20codons_20genes.csv", false);
+    exit(0);
+	/*genome.readFasta(pathBegin + "RibModelDev/data/singleMixture/genome_2000.fasta", false);
 	
 	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
@@ -1002,13 +1003,13 @@ int main()
 	//testUtility();
 	//testSequenceSummary();
 	//testGene();
-	testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
+	//testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
 	//testCovarianceMatrix();
 	//testParameter();
 	//testParameterWithFile(pathBegin + "HollisFile.txt");
 	//testPAParameter();
 	//testMCMCAlgorithm();
-	exit(0);
+	//exit(0);
 
 
 	std::string modelToRun = "PANSE"; //can be RFP, ROC or FONSE
@@ -1017,14 +1018,14 @@ int main()
 
 
 	my_print("Initializing MCMCAlgorithm object---------------\n");
-	unsigned samples = 10;
-	unsigned thinning = 10;
-	int useSamples = 100;
+	unsigned samples = 100;
+	unsigned thinning = 100;
+	int useSamples = 1000;
 	my_print("\t# Samples: %\n", samples);
 	my_print("\tThinning: %\n", thinning);
 	my_print("\t # Samples used: %\n", useSamples);
 	MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thinning, 10, true, true, true);
-	//mcmc.setRestartFileSettings(pathBegin + "RestartFile.txt", 20, true);
+	mcmc.setRestartFileSettings(pathBegin + "RestartFile.txt", 20, true);
 	my_print("Done!-------------------------------\n\n\n");
 
 
@@ -1117,6 +1118,7 @@ int main()
 		my_print("Initializing Genome object--------------------------\n");
 		Genome genome;
 		//genome.readRFPData(pathBegin + "RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+		genome.readRFPData(pathBegin + "PopPAData.csv");
 		my_print("Done!-------------------------------\n\n\n");
 
 
@@ -1144,19 +1146,19 @@ int main()
 		my_print("Done!------------------------\n\n\n");
 
 
-		my_print("Initializing PAParameter object--------------------\n\n");
-		PAParameter parameter;
+		my_print("Initializing PANSEParameter object--------------------\n\n");
+		PANSEParameter parameter;
 		//parameter.writeBasicRestartFile("/Users/hollisbui/HollisFile.txt");
 
 		if (fromRestart)
 		{
-			PAParameter tmp(pathBegin + "RibModelFramework/10_restartFile.rst");
+			PANSEParameter tmp(pathBegin + "RibModelFramework/10_restartFile.rst");
 			parameter = tmp;
 		}
 		else
 		{
 			std::string mixDef = Parameter::allUnique;
-			PAParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
+			PANSEParameter tmp(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
 
 			for (unsigned i = 0u; i < numMixtures; i++)
 			{
@@ -1174,7 +1176,7 @@ int main()
 
 
 		my_print("Initializing PAModel object--------------------------\n");
-		PAModel model;
+		PANSEModel model;
 		model.setParameter(parameter);
 		my_print("Done!----------------------------------\n\n\n");
 

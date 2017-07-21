@@ -56,4 +56,7 @@ junk
 *.dat
 symbols.rds
 cmake*
+CMake*
 autom4te.cache
+Makefile
+a.out

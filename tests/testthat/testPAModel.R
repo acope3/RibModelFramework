@@ -5,7 +5,7 @@ context("PA Model")
 
 test_that("PA Model testing simulated versus actual accuracy", {
   # Skip unless manually run or changed
-  #if (F)
+#  if (F)
     skip("PA Model testing is optional.")
   
   #####################

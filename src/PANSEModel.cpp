@@ -29,11 +29,24 @@ PANSEModel::~PANSEModel()
 double PANSEModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
         unsigned currRFPObserved, unsigned currNumCodonsInMRNA, double phiValue)
 {
-    double logLikelihood = ((std::lgamma((currNumCodonsInMRNA * currAlpha) + currRFPObserved)) - (std::lgamma(currNumCodonsInMRNA * currAlpha)))
+/*    double logLikelihood = ((std::lgamma((currNumCodonsInMRNA * currAlpha) + currRFPObserved)) - (std::lgamma(currNumCodonsInMRNA * currAlpha)))
         + (currRFPObserved * (std::log(phiValue) - std::log(currLambdaPrime + phiValue)))
         + ((currNumCodonsInMRNA * currAlpha) * (std::log(currLambdaPrime) - std::log(currLambdaPrime + phiValue)));
 
     return logLikelihood;
+    double term1, term2, term3;*/
+    double prevdelta = 1;
+    
+    double term1 = std::lgamma(currAlpha + currRFPObserved) - lgamma(currAlpha);
+    double term2 = std::log(phiValue) + std::log(prevdelta) - std::log(currLambdaPrime + (phiValue * prevdelta));
+    double term3 = std::log(currLambdaPrime) - std::log(currLambdaPrime + (phiValue * prevdelta));
+
+    term2 *= currRFPObserved;
+    term3 *= currAlpha;
+
+    my_print("term1 = %\nterm2 = %\nterm3 = %\nalpha = %\nlambda = %\nphi = %\n", term1, term2, term3, currAlpha, currLambdaPrime, phiValue);
+
+    return term1 + term2 + term3;
 }
 
 
@@ -58,7 +71,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 
     double phiValue = parameter->getSynthesisRate(geneIndex, synthesisRateCategory, false);
     double phiValue_proposed = parameter->getSynthesisRate(geneIndex, synthesisRateCategory, true);
-
+/*
 #ifdef _OPENMP
     //#ifndef __APPLE__
 #pragma omp parallel for reduction(+:logLikelihood,logLikelihood_proposed)
@@ -76,7 +89,22 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 
         logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
         logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue_proposed);
-    }
+    }*/
+
+    std::vector <unsigned> positions = gene.geneData.getPositionCodonID();
+
+        for (unsigned index = 0; index < positions.size(); index++){
+            std::string codon = gene.geneData.indexToCodon(positions[index]);
+        double currAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, false);
+        double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PANSEParameter::lmPri, codon, false);
+        unsigned currRFPObserved = gene.geneData.getRFPValue(index);
+
+        unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(index);
+        if (currNumCodonsInMRNA == 0) continue;
+
+        logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
+        logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue_proposed);
+        }
 
     double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(lambdaPrimeCategory, false);
     double logPhiProbability = Parameter::densityLogNorm(phiValue, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
@@ -89,6 +117,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
     logProbabilityRatio[2] = proposedLogLikelihood - std::log(phiValue);
     logProbabilityRatio[3] = currentLogLikelihood;
     logProbabilityRatio[4] = proposedLogLikelihood;
+    //5 and 6 are used in ROC for trace and should be added
 }
 
 
@@ -519,7 +548,7 @@ void PANSEModel::updateHyperParameter(unsigned hp)
     }
 }
 
-
+//TODO: Account for position
 void PANSEModel::simulateGenome(Genome &genome)
 {
     for (unsigned geneIndex = 0u; geneIndex < genome.getGenomeSize(); geneIndex++)
