@@ -25,7 +25,7 @@ test_that("PA Model testing simulated versus actual accuracy", {
     expect_equal(file.exists(fileTable), T)
   })
   
-  genome <- initializeGenomeObject(file = fileName, fasta=FALSE, FALSE)
+  genome <- initializeGenomeObject(file = fileName, fasta = FALSE, append = FALSE)
   
   sphi_init <- c(2)
   numMixtures <- 1

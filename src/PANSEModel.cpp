@@ -82,7 +82,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 
         double currAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, false);
         double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PANSEParameter::lmPri, codon, false);
-        unsigned currRFPObserved = gene.geneData.getRFPValue(index);
+        unsigned currRFPObserved = gene.geneData.getRFPValue(index, RFPCountColumn);
 
         unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(index);
         if (currNumCodonsInMRNA == 0) continue;
@@ -144,7 +144,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
         unsigned synthesisRateCategory = parameter->getSynthesisRateCategory(mixtureElement);
         // get non codon specific values, calculate likelihood conditional on these
         double phiValue = parameter->getSynthesisRate(i, synthesisRateCategory, false);
-        unsigned currRFPObserved = gene->geneData.getRFPValue(index);
+        unsigned currRFPObserved = gene->geneData.getRFPValue(index, RFPCountColumn);
         unsigned currNumCodonsInMRNA = gene->geneData.getCodonCountForCodon(index);
         if (currNumCodonsInMRNA == 0) continue;
 
@@ -551,13 +551,13 @@ void PANSEModel::updateHyperParameter(unsigned hp)
 //TODO: Account for position
 void PANSEModel::simulateGenome(Genome &genome)
 {
-    for (unsigned geneIndex = 0; geneIndex < genome.getGenomeSize(); geneIndex++)
+    for (unsigned geneIndex = 0u; geneIndex < genome.getGenomeSize(); geneIndex++)
     {
         unsigned mixtureElement = getMixtureAssignment(geneIndex);
         Gene gene = genome.getGene(geneIndex);
         double phi = parameter->getSynthesisRate(geneIndex, mixtureElement, false);
         Gene tmpGene = gene;
-        for (unsigned codonIndex = 0; codonIndex < 61; codonIndex++)
+        for (unsigned codonIndex = 0u; codonIndex < 61; codonIndex++)
         {
             std::string codon = SequenceSummary::codonArray[codonIndex];
             unsigned alphaCat = parameter->getMutationCategory(mixtureElement);
@@ -575,7 +575,7 @@ void PANSEModel::simulateGenome(Genome &genome)
             xx = rpois(1, xx[0] * phi);
             tmpGene.geneData.setRFPValue(codonIndex, xx[0], RFPCountColumn);
 #else
-            std::gamma_distribution<double> GDistribution(alphaPrime,1.0/lambdaPrime);
+            std::gamma_distribution<double> GDistribution(alphaPrime, 1.0/lambdaPrime);
             double tmp = GDistribution(Parameter::generator);
             std::poisson_distribution<unsigned> PDistribution(phi * tmp);
             unsigned simulatedValue = PDistribution(Parameter::generator);

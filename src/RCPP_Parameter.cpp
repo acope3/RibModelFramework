@@ -40,6 +40,7 @@ RCPP_MODULE(Parameter_mod)
 
 		//Group List Functions:
 		.method("getGroupList", &Parameter::getGroupList)
+		.method("setGroupList", &Parameter::setGroupList)
 
 		//Trace Functions:
 		.method("getTraceObject", &Parameter::getTraceObject) //TODO: only used in R?

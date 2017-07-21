@@ -12,7 +12,7 @@ class PANSEModel: public Model
 {
 	private:
 		PANSEParameter *parameter;
-        unsigned RFPCountColumn;
+		unsigned RFPCountColumn;
 
 		double calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
 				unsigned currRFPObserved, unsigned currNumCodonsInMRNA, double phiValue);
@@ -26,9 +26,9 @@ class PANSEModel: public Model
 
 		//Likelihood Ratio Functions:
 		virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k,
-				double* logProbabilityRatio);
+				double* logProbabilityRatio); // Depends on RFPCountColumn
 		virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
-				std::vector<double> &logAcceptanceRatioForAllMixtures);
+				std::vector<double> &logAcceptanceRatioForAllMixtures); // Depends on RFPCountColumn
 		virtual void calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration,
 				std::vector <double> &logProbabilityRatio);
 
@@ -103,7 +103,7 @@ class PANSEModel: public Model
 		virtual void updateAllHyperParameter();
 		virtual void updateHyperParameter(unsigned hp);
 
-		virtual void simulateGenome(Genome &genome);
+		virtual void simulateGenome(Genome &genome); // Depends on RFPCountColumn
 		virtual void printHyperParameters();
 		PANSEParameter* getParameter();
 

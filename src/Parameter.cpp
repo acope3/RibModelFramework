@@ -927,8 +927,8 @@ void Parameter::updateStdDevSynthesisRate()
 
 
 /* getStdCspForIndex (NOT EXPOSED)
- * Arguments: index of std_csp to be returned
- * Returns the std_csp at the index given.
+ * Arguments: index of standard deviation (proposal width) of the codon-specific parameter to be returned
+ * Returns the standard deviation (proposal width) of the codon-specific parameter at the index given.
  * Note: Used in unit testing only.
 */
 double Parameter::getStdCspForIndex(unsigned i)
