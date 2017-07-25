@@ -975,7 +975,7 @@ int main()
     //}
     //exit(1);
         
-	genome.readRFPData(pathBegin + "rfp_file_20codons_20genes.csv", false);
+	genome.readRFPData(pathBegin + "rfp_file_20positions_20genes.csv", false);
     exit(0);
 	/*genome.readFasta(pathBegin + "RibModelDev/data/singleMixture/genome_2000.fasta", false);
 	

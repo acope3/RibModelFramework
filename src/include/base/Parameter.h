@@ -265,6 +265,7 @@ class Parameter {
 		std::vector<unsigned> numAcceptForCodonSpecificParameters;
 		std::string mutationSelectionState; //TODO: Probably needs to be renamed
 
+        //<Alpha or Lambda or Mutation or Selection < Mixture < Codon >>> 
 		std::vector<std::vector<std::vector<double>>> proposedCodonSpecificParameter;
 		std::vector<std::vector<std::vector<double>>> currentCodonSpecificParameter;
 
