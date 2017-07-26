@@ -751,3 +751,11 @@ double PANSEModel::prob_Y_g_log(double curralpha, int sample_size, double lambda
 
     return term1 + term2 + term3;
 }
+
+//TODO: Add sigma to parameter object to keep it from being calulcated and initialize as need using MCMC adjust functions to reflect this
+double psi2phi(double psi, double sigma){
+    return sigma * psi;
+}
+double phi2psi(double phi, double sigma){
+    return phi / sigma;
+}
