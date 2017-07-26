@@ -44,7 +44,7 @@ double PANSEModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, doubl
     term2 *= currRFPObserved;
     term3 *= currAlpha;
 
-    my_print("term1 = %\nterm2 = %\nterm3 = %\nalpha = %\nlambda = %\nphi = %\n", term1, term2, term3, currAlpha, currLambdaPrime, phiValue);
+    //my_print("term1 = %\nterm2 = %\nterm3 = %\nalpha = %\nlambda = %\nphi = %\n", term1, term2, term3, currAlpha, currLambdaPrime, phiValue);
 
     return term1 + term2 + term3;
 }
@@ -71,6 +71,8 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 
     double phiValue = parameter->getSynthesisRate(geneIndex, synthesisRateCategory, false);
     double phiValue_proposed = parameter->getSynthesisRate(geneIndex, synthesisRateCategory, true);
+
+    std::string geneID = gene.getId();
 /*
 #ifdef _OPENMP
     //#ifndef __APPLE__
@@ -92,6 +94,8 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
     }*/
 
     std::vector <unsigned> positions = gene.geneData.getPositionCodonID();
+
+        my_print("\nGene = %s: \n\n", geneID.c_str());
 
         for (unsigned index = 0; index < positions.size(); index++){
             std::string codon = gene.geneData.indexToCodon(positions[index]);
@@ -117,7 +121,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
     logProbabilityRatio[2] = proposedLogLikelihood - std::log(phiValue);
     logProbabilityRatio[3] = currentLogLikelihood;
     logProbabilityRatio[4] = proposedLogLikelihood;
-    //5 and 6 are used in ROC for trace and should be added
+    //TODO: 5 and 6 are used in ROC for trace and should be added
 }
 
 
@@ -551,7 +555,7 @@ void PANSEModel::updateHyperParameter(unsigned hp)
 //TODO: Account for position
 void PANSEModel::simulateGenome(Genome &genome)
 {
-    for (unsigned geneIndex = 0u; geneIndex < genome.getGenomeSize(); geneIndex++)
+    /*for (unsigned geneIndex = 0u; geneIndex < genome.getGenomeSize(); geneIndex++)
     {
         unsigned mixtureElement = getMixtureAssignment(geneIndex);
         Gene gene = genome.getGene(geneIndex);
@@ -583,7 +587,15 @@ void PANSEModel::simulateGenome(Genome &genome)
 #endif
         }
         genome.addGene(tmpGene, true);
+    }*/
+    for (unsigned geneIndex = 0u; geneIndex < genome.getGenomeSize(); geneIndex++)
+    {
+        unsigned mixtureElement = getMixtureAssignment(geneIndex);
+        Gene gene = genome.getGene(geneIndex);
+        double phi = parameter->getSynthesisRate(geneIndex, mixtureElement, false);
+        Gene tmpGene = gene;
     }
+    
 }
 
 
