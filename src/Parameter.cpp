@@ -633,7 +633,7 @@ std::vector <double> Parameter::readPhiValues(std::string filename)
 		currentFile >> tmpString; //trash the first line, no info given.
 		while (currentFile >> tmpString)
 		{
-			pos = tmpString.find(",");
+			pos = tmpString.find(',');
 			if (pos != std::string::npos)
 			{
 				std::string val = tmpString.substr(pos + 1);
@@ -1281,10 +1281,12 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 			{
 			  
 			  if (acceptanceLevel < 0.1)
-					for (unsigned k = aaStart; k < aaEnd; k++)
-						covarianceMatrix[aaIndex] *= 0.8;
-				else
-				{
+			  {
+				  for (unsigned k = aaStart; k < aaEnd; k++)
+					  covarianceMatrix[aaIndex] *= 0.8;
+			  }
+			  else
+			  {
 				  //Update cov matrix based on previous window
 				  CovarianceMatrix covcurr(covarianceMatrix[aaIndex].getNumVariates());
 				  covcurr.calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples,
@@ -1296,10 +1298,10 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 				  //replace cov matrix based on previous window
 				  //The is approach was commented out and above code uncommented to replace it 
 				  //covarianceMatrix[aaIndex].calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
-				}
-				
-			//Decomposing of cov matrix to convert iid samples to covarying samples using matrix decomposition
-			//The decomposed matrix is used in the proposal of new samples
+			  }
+
+				//Decomposing of cov matrix to convert iid samples to covarying samples using matrix decomposition
+				//The decomposed matrix is used in the proposal of new samples
 				covarianceMatrix[aaIndex].choleskyDecomposition();
 
 				//Adjust proposal width if for codon specific parameters
