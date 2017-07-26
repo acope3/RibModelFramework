@@ -59,6 +59,10 @@ class PANSEParameter: public Parameter {
 		void proposeCodonSpecificParameter();
 		void updateCodonSpecificParameter(std::string grouping);
 
+        //NSE Functions
+        //void setNSEWaitingTimes
+
+
 
 		//Adaptive Width Functions:
 		void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastIteration, bool adapt); //may make virtual
