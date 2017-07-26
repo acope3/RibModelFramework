@@ -538,11 +538,11 @@ void PAModel::simulateGenome(Genome &genome)
 			double alphaPrime = alpha * gene.geneData.getCodonCountForCodon(codon);
 
 #ifndef STANDALONE
-				RNGScope scope;
-				NumericVector xx(1);
-				xx = rgamma(1, alphaPrime, 1.0/lambdaPrime);
-				xx = rpois(1, xx[0] * phi);
-				tmpGene.geneData.setRFPValue(codonIndex, xx[0], RFPCountColumn);
+			RNGScope scope;
+			NumericVector xx(1);
+			xx = rgamma(1, alphaPrime, 1.0/lambdaPrime);
+			xx = rpois(1, xx[0] * phi);
+			tmpGene.geneData.setRFPValue(codonIndex, xx[0], RFPCountColumn);
 #else
 			std::gamma_distribution<double> GDistribution(alphaPrime, 1.0/lambdaPrime);
 			double tmp = GDistribution(Parameter::generator);

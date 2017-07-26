@@ -1479,7 +1479,8 @@ int testGene()
  * Used in testGenome for convenience.
  * If simulated is true, we will only count up categories for long.
  */
-void testGenomePAHelper(Genome* genome, bool simulated) {
+void testGenomePAHelper(Genome* genome, bool simulated)
+{
     // All values here are derived from readRFPData.csv's hardcoded values
     // or from readSimulatedGenome.csv
 
@@ -1588,13 +1589,58 @@ void testGenomePAHelper(Genome* genome, bool simulated) {
 }
 
 
+/* testGenomeSimulatedEqualityHelper (NOT EXPOSED)
+ * Arguments: Two genomes to check if they are equal to one another, with genome1 created by the simulateGenome function.
+ * Compares if two genomes are equivalent under the assumption that genome1 was created by the simulateGenome function,
+ * and therefore this genome lacks position-based data and therefore cannot be checked by a simple == operator.
+ *
+ * Thus, compared to an == statement, the following do not need to get checked: simulatedGenes (nothing is stored),
+ * numGenesWithPhi (nothing for both), RFPCountColumnNames (only one RFPCountColumn is stored, and it does not need a name [yet]),
+ * seq (indeterminable because position is not stored), id and description (not handled in testing) observedSynthesisRates
+ * (nothing for both), codonPositions (used in FONSE), naa (not handled in testing), RFPCount (this is a position-based value,
+ * as opposed to sumRFPCount), and positionCodonID (position-based).
+ *
+ * Used in testGenome for convenience.
+ * Returns true if successful, false if error is found.
+ */
+bool testGenomeSimulatedPAEqualityHelper(Genome genome1, Genome genome2)
+{
+    std::vector <Gene> genes1, genes2;
+
+    genes1 = genome1.getGenes(false);
+    genes2 = genome2.getGenes(false);
+
+    // Check if number of genes in genomes are equal
+    if (genes1.size() != genes2.size()) return false;
+
+    for (unsigned i = 0u; i < genes1.size(); i++)
+    {
+        SequenceSummary seq1 = genes1[i].geneData;
+        SequenceSummary seq2 = genes2[i].geneData;
+
+        // Check if sumRFPCount is equal
+        if (seq1.getSumRFPCount() != seq2.getSumRFPCount()) return false;
+
+        // Check if nCodons is equal for all 64 codons.
+        for (unsigned j = 0u; j < 64; j++)
+        {
+            if (seq1.getCodonCountForCodon(j) != seq2.getCodonCountForCodon(j))
+                return false;
+        }
+    }
+
+    return true;
+}
+
+
 /* testGenome (RCPP EXPOSED)
  * Arguments: string of the name of the directory in which testing files are found for reading and writing files
  * Performs Unit Testing on functions within Genome.cpp
  * that are not exposed to RCPP already.
  * Returns 0 if successful, 1 if error found.
  */
-int testGenome(std::string testFileDir) {
+int testGenome(std::string testFileDir)
+{
     Genome genome1;
     Genome genome2;
     Gene g1("ATGGCCACTATTGGGTCTTAG", "TEST001", "TEST001 Test Gene");
@@ -1979,49 +2025,34 @@ int testGenome(std::string testFileDir) {
         globalError = 1;
     }
 
-    // TODO: Rewrite, test new function
-
     //-----------------------------------------------------//
     //------ readSimulatedGenomeFromPAModel Function ------//
     //-----------------------------------------------------//
-    file2 = testFileDir + "/" + "readSimulatedGenome.csv";
+    file = testFileDir + "/" + "readSimulatedGenome.csv";
 
-    genome1.clear();
+    // First, check if the function works compared to a PA-formatted read-in genome (genome 1).
     testGenomePAHelper(&genome1, true);
-    genome2.clear();
-    genome2.readSimulatedGenomeFromPAModel(file2);
+    genome2.readSimulatedGenomeFromPAModel(file);
 
-    if (!(testEqualityGenome(genome1, genome2)))
+    if (!(testGenomeSimulatedPAEqualityHelper(genome1, genome2)))
     {
-        my_printError("Error in testGenome: readSimulatedGenomeFromPAModel. Genome written is not equivalent to what is read.\n");
+        my_printError("Error in testGenome: readSimulatedGenomeFromPAModel with non-simulated genes. Genomes are not equivalent.\n");
         error = 1;
         globalError = 1;
     }
 
-    std::string file3 = testFileDir + "/" + "writeSimulatedGenome.csv";
+    file2 = testFileDir + "/" + "writeSimulatedGenome.csv";
 
-    genome2.writeRFPData(file3, true);
-    genome1.clear();
-    genome1.readSimulatedGenomeFromPAModel(file3);
+    // Then, check if the function works compared to an RFPData-formatted read-in genome (genome 1 again).
+    genome2.writeRFPData(file2, true);
+    genome1.readSimulatedGenomeFromPAModel(file2);
     
-    if (!(testEqualityGenome(genome1, genome2)))
+    if (!(testGenomeSimulatedPAEqualityHelper(genome1, genome2)))
     {
-        my_printError("Error in testGenome: readSimulatedGenomeFromPAModel. Genome written is not equivalent to what is read.\n");
+        my_printError("Error in testGenome: readSimulatedGenomeFromPAModel with simulated genes. Genomes are not equivalent.\n");
         error = 1;
         globalError = 1;
     }
-
-    /* NOTE: Not working! TODO: Fix; idea: position of codons is unneeded, and writeRFPData writes all codons even with
-     * 0 counts. When readSimulatedGenomeFromPAModel is called, it should happily ignore these ncodon = 0 codons, and we can
-     * compare the actual numbers of codons and their RFP counts. BUT, == compares sequences, which is unnecessary and
-     * ambiguous since position is not tracked -- we would print them in a convenient order rather than a set sequence.
-    if (!(genome1 == genome2))
-    {
-        my_printError("Error in testGenome: readSimulatedGenomeFromPAModel or writeRFPData with simulated genes.");
-        my_printError(" Genomes are not equivalent.\n");
-        error = 1;
-        globalError = 1;
-    }*/
 
     if (!error)
         my_print("Genome readSimulatedGenomeFromPAModel --- Pass\n");
@@ -3101,7 +3132,6 @@ int testParameterWithFile(std::string filename)
 int testCovarianceMatrix()
 {
     CovarianceMatrix covM; //Default constructor sets numVariates to 2.
-    CovarianceMatrix covMcp; //Default constructor sets numVariates to 2.
     int error = 0;
     int globalError = 0;
 
@@ -3135,10 +3165,6 @@ int testCovarianceMatrix()
     else
         error = 0; //Reset for next function.
 
-    covMcp = covM;
-
-    if(covMcp == covM) my_print("CovarianceMatrix == --- Pass\n");
-    else  my_print("CovarianceMatrix == --- Fail\n");
     //------------------------------//
     //------ setDiag Function ------//
     //------------------------------//
@@ -3219,6 +3245,21 @@ int testCovarianceMatrix()
     }
     else
         my_print("CovarianceMatrix getNumVariates --- Pass\n");
+
+    //----------------------------------//
+    //------ == Operator Function ------//
+    //----------------------------------//
+    CovarianceMatrix covMcp; //Default constructor sets numVariates to 2.
+
+    covMcp = covM;
+
+    if (!(covMcp == covM))
+    {
+        my_printError("Error in CovarianceMatrix == operator. Fails to be equivalent.\n");
+        globalError = 1;
+    }
+    else
+        my_print("CovarianceMatrix == operator --- Pass\n");
 
     //TODO: Test these final two functions.
     //-------------------------------------------------------------//
@@ -3396,35 +3437,6 @@ int testPAParameter()
  * that are not exposed to RCPP already.
  * Returns 0 if successful, 1 if error found.
 */
-
-bool testEqualityGenome(Genome object, Genome other){
-    int i, j;
-    std::vector <Gene> genes1, genes2;
-    
-    genes1 = object.getGenes(false);
-    genes2 = other.getGenes(false);
-
-    if(genes1.size() != genes2.size()) return false;
-
-    for (i = 0; i < genes1.size(); i++){
-        SequenceSummary seq1 = genes1[i].geneData;
-        SequenceSummary seq2 = genes2[i].geneData;
-        std::array <unsigned, 64> sumRFP1 = seq1.getSumRFPCount();
-        std::array <unsigned, 64> sumRFP2 = seq2.getSumRFPCount();
-
-        for(j = 0; j < sumRFP1.size(); j++){
-            if(sumRFP1[j] != sumRFP2[j]){
-                return false;
-            }
-            if(seq1.getCodonCountForCodon(j) != seq2.getCodonCountForCodon(j)){
-                return false;
-            }
-        }
-    }
-    
-    return true;
-}
-
 int testMCMCAlgorithm()
 {
 	unsigned samples = 10;

@@ -78,7 +78,7 @@ class SequenceSummary
 		std::array <unsigned, 64> getSumRFPCount(unsigned RFPCountColumn = 0u);
 		void setSumRFPCount(std::array <unsigned, 64> arg, unsigned RFPCountColumn = 0u);
 
-		std::vector <unsigned> getPositionCodonID();
+		std::vector <unsigned> getPositionCodonID(); //Used in PANSE for getting codon positions over gene
 		void setPositionCodonID(std::vector <unsigned> arg);
 
         //TODO: Adjust naming for getRFPValue and sumRFPCount

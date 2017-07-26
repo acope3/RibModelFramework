@@ -3,10 +3,14 @@
 ## Ignore travis config file
 ^\.travis\.yml$
 
-## Ignore CMakeLists
+## Ignore CMake files
 ^src\/CMakeLists\.txt$
 ^src\/cmake-build-debug$
 ^src\/CMake*$
+^src\/Makefile$
+
+## Ignore compiled src file
+^src\/src$
 
 ## Ignore IDE setting folders
 ^src\/\.idea$

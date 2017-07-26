@@ -16,6 +16,7 @@ class Model
         explicit Model();
 		// TODO: Rule of Three dictates we may need a copy assignment operator as well (operator=)
         virtual ~Model();
+        Model& operator=(const Model& rhs);
 
 
         //Likelihood Ratio Functions:

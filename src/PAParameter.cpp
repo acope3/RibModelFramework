@@ -374,6 +374,8 @@ void PAParameter::initLambdaPrime(double lambdaPrimeValue, unsigned mixtureEleme
  * Arguments: vector of file names, number of categories, parameter type to initialize
  * From a file, initialize the alpha or lambda prime values for all categories. The files vector length should
  * be the same number as numCategories.
+ * TODO: Rename to initAlphaLambdaCategories. This is difficult since this function is derived from a base function
+ * in Parameter.cpp.
 */
 void PAParameter::initMutationSelectionCategories(std::vector<std::string> files, unsigned numCategories, unsigned paramType)
 {
