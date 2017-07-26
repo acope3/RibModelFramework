@@ -489,7 +489,7 @@ void FONSEParameter::proposeCodonSpecificParameter()
 
     std::vector<double> covaryingNums;
 	//TODO: Explain the following line
-    covaryingNums = covarianceMatrix[SequenceSummary::AAToAAIndex(aa)].transformIidNumersIntoCovaryingNumbers(iidProposed);
+    covaryingNums = covarianceMatrix[SequenceSummary::AAToAAIndex(aa)].transformIidNumbersIntoCovaryingNumbers(iidProposed);
 		unsigned biggestCat = std::max(numMutationCategories, numSelectionCategories);
 
 		for (unsigned i = 0; i < biggestCat; i++)

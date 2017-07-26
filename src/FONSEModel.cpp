@@ -92,7 +92,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 	double mutation[5];
 	double selection[5];
 
-	//SequenceSummary *seqsum = gene.getSequenceSummary(); //currently unused
+	//SequenceSummary *sequenceSummary = gene.getSequenceSummary(); //currently unused
 
 	// get correct index for everything
 	unsigned mutationCategory = parameter->getMutationCategory(k);
@@ -136,11 +136,11 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 	logProbabilityRatio[0] = (proposedLogLikelihood - currentLogLikelihood) - (std::log(phiValue) - std::log(phiValue_proposed));
 	logProbabilityRatio[1] = currentLogLikelihood - std::log(phiValue_proposed);
 	if (std::isinf(logProbabilityRatio[1])) {
-		my_print("logprob1 inf\n");
+		my_print("logProb1 inf\n");
 	}
 	logProbabilityRatio[2] = proposedLogLikelihood - std::log(phiValue);
 	if (std::isinf(logProbabilityRatio[2])) {
-		my_print("logprob2 inf\n");
+		my_print("logProb2 inf\n");
 	}
 
 	//------------NOTE: Jeremy, Cedric changed the reverse jump to where we DON'T include it. I had my PA
@@ -166,7 +166,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 	std::string curAA;
 
 	Gene *gene;
-	SequenceSummary *seqsum;
+	SequenceSummary *sequenceSummary;
 	unsigned aaIndex = SequenceSummary::AAToAAIndex(grouping);
 
 #ifdef _OPENMP
@@ -176,8 +176,8 @@ void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 	for (unsigned i = 0u; i < numGenes; i++)
 	{
 		gene = &genome.getGene(i);
-		seqsum = gene->getSequenceSummary();
-		if (seqsum->getAACountForAA(aaIndex) == 0) continue;
+		sequenceSummary = gene->getSequenceSummary();
+		if (sequenceSummary->getAACountForAA(aaIndex) == 0) continue;
 
 		// which mixture element does this gene belong to
 		unsigned mixtureElement = parameter->getMixtureAssignment(i);
@@ -221,7 +221,7 @@ void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 		currentMphi[i] = -((currentStdDevSynthesisRate[i] * currentStdDevSynthesisRate[i]) / 2);
 		proposedStdDevSynthesisRate[i] = getStdDevSynthesisRate(i, true);
 		proposedMphi[i] = -((proposedStdDevSynthesisRate[i] * proposedStdDevSynthesisRate[i]) / 2);
-		// take the jacobian into account for the non-linear transformation from logN to N distribution
+		// take the Jacobian into account for the non-linear transformation from logN to N distribution
 		lpr -= (std::log(currentStdDevSynthesisRate[i]) - std::log(proposedStdDevSynthesisRate[i]));
 	}
 

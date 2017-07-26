@@ -1,6 +1,7 @@
 #include "include/MCMCAlgorithm.h"
 #include "include/Testing.h"
 #include <vector>
+#include "include/SequenceSummary.h"
 
 #ifdef CEDRIC
 int main()
@@ -700,20 +701,20 @@ int main()
 	//testUtility();
 	//testSequenceSummary();
 	//testGene();
-	testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
+	//testGenome(pathBegin + "RibModelFramework/tests/testthat/UnitTestingData");
 	//testCovarianceMatrix();
 	//testParameter();
 	//testMCMCAlgorithm();
-	exit(0);
+	//exit(0);
 
 
-	std::string modelToRun = "RFP"; //can be RFP, ROC or FONSE
+	std::string modelToRun = "PA"; //can be PA, ROC or FONSE
 	bool withPhi = false;
 	bool fromRestart = false;
 
 
 	my_print("Initializing MCMCAlgorithm object---------------\n");
-	unsigned samples = 10;
+	unsigned samples = 1000;
 	unsigned thinning = 10;
 	int useSamples = 100;
 	my_print("\t# Samples: %\n", samples);
@@ -722,12 +723,11 @@ int main()
 	MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thinning, 10, true, true, true);
 	//mcmc.setRestartFileSettings(pathBegin + "RestartFile.txt", 20, true);
 	my_print("Done!-------------------------------\n\n\n");
-
+	my_print("Initializing Genome object--------------------------\n");
+	Genome genome;
 
 	if (modelToRun == "ROC")
 	{
-		my_print("Initializing Genome object--------------------------\n");
-		Genome genome;
 		genome.readFasta(pathBegin + "RibModelDev/data/twoMixtures/simulatedAllUniqueR.fasta");
 		if (withPhi)
 		{
@@ -756,7 +756,6 @@ int main()
 				else geneAssignment[i] = 0u;
 			}
 		}
-		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 		my_print("Done!------------------------\n\n\n");
 
 
@@ -808,11 +807,9 @@ int main()
 		mcmc.run(genome, model, 1, 0);
 		my_print("Done!----------------------------------\n\n\n");
 	} //END OF ROC
-	else if (modelToRun == "RFP")
+	else if (modelToRun == "PA")
 	{
-		my_print("Initializing Genome object--------------------------\n");
-		Genome genome;
-		//genome.readRFPData(pathBegin + "RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+		genome.readRFPData(pathBegin + "labnotebooks/Hollis.Bui/RunnableScriptsAndData/June2017PAModelPop/PopPADataOneGene.csv");
 		my_print("Done!-------------------------------\n\n\n");
 
 
@@ -836,13 +833,12 @@ int main()
 				else geneAssignment[i] = 0u;
 			}
 		}
-		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 		my_print("Done!------------------------\n\n\n");
 
 
 		my_print("Initializing PAParameter object--------------------\n\n");
 		PAParameter parameter;
-		//parameter.writeBasicRestartFile("/Users/hollisbui/HollisFile.txt");
+		parameter.writeBasicRestartFile(pathBegin + "RibModelFramework/HollisRestartFile.txt");
 
 		if (fromRestart)
 		{
@@ -864,7 +860,7 @@ int main()
 
 			tmp.InitializeSynthesisRate(genome, sphi_init[0]);
 			parameter = tmp;
-			//parameter.writeEntireRestartFile("/Users/hollisbui/HollisFile2.txt");
+			parameter.writeEntireRestartFile(pathBegin + "RibModelFramework/HollisRestartFile2.txt");
 		}
 		my_print("Done!--------------------------------\n\n\n");
 
@@ -879,11 +875,34 @@ int main()
 		mcmc.run(genome, model, 1, 0);
 		my_print("Done!----------------------------------\n\n\n");
 
-	} //END OF RFP
+		std::vector<double> alphaList (61,0);
+		std::vector<double> lambdaPrimeList (61,0);
+		std::vector<double> waitingTimes (61,0);
+		std::vector<double> waitRates (61,0);
+		std::vector<std::string> codonList = SequenceSummary::codons();
+		unsigned cat = 0u;
+
+		for (unsigned i = 0u; i < 61; i++)
+		{
+			std::string codon = codonList[i];
+
+			alphaList[i] = parameter.getCodonSpecificPosteriorMean(cat, samples / 2, codon, 0, false);
+			//alphaTrace <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(1, codon, 0, FALSE)
+			//alpha.ci[i,] <- quantile(alphaTrace[(samples * 0.5):samples], probs = c(0.025,0.975))
+
+			lambdaPrimeList[i] = parameter.getCodonSpecificPosteriorMean(cat, samples / 2, codon, 1, false);
+			//lambdaPrimeTrace <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(1, codon, 1, FALSE)
+			//lambdaPrime.ci[i,] <- quantile(lambdaPrimeTrace[(samples * 0.5):samples], probs = c(0.025,0.975))
+
+			waitingTimes[i] = alphaList[i] / lambdaPrimeList[i];
+			waitRates[i] = (1.0/waitingTimes[i]);
+
+			my_print("For codon %, alpha is %, lambda prime is %, and waitingTime is %.\n", codonList[i], alphaList[i],
+					 lambdaPrimeList[i], waitingTimes[i]);
+		}
+	} //END OF PA
 	else if (modelToRun == "FONSE")
 	{
-		my_print("initialize Genome object--------------------------\n");
-		Genome genome;
 		genome.readFasta(pathBegin + "RibModelDev/data/singleMixture/genome_2000.fasta");
 		my_print("Done!-------------------------------\n\n\n");
 
@@ -908,7 +927,6 @@ int main()
 				else geneAssignment[i] = 0u;
 			}
 		}
-		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 		my_print("Done!------------------------\n\n\n");
 
 

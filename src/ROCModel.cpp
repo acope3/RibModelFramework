@@ -80,7 +80,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 	double logLikelihood = 0.0;
 	double logLikelihood_proposed = 0.0;
 
-	SequenceSummary *seqsum = gene.getSequenceSummary();
+	SequenceSummary *sequenceSummary = gene.getSequenceSummary();
 
 	// get correct index for everything
 	unsigned mutationCategory = parameter->getMutationCategory(k);
@@ -102,15 +102,15 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 		std::string curAA = getGrouping(i);
 
 		// skip amino acids which do not occur in current gene. Avoid useless calculations and multiplying by 0
-		if (seqsum->getAACountForAA(i) == 0) continue;
+		if (sequenceSummary->getAACountForAA(i) == 0) continue;
 
 		// get number of codons for AA (total number not parameter->count)
-		unsigned numCodons = seqsum->GetNumCodonsForAA(curAA);
+		unsigned numCodons = sequenceSummary->GetNumCodonsForAA(curAA);
 		// get mutation and selection parameter->for gene
 		parameter->getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
 		parameter->getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
 		// get codon occurrence in sequence
-		obtainCodonCount(seqsum, curAA, codonCount);
+		obtainCodonCount(sequenceSummary, curAA, codonCount);
 
 		logLikelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
 		logLikelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue_proposed);
@@ -164,7 +164,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 
 	int codonCount[6];
 	Gene *gene;
-	SequenceSummary *seqsum;
+	SequenceSummary *sequenceSummary;
 	unsigned aaIndex = SequenceSummary::AAToAAIndex(grouping);
 #ifdef _OPENMP
 //#ifndef __APPLE__
@@ -173,8 +173,8 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 	for (unsigned i = 0u; i < numGenes; i++)
 	{
 		gene = &genome.getGene(i);
-		seqsum = gene->getSequenceSummary();
-		if (seqsum->getAACountForAA(aaIndex) == 0) continue;
+		sequenceSummary = gene->getSequenceSummary();
+		if (sequenceSummary->getAACountForAA(aaIndex) == 0) continue;
 
 		// which mixture element does this gene belong to
 		unsigned mixtureElement = parameter->getMixtureAssignment(i);
@@ -192,7 +192,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 		parameter->getParameterForCategory(mutationCategory, ROCParameter::dM, grouping, true, mutation_proposed);
 		parameter->getParameterForCategory(selectionCategory, ROCParameter::dEta, grouping, true, selection_proposed);
 
-		obtainCodonCount(seqsum, grouping, codonCount);
+		obtainCodonCount(sequenceSummary, grouping, codonCount);
 		likelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
 		likelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation_proposed, selection_proposed, phiValue);
 	}
@@ -271,13 +271,13 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 			{
 				unsigned mixtureAssignment = getMixtureAssignment(j);
 				mixtureAssignment = getSynthesisRateCategory(mixtureAssignment);
-				double logphi = std::log(getSynthesisRate(j, mixtureAssignment, false));
+				double logPhi = std::log(getSynthesisRate(j, mixtureAssignment, false));
 				double obsPhi = genome.getGene(j).getObservedSynthesisRate(i);
 				if (obsPhi > -1.0)
 				{
-					double logobsPhi = std::log(obsPhi);
-					double proposed = Parameter::densityNorm(logobsPhi, logphi + noiseOffset_proposed, observedSynthesisNoise, true);
-					double current = Parameter::densityNorm(logobsPhi, logphi + noiseOffset, observedSynthesisNoise, true);
+					double logObsPhi = std::log(obsPhi);
+					double proposed = Parameter::densityNorm(logObsPhi, logPhi + noiseOffset_proposed, observedSynthesisNoise, true);
+					double current = Parameter::densityNorm(logObsPhi, logPhi + noiseOffset, observedSynthesisNoise, true);
 					lpr += proposed - current;
 				}
 			}

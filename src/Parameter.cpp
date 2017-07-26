@@ -1481,7 +1481,8 @@ double Parameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex,
 		samples = traceLength;
 	}
 
-	float posteriorMean = getSynthesisRatePosteriorMean(samples, geneIndex, mixtureElement);
+	// NOTE: The loss of precision here is acceptable for storage purposes.
+	float posteriorMean = (float)getSynthesisRatePosteriorMean(samples, geneIndex, mixtureElement);
 
 	float posteriorVariance = 0.0;
 	if (!std::isnan(posteriorMean))
@@ -1558,7 +1559,7 @@ std::vector<double> Parameter::getCodonSpecificQuantile(unsigned mixtureElement,
 																							  + lastIteration + 1));
     std::sort(samplesTrace.begin(), samplesTrace.end());
     std::vector<double> retVec(probs.size());
-    for (int i = 0; i < probs.size(); i++)
+    for (unsigned i = 0u; i < probs.size(); i++)
     {
         double h = (1.0+(samplesTrace.size()-1.0)*probs[i]);
         int low = (int)h;
@@ -1666,7 +1667,7 @@ int Parameter::pivotPair(double a[], int b[], int first, int last)
 // http://www.tandfonline.com/doi/pdf/10.1080/03081070500502967 */
 double Parameter::calculateSCUO(Gene& gene, unsigned maxAA)
 {
-	SequenceSummary *seqsum = gene.getSequenceSummary();
+	SequenceSummary *sequenceSummary = gene.getSequenceSummary();
 
 	double totalDegenerateAACount = 0.0;
 	for (unsigned i = 0u; i < maxAA; i++)
@@ -1674,7 +1675,7 @@ double Parameter::calculateSCUO(Gene& gene, unsigned maxAA)
 		std::string curAA = SequenceSummary::AminoAcidArray[i];
 		// skip amino acids with only one codon or stop codons
 		if (curAA == "X" || curAA == "M" || curAA == "W") continue;
-		totalDegenerateAACount += (double)seqsum->getAACountForAA(i);
+		totalDegenerateAACount += (double)sequenceSummary->getAACountForAA(i);
 	}
 
 	double scuoValue = 0.0;
@@ -1685,7 +1686,7 @@ double Parameter::calculateSCUO(Gene& gene, unsigned maxAA)
 		if (curAA == "X" || curAA == "M" || curAA == "W") continue;
 		double numDegenerateCodons = SequenceSummary::GetNumCodonsForAA(curAA);
 
-		double aaCount = (double)seqsum->getAACountForAA(i);
+		double aaCount = (double)sequenceSummary->getAACountForAA(i);
 		if (aaCount == 0) continue;
 
 		unsigned start, end;
@@ -1695,7 +1696,7 @@ double Parameter::calculateSCUO(Gene& gene, unsigned maxAA)
 		double aaEntropy = 0.0;
 		for (unsigned k = start; k < end; k++)
 		{
-			int currCodonCount = seqsum->getCodonCountForCodon(k);
+			int currCodonCount = sequenceSummary->getCodonCountForCodon(k);
 			if (currCodonCount == 0) continue;
 			double codonProportion = (double)currCodonCount / aaCount;
 			aaEntropy += codonProportion*std::log(codonProportion);
@@ -1853,13 +1854,13 @@ double Parameter::randUnif(double minVal, double maxVal)
 unsigned Parameter::randMultinom(std::vector <double> &probabilities, unsigned mixtureElements)
 {
 	// calculate cumulative sum to determine group boundaries
-	double* cumsum = new double[mixtureElements]();
+	double* cumSum = new double[mixtureElements]();
 	//std::vector<double> cumsum(groups);
-	cumsum[0] = probabilities[0];
+	cumSum[0] = probabilities[0];
 
 	for (unsigned i = 1u; i < mixtureElements; i++)
 	{
-		cumsum[i] = cumsum[i-1u] + probabilities[i];
+		cumSum[i] = cumSum[i-1u] + probabilities[i];
 	}
 	// draw random number from U(0,1)
 	double referenceValue;
@@ -1876,26 +1877,26 @@ unsigned Parameter::randMultinom(std::vector <double> &probabilities, unsigned m
 	unsigned returnValue = 0u;
 	for (unsigned i = 0u; i < mixtureElements; i++)
 	{
-		if (referenceValue <= cumsum[i])
+		if (referenceValue <= cumSum[i])
 		{
 			returnValue = i;
 			break;
 		}
 	}
-	delete [] cumsum;
+	delete [] cumSum;
 	return returnValue;
 }
 
 unsigned Parameter::randMultinom(double *probabilities, unsigned mixtureElements)
 {
 	// calculate cumulative sum to determine group boundaries
-	double* cumsum = new double[mixtureElements]();
+	double* cumSum = new double[mixtureElements]();
 	//std::vector<double> cumsum(groups);
-	cumsum[0] = probabilities[0];
+	cumSum[0] = probabilities[0];
 
 	for (unsigned i = 1u; i < mixtureElements; i++)
 	{
-		cumsum[i] = cumsum[i - 1u] + probabilities[i];
+		cumSum[i] = cumSum[i - 1u] + probabilities[i];
 	}
 	// draw random number from U(0,1)
 	double referenceValue;
@@ -1912,15 +1913,16 @@ unsigned Parameter::randMultinom(double *probabilities, unsigned mixtureElements
 	unsigned returnValue = 0u;
 	for (unsigned i = 0u; i < mixtureElements; i++)
 	{
-		if (referenceValue <= cumsum[i])
+		if (referenceValue <= cumSum[i])
 		{
 			returnValue = i;
 			break;
 		}
 	}
-	delete[] cumsum;
+	delete[] cumSum;
 	return returnValue;
 }
+
 
 double Parameter::densityNorm(double x, double mean, double sd, bool log)
 {

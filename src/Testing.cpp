@@ -3263,13 +3263,13 @@ int testCovarianceMatrix()
 
     //TODO: Test these final two functions.
     //-------------------------------------------------------------//
-    //------ transformIidNumersIntoCovaryingNumbers Function ------//
+    //------ transformIidNumbersIntoCovaryingNumbers Function ------//
     //-------------------------------------------------------------//
     //TODO: Should implement Parameter unit testing for RandNorm before doing this!
 
     //Size is numCodons * (numMutationCategories + numSelectionCategories for ROCParameter
     //Each value is based on randNorm(0.0, 1.0)
-    //covM.transformIidNumersIntoCovaryingNumbers(iidTest);
+    //covM.transformIidNumbersIntoCovaryingNumbers(iidTest);
 
     //------------------------------------------------//
     //------ calculateSampleCovariance Function ------//

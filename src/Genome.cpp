@@ -386,7 +386,9 @@ void Genome::readRFPData(std::string filename, bool append)
 							else tableRow[tableIndex] = -1;
 						}
                         else
+						{
 							tableRow[tableIndex] = -1;
+						}
 
 						pos = pos2;
 						tableIndex++;
@@ -447,7 +449,7 @@ void Genome::writeRFPData(std::string filename, bool simulated)
 			{
 				Gene *currentGene = &genes[geneIndex];
 				std::vector<unsigned> positionCodonID = currentGene->geneData.getPositionCodonID();
-				unsigned numPositions = (unsigned) positionCodonID.size();
+				unsigned numPositions = (unsigned)positionCodonID.size();
 
 				for (unsigned position = 0u; position < numPositions; position++)
 				{
@@ -478,8 +480,8 @@ void Genome::writeRFPData(std::string filename, bool simulated)
 
 					Fout << currentGene->getId() << "," << codon << ",";
 
-					SequenceSummary *seqsum = currentGene->getSequenceSummary();
-					unsigned codonCount = seqsum -> getCodonCountForCodon(codonIndex);
+					SequenceSummary *sequenceSummary = currentGene->getSequenceSummary();
+					unsigned codonCount = sequenceSummary->getCodonCountForCodon(codonIndex);
 					Fout << codonCount << ",";
 
 					// Simulated sum RFP counts will only print one column! So, we default to column = 0.
@@ -860,8 +862,8 @@ std::vector<unsigned> Genome::getCodonCountsPerGene(std::string codon)
 	for (unsigned i = 0u; i < genes.size(); i++)
 	{
 		Gene gene = genes[i];
-		SequenceSummary *seqsum = gene.getSequenceSummary();
-		codonCounts[i] = seqsum -> getCodonCountForCodon(codonIndex);
+		SequenceSummary *sequenceSummary = gene.getSequenceSummary();
+		codonCounts[i] = sequenceSummary->getCodonCountForCodon(codonIndex);
 	}
 	return codonCounts;
 }
