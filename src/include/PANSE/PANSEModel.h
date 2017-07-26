@@ -127,7 +127,7 @@ class PANSEModel: public Model
         
         //Psi-Phi Conversion Functions
         double psi2phi(double psi, double sigma);
-        double phi2psi(double phi, double sigma)
+        double phi2psi(double phi, double sigma);
 
 	protected:
 };
