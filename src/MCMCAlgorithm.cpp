@@ -325,7 +325,6 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 			{
 				likelihoodTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[1];
 				posteriorTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[3];
-
 			}
 		}
 		if ((iteration % thinning) == 0)

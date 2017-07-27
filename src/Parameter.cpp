@@ -361,7 +361,7 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 				}
 			}
 		}
-	
+
 		input.close();
 
 		//initialize all the default Parameter values now.
@@ -454,7 +454,7 @@ void Parameter::writeBasicRestartFile(std::string filename)
 			else oss <<" ";
 		}
 		if (i % 10 != 0) oss <<"\n";
-	
+
 		oss << ">selectionIsInMixture:\n";
 		for (i = 0; i < selectionIsInMixture.size(); i++)
 		{
@@ -1279,7 +1279,6 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 			//Adjust proposal variance to try and get within this range
 			if (acceptanceLevel < 0.2)
 			{
-			  
 			  if (acceptanceLevel < 0.1)
 					for (unsigned k = aaStart; k < aaEnd; k++)
 						covarianceMatrix[aaIndex] *= 0.8;
@@ -1294,10 +1293,10 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 				  covcurr = (covcurr*0.4);
 				  covarianceMatrix[aaIndex] = covprev + covcurr;
 				  //replace cov matrix based on previous window
-				  //The is approach was commented out and above code uncommented to replace it 
+				  //The is approach was commented out and above code uncommented to replace it
 				  //covarianceMatrix[aaIndex].calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
 				}
-				
+
 			//Decomposing of cov matrix to convert iid samples to covarying samples using matrix decomposition
 			//The decomposed matrix is used in the proposal of new samples
 				covarianceMatrix[aaIndex].choleskyDecomposition();
@@ -1314,7 +1313,7 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 				for (unsigned k = aaStart; k < aaEnd; k++)
 				{
 					std_csp[k] *= 1.2;
-    				covarianceMatrix[aaIndex] *= 1.2;                    
+    				covarianceMatrix[aaIndex] *= 1.2;
                 }
 				covarianceMatrix[aaIndex].choleskyDecomposition();
 			}
@@ -1540,7 +1539,7 @@ std::vector<double> Parameter::getCodonSpecificQuantile(unsigned mixtureElement,
 {
  	std::vector<float> parameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
 		mixtureElement, codon, paramType, withoutReference);
-    
+
     unsigned traceLength = lastIteration + 1;
     //unsigned traceEnd = parameterTrace.size() - (parameterTrace.size() - lastIteration); //currently unused
 	if (samples > traceLength)
@@ -1551,7 +1550,7 @@ std::vector<double> Parameter::getCodonSpecificQuantile(unsigned mixtureElement,
 
 		samples = traceLength;
 	}
-    
+
     std::vector<double> samplesTrace(parameterTrace.begin() + (lastIteration - samples) + 1, (parameterTrace.begin()
 																							  + lastIteration + 1));
     std::sort(samplesTrace.begin(), samplesTrace.end());
@@ -1562,7 +1561,7 @@ std::vector<double> Parameter::getCodonSpecificQuantile(unsigned mixtureElement,
         int low = (int)h;
         retVec[i] = samplesTrace[low] + (h - low)*(samplesTrace[low+1] - samplesTrace[low]);
     }
-    
+
     return retVec;
 }
 
@@ -2169,7 +2168,7 @@ std::vector<double> Parameter::getCodonSpecificQuantileForCodon(unsigned mixture
 	{
         rv = getCodonSpecificQuantile(mixtureElement - 1, samples, codon, paramType, probs, withoutReference);
     }
-    return rv;     
+    return rv;
 }
 
 
@@ -2298,4 +2297,3 @@ void Parameter::setNumMixtureElements(unsigned _numMixtures)
 
 
 #endif
-
