@@ -124,6 +124,10 @@ class PANSEModel: public Model
         double delta_g_log(int i, int g, double *lambda, double *v_g, double *alpha);
         double prob_Y_g(double curralpha, int sample_size, double lambda_prime, double psi, double prevdelta);
         double prob_Y_g_log(double curralpha, int sample_size, double lambda_prime, double psi, double prevdelta);
+        
+        //Psi-Phi Conversion Functions
+        double psi2phi(double psi, double sigma);
+        double phi2psi(double phi, double sigma);
 
 	protected:
 };

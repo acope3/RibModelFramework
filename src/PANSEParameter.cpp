@@ -1,4 +1,5 @@
 #include "include/PANSE/PANSEParameter.h"
+//Write this down hyper parameter is model specific parameters NSE wait time should be added here, and s_phi is one
 
 #ifndef STANDALONE
 #include <Rcpp.h>
