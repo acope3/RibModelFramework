@@ -821,8 +821,10 @@ unsigned Parameter::getNumAcceptForCspForIndex(unsigned i)
 // -------------------------------------------//
 
 
-//TODO: Expose this to allow for testing with only specific codons.
-/* setGroupList (NOT EXPOSED)
+//TODO: Hollis: Verify or implement the Group List such that the MCMC will now only run on the subset of codons set by
+// this function.
+
+/* setGroupList (RCPP EXPOSED)
  * Arguments: vector of strings representing a group list
  * Sets the group list to the argument after clearing the group list, adding elements only if they have no errors.
 */
@@ -1423,7 +1425,7 @@ double Parameter::getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigne
 
 	if (samples > traceLength)
 	{
-		my_printError("Warning in ROCParameter::getCodonSpecificPosteriorMean throws: Number of anticipated samples ");
+		my_printError("Warning in Parameter::getCodonSpecificPosteriorMean throws: Number of anticipated samples ");
 		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n",
 					  samples, traceLength);
 
@@ -1445,7 +1447,7 @@ double Parameter::getStdDevSynthesisRateVariance(unsigned samples, unsigned mixt
 	unsigned traceLength = (unsigned)StdDevSynthesisRateTrace.size();
 	if (samples > traceLength)
 	{
-		my_printError("Warning in ROCParameter::getSynthesisRateVariance throws: Number of anticipated samples ");
+		my_printError("Warning in Parameter::getSynthesisRateVariance throws: Number of anticipated samples ");
 		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n",
 					  samples, traceLength);
 
@@ -1474,7 +1476,7 @@ double Parameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex,
 	unsigned traceLength = lastIteration + 1;
 	if (samples > traceLength)
 	{
-		my_printError("Warning in ROCParameter::getSynthesisRateVariance throws: Number of anticipated samples ");
+		my_printError("Warning in Parameter::getSynthesisRateVariance throws: Number of anticipated samples ");
 		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n",
 					  samples, traceLength);
 
@@ -1597,7 +1599,7 @@ std::vector<double> Parameter::getEstimatedMixtureAssignmentProbabilities(unsign
 
 	if (samples > traceLength)
 	{
-		my_printError("Warning in ROCParameter::getEstimatedMixtureAssignmentProbabilities throws: Number of anticipated samples ");
+		my_printError("Warning in Parameter::getEstimatedMixtureAssignmentProbabilities throws: Number of anticipated samples ");
 		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n",
 					  samples, traceLength);
 

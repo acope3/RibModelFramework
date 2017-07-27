@@ -335,7 +335,7 @@ void Genome::readRFPData(std::string filename, bool append)
 
 				// Set to 0-indexed value for convenience of vector calculation
 				// Error-checking note: Of course, atoi function returns 0 if not an integer
-				// -> leads to 0 - 1 == -1 -> codon ignored.
+				// -> leads to 0 - 1 == -1 -> codon ignored (as intended).
 				position = std::atoi(tmp.substr(pos + 1, pos2 - (pos + 1)).c_str()) - 1;
 
 				// Position integer: Ensure that if position is negative, ignore the codon.
@@ -466,6 +466,8 @@ void Genome::writeRFPData(std::string filename, bool simulated)
 				}
 			}
 		}
+            // We are printing a simulated gene: There is no position-based RFP calculations.
+            // This is a different format than the standard RFPData one.
 		else
 		{
 			Fout << "GeneID,Codon,Codon_Count,RFPCount\n";
