@@ -32,8 +32,6 @@ class ROCParameter : public Parameter
 		
 		double mutation_prior_sd;
 
-
-		// functions TODO: never used?
 		std::vector<double> propose(std::vector<double> currentParam, double (*proposal)(double a, double b), double A, std::vector<double> B);
 
 	public:
