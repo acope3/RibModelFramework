@@ -56,14 +56,14 @@ double ROCModel::calculateMutationPrior(std::string grouping, bool proposed)
 }
 
 
-void ROCModel::obtainCodonCount(SequenceSummary *seqsum, std::string curAA, int codonCount[])
+void ROCModel::obtainCodonCount(SequenceSummary *sequenceSummary, std::string curAA, int codonCount[])
 {
 	unsigned aaStart, aaEnd;
 	SequenceSummary::AAToCodonRange(curAA, aaStart, aaEnd, false);
 	// get codon counts for AA
 	unsigned j = 0u;
 	for (unsigned i = aaStart; i < aaEnd; i++, j++)
-		codonCount[j] = seqsum->getCodonCountForCodon(i);
+		codonCount[j] = sequenceSummary->getCodonCountForCodon(i);
 }
 
 
@@ -168,7 +168,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 	unsigned aaIndex = SequenceSummary::AAToAAIndex(grouping);
 #ifdef _OPENMP
 //#ifndef __APPLE__
-#pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed, codonCount, gene, seqsum) reduction(+:likelihood,likelihood_proposed)
+#pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed, codonCount, gene, sequenceSummary) reduction(+:likelihood,likelihood_proposed)
 #endif
 	for (unsigned i = 0u; i < numGenes; i++)
 	{
@@ -673,7 +673,7 @@ void ROCModel::simulateGenome(Genome &genome)
 	for (unsigned geneIndex = 0; geneIndex < genome.getGenomeSize(); geneIndex++) //loop over all genes in the genome
 	{
 		Gene gene = genome.getGene(geneIndex);
-		SequenceSummary seqSum = gene.geneData;
+		SequenceSummary sequenceSummary = gene.geneData;
 		std::string tmpSeq = "ATG"; //Always will have the start amino acid
 
 
@@ -714,10 +714,10 @@ void ROCModel::simulateGenome(Genome &genome)
 			codonIndex = Parameter::randMultinom(codonProb, numCodons);
 			unsigned aaStart, aaEnd;
 			SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, false); //need the first spot in the array where the codons for curAA are
-			codon = seqSum.indexToCodon(aaStart + codonIndex);//get the correct codon based off codonIndex
+			codon = sequenceSummary.indexToCodon(aaStart + codonIndex);//get the correct codon based off codonIndex
 			tmpSeq += codon;
 		}
-		std::string codon =	seqSum.indexToCodon((unsigned)Parameter::randUnif(61.0, 64.0)); //randomly choose a stop codon, from range 61-63
+		std::string codon =	sequenceSummary.indexToCodon((unsigned)Parameter::randUnif(61.0, 64.0)); //randomly choose a stop codon, from range 61-63
 		tmpSeq += codon;
 		Gene simulatedGene(tmpSeq, tmpDesc, gene.getId());
 		genome.addGene(simulatedGene, true);

@@ -551,7 +551,7 @@ void Parameter::initCategoryDefinitions(std::string _mutationSelectionState,
 void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 {
 	unsigned genomeSize = genome.getGenomeSize();
-	double* scuoValues = new double[genomeSize]();
+	double* SCUOValues = new double[genomeSize]();
 	double* expression = new double[genomeSize]();
 	int* index = new int[genomeSize]();
 
@@ -559,11 +559,11 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 	{
 		index[i] = i;
 		//This used to be maxGrouping instead of 22, but PA model will not work that way
-		scuoValues[i] = calculateSCUO( genome.getGene(i), 22 );
+		SCUOValues[i] = calculateSCUO( genome.getGene(i), 22 );
 		expression[i] = Parameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
 	}
 
-	quickSortPair(scuoValues, index, 0, genomeSize);
+	quickSortPair(SCUOValues, index, 0, genomeSize);
 	std::sort(expression, expression + genomeSize);
 
 	for (unsigned category = 0u; category < numSelectionCategories; category++)
@@ -576,7 +576,7 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 		}
 	}
 
-	delete [] scuoValues;
+	delete [] SCUOValues;
 	delete [] expression;
 	delete [] index;
 }
@@ -1854,13 +1854,13 @@ double Parameter::randUnif(double minVal, double maxVal)
 unsigned Parameter::randMultinom(std::vector <double> &probabilities, unsigned mixtureElements)
 {
 	// calculate cumulative sum to determine group boundaries
-	double* cumSum = new double[mixtureElements]();
-	//std::vector<double> cumsum(groups);
-	cumSum[0] = probabilities[0];
+	double* cumulativeSum = new double[mixtureElements]();
+	//std::vector<double> cumulativeSum(groups);
+	cumulativeSum[0] = probabilities[0];
 
 	for (unsigned i = 1u; i < mixtureElements; i++)
 	{
-		cumSum[i] = cumSum[i-1u] + probabilities[i];
+		cumulativeSum[i] = cumulativeSum[i-1u] + probabilities[i];
 	}
 	// draw random number from U(0,1)
 	double referenceValue;
@@ -1877,26 +1877,26 @@ unsigned Parameter::randMultinom(std::vector <double> &probabilities, unsigned m
 	unsigned returnValue = 0u;
 	for (unsigned i = 0u; i < mixtureElements; i++)
 	{
-		if (referenceValue <= cumSum[i])
+		if (referenceValue <= cumulativeSum[i])
 		{
 			returnValue = i;
 			break;
 		}
 	}
-	delete [] cumSum;
+	delete [] cumulativeSum;
 	return returnValue;
 }
 
 unsigned Parameter::randMultinom(double *probabilities, unsigned mixtureElements)
 {
 	// calculate cumulative sum to determine group boundaries
-	double* cumSum = new double[mixtureElements]();
-	//std::vector<double> cumsum(groups);
-	cumSum[0] = probabilities[0];
+	double* cumulativeSum = new double[mixtureElements]();
+	//std::vector<double> cumulativeSum(groups);
+	cumulativeSum[0] = probabilities[0];
 
 	for (unsigned i = 1u; i < mixtureElements; i++)
 	{
-		cumSum[i] = cumSum[i - 1u] + probabilities[i];
+		cumulativeSum[i] = cumulativeSum[i - 1u] + probabilities[i];
 	}
 	// draw random number from U(0,1)
 	double referenceValue;
@@ -1913,13 +1913,13 @@ unsigned Parameter::randMultinom(double *probabilities, unsigned mixtureElements
 	unsigned returnValue = 0u;
 	for (unsigned i = 0u; i < mixtureElements; i++)
 	{
-		if (referenceValue <= cumSum[i])
+		if (referenceValue <= cumulativeSum[i])
 		{
 			returnValue = i;
 			break;
 		}
 	}
-	delete[] cumSum;
+	delete[] cumulativeSum;
 	return returnValue;
 }
 
