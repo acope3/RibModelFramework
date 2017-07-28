@@ -2368,10 +2368,10 @@ int testParameter()
     // Check proposed StdDevSynthesisRate
     for (unsigned i = 0u; i < numMixtures; i++)
     {
-        if (parameter.getStdDevSynthesisRate(i, 1) != stdDev[i])
+        if (parameter.getStdDevSynthesisRate(i, true) != stdDev[i])
         {
             my_printError("Error in initParameterSet or getStdDevSynthesisRate(proposed) for index %.", i);
-            my_printError(" Value should be %, but is instead %.\n", stdDev[i], parameter.getStdDevSynthesisRate(i, 1));
+            my_printError(" Value should be %, but is instead %.\n", stdDev[i], parameter.getStdDevSynthesisRate(i, true));
             error = 1;
             globalError = 1;
             initParameterSetError = 1;
@@ -2381,10 +2381,10 @@ int testParameter()
     // Check non-proposed StdDevSynthesisRate
     for (unsigned i = 0u; i < numMixtures; i++)
     {
-        if (parameter.getStdDevSynthesisRate(i, 0) != stdDev[i])
+        if (parameter.getStdDevSynthesisRate(i, false) != stdDev[i])
         {
             my_printError("Error in initParameterSet or getStdDevSynthesisRate(non-proposed) for index %.", i);
-            my_printError(" Value should be %, but is instead %.\n", stdDev[i], parameter.getStdDevSynthesisRate(i, 0));
+            my_printError(" Value should be %, but is instead %.\n", stdDev[i], parameter.getStdDevSynthesisRate(i, false));
             error = 1;
             globalError = 1;
             initParameterSetError = 1;
@@ -2729,10 +2729,10 @@ int testParameter()
     {
         for (unsigned j = 0u; j < numGenes; j++)
         {
-            if (parameter.getSynthesisRate(j, i, 1) != 0.0)
+            if (parameter.getSynthesisRate(j, i, true) != 0.0)
             {
                 my_printError("Error in initParameterSet or getSynthesisRate(proposed) for index % of mixture %.", j, i);
-                my_printError(" Value should be 0.0, but is instead %.\n", parameter.getSynthesisRate(j, i, 1));
+                my_printError(" Value should be 0.0, but is instead %.\n", parameter.getSynthesisRate(j, i, true));
                 error = 1;
                 globalError = 1;
                 initParameterSetError = 1;
@@ -2745,10 +2745,10 @@ int testParameter()
     {
         for (unsigned j = 0u; j < numGenes; j++)
         {
-            if (parameter.getSynthesisRate(j, i, 0) != 0.0)
+            if (parameter.getSynthesisRate(j, i, false) != 0.0)
             {
                 my_printError("Error in initParameterSet or getSynthesisRate(non-proposed) for index % of mixture %.", j, i);
-                my_printError(" Value should be 0.0, but is instead %.\n", parameter.getSynthesisRate(j, i, 0));
+                my_printError(" Value should be 0.0, but is instead %.\n", parameter.getSynthesisRate(j, i, false));
                 error = 1;
                 globalError = 1;
                 initParameterSetError = 1;
@@ -2771,10 +2771,10 @@ int testParameter()
         for (unsigned j = 0u; j < numGenes; j++)
         {
             parameter.setSynthesisRate(j, j, i);
-            if (parameter.getSynthesisRate(j, i, 0) != j)
+            if (parameter.getSynthesisRate(j, i, false) != j)
             {
                 my_printError("Error in setSynthesisRate for index % of mixture %. Value should be %, but is instead %.\n",
-                              j, i, j, parameter.getSynthesisRate(j, i, 0));
+                              j, i, j, parameter.getSynthesisRate(j, i, false));
                 error = 1;
                 globalError = 1;
             }
@@ -3263,13 +3263,13 @@ int testCovarianceMatrix()
 
     //TODO: Test these final two functions.
     //-------------------------------------------------------------//
-    //------ transformIidNumersIntoCovaryingNumbers Function ------//
+    //------ transformIidNumbersIntoCovaryingNumbers Function ------//
     //-------------------------------------------------------------//
     //TODO: Should implement Parameter unit testing for RandNorm before doing this!
 
     //Size is numCodons * (numMutationCategories + numSelectionCategories for ROCParameter
     //Each value is based on randNorm(0.0, 1.0)
-    //covM.transformIidNumersIntoCovaryingNumbers(iidTest);
+    //covM.transformIidNumbersIntoCovaryingNumbers(iidTest);
 
     //------------------------------------------------//
     //------ calculateSampleCovariance Function ------//

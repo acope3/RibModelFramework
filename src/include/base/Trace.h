@@ -26,8 +26,8 @@ class Trace {
 		std::vector<std::vector<std::vector<float>>> synthesisRateTrace;//order: expression category, gene, samples
 		std::vector<std::vector<unsigned>> mixtureAssignmentTrace;//order: numGenes, samples
 		std::vector<std::vector<double>> mixtureProbabilitiesTrace;//order: numMixtures, samples
-		std::vector<std::vector<std::vector<std::vector<float>>>> codonSpecificParameterTrace; //order: paramType, category, numparam, samples
-		//std::vector<std::vector<std::vector<double>>> codonSpecificParameterTraceTwo; //order: category, numparam, samples
+		std::vector<std::vector<std::vector<std::vector<float>>>> codonSpecificParameterTrace; //order: paramType, category, numParam, samples
+		//std::vector<std::vector<std::vector<double>>> codonSpecificParameterTraceTwo; //order: category, numParam, samples
 		std::vector<mixtureDefinition> *categories;
 
 

@@ -56,14 +56,14 @@ double ROCModel::calculateMutationPrior(std::string grouping, bool proposed)
 }
 
 
-void ROCModel::obtainCodonCount(SequenceSummary *seqsum, std::string curAA, int codonCount[])
+void ROCModel::obtainCodonCount(SequenceSummary *sequenceSummary, std::string curAA, int codonCount[])
 {
 	unsigned aaStart, aaEnd;
 	SequenceSummary::AAToCodonRange(curAA, aaStart, aaEnd, false);
 	// get codon counts for AA
 	unsigned j = 0u;
 	for (unsigned i = aaStart; i < aaEnd; i++, j++)
-		codonCount[j] = seqsum->getCodonCountForCodon(i);
+		codonCount[j] = sequenceSummary->getCodonCountForCodon(i);
 }
 
 
@@ -80,7 +80,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 	double logLikelihood = 0.0;
 	double logLikelihood_proposed = 0.0;
 
-	SequenceSummary *seqsum = gene.getSequenceSummary();
+	SequenceSummary *sequenceSummary = gene.getSequenceSummary();
 
 	// get correct index for everything
 	unsigned mutationCategory = parameter->getMutationCategory(k);
@@ -102,15 +102,15 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 		std::string curAA = getGrouping(i);
 
 		// skip amino acids which do not occur in current gene. Avoid useless calculations and multiplying by 0
-		if (seqsum->getAACountForAA(i) == 0) continue;
+		if (sequenceSummary->getAACountForAA(i) == 0) continue;
 
 		// get number of codons for AA (total number not parameter->count)
-		unsigned numCodons = seqsum->GetNumCodonsForAA(curAA);
+		unsigned numCodons = sequenceSummary->GetNumCodonsForAA(curAA);
 		// get mutation and selection parameter->for gene
 		parameter->getParameterForCategory(mutationCategory, ROCParameter::dM, curAA, false, mutation);
 		parameter->getParameterForCategory(selectionCategory, ROCParameter::dEta, curAA, false, selection);
 		// get codon occurrence in sequence
-		obtainCodonCount(seqsum, curAA, codonCount);
+		obtainCodonCount(sequenceSummary, curAA, codonCount);
 
 		logLikelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
 		logLikelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue_proposed);
@@ -164,17 +164,17 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 
 	int codonCount[6];
 	Gene *gene;
-	SequenceSummary *seqsum;
+	SequenceSummary *sequenceSummary;
 	unsigned aaIndex = SequenceSummary::AAToAAIndex(grouping);
 #ifdef _OPENMP
 //#ifndef __APPLE__
-#pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed, codonCount, gene, seqsum) reduction(+:likelihood,likelihood_proposed)
+#pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed, codonCount, gene, sequenceSummary) reduction(+:likelihood,likelihood_proposed)
 #endif
 	for (unsigned i = 0u; i < numGenes; i++)
 	{
 		gene = &genome.getGene(i);
-		seqsum = gene->getSequenceSummary();
-		if (seqsum->getAACountForAA(aaIndex) == 0) continue;
+		sequenceSummary = gene->getSequenceSummary();
+		if (sequenceSummary->getAACountForAA(aaIndex) == 0) continue;
 
 		// which mixture element does this gene belong to
 		unsigned mixtureElement = parameter->getMixtureAssignment(i);
@@ -192,7 +192,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 		parameter->getParameterForCategory(mutationCategory, ROCParameter::dM, grouping, true, mutation_proposed);
 		parameter->getParameterForCategory(selectionCategory, ROCParameter::dEta, grouping, true, selection_proposed);
 
-		obtainCodonCount(seqsum, grouping, codonCount);
+		obtainCodonCount(sequenceSummary, grouping, codonCount);
 		likelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
 		likelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation_proposed, selection_proposed, phiValue);
 	}
@@ -271,13 +271,13 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 			{
 				unsigned mixtureAssignment = getMixtureAssignment(j);
 				mixtureAssignment = getSynthesisRateCategory(mixtureAssignment);
-				double logphi = std::log(getSynthesisRate(j, mixtureAssignment, false));
+				double logPhi = std::log(getSynthesisRate(j, mixtureAssignment, false));
 				double obsPhi = genome.getGene(j).getObservedSynthesisRate(i);
 				if (obsPhi > -1.0)
 				{
-					double logobsPhi = std::log(obsPhi);
-					double proposed = Parameter::densityNorm(logobsPhi, logphi + noiseOffset_proposed, observedSynthesisNoise, true);
-					double current = Parameter::densityNorm(logobsPhi, logphi + noiseOffset, observedSynthesisNoise, true);
+					double logObsPhi = std::log(obsPhi);
+					double proposed = Parameter::densityNorm(logObsPhi, logPhi + noiseOffset_proposed, observedSynthesisNoise, true);
+					double current = Parameter::densityNorm(logObsPhi, logPhi + noiseOffset, observedSynthesisNoise, true);
 					lpr += proposed - current;
 				}
 			}
@@ -673,7 +673,7 @@ void ROCModel::simulateGenome(Genome &genome)
 	for (unsigned geneIndex = 0; geneIndex < genome.getGenomeSize(); geneIndex++) //loop over all genes in the genome
 	{
 		Gene gene = genome.getGene(geneIndex);
-		SequenceSummary seqSum = gene.geneData;
+		SequenceSummary sequenceSummary = gene.geneData;
 		std::string tmpSeq = "ATG"; //Always will have the start amino acid
 
 
@@ -714,10 +714,10 @@ void ROCModel::simulateGenome(Genome &genome)
 			codonIndex = Parameter::randMultinom(codonProb, numCodons);
 			unsigned aaStart, aaEnd;
 			SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, false); //need the first spot in the array where the codons for curAA are
-			codon = seqSum.indexToCodon(aaStart + codonIndex);//get the correct codon based off codonIndex
+			codon = sequenceSummary.indexToCodon(aaStart + codonIndex);//get the correct codon based off codonIndex
 			tmpSeq += codon;
 		}
-		std::string codon =	seqSum.indexToCodon((unsigned)Parameter::randUnif(61.0, 64.0)); //randomly choose a stop codon, from range 61-63
+		std::string codon =	sequenceSummary.indexToCodon((unsigned)Parameter::randUnif(61.0, 64.0)); //randomly choose a stop codon, from range 61-63
 		tmpSeq += codon;
 		Gene simulatedGene(tmpSeq, tmpDesc, gene.getId());
 		genome.addGene(simulatedGene, true);

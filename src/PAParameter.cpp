@@ -405,7 +405,7 @@ void PAParameter::initMutationSelectionCategories(std::vector<std::string> files
 			while (currentFile >> tmpString)
 			{
 				std::string codon = tmpString.substr(0, 3);
-				std::size_t pos = tmpString.find(",", 3);
+				std::size_t pos = tmpString.find(',', 3);
 				std::string val = tmpString.substr(pos + 1, std::string::npos);
 				unsigned index = SequenceSummary::codonToIndex(codon, false);
 				temp[index] = std::atof(val.c_str());

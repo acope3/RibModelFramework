@@ -87,7 +87,7 @@ void Genome::readFasta(std::string filename, bool append)
 
 			Gene tmpGene;
 			std::string tempSeq = "";
-			while (1)
+			while (true)
 			{
 				// read a new line in every cycle
 				std::getline(Fin, buf);
@@ -121,7 +121,7 @@ void Genome::readFasta(std::string filename, bool append)
 						tempSeq = "";
 					}
 					tmpGene.setDescription( buf.substr(1,buf.size()-1) );
-					std::size_t pos = buf.find(" ") - 1;
+					std::size_t pos = buf.find(' ') - 1;
 					tmpGene.setId( buf.substr(1,pos) );
 				}
 
@@ -216,7 +216,7 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
 	while (std::getline(Fin, tmp))
 	{
 		// Find the GeneID
-		std::size_t pos = tmp.find(",");
+		std::size_t pos = tmp.find(',');
 		std::string ID = tmp.substr(0, pos);
 
 		if (first)
@@ -243,7 +243,7 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
 
 		// Next, find the Codon_Count
 		pos += 4;
-		std::size_t pos2 = tmp.find(",", pos + 1);
+		std::size_t pos2 = tmp.find(',', pos + 1);
 		std::string value = tmp.substr(pos + 1, pos2 - (pos + 1));
 		unsigned count = (unsigned)std::atoi(value.c_str());
 
@@ -255,15 +255,7 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
 		value = tmp.substr(pos2 + 1);
 		count = (unsigned)std::atoi(value.c_str());
 		unsigned codonIndex = SequenceSummary::codonToIndex(codon);
-		//my_print("So I'm setting at codon index % the count as %\n", codonIndex, count);
 		tmpGene.geneData.setRFPValue(codonIndex, count, 0);
-		/*
-		for (int i = 0; i < 64; i++)
-		{
-			my_print("% ", tmpGene.geneData.getRFPValue(i, 0));
-		}
-		my_print("\n");
-		 */
 		prevID = ID;
 	}
 
@@ -304,9 +296,9 @@ void Genome::readRFPData(std::string filename, bool append)
                 my_printError("Error in Genome::readRFPData: RFPData file % has no header.\n", filename);
 
 			// Ignore first 3 commas: ID, position, codon
-			std::size_t pos = tmp.find(",");
-			pos = tmp.find(",", pos + 1);
-			pos = tmp.find(",", pos + 1);
+			std::size_t pos = tmp.find(',');
+			pos = tmp.find(',', pos + 1);
+			pos = tmp.find(',', pos + 1);
 
 			// While there are more commas, there are more categories of RFP counts
 			unsigned numCategories = 0;
@@ -314,7 +306,7 @@ void Genome::readRFPData(std::string filename, bool append)
 			while (pos != std::string::npos)
 			{
 				numCategories++;
-				pos2 = tmp.find(",", pos + 1);
+				pos2 = tmp.find(',', pos + 1);
 				addRFPCountColumnName(tmp.substr(pos + 1, pos2 - (pos + 1)));
 				pos = pos2;
 			}
@@ -335,15 +327,15 @@ void Genome::readRFPData(std::string filename, bool append)
 			//Now for each line associated with a gene ID, set the string appropriately
 			while (std::getline(Fin, tmp))
 			{
-				pos = tmp.find(",");
+				pos = tmp.find(',');
 				std::string ID = tmp.substr(0, pos);
 
 				// Make pos2 find next comma to find position integer
-				pos2 = tmp.find(",", pos + 1);
+				pos2 = tmp.find(',', pos + 1);
 
 				// Set to 0-indexed value for convenience of vector calculation
 				// Error-checking note: Of course, atoi function returns 0 if not an integer
-				// -> leads to 0 - 1 == -1 -> codon ignored.
+				// -> leads to 0 - 1 == -1 -> codon ignored (as intended).
 				position = std::atoi(tmp.substr(pos + 1, pos2 - (pos + 1)).c_str()) - 1;
 
 				// Position integer: Ensure that if position is negative, ignore the codon.
@@ -378,13 +370,13 @@ void Genome::readRFPData(std::string filename, bool append)
 					// Note: May be an invalid Codon read in, but this is resolved when the sequence is set and processed.
 
 					// Skip to end RFPCount(s), if any
-					pos = tmp.find(",", pos2 + 1);
+					pos = tmp.find(',', pos2 + 1);
 					tableIndex ++;
 
 					// While there are more commas, there are more categories of RFP counts
 					while (pos != std::string::npos)
 					{
-						pos2 = tmp.find(",", pos + 1);
+						pos2 = tmp.find(',', pos + 1);
 
 						// RFPCount is input as either its integer value (> -1) or as -1 (stored, not calculated).
 						// Also accounts for if the value is "NA" or a string (converted to -1).
@@ -394,7 +386,9 @@ void Genome::readRFPData(std::string filename, bool append)
 							else tableRow[tableIndex] = -1;
 						}
                         else
+						{
 							tableRow[tableIndex] = -1;
+						}
 
 						pos = pos2;
 						tableIndex++;
@@ -455,7 +449,7 @@ void Genome::writeRFPData(std::string filename, bool simulated)
 			{
 				Gene *currentGene = &genes[geneIndex];
 				std::vector<unsigned> positionCodonID = currentGene->geneData.getPositionCodonID();
-				unsigned numPositions = (unsigned) positionCodonID.size();
+				unsigned numPositions = (unsigned)positionCodonID.size();
 
 				for (unsigned position = 0u; position < numPositions; position++)
 				{
@@ -472,6 +466,8 @@ void Genome::writeRFPData(std::string filename, bool simulated)
 				}
 			}
 		}
+            // We are printing a simulated gene: There is no position-based RFP calculations.
+            // This is a different format than the standard RFPData one.
 		else
 		{
 			Fout << "GeneID,Codon,Codon_Count,RFPCount\n";
@@ -486,8 +482,8 @@ void Genome::writeRFPData(std::string filename, bool simulated)
 
 					Fout << currentGene->getId() << "," << codon << ",";
 
-					SequenceSummary *seqsum = currentGene->getSequenceSummary();
-					unsigned codonCount = seqsum -> getCodonCountForCodon(codonIndex);
+					SequenceSummary *sequenceSummary = currentGene->getSequenceSummary();
+					unsigned codonCount = sequenceSummary->getCodonCountForCodon(codonIndex);
 					Fout << codonCount << ",";
 
 					// Simulated sum RFP counts will only print one column! So, we default to column = 0.
@@ -541,7 +537,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
                 bool first = true;
                 while (std::getline(input, tmp))
 				{
-                    std::size_t pos = tmp.find(",");
+                    std::size_t pos = tmp.find(',');
                     std::string geneID = tmp.substr(0, pos);
                     std::map<std::string, Gene *>::iterator it;
                     it = genomeMapping.find(geneID);
@@ -557,7 +553,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 						// Loop over each comma-separated value
                         while (notDone)
 						{
-							std::size_t pos2 = tmp.find(",", pos + 1);
+							std::size_t pos2 = tmp.find(',', pos + 1);
 
 							// End of string, end loop
 							if (pos2 == std::string::npos)
@@ -641,7 +637,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 						break;
 					}
 
-					std::size_t pos = tmp.find(",");
+					std::size_t pos = tmp.find(',');
 					std::string val = "";
 					bool notDone = true;
 					double dval;
@@ -649,7 +645,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 					// Loop over each comma-separated value
 					while (notDone)
 					{
-						std::size_t pos2 = tmp.find(",", pos + 1);
+						std::size_t pos2 = tmp.find(',', pos + 1);
 
 						// End of string, end loop
 						if (pos2 == std::string::npos)
@@ -789,7 +785,7 @@ Gene& Genome::getGene(std::string id, bool simulated)
 	{
 		tempGene = simulated ? simulatedGenes[geneIndex] : genes[geneIndex];
 
-		if (tempGene.getId().compare(id) == 0) break;
+		if (tempGene.getId() == id) break;
 	}
 	return simulated ? simulatedGenes[geneIndex] : genes[geneIndex];
 }
@@ -868,8 +864,8 @@ std::vector<unsigned> Genome::getCodonCountsPerGene(std::string codon)
 	for (unsigned i = 0u; i < genes.size(); i++)
 	{
 		Gene gene = genes[i];
-		SequenceSummary *seqsum = gene.getSequenceSummary();
-		codonCounts[i] = seqsum -> getCodonCountForCodon(codonIndex);
+		SequenceSummary *sequenceSummary = gene.getSequenceSummary();
+		codonCounts[i] = sequenceSummary->getCodonCountForCodon(codonIndex);
 	}
 	return codonCounts;
 }

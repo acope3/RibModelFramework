@@ -23,7 +23,7 @@ CovarianceMatrix::CovarianceMatrix()
 }
 
 
-CovarianceMatrix::CovarianceMatrix(int _numVariates)
+CovarianceMatrix::CovarianceMatrix(unsigned _numVariates)
 {
 	numVariates = _numVariates;
 	initCovarianceMatrix(_numVariates);
@@ -115,7 +115,7 @@ CovarianceMatrix::~CovarianceMatrix()
 void CovarianceMatrix::initCovarianceMatrix(unsigned _numVariates)
 {
     numVariates = _numVariates;
-    int vectorLength = numVariates * numVariates;
+    unsigned vectorLength = numVariates * numVariates;
     covMatrix.resize(vectorLength);
     choleskyMatrix.resize(vectorLength);
 
@@ -159,8 +159,7 @@ void CovarianceMatrix::choleskyDecomposition()
 
 void CovarianceMatrix::printCovarianceMatrix()
 {
-
-    for (int i = 0; i < numVariates * numVariates; i++)
+    for (unsigned i = 0u; i < numVariates * numVariates; i++)
     {
         if (i % numVariates == 0 && i != 0)
             my_print("\n");
@@ -173,7 +172,7 @@ void CovarianceMatrix::printCovarianceMatrix()
 
 void CovarianceMatrix::printCholeskyMatrix()
 {
-    for (int i = 0; i < numVariates * numVariates; i++)
+    for (unsigned i = 0u; i < numVariates * numVariates; i++)
     {
         if (i % numVariates == 0 && i != 0)
             my_print("\n");
@@ -204,27 +203,27 @@ int CovarianceMatrix::getNumVariates()
 }
 
 
-std::vector<double> CovarianceMatrix::transformIidNumersIntoCovaryingNumbers(std::vector <double> iidnumbers)
+std::vector<double> CovarianceMatrix::transformIidNumbersIntoCovaryingNumbers(std::vector <double> iidNumbers)
 {
-    std::vector<double> covnumbers;
-    for (int i = 0; i < numVariates; i++)
+    std::vector<double> covaryingNumbers;
+    for (unsigned i = 0u; i < numVariates; i++)
     {
         double sum = 0.0;
-        for (int k = 0; k < numVariates; k++)
+        for (unsigned k = 0u; k < numVariates; k++)
         {
 			// testing if [i * numVariates + k] or [k * numVariates + i], first option was default
-            sum += choleskyMatrix[k * numVariates + i] * iidnumbers[k];
+            sum += choleskyMatrix[k * numVariates + i] * iidNumbers[k];
         }
 
-        covnumbers.push_back(sum);
+        covaryingNumbers.push_back(sum);
     }
-    return covnumbers;
+    return covaryingNumbers;
 }
 
 
 void CovarianceMatrix::calculateSampleCovariance(std::vector<std::vector<std::vector<std::vector<float>>>> codonSpecificParameterTrace, std::string aa, unsigned samples, unsigned lastIteration)
 {
-	//order of codonSpecificParameterTrace: paramType, category, numparam, samples
+	//order of codonSpecificParameterTrace: paramType, category, numParam, samples
 	unsigned numParamTypesInModel = (unsigned)codonSpecificParameterTrace.size();
 	std::vector<unsigned> numCategoriesInModelPerParamType(numParamTypesInModel);
 	// number of categories can vary between parameter types, see selection shared, mutation shared
