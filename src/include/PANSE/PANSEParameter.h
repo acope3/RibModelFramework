@@ -20,8 +20,9 @@ class PANSEParameter: public Parameter {
 	private:
 
 		std::vector<std::vector<double>> lambdaValues; //Currently not used.
-        std::vector<double> NSEWaitingTimes; //Calulcated Per Gene per position
-        std::vector<double> elongationProbability; //Per gene
+        std::vector<std::vector<double>> NSEWaitingTimes; //Calulcated Per mixture per codon same for gene and position
+        std::vector<std::vector<double>> NSEWaitingTimes_proposed; //Calulcated Per mixture per codon same for gene and position
+        //std::vector<double> elongationProbability; //Per gene
 		double bias_csp;
 
 	public:
