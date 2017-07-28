@@ -15,14 +15,14 @@ class CovarianceMatrix
     private:
         std::vector<double> covMatrix;
         std::vector<double> choleskyMatrix;
-        int numVariates; //make static const again
+        unsigned numVariates; //make static const again
 
 		double sampleMean(std::vector<float> sampleVector, unsigned samples, unsigned lastIteration);
 
     public:
         //Constructors & Destructors:
         CovarianceMatrix(); //Defaults to initCovarianceMatrix(2)
-        CovarianceMatrix(int _numVariates);
+        CovarianceMatrix(unsigned _numVariates);
         CovarianceMatrix(std::vector <double> &matrix);
         CovarianceMatrix(const CovarianceMatrix& other);
         CovarianceMatrix& operator=(const CovarianceMatrix& other);
@@ -42,7 +42,7 @@ class CovarianceMatrix
         std::vector<double>* getCovMatrix();
 		std::vector<double>* getCholeskyMatrix(); //Only for unit testing.
         int getNumVariates();
-        std::vector<double> transformIidNumersIntoCovaryingNumbers(std::vector<double> iidnumbers);
+        std::vector<double> transformIidNumbersIntoCovaryingNumbers(std::vector<double> iidNumbers);
 		void calculateSampleCovariance(std::vector<std::vector<std::vector<std::vector<float>>>> codonSpecificParameterTrace, std::string aa, unsigned samples, unsigned lastIteration);
 
 #ifndef STANDALONE

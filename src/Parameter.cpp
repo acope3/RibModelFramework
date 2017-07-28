@@ -551,7 +551,7 @@ void Parameter::initCategoryDefinitions(std::string _mutationSelectionState,
 void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 {
 	unsigned genomeSize = genome.getGenomeSize();
-	double* scuoValues = new double[genomeSize]();
+	double* SCUOValues = new double[genomeSize]();
 	double* expression = new double[genomeSize]();
 	int* index = new int[genomeSize]();
 
@@ -559,11 +559,11 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 	{
 		index[i] = i;
 		//This used to be maxGrouping instead of 22, but PA model will not work that way
-		scuoValues[i] = calculateSCUO( genome.getGene(i), 22 );
+		SCUOValues[i] = calculateSCUO( genome.getGene(i), 22 );
 		expression[i] = Parameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
 	}
 
-	quickSortPair(scuoValues, index, 0, genomeSize);
+	quickSortPair(SCUOValues, index, 0, genomeSize);
 	std::sort(expression, expression + genomeSize);
 
 	for (unsigned category = 0u; category < numSelectionCategories; category++)
@@ -576,7 +576,7 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 		}
 	}
 
-	delete [] scuoValues;
+	delete [] SCUOValues;
 	delete [] expression;
 	delete [] index;
 }
@@ -633,7 +633,7 @@ std::vector <double> Parameter::readPhiValues(std::string filename)
 		currentFile >> tmpString; //trash the first line, no info given.
 		while (currentFile >> tmpString)
 		{
-			pos = tmpString.find(",");
+			pos = tmpString.find(',');
 			if (pos != std::string::npos)
 			{
 				std::string val = tmpString.substr(pos + 1);
@@ -821,8 +821,10 @@ unsigned Parameter::getNumAcceptForCspForIndex(unsigned i)
 // -------------------------------------------//
 
 
-//TODO: Expose this to allow for testing with only specific codons.
-/* setGroupList (NOT EXPOSED)
+//TODO: Hollis: Verify or implement the Group List such that the MCMC will now only run on the subset of codons set by
+// this function.
+
+/* setGroupList (RCPP EXPOSED)
  * Arguments: vector of strings representing a group list
  * Sets the group list to the argument after clearing the group list, adding elements only if they have no errors.
 */
@@ -1281,10 +1283,12 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 			{
 			  
 			  if (acceptanceLevel < 0.1)
-					for (unsigned k = aaStart; k < aaEnd; k++)
-						covarianceMatrix[aaIndex] *= 0.8;
-				else
-				{
+			  {
+				  for (unsigned k = aaStart; k < aaEnd; k++)
+					  covarianceMatrix[aaIndex] *= 0.8;
+			  }
+			  else
+			  {
 				  //Update cov matrix based on previous window
 				  CovarianceMatrix covcurr(covarianceMatrix[aaIndex].getNumVariates());
 				  covcurr.calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples,
@@ -1296,10 +1300,10 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 				  //replace cov matrix based on previous window
 				  //The is approach was commented out and above code uncommented to replace it 
 				  //covarianceMatrix[aaIndex].calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
-				}
-				
-			//Decomposing of cov matrix to convert iid samples to covarying samples using matrix decomposition
-			//The decomposed matrix is used in the proposal of new samples
+			  }
+
+				//Decomposing of cov matrix to convert iid samples to covarying samples using matrix decomposition
+				//The decomposed matrix is used in the proposal of new samples
 				covarianceMatrix[aaIndex].choleskyDecomposition();
 
 				//Adjust proposal width if for codon specific parameters
@@ -1421,7 +1425,7 @@ double Parameter::getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigne
 
 	if (samples > traceLength)
 	{
-		my_printError("Warning in ROCParameter::getCodonSpecificPosteriorMean throws: Number of anticipated samples ");
+		my_printError("Warning in Parameter::getCodonSpecificPosteriorMean throws: Number of anticipated samples ");
 		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n",
 					  samples, traceLength);
 
@@ -1443,7 +1447,7 @@ double Parameter::getStdDevSynthesisRateVariance(unsigned samples, unsigned mixt
 	unsigned traceLength = (unsigned)StdDevSynthesisRateTrace.size();
 	if (samples > traceLength)
 	{
-		my_printError("Warning in ROCParameter::getSynthesisRateVariance throws: Number of anticipated samples ");
+		my_printError("Warning in Parameter::getSynthesisRateVariance throws: Number of anticipated samples ");
 		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n",
 					  samples, traceLength);
 
@@ -1472,14 +1476,15 @@ double Parameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex,
 	unsigned traceLength = lastIteration + 1;
 	if (samples > traceLength)
 	{
-		my_printError("Warning in ROCParameter::getSynthesisRateVariance throws: Number of anticipated samples ");
+		my_printError("Warning in Parameter::getSynthesisRateVariance throws: Number of anticipated samples ");
 		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n",
 					  samples, traceLength);
 
 		samples = traceLength;
 	}
 
-	float posteriorMean = getSynthesisRatePosteriorMean(samples, geneIndex, mixtureElement);
+	// NOTE: The loss of precision here is acceptable for storage purposes.
+	float posteriorMean = (float)getSynthesisRatePosteriorMean(samples, geneIndex, mixtureElement);
 
 	float posteriorVariance = 0.0;
 	if (!std::isnan(posteriorMean))
@@ -1556,7 +1561,7 @@ std::vector<double> Parameter::getCodonSpecificQuantile(unsigned mixtureElement,
 																							  + lastIteration + 1));
     std::sort(samplesTrace.begin(), samplesTrace.end());
     std::vector<double> retVec(probs.size());
-    for (int i = 0; i < probs.size(); i++)
+    for (unsigned i = 0u; i < probs.size(); i++)
     {
         double h = (1.0+(samplesTrace.size()-1.0)*probs[i]);
         int low = (int)h;
@@ -1594,7 +1599,7 @@ std::vector<double> Parameter::getEstimatedMixtureAssignmentProbabilities(unsign
 
 	if (samples > traceLength)
 	{
-		my_printError("Warning in ROCParameter::getEstimatedMixtureAssignmentProbabilities throws: Number of anticipated samples ");
+		my_printError("Warning in Parameter::getEstimatedMixtureAssignmentProbabilities throws: Number of anticipated samples ");
 		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n",
 					  samples, traceLength);
 
@@ -1664,7 +1669,7 @@ int Parameter::pivotPair(double a[], int b[], int first, int last)
 // http://www.tandfonline.com/doi/pdf/10.1080/03081070500502967 */
 double Parameter::calculateSCUO(Gene& gene, unsigned maxAA)
 {
-	SequenceSummary *seqsum = gene.getSequenceSummary();
+	SequenceSummary *sequenceSummary = gene.getSequenceSummary();
 
 	double totalDegenerateAACount = 0.0;
 	for (unsigned i = 0u; i < maxAA; i++)
@@ -1672,7 +1677,7 @@ double Parameter::calculateSCUO(Gene& gene, unsigned maxAA)
 		std::string curAA = SequenceSummary::AminoAcidArray[i];
 		// skip amino acids with only one codon or stop codons
 		if (curAA == "X" || curAA == "M" || curAA == "W") continue;
-		totalDegenerateAACount += (double)seqsum->getAACountForAA(i);
+		totalDegenerateAACount += (double)sequenceSummary->getAACountForAA(i);
 	}
 
 	double scuoValue = 0.0;
@@ -1683,7 +1688,7 @@ double Parameter::calculateSCUO(Gene& gene, unsigned maxAA)
 		if (curAA == "X" || curAA == "M" || curAA == "W") continue;
 		double numDegenerateCodons = SequenceSummary::GetNumCodonsForAA(curAA);
 
-		double aaCount = (double)seqsum->getAACountForAA(i);
+		double aaCount = (double)sequenceSummary->getAACountForAA(i);
 		if (aaCount == 0) continue;
 
 		unsigned start, end;
@@ -1693,7 +1698,7 @@ double Parameter::calculateSCUO(Gene& gene, unsigned maxAA)
 		double aaEntropy = 0.0;
 		for (unsigned k = start; k < end; k++)
 		{
-			int currCodonCount = seqsum->getCodonCountForCodon(k);
+			int currCodonCount = sequenceSummary->getCodonCountForCodon(k);
 			if (currCodonCount == 0) continue;
 			double codonProportion = (double)currCodonCount / aaCount;
 			aaEntropy += codonProportion*std::log(codonProportion);
@@ -1851,13 +1856,13 @@ double Parameter::randUnif(double minVal, double maxVal)
 unsigned Parameter::randMultinom(std::vector <double> &probabilities, unsigned mixtureElements)
 {
 	// calculate cumulative sum to determine group boundaries
-	double* cumsum = new double[mixtureElements]();
-	//std::vector<double> cumsum(groups);
-	cumsum[0] = probabilities[0];
+	double* cumulativeSum = new double[mixtureElements]();
+	//std::vector<double> cumulativeSum(groups);
+	cumulativeSum[0] = probabilities[0];
 
 	for (unsigned i = 1u; i < mixtureElements; i++)
 	{
-		cumsum[i] = cumsum[i-1u] + probabilities[i];
+		cumulativeSum[i] = cumulativeSum[i-1u] + probabilities[i];
 	}
 	// draw random number from U(0,1)
 	double referenceValue;
@@ -1874,26 +1879,26 @@ unsigned Parameter::randMultinom(std::vector <double> &probabilities, unsigned m
 	unsigned returnValue = 0u;
 	for (unsigned i = 0u; i < mixtureElements; i++)
 	{
-		if (referenceValue <= cumsum[i])
+		if (referenceValue <= cumulativeSum[i])
 		{
 			returnValue = i;
 			break;
 		}
 	}
-	delete [] cumsum;
+	delete [] cumulativeSum;
 	return returnValue;
 }
 
 unsigned Parameter::randMultinom(double *probabilities, unsigned mixtureElements)
 {
 	// calculate cumulative sum to determine group boundaries
-	double* cumsum = new double[mixtureElements]();
-	//std::vector<double> cumsum(groups);
-	cumsum[0] = probabilities[0];
+	double* cumulativeSum = new double[mixtureElements]();
+	//std::vector<double> cumulativeSum(groups);
+	cumulativeSum[0] = probabilities[0];
 
 	for (unsigned i = 1u; i < mixtureElements; i++)
 	{
-		cumsum[i] = cumsum[i - 1u] + probabilities[i];
+		cumulativeSum[i] = cumulativeSum[i - 1u] + probabilities[i];
 	}
 	// draw random number from U(0,1)
 	double referenceValue;
@@ -1910,15 +1915,16 @@ unsigned Parameter::randMultinom(double *probabilities, unsigned mixtureElements
 	unsigned returnValue = 0u;
 	for (unsigned i = 0u; i < mixtureElements; i++)
 	{
-		if (referenceValue <= cumsum[i])
+		if (referenceValue <= cumulativeSum[i])
 		{
 			returnValue = i;
 			break;
 		}
 	}
-	delete[] cumsum;
+	delete[] cumulativeSum;
 	return returnValue;
 }
+
 
 double Parameter::densityNorm(double x, double mean, double sd, bool log)
 {
