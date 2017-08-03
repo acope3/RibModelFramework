@@ -422,13 +422,13 @@ Gene Gene::reverseComplement()
 */
 std::string Gene::toAASequence()
 {
-    std::string aaseq = "";
+    std::string AASequence = "";
     for (unsigned i = 0; i < seq.length(); i+=3)
     {
         std::string codon = seq.substr(i, 3);
-        aaseq += SequenceSummary::codonToAA(codon);
+        AASequence += SequenceSummary::codonToAA(codon);
     }
-    return aaseq;
+    return AASequence;
 }
 
 
