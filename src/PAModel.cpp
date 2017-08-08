@@ -12,7 +12,7 @@ using namespace Rcpp;
 
 PAModel::PAModel(unsigned _RFPCountColumn) : Model()
 {
-	parameter = 0;
+	parameter = NULL;
 	RFPCountColumn = _RFPCountColumn;
 	//ctor
 }
@@ -577,6 +577,10 @@ PAParameter* PAModel::getParameter()
 }
 
 
+/* setParameter (RCPP EXPOSED)
+ * Arguments: The PAParameter object to be referenced and stored.
+ * Sets the private parameter object to the parameter object specified.
+*/
 void PAModel::setParameter(PAParameter &_parameter)
 {
 	parameter = &_parameter;

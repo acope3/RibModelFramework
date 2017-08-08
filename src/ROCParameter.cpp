@@ -431,12 +431,12 @@ void ROCParameter::initMutationCategories(std::vector<std::string> files, unsign
 			while (currentFile >> tmp)
 			{
 				//Get the Codon and Index
-				std::size_t pos = tmp.find(",", 2); //Amino Acid and a comma will always be the first 2 characters
+				std::size_t pos = tmp.find(',', 2); //Amino Acid and a comma will always be the first 2 characters
 				std::string codon = tmp.substr(2, pos - 2);
 				unsigned codonIndex = SequenceSummary::codonToIndex(codon, true);
 
 				//get the value to store
-				std::size_t pos2 = tmp.find(",", pos + 1);
+				std::size_t pos2 = tmp.find(',', pos + 1);
 				//my_print("%\n", tmp.substr(pos + 1, pos2 - pos - 1 ));
 				double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
 
@@ -467,12 +467,12 @@ void ROCParameter::initSelectionCategories(std::vector<std::string> files, unsig
 			while (currentFile >> tmp)
 			{
 				//Get the Codon and Index
-				std::size_t pos = tmp.find(",", 2); //Amino Acid and a comma will always be the first 2 characters
+				std::size_t pos = tmp.find(',', 2); //Amino Acid and a comma will always be the first 2 characters
 				std::string codon = tmp.substr(2, pos - 2);
 				unsigned codonIndex = SequenceSummary::codonToIndex(codon, true);
 
 				//get the value to store
-				std::size_t pos2 = tmp.find(",", pos + 1);
+				std::size_t pos2 = tmp.find(',', pos + 1);
 				//	my_print("%\n", tmp.substr(pos + 1, pos2 - pos - 1 ));
 				double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
 
@@ -651,7 +651,7 @@ void ROCParameter::proposeCodonSpecificParameter()
 		}
 
 		std::vector<double> covaryingNums;
-		covaryingNums = covarianceMatrix[SequenceSummary::AAToAAIndex(aa)].transformIidNumersIntoCovaryingNumbers(
+		covaryingNums = covarianceMatrix[SequenceSummary::AAToAAIndex(aa)].transformIidNumbersIntoCovaryingNumbers(
 				iidProposed);
 		for (unsigned i = 0; i < numMutationCategories; i++)
 		{
