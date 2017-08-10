@@ -50,6 +50,9 @@ class PANSEParameter: public Parameter {
 		void initMutationSelectionCategories(std::vector<std::string> files, unsigned numCategories,
 				unsigned paramType); //TODO: function needs to be changed
 
+        //CSP Read Functions:
+        std::vector<double> readAlphaValues(std::string filename);
+        std::vector<double> readLambdaValues(std::string filename);
 
 		//Trace Functions:
 		void updateCodonSpecificParameterTrace(unsigned sample, std::string codon);
@@ -60,9 +63,15 @@ class PANSEParameter: public Parameter {
 		void proposeCodonSpecificParameter();
 		void updateCodonSpecificParameter(std::string grouping);
 
-        //NSE Functions
-        //void setNSEWaitingTimes
-
+        /*NSE Functions Need to test all
+        double getNSERate(unsigned selectionCategory, bool proposed = false);
+        virtual void proposeNSERate();
+        void setNSERate(double nseRate, unsigned selectionCategory);
+        double getCurrentNSERateProposalWidth();
+        unsigned getNumAcceptForNSERate(); //Only for unit testing.
+        void updateNSERate();
+        double getStdCspForIndex(unsigned i); //Only for unit testing
+        */
 
 
 		//Adaptive Width Functions:

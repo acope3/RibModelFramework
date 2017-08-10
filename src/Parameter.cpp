@@ -743,7 +743,7 @@ unsigned Parameter::getNumSynthesisRateCategories()
 	return numSelectionCategories;
 }
 
-
+//Used to get alphacategory in PA and PANSE
 unsigned Parameter::getMutationCategory(unsigned mixtureElement)
 {
 	return categories[mixtureElement].delM;
@@ -765,6 +765,7 @@ unsigned Parameter::getMutationCategory(unsigned mixtureElement)
  * See Note 1) above.
  * Wrapped by getSelectionCategoryForMixture on the R-side.
  */
+//Used to get lambdacategory in PA and PANSE
 unsigned Parameter::getSelectionCategory(unsigned mixtureElement)
 {
 	return categories[mixtureElement].delEta;

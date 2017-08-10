@@ -980,7 +980,24 @@ int main()
 #ifdef DENIZHAN
 int main()
 {
-	std::string pathBegin = "/home/nax/Work/biolab/TestingIn/";
+	PANSEParameter parameter;
+    std::vector <double> alphas;
+    std::vector <double> lambdas;
+
+    std::string file = "/home/nax/Work/biolab/Dev/data/rfp/RFPAlphaValues.csv";
+    alphas = parameter.readAlphaValues(file);
+    lambdas = parameter.readLambdaValues("/home/nax/Work/biolab/Dev/data/rfp/RFPLambdaPrimeValues.csv");
+
+    for(int i = 0; i < alphas.size(); i++){
+        my_print("%,%\n", SequenceSummary::indexToCodon(i), alphas[i]);
+    }
+    
+    for(int i = 0; i < lambdas.size(); i++){
+        my_print("%,%\n", SequenceSummary::indexToCodon(i), lambdas[i]);
+    }
+    exit(0);
+	
+    std::string pathBegin = "/home/nax/Work/biolab/TestingIn/";
 
 	unsigned numMixtures = 1;
 	std::vector<double> sphi_init(numMixtures, 2);
@@ -1133,7 +1150,8 @@ int main()
 	} //END OF ROC
 	else if (modelToRun == "PANSE")
 	{
-		my_print("Initializing Genome object--------------------------\n");
+        
+        my_print("Initializing Genome object--------------------------\n");
 		Genome genome;
 		//genome.readRFPData(pathBegin + "RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 		genome.readRFPData(pathBegin + "PopPAData.csv");
@@ -1165,7 +1183,7 @@ int main()
 
 
 		my_print("Initializing PANSEParameter object--------------------\n\n");
-		PANSEParameter parameter;
+		//PANSEParameter parameter;
 		//parameter.writeBasicRestartFile("/Users/hollisbui/HollisFile.txt");
 
 		if (fromRestart)
@@ -1203,7 +1221,7 @@ int main()
 		mcmc.run(genome, model, 1, 0);
 		my_print("Done!----------------------------------\n\n\n");
 
-	} //END OF RFP
+	} //END OF PANSE
 	else if (modelToRun == "FONSE")
 	{
 		my_print("initialize Genome object--------------------------\n");

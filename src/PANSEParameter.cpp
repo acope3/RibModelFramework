@@ -766,7 +766,6 @@ double PANSEParameter::getParameterForCategoryR(unsigned mixtureElement, unsigne
 		codon[2] = (char)std::toupper(codon[2]);
 		if (paramType == PANSEParameter::alp)
 		{
-			//TODO THIS NEEDS TO CHANGE, NAMING!!!!
 			category = getMutationCategory(mixtureElement); //really alpha here
 		}
 		else if (paramType == PANSEParameter::lmPri)
@@ -777,6 +776,66 @@ double PANSEParameter::getParameterForCategoryR(unsigned mixtureElement, unsigne
 	}
 	return rv;
 }
-
 #endif
 
+std::vector<double> PANSEParameter::readAlphaValues(std::string filename)
+{
+    std::size_t pos;
+    std::ifstream currentFile;
+    std::string tmpString;
+    std::vector <double> rv;
+
+    rv.resize(64,1);
+
+    currentFile.open(filename);
+    if (currentFile.fail())
+        my_printError("Error opening file %\n", filename.c_str());
+    else
+    {
+        currentFile >> tmpString;
+        while (currentFile >> tmpString){
+            pos = tmpString.find(',');
+            if (pos != std::string::npos)
+            {
+                std::string codon = tmpString.substr(0,3);
+                std::string val = tmpString.substr(pos + 1, std::string::npos);
+                rv[SequenceSummary::codonToIndex(codon)] = std::atof(val.c_str());
+            }
+        }
+    }
+
+    currentFile.close();
+    return rv;
+
+}
+
+std::vector<double> PANSEParameter::readLambdaValues(std::string filename)
+{
+    std::size_t pos;
+    std::ifstream currentFile;
+    std::string tmpString;
+    std::vector <double> rv;
+    
+    rv.resize(64, 0.1);
+
+    currentFile.open(filename);
+    if (currentFile.fail())
+        my_printError("Error opening file %\n", filename.c_str());
+    else
+    {
+        currentFile >> tmpString;
+        while (currentFile >> tmpString){
+            pos = tmpString.find(',');
+            if (pos != std::string::npos)
+            {
+                std::string codon = tmpString.substr(0,3);
+                std::string val = tmpString.substr(pos + 1, std::string::npos);
+                rv[SequenceSummary::codonToIndex(codon, true)] = std::atof(val.c_str());
+                my_print("%: %\n", codon, rv[SequenceSummary::codonToIndex(codon, true)]);
+            }
+        }
+    }
+    
+    currentFile.close();
+    return rv;
+}

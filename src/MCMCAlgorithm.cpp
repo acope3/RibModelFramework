@@ -232,6 +232,8 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
             if (std::isnan(logPosterior))
             {
                 my_print("\n\n\n");
+                my_print("logPosterior: %\n", logPosterior);
+                my_print("currGeneLogPost: %\n", currGeneLogPost);
                 my_print("Gene: %, %\n", i, gene->getId());
                 my_print("Mixture: %\n", k);
                 my_print("Mix. Prop.: %\n", probabilities[k]);

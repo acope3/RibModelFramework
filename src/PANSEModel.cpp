@@ -44,9 +44,12 @@ double PANSEModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, doubl
     term2 *= currRFPObserved;
     term3 *= currAlpha;
 
-    //my_print("term1 = %\nterm2 = %\nterm3 = %\nalpha = %\nlambda = %\nphi = %\n", term1, term2, term3, currAlpha, currLambdaPrime, phiValue);
 
-    return term1 + term2 + term3;
+    double rv = term1 + term2 + term3;
+
+    if (std::isnan(rv)){
+        my_print("term1 = %\nterm2 = %\nterm3 = %\nalpha = %\nlambda = %\nphi = %\n", term1, term2, term3, currAlpha, currLambdaPrime, phiValue);
+    }
 }
 
 
@@ -108,6 +111,13 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 
         logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
         logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue_proposed);
+
+        if(std::isnan(logLikelihood)){
+            my_print("real is nan\n");
+        }
+        if(std::isnan(logLikelihood_proposed)){
+            my_print("proposed is nan\n");
+        }
         }
 
     double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(lambdaPrimeCategory, false);
@@ -770,4 +780,60 @@ double psi2phi(double psi, double sigma){
 }
 double phi2psi(double phi, double sigma){
     return phi / sigma;
+}
+
+std::vector <double> readAlphaValues(std::string filename){
+    std::size_t pos;
+    std::ifstream currentFile;
+    std::string tmpString;
+    std::vector <double> rv;
+
+    rv.resize(64);
+
+    currentFile.open(filename);
+    if (currentFile.fail())
+        my_printError("Error opening file %\n", filename.c_str());
+    else
+    {
+        currentFile >> tmpString;
+        while (currentFile >> tmpString){
+            pos = tmpString.find(',');
+            if (pos != std::string::npos)
+            {
+                std::string codon = tmpString.substr(0,3);
+                std::string val = tmpString.substr(pos + 1, std::string::npos);
+                rv[SequenceSummary::codonToIndex(codon, true)] = std::atof(val.c_str());
+            }
+        }
+    }
+
+    return rv;
+
+}
+std::vector <double> readLambdaValues(std::string filename){
+    std::size_t pos;
+    std::ifstream currentFile;
+    std::string tmpString;
+    std::vector <double> rv;
+    
+    rv.resize(64);
+
+    currentFile.open(filename);
+    if (currentFile.fail())
+        my_printError("Error opening file %\n", filename.c_str());
+    else
+    {
+        currentFile >> tmpString;
+        while (currentFile >> tmpString){
+            pos = tmpString.find(',');
+            if (pos != std::string::npos)
+            {
+                std::string codon = tmpString.substr(0,3);
+                std::string val = tmpString.substr(pos + 1, std::string::npos);
+                rv[SequenceSummary::codonToIndex(codon, true)] = std::atof(val.c_str());
+            }
+        }
+    }
+
+    return rv;
 }
