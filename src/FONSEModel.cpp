@@ -45,7 +45,7 @@ double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grou
 		for (unsigned j = 0; j < positions->size(); j++)
 		{
 			calculateLogCodonProbabilityVector(numCodons, positions->at(j), minIndexVal, mutation, selection, phiValue, codonProb);
-			if (codonProb[k] == 0) continue; //TODO: Why is this continue statement needed? If it's zero you can still add it and not change the value
+			//if (codonProb[k] == 0) continue; //TODO: Why is this continue statement needed? If it's zero you can still add it and not change the value
 			logLikelihood += codonProb[k];
 		}
 		//positions->clear();
@@ -63,6 +63,7 @@ double FONSEModel::calculateMutationPrior(std::string grouping, bool proposed)
 
 	unsigned numMutCat = parameter->getNumMutationCategories();
 	double mutation_prior_sd = parameter->getMutationPriorStandardDeviation();
+	//TODO: Explain what's going on here
 	for (unsigned i = 0u; i < numMutCat; i++)
 	{
 		parameter->getParameterForCategory(i, FONSEParameter::dM, grouping, proposed, mutation);
@@ -125,8 +126,8 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 	double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(selectionCategory, false);
 	double logPhiProbability = Parameter::densityLogNorm(phiValue, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
 	double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
-	double currentLogLikelihood = (likelihood + logPhiProbability);
-	double proposedLogLikelihood = (likelihood_proposed + logPhiProbability_proposed);
+	double currentLogLikelihood = likelihood + logPhiProbability;
+	double proposedLogLikelihood = likelihood_proposed + logPhiProbability_proposed;
 	if (phiValue == 0) {
 		my_print("phiValue is 0\n");
 	}
@@ -434,7 +435,22 @@ void FONSEModel::updateHyperParameterTraces(unsigned sample)
 void FONSEModel::updateTracesWithInitialValues(Genome & genome)
 {
 	std::vector <std::string> groupList = parameter->getGroupList();
-
+	unsigned groupSize = groupList.size();
+	unsigned genomeSize = genome.getGenomeSize();
+	unsigned biggestSize = std::max(groupSize, genomeSize);
+	for (unsigned i = 0; i < biggestSize; i++)
+	{
+		if (i < genomeSize)
+		{
+			parameter->updateSynthesisRateTrace(0, i);
+			parameter->updateMixtureAssignmentTrace(0, i);
+		}
+		if (i < groupSize)
+		{
+			parameter->updateCodonSpecificParameterTrace(0, getGrouping(i));
+		}
+	}
+	/*
 	for (unsigned i = 0; i < genome.getGenomeSize(); i++)
 	{
 		parameter->updateSynthesisRateTrace(0, i);
@@ -445,6 +461,7 @@ void FONSEModel::updateTracesWithInitialValues(Genome & genome)
 	{
 		parameter->updateCodonSpecificParameterTrace(0, getGrouping(i));
 	}
+	*/
 }
 
 
@@ -602,6 +619,7 @@ void FONSEModel::simulateGenome(Genome & genome)
 		double phi = getSynthesisRate(geneIndex, synthesisRateCategory, false);
 
 		std::string geneSeq = gene.getSequence();
+		//TODO: Documentation
 		for (unsigned position = 1; position < (geneSeq.size() / 3); position++)
 		{
 			std::string codon = geneSeq.substr((position * 3), 3);
@@ -609,7 +627,8 @@ void FONSEModel::simulateGenome(Genome & genome)
 
 			//TODO: Throw an error here instead
 			if (curAA == "X") {
-				if (position < (geneSeq.size() / 3) - 1) my_print("Warning: Internal stop codon found in gene % at position %. Ignoring and moving on.\n", gene.getId(), position);
+				if (position < (geneSeq.size() / 3) - 1)
+					my_print("Warning: Internal stop codon found in gene % at position %. Ignoring and moving on.\n", gene.getId(), position);
 				continue;
 			}
 
@@ -634,11 +653,11 @@ void FONSEModel::simulateGenome(Genome & genome)
 
 			codonIndex = Parameter::randMultinom(codonProb, numCodons);
 			unsigned aaStart, aaEnd;
-			SequenceSummary::AAToCodonRange(curAA, aaStart, aaEnd, false);  //need the first spot in the array where the codons for curAA are
-			codon = sequenceSummary.indexToCodon(aaStart + codonIndex);//get the correct codon based off codonIndex
+			SequenceSummary::AAToCodonRange(curAA, aaStart, aaEnd, false);  // need the first spot in the array where the codons for curAA are
+			codon = sequenceSummary.indexToCodon(aaStart + codonIndex); // get the correct codon based off codonIndex
 			tmpSeq += codon;
 		}
-		std::string codon = sequenceSummary.indexToCodon((unsigned)Parameter::randUnif(61.0, 64.0)); //randomly choose a stop codon, from range 61-63
+		std::string codon = sequenceSummary.indexToCodon((unsigned)Parameter::randUnif(61.0, 64.0)); // randomly choose a stop codon, from range 61-63
 		tmpSeq += codon;
 		Gene simulatedGene(tmpSeq, tmpDesc, gene.getId());
 		genome.addGene(simulatedGene, true);
