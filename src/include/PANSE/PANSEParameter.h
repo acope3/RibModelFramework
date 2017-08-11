@@ -26,6 +26,9 @@ class PANSEParameter: public Parameter {
 		double bias_csp;
 
 	public:
+        //Testing Functions
+        std::vector<double> oneMixLambda();
+        std::vector<double> oneMixAlpha();
 
 		//Constructors & Destructors:
 		explicit PANSEParameter();

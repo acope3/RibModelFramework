@@ -364,7 +364,7 @@ void PAParameter::initAlpha(double alphaValue, unsigned mixtureElement, std::str
  */
 void PAParameter::initLambdaPrime(double lambdaPrimeValue, unsigned mixtureElement, std::string codon)
 {
-	unsigned category = getMutationCategory(mixtureElement);
+	unsigned category = getSelectionCategory(mixtureElement);
 	unsigned index = SequenceSummary::codonToIndex(codon);
 	currentCodonSpecificParameter[lmPri][category][index] = lambdaPrimeValue;
 }

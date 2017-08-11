@@ -983,14 +983,16 @@ int main()
 	PANSEParameter parameter;
     std::vector <double> alphas;
     std::vector <double> lambdas;
+    std::vector <std::string> cspFiles;
 
-    std::string file = "/home/nax/Work/biolab/Dev/data/rfp/RFPAlphaValues.csv";
-    alphas = parameter.readAlphaValues(file);
-    lambdas = parameter.readLambdaValues("/home/nax/Work/biolab/Dev/data/rfp/RFPLambdaPrimeValues.csv");
+    cspFiles.push_back("/home/nax/Work/biolab/Dev/data/rfp/RFPAlphaValues.csv");
+    parameter.initMutationSelectionCategories(cspFiles, 1, parameter.alp);
+    
+    cspFiles.push_back("/home/nax/Work/biolab/Dev/data/rfp/RFPLambdaPrimeValues.csv");
+    parameter.initMutationSelectionCategories(cspFiles, 1, parameter.lmPri);
 
-    for(int i = 0; i < alphas.size(); i++){
-        my_print("%,%\n", SequenceSummary::indexToCodon(i), alphas[i]);
-    }
+    alphas = parameter.oneMixAlpha();
+    lambdas = parameter.oneMixLambda();
     
     for(int i = 0; i < lambdas.size(); i++){
         my_print("%,%\n", SequenceSummary::indexToCodon(i), lambdas[i]);

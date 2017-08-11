@@ -366,7 +366,7 @@ void PANSEParameter::initAlpha(double alphaValue, unsigned mixtureElement, std::
  */
 void PANSEParameter::initLambdaPrime(double lambdaPrimeValue, unsigned mixtureElement, std::string codon)
 {
-	unsigned category = getMutationCategory(mixtureElement);
+	unsigned category = getSelectionCategory(mixtureElement);
 	unsigned index = SequenceSummary::codonToIndex(codon);
 	currentCodonSpecificParameter[lmPri][category][index] = lambdaPrimeValue;
 }
@@ -824,14 +824,15 @@ std::vector<double> PANSEParameter::readLambdaValues(std::string filename)
     else
     {
         currentFile >> tmpString;
+        unsigned i = 0;
         while (currentFile >> tmpString){
             pos = tmpString.find(',');
             if (pos != std::string::npos)
             {
                 std::string codon = tmpString.substr(0,3);
                 std::string val = tmpString.substr(pos + 1, std::string::npos);
-                rv[SequenceSummary::codonToIndex(codon, true)] = std::atof(val.c_str());
-                my_print("%: %\n", codon, rv[SequenceSummary::codonToIndex(codon, true)]);
+                i = SequenceSummary::codonToIndex(codon);
+                rv[SequenceSummary::codonToIndex(codon)] = std::atof(val.c_str());
             }
         }
     }
@@ -839,3 +840,11 @@ std::vector<double> PANSEParameter::readLambdaValues(std::string filename)
     currentFile.close();
     return rv;
 }
+
+std::vector<double> PANSEParameter::oneMixLambda(){
+    return currentCodonSpecificParameter[lmPri][0];
+}
+std::vector<double> PANSEParameter::oneMixAlpha(){
+    return currentCodonSpecificParameter[alp][0];
+}
+
