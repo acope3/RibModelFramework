@@ -778,14 +778,14 @@ double PANSEParameter::getParameterForCategoryR(unsigned mixtureElement, unsigne
 }
 #endif
 
-std::vector<double> PANSEParameter::readAlphaValues(std::string filename)
+void PANSEParameter::readAlphaValues(std::string filename)
 {
     std::size_t pos;
     std::ifstream currentFile;
     std::string tmpString;
-    std::vector <double> rv;
+    std::vector <double> tmp;
 
-    rv.resize(64,1);
+    tmp.resize(64,1);
 
     currentFile.open(filename);
     if (currentFile.fail())
@@ -799,24 +799,30 @@ std::vector<double> PANSEParameter::readAlphaValues(std::string filename)
             {
                 std::string codon = tmpString.substr(0,3);
                 std::string val = tmpString.substr(pos + 1, std::string::npos);
-                rv[SequenceSummary::codonToIndex(codon)] = std::atof(val.c_str());
+                tmp[SequenceSummary::codonToIndex(codon)] = std::atof(val.c_str());
             }
         }
     }
-
     currentFile.close();
-    return rv;
+
+	unsigned alphaCategories = getNumMutationCategories();
+
+	for (unsigned i = 0; i < alphaCategories; i++)
+	{
+		currentCodonSpecificParameter[alp][i] = tmp;
+		proposedCodonSpecificParameter[alp][i] = tmp;
+	}
 
 }
 
-std::vector<double> PANSEParameter::readLambdaValues(std::string filename)
+void PANSEParameter::readLambdaValues(std::string filename)
 {
     std::size_t pos;
     std::ifstream currentFile;
     std::string tmpString;
-    std::vector <double> rv;
+    std::vector <double> tmp;
     
-    rv.resize(64, 0.1);
+    tmp.resize(64, 0.1);
 
     currentFile.open(filename);
     if (currentFile.fail())
@@ -832,13 +838,21 @@ std::vector<double> PANSEParameter::readLambdaValues(std::string filename)
                 std::string codon = tmpString.substr(0,3);
                 std::string val = tmpString.substr(pos + 1, std::string::npos);
                 i = SequenceSummary::codonToIndex(codon);
-                rv[SequenceSummary::codonToIndex(codon)] = std::atof(val.c_str());
+                tmp[SequenceSummary::codonToIndex(codon)] = std::atof(val.c_str());
             }
         }
     }
     
     currentFile.close();
-    return rv;
+	unsigned lambdaPrimeCategories = getNumSelectionCategories();
+
+	for (unsigned i = 0; i < lambdaPrimeCategories; i++)
+	{
+		currentCodonSpecificParameter[lmPri][i] = tmp;
+		proposedCodonSpecificParameter[lmPri][i] = tmp;
+		lambdaValues[i] = tmp; //Maybe we don't initialize this one? or we do it differently?
+	}
+
 }
 
 std::vector<double> PANSEParameter::oneMixLambda(){

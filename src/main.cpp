@@ -980,26 +980,41 @@ int main()
 #ifdef DENIZHAN
 int main()
 {
-	PANSEParameter parameter;
     std::vector <double> alphas;
     std::vector <double> lambdas;
     std::vector <std::string> cspFiles;
+    std::string pathBegin = "/home/nax/Work/biolab/TestingIn/";
+    Genome genome;
+	unsigned numMixtures = 1;
+	std::vector<double> sphi_init(numMixtures, 2);
+	std::vector<std::vector<unsigned> > mixtureDefinitionMatrix;
+	std::vector<unsigned> geneAssignment;
+	genome.readRFPData("/home/nax/Work/biolab/Logs/Main/simRFP2.csv", false);
+    geneAssignment.resize(genome.getGenomeSize());
+    my_print("%\n", genome.getGenomeSize());
+	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+	{
+		geneAssignment[i] = 0u;
+	}
+	
+    PANSEParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
 
     cspFiles.push_back("/home/nax/Work/biolab/Dev/data/rfp/RFPAlphaValues.csv");
+    //parameter.readAlphaValues(cspFiles[0]);
     parameter.initMutationSelectionCategories(cspFiles, 1, parameter.alp);
     
-    cspFiles.push_back("/home/nax/Work/biolab/Dev/data/rfp/RFPLambdaPrimeValues.csv");
+    cspFiles[0] = ("/home/nax/Work/biolab/Dev/data/rfp/RFPLambdaPrimeValues.csv");
+    //parameter.readLambdaValues(cspFiles[1]);
     parameter.initMutationSelectionCategories(cspFiles, 1, parameter.lmPri);
 
     alphas = parameter.oneMixAlpha();
     lambdas = parameter.oneMixLambda();
     
-    for(int i = 0; i < lambdas.size(); i++){
-        my_print("%,%\n", SequenceSummary::indexToCodon(i), lambdas[i]);
+    for(int i = 0; i < alphas.size(); i++){
+        my_print("%,%\n", SequenceSummary::indexToCodon(i), alphas[i]);
     }
     exit(0);
-	
-    std::string pathBegin = "/home/nax/Work/biolab/TestingIn/";
+/*	
 
 	unsigned numMixtures = 1;
 	std::vector<double> sphi_init(numMixtures, 2);
@@ -1014,7 +1029,7 @@ int main()
         
 	genome.readRFPData(pathBegin + "rfp_file_20positions_20genes.csv", false);
     exit(0);
-	/*genome.readFasta(pathBegin + "RibModelDev/data/singleMixture/genome_2000.fasta", false);
+	genome.readFasta(pathBegin + "RibModelDev/data/singleMixture/genome_2000.fasta", false);
 	
 	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)

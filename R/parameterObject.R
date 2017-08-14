@@ -741,6 +741,7 @@ writeParameterObject.Rcpp_PAParameter <- function(parameter, file){
        file=file)
 }
 
+#called from "writeParameterObject."
 writeParameterObject.Rcpp_PANSEParameter <- function(parameter, file){
   paramBase <- extractBaseInfo(parameter)
   

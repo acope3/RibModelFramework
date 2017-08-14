@@ -54,8 +54,8 @@ class PANSEParameter: public Parameter {
 				unsigned paramType); //TODO: function needs to be changed
 
         //CSP Read Functions:
-        std::vector<double> readAlphaValues(std::string filename);
-        std::vector<double> readLambdaValues(std::string filename);
+        void readAlphaValues(std::string filename);
+        void readLambdaValues(std::string filename);
 
 		//Trace Functions:
 		void updateCodonSpecificParameterTrace(unsigned sample, std::string codon);
