@@ -312,12 +312,12 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 		if ( -Parameter::randExp(1) < acceptanceRatioForAllMixtures[0])
 		{
 			// moves proposed codon specific parameters to current codon specific parameters
-			posterior = acceptanceRatioForAllMixtures[4];
-			model.updateCodonSpecificParameter(grouping);
+			posterior = acceptanceRatioForAllMixtures[4]; //unassigned will be 0
+			model.updateCodonSpecificParameter(grouping); 
 			if ((iteration % thinning) == 0)
 			{
-				likelihoodTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[2];
-				posteriorTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[4];
+				likelihoodTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[2];//will be 0
+				posteriorTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[4];//will be 0
 			}
 		}
 		else
