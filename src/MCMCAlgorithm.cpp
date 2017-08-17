@@ -454,6 +454,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 		{
 			model.proposeCodonSpecificParameter();
 			acceptRejectCodonSpecificParameter(genome, model, iteration);
+            //TODO:Probably do a nan check
 			if ((iteration % adaptiveWidth) == 0u)
 				model.adaptCodonSpecificParameterProposalWidth(adaptiveWidth, iteration / thinning, iteration <= stepsToAdapt);
 		}
@@ -463,6 +464,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 			model.updateGibbsSampledHyperParameters(genome);
 			model.proposeHyperParameters();
 			acceptRejectHyperParameter(genome, model, iteration);
+            //TODO:Probably do a nan check
 			if ((iteration % adaptiveWidth) == 0u)
 				model.adaptHyperParameterProposalWidths(adaptiveWidth, iteration <= stepsToAdapt);
 		}
@@ -470,7 +472,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 		if (estimateSynthesisRate || estimateMixtureAssignment)
 		{
 			model.proposeSynthesisRateLevels();
-			double logPost= acceptRejectSynthesisRateLevelForAllGenes(genome, model, iteration);
+			double logPost = acceptRejectSynthesisRateLevelForAllGenes(genome, model, iteration);
 			if ((iteration % thinning) == 0u)
 			{
 				posteriorTrace[(iteration / thinning)] = logPost;

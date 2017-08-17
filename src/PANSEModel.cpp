@@ -123,15 +123,16 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
     double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(lambdaPrimeCategory, false);
     double logPhiProbability = Parameter::densityLogNorm(phiValue, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
     double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
-    double currentLogLikelihood = (logLikelihood + logPhiProbability);
-    double proposedLogLikelihood = (logLikelihood_proposed + logPhiProbability_proposed);
+	double currentLogPosterior = (logLikelihood + logPhiProbability);
+	double proposedLogPosterior = (logLikelihood_proposed + logPhiProbability_proposed);
 
-    logProbabilityRatio[0] = (proposedLogLikelihood - currentLogLikelihood) - (std::log(phiValue) - std::log(phiValue_proposed));
-    logProbabilityRatio[1] = currentLogLikelihood - std::log(phiValue_proposed);
-    logProbabilityRatio[2] = proposedLogLikelihood - std::log(phiValue);
-    logProbabilityRatio[3] = currentLogLikelihood;
-    logProbabilityRatio[4] = proposedLogLikelihood;
-    //TODO: 5 and 6 are used in ROC for trace and should be added
+	logProbabilityRatio[0] = (proposedLogPosterior - currentLogPosterior) - (std::log(phiValue) - std::log(phiValue_proposed));//Is recalulcated in MCMC
+	logProbabilityRatio[1] = currentLogPosterior - std::log(phiValue_proposed);
+	logProbabilityRatio[2] = proposedLogPosterior - std::log(phiValue);
+	logProbabilityRatio[3] = currentLogPosterior;
+	logProbabilityRatio[4] = proposedLogPosterior;
+	logProbabilityRatio[5] = logLikelihood;
+	logProbabilityRatio[6] = logLikelihood_proposed;
 }
 
 
@@ -173,7 +174,11 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
         logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
         logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
     }
-    logAcceptanceRatioForAllMixtures[0] = logLikelihood_proposed - logLikelihood;
+	logAcceptanceRatioForAllMixtures[0] = logLikelihood_proposed - logLikelihood;
+	logAcceptanceRatioForAllMixtures[1] = logLikelihood;
+	logAcceptanceRatioForAllMixtures[2] = logLikelihood_proposed;
+	logAcceptanceRatioForAllMixtures[3] = logLikelihood;
+	logAcceptanceRatioForAllMixtures[4] = logLikelihood_proposed;
 }
 
 
