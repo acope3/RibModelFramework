@@ -485,7 +485,7 @@ void PAParameter::proposeCodonSpecificParameter()
 	{
 		for (unsigned j = 0; j < numAlpha; j++)
 		{
-			proposedCodonSpecificParameter[alp][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[alp][i][j]) , std_csp[j]) );
+			double a = proposedCodonSpecificParameter[alp][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[alp][i][j]) , std_csp[j]) );
 		}
 	}
 
@@ -511,11 +511,13 @@ void PAParameter::updateCodonSpecificParameter(std::string grouping)
 
 	for (unsigned k = 0u; k < numMutationCategories; k++)
 	{
-		currentCodonSpecificParameter[alp][k][i] = proposedCodonSpecificParameter[alp][k][i];
+		double a = currentCodonSpecificParameter[alp][k][i] = proposedCodonSpecificParameter[alp][k][i];
+        my_print("updated alpha is %", a);
 	}
 	for (unsigned k = 0u; k < numSelectionCategories; k++)
 	{
-		currentCodonSpecificParameter[lmPri][k][i] = proposedCodonSpecificParameter[lmPri][k][i];
+		double l = currentCodonSpecificParameter[lmPri][k][i] = proposedCodonSpecificParameter[lmPri][k][i];
+        my_print("updated lambda is %", l);
 	}
 }
 
