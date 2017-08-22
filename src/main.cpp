@@ -1064,8 +1064,9 @@ int main()
 	//exit(0);
 
 
-	std::string modelToRun = "PANSE"; //can be RFP, ROC or FONSE
+	std::string modelToRun = "PA"; //can be RFP, ROC or FONSE
 	bool withPhi = false;
+    getStdCspForIndex(unsigned i);
 	bool fromRestart = false;
 
 
