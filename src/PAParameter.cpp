@@ -539,6 +539,7 @@ void PAParameter::updateCodonSpecificParameter(std::string grouping)
 void PAParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastIteration, bool adapt)
 {
 	my_print("acceptance rate for codon:\n");
+    adapt = false;
 	for (unsigned i = 0; i < groupList.size(); i++)
 	{
 		my_print("%\t", groupList[i]);
