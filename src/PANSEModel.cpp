@@ -50,6 +50,8 @@ double PANSEModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, doubl
     if (std::isnan(rv)){
         my_print("term1 = %\nterm2 = %\nterm3 = %\nalpha = %\nlambda = %\nphi = %\n", term1, term2, term3, currAlpha, currLambdaPrime, phiValue);
     }
+
+    return rv;
 }
 
 
@@ -98,17 +100,21 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 
     std::vector <unsigned> positions = gene.geneData.getPositionCodonID();
 
-        my_print("\nGene = %s: \n\n", geneID.c_str());
 
-        for (unsigned index = 0; index < positions.size(); index++){
-            std::string codon = gene.geneData.indexToCodon(positions[index]);
+    for (unsigned index = 0; index < positions.size(); index++)
+    {
+        std::string codon = gene.geneData.indexToCodon(positions[index]);
+        
         double currAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, false);
         double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PANSEParameter::lmPri, codon, false);
+        //Should be rfp value at position not all of codon
         unsigned currRFPObserved = gene.geneData.getRFPValue(index);
 
         unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(index);
+        //This line will never execute
         if (currNumCodonsInMRNA == 0) continue;
 
+        //Have to redo the math becuas rfp observed has changed
         logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
         logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue_proposed);
 
@@ -119,7 +125,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
             my_print("proposed is nan\n");
         }
         }
-
+    //Double check math here
     double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(lambdaPrimeCategory, false);
     double logPhiProbability = Parameter::densityLogNorm(phiValue, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
     double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
