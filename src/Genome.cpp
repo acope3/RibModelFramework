@@ -215,6 +215,10 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
 
 	while (std::getline(Fin, tmp))
 	{
+    // Remove whitespace from the string
+    tmp.erase(std::remove_if(tmp.begin(), tmp.end(), 
+              std::bind(std::isspace<char>, std::placeholders::_1, std::locale::classic())), tmp.end());
+
 		// Find the GeneID
 		std::size_t pos = tmp.find(',');
 		std::string ID = tmp.substr(0, pos);
@@ -327,6 +331,10 @@ void Genome::readRFPData(std::string filename, bool append)
 			//Now for each line associated with a gene ID, set the string appropriately
 			while (std::getline(Fin, tmp))
 			{
+        // Remove whitespace from the string
+        tmp.erase(std::remove_if(tmp.begin(), tmp.end(), 
+                  std::bind(std::isspace<char>, std::placeholders::_1, std::locale::classic())), tmp.end());
+
 				pos = tmp.find(',');
 				std::string ID = tmp.substr(0, pos);
 
