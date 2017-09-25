@@ -237,7 +237,7 @@ void Gene::setPANSESequence(std::vector<std::vector<int>> table)
     }
 
     // Call processPA with a checking error statement printed if needed. TODO: Need to add a process PANSE
-    if (!geneData.processPA(table))
+    if (!geneData.processPANSE(table))
         my_printError("WARNING: Error with gene %\nBad codons found!\n", id);
 }
 
