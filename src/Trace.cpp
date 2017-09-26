@@ -602,11 +602,10 @@ void Trace::updateCodonSpecificParameterTraceForCodon(unsigned sample, std::stri
 	unsigned i = SequenceSummary::codonToIndex(codon);
 	for (unsigned category = 0; category < codonSpecificParameterTrace[paramType].size(); category++)
 	{
-		codonSpecificParameterTrace[paramType][category][i][sample] = curParam[category][i];
         if(std::isnan(curParam[category][i])){
-            my_printError("\nWell fuck\n");
-            exit(0);
+            my_printError("\n Trace::updateCodonSpecificParameterTraceForCodon: Current parameter set contains NaN. \n");
         }
+		codonSpecificParameterTrace[paramType][category][i][sample] = curParam[category][i];
 	}
 
 	/*

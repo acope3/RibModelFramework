@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/clandere/RibModelFramework.svg)](https://travis-ci.org/clandere/RibModelFramework)
-# angus or what ever we will call it
+#AnaCoDa
 
-* angus is a collection of codon models. 
+* AnaCoDa is a collection of codon models. 
 * the release version can be obtained from ...
 
 
