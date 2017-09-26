@@ -20,10 +20,15 @@ class PANSEParameter: public Parameter {
 	private:
 
 		std::vector<std::vector<double>> lambdaValues; //Currently not used.
-        std::vector<double> NSEWaitingTimes;
+        std::vector<std::vector<double>> NSEWaitingTimes; //Calulcated Per mixture per codon same for gene and position
+        std::vector<std::vector<double>> NSEWaitingTimes_proposed; //Calulcated Per mixture per codon same for gene and position
+        //std::vector<double> elongationProbability; //Per gene
 		double bias_csp;
 
 	public:
+        //Testing Functions
+        std::vector<double> oneMixLambda();
+        std::vector<double> oneMixAlpha();
 
 		//Constructors & Destructors:
 		explicit PANSEParameter();
@@ -48,6 +53,9 @@ class PANSEParameter: public Parameter {
 		void initMutationSelectionCategories(std::vector<std::string> files, unsigned numCategories,
 				unsigned paramType); //TODO: function needs to be changed
 
+        //CSP Read Functions:
+        void readAlphaValues(std::string filename);
+        void readLambdaValues(std::string filename);
 
 		//Trace Functions:
 		void updateCodonSpecificParameterTrace(unsigned sample, std::string codon);
@@ -57,6 +65,16 @@ class PANSEParameter: public Parameter {
 		double getCurrentCodonSpecificProposalWidth(unsigned index);
 		void proposeCodonSpecificParameter();
 		void updateCodonSpecificParameter(std::string grouping);
+
+        /*NSE Functions Need to test all
+        double getNSERate(unsigned selectionCategory, bool proposed = false);
+        virtual void proposeNSERate();
+        void setNSERate(double nseRate, unsigned selectionCategory);
+        double getCurrentNSERateProposalWidth();
+        unsigned getNumAcceptForNSERate(); //Only for unit testing.
+        void updateNSERate();
+        double getStdCspForIndex(unsigned i); //Only for unit testing
+        */
 
 
 		//Adaptive Width Functions:

@@ -980,7 +980,41 @@ int main()
 #ifdef DENIZHAN
 int main()
 {
-	std::string pathBegin = "/home/nax/Work/biolab/TestingIn/";
+    std::vector <double> alphas;
+    std::vector <double> lambdas;
+    std::vector <std::string> cspFiles;
+    std::string pathBegin = "/home/nax/Work/biolab/TestingIn/";
+    Genome genome;
+	unsigned numMixtures = 1;
+	std::vector<double> sphi_init(numMixtures, 2);
+	std::vector<std::vector<unsigned> > mixtureDefinitionMatrix;
+	std::vector<unsigned> geneAssignment;
+	genome.readRFPData("/home/nax/Work/biolab/Logs/Main/simRFP2.csv", false);
+    geneAssignment.resize(genome.getGenomeSize());
+    my_print("%\n", genome.getGenomeSize());
+	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+	{
+		geneAssignment[i] = 0u;
+	}
+	
+    PANSEParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
+
+    cspFiles.push_back("/home/nax/Work/biolab/Dev/data/rfp/RFPAlphaValues.csv");
+    //parameter.readAlphaValues(cspFiles[0]);
+    parameter.initMutationSelectionCategories(cspFiles, 1, parameter.alp);
+    
+    cspFiles[0] = ("/home/nax/Work/biolab/Dev/data/rfp/RFPLambdaPrimeValues.csv");
+    //parameter.readLambdaValues(cspFiles[1]);
+    parameter.initMutationSelectionCategories(cspFiles, 1, parameter.lmPri);
+
+    alphas = parameter.oneMixAlpha();
+    lambdas = parameter.oneMixLambda();
+    
+    for(int i = 0; i < alphas.size(); i++){
+        my_print("%,%\n", SequenceSummary::indexToCodon(i), alphas[i]);
+    }
+    exit(0);
+/*	
 
 	unsigned numMixtures = 1;
 	std::vector<double> sphi_init(numMixtures, 2);
@@ -995,7 +1029,7 @@ int main()
         
 	genome.readRFPData(pathBegin + "rfp_file_20positions_20genes.csv", false);
     exit(0);
-	/*genome.readFasta(pathBegin + "RibModelDev/data/singleMixture/genome_2000.fasta", false);
+	genome.readFasta(pathBegin + "RibModelDev/data/singleMixture/genome_2000.fasta", false);
 	
 	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
@@ -1030,8 +1064,9 @@ int main()
 	//exit(0);
 
 
-	std::string modelToRun = "PANSE"; //can be RFP, ROC or FONSE
+	std::string modelToRun = "PA"; //can be RFP, ROC or FONSE
 	bool withPhi = false;
+    getStdCspForIndex(unsigned i);
 	bool fromRestart = false;
 
 
@@ -1133,7 +1168,8 @@ int main()
 	} //END OF ROC
 	else if (modelToRun == "PANSE")
 	{
-		my_print("Initializing Genome object--------------------------\n");
+        
+        my_print("Initializing Genome object--------------------------\n");
 		Genome genome;
 		//genome.readRFPData(pathBegin + "RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 		genome.readRFPData(pathBegin + "PopPAData.csv");
@@ -1165,7 +1201,7 @@ int main()
 
 
 		my_print("Initializing PANSEParameter object--------------------\n\n");
-		PANSEParameter parameter;
+		//PANSEParameter parameter;
 		//parameter.writeBasicRestartFile("/Users/hollisbui/HollisFile.txt");
 
 		if (fromRestart)
@@ -1203,7 +1239,7 @@ int main()
 		mcmc.run(genome, model, 1, 0);
 		my_print("Done!----------------------------------\n\n\n");
 
-	} //END OF RFP
+	} //END OF PANSE
 	else if (modelToRun == "FONSE")
 	{
 		my_print("initialize Genome object--------------------------\n");

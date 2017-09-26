@@ -17,6 +17,7 @@ class Gene
 		std::string seq; //Gene sequence. Ex: "AATTCAGCT..."
 		std::string id; //Gene id: Ex: "YALOC001"
 		std::string description; //Additional information about the gene.
+        std::vector<int> rfpPerPosition;
 
 	public:
 
@@ -41,6 +42,7 @@ class Gene
 		std::string getSequence();
 		void setSequence(std::string _seq);
         void setPASequence(std::vector <std::vector <int>> table);
+        void setPANSESequence(std::vector <std::vector <int>> table);
 		SequenceSummary *getSequenceSummary();
 		std::vector<double> getObservedSynthesisRateValues(); //exposed to RCPP, tested in C++
 		void setObservedSynthesisRateValues(std::vector <double> values); //Only for unit testing.

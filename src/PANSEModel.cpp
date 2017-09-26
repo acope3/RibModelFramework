@@ -44,9 +44,14 @@ double PANSEModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, doubl
     term2 *= currRFPObserved;
     term3 *= currAlpha;
 
-    my_print("term1 = %\nterm2 = %\nterm3 = %\nalpha = %\nlambda = %\nphi = %\n", term1, term2, term3, currAlpha, currLambdaPrime, phiValue);
 
-    return term1 + term2 + term3;
+    double rv = term1 + term2 + term3;
+
+    if (std::isnan(rv)){
+        my_print("term1 = %\nterm2 = %\nterm3 = %\nalpha = %\nlambda = %\nphi = %\n", term1, term2, term3, currAlpha, currLambdaPrime, phiValue);
+    }
+
+    return rv;
 }
 
 
@@ -71,6 +76,8 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 
     double phiValue = parameter->getSynthesisRate(geneIndex, synthesisRateCategory, false);
     double phiValue_proposed = parameter->getSynthesisRate(geneIndex, synthesisRateCategory, true);
+
+    std::string geneID = gene.getId();
 /*
 #ifdef _OPENMP
     //#ifndef __APPLE__
@@ -93,31 +100,45 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 
     std::vector <unsigned> positions = gene.geneData.getPositionCodonID();
 
-        for (unsigned index = 0; index < positions.size(); index++){
-            std::string codon = gene.geneData.indexToCodon(positions[index]);
+
+    for (unsigned index = 0; index < positions.size(); index++)
+    {
+        std::string codon = gene.geneData.indexToCodon(positions[index]);
+        
         double currAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, false);
         double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PANSEParameter::lmPri, codon, false);
+        //Should be rfp value at position not all of codon
         unsigned currRFPObserved = gene.geneData.getRFPValue(index);
 
         unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(index);
+        //This line will never execute
         if (currNumCodonsInMRNA == 0) continue;
 
+        //Have to redo the math becuas rfp observed has changed
         logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
         logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue_proposed);
-        }
 
+        if(std::isnan(logLikelihood)){
+            my_print("real is nan\n");
+        }
+        if(std::isnan(logLikelihood_proposed)){
+            my_print("proposed is nan\n");
+        }
+        }
+    //Double check math here
     double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(lambdaPrimeCategory, false);
     double logPhiProbability = Parameter::densityLogNorm(phiValue, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
     double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
-    double currentLogLikelihood = (logLikelihood + logPhiProbability);
-    double proposedLogLikelihood = (logLikelihood_proposed + logPhiProbability_proposed);
+	double currentLogPosterior = (logLikelihood + logPhiProbability);
+	double proposedLogPosterior = (logLikelihood_proposed + logPhiProbability_proposed);
 
-    logProbabilityRatio[0] = (proposedLogLikelihood - currentLogLikelihood) - (std::log(phiValue) - std::log(phiValue_proposed));
-    logProbabilityRatio[1] = currentLogLikelihood - std::log(phiValue_proposed);
-    logProbabilityRatio[2] = proposedLogLikelihood - std::log(phiValue);
-    logProbabilityRatio[3] = currentLogLikelihood;
-    logProbabilityRatio[4] = proposedLogLikelihood;
-    //5 and 6 are used in ROC for trace and should be added
+	logProbabilityRatio[0] = (proposedLogPosterior - currentLogPosterior) - (std::log(phiValue) - std::log(phiValue_proposed));//Is recalulcated in MCMC
+	logProbabilityRatio[1] = currentLogPosterior - std::log(phiValue_proposed);
+	logProbabilityRatio[2] = proposedLogPosterior - std::log(phiValue);
+	logProbabilityRatio[3] = currentLogPosterior;
+	logProbabilityRatio[4] = proposedLogPosterior;
+	logProbabilityRatio[5] = logLikelihood;
+	logProbabilityRatio[6] = logLikelihood_proposed;
 }
 
 
@@ -159,7 +180,11 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
         logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
         logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
     }
-    logAcceptanceRatioForAllMixtures[0] = logLikelihood_proposed - logLikelihood;
+	logAcceptanceRatioForAllMixtures[0] = logLikelihood_proposed - logLikelihood;
+	logAcceptanceRatioForAllMixtures[1] = logLikelihood;
+	logAcceptanceRatioForAllMixtures[2] = logLikelihood_proposed;
+	logAcceptanceRatioForAllMixtures[3] = logLikelihood;
+	logAcceptanceRatioForAllMixtures[4] = logLikelihood_proposed;
 }
 
 
@@ -551,7 +576,7 @@ void PANSEModel::updateHyperParameter(unsigned hp)
 //TODO: Account for position
 void PANSEModel::simulateGenome(Genome &genome)
 {
-    for (unsigned geneIndex = 0u; geneIndex < genome.getGenomeSize(); geneIndex++)
+    /*for (unsigned geneIndex = 0u; geneIndex < genome.getGenomeSize(); geneIndex++)
     {
         unsigned mixtureElement = getMixtureAssignment(geneIndex);
         Gene gene = genome.getGene(geneIndex);
@@ -583,7 +608,15 @@ void PANSEModel::simulateGenome(Genome &genome)
 #endif
         }
         genome.addGene(tmpGene, true);
+    }*/
+    for (unsigned geneIndex = 0u; geneIndex < genome.getGenomeSize(); geneIndex++)
+    {
+        unsigned mixtureElement = getMixtureAssignment(geneIndex);
+        Gene gene = genome.getGene(geneIndex);
+        double phi = parameter->getSynthesisRate(geneIndex, mixtureElement, false);
+        Gene tmpGene = gene;
     }
+    
 }
 
 
@@ -758,4 +791,60 @@ double psi2phi(double psi, double sigma){
 }
 double phi2psi(double phi, double sigma){
     return phi / sigma;
+}
+
+std::vector <double> readAlphaValues(std::string filename){
+    std::size_t pos;
+    std::ifstream currentFile;
+    std::string tmpString;
+    std::vector <double> rv;
+
+    rv.resize(64);
+
+    currentFile.open(filename);
+    if (currentFile.fail())
+        my_printError("Error opening file %\n", filename.c_str());
+    else
+    {
+        currentFile >> tmpString;
+        while (currentFile >> tmpString){
+            pos = tmpString.find(',');
+            if (pos != std::string::npos)
+            {
+                std::string codon = tmpString.substr(0,3);
+                std::string val = tmpString.substr(pos + 1, std::string::npos);
+                rv[SequenceSummary::codonToIndex(codon, true)] = std::atof(val.c_str());
+            }
+        }
+    }
+
+    return rv;
+
+}
+std::vector <double> readLambdaValues(std::string filename){
+    std::size_t pos;
+    std::ifstream currentFile;
+    std::string tmpString;
+    std::vector <double> rv;
+    
+    rv.resize(64);
+
+    currentFile.open(filename);
+    if (currentFile.fail())
+        my_printError("Error opening file %\n", filename.c_str());
+    else
+    {
+        currentFile >> tmpString;
+        while (currentFile >> tmpString){
+            pos = tmpString.find(',');
+            if (pos != std::string::npos)
+            {
+                std::string codon = tmpString.substr(0,3);
+                std::string val = tmpString.substr(pos + 1, std::string::npos);
+                rv[SequenceSummary::codonToIndex(codon, true)] = std::atof(val.c_str());
+            }
+        }
+    }
+
+    return rv;
 }

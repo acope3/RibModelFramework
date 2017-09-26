@@ -366,7 +366,7 @@ void PANSEParameter::initAlpha(double alphaValue, unsigned mixtureElement, std::
  */
 void PANSEParameter::initLambdaPrime(double lambdaPrimeValue, unsigned mixtureElement, std::string codon)
 {
-	unsigned category = getMutationCategory(mixtureElement);
+	unsigned category = getSelectionCategory(mixtureElement);
 	unsigned index = SequenceSummary::codonToIndex(codon);
 	currentCodonSpecificParameter[lmPri][category][index] = lambdaPrimeValue;
 }
@@ -766,7 +766,6 @@ double PANSEParameter::getParameterForCategoryR(unsigned mixtureElement, unsigne
 		codon[2] = (char)std::toupper(codon[2]);
 		if (paramType == PANSEParameter::alp)
 		{
-			//TODO THIS NEEDS TO CHANGE, NAMING!!!!
 			category = getMutationCategory(mixtureElement); //really alpha here
 		}
 		else if (paramType == PANSEParameter::lmPri)
@@ -777,6 +776,89 @@ double PANSEParameter::getParameterForCategoryR(unsigned mixtureElement, unsigne
 	}
 	return rv;
 }
-
 #endif
+
+void PANSEParameter::readAlphaValues(std::string filename)
+{
+    std::size_t pos;
+    std::ifstream currentFile;
+    std::string tmpString;
+    std::vector <double> tmp;
+
+    tmp.resize(64,1);
+
+    currentFile.open(filename);
+    if (currentFile.fail())
+        my_printError("Error opening file %\n", filename.c_str());
+    else
+    {
+        currentFile >> tmpString;
+        while (currentFile >> tmpString){
+            pos = tmpString.find(',');
+            if (pos != std::string::npos)
+            {
+                std::string codon = tmpString.substr(0,3);
+                std::string val = tmpString.substr(pos + 1, std::string::npos);
+                tmp[SequenceSummary::codonToIndex(codon)] = std::atof(val.c_str());
+            }
+        }
+    }
+    currentFile.close();
+
+	unsigned alphaCategories = getNumMutationCategories();
+
+	for (unsigned i = 0; i < alphaCategories; i++)
+	{
+		currentCodonSpecificParameter[alp][i] = tmp;
+		proposedCodonSpecificParameter[alp][i] = tmp;
+	}
+
+}
+
+void PANSEParameter::readLambdaValues(std::string filename)
+{
+    std::size_t pos;
+    std::ifstream currentFile;
+    std::string tmpString;
+    std::vector <double> tmp;
+    
+    tmp.resize(64, 0.1);
+
+    currentFile.open(filename);
+    if (currentFile.fail())
+        my_printError("Error opening file %\n", filename.c_str());
+    else
+    {
+        currentFile >> tmpString;
+        unsigned i = 0;
+        while (currentFile >> tmpString){
+            pos = tmpString.find(',');
+            if (pos != std::string::npos)
+            {
+                std::string codon = tmpString.substr(0,3);
+                std::string val = tmpString.substr(pos + 1, std::string::npos);
+                i = SequenceSummary::codonToIndex(codon);
+                tmp[SequenceSummary::codonToIndex(codon)] = std::atof(val.c_str());
+            }
+        }
+    }
+    
+    currentFile.close();
+	unsigned lambdaPrimeCategories = getNumSelectionCategories();
+
+	for (unsigned i = 0; i < lambdaPrimeCategories; i++)
+	{
+		currentCodonSpecificParameter[lmPri][i] = tmp;
+		proposedCodonSpecificParameter[lmPri][i] = tmp;
+		lambdaValues[i] = tmp; //Maybe we don't initialize this one? or we do it differently?
+	}
+
+}
+
+std::vector<double> PANSEParameter::oneMixLambda(){
+    return currentCodonSpecificParameter[lmPri][0];
+}
+std::vector<double> PANSEParameter::oneMixAlpha(){
+    return currentCodonSpecificParameter[alp][0];
+}
 

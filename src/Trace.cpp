@@ -603,6 +603,10 @@ void Trace::updateCodonSpecificParameterTraceForCodon(unsigned sample, std::stri
 	for (unsigned category = 0; category < codonSpecificParameterTrace[paramType].size(); category++)
 	{
 		codonSpecificParameterTrace[paramType][category][i][sample] = curParam[category][i];
+        if(std::isnan(curParam[category][i])){
+            my_printError("\nWell fuck\n");
+            exit(0);
+        }
 	}
 
 	/*

@@ -90,6 +90,7 @@ class SequenceSummary
 		void clear();
 		bool processSequence(const std::string& sequence);
         bool processPA(std::vector <std::vector <int>> table);
+        bool processPANSE(std::vector <std::vector <int>> table);
 
 
 		//Static Functions:
