@@ -1,5 +1,5 @@
 #loading
-useDynLib(ribModel, .registration = TRUE)
+useDynLib(AnaCoDa, .registration = TRUE)
 
 #imports
 importFrom(methods, new)

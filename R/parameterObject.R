@@ -96,6 +96,11 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
     if(num.mixtures < 1){
       stop("num. mixture has to be a positive non-zero value!\n")
     }    
+    if (!is.null(initial.expression.values)) {
+      if (length(initial.expression.values) != length.Rcpp_Genome(genome)) {
+        stop("initial.expression.values must have length equal to the number of genes in the Genome object\n")
+      }
+    }
     #TODO: should we check integrity of other values, such as numMixtures being
     #positive?
   }

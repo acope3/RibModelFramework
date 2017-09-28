@@ -1,2 +1,2 @@
 library(testthat)
-test_check("ribModel")
+test_check("AnaCoDa")

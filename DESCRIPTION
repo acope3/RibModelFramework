@@ -1,8 +1,9 @@
-Package: ribModel
+Package: AnaCoDa
 Type: Package
-Title: Analysis of Genomic Data under Stationarity
-Version: 0.0.6
-Date: 2017-05-16
+Title: Analysis of Codon Data under Stationarity using a Bayesian
+        Framework
+Version: 0.1.1
+Date: 2017-09-26
 Authors@R: c(person("Cedric", "Landerer", role = c("aut", "cre"), email
         = "cedric.landerer@gmail.com"), person("Gabriel", "Hanas", role
         = "ctb"), person("Jeremy", "Rogers", role = "ctb"),
@@ -12,13 +13,14 @@ Author: Cedric Landerer [aut, cre], Gabriel Hanas [ctb], Jeremy Rogers
 Maintainer: Cedric Landerer <cedric.landerer@gmail.com>
 URL: https://github.com/clandere/RibModelFramework
 NeedsCompilation: yes
-Depends: R (>= 3.1.0), Rcpp (>= 0.11.3), methods
+Depends: R (>= 3.3.0), Rcpp (>= 0.11.3), methods
 Suggests: Hmisc, VGAM, coda, testthat
 RcppModules: Test_mod, Trace_mod, CovarianceMatrix_mod,
         MCMCAlgorithm_mod, Model_mod, Parameter_mod, Genome_mod,
         Gene_mod, SequenceSummary_mod
-Description: More about what it does (maybe more than one line) as a
-        complete sentence.
+Description: Is a collection of models to analyze genome scale codon
+        data using a Bayesian framework. Provides visualization
+        routines and checkpointing for model fittings.
 License: GPL (>= 2)
 Imports:
 LinkingTo: Rcpp

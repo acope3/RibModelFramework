@@ -1,5 +1,5 @@
 library(testthat)
-library(ribModel)
+library(AnaCoDa)
 
 context("Sequence Summary")
 
