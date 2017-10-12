@@ -146,7 +146,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		std::vector <double> unscaledLogPost_prop(numSynthesisRateCategories, 0.0);
 
 		std::vector <double> unscaledLogProb_curr_singleMixture(numMixtures, 0.0);
-		std::vector <double> unscaledLogPost_prop_singleMixture(numMixtures, 0.0);
+		std::vector <double> unscaledLogProb_prop_singleMixture(numMixtures, 0.0);
 		std::vector <double> probabilities(numMixtures, 0.0);
 
 		for (unsigned k = 0u; k < numSynthesisRateCategories; k++)
@@ -169,12 +169,13 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				unscaledLogLike_prop[k] += logProbabilityRatio[6]; //proposed logLikelihood
 
 				unscaledLogProb_curr_singleMixture[mixtureIndex] = logProbabilityRatio[3];
+				unscaledLogProb_prop_singleMixture[mixtureIndex] = logProbabilityRatio[4];
 
 				maxValue = unscaledLogProb_curr_singleMixture[mixtureIndex] > maxValue ?
 						   unscaledLogProb_curr_singleMixture[mixtureIndex] : maxValue;
 
-				maxValue2 = unscaledLogPost_prop_singleMixture[mixtureIndex] > maxValue2 ?
-							unscaledLogPost_prop_singleMixture[mixtureIndex] : maxValue2;
+				maxValue2 = unscaledLogProb_prop_singleMixture[mixtureIndex] > maxValue2 ?
+							unscaledLogProb_prop_singleMixture[mixtureIndex] : maxValue2;
 				//maxValue2 = unscaledLogPost_prop[k] > maxValue2 ?
 				//		unscaledLogPost_prop[k] : maxValue2;
 
@@ -205,7 +206,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
                 my_print("Max Val. %\n", maxValue);
                 my_print("\n\n\n");
             }
-            unscaledLogPost_curr_singleMixture[k] += maxValue;
+            unscaledLogProb_curr_singleMixture[k] += maxValue;
 		}
 		// normalize probabilities
 		for (unsigned k = 0u; k < numMixtures; k++)
@@ -231,7 +232,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				for (unsigned n = 0u; n < mixtureElements.size(); n++)
 				{
 					unsigned element = mixtureElements[n];
-					currGeneLogPost += probabilities[element] * std::exp(unscaledLogPost_prop_singleMixture[element] - maxValue2);
+					currGeneLogPost += probabilities[element] * std::exp(unscaledLogProb_prop_singleMixture[element] - maxValue2);
 				}
 			}
 			else
@@ -240,7 +241,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				for (unsigned n = 0u; n < mixtureElements.size(); n++)
 				{
 					unsigned element = mixtureElements[n];
-					currGeneLogPost += probabilities[element] * std::exp(unscaledLogPost_curr_singleMixture[element] - maxValue2);
+					currGeneLogPost += probabilities[element] * std::exp(unscaledLogProb_curr_singleMixture[element] - maxValue2);
 				}
 			}
 
