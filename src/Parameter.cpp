@@ -323,6 +323,13 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 						}
 					}
 				}
+				else if (variableName == "obsPhiSets")
+				{
+					iss.str(tmp);
+					my_print("read\n");
+					iss >> obsPhiSets;
+					my_print("%",obsPhiSets);
+				}
 				else if (variableName == "currentSynthesisRateLevel")
 				{
 					if (tmp == "***")
@@ -369,7 +376,7 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 		numAcceptForStdDevSynthesisRate = 0u;
 		bias_stdDevSynthesisRate = 0;
 		bias_phi = 0;
-		obsPhiSets = 0;
+		//obsPhiSets = 0;
 
 		numAcceptForSynthesisRate.resize(numSelectionCategories);
 		proposedSynthesisRateLevel.resize(numSelectionCategories);
@@ -476,7 +483,7 @@ void Parameter::writeBasicRestartFile(std::string filename)
 			}
 			oss << "\n";
 		}
-
+		oss << ">obsPhiSets:\n" << obsPhiSets << "\n";
 		oss << ">currentSynthesisRateLevel:\n";
 		for (i = 0; i < currentSynthesisRateLevel.size(); i++)
 		{
