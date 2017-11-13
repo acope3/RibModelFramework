@@ -31,6 +31,7 @@ Genome& Genome::operator=(const Genome& rhs)
 	simulatedGenes = rhs.simulatedGenes;
 	numGenesWithPhi = rhs.numGenesWithPhi;
 	RFPCountColumnNames = rhs.RFPCountColumnNames;
+	globalGeneIndex = rhs.globalGeneIndex;
 	//assignment operator
 	return *this;
 }
@@ -634,7 +635,8 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 				// By index
             else
 			{
-				unsigned geneIndex = 0;
+				//unsigned geneIndex = 0;
+				unsigned geneIndex=globalGeneIndex;
 				bool first = true;
 
 				while (std::getline(input, tmp))
@@ -722,6 +724,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 						}
 					}
 				}
+				globalGeneIndex = geneIndex;
 			}
 		}
 		input.close();

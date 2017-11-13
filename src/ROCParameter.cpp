@@ -223,6 +223,7 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 					while (iss >> val)
 					{
 						noiseOffset.push_back(val);
+						noiseOffset_proposed.push_back(val);
 					}
 				}
 				else if (variableName == "observedSynthesisNoise")
@@ -269,6 +270,7 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 	input.close();
 
 	//init other values
+	numAcceptForNoiseOffset.resize(obsPhiSets, 0);
 	bias_csp = 0;
 	proposedCodonSpecificParameter[dM].resize(numMutationCategories);
 	proposedCodonSpecificParameter[dEta].resize(numSelectionCategories);
