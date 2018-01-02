@@ -323,13 +323,6 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 						}
 					}
 				}
-				else if (variableName == "obsPhiSets")
-				{
-					iss.str(tmp);
-					my_print("read\n");
-					iss >> obsPhiSets;
-					my_print("%",obsPhiSets);
-				}
 				else if (variableName == "currentSynthesisRateLevel")
 				{
 					if (tmp == "***")
@@ -376,7 +369,7 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 		numAcceptForStdDevSynthesisRate = 0u;
 		bias_stdDevSynthesisRate = 0;
 		bias_phi = 0;
-		//obsPhiSets = 0;
+		obsPhiSets = 0;
 
 		numAcceptForSynthesisRate.resize(numSelectionCategories);
 		proposedSynthesisRateLevel.resize(numSelectionCategories);
@@ -483,7 +476,7 @@ void Parameter::writeBasicRestartFile(std::string filename)
 			}
 			oss << "\n";
 		}
-		oss << ">obsPhiSets:\n" << obsPhiSets << "\n";
+
 		oss << ">currentSynthesisRateLevel:\n";
 		for (i = 0; i < currentSynthesisRateLevel.size(); i++)
 		{
@@ -750,7 +743,7 @@ unsigned Parameter::getNumSynthesisRateCategories()
 	return numSelectionCategories;
 }
 
-//Used to get alpha category in PA and PANSE
+
 unsigned Parameter::getMutationCategory(unsigned mixtureElement)
 {
 	return categories[mixtureElement].delM;
@@ -772,7 +765,6 @@ unsigned Parameter::getMutationCategory(unsigned mixtureElement)
  * See Note 1) above.
  * Wrapped by getSelectionCategoryForMixture on the R-side.
  */
-//Used to get lambda category in PA and PANSE
 unsigned Parameter::getSelectionCategory(unsigned mixtureElement)
 {
 	return categories[mixtureElement].delEta;
@@ -1307,10 +1299,17 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 				  //replace cov matrix based on previous window
 				  //The is approach was commented out and above code uncommented to replace it
 				  //covarianceMatrix[aaIndex].calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
+<<<<<<< HEAD
+				}
+
+			//Decomposing of cov matrix to convert iid samples to covarying samples using matrix decomposition
+			//The decomposed matrix is used in the proposal of new samples
+=======
 			  }
 
 				//Decomposing of cov matrix to convert iid samples to covarying samples using matrix decomposition
 				//The decomposed matrix is used in the proposal of new samples
+>>>>>>> ecdaedde3bc591f34b9f8c7326d5018bd795615b
 				covarianceMatrix[aaIndex].choleskyDecomposition();
 
 				//Adjust proposal width if for codon specific parameters

@@ -102,7 +102,7 @@ void FONSEParameter::initFONSEParameterSet()
 
 	currentCodonSpecificParameter[dOmega].resize(numSelectionCategories);
 	proposedCodonSpecificParameter[dOmega].resize(numSelectionCategories);
-
+	// biggestCat is the max number of iterations
 	unsigned biggestCat = std::max(std::max(numMutationCategories, numSelectionCategories), maxGrouping);
 	for(unsigned i = 0u; i < biggestCat; i++)
 	{
@@ -120,7 +120,7 @@ void FONSEParameter::initFONSEParameterSet()
 		if(i < maxGrouping)
 		{
 			std::string aa = SequenceSummary::AminoAcidArray[i];
-			//TODO: Explain this
+			//Solving the linear system of equations using cholesky decomposition
 			unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa, true);
 			CovarianceMatrix m((numMutationCategories + numSelectionCategories) * numCodons);
 			m.choleskyDecomposition();
@@ -144,17 +144,7 @@ void FONSEParameter::initFONSEValuesFromFile(std::string filename)
 		unsigned cat = 0;
 		while (getline(input, tmp))
 		{
-			int flag;
 			if (tmp[0] == '>')
-				flag = 1;
-			else if (input.eof() || tmp == "\n")
-				flag = 2;
-			else if (tmp[0] == '#')
-				flag = 3;
-			else
-				flag = 4;
-
-			if (flag == 1)
 			{
 				mat.clear();
 				cat = 0;
@@ -166,12 +156,13 @@ void FONSEParameter::initFONSEValuesFromFile(std::string filename)
 					cat = SequenceSummary::AAToAAIndex(tmp); //getting the index value of the amino acid
 				}
 			}
-			else if (flag == 2)
+			else if (input.eof() || tmp == "\n")
 			{
 				my_print("here\n");
 			}
-			else if (flag == 3) //user comment, continue
+			else if (tmp[0] == '#')
 			{
+				//user comment, continue
 				continue;
 			}
 			else
@@ -278,7 +269,6 @@ void FONSEParameter::writeEntireRestartFile(std::string filename)
 void FONSEParameter::writeFONSERestartFile(std::string filename)
 {
   std::ofstream out(filename.c_str(), std::ofstream::app);
-  //out.open(filename.c_str(), std::ofstream::app);
   if (out.fail())
       my_printError("ERROR: Could not open RestartFile.txt to append\n");
 	else
@@ -478,7 +468,7 @@ void FONSEParameter::proposeCodonSpecificParameter()
   {
     std::vector<double> iidProposed;
     std::string aa = getGrouping(k);
-	
+
     unsigned aaStart, aaEnd;
     SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
     unsigned numCodons = aaEnd - aaStart;
@@ -488,10 +478,10 @@ void FONSEParameter::proposeCodonSpecificParameter()
     }
 
     std::vector<double> covaryingNums;
-	//TODO: Explain the following line
+		//TODO: Explain the following line
     covaryingNums = covarianceMatrix[SequenceSummary::AAToAAIndex(aa)].transformIidNumbersIntoCovaryingNumbers(iidProposed);
-		unsigned biggestCat = std::max(numMutationCategories, numSelectionCategories);
 
+		unsigned biggestCat = std::max(numMutationCategories, numSelectionCategories);
 		for (unsigned i = 0; i < biggestCat; i++)
     {
       for (unsigned j = i * numCodons, l = aaStart; j < (i * numCodons) + numCodons; j++, l++)
@@ -513,7 +503,7 @@ void FONSEParameter::updateCodonSpecificParameter(std::string grouping)
 	unsigned aaStart, aaEnd;
 	SequenceSummary::AAToCodonRange(grouping, aaStart, aaEnd, true);
     unsigned aaIndex = SequenceSummary::aaToIndex.find(grouping)->second;
-	
+
     numAcceptForCodonSpecificParameters[aaIndex]++;
 
     unsigned biggestCat = std::max(numMutationCategories, numSelectionCategories);
@@ -521,10 +511,10 @@ void FONSEParameter::updateCodonSpecificParameter(std::string grouping)
     {
         for (unsigned i = aaStart; i < aaEnd; i++)
         {
-		    if (i < numMutationCategories)
-      	        currentCodonSpecificParameter[dM][k][i] = proposedCodonSpecificParameter[dM][k][i];
-			if (i < numSelectionCategories)
-			    currentCodonSpecificParameter[dOmega][k][i] = proposedCodonSpecificParameter[dOmega][k][i];
+		    	if (k < numMutationCategories)
+						currentCodonSpecificParameter[dM][k][i] = proposedCodonSpecificParameter[dM][k][i];
+					if (k < numSelectionCategories)
+			    	currentCodonSpecificParameter[dOmega][k][i] = proposedCodonSpecificParameter[dOmega][k][i];
         }
     }
 }
@@ -557,25 +547,25 @@ void FONSEParameter::setMutationPriorStandardDeviation(double _mutation_prior_sd
 void FONSEParameter::getParameterForCategory(unsigned category, unsigned paramType, std::string aa, bool proposal,
                                              double *returnSet)
 {
-    std::vector<double> *tempSet;
+	std::vector<double> *tempSet;
 	tempSet = proposal ? &proposedCodonSpecificParameter[paramType][category] : &currentCodonSpecificParameter[paramType][category];
 	unsigned aaStart, aaEnd;
 	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
 
-    unsigned j = 0u;
-    for (unsigned i = aaStart; i < aaEnd; i++, j++)
-    {
-        returnSet[j] = tempSet->at(i);
-    }
+	unsigned j = 0u;
+  for (unsigned i = aaStart; i < aaEnd; i++, j++)
+  {
+    returnSet[j] = tempSet->at(i);
+  }
 }
 
 
 void FONSEParameter::proposeHyperParameters()
 {
-    for (unsigned i = 0u; i < numSelectionCategories; i++)
-    {
+  for (unsigned i = 0u; i < numSelectionCategories; i++)
+  {
 		stdDevSynthesisRate_proposed[i] = std::exp(randNorm(std::log(stdDevSynthesisRate[i]), std_stdDevSynthesisRate));
-    }
+  }
 }
 
 
@@ -602,7 +592,7 @@ FONSEParameter::FONSEParameter(std::vector<double> stdDevSynthesisRate, std::vec
                                std::vector<unsigned> _matrix, bool splitSer) : Parameter(22)
 {
     unsigned _numMixtures = _matrix.size() / 2;
-    std::vector<std::vector<unsigned>> thetaKMatrix;
+    std::vector< std::vector<unsigned> > thetaKMatrix;
     thetaKMatrix.resize(_numMixtures);
 
     unsigned index = 0;
@@ -622,7 +612,7 @@ FONSEParameter::FONSEParameter(std::vector<double> stdDevSynthesisRate, std::vec
 FONSEParameter::FONSEParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
                                bool splitSer, std::string _mutationSelectionState) : Parameter(22)
 {
-    std::vector<std::vector<unsigned>> thetaKMatrix;
+    std::vector< std::vector<unsigned> > thetaKMatrix;
     initParameterSet(stdDevSynthesisRate, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
     initFONSEParameterSet();
 }
@@ -638,72 +628,72 @@ FONSEParameter::FONSEParameter(std::vector<double> stdDevSynthesisRate, unsigned
 
 void FONSEParameter::initCovarianceMatrix(SEXP _matrix, std::string aa)
 {
-    std::vector<double> tmp;
-    NumericMatrix matrix(_matrix);
+  std::vector<double> tmp;
+  NumericMatrix matrix(_matrix);
 
-    for (unsigned i = 0u; i < aa.length(); i++)	aa[i] = (char)std::toupper(aa[i]);
+  for (unsigned i = 0u; i < aa.length(); i++)	aa[i] = (char)std::toupper(aa[i]);
 
-    unsigned aaIndex = SequenceSummary::aaToIndex.find(aa)->second;
-    unsigned numRows = matrix.nrow();
-    std::vector<double> covMatrix(numRows * numRows);
+  unsigned aaIndex = SequenceSummary::aaToIndex.find(aa)->second;
+  unsigned numRows = matrix.nrow();
+  std::vector<double> covMatrix(numRows * numRows);
 
-    //NumericMatrix stores the matrix by column, not by row. The loop
-    //below transposes the matrix when it stores it.
-    unsigned index = 0;
-    for (unsigned i = 0; i < numRows; i++)
+  //NumericMatrix stores the matrix by column, not by row. The loop
+  //below transposes the matrix when it stores it.
+  unsigned index = 0;
+  for (unsigned i = 0; i < numRows; i++)
+  {
+    for (unsigned j = i; j < numRows * numRows; j += numRows, index++)
     {
-        for (unsigned j = i; j < numRows * numRows; j += numRows, index++)
-        {
-            covMatrix[index] = matrix[j];
-        }
+      covMatrix[index] = matrix[j];
     }
-    CovarianceMatrix m(covMatrix);
-    m.choleskyDecomposition();
-    covarianceMatrix[aaIndex] = m;
+  }
+  CovarianceMatrix m(covMatrix);
+  m.choleskyDecomposition();
+  covarianceMatrix[aaIndex] = m;
 }
 
 void FONSEParameter::initMutation(std::vector<double> mutationValues, unsigned mixtureElement, std::string aa)
 {
-    //TODO: seperate out the R wrapper functionality and make the wrapper
-    //currentMutationParameter
-    bool check = checkIndex(mixtureElement, 1, numMixtures);
-    if (check)
-    {
-        mixtureElement--;
+  //TODO: seperate out the R wrapper functionality and make the wrapper
+  //currentMutationParameter
+  bool check = checkIndex(mixtureElement, 1, numMixtures);
+  if (check)
+  {
+    mixtureElement--;
 
-        unsigned category = getMutationCategory(mixtureElement);
-        aa[0] = (char)std::toupper(aa[0]);
-	    
-        unsigned aaStart, aaEnd;
-	    SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
-        for (unsigned i = aaStart, j = 0; i < aaEnd; i++, j++)
-        {
-            currentCodonSpecificParameter[dM][category][i] = mutationValues[j];
-        }
+    unsigned category = getMutationCategory(mixtureElement);
+    aa[0] = (char)std::toupper(aa[0]);
+
+    unsigned aaStart, aaEnd;
+    SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
+    for (unsigned i = aaStart, j = 0; i < aaEnd; i++, j++)
+    {
+      currentCodonSpecificParameter[dM][category][i] = mutationValues[j];
     }
+  }
 }
 
 
 void FONSEParameter::initSelection(std::vector<double> selectionValues, unsigned mixtureElement, std::string aa)
 {
-    //TODO: seperate out the R wrapper functionality and make the wrapper
-    //currentSelectionParameter
-    bool check = checkIndex(mixtureElement, 1, numMixtures);
-    if (check)
+  //TODO: seperate out the R wrapper functionality and make the wrapper
+  //currentSelectionParameter
+  bool check = checkIndex(mixtureElement, 1, numMixtures);
+  if (check)
+  {
+    mixtureElement--;
+
+    int category = getSelectionCategory(mixtureElement);
+
+    aa[0] = (char)std::toupper(aa[0]);
+
+    unsigned aaStart, aaEnd;
+    SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
+    for (unsigned i = aaStart, j = 0; i < aaEnd; i++, j++)
     {
-        mixtureElement--;
-
-        int category = getSelectionCategory(mixtureElement);
-
-        aa[0] = (char)std::toupper(aa[0]);
-	    
-        unsigned aaStart, aaEnd;
-        SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
-        for (unsigned i = aaStart, j = 0; i < aaEnd; i++, j++)
-        {
-            currentCodonSpecificParameter[dOmega][category][i] = selectionValues[j];
-        }
+      currentCodonSpecificParameter[dOmega][category][i] = selectionValues[j];
     }
+  }
 }
 
 
@@ -714,13 +704,13 @@ void FONSEParameter::initSelection(std::vector<double> selectionValues, unsigned
 
 std::vector< std::vector <double> > FONSEParameter::getCurrentMutationParameter()
 {
-    return currentCodonSpecificParameter[dM];
+  return currentCodonSpecificParameter[dM];
 }
 
 
 std::vector< std::vector <double> > FONSEParameter::getCurrentSelectionParameter()
 {
-    return currentCodonSpecificParameter[dOmega];
+  return currentCodonSpecificParameter[dOmega];
 }
 
 

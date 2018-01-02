@@ -31,7 +31,6 @@ Genome& Genome::operator=(const Genome& rhs)
 	simulatedGenes = rhs.simulatedGenes;
 	numGenesWithPhi = rhs.numGenesWithPhi;
 	RFPCountColumnNames = rhs.RFPCountColumnNames;
-	globalGeneIndex = rhs.globalGeneIndex;
 	//assignment operator
 	return *this;
 }
@@ -200,10 +199,6 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
 
 	while (std::getline(Fin, tmp))
 	{
-    // Remove whitespace from the string
-    tmp.erase(std::remove_if(tmp.begin(), tmp.end(), 
-              std::bind(std::isspace<char>, std::placeholders::_1, std::locale::classic())), tmp.end());
-
 		// Find the GeneID
 		std::size_t pos = tmp.find(',');
 		std::string ID = tmp.substr(0, pos);
@@ -316,10 +311,6 @@ void Genome::readRFPData(std::string filename, bool append)
 			//Now for each line associated with a gene ID, set the string appropriately
 			while (std::getline(Fin, tmp))
 			{
-        // Remove whitespace from the string
-        tmp.erase(std::remove_if(tmp.begin(), tmp.end(), 
-                  std::bind(std::isspace<char>, std::placeholders::_1, std::locale::classic())), tmp.end());
-
 				pos = tmp.find(',');
 				std::string ID = tmp.substr(0, pos);
 
@@ -619,8 +610,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 				// By index
             else
 			{
-				//unsigned geneIndex = 0;
-				unsigned geneIndex=globalGeneIndex;
+				unsigned geneIndex = 0;
 				bool first = true;
 
 				while (std::getline(input, tmp))
@@ -708,7 +698,6 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 						}
 					}
 				}
-				globalGeneIndex = geneIndex;
 			}
 		}
 		input.close();
