@@ -106,6 +106,9 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
         stop("initial.expression.values must have length equal to the number of genes in the Genome object\n")
       }
     }
+    if (!identical(split.serine, TRUE) && !identical(split.serine, FALSE)) {
+      stop("split.serine must be a boolean value\n")
+    }
     if (mixture.definition != "allUnique" && mixture.definition != "mutationShared" &&
         mixture.definition != "selectionShared") {
       stop("mixture.definition must be \"allUnique\", \"mutationShared\", or \"selectionShared\". Default is \"allUnique\"\n")
