@@ -643,7 +643,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 				{
 					if (geneIndex >= genes.size())
 					{
-						my_printError("ERROR: GeneIndex exceeds the number of genes in the genome. Exiting function.\n");
+						my_printError("ERROR: GeneIndex exceeds the number of genes in the genome. Exiting function.");
 						break;
 					}
 
