@@ -35,7 +35,30 @@ initializeMCMCObject <- function(samples, thinning=1, adaptive.width=100,
                                  est.expression=TRUE, est.csp=TRUE, 
                                  est.hyper=TRUE, est.mix=TRUE){
   
-  #TODO: error check given values.
+  # error check given values.
+  if (!is.numeric(samples) || samples < 1 || !all(samples == as.integer(samples))) {
+    stop("samples must be a positive integer\n")
+  }
+  if (!is.numeric(thinning) || thinning < 1 || !all(thinning == as.integer(thinning))) {
+    stop("thinning must be a positive integer\n")
+  }
+  if (!is.numeric(adaptive.width) || adaptive.width < 1 || 
+      !all(adaptive.width == as.integer(adaptive.width))) {
+    stop("adaptive.width must be a positive integer\n")
+  }
+  if (!identical(est.expression, TRUE) && !identical(est.expression, FALSE)) {
+    stop("est.expression must be a boolean value\n")
+  }
+  if (!identical(est.csp, TRUE) && !identical(est.csp, FALSE)) {
+    stop("est.csp must be a boolean value\n")
+  }
+  if (!identical(est.hyper, TRUE) && !identical(est.hyper, FALSE)) {
+    stop("est.hyper must be a boolean value\n")
+  }
+  if (!identical(est.mix, TRUE) && !identical(est.mix, FALSE)) {
+    stop("est.mix must be a boolean value\n")
+  }
+
   mcmc <- new(MCMCAlgorithm, samples, thinning, adaptive.width, est.expression, 
               est.csp, est.hyper)
   mcmc$setEstimateMixtureAssignment(est.mix)
@@ -89,6 +112,10 @@ initializeMCMCObject <- function(samples, thinning=1, adaptive.width=100,
 #' 
 runMCMC <- function(mcmc, genome, model, ncores = 1, divergence.iteration = 0){
   if(class(mcmc) != "Rcpp_MCMCAlgorithm") stop("mcmc is not of class Rcpp_Algorithm")
+  
+  if (ncores < 1 || !all(ncores == as.integer(ncores))) {
+    stop("ncores must be a positive integer\n")
+  }
   mcmc$run(genome, model, ncores, divergence.iteration)
 }
 
