@@ -536,7 +536,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 			{
 				//Mapping is done so the genes can be found
 				std::map<std::string, Gene *> genomeMapping;
-				for (unsigned i = prev_genome_size; i < genes.size(); i++)
+				for (unsigned i = 0; i < genes.size(); i++)
 				{
 					genomeMapping.insert(make_pair(genes[i].getId(), &genes[i]));
 				}
