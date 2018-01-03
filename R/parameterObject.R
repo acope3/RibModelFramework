@@ -649,7 +649,7 @@ getExpressionEstimatesForMixture <- function(parameter, gene.index, mixtureAssig
   
   expressionStdErr <- sqrt(unlist(lapply(gene.index, function(geneIndex){ 
     expressionCategory <- parameter$getSynthesisRateCategoryForMixture(mixtureAssignment[geneIndex]) 
-    parameter$getSynthesisRateVarianceByMixtureElementForGene(samples, geneIndex, expressionCategory) 
+    parameter$getSynthesisRateVarianceByMixtureElementForGene(samples, geneIndex, expressionCategory,T) 
   }))) / samples
   
   expr.mat <- cbind(expressionValues, expressionStdErr)

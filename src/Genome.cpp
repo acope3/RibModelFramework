@@ -31,7 +31,7 @@ Genome& Genome::operator=(const Genome& rhs)
 	simulatedGenes = rhs.simulatedGenes;
 	numGenesWithPhi = rhs.numGenesWithPhi;
 	RFPCountColumnNames = rhs.RFPCountColumnNames;
-	globalGeneIndex = rhs.globalGeneIndex;
+	prev_genome_size = rhs.prev_genome_size;
 	//assignment operator
 	return *this;
 }
@@ -57,9 +57,6 @@ bool Genome::operator==(const Genome& other) const
 }
 
 
-
-
-
 //----------------------------------------//
 //---------- File I/O Functions ----------//
 //----------------------------------------//
@@ -71,6 +68,7 @@ bool Genome::operator==(const Genome& other) const
 */
 void Genome::readFasta(std::string filename, bool append)
 {
+	prev_genome_size = genes.size();
 	try
 	{
 		if (!append)
@@ -538,7 +536,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 			{
 				//Mapping is done so the genes can be found
 				std::map<std::string, Gene *> genomeMapping;
-				for (unsigned i = 0; i < genes.size(); i++)
+				for (unsigned i = prev_genome_size; i < genes.size(); i++)
 				{
 					genomeMapping.insert(make_pair(genes[i].getId(), &genes[i]));
 				}
@@ -636,7 +634,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
             else
 			{
 				//unsigned geneIndex = 0;
-				unsigned geneIndex=globalGeneIndex;
+				unsigned geneIndex=prev_genome_size;
 				bool first = true;
 
 				while (std::getline(input, tmp))
@@ -724,7 +722,6 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 						}
 					}
 				}
-				globalGeneIndex = geneIndex;
 			}
 		}
 		input.close();

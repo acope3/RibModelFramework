@@ -478,25 +478,16 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 		}
 		if (estimateCodonSpecificParameter)
 		{
-      /* ZT DEBUG */
-      //const clock_t begin_time1 = std::clock();
-    //  my_printError("starting estimateCodonSpecifiParameter at %\n", float(begin_time1) / CLOCKS_PER_SEC);
 
 			model.proposeCodonSpecificParameter();
 			acceptRejectCodonSpecificParameter(genome, model, iteration);
             //TODO:Probably do a nan check
 			if ((iteration % adaptiveWidth) == 0u)
 				model.adaptCodonSpecificParameterProposalWidth(adaptiveWidth, iteration / thinning, iteration <= stepsToAdapt);
-
-      /* ZT DEBUG */
-      //my_printError("estimateCodonSpecifiParameter took % time\n", float(clock() - begin_time1) / CLOCKS_PER_SEC);
 		}
 		// update hyper parameter
 		if (estimateHyperParameter)
 		{
-      /* ZT DEBUG */
-      //const clock_t begin_time2 = std::clock();
-      //my_printError("starting estimateHyperParameter at %\n", float(begin_time2) / CLOCKS_PER_SEC);
 
 			model.updateGibbsSampledHyperParameters(genome);
 			model.proposeHyperParameters();
@@ -504,17 +495,11 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
             //TODO:Probably do a nan check
 			if ((iteration % adaptiveWidth) == 0u)
 				model.adaptHyperParameterProposalWidths(adaptiveWidth, iteration <= stepsToAdapt);
-      
-      /* ZT DEBUG */
-      //my_printError("estimateHyperParameter took % time\n", float(clock() - begin_time2) / CLOCKS_PER_SEC);
+   
 		}
 		// update expression level values
 		if (estimateSynthesisRate || estimateMixtureAssignment)
 		{
-      /* ZT DEBUG */
-      //const clock_t begin_time3 = std::clock();
-      //my_printError("starting estimateSynthisisRate || estimateMixtureAssignment at %\n", float(begin_time3) / CLOCKS_PER_SEC);
-
 			model.proposeSynthesisRateLevels();
 			double logPost = acceptRejectSynthesisRateLevelForAllGenes(genome, model, iteration);
 			if ((iteration % thinning) == 0u)
@@ -530,9 +515,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 			if ((iteration % adaptiveWidth) == 0u)
 				model.adaptSynthesisRateProposalWidth(adaptiveWidth, iteration <= stepsToAdapt);
       
-      /* ZT DEBUG */
-      //my_printError("estimateSynthesisRate || estimateMixtureAssignment took % time\n", float(clock() - begin_time3) / CLOCKS_PER_SEC);
-		}
+  		}
 
 
 		if ((iteration % (50 * adaptiveWidth)) == 0u)
