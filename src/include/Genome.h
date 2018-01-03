@@ -26,8 +26,7 @@ class Genome
 		std::vector <unsigned> numGenesWithPhi; //Number of phi sets is vector size, value is number of genes
 												//with a phi value for that set. Values should currently be equal.
         std::vector<std::string> RFPCountColumnNames;
-        unsigned globalGeneIndex = 0; 			// This is used to append on observed phi values when appending a new fasta file
-        										// Solution is a hack. Think of something more elegant.  
+        unsigned prev_genome_size;  
 
   
   	public:
