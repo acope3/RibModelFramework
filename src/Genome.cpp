@@ -31,6 +31,7 @@ Genome& Genome::operator=(const Genome& rhs)
 	simulatedGenes = rhs.simulatedGenes;
 	numGenesWithPhi = rhs.numGenesWithPhi;
 	RFPCountColumnNames = rhs.RFPCountColumnNames;
+	prev_genome_size = rhs.prev_genome_size;
 	//assignment operator
 	return *this;
 }
@@ -56,9 +57,6 @@ bool Genome::operator==(const Genome& other) const
 }
 
 
-
-
-
 //----------------------------------------//
 //---------- File I/O Functions ----------//
 //----------------------------------------//
@@ -70,6 +68,7 @@ bool Genome::operator==(const Genome& other) const
 */
 void Genome::readFasta(std::string filename, bool append)
 {
+	prev_genome_size = genes.size();
 	try
 	{
 		if (!append)
@@ -634,14 +633,15 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 				// By index
             else
 			{
-				unsigned geneIndex = 0;
+				//unsigned geneIndex = 0;
+				unsigned geneIndex=prev_genome_size;
 				bool first = true;
 
 				while (std::getline(input, tmp))
 				{
 					if (geneIndex >= genes.size())
 					{
-						my_printError("ERROR: GeneIndex exceeds the number of genes in the genome. Exiting function.\n");
+						my_printError("ERROR: GeneIndex exceeds the number of genes in the genome. Exiting function.");
 						break;
 					}
 

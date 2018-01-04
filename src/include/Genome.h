@@ -26,6 +26,10 @@ class Genome
 		std::vector <unsigned> numGenesWithPhi; //Number of phi sets is vector size, value is number of genes
 												//with a phi value for that set. Values should currently be equal.
         std::vector<std::string> RFPCountColumnNames;
+        unsigned prev_genome_size;  
+
+  
+  	public:
 
 	public:
 

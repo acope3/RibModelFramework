@@ -96,8 +96,36 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
     if(num.mixtures < 1){
       stop("num. mixture has to be a positive non-zero value!\n")
     }    
-    #TODO: should we check integrity of other values, such as numMixtures being
-    #positive?
+    if (!is.null(sphi)) {
+      if (length(sphi) != num.mixtures) {
+        stop("sphi must be a vector of length numMixtures\n")
+      }
+    }
+    if (!is.null(initial.expression.values)) {
+      if (length(initial.expression.values) != length.Rcpp_Genome(genome)) {
+        stop("initial.expression.values must have length equal to the number of genes in the Genome object\n")
+      }
+    }
+    if (!identical(split.serine, TRUE) && !identical(split.serine, FALSE)) {
+      stop("split.serine must be a boolean value\n")
+    }
+    if (mixture.definition != "allUnique" && mixture.definition != "mutationShared" &&
+        mixture.definition != "selectionShared") {
+      stop("mixture.definition must be \"allUnique\", \"mutationShared\", or \"selectionShared\". Default is \"allUnique\"\n")
+    }
+    if (mutation.prior.sd < 0) {
+      stop("mutation.prior.sd should be positive\n")
+    }
+    if (init.csp.variance < 0) {
+      stop("init.csp.variance should be positive\n")
+    } 
+    if (init.sepsilon < 0) {
+      stop("init.sepsilon should be positive\n")
+    }
+  } else {
+      if (!file.exists(init.with.restart.file)) {
+        stop("init.with.restart.file provided does not exist\n")
+      }
   }
 
   
