@@ -317,11 +317,11 @@ std::vector<double> Trace::getCodonSpecificAcceptanceRateTraceForAA(std::string 
 }
 
 
-std::vector<double> Trace::getSynthesisRateTraceForGene(unsigned geneIndex)
+std::vector<float> Trace::getSynthesisRateTraceForGene(unsigned geneIndex)
 {
 	unsigned traceLength = (unsigned)synthesisRateTrace[0][0].size();
 
-	std::vector<double> returnVector(traceLength, 0.0);
+	std::vector<float> returnVector(traceLength, 0.0);
 	for (unsigned i = 0u; i < traceLength; i++)
 	{
 		unsigned mixtureElement = mixtureAssignmentTrace[geneIndex][i];
@@ -334,6 +334,8 @@ std::vector<double> Trace::getSynthesisRateTraceForGene(unsigned geneIndex)
 
 std::vector<float> Trace::getSynthesisRateTraceByMixtureElementForGene(unsigned mixtureElement, unsigned geneIndex)
 {
+	
+
 	unsigned category = getSynthesisRateCategory(mixtureElement);
 	return synthesisRateTrace[category][geneIndex];
 }
@@ -655,9 +657,9 @@ std::vector<double> Trace::getSynthesisRateAcceptanceRateTraceByMixtureElementFo
 }
 
 
-std::vector<double> Trace::getSynthesisRateTraceForGeneR(unsigned geneIndex)
+std::vector<float> Trace::getSynthesisRateTraceForGeneR(unsigned geneIndex)
 {
-	std::vector<double> RV;
+	std::vector<float> RV;
 	bool checkGene = checkIndex(geneIndex, 1, synthesisRateTrace[0].size());
 	if (checkGene)
 	{

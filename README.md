@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/clandere/RibModelFramework.svg)](https://travis-ci.org/clandere/RibModelFramework)
-#AnaCoDa
+
+# AnaCoDa
 
 * AnaCoDa is a collection of codon models. 
 * the release version can be obtained from ...

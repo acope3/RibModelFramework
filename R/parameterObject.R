@@ -297,14 +297,7 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
 #' @description \code{getCSPEstimates} returns the codon specific
 #' parameter estimates for a given parameter and mixture or write it to a csv file.
 #' 
-#' 
-getCSPEstimates <- function(parameter, filename, CSP, mixture, samples){
-  UseMethod("getCSPEstimates", parameter)
-}
-
-
-#Called from getCSPEstimates
-getCSPEstimates.Rcpp_Parameter <- function(parameter, filename=NULL, CSP="Mutation", mixture = 1, samples = 10){
+getCSPEstimates <- function(parameter, filename=NULL, CSP="Mutation", mixture = 1, samples = 10){
   Amino_Acid <- c()
   Value <- c()
   Codon <- c()
@@ -591,9 +584,9 @@ getMixtureAssignmentEstimate <- function(parameter, gene.index, samples)
 #' 
 #' @param gene.index a integer or vector of integers representing the gene(s) of interesst.
 #' 
-#' @param mixtureAssignment a vector with the same length as \code{gene.index} decsribing the mixture assignment of the gene
-#' 
 #' @param samples number of samples for the posterior estimate
+#'
+#' @param quantiles vector of quantiles, (default: c(0.025, 0.975))
 #' 
 #' @return returns a vector with the mixture assignment of each gene corresbonding to \code{gene.index} in the same order as the genome. 
 #'
@@ -612,20 +605,36 @@ getMixtureAssignmentEstimate <- function(parameter, gene.index, samples)
 #' getExpressionEstimatesForMixture(parameter, 1:length(genome), mix.assign, 1000)
 #' }
 
-getExpressionEstimatesForMixture <- function(parameter, gene.index, mixtureAssignment, samples)
+getExpressionEstimates <- function(parameter, gene.index, samples, quantiles=c(0.025, 0.975))
 {
   expressionValues <- unlist(lapply(gene.index, function(geneIndex){ 
-    expressionCategory <- parameter$getSynthesisRateCategoryForMixture(mixtureAssignment[geneIndex]) 
-    parameter$getSynthesisRatePosteriorMeanByMixtureElementForGene(samples, geneIndex, expressionCategory) 
+    parameter$getSynthesisRatePosteriorMeanForGene(samples, geneIndex, FALSE) 
+  }))
+
+  expressionValuesLog <- unlist(lapply(gene.index, function(geneIndex){ 
+    parameter$getSynthesisRatePosteriorMeanForGene(samples, geneIndex, TRUE) 
   }))
   
   expressionStdErr <- sqrt(unlist(lapply(gene.index, function(geneIndex){ 
-    expressionCategory <- parameter$getSynthesisRateCategoryForMixture(mixtureAssignment[geneIndex]) 
-    parameter$getSynthesisRateVarianceByMixtureElementForGene(samples, geneIndex, expressionCategory) 
+    parameter$getSynthesisRateVarianceForGene(samples, geneIndex, TRUE, FALSE) 
   }))) / samples
   
-  expr.mat <- cbind(expressionValues, expressionStdErr)
-  colnames(expr.mat) <- c("PHI", "Std_Error")
+  expressionStdErrLog <- sqrt(unlist(lapply(gene.index, function(geneIndex){ 
+    parameter$getSynthesisRateVarianceForGene(samples, geneIndex, TRUE, TRUE) 
+  }))) / samples
+
+  expressionQuantile <- lapply(gene.index, function(geneIndex){ 
+    parameter$getExpressionQuantile(samples, geneIndex, quantiles, FALSE) 
+  })
+  expressionQuantile <- do.call(rbind, expressionQuantile)
+
+  expressionQuantileLog <- lapply(gene.index, function(geneIndex){ 
+    parameter$getExpressionQuantile(samples, geneIndex, quantiles, TRUE) 
+  })
+  expressionQuantileLog <- do.call(rbind, expressionQuantileLog)
+
+  expr.mat <- cbind(expressionValues, expressionValuesLog, expressionStdErr, expressionStdErrLog, expressionQuantile, expressionQuantileLog)
+  colnames(expr.mat) <- c("PHI", "log10.PHI", "Std.Error", "log10.Std.Error", quantiles, paste("log10.", quantiles, sep=""))
   return(expr.mat)
 }
 

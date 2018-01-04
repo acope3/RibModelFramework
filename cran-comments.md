@@ -1,6 +1,6 @@
 ## Test environments
 * ubuntu 16.04 LTS, R 3.4.1
-* ubuntu 12.04 LTS (on Travis-CI), R 3.4.0
+* ubuntu 14.04 LTS (on Travis-CI), R 3.4.1
 * win-builder (devel, release, and oldrelease)
 
 ## R CMD check results
@@ -16,6 +16,13 @@ On Ubuntu
     libs  23.6Mb
  
   Response: The package contains mostly compiled code to improve computation speed. The compiled objects can not be reduced in size.
+
+* checking top-level files ... NOTE
+  Non-standard file/directory found at top level:
+    'cran-comments.md'
+
+  Response: cran-comments.md included for cran maintainers as this is a new submission.
+
 
 On Windows
 

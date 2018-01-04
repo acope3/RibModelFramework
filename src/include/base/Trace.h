@@ -109,7 +109,7 @@ class Trace {
         std::vector<double> getSynthesisRateAcceptanceRateTraceByMixtureElementForGene(unsigned mixtureElement, unsigned geneIndex);
         std::vector<std::vector<std::vector<double>>> getSynthesisRateAcceptanceRateTrace();
         std::vector<double> getCodonSpecificAcceptanceRateTraceForAA(std::string aa);
-        std::vector<double> getSynthesisRateTraceForGene(unsigned geneIndex); //will build the trace appropriately based on what cat you are in
+        std::vector<float> getSynthesisRateTraceForGene(unsigned geneIndex); //will build the trace appropriately based on what cat you are in
         std::vector<float> getSynthesisRateTraceByMixtureElementForGene(unsigned mixtureElement, unsigned geneIndex);
         std::vector<unsigned> getMixtureAssignmentTraceForGene(unsigned geneIndex);
         std::vector<double> getMixtureProbabilitiesTraceForMixture(unsigned mixtureIndex);
@@ -168,7 +168,7 @@ class Trace {
 #ifndef STANDALONE
         //Getter Functions:
         std::vector<double> getSynthesisRateAcceptanceRateTraceByMixtureElementForGeneR(unsigned mixtureElement, unsigned geneIndex);//R WRAPPER
-        std::vector<double> getSynthesisRateTraceForGeneR(unsigned geneIndex);//R WRAPPER
+        std::vector<float> getSynthesisRateTraceForGeneR(unsigned geneIndex);//R WRAPPER
         std::vector<float> getSynthesisRateTraceByMixtureElementForGeneR(unsigned mixtureElement, unsigned geneIndex);//R WRAPPER
         std::vector<unsigned> getMixtureAssignmentTraceForGeneR(unsigned geneIndex);//R WRAPPER
         std::vector<double> getMixtureProbabilitiesTraceForMixtureR(unsigned mixtureIndex);//R WRAPPER
