@@ -458,6 +458,16 @@ splitMatrix <- function(M, r, c){
   return(lapply(1:N, function(i) matrix(cv[[i]], nrow = r)))
 } 
 
+#' extracts an object of traces from a parameter object.
+#'
+#' @param parameter A Parameter object that corresponds to one of the model types.
+#'
+#' @return trace Returns an object of type Trace extracted from the given parameter object
+
+getTrace <- function(parameter){
+	return(parameter$getTraceObject())
+}
+
 
 
 #######

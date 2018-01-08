@@ -210,8 +210,39 @@ def.matrix <- matrix(c(1,2,1,1,1,2), ncol=2)
 In this case gene set one and three share their mutation parameters, while gene set one and two share their selection parameters.
 
 ### Checkpointing
+AnaCoDa does provide checkpointing functionality in case runtime has to be restiricted.
+To enable checkpointing, one can use the function `setRestartSettings`.
+```{r, echo = TRUE, eval = FALSE}
+# writing a restart file every 1000 samples
+setRestartSettings(mcmc, "restart_file", 1000, write.multiple=TRUE)
+# writing a restart file every 1000 samples but overwriting it every time
+setRestartSettings(mcmc, "restart_file", 1000, write.multiple=FALSE)
+```
 
+To re-initialize a parameter object from a restart file one can simply pass the restart file to the initialization function
+```{r, echo = TRUE, eval = FALSE}
+initializeParameterObject(init.with.restart.file = "restart_file.rst")
+```
 
+### Load and save parameter objects
+AnaCoDa is based on C++ objects using the Rcpp [@rcpp_article]. This comes with the problem that C++ objects are by default not serializable and can therefore not be saved/loaded with the default R save/load functions.
+
+AnaCoDa however, does provide functions to load and save `parameter` and `mcmc` objects. These are the only two objects that store information during a run.
+
+```{r, echo = TRUE, eval = FALSE}
+#save objects after a run
+runMCMC(mcmc = mcmc, genome = genome, model = model)
+writeParameterObject(parameter = parameter, file = "parameter_out.Rda")
+writeMCMCObject(mcmc = mcmc, file = "mcmc_out.Rda")
+```
+
+As `genome`, and `model` objects are purely storage containers, no save/load function is provided at this point, but will be added in the future.
+
+```{r, echo = TRUE, eval = FALSE}
+#save objects after a run
+parameter <- loadParameterObject(file = "parameter_out.Rda")
+mcmc <- loadMCMCObject(file = "mcmc_out.Rda")
+```
 
 ## File formats
 
@@ -273,18 +304,17 @@ getCSPEstimates(parameter = parameter, filename = "mutation.csv", CSP="Mutation"
 To obtain posterior estimates for the gene specific parameters, we can use the function `getExpressionEstimatesForMixture`.
 In the case below we ask to get the gene specific parameters for all genes, and under the assumption each gene is assigned to mixture 1.
 ```{r, echo = TRUE, eval = FALSE}
-phi_mat <- getExpressionEstimatesForMixture(parameter = parameter, 
-                                            gene.index = 1:length(genome), 
-                                            mixtureAssignment = rep(1,length(genome)), 
-                                            samples = 1000)
+phi_mat <- getExpressionEstimates(parameter = parameter, 
+                                  gene.index = 1:length(genome),
+                                  samples = 1000)
 head(phi_mat)
-#           PHI    Std_Error
-#[1,] 0.2729446 0.0001261525
-#[2,] 1.4221716 0.0001669425
-#[3,] 0.7459888 0.0002313539
-#[4,] 0.6573082 0.0001935466
-#[5,] 1.6316902 0.0001846631
-#[6,] 0.6179711 0.0001744928
+#           PHI  log10.PHI    Std.Error log10.Std.Error      0.025     0.975 log10.0.025 log10.0.975
+#[1,] 0.2729446 -0.6188447 0.0001261525    2.362358e-04 0.07331819 0.5455295 -1.13478830 -0.26319141
+#[2,] 1.4221716  0.1498953 0.0001669425    5.194123e-05 1.09593642 1.7562065  0.03978491  0.24457557
+#[3,] 0.7459888 -0.1512764 0.0002313539    1.529267e-04 0.31559618 1.2198282 -0.50086958  0.08629407
+#[4,] 0.6573082 -0.2030291 0.0001935466    1.400333e-04 0.31591233 1.0699855 -0.50043989  0.02937787
+#[5,] 1.6316901  0.2098120 0.0001846631    4.986347e-05 1.28410352 2.0035207  0.10860000  0.30179215
+#[6,] 0.6179711 -0.2286806 0.0001744928    1.374863e-04 0.28478950 0.9683327 -0.54550116 -0.01397541
 ```
 
 However we can decide to only obtain certain gene parameters. in the first case we sample 100 random genes.
@@ -315,7 +345,7 @@ Now we can just plot the trace object. The argument 'what' specifies which type 
 Here we plot the selection parameter $\Delta \eta$ of the ROC model. These parameters are mixture specific and one can decide which mixture set to visualize using the argument `mixture`.
 
 ```{r, echo = TRUE, eval = FALSE}
-trace <- parameter$getTraceObject()
+trace <- getTrace(parameter)
 plot(x = trace, what = "Mutation", mixture = 1)
 ```
 ![Trace plot showing the traces of all 40 codon specific selection parameters organized by amino acid](selection_trace.png)

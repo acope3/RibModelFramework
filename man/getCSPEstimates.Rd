@@ -4,7 +4,8 @@
 \alias{getCSPEstimates}
 \title{Return Codon Specific Paramters (or write to csv) estimates as data.frame}
 \usage{
-getCSPEstimates(parameter, filename, CSP, mixture, samples)
+getCSPEstimates(parameter, filename = NULL, CSP = "Mutation", mixture = 1,
+  samples = 10)
 }
 \arguments{
 \item{parameter}{parameter on object created by \code{initializeParameterObject}.}
