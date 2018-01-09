@@ -1,6 +1,5 @@
 # R stuff
 *.RData
-*.rst
 *.Rda
 *.Rdat
 *.rda
@@ -39,6 +38,8 @@ junk
 .launch
 .idea
 .externalToolBuilders
+.vcode
+.settings
 
 # .swp/swo files
 *.swp
