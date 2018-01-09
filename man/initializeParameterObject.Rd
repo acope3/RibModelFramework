@@ -84,9 +84,36 @@ representation would be \code{matrix(c(1,2,3,1,2,3), ncol=2)}
 where each row represents a mixture, the first column represents the mutation
 category, and the second column represents the selection category.
 Another example would be mixture.definition = "selectionShared" and numMixtures = 4 (
-\code{matrix(c(1,2,3, 4,1,1,1,1), ncol=2)}).
+\code{matrix(c(1,2,3,4,1,1,1,1), ncol=2)}).
 In this case, the selection category is the same for every mixture. If a matrix
 is given, and it is valid, then the mutation/selection relationship will be
 defined by the given matrix and the keyword will be ignored. A matrix should only
 be given in cases where the keywords would not create the desired matrix.
+}
+\examples{
+
+genome_file <- system.file("extdata", "genome.fasta", package = "AnaCoDa")
+restart_file <- system.file("extdata", "restart_file.rst", package = "AnaCoDa")
+
+genome <- initializeGenomeObject(file = genome_file)
+
+## initialize a new parameter object
+sphi_init <- 1
+numMixtures <- 1
+geneAssignment <- rep(1, length(genome))
+parameter <- initializeParameterObject(genome = genome, sphi = sphi_init, 
+                                       num.mixtures = numMixtures, 
+                                       gene.assignment = geneAssignment, 
+                                       mixture.definition = "allUnique")
+
+## re-initialize a parameter object from a restart file. Useful for checkpointing
+parameter <- initializeParameterObject(init.with.restart.file = restart_file)
+
+## initialize a parameter object with a custon mixture definition matrix
+def.matrix <- matrix(c(1,1,1,2), ncol=2)
+geneAssignment <- sample(1:2, length(genome), replace = TRUE) # random assignment to mixtures
+parameter <- initializeParameterObject(genome = genome, sphi = c(0.5, 2), num.mixtures = 2,
+                                       gene.assignment = geneAssignment,
+                                       mixture.definition.matrix = def.matrix)
+
 }

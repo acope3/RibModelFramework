@@ -20,6 +20,22 @@
 #' 
 #' @return This function returns the initialized Genome object.
 #' 
+#' @examples 
+#' 
+#' genome_file <- system.file("extdata", "genome.fasta", package = "AnaCoDa")
+#' genes_file <- system.file("extdata", "more_genes.fasta", package = "AnaCoDa")
+#' expression_file <- system.file("extdata", "expression.csv", package = "AnaCoDa")
+#'  
+#' ## reading genome
+#' genome <- initializeGenomeObject(file = genome_file)
+#' 
+#' ## reading genome and observed expression data
+#' genome <- initializeGenomeObject(file = genome_file, observed.expression.file = expression_file)
+#'  
+#' ## add aditional genes to existing genome
+#' genome <- initializeGenomeObject(file = genome_file)
+#' genome <- initializeGenomeObject(file = genes_file, genome = genome, append = TRUE)   
+#' 
 initializeGenomeObject <- function(file, genome=NULL, observed.expression.file=NULL, fasta=TRUE, match.expression.by.id=TRUE, append=FALSE) {
   if (is.null(genome)){ 
     genome <- new(Genome)
@@ -39,18 +55,28 @@ initializeGenomeObject <- function(file, genome=NULL, observed.expression.file=N
 
 #' Get Codon Counts For Each Amino Acid 
 #' 
+#' @param aa A one character representation of an amino acid.
+#' 
 #' @param genome A genome object from which the counts of each
 #' codon can be obtained.
 #'  
-#' @param aa A one character representation of an amino acid.
-#' 
 #' @return Returns a matrix storing the codonCounts for the given amino acid. 
 #' 
 #' @description provides the codon counts for a fiven amino acid across all genes
 #' 
 #' @details The returned matrix containes a row for each gene and a coloumn for each codon.
 #' 
-getCodonCountsForAA <- function(genome, aa){
+#' @examples 
+#' 
+#' genome_file <- system.file("extdata", "genome.fasta", package = "AnaCoDa")
+#'  
+#' ## reading genome
+#' genome <- initializeGenomeObject(file = genome_file)
+#' countsForA <- getCodonCountsForAA("A", genome)
+#' 
+#' counts <- lapply(X = c("A", "C"), FUN = getCodonCountsForAA, genome = genome)
+#' 
+getCodonCountsForAA <- function(aa, genome){
   # get codon count for aa
   codons <- AAToCodon(aa, F)
   codonCounts <- lapply(codons, function(codon){
@@ -69,6 +95,15 @@ getCodonCountsForAA <- function(genome, aa){
 #' @param x A genome object initialized with \code{\link{initializeGenomeObject}}.
 #' 
 #' @return returns the number of genes in a genome
+#' 
+#' @examples 
+#' 
+#' genome_file <- system.file("extdata", "genome.fasta", package = "AnaCoDa")
+#'  
+#' ## reading genome
+#' genome <- initializeGenomeObject(file = genome_file)
+#' length(genome) # 10
+#' 
 length.Rcpp_Genome <- function(x) {
   return(x$getGenomeSize(F))
 }
@@ -105,6 +140,16 @@ summary.Rcpp_Genome <- function(object, ...) {
 #' 
 #' @return gene.names Returns the names of the genes as a vector of strings.
 #' 
+#' @examples 
+#' 
+#' genome_file <- system.file("extdata", "genome.fasta", package = "AnaCoDa")
+#'  
+#' ## reading genome
+#' genome <- initializeGenomeObject(file = genome_file)
+#'
+#' ## return all gene ids for the genome
+#' geneIDs <- getNames(genome, FALSE)
+#' 
 getNames <- function(genome, simulated = FALSE)
 {
   genes <- genome$getGenes(simulated)
@@ -115,17 +160,32 @@ getNames <- function(genome, simulated = FALSE)
 
 #' Add gene observed synthesis rates
 #' 
-#' \code{addObservedSynthesisRateSet} returns the observed synthesis rates of the genes within the genome specified.
+#' \code{addObservedSynthesisRateSet} returns the observed 
+#' synthesis rates of the genes within the genome specified.
 #' 
-#' @param genome A genome object initialized with \code{\link{initializeGenomeObject}} to add observed expression data.
+#' @param genome A genome object initialized with 
+#' \code{\link{initializeGenomeObject}} to add observed expression data.
 #' 
-#' @param observed.expression.file A string containing the location of a file containing
-#'  empirical expression rates (optional).
+#' @param observed.expression.file A string containing 
+#' the location of a file containing empirical expression rates (optional).
 #' 
-#' @param match.expression.by.id If TRUE (default) observed expression values will be assigned by matching sequence identifier.
+#' @param match.expression.by.id If TRUE (default) observed expression 
+#' values will be assigned by matching sequence identifier.
 #' If FALSE observed expression values will be assigned by order
 #' 
 #' @return gene.names Returns the names of the genes as a vector of strings.
+#' 
+#' @examples 
+#' 
+#' genome_file <- system.file("extdata", "genome.fasta", package = "AnaCoDa")
+#' expression_file <- system.file("extdata", "expression.csv", package = "AnaCoDa") 
+#' ## reading genome
+#' genome <- initializeGenomeObject(file = genome_file)
+#' 
+#'
+#' ## add expression values after the genome was initiallized, 
+#' ## or adding an additional set of expression values
+#' addObservedSynthesisRateSet(genome = genome, observed.expression.file = expression_file)
 #' 
 addObservedSynthesisRateSet <- function(genome, observed.expression.file, match.expression.by.id=TRUE)
 {
@@ -136,21 +196,34 @@ addObservedSynthesisRateSet <- function(genome, observed.expression.file, match.
 
 #' Get gene observed synthesis rates
 #' 
-#' \code{getObservedSynthesisRateSet} returns the observed synthesis rates of the genes within the genome specified.
+#' \code{getObservedSynthesisRateSet} returns the observed 
+#' synthesis rates of the genes within the genome specified.
 #' 
 #' @param genome A genome object initialized with \code{\link{initializeGenomeObject}}.
 #' 
-#' @param simulated A logical value denoting if the synthesis rates to be listed are simulated or not.
-#' The default value is FALSE.
+#' @param simulated A logical value denoting if the synthesis 
+#' rates to be listed are simulated or not. The default value is FALSE.
 #' 
 #' @return gene.names Returns the names of the genes as a vector of strings.
+#' 
+#' @examples 
+#' 
+#' genome_file <- system.file("extdata", "genome.fasta", package = "AnaCoDa")
+#' expression_file <- system.file("extdata", "expression.csv", package = "AnaCoDa") 
+#' ## reading genome
+#' genome <- initializeGenomeObject(file = genome_file)
+#' 
+#'
+#' ## return expression values as a data.frame with gene ids in the first column.
+#' expressionValues <- getObservedSynthesisRateSet(genome = genome)
 #' 
 getObservedSynthesisRateSet <- function(genome, simulated = FALSE)
 {
   genes <- genome$getGenes(simulated)
   expression <- lapply(1:length(genes), function(i){return(genes[[i]]$getObservedSynthesisRateValues())})
-  
-  return(do.call(rbind, expression))
+  ids <- getNames(genome, simulated)
+  mat <- do.call(rbind, expression)
+  return(cbind(ids, mat))
 }
 
 

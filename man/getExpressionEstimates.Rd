@@ -27,12 +27,32 @@ The returned vector is unnamed as gene ids are only stored in the \code{genome} 
 but the \code{gene.index} vector can be used to match the assignment to the genome.
 }
 \examples{
-\dontrun{
-# get the estimated phi values for all genes assuming they are in mixture 1
-getExpressionEstimatesForMixture(parameter, 1:length(genome), rep(1, length(genome), 1000)
+ 
+genome_file <- system.file("extdata", "genome.fasta", package = "AnaCoDa")
 
-# get the estimated phi values for all genes for the estimated mixture element
-mix.assign <- getMixtureAssignmentEstimate(parameter, 1:length(genome), 1000)
-getExpressionEstimatesForMixture(parameter, 1:length(genome), mix.assign, 1000)
+genome <- initializeGenomeObject(file = genome_file)
+sphi_init <- c(1,1)
+numMixtures <- 2
+geneAssignment <- sample(1:2, length(genome), replace = TRUE) # random assignment to mixtures
+parameter <- initializeParameterObject(genome = genome, sphi = sphi_init, 
+                                       num.mixtures = numMixtures, 
+                                       gene.assignment = geneAssignment, 
+                                       mixture.definition = "allUnique")
+model <- initializeModelObject(parameter = parameter, model = "ROC")
+samples <- 2500
+thinning <- 50
+adaptiveWidth <- 25
+mcmc <- initializeMCMCObject(samples = samples, thinning = thinning, 
+                             adaptive.width=adaptiveWidth, est.expression=TRUE,
+                             est.csp=TRUE, est.hyper=TRUE, est.mix = TRUE) 
+divergence.iteration <- 10
+\dontrun{
+runMCMC(mcmc = mcmc, genome = genome, model = model, 
+        ncores = 4, divergence.iteration = divergence.iteration)
+
+# get the estimated expression values for all genes based on the mixture 
+# they are assigned to at each step
+estimatedExpression <- getExpressionEstimates(parameter, 1:length(genome), 1000)
 }
+
 }

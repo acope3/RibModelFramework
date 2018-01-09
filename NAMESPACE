@@ -49,6 +49,8 @@ export(
 "initializeGenomeObject",
 "getCodonCountsForAA",
 "getNames",
+"addObservedSynthesisRateSet",
+"getObservedSynthesisRateSet",
 
 ## MCMC object
 "initializeMCMCObject",
