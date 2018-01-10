@@ -860,18 +860,19 @@ ROCParameter::ROCParameter(std::vector<double> stdDevSynthesisRate, std::vector<
 	unsigned _numMixtures = _matrix.size() / 2;
 	std::vector<std::vector<unsigned>> thetaKMatrix;
 	thetaKMatrix.resize(_numMixtures, std::vector<unsigned> (2, 0));
-
-
 	unsigned index = 0;
-	for (unsigned i = 0; i < _numMixtures; i++)
+	for (unsigned j = 0; j < 2; j++)
 	{
-		for (unsigned j = 0; j < 2; j++, index++)
+		for (unsigned i = 0; i < _numMixtures; i++,index++)
 		{
 			thetaKMatrix[i][j] = _matrix[index];
 		}
 	}
+	my_print("Completed Initializing thetaKMatrix\n");
 	initParameterSet(stdDevSynthesisRate, _numMixtures, geneAssignment, thetaKMatrix, splitSer, "");
+	my_print("Completed Initializing Parameter Set\n");
 	initROCParameterSet();
+	my_print("Completed Initializing ROCParameter Set\n");
 
 }
 

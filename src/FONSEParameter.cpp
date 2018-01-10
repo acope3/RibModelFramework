@@ -613,13 +613,13 @@ FONSEParameter::FONSEParameter(std::vector<double> stdDevSynthesisRate, std::vec
 
 
     unsigned index = 0;
-    for (unsigned i = 0; i < _numMixtures; i++)
-    {
-		for (unsigned j = 0; j < 2; j++, index++)
+    for (unsigned j = 0; j < 2; j++)
+	{
+		for (unsigned i = 0; i < _numMixtures; i++,index++)
 		{
 			thetaKMatrix[i][j] = _matrix[index];
 		}
-    }
+	}
     initParameterSet(stdDevSynthesisRate, _numMixtures, geneAssignment, thetaKMatrix, splitSer, "");
     initFONSEParameterSet();
 
