@@ -679,11 +679,12 @@ void Parameter::setNumMutationSelectionValues(std::string _mutationSelectionStat
 		//of unique categories.
 		std::set<unsigned> delMCounter;
 		std::set<unsigned> delEtaCounter;
-
 		for (unsigned i = 0u; i < numMixtures; i++)
 		{
 			delMCounter.insert(mixtureDefinitionMatrix[i][0] - 1);
 			delEtaCounter.insert(mixtureDefinitionMatrix[i][1] - 1);
+
+
 		}
 		numMutationCategories = (unsigned)delMCounter.size();
 		numSelectionCategories = (unsigned)delEtaCounter.size();
