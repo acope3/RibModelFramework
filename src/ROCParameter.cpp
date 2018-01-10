@@ -868,11 +868,8 @@ ROCParameter::ROCParameter(std::vector<double> stdDevSynthesisRate, std::vector<
 			thetaKMatrix[i][j] = _matrix[index];
 		}
 	}
-	my_print("Completed Initializing thetaKMatrix\n");
 	initParameterSet(stdDevSynthesisRate, _numMixtures, geneAssignment, thetaKMatrix, splitSer, "");
-	my_print("Completed Initializing Parameter Set\n");
 	initROCParameterSet();
-	my_print("Completed Initializing ROCParameter Set\n");
 
 }
 
