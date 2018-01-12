@@ -1382,7 +1382,7 @@ double Parameter::getStdDevSynthesisRatePosteriorMean(unsigned samples, unsigned
  * Note: May return NaN if the gene was never in the category (expected resulted, OK).
  * Wrapped by getSynthesisRatePosteriorMeanByMixtureElementForGene on the R-side.
 */
-double Parameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, bool log10)
+double Parameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, bool log_scale)
 {
 	float posteriorMean = 0.0;
 	std::vector<float> synthesisRateTrace = traces.getSynthesisRateTraceForGene(geneIndex);
@@ -1397,7 +1397,7 @@ double Parameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned geneI
 	}
 	unsigned start = traceLength - samples;
 
-	if(log10)
+	if(log_scale)
 	{
 		for (unsigned i = start; i < traceLength; i++)
 		{
@@ -1475,7 +1475,7 @@ double Parameter::getStdDevSynthesisRateVariance(unsigned samples, unsigned mixt
 }
 
 
-double Parameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex, bool unbiased, bool log10)
+double Parameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex, bool unbiased, bool log_scale)
 {
 	std::vector<float> synthesisRateTrace = traces.getSynthesisRateTraceForGene(geneIndex);
 
@@ -1489,7 +1489,7 @@ double Parameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex,
 		samples = traceLength;
 	}
 	unsigned start = traceLength - samples;
-	if(log10)
+	if(log_scale)
 	{
 		for (unsigned i = start; i < traceLength; i++)
 		{
@@ -1498,7 +1498,7 @@ double Parameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex,
 	}
 
 	// NOTE: The loss of precision here is acceptable for storage purposes.
-	float posteriorMean = (float)getSynthesisRatePosteriorMean(samples, geneIndex, log10);
+	float posteriorMean = (float)getSynthesisRatePosteriorMean(samples, geneIndex, log_scale);
 
 	float posteriorVariance = 0.0;
 	if (!std::isnan(posteriorMean))
@@ -1554,7 +1554,7 @@ double Parameter::getCodonSpecificVariance(unsigned mixtureElement, unsigned sam
 
 
 
-std::vector<double> Parameter::calculateQuantile(std::vector<float> &parameterTrace, unsigned samples, std::vector<double> probs, bool log10)
+std::vector<double> Parameter::calculateQuantile(std::vector<float> &parameterTrace, unsigned samples, std::vector<double> probs, bool log_scale)
 {
     unsigned traceLength = lastIteration + 1u;
     //unsigned traceEnd = parameterTrace.size() - (parameterTrace.size() - lastIteration); //currently unused
@@ -1570,7 +1570,7 @@ std::vector<double> Parameter::calculateQuantile(std::vector<float> &parameterTr
     std::vector<double> samplesTrace(parameterTrace.begin() + (lastIteration - samples) + 1, (parameterTrace.begin() + lastIteration + 1));
     std::sort(samplesTrace.begin(), samplesTrace.end());
 
-	if(log10)
+	if(log_scale)
 	{
 		for (unsigned i = 0u; i < samplesTrace.size(); i++)
 		{
@@ -1600,19 +1600,19 @@ std::vector<double> Parameter::calculateQuantile(std::vector<float> &parameterTr
     return retVec;
 }
 
-std::vector<double> Parameter::getExpressionQuantile(unsigned samples, unsigned geneIndex, std::vector<double> probs, bool log10)
+std::vector<double> Parameter::getExpressionQuantile(unsigned samples, unsigned geneIndex, std::vector<double> probs, bool log_scale)
 {
 	std::vector<float> parameterTrace = traces.getSynthesisRateTraceForGene(geneIndex);
-	return calculateQuantile(parameterTrace, samples, probs, log10);
+	return calculateQuantile(parameterTrace, samples, probs, log_scale);
 }
 
 std::vector<double> Parameter::getCodonSpecificQuantile(unsigned mixtureElement, unsigned samples, std::string &codon,
-	unsigned paramType, std::vector<double> probs, bool withoutReference, bool log10)
+	unsigned paramType, std::vector<double> probs, bool withoutReference)
 {
  	std::vector<float> parameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
 		mixtureElement, codon, paramType, withoutReference);
     
-	return calculateQuantile(parameterTrace, samples, probs, log10);
+	return calculateQuantile(parameterTrace, samples, probs, false);
 }
 
 
@@ -2208,7 +2208,7 @@ double Parameter::getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsi
 
 
 std::vector<double> Parameter::getCodonSpecificQuantileForCodon(unsigned mixtureElement, unsigned samples,
-	std::string &codon, unsigned paramType, std::vector<double> probs, bool withoutReference, bool log10)
+	std::string &codon, unsigned paramType, std::vector<double> probs, bool withoutReference)
 {
 	std::vector<double> rv;
 	codon[0] = (char)std::toupper(codon[0]);
@@ -2217,19 +2217,19 @@ std::vector<double> Parameter::getCodonSpecificQuantileForCodon(unsigned mixture
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
 	if (check)
 	{
-        rv = getCodonSpecificQuantile(mixtureElement - 1, samples, codon, paramType, probs, withoutReference, log10);
+        rv = getCodonSpecificQuantile(mixtureElement - 1, samples, codon, paramType, probs, withoutReference);
     }
     return rv;     
 }
 
 std::vector<double> Parameter::getExpressionQuantileForGene(unsigned samples,
-	unsigned geneIndex, std::vector<double> probs, bool log10)
+	unsigned geneIndex, std::vector<double> probs, bool log_scale)
 {
 	std::vector<double> rv;
 	bool checkGene = checkIndex(geneIndex, 1, (unsigned) mixtureAssignment.size());
 	if (checkGene)
 	{
-        rv = getExpressionQuantile(samples, geneIndex - 1, probs, log10);
+        rv = getExpressionQuantile(samples, geneIndex - 1, probs, log_scale);
     }
     return rv;     
 }
@@ -2242,19 +2242,19 @@ std::vector<double> Parameter::getExpressionQuantileForGene(unsigned samples,
  * To implement the R version of this function, the index is also checked.
  * This is the R-wrapper for the C-side function "getSynthesisRatePosteriorMean".
 */
-double Parameter::getSynthesisRatePosteriorMeanForGene(unsigned samples, unsigned geneIndex, bool log10)
+double Parameter::getSynthesisRatePosteriorMeanForGene(unsigned samples, unsigned geneIndex, bool log_scale)
 {
 	double rv = -1.0;
 	bool checkGene = checkIndex(geneIndex, 1, (unsigned) mixtureAssignment.size());
 	if (checkGene)
 	{
-		rv = getSynthesisRatePosteriorMean(samples, geneIndex - 1, log10);
+		rv = getSynthesisRatePosteriorMean(samples, geneIndex - 1, log_scale);
 	}
 	return rv;
 }
 
 
-double Parameter::getSynthesisRateVarianceForGene(unsigned samples, unsigned geneIndex, bool unbiased, bool log10)
+double Parameter::getSynthesisRateVarianceForGene(unsigned samples, unsigned geneIndex, bool unbiased, bool log_scale)
 {
 	double rv = -1.0;
 	bool checkGene = checkIndex(geneIndex, 1, (unsigned) mixtureAssignment.size());
