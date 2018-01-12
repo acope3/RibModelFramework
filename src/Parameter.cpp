@@ -2260,7 +2260,7 @@ double Parameter::getSynthesisRateVarianceForGene(unsigned samples, unsigned gen
 	bool checkGene = checkIndex(geneIndex, 1, (unsigned) mixtureAssignment.size());
 	if (checkGene)
 	{
-		rv = getSynthesisRateVariance(samples, geneIndex - 1, unbiased, log10);
+		rv = getSynthesisRateVariance(samples, geneIndex - 1, unbiased, log_scale);
 	}
 	return rv;
 }
