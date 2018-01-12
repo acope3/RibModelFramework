@@ -158,7 +158,7 @@ class Parameter {
 		double getCodonSpecificVariance(unsigned mixtureElement, unsigned samples, std::string &codon,
 			unsigned paramType, bool unbiased, bool withoutReference = true);
 	        std::vector<double> getCodonSpecificQuantile(unsigned mixtureElement, unsigned samples, std::string &codon,
-			unsigned paramType, std::vector<double> probs, bool withoutReference, bool log10);
+			unsigned paramType, std::vector<double> probs, bool withoutReference, bool log10 = false);
 		std::vector<double> getExpressionQuantile(unsigned samples, unsigned geneIndex, 
 			std::vector<double> probs, bool log10 = false);
 		std::vector<double> calculateQuantile(std::vector<float> &parameterTrace, unsigned samples, std::vector<double> probs, bool log10);
