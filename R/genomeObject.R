@@ -225,8 +225,7 @@ getObservedSynthesisRateSet <- function(genome, simulated = FALSE)
   expression <- lapply(1:length(genes), function(i){return(genes[[i]]$getObservedSynthesisRateValues())})
   ids <- getNames(genome, simulated)
   mat <- do.call(rbind, expression)
-  colnames(mat) <- ids
-  return(mat)
+  return(cbind(ids, mat))
 }
 
 #' Calculate the CAI codon weigths for a reference genome
