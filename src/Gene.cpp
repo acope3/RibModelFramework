@@ -181,13 +181,13 @@ void Gene::setSequence(std::string _seq)
 	{
 		bool check = geneData.processSequence(seq);
 		if (!check)
-			my_printError("WARNING: Error with gene %\nBad codons found!\n", id);
+			my_printError("WARNING: Error in gene % \nBad codons found!\n", id);
 	}
 	else
-    {
+    	{
 		my_printError("WARNING: Gene: % has sequence length NOT multiple of 3!\n", id);
-        my_printError("Gene data is NOT processed!\nValid characters are A,C,T,G\n\n");
-    }
+        	my_printError("Gene data is NOT processed!\nValid characters are A,C,T,G\n\n");
+    	}
 }
 
 /* setPASequence (NOT EXPOSED)

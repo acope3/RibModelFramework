@@ -1142,7 +1142,7 @@ std::vector<std::vector<double>> Parameter::calculateSelectionCoefficients(unsig
 			for (unsigned k = aaStart; k < aaEnd; k++)
 			{
 				std::string codon = SequenceSummary::codonArrayParameter[k];
-				tmp.push_back(getCodonSpecificPosteriorMean(sample, mixture, codon, 1));
+				tmp.push_back(getCodonSpecificPosteriorMean(i, sample, codon, 1, true, true));
 				if (tmp[k] < minValue)
 				{
 					minValue = tmp[k];
@@ -1412,6 +1412,9 @@ double Parameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned geneI
 }
 
 
+
+
+
 /* getCodonSpecificPosteriorMean (RCPP EXPOSED VIA WRAPPER)
  * Arguments: the mixture element, the number of samples from the end of the trace to examine, the codon to examine,
  * 			  the parameter type to examine, and whether or not it is with reference.
@@ -1420,12 +1423,19 @@ double Parameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned geneI
  * of the codon-specific parameter's trace, and then getting the mean of these values.
  * Wrapped by getCodonSpecificPosteriorMeanForCodon on the R-side.
 */
-double Parameter::getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon,
-	unsigned paramType, bool withoutReference)
+double Parameter::getCodonSpecificPosteriorMean(unsigned element, unsigned samples, std::string &codon,
+	unsigned paramType, bool withoutReference, bool byGene)
 {
 	double posteriorMean = 0.0;
-	std::vector<float> parameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
-		mixtureElement, codon, paramType, withoutReference);
+	std::vector<float> parameterTrace;
+	if(byGene)
+	{
+		 parameterTrace= traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
+			element, codon, paramType, withoutReference);
+	}else{
+		parameterTrace = traces.getCodonSpecificParameterTraceByGeneElementForCodon(
+			element, codon, paramType, withoutReference);
+	}
 
 	unsigned traceLength = lastIteration + 1;
 
@@ -1537,7 +1547,7 @@ double Parameter::getCodonSpecificVariance(unsigned mixtureElement, unsigned sam
 		samples = traceLength;
 	}
 
-	double posteriorMean = getCodonSpecificPosteriorMean(mixtureElement, samples, codon, paramType, withoutReference);
+	double posteriorMean = getCodonSpecificPosteriorMean(mixtureElement, samples, codon, paramType, withoutReference, false);
 
 	double posteriorVariance = 0.0;
 
@@ -2185,7 +2195,7 @@ double Parameter::getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement,
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
 	if (check)
 	{
-		rv = getCodonSpecificPosteriorMean(mixtureElement - 1, samples, codon, paramType, withoutReference);
+		rv = getCodonSpecificPosteriorMean(mixtureElement - 1, samples, codon, paramType, withoutReference, false);
 	}
 	return rv;
 }

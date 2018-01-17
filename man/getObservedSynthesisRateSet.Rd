@@ -13,7 +13,7 @@ getObservedSynthesisRateSet(genome, simulated = FALSE)
 rates to be listed are simulated or not. The default value is FALSE.}
 }
 \value{
-gene.names Returns the names of the genes as a vector of strings.
+Returns the names of the genes as a vector of strings.
 }
 \description{
 \code{getObservedSynthesisRateSet} returns the observed 

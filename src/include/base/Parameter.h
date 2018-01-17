@@ -151,7 +151,7 @@ class Parameter {
 		double getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, bool log_scale=false);
 
 		double getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon,
-			unsigned paramType, bool withoutReference = true);
+			unsigned paramType, bool withoutReference = true, bool byGene = false);
 		double getStdDevSynthesisRateVariance(unsigned samples, unsigned mixture, bool unbiased);
 		double getSynthesisRateVariance(unsigned samples, unsigned geneIndex,
 			bool unbiased = true, bool log_scale = false);

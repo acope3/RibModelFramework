@@ -379,10 +379,8 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
 #' csp_mat <- getCSPEstimates(parameter, CSP="Mutation")
 #' 
 #' # write the result directly to the filesystem as a csv file. No values are returned
-#' getCSPEstimates(parameter, , filename="csp_out.csv", CSP="Mutation")
+#' getCSPEstimates(parameter, , filename=file.path(tempdir(), "csp_out.csv"), CSP="Mutation")
 #' 
-#' unlink("csp_out.csv")
-#' unlink(".RData")
 #' }
 #' 
 getCSPEstimates <- function(parameter, filename=NULL, CSP="Mutation", mixture = 1, samples = 10){
@@ -819,10 +817,8 @@ getExpressionEstimates <- function(parameter, gene.index, samples, quantiles=c(0
 #'                                        mixture.definition = "allUnique")
 #' 
 #' ## writing an empty parameter object as the runMCMC routine was not called yet
-#' writeParameterObject(parameter, "parameter.Rda")
+#' writeParameterObject(parameter = parameter, file = file.path(tempdir(), "file.Rda"))
 #' 
-#' unlink("parameter.Rda")
-#' unlink(".RData")
 #' }
 #' 
 writeParameterObject <- function(parameter, file)
