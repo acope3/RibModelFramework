@@ -274,9 +274,18 @@ YAL003W,10.45,NA,...,9.564
 YAL005C,0.556,0.957,...,0.758
 ```
 
-### RFP counts
-
-
+### Ribosome FootPrinting counts
+Ribosome Foot-Printing (RFP) counts are provided in a csv file format.
+The first line is expected to be a header describing each column.
+The columns are expected in the following order gene id, position, codon, rfpcount.
+Each row corresponds to a single codon with an associated number of ribosome footprints.
+```
+GeneID,Position,Codon,rfpCount
+YBR177C, 0, ATA, 8
+YBR177C, 1, CGG, 1
+YBR177C, 2, GTT, 8
+YBR177C, 3, CGC, 1
+```
 
 ## Analyzing and Visualizating results
 

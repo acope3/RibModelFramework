@@ -842,11 +842,7 @@ void Parameter::setGroupList(std::vector <std::string> gl)
 	groupList.clear();
 	for (unsigned i = 0; i < gl.size(); i++)
 	{
-		if (gl[i] == "M" || gl[i] == "W" || gl[i] == "X")
-		    // TODO: print only with ROC and FONSE models, somehow.
-			my_printError("Warning: Amino Acid % not recognized in ROC or FONSE model.\n", gl[i].c_str());
-		else
-			groupList.push_back(gl[i]);
+		groupList.push_back(gl[i]);
 	}
 }
 
@@ -1124,16 +1120,20 @@ unsigned Parameter::getMixtureAssignment(unsigned gene)
 }
 
 
-std::vector<std::vector<double>> Parameter::calculateSelectionCoefficients(unsigned sample, unsigned mixture)
+std::vector<std::vector<double>> Parameter::calculateSelectionCoefficients(unsigned sample)
 {
 	unsigned numGenes = (unsigned)mixtureAssignment.size();
 	std::vector<std::vector<double>> selectionCoefficients;
-	selectionCoefficients.resize(numGenes);
+	selectionCoefficients.resize(numGenes, std::vector<double> (61, 0));
+	unsigned numGroupings = getGroupListSize();
+
 	for (unsigned i = 0; i < numGenes; i++)
 	{
-		for (unsigned j = 0; j < getGroupListSize(); j++)
-		{
+		unsigned codon_index = 0;
+		double phi = getSynthesisRatePosteriorMean(sample, i, false);
 
+		for (unsigned j = 0; j < numGroupings; j++)
+		{
 			std::string aa = getGrouping(j);
 			unsigned aaStart, aaEnd;
 			SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
@@ -1142,18 +1142,15 @@ std::vector<std::vector<double>> Parameter::calculateSelectionCoefficients(unsig
 			for (unsigned k = aaStart; k < aaEnd; k++)
 			{
 				std::string codon = SequenceSummary::codonArrayParameter[k];
-				tmp.push_back(getCodonSpecificPosteriorMean(i, sample, codon, 1, true, true));
-				if (tmp[k] < minValue)
-				{
-					minValue = tmp[k];
-				}
+				double x = getCodonSpecificPosteriorMean(i, sample, codon, 1, true, true);
+				tmp.push_back(x);
+				minValue = (x < minValue) ? x : minValue;
 			}
 			tmp.push_back(0.0);
-			double phi = getSynthesisRatePosteriorMean(sample, i, false);
-			for (unsigned k = 0; k < tmp.size(); k++)
+			for (unsigned k = 0; k < tmp.size(); k++, codon_index++)
 			{
 				tmp[k] -= minValue;
-				selectionCoefficients[i].push_back(phi * tmp[k]);
+				selectionCoefficients[i][codon_index] = -(phi * tmp[k]);
 			}
 		}
 	}
@@ -1430,10 +1427,10 @@ double Parameter::getCodonSpecificPosteriorMean(unsigned element, unsigned sampl
 	std::vector<float> parameterTrace;
 	if(byGene)
 	{
-		 parameterTrace= traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
+		parameterTrace = traces.getCodonSpecificParameterTraceByGeneElementForCodon(
 			element, codon, paramType, withoutReference);
 	}else{
-		parameterTrace = traces.getCodonSpecificParameterTraceByGeneElementForCodon(
+		parameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
 			element, codon, paramType, withoutReference);
 	}
 
@@ -2303,21 +2300,16 @@ std::vector<double> Parameter::getEstimatedMixtureAssignmentProbabilitiesForGene
 //-------------------------------------//
 
 
-SEXP Parameter::calculateSelectionCoefficientsR(unsigned sample, unsigned mixture)
+SEXP Parameter::calculateSelectionCoefficientsR(unsigned sample)
 {
-	NumericMatrix RSelectionCoefficents(mixtureAssignment.size(), 62); //62 due to stop codons
-	std::vector<std::vector<double>> selectionCoefficients;
-	bool checkMixture = checkIndex(mixture, 1, numMixtures);
-	if (checkMixture)
+	NumericMatrix RSelectionCoefficents(mixtureAssignment.size(), 61); //61 due to stop codons
+	std::vector<std::vector<double>> selectionCoefficients = calculateSelectionCoefficients(sample);
+	unsigned index = 0;
+	for (unsigned i = 0; i < selectionCoefficients.size(); i++)
 	{
-		selectionCoefficients = calculateSelectionCoefficients(sample, mixture - 1);
-		unsigned index = 0;
-		for (unsigned i = 0; i < selectionCoefficients.size(); i++)
+		for (unsigned j = 0; j < selectionCoefficients[i].size(); j++, index++)
 		{
-			for (unsigned j = 0; j < selectionCoefficients[i].size(); j++, index++)
-			{
-				RSelectionCoefficents[index] = selectionCoefficients[i][j];
-			}
+			RSelectionCoefficents(i,j) = selectionCoefficients[i][j];
 		}
 	}
 	return RSelectionCoefficents;

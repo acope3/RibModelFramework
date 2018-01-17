@@ -64,7 +64,8 @@ initializeGenomeObject <- function(file, genome=NULL, observed.expression.file=N
 #' 
 #' @description provides the codon counts for a fiven amino acid across all genes
 #' 
-#' @details The returned matrix containes a row for each gene and a coloumn for each codon.
+#' @details The returned matrix containes a row for each gene and a coloumn 
+#' for each synonymous codon of \code{aa}.
 #' 
 #' @examples 
 #' 
@@ -173,7 +174,7 @@ getNames <- function(genome, simulated = FALSE)
 #' values will be assigned by matching sequence identifier.
 #' If FALSE observed expression values will be assigned by order
 #' 
-#' @return gene.names Returns the names of the genes as a vector of strings.
+#' @return Returns the genome after adding the new gene expression values
 #' 
 #' @examples 
 #' 
@@ -185,7 +186,8 @@ getNames <- function(genome, simulated = FALSE)
 #'
 #' ## add expression values after the genome was initiallized, 
 #' ## or adding an additional set of expression values
-#' addObservedSynthesisRateSet(genome = genome, observed.expression.file = expression_file)
+#' genome <- addObservedSynthesisRateSet(genome = genome, 
+#'                    observed.expression.file = expression_file)
 #' 
 addObservedSynthesisRateSet <- function(genome, observed.expression.file, match.expression.by.id=TRUE)
 {
@@ -204,7 +206,7 @@ addObservedSynthesisRateSet <- function(genome, observed.expression.file, match.
 #' @param simulated A logical value denoting if the synthesis 
 #' rates to be listed are simulated or not. The default value is FALSE.
 #' 
-#' @return Returns the names of the genes as a vector of strings.
+#' @return Returns a data.frame with the observed expression values in genome
 #' 
 #' @examples 
 #' 
@@ -223,7 +225,8 @@ getObservedSynthesisRateSet <- function(genome, simulated = FALSE)
   expression <- lapply(1:length(genes), function(i){return(genes[[i]]$getObservedSynthesisRateValues())})
   ids <- getNames(genome, simulated)
   mat <- do.call(rbind, expression)
-  return(cbind(ids, mat))
+  colnames(mat) <- ids
+  return(mat)
 }
 
 #' Calculate the CAI codon weigths for a reference genome
