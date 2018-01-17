@@ -8,7 +8,7 @@ getCSPEstimates(parameter, filename = NULL, CSP = "Mutation", mixture = 1,
   samples = 10)
 }
 \arguments{
-\item{parameter}{parameter on object created by \code{initializeParameterObject}.}
+\item{parameter}{parameter an object created by \code{initializeParameterObject}.}
 
 \item{filename}{Posterior estimates will be written to file instead of returned if specified (format: csv).}
 

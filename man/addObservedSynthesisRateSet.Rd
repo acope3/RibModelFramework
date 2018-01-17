@@ -19,7 +19,7 @@ values will be assigned by matching sequence identifier.
 If FALSE observed expression values will be assigned by order}
 }
 \value{
-gene.names Returns the names of the genes as a vector of strings.
+Returns the genome after adding the new gene expression values
 }
 \description{
 \code{addObservedSynthesisRateSet} returns the observed 
@@ -35,6 +35,7 @@ genome <- initializeGenomeObject(file = genome_file)
 
 ## add expression values after the genome was initiallized, 
 ## or adding an additional set of expression values
-addObservedSynthesisRateSet(genome = genome, observed.expression.file = expression_file)
+genome <- addObservedSynthesisRateSet(genome = genome, 
+                   observed.expression.file = expression_file)
 
 }
