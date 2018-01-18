@@ -2,8 +2,8 @@ Package: AnaCoDa
 Type: Package
 Title: Analysis of Codon Data under Stationarity using a Bayesian
         Framework
-Version: 0.1.4
-Date: 2018-01-17
+Version: 0.1.5
+Date: 2018-01-18
 Authors@R: c(person("Cedric", "Landerer", role = c("aut", "cre"), email
         = "cedric.landerer@gmail.com"), person("Gabriel", "Hanas", role
         = "ctb"), person("Jeremy", "Rogers", role = "ctb"),
