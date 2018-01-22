@@ -955,7 +955,9 @@ double Parameter::getStdCspForIndex(unsigned i)
 double Parameter::getSynthesisRate(unsigned geneIndex, unsigned mixtureElement, bool proposed)
 {
 	unsigned category = getSelectionCategory(mixtureElement);
-	return (proposed ? proposedSynthesisRateLevel[category][geneIndex] : currentSynthesisRateLevel[category][geneIndex]);
+	double tmp = (proposed ? proposedSynthesisRateLevel[category][geneIndex] : currentSynthesisRateLevel[category][geneIndex]);
+    my_print("Returned Synthesis Rate = %\n", tmp);
+    return tmp;
 }
 
 

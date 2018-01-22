@@ -218,7 +218,7 @@ void Gene::setPASequence(std::vector<std::vector<int>> table)
         my_printError("WARNING: Error with gene %\nBad codons found!\n", id);
 }
 
-/* setPASequence (NOT EXPOSED)
+/* setPANSE Sequence (NOT EXPOSED)
  * Arguments: A table-styled vector (based on lines of input) of integer vectors (storing actual values).
  * The argument is intended to be derived from solely Genome::readRFPData,
  TODO: Needs to be adjusted to maintain rfp position*/
