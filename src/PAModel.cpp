@@ -32,7 +32,7 @@ double PAModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double c
 	double logLikelihood = ((std::lgamma((currNumCodonsInMRNA * currAlpha) + currRFPValue)) - (std::lgamma(currNumCodonsInMRNA * currAlpha)))
 						   + (currRFPValue * (std::log(phiValue) - std::log(currLambdaPrime + phiValue)))
 						   + ((currNumCodonsInMRNA * currAlpha) * (std::log(currLambdaPrime) - std::log(currLambdaPrime + phiValue)));
-    //my_print("Loglikelihood for alpha = % and lambda = % is %", currAlpha, currLambdaPrime, logLikelihood);
+    my_print("alpha = % \n lambda = % \n phivalue = % \n loglikelihood % \n", currAlpha, currLambdaPrime, phiValue, logLikelihood);
 
 	return logLikelihood;
 }
