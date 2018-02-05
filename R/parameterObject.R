@@ -183,7 +183,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
     if(is.null(init.with.restart.file)){
       parameter <- initializePAParameterObject(genome, sphi, num.mixtures, 
                                                 gene.assignment, initial.expression.values, split.serine, 
-                            mixture.definition, mixture.definition.matrix, init.csp.variance) 
+                            mixture.definition, mixture.definition.matrix, init.csp.variance,init.w.obs.phi) 
     }else{
       parameter <- new(PAParameter, init.with.restart.file)
     }
@@ -191,7 +191,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
     if(is.null(init.with.restart.file)){
       parameter <- initializePANSEParameterObject(genome, sphi, num.mixtures, 
                                                 gene.assignment, initial.expression.values, split.serine, 
-                            mixture.definition, mixture.definition.matrix, init.csp.variance) 
+                            mixture.definition, mixture.definition.matrix, init.csp.variance,init.w.obs.phi) 
     }else{
       parameter <- new(PANSEParameter, init.with.restart.file)
     }
@@ -269,7 +269,7 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
 initializePAParameterObject <- function(genome, sphi, numMixtures, geneAssignment, 
                           expressionValues = NULL, split.serine = TRUE, 
                           mixture.definition = "allUnique", 
-                          mixture.definition.matrix = NULL, init.csp.variance){
+                          mixture.definition.matrix = NULL, init.csp.variance,init.w.obs.phi=FALSE){
 
   if(is.null(mixture.definition.matrix))
   { # keyword constructor
@@ -322,7 +322,7 @@ initializePAParameterObject <- function(genome, sphi, numMixtures, geneAssignmen
 initializePANSEParameterObject <- function(genome, sphi, numMixtures, geneAssignment, 
                           expressionValues = NULL, split.serine = TRUE, 
                           mixture.definition = "allUnique", 
-                          mixture.definition.matrix = NULL, init.csp.variance){
+                          mixture.definition.matrix = NULL, init.csp.variance,init.w.obs.phi=FALSE){
 
   if(is.null(mixture.definition.matrix))
   { # keyword constructor
@@ -373,7 +373,7 @@ initializePANSEParameterObject <- function(genome, sphi, numMixtures, geneAssign
 initializeFONSEParameterObject <- function(genome, sphi, numMixtures, 
                         geneAssignment, expressionValues = NULL, split.serine = TRUE,
                         mixture.definition = "allUnique", 
-                        mixture.definition.matrix = NULL, init.csp.variance){
+                        mixture.definition.matrix = NULL, init.csp.variance,init.w.obs.phi=FALSE){
 
   # create Parameter object
   if(is.null(mixture.definition.matrix))
