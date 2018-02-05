@@ -124,6 +124,8 @@ class Trace {
         //ROC Specific:
         std::vector<float> getCodonSpecificParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon,
                 unsigned paramType, bool withoutReference = true);
+	std::vector<float> getCodonSpecificParameterTraceByGeneElementForCodon(unsigned geneIndex, std::string& codon, 
+		unsigned paramType, bool withoutReference = true);
         std::vector<double> getSynthesisOffsetTrace(unsigned index);
         std::vector<double> getSynthesisOffsetAcceptanceRateTraceForIndex(unsigned index);
         std::vector<double> getObservedSynthesisNoiseTrace(unsigned index);

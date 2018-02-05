@@ -426,7 +426,7 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
 
 #' Return Codon Specific Paramters (or write to csv) estimates as data.frame
 #' 
-#' @param parameter parameter on object created by \code{initializeParameterObject}.
+#' @param parameter parameter an object created by \code{initializeParameterObject}.
 #' 
 #' @param filename Posterior estimates will be written to file instead of returned if specified (format: csv).
 #' 
@@ -469,10 +469,8 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
 #' csp_mat <- getCSPEstimates(parameter, CSP="Mutation")
 #' 
 #' # write the result directly to the filesystem as a csv file. No values are returned
-#' getCSPEstimates(parameter, , filename="csp_out.csv", CSP="Mutation")
+#' getCSPEstimates(parameter, , filename=file.path(tempdir(), "csp_out.csv"), CSP="Mutation")
 #' 
-#' unlink("csp_out.csv")
-#' unlink(".RData")
 #' }
 #' 
 getCSPEstimates <- function(parameter, filename=NULL, CSP="Mutation", mixture = 1, samples = 10){
@@ -563,6 +561,70 @@ getCSPEstimates <- function(parameter, filename=NULL, CSP="Mutation", mixture = 
   }
 }
 
+
+
+#' Calculate Selection coefficients
+#' 
+#' \code{getSelectionCoefficients} calculates the selection coefficient of each codon in each gene.
+#' 
+#' @param genome A genome object initialized with 
+#' \code{\link{initializeGenomeObject}} to add observed expression data.
+#' 
+#' @param parameter an object created by \code{initializeParameterObject}.
+#' 
+#' @param samples The number of samples used for the posterior estimates.
+#' 
+#' @return A matrix with selection coefficients.
+#' 
+#' @examples 
+#' genome_file <- system.file("extdata", "genome.fasta", package = "AnaCoDa")
+#'
+#' genome <- initializeGenomeObject(file = genome_file)
+#' sphi_init <- 1
+#' numMixtures <- 1
+#' geneAssignment <- rep(1, length(genome))
+#' parameter <- initializeParameterObject(genome = genome, sphi = sphi_init, 
+#'                                        num.mixtures = numMixtures, 
+#'                                        gene.assignment = geneAssignment, 
+#'                                        mixture.definition = "allUnique")
+#' model <- initializeModelObject(parameter = parameter, model = "ROC")
+#' samples <- 2500
+#' thinning <- 50
+#' adaptiveWidth <- 25
+#' mcmc <- initializeMCMCObject(samples = samples, thinning = thinning, 
+#'                              adaptive.width=adaptiveWidth, est.expression=TRUE, 
+#'                              est.csp=TRUE, est.hyper=TRUE, est.mix = TRUE) 
+#' divergence.iteration <- 10
+#' \dontrun{
+#' runMCMC(mcmc = mcmc, genome = genome, model = model, 
+#'         ncores = 4, divergence.iteration = divergence.iteration)
+#' 
+#' ## return estimates for selection coefficients s for each codon in each gene
+#' selection.coefficients <- getSelectionCoefficients(genome = genome, 
+#'                                                    parameter = parameter, samples = 1000)
+#' }
+#' 
+getSelectionCoefficients <- function(genome, parameter, samples = 100)
+{
+  sel.coef <- parameter$calculateSelectionCoefficients(samples)
+  grouplist <- parameter$getGroupList()
+  codon.names <- NULL
+  if(class(parameter) == "Rcpp_ROCParameter" || class(parameter) == "Rcpp_FONSEParameter")
+  {
+    for(aa in grouplist)
+      codon.names <- c(codon.names, AAToCodon(aa))
+    
+    sel.coef <- sel.coef[, -c(60, 61)] # The matrix is to large as it could store M and W which is not used here.
+  }else{
+    codon.names <- grouplist
+  }
+  
+  gene.names <- getNames(genome)
+  
+  colnames(sel.coef) <- codon.names
+  rownames(sel.coef) <- gene.names
+  return(sel.coef)  
+}
 
 
 # Uses a multinomial logistic regression to estimate the codon specific parameters for every category.
@@ -909,10 +971,8 @@ getExpressionEstimates <- function(parameter, gene.index, samples, quantiles=c(0
 #'                                        mixture.definition = "allUnique")
 #' 
 #' ## writing an empty parameter object as the runMCMC routine was not called yet
-#' writeParameterObject(parameter, "parameter.Rda")
+#' writeParameterObject(parameter = parameter, file = file.path(tempdir(), "file.Rda"))
 #' 
-#' unlink("parameter.Rda")
-#' unlink(".RData")
 #' }
 #' 
 writeParameterObject <- function(parameter, file)
@@ -937,6 +997,8 @@ extractBaseInfo <- function(parameter){
   categories <- parameter$getCategories()
   curMixAssignment <- parameter$getMixtureAssignment()
   lastIteration <- parameter$getLastIteration()
+  grouplist <- parameter$getGroupList()
+
   
   varList <- list(stdDevSynthesisRateTraces = stdDevSynthesisRateTraces, 
                     stdDevSynthesisRateAcceptRatTrace = stdDevSynthesisRateAcceptRatTrace,
@@ -950,7 +1012,8 @@ extractBaseInfo <- function(parameter){
                     numSel = numSel,
                     categories = categories,
                     curMixAssignment = curMixAssignment,
-                    lastIteration = lastIteration
+                    lastIteration = lastIteration,
+		    grouplist = grouplist
                     )
   return(varList)
 }
@@ -1126,6 +1189,7 @@ setBaseInfo <- function(parameter, files)
       mixtureAssignment <- tempEnv$paramBase$curMixAssignment
       lastIteration <- tempEnv$paramBase$lastIteration
       max <- tempEnv$paramBase$lastIteration + 1
+      grouplist <- tempEnv$paramBase$grouplist
       
       stdDevSynthesisRateTraces <- vector("list", length = numSelectionCategories)
       for (j in 1:numSelectionCategories) {
@@ -1169,6 +1233,10 @@ setBaseInfo <- function(parameter, files)
         stop("The length of the mixture assignment is not the same between files. 
              Make sure the same genome is used on each run.")
       }
+
+      if(length(grouplist) != length(tempEnv$paramBase$grouplist)){
+	stop("Number of Amino Acids/Codons is not the same between files.")	
+      }
       
       curStdDevSynthesisRateTraces <- tempEnv$paramBase$stdDevSynthesisRateTraces
       curStdDevSynthesisRateAcceptanceRateTrace <- tempEnv$paramBase$stdDevSynthesisRateAcceptRatTrace
@@ -1208,6 +1276,7 @@ setBaseInfo <- function(parameter, files)
   parameter$numSelectionCategories <- numSelectionCategories
   parameter$setMixtureAssignment(tempEnv$paramBase$curMixAssignment) #want the last in the file sequence
   parameter$setLastIteration(lastIteration)
+  parameter$setGroupList(grouplist)
   
   trace <- parameter$getTraceObject()
   trace$setStdDevSynthesisRateTraces(stdDevSynthesisRateTraces)

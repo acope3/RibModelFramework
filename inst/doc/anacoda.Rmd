@@ -274,9 +274,18 @@ YAL003W,10.45,NA,...,9.564
 YAL005C,0.556,0.957,...,0.758
 ```
 
-### RFP counts
-
-
+### Ribosome FootPrinting counts
+Ribosome Foot-Printing (RFP) counts are provided in a csv file format.
+The first line is expected to be a header describing each column.
+The columns are expected in the following order gene id, position, codon, rfpcount.
+Each row corresponds to a single codon with an associated number of ribosome footprints.
+```
+GeneID,Position,Codon,rfpCount
+YBR177C, 0, ATA, 8
+YBR177C, 1, CGG, 1
+YBR177C, 2, GTT, 8
+YBR177C, 3, CGC, 1
+```
 
 ## Analyzing and Visualizating results
 
@@ -318,22 +327,71 @@ head(phi_mat)
 ```
 
 However we can decide to only obtain certain gene parameters. in the first case we sample 100 random genes.
-In the second case, we decide to use the function `getMixtureAssignmentEstimate` to obtain the estimated gene assignment. 
 
 ```{r, echo = TRUE, eval = FALSE}
 # sampling 100 genes at random
-phi_mat <- getExpressionEstimatesForMixture(parameter = parameter, 
-                                            gene.index = sample(1:length(genome), 100), 
-                                            mixtureAssignment = rep(1,length(genome)), 
-                                            samples = 1000)
-
-# finding the estimated gene assignment and using it to obtaine the corresbonding estimated gene expression.
-assignment <- getMixtureAssignmentEstimate(parameter = parameter, 1:length(genome), samples = 1000)
-phi_mat <- getExpressionEstimatesForMixture(parameter = parameter, 
-                                            gene.index = 1:length(genome), 
-                                            mixtureAssignment = assignment), 
-                                            samples = 1000)
+phi_mat <- getExpressionEstimates(parameter = parameter, 
+                                  gene.index = sample(1:length(genome), 100), 
+                                  samples = 1000)
 ```
+
+Furthermore, AnaCoDa allows to calculate the selection coefficient $s$ for each codon and each gene. 
+We can use the function `getSelectionCoefficients` to do so. Please note, that this function returns the $log(s)$.
+
+`getSelectionCoefficients` returns a matrix with $log(s)$ relative to the most efficient synonymous codon.
+```{r, echo = TRUE, eval = FALSE}
+selection.coefficients <- getSelectionCoefficients(genome = genome, 
+                                                   parameter = parameter, 
+                                                   samples = 1000)
+head(selection.coefficients)
+#                    GCA          GCC        GCG GCT        TGC TGT GAC         GAT ...
+#SAKL0A00132g -0.1630284 -0.008695144 -0.2097771   0 -0.1014373   0   0 -0.05092397 ...
+#SAKL0A00154g -0.8494558 -0.045305847 -1.0930388   0 -0.5285367   0   0 -0.26533820 ...
+#SAKL0A00176g -0.4455753 -0.023764823 -0.5733448   0 -0.2772397   0   0 -0.13918105 ...
+#SAKL0A00198g -0.3926068 -0.020939740 -0.5051875   0 -0.2442824   0   0 -0.12263567 ...
+#SAKL0A00220g -0.9746002 -0.051980440 -1.2540685   0 -0.6064022   0   0 -0.30442861 ...
+#SAKL0A00242g -0.3691110 -0.019686586 -0.4749542   0 -0.2296631   0   0 -0.11529644 ...
+```
+
+We can compare these values to the weights from the codon adaptatoin index (CAI) [@SharpLi1987] or effective number of codons (Nc) [@Wright1990] by using the functions
+`getCAIweights` and `getNcAA`.
+```{r, echo = TRUE, eval = FALSE}
+cai.weights <- getCAIweights(referenceGenome = genome)
+head(cai.weights)
+#      GCA       GCC       GCG       GCT       TGC       TGT 
+#0.7251276 0.6282192 0.2497737 1.0000000 0.6222628 1.0000000 
+
+nc.per.aa <- getNcAA(genome = genome)
+head(nc.per.aa)
+#                    A        C        D        E        F        G ...
+#SAKL0A00132g 3.611111 1.000000 2.200000 2.142857 1.792453 4.109589 ...
+#SAKL0A00154g 1.843866 2.500000 2.035782 1.942505 1.986595 2.752660 ...
+#SAKL0A00176g 5.142857       NA 1.857143 1.652174 1.551724 3.122449 ...
+#SAKL0A00198g 3.800000       NA 1.924779 1.913043 2.129032 4.136364 ...
+#SAKL0A00220g 3.198529 1.666667 1.741573 1.756757 2.000000 1.371638 ...
+#SAKL0A00242g 4.500000       NA 2.095890 2.000000 1.408163 3.734043 ...
+
+```
+
+We can compare the distribution of selection coefficients to the CAI values estimated from a reference set of genes.
+
+```{r, echo = TRUE, eval = FALSE}
+selection.coefficients <- getSelectionCoefficients(genome = genome, 
+                                                   parameter = parameter, 
+                                                   samples = 1000)
+s <- exp(selection.coefficients)
+cai.weights <- getCAIweights(referenceGenome = ref.genome)
+
+codon.names <- colnames(s)
+h <- hist(s[, 1], plot = F)
+plot(NULL, NULL, axes = F, xlim = c(0,1), ylim = range(c(0,h$counts)), 
+     xlab = "s", ylab = "Frequency", main = codon.names[1], cex.lab = 1.2)
+lines(x = h$breaks, y = c(0,h$counts), type = "S", lwd=2)
+abline(v = cai.weights[1], lwd=2, lty=2)
+axis(1, lwd = 3, cex.axis = 1.2)
+axis(2, lwd = 3, cex.axis = 1.2)
+```
+![Distribution of $s$ for codon GCA for amino acid alanine. Dashed line indicates the CAI weight for GCA. The comparisson provides a more nuanced picture as we can see that the selection on GCA varies across the genome.](sel_cai_comp.png)
 
 ### Diagnostic plots
 A first step after every run should be to determine if the sampling routine has converged. 

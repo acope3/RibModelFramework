@@ -41,6 +41,7 @@ export(
 "writeParameterObject",
 "loadParameterObject",
 "getTrace",
+"getSelectionCoefficients",
 "geom_mean",
 
 ## Model object
@@ -52,6 +53,10 @@ export(
 "getNames",
 "addObservedSynthesisRateSet",
 "getObservedSynthesisRateSet",
+"getCAIweights",
+"getCAI",
+"getNc",
+"getNcAA",
 
 ## MCMC object
 "initializeMCMCObject",

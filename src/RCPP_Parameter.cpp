@@ -78,7 +78,7 @@ RCPP_MODULE(Parameter_mod)
 		//setNumMixtureElements it taken care in the properties section below
 
 		//Other Functions:
-		.method("calculateSelectionCoefficients", &ROCParameter::calculateSelectionCoefficientsR)
+		.method("calculateSelectionCoefficients", &Parameter::calculateSelectionCoefficientsR)
 
 
 

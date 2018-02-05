@@ -36,10 +36,8 @@ parameter <- initializeParameterObject(genome = genome, sphi = sphi_init,
                                        mixture.definition = "allUnique")
 
 ## writing an empty parameter object as the runMCMC routine was not called yet
-writeParameterObject(parameter, "parameter.Rda")
+writeParameterObject(parameter = parameter, file = file.path(tempdir(), "file.Rda"))
 
-unlink("parameter.Rda")
-unlink(".RData")
 }
 
 }

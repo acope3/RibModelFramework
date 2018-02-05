@@ -9,8 +9,7 @@ writeMCMCObject(mcmc, file)
 \arguments{
 \item{mcmc}{MCMC object that has run the model fitting algorithm.}
 
-\item{file}{A filename where the data will be stored.
-The file should end with the extension "Rdat".}
+\item{file}{A filename where the data will be stored.}
 }
 \value{
 This function has no return value.
@@ -42,9 +41,7 @@ divergence.iteration <- 10
 \dontrun{
 runMCMC(mcmc = mcmc, genome = genome, model = model, 
         ncores = 4, divergence.iteration = divergence.iteration)
-writeMCMCObject(mcmc = mcmc, file = "mcmc.Rda")
+writeMCMCObject(mcmc = mcmc, file = file.path(tempdir(), "file.Rda"))
 
-unlink("mcmc.Rda")
-unlink(".RData")
 }
 }

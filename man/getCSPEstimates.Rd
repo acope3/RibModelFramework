@@ -8,7 +8,7 @@ getCSPEstimates(parameter, filename = NULL, CSP = "Mutation", mixture = 1,
   samples = 10)
 }
 \arguments{
-\item{parameter}{parameter on object created by \code{initializeParameterObject}.}
+\item{parameter}{parameter an object created by \code{initializeParameterObject}.}
 
 \item{filename}{Posterior estimates will be written to file instead of returned if specified (format: csv).}
 
@@ -54,10 +54,8 @@ runMCMC(mcmc = mcmc, genome = genome, model = model,
 csp_mat <- getCSPEstimates(parameter, CSP="Mutation")
 
 # write the result directly to the filesystem as a csv file. No values are returned
-getCSPEstimates(parameter, , filename="csp_out.csv", CSP="Mutation")
+getCSPEstimates(parameter, , filename=file.path(tempdir(), "csp_out.csv"), CSP="Mutation")
 
-unlink("csp_out.csv")
-unlink(".RData")
 }
 
 }

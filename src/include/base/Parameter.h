@@ -151,7 +151,7 @@ class Parameter {
 		double getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, bool log_scale=false);
 
 		double getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon,
-			unsigned paramType, bool withoutReference = true);
+			unsigned paramType, bool withoutReference = true, bool byGene = false);
 		double getStdDevSynthesisRateVariance(unsigned samples, unsigned mixture, bool unbiased);
 		double getSynthesisRateVariance(unsigned samples, unsigned geneIndex,
 			bool unbiased = true, bool log_scale = false);
@@ -173,7 +173,7 @@ class Parameter {
 		void setMixtureAssignment(unsigned gene, unsigned value);
 		unsigned getMixtureAssignment(unsigned gene);
 		virtual void setNumObservedPhiSets(unsigned _phiGroupings);
-		virtual std::vector <std::vector <double> > calculateSelectionCoefficients(unsigned sample, unsigned mixture); //TODO: test
+		virtual std::vector <std::vector <double> > calculateSelectionCoefficients(unsigned sample); //TODO: test
 
 
 		//Static Functions: TODO: test
@@ -247,7 +247,7 @@ class Parameter {
 
 
 		//Other Functions:
-		SEXP calculateSelectionCoefficientsR(unsigned sample, unsigned mixture);
+		SEXP calculateSelectionCoefficientsR(unsigned sample);
 		std::vector<unsigned> getMixtureAssignmentR();
 		void setMixtureAssignmentR(std::vector<unsigned> _mixtureAssignment);
 		unsigned getMixtureAssignmentForGeneR(unsigned geneIndex);

@@ -283,7 +283,6 @@ convergence.test.Rcpp_MCMCAlgorithm <- function(object, samples = 10, frac1 = 0.
 #' @param mcmc MCMC object that has run the model fitting algorithm.
 #' 
 #' @param file A filename where the data will be stored.
-#' The file should end with the extension "Rdat".
 #' 
 #' @return This function has no return value.
 #' 
@@ -313,10 +312,8 @@ convergence.test.Rcpp_MCMCAlgorithm <- function(object, samples = 10, frac1 = 0.
 #' \dontrun{
 #' runMCMC(mcmc = mcmc, genome = genome, model = model, 
 #'         ncores = 4, divergence.iteration = divergence.iteration)
-#' writeMCMCObject(mcmc = mcmc, file = "mcmc.Rda")
+#' writeMCMCObject(mcmc = mcmc, file = file.path(tempdir(), "file.Rda"))
 #' 
-#' unlink("mcmc.Rda")
-#' unlink(".RData")
 #' }
 writeMCMCObject <- function(mcmc, file){
   logPostTrace <- mcmc$getLogPosteriorTrace()
