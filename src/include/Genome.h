@@ -46,6 +46,7 @@ class Genome
 		void readRFPData(std::string filename, bool append = false);
 		void writeRFPData(std::string filename, bool simulated = false);
 		void readObservedPhiValues(std::string filename, bool byId = true);
+		void removeUnobservedGenes();
         void readSimulatedGenomeFromPAModel(std::string filename);
 
 

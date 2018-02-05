@@ -551,6 +551,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 
                     if (it == genomeMapping.end())
                         my_printError("WARNING: Gene % not found!\n", geneID);
+
                     else //gene is found
                     {
                         std::string val = "";
@@ -618,7 +619,8 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 							my_printError("WARNING: Gene # % (%) does not have any phi values. ", i, gene->getId());
                             my_printError("Please check your file to make sure every gene has a phi value. Filling empty genes ");
                             my_printError("with Missing Value Flag for calculations.\n");
-                            gene->observedSynthesisRateValues.resize(numPhi, -1);
+                           	gene->observedSynthesisRateValues.resize(numPhi, -1);
+                            
                         }
 
 						// Finally increment numGenesWithPhi based on stored observedSynthesisRateValues
@@ -711,7 +713,8 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
                             my_printError("WARNING: Gene # % (%) does not have any phi values. ", i, gene->getId());
                             my_printError("Please check your file to make sure every gene has a phi value. Filling empty genes ");
                             my_printError("with Missing Value Flag for calculations.\n");
-							gene->observedSynthesisRateValues.resize(numPhi, -1);
+                           	gene->observedSynthesisRateValues.resize(numPhi, -1);
+                            
 						}
 
 						// Finally increment numGenesWithPhi based on stored observedSynthesisRateValues
@@ -729,7 +732,23 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 }
 
 
-
+void Genome::removeUnobservedGenes()
+{
+	std::vector<Gene> tmp;
+	for (unsigned i = 0; i < getGenomeSize(); i++)
+	{
+		Gene *gene = &(getGene(i));
+		for (unsigned j = 0; j < gene -> observedSynthesisRateValues.size(); j++)
+		{
+			if (gene -> observedSynthesisRateValues[j] != -1)
+			{
+				tmp.push_back(*gene);
+				break;
+			}
+		}
+	}
+	genes = tmp;
+}
 
 
 //------------------------------------//
@@ -746,7 +765,6 @@ void Genome::addGene(const Gene& gene, bool simulated)
 {
 	simulated ? simulatedGenes.push_back(gene) : genes.push_back(gene);
 }
-
 
 /* getGenes (RCPP EXPOSED)
  * Arguments: boolean if simulated genes should be returned.
@@ -1025,7 +1043,7 @@ RCPP_MODULE(Genome_mod)
 		.method("readRFPData", &Genome::readRFPData, "reads RFPData to be used in PA(NSE) models")
 		.method("writeRFPData", &Genome::writeRFPData, "writes RFPData used in PA(NSE) models")
 		.method("readObservedPhiValues", &Genome::readObservedPhiValues)
-
+		.method("removeUnobservedGenes", &Genome::removeUnobservedGenes)
 
 		//Gene Functions:
 		.method("addGene", &Genome::addGene) //TEST THAT ONLY!
