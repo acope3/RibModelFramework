@@ -55,6 +55,10 @@
 #' 
 #' @param init.sepsilon specifies the initial value for sepsilon. default is 0.1
 #' 
+#' @param init.w.obs.phi a boolean value which allows users to initialize phi values with observed phi values (data from RNAseq, mass spectrometry, ribosome footprinting)
+#' Default is FALSE. When using this function, users should remove any genes without an unobserved phi values. Not doing so will lead to potential issues,
+#' such as the model attempting to take the logarithm of a negative number.  
+#' 
 #' @return parameter Returns an initialized Parameter object.
 #' 
 #' @description \code{initializeParameterObject} initializes a new parameter object or reconstructs one from a restart file
@@ -108,7 +112,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
                                     mixture.definition = "allUnique", 
                                     mixture.definition.matrix = NULL,
                                     init.with.restart.file = NULL, mutation.prior.sd = 0.35, 
-				    init.csp.variance = 0.0025, init.sepsilon = 0.1){
+				    init.csp.variance = 0.0025, init.sepsilon = 0.1,init.w.obs.phi=FALSE){
   # check input integrity
   if(is.null(init.with.restart.file)){
     if(length(sphi) != num.mixtures){
@@ -163,7 +167,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
       parameter <- initializeROCParameterObject(genome, sphi, num.mixtures, 
                                                 gene.assignment, initial.expression.values, split.serine, 
                             mixture.definition, mixture.definition.matrix, 
-                            mutation.prior.sd, init.csp.variance, init.sepsilon)    
+                            mutation.prior.sd, init.csp.variance, init.sepsilon,init.w.obs.phi)    
     }else{
       parameter <- new(ROCParameter, init.with.restart.file)
     }
@@ -171,7 +175,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
     if(is.null(init.with.restart.file)){
       parameter <- initializeFONSEParameterObject(genome, sphi, num.mixtures, 
                                                   gene.assignment, initial.expression.values, split.serine, 
-                            mixture.definition, mixture.definition.matrix, init.csp.variance)
+                            mixture.definition, mixture.definition.matrix, init.csp.variance,init.w.obs.phi)
     }else{
       parameter <- new(FONSEParameter, init.with.restart.file)
     }
@@ -203,7 +207,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
 initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignment,
                       expressionValues = NULL, split.serine = TRUE,
                       mixture.definition = "allUnique", 
-                      mixture.definition.matrix = NULL, mutation_prior_sd = 0.35, init.csp.variance = 0.0025, init.sepsilon = 0.1){
+                      mixture.definition.matrix = NULL, mutation_prior_sd = 0.35, init.csp.variance = 0.0025, init.sepsilon = 0.1,init.w.obs.phi=FALSE){
 
   if(is.null(mixture.definition.matrix)){ 
     # keyword constructor
@@ -219,10 +223,31 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
   
   
   # initialize expression values
-  if(is.null(expressionValues)){
+  if(is.null(expressionValues) && init.w.obs.phi == F)
+  {
     parameter$initializeSynthesisRateByGenome(genome, mean(sphi))
-  }else{
+    
+  } 
+  else if(init.w.obs.phi == T && is.null(expressionValues))
+  {
+    observed.phi <- getObservedSynthesisRateSet(genome)
+    if (ncol(observed.phi)-1 > 1)
+    {
+      observed.phi <- apply(observed.phi[,2:ncol(observed.phi)],geom_mean,MARGIN = 1)
+    }
+    else
+    {
+      observed.phi <- observed.phi[,2]
+    }
+    parameter$initializeSynthesisRateByList(observed.phi)
+  }
+  else if (!is.null(expressionValues) && init.w.obs.phi == F)
+  {
     parameter$initializeSynthesisRateByList(expressionValues)
+  }
+  else
+  {
+    stop("expressionValues is not NULL and init.w.obs.phi == TRUE. Please choose only one of these options.")
   }
   
   n.obs.phi.sets <- ncol(getObservedSynthesisRateSet(genome)) - 1
@@ -260,10 +285,32 @@ initializePAParameterObject <- function(genome, sphi, numMixtures, geneAssignmen
   
   
   # initialize expression values
-  if(is.null(expressionValues)){
-    parameter$initializeSynthesisRateByGenome(genome, sphi)
-  }else{
+  # initialize expression values
+  if(is.null(expressionValues) && init.w.obs.phi == F)
+  {
+    parameter$initializeSynthesisRateByGenome(genome, mean(sphi))
+    
+  } 
+  else if(init.w.obs.phi == T && is.null(expressionValues))
+  {
+    observed.phi <- getObservedSynthesisRateSet(genome)
+    if (ncol(observed.phi)-1 > 1)
+    {
+      observed.phi <- apply(observed.phi[,2:ncol(observed.phi)],geom_mean,MARGIN = 1)
+    }
+    else
+    {
+      observed.phi <- observed.phi[,2]
+    }
+    parameter$initializeSynthesisRateByList(observed.phi)
+  }
+  else if (!is.null(expressionValues) && init.w.obs.phi == F)
+  {
     parameter$initializeSynthesisRateByList(expressionValues)
+  }
+  else
+  {
+    stop("expressionValues is not NULL and init.w.obs.phi == TRUE. Please choose only one of these options.")
   }
   
   ## TODO (Cedric): use init.csp.variance to set initial proposal width for CSP parameters
@@ -291,10 +338,32 @@ initializePANSEParameterObject <- function(genome, sphi, numMixtures, geneAssign
   
   
   # initialize expression values
-  if(is.null(expressionValues)){
-    parameter$initializeSynthesisRateByGenome(genome, sphi)
-  }else{
+  # initialize expression values
+  if(is.null(expressionValues) && init.w.obs.phi == F)
+  {
+    parameter$initializeSynthesisRateByGenome(genome, mean(sphi))
+    
+  } 
+  else if(init.w.obs.phi == T && is.null(expressionValues))
+  {
+    observed.phi <- getObservedSynthesisRateSet(genome)
+    if (ncol(observed.phi)-1 > 1)
+    {
+      observed.phi <- apply(observed.phi[,2:ncol(observed.phi)],geom_mean,MARGIN = 1)
+    }
+    else
+    {
+      observed.phi <- observed.phi[,2]
+    }
+    parameter$initializeSynthesisRateByList(observed.phi)
+  }
+  else if (!is.null(expressionValues) && init.w.obs.phi == F)
+  {
     parameter$initializeSynthesisRateByList(expressionValues)
+  }
+  else
+  {
+    stop("expressionValues is not NULL and init.w.obs.phi == TRUE. Please choose only one of these options.")
   }
   
   return (parameter)
@@ -321,12 +390,33 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
   
   
   # initialize expression values
-  if(is.null(expressionValues)){
-    parameter$initializeSynthesisRateByGenome(genome, sphi)
-  }else{
+  # initialize expression values
+  if(is.null(expressionValues) && init.w.obs.phi == F)
+  {
+    parameter$initializeSynthesisRateByGenome(genome, mean(sphi))
+    
+  } 
+  else if(init.w.obs.phi == T && is.null(expressionValues))
+  {
+    observed.phi <- getObservedSynthesisRateSet(genome)
+    if (ncol(observed.phi)-1 > 1)
+    {
+      observed.phi <- apply(observed.phi[,2:ncol(observed.phi)],geom_mean,MARGIN = 1)
+    }
+    else
+    {
+      observed.phi <- observed.phi[,2]
+    }
+    parameter$initializeSynthesisRateByList(observed.phi)
+  }
+  else if (!is.null(expressionValues) && init.w.obs.phi == F)
+  {
     parameter$initializeSynthesisRateByList(expressionValues)
   }
-  
+  else
+  {
+    stop("expressionValues is not NULL and init.w.obs.phi == TRUE. Please choose only one of these options.")
+  }
   parameter <- initializeCovarianceMatrices(parameter, genome, numMixtures, geneAssignment, init.csp.variance)
   
   return(parameter)
@@ -1384,6 +1474,55 @@ loadFONSEParameterObject <- function(parameter, files)
 }
 
 
+
+#' Take the geometric mean of a vector
+#'  
+#' @param x A vector of numerical .
+#' 
+#' @param rm.invalid Boolean value for handling 0, negative, or NA values in the vector. Default is TRUE and will not
+#' include these values in the calculation. If FALSE, these values will be replaced by the argument for default and will
+#' be included in the calculation.  
+#' 
+#' @param default Numerical value that serves as the value to replace 0, negative, or NA values in the calculation when rm.invalid is FALSE.
+#' Default is 1e-5.
+#' 
+#' @return Returns the geometric mean of a vector.
+#' 
+#' @description \code{geom_mean} will calculate the geometric mean of a list of numerical values.
+#' 
+#' @details This function returns the geometric mean of a vector and can handle 0, negative, or NA values. We assume the user does not want to include
+#' negative values in the calculation, as this can results in NaNs. This function is called when initializing a Parameter object with 
+#' with observed phi values and there is more than one set. In this case, any genes not having an observed phi value should be removed prior to initializing the Parameter object.
+#' This can be done using the removeUnobservedGenes(genome) function. 
+#' @examples 
+#' x <- c(1,2,3,4)
+#' geom_mean(x)
+#' 
+#' y<- c(1,NA,3,4,0,-1)
+#' # Only take the mean of non-Na values greater than 0
+#' geom_mean(y)
+#' 
+#' # Replace values <= 0 or NAs with a default value 0.001 and then take the mean
+#' geom_mean(y,rm.invalid=F,default=0.001)
+#' 
+
+
+
+geom_mean<-function(x,rm.invalid=T,default = 1e-5)
+{
+  if(!rm.invalid)
+  {
+    x[x <= 0 | is.na(x)] <- default
+  } else{
+    x <- x[which(x > 0 & !is.na(x))]
+  }
+  len <- length(x)
+  total <- prod(x)
+  total <- total ^ (1/len)
+  return(total)
+}
+
+
 #Intended to combine 2D traces (vector of vectors) read in from C++. The first
 #element of the second trace is omited since it should be the same as the 
 #last value of the first trace.
@@ -1407,3 +1546,8 @@ combineThreeDimensionalTrace <- function(trace1, trace2, max){
     }
   }
 }
+
+
+
+
+

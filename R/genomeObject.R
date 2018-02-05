@@ -222,8 +222,8 @@ getObservedSynthesisRateSet <- function(genome, simulated = FALSE)
   genes <- genome$getGenes(simulated)
   expression <- lapply(1:length(genes), function(i){return(genes[[i]]$getObservedSynthesisRateValues())})
   ids <- getNames(genome, simulated)
-  mat <- do.call(rbind, expression)
-  return(cbind(ids, mat))
+  mat <- do.call(rbind,expression)
+  return(cbind.data.frame(ids, mat,stringsAsFactors=F))
 }
 
 

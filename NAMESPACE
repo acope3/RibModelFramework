@@ -41,6 +41,7 @@ export(
 "writeParameterObject",
 "loadParameterObject",
 "getTrace",
+"geom_mean",
 
 ## Model object
 "initializeModelObject",
