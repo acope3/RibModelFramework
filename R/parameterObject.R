@@ -1585,9 +1585,7 @@ geom_mean<-function(x,rm.invalid=T,default = 1e-5)
   } else{
     x <- x[which(x > 0 & !is.na(x))]
   }
-  len <- length(x)
-  total <- prod(x)
-  total <- total ^ (1/len)
+  total <- prod(x) ^ (1/length(x))
   return(total)
 }
 
