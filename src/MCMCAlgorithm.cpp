@@ -341,10 +341,12 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 		// calculate likelihood ratio for every Category for current AA
 		model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures);
 		//logPosterior += model.calculateAllPriors();
-        rando = -Parameter::randExp(1);
+        double rando = -Parameter::randExp(1);
         if (iteration % thinning == 0){
             likelihoodTrace[(iteration / thinning)] = rando;
+            probabilityTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[0];
         }
+
 		if ( rando < acceptanceRatioForAllMixtures[0])
 		{
 			// moves proposed codon specific parameters to current codon specific parameters
