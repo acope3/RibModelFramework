@@ -343,7 +343,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 		//logPosterior += model.calculateAllPriors();
         double rando = -Parameter::randExp(1);
         if (iteration % thinning == 0){
-            likelihoodTrace[(iteration / thinning)] = rando;
+            randomTrace[(iteration / thinning)] = rando;
             probabilityTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[0];
         }
 
