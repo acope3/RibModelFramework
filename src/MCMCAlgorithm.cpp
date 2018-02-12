@@ -42,8 +42,6 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thinning(1), adaptiveWidth(100 *
 	likelihoodTrace.resize(samples + 1);
 
     ratioTrace.resize(samples + 1);
-    randomTrace.resize(samples + 1);
-    probabilityTrace.resize(samples + 1); //Debug stuff
 
 	
     writeRestartFile = false;
@@ -343,8 +341,8 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 		//logPosterior += model.calculateAllPriors();
         double rando = -Parameter::randExp(1);
         if (iteration % thinning == 0){
-            randomTrace[(iteration / thinning)] = rando;
-            probabilityTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[0];
+            randomTrace.push_back(rando);
+            probabilityTrace.push_back(acceptanceRatioForAllMixtures[0]);
         }
 
 		if ( rando < acceptanceRatioForAllMixtures[0])
