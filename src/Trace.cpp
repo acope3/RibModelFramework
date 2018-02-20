@@ -201,7 +201,7 @@ void Trace::initializePATrace(unsigned samples, unsigned num_genes, unsigned num
 	std::vector<unsigned> init_mix_assign)
 {
 	initializeSharedTraces(samples, num_genes, numLambdaPrimeCategories, numMixtures,
-		_categories, maxGrouping,init_phi,init_mix_assign);
+		_categories, maxGrouping, init_phi, init_mix_assign);
 
 	// See Note 1) above.
 	initCodonSpecificParameterTrace(samples, numAlphaCategories,  numParam, 0u); // alp
@@ -592,9 +592,22 @@ void Trace::updateObservedSynthesisNoiseTrace(unsigned index, unsigned sample, d
 
 
 //-------------------------------------//
-//---------- RFP Specific -------------//
+//---------- PA Specific -------------//
 //-------------------------------------//
 
+//To be used for debugging CSP proposal issues
+void Trace::UpdateCodonSpecificHyperParameterTraceForCodon(unsigned sample, std::string codon,
+    std:: vector<std::vector<double>> &currHyperParam, unsigned paramType)
+{
+    unsigned i = SequenceSummary::codonToIndex(codon);
+    for (unsigned category = 0; category < codonSpecificHyperParameterTrace[paramType].size(); category++)
+    {
+        if(std::isnan(curParam[category][i])){
+            my_printError("\n Trace::updateCodonSpecificHyperParameterTraceForCodon: Current hyper-parameter set contains NaN. \n");
+        }
+		codonSpecificHyperParameterTrace[paramType][category][i][sample] = curParam[category][i];
+	}
+}
 
 void Trace::updateCodonSpecificParameterTraceForCodon(unsigned sample, std::string codon,
 	std::vector<std::vector<double>> &curParam, unsigned paramType)
@@ -607,28 +620,6 @@ void Trace::updateCodonSpecificParameterTraceForCodon(unsigned sample, std::stri
         }
 		codonSpecificParameterTrace[paramType][category][i][sample] = curParam[category][i];
 	}
-
-	/*
-	switch (paramType)
-	{
-		case 0:
-			for (unsigned category = 0; category < codonSpecificParameterTraceOne.size(); category++)
-			{
-				codonSpecificParameterTraceOne[category][i][sample] = curParam[category][i];
-			}
-			break;
-		case 1:
-			for (unsigned category = 0; category < codonSpecificParameterTraceTwo.size(); category++)
-			{
-				codonSpecificParameterTraceTwo[category][i][sample] = curParam[category][i];
-			}
-			break;
-		default:
-			my_printError("ERROR: Unknown parameter type in updateCodonSpecificParameterTraceForCodon\n");
-			break;
-	}
-	*/
-
 }
 
 

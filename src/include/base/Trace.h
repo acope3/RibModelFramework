@@ -41,6 +41,8 @@ class Trace {
 
 
 		//PA Trace:
+		std::vector<std::vector<std::vector<std::vector<float>>>> codonSpecificHyperParameterTrace; //order: paramType, category, numParam, samples 
+        //paramType = {randomNumber, acceptanceRatio, currentLogLikelihood, currentLogLikelihoodAdjusted, proposedLogLikelihood, proposedLogLikelihoodAdjusted}
 
 		//--------------------------------------//
 		//------ Initialization Functions ------//
@@ -161,6 +163,7 @@ class Trace {
 
         //PA Specific:
         void updateCodonSpecificParameterTraceForCodon(unsigned sample, std::string codon, std::vector<std::vector<double>> &curParam, unsigned paramType);
+        void UpdateCodonSpecificHyperParameterTraceForCodon(unsigned sample, std::string codon, std:: vector<std::vector<double>> &currHyperParam, unsigned paramType);
 
 
 
