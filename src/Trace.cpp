@@ -602,10 +602,10 @@ void Trace::UpdateCodonSpecificHyperParameterTraceForCodon(unsigned sample, std:
     unsigned i = SequenceSummary::codonToIndex(codon);
     for (unsigned category = 0; category < codonSpecificHyperParameterTrace[paramType].size(); category++)
     {
-        if(std::isnan(curParam[category][i])){
+        if(std::isnan(currHyperParam[category][i])){
             my_printError("\n Trace::updateCodonSpecificHyperParameterTraceForCodon: Current hyper-parameter set contains NaN. \n");
         }
-		codonSpecificHyperParameterTrace[paramType][category][i][sample] = curParam[category][i];
+		codonSpecificHyperParameterTrace[paramType][category][i][sample] = currHyperParam[category][i];
 	}
 }
 
