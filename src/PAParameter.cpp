@@ -19,6 +19,7 @@ PAParameter::PAParameter() : Parameter()
 	bias_csp = 0;
 	currentCodonSpecificParameter.resize(2);
 	proposedCodonSpecificParameter.resize(2);
+    currentCodonSpecificHyperParameter.resize(6);
 }
 
 
@@ -30,6 +31,7 @@ PAParameter::PAParameter(std::string filename) : Parameter(64)
 {
 	currentCodonSpecificParameter.resize(2);
 	proposedCodonSpecificParameter.resize(2);
+    currentCodonSpecificHyperParameter.resize(6);
 	initFromRestartFile(filename);
 	numParam = 61;
 }
@@ -75,7 +77,7 @@ PAParameter& PAParameter::operator=(const PAParameter& rhs)
 */
 PAParameter::~PAParameter()
 {
-	//dtor 
+	//dtor
 	//TODO: Need to call Parameter's deconstructor?
 }
 
@@ -100,6 +102,14 @@ void PAParameter::initPAParameterSet()
 	currentCodonSpecificParameter.resize(2);
 	proposedCodonSpecificParameter.resize(2);
 
+    currentCodonSpecificHyperParameter.resize(6);
+	currentCodonSpecificHyperParameter[0u].resize(numMixtures);
+	currentCodonSpecificHyperParameter[1u].resize(numMixtures);
+	currentCodonSpecificHyperParameter[2u].resize(numMixtures);
+	currentCodonSpecificHyperParameter[3u].resize(numMixtures);
+	currentCodonSpecificHyperParameter[4u].resize(numMixtures);
+	currentCodonSpecificHyperParameter[5u].resize(numMixtures);
+
 	currentCodonSpecificParameter[alp].resize(alphaCategories);
 	proposedCodonSpecificParameter[alp].resize(alphaCategories);
 	currentCodonSpecificParameter[lmPri].resize(lambdaPrimeCategories);
@@ -120,6 +130,18 @@ void PAParameter::initPAParameterSet()
 		proposedCodonSpecificParameter[lmPri][i] = tmp;
 		lambdaValues[i] = tmp; //Maybe we don't initialize this one? or we do it differently?
 	}
+
+    //Used for CSP Proposal debugging
+    for (unsigned i = 0; i < numMixtures; i++)
+    {
+        std::vector <double> tmp(numParam, 1.0);
+        currentCodonSpecificHyperParameter[0u][i] = tmp;
+        currentCodonSpecificHyperParameter[1u][i] = tmp;
+        currentCodonSpecificHyperParameter[2u][i] = tmp;
+        currentCodonSpecificHyperParameter[3u][i] = tmp;
+        currentCodonSpecificHyperParameter[4u][i] = tmp;
+        currentCodonSpecificHyperParameter[5u][i] = tmp;
+    }
 
 	bias_csp = 0;
 	std_csp.resize(numParam, 0.1);
@@ -451,6 +473,13 @@ void PAParameter::updateCodonSpecificParameterTrace(unsigned sample, std::string
 {
 	traces.updateCodonSpecificParameterTraceForCodon(sample, codon, currentCodonSpecificParameter[alp], alp);
 	traces.updateCodonSpecificParameterTraceForCodon(sample, codon, currentCodonSpecificParameter[lmPri], lmPri);
+
+	traces.updateCodonSpecificHyperParameterTraceForCodon(sample, codon, currentCodonSpecificHyperParameter[lmPri], 0u);
+	traces.updateCodonSpecificHyperParameterTraceForCodon(sample, codon, currentCodonSpecificHyperParameter[lmPri], 1u);
+	traces.updateCodonSpecificHyperParameterTraceForCodon(sample, codon, currentCodonSpecificHyperParameter[lmPri], 2u);
+	traces.updateCodonSpecificHyperParameterTraceForCodon(sample, codon, currentCodonSpecificHyperParameter[lmPri], 3u);
+	traces.updateCodonSpecificHyperParameterTraceForCodon(sample, codon, currentCodonSpecificHyperParameter[lmPri], 4u);
+	traces.updateCodonSpecificHyperParameterTraceForCodon(sample, codon, currentCodonSpecificHyperParameter[lmPri], 5u);
 }
 
 
@@ -788,4 +817,3 @@ double PAParameter::getParameterForCategoryR(unsigned mixtureElement, unsigned p
 }
 
 #endif
-
