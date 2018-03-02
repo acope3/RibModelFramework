@@ -168,7 +168,7 @@ class Trace {
 
         //PA Specific:
         void updateCodonSpecificParameterTraceForCodon(unsigned sample, std::string codon, std::vector<std::vector<double>> &curParam, unsigned paramType);
-        void UpdateCodonSpecificHyperParameterTraceForCodon(unsigned sample, std::string codon, std:: vector<std::vector<double>> &currHyperParam, unsigned paramType);
+        void updateCodonSpecificHyperParameterTraceForCodon(unsigned sample, std::string codon, std:: vector<std::vector<double>> &currHyperParam, unsigned paramType);
 
 
 

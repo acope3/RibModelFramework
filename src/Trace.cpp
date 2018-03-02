@@ -637,7 +637,7 @@ void Trace::updateObservedSynthesisNoiseTrace(unsigned index, unsigned sample, d
 //-------------------------------------//
 
 //To be used for debugging CSP proposal issues
-void Trace::UpdateCodonSpecificHyperParameterTraceForCodon(unsigned sample, std::string codon,
+void Trace::updateCodonSpecificHyperParameterTraceForCodon(unsigned sample, std::string codon,
     std:: vector<std::vector<double>> &currHyperParam, unsigned paramType)
 {
     unsigned i = SequenceSummary::codonToIndex(codon);
