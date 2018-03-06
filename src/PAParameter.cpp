@@ -131,7 +131,7 @@ void PAParameter::initPAParameterSet()
 		lambdaValues[i] = tmp; //Maybe we don't initialize this one? or we do it differently?
 	}
 
-    //Used for CSP Proposal debugging
+    //Used for CSP Proposal debugginu
     for (unsigned i = 0; i < numMixtures; i++)
     {
         std::vector <double> tmp(numParam, 1.0);
@@ -468,18 +468,25 @@ void PAParameter::initMutationSelectionCategories(std::vector<std::string> files
  * Arguments: sample index to update, codon given as a string
  * Takes a sample as an index into the trace and will eventually convert the codon into
  * an index into the trace as well.
+ * Codon Specific Hyper Parameters
+ * 1u Random Number
+ * 2u Acceptance Ratio
+ * 3u Current Log Likelihood
+ * 4u Proposed Log Likelihood
+ * 5u Current Log Likelihood adjusted
+ * 6u Proposed Log Likelihood adjusted
 */
 void PAParameter::updateCodonSpecificParameterTrace(unsigned sample, std::string codon)
 {
 	traces.updateCodonSpecificParameterTraceForCodon(sample, codon, currentCodonSpecificParameter[alp], alp);
 	traces.updateCodonSpecificParameterTraceForCodon(sample, codon, currentCodonSpecificParameter[lmPri], lmPri);
 
-	traces.updateCodonSpecificHyperParameterTraceForCodon(sample, codon, currentCodonSpecificHyperParameter[lmPri], 0u);
-	traces.updateCodonSpecificHyperParameterTraceForCodon(sample, codon, currentCodonSpecificHyperParameter[lmPri], 1u);
-	traces.updateCodonSpecificHyperParameterTraceForCodon(sample, codon, currentCodonSpecificHyperParameter[lmPri], 2u);
-	traces.updateCodonSpecificHyperParameterTraceForCodon(sample, codon, currentCodonSpecificHyperParameter[lmPri], 3u);
-	traces.updateCodonSpecificHyperParameterTraceForCodon(sample, codon, currentCodonSpecificHyperParameter[lmPri], 4u);
-	traces.updateCodonSpecificHyperParameterTraceForCodon(sample, codon, currentCodonSpecificHyperParameter[lmPri], 5u);
+	traces.updateCodonSpecificHyperParameterTraceForCodon(sample, codon, currentCodonSpecificHyperParameter[0u], 0u);
+	traces.updateCodonSpecificHyperParameterTraceForCodon(sample, codon, currentCodonSpecificHyperParameter[1u], 1u);
+	traces.updateCodonSpecificHyperParameterTraceForCodon(sample, codon, currentCodonSpecificHyperParameter[2u], 2u);
+	traces.updateCodonSpecificHyperParameterTraceForCodon(sample, codon, currentCodonSpecificHyperParameter[3u], 3u);
+	traces.updateCodonSpecificHyperParameterTraceForCodon(sample, codon, currentCodonSpecificHyperParameter[4u], 4u);
+	traces.updateCodonSpecificHyperParameterTraceForCodon(sample, codon, currentCodonSpecificHyperParameter[5u], 5u);
 }
 
 
@@ -550,7 +557,20 @@ void PAParameter::updateCodonSpecificParameter(std::string grouping)
 	}
 }
 
+void PAParameter::updateCodonSpecificHyperParameter(std::string grouping, double randomNumber, double acceptanceRatio, double currLogLikelihood, double propLogLikelihood, double currLogLikelihoodAdjusted, double propLogLikelihoodAdjusted)
+{
+    unsigned i = SequenceSummary::codonToIndex(grouping);
 
+    for (unsigned k = 0u; k < numMixtures; k++)
+    {
+        currentCodonSpecificHyperParameter[0u][k][i] = randomNumber;
+        currentCodonSpecificHyperParameter[1u][k][i] = acceptanceRatio;
+        currentCodonSpecificHyperParameter[2u][k][i] = currLogLikelihood;
+        currentCodonSpecificHyperParameter[3u][k][i] = propLogLikelihood;
+        currentCodonSpecificHyperParameter[4u][k][i] = currLogLikelihoodAdjusted;
+        currentCodonSpecificHyperParameter[5u][k][i] = propLogLikelihoodAdjusted;
+    }
+}
 
 
 
