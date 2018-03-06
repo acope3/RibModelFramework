@@ -84,11 +84,11 @@ void PAModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex,
 	double currentLogPosterior = (logLikelihood + logPhiProbability);
 	double proposedLogPosterior = (logLikelihood_proposed + logPhiProbability_proposed);
 
-	logProbabilityRatio[0] = (proposedLogPosterior - currentLogPosterior) - (std::log(phiValue) - std::log(phiValue_proposed));//Is recalulcated in MCMC
-	logProbabilityRatio[1] = currentLogPosterior - std::log(phiValue_proposed);
-	logProbabilityRatio[2] = proposedLogPosterior - std::log(phiValue);
-	logProbabilityRatio[3] = currentLogPosterior;
-	logProbabilityRatio[4] = proposedLogPosterior;
+	CSPHyperParameters[0] = logProbabilityRatio[0] = (proposedLogPosterior - currentLogPosterior) - (std::log(phiValue) - std::log(phiValue_proposed));//Is recalulcated in MCMC
+	CSPHyperParameters[1] = logProbabilityRatio[1] = currentLogPosterior - std::log(phiValue_proposed);
+	CSPHyperParameters[2] = logProbabilityRatio[2] = proposedLogPosterior - std::log(phiValue);
+	CSPHyperParameters[3] = logProbabilityRatio[3] = currentLogPosterior;
+	CSPHyperParameters[4] = logProbabilityRatio[4] = proposedLogPosterior;
 	logProbabilityRatio[5] = logLikelihood;
 	logProbabilityRatio[6] = logLikelihood_proposed;
 
@@ -498,6 +498,11 @@ void PAModel::updateCodonSpecificParameter(std::string aa)
 	parameter->updateCodonSpecificParameter(aa);
 }
 
+void PAModel::updateCodonSpecificHyperParameter(std::string aa, double randomNumber)
+{
+	parameter->updateCodonSpecificHyperParameter(aa, randomNumber, CSHyperParameters[0], CSHyperParameters[3], CSHyperParameters[4], 
+        CSHyperParameters[1],CSHyperParameters[2]);
+}
 
 void PAModel::updateGibbsSampledHyperParameters(Genome &genome)
 {
@@ -605,4 +610,3 @@ double PAModel::getParameterForCategory(unsigned category, unsigned param, std::
 {
 	return parameter->getParameterForCategory(category, param, codon, proposal);
 }
-
