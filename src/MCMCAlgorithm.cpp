@@ -43,7 +43,7 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thinning(1), adaptiveWidth(100 *
 
     ratioTrace.resize(samples + 1);
 
-	
+
     writeRestartFile = false;
 	multipleFiles = false;
 	fileWriteInterval = 1u;
@@ -339,17 +339,13 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 		// calculate likelihood ratio for every Category for current AA
 		model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures);
 		//logPosterior += model.calculateAllPriors();
-        double rando = -Parameter::randExp(1);
-        if (iteration % thinning == 0){
-            randomTrace.push_back(rando);
-            probabilityTrace.push_back(acceptanceRatioForAllMixtures[0]);
-        }
+        double random = -Parameter::randExp(1);
 
-		if ( rando < acceptanceRatioForAllMixtures[0])
+		if ( random < acceptanceRatioForAllMixtures[0])
 		{
 			// moves proposed codon specific parameters to current codon specific parameters
 			posterior = acceptanceRatioForAllMixtures[4]; //unassigned will be 0
-			model.updateCodonSpecificParameter(grouping); 
+			model.updateCodonSpecificParameter(grouping);
 			if ((iteration % thinning) == 0)
 			{
 				likelihoodTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[2];//will be 0
@@ -368,6 +364,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 		}
 		if ((iteration % thinning) == 0)
 		{
+            model.updateCodonSpecificHyperParameter(grouping, random);
 			model.updateCodonSpecificParameterTrace(iteration/thinning, grouping);
 		}
 	}
@@ -505,7 +502,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
             //TODO:Probably do a nan check
 			if ((iteration % adaptiveWidth) == 0u)
 				model.adaptHyperParameterProposalWidths(adaptiveWidth, iteration <= stepsToAdapt);
-   
+
 		}
 		// update expression level values
 		if (estimateSynthesisRate || estimateMixtureAssignment)
@@ -524,7 +521,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 			}
 			if ((iteration % adaptiveWidth) == 0u)
 				model.adaptSynthesisRateProposalWidth(adaptiveWidth, iteration <= stepsToAdapt);
-      
+
   		}
 
 

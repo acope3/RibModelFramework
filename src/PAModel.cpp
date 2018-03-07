@@ -369,6 +369,12 @@ void PAModel::updateCodonSpecificParameterTrace(unsigned sample, std::string cod
 	parameter->updateCodonSpecificParameterTrace(sample, codon);
 }
 
+void PAModel::updateCodonSpecificHyperParameter(std::string aa, double randomNumber)
+{
+	parameter->updateCodonSpecificHyperParameter(aa, randomNumber, CSHyperParameters[0], CSHyperParameters[3], CSHyperParameters[4],
+        CSHyperParameters[1],CSHyperParameters[2]);
+}
+
 
 void PAModel::updateHyperParameterTraces(unsigned sample)
 {
@@ -496,12 +502,6 @@ void PAModel::setCategoryProbability(unsigned mixture, double value)
 void PAModel::updateCodonSpecificParameter(std::string aa)
 {
 	parameter->updateCodonSpecificParameter(aa);
-}
-
-void PAModel::updateCodonSpecificHyperParameter(std::string aa, double randomNumber)
-{
-	parameter->updateCodonSpecificHyperParameter(aa, randomNumber, CSHyperParameters[0], CSHyperParameters[3], CSHyperParameters[4],
-        CSHyperParameters[1],CSHyperParameters[2]);
 }
 
 void PAModel::updateGibbsSampledHyperParameters(Genome &genome)
