@@ -13,6 +13,9 @@ class PAModel: public Model
 		PAParameter *parameter;
 		unsigned RFPCountColumn;
 
+        //CSP Hyper parameters
+        double CSHyperParameters[5];
+
 		double calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
 				unsigned currRFPValue, unsigned currNumCodonsInMRNA, double phiValue);
 
@@ -26,7 +29,7 @@ class PAModel: public Model
 		//Likelihood Ratio Functions:
 		virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k,
 				double* logProbabilityRatio); // Depends on RFPCountColumn
-		virtual void calclateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
+		virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
 				std::vector<double> &logAcceptanceRatioForAllMixtures); // Depends on RFPCountColumn
 		virtual void calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration,
 				std::vector <double> &logProbabilityRatio);
@@ -111,10 +114,6 @@ class PAModel: public Model
 		virtual double calculateAllPriors();
 		virtual double getParameterForCategory(unsigned category, unsigned param, std::string codon, bool proposal);
 
-
-        //CSP Hyper parameters
-        double CSHyperParameters[5];
-        
 	protected:
 };
 
