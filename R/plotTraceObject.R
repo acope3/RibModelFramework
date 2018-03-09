@@ -192,6 +192,119 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
   par(opar)
 } 
 
+# Called from Plot Trace Object (plot for trace)
+# NOT EXPOSED
+# 
+#' Plot Codon Specific Hyper Parameter
+#' @param trace An Rcpp trace object initialized with \code{initializeTraceObject}.
+#'
+#' @param mixture The mixture for which to plot values.
+#'
+#' @param type A string containing one of the following to graph: \code{Random, LoglikelihoodRatio, currLoglikelihood, propLoglikelihood, currLoglikelihoodAdjusted, propLoglikelihoodAdjusted}. 
+#'
+#' @param main The title of the plot.
+#'
+#' @param PA A logical value determining if the Parameter was PA or not.
+#'
+#' @return This function has no return value.
+#' 
+#' @description Plots a codon-specific set of traces, specified with the \code{type} parameter.
+#'
+plotCodonSpecificHyperParameters <- function(trace, mixture, type="Mutation", main="Mutation Parameter Traces", PA=TRUE)
+{
+  opar <- par(no.readonly = T) 
+  
+  ### Trace plot.
+  if (PA)
+  {
+    nf <- layout(matrix(c(rep(1, 4), 2:21), nrow = 6, ncol = 4, byrow = TRUE),
+               rep(1, 4), c(2, 8, 8, 8, 8, 8), respect = FALSE)  
+  }else
+  {    
+      return
+  }
+  ### Plot title.
+  par(mar = c(1,1,1,1))
+  
+  plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
+  text(0.5, 0.6, main)
+  text(0.5, 0.4, date(), cex = 0.6)
+  par(mar = c(5.1, 4.1, 4.1, 2.1))
+  
+  # TODO change to groupList -> checks for ROC like model is not necessary!
+  names.aa <- aminoAcids()
+  with.ref.codon <- ifelse(ROC, TRUE, FALSE)
+  
+  for(aa in names.aa)
+  { 
+    codons <- AAToCodon(aa, with.ref.codon)
+    if(length(codons) == 0) next
+    if(aa == "X") next
+    cur.trace <- vector("list", length(codons))
+    paramType <- 0
+    
+    if(type == "Mutation"){
+      ylab <- expression(Delta~"M")
+      paramType <- 0
+      special <- FALSE
+    }else if (type == "Selection"){
+      ylab <- expression(Delta~eta)
+      paramType <- 1
+      special <- FALSE
+    }else if (type == "Alpha"){
+      ylab <- expression(alpha)
+      paramType <- 0
+      special <- FALSE
+    }else if (type == "LambdaPrime"){
+      ylab <- expression(lambda~"'")
+      paramType <- 1
+      special <- FALSE
+    }else if (type == "MeanWaitingTime"){
+      ylab <- expression(alpha/lambda~"'")
+      special <- TRUE
+    }else if (type == "VarWaitingTime"){
+      ylab <- expression(alpha/lambda~"'"^"2")
+      special <- TRUE
+    }else{
+      stop("Parameter 'type' not recognized! Must be one of: 'Mutation', 'Selection', 'Alpha', 'LambdaPrime', 'MeanWaitingTime', 'VarWaitingTime'.")
+    }
+
+    for(i in 1:length(codons)){
+      if(special){
+        tmpAlpha <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], 0, with.ref.codon)
+        tmpLambdaPrime <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], 1, with.ref.codon)
+        
+        if (type == "MeanWaitingTime"){          
+          cur.trace[[i]] <- tmpAlpha / tmpLambdaPrime
+        }else if (type == "VarWaitingTime"){
+          cur.trace[[i]] <- tmpAlpha / (tmpLambdaPrime * tmpLambdaPrime)
+        }
+      }
+      else{
+        cur.trace[[i]] <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], paramType, with.ref.codon)
+      }
+    }
+
+    cur.trace <- do.call("cbind", cur.trace)
+    if(length(cur.trace) == 0) next
+    x <- 1:dim(cur.trace)[1]
+    xlim <- range(x)
+    ylim <- range(cur.trace, na.rm=T)
+    
+    main.aa <- aa #TODO map to three leter code
+    plot(NULL, NULL, xlim = xlim, ylim = ylim,
+         xlab = "Samples", ylab = ylab, main = main.aa)
+    plot.order <- order(apply(cur.trace, 2, sd), decreasing = TRUE)
+    for(i.codon in plot.order){
+      lines(x = x, y = cur.trace[, i.codon], col = .codonColors[[codons[i.codon]]])
+    }
+    colors <- unlist(.codonColors[codons])
+    legend("topleft", legend = codons, col = colors, 
+           lty = rep(1, length(codons)), bty = "n", cex = 0.75)
+  }
+  par(opar)
+} 
+
 # NOT EXPOSED
 plotExpressionTrace <- function(trace, geneIndex)
 {
