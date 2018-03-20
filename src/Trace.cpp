@@ -812,7 +812,6 @@ std::vector<float> Trace::getCodonSpecificParameterTraceByMixtureElementForCodon
 	return RV;
 }
 
-
 std::vector<std::vector<double>> Trace::getSynthesisOffsetTraceR()
 {
 	return synthesisOffsetTrace;
@@ -876,4 +875,31 @@ bool Trace::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound)
 
 	return check;
 }
+
+//----------------------------------//
+//---------- PA Debug Specific ----------//
+//----------------------------------//
+
+std::vector<float> Trace::getCodonSpecificHyperParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, 
+        std::string& codon, unsigned paramType)
+{
+
+	std::vector<float> RV;
+	bool checkMixtureElement = checkIndex(mixtureElement, 1, getNumberOfMixtures());
+	if (checkMixtureElement)
+	{
+		RV = getCodonSpecificHyperParameterTraceByMixtureElementForCodon(mixtureElement - 1, codon, paramType);
+	}
+	return RV;
+}
+
+std::vector<float> Trace::getCodonSpecificHyperParameterTraceByMixtureElementForCodon(unsigned mixtureElement,
+	std::string& codon, unsigned paramType)
+{
+	std::vector <float> rv;
+	unsigned codonIndex = SequenceSummary::codonToIndex(codon, true);
+	rv = codonSpecificParameterTrace[paramType][mixtureElement][codonIndex];
+	return rv;
+}
+
 #endif

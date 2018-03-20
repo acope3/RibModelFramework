@@ -72,6 +72,38 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
   {
     plotExpressionTrace(x, geneIndex)
   }
+
+  #CSHP Debug
+  if(what[1] == "RandomNumber")
+  {
+      plotCodonSpecificHyperParameters(x, mixture, "RandomNumber", "Random Number Trace", TRUE)
+  }
+
+  if(what[1] == "AcceptanceRatio")
+  {
+      plotCodonSpecificHyperParameters(x, mixture, "AcceptanceRatio", "Acceptance Ratio Trace", TRUE)
+  }
+
+  if(what[1] == "CurrentLogLikelihood")
+  {
+      plotCodonSpecificHyperParameters(x, mixture, "CurrentLogLikelihood", "Current Log Likelihood Trace", TRUE)
+  }
+  
+  if(what[1] == "ProposedLogLikelihood")
+  {
+      plotCodonSpecificHyperParameters(x, mixture, "ProposedLogLikelihood", "Proposed Log Likelihood Trace", TRUE)
+  }
+
+  if(what[1] == "CurrentLogLikelihoodAdjusted")
+  {
+      plotCodonSpecificHyperParameters(x, mixture, "CurrentLogLikelihoodAdjusted", "Adjusted Current Log Likelihood Trace", TRUE)
+  }
+
+  if(what[1] == "RandomNumber")
+  {
+      plotCodonSpecificHyperParameters(x, mixture, "ProposedLogLikelihoodAdjusted", "Adjusted Proposed Log Likelihood Trace", TRUE)
+  }
+
 }
 
 # Called from Plot Trace Object (plot for trace)
@@ -210,7 +242,7 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
 #' 
 #' @description Plots a codon-specific set of traces, specified with the \code{type} parameter.
 #'
-plotCodonSpecificHyperParameters <- function(trace, mixture, type="RandomNumber", main="Mutation Parameter Traces", PA=TRUE)
+plotCodonSpecificHyperParameters <- function(trace, mixture, type="RandomNumber", main="Random Number Parameter Traces", PA=TRUE)
 {
   opar <- par(no.readonly = T) 
   
@@ -234,44 +266,40 @@ plotCodonSpecificHyperParameters <- function(trace, mixture, type="RandomNumber"
   names.aa <- aminoAcids()
   
   for(aa in names.aa)
-    for(i in 1:length(codons)){
-  { 
+  {
+ 	if(aa == "X") next
+    
     codons <- AAToCodon(aa, with.ref.codon)
     if(length(codons) == 0) next
-    if(aa == "X") next
-    cur.trace <- vector("list", length(codons))
-    paramType <- 0
+ 	cur.trace <- vector("list", length(codons))
     
-    if(type == "RandomNumber"){
-      ylab <- expression("Random Number")
-      paramType <- 0
-    }else if (type == "AcceptanceRatio"){
-      ylab <- expression("Acceptance Ratio")
-      paramType <- 1
-    }else if (type == "CurrentLogLikelihood"){
-      ylab <- expression("Current Log Likelihood")
-      paramType <- 2
-    }else if (type == "ProposedLogLikelihood"){
-      ylab <- expression("Proposed Log Likelihood")
-      paramType <- 3
-    }else if (type == "CurrentLogLikelihoodAdjusted"){
-      ylab <- expression("Adjusted Current Log Likelihood")
-      paramType <- 4
-    }else if (type == "ProposedLogLikelihoodAdjusted"){
-      ylab <- expression("Adjusted Proposed Log Likelihood")
-      paramType <- 5
-    }else{
-      stop("Parameter 'type' not recognized! Must be one of: 'Mutation', 'Selection', 'Alpha', 'LambdaPrime', 'MeanWaitingTime', 'VarWaitingTime'.")
+    for(i in 1:length(codons))
+    { 
+ 	  if(type == "RandomNumber"){
+ 	    ylab <- expression("Random Number")
+ 	    paramType <- 0
+ 	  }else if (type == "AcceptanceRatio"){
+ 	    ylab <- expression("Acceptance Ratio")
+ 	    paramType <- 1
+ 	  }else if (type == "CurrentLogLikelihood"){
+ 	    ylab <- expression("Current Log Likelihood")
+ 	    paramType <- 2
+ 	  }else if (type == "ProposedLogLikelihood"){
+ 	    ylab <- expression("Proposed Log Likelihood")
+ 	    paramType <- 3
+ 	  }else if (type == "CurrentLogLikelihoodAdjusted"){
+ 	    ylab <- expression("Adjusted Current Log Likelihood")
+ 	    paramType <- 4
+ 	  }else if (type == "ProposedLogLikelihoodAdjusted"){
+ 	    ylab <- expression("Adjusted Proposed Log Likelihood")
+ 	    paramType <- 5
+ 	  }else{
+ 	    stop("Parameter 'type' not recognized! Must be one of: 'Mutation', 'Selection', 'Alpha', 'LambdaPrime', 'MeanWaitingTime', 'VarWaitingTime'.")
+      }
+        cur.trace[i] <- trace$getCodonSpecificHyperParameterTraceByMixtureElementForCodon(mixture, codons[i], paramtype)
     }
-  }
-
-        tmpRandomNumber <- trace$getCodonSpecificHyperParameterTraceByMixtureElementForCodon(mixture, codons[i], 0)
-        tmpAcceptanceRatio <- trace$getCodonSpecificHyperParameterTraceByMixtureElementForCodon(mixture, codons[i], 1)
-        tmpCurrLogLikelihood <- trace$getCodonSpecificHyperParameterTraceByMixtureElementForCodon(mixture, codons[i], 1)
-        tmpPropLogLikelihood <- trace$getCodonSpecificHyperParameterTraceByMixtureElementForCodon(mixture, codons[i], 1)
-        tmpCurrLogLikelihoodAdjusted <- trace$getCodonHyperSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], 1)
-        tmpPropLogLikelihoodAdjusted <- trace$getCodonHyperSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], 1)
-    }
+  
+    
 
     cur.trace <- do.call("cbind", cur.trace)
     if(length(cur.trace) == 0) next

@@ -142,6 +142,10 @@ class Trace {
 
 
         //PA Specific:
+        std::vector<float> getCodonSpecificHyperParameterTraceByMixtureElementForCodon(unsigned mixtureElement, std::string& codon,
+                unsigned paramType);
+        std::vector<float> getCodonSpecificHyperParameterTraceByMixtureElementForCodonR(unsigned mixtureElement, std::string& codon,
+                unsigned paramType);
 
 
 		//------------------------------//
