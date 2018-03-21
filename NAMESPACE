@@ -49,7 +49,7 @@ export(
 
 ## Genome object
 "initializeGenomeObject",
-"getCodonCountsForAA",
+"getCodonCounts",
 "getNames",
 "addObservedSynthesisRateSet",
 "getObservedSynthesisRateSet",

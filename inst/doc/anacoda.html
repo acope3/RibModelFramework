@@ -12,7 +12,7 @@
 
 <meta name="author" content="Cedric Landerer &amp; Alex Cope" />
 
-<meta name="date" content="2018-01-18" />
+<meta name="date" content="2018-03-20" />
 
 <title>AnaCoDa: Analyzing Codon Data</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">AnaCoDa: Analyzing Codon Data</h1>
 <h4 class="author"><em>Cedric Landerer &amp; Alex Cope</em></h4>
-<h4 class="date"><em>2018-01-18</em></h4>
+<h4 class="date"><em>2018-03-20</em></h4>
 
 
 
@@ -105,7 +105,8 @@ E[\phi] = \exp\left(m_\phi+\frac{s_\phi^2}{2}\right) = 1
 <p>Therefor the mean <span class="math inline">\(m_\phi\)</span> is set to be <span class="math inline">\(-\frac{s_\phi^2}{2}\)</span>. For more details see <span class="citation">(Gilchrist et al. 2015)</span></p>
 <p>After choosing the model and specifying the necessary arguments for the MCMC routine, the MCMC is run.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">genome &lt;-<span class="st"> </span><span class="kw">initializeGenomeObject</span>(<span class="dt">file =</span> <span class="st">&quot;genome.fasta&quot;</span>)
-parameter &lt;-<span class="st"> </span><span class="kw">initializeParameterObject</span>(<span class="dt">genome =</span> genome, <span class="dt">sphi =</span> <span class="dv">1</span>, <span class="dt">num.mixtures =</span> <span class="dv">1</span>, <span class="dt">geneAssignment =</span> <span class="kw">rep</span>(<span class="dv">1</span>, <span class="kw">length</span>(genome)))
+parameter &lt;-<span class="st"> </span><span class="kw">initializeParameterObject</span>(<span class="dt">genome =</span> genome, <span class="dt">sphi =</span> <span class="dv">1</span>, <span class="dt">num.mixtures =</span> <span class="dv">1</span>, 
+                                       <span class="dt">gene.assignment =</span> <span class="kw">rep</span>(<span class="dv">1</span>, <span class="kw">length</span>(genome)))
 model &lt;-<span class="st"> </span><span class="kw">initializeModelObject</span>(<span class="dt">parameter =</span> parameter, <span class="dt">model =</span> <span class="st">&quot;ROC&quot;</span>)
 mcmc &lt;-<span class="st"> </span><span class="kw">initializeMCMCObject</span>(<span class="dt">samples =</span> <span class="dv">5000</span>, <span class="dt">thinning =</span> <span class="dv">10</span>, <span class="dt">adaptive.width=</span><span class="dv">50</span>)
 <span class="kw">runMCMC</span>(<span class="dt">mcmc =</span> mcmc, <span class="dt">genome =</span> genome, <span class="dt">model =</span> model)</code></pre></div>
@@ -117,13 +118,15 @@ mcmc &lt;-<span class="st"> </span><span class="kw">initializeMCMCObject</span>(
 <div id="application-of-codon-model-to-a-mixture-of-genomes" class="section level3">
 <h3>Application of codon model to a mixture of genomes</h3>
 <p>This case applies if we assume that parts of the genome differ in their gene-set specific parameters. This could be due to introgression events or strand specific mutation difference or other stuff. We make the assumption that all sets of genes are independent of one another. For two sets of gene-set specific parameter with a random gene assignment we can use:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">parameter &lt;-<span class="st"> </span><span class="kw">initializeParameterObject</span>(<span class="dt">genome =</span> genome, <span class="dt">sphi =</span> <span class="kw">c</span>(<span class="fl">0.5</span>, <span class="dv">2</span>), <span class="dt">num.mixtures =</span> <span class="dv">2</span>, <span class="dt">geneAssignment =</span> <span class="kw">sample.int</span>(<span class="dv">2</span>, <span class="kw">length</span>(genome), <span class="dt">replace =</span> T))</code></pre></div>
-<p>To accommodate for this mixing we only have to adjust <code>sphi</code>, which is now a vector of length 2, <code>num.mixtures</code>, and <code>geneAssignment</code>, which is chosen at random here.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">parameter &lt;-<span class="st"> </span><span class="kw">initializeParameterObject</span>(<span class="dt">genome =</span> genome, <span class="dt">sphi =</span> <span class="kw">c</span>(<span class="fl">0.5</span>, <span class="dv">2</span>), <span class="dt">num.mixtures =</span> <span class="dv">2</span>, 
+                                       <span class="dt">gene.assignment =</span> <span class="kw">sample.int</span>(<span class="dv">2</span>, <span class="kw">length</span>(genome), <span class="dt">replace =</span> T))</code></pre></div>
+<p>To accommodate for this mixing we only have to adjust <code>sphi</code>, which is now a vector of length 2, <code>num.mixtures</code>, and <code>gene.assignment</code>, which is chosen at random here.</p>
 </div>
 <div id="using-empirical-protein-synthesis-rate-values" class="section level3">
 <h3>Using empirical protein synthesis rate values</h3>
 <p>To use empirical values as prior information one can simply specify an <code>observed.expression.file</code> when initializing the genome object.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">genome &lt;-<span class="st"> </span><span class="kw">initializeGenomeObject</span>(<span class="dt">file =</span> <span class="st">&quot;genome.fasta&quot;</span>, <span class="dt">observed.expression.file =</span> <span class="st">&quot;synthesis_values.csv&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">genome &lt;-<span class="st"> </span><span class="kw">initializeGenomeObject</span>(<span class="dt">file =</span> <span class="st">&quot;genome.fasta&quot;</span>, 
+                                 <span class="dt">observed.expression.file =</span> <span class="st">&quot;synthesis_values.csv&quot;</span>)</code></pre></div>
 <p>These observed expression or synthesis values (<span class="math inline">\(\Phi\)</span>) are independent of the number of gene-sets. The error in the observed <span class="math inline">\(\Phi\)</span> values is estimated and described by sepsilon (<span class="math inline">\(s_\epsilon\)</span>). The csv file can contain multiple observation sets separated by comma. For each set of observations an initial <span class="math inline">\(s_\epsilon\)</span> has to be specified.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># One case of observed data</span>
 sepsilon &lt;-<span class="st"> </span><span class="fl">0.1</span>
@@ -133,43 +136,55 @@ sepsilon &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl
 <span class="co"># Five cases of observed data</span>
 sepsilon &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="dv">1</span>, <span class="fl">0.8</span>, <span class="dv">3</span>)
 
-parameter &lt;-<span class="st"> </span><span class="kw">initializeParameterObject</span>(<span class="dt">genome =</span> genome, <span class="dt">sphi =</span> <span class="dv">1</span>, <span class="dt">num.mixtures =</span> <span class="dv">1</span>, <span class="dt">geneAssignment =</span> <span class="kw">rep</span>(<span class="dv">1</span>, <span class="kw">length</span>(genome)), <span class="dt">init.sepsilon =</span> sepsilon)</code></pre></div>
+parameter &lt;-<span class="st"> </span><span class="kw">initializeParameterObject</span>(<span class="dt">genome =</span> genome, <span class="dt">sphi =</span> <span class="dv">1</span>, <span class="dt">num.mixtures =</span> <span class="dv">1</span>, 
+                                       <span class="dt">gene.assignment =</span> <span class="kw">rep</span>(<span class="dv">1</span>, <span class="kw">length</span>(genome)), 
+                                       <span class="dt">init.sepsilon =</span> sepsilon)</code></pre></div>
 <p>In addition one can choose to keep the noise in the observations (<span class="math inline">\(s_\epsilon\)</span>) constant by using the <code>fix.observation.noise</code> flag in the model object.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">initializeModelObject</span>(<span class="dt">parameter =</span> parameter, <span class="dt">model =</span> <span class="st">&quot;ROC&quot;</span>,  <span class="dt">fix.observation.noise =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">initializeModelObject</span>(<span class="dt">parameter =</span> parameter, <span class="dt">model =</span> <span class="st">&quot;ROC&quot;</span>,  
+                               <span class="dt">fix.observation.noise =</span> <span class="ot">TRUE</span>)</code></pre></div>
 </div>
 <div id="keeping-parameter-types-fixed" class="section level3">
 <h3>Keeping parameter types fixed</h3>
 <p>It can sometime be advantages to fix certain parameters, like the gene specific parameters. For example in cases where only few sequences are available but gene expression measurements are at hand we can fix the gene specific parameters to increase confidence in our estimates of gene-set specific parameters.</p>
 <p>We again initialize our <code>genome</code>, <code>parameter</code>, and <code>model</code> objects.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">genome &lt;-<span class="st"> </span><span class="kw">initializeGenomeObject</span>(<span class="dt">file =</span> <span class="st">&quot;genome.fasta&quot;</span>)
-parameter &lt;-<span class="st"> </span><span class="kw">initializeParameterObject</span>(<span class="dt">genome =</span> genome, <span class="dt">sphi =</span> <span class="dv">1</span>, <span class="dt">num.mixtures =</span> <span class="dv">1</span>, <span class="dt">geneAssignment =</span> <span class="kw">rep</span>(<span class="dv">1</span>, <span class="kw">length</span>(genome)))
+parameter &lt;-<span class="st"> </span><span class="kw">initializeParameterObject</span>(<span class="dt">genome =</span> genome, <span class="dt">sphi =</span> <span class="dv">1</span>, <span class="dt">num.mixtures =</span> <span class="dv">1</span>, 
+                                       <span class="dt">gene.assignment =</span> <span class="kw">rep</span>(<span class="dv">1</span>, <span class="kw">length</span>(genome)))
 model &lt;-<span class="st"> </span><span class="kw">initializeModelObject</span>(<span class="dt">parameter =</span> parameter, <span class="dt">model =</span> <span class="st">&quot;ROC&quot;</span>)</code></pre></div>
 <p>To fix gene specific parameters we will set the <code>est.expression</code> flag to <code>FALSE</code>. This will estimate only gene-set specific parameters, hyperparameters, and the assignments of genes to various sets.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mcmc &lt;-<span class="st"> </span><span class="kw">initializeMCMCObject</span>(samples, <span class="dt">thinning=</span><span class="dv">1</span>, <span class="dt">adaptive.width=</span><span class="dv">100</span>, <span class="dt">est.expression=</span><span class="ot">FALSE</span>, <span class="dt">est.csp=</span><span class="ot">TRUE</span>, <span class="dt">est.hyper=</span><span class="ot">TRUE</span>, <span class="dt">est.mix=</span><span class="ot">TRUE</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mcmc &lt;-<span class="st"> </span><span class="kw">initializeMCMCObject</span>(samples, <span class="dt">thinning=</span><span class="dv">1</span>, <span class="dt">adaptive.width=</span><span class="dv">100</span>, 
+                             <span class="dt">est.expression=</span><span class="ot">FALSE</span>, <span class="dt">est.csp=</span><span class="ot">TRUE</span>, 
+                             <span class="dt">est.hyper=</span><span class="ot">TRUE</span>, <span class="dt">est.mix=</span><span class="ot">TRUE</span>)</code></pre></div>
 <p>If we would like to fix gene-set specific parameters we instead disable the <code>est.csp</code> flag.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mcmc &lt;-<span class="st"> </span><span class="kw">initializeMCMCObject</span>(samples, <span class="dt">thinning=</span><span class="dv">1</span>, <span class="dt">adaptive.width=</span><span class="dv">100</span>, <span class="dt">est.expression=</span><span class="ot">TRUE</span>, <span class="dt">est.csp=</span><span class="ot">FALSE</span>, <span class="dt">est.hyper=</span><span class="ot">TRUE</span>, <span class="dt">est.mix=</span><span class="ot">TRUE</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mcmc &lt;-<span class="st"> </span><span class="kw">initializeMCMCObject</span>(samples, <span class="dt">thinning=</span><span class="dv">1</span>, <span class="dt">adaptive.width=</span><span class="dv">100</span>, 
+                             <span class="dt">est.expression=</span><span class="ot">TRUE</span>, <span class="dt">est.csp=</span><span class="ot">FALSE</span>, 
+                             <span class="dt">est.hyper=</span><span class="ot">TRUE</span>, <span class="dt">est.mix=</span><span class="ot">TRUE</span>)</code></pre></div>
 <p>The same applies to the hyper parameters (<code>est.hyper</code>),</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mcmc &lt;-<span class="st"> </span><span class="kw">initializeMCMCObject</span>(samples, <span class="dt">thinning=</span><span class="dv">1</span>, <span class="dt">adaptive.width=</span><span class="dv">100</span>, <span class="dt">est.expression=</span><span class="ot">TRUE</span>, <span class="dt">est.csp=</span><span class="ot">TRUE</span>, <span class="dt">est.hyper=</span><span class="ot">FALSE</span>, <span class="dt">est.mix=</span><span class="ot">TRUE</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mcmc &lt;-<span class="st"> </span><span class="kw">initializeMCMCObject</span>(samples, <span class="dt">thinning=</span><span class="dv">1</span>, <span class="dt">adaptive.width=</span><span class="dv">100</span>, 
+                             <span class="dt">est.expression=</span><span class="ot">TRUE</span>, <span class="dt">est.csp=</span><span class="ot">TRUE</span>, 
+                             <span class="dt">est.hyper=</span><span class="ot">FALSE</span>, <span class="dt">est.mix=</span><span class="ot">TRUE</span>)</code></pre></div>
 <p>and gene set assignment (<code>est.mix</code>).</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mcmc &lt;-<span class="st"> </span><span class="kw">initializeMCMCObject</span>(samples, <span class="dt">thinning=</span><span class="dv">1</span>, <span class="dt">adaptive.width=</span><span class="dv">100</span>, <span class="dt">est.expression=</span><span class="ot">TRUE</span>, <span class="dt">est.csp=</span><span class="ot">TRUE</span>, <span class="dt">est.hyper=</span><span class="ot">TRUE</span>, <span class="dt">est.mix=</span><span class="ot">FALSE</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mcmc &lt;-<span class="st"> </span><span class="kw">initializeMCMCObject</span>(samples, <span class="dt">thinning=</span><span class="dv">1</span>, <span class="dt">adaptive.width=</span><span class="dv">100</span>, 
+                             <span class="dt">est.expression=</span><span class="ot">TRUE</span>, <span class="dt">est.csp=</span><span class="ot">TRUE</span>, 
+                             <span class="dt">est.hyper=</span><span class="ot">TRUE</span>, <span class="dt">est.mix=</span><span class="ot">FALSE</span>)</code></pre></div>
 <p>We can use these flags to fix parameters in any combination.</p>
 </div>
 <div id="combining-various-gene-set-specific-parameters-to-a-gene-set-description." class="section level3">
 <h3>Combining various gene-set specific parameters to a gene-set description.</h3>
 <p>We distinguish between three simple cases of gene-set descriptions, and the ability to customize the parameter mapping. The specification is done when initializing the parameter object with the <code>mixture.definition</code> argument.</p>
 <p>We encounter the simplest case when we assume that all gene sets are independent.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">parameter &lt;-<span class="st"> </span><span class="kw">initializeParameterObject</span>(<span class="dt">genome =</span> genome, <span class="dt">sphi =</span> <span class="kw">c</span>(<span class="fl">0.5</span>, <span class="dv">2</span>), <span class="dt">num.mixtures =</span> <span class="dv">2</span>
-                                       , <span class="dt">geneAssignment =</span> <span class="kw">sample.int</span>(<span class="dv">2</span>, <span class="kw">length</span>(genome), <span class="dt">replace =</span> T),
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">parameter &lt;-<span class="st"> </span><span class="kw">initializeParameterObject</span>(<span class="dt">genome =</span> genome, <span class="dt">sphi =</span> <span class="kw">c</span>(<span class="fl">0.5</span>, <span class="dv">2</span>), <span class="dt">num.mixtures =</span> <span class="dv">2</span>, 
+                                       <span class="dt">gene.assignment =</span> <span class="kw">sample.int</span>(<span class="dv">2</span>, <span class="kw">length</span>(genome), <span class="dt">replace =</span> T),
                                        <span class="dt">mixture.definition =</span> <span class="st">&quot;allUnique&quot;</span>)</code></pre></div>
 <p>The <code>allUnique</code> keyword allows each type of gene-set specific parameter to be estimated independent of parameters describing other gene sets.</p>
 <p>In case we want to share mutation parameter between gene sets we can use the keyword <code>mutationShared</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">parameter &lt;-<span class="st"> </span><span class="kw">initializeParameterObject</span>(<span class="dt">genome =</span> genome, <span class="dt">sphi =</span> <span class="kw">c</span>(<span class="fl">0.5</span>, <span class="dv">2</span>), <span class="dt">num.mixtures =</span> <span class="dv">2</span>
-                                       , <span class="dt">geneAssignment =</span> <span class="kw">sample.int</span>(<span class="dv">2</span>, <span class="kw">length</span>(genome), <span class="dt">replace =</span> T),
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">parameter &lt;-<span class="st"> </span><span class="kw">initializeParameterObject</span>(<span class="dt">genome =</span> genome, <span class="dt">sphi =</span> <span class="kw">c</span>(<span class="fl">0.5</span>, <span class="dv">2</span>), <span class="dt">num.mixtures =</span> <span class="dv">2</span>, 
+                                       <span class="dt">gene.assignment =</span> <span class="kw">sample.int</span>(<span class="dv">2</span>, <span class="kw">length</span>(genome), <span class="dt">replace =</span> T),
                                        <span class="dt">mixture.definition =</span> <span class="st">&quot;mutationShared&quot;</span>)</code></pre></div>
 <p>This will force all gene sets to share the same mutation parameters.</p>
 <p>The same can be done with parameters describing selection, using the keyword <code>selectionShared</code></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">parameter &lt;-<span class="st"> </span><span class="kw">initializeParameterObject</span>(<span class="dt">genome =</span> genome, <span class="dt">sphi =</span> <span class="kw">c</span>(<span class="fl">0.5</span>, <span class="dv">2</span>), <span class="dt">num.mixtures =</span> <span class="dv">2</span>
-                                       , <span class="dt">geneAssignment =</span> <span class="kw">sample.int</span>(<span class="dv">2</span>, <span class="kw">length</span>(genome), <span class="dt">replace =</span> T),
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">parameter &lt;-<span class="st"> </span><span class="kw">initializeParameterObject</span>(<span class="dt">genome =</span> genome, <span class="dt">sphi =</span> <span class="kw">c</span>(<span class="fl">0.5</span>, <span class="dv">2</span>), <span class="dt">num.mixtures =</span> <span class="dv">2</span>, 
+                                       <span class="dt">gene.assignment =</span> <span class="kw">sample.int</span>(<span class="dv">2</span>, <span class="kw">length</span>(genome), <span class="dt">replace =</span> T),
                                        <span class="dt">mixture.definition =</span> <span class="st">&quot;selectionShared&quot;</span>)</code></pre></div>
 <p>For more intricate compositions of gene sets, one can specify a custom <span class="math inline">\(n\times2\)</span> matrix, where <span class="math inline">\(n\)</span> is the number of gene sets, to describe how gene-set specific parameters should be shared. Instead of using the <code>mixture.definition</code> argument one uses the <code>mixture.definition.matrix</code> argument.</p>
 <p>The matrix representation of <code>mutationShared</code> can be obtained by</p>
@@ -179,7 +194,7 @@ model &lt;-<span class="st"> </span><span class="kw">initializeModelObject</span
 <span class="co">#[3,]    1    3</span>
 def.matrix &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>), <span class="dt">ncol=</span><span class="dv">2</span>)
 parameter &lt;-<span class="st"> </span><span class="kw">initializeParameterObject</span>(<span class="dt">genome =</span> genome, <span class="dt">sphi =</span> <span class="kw">c</span>(<span class="fl">0.5</span>, <span class="dv">2</span>, <span class="dv">1</span>), <span class="dt">num.mixtures =</span> <span class="dv">3</span>,
-                                       <span class="dt">geneAssignment =</span> <span class="kw">sample.int</span>(<span class="dv">3</span>, <span class="kw">length</span>(genome), <span class="dt">replace =</span> T),
+                                       <span class="dt">gene.assignment =</span> <span class="kw">sample.int</span>(<span class="dv">3</span>, <span class="kw">length</span>(genome), <span class="dt">replace =</span> T),
                                        <span class="dt">mixture.definition.matrix =</span> def.matrix)</code></pre></div>
 <p>Columns represent mutation and selection, while each row represents a gene set. In this case we have three gene sets, each sharing the same mutation category and three different selection categories.</p>
 <p>In the same way one can produce the matrix for three independent gene sets equivalent to the <code>allUnique</code> keyword.</p>
@@ -258,7 +273,8 @@ YBR177C, 3, CGC, 1</code></pre>
 <div id="parameter-estimates" class="section level3">
 <h3>Parameter estimates</h3>
 <p>After we have completed the model fitting, we are interested in the results. AnaCoDa provides functions to obtain the posterior estimate for each parameter. For gene-set specific parameters or codon specific parameters we can use the function <code>getCSPEstimates</code>. Again we can specify for which mixture we would like the posterior estimate and how many samples should be used. <code>getCSPEstimates</code> has an optional argument <code>filename</code> which will cause the routine to write the result as a csv file instead of returning a <code>data.frame</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">csp_mat &lt;-<span class="st"> </span><span class="kw">getCSPEstimates</span>(<span class="dt">parameter =</span> parameter, <span class="dt">CSP=</span><span class="st">&quot;Mutation&quot;</span>, <span class="dt">mixture =</span> <span class="dv">1</span>, <span class="dt">samples =</span> <span class="dv">1000</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">csp_mat &lt;-<span class="st"> </span><span class="kw">getCSPEstimates</span>(<span class="dt">parameter =</span> parameter, <span class="dt">CSP=</span><span class="st">&quot;Mutation&quot;</span>, 
+                           <span class="dt">mixture =</span> <span class="dv">1</span>, <span class="dt">samples =</span> <span class="dv">1000</span>)
 <span class="kw">head</span>(csp_mat)
 <span class="co">#  AA Codon  Posterior     0.025%     0.975%</span>
 <span class="co">#1  A   GCA -0.2435340 -0.2720696 -0.2165220</span>
@@ -268,7 +284,8 @@ YBR177C, 3, CGC, 1</code></pre>
 <span class="co">#5  D   GAC  0.5775052  0.5618199  0.5936979</span>
 <span class="co">#6  E   GAA -0.4524295 -0.4688044 -0.4356677</span>
 
-<span class="kw">getCSPEstimates</span>(<span class="dt">parameter =</span> parameter, <span class="dt">filename =</span> <span class="st">&quot;mutation.csv&quot;</span>, <span class="dt">CSP=</span><span class="st">&quot;Mutation&quot;</span>, <span class="dt">mixture =</span> <span class="dv">1</span>, <span class="dt">samples =</span> <span class="dv">1000</span>)</code></pre></div>
+<span class="kw">getCSPEstimates</span>(<span class="dt">parameter =</span> parameter, <span class="dt">filename =</span> <span class="st">&quot;mutation.csv&quot;</span>, 
+                <span class="dt">CSP=</span><span class="st">&quot;Mutation&quot;</span>, <span class="dt">mixture =</span> <span class="dv">1</span>, <span class="dt">samples =</span> <span class="dv">1000</span>)</code></pre></div>
 <p>To obtain posterior estimates for the gene specific parameters, we can use the function <code>getExpressionEstimatesForMixture</code>. In the case below we ask to get the gene specific parameters for all genes, and under the assumption each gene is assigned to mixture 1.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">phi_mat &lt;-<span class="st"> </span><span class="kw">getExpressionEstimates</span>(<span class="dt">parameter =</span> parameter, 
                                   <span class="dt">gene.index =</span> <span class="dv">1</span>:<span class="kw">length</span>(genome),
