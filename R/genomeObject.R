@@ -86,6 +86,16 @@ getCodonCounts <- function(genome){
   return(as.data.frame(ORF))
 }
 
+getCodonCountsForAA <- function(aa, genome){
+  # get codon count for aa
+  codons <- AAToCodon(aa, F)
+  codonCounts <- lapply(codons, function(codon){
+    codonCounts <- genome$getCodonCountsPerGene(codon)
+  })
+  codonCounts <- do.call("cbind", codonCounts)
+  return(codonCounts)
+}
+
 
 
 #' Length of Genome
