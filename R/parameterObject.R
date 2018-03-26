@@ -55,9 +55,11 @@
 #' 
 #' @param init.sepsilon specifies the initial value for sepsilon. default is 0.1
 #' 
-#' @param init.w.obs.phi a boolean value which allows users to initialize phi values with observed phi values (data from RNAseq, mass spectrometry, ribosome footprinting)
-#' Default is FALSE. When using this function, users should remove any genes without an unobserved phi values. Not doing so will lead to potential issues,
-#' such as the model attempting to take the logarithm of a negative number.  
+#' @param init.w.obs.phi TRUE: initialize phi values with observed phi values 
+#' (data from RNAseq, mass spectrometry, ribosome footprinting) Default is FALSE. 
+#' If multiple observed phi values exist for a gene, the geometric mean of these values is used as initial phi.
+#' When using this function, one should remove any genes with 
+#' missing phi values, as these genes will not have an initial phi value.
 #' 
 #' @return parameter Returns an initialized Parameter object.
 #' 
@@ -112,7 +114,8 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
                                     mixture.definition = "allUnique", 
                                     mixture.definition.matrix = NULL,
                                     init.with.restart.file = NULL, mutation.prior.sd = 0.35, 
-				    init.csp.variance = 0.0025, init.sepsilon = 0.1,init.w.obs.phi=FALSE){
+				                            init.csp.variance = 0.0025, init.sepsilon = 0.1, 
+				                            init.w.obs.phi=FALSE){
   # check input integrity
   if(is.null(init.with.restart.file)){
     if(length(sphi) != num.mixtures){
@@ -1571,35 +1574,35 @@ loadFONSEParameterObject <- function(parameter, files)
 #' @param x A vector of numerical .
 #' 
 #' @param rm.invalid Boolean value for handling 0, negative, or NA values in the vector. Default is TRUE and will not
-#' include these values in the calculation. If FALSE, these values will be replaced by the argument for default and will
-#' be included in the calculation.  
+#' include these values in the calculation. If FALSE, these values will be replaced by the value give to \code{default} and will
+#' be included in the calculation.
 #' 
 #' @param default Numerical value that serves as the value to replace 0, negative, or NA values in the calculation when rm.invalid is FALSE.
 #' Default is 1e-5.
 #' 
 #' @return Returns the geometric mean of a vector.
 #' 
-#' @description \code{geom_mean} will calculate the geometric mean of a list of numerical values.
+#' @description \code{geomMean} will calculate the geometric mean of a list of numerical values.
 #' 
-#' @details This function returns the geometric mean of a vector and can handle 0, negative, or NA values. We assume the user does not want to include
-#' negative values in the calculation, as this can results in NaNs. This function is called when initializing a Parameter object with 
-#' with observed phi values and there is more than one set. In this case, any genes not having an observed phi value should be removed prior to initializing the Parameter object.
-#' This can be done using the removeUnobservedGenes(genome) function. 
+#' @details This function is a special version of the geometric mean specifically for AnaCoda.
+#' Most models in Anacoda assume a log normal distribution for phi values, thus all values in \code{x} are expectd to be positive.
+#' geomMean returns the geometric mean of a vector and can handle 0, negative, or NA values. 
+#' 
 #' @examples 
-#' x <- c(1,2,3,4)
-#' geom_mean(x)
+#' x <- c(1, 2, 3, 4)
+#' geomMean(x)
 #' 
-#' y<- c(1,NA,3,4,0,-1)
+#' y<- c(1, NA, 3, 4, 0, -1)
 #' # Only take the mean of non-Na values greater than 0
-#' geom_mean(y)
+#' geomMean(y)
 #' 
 #' # Replace values <= 0 or NAs with a default value 0.001 and then take the mean
-#' geom_mean(y,rm.invalid=F,default=0.001)
+#' geomMean(y, rm.invalid = FALSE, default = 0.001)
 #' 
 
 
 
-geom_mean<-function(x,rm.invalid=T,default = 1e-5)
+geomMean <- function(x, rm.invalid = TRUE, default = 1e-5)
 {
   if(!rm.invalid)
   {

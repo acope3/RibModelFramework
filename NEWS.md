@@ -1,5 +1,5 @@
 
-# CHANGES IN AnaCoDa version 0.1.x
+# CHANGES IN AnaCoDa 0.1.1
 
 ## BUG FIXES
 - fixed problem with getCSPEstimates where log scaling was falsely enabled
@@ -8,5 +8,7 @@
 
 ## NEW FEATURES
 - Added functions to calculate the Codon Adaptation Index, Effective Number of Codons and selection coefficients.
+
+- Allow to set initial phi values based on observed phi values stored in genome object.
 
 

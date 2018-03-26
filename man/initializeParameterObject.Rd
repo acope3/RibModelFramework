@@ -9,7 +9,7 @@ initializeParameterObject(genome = NULL, sphi = NULL, num.mixtures = 1,
   split.serine = TRUE, mixture.definition = "allUnique",
   mixture.definition.matrix = NULL, init.with.restart.file = NULL,
   mutation.prior.sd = 0.35, init.csp.variance = 0.0025,
-  init.sepsilon = 0.1)
+  init.sepsilon = 0.1, init.w.obs.phi = FALSE)
 }
 \arguments{
 \item{genome}{An object of type Genome necessary for the initialization of the Parameter object.
@@ -66,6 +66,12 @@ prior on the mutation parameters}
 The proposal width adapts during the runtime to reach a taget acceptance rate of ~0.25}
 
 \item{init.sepsilon}{specifies the initial value for sepsilon. default is 0.1}
+
+\item{init.w.obs.phi}{TRUE: initialize phi values with observed phi values 
+(data from RNAseq, mass spectrometry, ribosome footprinting) Default is FALSE. 
+If multiple observed phi values exist for a gene, the geometric mean of these values is used as initial phi.
+When using this function, one should remove any genes with 
+missing phi values, as these genes will not have an initial phi value.}
 }
 \value{
 parameter Returns an initialized Parameter object.
