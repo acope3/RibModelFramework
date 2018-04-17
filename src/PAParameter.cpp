@@ -131,7 +131,7 @@ void PAParameter::initPAParameterSet()
 		lambdaValues[i] = tmp; //Maybe we don't initialize this one? or we do it differently?
 	}
 
-    //Used for CSP Proposal debugginu
+    //Used for CSP Proposal debuging
     for (unsigned i = 0; i < numMixtures; i++)
     {
         std::vector <double> tmp(numParam, 1.0);
@@ -573,6 +573,35 @@ void PAParameter::updateCodonSpecificHyperParameter(std::string grouping, double
 }
 
 
+double PAParameter::calculateExpectedZ(Genome &genome)
+{
+    double sum = 0;
+    double tmp = 0;
+
+    for (unsigned i = 0u; i < currentSynthesisRateLevel.size(); i++)
+    {
+        unsigned start, end;
+        Gene gene = genome.getGene(i);
+
+        SequenceSummary::AAIndexToCodonRange(i, start, end, false);
+
+        //Indexing may be off check read mechanism
+        double phi = currentSynthesisRateLevel[i][0];
+        for (unsigned j = start; j < end; j++)
+        {
+            std::string codon = gene.geneData.indexToCodon(j);
+            double currCodonCount = gene.getCodonCount(codon);
+            double alpha = currentCodonSpecificParameter[alp][0][j];
+            double lambda = currentLambdaParameter[0][j];
+
+            sum += (currCodonCount * alpha / lambda);
+        }
+
+        sum += (tmp * phi);
+    }
+
+    return sum;
+}
 
 // ----------------------------------------------//
 // ---------- Adaptive Width Functions ----------//

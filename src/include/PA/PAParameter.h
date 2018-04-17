@@ -61,7 +61,7 @@ class PAParameter: public Parameter {
         //CSP Proposal Debugging`
         void updateCodonSpecificHyperParameter(std::string grouping, double randomNumber, double acceptanceRatio,
             double currLogLikelihood, double propLogLikelihood, double currLogLikelihoodAdjusted, double propLogLikelihoodAdjusted);
-
+        double calculateExpectedZ(Genome &genome);
 
 
 		//Adaptive Width Functions:

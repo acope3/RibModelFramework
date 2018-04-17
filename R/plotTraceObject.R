@@ -262,19 +262,16 @@ plotCodonSpecificHyperParameters <- function(trace, mixture, type="RandomNumber"
   text(0.5, 0.4, date(), cex = 0.6)
   par(mar = c(5.1, 4.1, 4.1, 2.1))
   
-  # TODO change to groupList -> checks for ROC like model is not necessary!
   names.aa <- aminoAcids()
   
   for(aa in names.aa)
   {
  	if(aa == "X") next
     
-    codons <- AAToCodon(aa, with.ref.codon)
+    codons <- AAToCodon(aa, FALSE)
     if(length(codons) == 0) next
  	cur.trace <- vector("list", length(codons))
     
-    for(i in 1:length(codons))
-    { 
  	  if(type == "RandomNumber"){
  	    ylab <- expression("Random Number")
  	    paramType <- 0
@@ -296,7 +293,10 @@ plotCodonSpecificHyperParameters <- function(trace, mixture, type="RandomNumber"
  	  }else{
  	    stop("Parameter 'type' not recognized! Must be one of: 'Mutation', 'Selection', 'Alpha', 'LambdaPrime', 'MeanWaitingTime', 'VarWaitingTime'.")
       }
-        cur.trace[i] <- trace$getCodonSpecificHyperParameterTraceByMixtureElementForCodon(mixture, codons[i], paramtype)
+    
+    for(i in 1:length(codons))
+    { 
+        cur.trace[[i]] <- trace$getCodonSpecificHyperParameterTraceByMixtureElementForCodon(mixture, codons[i], paramType)
     }
   
     
@@ -318,7 +318,8 @@ plotCodonSpecificHyperParameters <- function(trace, mixture, type="RandomNumber"
     legend("topleft", legend = codons, col = colors, 
            lty = rep(1, length(codons)), bty = "n", cex = 0.75)
   }
-  par(opar)
+  #par(opar)
+  print(cur.trace)
 } 
 
 # NOT EXPOSED

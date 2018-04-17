@@ -273,7 +273,9 @@ class Parameter {
 		std::vector<std::vector<std::vector<double>>> proposedCodonSpecificParameter;
 		std::vector<std::vector<std::vector<double>>> currentCodonSpecificParameter;
 
+        //CSP PA Proposal Debug
         std::vector<std::vector<std::vector<double>>> currentCodonSpecificHyperParameter;
+		std::vector<std::vector<double>> currentLambdaParameter;
 
 		std::vector<unsigned> mixtureAssignment;
 		std::vector<std::string> groupList;
@@ -288,6 +290,7 @@ class Parameter {
 		std::vector<double> std_csp;
 
 
+        //Unknown indexing hoping (mixture) then gene
 		std::vector<std::vector<double>> proposedSynthesisRateLevel;
 		std::vector<std::vector<double>> currentSynthesisRateLevel;
 		std::vector<std::vector<unsigned>> numAcceptForSynthesisRate;
