@@ -18,6 +18,8 @@ class PAModel: public Model
 
 		double calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
 				unsigned currRFPValue, unsigned currNumCodonsInMRNA, double phiValue);
+        double ExpectedZ;
+        double Y;
 
 
 	public:
@@ -115,6 +117,9 @@ class PAModel: public Model
 		virtual double getParameterForCategory(unsigned category, unsigned param, std::string codon, bool proposal);
 
 	protected:
+        //debug
+        double calculateExpectedZ(Genome &genome);
+        double calculateY(Genome &genome);
 };
 
 #endif // PAModel_H
