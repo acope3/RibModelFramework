@@ -53,14 +53,13 @@ initializeGenomeObject <- function(file, genome=NULL, observed.expression.file=N
 }
 
 
-#' Get Codon Counts For Each Amino Acid 
+#' Get Codon Counts For all Amino Acids
 #' 
-#' @param aa A one character representation of an amino acid.
 #' 
 #' @param genome A genome object from which the counts of each
 #' codon can be obtained.
 #'  
-#' @return Returns a matrix storing the codonCounts for the given amino acid. 
+#' @return Returns a data.frame storing the codon counts for each amino acid. 
 #' 
 #' @description provides the codon counts for a fiven amino acid across all genes
 #' 
@@ -73,10 +72,20 @@ initializeGenomeObject <- function(file, genome=NULL, observed.expression.file=N
 #'  
 #' ## reading genome
 #' genome <- initializeGenomeObject(file = genome_file)
-#' countsForA <- getCodonCountsForAA("A", genome)
+#' counts <- getCodonCounts(genome)
 #' 
-#' counts <- lapply(X = c("A", "C"), FUN = getCodonCountsForAA, genome = genome)
-#' 
+getCodonCounts <- function(genome){
+  codons <- codons()
+  ORF <- getNames(genome)
+  codonCounts <- lapply(codons, function(codon) {
+      codonCounts <- genome$getCodonCountsPerGene(codon)
+  })
+  codonCounts <- do.call("cbind", codonCounts)
+  colnames(codonCounts) <- codons
+  ORF <- cbind(ORF, codonCounts)
+  return(as.data.frame(ORF))
+}
+
 getCodonCountsForAA <- function(aa, genome){
   # get codon count for aa
   codons <- AAToCodon(aa, F)

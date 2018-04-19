@@ -42,14 +42,14 @@ export(
 "loadParameterObject",
 "getTrace",
 "getSelectionCoefficients",
-#"geom_mean",
+"geomMean",
 
 ## Model object
 "initializeModelObject",
 
 ## Genome object
 "initializeGenomeObject",
-"getCodonCountsForAA",
+"getCodonCounts",
 "getNames",
 "addObservedSynthesisRateSet",
 "getObservedSynthesisRateSet",
