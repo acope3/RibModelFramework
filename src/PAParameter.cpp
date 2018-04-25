@@ -572,7 +572,6 @@ void PAParameter::updateCodonSpecificHyperParameter(std::string grouping, double
     }
 }
 
-
 double PAParameter::calculateExpectedZ(Genome &genome)
 {
     double sum = 0;
@@ -586,13 +585,13 @@ double PAParameter::calculateExpectedZ(Genome &genome)
         SequenceSummary::AAIndexToCodonRange(i, start, end, false);
 
         //Indexing may be off check read mechanism
-        double phi = currentSynthesisRateLevel[i][0];
+        double phi = currentSynthesisRateLevel[0][i];
         for (unsigned j = start; j < end; j++)
         {
             std::string codon = gene.geneData.indexToCodon(j);
             double currCodonCount = gene.getCodonCount(codon);
             double alpha = currentCodonSpecificParameter[alp][0][j];
-            double lambda = currentLambdaParameter[0][j];
+            double lambda = currentCodonSpecificParameter[lmPri][0][i];
 
             sum += (currCodonCount * alpha / lambda);
         }
