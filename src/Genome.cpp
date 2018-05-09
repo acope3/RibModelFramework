@@ -211,9 +211,13 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
 	Gene tmpGene;
 	bool first = true;
 	std::string seq = "";
+    int counter = 0; ////TMP/////
+    my_printError("The count is %\n", counter);
 
 	while (std::getline(Fin, tmp))
 	{
+        counter++;
+        my_printError("The count is %\n", counter);
     // Remove whitespace from the string
     tmp.erase(std::remove_if(tmp.begin(), tmp.end(), 
               std::bind(std::isspace<char>, std::placeholders::_1, std::locale::classic())), tmp.end());
@@ -256,6 +260,7 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
         // Concatenate the sequence based on this number of codons
 		for (unsigned i = 0u; i < codoncount; i++)
 			seq.append(codon);
+            my_printError("The sequence is %\n", seq); 
         
 		unsigned codonIndex = SequenceSummary::codonToIndex(codon);
 		tmpGene.geneData.setRFPValue(codonIndex, rfpcount, 0);
