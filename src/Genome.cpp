@@ -216,8 +216,7 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
 
 	while (std::getline(Fin, tmp))
 	{
-        counter++;
-        my_printError("The count is %\n", counter);
+    counter++;
     // Remove whitespace from the string
     tmp.erase(std::remove_if(tmp.begin(), tmp.end(), 
               std::bind(std::isspace<char>, std::placeholders::_1, std::locale::classic())), tmp.end());
@@ -237,7 +236,7 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
 			tmpGene.setId(prevID);
 			tmpGene.setDescription("No description for PA(NSE) Model");
 			tmpGene.setSequence(seq);
-			addGene(tmpGene, true); //add to genome
+			addGene(tmpGene, false); //add to genome
 			tmpGene.clear();
 			seq = "";
 		}
@@ -260,17 +259,17 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
         // Concatenate the sequence based on this number of codons
 		for (unsigned i = 0u; i < codoncount; i++)
 			seq.append(codon);
-            my_printError("The sequence is %\n", seq); 
         
 		unsigned codonIndex = SequenceSummary::codonToIndex(codon);
 		tmpGene.geneData.setRFPValue(codonIndex, rfpcount, 0);
 		prevID = ID;
 	}
+    my_printError("The count is %\n", counter);
 
 	tmpGene.setId(prevID);
 	tmpGene.setDescription("No description for PA(NSE) Model");
 	tmpGene.setSequence(seq);
-	addGene(tmpGene, true); //add to genome
+	addGene(tmpGene, false); //add to genome
 
 	Fin.close();
 }
