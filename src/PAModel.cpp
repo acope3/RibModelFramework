@@ -534,22 +534,23 @@ void PAModel::updateHyperParameter(unsigned hp)
 }
 
 
+//Commenting out correct values to make fake Genome
 void PAModel::simulateGenome(Genome &genome)
 {
 	for (unsigned geneIndex = 0u; geneIndex < genome.getGenomeSize(); geneIndex++)
 	{
 		unsigned mixtureElement = getMixtureAssignment(geneIndex);
 		Gene gene = genome.getGene(geneIndex);
-		double phi = parameter->getSynthesisRate(geneIndex, mixtureElement, false);
+		double phi = 1;//parameter->getSynthesisRate(geneIndex, mixtureElement, false);
 		Gene tmpGene = gene;
 		for (unsigned codonIndex = 0u; codonIndex < 61; codonIndex++)
 		{
 			std::string codon = SequenceSummary::codonArray[codonIndex];
-			unsigned alphaCat = parameter->getMutationCategory(mixtureElement);
-			unsigned lambdaPrimeCat = parameter->getSelectionCategory(mixtureElement);
+			//unsigned alphaCat = parameter->getMutationCategory(mixtureElement);
+			//unsigned lambdaPrimeCat = parameter->getSelectionCategory(mixtureElement);
 
-			double alpha = getParameterForCategory(alphaCat, PAParameter::alp, codon, false);
-			double lambdaPrime = getParameterForCategory(lambdaPrimeCat, PAParameter::lmPri, codon, false);
+			double alpha = 1;//getParameterForCategory(alphaCat, PAParameter::alp, codon, false);
+			double lambdaPrime = 0.1;//getParameterForCategory(lambdaPrimeCat, PAParameter::lmPri, codon, false);
 
 			double alphaPrime = alpha * gene.geneData.getCodonCountForCodon(codon);
 
@@ -558,12 +559,14 @@ void PAModel::simulateGenome(Genome &genome)
 			NumericVector xx(1);
 			xx = rgamma(1, alphaPrime, 1.0/lambdaPrime);
 			xx = rpois(1, xx[0] * phi);
+            //my_printError("RFP for index % is %\n", codonIndex,xx[0]);
 			tmpGene.geneData.setRFPValue(codonIndex, xx[0], RFPCountColumn);
 #else
 			std::gamma_distribution<double> GDistribution(alphaPrime, 1.0/lambdaPrime);
 			double tmp = GDistribution(Parameter::generator);
 			std::poisson_distribution<unsigned> PDistribution(phi * tmp);
 			unsigned simulatedValue = PDistribution(Parameter::generator);
+            //my_printError("RFP for index % is %\n", codonIndex, simulatedValue);
 			tmpGene.geneData.setRFPValue(codonIndex, simulatedValue, RFPCountColumn);
 #endif
 		}

@@ -298,7 +298,11 @@ unsigned SequenceSummary::getRFPValue(std::string codon, unsigned RFPCountColumn
  */
 unsigned SequenceSummary::getRFPValue(unsigned codonIndex, unsigned RFPCountColumn)
 {
-	if (sumRFPCount.size() < RFPCountColumn + 1) initSumRFPCount(RFPCountColumn + 1);
+	if (sumRFPCount.size() < RFPCountColumn + 1) {
+        initSumRFPCount(RFPCountColumn + 1);
+        //my_printError("RFP Count is initialized\n");
+    }
+    //if (sumRFPCount[RFPCountColumn][codonIndex] != 0) my_printError("The value is %\n", sumRFPCount[RFPCountColumn][codonIndex]);
     return sumRFPCount[RFPCountColumn][codonIndex];
 }
 
@@ -312,6 +316,7 @@ void SequenceSummary::setRFPValue(unsigned codonIndex, unsigned value, unsigned 
 {
     if (sumRFPCount.size() < RFPCountColumn + 1) initSumRFPCount(RFPCountColumn + 1);
     sumRFPCount[RFPCountColumn][codonIndex] = value;
+    //if (value != 0) my_printError("The value is %\n", value);
 }
 
 

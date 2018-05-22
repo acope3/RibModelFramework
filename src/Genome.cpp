@@ -211,12 +211,9 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
 	Gene tmpGene;
 	bool first = true;
 	std::string seq = "";
-    int counter = 0; ////TMP/////
-    my_printError("The count is %\n", counter);
 
 	while (std::getline(Fin, tmp))
 	{
-    counter++;
     // Remove whitespace from the string
     tmp.erase(std::remove_if(tmp.begin(), tmp.end(), 
               std::bind(std::isspace<char>, std::placeholders::_1, std::locale::classic())), tmp.end());
@@ -240,31 +237,30 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
 			tmpGene.clear();
 			seq = "";
 		}
-		
-        //Read rfp count
-		std::size_t pos2 = tmp.find(',', pos + 1);
-        std::string value = tmp.substr(pos + 1, pos2 - (pos + 1));
-		unsigned rfpcount = (unsigned)std::atoi(value.c_str());
-        
-		pos = tmp.find(',', pos2 + 1);
-		value = tmp.substr(pos2 + 1, pos - (pos2 + 1));
-		unsigned codoncount = (unsigned)std::atoi(value.c_str());
-		
-        // Now find codon string: Follows prior comma, guaranteed to be of size 3
+
+		// Now find codon string: Follows prior comma, guaranteed to be of size 3
 		std::string codon = tmp.substr(pos + 1, 3);
 		codon[0] = (char)std::toupper(codon[0]);
 		codon[1] = (char)std::toupper(codon[1]);
 		codon[2] = (char)std::toupper(codon[2]);
-		
-        // Concatenate the sequence based on this number of codons
-		for (unsigned i = 0u; i < codoncount; i++)
+
+		// Next, find the Codon_Count
+		pos += 4;
+		std::size_t pos2 = tmp.find(',', pos + 1);
+		std::string value = tmp.substr(pos + 1, pos2 - (pos + 1));
+		unsigned count = (unsigned)std::atoi(value.c_str());
+
+		// Concatenate the sequence based on this number of codons
+		for (unsigned i = 0u; i < count; i++)
 			seq.append(codon);
-        
+
+		// Finally, get the RFPCount: substring from pos2 + 1 to the end, convert to an unsigned number
+		value = tmp.substr(pos2 + 1);
+		count = (unsigned)std::atoi(value.c_str());
 		unsigned codonIndex = SequenceSummary::codonToIndex(codon);
-		tmpGene.geneData.setRFPValue(codonIndex, rfpcount, 0);
+		tmpGene.geneData.setRFPValue(codonIndex, count, 0);
 		prevID = ID;
 	}
-    my_printError("The count is %\n", counter);
 
 	tmpGene.setId(prevID);
 	tmpGene.setDescription("No description for PA(NSE) Model");
@@ -498,7 +494,7 @@ void Genome::writeRFPData(std::string filename, bool simulated)
 					Fout << codonCount << ",";
 
 					// Simulated sum RFP counts will only print one column! So, we default to column = 0.
-					Fout << currentGene->geneData.getRFPValue(codonIndex, 0) << "\n";
+					Fout << currentGene->geneData.getRFPValue(codonIndex, 1) << "\n";
 				}
 			}
 		}
