@@ -153,7 +153,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
     if (init.csp.variance < 0) {
       stop("init.csp.variance should be positive\n")
     } 
-    if (init.sepsilon < 0) {
+    if (any(init.sepsilon < 0)) {
       stop("init.sepsilon should be positive\n")
     }
   } else {
@@ -1560,27 +1560,27 @@ loadFONSEParameterObject <- function(parameter, files)
 #' 
 #' @return Returns the geometric mean of a vector.
 #' 
-#' @description \code{geomMean} will calculate the geometric mean of a list of numerical values.
+#' @description \code{geom_mean} will calculate the geometric mean of a list of numerical values.
 #' 
 #' @details This function is a special version of the geometric mean specifically for AnaCoda.
 #' Most models in Anacoda assume a log normal distribution for phi values, thus all values in \code{x} are expectd to be positive.
-#' geomMean returns the geometric mean of a vector and can handle 0, negative, or NA values. 
+#' geom_mean returns the geometric mean of a vector and can handle 0, negative, or NA values. 
 #' 
 #' @examples 
 #' x <- c(1, 2, 3, 4)
-#' geomMean(x)
+#' geom_mean(x)
 #' 
 #' y<- c(1, NA, 3, 4, 0, -1)
 #' # Only take the mean of non-Na values greater than 0
-#' geomMean(y)
+#' geom_mean(y)
 #' 
 #' # Replace values <= 0 or NAs with a default value 0.001 and then take the mean
-#' geomMean(y, rm.invalid = FALSE, default = 0.001)
+#' geom_mean(y, rm.invalid = FALSE, default = 0.001)
 #' 
 
 
 
-geomMean <- function(x, rm.invalid = TRUE, default = 1e-5)
+geom_mean <- function(x, rm.invalid = TRUE, default = 1e-5)
 {
   if(!rm.invalid)
   {
