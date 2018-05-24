@@ -50,6 +50,7 @@ export(
 ## Genome object
 "initializeGenomeObject",
 "getCodonCounts",
+"calculeSCUO",
 "getNames",
 "addObservedSynthesisRateSet",
 "getObservedSynthesisRateSet",

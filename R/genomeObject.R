@@ -98,6 +98,54 @@ getCodonCountsForAA <- function(aa, genome){
 
 
 
+#' calculates the synonymous codon usage order (SCUO) 
+#' 
+#' \code{calculeSCUO} calulates the SCUO value for each gene in genome
+#' 
+#' @param genome A genome object initialized with \code{\link{initializeGenomeObject}}.
+#' 
+#' @return returns the SCUO value for each gene in genome
+#' 
+#' @examples 
+#' 
+#' genome_file <- system.file("extdata", "genome.fasta", package = "AnaCoDa")
+#'  
+#' ## reading genome
+#' genome <- initializeGenomeObject(file = genome_file)
+#' scuo <- calculeSCUO(genome)
+#' 
+calculeSCUO <- function(genome)
+{
+  aas <- aminoAcids()
+  genes <- genome$getGenes(F)
+  scuo.values <- data.frame(ORF=getNames(genome), SCUO=rep(NA, length(genome)))
+  for(i in 1:length(genes))
+  {
+    g <- genes[[i]]
+    total.aa.count <- g$length()/3
+    
+    scuo.per.aa <- unlist(lapply(X = aas, FUN = function(aa)
+    {
+      codon <- AAToCodon(aa = aa, focal = F)
+      num.codons <- length(codon)
+      aa.count <- g$getAACount(aa)
+      if(aa.count == 0) return(0)
+      
+      codon.count <- unlist(lapply(codon, FUN = function(c){return(g$getCodonCount(c))}))
+      codon.propotions <- codon.count / aa.count
+      aa.entropy <- sum(codon.propotions * log(codon.propotions))
+      
+      max.entropy <- -log(1/num.codons)
+      norm.entropy.diff <- (max.entropy - aa.entropy) / max.entropy
+      
+      comp.ratio <- aa.count / total.aa.count
+      scuo.aa <- comp.ratio * norm.entropy.diff
+      return(scuo.aa)
+    }))
+    scuo.values[i] <- sum(scuo.per.aa)
+  }
+}
+
 #' Length of Genome
 #' 
 #' \code{length} gives the length of a genome
