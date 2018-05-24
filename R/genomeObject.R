@@ -36,7 +36,7 @@
 #' genome <- initializeGenomeObject(file = genome_file)
 #' genome <- initializeGenomeObject(file = genes_file, genome = genome, append = TRUE)   
 #' 
-initializeGenomeObject <- function(file, genome=NULL, observed.expression.file=NULL, fasta=TRUE, match.expression.by.id=TRUE, append=FALSE) {
+initializeGenomeObject <- function(file, genome=NULL, observed.expression.file=NULL, fasta=TRUE, simulated = FALSE, match.expression.by.id=TRUE, append=FALSE) {
   if (is.null(genome)){ 
     genome <- new(Genome)
   }
@@ -44,7 +44,11 @@ initializeGenomeObject <- function(file, genome=NULL, observed.expression.file=N
   if (fasta == TRUE) {
     genome$readFasta(file, append)
   } else {
-    genome$readRFPData(file, append)
+    if (simulated == TRUE){
+        genome$readSimRFPData(file)
+    } else{
+        genome$readRFPData(file, append)
+    }
   }
   if(!is.null(observed.expression.file)) {
     genome$readObservedPhiValues(observed.expression.file, match.expression.by.id)
