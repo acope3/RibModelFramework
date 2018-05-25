@@ -127,7 +127,7 @@ void PAModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grou
 
 		double currAlpha = getParameterForCategory(alphaCategory, PAParameter::alp, grouping, false);
 		double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, grouping, false);
-        currLambdaPrime *= (ExpectedZ/Y);
+        //currLambdaPrime *= (ExpectedZ/Y);
 
 		double propAlpha = getParameterForCategory(alphaCategory, PAParameter::alp, grouping, true);
 		double propLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, grouping, true);
@@ -534,32 +534,31 @@ void PAModel::updateHyperParameter(unsigned hp)
 }
 
 
-//Commenting out correct values to make fake Genome
 void PAModel::simulateGenome(Genome &genome)
 {
 	for (unsigned geneIndex = 0u; geneIndex < genome.getGenomeSize(); geneIndex++)
 	{
 		unsigned mixtureElement = getMixtureAssignment(geneIndex);
 		Gene gene = genome.getGene(geneIndex);
-		double phi = 1;//parameter->getSynthesisRate(geneIndex, mixtureElement, false);
+		double phi = parameter->getSynthesisRate(geneIndex, mixtureElement, false);
 		Gene tmpGene = gene;
 		for (unsigned codonIndex = 0u; codonIndex < 61; codonIndex++)
 		{
 			std::string codon = SequenceSummary::codonArray[codonIndex];
-			//unsigned alphaCat = parameter->getMutationCategory(mixtureElement);
-			//unsigned lambdaPrimeCat = parameter->getSelectionCategory(mixtureElement);
+			unsigned alphaCat = parameter->getMutationCategory(mixtureElement);
+			unsigned lambdaPrimeCat = parameter->getSelectionCategory(mixtureElement);
 
-			double alpha = 1;//getParameterForCategory(alphaCat, PAParameter::alp, codon, false);
-			double lambdaPrime = 0.1;//getParameterForCategory(lambdaPrimeCat, PAParameter::lmPri, codon, false);
+			double alpha = getParameterForCategory(alphaCat, PAParameter::alp, codon, false);
+			double lambdaPrime = getParameterForCategory(lambdaPrimeCat, PAParameter::lmPri, codon, false);
 
 			double alphaPrime = alpha * gene.geneData.getCodonCountForCodon(codon);
 
 #ifndef STANDALONE
 			RNGScope scope;
 			NumericVector xx(1);
-			xx = rgamma(1, alphaPrime, 1.0/lambdaPrime);
+			xx = rgamma(1, alphaPrime, /*1.0*/lambdaPrime);
 			xx = rpois(1, xx[0] * phi);
-            //my_printError("RFP for index % is %\n", codonIndex,xx[0]);
+            my_printError("RFP for index % is %\n", codonIndex,xx[0]);
 			tmpGene.geneData.setRFPValue(codonIndex, xx[0], RFPCountColumn);
 #else
 			std::gamma_distribution<double> GDistribution(alphaPrime, 1.0/lambdaPrime);
