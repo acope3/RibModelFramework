@@ -729,7 +729,7 @@ void ROCModel::simulateGenome(Genome &genome)
 void ROCModel::printHyperParameters()
 {
 	for (unsigned i = 0u; i < getNumSynthesisRateCategories(); i++)
-		my_print("\t Current stdDevSynthesisRate estimate for selection category %: %\n", i, getStdDevSynthesisRate(i, false));
+		my_print("\t current stdDevSynthesisRate estimate for selection category %: %\n", i, getStdDevSynthesisRate(i, false));
 
 	my_print("\t current stdDevSynthesisRate proposal width: %\n", getCurrentStdDevSynthesisRateProposalWidth());
 
