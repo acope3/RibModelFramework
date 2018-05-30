@@ -42,7 +42,7 @@ export(
 "loadParameterObject",
 "getTrace",
 "getSelectionCoefficients",
-"geomMean",
+"geom_mean",
 
 ## Model object
 "initializeModelObject",
