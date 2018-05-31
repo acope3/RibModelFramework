@@ -36,7 +36,8 @@
 #' genome <- initializeGenomeObject(file = genome_file)
 #' genome <- initializeGenomeObject(file = genes_file, genome = genome, append = TRUE)   
 #' 
-initializeGenomeObject <- function(file, genome=NULL, observed.expression.file=NULL, fasta=TRUE, simulated = FALSE, match.expression.by.id=TRUE, append=FALSE) {
+initializeGenomeObject <- function(file, genome=NULL, observed.expression.file=NULL, fasta=TRUE, simulated = FALSE, 
+                                   match.expression.by.id=TRUE, append=FALSE) {
   if (is.null(genome)){ 
     genome <- new(Genome)
   }

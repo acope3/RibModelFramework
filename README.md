@@ -3,7 +3,7 @@
 # AnaCoDa
 
 * AnaCoDa is a collection of codon models. 
-* the release version can be obtained from ...
+* The release version can be obtained from https://cran.r-project.org/web/packages/AnaCoDa/index.html
 
 
 # Examples: Running models

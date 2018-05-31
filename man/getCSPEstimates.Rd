@@ -5,7 +5,7 @@
 \title{Return Codon Specific Paramters (or write to csv) estimates as data.frame}
 \usage{
 getCSPEstimates(parameter, filename = NULL, CSP = "Mutation", mixture = 1,
-  samples = 10)
+  samples = 10, optref = FALSE)
 }
 \arguments{
 \item{parameter}{parameter an object created by \code{initializeParameterObject}.}
@@ -17,6 +17,9 @@ getCSPEstimates(parameter, filename = NULL, CSP = "Mutation", mixture = 1,
 \item{mixture}{estimates for which mixture should be returned}
 
 \item{samples}{The number of samples used for the posterior estimates.}
+
+\item{optref}{Boolean determining if the alphabetically last codon, or the
+prefered codon should be used as reference (Defult: FALSE).}
 }
 \value{
 returns a data.frame with the posterior estimates of the models 
