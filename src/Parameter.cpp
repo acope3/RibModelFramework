@@ -2182,7 +2182,7 @@ std::vector<double> Parameter::getCurrentSynthesisRateForMixture(unsigned mixtur
  * To implement the R version of this function, the index is also checked.
  * This is the R-wrapper for the C-side function "getCodonSpecificPosteriorMean".
 */
-double Parameter::getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon,
+double Parameter::getCodonSpecificPosteriorMeanForCodon(std::string codon, unsigned mixtureElement, unsigned samples,
 	unsigned paramType, bool withoutReference)
 {
 	double rv = -1.0;
@@ -2198,7 +2198,7 @@ double Parameter::getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement,
 }
 
 
-double Parameter::getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon,
+double Parameter::getCodonSpecificVarianceForCodon(std::string codon,unsigned mixtureElement, unsigned samples, 
 	unsigned paramType, bool unbiased, bool withoutReference)
 {
 	double rv = -1.0;
@@ -2214,8 +2214,8 @@ double Parameter::getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsi
 }
 
 
-std::vector<double> Parameter::getCodonSpecificQuantileForCodon(unsigned mixtureElement, unsigned samples,
-	std::string &codon, unsigned paramType, std::vector<double> probs, bool withoutReference)
+std::vector<double> Parameter::getCodonSpecificQuantileForCodon(std::string &codon, unsigned mixtureElement, unsigned samples, 
+	unsigned paramType, std::vector<double> probs, bool withoutReference)
 {
 	std::vector<double> rv;
 	codon[0] = (char)std::toupper(codon[0]);

@@ -491,11 +491,11 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
   {
     codons <- codons[which(codons %in% unlist(lapply(X = names.aa,FUN = AAToCodon,T)))]
   }
-  param.1[codons,"Posterior"] <- unlist(lapply(codons,parameter$getCodonSpecificPosteriorMean,mixture,samples,0,wo.ref))
-  param.2[codons,"Posterior"] <- unlist(lapply(codons,parameter$getCodonSpecificPosteriorMean,mixture,samples,1,wo.ref))
+  param.1[codons,"Posterior"] <- unlist(lapply(codons,parameter$getCodonSpecificPosteriorMean,mixtureElement=mixture,samples=samples,paramType=0,withoutReference=wo.ref))
+  param.2[codons,"Posterior"] <- unlist(lapply(codons,parameter$getCodonSpecificPosteriorMean,mixtureElement=mixture,samples=samples,paramType=1,withoutReference=wo.ref))
   
-  quantile.param.1 <- unlist(lapply(codons,parameter$getCodonSpecificQuantile,mixture, samples,0, c(0.025, 0.975),wo.ref))
-  quantile.param.2 <- unlist(lapply(codons,parameter$getCodonSpecificQuantile,mixture, samples,1, c(0.025, 0.975),wo.ref))
+  quantile.param.1 <- unlist(lapply(codons,parameter$getCodonSpecificQuantile,mixtureElement=mixture, samples=samples,paramType=0, probs=c(0.025, 0.975),withoutReference=wo.ref))
+  quantile.param.2 <- unlist(lapply(codons,parameter$getCodonSpecificQuantile,mixtureElement=mixture, samples=samples,paramType=1, probs=c(0.025, 0.975),withoutReference=wo.ref))
   
   quantile.param.1<- matrix(quantile.param.1, nrow = 2)
   quantile.param.2 <- matrix(quantile.param.2, nrow = 2) 
@@ -528,6 +528,7 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
   }
 }
 
+## NOT EXPOSED
 rescaleCSPEstimates<- function(param.1,param.2,parameter.names,report.original.ref)
 {
   rescale.param.1 <- data.frame()
@@ -567,6 +568,7 @@ rescaleCSPEstimates<- function(param.1,param.2,parameter.names,report.original.r
   return(csp.param)
 }
 
+## NOT EXPOSED
 checkModel <- function(parameter)
 {
   class.type = class(parameter)
