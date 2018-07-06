@@ -45,7 +45,7 @@ export(
 "getTrace",
 "findOptimalCodon",
 "getSelectionCoefficients",
-"geom_mean",
+"geomMean",
 
 ## Model object
 "initializeModelObject",
