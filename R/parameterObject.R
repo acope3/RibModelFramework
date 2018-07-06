@@ -236,7 +236,7 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
     observed.phi <- getObservedSynthesisRateSet(genome)
     if (ncol(observed.phi)-1 > 1)
     {
-      observed.phi <- apply(observed.phi[,2:ncol(observed.phi)],geom_mean,MARGIN = 1)
+      observed.phi <- apply(observed.phi[,2:ncol(observed.phi)],geomMean,MARGIN = 1)
     }
     else
     {
@@ -299,7 +299,7 @@ initializePAParameterObject <- function(genome, sphi, numMixtures, geneAssignmen
     observed.phi <- getObservedSynthesisRateSet(genome)
     if (ncol(observed.phi)-1 > 1)
     {
-      observed.phi <- apply(observed.phi[,2:ncol(observed.phi)],geom_mean,MARGIN = 1)
+      observed.phi <- apply(observed.phi[,2:ncol(observed.phi)],geomMean,MARGIN = 1)
     }
     else
     {
@@ -352,7 +352,7 @@ initializePANSEParameterObject <- function(genome, sphi, numMixtures, geneAssign
     observed.phi <- getObservedSynthesisRateSet(genome)
     if (ncol(observed.phi)-1 > 1)
     {
-      observed.phi <- apply(observed.phi[,2:ncol(observed.phi)],geom_mean,MARGIN = 1)
+      observed.phi <- apply(observed.phi[,2:ncol(observed.phi)],geomMean,MARGIN = 1)
     }
     else
     {
@@ -404,7 +404,7 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
     observed.phi <- getObservedSynthesisRateSet(genome)
     if (ncol(observed.phi)-1 > 1)
     {
-      observed.phi <- apply(observed.phi[,2:ncol(observed.phi)],geom_mean,MARGIN = 1)
+      observed.phi <- apply(observed.phi[,2:ncol(observed.phi)],geomMean,MARGIN = 1)
     }
     else
     {
@@ -1641,24 +1641,24 @@ loadFONSEParameterObject <- function(parameter, files)
 #' 
 #' @return Returns the geometric mean of a vector.
 #' 
-#' @description \code{geom_mean} will calculate the geometric mean of a list of numerical values.
+#' @description \code{geomMean} will calculate the geometric mean of a list of numerical values.
 #' 
 #' @details This function is a special version of the geometric mean specifically for AnaCoda.
 #' Most models in Anacoda assume a log normal distribution for phi values, thus all values in \code{x} are expectd to be positive.
-#' geom_mean returns the geometric mean of a vector and can handle 0, negative, or NA values. 
+#' geomMean returns the geometric mean of a vector and can handle 0, negative, or NA values. 
 #' 
 #' @examples 
 #' x <- c(1, 2, 3, 4)
-#' geom_mean(x)
+#' geomMean(x)
 #' 
 #' y<- c(1, NA, 3, 4, 0, -1)
 #' # Only take the mean of non-Na values greater than 0
-#' geom_mean(y)
+#' geomMean(y)
 #' 
 #' # Replace values <= 0 or NAs with a default value 0.001 and then take the mean
-#' geom_mean(y, rm.invalid = FALSE, default = 0.001)
+#' geomMean(y, rm.invalid = FALSE, default = 0.001)
 #' 
-geom_mean <- function(x, rm.invalid = TRUE, default = 1e-5)
+geomMean <- function(x, rm.invalid = TRUE, default = 1e-5)
 {
   if(!rm.invalid)
   {
