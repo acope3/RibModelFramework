@@ -1,7 +1,13 @@
 #include "include/MCMCAlgorithm.h"
 #include "include/Testing.h"
-#include <vector>
 #include "include/SequenceSummary.h"
+#include <vector>
+#include <iostream>
+#include <cstdio>
+#include <cstdlib>
+
+#define CEDRIC
+#define STANDALONE
 
 #ifdef CEDRIC
 int main()
@@ -24,12 +30,12 @@ int main()
 	bool withPhi = true;
 
 	Genome genome;
-	genome.readFasta("/home/clandere/CodonUsageBias/R_roctest/bioinf_test_data/second_run/genome1/sim_oneMix_id_1_csp_-1_1_sphi_0.5.fasta");
+	genome.readFasta("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/tests/testthat/UnitTestingData/testMCMCROCFiles/simulatedAllUniqueR.fasta");
 	//genome.readFasta("F:/GitHub/RibModelDev/data/twoMixtures/simulatedAllUniqueR.fasta");
 	//genome.readFasta("E:/RibosomeModel/RibModelDev/data/twoMixtures/simulatedAllUniqueR_unevenMixtures.fasta");
 	if(withPhi)
 	{
-		genome.readObservedPhiValues("/home/clandere/CodonUsageBias/R_roctest/bioinf_test_data/second_run/genome1/sim_oneMix_id_1_sphi_0.5_aphi_1_seps_1.csv", false);
+		genome.readObservedPhiValues("/home/clandere/CodonUsageBias/RibosomeModel/RibModelFramework/tests/testthat/UnitTestingData/testMCMCROCFiles/simulatedAllUniqueR_phi_withPhiSet.csv", false);
 		//genome.readObservedPhiValues("E:/RibosomeModel/RibModelDev/data/twoMixtures/simulatedAllUniqueR_phi_unevenMixtures.csv", false);
 	}
 

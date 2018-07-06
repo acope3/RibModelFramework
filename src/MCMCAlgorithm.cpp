@@ -209,6 +209,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
                 my_print("exp(curr logLik - maxVal): %\n", std::exp(unscaledLogProb_curr_singleMixture[k]));
                 my_print("Max Val. %\n", maxValue);
                 my_print("\n\n\n");
+		break;
             }
             unscaledLogProb_curr_singleMixture[k] += maxValue;
 		}
