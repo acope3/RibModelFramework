@@ -88,6 +88,10 @@ void Genome::readFasta(std::string filename, bool append)
 			std::string tempSeq = "";
 			while (true)
 			{
+			    #ifndef STANDALONE
+			    Rcpp::checkUserInterrupt();
+			    #endif
+
 				// read a new line in every cycle
 				std::getline(Fin, buf);
 				/* The new line is marked with an integer, which corresponds
@@ -214,6 +218,10 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
 
 	while (std::getline(Fin, tmp))
 	{
+            #ifndef STANDALONE
+            Rcpp::checkUserInterrupt();
+            #endif
+
     // Remove whitespace from the string
     tmp.erase(std::remove_if(tmp.begin(), tmp.end(), 
               std::bind(std::isspace<char>, std::placeholders::_1, std::locale::classic())), tmp.end());
@@ -330,6 +338,11 @@ void Genome::readRFPData(std::string filename, bool append)
 			//Now for each line associated with a gene ID, set the string appropriately
 			while (std::getline(Fin, tmp))
 			{
+
+            #ifndef STANDALONE
+            Rcpp::checkUserInterrupt();
+            #endif
+
         // Remove whitespace from the string
         tmp.erase(std::remove_if(tmp.begin(), tmp.end(), 
                   std::bind(std::isspace<char>, std::placeholders::_1, std::locale::classic())), tmp.end());
@@ -544,6 +557,10 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
                 bool first = true;
                 while (std::getline(input, tmp))
 				{
+
+            #ifndef STANDALONE
+            Rcpp::checkUserInterrupt();
+            #endif
                     std::size_t pos = tmp.find(',');
                     std::string geneID = tmp.substr(0, pos);
                     std::map<std::string, Gene *>::iterator it;
