@@ -41,9 +41,6 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thinning(1), adaptiveWidth(100 *
 	posteriorTrace.resize(samples + 1); // +1 for storing initial evaluation
 	likelihoodTrace.resize(samples + 1);
 
-    ratioTrace.resize(samples + 1);
-
-
     writeRestartFile = false;
 	multipleFiles = false;
 	fileWriteInterval = 1u;
@@ -340,9 +337,8 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 		// calculate likelihood ratio for every Category for current AA
 		model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures);
 		//logPosterior += model.calculateAllPriors();
-        double random = -Parameter::randExp(1);
 
-		if ( random < acceptanceRatioForAllMixtures[0])
+		if (-Parameter::randExp(1) < acceptanceRatioForAllMixtures[0])
 		{
 			// moves proposed codon specific parameters to current codon specific parameters
 			posterior = acceptanceRatioForAllMixtures[4]; //unassigned will be 0
@@ -365,7 +361,6 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 		}
 		if ((iteration % thinning) == 0)
 		{
-            model.updateCodonSpecificHyperParameter(grouping, random);
 			model.updateCodonSpecificParameterTrace(iteration/thinning, grouping);
 		}
 	}

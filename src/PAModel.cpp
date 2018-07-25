@@ -32,7 +32,6 @@ double PAModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double c
 	double logLikelihood = ((std::lgamma((currNumCodonsInMRNA * currAlpha) + currRFPValue)) - (std::lgamma(currNumCodonsInMRNA * currAlpha)))
 						   + (currRFPValue * (std::log(phiValue) - std::log(currLambdaPrime + phiValue)))
 						   + ((currNumCodonsInMRNA * currAlpha) * (std::log(currLambdaPrime) - std::log(currLambdaPrime + phiValue)));
-    //my_print("alpha = % \n lambda = % \n phivalue = % \n loglikelihood % \n", currAlpha, currLambdaPrime, phiValue, logLikelihood);
 
 	return logLikelihood;
 }
@@ -84,11 +83,11 @@ void PAModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex,
 	double currentLogPosterior = (logLikelihood + logPhiProbability);
 	double proposedLogPosterior = (logLikelihood_proposed + logPhiProbability_proposed);
 
-	CSHyperParameters[0] = logProbabilityRatio[0] = (proposedLogPosterior - currentLogPosterior) - (std::log(phiValue) - std::log(phiValue_proposed));//Is recalulcated in MCMC
-	CSHyperParameters[1] = logProbabilityRatio[1] = currentLogPosterior - std::log(phiValue_proposed);
-	CSHyperParameters[2] = logProbabilityRatio[2] = proposedLogPosterior - std::log(phiValue);
-	CSHyperParameters[3] = logProbabilityRatio[3] = currentLogPosterior;
-	CSHyperParameters[4] = logProbabilityRatio[4] = proposedLogPosterior;
+	logProbabilityRatio[0] = (proposedLogPosterior - currentLogPosterior) - (std::log(phiValue) - std::log(phiValue_proposed));//Is recalulcated in MCMC
+	logProbabilityRatio[1] = currentLogPosterior - std::log(phiValue_proposed);
+	logProbabilityRatio[2] = proposedLogPosterior - std::log(phiValue);
+	logProbabilityRatio[3] = currentLogPosterior;
+	logProbabilityRatio[4] = proposedLogPosterior;
 	logProbabilityRatio[5] = logLikelihood;
 	logProbabilityRatio[6] = logLikelihood_proposed;
 
@@ -100,8 +99,6 @@ void PAModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grou
 {
 	double logLikelihood = 0.0;
 	double logLikelihood_proposed = 0.0;
-    ExpectedZ =  calculateExpectedZ(genome);
-    Y = calculateY(genome);
 	Gene *gene;
 	unsigned index = SequenceSummary::codonToIndex(grouping);
 
@@ -127,7 +124,6 @@ void PAModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grou
 
 		double currAlpha = getParameterForCategory(alphaCategory, PAParameter::alp, grouping, false);
 		double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, grouping, false);
-        currLambdaPrime *= (ExpectedZ/Y);
 
 		double propAlpha = getParameterForCategory(alphaCategory, PAParameter::alp, grouping, true);
 		double propLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, grouping, true);
@@ -372,12 +368,6 @@ void PAModel::updateCodonSpecificParameterTrace(unsigned sample, std::string cod
 	parameter->updateCodonSpecificParameterTrace(sample, codon);
 }
 
-void PAModel::updateCodonSpecificHyperParameter(std::string aa, double randomNumber)
-{
-	parameter->updateCodonSpecificHyperParameter(aa, randomNumber, CSHyperParameters[0], CSHyperParameters[3], CSHyperParameters[4],
-        CSHyperParameters[1],CSHyperParameters[2]);
-}
-
 
 void PAModel::updateHyperParameterTraces(unsigned sample)
 {
@@ -542,6 +532,7 @@ void PAModel::simulateGenome(Genome &genome)
 		Gene gene = genome.getGene(geneIndex);
 		double phi = parameter->getSynthesisRate(geneIndex, mixtureElement, false);
 		Gene tmpGene = gene;
+        unsigned sumRFP;
 		for (unsigned codonIndex = 0u; codonIndex < 61; codonIndex++)
 		{
 			std::string codon = SequenceSummary::codonArray[codonIndex];
@@ -558,6 +549,7 @@ void PAModel::simulateGenome(Genome &genome)
 			NumericVector xx(1);
 			xx = rgamma(1, alphaPrime, 1.0/lambdaPrime);
 			xx = rpois(1, xx[0] * phi);
+            my_printError("RFP for index % is %\n", codonIndex,xx[0]);
 			tmpGene.geneData.setRFPValue(codonIndex, xx[0], RFPCountColumn);
 #else
 			std::gamma_distribution<double> GDistribution(alphaPrime, 1.0/lambdaPrime);
@@ -608,24 +600,8 @@ double PAModel::calculateAllPriors()
 	return 0.0; //TODO(Cedric): implement me, see ROCModel
 }
 
-//TODO: Debug Function
-double PAModel::calculateExpectedZ(Genome &genome)
-{
-    return parameter->calculateExpectedZ(genome);
-}
-
 double PAModel::getParameterForCategory(unsigned category, unsigned param, std::string codon, bool proposal)
 {
 	return parameter->getParameterForCategory(category, param, codon, proposal);
 }
 
-//DEBUG function
-double PAModel::calculateY(Genome &genome)
-{
-    std::vector <Gene> tmp = genome.getGenes();
-    int sum = 0;
-    for (unsigned i = 0u; i < genome.getGenomeSize(); i++){
-        sum += tmp[i].getTotalRFPCount();    
-    }
-    return sum;
-}

@@ -543,19 +543,6 @@ std::vector <unsigned> Gene::getCodonPositions(std::string codon)
     return rv;
 }
 
-//Debug
-int Gene::getTotalRFPCount()
-{
-    std::vector <int> rfpCounts = getRFPCount();
-    int sum = 0;
-
-    for (unsigned i = 0u; i < rfpCounts.size(); i++){
-        sum += rfpCounts[i];
-    }
-
-    return sum;
-}
-
 
 
 
