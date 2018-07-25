@@ -492,9 +492,15 @@ void PAParameter::proposeCodonSpecificParameter()
 	{
 		for (unsigned j = 0; j < numLambdaPrime; j++)
 		{
-			proposedCodonSpecificParameter[lmPri][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[lmPri][i][j]) , std_csp[j]) );
+			double l = proposedCodonSpecificParameter[lmPri][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[lmPri][i][j]) , std_csp[j]) );
 		}
-	}
+	}/*
+    if (std::isnan(l) || std::isnan(a)){
+        div_flag = TRUE;
+        bool isAlpha = isnan(a);
+        my_print("First divergence is alpha %\n The Current state is:
+        \n", isAlpha);
+    }*/
 }
 
 

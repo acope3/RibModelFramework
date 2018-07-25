@@ -11,6 +11,7 @@
 #include <fstream>
 #include <sstream>
 #include <cmath>
+#include <functional>
 
 #ifndef STANDALONE
 #include <Rcpp.h>

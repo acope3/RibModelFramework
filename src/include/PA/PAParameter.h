@@ -20,6 +20,7 @@ class PAParameter: public Parameter {
 
 		std::vector<std::vector<double>> lambdaValues; //Currently not used.
 		double bias_csp;
+        bool div_flag;
 
 	public:
 		static const unsigned dalpha;

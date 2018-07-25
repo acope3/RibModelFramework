@@ -98,6 +98,8 @@ void PAModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grou
                                                                 std::vector<double> &logAcceptanceRatioForAllMixtures)
 {
 	double logLikelihood = 0.0;
+    double currAlpha, currLambdaPrime;
+    double propAlpha, propLambdaPrime;
 	double logLikelihood_proposed = 0.0;
 	Gene *gene;
 	unsigned index = SequenceSummary::codonToIndex(grouping);
@@ -122,19 +124,20 @@ void PAModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grou
 		if (currNumCodonsInMRNA == 0) continue;
 
 
-		double currAlpha = getParameterForCategory(alphaCategory, PAParameter::alp, grouping, false);
-		double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, grouping, false);
+		currAlpha = getParameterForCategory(alphaCategory, PAParameter::alp, grouping, false);
+		currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, grouping, false);
 
-		double propAlpha = getParameterForCategory(alphaCategory, PAParameter::alp, grouping, true);
-		double propLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, grouping, true);
+		propAlpha = getParameterForCategory(alphaCategory, PAParameter::alp, grouping, true);
+		propLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, grouping, true);
 
 
 		logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPValue, currNumCodonsInMRNA, phiValue);
 		logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambdaPrime, currRFPValue, currNumCodonsInMRNA, phiValue);
 	}
-	logAcceptanceRatioForAllMixtures[0] = logLikelihood_proposed - logLikelihood;
-	logAcceptanceRatioForAllMixtures[1] = logLikelihood;
-	logAcceptanceRatioForAllMixtures[2] = logLikelihood_proposed;
+	logAcceptanceRatioForAllMixtures[0] = logLikelihood_proposed - logLikelihood - ((std::log(currAlpha) + std::log(currLambdaPrime))
+                                                                                                        - (std::log(propAlpha) + std::log(propLambdaPrime)));
+	logAcceptanceRatioForAllMixtures[1] = logLikelihood - (std::log(propAlpha) + std::log(propLambdaPrime));
+	logAcceptanceRatioForAllMixtures[2] = logLikelihood_proposed - (std::log(currAlpha) + std::log(currLambdaPrime));
 	logAcceptanceRatioForAllMixtures[3] = logLikelihood;
 	logAcceptanceRatioForAllMixtures[4] = logLikelihood_proposed;
 }
@@ -532,7 +535,6 @@ void PAModel::simulateGenome(Genome &genome)
 		Gene gene = genome.getGene(geneIndex);
 		double phi = parameter->getSynthesisRate(geneIndex, mixtureElement, false);
 		Gene tmpGene = gene;
-        unsigned sumRFP;
 		for (unsigned codonIndex = 0u; codonIndex < 61; codonIndex++)
 		{
 			std::string codon = SequenceSummary::codonArray[codonIndex];
@@ -549,10 +551,9 @@ void PAModel::simulateGenome(Genome &genome)
 			NumericVector xx(1);
 			xx = rgamma(1, alphaPrime, 1.0/lambdaPrime);
 			xx = rpois(1, xx[0] * phi);
-            my_printError("RFP for index % is %\n", codonIndex,xx[0]);
 			tmpGene.geneData.setRFPValue(codonIndex, xx[0], RFPCountColumn);
 #else
-			std::gamma_distribution<double> GDistribution(alphaPrime, 1.0/lambdaPrime);
+			std::gamma_distribution<double> GDistribution(alphaPrime,1.0/lambdaPrime);
 			double tmp = GDistribution(Parameter::generator);
 			std::poisson_distribution<unsigned> PDistribution(phi * tmp);
 			unsigned simulatedValue = PDistribution(Parameter::generator);
@@ -568,9 +569,9 @@ void PAModel::printHyperParameters()
 {
 	for (unsigned i = 0u; i < getNumSynthesisRateCategories(); i++)
 	{
-		//my_print("stdDevSynthesisRate posterior estimate for selection category %: %\n", i, parameter->getStdDevSynthesisRate(i));
+		my_print("stdDevSynthesisRate posterior estimate for selection category %: %\n", i, parameter->getStdDevSynthesisRate(i));
 	}
-	//my_print("\t current stdDevSynthesisRate proposal width: %\n", getCurrentStdDevSynthesisRateProposalWidth());
+	my_print("\t current stdDevSynthesisRate proposal width: %\n", getCurrentStdDevSynthesisRateProposalWidth());
 }
 
 
@@ -600,8 +601,8 @@ double PAModel::calculateAllPriors()
 	return 0.0; //TODO(Cedric): implement me, see ROCModel
 }
 
+
 double PAModel::getParameterForCategory(unsigned category, unsigned param, std::string codon, bool proposal)
 {
 	return parameter->getParameterForCategory(category, param, codon, proposal);
 }
-
