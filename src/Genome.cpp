@@ -241,7 +241,7 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
 			tmpGene.setId(prevID);
 			tmpGene.setDescription("No description for PA(NSE) Model");
 			tmpGene.setSequence(seq);
-			addGene(tmpGene, true); //add to genome
+			addGene(tmpGene, false); //add to genome
 			tmpGene.clear();
 			seq = "";
 		}
@@ -273,7 +273,7 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
 	tmpGene.setId(prevID);
 	tmpGene.setDescription("No description for PA(NSE) Model");
 	tmpGene.setSequence(seq);
-	addGene(tmpGene, true); //add to genome
+	addGene(tmpGene, false); //add to genome
 
 	Fin.close();
 }
