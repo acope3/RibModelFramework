@@ -337,8 +337,13 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 		// calculate likelihood ratio for every Category for current AA
 		model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures);
 		//logPosterior += model.calculateAllPriors();
-
-		if (-Parameter::randExp(1) < acceptanceRatioForAllMixtures[0])
+        double threshold = -Parameter::randExp(1);
+        if ((iteration % thinning) == 0)
+        {
+            my_print("The returned logLikelihood Ratio is: %\n", acceptanceRatioForAllMixtures[0]);
+            my_print("The Returned Threshhold is: %\n", threshold);
+        }
+		if (threshold < acceptanceRatioForAllMixtures[0] && std::isfinite(acceptanceRatioForAllMixtures[0]))
 		{
 			// moves proposed codon specific parameters to current codon specific parameters
 			posterior = acceptanceRatioForAllMixtures[4]; //unassigned will be 0

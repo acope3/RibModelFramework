@@ -34,6 +34,10 @@ class SequenceSummary
 		// outer index is the RFPCount for the category specified via index
 		// inner index, 64, is the number of codons
 
+        std::vector <std::array <unsigned, 64>> sumSimRFPCount;
+        // outer index is the RFPCount for the category specified via index
+        // inner index, 64, is the number of codons
+
 		std::vector <unsigned> positionCodonID;
 		// index is the number of position, where a value (codonID) is set
 
@@ -73,8 +77,8 @@ class SequenceSummary
 		std::vector <int> getRFPCount(unsigned RFPCountColumn = 0u);
 		int getSingleRFPCount(unsigned position, unsigned RFPCountColumn = 0u);
 		void setRFPCount(std::vector <int> arg, unsigned RFPCountColumn = 0u);
-		
-        void initSumRFPCount(unsigned numCategories); 
+
+        void initSumRFPCount(unsigned numCategories);
 		std::array <unsigned, 64> getSumRFPCount(unsigned RFPCountColumn = 0u);
 		void setSumRFPCount(std::array <unsigned, 64> arg, unsigned RFPCountColumn = 0u);
 
@@ -85,6 +89,12 @@ class SequenceSummary
         unsigned getRFPValue(std::string codon, unsigned RFPCountColumn = 0u);
         unsigned getRFPValue(unsigned codonIndex, unsigned RFPCountColumn = 0u);
         void setRFPValue(unsigned codonIndex, unsigned value, unsigned RFPCountColumn = 0u);
+
+        //TODO: Adjust naming for getSimRFPValue and sumSimRFPCount
+        void initSumSimRFPCount(unsigned numCategories);
+        unsigned getSimRFPValue(std::string codon, unsigned RFPCountColumn = 0u);
+        unsigned getSimRFPValue(unsigned codonIndex, unsigned RFPCountColumn = 0u);
+        void setSimRFPValue(unsigned codonIndex, unsigned value, unsigned RFPCountColumn = 0u);
 
 		//Other Functions (All tested):
 		void clear();
@@ -113,5 +123,3 @@ class SequenceSummary
 };
 
 #endif // SequenceSummary_H
-
-

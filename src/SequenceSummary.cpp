@@ -314,8 +314,61 @@ void SequenceSummary::setRFPValue(unsigned codonIndex, unsigned value, unsigned 
     sumRFPCount[RFPCountColumn][codonIndex] = value;
 }
 
+//---------------------------------------//
+//---------- Sim RFP Functions ---------//
+//-------------------------------------//
+
+/* initSumSimRFPCount (NOT EXPOSED)
+ * Arguments: A number representing the number of RFP categories in simulated data.
+ * Initializes the vector of arrays that describes, for each category, the sumRFPCount vector.
+ * Note: When programming in C, this function should be called before manipulating sumRFPCount.
+ * Reminder: It must be called after setting the sequence, since that function
+ * resets the sequence summary, including the sumRFPCount.
+ */
+void SequenceSummary::initSumSimRFPCount(unsigned numCategories)
+{
+	sumSimRFPCount.resize(numCategories);
+	for (unsigned i = 0; i < numCategories; i++)
+		sumSimRFPCount[i].fill(0);
+}
+
+/* getRFPValue (by codon string) (RCPP EXPOSED VIA WRAPPER)
+ * Arguments: A three-character codon string to get the RFP value of, a number representing the RFP category to return (default 0)
+ * Returns the RFP value of the codon string for the category index specified.
+ * Note: If initSumRFPCount is not called beforehand, it is called now to return a value of 0.
+ * Wrapped by Gene::getSumRFPCountForCodon on the R-side.
+ */
+unsigned SequenceSummary::getSimRFPValue(std::string codon, unsigned RFPCountColumn)
+{
+	if (sumSimRFPCount.size() < RFPCountColumn + 1) initSumSimRFPCount(RFPCountColumn + 1);
+	return sumSimRFPCount[RFPCountColumn][codonToIndex(codon)];
+}
 
 
+/* getRFPValue (by codon index) (NOT EXPOSED)
+ * Arguments: A codon index to get the RFP value of, a number representing the RFP category to return (default 0)
+ * Returns the RFP value at the codon index for the category index specified.
+ * Note: If initSumRFPCount is not called beforehand, it is called now to return a value of 0.
+ */
+unsigned SequenceSummary::getSimRFPValue(unsigned codonIndex, unsigned RFPCountColumn)
+{
+	//if (sumSimRFPCount.size() < RFPCountColumn + 1) initSumSimRFPCount(RFPCountColumn + 1);
+    return sumSimRFPCount[RFPCountColumn][codonIndex];
+
+}
+
+
+/* setRFPValue (NOT EXPOSED)
+ * Arguments: A codon index, the value to set the RFP value to, and a number representing the RFP category (default 0)
+ * Sets the RFP value at the codon index for the category index specified.
+ * Note: If initSumRFPCount is not called beforehand, it is called now to return initialize the vector of vectors.
+ */
+void SequenceSummary::setSimRFPValue(unsigned codonIndex, unsigned value, unsigned RFPCountColumn)
+{
+    if (sumSimRFPCount.size() < RFPCountColumn + 1) initSumSimRFPCount(RFPCountColumn + 1);
+    sumSimRFPCount[RFPCountColumn][codonIndex] = value;
+    //my_printError("The rfp value is %\n", value);
+}
 
 
 //------------------------------------//

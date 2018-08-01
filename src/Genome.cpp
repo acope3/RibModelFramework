@@ -199,6 +199,7 @@ void Genome::writeFasta (std::string filename, bool simulated)
 
 // Recall: Because this is simulated genome data from PAModel's simulateGenome function, it will read in data that
 // disregards position. Codon counts are summed up when setSequence calls processSequence.
+// Note that for debug purposes this reads genome into the non-simulated genome TODO fix that
 void Genome::readSimulatedGenomeFromPAModel(std::string filename)
 {
 	std::ifstream Fin;
@@ -223,7 +224,7 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
             #endif
 
     // Remove whitespace from the string
-    tmp.erase(std::remove_if(tmp.begin(), tmp.end(), 
+    tmp.erase(std::remove_if(tmp.begin(), tmp.end(),
               std::bind(std::isspace<char>, std::placeholders::_1, std::locale::classic())), tmp.end());
 
 		// Find the GeneID
@@ -241,30 +242,30 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
 			tmpGene.setId(prevID);
 			tmpGene.setDescription("No description for PA(NSE) Model");
 			tmpGene.setSequence(seq);
-			addGene(tmpGene, true); //add to genome
+			addGene(tmpGene, false); //add to genome
 			tmpGene.clear();
 			seq = "";
 		}
-		
-        //Read rfp count
-		std::size_t pos2 = tmp.find(',', pos + 1);
-        std::string value = tmp.substr(pos + 1, pos2 - (pos + 1));
-		unsigned rfpcount = (unsigned)std::atoi(value.c_str());
-        
-		pos = tmp.find(',', pos2 + 1);
-		value = tmp.substr(pos2 + 1, pos - (pos2 + 1));
-		unsigned codoncount = (unsigned)std::atoi(value.c_str());
-		
+
         // Now find codon string: Follows prior comma, guaranteed to be of size 3
-		std::string codon = tmp.substr(pos + 1, 3);
-		codon[0] = (char)std::toupper(codon[0]);
-		codon[1] = (char)std::toupper(codon[1]);
-		codon[2] = (char)std::toupper(codon[2]);
-		
+        std::string codon = tmp.substr(pos + 1, 3);
+        codon[0] = (char)std::toupper(codon[0]);
+        codon[1] = (char)std::toupper(codon[1]);
+        codon[2] = (char)std::toupper(codon[2]);
+
+        std::size_t pos2 = pos + 4;
+        pos = tmp.find(",", pos2 + 1);
+        std::string value = tmp.substr(pos2 + 1, pos - (pos2 + 1));
+        unsigned codonCount = (unsigned)std::atoi(value.c_str());
+
         // Concatenate the sequence based on this number of codons
-		for (unsigned i = 0u; i < codoncount; i++)
-			seq.append(codon);
-        
+        for (unsigned i = 0u; i < codonCount; i++)
+            seq.append(codon);
+
+        //Read rfp count
+        value = tmp.substr(pos + 1);
+		unsigned rfpcount = (unsigned)std::atoi(value.c_str());
+
 		unsigned codonIndex = SequenceSummary::codonToIndex(codon);
 		tmpGene.geneData.setRFPValue(codonIndex, rfpcount, 0);
 		prevID = ID;
@@ -273,7 +274,7 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
 	tmpGene.setId(prevID);
 	tmpGene.setDescription("No description for PA(NSE) Model");
 	tmpGene.setSequence(seq);
-	addGene(tmpGene, true); //add to genome
+	addGene(tmpGene, false); //add to genome
 
 	Fin.close();
 }
@@ -344,7 +345,7 @@ void Genome::readRFPData(std::string filename, bool append)
             #endif
 
         // Remove whitespace from the string
-        tmp.erase(std::remove_if(tmp.begin(), tmp.end(), 
+        tmp.erase(std::remove_if(tmp.begin(), tmp.end(),
                   std::bind(std::isspace<char>, std::placeholders::_1, std::locale::classic())), tmp.end());
 
 				pos = tmp.find(',');
@@ -507,7 +508,7 @@ void Genome::writeRFPData(std::string filename, bool simulated)
 					Fout << codonCount << ",";
 
 					// Simulated sum RFP counts will only print one column! So, we default to column = 0.
-					Fout << currentGene->geneData.getRFPValue(codonIndex, 0) << "\n";
+					Fout << currentGene->geneData.getSimRFPValue(codonIndex, 0) << "\n";
 				}
 			}
 		}
@@ -637,7 +638,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
                             my_printError("Please check your file to make sure every gene has a phi value. Filling empty genes ");
                             my_printError("with Missing Value Flag for calculations.\n");
                            	gene->observedSynthesisRateValues.resize(numPhi, -1);
-                            
+
                         }
 
 						// Finally increment numGenesWithPhi based on stored observedSynthesisRateValues
@@ -731,7 +732,7 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
                             my_printError("Please check your file to make sure every gene has a phi value. Filling empty genes ");
                             my_printError("with Missing Value Flag for calculations.\n");
                            	gene->observedSynthesisRateValues.resize(numPhi, -1);
-                            
+
 						}
 
 						// Finally increment numGenesWithPhi based on stored observedSynthesisRateValues
