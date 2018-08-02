@@ -32,6 +32,11 @@ double PAModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double c
 	double logLikelihood = ((std::lgamma((currNumCodonsInMRNA * currAlpha) + currRFPValue)) - (std::lgamma(currNumCodonsInMRNA * currAlpha)))
 						   + (currRFPValue * (std::log(phiValue) - std::log(currLambdaPrime + phiValue)))
 						   + ((currNumCodonsInMRNA * currAlpha) * (std::log(currLambdaPrime) - std::log(currLambdaPrime + phiValue)));
+    my_print("The current Alpha is: %\n", currAlpha);
+    my_print("The current LambdaPrime is:  %\n", currLambdaPrime);
+    my_print("The current RFPValue is:  %\n", currRFPValue);
+    my_print("The current Number of Codons is: %\n", currNumCodonsInMRNA);
+    my_print("The current Phi is:  %\n", phiValue);
 
 	return logLikelihood;
 }
@@ -68,7 +73,7 @@ void PAModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex,
 
 		double currAlpha = getParameterForCategory(alphaCategory, PAParameter::alp, codon, false);
 		double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, codon, false);
-		unsigned currRFPValue = gene.geneData.getRFPValue(index, RFPCountColumn);
+		unsigned currRFPValue = gene.geneData.getCodonSpecificSumRFPCount(index, RFPCountColumn);
 
 		unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(index);
 		if (currNumCodonsInMRNA == 0) continue;
@@ -98,6 +103,8 @@ void PAModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grou
                                                                 std::vector<double> &logAcceptanceRatioForAllMixtures)
 {
 	double logLikelihood = 0.0;
+    double currAlpha, currLambdaPrime;
+    double propAlpha, propLambdaPrime;
 	double logLikelihood_proposed = 0.0;
 	Gene *gene;
 	unsigned index = SequenceSummary::codonToIndex(grouping);
@@ -106,7 +113,7 @@ void PAModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grou
 //#ifndef __APPLE__
 #pragma omp parallel for private(gene) reduction(+:logLikelihood,logLikelihood_proposed)
 #endif
-	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+    for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{
 		gene = &genome.getGene(i);
 		// which mixture element does this gene belong to
@@ -117,24 +124,27 @@ void PAModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grou
 		unsigned synthesisRateCategory = parameter->getSynthesisRateCategory(mixtureElement);
 		// get non codon specific values, calculate likelihood conditional on these
 		double phiValue = parameter->getSynthesisRate(i, /*synthesisRateCategory*/mixtureElement, false);
-		unsigned currRFPValue = gene->geneData.getRFPValue(index, RFPCountColumn);
+		unsigned currRFPValue = gene->geneData.getCodonSpecificSumRFPCount(index, RFPCountColumn);
 		unsigned currNumCodonsInMRNA = gene->geneData.getCodonCountForCodon(index);
+        my_print("There are % copies of codon %\n in gene %",currNumCodonsInMRNA, grouping, gene->getId() );
 		if (currNumCodonsInMRNA == 0) continue;
 
 
-		double currAlpha = getParameterForCategory(alphaCategory, PAParameter::alp, grouping, false);
-		double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, grouping, false);
+		currAlpha = getParameterForCategory(alphaCategory, PAParameter::alp, grouping, false);
+		currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, grouping, false);
 
-		double propAlpha = getParameterForCategory(alphaCategory, PAParameter::alp, grouping, true);
-		double propLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, grouping, true);
+		propAlpha = getParameterForCategory(alphaCategory, PAParameter::alp, grouping, true);
+		propLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, grouping, true);
+
 
 
 		logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPValue, currNumCodonsInMRNA, phiValue);
 		logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambdaPrime, currRFPValue, currNumCodonsInMRNA, phiValue);
 	}
-	logAcceptanceRatioForAllMixtures[0] = logLikelihood_proposed - logLikelihood;
-	logAcceptanceRatioForAllMixtures[1] = logLikelihood;
-	logAcceptanceRatioForAllMixtures[2] = logLikelihood_proposed;
+	logAcceptanceRatioForAllMixtures[0] = logLikelihood_proposed - logLikelihood - ((std::log(currAlpha) + std::log(currLambdaPrime))
+                                                                                                        - (std::log(propAlpha) + std::log(propLambdaPrime)));
+	logAcceptanceRatioForAllMixtures[1] = logLikelihood - (std::log(propAlpha) + std::log(propLambdaPrime));
+	logAcceptanceRatioForAllMixtures[2] = logLikelihood_proposed - (std::log(currAlpha) + std::log(currLambdaPrime));
 	logAcceptanceRatioForAllMixtures[3] = logLikelihood;
 	logAcceptanceRatioForAllMixtures[4] = logLikelihood_proposed;
 }
@@ -532,7 +542,6 @@ void PAModel::simulateGenome(Genome &genome)
 		Gene gene = genome.getGene(geneIndex);
 		double phi = parameter->getSynthesisRate(geneIndex, mixtureElement, false);
 		Gene tmpGene = gene;
-        unsigned sumRFP;
 		for (unsigned codonIndex = 0u; codonIndex < 61; codonIndex++)
 		{
 			std::string codon = SequenceSummary::codonArray[codonIndex];
@@ -549,14 +558,14 @@ void PAModel::simulateGenome(Genome &genome)
 			NumericVector xx(1);
 			xx = rgamma(1, alphaPrime, 1.0/lambdaPrime);
 			xx = rpois(1, xx[0] * phi);
-            my_printError("RFP for index % is %\n", codonIndex,xx[0]);
-			tmpGene.geneData.setRFPValue(codonIndex, xx[0], RFPCountColumn);
+			tmpGene.geneData.setCodonSpecificSumRFPCount(codonIndex, xx[0], /*RFPCountColumn*/0);
 #else
-			std::gamma_distribution<double> GDistribution(alphaPrime, 1.0/lambdaPrime);
+			std::gamma_distribution<double> GDistribution(alphaPrime,1.0/lambdaPrime);
 			double tmp = GDistribution(Parameter::generator);
 			std::poisson_distribution<unsigned> PDistribution(phi * tmp);
 			unsigned simulatedValue = PDistribution(Parameter::generator);
-			tmpGene.geneData.setRFPValue(codonIndex, simulatedValue, RFPCountColumn);
+			tmpGene.geneData.setCodonSpecificSumRFPCount(codonIndex, simulatedValue, /*RFPCountColumn*/0);
+
 #endif
 		}
 		genome.addGene(tmpGene, true);
@@ -568,11 +577,27 @@ void PAModel::printHyperParameters()
 {
 	for (unsigned i = 0u; i < getNumSynthesisRateCategories(); i++)
 	{
-		//my_print("stdDevSynthesisRate posterior estimate for selection category %: %\n", i, parameter->getStdDevSynthesisRate(i));
+		my_print("stdDevSynthesisRate posterior estimate for selection category %: %\n", i, parameter->getStdDevSynthesisRate(i));
 	}
-	//my_print("\t current stdDevSynthesisRate proposal width: %\n", getCurrentStdDevSynthesisRateProposalWidth());
+	my_print("\t current stdDevSynthesisRate proposal width: %\n", getCurrentStdDevSynthesisRateProposalWidth());
+    //printCodonSpecificParameters(); //TODO put this in MCMC instead
 }
 
+//TODO: Assumed single mixture correct this and label values
+void PAModel::printCodonSpecificParameters()
+{
+    std::vector<std::vector<double>> alphas = parameter->getCurrentAlphaParameter();
+    std::vector<std::vector<double>> lambdaPrimes = parameter->getCurrentLambdaPrimeParameter();
+
+	for (unsigned i = 0u; i < alphas.size(); i++)
+	{
+        for (unsigned j = 0u; j < alphas[i].size(); j++)
+        {
+    		my_print("Alpha estimate for selection category %: %\n", i, alphas[i][j]);
+	    	my_print("Lambda Prime  estimate for selection category %: %\n", i, lambdaPrimes[i][j]);
+        }
+	}
+}
 
 /* getParameter (RCPP EXPOSED)
  * Arguments: None
@@ -600,8 +625,8 @@ double PAModel::calculateAllPriors()
 	return 0.0; //TODO(Cedric): implement me, see ROCModel
 }
 
+
 double PAModel::getParameterForCategory(unsigned category, unsigned param, std::string codon, bool proposal)
 {
 	return parameter->getParameterForCategory(category, param, codon, proposal);
 }
-

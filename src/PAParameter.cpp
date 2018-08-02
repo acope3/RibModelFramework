@@ -115,7 +115,7 @@ void PAParameter::initPAParameterSet()
 	}
 	for (unsigned i = 0; i < lambdaPrimeCategories; i++)
 	{
-		std::vector <double> tmp(numParam,1.0);
+		std::vector <double> tmp(numParam,0.1);
 		currentCodonSpecificParameter[lmPri][i] = tmp;
 		proposedCodonSpecificParameter[lmPri][i] = tmp;
 		lambdaValues[i] = tmp; //Maybe we don't initialize this one? or we do it differently?
@@ -492,9 +492,15 @@ void PAParameter::proposeCodonSpecificParameter()
 	{
 		for (unsigned j = 0; j < numLambdaPrime; j++)
 		{
-			proposedCodonSpecificParameter[lmPri][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[lmPri][i][j]) , std_csp[j]) );
+			double l = proposedCodonSpecificParameter[lmPri][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[lmPri][i][j]) , std_csp[j]) );
 		}
-	}
+	}/*
+    if (std::isnan(l) || std::isnan(a)){
+        div_flag = TRUE;
+        bool isAlpha = isnan(a);
+        my_print("First divergence is alpha %\n The Current state is:
+        \n", isAlpha);
+    }*/
 }
 
 
@@ -535,7 +541,7 @@ void PAParameter::updateCodonSpecificParameter(std::string grouping)
 void PAParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastIteration, bool adapt)
 {
 	my_print("acceptance rate for codon:\n");
-    adapt = false;
+    adapt = true;
 	for (unsigned i = 0; i < groupList.size(); i++)
 	{
 		my_print("%\t", groupList[i]);

@@ -6,7 +6,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-#define CEDRIC
+#define JEREMY
 #define STANDALONE
 
 #ifdef CEDRIC
@@ -416,13 +416,13 @@ int main()
 {
 	unsigned index;
 	bool fromRestart = false;
-	std::string modelToRun = "FONSE";
+	std::string modelToRun = "PA";
 	bool withPhi = false;
 
 
 	std::cout << "Initializing MCMCAlgorithm object---------------" << std::endl;
-	int samples = 100;
-	int thinning = 10;
+	int samples = 50000;
+	int thinning = 100;
 	int useSamples = 100;
 	unsigned numMixtures = 1;
 	std::cout << "\t# Samples: " << samples << "\n";
@@ -502,7 +502,7 @@ int main()
 	{
 		std::cout << "Initializing Genome object--------------------------" << std::endl;
 		Genome genome;
-		genome.readRFPData("C:/Users/Jeremy/Documents/GitHub/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
+		genome.readRFPData("/home/nax/Work/biolab/Logs/Input/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
 		std::cout << "Done!-------------------------------\n\n\n";
 
 
@@ -1002,25 +1002,25 @@ int main()
 	{
 		geneAssignment[i] = 0u;
 	}
-	
+
     PANSEParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
 
     cspFiles.push_back("/home/nax/Work/biolab/Dev/data/rfp/RFPAlphaValues.csv");
     //parameter.readAlphaValues(cspFiles[0]);
     parameter.initMutationSelectionCategories(cspFiles, 1, parameter.alp);
-    
+
     cspFiles[0] = ("/home/nax/Work/biolab/Dev/data/rfp/RFPLambdaPrimeValues.csv");
     //parameter.readLambdaValues(cspFiles[1]);
     parameter.initMutationSelectionCategories(cspFiles, 1, parameter.lmPri);
 
     alphas = parameter.oneMixAlpha();
     lambdas = parameter.oneMixLambda();
-    
+
     for(int i = 0; i < alphas.size(); i++){
         my_print("%,%\n", SequenceSummary::indexToCodon(i), alphas[i]);
     }
     exit(0);
-/*	
+/*
 
 	unsigned numMixtures = 1;
 	std::vector<double> sphi_init(numMixtures, 2);
@@ -1032,11 +1032,11 @@ int main()
       //  my_print("So far so good\n");
     //}
     //exit(1);
-        
+
 	genome.readRFPData(pathBegin + "rfp_file_20positions_20genes.csv", false);
     exit(0);
 	genome.readFasta(pathBegin + "RibModelDev/data/singleMixture/genome_2000.fasta", false);
-	
+
 	std::vector<unsigned> geneAssignment(genome.getGenomeSize());
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{
@@ -1045,7 +1045,7 @@ int main()
 
 	PAParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
 	PAModel model;
-	
+
     //ROCParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, "allUnique");
 	//ROCModel model;
 
@@ -1055,7 +1055,7 @@ int main()
 	genome.writeRFPData(pathBegin + "labbooks/Denizhan.Pak/Log_Files/sim_genomes/PASim.csv", true);
 	genome.writeRFPData(pathBegin + "labbooks/Denizhan.Pak/Log_Files/sim_genomes/PANotSim.csv", false);
 	exit(1);*/
-	
+
 
 	// UNIT TESTING
 	//testUtility();
@@ -1174,7 +1174,7 @@ int main()
 	} //END OF ROC
 	else if (modelToRun == "PANSE")
 	{
-        
+
         my_print("Initializing Genome object--------------------------\n");
 		Genome genome;
 		//genome.readRFPData(pathBegin + "RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
