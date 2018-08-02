@@ -242,7 +242,7 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
 			tmpGene.setId(prevID);
 			tmpGene.setDescription("No description for PA(NSE) Model");
 			tmpGene.setSequence(seq);
-			addGene(tmpGene, false); //add to genome
+			addGene(tmpGene, true); //add to genome
 			tmpGene.clear();
 			seq = "";
 		}
@@ -267,14 +267,14 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
 		unsigned rfpcount = (unsigned)std::atoi(value.c_str());
 
 		unsigned codonIndex = SequenceSummary::codonToIndex(codon);
-		tmpGene.geneData.setRFPValue(codonIndex, rfpcount, 0);
+		tmpGene.geneData.setCodonSpecificSumRFPCount(codonIndex, rfpcount, 0);
 		prevID = ID;
 	}
 
 	tmpGene.setId(prevID);
 	tmpGene.setDescription("No description for PA(NSE) Model");
 	tmpGene.setSequence(seq);
-	addGene(tmpGene, false); //add to genome
+	addGene(tmpGene, true); //add to genome
 
 	Fin.close();
 }
@@ -491,24 +491,31 @@ void Genome::writeRFPData(std::string filename, bool simulated)
             // This is a different format than the standard RFPData one.
 		else
 		{
-			Fout << "GeneID,Codon,Codon_Count,RFPCount\n";
+			Fout << "GeneID,Position,Codon,RFPCount\n";
 
 			for (unsigned geneIndex = 0u; geneIndex < numGenes; geneIndex++)
 			{
+                unsigned position = 1u;
 				Gene *currentGene = &simulatedGenes[geneIndex];
 
 				for (unsigned codonIndex = 0u; codonIndex < 64; codonIndex++)
 				{
-					std::string codon = SequenceSummary::codonArray[codonIndex];
-
-					Fout << currentGene->getId() << "," << codon << ",";
-
-					SequenceSummary *sequenceSummary = currentGene->getSequenceSummary();
+                    SequenceSummary *sequenceSummary = currentGene->getSequenceSummary();
 					unsigned codonCount = sequenceSummary->getCodonCountForCodon(codonIndex);
-					Fout << codonCount << ",";
 
-					// Simulated sum RFP counts will only print one column! So, we default to column = 0.
-					Fout << currentGene->geneData.getSimRFPValue(codonIndex, 0) << "\n";
+                    for (unsigned positionIndex = 0u; positionIndex < codonCount; positionIndex++)
+                    {
+    					std::string codon = SequenceSummary::codonArray[codonIndex];
+
+    					Fout << currentGene->getId() << "," << position << "," << codon << ",";
+
+                        unsigned rfpValue = 0u;
+                        if (positionIndex == 0)
+                            rfpValue = currentGene->geneData.getCodonSpecificSumRFPCount(codonIndex, 0);
+    					// Simulated sum RFP counts will only print one column! So, we default to column = 0.
+    					Fout << rfpValue << "\n";
+                        position++;
+                    }
 				}
 			}
 		}
@@ -779,7 +786,7 @@ void Genome::removeUnobservedGenes()
  * Depending on whether a gene was simulated, appends to
  * genes or simulated genes.
 */
-void Genome::addGene(const Gene& gene, bool simulated)
+void Genome::addGene(Gene& gene, bool simulated)
 {
 	simulated ? simulatedGenes.push_back(gene) : genes.push_back(gene);
 }

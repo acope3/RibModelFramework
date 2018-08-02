@@ -73,7 +73,7 @@ void PAModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex,
 
 		double currAlpha = getParameterForCategory(alphaCategory, PAParameter::alp, codon, false);
 		double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, codon, false);
-		unsigned currRFPValue = gene.geneData.getRFPValue(index, RFPCountColumn);
+		unsigned currRFPValue = gene.geneData.getCodonSpecificSumRFPCount(index, RFPCountColumn);
 
 		unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(index);
 		if (currNumCodonsInMRNA == 0) continue;
@@ -124,7 +124,7 @@ void PAModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grou
 		unsigned synthesisRateCategory = parameter->getSynthesisRateCategory(mixtureElement);
 		// get non codon specific values, calculate likelihood conditional on these
 		double phiValue = parameter->getSynthesisRate(i, /*synthesisRateCategory*/mixtureElement, false);
-		unsigned currRFPValue = gene->geneData.getRFPValue(index, RFPCountColumn);
+		unsigned currRFPValue = gene->geneData.getCodonSpecificSumRFPCount(index, RFPCountColumn);
 		unsigned currNumCodonsInMRNA = gene->geneData.getCodonCountForCodon(index);
         my_print("There are % copies of codon %\n in gene %",currNumCodonsInMRNA, grouping, gene->getId() );
 		if (currNumCodonsInMRNA == 0) continue;
@@ -552,23 +552,20 @@ void PAModel::simulateGenome(Genome &genome)
 			double lambdaPrime = getParameterForCategory(lambdaPrimeCat, PAParameter::lmPri, codon, false);
 
 			double alphaPrime = alpha * gene.geneData.getCodonCountForCodon(codon);
-            //my_printError("Alpha Prime is %\n", alphaPrime);
-            //my_printError("LambdaPrime is %\n", lambdaPrime);
 
 #ifndef STANDALONE
 			RNGScope scope;
 			NumericVector xx(1);
 			xx = rgamma(1, alphaPrime, 1.0/lambdaPrime);
-            //my_printError("W is %\n", xx[0]);
 			xx = rpois(1, xx[0] * phi);
-            //my_printError("Y_g is %\n", xx[0]);
-			tmpGene.geneData.setSimRFPValue(codonIndex, xx[0], RFPCountColumn);
+			tmpGene.geneData.setCodonSpecificSumRFPCount(codonIndex, xx[0], /*RFPCountColumn*/0);
 #else
 			std::gamma_distribution<double> GDistribution(alphaPrime,1.0/lambdaPrime);
 			double tmp = GDistribution(Parameter::generator);
 			std::poisson_distribution<unsigned> PDistribution(phi * tmp);
 			unsigned simulatedValue = PDistribution(Parameter::generator);
-			tmpGene.geneData.setSimRFPValue(codonIndex, simulatedValue, RFPCountColumn);
+			tmpGene.geneData.setCodonSpecificSumRFPCount(codonIndex, simulatedValue, /*RFPCountColumn*/0);
+
 #endif
 		}
 		genome.addGene(tmpGene, true);
