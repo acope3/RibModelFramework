@@ -4,14 +4,14 @@ useDynLib(AnaCoDa, .registration = TRUE)
 #imports
 importFrom(methods, new)
 importFrom(Rcpp, evalCpp)
-importFrom("grDevices", "adjustcolor", "rgb")
-importFrom("graphics", "mtext", "title")
 
 importFrom(graphics, abline, axis, box, grid, hist,
       layout, legend, lines, pairs, par, plot,
       points, segments, text)
 importFrom(stats, lm, median, qt, quantile, sd, acf)
 importFrom(utils, write.csv)
+importFrom(grDevices, adjustcolor, rgb)
+importFrom(graphics , mtext, title)
 
 S3method(length, Rcpp_Genome)
 S3method(summary, Rcpp_Genome)
@@ -43,7 +43,6 @@ export(
 "writeParameterObject",
 "loadParameterObject",
 "getTrace",
-"findOptimalCodon",
 "getSelectionCoefficients",
 "geomMean",
 
@@ -53,7 +52,7 @@ export(
 ## Genome object
 "initializeGenomeObject",
 "getCodonCounts",
-"calculeSCUO",
+"getCodonCountsForAA",
 "getNames",
 "addObservedSynthesisRateSet",
 "getObservedSynthesisRateSet",
@@ -61,6 +60,7 @@ export(
 "getCAI",
 "getNc",
 "getNcAA",
+"calculateSCUO",
 
 ## MCMC object
 "initializeMCMCObject",

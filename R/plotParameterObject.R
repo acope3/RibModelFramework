@@ -324,8 +324,6 @@ plotCSPdf <- function(df1, df2, xlab = "", ylab = "", main = "")
     df2[aa.pos,3] <- df2[aa.pos,3] - mean(df2[aa.pos,3])
   }
   
-
-  
   xlim <- range(df1[, 4:5])
   ylim <- range(df2[, 4:5])
   

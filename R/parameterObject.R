@@ -440,7 +440,7 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
 #' @param samples The number of samples used for the posterior estimates.
 #'
 #' @param optref Boolean determining if the alphabetically last codon, or the
-#' prefered codon should be used as reference (Defult: FALSE).
+#' prefered codon should be used as reference (Default: FALSE).
 #' 
 #' @return returns a data.frame with the posterior estimates of the models 
 #' codon specific parameters or writes it directly to a csv file if \code{filename} is specified
@@ -475,11 +475,11 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
 #' csp_mat <- getCSPEstimates(parameter, CSP="Mutation")
 #' 
 #' # write the result directly to the filesystem as a csv file. No values are returned
-#' getCSPEstimates(parameter, , filename=file.path(tempdir(), "csp_out.csv"), CSP="Mutation")
+#' getCSPEstimates(parameter, filename=file.path(tempdir(), "csp_out.csv"), CSP="Mutation")
 #' 
 #' }
 #' 
-getCSPEstimates <- function(parameter, filename=NULL, CSP="Mutation", mixture = 1, samples = 10, optref=FALSE){
+getCSPEstimates <- function(parameter, filename=NULL, CSP="Mutation", mixture = 1, samples = 10, optref = FALSE){
   Amino_Acid <- c()
   Value <- c()
   Codon <- c()

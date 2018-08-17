@@ -6,8 +6,8 @@
 #include <cstdio>
 #include <cstdlib>
 
-#define JEREMY
-#define STANDALONE
+//#define JEREMY
+//#define STANDALONE
 
 #ifdef CEDRIC
 int main()

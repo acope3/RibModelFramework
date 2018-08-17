@@ -19,6 +19,8 @@ empirical expression rates (optional).}
 \item{fasta}{A boolean value which decides whether to initialize with a
 fasta file or an RFPData file. (TRUE for fasta, FALSE for RFPData)}
 
+\item{simulated}{boolean to determine if the data should be treated as a simulated data set (Default = FALSE).}
+
 \item{match.expression.by.id}{If TRUE (default), observed expression values will be assigned by matching sequence identifier.
 If FALSE, observed expression values will be assigned by order.}
 
