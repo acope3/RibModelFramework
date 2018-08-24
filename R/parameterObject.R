@@ -647,6 +647,122 @@ findOptimalCodon <- function(csp)
   return(result)
 }
 
+getCSPEstimates_Alex <- function(parameter, filename=NULL, mixture = 1, samples = 10, rescale=T, report.original.ref = T)
+{
+  model.cond <- checkModel(parameter)
+  wo.ref <- model.cond$wo.ref
+  names.aa <- model.cond$aa
+  codons <- model.cond$codons
+  parameter.names <- model.cond$parameter.names
+  init <- rep(0.0,length(codons))
+  param.1<- data.frame(AA=names.aa,Codon=codons,Posterior=init,Lower.quant=init, Upper.quant=init,stringsAsFactors = F,row.names = codons)
+  param.2 <- data.frame(AA=names.aa,Codon=codons,Posterior=init,Lower.quant=init, Upper.quant=init,stringsAsFactors = F,row.names=codons)
+  if (wo.ref)
+  {
+    codons <- codons[which(codons %in% unlist(lapply(X = names.aa,FUN = AAToCodon,T)))]
+  }
+  for (codon in codons)
+  {
+    param.1[codons,"Posterior"] <- parameter$getCodonSpecificPosteriorMean,mixtureElement=mixture,samples=samples,codon=codon,paramType=0,withoutReference=wo.ref))
+    param.2[codons,"Posterior"] <- parameter$getCodonSpecificPosteriorMean,mixtureElement=mixture,samples=samples,codon=codon,paramType=1,withoutReference=wo.ref))
+    quantile.param.1 <- parameter$getCodonSpecificQuantile,mixtureElement=mixture, samples=samples,codon=codon,paramType=0, probs=c(0.025, 0.975),withoutReference=wo.ref))
+    quantile.param.2 <- parameter$getCodonSpecificQuantile,mixtureElement=mixture, samples=samples,codon=codon,paramType=1, probs=c(0.025, 0.975),withoutReference=wo.ref))
+  }
+  quantile.param.1<- matrix(quantile.param.1, nrow = 2)
+  quantile.param.2 <- matrix(quantile.param.2, nrow = 2) 
+  param.1[codons,"Lower.quant"] <- quantile.param.1[1,]
+  param.1[codons,"Upper.quant"] <- quantile.param.1[2,]
+  param.2[codons,"Lower.quant"] <- quantile.param.2[1,]
+  param.2[codons,"Upper.quant"] <- quantile.param.2[2,]
+  colnames(param.1) <- c("AA", "Codon", "Posterior", "0.025%", "0.975%")
+  colnames(param.2) <- c("AA", "Codon", "Posterior", "0.025%", "0.975%")
+  if(rescale && wo.ref)
+  {
+    csp.param <- rescaleCSPEstimates(param.1,param.2,parameter.names,report.original.ref)
+  } else if (rescale == F || wo.ref == F ){
+    if (wo.ref && !report.original.ref)
+    {
+      param.1 <- param.1[-which(param.1[,"Posterior"]==0),]
+      param.2 <- param.2[-which(param.2[,"Posterior"]==0),]
+    }
+    csp.param <- vector(mode="list",length=2)
+    names(csp.param) <- parameter.names
+    csp.param[[parameter.names[1]]] <- param.1
+    csp.param[[parameter.names[2]]] <- param.2
+  }
+  if(is.null(filename))
+  {
+    return(csp.param)
+  }else {
+    write.csv(csp.param[[parameter.names[1]]], file = paste0(parameter.names[1],"_",filename,".csv"), row.names = FALSE, quote=FALSE)
+    write.csv(csp.param[[parameter.names[2]]], file = paste0(parameter.names[2],"_",filename,".csv"), row.names = FALSE, quote=FALSE)
+  }
+}
+
+## NOT EXPOSED
+rescaleCSPEstimates<- function(param.1,param.2,parameter.names,report.original.ref)
+{
+  rescale.param.1 <- data.frame()
+  rescale.param.2 <- data.frame()
+  aa <- unique(param.2[,1])
+  for (a in aa)
+  {
+    codons <- AAToCodon(a)
+    tmp.1 <- param.1[codons,]
+    tmp.2 <- param.2[codons,]
+    ref.row <- which(tmp.2[,"Posterior"]==0)
+    min.value <- min(tmp.2[,"Posterior"])
+    if (min.value != 0.0)
+    {
+      tmp.2[,c("Posterior","0.025%","0.975%")] <- tmp.2[,c("Posterior","0.025%","0.975%")] - min.value
+      new.ref.row <- which(tmp.2[,"Posterior"]==0.0)
+      tmp.2[ref.row,c("0.025%","0.975%")] <- tmp.2[new.ref.row,c("0.025%","0.975%")] + tmp.2[ref.row,"Posterior"]
+      tmp.2[new.ref.row,c("Posterior","0.025%","0.975%")] <- 0.0
+      
+      ref.tmp.1<- tmp.1[new.ref.row,"Posterior"]
+      tmp.1[,c("Posterior","0.025%","0.975%")] <- tmp.1[,c("Posterior","0.025%","0.975%")] - ref.tmp.1
+      tmp.1[ref.row,c("0.025%","0.975%")] <- tmp.1[new.ref.row,c("0.025%","0.975%")] + tmp.1[ref.row,"Posterior"]
+      tmp.1[new.ref.row,c("Posterior","0.025%","0.975%")] <- 0.0
+    }
+    if (!report.original.ref)
+    {
+      tmp.1 <- tmp.1[-ref.row,]
+      tmp.2 <- tmp.2[-ref.row,]
+    }
+    rescale.param.1 <- rbind(rescale.param.1,tmp.1)
+    rescale.param.2 <- rbind(rescale.param.2,tmp.2)
+  }
+  csp.param <- vector(mode="list",length=2)
+  names(csp.param) <- parameter.names
+  csp.param[[parameter.names[1]]] <- rescale.param.1
+  csp.param[[parameter.names[2]]] <- rescale.param.2
+  return(csp.param)
+}
+
+## NOT EXPOSED
+checkModel <- function(parameter)
+{
+  class.type = class(parameter)
+  if(class(parameter)=="Rcpp_ROCParameter" || class(parameter)=="Rcpp_FONSEParameter")
+  {
+    wo.ref = TRUE
+    names.aa <- parameter$getGroupList()
+    codons <- unlist(lapply(names.aa,AAToCodon))
+    aa <- unlist(lapply(codons,codonToAA))
+    parameter.names <- c("Mutation","Selection")
+    
+  } else
+  {
+    wo.ref = FALSE
+    codons <- parameter$getGroupList()
+    aa <- unlist(lapply(codons,codonToAA))
+    parameter.names <- c("Alpha","Lambda Prime")
+  }
+  return(list(aa=aa,codons=codons,wo.ref=wo.ref,parameter.names=parameter.names))
+}
+
+
+
 #' Calculate Selection coefficients
 #' 
 #' \code{getSelectionCoefficients} calculates the selection coefficient of each codon in each gene.
