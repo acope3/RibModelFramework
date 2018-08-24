@@ -663,17 +663,11 @@ getCSPEstimates_Alex <- function(parameter, filename=NULL, mixture = 1, samples 
   }
   for (codon in codons)
   {
-    param.1[codons,"Posterior"] <- parameter$getCodonSpecificPosteriorMean(mixtureElement=mixture,samples=samples,codon=codon,paramType=0,withoutReference=wo.ref)
-    param.2[codons,"Posterior"] <- parameter$getCodonSpecificPosteriorMean(mixtureElement=mixture,samples=samples,codon=codon,paramType=1,withoutReference=wo.ref)
-    quantile.param.1 <- parameter$getCodonSpecificQuantile(mixtureElement=mixture, samples=samples,codon=codon,paramType=0, probs=c(0.025, 0.975),withoutReference=wo.ref)
-    quantile.param.2 <- parameter$getCodonSpecificQuantile(mixtureElement=mixture, samples=samples,codon=codon,paramType=1, probs=c(0.025, 0.975),withoutReference=wo.ref)
+    param.1[codon,"Posterior"] <- parameter$getCodonSpecificPosteriorMean(mixtureElement=mixture,samples=samples,codon=codon,paramType=0,withoutReference=wo.ref)
+    param.2[codon,"Posterior"] <- parameter$getCodonSpecificPosteriorMean(mixtureElement=mixture,samples=samples,codon=codon,paramType=1,withoutReference=wo.ref)
+    param.1[codon,c("Lower.quant","Upper.quant")] <- parameter$getCodonSpecificQuantile(mixtureElement=mixture, samples=samples,codon=codon,paramType=0, probs=c(0.025, 0.975),withoutReference=wo.ref)
+    param.2[codon,c("Lower.quant","Upper.quant")]  <- parameter$getCodonSpecificQuantile(mixtureElement=mixture, samples=samples,codon=codon,paramType=1, probs=c(0.025, 0.975),withoutReference=wo.ref)
   }
-  quantile.param.1<- matrix(quantile.param.1, nrow = 2)
-  quantile.param.2 <- matrix(quantile.param.2, nrow = 2) 
-  param.1[codons,"Lower.quant"] <- quantile.param.1[1,]
-  param.1[codons,"Upper.quant"] <- quantile.param.1[2,]
-  param.2[codons,"Lower.quant"] <- quantile.param.2[1,]
-  param.2[codons,"Upper.quant"] <- quantile.param.2[2,]
   colnames(param.1) <- c("AA", "Codon", "Posterior", "0.025%", "0.975%")
   colnames(param.2) <- c("AA", "Codon", "Posterior", "0.025%", "0.975%")
   if(rescale && wo.ref)
@@ -760,7 +754,6 @@ checkModel <- function(parameter)
   }
   return(list(aa=aa,codons=codons,wo.ref=wo.ref,parameter.names=parameter.names))
 }
-
 
 
 #' Calculate Selection coefficients
