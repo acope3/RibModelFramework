@@ -3,7 +3,7 @@
 # AnaCoDa
 
 * AnaCoDa is a collection of codon models. 
-* The release version can be obtained from https://cran.r-project.org/web/packages/AnaCoDa/index.html
+* the release version can be obtained from ...
 
 
 # Examples: Running models
@@ -63,4 +63,6 @@ mcmc <- initializeMCMCObject(samples = 5000, thinning = 10, adaptive.width=50, e
 model <- initializeModelObject(parameter = parameter, model = "ROC")
 runMCMC(mcmc = mcmc, genome = genome, model = model)
 ```
+
+
 

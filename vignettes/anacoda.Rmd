@@ -66,8 +66,7 @@ After choosing the model and specifying the necessary arguments for the MCMC rou
 
 ```{r, echo = TRUE, eval = FALSE}
 genome <- initializeGenomeObject(file = "genome.fasta")
-parameter <- initializeParameterObject(genome = genome, sphi = 1, num.mixtures = 1, 
-                                       gene.assignment = rep(1, length(genome)))
+parameter <- initializeParameterObject(genome = genome, sphi = 1, num.mixtures = 1, geneAssignment = rep(1, length(genome)))
 model <- initializeModelObject(parameter = parameter, model = "ROC")
 mcmc <- initializeMCMCObject(samples = 5000, thinning = 10, adaptive.width=50)
 runMCMC(mcmc = mcmc, genome = genome, model = model)
@@ -85,18 +84,16 @@ This case applies if we assume that parts of the genome differ in their gene-set
 For two sets of gene-set specific parameter with a random gene assignment we can use:
 
 ```{r, echo = TRUE, eval = FALSE}
-parameter <- initializeParameterObject(genome = genome, sphi = c(0.5, 2), num.mixtures = 2, 
-                                       gene.assignment = sample.int(2, length(genome), replace = T))
+parameter <- initializeParameterObject(genome = genome, sphi = c(0.5, 2), num.mixtures = 2, geneAssignment = sample.int(2, length(genome), replace = T))
 ```
 
-To accommodate for this mixing we only have to adjust `sphi`, which is now a vector of length 2,  `num.mixtures`, and `gene.assignment`, which is chosen at random here.
+To accommodate for this mixing we only have to adjust `sphi`, which is now a vector of length 2,  `num.mixtures`, and `geneAssignment`, which is chosen at random here.
 
 ### Using empirical protein synthesis rate values
 To use empirical values as prior information one can simply specify an `observed.expression.file` when initializing the genome object.
 
 ```{r, echo = TRUE, eval = FALSE}
-genome <- initializeGenomeObject(file = "genome.fasta", 
-                                 observed.expression.file = "synthesis_values.csv")
+genome <- initializeGenomeObject(file = "genome.fasta", observed.expression.file = "synthesis_values.csv")
 ```
 
 These observed expression or synthesis  values ($\Phi$) are independent of the number of gene-sets.
@@ -112,15 +109,12 @@ sepsilon <- c(0.1, 0.5)
 # Five cases of observed data
 sepsilon <- c(0.1, 0.5, 1, 0.8, 3)
 
-parameter <- initializeParameterObject(genome = genome, sphi = 1, num.mixtures = 1, 
-                                       gene.assignment = rep(1, length(genome)), 
-                                       init.sepsilon = sepsilon)
+parameter <- initializeParameterObject(genome = genome, sphi = 1, num.mixtures = 1, geneAssignment = rep(1, length(genome)), init.sepsilon = sepsilon)
 ```
 
 In addition one can choose to keep the noise in the observations ($s_\epsilon$) constant by using the `fix.observation.noise` flag in the model object.
 ```{r, echo = TRUE, eval = FALSE}
-model <- initializeModelObject(parameter = parameter, model = "ROC",  
-                               fix.observation.noise = TRUE)
+model <- initializeModelObject(parameter = parameter, model = "ROC",  fix.observation.noise = TRUE)
 ```
 
 ### Keeping parameter types fixed
@@ -130,34 +124,25 @@ For example in cases where only few sequences are available but gene expression 
 We again initialize our `genome`, `parameter`, and `model` objects.
 ```{r, echo = TRUE, eval = FALSE}
 genome <- initializeGenomeObject(file = "genome.fasta")
-parameter <- initializeParameterObject(genome = genome, sphi = 1, num.mixtures = 1, 
-                                       gene.assignment = rep(1, length(genome)))
+parameter <- initializeParameterObject(genome = genome, sphi = 1, num.mixtures = 1, geneAssignment = rep(1, length(genome)))
 model <- initializeModelObject(parameter = parameter, model = "ROC")
 ```
 To fix gene specific parameters we will set the `est.expression` flag to `FALSE`.
 This will estimate only gene-set specific parameters, hyperparameters, and the assignments of genes to various sets.
 ```{r, echo = TRUE, eval = FALSE}
-mcmc <- initializeMCMCObject(samples, thinning=1, adaptive.width=100, 
-                             est.expression=FALSE, est.csp=TRUE, 
-                             est.hyper=TRUE, est.mix=TRUE)
+mcmc <- initializeMCMCObject(samples, thinning=1, adaptive.width=100, est.expression=FALSE, est.csp=TRUE, est.hyper=TRUE, est.mix=TRUE)
 ```
 If we would like to fix gene-set specific parameters we instead disable the `est.csp` flag.
 ```{r, echo = TRUE, eval = FALSE}
-mcmc <- initializeMCMCObject(samples, thinning=1, adaptive.width=100, 
-                             est.expression=TRUE, est.csp=FALSE, 
-                             est.hyper=TRUE, est.mix=TRUE)
+mcmc <- initializeMCMCObject(samples, thinning=1, adaptive.width=100, est.expression=TRUE, est.csp=FALSE, est.hyper=TRUE, est.mix=TRUE)
 ```
 The same applies to the hyper parameters (`est.hyper`), 
 ```{r, echo = TRUE, eval = FALSE}
-mcmc <- initializeMCMCObject(samples, thinning=1, adaptive.width=100, 
-                             est.expression=TRUE, est.csp=TRUE, 
-                             est.hyper=FALSE, est.mix=TRUE)
+mcmc <- initializeMCMCObject(samples, thinning=1, adaptive.width=100, est.expression=TRUE, est.csp=TRUE, est.hyper=FALSE, est.mix=TRUE)
 ```
 and gene set assignment (`est.mix`).
 ```{r, echo = TRUE, eval = FALSE}
-mcmc <- initializeMCMCObject(samples, thinning=1, adaptive.width=100, 
-                             est.expression=TRUE, est.csp=TRUE, 
-                             est.hyper=TRUE, est.mix=FALSE)
+mcmc <- initializeMCMCObject(samples, thinning=1, adaptive.width=100, est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE, est.mix=FALSE)
 ```
 We can use these flags to fix parameters in any combination.
 
@@ -167,24 +152,24 @@ The specification is done when initializing the parameter object with the `mixtu
 
 We encounter the simplest case when we assume that all gene sets are independent. 
 ```{r, echo = TRUE, eval = FALSE}
-parameter <- initializeParameterObject(genome = genome, sphi = c(0.5, 2), num.mixtures = 2, 
-                                       gene.assignment = sample.int(2, length(genome), replace = T),
+parameter <- initializeParameterObject(genome = genome, sphi = c(0.5, 2), num.mixtures = 2
+                                       , geneAssignment = sample.int(2, length(genome), replace = T),
                                        mixture.definition = "allUnique")
 ```
 The `allUnique` keyword allows each type of gene-set specific parameter to be estimated independent of parameters describing other gene sets.
 
 In case we want to share mutation parameter between gene sets we can use the keyword `mutationShared`.
 ```{r, echo = TRUE, eval = FALSE}
-parameter <- initializeParameterObject(genome = genome, sphi = c(0.5, 2), num.mixtures = 2, 
-                                       gene.assignment = sample.int(2, length(genome), replace = T),
+parameter <- initializeParameterObject(genome = genome, sphi = c(0.5, 2), num.mixtures = 2
+                                       , geneAssignment = sample.int(2, length(genome), replace = T),
                                        mixture.definition = "mutationShared")
 ```
 This will force all gene sets to share the same mutation parameters.
 
 The same can be done with parameters describing selection, using the keyword `selectionShared`
 ```{r, echo = TRUE, eval = FALSE}
-parameter <- initializeParameterObject(genome = genome, sphi = c(0.5, 2), num.mixtures = 2, 
-                                       gene.assignment = sample.int(2, length(genome), replace = T),
+parameter <- initializeParameterObject(genome = genome, sphi = c(0.5, 2), num.mixtures = 2
+                                       , geneAssignment = sample.int(2, length(genome), replace = T),
                                        mixture.definition = "selectionShared")
 ```
 
@@ -199,7 +184,7 @@ The matrix representation of `mutationShared` can be obtained by
 #[3,]    1    3
 def.matrix <- matrix(c(1,1,1,1,2,3), ncol=2)
 parameter <- initializeParameterObject(genome = genome, sphi = c(0.5, 2, 1), num.mixtures = 3,
-                                       gene.assignment = sample.int(3, length(genome), replace = T),
+                                       geneAssignment = sample.int(3, length(genome), replace = T),
                                        mixture.definition.matrix = def.matrix)
 ```
 Columns represent mutation and selection, while each row represents a gene set. 
@@ -312,8 +297,7 @@ Again we can specify for which mixture we would like the posterior estimate and 
 `getCSPEstimates` has an optional argument `filename` which will cause the routine to write the result as a csv file instead of returning a `data.frame`.
 
 ```{r, echo = TRUE, eval = FALSE}
-csp_mat <- getCSPEstimates(parameter = parameter, CSP="Mutation", 
-                           mixture = 1, samples = 1000)
+csp_mat <- getCSPEstimates(parameter = parameter, CSP="Mutation", mixture = 1, samples = 1000)
 head(csp_mat)
 #  AA Codon  Posterior     0.025%     0.975%
 #1  A   GCA -0.2435340 -0.2720696 -0.2165220
@@ -323,8 +307,7 @@ head(csp_mat)
 #5  D   GAC  0.5775052  0.5618199  0.5936979
 #6  E   GAA -0.4524295 -0.4688044 -0.4356677
 
-getCSPEstimates(parameter = parameter, filename = "mutation.csv", 
-                CSP="Mutation", mixture = 1, samples = 1000)
+getCSPEstimates(parameter = parameter, filename = "mutation.csv", CSP="Mutation", mixture = 1, samples = 1000)
 ```
 
 To obtain posterior estimates for the gene specific parameters, we can use the function `getExpressionEstimatesForMixture`.

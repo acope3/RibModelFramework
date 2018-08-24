@@ -1,13 +1,10 @@
-
 # CHANGES IN AnaCoDa 0.1.2
 
 ## BUG FIXES
-
-- fixed error using log(Aphi) instead of Aphi in prior of phi, when using experimental expression values.
+- fixed a bug were the scaling of observed phi values was used inconsitently, causing problems with estimates of Aphi and Sepsilon
 
 ## NEW FEATURES
-
-- added inclusion of reference codon in getCSPEstimates
+- Added SCUO calculation and improved getCSPEstimates to include reference codons
 
 # CHANGES IN AnaCoDa 0.1.1
 

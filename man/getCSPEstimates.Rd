@@ -19,7 +19,7 @@ getCSPEstimates(parameter, filename = NULL, CSP = "Mutation", mixture = 1,
 \item{samples}{The number of samples used for the posterior estimates.}
 
 \item{optref}{Boolean determining if the alphabetically last codon, or the
-prefered codon should be used as reference (Defult: FALSE).}
+prefered codon should be used as reference (Default: FALSE).}
 }
 \value{
 returns a data.frame with the posterior estimates of the models 
@@ -57,7 +57,7 @@ runMCMC(mcmc = mcmc, genome = genome, model = model,
 csp_mat <- getCSPEstimates(parameter, CSP="Mutation")
 
 # write the result directly to the filesystem as a csv file. No values are returned
-getCSPEstimates(parameter, , filename=file.path(tempdir(), "csp_out.csv"), CSP="Mutation")
+getCSPEstimates(parameter, filename=file.path(tempdir(), "csp_out.csv"), CSP="Mutation")
 
 }
 
