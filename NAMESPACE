@@ -4,6 +4,8 @@ useDynLib(AnaCoDa, .registration = TRUE)
 #imports
 importFrom(methods, new)
 importFrom(Rcpp, evalCpp)
+importFrom("grDevices", "adjustcolor", "rgb")
+importFrom("graphics", "mtext", "title")
 
 importFrom(graphics, abline, axis, box, grid, hist,
       layout, legend, lines, pairs, par, plot,
@@ -41,8 +43,9 @@ export(
 "writeParameterObject",
 "loadParameterObject",
 "getTrace",
+"findOptimalCodon",
 "getSelectionCoefficients",
-"geomMean",
+"geom_mean",
 
 ## Model object
 "initializeModelObject",
@@ -50,6 +53,7 @@ export(
 ## Genome object
 "initializeGenomeObject",
 "getCodonCounts",
+"calculeSCUO",
 "getNames",
 "addObservedSynthesisRateSet",
 "getObservedSynthesisRateSet",

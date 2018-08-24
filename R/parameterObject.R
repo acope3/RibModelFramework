@@ -153,7 +153,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
     if (init.csp.variance < 0) {
       stop("init.csp.variance should be positive\n")
     } 
-    if (init.sepsilon < 0) {
+    if (any(init.sepsilon < 0)) {
       stop("init.sepsilon should be positive\n")
     }
   } else {
@@ -236,7 +236,7 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
     observed.phi <- getObservedSynthesisRateSet(genome)
     if (ncol(observed.phi)-1 > 1)
     {
-      observed.phi <- apply(observed.phi[,2:ncol(observed.phi)],geom_mean,MARGIN = 1)
+      observed.phi <- apply(observed.phi[,2:ncol(observed.phi)],geomMean,MARGIN = 1)
     }
     else
     {
@@ -299,7 +299,7 @@ initializePAParameterObject <- function(genome, sphi, numMixtures, geneAssignmen
     observed.phi <- getObservedSynthesisRateSet(genome)
     if (ncol(observed.phi)-1 > 1)
     {
-      observed.phi <- apply(observed.phi[,2:ncol(observed.phi)],geom_mean,MARGIN = 1)
+      observed.phi <- apply(observed.phi[,2:ncol(observed.phi)],geomMean,MARGIN = 1)
     }
     else
     {
@@ -352,7 +352,7 @@ initializePANSEParameterObject <- function(genome, sphi, numMixtures, geneAssign
     observed.phi <- getObservedSynthesisRateSet(genome)
     if (ncol(observed.phi)-1 > 1)
     {
-      observed.phi <- apply(observed.phi[,2:ncol(observed.phi)],geom_mean,MARGIN = 1)
+      observed.phi <- apply(observed.phi[,2:ncol(observed.phi)],geomMean,MARGIN = 1)
     }
     else
     {
@@ -404,7 +404,7 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
     observed.phi <- getObservedSynthesisRateSet(genome)
     if (ncol(observed.phi)-1 > 1)
     {
-      observed.phi <- apply(observed.phi[,2:ncol(observed.phi)],geom_mean,MARGIN = 1)
+      observed.phi <- apply(observed.phi[,2:ncol(observed.phi)],geomMean,MARGIN = 1)
     }
     else
     {
@@ -436,6 +436,9 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
 #' @param mixture estimates for which mixture should be returned
 #' 
 #' @param samples The number of samples used for the posterior estimates.
+#'
+#' @param optref Boolean determining if the alphabetically last codon, or the
+#' prefered codon should be used as reference (Defult: FALSE).
 #' 
 #' @param rescale Rescale the CSP estimates such that the reference codon is the most efficient codon (Only applies for ROC and FONSE, default is True)
 #' 
@@ -478,56 +481,201 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
 #' }
 #' 
 
-getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10, rescale=T, report.original.ref = T){
-  model.cond <- checkModel(parameter)
-  wo.ref <- model.cond$wo.ref
-  names.aa <- model.cond$aa
-  codons <- model.cond$codons
-  parameter.names <- model.cond$parameter.names
-  init <- rep(0.0,length(codons))
-  param.1<- data.frame(AA=names.aa,Codon=codons,Posterior=init,Lower.quant=init, Upper.quant=init,stringsAsFactors = F,row.names = codons)
-  param.2 <- data.frame(AA=names.aa,Codon=codons,Posterior=init,Lower.quant=init, Upper.quant=init,stringsAsFactors = F,row.names=codons)
-  if (wo.ref)
-  {
-    codons <- codons[which(codons %in% unlist(lapply(X = names.aa,FUN = AAToCodon,T)))]
-  }
-  param.1[codons,"Posterior"] <- unlist(lapply(codons,parameter$getCodonSpecificPosteriorMean,mixtureElement=mixture,samples=samples,paramType=0,withoutReference=wo.ref))
-  param.2[codons,"Posterior"] <- unlist(lapply(codons,parameter$getCodonSpecificPosteriorMean,mixtureElement=mixture,samples=samples,paramType=1,withoutReference=wo.ref))
+getCSPEstimates <- function(parameter, filename=NULL, CSP="Mutation", mixture = 1, samples = 10, optref=FALSE){
+  Amino_Acid <- c()
+  Value <- c()
+  Codon <- c()
+  quantile_list <- vector("list")
   
-  quantile.param.1 <- unlist(lapply(codons,parameter$getCodonSpecificQuantile,mixtureElement=mixture, samples=samples,paramType=0, probs=c(0.025, 0.975),withoutReference=wo.ref))
-  quantile.param.2 <- unlist(lapply(codons,parameter$getCodonSpecificQuantile,mixtureElement=mixture, samples=samples,paramType=1, probs=c(0.025, 0.975),withoutReference=wo.ref))
-  
-  quantile.param.1<- matrix(quantile.param.1, nrow = 2)
-  quantile.param.2 <- matrix(quantile.param.2, nrow = 2) 
-  param.1[codons,"Lower.quant"] <- quantile.param.1[1,]
-  param.1[codons,"Upper.quant"] <- quantile.param.1[2,]
-  param.2[codons,"Lower.quant"] <- quantile.param.2[1,]
-  param.2[codons,"Upper.quant"] <- quantile.param.2[2,]
-  colnames(param.1) <- c("AA", "Codon", "Posterior", "0.025%", "0.975%")
-  colnames(param.2) <- c("AA", "Codon", "Posterior", "0.025%", "0.975%")
-  if(rescale && wo.ref)
-  {
-    csp.param <- rescaleCSPEstimates(param.1,param.2,parameter.names,report.original.ref)
-  } else if (rescale == F || wo.ref == F ){
-    if (wo.ref && !report.original.ref)
-    {
-      param.1 <- param.1[-which(param.1[,"Posterior"]==0),]
-      param.2 <- param.2[-which(param.2[,"Posterior"]==0),]
+  if (class(parameter) == "Rcpp_ROCParameter" || class(parameter) == "Rcpp_FONSEParameter"){
+    names.aa <- aminoAcids()
+    
+    for(aa in names.aa){
+      if(aa == "M" || aa == "W" || aa == "X") next
+      codons <- AAToCodon(aa, T)
+    
+      for(i in 1:length(codons)){
+        Amino_Acid <- c(Amino_Acid, aa)
+        Codon <- c(Codon, codons[i])
+      
+        if(CSP == "Mutation"){
+          Value <- c(Value, parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 0, TRUE))
+          quantile_list <- c(quantile_list, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 0, c(0.025, 0.975), TRUE))
+        }
+        else if(CSP == "Selection"){
+          Value <- c(Value, parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 1, TRUE))
+          quantile_list <- c(quantile_list, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 1, c(0.025, 0.975), TRUE))
+        }
+        else {
+          stop("Unknown parameter type given with argument: CSP")
+        }
+      }
     }
-    csp.param <- vector(mode="list",length=2)
-    names(csp.param) <- parameter.names
-    csp.param[[parameter.names[1]]] <- param.1
-    csp.param[[parameter.names[2]]] <- param.2
   }
+  else if (class(parameter) == "Rcpp_PAParameter"){
+    groupList <- parameter$getGroupList()
+
+    for(i in 1:length(groupList)){
+      aa <- codonToAA(groupList[i])
+      Codon <- c(Codon, groupList[i])
+      Amino_Acid <- c(Amino_Acid, aa)
+       
+      if(CSP == "Alpha"){
+        Value <- c(Value, parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 0, FALSE))
+        quantile_list <- c(quantile_list, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 0, c(0.025, 0.975), FALSE))
+        }
+      else if(CSP == "Lambda Prime"){
+        Value <- c(Value, parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 1, FALSE))
+        quantile_list <- c(quantile_list, parameter$getCodonSpecificQuantile(mixture, samples, codons[i], 1, c(0.025, 0.975), FALSE))
+      }
+      else {
+        stop("Unknown parameter type given with argument: CSP")
+      }
+    }
+  else{
+    stop("Unknown object provided with argument: parameter")
+  }
+  quantile_list <- matrix(unlist(quantile_list), nrow = 2)
+  data <- data.frame(Amino_Acid, Codon, Value, Lower=quantile_list[1,], Upper=quantile_list[2,])
+  colnames(data) <- c("AA", "Codon", "Posterior", "0.025%", "0.975%")
+  data <- add.ref.codon(data, optref)
   if(is.null(filename))
   {
-    return(csp.param)
+    return(data)
   }else {
-    write.csv(csp.param[[parameter.names[1]]], file = paste0(parameter.names[1],"_",filename), row.names = FALSE, quote=FALSE)
-    write.csv(csp.param[[parameter.names[2]]], file = paste0(parameter.names[2],"_",filename), row.names = FALSE, quote=FALSE)
+    write.csv(data, file = filename, row.names = FALSE, quote=FALSE)
   }
 }
+  
+add.ref.codon <- function(csp, opt.ref = FALSE)
+  {
+    fill.in <- data.frame(Codon=as.character(AnaCoDa::codons()))
+    csp <- merge(x = csp, y = fill.in, by = "Codon", all = T)
+    for(i in 1:64)
+      csp$AA[i] <- AnaCoDa::codonToAA(as.character(csp$Codon[i]))
+    csp[is.na(csp)] <- 0
+    csp <- csp[order(csp$AA), ]
+    if(opt.ref)
+    {
+      aas <- aminoAcids()
+      n.aa <- length(aas)
+      for(j in 1:n.aa)
+      {
+        aa <- aas[j]
+        if(aa == "W" || aa == "M" || aa == "X") next
+        aa.pos <- which(csp$AA == aa)
+        csp[aa.pos, 3] <- csp[aa.pos, 3] - min(csp[aa.pos, 3])
+        csp[aa.pos, 4] <- csp[aa.pos, 4] - min(csp[aa.pos, 4])
+        csp[aa.pos, 5] <- csp[aa.pos, 5] - min(csp[aa.pos, 5])
+      }
+    }
+    return(csp)
+}
 
+#' Find and return list of optimal codons
+#' 
+#' \code{findOptimalCodon} extracts the optimal codon for each amino acid.
+#' 
+#' @param csp a \code{data.frame} as returned by \code{getCSPEstimates}.
+#'
+#' @return A named list with with optimal codons for each amino acid.
+#'
+#' @examples 
+#' genome_file <- system.file("extdata", "genome.fasta", package = "AnaCoDa")
+#'
+#' genome <- initializeGenomeObject(file = genome_file)
+#' sphi_init <- 1
+#' numMixtures <- 1
+#' geneAssignment <- rep(1, length(genome))
+#' parameter <- initializeParameterObject(genome = genome, sphi = sphi_init, 
+#'                                        num.mixtures = numMixtures, 
+#'                                        gene.assignment = geneAssignment, 
+#'                                        mixture.definition = "allUnique")
+#' model <- initializeModelObject(parameter = parameter, model = "ROC")
+#' samples <- 2500
+#' thinning <- 50
+#' adaptiveWidth <- 25
+#' mcmc <- initializeMCMCObject(samples = samples, thinning = thinning, 
+#'                              adaptive.width=adaptiveWidth, est.expression=TRUE, 
+#'                              est.csp=TRUE, est.hyper=TRUE, est.mix = TRUE) 
+#' divergence.iteration <- 10
+#' \dontrun{
+#' runMCMC(mcmc = mcmc, genome = genome, model = model, 
+#'         ncores = 4, divergence.iteration = divergence.iteration)
+#' 
+#' csp_mat <- getCSPEstimates(parameter, CSP="Selection")
+#' opt_codons <- findOptimalCodon(csp_mat)
+#' }
+#' 
+findOptimalCodon <- function(csp)
+{
+  aas <- aminoAcids()
+  n.aa <- length(aas)
+  result <- vector("list", length(aas))
+  names(result) <- aas
+  for(j in 1:n.aa)
+  {
+    aa <- aas[j]
+    if(aa == "W" || aa == "M" || aa == "X") next
+    aa.pos <- which(csp$AA == aa)
+    opt.codon.pos <- which(csp[aa.pos, 3] == min(csp[aa.pos, 3]))
+    result[[j]] <- csp$Codon[aa.pos[opt.codon.pos]]
+  }
+  return(result)
+}
+
+
+getCSPEstimates_Alex <- function(parameter, filename=NULL, mixture = 1, samples = 10, rescale=T, report.original.ref = T)
+  {
+    model.cond <- checkModel(parameter)
+    wo.ref <- model.cond$wo.ref
+    names.aa <- model.cond$aa
+    codons <- model.cond$codons
+    parameter.names <- model.cond$parameter.names
+    init <- rep(0.0,length(codons))
+    param.1<- data.frame(AA=names.aa,Codon=codons,Posterior=init,Lower.quant=init, Upper.quant=init,stringsAsFactors = F,row.names = codons)
+    param.2 <- data.frame(AA=names.aa,Codon=codons,Posterior=init,Lower.quant=init, Upper.quant=init,stringsAsFactors = F,row.names=codons)
+    if (wo.ref)
+    {
+      codons <- codons[which(codons %in% unlist(lapply(X = names.aa,FUN = AAToCodon,T)))]
+    }
+    for (codon in codons){
+      param.1[codons,"Posterior"] <- parameter$getCodonSpecificPosteriorMean,mixtureElement=mixture,samples=samples,codon=codon,paramType=0,withoutReference=wo.ref))
+      param.2[codons,"Posterior"] <- parameter$getCodonSpecificPosteriorMean,mixtureElement=mixture,samples=samples,codon=codon,paramType=1,withoutReference=wo.ref))
+      quantile.param.1 <- parameter$getCodonSpecificQuantile,mixtureElement=mixture, samples=samples,codon=codon,paramType=0, probs=c(0.025, 0.975),withoutReference=wo.ref))
+      quantile.param.2 <- parameter$getCodonSpecificQuantile,mixtureElement=mixture, samples=samples,codon=codon,paramType=1, probs=c(0.025, 0.975),withoutReference=wo.ref))
+    }
+    quantile.param.1<- matrix(quantile.param.1, nrow = 2)
+    quantile.param.2 <- matrix(quantile.param.2, nrow = 2) 
+    param.1[codons,"Lower.quant"] <- quantile.param.1[1,]
+    param.1[codons,"Upper.quant"] <- quantile.param.1[2,]
+    param.2[codons,"Lower.quant"] <- quantile.param.2[1,]
+    param.2[codons,"Upper.quant"] <- quantile.param.2[2,]
+    colnames(param.1) <- c("AA", "Codon", "Posterior", "0.025%", "0.975%")
+    colnames(param.2) <- c("AA", "Codon", "Posterior", "0.025%", "0.975%")
+    if(rescale && wo.ref)
+    {
+      csp.param <- rescaleCSPEstimates(param.1,param.2,parameter.names,report.original.ref)
+    } else if (rescale == F || wo.ref == F ){
+      if (wo.ref && !report.original.ref)
+      {
+        param.1 <- param.1[-which(param.1[,"Posterior"]==0),]
+        param.2 <- param.2[-which(param.2[,"Posterior"]==0),]
+      }
+      csp.param <- vector(mode="list",length=2)
+      names(csp.param) <- parameter.names
+      csp.param[[parameter.names[1]]] <- param.1
+      csp.param[[parameter.names[2]]] <- param.2
+    }
+    if(is.null(filename))
+    {
+      return(csp.param)
+    }else {
+      write.csv(csp.param[[parameter.names[1]]], file = paste0(parameter.names[1],"_",filename,".csv"), row.names = FALSE, quote=FALSE)
+      write.csv(csp.param[[parameter.names[2]]], file = paste0(parameter.names[2],"_",filename,".csv"), row.names = FALSE, quote=FALSE)
+    }
+  }
+  
 ## NOT EXPOSED
 rescaleCSPEstimates<- function(param.1,param.2,parameter.names,report.original.ref)
 {
@@ -1601,9 +1749,6 @@ loadFONSEParameterObject <- function(parameter, files)
 #' # Replace values <= 0 or NAs with a default value 0.001 and then take the mean
 #' geomMean(y, rm.invalid = FALSE, default = 0.001)
 #' 
-
-
-
 geomMean <- function(x, rm.invalid = TRUE, default = 1e-5)
 {
   if(!rm.invalid)

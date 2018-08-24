@@ -1,4 +1,14 @@
 
+# CHANGES IN AnaCoDa 0.1.2
+
+## BUG FIXES
+
+- fixed error using log(Aphi) instead of Aphi in prior of phi, when using experimental expression values.
+
+## NEW FEATURES
+
+- added inclusion of reference codon in getCSPEstimates
+
 # CHANGES IN AnaCoDa 0.1.1
 
 ## BUG FIXES

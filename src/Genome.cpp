@@ -88,6 +88,10 @@ void Genome::readFasta(std::string filename, bool append)
 			std::string tempSeq = "";
 			while (true)
 			{
+			    #ifndef STANDALONE
+			    Rcpp::checkUserInterrupt();
+			    #endif
+
 				// read a new line in every cycle
 				std::getline(Fin, buf);
 				/* The new line is marked with an integer, which corresponds
@@ -214,6 +218,10 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
 
 	while (std::getline(Fin, tmp))
 	{
+            #ifndef STANDALONE
+            Rcpp::checkUserInterrupt();
+            #endif
+
     // Remove whitespace from the string
     tmp.erase(std::remove_if(tmp.begin(), tmp.end(), 
               std::bind(std::isspace<char>, std::placeholders::_1, std::locale::classic())), tmp.end());
@@ -237,28 +245,28 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
 			tmpGene.clear();
 			seq = "";
 		}
-
-		// Now find codon string: Follows prior comma, guaranteed to be of size 3
+		
+        //Read rfp count
+		std::size_t pos2 = tmp.find(',', pos + 1);
+        std::string value = tmp.substr(pos + 1, pos2 - (pos + 1));
+		unsigned rfpcount = (unsigned)std::atoi(value.c_str());
+        
+		pos = tmp.find(',', pos2 + 1);
+		value = tmp.substr(pos2 + 1, pos - (pos2 + 1));
+		unsigned codoncount = (unsigned)std::atoi(value.c_str());
+		
+        // Now find codon string: Follows prior comma, guaranteed to be of size 3
 		std::string codon = tmp.substr(pos + 1, 3);
 		codon[0] = (char)std::toupper(codon[0]);
 		codon[1] = (char)std::toupper(codon[1]);
 		codon[2] = (char)std::toupper(codon[2]);
-
-		// Next, find the Codon_Count
-		pos += 4;
-		std::size_t pos2 = tmp.find(',', pos + 1);
-		std::string value = tmp.substr(pos + 1, pos2 - (pos + 1));
-		unsigned count = (unsigned)std::atoi(value.c_str());
-
-		// Concatenate the sequence based on this number of codons
-		for (unsigned i = 0u; i < count; i++)
+		
+        // Concatenate the sequence based on this number of codons
+		for (unsigned i = 0u; i < codoncount; i++)
 			seq.append(codon);
-
-		// Finally, get the RFPCount: substring from pos2 + 1 to the end, convert to an unsigned number
-		value = tmp.substr(pos2 + 1);
-		count = (unsigned)std::atoi(value.c_str());
+        
 		unsigned codonIndex = SequenceSummary::codonToIndex(codon);
-		tmpGene.geneData.setRFPValue(codonIndex, count, 0);
+		tmpGene.geneData.setRFPValue(codonIndex, rfpcount, 0);
 		prevID = ID;
 	}
 
@@ -330,6 +338,11 @@ void Genome::readRFPData(std::string filename, bool append)
 			//Now for each line associated with a gene ID, set the string appropriately
 			while (std::getline(Fin, tmp))
 			{
+
+            #ifndef STANDALONE
+            Rcpp::checkUserInterrupt();
+            #endif
+
         // Remove whitespace from the string
         tmp.erase(std::remove_if(tmp.begin(), tmp.end(), 
                   std::bind(std::isspace<char>, std::placeholders::_1, std::locale::classic())), tmp.end());
@@ -544,6 +557,10 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
                 bool first = true;
                 while (std::getline(input, tmp))
 				{
+
+            #ifndef STANDALONE
+            Rcpp::checkUserInterrupt();
+            #endif
                     std::size_t pos = tmp.find(',');
                     std::string geneID = tmp.substr(0, pos);
                     std::map<std::string, Gene *>::iterator it;
@@ -1041,6 +1058,7 @@ RCPP_MODULE(Genome_mod)
 		.method("readFasta", &Genome::readFasta, "reads a genome into the object")
 		.method("writeFasta", &Genome::writeFasta, "writes the genome to a fasta file")
 		.method("readRFPData", &Genome::readRFPData, "reads RFPData to be used in PA(NSE) models")
+		.method("readSimRFPData", &Genome::readSimulatedGenomeFromPAModel, "reads already simulated RFPData to be used in PA(NSE) models")
 		.method("writeRFPData", &Genome::writeRFPData, "writes RFPData used in PA(NSE) models")
 		.method("readObservedPhiValues", &Genome::readObservedPhiValues)
 		.method("removeUnobservedGenes", &Genome::removeUnobservedGenes)

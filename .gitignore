@@ -62,3 +62,4 @@ autom4te.cache
 Makefile
 a.out
 src/src
+.nfs*
