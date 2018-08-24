@@ -663,10 +663,10 @@ getCSPEstimates_Alex <- function(parameter, filename=NULL, mixture = 1, samples 
   }
   for (codon in codons)
   {
-    param.1[codons,"Posterior"] <- parameter$getCodonSpecificPosteriorMean,mixtureElement=mixture,samples=samples,codon=codon,paramType=0,withoutReference=wo.ref))
-    param.2[codons,"Posterior"] <- parameter$getCodonSpecificPosteriorMean,mixtureElement=mixture,samples=samples,codon=codon,paramType=1,withoutReference=wo.ref))
-    quantile.param.1 <- parameter$getCodonSpecificQuantile,mixtureElement=mixture, samples=samples,codon=codon,paramType=0, probs=c(0.025, 0.975),withoutReference=wo.ref))
-    quantile.param.2 <- parameter$getCodonSpecificQuantile,mixtureElement=mixture, samples=samples,codon=codon,paramType=1, probs=c(0.025, 0.975),withoutReference=wo.ref))
+    param.1[codons,"Posterior"] <- parameter$getCodonSpecificPosteriorMean(mixtureElement=mixture,samples=samples,codon=codon,paramType=0,withoutReference=wo.ref)
+    param.2[codons,"Posterior"] <- parameter$getCodonSpecificPosteriorMean(mixtureElement=mixture,samples=samples,codon=codon,paramType=1,withoutReference=wo.ref)
+    quantile.param.1 <- parameter$getCodonSpecificQuantile(mixtureElement=mixture, samples=samples,codon=codon,paramType=0, probs=c(0.025, 0.975),withoutReference=wo.ref)
+    quantile.param.2 <- parameter$getCodonSpecificQuantile(mixtureElement=mixture, samples=samples,codon=codon,paramType=1, probs=c(0.025, 0.975),withoutReference=wo.ref)
   }
   quantile.param.1<- matrix(quantile.param.1, nrow = 2)
   quantile.param.2 <- matrix(quantile.param.2, nrow = 2) 

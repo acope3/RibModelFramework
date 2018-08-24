@@ -1420,7 +1420,7 @@ double Parameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned geneI
  * of the codon-specific parameter's trace, and then getting the mean of these values.
  * Wrapped by getCodonSpecificPosteriorMeanForCodon on the R-side.
 */
-double Parameter::getCodonSpecificPosteriorMean(unsigned element, unsigned samples, std::string &codon,
+double Parameter::getCodonSpecificPosteriorMean(unsigned element, unsigned samples, std::string codon,
 	unsigned paramType, bool withoutReference, bool byGene)
 {
 	double posteriorMean = 0.0;
@@ -1522,7 +1522,7 @@ double Parameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex,
 }
 
 
-double Parameter::getCodonSpecificVariance(unsigned mixtureElement, unsigned samples, std::string &codon,
+double Parameter::getCodonSpecificVariance(unsigned mixtureElement, unsigned samples, std::string codon,
 	unsigned paramType, bool unbiased, bool withoutReference)
 {
 	if (unbiased && samples == 1)
@@ -1613,7 +1613,7 @@ std::vector<double> Parameter::getExpressionQuantile(unsigned samples, unsigned 
 	return calculateQuantile(parameterTrace, samples, probs, log_scale);
 }
 
-std::vector<double> Parameter::getCodonSpecificQuantile(unsigned mixtureElement, unsigned samples, std::string &codon,
+std::vector<double> Parameter::getCodonSpecificQuantile(unsigned mixtureElement, unsigned samples, std::string codon,
 	unsigned paramType, std::vector<double> probs, bool withoutReference)
 {
  	std::vector<float> parameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
@@ -2215,7 +2215,7 @@ double Parameter::getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsi
 
 
 std::vector<double> Parameter::getCodonSpecificQuantileForCodon(unsigned mixtureElement, unsigned samples,
-	std::string &codon, unsigned paramType, std::vector<double> probs, bool withoutReference)
+	std::string codon, unsigned paramType, std::vector<double> probs, bool withoutReference)
 {
 	std::vector<double> rv;
 	codon[0] = (char)std::toupper(codon[0]);

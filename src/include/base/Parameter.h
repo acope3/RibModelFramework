@@ -150,14 +150,14 @@ class Parameter {
 		double getStdDevSynthesisRatePosteriorMean(unsigned samples, unsigned mixture);
 		double getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, bool log_scale=false);
 
-		double getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon,
+		double getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigned samples, std::string codon,
 			unsigned paramType, bool withoutReference = true, bool byGene = false);
 		double getStdDevSynthesisRateVariance(unsigned samples, unsigned mixture, bool unbiased);
 		double getSynthesisRateVariance(unsigned samples, unsigned geneIndex,
 			bool unbiased = true, bool log_scale = false);
-		double getCodonSpecificVariance(unsigned mixtureElement, unsigned samples, std::string &codon,
+		double getCodonSpecificVariance(unsigned mixtureElement, unsigned samples, std::string codon,
 			unsigned paramType, bool unbiased, bool withoutReference = true);
-	        std::vector<double> getCodonSpecificQuantile(unsigned mixtureElement, unsigned samples, std::string &codon,
+	        std::vector<double> getCodonSpecificQuantile(unsigned mixtureElement, unsigned samples, std::string codon,
 			unsigned paramType, std::vector<double> probs, bool withoutReference);
 		std::vector<double> getExpressionQuantile(unsigned samples, unsigned geneIndex,
 			std::vector<double> probs, bool log_scale = false);
@@ -240,7 +240,7 @@ class Parameter {
 		double getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon,
 			unsigned paramType, bool unbiased, bool withoutReference);
         	std::vector<double> getCodonSpecificQuantileForCodon(unsigned mixtureElement, unsigned samples,
-        		std::string &codon, unsigned paramType, std::vector<double> probs, bool withoutReference);
+        		std::string codon, unsigned paramType, std::vector<double> probs, bool withoutReference);
 		std::vector<double> getExpressionQuantileForGene(unsigned samples,
 			unsigned geneIndex, std::vector<double> probs, bool log_scale);
 
