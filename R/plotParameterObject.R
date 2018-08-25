@@ -74,8 +74,8 @@ plotParameterObject <- function(x, what = "Mutation", samples = 100, mixture.nam
       if (aa == "M" || aa == "W" || aa == "X") next
       codons <- AAToCodon(aa, T)
       for (i in 1:length(codons)){
-       means[count,mixture] <- x$getCodonSpecificPosteriorMean(mixture, samples, codons[i], paramType, TRUE)
-        tmp <- x$getCodonSpecificQuantile(mixture, samples, codons[i], paramType, c(0.025, 0.975), TRUE)
+       means[count,mixture] <- x$getCodonSpecificPosteriorMean(codons[i], mixture, samples, paramType, TRUE)
+        tmp <- x$getCodonSpecificQuantile(codons[i],mixture, samples, paramType, c(0.025, 0.975), TRUE)
         
         ## This approach to storing the quantiles may seem unconventional, but I actually found it to be the most straight forward approach
         ## for plotting later.
@@ -175,7 +175,7 @@ upper.panel.plot <- function(x, y, sd.x=NULL, sd.y=NULL, ...){
   intercept <- round(summary(lm.line)$coefficients[1], 3)
   t <- (slope - 1)/std.error
   
-  if(t > qt(1-(0.05/2), lm.line$df.residual - 1)){
+  if((t > qt(1-(0.05/2), lm.line$df.residual - 1))||(t < qt((0.05/2),lm.line$df.residul-1))){
     eq <- paste0("y = ", sprintf("%.3f", intercept), " + ", sprintf("%.3f", slope), "x *")
     text(xlim[1] + width * 0.01, ylim[2] - height * 0.2, eq, pos = 4, cex = 1.5)
   }else{
@@ -253,11 +253,12 @@ acfCSP <- function(parameter, csp = "Mutation", numMixtures = 1, samples = NULL,
   {
     paramType <- 1
   }
-  if(is.null(samples)){ samples <- round(10*log10(length(trace))) }
+ 
   
   acf.list <- list()
   names.aa <- aminoAcids()
   trace <- parameter$getTraceObject()
+  if(is.null(samples)){ samples <- round(10*log10(length(trace))) }
   for (aa in names.aa)
   {
     if (aa == "M" || aa == "W" || aa == "X")
