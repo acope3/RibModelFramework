@@ -3444,95 +3444,14 @@ int testMCMCAlgorithm()
     int globalError = 0;
 
     MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thinning, 10, true, true, true);
-    /*
-    my_print("Initializing MCMCAlgorithm object---------------\n");
-    my_print("\t# Samples: %\n", samples);
-    my_print("\tThinning: %\n", thinning);
-    my_print("\t # Samples used: %\n", 100);
 
-    MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thinning, 10, true, true, true);
-    my_print("Done!-------------------------------\n\n\n");
-
-    my_print("Initializing Genome object--------------------------\n");
-    Genome genome;
-    genome.readRFPData("/Users/hollisbui/RibModelDev/data/rfp/rfp.counts.by.codon.and.gene.GSE63789.wt.csv");
-    my_print("Done!-------------------------------\n\n\n");
-    my_print("Initializing shared parameter variables---------------\n");
-    unsigned numMixtures = 1;
-    std::vector <double> stdDev(numMixtures, 1);
-    unsigned numGenes = genome.getGenomeSize();
-    std::vector <unsigned> geneAssignment(numGenes);
-    if (numMixtures == 1)
-    {
-        for (unsigned i = 0u; i < numGenes; i++)
-        {
-            geneAssignment[i] = 0u;
-        }
-    }
-    else if (numMixtures == 3)
-    {
-        for (unsigned i = 0u; i < numGenes; i++)
-        {
-            if (i < 961) geneAssignment[i] = 0u;
-            else if (i < 1418) geneAssignment[i] = 1u;
-            else geneAssignment[i] = 0u;
-        }
-    }
-    std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
-    bool splitSer = true;
-    std::string mutationSelectionState = Parameter::allUnique;
-    my_print("Done!------------------------\n\n\n");
-
-
-    my_print("Initializing PAParameter object--------------------\n\n");
-    PAParameter parameter(stdDev, numMixtures, geneAssignment, mixtureDefinitionMatrix, splitSer, mutationSelectionState);
-    for (unsigned i = 0u; i < numMixtures; i++)
-    {
-        unsigned selectionCategory = parameter.getSelectionCategory(i);
-        my_print("Sphi_init for selection category %: %\n", selectionCategory, stdDev[selectionCategory]);
-    }
-    my_print("\t# mixtures: %\n", numMixtures);
-    my_print("\tmixture definition: %\n", mutationSelectionState);
-
-    parameter.InitializeSynthesisRate(genome, stdDev[0]);
-
-    my_print("Done!--------------------------------\n\n\n");
-
-    my_print("Initializing PAModel object--------------------------\n");
-    PAModel model;
-    model.setParameter(parameter);
-    my_print("Done!----------------------------------\n\n\n");
-
-    my_print("Running MCMC.............\n\n");
-    mcmc.run(genome, model, 1, 0);
-    my_print("Done!----------------------------------\n\n\n");
-    */
-
-    //--------------------------------------------//
-    //------ varyInitialConditions Function ------//
-    //--------------------------------------------//
-
-    //TODO: must be done before run, etc.
-    //Requires running with models: ROC, RFP, FONSE.
-    //Thus, unit testing can only be done after those models are unit tested.
-
-    //--------------------------//
-    //------ run Function ------//
-    //--------------------------//
-
-    //-------------------------------------------//
-    //------ calculateGewekeScore Function ------//
-    //-------------------------------------------//
-
-    //---------------------------------------------------//
-    //------ is/setEstimateSynthesisRate Functions ------//
-    //---------------------------------------------------//
     if (!mcmc.isEstimateSynthesisRate())
     {
         my_printError("Error in isEstimateSynthesisRate. Function should return true, but returns false.\n");
         error = 1;
         globalError = 1;
     }
+    my_print("checked mcmc.isEstimateSynthesisRate(default)\n");
 
     mcmc.setEstimateSynthesisRate(false);
     if (mcmc.isEstimateSynthesisRate())
@@ -3542,6 +3461,7 @@ int testMCMCAlgorithm()
         error = 1;
         globalError = 1;
     }
+    my_print("checked mcmc.isEstimateSynthesisRate(false)\n");
 
     mcmc.setEstimateSynthesisRate(true);
     if (!mcmc.isEstimateSynthesisRate())
@@ -3551,6 +3471,7 @@ int testMCMCAlgorithm()
         error = 1;
         globalError = 1;
     }
+    my_print("checked mcmc.isEstimateSynthesisRate(true)\n");
 
     if (!error)
         my_print("MCMCAlgorithm is/setEstimateSynthesisRate --- Pass\n");
