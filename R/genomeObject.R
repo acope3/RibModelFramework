@@ -321,7 +321,7 @@ getObservedSynthesisRateSet <- function(genome, simulated = FALSE)
 #' based on a reference genome.
 #' 
 #' @param referenceGenome A genome object initialized with \code{\link{initializeGenomeObject}}.
-#' 
+#' @param default.weight Set default weight for any codon not observed in the reference genome
 #' @return Returns a named vector with the CAI weights for each codon
 #' 
 #' @examples 
@@ -333,7 +333,7 @@ getObservedSynthesisRateSet <- function(genome, simulated = FALSE)
 #' 
 #' wi <- getCAIweights(referenceGenome)
 #' 
-getCAIweights <- function(referenceGenome)
+getCAIweights <- function(referenceGenome,default.weight=0.5)
 {
   aa.vec <- aminoAcids()
   aa.vec <- aa.vec[-length(aa.vec)]
@@ -354,6 +354,7 @@ getCAIweights <- function(referenceGenome)
   
   wi.vec <- unlist(wi.list)
   names(wi.vec) <- codon.names
+  wi.vec[wi.vec == 0.0] <- default.weight
   return(wi.vec)
 }
 
@@ -367,13 +368,19 @@ calcCAI <- function(gene, wi)
   seq <- paste(seq[c(T,F,F)], seq[c(F,T,F)], seq[c(F,F,T)], sep="")
   codon.length <- length(seq)
   
-  CAI <- 1
+  CAI <- 0
   for(s in seq)
   {
-    if(is.na(wi[s])) next
-    CAI <- CAI * wi[s]
+    ## Sharp and Li reccommend not counting Methionine and Tryptophan for CAI. Also skip stop codons
+    if(is.na(wi[s]) || s == "ATG" || s == "TGG" || s == "TAG" || s=="TAA" || s=="TGA") 
+    {
+      codon.length <- codon.length - 1
+      next
+    }
+    ## Calculate on log-scale to avoid potential numerical issues
+    CAI <- CAI + log(wi[s])
   }
-  CAI <- CAI^(1/codon.length)
+  CAI <- exp((1/codon.length)*CAI)
   return(CAI)
 }
 
@@ -389,6 +396,7 @@ calcCAI <- function(gene, wi)
 #' @param testGenome A genome object initialized with \code{\link{initializeGenomeObject}}.
 #' The genome for which the CAI is supposed to be calculated
 #' 
+#' @param default.weight Default weight to use if codon is missing from referenceGenome
 #' @return Returns a named vector with the CAI for each gene
 #' 
 #' @examples 
@@ -402,10 +410,10 @@ calcCAI <- function(gene, wi)
 #'
 #' cai <- getCAI(referenceGenome, testGenome)
 #' 
-getCAI <- function(referenceGenome, testGenome)
+getCAI <- function(referenceGenome, testGenome,default.weight=0.5)
 {
   genes <- testGenome$getGenes(FALSE)
-  wi <- getCAIweights(referenceGenome)
+  wi <- getCAIweights(referenceGenome,default.weight)
   CAI <- unlist(lapply(genes, calcCAI, wi))
   names(CAI) <- getNames(testGenome, FALSE)
   return(CAI)  
