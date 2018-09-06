@@ -647,20 +647,24 @@ findOptimalCodon <- function(csp)
   return(result)
 }
 
-getCSPEstimates_Alex <- function(parameter, filename=NULL, mixture = 1, samples = 10, rescale=T, report.original.ref = T)
+getCSPEstimates_Alex <- function(parameter, filename=NULL, mixture = 1, samples = 10, relative.to.optimal.codon=T, report.original.ref = T)
 {
-  model.cond <- checkModel(parameter)
-  wo.ref <- model.cond$wo.ref
-  names.aa <- model.cond$aa
-  codons <- model.cond$codons
-  parameter.names <- model.cond$parameter.names
+  model.conditions <- checkModel(parameter)
+  model.uses.ref.codon <- model.conditions$model.uses.ref.codon
+  names.aa <- model.conditions$aa
+  codons <- model.conditions$codons
+  parameter.names <- model.conditions$parameter.names
+  
+  ## Creates empty vector of 0 for initial dataframes
   init <- rep(0.0,length(codons))
+  
   param.1<- data.frame(AA=names.aa,Codon=codons,Posterior=init,Lower.quant=init, Upper.quant=init,stringsAsFactors = F,row.names = codons)
   param.2 <- data.frame(AA=names.aa,Codon=codons,Posterior=init,Lower.quant=init, Upper.quant=init,stringsAsFactors = F,row.names=codons)
-  if (wo.ref)
+  if (model.uses.ref.codon)
   {
     codons <- codons[which(codons %in% unlist(lapply(X = names.aa,FUN = AAToCodon,T)))]
   }
+  ## Get parameter estimate for each codon
   for (codon in codons)
   {
     param.1[codon,"Posterior"] <- parameter$getCodonSpecificPosteriorMean(mixtureElement=mixture,samples=samples,codon=codon,paramType=0,withoutReference=wo.ref)
@@ -670,11 +674,15 @@ getCSPEstimates_Alex <- function(parameter, filename=NULL, mixture = 1, samples 
   }
   colnames(param.1) <- c("AA", "Codon", "Posterior", "0.025%", "0.975%")
   colnames(param.2) <- c("AA", "Codon", "Posterior", "0.025%", "0.975%")
-  if(rescale && wo.ref)
+  
+  ## Only called if model actually uses reference codon
+  if(relative.to.optimal.codon && model.uses.ref.codon)
   {
-    csp.param <- rescaleCSPEstimates(param.1,param.2,parameter.names,report.original.ref)
-  } else if (rescale == F || wo.ref == F ){
-    if (wo.ref && !report.original.ref)
+    csp.param <- optimalAsReference(param.1,param.2,parameter.names,report.original.ref)
+  } else if (relative.to.optimal.codon == F || model.uses.ref.codon == F ){
+    ## This is just in case the user wants to exclude the original reference codon
+    ## TO DO: update C++ function which might expect certain format for the input CSP file parameters
+    if (model.uses.ref.codon && !report.original.ref)
     {
       param.1 <- param.1[-which(param.1[,"Posterior"]==0),]
       param.2 <- param.2[-which(param.2[,"Posterior"]==0),]
@@ -688,48 +696,53 @@ getCSPEstimates_Alex <- function(parameter, filename=NULL, mixture = 1, samples 
   {
     return(csp.param)
   }else {
-    write.csv(csp.param[[parameter.names[1]]], file = paste0(parameter.names[1],"_",filename,".csv"), row.names = FALSE, quote=FALSE)
-    write.csv(csp.param[[parameter.names[2]]], file = paste0(parameter.names[2],"_",filename,".csv"), row.names = FALSE, quote=FALSE)
+    write.csv(csp.param[[parameter.names[1]]], file = paste0(parameter.names[1],"_",filename), row.names = FALSE, quote=FALSE)
+    write.csv(csp.param[[parameter.names[2]]], file = paste0(parameter.names[2],"_",filename), row.names = FALSE, quote=FALSE)
   }
 }
 
 ## NOT EXPOSED
-rescaleCSPEstimates<- function(param.1,param.2,parameter.names,report.original.ref)
+optimalAsReference <- function(param.1,param.2,parameter.names,report.original.ref)
 {
-  rescale.param.1 <- data.frame()
-  rescale.param.2 <- data.frame()
+  updated.param.1 <- data.frame()
+  updated.param.2 <- data.frame()
   aa <- unique(param.2[,1])
   for (a in aa)
   {
     codons <- AAToCodon(a)
-    tmp.1 <- param.1[codons,]
-    tmp.2 <- param.2[codons,]
-    ref.row <- which(tmp.2[,"Posterior"]==0)
-    min.value <- min(tmp.2[,"Posterior"])
-    if (min.value != 0.0)
+    ## Create temporary data frames for modifying values
+    tmp.1 <- param.1[codons,] ## "Mutation" parameter
+    tmp.2 <- param.2[codons,] ## "Selection" parameter
+    current.reference.row <- which(tmp.2[,"Posterior"]==0)
+    optimal.parameter.value <- min(tmp.2[,"Posterior"])
+    ## No reason to do anything if optimal value is 0
+    if (optimal.parameter.value != 0.0)
     {
-      tmp.2[,c("Posterior","0.025%","0.975%")] <- tmp.2[,c("Posterior","0.025%","0.975%")] - min.value
-      new.ref.row <- which(tmp.2[,"Posterior"]==0.0)
-      tmp.2[ref.row,c("0.025%","0.975%")] <- tmp.2[new.ref.row,c("0.025%","0.975%")] + tmp.2[ref.row,"Posterior"]
-      tmp.2[new.ref.row,c("Posterior","0.025%","0.975%")] <- 0.0
+      tmp.2[,c("Posterior","0.025%","0.975%")] <- tmp.2[,c("Posterior","0.025%","0.975%")] - optimal.parameter.value
+      ##Get row of the optimal codon, which should be 0
+      optimal.codon.row <- which(tmp.2[,"Posterior"]==0.0)
+      tmp.2[current.reference.row,c("0.025%","0.975%")] <- tmp.2[optimal.codon.row,c("0.025%","0.975%")] + tmp.2[current.reference.row,"Posterior"]
+      ## Can now change optimal codon values to 0.0
+      tmp.2[optimal.codon.row,c("Posterior","0.025%","0.975%")] <- 0.0
       
-      ref.tmp.1<- tmp.1[new.ref.row,"Posterior"]
-      tmp.1[,c("Posterior","0.025%","0.975%")] <- tmp.1[,c("Posterior","0.025%","0.975%")] - ref.tmp.1
-      tmp.1[ref.row,c("0.025%","0.975%")] <- tmp.1[new.ref.row,c("0.025%","0.975%")] + tmp.1[ref.row,"Posterior"]
-      tmp.1[new.ref.row,c("Posterior","0.025%","0.975%")] <- 0.0
+      ## Find corresponding reference value for other parameter
+      optimal.parameter.value <- tmp.1[optimal.codon.row,"Posterior"]
+      tmp.1[,c("Posterior","0.025%","0.975%")] <- tmp.1[,c("Posterior","0.025%","0.975%")] - optimal.parameter.value
+      tmp.1[current.ref.row,c("0.025%","0.975%")] <- tmp.1[optimal.codon,c("0.025%","0.975%")] + tmp.1[current.ref.row,"Posterior"]
+      tmp.1[optimal.codon,c("Posterior","0.025%","0.975%")] <- 0.0
     }
     if (!report.original.ref)
     {
-      tmp.1 <- tmp.1[-ref.row,]
-      tmp.2 <- tmp.2[-ref.row,]
+      tmp.1 <- tmp.1[-current.ref.row,]
+      tmp.2 <- tmp.2[-current.ref.row,]
     }
-    rescale.param.1 <- rbind(rescale.param.1,tmp.1)
-    rescale.param.2 <- rbind(rescale.param.2,tmp.2)
+    updated.param.1 <- rbind(updated.param.1,tmp.1)
+    updated.param.2 <- rbind(updated.param.2,tmp.2)
   }
   csp.param <- vector(mode="list",length=2)
   names(csp.param) <- parameter.names
-  csp.param[[parameter.names[1]]] <- rescale.param.1
-  csp.param[[parameter.names[2]]] <- rescale.param.2
+  csp.param[[parameter.names[1]]] <- updated.param.1
+  csp.param[[parameter.names[2]]] <- updated.param.2
   return(csp.param)
 }
 
@@ -739,7 +752,7 @@ checkModel <- function(parameter)
   class.type = class(parameter)
   if(class(parameter)=="Rcpp_ROCParameter" || class(parameter)=="Rcpp_FONSEParameter")
   {
-    wo.ref = TRUE
+    model.uses.ref.codon <- TRUE
     names.aa <- parameter$getGroupList()
     codons <- unlist(lapply(names.aa,AAToCodon))
     aa <- unlist(lapply(codons,codonToAA))
@@ -747,12 +760,12 @@ checkModel <- function(parameter)
     
   } else
   {
-    wo.ref = FALSE
+    model.uses.ref.codon <- FALSE
     codons <- parameter$getGroupList()
     aa <- unlist(lapply(codons,codonToAA))
     parameter.names <- c("Alpha","Lambda Prime")
   }
-  return(list(aa=aa,codons=codons,wo.ref=wo.ref,parameter.names=parameter.names))
+  return(list(aa=aa,codons=codons,model.uses.ref.codon=model.uses.ref.codon,parameter.names=parameter.names))
 }
 
 
