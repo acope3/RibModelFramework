@@ -542,22 +542,58 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
 #   return(csp)
 # }
 
-# findOptimalCodon <- function(csp)
-# {
-#   aas <- aminoAcids()
-#   n.aa <- length(aas)
-#   result <- vector("list", length(aas))
-#   names(result) <- aas
-#   for(j in 1:n.aa)
-#   {
-#     aa <- aas[j]
-#     if(aa == "W" || aa == "M" || aa == "X") next
-#     aa.pos <- which(csp$AA == aa)
-#     opt.codon.pos <- which(csp[aa.pos, 3] == min(csp[aa.pos, 3]))
-#     result[[j]] <- csp$Codon[aa.pos[opt.codon.pos]]
-#   }
-#   return(result)
-# }
+
+#' Find and return list of optimal codons
+#' 
+#' \code{findOptimalCodon} extracrs the optimal codon for each amino acid.
+#' 
+#' @param csp a \code{data.frame} as returned by \code{getCSPEstimates}.
+#'
+#' @return A named list with with optimal codons for each amino acid.
+#'
+#' @examples 
+#' genome_file <- system.file("extdata", "genome.fasta", package = "AnaCoDa")
+#'
+#' genome <- initializeGenomeObject(file = genome_file)
+#' sphi_init <- 1
+#' numMixtures <- 1
+#' geneAssignment <- rep(1, length(genome))
+#' parameter <- initializeParameterObject(genome = genome, sphi = sphi_init, 
+#'                                        num.mixtures = numMixtures, 
+#'                                        gene.assignment = geneAssignment, 
+#'                                        mixture.definition = "allUnique")
+#' model <- initializeModelObject(parameter = parameter, model = "ROC")
+#' samples <- 2500
+#' thinning <- 50
+#' adaptiveWidth <- 25
+#' mcmc <- initializeMCMCObject(samples = samples, thinning = thinning, 
+#'                              adaptive.width=adaptiveWidth, est.expression=TRUE, 
+#'                              est.csp=TRUE, est.hyper=TRUE, est.mix = TRUE) 
+#' divergence.iteration <- 10
+#' \dontrun{
+#' runMCMC(mcmc = mcmc, genome = genome, model = model, 
+#'         ncores = 4, divergence.iteration = divergence.iteration)
+#' 
+#' csp_mat <- getCSPEstimates(parameter, CSP="Selection")
+#' opt_codons <- findOptimalCodon(csp_mat)
+#' }
+
+findOptimalCodon <- function(csp)
+{
+  aas <- aminoAcids()
+  n.aa <- length(aas)
+  result <- vector("list", length(aas))
+  names(result) <- aas
+  for(j in 1:n.aa)
+  {
+    aa <- aas[j]
+    if(aa == "W" || aa == "M" || aa == "X") next
+    aa.pos <- which(csp$AA == aa)
+    opt.codon.pos <- which(csp[aa.pos, 3] == min(csp[aa.pos, 3]))
+    result[[j]] <- csp$Codon[aa.pos[opt.codon.pos]]
+  }
+  return(result)
+}
 
 
 #' Return Codon Specific Paramters (or write to csv) estimates as data.frame
@@ -622,8 +658,8 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
   ## Creates empty vector of 0 for initial dataframes
   init <- rep(0.0,length(codons))
   
-  param.1<- data.frame(AA=names.aa,Codon=codons,Posterior=init,Lower.quant=init, Upper.quant=init,stringsAsFactors = F,row.names = codons)
-  param.2 <- data.frame(AA=names.aa,Codon=codons,Posterior=init,Lower.quant=init, Upper.quant=init,stringsAsFactors = F,row.names=codons)
+  param.1<- data.frame(Codon=codons,AA=names.aa,Posterior=init,Lower.quant=init, Upper.quant=init,stringsAsFactors = F,row.names = codons)
+  param.2 <- data.frame(Codon=codons,AA=names.aa,Posterior=init,Lower.quant=init, Upper.quant=init,stringsAsFactors = F,row.names=codons)
   if (model.uses.ref.codon)
   {
     codons <- codons[which(codons %in% unlist(lapply(X = names.aa,FUN = AAToCodon,T)))]
@@ -636,8 +672,8 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
     param.1[codon,c("Lower.quant","Upper.quant")] <- parameter$getCodonSpecificQuantile(mixtureElement=mixture, samples=samples,codon=codon,paramType=0, probs=c(0.025, 0.975),withoutReference=model.uses.ref.codon)
     param.2[codon,c("Lower.quant","Upper.quant")]  <- parameter$getCodonSpecificQuantile(mixtureElement=mixture, samples=samples,codon=codon,paramType=1, probs=c(0.025, 0.975),withoutReference=model.uses.ref.codon)
   }
-  colnames(param.1) <- c("AA", "Codon", "Posterior", "0.025%", "0.975%")
-  colnames(param.2) <- c("AA", "Codon", "Posterior", "0.025%", "0.975%")
+  colnames(param.1) <- c("Codon", "AA", "Posterior", "0.025%", "0.975%")
+  colnames(param.2) <- c("Codon", "AA", "Posterior", "0.025%", "0.975%")
   
   ## Only called if model actually uses reference codon
   if(relative.to.optimal.codon && model.uses.ref.codon)
