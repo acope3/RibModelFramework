@@ -707,7 +707,6 @@ optimalAsReference <- function(param.1,param.2,parameter.names,report.original.r
   updated.param.1 <- data.frame()
   updated.param.2 <- data.frame()
   aa <- unique(param.2[,"AA"])
-  print(aa)
   for (a in aa)
   {
     codons <- AAToCodon(a)
