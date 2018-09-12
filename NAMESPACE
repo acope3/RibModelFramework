@@ -39,6 +39,7 @@ export(
 "initializeParameterObject",
 "getCSPEstimates",
 "getMixtureAssignmentEstimate",
+"findOptimalCodon",
 "getExpressionEstimates",
 "writeParameterObject",
 "loadParameterObject",

@@ -74,8 +74,8 @@ plotParameterObject <- function(x, what = "Mutation", samples = 100, mixture.nam
       if (aa == "M" || aa == "W" || aa == "X") next
       codons <- AAToCodon(aa, T)
       for (i in 1:length(codons)){
-       means[count,mixture] <- x$getCodonSpecificPosteriorMean(codons[i], mixture, samples, paramType, TRUE)
-        tmp <- x$getCodonSpecificQuantile(codons[i],mixture, samples, paramType, c(0.025, 0.975), TRUE)
+       means[count,mixture] <- x$getCodonSpecificPosteriorMean(mixture, samples,codons[i], paramType, TRUE)
+        tmp <- x$getCodonSpecificQuantile(mixture,samples, codons[i], paramType, c(0.025, 0.975), TRUE)
         
         ## This approach to storing the quantiles may seem unconventional, but I actually found it to be the most straight forward approach
         ## for plotting later.

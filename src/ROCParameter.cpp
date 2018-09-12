@@ -659,14 +659,9 @@ void ROCParameter::proposeCodonSpecificParameter()
 		{
 			for (unsigned j = i * numCodons, l = aaStart; j < (i * numCodons) + numCodons; j++, l++)
 			{
-				if (fix_dM)
-				{
-					proposedCodonSpecificParameter[dM][i][l] = currentCodonSpecificParameter[dM][i][l];
-				}
-				else
-				{
-					proposedCodonSpecificParameter[dM][i][l] = currentCodonSpecificParameter[dM][i][l] + covaryingNums[j];
-				}
+				
+				proposedCodonSpecificParameter[dM][i][l] = currentCodonSpecificParameter[dM][i][l] + covaryingNums[j];
+				
 			}
 		}
 		for (unsigned i = 0; i < numSelectionCategories; i++)
@@ -703,12 +698,6 @@ void ROCParameter::updateCodonSpecificParameter(std::string grouping)
 		}
 	}
 }
-
-void ROCParameter::fixDM()
-{
-	fix_dM = true;
-}
-
 
 
 //-------------------------------------//
