@@ -3,9 +3,9 @@ library(AnaCoDa)
 
 context("Genome")
 
-test_that("general genome functions", {
-  expect_equal(testGenome("UnitTestingData"), 0)
-})
+# test_that("general genome functions", {
+#   expect_equal(testGenome("UnitTestingData"), 0)
+# })
 
 g <- new(Genome)
 
