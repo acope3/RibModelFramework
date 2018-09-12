@@ -326,7 +326,6 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& model, int iteration)
 {
 	//double acceptanceRatioForAllMixtures = 0.0;
-	double posterior;
 	std::vector<double> acceptanceRatioForAllMixtures(5,0.0);
 	unsigned size = model.getGroupListSize();
 
@@ -447,7 +446,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	// set the last iteration to the max iterations,
 	// this way if the MCMC doesn't exit based on Geweke score, it will use the max iteration for posterior means
 	model.setLastIteration(samples);
-	for (unsigned iteration = 1u; iteration <= maximumIterations; iteration++)
+	for (int iteration = 1u; iteration <= maximumIterations; iteration++)
 	{
 		if (writeRestartFile)
 		{
@@ -608,7 +607,7 @@ void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned
 		// prior on phi values -> take prior into account, but only the prior no likelihood
 		if (estimateSynthesisRate)
 		{
-			int numGenes = genome.getGenomeSize();
+			unsigned numGenes = genome.getGenomeSize();
 			unsigned numSynthesisRateCategories = model.getNumSynthesisRateCategories();
 			for (unsigned i = 0u; i < numGenes; i++)
 			{

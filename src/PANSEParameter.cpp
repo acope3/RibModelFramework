@@ -837,7 +837,6 @@ void PANSEParameter::readLambdaValues(std::string filename)
     else
     {
         currentFile >> tmpString;
-        unsigned i = 0;
         while (currentFile >> tmpString){
             pos = tmpString.find(',');
             if (pos != std::string::npos)
