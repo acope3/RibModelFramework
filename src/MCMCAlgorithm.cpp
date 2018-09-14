@@ -346,7 +346,6 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 		if (threshold < acceptanceRatioForAllMixtures[0] && std::isfinite(acceptanceRatioForAllMixtures[0]))
 		{
 			// moves proposed codon specific parameters to current codon specific parameters
-			posterior = acceptanceRatioForAllMixtures[4]; //unassigned will be 0
 			model.updateCodonSpecificParameter(grouping);
 			if ((iteration % thinning) == 0)
 			{
