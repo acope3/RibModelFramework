@@ -73,7 +73,7 @@ void PAModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex,
 
 		double currAlpha = getParameterForCategory(alphaCategory, PAParameter::alp, codon, false);
 		double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, codon, false);
-		unsigned currRFPValue = gene.geneData.getCodonSpecificSumRFPCount(index, 0 /*RFPCountColumn*/);
+		unsigned currRFPValue = gene.geneData.getCodonSpecificSumRFPCount(index, RFPCountColumn);
 
 		unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(index);
 		if (currNumCodonsInMRNA == 0) continue;
@@ -124,7 +124,7 @@ void PAModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grou
 		//unsigned synthesisRateCategory = parameter->getSynthesisRateCategory(mixtureElement);
 		// get non codon specific values, calculate likelihood conditional on these
 		double phiValue = parameter->getSynthesisRate(i, /*synthesisRateCategory*/mixtureElement, false);
-		unsigned currRFPValue = gene->geneData.getCodonSpecificSumRFPCount(index, 0 /*RFPCountColumn*/);
+		unsigned currRFPValue = gene->geneData.getCodonSpecificSumRFPCount(index, RFPCountColumn);
 		unsigned currNumCodonsInMRNA = gene->geneData.getCodonCountForCodon(index);
         my_print("There are % copies of codon %\n in gene %",currNumCodonsInMRNA, grouping, gene->getId() );
 		if (currNumCodonsInMRNA == 0) continue;
