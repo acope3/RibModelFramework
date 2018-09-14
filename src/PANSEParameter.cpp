@@ -843,7 +843,6 @@ void PANSEParameter::readLambdaValues(std::string filename)
             {
                 std::string codon = tmpString.substr(0,3);
                 std::string val = tmpString.substr(pos + 1, std::string::npos);
-                i = SequenceSummary::codonToIndex(codon);
                 tmp[SequenceSummary::codonToIndex(codon)] = std::atof(val.c_str());
             }
         }
