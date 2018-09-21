@@ -13,7 +13,7 @@ using namespace Rcpp;
 PAModel::PAModel(unsigned _RFPCountColumn) : Model()
 {
 	parameter = NULL;
-	RFPCountColumn = _RFPCountColumn;
+	RFPCountColumn = _RFPCountColumn - 1;
 	//ctor
 }
 
