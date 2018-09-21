@@ -513,17 +513,6 @@ void PAParameter::updateCodonSpecificParameter(std::string grouping)
 {
 	unsigned i = SequenceSummary::codonToIndex(grouping);
 	numAcceptForCodonSpecificParameters[i]++;
-
-	for (unsigned k = 0u; k < numMutationCategories; k++)
-	{
-		double a = currentCodonSpecificParameter[alp][k][i] = proposedCodonSpecificParameter[alp][k][i];
-        //my_print("updated alpha is %\n", a);
-	}
-	for (unsigned k = 0u; k < numSelectionCategories; k++)
-	{
-		double l = currentCodonSpecificParameter[lmPri][k][i] = proposedCodonSpecificParameter[lmPri][k][i];
-        //my_print("updated lambda is %\n", l);
-	}
 }
 
 
