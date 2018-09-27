@@ -13,7 +13,7 @@ using namespace Rcpp;
 PAModel::PAModel(unsigned _RFPCountColumn) : Model()
 {
 	parameter = NULL;
-	RFPCountColumn = _RFPCountColumn;
+	RFPCountColumn = _RFPCountColumn - 1;
 	//ctor
 }
 
@@ -121,7 +121,7 @@ void PAModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grou
 		// how is the mixture element defined. Which categories make it up
 		unsigned alphaCategory = parameter->getMutationCategory(mixtureElement);
 		unsigned lambdaPrimeCategory = parameter->getSelectionCategory(mixtureElement);
-		unsigned synthesisRateCategory = parameter->getSynthesisRateCategory(mixtureElement);
+		//unsigned synthesisRateCategory = parameter->getSynthesisRateCategory(mixtureElement);
 		// get non codon specific values, calculate likelihood conditional on these
 		double phiValue = parameter->getSynthesisRate(i, /*synthesisRateCategory*/mixtureElement, false);
 		unsigned currRFPValue = gene->geneData.getCodonSpecificSumRFPCount(index, RFPCountColumn);
