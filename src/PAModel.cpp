@@ -12,6 +12,7 @@ using namespace Rcpp;
 
 PAModel::PAModel(unsigned _RFPCountColumn) : Model()
 {
+    my_print("Building PAModel with RFPCountColumn = %\n", RFPCountColumn);
 	parameter = NULL;
 	RFPCountColumn = _RFPCountColumn - 1;
 	//ctor
@@ -32,11 +33,6 @@ double PAModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double c
 	double logLikelihood = ((std::lgamma((currNumCodonsInMRNA * currAlpha) + currRFPValue)) - (std::lgamma(currNumCodonsInMRNA * currAlpha)))
 						   + (currRFPValue * (std::log(phiValue) - std::log(currLambdaPrime + phiValue)))
 						   + ((currNumCodonsInMRNA * currAlpha) * (std::log(currLambdaPrime) - std::log(currLambdaPrime + phiValue)));
-    my_print("The current Alpha is: %\n", currAlpha);
-    my_print("The current LambdaPrime is:  %\n", currLambdaPrime);
-    my_print("The current RFPValue is:  %\n", currRFPValue);
-    my_print("The current Number of Codons is: %\n", currNumCodonsInMRNA);
-    my_print("The current Phi is:  %\n", phiValue);
 
 	return logLikelihood;
 }
@@ -126,7 +122,6 @@ void PAModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grou
 		double phiValue = parameter->getSynthesisRate(i, /*synthesisRateCategory*/mixtureElement, false);
 		unsigned currRFPValue = gene->geneData.getCodonSpecificSumRFPCount(index, RFPCountColumn);
 		unsigned currNumCodonsInMRNA = gene->geneData.getCodonCountForCodon(index);
-        my_print("There are % copies of codon %\n in gene %",currNumCodonsInMRNA, grouping, gene->getId() );
 		if (currNumCodonsInMRNA == 0) continue;
 
 

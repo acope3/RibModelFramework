@@ -273,10 +273,6 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		}
 		logPosterior += std::log(currGeneLogPost) + maxValue2;
 
-
-		if (std::isinf(logPosterior))
-            my_print("\tInfinity reached (Gene: %)\n", i);
-
 		// Get category in which the gene is placed in.
 		// If we use multiple sequence observation (like different mutants),
 		// randMultinom needs a parameter N to place N observations in numMixture buckets
