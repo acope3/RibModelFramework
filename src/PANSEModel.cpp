@@ -47,10 +47,6 @@ double PANSEModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, doubl
 
     double rv = term1 + term2 + term3;
 
-    if (std::isnan(rv)){
-        my_print("term1 = %\nterm2 = %\nterm3 = %\nalpha = %\nlambda = %\nphi = %\n", term1, term2, term3, currAlpha, currLambdaPrime, phiValue);
-    }
-
     return rv;
 }
 
