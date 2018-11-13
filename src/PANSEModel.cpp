@@ -611,10 +611,11 @@ void PANSEModel::simulateGenome(Genome &genome)
     }*/
     for (unsigned geneIndex = 0u; geneIndex < genome.getGenomeSize(); geneIndex++)
     {
-        unsigned mixtureElement = getMixtureAssignment(geneIndex);
+        /*unsigned mixtureElement = getMixtureAssignment(geneIndex);
         Gene gene = genome.getGene(geneIndex);
         double phi = parameter->getSynthesisRate(geneIndex, mixtureElement, false);
         Gene tmpGene = gene;
+        Need to reimplement*/
     }
 
 }
