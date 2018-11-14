@@ -175,7 +175,7 @@ upper.panel.plot <- function(x, y, sd.x=NULL, sd.y=NULL, ...){
   intercept <- round(summary(lm.line)$coefficients[1], 3)
   t <- (slope - 1)/std.error
   
-  if((t > qt(1-(0.05/2), lm.line$df.residual - 1))||(t < qt((0.05/2),lm.line$df.residul-1))){
+  if(t > qt(1-(0.05/2), lm.line$df.residual - 1) || t < qt(0.05/2,lm.line$df.residual-1)){
     eq <- paste0("y = ", sprintf("%.3f", intercept), " + ", sprintf("%.3f", slope), "x *")
     text(xlim[1] + width * 0.01, ylim[2] - height * 0.2, eq, pos = 4, cex = 1.5)
   }else{
