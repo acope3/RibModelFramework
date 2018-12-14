@@ -12,8 +12,9 @@ using namespace Rcpp;
 
 PANSEModel::PANSEModel(unsigned _RFPCountColumn) : Model()
 {
-    parameter = 0;
-    RFPCountColumn = _RFPCountColumn;
+    parameter = NULL;
+    RFPCountColumn = _RFPCountColumn - 1;
+    my_print("Building PAModel with RFPCountColumn = %\n", RFPCountColumn);
     //ctor
 }
 
@@ -104,7 +105,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
         double currAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, false);
         double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PANSEParameter::lmPri, codon, false);
         //Should be rfp value at position not all of codon
-        unsigned currRFPObserved = gene.geneData.getCodonSpecificSumRFPCount(index);
+        unsigned currRFPObserved = gene.geneData.getCodonSpecificSumRFPCount(index, 0);
 
         unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(index);
         //This line will never execute
@@ -161,7 +162,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
         unsigned synthesisRateCategory = parameter->getSynthesisRateCategory(mixtureElement);
         // get non codon specific values, calculate likelihood conditional on these
         double phiValue = parameter->getSynthesisRate(i, synthesisRateCategory, false);
-        unsigned currRFPObserved = gene->geneData.getCodonSpecificSumRFPCount(index, RFPCountColumn);
+        unsigned currRFPObserved = gene->geneData.getCodonSpecificSumRFPCount(index, /*RFPCountColumn*/ 0);
         unsigned currNumCodonsInMRNA = gene->geneData.getCodonCountForCodon(index);
         if (currNumCodonsInMRNA == 0) continue;
 

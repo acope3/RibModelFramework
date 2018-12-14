@@ -333,11 +333,6 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 		model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures);
 		//logPosterior += model.calculateAllPriors();
         double threshold = -Parameter::randExp(1);
-        /*if ((iteration % thinning) == 0)
-        {
-            my_print("The returned logLikelihood Ratio is: %\n", acceptanceRatioForAllMixtures[0]);
-            my_print("The Returned Threshhold is: %\n", threshold);
-        }*/
 
 		if (threshold < acceptanceRatioForAllMixtures[0] && std::isfinite(acceptanceRatioForAllMixtures[0]))
 		{

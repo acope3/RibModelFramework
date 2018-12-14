@@ -275,7 +275,10 @@ void SequenceSummary::setSumRFPCount(std::array <unsigned, 64> arg, unsigned RFP
  */
 unsigned SequenceSummary::getCodonSpecificSumRFPCount(std::string codon, unsigned RFPCountColumn)
 {
-	if (sumRFPCount.size() < RFPCountColumn + 1) initSumRFPCount(RFPCountColumn + 1);
+	if (sumRFPCount.size() < RFPCountColumn + 1){
+	    initSumRFPCount(RFPCountColumn + 1);
+	    my_printError("RFP Column initialized\n");
+	}
 	return sumRFPCount[RFPCountColumn][codonToIndex(codon)];
 }
 
