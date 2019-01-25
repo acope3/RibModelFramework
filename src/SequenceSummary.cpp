@@ -277,7 +277,6 @@ unsigned SequenceSummary::getCodonSpecificSumRFPCount(std::string codon, unsigne
 {
 	if (sumRFPCount.size() < RFPCountColumn + 1){
 	    initSumRFPCount(RFPCountColumn + 1);
-	    my_printError("RFP Column initialized\n");
 	}
 	return sumRFPCount[RFPCountColumn][codonToIndex(codon)];
 }

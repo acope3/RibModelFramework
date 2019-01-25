@@ -136,7 +136,7 @@ void PAModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grou
 		logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambdaPrime, currRFPValue, currNumCodonsInMRNA, phiValue);
 	}
 	logAcceptanceRatioForAllMixtures[0] = logLikelihood_proposed - logLikelihood;// - ((std::log(currAlpha) + std::log(currLambdaPrime))
-                                                                                                        - (std::log(propAlpha) + std::log(propLambdaPrime)));
+                                                                        //- (std::log(propAlpha) + std::log(propLambdaPrime)));
 	logAcceptanceRatioForAllMixtures[1] = logLikelihood; //- (std::log(propAlpha) + std::log(propLambdaPrime));
 	logAcceptanceRatioForAllMixtures[2] = logLikelihood_proposed; //- (std::log(currAlpha) + std::log(currLambdaPrime));
 	logAcceptanceRatioForAllMixtures[3] = logLikelihood;

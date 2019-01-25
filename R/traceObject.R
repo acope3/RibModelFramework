@@ -1,6 +1,3 @@
-
-
-
 #### TODO, lets move it into parameterObject.R and use a parameter instead of trace. thats how it is done for the acf function
 
 # see mcmc Object.R convergence.test function for documentation

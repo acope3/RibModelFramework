@@ -105,8 +105,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
         double currAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, false);
         double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PANSEParameter::lmPri, codon, false);
         //Should be rfp value at position not all of codon
-        unsigned currRFPObserved = gene.geneData.getCodonSpecificSumRFPCount(index, 0);
-
+        unsigned currRFPObserved = gene.geneData.getSingleRFPCount(index, 0);
         unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(index);
         //This line will never execute
         if (currNumCodonsInMRNA == 0) continue;
@@ -114,14 +113,8 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
         //Have to redo the math becuas rfp observed has changed
         logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue);
         logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue_proposed);
+    }
 
-        if(std::isnan(logLikelihood)){
-            my_print("real is nan\n");
-        }
-        if(std::isnan(logLikelihood_proposed)){
-            my_print("proposed is nan\n");
-        }
-        }
     //Double check math here
     double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(lambdaPrimeCategory, false);
     double logPhiProbability = Parameter::densityLogNorm(phiValue, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
