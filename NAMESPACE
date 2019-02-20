@@ -24,6 +24,7 @@ S3method(convergence.test, Rcpp_Trace)
 
 S3method(plot, Rcpp_ROCParameter)
 S3method(plot, Rcpp_FONSEParameter)
+S3method(plot, Rcpp_PAParameter)
 S3method(plot, Rcpp_ROCModel)
 S3method(plot, Rcpp_FONSEModel)
 S3method(plot, Rcpp_MCMCAlgorithm)

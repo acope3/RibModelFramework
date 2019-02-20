@@ -14,7 +14,7 @@ PANSEModel::PANSEModel(unsigned _RFPCountColumn) : Model()
 {
     parameter = NULL;
     RFPCountColumn = _RFPCountColumn - 1;
-    my_print("Building PAModel with RFPCountColumn = %\n", RFPCountColumn);
+    my_print("Building PANSEModel with RFPCountColumn = %\n", RFPCountColumn);
     //ctor
 }
 
@@ -566,48 +566,42 @@ void PANSEModel::updateHyperParameter(unsigned hp)
 //TODO: Account for position
 void PANSEModel::simulateGenome(Genome &genome)
 {
-    /*for (unsigned geneIndex = 0u; geneIndex < genome.getGenomeSize(); geneIndex++)
+    float sigma = 1;
+    for (unsigned geneIndex = 0u; geneIndex < genome.getGenomeSize(); geneIndex++)
     {
         unsigned mixtureElement = getMixtureAssignment(geneIndex);
         Gene gene = genome.getGene(geneIndex);
         double phi = parameter->getSynthesisRate(geneIndex, mixtureElement, false);
+        SequenceSummary sequence = gene.geneData;
         Gene tmpGene = gene;
-        for (unsigned codonIndex = 0u; codonIndex < 61; codonIndex++)
+        std::vector <unsigned> positions = sequence.getPositionCodonID();
+        std::vector <int> rfpCount;
+        for (unsigned codonID : positions)
         {
-            std::string codon = SequenceSummary::codonArray[codonIndex];
+            std::string codon = SequenceSummary::codonArray[codonID];
             unsigned alphaCat = parameter->getMutationCategory(mixtureElement);
             unsigned lambdaPrimeCat = parameter->getSelectionCategory(mixtureElement);
 
             double alpha = getParameterForCategory(alphaCat, PANSEParameter::alp, codon, false);
             double lambdaPrime = getParameterForCategory(lambdaPrimeCat, PANSEParameter::lmPri, codon, false);
 
-            double alphaPrime = alpha * gene.geneData.getCodonCountForCodon(codon);
-
 #ifndef STANDALONE
             RNGScope scope;
             NumericVector xx(1);
-            xx = rgamma(1, alphaPrime, 1.0/lambdaPrime);
-            xx = rpois(1, xx[0] * phi);
-            tmpGene.geneData.setCodonSpecificSumRFPCount(codonIndex, xx[0], RFPCountColumn);
+            xx = rgamma(1, alpha, 1.0/lambdaPrime);
+            xx = rpois(1, xx[0] * phi * sigma);
+            rfpCount.push_back(xx[0]);
 #else
             std::gamma_distribution<double> GDistribution(alphaPrime, 1.0/lambdaPrime);
             double tmp = GDistribution(Parameter::generator);
-            std::poisson_distribution<unsigned> PDistribution(phi * tmp);
+            std::poisson_distribution<unsigned> PDistribution(phi * tmp * sigma);
             unsigned simulatedValue = PDistribution(Parameter::generator);
-            tmpGene.geneData.setCodonSpecificSumRFPCount(codonIndex, simulatedValue, RFPCountColumn);
+            rfpCount.push_back(simulatedValue);
 #endif
         }
+        tmpGene.geneData.setRFPCount(rfpCount, RFPCountColumn);
         genome.addGene(tmpGene, true);
-    }*/
-    for (unsigned geneIndex = 0u; geneIndex < genome.getGenomeSize(); geneIndex++)
-    {
-        /*unsigned mixtureElement = getMixtureAssignment(geneIndex);
-        Gene gene = genome.getGene(geneIndex);
-        double phi = parameter->getSynthesisRate(geneIndex, mixtureElement, false);
-        Gene tmpGene = gene;
-        Need to reimplement*/
     }
-
 }
 
 

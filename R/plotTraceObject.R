@@ -72,6 +72,10 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
   {
     plotExpressionTrace(x, geneIndex)
   }
+  if(what[1] == "AcceptanceRatio")
+  {
+    plotCodonSpecificHyperParameters(x, what = what[1])
+  }
 
 
 }
@@ -212,7 +216,7 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
 #' 
 #' @description Plots a codon-specific set of traces, specified with the \code{type} parameter.
 #'
-plotCodonSpecificHyperParameters <- function(trace, mixture, type="RandomNumber", main="Random Number Parameter Traces", PA=TRUE)
+plotCodonSpecificHyperParameters <- function(trace, what="RandomNumber", main="Random Number Parameter Traces", PA=TRUE)
 {
   opar <- par(no.readonly = T) 
   
@@ -242,22 +246,22 @@ plotCodonSpecificHyperParameters <- function(trace, mixture, type="RandomNumber"
     if(length(codons) == 0) next
  	cur.trace <- vector("list", length(codons))
     
- 	  if(type == "RandomNumber"){
+ 	  if(what == "RandomNumber"){
  	    ylab <- expression("Random Number")
  	    paramType <- 0
- 	  }else if (type == "AcceptanceRatio"){
+ 	  }else if (what == "AcceptanceRatio"){
  	    ylab <- expression("Acceptance Ratio")
  	    paramType <- 1
- 	  }else if (type == "CurrentLogLikelihood"){
+ 	  }else if (what == "CurrentLogLikelihood"){
  	    ylab <- expression("Current Log Likelihood")
  	    paramType <- 2
- 	  }else if (type == "ProposedLogLikelihood"){
+ 	  }else if (what == "ProposedLogLikelihood"){
  	    ylab <- expression("Proposed Log Likelihood")
  	    paramType <- 3
- 	  }else if (type == "CurrentLogLikelihoodAdjusted"){
+ 	  }else if (what == "CurrentLogLikelihoodAdjusted"){
  	    ylab <- expression("Adjusted Current Log Likelihood")
  	    paramType <- 4
- 	  }else if (type == "ProposedLogLikelihoodAdjusted"){
+ 	  }else if (what == "ProposedLogLikelihoodAdjusted"){
  	    ylab <- expression("Adjusted Proposed Log Likelihood")
  	    paramType <- 5
  	  }else{
@@ -266,7 +270,12 @@ plotCodonSpecificHyperParameters <- function(trace, mixture, type="RandomNumber"
     
     for(i in 1:length(codons))
     { 
-        cur.trace[[i]] <- trace$getCodonSpecificHyperParameterTraceByMixtureElementForCodon(mixture, codons[i], paramType)
+        if(paramType == 1){
+            cur.trace[[i]] <- trace$getCodonSpecificAcceptanceRateTraceForAA(codons[i])
+        }
+        else{
+            cur.trace[[i]] <- trace$getCodonSpecificHyperParameterTraceByMixtureElementForCodon(mixture, codons[i], paramType)
+        }
     }
   
     

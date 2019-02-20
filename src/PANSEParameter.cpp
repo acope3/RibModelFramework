@@ -540,6 +540,7 @@ void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptatio
 	for (unsigned i = 0; i < groupList.size(); i++)
 	{
 
+
 		unsigned codonIndex = SequenceSummary::codonToIndex(groupList[i]);
 		double acceptanceLevel = (double)numAcceptForCodonSpecificParameters[codonIndex] / (double)adaptationWidth;
 		traces.updateCodonSpecificAcceptanceRateTrace(codonIndex, acceptanceLevel);

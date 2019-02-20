@@ -12,9 +12,9 @@ using namespace Rcpp;
 
 PAModel::PAModel(unsigned _RFPCountColumn) : Model()
 {
-    my_print("Building PAModel with RFPCountColumn = %\n", RFPCountColumn);
 	parameter = NULL;
 	RFPCountColumn = _RFPCountColumn - 1;
+    	my_print("Building PAModel with RFPCountColumn = %\n", RFPCountColumn);
 	//ctor
 }
 
