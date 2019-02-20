@@ -13,6 +13,10 @@ context("MCMC with ROC")
 # In R, file.path is faster than paste
 fileName = file.path("UnitTestingData", "testMCMCROCFiles", "simulatedAllUniqueR.fasta")
 expressionFile = file.path("UnitTestingData", "testMCMCROCFiles", "simulatedAllUniqueR_phi_withPhiSet.csv")
+selectionMainFile = file.path("UnitTestingData", "testMCMCROCFiles", "selection_mod_Ecoli_K12_MG1655_ncbi_main_liberal.csv")
+selectionHtFile = file.path("UnitTestingData", "testMCMCROCFiles", "selection_mod_Ecoli_K12_MG1655_ncbi_ht_liberal.csv")
+mutationMainFile = file.path("UnitTestingData", "testMCMCROCFiles", "mutation_mod_Ecoli_K12_MG1655_ncbi_main_liberal.csv")
+mutationHtFile = file.path("UnitTestingData", "testMCMCROCFiles", "mutation_mod_Ecoli_K12_MG1655_ncbi_ht_liberal.csv")
 
 # Ensure the input files exist.
 test_that("file exists: simulatedAllUniqueR.fasta", {
@@ -20,6 +24,18 @@ test_that("file exists: simulatedAllUniqueR.fasta", {
 })
 test_that("file exists: simulatedAllUniqueR_phi_withPhiSet.csv", {
   expect_equal(file.exists(expressionFile), T)
+})
+test_that("file exists: selection_mod_Ecoli_K12_MG1655_ncbi_main_liberal.csv", {
+  expect_equal(file.exists(selectionMainFile), T)
+})
+test_that("file exists: selection_mod_Ecoli_K12_MG1655_ncbi_ht_liberal.csv", {
+  expect_equal(file.exists(selectionHtFile), T)
+})
+test_that("file exists: mutation_mod_Ecoli_K12_MG1655_ncbi_main_liberal.csv", {
+  expect_equal(file.exists(mutationMainFile), T)
+})
+test_that("file exists: mutation_mod_Ecoli_K12_MG1655_ncbi_ht_liberal.csv", {
+  expect_equal(file.exists(mutationHtFile), T)
 })
 
 sphi_init <- c(1,1)
@@ -41,6 +57,8 @@ genome <- initializeGenomeObject(file = fileName, observed.expression.file = exp
 
 geneAssignment <- sample(c(1,2), size = length(genome), replace = TRUE, prob = c(0.3, 0.7)) #c(rep(1,500), rep(2,500))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
+parameter$initSelectionCategories(c(selectionMainFile, selectionHtFile), 2)
+parameter$initMutationCategories(c(mutationMainFile, mutationHtFile), 2)
 
 model <- initializeModelObject(parameter, "ROC", with.phi = TRUE) 
 
@@ -51,7 +69,7 @@ runMCMC(mcmc, genome, model, 1, divergence.iteration)
 sink()
 
 test_that("identical MCMC-ROC input with Phi, same log posterior", {
-  knownLogPosterior <- -828047
+  knownLogPosterior <- -953149
   testLogPosterior <- round(mcmc$getLogPosteriorTrace()[10])
   expect_equal(knownLogPosterior, testLogPosterior)
 })
@@ -63,6 +81,8 @@ genome <- initializeGenomeObject(file = fileName)
 
 geneAssignment <- sample(c(1,2), size = length(genome), replace = TRUE, prob = c(0.3, 0.7)) #c(rep(1,500), rep(2,500))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
+parameter$initSelectionCategories(c(selectionMainFile, selectiosHtFile), 2)
+parameter$initMutationCategories(c(mutationMainFile, mutationHtFile), 2)
 
 model <- initializeModelObject(parameter, "ROC", with.phi = FALSE) 
 
@@ -73,7 +93,7 @@ runMCMC(mcmc, genome, model, 1, divergence.iteration)
 sink()
 
 test_that("identical MCMC-ROC input without Phi, same log posterior", {
-  knownLogPosterior <- -831329
+  knownLogPosterior <- -879815
   testLogPosterior <- round(mcmc$getLogPosteriorTrace()[10])
   expect_equal(knownLogPosterior, testLogPosterior)
 })
