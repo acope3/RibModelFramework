@@ -14,8 +14,6 @@ PAModel::PAModel(unsigned _RFPCountColumn) : Model()
 {
 	parameter = NULL;
 	RFPCountColumn = _RFPCountColumn - 1;
-    	my_print("Building PAModel with RFPCountColumn = %\n", RFPCountColumn);
-	//ctor
 }
 
 
