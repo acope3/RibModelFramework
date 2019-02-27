@@ -576,6 +576,9 @@ void PANSEModel::simulateGenome(Genome &genome)
         Gene tmpGene = gene;
         std::vector <unsigned> positions = sequence.getPositionCodonID();
         std::vector <int> rfpCount;
+        if(geneIndex == 0){
+            for (unsigned pos : positions) my_printError("the pos is %\n", pos);
+        }
         for (unsigned codonID : positions)
         {
             std::string codon = SequenceSummary::codonArray[codonID];
