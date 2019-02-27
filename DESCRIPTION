@@ -36,5 +36,5 @@ Imports:
 LinkingTo: Rcpp
 LazyLoad: yes
 LazyData: yes
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
 Packaged: 2016-01-05 19:47:01 UTC; clandere
