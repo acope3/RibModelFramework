@@ -4,19 +4,17 @@
 \alias{plotCodonSpecificHyperParameters}
 \title{Plot Codon Specific Hyper Parameter}
 \usage{
-plotCodonSpecificHyperParameters(trace, mixture, type = "RandomNumber",
+plotCodonSpecificHyperParameters(trace, what = "RandomNumber",
   main = "Random Number Parameter Traces", PA = TRUE)
 }
 \arguments{
 \item{trace}{An Rcpp trace object initialized with \code{initializeTraceObject}.}
 
-\item{mixture}{The mixture for which to plot values.}
-
-\item{type}{A string containing one of the following to graph: \code{Random, LoglikelihoodRatio, currLoglikelihood, propLoglikelihood, currLoglikelihoodAdjusted, propLoglikelihoodAdjusted}.}
+\item{what}{A string containing one of the following to graph: \code{Random, LoglikelihoodRatio, currLoglikelihood, propLoglikelihood, currLoglikelihoodAdjusted, propLoglikelihoodAdjusted}.}
 
 \item{main}{The title of the plot.}
 
-\item{PA}{A logical value determining if the Parameter was PA or not.}
+\item{PA}{A logical value determining if the Parameter was PA or not. Default is True}
 }
 \value{
 This function has no return value.

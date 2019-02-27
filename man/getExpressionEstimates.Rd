@@ -4,8 +4,8 @@
 \alias{getExpressionEstimates}
 \title{Returns the estimated phi posterior for a gene}
 \usage{
-getExpressionEstimates(parameter, gene.index, samples, quantiles = c(0.025,
-  0.975))
+getExpressionEstimates(parameter, gene.index, samples,
+  quantiles = c(0.025, 0.975))
 }
 \arguments{
 \item{parameter}{on object created by \code{initializeParameterObject}.}
