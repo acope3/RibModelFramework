@@ -81,7 +81,7 @@ genome <- initializeGenomeObject(file = fileName)
 
 geneAssignment <- sample(c(1,2), size = length(genome), replace = TRUE, prob = c(0.3, 0.7)) #c(rep(1,500), rep(2,500))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
-parameter$initSelectionCategories(c(selectionMainFile, selectiosHtFile), 2)
+parameter$initSelectionCategories(c(selectionMainFile, selectionHtFile), 2)
 parameter$initMutationCategories(c(mutationMainFile, mutationHtFile), 2)
 
 model <- initializeModelObject(parameter, "ROC", with.phi = FALSE) 
@@ -93,7 +93,7 @@ runMCMC(mcmc, genome, model, 1, divergence.iteration)
 sink()
 
 test_that("identical MCMC-ROC input without Phi, same log posterior", {
-  knownLogPosterior <- -879815
+  knownLogPosterior <- -956882
   testLogPosterior <- round(mcmc$getLogPosteriorTrace()[10])
   expect_equal(knownLogPosterior, testLogPosterior)
 })
