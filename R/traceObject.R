@@ -1,6 +1,3 @@
-
-
-
 #### TODO, lets move it into parameterObject.R and use a parameter instead of trace. thats how it is done for the acf function
 
 # see mcmc Object.R convergence.test function for documentation
@@ -68,6 +65,25 @@ convergence.test.Rcpp_Trace <- function(object, samples = 10, frac1 = 0.1,
   if(what[1] == "Expression")
   {
     # TODO need way to determine number of expression traces
+  } 
+  if(what[1] == "AcceptanceCSP")
+  {
+    names.aa <- aminoAcids()
+    numCodons <- 0
+    for(aa in names.aa) {numCodons <- numCodons + length(codons)}
+    
+    index <- 1
+    cur.trace <- vector("list", numCodons)
+    for(aa in names.aa)
+    {
+      codons <- AAToCodon(aa, T)
+      for(i in 1:length(codons))
+      {
+        cur.trace[[index]] <- object$getCodonSpecificAcceptanceRateTraceForAA(codons[i])
+        index <- index + 1
+      }
+    }
+    current.trace <- do.call("rbind", cur.trace)
   } 
 
   trace.length <- length(current.trace)
