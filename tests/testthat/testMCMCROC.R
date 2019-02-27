@@ -1,6 +1,6 @@
 library(testthat)
 library(AnaCoDa)
-
+rm(list=ls(all.names=TRUE))
 context("MCMC with ROC")
 
 # This file currently checks the logPosterior recorded at iteration 100, between an old, hard-coded test and a current Unit Test.
