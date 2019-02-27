@@ -173,6 +173,7 @@ calculateSCUO <- function(genome)
     }))
     scuo.values[i] <- sum(scuo.per.aa)
   }
+  return(scuo.values)
 }
 
 #' Length of Genome

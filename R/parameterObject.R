@@ -692,6 +692,8 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
     csp.param[[parameter.names[1]]] <- param.1
     csp.param[[parameter.names[2]]] <- param.2
   }
+  param.1 <- param.1[,c("AA", "Codon", "Posterior", "0.025%", "0.975%")]
+  param.2 <- param.2[,c("AA", "Codon", "Posterior", "0.025%", "0.975%")]
   if(is.null(filename))
   {
     return(csp.param)
