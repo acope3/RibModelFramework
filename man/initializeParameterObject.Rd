@@ -4,9 +4,8 @@
 \alias{initializeParameterObject}
 \title{Initialize Parameter}
 \usage{
-initializeParameterObject(genome = NULL, sphi = NULL,
-  num.mixtures = 1, gene.assignment = NULL,
-  initial.expression.values = NULL, model = "ROC",
+initializeParameterObject(genome = NULL, sphi = NULL, num.mixtures = 1,
+  gene.assignment = NULL, initial.expression.values = NULL, model = "ROC",
   split.serine = TRUE, mixture.definition = "allUnique",
   mixture.definition.matrix = NULL, init.with.restart.file = NULL,
   mutation.prior.sd = 0.35, init.csp.variance = 0.0025,

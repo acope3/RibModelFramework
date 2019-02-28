@@ -4,9 +4,8 @@
 \alias{getCSPEstimates}
 \title{Return Codon Specific Paramters (or write to csv) estimates as data.frame}
 \usage{
-getCSPEstimates(parameter, filename = NULL, mixture = 1,
-  samples = 10, relative.to.optimal.codon = T,
-  report.original.ref = T)
+getCSPEstimates(parameter, filename = NULL, mixture = 1, samples = 10,
+  relative.to.optimal.codon = T, report.original.ref = T)
 }
 \arguments{
 \item{parameter}{parameter an object created by \code{initializeParameterObject}.}
