@@ -4,7 +4,7 @@ Title: Analysis of Codon Data under Stationarity using a Bayesian
         Framework
 Version: 0.1.2.2
 Date: 2019-02-27
-Authors@R: c(person("Cedric", "Landerer", role = c("aut", "cre"), email
+Author: c(person("Cedric", "Landerer", role = c("aut", "cre"), email
         = "cedric.landerer@gmail.com"), person("Gabriel", "Hanas", role
         = "ctb"), person("Jeremy", "Rogers", role = "ctb"),
         person("Alex", "Cope", role="ctb"), person("Denizhan", "Pak", role="ctb"))

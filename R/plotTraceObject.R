@@ -201,20 +201,22 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
 # Called from Plot Trace Object (plot for trace)
 # NOT EXPOSED
 # 
-#' Plot Codon Specific Hyper Parameter
+# Plot Codon Specific Hyper Parameter
 #' @param trace An Rcpp trace object initialized with \code{initializeTraceObject}.
-#'
-#' @param what A string containing one of the following to graph: \code{Random, LoglikelihoodRatio, currLoglikelihood, propLoglikelihood, currLoglikelihoodAdjusted, propLoglikelihoodAdjusted}. 
-#'
+#' 
+#' @param what A string containing one of the following to graph: \code{Random, LoglikelihoodRatio, currLoglikelihood, propLoglikelihood, currLoglikelihoodAdjusted, propLoglikelihoodAdjusted}.
+#' 
+#' @param mixture Mixture category to plot
+#' 
 #' @param main The title of the plot.
-#'
+#' 
 #' @param PA A logical value determining if the Parameter was PA or not. Default is True
-#'
+#' 
 #' @return This function has no return value.
 #' 
 #' @description Plots a codon-specific set of traces, specified with the \code{type} parameter.
-#'
-plotCodonSpecificHyperParameters <- function(trace, what="RandomNumber", main="Random Number Parameter Traces", PA=TRUE)
+
+plotCodonSpecificHyperParameters <- function(trace, what="RandomNumber", mixture=1, main="Random Number Parameter Traces", PA=TRUE)
 {
   opar <- par(no.readonly = T) 
   
