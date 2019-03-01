@@ -509,7 +509,6 @@ unsigned Gene::getSumRFPCountForCodon(std::string codon, unsigned RFPCountColumn
     if (SequenceSummary::codonToIndexWithReference.end() != SequenceSummary::codonToIndexWithReference.find(codon))
     {
         // Convert RFPCountColumn to 0-indexing internally
-        my_print("It is being called from Gene Object\n");
         rv = geneData.getCodonSpecificSumRFPCount(codon, RFPCountColumn - 1);
     }
     else

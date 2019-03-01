@@ -689,8 +689,8 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
     }
     csp.param <- vector(mode="list",length=2)
     names(csp.param) <- parameter.names
-    csp.param[[parameter.names[1]]] <- param.1
-    csp.param[[parameter.names[2]]] <- param.2
+    csp.param[[parameter.names[1]]] <- param.1[,c("AA", "Codon", "Posterior", "0.025%", "0.975%")]
+    csp.param[[parameter.names[2]]] <- param.2[,c("AA", "Codon", "Posterior", "0.025%", "0.975%")]
   }
   if(is.null(filename))
   {
@@ -741,8 +741,8 @@ optimalAsReference <- function(param.1,param.2,parameter.names,report.original.r
   }
   csp.param <- vector(mode="list",length=2)
   names(csp.param) <- parameter.names
-  csp.param[[parameter.names[1]]] <- updated.param.1
-  csp.param[[parameter.names[2]]] <- updated.param.2
+  csp.param[[parameter.names[1]]] <- updated.param.1[,c("AA", "Codon", "Posterior", "0.025%", "0.975%")]
+  csp.param[[parameter.names[2]]] <- updated.param.2[,c("AA", "Codon", "Posterior", "0.025%", "0.975%")]
   return(csp.param)
 }
 
