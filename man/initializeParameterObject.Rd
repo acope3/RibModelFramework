@@ -117,7 +117,7 @@ parameter <- initializeParameterObject(init.with.restart.file = restart_file)
 
 ## initialize a parameter object with a custon mixture definition matrix
 def.matrix <- matrix(c(1,1,1,2), ncol=2)
-geneAssignment <- sample(1:2, length(genome), replace = TRUE) # random assignment to mixtures
+geneAssignment <- c(1,1,1,1,2,2,2,2) # mixture assignment of genes
 parameter <- initializeParameterObject(genome = genome, sphi = c(0.5, 2), num.mixtures = 2,
                                        gene.assignment = geneAssignment,
                                        mixture.definition.matrix = def.matrix)
