@@ -13,10 +13,10 @@ context("MCMC with ROC")
 # In R, file.path is faster than paste
 fileName = file.path("UnitTestingData", "testMCMCROCFiles", "simulatedAllUniqueR.fasta")
 expressionFile = file.path("UnitTestingData", "testMCMCROCFiles", "simulatedAllUniqueR_phi_withPhiSet.csv")
-selectionMainFile = file.path("UnitTestingData", "testMCMCROCFiles", "selection_mod_Ecoli_K12_MG1655_ncbi_main_liberal.csv")
-selectionHtFile = file.path("UnitTestingData", "testMCMCROCFiles", "selection_mod_Ecoli_K12_MG1655_ncbi_ht_liberal.csv")
-mutationMainFile = file.path("UnitTestingData", "testMCMCROCFiles", "mutation_mod_Ecoli_K12_MG1655_ncbi_main_liberal.csv")
-mutationHtFile = file.path("UnitTestingData", "testMCMCROCFiles", "mutation_mod_Ecoli_K12_MG1655_ncbi_ht_liberal.csv")
+selectionMainFile = file.path("UnitTestingData", "testMCMCROCFiles", "selection_1.csv")
+selectionHtFile = file.path("UnitTestingData", "testMCMCROCFiles", "selection_2.csv")
+mutationMainFile = file.path("UnitTestingData", "testMCMCROCFiles", "mutation_1.csv")
+mutationHtFile = file.path("UnitTestingData", "testMCMCROCFiles", "mutation_2.csv")
 
 # Ensure the input files exist.
 test_that("file exists: simulatedAllUniqueR.fasta", {
@@ -25,16 +25,16 @@ test_that("file exists: simulatedAllUniqueR.fasta", {
 test_that("file exists: simulatedAllUniqueR_phi_withPhiSet.csv", {
   expect_equal(file.exists(expressionFile), T)
 })
-test_that("file exists: selection_mod_Ecoli_K12_MG1655_ncbi_main_liberal.csv", {
+test_that("file exists: selection_1.csv", {
   expect_equal(file.exists(selectionMainFile), T)
 })
-test_that("file exists: selection_mod_Ecoli_K12_MG1655_ncbi_ht_liberal.csv", {
+test_that("file exists: selection_2.csv", {
   expect_equal(file.exists(selectionHtFile), T)
 })
-test_that("file exists: mutation_mod_Ecoli_K12_MG1655_ncbi_main_liberal.csv", {
+test_that("file exists: mutation_1.csv", {
   expect_equal(file.exists(mutationMainFile), T)
 })
-test_that("file exists: mutation_mod_Ecoli_K12_MG1655_ncbi_ht_liberal.csv", {
+test_that("file exists: mutation_2.csv", {
   expect_equal(file.exists(mutationHtFile), T)
 })
 
@@ -69,7 +69,8 @@ runMCMC(mcmc, genome, model, 1, divergence.iteration)
 sink()
 
 test_that("identical MCMC-ROC input with Phi, same log posterior", {
-  knownLogPosterior <- -953149
+  knownLogPosterior <- -942493
+  print(round(mcmc$getLogPosteriorTrace()[10]))
   testLogPosterior <- round(mcmc$getLogPosteriorTrace()[10])
   expect_equal(knownLogPosterior, testLogPosterior)
 })
@@ -93,7 +94,8 @@ runMCMC(mcmc, genome, model, 1, divergence.iteration)
 sink()
 
 test_that("identical MCMC-ROC input without Phi, same log posterior", {
-  knownLogPosterior <- -956882
+  knownLogPosterior <- -960298
+  print(round(mcmc$getLogPosteriorTrace()[10]))
   testLogPosterior <- round(mcmc$getLogPosteriorTrace()[10])
   expect_equal(knownLogPosterior, testLogPosterior)
 })
