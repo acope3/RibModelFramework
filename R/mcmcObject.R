@@ -203,11 +203,11 @@ setRestartSettings <- function(mcmc, filename, samples, write.multiple=TRUE){
 #' 
 #' @param samples number of samples at the end of the trace used to determine convergence (< length of trace)
 #' 
-#' @param frac1 fraction to use from beginning of chain
+#' @param frac1 fraction to use from beginning of samples
 #' 
-#' @param frac2 fraction to use from end of chain
+#' @param frac2 fraction to use from end of samples
 #' 
-#' @param thin the thinning interval between consecutive observations
+#' @param thin the thinning interval between consecutive observations (QUESTION FOR ALEX: Has the MCMC object already been thinned? Either way help the user and indicate whether this is additional thinning or not)
 #' 
 #' @param plot (logical) plot result instead of returning an object
 #' 
@@ -216,7 +216,7 @@ setRestartSettings <- function(mcmc, filename, samples, write.multiple=TRUE){
 #' 
 #' @param mixture Integer determining for which mixture disribution the convergence test should be applied (only for trace object).
 #' 
-#' @return geweke score object
+#' @return Geweke score object evaluating whether means of two fractions (frac1 and frac2) differ.  Convergence occurs when they don't differ significantly, i.e. pnorm(abs(convergence.test(mcmcObj)$a, ,lower.tail=FALSE)*2 > 0.05
 #' 
 #' @examples 
 #' 
