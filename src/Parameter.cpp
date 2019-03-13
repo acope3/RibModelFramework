@@ -1231,6 +1231,16 @@ void Parameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool a
 	unsigned acceptanceUnder = 0u;
 	unsigned acceptanceOver = 0u;
 
+	// mikeg: variables below should likely be made global or added to parameter so that the same criteria is used in all adaptive proposal width routines.
+	double acceptanceAdjustLow = 0.225;
+	double acceptanceAdjustHigh = 0.325;
+	double diffAcceptanceAdjustVsCriteria = 0.05;
+	double acceptanceCriteriaLow; 
+	double acceptanceCriteriaHigh;
+
+	acceptanceCriteriaLow = acceptanceAdjustLow - diffAcceptanceAdjustVsCriteria;
+	acceptanceCriteriaHigh = acceptanceAdjustHigh + diffAcceptanceAdjustVsCriteria;
+	  
 	for (unsigned cat = 0u; cat < numSelectionCategories; cat++)
 	{
 		unsigned numGenes = (unsigned)numAcceptForSynthesisRate[cat].size();
@@ -1240,15 +1250,15 @@ void Parameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool a
 			traces.updateSynthesisRateAcceptanceRateTrace(cat, i, acceptanceLevel);
 			if (adapt)
 			{
-				if (acceptanceLevel < 0.225)
+				if (acceptanceLevel < acceptanceAdjustLow)
 				{
 					std_phi[cat][i] *= 0.8;
-					if (acceptanceLevel < 0.2) acceptanceUnder++;
+					if (acceptanceLevel < acceptanceCriteriaLow) acceptanceUnder++;
 				}
-				if (acceptanceLevel > 0.275)
+				if (acceptanceLevel > acceptanceAdjustHigh)
 				{
 					std_phi[cat][i] *= 1.2;
-					if (acceptanceLevel > 0.3) acceptanceOver++;
+					if (acceptanceLevel > acceptanceCriterialHigh) acceptanceOver++;
 				}
 			}
 			numAcceptForSynthesisRate[cat][i] = 0u;
@@ -1256,8 +1266,8 @@ void Parameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool a
 	}
 
 	my_print("acceptance rate for synthesis rate:\n");
-	my_print("\t acceptance rate too low: %\n", acceptanceUnder);
-	my_print("\t acceptance rate too high: %\n", acceptanceOver);
+	my_print("\t acceptance rates below %: %\n", acceptanceCriteriaLow, acceptanceUnder);
+	my_print("\t acceptance rate above %: %\n", acceptanceCriterialHigh, acceptanceOver);
 }
 
 
