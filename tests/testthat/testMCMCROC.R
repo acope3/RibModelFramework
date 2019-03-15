@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 library(testthat)
 library(AnaCoDa)
 rm(list=ls(all.names=TRUE))
@@ -101,4 +100,3 @@ test_that("identical MCMC-ROC input without Phi, same log posterior", {
   expect_equal(knownLogPosterior, testLogPosterior)
 })
 
->>>>>>> upstream/master
