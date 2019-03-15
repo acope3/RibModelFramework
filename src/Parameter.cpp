@@ -392,7 +392,7 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 
 void Parameter::writeBasicRestartFile(std::string filename)
 {
-	my_print("Writing File\n");
+	my_print("Begin writing restart file\n");
 
 	std::ofstream out;
 	std::string output = "";
@@ -497,7 +497,7 @@ void Parameter::writeBasicRestartFile(std::string filename)
 			if (j % 10 != 0) oss << "\n";
 		}
 	}
-	my_print("Done writing\n");
+	my_print("End writing restart file\n");
 
 	output += oss.str();
 	out << output;
