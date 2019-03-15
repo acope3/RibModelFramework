@@ -102,7 +102,7 @@
 #' 
 #' ## initialize a parameter object with a custon mixture definition matrix
 #' def.matrix <- matrix(c(1,1,1,2), ncol=2)
-#' geneAssignment <- sample(1:2, length(genome), replace = TRUE) # random assignment to mixtures
+#' geneAssignment <- c(rep(1,floor(length(genome)/2)),rep(2,ceiling(length(genome)/2)))
 #' parameter <- initializeParameterObject(genome = genome, sphi = c(0.5, 2), num.mixtures = 2,
 #'                                        gene.assignment = geneAssignment,
 #'                                        mixture.definition.matrix = def.matrix)
@@ -622,7 +622,7 @@ findOptimalCodon <- function(csp)
 #' genome <- initializeGenomeObject(file = genome_file)
 #' sphi_init <- c(1,1)
 #' numMixtures <- 2
-#' geneAssignment <- sample(1:2, length(genome), replace = TRUE) # random assignment to mixtures
+#' geneAssignment <- c(rep(1,floor(length(genome)/2)),rep(2,ceiling(length(genome)/2)))
 #' parameter <- initializeParameterObject(genome = genome, sphi = sphi_init, 
 #'                                        num.mixtures = numMixtures, 
 #'                                        gene.assignment = geneAssignment, 
@@ -888,7 +888,7 @@ splitMatrix <- function(M, r, c){
 #' genome <- initializeGenomeObject(file = genome_file)
 #' sphi_init <- c(1,1)
 #' numMixtures <- 2
-#' geneAssignment <- sample(1:2, length(genome), replace = TRUE) # random assignment to mixtures
+#' geneAssignment <- c(rep(1,floor(length(genome)/2)),rep(2,ceiling(length(genome)/2)))
 #' parameter <- initializeParameterObject(genome = genome, sphi = sphi_init, 
 #'                                        num.mixtures = numMixtures, 
 #'                                        gene.assignment = geneAssignment, 
@@ -948,7 +948,6 @@ initializeCovarianceMatrices <- function(parameter, genome, numMixtures, geneAss
     for(mixElement in 1:numMixtures){    
       idx <- geneAssignment == mixElement
       csp <- getCSPbyLogit(codonCounts[idx, ], phi[idx])
-      
       parameter$initMutation(csp$coef.mat[1,], mixElement, aa)
       parameter$initSelection(csp$coef.mat[2,], mixElement, aa)
     }
@@ -1036,7 +1035,7 @@ initializeCovarianceMatrices <- function(parameter, genome, numMixtures, geneAss
 #' genome <- initializeGenomeObject(file = genome_file)
 #' sphi_init <- c(1,1)
 #' numMixtures <- 2
-#' geneAssignment <- sample(1:2, length(genome), replace = TRUE) # random assignment to mixtures
+#' geneAssignment <- c(rep(1,floor(length(genome)/2)),rep(2,ceiling(length(genome)/2)))
 #' parameter <- initializeParameterObject(genome = genome, sphi = sphi_init, 
 #'                                        num.mixtures = numMixtures, 
 #'                                        gene.assignment = geneAssignment, 
@@ -1094,7 +1093,7 @@ getMixtureAssignmentEstimate <- function(parameter, gene.index, samples)
 #' genome <- initializeGenomeObject(file = genome_file)
 #' sphi_init <- c(1,1)
 #' numMixtures <- 2
-#' geneAssignment <- sample(1:2, length(genome), replace = TRUE) # random assignment to mixtures
+#' geneAssignment <- c(rep(1,floor(length(genome)/2)),rep(2,ceiling(length(genome)/2)))
 #' parameter <- initializeParameterObject(genome = genome, sphi = sphi_init, 
 #'                                        num.mixtures = numMixtures, 
 #'                                        gene.assignment = geneAssignment, 
@@ -1170,7 +1169,7 @@ getExpressionEstimates <- function(parameter, gene.index, samples, quantiles=c(0
 #' genome <- initializeGenomeObject(file = genome_file)
 #' sphi_init <- c(1,1)
 #' numMixtures <- 2
-#' geneAssignment <- sample(1:2, length(genome), replace = TRUE) # random assignment to mixtures
+#' geneAssignment <- c(rep(1,floor(length(genome)/2)),rep(2,ceiling(length(genome)/2)))
 #' parameter <- initializeParameterObject(genome = genome, sphi = sphi_init, 
 #'                                        num.mixtures = numMixtures, 
 #'                                        gene.assignment = geneAssignment, 

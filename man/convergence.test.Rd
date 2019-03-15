@@ -12,24 +12,22 @@ convergence.test(object, samples = 10, frac1 = 0.1, frac2 = 0.5,
 
 \item{samples}{number of samples at the end of the trace used to determine convergence (< length of trace)}
 
-\item{frac1}{fraction to use from beginning of chain}
+\item{frac1}{fraction to use from beginning of samples}
 
-\item{frac2}{fraction to use from end of chain}
+\item{frac2}{fraction to use from end of samples}
 
-\item{thin}{the thinning interval between consecutive observations}
+\item{thin}{the thinning interval between consecutive observations, which is used in creating a coda::mcmc object (according to the Coda documentation, users should specify if a MCMC chain has already been thinned using a the thin parameter). This does not further thin the data.}
 
 \item{plot}{(logical) plot result instead of returning an object}
-
-\item{what}{Character describing which trace should be tested for convergence (only for Trace object). Valid options are
-Mutation, Selection, MixtureProbability, Sphi, Mphi, ExpectedPhi, or Expression}
-
-\item{mixture}{Integer determining for which mixture disribution the convergence test should be applied (only for trace object).}
 }
 \value{
 geweke score object
 }
 \description{
 Convergence Test
+}
+\details{
+Be aware that convergence.test for Trace objects works primarily for Trace objects from the ROC parameter class. Future updates will adapt this function to work for parameters from other models and expression traces
 }
 \examples{
 
@@ -40,7 +38,7 @@ genome_file <- system.file("extdata", "genome.fasta", package = "AnaCoDa")
 genome <- initializeGenomeObject(file = genome_file)
 sphi_init <- c(1,1)
 numMixtures <- 2
-geneAssignment <- sample(1:2, length(genome), replace = TRUE) # random assignment to mixtures
+geneAssignment <- c(rep(1,floor(length(genome)/2)),rep(2,ceiling(length(genome)/2)))
 parameter <- initializeParameterObject(genome = genome, sphi = sphi_init, 
                                        num.mixtures = numMixtures, 
                                        gene.assignment = geneAssignment, 
