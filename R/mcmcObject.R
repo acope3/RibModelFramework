@@ -211,6 +211,10 @@ setRestartSettings <- function(mcmc, filename, samples, write.multiple=TRUE){
 #' 
 #' @param plot (logical) plot result instead of returning an object
 #' 
+#' @param what (for Trace Object only) which parameter to calculate convergence.test -- current options are Selection, Mutation, MixtureProbability, Sphi, Mphi, and AcceptanceCSP
+#' 
+#' @param mixture (for Trace Object only) mixture for which to calculate convergence.test
+#' 
 #' @details  Be aware that convergence.test for Trace objects works primarily for Trace objects from the ROC parameter class. Future updates will adapt this function to work for parameters from other models and expression traces
 #' 
 #' @return geweke score object

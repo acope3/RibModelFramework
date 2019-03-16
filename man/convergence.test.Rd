@@ -19,6 +19,10 @@ convergence.test(object, samples = 10, frac1 = 0.1, frac2 = 0.5,
 \item{thin}{the thinning interval between consecutive observations, which is used in creating a coda::mcmc object (according to the Coda documentation, users should specify if a MCMC chain has already been thinned using a the thin parameter). This does not further thin the data.}
 
 \item{plot}{(logical) plot result instead of returning an object}
+
+\item{what}{(for Trace Object only) which parameter to calculate convergence.test -- current options are Selection, Mutation, MixtureProbability, Sphi, Mphi, and AcceptanceCSP}
+
+\item{mixture}{(for Trace Object only) mixture for which to calculate convergence.test}
 }
 \value{
 geweke score object

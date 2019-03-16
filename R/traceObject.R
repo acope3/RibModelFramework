@@ -75,24 +75,13 @@ convergence.test.Rcpp_Trace <- function(object, samples = 10, frac1 = 0.1,
   if(what[1] == "AcceptanceCSP")
   {
     names.aa <- aminoAcids()
-    numCodons <- 0
-    for(aa in names.aa) 
-    {
-      if (aa == "M" || aa == "W" || aa == "X") next
-      codons <- AAToCodon(aa, T)
-      numCodons <- numCodons + length(codons)
-    }
     index <- 1
-    cur.trace <- vector("list", numCodons)
+    cur.trace <- vector("list", length(names.aa) - length(c("M","W","X")))
     for(aa in names.aa)
     {
       if (aa == "M" || aa == "W" || aa == "X") next
-      codons <- AAToCodon(aa, T)
-      for(i in 1:length(codons))
-      {
-        cur.trace[[index]] <- object$getCodonSpecificAcceptanceRateTraceForAA(codons[i])
-        index <- index + 1
-      }
+      cur.trace[[index]] <- object$getCodonSpecificAcceptanceRateTraceForAA(aa)
+      index <- index + 1
     }
     current.trace <- do.call("rbind", cur.trace)
     current.trace <- t(current.trace)
