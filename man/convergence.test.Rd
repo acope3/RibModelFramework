@@ -10,7 +10,9 @@ convergence.test(object, samples = 10, frac1 = 0.1, frac2 = 0.5,
 \arguments{
 \item{object}{an object of either class Trace or MCMC}
 
-\item{samples}{number of samples at the end of the trace used to determine convergence (< length of trace)}
+\item{samples}{number of samples at the end of the trace used to determine convergence (< length of trace). 
+Will use as starting point of convergence test. If the MCMC trace
+is of length x, then starting point for convergence test will be x - samples.}
 
 \item{frac1}{fraction to use from beginning of samples}
 
@@ -20,7 +22,7 @@ convergence.test(object, samples = 10, frac1 = 0.1, frac2 = 0.5,
 
 \item{plot}{(logical) plot result instead of returning an object}
 
-\item{what}{(for Trace Object only) which parameter to calculate convergence.test -- current options are Selection, Mutation, MixtureProbability, Sphi, Mphi, and AcceptanceCSP}
+\item{what}{(for Trace Object only) which parameter to calculate convergence.test -- current options are Selection, Mutation, MixtureProbability, Sphi, Mphi, ExpectedPhi, and AcceptanceCSP}
 
 \item{mixture}{(for Trace Object only) mixture for which to calculate convergence.test}
 }
@@ -62,10 +64,10 @@ convergence.test(object = mcmc, samples = 500, plot = TRUE)
 
 trace <- getTrace(parameter)
 # check if Mutation trace has converged
-convergence.test(mcmc, samples = 500, plot = TRUE, what = "Mutation")
+convergence.test(object = trace, samples = 500, plot = TRUE, what = "Mutation")
 # check if Sphi trace has converged
-convergence.test(mcmc, samples = 500, plot = TRUE, what = "Sphi")
+convergence.test(object = trace, samples = 500, plot = TRUE, what = "Sphi")
 # check if ExpectedPhi trace has converged
-convergence.test(mcmc, samples = 500, plot = TRUE, what = "ExpectedPhi")
+convergence.test(object = trace, samples = 500, plot = TRUE, what = "ExpectedPhi")
 }
 }

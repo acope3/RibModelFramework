@@ -48,13 +48,16 @@ convergence.test.Rcpp_Trace <- function(object, samples = 10, frac1 = 0.1,
   }
   if(what[1] == "Sphi")
   {
-    current.trace <- object$getSPhiTrace()
+    sphi <- object$getStdDevSynthesisRateTraces()
+    current.trace <- do.call("rbind", sphi)
+    current.trace <- t(current.trace)
   }
   if(what[1] == "Mphi")
   {
-    sphi <- object$getSPhiTrace();
+    sphi <- object$getStdDevSynthesisRateTraces()
+    sphi <- do.call("rbind", sphi)
     mphi <- -(sphi * sphi) / 2;
-    current.trace <- mphi
+    current.trace <- t(mphi)
   }
   if(what[1] == "Aphi")
   {
@@ -66,7 +69,7 @@ convergence.test.Rcpp_Trace <- function(object, samples = 10, frac1 = 0.1,
   }
   if(what[1] == "ExpectedPhi")
   {
-    current.trace <- object$getExpectedPhiTrace()
+    current.trace <- object$getExpectedSynthesisRateTrace()
   }
   if(what[1] == "Expression")
   {

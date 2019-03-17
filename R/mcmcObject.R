@@ -201,7 +201,9 @@ setRestartSettings <- function(mcmc, filename, samples, write.multiple=TRUE){
 #' 
 #' @param object an object of either class Trace or MCMC
 #' 
-#' @param samples number of samples at the end of the trace used to determine convergence (< length of trace)
+#' @param samples number of samples at the end of the trace used to determine convergence (< length of trace). 
+#' Will use as starting point of convergence test. If the MCMC trace
+#' is of length x, then starting point for convergence test will be x - samples.
 #' 
 #' @param frac1 fraction to use from beginning of samples
 #' 
@@ -211,7 +213,7 @@ setRestartSettings <- function(mcmc, filename, samples, write.multiple=TRUE){
 #' 
 #' @param plot (logical) plot result instead of returning an object
 #' 
-#' @param what (for Trace Object only) which parameter to calculate convergence.test -- current options are Selection, Mutation, MixtureProbability, Sphi, Mphi, and AcceptanceCSP
+#' @param what (for Trace Object only) which parameter to calculate convergence.test -- current options are Selection, Mutation, MixtureProbability, Sphi, Mphi, ExpectedPhi, and AcceptanceCSP
 #' 
 #' @param mixture (for Trace Object only) mixture for which to calculate convergence.test
 #' 
@@ -248,11 +250,11 @@ setRestartSettings <- function(mcmc, filename, samples, write.multiple=TRUE){
 #' 
 #' trace <- getTrace(parameter)
 #' # check if Mutation trace has converged
-#' convergence.test(mcmc, samples = 500, plot = TRUE, what = "Mutation")
+#' convergence.test(object = trace, samples = 500, plot = TRUE, what = "Mutation")
 #' # check if Sphi trace has converged
-#' convergence.test(mcmc, samples = 500, plot = TRUE, what = "Sphi")
+#' convergence.test(object = trace, samples = 500, plot = TRUE, what = "Sphi")
 #' # check if ExpectedPhi trace has converged
-#' convergence.test(mcmc, samples = 500, plot = TRUE, what = "ExpectedPhi")
+#' convergence.test(object = trace, samples = 500, plot = TRUE, what = "ExpectedPhi")
 #' }
 convergence.test <- function(object, samples = 10, frac1 = 0.1, frac2 = 0.5, 
                     thin = 1, plot = FALSE, what = "Mutation", mixture = 1){
