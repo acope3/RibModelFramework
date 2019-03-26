@@ -1238,14 +1238,16 @@ void Parameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool a
 	// for high dimensional problems
 	// We are dealing with single parameters here, however.
 
-	double acceptanceAdjustLow = 0.225;
-	double acceptanceAdjustHigh = 0.325;
-	double diffAcceptanceAdjustVsCriteria = 0.05;
-	double acceptanceCriteriaLow; 
-	double acceptanceCriteriaHigh;
+	double acceptanceTargetLow = 0.225; //below this value factor adjustment is applied
+	double acceptanceTargetHigh = 0.325; //above this value factor adjustment is applied
+	double factorCriteriaLow; 
+	double factorCriteriaHigh;
+	double adjustFactorLow = 0.8; //factor by which to reduce proposal widths
+	double adjustFactorHigh = 1.3; //factor by which to increase proposal widths
+	double adjustFactor; //variable assigned value of either adjustFactorLow or adjustFactorHigh depending on acceptance rate
 
-	acceptanceCriteriaLow = acceptanceAdjustLow - diffAcceptanceAdjustVsCriteria;
-	acceptanceCriteriaHigh = acceptanceAdjustHigh + diffAcceptanceAdjustVsCriteria;
+	factorCriteriaLow = acceptanceTargetLow;
+	factorCriteriaHigh = acceptanceTargetHigh;
 	  
 	for (unsigned cat = 0u; cat < numSelectionCategories; cat++)
 	{
@@ -1255,19 +1257,20 @@ void Parameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool a
 			double acceptanceLevel = (double)numAcceptForSynthesisRate[cat][i] / (double)adaptationWidth;
 			traces.updateSynthesisRateAcceptanceRateTrace(cat, i, acceptanceLevel);
 
-			if (acceptanceLevel < acceptanceCriteriaLow) acceptanceUnder++;
-			else if (acceptanceLevel > acceptanceCriteriaHigh) acceptanceOver++;
+			//Evaluate acceptance rates relative to target region
+			if (acceptanceLevel < acceptanceTargetLow) acceptanceUnder++;
+			else if (acceptanceLevel > acceptanceTargetHigh) acceptanceOver++;
 
 			if (adapt)
 			{
-				if (acceptanceLevel < acceptanceAdjustLow)
+				if (acceptanceLevel < acceptanceTargetLow)
 				{
-					std_phi[cat][i] *= 0.8;
+					std_phi[cat][i] *= adjustFactorLow;
 			
 				}
-				if (acceptanceLevel > acceptanceAdjustHigh)
+				if (acceptanceLevel > acceptanceTargetHigh)
 				{
-					std_phi[cat][i] *= 1.2;
+					std_phi[cat][i] *= adjustFactorHigh;
 
 				}
 			}
@@ -1276,10 +1279,10 @@ void Parameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool a
 	}
 
 	my_print("Acceptance rate for synthesis rate:\n");
-	my_print("Target range: %-% \n", acceptanceCriteriaLow, acceptanceCriteriaHigh );
-	my_print("Adjustment range: < % or > % \n", acceptanceAdjustLow, acceptanceAdjustHigh );
-	my_print("\t acceptance rates below lower target of %: %\n", acceptanceCriteriaLow, acceptanceUnder);
-	my_print("\t acceptance rate above upper target of %: %\n", acceptanceCriteriaHigh, acceptanceOver);
+	my_print("Target range: %-% \n", acceptanceTargetLow, acceptanceTargetHigh );
+	my_print("Adjustment range: < % or > % \n", factorCriteriaLow, factorCriteriaHigh );
+	my_print("\t acceptance rates below lower target of %: %\n", acceptanceTargetLow, acceptanceUnder);
+	my_print("\t acceptance rate above upper target of %: %\n", acceptanceTargetHigh, acceptanceOver);
 }
 
 
@@ -1293,24 +1296,25 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
   unsigned acceptanceUnder = 0u;
   unsigned acceptanceOver = 0u;
 
-  double acceptanceAdjustLow = 0.20; // was 0.2
-  double acceptanceAdjustHigh = 0.30;// was 0.3
-  double diffAcceptanceAdjustVsCriteria = 0.05; //was 0.1 and 0.0, respectively
-  double acceptanceCriteriaLow; 
-  double acceptanceCriteriaHigh;
-  double adjustFactorDown = 0.8; //factor by which to reduce proposal widths
-  double adjustFactorUp = 1.2; //factor by which to increase proposal widths
-  double adjustFactor; //variable assigned value of either adjustFactorDown or adjustFactorUp depending on acceptance rate
-  acceptanceCriteriaLow = acceptanceAdjustLow - diffAcceptanceAdjustVsCriteria;
-  acceptanceCriteriaHigh = acceptanceAdjustHigh + diffAcceptanceAdjustVsCriteria;
+  double acceptanceTargetLow = 0.225; //below this value weighted sum adjustment is applied, was 0.2
+  double acceptanceTargetHigh = 0.325;///above this value weighted sum adjustment is applied, was 0.3
+  double diffFactorAdjust = 0.05; //sets when multiplication factor adjustment is applied, was 0.1 and 0.0, respectively
+  double factorCriteriaLow; 
+  double factorCriteriaHigh;
+  double adjustFactorLow = 0.8; //factor by which to reduce proposal widths
+  double adjustFactorHigh = 1.3; //factor by which to increase proposal widths
+  double adjustFactor; //variable assigned value of either adjustFactorLow or adjustFactorHigh
+  
+  factorCriteriaLow = acceptanceTargetLow - diffFactorAdjust;  //below this value weighted sum and factor adjustments are applied
+  factorCriteriaHigh = acceptanceTargetHigh + diffFactorAdjust;  //above this value weighted sum and factor adjustments are applied
 
   adaptiveStepPrev = adaptiveStepCurr;
   adaptiveStepCurr = lastIteration;
   unsigned samples = adaptiveStepCurr - adaptiveStepPrev;
 
   my_print("Acceptance rates for Codon Specific Parameters\n");
-  my_print("Target range: %-% \n", acceptanceCriteriaLow, acceptanceCriteriaHigh );
-  my_print("Adjustment range: < % or > % \n", acceptanceAdjustLow, acceptanceAdjustHigh );
+  my_print("Target range: %-% \n", factorCriteriaLow, factorCriteriaHigh );
+  my_print("Adjustment range: < % or > % \n", acceptanceTargetLow, acceptanceTargetHigh );
   my_print("\tAA\tAcc.Rat\n"); //Prop.Width\n";
 
   for (unsigned i = 0; i < groupList.size(); i++) //cycle through all of the aa
@@ -1327,74 +1331,71 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
       SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
 
       //Evaluate current acceptance ratio  performance 
-      if (acceptanceLevel < acceptanceCriteriaLow) acceptanceUnder++;
-      else if (acceptanceLevel > acceptanceCriteriaHigh) acceptanceOver++;
+      if (acceptanceLevel < factorCriteriaLow) acceptanceUnder++;
+      else if (acceptanceLevel > factorCriteriaHigh) acceptanceOver++;
       
       if (adapt)
 	{
 
 
-	  if ( (acceptanceLevel < acceptanceAdjustLow) || (acceptanceLevel > acceptanceAdjustHigh) )
-	    {
-	      //Adjust cov matrixes
+	  if( (acceptanceLevel < acceptanceTargetLow) || (acceptanceLevel > acceptanceTargetHigh) )// adjust proposal width
+	    {	    
 
-	      // define adjustFactor appropriately
-	      if (acceptanceLevel < acceptanceAdjustLow) 
-		{
-		  adjustFactor = adjustFactorDown; 
-		}
-	      else //adjust: make proposal width larger
-		{
-		  adjustFactor = adjustFactorUp;
-		}
-	  
-	      for (unsigned k = aaStart; k < aaEnd; k++)
-		{ //cycle through codons
-
-		  //Adjust proposal width for codon specific parameters
-		  //These values are used when you are not using a cov to propose new parameter value
-		  // We infer that the same width used for mutation and selection.
-		  // On 03/13/19 we think this may no longer be needed
-
-		  std_csp[k] *= adjustFactor;
-
-		  //Adjust widths if using cov matrix			      
-		  covarianceMatrix[aaIndex] *= adjustFactor;
-		}
-
-	    }
-	  else // Not in adjust range, update matrix instead
-	    //prior to 3/13/19 this was done if 0.1 < acceptance < 0.2 
-	    // not sure if this was intentional or not.
-	    {
 	      //Update cov matrix based on previous window to improve efficiency of sampling
 	      CovarianceMatrix covcurr(covarianceMatrix[aaIndex].getNumVariates());
-	      covcurr.calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples,
-						adaptiveStepCurr);
+	      covcurr.calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
 	      CovarianceMatrix covprev = covarianceMatrix[aaIndex];
 	      covprev = (covprev*0.6);
 	      covcurr = (covcurr*0.4);
 	      covarianceMatrix[aaIndex] = covprev + covcurr;
 	      //replace cov matrix based on previous window
-	      //The is approach was commented out and above code uncommented to replace it 
+	      //The is approach was commented out and above code uncommented to replace it in commit ec63bb21a1e9 (2016).  Should remove
 	      //covarianceMatrix[aaIndex].calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
-	    }
-	  
-	  //Decomposing of cov matrix to convert iid samples to covarying samples using matrix decomposition
-	  //The decomposed matrix is used in the proposal of new samples
-	  //Prior to 3/13/19, this was done if outside target region (acceptance < 0.2 or > 0.3) even if we updated matrix (rather than adjust via a factor).
-	  // QUESTION FOR CEDRIC: Does this need to be done to all matrices? adjusted matrices? updated matrices -- Ask Cedric
-	  covarianceMatrix[aaIndex].choleskyDecomposition(); 
 
+	      // define adjustFactor 
+	      if (acceptanceLevel < factorCriteriaLow) 
+		{
+		  adjustFactor = adjustFactorLow; 
+		}
+	      else if(acceptanceLevel > factorCriteriaHigh)
+		{
+		  adjustFactor = adjustFactorHigh; 
+		}
+	      else //Don't adjust
+		{
+		  adjustFactor = 1.0;
+		}
+	    
+
+	      if( adjustFactor != 1.0 )
+		{
+		
+		for (unsigned k = aaStart; k < aaEnd; k++)
+		  { //cycle through codons
+
+		    //Adjust proposal width for codon specific parameters 
+		    std_csp[k] *= adjustFactor;
+
+		    //Adjust widths if using cov matrix			      
+		    covarianceMatrix[aaIndex] *= adjustFactor;
+		  }
+
+	      }
+	  
+	      //Decomposing of cov matrix to convert iid samples to covarying samples using matrix decomposition
+	      //The decomposed matrix is used in the proposal of new samples
+	      covarianceMatrix[aaIndex].choleskyDecomposition(); 
+	    }// end adjust loop
 	} // end if(adapt)
+      
       numAcceptForCodonSpecificParameters[aaIndex] = 0u;
     }
 
   my_print("Acceptance rate for CSP Matrices:\n");
-  my_print("Target range: %-% \n", acceptanceCriteriaLow, acceptanceCriteriaHigh );
-  my_print("Adjustment range: < % or > % \n", acceptanceAdjustLow, acceptanceAdjustHigh );
-  my_print("\t acceptance rates below lower target of %: %\n", acceptanceCriteriaLow, acceptanceUnder);
-  my_print("\t acceptance rate above upper target of %: %\n", acceptanceCriteriaHigh, acceptanceOver);
+  my_print("Target range: %-% \n", acceptanceTargetLow, acceptanceTargetHigh );
+  my_print("Factor Adjustment range: < % or > % \n", factorCriteriaLow, factorCriteriaHigh );
+  my_print("\t acceptance rates below lower target of %: %\n", factorCriteriaLow, acceptanceUnder);
+  my_print("\t acceptance rate above upper target of %: %\n", factorCriteriaHigh, acceptanceOver);
 
 
   my_print("\n");
