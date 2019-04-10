@@ -264,11 +264,7 @@ convergence.test <- function(object, samples = 10, frac1 = 0.1, frac2 = 0.5,
 convergence.test.Rcpp_MCMCAlgorithm <- function(object, samples = 10, frac1 = 0.1, 
                                        frac2 = 0.5, thin = 1, plot = FALSE, what = "Mutation", mixture = 1){
   # TODO: extend to work with multiple chains once we have that capability.
-  if (class(object) == "Rcpp_MCMCAlgorithm")
-  {
-    trace <- object$getLogPosteriorTrace()
-  } else if (class(object) == "Rcpp_TraceOb")
-  
+  trace <- object$getLogPosteriorTrace()
   loglik.trace <- object$getLogPosteriorTrace()
   trace.length <- length(loglik.trace)
   start <- max(1, trace.length - samples)
