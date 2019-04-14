@@ -289,7 +289,7 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
  * RFPCounts are not given as a positive number are set to -1 and are stored, but not used in calculation.
  * There may be more than one RFPCount, and thus the header is important.
 */
-void Genome::readRFPData(std::string filename, bool append)
+void Genome::readRFPData(std::string filename, bool append, bool positional)
 {
 	try {
 		if (!append) clear();
@@ -371,11 +371,13 @@ void Genome::readRFPData(std::string filename, bool append)
 						prevID = ID;
 						first = false;
 					}
+					//This is when we start at a new geneID
 					if (ID != prevID)
 					{
 						tmpGene.setId(prevID);
 						tmpGene.setDescription("No description for PA(NSE) Model");
-						tmpGene.setPASequence(table);
+						if(positional) tmpGene.setPANSESequence(table);
+						else tmpGene.setPASequence(table);
 						addGene(tmpGene, false); //add to genome
 						tmpGene.clear();
 						table.clear();
@@ -499,18 +501,14 @@ void Genome::writeRFPData(std::string filename, bool simulated)
 				Gene *currentGene = &simulatedGenes[geneIndex];
                 SequenceSummary *sequenceSummary = currentGene->getSequenceSummary();
                 std::vector <unsigned> positions = sequenceSummary->getPositionCodonID();
+                std::vector <int> rfpCounts = sequenceSummary->getRFPCount(0);
 				for (unsigned positionIndex = 0u; positionIndex < positions.size(); positionIndex++)
 				{
 					unsigned codonID = positions[positionIndex];
-                    my_printError("%\n",codonID);
     				std::string codon = SequenceSummary::codonArray[codonID];
 
-    				Fout << currentGene->getId() << "," << positionIndex << "," << codon << ",";
+    				Fout << currentGene->getId() << "," << positionIndex + 1 << "," << codon << "," << rfpCounts[positionIndex] << "\n";
 
-                    unsigned rfpValue = 0u;
-                    rfpValue = currentGene->geneData.getSingleRFPCount(position, 0);
-    				// Simulated sum RFP counts will only print one column! So, we default to column = 0.
-    				Fout << rfpValue << "\n";
 				}
 			}
 		}

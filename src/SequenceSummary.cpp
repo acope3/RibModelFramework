@@ -434,7 +434,7 @@ bool SequenceSummary::processPA(std::vector<std::vector<int>> table)
 //TODO: Turn into equivalent PANSE
 bool SequenceSummary::processPANSE(std::vector<std::vector<int>> table)
 {
-    // Table format: Each line of input from a .csv (.pa) file, ordered:
+    // Table format: Each line of input from a .csv (.panse) file, ordered:
     // unknown size table (nRows, aka table.size()), each row a vector:
     // position, codon, category1, ... (may be more than one category)
 
