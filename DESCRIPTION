@@ -2,9 +2,9 @@ Package: AnaCoDa
 Type: Package
 Title: Analysis of Codon Data under Stationarity using a Bayesian
         Framework
-Version: 0.1.2.1
-Date: 2018-08-16
-Authors@R: c(person("Cedric", "Landerer", role = c("aut", "cre"), email
+Version: 0.1.2.2
+Date: 2019-02-27
+Author: c(person("Cedric", "Landerer", role = c("aut", "cre"), email
         = "cedric.landerer@gmail.com"), person("Gabriel", "Hanas", role
         = "ctb"), person("Jeremy", "Rogers", role = "ctb"),
         person("Alex", "Cope", role="ctb"), person("Denizhan", "Pak", role="ctb"))
@@ -36,5 +36,5 @@ Imports:
 LinkingTo: Rcpp
 LazyLoad: yes
 LazyData: yes
-RoxygenNote: 6.1.1
+RoxygenNote: 6.0.1
 Packaged: 2016-01-05 19:47:01 UTC; clandere

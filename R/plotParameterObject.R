@@ -59,14 +59,13 @@ plot.Rcpp_FONSEParameter <- function(x, what = "Mutation", samples = 100, mixtur
 
 plot.Rcpp_PAParameter <- function(x, what = "Mutation", samples = 100, mixture.name = NULL, with.ci = TRUE, ...)
 {
-  to_plot = ifelse(what == "Alpha", "Mutation", "Selection")
-  #plotParameterObject(x, what = to_plot, samples=samples,mixture.name = mixture.name, with.ci=with.ci, ...)
-  plotPA(x)
+  #to_plot = ifelse(what == "Alpha", "Mutation", "Selection")
+  plotParameterObject(x, what = what, samples=samples,mixture.name = mixture.name, with.ci=with.ci, ...)
+  #plotPA(x)
 }
 
 ### NOT EXPOSED
 plotParameterObject <- function(x, what = "Mutation", samples = 100, mixture.name = NULL, with.ci = TRUE, ...){
-  
   numMixtures <- x$numMixtures
   means <- data.frame(matrix(0,ncol=numMixtures,nrow=40))
   sd.values <- data.frame(matrix(0,ncol=numMixtures*2,nrow=40))
@@ -119,18 +118,19 @@ plotParameterObject <- function(x, what = "Mutation", samples = 100, mixture.nam
                cex = 1.6, col = "black")
         }
       }
-          if(with.ci){
-            plot(means[,j],means[,i],ann=FALSE,xlim=range(cbind(sd.values[,j],sd.values[,j+numMixtures])),ylim=range(cbind(sd.values[,i],sd.values[,i+numMixtures])))
-            upper.panel.plot(means[,j],means[,i],sd.x=cbind(sd.values[,j],sd.values[,j+numMixtures]),sd.y=cbind(sd.values[,i],sd.values[,i+numMixtures]))
-            confidenceInterval.plot(x = 1:61,  y = means[,i],y = sd.values[,j])
-          } else{
-            plot(means[,j],means[,i],ann=FALSE,xlim=range(means[,j]),ylim=range(means[,i]))
-            upper.panel.plot(means[,j],means[,i])
-          }
-        
+      else if (i < j){
+        if(with.ci){
+          plot(means[,j],means[,i],ann=FALSE,xlim=range(cbind(sd.values[,j],sd.values[,j+numMixtures])),ylim=range(cbind(sd.values[,i],sd.values[,i+numMixtures])))
+          upper.panel.plot(means[,j],means[,i],sd.x=cbind(sd.values[,j],sd.values[,j+numMixtures]),sd.y=cbind(sd.values[,i],sd.values[,i+numMixtures]))
+          #confidenceInterval.plot(x = means[,j],y = mean[,i], sd.x=sd.values[,j],sd.y=sd.values[,i])
+        } else{
+          plot(means[,j],means[,i],ann=FALSE,xlim=range(means[,j]),ylim=range(means[,i]))
+          upper.panel.plot(means[,j],means[,i])
+        }
       }
     }
   }
+}
 
 
 
@@ -222,26 +222,27 @@ confidenceInterval.plot <- function(x, y, sd.x=NULL, sd.y=NULL, ...){
     epsilon <- range(y, na.rm = T) * 0.1
     segments(x.low, y, x.up, y, ...)
   }  
-  
-  lm.line <- lm(y~x, na.action = "na.exclude") 
-  
+
+  lm.line <- lm(y~x, na.action = "na.exclude")
+
   b <- lm.line$coef[2]
-  
+
   xlim <- range(x, na.rm = T)
   ylim <- range(y, na.rm = T)
-  
+
   width <- xlim[2] - xlim[1]
   height <- ylim[2] - ylim[1]
-  
+
   std.error <- summary(lm.line)$coefficients[4]
   slope <- round(summary(lm.line)$coefficients[2], 3)
   intercept <- round(summary(lm.line)$coefficients[1], 3)
   t <- (slope - 1)/std.error
 }
 
-plotPA <- function(parameter){
-    cat("hello")
-    cat <- 1
+
+plotPA <- function(parameter,genome,samples=100,mixture=1){
+    #cat("hello")
+    cat <- mixture
 trace <- parameter$getTraceObject()
 proposal <- FALSE
 alphaList <- numeric (61)
@@ -296,11 +297,7 @@ plot(NULL, NULL, xlim=range(1:61, na.rm = T), ylim=range(lambdaPrime.ci),
 confidenceInterval.plot(x = 1:61, y = lambdaPrimeList, sd.y = lambdaPrime.ci)
 axis(2)
 axis(1, tck = 0.02, labels = codonList[1:61], at=1:61, las=2, cex.axis=.6)
-
-
-
-dev.off()
-
+#dev.off()
 }
 
 #' Plots ACF for codon specific parameter traces
