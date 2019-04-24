@@ -128,15 +128,17 @@ void PAModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grou
 		propAlpha = getParameterForCategory(alphaCategory, PAParameter::alp, grouping, true);
 		propLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, grouping, true);
 
-
-
 		logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPValue, currNumCodonsInMRNA, phiValue);
 		logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambdaPrime, currRFPValue, currNumCodonsInMRNA, phiValue);
+
+		if(i == 0 and (grouping == "GCA" or grouping == "GCT")){
+		    my_print("%:\nAlpha: %\nLambda: %\nProp Alpha: %\nProp Lambda: %\nPhi: %\nRFP Count: %\nnumCodons: %\n\n",grouping, currAlpha, currLambdaPrime,propAlpha,propLambdaPrime, phiValue, currRFPValue,currNumCodonsInMRNA);
+		}
 	}
-	logAcceptanceRatioForAllMixtures[0] = logLikelihood_proposed - logLikelihood;// - ((std::log(currAlpha) + std::log(currLambdaPrime))
-                                                                        //- (std::log(propAlpha) + std::log(propLambdaPrime)));
-	logAcceptanceRatioForAllMixtures[1] = logLikelihood; //- (std::log(propAlpha) + std::log(propLambdaPrime));
-	logAcceptanceRatioForAllMixtures[2] = logLikelihood_proposed; //- (std::log(currAlpha) + std::log(currLambdaPrime));
+	logAcceptanceRatioForAllMixtures[0] = logLikelihood_proposed - logLikelihood - ((std::log(currAlpha) + std::log(currLambdaPrime))
+                                                                        - (std::log(propAlpha) + std::log(propLambdaPrime)));
+	logAcceptanceRatioForAllMixtures[1] = logLikelihood - (std::log(propAlpha) + std::log(propLambdaPrime));
+	logAcceptanceRatioForAllMixtures[2] = logLikelihood_proposed - (std::log(currAlpha) + std::log(currLambdaPrime));
 	logAcceptanceRatioForAllMixtures[3] = logLikelihood;
 	logAcceptanceRatioForAllMixtures[4] = logLikelihood_proposed;
 }

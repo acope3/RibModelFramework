@@ -140,7 +140,8 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
     double logLikelihood_proposed_adjusted = 0.0;
     double propAlpha, propLambdaPrime;
     double currAlpha, currLambdaPrime;
-    double adjustmentTerm = 0;
+    double currAdjustmentTerm = 0;
+    double propAdjustmentTerm = 0;
     Gene *gene;
     unsigned index = SequenceSummary::codonToIndex(grouping);
 
@@ -181,7 +182,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                                     currNumCodonsInMRNA, phiValue);
                 logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, positionalRFPCount,
                                    currNumCodonsInMRNA, phiValue);
-                adjustmentTerm += - ((std::log(currAlpha) + std::log(currLambdaPrime)) - (std::log(propAlpha) + std::log(propLambdaPrime)));
+
             }
 
             else{
@@ -191,10 +192,12 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
         }
 
     }
-    logAcceptanceRatioForAllMixtures[0] = logLikelihood_proposed - logLikelihood + adjustmentTerm;
-	my_print("Codon % Adjustment factors:\nCurrAlpha: %\nCurrLambda: %\nLikelihood: %\nPropAlpha: %\nPropLambda: %\nPropLikelihood: %\nAdjustment: %\n", grouping, currAlpha, currLambdaPrime, logLikelihood ,propAlpha, propLambdaPrime,logLikelihood_proposed, adjustmentTerm);
-	logAcceptanceRatioForAllMixtures[1] = logLikelihood - (std::log(propAlpha) + std::log(propLambdaPrime));
-	logAcceptanceRatioForAllMixtures[2] = logLikelihood_proposed - (std::log(currAlpha) + std::log(currLambdaPrime));
+    currAdjustmentTerm += std::log(currAlpha) + std::log(currLambdaPrime);
+    propAdjustmentTerm += std::log(propAlpha) + std::log(propLambdaPrime);
+    logAcceptanceRatioForAllMixtures[0] = logLikelihood_proposed - logLikelihood - (currAdjustmentTerm - propAdjustmentTerm);
+	//my_print("Codon % Adjustment factors:\nCurrAlpha: %\nCurrLambda: %\nLikelihood: %\nPropAlpha: %\nPropLambda: %\nPropLikelihood: %\nAdjustment: %\n", grouping, currAlpha, currLambdaPrime, logLikelihood ,propAlpha, propLambdaPrime,logLikelihood_proposed, adjustmentTerm);
+	logAcceptanceRatioForAllMixtures[1] = logLikelihood - propAdjustmentTerm;
+	logAcceptanceRatioForAllMixtures[2] = logLikelihood_proposed - currAdjustmentTerm;
 	logAcceptanceRatioForAllMixtures[3] = logLikelihood;
 	logAcceptanceRatioForAllMixtures[4] = logLikelihood_proposed;
 }
@@ -609,7 +612,7 @@ void PANSEModel::simulateGenome(Genome &genome)
             RNGScope scope;
             NumericVector xx(1);
             xx = rgamma(1, alpha, 1.0/lambdaPrime);
-            xx = rpois(1, xx[0] * phi * sigma* 10);
+            xx = rpois(1, xx[0] * phi * sigma);
             rfpCount.push_back(xx[0]);
 #else
             std::gamma_distribution<double> GDistribution(alphaPrime, 1.0/lambdaPrime);
@@ -618,9 +621,6 @@ void PANSEModel::simulateGenome(Genome &genome)
             unsigned simulatedValue = PDistribution(Parameter::generator);
             rfpCount.push_back(simulatedValue);
 #endif
-        }
-        if (geneIndex == 0){
-            for (unsigned val : rfpCount) my_print("%\n", val);
         }
         tmpGene.geneData.setRFPCount(rfpCount, RFPCountColumn);
         genome.addGene(tmpGene, true);
