@@ -404,7 +404,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 //#ifndef __APPLE__
 	omp_set_num_threads(numCores);
 #endif
-
+	// Replace with reportSample? 
 	unsigned reportStep = (100u < thinning) ? thinning : 100u;
 
 	// Allows to diverge from initial conditions (divergenceIterations controls the divergence).
@@ -438,7 +438,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 		{
 			if ((iteration) % fileWriteInterval == 0u)
 			{
-				my_print("Writing restart file!\n");
+				my_print("Begin saving restart file(s) at sample (iteration): % (%)\n",  (iteration / thinning), iteration);
 
 				if (multipleFiles)
 				{
