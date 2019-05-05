@@ -543,6 +543,136 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
 # }
 
 
+
+#' Calculates the marginal log-likelihood for a set of parameters
+#'
+#' @param parameter An object created with \code{initializeParameterObject}. 
+#'  
+#' @param mcmc An object created with \cide{initializeMCMCObject} 
+#'  
+#' @param mixture determines for which mixture the marginal log-likelihood should be calculated
+#'    
+#' @param samples How many samples should be used for the calculation 
+#'  
+#' @param scaling A value > 1 in order to scale down the tails of the importance distribution
+#'  
+#' @return This function returns the model object created. 
+#'  
+#' @description initializes the model object. 
+#' 
+#' @details calculate_marginal_log_likelihood Calculate marginal log-likelihood for
+#' calculation of the Bayes factor using a generalized harmonix mean estimator of the 
+#' marginal likelihood. See Gronau et al. (2017) for details
+#'
+#' @examples 
+#' \dontrun{
+#' # Calculate the log-marginal likelihood
+#' parameter <- loadParameterObject("parameter.Rda")
+#' mcmc <- loadMCMCObject("mcmc.Rda")
+#' calculate_marginal_likelihood(parameter, mcmc, mixture = 1, 
+#' samples = 500, scaling = 1.5)
+#'
+#' # Calculate the Bayes factor for two models
+#' parameter1 <- loadParameterObject("parameter1.Rda")
+#' parameter2 <- loadParameterObject("parameter2.Rda")
+#' mcmc1 <- loadMCMCObject("mcmc1.Rda")
+#' mcmc2 <- loadMCMCObject("mcmc2.Rda")
+#' mll1 <- calculate_marginal_likelihood(parameter1, mcmc1, mixture = 1, 
+#' samples = 500, scaling = 1.5)
+#' mll2 <- calculate_marginal_likelihood(parameter2, mcmc2, mixture = 1, 
+#' samples = 500, scaling = 1.5)
+#' cat("Bayes factor: ", mll1 - mll2, "\n")
+#' }
+#'  
+calculate_marginal_log_likelihood <- function(parameter, mcmc, mixture, samples, scaling)
+{  
+  
+  if(scaling < 1) stop("Covariance scaling has to be greater than 1")
+  
+  # Collect information from AnaCoDa objects
+  trace <- parameter$getTraceObject()
+  # This should be the posterior instead of the log_posterior but this causes an overflow, find fix!!!
+  log_posterior <- mcmc$getLogPosteriorTrace()
+  log_posterior <- log_posterior[(length(log_posterior) - samples+1):(length(log_posterior))]
+  
+  ### HANDLE CODON SPECIFIC PARAMETERS
+  log_inv_marg_lik <- rep(0, samples)
+  for(ptype in 0:1) # for all parameter types (mutation/selection parameters)
+  {
+    for(aa in AnaCoDa::aminoAcids()) # for all amino acids
+    {
+      if(aa == "M" || aa == "W" || aa == "X") next # ignore amino acids with only one codon or stop codons 
+      codons <- AnaCoDa::AAToCodon(aa, focal = T)
+      # get covariance matrix and mean of importance distribution
+      sample_mat <- matrix(NA, ncol = length(codons), nrow = samples)
+      mean_vals <- rep(NA, length(codons))
+      for(i in 1:length(codons)) # for all codons
+      {
+        vec <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], ptype, TRUE)
+        vec <- vec[(length(vec) - samples+1):(length(vec))]
+        sample_mat[,i] <- vec
+        mean_vals[i] <- mean(vec)
+      }
+      # scale/shrinked covariance matrix
+      cov_mat <- cov(sample_mat) / scaling
+      
+      # calculate importance density for collected samples
+      for(i in 1:samples)
+      {
+        log_imp_dens <- dmvnorm(x = sample_mat[i,], mean = mean_vals, sigma = cov_mat, log = TRUE)
+        # X = ln[g_IS(\theta)/(Lik(\theta) * Pr(\theta)) ] = ln[g_IS(\theta)] - ln[(Lik(\theta) * Pr(\theta))]
+        log_inv_marg_lik[i] = log_inv_marg_lik[i] + (log_imp_dens - log_posterior[i])
+      }
+    }
+  }
+  
+  # HANDLE GENE SPECIFIC PARAMETERS
+  synt_trace <- trace$getSynthesisRateTrace()[[1]]
+  sample_mat <- matrix(NA, ncol = length(synt_trace), nrow = samples)
+  sd_vals <- rep(NA, length(synt_trace))
+  mean_vals <- rep(NA, length(synt_trace))
+  for(i in 1:length(synt_trace))
+  {
+    vec <- synt_trace[[i]]
+    # Since I decided to use a normal density as importance function, I have to adjust the range of the samples to match the range of the normal.
+    # Using a normal density as importance function avoids transformation of the mean and sd values for e.g. a log-normal.
+    vec <- log(vec[(length(vec) - samples+1):(length(vec))])
+    sd_vals[i] <- sd(vec)
+    mean_vals[i] <- mean(vec)
+    sample_mat[,i] <- vec
+  }
+  
+  ##### THIS is only applicable IF a log-normal distribution is used as importance function. For simplicity sake I decided to use a normal.
+  # The functions sd and mean are best suited for normally/symmetrically distributed values, therefore I calculate the mean on the 
+  # logscale of the log-normally distribued phi values. Then convert the estimates into log mean/sd values for the log normal distribution.
+  # However, the difference is very small
+  # log_mean_vals = log(mean_vals) - 0.5 * log(1+(sd_vals^2/mean_vals^2))
+  # log_sd_vals = sqrt(log(1+(sd_vals^2/mean_vals^2)))
+  
+  # I want to point out any future reader that, while \phi ~ lognormal(...) this is only true for 
+  # the sample mean of all \phi values across a genome. The \phi posterior samples for each individual gene are approximal normally distributed.
+  
+  for(i in 1:length(synt_trace))
+  {
+    # Calculate importance density.
+    # if the scaing facotr is to large, the density can be (numerically) 0 at the sample location, thus I am adding a small number to avoid this issue.
+    log_imp_dens <- dnorm(x = sample_mat[,i], mean = mean_vals[i], sd = sd_vals[i]/scaling, log = TRUE)
+    # X = ln[g_IS(\theta)/(Lik(\theta) * Pr(\theta)) ] = ln[g_IS(\theta)] - ln[(Lik(\theta) * Pr(\theta))]
+    log_inv_marg_lik = log_inv_marg_lik + (log_imp_dens / log_posterior)
+  }  
+  
+  # Y = X - max_X
+  transformed_log_inv_marg_lik <- log_inv_marg_lik - max(log_inv_marg_lik)
+  # Z = sum(exp(vec(Y)))
+  transform_const <- sum(exp(transformed_log_inv_marg_lik))
+  # ln(ML) = ln(n) -(Z + max_X)
+  log_marg_lik <- log(samples) - (transform_const + max(log_inv_marg_lik))
+  #marg_lik = 1.0/(log_inv_marg_lik/samples) # equation 9
+  return(log_marg_lik)
+}
+
+
+
 #' Find and return list of optimal codons
 #' 
 #' \code{findOptimalCodon} extracrs the optimal codon for each amino acid.
