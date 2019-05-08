@@ -548,7 +548,7 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
 #'
 #' @param parameter An object created with \code{initializeParameterObject}. 
 #'  
-#' @param mcmc An object created with \cide{initializeMCMCObject} 
+#' @param mcmc An object created with \code{initializeMCMCObject} 
 #'  
 #' @param mixture determines for which mixture the marginal log-likelihood should be calculated
 #'    
@@ -586,88 +586,90 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
 #'  
 calculate_marginal_log_likelihood <- function(parameter, mcmc, mixture, samples, scaling)
 {  
+  # Implementation of harmonic mean estimation of the marginal likelihood from 
+  # Q.F. Gronau et al. / Journal of Mathematical Psychology 81 (2017) 80–97 
   
-  if(scaling < 1) stop("Covariance scaling has to be greater than 1")
+  if(divisor < 1) stop("Generalized Harmonic Mean Estimation of Marginal Likelihood requires importance sampling distribution variance divisor be greater than 1")
   
-  # Collect information from AnaCoDa objects
+  ## Collect information from AnaCoDa objects
   trace <- parameter$getTraceObject()
-  # This should be the posterior instead of the log_posterior but this causes an overflow, find fix!!!
+  ## This should be the posterior instead of the log_posterior but this causes an overflow, find fix!!!
   log_posterior <- mcmc$getLogPosteriorTrace()
-  log_posterior <- log_posterior[(length(log_posterior) - samples+1):(length(log_posterior))]
+  log_posterior <- log_posterior[(length(log_posterior) - n.samples+1):(length(log_posterior))]
   
   ### HANDLE CODON SPECIFIC PARAMETERS
-  log_inv_marg_lik <- rep(0, samples)
+  log_imp_dens_sample <- rep(0, n.samples)
   for(ptype in 0:1) # for all parameter types (mutation/selection parameters)
   {
     for(aa in AnaCoDa::aminoAcids()) # for all amino acids
     {
       if(aa == "M" || aa == "W" || aa == "X") next # ignore amino acids with only one codon or stop codons 
       codons <- AnaCoDa::AAToCodon(aa, focal = T)
-      # get covariance matrix and mean of importance distribution
-      sample_mat <- matrix(NA, ncol = length(codons), nrow = samples)
+      ## get covariance matrix and mean of importance distribution
+      sample_mat <- matrix(NA, ncol = length(codons), nrow = n.samples)
       mean_vals <- rep(NA, length(codons))
       for(i in 1:length(codons)) # for all codons
       {
         vec <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], ptype, TRUE)
-        vec <- vec[(length(vec) - samples+1):(length(vec))]
+        vec <- vec[(length(vec) - n.samples+1):(length(vec))]
         sample_mat[,i] <- vec
         mean_vals[i] <- mean(vec)
       }
-      # scale/shrinked covariance matrix
-      cov_mat <- cov(sample_mat) / scaling
+      ## scale/shrinked covariance matrix
+      cov_mat <- cov(sample_mat) / divisor
       
-      # calculate importance density for collected samples
-      for(i in 1:samples)
+      for(i in 1:n.samples)
       {
-        log_imp_dens <- dmvnorm(x = sample_mat[i,], mean = mean_vals, sigma = cov_mat, log = TRUE)
-        # X = ln[g_IS(\theta)/(Lik(\theta) * Pr(\theta)) ] = ln[g_IS(\theta)] - ln[(Lik(\theta) * Pr(\theta))]
-        log_inv_marg_lik[i] = log_inv_marg_lik[i] + (log_imp_dens - log_posterior[i])
+        ## calculate importance density for collected samples
+        ## mikeg: We should double check with Russ that it is okay to use the full covariance matrix of the sample (even though we have no prior on the cov structure) when constructing the importance density function.
+        ## It seems logical to do so
+        log_imp_dens_aa <- dmvnorm(x = sample_mat[i,], mean = mean_vals, sigma = cov_mat, log = TRUE)
+        log_imp_dens_sample[i] = log_imp_dens_sample[i] + log_imp_dens_aa
       }
     }
   }
   
-  # HANDLE GENE SPECIFIC PARAMETERS
+  ## HANDLE GENE SPECIFIC PARAMETERS
+  
+  # phi values are stored on natural scale.
   synt_trace <- trace$getSynthesisRateTrace()[[1]]
-  sample_mat <- matrix(NA, ncol = length(synt_trace), nrow = samples)
-  sd_vals <- rep(NA, length(synt_trace))
-  mean_vals <- rep(NA, length(synt_trace))
-  for(i in 1:length(synt_trace))
+  n_genes = length(synt_trace);
+  
+  sd_vals <- rep(NA, n_genes)
+  mean_vals <- rep(NA, n_genes)
+  for(i in 1:n_genes) ## i is indexing across genes
   {
     vec <- synt_trace[[i]]
-    # Since I decided to use a normal density as importance function, I have to adjust the range of the samples to match the range of the normal.
-    # Using a normal density as importance function avoids transformation of the mean and sd values for e.g. a log-normal.
-    vec <- log(vec[(length(vec) - samples+1):(length(vec))])
+    
+    vec <- vec[(length(vec) - n.samples+1):(length(vec))]
+    
     sd_vals[i] <- sd(vec)
     mean_vals[i] <- mean(vec)
-    sample_mat[,i] <- vec
-  }
+    log_mean_vals = log(mean_vals) - 0.5 * log(1+(sd_vals^2/mean_vals^2))
+    log_sd_vals = sqrt(log(1+(sd_vals^2/mean_vals^2)))
+    
+    ## Calculate vector of importance density for entire \phi trace of gene.
+    log_imp_dens_phi <- dlnorm(x = vec, meanlog = log_mean_vals[i], sdlog = log_sd_vals[i]/divisor, log = TRUE)
+    
+    
+    ## update importance density function vector of sample with current gene;
+    log_imp_dens_sample = log_imp_dens_sample + log_imp_dens_phi
+    
+  } ## end synth_trace loop
   
-  ##### THIS is only applicable IF a log-normal distribution is used as importance function. For simplicity sake I decided to use a normal.
-  # The functions sd and mean are best suited for normally/symmetrically distributed values, therefore I calculate the mean on the 
-  # logscale of the log-normally distribued phi values. Then convert the estimates into log mean/sd values for the log normal distribution.
-  # However, the difference is very small
-  # log_mean_vals = log(mean_vals) - 0.5 * log(1+(sd_vals^2/mean_vals^2))
-  # log_sd_vals = sqrt(log(1+(sd_vals^2/mean_vals^2)))
+  ## Scale importance density for each sample by its posterior probability (on log scale)
+  log_imp_dens_over_posterior = log_imp_dens_sample - log_posterior
   
-  # I want to point out any future reader that, while \phi ~ lognormal(...) this is only true for 
-  # the sample mean of all \phi values across a genome. The \phi posterior samples for each individual gene are approximal normally distributed.
-  
-  for(i in 1:length(synt_trace))
-  {
-    # Calculate importance density.
-    # if the scaing facotr is to large, the density can be (numerically) 0 at the sample location, thus I am adding a small number to avoid this issue.
-    log_imp_dens <- dnorm(x = sample_mat[,i], mean = mean_vals[i], sd = sd_vals[i]/scaling, log = TRUE)
-    # X = ln[g_IS(\theta)/(Lik(\theta) * Pr(\theta)) ] = ln[g_IS(\theta)] - ln[(Lik(\theta) * Pr(\theta))]
-    log_inv_marg_lik = log_inv_marg_lik + (log_imp_dens / log_posterior)
-  }  
-  
-  # Y = X - max_X
-  transformed_log_inv_marg_lik <- log_inv_marg_lik - max(log_inv_marg_lik)
-  # Z = sum(exp(vec(Y)))
-  transform_const <- sum(exp(transformed_log_inv_marg_lik))
-  # ln(ML) = ln(n) -(Z + max_X)
-  log_marg_lik <- log(samples) - (transform_const + max(log_inv_marg_lik))
-  #marg_lik = 1.0/(log_inv_marg_lik/samples) # equation 9
+  ## now scale by max term to facilitate summation
+  max_log_term = max(log_imp_dens_over_posterior)
+  ## Y = X - max_X
+  offset_log_imp_dens_over_posterior <- log_imp_dens_over_posterior - max_log_term
+  ## Z = sum(exp(vec(Y)))
+  offset_sum_imp_dens_over_posterior <- sum(exp(offset_log_imp_dens_over_posterior))/n.samples
+  log_sum_imp_dens_over_posterior <- log(offset_sum_imp_dens_over_posterior) + max_log_term
+  ## ln(ML) = ln(n) -(Z + max_X)
+  log_marg_lik <- log(n.samples) - log_sum_imp_dens_over_posterior
+  ##marg_lik = 1.0/(log_inv_marg_lik/n.samples) # equation 9
   return(log_marg_lik)
 }
 
