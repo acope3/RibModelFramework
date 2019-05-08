@@ -552,9 +552,9 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
 #'  
 #' @param mixture determines for which mixture the marginal log-likelihood should be calculated
 #'    
-#' @param samples How many samples should be used for the calculation 
+#' @param n.samples How many samples should be used for the calculation 
 #'  
-#' @param scaling A value > 1 in order to scale down the tails of the importance distribution
+#' @param divisor A value > 1 in order to scale down the tails of the importance distribution
 #'  
 #' @return This function returns the model object created. 
 #'  
@@ -584,13 +584,10 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
 #' cat("Bayes factor: ", mll1 - mll2, "\n")
 #' }
 #'  
-calculate_marginal_log_likelihood <- function(parameter, mcmc, mixture, samples, scaling)
+calculate_marginal_log_likelihood <- function(parameter, mcmc, mixture, n.samples, divisor)
 {  
-  # Implementation of harmonic mean estimation of the marginal likelihood from 
-  # Q.F. Gronau et al. / Journal of Mathematical Psychology 81 (2017) 80–97 
-  
   if(divisor < 1) stop("Generalized Harmonic Mean Estimation of Marginal Likelihood requires importance sampling distribution variance divisor be greater than 1")
-  
+
   ## Collect information from AnaCoDa objects
   trace <- parameter$getTraceObject()
   ## This should be the posterior instead of the log_posterior but this causes an overflow, find fix!!!

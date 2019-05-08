@@ -4,8 +4,8 @@
 \alias{calculate_marginal_log_likelihood}
 \title{Calculates the marginal log-likelihood for a set of parameters}
 \usage{
-calculate_marginal_log_likelihood(parameter, mcmc, mixture, samples,
-  scaling)
+calculate_marginal_log_likelihood(parameter, mcmc, mixture, n.samples,
+  divisor)
 }
 \arguments{
 \item{parameter}{An object created with \code{initializeParameterObject}.}
@@ -14,9 +14,9 @@ calculate_marginal_log_likelihood(parameter, mcmc, mixture, samples,
 
 \item{mixture}{determines for which mixture the marginal log-likelihood should be calculated}
 
-\item{samples}{How many samples should be used for the calculation}
+\item{n.samples}{How many samples should be used for the calculation}
 
-\item{scaling}{A value > 1 in order to scale down the tails of the importance distribution}
+\item{divisor}{A value > 1 in order to scale down the tails of the importance distribution}
 }
 \value{
 This function returns the model object created.
