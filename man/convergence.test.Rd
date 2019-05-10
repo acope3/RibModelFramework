@@ -27,7 +27,7 @@ is of length x, then starting point for convergence test will be x - samples.}
 \item{mixture}{(for Trace Object only) mixture for which to calculate convergence.test}
 }
 \value{
-geweke score object
+Geweke score object evaluating whether means of two fractions (frac1 and frac2) differ.  Convergence occurs when they don't differ significantly, i.e. pnorm(abs(convergence.test(mcmcObj)$a, ,lower.tail=FALSE)*2 > 0.05
 }
 \description{
 Convergence Test
