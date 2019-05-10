@@ -629,7 +629,7 @@ calculate_marginal_log_likelihood <- function(parameter, mcmc, mixture, n.sample
   ## HANDLE GENE SPECIFIC PARAMETERS
   
   # phi values are stored on natural scale.
-  synt_trace <- trace$getSynthesisRateTrace()[[1]]
+  synt_trace <- trace$getSynthesisRateTrace()[[mixture]]
   n_genes = length(synt_trace);
   
   sd_vals <- rep(NA, n_genes)
