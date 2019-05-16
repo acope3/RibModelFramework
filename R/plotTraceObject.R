@@ -76,8 +76,10 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
   {
     plotCodonSpecificHyperParameters(x, what = what[1])
   }
-
-
+  if(what[1] == "NSERate")
+  {
+    plotCodonSpecificParameters(x, mixture, "NSERate", main="NSERate", ROC=FALSE)
+  }  
 }
 
 # Called from Plot Trace Object (plot for trace)
@@ -158,6 +160,9 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
     }else if (type == "VarWaitingTime"){
       ylab <- expression(alpha/lambda~"'"^"2")
       special <- TRUE
+    }else if (type == "NSERate"){
+      paramType <- 2
+      special <- FALSE
     }else{
       stop("Parameter 'type' not recognized! Must be one of: 'Mutation', 'Selection', 'Alpha', 'LambdaPrime', 'MeanWaitingTime', 'VarWaitingTime'.")
     }
@@ -180,6 +185,7 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
 
     cur.trace <- do.call("cbind", cur.trace)
     if(length(cur.trace) == 0) next
+    if(type == "NSERate"){print(length(cur.trace))}
     x <- 1:dim(cur.trace)[1]
     xlim <- range(x)
     ylim <- range(cur.trace, na.rm=T)

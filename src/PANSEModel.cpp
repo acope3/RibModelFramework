@@ -30,12 +30,7 @@ PANSEModel::~PANSEModel()
 double PANSEModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
         unsigned currRFPObserved, unsigned currNumCodonsInMRNA, double phiValue)
 {
-/*    double logLikelihood = ((std::lgamma((currNumCodonsInMRNA * currAlpha) + currRFPObserved)) - (std::lgamma(currNumCodonsInMRNA * currAlpha)))
-        + (currRFPObserved * (std::log(phiValue) - std::log(currLambdaPrime + phiValue)))
-        + ((currNumCodonsInMRNA * currAlpha) * (std::log(currLambdaPrime) - std::log(currLambdaPrime + phiValue)));
 
-    return logLikelihood;
-    double term1, term2, term3;*/
     double prevdelta = 1;
 
     double term1 = std::lgamma(currAlpha + currRFPObserved) - lgamma(currAlpha);
@@ -168,14 +163,13 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
         std::vector <int> rfpCounts = gene->geneData.getRFPCount(/*RFPCountColumn*/ 0);
         currAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, grouping, false);
         currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PANSEParameter::lmPri, grouping, false);
+        currNSERate = getParameterForCategory(alphaCategory, PANSEParameter::alp, grouping, false);
         propAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, grouping, true);
         propLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PANSEParameter::lmPri, grouping, true);
 
         for (unsigned positionIndex = 0; positionIndex < positions.size(); positionIndex++){
             int positionalRFPCount = rfpCounts[positionIndex];
             std::string codon = gene->geneData.indexToCodon(positions[positionIndex]);
-
-
 
             if(codon == grouping){
                 logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambdaPrime, positionalRFPCount,
@@ -349,12 +343,11 @@ double PANSEModel::getCurrentStdDevSynthesisRateProposalWidth()
 }
 
 
+
 void PANSEModel::updateStdDevSynthesisRate()
 {
     parameter->updateStdDevSynthesisRate();
 }
-
-
 
 
 
@@ -489,8 +482,6 @@ void PANSEModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth, bool 
 
 
 
-
-
 //-------------------------------------//
 //---------- Other Functions ----------//
 //-------------------------------------//
@@ -583,14 +574,12 @@ void PANSEModel::updateHyperParameter(unsigned hp)
             updateStdDevSynthesisRate();
             break;
         default:
-            updateStdDevSynthesisRate();
             break;
     }
 }
 
 void PANSEModel::simulateGenome(Genome &genome)
 {
-    float sigma = 1;
     for (unsigned geneIndex = 0u; geneIndex < genome.getGenomeSize(); geneIndex++)
     {
         unsigned mixtureElement = getMixtureAssignment(geneIndex);
@@ -602,12 +591,13 @@ void PANSEModel::simulateGenome(Genome &genome)
         std::vector <int> rfpCount;
         unsigned alphaCat = parameter->getMutationCategory(mixtureElement);
         unsigned lambdaPrimeCat = parameter->getSelectionCategory(mixtureElement);
+        double sigma =  1.0;
         for (unsigned codonID : positions)
         {
             std::string codon = SequenceSummary::codonArray[codonID];
             double alpha = getParameterForCategory(alphaCat, PANSEParameter::alp, codon, false);
             double lambdaPrime = getParameterForCategory(lambdaPrimeCat, PANSEParameter::lmPri, codon, false);
-
+            sigma *= getParameterForCategory(alphaCat, PANSEParameter::nse, codon, false);
 #ifndef STANDALONE
             RNGScope scope;
             NumericVector xx(1);
@@ -830,6 +820,33 @@ std::vector <double> readAlphaValues(std::string filename){
 
 }
 std::vector <double> readLambdaValues(std::string filename){
+    std::size_t pos;
+    std::ifstream currentFile;
+    std::string tmpString;
+    std::vector <double> rv;
+
+    rv.resize(64);
+
+    currentFile.open(filename);
+    if (currentFile.fail())
+        my_printError("Error opening file %\n", filename.c_str());
+    else
+    {
+        currentFile >> tmpString;
+        while (currentFile >> tmpString){
+            pos = tmpString.find(',');
+            if (pos != std::string::npos)
+            {
+                std::string codon = tmpString.substr(0,3);
+                std::string val = tmpString.substr(pos + 1, std::string::npos);
+                rv[SequenceSummary::codonToIndex(codon, true)] = std::atof(val.c_str());
+            }
+        }
+    }
+
+    return rv;
+}
+std::vector <double> readNSERateValues(std::string filename){
     std::size_t pos;
     std::ifstream currentFile;
     std::string tmpString;

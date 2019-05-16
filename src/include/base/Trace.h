@@ -40,8 +40,8 @@ class Trace {
 		//FONSE Trace:
 
 
-		//PA Trace:
-        //paramType = {randomNumber, acceptanceRatio, currentLogLikelihood, proposedLogLikelihood, currentLogLikelihoodAdjusted, proposedLogLikelihoodAdjusted}
+		//PANSE Trace:
+
 
 		//--------------------------------------//
 		//------ Initialization Functions ------//
@@ -137,8 +137,9 @@ class Trace {
         //FONSE Specific:
 
 
+        //PANSE Specific:
 
-		//------------------------------//
+        //------------------------------//
 		//------ Update Functions ------//
 		//------------------------------//
         void updateStdDevSynthesisRateTrace(unsigned sample, double stdDevSynthesisRate, unsigned synthesisRateCategory);
@@ -160,9 +161,8 @@ class Trace {
         //FONSE Specific:
 
 
-        //PA Specific:
+        //PA/PANSE Specific:
         void updateCodonSpecificParameterTraceForCodon(unsigned sample, std::string codon, std::vector<std::vector<double>> &curParam, unsigned paramType);
-
 
 
         //R Section:

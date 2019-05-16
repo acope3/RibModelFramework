@@ -155,10 +155,6 @@ void Trace::initCodonSpecificParameterTrace(unsigned samples, unsigned numCatego
 
 
 
-
-
-
-
 //----------------------------------//
 //---------- ROC Specific ----------//
 //----------------------------------//
@@ -185,7 +181,9 @@ void Trace::initObservedSynthesisNoiseTrace(unsigned samples, unsigned numPhiGro
 }
 
 
-
+//----------------------------------//
+//--------- PANSE Specific ---------//
+//----------------------------------//
 
 
 //----------------------------------------------------//
@@ -248,12 +246,16 @@ void Trace::initializePANSETrace(unsigned samples, unsigned num_genes, unsigned 
 	std::vector<mixtureDefinition> &_categories, unsigned maxGrouping, std::vector<double> init_phi,
 	std::vector<unsigned> init_mix_assign)
 {
+    numCodonSpecificParamTypes = 3;
+    codonSpecificParameterTrace.resize(numCodonSpecificParamTypes);
+
 	initializeSharedTraces(samples, num_genes, numLambdaPrimeCategories, numMixtures,
-		_categories, maxGrouping,init_phi,init_mix_assign);
+		_categories, maxGrouping, init_phi,init_mix_assign);
 
 	// See Note 1) above.
 	initCodonSpecificParameterTrace(samples, numAlphaCategories,  numParam, 0u); //alp
 	initCodonSpecificParameterTrace(samples, numLambdaPrimeCategories, numParam, 1u); //lmPri
+    initCodonSpecificParameterTrace(samples, numAlphaCategories, numParam, 2u); //lmPri
 }
 
 
@@ -460,6 +462,9 @@ unsigned Trace::getCodonSpecificCategory(unsigned mixtureElement, unsigned param
 	case 1:
 		rv = categories->at(mixtureElement).delEta;
 		break;
+    case 2:
+        rv = categories->at(mixtureElement).delM;
+        break;
 	default:
 		my_printError("ERROR: Unknown parameter type in getCodonSpecificCategory\n");
 		break;
@@ -468,7 +473,9 @@ unsigned Trace::getCodonSpecificCategory(unsigned mixtureElement, unsigned param
 }
 
 
-
+//--------------------------------------//
+//----------- PANSE Specific -----------//
+//--------------------------------------//
 
 
 //--------------------------------------//
@@ -589,7 +596,7 @@ void Trace::updateObservedSynthesisNoiseTrace(unsigned index, unsigned sample, d
 
 
 //-------------------------------------//
-//---------- PA Specific -------------//
+//-------- PA/PANSE Specific ----------//
 //-------------------------------------//
 
 void Trace::updateCodonSpecificParameterTraceForCodon(unsigned sample, std::string codon,
@@ -604,6 +611,8 @@ void Trace::updateCodonSpecificParameterTraceForCodon(unsigned sample, std::stri
 		codonSpecificParameterTrace[paramType][category][i][sample] = curParam[category][i];
 	}
 }
+
+
 
 
 // -----------------------------------------------------------------------------------------------------//
