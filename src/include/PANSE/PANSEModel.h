@@ -15,7 +15,7 @@ class PANSEModel: public Model
 		unsigned RFPCountColumn;
 
 		double calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
-				unsigned currRFPObserved, unsigned currNumCodonsInMRNA, double phiValue);
+				unsigned currRFPObserved, unsigned currNumCodonsInMRNA, double phiValue, double prevSigma);
 
 
 	public:
@@ -57,6 +57,12 @@ class PANSEModel: public Model
 		virtual void updateStdDevSynthesisRate();
 
 
+        //Partition Function Functions:
+        virtual double getPartitionFunction(unsigned mixture, bool proposed = false);
+        virtual double getCurrentPartitionFunctionProposalWidth();
+        virtual void updatePartitionFunction();
+
+
 		//Synthesis Rate Functions:
 		virtual double getSynthesisRate(unsigned index, unsigned mixture, bool proposed = false);
 		virtual void updateSynthesisRate(unsigned i, unsigned k);
@@ -69,6 +75,7 @@ class PANSEModel: public Model
 
 		//Trace Functions:
 		virtual void updateStdDevSynthesisRateTrace(unsigned sample);
+        virtual void updatePartitionFunctionTrace(unsigned sample);
 		virtual void updateSynthesisRateTrace(unsigned sample, unsigned i);
 		virtual void updateMixtureAssignmentTrace(unsigned sample, unsigned i);
 		virtual void updateMixtureProbabilitiesTrace(unsigned sample);
@@ -79,6 +86,7 @@ class PANSEModel: public Model
 
 		//Adaptive Width Functions:
 		virtual void adaptStdDevSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt = true);
+        virtual void adaptPartitionFunctionProposalWidth(unsigned adaptiveWidth, bool adapt = true);
 		virtual void adaptSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt = true);
 		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, unsigned lastIteration, bool adapt = true);
 		virtual void adaptHyperParameterProposalWidths(unsigned adaptiveWidth, bool adapt = true);
@@ -110,19 +118,19 @@ class PANSEModel: public Model
 		void setParameter(PANSEParameter &_parameter);
 		virtual double calculateAllPriors();
 		virtual double getParameterForCategory(unsigned category, unsigned param, std::string codon, bool proposal);
-		double u_gamma_helper(double s, double x);
 
-		double u_gamma(double s, double x);
-		double u_gamma_log(double s, double x);
-        double generalized_integral(double p, double z);
+		double UpperIncompleteGammaHelper(double s, double x);
+		double UpperIncompleteGamma(double s, double x);
+		double UpperIncompleteGammaLog(double s, double x);
+        double GeneralizedIntegral(double p, double z);
 
 
-        double generalized_integral_log(double p, double z);
-        double prob_elongation(double curralpha, double currlambda, double currv);
-        double prob_elongation_log(double curralpha, double currlambda, double currv);
-        double delta_g(int i, int g, double *lambda, double *v_g, double *alpha);
+        double GeneralizedIntegralLog(double p, double z);
+        double elongationProbability(double currAlpha, double currLambda, double currNSE);
+        double elongationProbabilityLog(double currAlpha, double currLambda, double currNSE);
+        double elongationUnitilIndexProbability(int index, std::vector <double> lambdas, std::vector <double> NSERates);
         
-        double delta_g_log(int i, int g, double *lambda, double *v_g, double *alpha);
+        double elongationUnitilIndexProbabilityLog(int index, std::vector <double> lambdas, std::vector <double> NSERates);
         double prob_Y_g(double curralpha, int sample_size, double lambda_prime, double psi, double prevdelta);
         double prob_Y_g_log(double curralpha, int sample_size, double lambda_prime, double psi, double prevdelta);
         

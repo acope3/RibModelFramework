@@ -1,5 +1,4 @@
 #include "include/PANSE/PANSEParameter.h"
-//Write this down hyper parameter is model specific parameters NSE wait time should be added here, and s_phi is one
 
 #ifndef STANDALONE
 #include <Rcpp.h>
@@ -63,6 +62,10 @@ PANSEParameter& PANSEParameter::operator=(const PANSEParameter& rhs)
 
 	bias_csp = rhs.bias_csp;
 	std_csp = rhs.std_csp;
+	std_partitionFunction = rhs.std_partitionFunction;
+	partitionFunction_proposed = rhs.partitionFunction_proposed;
+	partitionFunction = rhs.partitionFunction;
+
 
 	return *this;
 }
@@ -96,6 +99,7 @@ void PANSEParameter::initPANSEParameterSet()
 	unsigned alphaCategories = getNumMutationCategories();
 	unsigned lambdaPrimeCategories = getNumSelectionCategories();
 	unsigned nonsenseErrorCategories = getNumMutationCategories();
+	unsigned partitionFunctionCategories = numMixtures;
 
 	currentCodonSpecificParameter.resize(3);
 	proposedCodonSpecificParameter.resize(3);
@@ -106,6 +110,8 @@ void PANSEParameter::initPANSEParameterSet()
 	proposedCodonSpecificParameter[lmPri].resize(lambdaPrimeCategories);
 	currentCodonSpecificParameter[nse].resize(nonsenseErrorCategories);
 	proposedCodonSpecificParameter[nse].resize(nonsenseErrorCategories);
+	partitionFunction_proposed.resize(partitionFunctionCategories);
+	partitionFunction.resize(partitionFunctionCategories);
 
 	numParam = 61;
 
@@ -131,6 +137,7 @@ void PANSEParameter::initPANSEParameterSet()
 
 	bias_csp = 0;
 	std_csp.resize(numParam, 0.1);
+	std_partitionFunction = 0.1;
 
 	groupList = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
 		"TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT", "ATA", "ATC",
@@ -521,7 +528,13 @@ void PANSEParameter::updateCodonSpecificParameterTrace(unsigned sample, std::str
     traces.updateCodonSpecificParameterTraceForCodon(sample, codon, currentCodonSpecificParameter[nse], nse);
 }
 
-
+void PANSEParameter::updatePartitionFunctionTrace(unsigned sample)
+{
+    for (unsigned i = 0u; i < numMixtures; i++)
+    {
+        traces.updatePartitionFunctionTrace(i, sample, partitionFunction[i]);
+    }
+}
 
 
 // -----------------------------------//
@@ -601,7 +614,52 @@ void PANSEParameter::updateCodonSpecificParameter(std::string grouping)
 }
 
 
+// ----------------------------------------------//
+// -------- Partition Function Functions --------//
+// ----------------------------------------------//
 
+double PANSEParameter::getPartitionFunction(unsigned mixtureCategory, bool proposed)
+{
+    if (proposed)
+    {
+        return partitionFunction_proposed[mixtureCategory];
+    }
+    return partitionFunction[mixtureCategory];
+}
+
+
+void PANSEParameter::proposePartitionFunction()
+{
+    for (unsigned i = 0u; i < numMixtures; i++){
+        partitionFunction_proposed[i] = std::exp( randNorm( std::log(partitionFunction[i]) , std_partitionFunction) );
+    }
+}
+
+
+void PANSEParameter::setPartitionFunction(double newPartitionFunction, unsigned mixtureCategory)
+{
+    partitionFunction[mixtureCategory] = newPartitionFunction;
+}
+
+
+double PANSEParameter::getCurrentPartitionFunctionProposalWidth()
+{
+    return std_partitionFunction;
+}
+
+
+unsigned PANSEParameter::getNumAcceptForPartitionFunction()
+{
+    return numAcceptForPartitionFunction;
+}
+
+
+void PANSEParameter::updatePartitionFunction()
+{
+    for (unsigned i = 0u; i < numMixtures; i++){
+        partitionFunction[i] = partitionFunction_proposed[i];
+    }
+}
 
 // ----------------------------------------------//
 // ---------- Adaptive Width Functions ----------//
@@ -635,6 +693,23 @@ void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptatio
 }
 
 
+/* adaptPartitionFunctionProposalWidth (NOT EXPOSED)
+ * Arguments: adaptionWidth, last iteration (NOT USED), adapt (bool)
+
+ */
+void PANSEParameter::adaptPartitionFunctionProposalWidth(unsigned adaptationWidth, bool adapt)
+{
+    double acceptanceLevel = (double)numAcceptForPartitionFunction / (double)adaptationWidth;
+    traces.updatePartitionFunctionAcceptanceRateTrace(acceptanceLevel);
+    if (adapt)
+    {
+        if (acceptanceLevel < 0.2)
+            std_partitionFunction *= 0.8;
+        if (acceptanceLevel > 0.3)
+            std_partitionFunction *= 1.2;
+    }
+    numAcceptForPartitionFunction = 0u;
+}
 
 
 // -------------------------------------//

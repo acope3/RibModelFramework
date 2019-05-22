@@ -41,7 +41,8 @@ class Trace {
 
 
 		//PANSE Trace:
-
+		std::vector<std::vector <double>> partitionFunctionTrace;
+		std::vector<double> partitionFunctionTraceAcceptanceRateTrace;
 
 		//--------------------------------------//
 		//------ Initialization Functions ------//
@@ -65,8 +66,8 @@ class Trace {
 		//FONSE Specific:
 
 
-		//PA Specific:
-
+		//PANSE Specific:
+		void initPartitionFunctionTrace(unsigned samples, unsigned numPartitionFunctionsGroupings);
 
 	public:
 		//Constructors & Destructors:
@@ -138,6 +139,7 @@ class Trace {
 
 
         //PANSE Specific:
+        std::vector<double> getPartitionFunctionTrace(unsigned mixtureIndex);
 
         //------------------------------//
 		//------ Update Functions ------//
@@ -161,9 +163,10 @@ class Trace {
         //FONSE Specific:
 
 
-        //PA/PANSE Specific:
+        //PANSE Specific:
         void updateCodonSpecificParameterTraceForCodon(unsigned sample, std::string codon, std::vector<std::vector<double>> &curParam, unsigned paramType);
-
+        void updatePartitionFunctionTrace(unsigned index, unsigned sample, double value);
+        void updatePartitionFunctionAcceptanceRateTrace(double value);
 
         //R Section:
 #ifndef STANDALONE
@@ -201,6 +204,9 @@ class Trace {
         void setObservedSynthesisNoiseTrace(std::vector<std::vector <double> > _ObservedSynthesisNoiseTrace);
         void setCodonSpecificParameterTrace(std::vector<std::vector<std::vector<float>>> _parameterTrace, unsigned paramType);
 
+        //PANSE Specific:
+        std::vector<double> getPartitionFunctionTraceR(unsigned mixtureIndex);
+        void setPartitionFunctionTrace(std::vector<std::vector <double> > _PartitionFunctionTrace);
 
         bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);
 

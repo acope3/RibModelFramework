@@ -18,6 +18,10 @@
 
 class PANSEParameter: public Parameter {
 	private:
+        std::vector <double> partitionFunction_proposed;
+        std::vector <double> partitionFunction; //A_Phi
+        double std_partitionFunction;
+        unsigned numAcceptForPartitionFunction;
 
 		double bias_csp;
 
@@ -58,6 +62,7 @@ class PANSEParameter: public Parameter {
 
 		//Trace Functions:
 		void updateCodonSpecificParameterTrace(unsigned sample, std::string codon);
+        void updatePartitionFunctionTrace(unsigned sample);
 
 
 		//CSP Functions:
@@ -65,8 +70,17 @@ class PANSEParameter: public Parameter {
 		void proposeCodonSpecificParameter();
 		void updateCodonSpecificParameter(std::string grouping);
 
+        //partitionFunction Functions: Mostly tested, see comments.
+        double getPartitionFunction(unsigned mixtureCategory, bool proposed); //TODO: test
+        virtual void proposePartitionFunction(); //TODO: test
+        void setPartitionFunction(double newPartitionFunction, unsigned mixtureCategory); //TODO: test
+        double getCurrentPartitionFunctionProposalWidth(); //TODO: test
+        unsigned getNumAcceptForPartitionFunction(); //Only for unit testing.
+        void updatePartitionFunction(); //TODO: test
+
 		//Adaptive Width Functions:
 		void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastIteration, bool adapt); //may make virtual
+		void adaptPartitionFunctionProposalWidth(unsigned adaptationWidth, bool adapt);
 
 		//Other functions:
 		double getParameterForCategory(unsigned category, unsigned paramType, std::string codon, bool proposal);
