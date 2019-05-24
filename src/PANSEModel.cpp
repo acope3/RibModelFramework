@@ -148,6 +148,8 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
     for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
     {
         gene = &genome.getGene(i);
+        double currSigma = 1.0;
+        double propSigma = 1.0;
         // which mixture element does this gene belong to
         unsigned mixtureElement = parameter->getMixtureAssignment(i);
         // how is the mixture element defined. Which categories make it up
@@ -172,12 +174,13 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
         for (unsigned positionIndex = 0; positionIndex < positions.size(); positionIndex++){
             int positionalRFPCount = rfpCounts[positionIndex];
             std::string codon = gene->geneData.indexToCodon(positions[positionIndex]);
-
+            currSigma *= elongationProbability(currAlpha, currLambdaPrime, 1/currNSERate);
+            propSigma *= elongationProbability(propAlpha, propLambdaPrime, 1/propNSERate);
             if(codon == grouping){
                 logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambdaPrime, positionalRFPCount,
-                                    currNumCodonsInMRNA, phiValue, 1);
+                                    currNumCodonsInMRNA, phiValue, currSigma);
                 logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, positionalRFPCount,
-                                   currNumCodonsInMRNA, phiValue, 1);
+                                   currNumCodonsInMRNA, phiValue, propSigma);
             }
 
             else{
@@ -187,8 +190,8 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
         }
 
     }
-    currAdjustmentTerm += std::log(currAlpha) + std::log(currLambdaPrime);
-    propAdjustmentTerm += std::log(propAlpha) + std::log(propLambdaPrime);
+    currAdjustmentTerm += std::log(currAlpha) + std::log(currLambdaPrime) + std::log(currNSERate);
+    propAdjustmentTerm += std::log(propAlpha) + std::log(propLambdaPrime) + std::log(propNSERate);
     logAcceptanceRatioForAllMixtures[0] = logLikelihood_proposed - logLikelihood - (currAdjustmentTerm - propAdjustmentTerm);
 	//my_print("Codon % Adjustment factors:\nCurrAlpha: %\nCurrLambda: %\nLikelihood: %\nPropAlpha: %\nPropLambda: %\nPropLikelihood: %\nAdjustment: %\n", grouping, currAlpha, currLambdaPrime, logLikelihood ,propAlpha, propLambdaPrime,logLikelihood_proposed, adjustmentTerm);
 	logAcceptanceRatioForAllMixtures[1] = logLikelihood - propAdjustmentTerm;
