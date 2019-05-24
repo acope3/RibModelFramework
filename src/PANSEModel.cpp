@@ -139,7 +139,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
     double propAdjustmentTerm = 0;
     Gene *gene;
     unsigned index = SequenceSummary::codonToIndex(grouping);
-
+    double U = getPartitionFunction(mixtureElement, false) genome.getSumRFP();
 
 #ifdef _OPENMP
     //#ifndef __APPLE__
@@ -152,6 +152,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
         double propSigma = 1.0;
         // which mixture element does this gene belong to
         unsigned mixtureElement = parameter->getMixtureAssignment(i);
+
         // how is the mixture element defined. Which categories make it up
         unsigned alphaCategory = parameter->getMutationCategory(mixtureElement);
         unsigned lambdaPrimeCategory = parameter->getSelectionCategory(mixtureElement);
@@ -163,8 +164,6 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 
         std::vector <unsigned> positions = gene->geneData.getPositionCodonID();
         std::vector <int> rfpCounts = gene->geneData.getRFPCount(/*RFPCountColumn*/ 0);
-
-
 
         for (unsigned positionIndex = 0; positionIndex < positions.size(); positionIndex++){
             int positionalRFPCount = rfpCounts[positionIndex];
