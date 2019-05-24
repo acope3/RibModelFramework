@@ -163,19 +163,21 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 
         std::vector <unsigned> positions = gene->geneData.getPositionCodonID();
         std::vector <int> rfpCounts = gene->geneData.getRFPCount(/*RFPCountColumn*/ 0);
-        currAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, grouping, false);
-        currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PANSEParameter::lmPri, grouping, false);
-        currNSERate = getParameterForCategory(alphaCategory, PANSEParameter::nse, grouping, false);
-        propAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, grouping, true);
-        propLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PANSEParameter::lmPri, grouping, true);
-        propNSERate = getParameterForCategory(alphaCategory, PANSEParameter::nse, grouping, true);
+
 
 
         for (unsigned positionIndex = 0; positionIndex < positions.size(); positionIndex++){
             int positionalRFPCount = rfpCounts[positionIndex];
             std::string codon = gene->geneData.indexToCodon(positions[positionIndex]);
+            currAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, false);
+            currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PANSEParameter::lmPri, codon, false);
+            currNSERate = getParameterForCategory(alphaCategory, PANSEParameter::nse, codon, false);
+            propAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, true);
+            propLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PANSEParameter::lmPri, codon, true);
+            propNSERate = getParameterForCategory(alphaCategory, PANSEParameter::nse, codon, true);
             currSigma *= elongationProbability(currAlpha, currLambdaPrime, 1/currNSERate);
             propSigma *= elongationProbability(propAlpha, propLambdaPrime, 1/propNSERate);
+
             if(codon == grouping){
                 logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambdaPrime, positionalRFPCount,
                                     currNumCodonsInMRNA, phiValue, currSigma);

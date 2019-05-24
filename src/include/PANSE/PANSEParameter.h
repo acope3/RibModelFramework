@@ -19,7 +19,7 @@
 class PANSEParameter: public Parameter {
 	private:
         std::vector <double> partitionFunction_proposed;
-        std::vector <double> partitionFunction; //A_Phi
+        std::vector <double> partitionFunction;
         double std_partitionFunction;
         unsigned numAcceptForPartitionFunction;
 
