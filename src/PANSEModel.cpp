@@ -139,7 +139,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
     double propAdjustmentTerm = 0;
     Gene *gene;
     unsigned index = SequenceSummary::codonToIndex(grouping);
-    double U = getPartitionFunction(mixtureElement, false) genome.getSumRFP();
+    double U = 1;//getPartitionFunction(0, false)/genome.getSumRFP();
 
 #ifdef _OPENMP
     //#ifndef __APPLE__

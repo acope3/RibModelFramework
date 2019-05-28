@@ -229,7 +229,7 @@ void PANSEParameter::initPANSEValuesFromFile(std::string filename)
 						}
 					}
 				}
-				else if (variableName == "currentLambdaPrimeParameter")
+				else if (variableName == "currentNSERateParameter")
                 {
                     if (tmp == "***")
                     {
@@ -341,7 +341,7 @@ void PANSEParameter::writePANSERestartFile(std::string filename)
 			if (j % 10 != 0)
 				oss << "\n";
 		}
-        oss << ">currentLambdaPrimeParameter:\n";
+        oss << ">currentNSERateParameter:\n";
         for (i = 0; i < currentCodonSpecificParameter[nse].size(); i++)
         {
             oss << "***\n";
