@@ -13,7 +13,6 @@ class PANSEModel: public Model
 	private:
 		PANSEParameter *parameter;
 		unsigned RFPCountColumn;
-
 		double calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
 				unsigned currRFPObserved, unsigned currNumCodonsInMRNA, double phiValue, double prevSigma);
 
