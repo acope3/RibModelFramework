@@ -161,6 +161,7 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
       ylab <- expression(alpha/lambda~"'"^"2")
       special <- TRUE
     }else if (type == "NSERate"){
+      ylab <- expression(NSERate)
       paramType <- 2
       special <- FALSE
     }else{
@@ -185,7 +186,6 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
 
     cur.trace <- do.call("cbind", cur.trace)
     if(length(cur.trace) == 0) next
-    if(type == "NSERate"){print(length(cur.trace))}
     x <- 1:dim(cur.trace)[1]
     xlim <- range(x)
     ylim <- range(cur.trace, na.rm=T)

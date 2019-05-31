@@ -28,7 +28,7 @@ PANSEModel::~PANSEModel()
 
 
 double PANSEModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
-        unsigned currRFPObserved, unsigned currNumCodonsInMRNA, double phiValue, double prevSigma)
+        unsigned currRFPObserved, double phiValue, double prevSigma)
 {
 
 
@@ -105,9 +105,9 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
         //This line will never execute
         if (currNumCodonsInMRNA == 0) continue;
 
-        //Have to redo the math becuase rfp observed has changed
-        logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue, 1);
-        logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, currNumCodonsInMRNA, phiValue_proposed, 1);
+        //Have to redo the math because rfp observed has changed
+        logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, phiValue, 1);
+        logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, phiValue_proposed, 1);
     }
 
     //Double check math here
@@ -193,9 +193,9 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 
                 propSigma *= propCodonSigma;
                 logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambdaPrime, positionalRFPCount,
-                                    currNumCodonsInMRNA, phiValue, currSigma);
+                                   phiValue, propSigma);
                 logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, positionalRFPCount,
-                                   currNumCodonsInMRNA, phiValue, propSigma);
+                                   phiValue, currSigma);
             }
 
             else{
@@ -241,7 +241,7 @@ void PANSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
     }
 
 
-    logProbabilityRatio.resize(1);
+    logProbabilityRatio.resize(2);
 #ifdef _OPENMP
     //#ifndef __APPLE__
 #pragma omp parallel for reduction(+:lpr)
@@ -251,17 +251,69 @@ void PANSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
         unsigned mixture = getMixtureAssignment(i);
         mixture = getSynthesisRateCategory(mixture);
         double phi = getSynthesisRate(i, mixture, false);
-        if (i == 0)
-        {
-            //my_print("proposed: %\n", Parameter::densityLogNorm(phi, proposedMPhi[mixture], proposedStdDevSynthesisRate[mixture], false));
-            //my_print("current: %\n", Parameter::densityLogNorm(phi, currentMPhi, currentStdDevSynthesisRate, false));
-        }
         lpr += Parameter::densityLogNorm(phi, proposedMphi[mixture], proposedStdDevSynthesisRate[mixture], true) -
             Parameter::densityLogNorm(phi, currentMphi[mixture], currentStdDevSynthesisRate[mixture], true);
-        //my_print("LPR: %\n", lpr);
     }
 
     logProbabilityRatio[0] = lpr;
+
+    Gene *gene;
+    std::vector <double> currCodonSigmas;
+    std::vector <double> propCodonSigmas;
+    currCodonSigmas.resize(getGroupListSize(), 0.0);
+    propCodonSigmas.resize(getGroupListSize(), 0.0);
+    double logLikelihood, logLikelihood_proposed;
+    lpr = 0.0;
+
+    for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+    {
+        gene = &genome.getGene(i);
+        double currSigma = 1.0;
+        double propSigma = 1.0;
+        // which mixture element does this gene belong to
+        unsigned mixtureElement = parameter->getMixtureAssignment(i);
+        double currU = getPartitionFunction(i, false);
+        double propU = getPartitionFunction(i, true);
+        // how is the mixture element defined. Which categories make it up
+        unsigned alphaCategory = parameter->getMutationCategory(mixtureElement);
+        unsigned lambdaPrimeCategory = parameter->getSelectionCategory(mixtureElement);
+        unsigned synthesisRateCategory = parameter->getSynthesisRateCategory(mixtureElement);
+        // get non codon specific values, calculate likelihood conditional on these
+        double phiValue = parameter->getSynthesisRate(i, synthesisRateCategory, false);
+
+        std::vector <unsigned> positions = gene->geneData.getPositionCodonID();
+        std::vector <int> rfpCounts = gene->geneData.getRFPCount(/*RFPCountColumn*/ 0);
+
+        for (unsigned positionIndex = 0; positionIndex < positions.size(); positionIndex++){
+            int positionalRFPCount = rfpCounts[positionIndex];
+            int codonIndex = positions[positionIndex];
+            std::string codon = gene->geneData.indexToCodon(codonIndex);
+            double currAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, false);
+            double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PANSEParameter::lmPri, codon, false);
+            double currNSERate = getParameterForCategory(alphaCategory, PANSEParameter::nse, codon, false);
+
+            if(currCodonSigmas[codonIndex] == 0.0)
+            {
+                currCodonSigmas[codonIndex] = elongationProbability(currAlpha, currU * currLambdaPrime, 1/currNSERate);
+                propCodonSigmas[codonIndex] = elongationProbability(currAlpha, propU * currLambdaPrime, 1/currNSERate);
+            }
+
+            currSigma *= currCodonSigmas[codonIndex];
+            propSigma *= propCodonSigmas[codonIndex];
+
+            logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, positionalRFPCount,
+                                phiValue, currSigma);
+            logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, positionalRFPCount,
+                               phiValue, propSigma);
+
+        }
+
+        lpr -= (std::log(getPartitionFunction(i, false)) - std::log(getPartitionFunction(i, true)));
+        lpr -= logLikelihood_proposed - logLikelihood;
+        my_print(" CurrU is %\n", currU);
+        my_print("Propose U is %\n", propU);
+        logProbabilityRatio[1] = lpr;
+    }
 }
 
 

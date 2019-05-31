@@ -110,8 +110,8 @@ void PANSEParameter::initPANSEParameterSet()
 	proposedCodonSpecificParameter[lmPri].resize(lambdaPrimeCategories);
 	currentCodonSpecificParameter[nse].resize(nonsenseErrorCategories);
 	proposedCodonSpecificParameter[nse].resize(nonsenseErrorCategories);
-	partitionFunction_proposed.resize(partitionFunctionCategories);
-	partitionFunction.resize(partitionFunctionCategories);
+	partitionFunction_proposed.resize(partitionFunctionCategories, 1);
+	partitionFunction.resize(partitionFunctionCategories, 1);
 
 	numParam = 61;
 
@@ -533,6 +533,7 @@ void PANSEParameter::updatePartitionFunctionTrace(unsigned sample)
     for (unsigned i = 0u; i < numMixtures; i++)
     {
         traces.updatePartitionFunctionTrace(i, sample, partitionFunction[i]);
+        my_print("Sample is %\n Partiiton Function is % \n",sample, partitionFunction[i]);
     }
 }
 
