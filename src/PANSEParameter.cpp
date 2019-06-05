@@ -633,7 +633,9 @@ void PANSEParameter::proposePartitionFunction()
 {
     for (unsigned i = 0u; i < numMixtures; i++){
         partitionFunction_proposed[i] = std::exp( randNorm( std::log(partitionFunction[i]) , std_partitionFunction) );
+        my_print("Proposed partition = %\n",  partitionFunction_proposed[i]);
     }
+
 }
 
 
