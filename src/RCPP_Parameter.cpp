@@ -221,8 +221,7 @@ RCPP_MODULE(Parameter_mod)
 
 		//Other Functions:
 		.method("getParameterForCategory", &PANSEParameter::getParameterForCategoryR)
-
-
+		.method("setPartitionFunction", &PANSEParameter::setPartitionFunction)
 
 		.property("proposedAlphaParameter", &PANSEParameter::getProposedAlphaParameter,
 		        &PANSEParameter::setProposedAlphaParameter) //R Specific
