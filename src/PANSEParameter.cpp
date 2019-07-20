@@ -76,7 +76,7 @@ PANSEParameter& PANSEParameter::operator=(const PANSEParameter& rhs)
 */
 PANSEParameter::~PANSEParameter()
 {
-	//dtor 
+	//dtor
 	//TODO: Need to call Parameter's deconstructor?
 }
 
@@ -339,10 +339,10 @@ void PANSEParameter::initFromRestartFile(std::string filename)
  * Arguments: number of samples, number of genes
  * Initializes all traces, base traces and those specific to PANSE.
  */
-void PANSEParameter::initAllTraces(unsigned samples, unsigned num_genes)
+void PANSEParameter::initAllTraces(unsigned samples, unsigned num_genes, bool estimateSynthesisRate)
 {
 	traces.initializePANSETrace(samples, num_genes, numMutationCategories, numSelectionCategories, numParam,
-						 numMixtures, categories, (unsigned)groupList.size(),currentSynthesisRateLevel[0],mixtureAssignment);
+						 numMixtures, categories, (unsigned)groupList.size(),currentSynthesisRateLevel[0],mixtureAssignment,estimateSynthesisRate);
 }
 
 
@@ -825,7 +825,7 @@ void PANSEParameter::readLambdaValues(std::string filename)
     std::ifstream currentFile;
     std::string tmpString;
     std::vector <double> tmp;
-    
+
     tmp.resize(64, 0.1);
 
     currentFile.open(filename);
@@ -844,7 +844,7 @@ void PANSEParameter::readLambdaValues(std::string filename)
             }
         }
     }
-    
+
     currentFile.close();
 	unsigned lambdaPrimeCategories = getNumSelectionCategories();
 
@@ -863,4 +863,3 @@ std::vector<double> PANSEParameter::oneMixLambda(){
 std::vector<double> PANSEParameter::oneMixAlpha(){
     return currentCodonSpecificParameter[alp][0];
 }
-

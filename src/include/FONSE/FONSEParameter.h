@@ -45,7 +45,7 @@ class FONSEParameter : public Parameter
 		void writeFONSERestartFile(std::string filename);
 		void initFromRestartFile(std::string filename);
 
-		void initAllTraces(unsigned samples, unsigned num_genes);
+		void initAllTraces(unsigned samples, unsigned num_genes, bool estimateSynthesisRate = true);
 		void initMutationCategories(std::vector<std::string> files, unsigned numCategories);
 		void initSelectionCategories(std::vector<std::string> files, unsigned numCategories);
 

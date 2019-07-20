@@ -34,7 +34,7 @@ class PANSEModel: public Model
 
 
 		//Initialization and Restart Functions:
-		virtual void initTraces(unsigned samples, unsigned num_genes);
+		virtual void initTraces(unsigned samples, unsigned num_genes, bool estimateSynthesisRate = true);
 		virtual void writeRestartFile(std::string filename);
 
 
@@ -120,11 +120,11 @@ class PANSEModel: public Model
         double prob_elongation(double curralpha, double currlambda, double currv);
         double prob_elongation_log(double curralpha, double currlambda, double currv);
         double delta_g(int i, int g, double *lambda, double *v_g, double *alpha);
-        
+
         double delta_g_log(int i, int g, double *lambda, double *v_g, double *alpha);
         double prob_Y_g(double curralpha, int sample_size, double lambda_prime, double psi, double prevdelta);
         double prob_Y_g_log(double curralpha, int sample_size, double lambda_prime, double psi, double prevdelta);
-        
+
         //Psi-Phi Conversion Functions
         double psi2phi(double psi, double sigma);
         double phi2psi(double phi, double sigma);

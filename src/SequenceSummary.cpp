@@ -51,15 +51,6 @@ const std::map<std::string, unsigned> SequenceSummary::codonToIndexWithoutRefere
 	{"TCA", 29}, {"TCC", 30}, {"TCG", 31}, {"ACA", 32}, {"ACC", 33}, {"ACG", 34}, {"GTA", 35}, {"GTC", 36}, {"GTG", 37},
 	{"TAC", 38}, {"AGC", 39}};
 
-/*
-const std::map<std::string, unsigned> SequenceSummary::codonToIndexWithoutReference = {{"GCT", 0}, {"GCC", 1},
-	{"GCG", 2}, {"TGT", 3}, {"GAT", 4}, {"GAG", 5}, {"TTT", 6}, {"GGT", 7}, {"GGC", 8}, {"GGG", 9}, {"CAT", 10},
-	{"ATT", 11}, {"ATC", 12}, {"AAG", 13}, {"TTG", 14}, {"CTC", 15}, {"CTG", 16}, {"CTT", 17}, {"TTA", 18}, {"AAT", 19},
-	{"CCT", 20}, {"CCC", 21}, {"CCG", 22}, {"CAG", 23}, {"CGT", 24}, {"AGG", 25}, {"CGA", 26}, {"CGC", 27}, {"CGG", 28},
-	{"TCT", 29}, {"TCC", 30}, {"TCG", 31}, {"ACT", 32}, {"ACC", 33}, {"ACG", 34}, {"GTT", 35}, {"GTC", 36}, {"GTG", 37},
-	{"TAT", 38}, {"AGT", 39}};
-*/
-
 //------------------------------------------------//
 //---------- Constructors & Destructors ----------//
 //------------------------------------------------//

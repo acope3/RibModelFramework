@@ -197,9 +197,9 @@ void PAModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsi
 //----------------------------------------------------------//
 
 
-void PAModel::initTraces(unsigned samples, unsigned num_genes)
+void PAModel::initTraces(unsigned samples, unsigned num_genes, bool estimateSynthesisRate)
 {
-	parameter->initAllTraces(samples, num_genes);
+	parameter->initAllTraces(samples, num_genes, estimateSynthesisRate);
 }
 
 

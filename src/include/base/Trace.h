@@ -51,7 +51,7 @@ class Trace {
 
 		void initStdDevSynthesisRateTrace(unsigned numSelectionCategories, unsigned samples);
 		void initSynthesisRateAcceptanceRateTrace(unsigned num_genes, unsigned numExpressionCategories);
-		void initSynthesisRateTrace(unsigned samples, unsigned num_genes, unsigned numExpressionCategories,std::vector<double> init_phi);
+		void initSynthesisRateTrace(unsigned samples, unsigned num_genes, unsigned numExpressionCategories,std::vector<double> init_phi,bool estimateSynthesisRate = true);
 		void initMixtureAssignmentTrace(unsigned samples, unsigned num_genes,std::vector<unsigned> init_mix_assign);
 		void initMixtureProbabilitiesTrace(unsigned samples, unsigned numMixtures);
 		void initCodonSpecificParameterTrace(unsigned samples, unsigned numMutationCategories, unsigned numParam, unsigned paramType);
@@ -79,25 +79,25 @@ class Trace {
 		void initializePATrace(unsigned samples, unsigned num_genes, unsigned numAlphaCategories,
 			unsigned numLambdaPrimeCategories, unsigned numParam, unsigned numMixtures,
 			std::vector<mixtureDefinition> &_categories, unsigned maxGrouping, std::vector<double> init_phi,
-                        std::vector<unsigned> init_mix_assign);
+                        std::vector<unsigned> init_mix_assign, bool estimateSynthesisRate);
 
 
 		void initializeROCTrace(unsigned samples, unsigned num_genes, unsigned numMutationCategories,
 			unsigned numSelectionCategories, unsigned numParam, unsigned numMixtures, std::vector<mixtureDefinition> &_categories,
 			unsigned maxGrouping, unsigned numObservedPhiSets,std::vector<double> init_phi,
-                        std::vector<unsigned> init_mix_assign);
+                        std::vector<unsigned> init_mix_assign, bool estimateSynthesisRate);
 
 
 		void initializeFONSETrace(unsigned samples, unsigned num_genes, unsigned numMutationCategories,
 			unsigned numSelectionCategories, unsigned numParam, unsigned numMixtures,
 			std::vector<mixtureDefinition> &_categories, unsigned maxGrouping,std::vector<double> init_phi,
-                        std::vector<unsigned> init_mix_assign);
+                        std::vector<unsigned> init_mix_assign, bool estimateSynthesisRate);
 
 
 		void initializePANSETrace(unsigned samples, unsigned num_genes, unsigned numAlphaCategories,
 			unsigned numLambdaPrimeCategories, unsigned numParam, unsigned numMixtures,
 			std::vector<mixtureDefinition> &_categories, unsigned maxGrouping,std::vector<double> init_phi,
-                        std::vector<unsigned> init_mix_assign);
+                        std::vector<unsigned> init_mix_assign, bool estimateSynthesisRate);
 
 
 		//------------------------------//

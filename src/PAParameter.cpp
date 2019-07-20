@@ -337,10 +337,10 @@ void PAParameter::initFromRestartFile(std::string filename)
  * Arguments: number of samples, number of genes
  * Initializes all traces, base traces and those specific to RFP.
  */
-void PAParameter::initAllTraces(unsigned samples, unsigned num_genes)
+void PAParameter::initAllTraces(unsigned samples, unsigned num_genes, bool estimateSynthesisRate)
 {
 	traces.initializePATrace(samples, num_genes, numMutationCategories, numSelectionCategories, numParam,
-						 numMixtures, categories, (unsigned)groupList.size(),currentSynthesisRateLevel[0],mixtureAssignment);
+						 numMixtures, categories, (unsigned)groupList.size(),currentSynthesisRateLevel[0],mixtureAssignment, estimateSynthesisRate);
 }
 
 

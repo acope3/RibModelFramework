@@ -26,7 +26,7 @@ class FONSEModel : public Model
 
 
 		//Initialization and Restart Functions:
-		virtual void initTraces(unsigned samples, unsigned num_genes);
+		virtual void initTraces(unsigned samples, unsigned num_genes, bool estimateSynthesisRate = true);
 		virtual void writeRestartFile(std::string filename);
 
 
@@ -110,7 +110,7 @@ class FONSEModel : public Model
 		virtual double calculateAllPriors();
 		void calculateLogCodonProbabilityVector(unsigned numCodons, unsigned position, unsigned minIndexValue,
 					double* mutation, double* selection, double phi, std::vector <double> &codonProb);
-		void calculateCodonProbabilityVector(unsigned numCodons, unsigned position, double* mutation, double* selection, 
+		void calculateCodonProbabilityVector(unsigned numCodons, unsigned position, double* mutation, double* selection,
 					double phi, double codonProb[]);
 		virtual void getParameterForCategory(unsigned category, unsigned param, std::string aa, bool proposal,
 					double* returnValue);

@@ -124,7 +124,10 @@ RCPP_MODULE(Parameter_mod)
 
 		//Prior Functions:
 		.method("getMutationPriorStandardDeviation", &ROCParameter::getMutationPriorStandardDeviation)
-		.method("setMutationPriorStandardDeviation", &ROCParameter::setMutationPriorStandardDeviation)
+		.method("getMutationPriorMean", &ROCParameter::getMutationPriorMean)
+		.method("setMutationPriorStandardDeviation", &ROCParameter::setMutationPriorStandardDeviationR)
+		.method("setMutationPriorMean", &ROCParameter::setMutationPriorMeanR)
+		.method("setProposeByPrior", &ROCParameter::setProposeByPrior)
 
 		//Posterior, Variance, and Estimates Functions:
 		//TODO: these functions are not wrapped! May not run correctly
@@ -140,7 +143,8 @@ RCPP_MODULE(Parameter_mod)
 		//Listed in the properties section below. NOTE: these getter/setters are ONLY
 		//used in R
 
-
+		.method("fixDM",&ROCParameter::fixDM)//Not a R wrapper
+		.method("fixDEta",&ROCParameter::fixDEta)//Not a R wrapper
 
 
 		//Other Functions:
@@ -152,8 +156,6 @@ RCPP_MODULE(Parameter_mod)
 		        &ROCParameter::setCurrentMutationParameter) //R Specific
 		.property("currentSelectionParameter", &ROCParameter::getCurrentSelectionParameter,
 		        &ROCParameter::setCurrentSelectionParameter) //R Specific
-		.property("mutation_prior_sd", &ROCParameter::getMutationPriorStandardDeviation,
-		        &ROCParameter::setMutationPriorStandardDeviation)
 		;
 
 
