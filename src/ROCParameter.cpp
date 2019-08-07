@@ -138,6 +138,7 @@ void ROCParameter::initROCParameterSet()
 
 void ROCParameter::initROCValuesFromFile(std::string filename)
 {
+	bool old_format = true;
 	std::ifstream input;
 	covarianceMatrix.resize(maxGrouping);
 	std::vector <double> mat;
@@ -274,6 +275,7 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 				{
 					if (tmp == "***")
 					{
+						old_format = false;
 						mutation_prior_mean.resize(mutation_prior_mean.size() + 1);
 						cat++;
 					}
@@ -293,6 +295,7 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 				{
 					if (tmp == "***")
 					{
+						old_format = false;
 						mutation_prior_sd.resize(mutation_prior_sd.size() + 1);
 						cat++;
 					}
@@ -302,9 +305,24 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 					{
 						double val;
 						iss.str(tmp);
-						while (iss >> val)
+						if (!old_format)
 						{
-							mutation_prior_sd[cat - 1].push_back(val);
+							while (iss >> val)
+							{
+								mutation_prior_sd[cat - 1].push_back(val);
+							}
+						}
+						else
+						{
+							mutation_prior_sd.resize(numMutationCategories);
+							for (int i = 0; i < numMutationCategories;i++)
+							{
+								mutation_prior_sd[i].resize(40);
+								for (int j = 0; j < 40; j++)
+								{
+									mutation_prior_sd[i][j] = val;
+								}
+							}
 						}
 					}
 				}
@@ -312,7 +330,18 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 		}
 	}
 	input.close();
-
+	if (!old_format)
+	{
+		mutation_prior_mean.resize(numMutationCategories);
+		for (int i = 0; i < numMutationCategories;i++)
+		{
+			mutation_prior_mean[i].resize(40);
+			for (int j = 0; j < 40; j++)
+			{
+				mutation_prior_mean[i][j] = 0.0;
+			}
+		}
+	}
 	//init other values
 	numAcceptForNoiseOffset.resize(obsPhiSets, 0);
 	bias_csp = 0;
@@ -518,13 +547,6 @@ void ROCParameter::initMutationCategories(std::vector<std::string> files, unsign
 
 				currentCodonSpecificParameter[dM][category][codonIndex] = value;
 				proposedCodonSpecificParameter[dM][category][codonIndex] = value;
-
-				// if (fix_dM)
-				// {
-				// 	std::size_t pos3 = tmp.find(',',pos + 1);
-				// 	double value = std::atof(tmp.substr(pos2 + 1, pos3 - pos2 - 1).c_str());
-				// 	mutationVariance[category][codonIndex] = value;
-				// }
 			}
 		}
 
@@ -561,14 +583,6 @@ void ROCParameter::initSelectionCategories(std::vector<std::string> files, unsig
 
 				currentCodonSpecificParameter[dEta][category][codonIndex] = value;
 				proposedCodonSpecificParameter[dEta][category][codonIndex] = value;
-
-				if (fix_dEta)
-				{
-					fix_dEta = true;
-					std::size_t pos3 = tmp.find(',',pos + 1);
-					double value = std::atof(tmp.substr(pos2 + 1, pos3 - pos2 - 1).c_str());
-					selectionVariance[category][codonIndex] = value;
-				}
 			}
 		}
 

@@ -57,8 +57,8 @@ genome <- initializeGenomeObject(file = fileName, observed.expression.file = exp
 
 geneAssignment <- sample(c(1,2), size = length(genome), replace = TRUE, prob = c(0.3, 0.7)) #c(rep(1,500), rep(2,500))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
-parameter$initSelectionCategories(c(selectionMainFile, selectionHtFile), 2)
-parameter$initMutationCategories(c(mutationMainFile, mutationHtFile), 2)
+parameter$initSelectionCategories(c(selectionMainFile, selectionHtFile), 2,F)
+parameter$initMutationCategories(c(mutationMainFile, mutationHtFile), 2,F)
 
 model <- initializeModelObject(parameter, "ROC", with.phi = TRUE) 
 
@@ -82,8 +82,8 @@ genome <- initializeGenomeObject(file = fileName)
 
 geneAssignment <- sample(c(1,2), size = length(genome), replace = TRUE, prob = c(0.3, 0.7)) #c(rep(1,500), rep(2,500))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
-parameter$initSelectionCategories(c(selectionMainFile, selectionHtFile), 2)
-parameter$initMutationCategories(c(mutationMainFile, mutationHtFile), 2)
+parameter$initSelectionCategories(c(selectionMainFile, selectionHtFile), 2,F)
+parameter$initMutationCategories(c(mutationMainFile, mutationHtFile), 2,F)
 
 model <- initializeModelObject(parameter, "ROC", with.phi = FALSE) 
 
@@ -100,17 +100,16 @@ test_that("identical MCMC-ROC input without Phi, same log posterior", {
   expect_equal(knownLogPosterior, testLogPosterior)
 })
 
-genome <- initializeGenomeObject(file = fileName) 
 
 geneAssignment <- sample(c(1,2), size = length(genome), replace = TRUE, prob = c(0.3, 0.7)) #c(rep(1,500), rep(2,500))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
-parameter$initSelectionCategories(c(selectionMainFile, selectionHtFile), 2)
-parameter$initMutationCategories(c(mutationMainFile, mutationHtFile), 2)
+parameter$initSelectionCategories(c(selectionMainFile, selectionHtFile), 2,F)
+parameter$initMutationCategories(c(mutationMainFile, mutationHtFile), 2,F)
 
-model <- initializeModelObject(parameter, "ROC", with.phi = FALSE) 
+model <- initializeModelObject(parameter, "ROC", with.phi = FALSE)
 
-mcmc <- initializeMCMCObject(samples = samples, thinning = thinning, adaptive.width = adaptiveWidth, 
-                             est.expression=FALSE, est.csp=TRUE, est.hyper=TRUE)
+mcmc <- initializeMCMCObject(samples = samples, thinning = thinning, adaptive.width = adaptiveWidth,
+                             est.expression=FALSE, est.csp=TRUE, est.hyper=TRUE,est.mix = FALSE)
 
 
 outFile = file.path("UnitTestingOut", "testMCMCROCLogWithoutPhi.txt")
@@ -127,9 +126,11 @@ test_that("Phi trace for each gene is a vector of length 1 when not estimating p
   expect_equal(length(phi.2), 1)
 })
 
+numMixtures <- 1
+sphi_init <- 1
 geneAssignment <- rep(1,length(genome))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
-parameter$initSelectionCategories(c(selectionMainFile), 1)
+parameter$initSelectionCategories(c(selectionMainFile), 1,F)
 parameter$initMutationCategories(c(mutationMainFile), 1,T)
 
 model <- initializeModelObject(parameter, "ROC", with.phi = FALSE) 
@@ -143,15 +144,17 @@ outFile = file.path("UnitTestingOut", "testMCMCROCLogWithoutPhi.txt")
 sink(outFile)
 runMCMC(mcmc, genome, model, 1, divergence.iteration)
 sink()
+
 aa <- aminoAcids()
 test_that("Making sure DeltaM does not change when fixed", {
+  trace <- parameter$getTraceObject()
   for (a in aa)
   {
     if (a == "M" || a == "W" || a == "X") next
     codons <- AAToCodon(a,T)
-    for (j in codons)
+    for (j in 1:length(codons))
     {
-      dm <- unlist(trace$getCodonSpecificParameterTraceByMixtureElementForCodon(1,j,0,T))
+      dm <-  trace$getCodonSpecificParameterTraceByMixtureElementForCodon(1,codons[j],0,T)
       expect_equal(var(dm),0)
     }
   }
@@ -160,7 +163,7 @@ test_that("Making sure DeltaM does not change when fixed", {
 geneAssignment <- rep(1,length(genome))
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
 parameter$initSelectionCategories(c(selectionMainFile), 1,T)
-parameter$initMutationCategories(c(mutationMainFile), 1)
+parameter$initMutationCategories(c(mutationMainFile), 1,F)
 
 model <- initializeModelObject(parameter, "ROC", with.phi = FALSE) 
 
@@ -173,15 +176,18 @@ outFile = file.path("UnitTestingOut", "testMCMCROCLogWithoutPhi.txt")
 sink(outFile)
 runMCMC(mcmc, genome, model, 1, divergence.iteration)
 sink()
+
+
 aa <- aminoAcids()
 test_that("Making sure DeltaEta does not change when fixed", {
+  trace <- parameter$getTraceObject()
   for (a in aa)
   {
     if (a == "M" || a == "W" || a == "X") next
     codons <- AAToCodon(a,T)
-    for (j in codons)
+    for (j in 1:length(codons))
     {
-      deta <- unlist(trace$getCodonSpecificParameterTraceByMixtureElementForCodon(1,j,1,T))
+      deta <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(1,codons[j],1,T)
       expect_equal(var(deta),0)
     }
   }

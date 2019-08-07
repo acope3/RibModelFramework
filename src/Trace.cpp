@@ -44,7 +44,7 @@ Trace::Trace(unsigned _numCodonSpecificParamTypes)
 
 void Trace::initializeSharedTraces(unsigned samples, unsigned num_genes, unsigned numSelectionCategories,
 	unsigned numMixtures, std::vector<mixtureDefinition> &_categories, unsigned maxGrouping, std::vector<double> init_phi,
-	std::vector<unsigned> init_mix_assign)
+	std::vector<unsigned> init_mix_assign, bool estimateSynthesisRate)
 {
 	my_print("maxGrouping: %\n", maxGrouping);
 
@@ -53,7 +53,7 @@ void Trace::initializeSharedTraces(unsigned samples, unsigned num_genes, unsigne
 	initStdDevSynthesisRateTrace(numSelectionCategories, samples);
 	initSynthesisRateAcceptanceRateTrace(num_genes, numSelectionCategories);
 	codonSpecificAcceptanceRateTrace.resize(maxGrouping);
-	initSynthesisRateTrace(samples, num_genes, numSelectionCategories,init_phi);
+	initSynthesisRateTrace(samples, num_genes, numSelectionCategories,init_phi,estimateSynthesisRate);
 	initMixtureAssignmentTrace(samples, num_genes,init_mix_assign);
 	initMixtureProbabilitiesTrace(samples, numMixtures);
 
@@ -212,7 +212,7 @@ void Trace::initializePATrace(unsigned samples, unsigned num_genes, unsigned num
 	std::vector<unsigned> init_mix_assign,bool estimateSynthesisRate)
 {
 	initializeSharedTraces(samples, num_genes, numLambdaPrimeCategories, numMixtures,
-		_categories, maxGrouping, init_phi, init_mix_assign);
+		_categories, maxGrouping, init_phi, init_mix_assign,estimateSynthesisRate);
 
 	// See Note 1) above.
 	initCodonSpecificParameterTrace(samples, numAlphaCategories,  numParam, 0u); // alp
@@ -226,7 +226,7 @@ void Trace::initializeROCTrace(unsigned samples, unsigned num_genes, unsigned nu
 	std::vector<mixtureDefinition> &_categories, unsigned maxGrouping, unsigned numObservedPhiSets,std::vector<double> init_phi,
 	std::vector<unsigned> init_mix_assign,bool estimateSynthesisRate)
 {
-	initializeSharedTraces(samples, num_genes, numSelectionCategories, numMixtures, _categories, maxGrouping,init_phi,init_mix_assign);
+	initializeSharedTraces(samples, num_genes, numSelectionCategories, numMixtures, _categories, maxGrouping,init_phi,init_mix_assign,estimateSynthesisRate);
 
 	// See Note 1) above.
 	initCodonSpecificParameterTrace(samples, numMutationCategories, numParam, 0u); // dM
@@ -243,7 +243,7 @@ void Trace::initializeFONSETrace(unsigned samples, unsigned num_genes, unsigned 
 	std::vector<unsigned> init_mix_assign,bool estimateSynthesisRate)
 {
 	initializeSharedTraces(samples, num_genes, numSelectionCategories, numMixtures,
-		 _categories, maxGrouping,init_phi,init_mix_assign);
+		 _categories, maxGrouping,init_phi,init_mix_assign,estimateSynthesisRate);
 
 	// See Note 1) above.
 	initCodonSpecificParameterTrace(samples, numMutationCategories, numParam, 0u); // dM
@@ -257,7 +257,7 @@ void Trace::initializePANSETrace(unsigned samples, unsigned num_genes, unsigned 
 	std::vector<unsigned> init_mix_assign, bool estimateSynthesisRate)
 {
 	initializeSharedTraces(samples, num_genes, numLambdaPrimeCategories, numMixtures,
-		_categories, maxGrouping,init_phi,init_mix_assign);
+		_categories, maxGrouping,init_phi,init_mix_assign,estimateSynthesisRate);
 
 	// See Note 1) above.
 	initCodonSpecificParameterTrace(samples, numAlphaCategories,  numParam, 0u); //alp

@@ -5,7 +5,7 @@
 \title{Calculates the marginal log-likelihood for a set of parameters}
 \usage{
 calculate_marginal_log_likelihood(parameter, mcmc, mixture, n.samples,
-  divisor)
+  divisor, warnings = TRUE)
 }
 \arguments{
 \item{parameter}{An object created with \code{initializeParameterObject}.}
@@ -17,6 +17,8 @@ calculate_marginal_log_likelihood(parameter, mcmc, mixture, n.samples,
 \item{n.samples}{How many samples should be used for the calculation}
 
 \item{divisor}{A value > 1 in order to scale down the tails of the importance distribution}
+
+\item{warnings}{Print warnings such as when the variance of a parameter is 0, which might occur when parameter is fixed}
 }
 \value{
 This function returns the model object created.
