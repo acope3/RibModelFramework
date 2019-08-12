@@ -74,6 +74,7 @@ class SequenceSummary
 		std::vector <int> getRFPCount(unsigned RFPCountColumn = 0u);
 		int getSingleRFPCount(unsigned position, unsigned RFPCountColumn = 0u);
 		void setRFPCount(std::vector <int> arg, unsigned RFPCountColumn = 0u);
+		int getSumTotalRFPCount(unsigned RFPCountColumn = 0u);
 
         void initSumRFPCount(unsigned numCategories);
 		std::array <unsigned, 64> getSumRFPCount(unsigned RFPCountColumn = 0u);

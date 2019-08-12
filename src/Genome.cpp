@@ -216,6 +216,7 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
 	Gene tmpGene;
 	bool first = true;
 	std::string seq = "";
+	totalRFPCount = 0;
 
 	while (std::getline(Fin, tmp))
 	{
@@ -275,6 +276,7 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
 	tmpGene.setDescription("No description for PA(NSE) Model");
 	tmpGene.setSequence(seq);
 	addGene(tmpGene, true); //add to genome
+	totalRFPCount += tmpGene.geneData.getSumTotalRFPCount(0);
 
 	Fin.close();
 }
@@ -293,7 +295,7 @@ void Genome::readRFPData(std::string filename, bool append, bool positional)
 {
 	try {
 		if (!append) clear();
-
+		totalRFPCount = 0;
 		std::ifstream Fin;
 		Fin.open(filename.c_str());
 
@@ -379,6 +381,7 @@ void Genome::readRFPData(std::string filename, bool append, bool positional)
 						if(positional) tmpGene.setPANSESequence(table);
 						else tmpGene.setPASequence(table);
 						addGene(tmpGene, false); //add to genome
+						totalRFPCount += tmpGene.geneData.getSumTotalRFPCount(0);
 						tmpGene.clear();
 						table.clear();
 					}
@@ -428,7 +431,7 @@ void Genome::readRFPData(std::string filename, bool append, bool positional)
                 tmpGene.setId(prevID);
                 tmpGene.setDescription("No description for PA(NSE) Model");
                 tmpGene.setPASequence(table);
-
+                totalRFPCount += tmpGene.geneData.getSumTotalRFPCount(0);
                 addGene(tmpGene, false); //add to genome
             }
 		} // end else
@@ -768,7 +771,10 @@ void Genome::removeUnobservedGenes()
 	genes = tmp;
 }
 
-
+unsigned Genome::getSumRFP()
+{
+    return totalRFPCount;
+}
 //------------------------------------//
 //---------- Gene Functions ----------//
 //------------------------------------//
