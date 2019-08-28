@@ -48,7 +48,7 @@ class PANSEParameter: public Parameter {
 		void writePANSERestartFile(std::string filename);
 		void initFromRestartFile(std::string filename);
 
-		void initAllTraces(unsigned samples, unsigned num_genes);
+		void initAllTraces(unsigned samples, unsigned num_genes, bool estimateSynthesisRate=true);
 		void initAlpha(double alphaValue, unsigned mixtureElement, std::string codon); //R?
 		void initLambdaPrime(double lambdaPrimeValue, unsigned mixtureElement, std::string codon); //R?
 		void initNonsenseErrorRate(double nonsenseErrorRateValue, unsigned mixtureElement, std::string codon);

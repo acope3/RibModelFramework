@@ -353,10 +353,10 @@ void FONSEParameter::initFromRestartFile(std::string filename)
 }
 
 
-void FONSEParameter::initAllTraces(unsigned samples, unsigned num_genes)
+void FONSEParameter::initAllTraces(unsigned samples, unsigned num_genes, bool estimateSynthesisRate)
 {
     traces.initializeFONSETrace(samples, num_genes, numMutationCategories, numSelectionCategories, numParam,
-                         numMixtures, categories, maxGrouping,currentSynthesisRateLevel[0],mixtureAssignment);
+                         numMixtures, categories, maxGrouping,currentSynthesisRateLevel[0],mixtureAssignment,estimateSynthesisRate);
 }
 
 void FONSEParameter::initMutationCategories(std::vector<std::string> files, unsigned numCategories)
@@ -478,7 +478,7 @@ void FONSEParameter::proposeCodonSpecificParameter()
   {
     std::vector<double> iidProposed;
     std::string aa = getGrouping(k);
-	
+
     unsigned aaStart, aaEnd;
     SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
     unsigned numCodons = aaEnd - aaStart;
@@ -515,7 +515,7 @@ void FONSEParameter::updateCodonSpecificParameter(std::string grouping)
 	unsigned aaStart, aaEnd;
 	SequenceSummary::AAToCodonRange(grouping, aaStart, aaEnd, true);
     unsigned aaIndex = SequenceSummary::aaToIndex.find(grouping)->second;
-	
+
     numAcceptForCodonSpecificParameters[aaIndex]++;
 
     unsigned biggestCat = std::max(numMutationCategories, numSelectionCategories);
@@ -682,7 +682,7 @@ void FONSEParameter::initMutation(std::vector<double> mutationValues, unsigned m
 
         unsigned category = getMutationCategory(mixtureElement);
         aa[0] = (char)std::toupper(aa[0]);
-	    
+
         unsigned aaStart, aaEnd;
 	    SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
         for (unsigned i = aaStart, j = 0; i < aaEnd; i++, j++)
@@ -705,7 +705,7 @@ void FONSEParameter::initSelection(std::vector<double> selectionValues, unsigned
         int category = getSelectionCategory(mixtureElement);
 
         aa[0] = (char)std::toupper(aa[0]);
-	    
+
         unsigned aaStart, aaEnd;
         SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
         for (unsigned i = aaStart, j = 0; i < aaEnd; i++, j++)

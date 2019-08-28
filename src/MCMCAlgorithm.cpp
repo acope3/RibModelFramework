@@ -331,7 +331,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 		// calculate likelihood ratio for every Category for current AA
 		model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures);
 		//logPosterior += model.calculateAllPriors();
-        double threshold = -Parameter::randExp(1);
+    double threshold = -Parameter::randExp(1);
 
 		if (threshold < acceptanceRatioForAllMixtures[0] && std::isfinite(acceptanceRatioForAllMixtures[0]))
 		{
@@ -339,16 +339,16 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 			model.updateCodonSpecificParameter(grouping);
 			if ((iteration % thinning) == 0)
 			{
-				likelihoodTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[2];//will be 0
-				posteriorTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[4];//will be 0
+				likelihoodTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[2];//will be 0
+				posteriorTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[4];//will be 0
 			}
 		}
 		else
 		{
 			if ((iteration % thinning) == 0)
 			{
-				likelihoodTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[1];
-				posteriorTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[3];
+				likelihoodTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[1];
+				posteriorTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[3];
 
 			}
 		}
@@ -404,7 +404,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 //#ifndef __APPLE__
 	omp_set_num_threads(numCores);
 #endif
-	// Replace with reportSample? 
+	// Replace with reportSample?
 	unsigned reportStep = (100u < thinning) ? thinning : 100u;
 
 	// Allows to diverge from initial conditions (divergenceIterations controls the divergence).
@@ -415,7 +415,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	// initialize everything
 
 	//model.setNumPhiGroupings(genome.getGene(0).getObservedSynthesisRateValues().size());
-	model.initTraces(samples + 1, genome.getGenomeSize()); //Samples + 2 so we can store the starting and ending values.
+	model.initTraces(samples + 1, genome.getGenomeSize(),(estimateSynthesisRate||estimateMixtureAssignment)); //Samples + 2 so we can store the starting and ending values.
 	// starting the MCMC
 
 	model.updateTracesWithInitialValues(genome);

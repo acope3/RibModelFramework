@@ -32,7 +32,7 @@ class Model
 
 
 		//Initialization and Restart Functions:
-		virtual void initTraces(unsigned samples, unsigned num_genes) = 0;
+		virtual void initTraces(unsigned samples, unsigned num_genes, bool estimateSynthesisRate = true) = 0;
 		virtual void writeRestartFile(std::string filename) = 0;
 
 

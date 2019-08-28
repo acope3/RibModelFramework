@@ -31,7 +31,9 @@ double ROCModel::calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codo
 	for (unsigned i = 0; i < numCodons; i++)
 	{
 		if (codonCount[i] == 0) continue;
+	//	my_print("\tCurrent LogLike for codon i: %\n",logLikelihood);
 		logLikelihood += logCodonProbabilities[i] * codonCount[i];
+	// my_print("\t%\t%\t%\t%\t%\n",numCodons,logCodonProbabilities[i],codonCount[i],(logCodonProbabilities[i]*codonCount[i]),logLikelihood);
 	}
 	return logLikelihood;
 }
@@ -40,17 +42,18 @@ double ROCModel::calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codo
 double ROCModel::calculateMutationPrior(std::string grouping, bool proposed)
 {
 	unsigned numCodons = SequenceSummary::GetNumCodonsForAA(grouping, true);
-	double mutation[5];
+	double mutation[5],mutation_mean[5],mutation_sd[5];
 
 	double priorValue = 0.0;
 
 	unsigned numMutCat = parameter->getNumMutationCategories();
-	double mutation_prior_sd = parameter->getMutationPriorStandardDeviation();
 	for (unsigned i = 0u; i < numMutCat; i++)
 	{
 		parameter->getParameterForCategory(i, ROCParameter::dM, grouping, proposed, mutation);
+		parameter->getMutationPriorStandardDeviationForCategoryForGroup(i,grouping,mutation_sd);
+		parameter->getMutationPriorMeanForCategoryForGroup(i,grouping,mutation_mean);
 		for (unsigned k = 0u; k < numCodons; k++)
-			priorValue += Parameter::densityNorm(mutation[k], 0.0, mutation_prior_sd, true);
+			priorValue += Parameter::densityNorm(mutation[k], mutation_mean[k], mutation_sd[k], true);
 	}
 	return priorValue;
 }
@@ -155,6 +158,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 {
 	int numGenes = genome.getGenomeSize();
 	unsigned numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
+	//my_print("Current grouping: %\n",grouping);
 	double likelihood = 0.0;
 	double likelihood_proposed = 0.0;
 	double posterior, posterior_proposed;
@@ -192,15 +196,21 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 		// get proposed mutation and selection parameter
 		parameter->getParameterForCategory(mutationCategory, ROCParameter::dM, grouping, true, mutation_proposed);
 		parameter->getParameterForCategory(selectionCategory, ROCParameter::dEta, grouping, true, selection_proposed);
-
 		obtainCodonCount(sequenceSummary, grouping, codonCount);
 		likelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
 		likelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation_proposed, selection_proposed, phiValue);
 	}
-
-	posterior_proposed = likelihood_proposed + calculateMutationPrior(grouping, true);
-	posterior = likelihood + calculateMutationPrior(grouping, false);
-
+	bool dm_fixed = parameter -> isDMFixed();
+	if (!dm_fixed)
+	{
+		posterior_proposed = likelihood_proposed + calculateMutationPrior(grouping, true);
+		posterior = likelihood + calculateMutationPrior(grouping, false);
+	}
+	else
+  {
+		posterior_proposed = likelihood_proposed;
+		posterior = likelihood;
+	}
 	logAcceptanceRatioForAllMixtures[0] = (posterior_proposed - posterior);
 	logAcceptanceRatioForAllMixtures[1] = likelihood;
 	logAcceptanceRatioForAllMixtures[2] = likelihood_proposed;
@@ -296,9 +306,9 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 //----------------------------------------------------------//
 
 
-void ROCModel::initTraces(unsigned samples, unsigned num_genes)
+void ROCModel::initTraces(unsigned samples, unsigned num_genes, bool estimateSynthesisRate)
 {
-	parameter -> initAllTraces(samples, num_genes);
+	parameter -> initAllTraces(samples, num_genes,estimateSynthesisRate);
 }
 
 
@@ -677,7 +687,6 @@ void ROCModel::simulateGenome(Genome &genome)
 		SequenceSummary sequenceSummary = gene.geneData;
 		std::string tmpSeq = "ATG"; //Always will have the start amino acid
 
-
 		unsigned mixtureElement = getMixtureAssignment(geneIndex);
 		unsigned mutationCategory = getMutationCategory(mixtureElement);
 		unsigned selectionCategory = getSelectionCategory(mixtureElement);
@@ -701,7 +710,6 @@ void ROCModel::simulateGenome(Genome &genome)
 			double* mutation = new double[numCodons - 1]();
 			double* selection = new double[numCodons - 1]();
 
-
 			if (aa == "M" || aa == "W")
 				codonProb[0] = 1;
 			else
@@ -710,8 +718,6 @@ void ROCModel::simulateGenome(Genome &genome)
 				getParameterForCategory(selectionCategory, ROCParameter::dEta, aa, false, selection);
 				calculateCodonProbabilityVector(numCodons, mutation, selection, phi, codonProb);
 			}
-
-
 			codonIndex = Parameter::randMultinom(codonProb, numCodons);
 			unsigned aaStart, aaEnd;
 			SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, false); //need the first spot in the array where the codons for curAA are

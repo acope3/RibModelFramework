@@ -47,6 +47,7 @@ export(
 "getTrace",
 "getSelectionCoefficients",
 "geomMean",
+"calculate_marginal_log_likelihood",
 
 ## Model object
 "initializeModelObject",

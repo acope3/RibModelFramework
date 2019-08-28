@@ -369,7 +369,7 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 				}
 			}
 		}
-	
+
 		input.close();
 
 		//initialize all the default Parameter values now.
@@ -462,7 +462,7 @@ void Parameter::writeBasicRestartFile(std::string filename)
 			else oss <<" ";
 		}
 		if (i % 10 != 0) oss <<"\n";
-	
+
 		oss << ">selectionIsInMixture:\n";
 		for (i = 0; i < selectionIsInMixture.size(); i++)
 		{
@@ -1241,7 +1241,7 @@ void Parameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool a
 
 	double acceptanceTargetLow = 0.225; //below this value factor adjustment is applied
 	double acceptanceTargetHigh = 0.325; //above this value factor adjustment is applied
-	double factorCriteriaLow; 
+	double factorCriteriaLow;
 	double factorCriteriaHigh;
 	double adjustFactorLow = 0.8; //factor by which to reduce proposal widths
 	double adjustFactorHigh = 1.3; //factor by which to increase proposal widths
@@ -1249,7 +1249,7 @@ void Parameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool a
 
 	factorCriteriaLow = acceptanceTargetLow;
 	factorCriteriaHigh = acceptanceTargetHigh;
-	  
+
 	for (unsigned cat = 0u; cat < numSelectionCategories; cat++)
 	{
 		unsigned numGenes = (unsigned)numAcceptForSynthesisRate[cat].size();
@@ -1267,7 +1267,7 @@ void Parameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool a
 				if (acceptanceLevel < acceptanceTargetLow)
 				{
 					std_phi[cat][i] *= adjustFactorLow;
-			
+
 				}
 				if (acceptanceLevel > acceptanceTargetHigh)
 				{
@@ -1294,112 +1294,176 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
   // For CSP the combined selection and mutation dimensions range from 2 to 10
   //Adjust proposal variance to try and get within this range
 
-  unsigned acceptanceUnder = 0u;
-  unsigned acceptanceOver = 0u;
+//   unsigned acceptanceUnder = 0u;
+//   unsigned acceptanceOver = 0u;
+//
+//   double acceptanceTargetLow = 0.225; //below this value weighted sum adjustment is applied, was 0.2
+//   double acceptanceTargetHigh = 0.325;///above this value weighted sum adjustment is applied, was 0.3
+//   double diffFactorAdjust = 0.05; //sets when multiplication factor adjustment is applied, was 0.1 and 0.0, respectively
+//   double factorCriteriaLow;
+//   double factorCriteriaHigh;
+//   double adjustFactorLow = 0.8; //factor by which to reduce proposal widths
+//   double adjustFactorHigh = 1.3; //factor by which to increase proposal widths
+//   double adjustFactor; //variable assigned value of either adjustFactorLow or adjustFactorHigh
+//
+//   factorCriteriaLow = acceptanceTargetLow - diffFactorAdjust;  //below this value weighted sum and factor adjustments are applied
+//   factorCriteriaHigh = acceptanceTargetHigh + diffFactorAdjust;  //above this value weighted sum and factor adjustments are applied
+//
+//   adaptiveStepPrev = adaptiveStepCurr;
+//   adaptiveStepCurr = lastIteration;
+//   unsigned samples = adaptiveStepCurr - adaptiveStepPrev;
+//
+//   my_print("Acceptance rates for Codon Specific Parameters\n");
+//   my_print("Target range: %-% \n", factorCriteriaLow, factorCriteriaHigh );
+//   my_print("Adjustment range: < % or > % \n", acceptanceTargetLow, acceptanceTargetHigh );
+//   my_print("\tAA\tAcc.Rat\n"); //Prop.Width\n";
+//
+//   for (unsigned i = 0; i < groupList.size(); i++) //cycle through all of the aa
+//     {
+//       std::string aa = groupList[i];
+//       unsigned aaIndex = SequenceSummary::AAToAAIndex(aa);
+//       double acceptanceLevel = (double)numAcceptForCodonSpecificParameters[aaIndex] / (double)adaptationWidth;
+//
+//       my_print("\t%:\t%\n", aa.c_str(), acceptanceLevel);
+//
+//       traces.updateCodonSpecificAcceptanceRateTrace(aaIndex, acceptanceLevel);
+//
+//       unsigned aaStart, aaEnd;
+//       SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
+//
+//       //Evaluate current acceptance ratio  performance
+//       if (acceptanceLevel < factorCriteriaLow) acceptanceUnder++;
+//       else if (acceptanceLevel > factorCriteriaHigh) acceptanceOver++;
+//
+//       if (adapt)
+// 	  	{
+// 				if( (acceptanceLevel < acceptanceTargetLow) || (acceptanceLevel > acceptanceTargetHigh) )// adjust proposal width
+// 		  	{
+//
+// 		      //Update cov matrix based on previous window to improve efficiency of sampling
+// 		      CovarianceMatrix covcurr(covarianceMatrix[aaIndex].getNumVariates());
+// 		      covcurr.calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
+// 		      CovarianceMatrix covprev = covarianceMatrix[aaIndex];
+// 		      covprev = (covprev*0.6);
+// 		      covcurr = (covcurr*0.4);
+// 		      covarianceMatrix[aaIndex] = covprev + covcurr;
+// 		      //replace cov matrix based on previous window
+// 		      //The is approach was commented out and above code uncommented to replace it in commit ec63bb21a1e9 (2016).  Should remove
+// 		      //covarianceMatrix[aaIndex].calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
+//
+// 		      // define adjustFactor
+// 		      if (acceptanceLevel < factorCriteriaLow)
+// 		      {
+// 			  		adjustFactor = adjustFactorLow;
+// 			  	}
+// 		      else if(acceptanceLevel > factorCriteriaHigh)
+// 		      {
+// 			  		adjustFactor = adjustFactorHigh;
+// 			  	}
+// 		      else //Don't adjust
+// 		      {
+// 			  		adjustFactor = 1.0;
+// 			  	}
+//
+// 			 if( adjustFactor != 1.0 )
+// 			 {
+// 			  for (unsigned k = aaStart; k < aaEnd; k++)
+// 			  { //cycle through codons
+//
+// 			    //Adjust proposal width for codon specific parameters
+// 			   	std_csp[k] *= adjustFactor;
+//
+// 			    //Adjust widths if using cov matrix
+// 			   	covarianceMatrix[aaIndex] *= adjustFactor;
+// 		  	}
+// 			}
+//
+// 		      //Decomposing of cov matrix to convert iid samples to covarying samples using matrix decomposition
+// 		      //The decomposed matrix is used in the proposal of new samples
+// 		 covarianceMatrix[aaIndex].choleskyDecomposition();
+// 		}// end adjust loop
+// 	} // end if(adapt)
+//
+// numAcceptForCodonSpecificParameters[aaIndex] = 0u;
+// }
+//
+// my_print("Acceptance rate for CSP Matrices:\n");
+// my_print("Target range: %-% \n", acceptanceTargetLow, acceptanceTargetHigh );
+// my_print("Factor Adjustment range: < % or > % \n", factorCriteriaLow, factorCriteriaHigh );
+// my_print("\t acceptance rates below lower target of %: %\n", factorCriteriaLow, acceptanceUnder);
+// my_print("\t acceptance rate above upper target of %: %\n", factorCriteriaHigh, acceptanceOver);
+//
+//
+//  //  my_print("\n");
+	adaptiveStepPrev = adaptiveStepCurr;
+	adaptiveStepCurr = lastIteration;
+	unsigned samples = adaptiveStepCurr - adaptiveStepPrev;
 
-  double acceptanceTargetLow = 0.225; //below this value weighted sum adjustment is applied, was 0.2
-  double acceptanceTargetHigh = 0.325;///above this value weighted sum adjustment is applied, was 0.3
-  double diffFactorAdjust = 0.05; //sets when multiplication factor adjustment is applied, was 0.1 and 0.0, respectively
-  double factorCriteriaLow; 
-  double factorCriteriaHigh;
-  double adjustFactorLow = 0.8; //factor by which to reduce proposal widths
-  double adjustFactorHigh = 1.3; //factor by which to increase proposal widths
-  double adjustFactor; //variable assigned value of either adjustFactorLow or adjustFactorHigh
-  
-  factorCriteriaLow = acceptanceTargetLow - diffFactorAdjust;  //below this value weighted sum and factor adjustments are applied
-  factorCriteriaHigh = acceptanceTargetHigh + diffFactorAdjust;  //above this value weighted sum and factor adjustments are applied
+	my_print("Acceptance rate for Codon Specific Parameter\n");
+	my_print("\tAA\tAcc.Rat\n"); //Prop.Width\n";
 
-  adaptiveStepPrev = adaptiveStepCurr;
-  adaptiveStepCurr = lastIteration;
-  unsigned samples = adaptiveStepCurr - adaptiveStepPrev;
-
-  my_print("Acceptance rates for Codon Specific Parameters\n");
-  my_print("Target range: %-% \n", factorCriteriaLow, factorCriteriaHigh );
-  my_print("Adjustment range: < % or > % \n", acceptanceTargetLow, acceptanceTargetHigh );
-  my_print("\tAA\tAcc.Rat\n"); //Prop.Width\n";
-
-  for (unsigned i = 0; i < groupList.size(); i++) //cycle through all of the aa
-    {
-      std::string aa = groupList[i];
-      unsigned aaIndex = SequenceSummary::AAToAAIndex(aa);
-      double acceptanceLevel = (double)numAcceptForCodonSpecificParameters[aaIndex] / (double)adaptationWidth;
-
-      my_print("\t%:\t%\n", aa.c_str(), acceptanceLevel);
-		
-      traces.updateCodonSpecificAcceptanceRateTrace(aaIndex, acceptanceLevel);
-
-      unsigned aaStart, aaEnd;
-      SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
-
-      //Evaluate current acceptance ratio  performance 
-      if (acceptanceLevel < factorCriteriaLow) acceptanceUnder++;
-      else if (acceptanceLevel > factorCriteriaHigh) acceptanceOver++;
-      
-      if (adapt)
+	for (unsigned i = 0; i < groupList.size(); i++)
 	{
-
-
-	  if( (acceptanceLevel < acceptanceTargetLow) || (acceptanceLevel > acceptanceTargetHigh) )// adjust proposal width
-	    {	    
-
-	      //Update cov matrix based on previous window to improve efficiency of sampling
-	      CovarianceMatrix covcurr(covarianceMatrix[aaIndex].getNumVariates());
-	      covcurr.calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
-	      CovarianceMatrix covprev = covarianceMatrix[aaIndex];
-	      covprev = (covprev*0.6);
-	      covcurr = (covcurr*0.4);
-	      covarianceMatrix[aaIndex] = covprev + covcurr;
-	      //replace cov matrix based on previous window
-	      //The is approach was commented out and above code uncommented to replace it in commit ec63bb21a1e9 (2016).  Should remove
-	      //covarianceMatrix[aaIndex].calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
-
-	      // define adjustFactor 
-	      if (acceptanceLevel < factorCriteriaLow) 
+		std::string aa = groupList[i];
+		unsigned aaIndex = SequenceSummary::AAToAAIndex(aa);
+		double acceptanceLevel = (double)numAcceptForCodonSpecificParameters[aaIndex] / (double)adaptationWidth;
+		traces.updateCodonSpecificAcceptanceRateTrace(aaIndex, acceptanceLevel);
+		if (adapt)
 		{
-		  adjustFactor = adjustFactorLow; 
+			unsigned aaStart, aaEnd;
+			SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
+			my_print("\t%:\t%\n", aa.c_str(), acceptanceLevel);
+
+			//Gelman BDA 3rd Edition suggests a target acceptance rate of 0.23
+			// for high dimensional problems
+			//Adjust proposal variance to try and get within this range
+			if (acceptanceLevel < 0.2)
+			{
+
+			  if (acceptanceLevel < 0.1)
+			  {
+				  for (unsigned k = aaStart; k < aaEnd; k++)
+					  covarianceMatrix[aaIndex] *= 0.8;
+			  }
+			  else
+			  {
+				  //Update cov matrix based on previous window
+				  CovarianceMatrix covcurr(covarianceMatrix[aaIndex].getNumVariates());
+				  covcurr.calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples,
+								    adaptiveStepCurr);
+				  CovarianceMatrix covprev = covarianceMatrix[aaIndex];
+				  covprev = (covprev*0.6);
+				  covcurr = (covcurr*0.4);
+				  covarianceMatrix[aaIndex] = covprev + covcurr;
+				  //replace cov matrix based on previous window
+				  //The is approach was commented out and above code uncommented to replace it
+				  //covarianceMatrix[aaIndex].calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
+			  }
+
+				//Decomposing of cov matrix to convert iid samples to covarying samples using matrix decomposition
+				//The decomposed matrix is used in the proposal of new samples
+				covarianceMatrix[aaIndex].choleskyDecomposition();
+
+				//Adjust proposal width if for codon specific parameters
+				//These values are used when you are not using a cov to propose new parameter values.
+				for (unsigned k = aaStart; k < aaEnd; k++)
+					std_csp[k] *= 0.8;
+			}
+			if (acceptanceLevel > 0.3)
+			{
+				//covarianceMatrix[aaIndex].calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa,
+				// samples, adaptiveStepCurr);
+				for (unsigned k = aaStart; k < aaEnd; k++)
+				{
+					std_csp[k] *= 1.2;
+    			covarianceMatrix[aaIndex] *= 1.2;
+        }
+				covarianceMatrix[aaIndex].choleskyDecomposition();
+			}
 		}
-	      else if(acceptanceLevel > factorCriteriaHigh)
-		{
-		  adjustFactor = adjustFactorHigh; 
-		}
-	      else //Don't adjust
-		{
-		  adjustFactor = 1.0;
-		}
-	    
-
-	      if( adjustFactor != 1.0 )
-		{
-		
-		for (unsigned k = aaStart; k < aaEnd; k++)
-		  { //cycle through codons
-
-		    //Adjust proposal width for codon specific parameters 
-		    std_csp[k] *= adjustFactor;
-
-		    //Adjust widths if using cov matrix			      
-		    covarianceMatrix[aaIndex] *= adjustFactor;
-		  }
-
-	      }
-	  
-	      //Decomposing of cov matrix to convert iid samples to covarying samples using matrix decomposition
-	      //The decomposed matrix is used in the proposal of new samples
-	      covarianceMatrix[aaIndex].choleskyDecomposition(); 
-	    }// end adjust loop
-	} // end if(adapt)
-      
-      numAcceptForCodonSpecificParameters[aaIndex] = 0u;
-    }
-
-  my_print("Acceptance rate for CSP Matrices:\n");
-  my_print("Target range: %-% \n", acceptanceTargetLow, acceptanceTargetHigh );
-  my_print("Factor Adjustment range: < % or > % \n", factorCriteriaLow, factorCriteriaHigh );
-  my_print("\t acceptance rates below lower target of %: %\n", factorCriteriaLow, acceptanceUnder);
-  my_print("\t acceptance rate above upper target of %: %\n", factorCriteriaHigh, acceptanceOver);
-
-
-  my_print("\n");
+		numAcceptForCodonSpecificParameters[aaIndex] = 0u;
+	}
+	my_print("\n");
 }
 
 
@@ -1451,29 +1515,37 @@ double Parameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned geneI
 {
 	float posteriorMean = 0.0;
 	std::vector<float> synthesisRateTrace = traces.getSynthesisRateTraceForGene(geneIndex);
-	unsigned traceLength = lastIteration + 1;
-	if (samples > lastIteration)
+	if (synthesisRateTrace.size() == 1)
 	{
-		my_printError("Warning in ROCParameter::getSynthesisRatePosteriorMean throws: Number of anticipated samples");
-		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n",
-					  samples, traceLength);
-
-		samples = traceLength;
+		posteriorMean = synthesisRateTrace[0];
 	}
-	unsigned start = traceLength - samples;
-
-	if(log_scale)
+	else
 	{
+		unsigned traceLength = lastIteration + 1;
+		if (samples > lastIteration)
+		{
+			my_printError("Warning in ROCParameter::getSynthesisRatePosteriorMean throws: Number of anticipated samples");
+			my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n",
+						  samples, traceLength);
+
+			samples = traceLength;
+		}
+		unsigned start = traceLength - samples;
+
+		if(log_scale)
+		{
+			for (unsigned i = start; i < traceLength; i++)
+			{
+				synthesisRateTrace[i] = std::log10(synthesisRateTrace[i]);
+			}
+		}
 		for (unsigned i = start; i < traceLength; i++)
 		{
-			synthesisRateTrace[i] = std::log10(synthesisRateTrace[i]);
+				posteriorMean += synthesisRateTrace[i];
 		}
+		posteriorMean = posteriorMean/float(samples);
 	}
-	for (unsigned i = start; i < traceLength; i++)
-	{
-			posteriorMean += synthesisRateTrace[i];
-	}
-	return posteriorMean / (float)samples;
+	return posteriorMean;
 }
 
 
@@ -1552,41 +1624,45 @@ double Parameter::getStdDevSynthesisRateVariance(unsigned samples, unsigned mixt
 
 double Parameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex, bool unbiased, bool log_scale)
 {
+	double variance = 0.0;
 	std::vector<float> synthesisRateTrace = traces.getSynthesisRateTraceForGene(geneIndex);
-
-	unsigned traceLength = lastIteration + 1;
-	if (samples > traceLength)
+	if (synthesisRateTrace.size() != 1)
 	{
-		my_printError("Warning in Parameter::getSynthesisRateVariance throws: Number of anticipated samples ");
-		my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n",
-					  samples, traceLength);
-
-		samples = traceLength;
-	}
-	unsigned start = traceLength - samples;
-	if(log_scale)
-	{
-		for (unsigned i = start; i < traceLength; i++)
+		unsigned traceLength = lastIteration + 1;
+		if (samples > traceLength)
 		{
-			synthesisRateTrace[i] = std::log10(synthesisRateTrace[i]);
+			my_printError("Warning in Parameter::getSynthesisRateVariance throws: Number of anticipated samples ");
+			my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n",
+						  samples, traceLength);
+
+			samples = traceLength;
 		}
-	}
-
-	// NOTE: The loss of precision here is acceptable for storage purposes.
-	float posteriorMean = (float)getSynthesisRatePosteriorMean(samples, geneIndex, log_scale);
-
-	float posteriorVariance = 0.0;
-	if (!std::isnan(posteriorMean))
-	{
-		double difference;
-		for (unsigned i = start; i < traceLength; i++)
+		unsigned start = traceLength - samples;
+		if(log_scale)
 		{
-			difference = synthesisRateTrace[i] - posteriorMean;
-			posteriorVariance += difference * difference;
+			for (unsigned i = start; i < traceLength; i++)
+			{
+				synthesisRateTrace[i] = std::log10(synthesisRateTrace[i]);
+			}
 		}
+
+		// NOTE: The loss of precision here is acceptable for storage purposes.
+		float posteriorMean = (float)getSynthesisRatePosteriorMean(samples, geneIndex, log_scale);
+
+		float posteriorVariance = 0.0;
+		if (!std::isnan(posteriorMean))
+		{
+			double difference;
+			for (unsigned i = start; i < traceLength; i++)
+			{
+				difference = synthesisRateTrace[i] - posteriorMean;
+				posteriorVariance += difference * difference;
+			}
+		}
+		float normalizationTerm = unbiased ? (1.0 / ((float)samples - 1.0)) : (1.0 / (float)samples);
+		variance = normalizationTerm * posteriorVariance;
 	}
-	float normalizationTerm = unbiased ? (1.0 / ((float)samples - 1.0)) : (1.0 / (float)samples);
-	return normalizationTerm * posteriorVariance;
+	return variance;
 }
 
 
@@ -1631,7 +1707,7 @@ double Parameter::getCodonSpecificVariance(unsigned mixtureElement, unsigned sam
 
 std::vector<double> Parameter::calculateQuantile(std::vector<float> &parameterTrace, unsigned samples, std::vector<double> probs, bool log_scale)
 {
-    unsigned traceLength = lastIteration + 1u;
+  unsigned traceLength = lastIteration + 1u;
     //unsigned traceEnd = parameterTrace.size() - (parameterTrace.size() - lastIteration); //currently unused
 	if (samples > traceLength)
 	{
@@ -1641,7 +1717,7 @@ std::vector<double> Parameter::calculateQuantile(std::vector<float> &parameterTr
 
 		samples = traceLength;
 	}
-    
+
     std::vector<double> samplesTrace(parameterTrace.begin() + (lastIteration - samples) + 1, (parameterTrace.begin() + lastIteration + 1));
     std::sort(samplesTrace.begin(), samplesTrace.end());
 
@@ -1677,8 +1753,20 @@ std::vector<double> Parameter::calculateQuantile(std::vector<float> &parameterTr
 
 std::vector<double> Parameter::getExpressionQuantile(unsigned samples, unsigned geneIndex, std::vector<double> probs, bool log_scale)
 {
+	std::vector<double> quantile(probs.size());
 	std::vector<float> parameterTrace = traces.getSynthesisRateTraceForGene(geneIndex);
-	return calculateQuantile(parameterTrace, samples, probs, log_scale);
+	if (parameterTrace.size() == 1)
+	{
+		for (int i; i < probs.size();i++)
+		{
+			quantile[i] = parameterTrace[0];
+		}
+	}
+	else
+	{
+		quantile = calculateQuantile(parameterTrace, samples, probs, log_scale);
+	}
+	return quantile;
 }
 
 std::vector<double> Parameter::getCodonSpecificQuantile(unsigned mixtureElement, unsigned samples, std::string &codon,
@@ -1686,7 +1774,7 @@ std::vector<double> Parameter::getCodonSpecificQuantile(unsigned mixtureElement,
 {
  	std::vector<float> parameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
 		mixtureElement, codon, paramType, withoutReference);
-    
+
 	return calculateQuantile(parameterTrace, samples, probs, false);
 }
 
@@ -2294,7 +2382,7 @@ std::vector<double> Parameter::getCodonSpecificQuantileForCodon(unsigned mixture
 	{
         rv = getCodonSpecificQuantile(mixtureElement - 1, samples, codon, paramType, probs, withoutReference);
     }
-    return rv;     
+    return rv;
 }
 
 std::vector<double> Parameter::getExpressionQuantileForGene(unsigned samples,
@@ -2306,7 +2394,7 @@ std::vector<double> Parameter::getExpressionQuantileForGene(unsigned samples,
 	{
         rv = getExpressionQuantile(samples, geneIndex - 1, probs, log_scale);
     }
-    return rv;     
+    return rv;
 }
 
 /* getSynthesisRatePosteriorMeanForGene

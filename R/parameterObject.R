@@ -47,8 +47,17 @@
 #' If given, all other arguments will be ignored.
 #' The default value for init.with.restart.file is NULL.
 #' 
-#' @param mutation.prior.sd Controlling the standard deviation of the normal 
-#' prior on the mutation parameters
+#' @param mutation.prior.mean Controlling the mean of the normal prior on mutation paramters.
+#' If passed in as single number (default is 0), this will be the mean value for all categories, for all codons. User may also
+#' supply a vector with n * 40 values, where n is the number of mutation categories. Future versions will check the number of rows matches
+#' the number of mutation categories definded by user. 
+#' 
+#' @param mutation.prior.sd Controlling the standard deviation of the normal prior on the mutation parameters.
+#' If passed in as single number (default is 0.35), this will be the standard deviation value for all categories, for all codons. User may also
+#' supply a vector with n * 40 values, where n is the number of mutation categories. Future versions will check the number of rows matches
+#' the number of mutation categories definded by user. 
+#' 
+#' @param propose.by.prior Mutation bias parameters will be proposed based on the means and standard deviations set in mutation.prior.mean and mutation.prior.sd
 #' 
 #' @param init.csp.variance specifies the initial proposal width for codon specific parameter (default is 0.0025). 
 #' The proposal width adapts during the runtime to reach a taget acceptance rate of ~0.25
@@ -113,7 +122,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
                                       model = "ROC", split.serine = TRUE, 
                                       mixture.definition = "allUnique", 
                                       mixture.definition.matrix = NULL,
-                                      init.with.restart.file = NULL, mutation.prior.sd = 0.35, 
+                                      init.with.restart.file = NULL, mutation.prior.mean = 0.0, mutation.prior.sd = 0.35, propose.by.prior=FALSE,
                                       init.csp.variance = 0.0025, init.sepsilon = 0.1, 
                                       init.w.obs.phi=FALSE){
   # check input integrity
@@ -168,9 +177,9 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
   if(model == "ROC"){
     if(is.null(init.with.restart.file)){
       parameter <- initializeROCParameterObject(genome, sphi, num.mixtures, 
-                                                gene.assignment, initial.expression.values, split.serine, 
+                                                gene.assignment, initial.expression.values, split.serine,
                                                 mixture.definition, mixture.definition.matrix, 
-                                                mutation.prior.sd, init.csp.variance, init.sepsilon,init.w.obs.phi)    
+                                                mutation.prior.mean,mutation.prior.sd,propose.by.prior,init.csp.variance, init.sepsilon,init.w.obs.phi)    
     }else{
       parameter <- new(ROCParameter, init.with.restart.file)
     }
@@ -210,7 +219,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
 initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignment,
                                          expressionValues = NULL, split.serine = TRUE,
                                          mixture.definition = "allUnique", 
-                                         mixture.definition.matrix = NULL, mutation_prior_sd = 0.35, init.csp.variance = 0.0025, init.sepsilon = 0.1,init.w.obs.phi=FALSE){
+                                         mixture.definition.matrix = NULL, mutation_prior_mean = 0.0, mutation_prior_sd = 0.35, propose.by.prior=FALSE,init.csp.variance = 0.0025, init.sepsilon = 0.1,init.w.obs.phi=FALSE){
   
   if(is.null(mixture.definition.matrix)){ 
     # keyword constructor
@@ -255,9 +264,22 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
   
   n.obs.phi.sets <- ncol(getObservedSynthesisRateSet(genome)) - 1
   parameter$setNumObservedSynthesisRateSets(n.obs.phi.sets)
+  if (length(mutation_prior_mean) == 1)
+  {
+    mutation_prior_mean <- rep(mutation_prior_mean,length=parameter$numMutationCategories * 40)
+  } else{
+    mutation_prior_mean <- as.vector(t(mutation_prior_mean))
+  }
   
-  parameter$mutation_prior_sd <- mutation_prior_sd
-  
+  if (length(mutation_prior_sd) == 1)
+  {
+    mutation_prior_sd <- rep(mutation_prior_sd,length=parameter$numMutationCategories * 40)
+  } else{
+    mutation_prior_sd <- as.vector(t(mutation_prior_sd))
+  }
+  parameter$setMutationPriorMean(mutation_prior_mean)
+  parameter$setMutationPriorStandardDeviation(mutation_prior_sd)
+  parameter$setProposeByPrior(propose.by.prior)
   if (n.obs.phi.sets != 0){
     parameter$setInitialValuesForSepsilon(as.vector(init.sepsilon))
   }
@@ -555,7 +577,8 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
 #' @param n.samples How many samples should be used for the calculation 
 #'  
 #' @param divisor A value > 1 in order to scale down the tails of the importance distribution
-#'  
+#'
+#' @param warnings Print warnings such as when the variance of a parameter is 0, which might occur when parameter is fixed  
 #' @return This function returns the model object created. 
 #'  
 #' @description initializes the model object. 
@@ -584,51 +607,59 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
 #' cat("Bayes factor: ", mll1 - mll2, "\n")
 #' }
 #'  
-calculate_marginal_log_likelihood <- function(parameter, mcmc, mixture, n.samples, divisor)
+calculate_marginal_log_likelihood <- function(parameter, mcmc, mixture, n.samples, divisor,warnings=TRUE)
 {  
   if(divisor < 1) stop("Generalized Harmonic Mean Estimation of Marginal Likelihood requires importance sampling distribution variance divisor be greater than 1")
-
+  
   ## Collect information from AnaCoDa objects
   trace <- parameter$getTraceObject()
   ## This should be the posterior instead of the log_posterior but this causes an overflow, find fix!!!
   log_posterior <- mcmc$getLogPosteriorTrace()
   log_posterior <- log_posterior[(length(log_posterior) - n.samples+1):(length(log_posterior))]
   
+  
   ### HANDLE CODON SPECIFIC PARAMETERS
   log_imp_dens_sample <- rep(0, n.samples)
-  for(ptype in 0:1) # for all parameter types (mutation/selection parameters)
+  for (k in 1:mixture)
   {
-    for(aa in AnaCoDa::aminoAcids()) # for all amino acids
+    for(ptype in 0:1) # for all parameter types (mutation/selection parameters)
     {
-      if(aa == "M" || aa == "W" || aa == "X") next # ignore amino acids with only one codon or stop codons 
-      codons <- AnaCoDa::AAToCodon(aa, focal = T)
-      ## get covariance matrix and mean of importance distribution
-      sample_mat <- matrix(NA, ncol = length(codons), nrow = n.samples)
-      mean_vals <- rep(NA, length(codons))
-      for(i in 1:length(codons)) # for all codons
+      for(aa in AnaCoDa::aminoAcids()) # for all amino acids
       {
-        vec <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], ptype, TRUE)
-        vec <- vec[(length(vec) - n.samples+1):(length(vec))]
-        sample_mat[,i] <- vec
-        mean_vals[i] <- mean(vec)
-      }
-      ## scale/shrinked covariance matrix
-      cov_mat <- cov(sample_mat) / divisor
-      
-      for(i in 1:n.samples)
-      {
-        ## calculate importance density for collected samples
-        ## mikeg: We should double check with Russ that it is okay to use the full covariance matrix of the sample (even though we have no prior on the cov structure) when constructing the importance density function.
-        ## It seems logical to do so
-        log_imp_dens_aa <- dmvnorm(x = sample_mat[i,], mean = mean_vals, sigma = cov_mat, log = TRUE)
-        log_imp_dens_sample[i] = log_imp_dens_sample[i] + log_imp_dens_aa
+        if(aa == "M" || aa == "W" || aa == "X") next # ignore amino acids with only one codon or stop codons 
+        codons <- AnaCoDa::AAToCodon(aa, focal = T)
+        ## get covariance matrix and mean of importance distribution
+        sample_mat <- matrix(NA, ncol = length(codons), nrow = n.samples)
+        mean_vals <- rep(NA, length(codons))
+        for(i in 1:length(codons)) # for all codons
+        {
+          vec <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(k, codons[i], ptype, TRUE)
+          vec <- vec[(length(vec) - n.samples+1):(length(vec))]
+          sample_mat[,i] <- vec
+          mean_vals[i] <- mean(vec)
+        }
+        ## scale/shrinked covariance matrix
+        cov_mat <- cov(sample_mat) / divisor
+        if(all(cov_mat == 0))
+        {
+          if(warnings) print(paste("Covariance matrix for codons in amino acid",aa,"has 0 for all values. Skipping."))
+          next
+        }
+        for(i in 1:n.samples)
+        {
+          ## calculate importance density for collected samples
+          ## mikeg: We should double check with Russ that it is okay to use the full covariance matrix of the sample (even though we have no prior on the cov structure) when constructing the importance density function.
+          ## It seems logical to do so
+          log_imp_dens_aa <- dmvnorm(x = sample_mat[i,], mean = mean_vals, sigma = cov_mat, log = TRUE)
+          log_imp_dens_sample[i] = log_imp_dens_sample[i] + log_imp_dens_aa
+        }
       }
     }
   }
-  
   ## HANDLE GENE SPECIFIC PARAMETERS
   
   # phi values are stored on natural scale.
+  
   synt_trace <- trace$getSynthesisRateTrace()[[mixture]]
   n_genes = length(synt_trace);
   
@@ -637,10 +668,13 @@ calculate_marginal_log_likelihood <- function(parameter, mcmc, mixture, n.sample
   for(i in 1:n_genes) ## i is indexing across genes
   {
     vec <- synt_trace[[i]]
-    
     vec <- vec[(length(vec) - n.samples+1):(length(vec))]
-    
     sd_vals[i] <- sd(vec)
+    if (all(sd_vals[i] == 0))
+    {
+      if(warnings) print(paste("Variance of gene",i,"is 0. Skipping."))
+      next
+    }
     mean_vals[i] <- mean(vec)
     log_mean_vals = log(mean_vals) - 0.5 * log(1+(sd_vals^2/mean_vals^2))
     log_sd_vals = sqrt(log(1+(sd_vals^2/mean_vals^2)))
@@ -656,21 +690,18 @@ calculate_marginal_log_likelihood <- function(parameter, mcmc, mixture, n.sample
   
   ## Scale importance density for each sample by its posterior probability (on log scale)
   log_imp_dens_over_posterior = log_imp_dens_sample - log_posterior
-  
   ## now scale by max term to facilitate summation
   max_log_term = max(log_imp_dens_over_posterior)
   ## Y = X - max_X
   offset_log_imp_dens_over_posterior <- log_imp_dens_over_posterior - max_log_term
   ## Z = sum(exp(vec(Y)))
-  offset_sum_imp_dens_over_posterior <- sum(exp(offset_log_imp_dens_over_posterior))/n.samples
+  offset_sum_imp_dens_over_posterior <- sum(exp(offset_log_imp_dens_over_posterior))
   log_sum_imp_dens_over_posterior <- log(offset_sum_imp_dens_over_posterior) + max_log_term
   ## ln(ML) = ln(n) -(Z + max_X)
   log_marg_lik <- log(n.samples) - log_sum_imp_dens_over_posterior
   ##marg_lik = 1.0/(log_inv_marg_lik/n.samples) # equation 9
   return(log_marg_lik)
 }
-
-
 
 #' Find and return list of optimal codons
 #' 
@@ -787,8 +818,8 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
   ## Creates empty vector of 0 for initial dataframes
   init <- rep(0.0,length(codons))
   
-  param.1<- data.frame(Codon=codons,AA=names.aa,Posterior=init,Lower.quant=init, Upper.quant=init,stringsAsFactors = F,row.names = codons)
-  param.2 <- data.frame(Codon=codons,AA=names.aa,Posterior=init,Lower.quant=init, Upper.quant=init,stringsAsFactors = F,row.names=codons)
+  param.1<- data.frame(Codon=codons,AA=names.aa,Posterior=init,Std.Dev=init,Lower.quant=init,Upper.quant=init,stringsAsFactors = F,row.names = codons)
+  param.2 <- data.frame(Codon=codons,AA=names.aa,Posterior=init,Std.Dev=init,Lower.quant=init,Upper.quant=init,stringsAsFactors = F,row.names=codons)
   if (model.uses.ref.codon)
   {
     codons <- codons[which(codons %in% unlist(lapply(X = names.aa,FUN = AAToCodon,T)))]
@@ -798,11 +829,13 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
   {
     param.1[codon,"Posterior"] <- parameter$getCodonSpecificPosteriorMean(mixtureElement=mixture,samples=samples,codon=codon,paramType=0,withoutReference=model.uses.ref.codon)
     param.2[codon,"Posterior"] <- parameter$getCodonSpecificPosteriorMean(mixtureElement=mixture,samples=samples,codon=codon,paramType=1,withoutReference=model.uses.ref.codon)
+    param.1[codon,"Std.Dev"] <- sqrt(parameter$getCodonSpecificVariance(mixtureElement=mixture,samples=samples,codon=codon,paramType=0,unbiased=T,withoutReference=model.uses.ref.codon))
+    param.2[codon,"Std.Dev"] <- sqrt(parameter$getCodonSpecificVariance(mixtureElement=mixture,samples=samples,codon=codon,paramType=1,unbiased=T,withoutReference=model.uses.ref.codon))
     param.1[codon,c("Lower.quant","Upper.quant")] <- parameter$getCodonSpecificQuantile(mixtureElement=mixture, samples=samples,codon=codon,paramType=0, probs=c(0.025, 0.975),withoutReference=model.uses.ref.codon)
     param.2[codon,c("Lower.quant","Upper.quant")]  <- parameter$getCodonSpecificQuantile(mixtureElement=mixture, samples=samples,codon=codon,paramType=1, probs=c(0.025, 0.975),withoutReference=model.uses.ref.codon)
   }
-  colnames(param.1) <- c("Codon", "AA", "Posterior", "0.025%", "0.975%")
-  colnames(param.2) <- c("Codon", "AA", "Posterior", "0.025%", "0.975%")
+  colnames(param.1) <- c("Codon", "AA", "Posterior","Std.Dev","0.025%", "0.975%")
+  colnames(param.2) <- c("Codon", "AA", "Posterior","Std.Dev","0.025%", "0.975%")
   
   ## Only called if model actually uses reference codon
   if(relative.to.optimal.codon && model.uses.ref.codon)
@@ -818,8 +851,8 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
     }
     csp.param <- vector(mode="list",length=2)
     names(csp.param) <- parameter.names
-    csp.param[[parameter.names[1]]] <- param.1[,c("AA", "Codon", "Posterior", "0.025%", "0.975%")]
-    csp.param[[parameter.names[2]]] <- param.2[,c("AA", "Codon", "Posterior", "0.025%", "0.975%")]
+    csp.param[[parameter.names[1]]] <- param.1[,c("AA", "Codon", "Posterior", "Std.Dev", "0.025%", "0.975%")]
+    csp.param[[parameter.names[2]]] <- param.2[,c("AA", "Codon", "Posterior", "Std.Dev", "0.025%", "0.975%")]
   }
   if(is.null(filename))
   {
@@ -850,15 +883,16 @@ optimalAsReference <- function(param.1,param.2,parameter.names,report.original.r
       tmp.2[,c("Posterior","0.025%","0.975%")] <- tmp.2[,c("Posterior","0.025%","0.975%")] - optimal.parameter.value
       ##Get row of the optimal codon, which should be 0
       optimal.codon.row <- which(tmp.2[,"Posterior"]==0.0)
+      tmp.2[current.reference.row,"Std.Dev"] <- tmp.2[optimal.codon.row,"Std.Dev"]
       tmp.2[current.reference.row,c("0.025%","0.975%")] <- tmp.2[optimal.codon.row,c("0.025%","0.975%")] + tmp.2[current.reference.row,"Posterior"]
       ## Can now change optimal codon values to 0.0
-      tmp.2[optimal.codon.row,c("Posterior","0.025%","0.975%")] <- 0.0
-      
+      tmp.2[optimal.codon.row,c("Posterior","Std.Dev","0.025%","0.975%")] <- 0.0
       ## Find corresponding reference value for other parameter
       optimal.parameter.value <- tmp.1[optimal.codon.row,"Posterior"]
+      tmp.1[current.reference.row,"Std.Dev"] <- tmp.1[optimal.codon.row,"Std.Dev"]
       tmp.1[,c("Posterior","0.025%","0.975%")] <- tmp.1[,c("Posterior","0.025%","0.975%")] - optimal.parameter.value
       tmp.1[current.reference.row,c("0.025%","0.975%")] <- tmp.1[optimal.codon.row,c("0.025%","0.975%")] + tmp.1[current.reference.row,"Posterior"]
-      tmp.1[optimal.codon.row,c("Posterior","0.025%","0.975%")] <- 0.0
+      tmp.1[optimal.codon.row,c("Posterior","Std.Dev","0.025%","0.975%")] <- 0.0
     }
     if (!report.original.ref)
     {
@@ -870,8 +904,8 @@ optimalAsReference <- function(param.1,param.2,parameter.names,report.original.r
   }
   csp.param <- vector(mode="list",length=2)
   names(csp.param) <- parameter.names
-  csp.param[[parameter.names[1]]] <- updated.param.1[,c("AA", "Codon", "Posterior", "0.025%", "0.975%")]
-  csp.param[[parameter.names[2]]] <- updated.param.2[,c("AA", "Codon", "Posterior", "0.025%", "0.975%")]
+  csp.param[[parameter.names[1]]] <- updated.param.1[,c("AA", "Codon", "Posterior","Std.Dev", "0.025%", "0.975%")]
+  csp.param[[parameter.names[2]]] <- updated.param.2[,c("AA", "Codon", "Posterior","Std.Dev","0.025%", "0.975%")]
   return(csp.param)
 }
 
@@ -1927,11 +1961,25 @@ geomMean <- function(x, rm.invalid = TRUE, default = 1e-5)
 #Intended to combine 2D traces (vector of vectors) read in from C++. The first
 #element of the second trace is omited since it should be the same as the 
 #last value of the first trace.
-combineTwoDimensionalTrace <- function(trace1, trace2, max){
+combineTwoDimensionalTrace <- function(trace1, trace2,start=2,end=NULL){
+  if(start < 2)
+  {
+    print("Start must be at least 2 because the last element of first trace is first of second trace. Setting start = 2.")
+  }
+  if(end <= start)
+  {
+    print("End must be greater than start. Setting end to length of trace2.")
+    end <- trace2
+  }
+  if(end == NULL)
+  {
+    end <- length(trace2)
+  }
   for (size in 1:length(trace1))
   {
-    trace1[[size]]<- c(trace1[[size]], trace2[[size]][2:max])
+    trace1[[size]]<- c(trace1[[size]], trace2[[size]][start:end])
   }
+  return(trace1)
 }
 
 
