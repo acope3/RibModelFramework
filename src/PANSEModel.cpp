@@ -29,8 +29,6 @@ PANSEModel::~PANSEModel()
 double PANSEModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
         unsigned currRFPObserved, double phiValue, double prevSigma)
 {
-
-
     double term1 = std::lgamma(currAlpha + currRFPObserved) - lgamma(currAlpha);
     double term2 = std::log(phiValue) + std::log(prevSigma) - std::log(currLambdaPrime + (phiValue * prevSigma));
     double term3 = std::log(currLambdaPrime) - std::log(currLambdaPrime + (phiValue * prevSigma));
@@ -105,8 +103,8 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
         if (currNumCodonsInMRNA == 0) continue;
 
         //Have to redo the math because rfp observed has changed
-        logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, phiValue, 1);
-        logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, phiValue_proposed, 1);
+        logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, phiValue, 1/currNSERate);
+        logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, phiValue_proposed, 1/currNSERate);
     }
 
     //Double check math here
@@ -193,6 +191,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                 if (propCodonSigma == 0.0) propCodonSigma = elongationProbabilityLog(propAlpha, propLambdaPrime, 1/propNSERate);
 
                 propSigma += propCodonSigma;
+                //if (grouping == "ACA") my_print("The prop sigma is %\n", propSigma);
                 logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambdaPrime, positionalRFPCount,
                                    phiValue, std::exp(propSigma));
                 logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, positionalRFPCount,
@@ -294,8 +293,8 @@ void PANSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 
             if(currCodonSigmas[codonIndex] == 0.0)
             {
-                currCodonSigmas[codonIndex] = elongationProbability(currAlpha, currU * currLambdaPrime, 1/currNSERate);
-                propCodonSigmas[codonIndex] = elongationProbability(currAlpha, propU * currLambdaPrime, 1/currNSERate);
+                currCodonSigmas[codonIndex] = elongationProbability(1 - currAlpha, currU * currLambdaPrime, 1/currNSERate);
+                propCodonSigmas[codonIndex] = elongationProbability(1 - currAlpha, propU * currLambdaPrime, 1/currNSERate);
             }
 
             currSigma *= currCodonSigmas[codonIndex];
