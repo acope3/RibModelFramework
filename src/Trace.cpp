@@ -163,10 +163,6 @@ void Trace::initCodonSpecificParameterTrace(unsigned samples, unsigned numCatego
 
 
 
-
-
-
-
 //----------------------------------//
 //---------- ROC Specific ----------//
 //----------------------------------//
@@ -193,7 +189,17 @@ void Trace::initObservedSynthesisNoiseTrace(unsigned samples, unsigned numPhiGro
 }
 
 
-
+//----------------------------------//
+//--------- PANSE Specific ---------//
+//----------------------------------//
+void Trace::initPartitionFunctionTrace(unsigned samples, unsigned numPartitionFunctionsGroupings)
+{
+    partitionFunctionTrace.resize(numPartitionFunctionsGroupings);
+    for (unsigned i = 0; i < numPartitionFunctionsGroupings; i++)
+    {
+        partitionFunctionTrace[i].resize(samples);
+    }
+}
 
 
 //----------------------------------------------------//
@@ -256,12 +262,17 @@ void Trace::initializePANSETrace(unsigned samples, unsigned num_genes, unsigned 
 	std::vector<mixtureDefinition> &_categories, unsigned maxGrouping, std::vector<double> init_phi,
 	std::vector<unsigned> init_mix_assign, bool estimateSynthesisRate)
 {
+    numCodonSpecificParamTypes = 3;
+    codonSpecificParameterTrace.resize(numCodonSpecificParamTypes);
+
 	initializeSharedTraces(samples, num_genes, numLambdaPrimeCategories, numMixtures,
 		_categories, maxGrouping,init_phi,init_mix_assign,estimateSynthesisRate);
 
 	// See Note 1) above.
 	initCodonSpecificParameterTrace(samples, numAlphaCategories,  numParam, 0u); //alp
 	initCodonSpecificParameterTrace(samples, numLambdaPrimeCategories, numParam, 1u); //lmPri
+    initCodonSpecificParameterTrace(samples, numAlphaCategories, numParam, 2u); //nseRate
+    initPartitionFunctionTrace(samples, numMixtures);
 }
 
 
@@ -468,6 +479,9 @@ unsigned Trace::getCodonSpecificCategory(unsigned mixtureElement, unsigned param
 	case 1:
 		rv = categories->at(mixtureElement).delEta;
 		break;
+    case 2:
+        rv = categories->at(mixtureElement).delM;
+        break;
 	default:
 		my_printError("ERROR: Unknown parameter type in getCodonSpecificCategory\n");
 		break;
@@ -476,8 +490,13 @@ unsigned Trace::getCodonSpecificCategory(unsigned mixtureElement, unsigned param
 }
 
 
-
-
+//--------------------------------------//
+//----------- PANSE Specific -----------//
+//--------------------------------------//
+std::vector<double> Trace::getPartitionFunctionTrace(unsigned mixtureIndex)
+{
+    return partitionFunctionTrace[mixtureIndex];
+}
 
 //--------------------------------------//
 //---------- Update Functions ----------//
@@ -597,7 +616,7 @@ void Trace::updateObservedSynthesisNoiseTrace(unsigned index, unsigned sample, d
 
 
 //-------------------------------------//
-//---------- PA Specific -------------//
+//-------- PA/PANSE Specific ----------//
 //-------------------------------------//
 
 void Trace::updateCodonSpecificParameterTraceForCodon(unsigned sample, std::string codon,
@@ -611,6 +630,16 @@ void Trace::updateCodonSpecificParameterTraceForCodon(unsigned sample, std::stri
         }
 		codonSpecificParameterTrace[paramType][category][i][sample] = curParam[category][i];
 	}
+}
+
+void Trace::updatePartitionFunctionTrace(unsigned index, unsigned sample, double value){
+   partitionFunctionTrace[index][sample] = value;
+}
+
+
+void Trace:: updatePartitionFunctionAcceptanceRateTrace(double value)
+{
+    partitionFunctionTraceAcceptanceRateTrace.push_back(value);
 }
 
 
@@ -695,6 +724,16 @@ std::vector<std::vector<double>> Trace::getStdDevSynthesisRateTraces()
 unsigned Trace::getNumberOfMixtures()
 {
 	return mixtureProbabilitiesTrace.size();
+}
+
+std::vector<double> Trace::getPartitionFunctionTraceR(unsigned mixtureIndex){
+    std::vector<double> RV;
+    bool check = checkIndex(mixtureIndex, 1, partitionFunctionTrace.size());
+    if (check)
+    {
+        RV = getPartitionFunctionTrace(mixtureIndex - 1);
+    }
+    return RV;
 }
 
 //--------------------------------------//
@@ -809,6 +848,16 @@ void Trace::setCodonSpecificParameterTrace(std::vector<std::vector<std::vector<f
 	}
 	*/
 }
+
+
+//----------------------------------//
+//--------- PANSE Specific ---------//
+//----------------------------------//
+void Trace::setPartitionFunctionTrace(std::vector<std::vector <double> > _PartitionFunctionTrace)
+{
+    partitionFunctionTrace = _PartitionFunctionTrace;
+}
+
 
 
 bool Trace::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound)

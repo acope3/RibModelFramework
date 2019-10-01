@@ -1446,17 +1446,20 @@ writeParameterObject.Rcpp_PANSEParameter <- function(parameter, file){
   
   currentAlpha <- parameter$currentAlphaParameter
   currentLambdaPrime <- parameter$currentLambdaPrimeParameter
+  currentNSERate <- parameter$currentNSERateParameter
   proposedAlpha <- parameter$proposedAlphaParameter
   proposedLambdaPrime <- parameter$proposedLambdaPrimeParameter
+  proposedNSERate <- parameter$proposedNSERateParameter
   model = "PANSE"
   
   
   trace <- parameter$getTraceObject()
   alphaTrace <- trace$getCodonSpecificParameterTrace(0)
   lambdaPrimeTrace <- trace$getCodonSpecificParameterTrace(1)
+  NSERateTrace <- trace$getCodonSpecificParameterTrace(2)
   
-  save(list = c("paramBase", "currentAlpha", "currentLambdaPrime", "proposedAlpha",
-                "proposedLambdaPrime", "model", "alphaTrace", "lambdaPrimeTrace"),
+  save(list = c("paramBase", "currentAlpha", "currentLambdaPrime", "currentNSERate", "proposedAlpha",
+                "proposedLambdaPrime", "proposedNSERate", "model", "alphaTrace", "lambdaPrimeTrace"),
        file=file)
 }
 

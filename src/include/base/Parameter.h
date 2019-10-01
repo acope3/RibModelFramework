@@ -49,6 +49,7 @@ class Parameter {
 		static const unsigned dOmega;
 		static const unsigned alp;
 		static const unsigned lmPri;
+		static const unsigned nse;
 
 #ifdef STANDALONE
 		static std::default_random_engine generator; // static to make sure that the same generator is used during the runtime.

@@ -213,6 +213,7 @@ RCPP_MODULE(Parameter_mod)
 		//Initialization, Restart, Index Checking:
 		.method("initAlpha", &PANSEParameter::initAlphaR)
 		.method("initLambdaPrime", &PANSEParameter::initLambdaPrimeR)
+		.method("initNSERate", &PANSEParameter::initNSERateR)
 		.method("initMutationSelectionCategories", &PANSEParameter::initMutationSelectionCategoriesR)
 
 
@@ -222,17 +223,20 @@ RCPP_MODULE(Parameter_mod)
 
 		//Other Functions:
 		.method("getParameterForCategory", &PANSEParameter::getParameterForCategoryR)
-
-
+		.method("setPartitionFunction", &PANSEParameter::setPartitionFunction)
 
 		.property("proposedAlphaParameter", &PANSEParameter::getProposedAlphaParameter,
 		        &PANSEParameter::setProposedAlphaParameter) //R Specific
 		.property("proposedLambdaPrimeParameter", &PANSEParameter::getProposedLambdaPrimeParameter,
 		        &PANSEParameter::setProposedLambdaPrimeParameter) //R Specific
+        .property("proposedNSERateParameter", &PANSEParameter::getProposedNSERateParameter,
+                &PANSEParameter::setProposedNSERateParameter) //R Specific
 		.property("currentAlphaParameter", &PANSEParameter::getCurrentAlphaParameter,
 		        &PANSEParameter::setCurrentAlphaParameter) //R Specific
 		.property("currentLambdaPrimeParameter", &PANSEParameter::getCurrentLambdaPrimeParameter,
 		        &PANSEParameter::setCurrentLambdaPrimeParameter) //R Specific
+        .property("currentNSERateParameter", &PANSEParameter::getCurrentNSERateParameter,
+                &PANSEParameter::setCurrentNSERateParameter) //R Specific
 		;
 
 	class_<FONSEParameter>("FONSEParameter")

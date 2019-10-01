@@ -128,15 +128,17 @@ void PAModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grou
 		propAlpha = getParameterForCategory(alphaCategory, PAParameter::alp, grouping, true);
 		propLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, grouping, true);
 
-
-
 		logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPValue, currNumCodonsInMRNA, phiValue);
 		logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambdaPrime, currRFPValue, currNumCodonsInMRNA, phiValue);
+
+		if(i == 0 and (grouping == "GCA" or grouping == "GCT")){
+		    my_print("%:\nAlpha: %\nLambda: %\nProp Alpha: %\nProp Lambda: %\nPhi: %\nRFP Count: %\nnumCodons: %\n\n",grouping, currAlpha, currLambdaPrime,propAlpha,propLambdaPrime, phiValue, currRFPValue,currNumCodonsInMRNA);
+		}
 	}
-	logAcceptanceRatioForAllMixtures[0] = logLikelihood_proposed - logLikelihood;// - ((std::log(currAlpha) + std::log(currLambdaPrime))
-                                                                        //- (std::log(propAlpha) + std::log(propLambdaPrime)));
-	logAcceptanceRatioForAllMixtures[1] = logLikelihood; //- (std::log(propAlpha) + std::log(propLambdaPrime));
-	logAcceptanceRatioForAllMixtures[2] = logLikelihood_proposed; //- (std::log(currAlpha) + std::log(currLambdaPrime));
+	logAcceptanceRatioForAllMixtures[0] = logLikelihood_proposed - logLikelihood - ((std::log(currAlpha) + std::log(currLambdaPrime))
+                                                                        - (std::log(propAlpha) + std::log(propLambdaPrime)));
+	logAcceptanceRatioForAllMixtures[1] = logLikelihood - (std::log(propAlpha) + std::log(propLambdaPrime));
+	logAcceptanceRatioForAllMixtures[2] = logLikelihood_proposed - (std::log(currAlpha) + std::log(currLambdaPrime));
 	logAcceptanceRatioForAllMixtures[3] = logLikelihood;
 	logAcceptanceRatioForAllMixtures[4] = logLikelihood_proposed;
 }
@@ -175,11 +177,6 @@ void PAModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsi
 		unsigned mixture = getMixtureAssignment(i);
 		mixture = getSynthesisRateCategory(mixture);
 		double phi = getSynthesisRate(i, mixture, false);
-		if (i == 0)
-		{
-			//my_print("proposed: %\n", Parameter::densityLogNorm(phi, proposedMPhi[mixture], proposedStdDevSynthesisRate[mixture], false));
-			//my_print("current: %\n", Parameter::densityLogNorm(phi, currentMPhi, currentStdDevSynthesisRate, false));
-		}
 		lpr += Parameter::densityLogNorm(phi, proposedMphi[mixture], proposedStdDevSynthesisRate[mixture], true) -
 				Parameter::densityLogNorm(phi, currentMphi[mixture], currentStdDevSynthesisRate[mixture], true);
 		//my_print("LPR: %\n", lpr);

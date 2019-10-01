@@ -258,6 +258,18 @@ void SequenceSummary::setSumRFPCount(std::array <unsigned, 64> arg, unsigned RFP
 }
 
 
+int SequenceSummary::getSumTotalRFPCount(unsigned RFPCountColumn)
+{
+    if (sumRFPCount.size() < RFPCountColumn + 1) initSumRFPCount(RFPCountColumn + 1);
+    int sum = 0;
+    for (unsigned i = 0u; i < sumRFPCount[RFPCountColumn].size(); i++)
+    {
+        sum += sumRFPCount[RFPCountColumn][i];
+    }
+
+    return sum;
+}
+
 /* getCodonSpecificSumRFPCount (by codon string) (RCPP EXPOSED VIA WRAPPER)
  * Arguments: A three-character codon string to get the RFP value of, a number representing the RFP category to return (default 0)
  * Returns the RFP value of the codon string for the category index specified.
@@ -425,7 +437,7 @@ bool SequenceSummary::processPA(std::vector<std::vector<int>> table)
 //TODO: Turn into equivalent PANSE
 bool SequenceSummary::processPANSE(std::vector<std::vector<int>> table)
 {
-    // Table format: Each line of input from a .csv (.pa) file, ordered:
+    // Table format: Each line of input from a .csv (.panse) file, ordered:
     // unknown size table (nRows, aka table.size()), each row a vector:
     // position, codon, category1, ... (may be more than one category)
 

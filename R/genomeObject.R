@@ -12,7 +12,7 @@
 #' @param fasta A boolean value which decides whether to initialize with a
 #'  fasta file or an RFPData file. (TRUE for fasta, FALSE for RFPData)
 #' 
-#' @param simulated boolean to determine if the data should be treated as a simulated data set (Default = FALSE).
+#' @param positional boolean to determine if the positional information in the RFP file is necessary.
 #' 
 #' @param match.expression.by.id If TRUE (default), observed expression values will be assigned by matching sequence identifier.
 #' If FALSE, observed expression values will be assigned by order.
@@ -38,7 +38,7 @@
 #' genome <- initializeGenomeObject(file = genome_file)
 #' genome <- initializeGenomeObject(file = genes_file, genome = genome, append = TRUE)   
 #' 
-initializeGenomeObject <- function(file, genome=NULL, observed.expression.file=NULL, fasta=TRUE, simulated = FALSE, 
+initializeGenomeObject <- function(file, genome=NULL, observed.expression.file=NULL, fasta=TRUE, positional = FALSE, 
                                    match.expression.by.id=TRUE, append=FALSE) {
   if (is.null(genome)){ 
     genome <- new(Genome)
@@ -47,11 +47,7 @@ initializeGenomeObject <- function(file, genome=NULL, observed.expression.file=N
   if (fasta == TRUE) {
     genome$readFasta(file, append)
   } else {
-    if (simulated == TRUE){
-        genome$readSimRFPData(file)
-    } else{
-        genome$readRFPData(file, append)
-    }
+      genome$readRFPData(file, append, positional)
   }
   if(!is.null(observed.expression.file)) {
     genome$readObservedPhiValues(observed.expression.file, match.expression.by.id)
