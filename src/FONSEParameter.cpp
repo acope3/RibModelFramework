@@ -88,6 +88,16 @@ FONSEParameter::~FONSEParameter()
 void FONSEParameter::initFONSEParameterSet()
 {
 	mutation_prior_sd = 0.35;
+	// mutation_prior_mean.resize(numMutationCategories);
+	// mutation_prior_sd.resize(numMutationCategories);
+	// for (int i=0; i < numMutationCategories; i++)
+	// {
+	// 	mutation_prior_mean[i].resize(40);
+	// 	mutation_prior_sd[i].resize(40);
+	// 	std::vector<double> tmp(40, 0.0);
+	// 	mutation_prior_mean[i] = tmp;
+	// 	mutation_prior_sd[i] = tmp;
+	// }
 	groupList = { "A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "P", "Q", "R", "S", "T", "V", "Y", "Z" };
 	// proposal bias and std for codon specific parameter
 	bias_csp = 0;
@@ -286,6 +296,36 @@ void FONSEParameter::writeFONSERestartFile(std::string filename)
 		std::ostringstream oss;
 		unsigned j;
 		oss << ">mutation_prior_sd:\n" << mutation_prior_sd << "\n";
+		// oss << ">mutation_prior_mean:\n";
+		// for (unsigned i = 0; i < mutation_prior_mean.size(); i++)
+		// {
+		// 	oss << "***\n";
+		// 	for (j = 0; j < mutation_prior_mean[i].size(); j++)
+		// 	{
+		// 		oss << mutation_prior_mean[i][j];
+		// 		if ((j + 1) % 10 == 0)
+		// 			oss << "\n";
+		// 		else
+		// 			oss << " ";
+		// 	}
+		// 	if (j % 10 != 0)
+		// 		oss << "\n";
+		// }
+		// oss << ">mutation_prior_sd:\n";
+		// for (unsigned i = 0; i < mutation_prior_sd.size(); i++)
+		// {
+		// 	oss << "***\n";
+		// 	for (j = 0; j < mutation_prior_sd[i].size(); j++)
+		// 	{
+		// 		oss << mutation_prior_sd[i][j];
+		// 		if ((j + 1) % 10 == 0)
+		// 			oss << "\n";
+		// 		else
+		// 			oss << " ";
+		// 	}
+		// 	if (j % 10 != 0)
+		// 		oss << "\n";
+		// }
 		oss << ">std_csp:\n";
 		for (unsigned i = 0; i < std_csp.size(); i++)
 		{

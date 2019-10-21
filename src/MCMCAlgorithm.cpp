@@ -164,6 +164,9 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				// log posterior with and without rev. jump probability
 				unscaledLogProb_curr[k] += logProbabilityRatio[1]; // with rev. jump prob.
 				unscaledLogProb_prop[k] += logProbabilityRatio[2]; // with rev. jump prob.
+
+				// TODO: unscaledLogPost_curr and unscaledLogPost_prop have been made redundant by modification to code adding unscaledLogProb_curr_singleMixture
+				// unscaledLogProb_prop_singleMixture. Remove.
 				unscaledLogPost_curr[k] += logProbabilityRatio[3]; // without rev. jump prob.
 				unscaledLogPost_prop[k] += logProbabilityRatio[4]; // without rev. jump prob.
 				unscaledLogLike_curr[k] += logProbabilityRatio[5]; //current logLikelihood
@@ -206,7 +209,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
                 my_print("exp(curr logLik - maxVal): %\n", std::exp(unscaledLogProb_curr_singleMixture[k]));
                 my_print("Max Val. %\n", maxValue);
                 my_print("\n\n\n");
-		break;
+				break;
             }
             unscaledLogProb_curr_singleMixture[k] += maxValue;
 		}
@@ -239,7 +242,6 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			}
 			else
 			{
-
 				for (unsigned n = 0u; n < mixtureElements.size(); n++)
 				{
 					unsigned element = mixtureElements[n];
@@ -458,8 +460,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
             #ifndef STANDALONE
             Rcpp::checkUserInterrupt();
             #endif
-
-	    my_print("Status at thinned sample (iteration): % (%)\n",  (iteration / thinning), iteration);
+	   		my_print("Status at thinned sample (iteration): % (%)\n",  (iteration / thinning), iteration);
 			my_print("\t current logPosterior: % \n", posteriorTrace[(iteration/thinning) - 1] );
 			if (iteration > stepsToAdapt)
 				my_print("No longer adapting\n");
@@ -481,7 +482,6 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 		// update hyper parameter
 		if (estimateHyperParameter)
 		{
-
 			model.updateGibbsSampledHyperParameters(genome);
 			model.proposeHyperParameters();
 			acceptRejectHyperParameter(genome, model, iteration);
@@ -507,7 +507,6 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 			}
 			if ((iteration % adaptiveWidth) == 0u)
 				model.adaptSynthesisRateProposalWidth(adaptiveWidth, iteration <= stepsToAdapt);
-
   		}
 
 
