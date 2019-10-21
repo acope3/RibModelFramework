@@ -57,6 +57,9 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
     double logLikelihood = 0.0;
     double logLikelihood_proposed = 0.0;
 
+    double sigma = 1.0;
+    double U = getPartitionFunction(0, false);
+
     unsigned alphaCategory = parameter->getMutationCategory(k);
     unsigned lambdaPrimeCategory = parameter->getSelectionCategory(k);
     unsigned synthesisRateCategory = parameter->getSynthesisRateCategory(k);
@@ -99,12 +102,14 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
         //Should be rfp value at position not all of codon
         unsigned currRFPObserved = rfpCounts[index];
         unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(codon);
+
+        sigma *= elongationProbability(currAlpha, currLambdaPrime/U, 1/currNSERate);
         //This line will never execute
         if (currNumCodonsInMRNA == 0) continue;
 
         //Have to redo the math because rfp observed has changed
-        logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, phiValue, 1/currNSERate);
-        logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, phiValue_proposed, 1/currNSERate);
+        logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, phiValue, sigma);
+        logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPObserved, phiValue_proposed, sigma);
     }
 
     //Double check math here
@@ -136,12 +141,12 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
     double propAdjustmentTerm = 0;
     Gene *gene;
     unsigned index = SequenceSummary::codonToIndex(grouping);
-    double U = 1;//getPartitionFunction(0, false)/genome.getSumRFP();
+    double U = getPartitionFunction(0, false);
     double propCodonSigma = 0.0;
     double propSigma, currSigma;
     std::vector<double> codonSigmas;
 
-    codonSigmas.resize(getGroupListSize(), 0.0);
+    codonSigmas.resize(getGroupListSize(), 1.0);
 
 #ifdef _OPENMP
     //#ifndef __APPLE__
@@ -178,34 +183,32 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
             propLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PANSEParameter::lmPri, codon, true);
             propNSERate = getParameterForCategory(alphaCategory, PANSEParameter::nse, codon, true);
 
-            if(codonSigmas[codonIndex] == 0.0)
+            if(codonSigmas[codonIndex] == 1.0)
             {
-                codonSigmas[codonIndex] = elongationProbabilityLog(1 - currAlpha, currLambdaPrime, 1/currNSERate);
+                codonSigmas[codonIndex] = elongationProbability(currAlpha, currLambdaPrime/U, 1/currNSERate);
             }
 
-            currSigma += codonSigmas[codonIndex];
-
-
+            currSigma *= codonSigmas[codonIndex];
 
             if(codon == grouping){
-                if (propCodonSigma == 0.0) propCodonSigma = elongationProbabilityLog(propAlpha, propLambdaPrime, 1/propNSERate);
+                if (propCodonSigma == 0.0) propCodonSigma = elongationProbability(propAlpha, propLambdaPrime/U, 1/propNSERate);
 
-                propSigma += propCodonSigma;
-                //if (grouping == "ACA") my_print("The prop sigma is %\n", propSigma);
+                propSigma *= propCodonSigma;
                 logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambdaPrime, positionalRFPCount,
-                                   phiValue, std::exp(propSigma));
+                                   phiValue, propSigma);
                 logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, positionalRFPCount,
-                                   phiValue, std::exp(currSigma));
+                                   phiValue, currSigma);
             }
 
             else{
-                propSigma += codonSigmas[positions[positionIndex]];
+                propSigma *= codonSigmas[positions[positionIndex]];
                 continue;
             }
 
         }
 
     }
+    //if (grouping == "AGA") my_print("The proposed sigma: %\n The Current Sigma: %\n", propSigma, currSigma);
     currAdjustmentTerm += std::log(currAlpha) + std::log(currLambdaPrime) + std::log(currNSERate);
     propAdjustmentTerm += std::log(propAlpha) + std::log(propLambdaPrime) + std::log(propNSERate);
     logAcceptanceRatioForAllMixtures[0] = logLikelihood_proposed - logLikelihood - (currAdjustmentTerm - propAdjustmentTerm);
@@ -293,8 +296,8 @@ void PANSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 
             if(currCodonSigmas[codonIndex] == 0.0)
             {
-                currCodonSigmas[codonIndex] = elongationProbability(1 - currAlpha, currU * currLambdaPrime, 1/currNSERate);
-                propCodonSigmas[codonIndex] = elongationProbability(1 - currAlpha, propU * currLambdaPrime, 1/currNSERate);
+                currCodonSigmas[codonIndex] = elongationProbability(currAlpha, currLambdaPrime/currU, 1/currNSERate);
+                propCodonSigmas[codonIndex] = elongationProbability(currAlpha, currLambdaPrime/currU, 1/currNSERate);
             }
 
             currSigma *= currCodonSigmas[codonIndex];
@@ -827,7 +830,7 @@ double PANSEModel::GeneralizedIntegralLog(double p, double z){
 
 //Calculation of the probability of elongation at current codon
 double PANSEModel::elongationProbability(double currAlpha, double currLambda, double currNSE){
-    return std::pow(currLambda * currNSE, currAlpha) * std::exp(currLambda * currNSE) * UpperIncompleteGamma(currAlpha, currLambda * currNSE);
+    return std::pow(currLambda * currNSE, currAlpha) * std::exp(currLambda * currNSE) * UpperIncompleteGamma(1 - currAlpha, currLambda * currNSE);
 }
 
 //Log probability of elongation at current codon

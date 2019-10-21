@@ -110,8 +110,8 @@ void PANSEParameter::initPANSEParameterSet()
 	proposedCodonSpecificParameter[lmPri].resize(lambdaPrimeCategories);
 	currentCodonSpecificParameter[nse].resize(nonsenseErrorCategories);
 	proposedCodonSpecificParameter[nse].resize(nonsenseErrorCategories);
-	partitionFunction_proposed.resize(partitionFunctionCategories, 1);
-	partitionFunction.resize(partitionFunctionCategories, 1);
+	partitionFunction_proposed.resize(partitionFunctionCategories, 1.0);
+	partitionFunction.resize(partitionFunctionCategories, 1.0);
 
 	numParam = 61;
 
