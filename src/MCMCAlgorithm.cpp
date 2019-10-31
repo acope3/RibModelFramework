@@ -333,10 +333,11 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 		// calculate likelihood ratio for every Category for current AA
 		model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures);
 		//logPosterior += model.calculateAllPriors();
-    double threshold = -Parameter::randExp(1);
-
+    	double threshold = -Parameter::randExp(1);
+    	//my_print("%\n",acceptanceRatioForAllMixtures[4]);
 		if (threshold < acceptanceRatioForAllMixtures[0] && std::isfinite(acceptanceRatioForAllMixtures[0]))
-		{
+		{	
+			//my_print("Updating CSP for %\n",grouping);
 			// moves proposed codon specific parameters to current codon specific parameters
 			model.updateCodonSpecificParameter(grouping);
 			if ((iteration % thinning) == 0)
@@ -1075,7 +1076,6 @@ void MCMCAlgorithm::setLogLikelihoodTrace(std::vector<double> _likelihoodTrace)
 //---------------------------------//
 //---------- RCPP Module ----------//
 //---------------------------------//
-
 
 RCPP_EXPOSED_CLASS(Genome)
 RCPP_EXPOSED_CLASS(ROCParameter)

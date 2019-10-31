@@ -159,6 +159,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 	//int numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
 	double likelihood = 0.0;
 	double likelihood_proposed = 0.0;
+	double posterior_proposed,posterior;
 
 	double mutation[5];
 	double selection[5];
@@ -199,13 +200,32 @@ void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 		parameter->getParameterForCategory(mutationCategory, FONSEParameter::dM, grouping, true, mutation_proposed);
 		parameter->getParameterForCategory(selectionCategory, FONSEParameter::dOmega, grouping, true, selection_proposed);
 
+		
+
 		likelihood += calculateLogLikelihoodRatioPerAA(*gene, grouping, mutation, selection, phiValue);
 		likelihood_proposed += calculateLogLikelihoodRatioPerAA(*gene, grouping, mutation_proposed, selection_proposed, phiValue);
 	}
+
+	//if (!dm_fixed)
+	//{
+	posterior_proposed = likelihood_proposed + calculateMutationPrior(grouping, true);
+	posterior = likelihood + calculateMutationPrior(grouping, false);
+	//}
+	// else
+ //  {
+	// 	posterior_proposed = likelihood_proposed;
+	// 	posterior = likelihood;
+	// }
 	//likelihood_proposed = likelihood_proposed + calculateMutationPrior(grouping, true);
 	//likelihood = likelihood + calculateMutationPrior(grouping, false);
 
-	logAcceptanceRatioForAllMixtures[0] = (likelihood_proposed - likelihood);
+
+
+	logAcceptanceRatioForAllMixtures[0] = (posterior_proposed - posterior);
+	logAcceptanceRatioForAllMixtures[1] = likelihood;
+	logAcceptanceRatioForAllMixtures[2] = likelihood_proposed;
+	logAcceptanceRatioForAllMixtures[3] = posterior;
+	logAcceptanceRatioForAllMixtures[4] = posterior_proposed;
 }
 
 

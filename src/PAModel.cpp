@@ -572,21 +572,21 @@ void PAModel::printHyperParameters()
     //printCodonSpecificParameters(); //TODO put this in MCMC instead
 }
 
-//TODO: Assumed single mixture correct this and label values
-void PAModel::printCodonSpecificParameters()
-{
-    std::vector<std::vector<double>> alphas = parameter->getCurrentAlphaParameter();
-    std::vector<std::vector<double>> lambdaPrimes = parameter->getCurrentLambdaPrimeParameter();
-
-	for (unsigned i = 0u; i < alphas.size(); i++)
-	{
-        for (unsigned j = 0u; j < alphas[i].size(); j++)
-        {
-    		my_print("Alpha estimate for selection category %: %\n", i, alphas[i][j]);
-	    	my_print("Lambda Prime  estimate for selection category %: %\n", i, lambdaPrimes[i][j]);
-        }
-	}
-}
+////TODO: Assumed single mixture correct this and label values
+//void PAModel::printCodonSpecificParameters()
+//{
+//    std::vector<std::vector<double>> alphas = parameter-> getCurrentAlphaParameter();
+//    std::vector<std::vector<double>> lambdaPrimes = parameter-> getCurrentLambdaPrimeParameter();
+//
+//	for (unsigned i = 0u; i < alphas.size(); i++)
+//	{
+//        for (unsigned j = 0u; j < alphas[i].size(); j++)
+//        {
+//    		my_print("Alpha estimate for selection category %: %\n", i, alphas[i][j]);
+//	    	my_print("Lambda Prime  estimate for selection category %: %\n", i, lambdaPrimes[i][j]);
+//        }
+//	}
+//}
 
 /* getParameter (RCPP EXPOSED)
  * Arguments: None

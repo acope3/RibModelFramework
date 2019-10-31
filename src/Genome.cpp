@@ -500,7 +500,7 @@ void Genome::writeRFPData(std::string filename, bool simulated)
 
 			for (unsigned geneIndex = 0u; geneIndex < numGenes; geneIndex++)
 			{
-                unsigned position = 1u;
+                //unsigned position = 1u;
 				Gene *currentGene = &simulatedGenes[geneIndex];
                 SequenceSummary *sequenceSummary = currentGene->getSequenceSummary();
                 std::vector <unsigned> positions = sequenceSummary->getPositionCodonID();

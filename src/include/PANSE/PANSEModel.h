@@ -13,6 +13,8 @@ class PANSEModel: public Model
 	private:
 		PANSEParameter *parameter;
 		unsigned RFPCountColumn;
+		double currSigmaCalculationSummationFor1, currSigmaCalculationSummationFor2;
+		double propSigmaCalculationSummationFor1, propSigmaCalculationSummationFor2;
 		double calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
 				unsigned currRFPObserved, double phiValue, double prevSigma);
 
@@ -123,15 +125,19 @@ class PANSEModel: public Model
 		double UpperIncompleteGammaLog(double s, double x);
         double GeneralizedIntegral(double p, double z);
 
-
         double GeneralizedIntegralLog(double p, double z);
         double elongationProbability(double currAlpha, double currLambda, double currNSE);
         double elongationProbabilityLog(double currAlpha, double currLambda, double currNSE);
-        double elongationUnitilIndexProbability(int index, std::vector <double> lambdas, std::vector <double> NSERates);
+        double elongationUntilIndexProbability(int index, std::vector <double> lambdas, std::vector <double> NSERates);
         
-        double elongationUnitilIndexProbabilityLog(int index, std::vector <double> lambdas, std::vector <double> NSERates);
+        double elongationUntilIndexProbabilityLog(int index, std::vector <double> lambdas, std::vector <double> NSERates);
         double prob_Y_g(double curralpha, int sample_size, double lambda_prime, double psi, double prevdelta);
         double prob_Y_g_log(double curralpha, int sample_size, double lambda_prime, double psi, double prevdelta);
+
+        double elongationUntilIndexApproximation1Probability(double alpha, double lambda, double v, double current);
+        double elongationUntilIndexApproximation2Probability(double alpha, double lambda, double v, bool proposed);
+        double elongationUntilIndexApproximation1ProbabilityLog(double alpha, double lambda, double v, bool proposed);
+        double elongationUntilIndexApproximation2ProbabilityLog(double alpha, double lambda, double v, double current);
 
         //Psi-Phi Conversion Functions
         double psi2phi(double psi, double sigma);
