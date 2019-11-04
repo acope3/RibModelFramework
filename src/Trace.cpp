@@ -54,6 +54,7 @@ void Trace::initializeSharedTraces(unsigned samples, unsigned num_genes, unsigne
 	initSynthesisRateAcceptanceRateTrace(num_genes, numSelectionCategories);
 	codonSpecificAcceptanceRateTrace.resize(maxGrouping);
 	initSynthesisRateTrace(samples, num_genes, numSelectionCategories,init_phi,estimateSynthesisRate);
+	
 	initMixtureAssignmentTrace(samples, num_genes,init_mix_assign);
 	initMixtureProbabilitiesTrace(samples, numMixtures);
 
@@ -233,6 +234,7 @@ void Trace::initializeROCTrace(unsigned samples, unsigned num_genes, unsigned nu
 	std::vector<unsigned> init_mix_assign,bool estimateSynthesisRate)
 {
 	initializeSharedTraces(samples, num_genes, numSelectionCategories, numMixtures, _categories, maxGrouping,init_phi,init_mix_assign,estimateSynthesisRate);
+
 
 	// See Note 1) above.
 	initCodonSpecificParameterTrace(samples, numMutationCategories, numParam, 0u); // dM
@@ -566,6 +568,7 @@ void Trace::updateCodonSpecificParameterTraceForAA(unsigned sample, std::string 
 	{
 		for (unsigned i = aaStart; i < aaEnd; i++)
 		{
+			//my_print("% % % %\n",category,i,aa,curParam[category][i]);
 			codonSpecificParameterTrace[paramType][category][i][sample] = curParam[category][i];
 		}
 	}
@@ -625,9 +628,9 @@ void Trace::updateCodonSpecificParameterTraceForCodon(unsigned sample, std::stri
 	unsigned i = SequenceSummary::codonToIndex(codon);
 	for (unsigned category = 0; category < codonSpecificParameterTrace[paramType].size(); category++)
 	{
-        if(std::isnan(curParam[category][i])){
-            my_printError("\n Trace::updateCodonSpecificParameterTraceForCodon: Current parameter set contains NaN. \n");
-        }
+//        if(std::isnan(curParam[category][i])){
+//            my_printError("\n Trace::updateCodonSpecificParameterTraceForCodon: Current parameter set contains NaN. \n");
+//        }
 		codonSpecificParameterTrace[paramType][category][i][sample] = curParam[category][i];
 	}
 }
@@ -876,3 +879,11 @@ bool Trace::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound)
 }
 
 #endif
+
+
+//Function implemented to resize codonSpecificParameterTrace for reloading parameter object.
+//TO DO: Think of more elegant solution. 
+void Trace::resizeNumberCodonSpecificParameterTrace(unsigned _numCodonSpecificParamTypes)
+{
+	codonSpecificParameterTrace.resize(_numCodonSpecificParamTypes);
+}

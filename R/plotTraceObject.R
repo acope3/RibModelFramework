@@ -17,7 +17,7 @@
 #' 
 #' @description Plots different traces, specified with the \code{what} parameter.
 #'
-plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbability" ,"Sphi", "Mphi", "Aphi", "Sepsilon", "ExpectedPhi", "Expression"), 
+plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbability" ,"Sphi", "Mphi", "Aphi", "Sepsilon", "ExpectedPhi", "Expression","NSERate"), 
                                    geneIndex=1, mixture = 1, ...)
 {
   if(what[1] == "Mutation")

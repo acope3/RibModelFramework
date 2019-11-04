@@ -101,6 +101,7 @@ void PANSEParameter::initPANSEParameterSet()
 	unsigned nonsenseErrorCategories = getNumMutationCategories();
 	unsigned partitionFunctionCategories = numMixtures;
 
+	numAcceptForPartitionFunction = 0u;
 	currentCodonSpecificParameter.resize(3);
 	proposedCodonSpecificParameter.resize(3);
 
@@ -130,13 +131,13 @@ void PANSEParameter::initPANSEParameterSet()
 
     for (unsigned i = 0; i < nonsenseErrorCategories; i++)
     {
-        std::vector <double> tmp(numParam,1.0);
+        std::vector <double> tmp(numParam,0.000005);
         currentCodonSpecificParameter[nse][i] = tmp;
         proposedCodonSpecificParameter[nse][i] = tmp;
     }
 
 	bias_csp = 0;
-	std_csp.resize(numParam, 0.1);
+	std_csp.resize(numParam,0.1);
 	std_partitionFunction = 0.1;
 
 	groupList = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
@@ -585,6 +586,7 @@ void PANSEParameter::proposeCodonSpecificParameter()
         for (unsigned j = 0; j < numNSE; j++)
         {
             proposedCodonSpecificParameter[nse][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[nse][i][j]) , std_csp[j]) );
+            //proposedCodonSpecificParameter[nse][i][j] = currentCodonSpecificParameter[nse][i][j];
         }
     }
 }
@@ -612,6 +614,7 @@ void PANSEParameter::updateCodonSpecificParameter(std::string grouping)
     {
         currentCodonSpecificParameter[nse][k][i] = proposedCodonSpecificParameter[nse][k][i];
     }
+ 
 }
 
 
@@ -633,7 +636,6 @@ void PANSEParameter::proposePartitionFunction()
 {
     for (unsigned i = 0u; i < numMixtures; i++){
         partitionFunction_proposed[i] = std::exp( randNorm( std::log(partitionFunction[i]) , std_partitionFunction) );
-        my_print("Proposed partition = %\n",  partitionFunction_proposed[i]);
     }
 
 }
@@ -662,6 +664,7 @@ void PANSEParameter::updatePartitionFunction()
     for (unsigned i = 0u; i < numMixtures; i++){
         partitionFunction[i] = partitionFunction_proposed[i];
     }
+    numAcceptForPartitionFunction++;
 }
 
 // ----------------------------------------------//
@@ -677,12 +680,13 @@ void PANSEParameter::updatePartitionFunction()
  */
 void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastIteration, bool adapt)
 {
+	my_print("Acceptance rate for Codon Specific Parameter\n");
+	my_print("\tAA\tAcc.Rat\n"); //Prop.Width\n";
 	for (unsigned i = 0; i < groupList.size(); i++)
 	{
-
-
 		unsigned codonIndex = SequenceSummary::codonToIndex(groupList[i]);
 		double acceptanceLevel = (double)numAcceptForCodonSpecificParameters[codonIndex] / (double)adaptationWidth;
+		my_print("\t%:\t%\n", groupList[i].c_str(), acceptanceLevel);
 		traces.updateCodonSpecificAcceptanceRateTrace(codonIndex, acceptanceLevel);
 		if (adapt)
 		{
@@ -693,6 +697,7 @@ void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptatio
 		}
 		numAcceptForCodonSpecificParameters[codonIndex] = 0u;
 	}
+	my_print("\n");
 }
 
 

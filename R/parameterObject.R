@@ -1459,7 +1459,7 @@ writeParameterObject.Rcpp_PANSEParameter <- function(parameter, file){
   NSERateTrace <- trace$getCodonSpecificParameterTrace(2)
   
   save(list = c("paramBase", "currentAlpha", "currentLambdaPrime", "currentNSERate", "proposedAlpha",
-                "proposedLambdaPrime", "proposedNSERate", "model", "alphaTrace", "lambdaPrimeTrace"),
+                "proposedLambdaPrime", "proposedNSERate", "model", "alphaTrace", "lambdaPrimeTrace","NSERateTrace"),
        file=file)
 }
 
@@ -1837,13 +1837,20 @@ loadPANSEParameterObject <- function(parameter, files)
           lambdaPrimeTrace[[j]][[k]] <- tempEnv$lambdaPrimeTrace[[j]][[k]][1:max]
         }
       }
+      NSERateTrace <- vector("list", length=numMutationCategories)
+      for (j in 1:numMutationCategories) {
+        for (k in 1:length(tempEnv$NSERateTrace[[j]])){
+          NSERateTrace[[j]][[k]] <- tempEnv$NSERateTrace[[j]][[k]][1:max]
+        }
+      }
     }else{
       
       curAlphaTrace <- tempEnv$alphaTrace
       curLambdaPrimeTrace <- tempEnv$lambdaPrimeTrace
-      
+      curNSERateTrace <- tempEnv$NSERateTrace
       combineThreeDimensionalTrace(alphaTrace, curAlphaTrace, max)
       combineThreeDimensionalTrace(lambdaPrimeTrace, curLambdaPrimeTrace, max)
+      combineThreeDimensionalTrace(NSERateTrace, curNSERateTrace, max)
     }
   }#end of for loop (files)
   
@@ -1852,9 +1859,13 @@ loadPANSEParameterObject <- function(parameter, files)
   parameter$proposedAlphaParameter <- tempEnv$proposedAlpha
   parameter$currentLambdaPrimeParameter <- tempEnv$currentLambdaPrime
   parameter$proposedLambdaPrimeParameter <- tempEnv$proposedLambdaPrime
+  parameter$proposedNSERateParameter <- tempEnv$proposedNSERate
+  parameter$currentNSERateParameter <- tempEnv$currentNSERate
   trace <- parameter$getTraceObject()
+  trace$resizeNumberCodonSpecificParameterTrace(3)
   trace$setCodonSpecificParameterTrace(alphaTrace, 0)
   trace$setCodonSpecificParameterTrace(lambdaPrimeTrace, 1)
+  trace$setCodonSpecificParameterTrace(NSERateTrace,2)
   
   parameter$setTraceObject(trace)
   return(parameter) 

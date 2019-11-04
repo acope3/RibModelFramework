@@ -125,29 +125,31 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 	double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(selectionCategory, false);
 	double logPhiProbability = Parameter::densityLogNorm(phiValue, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
 	double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
-	double currentLogLikelihood = (likelihood + logPhiProbability);
-	double proposedLogLikelihood = (likelihood_proposed + logPhiProbability_proposed);
+	double currentLogPosterior = (likelihood + logPhiProbability);
+	double proposedLogPosterior = (likelihood_proposed + logPhiProbability_proposed);
 	if (phiValue == 0) {
 		my_print("phiValue is 0\n");
 	}
 	if (phiValue_proposed == 0) {
 		my_print("phiValue_prop is 0\n");
 	}
-	logProbabilityRatio[0] = (proposedLogLikelihood - currentLogLikelihood) - (std::log(phiValue) - std::log(phiValue_proposed));
-	logProbabilityRatio[1] = currentLogLikelihood - std::log(phiValue_proposed);
-	if (std::isinf(logProbabilityRatio[1])) {
-		my_print("logProb1 inf\n");
-	}
-	logProbabilityRatio[2] = proposedLogLikelihood - std::log(phiValue);
-	if (std::isinf(logProbabilityRatio[2])) {
-		my_print("logProb2 inf\n");
-	}
+	logProbabilityRatio[0] = (proposedLogPosterior - currentLogPosterior) - (std::log(phiValue) - std::log(phiValue_proposed));
+	logProbabilityRatio[1] = currentLogPosterior - std::log(phiValue_proposed);
+	// if (std::isinf(logProbabilityRatio[1])) {
+	// 	my_print("logProb1 inf\n");
+	// }
+	logProbabilityRatio[2] = proposedLogPosterior - std::log(phiValue);
+	// if (std::isinf(logProbabilityRatio[2])) {
+	// 	my_print("logProb2 inf\n");
+	// }
 
 	//------------NOTE: Jeremy, Cedric changed the reverse jump to where we DON'T include it. I had my PA
 	//LogLikelihood go to 0 because of now missing terms. I have added the code underneath to where we calculate it---/
 
-	logProbabilityRatio[3] = currentLogLikelihood;
-	logProbabilityRatio[4] = proposedLogLikelihood;
+	logProbabilityRatio[3] = currentLogPosterior;
+	logProbabilityRatio[4] = proposedLogPosterior;
+	logProbabilityRatio[5] = likelihood;
+	logProbabilityRatio[6] = likelihood_proposed;
 }
 
 
@@ -157,6 +159,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 	//int numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
 	double likelihood = 0.0;
 	double likelihood_proposed = 0.0;
+	double posterior_proposed,posterior;
 
 	double mutation[5];
 	double selection[5];
@@ -197,13 +200,32 @@ void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 		parameter->getParameterForCategory(mutationCategory, FONSEParameter::dM, grouping, true, mutation_proposed);
 		parameter->getParameterForCategory(selectionCategory, FONSEParameter::dOmega, grouping, true, selection_proposed);
 
+		
+
 		likelihood += calculateLogLikelihoodRatioPerAA(*gene, grouping, mutation, selection, phiValue);
 		likelihood_proposed += calculateLogLikelihoodRatioPerAA(*gene, grouping, mutation_proposed, selection_proposed, phiValue);
 	}
+
+	//if (!dm_fixed)
+	//{
+	posterior_proposed = likelihood_proposed + calculateMutationPrior(grouping, true);
+	posterior = likelihood + calculateMutationPrior(grouping, false);
+	//}
+	// else
+ //  {
+	// 	posterior_proposed = likelihood_proposed;
+	// 	posterior = likelihood;
+	// }
 	//likelihood_proposed = likelihood_proposed + calculateMutationPrior(grouping, true);
 	//likelihood = likelihood + calculateMutationPrior(grouping, false);
 
-	logAcceptanceRatioForAllMixtures[0] = (likelihood_proposed - likelihood);
+
+
+	logAcceptanceRatioForAllMixtures[0] = (posterior_proposed - posterior);
+	logAcceptanceRatioForAllMixtures[1] = likelihood;
+	logAcceptanceRatioForAllMixtures[2] = likelihood_proposed;
+	logAcceptanceRatioForAllMixtures[3] = posterior;
+	logAcceptanceRatioForAllMixtures[4] = posterior_proposed;
 }
 
 

@@ -105,7 +105,7 @@ class PAModel: public Model
 
 		virtual void simulateGenome(Genome &genome); // Depends on RFPCountColumn
 		virtual void printHyperParameters();
-		virtual void printCodonSpecificParameters();
+		//virtual void printCodonSpecificParameters();
 		PAParameter* getParameter();
 		void setParameter(PAParameter &_parameter);
 		virtual double calculateAllPriors();

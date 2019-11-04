@@ -164,6 +164,9 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				// log posterior with and without rev. jump probability
 				unscaledLogProb_curr[k] += logProbabilityRatio[1]; // with rev. jump prob.
 				unscaledLogProb_prop[k] += logProbabilityRatio[2]; // with rev. jump prob.
+
+				// TODO: unscaledLogPost_curr and unscaledLogPost_prop have been made redundant by modification to code adding unscaledLogProb_curr_singleMixture
+				// unscaledLogProb_prop_singleMixture. Remove.
 				unscaledLogPost_curr[k] += logProbabilityRatio[3]; // without rev. jump prob.
 				unscaledLogPost_prop[k] += logProbabilityRatio[4]; // without rev. jump prob.
 				unscaledLogLike_curr[k] += logProbabilityRatio[5]; //current logLikelihood
@@ -206,7 +209,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
                 my_print("exp(curr logLik - maxVal): %\n", std::exp(unscaledLogProb_curr_singleMixture[k]));
                 my_print("Max Val. %\n", maxValue);
                 my_print("\n\n\n");
-		break;
+				break;
             }
             unscaledLogProb_curr_singleMixture[k] += maxValue;
 		}
@@ -239,7 +242,6 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			}
 			else
 			{
-
 				for (unsigned n = 0u; n < mixtureElements.size(); n++)
 				{
 					unsigned element = mixtureElements[n];
@@ -331,10 +333,11 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 		// calculate likelihood ratio for every Category for current AA
 		model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures);
 		//logPosterior += model.calculateAllPriors();
-    double threshold = -Parameter::randExp(1);
-
+    	double threshold = -Parameter::randExp(1);
+    	//my_print("%\n",acceptanceRatioForAllMixtures[4]);
 		if (threshold < acceptanceRatioForAllMixtures[0] && std::isfinite(acceptanceRatioForAllMixtures[0]))
-		{
+		{	
+			//my_print("Updating CSP for %\n",grouping);
 			// moves proposed codon specific parameters to current codon specific parameters
 			model.updateCodonSpecificParameter(grouping);
 			if ((iteration % thinning) == 0)
@@ -458,8 +461,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
             #ifndef STANDALONE
             Rcpp::checkUserInterrupt();
             #endif
-
-	    my_print("Status at thinned sample (iteration): % (%)\n",  (iteration / thinning), iteration);
+	   		my_print("Status at thinned sample (iteration): % (%)\n",  (iteration / thinning), iteration);
 			my_print("\t current logPosterior: % \n", posteriorTrace[(iteration/thinning) - 1] );
 			if (iteration > stepsToAdapt)
 				my_print("No longer adapting\n");
@@ -481,7 +483,6 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 		// update hyper parameter
 		if (estimateHyperParameter)
 		{
-
 			model.updateGibbsSampledHyperParameters(genome);
 			model.proposeHyperParameters();
 			acceptRejectHyperParameter(genome, model, iteration);
@@ -507,7 +508,6 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 			}
 			if ((iteration % adaptiveWidth) == 0u)
 				model.adaptSynthesisRateProposalWidth(adaptiveWidth, iteration <= stepsToAdapt);
-
   		}
 
 
@@ -1076,7 +1076,6 @@ void MCMCAlgorithm::setLogLikelihoodTrace(std::vector<double> _likelihoodTrace)
 //---------------------------------//
 //---------- RCPP Module ----------//
 //---------------------------------//
-
 
 RCPP_EXPOSED_CLASS(Genome)
 RCPP_EXPOSED_CLASS(ROCParameter)

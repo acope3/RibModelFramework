@@ -143,6 +143,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 	double currentLogPosterior = (logLikelihood + logPhiProbability);
 	double proposedLogPosterior = (logLikelihood_proposed + logPhiProbability_proposed);
 
+	//TODO: Can't see where logProbabilityRatio[0], which is acceptance ratio with reverse jump, is used. Consider deleting. 
 	logProbabilityRatio[0] = (proposedLogPosterior - currentLogPosterior) - (std::log(phiValue) - std::log(phiValue_proposed));
 	logProbabilityRatio[1] = currentLogPosterior - std::log(phiValue_proposed);
 	logProbabilityRatio[2] = proposedLogPosterior - std::log(phiValue);

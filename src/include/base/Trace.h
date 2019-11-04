@@ -168,6 +168,8 @@ class Trace {
         void updatePartitionFunctionTrace(unsigned index, unsigned sample, double value);
         void updatePartitionFunctionAcceptanceRateTrace(double value);
 
+        void resizeNumberCodonSpecificParameterTrace(unsigned _numCodonSpecificParamTypes);
+
         //R Section:
 #ifndef STANDALONE
         //Getter Functions:

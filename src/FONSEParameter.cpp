@@ -88,6 +88,16 @@ FONSEParameter::~FONSEParameter()
 void FONSEParameter::initFONSEParameterSet()
 {
 	mutation_prior_sd = 0.35;
+	// mutation_prior_mean.resize(numMutationCategories);
+	// mutation_prior_sd.resize(numMutationCategories);
+	// for (int i=0; i < numMutationCategories; i++)
+	// {
+	// 	mutation_prior_mean[i].resize(40);
+	// 	mutation_prior_sd[i].resize(40);
+	// 	std::vector<double> tmp(40, 0.0);
+	// 	mutation_prior_mean[i] = tmp;
+	// 	mutation_prior_sd[i] = tmp;
+	// }
 	groupList = { "A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "P", "Q", "R", "S", "T", "V", "Y", "Z" };
 	// proposal bias and std for codon specific parameter
 	bias_csp = 0;
@@ -103,30 +113,54 @@ void FONSEParameter::initFONSEParameterSet()
 	currentCodonSpecificParameter[dOmega].resize(numSelectionCategories);
 	proposedCodonSpecificParameter[dOmega].resize(numSelectionCategories);
 
-	unsigned biggestCat = std::max(std::max(numMutationCategories, numSelectionCategories), maxGrouping);
-	for(unsigned i = 0u; i < biggestCat; i++)
+	// unsigned biggestCat = std::max(std::max(numMutationCategories, numSelectionCategories), maxGrouping);
+	// for(unsigned i = 0u; i < biggestCat; i++)
+	// {
+	// 	std::vector<double> tmp(numParam, 0.0);
+	// 	if(i < numMutationCategories)
+	// 	{
+	// 		currentCodonSpecificParameter[dM][i] = tmp;
+	// 		proposedCodonSpecificParameter[dM][i] = tmp;
+	// 	}
+	// 	if(i < numSelectionCategories)
+	// 	{
+	// 		proposedCodonSpecificParameter[dOmega][i] = tmp;
+	// 		currentCodonSpecificParameter[dOmega][i] = tmp;
+	// 	}
+	// 	if(i < maxGrouping)
+	// 	{
+	// 		std::string aa = SequenceSummary::AminoAcidArray[i];
+	// 		//TODO: Explain this
+	// 		unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa, true);
+	// 		CovarianceMatrix m((numMutationCategories + numSelectionCategories) * numCodons);
+	// 		m.choleskyDecomposition();
+	// 		covarianceMatrix.push_back(m);
+	// 	}
+	// }
+	for (unsigned i = 0u; i < numMutationCategories; i++)
 	{
 		std::vector<double> tmp(numParam, 0.0);
-		if(i < numMutationCategories)
-		{
-			currentCodonSpecificParameter[dM][i] = tmp;
-			proposedCodonSpecificParameter[dM][i] = tmp;
-		}
-		if(i < numSelectionCategories)
-		{
-			proposedCodonSpecificParameter[dOmega][i] = tmp;
-			currentCodonSpecificParameter[dOmega][i] = tmp;
-		}
-		if(i < maxGrouping)
-		{
-			std::string aa = SequenceSummary::AminoAcidArray[i];
-			//TODO: Explain this
-			unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa, true);
-			CovarianceMatrix m((numMutationCategories + numSelectionCategories) * numCodons);
-			m.choleskyDecomposition();
-			covarianceMatrix.push_back(m);
-		}
+		currentCodonSpecificParameter[dM][i] = tmp;
+		proposedCodonSpecificParameter[dM][i] = tmp;
 	}
+
+	currentCodonSpecificParameter[dEta].resize(numSelectionCategories);
+	proposedCodonSpecificParameter[dEta].resize(numSelectionCategories);
+	for (unsigned i = 0u; i < numSelectionCategories; i++)
+	{
+		std::vector<double> tmp(numParam, 0.0);
+		proposedCodonSpecificParameter[dEta][i] = tmp;
+		currentCodonSpecificParameter[dEta][i] = tmp;
+	}
+
+	  for (unsigned i = 0; i < maxGrouping; i++)
+	  {
+	    std::string aa = SequenceSummary::AminoAcidArray[i];
+	    unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa, true);
+	    CovarianceMatrix m((numMutationCategories + numSelectionCategories) * numCodons);
+	    m.choleskyDecomposition();
+	    covarianceMatrix.push_back(m);
+	  }
 }
 
 
@@ -286,6 +320,36 @@ void FONSEParameter::writeFONSERestartFile(std::string filename)
 		std::ostringstream oss;
 		unsigned j;
 		oss << ">mutation_prior_sd:\n" << mutation_prior_sd << "\n";
+		// oss << ">mutation_prior_mean:\n";
+		// for (unsigned i = 0; i < mutation_prior_mean.size(); i++)
+		// {
+		// 	oss << "***\n";
+		// 	for (j = 0; j < mutation_prior_mean[i].size(); j++)
+		// 	{
+		// 		oss << mutation_prior_mean[i][j];
+		// 		if ((j + 1) % 10 == 0)
+		// 			oss << "\n";
+		// 		else
+		// 			oss << " ";
+		// 	}
+		// 	if (j % 10 != 0)
+		// 		oss << "\n";
+		// }
+		// oss << ">mutation_prior_sd:\n";
+		// for (unsigned i = 0; i < mutation_prior_sd.size(); i++)
+		// {
+		// 	oss << "***\n";
+		// 	for (j = 0; j < mutation_prior_sd[i].size(); j++)
+		// 	{
+		// 		oss << mutation_prior_sd[i][j];
+		// 		if ((j + 1) % 10 == 0)
+		// 			oss << "\n";
+		// 		else
+		// 			oss << " ";
+		// 	}
+		// 	if (j % 10 != 0)
+		// 		oss << "\n";
+		// }
 		oss << ">std_csp:\n";
 		for (unsigned i = 0; i < std_csp.size(); i++)
 		{
@@ -523,9 +587,9 @@ void FONSEParameter::updateCodonSpecificParameter(std::string grouping)
     {
         for (unsigned i = aaStart; i < aaEnd; i++)
         {
-		    if (i < numMutationCategories)
+		    if (k < numMutationCategories)
       	        currentCodonSpecificParameter[dM][k][i] = proposedCodonSpecificParameter[dM][k][i];
-			if (i < numSelectionCategories)
+			if (k < numSelectionCategories)
 			    currentCodonSpecificParameter[dOmega][k][i] = proposedCodonSpecificParameter[dOmega][k][i];
         }
     }

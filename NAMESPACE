@@ -48,6 +48,7 @@ export(
 "getSelectionCoefficients",
 "geomMean",
 "calculate_marginal_log_likelihood",
+"confidenceInterval.plot",
 
 ## Model object
 "initializeModelObject",

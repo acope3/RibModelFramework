@@ -51,6 +51,8 @@ RCPP_MODULE(Trace_mod)
     .method("setCodonSpecificParameterTrace", &Trace::setCodonSpecificParameterTrace)
 
     //PANSE Specific
+    .method("resizeNumberCodonSpecificParameterTrace", &Trace::resizeNumberCodonSpecificParameterTrace)
+
     ;
 }
 #endif
