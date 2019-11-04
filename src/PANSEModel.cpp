@@ -258,6 +258,12 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 	logAcceptanceRatioForAllMixtures[2] = logLikelihood_proposed - currAdjustmentTerm;
 	logAcceptanceRatioForAllMixtures[3] = logLikelihood;
 	logAcceptanceRatioForAllMixtures[4] = logLikelihood_proposed;
+
+	//If this is the last codon continue with updating all accepted CSPs
+	if (SequenceSummary::codonToIndex(grouping) == (getGroupListSize() - 1))
+	{
+	    parameter->completeUpdateCodonSpecificParameter();
+	}
     //my_print("Log Acceptance Ratio % \n",logAcceptanceRatioForAllMixtures[0]);
 }
 

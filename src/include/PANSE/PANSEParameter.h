@@ -20,6 +20,7 @@ class PANSEParameter: public Parameter {
 	private:
         std::vector <double> partitionFunction_proposed;
         std::vector <double> partitionFunction;
+        std::vector <int> CSPToUpdate;
         double std_partitionFunction;
         unsigned numAcceptForPartitionFunction;
 
@@ -68,7 +69,8 @@ class PANSEParameter: public Parameter {
 		//CSP Functions:
 		double getCurrentCodonSpecificProposalWidth(unsigned index);
 		void proposeCodonSpecificParameter();
-		void updateCodonSpecificParameter(std::string grouping);
+		void updateCodonSpecificParameter(std::string grouping); //Adds to an update queue
+        void completeUpdateCodonSpecificParameter();
 
         //partitionFunction Functions: Mostly tested, see comments.
         double getPartitionFunction(unsigned mixtureCategory, bool proposed); //TODO: test

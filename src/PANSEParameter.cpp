@@ -600,21 +600,35 @@ void PANSEParameter::proposeCodonSpecificParameter()
 void PANSEParameter::updateCodonSpecificParameter(std::string grouping)
 {
 	unsigned i = SequenceSummary::codonToIndex(grouping);
-	numAcceptForCodonSpecificParameters[i]++;
+	CSPToUpdate.push_back(i);
+}
 
-	for (unsigned k = 0u; k < numMutationCategories; k++)
-	{
-		currentCodonSpecificParameter[alp][k][i] = proposedCodonSpecificParameter[alp][k][i];
-	}
-	for (unsigned k = 0u; k < numSelectionCategories; k++)
-	{
-		currentCodonSpecificParameter[lmPri][k][i] = proposedCodonSpecificParameter[lmPri][k][i];
-	}
-    for (unsigned k = 0u; k < numMutationCategories; k++)
+
+/* updateCodonSpecificParameter (NOT EXPOSED)
+ * Arguments: string representation of a grouping (amino acid, codon...)
+ * Updates the count of accepted values for codon specific parameters and updates
+ * the current value to the accepted proposed value for all codon specific parameters.
+*/
+void PANSEParameter::completeUpdateCodonSpecificParameter()
+{
+    for (unsigned i : CSPToUpdate)
     {
-        currentCodonSpecificParameter[nse][k][i] = proposedCodonSpecificParameter[nse][k][i];
+        numAcceptForCodonSpecificParameters[i]++;
+
+        for (unsigned k = 0u; k < numMutationCategories; k++)
+        {
+            currentCodonSpecificParameter[alp][k][i] = proposedCodonSpecificParameter[alp][k][i];
+        }
+        for (unsigned k = 0u; k < numSelectionCategories; k++)
+        {
+            currentCodonSpecificParameter[lmPri][k][i] = proposedCodonSpecificParameter[lmPri][k][i];
+        }
+        for (unsigned k = 0u; k < numMutationCategories; k++)
+        {
+            currentCodonSpecificParameter[nse][k][i] = proposedCodonSpecificParameter[nse][k][i];
+        }
     }
- 
+    CSPToUpdate.clear();
 }
 
 
