@@ -62,6 +62,7 @@ class FONSEParameter : public Parameter
 		double getCurrentCodonSpecificProposalWidth(unsigned aa);
 		void proposeCodonSpecificParameter();
 		void updateCodonSpecificParameter(std::string grouping);
+		void completeUpdateCodonSpecificParameter();
 
 
 		//Prior Functions:

@@ -599,8 +599,8 @@ void PANSEParameter::proposeCodonSpecificParameter()
 */
 void PANSEParameter::updateCodonSpecificParameter(std::string grouping)
 {
-	unsigned i = SequenceSummary::codonToIndex(grouping);
-	CSPToUpdate.push_back(i);
+	//unsigned i = SequenceSummary::codonToIndex(grouping);
+	CSPToUpdate.push_back(grouping);
 }
 
 
@@ -611,8 +611,9 @@ void PANSEParameter::updateCodonSpecificParameter(std::string grouping)
 */
 void PANSEParameter::completeUpdateCodonSpecificParameter()
 {
-    for (unsigned i : CSPToUpdate)
+    for (std::string codon : CSPToUpdate)
     {
+    	unsigned i = SequenceSummary::codonToIndex(codon);
         numAcceptForCodonSpecificParameters[i]++;
 
         for (unsigned k = 0u; k < numMutationCategories; k++)

@@ -328,6 +328,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 
 	for (unsigned i = 0; i < size; i++)
 	{
+		
 		std::string grouping = model.getGrouping(i);
 
 		// calculate likelihood ratio for every Category for current AA
@@ -337,7 +338,6 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
     	//my_print("%\n",acceptanceRatioForAllMixtures[4]);
 		if (threshold < acceptanceRatioForAllMixtures[0] && std::isfinite(acceptanceRatioForAllMixtures[0]))
 		{	
-			//my_print("Updating CSP for %\n",grouping);
 			// moves proposed codon specific parameters to current codon specific parameters
 			model.updateCodonSpecificParameter(grouping);
 			if ((iteration % thinning) == 0)
@@ -355,8 +355,17 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 
 			}
 		}
-		if ((iteration % thinning) == 0)
+		// if ((iteration % thinning) == 0)
+		// {
+		// 	model.updateCodonSpecificParameterTrace(iteration/thinning, grouping);
+		// }
+	}
+	model.completeUpdateCodonSpecificParameter();
+	if ((iteration % thinning) == 0)
+	{
+		for (unsigned i = 0;i < size; i++)
 		{
+			std::string grouping = model.getGrouping(i);
 			model.updateCodonSpecificParameterTrace(iteration/thinning, grouping);
 		}
 	}

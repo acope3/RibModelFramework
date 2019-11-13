@@ -25,6 +25,7 @@ class PANSEModel: public Model
 		virtual ~PANSEModel();
 
 
+
 		//Likelihood Ratio Functions:
 		virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k,
 				double* logProbabilityRatio); // Depends on RFPCountColumn
@@ -97,6 +98,7 @@ class PANSEModel: public Model
 		virtual void proposeCodonSpecificParameter();
 		virtual void proposeHyperParameters();
 		virtual void proposeSynthesisRateLevels();
+		virtual void completeUpdateCodonSpecificParameter();
 
 		virtual unsigned getNumPhiGroupings();
 		virtual unsigned getMixtureAssignment(unsigned index);

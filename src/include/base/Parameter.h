@@ -36,6 +36,7 @@ class Parameter {
 		unsigned adaptiveStepPrev;
 		unsigned adaptiveStepCurr;
 
+		
 
 		std::vector<double> codonSpecificPrior;
 	public:
@@ -62,6 +63,7 @@ class Parameter {
 		Parameter& operator=(const Parameter& rhs);
 		virtual ~Parameter();
 
+		std::vector <std::string> CSPToUpdate;
 
 		//Initialization and Restart Functions: TODO: test
 		void initParameterSet(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures,

@@ -816,35 +816,43 @@ void ROCParameter::setProposeByPrior(bool _propose_by_prior)
 }
 
 
-void ROCParameter::updateCodonSpecificParameter(std::string grouping)
+void ROCParameter::completeUpdateCodonSpecificParameter()
 {
-	unsigned aaStart, aaEnd;
-	SequenceSummary::AAToCodonRange(grouping, aaStart, aaEnd, true);
-	unsigned aaIndex = SequenceSummary::aaToIndex.find(grouping)->second;
-	numAcceptForCodonSpecificParameters[aaIndex]++;
-
-	if (!fix_dM)
+	for (std::string grouping : CSPToUpdate)
 	{
-		for (unsigned k = 0u; k < numMutationCategories; k++)
+		unsigned aaStart, aaEnd;
+		SequenceSummary::AAToCodonRange(grouping, aaStart, aaEnd, true);
+		unsigned aaIndex = SequenceSummary::aaToIndex.find(grouping)->second;
+		numAcceptForCodonSpecificParameters[aaIndex]++;
+		if (!fix_dM)
 		{
-			for (unsigned i = aaStart; i < aaEnd; i++)
+			for (unsigned k = 0u; k < numMutationCategories; k++)
 			{
-				currentCodonSpecificParameter[dM][k][i] = proposedCodonSpecificParameter[dM][k][i];
+				for (unsigned i = aaStart; i < aaEnd; i++)
+				{
+					currentCodonSpecificParameter[dM][k][i] = proposedCodonSpecificParameter[dM][k][i];
+				}
+			}
+		}
+		if (!fix_dEta)
+		{
+			for (unsigned k = 0u; k < numSelectionCategories; k++)
+			{
+				for (unsigned i = aaStart; i < aaEnd; i++)
+				{
+					currentCodonSpecificParameter[dEta][k][i] = proposedCodonSpecificParameter[dEta][k][i];
+				}
 			}
 		}
 	}
-	if (!fix_dEta)
-	{
-		for (unsigned k = 0u; k < numSelectionCategories; k++)
-		{
-			for (unsigned i = aaStart; i < aaEnd; i++)
-			{
-				currentCodonSpecificParameter[dEta][k][i] = proposedCodonSpecificParameter[dEta][k][i];
-			}
-		}
-	}
+	CSPToUpdate.clear();
 }
 
+
+void ROCParameter::updateCodonSpecificParameter(std::string grouping)
+{
+	CSPToUpdate.push_back(grouping);
+}
 
 //-------------------------------------//
 //---------- Prior Functions ----------//

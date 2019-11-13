@@ -509,15 +509,33 @@ void PAParameter::proposeCodonSpecificParameter()
  * Updates the count of accepted values for codon specific parameters and updates
  * the current value to the accepted proposed value for all codon specific parameters.
 */
+void PAParameter::completeUpdateCodonSpecificParameter()
+{
+	for (std::string codon : CSPToUpdate)
+	{
+
+    	unsigned i = SequenceSummary::codonToIndex(codon);
+		numAcceptForCodonSpecificParameters[i]++;
+		for(unsigned j = 0; j < getNumMixtureElements(); j++)
+		{
+		    currentCodonSpecificParameter[alp][j][i] = proposedCodonSpecificParameter[alp][j][i];
+		    currentCodonSpecificParameter[lmPri][j][i] = proposedCodonSpecificParameter[lmPri][j][i];
+		}
+	}
+	CSPToUpdate.clear();
+}
+
+/* updateCodonSpecificParameter (NOT EXPOSED)
+ * Arguments: string representation of a grouping (amino acid, codon...)
+ * Updates the count of accepted values for codon specific parameters and updates
+ * the current value to the accepted proposed value for all codon specific parameters.
+*/
 void PAParameter::updateCodonSpecificParameter(std::string grouping)
 {
-	unsigned i = SequenceSummary::codonToIndex(grouping);
-	numAcceptForCodonSpecificParameters[i]++;
-	for(unsigned j = 0; j < getNumMixtureElements(); j++){
-	    currentCodonSpecificParameter[alp][j][i] = proposedCodonSpecificParameter[alp][j][i];
-	    currentCodonSpecificParameter[lmPri][j][i] = proposedCodonSpecificParameter[lmPri][j][i];
-	}
+	//unsigned i = SequenceSummary::codonToIndex(grouping);
+	CSPToUpdate.push_back(grouping);
 }
+
 
 
 // ----------------------------------------------//

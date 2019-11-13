@@ -223,19 +223,10 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
             logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, positionalRFPCount,
                                    phiValue, std::exp(currSigma));
             currSigma = elongationUntilIndexApproximation2ProbabilityLog(currAlpha, currLambdaPrime,1/currNSERate,currSigma);
-            // propSigma = elongationUntilIndexApproximation2ProbabilityLog(propAlpha, propLambdaPrime,1/propNSERate,propSigma);
-            //my_print("loglik %\n",logLikelihood);
-//            else if (currSigma > 1)
-//            {
-//            	exit(1);
-//            }
         }
        
 
     }
-    //my_print("Current % Proposed %\n",logLikelihood,logLikelihood_proposed);
-    // currAdjustmentTerm += std::log(currAlpha) + std::log(currLambdaPrime) + std::log(currNSERate);
-    // propAdjustmentTerm += std::log(propAlpha) + std::log(propLambdaPrime) + std::log(propNSERate);
     unsigned n = getNumMixtureElements();
     for (unsigned j = 0; j < n; j++)
     {
@@ -250,9 +241,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
         currAdjustmentTerm += std::log(currAlpha) + std::log(currLambdaPrime) + std::log(currNSERate);
         propAdjustmentTerm += std::log(propAlpha) + std::log(propLambdaPrime) + std::log(propNSERate);
     }
-    // my_print("Current % % %\n",currAlpha,currLambdaPrime,currNSERate);
-    // my_print("Proposed % % %\n",propAlpha,propLambdaPrime,propNSERate);
-    // my_print("Current Adjust % Proposed Adjust %\n",currAdjustmentTerm,propAdjustmentTerm);
+  
     logAcceptanceRatioForAllMixtures[0] = logLikelihood_proposed - logLikelihood - (currAdjustmentTerm - propAdjustmentTerm);
 	logAcceptanceRatioForAllMixtures[1] = logLikelihood - propAdjustmentTerm;
 	logAcceptanceRatioForAllMixtures[2] = logLikelihood_proposed - currAdjustmentTerm;
@@ -260,11 +249,11 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 	logAcceptanceRatioForAllMixtures[4] = logLikelihood_proposed;
 
 	//If this is the last codon continue with updating all accepted CSPs
-	if (SequenceSummary::codonToIndex(grouping) == (getGroupListSize() - 1))
-	{
-	    parameter->completeUpdateCodonSpecificParameter();
-	}
-    //my_print("Log Acceptance Ratio % \n",logAcceptanceRatioForAllMixtures[0]);
+    //Alex: This won't work because doesn't add last codon, adds it on next round
+	// if (SequenceSummary::codonToIndex(grouping) == (getGroupListSize() - 1))
+	// {
+	//       parameter->completeUpdateCodonSpecificParameter();
+	// }
 }
 
 
@@ -706,6 +695,12 @@ void PANSEModel::updateCodonSpecificParameter(std::string aa)
 }
 
 
+void PANSEModel::completeUpdateCodonSpecificParameter()
+{
+    parameter->completeUpdateCodonSpecificParameter();
+}
+
+
 void PANSEModel::updateGibbsSampledHyperParameters(Genome &genome)
 {
     //TODO: fill in
@@ -763,7 +758,7 @@ void PANSEModel::simulateGenome(Genome &genome)
 #ifndef STANDALONE
             RNGScope scope;
             NumericVector xx(1);
-            xx = rgamma(1, alpha, lambdaPrime);
+            xx = rgamma(1, alpha, scale=1/lambdaPrime);
             sigma *= (v/(xx[0] + v));
             xx = rpois(1, xx[0] * phi * sigma);
             rfpCount.push_back(xx[0]);

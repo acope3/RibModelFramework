@@ -19,6 +19,7 @@ class Model
         Model& operator=(const Model& rhs);
 
 
+
         //Likelihood Ratio Functions:
         virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k,
 					double* logProbabilityRatio) = 0;
@@ -105,6 +106,7 @@ class Model
 		virtual void setCategoryProbability(unsigned mixture, double value) = 0;
 
 		virtual void updateCodonSpecificParameter(std::string grouping) = 0;
+		virtual void completeUpdateCodonSpecificParameter() = 0;
 		virtual void updateGibbsSampledHyperParameters(Genome &genome) = 0;
 		virtual void updateAllHyperParameter() = 0;
 		virtual void updateHyperParameter(unsigned hp) = 0;

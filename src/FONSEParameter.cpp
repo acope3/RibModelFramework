@@ -574,28 +574,41 @@ void FONSEParameter::proposeCodonSpecificParameter()
 }
 
 
-void FONSEParameter::updateCodonSpecificParameter(std::string grouping)
+void FONSEParameter::completeUpdateCodonSpecificParameter()
 {
-	unsigned aaStart, aaEnd;
-	SequenceSummary::AAToCodonRange(grouping, aaStart, aaEnd, true);
-    unsigned aaIndex = SequenceSummary::aaToIndex.find(grouping)->second;
+    for (std::string grouping : CSPToUpdate)
+	{
+		unsigned aaStart, aaEnd;
+		SequenceSummary::AAToCodonRange(grouping, aaStart, aaEnd, true);
+		unsigned aaIndex = SequenceSummary::aaToIndex.find(grouping)->second;
+		numAcceptForCodonSpecificParameters[aaIndex]++;
+		
+		for (unsigned k = 0u; k < numMutationCategories; k++)
+		{
+			for (unsigned i = aaStart; i < aaEnd; i++)
+			{
+				currentCodonSpecificParameter[dM][k][i] = proposedCodonSpecificParameter[dM][k][i];
+			}
+		}
+		
+		
+		for (unsigned k = 0u; k < numSelectionCategories; k++)
+		{
+			for (unsigned i = aaStart; i < aaEnd; i++)
+			{
+				currentCodonSpecificParameter[dOmega][k][i] = proposedCodonSpecificParameter[dOmega][k][i];
+			}
+		}
+		
+	}
+	CSPToUpdate.clear();
 
-    numAcceptForCodonSpecificParameters[aaIndex]++;
-
-    unsigned biggestCat = std::max(numMutationCategories, numSelectionCategories);
-    for (unsigned k = 0u; k < biggestCat; k++)
-    {
-        for (unsigned i = aaStart; i < aaEnd; i++)
-        {
-		    if (k < numMutationCategories)
-      	        currentCodonSpecificParameter[dM][k][i] = proposedCodonSpecificParameter[dM][k][i];
-			if (k < numSelectionCategories)
-			    currentCodonSpecificParameter[dOmega][k][i] = proposedCodonSpecificParameter[dOmega][k][i];
-        }
-    }
 }
 
-
+void FONSEParameter::updateCodonSpecificParameter(std::string grouping)
+{
+	CSPToUpdate.push_back(grouping);
+}
 
 
 

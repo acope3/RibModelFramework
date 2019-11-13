@@ -575,6 +575,10 @@ void FONSEModel::updateCodonSpecificParameter(std::string grouping)
 	parameter->updateCodonSpecificParameter(grouping);
 }
 
+void FONSEModel::completeUpdateCodonSpecificParameter()
+{
+    parameter->completeUpdateCodonSpecificParameter();
+}
 
 void FONSEModel::updateGibbsSampledHyperParameters(Genome &genome)
 {

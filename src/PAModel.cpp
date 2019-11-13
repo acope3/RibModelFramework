@@ -496,6 +496,11 @@ void PAModel::updateCodonSpecificParameter(std::string aa)
 	parameter->updateCodonSpecificParameter(aa);
 }
 
+void PAModel::completeUpdateCodonSpecificParameter()
+{
+    parameter->completeUpdateCodonSpecificParameter();
+}
+
 void PAModel::updateGibbsSampledHyperParameters(Genome &genome)
 {
 	//TODO: fill in

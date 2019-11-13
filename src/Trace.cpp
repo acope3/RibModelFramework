@@ -92,16 +92,16 @@ void Trace::initSynthesisRateTrace(unsigned samples, unsigned num_genes, unsigne
 		synthesisRateTrace[category].resize(num_genes);
 		for (unsigned i = 0; i < num_genes; i++)
 		{
-			if (estimateSynthesisRate)
-			{
+			// if (estimateSynthesisRate)
+			// {
 				std::vector<float> tempExpr(samples, init_phi[i]);
 				synthesisRateTrace[category][i] = tempExpr;
-			}
-			else
-			{
-				synthesisRateTrace[category][i].resize(1);
-				synthesisRateTrace[category][i][0] = init_phi[i];
-			}
+			// }
+			// else
+			// {
+			// 	synthesisRateTrace[category][i].resize(1);
+			// 	synthesisRateTrace[category][i][0] = init_phi[i];
+			// }
 		}
 	}
 }

@@ -18,6 +18,7 @@ class FONSEModel : public Model
 
 
 
+
 		//Likelihood Ratio Functions:
 		virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k, double* logProbabilityRatio);
 		virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, std::vector<double> &logAcceptanceRatioForAllMixtures);
@@ -99,6 +100,8 @@ class FONSEModel : public Model
 		virtual void setCategoryProbability(unsigned mixture, double value);
 
 		virtual void updateCodonSpecificParameter(std::string grouping);
+		virtual void completeUpdateCodonSpecificParameter();
+
 		virtual void updateGibbsSampledHyperParameters(Genome &genome);
 		virtual void updateAllHyperParameter();
 		virtual void updateHyperParameter(unsigned hp);

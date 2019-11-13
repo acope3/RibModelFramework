@@ -617,6 +617,10 @@ void ROCModel::updateCodonSpecificParameter(std::string grouping)
 	parameter->updateCodonSpecificParameter(grouping);
 }
 
+void ROCModel::completeUpdateCodonSpecificParameter()
+{
+    parameter->completeUpdateCodonSpecificParameter();
+}
 
 void ROCModel::updateGibbsSampledHyperParameters(Genome &genome)
 {

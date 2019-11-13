@@ -23,6 +23,8 @@ class PAModel: public Model
 		virtual ~PAModel();
 
 
+
+
 		//Likelihood Ratio Functions:
 		virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k,
 				double* logProbabilityRatio); // Depends on RFPCountColumn
@@ -98,6 +100,7 @@ class PAModel: public Model
 		virtual void setCategoryProbability(unsigned mixture, double value);
 
 		virtual void updateCodonSpecificParameter(std::string aa);
+		virtual void completeUpdateCodonSpecificParameter();
 		virtual void updateGibbsSampledHyperParameters(Genome &genome);
 		virtual void updateAllHyperParameter();
 		virtual void updateHyperParameter(unsigned hp);

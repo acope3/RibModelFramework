@@ -100,6 +100,7 @@ class ROCParameter : public Parameter
 		void proposeCodonSpecificParameter();
     void setProposeByPrior(bool _propose_by_prior);
 		void updateCodonSpecificParameter(std::string grouping);
+		void completeUpdateCodonSpecificParameter();
 
 
 		//Prior Functions:
