@@ -36,7 +36,7 @@ class ROCParameter : public Parameter
 
 		bool fix_dM=false;
 		bool fix_dEta=false;
-    bool propose_by_prior=false;
+    	bool propose_by_prior=false;
 		std::vector<double> propose(std::vector<double> currentParam, double (*proposal)(double a, double b), double A, std::vector<double> B);
 	public:
 

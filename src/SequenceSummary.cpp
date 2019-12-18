@@ -350,8 +350,10 @@ void SequenceSummary::clear()
 bool SequenceSummary::processSequence(const std::string& sequence)
 {
 	bool check = true;
+	codonPositions.clear();
 	codonPositions.resize(64);
-
+	ncodons.fill(0);
+	naa.fill(0);
 	for (unsigned i = 0u; i < sequence.length(); i += 3)
 	{
 		std::string codon = sequence.substr(i, 3);

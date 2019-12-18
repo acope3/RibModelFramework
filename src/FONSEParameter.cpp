@@ -286,6 +286,7 @@ void FONSEParameter::initFONSEValuesFromFile(std::string filename)
 	//init other values
 	bias_csp = 0;
 	proposedCodonSpecificParameter[dM].resize(numMutationCategories);
+	proposedCodonSpecificParameter[dOmega].resize(numSelectionCategories);
 	//looping through the bigger of the two categories
 	unsigned biggerCat = std::max(numMutationCategories, numSelectionCategories);
 	for (unsigned i = 0; i < biggerCat; i++)

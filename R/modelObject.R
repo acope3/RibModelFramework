@@ -11,7 +11,9 @@
 #'	The initial condition for the observed expression noise can be set in the parameter object. 
 #'  
 #' @param rfp.count.column (PA and PANSE only) A number representing the RFP count column to use.
-#'  
+#'
+#' @param initiation.cost (FONSE only) A positive number representing the initiation cost (a_1 in the model description)
+#'      
 #' @return This function returns the model object created. 
 #'  
 #' @description initializes the model object. 
@@ -45,11 +47,11 @@
 #' # values stored in the genome object.
 #' initializeModelObject(parameter = parameter, model = "ROC", with.phi = FALSE)
 #' 
-initializeModelObject <- function(parameter, model = "ROC", with.phi = FALSE, fix.observation.noise = FALSE, rfp.count.column = 1) {
+initializeModelObject <- function(parameter, model = "ROC", with.phi = FALSE, fix.observation.noise = FALSE, rfp.count.column = 1, initiation.cost=4) {
   if(model == "ROC") {
     c.model <- new(ROCModel, with.phi, fix.observation.noise)
   } else if (model == "FONSE") {
-    c.model = new(FONSEModel)
+    c.model = new(FONSEModel,initiation.cost)
   } else if (model == "PA") {
     c.model <- new(PAModel, rfp.count.column)
   } else if (model == "PANSE") {

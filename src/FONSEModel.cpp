@@ -6,9 +6,10 @@
 //--------------------------------------------------//
 
 
-FONSEModel::FONSEModel() : Model()
+FONSEModel::FONSEModel(double a_1) : Model()
 {
 	parameter = 0;
+	a1 = a_1;
 }
 
 
@@ -735,11 +736,11 @@ void FONSEModel::calculateLogCodonProbabilityVector(unsigned numCodons, unsigned
 		denominator = 0.0;
 		for (unsigned i = 0u; i < (numCodons - 1); i++)
 		{
-			codonProb[i] = -(mutation[i] - mutation[minIndexValue]) - (phi * (4.0 + (4.0 * position)) * (selection[i] - selection[minIndexValue]));
+			codonProb[i] = -(mutation[i] - mutation[minIndexValue]) - (phi * (a1 + (4.0 * position)) * (selection[i] - selection[minIndexValue]));
 			denominator += std::exp(codonProb[i]);
 		}
 		//Alphabetically, the last codon is the reference codon.
-		codonProb[numCodons - 1] = (mutation[minIndexValue]) + (phi * (4.0 + (4.0 * position)) * selection[minIndexValue]);
+		codonProb[numCodons - 1] = (mutation[minIndexValue]) + (phi * (a1 + (4.0 * position)) * selection[minIndexValue]);
 		denominator += std::exp(codonProb[numCodons - 1]);
 	}
 	else
@@ -747,7 +748,7 @@ void FONSEModel::calculateLogCodonProbabilityVector(unsigned numCodons, unsigned
 		denominator = 1.0;
 		for (unsigned i = 0u; i < (numCodons - 1); i++)
 		{
-			codonProb[i] = -(mutation[i]) - (phi * (4.0 + (4.0 * position)) * selection[i]);
+			codonProb[i] = -(mutation[i]) - (phi * (a1 + (4.0 * position)) * selection[i]);
 			denominator += std::exp(codonProb[i]);
 		}
 		//Again, the last codon is the reference codon
@@ -795,11 +796,11 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 		denominator = 0.0;
 		for (unsigned i = 0u; i < (numCodons - 1); i++)
 		{
-			codonProb[i] = std::exp(-(mutation[i] - mutation[minIndexValue]) - (phi * (4.0 + (4.0 * position)) * (selection[i] - selection[minIndexValue])));
+			codonProb[i] = std::exp(-(mutation[i] - mutation[minIndexValue]) - (phi * (a1 + (4.0 * position)) * (selection[i] - selection[minIndexValue])));
 			denominator += codonProb[i];
 		}
 		//Alphabetically, the last codon is the reference codon.
-		codonProb[numCodons - 1] = std::exp((mutation[minIndexValue]) + (phi * (4.0 + (4.0 * position)) * selection[minIndexValue]));
+		codonProb[numCodons - 1] = std::exp((mutation[minIndexValue]) + (phi * (a1 + (4.0 * position)) * selection[minIndexValue]));
 		denominator += codonProb[numCodons - 1];
 	}
 	else
@@ -807,7 +808,7 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 		denominator = 1.0;
 		for (unsigned i = 0u; i < (numCodons - 1); i++)
 		{
-			codonProb[i] = std::exp(-(mutation[i]) - (phi * (4.0 + (4.0 * position)) * selection[i]));
+			codonProb[i] = std::exp(-(mutation[i]) - (phi * (a1 + (4.0 * position)) * selection[i]));
 			denominator += codonProb[i];
 		}
 		//Again, the last codon is the reference codon
@@ -823,6 +824,8 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 		codonProb[i] *= denominator;
 	}
 }
+
+
 
 void FONSEModel::getParameterForCategory(unsigned category, unsigned param, std::string aa, bool proposal, double* returnValue)
 {
@@ -844,16 +847,16 @@ void FONSEModel::getParameterForCategory(unsigned category, unsigned param, std:
 #ifndef STANDALONE
 
 
-/*std::vector<double> FONSEModel::CalculateProbabilitiesForCodons(std::vector<double> mutation, std::vector<double> selection, double phi)
+std::vector<double> FONSEModel::CalculateProbabilitiesForCodons(std::vector<double> mutation, std::vector<double> selection, double phi, unsigned position)
 {
 	unsigned numCodons = mutation.size() + 1;
 	double* _mutation = &mutation[0];
 	double* _selection = &selection[0];
 	double* codonProb = new double[numCodons]();
-	calculateCodonProbabilityVector(numCodons, _mutation, _selection, phi, codonProb);
+	calculateCodonProbabilityVector(numCodons, position, _mutation, _selection, phi, codonProb);
 	std::vector<double> returnVector(codonProb, codonProb + numCodons);
 	return returnVector;
-}*/
+}
 
 
 #endif

@@ -35,6 +35,28 @@ convergence.test.Rcpp_Trace <- function(object, samples = 10, frac1 = 0.1,
     ## Transpose matrix to get in correct format for coda::mcmc. Transposing results in same output from coda::geweke.test as performing the test separately on each codon specific parameter
     current.trace <- t(current.trace)
   }
+  
+  if(what[1] == "Alpha" || what[1] == "LambdaPrime" || what[1] == "NSERate")
+  {
+    codon.list <- codons()
+    codon.list <- codon.list[1:(length(codons.list)-3)]
+    cur.trace <- vector("list",length(codon.list))
+    for (i in 1:length(codon.list))
+    {
+      if (what[1]=="Alpha")
+      {
+        cur.trace[[i]]<- object$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codon.list[i], 0, F)
+      } else if (what[1]=="LambdaPrime"){
+        cur.trace[[i]]<- object$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codon.list[i], 1, F)
+      } else if (what[1]=="NSERate"){
+        cur.trace[[i]]<- object$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codon.list[i], 2, F)
+      }
+    }
+    current.trace <- do.call("rbind", cur.trace)
+    ## Transpose matrix to get in correct format for coda::mcmc. Transposing results in same output from coda::geweke.test as performing the test separately on each codon specific parameter
+    current.trace <- t(current.trace)
+  }
+  
   if(what[1] == "MixtureProbability")
   {
     numMixtures <- object$getNumberOfMixtures()

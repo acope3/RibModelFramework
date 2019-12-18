@@ -215,7 +215,9 @@ RCPP_MODULE(Parameter_mod)
 		.method("initLambdaPrime", &PANSEParameter::initLambdaPrimeR)
 		.method("initNSERate", &PANSEParameter::initNSERateR)
 		.method("initMutationSelectionCategories", &PANSEParameter::initMutationSelectionCategoriesR)
-
+		.method("fixAlpha",&PANSEParameter::fixAlpha)
+		.method("fixLambdaPrime",&PANSEParameter::fixLambdaPrime)
+		.method("fixNSERate",&PANSEParameter::fixNSERate)
 
 		//CSP Functions:
 		//Listed in the properties section below. NOTE: these getter/setters are ONLY

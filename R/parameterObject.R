@@ -820,6 +820,8 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
   
   param.1<- data.frame(Codon=codons,AA=names.aa,Posterior=init,Std.Dev=init,Lower.quant=init,Upper.quant=init,stringsAsFactors = F,row.names = codons)
   param.2 <- data.frame(Codon=codons,AA=names.aa,Posterior=init,Std.Dev=init,Lower.quant=init,Upper.quant=init,stringsAsFactors = F,row.names=codons)
+  param.3 <- data.frame(Codon=codons,AA=names.aa,Posterior=init,Std.Dev=init,Lower.quant=init,Upper.quant=init,stringsAsFactors = F,row.names=codons)
+  
   if (model.uses.ref.codon)
   {
     codons <- codons[which(codons %in% unlist(lapply(X = names.aa,FUN = AAToCodon,T)))]
@@ -833,9 +835,17 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
     param.2[codon,"Std.Dev"] <- sqrt(parameter$getCodonSpecificVariance(mixtureElement=mixture,samples=samples,codon=codon,paramType=1,unbiased=T,withoutReference=model.uses.ref.codon))
     param.1[codon,c("Lower.quant","Upper.quant")] <- parameter$getCodonSpecificQuantile(mixtureElement=mixture, samples=samples,codon=codon,paramType=0, probs=c(0.025, 0.975),withoutReference=model.uses.ref.codon)
     param.2[codon,c("Lower.quant","Upper.quant")]  <- parameter$getCodonSpecificQuantile(mixtureElement=mixture, samples=samples,codon=codon,paramType=1, probs=c(0.025, 0.975),withoutReference=model.uses.ref.codon)
+    if (length(parameter.names) == 3)
+    {
+      param.3[codon,"Posterior"] <- parameter$getCodonSpecificPosteriorMean(mixtureElement=mixture,samples=samples,codon=codon,paramType=2,withoutReference=model.uses.ref.codon)
+      param.3[codon,"Std.Dev"] <- sqrt(parameter$getCodonSpecificVariance(mixtureElement=mixture,samples=samples,codon=codon,paramType=2,unbiased=T,withoutReference=model.uses.ref.codon))
+      param.3[codon,c("Lower.quant","Upper.quant")] <- parameter$getCodonSpecificQuantile(mixtureElement=mixture, samples=samples,codon=codon,paramType=2, probs=c(0.025, 0.975),withoutReference=model.uses.ref.codon)
+      
+    }
   }
   colnames(param.1) <- c("Codon", "AA", "Posterior","Std.Dev","0.025%", "0.975%")
   colnames(param.2) <- c("Codon", "AA", "Posterior","Std.Dev","0.025%", "0.975%")
+  colnames(param.3) <- c("Codon", "AA", "Posterior","Std.Dev","0.025%", "0.975%")
   
   ## Only called if model actually uses reference codon
   if(relative.to.optimal.codon && model.uses.ref.codon)
@@ -849,10 +859,13 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
       param.1 <- param.1[-which(param.1[,"Posterior"]==0),]
       param.2 <- param.2[-which(param.2[,"Posterior"]==0),]
     }
-    csp.param <- vector(mode="list",length=2)
+    csp.param <- vector(mode="list",length=length(parameter.names))
     names(csp.param) <- parameter.names
-    csp.param[[parameter.names[1]]] <- param.1[,c("AA", "Codon", "Posterior", "Std.Dev", "0.025%", "0.975%")]
-    csp.param[[parameter.names[2]]] <- param.2[,c("AA", "Codon", "Posterior", "Std.Dev", "0.025%", "0.975%")]
+    for (i in 1:length(parameter.names))
+    {  
+      csp.param[[parameter.names[i]]] <- param.1[,c("AA", "Codon", "Posterior", "Std.Dev", "0.025%", "0.975%")]
+    }
+    #csp.param[[parameter.names[2]]] <- param.2[,c("AA", "Codon", "Posterior", "Std.Dev", "0.025%", "0.975%")]
   }
   if(is.null(filename))
   {
@@ -860,6 +873,10 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
   }else {
     write.csv(csp.param[[parameter.names[1]]], file = paste0(filename,"_",parameter.names[1],".csv"), row.names = FALSE, quote=FALSE)
     write.csv(csp.param[[parameter.names[2]]], file = paste0(filename,"_",parameter.names[2],".csv"), row.names = FALSE, quote=FALSE)
+    if (length(parameter.names)==3)
+    {
+      write.csv(csp.param[[parameter.names[3]]], file = paste0(filename,"_",parameter.names[3],".csv"), row.names = FALSE, quote=FALSE)
+    }
   }
 }
 
@@ -921,6 +938,12 @@ checkModel <- function(parameter)
     aa <- unlist(lapply(codons,codonToAA))
     parameter.names <- c("Mutation","Selection")
     
+  } else if (class(parameter)=="Rcpp_PANSEParameter")
+  {
+    model.uses.ref.codon <- FALSE
+    codons <- parameter$getGroupList()
+    aa <- unlist(lapply(codons,codonToAA))
+    parameter.names <- c("Alpha","Lambda Prime","NSERate")
   } else
   {
     model.uses.ref.codon <- FALSE
@@ -1290,11 +1313,11 @@ getExpressionEstimates <- function(parameter, gene.index, samples, quantiles=c(0
   
   expressionStdErr <- sqrt(unlist(lapply(gene.index, function(geneIndex){ 
     parameter$getSynthesisRateVarianceForGene(samples, geneIndex, TRUE, FALSE) 
-  }))) / samples
+  })))
   
   expressionStdErrLog <- sqrt(unlist(lapply(gene.index, function(geneIndex){ 
     parameter$getSynthesisRateVarianceForGene(samples, geneIndex, TRUE, TRUE) 
-  }))) / samples
+  })))
   
   expressionQuantile <- lapply(gene.index, function(geneIndex){ 
     parameter$getExpressionQuantile(samples, geneIndex, quantiles, FALSE) 
@@ -1307,7 +1330,7 @@ getExpressionEstimates <- function(parameter, gene.index, samples, quantiles=c(0
   expressionQuantileLog <- do.call(rbind, expressionQuantileLog)
   
   expr.mat <- cbind(expressionValues, expressionValuesLog, expressionStdErr, expressionStdErrLog, expressionQuantile, expressionQuantileLog)
-  colnames(expr.mat) <- c("PHI", "log10.PHI", "Std.Error", "log10.Std.Error", quantiles, paste("log10.", quantiles, sep=""))
+  colnames(expr.mat) <- c("PHI", "log10.PHI", "Std.Dev", "log10.Std.Dev", quantiles, paste("log10.", quantiles, sep=""))
   return(expr.mat)
 }
 

@@ -569,25 +569,44 @@ void PANSEParameter::proposeCodonSpecificParameter()
 	{
 		for (unsigned j = 0; j < numAlpha; j++)
 		{
-			proposedCodonSpecificParameter[alp][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[alp][i][j]) , std_csp[j]) );
+			if (fix_alpha)
+			{
+				proposedCodonSpecificParameter[alp][i][j] = currentCodonSpecificParameter[alp][i][j];
+			}
+			else
+			{
+				proposedCodonSpecificParameter[alp][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[alp][i][j]) , std_csp[j]) );
+			}
 		}
 	}
-
 	for (unsigned i = 0; i < numSelectionCategories; i++)
 	{
 		for (unsigned j = 0; j < numLambdaPrime; j++)
 		{
-			proposedCodonSpecificParameter[lmPri][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[lmPri][i][j]) , std_csp[j]) );
+			if (fix_lp)
+			{
+				proposedCodonSpecificParameter[lmPri][i][j] = currentCodonSpecificParameter[lmPri][i][j];
+			}
+			else
+			{
+				proposedCodonSpecificParameter[lmPri][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[lmPri][i][j]) , std_csp[j]) );
+			}
 		}
 	}
-
     for (unsigned i = 0; i < numMutationCategories; i++)
     {
         for (unsigned j = 0; j < numNSE; j++)
         {
-            proposedCodonSpecificParameter[nse][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[nse][i][j]) , std_csp[j]) );
-            //proposedCodonSpecificParameter[nse][i][j] = currentCodonSpecificParameter[nse][i][j];
-        }
+        	if (fix_nse)
+        	{
+        		proposedCodonSpecificParameter[nse][i][j] = currentCodonSpecificParameter[nse][i][j];
+        	}
+        	else
+        	{
+            	proposedCodonSpecificParameter[nse][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[nse][i][j]) , std_csp[j]) );
+            
+        	}
+    	}
     }
 }
 
@@ -844,6 +863,20 @@ void PANSEParameter::initLambdaPrimeR(double lambdaPrimeValue, unsigned mixtureE
 	}
 }
 
+void PANSEParameter::fixAlpha()
+{
+	fix_alpha = true;
+}
+
+void PANSEParameter::fixLambdaPrime()
+{
+	fix_lp = true;
+}
+
+void PANSEParameter::fixNSERate()
+{
+	fix_nse = true;
+}
 
 void PANSEParameter::initNSERateR(double NSERateValue, unsigned mixtureElement, std::string codon)
 {

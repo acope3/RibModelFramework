@@ -53,7 +53,9 @@ RCPP_MODULE(Model_mod)
 
 	class_<FONSEModel>("FONSEModel")
 		.derives<Model>("Model")
-		.constructor()
+		.constructor<double>()
+		.method("CalculateProbabilitiesForCodons", &FONSEModel::CalculateProbabilitiesForCodons,
+		        "Calculated codon probabilities. Input is one element shorter than output")
   		.method("getParameter", &FONSEModel::getParameter)
 		.method("setParameter", &FONSEModel::setParameter)
 		.method("simulateGenome", &FONSEModel::simulateGenome)

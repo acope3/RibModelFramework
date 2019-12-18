@@ -20,6 +20,10 @@ class PANSEParameter: public Parameter {
 	private:
         std::vector <double> partitionFunction_proposed;
         std::vector <double> partitionFunction;
+
+        bool fix_alpha=false;
+        bool fix_lp=false;
+        bool fix_nse=false;
         
         double std_partitionFunction;
         unsigned numAcceptForPartitionFunction;
@@ -55,6 +59,9 @@ class PANSEParameter: public Parameter {
 		void initNonsenseErrorRate(double nonsenseErrorRateValue, unsigned mixtureElement, std::string codon);
 		void initMutationSelectionCategories(std::vector<std::string> files, unsigned numCategories,
 				unsigned paramType); //TODO: function needs to be changed
+		void fixAlpha();
+		void fixLambdaPrime();
+		void fixNSERate();
 
         //CSP Read Functions:
         void readAlphaValues(std::string filename);

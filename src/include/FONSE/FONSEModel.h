@@ -10,10 +10,11 @@ class FONSEModel : public Model
 		FONSEParameter *parameter;
 		double calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grouping, double *mutation, double *selection, double phiValue);
 		double calculateMutationPrior(std::string grouping, bool proposed = false);
+		double a1;
 
 	public:
 		//Constructors & Destructors:
-		explicit FONSEModel();
+		FONSEModel(double a_1=4);
 		virtual ~FONSEModel();
 
 
@@ -122,7 +123,7 @@ class FONSEModel : public Model
 
 		//R Section:
 #ifndef STANDALONE
-		std::vector<double> CalculateProbabilitiesForCodons(std::vector<double> mutation, std::vector<double> selection, double phi);
+		std::vector<double> CalculateProbabilitiesForCodons(std::vector<double> mutation, std::vector<double> selection, double phi, unsigned position);
 #endif
 
 	protected:

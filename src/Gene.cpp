@@ -544,9 +544,6 @@ std::vector <unsigned> Gene::getCodonPositions(std::string codon)
 }
 
 
-
-
-
 //---------------------------------//
 //---------- RCPP Module ----------//
 //---------------------------------//
