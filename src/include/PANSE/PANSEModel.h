@@ -16,8 +16,13 @@ class PANSEModel: public Model
 		double currSigmaCalculationSummationFor1, currSigmaCalculationSummationFor2;
 		double propSigmaCalculationSummationFor1, propSigmaCalculationSummationFor2;
 		double calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
-				unsigned currRFPObserved, double phiValue, double prevSigma);
-
+				unsigned currRFPObserved, double phiValue, double prevSigma, double lgamma_currAlpha, double log_currLambdaPrime, double log_phi,double lgamma_rfp_alpha);
+		std::vector<std::vector<double>> lgamma_currentAlpha;
+   		std::vector<std::vector<double>> log_currentLambdaPrime;
+        std::vector<std::vector<std::vector<double>>> lgamma_rfp_alpha;
+        std::vector<std::vector<double>> current_sigma;
+        virtual void fillMatrices(Genome& genome);
+        virtual void clearMatrices();
 
 	public:
 		//Constructors & Destructors:
@@ -34,7 +39,7 @@ class PANSEModel: public Model
 		virtual void calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration,
 				std::vector <double> &logProbabilityRatio);
 
-
+		
 		//Initialization and Restart Functions:
 		virtual void initTraces(unsigned samples, unsigned num_genes, bool estimateSynthesisRate = true);
 		virtual void writeRestartFile(std::string filename);

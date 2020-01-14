@@ -122,28 +122,20 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 	}
 
 	//my_print("% %\n", logLikelihood, logLikelihood_proposed);
-
-	double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(selectionCategory, false);
-	double logPhiProbability = Parameter::densityLogNorm(phiValue, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
-	double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
+	unsigned mixture = getMixtureAssignment(geneIndex);
+	mixture = getSynthesisRateCategory(mixture);
+	double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(mixture, false);
+	double mPhi = (-(stdDevSynthesisRate * stdDevSynthesisRate) * 0.5); // X * 0.5 = X / 2
+	//double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(selectionCategory, false);
+	double logPhiProbability = Parameter::densityLogNorm(phiValue, mPhi, stdDevSynthesisRate, true);
+	double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, mPhi, stdDevSynthesisRate, true);
 	double currentLogPosterior = (likelihood + logPhiProbability);
 	double proposedLogPosterior = (likelihood_proposed + logPhiProbability_proposed);
-	if (phiValue == 0) {
-		my_print("phiValue is 0\n");
-	}
-	if (phiValue_proposed == 0) {
-		my_print("phiValue_prop is 0\n");
-	}
+	
 	logProbabilityRatio[0] = (proposedLogPosterior - currentLogPosterior) - (std::log(phiValue) - std::log(phiValue_proposed));
 	logProbabilityRatio[1] = currentLogPosterior - std::log(phiValue_proposed);
-	// if (std::isinf(logProbabilityRatio[1])) {
-	// 	my_print("logProb1 inf\n");
-	// }
+	
 	logProbabilityRatio[2] = proposedLogPosterior - std::log(phiValue);
-	// if (std::isinf(logProbabilityRatio[2])) {
-	// 	my_print("logProb2 inf\n");
-	// }
-
 	//------------NOTE: Jeremy, Cedric changed the reverse jump to where we DON'T include it. I had my PA
 	//LogLikelihood go to 0 because of now missing terms. I have added the code underneath to where we calculate it---/
 
@@ -241,9 +233,9 @@ void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 	for (unsigned i = 0u; i < selectionCategory; i++)
 	{
 		currentStdDevSynthesisRate[i] = getStdDevSynthesisRate(i, false);
-		currentMphi[i] = -((currentStdDevSynthesisRate[i] * currentStdDevSynthesisRate[i]) / 2);
+		currentMphi[i] = -((currentStdDevSynthesisRate[i] * currentStdDevSynthesisRate[i]) * 0.5);
 		proposedStdDevSynthesisRate[i] = getStdDevSynthesisRate(i, true);
-		proposedMphi[i] = -((proposedStdDevSynthesisRate[i] * proposedStdDevSynthesisRate[i]) / 2);
+		proposedMphi[i] = -((proposedStdDevSynthesisRate[i] * proposedStdDevSynthesisRate[i]) * 0.5);
 		// take the Jacobian into account for the non-linear transformation from logN to N distribution
 		lpr -= (std::log(currentStdDevSynthesisRate[i]) - std::log(proposedStdDevSynthesisRate[i]));
 	}

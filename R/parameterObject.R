@@ -861,11 +861,13 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
     }
     csp.param <- vector(mode="list",length=length(parameter.names))
     names(csp.param) <- parameter.names
-    for (i in 1:length(parameter.names))
-    {  
-      csp.param[[parameter.names[i]]] <- param.1[,c("AA", "Codon", "Posterior", "Std.Dev", "0.025%", "0.975%")]
+     
+    csp.param[[parameter.names[1]]] <- param.1[,c("AA", "Codon", "Posterior", "Std.Dev", "0.025%", "0.975%")]
+    csp.param[[parameter.names[2]]] <- param.2[,c("AA", "Codon", "Posterior", "Std.Dev", "0.025%", "0.975%")]
+    if (length(parameter.names)==3)
+    {
+      csp.param[[parameter.names[3]]] <- param.3[,c("AA", "Codon", "Posterior", "Std.Dev", "0.025%", "0.975%")]
     }
-    #csp.param[[parameter.names[2]]] <- param.2[,c("AA", "Codon", "Posterior", "Std.Dev", "0.025%", "0.975%")]
   }
   if(is.null(filename))
   {

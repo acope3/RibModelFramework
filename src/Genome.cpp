@@ -504,7 +504,7 @@ void Genome::writeRFPData(std::string filename, bool simulated)
 				Gene *currentGene = &simulatedGenes[geneIndex];
                 SequenceSummary *sequenceSummary = currentGene->getSequenceSummary();
                 std::vector <unsigned> positions = sequenceSummary->getPositionCodonID();
-                std::vector <int> rfpCounts = sequenceSummary->getRFPCount(0);
+                std::vector <unsigned> rfpCounts = sequenceSummary->getRFPCount(0);
 				for (unsigned positionIndex = 0u; positionIndex < positions.size(); positionIndex++)
 				{
 					unsigned codonID = positions[positionIndex];

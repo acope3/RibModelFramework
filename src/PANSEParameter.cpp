@@ -249,6 +249,21 @@ void PANSEParameter::initPANSEValuesFromFile(std::string filename)
                         }
                     }
                 }
+                else if (variableName == "partitionFunction")
+				{
+					partitionFunction.resize(0);
+					double val;
+					iss.str(tmp);
+					while (iss >> val)
+					{
+						partitionFunction.push_back(val);
+					}
+				}
+                else if (variableName == "std_partitionFunction")
+				{
+					iss.str(tmp);
+					iss >> std_partitionFunction ;
+				}
 				else if (variableName == "std_csp")
 				{
 					double val;
@@ -268,6 +283,19 @@ void PANSEParameter::initPANSEValuesFromFile(std::string filename)
 	proposedCodonSpecificParameter[lmPri].resize(numSelectionCategories);
     proposedCodonSpecificParameter[nse].resize(numMutationCategories);
 
+    partitionFunction_proposed.resize(partitionFunction.size());
+    for (unsigned i = 0; i < partitionFunction.size(); i++)
+    {
+    	partitionFunction_proposed[i] = partitionFunction[i];
+    }
+
+	groupList = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
+		"TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT", "ATA", "ATC",
+		"ATT", "AAA", "AAG", "CTA", "CTC", "CTG", "CTT", "TTA", "TTG", "ATG",
+		"AAC", "AAT", "CCA", "CCC", "CCG", "CCT", "CAA", "CAG", "AGA", "AGG",
+		"CGA", "CGC", "CGG", "CGT", "TCA", "TCC", "TCG", "TCT", "ACA", "ACC",
+		"ACG", "ACT", "GTA", "GTC", "GTG", "GTT", "TGG", "TAC", "TAT", "AGC",
+		"AGT"};
 	for (unsigned i = 0; i < numMutationCategories; i++)
 	{
 		proposedCodonSpecificParameter[alp][i] = currentCodonSpecificParameter[alp][i];
@@ -357,6 +385,15 @@ void PANSEParameter::writePANSERestartFile(std::string filename)
             if (j % 10 != 0)
                 oss << "\n";
         }
+        oss << ">partitionFunction:\n";
+		for (i = 0; i < partitionFunction.size(); i++)
+		{
+			oss << partitionFunction[i];
+			if ((i + 1) % 10 == 0) oss << "\n";
+			else oss <<" ";
+		}
+		if (i % 10 != 0) oss << "\n";
+		oss << ">std_partitionFunction:\n" << std_partitionFunction << "\n";
 		oss << ">std_csp:\n";
 		my_print("%\n", std_csp.size());
 		for (i = 0; i < std_csp.size(); i++)
@@ -593,21 +630,35 @@ void PANSEParameter::proposeCodonSpecificParameter()
 			}
 		}
 	}
-    for (unsigned i = 0; i < numMutationCategories; i++)
-    {
-        for (unsigned j = 0; j < numNSE; j++)
-        {
-        	if (fix_nse)
-        	{
-        		proposedCodonSpecificParameter[nse][i][j] = currentCodonSpecificParameter[nse][i][j];
-        	}
-        	else
-        	{
-            	proposedCodonSpecificParameter[nse][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[nse][i][j]) , std_csp[j]) );
-            
-        	}
+
+	if (share_nse)
+	{
+		for (unsigned i = 0; i < numMutationCategories; i++)
+    	{
+    		double global_nse = std::exp( randNorm( std::log(currentCodonSpecificParameter[nse][i][0]) , std_csp[0]) );
+	       	for (unsigned j = 0; j < numNSE; j++)
+	        {
+				proposedCodonSpecificParameter[nse][i][j] = global_nse;
+	    	}
     	}
     }
+    else
+    {
+	    for (unsigned i = 0; i < numMutationCategories; i++)
+	    {
+	        for (unsigned j = 0; j < numNSE; j++)
+	        {
+	        	if (fix_nse)
+	        	{
+	        		proposedCodonSpecificParameter[nse][i][j] = currentCodonSpecificParameter[nse][i][j];
+	        	}
+	        	else
+	        	{
+	        		proposedCodonSpecificParameter[nse][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[nse][i][j]) , std_csp[j]) );
+	        	}
+	    	}
+	    }
+	}
 }
 
 
@@ -877,6 +928,13 @@ void PANSEParameter::fixNSERate()
 {
 	fix_nse = true;
 }
+
+void PANSEParameter::shareNSERate()
+{
+	share_nse = true;
+}
+
+
 
 void PANSEParameter::initNSERateR(double NSERateValue, unsigned mixtureElement, std::string codon)
 {

@@ -39,7 +39,7 @@ convergence.test.Rcpp_Trace <- function(object, samples = 10, frac1 = 0.1,
   if(what[1] == "Alpha" || what[1] == "LambdaPrime" || what[1] == "NSERate")
   {
     codon.list <- codons()
-    codon.list <- codon.list[1:(length(codons.list)-3)]
+    codon.list <- codon.list[1:(length(codon.list)-3)]
     cur.trace <- vector("list",length(codon.list))
     for (i in 1:length(codon.list))
     {

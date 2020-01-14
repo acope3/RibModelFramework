@@ -218,6 +218,7 @@ RCPP_MODULE(Parameter_mod)
 		.method("fixAlpha",&PANSEParameter::fixAlpha)
 		.method("fixLambdaPrime",&PANSEParameter::fixLambdaPrime)
 		.method("fixNSERate",&PANSEParameter::fixNSERate)
+		.method("shareNSERate",&PANSEParameter::shareNSERate)
 
 		//CSP Functions:
 		//Listed in the properties section below. NOTE: these getter/setters are ONLY

@@ -24,6 +24,7 @@ class PANSEParameter: public Parameter {
         bool fix_alpha=false;
         bool fix_lp=false;
         bool fix_nse=false;
+        bool share_nse=false;
         
         double std_partitionFunction;
         unsigned numAcceptForPartitionFunction;
@@ -62,6 +63,7 @@ class PANSEParameter: public Parameter {
 		void fixAlpha();
 		void fixLambdaPrime();
 		void fixNSERate();
+		void shareNSERate();
 
         //CSP Read Functions:
         void readAlphaValues(std::string filename);

@@ -187,7 +187,7 @@ void SequenceSummary::initRFPCount(unsigned numCategories)
  * Returns the RFPCount vector for the category index specified.
  * Note: If initRFPCount is not called beforehand, it is called now to return a vector of 0s.
  */
-std::vector <int> SequenceSummary::getRFPCount(unsigned RFPCountColumn)
+std::vector <unsigned> SequenceSummary::getRFPCount(unsigned RFPCountColumn)
 {
 	// Note: If the user forgets to initRFPCount manually, this statement is executed but returns an empty vector.
 	if (RFPCount.size() < RFPCountColumn + 1) initRFPCount(RFPCountColumn + 1);
@@ -200,7 +200,7 @@ std::vector <int> SequenceSummary::getRFPCount(unsigned RFPCountColumn)
  * Returns the integer RFPCount value for the category index at the position specified.
  * Note: If initRFPCount is not called beforehand, it is called now to return a value of 0.
  */
-int SequenceSummary::getSingleRFPCount(unsigned position, unsigned RFPCountColumn)
+unsigned SequenceSummary::getSingleRFPCount(unsigned position, unsigned RFPCountColumn)
 {
 	if (RFPCount.size() < RFPCountColumn + 1) initRFPCount(RFPCountColumn + 1);
 	return RFPCount[RFPCountColumn][position];
@@ -212,7 +212,7 @@ int SequenceSummary::getSingleRFPCount(unsigned position, unsigned RFPCountColum
  * Sets the RFPCount vector for the category index specified to the vector argument given.
  * Note: If initRFPCount is not called beforehand, it is called now.
  */
-void SequenceSummary::setRFPCount(std::vector <int> arg, unsigned RFPCountColumn)
+void SequenceSummary::setRFPCount(std::vector <unsigned> arg, unsigned RFPCountColumn)
 {
 	if (RFPCount.size() < RFPCountColumn + 1) initRFPCount(RFPCountColumn + 1);
 	RFPCount[RFPCountColumn] = arg;
@@ -258,10 +258,10 @@ void SequenceSummary::setSumRFPCount(std::array <unsigned, 64> arg, unsigned RFP
 }
 
 
-int SequenceSummary::getSumTotalRFPCount(unsigned RFPCountColumn)
+unsigned SequenceSummary::getSumTotalRFPCount(unsigned RFPCountColumn)
 {
     if (sumRFPCount.size() < RFPCountColumn + 1) initSumRFPCount(RFPCountColumn + 1);
-    int sum = 0;
+    unsigned sum = 0;
     for (unsigned i = 0u; i < sumRFPCount[RFPCountColumn].size(); i++)
     {
         sum += sumRFPCount[RFPCountColumn][i];
@@ -367,7 +367,9 @@ bool SequenceSummary::processSequence(const std::string& sequence)
 			int aaID = codonToAAIndex(codon);
 			ncodons[codonID]++;
 			naa[aaID]++;
-			codonPositions[codonID].push_back(i / 3);
+			//Alex: I think this needs to be i + 3 so first position is at 1, not 0
+			//codonPositions[codonID].push_back(i / 3);
+			codonPositions[codonID].push_back((i+3)/3);
 		}
 		else
 		{
