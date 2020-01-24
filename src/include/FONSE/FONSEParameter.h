@@ -20,6 +20,10 @@ class FONSEParameter : public Parameter
 
 		double bias_csp;
 		double mutation_prior_sd;
+		double a1;
+		double a1_proposed;
+		double std_a1;
+        unsigned numAcceptForA1;
 
 		std::vector <double> propose(std::vector <double> currentParam, double(*proposal)(double a, double b), double A, std::vector <double> B);
 
@@ -31,7 +35,7 @@ class FONSEParameter : public Parameter
 		explicit FONSEParameter(std::string filename);
 		FONSEParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector <unsigned> geneAssignment,
 				   std::vector <std::vector <unsigned> > thetaKmatrix, bool splitSer = true,
-				   std::string _mutationSelectionState = "allUnique");
+				   std::string _mutationSelectionState = "allUnique",double _a1 = 4);
 		FONSEParameter& operator=(const FONSEParameter& rhs);
 		FONSEParameter(const FONSEParameter &other); //TODO: No longer needed?
 		virtual ~FONSEParameter();
@@ -39,7 +43,7 @@ class FONSEParameter : public Parameter
 
 
 		//Initialization, Restart, Index Checking:
-		void initFONSEParameterSet();
+		void initFONSEParameterSet(double _a1 = 4);
 		void initFONSEValuesFromFile(std::string filename);
 		void writeEntireRestartFile(std::string filename);
 		void writeFONSERestartFile(std::string filename);
@@ -53,7 +57,7 @@ class FONSEParameter : public Parameter
 
 		//Trace Functions:
 		void updateCodonSpecificParameterTrace(unsigned sample, std::string grouping);
-
+		void updateInitiationCostParameterTrace(unsigned sample);
 
 		//Covariance Functions:
 		CovarianceMatrix& getCovarianceMatrixForAA(std::string aa);
@@ -69,12 +73,14 @@ class FONSEParameter : public Parameter
 		double getMutationPriorStandardDeviation();
 		void setMutationPriorStandardDeviation(double _mutation_prior_sd);
 
+		double getInitiationCost(bool proposed);
 
 		//Other functions:
 		void getParameterForCategory(unsigned category, unsigned paramType, std::string aa, bool proposal, double *returnSet);
 		void proposeHyperParameters();
-
-
+		void updateInitiationCost();
+		double getCurrentInitiationCostProposalWidth();
+		void adaptInitiationCostProposalWidth(unsigned adaptationWidth, bool adapt);
 
 
 
@@ -83,9 +89,9 @@ class FONSEParameter : public Parameter
 #ifndef STANDALONE
 		//Constructors & Destructors:
 		FONSEParameter(std::vector<double> stdDevSynthesisRate, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix,
-		 				bool splitSer = true);
+		 				bool splitSer = true, double _a1 = 4);
 		FONSEParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
-						bool splitSer = true, std::string _mutationSelectionState = "allUnique");
+						bool splitSer = true, std::string _mutationSelectionState = "allUnique", double _a1 = 4);
 
 
 
@@ -102,6 +108,7 @@ class FONSEParameter : public Parameter
 		std::vector< std::vector <double> > getCurrentSelectionParameter();
 		void setCurrentMutationParameter(std::vector<std::vector<double>> _currentMutationParameter);
 		void setCurrentSelectionParameter(std::vector<std::vector<double>> _currentSelectionParameter);
+
 
 
 #endif //STANDALONE

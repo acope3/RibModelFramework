@@ -273,6 +273,11 @@ void PANSEParameter::initPANSEValuesFromFile(std::string filename)
 						std_csp.push_back(val);
 					}
 				}
+				else if (variableName == "total_y")
+				{
+					iss.str(tmp);
+					iss >> Y;
+				}
 			}
 		}
 	}
@@ -393,6 +398,7 @@ void PANSEParameter::writePANSERestartFile(std::string filename)
 			else oss <<" ";
 		}
 		if (i % 10 != 0) oss << "\n";
+		oss << ">total_y:\n" << Y << "\n";
 		oss << ">std_partitionFunction:\n" << std_partitionFunction << "\n";
 		oss << ">std_csp:\n";
 		my_print("%\n", std_csp.size());
@@ -571,7 +577,6 @@ void PANSEParameter::updatePartitionFunctionTrace(unsigned sample)
     for (unsigned i = 0u; i < numMixtures; i++)
     {
         traces.updatePartitionFunctionTrace(i, sample, partitionFunction[i]);
-        my_print("Sample is %\n Partiiton Function is % \n",sample, partitionFunction[i]);
     }
 }
 
@@ -1215,4 +1220,15 @@ std::vector<double> PANSEParameter::oneMixAlpha(){
 }
 std::vector<double> PANSEParameter::oneMixNSE(){
     return currentCodonSpecificParameter[nse][0];
+}
+
+
+void PANSEParameter::setTotalRFPCount(Genome& genome)
+{
+	Y = genome.getSumRFP();
+}
+
+unsigned PANSEParameter::getTotalRFPCount()
+{
+	return Y;
 }

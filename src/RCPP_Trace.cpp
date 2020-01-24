@@ -52,7 +52,13 @@ RCPP_MODULE(Trace_mod)
 
     //PANSE Specific
     .method("resizeNumberCodonSpecificParameterTrace", &Trace::resizeNumberCodonSpecificParameterTrace)
+    .method("getPartitionFunctionTraces",&Trace::getPartitionFunctionTraces)
+    .method("setPartitionFunctionTraces",&Trace::setPartitionFunctionTraces)
 
+
+    //FONSE Specific
+    .method("getInitiationCostTrace",&Trace::getInitiationCostTrace)
+    .method("setInitiationCostTrace", &Trace::setInitiationCostTrace)
     ;
 }
 #endif

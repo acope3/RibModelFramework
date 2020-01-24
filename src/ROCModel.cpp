@@ -208,7 +208,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 		posterior = likelihood + calculateMutationPrior(grouping, false);
 	}
 	else
-  {
+    {
 		posterior_proposed = likelihood_proposed;
 		posterior = likelihood;
 	}
@@ -628,7 +628,8 @@ void ROCModel::updateGibbsSampledHyperParameters(Genome &genome)
 
 	if (withPhi)
 	{
-		if(!fix_sEpsilon){
+		if(!fix_sEpsilon)
+		{
 			double shape = ((double)genome.getGenomeSize() - 1.0) / 2.0;
 			for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++)
 			{

@@ -53,7 +53,7 @@ RCPP_MODULE(Model_mod)
 
 	class_<FONSEModel>("FONSEModel")
 		.derives<Model>("Model")
-		.constructor<double>()
+		.constructor<bool, bool>()
 		.method("CalculateProbabilitiesForCodons", &FONSEModel::CalculateProbabilitiesForCodons,
 		        "Calculated codon probabilities. Input is one element shorter than output")
   		.method("getParameter", &FONSEModel::getParameter)

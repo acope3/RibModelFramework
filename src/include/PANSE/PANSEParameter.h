@@ -31,6 +31,9 @@ class PANSEParameter: public Parameter {
 
 		double bias_csp;
 
+		// Sum of all RFP counts
+		unsigned Y;
+
 	public:
         //Testing Functions
         std::vector<double> oneMixLambda();
@@ -96,8 +99,9 @@ class PANSEParameter: public Parameter {
 		//Other functions:
 		double getParameterForCategory(unsigned category, unsigned paramType, std::string codon, bool proposal);
 
-
-
+		//For setting Y value
+		void setTotalRFPCount(Genome& genome);
+		unsigned getTotalRFPCount();
 
 
 

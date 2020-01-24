@@ -38,7 +38,8 @@ class Trace {
 
 
 		//FONSE Trace:
-
+                std::vector<double> initiationCostTrace;
+                std::vector<double> initiationCostAcceptanceRateTrace;
 
 		//PANSE Trace:
 		std::vector<std::vector <double>> partitionFunctionTrace;
@@ -64,7 +65,7 @@ class Trace {
 
 
 		//FONSE Specific:
-
+                void initInitiationCostTrace(unsigned samples);
 
 		//PANSE Specific:
 		void initPartitionFunctionTrace(unsigned samples, unsigned numPartitionFunctionsGroupings);
@@ -136,10 +137,12 @@ class Trace {
 
 
         //FONSE Specific:
-
+        std::vector<double> getInitiationCostTrace();
+        std::vector<double> getInitiationCostAcceptanceRateTrace();
 
         //PANSE Specific:
         std::vector<double> getPartitionFunctionTrace(unsigned mixtureIndex);
+        std::vector<double> getPartitionFunctionAcceptanceRateTrace();
 
         //------------------------------//
 		//------ Update Functions ------//
@@ -161,6 +164,8 @@ class Trace {
 
 
         //FONSE Specific:
+        void updateInitiationCostTrace(unsigned sample,double value);
+        void updateInitiationCostAcceptanceRateTrace(double value);
 
 
         //PANSE Specific:
@@ -206,9 +211,12 @@ class Trace {
         void setObservedSynthesisNoiseTrace(std::vector<std::vector <double> > _ObservedSynthesisNoiseTrace);
         void setCodonSpecificParameterTrace(std::vector<std::vector<std::vector<float>>> _parameterTrace, unsigned paramType);
 
+        //FONSE specific:
+        void setInitiationCostTrace(std::vector <double> _InitiationCostTrace);
         //PANSE Specific:
         std::vector<double> getPartitionFunctionTraceR(unsigned mixtureIndex);
-        void setPartitionFunctionTrace(std::vector<std::vector <double> > _PartitionFunctionTrace);
+        void setPartitionFunctionTraces(std::vector<std::vector <double> > _PartitionFunctionTrace);
+        std::vector<std::vector<double>> getPartitionFunctionTraces();
 
         bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);
 

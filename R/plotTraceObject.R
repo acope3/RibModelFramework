@@ -17,7 +17,7 @@
 #' 
 #' @description Plots different traces, specified with the \code{what} parameter.
 #'
-plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbability" ,"Sphi", "Mphi", "Aphi", "Sepsilon", "ExpectedPhi", "Expression","NSERate"), 
+plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbability" ,"Sphi", "Mphi", "Aphi", "Sepsilon", "ExpectedPhi", "Expression","NSERate","InitiationCost"), 
                                    geneIndex=1, mixture = 1, ...)
 {
   if(what[1] == "Mutation")
@@ -59,6 +59,14 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
   if(what[1] == "Aphi")
   {
     plotHyperParameterTrace(x, what = what[1])
+  }
+  if(what[1] == "InitiationCost")
+  {
+    plotFONSEHyperParameterTrace(x,what=what[1])
+  }
+  if(what[1] == "PartitionFunction")
+  {
+    plotPANSEHyperParameterTrace(x,what=what[1])
   }
   if(what[1] == "Sepsilon") 
   {
@@ -410,6 +418,62 @@ plotHyperParameterTrace <- function(trace, what = c("Sphi", "Mphi", "Aphi", "Sep
   }
   #par(opar)
 }
+
+
+plotFONSEHyperParameterTrace <- function(trace, what = c("InitiationCost"))
+{
+#  opar <- par(no.readonly = T) 
+#  par(oma=c(1,1,2,1), mgp=c(2,1,0), mar = c(3,4,2,1), mfrow=c(2, 1))
+  xlab <- "Sample"
+  
+  if (what[1] == "InitiationCost")
+  {
+    a1 <- unlist(trace$getInitiationCostTrace())
+    ylimit <- range(a1) + c(-0.1, 0.1)
+    xlimit <- c(1, length(a1))
+    ylab <- expression("a"[1])
+    main <- expression("a"[1]*"Trace")
+    plot(NULL, NULL, type="l", xlab = xlab, ylab = ylab, xlim = xlimit, ylim = ylimit, main = main)
+    
+    lines(a1, col = "black")
+  }
+  
+  #par(opar)
+}
+
+
+plotPANSEHyperParameterTrace <- function(trace, what = c("PartitionFunction"))
+{
+#  opar <- par(no.readonly = T) 
+#  par(oma=c(1,1,2,1), mgp=c(2,1,0), mar = c(3,4,2,1), mfrow=c(2, 1))
+  xlab <- "Sample"
+  
+  if (what[1] == "PartitionFunction")
+  {
+    pf <- trace$getPartitionFunctionTraces();
+    numMixtures <- length(pf)
+    sphi <- do.call("cbind", pf)
+    
+    ylimit <- range(pf) + c(-0.1, 0.1)
+    xlimit <- c(1, nrow(pf))
+    ylab <- expression("Partition Function")
+    main <- expression("Partition Function Trace")
+    plot(NULL, NULL, type="l", xlab = xlab, ylab = ylab, xlim = xlimit, ylim = ylimit, main = main)
+    
+    for(i in 1:ncol(pf))
+    {
+      lines(pf[-1,i], col = .mixtureColors[i])
+    }
+    legend("topleft", legend = paste0("Mixture Element", 1:numMixtures), 
+           col = .mixtureColors[1:numMixtures], lty = rep(1, numMixtures), bty = "n")
+  }
+  
+  #par(opar)
+}
+
+
+
+
 
 # NOT EXPOSED
 plotMixtureProbability <- function(trace)

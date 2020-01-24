@@ -227,7 +227,7 @@ RCPP_MODULE(Parameter_mod)
 		//Other Functions:
 		.method("getParameterForCategory", &PANSEParameter::getParameterForCategoryR)
 		.method("setPartitionFunction", &PANSEParameter::setPartitionFunction)
-
+		.method("setTotalRFPCount", &PANSEParameter::setTotalRFPCount)
 		.property("proposedAlphaParameter", &PANSEParameter::getProposedAlphaParameter,
 		        &PANSEParameter::setProposedAlphaParameter) //R Specific
 		.property("proposedLambdaPrimeParameter", &PANSEParameter::getProposedLambdaPrimeParameter,
@@ -250,8 +250,8 @@ RCPP_MODULE(Parameter_mod)
 		//Constructors & Destructors:
 		.constructor()
 		.constructor <std::string>()
-		.constructor <std::vector<double>, std::vector<unsigned>, std::vector<unsigned>, bool>()
-		.constructor <std::vector<double>, unsigned, std::vector<unsigned>, bool, std::string>()
+		.constructor <std::vector<double>, std::vector<unsigned>, std::vector<unsigned>, bool,double>()
+		.constructor <std::vector<double>, unsigned, std::vector<unsigned>, bool, std::string,double>()
 
 
 
@@ -269,6 +269,11 @@ RCPP_MODULE(Parameter_mod)
 		.method("getMutationPriorStandardDeviation", &FONSEParameter::getMutationPriorStandardDeviation)
 		.method("setMutationPriorStandardDeviation", &FONSEParameter::setMutationPriorStandardDeviation)
 
+
+		// .property("proposedMutationParameter", &FONSEParameter::getProposedMutationParameter,
+		//         &FONSEParameter::setProposedMutationParameter) //R Specific
+		// .property("proposedSelectionParameter", &FONSEParameter::getProposedSelectionParameter,
+		//         &FONSEParameter::setProposedSelectionParameter) //R Specific
 		.property("currentMutationParameter", &FONSEParameter::getCurrentMutationParameter,
 		        &FONSEParameter::setCurrentMutationParameter) //R Specific
 		.property("currentSelectionParameter", &FONSEParameter::getCurrentSelectionParameter,

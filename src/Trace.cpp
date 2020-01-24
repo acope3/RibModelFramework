@@ -203,6 +203,17 @@ void Trace::initPartitionFunctionTrace(unsigned samples, unsigned numPartitionFu
 }
 
 
+
+//------------------------------------//
+//----------- FONSE Specific ---------//
+//------------------------------------//
+
+void Trace::initInitiationCostTrace(unsigned samples)
+{
+	initiationCostTrace.resize(samples);	
+}
+
+
 //----------------------------------------------------//
 //---------- Model Initialization Functions ----------//
 //----------------------------------------------------//
@@ -256,6 +267,7 @@ void Trace::initializeFONSETrace(unsigned samples, unsigned num_genes, unsigned 
 	// See Note 1) above.
 	initCodonSpecificParameterTrace(samples, numMutationCategories, numParam, 0u); // dM
 	initCodonSpecificParameterTrace(samples, numSelectionCategories, numParam, 1u); // dOmega
+	initInitiationCostTrace(samples);
 }
 
 
@@ -500,6 +512,34 @@ std::vector<double> Trace::getPartitionFunctionTrace(unsigned mixtureIndex)
     return partitionFunctionTrace[mixtureIndex];
 }
 
+std::vector<std::vector<double>> Trace::getPartitionFunctionTraces()
+{
+    return partitionFunctionTrace;
+}
+
+
+std::vector<double> Trace::getPartitionFunctionAcceptanceRateTrace()
+{
+    return partitionFunctionTraceAcceptanceRateTrace;
+}
+
+
+//--------------------------------------//
+//----------- FONSE Specific -----------//
+//--------------------------------------//
+std::vector<double> Trace::getInitiationCostTrace()
+{
+    return initiationCostTrace;
+}
+
+
+std::vector<double> Trace::getInitiationCostAcceptanceRateTrace()
+{
+    return initiationCostAcceptanceRateTrace;
+}
+
+
+
 //--------------------------------------//
 //---------- Update Functions ----------//
 //--------------------------------------//
@@ -635,7 +675,8 @@ void Trace::updateCodonSpecificParameterTraceForCodon(unsigned sample, std::stri
 	}
 }
 
-void Trace::updatePartitionFunctionTrace(unsigned index, unsigned sample, double value){
+void Trace::updatePartitionFunctionTrace(unsigned index, unsigned sample, double value)
+{
    partitionFunctionTrace[index][sample] = value;
 }
 
@@ -644,6 +685,28 @@ void Trace:: updatePartitionFunctionAcceptanceRateTrace(double value)
 {
     partitionFunctionTraceAcceptanceRateTrace.push_back(value);
 }
+
+
+//------------------------------------//
+//----------- FONSE Specific ---------//
+//------------------------------------//
+
+void Trace::updateInitiationCostTrace(unsigned sample, double value)
+{
+   initiationCostTrace[sample] = value;
+}
+
+
+void Trace:: updateInitiationCostAcceptanceRateTrace(double value)
+{
+    initiationCostAcceptanceRateTrace.push_back(value);
+}
+
+
+
+
+
+
 
 
 // -----------------------------------------------------------------------------------------------------//
@@ -856,10 +919,21 @@ void Trace::setCodonSpecificParameterTrace(std::vector<std::vector<std::vector<f
 //----------------------------------//
 //--------- PANSE Specific ---------//
 //----------------------------------//
-void Trace::setPartitionFunctionTrace(std::vector<std::vector <double> > _PartitionFunctionTrace)
+void Trace::setPartitionFunctionTraces(std::vector<std::vector <double> > _PartitionFunctionTrace)
 {
     partitionFunctionTrace = _PartitionFunctionTrace;
 }
+
+
+//----------------------------------//
+//--------- FONSE Specific ---------//
+//----------------------------------//
+void Trace::setInitiationCostTrace(std::vector <double> _InitiationCostTrace)
+{
+    initiationCostTrace = _InitiationCostTrace;
+}
+
+
 
 
 

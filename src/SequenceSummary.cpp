@@ -367,9 +367,8 @@ bool SequenceSummary::processSequence(const std::string& sequence)
 			int aaID = codonToAAIndex(codon);
 			ncodons[codonID]++;
 			naa[aaID]++;
-			//Alex: I think this needs to be i + 3 so first position is at 1, not 0
-			//codonPositions[codonID].push_back(i / 3);
-			codonPositions[codonID].push_back((i+3)/3);
+			codonPositions[codonID].push_back(i / 3);
+			
 		}
 		else
 		{

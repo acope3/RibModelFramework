@@ -93,6 +93,10 @@ convergence.test.Rcpp_Trace <- function(object, samples = 10, frac1 = 0.1,
   {
     current.trace <- object$getExpectedSynthesisRateTrace()
   }
+  if(what[1] == "InitiationCost")
+  {
+    current.trace <- object$getInitiationCostTrace()
+  }
   if(what[1] == "Expression")
   {
     # TODO need way to determine number of expression traces
