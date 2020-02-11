@@ -705,10 +705,10 @@ void PAModel::simulateGenome(Genome &genome)
 		Gene tmpGene = gene;
 		std::vector<unsigned> rfpCount;
 		std::vector<unsigned> codon_counts(61,0);
+		std::vector<unsigned> currentCodons(61,0);
 		std::vector<unsigned> rfpPerPositionPerCodon(61,0);
 		std::vector<unsigned> totalRFP(61,0);
 		std::vector <unsigned> positions = tmpGene.geneData.getPositionCodonID(); 
-        
 		for (unsigned codonIndex = 0u; codonIndex < 61; codonIndex++)
 		{
 
@@ -744,8 +744,9 @@ void PAModel::simulateGenome(Genome &genome)
 		}
 		for (unsigned codonID : positions)
 		{
-
-			if (totalRFP[codonID] - rfpPerPositionPerCodon[codonID] < 0)
+			currentCodons[codonID]++;
+			//If we're at the last codon, push however many are remaining
+			if (currentCodons[codonID] == codon_counts[codonID])
 			{
 				rfpCount.push_back(totalRFP[codonID]);
 			}
