@@ -246,7 +246,7 @@ void PAModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsi
                     lpr += proposed - current;
                 }
             }
-            logProbabilityRatio[i+2] = lpr;
+            logProbabilityRatio[i+1] = lpr;
         }
     }
 }
