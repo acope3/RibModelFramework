@@ -21,12 +21,12 @@ class PANSEModel: public Model
    		std::vector<std::vector<double>> log_currentLambdaPrime;
         std::vector<std::vector<std::vector<double>>> lgamma_rfp_alpha;
         std::vector<std::vector<double>> current_sigma;
-        virtual void fillMatrices(Genome& genome);
+        virtual void fillMatrices(Genome& genome,bool init_sigma_vector = true);
         virtual void clearMatrices();
 
 	public:
 		//Constructors & Destructors:
-		explicit PANSEModel(unsigned RFPCountColumn = 0u);
+		explicit PANSEModel(unsigned RFPCountColumn = 0u, bool _withPhi = false, bool _fix_sEpsilon = false);
 		virtual ~PANSEModel();
 
 
@@ -115,7 +115,7 @@ class PANSEModel: public Model
 		virtual void setCategoryProbability(unsigned mixture, double value);
 
 		virtual void updateCodonSpecificParameter(std::string aa);
-		virtual void updateGibbsSampledHyperParameters(Genome &genome);
+		//virtual void updateGibbsSampledHyperParameters(Genome &genome);
 		virtual void updateAllHyperParameter();
 		virtual void updateHyperParameter(unsigned hp);
 
@@ -149,6 +149,17 @@ class PANSEModel: public Model
         //Psi-Phi Conversion Functions
         double psi2phi(double psi, double sigma);
         double phi2psi(double phi, double sigma);
+
+
+      	virtual double getNoiseOffset(unsigned index, bool proposed = false);
+		virtual double getObservedSynthesisNoise(unsigned index) ;
+		virtual double getCurrentNoiseOffsetProposalWidth(unsigned index);
+		virtual void updateNoiseOffset(unsigned index);
+		virtual void updateNoiseOffsetTrace(unsigned sample);
+		virtual void updateObservedSynthesisNoiseTrace(unsigned sample);
+		virtual void adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt = true);
+		virtual void updateGibbsSampledHyperParameters(Genome &genome);
+
 
 	protected:
 };

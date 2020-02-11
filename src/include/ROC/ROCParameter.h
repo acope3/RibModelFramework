@@ -20,12 +20,12 @@ class ROCParameter : public Parameter
 {
 	private:
 
-		std::vector <double> observedSynthesisNoise;
+		// std::vector <double> observedSynthesisNoise;
 
-		std::vector <double> noiseOffset_proposed;
-		std::vector <double> noiseOffset; //A_Phi
-		std::vector <double> std_NoiseOffset;
-		std::vector <double> numAcceptForNoiseOffset;
+		// std::vector <double> noiseOffset_proposed;
+		// std::vector <double> noiseOffset; //A_Phi
+		// std::vector <double> std_NoiseOffset;
+		// std::vector <double> numAcceptForNoiseOffset;
 		std::vector<std::vector<double>> mutationVariance;
 		std::vector<std::vector<double>> selectionVariance;
 		double bias_csp;
@@ -69,8 +69,8 @@ class ROCParameter : public Parameter
 
 
 		//Trace Functions:
-		void updateObservedSynthesisNoiseTraces(unsigned sample);
-		void updateNoiseOffsetTraces(unsigned sample);
+		// void updateObservedSynthesisNoiseTraces(unsigned sample);
+		// void updateNoiseOffsetTraces(unsigned sample);
 		void updateCodonSpecificParameterTrace(unsigned sample, std::string grouping);
 
 
@@ -79,26 +79,26 @@ class ROCParameter : public Parameter
 
 
 		//observedSynthesisNoise Functions:
-		double getObservedSynthesisNoise(unsigned index);
-		void setObservedSynthesisNoise(unsigned index, double se);
+		// double getObservedSynthesisNoise(unsigned index);
+		// void setObservedSynthesisNoise(unsigned index, double se);
 
 
 
-		//noiseOffset Functions:
-		double getNoiseOffset(unsigned index, bool proposed = false);
-		double getCurrentNoiseOffsetProposalWidth(unsigned index);
-		void proposeNoiseOffset();
-		void setNoiseOffset(unsigned index, double _NoiseOffset);
-		void updateNoiseOffset(unsigned index);
+		// //noiseOffset Functions:
+		// double getNoiseOffset(unsigned index, bool proposed = false);
+		// double getCurrentNoiseOffsetProposalWidth(unsigned index);
+		// void proposeNoiseOffset();
+		// void setNoiseOffset(unsigned index, double _NoiseOffset);
+		// void updateNoiseOffset(unsigned index);
 
-		// noise Functions:
-		void setInitialValuesForSepsilon(std::vector<double> seps);
+		// // noise Functions:
+		// void setInitialValuesForSepsilon(std::vector<double> seps);
 
 
 		//CSP Functions:
 		double getCurrentCodonSpecificProposalWidth(unsigned aa);
 		void proposeCodonSpecificParameter();
-    void setProposeByPrior(bool _propose_by_prior);
+        void setProposeByPrior(bool _propose_by_prior);
 		void updateCodonSpecificParameter(std::string grouping);
 		void completeUpdateCodonSpecificParameter();
 
@@ -116,14 +116,14 @@ class ROCParameter : public Parameter
 
 
 		//Posterior, Variance, and Estimates Functions:
-		double getNoiseOffsetPosteriorMean(unsigned index, unsigned samples);
-		double getNoiseOffsetVariance(unsigned index, unsigned samples, bool unbiased = true);
+		//double getNoiseOffsetPosteriorMean(unsigned index, unsigned samples);
+		//double getNoiseOffsetVariance(unsigned index, unsigned samples, bool unbiased = true);
 
 		//Adaptive Width Functions:
-		void adaptNoiseOffsetProposalWidth(unsigned adaptationWidth, bool adapt);
+		//void adaptNoiseOffsetProposalWidth(unsigned adaptationWidth, bool adapt);
 
 		//Other Functions:
-		void setNumObservedPhiSets(unsigned _phiGroupings);
+		//void setNumObservedPhiSets(unsigned _phiGroupings);
 		void getParameterForCategory(unsigned category, unsigned parameter, std::string aa, bool proposal, double *returnValue);
 
 		void fixDM();

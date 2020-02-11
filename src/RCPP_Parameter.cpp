@@ -70,6 +70,16 @@ RCPP_MODULE(Parameter_mod)
         .method("getCodonSpecificQuantile", &Parameter::getCodonSpecificQuantileForCodon)
         .method("getExpressionQuantile", &Parameter::getExpressionQuantileForGene)
 
+        //TODO: these functions are not wrapped! May not run correctly
+		.method("getNoiseOffsetPosteriorMean", &Parameter::getNoiseOffsetPosteriorMean)
+		.method("getNoiseOffsetVariance", &Parameter::getNoiseOffsetVariance)
+
+		// Noise
+		.method("setInitialValuesForSepsilon", &Parameter::setInitialValuesForSepsilon)//Not a R wrapper
+
+
+		.method("setNumObservedSynthesisRateSets", &Parameter::setNumObservedPhiSets)//Not a R wrapper
+
 		//Other Functions:
 		.method("getMixtureAssignment", &Parameter::getMixtureAssignmentR)
 		.method("setMixtureAssignment", &Parameter::setMixtureAssignmentR)
@@ -130,15 +140,7 @@ RCPP_MODULE(Parameter_mod)
 		.method("setProposeByPrior", &ROCParameter::setProposeByPrior)
 
 		//Posterior, Variance, and Estimates Functions:
-		//TODO: these functions are not wrapped! May not run correctly
-		.method("getNoiseOffsetPosteriorMean", &ROCParameter::getNoiseOffsetPosteriorMean)
-		.method("getNoiseOffsetVariance", &ROCParameter::getNoiseOffsetVariance)
-
-		// Noise
-		.method("setInitialValuesForSepsilon", &ROCParameter::setInitialValuesForSepsilon)//Not a R wrapper
-
-
-		.method("setNumObservedSynthesisRateSets", &ROCParameter::setNumObservedPhiSets)//Not a R wrapper
+		
 		//CSP Functions:
 		//Listed in the properties section below. NOTE: these getter/setters are ONLY
 		//used in R
@@ -263,7 +265,7 @@ RCPP_MODULE(Parameter_mod)
 		.method("initSelection", &FONSEParameter::initSelection)
 		.method("initSelectionCategories", &FONSEParameter::initSelectionCategories)
 
-
+		.method("fixedInitiationCost",&FONSEParameter::fixedInitiationCost)
 
 		//Prior Functions:
 		.method("getMutationPriorStandardDeviation", &FONSEParameter::getMutationPriorStandardDeviation)

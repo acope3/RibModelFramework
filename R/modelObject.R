@@ -50,12 +50,12 @@
 initializeModelObject <- function(parameter, model = "ROC", with.phi = FALSE, fix.observation.noise = FALSE, rfp.count.column = 1) {
   if(model == "ROC") {
     c.model <- new(ROCModel, with.phi, fix.observation.noise)
-  } else if (model == "FONSE",with.phi,fix.observation.noise) {
-    c.model = new(FONSEModel)
+  } else if (model == "FONSE") {
+    c.model = new(FONSEModel,with.phi,fix.observation.noise)
   } else if (model == "PA") {
-    c.model <- new(PAModel, rfp.count.column)
+    c.model <- new(PAModel, rfp.count.column,with.phi,fix.observation.noise)
   } else if (model == "PANSE") {
-    c.model <- new(PANSEModel, rfp.count.column)
+    c.model <- new(PANSEModel, rfp.count.column,with.phi,fix.observation.noise)
   } else {
     stop("Unknown model.")
   }

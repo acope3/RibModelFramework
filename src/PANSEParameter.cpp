@@ -439,7 +439,7 @@ void PANSEParameter::initFromRestartFile(std::string filename)
 void PANSEParameter::initAllTraces(unsigned samples, unsigned num_genes, bool estimateSynthesisRate)
 {
 	traces.initializePANSETrace(samples, num_genes, numMutationCategories, numSelectionCategories, numParam,
-						 numMixtures, categories, (unsigned)groupList.size(),currentSynthesisRateLevel[0],mixtureAssignment,estimateSynthesisRate);
+						 numMixtures, categories, (unsigned)groupList.size(),obsPhiSets,currentSynthesisRateLevel[0],mixtureAssignment,estimateSynthesisRate);
 }
 
 
@@ -771,7 +771,7 @@ void PANSEParameter::updatePartitionFunction()
 void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastIteration, bool adapt)
 {
 	my_print("Acceptance rate for Codon Specific Parameter\n");
-	my_print("\tAA\tAcc.Rat\n"); //Prop.Width\n";
+	my_print("\tCodon\tAcc.Rat\n"); //Prop.Width\n";
 	for (unsigned i = 0; i < groupList.size(); i++)
 	{
 		unsigned codonIndex = SequenceSummary::codonToIndex(groupList[i]);
@@ -1226,6 +1226,7 @@ std::vector<double> PANSEParameter::oneMixNSE(){
 void PANSEParameter::setTotalRFPCount(Genome& genome)
 {
 	Y = genome.getSumRFP();
+	//numGenes = genome.getGenomeSize();
 }
 
 unsigned PANSEParameter::getTotalRFPCount()

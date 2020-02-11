@@ -492,12 +492,11 @@ void Genome::writeRFPData(std::string filename, bool simulated)
 				}
 			}
 		}
-            // We are printing a simulated gene: There is no position-based RFP calculations.
-            // This is a different format than the standard RFPData one.
+        // We are printing a simulated gene: There is no position-based RFP calculations.
+        // This is a different format than the standard RFPData one.
 		else
 		{
 			Fout << "GeneID,Position,Codon,RFPCount\n";
-
 			for (unsigned geneIndex = 0u; geneIndex < numGenes; geneIndex++)
 			{
                 //unsigned position = 1u;

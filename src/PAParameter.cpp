@@ -340,7 +340,7 @@ void PAParameter::initFromRestartFile(std::string filename)
 void PAParameter::initAllTraces(unsigned samples, unsigned num_genes, bool estimateSynthesisRate)
 {
 	traces.initializePATrace(samples, num_genes, numMutationCategories, numSelectionCategories, numParam,
-						 numMixtures, categories, (unsigned)groupList.size(),currentSynthesisRateLevel[0],mixtureAssignment, estimateSynthesisRate);
+						 numMixtures, categories, (unsigned)groupList.size(),obsPhiSets,currentSynthesisRateLevel[0],mixtureAssignment, estimateSynthesisRate);
 }
 
 
@@ -409,6 +409,7 @@ void PAParameter::initMutationSelectionCategories(std::vector<std::string> files
 				std::string val = tmpString.substr(pos + 1, std::string::npos);
 				unsigned index = SequenceSummary::codonToIndex(codon, false);
 				temp[index] = std::atof(val.c_str());
+				my_print("% % % %\n",codon,val,index,temp[index]);
 			}
 			unsigned altered = 0u;
 			for (unsigned j = 0; j < categories.size(); j++)
@@ -551,11 +552,13 @@ void PAParameter::updateCodonSpecificParameter(std::string grouping)
  */
 void PAParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastIteration, bool adapt)
 {
+	my_print("Acceptance rate for Codon Specific Parameter\n");
+	my_print("\tCodon\tAcc.Rat\n"); //Prop.Width\n";
 	for (unsigned i = 0; i < groupList.size(); i++)
 	{
         unsigned codonIndex = SequenceSummary::codonToIndex(groupList[i]);
 		double acceptanceLevel = (double)numAcceptForCodonSpecificParameters[codonIndex] / (double)adaptationWidth;
-
+		my_print("\t%:\t%\n", groupList[i].c_str(), acceptanceLevel);
 		traces.updateCodonSpecificAcceptanceRateTrace(codonIndex, acceptanceLevel);
 		if (adapt)
 		{

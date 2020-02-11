@@ -100,10 +100,7 @@ MCMCAlgorithm::~MCMCAlgorithm()
 */
 double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, Model& model, int iteration)
 {
-    //FILE * pFile;
-    //pFile = fopen("/home/clandere/Desktop/myfile.txt","a");
-	// TODO move the likelihood calculation out of here. make it a void function again.
-
+    
 	double loglikelihood;
 	double logPosterior = 0.0;
     //double logPosterior2 = 0.0; //currently unused
@@ -415,7 +412,9 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 #ifdef _OPENMP
 //#ifndef __APPLE__
 	omp_set_num_threads(numCores);
+	my_print("Requested % out of possible % threads\n",numCores,omp_get_max_threads());
 #endif
+
 	// Replace with reportSample?
 	unsigned reportStep = (100u < thinning) ? thinning : 100u;
 
@@ -429,7 +428,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	//model.setNumPhiGroupings(genome.getGene(0).getObservedSynthesisRateValues().size());
 	model.initTraces(samples + 1, genome.getGenomeSize(),(estimateSynthesisRate||estimateMixtureAssignment)); //Samples + 2 so we can store the starting and ending values.
 	// starting the MCMC
-
+	
 	model.updateTracesWithInitialValues(genome);
 	if (stepsToAdapt == -1)
 		stepsToAdapt = maximumIterations;
@@ -520,6 +519,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
   		}
 
 
+
 		if ((iteration % (50 * adaptiveWidth)) == 0u)
 		{
 			double gewekeScore = calculateGewekeScore(iteration/thinning);
@@ -592,6 +592,7 @@ void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned
 				std::string grouping = model.getGrouping(i);
 				model.updateCodonSpecificParameter(grouping);
 			}
+			model.completeUpdateCodonSpecificParameter();
 		}
 		// no prior on hyper parameters -> just accept everything
 		if (estimateHyperParameter)

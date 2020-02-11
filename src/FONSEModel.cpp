@@ -48,7 +48,6 @@ double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grou
 		for (unsigned j = 0; j < positions->size(); j++)
 		{
 			calculateLogCodonProbabilityVector(numCodons, positions->at(j), minIndexVal, mutation, selection, phiValue, a1_value, codonProb);
-			//my_print("Position %\n",positions->at(j));
 			logLikelihood += codonProb[k];
 		}
 		//positions->clear();
@@ -103,6 +102,8 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 	double phiValue_proposed = parameter->getSynthesisRate(geneIndex, expressionCategory, true);
 	double a1_value = getInitiationCost(false);
 
+	SequenceSummary *sequenceSummary = gene.getSequenceSummary();
+
 #ifdef _OPENMP
 //#ifndef __APPLE__
 #pragma omp parallel for private(mutation, selection,curAA) reduction(+:likelihood,likelihood_proposed)
@@ -110,6 +111,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 	for (unsigned i = 0u; i < getGroupListSize(); i++)
 	{
 		curAA = getGrouping(i);
+		if (sequenceSummary->getAACountForAA(i) == 0) continue;
 		parameter->getParameterForCategory(mutationCategory, FONSEParameter::dM, curAA, false, mutation);
 		parameter->getParameterForCategory(selectionCategory, FONSEParameter::dOmega, curAA, false, selection);
 		likelihood += calculateLogLikelihoodRatioPerAA(gene, curAA, mutation, selection, phiValue, a1_value);
@@ -123,12 +125,12 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 	//double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(selectionCategory, false);
 	double logPhiProbability = Parameter::densityLogNorm(phiValue, mPhi, stdDevSynthesisRate, true);
 	double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, mPhi, stdDevSynthesisRate, true);
-	
 	if (withPhi)
 	{
 		for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++)
 		{
 			double obsPhi = gene.getObservedSynthesisRate(i);
+			//my_print("Noise Offset: %\n",getNoiseOffset(i));
 			if (obsPhi > -1.0)
 			{
 				double logObsPhi = std::log(obsPhi);
@@ -137,10 +139,8 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 			}
 		}
 	}
-	
 	double currentLogPosterior = (likelihood + logPhiProbability);
 	double proposedLogPosterior = (likelihood_proposed + logPhiProbability_proposed);
-	
 	logProbabilityRatio[0] = (proposedLogPosterior - currentLogPosterior) - (std::log(phiValue) - std::log(phiValue_proposed));
 	logProbabilityRatio[1] = currentLogPosterior - std::log(phiValue_proposed);
 	logProbabilityRatio[2] = proposedLogPosterior - std::log(phiValue);
@@ -172,7 +172,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 	double a1_value = getInitiationCost(false);
 #ifdef _OPENMP
 //#ifndef __APPLE__
-	#pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed, curAA, gene, sequenceSummary) reduction(+:likelihood,likelihood_proposed)
+#pragma omp parallel for private(mutation, selection, mutation_proposed, selection_proposed, curAA, gene, sequenceSummary) reduction(+:likelihood,likelihood_proposed)
 #endif
 	for (unsigned i = 0u; i < numGenes; i++)
 	{
@@ -189,7 +189,6 @@ void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 		// get phi value, calculate likelihood conditional on phi
 		double phiValue = parameter->getSynthesisRate(i, expressionCategory, false);
 
-
 		// get current mutation and selection parameter
 		parameter->getParameterForCategory(mutationCategory, FONSEParameter::dM, grouping, false, mutation);
 		parameter->getParameterForCategory(selectionCategory, FONSEParameter::dOmega, grouping, false, selection);
@@ -197,7 +196,6 @@ void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 		// get proposed mutation and selection parameter
 		parameter->getParameterForCategory(mutationCategory, FONSEParameter::dM, grouping, true, mutation_proposed);
 		parameter->getParameterForCategory(selectionCategory, FONSEParameter::dOmega, grouping, true, selection_proposed);
-
 		likelihood += calculateLogLikelihoodRatioPerAA(*gene, grouping, mutation, selection, phiValue,a1_value);
 		likelihood_proposed += calculateLogLikelihoodRatioPerAA(*gene, grouping, mutation_proposed, selection_proposed, phiValue,a1_value);
 	}
@@ -209,6 +207,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 	logAcceptanceRatioForAllMixtures[2] = likelihood_proposed;
 	logAcceptanceRatioForAllMixtures[3] = posterior;
 	logAcceptanceRatioForAllMixtures[4] = posterior_proposed;
+
 }
 
 
@@ -221,8 +220,17 @@ void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 
 	double lpr_sphi = 0.0;
 	double lpr_a1 = 0.0;
+	double lpr = 0.0;
+	if (withPhi)
+	{
+		// one for each noiseOffset, one for stdDevSynthesisRate, one for initiation_cost a1
+		logProbabilityRatio.resize(getNumPhiGroupings() + 2);
+	}
+	else
+	{
+		logProbabilityRatio.resize(2);
+	}
 
-	logProbabilityRatio.resize(2);
 	double a1_current = getInitiationCost(false);
 	double a1_proposed = getInitiationCost(true);
 
@@ -245,7 +253,7 @@ void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 
 #ifdef _OPENMP
 //#ifndef __APPLE__
-#pragma #pragma omp parallel for private(gene,mutation, selection, curAA) reduction(+:lpr_sphi,lpr_a1)
+#pragma omp parallel for private(gene,mutation, selection, curAA) reduction(+:lpr_sphi,lpr_a1)
 #endif
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{
@@ -272,7 +280,37 @@ void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 	}
 	logProbabilityRatio[0] = lpr_sphi;
 	logProbabilityRatio[1] = lpr_a1;
-	//my_print("A1 current: % A1 proposed % LogLikelihoodRatio %\n",a1_current,a1_proposed,lpr_a1);
+	if (withPhi)
+	{
+		for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++)
+		{
+			
+			lpr = 0.0;
+			double noiseOffset = getNoiseOffset(i, false);
+			double noiseOffset_proposed = getNoiseOffset(i, true);
+			double observedSynthesisNoise = getObservedSynthesisNoise(i);
+#ifdef _OPENMP
+//#ifndef __APPLE__
+#pragma omp parallel for reduction(+:lpr)
+#endif
+			for (unsigned j = 0u; j < genome.getGenomeSize(); j++)
+			{
+				unsigned mixtureAssignment = getMixtureAssignment(j);
+				mixtureAssignment = getSynthesisRateCategory(mixtureAssignment);
+				double logPhi = std::log(getSynthesisRate(j, mixtureAssignment, false));
+				double obsPhi = genome.getGene(j).getObservedSynthesisRate(i);
+				if (obsPhi > -1.0)
+				{
+					double logObsPhi = std::log(obsPhi);
+					double proposed = Parameter::densityNorm(logObsPhi, logPhi + noiseOffset_proposed, observedSynthesisNoise, true);
+					double current = Parameter::densityNorm(logObsPhi, logPhi + noiseOffset, observedSynthesisNoise, true);
+					lpr += proposed - current;
+				}
+			}
+			logProbabilityRatio[i+2] = lpr;
+		}
+	}
+
 }
 
 
@@ -481,6 +519,8 @@ void FONSEModel::updateHyperParameterTraces(unsigned sample)
 {
 	updateStdDevSynthesisRateTrace(sample);
 	updateInitiationCostParameterTrace(sample);
+	updateNoiseOffsetTrace(sample);
+    updateObservedSynthesisNoiseTrace(sample);
 }
 
 
@@ -536,6 +576,8 @@ void FONSEModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth, bool 
 {
 	adaptStdDevSynthesisRateProposalWidth(adaptiveWidth, adapt);
 	adaptInitiationCostProposalWidth(adaptiveWidth,adapt);
+	if (withPhi)
+		adaptNoiseOffsetProposalWidth(adaptiveWidth, adapt);
 }
 
 
@@ -556,6 +598,10 @@ void FONSEModel::proposeCodonSpecificParameter()
 void FONSEModel::proposeHyperParameters()
 {
 	parameter->proposeHyperParameters();
+	if (withPhi)
+	{
+		parameter->proposeNoiseOffset();
+	}
 }
 
 
@@ -617,8 +663,55 @@ void FONSEModel::completeUpdateCodonSpecificParameter()
     parameter->completeUpdateCodonSpecificParameter();
 }
 
+//Noise offset functions
+
+double FONSEModel::getNoiseOffset(unsigned index, bool proposed)
+{
+	return parameter->getNoiseOffset(index, proposed);
+}
+
+
+double FONSEModel::getObservedSynthesisNoise(unsigned index)
+{
+	return parameter->getObservedSynthesisNoise(index);
+}
+
+
+double FONSEModel::getCurrentNoiseOffsetProposalWidth(unsigned index)
+{
+	return parameter->getCurrentNoiseOffsetProposalWidth(index);
+}
+
+
+void FONSEModel::updateNoiseOffset(unsigned index)
+{
+	parameter->updateNoiseOffset(index);
+}
+
+
+void FONSEModel::updateNoiseOffsetTrace(unsigned sample)
+{
+	parameter->updateNoiseOffsetTraces(sample);
+}
+
+
+void FONSEModel::updateObservedSynthesisNoiseTrace(unsigned sample)
+{
+	parameter->updateObservedSynthesisNoiseTraces(sample);
+}
+
+
+void FONSEModel::adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt)
+{
+	parameter->adaptNoiseOffsetProposalWidth(adaptiveWidth, adapt);
+}
+
+
+
 void FONSEModel::updateGibbsSampledHyperParameters(Genome &genome)
 {
+  // estimate s_epsilon by sampling from a gamma distribution and transforming it into an inverse gamma sample
+	
 	if (withPhi)
 	{
 		if(!fix_sEpsilon)
@@ -631,11 +724,11 @@ void FONSEModel::updateGibbsSampledHyperParameters(Genome &genome)
 				double noiseOffset = getNoiseOffset(i);
 				for (unsigned j = 0; j < genome.getGenomeSize(); j++)
 				{
-					mixtureAssignment = getMixtureAssignment(j);
+					mixtureAssignment = parameter->getMixtureAssignment(j);
 					double obsPhi = genome.getGene(j).getObservedSynthesisRate(i);
 					if (obsPhi > -1.0)
 					{
-						double sum = std::log(obsPhi) - noiseOffset - std::log(getSynthesisRate(j, mixtureAssignment, false));
+						double sum = std::log(obsPhi) - noiseOffset - std::log(parameter->getSynthesisRate(j, mixtureAssignment, false));
 						rate += (sum * sum);
 					}else{
 						// missing observation.
@@ -655,29 +748,37 @@ void FONSEModel::updateGibbsSampledHyperParameters(Genome &genome)
 		}
 	}
 }
-}
+
 
 
 void FONSEModel::updateAllHyperParameter()
 {
 	updateStdDevSynthesisRate();
 	updateInitiationCost();
+	if (withPhi)
+	{
+		for (unsigned i =0; i < parameter->getNumObservedPhiSets(); i++)
+		{
+			updateNoiseOffset(i);
+		}
+	}
 }
 
 void FONSEModel::updateHyperParameter(unsigned hp)
 {
 	// NOTE: when adding additional hyper parameter, also add to updateAllHyperParameter()
-	switch (hp)
+	if (hp == 0)
 	{
-		case 0:
-			updateStdDevSynthesisRate();
-			break;
-		case 1:
-			updateInitiationCost();
-			break;
-		default:
-			updateStdDevSynthesisRate();
-			break;
+		updateStdDevSynthesisRate();
+	}
+	else if (hp == 1)
+	{
+		updateInitiationCost();
+	}		
+	else if (hp > 1 and withPhi)
+	{	
+		//subtract off 2 because the first two parameters withh be the updateStdDevSynthesisRate
+		updateNoiseOffset(hp - 2);
 	}
 }
 
@@ -691,12 +792,9 @@ void FONSEModel::simulateGenome(Genome & genome)
 
 	for (unsigned geneIndex = 0; geneIndex < genome.getGenomeSize(); geneIndex++) //loop over all genes in the genome
 	{
-		if (geneIndex % 100 == 0) my_print("Simulating Gene %\n", geneIndex);
 		Gene gene = genome.getGene(geneIndex);
 		SequenceSummary sequenceSummary = gene.geneData;
 		std::string tmpSeq = "ATG"; //Always will have the start amino acid
-
-
 		unsigned mixtureElement = getMixtureAssignment(geneIndex);
 		unsigned mutationCategory = getMutationCategory(mixtureElement);
 		unsigned selectionCategory = getSelectionCategory(mixtureElement);

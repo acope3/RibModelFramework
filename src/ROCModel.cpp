@@ -31,9 +31,7 @@ double ROCModel::calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codo
 	for (unsigned i = 0; i < numCodons; i++)
 	{
 		if (codonCount[i] == 0) continue;
-	//	my_print("\tCurrent LogLike for codon i: %\n",logLikelihood);
 		logLikelihood += logCodonProbabilities[i] * codonCount[i];
-	// my_print("\t%\t%\t%\t%\t%\n",numCodons,logCodonProbabilities[i],codonCount[i],(logCodonProbabilities[i]*codonCount[i]),logLikelihood);
 	}
 	return logLikelihood;
 }
@@ -250,7 +248,7 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 
 #ifdef _OPENMP
 //#ifndef __APPLE__
-//#pragma omp parallel for reduction(+:lpr)
+#pragma omp parallel for reduction(+:lpr)
 #endif
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{
@@ -277,7 +275,7 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 			double observedSynthesisNoise = getObservedSynthesisNoise(i);
 #ifdef _OPENMP
 //#ifndef __APPLE__
-//#pragma omp parallel for reduction(+:lpr)
+#pragma omp parallel for reduction(+:lpr)
 #endif
 			for (unsigned j = 0u; j < genome.getGenomeSize(); j++)
 			{
@@ -485,11 +483,8 @@ void ROCModel::updateCodonSpecificParameterTrace(unsigned sample, std::string gr
 void ROCModel::updateHyperParameterTraces(unsigned sample)
 {
 	updateStdDevSynthesisRateTrace(sample);
-	for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++)
-	{
-		updateNoiseOffsetTrace(i, sample);
-		updateObservedSynthesisNoiseTrace(i, sample);
-	}
+	updateNoiseOffsetTrace(sample);
+	updateObservedSynthesisNoiseTrace(sample);
 }
 
 
@@ -541,6 +536,92 @@ void ROCModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth, bool ad
 		adaptNoiseOffsetProposalWidth(adaptiveWidth, adapt);
 }
 
+
+//Noise offset functions
+
+double ROCModel::getNoiseOffset(unsigned index, bool proposed)
+{
+	return parameter->getNoiseOffset(index, proposed);
+}
+
+
+double ROCModel::getObservedSynthesisNoise(unsigned index)
+{
+	return parameter->getObservedSynthesisNoise(index);
+}
+
+
+double ROCModel::getCurrentNoiseOffsetProposalWidth(unsigned index)
+{
+	return parameter->getCurrentNoiseOffsetProposalWidth(index);
+}
+
+
+void ROCModel::updateNoiseOffset(unsigned index)
+{
+	parameter->updateNoiseOffset(index);
+}
+
+
+void ROCModel::updateNoiseOffsetTrace(unsigned sample)
+{
+	parameter->updateNoiseOffsetTraces(sample);
+}
+
+
+void ROCModel::updateObservedSynthesisNoiseTrace(unsigned sample)
+{
+	parameter->updateObservedSynthesisNoiseTraces(sample);
+}
+
+
+void ROCModel::adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt)
+{
+	parameter->adaptNoiseOffsetProposalWidth(adaptiveWidth, adapt);
+}
+
+
+
+void ROCModel::updateGibbsSampledHyperParameters(Genome &genome)
+{
+  // estimate s_epsilon by sampling from a gamma distribution and transforming it into an inverse gamma sample
+	
+	if (withPhi)
+	{
+		if(!fix_sEpsilon)
+		{
+			double shape = ((double)genome.getGenomeSize() - 1.0) / 2.0;
+			for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++)
+			{
+				double rate = 0.0; //Prior on s_epsilon goes here?
+				unsigned mixtureAssignment;
+				double noiseOffset = getNoiseOffset(i);
+				for (unsigned j = 0; j < genome.getGenomeSize(); j++)
+				{
+					mixtureAssignment = parameter->getMixtureAssignment(j);
+					double obsPhi = genome.getGene(j).getObservedSynthesisRate(i);
+					if (obsPhi > -1.0)
+					{
+						double sum = std::log(obsPhi) - noiseOffset - std::log(parameter->getSynthesisRate(j, mixtureAssignment, false));
+						rate += (sum * sum);
+					}else{
+						// missing observation.
+						shape -= 0.5;
+						//Reduce shape because initial estimate assumes there are no missing observations
+					}
+				}
+				rate /= 2.0;
+				double rand = parameter->randGamma(shape, rate);
+
+				// Below the gamma sample is transformed into an inverse gamma sample
+				// According to Gilchrist et al (2015) Supporting Materials p. S6
+				// The sample 1/T is supposed to be equal to $s_\epsilon^2$.
+				double sepsilon = std::sqrt(1.0/rand);
+				parameter->setObservedSynthesisNoise(i, sepsilon);
+			}
+		}
+	}
+}
 
 
 
@@ -622,53 +703,14 @@ void ROCModel::completeUpdateCodonSpecificParameter()
     parameter->completeUpdateCodonSpecificParameter();
 }
 
-void ROCModel::updateGibbsSampledHyperParameters(Genome &genome)
-{
-  // estimate s_epsilon by sampling from a gamma distribution and transforming it into an inverse gamma sample
-
-	if (withPhi)
-	{
-		if(!fix_sEpsilon)
-		{
-			double shape = ((double)genome.getGenomeSize() - 1.0) / 2.0;
-			for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++)
-			{
-				double rate = 0.0; //Prior on s_epsilon goes here?
-				unsigned mixtureAssignment;
-				double noiseOffset = getNoiseOffset(i);
-				for (unsigned j = 0; j < genome.getGenomeSize(); j++)
-				{
-					mixtureAssignment = getMixtureAssignment(j);
-					double obsPhi = genome.getGene(j).getObservedSynthesisRate(i);
-					if (obsPhi > -1.0)
-					{
-						double sum = std::log(obsPhi) - noiseOffset - std::log(getSynthesisRate(j, mixtureAssignment, false));
-						rate += (sum * sum);
-					}else{
-						// missing observation.
-						shape -= 0.5;
-						//Reduce shape because initial estimate assumes there are no missing observations
-					}
-				}
-				rate /= 2.0;
-				double rand = parameter->randGamma(shape, rate);
-
-				// Below the gamma sample is transformed into an inverse gamma sample
-				// According to Gilchrist et al (2015) Supporting Materials p. S6
-				// The sample 1/T is supposed to be equal to $s_\epsilon^2$.
-				double sepsilon = std::sqrt(1.0/rand);
-				parameter->setObservedSynthesisNoise(i, sepsilon);
-			}
-		}
-	}
-}
-
 
 void ROCModel::updateAllHyperParameter()
 {
 	updateStdDevSynthesisRate();
 	for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++)
+	{
 		updateNoiseOffset(i);
+	}
 }
 
 
@@ -902,52 +944,6 @@ void ROCModel::getParameterForCategory(unsigned category, unsigned param, std::s
 
 
 
-
-//--------------------------------------------//
-//---------- ROC Specific Functions ----------//
-//--------------------------------------------//
-
-
-double ROCModel::getNoiseOffset(unsigned index, bool proposed)
-{
-	return parameter->getNoiseOffset(index, proposed);
-}
-
-
-double ROCModel::getObservedSynthesisNoise(unsigned index)
-{
-	return parameter->getObservedSynthesisNoise(index);
-}
-
-
-double ROCModel::getCurrentNoiseOffsetProposalWidth(unsigned index)
-{
-	return parameter->getCurrentNoiseOffsetProposalWidth(index);
-}
-
-
-void ROCModel::updateNoiseOffset(unsigned index)
-{
-	parameter->updateNoiseOffset(index);
-}
-
-
-void ROCModel::updateNoiseOffsetTrace(unsigned index, unsigned sample)
-{
-	parameter->updateNoiseOffsetTraces(sample);
-}
-
-
-void ROCModel::updateObservedSynthesisNoiseTrace(unsigned index, unsigned sample)
-{
-	parameter->updateObservedSynthesisNoiseTraces(sample);
-}
-
-
-void ROCModel::adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt)
-{
-	parameter->adaptNoiseOffsetProposalWidth(adaptiveWidth, adapt);
-}
 
 
 

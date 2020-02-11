@@ -107,7 +107,6 @@ void FONSEParameter::initFONSEParameterSet(double _a1)
 	std_a1 = 0.1;
 	numAcceptForA1 = 0;
 	//may need getter fcts
-	my_print("Initiation Cost a1 %\n",a1);
 	currentCodonSpecificParameter.resize(2);
 	proposedCodonSpecificParameter.resize(2);
 
@@ -117,30 +116,6 @@ void FONSEParameter::initFONSEParameterSet(double _a1)
 	currentCodonSpecificParameter[dOmega].resize(numSelectionCategories);
 	proposedCodonSpecificParameter[dOmega].resize(numSelectionCategories);
 
-	// unsigned biggestCat = std::max(std::max(numMutationCategories, numSelectionCategories), maxGrouping);
-	// for(unsigned i = 0u; i < biggestCat; i++)
-	// {
-	// 	std::vector<double> tmp(numParam, 0.0);
-	// 	if(i < numMutationCategories)
-	// 	{
-	// 		currentCodonSpecificParameter[dM][i] = tmp;
-	// 		proposedCodonSpecificParameter[dM][i] = tmp;
-	// 	}
-	// 	if(i < numSelectionCategories)
-	// 	{
-	// 		proposedCodonSpecificParameter[dOmega][i] = tmp;
-	// 		currentCodonSpecificParameter[dOmega][i] = tmp;
-	// 	}
-	// 	if(i < maxGrouping)
-	// 	{
-	// 		std::string aa = SequenceSummary::AminoAcidArray[i];
-	// 		//TODO: Explain this
-	// 		unsigned numCodons = SequenceSummary::GetNumCodonsForAA(aa, true);
-	// 		CovarianceMatrix m((numMutationCategories + numSelectionCategories) * numCodons);
-	// 		m.choleskyDecomposition();
-	// 		covarianceMatrix.push_back(m);
-	// 	}
-	// }
 	for (unsigned i = 0u; i < numMutationCategories; i++)
 	{
 		std::vector<double> tmp(numParam, 0.0);
@@ -436,7 +411,7 @@ void FONSEParameter::initFromRestartFile(std::string filename)
 void FONSEParameter::initAllTraces(unsigned samples, unsigned num_genes, bool estimateSynthesisRate)
 {
     traces.initializeFONSETrace(samples, num_genes, numMutationCategories, numSelectionCategories, numParam,
-                         numMixtures, categories, maxGrouping,currentSynthesisRateLevel[0],mixtureAssignment,estimateSynthesisRate);
+                         numMixtures, categories, maxGrouping,obsPhiSets,currentSynthesisRateLevel[0],mixtureAssignment,estimateSynthesisRate);
 }
 
 void FONSEParameter::initMutationCategories(std::vector<std::string> files, unsigned numCategories)
@@ -464,7 +439,7 @@ void FONSEParameter::initMutationCategories(std::vector<std::string> files, unsi
 					std::size_t pos2 = tmp.find(',', pos + 1);
 					//my_print("%\n", tmp.substr(pos + 1, pos2 - pos - 1 ));
 					double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
-
+					my_print("% %",codon,value);
 					currentCodonSpecificParameter[dM][category][codonIndex] = value;
 					proposedCodonSpecificParameter[dM][category][codonIndex] = value;
 				}
@@ -499,7 +474,7 @@ void FONSEParameter::initSelectionCategories(std::vector<std::string> files, uns
 				std::size_t pos2 = tmp.find(',', pos + 1);
 				//	my_print("%\n", tmp.substr(pos + 1, pos2 - pos - 1 ));
 				double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
-
+				my_print("% %",codon,value);
 				currentCodonSpecificParameter[dOmega][category][codonIndex] = value;
 				proposedCodonSpecificParameter[dOmega][category][codonIndex] = value;
 			}
@@ -634,6 +609,7 @@ void FONSEParameter::completeUpdateCodonSpecificParameter()
 			for (unsigned i = aaStart; i < aaEnd; i++)
 			{
 				currentCodonSpecificParameter[dOmega][k][i] = proposedCodonSpecificParameter[dOmega][k][i];
+
 			}
 		}
 		
@@ -707,9 +683,20 @@ void FONSEParameter::proposeHyperParameters()
     {
 		stdDevSynthesisRate_proposed[i] = std::exp(randNorm(std::log(stdDevSynthesisRate[i]), std_stdDevSynthesisRate));
     }
-    a1_proposed = std::exp(randNorm(std::log(a1), std_a1));
+    if (!fix_a1)
+    {
+    	a1_proposed = std::exp(randNorm(std::log(a1), std_a1));
+    }
+    else
+    {
+    	a1_proposed = a1;
+    }
 }
 
+void FONSEParameter::fixedInitiationCost()
+{
+	fix_a1 = true;
+}
 
 
 void FONSEParameter::adaptInitiationCostProposalWidth(unsigned adaptationWidth, bool adapt)

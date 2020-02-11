@@ -189,7 +189,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
     if(is.null(init.with.restart.file)){
       parameter <- initializeFONSEParameterObject(genome, sphi, num.mixtures, 
                                                   gene.assignment, initial.expression.values, split.serine, 
-                                                  mixture.definition, mixture.definition.matrix, init.csp.variance,init.w.obs.phi,init.initiation.cost)
+                                                  mixture.definition, mixture.definition.matrix, init.csp.variance,init.sepsilon,init.w.obs.phi,init.initiation.cost)
     }else{
       parameter <- new(FONSEParameter, init.with.restart.file)
     }
@@ -197,7 +197,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
     if(is.null(init.with.restart.file)){
       parameter <- initializePAParameterObject(genome, sphi, num.mixtures, 
                                                gene.assignment, initial.expression.values, split.serine, 
-                                               mixture.definition, mixture.definition.matrix, init.csp.variance,init.w.obs.phi) 
+                                               mixture.definition, mixture.definition.matrix, init.csp.variance,init.sepsilon,init.w.obs.phi) 
     }else{
       parameter <- new(PAParameter, init.with.restart.file)
     }
@@ -205,7 +205,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
     if(is.null(init.with.restart.file)){
       parameter <- initializePANSEParameterObject(genome, sphi, num.mixtures, 
                                                   gene.assignment, initial.expression.values, split.serine, 
-                                                  mixture.definition, mixture.definition.matrix, init.csp.variance,init.w.obs.phi) 
+                                                  mixture.definition, mixture.definition.matrix, init.csp.variance,init.sepsilon,init.w.obs.phi) 
     }else{
       parameter <- new(PANSEParameter, init.with.restart.file)
     }
@@ -296,7 +296,7 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
 initializePAParameterObject <- function(genome, sphi, numMixtures, geneAssignment, 
                                         expressionValues = NULL, split.serine = TRUE, 
                                         mixture.definition = "allUnique", 
-                                        mixture.definition.matrix = NULL, init.csp.variance,init.w.obs.phi=FALSE){
+                                        mixture.definition.matrix = NULL, init.csp.variance = 0.0025 ,init.sepsilon = 0.1,init.w.obs.phi=FALSE){
   
   if(is.null(mixture.definition.matrix))
   { # keyword constructor
@@ -341,7 +341,11 @@ initializePAParameterObject <- function(genome, sphi, numMixtures, geneAssignmen
   }
   
   ## TODO (Cedric): use init.csp.variance to set initial proposal width for CSP parameters
-  
+  n.obs.phi.sets <- ncol(getObservedSynthesisRateSet(genome)) - 1
+  parameter$setNumObservedSynthesisRateSets(n.obs.phi.sets)
+  if (n.obs.phi.sets != 0){
+    parameter$setInitialValuesForSepsilon(as.vector(init.sepsilon))
+  }
   return (parameter)
 }
 
@@ -349,7 +353,7 @@ initializePAParameterObject <- function(genome, sphi, numMixtures, geneAssignmen
 initializePANSEParameterObject <- function(genome, sphi, numMixtures, geneAssignment, 
                                            expressionValues = NULL, split.serine = TRUE, 
                                            mixture.definition = "allUnique", 
-                                           mixture.definition.matrix = NULL, init.csp.variance,init.w.obs.phi=FALSE){
+                                           mixture.definition.matrix = NULL, init.csp.variance = 0.0025 ,init.sepsilon = 0.1,init.w.obs.phi=FALSE){
   
   if(is.null(mixture.definition.matrix))
   { # keyword constructor
@@ -392,7 +396,13 @@ initializePANSEParameterObject <- function(genome, sphi, numMixtures, geneAssign
   {
     stop("expressionValues is not NULL and init.w.obs.phi == TRUE. Please choose only one of these options.")
   }
+
   parameter$setTotalRFPCount(genome);
+  n.obs.phi.sets <- ncol(getObservedSynthesisRateSet(genome)) - 1
+  parameter$setNumObservedSynthesisRateSets(n.obs.phi.sets)
+  if (n.obs.phi.sets != 0){
+    parameter$setInitialValuesForSepsilon(as.vector(init.sepsilon))
+  }
   return (parameter)
 }
 
@@ -400,7 +410,7 @@ initializePANSEParameterObject <- function(genome, sphi, numMixtures, geneAssign
 initializeFONSEParameterObject <- function(genome, sphi, numMixtures, 
                                            geneAssignment, expressionValues = NULL, split.serine = TRUE,
                                            mixture.definition = "allUnique", 
-                                           mixture.definition.matrix = NULL, init.csp.variance,init.w.obs.phi=FALSE,init.initiation.cost = 4){
+                                           mixture.definition.matrix = NULL, init.csp.variance = 0.0025 ,init.sepsilon = 0.1,init.w.obs.phi=FALSE,init.initiation.cost = 4){
   
   # create Parameter object
   if(is.null(mixture.definition.matrix))
@@ -444,8 +454,13 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
   {
     stop("expressionValues is not NULL and init.w.obs.phi == TRUE. Please choose only one of these options.")
   }
-  ## Alex: Note, set variance to be smaller value relative to roc given \Delta\omega is likely to be orders of magnitude smaller
-  parameter <- initializeCovarianceMatrices(parameter, genome, numMixtures, geneAssignment, init.csp.variance/10^3)
+
+  n.obs.phi.sets <- ncol(getObservedSynthesisRateSet(genome)) - 1
+  parameter$setNumObservedSynthesisRateSets(n.obs.phi.sets)
+  if (n.obs.phi.sets != 0){
+    parameter$setInitialValuesForSepsilon(as.vector(init.sepsilon))
+  }
+  parameter <- initializeCovarianceMatrices(parameter, genome, numMixtures, geneAssignment, init.csp.variance)
   
   return(parameter)
 }

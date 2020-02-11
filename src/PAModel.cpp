@@ -10,10 +10,12 @@ using namespace Rcpp;
 //----------- Constructors & Destructors ---------- //
 //--------------------------------------------------//
 
-PAModel::PAModel(unsigned _RFPCountColumn) : Model()
+PAModel::PAModel(unsigned _RFPCountColumn,bool _withPhi, bool _fix_sEpsilon) : Model()
 {
 	parameter = NULL;
 	RFPCountColumn = _RFPCountColumn - 1;
+	withPhi = _withPhi;
+	fix_sEpsilon = _fix_sEpsilon;
 }
 
 
@@ -67,7 +69,7 @@ void PAModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex,
 
 		double currAlpha = getParameterForCategory(alphaCategory, PAParameter::alp, codon, false);
 		double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, codon, false);
-		unsigned currRFPValue = gene.geneData.getCodonSpecificSumRFPCount(index, RFPCountColumn);
+		unsigned currRFPValue = gene.geneData.getCodonSpecificSumRFPCount(index,0 /*RFPCountColumn*/);
 		unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(index);
 		if (currNumCodonsInMRNA == 0) continue;
 
@@ -78,6 +80,23 @@ void PAModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex,
 	double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(lambdaPrimeCategory, false);
 	double logPhiProbability = Parameter::densityLogNorm(phiValue, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
 	double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
+	
+
+	if (withPhi)
+	{
+		for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++)
+		{
+			double obsPhi = gene.getObservedSynthesisRate(i);
+			if (obsPhi > -1.0)
+			{
+				double logObsPhi = std::log(obsPhi);
+				logPhiProbability += Parameter::densityNorm(logObsPhi, std::log(phiValue) + getNoiseOffset(i), getObservedSynthesisNoise(i), true);
+				logPhiProbability_proposed += Parameter::densityNorm(logObsPhi, std::log(phiValue_proposed) + getNoiseOffset(i), getObservedSynthesisNoise(i), true);
+			}
+		}
+	}
+
+
 	double currentLogPosterior = (logLikelihood + logPhiProbability);
 	double proposedLogPosterior = (logLikelihood_proposed + logPhiProbability_proposed);
 
@@ -95,32 +114,33 @@ void PAModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex,
 void PAModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
                                                                 std::vector<double> &logAcceptanceRatioForAllMixtures)
 {
+	double currAlpha,currLambdaPrime,propAlpha,propLambdaPrime;
 	double logLikelihood = 0.0;
-    double currAlpha, currLambdaPrime;
-    double propAlpha, propLambdaPrime;
 	double logLikelihood_proposed = 0.0;
 	Gene *gene;
 	unsigned index = SequenceSummary::codonToIndex(grouping);
-
+	unsigned n = getNumMixtureElements();
+	double currAdjustmentTerm = 0;
+    double propAdjustmentTerm = 0;
 #ifdef _OPENMP
 //#ifndef __APPLE__
-#pragma omp parallel for private(gene) reduction(+:logLikelihood,logLikelihood_proposed)
+#pragma omp parallel for private(gene,currAlpha,currLambdaPrime,propAlpha,propLambdaPrime) reduction(+:logLikelihood,logLikelihood_proposed)
 #endif
     for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{
 		gene = &genome.getGene(i);
-		// which mixture element does this gene belong to
+		
 		unsigned mixtureElement = parameter->getMixtureAssignment(i);
 		// how is the mixture element defined. Which categories make it up
 		unsigned alphaCategory = parameter->getMutationCategory(mixtureElement);
 		unsigned lambdaPrimeCategory = parameter->getSelectionCategory(mixtureElement);
-		//unsigned synthesisRateCategory = parameter->getSynthesisRateCategory(mixtureElement);
-		// get non codon specific values, calculate likelihood conditional on these
-		double phiValue = parameter->getSynthesisRate(i, /*synthesisRateCategory*/mixtureElement, false);
+		unsigned synthesisRateCategory = parameter->getSynthesisRateCategory(mixtureElement);
+		
+		double phiValue = parameter->getSynthesisRate(i, synthesisRateCategory, false);
+		
 		unsigned currRFPValue = gene->geneData.getCodonSpecificSumRFPCount(index, RFPCountColumn);
 		unsigned currNumCodonsInMRNA = gene->geneData.getCodonCountForCodon(index);
 		if (currNumCodonsInMRNA == 0) continue;
-
 
 		currAlpha = getParameterForCategory(alphaCategory, PAParameter::alp, grouping, false);
 		currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, grouping, false);
@@ -131,14 +151,23 @@ void PAModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grou
 		logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPValue, currNumCodonsInMRNA, phiValue);
 		logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambdaPrime, currRFPValue, currNumCodonsInMRNA, phiValue);
 
-		if(i == 0 and (grouping == "GCA" or grouping == "GCT")){
-		    my_print("%:\nAlpha: %\nLambda: %\nProp Alpha: %\nProp Lambda: %\nPhi: %\nRFP Count: %\nnumCodons: %\n\n",grouping, currAlpha, currLambdaPrime,propAlpha,propLambdaPrime, phiValue, currRFPValue,currNumCodonsInMRNA);
-		}
 	}
-	logAcceptanceRatioForAllMixtures[0] = logLikelihood_proposed - logLikelihood - ((std::log(currAlpha) + std::log(currLambdaPrime))
-                                                                        - (std::log(propAlpha) + std::log(propLambdaPrime)));
-	logAcceptanceRatioForAllMixtures[1] = logLikelihood - (std::log(propAlpha) + std::log(propLambdaPrime));
-	logAcceptanceRatioForAllMixtures[2] = logLikelihood_proposed - (std::log(currAlpha) + std::log(currLambdaPrime));
+	for (unsigned j = 0; j < n; j++)
+    {
+        unsigned alphaCategory = parameter->getMutationCategory(j);
+        unsigned lambdaPrimeCategory = parameter->getSelectionCategory(j);
+        currAlpha = getParameterForCategory(alphaCategory, PAParameter::alp, grouping, false);
+        currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, grouping, false);
+        propAlpha = getParameterForCategory(alphaCategory, PAParameter::alp, grouping, true);
+        propLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, grouping, true);
+
+        currAdjustmentTerm += std::log(currAlpha) + std::log(currLambdaPrime);
+        propAdjustmentTerm += std::log(propAlpha) + std::log(propLambdaPrime);
+    }
+	//my_print("% %\n",logLikelihood,logLikelihood_proposed);
+	logAcceptanceRatioForAllMixtures[0] = logLikelihood_proposed - logLikelihood - (currAdjustmentTerm - propAdjustmentTerm);
+	logAcceptanceRatioForAllMixtures[1] = logLikelihood - propAdjustmentTerm;
+	logAcceptanceRatioForAllMixtures[2] = logLikelihood_proposed - currAdjustmentTerm;
 	logAcceptanceRatioForAllMixtures[3] = logLikelihood;
 	logAcceptanceRatioForAllMixtures[4] = logLikelihood_proposed;
 }
@@ -164,10 +193,17 @@ void PAModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsi
 		lpr -= (std::log(currentStdDevSynthesisRate[i]) - std::log(proposedStdDevSynthesisRate[i]));
 		// take prior into account
 		//TODO(Cedric): make sure you can control that prior from R
-		lpr -= Parameter::densityNorm(currentStdDevSynthesisRate[i], 1.0, 0.1, true) - Parameter::densityNorm(proposedStdDevSynthesisRate[i], 1.0, 0.1, true);
+		//lpr -= Parameter::densityNorm(currentStdDevSynthesisRate[i], 1.0, 0.1, true) - Parameter::densityNorm(proposedStdDevSynthesisRate[i], 1.0, 0.1, true);
 	}
 
-	logProbabilityRatio.resize(1);
+	if (withPhi)
+    {
+        // one for each noiseOffset, and one for stdDevSynthesisRate
+        logProbabilityRatio.resize(getNumPhiGroupings() + 1);
+    }
+    else
+        logProbabilityRatio.resize(1);
+
 #ifdef _OPENMP
 //#ifndef __APPLE__
 #pragma omp parallel for reduction(+:lpr)
@@ -183,7 +219,38 @@ void PAModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsi
 	}
 
 	logProbabilityRatio[0] = lpr;
+	if (withPhi)
+    {
+        for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++)
+        {
+            
+            lpr = 0.0;
+            double noiseOffset = getNoiseOffset(i, false);
+            double noiseOffset_proposed = getNoiseOffset(i, true);
+            double observedSynthesisNoise = getObservedSynthesisNoise(i);
+#ifdef _OPENMP
+//#ifndef __APPLE__
+#pragma omp parallel for reduction(+:lpr)
+#endif
+            for (unsigned j = 0u; j < genome.getGenomeSize(); j++)
+            {
+                unsigned mixtureAssignment = getMixtureAssignment(j);
+                mixtureAssignment = getSynthesisRateCategory(mixtureAssignment);
+                double logPhi = std::log(getSynthesisRate(j, mixtureAssignment, false));
+                double obsPhi = genome.getGene(j).getObservedSynthesisRate(i);
+                if (obsPhi > -1.0)
+                {
+                    double logObsPhi = std::log(obsPhi);
+                    double proposed = Parameter::densityNorm(logObsPhi, logPhi + noiseOffset_proposed, observedSynthesisNoise, true);
+                    double current = Parameter::densityNorm(logObsPhi, logPhi + noiseOffset, observedSynthesisNoise, true);
+                    lpr += proposed - current;
+                }
+            }
+            logProbabilityRatio[i+2] = lpr;
+        }
+    }
 }
+
 
 
 
@@ -371,6 +438,9 @@ void PAModel::updateCodonSpecificParameterTrace(unsigned sample, std::string cod
 void PAModel::updateHyperParameterTraces(unsigned sample)
 {
 	updateStdDevSynthesisRateTrace(sample);
+	if(withPhi)
+	updateNoiseOffsetTrace(sample);
+    updateObservedSynthesisNoiseTrace(sample);
 }
 
 
@@ -420,6 +490,8 @@ void PAModel::adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, u
 void PAModel::adaptHyperParameterProposalWidths(unsigned adaptiveWidth, bool adapt)
 {
 	adaptStdDevSynthesisRateProposalWidth(adaptiveWidth, adapt);
+	if (withPhi)
+		adaptNoiseOffsetProposalWidth(adaptiveWidth, adapt);
 }
 
 
@@ -440,6 +512,10 @@ void PAModel::proposeCodonSpecificParameter()
 void PAModel::proposeHyperParameters()
 {
 	parameter->proposeStdDevSynthesisRate();
+	if (withPhi)
+	{
+		parameter->proposeNoiseOffset();
+	}
 }
 
 
@@ -501,30 +577,118 @@ void PAModel::completeUpdateCodonSpecificParameter()
     parameter->completeUpdateCodonSpecificParameter();
 }
 
+
+//Noise offset functions
+
+double PAModel::getNoiseOffset(unsigned index, bool proposed)
+{
+	return parameter->getNoiseOffset(index, proposed);
+}
+
+
+double PAModel::getObservedSynthesisNoise(unsigned index)
+{
+	return parameter->getObservedSynthesisNoise(index);
+}
+
+
+double PAModel::getCurrentNoiseOffsetProposalWidth(unsigned index)
+{
+	return parameter->getCurrentNoiseOffsetProposalWidth(index);
+}
+
+
+void PAModel::updateNoiseOffset(unsigned index)
+{
+	parameter->updateNoiseOffset(index);
+}
+
+
+void PAModel::updateNoiseOffsetTrace(unsigned sample)
+{
+	parameter->updateNoiseOffsetTraces(sample);
+}
+
+
+void PAModel::updateObservedSynthesisNoiseTrace(unsigned sample)
+{
+	parameter->updateObservedSynthesisNoiseTraces(sample);
+}
+
+
+void PAModel::adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt)
+{
+	parameter->adaptNoiseOffsetProposalWidth(adaptiveWidth, adapt);
+}
+
+
+
 void PAModel::updateGibbsSampledHyperParameters(Genome &genome)
 {
-	//TODO: fill in
+  // estimate s_epsilon by sampling from a gamma distribution and transforming it into an inverse gamma sample
+	
+	if (withPhi)
+	{
+		if(!fix_sEpsilon)
+		{
+			double shape = ((double)genome.getGenomeSize() - 1.0) / 2.0;
+			for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++)
+			{
+				double rate = 0.0; //Prior on s_epsilon goes here?
+				unsigned mixtureAssignment;
+				double noiseOffset = getNoiseOffset(i);
+				for (unsigned j = 0; j < genome.getGenomeSize(); j++)
+				{
+					mixtureAssignment = parameter->getMixtureAssignment(j);
+					double obsPhi = genome.getGene(j).getObservedSynthesisRate(i);
+					if (obsPhi > -1.0)
+					{
+						double sum = std::log(obsPhi) - noiseOffset - std::log(parameter->getSynthesisRate(j, mixtureAssignment, false));
+						rate += (sum * sum);
+					}else{
+						// missing observation.
+						shape -= 0.5;
+						//Reduce shape because initial estimate assumes there are no missing observations
+					}
+				}
+				rate /= 2.0;
+				double rand = parameter->randGamma(shape, rate);
+
+				// Below the gamma sample is transformed into an inverse gamma sample
+				// According to Gilchrist et al (2015) Supporting Materials p. S6
+				// The sample 1/T is supposed to be equal to $s_\epsilon^2$.
+				double sepsilon = std::sqrt(1.0/rand);
+				parameter->setObservedSynthesisNoise(i, sepsilon);
+			}
+		}
+	}
 }
 
 
 void PAModel::updateAllHyperParameter()
 {
 	updateStdDevSynthesisRate();
+	if (withPhi)
+	{
+		for (unsigned i =0; i < parameter->getNumObservedPhiSets(); i++)
+		{
+			updateNoiseOffset(i);
+		}
+	}
 }
 
 
 void PAModel::updateHyperParameter(unsigned hp)
 {
 	// NOTE: when adding additional hyper parameter, also add to updateAllHyperParameter()
-	switch (hp)
+	if (hp == 0)
 	{
-		case 0:
-			updateStdDevSynthesisRate();
-			break;
-		default:
-			updateStdDevSynthesisRate();
-			break;
+		updateStdDevSynthesisRate();
 	}
+	else if (hp > 0 and withPhi)
+	{
+		updateNoiseOffset(hp);
+	}		
 }
 
 
@@ -533,35 +697,65 @@ void PAModel::simulateGenome(Genome &genome)
 	for (unsigned geneIndex = 0u; geneIndex < genome.getGenomeSize(); geneIndex++)
 	{
 		unsigned mixtureElement = getMixtureAssignment(geneIndex);
-		Gene gene = genome.getGene(geneIndex);
+		unsigned alphaCat = parameter->getMutationCategory(mixtureElement);
+		unsigned lambdaPrimeCat = parameter->getSelectionCategory(mixtureElement);
 		double phi = parameter->getSynthesisRate(geneIndex, mixtureElement, false);
+
+		Gene gene = genome.getGene(geneIndex);
 		Gene tmpGene = gene;
+		std::vector<unsigned> rfpCount;
+		std::vector<unsigned> codon_counts(61,0);
+		std::vector<unsigned> rfpPerPositionPerCodon(61,0);
+		std::vector<unsigned> totalRFP(61,0);
+		std::vector <unsigned> positions = tmpGene.geneData.getPositionCodonID(); 
+        
 		for (unsigned codonIndex = 0u; codonIndex < 61; codonIndex++)
 		{
+
+			unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(codonIndex);
+			codon_counts[codonIndex] = currNumCodonsInMRNA;
 			std::string codon = SequenceSummary::codonArray[codonIndex];
-			unsigned alphaCat = parameter->getMutationCategory(mixtureElement);
-			unsigned lambdaPrimeCat = parameter->getSelectionCategory(mixtureElement);
 
 			double alpha = getParameterForCategory(alphaCat, PAParameter::alp, codon, false);
 			double lambdaPrime = getParameterForCategory(lambdaPrimeCat, PAParameter::lmPri, codon, false);
-
-			double alphaPrime = alpha * gene.geneData.getCodonCountForCodon(codon);
-
+			double alphaPrime = alpha * currNumCodonsInMRNA;
 #ifndef STANDALONE
 			RNGScope scope;
 			NumericVector xx(1);
 			xx = rgamma(1, alphaPrime, 1.0/lambdaPrime);
 			xx = rpois(1, xx[0] * phi);
 			tmpGene.geneData.setCodonSpecificSumRFPCount(codonIndex, xx[0], /*RFPCountColumn*/0);
+			rfpPerPositionPerCodon[codonIndex] = xx[0]/codon_counts[codonIndex];
+			totalRFP[codonIndex] = xx[0];
 #else
 			std::gamma_distribution<double> GDistribution(alphaPrime,1.0/lambdaPrime);
 			double tmp = GDistribution(Parameter::generator);
 			std::poisson_distribution<unsigned> PDistribution(phi * tmp);
 			unsigned simulatedValue = PDistribution(Parameter::generator);
 			tmpGene.geneData.setCodonSpecificSumRFPCount(codonIndex, simulatedValue, /*RFPCountColumn*/0);
-
+			rfpPerPositionPerCodon[codonIndex] = simulatedValue/codon_counts[codonIndex];
+			totalRFP[codonIndex] = simulatedValue;
 #endif
+			//my_print("% %\n",totalRFP[codonIndex],codon_counts[codonIndex]);
+			if (rfpPerPositionPerCodon[codonIndex] < 1)
+			{
+				rfpPerPositionPerCodon[codonIndex] = 1;
+			}
 		}
+		for (unsigned codonID : positions)
+		{
+
+			if (totalRFP[codonID] - rfpPerPositionPerCodon[codonID] < 0)
+			{
+				rfpCount.push_back(totalRFP[codonID]);
+			}
+			else
+			{
+				rfpCount.push_back(rfpPerPositionPerCodon[codonID]);
+				totalRFP[codonID] = totalRFP[codonID] - rfpPerPositionPerCodon[codonID];
+			}
+		}
+		tmpGene.geneData.setRFPCount(rfpCount, RFPCountColumn);
 		genome.addGene(tmpGene, true);
 	}
 }

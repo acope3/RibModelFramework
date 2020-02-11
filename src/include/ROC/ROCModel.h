@@ -104,7 +104,7 @@ class ROCModel : public Model
 
 		virtual void updateCodonSpecificParameter(std::string grouping);
 		virtual void completeUpdateCodonSpecificParameter();
-		virtual void updateGibbsSampledHyperParameters(Genome &genome);
+		//virtual void updateGibbsSampledHyperParameters(Genome &genome);
 		virtual void updateAllHyperParameter();
 		virtual void updateHyperParameter(unsigned hp);
 
@@ -118,15 +118,15 @@ class ROCModel : public Model
 		virtual void getParameterForCategory(unsigned category, unsigned param, std::string aa, bool proposal, double* returnValue);
 
 
-		//ROC Specific Functions:
-		double getNoiseOffset(unsigned index, bool proposed = false);
-		double getObservedSynthesisNoise(unsigned index) ;
-		double getCurrentNoiseOffsetProposalWidth(unsigned index);
-		void updateNoiseOffset(unsigned index);
-		void updateNoiseOffsetTrace(unsigned index, unsigned sample);
-		void updateObservedSynthesisNoiseTrace(unsigned index, unsigned sample);
-		void adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt = true);
-
+	
+		virtual double getNoiseOffset(unsigned index, bool proposed = false);
+		virtual double getObservedSynthesisNoise(unsigned index) ;
+		virtual double getCurrentNoiseOffsetProposalWidth(unsigned index);
+		virtual void updateNoiseOffset(unsigned index);
+		virtual void updateNoiseOffsetTrace(unsigned sample);
+		virtual void updateObservedSynthesisNoiseTrace(unsigned sample);
+		virtual void adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt = true);
+		virtual void updateGibbsSampledHyperParameters(Genome &genome);
 
 
 		//R Section:

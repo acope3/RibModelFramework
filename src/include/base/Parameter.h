@@ -36,8 +36,6 @@ class Parameter {
 		unsigned adaptiveStepPrev;
 		unsigned adaptiveStepCurr;
 
-		
-
 		std::vector<double> codonSpecificPrior;
 	public:
 
@@ -129,6 +127,30 @@ class Parameter {
 		unsigned getNumAcceptForSynthesisRate(unsigned expressionCategory, unsigned geneIndex); //Only for unit testing
 
 
+		//Noise Functions...updating AnaCoDa to allow all models (instead of just ROC) to use empirical gene expression values to inform estimation of \phi
+
+		double getObservedSynthesisNoise(unsigned index);
+		void setObservedSynthesisNoise(unsigned index, double se);
+
+		//noiseOffset Functions:
+		double getNoiseOffset(unsigned index, bool proposed = false);
+		double getCurrentNoiseOffsetProposalWidth(unsigned index);
+		void proposeNoiseOffset();
+		void setNoiseOffset(unsigned index, double _NoiseOffset);
+		void updateNoiseOffset(unsigned index);
+
+		void setNumObservedPhiSets(unsigned _phiGroupings);
+
+		// noise Functions:
+		void setInitialValuesForSepsilon(std::vector<double> seps);
+
+		//Posterior, Variance, and Estimates Functions for noise:
+		double getNoiseOffsetPosteriorMean(unsigned index, unsigned samples);
+		double getNoiseOffsetVariance(unsigned index, unsigned samples, bool unbiased = true);
+
+		//Adaptive Width Functions:
+		void adaptNoiseOffsetProposalWidth(unsigned adaptationWidth, bool adapt);
+
 		//Iteration Functions: All tested
 		unsigned getLastIteration();
 		void setLastIteration(unsigned iteration);
@@ -137,6 +159,8 @@ class Parameter {
 		//Trace Functions: TODO: test
 		Trace& getTraceObject();
 		void setTraceObject(Trace _trace);
+		void updateObservedSynthesisNoiseTraces(unsigned sample);
+		void updateNoiseOffsetTraces(unsigned sample);
 		void updateStdDevSynthesisRateTrace(unsigned sample);
 		void updateSynthesisRateTrace(unsigned sample, unsigned geneIndex);
 		void updateMixtureAssignmentTrace(unsigned sample, unsigned geneIndex);
@@ -175,7 +199,6 @@ class Parameter {
 		unsigned getNumObservedPhiSets();
 		void setMixtureAssignment(unsigned gene, unsigned value);
 		unsigned getMixtureAssignment(unsigned gene);
-		virtual void setNumObservedPhiSets(unsigned _phiGroupings);
 		virtual std::vector <std::vector <double> > calculateSelectionCoefficients(unsigned sample); //TODO: test
 
 
@@ -289,6 +312,13 @@ class Parameter {
 		std::vector<double> std_csp;
 
 
+		std::vector <double> observedSynthesisNoise;
+
+		std::vector <double> noiseOffset_proposed;
+		std::vector <double> noiseOffset; //A_Phi
+		std::vector <double> std_NoiseOffset;
+		std::vector <double> numAcceptForNoiseOffset;
+		
         //Unknown indexing hoping (mixture) then gene
 		std::vector<std::vector<double>> proposedSynthesisRateLevel;
 		std::vector<std::vector<double>> currentSynthesisRateLevel;

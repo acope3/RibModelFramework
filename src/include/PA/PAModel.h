@@ -19,7 +19,7 @@ class PAModel: public Model
 
 	public:
 		//Constructors & Destructors:
-		explicit PAModel(unsigned RFPCountColumn = 0u);
+		explicit PAModel(unsigned RFPCountColumn = 0u, bool _withPhi = false, bool _fix_sEpsilon = false);
 		virtual ~PAModel();
 
 
@@ -101,7 +101,7 @@ class PAModel: public Model
 
 		virtual void updateCodonSpecificParameter(std::string aa);
 		virtual void completeUpdateCodonSpecificParameter();
-		virtual void updateGibbsSampledHyperParameters(Genome &genome);
+		//virtual void updateGibbsSampledHyperParameters(Genome &genome);
 		virtual void updateAllHyperParameter();
 		virtual void updateHyperParameter(unsigned hp);
 
@@ -113,6 +113,16 @@ class PAModel: public Model
 		void setParameter(PAParameter &_parameter);
 		virtual double calculateAllPriors();
 		virtual double getParameterForCategory(unsigned category, unsigned param, std::string codon, bool proposal);
+
+	    virtual double getNoiseOffset(unsigned index, bool proposed = false);
+		virtual double getObservedSynthesisNoise(unsigned index) ;
+		virtual double getCurrentNoiseOffsetProposalWidth(unsigned index);
+		virtual void updateNoiseOffset(unsigned index);
+		virtual void updateNoiseOffsetTrace(unsigned sample);
+		virtual void updateObservedSynthesisNoiseTrace(unsigned sample);
+		virtual void adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt = true);
+		virtual void updateGibbsSampledHyperParameters(Genome &genome);
+
 
 };
 

@@ -8,15 +8,14 @@ class FONSEModel : public Model
 {
 	private:
 		FONSEParameter *parameter;
-		bool withPhi;
-		bool fix_sEpsilon;
+
 		double calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grouping, double *mutation, double *selection, double phiValue,double a1_value);
 		double calculateMutationPrior(std::string grouping, bool proposed = false);
 
 
 	public:
 		//Constructors & Destructors:
-		FONSEModel();
+		FONSEModel(bool _withPhi = false, bool _fix_sEpsilon = false);
 		virtual ~FONSEModel();
 
 
@@ -111,7 +110,7 @@ class FONSEModel : public Model
 		virtual void updateCodonSpecificParameter(std::string grouping);
 		virtual void completeUpdateCodonSpecificParameter();
 
-		virtual void updateGibbsSampledHyperParameters(Genome &genome);
+		//virtual void updateGibbsSampledHyperParameters(Genome &genome);
 		virtual void updateAllHyperParameter();
 		virtual void updateHyperParameter(unsigned hp);
 
@@ -127,7 +126,14 @@ class FONSEModel : public Model
 		virtual void getParameterForCategory(unsigned category, unsigned param, std::string aa, bool proposal,
 					double* returnValue);
 
-
+		virtual double getNoiseOffset(unsigned index, bool proposed = false);
+		virtual double getObservedSynthesisNoise(unsigned index) ;
+		virtual double getCurrentNoiseOffsetProposalWidth(unsigned index);
+		virtual void updateNoiseOffset(unsigned index);
+		virtual void updateNoiseOffsetTrace(unsigned sample);
+		virtual void updateObservedSynthesisNoiseTrace(unsigned sample);
+		virtual void adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt = true);
+		virtual void updateGibbsSampledHyperParameters(Genome &genome);
 
 		//R Section:
 #ifndef STANDALONE

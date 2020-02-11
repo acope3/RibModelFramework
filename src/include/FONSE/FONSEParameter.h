@@ -25,6 +25,8 @@ class FONSEParameter : public Parameter
 		double std_a1;
         unsigned numAcceptForA1;
 
+        bool fix_a1 = false;
+
 		std::vector <double> propose(std::vector <double> currentParam, double(*proposal)(double a, double b), double A, std::vector <double> B);
 
 
@@ -82,6 +84,7 @@ class FONSEParameter : public Parameter
 		double getCurrentInitiationCostProposalWidth();
 		void adaptInitiationCostProposalWidth(unsigned adaptationWidth, bool adapt);
 
+		void fixedInitiationCost();
 
 
 		//R Section:
