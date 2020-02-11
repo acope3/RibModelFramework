@@ -962,7 +962,9 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 	*                                                                          *
 	* Right now a_1 and a_2 are set to 4.0. However, we are planning on making *
 	* them hyperparameters in the future, since they are constant for the      *
-	* entire genome.                                                           */
+	* entire genome.
+	* Note codon position, indexing starts at 0,thus we don't need (i-1)
+	* \Delta \omega includes q Ne terms                                        */
 
 
 	// If the min(selection) is less than zero than we have to adjust the reference codon.
