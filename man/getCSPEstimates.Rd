@@ -15,7 +15,7 @@ getCSPEstimates(parameter, filename = NULL, mixture = 1,
 
 \item{mixture}{estimates for which mixture should be returned}
 
-\item{samples}{The number of samples used for the posterior estimates.}
+\item{samples}{The number of samples used for the posterior estimates. Earlier proportion of samples are usually not used, for example: samples*0.5 use the second half of the samples }
 
 \item{relative.to.optimal.codon}{Boolean determining if parameters should be relative to the preferred codon or the alphabetically last codon (Default=TRUE). Only applies to ROC and FONSE models}
 
