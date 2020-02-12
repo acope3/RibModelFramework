@@ -275,7 +275,6 @@ void FONSEParameter::initFONSEValuesFromFile(std::string filename)
 	proposedCodonSpecificParameter[dOmega].resize(numSelectionCategories);
 	//looping through the bigger of the two categories
 	a1_proposed = a1;
-	my_print("A_1 at restart is %\n",a1);
 	unsigned biggerCat = std::max(numMutationCategories, numSelectionCategories);
 	for (unsigned i = 0; i < biggerCat; i++)
 	{
@@ -437,9 +436,7 @@ void FONSEParameter::initMutationCategories(std::vector<std::string> files, unsi
 
 					//get the value to store
 					std::size_t pos2 = tmp.find(',', pos + 1);
-					//my_print("%\n", tmp.substr(pos + 1, pos2 - pos - 1 ));
 					double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
-					my_print("% %",codon,value);
 					currentCodonSpecificParameter[dM][category][codonIndex] = value;
 					proposedCodonSpecificParameter[dM][category][codonIndex] = value;
 				}
@@ -472,9 +469,7 @@ void FONSEParameter::initSelectionCategories(std::vector<std::string> files, uns
 
 				//get the value to store
 				std::size_t pos2 = tmp.find(',', pos + 1);
-				//	my_print("%\n", tmp.substr(pos + 1, pos2 - pos - 1 ));
 				double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
-				my_print("% %",codon,value);
 				currentCodonSpecificParameter[dOmega][category][codonIndex] = value;
 				proposedCodonSpecificParameter[dOmega][category][codonIndex] = value;
 			}

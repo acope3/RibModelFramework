@@ -130,7 +130,6 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 		for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++)
 		{
 			double obsPhi = gene.getObservedSynthesisRate(i);
-			//my_print("Noise Offset: %\n",getNoiseOffset(i));
 			if (obsPhi > -1.0)
 			{
 				double logObsPhi = std::log(obsPhi);
@@ -253,7 +252,7 @@ void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 
 #ifdef _OPENMP
 //#ifndef __APPLE__
-#pragma omp parallel for private(gene,mutation, selection, curAA) reduction(+:lpr_sphi,lpr_a1)
+//#pragma omp parallel for private(gene,mutation, selection, curAA) reduction(+:lpr_sphi,lpr_a1)
 #endif
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{
@@ -519,8 +518,11 @@ void FONSEModel::updateHyperParameterTraces(unsigned sample)
 {
 	updateStdDevSynthesisRateTrace(sample);
 	updateInitiationCostParameterTrace(sample);
-	updateNoiseOffsetTrace(sample);
-    updateObservedSynthesisNoiseTrace(sample);
+	if (withPhi)
+	{
+		updateNoiseOffsetTrace(sample);
+    	updateObservedSynthesisNoiseTrace(sample);
+    }
 }
 
 

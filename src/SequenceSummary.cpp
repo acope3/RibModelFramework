@@ -491,7 +491,6 @@ bool SequenceSummary::processPANSE(std::vector<std::vector<int>> table)
 			check = false;
 		}
 	}
-
 	return check;
 }
 

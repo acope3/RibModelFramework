@@ -784,8 +784,11 @@ void PANSEModel::updateHyperParameterTraces(unsigned sample)
 {
     updateStdDevSynthesisRateTrace(sample);
     updatePartitionFunctionTrace(sample);
-    updateNoiseOffsetTrace(sample);
-    updateObservedSynthesisNoiseTrace(sample);
+    if (withPhi)
+    {
+        updateNoiseOffsetTrace(sample);
+        updateObservedSynthesisNoiseTrace(sample);
+    }
 }
 
 

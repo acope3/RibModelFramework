@@ -118,13 +118,6 @@ sink(outFile)
 runMCMC(mcmc, genome, model, 1, divergence.iteration)
 sink()
 
-test_that("Phi trace for each gene is a vector of length 1 when not estimating phi", {
-  trace <- parameter$getTraceObject()
-  phi.1 <- trace$getSynthesisRateTraceByMixtureElementForGene(1,1)
-  phi.2 <- trace$getSynthesisRateTraceByMixtureElementForGene(2,1)
-  expect_equal(length(phi.1), 1)
-  expect_equal(length(phi.2), 1)
-})
 
 numMixtures <- 1
 sphi_init <- 1

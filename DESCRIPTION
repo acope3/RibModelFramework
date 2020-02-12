@@ -12,8 +12,8 @@ Maintainer: Cedric Landerer <cedric.landerer@gmail.com>
 URL: https://github.com/clandere/AnaCoDa
 VignetteBuilder: knitr
 NeedsCompilation: yes
-Depends: R (>= 3.3.0), Rcpp (>= 0.11.3), methods
-Suggests: knitr, Hmisc, VGAM, coda, testthat, lmodel2, mvtnorm
+Depends: R (>= 3.3.0), Rcpp (>= 0.11.3), VGAM, methods
+Suggests: knitr, Hmisc, coda, testthat, lmodel2, mvtnorm
 RcppModules: Test_mod, Trace_mod, CovarianceMatrix_mod,
         MCMCAlgorithm_mod, Model_mod, Parameter_mod, Genome_mod,
         Gene_mod, SequenceSummary_mod

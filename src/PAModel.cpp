@@ -30,6 +30,7 @@ PAModel::~PAModel()
 double PAModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime, unsigned currRFPValue,
                                                       unsigned currNumCodonsInMRNA, double phiValue)
 {
+	
 	double logLikelihood = ((std::lgamma((currNumCodonsInMRNA * currAlpha) + currRFPValue)) - (std::lgamma(currNumCodonsInMRNA * currAlpha)))
 						   + (currRFPValue * (std::log(phiValue) - std::log(currLambdaPrime + phiValue)))
 						   + ((currNumCodonsInMRNA * currAlpha) * (std::log(currLambdaPrime) - std::log(currLambdaPrime + phiValue)));
@@ -55,7 +56,6 @@ void PAModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex,
 	unsigned lambdaPrimeCategory = parameter->getSelectionCategory(k);
 	unsigned synthesisRateCategory = parameter->getSynthesisRateCategory(k);
 
-
 	double phiValue = parameter->getSynthesisRate(geneIndex, synthesisRateCategory, false);
 	double phiValue_proposed = parameter->getSynthesisRate(geneIndex, synthesisRateCategory, true);
 
@@ -78,8 +78,8 @@ void PAModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex,
 	}
 
 	double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(lambdaPrimeCategory, false);
-	double logPhiProbability = Parameter::densityLogNorm(phiValue, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
-	double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, (-(stdDevSynthesisRate * stdDevSynthesisRate) / 2), stdDevSynthesisRate, true);
+	double logPhiProbability = Parameter::densityLogNorm(phiValue, (-(stdDevSynthesisRate * stdDevSynthesisRate) * 0.5), stdDevSynthesisRate, true);
+	double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, (-(stdDevSynthesisRate * stdDevSynthesisRate) * 0.5), stdDevSynthesisRate, true);
 	
 
 	if (withPhi)
@@ -164,7 +164,7 @@ void PAModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grou
         currAdjustmentTerm += std::log(currAlpha) + std::log(currLambdaPrime);
         propAdjustmentTerm += std::log(propAlpha) + std::log(propLambdaPrime);
     }
-	//my_print("% %\n",logLikelihood,logLikelihood_proposed);
+	
 	logAcceptanceRatioForAllMixtures[0] = logLikelihood_proposed - logLikelihood - (currAdjustmentTerm - propAdjustmentTerm);
 	logAcceptanceRatioForAllMixtures[1] = logLikelihood - propAdjustmentTerm;
 	logAcceptanceRatioForAllMixtures[2] = logLikelihood_proposed - currAdjustmentTerm;
@@ -186,9 +186,9 @@ void PAModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsi
 	for (unsigned i = 0u; i < selectionCategory; i++)
 	{
 		currentStdDevSynthesisRate[i] = getStdDevSynthesisRate(i, false);
-		currentMphi[i] = -((currentStdDevSynthesisRate[i] * currentStdDevSynthesisRate[i]) / 2);
+		currentMphi[i] = -((currentStdDevSynthesisRate[i] * currentStdDevSynthesisRate[i]) * 0.5);
 		proposedStdDevSynthesisRate[i] = getStdDevSynthesisRate(i, true);
-		proposedMphi[i] = -((proposedStdDevSynthesisRate[i] * proposedStdDevSynthesisRate[i]) / 2);
+		proposedMphi[i] = -((proposedStdDevSynthesisRate[i] * proposedStdDevSynthesisRate[i]) * 0.5);
 		// take the Jacobian into account for the non-linear transformation from logN to N distribution
 		lpr -= (std::log(currentStdDevSynthesisRate[i]) - std::log(proposedStdDevSynthesisRate[i]));
 		// take prior into account
@@ -204,10 +204,10 @@ void PAModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsi
     else
         logProbabilityRatio.resize(1);
 
-#ifdef _OPENMP
-//#ifndef __APPLE__
-#pragma omp parallel for reduction(+:lpr)
-#endif
+// #ifdef _OPENMP
+// //#ifndef __APPLE__
+// #pragma omp parallel for reduction(+:lpr)
+// #endif
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{
 		unsigned mixture = getMixtureAssignment(i);
@@ -228,10 +228,10 @@ void PAModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsi
             double noiseOffset = getNoiseOffset(i, false);
             double noiseOffset_proposed = getNoiseOffset(i, true);
             double observedSynthesisNoise = getObservedSynthesisNoise(i);
-#ifdef _OPENMP
-//#ifndef __APPLE__
-#pragma omp parallel for reduction(+:lpr)
-#endif
+// #ifdef _OPENMP
+// //#ifndef __APPLE__
+// #pragma omp parallel for reduction(+:lpr)
+// #endif
             for (unsigned j = 0u; j < genome.getGenomeSize(); j++)
             {
                 unsigned mixtureAssignment = getMixtureAssignment(j);
@@ -250,10 +250,6 @@ void PAModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsi
         }
     }
 }
-
-
-
-
 
 
 //----------------------------------------------------------//
@@ -439,8 +435,10 @@ void PAModel::updateHyperParameterTraces(unsigned sample)
 {
 	updateStdDevSynthesisRateTrace(sample);
 	if(withPhi)
-	updateNoiseOffsetTrace(sample);
-    updateObservedSynthesisNoiseTrace(sample);
+	{
+		updateNoiseOffsetTrace(sample);
+    	updateObservedSynthesisNoiseTrace(sample);
+    }
 }
 
 
@@ -687,7 +685,7 @@ void PAModel::updateHyperParameter(unsigned hp)
 	}
 	else if (hp > 0 and withPhi)
 	{
-		updateNoiseOffset(hp);
+		updateNoiseOffset(hp-1);
 	}		
 }
 
@@ -725,14 +723,14 @@ void PAModel::simulateGenome(Genome &genome)
 			xx = rgamma(1, alphaPrime, 1.0/lambdaPrime);
 			xx = rpois(1, xx[0] * phi);
 			tmpGene.geneData.setCodonSpecificSumRFPCount(codonIndex, xx[0], /*RFPCountColumn*/0);
-			rfpPerPositionPerCodon[codonIndex] = xx[0]/codon_counts[codonIndex];
+			rfpPerPositionPerCodon[codonIndex] = floor(xx[0]/codon_counts[codonIndex]);
 			totalRFP[codonIndex] = xx[0];
 #else
 			std::gamma_distribution<double> GDistribution(alphaPrime,1.0/lambdaPrime);
 			double tmp = GDistribution(Parameter::generator);
 			std::poisson_distribution<unsigned> PDistribution(phi * tmp);
 			unsigned simulatedValue = PDistribution(Parameter::generator);
-			tmpGene.geneData.setCodonSpecificSumRFPCount(codonIndex, simulatedValue, /*RFPCountColumn*/0);
+			tmpGene.geneData.setCodonSpecificSumRFPCount(codonIndex, simulatedValue,0);
 			rfpPerPositionPerCodon[codonIndex] = simulatedValue/codon_counts[codonIndex];
 			totalRFP[codonIndex] = simulatedValue;
 #endif
@@ -746,9 +744,14 @@ void PAModel::simulateGenome(Genome &genome)
 		{
 			currentCodons[codonID]++;
 			//If we're at the last codon, push however many are remaining
-			if (currentCodons[codonID] == codon_counts[codonID])
+			if ((currentCodons[codonID] == codon_counts[codonID]) || ((totalRFP[codonID] - rfpPerPositionPerCodon[codonID]) < 0))
 			{
 				rfpCount.push_back(totalRFP[codonID]);
+				totalRFP[codonID] = 0;
+			}
+			else if (totalRFP[codonID] == 0)
+			{
+				rfpCount.push_back(0);
 			}
 			else
 			{

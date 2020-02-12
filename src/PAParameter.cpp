@@ -409,7 +409,6 @@ void PAParameter::initMutationSelectionCategories(std::vector<std::string> files
 				std::string val = tmpString.substr(pos + 1, std::string::npos);
 				unsigned index = SequenceSummary::codonToIndex(codon, false);
 				temp[index] = std::atof(val.c_str());
-				my_print("% % % %\n",codon,val,index,temp[index]);
 			}
 			unsigned altered = 0u;
 			for (unsigned j = 0; j < categories.size(); j++)
