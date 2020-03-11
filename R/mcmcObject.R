@@ -17,6 +17,7 @@
 #' 
 #' @param est.hyper Boolean that tells whether or not hyper parameters
 #' should be estimated in the MCMC algorithm run. Default value is TRUE.
+#' Setting for expression noise parameter sepsilon can be overridden by setting \code{fix.observation.noise} in initializeModelObject()
 #' 
 #' @param est.mix Boolean that tells whether or not the genes' mixture element
 #' should be estimated in the MCMC algorithm run. Default value is TRUE.
