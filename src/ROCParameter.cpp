@@ -81,12 +81,14 @@ void ROCParameter::initROCParameterSet()
 	mutation_prior_sd.resize(numMutationCategories);
 	for (int i=0; i < numMutationCategories; i++)
 	{
+	  // POTENTIAL ISSUE: Shouldn't we use (numParam) instead of (40)
 		mutation_prior_mean[i].resize(40);
 		mutation_prior_sd[i].resize(40);
 		std::vector<double> tmp(40, 0.0);
 		mutation_prior_mean[i] = tmp;
 		mutation_prior_sd[i] = tmp;
 	}
+	// POTENTIAL ISSUE: This seems to assume splitSer = True
 	groupList = {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "P", "Q", "R", "S", "T", "V", "Y", "Z"};
 	// proposal bias and std for codon specific parameter
 	bias_csp = 0;
