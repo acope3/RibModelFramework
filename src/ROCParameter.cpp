@@ -147,6 +147,8 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 	input.open(filename.c_str());
 	if (input.fail())
 		my_printError("Error opening file % to initialize from restart file.\n", filename.c_str());
+		my_printError("please use absolute path");
+		exit(0);
 	else
 	{
 		std::string tmp, variableName;
@@ -373,6 +375,7 @@ void ROCParameter::writeROCRestartFile(std::string filename)
 	out.open(filename.c_str(), std::ofstream::app);
 	if (out.fail())
 		my_printError("Error opening file % to write restart file.\n", filename.c_str());
+		
 	else
 	{
 		std::ostringstream oss;
@@ -523,6 +526,8 @@ void ROCParameter::initAllTraces(unsigned samples, unsigned num_genes, bool esti
 
 void ROCParameter::initMutationCategories(std::vector<std::string> files, unsigned numCategories, bool fix)
 {
+
+        std::cout<<"Here is the C output: "<<files[0]<<std::endl;
 	for (unsigned category = 0; category < numCategories; category++)
 	{
 		//Open the file for the category
@@ -530,6 +535,8 @@ void ROCParameter::initMutationCategories(std::vector<std::string> files, unsign
 		currentFile.open(files[category].c_str());
 		if (currentFile.fail())
 			my_printError("Error opening file % to initialize mutation values.\n", category);
+			my_printError("please use absolute path");
+			exit(0);
 		else
 		{
 			std::string tmp;
@@ -566,6 +573,8 @@ void ROCParameter::initSelectionCategories(std::vector<std::string> files, unsig
 		currentFile.open(files[category].c_str());
 		if (currentFile.fail())
 			my_printError("Error opening file % to initialize selection values.\n", category);
+			my_printError("please use absolute path");
+			exit(0);
 		else
 		{
 			std::string tmp;
