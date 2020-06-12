@@ -8,7 +8,7 @@
 #' 
 #' @param adaptive.width Number that determines how often the acceptance/rejection
 #' window should be altered. Default value is 100 samples.
-#' Proportion of MCMC steps where the proposal distribution is adaptive can be set using \code{mcmc$setStepsToAdapt}
+#' Proportion of MCMC steps where the proposal distribution is adaptive can be set using \code{mcmc$setStepsToAdapt}. The default parameter passed in as -1 uses the full iterations.
 #' 
 #' @param est.expression Boolean that tells whether or not synthesis rate values
 #' should be estimated in the MCMC algorithm run. Default value is TRUE.
