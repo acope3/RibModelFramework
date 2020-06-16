@@ -851,7 +851,31 @@ void ROCParameter::completeUpdateCodonSpecificParameter()
 
 void ROCParameter::updateCodonSpecificParameter(std::string grouping)
 {
-	CSPToUpdate.push_back(grouping);
+	//CSPToUpdate.push_back(grouping);
+	unsigned aaStart, aaEnd;
+	SequenceSummary::AAToCodonRange(grouping, aaStart, aaEnd, true);
+	unsigned aaIndex = SequenceSummary::aaToIndex.find(grouping)->second;
+	numAcceptForCodonSpecificParameters[aaIndex]++;
+	if (!fix_dM)
+	{
+		for (unsigned k = 0u; k < numMutationCategories; k++)
+		{
+			for (unsigned i = aaStart; i < aaEnd; i++)
+			{
+				currentCodonSpecificParameter[dM][k][i] = proposedCodonSpecificParameter[dM][k][i];
+			}
+		}
+	}
+	if (!fix_dEta)
+	{
+		for (unsigned k = 0u; k < numSelectionCategories; k++)
+		{
+			for (unsigned i = aaStart; i < aaEnd; i++)
+			{
+				currentCodonSpecificParameter[dEta][k][i] = proposedCodonSpecificParameter[dEta][k][i];
+			}
+		}
+	}
 }
 
 //-------------------------------------//

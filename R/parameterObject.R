@@ -126,7 +126,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
                                       mixture.definition.matrix = NULL,
                                       init.with.restart.file = NULL, mutation.prior.mean = 0.0, mutation.prior.sd = 0.35, propose.by.prior=FALSE,
                                       init.csp.variance = 0.0025, init.sepsilon = 0.1, 
-                                      init.w.obs.phi=FALSE, init.initiation.cost = 4){
+                                      init.w.obs.phi=FALSE, init.initiation.cost = 4,init.partition.function=1){
   # check input integrity
   if(is.null(init.with.restart.file)){
     if(length(sphi) != num.mixtures){
@@ -197,7 +197,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
     if(is.null(init.with.restart.file)){
       parameter <- initializePAParameterObject(genome, sphi, num.mixtures, 
                                                gene.assignment, initial.expression.values, split.serine, 
-                                               mixture.definition, mixture.definition.matrix, init.csp.variance,init.sepsilon,init.w.obs.phi) 
+                                               mixture.definition, mixture.definition.matrix, init.csp.variance,init.sepsilon,init.w.obs.phi)
     }else{
       parameter <- new(PAParameter, init.with.restart.file)
     }
@@ -205,7 +205,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
     if(is.null(init.with.restart.file)){
       parameter <- initializePANSEParameterObject(genome, sphi, num.mixtures, 
                                                   gene.assignment, initial.expression.values, split.serine, 
-                                                  mixture.definition, mixture.definition.matrix, init.csp.variance,init.sepsilon,init.w.obs.phi) 
+                                                  mixture.definition, mixture.definition.matrix, init.csp.variance,init.sepsilon,init.w.obs.phi,init.partition.function) 
     }else{
       parameter <- new(PANSEParameter, init.with.restart.file)
     }
@@ -353,7 +353,7 @@ initializePAParameterObject <- function(genome, sphi, numMixtures, geneAssignmen
 initializePANSEParameterObject <- function(genome, sphi, numMixtures, geneAssignment, 
                                            expressionValues = NULL, split.serine = TRUE, 
                                            mixture.definition = "allUnique", 
-                                           mixture.definition.matrix = NULL, init.csp.variance = 0.0025 ,init.sepsilon = 0.1,init.w.obs.phi=FALSE){
+                                           mixture.definition.matrix = NULL, init.csp.variance = 0.0025 ,init.sepsilon = 0.1,init.w.obs.phi=FALSE,init.partition.function=1){
   
   if(is.null(mixture.definition.matrix))
   { # keyword constructor
@@ -398,11 +398,16 @@ initializePANSEParameterObject <- function(genome, sphi, numMixtures, geneAssign
   }
 
   parameter$setTotalRFPCount(genome);
+  for (j in 1:numMixtures)
+  { 
+    parameter$setPartitionFunction(init.partition.function,j-1)
+  }
   n.obs.phi.sets <- ncol(getObservedSynthesisRateSet(genome)) - 1
   parameter$setNumObservedSynthesisRateSets(n.obs.phi.sets)
   if (n.obs.phi.sets != 0){
     parameter$setInitialValuesForSepsilon(as.vector(init.sepsilon))
   }
+  parameter <- initializeCovarianceMatricesForRFP(parameter,init.csp.variance)
   return (parameter)
 }
 
@@ -846,13 +851,13 @@ checkModel <- function(parameter)
     model.uses.ref.codon <- FALSE
     codons <- parameter$getGroupList()
     aa <- unlist(lapply(codons,codonToAA))
-    parameter.names <- c("Alpha","Lambda Prime","NSERate")
+    parameter.names <- c("Alpha","Lambda_Prime","NSERate")
   } else
   {
     model.uses.ref.codon <- FALSE
     codons <- parameter$getGroupList()
     aa <- unlist(lapply(codons,codonToAA))
-    parameter.names <- c("Alpha","Lambda Prime")
+    parameter.names <- c("Alpha","Lambda_Prime")
   }
   return(list(aa=aa,codons=codons,model.uses.ref.codon=model.uses.ref.codon,parameter.names=parameter.names))
 }
@@ -1050,7 +1055,7 @@ initializeCovarianceMatrices <- function(parameter, genome, numMixtures, geneAss
     parameter$initCovarianceMatrix(compl.covMat, aa)
   }
   
-  
+
   
   #for(aa in names.aa){
   # if(aa == "M" || aa == "W" || aa == "X") next
@@ -1103,6 +1108,26 @@ initializeCovarianceMatrices <- function(parameter, genome, numMixtures, geneAss
   #}
   
   return(parameter)
+}
+
+initializeCovarianceMatricesForRFP <- function(parameter,init.csp.variance = 0.0025)
+{  
+  numMutationCategory <- parameter$numMutationCategories
+  numSelectionCategory <- parameter$numSelectionCategories
+
+  names.codons <- codons()
+  # ct <- getInstance()
+  #  names.aa <- ct$getGroupList()
+  
+  for(codon in names.codons)
+  {
+    if(codon == "TGA" || codon == "TAA" || codon == "TAG") next
+    # One covariance matrix for all mixtures.
+    # Currently only variances used.
+    compl.covMat <- diag((numMutationCategory + numSelectionCategory+numMutationCategory)) * init.csp.variance
+    parameter$initCovarianceMatrix(compl.covMat, codon)
+  }
+  return(parameter)   
 }
 
 
@@ -1776,11 +1801,9 @@ loadPANSEParameterObject <- function(parameter, files)
           NSERateTrace[[j]][[k]] <- tempEnv$NSERateTrace[[j]][[k]][1:max]
         }
       }
-      partitionTrace <- vector("list", length=numMixtures)
-      for (j in 1:numMixtures) {
-        for (k in 1:length(tempEnv$partitionTrace[[j]])){
-          partitionTrace[[j]][[k]] <- tempEnv$partitionTrace[[j]][[k]][1:max]
-        }
+      partitionTrace <- vector("list", length = numSelectionCategories)
+      for (j in 1:numSelectionCategories) {
+        partitionTrace[[j]] <- tempEnv$paramBase$partitionTrace[[j]][1:max]
       }
     }else{
       

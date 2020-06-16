@@ -303,7 +303,7 @@ axis(1, tck = 0.02, labels = codonList[1:61], at=1:61, las=2, cex.axis=.6)
 #' Plots ACF for codon specific parameter traces
 #' 
 #' @param parameter object of class Parameter
-#' @param csp "Selection" or "Mutation", defaults to "Mutation"
+#' @param csp indicates which parameter to calculate the autocorrelation. Must be Mutation (the default, ROC, FONSE), Selection (ROC, FONSE), Alpha (PA, PANSE), LambdaPrime (PA, PANSE), NSERate (PA, PANSE)"
 #' @param numMixtures indicates the number of CSP mixtures used
 #' @param samples number of samples at the end of the trace used to calculate the acf
 #' @param lag.max Maximum amount of lag to calculate acf. Default is 10*log10(N), where N i the number of observations.
@@ -316,10 +316,15 @@ axis(1, tck = 0.02, labels = codonList[1:61], at=1:61, las=2, cex.axis=.6)
 
 acfCSP <- function(parameter, csp = "Mutation", numMixtures = 1, samples = NULL, lag.max = 40, plot=TRUE)
 {
-  paramType <- 0
-  if (csp == "Selection" )
+  if (csp == "Mutation" || csp == "Alpha")
   {
+    paramType <- 0
+  } else if (csp == "Selection" || csp == "LambdaPrime"){
     paramType <- 1
+  } else if (csp == "NSERate"){
+    paramType <- 2
+  } else{
+    stop("csp must take one of the following values: Mutation (ROC, FONSE), Selection (ROC, FONSE), Alpha (PA, PANSE), LambdaPrime (PA, PANSE), NSERate (PA, PANSE)")
   }
  
   

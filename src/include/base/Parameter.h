@@ -33,10 +33,11 @@ class Parameter {
 		void quickSortPair(double a[], int b[], int first, int last);
 		static int pivotPair(double a[], int b[], int first, int last);
 
-		unsigned adaptiveStepPrev;
-		unsigned adaptiveStepCurr;
+		
 
 		std::vector<double> codonSpecificPrior;
+
+		bool fix_stdDevSynthesis = false;
 	public:
 
 		static const std::string allUnique;
@@ -109,6 +110,7 @@ class Parameter {
 		//stdDevSynthesisRate Functions: Mostly tested, see comments.
 		double getStdDevSynthesisRate(unsigned selectionCategory, bool proposed = false);
 		virtual void proposeStdDevSynthesisRate(); //TODO: test
+		void fixStdDevSynthesis();
 		void setStdDevSynthesisRate(double stdDevSynthesisRate, unsigned selectionCategory);
 		double getCurrentStdDevSynthesisRateProposalWidth();
 		unsigned getNumAcceptForStdDevSynthesisRate(); //Only for unit testing.
@@ -285,6 +287,9 @@ class Parameter {
 	protected:
 		Trace traces;
 
+		unsigned adaptiveStepPrev;
+		unsigned adaptiveStepCurr;
+		
 		std::vector<CovarianceMatrix> covarianceMatrix;
 		std::vector<mixtureDefinition> categories;
 		std::vector<double> categoryProbabilities;

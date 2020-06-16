@@ -252,7 +252,7 @@ void FONSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 
 #ifdef _OPENMP
 //#ifndef __APPLE__
-//#pragma omp parallel for private(gene,mutation, selection, curAA) reduction(+:lpr_sphi,lpr_a1)
+#pragma omp parallel for private(gene,mutation, selection, curAA) reduction(+:lpr_sphi,lpr_a1)
 #endif
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{

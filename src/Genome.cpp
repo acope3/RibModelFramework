@@ -293,6 +293,7 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
 */
 void Genome::readRFPData(std::string filename, bool append, bool positional)
 {
+	prev_genome_size = genes.size();
 	try {
 		if (!append) clear();
 		totalRFPCount = 0;
@@ -342,13 +343,13 @@ void Genome::readRFPData(std::string filename, bool append, bool positional)
 			while (std::getline(Fin, tmp))
 			{
 
-            #ifndef STANDALONE
-            Rcpp::checkUserInterrupt();
-            #endif
+	            #ifndef STANDALONE
+	            Rcpp::checkUserInterrupt();
+	            #endif
 
-        // Remove whitespace from the string
-        tmp.erase(std::remove_if(tmp.begin(), tmp.end(),
-                  std::bind(std::isspace<char>, std::placeholders::_1, std::locale::classic())), tmp.end());
+		        // Remove whitespace from the string
+		        tmp.erase(std::remove_if(tmp.begin(), tmp.end(),
+	                  std::bind(std::isspace<char>, std::placeholders::_1, std::locale::classic())), tmp.end());
 
 				pos = tmp.find(',');
 				std::string ID = tmp.substr(0, pos);
@@ -492,8 +493,6 @@ void Genome::writeRFPData(std::string filename, bool simulated)
 				}
 			}
 		}
-        // We are printing a simulated gene: There is no position-based RFP calculations.
-        // This is a different format than the standard RFPData one.
 		else
 		{
 			Fout << "GeneID,Position,Codon,RFPCount\n";
@@ -657,10 +656,12 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 			{
 				//unsigned geneIndex = 0;
 				unsigned geneIndex=prev_genome_size;
+				my_print("Starting Value: %\n",prev_genome_size);
 				bool first = true;
 
 				while (std::getline(input, tmp))
 				{
+					my_print("%\n",geneIndex);
 					if (geneIndex >= genes.size())
 					{
 						my_printError("ERROR: GeneIndex exceeds the number of genes in the genome. Exiting function.");

@@ -91,7 +91,7 @@ RCPP_MODULE(Parameter_mod)
 		.method("calculateSelectionCoefficients", &Parameter::calculateSelectionCoefficientsR)
 
 
-
+		.method("fixSphi",&Parameter::fixStdDevSynthesis)
 
 
 
@@ -225,7 +225,7 @@ RCPP_MODULE(Parameter_mod)
 		//CSP Functions:
 		//Listed in the properties section below. NOTE: these getter/setters are ONLY
 		//used in R
-
+		.method("initCovarianceMatrix", &PANSEParameter::initCovarianceMatrix)
 		//Other Functions:
 		.method("getParameterForCategory", &PANSEParameter::getParameterForCategoryR)
 		.method("setPartitionFunction", &PANSEParameter::setPartitionFunction)

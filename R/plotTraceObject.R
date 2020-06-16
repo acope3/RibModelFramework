@@ -10,6 +10,7 @@
 #' MixtureProbability, Sphi, Mphi, Aphi, Spesilon, ExpectedPhi, Expression}.
 #' @param geneIndex When plotting expression, the index of the gene to be plotted.
 #' @param mixture The mixture for which to plot values.
+#' @param log.10.scale Plot parameter on the log10 scale
 #' @param ... Optional, additional arguments.
 #' For this function, may be a logical value determining if the trace is ROC-based or not.
 #'
@@ -17,8 +18,8 @@
 #' 
 #' @description Plots different traces, specified with the \code{what} parameter.
 #'
-plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbability" ,"Sphi", "Mphi", "Aphi", "Sepsilon", "ExpectedPhi", "Expression","NSERate","InitiationCost"), 
-                                   geneIndex=1, mixture = 1, ...)
+plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbability" ,"Sphi", "Mphi", "Aphi", "Sepsilon", "ExpectedPhi", "Expression","NSEProb","NSERate","InitiationCost","PartitionFunction"), 
+                                   geneIndex=1, mixture = 1,log.10.scale=F, ...)
 {
   if(what[1] == "Mutation")
   {
@@ -43,6 +44,10 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
   if(what[1] == "VarWaitingTime")
   {
     plotCodonSpecificParameters(x, mixture, "VarWaitingTime", main="Variance Waiting Time Parameter Traces", ROC=FALSE)
+  }  
+  if(what[1] == "NSEProb")
+  {
+    plotCodonSpecificParameters(x, mixture, "NSEProb", main="Nonsense Error Probability Parameter Traces", ROC=FALSE,log.10.scale=log.10.scale)
   }  
   if(what[1] == "MixtureProbability")
   {
@@ -86,7 +91,7 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
   }
   if(what[1] == "NSERate")
   {
-    plotCodonSpecificParameters(x, mixture, "NSERate", main="NSERate", ROC=FALSE)
+    plotCodonSpecificParameters(x, mixture, "NSERate", main="NSERate", ROC=FALSE,log.10.scale=log.10.scale)
   }  
 }
 
@@ -108,7 +113,7 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
 #' 
 #' @description Plots a codon-specific set of traces, specified with the \code{type} parameter.
 #'
-plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="Mutation Parameter Traces", ROC=TRUE)
+plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="Mutation Parameter Traces", ROC=TRUE,log.10.scale=F)
 {
   opar <- par(no.readonly = T) 
   
@@ -168,12 +173,25 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
     }else if (type == "VarWaitingTime"){
       ylab <- expression(alpha/lambda~"'"^"2")
       special <- TRUE
+    }else if (type == "NSEProb"){
+        if (log.10.scale)
+        {
+          ylab <- expression("log"[10]*"Pr(NSE)")
+        } else{
+          ylab <- expression("Pr(NSE)")
+        }
+        special <- TRUE
     }else if (type == "NSERate"){
-      ylab <- expression(NSERate)
+      if (log.10.scale)
+      {
+        ylab <- expression("log"[10]*"NSERate")
+      } else{
+        ylab <- expression("NSERate")
+      }
       paramType <- 2
       special <- FALSE
     }else{
-      stop("Parameter 'type' not recognized! Must be one of: 'Mutation', 'Selection', 'Alpha', 'LambdaPrime', 'MeanWaitingTime', 'VarWaitingTime'.")
+      stop("Parameter 'type' not recognized! Must be one of: 'Mutation', 'Selection', 'Alpha', 'LambdaPrime', 'MeanWaitingTime', 'VarWaitingTime', 'NSEProb', 'NSERate'.")
     }
 
     for(i in 1:length(codons)){
@@ -185,10 +203,22 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
           cur.trace[[i]] <- tmpAlpha / tmpLambdaPrime
         }else if (type == "VarWaitingTime"){
           cur.trace[[i]] <- tmpAlpha / (tmpLambdaPrime * tmpLambdaPrime)
+        } else if (type == "NSEProb"){
+          tmpNSERate <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], 2, with.ref.codon)
+          cur.trace[[i]] <- tmpNSERate/(tmpAlpha/tmpLambdaPrime)
+
+        }
+        if (log.10.scale)
+        {
+          cur.trace[[i]] <- log10(cur.trace[[i]])
         }
       }
       else{
         cur.trace[[i]] <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], paramType, with.ref.codon)
+        if (log.10.scale)
+        {
+          cur.trace[[i]] <- log10(cur.trace[[i]])
+        }
       }
     }
 
@@ -429,6 +459,7 @@ plotFONSEHyperParameterTrace <- function(trace, what = c("InitiationCost"))
   if (what[1] == "InitiationCost")
   {
     a1 <- unlist(trace$getInitiationCostTrace())
+    a1 <- a1[2:length(a1)]
     ylimit <- range(a1) + c(-0.1, 0.1)
     xlimit <- c(1, length(a1))
     ylab <- expression("a"[1])
@@ -452,7 +483,7 @@ plotPANSEHyperParameterTrace <- function(trace, what = c("PartitionFunction"))
   {
     pf <- trace$getPartitionFunctionTraces();
     numMixtures <- length(pf)
-    sphi <- do.call("cbind", pf)
+    pf <- do.call("cbind", pf)
     
     ylimit <- range(pf) + c(-0.1, 0.1)
     xlimit <- c(1, nrow(pf))

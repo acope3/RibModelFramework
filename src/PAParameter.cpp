@@ -513,7 +513,6 @@ void PAParameter::completeUpdateCodonSpecificParameter()
 {
 	for (std::string codon : CSPToUpdate)
 	{
-
     	unsigned i = SequenceSummary::codonToIndex(codon);
 		numAcceptForCodonSpecificParameters[i]++;
 		for(unsigned j = 0; j < getNumMixtureElements(); j++)

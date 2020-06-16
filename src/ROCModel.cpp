@@ -483,8 +483,11 @@ void ROCModel::updateCodonSpecificParameterTrace(unsigned sample, std::string gr
 void ROCModel::updateHyperParameterTraces(unsigned sample)
 {
 	updateStdDevSynthesisRateTrace(sample);
-	updateNoiseOffsetTrace(sample);
-	updateObservedSynthesisNoiseTrace(sample);
+	if (withPhi)
+	{
+		updateNoiseOffsetTrace(sample);
+		updateObservedSynthesisNoiseTrace(sample);
+	}
 }
 
 
@@ -718,7 +721,7 @@ void ROCModel::updateHyperParameter(unsigned hp)
 {
 	if (hp == 0)
 		updateStdDevSynthesisRate();
-	else
+	else if (hp > 0 && withPhi)
 		updateNoiseOffset(hp - 1);
 }
 

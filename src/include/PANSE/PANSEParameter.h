@@ -119,6 +119,7 @@ class PANSEParameter: public Parameter {
 
 
 		//Initialization, Restart, Index Checking:
+		void initCovarianceMatrix(SEXP matrix, std::string codon);
 		void initAlphaR(double alphaValue, unsigned mixtureElement, std::string codon);
 		void initLambdaPrimeR(double lambdaPrimeValue, unsigned mixtureElement, std::string codon);
         void initNSERateR(double NSETRateValue, unsigned mixtureElement, std::string codon);

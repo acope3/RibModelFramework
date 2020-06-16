@@ -66,21 +66,25 @@ void PAModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex,
 	for (unsigned index = 0; index < getGroupListSize(); index++) //number of codons, without the stop codons
 	{
 		std::string codon = getGrouping(index);
-
 		double currAlpha = getParameterForCategory(alphaCategory, PAParameter::alp, codon, false);
 		double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, codon, false);
 		unsigned currRFPValue = gene.geneData.getCodonSpecificSumRFPCount(index,0 /*RFPCountColumn*/);
 		unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(index);
-		if (currNumCodonsInMRNA == 0) continue;
-
+		if (currNumCodonsInMRNA == 0) 
+		{	
+			continue;
+		}
 		logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPValue, currNumCodonsInMRNA, phiValue);
 		logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPValue, currNumCodonsInMRNA, phiValue_proposed);
 	}
 
-	double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(lambdaPrimeCategory, false);
-	double logPhiProbability = Parameter::densityLogNorm(phiValue, (-(stdDevSynthesisRate * stdDevSynthesisRate) * 0.5), stdDevSynthesisRate, true);
-	double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, (-(stdDevSynthesisRate * stdDevSynthesisRate) * 0.5), stdDevSynthesisRate, true);
-	
+	unsigned mixture = getMixtureAssignment(geneIndex);
+	mixture = getSynthesisRateCategory(mixture);
+	double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(mixture, false);
+	double mPhi = (-(stdDevSynthesisRate * stdDevSynthesisRate) * 0.5); // X * 0.5 = X / 2
+	double logPhiProbability = Parameter::densityLogNorm(phiValue, mPhi, stdDevSynthesisRate, true);
+	double logPhiProbability_proposed = Parameter::densityLogNorm(phiValue_proposed, mPhi, stdDevSynthesisRate, true);
+
 
 	if (withPhi)
 	{
@@ -204,10 +208,10 @@ void PAModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsi
     else
         logProbabilityRatio.resize(1);
 
-// #ifdef _OPENMP
-// //#ifndef __APPLE__
-// #pragma omp parallel for reduction(+:lpr)
-// #endif
+#ifdef _OPENMP
+//#ifndef __APPLE__
+#pragma omp parallel for reduction(+:lpr)
+#endif
 	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
 	{
 		unsigned mixture = getMixtureAssignment(i);
@@ -228,10 +232,10 @@ void PAModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsi
             double noiseOffset = getNoiseOffset(i, false);
             double noiseOffset_proposed = getNoiseOffset(i, true);
             double observedSynthesisNoise = getObservedSynthesisNoise(i);
-// #ifdef _OPENMP
-// //#ifndef __APPLE__
-// #pragma omp parallel for reduction(+:lpr)
-// #endif
+#ifdef _OPENMP
+//#ifndef __APPLE__
+#pragma omp parallel for reduction(+:lpr)
+#endif
             for (unsigned j = 0u; j < genome.getGenomeSize(); j++)
             {
                 unsigned mixtureAssignment = getMixtureAssignment(j);
@@ -247,6 +251,7 @@ void PAModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsi
                 }
             }
             logProbabilityRatio[i+1] = lpr;
+            my_print("this should not be here\n");
         }
     }
 }
@@ -683,7 +688,7 @@ void PAModel::updateHyperParameter(unsigned hp)
 	{
 		updateStdDevSynthesisRate();
 	}
-	else if (hp > 0 and withPhi)
+	else if (hp > 0 && withPhi)
 	{
 		updateNoiseOffset(hp-1);
 	}		
