@@ -5,7 +5,6 @@
 #include "../base/Model.h"
 #include "PANSEParameter.h"
 #include "../SequenceSummary.h"
-
 #include <sstream>
 
 class PANSEModel: public Model
@@ -21,6 +20,8 @@ class PANSEModel: public Model
    		std::vector<std::vector<double>> log_currentLambdaPrime;
         std::vector<std::vector<std::vector<double>>> lgamma_rfp_alpha;
         std::vector<std::vector<double>> current_sigma;
+        std::vector<double> prob_successful;
+
         virtual void fillMatrices(Genome& genome,bool init_sigma_vector = true);
         virtual void clearMatrices();
 
@@ -29,13 +30,16 @@ class PANSEModel: public Model
 		explicit PANSEModel(unsigned RFPCountColumn = 0u, bool _withPhi = false, bool _fix_sEpsilon = false);
 		virtual ~PANSEModel();
 
-
+		std::string type = "PANSE";
 
 		//Likelihood Ratio Functions:
 		virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k,
 				double* logProbabilityRatio); // Depends on RFPCountColumn
+		//purely a placeholder
 		virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
-				std::vector<double> &logAcceptanceRatioForAllMixtures); // Depends on RFPCountColumn
+				std::vector<double> &logAcceptanceRatioForAllMixtures);
+		virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
+				std::vector<double> &logAcceptanceRatioForAllMixtures,std::string param="Elongation"); // Depends on RFPCountColumn
 		virtual void calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration,
 				std::vector <double> &logProbabilityRatio);
 
@@ -114,7 +118,8 @@ class PANSEModel: public Model
 		virtual void setMixtureAssignment(unsigned i, unsigned catOfGene);
 		virtual void setCategoryProbability(unsigned mixture, double value);
 
-		virtual void updateCodonSpecificParameter(std::string aa);
+		virtual void updateCodonSpecificParameter(std::string codon);
+		virtual void updateCodonSpecificParameter(std::string codon,std::string param="Elongation");
 		//virtual void updateGibbsSampledHyperParameters(Genome &genome);
 		virtual void updateAllHyperParameter();
 		virtual void updateHyperParameter(unsigned hp);
@@ -162,6 +167,7 @@ class PANSEModel: public Model
 
 
 	protected:
+		
 };
 
 #endif // PANSEMODEL_H
