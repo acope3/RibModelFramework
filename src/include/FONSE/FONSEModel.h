@@ -13,17 +13,18 @@ class FONSEModel : public Model
 		double calculateMutationPrior(std::string grouping, bool proposed = false);
 
 
+
 	public:
 		//Constructors & Destructors:
 		FONSEModel(bool _withPhi = false, bool _fix_sEpsilon = false);
 		virtual ~FONSEModel();
 
-
-
+		std::string type = "FONSE";
+		
 
 		//Likelihood Ratio Functions:
 		virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k, double* logProbabilityRatio);
-		virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, std::vector<double> &logAcceptanceRatioForAllMixtures);
+		virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, std::vector<double> &logAcceptanceRatioForAllMixtures); 
 		virtual void calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration, std::vector <double> &logProbabilityRatio);
 
 
@@ -141,6 +142,8 @@ class FONSEModel : public Model
 #endif
 
 	protected:
+
+		
 };
 
 #endif // FONSEMODEL_H

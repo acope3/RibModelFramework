@@ -21,6 +21,8 @@ class PANSEParameter: public Parameter {
         std::vector <double> partitionFunction_proposed;
         std::vector <double> partitionFunction;
 
+        std::vector<double> std_nse;
+
         bool fix_alpha=false;
         bool fix_lp=false;
         bool fix_nse=false;
@@ -28,7 +30,7 @@ class PANSEParameter: public Parameter {
         
         double std_partitionFunction;
         unsigned numAcceptForPartitionFunction;
-
+        std::vector<unsigned> numAcceptForNSERates;
 		double bias_csp;
 
 		// Sum of all RFP counts
@@ -81,7 +83,8 @@ class PANSEParameter: public Parameter {
 		//CSP Functions:
 		double getCurrentCodonSpecificProposalWidth(unsigned index);
 		void proposeCodonSpecificParameter();
-		void updateCodonSpecificParameter(std::string grouping); //Adds to an update queue
+		void updateCodonSpecificParameter(std::string grouping);
+		void updateCodonSpecificParameter(std::string grouping,std::string param);
         void completeUpdateCodonSpecificParameter();
 
         //partitionFunction Functions: Mostly tested, see comments.

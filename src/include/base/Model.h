@@ -20,13 +20,13 @@ class Model
         virtual ~Model();
         Model& operator=(const Model& rhs);
 
-
+        std::string type;
 
         //Likelihood Ratio Functions:
         virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k,
 					double* logProbabilityRatio) = 0;
         virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
-        			std::vector<double> &logAcceptanceRatioForAllMixtures) = 0;
+         			std::vector<double> &logAcceptanceRatioForAllMixtures) = 0;
 		virtual void calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration,
 					std::vector <double> &logProbabilityRatio) = 0;
 
@@ -126,6 +126,7 @@ class Model
 	protected:
 		bool withPhi;
 		bool fix_sEpsilon;
+		
 };
 
 #endif // MODEL_H

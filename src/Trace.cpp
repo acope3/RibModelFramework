@@ -272,7 +272,7 @@ void Trace::initializePANSETrace(unsigned samples, unsigned num_genes, unsigned 
 	std::vector<mixtureDefinition> &_categories, unsigned maxGrouping, unsigned numObservedPhiSets,std::vector<double> init_phi,
 	std::vector<unsigned> init_mix_assign, bool estimateSynthesisRate)
 {
-    numCodonSpecificParamTypes = 3;
+    numCodonSpecificParamTypes = 4;
     codonSpecificParameterTrace.resize(numCodonSpecificParamTypes);
 
 	initializeSharedTraces(samples, num_genes, numLambdaPrimeCategories, numMixtures,
@@ -282,6 +282,7 @@ void Trace::initializePANSETrace(unsigned samples, unsigned num_genes, unsigned 
 	initCodonSpecificParameterTrace(samples, numAlphaCategories,  numParam, 0u); //alp
 	initCodonSpecificParameterTrace(samples, numLambdaPrimeCategories, numParam, 1u); //lmPri
     initCodonSpecificParameterTrace(samples, numAlphaCategories, numParam, 2u); //nseRate
+    initCodonSpecificParameterTrace(samples, numLambdaPrimeCategories, numParam, 3u); //lm (lambda)
     initPartitionFunctionTrace(samples, numMixtures);
 }
 
@@ -478,7 +479,7 @@ std::vector<std::vector<double>> Trace::getSynthesisOffsetAcceptanceRateTrace()
 	return synthesisOffsetAcceptanceRateTrace;
 }
 
-
+//TO DO: How does this work for PA/PANSE
 unsigned Trace::getCodonSpecificCategory(unsigned mixtureElement, unsigned paramType)
 {
 	unsigned rv = 0;

@@ -36,7 +36,8 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
   if(what[1] == "LambdaPrime")
   {
     plotCodonSpecificParameters(x, mixture, "LambdaPrime", main="LambdaPrime Parameter Traces", ROC=FALSE)
-  }  
+  } 
+  
   if(what[1] == "MeanWaitingTime")
   {
     plotCodonSpecificParameters(x, mixture, "MeanWaitingTime", main="Mean Waiting Time Parameter Traces", ROC=FALSE)
