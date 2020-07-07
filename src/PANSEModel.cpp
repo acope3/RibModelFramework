@@ -481,11 +481,11 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
     unsigned n = getNumMixtureElements();
     unsigned Y = genome.getSumRFP();
 
-    std::vector<double> Z(2,0.0);
-    calculateZ(grouping,genome,Z,param);
-    double currU = Z[0]/Y; 
-    double propU = Z[1]/Y;
-    my_print("Current U % Proposed U %\n",currU,propU);
+    //std::vector<double> Z(2,0.0);
+    //calculateZ(grouping,genome,Z,param);
+    //double currU = Z[0]/Y; 
+    //double propU = Z[1]/Y;
+    //my_print("Current U % Proposed U %\n",currU,propU);
     //These vectors should be visible to all threads. If one thread tries to overwrite another one, should only result in it replacing the same value
     for (unsigned j = 0; j < n; j++)
     {
@@ -530,8 +530,9 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
         double currLgammaRFPAlpha;
         
         unsigned mixtureElement = parameter->getMixtureAssignment(i);
-        //double U = getPartitionFunction(mixtureElement, false)/Y;
-        
+        double U = getPartitionFunction(mixtureElement, false)/Y;
+        double currU = U;
+        double propU= U;
 
         // how is the mixture element defined. Which categories make it up
         unsigned alphaCategory = parameter->getMutationCategory(mixtureElement);
@@ -550,6 +551,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
         double currSigma_new = 0;
         for (unsigned positionIndex = 0; positionIndex < positions.size(); positionIndex++)
         {
+
             positionalRFPCount = rfpCounts[positionIndex];
             codonIndex = positions[positionIndex];
             codon = gene->geneData.indexToCodon(codonIndex);
