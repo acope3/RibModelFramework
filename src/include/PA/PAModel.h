@@ -13,6 +13,8 @@ class PAModel: public Model
 		PAParameter *parameter;
 		unsigned RFPCountColumn;
 
+
+
 		double calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
 				unsigned currRFPValue, unsigned currNumCodonsInMRNA, double phiValue);
 
@@ -22,6 +24,7 @@ class PAModel: public Model
 		explicit PAModel(unsigned RFPCountColumn = 0u, bool _withPhi = false, bool _fix_sEpsilon = false);
 		virtual ~PAModel();
 
+		std::string type = "PA";
 
 
 
@@ -123,6 +126,8 @@ class PAModel: public Model
 		virtual void adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt = true);
 		virtual void updateGibbsSampledHyperParameters(Genome &genome);
 
+	protected:
+		
 
 };
 

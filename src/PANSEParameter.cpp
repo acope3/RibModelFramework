@@ -26,7 +26,7 @@ PANSEParameter::PANSEParameter() : Parameter()
  * Arguments: filename
  * Initialize the object with values from a restart file.
 */
-PANSEParameter::PANSEParameter(std::string filename) : Parameter(64)
+PANSEParameter::PANSEParameter(std::string filename) : Parameter(61)
 {
 	currentCodonSpecificParameter.resize(3);
 	proposedCodonSpecificParameter.resize(3);
@@ -148,12 +148,11 @@ void PANSEParameter::initPANSEParameterSet()
     	covarianceMatrix.push_back(m);
   	}
 
-  	// nse_rates.resize(numParam,0.00005);
-   //  nse_rates_proposed.resize(numParam,0.00005);
-
+ 
 	bias_csp = 0;
 	std_csp.resize(numParam,0.1);
 	std_nse.resize(numParam,0.1);
+	//std_nse = 0.1;
 	std_partitionFunction = 0.1;
 
 	groupList = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
@@ -337,12 +336,13 @@ void PANSEParameter::initPANSEValuesFromFile(std::string filename)
 	proposedCodonSpecificParameter[alp].resize(numMutationCategories);
 	proposedCodonSpecificParameter[lmPri].resize(numSelectionCategories);
     proposedCodonSpecificParameter[nse].resize(numMutationCategories);
-
+  
     partitionFunction_proposed.resize(partitionFunction.size());
     for (unsigned i = 0; i < partitionFunction.size(); i++)
     {
     	partitionFunction_proposed[i] = partitionFunction[i];
     }
+    numAcceptForPartitionFunction = 0u;
 
 	groupList = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
 		"TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT", "ATA", "ATC",
@@ -359,6 +359,7 @@ void PANSEParameter::initPANSEValuesFromFile(std::string filename)
 	{
 		proposedCodonSpecificParameter[lmPri][i] = currentCodonSpecificParameter[lmPri][i];
 	}
+
     for (unsigned i = 0; i < numMutationCategories; i++)
     {
         proposedCodonSpecificParameter[nse][i] = currentCodonSpecificParameter[nse][i];
@@ -713,7 +714,6 @@ void PANSEParameter::proposeCodonSpecificParameter()
 		}
 	}
 
-  	
     for (unsigned i = 0; i < numMutationCategories; i++)
     {
         for (unsigned j = 0; j < numNSE; j++)
@@ -725,6 +725,7 @@ void PANSEParameter::proposeCodonSpecificParameter()
         	else
         	{
         		proposedCodonSpecificParameter[nse][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[nse][i][j]) , std_nse[j]) );
+        	
         	}
     	}
     }
@@ -822,6 +823,7 @@ void PANSEParameter::updateCodonSpecificParameter(std::string grouping,std::stri
 	if (param == "Elongation")
 	{
 		numAcceptForCodonSpecificParameters[i]++;
+		//my_print("% % % %\n",grouping,i,param,numAcceptForCodonSpecificParameters[i]);
 	    for (unsigned k = 0u; k < numMutationCategories; k++)
 	    {
 	        currentCodonSpecificParameter[alp][k][i] = proposedCodonSpecificParameter[alp][k][i];
@@ -834,6 +836,7 @@ void PANSEParameter::updateCodonSpecificParameter(std::string grouping,std::stri
 	else
 	{
 		numAcceptForNSERates[i]++;
+		//my_print("% % % %\n",grouping,i,param,numAcceptForNSERates[i]);
 	    for (unsigned k = 0u; k < numMutationCategories; k++)
 	    {
 	        currentCodonSpecificParameter[nse][k][i] = proposedCodonSpecificParameter[nse][k][i];
@@ -1304,6 +1307,10 @@ void PANSEParameter::initMutationSelectionCategoriesR(std::vector<std::string> f
     {
         value = PANSEParameter::nse;
     }
+    else if (paramType == "Lambda")
+    {
+    	value = PANSEParameter::lm;
+    }
 	else
 	{
 		my_printError("Bad paramType given. Expected \"Alpha\" or \"LambdaPrime\".\nFunction not being executed!\n");
@@ -1418,7 +1425,7 @@ double PANSEParameter::getParameterForCategoryR(unsigned mixtureElement, unsigne
 		{
 			category = getMutationCategory(mixtureElement); //really alpha here
 		}
-		else if (paramType == PANSEParameter::lmPri)
+		else if (paramType == PANSEParameter::lmPri || paramType == PANSEParameter::lm)
 		{
 			category = getSelectionCategory(mixtureElement);
 		}

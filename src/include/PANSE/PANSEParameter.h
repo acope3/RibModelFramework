@@ -21,9 +21,6 @@ class PANSEParameter: public Parameter {
         std::vector <double> partitionFunction_proposed;
         std::vector <double> partitionFunction;
 
-        std::vector <double> nse_rates;
-        std::vector <double> nse_rates_proposed;
-
         std::vector<double> std_nse;
 
         bool fix_alpha=false;

@@ -25,6 +25,7 @@ const unsigned Parameter::dOmega = 1;
 const unsigned Parameter::alp = 0;
 const unsigned Parameter::lmPri = 1;
 const unsigned Parameter::nse = 2;
+const unsigned Parameter::lm = 3;
 
 
 

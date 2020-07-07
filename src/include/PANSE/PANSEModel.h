@@ -22,6 +22,8 @@ class PANSEModel: public Model
         std::vector<std::vector<double>> current_sigma;
         std::vector<double> prob_successful;
 
+
+        virtual void calculateZ(std::string grouping,Genome& genome,std::vector<double> &Z,std::string param);
         virtual void fillMatrices(Genome& genome,bool init_sigma_vector = true);
         virtual void clearMatrices();
 

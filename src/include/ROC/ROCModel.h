@@ -20,6 +20,8 @@ class ROCModel : public Model
 		ROCModel(bool _withPhi = false, bool _fix_sEpsilon = false);
 		virtual ~ROCModel();
 
+		std::string type = "ROC";
+
 		//Likelihood Ratio Functions:
 		virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k,
 					double* logProbabilityRatio);
@@ -136,6 +138,7 @@ class ROCModel : public Model
 #endif //STANDALONE
 
     protected:
+    	
 };
 
 #endif // ROCMODEL_H
