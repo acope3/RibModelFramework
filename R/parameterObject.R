@@ -1124,7 +1124,7 @@ initializeCovarianceMatricesForRFP <- function(parameter,init.csp.variance = 0.0
     if(codon == "TGA" || codon == "TAA" || codon == "TAG") next
     # One covariance matrix for all mixtures.
     # Currently only variances used.
-    compl.covMat <- diag((numMutationCategory + numSelectionCategory+numMutationCategory)) * init.csp.variance
+    compl.covMat <- diag((numMutationCategory + numSelectionCategory + numMutationCategory)) * init.csp.variance
     parameter$initCovarianceMatrix(compl.covMat, codon)
   }
   return(parameter)   
