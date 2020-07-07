@@ -587,7 +587,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                                     phiValue,std::exp(propSigma),std::lgamma(propAlpha),(std::log(propLambdaPrime)+std::log(propU)),log_phi,std::lgamma(propAlpha+positionalRFPCount));
                     if (prop_prob_successful > 500)
                     {
-                        prop_prob_successful = elongationProbabilityLog(propAlpha, propLambda,1/currNSERate);
+                        prop_prob_successful = elongationProbabilityLog(propAlpha, propLambdaPrime,1/currNSERate);
                         if (prop_prob_successful > 0.0)
                         {
                             prop_prob_successful = 0.0;
@@ -603,7 +603,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                                     phiValue,std::exp(propSigma),std::lgamma(currAlpha),(std::log(currLambdaPrime)+std::log(propU)),log_phi,std::lgamma(currAlpha+positionalRFPCount));
                     if (prop_prob_successful > 500)
                     {
-                        prop_prob_successful = elongationProbabilityLog(currAlpha, currLambda,1/propNSERate);
+                        prop_prob_successful = elongationProbabilityLog(currAlpha, currLambdaPrime,1/propNSERate);
                         if (prop_prob_successful > 0.0)
                         {
                             prop_prob_successful = 0.0;
@@ -618,7 +618,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                                   phiValue,std::exp(propSigma),lgamma_currentAlpha[alphaCategory][codonIndex],std::log(currLambdaPrime)+std::log(propU),log_phi,currLgammaRFPAlpha);
                 if (prob_successful[codonIndex] > 500)
                 {
-                    prob_successful[codonIndex] = elongationProbabilityLog(currAlpha, currLambda,1/currNSERate);
+                    prob_successful[codonIndex] = elongationProbabilityLog(currAlpha, currLambdaPrime,1/currNSERate);
                     if (prob_successful[codonIndex] > 0.0)
                     {
                         prob_successful[codonIndex] = 0.0;
@@ -631,7 +631,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
             if (prob_successful[codonIndex] > 500)
             {
                
-                prob_successful[codonIndex] = elongationProbabilityLog(currAlpha, currLambda,1/currNSERate);
+                prob_successful[codonIndex] = elongationProbabilityLog(currAlpha, currLambdaPrime,1/currNSERate);
                 if (prob_successful[codonIndex] > 0.0)
                 {
                     prob_successful[codonIndex] = 0.0;
