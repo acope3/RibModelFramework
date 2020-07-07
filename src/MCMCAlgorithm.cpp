@@ -790,7 +790,7 @@ void MCMCAlgorithm::setRestartFileSettings(std::string filename, unsigned interv
 /* setStepsToAdapt (RCPP EXPOSED)
  * Arguments: steps (unsigned)
  * Will set the specified steps to adapt for the run if the value is less than samples * thinning (aka, the number
- * of steps the run will last).
+ * of steps the run will last).The default parameter passed in as -1 uses the full iterations.
 */
 void MCMCAlgorithm::setStepsToAdapt(unsigned steps)
 {

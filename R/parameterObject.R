@@ -64,7 +64,7 @@
 #' 
 #' @param init.sepsilon specifies the initial value for sepsilon. default is 0.1
 #' 
-#' @param init.w.obs.phi TRUE: initialize phi values with observed phi values 
+#' @param init.w.obs.phi If TRUE, initialize phi values with observed phi values 
 #' (data from RNAseq, mass spectrometry, ribosome footprinting) Default is FALSE. 
 #' If multiple observed phi values exist for a gene, the geometric mean of these values is used as initial phi.
 #' When using this function, one should remove any genes with 

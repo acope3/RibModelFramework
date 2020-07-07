@@ -5,14 +5,14 @@
 #' @param model A string containing the model to run (ROC, FONSE, or PA), has to match parameter object. 
 #'  
 #' @param with.phi (ROC only) A boolean that determines whether or not to include empirical
-#'    phi values (expression rates) for the calculations. 
+#'    phi values (expression rates) for the calculations. Default value is FALSE
 #'    
-#' @param fix.observation.noise (ROC only) Allows to fix the noise in the observed expression dataset to the initial condition.
-#'	The initial condition for the observed expression noise can be set in the parameter object. 
+#' @param fix.observation.noise (ROC only) Allows fixing the noise term sepsilon in the observed expression dataset to its initial condition.  This value should override the est.hyper=TRUE setting in \code{initializeMCMCObject()}
+#'	The initial condition for the observed expression noise is set in the parameter object. Default value is FALSE. 
 #'  
-#' @param rfp.count.column (PA and PANSE only) A number representing the RFP count column to use.
+#' @param rfp.count.column (PA and PANSE only) A number representing the RFP count column to use. Default value is 1.
 #'
-#' @param initiation.cost (FONSE only) A positive number representing the initiation cost (a_1 in the model description)
+#' @param initiation.cost (FONSE only) A positive number representing the initiation cost of initiating protein translation (a_1 in the model description, the elongation cost a_2 = 4 ~P) Default value is 4 ~P.
 #'      
 #' @return This function returns the model object created. 
 #'  

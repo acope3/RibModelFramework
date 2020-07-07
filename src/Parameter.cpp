@@ -174,6 +174,8 @@ void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsig
 	}
 
 	mutationSelectionState = _mutationSelectionState;
+	// Lose one parameter if ser is split into two groups.
+	// This is because one of the 2 codon set is now the reference codon
 	numParam = ((splitSer) ? 40 : 41);
 	numMixtures = _numMixtures;
 

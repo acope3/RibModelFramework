@@ -81,12 +81,14 @@ void ROCParameter::initROCParameterSet()
 	mutation_prior_sd.resize(numMutationCategories);
 	for (int i=0; i < numMutationCategories; i++)
 	{
+	  // POTENTIAL ISSUE: Shouldn't we use (numParam) instead of (40)
 		mutation_prior_mean[i].resize(40);
 		mutation_prior_sd[i].resize(40);
 		std::vector<double> tmp(40, 0.0);
 		mutation_prior_mean[i] = tmp;
 		mutation_prior_sd[i] = tmp;
 	}
+	// POTENTIAL ISSUE: This seems to assume splitSer = True
 	groupList = {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "P", "Q", "R", "S", "T", "V", "Y", "Z"};
 	// proposal bias and std for codon specific parameter
 	bias_csp = 0;
@@ -145,6 +147,8 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 	input.open(filename.c_str());
 	if (input.fail())
 		my_printError("Error opening file % to initialize from restart file.\n", filename.c_str());
+		my_printError("please use absolute path");
+		exit(0);
 	else
 	{
 		std::string tmp, variableName;
@@ -371,6 +375,7 @@ void ROCParameter::writeROCRestartFile(std::string filename)
 	out.open(filename.c_str(), std::ofstream::app);
 	if (out.fail())
 		my_printError("Error opening file % to write restart file.\n", filename.c_str());
+		
 	else
 	{
 		std::ostringstream oss;
@@ -521,6 +526,8 @@ void ROCParameter::initAllTraces(unsigned samples, unsigned num_genes, bool esti
 
 void ROCParameter::initMutationCategories(std::vector<std::string> files, unsigned numCategories, bool fix)
 {
+
+        std::cout<<"Here is the C output: "<<files[0]<<std::endl;
 	for (unsigned category = 0; category < numCategories; category++)
 	{
 		//Open the file for the category
@@ -528,6 +535,8 @@ void ROCParameter::initMutationCategories(std::vector<std::string> files, unsign
 		currentFile.open(files[category].c_str());
 		if (currentFile.fail())
 			my_printError("Error opening file % to initialize mutation values.\n", category);
+			my_printError("please use absolute path");
+			exit(0);
 		else
 		{
 			std::string tmp;
@@ -564,6 +573,8 @@ void ROCParameter::initSelectionCategories(std::vector<std::string> files, unsig
 		currentFile.open(files[category].c_str());
 		if (currentFile.fail())
 			my_printError("Error opening file % to initialize selection values.\n", category);
+			my_printError("please use absolute path");
+			exit(0);
 		else
 		{
 			std::string tmp;
