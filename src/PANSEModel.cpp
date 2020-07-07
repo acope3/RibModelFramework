@@ -482,10 +482,10 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
     unsigned Y = genome.getSumRFP();
 
     std::vector<double> Z(2,0.0);
-    //calculateZ(grouping,genome,Z,param);
+    calculateZ(grouping,genome,Z,param);
     double currU = Z[0]/Y; 
     double propU = Z[1]/Y;
-
+    my_print("Current U % Proposed U %\n",currU,propU);
     //These vectors should be visible to all threads. If one thread tries to overwrite another one, should only result in it replacing the same value
     for (unsigned j = 0; j < n; j++)
     {
@@ -518,7 +518,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
     
 #ifdef _OPENMP
     //#ifndef __APPLE__
-#pragma omp parallel for private(gene,currAlpha,currLambdaPrime,currNSERate,currLambda,propAlpha,propLambdaPrime,propNSERate,propLambda,currU,propU) reduction(+:logLikelihood,logLikelihood_proposed)
+#pragma omp parallel for private(gene,currAlpha,currLambdaPrime,currNSERate,propAlpha,propLambdaPrime,propNSERate) reduction(+:logLikelihood,logLikelihood_proposed)
 #endif
     for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
     {
@@ -576,7 +576,6 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
             {
                 currLgammaRFPAlpha = std::lgamma(currAlpha + positionalRFPCount);
             }
-
             if(codon == grouping)
             {
                 if (param == "Elongation")
@@ -594,7 +593,6 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                         }
                
                     }
-                    
                 }
                 else
                 {
@@ -645,7 +643,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
     }
     unsigned alphaCategory = parameter->getMutationCategory(0);
     unsigned lambdaPrimeCategory = parameter->getSelectionCategory(0);
-
+    
     for (unsigned j = 0; j < n; j++)
     {
         unsigned alphaCategory = parameter->getMutationCategory(j);
@@ -667,7 +665,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
             propAdjustmentTerm += std::log(propNSERate);
         }
     }
-
+    
     if (std::isnan(logLikelihood))
     {
         my_print("WARNING: current logLikelihood for % is NaN\n",grouping);
@@ -690,8 +688,6 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 	logAcceptanceRatioForAllMixtures[2] = logLikelihood_proposed;
 
     clearMatrices();
-    
-	
 }
 
 
