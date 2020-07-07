@@ -319,7 +319,6 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, PANSEMode
 	unsigned size = model.getGroupListSize();
 
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-	//unsigned seed = 500;	
 	std::default_random_engine e(seed);
 
 	std::vector<unsigned> groups(size);

@@ -1307,10 +1307,6 @@ void PANSEParameter::initMutationSelectionCategoriesR(std::vector<std::string> f
     {
         value = PANSEParameter::nse;
     }
-    else if (paramType == "Lambda")
-    {
-    	value = PANSEParameter::lm;
-    }
 	else
 	{
 		my_printError("Bad paramType given. Expected \"Alpha\" or \"LambdaPrime\".\nFunction not being executed!\n");
@@ -1425,7 +1421,7 @@ double PANSEParameter::getParameterForCategoryR(unsigned mixtureElement, unsigne
 		{
 			category = getMutationCategory(mixtureElement); //really alpha here
 		}
-		else if (paramType == PANSEParameter::lmPri || paramType == PANSEParameter::lm)
+		else if (paramType == PANSEParameter::lmPri)
 		{
 			category = getSelectionCategory(mixtureElement);
 		}
