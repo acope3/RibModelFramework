@@ -481,11 +481,11 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
     unsigned n = getNumMixtureElements();
     unsigned Y = genome.getSumRFP();
 
-    std::vector<double> Z(2,0.0);
-    calculateZ(grouping,genome,Z,param);
-    double currU = Z[0]/Y; 
-    double propU = Z[1]/Y;
-    my_print("Current U % Proposed U %\n",currU,propU);
+    // std::vector<double> Z(2,0.0);
+    // calculateZ(grouping,genome,Z,param);
+    // double currU = Z[0]/Y; 
+    // double propU = Z[1]/Y;
+    // my_print("Current U % Proposed U %\n",currU,propU);
     //These vectors should be visible to all threads. If one thread tries to overwrite another one, should only result in it replacing the same value
     for (unsigned j = 0; j < n; j++)
     {
@@ -530,7 +530,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
         double currLgammaRFPAlpha;
         
         unsigned mixtureElement = parameter->getMixtureAssignment(i);
-        //double U = getPartitionFunction(mixtureElement, false)/Y;
+        double U = getPartitionFunction(mixtureElement, false)/Y;
         
 
         // how is the mixture element defined. Which categories make it up
@@ -561,7 +561,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
             currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PANSEParameter::lmPri, codon, false);
             if (log_currentLambdaPrime[lambdaPrimeCategory][codonIndex] > 500)
             {
-                log_currentLambdaPrime[lambdaPrimeCategory][codonIndex] = std::log(currLambdaPrime) + std::log(currU);
+                log_currentLambdaPrime[lambdaPrimeCategory][codonIndex] = std::log(currLambdaPrime) + std::log(U);
             }
             currNSERate = getParameterForCategory(alphaCategory, PANSEParameter::nse, codon, false);
             if (positionalRFPCount < 50)
@@ -582,8 +582,8 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                 {
                     propAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, true);
                     propLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PANSEParameter::lmPri, codon, true);
-                    logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambdaPrime*propU, positionalRFPCount,
-                                    phiValue,std::exp(propSigma),std::lgamma(propAlpha),(std::log(propLambdaPrime)+std::log(propU)),log_phi,std::lgamma(propAlpha+positionalRFPCount));
+                    logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambdaPrime*U, positionalRFPCount,
+                                    phiValue,std::exp(propSigma),std::lgamma(propAlpha),(std::log(propLambdaPrime)+std::log(U)),log_phi,std::lgamma(propAlpha+positionalRFPCount));
                     if (prop_prob_successful > 500)
                     {
                         prop_prob_successful = elongationProbabilityLog(propAlpha, propLambdaPrime,1/currNSERate);
@@ -597,8 +597,8 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                 else
                 {
                     propNSERate = getParameterForCategory(alphaCategory, PANSEParameter::nse, codon, true);
-                    logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime*propU, positionalRFPCount,
-                                    phiValue,std::exp(propSigma),std::lgamma(currAlpha),(std::log(currLambdaPrime)+std::log(propU)),log_phi,std::lgamma(currAlpha+positionalRFPCount));
+                    logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime*U, positionalRFPCount,
+                                    phiValue,std::exp(propSigma),std::lgamma(currAlpha),(std::log(currLambdaPrime)+std::log(U)),log_phi,std::lgamma(currAlpha+positionalRFPCount));
                     if (prop_prob_successful > 500)
                     {
                         prop_prob_successful = elongationProbabilityLog(currAlpha, currLambdaPrime,1/propNSERate);
@@ -612,8 +612,8 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
            }
            else
            {
-                logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime*propU, positionalRFPCount,
-                                  phiValue,std::exp(propSigma),lgamma_currentAlpha[alphaCategory][codonIndex],std::log(currLambdaPrime)+std::log(propU),log_phi,currLgammaRFPAlpha);
+                logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime*U, positionalRFPCount,
+                                  phiValue,std::exp(propSigma),lgamma_currentAlpha[alphaCategory][codonIndex],std::log(currLambdaPrime)+std::log(U),log_phi,currLgammaRFPAlpha);
                 if (prob_successful[codonIndex] > 500)
                 {
                     prob_successful[codonIndex] = elongationProbabilityLog(currAlpha, currLambdaPrime,1/currNSERate);
@@ -624,7 +624,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                 }
                 propSigma_new = propSigma + prob_successful[codonIndex];  
             }
-            logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime*currU, positionalRFPCount,
+            logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime*U, positionalRFPCount,
                                     phiValue, std::exp(currSigma),lgamma_currentAlpha[alphaCategory][codonIndex],log_currentLambdaPrime[lambdaPrimeCategory][codonIndex],log_phi,currLgammaRFPAlpha);  
             if (prob_successful[codonIndex] > 500)
             {
