@@ -1236,7 +1236,7 @@ getExpressionEstimates <- function(parameter, gene.index, samples, quantiles=c(0
   expressionQuantileLog <- do.call(rbind, expressionQuantileLog)
   
   expr.mat <- cbind(expressionValues, expressionValuesLog, expressionStdErr, expressionStdErrLog, expressionQuantile, expressionQuantileLog)
-  colnames(expr.mat) <- c("Mean", "log10.Mean", "Std.Dev", "log10.Std.Dev", quantiles, paste("log10.", quantiles, sep=""))
+  colnames(expr.mat) <- c("Mean", "Mean.log10", "Std.Dev", "log10.Std.Dev", quantiles, paste("log10.", quantiles, sep=""))
   return(expr.mat)
 }
 
