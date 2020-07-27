@@ -66,7 +66,7 @@ initializeGenomeObject <- function(file, genome=NULL, observed.expression.file=N
 #' 
 #' @description provides the codon counts for a fiven amino acid across all genes
 #' 
-#' @details The returned matrix containes a row for each gene and a coloumn 
+#' @details The returned matrix containes a row for each gene and a column 
 #' for each synonymous codon of \code{aa}.
 #' 
 #' @examples 
@@ -85,8 +85,8 @@ getCodonCounts <- function(genome){
   })
   codonCounts <- do.call("cbind", codonCounts)
   colnames(codonCounts) <- codons
-  ORF <- cbind(ORF, codonCounts)
-  return(as.data.frame(ORF))
+  rownames(codonCounts) <- ORF
+  return(as.data.frame(codonCounts,stringsAsFactors = F))
 }
 
 #' Get Codon Counts For a specific Amino Acid
