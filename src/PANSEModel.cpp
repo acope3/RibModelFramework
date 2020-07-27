@@ -871,7 +871,6 @@ void PANSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 
     double currZ = getPartitionFunction(0, false);
     double propZ = getPartitionFunction(0, true);
-    my_print("% % % % % % ",currZ,currZ/Y,propZ,propZ/Y,logLikelihood,logLikelihood_proposed);
     for (unsigned j = 0; j < n; j++)
     {
         lpr -= (std::log(getPartitionFunction(j, false)) - std::log(getPartitionFunction(j, true)));

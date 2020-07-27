@@ -180,14 +180,14 @@ class Parameter {
 		double getSynthesisRatePosteriorMean(unsigned samples, unsigned geneIndex, bool log_scale=false);
 
 		double getCodonSpecificPosteriorMean(unsigned mixtureElement, unsigned samples, std::string &codon,
-			unsigned paramType, bool withoutReference = true, bool byGene = false);
+			unsigned paramType, bool withoutReference = true, bool byGene = false, bool log_scale = false);
 		double getStdDevSynthesisRateVariance(unsigned samples, unsigned mixture, bool unbiased);
 		double getSynthesisRateVariance(unsigned samples, unsigned geneIndex,
 			bool unbiased = true, bool log_scale = false);
 		double getCodonSpecificVariance(unsigned mixtureElement, unsigned samples, std::string &codon,
-			unsigned paramType, bool unbiased, bool withoutReference = true);
+			unsigned paramType, bool unbiased, bool withoutReference = true, bool log_scale = false);
 	        std::vector<double> getCodonSpecificQuantile(unsigned mixtureElement, unsigned samples, std::string &codon,
-			unsigned paramType, std::vector<double> probs, bool withoutReference);
+			unsigned paramType, std::vector<double> probs, bool withoutReference, bool log_scale = false);
 		std::vector<double> getExpressionQuantile(unsigned samples, unsigned geneIndex,
 			std::vector<double> probs, bool log_scale = false);
 		std::vector<double> calculateQuantile(std::vector<float> &parameterTrace, unsigned samples, std::vector<double> probs, bool log_scale=false);
@@ -264,11 +264,11 @@ class Parameter {
 		std::vector<double> getEstimatedMixtureAssignmentProbabilitiesForGene(unsigned samples, unsigned geneIndex);
 
 		double getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon,
-			unsigned paramType, bool withoutReference);
+			unsigned paramType, bool withoutReference, bool log_scale = false);
 		double getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon,
-			unsigned paramType, bool unbiased, bool withoutReference);
+			unsigned paramType, bool unbiased, bool withoutReference, bool log_scale = false);
         	std::vector<double> getCodonSpecificQuantileForCodon(unsigned mixtureElement, unsigned samples,
-        		std::string &codon, unsigned paramType, std::vector<double> probs, bool withoutReference);
+        		std::string &codon, unsigned paramType, std::vector<double> probs, bool withoutReference, bool log_scale = false);
 		std::vector<double> getExpressionQuantileForGene(unsigned samples,
 			unsigned geneIndex, std::vector<double> probs, bool log_scale);
 

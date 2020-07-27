@@ -1748,7 +1748,7 @@ double Parameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned geneI
  * Wrapped by getCodonSpecificPosteriorMeanForCodon on the R-side.
 */
 double Parameter::getCodonSpecificPosteriorMean(unsigned element, unsigned samples, std::string &codon,
-	unsigned paramType, bool withoutReference, bool byGene)
+	unsigned paramType, bool withoutReference, bool byGene, bool log_scale)
 {
 	double posteriorMean = 0.0;
 	std::vector<float> parameterTrace;
@@ -1775,7 +1775,16 @@ double Parameter::getCodonSpecificPosteriorMean(unsigned element, unsigned sampl
 	unsigned start = traceLength - samples;
 
 	for (unsigned i = start; i < traceLength; i++)
-		posteriorMean += parameterTrace[i];
+	{	
+		if (log_scale)
+		{
+			posteriorMean += std::log10(parameterTrace[i]);
+		}
+		else
+		{
+			posteriorMean += parameterTrace[i];
+		}
+	}
 
 	return posteriorMean / (double)samples;
 }
@@ -1854,7 +1863,7 @@ double Parameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex,
 
 
 double Parameter::getCodonSpecificVariance(unsigned mixtureElement, unsigned samples, std::string &codon,
-	unsigned paramType, bool unbiased, bool withoutReference)
+	unsigned paramType, bool unbiased, bool withoutReference, bool log_scale)
 {
 	if (unbiased && samples == 1)
 	{
@@ -1875,7 +1884,7 @@ double Parameter::getCodonSpecificVariance(unsigned mixtureElement, unsigned sam
 		samples = traceLength;
 	}
 
-	double posteriorMean = getCodonSpecificPosteriorMean(mixtureElement, samples, codon, paramType, withoutReference, false);
+	double posteriorMean = getCodonSpecificPosteriorMean(mixtureElement, samples, codon, paramType, withoutReference, false,log_scale);
 
 	double posteriorVariance = 0.0;
 
@@ -1883,7 +1892,14 @@ double Parameter::getCodonSpecificVariance(unsigned mixtureElement, unsigned sam
 	double difference;
 	for (unsigned i = start; i < traceLength; i++)
 	{
-		difference = parameterTrace[i] - posteriorMean;
+		if (log_scale)
+		{
+			difference = std::log10(parameterTrace[i]) - posteriorMean;
+		}
+		else
+		{
+			difference = parameterTrace[i] - posteriorMean;
+		}
 		posteriorVariance += difference * difference;
 	}
 	double normalizationTerm = unbiased ? (1.0 / ((double)samples - 1.0)) : (1.0 / (double)samples);
@@ -1920,20 +1936,20 @@ std::vector<double> Parameter::calculateQuantile(std::vector<float> &parameterTr
     double N = samplesTrace.size();
     for (unsigned i = 0u; i < probs.size(); i++)
     {
-	if( probs[i] < (2.0/3.0)/(N+(1.0/3.0)) )
-	{
-		retVec[i] = samplesTrace[0]; // first element
-	}
-	else if( probs[i] >= (N-(1.0/3.0))/(N+(1.0/3.0)) )
-	{
-		retVec[i] = samplesTrace[N - 1]; // last element
-	}
-	else
-	{
-		double h = (N*probs[i]) + (probs[i] + 1.0)/3.0;
-		int low = std::floor(h);
-		retVec[i] = samplesTrace[low] + (h - low)*(samplesTrace[low+1] - samplesTrace[low]);
-	}
+		if( probs[i] < (2.0/3.0)/(N+(1.0/3.0)) )
+		{
+			retVec[i] = samplesTrace[0]; // first element
+		}
+		else if( probs[i] >= (N-(1.0/3.0))/(N+(1.0/3.0)) )
+		{
+			retVec[i] = samplesTrace[N - 1]; // last element
+		}
+		else
+		{
+			double h = (N*probs[i]) + (probs[i] + 1.0)/3.0;
+			int low = std::floor(h);
+			retVec[i] = samplesTrace[low] + (h - low)*(samplesTrace[low+1] - samplesTrace[low]);
+		}
     }
     return retVec;
 }
@@ -1957,12 +1973,12 @@ std::vector<double> Parameter::getExpressionQuantile(unsigned samples, unsigned 
 }
 
 std::vector<double> Parameter::getCodonSpecificQuantile(unsigned mixtureElement, unsigned samples, std::string &codon,
-	unsigned paramType, std::vector<double> probs, bool withoutReference)
+	unsigned paramType, std::vector<double> probs, bool withoutReference, bool log_scale)
 {
  	std::vector<float> parameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
 		mixtureElement, codon, paramType, withoutReference);
 
-	return calculateQuantile(parameterTrace, samples, probs, false);
+	return calculateQuantile(parameterTrace, samples, probs, log_scale);
 }
 
 
@@ -2526,7 +2542,7 @@ std::vector<double> Parameter::getCurrentSynthesisRateForMixture(unsigned mixtur
  * This is the R-wrapper for the C-side function "getCodonSpecificPosteriorMean".
 */
 double Parameter::getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon,
-	unsigned paramType, bool withoutReference)
+	unsigned paramType, bool withoutReference,bool log_scale)
 {
 	double rv = -1.0;
 	codon[0] = (char)std::toupper(codon[0]);
@@ -2535,14 +2551,14 @@ double Parameter::getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement,
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
 	if (check)
 	{
-		rv = getCodonSpecificPosteriorMean(mixtureElement - 1, samples, codon, paramType, withoutReference, false);
+		rv = getCodonSpecificPosteriorMean(mixtureElement - 1, samples, codon, paramType, withoutReference, false, log_scale);
 	}
 	return rv;
 }
 
 
 double Parameter::getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon,
-	unsigned paramType, bool unbiased, bool withoutReference)
+	unsigned paramType, bool unbiased, bool withoutReference, bool log_scale)
 {
 	double rv = -1.0;
 	codon[0] = (char)std::toupper(codon[0]);
@@ -2551,14 +2567,14 @@ double Parameter::getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsi
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
 	if (check)
 	{
-		rv = getCodonSpecificVariance(mixtureElement - 1, samples, codon, paramType, unbiased, withoutReference);
+		rv = getCodonSpecificVariance(mixtureElement - 1, samples, codon, paramType, unbiased, withoutReference, log_scale);
 	}
 	return rv;
 }
 
 
 std::vector<double> Parameter::getCodonSpecificQuantileForCodon(unsigned mixtureElement, unsigned samples,
-	std::string &codon, unsigned paramType, std::vector<double> probs, bool withoutReference)
+	std::string &codon, unsigned paramType, std::vector<double> probs, bool withoutReference, bool log_scale)
 {
 	std::vector<double> rv;
 	codon[0] = (char)std::toupper(codon[0]);
@@ -2567,7 +2583,7 @@ std::vector<double> Parameter::getCodonSpecificQuantileForCodon(unsigned mixture
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
 	if (check)
 	{
-        rv = getCodonSpecificQuantile(mixtureElement - 1, samples, codon, paramType, probs, withoutReference);
+        rv = getCodonSpecificQuantile(mixtureElement - 1, samples, codon, paramType, probs, withoutReference, log_scale);
     }
     return rv;
 }

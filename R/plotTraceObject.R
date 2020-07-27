@@ -31,20 +31,20 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
   }
   if(what[1] == "Alpha")
   {
-    plotCodonSpecificParameters(x, mixture, "Alpha", main="Alpha Parameter Traces", ROC=FALSE)
+    plotCodonSpecificParameters(x, mixture, "Alpha", main="Alpha Parameter Traces", ROC.or.FONSE=FALSE,log.10.scale=log.10.scale)
   }
-  if(what[1] == "LambdaPrime")
+  if(what[1] == "Lambda")
   {
-    plotCodonSpecificParameters(x, mixture, "LambdaPrime", main="LambdaPrime Parameter Traces", ROC=FALSE)
+    plotCodonSpecificParameters(x, mixture, "Lambda", main="Lambda Parameter Traces", ROC.or.FONSE=FALSE,log.10.scale=log.10.scale)
   } 
   
   if(what[1] == "MeanWaitingTime")
   {
-    plotCodonSpecificParameters(x, mixture, "MeanWaitingTime", main="Mean Waiting Time Parameter Traces", ROC=FALSE)
+    plotCodonSpecificParameters(x, mixture, "MeanWaitingTime", main="Mean Waiting Time Parameter Traces", ROC.or.FONSE=FALSE,log.10.scale=log.10.scale)
   }  
   if(what[1] == "VarWaitingTime")
   {
-    plotCodonSpecificParameters(x, mixture, "VarWaitingTime", main="Variance Waiting Time Parameter Traces", ROC=FALSE)
+    plotCodonSpecificParameters(x, mixture, "VarWaitingTime", main="Variance Waiting Time Parameter Traces", ROC.or.FONSE=FALSE)
   }  
   if(what[1] == "NSEProb")
   {
@@ -108,18 +108,18 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
 #'
 #' @param main The title of the plot.
 #'
-#' @param ROC A logical value determining if the Parameter was ROC or not.
+#' @param ROC.or.FONSE A logical value determining if the Parameter was ROC/FONSE or not.
 #'
 #' @return This function has no return value.
 #' 
 #' @description Plots a codon-specific set of traces, specified with the \code{type} parameter.
 #'
-plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="Mutation Parameter Traces", ROC=TRUE,log.10.scale=F)
+plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="Mutation Parameter Traces", ROC.or.FONSE=TRUE,log.10.scale=F)
 {
   opar <- par(no.readonly = T) 
   
   ### Trace plot.
-  if (ROC)
+  if (ROC.or.FONSE)
   {
     nf <- layout(matrix(c(rep(1, 4), 2:21), nrow = 6, ncol = 4, byrow = TRUE),
                rep(1, 4), c(2, 8, 8, 8, 8, 8), respect = FALSE)  
@@ -129,7 +129,7 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
                     rep(1, 4), c(2, 8, 8, 8, 8, 8, 8), respect = FALSE) 
   }
   ### Plot title.
-  if (ROC){
+  if (ROC.or.FONSE){
     par(mar = c(0, 0, 0, 0))
   }else{
     par(mar = c(1,1,1,1))
@@ -141,7 +141,7 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
   
   # TODO change to groupList -> checks for ROC like model is not necessary!
   names.aa <- aminoAcids()
-  with.ref.codon <- ifelse(ROC, TRUE, FALSE)
+  with.ref.codon <- ifelse(ROC.or.FONSE, TRUE, FALSE)
   
   for(aa in names.aa)
   { 
@@ -161,26 +161,44 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
       paramType <- 1
       special <- FALSE
     }else if (type == "Alpha"){
-      ylab <- expression(alpha)
+      if (log.10.scale)
+        {
+          ylab <- expression("log"[10]*alpha)
+        } else{
+          ylab <- expression(alpha)
+        }
       paramType <- 0
       special <- FALSE
-    }else if (type == "LambdaPrime"){
-      ylab <- expression(lambda~"'")
+    }else if (type == "Lambda"){
+       if (log.10.scale)
+        {
+          ylab <- expression("log"[10]*lambda)
+        } else{
+          ylab <- expression(lambda)
+        }
       paramType <- 1
       special <- FALSE
     }else if (type == "MeanWaitingTime"){
-      ylab <- expression(alpha/lambda~"'")
+      if (log.10.scale)
+      {
+        ylab <- expression("log"[10]*alpha/lambda)
+      }else{
+        ylab <- expression(alpha/lambda)
+      }
       special <- TRUE
     }else if (type == "VarWaitingTime"){
-      ylab <- expression(alpha/lambda~"'"^"2")
+      ylab <- expression(alpha/lambda^"2")
       special <- TRUE
     }else if (type == "NSEProb"){
         if (log.10.scale)
         {
           ylab <- expression("log"[10]*"Pr(NSE)")
         } else{
-          ylab <- expression("Pr(NSE)")
+          ylab <- expression("E[Pr(NSE)]")
         }
+        special <- TRUE
+    }else if (type == "VarNSEProb"){
+        ylab <- expression("Var[Pr(NSE)]")
         special <- TRUE
     }else if (type == "NSERate"){
       if (log.10.scale)
@@ -192,7 +210,7 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
       paramType <- 2
       special <- FALSE
     }else{
-      stop("Parameter 'type' not recognized! Must be one of: 'Mutation', 'Selection', 'Alpha', 'LambdaPrime', 'MeanWaitingTime', 'VarWaitingTime', 'NSEProb', 'NSERate'.")
+      stop("Parameter 'type' not recognized! Must be one of: 'Mutation', 'Selection', 'Alpha', 'Lambda', 'MeanWaitingTime', 'VarWaitingTime', 'NSEProb', 'NSERate'.")
     }
 
     for(i in 1:length(codons)){
@@ -204,10 +222,14 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
           cur.trace[[i]] <- tmpAlpha / tmpLambdaPrime
         }else if (type == "VarWaitingTime"){
           cur.trace[[i]] <- tmpAlpha / (tmpLambdaPrime * tmpLambdaPrime)
-        } else if (type == "NSEProb"){
+        } else if (type == "NSEProb" || type == "VarNSEProb"){
           tmpNSERate <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], 2, with.ref.codon)
-          cur.trace[[i]] <- tmpNSERate/(tmpAlpha/tmpLambdaPrime)
-
+          if (type == "NSEProb")
+          {
+            cur.trace[[i]] <- tmpNSERate*(tmpAlpha/tmpLambdaPrime)
+            } else {
+              cur.trace[[i]] <- tmpNSERate*tmpeNSERate*(tmpAlpha/(tmpLambdaPrime * tmpLambdaPrime))
+            }
         }
         if (log.10.scale)
         {
