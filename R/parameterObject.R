@@ -662,6 +662,18 @@ findOptimalCodon <- function(csp)
 }
 
 
+getNSEProbabilityTrace <- function(parameter,mixture,codon,samples)
+{ 
+  trace <- parameter$getTraceObject()
+  alpha <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codon, 0, F)
+  lambda <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codon, 1, F)
+  nserate <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codon, 2, F)
+  prob.nse.trace <- nserate * (alpha/lambda)
+  return(prob.nse.trace[(length(prob.nse.trace)-samples):length(prob.nse.trace)])
+}
+
+
+
 #' Return Codon Specific Paramters (or write to csv) estimates as data.frame
 #' 
 #' @param parameter parameter an object created by \code{initializeParameterObject}.
@@ -713,8 +725,13 @@ findOptimalCodon <- function(csp)
 #' 
 #' }
 
-getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10, relative.to.optimal.codon=T, report.original.ref = T)
+getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10, relative.to.optimal.codon=T, report.original.ref = T,log.scale=F)
 {
+  if((class(parameter)=="Rcpp_ROCParameter" || class(parameter)=="Rcpp_FONSEParameter") && log.scale)
+  {
+    stop("Log transformation will be performed on negative values. Stopping execution of getCSPEstimates.")
+  }
+
   model.conditions <- checkModel(parameter)
   model.uses.ref.codon <- model.conditions$model.uses.ref.codon
   names.aa <- model.conditions$aa
@@ -724,9 +741,10 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
   ## Creates empty vector of 0 for initial dataframes
   init <- rep(0.0,length(codons))
   
-  param.1<- data.frame(Codon=codons,AA=names.aa,Posterior=init,Std.Dev=init,Lower.quant=init,Upper.quant=init,stringsAsFactors = F,row.names = codons)
-  param.2 <- data.frame(Codon=codons,AA=names.aa,Posterior=init,Std.Dev=init,Lower.quant=init,Upper.quant=init,stringsAsFactors = F,row.names=codons)
-  param.3 <- data.frame(Codon=codons,AA=names.aa,Posterior=init,Std.Dev=init,Lower.quant=init,Upper.quant=init,stringsAsFactors = F,row.names=codons)
+  param.1<- data.frame(Codon=codons,AA=names.aa,Mean=init,Std.Dev=init,Lower.quant=init,Upper.quant=init,stringsAsFactors = F,row.names = codons)
+  param.2 <- data.frame(Codon=codons,AA=names.aa,Mean=init,Std.Dev=init,Lower.quant=init,Upper.quant=init,stringsAsFactors = F,row.names=codons)
+  param.3 <- data.frame(Codon=codons,AA=names.aa,Mean=init,Std.Dev=init,Lower.quant=init,Upper.quant=init,stringsAsFactors = F,row.names=codons)
+  param.4 <- data.frame(Codon=codons,AA=names.aa,Mean=init,Std.Dev=init,Lower.quant=init,Upper.quant=init,stringsAsFactors = F,row.names=codons)
   
   if (model.uses.ref.codon)
   {
@@ -735,23 +753,33 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
   ## Get parameter estimate for each codon
   for (codon in codons)
   {
-    param.1[codon,"Posterior"] <- parameter$getCodonSpecificPosteriorMean(mixtureElement=mixture,samples=samples,codon=codon,paramType=0,withoutReference=model.uses.ref.codon)
-    param.2[codon,"Posterior"] <- parameter$getCodonSpecificPosteriorMean(mixtureElement=mixture,samples=samples,codon=codon,paramType=1,withoutReference=model.uses.ref.codon)
-    param.1[codon,"Std.Dev"] <- sqrt(parameter$getCodonSpecificVariance(mixtureElement=mixture,samples=samples,codon=codon,paramType=0,unbiased=T,withoutReference=model.uses.ref.codon))
-    param.2[codon,"Std.Dev"] <- sqrt(parameter$getCodonSpecificVariance(mixtureElement=mixture,samples=samples,codon=codon,paramType=1,unbiased=T,withoutReference=model.uses.ref.codon))
-    param.1[codon,c("Lower.quant","Upper.quant")] <- parameter$getCodonSpecificQuantile(mixtureElement=mixture, samples=samples,codon=codon,paramType=0, probs=c(0.025, 0.975),withoutReference=model.uses.ref.codon)
-    param.2[codon,c("Lower.quant","Upper.quant")]  <- parameter$getCodonSpecificQuantile(mixtureElement=mixture, samples=samples,codon=codon,paramType=1, probs=c(0.025, 0.975),withoutReference=model.uses.ref.codon)
-    if (length(parameter.names) == 3)
+    param.1[codon,"Mean"] <- parameter$getCodonSpecificPosteriorMean(mixtureElement=mixture,samples=samples,codon=codon,paramType=0,withoutReference=model.uses.ref.codon,log_scale=log.scale)
+    param.2[codon,"Mean"] <- parameter$getCodonSpecificPosteriorMean(mixtureElement=mixture,samples=samples,codon=codon,paramType=1,withoutReference=model.uses.ref.codon,log_scale=log.scale)
+    param.1[codon,"Std.Dev"] <- sqrt(parameter$getCodonSpecificVariance(mixtureElement=mixture,samples=samples,codon=codon,paramType=0,unbiased=T,withoutReference=model.uses.ref.codon,log_scale=log.scale))
+    param.2[codon,"Std.Dev"] <- sqrt(parameter$getCodonSpecificVariance(mixtureElement=mixture,samples=samples,codon=codon,paramType=1,unbiased=T,withoutReference=model.uses.ref.codon,log_scale=log.scale))
+    param.1[codon,c("Lower.quant","Upper.quant")] <- parameter$getCodonSpecificQuantile(mixtureElement=mixture, samples=samples,codon=codon,paramType=0, probs=c(0.025, 0.975),withoutReference=model.uses.ref.codon,log_scale=log.scale)
+    param.2[codon,c("Lower.quant","Upper.quant")]  <- parameter$getCodonSpecificQuantile(mixtureElement=mixture, samples=samples,codon=codon,paramType=1, probs=c(0.025, 0.975),withoutReference=model.uses.ref.codon,log_scale=log.scale)
+    if (length(parameter.names) == 4)
     {
-      param.3[codon,"Posterior"] <- parameter$getCodonSpecificPosteriorMean(mixtureElement=mixture,samples=samples,codon=codon,paramType=2,withoutReference=model.uses.ref.codon)
-      param.3[codon,"Std.Dev"] <- sqrt(parameter$getCodonSpecificVariance(mixtureElement=mixture,samples=samples,codon=codon,paramType=2,unbiased=T,withoutReference=model.uses.ref.codon))
-      param.3[codon,c("Lower.quant","Upper.quant")] <- parameter$getCodonSpecificQuantile(mixtureElement=mixture, samples=samples,codon=codon,paramType=2, probs=c(0.025, 0.975),withoutReference=model.uses.ref.codon)
-      
+      param.3[codon,"Mean"] <- parameter$getCodonSpecificPosteriorMean(mixtureElement=mixture,samples=samples,codon=codon,paramType=2,withoutReference=model.uses.ref.codon,log_scale=log.scale)
+      param.3[codon,"Std.Dev"] <- sqrt(parameter$getCodonSpecificVariance(mixtureElement=mixture,samples=samples,codon=codon,paramType=2,unbiased=T,withoutReference=model.uses.ref.codon,log_scale=log.scale))
+      param.3[codon,c("Lower.quant","Upper.quant")] <- parameter$getCodonSpecificQuantile(mixtureElement=mixture, samples=samples,codon=codon,paramType=2, probs=c(0.025, 0.975),withoutReference=model.uses.ref.codon,log_scale=log.scale)
+      prob.nse.trace <- getNSEProbabilityTrace(parameter,mixture,codon,samples)
+      if (log.scale)
+      {
+        prob.nse.trace <- log10(prob.nse.trace)
+      }
+      param.4[codon,"Mean"] <- mean(prob.nse.trace)
+      param.4[codon,"Std.Dev"] <- sd(prob.nse.trace)
+      param.4[codon,c("Lower.quant","Upper.quant")] <- quantile(prob.nse.trace,probs=c(0.025,0.975),type=8)
+     
+
     }
   }
-  colnames(param.1) <- c("Codon", "AA", "Posterior","Std.Dev","0.025%", "0.975%")
-  colnames(param.2) <- c("Codon", "AA", "Posterior","Std.Dev","0.025%", "0.975%")
-  colnames(param.3) <- c("Codon", "AA", "Posterior","Std.Dev","0.025%", "0.975%")
+  colnames(param.1) <- c("Codon", "AA", "Mean","Std.Dev","0.025%", "0.975%")
+  colnames(param.2) <- c("Codon", "AA", "Mean","Std.Dev","0.025%", "0.975%")
+  colnames(param.3) <- c("Codon", "AA", "Mean","Std.Dev","0.025%", "0.975%")
+  colnames(param.4) <- c("Codon", "AA", "Mean","Std.Dev","0.025%", "0.975%")
   
   ## Only called if model actually uses reference codon
   if(relative.to.optimal.codon && model.uses.ref.codon)
@@ -762,28 +790,36 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
     ## TO DO: update C++ function which might expect certain format for the input CSP file parameters
     if (model.uses.ref.codon && !report.original.ref)
     {
-      param.1 <- param.1[-which(param.1[,"Posterior"]==0),]
-      param.2 <- param.2[-which(param.2[,"Posterior"]==0),]
+      param.1 <- param.1[-which(param.1[,"Mean"]==0),]
+      param.2 <- param.2[-which(param.2[,"Mean"]==0),]
     }
     csp.param <- vector(mode="list",length=length(parameter.names))
     names(csp.param) <- parameter.names
      
-    csp.param[[parameter.names[1]]] <- param.1[,c("AA", "Codon", "Posterior", "Std.Dev", "0.025%", "0.975%")]
-    csp.param[[parameter.names[2]]] <- param.2[,c("AA", "Codon", "Posterior", "Std.Dev", "0.025%", "0.975%")]
-    if (length(parameter.names)==3)
+    csp.param[[parameter.names[1]]] <- param.1[,c("AA", "Codon", "Mean", "Std.Dev", "0.025%", "0.975%")]
+    csp.param[[parameter.names[2]]] <- param.2[,c("AA", "Codon", "Mean", "Std.Dev", "0.025%", "0.975%")]
+    if (length(parameter.names)==4)
     {
-      csp.param[[parameter.names[3]]] <- param.3[,c("AA", "Codon", "Posterior", "Std.Dev", "0.025%", "0.975%")]
+      csp.param[[parameter.names[3]]] <- param.3[,c("AA", "Codon", "Mean", "Std.Dev", "0.025%", "0.975%")]
+      csp.param[[parameter.names[4]]] <- param.4[,c("AA", "Codon", "Mean", "Std.Dev", "0.025%", "0.975%")]
     }
   }
   if(is.null(filename))
   {
     return(csp.param)
   }else {
-    write.csv(csp.param[[parameter.names[1]]], file = paste0(filename,"_",parameter.names[1],".csv"), row.names = FALSE, quote=FALSE)
-    write.csv(csp.param[[parameter.names[2]]], file = paste0(filename,"_",parameter.names[2],".csv"), row.names = FALSE, quote=FALSE)
-    if (length(parameter.names)==3)
+    if (log.scale)
     {
-      write.csv(csp.param[[parameter.names[3]]], file = paste0(filename,"_",parameter.names[3],".csv"), row.names = FALSE, quote=FALSE)
+      suffix <- "_log_scale.csv"
+    } else{
+      suffix <- ".csv"
+    }
+    write.csv(csp.param[[parameter.names[1]]], file = paste0(filename,"_",parameter.names[1],suffix), row.names = FALSE, quote=FALSE)
+    write.csv(csp.param[[parameter.names[2]]], file = paste0(filename,"_",parameter.names[2],suffix), row.names = FALSE, quote=FALSE)
+    if (length(parameter.names)==4)
+    {
+      write.csv(csp.param[[parameter.names[3]]], file = paste0(filename,"_",parameter.names[3],suffix), row.names = FALSE, quote=FALSE)
+      write.csv(csp.param[[parameter.names[4]]], file = paste0(filename,"_",parameter.names[4],suffix), row.names = FALSE, quote=FALSE)
     }
   }
 }
@@ -837,7 +873,7 @@ optimalAsReference <- function(param.1,param.2,parameter.names,report.original.r
 ## NOT EXPOSED
 checkModel <- function(parameter)
 {
-  class.type = class(parameter)
+  class.type <- class(parameter)
   if(class(parameter)=="Rcpp_ROCParameter" || class(parameter)=="Rcpp_FONSEParameter")
   {
     model.uses.ref.codon <- TRUE
@@ -851,7 +887,7 @@ checkModel <- function(parameter)
     model.uses.ref.codon <- FALSE
     codons <- parameter$getGroupList()
     aa <- unlist(lapply(codons,codonToAA))
-    parameter.names <- c("Alpha","Lambda_Prime","NSERate")
+    parameter.names <- c("Alpha","Lambda","NSERate","NSEProb")
   } else
   {
     model.uses.ref.codon <- FALSE
@@ -1057,55 +1093,7 @@ initializeCovarianceMatrices <- function(parameter, genome, numMixtures, geneAss
   
 
   
-  #for(aa in names.aa){
-  # if(aa == "M" || aa == "W" || aa == "X") next
-  #should go away when CT is up and running
-  
-  #codonCounts <- getCodonCountsForAA(aa, genome)
-  #numCodons <- dim(codonCounts)[2] - 1
-  #-----------------------------------------
-  # TODO WORKS CURRENTLY ONLY FOR ALLUNIQUE!
-  #-----------------------------------------
-  # covmat <- vector("list", numMixtures)
-  #for(mixElement in 1:numMixtures){    
-  # idx <- geneAssignment == mixElement
-  #csp <- getCSPbyLogit(codonCounts[idx, ], phi[idx])
-  
-  #   parameter$initMutation(csp$coef.mat[1,], mixElement, aa)
-  #  parameter$initSelection(csp$coef.mat[2,], mixElement, aa)
-  # split matrix into sup matrices (dM and dEta)
-  # covmat[[mixElement]] <- splitMatrix(t(csp$R) %*% csp$R, numCodons, numCodons)  # we expect the covariance matrix, but get the decomposition.
-  #  }
-  # compl.covMat <- matrix(0, ncol = numMixtures * numCodons * 2, nrow = numMixtures * numCodons * 2)
-  #matrix.positions <- subMatrices(compl.covMat, numCodons, numCodons)
-  
-  #compl.seq <- seq(1, dim(compl.covMat)[1], numCodons)
-  #mut.seq <- compl.seq[1:(length(compl.seq)/2)]
-  #i <- 1
-  #for(pos in mut.seq){ 
-  # compl.covMat[matrix.positions == matrix.positions[pos, pos]] <- unlist(covmat[[i]][1])
-  #  i <- i + 1
-  # i <- ifelse(i > numMutationCategory, 1, i)
-  #  }
-  # sel.seq <- compl.seq[(length(compl.seq)/2 + 1):length(compl.seq)]
-  #  i <- 1
-  # for(pos in sel.seq){ 
-  #  compl.covMat[matrix.positions == matrix.positions[pos, pos]] <- unlist(covmat[[i]][4])
-  # i <- i + 1
-  #i <- ifelse(i > numMutationCategory, 1, i)
-  #}
-  
-  #ofdiag.seq <- mut.seq + numCodons*numMutationCategory
-  #for(i in 1:length(mut.seq)){
-  #  compl.covMat[matrix.positions == matrix.positions[mut.seq[i], ofdiag.seq[i]]] <- unlist(covmat[[i]][2])
-  # compl.covMat[matrix.positions == matrix.positions[ofdiag.seq[i], mut.seq[i]]] <- unlist(covmat[[i]][3])
-  #}
-  #for testing - in actuality this is used, it is currently overwriting 
-  #previous steps.
-  #compl.covMat <- diag((numMutationCategory + numSelectionCategory) * numCodons) * 0.05
-  #compl.covMat / max(compl.covMat)
-  #parameter$initCovarianceMatrix(compl.covMat, aa)
-  #}
+ 
   
   return(parameter)
 }

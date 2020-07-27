@@ -706,10 +706,19 @@ void PANSEParameter::proposeCodonSpecificParameter()
 			if (fix_lp)
 			{
 				proposedCodonSpecificParameter[lmPri][i][j] = currentCodonSpecificParameter[lmPri][i][j];
+
 			}
 			else
 			{
-				proposedCodonSpecificParameter[lmPri][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[lmPri][i][j]) , std_csp[j]) );
+				if (j == 29) // M/ATG has index 29, see SequenceSummary. This will need to be updated to be more general.
+        		{
+        			//This guarantees \alpha/\lambda will be 1. 
+        			proposedCodonSpecificParameter[lmPri][i][j] = proposedCodonSpecificParameter[alp][i][j];
+        		}
+        		else
+        		{
+					proposedCodonSpecificParameter[lmPri][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[lmPri][i][j]) , std_csp[j]) );
+				}
 			}
 		}
 	}
@@ -724,6 +733,10 @@ void PANSEParameter::proposeCodonSpecificParameter()
         	}
         	else
         	{
+        		if (j == 29) 
+        		{
+
+        		}
         		proposedCodonSpecificParameter[nse][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[nse][i][j]) , std_nse[j]) );
         	
         	}

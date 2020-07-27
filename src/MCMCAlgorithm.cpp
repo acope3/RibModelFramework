@@ -541,9 +541,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 void MCMCAlgorithm::acceptRejectHyperParameter(Genome &genome, Model& model, unsigned iteration)
 {
 	std::vector <double> logProbabilityRatios;
-
 	model.calculateLogLikelihoodRatioForHyperParameters(genome, iteration, logProbabilityRatios);
-	my_print("%\n",logProbabilityRatios[1]);
 	for (unsigned i = 0; i < logProbabilityRatios.size(); i++)
 	{
 		//my_print("%\n",logProbabilityRatios[i]);
