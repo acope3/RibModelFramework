@@ -146,11 +146,13 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 	std::vector <double> mat;
 	input.open(filename.c_str());
 	if (input.fail())
-		my_printError("Error opening file % to initialize from restart file.\n", filename.c_str());
-		my_printError("please use absolute path");
-		exit(0);
+	  {
+	    my_printError("Error opening file % to initialize from restart file.\n", filename.c_str());
+	    my_printError("please use absolute path");
+	    exit(0);
+	  }
 	else
-	{
+	  {
 		std::string tmp, variableName;
 		unsigned cat = 0;
 		while (getline(input, tmp))
@@ -534,9 +536,11 @@ void ROCParameter::initMutationCategories(std::vector<std::string> files, unsign
 		std::ifstream currentFile;
 		currentFile.open(files[category].c_str());
 		if (currentFile.fail())
+		  {
 			my_printError("Error opening file % to initialize mutation values.\n", category);
 			my_printError("please use absolute path");
 			exit(0);
+		  }
 		else
 		{
 			std::string tmp;
@@ -572,9 +576,11 @@ void ROCParameter::initSelectionCategories(std::vector<std::string> files, unsig
 		std::ifstream currentFile;
 		currentFile.open(files[category].c_str());
 		if (currentFile.fail())
+		  {
 			my_printError("Error opening file % to initialize selection values.\n", category);
 			my_printError("please use absolute path");
 			exit(0);
+		  }
 		else
 		{
 			std::string tmp;
