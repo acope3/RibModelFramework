@@ -152,7 +152,7 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 		exit(0);
 	}
 	else
-	{
+	  {
 		std::string tmp, variableName;
 		unsigned cat = 0;
 		while (getline(input, tmp))
@@ -541,6 +541,7 @@ void ROCParameter::initMutationCategories(std::vector<std::string> files, unsign
 			my_printError("please use absolute path");
 			exit(0);
 		}
+
 		else
 		{
 			std::string tmp;
@@ -581,6 +582,7 @@ void ROCParameter::initSelectionCategories(std::vector<std::string> files, unsig
 			my_printError("please use absolute path");
 			exit(0);
 		}
+
 		else
 		{
 			std::string tmp;

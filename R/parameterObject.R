@@ -776,10 +776,10 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
 
     }
   }
-  colnames(param.1) <- c("Codon", "AA", "Mean","Std.Dev","0.025%", "0.975%")
-  colnames(param.2) <- c("Codon", "AA", "Mean","Std.Dev","0.025%", "0.975%")
-  colnames(param.3) <- c("Codon", "AA", "Mean","Std.Dev","0.025%", "0.975%")
-  colnames(param.4) <- c("Codon", "AA", "Mean","Std.Dev","0.025%", "0.975%")
+  colnames(param.1) <- c("Codon", "AA", "Mean","Std.Dev","2.5%", "97.5%")
+  colnames(param.2) <- c("Codon", "AA", "Mean","Std.Dev","2.5%", "97.5%")
+  colnames(param.3) <- c("Codon", "AA", "Mean","Std.Dev","2.5%", "97.5%")
+  colnames(param.4) <- c("Codon", "AA", "Mean","Std.Dev","2.5%", "97.5%")
   
   ## Only called if model actually uses reference codon
   if(relative.to.optimal.codon && model.uses.ref.codon)
@@ -796,12 +796,13 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
     csp.param <- vector(mode="list",length=length(parameter.names))
     names(csp.param) <- parameter.names
      
-    csp.param[[parameter.names[1]]] <- param.1[,c("AA", "Codon", "Mean", "Std.Dev", "0.025%", "0.975%")]
-    csp.param[[parameter.names[2]]] <- param.2[,c("AA", "Codon", "Mean", "Std.Dev", "0.025%", "0.975%")]
+
+    csp.param[[parameter.names[1]]] <- param.1[,c("AA", "Codon", "Mean", "Std.Dev","2.5%", "97.5%")]
+    csp.param[[parameter.names[2]]] <- param.2[,c("AA", "Codon", "Mean", "Std.Dev","2.5%", "97.5%")]
     if (length(parameter.names)==4)
     {
-      csp.param[[parameter.names[3]]] <- param.3[,c("AA", "Codon", "Mean", "Std.Dev", "0.025%", "0.975%")]
-      csp.param[[parameter.names[4]]] <- param.4[,c("AA", "Codon", "Mean", "Std.Dev", "0.025%", "0.975%")]
+      csp.param[[parameter.names[3]]] <- param.3[,c("AA", "Codon", "Mean", "Std.Dev","2.5%", "97.5%")]
+      csp.param[[parameter.names[4]]] <- param.4[,c("AA", "Codon", "Mean", "Std.Dev","2.5%", "97.5%")]
     }
   }
   if(is.null(filename))
@@ -836,24 +837,24 @@ optimalAsReference <- function(param.1,param.2,parameter.names,report.original.r
     ## Create temporary data frames for modifying values
     tmp.1 <- param.1[codons,] ## "Mutation" parameter
     tmp.2 <- param.2[codons,] ## "Selection" parameter
-    current.reference.row <- which(tmp.2[,"Posterior"]==0)
-    optimal.parameter.value <- min(tmp.2[,"Posterior"])
+    current.reference.row <- which(tmp.2[,"Mean"]==0)
+    optimal.parameter.value <- min(tmp.2[,"Mean"])
     ## No reason to do anything if optimal value is 0
     if (optimal.parameter.value != 0.0)
     {
-      tmp.2[,c("Posterior","0.025%","0.975%")] <- tmp.2[,c("Posterior","0.025%","0.975%")] - optimal.parameter.value
+      tmp.2[,c("Mean","2.5%","97.5%")] <- tmp.2[,c("Mean","2.5%","97.5%")] - optimal.parameter.value
       ##Get row of the optimal codon, which should be 0
-      optimal.codon.row <- which(tmp.2[,"Posterior"]==0.0)
+      optimal.codon.row <- which(tmp.2[,"Mean"]==0.0)
       tmp.2[current.reference.row,"Std.Dev"] <- tmp.2[optimal.codon.row,"Std.Dev"]
-      tmp.2[current.reference.row,c("0.025%","0.975%")] <- tmp.2[optimal.codon.row,c("0.025%","0.975%")] + tmp.2[current.reference.row,"Posterior"]
+      tmp.2[current.reference.row,c("2.5%","97.5%")] <- tmp.2[optimal.codon.row,c("2.5%","97.5%")] + tmp.2[current.reference.row,"Mean"]
       ## Can now change optimal codon values to 0.0
-      tmp.2[optimal.codon.row,c("Posterior","Std.Dev","0.025%","0.975%")] <- 0.0
+      tmp.2[optimal.codon.row,c("Mean","Std.Dev","2.5%","97.5%")] <- 0.0
       ## Find corresponding reference value for other parameter
-      optimal.parameter.value <- tmp.1[optimal.codon.row,"Posterior"]
+      optimal.parameter.value <- tmp.1[optimal.codon.row,"Mean"]
       tmp.1[current.reference.row,"Std.Dev"] <- tmp.1[optimal.codon.row,"Std.Dev"]
-      tmp.1[,c("Posterior","0.025%","0.975%")] <- tmp.1[,c("Posterior","0.025%","0.975%")] - optimal.parameter.value
-      tmp.1[current.reference.row,c("0.025%","0.975%")] <- tmp.1[optimal.codon.row,c("0.025%","0.975%")] + tmp.1[current.reference.row,"Posterior"]
-      tmp.1[optimal.codon.row,c("Posterior","Std.Dev","0.025%","0.975%")] <- 0.0
+      tmp.1[,c("Mean","2.5%","97.5%")] <- tmp.1[,c("Mean","2.5%","97.5%")] - optimal.parameter.value
+      tmp.1[current.reference.row,c("2.5%","97.5%")] <- tmp.1[optimal.codon.row,c("2.5%","97.5%")] + tmp.1[current.reference.row,"Mean"]
+      tmp.1[optimal.codon.row,c("Mean","Std.Dev","2.5%","97.5%")] <- 0.0
     }
     if (!report.original.ref)
     {
@@ -865,8 +866,8 @@ optimalAsReference <- function(param.1,param.2,parameter.names,report.original.r
   }
   csp.param <- vector(mode="list",length=2)
   names(csp.param) <- parameter.names
-  csp.param[[parameter.names[1]]] <- updated.param.1[,c("AA", "Codon", "Posterior","Std.Dev", "0.025%", "0.975%")]
-  csp.param[[parameter.names[2]]] <- updated.param.2[,c("AA", "Codon", "Posterior","Std.Dev","0.025%", "0.975%")]
+  csp.param[[parameter.names[1]]] <- updated.param.1[,c("AA", "Codon", "Mean","Std.Dev", "2.5%", "97.5%")]
+  csp.param[[parameter.names[2]]] <- updated.param.2[,c("AA", "Codon", "Mean","Std.Dev","2.5%", "97.5%")]
   return(csp.param)
 }
 
@@ -1249,7 +1250,7 @@ getExpressionEstimates <- function(parameter, gene.index, samples, quantiles=c(0
   expressionQuantileLog <- do.call(rbind, expressionQuantileLog)
   
   expr.mat <- cbind(expressionValues, expressionValuesLog, expressionStdErr, expressionStdErrLog, expressionQuantile, expressionQuantileLog)
-  colnames(expr.mat) <- c("PHI", "log10.PHI", "Std.Dev", "log10.Std.Dev", quantiles, paste("log10.", quantiles, sep=""))
+  colnames(expr.mat) <- c("Mean", "Mean.log10", "Std.Dev", "log10.Std.Dev", quantiles, paste("log10.", quantiles, sep=""))
   return(expr.mat)
 }
 
