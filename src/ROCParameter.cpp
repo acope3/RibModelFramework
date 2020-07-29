@@ -528,8 +528,6 @@ void ROCParameter::initAllTraces(unsigned samples, unsigned num_genes, bool esti
 
 void ROCParameter::initMutationCategories(std::vector<std::string> files, unsigned numCategories, bool fix)
 {
-
-        std::cout<<"Here is the C output: "<<files[0]<<std::endl;
 	for (unsigned category = 0; category < numCategories; category++)
 	{
 		//Open the file for the category

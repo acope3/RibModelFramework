@@ -16,7 +16,7 @@
 #' The default Value is NULL.
 #' 
 #' @param initial.expression.values (Optional) A vector with intial phi values.
-#' The length of the vector has to equal the number of genes in the Genome object.
+#' The length of the vector has to equal the number of genes in the Genome object and the order of the genes should match the order of the genes in the Genome.
 #' The default value is NULL.
 #' 
 #' @param model Specifies the model used. Valid options are "ROC", "PA", "PANSE", or "FONSE".
@@ -71,6 +71,8 @@
 #' missing phi values, as these genes will not have an initial phi value.
 #' 
 #' @param init.initiation.cost FOR FONSE ONLY. Initializes the initiation cost a_1 at this value.
+#' 
+#' @param init.partition.function FOR PANSE ONLY. initializes the partition function Z. \lambda^\prime = \lambda z/Y
 #'
 #' @return parameter Returns an initialized Parameter object.
 #' 
@@ -1393,7 +1395,7 @@ writeParameterObject.Rcpp_PANSEParameter <- function(parameter, file){
   proposedAlpha <- parameter$proposedAlphaParameter
   proposedLambdaPrime <- parameter$proposedLambdaPrimeParameter
   proposedNSERate <- parameter$proposedNSERateParameter
-  model = "PANSE"
+  model <- "PANSE"
   
   
   trace <- parameter$getTraceObject()
@@ -1401,9 +1403,12 @@ writeParameterObject.Rcpp_PANSEParameter <- function(parameter, file){
   lambdaPrimeTrace <- trace$getCodonSpecificParameterTrace(1)
   NSERateTrace <- trace$getCodonSpecificParameterTrace(2)
   partitionTrace <- trace$getPartitionFunctionTraces()
+  nseSpecificAcceptRatTrace <- trace$getNseRateSpecificAcceptanceRateTrace()
+
+
   
   save(list = c("paramBase", "currentAlpha", "currentLambdaPrime", "currentNSERate", "proposedAlpha",
-                "proposedLambdaPrime", "proposedNSERate", "model", "alphaTrace", "lambdaPrimeTrace","NSERateTrace","partitionTrace"),
+                "proposedLambdaPrime", "proposedNSERate", "model", "alphaTrace", "lambdaPrimeTrace","NSERateTrace","partitionTrace","nseSpecificAcceptRatTrace"),
        file=file)
 }
 
@@ -1794,6 +1799,7 @@ loadPANSEParameterObject <- function(parameter, files)
       for (j in 1:numSelectionCategories) {
         partitionTrace[[j]] <- tempEnv$paramBase$partitionTrace[[j]][1:max]
       }
+      nseSpecificAcceptanceRateTrace <- tempEnv$paramBase$nseSpecificAcceptRatTrace
     }else{
       
       curAlphaTrace <- tempEnv$alphaTrace
@@ -1817,6 +1823,7 @@ loadPANSEParameterObject <- function(parameter, files)
   trace$setCodonSpecificParameterTrace(alphaTrace, 0)
   trace$setCodonSpecificParameterTrace(lambdaPrimeTrace, 1)
   trace$setCodonSpecificParameterTrace(NSERateTrace,2)
+  trace$setCodonSpecificAcceptanceRateTrace(nseSpecificAcceptanceRateTrace)
   trace$setPartitionFunctionTraces(partitionTrace)
   parameter$setTraceObject(trace)
   return(parameter) 

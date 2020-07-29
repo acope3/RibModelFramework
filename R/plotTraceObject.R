@@ -48,7 +48,7 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
   }  
   if(what[1] == "NSEProb")
   {
-    plotCodonSpecificParameters(x, mixture, "NSEProb", main="Nonsense Error Probability Parameter Traces", ROC=FALSE,log.10.scale=log.10.scale)
+    plotCodonSpecificParameters(x, mixture, "NSEProb", main="Nonsense Error Probability Parameter Traces", ROC.or.FONSE=FALSE,log.10.scale=log.10.scale)
   }  
   if(what[1] == "MixtureProbability")
   {
@@ -92,7 +92,7 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
   }
   if(what[1] == "NSERate")
   {
-    plotCodonSpecificParameters(x, mixture, "NSERate", main="NSERate", ROC=FALSE,log.10.scale=log.10.scale)
+    plotCodonSpecificParameters(x, mixture, "NSERate", main="NSERate", ROC.or.FONSE=FALSE,log.10.scale=log.10.scale)
   }  
 }
 
@@ -147,7 +147,7 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
   { 
     codons <- AAToCodon(aa, with.ref.codon)
     if(length(codons) == 0) next
-    if (!ROC){
+    if (!ROC.or.FONSE){
       if(aa == "X") next
     }
     cur.trace <- vector("list", length(codons))

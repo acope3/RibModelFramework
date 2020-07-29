@@ -36,7 +36,7 @@ convergence.test.Rcpp_Trace <- function(object, samples = 10, frac1 = 0.1,
     current.trace <- t(current.trace)
   }
   
-  if(what[1] == "Alpha" || what[1] == "LambdaPrime" || what[1] == "NSERate")
+  if(what[1] == "Alpha" || what[1] == "Lambda" || what[1] == "NSERate" || what[1] == "LambdaPrime")
   {
     codon.list <- codons()
     codon.list <- codon.list[1:(length(codon.list)-3)]
@@ -46,7 +46,7 @@ convergence.test.Rcpp_Trace <- function(object, samples = 10, frac1 = 0.1,
       if (what[1]=="Alpha")
       {
         cur.trace[[i]]<- object$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codon.list[i], 0, F)
-      } else if (what[1]=="LambdaPrime"){
+      } else if (what[1]=="Lambda" || what[1]=="LambdaPrime"){
         cur.trace[[i]]<- object$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codon.list[i], 1, F)
       } else if (what[1]=="NSERate"){
         cur.trace[[i]]<- object$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codon.list[i], 2, F)

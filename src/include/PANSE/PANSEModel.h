@@ -17,14 +17,14 @@ class PANSEModel: public Model
 		double calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
 				unsigned currRFPObserved, double phiValue, double prevSigma, double lgamma_currAlpha, double log_currLambdaPrime, double log_phi,double lgamma_rfp_alpha);
 		std::vector<std::vector<double>> lgamma_currentAlpha;
-   		std::vector<std::vector<double>> log_currentLambdaPrime;
+   		std::vector<std::vector<double>> log_currentLambda;
         std::vector<std::vector<std::vector<double>>> lgamma_rfp_alpha;
-        std::vector<std::vector<double>> current_sigma;
+      
         std::vector<double> prob_successful;
 
 
-        virtual void calculateZ(std::string grouping,Genome& genome,std::vector<double> &Z,std::string param);
-        virtual void fillMatrices(Genome& genome,bool init_sigma_vector = true);
+
+        virtual void fillMatrices(Genome& genome);
         virtual void clearMatrices();
 
 	public:
@@ -42,6 +42,8 @@ class PANSEModel: public Model
 				std::vector<double> &logAcceptanceRatioForAllMixtures);
 		virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
 				std::vector<double> &logAcceptanceRatioForAllMixtures,std::string param="Elongation"); // Depends on RFPCountColumn
+		
+
 		virtual void calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration,
 				std::vector <double> &logProbabilityRatio);
 
@@ -137,20 +139,13 @@ class PANSEModel: public Model
 		double UpperIncompleteGammaHelper(double s, double x);
 		double UpperIncompleteGamma(double s, double x);
 		double UpperIncompleteGammaLog(double s, double x);
-        double GeneralizedIntegral(double p, double z);
-
-        double GeneralizedIntegralLog(double p, double z);
+      
         double elongationProbability(double currAlpha, double currLambda, double currNSE);
         double elongationProbabilityLog(double currAlpha, double currLambda, double currNSE);
-        double elongationUntilIndexProbability(int index, std::vector <double> lambdas, std::vector <double> NSERates);
         
-        double elongationUntilIndexProbabilityLog(int index, std::vector <double> lambdas, std::vector <double> NSERates);
-        double prob_Y_g(double curralpha, int sample_size, double lambda_prime, double psi, double prevdelta);
-        double prob_Y_g_log(double curralpha, int sample_size, double lambda_prime, double psi, double prevdelta);
-
         double elongationUntilIndexApproximation1Probability(double alpha, double lambda, double v, double current);
         double elongationUntilIndexApproximation2Probability(double alpha, double lambda, double v, bool proposed);
-        double elongationUntilIndexApproximation1ProbabilityLog(double alpha, double lambda, double v, bool proposed);
+        double elongationUntilIndexApproximation1ProbabilityLog(double alpha, double lambda, double v, double current);
         double elongationUntilIndexApproximation2ProbabilityLog(double alpha, double lambda, double v, double current);
 
         //Psi-Phi Conversion Functions

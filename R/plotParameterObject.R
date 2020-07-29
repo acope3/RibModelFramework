@@ -319,7 +319,7 @@ acfCSP <- function(parameter, csp = "Mutation", numMixtures = 1, samples = NULL,
   if (csp == "Mutation" || csp == "Alpha")
   {
     paramType <- 0
-  } else if (csp == "Selection" || csp == "LambdaPrime"){
+  } else if (csp == "Selection" || csp == "LambdaPrime" || csp == "Lambda"){
     paramType <- 1
   } else if (csp == "NSERate"){
     paramType <- 2
@@ -331,19 +331,27 @@ acfCSP <- function(parameter, csp = "Mutation", numMixtures = 1, samples = NULL,
   acf.list <- list()
   names.aa <- aminoAcids()
   trace <- parameter$getTraceObject()
-  if(is.null(samples)){ samples <- round(10*log10(length(trace))) }
+  if(is.null(samples))
+  { 
+    samples <- round(10*log10(length(trace))) 
+  }
+
+  ref.codon <- ifelse(csp %in% c("Selection","Mutation"),TRUE,FALSE)
+
   for (aa in names.aa)
   {
-    if (aa == "M" || aa == "W" || aa == "X")
+    if (aa == "X")
       next
-    codons <- AAToCodon(aa, TRUE)
+     if ((aa == "M" || aa == "W") && ref.codon) ## If ROC or FONSE, skip amino acids without synonyms
+      next
+    codons <- AAToCodon(aa, ref.codon) ## If ROC or FONSE, skip reference codon
     codon.list <- list()
     for (i in 1:length(codons))
     {
       mix.list <- list()
       for (j in 1:numMixtures)
       {
-        csp.trace <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(j, codons[i], paramType, TRUE)
+        csp.trace <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(j, codons[i], paramType, ref.codon)
         csp.trace <- csp.trace[(length(csp.trace)-samples):length(csp.trace)]
         csp.acf <- acf(x = csp.trace, lag.max = lag.max, plot = FALSE)
         mix.list[[j]] <- csp.acf

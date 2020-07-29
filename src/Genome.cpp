@@ -379,8 +379,14 @@ void Genome::readRFPData(std::string filename, bool append, bool positional)
 					{
 						tmpGene.setId(prevID);
 						tmpGene.setDescription("No description for PA(NSE) Model");
-						if(positional) tmpGene.setPANSESequence(table);
-						else tmpGene.setPASequence(table);
+						if(positional) 
+						{
+							tmpGene.setPANSESequence(table);
+						}
+						else 
+						{
+							tmpGene.setPASequence(table);
+						}
 						addGene(tmpGene, false); //add to genome
 						totalRFPCount += tmpGene.geneData.getSumTotalRFPCount(0);
 						tmpGene.clear();
@@ -656,12 +662,10 @@ void Genome::readObservedPhiValues(std::string filename, bool byId)
 			{
 				//unsigned geneIndex = 0;
 				unsigned geneIndex=prev_genome_size;
-				my_print("Starting Value: %\n",prev_genome_size);
 				bool first = true;
 
 				while (std::getline(input, tmp))
 				{
-					my_print("%\n",geneIndex);
 					if (geneIndex >= genes.size())
 					{
 						my_printError("ERROR: GeneIndex exceeds the number of genes in the genome. Exiting function.");

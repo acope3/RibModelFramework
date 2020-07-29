@@ -15,6 +15,7 @@ RCPP_MODULE(Trace_mod)
     .method("getCodonSpecificAcceptanceRateTraceForAA", &Trace::getCodonSpecificAcceptanceRateTraceForAA)
     .method("getMixtureAssignmentTrace", &Trace::getMixtureAssignmentTrace)
     .method("getCodonSpecificAcceptanceRateTrace", &Trace::getCodonSpecificAcceptanceRateTrace)
+    .method("getNseRateSpecificAcceptanceRateTrace", &Trace::getNseRateSpecificAcceptanceRateTrace)
     .method("getMixtureProbabilitiesTrace", &Trace::getMixtureProbabilitiesTrace)
     .method("getExpectedSynthesisRateTrace", &Trace::getExpectedSynthesisRateTrace)
     .method("getSynthesisOffsetAcceptanceRateTrace", &Trace::getSynthesisOffsetAcceptanceRateTrace)
@@ -38,6 +39,7 @@ RCPP_MODULE(Trace_mod)
     .method("setMixtureAssignmentTrace", &Trace::setMixtureAssignmentTrace)
     .method("setMixtureProbabilitiesTrace", &Trace::setMixtureProbabilitiesTrace)
     .method("setCodonSpecificAcceptanceRateTrace", &Trace::setCodonSpecificAcceptanceRateTrace)
+    .method("setNseRateSpecificAcceptanceRateTrace", &Trace::setNseRateSpecificAcceptanceRateTrace)
 
 
     //ROC Specific:
