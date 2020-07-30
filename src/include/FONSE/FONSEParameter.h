@@ -25,6 +25,8 @@ class FONSEParameter : public Parameter
 		double std_a1;
         unsigned numAcceptForA1;
 
+        bool fix_dM=false;
+		bool fix_dOmega=false;
         bool fix_a1 = false;
 
 		std::vector <double> propose(std::vector <double> currentParam, double(*proposal)(double a, double b), double A, std::vector <double> B);
@@ -52,8 +54,8 @@ class FONSEParameter : public Parameter
 		void initFromRestartFile(std::string filename);
 
 		void initAllTraces(unsigned samples, unsigned num_genes, bool estimateSynthesisRate = true);
-		void initMutationCategories(std::vector<std::string> files, unsigned numCategories);
-		void initSelectionCategories(std::vector<std::string> files, unsigned numCategories);
+		void initMutationCategories(std::vector<std::string> files, unsigned numCategories, bool fix = false);
+		void initSelectionCategories(std::vector<std::string> files, unsigned numCategories, bool fix = false);
 
 
 
@@ -84,6 +86,10 @@ class FONSEParameter : public Parameter
 		double getCurrentInitiationCostProposalWidth();
 		void adaptInitiationCostProposalWidth(unsigned adaptationWidth, bool adapt);
 
+		void fixDM();
+		void fixDOmega();
+		bool isDMFixed();
+		bool isDOmegaFixed();
 		void fixedInitiationCost();
 
 

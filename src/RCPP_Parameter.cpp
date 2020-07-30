@@ -271,6 +271,9 @@ RCPP_MODULE(Parameter_mod)
 		.method("getMutationPriorStandardDeviation", &FONSEParameter::getMutationPriorStandardDeviation)
 		.method("setMutationPriorStandardDeviation", &FONSEParameter::setMutationPriorStandardDeviation)
 
+		.method("fixDM",&FONSEParameter::fixDM)//Not a R wrapper
+		.method("fixDOmega",&FONSEParameter::fixDOmega)//Not a R wrapper
+
 
 		// .property("proposedMutationParameter", &FONSEParameter::getProposedMutationParameter,
 		//         &FONSEParameter::setProposedMutationParameter) //R Specific

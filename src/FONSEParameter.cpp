@@ -413,53 +413,24 @@ void FONSEParameter::initAllTraces(unsigned samples, unsigned num_genes, bool es
                          numMixtures, categories, maxGrouping,obsPhiSets,currentSynthesisRateLevel[0],mixtureAssignment,estimateSynthesisRate);
 }
 
-void FONSEParameter::initMutationCategories(std::vector<std::string> files, unsigned numCategories)
+void FONSEParameter::initMutationCategories(std::vector<std::string> files, unsigned numCategories, bool fix)
 {
     for (unsigned category = 0; category < numCategories; category++)
     {
-      //Open the file for the category
-      std::ifstream currentFile;
-      currentFile.open(files[category].c_str());
-      if (currentFile.fail())
-        my_printError("Error opening file % to initialize mutation values.\n", category);
-			else
-			{
-				std::string tmp;
-				currentFile >> tmp; //The first line is a header (Amino Acid, Codon, Value, Std_deviation)
-
-				while (currentFile >> tmp)
-				{
-					//Get the Codon and Index
-					std::size_t pos = tmp.find(',', 2); //Amino Acid and a comma will always be the first 2 characters
-					std::string codon = tmp.substr(2, pos - 2);
-					unsigned codonIndex = SequenceSummary::codonToIndex(codon, true);
-
-					//get the value to store
-					std::size_t pos2 = tmp.find(',', pos + 1);
-					double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
-					currentCodonSpecificParameter[dM][category][codonIndex] = value;
-					proposedCodonSpecificParameter[dM][category][codonIndex] = value;
-				}
-			}
-      currentFile.close();
-    } //END OF A CATEGORY/FILE
-}
-
-
-void FONSEParameter::initSelectionCategories(std::vector<std::string> files, unsigned numCategories)
-{
-  for (unsigned category = 0; category < numCategories; category++)
-  {
-	  //Open the file for the category
-	  std::ifstream currentFile;
-	  currentFile.open(files[category].c_str());
-	  if (currentFile.fail())
-	      my_printError("Error opening file % to initialize mutation values.\n", category);
+		//Open the file for the category
+		std::ifstream currentFile;
+		currentFile.open(files[category].c_str());
+		if (currentFile.fail())
+		{
+			my_printError("Error opening file % to initialize mutation values.\n", category);
+			my_printError("please use absolute path");
+			exit(0);
+		}
 		else
 		{
 			std::string tmp;
 			currentFile >> tmp; //The first line is a header (Amino Acid, Codon, Value, Std_deviation)
-
+			fix_dM = fix;
 			while (currentFile >> tmp)
 			{
 				//Get the Codon and Index
@@ -470,10 +441,47 @@ void FONSEParameter::initSelectionCategories(std::vector<std::string> files, uns
 				//get the value to store
 				std::size_t pos2 = tmp.find(',', pos + 1);
 				double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
-				currentCodonSpecificParameter[dOmega][category][codonIndex] = value;
-				proposedCodonSpecificParameter[dOmega][category][codonIndex] = value;
+				currentCodonSpecificParameter[dM][category][codonIndex] = value;
+				proposedCodonSpecificParameter[dM][category][codonIndex] = value;
 			}
 		}
+        currentFile.close();
+    } //END OF A CATEGORY/FILE
+}
+
+
+void FONSEParameter::initSelectionCategories(std::vector<std::string> files, unsigned numCategories, bool fix)
+{
+  for (unsigned category = 0; category < numCategories; category++)
+  {
+	  //Open the file for the category
+	std::ifstream currentFile;
+	currentFile.open(files[category].c_str());
+	if (currentFile.fail())
+	{
+		my_printError("Error opening file % to initialize selection values.\n", category);
+		my_printError("please use absolute path");
+		exit(0);
+	}
+	else
+	{
+		std::string tmp;
+		currentFile >> tmp; //The first line is a header (Amino Acid, Codon, Value, Std_deviation)
+		fix_dOmega = fix;
+		while (currentFile >> tmp)
+		{
+			//Get the Codon and Index
+			std::size_t pos = tmp.find(',', 2); //Amino Acid and a comma will always be the first 2 characters
+			std::string codon = tmp.substr(2, pos - 2);
+			unsigned codonIndex = SequenceSummary::codonToIndex(codon, true);
+
+			//get the value to store
+			std::size_t pos2 = tmp.find(',', pos + 1);
+			double value = std::atof(tmp.substr(pos + 1, pos2 - pos - 1).c_str());
+			currentCodonSpecificParameter[dOmega][category][codonIndex] = value;
+			proposedCodonSpecificParameter[dOmega][category][codonIndex] = value;
+		}
+	}
     currentFile.close();
   } //END OF A CATEGORY/FILE
 }
@@ -540,7 +548,6 @@ void FONSEParameter::proposeCodonSpecificParameter()
     {
       iidProposed.push_back(randNorm(0.0, 1.0)); //Random distribution between 0 and 1
     }
-
     std::vector<double> covaryingNums;
 	//TODO: Explain the following line
     covaryingNums = covarianceMatrix[SequenceSummary::AAToAAIndex(aa)].transformIidNumbersIntoCovaryingNumbers(iidProposed);
@@ -548,33 +555,29 @@ void FONSEParameter::proposeCodonSpecificParameter()
 	{
 		for (unsigned j = i * numCodons, l = aaStart; j < (i * numCodons) + numCodons; j++, l++)
 		{
-			// if (fix_dM)
-			// {
-			// 	proposedCodonSpecificParameter[dM][i][l] = currentCodonSpecificParameter[dM][i][l];
-			// }
-			// else if (propose_by_prior)
-			// {
-			// 	proposedCodonSpecificParameter[dM][i][l] = randNorm(mutation_prior_mean[i][l],mutation_prior_sd[i][l]);
-			// }
-			//else
-			//{
-			proposedCodonSpecificParameter[dM][i][l] = currentCodonSpecificParameter[dM][i][l] + covaryingNums[j];
-			//}
+			if (fix_dM)
+			{
+				proposedCodonSpecificParameter[dM][i][l] = currentCodonSpecificParameter[dM][i][l];
+			}
+			else
+			{
+				proposedCodonSpecificParameter[dM][i][l] = currentCodonSpecificParameter[dM][i][l] + covaryingNums[j];
+			}
 		}
 	}
 	for (unsigned i = 0; i < numSelectionCategories; i++)
 	{
 		for (unsigned j = i * numCodons, l = aaStart; j < (i * numCodons) + numCodons; j++, l++)
 		{
-			//if (fix_dEta)
-			//{
-			//	proposedCodonSpecificParameter[dEta][i][l] = currentCodonSpecificParameter[dEta][i][l];
-			//}
-			//else
-			//{
-			proposedCodonSpecificParameter[dOmega][i][l] = currentCodonSpecificParameter[dOmega][i][l]
+			if (fix_dOmega)
+			{
+				proposedCodonSpecificParameter[dEta][i][l] = currentCodonSpecificParameter[dOmega][i][l];
+			}
+			else
+			{
+				proposedCodonSpecificParameter[dOmega][i][l] = currentCodonSpecificParameter[dOmega][i][l]
 											   + covaryingNums[(numMutationCategories * numCodons) + j];
-			//}
+			}
 		}
 	}
   }
@@ -615,7 +618,34 @@ void FONSEParameter::completeUpdateCodonSpecificParameter()
 
 void FONSEParameter::updateCodonSpecificParameter(std::string grouping)
 {
-	CSPToUpdate.push_back(grouping);
+	//CSPToUpdate.push_back(grouping);
+	unsigned aaStart, aaEnd;
+	SequenceSummary::AAToCodonRange(grouping, aaStart, aaEnd, true);
+	unsigned aaIndex = SequenceSummary::aaToIndex.find(grouping)->second;
+	numAcceptForCodonSpecificParameters[aaIndex]++;
+	
+	if (!fix_dM)
+	{
+		for (unsigned k = 0u; k < numMutationCategories; k++)
+		{
+			for (unsigned i = aaStart; i < aaEnd; i++)
+			{
+				currentCodonSpecificParameter[dM][k][i] = proposedCodonSpecificParameter[dM][k][i];
+			}
+		}
+	}
+	
+	if (!fix_dOmega)
+	{
+		for (unsigned k = 0u; k < numSelectionCategories; k++)
+		{
+			for (unsigned i = aaStart; i < aaEnd; i++)
+			{
+				currentCodonSpecificParameter[dOmega][k][i] = proposedCodonSpecificParameter[dOmega][k][i];
+
+			}
+		}
+	}
 }
 
 
@@ -625,6 +655,26 @@ void FONSEParameter::updateInitiationCost()
 	numAcceptForA1++;
 }
 
+
+void FONSEParameter::fixDM()
+{
+	fix_dM = true;
+}
+
+void FONSEParameter::fixDOmega()
+{
+	fix_dOmega = true;
+}
+
+bool FONSEParameter::isDMFixed()
+{
+	return fix_dM;
+}
+
+bool FONSEParameter::isDOmegaFixed()
+{
+	return fix_dOmega;
+}
 
 
 // -------------------------------------//
@@ -697,7 +747,7 @@ void FONSEParameter::fixedInitiationCost()
 void FONSEParameter::adaptInitiationCostProposalWidth(unsigned adaptationWidth, bool adapt)
 {
     double acceptanceLevel = (double)numAcceptForA1 / (double)adaptationWidth;
-    my_print("Accpeted Initiation Cost a_1: %\n",acceptanceLevel);
+    my_print("Accepted Initiation Cost a_1: %\n",acceptanceLevel);
     traces.updateInitiationCostAcceptanceRateTrace(acceptanceLevel);
     if (adapt)
     {
