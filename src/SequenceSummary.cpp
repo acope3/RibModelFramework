@@ -524,7 +524,7 @@ void SequenceSummary::AAIndexToCodonRange(unsigned aaIndex, unsigned& startAAInd
 //' @param aa corresponds to an entry in groupList which are separately defined for each parametrer type, e.g. in ROCParameter.cpp
 //' @param v2 Second value
 //' @return Product of v1 and v2
-// [[Rcpp::export]]
+// [[Rcpp__export]] Change __ to :: to export function description. Seems to be breaking things as of now. 
 void SequenceSummary::AAToCodonRange(std::string aa, unsigned& startAAIndex, unsigned& endAAIndex, bool forParamVector)
 {
 	//aa = (char)std::toupper(aa[0]); CEDRIC: commented out for performance. Put back in if necessary!
