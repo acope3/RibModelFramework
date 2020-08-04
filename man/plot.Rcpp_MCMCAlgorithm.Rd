@@ -4,7 +4,8 @@
 \alias{plot.Rcpp_MCMCAlgorithm}
 \title{Plot MCMC algorithm}
 \usage{
-\method{plot}{Rcpp_MCMCAlgorithm}(x, what = "LogPosterior", zoom.window = NULL, ...)
+\method{plot}{Rcpp_MCMCAlgorithm}(x, what = "LogPosterior",
+  zoom.window = NULL, ...)
 }
 \arguments{
 \item{x}{An Rcpp_MCMC object initialized with \code{initializeMCMCObject}.}

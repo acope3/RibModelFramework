@@ -4,13 +4,8 @@
 \alias{initializeModelObject}
 \title{Model Initialization}
 \usage{
-initializeModelObject(
-  parameter,
-  model = "ROC",
-  with.phi = FALSE,
-  fix.observation.noise = FALSE,
-  rfp.count.column = 1
-)
+initializeModelObject(parameter, model = "ROC", with.phi = FALSE,
+  fix.observation.noise = FALSE, rfp.count.column = 1)
 }
 \arguments{
 \item{parameter}{An object created with \code{initializeParameterObject}.}
@@ -18,14 +13,12 @@ initializeModelObject(
 \item{model}{A string containing the model to run (ROC, FONSE, or PA), has to match parameter object.}
 
 \item{with.phi}{(ROC only) A boolean that determines whether or not to include empirical
-phi values (expression rates) for the calculations. Default value is FALSE}
+phi values (expression rates) for the calculations.}
 
-\item{fix.observation.noise}{(ROC only) Allows fixing the noise term sepsilon in the observed expression dataset to its initial condition.  This value should override the est.hyper=TRUE setting in \code{initializeMCMCObject()}
-The initial condition for the observed expression noise is set in the parameter object. Default value is FALSE.}
+\item{fix.observation.noise}{(ROC only) Allows to fix the noise in the observed expression dataset to the initial condition.
+The initial condition for the observed expression noise can be set in the parameter object.}
 
-\item{rfp.count.column}{(PA and PANSE only) A number representing the RFP count column to use. Default value is 1.}
-
-\item{initiation.cost}{(FONSE only) A positive number representing the initiation cost of initiating protein translation (a_1 in the model description, the elongation cost a_2 = 4 ~P) Default value is 4 ~P.}
+\item{rfp.count.column}{(PA and PANSE only) A number representing the RFP count column to use.}
 }
 \value{
 This function returns the model object created.

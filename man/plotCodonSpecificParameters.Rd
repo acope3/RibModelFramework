@@ -4,14 +4,8 @@
 \alias{plotCodonSpecificParameters}
 \title{Plot Codon Specific Parameter}
 \usage{
-plotCodonSpecificParameters(
-  trace,
-  mixture,
-  type = "Mutation",
-  main = "Mutation Parameter Traces",
-  ROC.or.FONSE = TRUE,
-  log.10.scale = F
-)
+plotCodonSpecificParameters(trace, mixture, type = "Mutation",
+  main = "Mutation Parameter Traces", ROC = TRUE)
 }
 \arguments{
 \item{trace}{An Rcpp trace object initialized with \code{initializeTraceObject}.}
@@ -22,7 +16,7 @@ plotCodonSpecificParameters(
 
 \item{main}{The title of the plot.}
 
-\item{ROC.or.FONSE}{A logical value determining if the Parameter was ROC/FONSE or not.}
+\item{ROC}{A logical value determining if the Parameter was ROC or not.}
 }
 \value{
 This function has no return value.

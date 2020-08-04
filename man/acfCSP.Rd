@@ -4,19 +4,13 @@
 \alias{acfCSP}
 \title{Plots ACF for codon specific parameter traces}
 \usage{
-acfCSP(
-  parameter,
-  csp = "Mutation",
-  numMixtures = 1,
-  samples = NULL,
-  lag.max = 40,
-  plot = TRUE
-)
+acfCSP(parameter, csp = "Mutation", numMixtures = 1, samples = NULL,
+  lag.max = 40, plot = TRUE)
 }
 \arguments{
 \item{parameter}{object of class Parameter}
 
-\item{csp}{indicates which parameter to calculate the autocorrelation. Must be Mutation (the default, ROC, FONSE), Selection (ROC, FONSE), Alpha (PA, PANSE), LambdaPrime (PA, PANSE), NSERate (PA, PANSE)"}
+\item{csp}{"Selection" or "Mutation", defaults to "Mutation"}
 
 \item{numMixtures}{indicates the number of CSP mixtures used}
 

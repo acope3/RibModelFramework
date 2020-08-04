@@ -4,14 +4,8 @@
 \alias{calculate_marginal_log_likelihood}
 \title{Calculates the marginal log-likelihood for a set of parameters}
 \usage{
-calculate_marginal_log_likelihood(
-  parameter,
-  mcmc,
-  mixture,
-  n.samples,
-  divisor,
-  warnings = TRUE
-)
+calculate_marginal_log_likelihood(parameter, mcmc, mixture, n.samples,
+  divisor, warnings = TRUE)
 }
 \arguments{
 \item{parameter}{An object created with \code{initializeParameterObject}.}
@@ -54,7 +48,7 @@ mll1 <- calculate_marginal_likelihood(parameter1, mcmc1, mixture = 1,
 samples = 500, scaling = 1.5)
 mll2 <- calculate_marginal_likelihood(parameter2, mcmc2, mixture = 1, 
 samples = 500, scaling = 1.5)
-cat("Bayes factor: ", mll1 - mll2, "\n")
+cat("Bayes factor: ", mll1 - mll2, "\\n")
 }
  
 }

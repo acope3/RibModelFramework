@@ -4,16 +4,9 @@
 \alias{plot.Rcpp_Trace}
 \title{Plot Trace Object}
 \usage{
-\method{plot}{Rcpp_Trace}(
-  x,
-  what = c("Mutation", "Selection", "MixtureProbability", "Sphi", "Mphi", "Aphi",
-    "Sepsilon", "ExpectedPhi", "Expression", "NSEProb", "NSERate", "InitiationCost",
-    "PartitionFunction"),
-  geneIndex = 1,
-  mixture = 1,
-  log.10.scale = F,
-  ...
-)
+\method{plot}{Rcpp_Trace}(x, what = c("Mutation", "Selection",
+  "MixtureProbability", "Sphi", "Mphi", "Aphi", "Sepsilon", "ExpectedPhi",
+  "Expression"), geneIndex = 1, mixture = 1, ...)
 }
 \arguments{
 \item{x}{An Rcpp trace object initialized with \code{initializeTraceObject}.}
@@ -24,8 +17,6 @@ MixtureProbability, Sphi, Mphi, Aphi, Spesilon, ExpectedPhi, Expression}.}
 \item{geneIndex}{When plotting expression, the index of the gene to be plotted.}
 
 \item{mixture}{The mixture for which to plot values.}
-
-\item{log.10.scale}{Plot parameter on the log10 scale}
 
 \item{...}{Optional, additional arguments.
 For this function, may be a logical value determining if the trace is ROC-based or not.}

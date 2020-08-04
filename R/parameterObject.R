@@ -180,7 +180,6 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
   
   if(model == "ROC"){
     if(is.null(init.with.restart.file)){
-      print("Not initializing ROCParameter object with restart file. Initializing new object...")
       parameter <- initializeROCParameterObject(genome, sphi, num.mixtures, 
                                                 gene.assignment, initial.expression.values, split.serine,
                                                 mixture.definition, mixture.definition.matrix, 
@@ -1060,8 +1059,7 @@ getTrace <- function(parameter){
 #' 
 
 # Also initializes the mutaiton and selection parameter
-initializeCovarianceMatrices <- function(parameter, genome, numMixtures, geneAssignment, init.csp.variance = 0.0025) 
-{
+initializeCovarianceMatrices <- function(parameter, genome, numMixtures, geneAssignment, init.csp.variance = 0.0025) {
   numMutationCategory <- parameter$numMutationCategories
   numSelectionCategory <- parameter$numSelectionCategories
   

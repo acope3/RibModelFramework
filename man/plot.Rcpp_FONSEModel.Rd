@@ -4,15 +4,8 @@
 \alias{plot.Rcpp_FONSEModel}
 \title{Plot Model Object}
 \usage{
-\method{plot}{Rcpp_FONSEModel}(
-  x,
-  genome,
-  samples = 100,
-  mixture = 1,
-  simulated = FALSE,
-  codon.window = NULL,
-  ...
-)
+\method{plot}{Rcpp_FONSEModel}(x, genome, samples = 100, mixture = 1,
+  simulated = FALSE, ...)
 }
 \arguments{
 \item{x}{An Rcpp model object initialized with \code{initializeModelObject}.}
