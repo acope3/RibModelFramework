@@ -20,6 +20,8 @@
 #' @param append If TRUE, function will read in additional genome data to append to an existing genome.  
 #' If FALSE, genome data is cleared before reading in data (no preexisting data). Default value is FALSE.
 #' 
+#' @param codon.table Should be 1 or 12 (CTG from Leu to Ser)
+#'
 #' @return This function returns the initialized Genome object.
 #' 
 #' @examples 
@@ -39,13 +41,13 @@
 #' genome <- initializeGenomeObject(file = genes_file, genome = genome, append = TRUE)   
 #' 
 initializeGenomeObject <- function(file, genome=NULL, observed.expression.file=NULL, fasta=TRUE, positional = FALSE, 
-                                   match.expression.by.id=TRUE, append=FALSE) {
+                                   match.expression.by.id=TRUE, append=FALSE, codon.table = 1) {
   if (is.null(genome)){ 
     genome <- new(Genome)
   }
 
   if (fasta == TRUE) {
-    genome$readFasta(file, append)
+    genome$readFasta(file, append, codon.table)
   } else {
       genome$readRFPData(file, append, positional)
   }

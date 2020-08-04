@@ -147,8 +147,10 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
   { 
     codons <- AAToCodon(aa, with.ref.codon)
     if(length(codons) == 0) next
-    if (!ROC.or.FONSE){
-      if(aa == "X") next
+    if (ROC.or.FONSE){
+      if(aa == "X" || aa == "M" || aa == "W") next
+    } else{
+      if (aa == "X") next
     }
     cur.trace <- vector("list", length(codons))
     paramType <- 0
