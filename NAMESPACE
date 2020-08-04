@@ -83,6 +83,7 @@ export(
 "aminoAcids",
 "codonToAA",
 "codons",
+"setCodonTable",
 
 ##
 "acfMCMC",

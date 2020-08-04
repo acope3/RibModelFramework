@@ -190,6 +190,13 @@ void Gene::setSequence(std::string _seq)
     	}
 }
 
+void Gene::setCodonTable(unsigned codon_table_number)
+{
+    SequenceSummary::setCodonTable(codon_table_number);
+    
+}
+
+
 /* setPASequence (NOT EXPOSED)
  * Arguments: A table-styled vector (based on lines of input) of integer vectors (storing actual values).
  * The argument is intended to be derived from solely Genome::readRFPData,

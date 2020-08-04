@@ -1226,6 +1226,7 @@ std::vector<std::vector<double>> Parameter::calculateSelectionCoefficients(unsig
 	unsigned numGenes = (unsigned)mixtureAssignment.size();
 	std::vector<std::vector<double>> selectionCoefficients;
 	selectionCoefficients.resize(numGenes, std::vector<double> (61, 0));
+	std::vector<unsigned> codon_list;
 	unsigned numGroupings = getGroupListSize();
 
 	for (unsigned i = 0; i < numGenes; i++)
@@ -1236,13 +1237,14 @@ std::vector<std::vector<double>> Parameter::calculateSelectionCoefficients(unsig
 		for (unsigned j = 0; j < numGroupings; j++)
 		{
 			std::string aa = getGrouping(j);
-			unsigned aaStart, aaEnd;
-			SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
+			// unsigned aaStart, aaEnd;
+			// SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
+			codon_list = SequenceSummary::AAToCodonIndex(aa,true);
 			std::vector<double> tmp;
 			double minValue = 0.0;
-			for (unsigned k = aaStart; k < aaEnd; k++)
+			for (unsigned k = 0; k < codon_list.size(); k++)
 			{
-				std::string codon = SequenceSummary::codonArrayParameter[k];
+				std::string codon = SequenceSummary::codonArrayParameter[codon_list[k]];
 				double x = getCodonSpecificPosteriorMean(i, sample, codon, 1, true, true);
 				tmp.push_back(x);
 				minValue = (x < minValue) ? x : minValue;
@@ -1468,9 +1470,6 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
     my_print("\t%:\t%\n", aa.c_str(), acceptanceLevel);
 
     traces.updateCodonSpecificAcceptanceRateTrace(aaIndex, acceptanceLevel);
-
-    unsigned aaStart, aaEnd;
-    SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
 
       //Evaluate current acceptance ratio  performance
     if (acceptanceLevel < factorCriteriaLow) acceptanceUnder++;

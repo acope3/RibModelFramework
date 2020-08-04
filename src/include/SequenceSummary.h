@@ -42,6 +42,8 @@ class SequenceSummary
 
 		//Static Member Variables:
 		static const std::string Ser2;
+		
+
 		static const std::vector<std::string> AminoAcidArray;
 		static const std::string codonArray[];
 		static const std::string codonArrayParameter[];
@@ -49,6 +51,17 @@ class SequenceSummary
 		static const std::map<std::string, unsigned> codonToIndexWithReference;
 		static const std::map<std::string, unsigned> codonToIndexWithoutReference;
 
+		// static const std::map<std::string, std::vector<std::string>> AAToCodonsMapWithReference_1;
+		// static const std::map<std::string, std::vector<std::string>> AAToCodonsMapWithoutReference_1;
+		// static const std::map<std::string, std::string> codonToAAMap_1;
+
+		// static const std::map<std::string, std::vector<std::string>> AAToCodonsMapWithReference_12;
+		// static const std::map<std::string, std::vector<std::string>> AAToCodonsMapWithoutReference_12;
+		// static const std::map<std::string, std::string> codonToAAMap_12;
+
+		static std::map<std::string, std::vector<std::string>> AAToCodonsMapWithReference;
+		static std::map<std::string, std::vector<std::string>> AAToCodonsMapWithoutReference;
+		static std::map<std::string, std::string> codonToAAMap;
 
 		//Constructors & Destructors:
 		explicit SequenceSummary();
@@ -58,7 +71,7 @@ class SequenceSummary
 		bool operator==(const SequenceSummary& other) const;
 		virtual ~SequenceSummary(); //TODO:Why is this virtual????
 
-
+		static void setCodonTable(unsigned codon_table_number);
 		//Data Manipulation Functions (All tested):
 		unsigned getAACountForAA(std::string aa);
 		unsigned getAACountForAA(unsigned aaIndex);
@@ -71,13 +84,14 @@ class SequenceSummary
 		//RFP Functions (for PA and PANSE models) (All tested):
         //RFP Count has an inner vector indexed by position Sum RFP Count has an inner index of Codon Type
 		void initRFPCount(unsigned numCategories);
-		std::vector <unsigned> getRFPCount(unsigned RFPCountColumn = 0u);
+		std::vector<unsigned> getRFPCount(unsigned RFPCountColumn = 0u);
 		unsigned getSingleRFPCount(unsigned position, unsigned RFPCountColumn = 0u);
 		void setRFPCount(std::vector <unsigned> arg, unsigned RFPCountColumn = 0u);
-		unsigned getSumTotalRFPCount(unsigned RFPCountColumn = 0u);
 
         void initSumRFPCount(unsigned numCategories);
 		std::array <unsigned, 64> getSumRFPCount(unsigned RFPCountColumn = 0u);
+		unsigned getSumTotalRFPCount(unsigned RFPCountColumn=0);
+
 		void setSumRFPCount(std::array <unsigned, 64> arg, unsigned RFPCountColumn = 0u);
 
         //These functions deal with a single codon at a time
@@ -100,6 +114,7 @@ class SequenceSummary
 		static void AAIndexToCodonRange(unsigned aaIndex, unsigned& start, unsigned& end, bool forParamVector = false); //Moving to CT
 		static void AAToCodonRange(std::string aa, unsigned& start, unsigned& end, bool forParamVector = false); //Moving to CT
 		static std::vector<std::string> AAToCodon(std::string aa, bool forParamVector = false); //Moving to CT, but used in R currently
+		static std::vector<unsigned> AAToCodonIndex(std::string aa, bool forParamVector = false);
 		static std::string codonToAA(std::string& codon); //Moving to CT
 		static unsigned codonToIndex(std::string& codon, bool forParamVector = false); //Moving to CT
 		static unsigned codonToAAIndex(std::string& codon); //Moving to CT

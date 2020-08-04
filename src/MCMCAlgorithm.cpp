@@ -650,6 +650,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 			
             //TODO:Probably do a nan check
 			if ((iteration % adaptiveWidth) == 0u)
+
 				model.adaptCodonSpecificParameterProposalWidth(adaptiveWidth, iteration / thinning, iteration <= stepsToAdapt);
 		}
 		// update hyper parameter
@@ -908,7 +909,6 @@ void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned
 				std::string grouping = model.getGrouping(i);
 				model.updateCodonSpecificParameter(grouping);
 			}
-			model.completeUpdateCodonSpecificParameter();
 		}
 		// no prior on hyper parameters -> just accept everything
 		if (estimateHyperParameter)
