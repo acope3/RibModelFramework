@@ -240,8 +240,8 @@ calculateProbabilityVector <- function(parameter,model,expressionValues,mixture,
   mutation <- vector("numeric", length(codons))
   for (i in 1:length(codons))
   {
-    selection[i] <- parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 1, T, F, log_scale = F)
-    mutation[i] <- parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 0, T, F, log_scale = F)
+    selection[i] <- parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 1, T,log_scale = F)
+    mutation[i] <- parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 0, T,log_scale = F)
   }
   
   # calculate codon probabilities with respect to phi
@@ -283,7 +283,7 @@ plotSinglePanel <- function(parameter, model, genome, expressionValues, samples,
   mutation <- vector("numeric", length(codons))
   for (i in 1:length(codons))
   {
-    selection[i] <- parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 1, T, F, log_scale = F)
+    selection[i] <- parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 1, T, log_scale = F)
     mutation[i] <- parameter$getCodonSpecificPosteriorMean(mixture, samples, codons[i], 0, T, log_scale = F)
   }
   # 
