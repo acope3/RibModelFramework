@@ -1088,6 +1088,7 @@ void PANSEModel::simulateGenome(Genome &genome)
         unsigned lambdaCategory = parameter->getSelectionCategory(mixtureElement);
 
         double U = getPartitionFunction(mixtureElement, false)/Y;
+        my_print("Z/Y %\n",U);
         double sigma =  1.0;
         double v;
         for (unsigned positionIndex = 0; positionIndex < positions.size(); positionIndex++)
