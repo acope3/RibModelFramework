@@ -39,13 +39,13 @@
 #' genome <- initializeGenomeObject(file = genes_file, genome = genome, append = TRUE)   
 #' 
 initializeGenomeObject <- function(file, genome=NULL, observed.expression.file=NULL, fasta=TRUE, positional = FALSE, 
-                                   match.expression.by.id=TRUE, append=FALSE) {
+                                   match.expression.by.id=TRUE, append=FALSE, codon_table = 1) {
   if (is.null(genome)){ 
     genome <- new(Genome)
   }
 
   if (fasta == TRUE) {
-    genome$readFasta(file, append)
+    genome$readFasta(file, append, codon_table)
   } else {
       genome$readRFPData(file, append, positional)
   }

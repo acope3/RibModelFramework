@@ -59,12 +59,17 @@ double ROCModel::calculateMutationPrior(std::string grouping, bool proposed)
 
 void ROCModel::obtainCodonCount(SequenceSummary *sequenceSummary, std::string curAA, int codonCount[])
 {
-	unsigned aaStart, aaEnd;
-	SequenceSummary::AAToCodonRange(curAA, aaStart, aaEnd, false);
+	//unsigned aaStart, aaEnd;
+	//SequenceSummary::AAToCodonRange(curAA, aaStart, aaEnd, false);
+	std::vector<unsigned> codon_index = SequenceSummary::AAToCodonIndex(curAA,false);
 	// get codon counts for AA
 	unsigned j = 0u;
-	for (unsigned i = aaStart; i < aaEnd; i++, j++)
-		codonCount[j] = sequenceSummary->getCodonCountForCodon(i);
+	// for (unsigned i = aaStart; i < aaEnd; i++, j++)
+	// 	codonCount[j] = sequenceSummary->getCodonCountForCodon(i);
+	for (unsigned i=0;i < codon_index.size(); i++,j++)
+	{
+		codonCount[j] = sequenceSummary->getCodonCountForCodon(codon_index[i]);
+	}
 }
 
 
@@ -701,10 +706,6 @@ void ROCModel::updateCodonSpecificParameter(std::string grouping)
 	parameter->updateCodonSpecificParameter(grouping);
 }
 
-void ROCModel::completeUpdateCodonSpecificParameter()
-{
-    parameter->completeUpdateCodonSpecificParameter();
-}
 
 
 void ROCModel::updateAllHyperParameter()
@@ -729,7 +730,7 @@ void ROCModel::updateHyperParameter(unsigned hp)
 void ROCModel::simulateGenome(Genome &genome)
 {
 	unsigned codonIndex;
-
+	std::vector<unsigned> codon_list;
 	std::string tmpDesc = "Simulated Gene";
 
 	for (unsigned geneIndex = 0; geneIndex < genome.getGenomeSize(); geneIndex++) //loop over all genes in the genome
@@ -770,9 +771,11 @@ void ROCModel::simulateGenome(Genome &genome)
 				calculateCodonProbabilityVector(numCodons, mutation, selection, phi, codonProb);
 			}
 			codonIndex = Parameter::randMultinom(codonProb, numCodons);
-			unsigned aaStart, aaEnd;
-			SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, false); //need the first spot in the array where the codons for curAA are
-			codon = sequenceSummary.indexToCodon(aaStart + codonIndex);//get the correct codon based off codonIndex
+			// unsigned aaStart, aaEnd;
+			// SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, false); //need the first spot in the array where the codons for curAA are
+			// codon = sequenceSummary.indexToCodon(aaStart + codonIndex);//get the correct codon based off codonIndex
+			codon_list = SequenceSummary::AAToCodonIndex(aa,false);
+			codon = sequenceSummary.indexToCodon(codon_list[codonIndex]);
 			tmpSeq += codon;
 		}
 		std::string codon =	sequenceSummary.indexToCodon((unsigned)Parameter::randUnif(61.0, 64.0)); //randomly choose a stop codon, from range 61-63

@@ -235,30 +235,35 @@ void CovarianceMatrix::calculateSampleCovariance(std::vector<std::vector<std::ve
 
 	unsigned start = lastIteration - samples;
 	
-	unsigned aaStart, aaEnd;
-	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
+	// unsigned aaStart, aaEnd;
+	// SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
 
+    std::vector<unsigned> codon_list = SequenceSummary::AAToCodonIndex(aa,true);
+    unsigned numCodons = codon_list.size();
+    unsigned codon_index_1, codon_index_2;
 	unsigned IDX = 0;
 	for (unsigned paramType1 = 0; paramType1 < numParamTypesInModel; paramType1++)
 	{
 		unsigned numCategoriesInModel1 = numCategoriesInModelPerParamType[paramType1];
 		for (unsigned category1 = 0; category1 < numCategoriesInModel1; category1++)
 		{
-			for (unsigned param1 = aaStart; param1 < aaEnd; param1++)
+			for (unsigned param1 = 0; param1 < numCodons; param1++)
 			{
-				double mean1 = sampleMean(codonSpecificParameterTrace[paramType1][category1][param1], samples, lastIteration);
+                codon_index_1 = codon_list[param1];
+				double mean1 = sampleMean(codonSpecificParameterTrace[paramType1][category1][codon_index_1], samples, lastIteration);
 				for (unsigned paramType2 = 0; paramType2 < numParamTypesInModel; paramType2++)
 				{
 					unsigned numCategoriesInModel2 = numCategoriesInModelPerParamType[paramType2];
 					for (unsigned category2 = 0; category2 < numCategoriesInModel2; category2++)
 					{
-						for (unsigned param2 = aaStart; param2 < aaEnd; param2++)
+						for (unsigned param2 = 0; param2 < numCodons; param2++)
 						{
-							double mean2 = sampleMean(codonSpecificParameterTrace[paramType2][category2][param2], samples, lastIteration);
+                            codon_index_2 = codon_list[param2];
+							double mean2 = sampleMean(codonSpecificParameterTrace[paramType2][category2][codon_index_2], samples, lastIteration);
 							double unscaledSampleCov = 0.0;
 							for (unsigned i = start; i < lastIteration; i++)
 							{
-								unscaledSampleCov += (codonSpecificParameterTrace[paramType1][category1][param1][i] - mean1) * (codonSpecificParameterTrace[paramType2][category2][param2][i] - mean2);
+								unscaledSampleCov += (codonSpecificParameterTrace[paramType1][category1][codon_index_1][i] - mean1) * (codonSpecificParameterTrace[paramType2][category2][codon_index_2][i] - mean2);
 							}
 							covMatrix[IDX] = unscaledSampleCov / ((double)samples - 1.0);
 

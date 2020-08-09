@@ -117,9 +117,18 @@ void PANSEParameter::initPANSEParameterSet()
 	partitionFunction_proposed.resize(partitionFunctionCategories, 1.0);
 	partitionFunction.resize(partitionFunctionCategories, 1.0);
 
-	numParam = 61;
+	groupList = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
+		"TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT", "ATA", "ATC",
+		"ATT", "AAA", "AAG", "CTA", "CTC", "CTG", "CTT", "TTA", "TTG", "ATG",
+		"AAC", "AAT", "CCA", "CCC", "CCG", "CCT", "CAA", "CAG", "AGA", "AGG",
+		"CGA", "CGC", "CGG", "CGT", "TCA", "TCC", "TCG", "TCT", "ACA", "ACC",
+		"ACG", "ACT", "GTA", "GTC", "GTG", "GTT", "TGG", "TAC", "TAT", "AGC",
+		"AGT"};
+
+	numParam = groupList.size();
 
 	numAcceptForNSERates.resize(numParam,0u);
+
 
 
 	for (unsigned i = 0; i < alphaCategories; i++)
@@ -141,13 +150,6 @@ void PANSEParameter::initPANSEParameterSet()
         currentCodonSpecificParameter[nse][i] = tmp;
         proposedCodonSpecificParameter[nse][i] = tmp;
     }
-    for (unsigned i = 0; i < numParam; i++)
-  	{
-    	//CovarianceMatrix m((numMutationCategories+numSelectionCategories+numMutationCategories));
-    	CovarianceMatrix m((numMutationCategories+numSelectionCategories));
-    	m.choleskyDecomposition();
-    	covarianceMatrix.push_back(m);
-  	}
 
  
 	bias_csp = 0;
@@ -155,13 +157,7 @@ void PANSEParameter::initPANSEParameterSet()
 	std_nse.resize(numParam,0.1);
 	std_partitionFunction = 0.1;
 
-	groupList = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
-		"TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT", "ATA", "ATC",
-		"ATT", "AAA", "AAG", "CTA", "CTC", "CTG", "CTT", "TTA", "TTG", "ATG",
-		"AAC", "AAT", "CCA", "CCC", "CCG", "CCT", "CAA", "CAG", "AGA", "AGG",
-		"CGA", "CGC", "CGG", "CGT", "TCA", "TCC", "TCG", "TCT", "ACA", "ACC",
-		"ACG", "ACT", "GTA", "GTC", "GTG", "GTT", "TGG", "TAC", "TAT", "AGC",
-		"AGT"};
+	
 
 }
 

@@ -66,7 +66,7 @@ bool Genome::operator==(const Genome& other) const
  * (if not set to true, will default to clearing file; defaults to false)
  * Takes input in Fasta format from file and saves to genome.
 */
-void Genome::readFasta(std::string filename, bool append)
+void Genome::readFasta(std::string filename, bool append, unsigned codon_table_number)
 {
 	prev_genome_size = genes.size();
 	try
@@ -85,6 +85,7 @@ void Genome::readFasta(std::string filename, bool append)
 			int newLine;
 
 			Gene tmpGene;
+			tmpGene.setCodonTable(codon_table_number);
 			std::string tempSeq = "";
 			while (true)
 			{

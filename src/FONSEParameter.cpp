@@ -537,112 +537,80 @@ double FONSEParameter::getCurrentCodonSpecificProposalWidth(unsigned aa)
 void FONSEParameter::proposeCodonSpecificParameter()
 {
   for (unsigned k = 0; k < getGroupListSize(); k++)
-  {
-    std::vector<double> iidProposed;
-    std::string aa = getGrouping(k);
+  	{
+    	std::vector<double> iidProposed;
+    	std::string aa = getGrouping(k);
 
-    unsigned aaStart, aaEnd;
-    SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
-    unsigned numCodons = aaEnd - aaStart;
-    for (unsigned i = 0u; i < (numCodons * (numMutationCategories + numSelectionCategories)); i++)
-    {
-      iidProposed.push_back(randNorm(0.0, 1.0)); //Random distribution between 0 and 1
-    }
-    std::vector<double> covaryingNums;
-	//TODO: Explain the following line
-    covaryingNums = covarianceMatrix[SequenceSummary::AAToAAIndex(aa)].transformIidNumbersIntoCovaryingNumbers(iidProposed);
-	for (unsigned i = 0; i < numMutationCategories; i++)
-	{
-		for (unsigned j = i * numCodons, l = aaStart; j < (i * numCodons) + numCodons; j++, l++)
+    	std::vector<unsigned> codon_list = SequenceSummary::AAToCodonIndex(aa,true);
+		unsigned numCodons = codon_list.size();
+		for (unsigned i = 0u; i < (numCodons * (numMutationCategories + numSelectionCategories)); i++)
 		{
-			if (fix_dM)
+			iidProposed.push_back(randNorm(0.0, 1.0));
+		}
+
+		std::vector<double> covaryingNums;
+		covaryingNums = covarianceMatrix[SequenceSummary::AAToAAIndex(aa)].transformIidNumbersIntoCovaryingNumbers(iidProposed);
+		for (unsigned i = 0; i < numMutationCategories; i++)
+		{
+			for (unsigned j = i * numCodons, l = 0; j < (i * numCodons) + numCodons; j++, l++)
 			{
-				proposedCodonSpecificParameter[dM][i][l] = currentCodonSpecificParameter[dM][i][l];
+				if (fix_dM)
+				{
+					proposedCodonSpecificParameter[dM][i][codon_list[l]] = currentCodonSpecificParameter[dM][i][codon_list[l]];
+				}
+				else
+				{
+					proposedCodonSpecificParameter[dM][i][codon_list[l]] = currentCodonSpecificParameter[dM][i][codon_list[l]] + covaryingNums[j];
+				}
 			}
-			else
+		}
+		for (unsigned i = 0; i < numSelectionCategories; i++)
+		{
+			for (unsigned j = i * numCodons, l = 0; j < (i * numCodons) + numCodons; j++, l++)
 			{
-				proposedCodonSpecificParameter[dM][i][l] = currentCodonSpecificParameter[dM][i][l] + covaryingNums[j];
+				if (fix_dOmega)
+				{
+					proposedCodonSpecificParameter[dOmega][i][codon_list[l]] = currentCodonSpecificParameter[dOmega][i][codon_list[l]];
+				}
+				else
+				{
+					proposedCodonSpecificParameter[dOmega][i][codon_list[l]] = currentCodonSpecificParameter[dOmega][i][codon_list[l]]
+												   + covaryingNums[(numMutationCategories * numCodons) + j];
+				}
 			}
 		}
 	}
-	for (unsigned i = 0; i < numSelectionCategories; i++)
-	{
-		for (unsigned j = i * numCodons, l = aaStart; j < (i * numCodons) + numCodons; j++, l++)
-		{
-			if (fix_dOmega)
-			{
-				proposedCodonSpecificParameter[dEta][i][l] = currentCodonSpecificParameter[dOmega][i][l];
-			}
-			else
-			{
-				proposedCodonSpecificParameter[dOmega][i][l] = currentCodonSpecificParameter[dOmega][i][l]
-											   + covaryingNums[(numMutationCategories * numCodons) + j];
-			}
-		}
-	}
-  }
 }
 
 
-void FONSEParameter::completeUpdateCodonSpecificParameter()
-{
-    for (std::string grouping : CSPToUpdate)
-	{
-		unsigned aaStart, aaEnd;
-		SequenceSummary::AAToCodonRange(grouping, aaStart, aaEnd, true);
-		unsigned aaIndex = SequenceSummary::aaToIndex.find(grouping)->second;
-		numAcceptForCodonSpecificParameters[aaIndex]++;
-		
-		for (unsigned k = 0u; k < numMutationCategories; k++)
-		{
-			for (unsigned i = aaStart; i < aaEnd; i++)
-			{
-				currentCodonSpecificParameter[dM][k][i] = proposedCodonSpecificParameter[dM][k][i];
-			}
-		}
-		
-		
-		for (unsigned k = 0u; k < numSelectionCategories; k++)
-		{
-			for (unsigned i = aaStart; i < aaEnd; i++)
-			{
-				currentCodonSpecificParameter[dOmega][k][i] = proposedCodonSpecificParameter[dOmega][k][i];
-
-			}
-		}
-		
-	}
-	CSPToUpdate.clear();
-
-}
 
 void FONSEParameter::updateCodonSpecificParameter(std::string grouping)
 {
-	//CSPToUpdate.push_back(grouping);
-	unsigned aaStart, aaEnd;
-	SequenceSummary::AAToCodonRange(grouping, aaStart, aaEnd, true);
+	// unsigned aaStart, aaEnd;
+	// SequenceSummary::AAToCodonRange(grouping, aaStart, aaEnd, true);
+	// unsigned aaIndex = SequenceSummary::aaToIndex.find(grouping)->second;
+	// numAcceptForCodonSpecificParameters[aaIndex]++;
+	
+	std::vector<unsigned> codon_list = SequenceSummary::AAToCodonIndex(grouping,true);
 	unsigned aaIndex = SequenceSummary::aaToIndex.find(grouping)->second;
 	numAcceptForCodonSpecificParameters[aaIndex]++;
-	
 	if (!fix_dM)
 	{
 		for (unsigned k = 0u; k < numMutationCategories; k++)
 		{
-			for (unsigned i = aaStart; i < aaEnd; i++)
+			for (unsigned i = 0; i < codon_list.size(); i++)
 			{
-				currentCodonSpecificParameter[dM][k][i] = proposedCodonSpecificParameter[dM][k][i];
+				currentCodonSpecificParameter[dM][k][codon_list[i]] = proposedCodonSpecificParameter[dM][k][codon_list[i]];
 			}
 		}
 	}
-	
 	if (!fix_dOmega)
 	{
 		for (unsigned k = 0u; k < numSelectionCategories; k++)
 		{
-			for (unsigned i = aaStart; i < aaEnd; i++)
+			for (unsigned i = 0; i < codon_list.size(); i++)
 			{
-				currentCodonSpecificParameter[dOmega][k][i] = proposedCodonSpecificParameter[dOmega][k][i];
-
+				currentCodonSpecificParameter[dOmega][k][codon_list[i]] = proposedCodonSpecificParameter[dOmega][k][codon_list[i]];
 			}
 		}
 	}
@@ -711,14 +679,21 @@ void FONSEParameter::getParameterForCategory(unsigned category, unsigned paramTy
 {
     std::vector<double> *tempSet;
 	tempSet = proposal ? &proposedCodonSpecificParameter[paramType][category] : &currentCodonSpecificParameter[paramType][category];
-	unsigned aaStart, aaEnd;
-	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
+	// unsigned aaStart, aaEnd;
+	// SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
 
-    unsigned j = 0u;
-    for (unsigned i = aaStart; i < aaEnd; i++, j++)
-    {
-        returnSet[j] = tempSet->at(i);
-    }
+ //    unsigned j = 0u;
+ //    for (unsigned i = aaStart; i < aaEnd; i++, j++)
+ //    {
+ //        returnSet[j] = tempSet->at(i);
+ //    }
+	std::vector<unsigned> codon_list = SequenceSummary::AAToCodonIndex(aa,true);
+
+	unsigned j = 0u;
+	for (unsigned i = 0; i < codon_list.size(); i++, j++)
+	{
+		returnSet[j] = tempSet->at(codon_list[i]);
+	}
 }
 
 
@@ -860,11 +835,16 @@ void FONSEParameter::initMutation(std::vector<double> mutationValues, unsigned m
         unsigned category = getMutationCategory(mixtureElement);
         aa[0] = (char)std::toupper(aa[0]);
 
-        unsigned aaStart, aaEnd;
-	    SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
-        for (unsigned i = aaStart, j = 0; i < aaEnd; i++, j++)
+     //    unsigned aaStart, aaEnd;
+	    // SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
+     //    for (unsigned i = aaStart, j = 0; i < aaEnd; i++, j++)
+     //    {
+     //        currentCodonSpecificParameter[dM][category][i] = mutationValues[j];
+     //    }
+        std::vector<unsigned> codon_list = SequenceSummary::AAToCodonIndex(aa,true);
+        for (unsigned i = 0, j = 0; i < codon_list.size(); i++, j++)
         {
-            currentCodonSpecificParameter[dM][category][i] = mutationValues[j];
+            currentCodonSpecificParameter[dM][category][codon_list[i]] = mutationValues[j];
         }
     }
 }
@@ -883,11 +863,13 @@ void FONSEParameter::initSelection(std::vector<double> selectionValues, unsigned
 
         aa[0] = (char)std::toupper(aa[0]);
 
-        unsigned aaStart, aaEnd;
-        SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
-        for (unsigned i = aaStart, j = 0; i < aaEnd; i++, j++)
+        // unsigned aaStart, aaEnd;
+        // SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
+        // for (unsigned i = aaStart, j = 0; i < aaEnd; i++, j++)
+        std::vector<unsigned> codon_list = SequenceSummary::AAToCodonIndex(aa,true);
+        for (unsigned i = 0, j = 0; i < codon_list.size(); i++, j++)
         {
-            currentCodonSpecificParameter[dOmega][category][i] = selectionValues[j];
+            currentCodonSpecificParameter[dOmega][category][codon_list[i]] = selectionValues[j];
         }
     }
 }

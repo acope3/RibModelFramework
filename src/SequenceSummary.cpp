@@ -49,7 +49,70 @@ const std::map<std::string, unsigned> SequenceSummary::codonToIndexWithoutRefere
 	{"ATA", 11}, {"ATC", 12}, {"AAA", 13}, {"CTA", 14}, {"CTC", 15}, {"CTG", 16}, {"CTT", 17}, {"TTA", 18}, {"AAC", 19},
 	{"CCA", 20}, {"CCC", 21}, {"CCG", 22}, {"CAA", 23}, {"AGA", 24}, {"AGG", 25}, {"CGA", 26}, {"CGC", 27}, {"CGG", 28},
 	{"TCA", 29}, {"TCC", 30}, {"TCG", 31}, {"ACA", 32}, {"ACC", 33}, {"ACG", 34}, {"GTA", 35}, {"GTC", 36}, {"GTG", 37},
-	{"TAC", 38}, {"AGC", 39}};
+	{"TAC", 38}, {"AGC", 39}}; //Need to add case for AGT
+
+
+std::map<std::string, std::vector<std::string>> SequenceSummary::AAToCodonsMapWithReference = {{"A",{"GCA","GCC","GCG","GCT"}}, 
+			{"C",{"TGC", "TGT"}}, {"D",{"GAC", "GAT"}}, {"E",{"GAA", "GAG"}}, {"F",{"TTC", "TTT"}},
+			{"G",{"GGA", "GGC", "GGG", "GGT"}}, {"H",{"CAC", "CAT"}}, {"I",{"ATA", "ATC", "ATT"}},
+			{"K",{"AAA", "AAG"}}, {"L",{"CTA", "CTC", "CTG","CTT", "TTA", "TTG"}}, {"M", {"ATG"}},
+			{"N",{"AAC", "AAT"}}, {"P",{"CCA", "CCC", "CCG", "CCT"}}, {"Q",{"CAA", "CAG"}}, {"R",{"AGA","AGG", "CGA", "CGC", "CGG", "CGT"}}, 
+			{"S",{"TCA", "TCC", "TCG", "TCT"}}, {"T",{"ACA", "ACC", "ACG", "ACT"}}, {"V",{"GTA", "GTC", "GTG", "GTT"}}, {"W",{"TGG"}},
+			{"Y",{"TAC", "TAT"}}, {"Z", {"AGC", "AGT"}}, {"X",{"TAA", "TAG", "TGA"}}};
+
+std::map<std::string, std::vector<std::string>> SequenceSummary::AAToCodonsMapWithoutReference = {{"A",{"GCA","GCC","GCG"}}, 
+	{"C",{"TGC"}}, {"D",{"GAC"}}, {"E",{"GAA"}}, {"F",{"TTC"}},
+	{"G",{"GGA", "GGC", "GGG"}}, {"H",{"CAC"}}, {"I",{"ATA", "ATC"}},
+	{"K",{"AAA"}}, {"L",{"CTA", "CTC", "CTG","CTT", "TTA"}}, {"M", {}},
+	{"N",{"AAC"}}, {"P",{"CCA", "CCC", "CCG"}}, {"Q",{"CAA"}}, {"R",{"AGA","AGG", "CGA", "CGC", "CGG"}}, 
+	{"S",{"TCA", "TCC", "TCG"}}, {"T",{"ACA", "ACC", "ACG"}}, {"V",{"GTA", "GTC", "GTG"}}, {"W", {}},
+	{"Y",{"TAC"}}, {"Z", {"AGC"}},{"X",{"TAA", "TAG"}}};
+
+std::map<std::string, std::string> SequenceSummary::codonToAAMap = {{"GCA", "A"}, {"GCC", "A"}, {"GCG", "A"},
+	{"GCT", "A"}, {"TGC", "C"}, {"TGT", "C"}, {"GAC", "D"}, {"GAT",  "D"}, {"GAA",  "E"}, {"GAG", "E"}, {"TTC", "F"}, {"TTT", "F"},
+	{"GGA", "G"}, {"GGC", "G"}, {"GGG", "G"}, {"GGT", "G"}, {"CAC", "H"}, {"CAT", "H"}, {"ATA", "I"}, {"ATC", "I"}, {"ATT", "I"},
+	{"AAA", "K"}, {"AAG", "K"}, {"CTA", "L"}, {"CTC", "L"}, {"CTG", "L"}, {"CTT", "L"}, {"TTA", "L"}, {"TTG", "L"}, {"ATG", "M"},
+	{"AAC", "N"}, {"AAT", "N"}, {"CCA", "P"}, {"CCC", "P"}, {"CCG", "P"}, {"CCT", "P"}, {"CAA", "Q"}, {"CAG", "Q"}, {"AGA", "R"},
+	{"AGG", "R"}, {"CGA", "R"}, {"CGC", "R"}, {"CGG", "R"}, {"CGT", "R"}, {"TCA", "S"}, {"TCC", "S"}, {"TCG", "S"}, {"TCT", "S"},
+	{"ACA", "T"}, {"ACC", "T"}, {"ACG", "T"}, {"ACT", "T"}, {"GTA", "V"}, {"GTC", "V"}, {"GTG", "V"}, {"GTT", "V"}, {"TGG", "W"},
+	{"TAC", "Y"}, {"TAT", "Y"}, {"AGC", "Z"}, {"AGT", "Z"}, {"TAA", "X"}, {"TAG", "X"}, {"TGA", "X"}};
+
+
+
+
+// const std::map<std::string, std::vector<std::string>> SequenceSummary::AAToCodonsMapWithReference_12 = {{"A",{"GCA","GCC","GCG","GCT"}}, 
+// 			{"C",{"TGC", "TGT"}}, {"D",{"GAC", "GAT"}}, {"E",{"GAA", "GAG"}}, {"F",{"TTC", "TTT"}},
+// 			{"G",{"GGA", "GGC", "GGG", "GGT"}}, {"H",{"CAC", "CAT"}}, {"I",{"ATA", "ATC", "ATT"}},
+// 			{"K",{"AAA", "AAG"}}, {"L",{"CTA", "CTC", "CTT", "TTA", "TTG"}}, {"M", {"ATG"}},
+// 			{"N",{"AAC", "AAT"}}, {"P",{"CCA", "CCC", "CCG", "CCT"}}, {"Q",{"CAA", "CAG"}}, {"R",{"AGA","AGG","CGA", "CGC", "CGG", "CGT"}}, 
+// 			{"S",{"TCA", "TCC", "TCG", "TCT"}}, {"T",{"ACA", "ACC", "ACG", "ACT"}}, {"V",{"GTA", "GTC", "GTG", "GTT"}}, {"W",{"TGG"}},
+// 			{"Y",{"TAC", "TAT"}}, {"Z", {"AGC", "AGT", "CTG"}}, {"X",{"TAA", "TAG", "TGA"}}};
+
+// const std::map<std::string, std::vector<std::string>> SequenceSummary::AAToCodonsMapWithoutReference_12 = {{"A",{"GCA","GCC","GCG"}}, 
+// 	{"C",{"TGC"}}, {"D",{"GAC"}}, {"E",{"GAA"}}, {"F",{"TTC"}},
+// 	{"G",{"GGA", "GGC", "GGG"}}, {"H",{"CAC"}}, {"I",{"ATA", "ATC"}},
+// 	{"K",{"AAA"}}, {"L",{"CTA", "CTC","CTT", "TTA"}},{"M", {}},
+// 	{"N",{"AAC"}}, {"P",{"CCA", "CCC", "CCG"}}, {"Q",{"CAA"}}, {"R",{"AGA","AGG", "CGA", "CGC", "CGG"}}, 
+// 	{"S",{"TCA", "TCC", "TCG"}}, {"T",{"ACA", "ACC", "ACG"}}, {"V",{"GTA", "GTC", "GTG"}}, {"W", {}},
+// 	{"Y",{"TAC"}}, {"Z", {"AGC", "AGT"}},{"X",{"TAA", "TAG"}}};
+
+// const std::map<std::string, std::string> SequenceSummary::codonToAAMap_12 = {{"GCA", "A"}, {"GCC", "A"}, {"GCG", "A"},
+// 	{"GCT", "A"}, {"TGC", "C"}, {"TGT", "C"}, {"GAC", "D"}, {"GAT",  "D"}, {"GAA",  "E"}, {"GAG", "E"}, {"TTC", "F"}, {"TTT", "F"},
+// 	{"GGA", "G"}, {"GGC", "G"}, {"GGG", "G"}, {"GGT", "G"}, {"CAC", "H"}, {"CAT", "H"}, {"ATA", "I"}, {"ATC", "I"}, {"ATT", "I"},
+// 	{"AAA", "K"}, {"AAG", "K"}, {"CTA", "L"}, {"CTC", "L"}, {"CTG", "Z"}, {"CTT", "L"}, {"TTA", "L"}, {"TTG", "L"}, {"ATG", "M"},
+// 	{"AAC", "N"}, {"AAT", "N"}, {"CCA", "P"}, {"CCC", "P"}, {"CCG", "P"}, {"CCT", "P"}, {"CAA", "Q"}, {"CAG", "Q"}, {"AGA", "R"},
+// 	{"AGG", "R"}, {"CGA", "R"}, {"CGC", "R"}, {"CGG", "R"}, {"CGT", "R"}, {"TCA", "S"}, {"TCC", "S"}, {"TCG", "S"}, {"TCT", "S"},
+// 	{"ACA", "T"}, {"ACC", "T"}, {"ACG", "T"}, {"ACT", "T"}, {"GTA", "V"}, {"GTC", "V"}, {"GTG", "V"}, {"GTT", "V"}, {"TGG", "W"},
+// 	{"TAC", "Y"}, {"TAT", "Y"}, {"AGC", "Z"}, {"AGT", "Z"}, {"TAA", "X"}, {"TAG", "X"}, {"TGA", "X"}};
+
+
+// std::map<std::string, std::vector<std::string>> SequenceSummary::AAToCodonsMapWithReference;
+// std::map<std::string, std::vector<std::string>> SequenceSummary::AAToCodonsMapWithoutReference;
+// std::map<std::string, std::string> SequenceSummary::codonToAAMap;
+
+
+
+
 
 //------------------------------------------------//
 //---------- Constructors & Destructors ----------//
@@ -123,6 +186,63 @@ SequenceSummary::~SequenceSummary()
 //---------- Data Manipulation Functions ----------//
 //-------------------------------------------------//
 
+void SequenceSummary::setCodonTable(unsigned codon_table_number)
+{
+
+	if (codon_table_number == 1)
+	{
+		SequenceSummary::AAToCodonsMapWithReference = {{"A",{"GCA","GCC","GCG","GCT"}}, 
+			{"C",{"TGC", "TGT"}}, {"D",{"GAC", "GAT"}}, {"E",{"GAA", "GAG"}}, {"F",{"TTC", "TTT"}},
+			{"G",{"GGA", "GGC", "GGG", "GGT"}}, {"H",{"CAC", "CAT"}}, {"I",{"ATA", "ATC", "ATT"}},
+			{"K",{"AAA", "AAG"}}, {"L",{"CTA", "CTC", "CTG","CTT", "TTA", "TTG"}}, {"M", {"ATG"}},
+			{"N",{"AAC", "AAT"}}, {"P",{"CCA", "CCC", "CCG", "CCT"}}, {"Q",{"CAA", "CAG"}}, {"R",{"AGA","AGG", "CGA", "CGC", "CGG", "CGT"}}, 
+			{"S",{"TCA", "TCC", "TCG", "TCT"}}, {"T",{"ACA", "ACC", "ACG", "ACT"}}, {"V",{"GTA", "GTC", "GTG", "GTT"}}, {"W",{"TGG"}},
+			{"Y",{"TAC", "TAT"}}, {"Z", {"AGC", "AGT"}}, {"X",{"TAA", "TAG", "TGA"}}};
+
+		SequenceSummary::AAToCodonsMapWithoutReference = {{"A",{"GCA","GCC","GCG"}}, 
+			{"C",{"TGC"}}, {"D",{"GAC"}}, {"E",{"GAA"}}, {"F",{"TTC"}},
+			{"G",{"GGA", "GGC", "GGG"}}, {"H",{"CAC"}}, {"I",{"ATA", "ATC"}},
+			{"K",{"AAA"}}, {"L",{"CTA", "CTC", "CTG","CTT", "TTA"}}, {"M", {}},
+			{"N",{"AAC"}}, {"P",{"CCA", "CCC", "CCG"}}, {"Q",{"CAA"}}, {"R",{"AGA","AGG", "CGA", "CGC", "CGG"}}, 
+			{"S",{"TCA", "TCC", "TCG"}}, {"T",{"ACA", "ACC", "ACG"}}, {"V",{"GTA", "GTC", "GTG"}}, {"W", {}},
+			{"Y",{"TAC"}}, {"Z", {"AGC"}},{"X",{"TAA", "TAG"}}};
+
+		SequenceSummary::codonToAAMap = {{"GCA", "A"}, {"GCC", "A"}, {"GCG", "A"},
+			{"GCT", "A"}, {"TGC", "C"}, {"TGT", "C"}, {"GAC", "D"}, {"GAT",  "D"}, {"GAA",  "E"}, {"GAG", "E"}, {"TTC", "F"}, {"TTT", "F"},
+			{"GGA", "G"}, {"GGC", "G"}, {"GGG", "G"}, {"GGT", "G"}, {"CAC", "H"}, {"CAT", "H"}, {"ATA", "I"}, {"ATC", "I"}, {"ATT", "I"},
+			{"AAA", "K"}, {"AAG", "K"}, {"CTA", "L"}, {"CTC", "L"}, {"CTG", "L"}, {"CTT", "L"}, {"TTA", "L"}, {"TTG", "L"}, {"ATG", "M"},
+			{"AAC", "N"}, {"AAT", "N"}, {"CCA", "P"}, {"CCC", "P"}, {"CCG", "P"}, {"CCT", "P"}, {"CAA", "Q"}, {"CAG", "Q"}, {"AGA", "R"},
+			{"AGG", "R"}, {"CGA", "R"}, {"CGC", "R"}, {"CGG", "R"}, {"CGT", "R"}, {"TCA", "S"}, {"TCC", "S"}, {"TCG", "S"}, {"TCT", "S"},
+			{"ACA", "T"}, {"ACC", "T"}, {"ACG", "T"}, {"ACT", "T"}, {"GTA", "V"}, {"GTC", "V"}, {"GTG", "V"}, {"GTT", "V"}, {"TGG", "W"},
+			{"TAC", "Y"}, {"TAT", "Y"}, {"AGC", "Z"}, {"AGT", "Z"}, {"TAA", "X"}, {"TAG", "X"}, {"TGA", "X"}};
+	}
+	if (codon_table_number == 12)
+	{
+		std::map<std::string, std::vector<std::string>>::iterator it_1;
+		std::map<std::string, std::string>::iterator it_2;
+
+		std::string L("L");
+		std::string Z("Z");
+		std::string CTG("CTG");
+
+		it_1 = AAToCodonsMapWithReference.find(L);
+		it_1 -> second = {"CTA", "CTC", "CTT", "TTA", "TTG"};
+		it_1 = AAToCodonsMapWithReference.find(Z);
+		it_1 -> second = {"AGC", "AGT", "CTG"};
+		
+		it_1 = AAToCodonsMapWithoutReference.find(L);
+		it_1 -> second = {"CTA", "CTC", "CTT", "TTA"};
+		it_1 = AAToCodonsMapWithoutReference.find(Z);
+		it_1 -> second = {"AGC", "CTG"};
+
+		
+
+		it_2 = codonToAAMap.find(CTG);
+		it_2 -> second = "Z";
+	}
+	
+}
+
 
 unsigned SequenceSummary::getAACountForAA(std::string aa)
 {
@@ -187,7 +307,7 @@ void SequenceSummary::initRFPCount(unsigned numCategories)
  * Returns the RFPCount vector for the category index specified.
  * Note: If initRFPCount is not called beforehand, it is called now to return a vector of 0s.
  */
-std::vector <unsigned> SequenceSummary::getRFPCount(unsigned RFPCountColumn)
+std::vector<unsigned> SequenceSummary::getRFPCount(unsigned RFPCountColumn)
 {
 	// Note: If the user forgets to initRFPCount manually, this statement is executed but returns an empty vector.
 	if (RFPCount.size() < RFPCountColumn + 1) initRFPCount(RFPCountColumn + 1);
@@ -517,6 +637,7 @@ void SequenceSummary::AAIndexToCodonRange(unsigned aaIndex, unsigned& startAAInd
 	AAToCodonRange(aa, startAAIndex, endAAIndex, forParamVector);
 }
 
+
 //std::array<unsigned, 2>
 // Note: From function definition in header, default forParamVector is false.
 //' Returns the range of index values in the CodonTable for codons corresponding to a given amino acid. The function is overloaded and uses a wrapper function to map from an amino acid index value rather than a string. (which I believe is only a single char).
@@ -636,23 +757,41 @@ void SequenceSummary::AAToCodonRange(std::string aa, unsigned& startAAIndex, uns
 // Note: From function definition in header, default category is 0.
 std::vector<std::string> SequenceSummary::AAToCodon(std::string aa, bool forParamVector)
 {
-	std::vector <std::string> RV;
+	std::vector<std::string> RV;
 	aa = (char) std::toupper(aa[0]);
 
-	unsigned aaStart, aaEnd;
-	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, forParamVector);
 	if (forParamVector)
 	{
-		for (unsigned i = aaStart; i < aaEnd; i++)
+		RV = SequenceSummary::AAToCodonsMapWithoutReference.find(aa) -> second;
+	}
+	else
+	{
+		RV = SequenceSummary::AAToCodonsMapWithReference.find(aa) -> second;
+	}
+	return RV;
+}
+
+// Note: From function definition in header, default category is 0.
+std::vector<unsigned> SequenceSummary::AAToCodonIndex(std::string aa, bool forParamVector)
+{
+	std::vector<std::string> codon_list;
+	std::vector<unsigned> RV;
+	aa = (char) std::toupper(aa[0]);
+
+	if (forParamVector)
+	{
+		codon_list = SequenceSummary::AAToCodonsMapWithoutReference.find(aa) -> second;
+		for (unsigned i = 0; i < codon_list.size();i++)
 		{
-			RV.push_back(codonArrayParameter[i]);
+			RV.push_back(SequenceSummary::codonToIndexWithoutReference.find(codon_list[i])->second);
 		}
 	}
 	else
 	{
-		for (unsigned i = aaStart; i < aaEnd; i++)
+		codon_list = SequenceSummary::AAToCodonsMapWithReference.find(aa) -> second;
+		for (unsigned i = 0; i < codon_list.size();i++)
 		{
-			RV.push_back(codonArray[i]);
+			RV.push_back(SequenceSummary::codonToIndexWithReference.find(codon_list[i])->second);
 		}
 	}
 	return RV;
@@ -664,67 +803,22 @@ std::string SequenceSummary::codonToAA(std::string& codon)
 	codon[0] = (char) std::toupper(codon[0]);
 	codon[1] = (char) std::toupper(codon[1]);
 	codon[2] = (char) std::toupper(codon[2]);
-	//std::transform(codon.begin(), codon.end(), codon.begin(), ::toupper);
-	std::string aa = "#";
-	//Phenylalanine
-	if (!codon.compare("TTT") || !codon.compare("UUU") || !codon.compare("TTC") || !codon.compare("UUC")) aa = "F";
-		//Leucine
-	else if (!codon.compare("TTA") || !codon.compare("UUA") || !codon.compare("TTG") || !codon.compare("UUG") ||
-			!codon.compare("CTT") || !codon.compare("CUU") || !codon.compare("CTC") || !codon.compare("CUC") ||
-			!codon.compare("CTA") || !codon.compare("CUA") || !codon.compare("CTG") || !codon.compare("CUG")) aa = "L";
-		//Isoleucine
-	else if (!codon.compare("ATT") || !codon.compare("AUU") || !codon.compare("ATC") || !codon.compare("AUC") ||
-			!codon.compare("ATA") || !codon.compare("AUA")) aa = "I";
-		//Methionine
-	else if (!codon.compare("ATG") || !codon.compare("AUG")) aa = "M";
-		//Valine
-	else if (!codon.compare("GTT") || !codon.compare("GUU") || !codon.compare("GTC") || !codon.compare("GUC") ||
-			!codon.compare("GTA") || !codon.compare("GUA") || !codon.compare("GTG") || !codon.compare("GUG")) aa = "V";
-		//Serine4
-	else if (!codon.compare("TCT") || !codon.compare("UCU") || !codon.compare("TCC") || !codon.compare("UCC") ||
-			!codon.compare("TCA") || !codon.compare("UCA") || !codon.compare("TCG") || !codon.compare("UCG")) aa = "S";
-		//Proline
-	else if (!codon.compare("CCT") || !codon.compare("CCU") || !codon.compare("CCC") ||
-			!codon.compare("CCA") || !codon.compare("CCG")) aa = "P";
-		//Threonine
-	else if (!codon.compare("ACT") || !codon.compare("ACU") || !codon.compare("ACC") ||
-			!codon.compare("ACA") || !codon.compare("ACG")) aa = "T";
-		//Alanine
-	else if (!codon.compare("GCT") || !codon.compare("GCU") || !codon.compare("GCC") ||
-			!codon.compare("GCA") || !codon.compare("GCG")) aa = "A";
-		//Tyrosine
-	else if (!codon.compare("TAT") || !codon.compare("UAU") || !codon.compare("TAC") || !codon.compare("UAC")) aa = "Y";
-		//Histidine
-	else if (!codon.compare("CAT") || !codon.compare("CAU") || !codon.compare("CAC")) aa = "H";
-		//Glutamine
-	else if (!codon.compare("CAA") || !codon.compare("CAG")) aa = "Q";
-		//Asparagine
-	else if (!codon.compare("AAT") || !codon.compare("AAU") || !codon.compare("AAC")) aa = "N";
-		//Lysine
-	else if (!codon.compare("AAA") || !codon.compare("AAG")) aa = "K";
-		//Aspartic Acid
-	else if (!codon.compare("GAT") || !codon.compare("GAU") || !codon.compare("GAC")) aa = "D";
-		//Glutamic Acid
-	else if (!codon.compare("GAA") || !codon.compare("GAG")) aa = "E";
-		//Cysteine
-	else if (!codon.compare("TGT") || !codon.compare("TAT") || !codon.compare("TGC") || !codon.compare("UGC")) aa = "C";
-		//Tryptophan
-	else if (!codon.compare("TGG") || !codon.compare("UGG")) aa = "W";
-		//Arginine
-	else if (!codon.compare("CGT") || !codon.compare("CGU") || !codon.compare("CGC") || !codon.compare("CGA") ||
-			!codon.compare("CGG") || !codon.compare("AGA") || !codon.compare("AGG")) aa = "R";
-		//Serine2
-	else if (!codon.compare("AGT") || !codon.compare("AGU") || !codon.compare("AGC")) aa = SequenceSummary::Ser2;
-		//Glycine
-	else if (!codon.compare("GGT") || !codon.compare("GGU") || !codon.compare("GGC")  || !codon.compare("GGC") ||
-			!codon.compare("GGA")  || !codon.compare("GGG")) aa = "G";
-		//Stop
-	else if (!codon.compare("TAA") || !codon.compare("UAA") || !codon.compare("TAG") || !codon.compare("UAG") ||
-			 !codon.compare("TGA") || !codon.compare("UGA")) aa = "X";
 
+	//std::transform(codon.begin(), codon.end(), codon.begin(), ::toupper);
+	std::map<std::string, std::string>::iterator it;
+	std::string aa = "#";
+	it = SequenceSummary::codonToAAMap.find(codon);
+	if (it != SequenceSummary::codonToAAMap.end())
+	{
+		aa = it -> second;
+	}
+	else
+	{
+		my_print("WARNING: Codon % has no corresponding amino acid. Returning A by default",codon);
+		aa = "A";
+	}
 	return aa;
 }
-
 
 // Note: From function definition in header, default forParamVector is false.
 unsigned SequenceSummary::codonToIndex(std::string& codon, bool forParamVector)
@@ -773,81 +867,20 @@ std::string SequenceSummary::indexToCodon(unsigned index, bool forParamVector)
 // Note: From function definition in header, default forParamVector is false.
 unsigned SequenceSummary::GetNumCodonsForAA(std::string& aa, bool forParamVector)
 {
-	unsigned ncodon = 0;
-	char AA = aa[0];
-	switch (AA)
+	std::vector<std::string> RV;
+	aa = (char) std::toupper(aa[0]);
+
+	if (forParamVector)
 	{
-	case 'A':
-		ncodon = 4;
-		break;
-	case 'C':
-		ncodon = 2;
-		break;
-	case 'D':
-		ncodon = 2;
-		break;
-	case 'E':
-		ncodon = 2;
-		break;
-	case 'F':
-		ncodon = 2;
-		break;
-	case 'G':
-		ncodon = 4;
-		break;
-	case 'H':
-		ncodon = 2;
-		break;
-	case 'I':
-		ncodon = 3;
-		break;
-	case 'K':
-		ncodon = 2;
-		break;
-	case 'L':
-		ncodon = 6;
-		break;
-	case 'M':
-		ncodon = 1;
-		break;
-	case 'N':
-		ncodon = 2;
-		break;
-	case 'P':
-		ncodon = 4;
-		break;
-	case 'Q':
-		ncodon = 2;
-		break;
-	case 'R':
-		ncodon = 6;
-		break;
-	case 'S':
-		ncodon = 4;
-		break;
-	case 'T':
-		ncodon = 4;
-		break;
-	case 'V':
-		ncodon = 4;
-		break;
-	case 'W':
-		ncodon = 1;
-		break;
-	case 'Y':
-		ncodon = 2;
-		break;
-	case 'Z':
-		ncodon = 2;
-		break;
-	case 'X':
-		ncodon = 3;
-		break;
-	default: // INVALID AA
-		my_printError("WARNING: Invalid Amino Acid given (%), returning 0,0\n", aa);
-		break;
+		RV = SequenceSummary::AAToCodonsMapWithoutReference.find(aa) -> second;
+	
 	}
-	return (forParamVector ? (ncodon - 1) : ncodon);
+	else
+	{
+		RV = SequenceSummary::AAToCodonsMapWithReference.find(aa) -> second;
+	}
+	return (RV.size());
+
 }
 
 
@@ -897,7 +930,7 @@ RCPP_MODULE(SequenceSummary_mod)
 
 		//Static Functions:
 		Rcpp::function("AAToCodon", &SequenceSummary::AAToCodon, List::create(_["aa"], _["focal"] = false),
-				"returns a vector of codons for a given amino acid"); //Used, but will move into Codon Table
+				"returns a vector of codons (either containing the reference codon or excluding it) for a given amino acid"); //Used, but will move into Codon Table
 
 		Rcpp::function("codonToAA", &SequenceSummary::codonToAA, List::create(_["codon"]),
 		"returns an amino acid string for a given codon string");
@@ -905,6 +938,10 @@ RCPP_MODULE(SequenceSummary_mod)
 
 		Rcpp::function("aminoAcids", &SequenceSummary::aminoAcids, "returns all Amino Acids as one letter code");
 		Rcpp::function("codons", &SequenceSummary::codons, "returns all codons or all reference codons");
+
+		Rcpp::function("setCodonTable", &SequenceSummary::setCodonTable, List::create(_["codon_table_number"]),
+				"Sets the codon table."); //Used, but will move into Codon Table
+
 
 }
 #endif

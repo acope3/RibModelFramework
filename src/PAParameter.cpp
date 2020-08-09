@@ -105,7 +105,17 @@ void PAParameter::initPAParameterSet()
 	currentCodonSpecificParameter[lmPri].resize(lambdaPrimeCategories);
 	proposedCodonSpecificParameter[lmPri].resize(lambdaPrimeCategories);
 	lambdaValues.resize(lambdaPrimeCategories);
-	numParam = 61;
+
+	groupList = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
+		"TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT", "ATA", "ATC",
+		"ATT", "AAA", "AAG", "CTA", "CTC", "CTG", "CTT", "TTA", "TTG", "ATG",
+		"AAC", "AAT", "CCA", "CCC", "CCG", "CCT", "CAA", "CAG", "AGA", "AGG",
+		"CGA", "CGC", "CGG", "CGT", "TCA", "TCC", "TCG", "TCT", "ACA", "ACC",
+		"ACG", "ACT", "GTA", "GTC", "GTG", "GTT", "TGG", "TAC", "TAT", "AGC",
+		"AGT"};
+
+
+	numParam = groupList.size();
 
 	for (unsigned i = 0; i < alphaCategories; i++)
 	{
@@ -124,13 +134,7 @@ void PAParameter::initPAParameterSet()
 	bias_csp = 0;
 	std_csp.resize(numParam, 0.1);
 
-	groupList = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
-		"TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT", "ATA", "ATC",
-		"ATT", "AAA", "AAG", "CTA", "CTC", "CTG", "CTT", "TTA", "TTG", "ATG",
-		"AAC", "AAT", "CCA", "CCC", "CCG", "CCT", "CAA", "CAG", "AGA", "AGG",
-		"CGA", "CGC", "CGG", "CGT", "TCA", "TCC", "TCG", "TCT", "ACA", "ACC",
-		"ACG", "ACT", "GTA", "GTC", "GTG", "GTT", "TGG", "TAC", "TAT", "AGC",
-		"AGT"};
+	
 }
 
 
