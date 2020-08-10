@@ -17,7 +17,7 @@ class PAModel: public Model
 
 		double calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
 				unsigned currRFPValue, unsigned currNumCodonsInMRNA, double phiValue);
-
+		virtual void calculateZ(std::string grouping,Genome& genome,std::vector<double> &Z);
 
 	public:
 		//Constructors & Destructors:

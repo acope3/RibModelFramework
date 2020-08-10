@@ -22,7 +22,7 @@ class PANSEModel: public Model
       
         std::vector<double> prob_successful;
 
-
+        virtual void calculateZ(std::string grouping,Genome& genome,std::vector<double> &Z,std::string param);
 
         virtual void fillMatrices(Genome& genome);
         virtual void clearMatrices();

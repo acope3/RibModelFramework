@@ -531,8 +531,14 @@ void PAParameter::completeUpdateCodonSpecificParameter()
 */
 void PAParameter::updateCodonSpecificParameter(std::string grouping)
 {
-	//unsigned i = SequenceSummary::codonToIndex(grouping);
-	CSPToUpdate.push_back(grouping);
+	unsigned i = SequenceSummary::codonToIndex(grouping);
+	numAcceptForCodonSpecificParameters[i]++;
+	for(unsigned j = 0; j < getNumMixtureElements(); j++)
+	{
+	    currentCodonSpecificParameter[alp][j][i] = proposedCodonSpecificParameter[alp][j][i];
+	    currentCodonSpecificParameter[lmPri][j][i] = proposedCodonSpecificParameter[lmPri][j][i];
+	}
+	
 }
 
 
