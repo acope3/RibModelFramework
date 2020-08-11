@@ -324,11 +324,11 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 
     fillMatrices(genome);
 
-    std::vector<double> Z(2,0);
-    calculateZ(grouping,genome,Z,param);
+    //std::vector<double> Z(2,0);
+    //calculateZ(grouping,genome,Z,param);
     
-    double currU = Z[0]/Y;
-    double propU = Z[1]/Y;
+    //double currU = Z[0]/Y;
+    //double propU = Z[1]/Y;
 
 #ifdef _OPENMP
     //#ifndef __APPLE__
@@ -345,7 +345,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
         
         unsigned mixtureElement = parameter->getMixtureAssignment(i);
         
-        //double U = getPartitionFunction(mixtureElement, false)/Y;
+        double U = getPartitionFunction(mixtureElement, false)/Y;
 
         // how is the mixture element defined. Which categories make it up
         unsigned alphaCategory = parameter->getMutationCategory(mixtureElement);
@@ -378,7 +378,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
            
             if (log_currentLambda[lambdaCategory][codonIndex] > 500)
             {
-                log_currentLambda[lambdaCategory][codonIndex] = std::log(currLambda) + std::log(currU);
+                log_currentLambda[lambdaCategory][codonIndex] = std::log(currLambda) + std::log(U);
             }
             
             if (positionalRFPCount < 50)
@@ -402,8 +402,8 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                 {
                     propAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, true);
                     propLambda = getParameterForCategory(lambdaCategory, PANSEParameter::lmPri, codon, true);
-                    logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambda*propU, positionalRFPCount,
-                                    phiValue,std::exp(propSigma),std::lgamma(propAlpha),(std::log(propLambda)+std::log(propU)),log_phi,std::lgamma(propAlpha+positionalRFPCount));
+                    logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambda*U, positionalRFPCount,
+                                    phiValue,std::exp(propSigma),std::lgamma(propAlpha),(std::log(propLambda)+std::log(U)),log_phi,std::lgamma(propAlpha+positionalRFPCount));
                     if (prop_prob_successful > 500)
                     {
                         prop_prob_successful = elongationProbabilityLog(propAlpha, propLambda,1/currNSERate);
@@ -417,8 +417,8 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                 else
                 {
                     propNSERate = getParameterForCategory(alphaCategory, PANSEParameter::nse, codon, true);
-                    logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda*propU, positionalRFPCount,
-                                    phiValue,std::exp(propSigma),std::lgamma(currAlpha),(std::log(currLambda)+std::log(propU)),log_phi,std::lgamma(currAlpha+positionalRFPCount));
+                    logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda*U, positionalRFPCount,
+                                    phiValue,std::exp(propSigma),std::lgamma(currAlpha),(std::log(currLambda)+std::log(U)),log_phi,std::lgamma(currAlpha+positionalRFPCount));
                     if (prop_prob_successful > 500)
                     {
                         prop_prob_successful = elongationProbabilityLog(currAlpha, currLambda,1/propNSERate);
@@ -432,8 +432,8 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
            }
            else
            {
-                logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda*currU, positionalRFPCount,
-                                  phiValue,std::exp(propSigma),lgamma_currentAlpha[alphaCategory][codonIndex],std::log(currLambda)+std::log(currU),log_phi,currLgammaRFPAlpha);
+                logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda*U, positionalRFPCount,
+                                  phiValue,std::exp(propSigma),lgamma_currentAlpha[alphaCategory][codonIndex],std::log(currLambda)+std::log(U),log_phi,currLgammaRFPAlpha);
                 if (prob_successful[codonIndex] > 500)
                 {
                     prob_successful[codonIndex] = elongationProbabilityLog(currAlpha, currLambda,1/currNSERate);
@@ -447,7 +447,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
             
 
 
-            logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda*currU, positionalRFPCount,
+            logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda*U, positionalRFPCount,
                                     phiValue, std::exp(currSigma),lgamma_currentAlpha[alphaCategory][codonIndex],log_currentLambda[lambdaCategory][codonIndex],log_phi,currLgammaRFPAlpha);  
             
             if (prob_successful[codonIndex] > 500)
@@ -1195,6 +1195,7 @@ void PANSEModel::simulateGenome(Genome &genome)
     std::vector<double> Z(2,0.0);
     calculateZ("GCA",genome,Z,"Elongation"); //For simulation, only care about current parameter. Codon and proposed param are irrelevant.
     double U = Z[0]/Y;
+    my_print("Z % U %\n",Z[0],U);
     for (unsigned geneIndex = 0u; geneIndex < genome.getGenomeSize(); geneIndex++)
     {
         unsigned mixtureElement = getMixtureAssignment(geneIndex);
