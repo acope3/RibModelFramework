@@ -147,7 +147,11 @@ void FONSEParameter::initFONSEValuesFromFile(std::string filename)
 	covarianceMatrix.resize(maxGrouping);
 	input.open(filename.c_str());
 	if (input.fail())
+	{
 		my_printError("ERROR: Could not open RestartFile.txt to initialize FONSE values\n");
+		my_printError("please use absolute path");
+		exit(EXIT_FAILURE);
+	}
 	else
 	{
 		std::string tmp, variableName;
@@ -424,7 +428,7 @@ void FONSEParameter::initMutationCategories(std::vector<std::string> files, unsi
 		{
 			my_printError("Error opening file % to initialize mutation values.\n", category);
 			my_printError("please use absolute path");
-			exit(0);
+			exit(EXIT_FAILURE);
 		}
 		else
 		{
@@ -461,7 +465,7 @@ void FONSEParameter::initSelectionCategories(std::vector<std::string> files, uns
 	{
 		my_printError("Error opening file % to initialize selection values.\n", category);
 		my_printError("please use absolute path");
-		exit(0);
+		exit(EXIT_FAILURE);
 	}
 	else
 	{

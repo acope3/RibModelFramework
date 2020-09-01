@@ -1,6 +1,6 @@
 #' Plot Model Object
 #' 
-#' @param x An Rcpp model object initialized with \code{initializeModelObject}.
+#' @param model An Rcpp model object initialized with \code{initializeModelObject}.
 #' @param genome An Rcpp genome object initialized with \code{initializeGenomeObject}.#
 #' @param samples The number of samples in the trace
 #' @param mixture The mixture for which to graph values.
@@ -17,7 +17,7 @@
 #' Otherwise, the expression values plotted will just be SCUO values estimated upon
 #' initialization of the Parameter object.
 
-plot.Rcpp_ROCModel <- function(x, genome = NULL, samples = 100, mixture = 1, 
+plot.Rcpp_ROCModel <- function(model, genome = NULL, samples = 100, mixture = 1, 
                                simulated = FALSE, ...)
 {
   opar <- par(no.readonly = T) 
@@ -42,7 +42,7 @@ plot.Rcpp_ROCModel <- function(x, genome = NULL, samples = 100, mixture = 1,
   text(0.5, 0.4, date(), cex = 0.6)
   
   num.genes <- length(genome)
-  parameter <- x$getParameter()
+  parameter <- model$getParameter()
 
   mixtureAssignment <- unlist(lapply(1:num.genes,  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))
   genes.in.mixture <- which(mixtureAssignment == mixture)
@@ -103,7 +103,7 @@ plot.Rcpp_ROCModel <- function(x, genome = NULL, samples = 100, mixture = 1,
 
 #' Plot Model Object
 #' 
-#' @param x An Rcpp model object initialized with \code{initializeModelObject}.
+#' @param model An Rcpp model object initialized with \code{initializeModelObject}.
 #'
 #' @param genome An Rcpp genome object initialized with \code{initializeGenomeObject}.
 #'
@@ -112,6 +112,8 @@ plot.Rcpp_ROCModel <- function(x, genome = NULL, samples = 100, mixture = 1,
 #' @param mixture The mixture for which to graph values.
 #'
 #' @param simulated A boolean value that determines whether to use the simulated genome.
+#'
+#' @param codon.window A boolean value that determines the codon window to use for calculating codon frequencies. If NULL (the default), use complete sequences.
 #'
 #' @param ... Optional, additional arguments.
 #' For this function, a possible title for the plot in the form of a list if set with "main".
@@ -125,7 +127,7 @@ plot.Rcpp_ROCModel <- function(x, genome = NULL, samples = 100, mixture = 1,
 #' Otherwise, the expression values plotted will just be SCUO values estimated upon
 #' initialization of the Parameter object.
 #'
-plot.Rcpp_FONSEModel <- function(x, genome, samples = 100, mixture = 1, 
+plot.Rcpp_FONSEModel <- function(model, genome, samples = 100, mixture = 1, 
                                simulated = FALSE, codon.window = NULL,...)
 {
   opar <- par(no.readonly = T) 
@@ -150,7 +152,7 @@ plot.Rcpp_FONSEModel <- function(x, genome, samples = 100, mixture = 1,
   text(0.5, 0.4, date(), cex = 0.6)
   
   num.genes <- length(genome)
-  parameter <- x$getParameter()
+  parameter <- model$getParameter()
   
   mixtureAssignment <- unlist(lapply(1:num.genes,  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))
   genes.in.mixture <- which(mixtureAssignment == mixture)

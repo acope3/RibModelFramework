@@ -326,7 +326,10 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, PANSEMode
 	std::shuffle ( groups.begin(), groups.end(),e);
 
 	std::string param_1,param_2;
-	int x = std::rand() % 2;
+	std::uniform_int_distribution<int> uni(0,1);
+
+	int x = uni(e);
+
 	if (x == 0)
 	{
 		param_1 = "Elongation";
@@ -337,24 +340,11 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, PANSEMode
 		param_2 = "Elongation";
 		param_1 = "NSE";
 	}
-	param_1 = "Elongation";
-	param_2 = "NSE";
+	
 	for (unsigned i = 0; i < size; i++)
 	{
 
-		// int x = std::rand() % 2;
-		// if (x == 0)
-		// {
-		// 	param_1 = "Elongation";
-		// 	param_2 = "NSE";
-		// }
-		// else
-		// {
-		// 	param_2 = "Elongation";
-		// 	param_1 = "NSE";
-		// }
 		std::string grouping = model.getGrouping(groups[i]);
-		//my_print("% % % %\n",groups[i],grouping,param_1,param_2);
 		model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures,param_1);
     	double threshold = -Parameter::randExp(1);
  		if (threshold < acceptanceRatioForAllMixtures[0] && std::isfinite(acceptanceRatioForAllMixtures[0]) && !std::isnan(acceptanceRatioForAllMixtures[2]))
@@ -366,58 +356,14 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, PANSEMode
 			
 			// moves proposed codon specific parameters to current codon specific parameters
 			model.updateCodonSpecificParameter(grouping,param_1);
-			// if ((iteration % thinning) == 0)
-			// {
-			// 	likelihoodTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[2];//will be 0
-			// 	posteriorTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[4];//will be 0
-			// }
-			
-		}
-		else
-		{
-			// if ((iteration % thinning) == 0)
-			// {
-			// 	likelihoodTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[1];
-			// 	posteriorTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[3];
-
-			// }
-			
-		}
-		// model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures,param_2);
-  //   	threshold = -Parameter::randExp(1);
- 	// 	if (threshold < acceptanceRatioForAllMixtures[0] && std::isfinite(acceptanceRatioForAllMixtures[0]) && !std::isnan(acceptanceRatioForAllMixtures[2]))
-		// {	
-		// 	// moves proposed codon specific parameters to current codon specific parameters
-		// 	if (std::isnan(acceptanceRatioForAllMixtures[0]))
-		// 	{
-		// 		my_print("ERROR: Accepted proposed value that results in NaN\n");
-		// 	}
-		// 	model.updateCodonSpecificParameter(grouping,param_2);
-		// 	if ((iteration % thinning) == 0)
-		// 	{
-		// 		likelihoodTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[2];//will be 0
-		// 		posteriorTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[4];//will be 0
-		// 	}
-		// }
-		// else
-		// {
-		// 	if ((iteration % thinning) == 0)
-		// 	{
-		// 		likelihoodTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[1];
-		// 		posteriorTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[3];
-		// 	}	
-		// }
-	
-		
+		}	
 	}
-	//likelihoodTrace[(iteration / thinning)] = 0;
-	//posteriorTrace[(iteration / thinning)] = 0;
+
 	std::shuffle ( groups.begin(), groups.end(),e);
 	for (unsigned i = 0; i < size; i++)
 	{
 
 		std::string grouping = model.getGrouping(groups[i]);
-		//std::string grouping = "GCA";
 		// calculate likelihood ratio for every Category for current AA (ROC, FONSE) or Codon (PA, PANSE)
 		model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures,param_2);
 		double threshold = -Parameter::randExp(1);
@@ -469,17 +415,20 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 	std::vector<double> acceptanceRatioForAllMixtures(5,0.0);
 	unsigned size = model.getGroupListSize();
 
-	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-	std::default_random_engine e(seed);
+	// unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+	// std::default_random_engine e(seed);
 
-	std::vector<unsigned> groups(size);
-	std::iota(groups.begin(),groups.end(),0);
-	std::shuffle ( groups.begin(), groups.end(),e);
+	// std::random_device rd;
+ //    std::mt19937 g(rd());
+
+	// std::vector<unsigned> groups(size);
+	// std::iota(groups.begin(),groups.end(),0);
+	// std::shuffle ( groups.begin(), groups.end(),g);
 	
 	for (unsigned i = 0; i < size; i++)
 	{
 
-		std::string grouping = model.getGrouping(groups[i]);
+		std::string grouping = model.getGrouping(i);
 		// calculate likelihood ratio for every Category for current AA (ROC, FONSE) or Codon (PA, PANSE)
 		model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures);
     	double threshold = -Parameter::randExp(1);
@@ -516,9 +465,6 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 		// 	model.updateCodonSpecificParameterTrace(iteration/thinning, grouping);
 		// }
 	}
-	
-	
-	//model.completeUpdateCodonSpecificParameter();
 	if ((iteration % thinning) == 0)
 	{
 		for (unsigned i = 0;i < size; i++)

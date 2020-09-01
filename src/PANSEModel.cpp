@@ -324,12 +324,6 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 
     fillMatrices(genome);
 
-    //std::vector<double> Z(2,0);
-    //calculateZ(grouping,genome,Z,param);
-    
-    //double currU = Z[0]/Y;
-    //double propU = Z[1]/Y;
-
 #ifdef _OPENMP
     //#ifndef __APPLE__
 #pragma omp parallel for private(gene,currAlpha,currLambda,currNSERate,propAlpha,propLambda,propNSERate) reduction(+:logLikelihood,logLikelihood_proposed)
@@ -1202,11 +1196,6 @@ void PANSEModel::updateHyperParameter(unsigned hp)
 void PANSEModel::simulateGenome(Genome &genome)
 {
     unsigned Y = parameter->getTotalRFPCount();
-    //std::vector<double> Z(2,0.0);
-    //calculateZ("GCA",genome,Z,"Elongation"); //For simulation, only care about current parameter. Codon and proposed param are irrelevant.
-    //double U = Z[0]/Y;
-    //my_print("Z % U %\n",Z[0],U);
-
     double Z = 0;
     std::vector<std::vector<double>> wait_times;
     wait_times.resize(genome.getGenomeSize());
@@ -1259,7 +1248,6 @@ void PANSEModel::simulateGenome(Genome &genome)
         }
     }
     double U = Z/Y;
-    my_print("Value of Z and U: % %",Z,U);
 
     for (unsigned geneIndex = 0u; geneIndex < genome.getGenomeSize(); geneIndex++)
     {

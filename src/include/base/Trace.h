@@ -113,6 +113,7 @@ class Trace {
         std::vector<double> getSynthesisRateAcceptanceRateTraceByMixtureElementForGene(unsigned mixtureElement, unsigned geneIndex);
         std::vector<std::vector<std::vector<double>>> getSynthesisRateAcceptanceRateTrace();
         std::vector<double> getCodonSpecificAcceptanceRateTraceForAA(std::string aa);
+        std::vector<double> getCodonSpecificAcceptanceRateTraceForCodon(std::string codon);
         std::vector<float> getSynthesisRateTraceForGene(unsigned geneIndex); //will build the trace appropriately based on what cat you are in
         std::vector<float> getSynthesisRateTraceByMixtureElementForGene(unsigned mixtureElement, unsigned geneIndex);
         std::vector<unsigned> getMixtureAssignmentTraceForGene(unsigned geneIndex);
