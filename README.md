@@ -45,7 +45,7 @@ runMCMC(mcmc = mcmc, genome = genome, model = model)
 ```
 
 ## Example 2: Using codon data in the form of CDS in fasta format with one mixture (FONSE)
-The following example illustrates how you would estimates parameters under the FONSE model of a given set of protein coding genes, assuming the same mutation and selection regime for all genes.
+The following example illustrates how you would estimates parameters under the FONSE model of a given set of protein coding genes, assuming the same mutation and selection regime for all genes. Note that this model is not published and is still under beta testing.
 
 ```{r, echo = FALSE}
 genome <- initializeGenomeObject(file = "genome.fasta")
@@ -56,7 +56,7 @@ runMCMC(mcmc = mcmc, genome = genome, model = model)
 ```
 
 ## Example 3: Using codon data in the form of Ribosome footprints with one mixture (PA)
-The following example illustrates how you would estimates parameters under the PA model of a given set of protein coding genes, assuming the same mutation and selection regime for all genes.
+The following example illustrates how you would estimates parameters under the PA model of a given set of protein coding genes, assuming the same mutation and selection regime for all genes. Note that this model (and PANSE) is not published and is still under beta testing.
 
 ```{r, echo = FALSE}
 genome <- initializeGenomeObject(file = "rfpcounts.tsv", fasta = FALSE)
