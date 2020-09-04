@@ -2,10 +2,10 @@
 % Please edit documentation in R/RcppExports.R
 \name{setGroupList}
 \alias{setGroupList}
-\title{Set amino acids (ROC, FONSE) or codons (PA, PANSE) for which parameters will be estimated. Note that non-default groupLists are still in beta testing and should be used with caution.}
+\title{setGroupList}
 \arguments{
 \item{List}{of strings epresenting groups for parameters to be estimated. Should be one letter amino acid (ROC, FONSE) or list of sense codons (PA, PANSE).}
 }
 \description{
-Set amino acids (ROC, FONSE) or codons (PA, PANSE) for which parameters will be estimated. Note that non-default groupLists are still in beta testing and should be used with caution.
+Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Set amino acids (ROC, FONSE) or codons (PA, PANSE) for which parameters will be estimated. Note that non-default groupLists are still in beta testing and should be used with caution.
 }

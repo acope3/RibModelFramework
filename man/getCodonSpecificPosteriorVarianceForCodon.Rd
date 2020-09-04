@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{getCodonSpecificPosteriorVarianceForCodon}
 \alias{getCodonSpecificPosteriorVarianceForCodon}
-\title{Calculate codon-specific parameter (CSP) variance}
+\title{getCodonSpecificPosteriorVarianceForCodon}
 \arguments{
 \item{mixtureElement}{mixture to calculate CSP variance. Should be between 1 and n, where n is number of mixtures.}
 
@@ -22,5 +22,5 @@
 variance over trace for CSP
 }
 \description{
-Calculate codon-specific parameter (CSP) variance
+Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Calculate codon-specific parameter (CSP) variance
 }

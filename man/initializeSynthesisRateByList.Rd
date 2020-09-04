@@ -2,10 +2,10 @@
 % Please edit documentation in R/RcppExports.R
 \name{initializeSynthesisRateByList}
 \alias{initializeSynthesisRateByList}
-\title{Initialize synthesis rates with values passed in as a list}
+\title{initializeSynthesisRateByList}
 \arguments{
 \item{expression}{a list of values to use as initial synthesis rate values. Should be same size as number of genes in genome.}
 }
 \description{
-Initialize synthesis rates with values passed in as a list
+Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Initialize synthesis rates with values passed in as a list
 }

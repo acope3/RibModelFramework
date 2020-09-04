@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{getNoiseOffsetVariance}
 \alias{getNoiseOffsetVariance}
-\title{Calculate variance of noise offset parameter used when fitting model with empirical estimates of synthesis rates (ie. withPhi fits)}
+\title{getNoiseOffsetVariance}
 \arguments{
 \item{index}{mixture index to use. Should be number between 0 and n-1, where n is number of mixtures}
 
@@ -14,5 +14,5 @@
 returns variance for noise offset
 }
 \description{
-Calculate variance of noise offset parameter used when fitting model with empirical estimates of synthesis rates (ie. withPhi fits)
+Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Calculate variance of noise offset parameter used when fitting model with empirical estimates of synthesis rates (ie. withPhi fits)
 }

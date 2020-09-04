@@ -2,10 +2,10 @@
 % Please edit documentation in R/RcppExports.R
 \name{initializeSynthesisRateByGenome}
 \alias{initializeSynthesisRateByGenome}
-\title{Initialize synthesis rates using SCUO values calcuated from the genome}
+\title{initializeSynthesisRateByGenome}
 \arguments{
 \item{genome}{a Genome object}
 }
 \description{
-Initialize synthesis rates using SCUO values calcuated from the genome
+Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Initialize synthesis rates using SCUO values calcuated from the genome
 }

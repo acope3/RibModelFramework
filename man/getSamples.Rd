@@ -2,7 +2,10 @@
 % Please edit documentation in R/RcppExports.R
 \name{getSamples}
 \alias{getSamples}
-\title{Return number of samples set for MCMCAlgorithm object}
+\title{getSamples}
+\value{
+number of samples used during MCMC
+}
 \description{
-Return number of samples set for MCMCAlgorithm object
+Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Return number of samples set for MCMCAlgorithm object
 }

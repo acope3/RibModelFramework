@@ -2,7 +2,10 @@
 % Please edit documentation in R/RcppExports.R
 \name{getThinning}
 \alias{getThinning}
-\title{Return thinning value, which is the number of iterations (total iterations = samples * thinning) not being kept}
+\title{getThinning}
+\value{
+thinning value used during MCMC
+}
 \description{
-Return thinning value, which is the number of iterations (total iterations = samples * thinning) not being kept
+Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Return thinning value, which is the number of iterations (total iterations = samples * thinning) not being kept
 }

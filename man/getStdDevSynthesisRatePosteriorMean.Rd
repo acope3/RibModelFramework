@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{getStdDevSynthesisRatePosteriorMean}
 \alias{getStdDevSynthesisRatePosteriorMean}
-\title{Calculate posterior mean of standard deviation parameter of lognormal describing distribution of synthesis rates}
+\title{getStdDevSynthesisRatePosteriorMean}
 \arguments{
 \item{samples}{number of samples over which to calculate posterior mean}
 
@@ -12,5 +12,5 @@
 returns posterior mean for standard deviation of lognormal distribution of synthesis rates
 }
 \description{
-Calculate posterior mean of standard deviation parameter of lognormal describing distribution of synthesis rates
+Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Calculate posterior mean of standard deviation parameter of lognormal describing distribution of synthesis rates
 }

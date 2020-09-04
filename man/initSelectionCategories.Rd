@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{initSelectionCategories}
 \alias{initSelectionCategories}
-\title{Initialize values for selection CSP. File should be of comma-separated with header. Three columns should be of order Amino_acid,Codon,Value}
+\title{initSelectionCategories}
 \arguments{
 \item{files}{list of files containing starting values. Number of files should equal the number of categories.}
 
@@ -11,5 +11,5 @@
 \item{fix}{Can use this parameter to fix selection at current values (won't change over course of MCMC run)}
 }
 \description{
-Initialize values for selection CSP. File should be of comma-separated with header. Three columns should be of order Amino_acid,Codon,Value
+Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Initialize values for selection CSP. File should be of comma-separated with header. Three columns should be of order Amino_acid,Codon,Value
 }

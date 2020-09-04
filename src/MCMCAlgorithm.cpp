@@ -1032,7 +1032,8 @@ void MCMCAlgorithm::setEstimateMixtureAssignment(bool in)
  * is actually the interval specified times the thinning.
 */
 //' @name setRestartFileSettings
-//' @title Set restart file output name and frequency prior to running MCMC
+//' @title setRestartFileSettings
+//' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Set restart file output name and frequency prior to running MCMC
 //' @param filename name of restart file
 //' @param interval number of samples (ie. iterations * thinning) between writing new restart file
 //' @param multiple if true, will output a new restart file at each interval (file name will include sample it was written at)
@@ -1053,8 +1054,9 @@ void MCMCAlgorithm::setRestartFileSettings(std::string filename, unsigned interv
  * of steps the run will last).The default parameter passed in as -1 uses the full iterations.
 */
 //' @name setStepsToAdapt
-//' @title Set number of iterations (total iterations = samples * thinning) to allow proposal widths to adapt
-//' @param steps postive value
+//' @title setStepsToAdapt
+//' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Set number of iterations (total iterations = samples * thinning) to allow proposal widths to adapt
+//' @param steps a postive value
 void MCMCAlgorithm::setStepsToAdapt(unsigned steps)
 {
 	if (steps <= samples * thinning)
@@ -1069,8 +1071,9 @@ void MCMCAlgorithm::setStepsToAdapt(unsigned steps)
  * Return the value of stepsToAdapt
 */
 //' @name getStepsToAdapt
-//' @title Return number of iterations (total iterations = samples * thinning) to allow proposal widths to adapt
-
+//' @title getStepsToAdapt
+//' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Return number of iterations (total iterations = samples * thinning) to allow proposal widths to adapt
+//' @return number of sample steps to adapt
 int MCMCAlgorithm::getStepsToAdapt()
 {
 	return stepsToAdapt;
@@ -1083,8 +1086,9 @@ int MCMCAlgorithm::getStepsToAdapt()
 */
 
 //' @name getLogPosteriorTrace 
-//' @title Returns the logPosterior trace
-
+//' @title getLogPosteriorTrace 
+//' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Returns the logPosterior trace
+//' @return vector representing logPosterior trace
 std::vector<double> MCMCAlgorithm::getLogPosteriorTrace()
 {
 	return posteriorTrace;
@@ -1097,8 +1101,9 @@ std::vector<double> MCMCAlgorithm::getLogPosteriorTrace()
 */
 
 //' @name getLogLikelihoodTrace
-//' @title Returns the logLikelihood trace
-
+//' @title getLogLikelihoodTrace
+//' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Returns the logLikelihood trace
+//' @return vector representing logLikelihood trace
 std::vector<double> MCMCAlgorithm::getLogLikelihoodTrace()
 {
 	return likelihoodTrace;
@@ -1113,9 +1118,10 @@ std::vector<double> MCMCAlgorithm::getLogLikelihoodTrace()
 
 
 //' @name getLogPosteriorMean
-//' @title Calculate the mean log posterior probability over the last n samples
+//' @title getLogPosteriorMean
+//' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Calculate the mean log posterior probability over the last n samples
 //' @param samples postive value less than total length of the MCMC trace
-
+//' @return mean logPosterior
 double MCMCAlgorithm::getLogPosteriorMean(unsigned _samples)
 {
 	double posteriorMean = 0.0;
@@ -1294,8 +1300,9 @@ std::vector<std::vector<double>> MCMCAlgorithm::solveToeplitzMatrix(int lr, std:
  * Return samples.
 */
 //' @name getSamples
-//' @title Return number of samples set for MCMCAlgorithm object
-
+//' @title getSamples 
+//' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Return number of samples set for MCMCAlgorithm object
+//' @return number of samples used during MCMC
 unsigned MCMCAlgorithm::getSamples()
 {
     return samples;
@@ -1307,8 +1314,9 @@ unsigned MCMCAlgorithm::getSamples()
  * Return thinning.
 */
 //' @name getThinning
-//' @title Return thinning value, which is the number of iterations (total iterations = samples * thinning) not being kept
-
+//' @title getThinning 
+//' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Return thinning value, which is the number of iterations (total iterations = samples * thinning) not being kept
+//' @return thinning value used during MCMC
 unsigned MCMCAlgorithm::getThinning()
 {
     return thinning;
@@ -1320,8 +1328,9 @@ unsigned MCMCAlgorithm::getThinning()
  * Return adaptiveWidth.
 */
 //' @name getAdaptiveWidth
-//' @title Return sample adaptiveWidth value, which is the number of samples (not iterations) between adapting parameter proposal widths
-
+//' @title getAdaptiveWidth
+//' @description Return sample adaptiveWidth value, which is the number of samples (not iterations) between adapting parameter proposal widths
+//' @return number of sample steps between adapting proposal widths
 unsigned MCMCAlgorithm::getAdaptiveWidth()
 {
     return adaptiveWidth;
@@ -1333,7 +1342,8 @@ unsigned MCMCAlgorithm::getAdaptiveWidth()
  * Change samples.
 */
 //' @name setSamples
-//' @title Set number of samples set for MCMCAlgorithm object
+//' @title setSamples
+//' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Set number of samples set for MCMCAlgorithm object
 //' @param _samples postive value
 
 void MCMCAlgorithm::setSamples(unsigned _samples)
@@ -1347,7 +1357,8 @@ void MCMCAlgorithm::setSamples(unsigned _samples)
  * Change thinning.
 */
 //' @name setThinning
-//' @title  Set thinning value, which is the number of iterations (total iterations = samples * thinning) not being kept
+//' @title setThinning
+//' @description  Set thinning value, which is the number of iterations (total iterations = samples * thinning) not being kept
 //' @param _thinning postive value
 
 void MCMCAlgorithm::setThinning(unsigned _thinning)
@@ -1361,7 +1372,8 @@ void MCMCAlgorithm::setThinning(unsigned _thinning)
  * Change adaptiveWidth.
 */
 //' @name setAdaptiveWidth
-//' @title  Set sample adaptiveWidth value, which is the number of samples (not iterations) between adapting parameter proposal widths
+//' @title setAdaptiveWidth
+//' @description  Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Set sample adaptiveWidth value, which is the number of samples (not iterations) between adapting parameter proposal widths
 //' @param _adaptiveWidth postive value
 
 void MCMCAlgorithm::setAdaptiveWidth(unsigned _adaptiveWidth)

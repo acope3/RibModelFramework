@@ -2,7 +2,10 @@
 % Please edit documentation in R/RcppExports.R
 \name{getTraceObject}
 \alias{getTraceObject}
-\title{Get Trace object stored by a Parameter object. Useful for plotting certain parameter traces.}
+\title{getTraceObject}
+\value{
+Trace object
+}
 \description{
-Get Trace object stored by a Parameter object. Useful for plotting certain parameter traces.
+Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Get Trace object stored by a Parameter object. Useful for plotting certain parameter traces.
 }

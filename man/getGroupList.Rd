@@ -2,7 +2,10 @@
 % Please edit documentation in R/RcppExports.R
 \name{getGroupList}
 \alias{getGroupList}
-\title{Get amino acids (ROC, FONSE) or codons (PA, PANSE) for which parameters will be estimated}
+\title{getGroupList}
+\value{
+returns list of amino acids or codons
+}
 \description{
-Get amino acids (ROC, FONSE) or codons (PA, PANSE) for which parameters will be estimated
+Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Get amino acids (ROC, FONSE) or codons (PA, PANSE) for which parameters will be estimated
 }

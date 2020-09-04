@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{setRestartFileSettings}
 \alias{setRestartFileSettings}
-\title{Set restart file output name and frequency prior to running MCMC}
+\title{setRestartFileSettings}
 \arguments{
 \item{filename}{name of restart file}
 
@@ -11,5 +11,5 @@
 \item{multiple}{if true, will output a new restart file at each interval (file name will include sample it was written at)}
 }
 \description{
-Set restart file output name and frequency prior to running MCMC
+Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Set restart file output name and frequency prior to running MCMC
 }

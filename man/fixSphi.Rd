@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{fixSphi}
 \alias{fixSphi}
-\title{Fix the value of s_phi (standard deviation of lognormal for synthesis rates) at its current value}
+\title{fixSphi}
 \description{
-Fix the value of s_phi (standard deviation of lognormal for synthesis rates) at its current value
+Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Fix the value of s_phi (standard deviation of lognormal for synthesis rates) at its current value
 }

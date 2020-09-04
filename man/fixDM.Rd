@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{fixDM}
 \alias{fixDM}
-\title{Fix the value of mutation its current value}
+\title{fixDM}
 \description{
-Fix the value of mutation its current value
+Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Fix the value of mutation its current value
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{getEstimatedMixtureAssignmentForGene}
 \alias{getEstimatedMixtureAssignmentForGene}
-\title{Get estimated mixture assignment for gene}
+\title{getEstimatedMixtureAssignmentForGene}
 \arguments{
 \item{samples}{number of samples over which to calculate mixture assignment}
 
@@ -12,5 +12,5 @@
 returns value between 1 and n, where n is number of mixtures
 }
 \description{
-Get estimated mixture assignment for gene
+Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Get estimated mixture assignment for gene
 }

@@ -2,10 +2,10 @@
 % Please edit documentation in R/RcppExports.R
 \name{setStepsToAdapt}
 \alias{setStepsToAdapt}
-\title{Set number of iterations (total iterations = samples * thinning) to allow proposal widths to adapt}
+\title{setStepsToAdapt}
 \arguments{
-\item{steps}{postive value}
+\item{steps}{a postive value}
 }
 \description{
-Set number of iterations (total iterations = samples * thinning) to allow proposal widths to adapt
+Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Set number of iterations (total iterations = samples * thinning) to allow proposal widths to adapt
 }

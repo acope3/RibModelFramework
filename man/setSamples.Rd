@@ -2,10 +2,10 @@
 % Please edit documentation in R/RcppExports.R
 \name{setSamples}
 \alias{setSamples}
-\title{Set number of samples set for MCMCAlgorithm object}
+\title{setSamples}
 \arguments{
 \item{_samples}{postive value}
 }
 \description{
-Set number of samples set for MCMCAlgorithm object
+Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Set number of samples set for MCMCAlgorithm object
 }

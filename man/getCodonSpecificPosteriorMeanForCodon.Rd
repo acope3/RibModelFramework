@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{getCodonSpecificPosteriorMeanForCodon}
 \alias{getCodonSpecificPosteriorMeanForCodon}
-\title{Calculate codon-specific parameter (CSP) posterior mean}
+\title{getCodonSpecificPosteriorMeanForCodon}
 \arguments{
 \item{mixtureElement}{mixture to calculate CSP posterior mean. Should be between 1 and n, where n is number of mixtures.}
 
@@ -20,5 +20,5 @@
 posterior mean value for CSP
 }
 \description{
-Calculate codon-specific parameter (CSP) posterior mean
+Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Calculate codon-specific parameter (CSP) posterior mean
 }

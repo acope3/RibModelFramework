@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{getStdDevSynthesisRateVariance}
 \alias{getStdDevSynthesisRateVariance}
-\title{Calculate variance of standard deviation parameter of lognormal describing distribution of synthesis rates}
+\title{getStdDevSynthesisRateVariance}
 \arguments{
 \item{samples}{number of samples over which to calculate variance}
 
@@ -14,5 +14,5 @@
 returns variance for standard deviation of lognormal distribution of synthesis rates
 }
 \description{
-Calculate variance of standard deviation parameter of lognormal describing distribution of synthesis rates
+Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Calculate variance of standard deviation parameter of lognormal describing distribution of synthesis rates
 }

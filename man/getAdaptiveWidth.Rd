@@ -2,7 +2,10 @@
 % Please edit documentation in R/RcppExports.R
 \name{getAdaptiveWidth}
 \alias{getAdaptiveWidth}
-\title{Return sample adaptiveWidth value, which is the number of samples (not iterations) between adapting parameter proposal widths}
+\title{getAdaptiveWidth}
+\value{
+number of sample steps between adapting proposal widths
+}
 \description{
 Return sample adaptiveWidth value, which is the number of samples (not iterations) between adapting parameter proposal widths
 }

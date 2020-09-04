@@ -2,10 +2,10 @@
 % Please edit documentation in R/RcppExports.R
 \name{readPhiValue}
 \alias{readPhiValue}
-\title{Read synthesis rate values from file. File should be two column file <gene_id,phi> and is expected to have a header row}
+\title{readPhiValue}
 \arguments{
 \item{filename}{name of file to be read}
 }
 \description{
-Read synthesis rate values from file. File should be two column file <gene_id,phi> and is expected to have a header row
+Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Read synthesis rate values from file. File should be two column file <gene_id,phi> and is expected to have a header row
 }

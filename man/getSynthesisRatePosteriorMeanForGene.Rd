@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{getSynthesisRatePosteriorMeanForGene}
 \alias{getSynthesisRatePosteriorMeanForGene}
-\title{Get posterior mean synthesis rate value for a gene}
+\title{getSynthesisRatePosteriorMeanForGene}
 \arguments{
 \item{samples}{number of samples over which to calculate mean}
 
@@ -14,5 +14,5 @@
 posterior mean synthesis rate for gene
 }
 \description{
-Get posterior mean synthesis rate value for a gene
+Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Get posterior mean synthesis rate value for a gene
 }

@@ -2,10 +2,13 @@
 % Please edit documentation in R/RcppExports.R
 \name{getLogPosteriorMean}
 \alias{getLogPosteriorMean}
-\title{Calculate the mean log posterior probability over the last n samples}
+\title{getLogPosteriorMean}
 \arguments{
 \item{samples}{postive value less than total length of the MCMC trace}
 }
+\value{
+mean logPosterior
+}
 \description{
-Calculate the mean log posterior probability over the last n samples
+Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Calculate the mean log posterior probability over the last n samples
 }

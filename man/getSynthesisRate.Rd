@@ -2,10 +2,10 @@
 % Please edit documentation in R/RcppExports.R
 \name{getSynthesisRate}
 \alias{getSynthesisRate}
-\title{Get current synthesis rates for all genes and all mixtures}
+\title{getSynthesisRate}
 \value{
 2 by 2 vector of numeric values
 }
 \description{
-Get current synthesis rates for all genes and all mixtures
+Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Get current synthesis rates for all genes and all mixtures
 }

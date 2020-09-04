@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{setThinning}
 \alias{setThinning}
-\title{Set thinning value, which is the number of iterations (total iterations = samples * thinning) not being kept}
+\title{setThinning}
 \arguments{
 \item{_thinning}{postive value}
 }

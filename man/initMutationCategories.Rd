@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{initMutationCategories}
 \alias{initMutationCategories}
-\title{Initialize values for mutation CSP. File should be of comma-separated with header. Three columns should be of order Amino_acid,Codon,Value}
+\title{initMutationCategories}
 \arguments{
 \item{files}{list of files containing starting values. Number of files should equal the number of categories.}
 

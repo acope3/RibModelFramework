@@ -2,7 +2,10 @@
 % Please edit documentation in R/RcppExports.R
 \name{getStepsToAdapt}
 \alias{getStepsToAdapt}
-\title{Return number of iterations (total iterations = samples * thinning) to allow proposal widths to adapt}
+\title{getStepsToAdapt}
+\value{
+number of sample steps to adapt
+}
 \description{
-Return number of iterations (total iterations = samples * thinning) to allow proposal widths to adapt
+Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Return number of iterations (total iterations = samples * thinning) to allow proposal widths to adapt
 }

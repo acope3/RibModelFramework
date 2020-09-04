@@ -12,46 +12,58 @@ RCPP_EXPOSED_CLASS(Genome)
 RCPP_EXPOSED_CLASS(CovarianceMatrix)
 
 //' @name readPhiValue
-//' @title Read synthesis rate values from file. File should be two column file <gene_id,phi> and is expected to have a header row
+//' @title readPhiValue
+//' @description Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Read synthesis rate values from file. File should be two column file <gene_id,phi> and is expected to have a header row
 //' @param filename name of file to be read
 
 
 //' @name setGroupList
-//' @title Set amino acids (ROC, FONSE) or codons (PA, PANSE) for which parameters will be estimated. Note that non-default groupLists are still in beta testing and should be used with caution.
+//' @title setGroupList
+//' @description Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Set amino acids (ROC, FONSE) or codons (PA, PANSE) for which parameters will be estimated. Note that non-default groupLists are still in beta testing and should be used with caution.
 //' @param List of strings epresenting groups for parameters to be estimated. Should be one letter amino acid (ROC, FONSE) or list of sense codons (PA, PANSE). 
 
 //' @name getGroupList
-//' @title Get amino acids (ROC, FONSE) or codons (PA, PANSE) for which parameters will be estimated
+//' @title getGroupList
+//' @description Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Get amino acids (ROC, FONSE) or codons (PA, PANSE) for which parameters will be estimated
+//' @return returns list of amino acids or codons
+
 
 //' @name getTraceObject
-//' @title Get Trace object stored by a Parameter object. Useful for plotting certain parameter traces.
-
+//' @title getTraceObject
+//' @description Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Get Trace object stored by a Parameter object. Useful for plotting certain parameter traces.
+//' @return Trace object
 
 //' @name initializeSynthesisRateByGenome
-//' @title Initialize synthesis rates using SCUO values calcuated from the genome
+//' @title initializeSynthesisRateByGenome
+//' @description Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Initialize synthesis rates using SCUO values calcuated from the genome
 //' @param genome a Genome object
 
 //' @name initializeSynthesisRateByRandom
-//' @title Initialize synthesis rates by drawing a from a lognormal distribution with mean = -(sd_phi)^2/2 and sd = sd_phi
+//' @title initializeSynthesisRateByRandom
+//' @description Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Initialize synthesis rates by drawing a from a lognormal distribution with mean = -(sd_phi)^2/2 and sd = sd_phi
 //' @param sd_phi a positive value which will be the standard deviation of the lognormal distribution
 
 //' @name initializeSynthesisRateByList
-//' @title Initialize synthesis rates with values passed in as a list
+//' @title initializeSynthesisRateByList
+//' @description Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Initialize synthesis rates with values passed in as a list
 //' @param expression a list of values to use as initial synthesis rate values. Should be same size as number of genes in genome.
 
 //' @name getSynthesisRate
-//' @title Get current synthesis rates for all genes and all mixtures 
+//' @title getSynthesisRate
+//' @description Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Get current synthesis rates for all genes and all mixtures 
 //' @return 2 by 2 vector of numeric values
 
 //' @name getSynthesisRatePosteriorMeanForGene
-//' @title Get posterior mean synthesis rate value for a gene
+//' @title getSynthesisRatePosteriorMeanForGene
+//' @description Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Get posterior mean synthesis rate value for a gene
 //' @param samples number of samples over which to calculate mean
 //' @param geneIndex corresponding index of gene in genome for which posterior mean synthesis rate will be calculated. Should be a number between 1 and length(genome) 
 //' @param log_scale Calculate posterior mean on log scale
 //' @return posterior mean synthesis rate for gene
 
 //' @name getSynthesisRatePosteriorVarianceForGene
-//' @title Get synthesis rate variance for a gene
+//' @title getSynthesisRatePosteriorVarianceForGene
+//' @description Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Get synthesis rate variance for a gene
 //' @param samples number of samples over which to calculate variance
 //' @param geneIndex corresponding index of gene in genome for which synthesis rate variance will be calculated. Should be a number between 1 and length(genome) 
 //' @param unbiased Should calculate variance using unbiased (N-1) or biased (N) correction
@@ -59,32 +71,37 @@ RCPP_EXPOSED_CLASS(CovarianceMatrix)
 //' @return posterior mean synthesis rate for gene
 
 //' @name getEstimatedMixtureAssignmentForGene
-//' @title Get estimated mixture assignment for gene
+//' @title getEstimatedMixtureAssignmentForGene
+//' @description Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Get estimated mixture assignment for gene
 //' @param samples number of samples over which to calculate mixture assignment
 //' @param geneIndex corresponding index of gene in genome. Should be a number between 1 and length(genome). 
 //' @return returns value between 1 and n, where n is number of mixtures
 
 //' @name getEstimatedMixtureAssignmentProbabilitiesForGene
-//' @title Get estimated mixture assignment probabilities for gene
+//' @title getEstimatedMixtureAssignmentProbabilitiesForGene
+//' @description Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Get estimated mixture assignment probabilities for gene
 //' @param samples number of samples over which to calculate mixture assignment probabilities
 //' @param geneIndex corresponding index of gene in genome. Should be a number between 1 and length(genome). 
 //' @return returns vector of probabilities representing mixture probabilities for gene
 
 //' @name getStdDevSynthesisRatePosteriorMean
-//' @title Calculate posterior mean of standard deviation parameter of lognormal describing distribution of synthesis rates
+//' @title getStdDevSynthesisRatePosteriorMean
+//' @description Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Calculate posterior mean of standard deviation parameter of lognormal describing distribution of synthesis rates
 //' @param samples number of samples over which to calculate posterior mean
 //' @param mixture mixture index to use. Should be number between 0 and n-1, where n is number of mixtures
 //' @return returns posterior mean for standard deviation of lognormal distribution of synthesis rates
 
 //' @name getStdDevSynthesisRateVariance
-//' @title Calculate variance of standard deviation parameter of lognormal describing distribution of synthesis rates
+//' @title getStdDevSynthesisRateVariance
+//' @description Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Calculate variance of standard deviation parameter of lognormal describing distribution of synthesis rates
 //' @param samples number of samples over which to calculate variance
 //' @param mixture mixture index to use. Should be number between 0 and n-1, where n is number of mixtures
 //' @param unbiased If TRUE, should calculate variance using unbiased (N-1). Otherwise, used biased (N) correction
 //' @return returns variance for standard deviation of lognormal distribution of synthesis rates
 
 //' @name getCodonSpecificPosteriorMeanForCodon
-//' @title Calculate codon-specific parameter (CSP) posterior mean
+//' @title getCodonSpecificPosteriorMeanForCodon
+//' @description Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Calculate codon-specific parameter (CSP) posterior mean
 //' @param mixtureElement mixture to calculate CSP posterior mean. Should be between 1 and n, where n is number of mixtures.
 //' @param samples number of samples to use for calculating posterior mean
 //' @param codon codon to calculate CSP
@@ -94,7 +111,8 @@ RCPP_EXPOSED_CLASS(CovarianceMatrix)
 //' @return posterior mean value for CSP
 
 //' @name getCodonSpecificPosteriorVarianceForCodon
-//' @title Calculate codon-specific parameter (CSP) variance
+//' @title getCodonSpecificPosteriorVarianceForCodon
+//' @description Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Calculate codon-specific parameter (CSP) variance
 //' @param mixtureElement mixture to calculate CSP variance. Should be between 1 and n, where n is number of mixtures.
 //' @param samples number of samples to use for calculating variance
 //' @param codon codon to calculate CSP
@@ -105,7 +123,8 @@ RCPP_EXPOSED_CLASS(CovarianceMatrix)
 //' @return variance over trace for CSP
 
 //' @name getCodonSpecificQuantilesForCodon
-//' @title Calculate quantiles of CSP traces
+//' @title getCodonSpecificQuantilesForCodon
+//' @description Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Calculate quantiles of CSP traces
 //' @param mixtureElement mixture to calculate CSP variance. Should be between 1 and n, where n is number of mixtures.
 //' @param samples number of samples to use for calculating variance
 //' @param codon codon to calculate CSP
@@ -116,13 +135,15 @@ RCPP_EXPOSED_CLASS(CovarianceMatrix)
 //' @return vector representing lower and upper bound of quantile
 
 //' @name getNoiseOffsetPosteriorMean
-//' @title Calculate posterior mean of standard deviation parameter of lognormal describing distribution of synthesis rates
+//' @title getNoiseOffsetPosteriorMean
+//' @description Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Calculate posterior mean of standard deviation parameter of lognormal describing distribution of synthesis rates
 //' @param index mixture index to use. Should be number between 0 and n-1, where n is number of mixtures
 //' @param samples number of samples over which to calculate posterior mean
 //' @return returns posterior mean for standard deviation of lognormal distribution of synthesis rates
 
 //' @name getNoiseOffsetVariance
-//' @title Calculate variance of noise offset parameter used when fitting model with empirical estimates of synthesis rates (ie. withPhi fits)
+//' @title getNoiseOffsetVariance
+//' @description Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Calculate variance of noise offset parameter used when fitting model with empirical estimates of synthesis rates (ie. withPhi fits)
 //' @param index mixture index to use. Should be number between 0 and n-1, where n is number of mixtures
 //' @param samples number of samples over which to calculate variance
 //' @param unbiased If TRUE, should calculate variance using unbiased (N-1). Otherwise, used biased (N) correction
@@ -130,26 +151,31 @@ RCPP_EXPOSED_CLASS(CovarianceMatrix)
 
 
 //' @name fixSphi
-//' @title Fix the value of s_phi (standard deviation of lognormal for synthesis rates) at its current value
+//' @title fixSphi
+//' @description Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Fix the value of s_phi (standard deviation of lognormal for synthesis rates) at its current value
 
 
 //' @name initMutationCategories
-//' @title Initialize values for mutation CSP. File should be of comma-separated with header. Three columns should be of order Amino_acid,Codon,Value
+//' @title initMutationCategories
+//' @description Initialize values for mutation CSP. File should be of comma-separated with header. Three columns should be of order Amino_acid,Codon,Value
 //' @param files list of files containing starting values. Number of files should equal the number of categories.
 //' @param numCategories number of mutation categories (should be less than or equal to number of mixtures)
 //' @param fix Can use this parameter to fix mutation at current values (won't change over course of MCMC run)
 
 //' @name initSelectionCategories
-//' @title Initialize values for selection CSP. File should be of comma-separated with header. Three columns should be of order Amino_acid,Codon,Value
+//' @title initSelectionCategories
+//' @description Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Initialize values for selection CSP. File should be of comma-separated with header. Three columns should be of order Amino_acid,Codon,Value
 //' @param files list of files containing starting values. Number of files should equal the number of categories.
 //' @param numCategories number of mutation categories (should be less than or equal to number of mixtures)
 //' @param fix Can use this parameter to fix selection at current values (won't change over course of MCMC run)
 
 //' @name fixDM
-//' @title Fix the value of mutation its current value
+//' @title fixDM
+//' @description Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Fix the value of mutation its current value
 
 //' @name fixDEta
-//' @title Fix the value of selection its current value
+//' @title fixDEta
+//' @description Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Fix the value of selection its current value
 
 
 RCPP_MODULE(Parameter_mod)

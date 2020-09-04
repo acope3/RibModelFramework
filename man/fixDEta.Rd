@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{fixDEta}
 \alias{fixDEta}
-\title{Fix the value of selection its current value}
+\title{fixDEta}
 \description{
-Fix the value of selection its current value
+Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Fix the value of selection its current value
 }

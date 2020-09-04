@@ -2,7 +2,10 @@
 % Please edit documentation in R/RcppExports.R
 \name{getLogLikelihoodTrace}
 \alias{getLogLikelihoodTrace}
-\title{Returns the logLikelihood trace}
+\title{getLogLikelihoodTrace}
+\value{
+vector representing logLikelihood trace
+}
 \description{
-Returns the logLikelihood trace
+Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Returns the logLikelihood trace
 }

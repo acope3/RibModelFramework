@@ -2,7 +2,10 @@
 % Please edit documentation in R/RcppExports.R
 \name{getLogPosteriorTrace}
 \alias{getLogPosteriorTrace}
-\title{Returns the logPosterior trace}
+\title{getLogPosteriorTrace}
+\value{
+vector representing logPosterior trace
+}
 \description{
-Returns the logPosterior trace
+Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Returns the logPosterior trace
 }

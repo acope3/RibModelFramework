@@ -2,10 +2,10 @@
 % Please edit documentation in R/RcppExports.R
 \name{setAdaptiveWidth}
 \alias{setAdaptiveWidth}
-\title{Set sample adaptiveWidth value, which is the number of samples (not iterations) between adapting parameter proposal widths}
+\title{setAdaptiveWidth}
 \arguments{
 \item{_adaptiveWidth}{postive value}
 }
 \description{
-Set sample adaptiveWidth value, which is the number of samples (not iterations) between adapting parameter proposal widths
+Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Set sample adaptiveWidth value, which is the number of samples (not iterations) between adapting parameter proposal widths
 }

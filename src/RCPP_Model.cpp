@@ -14,7 +14,8 @@ void roc_finalizer(ROCModel* m)
 */
 
 //' @name simulateGenome
-//' @title Will simulate a version of the given genome using the current set of parameters stored in the Parameter object
+//' @title simulateGenome
+//' @description Method of Model class (access via model$<function name>, where model is an object initialized by initializeModelObject). Will simulate a version of the given genome using the current set of parameters stored in the Parameter object. This can be written to a FASTA file using genome$writeFasta(<filename>,simulated = TRUE).
 //' @param genome a Genome object initialized by initializeGenomeObject
 
 RCPP_EXPOSED_CLASS(ROCParameter)

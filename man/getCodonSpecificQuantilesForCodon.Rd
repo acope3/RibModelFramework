@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{getCodonSpecificQuantilesForCodon}
 \alias{getCodonSpecificQuantilesForCodon}
-\title{Calculate quantiles of CSP traces}
+\title{getCodonSpecificQuantilesForCodon}
 \arguments{
 \item{mixtureElement}{mixture to calculate CSP variance. Should be between 1 and n, where n is number of mixtures.}
 
@@ -22,5 +22,5 @@
 vector representing lower and upper bound of quantile
 }
 \description{
-Calculate quantiles of CSP traces
+Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Calculate quantiles of CSP traces
 }

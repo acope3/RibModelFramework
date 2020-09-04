@@ -2,10 +2,10 @@
 % Please edit documentation in R/RcppExports.R
 \name{initializeSynthesisRateByRandom}
 \alias{initializeSynthesisRateByRandom}
-\title{Initialize synthesis rates by drawing a from a lognormal distribution with mean = -(sd_phi)^2/2 and sd = sd_phi}
+\title{initializeSynthesisRateByRandom}
 \arguments{
 \item{sd_phi}{a positive value which will be the standard deviation of the lognormal distribution}
 }
 \description{
-Initialize synthesis rates by drawing a from a lognormal distribution with mean = -(sd_phi)^2/2 and sd = sd_phi
+Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Initialize synthesis rates by drawing a from a lognormal distribution with mean = -(sd_phi)^2/2 and sd = sd_phi
 }
