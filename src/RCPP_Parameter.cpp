@@ -11,6 +11,146 @@ RCPP_EXPOSED_CLASS(Trace)
 RCPP_EXPOSED_CLASS(Genome)
 RCPP_EXPOSED_CLASS(CovarianceMatrix)
 
+//' @name readPhiValue
+//' @title Read synthesis rate values from file. File should be two column file <gene_id,phi> and is expected to have a header row
+//' @param filename name of file to be read
+
+
+//' @name setGroupList
+//' @title Set amino acids (ROC, FONSE) or codons (PA, PANSE) for which parameters will be estimated. Note that non-default groupLists are still in beta testing and should be used with caution.
+//' @param List of strings epresenting groups for parameters to be estimated. Should be one letter amino acid (ROC, FONSE) or list of sense codons (PA, PANSE). 
+
+//' @name getGroupList
+//' @title Get amino acids (ROC, FONSE) or codons (PA, PANSE) for which parameters will be estimated
+
+//' @name getTraceObject
+//' @title Get Trace object stored by a Parameter object. Useful for plotting certain parameter traces.
+
+
+//' @name initializeSynthesisRateByGenome
+//' @title Initialize synthesis rates using SCUO values calcuated from the genome
+//' @param genome a Genome object
+
+//' @name initializeSynthesisRateByRandom
+//' @title Initialize synthesis rates by drawing a from a lognormal distribution with mean = -(sd_phi)^2/2 and sd = sd_phi
+//' @param sd_phi a positive value which will be the standard deviation of the lognormal distribution
+
+//' @name initializeSynthesisRateByList
+//' @title Initialize synthesis rates with values passed in as a list
+//' @param expression a list of values to use as initial synthesis rate values. Should be same size as number of genes in genome.
+
+//' @name getSynthesisRate
+//' @title Get current synthesis rates for all genes and all mixtures 
+//' @return 2 by 2 vector of numeric values
+
+//' @name getSynthesisRatePosteriorMeanForGene
+//' @title Get posterior mean synthesis rate value for a gene
+//' @param samples number of samples over which to calculate mean
+//' @param geneIndex corresponding index of gene in genome for which posterior mean synthesis rate will be calculated. Should be a number between 1 and length(genome) 
+//' @param log_scale Calculate posterior mean on log scale
+//' @return posterior mean synthesis rate for gene
+
+//' @name getSynthesisRatePosteriorVarianceForGene
+//' @title Get synthesis rate variance for a gene
+//' @param samples number of samples over which to calculate variance
+//' @param geneIndex corresponding index of gene in genome for which synthesis rate variance will be calculated. Should be a number between 1 and length(genome) 
+//' @param unbiased Should calculate variance using unbiased (N-1) or biased (N) correction
+//' @param log_scale Calculate variance on log scale
+//' @return posterior mean synthesis rate for gene
+
+//' @name getEstimatedMixtureAssignmentForGene
+//' @title Get estimated mixture assignment for gene
+//' @param samples number of samples over which to calculate mixture assignment
+//' @param geneIndex corresponding index of gene in genome. Should be a number between 1 and length(genome). 
+//' @return returns value between 1 and n, where n is number of mixtures
+
+//' @name getEstimatedMixtureAssignmentProbabilitiesForGene
+//' @title Get estimated mixture assignment probabilities for gene
+//' @param samples number of samples over which to calculate mixture assignment probabilities
+//' @param geneIndex corresponding index of gene in genome. Should be a number between 1 and length(genome). 
+//' @return returns vector of probabilities representing mixture probabilities for gene
+
+//' @name getStdDevSynthesisRatePosteriorMean
+//' @title Calculate posterior mean of standard deviation parameter of lognormal describing distribution of synthesis rates
+//' @param samples number of samples over which to calculate posterior mean
+//' @param mixture mixture index to use. Should be number between 0 and n-1, where n is number of mixtures
+//' @return returns posterior mean for standard deviation of lognormal distribution of synthesis rates
+
+//' @name getStdDevSynthesisRateVariance
+//' @title Calculate variance of standard deviation parameter of lognormal describing distribution of synthesis rates
+//' @param samples number of samples over which to calculate variance
+//' @param mixture mixture index to use. Should be number between 0 and n-1, where n is number of mixtures
+//' @param unbiased If TRUE, should calculate variance using unbiased (N-1). Otherwise, used biased (N) correction
+//' @return returns variance for standard deviation of lognormal distribution of synthesis rates
+
+//' @name getCodonSpecificPosteriorMeanForCodon
+//' @title Calculate codon-specific parameter (CSP) posterior mean
+//' @param mixtureElement mixture to calculate CSP posterior mean. Should be between 1 and n, where n is number of mixtures.
+//' @param samples number of samples to use for calculating posterior mean
+//' @param codon codon to calculate CSP
+//' @param paramType CSP to calculate posterior mean for. 0: Mutation (ROC,FONSE) or Alpha (PA, PANSE). 1: Selection (ROC,FONSE), Lambda (PANSE), Lambda^prime (PA). 2: NSERate (PANSE) 
+//' @param withoutReference If model uses reference codon, then ignore this codon (fixed at 0). Should be TRUE for ROC and FONSE. Should be FALSE for PA and PANSE.
+//' @param log_scale If true, calculate posterior mean on log scale. Should only be used for PA and PANSE.
+//' @return posterior mean value for CSP
+
+//' @name getCodonSpecificPosteriorVarianceForCodon
+//' @title Calculate codon-specific parameter (CSP) variance
+//' @param mixtureElement mixture to calculate CSP variance. Should be between 1 and n, where n is number of mixtures.
+//' @param samples number of samples to use for calculating variance
+//' @param codon codon to calculate CSP
+//' @param paramType CSP to calculate variance for. 0: Mutation (ROC,FONSE) or Alpha (PA, PANSE). 1: Selection (ROC,FONSE), Lambda (PANSE), Lambda^prime (PA). 2: NSERate (PANSE) 
+//' @param unbiased If TRUE, should calculate variance using unbiased (N-1). Otherwise, used biased (N) correction
+//' @param withoutReference If model uses reference codon, then ignore this codon (fixed at 0). Should be TRUE for ROC and FONSE. Should be FALSE for PA and PANSE.
+//' @param log_scale If true, calculate posterior mean on log scale. Should only be used for PA and PANSE.
+//' @return variance over trace for CSP
+
+//' @name getCodonSpecificQuantilesForCodon
+//' @title Calculate quantiles of CSP traces
+//' @param mixtureElement mixture to calculate CSP variance. Should be between 1 and n, where n is number of mixtures.
+//' @param samples number of samples to use for calculating variance
+//' @param codon codon to calculate CSP
+//' @param paramType CSP to calculate variance for. 0: Mutation (ROC,FONSE) or Alpha (PA, PANSE). 1: Selection (ROC,FONSE), Lambda (PANSE), Lambda^prime (PA). 2: NSERate (PANSE) 
+//' @param probs vector of two doubles between 0 and 1 indicating range over which to calculate quantiles. <0.0275, 0.975> would give 95\% quantiles.
+//' @param withoutReference If model uses reference codon, then ignore this codon (fixed at 0). Should be TRUE for ROC and FONSE. Should be FALSE for PA and PANSE.
+//' @param log_scale If true, calculate posterior mean on log scale. Should only be used for PA and PANSE.
+//' @return vector representing lower and upper bound of quantile
+
+//' @name getNoiseOffsetPosteriorMean
+//' @title Calculate posterior mean of standard deviation parameter of lognormal describing distribution of synthesis rates
+//' @param index mixture index to use. Should be number between 0 and n-1, where n is number of mixtures
+//' @param samples number of samples over which to calculate posterior mean
+//' @return returns posterior mean for standard deviation of lognormal distribution of synthesis rates
+
+//' @name getNoiseOffsetVariance
+//' @title Calculate variance of noise offset parameter used when fitting model with empirical estimates of synthesis rates (ie. withPhi fits)
+//' @param index mixture index to use. Should be number between 0 and n-1, where n is number of mixtures
+//' @param samples number of samples over which to calculate variance
+//' @param unbiased If TRUE, should calculate variance using unbiased (N-1). Otherwise, used biased (N) correction
+//' @return returns variance for noise offset
+
+
+//' @name fixSphi
+//' @title Fix the value of s_phi (standard deviation of lognormal for synthesis rates) at its current value
+
+
+//' @name initMutationCategories
+//' @title Initialize values for mutation CSP. File should be of comma-separated with header. Three columns should be of order Amino_acid,Codon,Value
+//' @param files list of files containing starting values. Number of files should equal the number of categories.
+//' @param numCategories number of mutation categories (should be less than or equal to number of mixtures)
+//' @param fix Can use this parameter to fix mutation at current values (won't change over course of MCMC run)
+
+//' @name initSelectionCategories
+//' @title Initialize values for selection CSP. File should be of comma-separated with header. Three columns should be of order Amino_acid,Codon,Value
+//' @param files list of files containing starting values. Number of files should equal the number of categories.
+//' @param numCategories number of mutation categories (should be less than or equal to number of mixtures)
+//' @param fix Can use this parameter to fix selection at current values (won't change over course of MCMC run)
+
+//' @name fixDM
+//' @title Fix the value of mutation its current value
+
+//' @name fixDEta
+//' @title Fix the value of selection its current value
+
 
 RCPP_MODULE(Parameter_mod)
 {
@@ -60,9 +200,9 @@ RCPP_MODULE(Parameter_mod)
 		.method("getSynthesisRateVarianceForGene",
 		        &Parameter::getSynthesisRateVarianceForGene)
 		.method("getEstimatedMixtureAssignmentForGene", &Parameter::getEstimatedMixtureAssignmentForGene,
-		        "returns the mixture assignment for a given gene")
+		        "returns the mixture assignment for a given gene") //Not a R wrapper
 		.method("getEstimatedMixtureAssignmentProbabilitiesForGene", &Parameter::getEstimatedMixtureAssignmentProbabilitiesForGene,
-		        "returns the probabilities assignment for a given gene")
+		        "returns the probabilities assignment for a given gene") //Not a R wrapper
 		.method("getStdDevSynthesisRatePosteriorMean", &Parameter::getStdDevSynthesisRatePosteriorMean) //Not a R wrapper
 		.method("getCodonSpecificPosteriorMean", &Parameter::getCodonSpecificPosteriorMeanForCodon)
 		.method("getStdDevSynthesisRateVariance", &Parameter::getStdDevSynthesisRateVariance)

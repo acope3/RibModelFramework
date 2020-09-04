@@ -72,7 +72,7 @@ class Parameter {
 		void writeBasicRestartFile(std::string filename);
 		void initCategoryDefinitions(std::string mutationSelectionState,
 			std::vector<std::vector<unsigned>> mixtureDefinitionMatrix);
-		void InitializeSynthesisRate(Genome& genome, double sd_phi);
+		void InitializeSynthesisRate(Genome& genome);
 		void InitializeSynthesisRate(double sd_phi);
 		void InitializeSynthesisRate(std::vector<double> expression);
 		std::vector<double> readPhiValues(std::string filename); //General function, possibly move
@@ -205,7 +205,7 @@ class Parameter {
 
 
 		//Static Functions: TODO: test
-		static double calculateSCUO(Gene& gene, unsigned maxAA);
+		static double calculateSCUO(Gene& gene);
 		static void drawIidRandomVector(unsigned draws, double mean, double sd, double (*proposal)(double a, double b),
 			double* randomNumbers);
 		static void drawIidRandomVector(unsigned draws, double r, double (*proposal)(double r), double* randomNumber);
@@ -231,7 +231,7 @@ class Parameter {
 #ifndef STANDALONE
 
 		//Initialization and Restart Functions:
-		void initializeSynthesisRateByGenome(Genome& genome, double sd_phi);
+		void initializeSynthesisRateByGenome(Genome& genome);
 		void initializeSynthesisRateByRandom(double sd_phi);
 		void initializeSynthesisRateByList(std::vector<double> expression);
 		bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);

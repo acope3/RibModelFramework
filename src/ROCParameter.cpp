@@ -526,6 +526,12 @@ void ROCParameter::initAllTraces(unsigned samples, unsigned num_genes, bool esti
 }
 
 
+//' @name initMutationCategories
+//' @title Initialize values for mutation CSP. File should be of comma-separated with header. Three columns should be of order Amino_acid,Codon,Value
+//' @param files list of files containing starting values. Number of files should equal the number of categories.
+//' @param numCategories number of mutation categories (should be less than or equal to number of mixtures)
+//' @param fix Can use this parameter to fix mutation at current values (won't change over course of MCMC run)
+
 void ROCParameter::initMutationCategories(std::vector<std::string> files, unsigned numCategories, bool fix)
 {
 	for (unsigned category = 0; category < numCategories; category++)
@@ -566,6 +572,11 @@ void ROCParameter::initMutationCategories(std::vector<std::string> files, unsign
 	} //END OF A CATEGORY/FILE
 }
 
+//' @name initSelectionCategories
+//' @title Initialize values for selection CSP. File should be of comma-separated with header. Three columns should be of order Amino_acid,Codon,Value
+//' @param files list of files containing starting values. Number of files should equal the number of categories.
+//' @param numCategories number of mutation categories (should be less than or equal to number of mixtures)
+//' @param fix Can use this parameter to fix selection at current values (won't change over course of MCMC run)
 
 void ROCParameter::initSelectionCategories(std::vector<std::string> files, unsigned numCategories, bool fix)
 {
@@ -639,11 +650,16 @@ void ROCParameter::updateCodonSpecificParameterTrace(unsigned sample, std::strin
 }
 
 
+//' @name fixDM
+//' @title Fix the value of mutation its current value
 
 void ROCParameter::fixDM()
 {
 	fix_dM = true;
 }
+
+//' @name fixDEta
+//' @title Fix the value of selection its current value
 
 void ROCParameter::fixDEta()
 {

@@ -241,7 +241,7 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
   # initialize expression values
   if(is.null(expressionValues) && init.w.obs.phi == F)
   {
-    parameter$initializeSynthesisRateByGenome(genome, mean(sphi))
+    parameter$initializeSynthesisRateByGenome(genome)
     
   } 
   else if(init.w.obs.phi == T && is.null(expressionValues))
@@ -314,10 +314,9 @@ initializePAParameterObject <- function(genome, sphi, numMixtures, geneAssignmen
   
   
   # initialize expression values
-  # initialize expression values
   if(is.null(expressionValues) && init.w.obs.phi == F)
   {
-    parameter$initializeSynthesisRateByGenome(genome, mean(sphi))
+    parameter$initializeSynthesisRateByRandom(genome)
     
   } 
   else if(init.w.obs.phi == T && is.null(expressionValues))
@@ -374,8 +373,8 @@ initializePANSEParameterObject <- function(genome, sphi, numMixtures, geneAssign
   # initialize expression values
   if(is.null(expressionValues) && init.w.obs.phi == F)
   {
-    parameter$initializeSynthesisRateByGenome(genome, mean(sphi))
-    
+    parameter$initializeSynthesisRateByRandom(genome)
+
   } 
   else if(init.w.obs.phi == T && is.null(expressionValues))
   {
@@ -437,7 +436,7 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
   # initialize expression values
   if(is.null(expressionValues) && init.w.obs.phi == F)
   {
-    parameter$initializeSynthesisRateByGenome(genome, mean(sphi))
+    parameter$initializeSynthesisRateByRandom(genome)
     
   } 
   else if(init.w.obs.phi == T && is.null(expressionValues))

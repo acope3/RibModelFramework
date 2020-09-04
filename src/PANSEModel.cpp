@@ -495,8 +495,8 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
     //Should never accept parameters that give NaN, so just check proposed parameters
     
     logAcceptanceRatioForAllMixtures[0] = logLikelihood_proposed - logLikelihood - (currAdjustmentTerm - propAdjustmentTerm);
-	logAcceptanceRatioForAllMixtures[3] = logLikelihood - propAdjustmentTerm;
-	logAcceptanceRatioForAllMixtures[4] = logLikelihood_proposed - currAdjustmentTerm;
+	logAcceptanceRatioForAllMixtures[3] = logLikelihood;
+	logAcceptanceRatioForAllMixtures[4] = logLikelihood_proposed;
 	logAcceptanceRatioForAllMixtures[1] = logLikelihood;
 	logAcceptanceRatioForAllMixtures[2] = logLikelihood_proposed;
 
@@ -643,15 +643,6 @@ void PANSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
                     prob_successful[codonIndex] = 0.0;
                 }
             }
-            
-            // if (prop_prob_successful[codonIndex] > 500)
-            // {
-            //     prop_prob_successful[codonIndex] = elongationProbabilityLog(currAlpha, currLambda/propU,1/currNSERate);
-            //     if (prop_prob_successful[codonIndex] > 0.0)
-            //     {
-            //         prop_prob_successful[codonIndex] = 0.0;
-            //     }
-            // }
 
             currSigma = currSigma + prob_successful[codonIndex];
             propSigma = propSigma + prob_successful[codonIndex];
@@ -1195,7 +1186,7 @@ void PANSEModel::updateHyperParameter(unsigned hp)
 
 void PANSEModel::simulateGenome(Genome &genome)
 {
-    unsigned Y = parameter->getTotalRFPCount();
+    unsigned Y = genome.getSumRFP();
     double Z = 0;
     std::vector<std::vector<double>> wait_times;
     wait_times.resize(genome.getGenomeSize());

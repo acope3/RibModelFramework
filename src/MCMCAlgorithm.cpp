@@ -23,8 +23,6 @@ using namespace Rcpp;
 #endif
 
 
-
-
 //--------------------------------------------------//
 //----------- Constructors & Destructors -----------//
 //--------------------------------------------------//
@@ -1033,6 +1031,12 @@ void MCMCAlgorithm::setEstimateMixtureAssignment(bool in)
  * it was written at and allow for multiple files to be written if multiple is set to true. The file write interval
  * is actually the interval specified times the thinning.
 */
+//' @name setRestartFileSettings
+//' @title Set restart file output name and frequency prior to running MCMC
+//' @param filename name of restart file
+//' @param interval number of samples (ie. iterations * thinning) between writing new restart file
+//' @param multiple if true, will output a new restart file at each interval (file name will include sample it was written at)
+
 void MCMCAlgorithm::setRestartFileSettings(std::string filename, unsigned interval, bool multiple)
 {
 	file = filename.substr(0,  filename.find_last_of("."));
@@ -1048,6 +1052,9 @@ void MCMCAlgorithm::setRestartFileSettings(std::string filename, unsigned interv
  * Will set the specified steps to adapt for the run if the value is less than samples * thinning (aka, the number
  * of steps the run will last).The default parameter passed in as -1 uses the full iterations.
 */
+//' @name setStepsToAdapt
+//' @title Set number of iterations (total iterations = samples * thinning) to allow proposal widths to adapt
+//' @param steps postive value
 void MCMCAlgorithm::setStepsToAdapt(unsigned steps)
 {
 	if (steps <= samples * thinning)
@@ -1061,6 +1068,9 @@ void MCMCAlgorithm::setStepsToAdapt(unsigned steps)
  * Arguments: None
  * Return the value of stepsToAdapt
 */
+//' @name getStepsToAdapt
+//' @title Return number of iterations (total iterations = samples * thinning) to allow proposal widths to adapt
+
 int MCMCAlgorithm::getStepsToAdapt()
 {
 	return stepsToAdapt;
@@ -1071,6 +1081,10 @@ int MCMCAlgorithm::getStepsToAdapt()
  * Arguments: None
  * Return the log posterior trace.
 */
+
+//' @name getLogPosteriorTrace 
+//' @title Returns the logPosterior trace
+
 std::vector<double> MCMCAlgorithm::getLogPosteriorTrace()
 {
 	return posteriorTrace;
@@ -1081,6 +1095,10 @@ std::vector<double> MCMCAlgorithm::getLogPosteriorTrace()
  * Arguments: None
  * Return the log likelihoodTrace trace.
 */
+
+//' @name getLogLikelihoodTrace
+//' @title Returns the logLikelihood trace
+
 std::vector<double> MCMCAlgorithm::getLogLikelihoodTrace()
 {
 	return likelihoodTrace;
@@ -1092,6 +1110,12 @@ std::vector<double> MCMCAlgorithm::getLogLikelihoodTrace()
  * Calculates the mean for the specified number of samples from the end of the trace
  * for the loglikelihood trace.
 */
+
+
+//' @name getLogPosteriorMean
+//' @title Calculate the mean log posterior probability over the last n samples
+//' @param samples postive value less than total length of the MCMC trace
+
 double MCMCAlgorithm::getLogPosteriorMean(unsigned _samples)
 {
 	double posteriorMean = 0.0;
@@ -1269,6 +1293,9 @@ std::vector<std::vector<double>> MCMCAlgorithm::solveToeplitzMatrix(int lr, std:
  * Arguments: None
  * Return samples.
 */
+//' @name getSamples
+//' @title Return number of samples set for MCMCAlgorithm object
+
 unsigned MCMCAlgorithm::getSamples()
 {
     return samples;
@@ -1279,6 +1306,9 @@ unsigned MCMCAlgorithm::getSamples()
  * Arguments: None
  * Return thinning.
 */
+//' @name getThinning
+//' @title Return thinning value, which is the number of iterations (total iterations = samples * thinning) not being kept
+
 unsigned MCMCAlgorithm::getThinning()
 {
     return thinning;
@@ -1289,6 +1319,9 @@ unsigned MCMCAlgorithm::getThinning()
  * Arguments: None
  * Return adaptiveWidth.
 */
+//' @name getAdaptiveWidth
+//' @title Return sample adaptiveWidth value, which is the number of samples (not iterations) between adapting parameter proposal widths
+
 unsigned MCMCAlgorithm::getAdaptiveWidth()
 {
     return adaptiveWidth;
@@ -1299,6 +1332,10 @@ unsigned MCMCAlgorithm::getAdaptiveWidth()
  * Arguments: None
  * Change samples.
 */
+//' @name setSamples
+//' @title Set number of samples set for MCMCAlgorithm object
+//' @param _samples postive value
+
 void MCMCAlgorithm::setSamples(unsigned _samples)
 {
     samples = _samples;
@@ -1309,6 +1346,10 @@ void MCMCAlgorithm::setSamples(unsigned _samples)
  * Arguments: None
  * Change thinning.
 */
+//' @name setThinning
+//' @title  Set thinning value, which is the number of iterations (total iterations = samples * thinning) not being kept
+//' @param _thinning postive value
+
 void MCMCAlgorithm::setThinning(unsigned _thinning)
 {
     thinning = _thinning;
@@ -1319,6 +1360,10 @@ void MCMCAlgorithm::setThinning(unsigned _thinning)
  * Arguments: None
  * Change adaptiveWidth.
 */
+//' @name setAdaptiveWidth
+//' @title  Set sample adaptiveWidth value, which is the number of samples (not iterations) between adapting parameter proposal widths
+//' @param _adaptiveWidth postive value
+
 void MCMCAlgorithm::setAdaptiveWidth(unsigned _adaptiveWidth)
 {
     adaptiveWidth = _adaptiveWidth;

@@ -3010,7 +3010,7 @@ int testParameter(std::string testFileDir)
     //----------------------------------------------//
     //------ InitializeSynthesisRate Function ------//
     //----------------------------------------------//
-    parameter.InitializeSynthesisRate(genome, stdDev[0]);
+    parameter.InitializeSynthesisRate(genome);
 
     // This call changes currentSynthesisRateLevel, std_phi, and numAcceptForSynthesisRate.
     // These functions must now be checked.
