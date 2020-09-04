@@ -13,6 +13,10 @@ void roc_finalizer(ROCModel* m)
 }
 */
 
+//' @name simulateGenome
+//' @title Will simulate a version of the given genome using the current set of parameters stored in the Parameter object
+//' @param genome a Genome object initialized by initializeGenomeObject
+
 RCPP_EXPOSED_CLASS(ROCParameter)
 RCPP_EXPOSED_CLASS(PAParameter)
 RCPP_EXPOSED_CLASS(PANSEParameter)
