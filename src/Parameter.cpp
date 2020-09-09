@@ -634,11 +634,11 @@ void Parameter::initCategoryDefinitions(std::string _mutationSelectionState,
 /* InitializeSynthesisRate (using SCUO per genome) (RCPP EXPOSED VIA WRAPPER)
  * Arguments: //TODO
 */
-void Parameter::InitializeSynthesisRate(Genome& genome)
+void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 {
 	unsigned genomeSize = genome.getGenomeSize();
 	double* SCUOValues = new double[genomeSize]();
-	//double* expression = new double[genomeSize]();
+	double* expression = new double[genomeSize]();
 	int* index = new int[genomeSize]();
 
 
@@ -647,24 +647,24 @@ void Parameter::InitializeSynthesisRate(Genome& genome)
 		index[i] = i;
 		//This used to be maxGrouping instead of 22, but PA model will not work that way
 		SCUOValues[i] = calculateSCUO( genome.getGene(i));
-	//	expression[i] = Parameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
+		expression[i] = Parameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
 	}
 
 	quickSortPair(SCUOValues, index, 0, genomeSize);
-	//std::sort(expression, expression + genomeSize);
+	std::sort(expression, expression + genomeSize);
 
 	for (unsigned category = 0u; category < numSelectionCategories; category++)
 	{
 		for (unsigned j = 0u; j < genomeSize; j++)
 		{
-			currentSynthesisRateLevel[category][index[j]] = SCUOValues[j];
+			currentSynthesisRateLevel[category][index[j]] = expression[j];
 			std_phi[category][j] = 0.1;
 			numAcceptForSynthesisRate[category][j] = 0u;
 		}
 	}
 
 	delete [] SCUOValues;
-	//delete [] expression;
+	delete [] expression;
 	delete [] index;
 }
 
@@ -673,11 +673,10 @@ void Parameter::InitializeSynthesisRate(Genome& genome)
  * Arguments: //TODO
 */
 void Parameter::InitializeSynthesisRate(double sd_phi)
-{
-	unsigned numGenes = (unsigned)currentSynthesisRateLevel[1].size();
+{	unsigned genomeSize = (unsigned)currentSynthesisRateLevel[0].size();
 	for (unsigned category = 0u; category < numSelectionCategories; category++)
 	{
-		for (unsigned i = 0u; i < numGenes; i++)
+		for (unsigned i = 0u; i < genomeSize; i++)
 		{
 			currentSynthesisRateLevel[category][i] = Parameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
 			std_phi[category][i] = 0.1;
@@ -2409,9 +2408,9 @@ double Parameter::densityLogNorm(double x, double mean, double sd, bool log)
 //' @title Initialize synthesis rates using SCUO values calcuated from the genome
 //' @param genome a Genome object
 
-void Parameter::initializeSynthesisRateByGenome(Genome& genome)
+void Parameter::initializeSynthesisRateByGenome(Genome& genome,double sd_phi)
 {
-	InitializeSynthesisRate(genome);
+	InitializeSynthesisRate(genome,sd_phi);
 }
 
 //' @name initializeSynthesisRateByRandom

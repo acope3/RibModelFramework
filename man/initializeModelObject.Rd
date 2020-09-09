@@ -24,8 +24,6 @@ phi values (expression rates) for the calculations. Default value is FALSE}
 The initial condition for the observed expression noise is set in the parameter object. Default value is FALSE.}
 
 \item{rfp.count.column}{(PA and PANSE only) A number representing the RFP count column to use. Default value is 1.}
-
-\item{initiation.cost}{(FONSE only) A positive number representing the initiation cost of initiating protein translation (a_1 in the model description, the elongation cost a_2 = 4 ~P) Default value is 4 ~P.}
 }
 \value{
 This function returns the model object created.

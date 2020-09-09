@@ -1,7 +1,7 @@
 #' Plot Model Object
 #' 
 #' @param model An Rcpp model object initialized with \code{initializeModelObject}.
-#' @param genome An Rcpp genome object initialized with \code{initializeGenomeObject}.#
+#' @param genome An Rcpp genome object initialized with \code{initializeGenomeObject}.
 #' @param samples The number of samples in the trace
 #' @param mixture The mixture for which to graph values.
 #' @param simulated A boolean value that determines whether to use the simulated genome.
@@ -61,7 +61,7 @@ plot.Rcpp_ROCModel <- function(model, genome = NULL, samples = 100, mixture = 1,
   {
     if(aa == "M" || aa == "W" || aa == "X") next
     codon.probability <- calculateProbabilityVector(parameter,model,expressionValues,mixture,samples,aa,model.type="ROC")
-    xlimit <- plotSinglePanel(parameter, x, genome, expressionValues, samples, mixture, aa,codon.probability = codon.probability)
+    xlimit <- plotSinglePanel(parameter, model, genome, expressionValues, samples, mixture, aa,codon.probability = codon.probability)
     box()
     main.aa <- aa #TODO map to three letter code
     text(mean(xlimit), 1, main.aa, cex = 1.5)
@@ -193,7 +193,7 @@ plot.Rcpp_FONSEModel <- function(model, genome, samples = 100, mixture = 1,
   {
     if(aa == "M" || aa == "W" || aa == "X") next
     codon.probability <- calculateProbabilityVector(parameter,model,expressionValues,mixture,samples,aa,model.type="FONSE",codon.window = codon.window)
-    xlimit <- plotSinglePanel(parameter, x, genome, expressionValues, samples, mixture, aa,codon.probability = codon.probability)
+    xlimit <- plotSinglePanel(parameter, model, genome, expressionValues, samples, mixture, aa,codon.probability = codon.probability)
     box()
     main.aa <- aa #TODO map to three letter code
     text(mean(xlimit), 1, main.aa, cex = 1.5)

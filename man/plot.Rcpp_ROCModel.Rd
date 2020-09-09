@@ -9,7 +9,7 @@
 \arguments{
 \item{model}{An Rcpp model object initialized with \code{initializeModelObject}.}
 
-\item{genome}{An Rcpp genome object initialized with \code{initializeGenomeObject}.#}
+\item{genome}{An Rcpp genome object initialized with \code{initializeGenomeObject}.}
 
 \item{samples}{The number of samples in the trace}
 
