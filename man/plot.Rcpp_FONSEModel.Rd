@@ -5,7 +5,7 @@
 \title{Plot Model Object}
 \usage{
 \method{plot}{Rcpp_FONSEModel}(
-  model,
+  x,
   genome,
   samples = 100,
   mixture = 1,
@@ -15,7 +15,7 @@
 )
 }
 \arguments{
-\item{model}{An Rcpp model object initialized with \code{initializeModelObject}.}
+\item{x}{An Rcpp model object initialized with \code{initializeModelObject}.}
 
 \item{genome}{An Rcpp genome object initialized with \code{initializeGenomeObject}.}
 

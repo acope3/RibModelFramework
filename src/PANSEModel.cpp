@@ -317,7 +317,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
     double currAdjustmentTerm = 0;
     double propAdjustmentTerm = 0;
     Gene *gene;
-    unsigned index = SequenceSummary::codonToIndex(grouping);
+    //unsigned index = SequenceSummary::codonToIndex(grouping);
     std::vector<double> codonSigmas;
     unsigned n = getNumMixtureElements();
     unsigned Y = genome.getSumRFP();
@@ -651,8 +651,8 @@ void PANSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
     }
    
 
-    double currZ = getPartitionFunction(0, false);
-    double propZ = getPartitionFunction(0, true);
+    //double currZ = getPartitionFunction(0, false);
+    //double propZ = getPartitionFunction(0, true);
     for (unsigned j = 0; j < n; j++)
     {
         lpr -= (std::log(getPartitionFunction(j, false)) - std::log(getPartitionFunction(j, true)));
@@ -1270,8 +1270,8 @@ void PANSEModel::simulateGenome(Genome &genome)
             {
                 my_print("Stop codon being used during simulations\n");
             }
-            double alpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, false);
-            double lambda = getParameterForCategory(lambdaCategory, PANSEParameter::lmPri, codon, false);
+            //double alpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, false);
+            //double lambda = getParameterForCategory(lambdaCategory, PANSEParameter::lmPri, codon, false);
             double NSERate = getParameterForCategory(alphaCategory, PANSEParameter::nse, codon, false);
             v = 1.0 / NSERate;
 #ifndef STANDALONE

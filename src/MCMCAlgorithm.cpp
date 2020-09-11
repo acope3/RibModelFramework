@@ -99,7 +99,7 @@ MCMCAlgorithm::~MCMCAlgorithm()
 double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, Model& model, int iteration)
 {
     
-	double loglikelihood;
+	double loglikelihood = 0.0;
 	double logPosterior = 0.0;
     //double logPosterior2 = 0.0; //currently unused
 	int numGenes = genome.getGenomeSize();

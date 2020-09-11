@@ -858,7 +858,7 @@ void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptatio
 
   adaptiveStepPrev = adaptiveStepCurr;
   adaptiveStepCurr = lastIteration;
-  unsigned samples = adaptiveStepCurr - adaptiveStepPrev;
+  //unsigned samples = adaptiveStepCurr - adaptiveStepPrev;
 
   my_print("Acceptance rates for Codon Specific Parameters\n");
   my_print("Target range: %-% \n", factorCriteriaLow, factorCriteriaHigh );
