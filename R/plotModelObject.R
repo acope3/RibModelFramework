@@ -1,6 +1,6 @@
 #' Plot Model Object
 #' 
-#' @param model An Rcpp model object initialized with \code{initializeModelObject}.
+#' @param x An Rcpp model object initialized with \code{initializeModelObject}.
 #' @param genome An Rcpp genome object initialized with \code{initializeGenomeObject}.
 #' @param samples The number of samples in the trace
 #' @param mixture The mixture for which to graph values.
@@ -17,9 +17,10 @@
 #' Otherwise, the expression values plotted will just be SCUO values estimated upon
 #' initialization of the Parameter object.
 
-plot.Rcpp_ROCModel <- function(model, genome = NULL, samples = 100, mixture = 1, 
+plot.Rcpp_ROCModel <- function(x, genome = NULL, samples = 100, mixture = 1, 
                                simulated = FALSE, ...)
 {
+  model <- x
   opar <- par(no.readonly = T) 
   
   input_list <- as.list(list(...))
@@ -103,7 +104,7 @@ plot.Rcpp_ROCModel <- function(model, genome = NULL, samples = 100, mixture = 1,
 
 #' Plot Model Object
 #' 
-#' @param model An Rcpp model object initialized with \code{initializeModelObject}.
+#' @param x An Rcpp model object initialized with \code{initializeModelObject}.
 #'
 #' @param genome An Rcpp genome object initialized with \code{initializeGenomeObject}.
 #'
@@ -127,9 +128,10 @@ plot.Rcpp_ROCModel <- function(model, genome = NULL, samples = 100, mixture = 1,
 #' Otherwise, the expression values plotted will just be SCUO values estimated upon
 #' initialization of the Parameter object.
 #'
-plot.Rcpp_FONSEModel <- function(model, genome, samples = 100, mixture = 1, 
+plot.Rcpp_FONSEModel <- function(x, genome, samples = 100, mixture = 1, 
                                simulated = FALSE, codon.window = NULL,...)
 {
+  model <- x
   opar <- par(no.readonly = T) 
   
   input_list <- as.list(list(...))

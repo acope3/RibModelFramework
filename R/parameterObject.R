@@ -490,7 +490,7 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
 #'  
 #' @description initializes the model object. 
 #' 
-#' @details calculate_marginal_log_likelihood Calculate marginal log-likelihood for
+#' @details calculateMarginalLogLikelihood Calculate marginal log-likelihood for
 #' calculation of the Bayes factor using a generalized harmonix mean estimator of the 
 #' marginal likelihood. See Gronau et al. (2017) for details
 #'
@@ -514,7 +514,7 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
 #' cat("Bayes factor: ", mll1 - mll2, "\n")
 #' }
 #'  
-calculate_marginal_log_likelihood <- function(parameter, mcmc, mixture, n.samples, divisor,warnings=TRUE)
+calculateMarginalLogLikelihood <- function(parameter, mcmc, mixture, n.samples, divisor,warnings=TRUE)
 {  
   if(divisor < 1) stop("Generalized Harmonic Mean Estimation of Marginal Likelihood requires importance sampling distribution variance divisor be greater than 1")
   
@@ -977,8 +977,8 @@ getCSPbyLogit <- function(codonCounts, phi, coefstart = NULL, x.arg = FALSE,
   idx <- rowSums(codonCounts) != 0
   
   # performs the regression and returns Delta M and Delta eta as well as other information no used here
-  ret <- VGAM::vglm(codonCounts[idx, ] ~ phi[idx],
-                    VGAM::multinomial, coefstart = coefstart,
+  ret <- vglm(codonCounts[idx, ] ~ phi[idx],
+                    multinomial, coefstart = coefstart,
                     x.arg = x.arg, y.arg = y.arg, qr.arg = qr.arg)
   coefficients <- ret@coefficients
   
