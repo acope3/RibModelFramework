@@ -1394,7 +1394,7 @@ void Parameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool a
 	double factorCriteriaHigh;
 	double adjustFactorLow = 0.8; //factor by which to reduce proposal widths
 	double adjustFactorHigh = 1.3; //factor by which to increase proposal widths
-	double adjustFactor; //variable assigned value of either adjustFactorLow or adjustFactorHigh depending on acceptance rate
+	double adjustFactor = 1.0; //variable assigned value of either adjustFactorLow or adjustFactorHigh depending on acceptance rate
 
 	factorCriteriaLow = acceptanceTargetLow;
 	factorCriteriaHigh = acceptanceTargetHigh;
@@ -1453,7 +1453,7 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
   double factorCriteriaHigh;
   double adjustFactorLow = 0.8; //factor by which to reduce proposal widths
   double adjustFactorHigh = 1.2; //factor by which to increase proposal widths
-  double adjustFactor; //variable assigned value of either adjustFactorLow or adjustFactorHigh
+  double adjustFactor = 1.0; //variable assigned value of either adjustFactorLow or adjustFactorHigh
 
   factorCriteriaLow = acceptanceTargetLow - diffFactorAdjust;  //below this value weighted sum and factor adjustments are applied
   factorCriteriaHigh = acceptanceTargetHigh + diffFactorAdjust;  //above this value weighted sum and factor adjustments are applied
@@ -1985,7 +1985,7 @@ std::vector<double> Parameter::getExpressionQuantile(unsigned samples, unsigned 
 	std::vector<float> parameterTrace = traces.getSynthesisRateTraceForGene(geneIndex);
 	if (parameterTrace.size() == 1)
 	{
-		for (int i; i < probs.size();i++)
+		for (int i = 0; i < probs.size();i++)
 		{
 			quantile[i] = parameterTrace[0];
 		}
