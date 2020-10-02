@@ -222,23 +222,20 @@ void SequenceSummary::setCodonTable(unsigned codon_table_number)
 		std::map<std::string, std::string>::iterator it_2;
 
 		std::string L("L");
-		std::string Z("Z");
 		std::string CTG("CTG");
 
 		it_1 = AAToCodonsMapWithReference.find(L);
 		it_1 -> second = {"CTA", "CTC", "CTT", "TTA", "TTG"};
-		it_1 = AAToCodonsMapWithReference.find(Z);
-		it_1 -> second = {"AGC", "AGT", "CTG"};
+		
 		
 		it_1 = AAToCodonsMapWithoutReference.find(L);
 		it_1 -> second = {"CTA", "CTC", "CTT", "TTA"};
-		it_1 = AAToCodonsMapWithoutReference.find(Z);
-		it_1 -> second = {"AGC", "CTG"};
+		
 
 		
 
 		it_2 = codonToAAMap.find(CTG);
-		it_2 -> second = "Z";
+		it_2 -> second = "J";
 	}
 	
 }
