@@ -31,7 +31,7 @@ plot.Rcpp_MCMCAlgorithm <- function(x, what = "LogPosterior", zoom.window = NULL
   zoomEnd <- trace.length
   logL <- mean(trace[zoomStart:trace.length])
   #TODO change main title
-  plot(trace, type="l", main=paste0(ylab, ": ", logL), xlab="Sample", ylab=ylab)
+  plot(trace, type="l", main=paste0(ylab, ": ", round(logL, 1)), xlab="Sample", ylab=ylab)
   grid (NULL,NULL, lty = 6, col = "cornsilk2")
   trace[trace == -Inf] <- NA
   
