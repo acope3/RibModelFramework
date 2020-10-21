@@ -1535,8 +1535,8 @@ setBaseInfo <- function(parameter, files)
 
       withPhi <- tempEnv$paramBase$withPhi
       if (withPhi){
-        phiGroups <- length(tempEnv$synthesisOffsetTrace)
-        synthesisOffsetTrace <- c()
+        phiGroups <- length(tempEnv$paramBase$synthesisOffsetTrace)
+        synthesisOffsetTrace <- vector(mode="list",length=phiGroups)
         for (j in 1:phiGroups) {
           synthesisOffsetTrace[[j]] <- tempEnv$paramBase$synthesisOffsetTrace[[j]][1:max]
         }
@@ -1545,7 +1545,7 @@ setBaseInfo <- function(parameter, files)
         synthesisOffsetAcceptanceRateTrace <- tempEnv$paramBase$synthesisOffsetAcceptRatTrace
         
         
-        observedSynthesisNoiseTrace <- c()
+        observedSynthesisNoiseTrace <- vector(mode="list",length=phiGroups)
         for (j in 1:phiGroups) {
           observedSynthesisNoiseTrace[[j]] <- tempEnv$paramBase$observedSynthesisNoiseTrace[[j]][1:max]
         }
