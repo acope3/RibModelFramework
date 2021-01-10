@@ -123,6 +123,9 @@ class Model
 		virtual void simulateGenome(Genome &genome) =0;
 		virtual void printHyperParameters() = 0;
 
+
+		virtual void calculateUniversalParameter(Genome& genome,unsigned index,unsigned k);
+		virtual void updateUniversalParameter();
 	protected:
 		bool withPhi;
 		bool fix_sEpsilon;
