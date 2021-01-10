@@ -92,7 +92,7 @@ RCPP_MODULE(Parameter_mod)
 
 
 		.method("fixSphi",&Parameter::fixStdDevSynthesis)
-
+		.method("setStdDevSynthesisRate",&Parameter::setStdDevSynthesisRate)
 
 
 		//Used for getters and setters

@@ -1074,20 +1074,26 @@ void PANSEModel::updateHyperParameter(unsigned hp)
 
 void PANSEModel::simulateGenome(Genome &genome)
 {
-    unsigned Y = parameter->getTotalRFPCount();
+    unsigned Y = genome.getSumRFP();
+    double Z = 0;
+    std::vector<std::vector<double>> wait_times;
+    wait_times.resize(genome.getGenomeSize());
+
     for (unsigned geneIndex = 0u; geneIndex < genome.getGenomeSize(); geneIndex++)
     {
+
         unsigned mixtureElement = getMixtureAssignment(geneIndex);
         Gene gene = genome.getGene(geneIndex);
         double phi = parameter->getSynthesisRate(geneIndex, mixtureElement, false);
         SequenceSummary sequence = gene.geneData;
         Gene tmpGene = gene;
         std::vector <unsigned> positions = sequence.getPositionCodonID();
+        wait_times[geneIndex].resize(positions.size());
         std::vector <unsigned> rfpCount;
         unsigned alphaCategory = parameter->getMutationCategory(mixtureElement);
         unsigned lambdaCategory = parameter->getSelectionCategory(mixtureElement);
 
-        double U = getPartitionFunction(mixtureElement, false)/Y;
+        //double U = getPartitionFunction(mixtureElement, false)/Y;
         double sigma =  1.0;
         double v;
         for (unsigned positionIndex = 0; positionIndex < positions.size(); positionIndex++)
@@ -1105,27 +1111,71 @@ void PANSEModel::simulateGenome(Genome &genome)
             double alpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, false);
             double lambda = getParameterForCategory(lambdaCategory, PANSEParameter::lmPri, codon, false);
             double NSERate = getParameterForCategory(alphaCategory, PANSEParameter::nse, codon, false);
-            
             v = 1.0 / NSERate;
 #ifndef STANDALONE
             RNGScope scope;
             NumericVector wt(1);
+            wt = rgamma(1, alpha,1/(lambda));
+            wait_times[geneIndex][positionIndex] = wt[0];
+            sigma *= (v/(wait_times[geneIndex][positionIndex] + v));
+#else
+            std::gamma_distribution<double> GDistribution(alpha, 1.0/(lambda));
+            wait_times[geneIndex][positionIndex] = GDistribution(Parameter::generator);
+            sigma *= (v/(wait_times[geneIndex][positionIndex] + v));
+#endif
+            Z += phi * wait_times[geneIndex][positionIndex] * sigma;
+        }
+    }
+    double U = Z/Y;
+    my_print("True value of Z: %\n",Z);
+    for (unsigned geneIndex = 0u; geneIndex < genome.getGenomeSize(); geneIndex++)
+    {
+
+        unsigned mixtureElement = getMixtureAssignment(geneIndex);
+        Gene gene = genome.getGene(geneIndex);
+        double phi = parameter->getSynthesisRate(geneIndex, mixtureElement, false);
+        SequenceSummary sequence = gene.geneData;
+        Gene tmpGene = gene;
+        std::vector <unsigned> positions = sequence.getPositionCodonID();
+        wait_times[geneIndex].resize(positions.size());
+        std::vector <unsigned> rfpCount;
+        unsigned alphaCategory = parameter->getMutationCategory(mixtureElement);
+        unsigned lambdaCategory = parameter->getSelectionCategory(mixtureElement);
+
+        double sigma =  1.0;
+        double v;
+        
+        
+        for (unsigned positionIndex = 0; positionIndex < positions.size(); positionIndex++)
+        {
+            unsigned codonIndex = positions[positionIndex];
+            std::string codon = sequence.indexToCodon(codonIndex);
+            if (positionIndex == 0 && codon != "ATG")
+            {
+                my_print("Gene % does not start with ATG\n",gene.getId());
+            }
+            if (codon == "TAG" || codon == "TGA" || codon == "TAA")
+            {
+                my_print("Stop codon being used during simulations\n");
+            }
+            //double alpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, false);
+            //double lambda = getParameterForCategory(lambdaCategory, PANSEParameter::lmPri, codon, false);
+            double NSERate = getParameterForCategory(alphaCategory, PANSEParameter::nse, codon, false);
+            v = 1.0 / NSERate;
+#ifndef STANDALONE
+            RNGScope scope;
             NumericVector ribo_count(1);
-            NumericVector prob_seeing_ribo(1);
-            wt = rgamma(1, alpha,1/(lambda*U));
-            ribo_count = rpois(1, wt[0] * phi * sigma);
-            prob_seeing_ribo = (v/(wt[0] + v));
-            sigma *= (v/(wt[0] + v));
+            ribo_count = rpois(1, wait_times[geneIndex][positionIndex] * (1.0/U) * phi * sigma);
+            sigma *= (v/(wait_times[geneIndex][positionIndex] + v));
             rfpCount.push_back(ribo_count[0]);
 #else
-            std::gamma_distribution<double> GDistribution(alpha, 1.0/(lambda*U));
-            double tmp = GDistribution(Parameter::generator);
-            std::poisson_distribution<unsigned> PDistribution(phi * tmp * sigma);
+            std::poisson_distribution<unsigned> PDistribution(phi * wait_times[geneIndex][positionIndex] * (1.0/U) * sigma);
             unsigned simulatedValue = PDistribution(Parameter::generator);
             sigma *= (v/(tmp + v));
             rfpCount.push_back(simulatedValue);
 #endif
         }
+
         tmpGene.geneData.setRFPCount(rfpCount, RFPCountColumn);
         genome.addGene(tmpGene, true);
     }

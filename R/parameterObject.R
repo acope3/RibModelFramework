@@ -375,7 +375,7 @@ initializePANSEParameterObject <- function(genome, sphi, numMixtures, geneAssign
   if(is.null(expressionValues) && init.w.obs.phi == F)
   {
     parameter$initializeSynthesisRateByGenome(genome, mean(sphi))
-    
+    print("phi values initialized")
   } 
   else if(init.w.obs.phi == T && is.null(expressionValues))
   {
@@ -409,7 +409,6 @@ initializePANSEParameterObject <- function(genome, sphi, numMixtures, geneAssign
   if (n.obs.phi.sets != 0){
     parameter$setInitialValuesForSepsilon(as.vector(init.sepsilon))
   }
-  parameter <- initializeCovarianceMatricesForRFP(parameter,init.csp.variance)
   return (parameter)
 }
 
@@ -674,6 +673,15 @@ getNSEProbabilityTrace <- function(parameter,mixture,codon,samples)
   return(prob.nse.trace[(length(prob.nse.trace)-samples):length(prob.nse.trace)])
 }
 
+getEffectiveSampleSizesByCodon <- function(parameter,codon,samples,paramType,mixture=1,thin=10,withoutReference=T)
+{
+  trace <- parameter$getTraceObject()
+  trace.vec <-trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture,codon,paramType,withoutReference)
+  trace.vec <- trace.vec[(length(trace.vec)-samples):(length(trace.vec))]
+  mcmc.csp <- coda::mcmc(trace.vec,thin)
+  return(coda::effectiveSize(mcmc.csp))     
+}
+
 
 
 #' Return Codon Specific Paramters (or write to csv) estimates as data.frame
@@ -689,7 +697,9 @@ getNSEProbabilityTrace <- function(parameter,mixture,codon,samples)
 #' @param relative.to.optimal.codon Boolean determining if parameters should be relative to the preferred codon or the alphabetically last codon (Default=TRUE). Only applies to ROC and FONSE models 
 #'
 #' @param report.original.ref Include the original reference codon (Default = TRUE). Note this is only included for the purposes of simulations, which expect the input parameter file to be in a specific format. Later version of AnaCoDa will remove this. 
-
+#'
+#' @param log.scale Calculate posterior means, standard deviation, and posterior probability intervals on the natural log scale. Should be used for PA and PANSE models only.
+#'
 #' @return returns a list data.frame with the posterior estimates of the models 
 #' codon specific parameters or writes it directly to a csv file if \code{filename} is specified
 #' 
@@ -727,7 +737,7 @@ getNSEProbabilityTrace <- function(parameter,mixture,codon,samples)
 #' 
 #' }
 
-getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10, relative.to.optimal.codon=T, report.original.ref = T,log.scale=F)
+getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10, relative.to.optimal.codon=T, report.original.ref = T,log.scale=F,thin=10)
 {
   if((class(parameter)=="Rcpp_ROCParameter" || class(parameter)=="Rcpp_FONSEParameter") && log.scale)
   {
@@ -743,10 +753,10 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
   ## Creates empty vector of 0 for initial dataframes
   init <- rep(0.0,length(codons))
   
-  param.1<- data.frame(Codon=codons,AA=names.aa,Mean=init,Std.Dev=init,Lower.quant=init,Upper.quant=init,stringsAsFactors = F,row.names = codons)
-  param.2 <- data.frame(Codon=codons,AA=names.aa,Mean=init,Std.Dev=init,Lower.quant=init,Upper.quant=init,stringsAsFactors = F,row.names=codons)
-  param.3 <- data.frame(Codon=codons,AA=names.aa,Mean=init,Std.Dev=init,Lower.quant=init,Upper.quant=init,stringsAsFactors = F,row.names=codons)
-  param.4 <- data.frame(Codon=codons,AA=names.aa,Mean=init,Std.Dev=init,Lower.quant=init,Upper.quant=init,stringsAsFactors = F,row.names=codons)
+  param.1<- data.frame(Codon=codons,AA=names.aa,Mean=init,Std.Dev=init,Effective.Samples=init,Lower.quant=init,Upper.quant=init,stringsAsFactors = F,row.names = codons)
+  param.2 <- data.frame(Codon=codons,AA=names.aa,Mean=init,Std.Dev=init,Effective.Samples=init,Lower.quant=init,Upper.quant=init,stringsAsFactors = F,row.names=codons)
+  param.3 <- data.frame(Codon=codons,AA=names.aa,Mean=init,Std.Dev=init,Effective.Samples=init,Lower.quant=init,Upper.quant=init,stringsAsFactors = F,row.names=codons)
+  param.4 <- data.frame(Codon=codons,AA=names.aa,Mean=init,Std.Dev=init,Effective.Samples=init,Lower.quant=init,Upper.quant=init,stringsAsFactors = F,row.names=codons)
   
   if (model.uses.ref.codon)
   {
@@ -761,11 +771,17 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
     param.2[codon,"Std.Dev"] <- sqrt(parameter$getCodonSpecificVariance(mixtureElement=mixture,samples=samples,codon=codon,paramType=1,unbiased=T,withoutReference=model.uses.ref.codon,log_scale=log.scale))
     param.1[codon,c("Lower.quant","Upper.quant")] <- parameter$getCodonSpecificQuantile(mixtureElement=mixture, samples=samples,codon=codon,paramType=0, probs=c(0.025, 0.975),withoutReference=model.uses.ref.codon,log_scale=log.scale)
     param.2[codon,c("Lower.quant","Upper.quant")]  <- parameter$getCodonSpecificQuantile(mixtureElement=mixture, samples=samples,codon=codon,paramType=1, probs=c(0.025, 0.975),withoutReference=model.uses.ref.codon,log_scale=log.scale)
+    param.1[codon,c("Effective.Samples")] <- getEffectiveSampleSizesByCodon(parameter,codon,samples=samples,paramType=0,withoutReference=model.uses.ref.codon,thin=thin)
+    param.2[codon,c("Effective.Samples")] <- getEffectiveSampleSizesByCodon(parameter,codon,samples=samples,paramType=1,withoutReference=model.uses.ref.codon,thin=thin)
+    
     if (length(parameter.names) == 4)
     {
       param.3[codon,"Mean"] <- parameter$getCodonSpecificPosteriorMean(mixtureElement=mixture,samples=samples,codon=codon,paramType=2,withoutReference=model.uses.ref.codon,log_scale=log.scale)
       param.3[codon,"Std.Dev"] <- sqrt(parameter$getCodonSpecificVariance(mixtureElement=mixture,samples=samples,codon=codon,paramType=2,unbiased=T,withoutReference=model.uses.ref.codon,log_scale=log.scale))
       param.3[codon,c("Lower.quant","Upper.quant")] <- parameter$getCodonSpecificQuantile(mixtureElement=mixture, samples=samples,codon=codon,paramType=2, probs=c(0.025, 0.975),withoutReference=model.uses.ref.codon,log_scale=log.scale)
+      param.3[codon,c("Effective.Samples")] <- getEffectiveSampleSizesByCodon(parameter,codon,samples=samples,paramType=2,withoutReference=model.uses.ref.codon,thin=thin)
+      
+
       prob.nse.trace <- getNSEProbabilityTrace(parameter,mixture,codon,samples)
       if (log.scale)
       {
@@ -774,14 +790,15 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
       param.4[codon,"Mean"] <- mean(prob.nse.trace)
       param.4[codon,"Std.Dev"] <- sd(prob.nse.trace)
       param.4[codon,c("Lower.quant","Upper.quant")] <- quantile(prob.nse.trace,probs=c(0.025,0.975),type=8)
-     
 
+      mcmc.prob.nse.trace <- coda::mcmc(prob.nse.trace[(length(prob.nse.trace)-samples):(length(prob.nse.trace))],thin)
+      param.4[codon,c("Effective.Samples")] <- coda::effectiveSize(mcmc.prob.nse.trace)
     }
   }
-  colnames(param.1) <- c("Codon", "AA", "Mean","Std.Dev","2.5%", "97.5%")
-  colnames(param.2) <- c("Codon", "AA", "Mean","Std.Dev","2.5%", "97.5%")
-  colnames(param.3) <- c("Codon", "AA", "Mean","Std.Dev","2.5%", "97.5%")
-  colnames(param.4) <- c("Codon", "AA", "Mean","Std.Dev","2.5%", "97.5%")
+  colnames(param.1) <- c("Codon", "AA", "Mean","Std.Dev","Effective.Samples","2.5%", "97.5%")
+  colnames(param.2) <- c("Codon", "AA", "Mean","Std.Dev","Effective.Samples","2.5%", "97.5%")
+  colnames(param.3) <- c("Codon", "AA", "Mean","Std.Dev","Effective.Samples","2.5%", "97.5%")
+  colnames(param.4) <- c("Codon", "AA", "Mean","Std.Dev","Effective.Samples","2.5%", "97.5%")
   
   ## Only called if model actually uses reference codon
   if(relative.to.optimal.codon && model.uses.ref.codon)
@@ -799,12 +816,12 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
     names(csp.param) <- parameter.names
      
 
-    csp.param[[parameter.names[1]]] <- param.1[,c("AA", "Codon", "Mean", "Std.Dev","2.5%", "97.5%")]
-    csp.param[[parameter.names[2]]] <- param.2[,c("AA", "Codon", "Mean", "Std.Dev","2.5%", "97.5%")]
+    csp.param[[parameter.names[1]]] <- param.1[,c("AA", "Codon", "Mean", "Std.Dev","Effective.Samples","2.5%", "97.5%")]
+    csp.param[[parameter.names[2]]] <- param.2[,c("AA", "Codon", "Mean", "Std.Dev","Effective.Samples","2.5%", "97.5%")]
     if (length(parameter.names)==4)
     {
-      csp.param[[parameter.names[3]]] <- param.3[,c("AA", "Codon", "Mean", "Std.Dev","2.5%", "97.5%")]
-      csp.param[[parameter.names[4]]] <- param.4[,c("AA", "Codon", "Mean", "Std.Dev","2.5%", "97.5%")]
+      csp.param[[parameter.names[3]]] <- param.3[,c("AA", "Codon", "Mean", "Std.Dev","Effective.Samples","2.5%", "97.5%")]
+      csp.param[[parameter.names[4]]] <- param.4[,c("AA", "Codon", "Mean", "Std.Dev","Effective.Samples","2.5%", "97.5%")]
     }
   }
   if(is.null(filename))
@@ -826,7 +843,6 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
     }
   }
 }
-
 ## NOT EXPOSED
 optimalAsReference <- function(param.1,param.2,parameter.names,report.original.ref)
 {
@@ -1223,8 +1239,15 @@ getMixtureAssignmentEstimate <- function(parameter, gene.index, samples)
 #' estimatedExpression <- getExpressionEstimates(parameter, 1:length(genome), 1000)
 #' }
 #' 
-getExpressionEstimates <- function(parameter, gene.index, samples, quantiles=c(0.025, 0.975))
+getExpressionEstimates <- function(parameter, gene.index, samples, quantiles=c(0.025, 0.975),genome=NULL)
 {
+  if (!is.null(genome))
+  {
+    geneID <- unlist(lapply(gene.index, function(geneIndex){
+      gene <- genome$getGeneByIndex(geneIndex,F);
+      gene$id
+      }))
+  }
   expressionValues <- unlist(lapply(gene.index, function(geneIndex){ 
     parameter$getSynthesisRatePosteriorMeanForGene(samples, geneIndex, FALSE) 
   }))
@@ -1251,8 +1274,14 @@ getExpressionEstimates <- function(parameter, gene.index, samples, quantiles=c(0
   })
   expressionQuantileLog <- do.call(rbind, expressionQuantileLog)
   
-  expr.mat <- cbind(expressionValues, expressionValuesLog, expressionStdErr, expressionStdErrLog, expressionQuantile, expressionQuantileLog)
-  colnames(expr.mat) <- c("Mean", "Mean.log10", "Std.Dev", "log10.Std.Dev", quantiles, paste("log10.", quantiles, sep=""))
+  if (is.null(genome))
+  {
+    expr.mat <- cbind(expressionValues, expressionValuesLog, expressionStdErr, expressionStdErrLog, expressionQuantile, expressionQuantileLog)
+    colnames(expr.mat) <- c("Mean", "Mean.log10", "Std.Dev", "log10.Std.Dev", quantiles, paste("log10.", quantiles, sep=""))
+  } else {
+    expr.mat <- cbind(geneID,expressionValues, expressionValuesLog, expressionStdErr, expressionStdErrLog, expressionQuantile, expressionQuantileLog)
+    colnames(expr.mat) <- c("GeneID","Mean", "Mean.log10", "Std.Dev", "log10.Std.Dev", quantiles, paste("log10.", quantiles, sep=""))
+  }
   return(expr.mat)
 }
 
