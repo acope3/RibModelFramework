@@ -56,6 +56,7 @@ set.seed(446141)
 genome <- initializeGenomeObject(file = fileName, observed.expression.file = expressionFile, match.expression.by.id=FALSE)
 
 geneAssignment <- sample(c(1,2), size = length(genome), replace = TRUE, prob = c(0.3, 0.7)) #c(rep(1,500), rep(2,500))
+
 parameter <- initializeParameterObject(genome, sphi_init, numMixtures, geneAssignment, split.serine = TRUE, mixture.definition = mixDef)
 parameter$initSelectionCategories(c(selectionMainFile, selectionHtFile), 2,F)
 parameter$initMutationCategories(c(mutationMainFile, mutationHtFile), 2,F)
@@ -67,7 +68,6 @@ outFile = file.path("UnitTestingOut", "testMCMCROCLogPhi.txt")
 sink(outFile)
 runMCMC(mcmc, genome, model, 1, divergence.iteration)
 sink()
-
 test_that("identical MCMC-ROC input with Phi, same log posterior", {
   knownLogPosterior <- -942493
   print(round(mcmc$getLogPosteriorTrace()[10]))
@@ -92,7 +92,6 @@ outFile = file.path("UnitTestingOut", "testMCMCROCLogWithoutPhi.txt")
 sink(outFile)
 runMCMC(mcmc, genome, model, 1, divergence.iteration)
 sink()
-
 test_that("identical MCMC-ROC input without Phi, same log posterior", {
   knownLogPosterior <- -960298
   print(round(mcmc$getLogPosteriorTrace()[10]))

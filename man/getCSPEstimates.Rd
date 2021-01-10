@@ -4,9 +4,15 @@
 \alias{getCSPEstimates}
 \title{Return Codon Specific Paramters (or write to csv) estimates as data.frame}
 \usage{
-getCSPEstimates(parameter, filename = NULL, mixture = 1,
-  samples = 10, relative.to.optimal.codon = T,
-  report.original.ref = T)
+getCSPEstimates(
+  parameter,
+  filename = NULL,
+  mixture = 1,
+  samples = 10,
+  relative.to.optimal.codon = T,
+  report.original.ref = T,
+  log.scale = F
+)
 }
 \arguments{
 \item{parameter}{parameter an object created by \code{initializeParameterObject}.}
@@ -15,11 +21,13 @@ getCSPEstimates(parameter, filename = NULL, mixture = 1,
 
 \item{mixture}{estimates for which mixture should be returned}
 
-\item{samples}{The number of samples used for the posterior estimates. Earlier proportion of samples are usually not used, for example: samples*0.5 use the second half of the samples }
+\item{samples}{The number of samples used for the posterior estimates.}
 
 \item{relative.to.optimal.codon}{Boolean determining if parameters should be relative to the preferred codon or the alphabetically last codon (Default=TRUE). Only applies to ROC and FONSE models}
 
 \item{report.original.ref}{Include the original reference codon (Default = TRUE). Note this is only included for the purposes of simulations, which expect the input parameter file to be in a specific format. Later version of AnaCoDa will remove this.}
+
+\item{log.scale}{Calculate posterior means, standard deviation, and posterior probability intervals on the natural log scale. Should be used for PA and PANSE models only.}
 }
 \value{
 returns a list data.frame with the posterior estimates of the models 

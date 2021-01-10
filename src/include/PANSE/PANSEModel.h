@@ -22,10 +22,10 @@ class PANSEModel: public Model
       
         std::vector<double> prob_successful;
 
-
-
-        virtual void fillMatrices(Genome& genome);
-        virtual void clearMatrices();
+        
+        
+        
+        std::vector<double> Z;
 
 	public:
 		//Constructors & Destructors:
@@ -33,6 +33,9 @@ class PANSEModel: public Model
 		virtual ~PANSEModel();
 
 		std::string type = "PANSE";
+
+		virtual void fillMatrices(Genome& genome);
+        virtual void clearMatrices();
 
 		//Likelihood Ratio Functions:
 		virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k,
@@ -145,7 +148,7 @@ class PANSEModel: public Model
         
         double elongationUntilIndexApproximation1Probability(double alpha, double lambda, double v, double current);
         double elongationUntilIndexApproximation2Probability(double alpha, double lambda, double v, bool proposed);
-        double elongationUntilIndexApproximation1ProbabilityLog(double alpha, double lambda, double v, double current);
+        double elongationUntilIndexApproximation1ProbabilityLog(double alpha, double lambda, double v);
         double elongationUntilIndexApproximation2ProbabilityLog(double alpha, double lambda, double v, double current);
 
         //Psi-Phi Conversion Functions
@@ -162,7 +165,11 @@ class PANSEModel: public Model
 		virtual void adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt = true);
 		virtual void updateGibbsSampledHyperParameters(Genome &genome);
 
-
+		
+		virtual void initializeZ(Genome &genome);
+		virtual void calculateProposedZ(std::string grouping,Genome& genome,std::string param);
+		virtual void calculateUniversalParameter(Genome& genome,unsigned index,unsigned k);
+		virtual void updateUniversalParameter();
 	protected:
 		
 };

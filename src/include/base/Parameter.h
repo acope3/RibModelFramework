@@ -205,7 +205,7 @@ class Parameter {
 
 
 		//Static Functions: TODO: test
-		static double calculateSCUO(Gene& gene, unsigned maxAA);
+		static double calculateSCUO(Gene& gene);
 		static void drawIidRandomVector(unsigned draws, double mean, double sd, double (*proposal)(double a, double b),
 			double* randomNumbers);
 		static void drawIidRandomVector(unsigned draws, double r, double (*proposal)(double r), double* randomNumber);

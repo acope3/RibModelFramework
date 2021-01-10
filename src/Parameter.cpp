@@ -641,11 +641,12 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 	double* expression = new double[genomeSize]();
 	int* index = new int[genomeSize]();
 
+
 	for (unsigned i = 0u; i < genomeSize; i++)
 	{
 		index[i] = i;
 		//This used to be maxGrouping instead of 22, but PA model will not work that way
-		SCUOValues[i] = calculateSCUO( genome.getGene(i), 22 );
+		SCUOValues[i] = calculateSCUO( genome.getGene(i));
 		expression[i] = Parameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
 	}
 
@@ -672,11 +673,10 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
  * Arguments: //TODO
 */
 void Parameter::InitializeSynthesisRate(double sd_phi)
-{
-	unsigned numGenes = (unsigned)currentSynthesisRateLevel[1].size();
+{	unsigned genomeSize = (unsigned)currentSynthesisRateLevel[0].size();
 	for (unsigned category = 0u; category < numSelectionCategories; category++)
 	{
-		for (unsigned i = 0u; i < numGenes; i++)
+		for (unsigned i = 0u; i < genomeSize; i++)
 		{
 			currentSynthesisRateLevel[category][i] = Parameter::randLogNorm(-(sd_phi * sd_phi) / 2, sd_phi);
 			std_phi[category][i] = 0.1;
@@ -703,7 +703,9 @@ void Parameter::InitializeSynthesisRate(std::vector<double> expression)
 	}
 }
 
-
+//' @name readPhiValue
+//' @title Read synthesis rate values from file. File should be two column file <gene_id,phi> and is expected to have a header row
+//' @param filename name of file to be read
 std::vector <double> Parameter::readPhiValues(std::string filename)
 {
 	std::size_t pos;
@@ -916,6 +918,10 @@ unsigned Parameter::getNumAcceptForCspForIndex(unsigned i)
  * Arguments: vector of strings representing a group list
  * Sets the group list to the argument after clearing the group list, adding elements only if they have no errors.
 */
+
+//' @name setGroupList
+//' @title Set amino acids (ROC, FONSE) or codons (PA, PANSE) for which parameters will be estimated. Note that non-default groupLists are still in beta testing and should be used with caution.
+//' @param List of strings epresenting groups for parameters to be estimated. Should be one letter amino acid (ROC, FONSE) or list of sense codons (PA, PANSE). 
 void Parameter::setGroupList(std::vector <std::string> gl)
 {
 	groupList.clear();
@@ -940,6 +946,9 @@ std::string Parameter::getGrouping(unsigned index)
  * Arguments: None
  * Returns the group list as a vector of strings.
 */
+
+//' @name getGroupList
+//' @title Get amino acids (ROC, FONSE) or codons (PA, PANSE) for which parameters will be estimated
 std::vector<std::string> Parameter::getGroupList()
 {
 	return groupList;
@@ -1041,7 +1050,6 @@ double Parameter::getStdCspForIndex(unsigned i)
 //-----------------------------------------------//
 //---------- Synthesis Rate Functions -----------//
 //-----------------------------------------------//
-
 
 double Parameter::getSynthesisRate(unsigned geneIndex, unsigned mixtureElement, bool proposed)
 {
@@ -1267,8 +1275,8 @@ std::vector<std::vector<double>> Parameter::calculateSelectionCoefficients(unsig
 //--------------------------------------//
 
 
-
-
+//' @name getTraceObject
+//' @title Get Trace object stored by a Parameter object. Useful for plotting certain parameter traces.
 Trace& Parameter::getTraceObject()
 {
 	return traces;
@@ -1386,7 +1394,7 @@ void Parameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool a
 	double factorCriteriaHigh;
 	double adjustFactorLow = 0.8; //factor by which to reduce proposal widths
 	double adjustFactorHigh = 1.3; //factor by which to increase proposal widths
-	double adjustFactor; //variable assigned value of either adjustFactorLow or adjustFactorHigh depending on acceptance rate
+	double adjustFactor = 1.0; //variable assigned value of either adjustFactorLow or adjustFactorHigh depending on acceptance rate
 
 	factorCriteriaLow = acceptanceTargetLow;
 	factorCriteriaHigh = acceptanceTargetHigh;
@@ -1445,7 +1453,7 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
   double factorCriteriaHigh;
   double adjustFactorLow = 0.8; //factor by which to reduce proposal widths
   double adjustFactorHigh = 1.2; //factor by which to increase proposal widths
-  double adjustFactor; //variable assigned value of either adjustFactorLow or adjustFactorHigh
+  double adjustFactor = 1.0; //variable assigned value of either adjustFactorLow or adjustFactorHigh
 
   factorCriteriaLow = acceptanceTargetLow - diffFactorAdjust;  //below this value weighted sum and factor adjustments are applied
   factorCriteriaHigh = acceptanceTargetHigh + diffFactorAdjust;  //above this value weighted sum and factor adjustments are applied
@@ -1509,8 +1517,10 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 		 {
 		 
 		    //Adjust proposal width for codon specific parameters
-		   //	std_csp[k] *= adjustFactor;
-
+		    for (unsigned k = aaStart; k < aaEnd; k++)
+		    {
+		    	std_csp[k] *= adjustFactor;
+		    }
 		    //Adjust widths if using cov matrix
 		   	covarianceMatrix[aaIndex] *= adjustFactor;
 	  	   
@@ -1629,6 +1639,12 @@ double Parameter::getNoiseOffsetPosteriorMean(unsigned index, unsigned samples)
 	return posteriorMean / (double)samples;
 }
 
+//' @name getNoiseOffsetVariance
+//' @title Calculate variance of noise offset parameter used when fitting model with empirical estimates of synthesis rates (ie. withPhi fits)
+//' @param index mixture index to use. Should be number between 0 and n-1, where n is number of mixtures
+//' @param samples number of samples over which to calculate variance
+//' @param unbiased If TRUE, should calculate variance using unbiased (N-1). Otherwise, used biased (N) correction
+//' @return returns variance for noise offset
 
 double Parameter::getNoiseOffsetVariance(unsigned index, unsigned samples, bool unbiased)
 {
@@ -1665,6 +1681,12 @@ double Parameter::getNoiseOffsetVariance(unsigned index, unsigned samples, bool 
  * This is calculated by simply gathering a number of traces from the end of the entire trace (up to all of it) to the end
  * of the standard deviation synthesis rate trace, and then getting the mean of these values.
 */
+
+//' @name getStdDevSynthesisRatePosteriorMean
+//' @title Calculate posterior mean of standard deviation parameter of lognormal describing distribution of synthesis rates
+//' @param samples number of samples over which to calculate posterior mean
+//' @param mixture mixture index to use. Should be number between 0 and n, where n is number of mixtures
+//' @return returns posterior mean for standard deviation of lognormal distribution of synthesis rates
 double Parameter::getStdDevSynthesisRatePosteriorMean(unsigned samples, unsigned mixture)
 {
 	double posteriorMean = 0.0;
@@ -1789,7 +1811,12 @@ double Parameter::getCodonSpecificPosteriorMean(unsigned element, unsigned sampl
 	return posteriorMean / (double)samples;
 }
 
-
+//' @name getStdDevSynthesisRateVariance
+//' @title Calculate variance of standard deviation parameter of lognormal describing distribution of synthesis rates
+//' @param samples number of samples over which to calculate variance
+//' @param mixture mixture index to use. Should be number between 0 and n, where n is number of mixtures
+//' @param unbiased If TRUE, should calculate variance using unbiased (N-1). Otherwise, used biased (N) correction
+//' @return returns variance for standard deviation of lognormal distribution of synthesis rates
 double Parameter::getStdDevSynthesisRateVariance(unsigned samples, unsigned mixture, bool unbiased)
 {
 	unsigned selectionCategory = getSelectionCategory(mixture);
@@ -1960,7 +1987,7 @@ std::vector<double> Parameter::getExpressionQuantile(unsigned samples, unsigned 
 	std::vector<float> parameterTrace = traces.getSynthesisRateTraceForGene(geneIndex);
 	if (parameterTrace.size() == 1)
 	{
-		for (int i; i < probs.size();i++)
+		for (int i = 0; i < probs.size();i++)
 		{
 			quantile[i] = parameterTrace[0];
 		}
@@ -1981,7 +2008,11 @@ std::vector<double> Parameter::getCodonSpecificQuantile(unsigned mixtureElement,
 	return calculateQuantile(parameterTrace, samples, probs, log_scale);
 }
 
-
+//' @name getEstimatedMixtureAssignment
+//' @title Get estimated mixture assignment for gene
+//' @param samples number of samples over which to calculate mixture assignment
+//' @param geneIndex corresponding index of gene in genome. Should be a number between 0 and length(genome) - 1. 
+//' @return mixture returns value between 0 and n, where n is number of mixtures
 unsigned Parameter::getEstimatedMixtureAssignment(unsigned samples, unsigned geneIndex)
 {
 	unsigned rv = 0u;
@@ -2077,11 +2108,12 @@ int Parameter::pivotPair(double a[], int b[], int first, int last)
 // Wan et al. CodonO: a new informatics method for measuring synonymous codon usage bias within and across genomes
 // International Journal of General Systems, Vol. 35, No. 1, February 2006, 109–125
 // http://www.tandfonline.com/doi/pdf/10.1080/03081070500502967 */
-double Parameter::calculateSCUO(Gene& gene, unsigned maxAA)
+double Parameter::calculateSCUO(Gene& gene)
 {
 	SequenceSummary *sequenceSummary = gene.getSequenceSummary();
 
 	double totalDegenerateAACount = 0.0;
+	unsigned maxAA = (SequenceSummary::AminoAcidArray).size();
 	for (unsigned i = 0u; i < maxAA; i++)
 	{
 		std::string curAA = SequenceSummary::AminoAcidArray[i];
@@ -2374,19 +2406,27 @@ double Parameter::densityLogNorm(double x, double mean, double sd, bool log)
 //---------- Initialization and Restart Functions --------------//
 //--------------------------------------------------------------//
 
+//' @name initializeSynthesisRateByGenome
+//' @title Initialize synthesis rates using SCUO values calcuated from the genome
+//' @param genome a Genome object
 
-void Parameter::initializeSynthesisRateByGenome(Genome& genome, double sd_phi)
+void Parameter::initializeSynthesisRateByGenome(Genome& genome,double sd_phi)
 {
-	InitializeSynthesisRate(genome, sd_phi);
+	InitializeSynthesisRate(genome,sd_phi);
 }
 
+//' @name initializeSynthesisRateByRandom
+//' @title Initialize synthesis rates by drawing a from a lognormal distribution with mean = -(sd_phi)^2/2 and sd = sd_phi
+//' @param sd_phi a positive value which will be the standard deviation of the lognormal distribution
 
 void Parameter::initializeSynthesisRateByRandom(double sd_phi)
 {
 	InitializeSynthesisRate(sd_phi);
 }
 
-
+//' @name initializeSynthesisRateByList
+//' @title Initialize synthesis rates with values passed in as a list
+//' @param expression a list of values to use as initial synthesis rate values. Should be same size as number of genes in genome.
 void Parameter::initializeSynthesisRateByList(std::vector<double> expression)
 {
 	InitializeSynthesisRate(expression);
@@ -2504,7 +2544,9 @@ void Parameter::setNumSelectionCategories(unsigned _numSelectionCategories)
 //---------- Synthesis Rate Functions -----------//
 //-----------------------------------------------//
 
-
+//' @name getSynthesisRate
+//' @title Get current synthesis rates for all genes and all mixtures 
+//' @return 2 by 2 vector of numeric values
 std::vector<std::vector<double>> Parameter::getSynthesisRateR()
 {
 	return currentSynthesisRateLevel;
@@ -2541,6 +2583,16 @@ std::vector<double> Parameter::getCurrentSynthesisRateForMixture(unsigned mixtur
  * To implement the R version of this function, the index is also checked.
  * This is the R-wrapper for the C-side function "getCodonSpecificPosteriorMean".
 */
+
+
+ //' @name getCodonSpecificPosteriorMeanForCodon
+ //' @title Calculate codon-specific parameter (CSP) posterior mean
+ //' @param mixtureElement mixture to calculate CSP posterior mean. Should be between 1 and n, where n is number of mixtures.
+ //' @param samples number of samples to use for calculating posterior mean
+ //' @param codon codon to calculate CSP
+ //' @param paramType CSP to calculate posterior mean for. 0: Mutation (ROC,FONSE) or Alpha (PA, PANSE). 1: Selection (ROC,FONSE), Lambda (PANSE), Lambda^prime (PA). 2: NSERate (PANSE) 
+ //' @param withoutReference If model uses reference codon, then ignore this codon (fixed at 0). Should be TRUE for ROC and FONSE. Should be FALSE for PA and PANSE.
+ //' @param log_scale If true, calculate posterior mean on log scale. Should only be used for PA and PANSE.
 double Parameter::getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement, unsigned samples, std::string codon,
 	unsigned paramType, bool withoutReference,bool log_scale)
 {
@@ -2556,7 +2608,15 @@ double Parameter::getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement,
 	return rv;
 }
 
-
+ //' @name getCodonSpecificPosteriorVarianceForCodon
+ //' @title Calculate codon-specific parameter (CSP) variance
+ //' @param mixtureElement mixture to calculate CSP variance. Should be between 1 and n, where n is number of mixtures.
+ //' @param samples number of samples to use for calculating variance
+ //' @param codon codon to calculate CSP
+ //' @param paramType CSP to calculate variance for. 0: Mutation (ROC,FONSE) or Alpha (PA, PANSE). 1: Selection (ROC,FONSE), Lambda (PANSE), Lambda^prime (PA). 2: NSERate (PANSE) 
+ //' @param unbiased If TRUE, should calculate variance using unbiased (N-1). Otherwise, used biased (N) correction
+ //' @param withoutReference If model uses reference codon, then ignore this codon (fixed at 0). Should be TRUE for ROC and FONSE. Should be FALSE for PA and PANSE.
+ //' @param log_scale If true, calculate posterior mean on log scale. Should only be used for PA and PANSE.
 double Parameter::getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsigned samples, std::string codon,
 	unsigned paramType, bool unbiased, bool withoutReference, bool log_scale)
 {
@@ -2572,7 +2632,16 @@ double Parameter::getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsi
 	return rv;
 }
 
-
+ //' @name getCodonSpecificQuantilesForCodon
+ //' @title Calculate quantiles of CSP traces
+ //' @param mixtureElement mixture to calculate CSP variance. Should be between 1 and n, where n is number of mixtures.
+ //' @param samples number of samples to use for calculating variance
+ //' @param codon codon to calculate CSP
+ //' @param paramType CSP to calculate variance for. 0: Mutation (ROC,FONSE) or Alpha (PA, PANSE). 1: Selection (ROC,FONSE), Lambda (PANSE), Lambda^prime (PA). 2: NSERate (PANSE) 
+ //' @param probs vector of two doubles between 0 and 1 indicating range over which to calculate quantiles. <0.0275, 0.975> would give 95% quantiles.
+ //' @param withoutReference If model uses reference codon, then ignore this codon (fixed at 0). Should be TRUE for ROC and FONSE. Should be FALSE for PA and PANSE.
+ //' @param log_scale If true, calculate posterior mean on log scale. Should only be used for PA and PANSE.
+//'  @return vector representing lower and upper bound of quantile
 std::vector<double> Parameter::getCodonSpecificQuantileForCodon(unsigned mixtureElement, unsigned samples,
 	std::string &codon, unsigned paramType, std::vector<double> probs, bool withoutReference, bool log_scale)
 {
@@ -2608,6 +2677,13 @@ std::vector<double> Parameter::getExpressionQuantileForGene(unsigned samples,
  * To implement the R version of this function, the index is also checked.
  * This is the R-wrapper for the C-side function "getSynthesisRatePosteriorMean".
 */
+
+//' @name getSynthesisRatePosteriorMeanForGene
+//' @title Get posterior mean synthesis rate value for a gene
+//' @param samples number of samples over which to calculate mean
+//' @param geneIndex corresponding index of gene in genome for which posterior mean synthesis rate will be calculated. Should be a number between 1 and length(genome) 
+//' @param log_scale Calculate posterior mean on log scale
+//' @return posterior mean synthesis rate for gene
 double Parameter::getSynthesisRatePosteriorMeanForGene(unsigned samples, unsigned geneIndex, bool log_scale)
 {
 	double rv = -1.0;
@@ -2619,7 +2695,13 @@ double Parameter::getSynthesisRatePosteriorMeanForGene(unsigned samples, unsigne
 	return rv;
 }
 
-
+//' @name getSynthesisRatePosteriorVarianceForGene
+//' @title Get synthesis rate variance for a gene
+//' @param samples number of samples over which to calculate variance
+//' @param geneIndex corresponding index of gene in genome for which synthesis rate variance will be calculated. Should be a number between 1 and length(genome) 
+//' @param unbiased Should calculate variance using unbiased (N-1) or biased (N) correction
+//' @param log_scale Calculate variance on log scale
+//' @return posterior mean synthesis rate for gene
 double Parameter::getSynthesisRateVarianceForGene(unsigned samples, unsigned geneIndex, bool unbiased, bool log_scale)
 {
 	double rv = -1.0;

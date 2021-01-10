@@ -311,7 +311,7 @@ YAL003W,10.45,NA,...,9.564
 YAL005C,0.556,0.957,...,0.758
 ```
 ## Estimating Nonsense Error Probabilities from codon data.
-
+NOTE: The model described here is unpublished and currently in beta testing. Please use with caution. 
 A common observation is tendency for inefficient codons to be more frequent at the 5'-ends of transcripts. One explanation for this is selection against ribosome drop-off, or nonsense errors, during translation. It is expected that nonsense errors are less costly towards the beginning of translation. AnaCoDa contains a model, the First Order Nonsense Error (FONSE) model, for estimating codon-specific nonsense error probabilities from codon count data. This models functionality is very similar to ROC. The primary difference for fitting a FONSE model instead of a ROC model to genomic data is specifying FONSE when initializing the Parameter and Model objects.
 
 ```{r, echo = TRUE, eval = FALSE}
@@ -338,6 +338,7 @@ ci_a1 <- quantile(trace_a1,probs = c(0.025,0.975))
 ```
 
 ### Application of AnaCoDa to Ribo-Seq data
+NOTE: The models described here are unpublished and currently in beta testing. Please use with caution. 
 Ribosome footprinting, or Ribo-Seq, is a relatively new technology which has allowed researchers to explore the translatome (mRNA being actively translated in the cell).
 The current version of AnaCoDa contains two models for estimating parameters from RFP data: The Pausing Model (PA) and the Pausing and Nonsense Error (PANSE) model.
 Although provided with the initial release of AnaCoDa, these models were still in beta testing. 

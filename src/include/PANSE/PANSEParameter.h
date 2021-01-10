@@ -26,6 +26,7 @@ class PANSEParameter: public Parameter {
         bool fix_alpha=false;
         bool fix_lp=false;
         bool fix_nse=false;
+        bool fix_Z=false;
         bool share_nse=false;
         
         double std_partitionFunction;
@@ -68,6 +69,7 @@ class PANSEParameter: public Parameter {
 		void fixAlpha();
 		void fixLambdaPrime();
 		void fixNSERate();
+		void fixZ();
 		void shareNSERate();
 
         //CSP Read Functions:
@@ -90,7 +92,7 @@ class PANSEParameter: public Parameter {
         //partitionFunction Functions: Mostly tested, see comments.
         double getPartitionFunction(unsigned mixtureCategory, bool proposed); //TODO: test
         virtual void proposePartitionFunction(); //TODO: test
-        void setPartitionFunction(double newPartitionFunction, unsigned mixtureCategory); //TODO: test
+        void setPartitionFunction(double newPartitionFunction, unsigned mixtureCategory, bool proposed); //TODO: test
         double getCurrentPartitionFunctionProposalWidth(); //TODO: test
         unsigned getNumAcceptForPartitionFunction(); //Only for unit testing.
         void updatePartitionFunction(); //TODO: test

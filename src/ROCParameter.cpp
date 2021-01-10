@@ -149,7 +149,7 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 	{
 		my_printError("Error opening file % to initialize from restart file.\n", filename.c_str());
 		my_printError("please use absolute path");
-		exit(0);
+		return;
 	}
 	else
 	  {
@@ -291,9 +291,25 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 					{
 						double val;
 						iss.str(tmp);
-						while (iss >> val)
+						if (!old_format)
 						{
-							mutation_prior_mean[cat - 1].push_back(val);
+							while (iss >> val)
+							{
+								mutation_prior_mean[cat - 1].push_back(val);
+							}
+							
+						}
+						else 
+						{
+							mutation_prior_mean.resize(numMutationCategories);
+							for (int i = 0; i < numMutationCategories;i++)
+							{
+								mutation_prior_mean[i].resize(40);
+								for (int j = 0; j < 40; j++)
+								{
+									mutation_prior_mean[i][j] = val;
+								}
+							}
 						}
 					}
 				}
@@ -309,7 +325,7 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 						continue;
 					else
 					{
-						double val;
+						double val = 0.0;
 						iss.str(tmp);
 						if (!old_format)
 						{
@@ -336,18 +352,7 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 		}
 	}
 	input.close();
-	if (!old_format)
-	{
-		mutation_prior_mean.resize(numMutationCategories);
-		for (int i = 0; i < numMutationCategories;i++)
-		{
-			mutation_prior_mean[i].resize(40);
-			for (int j = 0; j < 40; j++)
-			{
-				mutation_prior_mean[i][j] = 0.0;
-			}
-		}
-	}
+	
 	//init other values
 	//numAcceptForNoiseOffset.resize(obsPhiSets, 0);
 	bias_csp = 0;
@@ -526,6 +531,12 @@ void ROCParameter::initAllTraces(unsigned samples, unsigned num_genes, bool esti
 }
 
 
+//' @name initMutationCategories
+//' @title Initialize values for mutation CSP. File should be of comma-separated with header. Three columns should be of order Amino_acid,Codon,Value
+//' @param files list of files containing starting values. Number of files should equal the number of categories.
+//' @param numCategories number of mutation categories (should be less than or equal to number of mixtures)
+//' @param fix Can use this parameter to fix mutation at current values (won't change over course of MCMC run)
+
 void ROCParameter::initMutationCategories(std::vector<std::string> files, unsigned numCategories, bool fix)
 {
 	for (unsigned category = 0; category < numCategories; category++)
@@ -537,7 +548,7 @@ void ROCParameter::initMutationCategories(std::vector<std::string> files, unsign
 		{
 			my_printError("Error opening file % to initialize mutation values.\n", category);
 			my_printError("please use absolute path");
-			exit(0);
+			return;
 		}
 
 		else
@@ -566,6 +577,11 @@ void ROCParameter::initMutationCategories(std::vector<std::string> files, unsign
 	} //END OF A CATEGORY/FILE
 }
 
+//' @name initSelectionCategories
+//' @title Initialize values for selection CSP. File should be of comma-separated with header. Three columns should be of order Amino_acid,Codon,Value
+//' @param files list of files containing starting values. Number of files should equal the number of categories.
+//' @param numCategories number of mutation categories (should be less than or equal to number of mixtures)
+//' @param fix Can use this parameter to fix selection at current values (won't change over course of MCMC run)
 
 void ROCParameter::initSelectionCategories(std::vector<std::string> files, unsigned numCategories, bool fix)
 {
@@ -578,7 +594,7 @@ void ROCParameter::initSelectionCategories(std::vector<std::string> files, unsig
 		{
 			my_printError("Error opening file % to initialize selection values.\n", category);
 			my_printError("please use absolute path");
-			exit(0);
+			return;
 		}
 
 		else
@@ -639,11 +655,16 @@ void ROCParameter::updateCodonSpecificParameterTrace(unsigned sample, std::strin
 }
 
 
+//' @name fixDM
+//' @title Fix the value of mutation its current value
 
 void ROCParameter::fixDM()
 {
 	fix_dM = true;
 }
+
+//' @name fixDEta
+//' @title Fix the value of selection its current value
 
 void ROCParameter::fixDEta()
 {
@@ -816,6 +837,11 @@ void ROCParameter::proposeCodonSpecificParameter()
 				if (fix_dEta)
 				{
 					proposedCodonSpecificParameter[dEta][i][l] = currentCodonSpecificParameter[dEta][i][l];
+				}
+				else if (propose_by_prior) //Don't estimate covariance matrix. 
+				{
+					proposedCodonSpecificParameter[dEta][i][l] = randNorm(currentCodonSpecificParameter[dEta][i][l] , std_csp[l]);
+			
 				}
 				else
 				{

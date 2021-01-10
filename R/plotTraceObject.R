@@ -10,7 +10,8 @@
 #' MixtureProbability, Sphi, Mphi, Aphi, Spesilon, ExpectedPhi, Expression}.
 #' @param geneIndex When plotting expression, the index of the gene to be plotted.
 #' @param mixture The mixture for which to plot values.
-#' @param log.10.scale Plot parameter on the log10 scale
+#' @param log.10.scale A logical value determining if figures should be plotted on the log.10.scale (default=F). Should not be applied to mutation and selection parameters estimated by ROC/FONSE.
+#'
 #' @param ... Optional, additional arguments.
 #' For this function, may be a logical value determining if the trace is ROC-based or not.
 #'
@@ -19,7 +20,7 @@
 #' @description Plots different traces, specified with the \code{what} parameter.
 #'
 plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbability" ,"Sphi", "Mphi", "Aphi", "Sepsilon", "ExpectedPhi", "Expression","NSEProb","NSERate","InitiationCost","PartitionFunction"), 
-                                   geneIndex=1, mixture = 1,log.10.scale=F, ...)
+                                   geneIndex=1, mixture = 1,log.10.scale=F,...)
 {
   if(what[1] == "Mutation")
   {
@@ -88,7 +89,7 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
   }
   if(what[1] == "AcceptanceRatio")
   {
-    plotCodonSpecificHyperParameters(x, what = what[1])
+    plotAcceptanceRatios(x)
   }
   if(what[1] == "NSERate")
   {
@@ -109,6 +110,8 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
 #' @param main The title of the plot.
 #'
 #' @param ROC.or.FONSE A logical value determining if the Parameter was ROC/FONSE or not.
+#'
+#' @param log.10.scale A logical value determining if figures should be plotted on the log.10.scale (default=F). Should not be applied to mutation and selection parameters estimated by ROC/FONSE.
 #'
 #' @return This function has no return value.
 #' 
@@ -228,7 +231,7 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
           {
             cur.trace[[i]] <- tmpNSERate*(tmpAlpha/tmpLambdaPrime)
             } else {
-              cur.trace[[i]] <- tmpNSERate*tmpeNSERate*(tmpAlpha/(tmpLambdaPrime * tmpLambdaPrime))
+              cur.trace[[i]] <- tmpNSERate*tmpNSERate*(tmpAlpha/(tmpLambdaPrime * tmpLambdaPrime))
             }
         }
         if (log.10.scale)
@@ -268,85 +271,74 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
 # Called from Plot Trace Object (plot for trace)
 # NOT EXPOSED
 # 
-# Plot Codon Specific Hyper Parameter
+#' Plot Acceptance ratios
 #' @param trace An Rcpp trace object initialized with \code{initializeTraceObject}.
-#' 
-#' @param what A string containing one of the following to graph: \code{Random, LoglikelihoodRatio, currLoglikelihood, propLoglikelihood, currLoglikelihoodAdjusted, propLoglikelihoodAdjusted}.
-#' 
-#' @param mixture Mixture category to plot
 #' 
 #' @param main The title of the plot.
 #' 
-#' @param PA A logical value determining if the Parameter was PA or not. Default is True
-#' 
 #' @return This function has no return value.
 #' 
-#' @description Plots a codon-specific set of traces, specified with the \code{type} parameter.
+#' @description Plots acceptance ratios for codon-specific parameters. Will be by amino acid for ROC and FONSE models, but will be by codon for PA and PANSE models. Note assumes estimating parameters for all codons.
 
-plotCodonSpecificHyperParameters <- function(trace, what="RandomNumber", mixture=1, main="Random Number Parameter Traces", PA=TRUE)
+plotAcceptanceRatios <- function(trace,main="CSP Acceptance Ratio Traces")
 {
   opar <- par(no.readonly = T) 
   
   ### Trace plot.
-  if (PA)
+  acceptance.rate.traces <- trace$getCodonSpecificAcceptanceRateTrace()
+  if (length(acceptance.rate.traces) == 61)
   {
-    nf <- layout(matrix(c(rep(1, 4), 2:21), nrow = 6, ncol = 4, byrow = TRUE), rep(1, 4), c(2, 8, 8, 8, 8, 8), respect = FALSE)  
+    ROC.or.FONSE <- FALSE  
+  } else {
+    ROC.or.FONSE <- TRUE
+  }
+
+
+
+  if (ROC.or.FONSE)
+  {
+    nf <- layout(matrix(c(rep(1, 4), 2:21), nrow = 6, ncol = 4, byrow = TRUE),
+               rep(1, 4), c(2, 8, 8, 8, 8, 8), respect = FALSE)  
   }else
   {    
-      return
+    nf <- layout(matrix(c(rep(1, 4), 2:25), nrow = 7, ncol = 4, byrow = TRUE),
+                    rep(1, 4), c(2, 8, 8, 8, 8, 8, 8), respect = FALSE) 
   }
   ### Plot title.
-  par(mar = c(1,1,1,1))
-  
+  if (ROC.or.FONSE){
+    par(mar = c(0, 0, 0, 0))
+  }else{
+    par(mar = c(1,1,1,1))
+  }
   plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
   text(0.5, 0.6, main)
   text(0.5, 0.4, date(), cex = 0.6)
   par(mar = c(5.1, 4.1, 4.1, 2.1))
   
+  # TODO change to groupList -> checks for ROC like model is not necessary!
   names.aa <- aminoAcids()
+  with.ref.codon <- ifelse(ROC.or.FONSE, TRUE, FALSE)
   
   for(aa in names.aa)
-  {
- 	if(aa == "X") next
-    
-    codons <- AAToCodon(aa, FALSE)
+  { 
+    codons <- AAToCodon(aa, with.ref.codon)
     if(length(codons) == 0) next
- 	cur.trace <- vector("list", length(codons))
-    
- 	  if(what == "RandomNumber"){
- 	    ylab <- expression("Random Number")
- 	    paramType <- 0
- 	  }else if (what == "AcceptanceRatio"){
- 	    ylab <- expression("Acceptance Ratio")
- 	    paramType <- 1
- 	  }else if (what == "CurrentLogLikelihood"){
- 	    ylab <- expression("Current Log Likelihood")
- 	    paramType <- 2
- 	  }else if (what == "ProposedLogLikelihood"){
- 	    ylab <- expression("Proposed Log Likelihood")
- 	    paramType <- 3
- 	  }else if (what == "CurrentLogLikelihoodAdjusted"){
- 	    ylab <- expression("Adjusted Current Log Likelihood")
- 	    paramType <- 4
- 	  }else if (what == "ProposedLogLikelihoodAdjusted"){
- 	    ylab <- expression("Adjusted Proposed Log Likelihood")
- 	    paramType <- 5
- 	  }else{
- 	    stop("Parameter 'type' not recognized! Must be one of: 'Mutation', 'Selection', 'Alpha', 'LambdaPrime', 'MeanWaitingTime', 'VarWaitingTime'.")
-      }
-    
-    for(i in 1:length(codons))
-    { 
-        if(paramType == 1){
-            cur.trace[[i]] <- trace$getCodonSpecificAcceptanceRateTraceForAA(codons[i])
-        }
-        else{
-            cur.trace[[i]] <- trace$getCodonSpecificHyperParameterTraceByMixtureElementForCodon(mixture, codons[i], paramType)
-        }
+    if (!ROC.or.FONSE){
+      if(aa == "X") next
     }
-  
     
 
+    if (!ROC.or.FONSE)
+    {
+      cur.trace <- vector("list", length(codons))
+      for(i in 1:length(codons))
+      { 
+        cur.trace[[i]] <- trace$getCodonSpecificAcceptanceRateTraceForCodon(codons[i])
+      }
+    } else {
+      cur.trace <- vector("list", 1)
+      cur.trace[[1]] <- trace$getCodonSpecificAcceptanceRateTraceForAA(aa)
+      }
     cur.trace <- do.call("cbind", cur.trace)
     if(length(cur.trace) == 0) next
     x <- 1:dim(cur.trace)[1]
@@ -355,7 +347,7 @@ plotCodonSpecificHyperParameters <- function(trace, what="RandomNumber", mixture
     
     main.aa <- aa #TODO map to three leter code
     plot(NULL, NULL, xlim = xlim, ylim = ylim,
-         xlab = "Samples", ylab = ylab, main = main.aa)
+         xlab = "Samples", ylab = "Accept. Rat.", main = main.aa)
     plot.order <- order(apply(cur.trace, 2, sd), decreasing = TRUE)
     for(i.codon in plot.order){
       lines(x = x, y = cur.trace[, i.codon], col = .codonColors[[codons[i.codon]]])
@@ -364,8 +356,7 @@ plotCodonSpecificHyperParameters <- function(trace, what="RandomNumber", mixture
     legend("topleft", legend = codons, col = colors, 
            lty = rep(1, length(codons)), bty = "n", cex = 0.75)
   }
-  #par(opar)
-  print(cur.trace)
+  par(opar)
 } 
 
 # NOT EXPOSED
