@@ -126,6 +126,9 @@ class PAModel: public Model
 		virtual void adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt = true);
 		virtual void updateGibbsSampledHyperParameters(Genome &genome);
 
+
+		
+
 	protected:
 		
 

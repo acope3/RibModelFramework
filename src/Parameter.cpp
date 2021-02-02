@@ -1517,8 +1517,10 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 		 {
 		 
 		    //Adjust proposal width for codon specific parameters
-		   //	std_csp[k] *= adjustFactor;
-
+		    for (unsigned k = aaStart; k < aaEnd; k++)
+		    {
+		    	std_csp[k] *= adjustFactor;
+		    }
 		    //Adjust widths if using cov matrix
 		   	covarianceMatrix[aaIndex] *= adjustFactor;
 	  	   

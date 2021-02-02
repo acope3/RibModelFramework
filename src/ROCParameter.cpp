@@ -291,9 +291,25 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 					{
 						double val;
 						iss.str(tmp);
-						while (iss >> val)
+						if (!old_format)
 						{
-							mutation_prior_mean[cat - 1].push_back(val);
+							while (iss >> val)
+							{
+								mutation_prior_mean[cat - 1].push_back(val);
+							}
+							
+						}
+						else 
+						{
+							mutation_prior_mean.resize(numMutationCategories);
+							for (int i = 0; i < numMutationCategories;i++)
+							{
+								mutation_prior_mean[i].resize(40);
+								for (int j = 0; j < 40; j++)
+								{
+									mutation_prior_mean[i][j] = val;
+								}
+							}
 						}
 					}
 				}
@@ -336,18 +352,7 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 		}
 	}
 	input.close();
-	if (!old_format)
-	{
-		mutation_prior_mean.resize(numMutationCategories);
-		for (int i = 0; i < numMutationCategories;i++)
-		{
-			mutation_prior_mean[i].resize(40);
-			for (int j = 0; j < 40; j++)
-			{
-				mutation_prior_mean[i][j] = 0.0;
-			}
-		}
-	}
+	
 	//init other values
 	//numAcceptForNoiseOffset.resize(obsPhiSets, 0);
 	bias_csp = 0;
@@ -832,6 +837,11 @@ void ROCParameter::proposeCodonSpecificParameter()
 				if (fix_dEta)
 				{
 					proposedCodonSpecificParameter[dEta][i][l] = currentCodonSpecificParameter[dEta][i][l];
+				}
+				else if (propose_by_prior) //Don't estimate covariance matrix. 
+				{
+					proposedCodonSpecificParameter[dEta][i][l] = randNorm(currentCodonSpecificParameter[dEta][i][l] , std_csp[l]);
+			
 				}
 				else
 				{

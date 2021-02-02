@@ -12,6 +12,18 @@ Model::~Model()
 //dtor
 }
 
+void Model::calculateUniversalParameter(Genome& genome,unsigned index,unsigned k)
+{
+
+}
+
+void Model::updateUniversalParameter()
+{
+
+}
+
+
+
 //Cedric: This functions will replace calculateMutationPrior in ROC/FONSE model and allows us to more generally use priors on codon specific parameters.
 //			We have to first change how current and proposed csp values are stored to move the function getParameterForCategory up into the base parameter class.
 

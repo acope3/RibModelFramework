@@ -386,6 +386,7 @@ RCPP_MODULE(Parameter_mod)
 		.method("fixAlpha",&PANSEParameter::fixAlpha)
 		.method("fixLambdaPrime",&PANSEParameter::fixLambdaPrime)
 		.method("fixNSERate",&PANSEParameter::fixNSERate)
+		.method("fixZ",&PANSEParameter::fixZ)
 		.method("shareNSERate",&PANSEParameter::shareNSERate)
 
 		//CSP Functions:

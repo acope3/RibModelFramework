@@ -114,10 +114,10 @@ void PAModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex,
 	double phiValue = parameter->getSynthesisRate(geneIndex, synthesisRateCategory, false);
 	double phiValue_proposed = parameter->getSynthesisRate(geneIndex, synthesisRateCategory, true);
 
-#ifdef _OPENMP
-//#ifndef __APPLE__
-#pragma omp parallel for reduction(+:logLikelihood,logLikelihood_proposed)
-#endif
+// #ifdef _OPENMP
+// //#ifndef __APPLE__
+// #pragma omp parallel for reduction(+:logLikelihood,logLikelihood_proposed)
+// #endif
 	for (unsigned index = 0; index < getGroupListSize(); index++) //number of codons, without the stop codons
 	{
 		std::string codon = getGrouping(index);
