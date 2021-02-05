@@ -690,7 +690,8 @@ getEffectiveSampleSizesByCodon <- function(parameter,codon,samples,paramType,mix
   trace.vec <-trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture,codon,paramType,withoutReference)
   trace.vec <- trace.vec[(length(trace.vec)-samples):(length(trace.vec))]
   mcmc.csp <- coda::mcmc(trace.vec,thin)
-  return(coda::effectiveSize(mcmc.csp))     
+  ess <- coda::effectiveSize(mcmc.csp)
+  return(ess)     
 }
 
 
@@ -748,7 +749,7 @@ getEffectiveSampleSizesByCodon <- function(parameter,codon,samples,paramType,mix
 #' 
 #' }
 
-getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10, relative.to.optimal.codon=T, report.original.ref = T,log.scale=F,thin=10)
+getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10, relative.to.optimal.codon=T, report.original.ref = T,log.scale=F)
 {
   if((class(parameter)=="Rcpp_ROCParameter" || class(parameter)=="Rcpp_FONSEParameter") && log.scale)
   {
@@ -764,10 +765,10 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
   ## Creates empty vector of 0 for initial dataframes
   init <- rep(0.0,length(codons))
   
-  param.1<- data.frame(Codon=codons,AA=names.aa,Mean=init,Std.Dev=init,Effective.Samples=init,Lower.quant=init,Upper.quant=init,stringsAsFactors = F,row.names = codons)
-  param.2 <- data.frame(Codon=codons,AA=names.aa,Mean=init,Std.Dev=init,Effective.Samples=init,Lower.quant=init,Upper.quant=init,stringsAsFactors = F,row.names=codons)
-  param.3 <- data.frame(Codon=codons,AA=names.aa,Mean=init,Std.Dev=init,Effective.Samples=init,Lower.quant=init,Upper.quant=init,stringsAsFactors = F,row.names=codons)
-  param.4 <- data.frame(Codon=codons,AA=names.aa,Mean=init,Std.Dev=init,Effective.Samples=init,Lower.quant=init,Upper.quant=init,stringsAsFactors = F,row.names=codons)
+  param.1 <- data.frame(Codon=codons,AA=names.aa,Mean=init,Std.Dev=init,Lower.quant=init,Upper.quant=init,stringsAsFactors = F,row.names = codons)
+  param.2 <- data.frame(Codon=codons,AA=names.aa,Mean=init,Std.Dev=init,Lower.quant=init,Upper.quant=init,stringsAsFactors = F,row.names=codons)
+  param.3 <- data.frame(Codon=codons,AA=names.aa,Mean=init,Std.Dev=init,Lower.quant=init,Upper.quant=init,stringsAsFactors = F,row.names=codons)
+  param.4 <- data.frame(Codon=codons,AA=names.aa,Mean=init,Std.Dev=init,Lower.quant=init,Upper.quant=init,stringsAsFactors = F,row.names=codons)
   
   if (model.uses.ref.codon)
   {
@@ -782,17 +783,13 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
     param.2[codon,"Std.Dev"] <- sqrt(parameter$getCodonSpecificVariance(mixtureElement=mixture,samples=samples,codon=codon,paramType=1,unbiased=T,withoutReference=model.uses.ref.codon,log_scale=log.scale))
     param.1[codon,c("Lower.quant","Upper.quant")] <- parameter$getCodonSpecificQuantile(mixtureElement=mixture, samples=samples,codon=codon,paramType=0, probs=c(0.025, 0.975),withoutReference=model.uses.ref.codon,log_scale=log.scale)
     param.2[codon,c("Lower.quant","Upper.quant")]  <- parameter$getCodonSpecificQuantile(mixtureElement=mixture, samples=samples,codon=codon,paramType=1, probs=c(0.025, 0.975),withoutReference=model.uses.ref.codon,log_scale=log.scale)
-    param.1[codon,c("Effective.Samples")] <- getEffectiveSampleSizesByCodon(parameter,codon,samples=samples,paramType=0,withoutReference=model.uses.ref.codon,thin=thin)
-    param.2[codon,c("Effective.Samples")] <- getEffectiveSampleSizesByCodon(parameter,codon,samples=samples,paramType=1,withoutReference=model.uses.ref.codon,thin=thin)
-    
+  
     if (length(parameter.names) == 4)
     {
       param.3[codon,"Mean"] <- parameter$getCodonSpecificPosteriorMean(mixtureElement=mixture,samples=samples,codon=codon,paramType=2,withoutReference=model.uses.ref.codon,log_scale=log.scale)
       param.3[codon,"Std.Dev"] <- sqrt(parameter$getCodonSpecificVariance(mixtureElement=mixture,samples=samples,codon=codon,paramType=2,unbiased=T,withoutReference=model.uses.ref.codon,log_scale=log.scale))
       param.3[codon,c("Lower.quant","Upper.quant")] <- parameter$getCodonSpecificQuantile(mixtureElement=mixture, samples=samples,codon=codon,paramType=2, probs=c(0.025, 0.975),withoutReference=model.uses.ref.codon,log_scale=log.scale)
-      param.3[codon,c("Effective.Samples")] <- getEffectiveSampleSizesByCodon(parameter,codon,samples=samples,paramType=2,withoutReference=model.uses.ref.codon,thin=thin)
-      
-
+    
       prob.nse.trace <- getNSEProbabilityTrace(parameter,mixture,codon,samples)
       if (log.scale)
       {
@@ -802,14 +799,12 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
       param.4[codon,"Std.Dev"] <- sd(prob.nse.trace)
       param.4[codon,c("Lower.quant","Upper.quant")] <- quantile(prob.nse.trace,probs=c(0.025,0.975),type=8)
 
-      mcmc.prob.nse.trace <- coda::mcmc(prob.nse.trace[(length(prob.nse.trace)-samples):(length(prob.nse.trace))],thin)
-      param.4[codon,c("Effective.Samples")] <- coda::effectiveSize(mcmc.prob.nse.trace)
     }
   }
-  colnames(param.1) <- c("Codon", "AA", "Mean","Std.Dev","Effective.Samples","2.5%", "97.5%")
-  colnames(param.2) <- c("Codon", "AA", "Mean","Std.Dev","Effective.Samples","2.5%", "97.5%")
-  colnames(param.3) <- c("Codon", "AA", "Mean","Std.Dev","Effective.Samples","2.5%", "97.5%")
-  colnames(param.4) <- c("Codon", "AA", "Mean","Std.Dev","Effective.Samples","2.5%", "97.5%")
+  colnames(param.1) <- c("Codon", "AA", "Mean","Std.Dev","2.5%", "97.5%")
+  colnames(param.2) <- c("Codon", "AA", "Mean","Std.Dev","2.5%", "97.5%")
+  colnames(param.3) <- c("Codon", "AA", "Mean","Std.Dev","2.5%", "97.5%")
+  colnames(param.4) <- c("Codon", "AA", "Mean","Std.Dev","2.5%", "97.5%")
   
   ## Only called if model actually uses reference codon
   if(relative.to.optimal.codon && model.uses.ref.codon)
@@ -827,12 +822,12 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
     names(csp.param) <- parameter.names
      
 
-    csp.param[[parameter.names[1]]] <- param.1[,c("AA", "Codon", "Mean", "Std.Dev","Effective.Samples","2.5%", "97.5%")]
-    csp.param[[parameter.names[2]]] <- param.2[,c("AA", "Codon", "Mean", "Std.Dev","Effective.Samples","2.5%", "97.5%")]
+    csp.param[[parameter.names[1]]] <- param.1[,c("AA", "Codon", "Mean", "Std.Dev","2.5%", "97.5%")]
+    csp.param[[parameter.names[2]]] <- param.2[,c("AA", "Codon", "Mean", "Std.Dev","2.5%", "97.5%")]
     if (length(parameter.names)==4)
     {
-      csp.param[[parameter.names[3]]] <- param.3[,c("AA", "Codon", "Mean", "Std.Dev","Effective.Samples","2.5%", "97.5%")]
-      csp.param[[parameter.names[4]]] <- param.4[,c("AA", "Codon", "Mean", "Std.Dev","Effective.Samples","2.5%", "97.5%")]
+      csp.param[[parameter.names[3]]] <- param.3[,c("AA", "Codon", "Mean", "Std.Dev","2.5%", "97.5%")]
+      csp.param[[parameter.names[4]]] <- param.4[,c("AA", "Codon", "Mean", "Std.Dev","2.5%", "97.5%")]
     }
   }
   if(is.null(filename))

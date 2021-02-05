@@ -898,6 +898,7 @@ void ROCParameter::updateCodonSpecificParameter(std::string grouping)
 	unsigned aaStart, aaEnd;
 	SequenceSummary::AAToCodonRange(grouping, aaStart, aaEnd, true);
 	unsigned aaIndex = SequenceSummary::aaToIndex.find(grouping)->second;
+	//my_print("AA % Start % End % Previously Accepted %\n",grouping,aaStart,aaEnd,numAcceptForCodonSpecificParameters[aaIndex]);
 	numAcceptForCodonSpecificParameters[aaIndex]++;
 	if (!fix_dM)
 	{
