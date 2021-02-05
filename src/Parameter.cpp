@@ -1444,7 +1444,7 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
   // for high dimensional problems
   // For CSP the combined selection and mutation dimensions range from 2 to 10
   //Adjust proposal variance to try and get within this range
-
+  std::vector<unsigned> codon_list;
   unsigned acceptanceUnder = 0u;
   unsigned acceptanceOver = 0u;
 
@@ -1464,6 +1464,8 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
   adaptiveStepCurr = lastIteration;
   unsigned samples = adaptiveStepCurr - adaptiveStepPrev;
 
+
+
   my_print("Acceptance rates for Codon Specific Parameters\n");
   my_print("Target range: %-% \n", factorCriteriaLow, factorCriteriaHigh );
   my_print("Adjustment range: < % or > % \n", acceptanceTargetLow, acceptanceTargetHigh );
@@ -1478,7 +1480,10 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
     my_print("\t%:\t%\n", aa.c_str(), acceptanceLevel);
 
     traces.updateCodonSpecificAcceptanceRateTrace(aaIndex, acceptanceLevel);
-
+    unsigned aaStart, aaEnd;
+    codon_list = SequenceSummary::AAToCodonIndex(aa,true);
+    aaStart = codon_list[0];
+    aaEnd = codon_list[codon_list.size()-1];
       //Evaluate current acceptance ratio  performance
     if (acceptanceLevel < factorCriteriaLow) acceptanceUnder++;
     else if (acceptanceLevel > factorCriteriaHigh) acceptanceOver++;

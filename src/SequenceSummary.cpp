@@ -633,10 +633,7 @@ void SequenceSummary::AAIndexToCodonRange(unsigned aaIndex, unsigned& startAAInd
 	AAToCodonRange(aa, startAAIndex, endAAIndex, forParamVector);
 }
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 7e358f8caac68038c33c89bba3922e7d9f4dd6a3
 //std::array<unsigned, 2>
 // Note: From function definition in header, default forParamVector is false.
 // Returns the range of index values in the CodonTable for codons corresponding to a given amino acid. The function is overloaded and uses a wrapper function to map from an amino acid index value rather than a string. (which I believe is only a single char).
