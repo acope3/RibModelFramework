@@ -81,8 +81,8 @@ plotParameterObject <- function(x, what = "Mutation", samples = 100, mixture.nam
       codons <- AAToCodon(aa, T)
       for (i in 1:length(codons))
       {
-       means[count,mixture] <- x$getCodonSpecificPosteriorMean(mixture, samples,codons[i], paramType, TRUE,FALSE)
-       tmp <- x$getCodonSpecificQuantile(mixture,samples, codons[i], paramType, c(0.025, 0.975), TRUE, FALSE)
+       means[count,mixture] <- x$getCodonSpecificPosteriorMean(mixture, samples,codons[i], paramType, TRUE, log_scale=FALSE)
+       tmp <- x$getCodonSpecificQuantile(mixture,samples, codons[i], paramType, c(0.025, 0.975), TRUE, log_scale=FALSE)
         
         ## This approach to storing the quantiles may seem unconventional, but I actually found it to be the most straight forward approach
         ## for plotting later.
@@ -257,12 +257,12 @@ codonList <- codons()
 for (i in 1:61)
 {
   codon <- codonList[i]
-  alphaList[i] <- parameter$getCodonSpecificPosteriorMean(cat, samples * 0.5, codon, 0, FALSE,FALSE)
+  alphaList[i] <- parameter$getCodonSpecificPosteriorMean(cat, samples * 0.5, codon, 0, FALSE,log_scale=F)
   alphaTrace <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(1, codon, 0, FALSE)
   alpha.ci[i,] <- quantile(alphaTrace[(samples * 0.5):samples], probs = c(0.025,0.975))
   
   
-  lambdaPrimeList[i] <- parameter$getCodonSpecificPosteriorMean(cat, samples * 0.5, codon, 1, FALSE, FALSE)
+  lambdaPrimeList[i] <- parameter$getCodonSpecificPosteriorMean(cat, samples * 0.5, codon, 1, FALSE, log_scale=F)
   lambdaPrimeTrace <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(1, codon, 1, FALSE)
   lambdaPrime.ci[i,] <- quantile(lambdaPrimeTrace[(samples * 0.5):samples], probs = c(0.025,0.975))
   waitingTimes[i] <- alphaList[i] * lambdaPrimeList[i]

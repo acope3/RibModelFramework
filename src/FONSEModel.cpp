@@ -22,6 +22,7 @@ FONSEModel::~FONSEModel()
 }
 
 
+
 double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grouping, double *mutation, double *selection, double phiValue,double a1_value)
 {
 	unsigned numCodons = SequenceSummary::GetNumCodonsForAA(grouping);

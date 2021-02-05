@@ -634,7 +634,14 @@ void SequenceSummary::AAIndexToCodonRange(unsigned aaIndex, unsigned& startAAInd
 	AAToCodonRange(aa, startAAIndex, endAAIndex, forParamVector);
 }
 
-
+//std::array<unsigned, 2>
+// Note: From function definition in header, default forParamVector is false.
+// Returns the range of index values in the CodonTable for codons corresponding to a given amino acid. The function is overloaded and uses a wrapper function to map from an amino acid index value rather than a string. (which I believe is only a single char).
+//
+// param aa corresponds to an entry in groupList which are separately defined for each parametrer type, e.g. in ROCParameter.cpp
+// param v2 Second value
+// return Product of v1 and v2
+// [[Rcpp__export]] Change __ to :: to export function description. Seems to be breaking things as of now. 
 void SequenceSummary::AAToCodonRange(std::string aa, unsigned& startAAIndex, unsigned& endAAIndex, bool forParamVector)
 {
 	//aa = (char)std::toupper(aa[0]); CEDRIC: commented out for performance. Put back in if necessary!

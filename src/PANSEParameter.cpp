@@ -793,16 +793,29 @@ void PANSEParameter::proposePartitionFunction()
 {
     for (unsigned i = 0u; i < numMixtures; i++)
     {
-        partitionFunction_proposed[i] = std::exp( randNorm( std::log(partitionFunction[i]) , std_partitionFunction) );
+    	if (!fix_Z)
+    	{
+        	partitionFunction_proposed[i] = std::exp( randNorm( std::log(partitionFunction[i]) , std_partitionFunction) );
+    	}
+    	else
+    	{
+    		partitionFunction_proposed[i] = partitionFunction[i];
+    	}
     }
 
 }
 
 
-void PANSEParameter::setPartitionFunction(double newPartitionFunction, unsigned mixtureCategory)
+void PANSEParameter::setPartitionFunction(double newPartitionFunction, unsigned mixtureCategory,bool proposed)
 {
-    partitionFunction[mixtureCategory] = newPartitionFunction;
-    partitionFunction_proposed[mixtureCategory] = newPartitionFunction;
+	if (proposed)
+	{
+    	partitionFunction_proposed[mixtureCategory] = newPartitionFunction;
+    }
+    else
+    {
+    	partitionFunction[mixtureCategory] = newPartitionFunction;
+    }
 }
 
 
@@ -854,7 +867,7 @@ void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptatio
 
   adaptiveStepPrev = adaptiveStepCurr;
   adaptiveStepCurr = lastIteration;
-  unsigned samples = adaptiveStepCurr - adaptiveStepPrev;
+  //unsigned samples = adaptiveStepCurr - adaptiveStepPrev;
 
   my_print("Acceptance rates for Codon Specific Parameters\n");
   my_print("Target range: %-% \n", factorCriteriaLow, factorCriteriaHigh );
@@ -1094,6 +1107,11 @@ void PANSEParameter::fixLambdaPrime()
 void PANSEParameter::fixNSERate()
 {
 	fix_nse = true;
+}
+
+void PANSEParameter::fixZ()
+{
+	fix_Z = true;
 }
 
 void PANSEParameter::shareNSERate()
