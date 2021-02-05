@@ -443,16 +443,6 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 {
 	std::vector<double> acceptanceRatioForAllMixtures(5,0.0);
 	unsigned size = model.getGroupListSize();
-
-	// unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-	// std::default_random_engine e(seed);
-
-	// std::random_device rd;
- //    std::mt19937 g(rd());
-
-	// std::vector<unsigned> groups(size);
-	// std::iota(groups.begin(),groups.end(),0);
-	// std::shuffle ( groups.begin(), groups.end(),g);
 	
 	for (unsigned i = 0; i < size; i++)
 	{
@@ -463,7 +453,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
     	double threshold = -Parameter::randExp(1);
  		if (threshold < acceptanceRatioForAllMixtures[0] && std::isfinite(acceptanceRatioForAllMixtures[0]) && !std::isnan(acceptanceRatioForAllMixtures[2]))
 		{	
-			
+			//my_print("AA % Threshold % Acceptance Ratio % \n",grouping,threshold,acceptanceRatioForAllMixtures[0]);
 			
 			// moves proposed codon specific parameters to current codon specific parameters
 			if (std::isnan(acceptanceRatioForAllMixtures[0]))
@@ -489,10 +479,6 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 			
 		}
 	
-		// if ((iteration % thinning) == 0)
-		// {
-		// 	model.updateCodonSpecificParameterTrace(iteration/thinning, grouping);
-		// }
 	}
 	if ((iteration % thinning) == 0)
 	{
