@@ -598,8 +598,8 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                 my_print("\tProposed NSE Rate: %\n",getParameterForCategory(alphaCategory, PANSEParameter::nse, grouping, true));
 
             }
-            //currAdjustmentTerm += std::log(currNSERate);
-            //propAdjustmentTerm += std::log(propNSERate);
+            currAdjustmentTerm += std::log(currNSERate);
+            propAdjustmentTerm += std::log(propNSERate);
         }
     }
     

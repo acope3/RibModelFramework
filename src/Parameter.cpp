@@ -1488,21 +1488,30 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 	{
 		if( (acceptanceLevel < acceptanceTargetLow) || (acceptanceLevel > acceptanceTargetHigh) )// adjust proposal width
 	  	{
-	  	  //Update cov matrix based on previous window to improve efficiency of sampling
-	      CovarianceMatrix covcurr(covarianceMatrix[aaIndex].getNumVariates());
-	      covcurr.calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
-	      CovarianceMatrix covprev = covarianceMatrix[aaIndex];
-	      covprev = (covprev*0.6);
-	      covcurr = (covcurr*0.4);
-	      covarianceMatrix[aaIndex] = covprev + covcurr;
-	      //replace cov matrix based on previous window
-	      //The is approach was commented out and above code uncommented to replace it in commit ec63bb21a1e9 (2016).  Should remove
-	      //covarianceMatrix[aaIndex].calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
-
+	  	 
 	      // define adjustFactor
 	      if (acceptanceLevel < factorCriteriaLow)
 	      {
 		  	adjustFactor = adjustFactorLow;
+		  	
+		  	//Update cov matrix based on previous window to improve efficiency of sampling
+		  	//In original code, Cedric only did this when the acceptance level was too low.
+		  	//Mike updated the code to do this every time.
+		  	//Alex noticed this tended to lead to high acceptance ratios for some amino acids in ROC (e.g. 0.4 -- 0.5 range)
+		  	//Most likely effect is would decrease sampling efficiency. Parameter estimates should be reliable if MCMC run long enough.
+		  	//Can check effective sample sizes if concerned.
+		  	//Note that in Cedric's original code, he adjusted the covariance matrix prior to this chunk of code.
+		  	//This implementation seems to work, as well. 
+		  	CovarianceMatrix covcurr(covarianceMatrix[aaIndex].getNumVariates());
+	      	covcurr.calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
+	      	CovarianceMatrix covprev = covarianceMatrix[aaIndex];
+	      	covprev = (covprev*0.6);
+	      	covcurr = (covcurr*0.4);
+	      	covarianceMatrix[aaIndex] = covprev + covcurr;
+	      	//replace cov matrix based on previous window
+	      //The is approach was commented out and above code uncommented to replace it in commit ec63bb21a1e9 (2016).  Should remove
+	      //covarianceMatrix[aaIndex].calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
+
 		  }
 	      else if(acceptanceLevel > factorCriteriaHigh)
 	      {
@@ -1520,9 +1529,11 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 		    for (unsigned k = aaStart; k < aaEnd; k++)
 		    {
 		    	std_csp[k] *= adjustFactor;
+		    	
 		    }
+		    covarianceMatrix[aaIndex] *= adjustFactor;
 		    //Adjust widths if using cov matrix
-		   	covarianceMatrix[aaIndex] *= adjustFactor;
+		   	
 	  	   
 		 }
 
@@ -1533,8 +1544,10 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 	} // end if(adapt)
 
 	numAcceptForCodonSpecificParameters[aaIndex] = 0u;
-   }
+  }
 }
+
+
 
 
 //------------------------------------------------------//
