@@ -12,8 +12,6 @@
 #'  
 #' @param rfp.count.column (PA and PANSE only) A number representing the RFP count column to use. Default value is 1.
 #'
-#' @param initiation.cost (FONSE only) A positive number representing the initiation cost of initiating protein translation (a_1 in the model description, the elongation cost a_2 = 4 ~P) Default value is 4 ~P.
-#'      
 #' @return This function returns the model object created. 
 #'  
 #' @description initializes the model object. 

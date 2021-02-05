@@ -27,6 +27,61 @@ PAModel::~PAModel()
 }
 
 
+void PAModel::calculateZ(std::string grouping,Genome& genome,std::vector<double> &Z)
+{
+
+    double currAlpha,currLambda,propAlpha,propLambda;
+    double currZ = 0;
+    double propZ = 0;
+    Gene* gene;
+    std::vector<std::string> groups = parameter -> getGroupList();
+#ifdef _OPENMP
+    //#ifndef __APPLE__
+#pragma omp parallel for private(gene,currAlpha,currLambda,propAlpha,propLambda) reduction(+:currZ,propZ)
+#endif
+    for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+    {
+        gene = &genome.getGene(i);
+        unsigned mixtureElement = parameter->getMixtureAssignment(i);
+        // how is the mixture element defined. Which categories make it up
+        unsigned alphaCategory = parameter->getMutationCategory(mixtureElement);
+        unsigned lambdaPrimeCategory = parameter->getSelectionCategory(mixtureElement);
+        unsigned synthesisRateCategory = parameter->getSynthesisRateCategory(mixtureElement);
+        
+
+        double phi = parameter->getSynthesisRate(i, synthesisRateCategory, false);
+        double currZ_gene = 0;
+	    double propZ_gene = 0;
+        for (unsigned j = 0; j < groups.size();j++)
+        {
+        	std::string codon = groups[j];
+	        unsigned currNumCodonsInMRNA = gene->geneData.getCodonCountForCodon(codon);
+	        
+	        currAlpha = getParameterForCategory(alphaCategory, PAParameter::alp, codon, false);
+	        currLambda = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, codon, false);
+
+	        propAlpha = getParameterForCategory(alphaCategory, PAParameter::alp, codon, true);
+	        propLambda = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, codon, true);
+
+	        if(codon == grouping)
+	        {
+	            propZ_gene += propAlpha/propLambda; 
+	        }
+	        else
+	        {
+	            propZ_gene += currAlpha/currLambda; 
+	        }
+
+	        currZ_gene += currAlpha/currLambda;
+    	}
+    
+        currZ += phi * currZ_gene;
+        propZ += phi * propZ_gene;
+    }
+    Z[0] = currZ;
+    Z[1] = propZ;
+}
+
 double PAModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime, unsigned currRFPValue,
                                                       unsigned currNumCodonsInMRNA, double phiValue)
 {
@@ -59,10 +114,10 @@ void PAModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex,
 	double phiValue = parameter->getSynthesisRate(geneIndex, synthesisRateCategory, false);
 	double phiValue_proposed = parameter->getSynthesisRate(geneIndex, synthesisRateCategory, true);
 
-#ifdef _OPENMP
-//#ifndef __APPLE__
-#pragma omp parallel for reduction(+:logLikelihood,logLikelihood_proposed)
-#endif
+// #ifdef _OPENMP
+// //#ifndef __APPLE__
+// #pragma omp parallel for reduction(+:logLikelihood,logLikelihood_proposed)
+// #endif
 	for (unsigned index = 0; index < getGroupListSize(); index++) //number of codons, without the stop codons
 	{
 		std::string codon = getGrouping(index);

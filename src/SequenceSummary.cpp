@@ -226,9 +226,11 @@ void SequenceSummary::setCodonTable(unsigned codon_table_number)
 
 		it_1 = AAToCodonsMapWithReference.find(L);
 		it_1 -> second = {"CTA", "CTC", "CTT", "TTA", "TTG"};
+
 		
 		it_1 = AAToCodonsMapWithoutReference.find(L);
 		it_1 -> second = {"CTA", "CTC", "CTT", "TTA"};
+
 		
 
 		it_2 = codonToAAMap.find(CTG);
@@ -631,14 +633,17 @@ void SequenceSummary::AAIndexToCodonRange(unsigned aaIndex, unsigned& startAAInd
 	AAToCodonRange(aa, startAAIndex, endAAIndex, forParamVector);
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 7e358f8caac68038c33c89bba3922e7d9f4dd6a3
 //std::array<unsigned, 2>
 // Note: From function definition in header, default forParamVector is false.
-//' Returns the range of index values in the CodonTable for codons corresponding to a given amino acid. The function is overloaded and uses a wrapper function to map from an amino acid index value rather than a string. (which I believe is only a single char).
-//'
-//' @param aa corresponds to an entry in groupList which are separately defined for each parametrer type, e.g. in ROCParameter.cpp
-//' @param v2 Second value
-//' @return Product of v1 and v2
+// Returns the range of index values in the CodonTable for codons corresponding to a given amino acid. The function is overloaded and uses a wrapper function to map from an amino acid index value rather than a string. (which I believe is only a single char).
+//
+// param aa corresponds to an entry in groupList which are separately defined for each parametrer type, e.g. in ROCParameter.cpp
+// param v2 Second value
+// return Product of v1 and v2
 // [[Rcpp__export]] Change __ to :: to export function description. Seems to be breaking things as of now. 
 void SequenceSummary::AAToCodonRange(std::string aa, unsigned& startAAIndex, unsigned& endAAIndex, bool forParamVector)
 {

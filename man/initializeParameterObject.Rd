@@ -4,14 +4,26 @@
 \alias{initializeParameterObject}
 \title{Initialize Parameter}
 \usage{
-initializeParameterObject(genome = NULL, sphi = NULL,
-  num.mixtures = 1, gene.assignment = NULL,
-  initial.expression.values = NULL, model = "ROC",
-  split.serine = TRUE, mixture.definition = "allUnique",
-  mixture.definition.matrix = NULL, init.with.restart.file = NULL,
-  mutation.prior.mean = 0, mutation.prior.sd = 0.35,
-  propose.by.prior = FALSE, init.csp.variance = 0.0025,
-  init.sepsilon = 0.1, init.w.obs.phi = FALSE)
+initializeParameterObject(
+  genome = NULL,
+  sphi = NULL,
+  num.mixtures = 1,
+  gene.assignment = NULL,
+  initial.expression.values = NULL,
+  model = "ROC",
+  split.serine = TRUE,
+  mixture.definition = "allUnique",
+  mixture.definition.matrix = NULL,
+  init.with.restart.file = NULL,
+  mutation.prior.mean = 0,
+  mutation.prior.sd = 0.35,
+  propose.by.prior = FALSE,
+  init.csp.variance = 0.0025,
+  init.sepsilon = 0.1,
+  init.w.obs.phi = FALSE,
+  init.initiation.cost = 4,
+  init.partition.function = 1
+)
 }
 \arguments{
 \item{genome}{An object of type Genome necessary for the initialization of the Parameter object.
@@ -30,7 +42,7 @@ It is possible but not advised to leave a mixture element empty.
 The default Value is NULL.}
 
 \item{initial.expression.values}{(Optional) A vector with intial phi values.
-The length of the vector has to equal the number of genes in the Genome object.
+The length of the vector has to equal the number of genes in the Genome object and the order of the genes should match the order of the genes in the Genome.
 The default value is NULL.}
 
 \item{model}{Specifies the model used. Valid options are "ROC", "PA", "PANSE", or "FONSE".
@@ -78,11 +90,15 @@ The proposal width adapts during the runtime to reach a taget acceptance rate of
 
 \item{init.sepsilon}{specifies the initial value for sepsilon. default is 0.1}
 
-\item{init.w.obs.phi}{TRUE: initialize phi values with observed phi values 
+\item{init.w.obs.phi}{If TRUE, initialize phi values with observed phi values 
 (data from RNAseq, mass spectrometry, ribosome footprinting) Default is FALSE. 
 If multiple observed phi values exist for a gene, the geometric mean of these values is used as initial phi.
 When using this function, one should remove any genes with 
 missing phi values, as these genes will not have an initial phi value.}
+
+\item{init.initiation.cost}{FOR FONSE ONLY. Initializes the initiation cost a_1 at this value.}
+
+\item{init.partition.function}{FOR PANSE ONLY. initializes the partition function Z.}
 }
 \value{
 parameter Returns an initialized Parameter object.

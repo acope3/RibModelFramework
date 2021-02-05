@@ -351,6 +351,14 @@ std::vector<double> Trace::getCodonSpecificAcceptanceRateTraceForAA(std::string 
 	return codonSpecificAcceptanceRateTrace[aaIndex];
 }
 
+std::vector<double> Trace::getCodonSpecificAcceptanceRateTraceForCodon(std::string codon)
+{
+	codon[0] = (char)std::toupper(codon[0]);
+	unsigned codonIndex = SequenceSummary::codonToIndexWithReference.find(codon)->second;
+	return codonSpecificAcceptanceRateTrace[codonIndex];
+}
+
+
 
 std::vector<float> Trace::getSynthesisRateTraceForGene(unsigned geneIndex)
 {

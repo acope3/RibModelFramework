@@ -4,6 +4,9 @@ useDynLib(AnaCoDa, .registration = TRUE)
 #imports
 importFrom(methods, new)
 importFrom(Rcpp, evalCpp)
+importFrom(stats, cov, dlnorm)
+importFrom(mvtnorm, dmvnorm)
+importFrom(VGAM, vglm, multinomial)
 
 importFrom(graphics, abline, axis, box, grid, hist,
       layout, legend, lines, pairs, par, plot,
@@ -47,8 +50,8 @@ export(
 "getTrace",
 "getSelectionCoefficients",
 "geomMean",
-"calculate_marginal_log_likelihood",
-"confidenceInterval.plot",
+"calculateMarginalLogLikelihood",
+#"confidenceInterval.plot",
 
 ## Model object
 "initializeModelObject",
