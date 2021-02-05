@@ -823,7 +823,6 @@ void ROCParameter::proposeCodonSpecificParameter()
 				else if (propose_by_prior)
 				{
 					proposedCodonSpecificParameter[dM][i][l] = randNorm(mutation_prior_mean[i][l],mutation_prior_sd[i][l]);
-					my_print("wrong\n");
 				}
 				else
 				{
