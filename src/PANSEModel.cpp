@@ -518,6 +518,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                         }
                
                     }
+                    //propSigma = elongationUntilIndexApproximation2ProbabilityLog(propAlpha,propLambda,1.0/currNSERate,propSigma);
                 }
                 else
                 {
@@ -532,8 +533,10 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                             prop_prob_successful = 0.0;
                         }
                     }
+                    //propSigma = elongationUntilIndexApproximation2ProbabilityLog(currAlpha,currLambda,1.0/propNSERate,propSigma);
                 }
                 propSigma = propSigma + prop_prob_successful;
+    
            }
            else
            {
@@ -547,7 +550,8 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                         prob_successful[codonIndex] = 0.0;
                     }
                 }
-                propSigma = propSigma + prob_successful[codonIndex];  
+                propSigma = propSigma + prob_successful[codonIndex];
+                //propSigma = elongationUntilIndexApproximation2ProbabilityLog(currAlpha,currLambda,1.0/currNSERate,propSigma);
             }
             
 
@@ -566,6 +570,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
             }
 
             currSigma = currSigma + prob_successful[codonIndex];
+            //currSigma = elongationUntilIndexApproximation2ProbabilityLog(currAlpha,currLambda,1.0/currNSERate,currSigma);
         }
     }
     
@@ -1298,6 +1303,7 @@ void PANSEModel::updateHyperParameter(unsigned hp)
 void PANSEModel::simulateGenome(Genome &genome)
 {
     unsigned Y = genome.getSumRFP();
+    my_print("Total number of RFPs in Real Dataset: %\n",Y);
     double Z = 0;
     std::vector<std::vector<double>> wait_times;
     wait_times.resize(genome.getGenomeSize());
@@ -1382,8 +1388,6 @@ void PANSEModel::simulateGenome(Genome &genome)
             {
                 my_print("Stop codon being used during simulations\n");
             }
-            //double alpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, false);
-            //double lambda = getParameterForCategory(lambdaCategory, PANSEParameter::lmPri, codon, false);
             double NSERate = getParameterForCategory(alphaCategory, PANSEParameter::nse, codon, false);
             v = 1.0 / NSERate;
 #ifndef STANDALONE

@@ -321,12 +321,14 @@ plotAcceptanceRatios <- function(trace,main="CSP Acceptance Ratio Traces")
   
   for(aa in names.aa)
   { 
-    codons <- AAToCodon(aa, with.ref.codon)
-    if(length(codons) == 0) next
     if (!ROC.or.FONSE){
       if(aa == "X") next
+    } else if(ROC.or.FONSE){
+        if(aa == "X" || aa == "W" || aa == "M") next
     }
     
+    codons <- AAToCodon(aa, with.ref.codon)
+    if(length(codons) == 0) next
 
     if (!ROC.or.FONSE)
     {

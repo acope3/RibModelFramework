@@ -68,6 +68,7 @@ class Genome
         std::vector <std::string> getRFPCountColumnNames();
 		void addRFPCountColumnName(std::string categoryName);
 		unsigned getSumRFP();
+		void setSumRFP(unsigned _totalRFPCount);
 
 		//Testing Functions:
 		std::vector <unsigned> getNumGenesWithPhi();
