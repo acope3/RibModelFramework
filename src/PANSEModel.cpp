@@ -1351,6 +1351,7 @@ void PANSEModel::simulateGenome(Genome &genome)
     }
     double U = Z/Y;
     my_print("True Z value based on provided phi and CSPs:%\n",Z);
+
     for (unsigned geneIndex = 0u; geneIndex < genome.getGenomeSize(); geneIndex++)
     {
 
