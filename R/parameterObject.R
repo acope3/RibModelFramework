@@ -373,8 +373,8 @@ initializePANSEParameterObject <- function(genome, sphi, numMixtures, geneAssign
   # initialize expression values
   if(is.null(expressionValues) && init.w.obs.phi == F)
   {
-    parameter$initializeSynthesisRateByRandom(mean(sphi))
 
+    parameter$initializeSynthesisRateByRandom(mean(sphi))
   } 
   else if(init.w.obs.phi == T && is.null(expressionValues))
   {
@@ -409,7 +409,6 @@ initializePANSEParameterObject <- function(genome, sphi, numMixtures, geneAssign
   if (n.obs.phi.sets != 0){
     parameter$setInitialValuesForSepsilon(as.vector(init.sepsilon))
   }
-
   return (parameter)
 }
 
@@ -674,6 +673,15 @@ getNSEProbabilityTrace <- function(parameter,mixture,codon,samples)
   return(prob.nse.trace[(length(prob.nse.trace)-samples):length(prob.nse.trace)])
 }
 
+getEffectiveSampleSizesByCodon <- function(parameter,codon,samples,paramType,mixture=1,thin=10,withoutReference=T)
+{
+  trace <- parameter$getTraceObject()
+  trace.vec <-trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture,codon,paramType,withoutReference)
+  trace.vec <- trace.vec[(length(trace.vec)-samples):(length(trace.vec))]
+  mcmc.csp <- coda::mcmc(trace.vec,thin)
+  return(coda::effectiveSize(mcmc.csp))     
+}
+
 
 
 getEffectiveSampleSizesByCodon <- function(parameter,codon,samples,paramType,mixture=1,thin=10,withoutReference=T)
@@ -841,7 +849,6 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
     }
   }
 }
-
 ## NOT EXPOSED
 optimalAsReference <- function(param.1,param.2,parameter.names,report.original.ref)
 {
