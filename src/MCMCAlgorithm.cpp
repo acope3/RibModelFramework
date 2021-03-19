@@ -147,6 +147,8 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		std::vector <double> unscaledLogPost_curr(numSynthesisRateCategories, 0.0);
 		std::vector <double> unscaledLogPost_prop(numSynthesisRateCategories, 0.0);
 
+		std::vector <double> unscaledLogLike_curr_singleMixture(numMixtures, 0.0);
+		std::vector <double> unscaledLogLike_prop_singleMixture(numMixtures, 0.0);
 		std::vector <double> unscaledLogProb_curr_singleMixture(numMixtures, 0.0);
 		std::vector <double> unscaledLogProb_prop_singleMixture(numMixtures, 0.0);
 		std::vector <double> probabilities(numMixtures, 0.0);
@@ -174,14 +176,19 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				unscaledLogLike_curr[k] += logProbabilityRatio[5]; //current logLikelihood
 				unscaledLogLike_prop[k] += logProbabilityRatio[6]; //proposed logLikelihood
 
+
+				
 				unscaledLogProb_curr_singleMixture[mixtureIndex] = logProbabilityRatio[3];
 				unscaledLogProb_prop_singleMixture[mixtureIndex] = logProbabilityRatio[4];
+				unscaledLogLike_curr_singleMixture[mixtureIndex] = logProbabilityRatio[5];
+				unscaledLogLike_prop_singleMixture[mixtureIndex] = logProbabilityRatio[6];
 
 				maxValue = unscaledLogProb_curr_singleMixture[mixtureIndex] > maxValue ?
 						   unscaledLogProb_curr_singleMixture[mixtureIndex] : maxValue;
 
 				maxValue2 = unscaledLogProb_prop_singleMixture[mixtureIndex] > maxValue2 ?
 							unscaledLogProb_prop_singleMixture[mixtureIndex] : maxValue2;
+
 				//maxValue2 = unscaledLogPost_prop[k] > maxValue2 ?
 				//		unscaledLogPost_prop[k] : maxValue2;
 
@@ -222,6 +229,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		}
 
 		double currGeneLogPost = 0.0;
+		double currGeneLogLike = 0.0;
 		for (unsigned k = 0u; k < numSynthesisRateCategories; k++)
 		{
 			// We do not need to add std::log(model.getCategoryProbability(k)) since it will cancel in the ratio!
@@ -239,8 +247,9 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				{
 					unsigned element = mixtureElements[n];
 					currGeneLogPost += probabilities[element] * std::exp(unscaledLogProb_prop_singleMixture[element] - maxValue2);
+					currGeneLogLik += probabilities[element] * std::exp(unscaledLogLike_prop_singleMixture[element] - maxValue2);
 				}
-				loglikelihood += unscaledLogLike_prop[k]; //unscaled
+				//loglikelihood += unscaledLogLike_prop[k]; //unscaled
 			}
 			else
 			{
@@ -248,8 +257,9 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				{
 					unsigned element = mixtureElements[n];
 					currGeneLogPost += probabilities[element] * std::exp(unscaledLogProb_curr_singleMixture[element] - maxValue2);
+					currGeneLogLik += probabilities[element] * std::exp(unscaledLogLike_curr_singleMixture[element] - maxValue2);
 				}
-				loglikelihood += unscaledLogLike_curr[k]; //unscaled
+				//loglikelihood += unscaledLogLike_curr[k]; //unscaled
 			}
 
             if (std::isnan(logPosterior))
@@ -266,6 +276,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
                 my_print("\n\n\n");
             }
 		}
+		loglikelihood += std::log(currGeneLogLik) + maxValue2;
 		logPosterior += std::log(currGeneLogPost) + maxValue2;
 
 		//Get category in which the gene is placed in.
