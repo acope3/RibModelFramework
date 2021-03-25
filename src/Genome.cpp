@@ -508,7 +508,7 @@ void Genome::writeRFPData(std::string filename, bool simulated)
 				Gene *currentGene = &simulatedGenes[geneIndex];
                 SequenceSummary *sequenceSummary = currentGene->getSequenceSummary();
                 std::vector <unsigned> positions = sequenceSummary->getPositionCodonID();
-                std::vector <unsigned> rfpCounts = sequenceSummary->getRFPCount(0);
+                std::vector <unsigned long> rfpCounts = sequenceSummary->getRFPCount(0);
 				for (unsigned positionIndex = 0u; positionIndex < positions.size(); positionIndex++)
 				{
 					unsigned codonID = positions[positionIndex];
@@ -775,13 +775,13 @@ void Genome::removeUnobservedGenes()
 	genes = tmp;
 }
 
-unsigned Genome::getSumRFP()
+unsigned long Genome::getSumRFP()
 {
     return totalRFPCount;
 }
 
 //This function should only be used when simulating, but want to set number of ribosome profiling counts
-void Genome::setSumRFP(unsigned _totalRFPCount)
+void Genome::setSumRFP(unsigned long _totalRFPCount)
 {
     totalRFPCount = _totalRFPCount;
 }

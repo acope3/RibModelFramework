@@ -395,7 +395,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, PANSEMode
 		// calculate likelihood ratio for every Category for current AA (ROC, FONSE) or Codon (PA, PANSE)
 		model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures,param_2);
 		double threshold = -Parameter::randExp(1);
-		if (threshold < acceptanceRatioForAllMixtures[0] && std::isfinite(acceptanceRatioForAllMixtures[0]) && !std::isnan(acceptanceRatioForAllMixtures[2]))
+		if (threshold < acceptanceRatioForAllMixtures[0] && std::isfinite(acceptanceRatioForAllMixtures[0]) && !std::isnan(acceptanceRatioForAllMixtures[2]) && acceptanceRatioForAllMixtures[1] != 0)
 		{	
 			// moves proposed codon specific parameters to current codon specific parameters
 			if (std::isnan(acceptanceRatioForAllMixtures[0]))
@@ -403,7 +403,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, PANSEMode
 				my_print("ERROR: Accepted proposed value that results in NaN\n");
 			}
 			model.updateCodonSpecificParameter(grouping,param_2);
-			if ((iteration % thinning) == 0)
+			if ((iteration % thinning) == 0 && acceptanceRatioForAllMixtures[2] != 0)
 			{
 				likelihoodTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[2];//will be 0
 				posteriorTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[4];//will be 0
@@ -411,7 +411,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, PANSEMode
 		}
 		else
 		{
-			if ((iteration % thinning) == 0)
+			if ((iteration % thinning) == 0 && acceptanceRatioForAllMixtures[1] != 0)
 			{
 				likelihoodTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[1];
 				posteriorTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[3];

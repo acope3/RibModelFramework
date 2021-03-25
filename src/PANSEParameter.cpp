@@ -741,7 +741,6 @@ void PANSEParameter::updateCodonSpecificParameter(std::string grouping,std::stri
 	else
 	{
 		numAcceptForNSERates[i]++;
-		//my_print("% % % %\n",grouping,i,param,numAcceptForNSERates[i]);
 	    for (unsigned k = 0u; k < numMutationCategories; k++)
 	    {
 	        currentCodonSpecificParameter[nse][k][i] = proposedCodonSpecificParameter[nse][k][i];
@@ -886,8 +885,7 @@ void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptatio
     unsigned codonIndex = SequenceSummary::codonToIndex(codon);
     double acceptanceLevel_elong = (double)numAcceptForCodonSpecificParameters[codonIndex] / (double)adaptationWidth;
     double acceptanceLevel_nse = (double)numAcceptForNSERates[codonIndex] / (double)adaptationWidth;
-    double acceptanceLevel = 0.5 * (acceptanceLevel_elong+acceptanceLevel_nse);
-    my_print("\t%:\t%\t%\t%\n", codon.c_str(), acceptanceLevel_elong,acceptanceLevel_nse,acceptanceLevel);
+    my_print("\t%:\t%\t%\n", codon.c_str(), acceptanceLevel_elong,acceptanceLevel_nse);
    	//my_print("\t%:\t%\n", codon.c_str(), acceptanceLevel_elong);
    
     traces.updateCodonSpecificAcceptanceRateTrace(codonIndex, acceptanceLevel_elong);
@@ -898,38 +896,42 @@ void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptatio
 
     if (adapt)
 	{
-		if( (acceptanceLevel_elong < acceptanceTargetLow) || (acceptanceLevel_elong > acceptanceTargetHigh) )// adjust proposal width
-	  	{
-
-	      // define adjustFactor
-	    
-	      if (acceptanceLevel_elong < factorCriteriaLow)
-	      {
-		  	adjustFactor = adjustFactorLow;
-		  	std_csp[codonIndex] *= adjustFactor;
-		  }
-	      else if(acceptanceLevel_elong > factorCriteriaHigh)
-	      {
-		  	adjustFactor = adjustFactorHigh;
-		  	std_csp[codonIndex] *= adjustFactor;
-		  }
-		 
-		}// end if statement
-
-
-		if ( (acceptanceLevel_nse < acceptanceTargetLow) || (acceptanceLevel_nse > acceptanceTargetHigh))
+		if (!fix_lp || !fix_alpha)
 		{
-		 if (acceptanceLevel_nse < factorCriteriaLow)
-	      {
-		  	adjustFactor = adjustFactorLow;
-		  	std_nse[codonIndex] *= adjustFactor;
-		  }
-	      else if(acceptanceLevel_nse > factorCriteriaHigh)
-	      {
-		  	adjustFactor = adjustFactorHigh;
-		  	std_nse[codonIndex] *= adjustFactor;
-		  }
-	
+			if( (acceptanceLevel_elong < acceptanceTargetLow) || (acceptanceLevel_elong > acceptanceTargetHigh) )// adjust proposal width
+		  	{
+
+		      // define adjustFactor
+		    
+		      if (acceptanceLevel_elong < factorCriteriaLow)
+		      {
+			  	adjustFactor = adjustFactorLow;
+			  	std_csp[codonIndex] *= adjustFactor;
+			  }
+		      else if(acceptanceLevel_elong > factorCriteriaHigh)
+		      {
+			  	adjustFactor = adjustFactorHigh;
+			  	std_csp[codonIndex] *= adjustFactor;
+			  }
+			 
+			}// end if statement
+		}
+		if (!fix_nse)
+		{
+			if ( (acceptanceLevel_nse < acceptanceTargetLow) || (acceptanceLevel_nse > acceptanceTargetHigh))
+			{
+			 if (acceptanceLevel_nse < factorCriteriaLow)
+		      {
+			  	adjustFactor = adjustFactorLow;
+			  	std_nse[codonIndex] *= adjustFactor;
+			  }
+		      else if(acceptanceLevel_nse > factorCriteriaHigh)
+		      {
+			  	adjustFactor = adjustFactorHigh;
+			  	std_nse[codonIndex] *= adjustFactor;
+			  }
+			
+			}
 		}
 
 
@@ -1412,7 +1414,7 @@ void PANSEParameter::setTotalRFPCount(Genome& genome)
 	Y = genome.getSumRFP();
 }
 
-unsigned PANSEParameter::getTotalRFPCount()
+unsigned long PANSEParameter::getTotalRFPCount()
 {
 	return Y;
 }
