@@ -248,21 +248,20 @@ double PANSEModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, doubl
 {
 
     //Need to do this on log-scale or will get overflow
-    unsigned long factorial = 0;
-    if (currRFPObserved > 0)
-    {
-        for (unsigned i = 1; i <= currRFPObserved;i++)
-        {
-            factorial += std::log(i);
-        }
-    }
+    // double factorial = 0;
+    // if (currRFPObserved > 0)
+    // {
+    //     for (unsigned i = 1; i <= currRFPObserved;i++)
+    //     {
+    //         factorial += std::log(i);
+    //     }
+    // }
 
-    double term1 = lgamma_rfp_alpha - (lgamma_currAlpha + factorial);//std::lgamma(currAlpha);
+    double term1 = lgamma_rfp_alpha - (lgamma_currAlpha);//std::lgamma(currAlpha);
     double term2 = log_phi + std::log(prevSigma) - std::log(currLambdaPrime + (phiValue * prevSigma));
     double term3 = log_currLambdaPrime - std::log(currLambdaPrime + (phiValue * prevSigma));
 
-    if (!std::isfinite(term1))
-        my_print("currRFPObserved: % Log(Factorial): % Term1: %\n",currRFPObserved,factorial,term1);
+    
     term2 *= currRFPObserved;
     term3 *= currAlpha;
 
@@ -430,8 +429,8 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, std::vector<double> &logAcceptanceRatioForAllMixtures,std::string param)
 {
     std::vector<std::string> groups = parameter -> getGroupList();
-    double logLikelihood = 0.0;
-    double logLikelihood_proposed = 0.0;
+    double logLikelihood, logPosterior = 0.0;
+    double logLikelihood_proposed, logPosterior_proposed = 0.0;
     double propAlpha, propLambda, propNSERate;
     
     double currAlpha, currLambda, currNSERate;
@@ -631,14 +630,16 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
         }
     }
 
+    logPosterior_proposed = logLikelihood_proposed + calculateNSERatePrior(grouping,true);
+    logPosterior = logLikelihood + calculateNSERatePrior(grouping,false);
     
     //Should never accept parameters that give NaN, so just check proposed parameters
     
-    logAcceptanceRatioForAllMixtures[0] = logLikelihood_proposed - logLikelihood - (currAdjustmentTerm - propAdjustmentTerm);
+    logAcceptanceRatioForAllMixtures[0] = logPosterior_proposed - logPosterior - (currAdjustmentTerm - propAdjustmentTerm);
 	logAcceptanceRatioForAllMixtures[3] = logLikelihood;
 	logAcceptanceRatioForAllMixtures[4] = logLikelihood_proposed;
-	logAcceptanceRatioForAllMixtures[1] = logLikelihood;
-	logAcceptanceRatioForAllMixtures[2] = logLikelihood_proposed;
+	logAcceptanceRatioForAllMixtures[1] = logPosterior;
+	logAcceptanceRatioForAllMixtures[2] = logPosterior_proposed;
 
     clearMatrices();
 }
@@ -1462,9 +1463,40 @@ void PANSEModel::setParameter(PANSEParameter &_parameter)
 }
 
 
+double PANSEModel::calculateNSERatePrior(std::string grouping,bool proposed)
+{
+   	double priorValue = 0.0;
+
+	unsigned numMutCat = parameter->getNumMutationCategories();
+	for (unsigned i = 0u; i < numMutCat; i++)
+	{
+		double NSERate = parameter->getParameterForCategory(i, PANSEParameter::nse, grouping, proposed);
+		if (NSERate < 1e-10 || NSERate > 1e-1)
+		{
+			priorValue = std::log(0);
+		}
+		else
+		{
+			priorValue = std::log(1);
+		}
+	}
+	return priorValue;
+}
+
 double PANSEModel::calculateAllPriors()
 {
-    return 0.0; //TODO(Cedric): implement me, see ROCModel
+   	double prior = 0.0;
+	unsigned size = getGroupListSize();
+
+	for (unsigned i = 0; i < size; i++)
+	{
+		std::string grouping = getGrouping(i);
+		prior += calculateNSERatePrior(grouping, false);
+	}
+
+	// add more priors if necessary.
+
+	return prior;
 }
 
 
