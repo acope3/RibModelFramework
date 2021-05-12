@@ -137,6 +137,7 @@ class PANSEModel: public Model
 
 		void setParameter(PANSEParameter &_parameter);
 		virtual double calculateAllPriors();
+		virtual double calculateNSERatePrior(std::string grouping,bool proposed=false);
 		virtual double getParameterForCategory(unsigned category, unsigned param, std::string codon, bool proposal);
 
 		double UpperIncompleteGammaHelper(double s, double x);

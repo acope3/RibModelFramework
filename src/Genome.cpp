@@ -508,7 +508,7 @@ void Genome::writeRFPData(std::string filename, bool simulated)
 				Gene *currentGene = &simulatedGenes[geneIndex];
                 SequenceSummary *sequenceSummary = currentGene->getSequenceSummary();
                 std::vector <unsigned> positions = sequenceSummary->getPositionCodonID();
-                std::vector <unsigned> rfpCounts = sequenceSummary->getRFPCount(0);
+                std::vector <unsigned long> rfpCounts = sequenceSummary->getRFPCount(0);
 				for (unsigned positionIndex = 0u; positionIndex < positions.size(); positionIndex++)
 				{
 					unsigned codonID = positions[positionIndex];
@@ -775,10 +775,17 @@ void Genome::removeUnobservedGenes()
 	genes = tmp;
 }
 
-unsigned Genome::getSumRFP()
+unsigned long Genome::getSumRFP()
 {
     return totalRFPCount;
 }
+
+//This function should only be used when simulating, but want to set number of ribosome profiling counts
+void Genome::setSumRFP(unsigned long _totalRFPCount)
+{
+    totalRFPCount = _totalRFPCount;
+}
+
 //------------------------------------//
 //---------- Gene Functions ----------//
 //------------------------------------//
@@ -1094,6 +1101,8 @@ RCPP_MODULE(Genome_mod)
 		.method("getGeneById", &Genome::getGeneById) //TEST THAT ONLY!
 		.method("getGenomeForGeneIndices", &Genome::getGenomeForGeneIndicesR,
 			"returns a new genome based on the ones requested in the given vector")
+		.method("setSumRFP", &Genome::setSumRFP, "set the total number of ribosome counts, should be used with simulateGenome to control number of ribosome counts")
+		.method("getSumRFP", &Genome::getSumRFP, "get the total number of ribosome counts")
 		;
 }
 #endif

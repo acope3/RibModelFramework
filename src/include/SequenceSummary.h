@@ -26,11 +26,11 @@ class SequenceSummary
         // outer index is the codonID, size of 64 for number of codons
         // inner index is the position of each occurrence of the codonID specified.
 
-        std::vector <std::vector <unsigned>> RFPCount;
+        std::vector <std::vector <unsigned long>> RFPCount;
 		// outer index is the RFPCount for the category specified via index
 		// inner index is number of position
 
-		std::vector <std::array <unsigned, 64>> sumRFPCount;
+		std::vector <std::array <unsigned long, 64>> sumRFPCount;
 		// outer index is the RFPCount for the category specified via index
 		// inner index, 64, is the number of codons
 
@@ -71,19 +71,19 @@ class SequenceSummary
 		//RFP Functions (for PA and PANSE models) (All tested):
         //RFP Count has an inner vector indexed by position Sum RFP Count has an inner index of Codon Type
 		void initRFPCount(unsigned numCategories);
-		std::vector <unsigned> getRFPCount(unsigned RFPCountColumn = 0u);
-		unsigned getSingleRFPCount(unsigned position, unsigned RFPCountColumn = 0u);
-		void setRFPCount(std::vector <unsigned> arg, unsigned RFPCountColumn = 0u);
-		unsigned getSumTotalRFPCount(unsigned RFPCountColumn = 0u);
+		std::vector <unsigned long> getRFPCount(unsigned RFPCountColumn = 0u);
+		unsigned long getSingleRFPCount(unsigned position, unsigned RFPCountColumn = 0u);
+		void setRFPCount(std::vector <unsigned long> arg, unsigned RFPCountColumn = 0u);
+		unsigned long getSumTotalRFPCount(unsigned RFPCountColumn = 0u);
 
         void initSumRFPCount(unsigned numCategories);
-		std::array <unsigned, 64> getSumRFPCount(unsigned RFPCountColumn = 0u);
-		void setSumRFPCount(std::array <unsigned, 64> arg, unsigned RFPCountColumn = 0u);
+		std::array <unsigned long, 64> getSumRFPCount(unsigned RFPCountColumn = 0u);
+		void setSumRFPCount(std::array <unsigned long, 64> arg, unsigned RFPCountColumn = 0u);
 
         //These functions deal with a single codon at a time
-        unsigned getCodonSpecificSumRFPCount(std::string codon, unsigned RFPCountColumn = 0u);
-        unsigned getCodonSpecificSumRFPCount(unsigned codonIndex, unsigned RFPCountColumn = 0u);
-        void setCodonSpecificSumRFPCount(unsigned codonIndex, unsigned value, unsigned RFPCountColumn = 0u);
+        unsigned long getCodonSpecificSumRFPCount(std::string codon, unsigned RFPCountColumn = 0u);
+        unsigned long getCodonSpecificSumRFPCount(unsigned codonIndex, unsigned RFPCountColumn = 0u);
+        void setCodonSpecificSumRFPCount(unsigned codonIndex, unsigned long value, unsigned RFPCountColumn = 0u);
 
         //Poisitonal information about Codons
         std::vector <unsigned> getPositionCodonID(); //Used in PANSE for getting codon positions over gene
