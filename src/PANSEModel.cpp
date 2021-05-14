@@ -630,8 +630,9 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
         }
     }
 
-    logPosterior_proposed = logLikelihood_proposed + calculateNSERatePrior(grouping,true);
-    logPosterior = logLikelihood + calculateNSERatePrior(grouping,false);
+
+    logPosterior_proposed = logLikelihood_proposed + calculateNSERatePrior(grouping,true) + calculateAlphaPrior(grouping,true) + calculateLambdaPrior(grouping,true);
+    logPosterior = logLikelihood + calculateNSERatePrior(grouping,false) + calculateAlphaPrior(grouping,false) + calculateLambdaPrior(grouping,false);
     
     //Should never accept parameters that give NaN, so just check proposed parameters
     
@@ -1404,10 +1405,10 @@ void PANSEModel::simulateGenome(Genome &genome)
         {
             unsigned codonIndex = positions[positionIndex];
             std::string codon = sequence.indexToCodon(codonIndex);
-            if (positionIndex == 0 && codon != "ATG")
-            {
-                my_print("Gene % does not start with ATG\n",gene.getId());
-            }
+            // if (positionIndex == 0 && codon != "ATG")
+            // {
+            //     my_print("Gene % does not start with ATG\n",gene.getId());
+            // }
             if (codon == "TAG" || codon == "TGA" || codon == "TAA")
             {
                 my_print("Stop codon being used during simulations\n");
@@ -1462,6 +1463,46 @@ void PANSEModel::setParameter(PANSEParameter &_parameter)
     parameter = &_parameter;
 }
 
+double PANSEModel::calculateAlphaPrior(std::string grouping,bool proposed)
+{
+    double priorValue = 0.0;
+
+    unsigned numMutCat = parameter->getNumMutationCategories();
+    for (unsigned i = 0u; i < numMutCat; i++)
+    {
+        double alpha = parameter->getParameterForCategory(i, PANSEParameter::alp, grouping, proposed);
+        if (alpha < 0 || alpha > 100)
+        {
+            priorValue = std::log(0);
+        }
+        else
+        {
+            priorValue = std::log(1);
+        }
+    }
+    return priorValue;
+}
+
+double PANSEModel::calculateLambdaPrior(std::string grouping,bool proposed)
+{
+    double priorValue = 0.0;
+
+    unsigned numSelCat = parameter->getNumSelectionCategories();
+    for (unsigned i = 0u; i < numSelCat; i++)
+    {
+        double lambda = parameter->getParameterForCategory(i, PANSEParameter::lmPri, grouping, proposed);
+        if (lambda < 0 || lambda > 100)
+        {
+            priorValue = std::log(0);
+        }
+        else
+        {
+            priorValue = std::log(1);
+        }
+    }
+    return priorValue;
+}
+
 
 double PANSEModel::calculateNSERatePrior(std::string grouping,bool proposed)
 {
@@ -1492,6 +1533,8 @@ double PANSEModel::calculateAllPriors()
 	{
 		std::string grouping = getGrouping(i);
 		prior += calculateNSERatePrior(grouping, false);
+        prior += calculateAlphaPrior(grouping, false);
+        prior += calculateLambdaPrior(grouping, false);
 	}
 
 	// add more priors if necessary.
