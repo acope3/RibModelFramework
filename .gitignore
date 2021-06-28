@@ -1,3 +1,7 @@
 # Eclipse Stuff
 .project
 *.Rhistory
+pdfxup.pdf
+
+# Emacs temp files
+\#*
