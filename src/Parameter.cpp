@@ -1451,8 +1451,8 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
   double diffFactorAdjust = 0.05; //sets when multiplication factor adjustment is applied, was 0.1 and 0.0, respectively
   double factorCriteriaLow;
   double factorCriteriaHigh;
-  double adjustFactorLow = 0.8; //factor by which to reduce proposal widths
-  double adjustFactorHigh = 1.2; //factor by which to increase proposal widths
+  double adjustFactorLow = 0.7; //factor by which to reduce proposal widths
+  double adjustFactorHigh = 1.4; //factor by which to increase proposal widths
   double adjustFactor = 1.0; //variable assigned value of either adjustFactorLow or adjustFactorHigh
 
   factorCriteriaLow = acceptanceTargetLow - diffFactorAdjust;  //below this value weighted sum and factor adjustments are applied
@@ -1469,7 +1469,7 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 
   for (unsigned i = 0; i < groupList.size(); i++) //cycle through all of the aa
   {
-  	std::string aa = groupList[i];
+    std::string aa = groupList[i];
     unsigned aaIndex = SequenceSummary::AAToAAIndex(aa);
     double acceptanceLevel = (double)numAcceptForCodonSpecificParameters[aaIndex] / (double)adaptationWidth;
 
@@ -1480,70 +1480,67 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
     unsigned aaStart, aaEnd;
     SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
 
-      //Evaluate current acceptance ratio  performance
+    //Evaluate current acceptance ratio  performance
     if (acceptanceLevel < factorCriteriaLow) acceptanceUnder++;
     else if (acceptanceLevel > factorCriteriaHigh) acceptanceOver++;
 
     if (adapt)
-	{
-		if( (acceptanceLevel < acceptanceTargetLow) || (acceptanceLevel > acceptanceTargetHigh) )// adjust proposal width
-	  	{
-	  	 
-	      // define adjustFactor
-	      if (acceptanceLevel < factorCriteriaLow)
+      {
+        
+        if( (acceptanceLevel < acceptanceTargetLow) || (acceptanceLevel > acceptanceTargetHigh) )// adjust proposal width
+          {
+
+            //Update cov matrix based on previous window to improve efficiency of sampling
+            //Previously, Cedric only did this when the acceptance level was too low.
+            //Mike updated the code to do this every time we're out of the adaptive range.
+            CovarianceMatrix covcurr(covarianceMatrix[aaIndex].getNumVariates());
+            covcurr.calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
+            CovarianceMatrix covprev = covarianceMatrix[aaIndex];
+            covprev = (covprev*0.6);
+            covcurr = (covcurr*0.4);
+            covarianceMatrix[aaIndex] = covprev + covcurr;
+            //replace cov matrix based on previous window
+            //The is approach was commented out and above code uncommented to replace it in commit ec63bb21a1e9 (2016).  Should remove
+            //covarianceMatrix[aaIndex].calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
+
+
+            // define adjustFactor
+            if (acceptanceLevel < factorCriteriaLow)
 	      {
-		  	adjustFactor = adjustFactorLow;
+                adjustFactor = adjustFactorLow;
 		  	
-		  	//Update cov matrix based on previous window to improve efficiency of sampling
-		  	//In original code, Cedric only did this when the acceptance level was too low.
-		  	//Mike updated the code to do this every time.
-		  	//Alex noticed this tended to lead to high acceptance ratios for some amino acids in ROC (e.g. 0.4 -- 0.5 range)
-		  	//Most likely effect is would decrease sampling efficiency. Parameter estimates should be reliable if MCMC run long enough.
-		  	//Can check effective sample sizes if concerned.
-		  	//Note that in Cedric's original code, he adjusted the covariance matrix prior to this chunk of code.
-		  	//This implementation seems to work, as well. 
-		  	CovarianceMatrix covcurr(covarianceMatrix[aaIndex].getNumVariates());
-	      	covcurr.calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
-	      	CovarianceMatrix covprev = covarianceMatrix[aaIndex];
-	      	covprev = (covprev*0.6);
-	      	covcurr = (covcurr*0.4);
-	      	covarianceMatrix[aaIndex] = covprev + covcurr;
-	      	//replace cov matrix based on previous window
-	      //The is approach was commented out and above code uncommented to replace it in commit ec63bb21a1e9 (2016).  Should remove
-	      //covarianceMatrix[aaIndex].calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
-
-		  }
-	      else if(acceptanceLevel > factorCriteriaHigh)
+              }
+            else if(acceptanceLevel > factorCriteriaHigh)
 	      {
-		  	adjustFactor = adjustFactorHigh;
-		  }
-	      else //Don't adjust
+                adjustFactor = adjustFactorHigh;
+              }
+            else //Don't adjust
 	      {
-		  	adjustFactor = 1.0;
-		  }
+                adjustFactor = 1.0;
+              }
 
-		 if( adjustFactor != 1.0 )
-		 {
+            if( adjustFactor != 1.0 )
+              {
 		 
-		    //Adjust proposal width for codon specific parameters
-		    for (unsigned k = aaStart; k < aaEnd; k++)
-		    {
-		    	std_csp[k] *= adjustFactor;
+                //Adjust proposal width for codon specific parameters
+                for (unsigned k = aaStart; k < aaEnd; k++)
+                  {
+                    std_csp[k] *= adjustFactor;
 		    	
-		    }
-		    covarianceMatrix[aaIndex] *= adjustFactor;
-		    //Adjust widths if using cov matrix
+                  }
+                covarianceMatrix[aaIndex] *= adjustFactor;
+                //Adjust widths if using cov matrix
 		   	
 	  	   
-		 }
+              }
 
-		      //Decomposing of cov matrix to convert iid samples to covarying samples using matrix decomposition
-		      //The decomposed matrix is used in the proposal of new samples
-		 covarianceMatrix[aaIndex].choleskyDecomposition();
-		}// end adjust loop
-	} // end if(adapt)
+            //Decomposing of cov matrix to convert iid samples to covarying samples using matrix decomposition
+            //The decomposed matrix is used in the proposal of new samples
+            covarianceMatrix[aaIndex].choleskyDecomposition();
+          }// end adjust loop
+      } // end if(adapt)
 
-	numAcceptForCodonSpecificParameters[aaIndex] = 0u;
+    numAcceptForCodonSpecificParameters[aaIndex] = 0u;
   }
 }
 
