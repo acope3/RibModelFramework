@@ -50,7 +50,8 @@
 #' @param mutation.prior.mean Controlling the mean of the normal prior on mutation paramters.
 #' If passed in as single number (default is 0), this will be the mean value for all categories, for all codons. User may also
 #' supply a vector with n * 40 values, where n is the number of mutation categories. Future versions will check the number of rows matches
-#' the number of mutation categories definded by user. 
+#' the number of mutation categories definded by user. For the standard genetic code with split serine, the codon specific values exclude
+#' the reference codons for each amino acid and are ordered according to the order found in the C++ variable CodonTable::codonToIndexWithoutReference} 
 #' 
 #' @param mutation.prior.sd Controlling the standard deviation of the normal prior on the mutation parameters.
 #' If passed in as single number (default is 0.35), this will be the standard deviation value for all categories, for all codons. User may also
