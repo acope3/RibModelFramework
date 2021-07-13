@@ -1451,10 +1451,14 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
   double diffFactorAdjust = 0.05; //sets when multiplication factor adjustment is applied, was 0.1 and 0.0, respectively
   double factorCriteriaLow;
   double factorCriteriaHigh;
-  double adjustFactorLow = 0.7; //factor by which to reduce proposal widths
-  double adjustFactorHigh = 1.4; //factor by which to increase proposal widths
+  double adjustFactorLow = 0.9; //factor by which to reduce proposal widths (sort of)
+  double adjustFactorHigh = 2; //factor by which to increase proposal widths (sort of)
+  // Why (sort of)? Effects of adjustFactor* seem to be lost if too close to 1.
+  // I suspect this is due to effect of covPrevWeight
   double adjustFactor = 1.0; //variable assigned value of either adjustFactorLow or adjustFactorHigh
-
+  double covPrevWeight = 0.6; //covPrevWeight + covCurrWeight = 1
+  double covCurrWeight = 0.4;
+  
   factorCriteriaLow = acceptanceTargetLow - diffFactorAdjust;  //below this value weighted sum and factor adjustments are applied
   factorCriteriaHigh = acceptanceTargetHigh + diffFactorAdjust;  //above this value weighted sum and factor adjustments are applied
 
@@ -1472,8 +1476,8 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
     std::string aa = groupList[i];
     unsigned aaIndex = SequenceSummary::AAToAAIndex(aa);
     double acceptanceLevel = (double)numAcceptForCodonSpecificParameters[aaIndex] / (double)adaptationWidth;
-
-    my_print("\t%:\t%\n", aa.c_str(), acceptanceLevel);
+    int numCodonsForAA = SequenceSummary::GetNumCodonsForAA(aa, FALSE);
+    my_print("\t% (%):\t%\n", aa.c_str(), numCodonsForAA, acceptanceLevel);
 
     traces.updateCodonSpecificAcceptanceRateTrace(aaIndex, acceptanceLevel);
 
@@ -1496,8 +1500,8 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
             CovarianceMatrix covcurr(covarianceMatrix[aaIndex].getNumVariates());
             covcurr.calculateSampleCovariance(*traces.getCodonSpecificParameterTrace(), aa, samples, adaptiveStepCurr);
             CovarianceMatrix covprev = covarianceMatrix[aaIndex];
-            covprev = (covprev*0.6);
-            covcurr = (covcurr*0.4);
+            covprev = (covprev*covPrevWeight);
+            covcurr = (covcurr*covCurrWeight);
             covarianceMatrix[aaIndex] = covprev + covcurr;
             //replace cov matrix based on previous window
             //The is approach was commented out and above code uncommented to replace it in commit ec63bb21a1e9 (2016).  Should remove
