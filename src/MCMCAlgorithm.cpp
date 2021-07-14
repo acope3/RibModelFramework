@@ -688,12 +688,10 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 
 		if ((iteration % (50 * adaptiveWidth)) == 0u)
 		{
-                  double start1 = 0, start2 = 0 , end1 = 0 , end2 = 0, gewekeScore;
-                        calculateGewekeIntervals(&start1, &start2, &end1, &end2)
-                          gewekeScore = calculateGewekeScore(start1, start2, end1, end2);
+			double gewekeScore = calculateGewekeScore(iteration/thinning);
 
 			my_print("##################################################\n");
-			my_print("Geweke Score at % iterations: %\n", iteration, gewekeScore);
+			my_print("Geweke Score after % iterations: %\n", iteration, gewekeScore);
 			my_print("##################################################\n");
 
 			if (std::abs(gewekeScore) < 1.96)
@@ -962,11 +960,11 @@ void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned
 
 
 /* calculateGewekeScore (NOT EXPOSED)
- * Arguments: start1, end1, start2, end2: the start and end of sample windows 
+ * Arguments: current sample index
  * Calculate the Geweke score based of the last test and the posterior means. If this is the first
  * convergence test, lastConvergenceTest should be equal to 0.
 */
-double MCMCAlgorithm::calculateGewekeScore(unsigned *start1, unsigned *end1, unsigned *start2, unsigned *end2,)
+double MCMCAlgorithm::calculateGewekeScore(unsigned current_sample)
 {
 	double posteriorMean1 = 0.0;
 	double posteriorMean2 = 0.0;
