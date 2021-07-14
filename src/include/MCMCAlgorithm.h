@@ -27,7 +27,9 @@ class MCMCAlgorithm
 		unsigned thinning;
 		unsigned adaptiveWidth;
 		unsigned lastConvergenceTest;
+                unsigned reportInterval;
 		int stepsToAdapt;
+  
 
 
 		bool estimateSynthesisRate;
@@ -78,8 +80,8 @@ class MCMCAlgorithm
 		void setEstimateCodonSpecificParameter(bool in);
 		void setEstimateHyperParameter(bool in);
 		void setEstimateMixtureAssignment(bool in);
-
-		void setRestartFileSettings(std::string filename, unsigned interval, bool multiple); //TODO: UNTESTED
+                void setReportInterval(unsigned reportInterval);
+                void setRestartFileSettings(std::string filename, unsigned interval, bool multiple); //TODO: UNTESTED
 		void setStepsToAdapt(unsigned steps);
 		int getStepsToAdapt();
 

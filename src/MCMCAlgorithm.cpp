@@ -39,11 +39,11 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thinning(1), adaptiveWidth(100 *
 	posteriorTrace.resize(samples + 1); // +1 for storing initial evaluation
 	likelihoodTrace.resize(samples + 1);
 
-    writeRestartFile = false;
+        writeRestartFile = false;
 	multipleFiles = false;
 	fileWriteInterval = 1u;
 	lastConvergenceTest = 0u;
-
+        reportInterval = 100u;
 	estimateMixtureAssignment = true;
 	stepsToAdapt = -1;
 }
@@ -66,6 +66,7 @@ MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thinning, unsigned _ad
 	likelihoodTrace.resize(samples + 1);
 	writeRestartFile = false;
 	multipleFiles = false;
+        reportInterval = (100u < thinning) ? thinning : 100u;
 	fileWriteInterval = 1u;
 	lastConvergenceTest = 0u;
 	estimateMixtureAssignment = true;
@@ -570,8 +571,10 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	omp_set_num_threads(numCores);
 #endif
 
-	// Replace with reportSample?
-	unsigned reportStep = (100u < thinning) ? thinning : 100u;
+        // Sets frequency of printing information to stdout
+	// Was reportStep
+        // Moved to definition of MCMCAlgorithm() on 2021-07-14 by mikeg
+        //unsigned reportInterval = (100u < thinning) ? thinning : 100u;
 
 	// Allows to diverge from initial conditions (divergenceIterations controls the divergence).
 	// This allows for varying initial conditions for better exploration of the parameter space.
@@ -619,22 +622,28 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 				}
 			}
 		}
-		if ((iteration) % reportStep == 0u)
+		if ((iteration) % reportInterval == 0u)
 		{
             #ifndef STANDALONE
             Rcpp::checkUserInterrupt();
             #endif
 	   		my_print("Status at thinned sample (iteration): % (%)\n",  (iteration / thinning), iteration);
-			my_print("\t current logPosterior: % \n", posteriorTrace[(iteration/thinning) - 1]);
-			my_print("\t current logLikelihood: %\n", likelihoodTrace[(iteration/thinning) - 1]);
+			my_print("\tCurrent logPosterior: % \n", posteriorTrace[(iteration/thinning) - 1]);
+			my_print("\tCurrent logLikelihood: %\n", likelihoodTrace[(iteration/thinning) - 1]);
 			if (iteration > stepsToAdapt)
-				my_print("No longer adapting\n");
-
+                          {
+                            my_print("\tMCMC Adaptation: Off\n");
+                          } else {
+                             my_print("\tMCMC Adaptation: On\n");
+                        }
 			model.printHyperParameters();
-			for (unsigned i = 0u; i < model.getNumMixtureElements(); i++)
-			{
-				my_print("\t current Mixture element probability for element %: %\n", i, model.getCategoryProbability(i));
-			}
+                        if(model.getNumMixtureElements() > 1)
+                          {
+                            for (unsigned i = 0u; i < model.getNumMixtureElements(); i++)
+                              {
+				my_print("\tCurrent Mixture element probability for element %: %\n", i, model.getCategoryProbability(i));
+                              }
+                          }
 		}
 		if (estimateCodonSpecificParameter)
 		{
@@ -679,10 +688,12 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 
 		if ((iteration % (50 * adaptiveWidth)) == 0u)
 		{
-			double gewekeScore = calculateGewekeScore(iteration/thinning);
+                  double start1 = 0, start2 = 0 , end1 = 0 , end2 = 0, gewekeScore;
+                        calculateGewekeIntervals(&start1, &start2, &end1, &end2)
+                          gewekeScore = calculateGewekeScore(start1, start2, end1, end2);
 
 			my_print("##################################################\n");
-			my_print("Geweke Score after % iterations: %\n", iteration, gewekeScore);
+			my_print("Geweke Score at % iterations: %\n", iteration, gewekeScore);
 			my_print("##################################################\n");
 
 			if (std::abs(gewekeScore) < 1.96)
@@ -718,9 +729,10 @@ void MCMCAlgorithm::run_PANSE(Genome& genome, PANSEModel& model, unsigned numCor
 //#ifndef __APPLE__
 	omp_set_num_threads(numCores);
 #endif
-
-	// Replace with reportSample?
-	unsigned reportStep = (100u < thinning) ? thinning : 100u;
+        // Sets frequency of printing information to stdout
+	// Was reportStep
+        // Moved to definition of MCMCAlgorithm() on 2021-07-14 by mikeg
+	//unsigned reportInterval = (100u < thinning) ? thinning : 100u;
 
 	// Allows to diverge from initial conditions (divergenceIterations controls the divergence).
 	// This allows for varying initial conditions for better exploration of the parameter space.
@@ -768,7 +780,7 @@ void MCMCAlgorithm::run_PANSE(Genome& genome, PANSEModel& model, unsigned numCor
 				}
 			}
 		}
-		if ((iteration) % reportStep == 0u)
+		if ((iteration) % reportInterval == 0u)
 		{
             #ifndef STANDALONE
             Rcpp::checkUserInterrupt();
@@ -950,22 +962,22 @@ void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned
 
 
 /* calculateGewekeScore (NOT EXPOSED)
- * Arguments: current iteration
+ * Arguments: start1, end1, start2, end2: the start and end of sample windows 
  * Calculate the Geweke score based of the last test and the posterior means. If this is the first
  * convergence test, lastConvergenceTest should be equal to 0.
 */
-double MCMCAlgorithm::calculateGewekeScore(unsigned current_iteration)
+double MCMCAlgorithm::calculateGewekeScore(unsigned *start1, unsigned *end1, unsigned *start2, unsigned *end2,)
 {
 	double posteriorMean1 = 0.0;
 	double posteriorMean2 = 0.0;
 	double posteriorVariance1 = 0.0;
 	double posteriorVariance2 = 0.0;
 
-	unsigned end1 = (unsigned)std::round( (current_iteration - lastConvergenceTest) * 0.1) + lastConvergenceTest;
-	unsigned start2 = (unsigned)std::round(current_iteration - (current_iteration * 0.5));
+	unsigned end1 = (unsigned)std::round( (current_sample - lastConvergenceTest) * 0.1) + lastConvergenceTest;
+	unsigned start2 = (unsigned)std::round(current_sample - (current_sample * 0.5));
 
 	double numSamples1 = (double) (end1 - lastConvergenceTest);
-	double numSamples2 = std::round(current_iteration * 0.5);
+	double numSamples2 = std::round(current_sample * 0.5);
 
 	// calculate mean and and variance of first part of likelihood trace
 	for (unsigned i = lastConvergenceTest; i < end1; i++)
@@ -981,18 +993,18 @@ double MCMCAlgorithm::calculateGewekeScore(unsigned current_iteration)
 
 
 	// calculate mean and and variance of last part of likelihood trace
-	for (unsigned i = start2; i < current_iteration; i++)
+	for (unsigned i = start2; i < current_sample; i++)
 	{
 		posteriorMean2 += posteriorTrace[i];
 	}
 	posteriorMean2 = posteriorMean2 / numSamples2;
-	for (unsigned i = start2; i < current_iteration; i++)
+	for (unsigned i = start2; i < current_sample; i++)
 	{
 		posteriorVariance2 += (posteriorTrace[i] - posteriorMean2) * (posteriorTrace[i] - posteriorMean2);
 	}
 	posteriorVariance2 = posteriorVariance2 / numSamples2;
 
-	lastConvergenceTest = current_iteration;
+	lastConvergenceTest = current_sample;
 	// Geweke score
 	return (posteriorMean1 - posteriorMean2) / std::sqrt( ( posteriorVariance1 / numSamples1 ) + ( posteriorVariance2 / numSamples2 ) );
 }
@@ -1075,6 +1087,14 @@ void MCMCAlgorithm::setEstimateHyperParameter(bool in)
 void MCMCAlgorithm::setEstimateMixtureAssignment(bool in)
 {
 	estimateMixtureAssignment = in;
+}
+
+/* setReportInterval (RCPP EXPOSED)
+ * Arguments: Integer for setting interval between printing information to stdout.
+*/
+void MCMCAlgorithm::setReportInterval(unsigned in)
+{
+	reportInterval = in;
 }
 
 
@@ -1481,7 +1501,8 @@ RCPP_MODULE(MCMCAlgorithm_mod)
 		.method("run", &MCMCAlgorithm::run)
 		.method("run_PANSE", &MCMCAlgorithm::run_PANSE)
 		.method("setEstimateMixtureAssignment", &MCMCAlgorithm::setEstimateMixtureAssignment)
-		.method("setRestartFileSettings", &MCMCAlgorithm::setRestartFileSettings)
+		.method("setReportInterval", &MCMCAlgorithm::setReportInterval)
+                .method("setRestartFileSettings", &MCMCAlgorithm::setRestartFileSettings)
 		.method("getLogPosteriorTrace", &MCMCAlgorithm::getLogPosteriorTrace)
 		.method("getLogLikelihoodTrace", &MCMCAlgorithm::getLogLikelihoodTrace)
 		.method("getLogPosteriorMean", &MCMCAlgorithm::getLogPosteriorMean)
