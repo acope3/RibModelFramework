@@ -1,5 +1,5 @@
-#### TODO, lets move it into parameterObject.R and use a parameter instead of trace. thats how it is done for the acf function
-
+# Note there is a convergence.test.Rcpp_ROCParameter() and .Rcpp_PANSEParameter() wrapper
+#functions for convergence.test.Rcpp_Trace()
 # see mcmc Object.R convergence.test function for documentation
 convergence.test.Rcpp_Trace <- function(object, samples = 10, frac1 = 0.1,
                                         frac2 = 0.5, thin = 1, plot = FALSE, what = "Mutation", mixture = 1)

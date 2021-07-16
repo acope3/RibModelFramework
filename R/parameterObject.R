@@ -1997,5 +1997,17 @@ combineThreeDimensionalTrace <- function(trace1, trace2, max){
 }
 
 
+## Wrapper function for convergence.test.Rcpp_Trace
+convergence.test.Rcpp_ROCParameter <- function(object, ...)
+{
+    traceObject  <- object$getTraceObject()
+    convergence.test(traceObject, ...)
+}
+  
 
-
+## Wrapper function for convergence.test.Rcpp_Trace
+convergence.test.Rcpp_PANSEParameter <- function(object, ...)
+{
+    traceObject  <- object$getTraceObject()
+    convergence.test(traceObject, ...)
+}
