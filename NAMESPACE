@@ -24,6 +24,8 @@ S3method(writeParameterObject, Rcpp_PANSEParameter)
 S3method(writeParameterObject, Rcpp_FONSEParameter)
 S3method(convergence.test, Rcpp_MCMCAlgorithm)
 S3method(convergence.test, Rcpp_Trace)
+S3method(convergence.test, Rcpp_ROCParameter)
+S3method(convergence.test, Rcpp_PANSEParameter)
 
 S3method(plot, Rcpp_ROCParameter)
 S3method(plot, Rcpp_FONSEParameter)
@@ -35,65 +37,68 @@ S3method(plot, Rcpp_Trace)
 
 
 #exports
-#exportPattern("^[[:alpha:]]+") #<- if commented out, only functions explicitly exported will be exposed 
+if(sum(grep("\\.9[0-9]{3}", packageVersion("AnaCoDa")))==1)
+{   # Working with development version of package (i.e. 1.4.0.9001) so export everything
+    exportPattern("^[[:alpha:]]+") #<- if commented out, only functions explicitly exported will be exposed 
+}else{
+    ## Non-development version
+    export(
+        ## Parameter object
+        "calculateMarginalLogLikelihood",
+        "extractBaseObject",
+        "findOptimalCodon",
+        "geomMean",
+        "getCSPEstimates",
+        "getExpressionEstimates",
+        "getMixtureAssignmentEstimate",
+        "getSelectionCoefficients",
+        "getTrace",
+        "initializeParameterObject",
+        "loadParameterObject",
+        "writeParameterObject",
+                                        #"confidenceInterval.plot",
 
+        ## Model object
+        "initializeModelObject",
 
-export(
-## Parameter object
-"initializeParameterObject",
-"getCSPEstimates",
-"getMixtureAssignmentEstimate",
-"findOptimalCodon",
-"getExpressionEstimates",
-"writeParameterObject",
-"loadParameterObject",
-"getTrace",
-"getSelectionCoefficients",
-"geomMean",
-"calculateMarginalLogLikelihood",
-#"confidenceInterval.plot",
+        ## Genome object
+        "addObservedSynthesisRateSet",
+        "calculateSCUO",
+        "getCAI",
+        "getCAIweights",
+        "getCodonCounts",
+        "getCodonCountsForAA",
+        "getNames",
+        "getNc",
+        "getNcAA",
+        "getObservedSynthesisRateSet",
+        "initializeGenomeObject",
 
-## Model object
-"initializeModelObject",
+        ## MCMC object
+        "initializeMCMCObject",
+        "loadMCMCObject",
+        "runMCMC",
+        "setRestartSettings",
+        "writeMCMCObject",
 
-## Genome object
-"initializeGenomeObject",
-"getCodonCounts",
-"getCodonCountsForAA",
-"getNames",
-"addObservedSynthesisRateSet",
-"getObservedSynthesisRateSet",
-"getCAIweights",
-"getCAI",
-"getNc",
-"getNcAA",
-"calculateSCUO",
+        ## Trace object
 
-## MCMC object
-"initializeMCMCObject",
-"runMCMC",
-"setRestartSettings",
-"writeMCMCObject",
-"loadMCMCObject",
+        ## shared functions
+        "convergence.test",
 
-## Trace object
+                                        #Static C++ functions
+        "AAToCodon",
+        "aminoAcids",
+        "codonToAA",
+        "codons",
 
-## shared functions
-"convergence.test",
+        ##
+        "acfMCMC",
+        "acfCSP"
 
-#Static C++ functions
-"AAToCodon",
-"aminoAcids",
-"codonToAA",
-"codons",
+    )
 
-##
-"acfMCMC",
-"acfCSP"
-
-)
-
-
+}
 
 
 

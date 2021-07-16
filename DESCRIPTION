@@ -2,12 +2,21 @@ Package: AnaCoDa
 Type: Package
 Title: Analysis of Codon Data under Stationarity using a Bayesian
         Framework
-Version: 0.1.4.0
-Date: 2020-09-11
+Note: We should increase the major version number to 1 and use the git commit info as the dev number.
+Note: Versioning should be Major.Minor.Patch for released versions
+Note: Versioning should be Major.Minor.Patch.<git commit hash> for development versions
+Note: This doesn't work Version: paste0("0.1.5.", system("git --git-dir "./RibModelFramework" log -n 1 --pretty=format:%h", intern = TRUE))
+Note: Issue seems to be the use of non-numeric characters
+Note: See https://stackoverflow.com/a/56220622/5322644 for a possible solution using numbers
+Version: 0.1.4.9000
+Date: Sys.Date()
 Author: c(person("Cedric", "Landerer", role = c("aut", "cre"), email
-        = "cedric.landerer@gmail.com"), person("Gabriel", "Hanas", role
-        = "ctb"), person("Jeremy", "Rogers", role = "ctb"),
-        person("Alex", "Cope", role="ctb"), person("Denizhan", "Pak", role="ctb"))
+        = "cedric.landerer@gmail.com"),
+        person("Alex", "Cope", role="aut"),
+        person("Michael A", "Gilchrist", role = "aut"),
+        person("Gabriel", "Hanas", role= "ctb"),
+        person("Jeremy", "Rogers", role = "ctb"),
+        person("Denizhan", "Pak", role="ctb"))
 Maintainer: Cedric Landerer <cedric.landerer@gmail.com>
 URL: https://github.com/clandere/AnaCoDa
 VignetteBuilder: knitr
