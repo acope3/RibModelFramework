@@ -3582,38 +3582,38 @@ int testMCMCAlgorithm()
         error = 0; //Reset for next function.
 
     //-------------------------------------------//
-    //------ get/setStepsToAdapt Functions ------//
+    //------ get/setIterationsToAdapt Functions ------//
     //-------------------------------------------//
 
     // NOTE: By default, both constructors initialize stepsToAdapt to -1
-    if (mcmc.getStepsToAdapt() != -1)
+    if (mcmc.getIterationsToAdapt() != -1)
     {
-        my_printError("Error in getStepsToAdapt. Function should return -1, but returns %.\n", mcmc.getStepsToAdapt());
+        my_printError("Error in getIterationsToAdapt. Function should return -1, but returns %.\n", mcmc.getIterationsToAdapt());
         error = 1;
         globalError = 1;
     }
 
-    mcmc.setStepsToAdapt(52);
-    if (mcmc.getStepsToAdapt() != 52)
+    mcmc.setIterationsToAdapt(52);
+    if (mcmc.getIterationsToAdapt() != 52)
     {
-        my_printError("Error in getStepsToAdapt or setStepsToAdapt. Function should return 52, but returns %.\n",
-                      mcmc.getStepsToAdapt());
+        my_printError("Error in getIterationsToAdapt or setIterationsToAdapt. Function should return 52, but returns %.\n",
+                      mcmc.getIterationsToAdapt());
         error = 1;
         globalError = 1;
     }
 
     // Intentional error checking: Should print an error message with no change to stepsToAdapt
-    mcmc.setStepsToAdapt(101);
-    if (mcmc.getStepsToAdapt() != 52)
+    mcmc.setIterationsToAdapt(101);
+    if (mcmc.getIterationsToAdapt() != 52)
     {
-        my_printError("Error in getStepsToAdapt or setStepsToAdapt.");
-        my_printError(" Function should return 52, with no change, but returns %.\n", mcmc.getStepsToAdapt());
+        my_printError("Error in getIterationsToAdapt or setIterationsToAdapt.");
+        my_printError(" Function should return 52, with no change, but returns %.\n", mcmc.getIterationsToAdapt());
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        my_print("MCMCAlgorithm get/setStepsToAdapt --- Pass\n");
+        my_print("MCMCAlgorithm get/setIterationsToAdapt --- Pass\n");
     else
         error = 0; //Reset for next function.
 

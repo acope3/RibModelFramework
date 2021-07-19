@@ -1119,14 +1119,33 @@ void MCMCAlgorithm::setRestartFileSettings(std::string filename, unsigned interv
 }
 
 
-/* setStepsToAdapt (RCPP EXPOSED)
+/* setIterationsToAdapt (RCPP EXPOSED)
  * Arguments: steps (unsigned)
  * Will set the specified steps to adapt for the run if the value is less than samples * thinning (aka, the number
  * of steps the run will last).The default parameter passed in as -1 uses the full iterations.
 */
+//' @name setIterationsToAdapt
+//' @title setIterationsToAdapt
+//' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Set number of iterations (total iterations = samples * thinning) to allow proposal widths to adapt
+//' @param steps a postive value
+void MCMCAlgorithm::setIterationsToAdapt(unsigned steps)
+{
+	if (steps <= samples * thinning)
+		stepsToAdapt = steps;
+	else
+		my_printError("ERROR: Cannot set steps - value must be smaller than samples times thinning (maxIterations)\n");
+}
+
+/* setStepsToAdapt (RCPP EXPOSED)
+ * Arguments: iterations (unsigned)
+ * DEPRECATED 
+ * REPLACED BY setIterationsToAdapt
+ * Will set the specified iterations to adapt for the run if the value is less than samples * thinning (aka, the number
+ * of iterations the run will last).The default parameter passed in as -1 uses the full iterations.
+*/
 //' @name setStepsToAdapt
 //' @title setStepsToAdapt
-//' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Set number of iterations (total iterations = samples * thinning) to allow proposal widths to adapt
+//' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Set number of iterations (iterations = samples * thinning) to allow proposal widths to adapt
 //' @param steps a postive value
 void MCMCAlgorithm::setStepsToAdapt(unsigned steps)
 {
@@ -1136,19 +1155,33 @@ void MCMCAlgorithm::setStepsToAdapt(unsigned steps)
 		my_printError("ERROR: Cannot set steps - value must be smaller than samples times thinning (maxIterations)\n");
 }
 
-
-/* getStepsToAdapt (RCPP EXPOSED)
+/* getIterationsToAdapt (RCPP EXPOSED)
  * Arguments: None
  * Return the value of stepsToAdapt
 */
-//' @name getStepsToAdapt
-//' @title getStepsToAdapt
-//' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Return number of iterations (total iterations = samples * thinning) to allow proposal widths to adapt
+//' @name getIterationsToAdapt
+//' @title getIterationsToAdapt
+//' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Return number of iterations (iterations = samples * thinning) to allow proposal widths to adapt
 //' @return number of sample steps to adapt
-int MCMCAlgorithm::getStepsToAdapt()
+int MCMCAlgorithm::getIterationsToAdapt()
 {
 	return stepsToAdapt;
 }
+
+ /* getStepsToAdapt (RCPP EXPOSED)
+ * Arguments: None
+ * DEPRICATED FUNCTION REPLACED BY getIterationsToAdapt and getSamplesToAdapt
+ * Return the value of iterationsToAdapt (formerly stepsToAdapt)
+*/
+//' @name getStepsToAdapt
+//' @title getStepsToAdapt
+//' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Return number of iterations (iterations = samples * thinning) to allow proposal widths to adapt
+//' @return number of sample steps to adapt
+int MCMCAlgorithm::getStepsToAdapt()
+{
+	return iterationsToAdapt;
+}
+
 
 
 /* getLogPosteriorTrace (RCPP EXPOSED)
@@ -1516,8 +1549,8 @@ RCPP_MODULE(MCMCAlgorithm_mod)
         .method("setAdaptiveWidth", &MCMCAlgorithm::setAdaptiveWidth)
         .method("setLogPosteriorTrace", &MCMCAlgorithm::setLogPosteriorTrace)
         .method("setLogLikelihoodTrace", &MCMCAlgorithm::setLogLikelihoodTrace)
-        .method("setStepsToAdapt", &MCMCAlgorithm::setStepsToAdapt)
-        .method("getStepsToAdapt", &MCMCAlgorithm::getStepsToAdapt)
+        .method("setIterationsToAdapt", &MCMCAlgorithm::setIterationsToAdapt)
+        .method("getIterationsToAdapt", &MCMCAlgorithm::getIterationsToAdapt)
 		;
 
 
