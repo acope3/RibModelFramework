@@ -3,12 +3,12 @@ Type: Package
 Title: Analysis of Codon Data under Stationarity using a Bayesian
         Framework
 Note: We should increase the major version number to 1 and use the git commit info as the dev number.
-Note: Versioning should be Major.Minor.Patch for released versions
-Note: Versioning should be Major.Minor.Patch.<git commit hash> for development versions
-Note: This doesn't work Version: paste0("0.1.5.", system("git --git-dir "./RibModelFramework" log -n 1 --pretty=format:%h", intern = TRUE))
-Note: Issue seems to be the use of non-numeric characters
-Note: See https://stackoverflow.com/a/56220622/5322644 for a possible solution using numbers
-Version: 0.1.4.9000
+      Versioning should be Major.Minor.Patch for released versions
+      Versioning should be Major.Minor.Patch.<git commit hash> for development versions
+      This doesn't work Version: paste0("0.1.5.", system("git --git-dir "./RibModelFramework" log -n 1 --pretty=format:%h", intern = TRUE))
+      Issue seems to be the use of non-numeric characters
+      See https://stackoverflow.com/a/56220622/5322644 for a possible solution using numbers
+Version: 0.1.4.9001
 Date: Sys.Date()
 Author: c(person("Cedric", "Landerer", role = c("aut", "cre"), email
         = "cedric.landerer@gmail.com"),
