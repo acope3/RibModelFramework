@@ -9,15 +9,31 @@
 #' @param multiple if true, will output a new restart file at each interval (file name will include sample it was written at)
 NULL
 
+#' @name setIterationsToAdapt
+#' @title setIterationsToAdapt
+#' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Set number of iterations (total iterations = samples * thinning) to allow proposal widths to adapt
+#' @param steps a postive value
+NULL
+
+#' @name getIterationsToAdapt
+#' @title getIterationsToAdapt
+#' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Return number of iterations (total iterations = samples * thinning) to allow proposal widths to adapt
+#' @return number of sample steps to adapt
+NULL
+
 #' @name setStepsToAdapt
 #' @title setStepsToAdapt
-#' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Set number of iterations (total iterations = samples * thinning) to allow proposal widths to adapt
+#' @description DEPRECATED: USE setIterationsToAdapt
+#' Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject).
+#' Set number of steps (steps = iterations = samples * thinning) to allow proposal widths to adapt
 #' @param steps a postive value
 NULL
 
 #' @name getStepsToAdapt
 #' @title getStepsToAdapt
-#' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Return number of iterations (total iterations = samples * thinning) to allow proposal widths to adapt
+#' @description DEPRECATED: USE getIterationsToAdapt
+#' Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject).
+#' Return number of steps (steps =  iterations = samples * thinning) to allow proposal widths to adapt
 #' @return number of sample steps to adapt
 NULL
 

@@ -82,8 +82,10 @@ class MCMCAlgorithm
 		void setEstimateMixtureAssignment(bool in);
                 void setReportInterval(unsigned reportInterval);
                 void setRestartFileSettings(std::string filename, unsigned interval, bool multiple); //TODO: UNTESTED
-		void setStepsToAdapt(unsigned steps);
-		int getStepsToAdapt();
+		void setIterationsToAdapt(unsigned steps);
+		int getIterationsToAdapt();
+                void setStepsToAdapt(unsigned steps); //Deprecated
+                int getStepsToAdapt(); //Deprecated
 
 		std::vector<double> getLogPosteriorTrace();
 		std::vector<double> getLogLikelihoodTrace();
