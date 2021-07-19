@@ -18,7 +18,7 @@ the given genome.}
 \item{ncores}{Number of cores to perform the model fitting with. Default
 value is 1.}
 
-\item{divergence.iteration}{Number of steps that the initial conditions
+\item{divergence.iteration}{Number of iterations that the initial conditions
 can diverge from the original conditions given. Default value is 0.}
 }
 \value{
@@ -31,7 +31,7 @@ for the given mcmc, genome, and model objects to perform a model fitting.
 \details{
 \code{runMCMC} will run for the number of samples times the number
 thinning given when the mcmc object is initialized. Updates are provided every 100
-steps, and the state of the chain is saved every thinning steps.
+iterations, and the state of the chain is saved every thinning iterations.
 }
 \examples{
 

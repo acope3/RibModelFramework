@@ -51,7 +51,7 @@
 #' If passed in as single number (default is 0), this will be the mean value for all categories, for all codons. User may also
 #' supply a vector with n * 40 values, where n is the number of mutation categories. Future versions will check the number of rows matches
 #' the number of mutation categories definded by user. For the standard genetic code with split serine, the codon specific values exclude
-#' the reference codons for each amino acid and are ordered according to the order found in the C++ variable CodonTable::codonToIndexWithoutReference} 
+#' the reference codons for each amino acid and are ordered according to the order found in the C++ variable CodonTable::codonToIndexWithoutReference
 #' 
 #' @param mutation.prior.sd Controlling the standard deviation of the normal prior on the mutation parameters.
 #' If passed in as single number (default is 0.35), this will be the standard deviation value for all categories, for all codons. User may also
@@ -1224,7 +1224,7 @@ getMixtureAssignmentEstimate <- function(parameter, gene.index, samples)
 #'         ncores = 4, divergence.iteration = divergence.iteration)
 #' 
 #' # get the estimated expression values for all genes based on the mixture 
-#' # they are assigned to at each step
+#' # they are assigned to at each stample
 #' estimatedExpression <- getExpressionEstimates(parameter, 1:length(genome), 1000)
 #' }
 #' 
@@ -1326,7 +1326,7 @@ extractBaseInfo <- function(parameter){
   numSel <- parameter$numSelectionCategories
   categories <- parameter$getCategories()
   curMixAssignment <- parameter$getMixtureAssignment()
-  lastIteration <- parameter$getLastIteration()
+  lastSample <- parameter$getLastSample()
   grouplist <- parameter$getGroupList()
   
   synthesisOffsetAcceptRatTrace <- trace$getSynthesisOffsetAcceptanceRateTrace()
@@ -1350,7 +1350,7 @@ extractBaseInfo <- function(parameter){
                   numSel = numSel,
                   categories = categories,
                   curMixAssignment = curMixAssignment,
-                  lastIteration = lastIteration,
+                  lastSample = lastSample,
                   grouplist = grouplist,
                   synthesisOffsetTrace = synthesisOffsetTrace,
                   synthesisOffsetAcceptRatTrace = synthesisOffsetAcceptRatTrace,
@@ -1529,8 +1529,8 @@ setBaseInfo <- function(parameter, files)
       numMutationCategories <- tempEnv$paramBase$numMut
       numSelectionCategories <- tempEnv$paramBase$numSel
       mixtureAssignment <- tempEnv$paramBase$curMixAssignment
-      lastIteration <- tempEnv$paramBase$lastIteration
-      max <- tempEnv$paramBase$lastIteration + 1
+      lastSample <- tempEnv$paramBase$lastSample
+      max <- tempEnv$paramBase$lastSample + 1
       grouplist <- tempEnv$paramBase$grouplist
       
       stdDevSynthesisRateTraces <- vector("list", length = numSelectionCategories)
@@ -1630,11 +1630,11 @@ setBaseInfo <- function(parameter, files)
       curMixtureProbabilitiesTrace <- tempEnv$paramBase$mixProbTrace
       curCodonSpecificAcceptanceRateTrace <- tempEnv$paramBase$codonSpecificAcceptRatTrace
       
-      lastIteration <- lastIteration + tempEnv$paramBase$lastIteration
+      lastSample <- lastSample + tempEnv$paramBase$lastSample
       
       
       #assuming all checks have passed, time to concatenate traces
-      max <- tempEnv$paramBase$lastIteration + 1
+      max <- tempEnv$paramBase$lastSample + 1
       combineTwoDimensionalTrace(stdDevSynthesisRateTraces, curStdDevSynthesisRateTraces, max)
       
       size <- length(curStdDevSynthesisRateAcceptanceRateTrace)
@@ -1659,7 +1659,7 @@ setBaseInfo <- function(parameter, files)
   parameter$numMutationCategories <- numMutationCategories
   parameter$numSelectionCategories <- numSelectionCategories
   parameter$setMixtureAssignment(tempEnv$paramBase$curMixAssignment) #want the last in the file sequence
-  parameter$setLastIteration(lastIteration)
+  parameter$setLastSample(lastSample)
   parameter$setGroupList(grouplist)
   
   trace <- parameter$getTraceObject()
@@ -1689,7 +1689,7 @@ loadROCParameterObject <- function(parameter, files)
     
     numMutationCategories <- tempEnv$paramBase$numMut
     numSelectionCategories <- tempEnv$paramBase$numSel
-    max <- tempEnv$paramBase$lastIteration + 1
+    max <- tempEnv$paramBase$lastSample + 1
     
     if (i == 1){
      
@@ -1741,7 +1741,7 @@ loadPAParameterObject <- function(parameter, files)
     tempEnv <- new.env();
     load(file = files[i], envir = tempEnv)
     
-    max <- tempEnv$paramBase$lastIteration + 1
+    max <- tempEnv$paramBase$lastSample + 1
     numMixtures <- tempEnv$paramBase$numMix
     numMutationCategories <- tempEnv$paramBase$numMut
     numSelectionCategories <- tempEnv$paramBase$numSel
@@ -1793,7 +1793,7 @@ loadPANSEParameterObject <- function(parameter, files)
     tempEnv <- new.env();
     load(file = files[i], envir = tempEnv)
     
-    max <- tempEnv$paramBase$lastIteration + 1
+    max <- tempEnv$paramBase$lastSample + 1
     numMixtures <- tempEnv$paramBase$numMix
     numMutationCategories <- tempEnv$paramBase$numMut
     numSelectionCategories <- tempEnv$paramBase$numSel
@@ -1867,7 +1867,7 @@ loadFONSEParameterObject <- function(parameter, files)
     
     numMutationCategories <- tempEnv$paramBase$numMut
     numSelectionCategories <- tempEnv$paramBase$numSel
-    max <- tempEnv$paramBase$lastIteration + 1
+    max <- tempEnv$paramBase$lastSample + 1
     
     if (i == 1){
       

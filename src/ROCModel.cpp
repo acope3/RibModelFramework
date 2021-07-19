@@ -430,15 +430,15 @@ void ROCModel::updateSynthesisRate(unsigned i, unsigned k)
 //-----------------------------------------//
 
 
-unsigned ROCModel::getLastIteration()
+unsigned ROCModel::getLastSample()
 {
-	return parameter->getLastIteration();
+	return parameter->getLastSample();
 }
 
 
-void ROCModel::setLastIteration(unsigned iteration)
+void ROCModel::setLastSample(unsigned iteration)
 {
-	parameter->setLastIteration(iteration);
+	parameter->setLastSample(iteration);
 }
 
 
@@ -526,9 +526,9 @@ void ROCModel::adaptSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adap
 }
 
 
-void ROCModel::adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, unsigned lastIteration, bool adapt)
+void ROCModel::adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, unsigned lastSample, bool adapt)
 {
-	parameter->adaptCodonSpecificParameterProposalWidth(adaptiveWidth, lastIteration, adapt);
+	parameter->adaptCodonSpecificParameterProposalWidth(adaptiveWidth, lastSample, adapt);
 }
 
 

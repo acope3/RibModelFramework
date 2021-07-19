@@ -554,7 +554,7 @@ void PAParameter::updateCodonSpecificParameter(std::string grouping)
  * meaning true, then if the acceptance level is in a certain range we change the width.
  * NOTE: This function extends Parameter's adaptCodonSpecificParameterProposalWidth function!
  */
-void PAParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastIteration, bool adapt)
+void PAParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastSample, bool adapt)
 {
 	my_print("Acceptance rate for Codon Specific Parameter\n");
 	my_print("\tCodon\tAcc.Rat\n"); //Prop.Width\n";

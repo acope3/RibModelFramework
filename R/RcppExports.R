@@ -12,13 +12,7 @@ NULL
 #' @name setIterationsToAdapt
 #' @title setIterationsToAdapt
 #' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Set number of iterations (total iterations = samples * thinning) to allow proposal widths to adapt
-#' @param steps a postive value
-NULL
-
-#' @name getIterationsToAdapt
-#' @title getIterationsToAdapt
-#' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Return number of iterations (total iterations = samples * thinning) to allow proposal widths to adapt
-#' @return number of sample steps to adapt
+#' @param iterations a postive value
 NULL
 
 #' @name setStepsToAdapt
@@ -27,6 +21,12 @@ NULL
 #' Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject).
 #' Set number of steps (steps = iterations = samples * thinning) to allow proposal widths to adapt
 #' @param steps a postive value
+NULL
+
+#' @name getIterationsToAdapt
+#' @title getIterationsToAdapt
+#' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Return number of iterations (iterations = samples * thinning) to allow proposal widths to adapt
+#' @return number of iterations to adapt
 NULL
 
 #' @name getStepsToAdapt
@@ -71,7 +71,7 @@ NULL
 #' @name getAdaptiveWidth
 #' @title getAdaptiveWidth
 #' @description Return sample adaptiveWidth value, which is the number of samples (not iterations) between adapting parameter proposal widths
-#' @return number of sample steps between adapting proposal widths
+#' @return number of samples between adapting proposal widths
 NULL
 
 #' @name setSamples

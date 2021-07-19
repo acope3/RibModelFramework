@@ -461,15 +461,15 @@ void FONSEModel::updateSynthesisRate(unsigned i, unsigned k)
 //-----------------------------------------//
 
 
-unsigned FONSEModel::getLastIteration()
+unsigned FONSEModel::getLastSample()
 {
-	return parameter->getLastIteration();
+	return parameter->getLastSample();
 }
 
 
-void FONSEModel::setLastIteration(unsigned iteration)
+void FONSEModel::setLastSample(unsigned iteration)
 {
-	parameter->setLastIteration(iteration);
+	parameter->setLastSample(iteration);
 }
 
 
@@ -569,9 +569,9 @@ void FONSEModel::adaptSynthesisRateProposalWidth(unsigned adaptiveWidth, bool ad
 }
 
 
-void FONSEModel::adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, unsigned lastIteration, bool adapt)
+void FONSEModel::adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, unsigned lastSample, bool adapt)
 {
-	parameter->adaptCodonSpecificParameterProposalWidth(adaptiveWidth, lastIteration, adapt);
+	parameter->adaptCodonSpecificParameterProposalWidth(adaptiveWidth, lastSample, adapt);
 }
 
 

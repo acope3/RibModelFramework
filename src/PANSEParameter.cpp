@@ -848,7 +848,7 @@ void PANSEParameter::updatePartitionFunction()
 // ----------------------------------------------//
 
 
-void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastIteration, bool adapt)
+void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastSample, bool adapt)
 {
   //Gelman BDA 3rd Edition suggests a target acceptance rate of 0.23
   // for high dimensional problems
@@ -869,7 +869,7 @@ void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptatio
   factorCriteriaHigh = acceptanceTargetHigh + diffFactorAdjust;  //above this value weighted sum and factor adjustments are applied
 
   adaptiveStepPrev = adaptiveStepCurr;
-  adaptiveStepCurr = lastIteration;
+  adaptiveStepCurr = lastSample;
   //unsigned samples = adaptiveStepCurr - adaptiveStepPrev;
 
   my_print("Acceptance rates for Codon Specific Parameters\n");

@@ -3051,32 +3051,32 @@ int testParameter(std::string testFileDir)
 
     /* Section 4:
      * Other functions: 4 functions tested in total.
-     * get/setLastIteration, get/setNumObservedPhiSets
+     * get/setLastSample, get/setNumObservedPhiSets
     */
 
     //--------------------------------------------//
-    //------ get/setLastIteration Functions ------//
+    //------ get/setLastSample Functions ------//
     //--------------------------------------------//
 
-    //lastIteration should be initialized to 0 in the constructor.
-    if (parameter.getLastIteration() != 0)
+    //lastSample should be initialized to 0 in the constructor.
+    if (parameter.getLastSample() != 0)
     {
-        my_printError("Error in getLastIteration. Value should be 0, but is instead %.\n", parameter.getLastIteration());
+        my_printError("Error in getLastSample. Value should be 0, but is instead %.\n", parameter.getLastSample());
         error = 1;
         globalError = 1;
     }
 
-    parameter.setLastIteration(9);
-    if (parameter.getLastIteration() != 9)
+    parameter.setLastSample(9);
+    if (parameter.getLastSample() != 9)
     {
-        my_printError("Error in setLastIteration or getLastIteration. Value should be 9, but is instead %.\n",
-                      parameter.getLastIteration());
+        my_printError("Error in setLastSample or getLastSample. Value should be 9, but is instead %.\n",
+                      parameter.getLastSample());
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        my_print("Parameter get/setLastIteration --- Pass\n");
+        my_print("Parameter get/setLastSample --- Pass\n");
     else
         error = 0; //Reset for next function.
 
@@ -3584,8 +3584,8 @@ int testMCMCAlgorithm()
     //-------------------------------------------//
     //------ get/setIterationsToAdapt Functions ------//
     //-------------------------------------------//
+    // NOTE: By default, both constructors initialize iterationsToAdapt to -1
 
-    // NOTE: By default, both constructors initialize stepsToAdapt to -1
     if (mcmc.getIterationsToAdapt() != -1)
     {
         my_printError("Error in getIterationsToAdapt. Function should return -1, but returns %.\n", mcmc.getIterationsToAdapt());
@@ -3602,7 +3602,7 @@ int testMCMCAlgorithm()
         globalError = 1;
     }
 
-    // Intentional error checking: Should print an error message with no change to stepsToAdapt
+    // Intentional error checking: Should print an error message with no change to iterationsToAdapt
     mcmc.setIterationsToAdapt(101);
     if (mcmc.getIterationsToAdapt() != 52)
     {

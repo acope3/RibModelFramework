@@ -997,7 +997,7 @@ void ROCParameter::setMutationPriorStandardDeviation(std::vector<std::vector<dou
 // {
 // 	double posteriorMean = 0.0;
 // 	std::vector<double> NoiseOffsetTrace = traces.getSynthesisOffsetTrace(index);
-// 	unsigned traceLength = lastIteration;
+// 	unsigned traceLength = lastSample;
 
 // 	if (samples > traceLength)
 // 	{
@@ -1018,7 +1018,7 @@ void ROCParameter::setMutationPriorStandardDeviation(std::vector<std::vector<dou
 // double ROCParameter::getNoiseOffsetVariance(unsigned index, unsigned samples, bool unbiased)
 // {
 // 	std::vector<double> NoiseOffsetTrace = traces.getSynthesisOffsetTrace(index);
-// 	unsigned traceLength = lastIteration;
+// 	unsigned traceLength = lastSample;
 // 	if (samples > traceLength)
 // 	{
 // 		my_printError("Warning in ROCParameter::getNoiseOffsetVariance throws: Number of anticipated samples ");

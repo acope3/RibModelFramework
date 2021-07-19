@@ -25,10 +25,11 @@ class MCMCAlgorithm
 	private:
 		unsigned samples;
 		unsigned thinning;
-		unsigned adaptiveWidth;
+                unsigned adaptiveWidth; //in units of samples
+                unsigned adaptiveWidthIterations; //for working with iterations = samples * thinning
 		unsigned lastConvergenceTest;
                 unsigned reportInterval;
-		int stepsToAdapt;
+		int iterationsToAdapt;
   
 
 
@@ -82,9 +83,9 @@ class MCMCAlgorithm
 		void setEstimateMixtureAssignment(bool in);
                 void setReportInterval(unsigned reportInterval);
                 void setRestartFileSettings(std::string filename, unsigned interval, bool multiple); //TODO: UNTESTED
-		void setIterationsToAdapt(unsigned steps);
+		void setIterationsToAdapt(unsigned iterations);
 		int getIterationsToAdapt();
-                void setStepsToAdapt(unsigned steps); //Deprecated
+                void setStepsToAdapt(unsigned iterations); //Deprecated
                 int getStepsToAdapt(); //Deprecated
 
 		std::vector<double> getLogPosteriorTrace();

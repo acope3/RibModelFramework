@@ -30,7 +30,7 @@ using namespace Rcpp;
 
 /*MCMCAlgorithm constructor (RCPP EXPOSED)
 * Arguments: None
-* Sets up the object with the specified default values. Every step is a sample in
+* Sets up the object with the specified default values. Every iteration is a sample in
 * this case, so every iteration trace values will be stored. All parameters are estimated.
 */
 MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thinning(1), adaptiveWidth(100 * thinning), estimateSynthesisRate(true),
@@ -45,7 +45,8 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thinning(1), adaptiveWidth(100 *
 	lastConvergenceTest = 0u;
         reportInterval = 100u;
 	estimateMixtureAssignment = true;
-	stepsToAdapt = -1;
+	iterationsToAdapt = -1;
+        adaptiveWidthIterations = adaptiveWidth * thinning;
 }
 
 
@@ -57,7 +58,7 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thinning(1), adaptiveWidth(100 *
 */
 MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thinning, unsigned _adaptiveWidth, bool _estimateSynthesisRate,
 							 bool _estimateCodonSpecificParameter, bool _estimateHyperParameter) : samples(_samples),
-							 thinning(_thinning), adaptiveWidth(_adaptiveWidth * thinning),
+							 thinning(_thinning), adaptiveWidth(_adaptiveWidth),
 							 estimateSynthesisRate(_estimateSynthesisRate),
 							 estimateCodonSpecificParameter(_estimateCodonSpecificParameter),
 							 estimateHyperParameter(_estimateHyperParameter)
@@ -70,7 +71,8 @@ MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thinning, unsigned _ad
 	fileWriteInterval = 1u;
 	lastConvergenceTest = 0u;
 	estimateMixtureAssignment = true;
-	stepsToAdapt = -1;
+	iterationsToAdapt = -1;
+        adaptiveWidthIterations = adaptiveWidth * thinning;
 }
 
 
@@ -92,7 +94,7 @@ MCMCAlgorithm::~MCMCAlgorithm()
 //----------------------------------------------------//
 
 /* acceptRejectSynthesisRateLevelForAllGenes (NOT EXPOSED)
-* Arguments: reference to a genome and a model. which iteration (step) is currently being estimated
+* Arguments: reference to a genome and a model. which iteration is currently being estimated
 * Based on the loglikelihood probabilities proposed for a gene (with and without reverse jump), it is decided
 * whether or not a synthesis rate is accepted for that gene or not. Mixture assignment is also updated when
 * applicable.
@@ -369,7 +371,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 
 
 /* acceptRejectCodonSpecificParameter (NOT EXPOSED)
- * Arguments: reference to a genome and a model. which iteration (step) is currently being estimated
+ * Arguments: reference to a genome and a model. which iteration is currently being estimated
  * Calculates the logLikelihood for each grouping based on codon specific parameters. If this is greater
  * than a random number from the exponential distribution we update the parameters from proposed to
  * current. Update the trace when applicable.
@@ -467,7 +469,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, PANSEMode
 
 
 /* acceptRejectCodonSpecificParameter (NOT EXPOSED)
- * Arguments: reference to a genome and a model. which iteration (step) is currently being estimated
+ * Arguments: reference to a genome and a model. which iteration is currently being estimated
  * Calculates the logLikelihood for each grouping based on codon specific parameters. If this is greater
  * than a random number from the exponential distribution we update the parameters from proposed to
  * current. Update the trace when applicable.
@@ -528,7 +530,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 
 
 /* acceptRejectHyperParameter (NOT EXPOSED)
- * Arguments: reference to a genome and a model. which iteration (step) is currently being estimated
+ * Arguments: reference to a genome and a model. which iteration is currently being estimated
  * Calculates the logLikelihood for hyper parameters. If the calculated value is greater than a random number
  * from the exponential distribution we update the parameters from proposed to current. Update the trace when applicable.
 */
@@ -588,19 +590,19 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	// starting the MCMC
 	
 	model.updateTracesWithInitialValues(genome);
-	if (stepsToAdapt == -1)
-		stepsToAdapt = maximumIterations;
+	if (iterationsToAdapt == -1)
+		iterationsToAdapt = maximumIterations;
 	my_print("Type: %\n",model.type);
 	my_print("Starting MCMC\n");
 	my_print("\tEstimate Codon Specific Parameters? % \n", (estimateCodonSpecificParameter ? "TRUE" : "FALSE") );
 	my_print("\tEstimate Hyper Parameters? % \n", (estimateHyperParameter ? "TRUE" : "FALSE") );
 	my_print("\tEstimate Synthesis rates? % \n", (estimateSynthesisRate ? "TRUE" : "FALSE") );
 	my_print("\tStarting MCMC with % iterations\n", maximumIterations);
-	my_print("\tAdapting will stop after % steps\n", stepsToAdapt);
+	my_print("\tAdapting will stop after % iterations\n", iterationsToAdapt);
 
 	// set the last iteration to the max iterations,
 	// this way if the MCMC doesn't exit based on Geweke score, it will use the max iteration for posterior means
-	model.setLastIteration(samples);
+	model.setLastSample(samples);
 	for (int iteration = 1u; iteration <= maximumIterations; iteration++)
 	{
 		if (writeRestartFile)
@@ -630,7 +632,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	   		my_print("Status at thinned sample (iteration): % (%)\n",  (iteration / thinning), iteration);
 			my_print("\tCurrent logPosterior: % \n", posteriorTrace[(iteration/thinning) - 1]);
 			my_print("\tCurrent logLikelihood: %\n", likelihoodTrace[(iteration/thinning) - 1]);
-			if (iteration > stepsToAdapt)
+			if (iteration > iterationsToAdapt)
                           {
                             my_print("\tMCMC Adaptation: Off\n");
                           } else {
@@ -651,8 +653,8 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 			acceptRejectCodonSpecificParameter(genome, model, iteration);
 			
             //TODO:Probably do a nan check
-			if ((iteration % adaptiveWidth) == 0u)
-				model.adaptCodonSpecificParameterProposalWidth(adaptiveWidth, iteration / thinning, iteration <= stepsToAdapt);
+			if ((iteration % adaptiveWidthIterations) == 0u)
+				model.adaptCodonSpecificParameterProposalWidth(adaptiveWidth, iteration / thinning, iteration <= iterationsToAdapt);
 		}
 		// update hyper parameter
 		if (estimateHyperParameter)
@@ -661,8 +663,8 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 			model.proposeHyperParameters();
 			acceptRejectHyperParameter(genome, model, iteration);
             //TODO:Probably do a nan check
-			if ((iteration % adaptiveWidth) == 0u)
-				model.adaptHyperParameterProposalWidths(adaptiveWidth, iteration <= stepsToAdapt);
+			if ((iteration % adaptiveWidthIterations) == 0u)
+				model.adaptHyperParameterProposalWidths(adaptiveWidth, iteration <= iterationsToAdapt);
 
 		}
 		// update expression level values
@@ -676,12 +678,12 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 				if (std::isnan(logPost))
 				{
 					my_printError("ERROR: LogPosterior is NaN, exiting at iteration %\n", iteration);
-					model.setLastIteration(iteration / thinning);
+					model.setLastSample(iteration / thinning);
 					return;
 				}
 			}
-			if ((iteration % adaptiveWidth) == 0u)
-				model.adaptSynthesisRateProposalWidth(adaptiveWidth, iteration <= stepsToAdapt);
+			if ((iteration % adaptiveWidthIterations) == 0u)
+				model.adaptSynthesisRateProposalWidth(adaptiveWidth, iteration <= iterationsToAdapt);
   		}
 
 
@@ -699,7 +701,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 				my_print("Stopping run based on convergence after % iterations\n\n", iteration);
 
 				// Comment out this break to keep the run from stopping on convergence
-				//model.setLastIteration(iteration/thinning);
+				//model.setLastSample(iteration/thinning);
 				//break;
 			}
 		}
@@ -744,19 +746,19 @@ void MCMCAlgorithm::run_PANSE(Genome& genome, PANSEModel& model, unsigned numCor
 	// starting the MCMC
 	
 	model.updateTracesWithInitialValues(genome);
-	if (stepsToAdapt == -1)
-		stepsToAdapt = maximumIterations;
+	if (iterationsToAdapt == -1)
+		iterationsToAdapt = maximumIterations;
 	my_print("Type: %\n",model.type);
 	my_print("Starting MCMC\n");
 	my_print("\tEstimate Codon Specific Parameters? % \n", (estimateCodonSpecificParameter ? "TRUE" : "FALSE") );
 	my_print("\tEstimate Hyper Parameters? % \n", (estimateHyperParameter ? "TRUE" : "FALSE") );
 	my_print("\tEstimate Synthesis rates? % \n", (estimateSynthesisRate ? "TRUE" : "FALSE") );
 	my_print("\tStarting MCMC with % iterations\n", maximumIterations);
-	my_print("\tAdapting will stop after % steps\n", stepsToAdapt);
+	my_print("\tAdapting will stop after % iterations\n", iterationsToAdapt);
 
 	// set the last iteration to the max iterations,
 	// this way if the MCMC doesn't exit based on Geweke score, it will use the max iteration for posterior means
-	model.setLastIteration(samples);
+	model.setLastSample(samples);
 	for (int iteration = 1u; iteration <= maximumIterations; iteration++)
 	{
 		if (writeRestartFile)
@@ -786,7 +788,7 @@ void MCMCAlgorithm::run_PANSE(Genome& genome, PANSEModel& model, unsigned numCor
 	   		my_print("Status at thinned sample (iteration): % (%)\n",  (iteration / thinning), iteration);
 			my_print("\t current logPosterior: % \n", posteriorTrace[(iteration/thinning) - 1]);
 			my_print("\t current logLikelihood: %\n", likelihoodTrace[(iteration/thinning) - 1]);
-			if (iteration > stepsToAdapt)
+			if (iteration > iterationsToAdapt)
 				my_print("No longer adapting\n");
 
 			model.printHyperParameters();
@@ -802,8 +804,8 @@ void MCMCAlgorithm::run_PANSE(Genome& genome, PANSEModel& model, unsigned numCor
 			acceptRejectCodonSpecificParameter(genome, model, iteration);
 			
             //TODO:Probably do a nan check
-			if ((iteration % adaptiveWidth) == 0u)
-				model.adaptCodonSpecificParameterProposalWidth(adaptiveWidth, iteration / thinning, iteration <= stepsToAdapt);
+			if ((iteration % adaptiveWidthIterations) == 0u)
+				model.adaptCodonSpecificParameterProposalWidth(adaptiveWidth, iteration / thinning, iteration <= iterationsToAdapt);
 		}
 		// update hyper parameter
 		if (estimateHyperParameter)
@@ -812,8 +814,8 @@ void MCMCAlgorithm::run_PANSE(Genome& genome, PANSEModel& model, unsigned numCor
 			model.proposeHyperParameters();
 			acceptRejectHyperParameter(genome, model, iteration);
             //TODO:Probably do a nan check
-			if ((iteration % adaptiveWidth) == 0u)
-				model.adaptHyperParameterProposalWidths(adaptiveWidth, iteration <= stepsToAdapt);
+			if ((iteration % adaptiveWidthIterations) == 0u)
+				model.adaptHyperParameterProposalWidths(adaptiveWidth, iteration <= iterationsToAdapt);
 
 		}
 		// update expression level values
@@ -830,12 +832,12 @@ void MCMCAlgorithm::run_PANSE(Genome& genome, PANSEModel& model, unsigned numCor
 				if (std::isnan(logPost))
 				{
 					my_printError("ERROR: LogPosterior is NaN, exiting at iteration %\n", iteration);
-					model.setLastIteration(iteration / thinning);
+					model.setLastSample(iteration / thinning);
 					return;
 				}
 			}
-			if ((iteration % adaptiveWidth) == 0u)
-				model.adaptSynthesisRateProposalWidth(adaptiveWidth, iteration <= stepsToAdapt);
+			if ((iteration % adaptiveWidthIterations) == 0u)
+				model.adaptSynthesisRateProposalWidth(adaptiveWidth, iteration <= iterationsToAdapt);
   		}
 
 
@@ -853,7 +855,7 @@ void MCMCAlgorithm::run_PANSE(Genome& genome, PANSEModel& model, unsigned numCor
 				my_print("Stopping run based on convergence after % iterations\n\n", iteration);
 
 				// Comment out this break to keep the run from stopping on convergence
-				//model.setLastIteration(iteration/thinning);
+				//model.setLastSample(iteration/thinning);
 				//break;
 			}
 		}
@@ -891,7 +893,7 @@ void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned
 	my_print("Allowing divergence from initial conditions for % iterations.\n\n", divergenceIterations);
 	// divergence from initial conditions is not stored in trace
 
-	// how many steps do you want to walk "away" from the initial conditions
+	// how many iterations do you want to walk "away" from the initial conditions
 	for (unsigned iteration = 0u; iteration < divergenceIterations; iteration++)
 	{
 		if (estimateCodonSpecificParameter)
@@ -1098,7 +1100,7 @@ void MCMCAlgorithm::setReportInterval(unsigned in)
 
 /* setRestartFileSettings (RCPP EXPOSED)
  * Arguments: base of filename to write to, interval to write file, bool telling if one or many files should be written.
- * Filename is the base of the file name to be written to. The interval will be placed in front to specify the step
+ * Filename is the base of the file name to be written to. The interval will be placed in front to specify the iteration
  * it was written at and allow for multiple files to be written if multiple is set to true. The file write interval
  * is actually the interval specified times the thinning.
 */
@@ -1120,20 +1122,37 @@ void MCMCAlgorithm::setRestartFileSettings(std::string filename, unsigned interv
 
 
 /* setIterationsToAdapt (RCPP EXPOSED)
- * Arguments: steps (unsigned)
- * Will set the specified steps to adapt for the run if the value is less than samples * thinning (aka, the number
- * of steps the run will last).The default parameter passed in as -1 uses the full iterations.
+ * Arguments: iterations (unsigned)
+ * Will set the specified iterations to adapt for the run if the value is less than samples * thinning (aka, the number
+ * of iterations the run will last).The default parameter passed in as -1 uses the full iterations.
 */
 //' @name setIterationsToAdapt
 //' @title setIterationsToAdapt
 //' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Set number of iterations (total iterations = samples * thinning) to allow proposal widths to adapt
-//' @param steps a postive value
-void MCMCAlgorithm::setIterationsToAdapt(unsigned steps)
+//' @param iterations a postive value
+void MCMCAlgorithm::setIterationsToAdapt(unsigned iterations)
 {
-	if (steps <= samples * thinning)
-		stepsToAdapt = steps;
+	if (iterations <= samples * thinning)
+                iterationsToAdapt = iterations;
 	else
-		my_printError("ERROR: Cannot set steps - value must be smaller than samples times thinning (maxIterations)\n");
+		my_printError("ERROR: Cannot set iterations - value must be smaller than samples times thinning (maxIterations)\n");
+}
+
+/* setSamplesToAdapt (RCPP EXPOSED)
+ * Arguments: iterations (unsigned)
+ * Will set the specified iterations to adapt for the run if the value is less than samples * thinning (aka, the number
+ * of iterations the run will last).The default parameter passed in as -1 uses the full iterations.
+*/
+//' @name setSamplesToAdapt
+//' @title setSamplesToAdapt
+//' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Set number of samples to allow proposal widths to adapt. The variable iterationsToAdapt is the actual variable updated.
+//' @param iterations a postive value
+void MCMCAlgorithm::setSamplesToAdapt(unsigned _samples)
+{
+	if (_samples <= samples)
+                iterationsToAdapt = _samples * thinning;
+	else
+		my_printError("ERROR: Cannot set samplesToAdapt - value must be smaller than total samples\n");
 }
 
 /* setStepsToAdapt (RCPP EXPOSED)
@@ -1150,22 +1169,35 @@ void MCMCAlgorithm::setIterationsToAdapt(unsigned steps)
 void MCMCAlgorithm::setStepsToAdapt(unsigned steps)
 {
 	if (steps <= samples * thinning)
-		stepsToAdapt = steps;
+		iterationsToAdapt = steps;
 	else
 		my_printError("ERROR: Cannot set steps - value must be smaller than samples times thinning (maxIterations)\n");
 }
 
 /* getIterationsToAdapt (RCPP EXPOSED)
  * Arguments: None
- * Return the value of stepsToAdapt
+ * Return the value of iterationsToAdapt
 */
 //' @name getIterationsToAdapt
 //' @title getIterationsToAdapt
 //' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Return number of iterations (iterations = samples * thinning) to allow proposal widths to adapt
-//' @return number of sample steps to adapt
+//' @return number of iterations to adapt
 int MCMCAlgorithm::getIterationsToAdapt()
 {
-	return stepsToAdapt;
+	return iterationsToAdapt;
+}
+
+/* getSamplesToAdapt (RCPP EXPOSED)
+ * Arguments: None
+ * Return the value of iterationsToAdapt
+*/
+//' @name getSamplesToAdapt
+//' @title getSamplesToAdapt
+//' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Return number of samples (~= iterations/thinning) to allow proposal widths to adapt
+//' @return number of samples to adapt
+int MCMCAlgorithm::getSamplesToAdapt()
+{
+	return iterationsToAdapt/thinning;
 }
 
  /* getStepsToAdapt (RCPP EXPOSED)
@@ -1176,7 +1208,8 @@ int MCMCAlgorithm::getIterationsToAdapt()
 //' @name getStepsToAdapt
 //' @title getStepsToAdapt
 //' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Return number of iterations (iterations = samples * thinning) to allow proposal widths to adapt
-//' @return number of sample steps to adapt
+//' @return number of iterations to adapt
+
 int MCMCAlgorithm::getStepsToAdapt()
 {
 	return iterationsToAdapt;
@@ -1434,7 +1467,7 @@ unsigned MCMCAlgorithm::getThinning()
 //' @name getAdaptiveWidth
 //' @title getAdaptiveWidth
 //' @description Return sample adaptiveWidth value, which is the number of samples (not iterations) between adapting parameter proposal widths
-//' @return number of sample steps between adapting proposal widths
+//' @return number of samples between adapting proposal widths
 unsigned MCMCAlgorithm::getAdaptiveWidth()
 {
     return adaptiveWidth;
@@ -1483,6 +1516,7 @@ void MCMCAlgorithm::setThinning(unsigned _thinning)
 void MCMCAlgorithm::setAdaptiveWidth(unsigned _adaptiveWidth)
 {
     adaptiveWidth = _adaptiveWidth;
+    adaptiveWidthIterations = adaptiveWidth * thinning;
 }
 
 

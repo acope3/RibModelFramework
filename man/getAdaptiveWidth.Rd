@@ -4,7 +4,7 @@
 \alias{getAdaptiveWidth}
 \title{getAdaptiveWidth}
 \value{
-number of sample steps between adapting proposal widths
+number of samples between adapting proposal widths
 }
 \description{
 Return sample adaptiveWidth value, which is the number of samples (not iterations) between adapting parameter proposal widths
