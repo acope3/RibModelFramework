@@ -992,15 +992,15 @@ void PANSEModel::updateSynthesisRate(unsigned i, unsigned k)
 //-----------------------------------------//
 
 
-unsigned PANSEModel::getLastIteration()
+unsigned PANSEModel::getLastSample()
 {
-    return parameter->getLastIteration();
+    return parameter->getLastSample();
 }
 
 
-void PANSEModel::setLastIteration(unsigned iteration)
+void PANSEModel::setLastSample(unsigned iteration)
 {
-    parameter->setLastIteration(iteration);
+    parameter->setLastSample(iteration);
 }
 
 
@@ -1103,9 +1103,9 @@ void PANSEModel::adaptSynthesisRateProposalWidth(unsigned adaptiveWidth, bool ad
 }
 
 
-void PANSEModel::adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, unsigned lastIteration, bool adapt)
+void PANSEModel::adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, unsigned lastSample, bool adapt)
 {
-    parameter->adaptCodonSpecificParameterProposalWidth(adaptiveWidth, lastIteration, adapt);
+    parameter->adaptCodonSpecificParameterProposalWidth(adaptiveWidth, lastSample, adapt);
 }
 
 

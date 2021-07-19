@@ -66,8 +66,8 @@ class ROCModel : public Model
 
 
 		//Iteration Functions:
-		virtual unsigned getLastIteration();
-		virtual void setLastIteration(unsigned iteration);
+		virtual unsigned getLastSample();
+		virtual void setLastSample(unsigned iteration);
 
 
 
@@ -85,7 +85,7 @@ class ROCModel : public Model
 		//Adaptive Width Functions:
 		virtual void adaptStdDevSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt = true);
 		virtual void adaptSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt = true);
-		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, unsigned lastIteration, bool adapt = true);
+		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, unsigned lastSample, bool adapt = true);
 		virtual void adaptHyperParameterProposalWidths(unsigned adaptiveWidth, bool adapt = true);
 
 

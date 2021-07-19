@@ -221,7 +221,7 @@ std::vector<double> CovarianceMatrix::transformIidNumbersIntoCovaryingNumbers(st
 }
 
 
-void CovarianceMatrix::calculateSampleCovariance(std::vector<std::vector<std::vector<std::vector<float>>>> codonSpecificParameterTrace, std::string aa, unsigned samples, unsigned lastIteration)
+void CovarianceMatrix::calculateSampleCovariance(std::vector<std::vector<std::vector<std::vector<float>>>> codonSpecificParameterTrace, std::string aa, unsigned samples, unsigned lastSample)
 {
 	//order of codonSpecificParameterTrace: paramType, category, numParam, samples
 	unsigned numParamTypesInModel = (unsigned)codonSpecificParameterTrace.size();
@@ -233,7 +233,7 @@ void CovarianceMatrix::calculateSampleCovariance(std::vector<std::vector<std::ve
 	}
 
 
-	unsigned start = lastIteration - samples;
+	unsigned start = lastSample - samples;
 	
 	unsigned aaStart, aaEnd;
 	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
@@ -246,7 +246,7 @@ void CovarianceMatrix::calculateSampleCovariance(std::vector<std::vector<std::ve
 		{
 			for (unsigned param1 = aaStart; param1 < aaEnd; param1++)
 			{
-				double mean1 = sampleMean(codonSpecificParameterTrace[paramType1][category1][param1], samples, lastIteration);
+				double mean1 = sampleMean(codonSpecificParameterTrace[paramType1][category1][param1], samples, lastSample);
 				for (unsigned paramType2 = 0; paramType2 < numParamTypesInModel; paramType2++)
 				{
 					unsigned numCategoriesInModel2 = numCategoriesInModelPerParamType[paramType2];
@@ -254,9 +254,9 @@ void CovarianceMatrix::calculateSampleCovariance(std::vector<std::vector<std::ve
 					{
 						for (unsigned param2 = aaStart; param2 < aaEnd; param2++)
 						{
-							double mean2 = sampleMean(codonSpecificParameterTrace[paramType2][category2][param2], samples, lastIteration);
+							double mean2 = sampleMean(codonSpecificParameterTrace[paramType2][category2][param2], samples, lastSample);
 							double unscaledSampleCov = 0.0;
-							for (unsigned i = start; i < lastIteration; i++)
+							for (unsigned i = start; i < lastSample; i++)
 							{
 								unscaledSampleCov += (codonSpecificParameterTrace[paramType1][category1][param1][i] - mean1) * (codonSpecificParameterTrace[paramType2][category2][param2][i] - mean2);
 							}
@@ -271,7 +271,7 @@ void CovarianceMatrix::calculateSampleCovariance(std::vector<std::vector<std::ve
 	}
 }
 
-void CovarianceMatrix::calculateSampleCovarianceForPANSE(std::vector<std::vector<std::vector<std::vector<float>>>> codonSpecificParameterTrace, std::string codon, unsigned samples, unsigned lastIteration)
+void CovarianceMatrix::calculateSampleCovarianceForPANSE(std::vector<std::vector<std::vector<std::vector<float>>>> codonSpecificParameterTrace, std::string codon, unsigned samples, unsigned lastSample)
 {
     //order of codonSpecificParameterTrace: paramType, category, numParam, samples
     unsigned numParamTypesInModel = (unsigned)codonSpecificParameterTrace.size();
@@ -283,7 +283,7 @@ void CovarianceMatrix::calculateSampleCovarianceForPANSE(std::vector<std::vector
     }
 
 
-    unsigned start = lastIteration - samples;
+    unsigned start = lastSample - samples;
     
     //unsigned aaStart, aaEnd;
     //SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
@@ -294,16 +294,16 @@ void CovarianceMatrix::calculateSampleCovarianceForPANSE(std::vector<std::vector
         unsigned numCategoriesInModel1 = numCategoriesInModelPerParamType[paramType1];
         for (unsigned category1 = 0; category1 < numCategoriesInModel1; category1++)
         {
-            double mean1 = sampleMean(codonSpecificParameterTrace[paramType1][category1][codonIndex], samples, lastIteration,true);
+            double mean1 = sampleMean(codonSpecificParameterTrace[paramType1][category1][codonIndex], samples, lastSample,true);
 
             for (unsigned paramType2 = 0; paramType2 < numParamTypesInModel; paramType2++)
             {
                 unsigned numCategoriesInModel2 = numCategoriesInModelPerParamType[paramType2];
                 for (unsigned category2 = 0; category2 < numCategoriesInModel2; category2++)
                 {               
-                    double mean2 = sampleMean(codonSpecificParameterTrace[paramType2][category2][codonIndex], samples, lastIteration,true);
+                    double mean2 = sampleMean(codonSpecificParameterTrace[paramType2][category2][codonIndex], samples, lastSample,true);
                     double unscaledSampleCov = 0.0;
-                    for (unsigned i = start; i < lastIteration; i++)
+                    for (unsigned i = start; i < lastSample; i++)
                     {
                         unscaledSampleCov += (std::log(codonSpecificParameterTrace[paramType1][category1][codonIndex][i]) - mean1) * (std::log(codonSpecificParameterTrace[paramType2][category2][codonIndex][i]) - mean2);
                     }
@@ -316,11 +316,11 @@ void CovarianceMatrix::calculateSampleCovarianceForPANSE(std::vector<std::vector
 }
 
 
-double CovarianceMatrix::sampleMean(std::vector<float> sampleVector, unsigned samples, unsigned lastIteration,bool log_scale)
+double CovarianceMatrix::sampleMean(std::vector<float> sampleVector, unsigned samples, unsigned lastSample,bool log_scale)
 {
 	double posteriorMean = 0.0;
-	unsigned start = lastIteration - samples;
-	for (unsigned i = start; i < lastIteration; i++)
+	unsigned start = lastSample - samples;
+	for (unsigned i = start; i < lastSample; i++)
 	{
         if (log_scale)
         {

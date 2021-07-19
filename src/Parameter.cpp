@@ -35,7 +35,7 @@ const unsigned Parameter::nse = 2;
 
 Parameter::Parameter()
 {
-	lastIteration = 0u;
+	lastSample = 0u;
 	numParam = 0u;
 	obsPhiSets = 0u;
 	adaptiveStepPrev = 0;
@@ -55,7 +55,7 @@ Parameter::Parameter()
 
 Parameter::Parameter(unsigned _maxGrouping)
 {
-	lastIteration = 0u;
+	lastSample = 0u;
 	numParam = 0u;
 	obsPhiSets = 0u;
 	adaptiveStepPrev = 0;
@@ -1147,23 +1147,23 @@ unsigned Parameter::getNumAcceptForSynthesisRate(unsigned expressionCategory, un
 //------------------------------------------//
 
 
-/* setLastIteration (RCPP EXPOSED)
+/* setLastSample (RCPP EXPOSED)
  * Arguments: None
  * Returns the last iteration.
 */
-unsigned Parameter::getLastIteration()
+unsigned Parameter::getLastSample()
 {
-	return lastIteration;
+	return lastSample;
 }
 
 
-/* setLastIteration (RCPP EXPOSED)
+/* setLastSample (RCPP EXPOSED)
  * Arguments: unsigned value representing an iteration
  * Sets the last iteration to the argument given.
 */
-void Parameter::setLastIteration(unsigned iteration)
+void Parameter::setLastSample(unsigned iteration)
 {
-	lastIteration = iteration;
+	lastSample = iteration;
 }
 
 
@@ -1436,7 +1436,7 @@ void Parameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool a
 }
 
 
-void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastIteration, bool adapt)
+void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastSample, bool adapt)
 {
   //Gelman BDA 3rd Edition suggests a target acceptance rate of 0.23
   // for high dimensional problems
@@ -1463,7 +1463,7 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
   factorCriteriaHigh = acceptanceTargetHigh + diffFactorAdjust;  //above this value weighted sum and factor adjustments are applied
 
   adaptiveStepPrev = adaptiveStepCurr;
-  adaptiveStepCurr = lastIteration;
+  adaptiveStepCurr = lastSample;
   unsigned samples = adaptiveStepCurr - adaptiveStepPrev;
 
   my_print("Acceptance rates for Codon Specific Parameters\n");
@@ -1636,7 +1636,7 @@ double Parameter::getNoiseOffsetPosteriorMean(unsigned index, unsigned samples)
 {
 	double posteriorMean = 0.0;
 	std::vector<double> NoiseOffsetTrace = traces.getSynthesisOffsetTrace(index);
-	unsigned traceLength = lastIteration;
+	unsigned traceLength = lastSample;
 
 	if (samples > traceLength)
 	{
@@ -1663,7 +1663,7 @@ double Parameter::getNoiseOffsetPosteriorMean(unsigned index, unsigned samples)
 double Parameter::getNoiseOffsetVariance(unsigned index, unsigned samples, bool unbiased)
 {
 	std::vector<double> NoiseOffsetTrace = traces.getSynthesisOffsetTrace(index);
-	unsigned traceLength = lastIteration;
+	unsigned traceLength = lastSample;
 	if (samples > traceLength)
 	{
 		my_printError("Warning in Parameter::getNoiseOffsetVariance throws: Number of anticipated samples ");
@@ -1706,7 +1706,7 @@ double Parameter::getStdDevSynthesisRatePosteriorMean(unsigned samples, unsigned
 	double posteriorMean = 0.0;
 	unsigned selectionCategory = getSelectionCategory(mixture);
 	std::vector<double> stdDevSynthesisRateTrace = traces.getStdDevSynthesisRateTrace(selectionCategory);
-	unsigned traceLength = lastIteration + 1;
+	unsigned traceLength = lastSample + 1;
 
 	if (samples > traceLength)
 	{
@@ -1744,8 +1744,8 @@ double Parameter::getSynthesisRatePosteriorMean(unsigned samples, unsigned geneI
 	}
 	else
 	{
-		unsigned traceLength = lastIteration + 1;
-		if (samples > lastIteration)
+		unsigned traceLength = lastSample + 1;
+		if (samples > lastSample)
 		{
 			my_printError("Warning in Parameter::getSynthesisRatePosteriorMean throws: Number of anticipated samples");
 			my_printError("(%) is greater than the length of the available trace (%). Whole trace is used for posterior estimate! \n",
@@ -1797,7 +1797,7 @@ double Parameter::getCodonSpecificPosteriorMean(unsigned element, unsigned sampl
 			element, codon, paramType, withoutReference);
 	}
 
-	unsigned traceLength = lastIteration + 1;
+	unsigned traceLength = lastSample + 1;
 
 
 	if (samples > traceLength)
@@ -1865,7 +1865,7 @@ double Parameter::getSynthesisRateVariance(unsigned samples, unsigned geneIndex,
 	std::vector<float> synthesisRateTrace = traces.getSynthesisRateTraceForGene(geneIndex);
 	if (synthesisRateTrace.size() != 1)
 	{
-		unsigned traceLength = lastIteration + 1;
+		unsigned traceLength = lastSample + 1;
 		if (samples > traceLength)
 		{
 			my_printError("Warning in Parameter::getSynthesisRateVariance throws: Number of anticipated samples ");
@@ -1915,7 +1915,7 @@ double Parameter::getCodonSpecificVariance(unsigned mixtureElement, unsigned sam
 
 	std::vector<float> parameterTrace = traces.getCodonSpecificParameterTraceByMixtureElementForCodon(
 		mixtureElement, codon, paramType, withoutReference);
-	unsigned traceLength = lastIteration + 1;
+	unsigned traceLength = lastSample + 1;
 	if (samples > traceLength)
 	{
 		my_printError("Warning in Parameter::getCodonSpecificVariance throws: Number of anticipated samples ");
@@ -1951,8 +1951,8 @@ double Parameter::getCodonSpecificVariance(unsigned mixtureElement, unsigned sam
 
 std::vector<double> Parameter::calculateQuantile(std::vector<float> &parameterTrace, unsigned samples, std::vector<double> probs, bool log_scale)
 {
-  unsigned traceLength = lastIteration + 1u;
-    //unsigned traceEnd = parameterTrace.size() - (parameterTrace.size() - lastIteration); //currently unused
+  unsigned traceLength = lastSample + 1u;
+    //unsigned traceEnd = parameterTrace.size() - (parameterTrace.size() - lastSample); //currently unused
 	if (samples > traceLength)
 	{
 		my_printError("Warning in Parameter::calculateQuantile throws: Number of anticipated samples ");
@@ -1962,7 +1962,7 @@ std::vector<double> Parameter::calculateQuantile(std::vector<float> &parameterTr
 		samples = traceLength;
 	}
 
-    std::vector<double> samplesTrace(parameterTrace.begin() + (lastIteration - samples) + 1, (parameterTrace.begin() + lastIteration + 1));
+    std::vector<double> samplesTrace(parameterTrace.begin() + (lastSample - samples) + 1, (parameterTrace.begin() + lastSample + 1));
     std::sort(samplesTrace.begin(), samplesTrace.end());
 
 	if(log_scale)
@@ -2050,7 +2050,7 @@ std::vector<double> Parameter::getEstimatedMixtureAssignmentProbabilities(unsign
 {
 	std::vector<unsigned> mixtureAssignmentTrace = traces.getMixtureAssignmentTraceForGene(geneIndex);
 	std::vector<double> probabilities(numMixtures, 0.0);
-	unsigned traceLength = lastIteration + 1;
+	unsigned traceLength = lastSample + 1;
 
 	if (samples > traceLength)
 	{

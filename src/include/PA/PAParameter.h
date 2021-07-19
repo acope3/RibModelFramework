@@ -62,7 +62,7 @@ class PAParameter: public Parameter {
 
 
 		//Adaptive Width Functions:
-		void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastIteration, bool adapt); //may make virtual
+		void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastSample, bool adapt); //may make virtual
 
 
 		//Other functions:

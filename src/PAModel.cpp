@@ -489,15 +489,15 @@ void PAModel::updateSynthesisRate(unsigned i, unsigned k)
 //-----------------------------------------//
 
 
-unsigned PAModel::getLastIteration()
+unsigned PAModel::getLastSample()
 {
-	return parameter->getLastIteration();
+	return parameter->getLastSample();
 }
 
 
-void PAModel::setLastIteration(unsigned iteration)
+void PAModel::setLastSample(unsigned iteration)
 {
-	parameter->setLastIteration(iteration);
+	parameter->setLastSample(iteration);
 }
 
 
@@ -587,9 +587,9 @@ void PAModel::adaptSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt
 }
 
 
-void PAModel::adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, unsigned lastIteration, bool adapt)
+void PAModel::adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, unsigned lastSample, bool adapt)
 {
-	parameter->adaptCodonSpecificParameterProposalWidth(adaptiveWidth, lastIteration, adapt);
+	parameter->adaptCodonSpecificParameterProposalWidth(adaptiveWidth, lastSample, adapt);
 }
 
 

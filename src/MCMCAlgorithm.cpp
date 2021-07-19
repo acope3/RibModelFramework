@@ -602,7 +602,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 
 	// set the last iteration to the max iterations,
 	// this way if the MCMC doesn't exit based on Geweke score, it will use the max iteration for posterior means
-	model.setLastIteration(samples);
+	model.setLastSample(samples);
 	for (int iteration = 1u; iteration <= maximumIterations; iteration++)
 	{
 		if (writeRestartFile)
@@ -678,7 +678,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 				if (std::isnan(logPost))
 				{
 					my_printError("ERROR: LogPosterior is NaN, exiting at iteration %\n", iteration);
-					model.setLastIteration(iteration / thinning);
+					model.setLastSample(iteration / thinning);
 					return;
 				}
 			}
@@ -701,7 +701,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 				my_print("Stopping run based on convergence after % iterations\n\n", iteration);
 
 				// Comment out this break to keep the run from stopping on convergence
-				//model.setLastIteration(iteration/thinning);
+				//model.setLastSample(iteration/thinning);
 				//break;
 			}
 		}
@@ -758,7 +758,7 @@ void MCMCAlgorithm::run_PANSE(Genome& genome, PANSEModel& model, unsigned numCor
 
 	// set the last iteration to the max iterations,
 	// this way if the MCMC doesn't exit based on Geweke score, it will use the max iteration for posterior means
-	model.setLastIteration(samples);
+	model.setLastSample(samples);
 	for (int iteration = 1u; iteration <= maximumIterations; iteration++)
 	{
 		if (writeRestartFile)
@@ -832,7 +832,7 @@ void MCMCAlgorithm::run_PANSE(Genome& genome, PANSEModel& model, unsigned numCor
 				if (std::isnan(logPost))
 				{
 					my_printError("ERROR: LogPosterior is NaN, exiting at iteration %\n", iteration);
-					model.setLastIteration(iteration / thinning);
+					model.setLastSample(iteration / thinning);
 					return;
 				}
 			}
@@ -855,7 +855,7 @@ void MCMCAlgorithm::run_PANSE(Genome& genome, PANSEModel& model, unsigned numCor
 				my_print("Stopping run based on convergence after % iterations\n\n", iteration);
 
 				// Comment out this break to keep the run from stopping on convergence
-				//model.setLastIteration(iteration/thinning);
+				//model.setLastSample(iteration/thinning);
 				//break;
 			}
 		}
