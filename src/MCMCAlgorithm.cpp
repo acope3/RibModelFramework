@@ -46,6 +46,7 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thinning(1), adaptiveWidth(100 *
         reportInterval = 100u;
 	estimateMixtureAssignment = true;
 	iterationsToAdapt = -1;
+        adaptiveWidthIterations = adaptiveWidth * thinning;
 }
 
 
@@ -57,7 +58,7 @@ MCMCAlgorithm::MCMCAlgorithm() : samples(1000), thinning(1), adaptiveWidth(100 *
 */
 MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thinning, unsigned _adaptiveWidth, bool _estimateSynthesisRate,
 							 bool _estimateCodonSpecificParameter, bool _estimateHyperParameter) : samples(_samples),
-							 thinning(_thinning), adaptiveWidth(_adaptiveWidth * thinning),
+							 thinning(_thinning), adaptiveWidth(_adaptiveWidth),
 							 estimateSynthesisRate(_estimateSynthesisRate),
 							 estimateCodonSpecificParameter(_estimateCodonSpecificParameter),
 							 estimateHyperParameter(_estimateHyperParameter)
@@ -71,6 +72,7 @@ MCMCAlgorithm::MCMCAlgorithm(unsigned _samples, unsigned _thinning, unsigned _ad
 	lastConvergenceTest = 0u;
 	estimateMixtureAssignment = true;
 	iterationsToAdapt = -1;
+        adaptiveWidthIterations = adaptiveWidth * thinning;
 }
 
 
@@ -651,7 +653,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 			acceptRejectCodonSpecificParameter(genome, model, iteration);
 			
             //TODO:Probably do a nan check
-			if ((iteration % adaptiveWidth) == 0u)
+			if ((iteration % adaptiveWidthIterations) == 0u)
 				model.adaptCodonSpecificParameterProposalWidth(adaptiveWidth, iteration / thinning, iteration <= iterationsToAdapt);
 		}
 		// update hyper parameter
@@ -661,7 +663,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 			model.proposeHyperParameters();
 			acceptRejectHyperParameter(genome, model, iteration);
             //TODO:Probably do a nan check
-			if ((iteration % adaptiveWidth) == 0u)
+			if ((iteration % adaptiveWidthIterations) == 0u)
 				model.adaptHyperParameterProposalWidths(adaptiveWidth, iteration <= iterationsToAdapt);
 
 		}
@@ -680,7 +682,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 					return;
 				}
 			}
-			if ((iteration % adaptiveWidth) == 0u)
+			if ((iteration % adaptiveWidthIterations) == 0u)
 				model.adaptSynthesisRateProposalWidth(adaptiveWidth, iteration <= iterationsToAdapt);
   		}
 
@@ -802,7 +804,7 @@ void MCMCAlgorithm::run_PANSE(Genome& genome, PANSEModel& model, unsigned numCor
 			acceptRejectCodonSpecificParameter(genome, model, iteration);
 			
             //TODO:Probably do a nan check
-			if ((iteration % adaptiveWidth) == 0u)
+			if ((iteration % adaptiveWidthIterations) == 0u)
 				model.adaptCodonSpecificParameterProposalWidth(adaptiveWidth, iteration / thinning, iteration <= iterationsToAdapt);
 		}
 		// update hyper parameter
@@ -812,7 +814,7 @@ void MCMCAlgorithm::run_PANSE(Genome& genome, PANSEModel& model, unsigned numCor
 			model.proposeHyperParameters();
 			acceptRejectHyperParameter(genome, model, iteration);
             //TODO:Probably do a nan check
-			if ((iteration % adaptiveWidth) == 0u)
+			if ((iteration % adaptiveWidthIterations) == 0u)
 				model.adaptHyperParameterProposalWidths(adaptiveWidth, iteration <= iterationsToAdapt);
 
 		}
@@ -834,7 +836,7 @@ void MCMCAlgorithm::run_PANSE(Genome& genome, PANSEModel& model, unsigned numCor
 					return;
 				}
 			}
-			if ((iteration % adaptiveWidth) == 0u)
+			if ((iteration % adaptiveWidthIterations) == 0u)
 				model.adaptSynthesisRateProposalWidth(adaptiveWidth, iteration <= iterationsToAdapt);
   		}
 
@@ -1483,6 +1485,7 @@ void MCMCAlgorithm::setThinning(unsigned _thinning)
 void MCMCAlgorithm::setAdaptiveWidth(unsigned _adaptiveWidth)
 {
     adaptiveWidth = _adaptiveWidth;
+    adaptiveWidthIterations = adaptiveWidth * thinning;
 }
 
 

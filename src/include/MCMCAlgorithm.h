@@ -25,7 +25,8 @@ class MCMCAlgorithm
 	private:
 		unsigned samples;
 		unsigned thinning;
-		unsigned adaptiveWidth;
+                unsigned adaptiveWidth; //in units of samples
+                unsigned adaptiveWidthIterations; //for working with iterations = samples * thinning
 		unsigned lastConvergenceTest;
                 unsigned reportInterval;
 		int iterationsToAdapt;
