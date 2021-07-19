@@ -98,7 +98,7 @@ class PANSEParameter: public Parameter {
         void updatePartitionFunction(); //TODO: test
 
 		//Adaptive Width Functions:
-		void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastSample, bool adapt); //may make virtual
+		void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned latestSample, bool adapt); //may make virtual
 		void adaptPartitionFunctionProposalWidth(unsigned adaptationWidth, bool adapt);
 
 		//Other functions:

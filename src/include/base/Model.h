@@ -71,8 +71,8 @@ class Model
 
 
 		//Iteration Functions:
-		virtual unsigned getLastSample() = 0;
-		virtual void setLastSample(unsigned iteration) = 0;
+		virtual unsigned getLatestSample() = 0;
+		virtual void setLatestSample(unsigned iteration) = 0;
 
 
 		//Trace Functions:
@@ -87,7 +87,7 @@ class Model
 		//Adaptive Width Functions:
 		virtual void adaptStdDevSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt) = 0;
 		virtual void adaptSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt) = 0;
-		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, unsigned lastSample,
+		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, unsigned latestSample,
 					bool adapt) = 0;
 		virtual void adaptHyperParameterProposalWidths(unsigned adaptiveWidth, bool adapt) = 0;
 

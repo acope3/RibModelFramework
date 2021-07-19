@@ -154,8 +154,8 @@ class Parameter {
 		void adaptNoiseOffsetProposalWidth(unsigned adaptationWidth, bool adapt);
 
 		//Iteration Functions: All tested
-		unsigned getLastSample();
-		void setLastSample(unsigned iteration);
+		unsigned getLatestSample();
+		void setLatestSample(unsigned iteration);
 
 
 		//Trace Functions: TODO: test
@@ -172,7 +172,7 @@ class Parameter {
 		//Adaptive Width Functions: TODO: test
 		void adaptStdDevSynthesisRateProposalWidth(unsigned adaptationWidth, bool adapt);
 		void adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool adapt);
-		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned lastSample, bool adapt);
+		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidth, unsigned latestSample, bool adapt);
 
 
 		//Posterior, Variance, and Estimates Functions: TODO: test
@@ -329,7 +329,7 @@ class Parameter {
 		std::vector<std::vector<double>> currentSynthesisRateLevel;
 		std::vector<std::vector<unsigned>> numAcceptForSynthesisRate;
 
-		unsigned lastSample;
+		unsigned latestSample;
 
 		unsigned int numParam;
 		unsigned numMixtures;

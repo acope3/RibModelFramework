@@ -3051,32 +3051,32 @@ int testParameter(std::string testFileDir)
 
     /* Section 4:
      * Other functions: 4 functions tested in total.
-     * get/setLastSample, get/setNumObservedPhiSets
+     * get/setLatestSample, get/setNumObservedPhiSets
     */
 
     //--------------------------------------------//
-    //------ get/setLastSample Functions ------//
+    //------ get/setLatestSample Functions ------//
     //--------------------------------------------//
 
-    //lastSample should be initialized to 0 in the constructor.
-    if (parameter.getLastSample() != 0)
+    //latestSample should be initialized to 0 in the constructor.
+    if (parameter.getLatestSample() != 0)
     {
-        my_printError("Error in getLastSample. Value should be 0, but is instead %.\n", parameter.getLastSample());
+        my_printError("Error in getLatestSample. Value should be 0, but is instead %.\n", parameter.getLatestSample());
         error = 1;
         globalError = 1;
     }
 
-    parameter.setLastSample(9);
-    if (parameter.getLastSample() != 9)
+    parameter.setLatestSample(9);
+    if (parameter.getLatestSample() != 9)
     {
-        my_printError("Error in setLastSample or getLastSample. Value should be 9, but is instead %.\n",
-                      parameter.getLastSample());
+        my_printError("Error in setLatestSample or getLatestSample. Value should be 9, but is instead %.\n",
+                      parameter.getLatestSample());
         error = 1;
         globalError = 1;
     }
 
     if (!error)
-        my_print("Parameter get/setLastSample --- Pass\n");
+        my_print("Parameter get/setLatestSample --- Pass\n");
     else
         error = 0; //Reset for next function.
 

@@ -87,8 +87,8 @@ class PANSEModel: public Model
 
 
 		//Iteration Functions:
-		virtual unsigned getLastSample();
-		virtual void setLastSample(unsigned iteration);
+		virtual unsigned getLatestSample();
+		virtual void setLatestSample(unsigned iteration);
 
 
 		//Trace Functions:
@@ -106,7 +106,7 @@ class PANSEModel: public Model
 		virtual void adaptStdDevSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt = true);
         virtual void adaptPartitionFunctionProposalWidth(unsigned adaptiveWidth, bool adapt = true);
 		virtual void adaptSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt = true);
-		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, unsigned lastSample, bool adapt = true);
+		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, unsigned latestSample, bool adapt = true);
 		virtual void adaptHyperParameterProposalWidths(unsigned adaptiveWidth, bool adapt = true);
 
 

@@ -17,7 +17,7 @@ class CovarianceMatrix
         std::vector<double> choleskyMatrix;
         unsigned numVariates; //make static const again
 
-		double sampleMean(std::vector<float> sampleVector, unsigned samples, unsigned lastSample,bool log_scale=false);
+		double sampleMean(std::vector<float> sampleVector, unsigned samples, unsigned latestSample,bool log_scale=false);
 
     public:
         //Constructors & Destructors:
@@ -43,8 +43,8 @@ class CovarianceMatrix
 		std::vector<double>* getCholeskyMatrix(); //Only for unit testing.
         int getNumVariates();
         std::vector<double> transformIidNumbersIntoCovaryingNumbers(std::vector<double> iidNumbers);
-		void calculateSampleCovariance(std::vector<std::vector<std::vector<std::vector<float>>>> codonSpecificParameterTrace, std::string aa, unsigned samples, unsigned lastSample);
-        void calculateSampleCovarianceForPANSE(std::vector<std::vector<std::vector<std::vector<float>>>> codonSpecificParameterTrace, std::string codon, unsigned samples, unsigned lastSample);
+		void calculateSampleCovariance(std::vector<std::vector<std::vector<std::vector<float>>>> codonSpecificParameterTrace, std::string aa, unsigned samples, unsigned latestSample);
+        void calculateSampleCovarianceForPANSE(std::vector<std::vector<std::vector<std::vector<float>>>> codonSpecificParameterTrace, std::string codon, unsigned samples, unsigned latestSample);
 
 #ifndef STANDALONE
     void setCovarianceMatrix(SEXP _matrix);

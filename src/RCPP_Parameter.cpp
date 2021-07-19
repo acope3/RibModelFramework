@@ -217,8 +217,8 @@ RCPP_MODULE(Parameter_mod)
 		.method("getCurrentSynthesisRateForMixture", &Parameter::getCurrentSynthesisRateForMixture)
 
 		//Iteration Functions:
-		.method("getLastSample", &Parameter::getLastSample) //Not a R wrapper
-		.method("setLastSample", &Parameter::setLastSample) //Not a R wrapper
+		.method("getLatestSample", &Parameter::getLatestSample) //Not a R wrapper
+		.method("setLatestSample", &Parameter::setLatestSample) //Not a R wrapper
 
 		//Posterior, Variance, and Estimates Functions:
 		.method("getSynthesisRatePosteriorMeanForGene",
