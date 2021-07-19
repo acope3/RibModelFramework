@@ -4,11 +4,11 @@
 #' MCMC algorithm. No default value.
 #' 
 #' @param thinning The thinning interval between consecutive observations. If set to 
-#' 1, every step will be saved as a sample. Default value is 1.
+#' 1, every iteration will be saved as a sample. Default value is 1.
 #' 
 #' @param adaptive.width Number that determines how often the acceptance/rejection
 #' window should be altered. Default value is 100 samples.
-#' Proportion of MCMC steps where the proposal distribution is adaptive can be set using \code{mcmc$setIterationsToAdapt}. The default parameter passed in as -1 uses the full iterations.
+#' Proportion of MCMC iterations where the proposal distribution is adaptive can be set using \code{mcmc$setIterationsToAdapt}. The default parameter passed in as -1 uses the full iterations.
 #' 
 #' @param est.expression Boolean that tells whether or not synthesis rate values
 #' should be estimated in the MCMC algorithm run. Default value is TRUE.
@@ -101,7 +101,7 @@ initializeMCMCObject <- function(samples, thinning=1, adaptive.width=100,
 #' @param ncores Number of cores to perform the model fitting with. Default
 #' value is 1.
 #' 
-#' @param divergence.iteration Number of steps that the initial conditions
+#' @param divergence.iteration Number of iterations that the initial conditions
 #' can diverge from the original conditions given. Default value is 0.
 #' 
 #' @return This function has no return value.
@@ -111,7 +111,7 @@ initializeMCMCObject <- function(samples, thinning=1, adaptive.width=100,
 #' 
 #' @details \code{runMCMC} will run for the number of samples times the number
 #' thinning given when the mcmc object is initialized. Updates are provided every 100
-#' steps, and the state of the chain is saved every thinning steps.
+#' iterations, and the state of the chain is saved every thinning iterations.
 #' 
 #' @examples 
 #' 

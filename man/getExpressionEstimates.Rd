@@ -58,7 +58,7 @@ runMCMC(mcmc = mcmc, genome = genome, model = model,
         ncores = 4, divergence.iteration = divergence.iteration)
 
 # get the estimated expression values for all genes based on the mixture 
-# they are assigned to at each step
+# they are assigned to at each stample
 estimatedExpression <- getExpressionEstimates(parameter, 1:length(genome), 1000)
 }
 

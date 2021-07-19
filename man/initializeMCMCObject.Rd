@@ -19,11 +19,11 @@ initializeMCMCObject(
 MCMC algorithm. No default value.}
 
 \item{thinning}{The thinning interval between consecutive observations. If set to 
-1, every step will be saved as a sample. Default value is 1.}
+1, every iteration will be saved as a sample. Default value is 1.}
 
 \item{adaptive.width}{Number that determines how often the acceptance/rejection
 window should be altered. Default value is 100 samples.
-Proportion of MCMC steps where the proposal distribution is adaptive can be set using \code{mcmc$setStepsToAdapt}. The default parameter passed in as -1 uses the full iterations.}
+Proportion of MCMC iterations where the proposal distribution is adaptive can be set using \code{mcmc$setIterationsToAdapt}. The default parameter passed in as -1 uses the full iterations.}
 
 \item{est.expression}{Boolean that tells whether or not synthesis rate values
 should be estimated in the MCMC algorithm run. Default value is TRUE.}

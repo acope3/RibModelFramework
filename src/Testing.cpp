@@ -3585,7 +3585,7 @@ int testMCMCAlgorithm()
     //------ get/setIterationsToAdapt Functions ------//
     //-------------------------------------------//
 
-    // NOTE: By default, both constructors initialize stepsToAdapt to -1
+    // NOTE: By default, both constructors initialize iterationsToAdapt to -1
     if (mcmc.getIterationsToAdapt() != -1)
     {
         my_printError("Error in getIterationsToAdapt. Function should return -1, but returns %.\n", mcmc.getIterationsToAdapt());
@@ -3602,7 +3602,7 @@ int testMCMCAlgorithm()
         globalError = 1;
     }
 
-    // Intentional error checking: Should print an error message with no change to stepsToAdapt
+    // Intentional error checking: Should print an error message with no change to iterationsToAdapt
     mcmc.setIterationsToAdapt(101);
     if (mcmc.getIterationsToAdapt() != 52)
     {
