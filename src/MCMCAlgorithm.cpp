@@ -1133,9 +1133,26 @@ void MCMCAlgorithm::setRestartFileSettings(std::string filename, unsigned interv
 void MCMCAlgorithm::setIterationsToAdapt(unsigned iterations)
 {
 	if (iterations <= samples * thinning)
-		iterationsToAdapt = iterations;
+                iterationsToAdapt = iterations;
 	else
 		my_printError("ERROR: Cannot set iterations - value must be smaller than samples times thinning (maxIterations)\n");
+}
+
+/* setSamplesToAdapt (RCPP EXPOSED)
+ * Arguments: iterations (unsigned)
+ * Will set the specified iterations to adapt for the run if the value is less than samples * thinning (aka, the number
+ * of iterations the run will last).The default parameter passed in as -1 uses the full iterations.
+*/
+//' @name setSamplesToAdapt
+//' @title setSamplesToAdapt
+//' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Set number of samples to allow proposal widths to adapt. The variable iterationsToAdapt is the actual variable updated.
+//' @param iterations a postive value
+void MCMCAlgorithm::setSamplesToAdapt(unsigned _samples)
+{
+	if (_samples <= samples)
+                iterationsToAdapt = _samples * thinning;
+	else
+		my_printError("ERROR: Cannot set samplesToAdapt - value must be smaller than total samples\n");
 }
 
 /* setStepsToAdapt (RCPP EXPOSED)
@@ -1170,6 +1187,18 @@ int MCMCAlgorithm::getIterationsToAdapt()
 	return iterationsToAdapt;
 }
 
+/* getIterationsToAdapt (RCPP EXPOSED)
+ * Arguments: None
+ * Return the value of iterationsToAdapt
+*/
+//' @name getSamplesToAdapt
+//' @title getSamplesToAdapt
+//' @description Method of MCMC class (access via mcmc$<function name>, where mcmc is an object initialized by initializeMCMCObject). Return number of samples (~= iterations/thinning) to allow proposal widths to adapt
+//' @return number of samples to adapt
+int MCMCAlgorithm::getSamplesToAdapt()
+{
+	return iterationsToAdapt/thinning;
+}
  /* getStepsToAdapt (RCPP EXPOSED)
  * Arguments: None
  * DEPRICATED FUNCTION REPLACED BY getIterationsToAdapt and getSamplesToAdapt
