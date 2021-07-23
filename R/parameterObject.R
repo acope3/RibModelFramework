@@ -1965,14 +1965,10 @@ combineTwoDimensionalTrace <- function(trace1, trace2,start=2,end=NULL){
   {
     print("Start must be at least 2 because the last element of first trace is first of second trace. Setting start = 2.")
   }
-  if(end <= start)
+  if(is.null(end) || end <= start)
   {
-    print("End must be greater than start. Setting end to length of trace2.")
+    print(paste0("End must be greater than start. Setting end to length(trace2) = ", length(trace2)))
     end <- trace2
-  }
-  if(end == NULL)
-  {
-    end <- length(trace2)
   }
   for (size in 1:length(trace1))
   {
