@@ -187,7 +187,7 @@ void SequenceSummary::initRFPCount(unsigned numCategories)
  * Returns the RFPCount vector for the category index specified.
  * Note: If initRFPCount is not called beforehand, it is called now to return a vector of 0s.
  */
-std::vector <unsigned> SequenceSummary::getRFPCount(unsigned RFPCountColumn)
+std::vector <unsigned long> SequenceSummary::getRFPCount(unsigned RFPCountColumn)
 {
 	// Note: If the user forgets to initRFPCount manually, this statement is executed but returns an empty vector.
 	if (RFPCount.size() < RFPCountColumn + 1) initRFPCount(RFPCountColumn + 1);
@@ -200,7 +200,7 @@ std::vector <unsigned> SequenceSummary::getRFPCount(unsigned RFPCountColumn)
  * Returns the integer RFPCount value for the category index at the position specified.
  * Note: If initRFPCount is not called beforehand, it is called now to return a value of 0.
  */
-unsigned SequenceSummary::getSingleRFPCount(unsigned position, unsigned RFPCountColumn)
+unsigned long SequenceSummary::getSingleRFPCount(unsigned position, unsigned RFPCountColumn)
 {
 	if (RFPCount.size() < RFPCountColumn + 1) initRFPCount(RFPCountColumn + 1);
 	return RFPCount[RFPCountColumn][position];
@@ -212,7 +212,7 @@ unsigned SequenceSummary::getSingleRFPCount(unsigned position, unsigned RFPCount
  * Sets the RFPCount vector for the category index specified to the vector argument given.
  * Note: If initRFPCount is not called beforehand, it is called now.
  */
-void SequenceSummary::setRFPCount(std::vector <unsigned> arg, unsigned RFPCountColumn)
+void SequenceSummary::setRFPCount(std::vector <unsigned long> arg, unsigned RFPCountColumn)
 {
 	if (RFPCount.size() < RFPCountColumn + 1) initRFPCount(RFPCountColumn + 1);
 	RFPCount[RFPCountColumn] = arg;
@@ -239,7 +239,7 @@ void SequenceSummary::initSumRFPCount(unsigned numCategories)
  * Returns the sumRFPCount array of size 64 for the category index specified.
  * Note: If initSumRFPCount is not called beforehand, it is called now to return an array of 0s.
  */
-std::array <unsigned, 64> SequenceSummary::getSumRFPCount(unsigned RFPCountColumn)
+std::array <unsigned long, 64> SequenceSummary::getSumRFPCount(unsigned RFPCountColumn)
 {
 	if (sumRFPCount.size() < RFPCountColumn + 1) initSumRFPCount(RFPCountColumn + 1);
 	return sumRFPCount[RFPCountColumn];
@@ -251,17 +251,17 @@ std::array <unsigned, 64> SequenceSummary::getSumRFPCount(unsigned RFPCountColum
  * Sets the sumRFPCount vector for the category index specified to the array argument given.
  * Note: If initSumRFPCount is not called beforehand, it is called now.
  */
-void SequenceSummary::setSumRFPCount(std::array <unsigned, 64> arg, unsigned RFPCountColumn)
+void SequenceSummary::setSumRFPCount(std::array <unsigned long, 64> arg, unsigned RFPCountColumn)
 {
 	if (sumRFPCount.size() < RFPCountColumn + 1) initSumRFPCount(RFPCountColumn + 1);
 	sumRFPCount[RFPCountColumn] = arg;
 }
 
 
-unsigned SequenceSummary::getSumTotalRFPCount(unsigned RFPCountColumn)
+unsigned long SequenceSummary::getSumTotalRFPCount(unsigned RFPCountColumn)
 {
     if (sumRFPCount.size() < RFPCountColumn + 1) initSumRFPCount(RFPCountColumn + 1);
-    unsigned sum = 0;
+    unsigned long sum = 0;
     for (unsigned i = 0u; i < sumRFPCount[RFPCountColumn].size(); i++)
     {
         sum += sumRFPCount[RFPCountColumn][i];
@@ -276,7 +276,7 @@ unsigned SequenceSummary::getSumTotalRFPCount(unsigned RFPCountColumn)
  * Note: If initSumRFPCount is not called beforehand, it is called now to return a value of 0.
  * Wrapped by Gene::getSumRFPCountForCodon on the R-side.
  */
-unsigned SequenceSummary::getCodonSpecificSumRFPCount(std::string codon, unsigned RFPCountColumn)
+unsigned long SequenceSummary::getCodonSpecificSumRFPCount(std::string codon, unsigned RFPCountColumn)
 {
 	if (sumRFPCount.size() < RFPCountColumn + 1){
 	    initSumRFPCount(RFPCountColumn + 1);
@@ -290,7 +290,7 @@ unsigned SequenceSummary::getCodonSpecificSumRFPCount(std::string codon, unsigne
  * Returns the RFP value at the codon index for the category index specified.
  * Note: If initSumRFPCount is not called beforehand, it is called now to return a value of 0.
  */
-unsigned SequenceSummary::getCodonSpecificSumRFPCount(unsigned codonIndex, unsigned RFPCountColumn)
+unsigned long SequenceSummary::getCodonSpecificSumRFPCount(unsigned codonIndex, unsigned RFPCountColumn)
 {
 	if (sumRFPCount.size() < RFPCountColumn + 1){
 		initSumRFPCount(RFPCountColumn + 1);
@@ -304,7 +304,7 @@ unsigned SequenceSummary::getCodonSpecificSumRFPCount(unsigned codonIndex, unsig
  * Sets the RFP value at the codon index for the category index specified.
  * Note: If initSumRFPCount is not called beforehand, it is called now to return initialize the vector of vectors.
  */
-void SequenceSummary::setCodonSpecificSumRFPCount(unsigned codonIndex, unsigned value, unsigned RFPCountColumn)
+void SequenceSummary::setCodonSpecificSumRFPCount(unsigned codonIndex, unsigned long value, unsigned RFPCountColumn)
 {
     if (sumRFPCount.size() < RFPCountColumn + 1) initSumRFPCount(RFPCountColumn + 1);
     sumRFPCount[RFPCountColumn][codonIndex] = value;

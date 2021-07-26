@@ -115,6 +115,9 @@ class PAModel: public Model
 		PAParameter* getParameter();
 		void setParameter(PAParameter &_parameter);
 		virtual double calculateAllPriors();
+		virtual double calculateAlphaPrior(std::string grouping,bool proposed=false);
+		virtual double calculateLambdaPrior(std::string grouping,bool proposed=false);
+	
 		virtual double getParameterForCategory(unsigned category, unsigned param, std::string codon, bool proposal);
 
 	    virtual double getNoiseOffset(unsigned index, bool proposed = false);

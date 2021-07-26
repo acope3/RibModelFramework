@@ -333,7 +333,7 @@ void Gene::initRFPCount(unsigned numCategories)
  * Returns the RFPCount vector for the category index specified.
  * For unit testing only.
  */
-std::vector <unsigned> Gene::getRFPCount(unsigned RFPCountColumn)
+std::vector <unsigned long> Gene::getRFPCount(unsigned RFPCountColumn)
 {
     return geneData.getRFPCount(RFPCountColumn);
 }
@@ -343,7 +343,7 @@ std::vector <unsigned> Gene::getRFPCount(unsigned RFPCountColumn)
  * Arguments: A vector argument to set the RFP category's RFPCount to, a number representing the RFP category to modify (default 0)
  * Sets the RFPCount vector for the category index specified to the vector argument given.
  */
-void Gene::setRFPCount(std::vector <unsigned> RFPCounts, unsigned RFPCountColumn)
+void Gene::setRFPCount(std::vector <unsigned long> RFPCounts, unsigned RFPCountColumn)
 {
     geneData.setRFPCount(RFPCounts, RFPCountColumn);
 }
@@ -367,7 +367,7 @@ void Gene::initSumRFPCount(unsigned numCategories)
  * Returns the sumRFPCount array of size 64 for the category index specified.
  * For unit testing only.
  */
-std::array <unsigned, 64> Gene::getSumRFPCount(unsigned RFPCountColumn)
+std::array <unsigned long, 64> Gene::getSumRFPCount(unsigned RFPCountColumn)
 {
     return geneData.getSumRFPCount(RFPCountColumn);
 }
@@ -377,7 +377,7 @@ std::array <unsigned, 64> Gene::getSumRFPCount(unsigned RFPCountColumn)
  * Arguments: An array argument to set the RFP category's sumRFPCount to, a number representing the RFP category to modify (default 0)
  * Sets the sumRFPCount array for the category index specified to the array argument given.
  */
-void Gene::setSumRFPCount(std::array <unsigned, 64> sumRFPCounts, unsigned RFPCountColumn)
+void Gene::setSumRFPCount(std::array <unsigned long, 64> sumRFPCounts, unsigned RFPCountColumn)
 {
     geneData.setSumRFPCount(sumRFPCounts, RFPCountColumn);
 }
@@ -502,7 +502,7 @@ unsigned Gene::getCodonCount(std::string& codon)
  * This is the R-wrapper for the C-side function "SequenceSummary::getCodonSpecificSumRFPCount".
 */
 // Note: From function definition in header, default category is 1.
-unsigned Gene::getSumRFPCountForCodon(std::string codon, unsigned RFPCountColumn)
+unsigned long Gene::getSumRFPCountForCodon(std::string codon, unsigned RFPCountColumn)
 {
     unsigned rv = 0;
 

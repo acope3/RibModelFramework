@@ -53,13 +53,13 @@ class Gene
 
 		//RFP Functions (for PA and PANSE models) (All tested):
 		void initRFPCount(unsigned numCategories); // Wraps SequenceSummary:initRFPCount()
-		std::vector <unsigned> getRFPCount(unsigned RFPCountColumn = 0u); //Only for unit testing.
+		std::vector <unsigned long> getRFPCount(unsigned RFPCountColumn = 0u); //Only for unit testing.
 																	 // Wraps SequenceSummary::getRFPCount()
-		void setRFPCount(std::vector <unsigned> RFPCounts, unsigned RFPCountColumn = 0u); // Wraps SequenceSummary:setRFPCount()
+		void setRFPCount(std::vector <unsigned long> RFPCounts, unsigned RFPCountColumn = 0u); // Wraps SequenceSummary:setRFPCount()
 		void initSumRFPCount(unsigned numCategories); // Wraps SequenceSummary:initSumRFPCount()
-		std::array <unsigned, 64> getSumRFPCount(unsigned RFPCountColumn = 0u); //Only for unit testing.
+		std::array <unsigned long, 64> getSumRFPCount(unsigned RFPCountColumn = 0u); //Only for unit testing.
 																		// Wraps SequenceSummary::getSumRFPCount()
-		void setSumRFPCount(std::array <unsigned, 64> sumRFPCounts, unsigned RFPCountColumn = 0u); // Wraps SequenceSummary:setSumRFPCount()
+		void setSumRFPCount(std::array <unsigned long, 64> sumRFPCounts, unsigned RFPCountColumn = 0u); // Wraps SequenceSummary:setSumRFPCount()
 
 
 		//Other functions:
@@ -75,7 +75,7 @@ class Gene
 
 		unsigned getAACount(std::string aa);
 		unsigned getCodonCount(std::string& codon);
-		unsigned getSumRFPCountForCodon(std::string codon, unsigned RFPCountColumn = 1);
+		unsigned long getSumRFPCountForCodon(std::string codon, unsigned RFPCountColumn = 1);
 		std::vector <unsigned> getCodonPositions(std::string codon);
 #endif
 

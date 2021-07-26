@@ -96,8 +96,7 @@ MCMCAlgorithm::~MCMCAlgorithm()
 */
 double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, Model& model, int iteration)
 {
-    
-	double loglikelihood = 0.0;
+  	double loglikelihood = 0.0;
 	double logPosterior = 0.0;
 	int numGenes = genome.getGenomeSize();
 	std::vector<unsigned> categoryOfGene_vec(numGenes,0);
@@ -162,45 +161,39 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		{
 			for (unsigned k = 0u; k < numSynthesisRateCategories; k++)
 			{
-				// logProbabilityRatio contains the logProbabilityRatio in element 0,
-				// the current unscaled probability in element 1 and the proposed unscaled probability in element 2
-				std::vector<unsigned> mixtureElements = model.getMixtureElementsOfSelectionCategory(k);
-				for (unsigned n = 0u; n < mixtureElements.size(); n++)
-				{
-					unsigned mixtureElement = mixtureElements[n];
-					double logProbabilityRatio[7];
-					//model.calculateUniversalParameter(genome,i,mixtureElement);
-					model.calculateLogLikelihoodRatioPerGene(*gene, i, mixtureElement, logProbabilityRatio); //has to return likelihood, not just ratio, no priors
+				unsigned mixtureElement = mixtureElements[n];
+				double logProbabilityRatio[7];
+				//model.calculateUniversalParameter(genome,i,mixtureElement);
+				model.calculateLogLikelihoodRatioPerGene(*gene, i, mixtureElement, logProbabilityRatio); //has to return likelihood, not just ratio, no priors
 
-					// log posterior with and without rev. jump probability
-					unscaledLogProb_curr[k] += logProbabilityRatio[1]; // with rev. jump prob.
-					unscaledLogProb_prop[k] += logProbabilityRatio[2]; // with rev. jump prob.
+				// log posterior with and without rev. jump probability
+				unscaledLogProb_curr[k] += logProbabilityRatio[1]; // with rev. jump prob.
+				unscaledLogProb_prop[k] += logProbabilityRatio[2]; // with rev. jump prob.
 
-					// TODO: unscaledLogPost_curr and unscaledLogPost_prop have been made redundant by modification to code adding unscaledLogProb_curr_singleMixture
-					// unscaledLogProb_prop_singleMixture. Remove.
-					unscaledLogPost_curr[k] += logProbabilityRatio[3]; // without rev. jump prob.
-					unscaledLogPost_prop[k] += logProbabilityRatio[4]; // without rev. jump prob.
-					unscaledLogLike_curr[k] += logProbabilityRatio[5]; //current logLikelihood
-					unscaledLogLike_prop[k] += logProbabilityRatio[6]; //proposed logLikelihood
+				// TODO: unscaledLogPost_curr and unscaledLogPost_prop have been made redundant by modification to code adding unscaledLogProb_curr_singleMixture
+				// unscaledLogProb_prop_singleMixture. Remove.
+				unscaledLogPost_curr[k] += logProbabilityRatio[3]; // without rev. jump prob.
+				unscaledLogPost_prop[k] += logProbabilityRatio[4]; // without rev. jump prob.
+				unscaledLogLike_curr[k] += logProbabilityRatio[5]; //current logLikelihood
+				unscaledLogLike_prop[k] += logProbabilityRatio[6]; //proposed logLikelihood
 
-					unscaledLogProbRev_curr_singleMixture[mixtureIndex] = logProbabilityRatio[1];
-					unscaledLogProbRev_prop_singleMixture[mixtureIndex] = logProbabilityRatio[2];
-					unscaledLogProb_curr_singleMixture[mixtureIndex] = logProbabilityRatio[3];
-					unscaledLogProb_prop_singleMixture[mixtureIndex] = logProbabilityRatio[4];
-					unscaledLogLike_curr_singleMixture[mixtureIndex] = logProbabilityRatio[5];
-					unscaledLogLike_prop_singleMixture[mixtureIndex] = logProbabilityRatio[6];
+				unscaledLogProbRev_curr_singleMixture[mixtureIndex] = logProbabilityRatio[1];
+				unscaledLogProbRev_prop_singleMixture[mixtureIndex] = logProbabilityRatio[2];
+				unscaledLogProb_curr_singleMixture[mixtureIndex] = logProbabilityRatio[3];
+				unscaledLogProb_prop_singleMixture[mixtureIndex] = logProbabilityRatio[4];
+				unscaledLogLike_curr_singleMixture[mixtureIndex] = logProbabilityRatio[5];
+				unscaledLogLike_prop_singleMixture[mixtureIndex] = logProbabilityRatio[6];
 
-					maxValue = unscaledLogProb_curr_singleMixture[mixtureIndex] > maxValue ?
-							   unscaledLogProb_curr_singleMixture[mixtureIndex] : maxValue;
+				maxValue = unscaledLogProb_curr_singleMixture[mixtureIndex] > maxValue ?
+						   unscaledLogProb_curr_singleMixture[mixtureIndex] : maxValue;
 
-					maxValue2 = unscaledLogProb_prop_singleMixture[mixtureIndex] > maxValue2 ?
-								unscaledLogProb_prop_singleMixture[mixtureIndex] : maxValue2;
+				maxValue2 = unscaledLogProb_prop_singleMixture[mixtureIndex] > maxValue2 ?
+							unscaledLogProb_prop_singleMixture[mixtureIndex] : maxValue2;
 
-					//maxValue2 = unscaledLogPost_prop[k] > maxValue2 ?
-					//		unscaledLogPost_prop[k] : maxValue2;
+				//maxValue2 = unscaledLogPost_prop[k] > maxValue2 ?
+				//		unscaledLogPost_prop[k] : maxValue2;
 
-					mixtureIndex++;
-				}
+				mixtureIndex++;
 			}
 			maxValue2 = maxValue > maxValue2 ? maxValue : maxValue2;
 
@@ -231,7 +224,6 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			{
 				probabilities[k] = probabilities[k] / normalizingProbabilityConstant;
 			}
-
 			
 			for (unsigned k = 0u; k < numSynthesisRateCategories; k++)
 			{
@@ -384,9 +376,12 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	}
 	std::vector <double> newMixtureProbabilities(numMixtures, 0);
 	Parameter::randDirichlet(dirichletParameters, numMixtures, newMixtureProbabilities);
-	for (unsigned k = 0u; k < numMixtures; k++)
+	if (estimateMixtureAssignment)
 	{
-		model.setCategoryProbability(k, newMixtureProbabilities[k]);
+		for (unsigned k = 0u; k < numMixtures; k++)
+		{
+			model.setCategoryProbability(k, newMixtureProbabilities[k]);
+		}
 	}
 
 	if ((iteration % thinning) == 0)
@@ -461,7 +456,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, PANSEMode
 		// calculate likelihood ratio for every Category for current AA (ROC, FONSE) or Codon (PA, PANSE)
 		model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures,param_2);
 		double threshold = -Parameter::randExp(1);
-		if (threshold < acceptanceRatioForAllMixtures[0] && std::isfinite(acceptanceRatioForAllMixtures[0]) && !std::isnan(acceptanceRatioForAllMixtures[2]))
+		if (threshold < acceptanceRatioForAllMixtures[0] && std::isfinite(acceptanceRatioForAllMixtures[0]) && !std::isnan(acceptanceRatioForAllMixtures[2]) && acceptanceRatioForAllMixtures[1] != 0)
 		{	
 			// moves proposed codon specific parameters to current codon specific parameters
 			if (std::isnan(acceptanceRatioForAllMixtures[0]))
@@ -469,7 +464,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, PANSEMode
 				my_print("ERROR: Accepted proposed value that results in NaN\n");
 			}
 			model.updateCodonSpecificParameter(grouping,param_2);
-			if ((iteration % thinning) == 0)
+			if ((iteration % thinning) == 0 && acceptanceRatioForAllMixtures[2] != 0)
 			{
 				likelihoodTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[2];//will be 0
 				posteriorTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[4];//will be 0
@@ -477,7 +472,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, PANSEMode
 		}
 		else
 		{
-			if ((iteration % thinning) == 0)
+			if ((iteration % thinning) == 0 && acceptanceRatioForAllMixtures[1] != 0)
 			{
 				likelihoodTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[1];
 				posteriorTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[3];
