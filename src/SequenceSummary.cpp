@@ -35,7 +35,7 @@ const std::map<std::string, unsigned> SequenceSummary::aaToIndex = {{"A", 0}, {"
 	{"G", 5}, {"H", 6}, {"I", 7}, {"K", 8}, {"L", 9}, {"M", 10}, {"N", 11}, {"P", 12}, {"Q", 13}, {"R", 14}, {"S", 15},
 	{"T", 16}, {"V", 17}, {"W", 18}, {"Y", 19}, {SequenceSummary::Ser2, 20}, {"X", 21}};
 
-const std::map<std::string, unsigned> SequenceSummary::codonToIndexWithReference = {{"GCA", 0}, {"GCC", 1}, {"GCG", 2},
+std::map<std::string, unsigned> SequenceSummary::codonToIndexWithReference = {{"GCA", 0}, {"GCC", 1}, {"GCG", 2},
 	{"GCT", 3}, {"TGC", 4}, {"TGT", 5}, {"GAC", 6}, {"GAT", 7}, {"GAA", 8}, {"GAG", 9}, {"TTC", 10}, {"TTT", 11},
 	{"GGA", 12}, {"GGC", 13}, {"GGG", 14}, {"GGT", 15}, {"CAC", 16}, {"CAT", 17}, {"ATA", 18}, {"ATC", 19}, {"ATT", 20},
 	{"AAA", 21}, {"AAG", 22}, {"CTA", 23}, {"CTC", 24}, {"CTG", 25}, {"CTT", 26}, {"TTA", 27}, {"TTG", 28}, {"ATG", 29},
@@ -44,7 +44,7 @@ const std::map<std::string, unsigned> SequenceSummary::codonToIndexWithReference
 	{"ACA", 48}, {"ACC", 49}, {"ACG", 50}, {"ACT", 51}, {"GTA", 52}, {"GTC", 53}, {"GTG", 54}, {"GTT", 55}, {"TGG", 56},
 	{"TAC", 57}, {"TAT", 58}, {"AGC", 59}, {"AGT", 60}, {"TAA", 61}, {"TAG", 62}, {"TGA", 63}};
 
-const std::map<std::string, unsigned> SequenceSummary::codonToIndexWithoutReference = {{"GCA", 0}, {"GCC", 1},
+std::map<std::string, unsigned> SequenceSummary::codonToIndexWithoutReference = {{"GCA", 0}, {"GCC", 1},
 	{"GCG", 2}, {"TGC", 3}, {"GAC", 4}, {"GAA", 5}, {"TTC", 6}, {"GGA", 7}, {"GGC", 8}, {"GGG", 9}, {"CAC", 10},
 	{"ATA", 11}, {"ATC", 12}, {"AAA", 13}, {"CTA", 14}, {"CTC", 15}, {"CTG", 16}, {"CTT", 17}, {"TTA", 18}, {"AAC", 19},
 	{"CCA", 20}, {"CCC", 21}, {"CCG", 22}, {"CAA", 23}, {"AGA", 24}, {"AGG", 25}, {"CGA", 26}, {"CGC", 27}, {"CGG", 28},
@@ -76,6 +76,25 @@ std::map<std::string, std::string> SequenceSummary::codonToAAMap = {{"GCA", "A"}
 	{"AGG", "R"}, {"CGA", "R"}, {"CGC", "R"}, {"CGG", "R"}, {"CGT", "R"}, {"TCA", "S"}, {"TCC", "S"}, {"TCG", "S"}, {"TCT", "S"},
 	{"ACA", "T"}, {"ACC", "T"}, {"ACG", "T"}, {"ACT", "T"}, {"GTA", "V"}, {"GTC", "V"}, {"GTG", "V"}, {"GTT", "V"}, {"TGG", "W"},
 	{"TAC", "Y"}, {"TAT", "Y"}, {"AGC", "Z"}, {"AGT", "Z"}, {"TAA", "X"}, {"TAG", "X"}, {"TGA", "X"}};
+
+
+std::unordered_map<std::string, std::vector<unsigned>> SequenceSummary::AAToCodonRangeMapWithReference = {{"A",{0,4}}, 
+	{"C",{4,6}}, {"D",{6,8}}, {"E",{8,10}}, {"F",{10,12}},
+	{"G",{12,16}}, {"H",{16,18}}, {"I",{18, 21}},
+	{"K",{21,23}}, {"L",{23,29}}, {"M", {29,30}},
+	{"N",{30,32}}, {"P",{32, 36}}, {"Q",{36,38}}, {"R",{38,44}}, 
+	{"S",{44,48}}, {"T",{48,52}}, {"V",{52,56}}, {"W", {56,57}},
+	{"Y",{57,59}}, {"Z", {59,61}},{"X",{61,64}}};
+
+
+
+std::unordered_map<std::string, std::vector<unsigned>> SequenceSummary::AAToCodonRangeMapWithoutReference = {{"A",{0,3}}, 
+	{"C",{3,4}}, {"D",{4,5}}, {"E",{5,6}}, {"F",{6,7}},
+	{"G",{7,10}}, {"H",{10,11}}, {"I",{11, 13}},
+	{"K",{13,14}}, {"L",{14,19}}, {"M", {19,19}},
+	{"N",{19,20}}, {"P",{20, 23}}, {"Q",{23,24}}, {"R",{24,29}}, 
+	{"S",{29,32}}, {"T",{32,35}}, {"V",{35,38}}, {"W", {38,38}},
+	{"Y",{38,39}}, {"Z", {39,40}},{"X",{40,40}}};
 
 
 
@@ -215,9 +234,14 @@ void SequenceSummary::setCodonTable(unsigned codon_table_number)
 			{"AGG", "R"}, {"CGA", "R"}, {"CGC", "R"}, {"CGG", "R"}, {"CGT", "R"}, {"TCA", "S"}, {"TCC", "S"}, {"TCG", "S"}, {"TCT", "S"},
 			{"ACA", "T"}, {"ACC", "T"}, {"ACG", "T"}, {"ACT", "T"}, {"GTA", "V"}, {"GTC", "V"}, {"GTG", "V"}, {"GTT", "V"}, {"TGG", "W"},
 			{"TAC", "Y"}, {"TAT", "Y"}, {"AGC", "Z"}, {"AGT", "Z"}, {"TAA", "X"}, {"TAG", "X"}, {"TGA", "X"}};
+
+
+
 	}
 	if (codon_table_number == 12)
 	{
+
+
 		std::map<std::string, std::vector<std::string>>::iterator it_1;
 		std::map<std::string, std::string>::iterator it_2;
 
@@ -235,6 +259,38 @@ void SequenceSummary::setCodonTable(unsigned codon_table_number)
 
 		it_2 = codonToAAMap.find(CTG);
 		it_2 -> second = "J";
+
+		SequenceSummary::codonToIndexWithReference = {{"GCA", 0}, {"GCC", 1}, {"GCG", 2},
+		{"GCT", 3}, {"TGC", 4}, {"TGT", 5}, {"GAC", 6}, {"GAT", 7}, {"GAA", 8}, {"GAG", 9}, {"TTC", 10}, {"TTT", 11},
+		{"GGA", 12}, {"GGC", 13}, {"GGG", 14}, {"GGT", 15}, {"CAC", 16}, {"CAT", 17}, {"ATA", 18}, {"ATC", 19}, {"ATT", 20},
+		{"AAA", 21}, {"AAG", 22}, {"CTA", 23}, {"CTC", 24}, {"CTT", 25}, {"TTA", 26}, {"TTG", 27}, {"ATG", 28},
+		{"AAC", 29}, {"AAT", 30}, {"CCA", 31}, {"CCC", 32}, {"CCG", 33}, {"CCT", 34}, {"CAA", 35}, {"CAG", 36}, {"AGA", 37},
+		{"AGG", 38}, {"CGA", 39}, {"CGC", 40}, {"CGG", 41}, {"CGT", 42}, {"TCA", 43}, {"TCC", 44}, {"TCG", 45}, {"TCT", 46},
+		{"ACA", 47}, {"ACC", 48}, {"ACG", 49}, {"ACT", 50}, {"GTA", 51}, {"GTC", 52}, {"GTG", 53}, {"GTT", 54}, {"TGG", 55},
+		{"TAC", 56}, {"TAT", 57}, {"AGC", 58}, {"AGT", 59}, {"TAA", 60}, {"TAG", 61}, {"TGA", 62}};
+
+		SequenceSummary::codonToIndexWithoutReference = {{"GCA", 0}, {"GCC", 1},
+		{"GCG", 2}, {"TGC", 3}, {"GAC", 4}, {"GAA", 5}, {"TTC", 6}, {"GGA", 7}, {"GGC", 8}, {"GGG", 9}, {"CAC", 10},
+		{"ATA", 11}, {"ATC", 12}, {"AAA", 13}, {"CTA", 14}, {"CTC", 15} , {"CTT", 16}, {"TTA", 17}, {"AAC", 18},
+		{"CCA", 19}, {"CCC", 20}, {"CCG", 21}, {"CAA", 22}, {"AGA", 23}, {"AGG", 24}, {"CGA", 25}, {"CGC", 26}, {"CGG", 27},
+		{"TCA", 28}, {"TCC", 29}, {"TCG", 30}, {"ACA", 31}, {"ACC", 32}, {"ACG", 33}, {"GTA", 34}, {"GTC", 35}, {"GTG", 36},
+		{"TAC", 37}, {"AGC", 38}}; //Need to add case for AGT
+
+		SequenceSummary::AAToCodonRangeMapWithReference = {{"A",{0,4}}, 
+		{"C",{4,6}}, {"D",{6,8}}, {"E",{8,10}}, {"F",{10,12}},
+		{"G",{12,16}}, {"H",{16,18}}, {"I",{18, 21}},
+		{"K",{21,23}}, {"L",{23,28}}, {"M", {28,29}},
+		{"N",{29,31}}, {"P",{31, 35}}, {"Q",{35,37}}, {"R",{37,43}}, 
+		{"S",{43,47}}, {"T",{47,51}}, {"V",{51,55}}, {"W", {55,56}},
+		{"Y",{56,58}}, {"Z", {58,60}},{"X",{60,63}}};
+
+		SequenceSummary::AAToCodonRangeMapWithoutReference = {{"A",{0,3}}, 
+		{"C",{3,4}}, {"D",{4,5}}, {"E",{5,6}}, {"F",{6,7}},
+		{"G",{7,10}}, {"H",{10,11}}, {"I",{11, 13}},
+		{"K",{13,14}}, {"L",{14,18}}, {"M", {18,18}},
+		{"N",{18,19}}, {"P",{19, 22}}, {"Q",{22,23}}, {"R",{23,28}}, 
+		{"S",{28,31}}, {"T",{31,34}}, {"V",{34,37}}, {"W", {37,37}},
+		{"Y",{37,38}}, {"Z", {38,39}},{"X",{39,39}}};
 	}
 	
 }
@@ -648,105 +704,116 @@ void SequenceSummary::AAToCodonRange(std::string aa, unsigned& startAAIndex, uns
 	// switch statement is a lot faster than a chain of if else!
 	//unsigned startAAIndex = 0u;
 	//unsigned endAAIndex = 0u;
-	char AA = aa[0];
-
-	switch (AA)
+	// char tmp = aa[0];
+	// std::string (1,tmp);
+	std::vector<unsigned> index_range;
+	if (!forParamVector)
 	{
-	case 'A':
-		if (!forParamVector) { startAAIndex = 0; endAAIndex = 4; }
-		else { startAAIndex = 0; endAAIndex = 3; }
-		break;
-	case 'C':
-		if (!forParamVector) { startAAIndex = 4; endAAIndex = 6; }
-		else { startAAIndex = 3; endAAIndex = 4; }
-		break;
-	case 'D':
-		if (!forParamVector) { startAAIndex = 6; endAAIndex = 8; }
-		else { startAAIndex = 4; endAAIndex = 5; }
-		break;
-	case 'E':
-		if (!forParamVector) { startAAIndex = 8; endAAIndex = 10; }
-		else { startAAIndex = 5; endAAIndex = 6; }
-		break;
-	case 'F':
-		if (!forParamVector) { startAAIndex = 10; endAAIndex = 12; }
-		else { startAAIndex = 6; endAAIndex = 7; }
-		break;
-	case 'G':
-		if (!forParamVector) { startAAIndex = 12; endAAIndex = 16; }
-		else { startAAIndex = 7; endAAIndex = 10; }
-		break;
-	case 'H':
-		if (!forParamVector) { startAAIndex = 16; endAAIndex = 18; }
-		else { startAAIndex = 10; endAAIndex = 11; }
-		break;
-	case 'I':
-		if (!forParamVector) { startAAIndex = 18; endAAIndex = 21; }
-		else { startAAIndex = 11; endAAIndex = 13; }
-		break;
-	case 'K':
-		if (!forParamVector) { startAAIndex = 21; endAAIndex = 23; }
-		else { startAAIndex = 13; endAAIndex = 14; }
-		break;
-	case 'L':
-		if (!forParamVector) { startAAIndex = 23; endAAIndex = 29; }
-		else { startAAIndex = 14; endAAIndex = 19; }
-		break;
-	case 'M':
-		if (!forParamVector) { startAAIndex = 29; endAAIndex = 30; }
-		else { startAAIndex = 19; endAAIndex = 19; }
-		break;
-	case 'N':
-		if (!forParamVector) { startAAIndex = 30; endAAIndex = 32; }
-		else { startAAIndex = 19; endAAIndex = 20; }
-		break;
-	case 'P':
-		if (!forParamVector) { startAAIndex = 32; endAAIndex = 36; }
-		else { startAAIndex = 20; endAAIndex = 23; }
-		break;
-	case 'Q':
-		if (!forParamVector) { startAAIndex = 36; endAAIndex = 38; }
-		else { startAAIndex = 23; endAAIndex = 24; }
-		break;
-	case 'R':
-		if (!forParamVector) { startAAIndex = 38; endAAIndex = 44; }
-		else { startAAIndex = 24; endAAIndex = 29; }
-		break;
-	case 'S':
-		if (!forParamVector) { startAAIndex = 44; endAAIndex = 48; }
-		else { startAAIndex = 29; endAAIndex = 32; }
-		break;
-	case 'T':
-		if (!forParamVector) { startAAIndex = 48; endAAIndex = 52; }
-		else { startAAIndex = 32; endAAIndex = 35; }
-		break;
-	case 'V':
-		if (!forParamVector) { startAAIndex = 52; endAAIndex = 56; }
-		else { startAAIndex = 35; endAAIndex = 38; }
-		break;
-	case 'W':
-		if (!forParamVector) { startAAIndex = 56; endAAIndex = 57; }
-		else { startAAIndex = 38; endAAIndex = 38; }
-		break;
-	case 'Y':
-		if (!forParamVector) { startAAIndex = 57; endAAIndex = 59; }
-		else { startAAIndex = 38; endAAIndex = 39; }
-		break;
-	case 'Z':
-		if (!forParamVector) { startAAIndex = 59; endAAIndex = 61; }
-		else { startAAIndex = 39; endAAIndex = 40; }
-		break;
-	case 'X':
-		if (!forParamVector) { startAAIndex = 61; endAAIndex = 64; }
-		else { startAAIndex = 40; endAAIndex = 40; }
-		break;
-	default: // INVALID AA
-		startAAIndex = 0;
-		endAAIndex = 0;
-		my_print("%\n", AA);
-		my_printError("Invalid AA given, returning 0,0\n");
-		break;
+		index_range = SequenceSummary::AAToCodonRangeMapWithReference.find(aa) -> second;
 	}
+	else
+	{
+		index_range = SequenceSummary::AAToCodonRangeMapWithoutReference.find(aa) -> second;
+	}
+	startAAIndex = index_range[0];
+	endAAIndex = index_range[1];
+	// switch (AA)
+	// {
+	// case 'A':
+	// 	if (!forParamVector) { startAAIndex = 0; endAAIndex = 4; }
+	// 	else { startAAIndex = 0; endAAIndex = 3; }
+	// 	break;
+	// case 'C':
+	// 	if (!forParamVector) { startAAIndex = 4; endAAIndex = 6; }
+	// 	else { startAAIndex = 3; endAAIndex = 4; }
+	// 	break;
+	// case 'D':
+	// 	if (!forParamVector) { startAAIndex = 6; endAAIndex = 8; }
+	// 	else { startAAIndex = 4; endAAIndex = 5; }
+	// 	break;
+	// case 'E':
+	// 	if (!forParamVector) { startAAIndex = 8; endAAIndex = 10; }
+	// 	else { startAAIndex = 5; endAAIndex = 6; }
+	// 	break;
+	// case 'F':
+	// 	if (!forParamVector) { startAAIndex = 10; endAAIndex = 12; }
+	// 	else { startAAIndex = 6; endAAIndex = 7; }
+	// 	break;
+	// case 'G':
+	// 	if (!forParamVector) { startAAIndex = 12; endAAIndex = 16; }
+	// 	else { startAAIndex = 7; endAAIndex = 10; }
+	// 	break;
+	// case 'H':
+	// 	if (!forParamVector) { startAAIndex = 16; endAAIndex = 18; }
+	// 	else { startAAIndex = 10; endAAIndex = 11; }
+	// 	break;
+	// case 'I':
+	// 	if (!forParamVector) { startAAIndex = 18; endAAIndex = 21; }
+	// 	else { startAAIndex = 11; endAAIndex = 13; }
+	// 	break;
+	// case 'K':
+	// 	if (!forParamVector) { startAAIndex = 21; endAAIndex = 23; }
+	// 	else { startAAIndex = 13; endAAIndex = 14; }
+	// 	break;
+	// case 'L':
+	// 	if (!forParamVector) { startAAIndex = 23; endAAIndex = 29; }
+	// 	else { startAAIndex = 14; endAAIndex = 19; }
+	// 	break;
+	// case 'M':
+	// 	if (!forParamVector) { startAAIndex = 29; endAAIndex = 30; }
+	// 	else { startAAIndex = 19; endAAIndex = 19; }
+	// 	break;
+	// case 'N':
+	// 	if (!forParamVector) { startAAIndex = 30; endAAIndex = 32; }
+	// 	else { startAAIndex = 19; endAAIndex = 20; }
+	// 	break;
+	// case 'P':
+	// 	if (!forParamVector) { startAAIndex = 32; endAAIndex = 36; }
+	// 	else { startAAIndex = 20; endAAIndex = 23; }
+	// 	break;
+	// case 'Q':
+	// 	if (!forParamVector) { startAAIndex = 36; endAAIndex = 38; }
+	// 	else { startAAIndex = 23; endAAIndex = 24; }
+	// 	break;
+	// case 'R':
+	// 	if (!forParamVector) { startAAIndex = 38; endAAIndex = 44; }
+	// 	else { startAAIndex = 24; endAAIndex = 29; }
+	// 	break;
+	// case 'S':
+	// 	if (!forParamVector) { startAAIndex = 44; endAAIndex = 48; }
+	// 	else { startAAIndex = 29; endAAIndex = 32; }
+	// 	break;
+	// case 'T':
+	// 	if (!forParamVector) { startAAIndex = 48; endAAIndex = 52; }
+	// 	else { startAAIndex = 32; endAAIndex = 35; }
+	// 	break;
+	// case 'V':
+	// 	if (!forParamVector) { startAAIndex = 52; endAAIndex = 56; }
+	// 	else { startAAIndex = 35; endAAIndex = 38; }
+	// 	break;
+	// case 'W':
+	// 	if (!forParamVector) { startAAIndex = 56; endAAIndex = 57; }
+	// 	else { startAAIndex = 38; endAAIndex = 38; }
+	// 	break;
+	// case 'Y':
+	// 	if (!forParamVector) { startAAIndex = 57; endAAIndex = 59; }
+	// 	else { startAAIndex = 38; endAAIndex = 39; }
+	// 	break;
+	// case 'Z':
+	// 	if (!forParamVector) { startAAIndex = 59; endAAIndex = 61; }
+	// 	else { startAAIndex = 39; endAAIndex = 40; }
+	// 	break;
+	// case 'X':
+	// 	if (!forParamVector) { startAAIndex = 61; endAAIndex = 64; }
+	// 	else { startAAIndex = 40; endAAIndex = 40; }
+	// 	break;
+	// default: // INVALID AA
+	// 	startAAIndex = 0;
+	// 	endAAIndex = 0;
+	// 	my_print("%\n", AA);
+	// 	my_printError("Invalid AA given, returning 0,0\n");
+	// 	break;
+	// }
 }
 
 

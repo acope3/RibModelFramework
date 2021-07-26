@@ -48,8 +48,8 @@ class SequenceSummary
 		static const std::string codonArray[];
 		static const std::string codonArrayParameter[];
 		static const std::map<std::string, unsigned> aaToIndex;
-		static const std::map<std::string, unsigned> codonToIndexWithReference;
-		static const std::map<std::string, unsigned> codonToIndexWithoutReference;
+		static std::map<std::string, unsigned> codonToIndexWithReference;
+		static std::map<std::string, unsigned> codonToIndexWithoutReference;
 
 		// static const std::map<std::string, std::vector<std::string>> AAToCodonsMapWithReference_1;
 		// static const std::map<std::string, std::vector<std::string>> AAToCodonsMapWithoutReference_1;
@@ -61,6 +61,8 @@ class SequenceSummary
 
 		static std::map<std::string, std::vector<std::string>> AAToCodonsMapWithReference;
 		static std::map<std::string, std::vector<std::string>> AAToCodonsMapWithoutReference;
+		static std::unordered_map<std::string, std::vector<unsigned>> AAToCodonRangeMapWithReference;
+		static std::unordered_map<std::string, std::vector<unsigned>> AAToCodonRangeMapWithoutReference;
 		static std::map<std::string, std::string> codonToAAMap;
 
 		//Constructors & Destructors:
