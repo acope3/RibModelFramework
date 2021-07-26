@@ -76,20 +76,29 @@ ROCParameter::~ROCParameter()
 
 void ROCParameter::initROCParameterSet()
 {
-	//mutation_prior_sd = 0.35;
+	// POTENTIAL ISSUE: This seems to assume splitSer = True
+	unsigned aa_numCodons;
+	groupList = {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "P", "Q", "R", "S", "T", "V", "Y", "Z"};
+	numParam = 0;
+	
+	for (unsigned i = 0; i < groupList.size(); i++)
+	{
+		aa_numCodons = SequenceSummary::GetNumCodonsForAA(groupList[i],true);
+		numParam += aa_numCodons;
+	}
 	mutation_prior_mean.resize(numMutationCategories);
 	mutation_prior_sd.resize(numMutationCategories);
 	for (int i=0; i < numMutationCategories; i++)
 	{
+
+		std::vector<double> prior_tmp(numParam, 0.0);
 	  // POTENTIAL ISSUE: Shouldn't we use (numParam) instead of (40)
-		mutation_prior_mean[i].resize(40);
-		mutation_prior_sd[i].resize(40);
-		std::vector<double> tmp(40, 0.0);
-		mutation_prior_mean[i] = tmp;
-		mutation_prior_sd[i] = tmp;
+		mutation_prior_mean[i].resize(numParam);
+		mutation_prior_sd[i].resize(numParam);
+		mutation_prior_mean[i] = prior_tmp;
+		mutation_prior_sd[i] = prior_tmp;
 	}
-	// POTENTIAL ISSUE: This seems to assume splitSer = True
-	groupList = {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "P", "Q", "R", "S", "T", "V", "Y", "Z"};
+	std_csp.resize(numParam, 0.1);
 	// proposal bias and std for codon specific parameter
 	bias_csp = 0;
 
@@ -103,18 +112,19 @@ void ROCParameter::initROCParameterSet()
 
 	for (unsigned i = 0u; i < numMutationCategories; i++)
 	{
-		std::vector<double> tmp(numParam, 0.0);
-		currentCodonSpecificParameter[dM][i] = tmp;
-		proposedCodonSpecificParameter[dM][i] = tmp;
+		std::vector<double> mut_tmp(numParam, 0.0);
+		currentCodonSpecificParameter[dM][i] = mut_tmp;
+		proposedCodonSpecificParameter[dM][i] = mut_tmp;
+
 	}
 
 	currentCodonSpecificParameter[dEta].resize(numSelectionCategories);
 	proposedCodonSpecificParameter[dEta].resize(numSelectionCategories);
 	for (unsigned i = 0u; i < numSelectionCategories; i++)
 	{
-		std::vector<double> tmp(numParam, 0.0);
-		proposedCodonSpecificParameter[dEta][i] = tmp;
-		currentCodonSpecificParameter[dEta][i] = tmp;
+		std::vector<double> sel_tmp(numParam, 0.0);
+		proposedCodonSpecificParameter[dEta][i] = sel_tmp;
+		currentCodonSpecificParameter[dEta][i] = sel_tmp;
 	}
 
     for (unsigned i = 0; i < maxGrouping; i++)
@@ -224,34 +234,6 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 						std_csp.push_back(val);
 					}
 				}
-				// else if (variableName == "noiseOffset")
-				// {
-				// 	double val;
-				// 	iss.str(tmp);
-				// 	while (iss >> val)
-				// 	{
-				// 		noiseOffset.push_back(val);
-				// 		noiseOffset_proposed.push_back(val);
-				// 	}
-				// }
-				// else if (variableName == "observedSynthesisNoise")
-				// {
-				// 	double val;
-				// 	iss.str(tmp);
-				// 	while (iss >> val)
-				// 	{
-				// 		observedSynthesisNoise.push_back(val);
-				// 	}
-				// }
-				// else if (variableName == "std_NoiseOffset")
-				// {
-				// 	double val;
-				// 	iss.str(tmp);
-				// 	while (iss >> val)
-				// 	{
-				// 		std_NoiseOffset.push_back(val);
-				// 	}
-				// }
 				else if (variableName == "covarianceMatrix")
 				{
 					if (tmp == "***") //end of matrix
@@ -294,8 +276,8 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 							mutation_prior_mean.resize(numMutationCategories);
 							for (int i = 0; i < numMutationCategories;i++)
 							{
-								mutation_prior_mean[i].resize(40);
-								for (int j = 0; j < 40; j++)
+								mutation_prior_mean[i].resize(numParam);
+								for (int j = 0; j < numParam; j++)
 								{
 									mutation_prior_mean[i][j] = val;
 								}
@@ -329,8 +311,8 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 							mutation_prior_sd.resize(numMutationCategories);
 							for (int i = 0; i < numMutationCategories;i++)
 							{
-								mutation_prior_sd[i].resize(40);
-								for (int j = 0; j < 40; j++)
+								mutation_prior_sd[i].resize(numParam);
+								for (int j = 0; j < numParam; j++)
 								{
 									mutation_prior_sd[i][j] = val;
 								}
@@ -377,31 +359,6 @@ void ROCParameter::writeROCRestartFile(std::string filename)
 	{
 		std::ostringstream oss;
 		unsigned j;
-		// oss << ">noiseOffset:\n";
-		// for (j = 0; j < noiseOffset.size(); j++)
-		// {
-		// 	oss << noiseOffset[j];
-		// 	if ((j + 1) % 10 == 0)
-		// 		oss << "\n";
-		// 	else
-		// 		oss << " ";
-		// }
-		// if (j % 10 != 0)
-		// 	oss << "\n";
-
-		// oss << ">observedSynthesisNoise:\n";
-		// for (j = 0; j < observedSynthesisNoise.size(); j++)
-		// {
-		// 	oss << observedSynthesisNoise[j];
-		// 	if ((j + 1) % 10 == 0)
-		// 		oss << "\n";
-		// 	else
-		// 		oss << " ";
-		// }
-		// if (j % 10 != 0)
-		// 	oss << "\n";
-
-		//oss << ">mutation_prior_sd:\n" << mutation_prior_sd << "\n";
 		oss << ">mutation_prior_mean:\n";
 		for (unsigned i = 0; i < mutation_prior_mean.size(); i++)
 		{
@@ -432,17 +389,7 @@ void ROCParameter::writeROCRestartFile(std::string filename)
 			if (j % 10 != 0)
 				oss << "\n";
 		}
-		// oss << ">std_NoiseOffset:\n";
-		// for (j = 0; j < std_NoiseOffset.size(); j++)
-		// {
-		// 	oss << std_NoiseOffset[j];
-		// 	if ((j + 1) % 10 == 0)
-		// 		oss << "\n";
-		// 	else
-		// 		oss << " ";
-		// }
-		// if (j % 10 != 0)
-		// 	oss << "\n";
+
 		oss << ">std_csp:\n";
 		for (j = 0; j < std_csp.size(); j++)
 		{
@@ -621,22 +568,6 @@ void ROCParameter::initSelectionCategories(std::vector<std::string> files, unsig
 //---------- Trace Functions -----------//
 //--------------------------------------//
 
-// void ROCParameter::updateObservedSynthesisNoiseTraces(unsigned sample)
-// {
-// 	for (unsigned i = 0; i < observedSynthesisNoise.size(); i++)
-// 	{
-// 		traces.updateObservedSynthesisNoiseTrace(i, sample, observedSynthesisNoise[i]);
-// 	}
-// }
-
-
-// void ROCParameter::updateNoiseOffsetTraces(unsigned sample)
-// {
-// 	for (unsigned i = 0; i < noiseOffset.size(); i++)
-// 	{
-// 		traces.updateSynthesisOffsetTrace(i, sample, noiseOffset[i]);
-// 	}
-// }
 
 void ROCParameter::updateCodonSpecificParameterTrace(unsigned sample, std::string grouping)
 {
@@ -687,85 +618,6 @@ CovarianceMatrix& ROCParameter::getCovarianceMatrixForAA(std::string aa)
 
 
 
-//------------------------------------------------------//
-//---------- observedSynthesisNoise Functions ----------//
-//------------------------------------------------------//
-
-
-// double ROCParameter::getObservedSynthesisNoise(unsigned index)
-// {
-// 	return observedSynthesisNoise[index];
-// }
-
-
-// void ROCParameter::setObservedSynthesisNoise(unsigned index, double se)
-// {
-// 	observedSynthesisNoise[index] = se;
-// }
-
-
-
-
-
-// //-------------------------------------------//
-// //---------- noiseOffset Functions ----------//
-// //-------------------------------------------//
-
-
-// double ROCParameter::getNoiseOffset(unsigned index, bool proposed)
-// {
-// 	return (proposed ? noiseOffset_proposed[index] : noiseOffset[index]);
-// }
-
-
-// double ROCParameter::getCurrentNoiseOffsetProposalWidth(unsigned index)
-// {
-// 	return std_NoiseOffset[index];
-// }
-
-
-// void ROCParameter::proposeNoiseOffset()
-// {
-// 	for (unsigned i = 0; i < getNumObservedPhiSets(); i++)
-// 	{
-// 		noiseOffset_proposed[i] = randNorm(noiseOffset[i], std_NoiseOffset[i]);
-// 	}
-// }
-
-
-// void ROCParameter::setNoiseOffset(unsigned index, double _noiseOffset)
-// {
-// 	noiseOffset[index] = _noiseOffset;
-// }
-
-
-// void ROCParameter::updateNoiseOffset(unsigned index)
-// {
-// 	noiseOffset[index] = noiseOffset_proposed[index];
-// 	numAcceptForNoiseOffset[index]++;
-// }
-
-
-//-----------------------------------//
-//---------- Noise Functions --------//
-//-----------------------------------//
-
-// void ROCParameter::setInitialValuesForSepsilon(std::vector<double> seps)
-// {
-// 	if (seps.size() == observedSynthesisNoise.size())
-// 	{
-// 		for (unsigned i = 0; i < observedSynthesisNoise.size(); i++)
-// 		{
-// 			observedSynthesisNoise[i] = seps[i];
-// 		}
-// 	}
-// 	else
-// 	{
-// 		my_printError("ROCParameter::setInitialValuesForSepsilon number of initial values (%) does not match number of expression sets (%)",
-// 					  seps.size(), observedSynthesisNoise.size());
-// 	}
-// }
-
 
 //-----------------------------------//
 //---------- CSP Functions ----------//
@@ -810,10 +662,7 @@ void ROCParameter::proposeCodonSpecificParameter()
 				}
 				else if (propose_by_prior)
 				{
-
 					proposedCodonSpecificParameter[dM][i][codon_list[l]] = randNorm(mutation_prior_mean[i][codon_list[l]],mutation_prior_sd[i][codon_list[l]]);
-
-
 				}
 				else
 				{
@@ -831,7 +680,7 @@ void ROCParameter::proposeCodonSpecificParameter()
 				}
 				else if (propose_by_prior) //Don't estimate covariance matrix. 
 				{
-					proposedCodonSpecificParameter[dEta][i][l] = randNorm(currentCodonSpecificParameter[dEta][i][l] , std_csp[l]);
+					proposedCodonSpecificParameter[dEta][i][codon_list[l]] = randNorm(currentCodonSpecificParameter[dEta][i][codon_list[l]] , std_csp[codon_list[l]]);
 			
 				}
 				else
@@ -854,7 +703,6 @@ void ROCParameter::updateCodonSpecificParameter(std::string grouping)
 {
 	std::vector<unsigned> codon_list = SequenceSummary::AAToCodonIndex(grouping,true);
 	unsigned aaIndex = SequenceSummary::aaToIndex.find(grouping)->second;
-	//my_print("AA % Start % End % Previously Accepted %\n",grouping,aaStart,aaEnd,numAcceptForCodonSpecificParameters[aaIndex]);
 	numAcceptForCodonSpecificParameters[aaIndex]++;
 	if (!fix_dM)
 	{
@@ -1094,7 +942,7 @@ void ROCParameter::setMutationPriorMeanR(std::vector<double> _mutation_prior_mea
 	unsigned index = 0;
 	for (unsigned i = 0; i < numMutationCategories; i++)
 	{
-		for (unsigned j = 0; j < 40; j++,index++)
+		for (unsigned j = 0; j < numParam; j++,index++)
 		{
 			mutation_prior_mean[i][j] = _mutation_prior_mean[index];
 		}
@@ -1108,7 +956,7 @@ void ROCParameter::setMutationPriorStandardDeviationR(std::vector<double> _mutat
 	unsigned index = 0;
 	for (unsigned i = 0; i < numMutationCategories; i++)
 	{
-		for (unsigned j = 0; j < 40; j++,index++)
+		for (unsigned j = 0; j < numParam; j++,index++)
 		{
 			mutation_prior_sd[i][j] = _mutation_prior_sd[index];
 		}

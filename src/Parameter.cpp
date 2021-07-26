@@ -148,6 +148,7 @@ void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsig
     std::string _mutationSelectionState)
 {
 	// assign genes to mixture element
+	unsigned aa_numCodons;
 	unsigned numGenes = (unsigned)geneAssignment.size();
 	mixtureAssignment.resize(numGenes, 0);
 
@@ -176,7 +177,14 @@ void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsig
 	mutationSelectionState = _mutationSelectionState;
 	// Lose one parameter if ser is split into two groups.
 	// This is because one of the 2 codon set is now the reference codon
-	numParam = ((splitSer) ? 40 : 41);
+	numParam = 0;
+	
+	for (unsigned i = 0; i < groupList.size(); i++)
+	{
+		aa_numCodons = SequenceSummary::GetNumCodonsForAA(groupList[i],true);
+		numParam += aa_numCodons;
+	}
+	
 	numMixtures = _numMixtures;
 
 	stdDevSynthesisRate = _stdDevSynthesisRate;
@@ -986,15 +994,26 @@ double Parameter::getStdDevSynthesisRate(unsigned selectionCategory, bool propos
 
 void Parameter::proposeStdDevSynthesisRate()
 {
-	for (unsigned i = 0u; i < numSelectionCategories; i++)
-	{	
-		if (!fix_stdDevSynthesis)
+	if (share_stdDevSynthesis)
+	{
+		double proposed = std::exp(randNorm(std::log(stdDevSynthesisRate[0]), std_stdDevSynthesisRate));
+		for (unsigned i = 0u; i < numSelectionCategories; i++)
 		{
-			stdDevSynthesisRate_proposed[i] = std::exp(randNorm(std::log(stdDevSynthesisRate[i]), std_stdDevSynthesisRate));
-		}
-		else
-		{
-			stdDevSynthesisRate_proposed[i] = stdDevSynthesisRate[i];
+			stdDevSynthesisRate_proposed[i] = proposed;
+		}	
+	}
+	else
+	{
+		for (unsigned i = 0u; i < numSelectionCategories; i++)
+		{	
+			if (!fix_stdDevSynthesis)
+			{
+				stdDevSynthesisRate_proposed[i] = std::exp(randNorm(std::log(stdDevSynthesisRate[i]), std_stdDevSynthesisRate));	
+			}
+			else
+			{
+				stdDevSynthesisRate_proposed[i] = stdDevSynthesisRate[i];
+			}
 		}
 	}
 }
@@ -1020,6 +1039,17 @@ double Parameter::getCurrentStdDevSynthesisRateProposalWidth()
 unsigned Parameter::getNumAcceptForStdDevSynthesisRate()
 {
 	return numAcceptForStdDevSynthesisRate;
+}
+
+
+void Parameter::shareSynthesisRate()
+{
+	share_phi = true;
+}
+
+void Parameter::shareStdDevSynthesis()
+{
+	share_stdDevSynthesis = true;
 }
 
 
@@ -1091,13 +1121,29 @@ double Parameter::getSynthesisRateProposalWidth(unsigned geneIndex, unsigned mix
 void Parameter::proposeSynthesisRateLevels()
 {
 	unsigned numSynthesisRateLevels = (unsigned) currentSynthesisRateLevel[0].size();
-	for (unsigned category = 0; category < numSelectionCategories; category++)
+	if (share_phi)
 	{
 		for (unsigned i = 0u; i < numSynthesisRateLevels; i++)
 		{
-			// avoid adjusting probabilities for asymmetry of distribution
-			proposedSynthesisRateLevel[category][i] = std::exp( randNorm( std::log(currentSynthesisRateLevel[category][i]),
-																		  std_phi[category][i]) );
+			double tmp = std::exp( randNorm( std::log(currentSynthesisRateLevel[0][i]),
+																		  std_phi[0][i]) );
+			for (unsigned category = 0; category < numSelectionCategories; category++)
+			{
+				proposedSynthesisRateLevel[category][i] = tmp;
+			}
+		}
+	}
+
+	else
+	{
+		for (unsigned category = 0; category < numSelectionCategories; category++)
+		{
+			for (unsigned i = 0u; i < numSynthesisRateLevels; i++)
+			{
+				// avoid adjusting probabilities for asymmetry of distribution
+				proposedSynthesisRateLevel[category][i] = std::exp( randNorm( std::log(currentSynthesisRateLevel[category][i]),
+																			  std_phi[category][i]) );
+			}
 		}
 	}
 }
@@ -1400,12 +1446,44 @@ void Parameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool a
 
 	factorCriteriaLow = acceptanceTargetLow;
 	factorCriteriaHigh = acceptanceTargetHigh;
-
-	for (unsigned cat = 0u; cat < numSelectionCategories; cat++)
+	if (!share_phi)
 	{
-		unsigned numGenes = (unsigned)numAcceptForSynthesisRate[cat].size();
+		for (unsigned cat = 0u; cat < numSelectionCategories; cat++)
+		{
+			unsigned numGenes = (unsigned)numAcceptForSynthesisRate[cat].size();
+			for (unsigned i = 0; i < numGenes; i++)
+			{
+				double acceptanceLevel = (double)numAcceptForSynthesisRate[cat][i] / (double)adaptationWidth;
+				traces.updateSynthesisRateAcceptanceRateTrace(cat, i, acceptanceLevel);
+
+				//Evaluate acceptance rates relative to target region
+				if (acceptanceLevel < acceptanceTargetLow) acceptanceUnder++;
+				else if (acceptanceLevel > acceptanceTargetHigh) acceptanceOver++;
+
+				if (adapt)
+				{
+					if (acceptanceLevel < acceptanceTargetLow)
+					{
+						std_phi[cat][i] *= adjustFactorLow;
+
+					}
+					if (acceptanceLevel > acceptanceTargetHigh)
+					{
+						std_phi[cat][i] *= adjustFactorHigh;
+
+					}
+				}
+				numAcceptForSynthesisRate[cat][i] = 0u;
+			}
+		}
+	}
+	else
+	{
+		unsigned cat;
+		unsigned numGenes = (unsigned)numAcceptForSynthesisRate[0].size();
 		for (unsigned i = 0; i < numGenes; i++)
 		{
+			cat = getMixtureAssignment(i);
 			double acceptanceLevel = (double)numAcceptForSynthesisRate[cat][i] / (double)adaptationWidth;
 			traces.updateSynthesisRateAcceptanceRateTrace(cat, i, acceptanceLevel);
 
@@ -1429,7 +1507,6 @@ void Parameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool a
 			numAcceptForSynthesisRate[cat][i] = 0u;
 		}
 	}
-
 	my_print("Acceptance rate for synthesis rate:\n");
 	my_print("Target range: %-% \n", acceptanceTargetLow, acceptanceTargetHigh );
 	my_print("Adjustment range: < % or > % \n", factorCriteriaLow, factorCriteriaHigh );
@@ -1539,11 +1616,11 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 		    //Adjust widths if using cov matrix
 		   	
 	  	   
-		 }
+		}
 
-		      //Decomposing of cov matrix to convert iid samples to covarying samples using matrix decomposition
-		      //The decomposed matrix is used in the proposal of new samples
-		 covarianceMatrix[aaIndex].choleskyDecomposition();
+		//Decomposing of cov matrix to convert iid samples to covarying samples using matrix decomposition
+		//The decomposed matrix is used in the proposal of new samples
+		covarianceMatrix[aaIndex].choleskyDecomposition();
 		}// end adjust loop
 	} // end if(adapt)
 

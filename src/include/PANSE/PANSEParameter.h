@@ -106,7 +106,7 @@ class PANSEParameter: public Parameter {
 
 		//For setting Y value
 		void setTotalRFPCount(Genome& genome);
-		unsigned getTotalRFPCount();
+		unsigned long getTotalRFPCount();
 
 
 

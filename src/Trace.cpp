@@ -240,7 +240,8 @@ void Trace::initializeROCTrace(unsigned samples, unsigned num_genes, unsigned nu
 	std::vector<mixtureDefinition> &_categories, unsigned maxGrouping, unsigned numObservedPhiSets,std::vector<double> init_phi,
 	std::vector<unsigned> init_mix_assign,bool estimateSynthesisRate)
 {
-	initializeSharedTraces(samples, num_genes, numSelectionCategories, numMixtures, _categories, maxGrouping,init_phi,init_mix_assign,estimateSynthesisRate);
+	initializeSharedTraces(samples, num_genes, numSelectionCategories, numMixtures,
+	 _categories, maxGrouping,init_phi,init_mix_assign,numObservedPhiSets,estimateSynthesisRate);
 
 
 	// See Note 1) above.
@@ -620,7 +621,6 @@ void Trace::updateCodonSpecificParameterTraceForAA(unsigned sample, std::string 
 	{
 		for (unsigned i = aaStart; i < aaEnd; i++)
 		{
-			//my_print("% % % %\n",category,i,aa,curParam[category][i]);
 			codonSpecificParameterTrace[paramType][category][i][sample] = curParam[category][i];
 		}
 	}
@@ -897,19 +897,8 @@ void Trace::setObservedSynthesisNoiseTrace(std::vector<std::vector <double> > _O
 void Trace::setCodonSpecificParameterTrace(std::vector<std::vector<std::vector<float>>> _parameterTrace, unsigned paramType)
 {
 	codonSpecificParameterTrace[paramType] = _parameterTrace;
-	/*
-	switch (paramType) {
-	case 0:
-		codonSpecificParameterTraceOne = _parameterTrace;
-		break;
-	case 1:
-		codonSpecificParameterTraceTwo = _parameterTrace;
-		break;
-	default:
-		my_printError("ERROR: Unknown parameter type in setCodonSpecificParameterTrace.\n");
-		break;
-	}
-	*/
+	
+
 }
 
 

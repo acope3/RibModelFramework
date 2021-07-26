@@ -120,7 +120,7 @@ int testSequenceSummary()
 {
     SequenceSummary SS("ATGCTCATTCTCACTGCTGCCTCGTAG");
     std::vector <unsigned> *uVectStar;
-    std::vector <unsigned> iVect;
+    std::vector <unsigned long> iVect;
     std::vector <unsigned> uVect;
     int error = 0;
     int globalError = 0;
@@ -889,8 +889,8 @@ int testSequenceSummary()
     //------ init/get/setSumRFPCount Functions ------//
     //-----------------------------------------------//
     SS.initSumRFPCount(1);
-    std::array <unsigned, 64> u64Array = SS.getSumRFPCount(0);
-    std::array <unsigned, 64> empty;
+    std::array <unsigned long, 64> u64Array = SS.getSumRFPCount(0);
+    std::array <unsigned long, 64> empty;
     empty.fill(0);
 
     if (u64Array != empty)
@@ -976,7 +976,7 @@ int testSequenceSummary()
     SS.setCodonSpecificSumRFPCount(54,2);
     SS.setCodonSpecificSumRFPCount(45,0);
 
-    unsigned tmp = SS.getCodonSpecificSumRFPCount("TGC");
+    unsigned long tmp = SS.getCodonSpecificSumRFPCount("TGC");
     if (35 != tmp)
     {
         my_printError("Error in getCodonSpecificSumRFPCount(string) or setCodonSpecificSumRFPCount for codon \"TGC\".\n");
@@ -1120,7 +1120,7 @@ int testGene()
     //------ init/get/setRFPCount Functions ------//
     //---------------------------------------------//
     testGene.initRFPCount(1);
-    std::vector <unsigned> RFPCounts = testGene.getRFPCount(0);
+    std::vector <unsigned long> RFPCounts = testGene.getRFPCount(0);
 
     if (0 != RFPCounts.size())
     {
@@ -1158,8 +1158,8 @@ int testGene()
     //------ init/get/setSumRFPCount Functions ------//
     //------------------------------------------------//
     testGene.initSumRFPCount(1);
-    std::array <unsigned, 64> sumRFPCounts = testGene.getSumRFPCount(0);
-    std::array <unsigned, 64> empty;
+    std::array <unsigned long, 64> sumRFPCounts = testGene.getSumRFPCount(0);
+    std::array <unsigned long, 64> empty;
     empty.fill(0);
 
     if (sumRFPCounts != empty)
@@ -1492,25 +1492,25 @@ void testGenomePAHelper(Genome* genome, bool simulated)
     Gene panse2(genomeString2, "TEST002", "No description for PA(NSE) Model");
 
     // RFPCount for TEST001: value[position] = RFPCount
-    std::vector <unsigned> test1Cat1 = {0, 0, 2, 0, 1, 1};
-    std::vector <unsigned> test1Cat2 = {0, 17, 0, 1, 0, 0};
+    std::vector <unsigned long> test1Cat1 = {0, 0, 2, 0, 1, 1};
+    std::vector <unsigned long> test1Cat2 = {0, 17, 0, 1, 0, 0};
 
     // RFPCount for TEST002: value[position] = RFPCount
-    std::vector <unsigned> test2Cat1 = {1, 1, 0, 0, 1};
-    std::vector <unsigned> test2Cat2 = {2, 0, 2, 3, 6};
+    std::vector <unsigned long> test2Cat1 = {1, 1, 0, 0, 1};
+    std::vector <unsigned long> test2Cat2 = {2, 0, 2, 3, 6};
 
     std::string codon;
     unsigned index1, index2, index3, index4, index5, index6, index7, index8;
 
     // sumRFPCount for TEST001
-    std::array <unsigned, 64> sumTest1Cat1;
-    std::array <unsigned, 64> sumTest1Cat2;
+    std::array <unsigned long, 64> sumTest1Cat1;
+    std::array <unsigned long, 64> sumTest1Cat2;
     sumTest1Cat1.fill(0);
     sumTest1Cat2.fill(0);
 
     // sumRFPCount for TEST002
-    std::array <unsigned, 64> sumTest2Cat1;
-    std::array <unsigned, 64> sumTest2Cat2;
+    std::array <unsigned long, 64> sumTest2Cat1;
+    std::array <unsigned long, 64> sumTest2Cat2;
     sumTest2Cat1.fill(0);
     sumTest2Cat2.fill(0);
 

@@ -177,6 +177,9 @@ RCPP_EXPOSED_CLASS(CovarianceMatrix)
 //' @title fixDEta
 //' @description Method of Parameter class (access via parameter$<function name>, where parameter is an object initialized by initializeParameterObject). Fix the value of selection its current value
 
+//' @name shareStdDevSynthesis
+//' @title shareStdDevSynthesis
+//' @description Force s_{\phi} to be the same for both mixtures 
 
 RCPP_MODULE(Parameter_mod)
 {
@@ -256,7 +259,8 @@ RCPP_MODULE(Parameter_mod)
 		//Other Functions:
 		.method("calculateSelectionCoefficients", &Parameter::calculateSelectionCoefficientsR)
 
-
+		.method("shareSynthesisRate",&Parameter::shareSynthesisRate)
+		.method("shareStdDevSynthesis",&Parameter::shareStdDevSynthesis)
 		.method("fixSphi",&Parameter::fixStdDevSynthesis)
 		.method("setStdDevSynthesisRate",&Parameter::setStdDevSynthesisRate)
 

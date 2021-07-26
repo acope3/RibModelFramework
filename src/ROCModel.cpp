@@ -59,16 +59,12 @@ double ROCModel::calculateMutationPrior(std::string grouping, bool proposed)
 
 void ROCModel::obtainCodonCount(SequenceSummary *sequenceSummary, std::string curAA, int codonCount[])
 {
-	//unsigned aaStart, aaEnd;
-	//SequenceSummary::AAToCodonRange(curAA, aaStart, aaEnd, false);
-	std::vector<unsigned> codon_index = SequenceSummary::AAToCodonIndex(curAA,false);
-	// get codon counts for AA
+	unsigned aaStart, aaEnd;
+	SequenceSummary::AAToCodonRange(curAA, aaStart, aaEnd, false);
 	unsigned j = 0u;
-	// for (unsigned i = aaStart; i < aaEnd; i++, j++)
-	// 	codonCount[j] = sequenceSummary->getCodonCountForCodon(i);
-	for (unsigned i=0;i < codon_index.size(); i++,j++)
+	for (unsigned i = aaStart; i < aaEnd; i++, j++)
 	{
-		codonCount[j] = sequenceSummary->getCodonCountForCodon(codon_index[i]);
+	 	codonCount[j] = sequenceSummary->getCodonCountForCodon(i);
 	}
 }
 
@@ -99,10 +95,6 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 	double mutation[5];
 	double selection[5];
 	int codonCount[6];
-// #ifdef _OPENMP
-// //#ifndef __APPLE__
-// #pragma omp parallel for private(mutation, selection, codonCount) reduction(+:logLikelihood,logLikelihood_proposed)
-// #endif
 	for (unsigned i = 0u; i < getGroupListSize(); i++)
 	{
 		std::string curAA = getGrouping(i);
@@ -121,8 +113,8 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 		logLikelihood += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue);
 		logLikelihood_proposed += calculateLogLikelihoodPerAAPerGene(numCodons, codonCount, mutation, selection, phiValue_proposed);
 	}
-	unsigned mixture = getMixtureAssignment(geneIndex);
-	mixture = getSynthesisRateCategory(mixture);
+	//unsigned mixture = getMixtureAssignment(geneIndex);
+	unsigned mixture = getSynthesisRateCategory(expressionCategory);
 	double stdDevSynthesisRate = parameter->getStdDevSynthesisRate(mixture, false);
 	double mPhi = (-(stdDevSynthesisRate * stdDevSynthesisRate) * 0.5); // X * 0.5 = X / 2
 	double logPhiProbability = Parameter::densityLogNorm(phiValue, mPhi, stdDevSynthesisRate, true);
@@ -134,7 +126,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 		for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++)
 		{
 			double obsPhi = gene.getObservedSynthesisRate(i);
-			if (obsPhi > -1.0)
+			if (obsPhi > 0)
 			{
 				double logObsPhi = std::log(obsPhi);
 				logPhiProbability += Parameter::densityNorm(logObsPhi, std::log(phiValue) + getNoiseOffset(i), getObservedSynthesisNoise(i), true);
@@ -142,10 +134,9 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 			}
 		}
 	}
-
+	// my_print("Priors\n: % %\n",logPhiProbability,logPhiProbability_proposed);
 	double currentLogPosterior = (logLikelihood + logPhiProbability);
 	double proposedLogPosterior = (logLikelihood_proposed + logPhiProbability_proposed);
-
 	//TODO: Can't see where logProbabilityRatio[0], which is acceptance ratio with reverse jump, is used. Consider deleting. 
 	logProbabilityRatio[0] = (proposedLogPosterior - currentLogPosterior) - (std::log(phiValue) - std::log(phiValue_proposed));
 	logProbabilityRatio[1] = currentLogPosterior - std::log(phiValue_proposed);
@@ -162,7 +153,6 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 {
 	int numGenes = genome.getGenomeSize();
 	unsigned numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
-	//my_print("Current grouping: %\n",grouping);
 	double likelihood = 0.0;
 	double likelihood_proposed = 0.0;
 	double posterior, posterior_proposed;
@@ -278,19 +268,21 @@ void ROCModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, uns
 			double noiseOffset = getNoiseOffset(i, false);
 			double noiseOffset_proposed = getNoiseOffset(i, true);
 			double observedSynthesisNoise = getObservedSynthesisNoise(i);
-#ifdef _OPENMP
-//#ifndef __APPLE__
-#pragma omp parallel for reduction(+:lpr)
-#endif
+// #ifdef _OPENMP
+// //#ifndef __APPLE__
+// #pragma omp parallel for private(i,noiseOffset,noiseOffset_proposed,observedSynthesisNoise) reduction(+:lpr)
+// #endif
 			for (unsigned j = 0u; j < genome.getGenomeSize(); j++)
 			{
 				unsigned mixtureAssignment = getMixtureAssignment(j);
 				mixtureAssignment = getSynthesisRateCategory(mixtureAssignment);
 				double logPhi = std::log(getSynthesisRate(j, mixtureAssignment, false));
 				double obsPhi = genome.getGene(j).getObservedSynthesisRate(i);
-				if (obsPhi > -1.0)
+				if (obsPhi > 0)
 				{
+
 					double logObsPhi = std::log(obsPhi);
+					
 					double proposed = Parameter::densityNorm(logObsPhi, logPhi + noiseOffset_proposed, observedSynthesisNoise, true);
 					double current = Parameter::densityNorm(logObsPhi, logPhi + noiseOffset, observedSynthesisNoise, true);
 					lpr += proposed - current;
@@ -500,12 +492,6 @@ void ROCModel::updateTracesWithInitialValues(Genome &genome)
 {
 	std::vector <std::string> groupList = parameter->getGroupList();
 
-	// for (unsigned i = 0; i < genome.getGenomeSize(); i++)
-	// {
-	// 	parameter->updateSynthesisRateTrace(0, i);
-	// 	parameter->updateMixtureAssignmentTrace(0, i);
-	// }
-
 	for (unsigned i = 0; i < groupList.size(); i++)
 		parameter->updateCodonSpecificParameterTrace(0, getGrouping(i));
 }
@@ -598,9 +584,10 @@ void ROCModel::updateGibbsSampledHyperParameters(Genome &genome)
 	{
 		if(!fix_sEpsilon)
 		{
-			double shape = ((double)genome.getGenomeSize() - 1.0) / 2.0;
+			//double shape = ((double)genome.getGenomeSize() - 1.0) / 2.0;
 			for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++)
 			{
+				double shape = ((double)genome.getGenomeSize() - 1.0) / 2.0;
 				double rate = 0.0; //Prior on s_epsilon goes here?
 				unsigned mixtureAssignment;
 				double noiseOffset = getNoiseOffset(i);
@@ -608,7 +595,7 @@ void ROCModel::updateGibbsSampledHyperParameters(Genome &genome)
 				{
 					mixtureAssignment = parameter->getMixtureAssignment(j);
 					double obsPhi = genome.getGene(j).getObservedSynthesisRate(i);
-					if (obsPhi > -1.0)
+					if (obsPhi > 0.0)
 					{
 						double sum = std::log(obsPhi) - noiseOffset - std::log(parameter->getSynthesisRate(j, mixtureAssignment, false));
 						rate += (sum * sum);

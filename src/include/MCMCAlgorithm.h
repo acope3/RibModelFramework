@@ -107,6 +107,7 @@ class MCMCAlgorithm
     	void setAdaptiveWidth(unsigned _adaptiveWidth);
 		void setLogPosteriorTrace(std::vector<double> _posteriorTrace);
 		void setLogLikelihoodTrace(std::vector<double> _likelihoodTrace);
+
 #endif //STANDALONE
 
 

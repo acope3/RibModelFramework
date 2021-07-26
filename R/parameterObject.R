@@ -128,7 +128,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
                                       mixture.definition.matrix = NULL,
                                       init.with.restart.file = NULL, mutation.prior.mean = 0.0, mutation.prior.sd = 0.35, propose.by.prior=FALSE,
                                       init.csp.variance = 0.0025, init.sepsilon = 0.1, 
-                                      init.w.obs.phi=FALSE, init.initiation.cost = 4,init.partition.function=1){
+                                      init.w.obs.phi=FALSE, init.by.random = FALSE ,init.initiation.cost = 4,init.partition.function=1){
   # check input integrity
   if(is.null(init.with.restart.file)){
     if(length(sphi) != num.mixtures){
@@ -183,7 +183,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
       parameter <- initializeROCParameterObject(genome, sphi, num.mixtures, 
                                                 gene.assignment, initial.expression.values, split.serine,
                                                 mixture.definition, mixture.definition.matrix, 
-                                                mutation.prior.mean,mutation.prior.sd,propose.by.prior,init.csp.variance, init.sepsilon,init.w.obs.phi)    
+                                                mutation.prior.mean,mutation.prior.sd,propose.by.prior,init.csp.variance, init.sepsilon,init.w.obs.phi,init.by.random)    
     }else{
       parameter <- new(ROCParameter, init.with.restart.file)
     }
@@ -223,7 +223,10 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
 initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignment,
                                          expressionValues = NULL, split.serine = TRUE,
                                          mixture.definition = "allUnique", 
-                                         mixture.definition.matrix = NULL, mutation_prior_mean = 0.0, mutation_prior_sd = 0.35, propose.by.prior=FALSE,init.csp.variance = 0.0025, init.sepsilon = 0.1,init.w.obs.phi=FALSE){
+                                         mixture.definition.matrix = NULL, mutation_prior_mean = 0.0, mutation_prior_sd = 0.35, 
+                                         propose.by.prior=FALSE,init.csp.variance = 0.0025, init.sepsilon = 0.1,init.w.obs.phi=FALSE,
+                                         init.by.random = FALSE)
+{
   
   if(is.null(mixture.definition.matrix)){ 
     # keyword constructor
@@ -239,7 +242,11 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
   
   
   # initialize expression values
-  if(is.null(expressionValues) && init.w.obs.phi == F)
+  if (init.by.random)
+  {
+    parameter$initializeSynthesisRateByRandom(sphi[1])
+  }
+  else if(is.null(expressionValues) && init.w.obs.phi == F)
   {
     parameter$initializeSynthesisRateByGenome(genome,mean(sphi))
     
@@ -247,14 +254,19 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
   else if(init.w.obs.phi == T && is.null(expressionValues))
   {
     observed.phi <- getObservedSynthesisRateSet(genome)
+    observed.phi[observed.phi == -1.0] <- NA
     if (ncol(observed.phi)-1 > 1)
     {
       observed.phi <- apply(observed.phi[,2:ncol(observed.phi)],geomMean,MARGIN = 1)
+
     }
     else
     {
       observed.phi <- observed.phi[,2]
     }
+    observed.phi[observed.phi == 0.0] <- NA
+    observed.phi <- observed.phi/mean(observed.phi,na.rm=T)
+    observed.phi[is.na(observed.phi)] <- 1.0
     parameter$initializeSynthesisRateByList(observed.phi)
   }
   else if (!is.null(expressionValues) && init.w.obs.phi == F)
@@ -268,16 +280,25 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
   
   n.obs.phi.sets <- ncol(getObservedSynthesisRateSet(genome)) - 1
   parameter$setNumObservedSynthesisRateSets(n.obs.phi.sets)
+  aa <- aminoAcids()
+  numCodons <- 0
+  for (a in aa)
+  {
+    if (a == "X" || a == "M" || a == "W") next
+    codons <- AAToCodon(a,T)
+    numCodons <- numCodons + length(codons)
+
+  }
   if (length(mutation_prior_mean) == 1)
   {
-    mutation_prior_mean <- rep(mutation_prior_mean,length=parameter$numMutationCategories * 40)
+    mutation_prior_mean <- rep(mutation_prior_mean,length=parameter$numMutationCategories * numCodons)
   } else{
     mutation_prior_mean <- as.vector(t(mutation_prior_mean))
   }
   
   if (length(mutation_prior_sd) == 1)
   {
-    mutation_prior_sd <- rep(mutation_prior_sd,length=parameter$numMutationCategories * 40)
+    mutation_prior_sd <- rep(mutation_prior_sd,length=parameter$numMutationCategories * numCodons)
   } else{
     mutation_prior_sd <- as.vector(t(mutation_prior_sd))
   }
@@ -287,9 +308,8 @@ initializeROCParameterObject <- function(genome, sphi, numMixtures, geneAssignme
   if (n.obs.phi.sets != 0){
     parameter$setInitialValuesForSepsilon(as.vector(init.sepsilon))
   }
-  
   parameter <- initializeCovarianceMatrices(parameter, genome, numMixtures, geneAssignment, init.csp.variance)
-  
+
   return(parameter)
 }
 
@@ -322,14 +342,17 @@ initializePAParameterObject <- function(genome, sphi, numMixtures, geneAssignmen
   else if(init.w.obs.phi == T && is.null(expressionValues))
   {
     observed.phi <- getObservedSynthesisRateSet(genome)
+    observed.phi[observed.phi == -1.0] <- NA
     if (ncol(observed.phi)-1 > 1)
     {
       observed.phi <- apply(observed.phi[,2:ncol(observed.phi)],geomMean,MARGIN = 1)
-    }
-    else
+    } else
     {
       observed.phi <- observed.phi[,2]
     }
+    observed.phi[observed.phi == 0.0] <- NA
+    observed.phi <- observed.phi/mean(observed.phi,na.rm=T)
+    observed.phi[is.na(observed.phi)] <- 1
     parameter$initializeSynthesisRateByList(observed.phi)
   }
   else if (!is.null(expressionValues) && init.w.obs.phi == F)
@@ -379,6 +402,7 @@ initializePANSEParameterObject <- function(genome, sphi, numMixtures, geneAssign
   else if(init.w.obs.phi == T && is.null(expressionValues))
   {
     observed.phi <- getObservedSynthesisRateSet(genome)
+    observed.phi[observed.phi == -1.0] <- NA
     if (ncol(observed.phi)-1 > 1)
     {
       observed.phi <- apply(observed.phi[,2:ncol(observed.phi)],geomMean,MARGIN = 1)
@@ -387,6 +411,10 @@ initializePANSEParameterObject <- function(genome, sphi, numMixtures, geneAssign
     {
       observed.phi <- observed.phi[,2]
     }
+    observed.phi[observed.phi == 0.0] <- NA
+    
+    observed.phi <- observed.phi/mean(observed.phi,na.rm=T)
+    observed.phi[is.na(observed.phi)] <- 1
     parameter$initializeSynthesisRateByList(observed.phi)
   }
   else if (!is.null(expressionValues) && init.w.obs.phi == F)
@@ -442,6 +470,7 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
   else if(init.w.obs.phi == T && is.null(expressionValues))
   {
     observed.phi <- getObservedSynthesisRateSet(genome)
+    observed.phi[observed.phi == -1.0] <- NA
     if (ncol(observed.phi)-1 > 1)
     {
       observed.phi <- apply(observed.phi[,2:ncol(observed.phi)],geomMean,MARGIN = 1)
@@ -450,6 +479,9 @@ initializeFONSEParameterObject <- function(genome, sphi, numMixtures,
     {
       observed.phi <- observed.phi[,2]
     }
+    observed.phi[observed.phi == 0.0] <- NA
+    observed.phi <- observed.phi/mean(observed.phi,na.rm=T)
+    observed.phi[is.na(observed.phi)] <- 1
     parameter$initializeSynthesisRateByList(observed.phi)
   }
   else if (!is.null(expressionValues) && init.w.obs.phi == F)
@@ -1108,6 +1140,7 @@ initializeCovarianceMatrices <- function(parameter, genome, numMixtures, geneAss
       csp <- getCSPbyLogit(codonCounts[idx, ], phi[idx])
       parameter$initMutation(csp$coef.mat[1,], mixElement, aa)
       parameter$initSelection(csp$coef.mat[2,], mixElement, aa)
+
     }
     
     # One covariance matrix for all mixtures.
@@ -1946,15 +1979,22 @@ loadFONSEParameterObject <- function(parameter, files)
 #' 
 geomMean <- function(x, rm.invalid = TRUE, default = 1e-5)
 {
+  x <- unname(x)
   if(!rm.invalid)
   {
     x[x <= 0 | is.na(x)] <- default
   } else{
     x <- x[which(x > 0 & !is.na(x))]
   }
-  total <- prod(x) ^ (1/length(x))
+  if (length(x) == 0)
+  {
+    total <- 0
+  } else{
+    total <- prod(x) ^ (1/length(x))
+  }
   return(total)
 }
+
 
 
 #Intended to combine 2D traces (vector of vectors) read in from C++. The first
@@ -1965,13 +2005,9 @@ combineTwoDimensionalTrace <- function(trace1, trace2,start=2,end=NULL){
   {
     print("Start must be at least 2 because the last element of first trace is first of second trace. Setting start = 2.")
   }
-  if(end <= start)
+  if(is.null(end) || end <= start)
   {
-    print("End must be greater than start. Setting end to length of trace2.")
-    end <- trace2
-  }
-  if(end == NULL)
-  {
+    print(paste0("End must be greater than start. Setting end to length(trace2) = ", length(trace2)))
     end <- length(trace2)
   }
   for (size in 1:length(trace1))

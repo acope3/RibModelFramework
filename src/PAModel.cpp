@@ -82,6 +82,49 @@ void PAModel::calculateZ(std::string grouping,Genome& genome,std::vector<double>
     Z[1] = propZ;
 }
 
+
+double PAModel::calculateAlphaPrior(std::string grouping,bool proposed)
+{
+    double priorValue = 0.0;
+
+    unsigned numMutCat = parameter->getNumMutationCategories();
+    for (unsigned i = 0u; i < numMutCat; i++)
+    {
+        double alpha = parameter->getParameterForCategory(i, PAParameter::alp, grouping, proposed);
+        if (alpha < 0 || alpha > 100)
+        {
+            priorValue = std::log(0);
+        }
+        else
+        {
+            priorValue = std::log(1);
+        }
+    }
+    return priorValue;
+}
+
+double PAModel::calculateLambdaPrior(std::string grouping,bool proposed)
+{
+    double priorValue = 0.0;
+
+    unsigned numSelCat = parameter->getNumSelectionCategories();
+    for (unsigned i = 0u; i < numSelCat; i++)
+    {
+        double lambda = parameter->getParameterForCategory(i, PAParameter::lmPri, grouping, proposed);
+        if (lambda < 0 || lambda > 100)
+        {
+            priorValue = std::log(0);
+        }
+        else
+        {
+            priorValue = std::log(1);
+        }
+    }
+    return priorValue;
+}
+
+
+
 double PAModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime, unsigned currRFPValue,
                                                       unsigned currNumCodonsInMRNA, double phiValue)
 {
@@ -104,6 +147,7 @@ double PAModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double c
 
 void PAModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k, double* logProbabilityRatio)
 {
+	my_print("Yes\n");
 	double logLikelihood = 0.0;
 	double logLikelihood_proposed = 0.0;
 
@@ -174,8 +218,8 @@ void PAModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grou
                                                                 std::vector<double> &logAcceptanceRatioForAllMixtures)
 {
 	double currAlpha,currLambdaPrime,propAlpha,propLambdaPrime;
-	double logLikelihood = 0.0;
-	double logLikelihood_proposed = 0.0;
+	double logLikelihood, logPosterior = 0.0;
+    double logLikelihood_proposed, logPosterior_proposed = 0.0;
 	Gene *gene;
 	unsigned index = SequenceSummary::codonToIndex(grouping);
 	unsigned n = getNumMixtureElements();
@@ -223,12 +267,16 @@ void PAModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grou
         currAdjustmentTerm += std::log(currAlpha) + std::log(currLambdaPrime);
         propAdjustmentTerm += std::log(propAlpha) + std::log(propLambdaPrime);
     }
+
+    logPosterior_proposed = logLikelihood_proposed + calculateAlphaPrior(grouping,true) + calculateLambdaPrior(grouping,true);
+    logPosterior = logLikelihood + calculateAlphaPrior(grouping,false) + calculateLambdaPrior(grouping,false);
+    
 	
-	logAcceptanceRatioForAllMixtures[0] = logLikelihood_proposed - logLikelihood - (currAdjustmentTerm - propAdjustmentTerm);
-	logAcceptanceRatioForAllMixtures[1] = logLikelihood - propAdjustmentTerm;
-	logAcceptanceRatioForAllMixtures[2] = logLikelihood_proposed - currAdjustmentTerm;
+	logAcceptanceRatioForAllMixtures[0] = logPosterior_proposed - logPosterior - (currAdjustmentTerm - propAdjustmentTerm);
 	logAcceptanceRatioForAllMixtures[3] = logLikelihood;
 	logAcceptanceRatioForAllMixtures[4] = logLikelihood_proposed;
+	logAcceptanceRatioForAllMixtures[1] = logPosterior;
+	logAcceptanceRatioForAllMixtures[2] = logPosterior_proposed;
 }
 
 
@@ -761,11 +809,11 @@ void PAModel::simulateGenome(Genome &genome)
 
 		Gene gene = genome.getGene(geneIndex);
 		Gene tmpGene = gene;
-		std::vector<unsigned> rfpCount;
+		std::vector<unsigned long> rfpCount;
 		std::vector<unsigned> codon_counts(61,0);
 		std::vector<unsigned> currentCodons(61,0);
-		std::vector<unsigned> rfpPerPositionPerCodon(61,0);
-		std::vector<unsigned> totalRFP(61,0);
+		std::vector<unsigned long> rfpPerPositionPerCodon(61,0);
+		std::vector<unsigned long> totalRFP(61,0);
 		std::vector <unsigned> positions = tmpGene.geneData.getPositionCodonID(); 
 		for (unsigned codonIndex = 0u; codonIndex < 61; codonIndex++)
 		{
@@ -789,7 +837,7 @@ void PAModel::simulateGenome(Genome &genome)
 			std::gamma_distribution<double> GDistribution(alphaPrime,1.0/lambdaPrime);
 			double tmp = GDistribution(Parameter::generator);
 			std::poisson_distribution<unsigned> PDistribution(phi * tmp);
-			unsigned simulatedValue = PDistribution(Parameter::generator);
+			unsigned long simulatedValue = PDistribution(Parameter::generator);
 			tmpGene.geneData.setCodonSpecificSumRFPCount(codonIndex, simulatedValue,0);
 			rfpPerPositionPerCodon[codonIndex] = simulatedValue/codon_counts[codonIndex];
 			totalRFP[codonIndex] = simulatedValue;
@@ -874,7 +922,19 @@ void PAModel::setParameter(PAParameter &_parameter)
 
 double PAModel::calculateAllPriors()
 {
-	return 0.0; //TODO(Cedric): implement me, see ROCModel
+	double prior = 0.0;
+	unsigned size = getGroupListSize();
+
+	for (unsigned i = 0; i < size; i++)
+	{
+		std::string grouping = getGrouping(i);
+        prior += calculateAlphaPrior(grouping, false);
+        prior += calculateLambdaPrior(grouping, false);
+	}
+
+	// add more priors if necessary.
+
+	return prior;
 }
 
 

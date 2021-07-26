@@ -153,6 +153,9 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
     if (!ROC.or.FONSE){
       if(aa == "X") next
     }
+    if (ROC.or.FONSE){
+      if(aa == "X" || aa == "M" || aa == "W") next
+    }
     cur.trace <- vector("list", length(codons))
     paramType <- 0
     if(type == "Mutation"){
@@ -321,12 +324,14 @@ plotAcceptanceRatios <- function(trace,main="CSP Acceptance Ratio Traces")
   
   for(aa in names.aa)
   { 
-    codons <- AAToCodon(aa, with.ref.codon)
-    if(length(codons) == 0) next
     if (!ROC.or.FONSE){
       if(aa == "X") next
+    } else if(ROC.or.FONSE){
+        if(aa == "X" || aa == "W" || aa == "M") next
     }
     
+    codons <- AAToCodon(aa, with.ref.codon)
+    if(length(codons) == 0) next
 
     if (!ROC.or.FONSE)
     {
