@@ -1074,12 +1074,7 @@ void ROCParameter::initSelection(std::vector<double> selectionValues, unsigned m
         SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
         for (unsigned i = aaStart, j = 0; i < aaEnd; i++, j++)
         {
-<<<<<<< Updated upstream
             currentCodonSpecificParameter[dEta][category][i] = selectionValues[j];
-=======
-
-            currentCodonSpecificParameter[dEta][category][codon_list[i]] = selectionValues[j];
->>>>>>> Stashed changes
         }
     }
 }
