@@ -142,6 +142,7 @@ getCodonCountsForAA <- function(aa, genome){
 calculateSCUO <- function(genome)
 {
   aas <- aminoAcids()
+  aas <- aas[which(!aas %in% c("M","X","W","J"))]
   genes <- genome$getGenes(F)
   scuo.values <- data.frame(ORF=getNames(genome), SCUO=rep(NA, length(genome)))
   for(i in 1:length(genes))
@@ -158,13 +159,14 @@ calculateSCUO <- function(genome)
       
       codon.count <- unlist(lapply(codon, FUN = function(c){return(g$getCodonCount(c))}))
       codon.propotions <- codon.count / aa.count
-      aa.entropy <- sum(codon.propotions * log(codon.propotions))
+      aa.entropy <- -1*sum(codon.propotions * log(codon.propotions),na.rm = T)
       max.entropy <- -log(1/num.codons)
       norm.entropy.diff <- (max.entropy - aa.entropy) / max.entropy
       
       comp.ratio <- aa.count / total.aa.count
+      
       scuo.aa <- comp.ratio * norm.entropy.diff
-      return(scuo.aa)
+      scuo.aa
     }))
     scuo.values[i,"SCUO"] <- sum(scuo.per.aa,na.rm = T)
   }

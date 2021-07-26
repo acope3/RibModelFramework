@@ -84,8 +84,6 @@ MCMCAlgorithm::~MCMCAlgorithm()
 
 
 
-
-
 //----------------------------------------------------//
 //---------- Acceptance Rejection Functions ----------//
 //----------------------------------------------------//
@@ -135,6 +133,8 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 
 		double maxValue = -1.0e+20;
 		double maxValue2 = -1.0e+20;
+		double maxValue3 = -1.0e+20;
+		double maxValue4 = -1.0e+20;
 		unsigned mixtureIndex = 0u;
 
 		std::vector <double> unscaledLogProb_curr(numSynthesisRateCategories, 0.0);
@@ -151,138 +151,190 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		std::vector <double> unscaledLogLike_prop_singleMixture(numMixtures, 0.0);
 		std::vector <double> unscaledLogProb_curr_singleMixture(numMixtures, 0.0);
 		std::vector <double> unscaledLogProb_prop_singleMixture(numMixtures, 0.0);
+		std::vector <double> unscaledLogProbRev_curr_singleMixture(numMixtures, 0.0);
+		std::vector <double> unscaledLogProbRev_prop_singleMixture(numMixtures, 0.0);
 		std::vector <double> probabilities(numMixtures, 0.0);
-
-		for (unsigned k = 0u; k < numSynthesisRateCategories; k++)
-		{
-			// logProbabilityRatio contains the logProbabilityRatio in element 0,
-			// the current unscaled probability in element 1 and the proposed unscaled probability in element 2
-			std::vector<unsigned> mixtureElements = model.getMixtureElementsOfSelectionCategory(k);
-			for (unsigned n = 0u; n < mixtureElements.size(); n++)
-			{
-				unsigned mixtureElement = mixtureElements[n];
-				double logProbabilityRatio[7];
-				//model.calculateUniversalParameter(genome,i,mixtureElement);
-				model.calculateLogLikelihoodRatioPerGene(*gene, i, mixtureElement, logProbabilityRatio); //has to return likelihood, not just ratio, no priors
-
-				// log posterior with and without rev. jump probability
-				unscaledLogProb_curr[k] += logProbabilityRatio[1]; // with rev. jump prob.
-				unscaledLogProb_prop[k] += logProbabilityRatio[2]; // with rev. jump prob.
-
-				// TODO: unscaledLogPost_curr and unscaledLogPost_prop have been made redundant by modification to code adding unscaledLogProb_curr_singleMixture
-				// unscaledLogProb_prop_singleMixture. Remove.
-				unscaledLogPost_curr[k] += logProbabilityRatio[3]; // without rev. jump prob.
-				unscaledLogPost_prop[k] += logProbabilityRatio[4]; // without rev. jump prob.
-				unscaledLogLike_curr[k] += logProbabilityRatio[5]; //current logLikelihood
-				unscaledLogLike_prop[k] += logProbabilityRatio[6]; //proposed logLikelihood
-
-
-				
-				unscaledLogProb_curr_singleMixture[mixtureIndex] = logProbabilityRatio[3];
-				unscaledLogProb_prop_singleMixture[mixtureIndex] = logProbabilityRatio[4];
-				unscaledLogLike_curr_singleMixture[mixtureIndex] = logProbabilityRatio[5];
-				unscaledLogLike_prop_singleMixture[mixtureIndex] = logProbabilityRatio[6];
-
-				maxValue = unscaledLogProb_curr_singleMixture[mixtureIndex] > maxValue ?
-						   unscaledLogProb_curr_singleMixture[mixtureIndex] : maxValue;
-
-				maxValue2 = unscaledLogProb_prop_singleMixture[mixtureIndex] > maxValue2 ?
-							unscaledLogProb_prop_singleMixture[mixtureIndex] : maxValue2;
-
-				//maxValue2 = unscaledLogPost_prop[k] > maxValue2 ?
-				//		unscaledLogPost_prop[k] : maxValue2;
-
-				mixtureIndex++;
-			}
-		}
-		maxValue2 = maxValue > maxValue2 ? maxValue : maxValue2;
-
-		// adjust the the unscaled probabilities by the constant c
-		// ln(f') = ln(c) + ln(f)
-		// calculate ln(P) = ln( Sum(p_i*f'(...)) ) and obtain normalizing constant for new p_i
-		double normalizingProbabilityConstant = 0.0;
-
-		for (unsigned k = 0u; k < numMixtures; k++)
-		{
-			unscaledLogProb_curr_singleMixture[k] -= maxValue;
-			probabilities[k] = model.getCategoryProbability(k) * std::exp(unscaledLogProb_curr_singleMixture[k]);
-			normalizingProbabilityConstant += probabilities[k];
-            if (std::isnan(probabilities[k]))
-            {
-                my_print("\n\n\n");
-                my_print("Gene: %, %\n", i, gene->getId());
-                my_print("Mixture: %\n", k);
-                my_print("unscaled Mix. Prop. of gene: %\n", probabilities[k]);
-                my_print("Mix. cat. prob.: %\n", model.getCategoryProbability(k));
-                my_print("curr logLik - maxVal: %\n", unscaledLogProb_curr_singleMixture[k]);
-                my_print("exp(curr logLik - maxVal): %\n", std::exp(unscaledLogProb_curr_singleMixture[k]));
-                my_print("Max Val. %\n", maxValue);
-                my_print("\n\n\n");
-				break;
-            }
-            unscaledLogProb_curr_singleMixture[k] += maxValue;
-		}
-		//normalize probabilities
-		for (unsigned k = 0u; k < numMixtures; k++)
-		{
-			probabilities[k] = probabilities[k] / normalizingProbabilityConstant;
-		}
 
 		double currGeneLogPost = 0.0;
 		double currGeneLogLike = 0.0;
-		for (unsigned k = 0u; k < numSynthesisRateCategories; k++)
+		double alpha = -exp_distribution(generator);
+		if (estimateMixtureAssignment)
 		{
-			// We do not need to add std::log(model.getCategoryProbability(k)) since it will cancel in the ratio!
-			double currLogPost = unscaledLogProb_curr[k];
-			double propLogPost = unscaledLogProb_prop[k];
-			std::vector<unsigned> mixtureElements = model.getMixtureElementsOfSelectionCategory(k);
-            //double alpha = -Parameter::randExp(1);
-			double alpha = -exp_distribution(generator);
-			//#endif
-
-			if ( (alpha < (propLogPost - currLogPost)) && estimateSynthesisRate )
+			for (unsigned k = 0u; k < numSynthesisRateCategories; k++)
 			{
-				model.updateSynthesisRate(i,k);
+				// logProbabilityRatio contains the logProbabilityRatio in element 0,
+				// the current unscaled probability in element 1 and the proposed unscaled probability in element 2
+				std::vector<unsigned> mixtureElements = model.getMixtureElementsOfSelectionCategory(k);
 				for (unsigned n = 0u; n < mixtureElements.size(); n++)
 				{
-					unsigned element = mixtureElements[n];
-					currGeneLogPost += probabilities[element] * std::exp(unscaledLogProb_prop_singleMixture[element] - maxValue2);
-					currGeneLogLik += probabilities[element] * std::exp(unscaledLogLike_prop_singleMixture[element] - maxValue2);
+					unsigned mixtureElement = mixtureElements[n];
+					double logProbabilityRatio[7];
+					//model.calculateUniversalParameter(genome,i,mixtureElement);
+					model.calculateLogLikelihoodRatioPerGene(*gene, i, mixtureElement, logProbabilityRatio); //has to return likelihood, not just ratio, no priors
+
+					// log posterior with and without rev. jump probability
+					unscaledLogProb_curr[k] += logProbabilityRatio[1]; // with rev. jump prob.
+					unscaledLogProb_prop[k] += logProbabilityRatio[2]; // with rev. jump prob.
+
+					// TODO: unscaledLogPost_curr and unscaledLogPost_prop have been made redundant by modification to code adding unscaledLogProb_curr_singleMixture
+					// unscaledLogProb_prop_singleMixture. Remove.
+					unscaledLogPost_curr[k] += logProbabilityRatio[3]; // without rev. jump prob.
+					unscaledLogPost_prop[k] += logProbabilityRatio[4]; // without rev. jump prob.
+					unscaledLogLike_curr[k] += logProbabilityRatio[5]; //current logLikelihood
+					unscaledLogLike_prop[k] += logProbabilityRatio[6]; //proposed logLikelihood
+
+					unscaledLogProbRev_curr_singleMixture[mixtureIndex] = logProbabilityRatio[1];
+					unscaledLogProbRev_prop_singleMixture[mixtureIndex] = logProbabilityRatio[2];
+					unscaledLogProb_curr_singleMixture[mixtureIndex] = logProbabilityRatio[3];
+					unscaledLogProb_prop_singleMixture[mixtureIndex] = logProbabilityRatio[4];
+					unscaledLogLike_curr_singleMixture[mixtureIndex] = logProbabilityRatio[5];
+					unscaledLogLike_prop_singleMixture[mixtureIndex] = logProbabilityRatio[6];
+
+					maxValue = unscaledLogProb_curr_singleMixture[mixtureIndex] > maxValue ?
+							   unscaledLogProb_curr_singleMixture[mixtureIndex] : maxValue;
+
+					maxValue2 = unscaledLogProb_prop_singleMixture[mixtureIndex] > maxValue2 ?
+								unscaledLogProb_prop_singleMixture[mixtureIndex] : maxValue2;
+
+					//maxValue2 = unscaledLogPost_prop[k] > maxValue2 ?
+					//		unscaledLogPost_prop[k] : maxValue2;
+
+					mixtureIndex++;
 				}
-				//loglikelihood += unscaledLogLike_prop[k]; //unscaled
+			}
+			maxValue2 = maxValue > maxValue2 ? maxValue : maxValue2;
+
+			double normalizingProbabilityConstant = 0.0;
+
+			for (unsigned k = 0u; k < numMixtures; k++)
+			{
+				unscaledLogProb_curr_singleMixture[k] -= maxValue;
+				probabilities[k] = model.getCategoryProbability(k) * std::exp(unscaledLogProb_curr_singleMixture[k]);
+				normalizingProbabilityConstant += probabilities[k];
+	            if (std::isnan(probabilities[k]))
+	            {
+	                my_print("\n\n\n");
+	                my_print("Gene: %, %\n", i, gene->getId());
+	                my_print("Mixture: %\n", k);
+	                my_print("unscaled Mix. Prop. of gene: %\n", probabilities[k]);
+	                my_print("Mix. cat. prob.: %\n", model.getCategoryProbability(k));
+	                my_print("curr logLik - maxVal: %\n", unscaledLogProb_curr_singleMixture[k]);
+	                my_print("exp(curr logLik - maxVal): %\n", std::exp(unscaledLogProb_curr_singleMixture[k]));
+	                my_print("Max Val. %\n", maxValue);
+	                my_print("\n\n\n");
+					break;
+	            }
+	            unscaledLogProb_curr_singleMixture[k] += maxValue;
+			}
+			//normalize probabilities
+			for (unsigned k = 0u; k < numMixtures; k++)
+			{
+				probabilities[k] = probabilities[k] / normalizingProbabilityConstant;
+			}
+
+			
+			for (unsigned k = 0u; k < numSynthesisRateCategories; k++)
+			{
+				// We do not need to add std::log(model.getCategoryProbability(k)) since it will cancel in the ratio!
+				double currLogPost = unscaledLogProb_curr[k];
+				double propLogPost = unscaledLogProb_prop[k];
+				std::vector<unsigned> mixtureElements = model.getMixtureElementsOfSelectionCategory(k);
+				
+				//#endif
+
+				if ( (alpha < (propLogPost - currLogPost)) && estimateSynthesisRate )
+				{
+					model.updateSynthesisRate(i,k);
+					for (unsigned n = 0u; n < mixtureElements.size(); n++)
+					{
+						unsigned element = mixtureElements[n];
+						currGeneLogPost += probabilities[element] * std::exp(unscaledLogProb_prop_singleMixture[element] - maxValue2);
+						currGeneLogLike += probabilities[element] * std::exp(unscaledLogLike_prop_singleMixture[element] - maxValue2);
+					}
+				}
+				else
+				{
+					for (unsigned n = 0u; n < mixtureElements.size(); n++)
+					{
+						unsigned element = mixtureElements[n];
+						currGeneLogPost += probabilities[element] * std::exp(unscaledLogProb_curr_singleMixture[element] - maxValue2);
+						currGeneLogLike += probabilities[element] * std::exp(unscaledLogLike_curr_singleMixture[element] - maxValue2);
+						
+					}
+					//loglikelihood += unscaledLogLike_curr[k]; //unscaled
+				}
+				if (std::isnan(logPosterior))
+		        {
+		            my_print("\n\n\n");
+		            my_print("logPosterior: %\n", logPosterior);
+		            my_print("currGeneLogPost: %\n", currGeneLogPost);
+		            my_print("Gene: %, %\n", i, gene->getId());
+		            my_print("Mixture: %\n", k);
+		            my_print("Mix. Prop.: %\n", probabilities[k]);
+		            my_print("cur logLik: %\n", unscaledLogPost_curr[k]);
+		            my_print("prop logLik: %\n", unscaledLogPost_prop[k]);
+		            my_print("Accepted?: % < % , %\n", alpha, (propLogPost - currLogPost), alpha < (propLogPost - currLogPost));
+		            my_print("\n\n\n");
+		        }
+			}
+		} 
+		else
+		{
+			unsigned mixtureElement = model.getMixtureAssignment(i);
+			unsigned k = model.getSynthesisRateCategory(mixtureElement);
+			double logProbabilityRatio[7];
+			model.calculateLogLikelihoodRatioPerGene(*gene, i, mixtureElement, logProbabilityRatio);
+			
+
+			unscaledLogProbRev_curr_singleMixture[mixtureElement] = logProbabilityRatio[1];
+			unscaledLogProbRev_prop_singleMixture[mixtureElement] = logProbabilityRatio[2];
+			unscaledLogProb_curr_singleMixture[mixtureElement] = logProbabilityRatio[3];
+			unscaledLogProb_prop_singleMixture[mixtureElement] = logProbabilityRatio[4];
+			unscaledLogLike_curr_singleMixture[mixtureElement] = logProbabilityRatio[5];
+			unscaledLogLike_prop_singleMixture[mixtureElement] = logProbabilityRatio[6];
+		
+			maxValue = unscaledLogProb_curr_singleMixture[mixtureElement] > maxValue ?
+					   unscaledLogProb_curr_singleMixture[mixtureElement] : maxValue;
+
+			maxValue2 = unscaledLogProb_prop_singleMixture[mixtureElement] > maxValue2 ?
+						unscaledLogProb_prop_singleMixture[mixtureElement] : maxValue2;
+			
+			maxValue3 = unscaledLogLike_curr_singleMixture[mixtureElement] > maxValue3 ?
+						unscaledLogLike_curr_singleMixture[mixtureElement] : maxValue3;
+
+			maxValue4 = unscaledLogLike_prop_singleMixture[mixtureElement] > maxValue4 ?
+						unscaledLogLike_prop_singleMixture[mixtureElement] : maxValue4;
+
+			maxValue2 = maxValue > maxValue2 ? maxValue : maxValue2;
+			maxValue4 = maxValue3 > maxValue4 ? maxValue3 : maxValue4;
+		// adjust the the unscaled probabilities by the constant c
+		// ln(f') = ln(c) + ln(f)
+		// calculate ln(P) = ln( Sum(p_i*f'(...)) ) and obtain normalizing constant for new p_i
+		
+			//unsigned expressionCategory = model.getSynthesisRateCategory(mixtureElement);
+			double currLogPost = unscaledLogProbRev_curr_singleMixture[mixtureElement];
+			double propLogPost = unscaledLogProbRev_prop_singleMixture[mixtureElement];
+			if ( (alpha < (propLogPost - currLogPost)) && estimateSynthesisRate )
+			{
+				model.updateSynthesisRate(i,k);		
+				currGeneLogPost += std::exp(unscaledLogProb_prop_singleMixture[mixtureElement] - maxValue2);
+				currGeneLogLike += std::exp(unscaledLogLike_prop_singleMixture[mixtureElement] - maxValue4);	
 			}
 			else
 			{
-				for (unsigned n = 0u; n < mixtureElements.size(); n++)
-				{
-					unsigned element = mixtureElements[n];
-					currGeneLogPost += probabilities[element] * std::exp(unscaledLogProb_curr_singleMixture[element] - maxValue2);
-					currGeneLogLik += probabilities[element] * std::exp(unscaledLogLike_curr_singleMixture[element] - maxValue2);
-				}
-				//loglikelihood += unscaledLogLike_curr[k]; //unscaled
+				currGeneLogPost += std::exp(unscaledLogProb_curr_singleMixture[mixtureElement] - maxValue2);
+				currGeneLogLike += std::exp(unscaledLogLike_curr_singleMixture[mixtureElement] - maxValue4);	
 			}
-
-            if (std::isnan(logPosterior))
-            {
-                my_print("\n\n\n");
-                my_print("logPosterior: %\n", logPosterior);
-                my_print("currGeneLogPost: %\n", currGeneLogPost);
-                my_print("Gene: %, %\n", i, gene->getId());
-                my_print("Mixture: %\n", k);
-                my_print("Mix. Prop.: %\n", probabilities[k]);
-                my_print("cur logLik: %\n", unscaledLogPost_curr[k]);
-                my_print("prop logLik: %\n", unscaledLogPost_prop[k]);
-                my_print("Accepted?: % < % , %\n", alpha, (propLogPost - currLogPost), alpha < (propLogPost - currLogPost));
-                my_print("\n\n\n");
-            }
 		}
-		loglikelihood += std::log(currGeneLogLik) + maxValue2;
+		loglikelihood += std::log(currGeneLogLike) + maxValue4;
 		logPosterior += std::log(currGeneLogPost) + maxValue2;
 
 		//Get category in which the gene is placed in.
 		//If we use multiple sequence observation (like different mutants),
 		// randMultinom needs a parameter N to place N observations in numMixture buckets
-		//unsigned categoryOfGene = Parameter::randMultinom(probabilities, numMixtures);
+		
+		
+			//unsigned categoryOfGene = Parameter::randMultinom(probabilities, numMixtures);
 		std::vector<double> cumulativeSum(numMixtures);
 		cumulativeSum[0] = probabilities[0];
 
@@ -304,7 +356,9 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 			}
 		}
 		if (estimateMixtureAssignment)
+		{
 			model.setMixtureAssignment(i, categoryOfGene_vec[i]);
+		}
 		// //dirichlet parameters needs to be the same across all threads, prevent possible race condition 
 		//dirichletParameters[categoryOfGene_vec[i]] += 1;
 		if ((iteration % thinning) == 0)
@@ -314,9 +368,6 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		}
 
 	}
-	//my_print("%\n",logPosterior);
-	// take all priors into account
-	//loglikelihood = logPosterior;
 	logPosterior += model.calculateAllPriors();
 	
     if (std::isnan(logPosterior))
@@ -325,7 +376,9 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
         my_print("logPosterior NaN after addition of prior values!\n");
         my_print("\n\n\n");
     }
-    for (unsigned i = 0; i < numGenes; i ++)
+    
+	
+	for (unsigned i = 0; i < numGenes; i ++)
 	{
 		dirichletParameters[categoryOfGene_vec[i]] += 1;
 	}
@@ -335,9 +388,11 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	{
 		model.setCategoryProbability(k, newMixtureProbabilities[k]);
 	}
+
 	if ((iteration % thinning) == 0)
 	{
-		model.updateMixtureProbabilitiesTrace(iteration/thinning);
+		if (estimateMixtureAssignment)
+			model.updateMixtureProbabilitiesTrace(iteration/thinning);
 		likelihoodTrace[iteration/thinning] = loglikelihood;
 		
 	}
@@ -463,7 +518,6 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
     	double threshold = -Parameter::randExp(1);
  		if (threshold < acceptanceRatioForAllMixtures[0] && std::isfinite(acceptanceRatioForAllMixtures[0]) && !std::isnan(acceptanceRatioForAllMixtures[2]))
 		{	
-			//my_print("AA % Threshold % Acceptance Ratio % \n",grouping,threshold,acceptanceRatioForAllMixtures[0]);
 			
 			// moves proposed codon specific parameters to current codon specific parameters
 			if (std::isnan(acceptanceRatioForAllMixtures[0]))
@@ -520,10 +574,13 @@ void MCMCAlgorithm::acceptRejectHyperParameter(Genome &genome, Model& model, uns
             my_print("logProbabilityRatio % not finite!\n", i);
 
 		if (-Parameter::randExp(1) < logProbabilityRatios[i])
+		{
 			model.updateHyperParameter(i);
+		}
 	}
 
 	if ((iteration % thinning) == 0)
+
 		model.updateHyperParameterTraces(iteration/thinning);
 }
 
@@ -565,7 +622,6 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	model.updateTracesWithInitialValues(genome);
 	if (stepsToAdapt == -1)
 		stepsToAdapt = maximumIterations;
-	my_print("Type: %\n",model.type);
 	my_print("Starting MCMC\n");
 	my_print("\tEstimate Codon Specific Parameters? % \n", (estimateCodonSpecificParameter ? "TRUE" : "FALSE") );
 	my_print("\tEstimate Hyper Parameters? % \n", (estimateHyperParameter ? "TRUE" : "FALSE") );
@@ -618,10 +674,11 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 		{
 			model.proposeCodonSpecificParameter();
 			acceptRejectCodonSpecificParameter(genome, model, iteration);
-			
             //TODO:Probably do a nan check
 			if ((iteration % adaptiveWidth) == 0u)
+			{
 				model.adaptCodonSpecificParameterProposalWidth(adaptiveWidth, iteration / thinning, iteration <= stepsToAdapt);
+			}
 		}
 		// update hyper parameter
 		if (estimateHyperParameter)
@@ -631,6 +688,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 			acceptRejectHyperParameter(genome, model, iteration);
             //TODO:Probably do a nan check
 			if ((iteration % adaptiveWidth) == 0u)
+
 				model.adaptHyperParameterProposalWidths(adaptiveWidth, iteration <= stepsToAdapt);
 
 		}
@@ -652,7 +710,6 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 			if ((iteration % adaptiveWidth) == 0u)
 				model.adaptSynthesisRateProposalWidth(adaptiveWidth, iteration <= stepsToAdapt);
   		}
-
 
 
 		if ((iteration % (50 * adaptiveWidth)) == 0u)

@@ -153,6 +153,9 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
     if (!ROC.or.FONSE){
       if(aa == "X") next
     }
+    if (ROC.or.FONSE){
+      if(aa == "X" || aa == "M" || aa == "W") next
+    }
     cur.trace <- vector("list", length(codons))
     paramType <- 0
     if(type == "Mutation"){
