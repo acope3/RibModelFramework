@@ -161,39 +161,41 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		{
 			for (unsigned k = 0u; k < numSynthesisRateCategories; k++)
 			{
-				unsigned mixtureElement = mixtureElements[n];
-				double logProbabilityRatio[7];
-				//model.calculateUniversalParameter(genome,i,mixtureElement);
-				model.calculateLogLikelihoodRatioPerGene(*gene, i, mixtureElement, logProbabilityRatio); //has to return likelihood, not just ratio, no priors
+				std::vector<unsigned> mixtureElements = model.getMixtureElementsOfSelectionCategory(k);
+				for (unsigned n = 0u; n < mixtureElements.size(); n++)
+				{
+					unsigned mixtureElement = mixtureElements[n];
+					double logProbabilityRatio[7];
+					//model.calculateUniversalParameter(genome,i,mixtureElement);
+					model.calculateLogLikelihoodRatioPerGene(*gene, i, mixtureElement, logProbabilityRatio); //has to return likelihood, not just ratio, no priors
 
-				// log posterior with and without rev. jump probability
-				unscaledLogProb_curr[k] += logProbabilityRatio[1]; // with rev. jump prob.
-				unscaledLogProb_prop[k] += logProbabilityRatio[2]; // with rev. jump prob.
+					// log posterior with and without rev. jump probability
+					unscaledLogProb_curr[k] += logProbabilityRatio[1]; // with rev. jump prob.
+					unscaledLogProb_prop[k] += logProbabilityRatio[2]; // with rev. jump prob.
 
-				// TODO: unscaledLogPost_curr and unscaledLogPost_prop have been made redundant by modification to code adding unscaledLogProb_curr_singleMixture
-				// unscaledLogProb_prop_singleMixture. Remove.
-				unscaledLogPost_curr[k] += logProbabilityRatio[3]; // without rev. jump prob.
-				unscaledLogPost_prop[k] += logProbabilityRatio[4]; // without rev. jump prob.
-				unscaledLogLike_curr[k] += logProbabilityRatio[5]; //current logLikelihood
-				unscaledLogLike_prop[k] += logProbabilityRatio[6]; //proposed logLikelihood
+					// TODO: unscaledLogPost_curr and unscaledLogPost_prop have been made redundant by modification to code adding unscaledLogProb_curr_singleMixture
+					// unscaledLogProb_prop_singleMixture. Remove.
+					unscaledLogPost_curr[k] += logProbabilityRatio[3]; // without rev. jump prob.
+					unscaledLogPost_prop[k] += logProbabilityRatio[4]; // without rev. jump prob.
+					unscaledLogLike_curr[k] += logProbabilityRatio[5]; //current logLikelihood
+					unscaledLogLike_prop[k] += logProbabilityRatio[6]; //proposed logLikelihood
 
-				unscaledLogProbRev_curr_singleMixture[mixtureIndex] = logProbabilityRatio[1];
-				unscaledLogProbRev_prop_singleMixture[mixtureIndex] = logProbabilityRatio[2];
-				unscaledLogProb_curr_singleMixture[mixtureIndex] = logProbabilityRatio[3];
-				unscaledLogProb_prop_singleMixture[mixtureIndex] = logProbabilityRatio[4];
-				unscaledLogLike_curr_singleMixture[mixtureIndex] = logProbabilityRatio[5];
-				unscaledLogLike_prop_singleMixture[mixtureIndex] = logProbabilityRatio[6];
+					unscaledLogProbRev_curr_singleMixture[mixtureIndex] = logProbabilityRatio[1];
+					unscaledLogProbRev_prop_singleMixture[mixtureIndex] = logProbabilityRatio[2];
+					unscaledLogProb_curr_singleMixture[mixtureIndex] = logProbabilityRatio[3];
+					unscaledLogProb_prop_singleMixture[mixtureIndex] = logProbabilityRatio[4];
+					unscaledLogLike_curr_singleMixture[mixtureIndex] = logProbabilityRatio[5];
+					unscaledLogLike_prop_singleMixture[mixtureIndex] = logProbabilityRatio[6];
 
-				maxValue = unscaledLogProb_curr_singleMixture[mixtureIndex] > maxValue ?
-						   unscaledLogProb_curr_singleMixture[mixtureIndex] : maxValue;
+					maxValue = unscaledLogProb_curr_singleMixture[mixtureIndex] > maxValue ?
+							   unscaledLogProb_curr_singleMixture[mixtureIndex] : maxValue;
 
-				maxValue2 = unscaledLogProb_prop_singleMixture[mixtureIndex] > maxValue2 ?
-							unscaledLogProb_prop_singleMixture[mixtureIndex] : maxValue2;
+					maxValue2 = unscaledLogProb_prop_singleMixture[mixtureIndex] > maxValue2 ?
+								unscaledLogProb_prop_singleMixture[mixtureIndex] : maxValue2;
 
-				//maxValue2 = unscaledLogPost_prop[k] > maxValue2 ?
-				//		unscaledLogPost_prop[k] : maxValue2;
 
-				mixtureIndex++;
+					mixtureIndex++;
+				}
 			}
 			maxValue2 = maxValue > maxValue2 ? maxValue : maxValue2;
 

@@ -644,48 +644,51 @@ void ROCParameter::proposeCodonSpecificParameter()
 	{
 		std::vector<double> iidProposed;
 		std::string aa = getGrouping(k);
-		std::vector<unsigned> codon_list = SequenceSummary::AAToCodonIndex(aa,true);
-		unsigned numCodons = codon_list.size();
+		unsigned aaStart, aaEnd;
+		SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
+		unsigned numCodons = aaEnd - aaStart;
 		for (unsigned i = 0u; i < (numCodons * (numMutationCategories + numSelectionCategories)); i++)
 		{
 			iidProposed.push_back(randNorm(0.0, 1.0));
 		}
+
 		std::vector<double> covaryingNums;
 		covaryingNums = covarianceMatrix[SequenceSummary::AAToAAIndex(aa)].transformIidNumbersIntoCovaryingNumbers(iidProposed);
 		for (unsigned i = 0; i < numMutationCategories; i++)
 		{
-			for (unsigned j = i * numCodons, l = 0; j < (i * numCodons) + numCodons; j++, l++)
+			for (unsigned j = i * numCodons, l = aaStart; j < (i * numCodons) + numCodons; j++, l++)
 			{
 				if (fix_dM)
 				{
-					proposedCodonSpecificParameter[dM][i][codon_list[l]] = currentCodonSpecificParameter[dM][i][codon_list[l]];
+					proposedCodonSpecificParameter[dM][i][l] = currentCodonSpecificParameter[dM][i][l];
 				}
 				else if (propose_by_prior)
 				{
-					proposedCodonSpecificParameter[dM][i][codon_list[l]] = randNorm(mutation_prior_mean[i][codon_list[l]],mutation_prior_sd[i][codon_list[l]]);
+					proposedCodonSpecificParameter[dM][i][l] = randNorm(mutation_prior_mean[i][l],mutation_prior_sd[i][l]);
+
 				}
 				else
 				{
-					proposedCodonSpecificParameter[dM][i][codon_list[l]] = currentCodonSpecificParameter[dM][i][codon_list[l]] + covaryingNums[j];
+					proposedCodonSpecificParameter[dM][i][l] = currentCodonSpecificParameter[dM][i][l] + covaryingNums[j];
 				}
 			}
 		}
 		for (unsigned i = 0; i < numSelectionCategories; i++)
 		{
-			for (unsigned j = i * numCodons, l = 0; j < (i * numCodons) + numCodons; j++, l++)
+			for (unsigned j = i * numCodons, l = aaStart; j < (i * numCodons) + numCodons; j++, l++)
 			{
 				if (fix_dEta)
 				{
-					proposedCodonSpecificParameter[dEta][i][codon_list[l]] = currentCodonSpecificParameter[dEta][i][codon_list[l]];
+					proposedCodonSpecificParameter[dEta][i][l] = currentCodonSpecificParameter[dEta][i][l];
 				}
 				else if (propose_by_prior) //Don't estimate covariance matrix. 
 				{
-					proposedCodonSpecificParameter[dEta][i][codon_list[l]] = randNorm(currentCodonSpecificParameter[dEta][i][codon_list[l]] , std_csp[codon_list[l]]);
+					proposedCodonSpecificParameter[dEta][i][l] = randNorm(currentCodonSpecificParameter[dEta][i][l] , std_csp[l]);
 			
 				}
 				else
 				{
-					proposedCodonSpecificParameter[dEta][i][codon_list[l]] = currentCodonSpecificParameter[dEta][i][codon_list[l]]
+					proposedCodonSpecificParameter[dEta][i][l] = currentCodonSpecificParameter[dEta][i][l]
 												   + covaryingNums[(numMutationCategories * numCodons) + j];
 				}
 			}
@@ -701,16 +704,18 @@ void ROCParameter::setProposeByPrior(bool _propose_by_prior)
 
 void ROCParameter::updateCodonSpecificParameter(std::string grouping)
 {
-	std::vector<unsigned> codon_list = SequenceSummary::AAToCodonIndex(grouping,true);
+	//CSPToUpdate.push_back(grouping);
+	unsigned aaStart, aaEnd;
+	SequenceSummary::AAToCodonRange(grouping, aaStart, aaEnd, true);
 	unsigned aaIndex = SequenceSummary::aaToIndex.find(grouping)->second;
 	numAcceptForCodonSpecificParameters[aaIndex]++;
 	if (!fix_dM)
 	{
 		for (unsigned k = 0u; k < numMutationCategories; k++)
 		{
-			for (unsigned i = 0; i < codon_list.size(); i++)
+			for (unsigned i = aaStart; i < aaEnd; i++)
 			{
-				currentCodonSpecificParameter[dM][k][codon_list[i]] = proposedCodonSpecificParameter[dM][k][codon_list[i]];
+				currentCodonSpecificParameter[dM][k][i] = proposedCodonSpecificParameter[dM][k][i];
 			}
 		}
 	}
@@ -718,9 +723,9 @@ void ROCParameter::updateCodonSpecificParameter(std::string grouping)
 	{
 		for (unsigned k = 0u; k < numSelectionCategories; k++)
 		{
-			for (unsigned i = 0; i < codon_list.size(); i++)
+			for (unsigned i = aaStart; i < aaEnd; i++)
 			{
-				currentCodonSpecificParameter[dEta][k][codon_list[i]] = proposedCodonSpecificParameter[dEta][k][codon_list[i]];
+				currentCodonSpecificParameter[dEta][k][i] = proposedCodonSpecificParameter[dEta][k][i];
 			}
 		}
 	}
@@ -755,26 +760,26 @@ void ROCParameter::getMutationPriorMeanForCategoryForGroup(unsigned category, st
 {
 	// unsigned aaStart, aaEnd;
 	// SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
-	std::vector<unsigned> codon_list = SequenceSummary::AAToCodonIndex(aa,true);
+	unsigned aaStart, aaEnd;
+	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
 	std::vector<double> mutation_prior_mean_category = mutation_prior_mean[category];
 	unsigned j = 0u;
-	for (unsigned i = 0; i < codon_list.size(); i++, j++)
+	for (unsigned i = aaStart; i < aaEnd; i++, j++)
 	{
-		returnSet[j] = mutation_prior_mean_category[codon_list[i]];
+		returnSet[j] = mutation_prior_mean_category[i];
 	}
 }
 
 
 void ROCParameter::getMutationPriorStandardDeviationForCategoryForGroup(unsigned category, std::string aa, double *returnSet)
 {
-	// unsigned aaStart, aaEnd;
-	// SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
-	std::vector<unsigned> codon_list = SequenceSummary::AAToCodonIndex(aa,true);
+	unsigned aaStart, aaEnd;
+	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
 	std::vector<double> mutation_prior_sd_category = mutation_prior_sd[category];
 	unsigned j = 0u;
-	for (unsigned i = 0; i < codon_list.size(); i++, j++)
+	for (unsigned i = aaStart; i < aaEnd; i++, j++)
 	{
-		returnSet[j] = mutation_prior_sd_category[codon_list[i]];
+		returnSet[j] = mutation_prior_sd_category[i];
 	}
 }
 
@@ -799,15 +804,13 @@ void ROCParameter::getParameterForCategory(unsigned category, unsigned paramType
 	std::vector<double> *tempSet;
 	tempSet = (proposal ? &proposedCodonSpecificParameter[paramType][category] : &currentCodonSpecificParameter[paramType][category]);
 
-	// unsigned aaStart, aaEnd;
-	// SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
-
-	std::vector<unsigned> codon_list = SequenceSummary::AAToCodonIndex(aa,true);
+	unsigned aaStart, aaEnd;
+	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
 
 	unsigned j = 0u;
-	for (unsigned i = 0; i < codon_list.size(); i++, j++)
+	for (unsigned i = aaStart; i < aaEnd; i++, j++)
 	{
-		returnSet[j] = tempSet->at(codon_list[i]);
+		returnSet[j] = tempSet->at(i);
 	}
 }
 
@@ -900,16 +903,14 @@ void ROCParameter::initMutation(std::vector<double> mutationValues, unsigned mix
 	if (check)
 	{
 		mixtureElement--;
-
         unsigned category = getMutationCategory(mixtureElement);
         aa[0] = (char) std::toupper(aa[0]);
 
-        // unsigned aaStart, aaEnd;
-        // SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
-        std::vector<unsigned> codon_list = SequenceSummary::AAToCodonIndex(aa,true);
-        for (unsigned i = 0, j = 0; i < codon_list.size(); i++, j++)
+        unsigned aaStart, aaEnd;
+        SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
+        for (unsigned i = aaStart, j = 0; i < aaEnd; i++, j++)
         {
-            currentCodonSpecificParameter[dM][category][codon_list[i]] = mutationValues[j];
+            currentCodonSpecificParameter[dM][category][i] = mutationValues[j];
         }
 	}
 }
@@ -927,12 +928,11 @@ void ROCParameter::initSelection(std::vector<double> selectionValues, unsigned m
 
         aa[0] = (char) std::toupper(aa[0]);
 
-        // unsigned aaStart, aaEnd;
-        // SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
-        std::vector<unsigned> codon_list = SequenceSummary::AAToCodonIndex(aa,true);
-        for (unsigned i = 0, j = 0; i < codon_list.size(); i++, j++)
+        unsigned aaStart, aaEnd;
+        SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
+        for (unsigned i = aaStart, j = 0; i < aaEnd; i++, j++)
         {
-            currentCodonSpecificParameter[dEta][category][codon_list[i]] = selectionValues[j];
+			currentCodonSpecificParameter[dEta][category][i] = selectionValues[j];
         }
     }
 }
