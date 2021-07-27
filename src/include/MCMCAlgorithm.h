@@ -87,6 +87,9 @@ class MCMCAlgorithm
 		int getIterationsToAdapt();
                 void setStepsToAdapt(unsigned iterations); //Deprecated
                 int getStepsToAdapt(); //Deprecated
+                void setSamplesToAdapt(unsigned _samples);
+                int getSamplesToAdapt(); 
+  
 
 		std::vector<double> getLogPosteriorTrace();
 		std::vector<double> getLogLikelihoodTrace();
