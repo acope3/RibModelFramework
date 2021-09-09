@@ -184,6 +184,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 				unscaledLogLike_curr_singleMixture[mixtureIndex] = logProbabilityRatio[5];
 				unscaledLogLike_prop_singleMixture[mixtureIndex] = logProbabilityRatio[6];
 
+				//TO DO: Change variable names to make clearer that maxValue and maxValue2 represent current and proposed respecitvely
 				maxValue = unscaledLogProb_curr_singleMixture[mixtureIndex] > maxValue ?
 						   unscaledLogProb_curr_singleMixture[mixtureIndex] : maxValue;
 
