@@ -279,11 +279,11 @@ void PANSEModel::fillMatrices(Genome& genome)
             currNSERate = getParameterForCategory(alphaCategory, PANSEParameter::nse, codon, false);
                 
             tmp[k] = std::lgamma(currAlpha);
-            tmp_2[k] = std::log(currLambda) + std::log(U);
-            prob_successful[k] = elongationProbabilityLog(currAlpha, currLambda,1/currNSERate);
+            tmp_2[k] = std::log(currLambda);// + std::log(U);
+            prob_successful[k] = elongationProbabilityLog(currAlpha, currLambda/U,1/currNSERate);
             if (prob_successful[k] > 0.0)
             {
-                prob_successful[k] = 0.0;
+                prob_successful[k] = std::numeric_limits<double>::quiet_NaN();
             }
             for (unsigned l=0; l < 50; l++)
             {
@@ -379,9 +379,9 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
         {
             currLgammaRFPAlpha = std::lgamma(currAlpha + positionalRFPCount);
         }
-        logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda * U, positionalRFPCount, phiValue, std::exp(currSigma), 
+        logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda, positionalRFPCount, phiValue, std::exp(currSigma), 
                                 lgamma_currentAlpha[alphaCategory][codonIndex],log_currentLambda[lambdaCategory][codonIndex], logPhi, currLgammaRFPAlpha);
-        logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda * U, positionalRFPCount, phiValue_proposed, std::exp(currSigma), 
+        logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda, positionalRFPCount, phiValue_proposed, std::exp(currSigma), 
                                 lgamma_currentAlpha[alphaCategory][codonIndex],log_currentLambda[lambdaCategory][codonIndex], logPhi_proposed, currLgammaRFPAlpha);
         currSigma = currSigma + prob_successful[codonIndex];
     }
@@ -510,14 +510,14 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 	                {
 	                    propAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, true);
 	                    propLambda = getParameterForCategory(lambdaCategory, PANSEParameter::lmPri, codon, true);
-	                    logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambda * U, positionalRFPCount,
-	                                    phiValue,std::exp(propSigma),std::lgamma(propAlpha),std::log(propLambda) + std::log(U),log_phi,std::lgamma(propAlpha+positionalRFPCount));
+	                    logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambda, positionalRFPCount,
+	                                    phiValue,std::exp(propSigma),std::lgamma(propAlpha),std::log(propLambda),log_phi,std::lgamma(propAlpha+positionalRFPCount));
 	                    if (prop_prob_successful > 500)
 	                    {
-	                        prop_prob_successful = elongationProbabilityLog(propAlpha, propLambda,1/currNSERate);
+	                        prop_prob_successful = elongationProbabilityLog(propAlpha, propLambda/U,1/currNSERate);
 	                        if (prop_prob_successful > 0.0)
 	                        {
-	                            prop_prob_successful = 0.0;
+	                            prop_prob_successful = std::numeric_limits<double>::quiet_NaN();
 	                        }
 	               
 	                    }
@@ -526,14 +526,14 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 	                else
 	                {
 	                    propNSERate = getParameterForCategory(alphaCategory, PANSEParameter::nse, codon, true);
-	                    logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda * U, positionalRFPCount,
+	                    logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda, positionalRFPCount,
 	                                    phiValue,std::exp(propSigma),lgamma_currentAlpha[alphaCategory][codonIndex],log_currentLambda[lambdaCategory][codonIndex],log_phi,currLgammaRFPAlpha);
 	                    if (prop_prob_successful > 500)
 	                    {
-	                        prop_prob_successful = elongationProbabilityLog(currAlpha, currLambda,1/propNSERate);
+	                        prop_prob_successful = elongationProbabilityLog(currAlpha, currLambda/U,1/propNSERate);
 	                        if (prop_prob_successful > 0.0)
 	                        {
-	                            prop_prob_successful = 0.0;
+	                            prop_prob_successful = std::numeric_limits<double>::quiet_NaN();
 	                        }
 	                    }
 	                }
@@ -542,7 +542,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 	           }
 	           else
 	           {
-	                logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda * U, positionalRFPCount,
+	                logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda, positionalRFPCount,
 	                                  phiValue,std::exp(propSigma),lgamma_currentAlpha[alphaCategory][codonIndex],log_currentLambda[lambdaCategory][codonIndex],log_phi,currLgammaRFPAlpha);
 	               
 	                propSigma = propSigma + prob_successful[codonIndex];
@@ -551,7 +551,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 	            
 
 
-	            logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda*U, positionalRFPCount,
+	            logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda, positionalRFPCount,
 	                                    phiValue, std::exp(currSigma),lgamma_currentAlpha[alphaCategory][codonIndex],log_currentLambda[lambdaCategory][codonIndex],log_phi,currLgammaRFPAlpha);  
 
 	            currSigma = currSigma + prob_successful[codonIndex];
@@ -671,7 +671,7 @@ void PANSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 
     unsigned long Y = genome.getSumRFP();
     fillMatrices(genome);
-    std::vector<double> log_propLambda = std::vector<double> (getGroupListSize(),-10000000);
+    //std::vector<double> log_propLambda = std::vector<double> (getGroupListSize(),-10000000);
     
 #ifdef _OPENMP
 //#ifndef __APPLE__
@@ -679,7 +679,7 @@ void PANSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 #endif
     for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
     {
-        //std::vector<double> prop_prob_successful(getGroupListSize(),1000);
+        std::vector<double> prop_prob_successful(getGroupListSize(),1000);
         unsigned long positionalRFPCount;
         unsigned codonIndex;
         std::string codon;
@@ -724,18 +724,23 @@ void PANSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
                 currLgammaRFPAlpha = std::lgamma(currAlpha + positionalRFPCount);
             }
 
-            if (log_propLambda[codonIndex] < -10000)
+            if (prop_prob_successful[codonIndex] > 500)
             {
-                log_propLambda[codonIndex] = std::log(currLambda) + std::log(propU);
+                //log_propLambda[codonIndex] = std::log(currLambda);// + std::log(propU);
+                prop_prob_successful[codonIndex] = elongationProbabilityLog(currAlpha,currLambda/propU,1/currNSERate);
+                if (prop_prob_successful[codonIndex] > 0.0)
+                {
+                    prop_prob_successful[codonIndex] = std::numeric_limits<double>::quiet_NaN();
+                }
             }
 
-            logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, (currLambda*propU), positionalRFPCount,
+            logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, (currLambda), positionalRFPCount,
                                    phiValue,std::exp(propSigma),lgamma_currentAlpha[alphaCategory][codonIndex],log_propLambda[codonIndex],log_phi,currLgammaRFPAlpha);
-            logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda*currU, positionalRFPCount,
+            logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda, positionalRFPCount,
                                    phiValue,std::exp(currSigma),lgamma_currentAlpha[alphaCategory][codonIndex],log_currentLambda[lambdaCategory][codonIndex],log_phi,currLgammaRFPAlpha);   
 
             currSigma = currSigma + prob_successful[codonIndex];
-            propSigma = propSigma + prob_successful[codonIndex];
+            propSigma = propSigma + prop_prob_successful[codonIndex];
         }
           
     }
