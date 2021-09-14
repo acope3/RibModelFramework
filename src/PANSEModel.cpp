@@ -735,7 +735,7 @@ void PANSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
             }
 
             logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, (currLambda), positionalRFPCount,
-                                   phiValue,std::exp(propSigma),lgamma_currentAlpha[alphaCategory][codonIndex],log_propLambda[codonIndex],log_phi,currLgammaRFPAlpha);
+                                   phiValue,std::exp(propSigma),lgamma_currentAlpha[alphaCategory][codonIndex],log_currentLambda[lambdaCategory][codonIndex],log_phi,currLgammaRFPAlpha);
             logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda, positionalRFPCount,
                                    phiValue,std::exp(currSigma),lgamma_currentAlpha[alphaCategory][codonIndex],log_currentLambda[lambdaCategory][codonIndex],log_phi,currLgammaRFPAlpha);   
 
