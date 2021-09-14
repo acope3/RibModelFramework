@@ -459,7 +459,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
     fillMatrices(genome);
 
 #ifdef _OPENMP
-    //#ifndef __APPLE__
+//#ifndef __APPLE__
 #pragma omp parallel for private(gene,currAlpha,currLambda,currNSERate,propAlpha,propLambda,propNSERate) reduction(+:logLikelihood,logLikelihood_proposed)
 #endif
     for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
@@ -478,7 +478,9 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 	        unsigned mixtureElement = parameter->getMixtureAssignment(i);
 	        
 	        double U = getPartitionFunction(mixtureElement, false)/Y;
-	        
+	        std::vector <unsigned> positions = gene->geneData.getPositionCodonID();
+            std::vector <unsigned long> rfpCounts = gene->geneData.getRFPCount(0);
+        
 
 	        
 	        // how is the mixture element defined. Which categories make it up
@@ -495,6 +497,10 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
             {
                 codonIndex = positions[positionIndex];
                 codon = gene->geneData.indexToCodon(codonIndex);
+                currAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, false);
+                currLambda = getParameterForCategory(lambdaCategory, PANSEParameter::lmPri, codon, false);
+                currNSERate = getParameterForCategory(alphaCategory, PANSEParameter::nse, codon, false);
+                
                 currTotalSigma = currTotalSigma + prob_successful[codonIndex];
                 if (grouping == codon)
                 {
@@ -533,8 +539,9 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                     propTotalSigma = propTotalSigma + prob_successful[codonIndex];
            
                }
-    
+            
             }
+            
 
             double initValue = phiValue/std::exp(currTotalSigma);
             double initValue_proposed = phiValue/std::exp(propTotalSigma);
@@ -542,9 +549,6 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
             double logPhi = std::log(phiValue) - currTotalSigma; 
             double logPhi_proposed = std::log(phiValue) - propTotalSigma;
     
-	        std::vector <unsigned> positions = gene->geneData.getPositionCodonID();
-	        std::vector <unsigned long> rfpCounts = gene->geneData.getRFPCount(0);
-	    
 	        double propSigma = 0;
 	        double currSigma = 0;
 	       
@@ -640,9 +644,9 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
             propLambda = getParameterForCategory(lambdaCategory, PANSEParameter::lmPri, grouping, true);
             if (std::isnan(logLikelihood_proposed))
             {
-                my_print("WARNING: proposed logLikelihood for % is NaN\n",grouping);
-                my_print("\tProposed alpha: % \n",getParameterForCategory(alphaCategory, PANSEParameter::alp, grouping, true));
-                my_print("\tProposed lambda: %\n",getParameterForCategory(lambdaCategory, PANSEParameter::lmPri, grouping, true));
+               my_print("WARNING: proposed logLikelihood for % is NaN\n",grouping);
+               my_print("\tProposed alpha: % \n",getParameterForCategory(alphaCategory, PANSEParameter::alp, grouping, true));
+               my_print("\tProposed lambda: %\n",getParameterForCategory(lambdaCategory, PANSEParameter::lmPri, grouping, true));
             }
             currAdjustmentTerm += std::log(currAlpha) + std::log(currLambda);
             propAdjustmentTerm += std::log(propAlpha) + std::log(propLambda);
@@ -762,6 +766,10 @@ void PANSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
         // get non codon specific values, calculate likelihood conditional on these
         double phiValue = parameter->getSynthesisRate(i, synthesisRateCategory, false);
 
+        std::vector <unsigned> positions = gene->geneData.getPositionCodonID();
+        std::vector <unsigned long> rfpCounts = gene->geneData.getRFPCount(/*RFPCountColumn*/ 0);
+  
+
         double currTotalSigma = 0;
         double propTotalSigma = 0;
         for (unsigned positionIndex = 0; positionIndex < positions.size();positionIndex++)
@@ -792,9 +800,7 @@ void PANSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
     
 
         
-        std::vector <unsigned> positions = gene->geneData.getPositionCodonID();
-        std::vector <unsigned long> rfpCounts = gene->geneData.getRFPCount(/*RFPCountColumn*/ 0);
-  
+        
         double currSigma = 0;
         double propSigma = 0;
 
