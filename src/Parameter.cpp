@@ -148,6 +148,7 @@ void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsig
     std::string _mutationSelectionState)
 {
 	// assign genes to mixture element
+	unsigned aa_numCodons;
 	unsigned numGenes = (unsigned)geneAssignment.size();
 	mixtureAssignment.resize(numGenes, 0);
 
@@ -176,7 +177,14 @@ void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsig
 	mutationSelectionState = _mutationSelectionState;
 	// Lose one parameter if ser is split into two groups.
 	// This is because one of the 2 codon set is now the reference codon
-	numParam = ((splitSer) ? 40 : 41);
+	numParam = 0;
+	
+	for (unsigned i = 0; i < groupList.size(); i++)
+	{
+		aa_numCodons = SequenceSummary::GetNumCodonsForAA(groupList[i],true);
+		numParam += aa_numCodons;
+	}
+	
 	numMixtures = _numMixtures;
 
 	stdDevSynthesisRate = _stdDevSynthesisRate;
@@ -989,7 +997,7 @@ void Parameter::proposeStdDevSynthesisRate()
 	{	
 		if (!fix_stdDevSynthesis)
 		{
-			stdDevSynthesisRate_proposed[i] = std::exp(randNorm(std::log(stdDevSynthesisRate[i]), std_stdDevSynthesisRate));
+			stdDevSynthesisRate_proposed[i] = std::exp(randNorm(std::log(stdDevSynthesisRate[i]), std_stdDevSynthesisRate));	
 		}
 		else
 		{
@@ -1020,6 +1028,7 @@ unsigned Parameter::getNumAcceptForStdDevSynthesisRate()
 {
 	return numAcceptForStdDevSynthesisRate;
 }
+
 
 
 void Parameter::updateStdDevSynthesisRate()
@@ -1090,6 +1099,7 @@ double Parameter::getSynthesisRateProposalWidth(unsigned geneIndex, unsigned mix
 void Parameter::proposeSynthesisRateLevels()
 {
 	unsigned numSynthesisRateLevels = (unsigned) currentSynthesisRateLevel[0].size();
+	
 	for (unsigned category = 0; category < numSelectionCategories; category++)
 	{
 		for (unsigned i = 0u; i < numSynthesisRateLevels; i++)
@@ -1099,6 +1109,7 @@ void Parameter::proposeSynthesisRateLevels()
 																		  std_phi[category][i]) );
 		}
 	}
+
 }
 
 
@@ -1397,7 +1408,7 @@ void Parameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool a
 
 	factorCriteriaLow = acceptanceTargetLow;
 	factorCriteriaHigh = acceptanceTargetHigh;
-
+	
 	for (unsigned cat = 0u; cat < numSelectionCategories; cat++)
 	{
 		unsigned numGenes = (unsigned)numAcceptForSynthesisRate[cat].size();
@@ -1426,7 +1437,7 @@ void Parameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool a
 			numAcceptForSynthesisRate[cat][i] = 0u;
 		}
 	}
-
+	
 	my_print("Acceptance rate for synthesis rate:\n");
 	my_print("Target range: %-% \n", acceptanceTargetLow, acceptanceTargetHigh );
 	my_print("Adjustment range: < % or > % \n", factorCriteriaLow, factorCriteriaHigh );
@@ -1534,11 +1545,11 @@ void Parameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptationWidt
 		    //Adjust widths if using cov matrix
 		   	
 	  	   
-		 }
+		}
 
-		      //Decomposing of cov matrix to convert iid samples to covarying samples using matrix decomposition
-		      //The decomposed matrix is used in the proposal of new samples
-		 covarianceMatrix[aaIndex].choleskyDecomposition();
+		//Decomposing of cov matrix to convert iid samples to covarying samples using matrix decomposition
+		//The decomposed matrix is used in the proposal of new samples
+		covarianceMatrix[aaIndex].choleskyDecomposition();
 		}// end adjust loop
 	} // end if(adapt)
 

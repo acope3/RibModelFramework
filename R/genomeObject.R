@@ -141,7 +141,7 @@ getCodonCountsForAA <- function(aa, genome){
 #' 
 calculateSCUO <- function(genome)
 {
-   aas <- aminoAcids()
+  aas <- aminoAcids()
   aas <- aas[which(!aas %in% c("M","X","W","J"))]
   genes <- genome$getGenes(F)
   scuo.values <- data.frame(ORF=getNames(genome), SCUO=rep(NA, length(genome)))

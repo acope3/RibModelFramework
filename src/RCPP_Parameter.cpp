@@ -256,7 +256,6 @@ RCPP_MODULE(Parameter_mod)
 		//Other Functions:
 		.method("calculateSelectionCoefficients", &Parameter::calculateSelectionCoefficientsR)
 
-
 		.method("fixSphi",&Parameter::fixStdDevSynthesis)
 		.method("setStdDevSynthesisRate",&Parameter::setStdDevSynthesisRate)
 

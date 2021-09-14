@@ -147,7 +147,6 @@ double PAModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double c
 
 void PAModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k, double* logProbabilityRatio)
 {
-	my_print("Yes\n");
 	double logLikelihood = 0.0;
 	double logLikelihood_proposed = 0.0;
 
@@ -322,7 +321,6 @@ void PAModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsi
 		double phi = getSynthesisRate(i, mixture, false);
 		lpr += Parameter::densityLogNorm(phi, proposedMphi[mixture], proposedStdDevSynthesisRate[mixture], true) -
 				Parameter::densityLogNorm(phi, currentMphi[mixture], currentStdDevSynthesisRate[mixture], true);
-		//my_print("LPR: %\n", lpr);
 	}
 
 	logProbabilityRatio[0] = lpr;
@@ -842,7 +840,6 @@ void PAModel::simulateGenome(Genome &genome)
 			rfpPerPositionPerCodon[codonIndex] = simulatedValue/codon_counts[codonIndex];
 			totalRFP[codonIndex] = simulatedValue;
 #endif
-			//my_print("% %\n",totalRFP[codonIndex],codon_counts[codonIndex]);
 			if (rfpPerPositionPerCodon[codonIndex] < 1)
 			{
 				rfpPerPositionPerCodon[codonIndex] = 1;

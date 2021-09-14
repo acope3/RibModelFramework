@@ -411,7 +411,7 @@ void Gene::clear()
 */
 unsigned Gene::length()
 {
-    return (unsigned)seq.size();
+    return (unsigned)seq.length();
 }
 
 

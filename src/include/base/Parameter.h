@@ -38,6 +38,7 @@ class Parameter {
 		std::vector<double> codonSpecificPrior;
 
 		bool fix_stdDevSynthesis = false;
+	
 	public:
 
 		static const std::string allUnique;
@@ -202,6 +203,7 @@ class Parameter {
 		void setMixtureAssignment(unsigned gene, unsigned value);
 		unsigned getMixtureAssignment(unsigned gene);
 		virtual std::vector <std::vector <double> > calculateSelectionCoefficients(unsigned sample); //TODO: test
+
 
 
 		//Static Functions: TODO: test
