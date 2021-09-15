@@ -1323,13 +1323,15 @@ void PANSEModel::simulateGenome(Genome &genome)
             NumericVector wt(1);
             wt = rgamma(1, alpha,1/(lambda));
             wait_times[geneIndex][positionIndex] = wt[0];
+            Z += phi * wait_times[geneIndex][positionIndex] * sigma;
             sigma *= (v/(wait_times[geneIndex][positionIndex] + v));
 #else
             std::gamma_distribution<double> GDistribution(alpha, 1.0/(lambda));
             wait_times[geneIndex][positionIndex] = GDistribution(Parameter::generator);
+            Z += phi * wait_times[geneIndex][positionIndex] * sigma;
             sigma *= (v/(wait_times[geneIndex][positionIndex] + v));
 #endif
-            Z += phi * wait_times[geneIndex][positionIndex] * sigma;
+            
         }
     }
     double U = Z/Y;
@@ -1344,7 +1346,6 @@ void PANSEModel::simulateGenome(Genome &genome)
         SequenceSummary sequence = gene.geneData;
         Gene tmpGene = gene;
         std::vector <unsigned> positions = sequence.getPositionCodonID();
-        wait_times[geneIndex].resize(positions.size());
         std::vector <unsigned long> rfpCount;
         unsigned alphaCategory = parameter->getMutationCategory(mixtureElement);
         unsigned lambdaCategory = parameter->getSelectionCategory(mixtureElement);
@@ -1470,8 +1471,8 @@ double PANSEModel::calculateNSERatePrior(std::string grouping,bool proposed)
 		}
 		else
 		{
-			//priorValue = std::log(1);
-            priorValue = Parameter::densityLogNorm(NSERate, std::log(1e-03), 1, true)
+			priorValue = std::log(1);
+            //priorValue = Parameter::densityLogNorm(NSERate, std::log(1e-03), 1, true)
 		}
 	}
 	return priorValue;
