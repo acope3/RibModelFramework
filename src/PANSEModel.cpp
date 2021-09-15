@@ -356,7 +356,6 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
     double phiValue = parameter->getSynthesisRate(geneIndex, synthesisRateCategory, false);
     double phiValue_proposed = parameter->getSynthesisRate(geneIndex, synthesisRateCategory, true);
     
-    
 
     double logPhi = std::log(phiValue); 
     double logPhi_proposed = std::log(phiValue_proposed);
@@ -383,7 +382,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
         }
         logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda * U, positionalRFPCount, phiValue, std::exp(currSigma), 
                                 lgamma_currentAlpha[alphaCategory][codonIndex],log_currentLambda[lambdaCategory][codonIndex], logPhi, currLgammaRFPAlpha);
-        logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda * U, positionalRFPCount, phiValue, std::exp(currSigma), 
+        logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda * U, positionalRFPCount, phiValue_proposed, std::exp(currSigma), 
                                 lgamma_currentAlpha[alphaCategory][codonIndex],log_currentLambda[lambdaCategory][codonIndex], logPhi_proposed, currLgammaRFPAlpha);
         currSigma = currSigma + prob_successful[codonIndex];
     }
@@ -702,8 +701,6 @@ void PANSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 
         std::vector <unsigned> positions = gene->geneData.getPositionCodonID();
         std::vector <unsigned long> rfpCounts = gene->geneData.getRFPCount(/*RFPCountColumn*/ 0);
-  
-
     
         double logPhi = std::log(phiValue);
         
@@ -1471,7 +1468,7 @@ double PANSEModel::calculateNSERatePrior(std::string grouping,bool proposed)
 		else
 		{
 			//priorValue = std::log(1);
-            priorValue = Parameter::densityLogNorm(NSERate, std::log(1e-03), 1, true)
+            priorValue = Parameter::densityLogNorm(NSERate, std::log(1e-04), 1, true);
 		}
 	}
 	return priorValue;
