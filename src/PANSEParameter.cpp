@@ -674,15 +674,15 @@ void PANSEParameter::proposeCodonSpecificParameter()
 			}
 			else
 			{
-				// if (j == 29) // M/ATG has index 29, see SequenceSummary. This will need to be updated to be more general.
-    //     		{
-    //     			//This guarantees \alpha/\lambda will be 1. 
-    //     			proposedCodonSpecificParameter[lmPri][i][j] = proposedCodonSpecificParameter[alp][i][j];
-    //     		}
-    //     		else
-    //     		{
+				if (j == 29) // M/ATG has index 29, see SequenceSummary. This will need to be updated to be more general.
+        		{
+        			//This guarantees \alpha/\lambda will be 1. 
+        			proposedCodonSpecificParameter[lmPri][i][j] = proposedCodonSpecificParameter[alp][i][j];
+        		}
+        		else
+        		{
 					proposedCodonSpecificParameter[lmPri][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[lmPri][i][j]) , std_csp[j]) );
-				//}
+				}
 			}
 		}
 	}
@@ -728,7 +728,6 @@ void PANSEParameter::updateCodonSpecificParameter(std::string grouping,std::stri
 	if (param == "Elongation")
 	{
 		numAcceptForCodonSpecificParameters[i]++;
-		//my_print("% % % %\n",grouping,i,param,numAcceptForCodonSpecificParameters[i]);
 	    for (unsigned k = 0u; k < numMutationCategories; k++)
 	    {
 	        currentCodonSpecificParameter[alp][k][i] = proposedCodonSpecificParameter[alp][k][i];
