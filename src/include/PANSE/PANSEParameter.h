@@ -71,6 +71,7 @@ class PANSEParameter: public Parameter {
 		void fixNSERate();
 		void fixZ();
 		void shareNSERate();
+		bool isNSEShared();
 
         //CSP Read Functions:
         void readAlphaValues(std::string filename);

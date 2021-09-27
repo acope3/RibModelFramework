@@ -430,11 +430,10 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, PANSEMode
 		param_2 = "Elongation";
 		param_1 = "NSE";
 	}
-	
-	for (unsigned i = 0; i < size; i++)
+	bool share_nse = model.shareNSE();
+	if (param_1 == "NSE" && share_nse)
 	{
-
-		std::string grouping = model.getGrouping(groups[i]);
+		std::string grouping = model.getGrouping(groups[0]);
 		model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures,param_1);
     	double threshold = -Parameter::randExp(1);
  		if (threshold < acceptanceRatioForAllMixtures[0] && std::isfinite(acceptanceRatioForAllMixtures[0]) && !std::isnan(acceptanceRatioForAllMixtures[2]))
@@ -447,30 +446,53 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, PANSEMode
 			// moves proposed codon specific parameters to current codon specific parameters
 			model.updateCodonSpecificParameter(grouping,param_1);
 			//model.updateUniversalParameter();
-		}	
+		}
+	}
+	else
+	{
+
+		for (unsigned i = 0; i < size; i++)
+		{
+
+			std::string grouping = model.getGrouping(groups[i]);
+			model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures,param_1);
+	    	double threshold = -Parameter::randExp(1);
+	 		if (threshold < acceptanceRatioForAllMixtures[0] && std::isfinite(acceptanceRatioForAllMixtures[0]) && !std::isnan(acceptanceRatioForAllMixtures[2]))
+			{	
+				if (std::isnan(acceptanceRatioForAllMixtures[0]))
+				{
+					my_print("ERROR: Accepted proposed value that results in NaN\n");
+				}
+				
+				// moves proposed codon specific parameters to current codon specific parameters
+				model.updateCodonSpecificParameter(grouping,param_1);
+				//model.updateUniversalParameter();
+			}	
+		}
 	}
 
 	std::shuffle ( groups.begin(), groups.end(),e);
-	for (unsigned i = 0; i < size; i++)
+	if (param_2 == "NSE" && share_nse)
 	{
 
-		std::string grouping = model.getGrouping(groups[i]);
-		// calculate likelihood ratio for every Category for current AA (ROC, FONSE) or Codon (PA, PANSE)
+		std::string grouping = model.getGrouping(groups[0]);
 		model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures,param_2);
-		double threshold = -Parameter::randExp(1);
-		if (threshold < acceptanceRatioForAllMixtures[0] && std::isfinite(acceptanceRatioForAllMixtures[0]) && !std::isnan(acceptanceRatioForAllMixtures[2]) && acceptanceRatioForAllMixtures[1] != 0)
+    	double threshold = -Parameter::randExp(1);
+ 		if (threshold < acceptanceRatioForAllMixtures[0] && std::isfinite(acceptanceRatioForAllMixtures[0]) && !std::isnan(acceptanceRatioForAllMixtures[2]))
 		{	
-			// moves proposed codon specific parameters to current codon specific parameters
 			if (std::isnan(acceptanceRatioForAllMixtures[0]))
 			{
 				my_print("ERROR: Accepted proposed value that results in NaN\n");
 			}
+			
+			// moves proposed codon specific parameters to current codon specific parameters
 			model.updateCodonSpecificParameter(grouping,param_2);
 			if ((iteration % thinning) == 0 && acceptanceRatioForAllMixtures[2] != 0)
 			{
 				likelihoodTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[2];//will be 0
 				posteriorTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[4];//will be 0
 			}
+			//model.updateUniversalParameter();
 		}
 		else
 		{
@@ -479,6 +501,39 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, PANSEMode
 				likelihoodTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[1];
 				posteriorTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[3];
 			}	
+		}
+	}
+	else
+	{
+		for (unsigned i = 0; i < size; i++)
+		{
+
+			std::string grouping = model.getGrouping(groups[i]);
+			// calculate likelihood ratio for every Category for current AA (ROC, FONSE) or Codon (PA, PANSE)
+			model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures,param_2);
+			double threshold = -Parameter::randExp(1);
+			if (threshold < acceptanceRatioForAllMixtures[0] && std::isfinite(acceptanceRatioForAllMixtures[0]) && !std::isnan(acceptanceRatioForAllMixtures[2]) && acceptanceRatioForAllMixtures[1] != 0)
+			{	
+				// moves proposed codon specific parameters to current codon specific parameters
+				if (std::isnan(acceptanceRatioForAllMixtures[0]))
+				{
+					my_print("ERROR: Accepted proposed value that results in NaN\n");
+				}
+				model.updateCodonSpecificParameter(grouping,param_2);
+				if ((iteration % thinning) == 0 && acceptanceRatioForAllMixtures[2] != 0)
+				{
+					likelihoodTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[2];//will be 0
+					posteriorTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[4];//will be 0
+				}
+			}
+			else
+			{
+				if ((iteration % thinning) == 0 && acceptanceRatioForAllMixtures[1] != 0)
+				{
+					likelihoodTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[1];
+					posteriorTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[3];
+				}	
+			}
 		}
 	}
 	
