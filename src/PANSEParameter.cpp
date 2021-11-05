@@ -689,19 +689,32 @@ void PANSEParameter::proposeCodonSpecificParameter()
 
     for (unsigned i = 0; i < numMutationCategories; i++)
     {
-        for (unsigned j = 0; j < numNSE; j++)
-        {
-        	if (fix_nse)
+
+    	if (share_nse)
+    	{
+    		double nserate = std::exp( randNorm( std::log(currentCodonSpecificParameter[nse][i][0]) , std_nse[0]) );
+    		for (unsigned j = 0; j < numNSE; j++)
         	{
-        		proposedCodonSpecificParameter[nse][i][j] = currentCodonSpecificParameter[nse][i][j];
-        	}
-        	else
-        	{
-        		
-        		proposedCodonSpecificParameter[nse][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[nse][i][j]) , std_nse[j]) );
-        		
+        		proposedCodonSpecificParameter[nse][i][j] = nserate;
         	}
     	}
+        else 
+        {
+        	for (unsigned j = 0; j < numNSE; j++)
+        	{
+	        	if (fix_nse)
+	        	{
+	        		proposedCodonSpecificParameter[nse][i][j] = currentCodonSpecificParameter[nse][i][j];
+	        	}
+	        	else
+	        	{
+	        		
+	        		proposedCodonSpecificParameter[nse][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[nse][i][j]) , std_nse[j]) );
+	        		
+	        	}
+    		}
+        }
+        
     }
 	
 }
@@ -728,7 +741,6 @@ void PANSEParameter::updateCodonSpecificParameter(std::string grouping,std::stri
 	if (param == "Elongation")
 	{
 		numAcceptForCodonSpecificParameters[i]++;
-		//my_print("% % % %\n",grouping,i,param,numAcceptForCodonSpecificParameters[i]);
 	    for (unsigned k = 0u; k < numMutationCategories; k++)
 	    {
 	        currentCodonSpecificParameter[alp][k][i] = proposedCodonSpecificParameter[alp][k][i];
@@ -740,11 +752,27 @@ void PANSEParameter::updateCodonSpecificParameter(std::string grouping,std::stri
 	}
 	else
 	{
-		numAcceptForNSERates[i]++;
-	    for (unsigned k = 0u; k < numMutationCategories; k++)
-	    {
-	        currentCodonSpecificParameter[nse][k][i] = proposedCodonSpecificParameter[nse][k][i];
-	    }
+		if (share_nse)
+		{
+			//numAcceptForNSERates[0]++;
+			for (unsigned k = 0u; k < numMutationCategories; k++)
+		    {
+		    	unsigned numNSE = (unsigned)currentCodonSpecificParameter[nse][0].size();
+		    	for (unsigned j = 0; j < numNSE; j ++)
+		    	{
+		    		numAcceptForNSERates[j]++;
+		        	currentCodonSpecificParameter[nse][k][j] = proposedCodonSpecificParameter[nse][k][j];
+		        }
+		    }
+		}
+		else
+		{
+			numAcceptForNSERates[i]++;
+		    for (unsigned k = 0u; k < numMutationCategories; k++)
+		    {
+		        currentCodonSpecificParameter[nse][k][i] = proposedCodonSpecificParameter[nse][k][i];
+		    }
+		}
 	}
 }
 
@@ -853,9 +881,11 @@ void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptatio
   //Gelman BDA 3rd Edition suggests a target acceptance rate of 0.23
   // for high dimensional problems
   //Adjust proposal variance to try and get within this range
+  
+  double acceptanceLevel_elong,acceptanceLevel_nse;
+
   unsigned acceptanceUnder = 0u;
   unsigned acceptanceOver = 0u;
-
   double acceptanceTargetLow = 0.225; //below this value weighted sum adjustment is applied, was 0.2
   double acceptanceTargetHigh = 0.325;///above this value weighted sum adjustment is applied, was 0.3
   double diffFactorAdjust = 0.05; //sets when multiplication factor adjustment is applied, was 0.1 and 0.0, respectively
@@ -877,14 +907,15 @@ void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptatio
   my_print("Adjustment range: < % or > % \n", acceptanceTargetLow, acceptanceTargetHigh );
  //my_print("\tCodon\tElongation Acc.Rat\tNSERate Acc. Rate\tAverage Acc. Rate\n"); //Prop.Width\n";
 
-  my_print("\tCodon\tAcc.Rat\n"); //Prop.Width\n";
+  my_print("\tCodon\tAcc.Rat (Elongation)\tAcc.Rat (NSERate)\n"); //Prop.Width\n";
 
   for (unsigned i = 0; i < groupList.size(); i++) //cycle through all of the aa
   {
   	std::string codon = groupList[i];
     unsigned codonIndex = SequenceSummary::codonToIndex(codon);
-    double acceptanceLevel_elong = (double)numAcceptForCodonSpecificParameters[codonIndex] / (double)adaptationWidth;
-    double acceptanceLevel_nse = (double)numAcceptForNSERates[codonIndex] / (double)adaptationWidth;
+    acceptanceLevel_elong = (double)numAcceptForCodonSpecificParameters[codonIndex] / (double)adaptationWidth;
+    acceptanceLevel_nse = (double)numAcceptForNSERates[codonIndex] / (double)adaptationWidth;
+    
     my_print("\t%:\t%\t%\n", codon.c_str(), acceptanceLevel_elong,acceptanceLevel_nse);
    	//my_print("\t%:\t%\n", codon.c_str(), acceptanceLevel_elong);
    
@@ -1125,6 +1156,10 @@ void PANSEParameter::shareNSERate()
 	share_nse = true;
 }
 
+bool PANSEParameter::isNSEShared()
+{
+	return(share_nse);
+}
 
 
 void PANSEParameter::initNSERateR(double NSERateValue, unsigned mixtureElement, std::string codon)

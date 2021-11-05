@@ -351,9 +351,8 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 				else if (variableName == "obsPhiSets")
 				{
 					iss.str(tmp);
-					my_print("read\n");
 					iss >> obsPhiSets;
-					my_print("%",obsPhiSets);
+				
 				}
 				else if (variableName == "currentSynthesisRateLevel")
 				{

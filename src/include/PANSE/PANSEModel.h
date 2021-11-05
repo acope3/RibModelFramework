@@ -173,6 +173,8 @@ class PANSEModel: public Model
 		virtual void calculateProposedZ(std::string grouping,Genome& genome,std::string param);
 		virtual void calculateUniversalParameter(Genome& genome,unsigned index,unsigned k);
 		virtual void updateUniversalParameter();
+
+		virtual bool shareNSE();
 	protected:
 		
 };
