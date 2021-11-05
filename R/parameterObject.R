@@ -705,15 +705,6 @@ getNSEProbabilityTrace <- function(parameter,mixture,codon,samples)
   return(prob.nse.trace[(length(prob.nse.trace)-samples):length(prob.nse.trace)])
 }
 
-getEffectiveSampleSizesByCodon <- function(parameter,codon,samples,paramType,mixture=1,thin=10,withoutReference=T)
-{
-  trace <- parameter$getTraceObject()
-  trace.vec <-trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture,codon,paramType,withoutReference)
-  trace.vec <- trace.vec[(length(trace.vec)-samples):(length(trace.vec))]
-  mcmc.csp <- coda::mcmc(trace.vec,thin)
-  return(coda::effectiveSize(mcmc.csp))     
-}
-
 
 
 getEffectiveSampleSizesByCodon <- function(parameter,codon,samples,paramType,mixture=1,thin=10,withoutReference=T)
@@ -1277,30 +1268,40 @@ getExpressionEstimates <- function(parameter, gene.index, samples, quantiles=c(0
     parameter$getSynthesisRatePosteriorMeanForGene(samples, geneIndex, TRUE) 
   }))
   
-  expressionStdErr <- sqrt(unlist(lapply(gene.index, function(geneIndex){ 
+  expressionStdDev <- sqrt(unlist(lapply(gene.index, function(geneIndex){ 
     parameter$getSynthesisRateVarianceForGene(samples, geneIndex, TRUE, FALSE) 
   })))
   
-  expressionStdErrLog <- sqrt(unlist(lapply(gene.index, function(geneIndex){ 
+  expressionStdDevLog <- sqrt(unlist(lapply(gene.index, function(geneIndex){ 
     parameter$getSynthesisRateVarianceForGene(samples, geneIndex, TRUE, TRUE) 
   })))
   
   expressionQuantile <- lapply(gene.index, function(geneIndex){ 
     parameter$getExpressionQuantile(samples, geneIndex, quantiles, FALSE) 
   })
-  expressionQuantile <- do.call(rbind, expressionQuantile)
-  
+  expressionQuantile <- data.frame(do.call(rbind, expressionQuantile),stringsAsFactors = F)
+  colnames(expressionQuantile) <- quantiles
   expressionQuantileLog <- lapply(gene.index, function(geneIndex){ 
     parameter$getExpressionQuantile(samples, geneIndex, quantiles, TRUE) 
   })
-  expressionQuantileLog <- do.call(rbind, expressionQuantileLog)
+  expressionQuantileLog <- data.frame(do.call(rbind, expressionQuantileLog),stringsAsFactors = F)
+  colnames(expressionQuantileLog) <- paste("log10.", quantiles, sep="")
   if (is.null(genome))
   {
-    expr.mat <- cbind(expressionValues, expressionValuesLog, expressionStdErr, expressionStdErrLog, expressionQuantile, expressionQuantileLog)
-    colnames(expr.mat) <- c("Mean", "Mean.log10", "Std.Dev", "log10.Std.Dev", quantiles, paste("log10.", quantiles, sep=""))
+    expr.mat <- data.frame(Mean=expressionValues,
+                           Mean.log10=expressionValuesLog,
+                           Std.Dev=expressionStdDev,
+                           log10.Std.Dev=expressionStdDevLog,
+                           stringsAsFactors = F)
+    expr.mat <- do.call(cbind,list(expr.mat,expressionQuantile,expressionQuantileLog))
   } else {
-    expr.mat <- cbind(geneID,expressionValues, expressionValuesLog, expressionStdErr, expressionStdErrLog, expressionQuantile, expressionQuantileLog)
-    colnames(expr.mat) <- c("GeneID","Mean", "Mean.log10", "Std.Dev", "log10.Std.Dev", quantiles, paste("log10.", quantiles, sep=""))
+    expr.mat <- data.frame(GeneID=geneID,
+                           Mean=expressionValues,
+                           Mean.log10=expressionValuesLog,
+                           Std.Dev=expressionStdDev,
+                           log10.Std.Dev=expressionStdDevLog,
+                           stringsAsFactors = F)
+    expr.mat <- do.call(cbind,list(expr.mat,expressionQuantile,expressionQuantileLog))
   }
   return(expr.mat)
 }
