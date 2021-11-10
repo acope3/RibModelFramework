@@ -11,7 +11,7 @@ FONSEModel::FONSEModel(bool _withPhi, bool _fix_sEpsilon) : Model()
 	parameter = 0;
 	withPhi = _withPhi;
 	fix_sEpsilon = _fix_sEpsilon;
-
+	parameter_types = {"Evolutionary"};
 }
 
 
@@ -151,7 +151,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 }
 
 
-void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, std::vector<double> &logAcceptanceRatioForAllMixtures)
+void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, std::vector<double> &logAcceptanceRatioForAllMixtures,std::string param)
 {
 	unsigned numGenes = genome.getGenomeSize();
 	//int numCodons = SequenceSummary::GetNumCodonsForAA(grouping);

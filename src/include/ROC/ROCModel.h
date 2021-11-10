@@ -8,13 +8,10 @@ class ROCModel : public Model
 {
     private:
 		ROCParameter *parameter;
-		bool withPhi;
-		bool fix_sEpsilon;
 
 		double calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codonCount[], double mutation[], double selection[], double phiValue);
 		double calculateMutationPrior(std::string grouping, bool proposed = false); // TODO add to FONSE as well? // cedric
 		void obtainCodonCount(SequenceSummary *sequenceSummary, std::string curAA, int codonCount[]);
-
     public:
 		//Constructors & Destructors:
 		ROCModel(bool _withPhi = false, bool _fix_sEpsilon = false);
@@ -26,7 +23,7 @@ class ROCModel : public Model
 		virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k,
 					double* logProbabilityRatio);
 		virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
-					std::vector<double> &logAcceptanceRatioForAllMixtures);
+					std::vector<double> &logAcceptanceRatioForAllMixtures, std::string param="Evolutionary");
 		virtual void calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration,
 					std::vector <double> &logProbabilityRatio);
 

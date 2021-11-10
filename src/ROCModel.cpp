@@ -11,6 +11,7 @@ ROCModel::ROCModel(bool _withPhi, bool _fix_sEpsilon) : Model()
 	parameter = 0;
 	withPhi = _withPhi;
 	fix_sEpsilon = _fix_sEpsilon;
+	parameter_types = {"Evolutionary"};
 }
 
 
@@ -149,7 +150,7 @@ void ROCModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex
 }
 
 
-void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, std::vector<double> &logAcceptanceRatioForAllMixtures)
+void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, std::vector<double> &logAcceptanceRatioForAllMixtures,std::string param)
 {
 	int numGenes = genome.getGenomeSize();
 	unsigned numCodons = SequenceSummary::GetNumCodonsForAA(grouping);

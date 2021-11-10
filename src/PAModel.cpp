@@ -16,6 +16,7 @@ PAModel::PAModel(unsigned _RFPCountColumn,bool _withPhi, bool _fix_sEpsilon) : M
 	RFPCountColumn = _RFPCountColumn - 1;
 	withPhi = _withPhi;
 	fix_sEpsilon = _fix_sEpsilon;
+	parameter_types = {"Elongation"};
 }
 
 
@@ -214,7 +215,7 @@ void PAModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex,
 
 
 void PAModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
-                                                                std::vector<double> &logAcceptanceRatioForAllMixtures)
+                                                                std::vector<double> &logAcceptanceRatioForAllMixtures,std::string param)
 {
 	double currAlpha,currLambdaPrime,propAlpha,propLambdaPrime;
 	double logLikelihood, logPosterior = 0.0;

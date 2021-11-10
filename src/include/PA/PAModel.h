@@ -13,8 +13,6 @@ class PAModel: public Model
 		PAParameter *parameter;
 		unsigned RFPCountColumn;
 
-
-
 		double calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
 				unsigned currRFPValue, unsigned currNumCodonsInMRNA, double phiValue);
 		virtual void calculateZ(std::string grouping,Genome& genome,std::vector<double> &Z);
@@ -32,7 +30,7 @@ class PAModel: public Model
 		virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k,
 				double* logProbabilityRatio); // Depends on RFPCountColumn
 		virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
-				std::vector<double> &logAcceptanceRatioForAllMixtures); // Depends on RFPCountColumn
+				std::vector<double> &logAcceptanceRatioForAllMixtures,std::string param="Elongation"); // Depends on RFPCountColumn
 		virtual void calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration,
 				std::vector <double> &logProbabilityRatio);
 

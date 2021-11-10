@@ -23,8 +23,7 @@ class PANSEModel: public Model
         std::vector<double> prob_successful;
 
         
-        
-        
+ 
         std::vector<double> Z;
 
 	public:

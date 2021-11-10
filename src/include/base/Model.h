@@ -11,8 +11,7 @@ class Model
 
 		double calculatePriorForCodonSpecificParam(Parameter *parameter, std::string grouping, unsigned paramType,
 					bool proposed = false);
-
-
+		
     public:
 		//Constructors & Destructors:
         explicit Model();
@@ -20,13 +19,13 @@ class Model
         virtual ~Model();
         Model& operator=(const Model& rhs);
 
-        std::string type;
+        
 
         //Likelihood Ratio Functions:
         virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k,
 					double* logProbabilityRatio) = 0;
         virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
-         			std::vector<double> &logAcceptanceRatioForAllMixtures) = 0;
+         			std::vector<double> &logAcceptanceRatioForAllMixtures, std::string param = "") = 0;
 		virtual void calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration,
 					std::vector <double> &logProbabilityRatio) = 0;
 
@@ -126,10 +125,15 @@ class Model
 
 		virtual void calculateUniversalParameter(Genome& genome,unsigned index,unsigned k);
 		virtual void updateUniversalParameter();
+	
+		std::vector<std::string> getParameterTypeList();
+
 	protected:
 		bool withPhi;
 		bool fix_sEpsilon;
+		std::vector<std::string> parameter_types;
 		
+
 };
 
 #endif // MODEL_H

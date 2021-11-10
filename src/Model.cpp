@@ -3,6 +3,7 @@
 Model::Model()
 {
   //ctor
+  parameter_types = {};
 }
 
 // TODO: Rule of Three dictates we may need a copy assignment operator as well (operator=)
@@ -45,6 +46,11 @@ double Model::calculatePriorForCodonSpecificParam(Parameter *parameter, std::str
 		}
 	}
 	return priorValue;
+}
+
+std::vector<std::string> Model::getParameterTypeList()
+{
+	return parameter_types;
 }
 
 

@@ -16,7 +16,8 @@ PANSEModel::PANSEModel(unsigned _RFPCountColumn, bool _withPhi, bool _fix_sEpsil
     RFPCountColumn = _RFPCountColumn - 1;
     withPhi = _withPhi;
     fix_sEpsilon = _fix_sEpsilon;
-    Z.resize(2);
+    Z.resize(1);
+    parameter_types = {"Elongation","NSERate"};
     //ctor
 }
 
