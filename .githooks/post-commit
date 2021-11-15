@@ -1,0 +1,16 @@
+# Script to add SHA Hash (commit ID) PRIOR to commit your about to make.
+# The prior value is used because it's impossible to predict what the SHA will be and it will depend on the commit
+# See: https://stackoverflow.com/a/14208345/5322644 for why you have to use the previous one
+# Code Source: https://stackoverflow.com/a/56220622/5322644
+# To use script you need to create a link to it (don't change the name!) in .git/hooks
+#
+
+echo "••••••••••••••••••••••••••••••••••••••••••••"
+echo "• Updating package date
+echo "• Updating version number w/pre-commit hash•"
+echo "••••••••••••••••••••••••••••••••••••••••••••"
+sed -i -E "s/^Date: .*/Date: $(date '+%Y-%m-%d')/" DESCRIPTION
+# get latest tags
+preCommitID=`git log --pretty=format:'%h' -n 1`
+sed -i -E "s/^Version: (.*prior.commit-)/Version: \1${new_version}/" DESCRIPTION
+# 
