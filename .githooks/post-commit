@@ -11,6 +11,6 @@ echo "• Updating version number w/pre-commit hash•"
 echo "••••••••••••••••••••••••••••••••••••••••••••"
 sed -i -E "s/^Date: .*/Date: $(date '+%Y-%m-%d')/" DESCRIPTION
 # get latest tags
-preCommitID=`git log --pretty=format:'%h' -n 1`
-sed -i -E "s/^Version: (.*prior.commit-)/Version: \1${new_version}/" DESCRIPTION
+preCommitID=`git log --pretty=format:'%H' -n 1`
+sed -i -E "s/^GitCommitHash: .*/GitCommitHash: ${preCommitID}/" DESCRIPTION
 # 
