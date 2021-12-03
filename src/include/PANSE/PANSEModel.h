@@ -151,7 +151,7 @@ class PANSEModel: public Model
         double elongationUntilIndexApproximation1Probability(double alpha, double lambda, double v, double current);
         double elongationUntilIndexApproximation2Probability(double alpha, double lambda, double v, bool proposed);
         double elongationUntilIndexApproximation1ProbabilityLog(double alpha, double lambda, double v);
-        double elongationUntilIndexApproximation2ProbabilityLog(double alpha, double lambda, double v, double current);
+        double elongationUntilIndexApproximation2ProbabilityLog(double alpha, double lambda, double v);
 
         //Psi-Phi Conversion Functions
         double psi2phi(double psi, double sigma);

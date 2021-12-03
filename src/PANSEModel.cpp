@@ -16,7 +16,7 @@ PANSEModel::PANSEModel(unsigned _RFPCountColumn, bool _withPhi, bool _fix_sEpsil
     RFPCountColumn = _RFPCountColumn - 1;
     withPhi = _withPhi;
     fix_sEpsilon = _fix_sEpsilon;
-    Z.resize(1);
+    Z.resize(2);
     parameter_types = {"Elongation","NSERate"};
     //ctor
 }
@@ -281,7 +281,7 @@ void PANSEModel::fillMatrices(Genome& genome)
                 
             tmp[k] = std::lgamma(currAlpha);
             tmp_2[k] = std::log(currLambda) + std::log(U);
-            prob_successful[k] = elongationProbabilityLog(currAlpha, currLambda,1/currNSERate);
+            prob_successful[k] = elongationUntilIndexApproximation1ProbabilityLog(currAlpha, currLambda,1/currNSERate);
             if (prob_successful[k] > 0.0)
             {
                 prob_successful[k] = std::numeric_limits<double>::quiet_NaN();
@@ -486,7 +486,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
         
         double propSigma = 0;
         double currSigma = 0;
-       
+        
         for (unsigned positionIndex = 0; positionIndex < positions.size(); positionIndex++)
         {
             positionalRFPCount = rfpCounts[positionIndex];
@@ -495,7 +495,6 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
             currAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, false);
             currLambda = getParameterForCategory(lambdaCategory, PANSEParameter::lmPri, codon, false);
             currNSERate = getParameterForCategory(alphaCategory, PANSEParameter::nse, codon, false);
-            
             if (positionalRFPCount < 50)
             {
                 currLgammaRFPAlpha = lgamma_rfp_alpha[positionalRFPCount][alphaCategory][codonIndex];
@@ -512,7 +511,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                                 phiValue,std::exp(propSigma),lgamma_currentAlpha[alphaCategory][codonIndex],log_currentLambda[lambdaCategory][codonIndex],logPhi,currLgammaRFPAlpha);
                 if (prop_prob_successful[codonIndex] > 500)
                 {
-                    prop_prob_successful[codonIndex] = elongationProbabilityLog(currAlpha, currLambda,1/propNSERate);
+                    prop_prob_successful[codonIndex] = elongationUntilIndexApproximation1ProbabilityLog(currAlpha, currLambda,1/propNSERate);
                     if (prop_prob_successful[codonIndex] > 0.0)
                     {
                         prop_prob_successful[codonIndex] = std::numeric_limits<double>::quiet_NaN();
@@ -530,7 +529,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                                     phiValue,std::exp(propSigma),std::lgamma(propAlpha),std::log(propLambda) + std::log(U),logPhi,std::lgamma(propAlpha+positionalRFPCount));
                     if (prop_prob_successful[codonIndex] > 500)
                     {
-                        prop_prob_successful[codonIndex] = elongationProbabilityLog(propAlpha, propLambda,1/currNSERate);
+                        prop_prob_successful[codonIndex] = elongationUntilIndexApproximation1ProbabilityLog(propAlpha, propLambda,1/currNSERate);
                         if (prop_prob_successful[codonIndex] > 0.0)
                         {
                             prop_prob_successful[codonIndex] = std::numeric_limits<double>::quiet_NaN();
@@ -546,7 +545,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                                     phiValue,std::exp(propSigma),lgamma_currentAlpha[alphaCategory][codonIndex],log_currentLambda[lambdaCategory][codonIndex],logPhi,currLgammaRFPAlpha);
                     if (prop_prob_successful[codonIndex] > 500)
                     {
-                        prop_prob_successful[codonIndex] = elongationProbabilityLog(currAlpha, currLambda,1/propNSERate);
+                        prop_prob_successful[codonIndex] = elongationUntilIndexApproximation1ProbabilityLog(currAlpha, currLambda,1/propNSERate);
                         if (prop_prob_successful[codonIndex] > 0.0)
                         {
                             prop_prob_successful[codonIndex] = std::numeric_limits<double>::quiet_NaN();
@@ -1602,9 +1601,9 @@ double PANSEModel::elongationUntilIndexApproximation1ProbabilityLog(double alpha
 {
     return (-1*(alpha/(lambda * v)));   	   
 }
-double PANSEModel::elongationUntilIndexApproximation2ProbabilityLog(double alpha, double lambda, double v, double current)
+double PANSEModel::elongationUntilIndexApproximation2ProbabilityLog(double alpha, double lambda, double v)
 {
-	return current + (-(alpha/(lambda * v)) + (alpha/(lambda * lambda * v * v))
+	return (-(alpha/(lambda * v)) + (alpha/(lambda * lambda * v * v))
                       + ((alpha/(lambda * v)) * (alpha/(lambda * v))) / 2);
 }
 

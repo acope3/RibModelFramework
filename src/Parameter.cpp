@@ -1375,7 +1375,7 @@ void Parameter::adaptStdDevSynthesisRateProposalWidth(unsigned adaptationWidth, 
 {
 	double acceptanceLevel = (double)numAcceptForStdDevSynthesisRate / (double)adaptationWidth;
 	traces.updateStdDevSynthesisRateAcceptanceRateTrace(acceptanceLevel);
-	if (adapt)
+	if (adapt && !fix_stdDevSynthesis)
 	{
 		if (acceptanceLevel < 0.2)
 			std_stdDevSynthesisRate *= 0.8;

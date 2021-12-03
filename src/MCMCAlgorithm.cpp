@@ -451,7 +451,6 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, PANSEMode
 			
 			// moves proposed codon specific parameters to current codon specific parameters
 			model.updateCodonSpecificParameter(grouping,param_1);
-			//model.updateUniversalParameter();
 		}
 	}
 	else
@@ -472,7 +471,6 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, PANSEMode
 				
 				// moves proposed codon specific parameters to current codon specific parameters
 				model.updateCodonSpecificParameter(grouping,param_1);
-				//model.updateUniversalParameter();
 			}	
 		}
 	}
