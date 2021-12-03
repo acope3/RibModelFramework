@@ -111,7 +111,7 @@ class ROCModel : public Model
 		virtual void printHyperParameters();
 		ROCParameter getParameter();
 		void setParameter(ROCParameter &_parameter);
-		virtual double calculateAllPriors();
+		virtual double calculateAllPriors(bool proposed=false);
 		void calculateCodonProbabilityVector(unsigned numCodons, double mutation[], double selection[], double phi, double codonProb[]);
 		void calculateLogCodonProbabilityVector(unsigned numCodons, double mutation[], double selection[], double phi, double codonProb[]);
 		virtual void getParameterForCategory(unsigned category, unsigned param, std::string aa, bool proposal, double* returnValue);

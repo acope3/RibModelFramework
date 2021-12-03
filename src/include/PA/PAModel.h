@@ -100,7 +100,7 @@ class PAModel: public Model
 		virtual void setMixtureAssignment(unsigned i, unsigned catOfGene);
 		virtual void setCategoryProbability(unsigned mixture, double value);
 
-		virtual void updateCodonSpecificParameter(std::string aa);
+		virtual void updateCodonSpecificParameter(std::string codon);
 		virtual void completeUpdateCodonSpecificParameter();
 		//virtual void updateGibbsSampledHyperParameters(Genome &genome);
 		virtual void updateAllHyperParameter();
@@ -112,7 +112,7 @@ class PAModel: public Model
 		//virtual void printCodonSpecificParameters();
 		PAParameter* getParameter();
 		void setParameter(PAParameter &_parameter);
-		virtual double calculateAllPriors();
+		virtual double calculateAllPriors(bool proposed=false);
 		virtual double calculateAlphaPrior(std::string grouping,bool proposed=false);
 		virtual double calculateLambdaPrior(std::string grouping,bool proposed=false);
 	

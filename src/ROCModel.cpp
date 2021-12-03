@@ -820,7 +820,7 @@ void ROCModel::setParameter(ROCParameter &_parameter)
 }
 
 
-double ROCModel::calculateAllPriors()
+double ROCModel::calculateAllPriors(bool proposed)
 {
 	double prior = 0.0;
 	unsigned size = getGroupListSize();
@@ -828,7 +828,7 @@ double ROCModel::calculateAllPriors()
 	for (unsigned i = 0; i < size; i++)
 	{
 		std::string grouping = getGrouping(i);
-		prior += calculateMutationPrior(grouping, false);
+		prior += calculateMutationPrior(grouping, proposed);
 	}
 
 	// add more priors if necessary.

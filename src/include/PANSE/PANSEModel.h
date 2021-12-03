@@ -135,7 +135,7 @@ class PANSEModel: public Model
 		PANSEParameter* getParameter();
 
 		void setParameter(PANSEParameter &_parameter);
-		virtual double calculateAllPriors();
+		virtual double calculateAllPriors(bool proposed=false);
 		virtual double calculateAlphaPrior(std::string grouping,bool proposed=false);
 		virtual double calculateLambdaPrior(std::string grouping,bool proposed=false);
 		virtual double calculateNSERatePrior(std::string grouping,bool proposed=false);
@@ -174,6 +174,8 @@ class PANSEModel: public Model
 		virtual void updateUniversalParameter();
 
 		virtual bool shareNSE();
+		virtual bool fixedAlpha();
+		virtual bool fixedLambda();
 	protected:
 		
 };

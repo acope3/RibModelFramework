@@ -71,6 +71,8 @@ class PANSEParameter: public Parameter {
 		void fixNSERate();
 		void fixZ();
 		void shareNSERate();
+		bool isAlphaFixed();
+		bool isLambdaFixed();
 		bool isNSEShared();
 
         //CSP Read Functions:

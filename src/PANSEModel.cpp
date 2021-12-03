@@ -1035,6 +1035,17 @@ void PANSEModel::updateTracesWithInitialValues(Genome & genome)
 
 
 
+bool PANSEModel::fixedAlpha()
+{
+    return(parameter->isAlphaFixed());
+}
+
+bool PANSEModel::fixedLambda()
+{
+    return(parameter->isLambdaFixed());
+}
+
+
 bool PANSEModel::shareNSE()
 {
     return(parameter->isNSEShared());
@@ -1478,7 +1489,7 @@ double PANSEModel::calculateNSERatePrior(std::string grouping,bool proposed)
 	return priorValue;
 }
 
-double PANSEModel::calculateAllPriors()
+double PANSEModel::calculateAllPriors(bool proposed)
 {
    	double prior = 0.0;
 	unsigned size = getGroupListSize();
@@ -1486,9 +1497,9 @@ double PANSEModel::calculateAllPriors()
 	for (unsigned i = 0; i < size; i++)
 	{
 		std::string grouping = getGrouping(i);
-		prior += calculateNSERatePrior(grouping, false);
-        prior += calculateAlphaPrior(grouping, false);
-        prior += calculateLambdaPrior(grouping, false);
+		prior += calculateNSERatePrior(grouping, proposed);
+        prior += calculateAlphaPrior(grouping, proposed);
+        prior += calculateLambdaPrior(grouping, proposed);
 	}
 
 	// add more priors if necessary.

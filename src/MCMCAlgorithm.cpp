@@ -431,7 +431,13 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, PANSEMode
 		param_1 = "NSE";
 	}
 	bool share_nse = model.shareNSE();
-	if (param_1 == "NSE" && share_nse)
+	bool fix_alpha = model.fixedAlpha();
+	bool fix_lambda = model.fixedLambda();
+	if (param_1 == "Elongation" && fix_alpha && fix_lambda)
+	{
+		//do nothing
+	}
+	else if (param_1 == "NSE" && share_nse)
 	{
 		std::string grouping = model.getGrouping(groups[0]);
 		model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures,param_1);
@@ -472,7 +478,11 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, PANSEMode
 	}
 
 	std::shuffle ( groups.begin(), groups.end(),e);
-	if (param_2 == "NSE" && share_nse)
+	if (param_2 == "Elongation" && fix_alpha && fix_lambda)
+	{
+		//do nothing
+	}
+	else if (param_2 == "NSE" && share_nse)
 	{
 
 		std::string grouping = model.getGrouping(groups[0]);
@@ -960,10 +970,7 @@ void MCMCAlgorithm::run_PANSE(Genome& genome, PANSEModel& model, unsigned numCor
 */
 void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned divergenceIterations)
 {
-	// Currently unused variables
-	//double previous_post = 0.0;
-	//double current_post = 0.0;
-
+	
 	// NOTE: IF PRIORS ARE ADDED, TAKE INTO ACCOUNT HERE!
 	my_print("Allowing divergence from initial conditions for % iterations.\n\n", divergenceIterations);
 	// divergence from initial conditions is not stored in trace
@@ -971,9 +978,16 @@ void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned
 	// how many steps do you want to walk "away" from the initial conditions
 	for (unsigned iteration = 0u; iteration < divergenceIterations; iteration++)
 	{
+		double prior = std::numeric_limits<double>::quiet_NaN();
 		if (estimateCodonSpecificParameter)
 		{
-			model.proposeCodonSpecificParameter();
+			// If proposed parameters go outside the accepatble boundaries, propose new set of parameters.
+			// Should only matter for PA or PANSE
+			while (std::isnan(prior) || !std::isfinite(prior))
+			{
+				model.proposeCodonSpecificParameter();
+				prior = model.calculateAllPriors(true);
+			}
 		}
 		if (estimateHyperParameter)
 		{
@@ -986,13 +1000,14 @@ void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned
 		// no prior on codon specific parameters -> just accept everything
 		if (estimateCodonSpecificParameter)
 		{
+
 			unsigned size = model.getGroupListSize();
 			for (unsigned i = 0; i < size; i++)
 			{
 				std::string grouping = model.getGrouping(i);
 				model.updateCodonSpecificParameter(grouping);
 			}
-			//model.completeUpdateCodonSpecificParameter();
+			
 		}
 		// no prior on hyper parameters -> just accept everything
 		if (estimateHyperParameter)

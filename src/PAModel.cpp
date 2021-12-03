@@ -672,9 +672,9 @@ void PAModel::setCategoryProbability(unsigned mixture, double value)
 }
 
 
-void PAModel::updateCodonSpecificParameter(std::string aa)
+void PAModel::updateCodonSpecificParameter(std::string codon)
 {
-	parameter->updateCodonSpecificParameter(aa);
+	parameter->updateCodonSpecificParameter(codon);
 }
 
 void PAModel::completeUpdateCodonSpecificParameter()
@@ -918,7 +918,7 @@ void PAModel::setParameter(PAParameter &_parameter)
 }
 
 
-double PAModel::calculateAllPriors()
+double PAModel::calculateAllPriors(bool proposed)
 {
 	double prior = 0.0;
 	unsigned size = getGroupListSize();
@@ -926,8 +926,8 @@ double PAModel::calculateAllPriors()
 	for (unsigned i = 0; i < size; i++)
 	{
 		std::string grouping = getGrouping(i);
-        prior += calculateAlphaPrior(grouping, false);
-        prior += calculateLambdaPrior(grouping, false);
+        prior += calculateAlphaPrior(grouping, proposed);
+        prior += calculateLambdaPrior(grouping, proposed);
 	}
 
 	// add more priors if necessary.

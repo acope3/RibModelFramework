@@ -878,7 +878,7 @@ void FONSEModel::setParameter(FONSEParameter &_parameter)
 }
 
 
-double FONSEModel::calculateAllPriors()
+double FONSEModel::calculateAllPriors(bool proposed)
 {
 	double priorRatio = 0.0;
 	unsigned size = getGroupListSize();
@@ -886,7 +886,7 @@ double FONSEModel::calculateAllPriors()
 	for (unsigned i = 0; i < size; i++)
 	{
 		std::string grouping = getGrouping(i);
-		priorRatio += calculateMutationPrior(grouping, false);
+		priorRatio += calculateMutationPrior(grouping, proposed);
 	}
 
 	// add more priors if necessary.
