@@ -168,11 +168,6 @@ class PANSEModel: public Model
 		virtual void updateGibbsSampledHyperParameters(Genome &genome);
 
 		
-		virtual void initializeZ(Genome &genome);
-		virtual void calculateProposedZ(std::string grouping,Genome& genome,std::string param);
-		virtual void calculateUniversalParameter(Genome& genome,unsigned index,unsigned k);
-		virtual void updateUniversalParameter();
-
 		virtual bool shareNSE();
 		virtual bool fixedAlpha();
 		virtual bool fixedLambda();
