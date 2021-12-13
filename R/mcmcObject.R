@@ -146,13 +146,8 @@ runMCMC <- function(mcmc, genome, model, ncores = 1, divergence.iteration = 0){
   if (ncores < 1 || !all(ncores == as.integer(ncores))) {
     stop("ncores must be a positive integer\n")
   }
-  if(class(model) == "Rcpp_PANSEModel")
-  {
-    mcmc$run_PANSE(genome, model, ncores, divergence.iteration)
-  } else
-  {
-   mcmc$run(genome, model, ncores, divergence.iteration)
-  }
+  print(class(model))
+  mcmc$run(genome, model, ncores, divergence.iteration)
 }
 
 

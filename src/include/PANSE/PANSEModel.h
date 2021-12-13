@@ -39,9 +39,7 @@ class PANSEModel: public Model
 		//Likelihood Ratio Functions:
 		virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k,
 				double* logProbabilityRatio); // Depends on RFPCountColumn
-		//purely a placeholder
-		virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
-				std::vector<double> &logAcceptanceRatioForAllMixtures);
+		
 		virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
 				std::vector<double> &logAcceptanceRatioForAllMixtures,std::string param="Elongation"); // Depends on RFPCountColumn
 		
@@ -153,24 +151,26 @@ class PANSEModel: public Model
         double elongationUntilIndexApproximation1ProbabilityLog(double alpha, double lambda, double v);
         double elongationUntilIndexApproximation2ProbabilityLog(double alpha, double lambda, double v);
 
-        //Psi-Phi Conversion Functions
-        double psi2phi(double psi, double sigma);
-        double phi2psi(double phi, double sigma);
+        
 
-
-      	virtual double getNoiseOffset(unsigned index, bool proposed = false);
-		virtual double getObservedSynthesisNoise(unsigned index) ;
-		virtual double getCurrentNoiseOffsetProposalWidth(unsigned index);
-		virtual void updateNoiseOffset(unsigned index);
-		virtual void updateNoiseOffsetTrace(unsigned sample);
-		virtual void updateObservedSynthesisNoiseTrace(unsigned sample);
-		virtual void adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt = true);
-		virtual void updateGibbsSampledHyperParameters(Genome &genome);
+        // virtual double getNoiseOffset(unsigned index, bool proposed = false);
+		// virtual double getObservedSynthesisNoise(unsigned index) ;
+		// virtual double getCurrentNoiseOffsetProposalWidth(unsigned index);
+		// virtual void updateNoiseOffset(unsigned index);
+		// virtual void updateNoiseOffsetTrace(unsigned sample);
+		// virtual void updateObservedSynthesisNoiseTrace(unsigned sample);
+		// virtual void adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt = true);
+		// virtual void updateGibbsSampledHyperParameters(Genome &genome);
 
 		
 		virtual bool shareNSE();
 		virtual bool fixedAlpha();
 		virtual bool fixedLambda();
+		virtual bool fixedNSE();
+		virtual bool getParameterTypeFixed(std::string csp_parameters);
+		virtual bool isShared(std::string csp_parameters);
+
+
 	protected:
 		
 };

@@ -8,6 +8,7 @@
 class Model
 {
     private:
+    	Parameter *parameter;
 
 		double calculatePriorForCodonSpecificParam(Parameter *parameter, std::string grouping, unsigned paramType,
 					bool proposed = false);
@@ -91,14 +92,24 @@ class Model
 		virtual void adaptHyperParameterProposalWidths(unsigned adaptiveWidth, bool adapt) = 0;
 
 		//noise functions:
-		virtual double getNoiseOffset(unsigned index, bool proposed = false) = 0;
-		virtual double getObservedSynthesisNoise(unsigned index) = 0;
-		virtual double getCurrentNoiseOffsetProposalWidth(unsigned index) = 0;
-		virtual void updateNoiseOffset(unsigned index) = 0;
-		virtual void updateNoiseOffsetTrace(unsigned sample) = 0;
-		virtual void updateObservedSynthesisNoiseTrace(unsigned sample) = 0;
-		virtual void adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt = true) = 0;
-		virtual void updateGibbsSampledHyperParameters(Genome &genome) = 0;
+		// virtual double getNoiseOffset(unsigned index, bool proposed = false) = 0;
+		// virtual double getObservedSynthesisNoise(unsigned index) = 0;
+		// virtual double getCurrentNoiseOffsetProposalWidth(unsigned index) = 0;
+		// virtual void updateNoiseOffset(unsigned index) = 0;
+		// virtual void updateNoiseOffsetTrace(unsigned sample) = 0;
+		// virtual void updateObservedSynthesisNoiseTrace(unsigned sample) = 0;
+		// virtual void adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt = true) = 0;
+		// virtual void updateGibbsSampledHyperParameters(Genome &genome) = 0;
+		double getNoiseOffset(unsigned index, bool proposed = false);
+		double getObservedSynthesisNoise(unsigned index) ;
+		double getCurrentNoiseOffsetProposalWidth(unsigned index);
+		void updateNoiseOffset(unsigned index);
+		void updateNoiseOffsetTrace(unsigned sample);
+		void updateObservedSynthesisNoiseTrace(unsigned sample);
+		void adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt = true);
+		void updateGibbsSampledHyperParameters(Genome &genome);
+
+
 		//Other Functions:
 		virtual void proposeCodonSpecificParameter() = 0;
 		virtual void proposeHyperParameters() = 0;
@@ -113,7 +124,10 @@ class Model
 		virtual void setMixtureAssignment(unsigned i, unsigned catOfGene) = 0;
 		virtual void setCategoryProbability(unsigned mixture, double value) = 0;
 
+
+		
 		virtual void updateCodonSpecificParameter(std::string grouping) = 0;
+		virtual void updateCodonSpecificParameter(std::string grouping, std::string param) = 0;
 		virtual void completeUpdateCodonSpecificParameter() = 0;
 		//virtual void updateGibbsSampledHyperParameters(Genome &genome) = 0;
 		virtual void updateAllHyperParameter() = 0;
@@ -122,11 +136,15 @@ class Model
 		virtual void simulateGenome(Genome &genome) =0;
 		virtual void printHyperParameters() = 0;
 
-
-		virtual void calculateUniversalParameter(Genome& genome,unsigned index,unsigned k);
-		virtual void updateUniversalParameter();
 	
+		virtual bool getParameterTypeFixed(std::string csp_parameters) = 0;
+		virtual bool isShared(std::string csp_parameters) = 0;
 		std::vector<std::string> getParameterTypeList();
+
+
+		virtual void fillMatrices(Genome& genome);
+        virtual void clearMatrices();
+		
 
 	protected:
 		bool withPhi;

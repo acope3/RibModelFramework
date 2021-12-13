@@ -1160,9 +1160,15 @@ bool PANSEParameter::isAlphaFixed()
 {
 	return(fix_alpha);
 }
+
 bool PANSEParameter::isLambdaFixed()
 {
 	return(fix_lp);
+}
+
+bool PANSEParameter::isNSEFixed()
+{
+	return(fix_nse);
 }
 
 bool PANSEParameter::isNSEShared()
