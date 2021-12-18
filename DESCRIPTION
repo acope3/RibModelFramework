@@ -3,8 +3,8 @@ Type: Package
 Title: Analysis of Codon Data under Stationarity using a Bayesian
         Framework
 Version: 0.1.4.0
-GitCommitHash: a44e61bc6aed82cfe672652403b2970342464918
-Date: 2021-11-15
+GitCommitHash: 248234f52fc73d5bf5e166a9de04d99606b4f2e1
+Date: 2021-12-18
 Author: c(person("Cedric", "Landerer", role = c("aut", "cre"), email
         = "cedric.landerer@gmail.com"), person("Gabriel", "Hanas", role
         = "ctb"), person("Jeremy", "Rogers", role = "ctb"),
