@@ -16,7 +16,7 @@ PANSEModel::PANSEModel(unsigned _RFPCountColumn, bool _withPhi, bool _fix_sEpsil
     RFPCountColumn = _RFPCountColumn - 1;
     withPhi = _withPhi;
     fix_sEpsilon = _fix_sEpsilon;
-    parameter_types = {"Elongation","NSERate"};
+    parameter_types = {"Elongation","NSE"};
     //ctor
 }
 
@@ -67,7 +67,7 @@ void PANSEModel::fillMatrices(Genome& genome)
                 
             tmp[k] = std::lgamma(currAlpha);
             tmp_2[k] = std::log(currLambda) + std::log(U);
-            prob_successful[k] = elongationUntilIndexApproximation2ProbabilityLog(currAlpha, currLambda,1/currNSERate);
+            prob_successful[k] = elongationUntilIndexApproximation2ProbabilityLog(currAlpha, currLambda, 1/currNSERate);
             if (prob_successful[k] > 0.0)
             {
                 prob_successful[k] = std::numeric_limits<double>::quiet_NaN();
