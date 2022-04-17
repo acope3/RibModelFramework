@@ -1291,7 +1291,6 @@ double PANSEModel::calculateNSERatePrior(std::string grouping,bool proposed)
 		}
 		else
 		{
-            //priorValue = Parameter::densityLogNorm(NSERate, std::log(1e-04), 1, true);
 			priorValue = std::log(1);  
 		}
 	}
