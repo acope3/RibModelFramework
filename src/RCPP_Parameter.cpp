@@ -352,7 +352,8 @@ RCPP_MODULE(Parameter_mod)
 		//Other Functions:
 		.method("getParameterForCategory", &PAParameter::getParameterForCategoryR)
 
-
+		.method("fixAlpha",&PAParameter::fixAlpha)
+		.method("fixLambdaPrime",&PAParameter::fixLambdaPrime)
 
 		.property("proposedAlphaParameter", &PAParameter::getProposedAlphaParameter,
 		        &PAParameter::setProposedAlphaParameter) //R Specific
