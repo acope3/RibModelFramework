@@ -16,6 +16,7 @@ PAModel::PAModel(unsigned _RFPCountColumn,bool _withPhi, bool _fix_sEpsilon) : M
 	RFPCountColumn = _RFPCountColumn - 1;
 	withPhi = _withPhi;
 	fix_sEpsilon = _fix_sEpsilon;
+	parameter_types = {"Elongation"};
 }
 
 
@@ -24,62 +25,6 @@ PAModel::~PAModel()
 	//dtor
 	//TODO: call Parent's deconstructor
 	//delete parameter;
-}
-
-
-void PAModel::calculateZ(std::string grouping,Genome& genome,std::vector<double> &Z)
-{
-
-    double currAlpha,currLambda,propAlpha,propLambda;
-    double currZ = 0;
-    double propZ = 0;
-    Gene* gene;
-    std::vector<std::string> groups = parameter -> getGroupList();
-#ifdef _OPENMP
-    //#ifndef __APPLE__
-#pragma omp parallel for private(gene,currAlpha,currLambda,propAlpha,propLambda) reduction(+:currZ,propZ)
-#endif
-    for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
-    {
-        gene = &genome.getGene(i);
-        unsigned mixtureElement = parameter->getMixtureAssignment(i);
-        // how is the mixture element defined. Which categories make it up
-        unsigned alphaCategory = parameter->getMutationCategory(mixtureElement);
-        unsigned lambdaPrimeCategory = parameter->getSelectionCategory(mixtureElement);
-        unsigned synthesisRateCategory = parameter->getSynthesisRateCategory(mixtureElement);
-        
-
-        double phi = parameter->getSynthesisRate(i, synthesisRateCategory, false);
-        double currZ_gene = 0;
-	    double propZ_gene = 0;
-        for (unsigned j = 0; j < groups.size();j++)
-        {
-        	std::string codon = groups[j];
-	        unsigned currNumCodonsInMRNA = gene->geneData.getCodonCountForCodon(codon);
-	        
-	        currAlpha = getParameterForCategory(alphaCategory, PAParameter::alp, codon, false);
-	        currLambda = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, codon, false);
-
-	        propAlpha = getParameterForCategory(alphaCategory, PAParameter::alp, codon, true);
-	        propLambda = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, codon, true);
-
-	        if(codon == grouping)
-	        {
-	            propZ_gene += propAlpha/propLambda; 
-	        }
-	        else
-	        {
-	            propZ_gene += currAlpha/currLambda; 
-	        }
-
-	        currZ_gene += currAlpha/currLambda;
-    	}
-    
-        currZ += phi * currZ_gene;
-        propZ += phi * propZ_gene;
-    }
-    Z[0] = currZ;
-    Z[1] = propZ;
 }
 
 
@@ -214,7 +159,7 @@ void PAModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex,
 
 
 void PAModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
-                                                                std::vector<double> &logAcceptanceRatioForAllMixtures)
+                                                                std::vector<double> &logAcceptanceRatioForAllMixtures,std::string param)
 {
 	double currAlpha,currLambdaPrime,propAlpha,propLambdaPrime;
 	double logLikelihood, logPosterior = 0.0;
@@ -671,9 +616,14 @@ void PAModel::setCategoryProbability(unsigned mixture, double value)
 }
 
 
-void PAModel::updateCodonSpecificParameter(std::string aa)
+void PAModel::updateCodonSpecificParameter(std::string codon)
 {
-	parameter->updateCodonSpecificParameter(aa);
+	parameter->updateCodonSpecificParameter(codon);
+}
+
+void PAModel::updateCodonSpecificParameter(std::string codon, std::string param)
+{
+	parameter->updateCodonSpecificParameter(codon);
 }
 
 void PAModel::completeUpdateCodonSpecificParameter()
@@ -684,89 +634,89 @@ void PAModel::completeUpdateCodonSpecificParameter()
 
 //Noise offset functions
 
-double PAModel::getNoiseOffset(unsigned index, bool proposed)
-{
-	return parameter->getNoiseOffset(index, proposed);
-}
+// double PAModel::getNoiseOffset(unsigned index, bool proposed)
+// {
+// 	return parameter->getNoiseOffset(index, proposed);
+// }
 
 
-double PAModel::getObservedSynthesisNoise(unsigned index)
-{
-	return parameter->getObservedSynthesisNoise(index);
-}
+// double PAModel::getObservedSynthesisNoise(unsigned index)
+// {
+// 	return parameter->getObservedSynthesisNoise(index);
+// }
 
 
-double PAModel::getCurrentNoiseOffsetProposalWidth(unsigned index)
-{
-	return parameter->getCurrentNoiseOffsetProposalWidth(index);
-}
+// double PAModel::getCurrentNoiseOffsetProposalWidth(unsigned index)
+// {
+// 	return parameter->getCurrentNoiseOffsetProposalWidth(index);
+// }
 
 
-void PAModel::updateNoiseOffset(unsigned index)
-{
-	parameter->updateNoiseOffset(index);
-}
+// void PAModel::updateNoiseOffset(unsigned index)
+// {
+// 	parameter->updateNoiseOffset(index);
+// }
 
 
-void PAModel::updateNoiseOffsetTrace(unsigned sample)
-{
-	parameter->updateNoiseOffsetTraces(sample);
-}
+// void PAModel::updateNoiseOffsetTrace(unsigned sample)
+// {
+// 	parameter->updateNoiseOffsetTraces(sample);
+// }
 
 
-void PAModel::updateObservedSynthesisNoiseTrace(unsigned sample)
-{
-	parameter->updateObservedSynthesisNoiseTraces(sample);
-}
+// void PAModel::updateObservedSynthesisNoiseTrace(unsigned sample)
+// {
+// 	parameter->updateObservedSynthesisNoiseTraces(sample);
+// }
 
 
-void PAModel::adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt)
-{
-	parameter->adaptNoiseOffsetProposalWidth(adaptiveWidth, adapt);
-}
+// void PAModel::adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt)
+// {
+// 	parameter->adaptNoiseOffsetProposalWidth(adaptiveWidth, adapt);
+// }
 
 
 
-void PAModel::updateGibbsSampledHyperParameters(Genome &genome)
-{
-  // estimate s_epsilon by sampling from a gamma distribution and transforming it into an inverse gamma sample
+// void PAModel::updateGibbsSampledHyperParameters(Genome &genome)
+// {
+//   // estimate s_epsilon by sampling from a gamma distribution and transforming it into an inverse gamma sample
 	
-	if (withPhi)
-	{
-		if(!fix_sEpsilon)
-		{
-			double shape = ((double)genome.getGenomeSize() - 1.0) / 2.0;
-			for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++)
-			{
-				double rate = 0.0; //Prior on s_epsilon goes here?
-				unsigned mixtureAssignment;
-				double noiseOffset = getNoiseOffset(i);
-				for (unsigned j = 0; j < genome.getGenomeSize(); j++)
-				{
-					mixtureAssignment = parameter->getMixtureAssignment(j);
-					double obsPhi = genome.getGene(j).getObservedSynthesisRate(i);
-					if (obsPhi > -1.0)
-					{
-						double sum = std::log(obsPhi) - noiseOffset - std::log(parameter->getSynthesisRate(j, mixtureAssignment, false));
-						rate += (sum * sum);
-					}else{
-						// missing observation.
-						shape -= 0.5;
-						//Reduce shape because initial estimate assumes there are no missing observations
-					}
-				}
-				rate /= 2.0;
-				double rand = parameter->randGamma(shape, rate);
+// 	if (withPhi)
+// 	{
+// 		if(!fix_sEpsilon)
+// 		{
+// 			double shape = ((double)genome.getGenomeSize() - 1.0) / 2.0;
+// 			for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++)
+// 			{
+// 				double rate = 0.0; //Prior on s_epsilon goes here?
+// 				unsigned mixtureAssignment;
+// 				double noiseOffset = getNoiseOffset(i);
+// 				for (unsigned j = 0; j < genome.getGenomeSize(); j++)
+// 				{
+// 					mixtureAssignment = parameter->getMixtureAssignment(j);
+// 					double obsPhi = genome.getGene(j).getObservedSynthesisRate(i);
+// 					if (obsPhi > -1.0)
+// 					{
+// 						double sum = std::log(obsPhi) - noiseOffset - std::log(parameter->getSynthesisRate(j, mixtureAssignment, false));
+// 						rate += (sum * sum);
+// 					}else{
+// 						// missing observation.
+// 						shape -= 0.5;
+// 						//Reduce shape because initial estimate assumes there are no missing observations
+// 					}
+// 				}
+// 				rate /= 2.0;
+// 				double rand = parameter->randGamma(shape, rate);
 
-				// Below the gamma sample is transformed into an inverse gamma sample
-				// According to Gilchrist et al (2015) Supporting Materials p. S6
-				// The sample 1/T is supposed to be equal to $s_\epsilon^2$.
-				double sepsilon = std::sqrt(1.0/rand);
-				parameter->setObservedSynthesisNoise(i, sepsilon);
-			}
-		}
-	}
-}
+// 				// Below the gamma sample is transformed into an inverse gamma sample
+// 				// According to Gilchrist et al (2015) Supporting Materials p. S6
+// 				// The sample 1/T is supposed to be equal to $s_\epsilon^2$.
+// 				double sepsilon = std::sqrt(1.0/rand);
+// 				parameter->setObservedSynthesisNoise(i, sepsilon);
+// 			}
+// 		}
+// 	}
+// }
 
 
 void PAModel::updateAllHyperParameter()
@@ -917,7 +867,7 @@ void PAModel::setParameter(PAParameter &_parameter)
 }
 
 
-double PAModel::calculateAllPriors()
+double PAModel::calculateAllPriors(bool proposed)
 {
 	double prior = 0.0;
 	unsigned size = getGroupListSize();
@@ -925,8 +875,8 @@ double PAModel::calculateAllPriors()
 	for (unsigned i = 0; i < size; i++)
 	{
 		std::string grouping = getGrouping(i);
-        prior += calculateAlphaPrior(grouping, false);
-        prior += calculateLambdaPrior(grouping, false);
+        prior += calculateAlphaPrior(grouping, proposed);
+        prior += calculateLambdaPrior(grouping, proposed);
 	}
 
 	// add more priors if necessary.
@@ -939,3 +889,22 @@ double PAModel::getParameterForCategory(unsigned category, unsigned param, std::
 {
 	return parameter->getParameterForCategory(category, param, codon, proposal);
 }
+
+
+bool PAModel::getParameterTypeFixed(std::string csp_parameter)
+{
+    bool fixed = false;
+    if (csp_parameter == parameter_types[0]) // == Evolutionary
+    {
+        bool alpha_fixed = parameter -> isAlphaFixed();
+        bool lambda_fixed = parameter -> isLambdaFixed();
+        fixed == alpha_fixed && lambda_fixed;
+    }
+    return(fixed);
+}
+
+bool PAModel::isShared(std::string csp_parameters)
+{
+	return false;
+}
+

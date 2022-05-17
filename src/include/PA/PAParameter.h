@@ -20,12 +20,11 @@ class PAParameter: public Parameter {
 
 		std::vector<std::vector<double>> lambdaValues; //Currently not used.
 		double bias_csp;
-        bool div_flag;
+        
+        bool fix_alpha=false;
+        bool fix_lp=false;
 
 	public:
-		static const unsigned dalpha;
-		static const unsigned dlambdaprime;
-
 		//Constructors & Destructors:
 		explicit PAParameter();
 		PAParameter(std::string filename);
@@ -69,6 +68,10 @@ class PAParameter: public Parameter {
 		double getParameterForCategory(unsigned category, unsigned paramType, std::string codon, bool proposal);
 
 
+		void fixAlpha();
+		void fixLambdaPrime();
+		bool isAlphaFixed();
+		bool isLambdaFixed();
 
 
 

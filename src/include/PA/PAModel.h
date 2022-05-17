@@ -13,12 +13,9 @@ class PAModel: public Model
 		PAParameter *parameter;
 		unsigned RFPCountColumn;
 
-
-
 		double calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
 				unsigned currRFPValue, unsigned currNumCodonsInMRNA, double phiValue);
-		virtual void calculateZ(std::string grouping,Genome& genome,std::vector<double> &Z);
-
+		
 	public:
 		//Constructors & Destructors:
 		explicit PAModel(unsigned RFPCountColumn = 0u, bool _withPhi = false, bool _fix_sEpsilon = false);
@@ -32,7 +29,7 @@ class PAModel: public Model
 		virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k,
 				double* logProbabilityRatio); // Depends on RFPCountColumn
 		virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
-				std::vector<double> &logAcceptanceRatioForAllMixtures); // Depends on RFPCountColumn
+				std::vector<double> &logAcceptanceRatioForAllMixtures,std::string param="Elongation"); // Depends on RFPCountColumn
 		virtual void calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration,
 				std::vector <double> &logProbabilityRatio);
 
@@ -102,7 +99,8 @@ class PAModel: public Model
 		virtual void setMixtureAssignment(unsigned i, unsigned catOfGene);
 		virtual void setCategoryProbability(unsigned mixture, double value);
 
-		virtual void updateCodonSpecificParameter(std::string aa);
+		virtual void updateCodonSpecificParameter(std::string grouping);
+		virtual void updateCodonSpecificParameter(std::string grouping, std::string param = "Elongation");
 		virtual void completeUpdateCodonSpecificParameter();
 		//virtual void updateGibbsSampledHyperParameters(Genome &genome);
 		virtual void updateAllHyperParameter();
@@ -114,22 +112,23 @@ class PAModel: public Model
 		//virtual void printCodonSpecificParameters();
 		PAParameter* getParameter();
 		void setParameter(PAParameter &_parameter);
-		virtual double calculateAllPriors();
+		virtual double calculateAllPriors(bool proposed=false);
 		virtual double calculateAlphaPrior(std::string grouping,bool proposed=false);
 		virtual double calculateLambdaPrior(std::string grouping,bool proposed=false);
 	
 		virtual double getParameterForCategory(unsigned category, unsigned param, std::string codon, bool proposal);
 
-	    virtual double getNoiseOffset(unsigned index, bool proposed = false);
-		virtual double getObservedSynthesisNoise(unsigned index) ;
-		virtual double getCurrentNoiseOffsetProposalWidth(unsigned index);
-		virtual void updateNoiseOffset(unsigned index);
-		virtual void updateNoiseOffsetTrace(unsigned sample);
-		virtual void updateObservedSynthesisNoiseTrace(unsigned sample);
-		virtual void adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt = true);
-		virtual void updateGibbsSampledHyperParameters(Genome &genome);
+	 //    virtual double getNoiseOffset(unsigned index, bool proposed = false);
+		// virtual double getObservedSynthesisNoise(unsigned index) ;
+		// virtual double getCurrentNoiseOffsetProposalWidth(unsigned index);
+		// virtual void updateNoiseOffset(unsigned index);
+		// virtual void updateNoiseOffsetTrace(unsigned sample);
+		// virtual void updateObservedSynthesisNoiseTrace(unsigned sample);
+		// virtual void adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt = true);
+		// virtual void updateGibbsSampledHyperParameters(Genome &genome);
 
-
+		virtual bool getParameterTypeFixed(std::string csp_parameters);
+		virtual bool isShared(std::string csp_parameters);
 		
 
 	protected:

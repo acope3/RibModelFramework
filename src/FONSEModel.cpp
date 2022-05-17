@@ -11,7 +11,7 @@ FONSEModel::FONSEModel(bool _withPhi, bool _fix_sEpsilon) : Model()
 	parameter = 0;
 	withPhi = _withPhi;
 	fix_sEpsilon = _fix_sEpsilon;
-
+	parameter_types = {"Evolutionary"};
 }
 
 
@@ -151,7 +151,7 @@ void FONSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
 }
 
 
-void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, std::vector<double> &logAcceptanceRatioForAllMixtures)
+void FONSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, std::vector<double> &logAcceptanceRatioForAllMixtures,std::string param)
 {
 	unsigned numGenes = genome.getGenomeSize();
 	//int numCodons = SequenceSummary::GetNumCodonsForAA(grouping);
@@ -661,6 +661,12 @@ void FONSEModel::updateCodonSpecificParameter(std::string grouping)
 	parameter->updateCodonSpecificParameter(grouping);
 }
 
+
+void FONSEModel::updateCodonSpecificParameter(std::string grouping, std::string param)
+{
+	parameter->updateCodonSpecificParameter(grouping);
+}
+
 void FONSEModel::completeUpdateCodonSpecificParameter()
 {
     parameter->completeUpdateCodonSpecificParameter();
@@ -668,89 +674,89 @@ void FONSEModel::completeUpdateCodonSpecificParameter()
 
 //Noise offset functions
 
-double FONSEModel::getNoiseOffset(unsigned index, bool proposed)
-{
-	return parameter->getNoiseOffset(index, proposed);
-}
+// double FONSEModel::getNoiseOffset(unsigned index, bool proposed)
+// {
+// 	return parameter->getNoiseOffset(index, proposed);
+// }
 
 
-double FONSEModel::getObservedSynthesisNoise(unsigned index)
-{
-	return parameter->getObservedSynthesisNoise(index);
-}
+// double FONSEModel::getObservedSynthesisNoise(unsigned index)
+// {
+// 	return parameter->getObservedSynthesisNoise(index);
+// }
 
 
-double FONSEModel::getCurrentNoiseOffsetProposalWidth(unsigned index)
-{
-	return parameter->getCurrentNoiseOffsetProposalWidth(index);
-}
+// double FONSEModel::getCurrentNoiseOffsetProposalWidth(unsigned index)
+// {
+// 	return parameter->getCurrentNoiseOffsetProposalWidth(index);
+// }
 
 
-void FONSEModel::updateNoiseOffset(unsigned index)
-{
-	parameter->updateNoiseOffset(index);
-}
+// void FONSEModel::updateNoiseOffset(unsigned index)
+// {
+// 	parameter->updateNoiseOffset(index);
+// }
 
 
-void FONSEModel::updateNoiseOffsetTrace(unsigned sample)
-{
-	parameter->updateNoiseOffsetTraces(sample);
-}
+// void FONSEModel::updateNoiseOffsetTrace(unsigned sample)
+// {
+// 	parameter->updateNoiseOffsetTraces(sample);
+// }
 
 
-void FONSEModel::updateObservedSynthesisNoiseTrace(unsigned sample)
-{
-	parameter->updateObservedSynthesisNoiseTraces(sample);
-}
+// void FONSEModel::updateObservedSynthesisNoiseTrace(unsigned sample)
+// {
+// 	parameter->updateObservedSynthesisNoiseTraces(sample);
+// }
 
 
-void FONSEModel::adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt)
-{
-	parameter->adaptNoiseOffsetProposalWidth(adaptiveWidth, adapt);
-}
+// void FONSEModel::adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt)
+// {
+// 	parameter->adaptNoiseOffsetProposalWidth(adaptiveWidth, adapt);
+// }
 
 
 
-void FONSEModel::updateGibbsSampledHyperParameters(Genome &genome)
-{
-  // estimate s_epsilon by sampling from a gamma distribution and transforming it into an inverse gamma sample
+// void FONSEModel::updateGibbsSampledHyperParameters(Genome &genome)
+// {
+//   // estimate s_epsilon by sampling from a gamma distribution and transforming it into an inverse gamma sample
 	
-	if (withPhi)
-	{
-		if(!fix_sEpsilon)
-		{
-			double shape = ((double)genome.getGenomeSize() - 1.0) / 2.0;
-			for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++)
-			{
-				double rate = 0.0; //Prior on s_epsilon goes here?
-				unsigned mixtureAssignment;
-				double noiseOffset = getNoiseOffset(i);
-				for (unsigned j = 0; j < genome.getGenomeSize(); j++)
-				{
-					mixtureAssignment = parameter->getMixtureAssignment(j);
-					double obsPhi = genome.getGene(j).getObservedSynthesisRate(i);
-					if (obsPhi > -1.0)
-					{
-						double sum = std::log(obsPhi) - noiseOffset - std::log(parameter->getSynthesisRate(j, mixtureAssignment, false));
-						rate += (sum * sum);
-					}else{
-						// missing observation.
-						shape -= 0.5;
-						//Reduce shape because initial estimate assumes there are no missing observations
-					}
-				}
-				rate /= 2.0;
-				double rand = parameter->randGamma(shape, rate);
+// 	if (withPhi)
+// 	{
+// 		if(!fix_sEpsilon)
+// 		{
+// 			double shape = ((double)genome.getGenomeSize() - 1.0) / 2.0;
+// 			for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++)
+// 			{
+// 				double rate = 0.0; //Prior on s_epsilon goes here?
+// 				unsigned mixtureAssignment;
+// 				double noiseOffset = getNoiseOffset(i);
+// 				for (unsigned j = 0; j < genome.getGenomeSize(); j++)
+// 				{
+// 					mixtureAssignment = parameter->getMixtureAssignment(j);
+// 					double obsPhi = genome.getGene(j).getObservedSynthesisRate(i);
+// 					if (obsPhi > -1.0)
+// 					{
+// 						double sum = std::log(obsPhi) - noiseOffset - std::log(parameter->getSynthesisRate(j, mixtureAssignment, false));
+// 						rate += (sum * sum);
+// 					}else{
+// 						// missing observation.
+// 						shape -= 0.5;
+// 						//Reduce shape because initial estimate assumes there are no missing observations
+// 					}
+// 				}
+// 				rate /= 2.0;
+// 				double rand = parameter->randGamma(shape, rate);
 
-				// Below the gamma sample is transformed into an inverse gamma sample
-				// According to Gilchrist et al (2015) Supporting Materials p. S6
-				// The sample 1/T is supposed to be equal to $s_\epsilon^2$.
-				double sepsilon = std::sqrt(1.0/rand);
-				parameter->setObservedSynthesisNoise(i, sepsilon);
-			}
-		}
-	}
-}
+// 				// Below the gamma sample is transformed into an inverse gamma sample
+// 				// According to Gilchrist et al (2015) Supporting Materials p. S6
+// 				// The sample 1/T is supposed to be equal to $s_\epsilon^2$.
+// 				double sepsilon = std::sqrt(1.0/rand);
+// 				parameter->setObservedSynthesisNoise(i, sepsilon);
+// 			}
+// 		}
+// 	}
+// }
 
 
 
@@ -878,7 +884,7 @@ void FONSEModel::setParameter(FONSEParameter &_parameter)
 }
 
 
-double FONSEModel::calculateAllPriors()
+double FONSEModel::calculateAllPriors(bool proposed)
 {
 	double priorRatio = 0.0;
 	unsigned size = getGroupListSize();
@@ -886,7 +892,7 @@ double FONSEModel::calculateAllPriors()
 	for (unsigned i = 0; i < size; i++)
 	{
 		std::string grouping = getGrouping(i);
-		priorRatio += calculateMutationPrior(grouping, false);
+		priorRatio += calculateMutationPrior(grouping, proposed);
 	}
 
 	// add more priors if necessary.
@@ -1016,8 +1022,24 @@ void FONSEModel::getParameterForCategory(unsigned category, unsigned param, std:
 
 
 
+bool FONSEModel::getParameterTypeFixed(std::string csp_parameter)
+{
+	bool fixed = false;
+	if (csp_parameter == parameter_types[0]) // == Evolutionary
+	{
+		bool dm_fixed = parameter -> isDMFixed();
+		bool domega_fixed = parameter -> isDOmegaFixed();
+		fixed == dm_fixed && domega_fixed;
+	}
+	return(fixed);
+}
 
 
+
+bool FONSEModel::isShared(std::string csp_parameters)
+{
+	return false;
+}
 
 
 

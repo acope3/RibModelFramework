@@ -13,7 +13,6 @@ class FONSEModel : public Model
 		double calculateMutationPrior(std::string grouping, bool proposed = false);
 
 
-
 	public:
 		//Constructors & Destructors:
 		FONSEModel(bool _withPhi = false, bool _fix_sEpsilon = false);
@@ -24,7 +23,7 @@ class FONSEModel : public Model
 
 		//Likelihood Ratio Functions:
 		virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k, double* logProbabilityRatio);
-		virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, std::vector<double> &logAcceptanceRatioForAllMixtures); 
+		virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome, std::vector<double> &logAcceptanceRatioForAllMixtures, std::string param="Evolutionary"); 
 		virtual void calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration, std::vector <double> &logProbabilityRatio);
 
 
@@ -109,6 +108,7 @@ class FONSEModel : public Model
 		virtual void setCategoryProbability(unsigned mixture, double value);
 
 		virtual void updateCodonSpecificParameter(std::string grouping);
+		virtual void updateCodonSpecificParameter(std::string grouping, std::string param = "Evolutionary");
 		virtual void completeUpdateCodonSpecificParameter();
 
 		//virtual void updateGibbsSampledHyperParameters(Genome &genome);
@@ -119,7 +119,7 @@ class FONSEModel : public Model
 		virtual void printHyperParameters();
 		FONSEParameter* getParameter();
 		void setParameter(FONSEParameter &_parameter);
-		virtual double calculateAllPriors();
+		virtual double calculateAllPriors(bool proposed=false);
 		void calculateLogCodonProbabilityVector(unsigned numCodons, unsigned position, unsigned minIndexValue,
 					double* mutation, double* selection, double phi, double a1_value, std::vector <double> &codonProb);
 		void calculateCodonProbabilityVector(unsigned numCodons, unsigned position, double* mutation, double* selection,
@@ -127,14 +127,20 @@ class FONSEModel : public Model
 		virtual void getParameterForCategory(unsigned category, unsigned param, std::string aa, bool proposal,
 					double* returnValue);
 
-		virtual double getNoiseOffset(unsigned index, bool proposed = false);
-		virtual double getObservedSynthesisNoise(unsigned index) ;
-		virtual double getCurrentNoiseOffsetProposalWidth(unsigned index);
-		virtual void updateNoiseOffset(unsigned index);
-		virtual void updateNoiseOffsetTrace(unsigned sample);
-		virtual void updateObservedSynthesisNoiseTrace(unsigned sample);
-		virtual void adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt = true);
-		virtual void updateGibbsSampledHyperParameters(Genome &genome);
+		// virtual double getNoiseOffset(unsigned index, bool proposed = false);
+		// virtual double getObservedSynthesisNoise(unsigned index) ;
+		// virtual double getCurrentNoiseOffsetProposalWidth(unsigned index);
+		// virtual void updateNoiseOffset(unsigned index);
+		// virtual void updateNoiseOffsetTrace(unsigned sample);
+		// virtual void updateObservedSynthesisNoiseTrace(unsigned sample);
+		// virtual void adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt = true);
+		// virtual void updateGibbsSampledHyperParameters(Genome &genome);
+
+
+		virtual bool getParameterTypeFixed(std::string csp_parameters);
+		virtual bool isShared(std::string csp_parameters);
+
+
 
 		//R Section:
 #ifndef STANDALONE

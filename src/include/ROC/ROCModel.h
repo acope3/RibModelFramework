@@ -8,13 +8,10 @@ class ROCModel : public Model
 {
     private:
 		ROCParameter *parameter;
-		bool withPhi;
-		bool fix_sEpsilon;
 
 		double calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codonCount[], double mutation[], double selection[], double phiValue);
 		double calculateMutationPrior(std::string grouping, bool proposed = false); // TODO add to FONSE as well? // cedric
 		void obtainCodonCount(SequenceSummary *sequenceSummary, std::string curAA, int codonCount[]);
-
     public:
 		//Constructors & Destructors:
 		ROCModel(bool _withPhi = false, bool _fix_sEpsilon = false);
@@ -26,7 +23,7 @@ class ROCModel : public Model
 		virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k,
 					double* logProbabilityRatio);
 		virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
-					std::vector<double> &logAcceptanceRatioForAllMixtures);
+					std::vector<double> &logAcceptanceRatioForAllMixtures, std::string param="Evolutionary");
 		virtual void calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration,
 					std::vector <double> &logProbabilityRatio);
 
@@ -105,6 +102,7 @@ class ROCModel : public Model
 		virtual void setCategoryProbability(unsigned mixture, double value);
 
 		virtual void updateCodonSpecificParameter(std::string grouping);
+		virtual void updateCodonSpecificParameter(std::string grouping, std::string param = "Evolutionary");
 		virtual void completeUpdateCodonSpecificParameter();
 		//virtual void updateGibbsSampledHyperParameters(Genome &genome);
 		virtual void updateAllHyperParameter();
@@ -114,21 +112,24 @@ class ROCModel : public Model
 		virtual void printHyperParameters();
 		ROCParameter getParameter();
 		void setParameter(ROCParameter &_parameter);
-		virtual double calculateAllPriors();
+		virtual double calculateAllPriors(bool proposed=false);
 		void calculateCodonProbabilityVector(unsigned numCodons, double mutation[], double selection[], double phi, double codonProb[]);
 		void calculateLogCodonProbabilityVector(unsigned numCodons, double mutation[], double selection[], double phi, double codonProb[]);
 		virtual void getParameterForCategory(unsigned category, unsigned param, std::string aa, bool proposal, double* returnValue);
 
 
 	
-		virtual double getNoiseOffset(unsigned index, bool proposed = false);
-		virtual double getObservedSynthesisNoise(unsigned index) ;
-		virtual double getCurrentNoiseOffsetProposalWidth(unsigned index);
-		virtual void updateNoiseOffset(unsigned index);
-		virtual void updateNoiseOffsetTrace(unsigned sample);
-		virtual void updateObservedSynthesisNoiseTrace(unsigned sample);
-		virtual void adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt = true);
-		virtual void updateGibbsSampledHyperParameters(Genome &genome);
+		// virtual double getNoiseOffset(unsigned index, bool proposed = false);
+		// virtual double getObservedSynthesisNoise(unsigned index) ;
+		// virtual double getCurrentNoiseOffsetProposalWidth(unsigned index);
+		// virtual void updateNoiseOffset(unsigned index);
+		// virtual void updateNoiseOffsetTrace(unsigned sample);
+		// virtual void updateObservedSynthesisNoiseTrace(unsigned sample);
+		// virtual void adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt = true);
+		// virtual void updateGibbsSampledHyperParameters(Genome &genome);
+
+		virtual bool getParameterTypeFixed(std::string csp_parameters);
+		virtual bool isShared(std::string csp_parameters);
 
 
 		//R Section:
