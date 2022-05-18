@@ -45,6 +45,7 @@ export(
 "getMixtureAssignmentEstimate",
 "findOptimalCodon",
 "getExpressionEstimates",
+"getSigmaEstimates",
 "writeParameterObject",
 "loadParameterObject",
 "getTrace",

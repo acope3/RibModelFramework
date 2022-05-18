@@ -3,12 +3,15 @@ Type: Package
 Title: Analysis of Codon Data under Stationarity using a Bayesian
         Framework
 Version: 0.1.4.0
-Date: 2020-09-11
+PreviousGitCommitHash: ad2611c3611ec51486d0654ec56c7a5ff25a416c
+                        The above is the hash for the previous commit
+Date: 2021-12-18
 Author: c(person("Cedric", "Landerer", role = c("aut", "cre"), email
         = "cedric.landerer@gmail.com"), person("Gabriel", "Hanas", role
         = "ctb"), person("Jeremy", "Rogers", role = "ctb"),
-        person("Alex", "Cope", role="ctb"), person("Denizhan", "Pak", role="ctb"))
-Maintainer: Cedric Landerer <cedric.landerer@gmail.com>
+        person("Alex", "Cope", role="aut", "ctb"), person("Denizhan", "Pak", role="ctb",
+        person("Michael", "Gilchrist", role="ctb", email = "mikeg@utk.edu"))
+Maintainer: Alex Cope  <alexandercope0@gmail.com>
 URL: https://github.com/clandere/AnaCoDa
 VignetteBuilder: knitr
 NeedsCompilation: yes
@@ -37,3 +40,4 @@ LinkingTo: Rcpp
 LazyLoad: yes
 LazyData: yes
 RoxygenNote: 7.1.1
+

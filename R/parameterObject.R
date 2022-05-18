@@ -1306,6 +1306,136 @@ getExpressionEstimates <- function(parameter, gene.index, samples, quantiles=c(0
   return(expr.mat)
 }
 
+
+calculateExpectedSigmaPerGene <- function(model,sequence,alpha,lambda,nserate)
+{
+  sigma <- exp(sum(unlist(lapply(sequence,
+                                 function(codon){
+                                   model$elongationProbabilityLog(unname(alpha[codon]),unname(lambda[codon]),1/unname(nserate[codon]))
+                                 })
+  )))
+  return(sigma)
+}
+
+
+
+#' Returns the estimated sigma posterior for a gene
+#' 
+#' @param parameter on object created by \code{initializeParameterObject}. Must be of class PANSEParameter.
+#'
+#' @param model an object created by \code{initializeModelObject}. Must be of class PANSEModel.
+#' 
+#' @param genome an object created by \code{initializeGenomeObject}.
+#' 
+#' @param gene.index a integer or vector of integers representing the gene(s) of interest.
+#' 
+#' @param samples number of samples for the posterior estimate
+#'
+#' @param quantiles vector of quantiles, (default: c(0.025, 0.975))
+#'
+#' @param num.threads integer for number of threads to use, if package \code{parallel} is installed. (default = 1)
+#' 
+#' @return returns a data.frame with the mixture assignment of each gene corresbonding to \code{gene.index} in the same order as the genome. 
+#'
+#' @description Posterior estimates for the phi value of specified genes
+#' 
+#' @details The returned vector is unnamed as gene ids are only stored in the \code{genome} object, 
+#' but the \code{gene.index} vector can be used to match the assignment to the genome.
+#' 
+#' @examples  
+#' genome_file <- system.file("extdata", "genome.fasta", package = "AnaCoDa")
+#'
+#' genome <- initializeGenomeObject(file = genome_file)
+#' sphi_init <- c(1,1)
+#' numMixtures <- 2
+#' geneAssignment <- c(rep(1,floor(length(genome)/2)),rep(2,ceiling(length(genome)/2)))
+#' parameter <- initializeParameterObject(genome = genome, sphi = sphi_init, 
+#'                                        num.mixtures = numMixtures, 
+#'                                        gene.assignment = geneAssignment, 
+#'                                        mixture.definition = "allUnique")
+#' model <- initializeModelObject(parameter = parameter, model = "ROC")
+#' samples <- 2500
+#' thinning <- 50
+#' adaptiveWidth <- 25
+#' mcmc <- initializeMCMCObject(samples = samples, thinning = thinning, 
+#'                              adaptive.width=adaptiveWidth, est.expression=TRUE,
+#'                              est.csp=TRUE, est.hyper=TRUE, est.mix = TRUE) 
+#' divergence.iteration <- 10
+#' \dontrun{
+#' runMCMC(mcmc = mcmc, genome = genome, model = model, 
+#'         ncores = 4, divergence.iteration = divergence.iteration)
+#' 
+#' # get the estimated expression values for all genes based on the mixture 
+#' # they are assigned to at each step
+#' estimatedExpression <- getExpressionEstimates(parameter, 1:length(genome), 1000)
+#' }
+#' 
+getSigmaEstimates <- function(parameter, model, genome, gene.index, samples, quantiles=c(0.025, 0.975),num.threads=1)
+{
+  if (class(parameter)!="Rcpp_PANSEParameter") {
+    stop("ERROR: Parameter object is not of class PANSEParameter.")
+  }
+  parallel.available <- require(parallel)
+  trace <- parameter$getTraceObject()
+  genome.subset <- genome$getGenomeForGeneIndices(gene.index,F)
+
+  alpha.trace <- do.call("rbind",trace$getCodonSpecificParameterTrace(0)[[1]])
+  lambda.trace <- do.call("rbind",trace$getCodonSpecificParameterTrace(1)[[1]])
+  nse.trace <- do.call("rbind",trace$getCodonSpecificParameterTrace(2)[[1]])
+  
+  codon.list <- codons()
+  codon.list <- codon.list[which(!codon.list %in% c("TGA","TAG","TAA"))]
+  
+  rownames(alpha.trace) <- codon.list
+  rownames(lambda.trace) <- codon.list
+  rownames(nse.trace) <- codon.list
+
+  total.samples <- ncol(alpha.trace)
+  start <- total.samples - samples + 1
+  end <- total.samples 
+  alpha.trace <- alpha.trace[,start:end]
+  lambda.trace <- lambda.trace[,start:end]
+  nse.trace <- nse.trace[,start:end]
+  
+  genes <- genome.subset$getGenes(F)
+  
+  if (parallel.available)
+  {
+    sigma.per.gene <- lapply(genes,function(gene){
+      sequence <- gene$seq
+      x<-strsplit(sequence,"")[[1]]
+      seq.codons <- paste0(x[c(TRUE, FALSE,FALSE)], x[c(FALSE, TRUE,FALSE)],x[c(F,F,T)])
+      sigma <- unlist(mclapply(1:samples,function(i){
+        calculateExpectedSigmaPerGene(model,seq.codons,alpha.trace[,i],lambda.trace[,i],nse.trace[,i])
+      },mc.cores=num.threads))
+    })
+  } else {
+    sigma.per.gene <- lapply(genes,function(gene){
+      sequence <- gene$seq
+      x<-strsplit(sequence,"")[[1]]
+      seq.codons <- paste0(x[c(TRUE, FALSE,FALSE)], x[c(FALSE, TRUE,FALSE)],x[c(F,F,T)])
+      sigma <- unlist(lapply(1:samples,function(i){
+        calculateExpectedSigmaPerGene(model,seq.codons,alpha.trace[,i],lambda.trace[,i],nse.trace[,i])
+      }))
+    })
+  }
+  sigma.mean <- unlist(lapply(sigma.per.gene,mean))
+  sigma.sd <- unlist(lapply(sigma.per.gene,sd))
+  sigma.pp <- lapply(sigma.per.gene,quantile,probs=quantiles)
+  df <- data.frame(Mean=unlist(sigma.mean),
+                   Std.dev=unlist(sigma.sd),
+                   `2.5%`=unlist(lapply(sigma.pp,function(x){unname(x[1])})),
+                   `97.5%`=unlist(lapply(sigma.pp,function(x){unname(x[2])})),stringsAsFactors=F)
+  gene.id <- unlist(lapply(genes,function(x){x$id}))
+  
+  df$GeneID  <- gene.id
+  df <- df[,c("GeneID","Mean","Std.dev","X2.5.","X97.5.")]
+  return(df)
+  
+}
+
+
+
 #' Write Parameter Object to a File
 #' 
 #' @param parameter parameter on object created by \code{initializeParameterObject}.
