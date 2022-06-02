@@ -820,7 +820,7 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
     if (length(parameter.names) >= 3)
     {
       
-      waiting.time.trace <- getWaitingTimeTrace()
+      waiting.time.trace <- getWaitingTimeTrace(trace,mixture,codon,samples)
       if (log.scale)
       {
         waiting.time.trace <- log10(waiting.time.trace)
