@@ -484,7 +484,14 @@ unsigned numLambdaPrime = (unsigned)currentCodonSpecificParameter[lmPri][0].size
 	{
 		for (unsigned j = 0; j < numAlpha; j++)
 		{
-			proposedCodonSpecificParameter[alp][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[alp][i][j]) , std_csp[j]) );
+			if (fix_alpha)
+			{
+				proposedCodonSpecificParameter[alp][i][j] = currentCodonSpecificParameter[alp][i][j];
+			}
+			else
+			{
+				proposedCodonSpecificParameter[alp][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[alp][i][j]) , std_csp[j]) );
+			}
 		}
 	}
 
@@ -492,7 +499,16 @@ unsigned numLambdaPrime = (unsigned)currentCodonSpecificParameter[lmPri][0].size
 	{
 		for (unsigned j = 0; j < numLambdaPrime; j++)
 		{
-			proposedCodonSpecificParameter[lmPri][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[lmPri][i][j]) , std_csp[j]) );
+			if (fix_lp)
+			{
+				proposedCodonSpecificParameter[lmPri][i][j] = currentCodonSpecificParameter[lmPri][i][j];
+
+			}
+			else
+			{
+				
+				proposedCodonSpecificParameter[lmPri][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[lmPri][i][j]) , std_csp[j]) );
+			}
 		}
 	}
 }

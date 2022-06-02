@@ -284,7 +284,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                 currLgammaRFPAlpha = std::lgamma(currAlpha + positionalRFPCount);
             }
            
-            if (share_nse && param == "NSE")
+            if (share_nse && param == "NSERate")
             {
                 propNSERate = getParameterForCategory(alphaCategory, PANSEParameter::nse, codon, true);
                 logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda * U, positionalRFPCount,
@@ -1291,7 +1291,6 @@ double PANSEModel::calculateNSERatePrior(std::string grouping,bool proposed)
 		}
 		else
 		{
-            //priorValue = Parameter::densityLogNorm(NSERate, std::log(1e-04), 1, true);
 			priorValue = std::log(1);  
 		}
 	}
