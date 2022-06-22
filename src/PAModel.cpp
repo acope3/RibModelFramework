@@ -748,75 +748,85 @@ void PAModel::updateHyperParameter(unsigned hp)
 
 void PAModel::simulateGenome(Genome &genome)
 {
-	for (unsigned geneIndex = 0u; geneIndex < genome.getGenomeSize(); geneIndex++)
-	{
-		unsigned mixtureElement = getMixtureAssignment(geneIndex);
-		unsigned alphaCat = parameter->getMutationCategory(mixtureElement);
-		unsigned lambdaPrimeCat = parameter->getSelectionCategory(mixtureElement);
-		double phi = parameter->getSynthesisRate(geneIndex, mixtureElement, false);
+	unsigned long Y = genome.getSumRFP();
+    double Z = 0;
+    std::vector<std::vector<double>> wait_times;
+    wait_times.resize(genome.getGenomeSize());
 
-		Gene gene = genome.getGene(geneIndex);
-		Gene tmpGene = gene;
-		std::vector<unsigned long> rfpCount;
-		std::vector<unsigned> codon_counts(61,0);
-		std::vector<unsigned> currentCodons(61,0);
-		std::vector<unsigned long> rfpPerPositionPerCodon(61,0);
-		std::vector<unsigned long> totalRFP(61,0);
-		std::vector <unsigned> positions = tmpGene.geneData.getPositionCodonID(); 
-		for (unsigned codonIndex = 0u; codonIndex < 61; codonIndex++)
-		{
+    for (unsigned geneIndex = 0u; geneIndex < genome.getGenomeSize(); geneIndex++)
+    {
 
-			unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(codonIndex);
-			codon_counts[codonIndex] = currNumCodonsInMRNA;
-			std::string codon = SequenceSummary::codonArray[codonIndex];
-
-			double alpha = getParameterForCategory(alphaCat, PAParameter::alp, codon, false);
-			double lambdaPrime = getParameterForCategory(lambdaPrimeCat, PAParameter::lmPri, codon, false);
-			double alphaPrime = alpha * currNumCodonsInMRNA;
+        unsigned mixtureElement = getMixtureAssignment(geneIndex);
+        Gene gene = genome.getGene(geneIndex);
+        double phi = parameter->getSynthesisRate(geneIndex, mixtureElement, false);
+        SequenceSummary sequence = gene.geneData;
+        Gene tmpGene = gene;
+        std::vector <unsigned> positions = sequence.getPositionCodonID();
+        wait_times[geneIndex].resize(positions.size());
+        std::vector <unsigned> rfpCount;
+        unsigned alphaCategory = parameter->getMutationCategory(mixtureElement);
+        unsigned lambdaCategory = parameter->getSelectionCategory(mixtureElement);
+        for (unsigned positionIndex = 0; positionIndex < positions.size(); positionIndex++)
+        {
+            unsigned codonIndex = positions[positionIndex];
+            std::string codon = sequence.indexToCodon(codonIndex);
+            if (codon == "TAG" || codon == "TGA" || codon == "TAA")
+            {
+                my_print("Stop codon being used during simulations\n");
+            }
+            double alpha = getParameterForCategory(alphaCategory, PAParameter::alp, codon, false);
+            double lambda = getParameterForCategory(lambdaCategory, PAParameter::lmPri, codon, false);
 #ifndef STANDALONE
-			RNGScope scope;
-			NumericVector xx(1);
-			xx = rgamma(1, alphaPrime, 1.0/lambdaPrime);
-			xx = rpois(1, xx[0] * phi);
-			tmpGene.geneData.setCodonSpecificSumRFPCount(codonIndex, xx[0], /*RFPCountColumn*/0);
-			rfpPerPositionPerCodon[codonIndex] = floor(xx[0]/codon_counts[codonIndex]);
-			totalRFP[codonIndex] = xx[0];
+            RNGScope scope;
+            NumericVector wt(1);
+            wt = rgamma(1, alpha,1/(lambda));
+            wait_times[geneIndex][positionIndex] = wt[0];
+            Z += phi * wait_times[geneIndex][positionIndex];
 #else
-			std::gamma_distribution<double> GDistribution(alphaPrime,1.0/lambdaPrime);
-			double tmp = GDistribution(Parameter::generator);
-			std::poisson_distribution<unsigned> PDistribution(phi * tmp);
-			unsigned long simulatedValue = PDistribution(Parameter::generator);
-			tmpGene.geneData.setCodonSpecificSumRFPCount(codonIndex, simulatedValue,0);
-			rfpPerPositionPerCodon[codonIndex] = simulatedValue/codon_counts[codonIndex];
-			totalRFP[codonIndex] = simulatedValue;
+            std::gamma_distribution<double> GDistribution(alpha, 1.0/(lambda));
+            wait_times[geneIndex][positionIndex] = GDistribution(Parameter::generator);
+            Z += phi * wait_times[geneIndex][positionIndex];
 #endif
-			if (rfpPerPositionPerCodon[codonIndex] < 1)
-			{
-				rfpPerPositionPerCodon[codonIndex] = 1;
-			}
-		}
-		for (unsigned codonID : positions)
-		{
-			currentCodons[codonID]++;
-			//If we're at the last codon, push however many are remaining
-			if ((currentCodons[codonID] == codon_counts[codonID]) || ((totalRFP[codonID] - rfpPerPositionPerCodon[codonID]) < 0))
-			{
-				rfpCount.push_back(totalRFP[codonID]);
-				totalRFP[codonID] = 0;
-			}
-			else if (totalRFP[codonID] == 0)
-			{
-				rfpCount.push_back(0);
-			}
-			else
-			{
-				rfpCount.push_back(rfpPerPositionPerCodon[codonID]);
-				totalRFP[codonID] = totalRFP[codonID] - rfpPerPositionPerCodon[codonID];
-			}
-		}
-		tmpGene.geneData.setRFPCount(rfpCount, RFPCountColumn);
-		genome.addGene(tmpGene, true);
-	}
+            
+        }
+    }
+    double U = Z/Y;
+    my_print("##True Z value based on provided phi and CSPs:%\n",Z);
+    for (unsigned geneIndex = 0u; geneIndex < genome.getGenomeSize(); geneIndex++)
+    {
+        unsigned mixtureElement = getMixtureAssignment(geneIndex);
+        Gene gene = genome.getGene(geneIndex);
+        double phi = parameter->getSynthesisRate(geneIndex, mixtureElement, false);
+        SequenceSummary sequence = gene.geneData;
+        Gene tmpGene = gene;
+        std::vector <unsigned> positions = sequence.getPositionCodonID();
+        std::vector <unsigned long> rfpCount;
+        unsigned alphaCategory = parameter->getMutationCategory(mixtureElement);
+        unsigned lambdaCategory = parameter->getSelectionCategory(mixtureElement);
+        double v;
+        
+        for (unsigned positionIndex = 0; positionIndex < positions.size(); positionIndex++)
+        {
+            unsigned codonIndex = positions[positionIndex];
+            std::string codon = sequence.indexToCodon(codonIndex);
+            if (codon == "TAG" || codon == "TGA" || codon == "TAA")
+            {
+                my_print("Stop codon being used during simulations\n");
+            }
+#ifndef STANDALONE
+            RNGScope scope;
+            NumericVector ribo_count(1);
+            ribo_count = rpois(1, wait_times[geneIndex][positionIndex] * (1.0/U) * phi);
+            rfpCount.push_back(ribo_count[0]);
+#else
+            std::poisson_distribution<unsigned> PDistribution(phi * wait_times[geneIndex][positionIndex] * (1.0/U));
+            unsigned long simulatedValue = PDistribution(Parameter::generator);
+            rfpCount.push_back(simulatedValue);
+#endif
+        }
+        tmpGene.geneData.setRFPCount(rfpCount, RFPCountColumn);
+        genome.addGene(tmpGene, true);
+    }
 }
 
 

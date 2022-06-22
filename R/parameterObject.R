@@ -709,7 +709,7 @@ getNSEProbabilityTrace <- function(trace,mixture,codon,samples)
   waiting.time <- getWaitingTimeTrace(trace,mixture,codon,samples)
   nserate <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codon, 2, F)
   nserate <- nserate[(length(nserate)-samples):length(nserate)]
-  prob.nse.trace <- nserate * (alpha/lambda)
+  prob.nse.trace <- nserate * waiting.time
   return(prob.nse.trace)
 }
 
@@ -827,7 +827,7 @@ getCSPEstimates <- function(parameter, filename=NULL, mixture = 1, samples = 10,
       }
       param.3[codon,"Mean"] <- mean(waiting.time.trace)
       param.3[codon,"Std.Dev"] <- sd(waiting.time.trace)
-      param.3[codon,c("Lower.quant","Upper.quant")] <- quantile(waiting.time,probs=c(0.025,0.975),type=8)
+      param.3[codon,c("Lower.quant","Upper.quant")] <- quantile(waiting.time.trace,probs=c(0.025,0.975),type=8)
       
       if (length(parameter.names) == 5)
       {
