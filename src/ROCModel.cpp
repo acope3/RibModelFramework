@@ -161,7 +161,6 @@ void ROCModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string gro
 	double selection[5];
 	double mutation_proposed[5];
 	double selection_proposed[5];
-
 	int codonCount[6];
 	Gene *gene;
 	SequenceSummary *sequenceSummary;
@@ -448,7 +447,7 @@ bool ROCModel::getParameterTypeFixed(std::string csp_parameter)
 	{
 		bool dm_fixed = parameter -> isDMFixed();
 		bool deta_fixed = parameter -> isDEtaFixed();
-		fixed == dm_fixed && deta_fixed;
+		fixed = (dm_fixed && deta_fixed);
 	}
 	return(fixed);
 }

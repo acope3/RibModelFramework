@@ -419,15 +419,19 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 	bool is_shared;
 	std::vector<std::string> csp_parameters = model.getParameterTypeList();
 	unsigned numCSPParamTypes = csp_parameters.size();
+	//my_print("Number of CSP Parameters: %\n",numCSPParamTypes);
 	for (unsigned param = 0; param < numCSPParamTypes; param++)
 	{
 
 		is_fixed = model.getParameterTypeFixed(csp_parameters[param]);
+		//my_print("Parameter type fixed: %\n",is_fixed);
 		if (! is_fixed)
 		{
 			is_shared = model.isShared(csp_parameters[param]);
+			//my_print("Parameter type is shared: %\n",is_shared);
 			if (is_shared)
 			{
+				//my_print("Shouldn't be here!\n");
 				std::string grouping = model.getGrouping(groups[0]);
 				model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures,csp_parameters[param]);
 		    	double threshold = -Parameter::randExp(1);
@@ -442,8 +446,8 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 					model.updateCodonSpecificParameter(grouping,csp_parameters[param]);
 					if ((iteration % thinning) == 0 && acceptanceRatioForAllMixtures[2] != 0 && param == (numCSPParamTypes - 1))
 					{
-						likelihoodTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[2];//will be 0
-						posteriorTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[4];//will be 0
+						likelihoodTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[2];
+						posteriorTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[4];
 					}
 				} 
 				else
@@ -460,7 +464,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 				std::shuffle(groups.begin(), groups.end(), e);
 				for (unsigned i = 0; i < size; i++)
 				{
-
+					//my_print("AA: %\n", groups[i]);
 					std::string grouping = model.getGrouping(groups[i]);
 					model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures,csp_parameters[param]);
 			    	double threshold = -Parameter::randExp(1);
@@ -475,16 +479,16 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 						model.updateCodonSpecificParameter(grouping,csp_parameters[param]);
 						if ((iteration % thinning) == 0 && acceptanceRatioForAllMixtures[2] != 0 && param  == (numCSPParamTypes - 1))
 						{
-							likelihoodTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[2];//will be 0
-							posteriorTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[4];//will be 0
+							likelihoodTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[2];
+							posteriorTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[4];
 						}
 					}
 					else
 					{
 						if ((iteration % thinning) == 0 && acceptanceRatioForAllMixtures[1] != 0 && param  == (numCSPParamTypes - 1))
 						{
-							likelihoodTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[1];
-							posteriorTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[3];
+							likelihoodTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[1];
+							posteriorTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[3];
 						}
 					}
 				}
