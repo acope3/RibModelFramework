@@ -63,7 +63,7 @@ parameter$initMutationCategories(c(mutationMainFile, mutationHtFile), 2,F)
 
 model <- initializeModelObject(parameter, "ROC", with.phi = TRUE) 
 
-outFile = file.path("UnitTestingOut", "testMCMCROCLogPhi.txt")
+outFile <- file.path("UnitTestingOut", "testMCMCROCLogPhi.txt")
 
 sink(outFile)
 runMCMC(mcmc, genome, model, 1, divergence.iteration)
@@ -76,25 +76,34 @@ test_that("identical MCMC-ROC input with Phi, same log posterior", {
 })
 
 
-#added by Elizabeth Barnes - Aug. 15 2022
 
-mcmcSaveFile = file.path("UnitTestingOut", "testMCMCROCobject.Rda")
+Gilchrist, Michael Aaron
+11:06 AM (3 hours ago)
 
-writeMCMCObject(mcmc = mcmc, file = mcmcSaveFile)
+to me
+
+## 2022-08-15: tests for saving and loading mcmc object added by Elizabeth Barnes and Mike Gilchrist
+
+## Notes:
+##   - When using a brand new mcmc object (not one loaded or extended), the first LogPosteriorTrace() and LogLikelihoodTrace() values are both 0.
+##   - Not sure if this is a bug or intentional.  If it's intentional, then we should simply alter the test for the objects that are saved and then reloaded.
+
+mcmcSaveFile <- file.path("UnitTestingOut", "testMCMCROCobject.Rda")
 
 test_that("object can be written successfully: mcmc", {
-  expect_equal(file.exists(mcmcSaveFile), T)
+  expect_null(writeMCMCObject(mcmc = mcmc, file = mcmcSaveFile))
 })
-
-#test works!
 
 test_that("object can be loaded successfully: mcmc", {
-  mcmcSaved <- loadMCMCObject(file = mcmcSaveFile)
-  expect_equal(length(mcmcSaved), 1)
+  expect_silent(mcmcSaved <- loadMCMCObject(file = mcmcSaveFile))  
 })
 
-#if object exists, it will have a length of 1 when loaded into R
-#would like to implement test comparing log posterior trace of original mcmc and mcmc object that has been saved and loaded
+test_that("object trace matches expected length of (samples + 1): mcmc",{
+  expect_equal(
+    length(mcmcSaved$getLogPosteriorTrace()), (samples+1) )
+})
+
+### end tests by Elizabeth Barnes and Mike Gilchrist
 
 
 ### Without Phi
