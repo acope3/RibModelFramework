@@ -75,6 +75,28 @@ test_that("identical MCMC-ROC input with Phi, same log posterior", {
   expect_equal(knownLogPosterior, testLogPosterior)
 })
 
+
+#added by Elizabeth Barnes - Aug. 15 2022
+
+mcmcSaveFile = file.path("UnitTestingOut", "testMCMCROCobject.Rda")
+
+writeMCMCObject(mcmc = mcmc, file = mcmcSaveFile)
+
+test_that("object can be written successfully: mcmc", {
+  expect_equal(file.exists(mcmcSaveFile), T)
+})
+
+#test works!
+
+test_that("object can be loaded successfully: mcmc", {
+  mcmcSaved <- loadMCMCObject(file = mcmcSaveFile)
+  expect_equal(length(mcmcSaved), 1)
+})
+
+#if object exists, it will have a length of 1 when loaded into R
+#would like to implement test comparing log posterior trace of original mcmc and mcmc object that has been saved and loaded
+
+
 ### Without Phi
 set.seed(446141)
 
