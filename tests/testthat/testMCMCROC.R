@@ -76,12 +76,6 @@ test_that("identical MCMC-ROC input with Phi, same log posterior", {
 })
 
 
-
-Gilchrist, Michael Aaron
-11:06 AM (3 hours ago)
-
-to me
-
 ## 2022-08-15: tests for saving and loading mcmc object added by Elizabeth Barnes and Mike Gilchrist
 
 ## Notes:
