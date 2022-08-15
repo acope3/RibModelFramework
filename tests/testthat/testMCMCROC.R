@@ -46,7 +46,7 @@ samples <- 10
 thinning <- 10
 adaptiveWidth <- 10
 divergence.iteration <- 0
-knownLogPosteriorValues <- c(-933180, -949228)
+knownLogPosteriorValues <- c(with.phi = -933180, without.phi = -949228)
 seedValue <- 446141
 
 ## Note that length of sample object will be samples + 1
@@ -72,7 +72,7 @@ sink(outFile)
 runMCMC(mcmc, genome, model, 1, divergence.iteration)
 sink()
 test_that("identical MCMC-ROC input with Phi, same log posterior", {
-  knownLogPosterior <- knownLogPosteriorValues[1]
+  knownLogPosterior <- knownLogPosteriorValues["with.phi"]
   print(round(mcmc$getLogPosteriorTrace()[(samples + 1)]))
   testLogPosterior <- round(mcmc$getLogPosteriorTrace()[(samples + 1)])
   expect_equal(knownLogPosterior, testLogPosterior)
@@ -124,7 +124,7 @@ sink(outFile)
 runMCMC(mcmc, genome, model, 1, divergence.iteration)
 sink()
 test_that("identical MCMC-ROC input without Phi, same log posterior", {
-  knownLogPosterior <- knownLogPosteriorValues[2]
+  knownLogPosterior <- knownLogPosteriorValues["without.phi"]
   print(round(mcmc$getLogPosteriorTrace()[(samples + 1)]))
   testLogPosterior <- round(mcmc$getLogPosteriorTrace()[(samples + 1)])
   expect_equal(knownLogPosterior, testLogPosterior)
