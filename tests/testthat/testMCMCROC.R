@@ -1,3 +1,4 @@
+
 library(testthat)
 library(AnaCoDa)
 rm(list=ls(all.names=TRUE))
@@ -103,7 +104,13 @@ mcmcLoaded <- loadMCMCObject(file = mcmcSaveFile)
 
 test_that("object trace matches expected length of (samples): mcmc",{
   expect_equal(
-    length(mcmcLoaded$getLogPosteriorTrace()), (samples) )
+    length(mcmcLoaded$getLogPosteriorTrace()), (samples)) ## note once bug #388 is fixed, replace samples with (samples + 1)
+})
+
+test_that("object loaded has expected log posterior", {
+   testLogPosterior <- round(mcmc$getLogPosteriorTrace()[(samples)]) ## note once bug #388 is fixed, replace samples with (samples + 1)
+   print(testLogPosterior)
+   expect_equal(knownLogPosteriorValues["with.phi"], testLogPosterior)
 })
 
 ### end tests by Elizabeth Barnes and Mike Gilchrist
