@@ -17,6 +17,7 @@ selectionMainFile = file.path("UnitTestingData", "testMCMCROCFiles", "selection_
 selectionHtFile = file.path("UnitTestingData", "testMCMCROCFiles", "selection_2.csv")
 mutationMainFile = file.path("UnitTestingData", "testMCMCROCFiles", "mutation_1.csv")
 mutationHtFile = file.path("UnitTestingData", "testMCMCROCFiles", "mutation_2.csv")
+mcmcSaveFile <- file.path("UnitTestingOut", "testMCMCROCobject.Rda")
 
 # Ensure the input files exist.
 test_that("file exists: simulatedAllUniqueR.fasta", {
@@ -81,8 +82,6 @@ test_that("identical MCMC-ROC input with Phi, same log posterior", {
 ## Notes:
 ##   - When using a brand new mcmc object (not one loaded or extended), the first LogPosteriorTrace() and LogLikelihoodTrace() values are both 0.
 ##   - Not sure if this is a bug or intentional.  If it's intentional, then we should simply alter the test for the objects that are saved and then reloaded.
-
-mcmcSaveFile <- file.path("UnitTestingOut", "testMCMCROCobject.Rda")
 
 test_that("object can be written successfully: mcmc", {
   expect_null(writeMCMCObject(mcmc = mcmc, file = mcmcSaveFile))
@@ -194,6 +193,13 @@ sink(outFile)
 runMCMC(mcmc, genome, model, 1, divergence.iteration)
 sink()
 
+## 2022-08-17: tests for saving and loading mcmc object added by Elizabeth Barnes and Mike Gilchrist
+
+test_that("object can be written successfully: mcmc", {
+  expect_null(writeMCMCObject(mcmc = mcmc, file = outFile))
+})
+
+### end tests by Elizabeth Barnes and Mike Gilchrist
 
 aa <- aminoAcids()
 test_that("Making sure DeltaEta does not change when fixed", {
