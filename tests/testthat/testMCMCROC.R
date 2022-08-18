@@ -73,10 +73,12 @@ outFile <- file.path("UnitTestingOut", "testMCMCROCLogPhi.txt")
 sink(outFile)
 runMCMC(mcmc = mcmc, genome = genome, model = model, ncores = 1, divergence.iteration = divergence.iteration)
 sink()
+
+
 test_that("identical MCMC-ROC input with Phi, same log posterior", {
    testLogPosterior <- round(mcmc$getLogPosteriorTrace()[(samples + 1)])
    print(testLogPosterior)
-   expect_equal(knownLogPosteriorValues["with.phi"], testLogPosterior)
+   expect_equal(knownLogPosteriorValues[["with.phi"]], testLogPosterior)
 })
 
 
@@ -110,7 +112,7 @@ test_that("object trace matches expected length of (samples): mcmc",{
 test_that("object loaded has expected log posterior", {
    testLogPosterior <- round(mcmc$getLogPosteriorTrace()[(samples)]) ## note once bug #388 is fixed, replace samples with (samples + 1)
    print(testLogPosterior)
-   expect_equal(knownLogPosteriorValues["with.phi"], testLogPosterior)
+   expect_equal(knownLogPosteriorValues[["with.phi"]], testLogPosterior)
 })
 
 ### end tests by Elizabeth Barnes and Mike Gilchrist
@@ -136,7 +138,7 @@ sink()
 test_that("identical MCMC-ROC input without Phi, same log posterior", {
   testLogPosterior <- round(mcmc$getLogPosteriorTrace()[(samples + 1)])
   print(testLogPosterior)
-  expect_equal(knownLogPosteriorValues["without.phi"], testLogPosterior)
+  expect_equal(knownLogPosteriorValues[["without.phi"]], testLogPosterior)
 })
 
 
