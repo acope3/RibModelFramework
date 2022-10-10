@@ -199,6 +199,10 @@ test_that("object can be written successfully: mcmc", {
   expect_null(writeMCMCObject(mcmc = mcmc, file = outFile))
 })
 
+test_that("object can be loaded successfully: mcmc", {
+  expect_silent(mcmcSaved <- loadMCMCObject(file = outFile))  
+})
+
 ### end tests by Elizabeth Barnes and Mike Gilchrist
 
 aa <- aminoAcids()
