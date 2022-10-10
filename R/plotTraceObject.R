@@ -120,7 +120,7 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
 plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="Mutation Parameter Traces", ROC.or.FONSE=TRUE,log.10.scale=F)
 {
   opar <- par(no.readonly = T) 
-  
+  browser() 
   ### Trace plot.
   if (ROC.or.FONSE)
   {
@@ -145,6 +145,20 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
   # TODO change to groupList -> checks for ROC like model is not necessary!
   names.aa <- aminoAcids()
   with.ref.codon <- ifelse(ROC.or.FONSE, TRUE, FALSE)
+  
+  ###Insert changes made by Elizabeth Barnes 2022/10/02
+fasta.file <- "orf_coding.fasta"
+
+
+  for(aa in names.aa)
+  {
+    codons <- AAToCodon(aa, with.ref.codon)
+    if(length(codons) >= 2) {
+      grep("[AG]", codons, ignore.case = TRUE)
+    }
+  }
+  
+  ### End changes made by Elizabeth Barnes 2022/10/02
   
   for(aa in names.aa)
   { 
