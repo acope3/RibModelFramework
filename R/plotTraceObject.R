@@ -11,6 +11,7 @@
 #' @param geneIndex When plotting expression, the index of the gene to be plotted.
 #' @param mixture The mixture for which to plot values.
 #' @param log.10.scale A logical value determining if figures should be plotted on the log.10.scale (default=F). Should not be applied to mutation and selection parameters estimated by ROC/FONSE.
+#' @param aa.names A vector of single letter amino acid names used to set order of plotting
 #'
 #' @param ... Optional, additional arguments.
 #' For this function, may be a logical value determining if the trace is ROC-based or not.
@@ -20,36 +21,36 @@
 #' @description Plots different traces, specified with the \code{what} parameter.
 #'
 plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbability" ,"Sphi", "Mphi", "Aphi", "Sepsilon", "ExpectedPhi", "Expression","NSEProb","NSERate","InitiationCost","PartitionFunction"), 
-                                   geneIndex=1, mixture = 1,log.10.scale=F,...)
+                                   geneIndex=1, mixture = 1, log.10.scale=F, aa.names = NULL)
 {
   if(what[1] == "Mutation")
   {
-    plotCodonSpecificParameters(x, mixture, "Mutation", main="Mutation Parameter Traces")
+    plotCodonSpecificParameters(x, mixture, "Mutation", main="Mutation Parameter Traces", aa.names = aa.names)
   }
   if(what[1] == "Selection")
   {
-    plotCodonSpecificParameters(x, mixture, "Selection", main="Selection Parameter Traces")
+    plotCodonSpecificParameters(x, mixture, "Selection", main="Selection Parameter Traces", aa.names = aa.names)
   }
   if(what[1] == "Alpha")
   {
-    plotCodonSpecificParameters(x, mixture, "Alpha", main="Alpha Parameter Traces", ROC.or.FONSE=FALSE,log.10.scale=log.10.scale)
+    plotCodonSpecificParameters(x, mixture, "Alpha", main="Alpha Parameter Traces", ROC.or.FONSE=FALSE, log.10.scale=log.10.scale, aa.names = aa.names)
   }
   if(what[1] == "Lambda")
   {
-    plotCodonSpecificParameters(x, mixture, "Lambda", main="Lambda Parameter Traces", ROC.or.FONSE=FALSE,log.10.scale=log.10.scale)
+    plotCodonSpecificParameters(x, mixture, "Lambda", main="Lambda Parameter Traces", ROC.or.FONSE=FALSE, log.10.scale=log.10.scale, aa.names = aa.names)
   } 
   
   if(what[1] == "MeanWaitingTime")
   {
-    plotCodonSpecificParameters(x, mixture, "MeanWaitingTime", main="Mean Waiting Time Parameter Traces", ROC.or.FONSE=FALSE,log.10.scale=log.10.scale)
+    plotCodonSpecificParameters(x, mixture, "MeanWaitingTime", main="Mean Waiting Time Parameter Traces", ROC.or.FONSE=FALSE, log.10.scale=log.10.scale, aa.names = aa.names)
   }  
   if(what[1] == "VarWaitingTime")
   {
-    plotCodonSpecificParameters(x, mixture, "VarWaitingTime", main="Variance Waiting Time Parameter Traces", ROC.or.FONSE=FALSE)
+    plotCodonSpecificParameters(x, mixture, "VarWaitingTime", main="Variance Waiting Time Parameter Traces", ROC.or.FONSE=FALSE, aa.names = aa.names)
   }  
   if(what[1] == "NSEProb")
   {
-    plotCodonSpecificParameters(x, mixture, "NSEProb", main="Nonsense Error Probability Parameter Traces", ROC.or.FONSE=FALSE,log.10.scale=log.10.scale)
+    plotCodonSpecificParameters(x, mixture, "NSEProb", main="Nonsense Error Probability Parameter Traces", ROC.or.FONSE=FALSE, log.10.scale=log.10.scale, aa.names = aa.names)
   }  
   if(what[1] == "MixtureProbability")
   {
@@ -93,7 +94,7 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
   }
   if(what[1] == "NSERate")
   {
-    plotCodonSpecificParameters(x, mixture, "NSERate", main="NSERate", ROC.or.FONSE=FALSE,log.10.scale=log.10.scale)
+    plotCodonSpecificParameters(x, mixture, "NSERate", main="NSERate", ROC.or.FONSE=FALSE, log.10.scale=log.10.scale, aa.names = aa.names)
   }  
 }
 
@@ -117,10 +118,9 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
 #' 
 #' @description Plots a codon-specific set of traces, specified with the \code{type} parameter.
 #'
-plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="Mutation Parameter Traces", ROC.or.FONSE=TRUE,log.10.scale=F)
+plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="Mutation Parameter Traces", ROC.or.FONSE=TRUE, log.10.scale=F, aa,vec = NULL)
 {
   opar <- par(no.readonly = T) 
-  browser() 
   ### Trace plot.
   if (ROC.or.FONSE)
   {
@@ -141,25 +141,56 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
   text(0.5, 0.6, main)
   text(0.5, 0.4, date(), cex = 0.6)
   par(mar = c(5.1, 4.1, 4.1, 2.1))
-  
-  # TODO change to groupList -> checks for ROC like model is not necessary!
-  names.aa <- aminoAcids()
+
+  ### TODO change to groupList -> checks for ROC like model is not necessary!
+
+  ## Check to ensure aa.names passed are valid
+  if( is.null(aa.names) ) {
+      aa.names <- aminoAcids()
+  } else {
+      aa.match <- (aa.names %in% aminoAcids())
+      ## test to ensure there's no aa being called that don't exist in trace
+      aa.mismatch <- aa.names[!aa.match]
+      if(length(aa.mismatch) > 0){
+          warning("Members ", aa.mismatch, "of aa.names argument absent from trace object and will be excluded.",
+                  call. = TRUE, immediate. = FALSE, noBreaks. = FALSE,
+                  domain = NULL)
+          }
+      aa.names <- aa.names[aa.match]
+  }
   with.ref.codon <- ifelse(ROC.or.FONSE, TRUE, FALSE)
+<<<<<<< HEAD
   
   ###Insert changes made by Elizabeth Barnes 2022/10/02
+library(AnaCoDa)
 fasta.file <- "orf_coding.fasta"
-
+genome <- initializeGenomeObject(file = fasta.file)
+length(genome)
+parameter <- initializeParameterObject(genome = genome, sphi = 1, num.mixtures = 1, gene.assignment = rep(1,length(genome)))
 
   for(aa in names.aa)
   {
-    codons <- AAToCodon(aa, with.ref.codon)
-    if(length(codons) >= 2) {
-      grep("[AG]", codons, ignore.case = TRUE)
-    }
+    aa.names <- aminoAcids()
+    codon.table <- (lapply(names.aa, function(x) {codons = AAToCodon(x);n_syn = length(codons);  ct_ending = grepl("[CT]$", codons); return(data.frame(aa = x, n_syn, codons, ct_ending))}))
+    codon.table <- do.call(rbind, codon.table)
   }
+
+
+if(what[1] == "Mutation")
+{
+  plotCodonSpecificParameters(x, mixture, "Mutation", main="Mutation Parameter Traces", aa.names = aa.names)
+}
+  
+##Code from Dr. Gilchrist
+aa.names <- aminoAcids()
+codon.table <- (lapply(names.aa, function(x) {codons = AAToCodon(x);n_syn = length(codons);  ct_ending = grepl("[CT]$", codons); return(data.frame(aa = x, n_syn, codons, ct_ending))}))
+codon.table <- do.call(rbind, codon.table)
   
   ### End changes made by Elizabeth Barnes 2022/10/02
   
+=======
+
+>>>>>>> b30d94606988207b0a56e9dacf264d833667005d
   for(aa in names.aa)
   { 
     codons <- AAToCodon(aa, with.ref.codon)

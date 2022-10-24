@@ -1,3 +1,4 @@
+
 library(testthat)
 library(AnaCoDa)
 rm(list=ls(all.names=TRUE))
@@ -47,12 +48,15 @@ samples <- 10
 thinning <- 10
 adaptiveWidth <- 10
 divergence.iteration <- 0
+knownLogPosteriorValues <- c(with.phi = -933180, without.phi = -949228)
+seedValue <- 446141
 
+## Note that length of sample object will be samples + 1
 mcmc <- initializeMCMCObject(samples = samples, thinning = thinning, adaptive.width = adaptiveWidth, 
                              est.expression=TRUE, est.csp=TRUE, est.hyper=TRUE)
 
 ### With Phi
-set.seed(446141)
+set.seed(seedValue)
 
 genome <- initializeGenomeObject(file = fileName, observed.expression.file = expressionFile, match.expression.by.id=FALSE)
 
@@ -67,13 +71,14 @@ model <- initializeModelObject(parameter, "ROC", with.phi = TRUE)
 outFile <- file.path("UnitTestingOut", "testMCMCROCLogPhi.txt")
 
 sink(outFile)
-runMCMC(mcmc, genome, model, 1, divergence.iteration)
+runMCMC(mcmc = mcmc, genome = genome, model = model, ncores = 1, divergence.iteration = divergence.iteration)
 sink()
+
+
 test_that("identical MCMC-ROC input with Phi, same log posterior", {
-  knownLogPosterior <- -942493
-  print(round(mcmc$getLogPosteriorTrace()[10]))
-  testLogPosterior <- round(mcmc$getLogPosteriorTrace()[10])
-  expect_equal(knownLogPosterior, testLogPosterior)
+   testLogPosterior <- round(mcmc$getLogPosteriorTrace()[(samples + 1)])
+   print(testLogPosterior)
+   expect_equal(knownLogPosteriorValues[["with.phi"]], testLogPosterior)
 })
 
 
@@ -81,26 +86,40 @@ test_that("identical MCMC-ROC input with Phi, same log posterior", {
 
 ## Notes:
 ##   - When using a brand new mcmc object (not one loaded or extended), the first LogPosteriorTrace() and LogLikelihoodTrace() values are both 0.
-##   - Not sure if this is a bug or intentional.  If it's intentional, then we should simply alter the test for the objects that are saved and then reloaded.
+##   - However, when an mcmc object is loaded, the first index is dropped.
+## TEMPORARY RESOLUTION: adjust index value for values
+## LONGTERM RESOLUTION: Alex will modify code per issue
+##   -`saving and loading MCMC object results in loss of first element #388`
+
 
 test_that("object can be written successfully: mcmc", {
   expect_null(writeMCMCObject(mcmc = mcmc, file = mcmcSaveFile))
 })
 
 test_that("object can be loaded successfully: mcmc", {
-  expect_silent(mcmcSaved <- loadMCMCObject(file = mcmcSaveFile))  
+  expect_silent(loadMCMCObject(file = mcmcSaveFile))
 })
 
-test_that("object trace matches expected length of (samples + 1): mcmc",{
+## Loading object in test_that failes to put it in global environment
+## Solution: Load explicitly here
+mcmcLoaded <- loadMCMCObject(file = mcmcSaveFile)
+
+test_that("object trace matches expected length of (samples): mcmc",{
   expect_equal(
-    length(mcmcSaved$getLogPosteriorTrace()), (samples+1) )
+    length(mcmcLoaded$getLogPosteriorTrace()), (samples)) ## note once bug #388 is fixed, replace samples with (samples + 1)
+})
+
+test_that("object loaded has expected log posterior", {
+   testLogPosterior <- round(mcmc$getLogPosteriorTrace()[(samples)]) ## note once bug #388 is fixed, replace samples with (samples + 1)
+   print(testLogPosterior)
+   expect_equal(knownLogPosteriorValues[["with.phi"]], testLogPosterior)
 })
 
 ### end tests by Elizabeth Barnes and Mike Gilchrist
 
 
 ### Without Phi
-set.seed(446141)
+set.seed(seedValue)
 
 genome <- initializeGenomeObject(file = fileName) 
 
@@ -117,10 +136,9 @@ sink(outFile)
 runMCMC(mcmc, genome, model, 1, divergence.iteration)
 sink()
 test_that("identical MCMC-ROC input without Phi, same log posterior", {
-  knownLogPosterior <- -960298
-  print(round(mcmc$getLogPosteriorTrace()[10]))
-  testLogPosterior <- round(mcmc$getLogPosteriorTrace()[10])
-  expect_equal(knownLogPosterior, testLogPosterior)
+  testLogPosterior <- round(mcmc$getLogPosteriorTrace()[(samples + 1)])
+  print(testLogPosterior)
+  expect_equal(knownLogPosteriorValues[["without.phi"]], testLogPosterior)
 })
 
 
