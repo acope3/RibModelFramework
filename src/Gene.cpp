@@ -190,7 +190,7 @@ void Gene::setSequence(std::string _seq)
     	}
 }
 
-/* setPASequence (NOT EXPOSED)
+/* setRFPSequence (NOT EXPOSED)
  * Arguments: A table-styled vector (based on lines of input) of integer vectors (storing actual values).
  * The argument is intended to be derived from solely Genome::readRFPData,
  * which creates a PA-formatted table indexed: Position,Codon,RFPCount(s) (may be multiple)
@@ -199,7 +199,7 @@ void Gene::setSequence(std::string _seq)
  * transfers the table to sequenceSummary::processPA.
  * NOTE: As part of changing the sequence, the sequence summary is also cleared.
 */
-void Gene::setPASequence(std::vector<std::vector<int>> table)
+void Gene::setRFPSequence(std::vector<std::vector<int>> table)
 {
     geneData.clear();
 
@@ -209,37 +209,15 @@ void Gene::setPASequence(std::vector<std::vector<int>> table)
 
     for (unsigned i = 0; i < nRows; i++)
     {
-        std::string codon = SequenceSummary::indexToCodon((unsigned) table[i][1]);
-        seq.replace((unsigned) table[i][0] * 3, 3, codon);
+        std::string codon = SequenceSummary::indexToCodon((unsigned) table[i][1]); // Codon is in the second column of table
+        seq.replace((unsigned) table[i][0] * 3, 3, codon); // First column is position in codon, multiply by 3.
     }
 
-    // Call processPA with a checking error statement printed if needed.
-    if (!geneData.processPA(table))
+    // Call processRFP with a checking error statement printed if needed.
+    if (!geneData.processRFP(table))
         my_printError("WARNING: Error with gene %\nBad codons found!\n", id);
 }
 
-/* setPANSE Sequence (NOT EXPOSED)
- * Arguments: A table-styled vector (based on lines of input) of integer vectors (storing actual values).
- * The argument is intended to be derived from solely Genome::readRFPData,
- TODO: Needs to be adjusted to maintain rfp position*/
-void Gene::setPANSESequence(std::vector<std::vector<int>> table)
-{
-    geneData.clear();
-
-    unsigned nRows = (unsigned)table.size();
-
-    seq.resize(nRows * 3); //multiply by three since codons
-
-    for (unsigned i = 0; i < nRows; i++)
-    {
-        std::string codon = SequenceSummary::indexToCodon((unsigned) table[i][1]);
-        seq.replace((unsigned) table[i][0] * 3, 3, codon);
-    }
-
-    // Call processPA with a checking error statement printed if needed. TODO: Need to add a process PANSE
-    if (!geneData.processPANSE(table))
-        my_printError("WARNING: Error with gene %\nBad codons found!\n", id);
-}
 
 
 /* getSequenceSummary (NOT EXPOSED)

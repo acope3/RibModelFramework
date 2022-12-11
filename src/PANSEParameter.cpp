@@ -63,6 +63,7 @@ PANSEParameter& PANSEParameter::operator=(const PANSEParameter& rhs)
 	bias_csp = rhs.bias_csp;
 	std_csp = rhs.std_csp;
 	covarianceMatrix = rhs.covarianceMatrix;
+	nse_covarianceMatrix = rhs.nse_covarianceMatrix;
 	std_partitionFunction = rhs.std_partitionFunction;
 	partitionFunction_proposed = rhs.partitionFunction_proposed;
 	partitionFunction = rhs.partitionFunction;
@@ -97,7 +98,7 @@ PANSEParameter::~PANSEParameter()
 */
 void PANSEParameter::initPANSEParameterSet()
 {
-	unsigned alphaCategories = getNumMutationCategories();
+	unsigned alphaCategories = getNumSelectionCategories();
 	unsigned lambdaPrimeCategories = getNumSelectionCategories();
 	unsigned nonsenseErrorCategories = getNumMutationCategories();
 	unsigned partitionFunctionCategories = numMixtures;
@@ -116,7 +117,13 @@ void PANSEParameter::initPANSEParameterSet()
 	
 	partitionFunction_proposed.resize(partitionFunctionCategories, 1.0);
 	partitionFunction.resize(partitionFunctionCategories, 1.0);
-
+	groupList = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
+              "TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT", "ATA", "ATC",
+              "ATT", "AAA", "AAG", "CTA", "CTC", "CTG", "CTT", "TTA", "TTG", "ATG",
+              "AAC", "AAT", "CCA", "CCC", "CCG", "CCT", "CAA", "CAG", "AGA", "AGG",
+              "CGA", "CGC", "CGG", "CGT", "TCA", "TCC", "TCG", "TCT", "ACA", "ACC",
+              "ACG", "ACT", "GTA", "GTC", "GTG", "GTT", "TGG", "TAC", "TAT", "AGC",
+              "AGT"};
 	numParam = 61;
 
 	numAcceptForNSERates.resize(numParam,0u);
@@ -143,26 +150,20 @@ void PANSEParameter::initPANSEParameterSet()
     }
     for (unsigned i = 0; i < numParam; i++)
   	{
-    	//CovarianceMatrix m((numMutationCategories+numSelectionCategories+numMutationCategories));
-    	CovarianceMatrix m((numMutationCategories+numSelectionCategories));
+      CovarianceMatrix m((alphaCategories + lambdaPrimeCategories));
     	m.choleskyDecomposition();
     	covarianceMatrix.push_back(m);
+    	if (nonsenseErrorCategories > 1)
+    	{
+    	  CovarianceMatrix m((nonsenseErrorCategories));
+    	  m.choleskyDecomposition();
+    	  nse_covarianceMatrix.push_back(m);
+    	}
   	}
-
- 
 	bias_csp = 0;
 	std_csp.resize(numParam,0.1);
 	std_nse.resize(numParam,0.1);
 	std_partitionFunction = 0.1;
-
-	groupList = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
-		"TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT", "ATA", "ATC",
-		"ATT", "AAA", "AAG", "CTA", "CTC", "CTG", "CTT", "TTA", "TTG", "ATG",
-		"AAC", "AAT", "CCA", "CCC", "CCG", "CCT", "CAA", "CAG", "AGA", "AGG",
-		"CGA", "CGC", "CGG", "CGT", "TCA", "TCC", "TCG", "TCT", "ACA", "ACC",
-		"ACG", "ACT", "GTA", "GTC", "GTG", "GTT", "TGG", "TAC", "TAT", "AGC",
-		"AGT"};
-
 }
 
 
@@ -646,7 +647,7 @@ void PANSEParameter::proposeCodonSpecificParameter()
 {
 	unsigned numAlpha = (unsigned)currentCodonSpecificParameter[alp][0].size();
 	unsigned numLambdaPrime = (unsigned)currentCodonSpecificParameter[lmPri][0].size();
-    unsigned numNSE = (unsigned)currentCodonSpecificParameter[nse][0].size();
+  unsigned numNSE = (unsigned)currentCodonSpecificParameter[nse][0].size();
 
 
 	for (unsigned i = 0; i < numMutationCategories; i++)
@@ -674,7 +675,7 @@ void PANSEParameter::proposeCodonSpecificParameter()
 			}
 			else
 			{
-				if (j == 29) // M/ATG has index 29, see SequenceSummary. This will need to be updated to be more general.
+				if (j == 29 && i == 0) // M/ATG has index 29, see SequenceSummary. This will need to be updated to be more general.
         		{
         			//This guarantees \alpha/\lambda will be 1. 
         			proposedCodonSpecificParameter[lmPri][i][j] = proposedCodonSpecificParameter[alp][i][j];

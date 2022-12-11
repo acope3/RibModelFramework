@@ -36,6 +36,9 @@ class SequenceSummary
 
 		std::vector <unsigned> positionCodonID;
 		// index is the number of position, where a value (codonID) is set
+		
+		std::vector <unsigned> positionMixture;
+		// index is the mixture assignment of the codon at a position
 
 
 	public:
@@ -69,14 +72,14 @@ class SequenceSummary
 
 
 		//RFP Functions (for PA and PANSE models) (All tested):
-        //RFP Count has an inner vector indexed by position Sum RFP Count has an inner index of Codon Type
+    //RFP Count has an inner vector indexed by position Sum RFP Count has an inner index of Codon Type
 		void initRFPCount(unsigned numCategories);
 		std::vector <unsigned long> getRFPCount(unsigned RFPCountColumn = 0u);
 		unsigned long getSingleRFPCount(unsigned position, unsigned RFPCountColumn = 0u);
 		void setRFPCount(std::vector <unsigned long> arg, unsigned RFPCountColumn = 0u);
 		unsigned long getSumTotalRFPCount(unsigned RFPCountColumn = 0u);
 
-        void initSumRFPCount(unsigned numCategories);
+    void initSumRFPCount(unsigned numCategories);
 		std::array <unsigned long, 64> getSumRFPCount(unsigned RFPCountColumn = 0u);
 		void setSumRFPCount(std::array <unsigned long, 64> arg, unsigned RFPCountColumn = 0u);
 
@@ -88,12 +91,14 @@ class SequenceSummary
         //Poisitonal information about Codons
         std::vector <unsigned> getPositionCodonID(); //Used in PANSE for getting codon positions over gene
         void setPositionCodonID(std::vector <unsigned> arg);
+        std::vector <unsigned> getPositionMixture();
 
 		//Other Functions (All tested):
 		void clear();
 		bool processSequence(const std::string& sequence);
-        bool processPA(std::vector <std::vector <int>> table);
-        bool processPANSE(std::vector <std::vector <int>> table);
+		bool processRFP(std::vector <std::vector <int>> table);
+    //   bool processPA(std::vector <std::vector <int>> table);
+    //    bool processPANSE(std::vector <std::vector <int>> table);
 
 		//Static Functions:
 		static unsigned AAToAAIndex(std::string aa); //Moving to CT

@@ -32,6 +32,7 @@ class PANSEParameter: public Parameter {
         double std_partitionFunction;
         unsigned numAcceptForPartitionFunction;
         std::vector<unsigned> numAcceptForNSERates;
+        std::vector<CovarianceMatrix> nse_covarianceMatrix;
 		double bias_csp;
 
 		// Sum of all RFP counts

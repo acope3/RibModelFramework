@@ -285,13 +285,13 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
 /* readRFPData (RCPP EXPOSED)
  * Arguments: string filename, boolean to determine if we are appending to the existing genome
  * (if not set to true, will default to clearing genome data; defaults to false)
- * Read in a PA-formatted file: GeneID,Position (1-indexed),Codon,RFPCount(s) (may be multiple)
+ * Read in a RFP-formatted file: GeneID,Position (1-indexed),Mixture,Codon,RFPCount (only one)
  * The positions are not necessarily in the right order.
  * Ignores ambiguously-positioned codons (marked with negative position).
  * RFPCounts are not given as a positive number are set to -1 and are stored, but not used in calculation.
- * There may be more than one RFPCount, and thus the header is important.
+ * Restrict RFPCounts to 1 dataset (which can be the combination of multiple datasets, potentially useful if analyzing replicates )
 */
-void Genome::readRFPData(std::string filename, bool append, bool positional)
+void Genome::readRFPData(std::string filename, bool append)
 {
 	prev_genome_size = genes.size();
 	try {
@@ -310,22 +310,31 @@ void Genome::readRFPData(std::string filename, bool append, bool positional)
             if (!std::getline(Fin, tmp))
                 my_printError("Error in Genome::readRFPData: RFPData file % has no header.\n", filename);
 
-			// Ignore first 3 commas: ID, position, codon
+			// Ignore first 3 commas: ID, position, codon, mixture
 			std::size_t pos = tmp.find(',');
 			pos = tmp.find(',', pos + 1);
 			pos = tmp.find(',', pos + 1);
+			pos = tmp.find(',', pos + 1);
+			
 
 			// While there are more commas, there are more categories of RFP counts
-			unsigned numCategories = 0;
-			std::size_t pos2;
+			unsigned numDatasets = 0;
+			std::size_t pos2, pos3;
 			while (pos != std::string::npos)
 			{
-				numCategories++;
+				numDatasets++;
 				pos2 = tmp.find(',', pos + 1);
-				addRFPCountColumnName(tmp.substr(pos + 1, pos2 - (pos + 1)));
+				if (numDatasets > 1)
+				{
+				  my_print("WARNING: Number of data columns is greater than 1. Will ignore all but the first.");
+				}
+				else 
+				{
+				  addRFPCountColumnName(tmp.substr(pos + 1, pos2 - (pos + 1)));
+				}
 				pos = pos2;
 			}
-			unsigned tableWidth = 2 + numCategories; // Table size: position + codonID + each category
+			unsigned tableWidth = 4; // Table size: position + codonID + mixture + RFPCount, 
 
 			// -------------------------------------------------------------------------//
 			// --------------- Now for each RFPCount category, record it. ------------- //
@@ -333,7 +342,7 @@ void Genome::readRFPData(std::string filename, bool append, bool positional)
 			// -------------------------------------------------------------------------//
 			std::string prevID = "";
 			Gene tmpGene;
-			int position, possValue;
+			int position, possValue, mixture;
 			prevID = "";
 			bool first = true;
 
@@ -379,14 +388,7 @@ void Genome::readRFPData(std::string filename, bool append, bool positional)
 					{
 						tmpGene.setId(prevID);
 						tmpGene.setDescription("No description for PA(NSE) Model");
-						if(positional) 
-						{
-							tmpGene.setPANSESequence(table);
-						}
-						else 
-						{
-							tmpGene.setPASequence(table);
-						}
+						tmpGene.setRFPSequence(table);
 						addGene(tmpGene, false); //add to genome
 						totalRFPCount += tmpGene.geneData.getSumTotalRFPCount(0);
 						tmpGene.clear();
@@ -401,9 +403,15 @@ void Genome::readRFPData(std::string filename, bool append, bool positional)
 					tableIndex ++;
 					tableRow[tableIndex] = SequenceSummary::codonToIndex(codon);
 					// Note: May be an invalid Codon read in, but this is resolved when the sequence is set and processed.
-
+          
+          // Get mixture assignment for codon at current position
+					pos3 = tmp.find(',', pos2 + 1);
+					mixture = std::atoi(tmp.substr(pos3 + 1, pos3 - (pos2 + 1)).c_str()) - 1;
+					tableIndex ++;
+					tableRow[tableIndex] = mixture;
+					
 					// Skip to end RFPCount(s), if any
-					pos = tmp.find(',', pos2 + 1);
+					pos = tmp.find(',', pos3 + 1);
 					tableIndex ++;
 
 					// While there are more commas, there are more categories of RFP counts
@@ -437,7 +445,7 @@ void Genome::readRFPData(std::string filename, bool append, bool positional)
             {
                 tmpGene.setId(prevID);
                 tmpGene.setDescription("No description for PA(NSE) Model");
-                tmpGene.setPASequence(table);
+                tmpGene.setRFPSequence(table);
                 totalRFPCount += tmpGene.geneData.getSumTotalRFPCount(0);
                 addGene(tmpGene, false); //add to genome
             }

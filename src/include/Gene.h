@@ -41,8 +41,9 @@ class Gene
 		void setDescription(std::string _desc);
 		std::string getSequence();
 		void setSequence(std::string _seq);
-        void setPASequence(std::vector <std::vector <int>> table);
-        void setPANSESequence(std::vector <std::vector <int>> table);
+    //void setPASequence(std::vector <std::vector <int>> table);
+    //void setPANSESequence(std::vector <std::vector <int>> table);
+    void setRFPSequence(std::vector <std::vector <int>> table);
 		SequenceSummary *getSequenceSummary();
 		std::vector<double> getObservedSynthesisRateValues(); //exposed to RCPP, tested in C++
 		void setObservedSynthesisRateValues(std::vector <double> values); //Only for unit testing.
