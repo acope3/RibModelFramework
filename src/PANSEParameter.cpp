@@ -995,6 +995,11 @@ unsigned PANSEParameter::getNSECategory(unsigned mixtureElement)
 }
 
 
+unsigned PANSEParameter::getNumElongationMixtureElements()
+{
+	return numElongationMixtures;
+}
+
 // ----------------------------------------------//
 // -------- Partition Function Functions --------//
 // ----------------------------------------------//

@@ -122,6 +122,7 @@ class PANSEParameter: public Parameter {
 		double getParameterForCategory(unsigned category, unsigned paramType, std::string codon, bool proposal);
 		unsigned getNumNSECategories();
 		unsigned getNSECategory(unsigned mixtureElement);
+		unsigned getNumElongationMixtureElements();
 
 		void printMixtureDefinitionMatrix();
 		//For setting Y value

@@ -20,7 +20,7 @@ class PANSEModel: public Model
    		std::vector<std::vector<double>> log_currentLambda;
         std::vector<std::vector<std::vector<double>>> lgamma_rfp_alpha;
       
-        std::vector<double> prob_successful;
+        std::vector<std::vector<double>> prob_successful;
 
         
  
@@ -116,6 +116,7 @@ class PANSEModel: public Model
 		virtual unsigned getNumPhiGroupings();
 		virtual unsigned getMixtureAssignment(unsigned index);
 		virtual unsigned getNumMixtureElements();
+		virtual unsigned getNumElongationMixtureElements();
 		virtual unsigned getNumSynthesisRateCategories();
 
 		virtual void setNumPhiGroupings(unsigned value);
