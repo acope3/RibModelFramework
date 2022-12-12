@@ -18,6 +18,9 @@ std::default_random_engine Parameter::generator( (unsigned) std::time(NULL));
 const std::string Parameter::allUnique = "allUnique";
 const std::string Parameter::selectionShared = "selectionShared";
 const std::string Parameter::mutationShared = "mutationShared";
+const std::string Parameter::elongationShared = "elongationShared"; //only intended for PANSE
+const std::string Parameter::nseShared = "nseShared"; //only intended for PANSE
+
 
 const unsigned Parameter::dM = 0;
 const unsigned Parameter::dEta = 1;
@@ -760,11 +763,13 @@ double Parameter::getCodonSpecificPriorStdDev(unsigned paramType)
 void Parameter::setNumMutationSelectionValues(std::string _mutationSelectionState,
 											  std::vector<std::vector<unsigned>> mixtureDefinitionMatrix)
 {
+	//Note that for PA(NSE), delM refers to alpha, and lambda
 	if (!mixtureDefinitionMatrix.empty())
 	{
 		//sets allow only the unique numbers to be added.
 		//at the end, the size of the set is equal to the number
 		//of unique categories.
+
 		std::set<unsigned> delMCounter;
 		std::set<unsigned> delEtaCounter;
 		for (unsigned i = 0u; i < numMixtures; i++)
@@ -777,11 +782,13 @@ void Parameter::setNumMutationSelectionValues(std::string _mutationSelectionStat
 		numMutationCategories = (unsigned)delMCounter.size();
 		numSelectionCategories = (unsigned)delEtaCounter.size();
 	}
+	// if PA, that means this share lambdaPrime parameters across mixtures
 	else if (_mutationSelectionState == selectionShared)
 	{
 		numMutationCategories = numMixtures;
 		numSelectionCategories = 1u;
 	}
+	// if PA, that means this share alpha parameters across mixtures
 	else if (_mutationSelectionState == mutationShared)
 	{
 		numMutationCategories = 1u;

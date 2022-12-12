@@ -33,12 +33,16 @@ class PANSEParameter: public Parameter {
         unsigned numAcceptForPartitionFunction;
         std::vector<unsigned> numAcceptForNSERates;
         std::vector<CovarianceMatrix> nse_covarianceMatrix;
+
+
 		double bias_csp;
+
 
 		// Sum of all RFP counts
 		unsigned Y;
 
 	public:
+
         //Testing Functions
         std::vector<double> oneMixLambda();
         std::vector<double> oneMixAlpha();
@@ -48,14 +52,15 @@ class PANSEParameter: public Parameter {
 		explicit PANSEParameter();
 		PANSEParameter(std::string filename);
 		PANSEParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
-				std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer = true,
+				std::vector<std::vector<unsigned>> thetaKMatrix, unsigned _numElongationMixtures, bool splitSer = true,
 				std::string _mutationSelectionState = "allUnique");
 		PANSEParameter& operator=(const PANSEParameter& rhs);
 		virtual ~PANSEParameter();
 
 
 		//Initialization, Restart, Index Checking:
-		void initPANSEParameterSet();
+		void initPANSEParameterSet( std::vector<std::vector<unsigned>> mixtureDefinitionMatrix,
+				std::string _mutationSelectionState, unsigned _numElongationMixtures);
 		void initPANSEValuesFromFile(std::string filename);
 		void writeEntireRestartFile(std::string filename);
 		void writePANSERestartFile(std::string filename);
@@ -67,6 +72,11 @@ class PANSEParameter: public Parameter {
 		void initNonsenseErrorRate(double nonsenseErrorRateValue, unsigned mixtureElement, std::string codon);
 		void initMutationSelectionCategories(std::vector<std::string> files, unsigned numCategories,
 				unsigned paramType); //TODO: function needs to be changed
+
+		void setNumMutationSelectionValues(std::string mutationSelectionState,
+					std::vector<std::vector<unsigned>> mixtureDefinitionMatrix); //TODO: test
+		void initCategoryDefinitions(std::string mutationSelectionState,
+					std::vector<std::vector<unsigned>> mixtureDefinitionMatrix);
 		void fixAlpha();
 		void fixLambdaPrime();
 		void fixNSERate();
@@ -108,7 +118,8 @@ class PANSEParameter: public Parameter {
 
 		//Other functions:
 		double getParameterForCategory(unsigned category, unsigned paramType, std::string codon, bool proposal);
-
+		unsigned getNumNSECategories();
+		unsigned getNSECategory(unsigned mixtureElement);
 		//For setting Y value
 		void setTotalRFPCount(Genome& genome);
 		unsigned long getTotalRFPCount();
@@ -166,6 +177,7 @@ class PANSEParameter: public Parameter {
 #endif //STANDALONE
 
 	protected:
+
 };
 
 #endif // PANSEPARAMETER_H

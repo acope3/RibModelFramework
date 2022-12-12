@@ -370,7 +370,6 @@ void Genome::readRFPData(std::string filename, bool append)
 				// Error-checking note: Of course, atoi function returns 0 if not an integer
 				// -> leads to 0 - 1 == -1 -> codon ignored (as intended).
 				position = std::atoi(tmp.substr(pos + 1, pos2 - (pos + 1)).c_str()) - 1;
-
 				// Position integer: Ensure that if position is negative, ignore the codon.
 				if (position > -1) // for convenience of calculation; ambiguous positions are marked by -1.
 				{
@@ -407,6 +406,7 @@ void Genome::readRFPData(std::string filename, bool append)
           // Get mixture assignment for codon at current position
 					pos3 = tmp.find(',', pos2 + 1);
 					mixture = std::atoi(tmp.substr(pos3 + 1, pos3 - (pos2 + 1)).c_str()) - 1;
+
 					tableIndex ++;
 					tableRow[tableIndex] = mixture;
 					

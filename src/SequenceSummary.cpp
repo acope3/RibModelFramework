@@ -77,6 +77,7 @@ SequenceSummary::SequenceSummary(const SequenceSummary& other)
 	RFPCount = other.RFPCount;
 	sumRFPCount = other.sumRFPCount;
 	positionCodonID = other.positionCodonID;
+	positionMixture = other.positionMixture;
 }
 
 
@@ -90,6 +91,7 @@ SequenceSummary& SequenceSummary::operator=(const SequenceSummary& rhs)
 	RFPCount = rhs.RFPCount;
 	sumRFPCount = rhs.sumRFPCount;
 	positionCodonID = rhs.positionCodonID;
+	positionMixture = rhs.positionMixture;
 
 	return *this;
 }
@@ -105,6 +107,7 @@ bool SequenceSummary::operator==(const SequenceSummary& other) const
 	if (this->RFPCount != other.RFPCount) {match = false; }
 	if (this->sumRFPCount != other.sumRFPCount) {match = false; }
 	if (this->positionCodonID != other.positionCodonID) { match = false; }
+	if (this->positionMixture != other.positionMixture) { match = false; }
 
 	return match;
 }
@@ -324,7 +327,7 @@ std::vector <unsigned> SequenceSummary::getPositionCodonID()
  * Arguments: None.
  * Returns the vector of codon IDs for each position.
  */
-std::vector <unsigned> SequenceSummary::getPositionMixture()()
+std::vector <unsigned> SequenceSummary::getPositionMixture()
 {
   return positionMixture;
 }
@@ -405,6 +408,7 @@ bool SequenceSummary::processRFP(std::vector<std::vector<int>> table)
 
 	// There should be at least 1 table entry to get to this point, so this should be a valid operation
   unsigned numCats = (unsigned)table[0].size() - 3; // numCats = after position, codon, mixture
+  my_print("NumCats: %\n",numCats);
 	initRFPCount(numCats);
 	sumRFPCount.resize(numCats);
 
@@ -429,7 +433,7 @@ bool SequenceSummary::processRFP(std::vector<std::vector<int>> table)
 			naa[aaID]++;
 			codonPositions[codonID].push_back((unsigned) row[0]);
 			positionCodonID[row[0]] = codonID;
-			positionMixture[row[0]] = row[3];
+			positionMixture[row[0]] = row[2];
 
 			for (unsigned j = 0; j < numCats; j++)
 			{
