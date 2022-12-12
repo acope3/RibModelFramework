@@ -202,23 +202,23 @@ void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsig
 	// proposal bias and std for phi values
 	bias_phi = 0;
 
-
 	setNumMutationSelectionValues(_mutationSelectionState, mixtureDefinitionMatrix);
 	mutationIsInMixture.resize(numMutationCategories);
 	selectionIsInMixture.resize(numSelectionCategories);
+	phiIsInMixture.resize(numSynthesisRateCategories);
 	initCategoryDefinitions(_mutationSelectionState, mixtureDefinitionMatrix);
 
 	categoryProbabilities.resize(numMixtures, 1.0/(double)numMixtures);
 
 
 	//Set up vector of vectors:
-	currentSynthesisRateLevel.resize(numSelectionCategories);
-	proposedSynthesisRateLevel.resize(numSelectionCategories);
-	numAcceptForSynthesisRate.resize(numSelectionCategories);
+	currentSynthesisRateLevel.resize(numSynthesisRateCategories);
+	proposedSynthesisRateLevel.resize(numSynthesisRateCategories);
+	numAcceptForSynthesisRate.resize(numSynthesisRateCategories);
 
-	std_phi.resize(numSelectionCategories);
+	std_phi.resize(numSynthesisRateCategories);
 
-	for (unsigned i = 0u; i < numSelectionCategories; i++)
+	for (unsigned i = 0u; i < numSynthesisRateCategories; i++)
 	{
 		std::vector<double> tempExpr(numGenes, 0.0);
 		currentSynthesisRateLevel[i] = tempExpr;
@@ -290,6 +290,7 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 				else if (variableName == "numParam") {iss.str(tmp); iss >> numParam;}
 				else if (variableName == "numMutationCategories") {iss.str(tmp); iss >> numMutationCategories;}
 				else if (variableName == "numSelectionCategories") {iss.str(tmp); iss >> numSelectionCategories;}
+				else if (variableName == "numSynthesisRateCategories") {iss.str(tmp); iss >> numSynthesisRateCategories;}
 				else if (variableName == "numMixtures") {iss.str(tmp); iss >> numMixtures;}
 				else if (variableName == "mixtureAssignment")
 				{
@@ -306,6 +307,8 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 					mixtureDefinition K;
 					iss >> K.delM;
 					iss >> K.delEta;
+					iss >> K.nse; // should be -1 if ROC, FONSE, or PA
+					iss >> K.phi;
 					categories.push_back(K);
 				}
 				else if (variableName == "categoryProbabilities")
@@ -348,6 +351,23 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 						while (iss >> val)
 						{
 							selectionIsInMixture[cat - 1].push_back(val);
+						}
+					}
+				}
+				else if (variableName == "phiIsInMixture")
+				{
+					if (tmp == "***")
+					{
+						phiIsInMixture.resize(phiIsInMixture.size() + 1);
+						cat++;
+					}
+					else
+					{
+						unsigned val;
+						iss.str(tmp);
+						while (iss >> val)
+						{
+							phiIsInMixture[cat - 1].push_back(val);
 						}
 					}
 				}
@@ -425,7 +445,10 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 		}
 
 		input.close();
-
+		if (phiIsInMixture.size() == 0)
+		{
+			phiIsInMixture = selectionIsInMixture;
+		}
 		//initialize all the default Parameter values now.
 		stdDevSynthesisRate_proposed = stdDevSynthesisRate;
 		numAcceptForStdDevSynthesisRate = 0u;
@@ -494,9 +517,8 @@ void Parameter::writeBasicRestartFile(std::string filename)
 		oss << ">categories:\n";
 		for (i = 0; i < categories.size(); i++)
 		{
-			oss << categories[i].delM << " " << categories[i].delEta << "\n";
+			oss << categories[i].delM << " " << categories[i].delEta << categories[i].nse << " " << categories[i].phi << " " << "\n";
 		}
-
 		oss << ">mixtureAssignment:\n";
 		for (i = 0; i < mixtureAssignment.size(); i++)
 		{
@@ -507,6 +529,7 @@ void Parameter::writeBasicRestartFile(std::string filename)
 		if (i % 50 != 0) oss <<"\n";
 		oss << ">numMutationCategories:\n" << numMutationCategories << "\n";
 		oss << ">numSelectionCategories:\n" << numSelectionCategories << "\n";
+		oss << ">numSynthesisRateCategories:\n" << numSynthesisRateCategories << "\n";
 
 		oss << ">categoryProbabilities:\n";
 		for (i = 0; i < categoryProbabilities.size(); i++)
@@ -527,7 +550,16 @@ void Parameter::writeBasicRestartFile(std::string filename)
 			}
 			oss << "\n";
 		}
-
+		oss << ">phiIsInMixture:\n";
+		for (i = 0; i < phiIsInMixture.size(); i++)
+		{
+			oss << "***\n";
+			for (j = 0; j < phiIsInMixture[i].size(); j++)
+			{
+				oss << phiIsInMixture[i][j] <<" ";
+			}
+			oss << "\n";
+		}
 		oss << ">mutationIsInMixture:\n";
 		for (i = 0; i < mutationIsInMixture.size(); i++)
 		{
@@ -600,6 +632,7 @@ void Parameter::initCategoryDefinitions(std::string _mutationSelectionState,
 	std::set<unsigned> delMCounter;
 	std::set<unsigned> delEtaCounter;
 
+	//Default assumes selection and synthesis rate categories are the same, but we have the ability to relax this
 	for (unsigned i = 0u; i < numMixtures; i++)
 	{
 		categories.push_back(mixtureDefinition()); //push a blank mixtureDefinition on the vector, then alter.
@@ -607,29 +640,45 @@ void Parameter::initCategoryDefinitions(std::string _mutationSelectionState,
 		{
 			categories[i].delM = mixtureDefinitionMatrix[i][0] - 1;
 			categories[i].delEta = mixtureDefinitionMatrix[i][1] - 1; //need check for negative and consecutive checks
+			categories[i].phi = mixtureDefinitionMatrix[i][1] - 1;
 			mutationIsInMixture[mixtureDefinitionMatrix[i][0] - 1].push_back(i);
 			selectionIsInMixture[mixtureDefinitionMatrix[i][1] - 1].push_back(i);
+			phiIsInMixture[mixtureDefinitionMatrix[i][1] - 1].push_back(i);
+
+			categories[i].nse = -1; // This should only be set when using PANSE. Use -1 to indicate no category for this parameter
 		}
 		else if (_mutationSelectionState == selectionShared)
 		{
 			categories[i].delM = i;
 			categories[i].delEta = 0;
+			categories[i].phi = 0;
 			mutationIsInMixture[i].push_back(i);
 			selectionIsInMixture[0].push_back(i);
+			phiIsInMixture[0].push_back(i);
+
+			categories[i].nse = -1;
 		}
 		else if (_mutationSelectionState == mutationShared)
 		{
 			categories[i].delM = 0;
 			categories[i].delEta = i;
+			categories[i].phi = i;
 			mutationIsInMixture[0].push_back(i);
 			selectionIsInMixture[i].push_back(i);
+			phiIsInMixture[i].push_back(i);
+
+			categories[i].nse = -1;
 		}
 		else //assuming the default of allUnique
 		{
 			categories[i].delM = i;
 			categories[i].delEta = i;
+			categories[i].phi = i;
 			mutationIsInMixture[i].push_back(i);
 			selectionIsInMixture[i].push_back(i);
+			phiIsInMixture[i].push_back(i);
+
+			categories[i].nse = -1;
 		}
 		delMCounter.insert(categories[i].delM);
 		delEtaCounter.insert(categories[i].delEta);
@@ -777,7 +826,6 @@ void Parameter::setNumMutationSelectionValues(std::string _mutationSelectionStat
 			delMCounter.insert(mixtureDefinitionMatrix[i][0] - 1);
 			delEtaCounter.insert(mixtureDefinitionMatrix[i][1] - 1);
 
-
 		}
 		numMutationCategories = (unsigned)delMCounter.size();
 		numSelectionCategories = (unsigned)delEtaCounter.size();
@@ -799,13 +847,17 @@ void Parameter::setNumMutationSelectionValues(std::string _mutationSelectionStat
 		numMutationCategories = numMixtures;
 		numSelectionCategories = numMixtures;
 	}
+	// In ROC and FONSE, numSelectionCategories == numSynthesisRateCategories
+	// We want to relax this assumption in PA/PANSE, so have separate value for numSynthesisRateCategories
+	numSynthesisRateCategories = numSelectionCategories;
 }
 
 
 void Parameter::printMixtureDefinitionMatrix()
 {
+	my_print("Mixture\tMutation\tSelection\tPhi\n");
 	for (unsigned i = 0u; i < numMixtures; i++)
-		my_print("%\t%\n", categories[i].delM, categories[i].delEta);
+		my_print("%\t%\t%\t%\n", i,categories[i].delM, categories[i].delEta,categories[i].phi);
 }
 
 
@@ -843,7 +895,7 @@ unsigned Parameter::getNumSelectionCategories()
 
 unsigned Parameter::getNumSynthesisRateCategories()
 {
-	return numSelectionCategories;
+	return numSynthesisRateCategories;
 }
 
 //Used to get alpha category in PA and PANSE
@@ -884,7 +936,7 @@ unsigned Parameter::getSelectionCategory(unsigned mixtureElement)
  */
 unsigned Parameter::getSynthesisRateCategory(unsigned mixtureElement)
 {
-	return categories[mixtureElement].delEta;
+	return categories[mixtureElement].phi;
 }
 
 
@@ -898,6 +950,13 @@ std::vector<unsigned> Parameter::getMixtureElementsOfSelectionCategory(unsigned 
 {
 	return selectionIsInMixture[category];
 }
+
+
+std::vector<unsigned> Parameter::getMixtureElementsOfSynthesisRateCategory(unsigned category)
+{
+	return phiIsInMixture[category];
+}
+
 
 
 std::string Parameter::getMutationSelectionState()
@@ -1000,7 +1059,7 @@ double Parameter::getStdDevSynthesisRate(unsigned selectionCategory, bool propos
 
 void Parameter::proposeStdDevSynthesisRate()
 {
-	for (unsigned i = 0u; i < numSelectionCategories; i++)
+	for (unsigned i = 0u; i < numSynthesisRateCategories; i++)
 	{	
 		if (!fix_stdDevSynthesis)
 		{
@@ -1040,7 +1099,7 @@ unsigned Parameter::getNumAcceptForStdDevSynthesisRate()
 
 void Parameter::updateStdDevSynthesisRate()
 {
-	for (unsigned i = 0u; i < numSelectionCategories; i++)
+	for (unsigned i = 0u; i < numSynthesisRateCategories; i++)
 	{
 		stdDevSynthesisRate[i] = stdDevSynthesisRate_proposed[i];
 	}
@@ -1068,7 +1127,7 @@ double Parameter::getStdCspForIndex(unsigned i)
 
 double Parameter::getSynthesisRate(unsigned geneIndex, unsigned mixtureElement, bool proposed)
 {
-	unsigned category = getSelectionCategory(mixtureElement);
+	unsigned category = getSynthesisRateCategory(mixtureElement);
  	return  (proposed ? proposedSynthesisRateLevel[category][geneIndex] : currentSynthesisRateLevel[category][geneIndex]);
 }
 
@@ -1098,7 +1157,7 @@ double Parameter::getCurrentSynthesisRateProposalWidth(unsigned expressionCatego
 */
 double Parameter::getSynthesisRateProposalWidth(unsigned geneIndex, unsigned mixtureElement)
 {
-	unsigned category = getSelectionCategory(mixtureElement);
+	unsigned category = getSynthesisRateCategory(mixtureElement);
 	return std_phi[category][geneIndex];
 }
 
@@ -1107,7 +1166,7 @@ void Parameter::proposeSynthesisRateLevels()
 {
 	unsigned numSynthesisRateLevels = (unsigned) currentSynthesisRateLevel[0].size();
 	
-	for (unsigned category = 0; category < numSelectionCategories; category++)
+	for (unsigned category = 0; category < numSynthesisRateCategories; category++)
 	{
 		for (unsigned i = 0u; i < numSynthesisRateLevels; i++)
 		{
@@ -1122,14 +1181,14 @@ void Parameter::proposeSynthesisRateLevels()
 
 void Parameter::setSynthesisRate(double phi, unsigned geneIndex, unsigned mixtureElement)
 {
-	unsigned category = getSelectionCategory(mixtureElement);
+	unsigned category = getSynthesisRateCategory(mixtureElement);
 	currentSynthesisRateLevel[category][geneIndex] = phi;
 }
 
 
 void Parameter::updateSynthesisRate(unsigned geneIndex)
 {
-	for (unsigned category = 0; category < numSelectionCategories; category++)
+	for (unsigned category = 0; category < numSynthesisRateCategories; category++)
 	{
 		numAcceptForSynthesisRate[category][geneIndex]++;
 		currentSynthesisRateLevel[category][geneIndex] = proposedSynthesisRateLevel[category][geneIndex];
@@ -1139,7 +1198,7 @@ void Parameter::updateSynthesisRate(unsigned geneIndex)
 
 void Parameter::updateSynthesisRate(unsigned geneIndex, unsigned mixtureElement)
 {
-	unsigned category = getSelectionCategory(mixtureElement);
+	unsigned category = getSynthesisRateCategory(mixtureElement);
 	numAcceptForSynthesisRate[category][geneIndex]++;
 	currentSynthesisRateLevel[category][geneIndex] = proposedSynthesisRateLevel[category][geneIndex];
 }
@@ -1326,7 +1385,7 @@ void Parameter::updateNoiseOffsetTraces(unsigned sample)
 
 void Parameter::updateStdDevSynthesisRateTrace(unsigned sample)
 {
-	for (unsigned i = 0u; i < numSelectionCategories; i++)
+	for (unsigned i = 0u; i < numSynthesisRateCategories; i++)
 	{
 		traces.updateStdDevSynthesisRateTrace(sample, stdDevSynthesisRate[i], i);
 	}
@@ -1416,7 +1475,7 @@ void Parameter::adaptSynthesisRateProposalWidth(unsigned adaptationWidth, bool a
 	factorCriteriaLow = acceptanceTargetLow;
 	factorCriteriaHigh = acceptanceTargetHigh;
 	
-	for (unsigned cat = 0u; cat < numSelectionCategories; cat++)
+	for (unsigned cat = 0u; cat < numSynthesisRateCategories; cat++)
 	{
 		unsigned numGenes = (unsigned)numAcceptForSynthesisRate[cat].size();
 		for (unsigned i = 0; i < numGenes; i++)
@@ -1849,7 +1908,7 @@ double Parameter::getCodonSpecificPosteriorMean(unsigned element, unsigned sampl
 //' @return returns variance for standard deviation of lognormal distribution of synthesis rates
 double Parameter::getStdDevSynthesisRateVariance(unsigned samples, unsigned mixture, bool unbiased)
 {
-	unsigned selectionCategory = getSelectionCategory(mixture);
+	unsigned selectionCategory = getSynthesisRateCategory(mixture);
 	std::vector<double> StdDevSynthesisRateTrace = traces.getStdDevSynthesisRateTrace(selectionCategory);
 	unsigned traceLength = (unsigned)StdDevSynthesisRateTrace.size();
 	if (samples > traceLength)
@@ -2518,7 +2577,7 @@ unsigned Parameter::getSelectionCategoryForMixture(unsigned mixtureElement)
 unsigned Parameter::getSynthesisRateCategoryForMixture(unsigned mixtureElement)
 {
 	bool check = checkIndex(mixtureElement, 1, numMixtures);
-	return check ? categories[mixtureElement - 1].delEta + 1 : 0;
+	return check ? categories[mixtureElement - 1].phi + 1 : 0;
 }
 
 
@@ -2531,6 +2590,7 @@ std::vector<std::vector<unsigned>> Parameter::getCategories()
 		std::vector<unsigned> tmp;
 		tmp.push_back(categories[i].delM);
 		tmp.push_back(categories[i].delEta);
+		tmp.push_back(categories[i].phi);
 		RV.push_back(tmp);
 	}
 
@@ -2545,6 +2605,7 @@ void Parameter::setCategories(std::vector<std::vector<unsigned>> _categories)
 		categories.push_back(mixtureDefinition());
 		categories[i].delM = _categories[i][0];
 		categories[i].delEta = _categories[i][1];
+		categories[i].phi = _categories[i][2];
 	}
 }
 

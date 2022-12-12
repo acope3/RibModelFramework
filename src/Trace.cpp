@@ -269,7 +269,7 @@ void Trace::initializeFONSETrace(unsigned samples, unsigned num_genes, unsigned 
 
 
 void Trace::initializePANSETrace(unsigned samples, unsigned num_genes, unsigned numAlphaCategories,
-	unsigned numLambdaPrimeCategories, unsigned numParam, unsigned numMixtures,
+	unsigned numLambdaPrimeCategories, unsigned numNSECategories, unsigned numParam, unsigned numMixtures,
 	std::vector<mixtureDefinition> &_categories, unsigned maxGrouping, unsigned numObservedPhiSets,std::vector<double> init_phi,
 	std::vector<unsigned> init_mix_assign, bool estimateSynthesisRate)
 {
@@ -282,7 +282,7 @@ void Trace::initializePANSETrace(unsigned samples, unsigned num_genes, unsigned 
 	// See Note 1) above.
 	initCodonSpecificParameterTrace(samples, numAlphaCategories,  numParam, 0u); //alp
 	initCodonSpecificParameterTrace(samples, numLambdaPrimeCategories, numParam, 1u); //lmPri
-    initCodonSpecificParameterTrace(samples, numAlphaCategories, numParam, 2u); //nseRate
+    initCodonSpecificParameterTrace(samples, numNSECategories, numParam, 2u); //nseRate
     initPartitionFunctionTrace(samples, numMixtures);
 
     nseSpecificAcceptanceRateTrace.resize(maxGrouping);
@@ -422,7 +422,7 @@ std::vector<std::vector<double>> Trace::getNseRateSpecificAcceptanceRateTrace()
 
 unsigned Trace::getSynthesisRateCategory(unsigned mixtureElement)
 {
-	return categories->at(mixtureElement).delEta;
+	return categories->at(mixtureElement).phi;
 }
 
 

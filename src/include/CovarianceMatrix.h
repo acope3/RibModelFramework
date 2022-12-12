@@ -44,7 +44,8 @@ class CovarianceMatrix
         int getNumVariates();
         std::vector<double> transformIidNumbersIntoCovaryingNumbers(std::vector<double> iidNumbers);
 		void calculateSampleCovariance(std::vector<std::vector<std::vector<std::vector<float>>>> codonSpecificParameterTrace, std::string aa, unsigned samples, unsigned lastIteration);
-        
+	    void calculateSampleCovarianceForPANSE(std::vector<std::vector<std::vector<std::vector<float>>>> codonSpecificParameterTrace, std::string codon, unsigned samples, unsigned lastIteration,std::string param_type="elongation");
+
 #ifndef STANDALONE
     void setCovarianceMatrix(SEXP _matrix);
 #endif

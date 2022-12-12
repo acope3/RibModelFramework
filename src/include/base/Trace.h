@@ -66,7 +66,7 @@ class Trace {
 
 
 		//FONSE Specific:
-                void initInitiationCostTrace(unsigned samples);
+        void initInitiationCostTrace(unsigned samples);
 
 		//PANSE Specific:
 		void initPartitionFunctionTrace(unsigned samples, unsigned numPartitionFunctionsGroupings);
@@ -98,7 +98,7 @@ class Trace {
 
 
 		void initializePANSETrace(unsigned samples, unsigned num_genes, unsigned numAlphaCategories,
-			unsigned numLambdaPrimeCategories, unsigned numParam, unsigned numMixtures,
+			unsigned numLambdaPrimeCategories, unsigned numNSECategores, unsigned numParam, unsigned numMixtures,
 			std::vector<mixtureDefinition> &_categories, unsigned maxGrouping,unsigned numObservedPhiSets,std::vector<double> init_phi,
                         std::vector<unsigned> init_mix_assign, bool estimateSynthesisRate = true);
 

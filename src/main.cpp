@@ -1337,59 +1337,61 @@ int main()
 	unsigned numMixtures = 1;
 	std::vector<double> sphi_init(numMixtures, 1);
 	std::vector<unsigned> geneAssignment;
-	my_print("Reading Genome\n");
 	genome.readRFPData("/Users/alexandercope/Test_PANSE/rfp_data_mix.csv", false);
 	Gene gene = genome.getGene(0);
 	std::vector<unsigned> position = gene.geneData.getPositionCodonID();
-	my_print("%\n",position.size());
 	std::vector<unsigned> mixture = gene.geneData.getPositionMixture();
-	my_print("%\n",mixture.size());
-	for (unsigned i = 0; i < mixture.size(); i++)
-	{
-		my_print("%\n",mixture[i]);
-	}
+
 	std::vector<unsigned long> rfp = gene.geneData.getRFPCount(0);
-	my_print("%\n",rfp.size());
-	for (unsigned i = 0; i < rfp.size(); i++)
-	{
-		my_print("%\n",rfp[i]);
-	}
-    //geneAssignment.resize(genome.getGenomeSize());
-    //my_print("%\n", genome.getGenomeSize());
-//	for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
-//	{
-//		geneAssignment[i] = 0u;
-//	}
+
+    geneAssignment.resize(genome.getGenomeSize());
+    for (int i = 0; i < geneAssignment.size(); i++)
+    {
+    	if (i == 1)
+    	{
+    		geneAssignment[i] = 0;
+    	}
+    	else
+    	{
+    		geneAssignment[i] = 1;
+    	}
+    }
+
 //
-//	std::vector<double> phi;
-//	std::size_t pos;
-//	std::ifstream currentFile;
-//	std::string tmpString;
-//	my_print("Initializing gene expression...\n");
-//	currentFile.open("/home/acope3/Panse_project/Input/PopData/orderedRandGeneIDPhiMean.csv");
-//	currentFile >> tmpString;
-//	while (currentFile >> tmpString)
-//	{
-//		pos = tmpString.find(',');
-//		if (pos != std::string::npos)
-//		{
-//			std::string val = tmpString.substr(pos + 1, std::string::npos);
-//			phi.push_back(std::atof(val.c_str()));
-//		}
-//	}
-//	my_print("Initializing CSP\n");
-//	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
-//	std::string mixDef = PANSEParameter::allUnique;
-//	PANSEParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);
-//    cspFiles.push_back("/home/acope3/Panse_project/Input/PopData/JeremyRFPAlphaValues.csv");
-//    parameter.initMutationSelectionCategories(cspFiles, 1, parameter.alp);
-//    cspFiles[0] = ("/home/acope3/Panse_project/Input/PopData/JeremyRFPLambdaPrimeValues.csv");
-//    parameter.initMutationSelectionCategories(cspFiles, 1, parameter.lmPri);
-//    cspFiles[0] = ("/home/acope3/Panse_project/Logs/Input/Stochastic_Simulation/simNSEMay_4.csv");
-//    parameter.initMutationSelectionCategories(cspFiles, 1, parameter.nse);
-//    parameter.InitializeSynthesisRate(phi);
-//	PANSEModel model;
-//	model.setParameter(parameter);
+	std::vector<double> phi;
+	std::size_t pos;
+	std::ifstream currentFile;
+	std::string tmpString;
+	my_print("Initializing gene expression...\n");
+	currentFile.open("/Users/alexandercope/Test_PANSE/phi.csv");
+	currentFile >> tmpString;
+	while (currentFile >> tmpString)
+	{
+		pos = tmpString.find(',');
+		if (pos != std::string::npos)
+		{
+			std::string val = tmpString.substr(pos + 1, std::string::npos);
+			phi.push_back(std::atof(val.c_str()));
+		}
+	}
+	my_print("Initializing CSP\n");
+	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
+	std::string mixDef = Parameter::elongationShared;
+	unsigned numElongationMixtures = 3;
+	PANSEParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, numElongationMixtures, true, mixDef);
+	parameter.printMixtureDefinitionMatrix();
+	unsigned synth_rate = parameter.getNumSynthesisRateCategories();
+	my_print("%\n",synth_rate);
+    cspFiles.push_back("/Users/alexandercope/Test_PANSE/alpha.csv");
+    parameter.initMutationSelectionCategories(cspFiles, 1, parameter.alp);
+    cspFiles[0] = ("/Users/alexandercope/Test_PANSE/lambda.csv");
+    parameter.initMutationSelectionCategories(cspFiles, 1, parameter.lmPri);
+    cspFiles[0] = ("/Users/alexandercope/Test_PANSE/nserate_uniform_1e05.csv");
+    parameter.initMutationSelectionCategories(cspFiles, 1, parameter.nse);
+    my_print("Done\n");
+    //parameter.InitializeSynthesisRate(phi);
+	//PANSEModel model;
+	//model.setParameter(parameter);
 //
 //	my_print("Initializing MCMCAlgorithm object---------------\n");
 //	unsigned samples = 50;

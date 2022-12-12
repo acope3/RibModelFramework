@@ -50,6 +50,7 @@ PANSEParameter::PANSEParameter(std::vector<double> stdDevSynthesisRate, unsigned
 		std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix, unsigned _numElongationMixtures, bool splitSer,
 		std::string _mutationSelectionState) : Parameter(61)
 {
+
 	initParameterSet(stdDevSynthesisRate, _numMixtures, geneAssignment, thetaKMatrix, splitSer, "allUnique");
 	// Note: Due to the structure of PANSE vs. other models, need to set up mixtures when initializing PANSE
 	initPANSEParameterSet(thetaKMatrix, _mutationSelectionState, _numElongationMixtures);
@@ -102,8 +103,9 @@ PANSEParameter::~PANSEParameter()
  * Initializes the variables that are specific to the PANSE Parameter object. The group list is set to all codons from
  * table 1 minus the stop codons. This will be corrected in CodonTable.
 */
-void PANSEParameter::initPANSEParameterSet( std::vector<std::vector<unsigned>> mixtureDefinitionMatrix, std::string _mutationSelectionState, unsigned _numElongationMixtures)
+void PANSEParameter::initPANSEParameterSet(std::vector<std::vector<unsigned>> mixtureDefinitionMatrix, std::string _mutationSelectionState, unsigned _numElongationMixtures)
 {
+	unsigned numGenes;
 	numElongationMixtures = _numElongationMixtures;
 
 	setNumMutationSelectionValues(_mutationSelectionState, mixtureDefinitionMatrix);
@@ -181,13 +183,21 @@ void PANSEParameter::initPANSEParameterSet( std::vector<std::vector<unsigned>> m
     // makes sense for most analysis to assume all synthesis rates (which are empirical data, not evolutionary averages)
     // to be pulled from the same distribution. However, to make functions consistent with ROC and FONSE, allow users to specify the
     // the number of mixtures.
+
+    //currentSynthesisRateLevel should already be initialized by the parent class Parameter. Use this to get number of genes.
+    numGenes = currentSynthesisRateLevel[0].size();
     currentSynthesisRateLevel.resize(numMixtures);
     proposedSynthesisRateLevel.resize(numMixtures);
     numAcceptForSynthesisRate.resize(numMixtures);
     std_phi.resize(numMixtures);
-
-    for (unsigned i = 0u; i < numMixtures; i++)
+    numSynthesisRateCategories = numMixtures;
+    if (numMixtures > numElongationMixtures)
     {
+    	categories.resize(numSynthesisRateCategories);
+    }
+    for (unsigned i = 0u; i < numSynthesisRateCategories; i++)
+    {
+    	categories[i].phi = i;
     	std::vector<double> tempExpr(numGenes, 0.0);
     	currentSynthesisRateLevel[i] = tempExpr;
     	proposedSynthesisRateLevel[i] = tempExpr;
@@ -197,6 +207,16 @@ void PANSEParameter::initPANSEParameterSet( std::vector<std::vector<unsigned>> m
 
     	std::vector<double> tempStdPhi(numGenes, 5);
     	std_phi[i] = tempStdPhi;
+    }
+
+    if (numMixtures > numElongationMixtures)
+    {
+    	 for (unsigned i = numElongationMixtures; i < numMixtures; i++)
+    	 {
+    	    categories[i].delM = -1;
+    	    categories[i].delEta = -1;
+    	    categories[i].nse = -1;
+    	 }
     }
 
 
@@ -239,6 +259,13 @@ void PANSEParameter::initPANSEValuesFromFile(std::string filename)
 				mat.clear();
 				cat = 0;
 				variableName = tmp.substr(1, tmp.size() - 2);
+				mat.clear();
+				if (variableName == "covarianceMatrix" || variableName == "nse_covarianceMatrix")
+				{
+					getline(input,tmp);
+					//char aa = tmp[0];
+					cat = SequenceSummary::codonToIndex(tmp); // ????
+				}
 			}
 			else if (flag == 2)
 			{
@@ -331,6 +358,36 @@ void PANSEParameter::initPANSEValuesFromFile(std::string filename)
 					while (iss >> val)
 					{
 						std_csp.push_back(val);
+					}
+				}
+				else if (variableName == "covarianceMatrix")
+				{
+					if (tmp == "***") //end of matrix
+					{
+						CovarianceMatrix CM(mat);
+						CM.choleskyDecomposition();
+						covarianceMatrix[cat] = CM;
+					}
+					double val;
+					iss.str(tmp);
+					while (iss >> val)
+					{
+						mat.push_back(val);
+					}
+				}
+				else if (variableName == "nse_covarianceMatrix")
+				{
+					if (tmp == "***") //end of matrix
+					{
+						CovarianceMatrix CM(mat);
+						CM.choleskyDecomposition();
+						nse_covarianceMatrix[cat] = CM;
+					}
+					double val;
+					iss.str(tmp);
+					while (iss >> val)
+					{
+						mat.push_back(val);
 					}
 				}
 				else if (variableName == "std_nse")
@@ -495,6 +552,36 @@ void PANSEParameter::writePANSERestartFile(std::string filename)
 		}
 		if (i % 10 != 0)
 			oss << "\n";
+
+		for (unsigned i = 0; i < groupList.size(); i++)
+		{
+			std::string codon = groupList[i];
+			oss << ">covarianceMatrix:\n" << codon << "\n";
+			CovarianceMatrix m = covarianceMatrix[SequenceSummary::codonToIndex(codon)];
+			std::vector<double>* tmp = m.getCovMatrix();
+			int size = m.getNumVariates();
+			for (unsigned k = 0; k < size * size; k++)
+			{
+				if (k % size == 0 && k != 0) { oss << "\n"; }
+				oss << tmp->at(k) << "\t";
+			}
+			oss << "\n***\n";
+		}
+		for (unsigned i = 0; i < groupList.size(); i++)
+		{
+			std::string codon = groupList[i];
+			oss << ">nse_covarianceMatrix:\n" << codon << "\n";
+			CovarianceMatrix m = nse_covarianceMatrix[SequenceSummary::codonToIndex(codon)];
+			std::vector<double>* tmp = m.getCovMatrix();
+			int size = m.getNumVariates();
+			for (unsigned k = 0; k < size * size; k++)
+			{
+				if (k % size == 0 && k != 0) { oss << "\n"; }
+				oss << tmp->at(k) << "\t";
+			}
+			oss << "\n***\n";
+		}
+
 		output = oss.str();
 		out << output;
 	}
@@ -520,7 +607,7 @@ void PANSEParameter::initFromRestartFile(std::string filename)
  */
 void PANSEParameter::initAllTraces(unsigned samples, unsigned num_genes, bool estimateSynthesisRate)
 {
-	traces.initializePANSETrace(samples, num_genes, numMutationCategories, numSelectionCategories, numParam,
+	traces.initializePANSETrace(samples, num_genes, numMutationCategories, numSelectionCategories, numNSECategories, numParam,
 						 numMixtures, categories, (unsigned)groupList.size(),obsPhiSets,currentSynthesisRateLevel[0],mixtureAssignment,estimateSynthesisRate);
 }
 
@@ -685,78 +772,124 @@ double PANSEParameter::getCurrentCodonSpecificProposalWidth(unsigned index)
 */
 void PANSEParameter::proposeCodonSpecificParameter()
 {
-	unsigned numAlpha = (unsigned)currentCodonSpecificParameter[alp][0].size();
-	unsigned numLambdaPrime = (unsigned)currentCodonSpecificParameter[lmPri][0].size();
-    unsigned numNSE = (unsigned)currentCodonSpecificParameter[nse][0].size();
-
-
-	for (unsigned i = 0; i < numMutationCategories; i++)
+//	unsigned numAlpha = (unsigned)currentCodonSpecificParameter[alp][0].size();
+//	unsigned numLambdaPrime = (unsigned)currentCodonSpecificParameter[lmPri][0].size();
+//    unsigned numNSE = (unsigned)currentCodonSpecificParameter[nse][0].size();
+	for (unsigned k = 0; k < getGroupListSize(); k++)
 	{
-		for (unsigned j = 0; j < numAlpha; j++)
+		std::vector<double> iidProposed;
+		std::string codon = getGrouping(k);
+		for (unsigned i = 0u; i < ((numMutationCategories + numSelectionCategories)); i++)
+		{
+			iidProposed.push_back(randNorm(0.0, 1.0));
+		}
+
+		std::vector<double> covaryingNums;
+		covaryingNums = covarianceMatrix[SequenceSummary::codonToIndex(codon)].transformIidNumbersIntoCovaryingNumbers(iidProposed);
+		for (unsigned i = 0; i < numMutationCategories; i++)
 		{
 			if (fix_alpha)
 			{
-				proposedCodonSpecificParameter[alp][i][j] = currentCodonSpecificParameter[alp][i][j];
+				proposedCodonSpecificParameter[alp][i][k] = currentCodonSpecificParameter[alp][i][k];
 			}
 			else
 			{
-				proposedCodonSpecificParameter[alp][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[alp][i][j]) , std_csp[j]) );
+				proposedCodonSpecificParameter[alp][i][k] = std::exp(std::log(currentCodonSpecificParameter[alp][i][k]) + covaryingNums[i]);
 			}
+
 		}
-	}
-	for (unsigned i = 0; i < numSelectionCategories; i++)
-	{
-		for (unsigned j = 0; j < numLambdaPrime; j++)
+		for (unsigned i = 0; i < numSelectionCategories; i++)
 		{
 			if (fix_lp)
 			{
-				proposedCodonSpecificParameter[lmPri][i][j] = currentCodonSpecificParameter[lmPri][i][j];
-
+				proposedCodonSpecificParameter[lmPri][i][k] = currentCodonSpecificParameter[lmPri][i][k];
 			}
 			else
 			{
-				if (j == 29 && i == 0) // M/ATG has index 29, see SequenceSummary. This will need to be updated to be more general.
-        		{
-        			//This guarantees \alpha/\lambda will be 1. 
-        			proposedCodonSpecificParameter[lmPri][i][j] = proposedCodonSpecificParameter[alp][i][j];
-        		}
-        		else
-        		{
-					proposedCodonSpecificParameter[lmPri][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[lmPri][i][j]) , std_csp[j]) );
+				if (k == 29 && i == 0) // M/ATG has index 29, see SequenceSummary. This will need to be updated to be more general.
+				{
+					//This guarantees \alpha/\lambda will be 1.
+					proposedCodonSpecificParameter[lmPri][i][k] = proposedCodonSpecificParameter[alp][i][k];
 				}
+				else
+				{
+					proposedCodonSpecificParameter[lmPri][i][k] = std::exp(std::log(currentCodonSpecificParameter[lmPri][i][k]) + covaryingNums[numMutationCategories + i]);
+				}
+			}
+
+		}
+		if (numNSECategories == 1)
+		{
+			for (unsigned i = 0; i < numNSECategories; i++)
+			{
+
+				if (share_nse)
+				{
+					if (k == 0)
+					{
+						proposedCodonSpecificParameter[nse][i][k] = std::exp( randNorm( std::log(currentCodonSpecificParameter[nse][i][k]) , std_nse[k]) );
+					}
+					else
+					{
+						proposedCodonSpecificParameter[nse][i][k] = proposedCodonSpecificParameter[nse][i][0];
+					}
+				}
+				else
+				{
+					if (fix_nse)
+					{
+						proposedCodonSpecificParameter[nse][i][k] = currentCodonSpecificParameter[nse][i][k];
+					}
+					else
+					{
+
+						proposedCodonSpecificParameter[nse][i][k] = std::exp( randNorm( std::log(currentCodonSpecificParameter[nse][i][k]) , std_nse[k]) );
+
+					}
+				}
+
+			}
+		}
+		else
+		{
+			iidProposed.clear();
+			for (unsigned i = 0u; i < ((numNSECategories)); i++)
+			{
+				iidProposed.push_back(randNorm(0.0, 1.0));
+			}
+
+			std::vector<double> covaryingNums;
+			covaryingNums = nse_covarianceMatrix[SequenceSummary::codonToIndex(codon)].transformIidNumbersIntoCovaryingNumbers(iidProposed);
+			for (unsigned i = 0; i < numNSECategories; i++)
+			{
+
+				if (share_nse)
+				{
+					if (k == 0)
+					{
+						proposedCodonSpecificParameter[nse][i][k] = std::exp(std::log(currentCodonSpecificParameter[nse][i][k]) + covaryingNums[i]);
+					}
+					else
+					{
+						proposedCodonSpecificParameter[nse][i][k] = proposedCodonSpecificParameter[nse][i][0];
+					}
+				}
+				else
+				{
+					if (fix_nse)
+					{
+						proposedCodonSpecificParameter[nse][i][k] = currentCodonSpecificParameter[nse][i][k];
+					}
+					else
+					{
+						proposedCodonSpecificParameter[nse][i][k] = std::exp(std::log(currentCodonSpecificParameter[nse][i][k]) + covaryingNums[i]);
+					}
+
+				}
+
 			}
 		}
 	}
-
-    for (unsigned i = 0; i < numNSECategories; i++)
-    {
-
-    	if (share_nse)
-    	{
-    		double nserate = std::exp( randNorm( std::log(currentCodonSpecificParameter[nse][i][0]) , std_nse[0]) );
-    		for (unsigned j = 0; j < numNSE; j++)
-        	{
-        		proposedCodonSpecificParameter[nse][i][j] = nserate;
-        	}
-    	}
-        else 
-        {
-        	for (unsigned j = 0; j < numNSE; j++)
-        	{
-	        	if (fix_nse)
-	        	{
-	        		proposedCodonSpecificParameter[nse][i][j] = currentCodonSpecificParameter[nse][i][j];
-	        	}
-	        	else
-	        	{
-	        		
-	        		proposedCodonSpecificParameter[nse][i][j] = std::exp( randNorm( std::log(currentCodonSpecificParameter[nse][i][j]) , std_nse[j]) );
-	        		
-	        	}
-    		}
-        }
-        
-    }
 	
 }
 
@@ -768,6 +901,14 @@ void PANSEParameter::updateCodonSpecificParameter(std::string grouping)
 	my_print("ERROR: PANSEParameter::updateCodonSpecificParameterstd::string grouping) should not be called for PANSE.\n");
 }
 
+
+void PANSEParameter::printMixtureDefinitionMatrix()
+{
+	unsigned max_mix = (numMixtures < numElongationMixtures) ? numElongationMixtures : numMixtures;
+	my_print("Mixture\tAlpha\tLambda\tNSERate\tPhi\n");
+	for (unsigned i = 0u; i < max_mix; i++)
+		my_print("%\t%\t%\t%\t%\n", i,categories[i].delM, categories[i].delEta, categories[i].nse,categories[i].phi);
+}
 
 
 
@@ -796,7 +937,7 @@ void PANSEParameter::updateCodonSpecificParameter(std::string grouping,std::stri
 		if (share_nse)
 		{
 			//numAcceptForNSERates[0]++;
-			for (unsigned k = 0u; k < numMutationCategories; k++)
+			for (unsigned k = 0u; k < numNSECategories; k++)
 		    {
 		    	unsigned numNSE = (unsigned)currentCodonSpecificParameter[nse][0].size();
 		    	for (unsigned j = 0; j < numNSE; j ++)
@@ -809,7 +950,7 @@ void PANSEParameter::updateCodonSpecificParameter(std::string grouping,std::stri
 		else
 		{
 			numAcceptForNSERates[i]++;
-		    for (unsigned k = 0u; k < numMutationCategories; k++)
+		    for (unsigned k = 0u; k < numNSECategories; k++)
 		    {
 		        currentCodonSpecificParameter[nse][k][i] = proposedCodonSpecificParameter[nse][k][i];
 		    }
@@ -948,7 +1089,7 @@ void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptatio
 
   adaptiveStepPrev = adaptiveStepCurr;
   adaptiveStepCurr = lastIteration;
-  //unsigned samples = adaptiveStepCurr - adaptiveStepPrev;
+  unsigned samples = adaptiveStepCurr - adaptiveStepPrev;
 
   my_print("Acceptance rates for Codon Specific Parameters\n");
   my_print("Target range: %-% \n", factorCriteriaLow, factorCriteriaHigh );
@@ -977,43 +1118,77 @@ void PANSEParameter::adaptCodonSpecificParameterProposalWidth(unsigned adaptatio
 	{
 		if (!fix_lp || !fix_alpha)
 		{
-			if( (acceptanceLevel_elong < acceptanceTargetLow) || (acceptanceLevel_elong > acceptanceTargetHigh) )// adjust proposal width
-		  	{
+			if (acceptanceLevel_elong < factorCriteriaLow)
+			{
+				adjustFactor = adjustFactorLow;
 
-		      // define adjustFactor
-		    
-		      if (acceptanceLevel_elong < factorCriteriaLow)
-		      {
-			  	adjustFactor = adjustFactorLow;
-			  	std_csp[codonIndex] *= adjustFactor;
+
+				CovarianceMatrix covcurr(covarianceMatrix[codonIndex].getNumVariates());
+				covcurr.calculateSampleCovarianceForPANSE(*traces.getCodonSpecificParameterTrace(), codon, samples, adaptiveStepCurr,"elongation");
+				CovarianceMatrix covprev = covarianceMatrix[codonIndex];
+				covprev = (covprev*0.6);
+				covcurr = (covcurr*0.4);
+				covarianceMatrix[codonIndex] = covprev + covcurr;
+
 			  }
-		      else if(acceptanceLevel_elong > factorCriteriaHigh)
-		      {
-			  	adjustFactor = adjustFactorHigh;
-			  	std_csp[codonIndex] *= adjustFactor;
+			  else if(acceptanceLevel_elong > factorCriteriaHigh)
+			  {
+				adjustFactor = adjustFactorHigh;
 			  }
-			 
-			}// end if statement
+			  else //Don't adjust
+			  {
+				adjustFactor = 1.0;
+			  }
+
+			  if( adjustFactor != 1.0 )
+			  {
+				  std_csp[codonIndex] *= adjustFactor;
+				  covarianceMatrix[codonIndex] *= adjustFactor;
+			  }
+
+			//Decomposing of cov matrix to convert iid samples to covarying samples using matrix decomposition
+			//The decomposed matrix is used in the proposal of new samples
+			covarianceMatrix[codonIndex].choleskyDecomposition();
 		}
 		if (!fix_nse)
 		{
-			if ( (acceptanceLevel_nse < acceptanceTargetLow) || (acceptanceLevel_nse > acceptanceTargetHigh))
+			if (acceptanceLevel_nse < factorCriteriaLow)
 			{
-			 if (acceptanceLevel_nse < factorCriteriaLow)
-		      {
-			  	adjustFactor = adjustFactorLow;
-			  	std_nse[codonIndex] *= adjustFactor;
+
+				adjustFactor = adjustFactorLow;
+				if (numNSECategories > 1)
+				{
+					CovarianceMatrix covcurr(nse_covarianceMatrix[codonIndex].getNumVariates());
+					covcurr.calculateSampleCovarianceForPANSE(*traces.getCodonSpecificParameterTrace(), codon, samples, adaptiveStepCurr,"nse");
+					CovarianceMatrix covprev = nse_covarianceMatrix[codonIndex];
+					covprev = (covprev*0.6);
+					covcurr = (covcurr*0.4);
+					nse_covarianceMatrix[codonIndex] = covprev + covcurr;
+				}
 			  }
-		      else if(acceptanceLevel_nse > factorCriteriaHigh)
-		      {
-			  	adjustFactor = adjustFactorHigh;
-			  	std_nse[codonIndex] *= adjustFactor;
+			  else if(acceptanceLevel_nse > factorCriteriaHigh)
+			  {
+				adjustFactor = adjustFactorHigh;
 			  }
-			
+			  else //Don't adjust
+			  {
+				adjustFactor = 1.0;
+			  }
+
+			  if( adjustFactor != 1.0 )
+			  {
+				  std_nse[codonIndex] *= adjustFactor;
+				  if (numNSECategories > 1)
+				  {
+					  nse_covarianceMatrix[codonIndex] *= adjustFactor;
+				  }
+			  }
+
+			if (numNSECategories > 1)
+			{
+				nse_covarianceMatrix[codonIndex].choleskyDecomposition();
 			}
 		}
-
-
 	} // end if(adapt)
 
 	numAcceptForCodonSpecificParameters[codonIndex] = 0u;

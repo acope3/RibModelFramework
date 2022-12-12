@@ -87,6 +87,8 @@ class PANSEParameter: public Parameter {
 		bool isNSEFixed();
 		bool isNSEShared();
 
+
+
         //CSP Read Functions:
         void readAlphaValues(std::string filename);
         void readLambdaValues(std::string filename);
@@ -120,6 +122,8 @@ class PANSEParameter: public Parameter {
 		double getParameterForCategory(unsigned category, unsigned paramType, std::string codon, bool proposal);
 		unsigned getNumNSECategories();
 		unsigned getNSECategory(unsigned mixtureElement);
+
+		void printMixtureDefinitionMatrix();
 		//For setting Y value
 		void setTotalRFPCount(Genome& genome);
 		unsigned long getTotalRFPCount();

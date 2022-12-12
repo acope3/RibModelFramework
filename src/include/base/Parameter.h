@@ -99,6 +99,7 @@ class Parameter {
 		unsigned getSynthesisRateCategory(unsigned mixtureElement); //see Note 1) at top of file.
 		std::vector<unsigned> getMixtureElementsOfMutationCategory(unsigned category); //TODO caveat
 		std::vector<unsigned> getMixtureElementsOfSelectionCategory(unsigned category); //TODO caveat
+		std::vector<unsigned> getMixtureElementsOfSynthesisRateCategory(unsigned category); //TODO caveat
 		std::string getMutationSelectionState();
 		unsigned getNumAcceptForCspForIndex(unsigned i); //Only for unit testing.
 
@@ -299,6 +300,7 @@ class Parameter {
 		std::vector<double> categoryProbabilities;
 		std::vector<std::vector<unsigned>> mutationIsInMixture;
 		std::vector<std::vector<unsigned>> selectionIsInMixture;
+		std::vector<std::vector<unsigned>> phiIsInMixture;
 		std::vector<std::vector<unsigned>> nseIsInMixture;
 		unsigned numMutationCategories; //TODO Probably needs to be renamed
 		unsigned numSelectionCategories; //TODO Probably needs to be renamed
