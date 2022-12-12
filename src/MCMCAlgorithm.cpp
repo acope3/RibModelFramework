@@ -566,8 +566,9 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 	//model.setNumPhiGroupings(genome.getGene(0).getObservedSynthesisRateValues().size());
 	model.initTraces(samples + 1, genome.getGenomeSize(),(estimateSynthesisRate||estimateMixtureAssignment)); //Samples + 2 so we can store the starting and ending values.
 	// starting the MCMC
-	
+
 	model.updateTracesWithInitialValues(genome);
+	my_print("Traces initialized\n");
 	if (stepsToAdapt == -1)
 		stepsToAdapt = maximumIterations;
 	my_print("Starting MCMC\n");

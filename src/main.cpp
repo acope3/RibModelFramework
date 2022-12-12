@@ -1353,7 +1353,7 @@ int main()
     	}
     	else
     	{
-    		geneAssignment[i] = 1;
+    		geneAssignment[i] = 0;
     	}
     }
 
@@ -1376,64 +1376,65 @@ int main()
 	}
 	my_print("Initializing CSP\n");
 	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
-	std::string mixDef = Parameter::elongationShared;
+	std::string mixDef = Parameter::allUnique;
 	unsigned numElongationMixtures = 3;
 	PANSEParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, numElongationMixtures, true, mixDef);
 	parameter.printMixtureDefinitionMatrix();
 	unsigned synth_rate = parameter.getNumSynthesisRateCategories();
-	my_print("%\n",synth_rate);
+
     cspFiles.push_back("/Users/alexandercope/Test_PANSE/alpha.csv");
-    parameter.initMutationSelectionCategories(cspFiles, 1, parameter.alp);
+    cspFiles.push_back("/Users/alexandercope/Test_PANSE/alpha.csv");
+    cspFiles.push_back("/Users/alexandercope/Test_PANSE/alpha.csv");
+    parameter.initMutationSelectionCategories(cspFiles, 3, parameter.alp);
     cspFiles[0] = ("/Users/alexandercope/Test_PANSE/lambda.csv");
-    parameter.initMutationSelectionCategories(cspFiles, 1, parameter.lmPri);
+    cspFiles[1] = ("/Users/alexandercope/Test_PANSE/lambda.csv");
+    cspFiles[2] = ("/Users/alexandercope/Test_PANSE/lambda.csv");
+    parameter.initMutationSelectionCategories(cspFiles, 3, parameter.lmPri);
     cspFiles[0] = ("/Users/alexandercope/Test_PANSE/nserate_uniform_1e05.csv");
-    parameter.initMutationSelectionCategories(cspFiles, 1, parameter.nse);
+    cspFiles[1] = ("/Users/alexandercope/Test_PANSE/nserate_uniform_1e05.csv");
+    cspFiles[2] = ("/Users/alexandercope/Test_PANSE/nserate_uniform_1e05.csv");
+    parameter.initMutationSelectionCategories(cspFiles, 3, parameter.nse);
+    parameter.InitializeSynthesisRate(phi);
     my_print("Done\n");
-    //parameter.InitializeSynthesisRate(phi);
-	//PANSEModel model;
-	//model.setParameter(parameter);
-//
-//	my_print("Initializing MCMCAlgorithm object---------------\n");
-//	unsigned samples = 50;
-//	unsigned thinning = 2;
-//
-//	my_print("\t# Samples: %\n", samples);
-//	my_print("\tThinning: %\n", thinning);
-//	MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thinning, 10, false, true, false);
-//	mcmc.setRestartFileSettings("RestartFile.txt", 20, true);
-//	my_print("Done!-------------------------------\n\n\n");
-//
-//	my_print("Done!--------------------------------\n\n\n");
-//
-//
-//	my_print("Initializing PAModel object--------------------------\n");
-//	model.setParameter(parameter);
-//	my_print("Done!----------------------------------\n\n\n");
-//
-//
-//	my_print("Running MCMC.............\n\n");
-//	mcmc.run(genome, model, 1, 0);
-//	my_print("Done!----------------------------------\n\n\n");
-//
-//	std::vector<std::string> codons = parameter.getGroupList();
-//	std::vector<double> alpha,lmprime,nse;
-//	double tmp;
-//	for (unsigned i=0; i < codons.size();i++)
-//	{
-//		tmp = parameter.getCodonSpecificPosteriorMean(0, samples, codons[i],0, true, false);
-//		alpha.push_back(tmp);
-//		tmp = parameter.getCodonSpecificPosteriorMean(0, samples, codons[i],1, true, false);
-//		lmprime.push_back(tmp);
-//		tmp = parameter.getCodonSpecificPosteriorMean(0, samples, codons[i],2, true, false);
-//		nse.push_back(tmp);
-//	}
-//	std::ofstream myFile("cpp_runs_10_24.csv");
-//	myFile << "Codon,Alpha,LambdaPrime,NSE\n";
-//	for (unsigned i=0;i < codons.size();i++)
-//	{
-//		myFile << codons[i] <<","<<alpha[i]<<","<<lmprime[i]<<","<<nse[i]<<"\n";
-//	}
-//	std::cout << mcmc.getLogPosteriorMean(samples);
+
+
+	PANSEModel model;
+	model.setParameter(parameter);
+
+	my_print("Initializing MCMCAlgorithm object---------------\n");
+	unsigned samples = 50;
+	unsigned thinning = 2;
+
+	my_print("\t# Samples: %\n", samples);
+	my_print("\tThinning: %\n", thinning);
+	MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thinning, 10, false, true, false);
+	mcmc.setRestartFileSettings("RestartFile.txt", 20, true);
+	my_print("Done!-------------------------------\n\n\n");
+
+
+	my_print("Running MCMC.............\n\n");
+	mcmc.run(genome, model, 1, 0);
+	my_print("Done!----------------------------------\n\n\n");
+
+	std::vector<std::string> codons = parameter.getGroupList();
+	std::vector<double> alpha,lmprime,nse;
+	double tmp;
+	for (unsigned i=0; i < codons.size();i++)
+	{
+		tmp = parameter.getCodonSpecificPosteriorMean(0, samples, codons[i],0, true, false);
+		alpha.push_back(tmp);
+		tmp = parameter.getCodonSpecificPosteriorMean(0, samples, codons[i],1, true, false);
+		lmprime.push_back(tmp);
+		tmp = parameter.getCodonSpecificPosteriorMean(0, samples, codons[i],2, true, false);
+		nse.push_back(tmp);
+	}
+	std::ofstream myFile("cpp_runs_10_24.csv");
+	myFile << "Codon,Alpha,LambdaPrime,NSE\n";
+	for (unsigned i=0;i < codons.size();i++)
+	{
+		myFile << codons[i] <<","<<alpha[i]<<","<<lmprime[i]<<","<<nse[i]<<"\n";
+	}
+	std::cout << mcmc.getLogPosteriorMean(samples);
 
 
 }

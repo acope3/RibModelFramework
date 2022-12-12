@@ -1417,7 +1417,7 @@ bool PANSEParameter::isNSEShared()
 //--------------------------------------------------//
 
 
-PANSEParameter::PANSEParameter(std::vector<double> stdDevSynthesisRate, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, bool splitSer) : Parameter(64)
+PANSEParameter::PANSEParameter(std::vector<double> stdDevSynthesisRate, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, unsigned _numElongationMixture, bool splitSer) : Parameter(64)
 {
   unsigned _numMixtures = _matrix.size() / 2;
   std::vector<std::vector<unsigned>> thetaKMatrix;
@@ -1438,18 +1438,19 @@ PANSEParameter::PANSEParameter(std::vector<double> stdDevSynthesisRate, std::vec
 			thetaKMatrix[i][j] = _matrix[index];
 		}
 	}
-  initParameterSet(stdDevSynthesisRate, _numMixtures, geneAssignment, thetaKMatrix, splitSer, "");
-  initPANSEParameterSet();
+  std::string _mutationSelectionState = "";
+  initParameterSet(stdDevSynthesisRate, _numMixtures, geneAssignment, thetaKMatrix, _numElongationMixture, splitSer, _mutationSelectionState);
+  initPANSEParameterSet(thetaKMatrix, _mutationSelectionState, _numElongationMixtures);
 
 }
 
 
-PANSEParameter::PANSEParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment, bool splitSer, std::string _mutationSelectionState) :
+PANSEParameter::PANSEParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment, unsigned _numElongationMixture, bool splitSer, std::string _mutationSelectionState) :
 Parameter(64)
 {
   std::vector<std::vector<unsigned>> thetaKMatrix;
-  initParameterSet(stdDevSynthesisRate, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
-  initPANSEParameterSet();
+  initParameterSet(stdDevSynthesisRate, _numMixtures, geneAssignment, thetaKMatrix, _numElongationMixtures, splitSer, _mutationSelectionState);
+  initPANSEParameterSet(thetaKMatrix, _mutationSelectionState, _numElongationMixtures);
 }
 
 void PANSEParameter::initCovarianceMatrix(SEXP _matrix, std::string codon)

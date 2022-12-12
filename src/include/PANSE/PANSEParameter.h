@@ -138,8 +138,8 @@ class PANSEParameter: public Parameter {
 
 		//Constructors & Destructors:
 		PANSEParameter(std::vector<double> stdDevSynthesisRate, std::vector<unsigned> geneAssignment,
-			std::vector<unsigned> _matrix, bool splitSer = true);
-		PANSEParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
+			std::vector<unsigned> _matrix, unsigned _numElongationMixture, bool splitSer = true);
+		PANSEParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment, unsigned _numElongationMixture,
 			bool splitSer = true, std::string _mutationSelectionState = "allUnique");
 
 

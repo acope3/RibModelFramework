@@ -276,7 +276,7 @@ void Trace::initializePANSETrace(unsigned samples, unsigned num_genes, unsigned 
     numCodonSpecificParamTypes = 3;
     codonSpecificParameterTrace.resize(numCodonSpecificParamTypes);
 
-	initializeSharedTraces(samples, num_genes, numLambdaPrimeCategories, numMixtures,
+	initializeSharedTraces(samples, num_genes, numMixtures, numMixtures,
 		_categories, maxGrouping,init_phi,init_mix_assign,numObservedPhiSets,estimateSynthesisRate);
 
 	// See Note 1) above.
@@ -585,6 +585,7 @@ void Trace::updateCodonSpecificAcceptanceRateTrace(unsigned codonIndex, double a
 void Trace::updateSynthesisRateTrace(unsigned sample, unsigned geneIndex,
 	std::vector<std::vector <double>> &currentSynthesisRateLevel)
 {
+	my_print("%\n",synthesisRateTrace.size());
 	for (unsigned category = 0; category < synthesisRateTrace.size(); category++)
 	{
 		synthesisRateTrace[category][geneIndex][sample] = currentSynthesisRateLevel[category][geneIndex];

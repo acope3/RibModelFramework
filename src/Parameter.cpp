@@ -712,7 +712,7 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 	quickSortPair(SCUOValues, index, 0, genomeSize);
 	std::sort(expression, expression + genomeSize);
 
-	for (unsigned category = 0u; category < numSelectionCategories; category++)
+	for (unsigned category = 0u; category < numSynthesisRateCategories; category++)
 	{
 		for (unsigned j = 0u; j < genomeSize; j++)
 		{
@@ -733,7 +733,7 @@ void Parameter::InitializeSynthesisRate(Genome& genome, double sd_phi)
 */
 void Parameter::InitializeSynthesisRate(double sd_phi)
 {	unsigned genomeSize = (unsigned)currentSynthesisRateLevel[0].size();
-	for (unsigned category = 0u; category < numSelectionCategories; category++)
+	for (unsigned category = 0u; category < numSynthesisRateCategories; category++)
 	{
 		for (unsigned i = 0u; i < genomeSize; i++)
 		{
@@ -751,7 +751,7 @@ void Parameter::InitializeSynthesisRate(double sd_phi)
 void Parameter::InitializeSynthesisRate(std::vector<double> expression)
 {
 	unsigned numGenes = (unsigned)currentSynthesisRateLevel[0].size();
-	for (unsigned category = 0u; category < numSelectionCategories; category++)
+	for (unsigned category = 0u; category < numSynthesisRateCategories; category++)
 	{
 		for (unsigned i = 0u; i < numGenes; i++)
 		{
