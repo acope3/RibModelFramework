@@ -177,11 +177,12 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
     
     for (unsigned positionIndex = 0; positionIndex < positions.size();positionIndex++)
     {
+
     	  codonMixture = positionMixture[positionIndex];
+
         positionalRFPCount = rfpCounts[positionIndex];
         codonIndex = positions[positionIndex];
         codon = gene.geneData.indexToCodon(codonIndex);
-        
         alphaCategory = mixture_to_category[codonMixture][0];
         lambdaCategory = mixture_to_category[codonMixture][1];
         nseCategory = mixture_to_category[codonMixture][2];
@@ -259,7 +260,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
     //unsigned index = SequenceSummary::codonToIndex(grouping);
     unsigned n = getNumElongationMixtureElements();
     unsigned long Y = genome.getSumRFP();
-
+    my_print("Y %\n",Y);
     bool share_nse = shareNSE();
 
 
@@ -283,7 +284,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
         }
         gene = &genome.getGene(i);
 
-        unsigned currNumCodonsInMRNA = gene->geneData.getCodonCountForCodon(grouping);
+        //unsigned currNumCodonsInMRNA = gene->geneData.getCodonCountForCodon(grouping);
         
         unsigned mixtureElement = parameter->getMixtureAssignment(i);
         
@@ -307,6 +308,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
         for (unsigned positionIndex = 0; positionIndex < positions.size(); positionIndex++)
         {
         	  codonMixture = positionMixture[positionIndex];
+        	 // my_print("%\n",codonMixture);
             positionalRFPCount = rfpCounts[positionIndex];
             codonIndex = positions[positionIndex];
             codon = gene->geneData.indexToCodon(codonIndex);
@@ -318,6 +320,9 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
             currAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, false);
             currLambda = getParameterForCategory(lambdaCategory, PANSEParameter::lmPri, codon, false);
             currNSERate = getParameterForCategory(nseCategory, PANSEParameter::nse, codon, false);
+//            my_print("Current Alpha\t%",currAlpha);
+//            my_print("Current Lambda\t%",currLambda);
+//            my_print("Current NSE\t%",currNSERate);
             if (positionalRFPCount < 50)
             {
                 currLgammaRFPAlpha = lgamma_rfp_alpha[positionalRFPCount][alphaCategory][codonIndex];
@@ -386,7 +391,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                 propSigma = propSigma + prob_successful[codonMixture][codonIndex];
        
             }
-            
+            //my_print("Proposed sigma\t%",propSigma);
 
 
             logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda * U, positionalRFPCount,
