@@ -34,8 +34,8 @@ class PANSEModel: public Model
 		std::string type = "PANSE";
 
 		virtual void fillMatrices(Genome& genome);
-        virtual void clearMatrices();
-
+    virtual void clearMatrices();
+    virtual std::vector<std::vector<unsigned>> getElongationMixtureCategories();
 		//Likelihood Ratio Functions:
 		virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k,
 				double* logProbabilityRatio); // Depends on RFPCountColumn

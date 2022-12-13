@@ -47,7 +47,7 @@ initializeGenomeObject <- function(file, genome=NULL, observed.expression.file=N
   if (fasta == TRUE) {
     genome$readFasta(file, append)
   } else {
-      genome$readRFPData(file, append, positional)
+      genome$readRFPData(file, append)
   }
   if(!is.null(observed.expression.file)) {
     genome$readObservedPhiValues(observed.expression.file, match.expression.by.id)

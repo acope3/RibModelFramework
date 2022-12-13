@@ -408,8 +408,7 @@ bool SequenceSummary::processRFP(std::vector<std::vector<int>> table)
 
 	// There should be at least 1 table entry to get to this point, so this should be a valid operation
   unsigned numCats = (unsigned)table[0].size() - 3; // numCats = after position, codon, mixture
-  my_print("NumCats: %\n",numCats);
-	initRFPCount(numCats);
+  initRFPCount(numCats);
 	sumRFPCount.resize(numCats);
 
 	for (unsigned j = 0; j < numCats; j++)

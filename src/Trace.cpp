@@ -585,7 +585,6 @@ void Trace::updateCodonSpecificAcceptanceRateTrace(unsigned codonIndex, double a
 void Trace::updateSynthesisRateTrace(unsigned sample, unsigned geneIndex,
 	std::vector<std::vector <double>> &currentSynthesisRateLevel)
 {
-	my_print("%\n",synthesisRateTrace.size());
 	for (unsigned category = 0; category < synthesisRateTrace.size(); category++)
 	{
 		synthesisRateTrace[category][geneIndex][sample] = currentSynthesisRateLevel[category][geneIndex];

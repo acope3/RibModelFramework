@@ -517,7 +517,7 @@ void Parameter::writeBasicRestartFile(std::string filename)
 		oss << ">categories:\n";
 		for (i = 0; i < categories.size(); i++)
 		{
-			oss << categories[i].delM << " " << categories[i].delEta << categories[i].nse << " " << categories[i].phi << " " << "\n";
+			oss << categories[i].delM << " " << categories[i].delEta << " " << categories[i].nse << " " << categories[i].phi << " " << "\n";
 		}
 		oss << ">mixtureAssignment:\n";
 		for (i = 0; i < mixtureAssignment.size(); i++)
