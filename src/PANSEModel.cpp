@@ -118,11 +118,16 @@ void PANSEModel::fillMatrices(Genome& genome)
             	codon = getGrouping(k);
             	currLambda = getParameterForCategory(lambdaCategory, PANSEParameter::lmPri, codon, false);
             	tmp_2[k] = std::log(currLambda) + std::log(U);
+            	//my_print("%\n",tmp_2[k]);
             }
-            tmp.push_back(tmp_2);
+            tmp[j] = tmp_2;
     	}
-    	log_currentLambda.push_back(tmp);
+    	log_currentLambda[i] = tmp;
     }
+
+//    my_print("%\n",log_currentLambda.size());
+//    my_print("%\n",log_currentLambda[0].size());
+//    my_print("%\n",log_currentLambda[0][0].size());
     mixture_to_category = getElongationMixtureCategories();
     
     
@@ -152,11 +157,11 @@ double PANSEModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, doubl
     term3 *= currAlpha;
 
     double rv = term1 + term2 + term3;
-    if (std::isinf(rv))
-    {
-    	//my_print("% % % %\n",log_currLambdaPrime,currLambdaPrime,phiValue,prevSigma);
-    }
-    //my_print("rv\n",rv);
+//    if (std::isinf(rv))
+//    {
+//    	my_print("% % % %\n",log_currLambdaPrime,currLambdaPrime,phiValue,prevSigma);
+//    }
+//    my_print("%\n",rv);
     return rv;
 }
 
@@ -286,12 +291,10 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
     //unsigned index = SequenceSummary::codonToIndex(grouping);
     unsigned n = getNumElongationMixtureElements();
     unsigned long Y = genome.getSumRFP();
-    my_print("Y %\n",Y);
     bool share_nse = shareNSE();
 
 
     fillMatrices(genome);
-  
 #ifdef _OPENMP
 //#ifndef __APPLE__
 #pragma omp parallel for private(gene,currAlpha,currLambda,currNSERate,propAlpha,propLambda,propNSERate,alphaCategory, lambdaCategory, nseCategory) reduction(+:logLikelihood,logLikelihood_proposed)
@@ -299,7 +302,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
     for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
     {
     	unsigned long positionalRFPCount;
-      unsigned codonMixture;
+        unsigned codonMixture;
     	unsigned codonIndex;
     	std::string codon;
     	double currLgammaRFPAlpha;
@@ -384,6 +387,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 
                     logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambda * U, positionalRFPCount,
                                     phiValue,std::exp(propSigma),std::lgamma(propAlpha),std::log(propLambda) + std::log(U),logPhi,std::lgamma(propAlpha+positionalRFPCount));
+
                     if (prop_prob_successful[codonMixture][codonIndex] > 500)
                     {
                         prop_prob_successful[codonMixture][codonIndex] = elongationUntilIndexApproximation2ProbabilityLog(propAlpha, propLambda,1/currNSERate);
@@ -470,12 +474,10 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 
 
 
-    //my_print("logPosterior %\t logPosterior_proposed %\n",logPosterior,logPosterior_proposed);
 
     logPosterior_proposed = logLikelihood_proposed + calculateNSERatePrior(grouping,true) + calculateAlphaPrior(grouping,true) + calculateLambdaPrior(grouping,true);
     logPosterior = logLikelihood + calculateNSERatePrior(grouping,false) + calculateAlphaPrior(grouping,false) + calculateLambdaPrior(grouping,false);
     
-
     //Should never accept parameters that give NaN, so just check proposed parameters
     
     logAcceptanceRatioForAllMixtures[0] = logPosterior_proposed - logPosterior - (currAdjustmentTerm - propAdjustmentTerm);
@@ -1387,7 +1389,7 @@ double PANSEModel::calculateNSERatePrior(std::string grouping,bool proposed)
 {
    	double priorValue = 0.0;
 
-	unsigned numMutCat = parameter->getNumMutationCategories();
+	unsigned numMutCat = parameter->getNumNSECategories();
 	for (unsigned i = 0u; i < numMutCat; i++)
 	{
 		double NSERate = parameter->getParameterForCategory(i, PANSEParameter::nse, grouping, proposed);
