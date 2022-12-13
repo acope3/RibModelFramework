@@ -218,8 +218,7 @@ void PANSEParameter::initPANSEParameterSet(std::vector<std::vector<unsigned>> mi
     	    categories[i].nse = -1;
     	 }
     }
-
-	bias_csp = 0;
+    bias_csp = 0;
 	std_csp.resize(numParam,0.1);
 	std_nse.resize(numParam,0.1);
 	std_partitionFunction = 0.1;
@@ -700,22 +699,22 @@ void PANSEParameter::initMutationSelectionCategories(std::vector<std::string> fi
 				{
 					currentCodonSpecificParameter[alp][j] = temp;
 					proposedCodonSpecificParameter[alp][j] = temp;
-					altered++;
+					//altered++;
 				}
 				else if (paramType == PANSEParameter::lmPri && categories[j].delEta == i)
 				{
 					currentCodonSpecificParameter[lmPri][j] = temp;
 					proposedCodonSpecificParameter[lmPri][j] = temp;
-					altered++;
+					//altered++;
 				}
-        else if (paramType == PANSEParameter::nse && categories[j].nse == i)
-        {
-            currentCodonSpecificParameter[nse][j] = temp;
-            proposedCodonSpecificParameter[nse][j] = temp;
-            altered++;
-        }
-				if (altered == numCategories)
-					break; //to not access indices out of bounds.
+				else if (paramType == PANSEParameter::nse && categories[j].nse == i)
+				{
+					currentCodonSpecificParameter[nse][j] = temp;
+					proposedCodonSpecificParameter[nse][j] = temp;
+					//altered++;
+				}
+				//if (altered == numCategories)
+				//	break; //to not access indices out of bounds.
 			}
 		}
 		currentFile.close();
@@ -1286,9 +1285,12 @@ void PANSEParameter::initCategoryDefinitions(std::string _mutationSelectionState
 	std::set<unsigned> delMCounter;
 	std::set<unsigned> delEtaCounter;
 	std::set<unsigned> nseCounter;
-	my_print("Checking\n");
 	for (unsigned i = 0u; i < numElongationMixtures; i++)
 	{
+		if (i >= numMixtures)
+		{
+			categories.push_back(mixtureDefinition());
+		}
 		if (!mixtureDefinitionMatrix.empty())
 		{
 			categories[i].delM = mixtureDefinitionMatrix[i][0] - 1;
@@ -1329,7 +1331,6 @@ void PANSEParameter::initCategoryDefinitions(std::string _mutationSelectionState
 		delMCounter.insert(categories[i].delM);
 		delEtaCounter.insert(categories[i].delEta);
 		nseCounter.insert(categories[i].nse);
-		my_print("Success\n");
 	}
 
 	//sets allow only the unique numbers to be added.

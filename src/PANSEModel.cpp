@@ -180,7 +180,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
     for (unsigned positionIndex = 0; positionIndex < positions.size();positionIndex++)
     {
 
-    	  codonMixture = positionMixture[positionIndex];
+    	codonMixture = positionMixture[positionIndex];
 
         positionalRFPCount = rfpCounts[positionIndex];
         codonIndex = positions[positionIndex];
@@ -188,6 +188,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
         alphaCategory = mixture_to_category[codonMixture][0];
         lambdaCategory = mixture_to_category[codonMixture][1];
         nseCategory = mixture_to_category[codonMixture][2];
+
 
         currAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, false);
         currLambda = getParameterForCategory(lambdaCategory, PANSEParameter::lmPri, codon, false);
@@ -321,9 +322,10 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
             currAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, false);
             currLambda = getParameterForCategory(lambdaCategory, PANSEParameter::lmPri, codon, false);
             currNSERate = getParameterForCategory(nseCategory, PANSEParameter::nse, codon, false);
-//            my_print("Current Alpha\t%",currAlpha);
-//            my_print("Current Lambda\t%",currLambda);
-//            my_print("Current NSE\t%",currNSERate);
+            my_print("Current Alpha\t%\n",currAlpha);
+            my_print("Current Lambda\t%\n",currLambda);
+            my_print("Current NSE\t%\n",currNSERate);
+
             if (positionalRFPCount < 50)
             {
                 currLgammaRFPAlpha = lgamma_rfp_alpha[positionalRFPCount][alphaCategory][codonIndex];
@@ -354,6 +356,9 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                 {
                     propAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, true);
                     propLambda = getParameterForCategory(lambdaCategory, PANSEParameter::lmPri, codon, true);
+                    my_print("Proposed Alpha\t%\n",propAlpha);
+                    my_print("Proposed Lambda\t%\n",propLambda);
+
                     logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambda * U, positionalRFPCount,
                                     phiValue,std::exp(propSigma),std::lgamma(propAlpha),std::log(propLambda) + std::log(U),logPhi,std::lgamma(propAlpha+positionalRFPCount));
                     if (prop_prob_successful[codonMixture][codonIndex] > 500)
@@ -370,6 +375,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                 else
                 {
                     propNSERate = getParameterForCategory(nseCategory, PANSEParameter::nse, codon, true);
+                    my_print("Proposed NSE\t%\n",propNSERate);
                     logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda * U, positionalRFPCount,
                                     phiValue,std::exp(propSigma),lgamma_currentAlpha[alphaCategory][codonIndex],log_currentLambda[lambdaCategory][codonIndex],logPhi,currLgammaRFPAlpha);
                     if (prop_prob_successful[codonMixture][codonIndex] > 500)
@@ -442,6 +448,8 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
     logPosterior_proposed = logLikelihood_proposed + calculateNSERatePrior(grouping,true) + calculateAlphaPrior(grouping,true) + calculateLambdaPrior(grouping,true);
     logPosterior = logLikelihood + calculateNSERatePrior(grouping,false) + calculateAlphaPrior(grouping,false) + calculateLambdaPrior(grouping,false);
     
+    my_print("logPosterior %\t logPosterior_proposed %\n",logPosterior,logPosterior_proposed);
+
     //Should never accept parameters that give NaN, so just check proposed parameters
     
     logAcceptanceRatioForAllMixtures[0] = logPosterior_proposed - logPosterior - (currAdjustmentTerm - propAdjustmentTerm);
