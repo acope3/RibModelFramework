@@ -285,7 +285,7 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
 /* readRFPData (RCPP EXPOSED)
  * Arguments: string filename, boolean to determine if we are appending to the existing genome
  * (if not set to true, will default to clearing genome data; defaults to false)
- * Read in a RFP-formatted file: GeneID,Position (1-indexed),Mixture,Codon,RFPCount (only one)
+ * Read in a RFP-formatted file: GeneID,Position (1-indexed),Codon,Mixture,RFPCount (only one)
  * The positions are not necessarily in the right order.
  * Ignores ambiguously-positioned codons (marked with negative position).
  * RFPCounts are not given as a positive number are set to -1 and are stored, but not used in calculation.
