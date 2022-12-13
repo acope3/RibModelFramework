@@ -103,6 +103,8 @@ void PANSEModel::fillMatrices(Genome& genome)
         lgamma_currentAlpha.push_back(tmp);
         log_currentLambda.push_back(tmp_2);
     }
+    mixture_to_category = getElongationMixtureCategories();
+    
     
 
 }
@@ -113,6 +115,7 @@ void PANSEModel::clearMatrices()
     log_currentLambda.clear();
     lgamma_rfp_alpha.clear();
     prob_successful.clear();
+    mixture_to_category.clear();
 }
 
 
@@ -173,7 +176,6 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
     
     double currSigma = 0;
     
-    std::vector<std::vector<unsigned>> mixture_to_category = getElongationMixtureCategories();
     
     for (unsigned positionIndex = 0; positionIndex < positions.size();positionIndex++)
     {
@@ -251,7 +253,6 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
     double propAlpha, propLambda, propNSERate;
     double currAlpha, currLambda, currNSERate;
     unsigned alphaCategory, lambdaCategory, nseCategory;
-    unsigned codonMixture;
 
 
     double currAdjustmentTerm = 0;
@@ -265,15 +266,15 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 
 
     fillMatrices(genome);
-    std::vector<std::vector<unsigned>> mixture_to_category = getElongationMixtureCategories();
-
+  
 #ifdef _OPENMP
 //#ifndef __APPLE__
-#pragma omp parallel for private(gene,currAlpha,currLambda,currNSERate,propAlpha,propLambda,propNSERate,alphaCategory,lambdaCategory,nseCategory,mixture_to_category) reduction(+:logLikelihood,logLikelihood_proposed)
+#pragma omp parallel for private(gene,currAlpha,currLambda,currNSERate,propAlpha,propLambda,propNSERate,alphaCategory, lambdaCategory, nseCategory) reduction(+:logLikelihood,logLikelihood_proposed)
 #endif
     for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
     {
     	unsigned long positionalRFPCount;
+      unsigned codonMixture;
     	unsigned codonIndex;
     	std::string codon;
     	double currLgammaRFPAlpha;
@@ -512,11 +513,10 @@ void PANSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 
     unsigned long Y = genome.getSumRFP();
     fillMatrices(genome);
-    std::vector<std::vector<unsigned>> mixture_to_category = getElongationMixtureCategories();
-    
+  
 #ifdef _OPENMP
 //#ifndef __APPLE__
-#pragma omp parallel for private(gene,currAlpha,currLambda,currNSERate,alphaCategory,lambdaCategory,nseCategory,mixture_to_category) reduction(+:logLikelihood,logLikelihood_proposed)
+#pragma omp parallel for private(gene,currAlpha,currLambda,currNSERate,alphaCategory,lambdaCategory,nseCategory) reduction(+:logLikelihood,logLikelihood_proposed)
 #endif
     for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
     {
@@ -1170,11 +1170,13 @@ void PANSEModel::updateHyperParameter(unsigned hp)
 
 void PANSEModel::simulateGenome(Genome &genome)
 {
+    unsigned alphaCategory, lambdaCategory, nseCategory;
     unsigned long Y = genome.getSumRFP();
+    my_print("##Total Number of Counts in Simulation: %\n",Y);
     double Z = 0;
     std::vector<std::vector<double>> wait_times;
     wait_times.resize(genome.getGenomeSize());
-
+    
     for (unsigned geneIndex = 0u; geneIndex < genome.getGenomeSize(); geneIndex++)
     {
 
@@ -1184,14 +1186,20 @@ void PANSEModel::simulateGenome(Genome &genome)
         SequenceSummary sequence = gene.geneData;
         Gene tmpGene = gene;
         std::vector <unsigned> positions = sequence.getPositionCodonID();
+        std::vector<unsigned> positionMixture = gene.geneData.getPositionMixture();
+        
         wait_times[geneIndex].resize(positions.size());
         std::vector <unsigned> rfpCount;
-        unsigned alphaCategory = parameter->getMutationCategory(mixtureElement);
-        unsigned lambdaCategory = parameter->getSelectionCategory(mixtureElement);
+        
         double sigma =  1.0;
         double v;
         for (unsigned positionIndex = 0; positionIndex < positions.size(); positionIndex++)
         {
+            unsigned codonMixture = positionMixture[positionIndex];
+            alphaCategory = parameter->getMutationCategory(codonMixture);
+            lambdaCategory = parameter->getSelectionCategory(codonMixture);
+            nseCategory = parameter->getNSECategory(codonMixture);
+          
             unsigned codonIndex = positions[positionIndex];
             std::string codon = sequence.indexToCodon(codonIndex);
             if (codon == "TAG" || codon == "TGA" || codon == "TAA")
@@ -1200,7 +1208,7 @@ void PANSEModel::simulateGenome(Genome &genome)
             }
             double alpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, false);
             double lambda = getParameterForCategory(lambdaCategory, PANSEParameter::lmPri, codon, false);
-            double NSERate = getParameterForCategory(alphaCategory, PANSEParameter::nse, codon, false);
+            double NSERate = getParameterForCategory(nseCategory, PANSEParameter::nse, codon, false);
             v = 1.0 / NSERate;
 #ifndef STANDALONE
             RNGScope scope;
@@ -1230,22 +1238,26 @@ void PANSEModel::simulateGenome(Genome &genome)
         SequenceSummary sequence = gene.geneData;
         Gene tmpGene = gene;
         std::vector <unsigned> positions = sequence.getPositionCodonID();
+        std::vector<unsigned> positionMixture = gene.geneData.getPositionMixture();
         std::vector <unsigned long> rfpCount;
-        unsigned alphaCategory = parameter->getMutationCategory(mixtureElement);
-        unsigned lambdaCategory = parameter->getSelectionCategory(mixtureElement);
-
+        
         double sigma =  1.0;
         double v;
         
         for (unsigned positionIndex = 0; positionIndex < positions.size(); positionIndex++)
         {
+            unsigned codonMixture = positionMixture[positionIndex];
+            alphaCategory = parameter->getMutationCategory(codonMixture);
+            lambdaCategory = parameter->getSelectionCategory(codonMixture);
+            nseCategory = parameter->getNSECategory(codonMixture);
+          
             unsigned codonIndex = positions[positionIndex];
             std::string codon = sequence.indexToCodon(codonIndex);
             if (codon == "TAG" || codon == "TGA" || codon == "TAA")
             {
                 my_print("Stop codon being used during simulations\n");
             }
-            double NSERate = getParameterForCategory(alphaCategory, PANSEParameter::nse, codon, false);
+            double NSERate = getParameterForCategory(nseCategory, PANSEParameter::nse, codon, false);
             v = 1.0 / NSERate;
 #ifndef STANDALONE
             RNGScope scope;

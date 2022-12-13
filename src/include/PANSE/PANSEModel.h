@@ -17,10 +17,10 @@ class PANSEModel: public Model
 		double calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
 				unsigned currRFPObserved, double phiValue, double prevSigma, double lgamma_currAlpha, double log_currLambdaPrime, double log_phi,double lgamma_rfp_alpha);
 		std::vector<std::vector<double>> lgamma_currentAlpha;
-   		std::vector<std::vector<double>> log_currentLambda;
-        std::vector<std::vector<std::vector<double>>> lgamma_rfp_alpha;
-      
-        std::vector<std::vector<double>> prob_successful;
+   	std::vector<std::vector<double>> log_currentLambda;
+    std::vector<std::vector<std::vector<double>>> lgamma_rfp_alpha;
+    std::vector<std::vector<double>> prob_successful;
+    std::vector<std::vector<unsigned>> mixture_to_category;
 
         
  

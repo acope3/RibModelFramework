@@ -708,12 +708,12 @@ void PANSEParameter::initMutationSelectionCategories(std::vector<std::string> fi
 					proposedCodonSpecificParameter[lmPri][j] = temp;
 					altered++;
 				}
-                else if (paramType == PANSEParameter::nse && categories[j].nse == i)
-                {
-                    currentCodonSpecificParameter[nse][j] = temp;
-                    proposedCodonSpecificParameter[nse][j] = temp;
-                    altered++;
-                }
+        else if (paramType == PANSEParameter::nse && categories[j].nse == i)
+        {
+            currentCodonSpecificParameter[nse][j] = temp;
+            proposedCodonSpecificParameter[nse][j] = temp;
+            altered++;
+        }
 				if (altered == numCategories)
 					break; //to not access indices out of bounds.
 			}
