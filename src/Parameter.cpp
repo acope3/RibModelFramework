@@ -189,6 +189,7 @@ void Parameter::initParameterSet(std::vector<double> _stdDevSynthesisRate, unsig
 	}
 	
 	numMixtures = _numMixtures;
+	numElongationMixtures = numMixtures;
 
 	stdDevSynthesisRate = _stdDevSynthesisRate;
 	stdDevSynthesisRate_proposed = _stdDevSynthesisRate;
@@ -458,6 +459,7 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 		numAcceptForNoiseOffset.resize(obsPhiSets, 0);
 		numAcceptForSynthesisRate.resize(numSelectionCategories);
 		proposedSynthesisRateLevel.resize(numSelectionCategories);
+		numElongationMixtures = numMixtures;
 		for (unsigned i = 0; i < numSelectionCategories; i++)
 		{
 			proposedSynthesisRateLevel[i] = currentSynthesisRateLevel[i];
@@ -2548,7 +2550,7 @@ bool Parameter::checkIndex(unsigned index, unsigned lowerbound, unsigned upperbo
 
 unsigned Parameter::getMutationCategoryForMixture(unsigned mixtureElement)
 {
-	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	bool check = checkIndex(mixtureElement, 1, numElongationMixtures);
 	return check ? categories[mixtureElement - 1].delM + 1 : 0;
 }
 
@@ -2562,7 +2564,7 @@ unsigned Parameter::getMutationCategoryForMixture(unsigned mixtureElement)
  */
 unsigned Parameter::getSelectionCategoryForMixture(unsigned mixtureElement)
 {
-	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	bool check = checkIndex(mixtureElement, 1, numElongationMixtures);
 	return check ? categories[mixtureElement - 1].delEta + 1 : 0;
 }
 
@@ -2691,7 +2693,7 @@ double Parameter::getCodonSpecificPosteriorMeanForCodon(unsigned mixtureElement,
 	codon[0] = (char)std::toupper(codon[0]);
 	codon[1] = (char)std::toupper(codon[1]);
 	codon[2] = (char)std::toupper(codon[2]);
-	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	bool check = checkIndex(mixtureElement, 1, numElongationMixtures);
 	if (check)
 	{
 		rv = getCodonSpecificPosteriorMean(mixtureElement - 1, samples, codon, paramType, withoutReference, false, log_scale);
@@ -2715,7 +2717,7 @@ double Parameter::getCodonSpecificVarianceForCodon(unsigned mixtureElement, unsi
 	codon[0] = (char)std::toupper(codon[0]);
 	codon[1] = (char)std::toupper(codon[1]);
 	codon[2] = (char)std::toupper(codon[2]);
-	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	bool check = checkIndex(mixtureElement, 1, numElongationMixtures);
 	if (check)
 	{
 		rv = getCodonSpecificVariance(mixtureElement - 1, samples, codon, paramType, unbiased, withoutReference, log_scale);
@@ -2740,7 +2742,7 @@ std::vector<double> Parameter::getCodonSpecificQuantileForCodon(unsigned mixture
 	codon[0] = (char)std::toupper(codon[0]);
 	codon[1] = (char)std::toupper(codon[1]);
 	codon[2] = (char)std::toupper(codon[2]);
-	bool check = checkIndex(mixtureElement, 1, numMixtures);
+	bool check = checkIndex(mixtureElement, 1, numElongationMixtures);
 	if (check)
 	{
         rv = getCodonSpecificQuantile(mixtureElement - 1, samples, codon, paramType, probs, withoutReference, log_scale);

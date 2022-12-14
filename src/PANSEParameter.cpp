@@ -276,6 +276,7 @@ void PANSEParameter::initPANSEValuesFromFile(std::string filename)
 			else
 			{
 				std::istringstream iss;
+			  
 				if (variableName == "currentAlphaParameter")
 				{
 					if (tmp == "***")
@@ -358,6 +359,11 @@ void PANSEParameter::initPANSEValuesFromFile(std::string filename)
 						std_csp.push_back(val);
 					}
 				}
+				else if (variableName == "numElongationMixtures") 
+				{
+				  iss.str(tmp); iss >> numElongationMixtures;
+			  }
+				
 				else if (variableName == "covarianceMatrix")
 				{
 					if (tmp == "***") //end of matrix
@@ -472,6 +478,7 @@ void PANSEParameter::writePANSERestartFile(std::string filename)
 		my_printError("ERROR: Could not open restart file for writing\n");
 	else
 	{
+	  oss << ">numElongationMixtures:\n" << numElongationMixtures << "\n";
 		oss << ">currentAlphaParameter:\n";
 		for (i = 0; i < currentCodonSpecificParameter[alp].size(); i++)
 		{

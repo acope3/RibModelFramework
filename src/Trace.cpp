@@ -506,7 +506,7 @@ unsigned Trace::getCodonSpecificCategory(unsigned mixtureElement, unsigned param
 		rv = categories->at(mixtureElement).delEta;
 		break;
     case 2:
-        rv = categories->at(mixtureElement).delM;
+        rv = categories->at(mixtureElement).nse;
         break;
 	default:
 		my_printError("ERROR: Unknown parameter type in getCodonSpecificCategory\n");
@@ -775,10 +775,10 @@ std::vector<std::vector<double>> Trace::getStdDevSynthesisRateTraces()
 	return stdDevSynthesisRateTrace;
 }
 
-
+//TODO: How well does this generalize?
 unsigned Trace::getNumberOfMixtures()
 {
-	return mixtureProbabilitiesTrace.size();
+	return categories->size();
 }
 
 std::vector<double> Trace::getPartitionFunctionTraceR(unsigned mixtureIndex){
