@@ -1378,28 +1378,30 @@ int main()
 	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 	std::string mixDef = Parameter::allUnique;
 	unsigned numElongationMixtures = 2;
-	PANSEParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, numElongationMixtures, true, mixDef);
-	parameter.setPartitionFunction(275222,0,false);
-	parameter.setPartitionFunction(275222,0,true);
+	PANSEParameter parameter;
+	parameter.initFromRestartFile("/Users/alexandercope/Test_PANSE/Test_codon_mix/Results/2022-12-13_simulated_2_mixtures_allUnique_start_truth/restart_1/Restart_files/rstartFile.rst_final");
+//	PANSEParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, numElongationMixtures, true, mixDef);
+//	parameter.setPartitionFunction(275222,0,false);
+//	parameter.setPartitionFunction(275222,0,true);
 	parameter.printMixtureDefinitionMatrix();
-
-    cspFiles.push_back("/Users/alexandercope/Test_PANSE/Test_codon_mix/Data/Simulation/2_mixtures_allUnique/alpha_1.csv");
-    cspFiles.push_back("/Users/alexandercope/Test_PANSE/Test_codon_mix/Data/Simulation/2_mixtures_allUnique/alpha_2.csv");
-    parameter.initMutationSelectionCategories(cspFiles, 2, parameter.alp);
-
-    cspFiles[0] = ("/Users/alexandercope/Test_PANSE/Test_codon_mix/Data/Simulation/2_mixtures_allUnique/lambda_1.csv");
-    cspFiles[1] = ("/Users/alexandercope/Test_PANSE/Test_codon_mix/Data/Simulation/2_mixtures_allUnique/lambda_2.csv");
-    parameter.initMutationSelectionCategories(cspFiles, 2, parameter.lmPri);
-
-
-    cspFiles[0] = ("/Users/alexandercope/Test_PANSE/Test_codon_mix/Data/Simulation/2_mixtures_allUnique/nserate_1.csv");
-    cspFiles[1] = ("/Users/alexandercope/Test_PANSE/Test_codon_mix/Data/Simulation/2_mixtures_allUnique/nserate_2.csv");
-    parameter.initMutationSelectionCategories(cspFiles, 2, parameter.nse);
-
-    parameter.InitializeSynthesisRate(phi);
-    my_print("Done\n");
-
-
+//
+//    cspFiles.push_back("/Users/alexandercope/Test_PANSE/Test_codon_mix/Data/Simulation/2_mixtures_allUnique/alpha_1.csv");
+//    cspFiles.push_back("/Users/alexandercope/Test_PANSE/Test_codon_mix/Data/Simulation/2_mixtures_allUnique/alpha_2.csv");
+//    parameter.initMutationSelectionCategories(cspFiles, 2, parameter.alp);
+//
+//    cspFiles[0] = ("/Users/alexandercope/Test_PANSE/Test_codon_mix/Data/Simulation/2_mixtures_allUnique/lambda_1.csv");
+//    cspFiles[1] = ("/Users/alexandercope/Test_PANSE/Test_codon_mix/Data/Simulation/2_mixtures_allUnique/lambda_2.csv");
+//    parameter.initMutationSelectionCategories(cspFiles, 2, parameter.lmPri);
+//
+//
+//    cspFiles[0] = ("/Users/alexandercope/Test_PANSE/Test_codon_mix/Data/Simulation/2_mixtures_allUnique/nserate_1.csv");
+//    cspFiles[1] = ("/Users/alexandercope/Test_PANSE/Test_codon_mix/Data/Simulation/2_mixtures_allUnique/nserate_2.csv");
+//    parameter.initMutationSelectionCategories(cspFiles, 2, parameter.nse);
+//
+//    parameter.InitializeSynthesisRate(phi);
+//    my_print("Done\n");
+//
+//
 	PANSEModel model;
 	model.setParameter(parameter);
 	std::vector<std::vector<unsigned>> mixture_to_category = model.getElongationMixtureCategories();

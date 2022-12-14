@@ -20,10 +20,12 @@ PANSEParameter::PANSEParameter() : Parameter()
 {
 	//ctor
 	bias_csp = 0;
-	numElongationMixtures = 0;
 	numNSECategories = 0;
 	currentCodonSpecificParameter.resize(3);
 	proposedCodonSpecificParameter.resize(3);
+	numAcceptForPartitionFunction = 0u;
+	std_partitionFunction = 0.1;
+	Y = 0;
 }
 
 
@@ -69,7 +71,11 @@ PANSEParameter& PANSEParameter::operator=(const PANSEParameter& rhs)
 
 	bias_csp = rhs.bias_csp;
 	std_csp = rhs.std_csp;
-	covarianceMatrix = rhs.covarianceMatrix;
+	std_nse = rhs.std_nse;
+
+  	numNSECategories = rhs.numNSECategories;
+  	nseIsInMixture = rhs.nseIsInMixture;
+	//covarianceMatrix = rhs.covarianceMatrix;
 	nse_covarianceMatrix = rhs.nse_covarianceMatrix;
 	std_partitionFunction = rhs.std_partitionFunction;
 	partitionFunction_proposed = rhs.partitionFunction_proposed;
@@ -234,6 +240,8 @@ void PANSEParameter::initPANSEValuesFromFile(std::string filename)
 	std::ifstream input;
 	input.open(filename.c_str());
 	std::vector <double> mat;
+	covarianceMatrix.resize(groupList.size());
+	nse_covarianceMatrix.resize(groupList.size());
 	if (input.fail())
 		my_printError("ERROR: Could not open file to initialize PANSE values\n");
 	else
@@ -362,7 +370,7 @@ void PANSEParameter::initPANSEValuesFromFile(std::string filename)
 				else if (variableName == "numElongationMixtures") 
 				{
 				  iss.str(tmp); iss >> numElongationMixtures;
-			  }
+			    }
 				
 				else if (variableName == "covarianceMatrix")
 				{

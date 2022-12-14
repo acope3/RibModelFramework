@@ -301,11 +301,9 @@ class Parameter {
 		std::vector<std::vector<unsigned>> mutationIsInMixture;
 		std::vector<std::vector<unsigned>> selectionIsInMixture;
 		std::vector<std::vector<unsigned>> phiIsInMixture;
-		std::vector<std::vector<unsigned>> nseIsInMixture;
 		unsigned numMutationCategories; //TODO Probably needs to be renamed
 		unsigned numSelectionCategories; //TODO Probably needs to be renamed
 		unsigned numSynthesisRateCategories;
-		unsigned numNSECategories;
 
 
 		std::vector<unsigned> numAcceptForCodonSpecificParameters;

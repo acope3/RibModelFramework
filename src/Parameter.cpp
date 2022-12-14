@@ -50,7 +50,9 @@ Parameter::Parameter()
 	bias_phi = 0.0;
 	numMutationCategories = 0u;
 	numSelectionCategories = 0u;
+	numSynthesisRateCategories = 0u;
 	numMixtures = 0u;
+	numElongationMixtures = numMixtures;
 	std_stdDevSynthesisRate = 0.1;
 	maxGrouping = 22;
 }
@@ -70,7 +72,9 @@ Parameter::Parameter(unsigned _maxGrouping)
 	bias_phi = 0.0;
 	numMutationCategories = 0u;
 	numSelectionCategories = 0u;
+	numSynthesisRateCategories = 0u;
 	numMixtures = 0u;
+	numElongationMixtures = numMixtures;
 	std_stdDevSynthesisRate = 0.1;
 	maxGrouping = _maxGrouping;
 	numAcceptForCodonSpecificParameters.resize(maxGrouping, 0u);
@@ -106,15 +110,17 @@ Parameter& Parameter::operator=(const Parameter& rhs)
 
   	numMutationCategories = rhs.numMutationCategories;
   	numSelectionCategories = rhs.numSelectionCategories;
-
+  	numSynthesisRateCategories = rhs.numSynthesisRateCategories;
 	proposedCodonSpecificParameter = rhs.proposedCodonSpecificParameter;
 	currentCodonSpecificParameter = rhs.currentCodonSpecificParameter;
 
   	numMixtures = rhs.numMixtures;
+  	numElongationMixtures = rhs.numElongationMixtures;
 
   	mutationSelectionState = rhs.mutationSelectionState;
   	selectionIsInMixture = rhs.selectionIsInMixture;
 	mutationIsInMixture = rhs.mutationIsInMixture;
+	phiIsInMixture = rhs.phiIsInMixture;
 	maxGrouping = rhs.maxGrouping;
 	groupList = rhs.groupList;
 	mixtureAssignment = rhs.mixtureAssignment;
@@ -271,6 +277,8 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 				std::istringstream iss;
 				if (variableName == "groupList")
 				{
+
+
 					std::string val;
 					iss.str(tmp);
 					while (iss >> val)
@@ -449,6 +457,7 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 		if (phiIsInMixture.size() == 0)
 		{
 			phiIsInMixture = selectionIsInMixture;
+			numSynthesisRateCategories = numSelectionCategories;
 		}
 		//initialize all the default Parameter values now.
 		stdDevSynthesisRate_proposed = stdDevSynthesisRate;
@@ -457,10 +466,10 @@ void Parameter::initBaseValuesFromFile(std::string filename)
 		bias_phi = 0;
 		//obsPhiSets = 0;
 		numAcceptForNoiseOffset.resize(obsPhiSets, 0);
-		numAcceptForSynthesisRate.resize(numSelectionCategories);
-		proposedSynthesisRateLevel.resize(numSelectionCategories);
+		numAcceptForSynthesisRate.resize(numSynthesisRateCategories);
+		proposedSynthesisRateLevel.resize(numSynthesisRateCategories);
 		numElongationMixtures = numMixtures;
-		for (unsigned i = 0; i < numSelectionCategories; i++)
+		for (unsigned i = 0; i < numSynthesisRateCategories; i++)
 		{
 			proposedSynthesisRateLevel[i] = currentSynthesisRateLevel[i];
 			std::vector <unsigned> tmp2(currentSynthesisRateLevel[i].size(), 0u);

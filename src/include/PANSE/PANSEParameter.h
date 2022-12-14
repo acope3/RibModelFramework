@@ -33,7 +33,8 @@ class PANSEParameter: public Parameter {
         unsigned numAcceptForPartitionFunction;
         std::vector<unsigned> numAcceptForNSERates;
         std::vector<CovarianceMatrix> nse_covarianceMatrix;
-
+        std::vector<std::vector<unsigned>> nseIsInMixture;
+		unsigned numNSECategories;
 
 		double bias_csp;
 
