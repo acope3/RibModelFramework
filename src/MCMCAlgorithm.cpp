@@ -464,7 +464,6 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 				std::shuffle(groups.begin(), groups.end(), e);
 				for (unsigned i = 0; i < size; i++)
 				{
-					//my_print("AA: %\n", groups[i]);
 					std::string grouping = model.getGrouping(groups[i]);
 					model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures,csp_parameters[param]);
 			    	double threshold = -Parameter::randExp(1);
@@ -474,7 +473,6 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 						{
 							my_print("ERROR: Accepted proposed value that results in NaN\n");
 						}
-						
 						// moves proposed codon specific parameters to current codon specific parameters
 						model.updateCodonSpecificParameter(grouping,csp_parameters[param]);
 						if ((iteration % thinning) == 0 && acceptanceRatioForAllMixtures[2] != 0 && param  == (numCSPParamTypes - 1))
@@ -623,7 +621,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 		{
 			model.proposeCodonSpecificParameter();
 			acceptRejectCodonSpecificParameter(genome, model, iteration);
-            //TODO:Probably do a nan check
+			//TODO:Probably do a nan check
 			if ((iteration % adaptiveWidth) == 0u)
 			{
 				model.adaptCodonSpecificParameterProposalWidth(adaptiveWidth, iteration / thinning, iteration <= stepsToAdapt);
@@ -634,8 +632,11 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 		if (estimateHyperParameter)
 		{
 			model.updateGibbsSampledHyperParameters(genome);
+			//my_print("propose hyp\n");
 			model.proposeHyperParameters();
+			//my_print("accept hyp\n");
 			acceptRejectHyperParameter(genome, model, iteration);
+			//my_print("done hyp\n");
             //TODO:Probably do a nan check
 			if ((iteration % adaptiveWidth) == 0u)
 

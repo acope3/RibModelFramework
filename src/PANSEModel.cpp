@@ -291,16 +291,18 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
     //unsigned index = SequenceSummary::codonToIndex(grouping);
     unsigned n = getNumElongationMixtureElements();
     unsigned long Y = genome.getSumRFP();
+
     bool share_nse = shareNSE();
 
-
     fillMatrices(genome);
+    //my_print("start!\n");
 #ifdef _OPENMP
 //#ifndef __APPLE__
 #pragma omp parallel for private(gene,currAlpha,currLambda,currNSERate,propAlpha,propLambda,propNSERate,alphaCategory, lambdaCategory, nseCategory) reduction(+:logLikelihood,logLikelihood_proposed)
 #endif
     for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
     {
+    	//my_print("Gene %\n",i);
     	unsigned long positionalRFPCount;
         unsigned codonMixture;
     	unsigned codonIndex;
@@ -316,16 +318,17 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
         //unsigned currNumCodonsInMRNA = gene->geneData.getCodonCountForCodon(grouping);
         
         unsigned mixtureElement = parameter->getMixtureAssignment(i);
+        //my_print("Mix %\n",mixtureElement);
         
         double U = getPartitionFunction(mixtureElement, false)/Y;
+        //my_print("U %\n",U);
         std::vector <unsigned> positions = gene->geneData.getPositionCodonID();
         std::vector <unsigned long> rfpCounts = gene->geneData.getRFPCount(0);
         std::vector<unsigned> positionMixture = gene->geneData.getPositionMixture();
 
         
         // how is the mixture element defined. Which categories make it up
-       unsigned synthesisRateCategory = parameter->getSynthesisRateCategory(mixtureElement);
-        
+        unsigned synthesisRateCategory = parameter->getSynthesisRateCategory(mixtureElement);
 
         double phiValue = parameter->getSynthesisRate(i, synthesisRateCategory, false);
 
@@ -336,8 +339,8 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
         
         for (unsigned positionIndex = 0; positionIndex < positions.size(); positionIndex++)
         {
-        	  codonMixture = positionMixture[positionIndex];
-        	 // my_print("%\n",codonMixture);
+        	codonMixture = positionMixture[positionIndex];
+
             positionalRFPCount = rfpCounts[positionIndex];
             codonIndex = positions[positionIndex];
             codon = gene->geneData.indexToCodon(codonIndex);
@@ -349,9 +352,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
             currAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, codon, false);
             currLambda = getParameterForCategory(lambdaCategory, PANSEParameter::lmPri, codon, false);
             currNSERate = getParameterForCategory(nseCategory, PANSEParameter::nse, codon, false);
-            //my_print("Current Alpha\t%\n",currAlpha);
-            //my_print("Current Lambda\t%\n",currLambda);
-            //my_print("Current NSE\t%\n",currNSERate);
+
 
             if (positionalRFPCount < 50)
             {
@@ -472,12 +473,14 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
         }
     }
 
-
+   // my_print("% % \n",logLikelihood,logLikelihood_proposed);
 
 
     logPosterior_proposed = logLikelihood_proposed + calculateNSERatePrior(grouping,true) + calculateAlphaPrior(grouping,true) + calculateLambdaPrior(grouping,true);
     logPosterior = logLikelihood + calculateNSERatePrior(grouping,false) + calculateAlphaPrior(grouping,false) + calculateLambdaPrior(grouping,false);
     
+    //my_print("% % \n",logPosterior,logPosterior_proposed);
+
     //Should never accept parameters that give NaN, so just check proposed parameters
     
     logAcceptanceRatioForAllMixtures[0] = logPosterior_proposed - logPosterior - (currAdjustmentTerm - propAdjustmentTerm);

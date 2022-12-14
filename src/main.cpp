@@ -1378,8 +1378,7 @@ int main()
 	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 	std::string mixDef = Parameter::allUnique;
 	unsigned numElongationMixtures = 2;
-	PANSEParameter parameter;
-	parameter.initFromRestartFile("/Users/alexandercope/Test_PANSE/Test_codon_mix/Results/2022-12-13_simulated_2_mixtures_allUnique_start_truth/restart_1/Restart_files/rstartFile.rst_final");
+	PANSEParameter parameter("/Users/alexandercope/Test_PANSE/Test_codon_mix/Results/2022-12-13_simulated_2_mixtures_allUnique_start_truth/restart_1/Restart_files/rstartFile.rst_final");
 //	PANSEParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, numElongationMixtures, true, mixDef);
 //	parameter.setPartitionFunction(275222,0,false);
 //	parameter.setPartitionFunction(275222,0,true);
@@ -1404,7 +1403,6 @@ int main()
 //
 	PANSEModel model;
 	model.setParameter(parameter);
-	std::vector<std::vector<unsigned>> mixture_to_category = model.getElongationMixtureCategories();
 	my_print("Initializing MCMCAlgorithm object---------------\n");
 	unsigned samples = 50;
 	unsigned thinning = 2;

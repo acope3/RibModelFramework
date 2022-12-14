@@ -369,9 +369,31 @@ void PANSEParameter::initPANSEValuesFromFile(std::string filename)
 				}
 				else if (variableName == "numElongationMixtures") 
 				{
-				  iss.str(tmp); iss >> numElongationMixtures;
+				  iss.str(tmp);
+				  iss >> numElongationMixtures;
 			    }
-				
+				else if (variableName == "numNSECategories")
+				{
+					iss.str(tmp);
+					iss >> numNSECategories;
+				}
+				else if (variableName == "selectionIsInMixture")
+				{
+					if (tmp == "***")
+					{
+						nseIsInMixture.resize(nseIsInMixture.size() + 1);
+						cat++;
+					}
+					else
+					{
+						unsigned val;
+						iss.str(tmp);
+						while (iss >> val)
+						{
+						   nseIsInMixture[cat - 1].push_back(val);
+						}
+					}
+				}
 				else if (variableName == "covarianceMatrix")
 				{
 					if (tmp == "***") //end of matrix
@@ -487,6 +509,18 @@ void PANSEParameter::writePANSERestartFile(std::string filename)
 	else
 	{
 	  oss << ">numElongationMixtures:\n" << numElongationMixtures << "\n";
+	  oss << ">numNSECategories:\n" << numNSECategories << "\n";
+	  oss << ">selectionIsInMixture:\n";
+	for (i = 0; i < nseIsInMixture.size(); i++)
+	{
+		oss << "***\n";
+		for (j = 0; j < nseIsInMixture[i].size(); j++)
+		{
+			oss << nseIsInMixture[i][j] <<" ";
+		}
+		oss << "\n";
+	}
+
 		oss << ">currentAlphaParameter:\n";
 		for (i = 0; i < currentCodonSpecificParameter[alp].size(); i++)
 		{
