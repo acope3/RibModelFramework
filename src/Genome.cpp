@@ -476,7 +476,7 @@ void Genome::writeRFPData(std::string filename, bool simulated)
 
 		if (!simulated)
 		{
-			Fout << "GeneID,Position,Codon";
+			Fout << "GeneID,Position,Codon,Mixture";
 
 			// For each category name, print for header
 			std::vector<std::string> RFPCountColumnNames = getRFPCountColumnNames();
@@ -490,15 +490,17 @@ void Genome::writeRFPData(std::string filename, bool simulated)
 			{
 				Gene *currentGene = &genes[geneIndex];
 				std::vector<unsigned> positionCodonID = currentGene->geneData.getPositionCodonID();
+				std::vector<unsigned> positionMixture = currentGene->geneData.getPositionMixture();
 				unsigned numPositions = (unsigned)positionCodonID.size();
 
 				for (unsigned position = 0u; position < numPositions; position++)
 				{
 					unsigned codonID = positionCodonID[position];
+				  unsigned codonMixture = positionMixture[position];
 					std::string codon = SequenceSummary::codonArray[codonID];
 
 					// Print position + 1 because it's externally one-indexed
-					Fout << currentGene->getId() << "," << position + 1 << "," << codon;
+					Fout << currentGene->getId() << "," << position + 1 << "," << codon << "," << codonMixture + 1;
 
 					for (unsigned category = 0; category < numCategories; category++)
 						Fout << "," << currentGene->geneData.getSingleRFPCount(position, category);
@@ -509,20 +511,24 @@ void Genome::writeRFPData(std::string filename, bool simulated)
 		}
 		else
 		{
-			Fout << "GeneID,Position,Codon,RFPCount\n";
+			Fout << "GeneID,Position,Codon,Mixture,RFPCount\n";
 			for (unsigned geneIndex = 0u; geneIndex < numGenes; geneIndex++)
 			{
                 //unsigned position = 1u;
 				Gene *currentGene = &simulatedGenes[geneIndex];
-                SequenceSummary *sequenceSummary = currentGene->getSequenceSummary();
-                std::vector <unsigned> positions = sequenceSummary->getPositionCodonID();
-                std::vector <unsigned long> rfpCounts = sequenceSummary->getRFPCount(0);
+        SequenceSummary *sequenceSummary = currentGene->getSequenceSummary();
+        std::vector <unsigned> positions = sequenceSummary->getPositionCodonID();
+        std::vector<unsigned> positionMixture = currentGene->geneData.getPositionMixture();
+        
+        std::vector <unsigned long> rfpCounts = sequenceSummary->getRFPCount(0);
 				for (unsigned positionIndex = 0u; positionIndex < positions.size(); positionIndex++)
 				{
 					unsigned codonID = positions[positionIndex];
-    				std::string codon = SequenceSummary::codonArray[codonID];
+				  
+				  unsigned codonMixture = positionMixture[positionIndex];
+    			std::string codon = SequenceSummary::codonArray[codonID];
 
-    				Fout << currentGene->getId() << "," << positionIndex + 1 << "," << codon << "," << rfpCounts[positionIndex] << "\n";
+    			Fout << currentGene->getId() << "," << positionIndex + 1 << "," << codon << "," << codonMixture + 1 << "," << rfpCounts[positionIndex] << "\n";
 
 				}
 			}
