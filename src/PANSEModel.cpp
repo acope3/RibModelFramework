@@ -91,9 +91,10 @@ void PANSEModel::fillMatrices(Genome& genome)
             tmp[k] = std::lgamma(currAlpha);
             //tmp_2[k] = std::log(currLambda) + std::log(U);
             prob_successful[j][k] = elongationUntilIndexApproximation2ProbabilityLog(currAlpha, currLambda, 1/currNSERate);
+
             if (prob_successful[j][k] > 0.0)
             {
-                prob_successful[j][k] = std::numeric_limits<double>::quiet_NaN();
+            	prob_successful[j][k] = std::numeric_limits<double>::quiet_NaN();
             }
             for (unsigned l=0; l < 50; l++)
             {
@@ -365,7 +366,9 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
            
             if (share_nse && param == "NSERate")
             {
+
                 propNSERate = getParameterForCategory(nseCategory, PANSEParameter::nse, codon, true);
+
                 logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda * U, positionalRFPCount,
                                 phiValue,std::exp(propSigma),lgamma_currentAlpha[alphaCategory][codonIndex],log_currentLambda[synthesisRateCategory][lambdaCategory][codonIndex],logPhi,currLgammaRFPAlpha);
                 if (prop_prob_successful[codonMixture][codonIndex] > 500)
@@ -403,7 +406,6 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                 else
                 {
                     propNSERate = getParameterForCategory(nseCategory, PANSEParameter::nse, codon, true);
-                    //my_print("Proposed NSE\t%\n",propNSERate);
                     logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda * U, positionalRFPCount,
                                     phiValue,std::exp(propSigma),lgamma_currentAlpha[alphaCategory][codonIndex],log_currentLambda[synthesisRateCategory][lambdaCategory][codonIndex],logPhi,currLgammaRFPAlpha);
                     if (prop_prob_successful[codonMixture][codonIndex] > 500)
@@ -411,7 +413,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                         prop_prob_successful[codonMixture][codonIndex] = elongationUntilIndexApproximation2ProbabilityLog(currAlpha, currLambda,1/propNSERate);
                         if (prop_prob_successful[codonMixture][codonIndex] > 0.0)
                         {
-                            prop_prob_successful[codonMixture][codonIndex] = std::numeric_limits<double>::quiet_NaN();
+                        	prop_prob_successful[codonMixture][codonIndex] = std::numeric_limits<double>::quiet_NaN();
                         }
                     }
                 }
@@ -422,11 +424,10 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
            {
                 logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda * U, positionalRFPCount,
                                   phiValue,std::exp(propSigma),lgamma_currentAlpha[alphaCategory][codonIndex],log_currentLambda[synthesisRateCategory][lambdaCategory][codonIndex],logPhi,currLgammaRFPAlpha);
-               
+                //my_print("%\t%\n",positionIndex,prob_successful[codonMixture][codonIndex]);
                 propSigma = propSigma + prob_successful[codonMixture][codonIndex];
        
             }
-            //my_print("Proposed sigma\t%",propSigma);
 
 
             logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda * U, positionalRFPCount,
@@ -451,9 +452,9 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
             propLambda = getParameterForCategory(lambdaCategory, PANSEParameter::lmPri, grouping, true);
             if (std::isnan(logLikelihood_proposed))
             {
-               my_print("WARNING: proposed logLikelihood for % is NaN\n",grouping);
-               my_print("\tProposed alpha: % \n",getParameterForCategory(alphaCategory, PANSEParameter::alp, grouping, true));
-               my_print("\tProposed lambda: %\n",getParameterForCategory(lambdaCategory, PANSEParameter::lmPri, grouping, true));
+//               my_print("WARNING: proposed logLikelihood for % is NaN\n",grouping);
+//               my_print("\tProposed alpha: % \n",getParameterForCategory(alphaCategory, PANSEParameter::alp, grouping, true));
+//               my_print("\tProposed lambda: %\n",getParameterForCategory(lambdaCategory, PANSEParameter::lmPri, grouping, true));
             }
             currAdjustmentTerm += std::log(currAlpha) + std::log(currLambda);
             propAdjustmentTerm += std::log(propAlpha) + std::log(propLambda);
@@ -464,8 +465,8 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
             propNSERate = getParameterForCategory(nseCategory, PANSEParameter::nse, grouping, true);
             if (std::isnan(logLikelihood_proposed))
             {
-                my_print("WARNING: proposed logLikelihood for % is NaN\n",grouping);
-                my_print("\tProposed NSE Rate: %\n",getParameterForCategory(nseCategory, PANSEParameter::nse, grouping, true));
+//                my_print("WARNING: proposed logLikelihood for % is NaN\n",grouping);
+//                my_print("\tProposed NSE Rate: %\n",getParameterForCategory(nseCategory, PANSEParameter::nse, grouping, true));
 
             }
             currAdjustmentTerm += std::log(currNSERate);
@@ -1088,91 +1089,6 @@ void PANSEModel::completeUpdateCodonSpecificParameter()
     parameter->completeUpdateCodonSpecificParameter();
 }
 
-//Noise offset functions
-
-// double PANSEModel::getNoiseOffset(unsigned index, bool proposed)
-// {
-//     return parameter->getNoiseOffset(index, proposed);
-// }
-
-
-// double PANSEModel::getObservedSynthesisNoise(unsigned index)
-// {
-//     return parameter->getObservedSynthesisNoise(index);
-// }
-
-
-// double PANSEModel::getCurrentNoiseOffsetProposalWidth(unsigned index)
-// {
-//     return parameter->getCurrentNoiseOffsetProposalWidth(index);
-// }
-
-
-// void PANSEModel::updateNoiseOffset(unsigned index)
-// {
-//     parameter->updateNoiseOffset(index);
-// }
-
-
-// void PANSEModel::updateNoiseOffsetTrace(unsigned sample)
-// {
-//     parameter->updateNoiseOffsetTraces(sample);
-// }
-
-
-// void PANSEModel::updateObservedSynthesisNoiseTrace(unsigned sample)
-// {
-//     parameter->updateObservedSynthesisNoiseTraces(sample);
-// }
-
-
-// void PANSEModel::adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt)
-// {
-//     parameter->adaptNoiseOffsetProposalWidth(adaptiveWidth, adapt);
-// }
-
-
-
-// void PANSEModel::updateGibbsSampledHyperParameters(Genome &genome)
-// {
-//   // estimate s_epsilon by sampling from a gamma distribution and transforming it into an inverse gamma sample
-    
-//     if (withPhi)
-//     {
-//         if(!fix_sEpsilon)
-//         {
-//             double shape = ((double)genome.getGenomeSize() - 1.0) / 2.0;
-//             for (unsigned i = 0; i < parameter->getNumObservedPhiSets(); i++)
-//             {
-//                 double rate = 0.0; //Prior on s_epsilon goes here?
-//                 unsigned mixtureAssignment;
-//                 double noiseOffset = getNoiseOffset(i);
-//                 for (unsigned j = 0; j < genome.getGenomeSize(); j++)
-//                 {
-//                     mixtureAssignment = parameter->getMixtureAssignment(j);
-//                     double obsPhi = genome.getGene(j).getObservedSynthesisRate(i);
-//                     if (obsPhi > -1.0)
-//                     {
-//                         double sum = std::log(obsPhi) - noiseOffset - std::log(parameter->getSynthesisRate(j, mixtureAssignment, false));
-//                         rate += (sum * sum);
-//                     }else{
-//                         // missing observation.
-//                         shape -= 0.5;
-//                         //Reduce shape because initial estimate assumes there are no missing observations
-//                     }
-//                 }
-//                 rate /= 2.0;
-//                 double rand = parameter->randGamma(shape, rate);
-
-//                 // Below the gamma sample is transformed into an inverse gamma sample
-//                 // According to Gilchrist et al (2015) Supporting Materials p. S6
-//                 // The sample 1/T is supposed to be equal to $s_\epsilon^2$.
-//                 double sepsilon = std::sqrt(1.0/rand);
-//                 parameter->setObservedSynthesisNoise(i, sepsilon);
-//             }
-//         }
-//     }
-// }
 
 
 void PANSEModel::updateAllHyperParameter()
@@ -1424,6 +1340,47 @@ double PANSEModel::calculateAllPriors(bool proposed)
 	// add more priors if necessary.
 
 	return prior;
+}
+
+
+bool PANSEModel::checkValues(bool proposed)
+{
+	unsigned alphaCategory,lambdaCategory,nseCategory;
+	double currAlpha, currLambda, currNSERate;
+
+   	double prior = 0.0;
+   	double prob_success;
+	unsigned size = getGroupListSize();
+	mixture_to_category = getElongationMixtureCategories();
+	bool good_values = true;
+	for (unsigned i = 0; i < size; i++)
+	{
+		std::string grouping = getGrouping(i);
+		prior += calculateNSERatePrior(grouping, proposed);
+        prior += calculateAlphaPrior(grouping, proposed);
+        prior += calculateLambdaPrior(grouping, proposed);
+        if (std::isnan(prior) || !std::isfinite(prior))
+        {
+        	good_values = false;
+        }
+        for (unsigned j=0; j < mixture_to_category.size(); j++)
+        {
+        	alphaCategory = mixture_to_category[j][0];
+        	lambdaCategory = mixture_to_category[j][1];
+			nseCategory = mixture_to_category[j][2];
+
+			currAlpha = getParameterForCategory(alphaCategory, PANSEParameter::alp, grouping, proposed);
+			currLambda = getParameterForCategory(lambdaCategory, PANSEParameter::lmPri, grouping, proposed);
+			currNSERate = getParameterForCategory(nseCategory, PANSEParameter::nse, grouping, proposed);
+			prob_success = elongationUntilIndexApproximation2ProbabilityLog(currAlpha, currLambda, 1/currNSERate);
+			if (prob_success > 0.0)
+			{
+				good_values = false;
+			}
+        }
+	}
+
+	return good_values;
 }
 
 

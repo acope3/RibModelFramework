@@ -615,20 +615,20 @@ void PANSEParameter::writePANSERestartFile(std::string filename)
 		}
 		if (numNSECategories > 1)
 		{
-  		for (unsigned n = 0; n < groupList.size(); n++)
-  		{
-  			std::string codon = groupList[n];
-  			oss << ">nse_covarianceMatrix:\n" << codon << "\n";
-  			CovarianceMatrix m = nse_covarianceMatrix[SequenceSummary::codonToIndex(codon)];
-  			std::vector<double>* tmp = m.getCovMatrix();
-  			int size = m.getNumVariates();
-  			for (unsigned k = 0; k < size * size; k++)
-  			{
-  				if (k % size == 0 && k != 0) { oss << "\n"; }
-  				oss << tmp->at(k) << "\t";
-  			}
-  			oss << "\n***\n";
-  		}
+			for (unsigned n = 0; n < groupList.size(); n++)
+			{
+				std::string codon = groupList[n];
+				oss << ">nse_covarianceMatrix:\n" << codon << "\n";
+				CovarianceMatrix m = nse_covarianceMatrix[SequenceSummary::codonToIndex(codon)];
+				std::vector<double>* tmp = m.getCovMatrix();
+				int size = m.getNumVariates();
+				for (unsigned k = 0; k < size * size; k++)
+				{
+					if (k % size == 0 && k != 0) { oss << "\n"; }
+					oss << tmp->at(k) << "\t";
+				}
+				oss << "\n***\n";
+			}
 		}
 
 		output = oss.str();

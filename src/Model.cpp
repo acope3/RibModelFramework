@@ -40,6 +40,12 @@ double Model::calculatePriorForCodonSpecificParam(Parameter *parameter, std::str
 	return priorValue;
 }
 
+bool Model::checkValues(bool proposed)
+{
+
+	return true;
+}
+
 std::vector<std::string> Model::getParameterTypeList()
 {
 	return parameter_types;

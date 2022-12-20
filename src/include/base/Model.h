@@ -31,6 +31,7 @@ class Model
 					std::vector <double> &logProbabilityRatio) = 0;
 
 		virtual double calculateAllPriors(bool proposed=false) = 0;
+		virtual bool checkValues(bool proposed=false);
 
 
 

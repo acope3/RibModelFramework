@@ -134,6 +134,7 @@ class PANSEModel: public Model
 		PANSEParameter* getParameter();
 
 		void setParameter(PANSEParameter &_parameter);
+		bool checkValues(bool proposed=false);
 		virtual double calculateAllPriors(bool proposed=false);
 		virtual double calculateAlphaPrior(std::string grouping,bool proposed=false);
 		virtual double calculateLambdaPrior(std::string grouping,bool proposed=false);

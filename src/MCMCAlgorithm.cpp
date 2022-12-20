@@ -389,8 +389,13 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	if ((iteration % thinning) == 0)
 	{
 		if (estimateMixtureAssignment)
+		{
 			model.updateMixtureProbabilitiesTrace(iteration/thinning);
-		likelihoodTrace[iteration/thinning] = loglikelihood;
+		}
+		if (std::isnan(loglikelihood))
+		{
+			likelihoodTrace[iteration/thinning] = likelihoodTrace[(iteration/thinning)-1];
+		}
 		
 	}
 	return logPosterior;
@@ -652,13 +657,21 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
  			model.clearMatrices();
 			if ((iteration % thinning) == 0u)
 			{
-				posteriorTrace[(iteration / thinning)] = logPost;
 				if (std::isnan(logPost))
 				{
-					my_printError("ERROR: LogPosterior is NaN, exiting at iteration %\n", iteration);
-					model.setLastIteration(iteration / thinning);
-					return;
+					posteriorTrace[(iteration / thinning)] = posteriorTrace[(iteration / thinning)-1];
 				}
+				else
+				{
+					posteriorTrace[(iteration / thinning)] = logPost;
+				}
+//				if (std::isnan(logPost))
+//				{
+//
+//					//my_printError("ERROR: LogPosterior is NaN, exiting at iteration %\n", iteration);
+//					//model.setLastIteration(iteration / thinning);
+//					//return;
+//				}
 			}
 			if ((iteration % adaptiveWidth) == 0u)
 				model.adaptSynthesisRateProposalWidth(adaptiveWidth, iteration <= stepsToAdapt);
@@ -716,15 +729,17 @@ void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned
 	// how many steps do you want to walk "away" from the initial conditions
 	for (unsigned iteration = 0u; iteration < divergenceIterations; iteration++)
 	{
-		double prior = std::numeric_limits<double>::quiet_NaN();
+		//double prior = std::numeric_limits<double>::quiet_NaN();
+		bool prior = false;
 		if (estimateCodonSpecificParameter)
 		{
 			// If proposed parameters go outside the accepatble boundaries, propose new set of parameters.
 			// Should only matter for PA or PANSE
-			while (std::isnan(prior) || !std::isfinite(prior))
+			//while (std::isnan(prior) || !std::isfinite(prior))
+			while (!prior)
 			{
 				model.proposeCodonSpecificParameter();
-				prior = model.calculateAllPriors(true);
+				prior = model.checkValues(true);
 			}
 		}
 		if (estimateHyperParameter)
