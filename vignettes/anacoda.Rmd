@@ -93,7 +93,7 @@ To accommodate for this mixing we only have to adjust `sphi`, which is now a vec
 To use empirical values as prior information one can simply specify an `observed.expression.file` when initializing the genome object.
 
 ```{r, echo = TRUE, eval = FALSE}
-genome <- initializeGenomeObject(file = "genome.fasta", observed.expression.file = "synthesis_values.csv")
+genome <- initializeGenomeObject(file = "genome.fasta", observed.expression.file = "expression.csv")
 ```
 
 These observed expression or synthesis  values ($\Phi$) are independent of the number of gene-sets.
