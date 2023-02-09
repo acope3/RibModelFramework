@@ -1,4 +1,12 @@
 # Eclipse Stuff
 .project
+# R code
 *.Rhistory
 *.RData
+# C code
+*.o
+# Random
+*.log
+# emacs and R output
+*~ 
+\#*\#
