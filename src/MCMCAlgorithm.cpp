@@ -395,6 +395,10 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		if (std::isnan(loglikelihood))
 		{
 			likelihoodTrace[iteration/thinning] = likelihoodTrace[(iteration/thinning)-1];
+		} 
+		else
+		{
+		  likelihoodTrace[iteration/thinning] = loglikelihood;
 		}
 		
 	}

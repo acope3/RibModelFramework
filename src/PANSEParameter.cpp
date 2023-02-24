@@ -710,17 +710,29 @@ void PANSEParameter::initMutationSelectionCategories(std::vector<std::string> fi
 	std::ifstream currentFile;
 	std::string tmpString;
 	std::string type;
-
+	unsigned alphaCategories = getNumMutationCategories(); //alpha and lambda both control elongation rates
+	unsigned lambdaPrimeCategories = getNumSelectionCategories();
+	unsigned nonsenseErrorCategories = getNumNSECategories();
+  unsigned var_categories = 0;
 
 	if (paramType == PANSEParameter::alp)
+	{
 		type = "alpha";
+	  var_categories = alphaCategories;
+	}
 	else if (paramType == PANSEParameter::nse)
-	    type = "nse";
+	{
+	  type = "nse";
+	  var_categories = nonsenseErrorCategories; 
+	}
 	else
+	{
 		type = "lambda";
+	  var_categories = lambdaPrimeCategories; 
+	}
 
 	//TODO: Might consider doing a size check before going through all of this.
-	for (unsigned i = 0; i < numCategories; i++)
+	for (unsigned i = 0; i < var_categories; i++)
 	{
 		std::vector<double> temp(numParam, 0.0);
 
@@ -746,20 +758,20 @@ void PANSEParameter::initMutationSelectionCategories(std::vector<std::string> fi
 			{
 				if (paramType == PANSEParameter::alp && categories[j].delM == i)
 				{
-					currentCodonSpecificParameter[alp][j] = temp;
-					proposedCodonSpecificParameter[alp][j] = temp;
+					currentCodonSpecificParameter[alp][i] = temp;
+					proposedCodonSpecificParameter[alp][i] = temp;
 					//altered++;
 				}
 				else if (paramType == PANSEParameter::lmPri && categories[j].delEta == i)
 				{
-					currentCodonSpecificParameter[lmPri][j] = temp;
-					proposedCodonSpecificParameter[lmPri][j] = temp;
+					currentCodonSpecificParameter[lmPri][i] = temp;
+					proposedCodonSpecificParameter[lmPri][i] = temp;
 					//altered++;
 				}
 				else if (paramType == PANSEParameter::nse && categories[j].nse == i)
 				{
-					currentCodonSpecificParameter[nse][j] = temp;
-					proposedCodonSpecificParameter[nse][j] = temp;
+					currentCodonSpecificParameter[nse][i] = temp;
+					proposedCodonSpecificParameter[nse][i] = temp;
 					//altered++;
 				}
 				//if (altered == numCategories)

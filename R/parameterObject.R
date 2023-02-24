@@ -31,7 +31,8 @@
 #' 
 #' @param mixture.definition A string describing how each mixture should
 #' be treated with respect to mutation and selection.
-#' Valid values consist of "allUnique", "mutationShared", and "selectionShared".
+#' Valid values consist of "allUnique", "mutationShared", and "selectionShared" for ROC/FONSE.
+#' Valid values consist of  "allUnique", "elongationShared", and "nseShared" for PANSE.
 #' The default value for mixture.definition is "allUnique".
 #' See details for more information.
 #' 
@@ -158,8 +159,8 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
       stop("split.serine must be a boolean value\n")
     }
     if (mixture.definition != "allUnique" && mixture.definition != "mutationShared" &&
-        mixture.definition != "selectionShared") {
-      stop("mixture.definition must be \"allUnique\", \"mutationShared\", or \"selectionShared\". Default is \"allUnique\"\n")
+        mixture.definition != "selectionShared" && mixture.definition != "elongationShared" && mixture.definition != "nseShared") {
+      stop("mixture.definition must be \"allUnique\", \"mutationShared\" (ROC/FONSE),\"selectionShared\" (ROC/FONSE), \"elongationShared\" (PANSE), or \"nseShared\" (PANSE). Default is \"allUnique\"\n")
     }
     if (mutation.prior.sd < 0) {
       stop("mutation.prior.sd should be positive\n")

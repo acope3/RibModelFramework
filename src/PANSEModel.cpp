@@ -452,9 +452,9 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
             propLambda = getParameterForCategory(lambdaCategory, PANSEParameter::lmPri, grouping, true);
             if (std::isnan(logLikelihood_proposed))
             {
-//               my_print("WARNING: proposed logLikelihood for % is NaN\n",grouping);
-//               my_print("\tProposed alpha: % \n",getParameterForCategory(alphaCategory, PANSEParameter::alp, grouping, true));
-//               my_print("\tProposed lambda: %\n",getParameterForCategory(lambdaCategory, PANSEParameter::lmPri, grouping, true));
+              my_print("WARNING: proposed logLikelihood for % is NaN\n",grouping);
+              my_print("\tProposed alpha: % \n",getParameterForCategory(alphaCategory, PANSEParameter::alp, grouping, true));
+              my_print("\tProposed lambda: %\n",getParameterForCategory(lambdaCategory, PANSEParameter::lmPri, grouping, true));
             }
             currAdjustmentTerm += std::log(currAlpha) + std::log(currLambda);
             propAdjustmentTerm += std::log(propAlpha) + std::log(propLambda);
@@ -465,8 +465,8 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
             propNSERate = getParameterForCategory(nseCategory, PANSEParameter::nse, grouping, true);
             if (std::isnan(logLikelihood_proposed))
             {
-//                my_print("WARNING: proposed logLikelihood for % is NaN\n",grouping);
-//                my_print("\tProposed NSE Rate: %\n",getParameterForCategory(nseCategory, PANSEParameter::nse, grouping, true));
+               my_print("WARNING: proposed logLikelihood for % is NaN\n",grouping);
+               my_print("\tProposed NSE Rate: %\n",getParameterForCategory(nseCategory, PANSEParameter::nse, grouping, true));
 
             }
             currAdjustmentTerm += std::log(currNSERate);
