@@ -748,26 +748,27 @@ void PAModel::updateHyperParameter(unsigned hp)
 
 void PAModel::simulateGenome(Genome &genome)
 {
-	unsigned long Y = genome.getSumRFP();
+	  unsigned long Y = genome.getSumRFP();
     double Z = 0;
     std::vector<std::vector<double>> wait_times;
     wait_times.resize(genome.getGenomeSize());
 
     for (unsigned geneIndex = 0u; geneIndex < genome.getGenomeSize(); geneIndex++)
     {
-
         unsigned mixtureElement = getMixtureAssignment(geneIndex);
         Gene gene = genome.getGene(geneIndex);
         double phi = parameter->getSynthesisRate(geneIndex, mixtureElement, false);
         SequenceSummary sequence = gene.geneData;
         Gene tmpGene = gene;
         std::vector <unsigned> positions = sequence.getPositionCodonID();
+        std::vector<unsigned> positionMixture = gene.geneData.getPositionMixture();
         wait_times[geneIndex].resize(positions.size());
         std::vector <unsigned> rfpCount;
         unsigned alphaCategory = parameter->getMutationCategory(mixtureElement);
         unsigned lambdaCategory = parameter->getSelectionCategory(mixtureElement);
         for (unsigned positionIndex = 0; positionIndex < positions.size(); positionIndex++)
         {
+            unsigned codonMixture = positionMixture[positionIndex];
             unsigned codonIndex = positions[positionIndex];
             std::string codon = sequence.indexToCodon(codonIndex);
             if (codon == "TAG" || codon == "TGA" || codon == "TAA")
@@ -803,8 +804,6 @@ void PAModel::simulateGenome(Genome &genome)
         std::vector <unsigned long> rfpCount;
         unsigned alphaCategory = parameter->getMutationCategory(mixtureElement);
         unsigned lambdaCategory = parameter->getSelectionCategory(mixtureElement);
-        double v;
-        
         for (unsigned positionIndex = 0; positionIndex < positions.size(); positionIndex++)
         {
             unsigned codonIndex = positions[positionIndex];

@@ -307,8 +307,8 @@ void Genome::readRFPData(std::string filename, bool append)
 			// Analyze the header line
 			std::string tmp;
 
-            if (!std::getline(Fin, tmp))
-                my_printError("Error in Genome::readRFPData: RFPData file % has no header.\n", filename);
+      if (!std::getline(Fin, tmp))
+          my_printError("Error in Genome::readRFPData: RFPData file % has no header.\n", filename);
 
 			// Ignore first 3 commas: ID, position, codon, mixture
 			std::size_t pos = tmp.find(',');
@@ -352,13 +352,13 @@ void Genome::readRFPData(std::string filename, bool append)
 			while (std::getline(Fin, tmp))
 			{
 
-	            #ifndef STANDALONE
-	            Rcpp::checkUserInterrupt();
-	            #endif
+        #ifndef STANDALONE
+        Rcpp::checkUserInterrupt();
+        #endif
 
-		        // Remove whitespace from the string
-		        tmp.erase(std::remove_if(tmp.begin(), tmp.end(),
-	                  std::bind(std::isspace<char>, std::placeholders::_1, std::locale::classic())), tmp.end());
+        // Remove whitespace from the string
+        tmp.erase(std::remove_if(tmp.begin(), tmp.end(),
+                std::bind(std::isspace<char>, std::placeholders::_1, std::locale::classic())), tmp.end());
 
 				pos = tmp.find(',');
 				std::string ID = tmp.substr(0, pos);
@@ -426,7 +426,7 @@ void Genome::readRFPData(std::string filename, bool append)
 							if (possValue > -1) tableRow[tableIndex] = possValue;
 							else tableRow[tableIndex] = -1;
 						}
-                        else
+            else
 						{
 							tableRow[tableIndex] = -1;
 						}
@@ -441,14 +441,14 @@ void Genome::readRFPData(std::string filename, bool append)
 			}
 
             // Ensure that at least one entry was read in
-            if (prevID != "")
-            {
-                tmpGene.setId(prevID);
-                tmpGene.setDescription("No description for PA(NSE) Model");
-                tmpGene.setRFPSequence(table);
-                totalRFPCount += tmpGene.geneData.getSumTotalRFPCount(0);
-                addGene(tmpGene, false); //add to genome
-            }
+      if (prevID != "")
+      {
+          tmpGene.setId(prevID);
+          tmpGene.setDescription("No description for PA(NSE) Model");
+          tmpGene.setRFPSequence(table);
+          totalRFPCount += tmpGene.geneData.getSumTotalRFPCount(0);
+          addGene(tmpGene, false); //add to genome
+      }
 		} // end else
 		Fin.close();
 	} // end try

@@ -903,9 +903,7 @@ void PANSEParameter::proposeCodonSpecificParameter()
 					}
 					else
 					{
-
 						proposedCodonSpecificParameter[nse][i][k] = std::exp( randNorm( std::log(currentCodonSpecificParameter[nse][i][k]) , std_nse[k]) );
-
 					}
 				}
 
