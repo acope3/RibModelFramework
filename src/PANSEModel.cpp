@@ -1154,7 +1154,7 @@ void PANSEModel::simulateGenome(Genome &genome)
     }
     double U = Z/Y;
     my_print("##True Z value based on provided phi and CSPs:%\n",Z);
-    my_print("Gene\tSigma\n");
+    my_print("Gene\tLog.Sigma\tSigma\n");
     for (unsigned geneIndex = 0u; geneIndex < genome.getGenomeSize(); geneIndex++)
     {
 
@@ -1198,8 +1198,8 @@ void PANSEModel::simulateGenome(Genome &genome)
             rfpCount.push_back(simulatedValue);
 #endif
         }
-        my_print("%\t%\n",gene.getId(),sigma);
-
+        std::cout << std::setprecision(15) << std::fixed;
+        std::cout << gene.getId() << "\t" << std::log(sigma) << "\t" << sigma << "\n";
         tmpGene.geneData.setRFPCount(rfpCount, RFPCountColumn);
         genome.addGene(tmpGene, true);
     }
