@@ -15,7 +15,11 @@ class PAModel: public Model
 
 		double calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
 				unsigned currRFPValue, unsigned currNumCodonsInMRNA, double phiValue);
-		
+		double calculateLogLikelihood(Genome &genome, std::vector<double> alpha, std::vector<double> lambda, 
+                                std::vector<double> phi, double Z);
+		double calculateLogLikelihoodPerCodonPerGeneByPosition(double currAlpha, double currLambdaPrime,
+                                                                  unsigned currRFPObserved, double phiValue);
+		  
 	public:
 		//Constructors & Destructors:
 		explicit PAModel(unsigned RFPCountColumn = 0u, bool _withPhi = false, bool _fix_sEpsilon = false);
@@ -130,8 +134,15 @@ class PAModel: public Model
 		virtual bool getParameterTypeFixed(std::string csp_parameters);
 		virtual bool isShared(std::string csp_parameters);
 		
+		
 
-	protected:
+		  //R section
+#ifndef STANDALONE
+		  double calculateLogLikelihoodR(Genome &genome, std::vector<double> _alpha, std::vector<double> _lambda,
+                                   std::vector<double> _phi, double _Z);
+#endif //STANDALONE		  
+		  
+protected:
 		
 
 };

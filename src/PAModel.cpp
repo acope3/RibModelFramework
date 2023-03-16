@@ -69,10 +69,30 @@ double PAModel::calculateLambdaPrior(std::string grouping,bool proposed)
 }
 
 
+double PAModel::calculateLogLikelihoodPerCodonPerGeneByPosition(double currAlpha, double currLambdaPrime,
+                                                         unsigned currRFPObserved, double phiValue)
+{
+  
+  double term1 = std::lgamma(currAlpha + currRFPObserved) - std::lgamma(currAlpha);
+  double term2 = std::log(phiValue) - std::log(currLambdaPrime + phiValue);
+  double term3 = std::log(currLambdaPrime) - std::log(currLambdaPrime + phiValue);
+  
+  
+  term2 *= currRFPObserved;
+  term3 *= currAlpha;
+  
+  double rv = term1 + term2 + term3;
+  return rv;
+}
+
+
+
 
 double PAModel::calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime, unsigned currRFPValue,
                                                       unsigned currNumCodonsInMRNA, double phiValue)
 {
+	
+	
 	
 	double logLikelihood = ((std::lgamma((currNumCodonsInMRNA * currAlpha) + currRFPValue)) - (std::lgamma(currNumCodonsInMRNA * currAlpha)))
 						   + (currRFPValue * (std::log(phiValue) - std::log(currLambdaPrime + phiValue)))
@@ -917,3 +937,104 @@ bool PAModel::isShared(std::string csp_parameters)
 	return false;
 }
 
+
+double PAModel::calculateLogLikelihood(Genome &genome, std::vector<double> alpha, std::vector<double> lambda, std::vector<double> phi, double Z)
+{
+  double currAlpha, currLambda, currNSERate;
+  unsigned alphaCategory, lambdaCategory, nseCategory;
+  unsigned currNumCodonsInMRNA, currRFPValue;
+  Gene *gene;
+  
+  std::vector<std::string> groups = parameter -> getGroupList();
+  double logLikelihood = 0.0;
+  unsigned long Y = genome.getSumRFP();
+  double U = Z/Y;
+  my_print("U: % Z:% Y:%\n",U,Z,Y);
+  // for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+  // {
+  //   gene = &genome.getGene(i);
+  //   
+  //   //unsigned mixtureElement = parameter->getMixtureAssignment(i);
+  //   // how is the mixture element defined. Which categories make it up
+  //   // unsigned alphaCategory = parameter->getMutationCategory(mixtureElement);
+  //   // unsigned lambdaPrimeCategory = parameter->getSelectionCategory(mixtureElement);
+  //   // unsigned synthesisRateCategory = parameter->getSynthesisRateCategory(mixtureElement);
+  //   // 
+  //   double phiValue = phi[i];
+  //   
+  //   for (unsigned index = 0; index < getGroupListSize(); index++) //number of codons, without the stop codons
+  //   {
+  //     std::string codon = getGrouping(index);
+  //     currNumCodonsInMRNA = gene->geneData.getCodonCountForCodon(index);
+  //     if (currNumCodonsInMRNA == 0) 
+  //     {	
+  //       continue;
+  //     }
+  //     double currAlpha = alpha[index];
+  //     double currLambdaPrime = lambda[index] * U;
+  //     unsigned currRFPValue = gene->geneData.getCodonSpecificSumRFPCount(index,0 /*RFPCountColumn*/);
+  //     logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPValue, currNumCodonsInMRNA, phiValue);
+  //   }
+  // }
+  for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
+  {
+    unsigned long positionalRFPCount;
+    unsigned codonMixture;
+    unsigned codonIndex;
+    std::string codon;
+    gene = &genome.getGene(i);
+    
+    
+    std::vector <unsigned> positions = gene->geneData.getPositionCodonID();
+    std::vector <unsigned long> rfpCounts = gene->geneData.getRFPCount(0);
+    std::vector<unsigned> positionMixture = gene->geneData.getPositionMixture();
+    
+    double phiValue = phi[i];
+    
+    for (unsigned positionIndex = 0; positionIndex < positions.size(); positionIndex++)
+    {
+      codonMixture = positionMixture[positionIndex];
+      
+      positionalRFPCount = rfpCounts[positionIndex];
+      codonIndex = positions[positionIndex];
+      codon = gene->geneData.indexToCodon(codonIndex);
+  
+      currAlpha = alpha[codonIndex];
+      currLambda = lambda[codonIndex];
+      logLikelihood += calculateLogLikelihoodPerCodonPerGeneByPosition(currAlpha, currLambda * U, positionalRFPCount,
+                                                                       phiValue);
+
+    }
+  }
+  
+  return(logLikelihood);
+}
+  
+  
+#ifndef STANDALONE
+  
+double PAModel::calculateLogLikelihoodR(Genome &genome, std::vector<double> _alpha, std::vector<double> _lambda, std::vector<double> _phi, double _Z)
+{
+  std::vector<double> alpha,lambda;
+  double loglikelihood;
+  std::vector<std::string> groups = parameter -> getGroupList();
+  unsigned numParam = groups.size();
+  if ((_alpha.size() % numParam != 0) || (_lambda.size() % numParam != 0))
+  {
+    my_print("ERROR: alpha and lambda must be a multiple of the number of codons (61).\n");
+    std::exit(1);
+  }
+  if (_alpha.size() != _lambda.size())
+  {
+    my_print("ERROR: alpha and lambdamust be the same size. If you are trying to share the same parameter values across elongation mixture, then these values should be included twice.\n");
+    std::exit(1);
+  }
+  alpha = _alpha;
+  lambda = _lambda;
+  loglikelihood = calculateLogLikelihood(genome,alpha,lambda,_phi,_Z);
+  return(loglikelihood);
+}
+  
+#endif //STANDALONE		  
+  
+  
