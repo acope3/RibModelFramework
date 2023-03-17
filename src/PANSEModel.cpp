@@ -1321,11 +1321,22 @@ double PANSEModel::calculateAllPriors(bool proposed)
 {
   double prior = 0.0;
 	unsigned size = getGroupListSize();
-
+	bool share_nse = shareNSE();
 	for (unsigned i = 0; i < size; i++)
 	{
   	std::string grouping = getGrouping(i);
-  	prior += calculateNSERatePrior(grouping, proposed);
+	  if (share_nse && i == 0)
+	  {
+  	  prior += calculateNSERatePrior(grouping, proposed);
+	  } 
+	  else if (share_nse && i > 0)
+	  {
+	    prior += 0;
+	  }
+	  else if (!share_nse)
+	  {
+	    prior += calculateNSERatePrior(grouping, proposed);
+	  }
     prior += calculateAlphaPrior(grouping, proposed);
     prior += calculateLambdaPrior(grouping, proposed);
 	}
