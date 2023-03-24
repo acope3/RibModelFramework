@@ -1298,24 +1298,25 @@ double PANSEModel::calculateNSERatePrior(std::string grouping,bool proposed)
 {
   double NSERate,logNSERate;
   double priorValue = 0.0;
-  double log_scale_lower_limit = -100;
-  double log_scale_upper_limit = -1;
-	unsigned numMutCat = parameter->getNumNSECategories();
-	for (unsigned i = 0u; i < numMutCat; i++)
-	{
-		NSERate = parameter->getParameterForCategory(i, PANSEParameter::nse, grouping, proposed);
-	  logNSERate = std::log(NSERate);
-		if (logNSERate < -100 || logNSERate > -1)
-		{
-			priorValue = std::log(0);
-		}
-		else
-		{
-			priorValue = std::log(1) - logNSERate - std::log(log_scale_upper_limit - log_scale_lower_limit);  
-		}
-	}
-	return priorValue;
+  double log_scale_lower_limit = std::log(1e-100);
+  double log_scale_upper_limit = std::log(1e-1);
+  unsigned numMutCat = parameter->getNumNSECategories();
+  for (unsigned i = 0u; i < numMutCat; i++)
+  {
+    NSERate = parameter->getParameterForCategory(i, PANSEParameter::nse, grouping, proposed);
+    logNSERate = std::log(NSERate);
+    if (logNSERate < log_scale_lower_limit || logNSERate > log_scale_upper_limit )
+    {
+      priorValue = std::log(0);
+    }
+    else
+    {
+      priorValue = std::log(1) - logNSERate - std::log(log_scale_upper_limit - log_scale_lower_limit);  
+    }
+  }
+  return priorValue;
 }
+
 
 double PANSEModel::calculateAllPriors(bool proposed)
 {
