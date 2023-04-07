@@ -1298,8 +1298,8 @@ double PANSEModel::calculateNSERatePrior(std::string grouping,bool proposed)
 {
   double NSERate,logNSERate;
   double priorValue = 0.0;
-  double log_scale_lower_limit = std::log(1e-100);
-  double log_scale_upper_limit = std::log(1e-1);
+  double log_scale_lower_limit = -100;
+  double log_scale_upper_limit = -1;
   unsigned numMutCat = parameter->getNumNSECategories();
   for (unsigned i = 0u; i < numMutCat; i++)
   {
