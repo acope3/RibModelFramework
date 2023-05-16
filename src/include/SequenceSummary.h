@@ -26,18 +26,18 @@ class SequenceSummary
         // outer index is the codonID, size of 64 for number of codons
         // inner index is the position of each occurrence of the codonID specified.
 
-        std::vector <std::vector <unsigned long>> RFPCount;
+    std::vector <std::vector <unsigned long>> RFPCount;
 		// outer index is the RFPCount for the category specified via index
 		// inner index is number of position
 
 		std::vector <std::array <unsigned long, 64>> sumRFPCount;
 		// outer index is the RFPCount for the category specified via index
 		// inner index, 64, is the number of codons
-
+		
 		std::vector <unsigned> positionCodonID;
 		// index is the number of position, where a value (codonID) is set
 		
-		std::vector <unsigned> positionMixture;
+		std::vector <int> positionMixture;
 		// index is the mixture assignment of the codon at a position
 
 
@@ -91,7 +91,7 @@ class SequenceSummary
         //Poisitonal information about Codons
         std::vector <unsigned> getPositionCodonID(); //Used in PANSE for getting codon positions over gene
         void setPositionCodonID(std::vector <unsigned> arg);
-        std::vector <unsigned> getPositionMixture();
+        std::vector <int> getPositionMixture();
 
 		//Other Functions (All tested):
 		void clear();

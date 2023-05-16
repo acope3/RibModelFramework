@@ -267,7 +267,7 @@ unsigned long SequenceSummary::getSumTotalRFPCount(unsigned RFPCountColumn)
     unsigned long sum = 0;
     for (unsigned i = 0u; i < sumRFPCount[RFPCountColumn].size(); i++)
     {
-        sum += sumRFPCount[RFPCountColumn][i];
+       sum += sumRFPCount[RFPCountColumn][i];;
     }
 
     return sum;
@@ -327,7 +327,7 @@ std::vector <unsigned> SequenceSummary::getPositionCodonID()
  * Arguments: None.
  * Returns the vector of codon IDs for each position.
  */
-std::vector <unsigned> SequenceSummary::getPositionMixture()
+std::vector <int> SequenceSummary::getPositionMixture()
 {
   return positionMixture;
 }

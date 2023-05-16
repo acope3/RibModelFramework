@@ -340,6 +340,7 @@ void Genome::readRFPData(std::string filename, bool append)
 			// --------------- Now for each RFPCount category, record it. ------------- //
 			// ----- Treat data as a table: push back vectors of size tableWidth. ----- //
 			// -------------------------------------------------------------------------//
+			
 			std::string prevID = "";
 			Gene tmpGene;
 			int position, possValue, mixture;
@@ -437,7 +438,6 @@ void Genome::readRFPData(std::string filename, bool append)
 
 					prevID = ID;
 					table.push_back(tableRow);
-				}
 			}
 
             // Ensure that at least one entry was read in
