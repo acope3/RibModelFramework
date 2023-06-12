@@ -761,14 +761,23 @@ void PAModel::simulateGenome(Genome &genome)
         SequenceSummary sequence = gene.geneData;
         Gene tmpGene = gene;
         std::vector <unsigned> positions = sequence.getPositionCodonID();
-        std::vector<unsigned> positionMixture = gene.geneData.getPositionMixture();
+        std::vector<int> positionMixture = gene.geneData.getPositionMixture();
         wait_times[geneIndex].resize(positions.size());
         std::vector <unsigned> rfpCount;
-        unsigned alphaCategory = parameter->getMutationCategory(mixtureElement);
-        unsigned lambdaCategory = parameter->getSelectionCategory(mixtureElement);
+        
         for (unsigned positionIndex = 0; positionIndex < positions.size(); positionIndex++)
         {
-            unsigned codonMixture = positionMixture[positionIndex];
+            int codonMixture = positionMixture[positionIndex] + 1;
+            if (codonMixture < 0)
+            {
+              codonMixture = -1 * (codonMixture) - 1;
+            } 
+            else
+            {
+              codonMixture = codonMixture - 1;
+            }
+            unsigned alphaCategory = parameter->getMutationCategory(codonMixture);
+            unsigned lambdaCategory = parameter->getSelectionCategory(codonMixture);
             unsigned codonIndex = positions[positionIndex];
             std::string codon = sequence.indexToCodon(codonIndex);
             if (codon == "TAG" || codon == "TGA" || codon == "TAA")
@@ -802,10 +811,20 @@ void PAModel::simulateGenome(Genome &genome)
         Gene tmpGene = gene;
         std::vector <unsigned> positions = sequence.getPositionCodonID();
         std::vector <unsigned long> rfpCount;
-        unsigned alphaCategory = parameter->getMutationCategory(mixtureElement);
-        unsigned lambdaCategory = parameter->getSelectionCategory(mixtureElement);
+        std::vector<int> positionMixture = gene.geneData.getPositionMixture();
         for (unsigned positionIndex = 0; positionIndex < positions.size(); positionIndex++)
         {
+            int codonMixture = positionMixture[positionIndex] + 1;
+            if (codonMixture < 0)
+            {
+              codonMixture = -1 * (codonMixture) - 1;
+            } 
+            else
+            {
+              codonMixture = codonMixture - 1;
+            }
+            unsigned alphaCategory = parameter->getMutationCategory(codonMixture);
+            unsigned lambdaCategory = parameter->getSelectionCategory(codonMixture);
             unsigned codonIndex = positions[positionIndex];
             std::string codon = sequence.indexToCodon(codonIndex);
             if (codon == "TAG" || codon == "TGA" || codon == "TAA")
