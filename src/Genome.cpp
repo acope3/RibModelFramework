@@ -294,7 +294,8 @@ void Genome::readSimulatedGenomeFromPAModel(std::string filename)
 void Genome::readRFPData(std::string filename, bool append)
 {
 	prev_genome_size = genes.size();
-	try {
+	try 
+	{
 		if (!append) clear();
 		totalRFPCount = 0;
 		std::ifstream Fin;
@@ -340,6 +341,7 @@ void Genome::readRFPData(std::string filename, bool append)
 			// --------------- Now for each RFPCount category, record it. ------------- //
 			// ----- Treat data as a table: push back vectors of size tableWidth. ----- //
 			// -------------------------------------------------------------------------//
+			
 			std::string prevID = "";
 			Gene tmpGene;
 			int position, possValue, mixture;
@@ -406,7 +408,11 @@ void Genome::readRFPData(std::string filename, bool append)
           // Get mixture assignment for codon at current position
 					pos3 = tmp.find(',', pos2 + 1);
 					mixture = std::atoi(tmp.substr(pos3 + 1, pos3 - (pos2 + 1)).c_str()) - 1;
-
+					if (mixture == -1)
+					{
+					  my_print("ERROR: Your column indicating elongation mixtures contains 0. Should be a non-zero positive (include position in likelihood) or negative (use only for sigma) number. Exiting program.\n");
+					  exit(1);
+					}
 					tableIndex ++;
 					tableRow[tableIndex] = mixture;
 					
@@ -437,9 +443,8 @@ void Genome::readRFPData(std::string filename, bool append)
 
 					prevID = ID;
 					table.push_back(tableRow);
-				}
 			}
-
+			}
             // Ensure that at least one entry was read in
       if (prevID != "")
       {
@@ -490,7 +495,7 @@ void Genome::writeRFPData(std::string filename, bool simulated)
 			{
 				Gene *currentGene = &genes[geneIndex];
 				std::vector<unsigned> positionCodonID = currentGene->geneData.getPositionCodonID();
-				std::vector<unsigned> positionMixture = currentGene->geneData.getPositionMixture();
+				std::vector<int> positionMixture = currentGene->geneData.getPositionMixture();
 				unsigned numPositions = (unsigned)positionCodonID.size();
 
 				for (unsigned position = 0u; position < numPositions; position++)
@@ -518,7 +523,7 @@ void Genome::writeRFPData(std::string filename, bool simulated)
 				Gene *currentGene = &simulatedGenes[geneIndex];
         SequenceSummary *sequenceSummary = currentGene->getSequenceSummary();
         std::vector <unsigned> positions = sequenceSummary->getPositionCodonID();
-        std::vector<unsigned> positionMixture = currentGene->geneData.getPositionMixture();
+        std::vector<int> positionMixture = currentGene->geneData.getPositionMixture();
         
         std::vector <unsigned long> rfpCounts = sequenceSummary->getRFPCount(0);
 				for (unsigned positionIndex = 0u; positionIndex < positions.size(); positionIndex++)
