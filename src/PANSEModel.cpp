@@ -1363,11 +1363,12 @@ double PANSEModel::calculateNSERatePrior(std::string grouping,bool proposed)
   double NSERate,logNSERate;
   double priorValue = 0.0;
   double dist_mean = 25000;
+  double log_dist_mean = std::log(dist_mean);
   unsigned numMutCat = parameter->getNumNSECategories();
   for (unsigned i = 0u; i < numMutCat; i++)
   {
     NSERate = parameter->getParameterForCategory(i, PANSEParameter::nse, grouping, proposed);
-    priorValue += (std::log(dist_mean) - dist_mean * NSERate);  
+    priorValue += (log_dist_mean - dist_mean * NSERate);  
     
   }
   return priorValue;
