@@ -1018,6 +1018,50 @@ double PANSEParameter::getParameterForCategory(unsigned category, unsigned param
 
 
 
+void PANSEParameter::fixAlpha()
+{
+	fix_alpha = true;
+}
+
+void PANSEParameter::fixLambdaPrime()
+{
+	fix_lp = true;
+}
+
+void PANSEParameter::fixNSERate()
+{
+	fix_nse = true;
+}
+
+void PANSEParameter::fixZ()
+{
+	fix_Z = true;
+}
+
+void PANSEParameter::shareNSERate()
+{
+	share_nse = true;
+}
+
+bool PANSEParameter::isAlphaFixed()
+{
+	return(fix_alpha);
+}
+
+bool PANSEParameter::isLambdaFixed()
+{
+	return(fix_lp);
+}
+
+bool PANSEParameter::isNSEFixed()
+{
+	return(fix_nse);
+}
+
+bool PANSEParameter::isNSEShared()
+{
+	return(share_nse);
+}
 
 
 // -----------------------------------------------------------------------------------------------------//
@@ -1131,50 +1175,6 @@ void PANSEParameter::initLambdaPrimeR(double lambdaPrimeValue, unsigned mixtureE
 	}
 }
 
-void PANSEParameter::fixAlpha()
-{
-	fix_alpha = true;
-}
-
-void PANSEParameter::fixLambdaPrime()
-{
-	fix_lp = true;
-}
-
-void PANSEParameter::fixNSERate()
-{
-	fix_nse = true;
-}
-
-void PANSEParameter::fixZ()
-{
-	fix_Z = true;
-}
-
-void PANSEParameter::shareNSERate()
-{
-	share_nse = true;
-}
-
-bool PANSEParameter::isAlphaFixed()
-{
-	return(fix_alpha);
-}
-
-bool PANSEParameter::isLambdaFixed()
-{
-	return(fix_lp);
-}
-
-bool PANSEParameter::isNSEFixed()
-{
-	return(fix_nse);
-}
-
-bool PANSEParameter::isNSEShared()
-{
-	return(share_nse);
-}
 
 
 void PANSEParameter::initNSERateR(double NSERateValue, unsigned mixtureElement, std::string codon)

@@ -12,7 +12,7 @@ using namespace Rcpp;
 
 PANSEModel::PANSEModel(unsigned _RFPCountColumn, bool _withPhi, bool _fix_sEpsilon) : Model()
 {
-    parameter = NULL;
+    parameter = 0;
     RFPCountColumn = _RFPCountColumn - 1;
     withPhi = _withPhi;
     fix_sEpsilon = _fix_sEpsilon;
@@ -991,47 +991,51 @@ void PANSEModel::completeUpdateCodonSpecificParameter()
 
 //Noise offset functions
 
-// double PANSEModel::getNoiseOffset(unsigned index, bool proposed)
-// {
-//     return parameter->getNoiseOffset(index, proposed);
-// }
+ double PANSEModel::getNoiseOffset(unsigned index, bool proposed)
+ {
+     return parameter->getNoiseOffset(index, proposed);
+ }
 
 
-// double PANSEModel::getObservedSynthesisNoise(unsigned index)
-// {
-//     return parameter->getObservedSynthesisNoise(index);
-// }
+ double PANSEModel::getObservedSynthesisNoise(unsigned index)
+ {
+     return parameter->getObservedSynthesisNoise(index);
+ }
 
 
-// double PANSEModel::getCurrentNoiseOffsetProposalWidth(unsigned index)
-// {
-//     return parameter->getCurrentNoiseOffsetProposalWidth(index);
-// }
+ double PANSEModel::getCurrentNoiseOffsetProposalWidth(unsigned index)
+ {
+     return parameter->getCurrentNoiseOffsetProposalWidth(index);
+ }
 
 
-// void PANSEModel::updateNoiseOffset(unsigned index)
-// {
-//     parameter->updateNoiseOffset(index);
-// }
+ void PANSEModel::updateNoiseOffset(unsigned index)
+ {
+     parameter->updateNoiseOffset(index);
+ }
 
 
-// void PANSEModel::updateNoiseOffsetTrace(unsigned sample)
-// {
-//     parameter->updateNoiseOffsetTraces(sample);
-// }
+ void PANSEModel::updateNoiseOffsetTrace(unsigned sample)
+ {
+     parameter->updateNoiseOffsetTraces(sample);
+ }
 
 
-// void PANSEModel::updateObservedSynthesisNoiseTrace(unsigned sample)
-// {
-//     parameter->updateObservedSynthesisNoiseTraces(sample);
-// }
+ void PANSEModel::updateObservedSynthesisNoiseTrace(unsigned sample)
+ {
+     parameter->updateObservedSynthesisNoiseTraces(sample);
+ }
 
 
-// void PANSEModel::adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt)
-// {
-//     parameter->adaptNoiseOffsetProposalWidth(adaptiveWidth, adapt);
-// }
+ void PANSEModel::adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt)
+ {
+     parameter->adaptNoiseOffsetProposalWidth(adaptiveWidth, adapt);
+ }
 
+ void PANSEModel::updateGibbsSampledHyperParameters(Genome &genome)
+ {
+ 	parameter->updateGibbsSampledHyperParameters(genome, withPhi, fix_sEpsilon);
+ }
 
 
 // void PANSEModel::updateGibbsSampledHyperParameters(Genome &genome)

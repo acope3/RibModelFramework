@@ -119,14 +119,14 @@ class ROCModel : public Model
 
 
 	
-		// virtual double getNoiseOffset(unsigned index, bool proposed = false);
-		// virtual double getObservedSynthesisNoise(unsigned index) ;
-		// virtual double getCurrentNoiseOffsetProposalWidth(unsigned index);
-		// virtual void updateNoiseOffset(unsigned index);
-		// virtual void updateNoiseOffsetTrace(unsigned sample);
-		// virtual void updateObservedSynthesisNoiseTrace(unsigned sample);
-		// virtual void adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt = true);
-		// virtual void updateGibbsSampledHyperParameters(Genome &genome);
+		 double getNoiseOffset(unsigned index, bool proposed = false);
+		 double getObservedSynthesisNoise(unsigned index) ;
+		 double getCurrentNoiseOffsetProposalWidth(unsigned index);
+		 void updateNoiseOffset(unsigned index);
+		 void updateNoiseOffsetTrace(unsigned sample);
+		 void updateObservedSynthesisNoiseTrace(unsigned sample);
+		 void adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt = true);
+		 void updateGibbsSampledHyperParameters(Genome &genome);
 
 		virtual bool getParameterTypeFixed(std::string csp_parameters);
 		virtual bool isShared(std::string csp_parameters);

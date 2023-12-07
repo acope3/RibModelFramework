@@ -180,7 +180,8 @@ class Trace {
         void updatePartitionFunctionAcceptanceRateTrace(double value);
 
         void resizeNumberCodonSpecificParameterTrace(unsigned _numCodonSpecificParamTypes);
-
+        std::vector<std::vector<double>> getPartitionFunctionTraces();
+        std::vector<std::vector<double>> getNseRateSpecificAcceptanceRateTrace();
         //R Section:
 #ifndef STANDALONE
         //Getter Functions:
@@ -191,7 +192,7 @@ class Trace {
         std::vector<double> getMixtureProbabilitiesTraceForMixtureR(unsigned mixtureIndex);//R WRAPPER
         std::vector<std::vector<double>> getStdDevSynthesisRateTraces();
         unsigned getNumberOfMixtures();
-        std::vector<std::vector<double>> getNseRateSpecificAcceptanceRateTrace();
+
 
 
 
@@ -226,7 +227,7 @@ class Trace {
 
         std::vector<double> getPartitionFunctionTraceR(unsigned mixtureIndex);
         void setPartitionFunctionTraces(std::vector<std::vector <double> > _PartitionFunctionTrace);
-        std::vector<std::vector<double>> getPartitionFunctionTraces();
+
 
         bool checkIndex(unsigned index, unsigned lowerbound, unsigned upperbound);
 

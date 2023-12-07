@@ -674,46 +674,51 @@ void FONSEModel::completeUpdateCodonSpecificParameter()
 
 //Noise offset functions
 
-// double FONSEModel::getNoiseOffset(unsigned index, bool proposed)
-// {
-// 	return parameter->getNoiseOffset(index, proposed);
-// }
+ double FONSEModel::getNoiseOffset(unsigned index, bool proposed)
+ {
+ 	return parameter->getNoiseOffset(index, proposed);
+ }
 
 
-// double FONSEModel::getObservedSynthesisNoise(unsigned index)
-// {
-// 	return parameter->getObservedSynthesisNoise(index);
-// }
+ double FONSEModel::getObservedSynthesisNoise(unsigned index)
+ {
+ 	return parameter->getObservedSynthesisNoise(index);
+ }
 
 
-// double FONSEModel::getCurrentNoiseOffsetProposalWidth(unsigned index)
-// {
-// 	return parameter->getCurrentNoiseOffsetProposalWidth(index);
-// }
+ double FONSEModel::getCurrentNoiseOffsetProposalWidth(unsigned index)
+ {
+ 	return parameter->getCurrentNoiseOffsetProposalWidth(index);
+ }
 
 
-// void FONSEModel::updateNoiseOffset(unsigned index)
-// {
-// 	parameter->updateNoiseOffset(index);
-// }
+ void FONSEModel::updateNoiseOffset(unsigned index)
+ {
+ 	parameter->updateNoiseOffset(index);
+ }
 
 
-// void FONSEModel::updateNoiseOffsetTrace(unsigned sample)
-// {
-// 	parameter->updateNoiseOffsetTraces(sample);
-// }
+ void FONSEModel::updateNoiseOffsetTrace(unsigned sample)
+ {
+ 	parameter->updateNoiseOffsetTraces(sample);
+ }
 
 
-// void FONSEModel::updateObservedSynthesisNoiseTrace(unsigned sample)
-// {
-// 	parameter->updateObservedSynthesisNoiseTraces(sample);
-// }
+ void FONSEModel::updateObservedSynthesisNoiseTrace(unsigned sample)
+ {
+ 	parameter->updateObservedSynthesisNoiseTraces(sample);
+ }
 
 
-// void FONSEModel::adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt)
-// {
-// 	parameter->adaptNoiseOffsetProposalWidth(adaptiveWidth, adapt);
-// }
+ void FONSEModel::adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt)
+ {
+ 	parameter->adaptNoiseOffsetProposalWidth(adaptiveWidth, adapt);
+ }
+
+ void FONSEModel::updateGibbsSampledHyperParameters(Genome &genome)
+ {
+ 	parameter->updateGibbsSampledHyperParameters(genome, withPhi, fix_sEpsilon);
+ }
 
 
 
