@@ -159,38 +159,36 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
       aa.names <- aa.names[aa.match]
   }
   with.ref.codon <- ifelse(ROC.or.FONSE, TRUE, FALSE)
-<<<<<<< HEAD
-  
-  ###Insert changes made by Elizabeth Barnes 2022/10/02
-library(AnaCoDa)
-fasta.file <- "orf_coding.fasta"
-genome <- initializeGenomeObject(file = fasta.file)
-length(genome)
-parameter <- initializeParameterObject(genome = genome, sphi = 1, num.mixtures = 1, gene.assignment = rep(1,length(genome)))
+# ###Insert changes made by Elizabeth Barnes 2022/10/02
+# ###Alex: I'm commenting this out as of 2023/12/07 --> this appears to have been added to this file by mistake 
+# library(AnaCoDa)
+# fasta.file <- "orf_coding.fasta"
+# genome <- initializeGenomeObject(file = fasta.file)
+# length(genome)
+# parameter <- initializeParameterObject(genome = genome, sphi = 1, num.mixtures = 1, gene.assignment = rep(1,length(genome)))
+# 
+#   for(aa in names.aa)
+#   {
+#     aa.names <- aminoAcids()
+#     codon.table <- (lapply(names.aa, function(x) {codons = AAToCodon(x);n_syn = length(codons);  ct_ending = grepl("[CT]$", codons); return(data.frame(aa = x, n_syn, codons, ct_ending))}))
+#     codon.table <- do.call(rbind, codon.table)
+#   }
+# 
+# 
+# if(what[1] == "Mutation")
+# {
+#   plotCodonSpecificParameters(x, mixture, "Mutation", main="Mutation Parameter Traces", aa.names = aa.names)
+# }
+#   
+# ##Code from Dr. Gilchrist
+# aa.names <- aminoAcids()
+# codon.table <- (lapply(names.aa, function(x) {codons = AAToCodon(x);n_syn = length(codons);  ct_ending = grepl("[CT]$", codons); return(data.frame(aa = x, n_syn, codons, ct_ending))}))
+# codon.table <- do.call(rbind, codon.table)
+#   
+#   ### End changes made by Elizabeth Barnes 2022/10/02
+#   
+# =======
 
-  for(aa in names.aa)
-  {
-    aa.names <- aminoAcids()
-    codon.table <- (lapply(names.aa, function(x) {codons = AAToCodon(x);n_syn = length(codons);  ct_ending = grepl("[CT]$", codons); return(data.frame(aa = x, n_syn, codons, ct_ending))}))
-    codon.table <- do.call(rbind, codon.table)
-  }
-
-
-if(what[1] == "Mutation")
-{
-  plotCodonSpecificParameters(x, mixture, "Mutation", main="Mutation Parameter Traces", aa.names = aa.names)
-}
-  
-##Code from Dr. Gilchrist
-aa.names <- aminoAcids()
-codon.table <- (lapply(names.aa, function(x) {codons = AAToCodon(x);n_syn = length(codons);  ct_ending = grepl("[CT]$", codons); return(data.frame(aa = x, n_syn, codons, ct_ending))}))
-codon.table <- do.call(rbind, codon.table)
-  
-  ### End changes made by Elizabeth Barnes 2022/10/02
-  
-=======
-
->>>>>>> b30d94606988207b0a56e9dacf264d833667005d
   for(aa in names.aa)
   { 
     codons <- AAToCodon(aa, with.ref.codon)
