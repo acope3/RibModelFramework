@@ -21,7 +21,11 @@
 #' @description Plots different traces, specified with the \code{what} parameter.
 #'
 plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbability" ,"Sphi", "Mphi", "Aphi", "Sepsilon", "ExpectedPhi", "Expression","NSEProb","NSERate","InitiationCost","PartitionFunction"), 
-                                   geneIndex=1, mixture = 1, log.10.scale=F, aa.names = NULL)
+                            geneIndex=1,
+                            mixture = 1,
+                            log.10.scale=F,
+                            aa.names = aminoAcids()
+                            )
 {
   if(what[1] == "Mutation")
   {
@@ -118,7 +122,7 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
 #' 
 #' @description Plots a codon-specific set of traces, specified with the \code{type} parameter.
 #'
-plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="Mutation Parameter Traces", ROC.or.FONSE=TRUE, log.10.scale=F, aa,vec = NULL)
+plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="Mutation Parameter Traces", ROC.or.FONSE=TRUE, log.10.scale=F, aa.names = aminoAcids())
 {
   opar <- par(no.readonly = T) 
   ### Trace plot.
@@ -159,37 +163,8 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
       aa.names <- aa.names[aa.match]
   }
   with.ref.codon <- ifelse(ROC.or.FONSE, TRUE, FALSE)
-# ###Insert changes made by Elizabeth Barnes 2022/10/02
-# ###Alex: I'm commenting this out as of 2023/12/07 --> this appears to have been added to this file by mistake 
-# library(AnaCoDa)
-# fasta.file <- "orf_coding.fasta"
-# genome <- initializeGenomeObject(file = fasta.file)
-# length(genome)
-# parameter <- initializeParameterObject(genome = genome, sphi = 1, num.mixtures = 1, gene.assignment = rep(1,length(genome)))
-# 
-#   for(aa in names.aa)
-#   {
-#     aa.names <- aminoAcids()
-#     codon.table <- (lapply(names.aa, function(x) {codons = AAToCodon(x);n_syn = length(codons);  ct_ending = grepl("[CT]$", codons); return(data.frame(aa = x, n_syn, codons, ct_ending))}))
-#     codon.table <- do.call(rbind, codon.table)
-#   }
-# 
-# 
-# if(what[1] == "Mutation")
-# {
-#   plotCodonSpecificParameters(x, mixture, "Mutation", main="Mutation Parameter Traces", aa.names = aa.names)
-# }
-#   
-# ##Code from Dr. Gilchrist
-# aa.names <- aminoAcids()
-# codon.table <- (lapply(names.aa, function(x) {codons = AAToCodon(x);n_syn = length(codons);  ct_ending = grepl("[CT]$", codons); return(data.frame(aa = x, n_syn, codons, ct_ending))}))
-# codon.table <- do.call(rbind, codon.table)
-#   
-#   ### End changes made by Elizabeth Barnes 2022/10/02
-#   
-# =======
 
-  for(aa in names.aa)
+  for(aa in aa.names)
   { 
     codons <- AAToCodon(aa, with.ref.codon)
     if(length(codons) == 0) next
@@ -326,7 +301,9 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
 #' 
 #' @description Plots acceptance ratios for codon-specific parameters. Will be by amino acid for ROC and FONSE models, but will be by codon for PA and PANSE models. Note assumes estimating parameters for all codons.
 
-plotAcceptanceRatios <- function(trace,main="CSP Acceptance Ratio Traces")
+plotAcceptanceRatios <- function(trace,
+                                 main="CSP Acceptance Ratio Traces",
+                                 aa.names = aminoAcids())
 {
   opar <- par(no.readonly = T) 
   
@@ -362,10 +339,9 @@ plotAcceptanceRatios <- function(trace,main="CSP Acceptance Ratio Traces")
   par(mar = c(5.1, 4.1, 4.1, 2.1))
   
   # TODO change to groupList -> checks for ROC like model is not necessary!
-  names.aa <- aminoAcids()
   with.ref.codon <- ifelse(ROC.or.FONSE, TRUE, FALSE)
   
-  for(aa in names.aa)
+  for(aa in aa.names)
   { 
     if (!ROC.or.FONSE){
       if(aa == "X") next
