@@ -90,13 +90,13 @@ void ROCParameter::initROCParameterSet()
 	mutation_prior_sd.resize(numMutationCategories);
 	for (int i=0; i < numMutationCategories; i++)
 	{
-
-		std::vector<double> prior_tmp(numParam, 0.0);
+		std::vector<double> prior_mean_tmp(numParam, 0.0);
+		std::vector<double> prior_sd_tmp(numParam, 0.35);
 	  // POTENTIAL ISSUE: Shouldn't we use (numParam) instead of (40)
 		mutation_prior_mean[i].resize(numParam);
 		mutation_prior_sd[i].resize(numParam);
-		mutation_prior_mean[i] = prior_tmp;
-		mutation_prior_sd[i] = prior_tmp;
+		mutation_prior_mean[i] = prior_mean_tmp;
+		mutation_prior_sd[i] = prior_sd_tmp;
 	}
 	std_csp.resize(numParam, 0.1);
 	// proposal bias and std for codon specific parameter

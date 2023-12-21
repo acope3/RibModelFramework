@@ -12,7 +12,7 @@ using namespace Rcpp;
 
 PAModel::PAModel(unsigned _RFPCountColumn,bool _withPhi, bool _fix_sEpsilon) : Model()
 {
-	parameter = NULL;
+	parameter = 0;
 	RFPCountColumn = _RFPCountColumn - 1;
 	withPhi = _withPhi;
 	fix_sEpsilon = _fix_sEpsilon;
@@ -634,47 +634,51 @@ void PAModel::completeUpdateCodonSpecificParameter()
 
 //Noise offset functions
 
-// double PAModel::getNoiseOffset(unsigned index, bool proposed)
-// {
-// 	return parameter->getNoiseOffset(index, proposed);
-// }
+ double PAModel::getNoiseOffset(unsigned index, bool proposed)
+ {
+ 	return parameter->getNoiseOffset(index, proposed);
+ }
 
 
-// double PAModel::getObservedSynthesisNoise(unsigned index)
-// {
-// 	return parameter->getObservedSynthesisNoise(index);
-// }
+ double PAModel::getObservedSynthesisNoise(unsigned index)
+ {
+ 	return parameter->getObservedSynthesisNoise(index);
+ }
 
 
-// double PAModel::getCurrentNoiseOffsetProposalWidth(unsigned index)
-// {
-// 	return parameter->getCurrentNoiseOffsetProposalWidth(index);
-// }
+ double PAModel::getCurrentNoiseOffsetProposalWidth(unsigned index)
+ {
+ 	return parameter->getCurrentNoiseOffsetProposalWidth(index);
+ }
 
 
-// void PAModel::updateNoiseOffset(unsigned index)
-// {
-// 	parameter->updateNoiseOffset(index);
-// }
+ void PAModel::updateNoiseOffset(unsigned index)
+ {
+ 	parameter->updateNoiseOffset(index);
+ }
 
 
-// void PAModel::updateNoiseOffsetTrace(unsigned sample)
-// {
-// 	parameter->updateNoiseOffsetTraces(sample);
-// }
+ void PAModel::updateNoiseOffsetTrace(unsigned sample)
+ {
+ 	parameter->updateNoiseOffsetTraces(sample);
+ }
 
 
-// void PAModel::updateObservedSynthesisNoiseTrace(unsigned sample)
-// {
-// 	parameter->updateObservedSynthesisNoiseTraces(sample);
-// }
+ void PAModel::updateObservedSynthesisNoiseTrace(unsigned sample)
+ {
+ 	parameter->updateObservedSynthesisNoiseTraces(sample);
+ }
 
 
-// void PAModel::adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt)
-// {
-// 	parameter->adaptNoiseOffsetProposalWidth(adaptiveWidth, adapt);
-// }
+ void PAModel::adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt)
+ {
+ 	parameter->adaptNoiseOffsetProposalWidth(adaptiveWidth, adapt);
+ }
 
+ void PAModel::updateGibbsSampledHyperParameters(Genome &genome)
+ {
+ 	parameter->updateGibbsSampledHyperParameters(genome, withPhi, fix_sEpsilon);
+ }
 
 
 // void PAModel::updateGibbsSampledHyperParameters(Genome &genome)

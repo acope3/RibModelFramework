@@ -1315,6 +1315,48 @@ void Parameter::updateNoiseOffsetTraces(unsigned sample)
 	}
 }
 
+void Parameter::updateGibbsSampledHyperParameters(Genome &genome, bool withPhi, bool fix_sEpsilon)
+{
+	// estimate s_epsilon by sampling from a gamma distribution and transforming it into an inverse gamma sample
+	unsigned mixtureAssignment;
+	double shape, rate, noiseOffset, obsPhi, rand, sepsilon;
+	if (withPhi)
+	{
+		if(!fix_sEpsilon)
+		{
+			//double shape = ((double)genome.getGenomeSize() - 1.0) / 2.0;
+			for (unsigned i = 0; i < getNumObservedPhiSets(); i++)
+			{
+				shape = ((double)genome.getGenomeSize() - 1.0) / 2.0;
+				rate = 0.0; //Prior on s_epsilon goes here?
+
+				noiseOffset = getNoiseOffset(i);
+				for (unsigned j = 0; j < genome.getGenomeSize(); j++)
+				{
+					mixtureAssignment = getMixtureAssignment(j);
+					obsPhi = genome.getGene(j).getObservedSynthesisRate(i);
+					if (obsPhi > 0.0)
+					{
+						double sum = std::log(obsPhi) - noiseOffset - std::log(getSynthesisRate(j, mixtureAssignment, false));
+						rate += (sum * sum);
+					}else{
+						// missing observation.
+						shape -= 0.5;
+						//Reduce shape because initial estimate assumes there are no missing observations
+					}
+				}
+				rate /= 2.0;
+				rand = randGamma(shape, rate);
+
+				// Below the gamma sample is transformed into an inverse gamma sample
+				// According to Gilchrist et al (2015) Supporting Materials p. S6
+				// The sample 1/T is supposed to be equal to $s_\epsilon^2$.
+				sepsilon = std::sqrt(1.0/rand);
+				setObservedSynthesisNoise(i, sepsilon);
+			}
+		}
+	}
+}
 
 
 void Parameter::updateStdDevSynthesisRateTrace(unsigned sample)
