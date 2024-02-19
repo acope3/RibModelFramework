@@ -1358,7 +1358,7 @@ double PANSEModel::calculateLambdaPrior(std::string grouping,bool proposed)
 }
 
 
-double PANSEModel::calculateNSERatePrior(std::string grouping,bool proposed)
+double PANSEModel::calculateNSERatePriorLogUniform(std::string grouping,bool proposed)
 {
   double NSERate,logNSERate;
   double priorValue = 0.0;
@@ -1376,6 +1376,30 @@ double PANSEModel::calculateNSERatePrior(std::string grouping,bool proposed)
     else
     {
       priorValue = std::log(1) - logNSERate - std::log(log_scale_upper_limit - log_scale_lower_limit);  
+    }
+  }
+  return priorValue;
+}
+
+
+double PANSEModel::calculateNSERatePriorNaturalUniform(std::string grouping,bool proposed)
+{
+  double NSERate,logNSERate;
+  double priorValue = 0.0;
+  double lower_limit = 1e-100;
+  double upper_limit = 1e-1;
+  unsigned numMutCat = parameter->getNumNSECategories();
+  for (unsigned i = 0u; i < numMutCat; i++)
+  {
+    NSERate = parameter->getParameterForCategory(i, PANSEParameter::nse, grouping, proposed);
+    logNSERate = std::log(NSERate);
+    if (NSERate < lower_limit || NSERate > upper_limit)
+    {
+      priorValue = std::log(0);
+    }
+    else
+    {
+      priorValue = -std::log(upper_limit - lower_limit);  
     }
   }
   return priorValue;
