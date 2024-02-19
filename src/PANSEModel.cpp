@@ -1360,7 +1360,7 @@ double PANSEModel::calculateLambdaPrior(std::string grouping,bool proposed)
 }
 
 
-void PANSEModel::setNSERatePriorDistribution(std::string distributionName,lower,upper,exponential_mean)
+void PANSEModel::setNSERatePriorDistribution(std::string distributionName, double lower, double upper, double exponential_mean)
 {
   if (distributionName == "Natural-Uniform")
   {
