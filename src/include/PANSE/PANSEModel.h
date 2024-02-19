@@ -31,7 +31,7 @@ class PANSEModel: public Model
     unsigned priorType = 0;
     int nse_lower_limit = 1e-100;
     int nse_upper_limit = 1e-1;
-    int nse_exponential = 
+    int nse_exponential_mean = 25000;
     
  
     std::vector<double> Z;
@@ -147,7 +147,7 @@ class PANSEModel: public Model
 
 		void setParameter(PANSEParameter &_parameter);
 		bool checkValues(bool proposed=false);
-		void setNSERatePriorDistribution(std::string distributionName = "Natural-Uniform", lower = 1e-100, upper=1e-10, mean = )
+		void setNSERatePriorDistribution(std::string distributionName = "Natural-Uniform", lower = 1e-100, upper=1e-10, mean = 25000)
 		virtual double calculateAllPriors(bool proposed=false);
 		virtual double calculateAlphaPrior(std::string grouping,bool proposed=false);
 		virtual double calculateLambdaPrior(std::string grouping,bool proposed=false);
