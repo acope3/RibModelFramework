@@ -998,7 +998,7 @@ double PAModel::calculateLogLikelihood(Genome &genome, std::vector<double> alpha
   for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
   {
     unsigned long positionalRFPCount;
-    unsigned codonMixture;
+    int codonMixture;
     unsigned codonIndex;
     std::string codon;
     gene = &genome.getGene(i);
@@ -1006,7 +1006,7 @@ double PAModel::calculateLogLikelihood(Genome &genome, std::vector<double> alpha
     
     std::vector <unsigned> positions = gene->geneData.getPositionCodonID();
     std::vector <unsigned long> rfpCounts = gene->geneData.getRFPCount(0);
-    std::vector<unsigned> positionMixture = gene->geneData.getPositionMixture();
+    std::vector<int> positionMixture = gene->geneData.getPositionMixture();
     
     double phiValue = phi[i];
     

@@ -152,6 +152,9 @@ class PANSEModel: public Model
 		virtual double calculateAlphaPrior(std::string grouping,bool proposed=false);
 		virtual double calculateLambdaPrior(std::string grouping,bool proposed=false);
 		virtual double calculateNSERatePrior(std::string grouping,bool proposed=false);
+		virtual double calculateNSERatePriorNaturalUniform(std::string grouping,bool proposed=false);
+		virtual double calculateNSERatePriorLogUniform(std::string grouping,bool proposed=false);
+		virtual double calculateNSERatePriorExponential(std::string grouping,bool proposed=false);
 		virtual double getParameterForCategory(unsigned category, unsigned param, std::string codon, bool proposal);
 
 		double UpperIncompleteGammaHelper(double s, double x);
