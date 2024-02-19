@@ -1328,11 +1328,11 @@ double PANSEModel::calculateAlphaPrior(std::string grouping,bool proposed)
         double alpha = parameter->getParameterForCategory(i, PANSEParameter::alp, grouping, proposed);
         if (alpha < lower_limit || alpha > upper_limit)
         {
-            priorValue = std::log(0);
+            priorValue += std::log(0);
         }
         else
         {
-            priorValue = -std::log(upper_limit - lower_limit);
+            priorValue += -std::log(upper_limit - lower_limit);
         }
     }
     return priorValue;
@@ -1349,11 +1349,11 @@ double PANSEModel::calculateLambdaPrior(std::string grouping,bool proposed)
         double lambda = parameter->getParameterForCategory(i, PANSEParameter::lmPri, grouping, proposed);
         if (lambda < lower_limit || lambda > upper_limit)
         {
-            priorValue = std::log(0);
+            priorValue += std::log(0);
         }
         else
         {
-            priorValue = -std::log(upper_limit - lower_limit);
+            priorValue += -std::log(upper_limit - lower_limit);
         }
     }
     return priorValue;
@@ -1388,14 +1388,14 @@ double PANSEModel::calculateNSERatePrior(std::string grouping, bool proposed)
   double prior = 0;
   if (priorType == 0)
   {
-    prior = calculateNSERatePriorNaturalUniform(grouping,proposed)
+    prior = calculateNSERatePriorNaturalUniform(grouping,proposed);
   }
   else if (priorType == 1)
   {
-    prior = calculateNSERatePriorLogUniform(grouping,proposed)
+    prior = calculateNSERatePriorLogUniform(grouping,proposed);
   } else if (priorType == 2)
   {
-    prior = calculateNSERatePriorExponential(grouping,proposed)
+    prior = calculateNSERatePriorExponential(grouping,proposed);
   }
   return(prior);
 }
@@ -1411,11 +1411,11 @@ double PANSEModel::calculateNSERatePriorNaturalUniform(std::string grouping,bool
     NSERate = parameter->getParameterForCategory(i, PANSEParameter::nse, grouping, proposed);
     if (NSERate < nse_lower_limit || NSERate > nse_upper_limit)
     {
-      priorValue = std::log(0);
+      priorValue += std::log(0);
     }
     else
     {
-      priorValue = -std::log(nse_upper_limit - nse_lower_limit);  
+      priorValue += -std::log(nse_upper_limit - nse_lower_limit);  
     }
   }
   return priorValue;
@@ -1434,11 +1434,11 @@ double PANSEModel::calculateNSERatePriorLogUniform(std::string grouping,bool pro
     logNSERate = std::log(NSERate);
     if (logNSERate < nse_lower_limit || logNSERate > nse_upper_limit )
     {
-      priorValue = std::log(0);
+      priorValue += std::log(0);
     }
     else
     {
-      priorValue = -1*logNSERate - std::log(nse_upper_limit - nse_lower_limit);  
+      priorValue += -1*logNSERate - std::log(nse_upper_limit - nse_lower_limit);  
     }
   }
   return priorValue;
@@ -1454,7 +1454,7 @@ double PANSEModel::calculateNSERatePriorExponential(std::string grouping,bool pr
   for (unsigned i = 0u; i < numMutCat; i++)
   {
     NSERate = parameter->getParameterForCategory(i, PANSEParameter::nse, grouping, proposed);
-    priorValue += (log_dist_mean - dist_mean * NSERate);  
+    priorValue += (log_dist_mean - nse_exponential_mean * NSERate);  
   }
   return priorValue;
 }
@@ -1645,7 +1645,7 @@ double PANSEModel::calculateLogLikelihood(Genome &genome, std::vector<std::vecto
   for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
   {
     unsigned long positionalRFPCount;
-    unsigned codonMixture;
+    int codonMixture;
     unsigned codonIndex;
     std::string codon;
     double currLgammaRFPAlpha;
@@ -1659,7 +1659,7 @@ double PANSEModel::calculateLogLikelihood(Genome &genome, std::vector<std::vecto
     
     std::vector <unsigned> positions = gene->geneData.getPositionCodonID();
     std::vector <unsigned long> rfpCounts = gene->geneData.getRFPCount(0);
-    std::vector<unsigned> positionMixture = gene->geneData.getPositionMixture();
+    std::vector<int> positionMixture = gene->geneData.getPositionMixture();
     
     double phiValue = phi[i];
     double currSigma = 0;
