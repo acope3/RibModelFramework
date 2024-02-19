@@ -147,7 +147,7 @@ class PANSEModel: public Model
 
 		void setParameter(PANSEParameter &_parameter);
 		bool checkValues(bool proposed=false);
-		void setNSERatePriorDistribution(std::string distributionName = "Natural-Uniform", double lower = 1e-100, double upper=1e-10, double mean = 25000)
+		void setNSERatePriorDistribution(std::string distributionName = "Natural-Uniform", double lower = 1e-100, double upper=1e-10, double mean = 25000);
 		virtual double calculateAllPriors(bool proposed=false);
 		virtual double calculateAlphaPrior(std::string grouping,bool proposed=false);
 		virtual double calculateLambdaPrior(std::string grouping,bool proposed=false);
