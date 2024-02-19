@@ -15,7 +15,13 @@ class PANSEModel: public Model
 		double currSigmaCalculationSummationFor1, currSigmaCalculationSummationFor2;
 		double propSigmaCalculationSummationFor1, propSigmaCalculationSummationFor2;
 		double calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
-				unsigned currRFPObserved, double phiValue, double prevSigma, double lgamma_currAlpha, double log_currLambdaPrime, double log_phi,double lgamma_rfp_alpha);
+		  unsigned currRFPObserved, double phiValue, double prevSigma, double lgamma_currAlpha, double log_currLambdaPrime, double log_phi,double lgamma_rfp_alpha);
+		double calculateLogLikelihood(Genome &genome, std::vector<std::vector<double>> alpha, std::vector<std::vector<double>> lambda, 
+                                std::vector<std::vector<double>> NSERate, std::vector<double> phi, double Z);
+		double calculateLogLikelihoodPerCodonPerGeneByPosition(double currAlpha, double currLambdaPrime,
+                                                                  unsigned currRFPObserved, double phiValue, double prevSigma);
+		  
+		
 		std::vector<std::vector<double>> lgamma_currentAlpha;
    	std::vector<std::vector<std::vector<double>>> log_currentLambda;
     std::vector<std::vector<std::vector<double>>> lgamma_rfp_alpha;
@@ -36,6 +42,8 @@ class PANSEModel: public Model
 		virtual void fillMatrices(Genome& genome);
     virtual void clearMatrices();
     virtual std::vector<std::vector<unsigned>> getElongationMixtureCategories();
+		
+		
 		//Likelihood Ratio Functions:
 		virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k,
 				double* logProbabilityRatio); // Depends on RFPCountColumn
@@ -72,10 +80,10 @@ class PANSEModel: public Model
 		virtual void updateStdDevSynthesisRate();
 
 
-        //Partition Function Functions:
-        virtual double getPartitionFunction(unsigned mixture, bool proposed = false);
-        virtual double getCurrentPartitionFunctionProposalWidth();
-        virtual void updatePartitionFunction();
+    //Partition Function Functions:
+    virtual double getPartitionFunction(unsigned mixture, bool proposed = false);
+    virtual double getCurrentPartitionFunctionProposalWidth();
+    virtual void updatePartitionFunction();
 
 
 		//Synthesis Rate Functions:
@@ -90,7 +98,7 @@ class PANSEModel: public Model
 
 		//Trace Functions:
 		virtual void updateStdDevSynthesisRateTrace(unsigned sample);
-        virtual void updatePartitionFunctionTrace(unsigned sample);
+    virtual void updatePartitionFunctionTrace(unsigned sample);
 		virtual void updateSynthesisRateTrace(unsigned sample, unsigned i);
 		virtual void updateMixtureAssignmentTrace(unsigned sample, unsigned i);
 		virtual void updateMixtureProbabilitiesTrace(unsigned sample);
@@ -101,7 +109,7 @@ class PANSEModel: public Model
 
 		//Adaptive Width Functions:
 		virtual void adaptStdDevSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt = true);
-        virtual void adaptPartitionFunctionProposalWidth(unsigned adaptiveWidth, bool adapt = true);
+    virtual void adaptPartitionFunctionProposalWidth(unsigned adaptiveWidth, bool adapt = true);
 		virtual void adaptSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt = true);
 		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, unsigned lastIteration, bool adapt = true);
 		virtual void adaptHyperParameterProposalWidths(unsigned adaptiveWidth, bool adapt = true);
@@ -145,25 +153,13 @@ class PANSEModel: public Model
 		double UpperIncompleteGamma(double s, double x);
 		double UpperIncompleteGammaLog(double s, double x);
       
-        double elongationProbability(double currAlpha, double currLambda, double currNSE);
-        double elongationProbabilityLog(double currAlpha, double currLambda, double currNSE);
-        
-        double elongationUntilIndexApproximation1Probability(double alpha, double lambda, double v, double current);
-        double elongationUntilIndexApproximation2Probability(double alpha, double lambda, double v, bool proposed);
-        double elongationUntilIndexApproximation1ProbabilityLog(double alpha, double lambda, double v);
-        double elongationUntilIndexApproximation2ProbabilityLog(double alpha, double lambda, double v);
-
-        
-
-        // virtual double getNoiseOffset(unsigned index, bool proposed = false);
-		// virtual double getObservedSynthesisNoise(unsigned index) ;
-		// virtual double getCurrentNoiseOffsetProposalWidth(unsigned index);
-		// virtual void updateNoiseOffset(unsigned index);
-		// virtual void updateNoiseOffsetTrace(unsigned sample);
-		// virtual void updateObservedSynthesisNoiseTrace(unsigned sample);
-		// virtual void adaptNoiseOffsetProposalWidth(unsigned adaptiveWidth, bool adapt = true);
-		// virtual void updateGibbsSampledHyperParameters(Genome &genome);
-
+    double elongationProbability(double currAlpha, double currLambda, double currNSE);
+    double elongationProbabilityLog(double currAlpha, double currLambda, double currNSE);
+    
+    double elongationUntilIndexApproximation1Probability(double alpha, double lambda, double v, double current);
+    double elongationUntilIndexApproximation2Probability(double alpha, double lambda, double v, bool proposed);
+    double elongationUntilIndexApproximation1ProbabilityLog(double alpha, double lambda, double v);
+    double elongationUntilIndexApproximation2ProbabilityLog(double alpha, double lambda, double v);
 		
 		virtual bool shareNSE();
 		virtual bool fixedAlpha();
@@ -172,8 +168,10 @@ class PANSEModel: public Model
 		virtual bool getParameterTypeFixed(std::string csp_parameters);
 		virtual bool isShared(std::string csp_parameters);
 
-
-	protected:
+		//R section
+#ifndef STANDALONE
+		double calculateLogLikelihoodR(Genome &genome, std::vector<double> _alpha, std::vector<double> _lambda, std::vector<double> _NSERate, std::vector<double> _phi, double _Z);
+#endif //STANDALONE		  
 		
 };
 

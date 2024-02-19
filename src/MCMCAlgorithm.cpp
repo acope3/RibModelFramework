@@ -428,19 +428,15 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 	bool is_shared;
 	std::vector<std::string> csp_parameters = model.getParameterTypeList();
 	unsigned numCSPParamTypes = csp_parameters.size();
-	//my_print("Number of CSP Parameters: %\n",numCSPParamTypes);
 	for (unsigned param = 0; param < numCSPParamTypes; param++)
 	{
 
 		is_fixed = model.getParameterTypeFixed(csp_parameters[param]);
-		//my_print("Parameter type fixed: %\n",is_fixed);
 		if (! is_fixed)
 		{
 			is_shared = model.isShared(csp_parameters[param]);
-			//my_print("Parameter type is shared: %\n",is_shared);
 			if (is_shared)
 			{
-				//my_print("Shouldn't be here!\n");
 				std::string grouping = model.getGrouping(groups[0]);
 				model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures,csp_parameters[param]);
 		    	double threshold = -Parameter::randExp(1);
@@ -475,7 +471,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 				{
 					std::string grouping = model.getGrouping(groups[i]);
 					model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures,csp_parameters[param]);
-			    	double threshold = -Parameter::randExp(1);
+			    double threshold = -Parameter::randExp(1);
 			 		if (threshold < acceptanceRatioForAllMixtures[0] && std::isfinite(acceptanceRatioForAllMixtures[0]) && !std::isnan(acceptanceRatioForAllMixtures[2]))
 					{	
 						if (std::isnan(acceptanceRatioForAllMixtures[0]))
@@ -486,16 +482,32 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 						model.updateCodonSpecificParameter(grouping,csp_parameters[param]);
 						if ((iteration % thinning) == 0 && acceptanceRatioForAllMixtures[2] != 0 && param  == (numCSPParamTypes - 1))
 						{
-							likelihoodTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[2];
-							posteriorTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[4];
+						  if (numCSPParamTypes == 1)
+						  {
+						  	likelihoodTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[2];
+							  posteriorTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[4];
+						  } 
+						  else
+						  {
+						    likelihoodTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[2];
+						    posteriorTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[4];
+						  }
 						}
 					}
 					else
 					{
 						if ((iteration % thinning) == 0 && acceptanceRatioForAllMixtures[1] != 0 && param  == (numCSPParamTypes - 1))
 						{
-							likelihoodTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[1];
-							posteriorTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[3];
+						  if (numCSPParamTypes == 1)
+						  {
+							  likelihoodTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[1];
+							  posteriorTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[3];
+						  }
+						  else
+						  {
+						    likelihoodTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[1];
+						    posteriorTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[3];
+						  }
 						}
 					}
 				}

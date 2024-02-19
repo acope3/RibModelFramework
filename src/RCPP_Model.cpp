@@ -46,6 +46,7 @@ RCPP_MODULE(Model_mod)
   		.method("getParameter", &PAModel::getParameter)
 		.method("setParameter", &PAModel::setParameter)
 		.method("simulateGenome", &PAModel::simulateGenome)
+    .method("calculateLogLikelihood", &PAModel::calculateLogLikelihoodR)
 		;
 	
     class_<PANSEModel>("PANSEModel")
@@ -56,6 +57,7 @@ RCPP_MODULE(Model_mod)
 		.method("simulateGenome", &PANSEModel::simulateGenome)
 		.method("elongationProbabilityLog", &PANSEModel::elongationUntilIndexApproximation2ProbabilityLog)
 		.method("UpperIncompleteGammaLog", &PANSEModel::UpperIncompleteGammaLog)
+    .method("calculateLogLikelihood", &PANSEModel::calculateLogLikelihoodR)
 		;
 
 	class_<FONSEModel>("FONSEModel")
