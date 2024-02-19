@@ -1360,7 +1360,7 @@ double PANSEModel::calculateLambdaPrior(std::string grouping,bool proposed)
 }
 
 
-void PANSEModel::setNSERatePriorDistribution(std::string distributionName,lower,upper,mean)
+void PANSEModel::setNSERatePriorDistribution(std::string distributionName,lower,upper,exponential_mean)
 {
   if (distributionName == "Natural-Uniform")
   {
@@ -1376,24 +1376,26 @@ void PANSEModel::setNSERatePriorDistribution(std::string distributionName,lower,
     my_print("Prior set to % (prior type %) with lower limit % and upper limit %",distributionName,priorType,nse_lower_limit,nse_upper_limit);
   } else if (distributionName == "Exponential")
   {
-    
+    priorType = 2;
+    nse_exponential_mean = exponential_mean;
+    my_print("Prior set to % (prior type %) with exponential mean",distributionName,priorType,nse_exponential_mean);
   }
 }
 
 
-double PANSEModel::calculateNSERatePrior(bool proposed,unsigned priorType)
+double PANSEModel::calculateNSERatePrior(std::string grouping, bool proposed)
 {
   double prior = 0;
   if (priorType == 0)
   {
-    prior = calculateNSERatePriorNaturalUniform(proposed)
+    prior = calculateNSERatePriorNaturalUniform(grouping,proposed)
   }
   else if (priorType == 1)
   {
-    prior = calculateNSERatePriorNaturalUniform(proposed)
+    prior = calculateNSERatePriorLogUniform(grouping,proposed)
   } else if (priorType == 2)
   {
-    
+    prior = calculateNSERatePriorExponential(grouping,proposed)
   }
   return(prior);
 }
@@ -1443,7 +1445,19 @@ double PANSEModel::calculateNSERatePriorLogUniform(std::string grouping,bool pro
 }
 
 
-
+double PANSEModel::calculateNSERatePriorExponential(std::string grouping,bool proposed)
+{
+  double NSERate,logNSERate;
+  double priorValue = 0.0;
+  double log_dist_mean = std::log(nse_exponential_mean);
+  unsigned numMutCat = parameter->getNumNSECategories();
+  for (unsigned i = 0u; i < numMutCat; i++)
+  {
+    NSERate = parameter->getParameterForCategory(i, PANSEParameter::nse, grouping, proposed);
+    priorValue += (log_dist_mean - dist_mean * NSERate);  
+  }
+  return priorValue;
+}
 
 
 
