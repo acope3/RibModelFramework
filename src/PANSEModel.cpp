@@ -1320,18 +1320,19 @@ void PANSEModel::setParameter(PANSEParameter &_parameter)
 double PANSEModel::calculateAlphaPrior(std::string grouping,bool proposed)
 {
     double priorValue = 0.0;
-
+    double lower_limit = 0;
+    double upper_limit = 100;
     unsigned numMutCat = parameter->getNumMutationCategories();
     for (unsigned i = 0u; i < numMutCat; i++)
     {
         double alpha = parameter->getParameterForCategory(i, PANSEParameter::alp, grouping, proposed);
-        if (alpha < 0 || alpha > 100)
+        if (alpha < lower_limit || alpha > upper_limit)
         {
             priorValue = std::log(0);
         }
         else
         {
-            priorValue = std::log(1);
+            priorValue = -std::log(upper_limit - lower_limit);
         }
     }
     return priorValue;
@@ -1340,18 +1341,19 @@ double PANSEModel::calculateAlphaPrior(std::string grouping,bool proposed)
 double PANSEModel::calculateLambdaPrior(std::string grouping,bool proposed)
 {
     double priorValue = 0.0;
-
+    double lower_limit = 0;
+    double upper_limit = 100;
     unsigned numSelCat = parameter->getNumSelectionCategories();
     for (unsigned i = 0u; i < numSelCat; i++)
     {
         double lambda = parameter->getParameterForCategory(i, PANSEParameter::lmPri, grouping, proposed);
-        if (lambda < 0 || lambda > 1000000000)
+        if (lambda < lower_limit || lambda > upper_limit)
         {
             priorValue = std::log(0);
         }
         else
         {
-            priorValue = std::log(1);
+            priorValue = -std::log(upper_limit - lower_limit);
         }
     }
     return priorValue;
@@ -1388,8 +1390,8 @@ double PANSEModel::calculateNSERatePriorNaturalUniform(std::string grouping,bool
   double priorValue = 0.0;
   double lower_limit = 1e-100;
   double upper_limit = 1e-1;
-  unsigned numMutCat = parameter->getNumNSECategories();
-  for (unsigned i = 0u; i < numMutCat; i++)
+  unsigned numNSECat = parameter->getNumNSECategories();
+  for (unsigned i = 0u; i < numNSECat; i++)
   {
     NSERate = parameter->getParameterForCategory(i, PANSEParameter::nse, grouping, proposed);
     logNSERate = std::log(NSERate);
