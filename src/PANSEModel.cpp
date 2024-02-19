@@ -1367,16 +1367,37 @@ void PANSEModel::setNSERatePriorDistribution(std::string distributionName,lower,
     priorType = 0;
     nse_lower_limit = lower;
     nse_upper_limit = upper;
+    my_print("Prior set to % (prior type %) with lower limit % and upper limit %",distributionName,priorType,nse_lower_limit,nse_upper_limit);
   } else if (distributionName == "Log-Uniform")
   {
     priorType = 1;
     nse_lower_limit = lower;
     nse_upper_limit = upper;
+    my_print("Prior set to % (prior type %) with lower limit % and upper limit %",distributionName,priorType,nse_lower_limit,nse_upper_limit);
   } else if (distributionName == "Exponential")
   {
     
   }
 }
+
+
+double PANSEModel::calculateNSERatePrior(bool proposed,unsigned priorType)
+{
+  double prior = 0;
+  if (priorType == 0)
+  {
+    prior = calculateNSERatePriorNaturalUniform(proposed)
+  }
+  else if (priorType == 1)
+  {
+    prior = calculateNSERatePriorNaturalUniform(proposed)
+  } else if (priorType == 2)
+  {
+    
+  }
+  return(prior);
+}
+
 
 double PANSEModel::calculateNSERatePriorNaturalUniform(std::string grouping,bool proposed)
 {
@@ -1424,18 +1445,6 @@ double PANSEModel::calculateNSERatePriorLogUniform(std::string grouping,bool pro
 
 
 
-double PANSEModel::calculateNSERatePrior(bool proposed,unsigned priorType)
-{
-  double prior = 0
-  if (priorType == 0)
-  {
-    prior = calculateNSERatePriorNaturalUniform(proposed)
-  }
-  else if (priorType == 1)
-  {
-    prior = calculateNSERatePriorNaturalUniform(proposed)
-  } 
-}
 
 
 double PANSEModel::calculateAllPriors(bool proposed)
