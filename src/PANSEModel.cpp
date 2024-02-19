@@ -1360,51 +1360,81 @@ double PANSEModel::calculateLambdaPrior(std::string grouping,bool proposed)
 }
 
 
-double PANSEModel::calculateNSERatePriorLogUniform(std::string grouping,bool proposed)
+void PANSEModel::setNSERatePriorDistribution(std::string distributionName,lower,upper,mean)
 {
-  double NSERate,logNSERate;
+  if (distributionName == "Natural-Uniform")
+  {
+    priorType = 0;
+    nse_lower_limit = lower;
+    nse_upper_limit = upper;
+  } else if (distributionName == "Log-Uniform")
+  {
+    priorType = 1;
+    nse_lower_limit = lower;
+    nse_upper_limit = upper;
+  } else if (distributionName == "Exponential")
+  {
+    
+  }
+}
+
+double PANSEModel::calculateNSERatePriorNaturalUniform(std::string grouping,bool proposed)
+{
+  double NSERate;
   double priorValue = 0.0;
-  double log_scale_lower_limit = -100;
-  double log_scale_upper_limit = -1;
-  unsigned numMutCat = parameter->getNumNSECategories();
-  for (unsigned i = 0u; i < numMutCat; i++)
+  unsigned numNSECat = parameter->getNumNSECategories();
+  for (unsigned i = 0u; i < numNSECat; i++)
   {
     NSERate = parameter->getParameterForCategory(i, PANSEParameter::nse, grouping, proposed);
-    logNSERate = std::log(NSERate);
-    if (logNSERate < log_scale_lower_limit || logNSERate > log_scale_upper_limit )
+    if (NSERate < nse_lower_limit || NSERate > nse_upper_limit)
     {
       priorValue = std::log(0);
     }
     else
     {
-      priorValue = std::log(1) - logNSERate - std::log(log_scale_upper_limit - log_scale_lower_limit);  
+      priorValue = -std::log(nse_upper_limit - nse_lower_limit);  
     }
   }
   return priorValue;
 }
 
 
-double PANSEModel::calculateNSERatePriorNaturalUniform(std::string grouping,bool proposed)
+
+double PANSEModel::calculateNSERatePriorLogUniform(std::string grouping,bool proposed)
 {
   double NSERate,logNSERate;
   double priorValue = 0.0;
-  double lower_limit = 1e-100;
-  double upper_limit = 1e-1;
-  unsigned numNSECat = parameter->getNumNSECategories();
-  for (unsigned i = 0u; i < numNSECat; i++)
+  unsigned numMutCat = parameter->getNumNSECategories();
+  for (unsigned i = 0u; i < numMutCat; i++)
   {
     NSERate = parameter->getParameterForCategory(i, PANSEParameter::nse, grouping, proposed);
     logNSERate = std::log(NSERate);
-    if (NSERate < lower_limit || NSERate > upper_limit)
+    if (logNSERate < nse_lower_limit || logNSERate > nse_upper_limit )
     {
       priorValue = std::log(0);
     }
     else
     {
-      priorValue = -std::log(upper_limit - lower_limit);  
+      priorValue = -1*logNSERate - std::log(nse_upper_limit - nse_lower_limit);  
     }
   }
   return priorValue;
+}
+
+
+
+
+double PANSEModel::calculateNSERatePrior(bool proposed,unsigned priorType)
+{
+  double prior = 0
+  if (priorType == 0)
+  {
+    prior = calculateNSERatePriorNaturalUniform(proposed)
+  }
+  else if (priorType == 1)
+  {
+    prior = calculateNSERatePriorNaturalUniform(proposed)
+  } 
 }
 
 
@@ -1413,6 +1443,7 @@ double PANSEModel::calculateAllPriors(bool proposed)
   double prior = 0.0;
 	unsigned size = getGroupListSize();
 	bool share_nse = shareNSE();
+	
 	for (unsigned i = 0; i < size; i++)
 	{
   	std::string grouping = getGrouping(i);

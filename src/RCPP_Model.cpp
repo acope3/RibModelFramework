@@ -58,6 +58,7 @@ RCPP_MODULE(Model_mod)
 		.method("elongationProbabilityLog", &PANSEModel::elongationUntilIndexApproximation2ProbabilityLog)
 		.method("UpperIncompleteGammaLog", &PANSEModel::UpperIncompleteGammaLog)
     .method("calculateLogLikelihood", &PANSEModel::calculateLogLikelihoodR)
+    .method("setNSERatePriorDistribution", &PANSEModel::setNSERatePriorDistribution)
 		;
 
 	class_<FONSEModel>("FONSEModel")
