@@ -302,6 +302,11 @@ RCPP_MODULE(Parameter_mod)
 		.method("getMutationPriorMean", &ROCParameter::getMutationPriorMean)
 		.method("setMutationPriorStandardDeviation", &ROCParameter::setMutationPriorStandardDeviationR)
 		.method("setMutationPriorMean", &ROCParameter::setMutationPriorMeanR)
+                .method("getSelectionPriorStandardDeviation", &ROCParameter::getSelectionPriorStandardDeviation)
+		.method("getSelectionPriorMean", &ROCParameter::getSelectionPriorMean)
+		.method("setSelectionPriorStandardDeviation", &ROCParameter::setSelectionPriorStandardDeviationR)
+		.method("setSelectionPriorMean", &ROCParameter::setSelectionPriorMeanR)
+          //Should create separate or additional setProposeByPrior functions for mutation and selection 
 		.method("setProposeByPrior", &ROCParameter::setProposeByPrior)
 
 		//Posterior, Variance, and Estimates Functions:

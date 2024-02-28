@@ -17,6 +17,9 @@ ROCParameter::ROCParameter() : Parameter()
 	//mutation_prior_sd = 0.35;
 	mutation_prior_mean.resize(40);
 	mutation_prior_sd.resize(40);
+        selection_prior_mean.resize(40);
+	selection_prior_sd.resize(40);
+
 	currentCodonSpecificParameter.resize(2);
 	proposedCodonSpecificParameter.resize(2);
 }
@@ -90,14 +93,28 @@ void ROCParameter::initROCParameterSet()
 	mutation_prior_sd.resize(numMutationCategories);
 	for (int i=0; i < numMutationCategories; i++)
 	{
-		std::vector<double> prior_mean_tmp(numParam, 0.0);
-		std::vector<double> prior_sd_tmp(numParam, 0.35);
+		std::vector<double> prior_mean_mutation_tmp(numParam, 0.0);
+		std::vector<double> prior_sd_mutation_tmp(numParam, 0.35);
 	  // POTENTIAL ISSUE: Shouldn't we use (numParam) instead of (40)
 		mutation_prior_mean[i].resize(numParam);
 		mutation_prior_sd[i].resize(numParam);
-		mutation_prior_mean[i] = prior_mean_tmp;
-		mutation_prior_sd[i] = prior_sd_tmp;
+		mutation_prior_mean[i] = prior_mean_mutation_tmp;
+		mutation_prior_sd[i] = prior_sd_mutation_tmp;
 	}
+
+        selection_prior_mean.resize(numSelectionCategories);
+	selection_prior_sd.resize(numSelectionCategories);
+	for (int i=0; i < numSelectionCategories; i++)
+	{
+		std::vector<double> prior_mean_selection_tmp(numParam, 0.0);
+		std::vector<double> prior_sd_selection_tmp(numParam, 100);
+	  // POTENTIAL ISSUE: Shouldn't we use (numParam) instead of (40)
+		selection_prior_mean[i].resize(numParam);
+		selection_prior_sd[i].resize(numParam);
+		selection_prior_mean[i] = prior_mean_selection_tmp;
+		selection_prior_sd[i] = prior_sd_selection_tmp;
+	}
+
 	std_csp.resize(numParam, 0.1);
 	// proposal bias and std for codon specific parameter
 	bias_csp = 0;
@@ -330,6 +347,77 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 						}
 					}
 				}
+                                else if (variableName == "selection_prior_mean")
+				{
+					if (tmp == "***")
+					{
+						old_format = false;
+						selection_prior_mean.resize(selection_prior_mean.size() + 1);
+						cat++;
+					}
+					else if (tmp == "\n")
+						continue;
+					else
+					{
+						double val;
+						iss.str(tmp);
+						if (!old_format)
+						{
+							while (iss >> val)
+							{
+								selection_prior_mean[cat - 1].push_back(val);
+							}
+							
+						}
+						else 
+						{
+							selection_prior_mean.resize(numSelectionCategories);
+							for (int i = 0; i < numSelectionCategories;i++)
+							{
+								selection_prior_mean[i].resize(numParam);
+								for (int j = 0; j < numParam; j++)
+								{
+									selection_prior_mean[i][j] = val;
+								}
+							}
+						}
+					}
+				}
+				else if (variableName == "selection_prior_sd")
+				{
+					if (tmp == "***")
+					{
+						old_format = false;
+						selection_prior_sd.resize(selection_prior_sd.size() + 1);
+						cat++;
+					}
+					else if (tmp == "\n")
+						continue;
+					else
+					{
+						double val = 0.0;
+						iss.str(tmp);
+						if (!old_format)
+						{
+							while (iss >> val)
+							{
+								selection_prior_sd[cat - 1].push_back(val);
+							}
+						}
+						else
+						{
+							selection_prior_sd.resize(numSelectionCategories);
+							for (int i = 0; i < numSelectionCategories;i++)
+							{
+								selection_prior_sd[i].resize(numParam);
+								for (int j = 0; j < numParam; j++)
+								{
+									selection_prior_sd[i][j] = val;
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -391,6 +479,37 @@ void ROCParameter::writeROCRestartFile(std::string filename)
 			for (j = 0; j < mutation_prior_sd[i].size(); j++)
 			{
 				oss << mutation_prior_sd[i][j];
+				if ((j + 1) % 10 == 0)
+					oss << "\n";
+				else
+					oss << " ";
+			}
+			if (j % 10 != 0)
+				oss << "\n";
+		}
+
+                oss << ">selection_prior_mean:\n";
+		for (unsigned i = 0; i < selection_prior_mean.size(); i++)
+		{
+			oss << "***\n";
+			for (j = 0; j < selection_prior_mean[i].size(); j++)
+			{
+				oss << selection_prior_mean[i][j];
+				if ((j + 1) % 10 == 0)
+					oss << "\n";
+				else
+					oss << " ";
+			}
+			if (j % 10 != 0)
+				oss << "\n";
+		}
+		oss << ">selection_prior_sd:\n";
+		for (unsigned i = 0; i < selection_prior_sd.size(); i++)
+		{
+			oss << "***\n";
+			for (j = 0; j < selection_prior_sd[i].size(); j++)
+			{
+				oss << selection_prior_sd[i][j];
 				if ((j + 1) % 10 == 0)
 					oss << "\n";
 				else
@@ -837,6 +956,65 @@ void ROCParameter::setMutationPriorStandardDeviation(std::vector<std::vector<dou
 }
 
 
+std::vector<std::vector<double>> ROCParameter::getSelectionPriorMean()
+{
+	return selection_prior_mean;
+}
+
+std::vector<std::vector<double>> ROCParameter::getSelectionPriorStandardDeviation()
+{
+	return selection_prior_sd;
+}
+
+
+std::vector<double> ROCParameter::getSelectionPriorMeanForCategory(unsigned category)
+{
+	return selection_prior_mean[category];
+}
+
+std::vector<double> ROCParameter::getSelectionPriorStandardDeviationForCategory(unsigned category)
+{
+	return selection_prior_sd[category];
+}
+
+void ROCParameter::getSelectionPriorMeanForCategoryForGroup(unsigned category, std::string aa, double *returnSet)
+{
+	unsigned aaStart, aaEnd;
+	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
+	std::vector<double> selection_prior_mean_category = selection_prior_mean[category];
+	unsigned j = 0u;
+	for (unsigned i = aaStart; i < aaEnd; i++, j++)
+	{
+		returnSet[j] = selection_prior_mean_category[i];
+	}
+}
+
+
+void ROCParameter::getSelectionPriorStandardDeviationForCategoryForGroup(unsigned category, std::string aa, double *returnSet)
+{
+	unsigned aaStart, aaEnd;
+	SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, true);
+	std::vector<double> selection_prior_sd_category = selection_prior_sd[category];
+	unsigned j = 0u;
+	for (unsigned i = aaStart; i < aaEnd; i++, j++)
+	{
+		returnSet[j] = selection_prior_sd_category[i];
+	}
+}
+
+
+void ROCParameter::setSelectionPriorMean(std::vector<std::vector<double>> _selection_prior_mean)
+{
+	selection_prior_mean = _selection_prior_mean;
+}
+
+
+void ROCParameter::setSelectionPriorStandardDeviation(std::vector<std::vector<double>> _selection_prior_sd)
+{
+	selection_prior_sd = _selection_prior_sd;
+}
+
+
 
 
 
@@ -1101,6 +1279,33 @@ void ROCParameter::setMutationPriorStandardDeviationR(std::vector<double> _mutat
 		for (unsigned j = 0; j < numParam; j++,index++)
 		{
 			mutation_prior_sd[i][j] = _mutation_prior_sd[index];
+		}
+	}
+}
+
+
+void ROCParameter::setSelectionPriorMeanR(std::vector<double> _selection_prior_mean)
+{
+	unsigned index = 0;
+	for (unsigned i = 0; i < numSelectionCategories; i++)
+	{
+		for (unsigned j = 0; j < numParam; j++,index++)
+		{
+			selection_prior_mean[i][j] = _selection_prior_mean[index];
+		}
+	}
+}
+
+
+
+void ROCParameter::setSelectionPriorStandardDeviationR(std::vector<double> _selection_prior_sd)
+{
+	unsigned index = 0;
+	for (unsigned i = 0; i < numSelectionCategories; i++)
+	{
+		for (unsigned j = 0; j < numParam; j++,index++)
+		{
+			selection_prior_sd[i][j] = _selection_prior_sd[index];
 		}
 	}
 }

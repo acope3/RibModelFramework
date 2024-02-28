@@ -34,6 +34,9 @@ class ROCParameter : public Parameter
 		std::vector<std::vector<double>> mutation_prior_mean;
 		std::vector<std::vector<double>> mutation_prior_sd;
 
+  		std::vector<std::vector<double>> selection_prior_mean;
+		std::vector<std::vector<double>> selection_prior_sd;
+
 		bool fix_dM=false;
 		bool fix_dEta=false;
     	bool propose_by_prior=false;
@@ -98,12 +101,13 @@ class ROCParameter : public Parameter
 		//CSP Functions:
 		double getCurrentCodonSpecificProposalWidth(unsigned aa);
 		void proposeCodonSpecificParameter();
-        void setProposeByPrior(bool _propose_by_prior);
+                void setProposeByPrior(bool _propose_by_prior);
 		void updateCodonSpecificParameter(std::string grouping);
 		void completeUpdateCodonSpecificParameter();
 
 
 		//Prior Functions:
+                //   Mutation
 		std::vector<std::vector<double>> getMutationPriorMean();
 		std::vector<std::vector<double>> getMutationPriorStandardDeviation();
 		std::vector<double> getMutationPriorMeanForCategory(unsigned category);
@@ -112,7 +116,15 @@ class ROCParameter : public Parameter
 		void getMutationPriorStandardDeviationForCategoryForGroup(unsigned category, std::string aa, double *returnSet);
 		void setMutationPriorMean(std::vector<std::vector<double>> _mutation_prior_mean);
 		void setMutationPriorStandardDeviation(std::vector<std::vector<double>> _mutation_prior_sd);
-
+                // Selection
+		std::vector<std::vector<double>> getSelectionPriorMean();
+		std::vector<std::vector<double>> getSelectionPriorStandardDeviation();
+		std::vector<double> getSelectionPriorMeanForCategory(unsigned category);
+		std::vector<double> getSelectionPriorStandardDeviationForCategory(unsigned category);
+		void getSelectionPriorMeanForCategoryForGroup(unsigned category, std::string aa, double *returnSet);
+		void getSelectionPriorStandardDeviationForCategoryForGroup(unsigned category, std::string aa, double *returnSet);
+		void setSelectionPriorMean(std::vector<std::vector<double>> _selection_prior_mean);
+		void setSelectionPriorStandardDeviation(std::vector<std::vector<double>> _selection_prior_sd);
 
 
 		//Posterior, Variance, and Estimates Functions:
@@ -150,6 +162,8 @@ class ROCParameter : public Parameter
 		void initSelection(std::vector<double> selectionValues, unsigned mixtureElement, std::string aa);
 		void setMutationPriorMeanR(std::vector<double> _mutation_prior_mean);
 		void setMutationPriorStandardDeviationR(std::vector<double> _mutation_prior_sd);
+                void setSelectionPriorMeanR(std::vector<double> _selection_prior_mean);
+		void setSelectionPriorStandardDeviationR(std::vector<double> _selection_prior_sd);
 
 		//CSP Functions:
 		std::vector<std::vector<double>> getProposedMutationParameter();

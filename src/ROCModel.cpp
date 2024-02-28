@@ -57,6 +57,25 @@ double ROCModel::calculateMutationPrior(std::string grouping, bool proposed)
 	return priorValue;
 }
 
+double ROCModel::calculateSelectionPrior(std::string grouping, bool proposed)
+{
+	unsigned numCodons = SequenceSummary::GetNumCodonsForAA(grouping, true);
+	double selection[5],selection_mean[5],selection_sd[5];
+
+	double priorValue = 0.0;
+
+	unsigned numMutCat = parameter->getNumSelectionCategories();
+	for (unsigned i = 0u; i < numMutCat; i++)
+	{
+		parameter->getParameterForCategory(i, ROCParameter::dEta, grouping, proposed, selection);
+		parameter->getSelectionPriorStandardDeviationForCategoryForGroup(i,grouping,selection_sd);
+		parameter->getSelectionPriorMeanForCategoryForGroup(i,grouping,selection_mean);
+		for (unsigned k = 0u; k < numCodons; k++)
+			priorValue += Parameter::densityNorm(selection[k], selection_mean[k], selection_sd[k], true);
+	}
+	return priorValue;
+}
+
 
 void ROCModel::obtainCodonCount(SequenceSummary *sequenceSummary, std::string curAA, int codonCount[])
 {
@@ -824,6 +843,7 @@ double ROCModel::calculateAllPriors(bool proposed)
 	{
 		std::string grouping = getGrouping(i);
 		prior += calculateMutationPrior(grouping, proposed);
+                prior += calculateSelectionPrior(grouping, proposed);
 	}
 
 	// add more priors if necessary.

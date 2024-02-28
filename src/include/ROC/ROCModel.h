@@ -11,6 +11,7 @@ class ROCModel : public Model
 
 		double calculateLogLikelihoodPerAAPerGene(unsigned numCodons, int codonCount[], double mutation[], double selection[], double phiValue);
 		double calculateMutationPrior(std::string grouping, bool proposed = false); // TODO add to FONSE as well? // cedric
+		double calculateSelectionPrior(std::string grouping, bool proposed = false); 
 		void obtainCodonCount(SequenceSummary *sequenceSummary, std::string curAA, int codonCount[]);
     public:
 		//Constructors & Destructors:
