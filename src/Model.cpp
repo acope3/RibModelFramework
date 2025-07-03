@@ -44,7 +44,6 @@ double Model::calculatePriorForCodonSpecificParam(Parameter *parameter, std::str
 
 bool Model::checkValues(bool proposed)
 {
-
 	return true;
 }
 

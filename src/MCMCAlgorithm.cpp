@@ -482,12 +482,12 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 						model.updateCodonSpecificParameter(grouping,csp_parameters[param]);
 						if ((iteration % thinning) == 0 && acceptanceRatioForAllMixtures[2] != 0 && param  == (numCSPParamTypes - 1))
 						{
-						  if (numCSPParamTypes == 1)
+						  if (numCSPParamTypes == 1) //ROC, FONSE, PA
 						  {
-						  	likelihoodTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[2];
+						  	  likelihoodTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[2];
 							  posteriorTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[4];
 						  } 
-						  else
+						  else // PANSE
 						  {
 						    likelihoodTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[2];
 						    posteriorTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[4];
@@ -498,12 +498,12 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 					{
 						if ((iteration % thinning) == 0 && acceptanceRatioForAllMixtures[1] != 0 && param  == (numCSPParamTypes - 1))
 						{
-						  if (numCSPParamTypes == 1)
+						  if (numCSPParamTypes == 1) //ROC, FONSE, PA
 						  {
 							  likelihoodTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[1];
 							  posteriorTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[3];
 						  }
-						  else
+						  else //PANSE
 						  {
 						    likelihoodTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[1];
 						    posteriorTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[3];

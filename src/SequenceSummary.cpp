@@ -407,8 +407,8 @@ bool SequenceSummary::processRFP(std::vector<std::vector<int>> table)
 	positionMixture.resize(nRows);
 
 	// There should be at least 1 table entry to get to this point, so this should be a valid operation
-  unsigned numCats = (unsigned)table[0].size() - 3; // numCats = after position, codon, mixture
-  initRFPCount(numCats);
+    unsigned numCats = (unsigned)table[0].size() - 3; // numCats = after position, codon, mixture
+    initRFPCount(numCats);
 	sumRFPCount.resize(numCats);
 
 	for (unsigned j = 0; j < numCats; j++)
@@ -428,8 +428,11 @@ bool SequenceSummary::processRFP(std::vector<std::vector<int>> table)
 		if (codonID != 64) // if codon id == 64 => codon not found. Ignore, probably N
 		{
 			int aaID = codonToAAIndex(codon);
-			ncodons[codonID]++;
-			naa[aaID]++;
+			if (row[2] >= 0) //Remember that a valid mixture that is to be included starts at 0.
+			{
+				ncodons[codonID]++;
+				naa[aaID]++;
+			}
 			codonPositions[codonID].push_back((unsigned) row[0]);
 			positionCodonID[row[0]] = codonID;
 			positionMixture[row[0]] = row[2];
@@ -438,8 +441,8 @@ bool SequenceSummary::processRFP(std::vector<std::vector<int>> table)
 			{
 				// Category j has an RFPCount at the position equal to the 2-indexed (after position, codon, mixture) value of j.
 				RFPCount[j][row[0]] = row[j + 3];
-				if (row[j+3] > 0) sumRFPCount[j][codonID] += row[j + 3];
-                // Recall: We store RFP counts < 0, but do not need to process this information in calculations
+				if (row[j+2] >= 0) sumRFPCount[j][codonID] += row[j + 3];
+                // Recall: If elongationMixture < 0, but do not need to process this information in calculations
                 // So we only add to the sumRFPCount if the value is "valid" (> 0).
 			}
 		}

@@ -1329,57 +1329,48 @@ int main()
 #ifdef ALEX
 int main()
 {
-<<<<<<< HEAD
+
 	srand(1500);
     std::vector <double> alphas;
     std::vector <double> lambdas;
     std::vector <std::string> cspFiles;
     Genome genome;
 	unsigned numMixtures = 1;
+    unsigned index = 21;
 	std::vector<double> sphi_init(numMixtures, 1);
 	std::vector<unsigned> geneAssignment;
-	genome.readRFPData("/Users/alexandercope/Test_PANSE/Test_codon_mix/Test_codon_mix/Data/Simulation/2_mixtures_allUnique_same_nse/simulated_rfp.csv", false);
-	Gene gene = genome.getGene(0);
+	genome.readRFPData("/Users/alexandercope/Test_PANSE/rfp_data_ignore_pos.csv", false);
+	Gene gene = genome.getGene(1);
 	std::vector<unsigned> position = gene.geneData.getPositionCodonID();
-	std::vector<unsigned> mixture = gene.geneData.getPositionMixture();
-
+	std::vector<int> mixture = gene.geneData.getPositionMixture();
 	std::vector<unsigned long> rfp = gene.geneData.getRFPCount(0);
-	my_print("%\n",genome.getSumRFP());
-    geneAssignment.resize(genome.getGenomeSize());
-    for (int i = 0; i < geneAssignment.size(); i++)
-    {
-    	if (i == 1)
-    	{
-    		geneAssignment[i] = 0;
-    	}
-    	else
-    	{
-    		geneAssignment[i] = 0;
-    	}
-    }
-
+	unsigned codonsPerMRNA = gene.geneData.getCodonCountForCodon(index);
+	my_print("%\n",codonsPerMRNA);
+	unsigned currRFPValue = gene.geneData.getCodonSpecificSumRFPCount(index,0 /*RFPCountColumn*/);
+	my_print("%\n",currRFPValue);
+	my_print("%\n",std::lgamma(0));
 //
-	std::vector<double> phi;
-	std::size_t pos;
-	std::ifstream currentFile;
-	std::string tmpString;
-	my_print("Initializing gene expression...\n");
-	currentFile.open("/Users/alexandercope/Test_PANSE/Test_codon_mix/Test_codon_mix/Data/Simulation/2_mixtures_allUnique_same_nse/phi.csv");
-	currentFile >> tmpString;
-	while (currentFile >> tmpString)
-	{
-		pos = tmpString.find(',');
-		if (pos != std::string::npos)
-		{
-			genome.readObservedPhiValues("/Users/alexandercope/RibModelFramework/tests/testthat/UnitTestingData/testMCMCROCFiles/simulatedAllUniqueR_phi_withPhiSet.csv", false);
-			//genome.readObservedPhiValues("E:/RibosomeModel/RibModelDev/data/twoMixtures/simulatedAllUniqueR_phi_unevenMixtures.csv", false);
-		}
-	}
-	my_print("Initializing CSP\n");
-	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
-	std::string mixDef = Parameter::allUnique;
-	unsigned numElongationMixtures = 2;
-	PANSEParameter parameter("/Users/alexandercope/Test_PANSE/Test_codon_mix/Test_codon_mix/Results/2022-12-15_simulated_2_mixtures_allUnique_div_truth_same_nse/restart_1/Restart_files/rstartFile.rst_final");
+//	std::vector<double> phi;
+//	std::size_t pos;
+//	std::ifstream currentFile;
+//	std::string tmpString;
+//	my_print("Initializing gene expression...\n");
+//	currentFile.open("/Users/alexandercope/Test_PANSE/Test_codon_mix/Test_codon_mix/Data/Simulation/2_mixtures_allUnique_same_nse/phi.csv");
+//	currentFile >> tmpString;
+//	while (currentFile >> tmpString)
+//	{
+//		pos = tmpString.find(',');
+//		if (pos != std::string::npos)
+//		{
+//			genome.readObservedPhiValues("/Users/alexandercope/RibModelFramework/tests/testthat/UnitTestingData/testMCMCROCFiles/simulatedAllUniqueR_phi_withPhiSet.csv", false);
+//			//genome.readObservedPhiValues("E:/RibosomeModel/RibModelDev/data/twoMixtures/simulatedAllUniqueR_phi_unevenMixtures.csv", false);
+//		}
+//	}
+//	my_print("Initializing CSP\n");
+//	std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
+//	std::string mixDef = Parameter::allUnique;
+//	unsigned numElongationMixtures = 2;
+//	PANSEParameter parameter("/Users/alexandercope/Test_PANSE/Test_codon_mix/Test_codon_mix/Results/2022-12-15_simulated_2_mixtures_allUnique_div_truth_same_nse/restart_1/Restart_files/rstartFile.rst_final");
 //	PANSEParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, numElongationMixtures, true, mixDef);
 //	parameter.setPartitionFunction(275222,0,false);
 //	parameter.setPartitionFunction(275222,0,true);
@@ -1405,22 +1396,22 @@ int main()
 //    my_print("%\n",nse_1);
 //    my_print("%\n",nse_2);
     //
-	PANSEModel model;
-	model.setParameter(parameter);
-	my_print("Initializing MCMCAlgorithm object---------------\n");
-	unsigned samples = 20;
-	unsigned thinning = 2;
-
-	my_print("\t# Samples: %\n", samples);
-	my_print("\tThinning: %\n", thinning);
-	MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thinning, 10, false, true,false);
-	mcmc.setRestartFileSettings("RestartFile.txt", 20, true);
-	my_print("Done!-------------------------------\n\n\n");
-
-
-	my_print("Running MCMC.............\n\n");
-	mcmc.run(genome, model, 1, 50);
-	my_print("Done!----------------------------------\n\n\n");
+//	PAModel model;
+//	model.setParameter(parameter);
+//	my_print("Initializing MCMCAlgorithm object---------------\n");
+//	unsigned samples = 20;
+//	unsigned thinning = 2;
+//
+//	my_print("\t# Samples: %\n", samples);
+//	my_print("\tThinning: %\n", thinning);
+//	MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thinning, 10, false, true,false);
+//	mcmc.setRestartFileSettings("RestartFile.txt", 20, true);
+//	my_print("Done!-------------------------------\n\n\n");
+//
+//
+//	my_print("Running MCMC.............\n\n");
+//	mcmc.run(genome, model, 1, 50);
+//	my_print("Done!----------------------------------\n\n\n");
 
 //	std::vector<std::string> codons = parameter.getGroupList();
 //	std::vector<double> alpha,lmprime,nse;

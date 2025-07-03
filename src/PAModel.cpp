@@ -133,8 +133,8 @@ void PAModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex,
 		double currLambdaPrime = getParameterForCategory(lambdaPrimeCategory, PAParameter::lmPri, codon, false);
 		unsigned currRFPValue = gene.geneData.getCodonSpecificSumRFPCount(index,0 /*RFPCountColumn*/);
 		unsigned currNumCodonsInMRNA = gene.geneData.getCodonCountForCodon(index);
-		if (currNumCodonsInMRNA == 0) 
-		{	
+		if (currNumCodonsInMRNA == 0)
+		{
 			continue;
 		}
 		logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambdaPrime, currRFPValue, currNumCodonsInMRNA, phiValue);

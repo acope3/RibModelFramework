@@ -347,7 +347,7 @@ void ROCParameter::initROCValuesFromFile(std::string filename)
 						}
 					}
 				}
-                                else if (variableName == "selection_prior_mean")
+        else if (variableName == "selection_prior_mean")
 				{
 					if (tmp == "***")
 					{

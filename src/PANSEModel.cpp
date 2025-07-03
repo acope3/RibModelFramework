@@ -352,7 +352,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
         
         for (unsigned positionIndex = 0; positionIndex < positions.size(); positionIndex++)
         {
-        	  codonMixture_w_flag = positionMixture[positionIndex] + 1; // put back on 1-indexed scale to check if original value was negative or not
+        	codonMixture_w_flag = positionMixture[positionIndex] + 1; // put back on 1-indexed scale to check if original value was negative or not
             if (codonMixture_w_flag < 0)
             {
               codonMixture = -1 * (codonMixture_w_flag) - 1; //if negative, get codonMixture if were not ignoring
@@ -509,7 +509,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
     
     //Should never accept parameters that give NaN, so just check proposed parameters
     
-  logAcceptanceRatioForAllMixtures[0] = logPosterior_proposed - logPosterior - (currAdjustmentTerm - propAdjustmentTerm);
+    logAcceptanceRatioForAllMixtures[0] = logPosterior_proposed - logPosterior - (currAdjustmentTerm - propAdjustmentTerm);
 	logAcceptanceRatioForAllMixtures[1] = logLikelihood;
 	logAcceptanceRatioForAllMixtures[2] = logLikelihood_proposed;
 	logAcceptanceRatioForAllMixtures[3] = logPosterior;
