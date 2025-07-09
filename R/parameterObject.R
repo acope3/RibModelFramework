@@ -148,7 +148,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
                                       selection.prior.sd = 100,
                                       init.csp.variance = 0.0025, init.sepsilon = 0.1, 
                                       init.w.obs.phi=FALSE, init.by.random = FALSE ,init.initiation.cost = 4,init.partition.function=1,
-                                      numElongationMixtures = 1
+                                      numElongationMixtures = 1,
                                       include.nonsense.errors=TRUE){
   # check input integrity
   if(is.null(init.with.restart.file)){
