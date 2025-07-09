@@ -1446,7 +1446,7 @@ bool PANSEParameter::isNSEIgnored()
 //--------------------------------------------------//
 
 
-PANSEParameter::PANSEParameter(std::vector<double> stdDevSynthesisRate, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, unsigned _numElongationMixtures, bool splitSer) : Parameter(64)
+PANSEParameter::PANSEParameter(std::vector<double> stdDevSynthesisRate, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, unsigned _numElongationMixtures, bool splitSer, bool _estimateNSE) : Parameter(64)
 {
   unsigned _numMixtures = _matrix.size() / 2;
   std::vector<std::vector<unsigned>> thetaKMatrix;
@@ -1469,17 +1469,17 @@ PANSEParameter::PANSEParameter(std::vector<double> stdDevSynthesisRate, std::vec
 	}
   std::string _mutationSelectionState = "";
   initParameterSet(stdDevSynthesisRate, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
-  initPANSEParameterSet(thetaKMatrix, _mutationSelectionState, _numElongationMixtures);
+  initPANSEParameterSet(thetaKMatrix, _mutationSelectionState, _numElongationMixtures,_estimateNSE);
 
 }
 
 
-PANSEParameter::PANSEParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment, unsigned _numElongationMixtures, bool splitSer, std::string _mutationSelectionState) :
+PANSEParameter::PANSEParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment, unsigned _numElongationMixtures, bool splitSer, std::string _mutationSelectionState, bool _estimateNSE) :
 Parameter(64)
 {
   std::vector<std::vector<unsigned>> thetaKMatrix;
   initParameterSet(stdDevSynthesisRate, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
-  initPANSEParameterSet(thetaKMatrix, _mutationSelectionState, _numElongationMixtures);
+  initPANSEParameterSet(thetaKMatrix, _mutationSelectionState, _numElongationMixtures, _estimateNSE);
 }
 
 void PANSEParameter::initCovarianceMatrix(SEXP _matrix, std::string codon)
