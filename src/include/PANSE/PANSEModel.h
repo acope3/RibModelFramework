@@ -14,8 +14,7 @@ class PANSEModel: public Model
 		unsigned RFPCountColumn;
 		double currSigmaCalculationSummationFor1, currSigmaCalculationSummationFor2;
 		double propSigmaCalculationSummationFor1, propSigmaCalculationSummationFor2;
-		double calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
-		  unsigned currRFPObserved, double phiValue, double prevSigma, double lgamma_currAlpha, double log_currLambdaPrime, double log_phi,double lgamma_rfp_alpha);
+
 		double calculateLogLikelihood(Genome &genome, std::vector<std::vector<double>> alpha, std::vector<std::vector<double>> lambda, 
                                 std::vector<std::vector<double>> NSERate, std::vector<double> phi, double Z);
 		double calculateLogLikelihoodPerCodonPerGeneByPosition(double currAlpha, double currLambdaPrime,
@@ -23,30 +22,33 @@ class PANSEModel: public Model
 		  
 		
 		std::vector<std::vector<double>> lgamma_currentAlpha;
-   	std::vector<std::vector<std::vector<double>>> log_currentLambda;
-    std::vector<std::vector<std::vector<double>>> lgamma_rfp_alpha;
-    std::vector<std::vector<double>> prob_successful;
-    std::vector<std::vector<unsigned>> mixture_to_category;
+		std::vector<std::vector<std::vector<double>>> log_currentLambda;
+		std::vector<std::vector<std::vector<double>>> lgamma_rfp_alpha;
+		std::vector<std::vector<double>> prob_successful;
+		std::vector<std::vector<unsigned>> mixture_to_category;
 
-    unsigned priorType = 0;
-    double nse_lower_limit = 1e-100;
-    double nse_upper_limit = 1e-1;
-    double nse_exponential_mean = 25000;
+		unsigned priorType = 0;
+		double nse_lower_limit = 1e-100;
+		double nse_upper_limit = 1e-1;
+		double nse_exponential_mean = 25000;
     
  
-    std::vector<double> Z;
+		std::vector<double> Z;
+
 
 	public:
 		//Constructors & Destructors:
 		explicit PANSEModel(unsigned RFPCountColumn = 0u, bool _withPhi = false, bool _fix_sEpsilon = false);
 		virtual ~PANSEModel();
 
-		std::string type = "PANSE";
+
+		double calculateLogLikelihoodPerCodonPerGene(double currAlpha, double currLambdaPrime,
+				  unsigned currRFPObserved, double phiValue, double prevSigma, double lgamma_currAlpha, double log_currLambdaPrime, double log_phi,double lgamma_rfp_alpha);
 
 		virtual void fillMatrices(Genome& genome);
-    virtual void clearMatrices();
-    virtual std::vector<std::vector<unsigned>> getElongationMixtureCategories();
-		
+		virtual void clearMatrices();
+		virtual std::vector<std::vector<unsigned>> getElongationMixtureCategories();
+
 		
 		//Likelihood Ratio Functions:
 		virtual void calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneIndex, unsigned k,
@@ -84,10 +86,10 @@ class PANSEModel: public Model
 		virtual void updateStdDevSynthesisRate();
 
 
-    //Partition Function Functions:
-    virtual double getPartitionFunction(unsigned mixture, bool proposed = false);
-    virtual double getCurrentPartitionFunctionProposalWidth();
-    virtual void updatePartitionFunction();
+		//Partition Function Functions:
+		virtual double getPartitionFunction(unsigned mixture, bool proposed = false);
+		virtual double getCurrentPartitionFunctionProposalWidth();
+		virtual void updatePartitionFunction();
 
 
 		//Synthesis Rate Functions:
@@ -102,7 +104,7 @@ class PANSEModel: public Model
 
 		//Trace Functions:
 		virtual void updateStdDevSynthesisRateTrace(unsigned sample);
-    virtual void updatePartitionFunctionTrace(unsigned sample);
+        virtual void updatePartitionFunctionTrace(unsigned sample);
 		virtual void updateSynthesisRateTrace(unsigned sample, unsigned i);
 		virtual void updateMixtureAssignmentTrace(unsigned sample, unsigned i);
 		virtual void updateMixtureProbabilitiesTrace(unsigned sample);
@@ -113,7 +115,7 @@ class PANSEModel: public Model
 
 		//Adaptive Width Functions:
 		virtual void adaptStdDevSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt = true);
-    virtual void adaptPartitionFunctionProposalWidth(unsigned adaptiveWidth, bool adapt = true);
+        virtual void adaptPartitionFunctionProposalWidth(unsigned adaptiveWidth, bool adapt = true);
 		virtual void adaptSynthesisRateProposalWidth(unsigned adaptiveWidth, bool adapt = true);
 		virtual void adaptCodonSpecificParameterProposalWidth(unsigned adaptiveWidth, unsigned lastIteration, bool adapt = true);
 		virtual void adaptHyperParameterProposalWidths(unsigned adaptiveWidth, bool adapt = true);
@@ -161,17 +163,17 @@ class PANSEModel: public Model
 		double UpperIncompleteGammaLog(double s, double x);
       
 
-    double elongationProbability(double currAlpha, double currLambda, double currNSE);
-    double elongationProbabilityLog(double currAlpha, double currLambda, double currNSE);
-        
-    double elongationUntilIndexApproximation1Probability(double alpha, double lambda, double v, double current);
-    double elongationUntilIndexApproximation2Probability(double alpha, double lambda, double v, bool proposed);
-    double elongationUntilIndexApproximation1ProbabilityLog(double alpha, double lambda, double v);
-    double elongationUntilIndexApproximation2ProbabilityLog(double alpha, double lambda, double v);
+		double elongationProbability(double currAlpha, double currLambda, double currNSE);
+		double elongationProbabilityLog(double currAlpha, double currLambda, double currNSE);
 
-        
+		double elongationUntilIndexApproximation1Probability(double alpha, double lambda, double v, double current);
+		double elongationUntilIndexApproximation2Probability(double alpha, double lambda, double v, bool proposed);
+		double elongationUntilIndexApproximation1ProbabilityLog(double alpha, double lambda, double v);
+		double elongationUntilIndexApproximation2ProbabilityLog(double alpha, double lambda, double v);
 
-    double getNoiseOffset(unsigned index, bool proposed = false);
+
+
+		double getNoiseOffset(unsigned index, bool proposed = false);
 		double getObservedSynthesisNoise(unsigned index) ;
 		double getCurrentNoiseOffsetProposalWidth(unsigned index);
 		void updateNoiseOffset(unsigned index);
@@ -185,7 +187,9 @@ class PANSEModel: public Model
 		virtual bool fixedLambda();
 		virtual bool fixedNSE();
 		virtual bool getParameterTypeFixed(std::string csp_parameters);
+		virtual bool isIgnored(std::string csp_parameters);
 		virtual bool isShared(std::string csp_parameters);
+		virtual bool isNSEIgnored();
 		
 		//R section
 #ifndef STANDALONE

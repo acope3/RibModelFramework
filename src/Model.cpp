@@ -52,8 +52,25 @@ std::vector<std::string> Model::getParameterTypeList()
 	return parameter_types;
 }
 
+std::string Model::getModelType()
+{
+	return type;
+}
+
+
+void Model::setModelType(std::string _type)
+{
+	type = _type;
+}
+
 
 bool Model::isShared(std::string csp_parameters)
+{
+	return false;
+}
+
+
+bool Model::isIgnored(std::string csp_parameters)
 {
 	return false;
 }

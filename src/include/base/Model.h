@@ -13,12 +13,18 @@ class Model
 		double calculatePriorForCodonSpecificParam(Parameter *parameter, std::string grouping, unsigned paramType,
 					bool proposed = false);
 		
+		std::string type;
+
     public:
 		//Constructors & Destructors:
         explicit Model();
 		// TODO: Rule of Three dictates we may need a copy assignment operator as well (operator=)
         virtual ~Model();
         Model& operator=(const Model& rhs);
+        std::vector<std::string> getParameterTypeList();
+
+        virtual std::string getModelType();
+        virtual void setModelType(std::string);
 
         
 
@@ -140,7 +146,8 @@ class Model
 	
 		virtual bool getParameterTypeFixed(std::string csp_parameters) = 0;
 		virtual bool isShared(std::string csp_parameters) = 0;
-		std::vector<std::string> getParameterTypeList();
+		virtual bool isIgnored(std::string csp_parameters) = 0;
+
 
 
 		virtual void fillMatrices(Genome& genome);

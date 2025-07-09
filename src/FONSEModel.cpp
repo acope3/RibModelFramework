@@ -12,6 +12,7 @@ FONSEModel::FONSEModel(bool _withPhi, bool _fix_sEpsilon) : Model()
 	withPhi = _withPhi;
 	fix_sEpsilon = _fix_sEpsilon;
 	parameter_types = {"Evolutionary"};
+	setModelType("FONSE");
 }
 
 

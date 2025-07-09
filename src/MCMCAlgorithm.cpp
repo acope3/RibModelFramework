@@ -414,6 +414,8 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 */
 void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& model, int iteration)
 {
+	bool is_fixed, is_ignored, is_shared;
+	std::string model_type = model.getModelType();
 	std::vector<double> acceptanceRatioForAllMixtures(5,0.0);
 	unsigned size = model.getGroupListSize();
 
@@ -422,17 +424,17 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 
 	std::vector<unsigned> groups(size);
 	std::iota(groups.begin(),groups.end(),0);
-	//std::shuffle ( groups.begin(), groups.end(),e);
 
-	bool is_fixed;
-	bool is_shared;
 	std::vector<std::string> csp_parameters = model.getParameterTypeList();
 	unsigned numCSPParamTypes = csp_parameters.size();
+
 	for (unsigned param = 0; param < numCSPParamTypes; param++)
 	{
 
 		is_fixed = model.getParameterTypeFixed(csp_parameters[param]);
-		if (! is_fixed)
+		is_ignored = model.isIgnored(csp_parameters[param]);
+
+		if (!is_fixed || !is_ignored)
 		{
 			is_shared = model.isShared(csp_parameters[param]);
 			if (is_shared)
@@ -449,7 +451,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 					
 					// moves proposed codon specific parameters to current codon specific parameters
 					model.updateCodonSpecificParameter(grouping,csp_parameters[param]);
-					if ((iteration % thinning) == 0 && acceptanceRatioForAllMixtures[2] != 0 && param == (numCSPParamTypes - 1))
+					if ((iteration % thinning) == 0 && acceptanceRatioForAllMixtures[2] != 0)
 					{
 						likelihoodTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[2];
 						posteriorTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[4];
@@ -457,7 +459,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 				} 
 				else
 				{
-					if ((iteration % thinning) == 0 && acceptanceRatioForAllMixtures[1] != 0 && param  == (numCSPParamTypes - 1))
+					if ((iteration % thinning) == 0 && acceptanceRatioForAllMixtures[1] != 0)
 					{
 						likelihoodTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[1];
 						posteriorTrace[(iteration / thinning)] = acceptanceRatioForAllMixtures[3];
@@ -471,7 +473,8 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 				{
 					std::string grouping = model.getGrouping(groups[i]);
 					model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures,csp_parameters[param]);
-			    double threshold = -Parameter::randExp(1);
+
+			        double threshold = -Parameter::randExp(1);
 			 		if (threshold < acceptanceRatioForAllMixtures[0] && std::isfinite(acceptanceRatioForAllMixtures[0]) && !std::isnan(acceptanceRatioForAllMixtures[2]))
 					{	
 						if (std::isnan(acceptanceRatioForAllMixtures[0]))
@@ -480,7 +483,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 						}
 						// moves proposed codon specific parameters to current codon specific parameters
 						model.updateCodonSpecificParameter(grouping,csp_parameters[param]);
-						if ((iteration % thinning) == 0 && acceptanceRatioForAllMixtures[2] != 0 && param  == (numCSPParamTypes - 1))
+						if ((iteration % thinning) == 0 && acceptanceRatioForAllMixtures[2] != 0)
 						{
 						  if (numCSPParamTypes == 1) //ROC, FONSE, PA
 						  {
@@ -496,7 +499,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 					}
 					else
 					{
-						if ((iteration % thinning) == 0 && acceptanceRatioForAllMixtures[1] != 0 && param  == (numCSPParamTypes - 1))
+						if ((iteration % thinning) == 0 && acceptanceRatioForAllMixtures[1] != 0)
 						{
 						  if (numCSPParamTypes == 1) //ROC, FONSE, PA
 						  {
@@ -522,6 +525,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 			model.updateCodonSpecificParameterTrace(iteration/thinning, grouping);
 		}
 	}
+
 }
 
 
@@ -737,7 +741,7 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 */
 void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned divergenceIterations)
 {
-	
+	unsigned counter;
 	// NOTE: IF PRIORS ARE ADDED, TAKE INTO ACCOUNT HERE!
 	my_print("Allowing divergence from initial conditions for % iterations.\n\n", divergenceIterations);
 	// divergence from initial conditions is not stored in trace
@@ -752,10 +756,17 @@ void MCMCAlgorithm::varyInitialConditions(Genome& genome, Model& model, unsigned
 			// If proposed parameters go outside the accepatble boundaries, propose new set of parameters.
 			// Should only matter for PA or PANSE
 			//while (std::isnan(prior) || !std::isfinite(prior))
-			while (!prior)
+			counter = 0;
+			while (!prior && counter < 1000)
 			{
 				model.proposeCodonSpecificParameter();
 				prior = model.checkValues(true);
+				counter+=1;
+				if (counter == 1000)
+				{
+					my_print("Varying from initial conditions has resulted in a large number of cases (1000) where an unacceptable set of parameters was generated. Suggest there may be something going wrong with the model set up. Exiting");
+					exit(1);
+				}
 			}
 		}
 		if (estimateHyperParameter)

@@ -50,12 +50,12 @@ PANSEParameter::PANSEParameter(std::string filename) : Parameter(61)
 */
 PANSEParameter::PANSEParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures,
 		std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix, unsigned _numElongationMixtures, bool splitSer,
-		std::string _mutationSelectionState) : Parameter(61)
+		std::string _mutationSelectionState, bool _estimateNSE) : Parameter(61)
 {
 
 	initParameterSet(stdDevSynthesisRate, _numMixtures, geneAssignment, thetaKMatrix, splitSer, "allUnique");
 	// Note: Due to the structure of PANSE vs. other models, need to set up mixtures when initializing PANSE
-	initPANSEParameterSet(thetaKMatrix, _mutationSelectionState, _numElongationMixtures);
+	initPANSEParameterSet(thetaKMatrix, _mutationSelectionState, _numElongationMixtures,_estimateNSE);
 }
 
 
@@ -75,7 +75,6 @@ PANSEParameter& PANSEParameter::operator=(const PANSEParameter& rhs)
 
   	numNSECategories = rhs.numNSECategories;
   	nseIsInMixture = rhs.nseIsInMixture;
-	//covarianceMatrix = rhs.covarianceMatrix;
 	nse_covarianceMatrix = rhs.nse_covarianceMatrix;
 	std_partitionFunction = rhs.std_partitionFunction;
 	partitionFunction_proposed = rhs.partitionFunction_proposed;
@@ -109,9 +108,13 @@ PANSEParameter::~PANSEParameter()
  * Initializes the variables that are specific to the PANSE Parameter object. The group list is set to all codons from
  * table 1 minus the stop codons. This will be corrected in CodonTable.
 */
-void PANSEParameter::initPANSEParameterSet(std::vector<std::vector<unsigned>> mixtureDefinitionMatrix, std::string _mutationSelectionState, unsigned _numElongationMixtures)
+void PANSEParameter::initPANSEParameterSet(std::vector<std::vector<unsigned>> mixtureDefinitionMatrix, std::string _mutationSelectionState, unsigned _numElongationMixtures, bool _estimateNSE)
 {
 	unsigned numGenes;
+	unsigned alphaCategories, lambdaPrimeCategories, nonsenseErrorCategories, partitionFunctionCategories;
+	double starting_nserate;
+
+
 	numElongationMixtures = _numElongationMixtures;
 	mutationIsInMixture.clear();
 	selectionIsInMixture.clear();
@@ -121,10 +124,17 @@ void PANSEParameter::initPANSEParameterSet(std::vector<std::vector<unsigned>> mi
 	nseIsInMixture.resize(numNSECategories);
 	initCategoryDefinitions(_mutationSelectionState, mixtureDefinitionMatrix);
 
-	unsigned alphaCategories = getNumMutationCategories(); //alpha and lambda both control elongation rates
-	unsigned lambdaPrimeCategories = getNumSelectionCategories();
-	unsigned nonsenseErrorCategories = getNumNSECategories();
-	unsigned partitionFunctionCategories = numMixtures;
+	alphaCategories = getNumMutationCategories(); //alpha and lambda both control elongation rates
+	lambdaPrimeCategories = getNumSelectionCategories();
+	nonsenseErrorCategories = getNumNSECategories();
+	partitionFunctionCategories = numMixtures;
+
+	if (!_estimateNSE)
+	{
+		ignoreNSE();
+		fixNSERate();
+		shareNSERate();
+	}
 
 	numAcceptForPartitionFunction = 0u;
 
@@ -167,7 +177,15 @@ void PANSEParameter::initPANSEParameterSet(std::vector<std::vector<unsigned>> mi
 
     for (unsigned i = 0; i < nonsenseErrorCategories; i++)
     {
-        std::vector <double> tmp(numParam,0.00005);
+    	if (estimate_nse)
+    	{
+    	  starting_nserate = 0.00005;
+    	}
+    	else
+    	{
+    	  starting_nserate = 0.0;
+    	}
+    	std::vector <double> tmp(numParam,starting_nserate);
         currentCodonSpecificParameter[nse][i] = tmp;
         proposedCodonSpecificParameter[nse][i] = tmp;
     }
@@ -224,7 +242,7 @@ void PANSEParameter::initPANSEParameterSet(std::vector<std::vector<unsigned>> mi
     	    categories[i].nse = -1;
     	 }
     }
-  bias_csp = 0;
+    bias_csp = 0;
 	std_csp.resize(numParam,0.1);
 	std_nse.resize(numParam,0.1);
 	std_partitionFunction = 0.1;
@@ -793,9 +811,7 @@ double PANSEParameter::getCurrentCodonSpecificProposalWidth(unsigned index)
 */
 void PANSEParameter::proposeCodonSpecificParameter()
 {
-//	unsigned numAlpha = (unsigned)currentCodonSpecificParameter[alp][0].size();
-//	unsigned numLambdaPrime = (unsigned)currentCodonSpecificParameter[lmPri][0].size();
-//    unsigned numNSE = (unsigned)currentCodonSpecificParameter[nse][0].size();
+
 	for (unsigned k = 0; k < getGroupListSize(); k++)
 	{
 		std::vector<double> iidProposed;
@@ -848,7 +864,14 @@ void PANSEParameter::proposeCodonSpecificParameter()
 				{
 					if (k == 0)
 					{
-						proposedCodonSpecificParameter[nse][i][k] = std::exp( randNorm( std::log(currentCodonSpecificParameter[nse][i][k]) , std_nse[k]) );
+						if (!estimate_nse)
+						{
+							proposedCodonSpecificParameter[nse][i][k] = 0.0;
+						}
+						else
+						{
+							proposedCodonSpecificParameter[nse][i][k] = std::exp( randNorm( std::log(currentCodonSpecificParameter[nse][i][k]) , std_nse[k]) );
+						}
 					}
 					else
 					{
@@ -857,6 +880,10 @@ void PANSEParameter::proposeCodonSpecificParameter()
 				}
 				else
 				{
+					if (!estimate_nse)
+					{
+						proposedCodonSpecificParameter[nse][i][k] = 0.0;
+					}
 					if (fix_nse)
 					{
 						proposedCodonSpecificParameter[nse][i][k] = currentCodonSpecificParameter[nse][i][k];
@@ -1374,6 +1401,11 @@ void PANSEParameter::shareNSERate()
 	share_nse = true;
 }
 
+void PANSEParameter::ignoreNSE()
+{
+	estimate_nse = false;
+}
+
 bool PANSEParameter::isAlphaFixed()
 {
 	return(fix_alpha);
@@ -1392,6 +1424,11 @@ bool PANSEParameter::isNSEFixed()
 bool PANSEParameter::isNSEShared()
 {
 	return(share_nse);
+}
+
+bool PANSEParameter::isNSEIgnored()
+{
+	return(!estimate_nse);
 }
 
 
