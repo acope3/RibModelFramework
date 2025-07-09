@@ -146,7 +146,7 @@ class Model
 	
 		virtual bool getParameterTypeFixed(std::string csp_parameters) = 0;
 		virtual bool isShared(std::string csp_parameters) = 0;
-		virtual bool isIgnored(std::string csp_parameters) = 0;
+		virtual bool isIgnored(std::string csp_parameters);
 
 
 
