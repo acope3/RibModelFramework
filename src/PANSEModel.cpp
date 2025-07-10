@@ -339,13 +339,14 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
         std::vector<std::vector<double>> prop_prob_successful(n);
         for (unsigned j = 0; j < n; j++ )
         {
-        	if (!ignore_nse)
+        	if (ignore_nse)
         	{
-        		prop_prob_successful[j] = std::vector<double>(getGroupListSize(),1000);
+        		prop_prob_successful[j] = std::vector<double>(getGroupListSize(),0.0);
+
         	}
         	else
         	{
-        		prop_prob_successful[j] = std::vector<double>(getGroupListSize(),0.0);
+        		prop_prob_successful[j] = std::vector<double>(getGroupListSize(),1000.0);
         	}
         }
         gene = &genome.getGene(i);
@@ -366,8 +367,8 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 
         double logPhi = std::log(phiValue); 
         
-        double propSigma = 0;
-        double currSigma = 0;
+        double propSigma = 0.0;
+        double currSigma = 0.0;
         
         for (unsigned positionIndex = 0; positionIndex < positions.size(); positionIndex++)
         {
@@ -405,7 +406,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                 currLgammaRFPAlpha = std::lgamma(currAlpha + positionalRFPCount);
             }
            
-            if (share_nse && param == "NSERate")
+            if (share_nse && param == "NSERate" && !ignore_nse)
             {
 
                 propNSERate = getParameterForCategory(nseCategory, PANSEParameter::nse, codon, true);
@@ -415,7 +416,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                   logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda * U, positionalRFPCount,
                                 phiValue,std::exp(propSigma),lgamma_currentAlpha[alphaCategory][codonIndex],log_currentLambda[synthesisRateCategory][lambdaCategory][codonIndex],logPhi,currLgammaRFPAlpha);
                 }
-                if (prop_prob_successful[codonMixture][codonIndex] > 500)
+                if (prop_prob_successful[codonMixture][codonIndex] > 500.0)
                 {
                     prop_prob_successful[codonMixture][codonIndex] = elongationUntilIndexApproximation2ProbabilityLog(currAlpha, currLambda,1/propNSERate);
                     if (prop_prob_successful[codonMixture][codonIndex] > 0.0)
@@ -424,7 +425,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                         prop_prob_successful[codonMixture][codonIndex] = 0.0;
                     }
                 }
-                propSigma = propSigma + prop_prob_successful[codonMixture][codonIndex];
+                propSigma = ignore_nse ? propSigma : (propSigma + prop_prob_successful[codonMixture][codonIndex]);
             }
             else if (codon == grouping)
             {
@@ -437,13 +438,12 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                       logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(propAlpha, propLambda * U, positionalRFPCount,
                                     phiValue,std::exp(propSigma),std::lgamma(propAlpha),std::log(propLambda) + std::log(U),logPhi,std::lgamma(propAlpha+positionalRFPCount));
                     }
-                    if (prop_prob_successful[codonMixture][codonIndex] > 500)
+                    if (prop_prob_successful[codonMixture][codonIndex] > 500.0)
                     {
                         prop_prob_successful[codonMixture][codonIndex] = elongationUntilIndexApproximation2ProbabilityLog(propAlpha, propLambda,1/currNSERate);
                         if (prop_prob_successful[codonMixture][codonIndex] > 0.0)
                         {
-                            //prop_prob_successful[codonMixture][codonIndex] = std::numeric_limits<double>::quiet_NaN();
-                            prop_prob_successful[codonMixture][codonIndex] = 0.0;
+                        	prop_prob_successful[codonMixture][codonIndex] = 0.0;
                         }
                
                     }
@@ -457,17 +457,16 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                       logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda * U, positionalRFPCount,
                                     phiValue,std::exp(propSigma),lgamma_currentAlpha[alphaCategory][codonIndex],log_currentLambda[synthesisRateCategory][lambdaCategory][codonIndex],logPhi,currLgammaRFPAlpha);
                     }
-                    if (prop_prob_successful[codonMixture][codonIndex] > 500)
+                    if (prop_prob_successful[codonMixture][codonIndex] > 500.0)
                     {
                         prop_prob_successful[codonMixture][codonIndex] = elongationUntilIndexApproximation2ProbabilityLog(currAlpha, currLambda,1/propNSERate);
                         if (prop_prob_successful[codonMixture][codonIndex] > 0.0)
                         {
-                        	//prop_prob_successful[codonMixture][codonIndex] = std::numeric_limits<double>::quiet_NaN();
                         	prop_prob_successful[codonMixture][codonIndex] = 0.0;
                         }
                     }
                 }
-                propSigma = propSigma + prop_prob_successful[codonMixture][codonIndex];
+                propSigma = ignore_nse ? propSigma : (propSigma + prop_prob_successful[codonMixture][codonIndex]);
            }
            else
            {
@@ -476,7 +475,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
                   logLikelihood_proposed += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda * U, positionalRFPCount,
                                   phiValue,std::exp(propSigma),lgamma_currentAlpha[alphaCategory][codonIndex],log_currentLambda[synthesisRateCategory][lambdaCategory][codonIndex],logPhi,currLgammaRFPAlpha);
                 }
-                propSigma = propSigma + prob_successful[codonMixture][codonIndex];
+                propSigma = ignore_nse ? propSigma : (propSigma + prob_successful[codonMixture][codonIndex]);
        
            }
            if (codonMixture_w_flag > 0)
@@ -484,8 +483,9 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
               logLikelihood += calculateLogLikelihoodPerCodonPerGene(currAlpha, currLambda * U, positionalRFPCount,
                                     phiValue, std::exp(currSigma),lgamma_currentAlpha[alphaCategory][codonIndex],log_currentLambda[synthesisRateCategory][lambdaCategory][codonIndex],logPhi,currLgammaRFPAlpha);
            }
-            currSigma = currSigma + prob_successful[codonMixture][codonIndex];
+           currSigma = ignore_nse ? currSigma : (currSigma + prob_successful[codonMixture][codonIndex]);
         }
+
     }
 	    
 

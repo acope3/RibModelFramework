@@ -390,6 +390,7 @@ RCPP_MODULE(Parameter_mod)
 		.method("fixNSERate",&PANSEParameter::fixNSERate)
 		.method("fixZ",&PANSEParameter::fixZ)
 		.method("shareNSERate",&PANSEParameter::shareNSERate)
+		.method("ignoreNSE",&PANSEParameter::ignoreNSE)
 
 		//CSP Functions:
 		//Listed in the properties section below. NOTE: these getter/setters are ONLY
