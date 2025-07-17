@@ -365,7 +365,7 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	double prior = model.calculateAllPriors(false);
 	logPosterior += prior;
 	
-    if (std::isnan(logPosterior) || std::isfinite(logPosterior))
+    if (std::isnan(logPosterior) || !std::isfinite(logPosterior))
     {
         my_print("\n\n\n");
         my_print("logPosterior NaN or Inf after addition of prior values! LogLik: \n");
@@ -373,7 +373,6 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
         my_print("\tLogLikelihood: %\n",loglikelihood);
         my_print("\tPrior: %",prior);
         my_print("\n\n\n");
-        exit(1);
     }
     
 	
@@ -473,12 +472,10 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 			}
 			else
 			{
-				//std::shuffle(groups.begin(), groups.end(), e);
-				my_print("Iteration %\n",iteration);
+				std::shuffle(groups.begin(), groups.end(), e);
 				for (unsigned i = 0; i < size; i++)
 				{
 					std::string grouping = model.getGrouping(groups[i]);
-					my_print("\tGroup %\n", grouping);
 					model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures,csp_parameters[param]);
 
 			        double threshold = -Parameter::randExp(1);
@@ -696,13 +693,13 @@ void MCMCAlgorithm::run(Genome& genome, Model& model, unsigned numCores, unsigne
 				{
 					posteriorTrace[(iteration / thinning)] = logPost;
 				}
-//				if (std::isnan(logPost))
-//				{
-//
-//					//my_printError("ERROR: LogPosterior is NaN, exiting at iteration %\n", iteration);
-//					//model.setLastIteration(iteration / thinning);
-//					//return;
-//				}
+				if (std::isnan(logPost) || !std::isfinite(logPost))
+				{
+
+					my_printError("ERROR: LogPosterior is NaN of infinite, exiting at iteration %\n", iteration);
+					model.setLastIteration(iteration / thinning);
+					return;
+				}
 			}
 			if ((iteration % adaptiveWidth) == 0u)
 				model.adaptSynthesisRateProposalWidth(adaptiveWidth, iteration <= stepsToAdapt);

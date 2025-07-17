@@ -265,7 +265,10 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
                                   lgamma_currentAlpha[alphaCategory][codonIndex],log_currentLambda[synthesisRateCategory][lambdaCategory][codonIndex], logPhi_proposed, currLgammaRFPAlpha);
           
         }
-        currSigma = ignore_nse ? 0.0 : (currSigma + prob_successful[codonMixture][codonIndex]);
+        if (!ignore_nse)
+        {
+        	currSigma = currSigma + prob_successful[codonMixture][codonIndex];
+        }
     }
 
 
@@ -1721,7 +1724,6 @@ double PANSEModel::calculateNSERatePriorExponential(std::string grouping,bool pr
 
 double PANSEModel::calculateAllPriors(bool proposed)
 {
-	double currNSERate;
 	double prior = 0.0;
 	unsigned size = getGroupListSize();
 	bool share_nse = shareNSE();
@@ -1737,9 +1739,12 @@ double PANSEModel::calculateAllPriors(bool proposed)
 		}
 		else if (!share_nse && !ignore_nse)
 		{
-			currNSERate = getParameterForCategory(0, PANSEParameter::nse, grouping, proposed);
 			prior += calculateNSERatePrior(grouping, proposed);
-			my_print("Prior % Codon % Proposed? % NSERate %\n",prior,grouping,proposed,currNSERate);
+			if (!std::isfinite(prior))
+			{
+				double currNSERate = getParameterForCategory(0, PANSEParameter::nse, grouping, proposed);
+				my_print("Prior % Codon % Proposed? % NSERate %\n",prior,grouping,proposed,currNSERate);
+			}
 		}
 		prior += calculateAlphaPrior(grouping, proposed);
 		prior += calculateLambdaPrior(grouping, proposed);
