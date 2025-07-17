@@ -528,34 +528,35 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory_PANSE(std::st
       propAdjustmentTerm += std::log(propNSERate);
     }
   }
-  
+  std::string tmp;
   for (unsigned k = 0; k < getGroupListSize(); k++)
   {
-    std::string codon = getGrouping(k);
-    is_group = (codon == grouping);
+    tmp = getGrouping(k);
+    is_group = (tmp == grouping);
     if (param == "Elongation")
     {
-      logPosterior_proposed = logLikelihood_proposed + calculateNSERatePrior(codon,false) + calculateAlphaPrior(codon,is_group) + calculateLambdaPrior(codon,is_group);
-      logPosterior = logLikelihood + calculateNSERatePrior(codon,false) + calculateAlphaPrior(codon,false) + calculateLambdaPrior(codon,false);
+      logPosterior_proposed = logLikelihood_proposed + calculateNSERatePrior(tmp,false) + calculateAlphaPrior(tmp,is_group) + calculateLambdaPrior(tmp,is_group);
+      logPosterior = logLikelihood + calculateNSERatePrior(tmp,false) + calculateAlphaPrior(tmp,false) + calculateLambdaPrior(tmp,false);
     }
     else
     {
       if (share_nse && k == 0)
       {
-        logPosterior_proposed = logLikelihood_proposed + calculateNSERatePrior(codon,is_group) + calculateAlphaPrior(codon,false) + calculateLambdaPrior(codon,false);
-        logPosterior = logLikelihood + calculateNSERatePrior(codon,false) + calculateAlphaPrior(codon,false) + calculateLambdaPrior(codon,false);
+        logPosterior_proposed = logLikelihood_proposed + calculateNSERatePrior(tmp,is_group) + calculateAlphaPrior(tmp,false) + calculateLambdaPrior(tmp,false);
+        logPosterior = logLikelihood + calculateNSERatePrior(tmp,false) + calculateAlphaPrior(tmp,false) + calculateLambdaPrior(tmp,false);
       }
       else if (share_nse && k > 0)
       {
-        logPosterior_proposed = logLikelihood_proposed + calculateAlphaPrior(codon,false) + calculateLambdaPrior(codon,false);
-        logPosterior = logLikelihood + calculateAlphaPrior(codon,false) + calculateLambdaPrior(codon,false);
+        logPosterior_proposed = logLikelihood_proposed + calculateAlphaPrior(tmp,false) + calculateLambdaPrior(tmp,false);
+        logPosterior = logLikelihood + calculateAlphaPrior(tmp,false) + calculateLambdaPrior(tmp,false);
       }
       else
       {
-        logPosterior_proposed = logLikelihood_proposed + calculateNSERatePrior(codon,is_group) + calculateAlphaPrior(codon,false) + calculateLambdaPrior(codon,false);
-        logPosterior = logLikelihood + calculateNSERatePrior(codon,false) + calculateAlphaPrior(codon,false) + calculateLambdaPrior(codon,false);
+        logPosterior_proposed = logLikelihood_proposed + calculateNSERatePrior(tmp,is_group) + calculateAlphaPrior(tmp,false) + calculateLambdaPrior(tmp,false);
+        logPosterior = logLikelihood + calculateNSERatePrior(tmp,false) + calculateAlphaPrior(tmp,false) + calculateLambdaPrior(tmp,false);
       }
     }
+
   }
 
   
@@ -564,6 +565,13 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory_PANSE(std::st
   logAcceptanceRatioForAllMixtures[2] = logLikelihood_proposed;
   logAcceptanceRatioForAllMixtures[3] = logPosterior;
   logAcceptanceRatioForAllMixtures[4] = logPosterior_proposed;
+  if (!std::isfinite(logPosterior_proposed))
+  {
+	currNSERate = getParameterForCategory(nseCategory, PANSEParameter::nse, tmp, false);
+	propNSERate = getParameterForCategory(nseCategory, PANSEParameter::nse, tmp, true);
+	my_print("Param %, Codon %, Group % Curr NSE %, Prop NSE % \n", param, tmp, grouping, currNSERate, propNSERate);
+  }
+
 }
 
 void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory_PA(std::string grouping, Genome& genome, std::vector<double> &logAcceptanceRatioForAllMixtures,std::string param)
@@ -697,13 +705,13 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory_PA(std::strin
     propAdjustmentTerm += std::log(propAlpha) + std::log(propLambda);
   }
   
-
+  std::string tmp;
   for (unsigned k = 0; k < getGroupListSize(); k++)
   {
-    std::string codon = getGrouping(k);
-    is_group = (codon == grouping);
-    logPosterior_proposed = logLikelihood_proposed + calculateAlphaPrior(codon,is_group) + calculateLambdaPrior(codon,is_group);
-    logPosterior = logLikelihood + calculateAlphaPrior(codon,false) + calculateLambdaPrior(codon,false);
+    tmp = getGrouping(k);
+    is_group = (tmp == grouping);
+    logPosterior_proposed = logLikelihood_proposed + calculateAlphaPrior(tmp,is_group) + calculateLambdaPrior(tmp,is_group);
+    logPosterior = logLikelihood + calculateAlphaPrior(tmp,false) + calculateLambdaPrior(tmp,false);
   }
   
   logAcceptanceRatioForAllMixtures[0] = logPosterior_proposed - logPosterior - (currAdjustmentTerm - propAdjustmentTerm);
@@ -1654,12 +1662,14 @@ double PANSEModel::calculateNSERatePriorNaturalUniform(std::string grouping,bool
   double NSERate;
   double priorValue = 0.0;
   unsigned numNSECat = parameter->getNumNSECategories();
+
   for (unsigned i = 0u; i < numNSECat; i++)
   {
     NSERate = parameter->getParameterForCategory(i, PANSEParameter::nse, grouping, proposed);
     if (NSERate < nse_lower_limit || NSERate > nse_upper_limit)
     {
       priorValue += std::log(0);
+
     }
     else
     {

@@ -990,12 +990,17 @@ void PANSEParameter::updateCodonSpecificParameter(std::string grouping,std::stri
 		        }
 		    }
 		}
-		else
+		else if (estimate_nse)
 		{
 			numAcceptForNSERates[i]++;
 		    for (unsigned k = 0u; k < numNSECategories; k++)
 		    {
 		        currentCodonSpecificParameter[nse][k][i] = proposedCodonSpecificParameter[nse][k][i];
+		        if (proposedCodonSpecificParameter[nse][k][i] > 1)
+		        {
+		        	my_print("ERROR: This NSE Rate is way too large! Should have been rejected. Exiting...\n");
+		        	exit(1);
+		        }
 		    }
 		}
 	}

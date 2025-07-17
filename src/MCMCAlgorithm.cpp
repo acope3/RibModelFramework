@@ -441,7 +441,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 			{
 				std::string grouping = model.getGrouping(groups[0]);
 				model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures,csp_parameters[param]);
-		    double threshold = -Parameter::randExp(1);
+		        double threshold = -Parameter::randExp(1);
 		 		if (threshold < acceptanceRatioForAllMixtures[0] && std::isfinite(acceptanceRatioForAllMixtures[0]) && !std::isnan(acceptanceRatioForAllMixtures[2]))
 				{	
 					if (std::isnan(acceptanceRatioForAllMixtures[0]))
@@ -468,18 +468,24 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 			}
 			else
 			{
-				std::shuffle(groups.begin(), groups.end(), e);
+				//std::shuffle(groups.begin(), groups.end(), e);
+				my_print("Iteration %\n",iteration);
 				for (unsigned i = 0; i < size; i++)
 				{
 					std::string grouping = model.getGrouping(groups[i]);
+					my_print("\tGroup %\n", grouping);
 					model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures,csp_parameters[param]);
 
-			    double threshold = -Parameter::randExp(1);
+			        double threshold = -Parameter::randExp(1);
 			 		if (threshold < acceptanceRatioForAllMixtures[0] && std::isfinite(acceptanceRatioForAllMixtures[0]) && !std::isnan(acceptanceRatioForAllMixtures[2]))
 					{	
 						if (std::isnan(acceptanceRatioForAllMixtures[4]) || !std::isfinite(acceptanceRatioForAllMixtures[4]))
 						{
 							my_print("ERROR: Accepted proposed value that results in NaN\n");
+						}
+						if (csp_parameters[param] == "NSERate")
+						{
+							my_print("\t\tACCEPTED: % % %\n",threshold,acceptanceRatioForAllMixtures[0],acceptanceRatioForAllMixtures[4]);
 						}
 						// moves proposed codon specific parameters to current codon specific parameters
 						model.updateCodonSpecificParameter(grouping,csp_parameters[param]);
@@ -488,7 +494,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 						  if (numCSPParamTypes == 1) //ROC, FONSE, PA
 						  {
 						  	likelihoodTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[2];
-							  posteriorTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[4];
+							posteriorTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[4];
 						  } 
 						  else // PANSE
 						  {
