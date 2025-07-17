@@ -565,7 +565,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory_PANSE(std::st
   logAcceptanceRatioForAllMixtures[2] = logLikelihood_proposed;
   logAcceptanceRatioForAllMixtures[3] = logPosterior;
   logAcceptanceRatioForAllMixtures[4] = logPosterior_proposed;
-  if (!std::isfinite(logPosterior_proposed))
+  if (!std::isfinite(logPosterior_proposed) && param == "NSERate")
   {
 	currNSERate = getParameterForCategory(nseCategory, PANSEParameter::nse, tmp, false);
 	propNSERate = getParameterForCategory(nseCategory, PANSEParameter::nse, tmp, true);
@@ -1721,32 +1721,28 @@ double PANSEModel::calculateNSERatePriorExponential(std::string grouping,bool pr
 
 double PANSEModel::calculateAllPriors(bool proposed)
 {
-  double prior = 0.0;
+	double currNSERate;
+	double prior = 0.0;
 	unsigned size = getGroupListSize();
 	bool share_nse = shareNSE();
 	bool ignore_nse = isNSEIgnored();
 	
+
 	for (unsigned i = 0; i < size; i++)
 	{
-  	std::string grouping = getGrouping(i);
-  	if (ignore_nse)
-  	{
-  	 prior += 0;
-  	}
-	  else if (share_nse && i == 0)
-	  {
+		std::string grouping = getGrouping(i);
+		if (share_nse && i == 0)
+		{
 		  prior += calculateNSERatePrior(grouping, proposed);
-	  } 
-	  else if (share_nse && i > 0)
-	  {
-	    prior += 0;
-	  }
-	  else if (!share_nse)
-	  {
-	    prior += calculateNSERatePrior(grouping, proposed);
-	  }
-    prior += calculateAlphaPrior(grouping, proposed);
-    prior += calculateLambdaPrior(grouping, proposed);
+		}
+		else if (!share_nse && !ignore_nse)
+		{
+			currNSERate = getParameterForCategory(0, PANSEParameter::nse, grouping, proposed);
+			prior += calculateNSERatePrior(grouping, proposed);
+			my_print("Prior % Codon % Proposed? % NSERate %\n",prior,grouping,proposed,currNSERate);
+		}
+		prior += calculateAlphaPrior(grouping, proposed);
+		prior += calculateLambdaPrior(grouping, proposed);
 	}
 	return prior;
 }
@@ -1757,8 +1753,8 @@ bool PANSEModel::checkValues(bool proposed)
 	unsigned alphaCategory,lambdaCategory,nseCategory;
 	double currAlpha, currLambda, currNSERate;
 
-  double prior = 0.0;
-  double prob_success;
+    double prior = 0.0;
+    double prob_success;
 	unsigned size = getGroupListSize();
 	bool ignore_nse = isNSEIgnored();
 	mixture_to_category = getElongationMixtureCategories();

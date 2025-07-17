@@ -362,13 +362,18 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 		}
 
 	}
-	logPosterior += model.calculateAllPriors();
+	double prior = model.calculateAllPriors(false);
+	logPosterior += prior;
 	
     if (std::isnan(logPosterior) || std::isfinite(logPosterior))
     {
         my_print("\n\n\n");
-        my_print("logPosterior NaN or Inf after addition of prior values!\n");
+        my_print("logPosterior NaN or Inf after addition of prior values! LogLik: \n");
+        my_print("\tLogPosterior: %\n",logPosterior);
+        my_print("\tLogLikelihood: %\n",loglikelihood);
+        my_print("\tPrior: %",prior);
         my_print("\n\n\n");
+        exit(1);
     }
     
 	
