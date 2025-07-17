@@ -232,6 +232,7 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
     }
   }else if(model == "PANSE"){
     if(is.null(init.with.restart.file)){
+      print("HERE\n")
       parameter <- initializePANSEParameterObject(genome, sphi, num.mixtures, 
                                                   gene.assignment, initial.expression.values, split.serine, 
                                                   mixture.definition, mixture.definition.matrix, init.csp.variance,init.sepsilon,init.w.obs.phi,init.partition.function,
@@ -430,6 +431,7 @@ initializePANSEParameterObject <- function(genome, sphi, numMixtures, geneAssign
   
   if(is.null(mixture.definition.matrix))
   { # keyword constructor
+    print("HERE_2\n\n")
     parameter <- new(PANSEParameter, as.vector(sphi), numMixtures, geneAssignment, 
                      numElongationMixtures, split.serine, mixture.definition, include.nonsense.errors)
   }else{

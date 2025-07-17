@@ -57,6 +57,12 @@ class PANSEModel: public Model
 		virtual void calculateLogLikelihoodRatioPerGroupingPerCategory(std::string grouping, Genome& genome,
 				std::vector<double> &logAcceptanceRatioForAllMixtures,std::string param="Elongation"); // Depends on RFPCountColumn
 		
+		virtual void calculateLogLikelihoodRatioPerGroupingPerCategory_PANSE(std::string grouping, Genome& genome,
+                                                                 std::vector<double> &logAcceptanceRatioForAllMixtures,std::string param="Elongation"); // Depends on RFPCountColumn
+		
+		virtual void calculateLogLikelihoodRatioPerGroupingPerCategory_PA(std::string grouping, Genome& genome,
+                                                                       std::vector<double> &logAcceptanceRatioForAllMixtures,std::string param="Elongation"); // Depends on RFPCountColumn
+		
 
 		virtual void calculateLogLikelihoodRatioForHyperParameters(Genome &genome, unsigned iteration,
 				std::vector <double> &logProbabilityRatio);

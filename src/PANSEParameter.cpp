@@ -133,7 +133,6 @@ void PANSEParameter::initPANSEParameterSet(std::vector<std::vector<unsigned>> mi
 	{
 		ignoreNSE();
 		fixNSERate();
-		shareNSERate();
 	}
 
 	numAcceptForPartitionFunction = 0u;
@@ -859,7 +858,6 @@ void PANSEParameter::proposeCodonSpecificParameter()
 		{
 			for (unsigned i = 0; i < numNSECategories; i++)
 			{
-
 				if (share_nse)
 				{
 					if (k == 0)
@@ -884,7 +882,7 @@ void PANSEParameter::proposeCodonSpecificParameter()
 					{
 						proposedCodonSpecificParameter[nse][i][k] = 0.0;
 					}
-					if (fix_nse)
+					else if (fix_nse)
 					{
 						proposedCodonSpecificParameter[nse][i][k] = currentCodonSpecificParameter[nse][i][k];
 					}
@@ -893,7 +891,6 @@ void PANSEParameter::proposeCodonSpecificParameter()
 						proposedCodonSpecificParameter[nse][i][k] = std::exp( randNorm( std::log(currentCodonSpecificParameter[nse][i][k]) , std_nse[k]) );
 					}
 				}
-
 			}
 		}
 		else

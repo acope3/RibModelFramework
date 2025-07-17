@@ -364,10 +364,10 @@ double MCMCAlgorithm::acceptRejectSynthesisRateLevelForAllGenes(Genome& genome, 
 	}
 	logPosterior += model.calculateAllPriors();
 	
-    if (std::isnan(logPosterior))
+    if (std::isnan(logPosterior) || std::isfinite(logPosterior))
     {
         my_print("\n\n\n");
-        my_print("logPosterior NaN after addition of prior values!\n");
+        my_print("logPosterior NaN or Inf after addition of prior values!\n");
         my_print("\n\n\n");
     }
     
@@ -441,7 +441,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 			{
 				std::string grouping = model.getGrouping(groups[0]);
 				model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures,csp_parameters[param]);
-		    	double threshold = -Parameter::randExp(1);
+		    double threshold = -Parameter::randExp(1);
 		 		if (threshold < acceptanceRatioForAllMixtures[0] && std::isfinite(acceptanceRatioForAllMixtures[0]) && !std::isnan(acceptanceRatioForAllMixtures[2]))
 				{	
 					if (std::isnan(acceptanceRatioForAllMixtures[0]))
@@ -474,10 +474,10 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 					std::string grouping = model.getGrouping(groups[i]);
 					model.calculateLogLikelihoodRatioPerGroupingPerCategory(grouping, genome, acceptanceRatioForAllMixtures,csp_parameters[param]);
 
-			        double threshold = -Parameter::randExp(1);
+			    double threshold = -Parameter::randExp(1);
 			 		if (threshold < acceptanceRatioForAllMixtures[0] && std::isfinite(acceptanceRatioForAllMixtures[0]) && !std::isnan(acceptanceRatioForAllMixtures[2]))
 					{	
-						if (std::isnan(acceptanceRatioForAllMixtures[0]))
+						if (std::isnan(acceptanceRatioForAllMixtures[4]) || !std::isfinite(acceptanceRatioForAllMixtures[4]))
 						{
 							my_print("ERROR: Accepted proposed value that results in NaN\n");
 						}
@@ -487,7 +487,7 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 						{
 						  if (numCSPParamTypes == 1) //ROC, FONSE, PA
 						  {
-						  	  likelihoodTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[2];
+						  	likelihoodTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[2];
 							  posteriorTrace[(iteration / thinning)] += acceptanceRatioForAllMixtures[4];
 						  } 
 						  else // PANSE
