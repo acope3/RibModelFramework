@@ -1672,6 +1672,9 @@ double PANSEModel::calculateNSERatePriorNaturalUniform(std::string grouping,bool
     if (NSERate < nse_lower_limit || NSERate > nse_upper_limit)
     {
       priorValue += std::log(0);
+      my_print("WARNING: NSE Rate is outside range of acceptable values. Prior will be infinity\n");
+      my_print("\tCodon: %, Proposed?: %, Prior: %, Value: %, Range: % - %\n", grouping,proposed,priorValue,NSERate,nse_lower_limit,nse_upper_limit);
+
 
     }
     else
