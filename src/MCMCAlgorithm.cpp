@@ -485,10 +485,6 @@ void MCMCAlgorithm::acceptRejectCodonSpecificParameter(Genome& genome, Model& mo
 						{
 							my_print("ERROR: Accepted proposed value that results in NaN\n");
 						}
-						if (csp_parameters[param] == "NSERate")
-						{
-							my_print("\t\tACCEPTED: % % %\n",threshold,acceptanceRatioForAllMixtures[0],acceptanceRatioForAllMixtures[4]);
-						}
 						// moves proposed codon specific parameters to current codon specific parameters
 						model.updateCodonSpecificParameter(grouping,csp_parameters[param]);
 						if ((iteration % thinning) == 0 && acceptanceRatioForAllMixtures[2] != 0)
