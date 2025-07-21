@@ -711,12 +711,14 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory_PA(std::strin
   }
   
   std::string tmp;
+  logPosterior_proposed = logLikelihood_proposed;
+  logPosterior = logLikelihood;
   for (unsigned k = 0; k < getGroupListSize(); k++)
   {
     tmp = getGrouping(k);
     is_group = (tmp == grouping);
-    logPosterior_proposed = logLikelihood_proposed + calculateAlphaPrior(tmp,is_group) + calculateLambdaPrior(tmp,is_group);
-    logPosterior = logLikelihood + calculateAlphaPrior(tmp,false) + calculateLambdaPrior(tmp,false);
+    logPosterior_proposed = logPosterior_proposed + calculateAlphaPrior(tmp,is_group) + calculateLambdaPrior(tmp,is_group);
+    logPosterior = logPosterior + calculateAlphaPrior(tmp,false) + calculateLambdaPrior(tmp,false);
   }
   
   logAcceptanceRatioForAllMixtures[0] = logPosterior_proposed - logPosterior - (currAdjustmentTerm - propAdjustmentTerm);
