@@ -557,7 +557,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory_PANSE(std::st
       }
       else
       {
-        logPosterior_proposed = logLikelihood_proposed + calculateNSERatePrior(tmp,is_group) + calculateAlphaPrior(tmp,false) + calculateLambdaPrior(tmp,false);
+        logPosterior_proposed = logPosterior_proposed + calculateNSERatePrior(tmp,is_group) + calculateAlphaPrior(tmp,false) + calculateLambdaPrior(tmp,false);
         logPosterior = logPosterior + calculateNSERatePrior(tmp,false) + calculateAlphaPrior(tmp,false) + calculateLambdaPrior(tmp,false);
       }
     }
