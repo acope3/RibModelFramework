@@ -38,7 +38,7 @@ PANSEParameter::PANSEParameter(std::string filename) : Parameter(61)
 	currentCodonSpecificParameter.resize(3);
 	proposedCodonSpecificParameter.resize(3);
 	initFromRestartFile(filename);
-	numParam = 61;
+	//numParam = 61;
 }
 
 
@@ -50,12 +50,12 @@ PANSEParameter::PANSEParameter(std::string filename) : Parameter(61)
 */
 PANSEParameter::PANSEParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures,
 		std::vector<unsigned> geneAssignment, std::vector<std::vector<unsigned>> thetaKMatrix, unsigned _numElongationMixtures, bool splitSer,
-		std::string _mutationSelectionState, bool _estimateNSE) : Parameter(61)
+		std::string _mutationSelectionState, bool _estimateNSE, bool _includeStop) : Parameter(61)
 {
 
 	initParameterSet(stdDevSynthesisRate, _numMixtures, geneAssignment, thetaKMatrix, splitSer, "allUnique");
 	// Note: Due to the structure of PANSE vs. other models, need to set up mixtures when initializing PANSE
-	initPANSEParameterSet(thetaKMatrix, _mutationSelectionState, _numElongationMixtures,_estimateNSE);
+	initPANSEParameterSet(thetaKMatrix, _mutationSelectionState, _numElongationMixtures,_estimateNSE,_includeStop);
 }
 
 
@@ -108,7 +108,8 @@ PANSEParameter::~PANSEParameter()
  * Initializes the variables that are specific to the PANSE Parameter object. The group list is set to all codons from
  * table 1 minus the stop codons. This will be corrected in CodonTable.
 */
-void PANSEParameter::initPANSEParameterSet(std::vector<std::vector<unsigned>> mixtureDefinitionMatrix, std::string _mutationSelectionState, unsigned _numElongationMixtures, bool _estimateNSE)
+void PANSEParameter::initPANSEParameterSet(std::vector<std::vector<unsigned>> mixtureDefinitionMatrix, 
+	std::string _mutationSelectionState, unsigned _numElongationMixtures, bool _estimateNSE, bool _includeStop)
 {
 	unsigned numGenes;
 	unsigned alphaCategories, lambdaPrimeCategories, nonsenseErrorCategories, partitionFunctionCategories;
@@ -149,14 +150,27 @@ void PANSEParameter::initPANSEParameterSet(std::vector<std::vector<unsigned>> mi
 	
 	partitionFunction_proposed.resize(partitionFunctionCategories, 1.0);
 	partitionFunction.resize(partitionFunctionCategories, 1.0);
-	groupList = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
+	if (_includeStop)
+	{
+		groupList = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
+              "TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT", "ATA", "ATC",
+              "ATT", "AAA", "AAG", "CTA", "CTC", "CTG", "CTT", "TTA", "TTG", "ATG",
+              "AAC", "AAT", "CCA", "CCC", "CCG", "CCT", "CAA", "CAG", "AGA", "AGG",
+              "CGA", "CGC", "CGG", "CGT", "TCA", "TCC", "TCG", "TCT", "ACA", "ACC",
+              "ACG", "ACT", "GTA", "GTC", "GTG", "GTT", "TGG", "TAC", "TAT", "AGC",
+              "AGT","TAA", "TAG", "TGA"};
+    }
+    else
+    {
+    	groupList = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
               "TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT", "ATA", "ATC",
               "ATT", "AAA", "AAG", "CTA", "CTC", "CTG", "CTT", "TTA", "TTG", "ATG",
               "AAC", "AAT", "CCA", "CCC", "CCG", "CCT", "CAA", "CAG", "AGA", "AGG",
               "CGA", "CGC", "CGG", "CGT", "TCA", "TCC", "TCG", "TCT", "ACA", "ACC",
               "ACG", "ACT", "GTA", "GTC", "GTG", "GTT", "TGG", "TAC", "TAT", "AGC",
               "AGT"};
-	numParam = 61;
+    }
+	numParam = groupList.size();
 
 	numAcceptForNSERates.resize(numParam,0u);
 
@@ -472,13 +486,14 @@ void PANSEParameter::initPANSEValuesFromFile(std::string filename)
     }
     numAcceptForPartitionFunction = 0u;
 
-	groupList = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
-		"TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT", "ATA", "ATC",
-		"ATT", "AAA", "AAG", "CTA", "CTC", "CTG", "CTT", "TTA", "TTG", "ATG",
-		"AAC", "AAT", "CCA", "CCC", "CCG", "CCT", "CAA", "CAG", "AGA", "AGG",
-		"CGA", "CGC", "CGG", "CGT", "TCA", "TCC", "TCG", "TCT", "ACA", "ACC",
-		"ACG", "ACT", "GTA", "GTC", "GTG", "GTT", "TGG", "TAC", "TAT", "AGC",
-		"AGT"};
+    // TODO: Make sure this is not necessary. The groupList should be set during the parameterEs
+	// groupList = {"GCA", "GCC", "GCG", "GCT", "TGC", "TGT", "GAC", "GAT", "GAA", "GAG",
+	// 	"TTC", "TTT", "GGA", "GGC", "GGG", "GGT", "CAC", "CAT", "ATA", "ATC",
+	// 	"ATT", "AAA", "AAG", "CTA", "CTC", "CTG", "CTT", "TTA", "TTG", "ATG",
+	// 	"AAC", "AAT", "CCA", "CCC", "CCG", "CCT", "CAA", "CAG", "AGA", "AGG",
+	// 	"CGA", "CGC", "CGG", "CGT", "TCA", "TCC", "TCG", "TCT", "ACA", "ACC",
+	// 	"ACG", "ACT", "GTA", "GTC", "GTG", "GTT", "TGG", "TAC", "TAT", "AGC",
+	// 	"AGT"};
 	for (unsigned i = 0; i < numMutationCategories; i++)
 	{
 		proposedCodonSpecificParameter[alp][i] = currentCodonSpecificParameter[alp][i];
@@ -1445,7 +1460,7 @@ bool PANSEParameter::isNSEIgnored()
 //--------------------------------------------------//
 
 
-PANSEParameter::PANSEParameter(std::vector<double> stdDevSynthesisRate, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, unsigned _numElongationMixtures, bool splitSer, bool _estimateNSE) : Parameter(64)
+PANSEParameter::PANSEParameter(std::vector<double> stdDevSynthesisRate, std::vector<unsigned> geneAssignment, std::vector<unsigned> _matrix, unsigned _numElongationMixtures, bool splitSer, bool _estimateNSE, bool _includeStop) : Parameter(64)
 {
   unsigned _numMixtures = _matrix.size() / 2;
   std::vector<std::vector<unsigned>> thetaKMatrix;
@@ -1468,17 +1483,17 @@ PANSEParameter::PANSEParameter(std::vector<double> stdDevSynthesisRate, std::vec
 	}
   std::string _mutationSelectionState = "";
   initParameterSet(stdDevSynthesisRate, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
-  initPANSEParameterSet(thetaKMatrix, _mutationSelectionState, _numElongationMixtures,_estimateNSE);
+  initPANSEParameterSet(thetaKMatrix, _mutationSelectionState, _numElongationMixtures,_estimateNSE,_includeStop);
 
 }
 
 
-PANSEParameter::PANSEParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment, unsigned _numElongationMixtures, bool splitSer, std::string _mutationSelectionState, bool _estimateNSE) :
+PANSEParameter::PANSEParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment, unsigned _numElongationMixtures, bool splitSer, std::string _mutationSelectionState, bool _estimateNSE, bool _includeStop) :
 Parameter(64)
 {
   std::vector<std::vector<unsigned>> thetaKMatrix;
   initParameterSet(stdDevSynthesisRate, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
-  initPANSEParameterSet(thetaKMatrix, _mutationSelectionState, _numElongationMixtures, _estimateNSE);
+  initPANSEParameterSet(thetaKMatrix, _mutationSelectionState, _numElongationMixtures, _estimateNSE, _includeStop);
 }
 
 void PANSEParameter::initCovarianceMatrix(SEXP _matrix, std::string codon)
