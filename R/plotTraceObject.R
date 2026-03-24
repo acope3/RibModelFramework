@@ -122,7 +122,8 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
 #' 
 #' @description Plots a codon-specific set of traces, specified with the \code{type} parameter.
 #'
-plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="Mutation Parameter Traces", ROC.or.FONSE=TRUE, log.10.scale=F, aa.names = aminoAcids())
+plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="Mutation Parameter Traces", 
+                                        ROC.or.FONSE=TRUE, log.10.scale=F, aa.names = aminoAcids(), include.stop.codons=F)
 {
   opar <- par(no.readonly = T) 
   ### Trace plot.
@@ -168,7 +169,7 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
   { 
     codons <- AAToCodon(aa, with.ref.codon)
     if(length(codons) == 0) next
-    if (!ROC.or.FONSE){
+    if (!ROC.or.FONSE && !include.stop.codons){
       if(aa == "X") next
     }
     if (ROC.or.FONSE){
@@ -303,13 +304,14 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
 
 plotAcceptanceRatios <- function(trace,
                                  main="CSP Acceptance Ratio Traces",
-                                 aa.names = aminoAcids())
+                                 aa.names = aminoAcids(),
+                                 include.stop.codons = FALSE)
 {
   opar <- par(no.readonly = T) 
   
   ### Trace plot.
   acceptance.rate.traces <- trace$getCodonSpecificAcceptanceRateTrace()
-  if (length(acceptance.rate.traces) == 61)
+  if (length(acceptance.rate.traces) >= 61)
   {
     ROC.or.FONSE <- FALSE  
   } else {
@@ -343,7 +345,7 @@ plotAcceptanceRatios <- function(trace,
   
   for(aa in aa.names)
   { 
-    if (!ROC.or.FONSE){
+    if (!ROC.or.FONSE && !include.stop.codons){
       if(aa == "X") next
     } else if(ROC.or.FONSE){
         if(aa == "X" || aa == "W" || aa == "M") next

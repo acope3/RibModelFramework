@@ -85,11 +85,13 @@
 #' 
 #' @param init.partition.function FOR PANSE ONLY. initializes the partition function Z.
 #'
-#' @param include.nonsense.errors FOR PANSE ONLY. Include effects of nonsense errors when estimating parameters. Setting this to FALSE reduces to a model that only accounts for variability in waiting times across codons. Default is TRUE.
-#'
 #' @param numElongationMixtures FOR PANSE ONLY. Allows for different categories of waiting time parameters based on position of codon..
 #'
+#' @param include.nonsense.errors FOR PANSE ONLY. Include effects of nonsense errors when estimating parameters. Setting this to FALSE reduces to a model that only accounts for variability in waiting times across codons. Default is TRUE.
 #'
+#' @param include.stop.codons FOR PANSE ONLY. Stop codons are included in the dataset and parameters will be estimated. This is an attempt to estimate the relative read-through efficiency of stop codons from ribosome profiling data. Default is FALSE.
+#'
+#' 
 #' @return parameter Returns an initialized Parameter object.
 #' 
 #' @description \code{initializeParameterObject} initializes a new parameter object or reconstructs one from a restart file
@@ -149,7 +151,8 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
                                       init.csp.variance = 0.0025, init.sepsilon = 0.1, 
                                       init.w.obs.phi=FALSE, init.by.random = FALSE ,init.initiation.cost = 4,init.partition.function=1,
                                       numElongationMixtures = 1,
-                                      include.nonsense.errors=TRUE){
+                                      include.nonsense.errors=TRUE,
+                                      include.stop.codons = FALSE){
   # check input integrity
   if(is.null(init.with.restart.file)){
     if(length(sphi) != num.mixtures){
@@ -232,11 +235,10 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
     }
   }else if(model == "PANSE"){
     if(is.null(init.with.restart.file)){
-      print("HERE\n")
       parameter <- initializePANSEParameterObject(genome, sphi, num.mixtures, 
                                                   gene.assignment, initial.expression.values, split.serine, 
                                                   mixture.definition, mixture.definition.matrix, init.csp.variance,init.sepsilon,init.w.obs.phi,init.partition.function,
-                                                  numElongationMixtures,include.nonsense.errors) 
+                                                  numElongationMixtures,include.nonsense.errors,include.stop.codons) 
     }else{
       parameter <- new(PANSEParameter, init.with.restart.file)
     }
@@ -427,13 +429,13 @@ initializePANSEParameterObject <- function(genome, sphi, numMixtures, geneAssign
                                            mixture.definition = "allUnique", 
                                            mixture.definition.matrix = NULL, init.csp.variance = 0.0025 ,init.sepsilon = 0.1,init.w.obs.phi=FALSE,init.partition.function=1,
                                            numElongationMixtures = 1,
-                                           include.nonsense.errors=TRUE){
+                                           include.nonsense.errors=TRUE,
+                                           include.stop.codons=FALSE){
   
   if(is.null(mixture.definition.matrix))
   { # keyword constructor
-    print("HERE_2\n\n")
     parameter <- new(PANSEParameter, as.vector(sphi), numMixtures, geneAssignment, 
-                     numElongationMixtures, split.serine, mixture.definition, include.nonsense.errors)
+                     numElongationMixtures, split.serine, mixture.definition, include.nonsense.errors,include.stop.codons)
   }else{
     #matrix constructor
     mixture.definition <- c(mixture.definition.matrix[, 1], 
@@ -441,7 +443,7 @@ initializePANSEParameterObject <- function(genome, sphi, numMixtures, geneAssign
                             mixture.definition.matrix[, 3])
     
     parameter <- new(PANSEParameter, as.vector(sphi), geneAssignment, 
-                    mixture.definition, numElongationMixtures, split.serine, include.nonsense.errors)
+                    mixture.definition, numElongationMixtures, split.serine, include.nonsense.errors,include.stop.codons)
   }
   
   
