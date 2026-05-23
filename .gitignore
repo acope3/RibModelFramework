@@ -2,3 +2,8 @@
 .project
 *.Rhistory
 *.RData
+
+# tmp files
+\#*
+*~
+

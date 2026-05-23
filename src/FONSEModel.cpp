@@ -32,7 +32,7 @@ double FONSEModel::calculateLogLikelihoodRatioPerAA(Gene& gene, std::string grou
 	std::vector <unsigned> *positions;
 	std::vector <double> codonProb(6, 0);
 
-	//Find the maximum index
+	//Find the index of the minimum selection value (used as reference to avoid Inf with large phi)
 	unsigned minIndexVal = 0u;
 	for (unsigned i = 1; i < (numCodons - 1); i++)
 	{
@@ -849,6 +849,9 @@ void FONSEModel::simulateGenome(Genome & genome)
 			SequenceSummary::AAToCodonRange(curAA, aaStart, aaEnd, false);  //need the first spot in the array where the codons for curAA are
 			codon = sequenceSummary.indexToCodon(aaStart + codonIndex);//get the correct codon based off codonIndex
 			tmpSeq += codon;
+			delete[] codonProb;
+			delete[] mutation;
+			delete[] selection;
 		}
 		std::string codon = sequenceSummary.indexToCodon((unsigned)Parameter::randUnif(61.0, 64.0)); //randomly choose a stop codon, from range 61-63
 		tmpSeq += codon;
@@ -963,7 +966,7 @@ void FONSEModel::calculateCodonProbabilityVector(unsigned numCodons, unsigned po
 	unsigned minIndexValue = 0u;
 	for (unsigned i = 1; i < (numCodons - 1); i++)
 	{
-		if (selection[minIndexValue] < selection[i])
+		if (selection[minIndexValue] > selection[i])
 		{
 			minIndexValue = i;
 		}
@@ -1032,7 +1035,7 @@ bool FONSEModel::getParameterTypeFixed(std::string csp_parameter)
 	{
 		bool dm_fixed = parameter -> isDMFixed();
 		bool domega_fixed = parameter -> isDOmegaFixed();
-		fixed == dm_fixed && domega_fixed;
+		fixed = dm_fixed && domega_fixed;
 	}
 	return(fixed);
 }

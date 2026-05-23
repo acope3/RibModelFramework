@@ -1105,24 +1105,34 @@ getSelectionCoefficients <- function(genome, parameter, samples = 100)
 # Uses a multinomial logistic regression to estimate the codon specific parameters for every category.
 # Delta M is the intercept - and Delta eta is the slope of the regression.
 # The package VGAM is used to perform the regression.
-getCSPbyLogit <- function(codonCounts, phi, coefstart = NULL, x.arg = FALSE, 
+getCSPbyLogit <- function(codonCounts, phi, coefstart = NULL, x.arg = FALSE,
                           y.arg = FALSE, qr.arg = FALSE)
 {
   #avoid cases with 0 aa count
   idx <- rowSums(codonCounts) != 0
-  
+  numCodons <- ncol(codonCounts)
+
   # performs the regression and returns Delta M and Delta eta as well as other information no used here
-  ret <- vglm(codonCounts[idx, ] ~ phi[idx],
-                    multinomial, coefstart = coefstart,
-                    x.arg = x.arg, y.arg = y.arg, qr.arg = qr.arg)
-  coefficients <- ret@coefficients
-  
-  ## convert delta.t to delta.eta
-  coefficients <- -coefficients
-  
-  ret <- list(coefficients = coefficients,
-              coef.mat = matrix(coefficients, nrow = 2, byrow = TRUE),
-              R = ret@R)
+  # Wrap in tryCatch: vglm can fail for amino acids with sparse/degenerate
+  # codon counts (e.g., near-complete separation). Fall back to zero initial
+  # values — these are only used as MCMC starting points and get overwritten
+  # if initMutationCategories/initSelectionCategories is called afterward.
+  ret <- tryCatch({
+    fit <- vglm(codonCounts[idx, ] ~ phi[idx],
+                      multinomial, coefstart = coefstart,
+                      x.arg = x.arg, y.arg = y.arg, qr.arg = qr.arg)
+    coefficients <- -fit@coefficients  # convert delta.t to delta.eta
+    list(coefficients = coefficients,
+         coef.mat = matrix(coefficients, nrow = 2, byrow = TRUE),
+         R = fit@R)
+  }, error = function(e) {
+    # Fall back to zero coefficients: (numCodons-1) mutation + (numCodons-1) selection
+    nCoef <- 2 * (numCodons - 1)
+    coefficients <- rep(0, nCoef)
+    list(coefficients = coefficients,
+         coef.mat = matrix(coefficients, nrow = 2, byrow = TRUE),
+         R = NULL)
+  })
   return(ret)
 }
 

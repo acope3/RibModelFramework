@@ -39,6 +39,11 @@ FONSEParameter::FONSEParameter(std::vector<double> stdDevSynthesisRate, unsigned
 	std::vector<std::vector<unsigned>> thetaKMatrix, bool splitSer, std::string _mutationSelectionState,double _a1) :
 	Parameter(22)
 {
+	// groupList must be set before initParameterSet because initParameterSet
+	// uses groupList.size() to compute numParam, which sizes std_csp and the
+	// inner dimensions of currentCodonSpecificParameter. Without this,
+	// numParam = 0 and initMutation segfaults on out-of-bounds access.
+	groupList = { "A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "P", "Q", "R", "S", "T", "V", "Y", "Z" };
 	initParameterSet(stdDevSynthesisRate, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
 	initFONSEParameterSet(_a1);
 }
@@ -575,7 +580,7 @@ void FONSEParameter::proposeCodonSpecificParameter()
 		{
 			if (fix_dOmega)
 			{
-				proposedCodonSpecificParameter[dEta][i][l] = currentCodonSpecificParameter[dOmega][i][l];
+				proposedCodonSpecificParameter[dOmega][i][l] = currentCodonSpecificParameter[dOmega][i][l];
 			}
 			else
 			{
@@ -754,6 +759,8 @@ void FONSEParameter::adaptInitiationCostProposalWidth(unsigned adaptationWidth, 
 FONSEParameter::FONSEParameter(std::vector<double> stdDevSynthesisRate, std::vector<unsigned> geneAssignment,
                                std::vector<unsigned> _matrix, bool splitSer,double _a1) : Parameter(22)
 {
+    // groupList must be set before initParameterSet (see comment in keyword constructor)
+    groupList = { "A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "P", "Q", "R", "S", "T", "V", "Y", "Z" };
     unsigned _numMixtures = _matrix.size() / 2;
     std::vector<std::vector<unsigned>> thetaKMatrix;
     thetaKMatrix.resize(_numMixtures);
@@ -782,6 +789,8 @@ FONSEParameter::FONSEParameter(std::vector<double> stdDevSynthesisRate, std::vec
 FONSEParameter::FONSEParameter(std::vector<double> stdDevSynthesisRate, unsigned _numMixtures, std::vector<unsigned> geneAssignment,
                                bool splitSer, std::string _mutationSelectionState, double _a1) : Parameter(22)
 {
+    // groupList must be set before initParameterSet (see comment in keyword constructor)
+    groupList = { "A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "P", "Q", "R", "S", "T", "V", "Y", "Z" };
     std::vector<std::vector<unsigned>> thetaKMatrix;
     initParameterSet(stdDevSynthesisRate, _numMixtures, geneAssignment, thetaKMatrix, splitSer, _mutationSelectionState);
     initFONSEParameterSet(_a1);

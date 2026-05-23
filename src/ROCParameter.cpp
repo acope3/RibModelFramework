@@ -812,7 +812,7 @@ void ROCParameter::proposeCodonSpecificParameter()
 				}
 				else if (propose_by_prior) //Don't estimate covariance matrix. 
 				{
-					proposedCodonSpecificParameter[dEta][i][l] = randNorm(currentCodonSpecificParameter[dEta][i][l] , std_csp[l]);
+					proposedCodonSpecificParameter[dEta][i][l] = randNorm(selection_prior_mean[i][l], selection_prior_sd[i][l]);
 			
 				}
 				else

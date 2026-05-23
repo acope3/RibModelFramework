@@ -2258,6 +2258,11 @@ int testParameter(std::string testFileDir)
     bool splitSer = true;
     std::string mutationSelectionState = Parameter::allUnique;
 
+    // groupList must be set before initParameterSet so numParam and std_csp are sized correctly.
+    // With splitSer=true, serine is split into S (TCA/TCC/TCG/TCT) and Z (AGC/AGT).
+    std::vector<std::string> groupListForTest = {"A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "N", "P", "Q", "R", "S", "T", "V", "Y", "Z"};
+    parameter.setGroupList(groupListForTest);
+
     parameter.initParameterSet(stdDev, numMixtures, geneAssignment, mixtureDefinitionMatrix, splitSer, mutationSelectionState);
     unsigned initParameterSetError = 0;
 
