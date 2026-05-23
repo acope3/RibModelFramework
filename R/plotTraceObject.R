@@ -24,7 +24,8 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
                             geneIndex=1,
                             mixture = 1,
                             log.10.scale=F,
-                            aa.names = aminoAcids()
+                            aa.names = aminoAcids(),
+														include.stop.codons = F
                             )
 {
   if(what[1] == "Mutation")
@@ -37,24 +38,24 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
   }
   if(what[1] == "Alpha")
   {
-    plotCodonSpecificParameters(x, mixture, "Alpha", main="Alpha Parameter Traces", ROC.or.FONSE=FALSE, log.10.scale=log.10.scale, aa.names = aa.names)
+    plotCodonSpecificParameters(x, mixture, "Alpha", main="Alpha Parameter Traces", ROC.or.FONSE=FALSE, log.10.scale=log.10.scale, aa.names = aa.names,include.stop.codons = include.stop.codons)
   }
   if(what[1] == "Lambda")
   {
-    plotCodonSpecificParameters(x, mixture, "Lambda", main="Lambda Parameter Traces", ROC.or.FONSE=FALSE, log.10.scale=log.10.scale, aa.names = aa.names)
+    plotCodonSpecificParameters(x, mixture, "Lambda", main="Lambda Parameter Traces", ROC.or.FONSE=FALSE, log.10.scale=log.10.scale, aa.names = aa.names,include.stop.codons = include.stop.codons)
   } 
   
   if(what[1] == "MeanWaitingTime")
   {
-    plotCodonSpecificParameters(x, mixture, "MeanWaitingTime", main="Mean Waiting Time Parameter Traces", ROC.or.FONSE=FALSE, log.10.scale=log.10.scale, aa.names = aa.names)
+    plotCodonSpecificParameters(x, mixture, "MeanWaitingTime", main="Mean Waiting Time Parameter Traces", ROC.or.FONSE=FALSE, log.10.scale=log.10.scale, aa.names = aa.names,include.stop.codons = include.stop.codons)
   }  
   if(what[1] == "VarWaitingTime")
   {
-    plotCodonSpecificParameters(x, mixture, "VarWaitingTime", main="Variance Waiting Time Parameter Traces", ROC.or.FONSE=FALSE, aa.names = aa.names)
+    plotCodonSpecificParameters(x, mixture, "VarWaitingTime", main="Variance Waiting Time Parameter Traces", ROC.or.FONSE=FALSE, aa.names = aa.names,include.stop.codons = include.stop.codons)
   }  
   if(what[1] == "NSEProb")
   {
-    plotCodonSpecificParameters(x, mixture, "NSEProb", main="Nonsense Error Probability Parameter Traces", ROC.or.FONSE=FALSE, log.10.scale=log.10.scale, aa.names = aa.names)
+    plotCodonSpecificParameters(x, mixture, "NSEProb", main="Nonsense Error Probability Parameter Traces", ROC.or.FONSE=FALSE, log.10.scale=log.10.scale, aa.names = aa.names,include.stop.codons = include.stop.codons)
   }  
   if(what[1] == "MixtureProbability")
   {
@@ -94,11 +95,11 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
   }
   if(what[1] == "AcceptanceRatio")
   {
-    plotAcceptanceRatios(x)
+    plotAcceptanceRatios(x,include.stop.codons = include.stop.codons)
   }
   if(what[1] == "NSERate")
   {
-    plotCodonSpecificParameters(x, mixture, "NSERate", main="NSERate", ROC.or.FONSE=FALSE, log.10.scale=log.10.scale, aa.names = aa.names)
+    plotCodonSpecificParameters(x, mixture, "NSERate", main="NSERate", ROC.or.FONSE=FALSE, log.10.scale=log.10.scale, aa.names = aa.names,include.stop.codons = include.stop.codons)
   }  
 }
 
@@ -239,29 +240,29 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
     }
 
     for(i in 1:length(codons)){
-      if(special){
+      if(special)
+      {
         tmpAlpha <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], 0, with.ref.codon)
         tmpLambdaPrime <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], 1, with.ref.codon)
-        
         if (type == "MeanWaitingTime"){          
           cur.trace[[i]] <- tmpAlpha / tmpLambdaPrime
-        }else if (type == "VarWaitingTime"){
+        } else if (type == "VarWaitingTime"){
           cur.trace[[i]] <- tmpAlpha / (tmpLambdaPrime * tmpLambdaPrime)
         } else if (type == "NSEProb" || type == "VarNSEProb"){
           tmpNSERate <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], 2, with.ref.codon)
           if (type == "NSEProb")
           {
             cur.trace[[i]] <- tmpNSERate*(tmpAlpha/tmpLambdaPrime)
-            } else {
+          } else {
               cur.trace[[i]] <- tmpNSERate*tmpNSERate*(tmpAlpha/(tmpLambdaPrime * tmpLambdaPrime))
-            }
+          }
         }
         if (log.10.scale)
         {
           cur.trace[[i]] <- log10(cur.trace[[i]])
         }
-      }
-      else{
+      } 
+    	else {
         cur.trace[[i]] <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], paramType, with.ref.codon)
         if (log.10.scale)
         {
