@@ -85,11 +85,13 @@
 #' 
 #' @param init.partition.function FOR PANSE ONLY. initializes the partition function Z.
 #'
-#' @param include.nonsense.errors FOR PANSE ONLY. Include effects of nonsense errors when estimating parameters. Setting this to FALSE reduces to a model that only accounts for variability in waiting times across codons. Default is TRUE.
-#'
 #' @param numElongationMixtures FOR PANSE ONLY. Allows for different categories of waiting time parameters based on position of codon..
 #'
+#' @param include.nonsense.errors FOR PANSE ONLY. Include effects of nonsense errors when estimating parameters. Setting this to FALSE reduces to a model that only accounts for variability in waiting times across codons. Default is TRUE.
 #'
+#' @param include.stop.codons FOR PANSE ONLY. Stop codons are included in the dataset and parameters will be estimated. This is an attempt to estimate the relative read-through efficiency of stop codons from ribosome profiling data. Default is FALSE.
+#'
+#' 
 #' @return parameter Returns an initialized Parameter object.
 #' 
 #' @description \code{initializeParameterObject} initializes a new parameter object or reconstructs one from a restart file
@@ -149,7 +151,8 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
                                       init.csp.variance = 0.0025, init.sepsilon = 0.1, 
                                       init.w.obs.phi=FALSE, init.by.random = FALSE ,init.initiation.cost = 4,init.partition.function=1,
                                       numElongationMixtures = 1,
-                                      include.nonsense.errors=TRUE){
+                                      include.nonsense.errors=TRUE,
+                                      include.stop.codons = FALSE){
   # check input integrity
   if(is.null(init.with.restart.file)){
     if(length(sphi) != num.mixtures){
@@ -232,11 +235,10 @@ initializeParameterObject <- function(genome = NULL, sphi = NULL, num.mixtures =
     }
   }else if(model == "PANSE"){
     if(is.null(init.with.restart.file)){
-      print("HERE\n")
       parameter <- initializePANSEParameterObject(genome, sphi, num.mixtures, 
                                                   gene.assignment, initial.expression.values, split.serine, 
                                                   mixture.definition, mixture.definition.matrix, init.csp.variance,init.sepsilon,init.w.obs.phi,init.partition.function,
-                                                  numElongationMixtures,include.nonsense.errors) 
+                                                  numElongationMixtures,include.nonsense.errors,include.stop.codons) 
     }else{
       parameter <- new(PANSEParameter, init.with.restart.file)
     }
@@ -427,13 +429,13 @@ initializePANSEParameterObject <- function(genome, sphi, numMixtures, geneAssign
                                            mixture.definition = "allUnique", 
                                            mixture.definition.matrix = NULL, init.csp.variance = 0.0025 ,init.sepsilon = 0.1,init.w.obs.phi=FALSE,init.partition.function=1,
                                            numElongationMixtures = 1,
-                                           include.nonsense.errors=TRUE){
+                                           include.nonsense.errors=TRUE,
+                                           include.stop.codons=FALSE){
   
   if(is.null(mixture.definition.matrix))
   { # keyword constructor
-    print("HERE_2\n\n")
     parameter <- new(PANSEParameter, as.vector(sphi), numMixtures, geneAssignment, 
-                     numElongationMixtures, split.serine, mixture.definition, include.nonsense.errors)
+                     numElongationMixtures, split.serine, mixture.definition, include.nonsense.errors,include.stop.codons)
   }else{
     #matrix constructor
     mixture.definition <- c(mixture.definition.matrix[, 1], 
@@ -441,7 +443,7 @@ initializePANSEParameterObject <- function(genome, sphi, numMixtures, geneAssign
                             mixture.definition.matrix[, 3])
     
     parameter <- new(PANSEParameter, as.vector(sphi), geneAssignment, 
-                    mixture.definition, numElongationMixtures, split.serine, include.nonsense.errors)
+                    mixture.definition, numElongationMixtures, split.serine, include.nonsense.errors,include.stop.codons)
   }
   
   
@@ -1103,24 +1105,34 @@ getSelectionCoefficients <- function(genome, parameter, samples = 100)
 # Uses a multinomial logistic regression to estimate the codon specific parameters for every category.
 # Delta M is the intercept - and Delta eta is the slope of the regression.
 # The package VGAM is used to perform the regression.
-getCSPbyLogit <- function(codonCounts, phi, coefstart = NULL, x.arg = FALSE, 
+getCSPbyLogit <- function(codonCounts, phi, coefstart = NULL, x.arg = FALSE,
                           y.arg = FALSE, qr.arg = FALSE)
 {
   #avoid cases with 0 aa count
   idx <- rowSums(codonCounts) != 0
-  
+  numCodons <- ncol(codonCounts)
+
   # performs the regression and returns Delta M and Delta eta as well as other information no used here
-  ret <- vglm(codonCounts[idx, ] ~ phi[idx],
-                    multinomial, coefstart = coefstart,
-                    x.arg = x.arg, y.arg = y.arg, qr.arg = qr.arg)
-  coefficients <- ret@coefficients
-  
-  ## convert delta.t to delta.eta
-  coefficients <- -coefficients
-  
-  ret <- list(coefficients = coefficients,
-              coef.mat = matrix(coefficients, nrow = 2, byrow = TRUE),
-              R = ret@R)
+  # Wrap in tryCatch: vglm can fail for amino acids with sparse/degenerate
+  # codon counts (e.g., near-complete separation). Fall back to zero initial
+  # values — these are only used as MCMC starting points and get overwritten
+  # if initMutationCategories/initSelectionCategories is called afterward.
+  ret <- tryCatch({
+    fit <- vglm(codonCounts[idx, ] ~ phi[idx],
+                      multinomial, coefstart = coefstart,
+                      x.arg = x.arg, y.arg = y.arg, qr.arg = qr.arg)
+    coefficients <- -fit@coefficients  # convert delta.t to delta.eta
+    list(coefficients = coefficients,
+         coef.mat = matrix(coefficients, nrow = 2, byrow = TRUE),
+         R = fit@R)
+  }, error = function(e) {
+    # Fall back to zero coefficients: (numCodons-1) mutation + (numCodons-1) selection
+    nCoef <- 2 * (numCodons - 1)
+    coefficients <- rep(0, nCoef)
+    list(coefficients = coefficients,
+         coef.mat = matrix(coefficients, nrow = 2, byrow = TRUE),
+         R = NULL)
+  })
   return(ret)
 }
 

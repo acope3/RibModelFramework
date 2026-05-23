@@ -1330,33 +1330,15 @@ int main()
 int main()
 {
 
-//	srand(1500);
-//    std::vector <double> alphas;
-//    std::vector <double> lambdas;
-//    std::vector <std::string> cspFiles;
-//    Genome genome;
-//	unsigned numMixtures = 1;
-//    unsigned index = 21;
-//	std::vector<double> sphi_init(numMixtures, 1);
-//	std::vector<unsigned> geneAssignment;
-//	genome.readRFPData("/Users/alexandercope/Test_PANSE/rfp_data_ignore_pos.csv", false);
-//	Gene gene = genome.getGene(0);
-//	std::vector<unsigned> position = gene.geneData.getPositionCodonID();
-//	std::vector<int> mixture = gene.geneData.getPositionMixture();
-//	std::vector<unsigned long> rfp = gene.geneData.getRFPCount(0);
-//	unsigned codonsPerMRNA = gene.geneData.getCodonCountForCodon(index);
-//	my_print("%\n",codonsPerMRNA);
-//	unsigned currRFPValue = gene.geneData.getCodonSpecificSumRFPCount(index,0 /*RFPCountColumn*/);
-//	my_print("%\n",currRFPValue);
 	    srand(1500);
 	    std::vector <double> alphas;
 	    std::vector <double> lambdas;
 	    std::vector <std::string> cspFiles;
 	    Genome genome;
 		unsigned numMixtures = 1;
-		std::vector<double> sphi_init(numMixtures, 1);
+		std::vector<double> sphi_init(numMixtures, 1.5);
 		std::vector<unsigned> geneAssignment;
-		genome.readRFPData("/Users/alexandercope/Test_PANSE/rfp_data_ignore_pos.csv", false);
+		genome.readRFPData("/Users/alexandercope/Research_projects/Yeast_Nonsense_Error_Analysis/00_data/00_panse_input/2023-06-12_weinberg_etal_2016_all_frames_200_ramp.csv", false);
 		Gene gene = genome.getGene(0);
 		std::vector<unsigned> position = gene.geneData.getPositionCodonID();
 		std::vector<int> mixture = gene.geneData.getPositionMixture();
@@ -1393,30 +1375,30 @@ int main()
 //				//genome.readObservedPhiValues("E:/RibosomeModel/RibModelDev/data/twoMixtures/simulatedAllUniqueR_phi_unevenMixtures.csv", false);
 //			}
 //		}
-		my_print("Initializing CSP\n");
+		my_print("Initializing Values\n");
 		std::vector<std::vector<unsigned>> mixtureDefinitionMatrix;
 		std::string mixDef = Parameter::allUnique;
 		unsigned numElongationMixtures = 1;
-		//PANSEParameter parameter("/Users/alexandercope/Test_PANSE/Test_codon_mix/Test_codon_mix/Results/2022-12-15_simulated_2_mixtures_allUnique_div_truth_same_nse/restart_1/Restart_files/rstartFile.rst_final");
-		PANSEParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, numElongationMixtures, true, mixDef,false);
-		parameter.setPartitionFunction(275222,0,false);
-		parameter.setPartitionFunction(275222,0,true);
 
-	    cspFiles.push_back("/Users/alexandercope/Test_PANSE/Test_codon_mix/Data/Simulation/2_mixtures_allUnique/alpha_1.csv");
-	    //cspFiles.push_back("/Users/alexandercope/Test_PANSE/Test_codon_mix/Data/Simulation/2_mixtures_allUnique/alpha_2.csv");
-	    parameter.initMutationSelectionCategories(cspFiles, 1, parameter.alp);
-
-	    cspFiles[0] = ("/Users/alexandercope/Test_PANSE/Test_codon_mix/Data/Simulation/2_mixtures_allUnique/lambda_1.csv");
-	    //cspFiles[1] = ("/Users/alexandercope/Test_PANSE/Test_codon_mix/Data/Simulation/2_mixtures_allUnique/lambda_2.csv");
-	    parameter.initMutationSelectionCategories(cspFiles, 1, parameter.lmPri);
-
-
-	    cspFiles[0] = ("/Users/alexandercope/Test_PANSE/Test_codon_mix/Data/Simulation/2_mixtures_allUnique/nserate_1.csv");
-	    //cspFiles[1] = ("/Users/alexandercope/Test_PANSE/Test_codon_mix/Data/Simulation/2_mixtures_allUnique/nserate_2.csv");
-	    parameter.initMutationSelectionCategories(cspFiles, 1, parameter.nse);
-	    phi.push_back(1);
-	    phi.push_back(1);
-	    parameter.InitializeSynthesisRate(phi);
+		PANSEParameter parameter(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, numElongationMixtures, true, mixDef,true);
+		parameter.setPartitionFunction(genome.getSumRFP(),0,false);
+		parameter.setPartitionFunction(genome.getSumRFP(),0,true);
+//
+//	    cspFiles.push_back("/Users/alexandercope/Test_PANSE/Test_codon_mix/Data/Simulation/2_mixtures_allUnique/alpha_1.csv");
+//	    //cspFiles.push_back("/Users/alexandercope/Test_PANSE/Test_codon_mix/Data/Simulation/2_mixtures_allUnique/alpha_2.csv");
+//	    parameter.initMutationSelectionCategories(cspFiles, 1, parameter.alp);
+//
+//	    cspFiles[0] = ("/Users/alexandercope/Test_PANSE/Test_codon_mix/Data/Simulation/2_mixtures_allUnique/lambda_1.csv");
+//	    //cspFiles[1] = ("/Users/alexandercope/Test_PANSE/Test_codon_mix/Data/Simulation/2_mixtures_allUnique/lambda_2.csv");
+//	    parameter.initMutationSelectionCategories(cspFiles, 1, parameter.lmPri);
+//
+//
+//	    cspFiles[0] = ("/Users/alexandercope/Test_PANSE/Test_codon_mix/Data/Simulation/2_mixtures_allUnique/nserate_really_high.csv");
+//	    //cspFiles[1] = ("/Users/alexandercope/Test_PANSE/Test_codon_mix/Data/Simulation/2_mixtures_allUnique/nserate_2.csv");
+//	    parameter.initMutationSelectionCategories(cspFiles, 1, parameter.nse);
+//	    phi.push_back(1);
+//	    phi.push_back(1);
+	    parameter.InitializeSynthesisRate(sphi_init[0]);
 
 	    //double nse_1 = parameter.getParameterForCategory(0, 2, "GCA",false);
 	    //double nse_2 = parameter.getParameterForCategory(1, 2, "GCA",false);
@@ -1427,19 +1409,19 @@ int main()
 		PANSEModel model;
 		model.setParameter(parameter);
 		my_print("Initializing MCMCAlgorithm object---------------\n");
-		unsigned samples = 20;
-		unsigned thinning = 2;
+		unsigned samples = 1000;
+		unsigned thinning = 5;
 
 		my_print("\t# Samples: %\n", samples);
 		my_print("\tThinning: %\n", thinning);
-		MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thinning, 10, false, true,false);
+		MCMCAlgorithm mcmc = MCMCAlgorithm(samples, thinning, 20, true, true,true);
 		mcmc.setRestartFileSettings("RestartFile.txt", 20, true);
 		my_print("Done!-------------------------------\n\n\n");
 
 
 		my_print("Running MCMC.............\n\n");
-		mcmc.run(genome, model, 1, 50);
-		my_print("Done!----------------------------------\n\n\nBeginning PA");
+		mcmc.run(genome, model, 1, 0);
+		my_print("Done!----------------------------------\n\n\n");
 
 
 //		PAParameter parameter_pa(sphi_init, numMixtures, geneAssignment, mixtureDefinitionMatrix, true, mixDef);

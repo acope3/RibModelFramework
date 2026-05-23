@@ -776,8 +776,9 @@ void ROCModel::simulateGenome(Genome &genome)
 			SequenceSummary::AAToCodonRange(aa, aaStart, aaEnd, false); //need the first spot in the array where the codons for curAA are
 			codon = sequenceSummary.indexToCodon(aaStart + codonIndex);//get the correct codon based off codonIndex
 			tmpSeq += codon;
-			
-			
+			delete[] codonProb;
+			delete[] mutation;
+			delete[] selection;
 		}
 		std::string codon =	sequenceSummary.indexToCodon((unsigned)Parameter::randUnif(61.0, 64.0)); //randomly choose a stop codon, from range 61-63
 		tmpSeq += codon;
