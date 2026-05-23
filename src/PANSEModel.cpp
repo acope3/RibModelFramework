@@ -564,18 +564,12 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory_PANSE(std::st
 
   }
 
-  
   logAcceptanceRatioForAllMixtures[0] = logPosterior_proposed - logPosterior - (currAdjustmentTerm - propAdjustmentTerm);
   logAcceptanceRatioForAllMixtures[1] = logLikelihood;
   logAcceptanceRatioForAllMixtures[2] = logLikelihood_proposed;
   logAcceptanceRatioForAllMixtures[3] = logPosterior;
   logAcceptanceRatioForAllMixtures[4] = logPosterior_proposed;
-  if (!std::isfinite(logPosterior_proposed) && param == "NSERate")
-  {
-	currNSERate = getParameterForCategory(nseCategory, PANSEParameter::nse, tmp, false);
-	propNSERate = getParameterForCategory(nseCategory, PANSEParameter::nse, tmp, true);
-	my_print("Param %, Codon %, Group % Curr NSE %, Prop NSE % \n", param, tmp, grouping, currNSERate, propNSERate);
-  }
+  
 
 }
 

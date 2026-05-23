@@ -378,8 +378,8 @@ RCPP_MODULE(Parameter_mod)
 		//Constructors & Destructors:
         .constructor()
 		.constructor <std::string>()
-		.constructor <std::vector<double>, std::vector<unsigned>, std::vector<unsigned>, unsigned, bool, bool>()
-		.constructor <std::vector<double>, unsigned, std::vector<unsigned>, unsigned, bool, std::string, bool>()
+		.constructor <std::vector<double>, std::vector<unsigned>, std::vector<unsigned>, unsigned, bool, bool, bool>()
+		.constructor <std::vector<double>, unsigned, std::vector<unsigned>, unsigned, bool, std::string, bool, bool>()
 
 
 
