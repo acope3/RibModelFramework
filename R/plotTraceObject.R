@@ -25,47 +25,48 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
                             mixture = 1,
                             log.10.scale=F,
                             aa.names = aminoAcids(),
+                            legacy.layout = FALSE,
                             ...
                             )
 {
   if(what[1] == "Mutation")
   {
-    plotCodonSpecificParameters(x, mixture, "Mutation", main="Mutation Parameter Traces", aa.names = aa.names)
+    plotCodonSpecificParameters(x, mixture, "Mutation", main="Mutation Parameter Traces", aa.names = aa.names, legacy.layout = legacy.layout)
   }
   if(what[1] == "Selection")
   {
-    plotCodonSpecificParameters(x, mixture, "Selection", main="Selection Parameter Traces", aa.names = aa.names)
+    plotCodonSpecificParameters(x, mixture, "Selection", main="Selection Parameter Traces", aa.names = aa.names, legacy.layout = legacy.layout)
   }
   if(what[1] == "Alpha")
   {
-    plotCodonSpecificParameters(x, mixture, "Alpha", main="Alpha Parameter Traces", ROC.or.FONSE=FALSE, log.10.scale=log.10.scale, aa.names = aa.names)
+    plotCodonSpecificParameters(x, mixture, "Alpha", main="Alpha Parameter Traces", ROC.or.FONSE=FALSE, log.10.scale=log.10.scale, aa.names = aa.names, legacy.layout = legacy.layout)
   }
   if(what[1] == "Lambda")
   {
-    plotCodonSpecificParameters(x, mixture, "Lambda", main="Lambda Parameter Traces", ROC.or.FONSE=FALSE, log.10.scale=log.10.scale, aa.names = aa.names)
-  } 
-  
+    plotCodonSpecificParameters(x, mixture, "Lambda", main="Lambda Parameter Traces", ROC.or.FONSE=FALSE, log.10.scale=log.10.scale, aa.names = aa.names, legacy.layout = legacy.layout)
+  }
+
   if(what[1] == "MeanWaitingTime")
   {
-    plotCodonSpecificParameters(x, mixture, "MeanWaitingTime", main="Mean Waiting Time Parameter Traces", ROC.or.FONSE=FALSE, log.10.scale=log.10.scale, aa.names = aa.names)
-  }  
+    plotCodonSpecificParameters(x, mixture, "MeanWaitingTime", main="Mean Waiting Time Parameter Traces", ROC.or.FONSE=FALSE, log.10.scale=log.10.scale, aa.names = aa.names, legacy.layout = legacy.layout)
+  }
   if(what[1] == "VarWaitingTime")
   {
-    plotCodonSpecificParameters(x, mixture, "VarWaitingTime", main="Variance Waiting Time Parameter Traces", ROC.or.FONSE=FALSE, aa.names = aa.names)
-  }  
+    plotCodonSpecificParameters(x, mixture, "VarWaitingTime", main="Variance Waiting Time Parameter Traces", ROC.or.FONSE=FALSE, aa.names = aa.names, legacy.layout = legacy.layout)
+  }
   if(what[1] == "NSEProb")
   {
-    plotCodonSpecificParameters(x, mixture, "NSEProb", main="Nonsense Error Probability Parameter Traces", ROC.or.FONSE=FALSE, log.10.scale=log.10.scale, aa.names = aa.names)
-  }  
+    plotCodonSpecificParameters(x, mixture, "NSEProb", main="Nonsense Error Probability Parameter Traces", ROC.or.FONSE=FALSE, log.10.scale=log.10.scale, aa.names = aa.names, legacy.layout = legacy.layout)
+  }
   if(what[1] == "MixtureProbability")
   {
     plotMixtureProbability(x)
   }
   if(what[1] == "Sphi")
   {
-    plotHyperParameterTrace(x, what = what[1]) 
+    plotHyperParameterTrace(x, what = what[1])
   }
-  if(what[1] == "Mphi") 
+  if(what[1] == "Mphi")
   {
     plotHyperParameterTrace(x, what = what[1])
   }
@@ -81,7 +82,7 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
   {
     plotPANSEHyperParameterTrace(x,what=what[1])
   }
-  if(what[1] == "Sepsilon") 
+  if(what[1] == "Sepsilon")
   {
     plotHyperParameterTrace(x, what = what[1])
   }
@@ -99,13 +100,54 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
   }
   if(what[1] == "NSERate")
   {
-    plotCodonSpecificParameters(x, mixture, "NSERate", main="NSERate", ROC.or.FONSE=FALSE, log.10.scale=log.10.scale, aa.names = aa.names)
-  }  
+    plotCodonSpecificParameters(x, mixture, "NSERate", main="NSERate", ROC.or.FONSE=FALSE, log.10.scale=log.10.scale, aa.names = aa.names, legacy.layout = legacy.layout)
+  }
+}
+
+.buildTraceLayout <- function(n.slots = 20L) {
+    n.rows.data <- ceiling(n.slots / 4L)
+    x.lbl <- 2L * n.slots + 2L
+    y.lbl <- 2L * n.slots + 3L
+
+    data.mat <- matrix(0L, nrow = n.rows.data, ncol = 8L)
+    pnum <- 2L
+    for (r in seq_len(n.rows.data)) {
+        for (cp in seq_len(4L)) {
+            j <- (cp - 1L) * 2L + 1L
+            if (pnum <= 2L * n.slots) {
+                data.mat[r, j]      <- pnum
+                data.mat[r, j + 1L] <- pnum + 1L
+                pnum <- pnum + 2L
+            }
+        }
+    }
+    title.row <- c(y.lbl, rep(1L, 8L))
+    data.rows <- cbind(y.lbl, data.mat)
+    xlbl.row  <- c(y.lbl, rep(x.lbl, 8L))
+    mat <- rbind(title.row, data.rows, xlbl.row)
+    list(mat     = mat,
+         widths  = c(3, 8, 3, 8, 3, 8, 3, 8, 3),
+         heights = c(3, rep(8, n.rows.data), 2),
+         x.lbl   = x.lbl,
+         y.lbl   = y.lbl)
+}
+
+.plotTraceMarginal <- function(cur.trace, codons, ylim) {
+    par(mar = c(0.5, 0.2, 0.5, 1.2))
+    plot(NULL, NULL, xlim = c(0, 1), ylim = ylim, axes = FALSE, xlab = "", ylab = "")
+    for (k in seq_len(ncol(cur.trace))) {
+        vals <- sort(cur.trace[, k], na.last = NA)
+        n    <- length(vals)
+        if (n < 2L) next
+        lines(seq_len(n) / n, vals, type = "s",
+              col = .codonColors[[codons[k]]], lwd = 0.8)
+    }
+    axis(4, las = 1, tck = 0.04, cex.axis = 0.55)
 }
 
 # Called from Plot Trace Object (plot for trace)
 # NOT EXPOSED
-# 
+#
 #' Plot Codon Specific Parameter
 #' @param trace An Rcpp trace object initialized with \code{initializeTraceObject}.
 #'
@@ -125,29 +167,9 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
 #'
 #' @description Plots a codon-specific set of traces, specified with the \code{type} parameter.
 #'
-plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="Mutation Parameter Traces", ROC.or.FONSE=TRUE, log.10.scale=F, aa.names = aminoAcids())
+plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="Mutation Parameter Traces", ROC.or.FONSE=TRUE, log.10.scale=F, aa.names = aminoAcids(), legacy.layout=FALSE)
 {
-  opar <- par(no.readonly = T) 
-  ### Trace plot.
-  if (ROC.or.FONSE)
-  {
-    nf <- layout(matrix(c(rep(1, 4), 2:21), nrow = 6, ncol = 4, byrow = TRUE),
-               rep(1, 4), c(2, 8, 8, 8, 8, 8), respect = FALSE)  
-  }else
-  {    
-    nf <- layout(matrix(c(rep(1, 4), 2:25), nrow = 7, ncol = 4, byrow = TRUE),
-                    rep(1, 4), c(2, 8, 8, 8, 8, 8, 8), respect = FALSE) 
-  }
-  ### Plot title.
-  if (ROC.or.FONSE){
-    par(mar = c(0, 0, 0, 0))
-  }else{
-    par(mar = c(1,1,1,1))
-  }
-  plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
-  text(0.5, 0.6, main)
-  text(0.5, 0.4, date(), cex = 0.6)
-  par(mar = c(5.1, 4.1, 4.1, 2.1))
+  opar <- par(no.readonly = T)
 
   ### TODO change to groupList -> checks for ROC like model is not necessary!
 
@@ -167,130 +189,177 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
   }
   with.ref.codon <- ifelse(ROC.or.FONSE, TRUE, FALSE)
 
-  for(aa in aa.names)
-  { 
-    codons <- AAToCodon(aa, with.ref.codon)
-    if(length(codons) == 0) next
-    if (!ROC.or.FONSE){
-      if(aa == "X") next
-    }
-    if (ROC.or.FONSE){
-      if(aa == "X" || aa == "M" || aa == "W") next
-    }
-    cur.trace <- vector("list", length(codons))
+  ## Determine ylab and extraction parameters once (shared by both layout branches)
+  if(type == "Mutation"){
+    ylab <- expression(Delta~"M")
     paramType <- 0
-    if(type == "Mutation"){
-      ylab <- expression(Delta~"M")
-      paramType <- 0
-      special <- FALSE
-    }else if (type == "Selection"){
-      ylab <- expression(Delta~eta)
-      paramType <- 1
-      special <- FALSE
-    }else if (type == "Alpha"){
-      if (log.10.scale)
-        {
-          ylab <- expression("log"[10]*alpha)
-        } else{
-          ylab <- expression(alpha)
-        }
-      paramType <- 0
-      special <- FALSE
-    }else if (type == "Lambda"){
-       if (log.10.scale)
-        {
-          ylab <- expression("log"[10]*lambda)
-        } else{
-          ylab <- expression(lambda)
-        }
-      paramType <- 1
-      special <- FALSE
-    }else if (type == "MeanWaitingTime"){
-      if (log.10.scale)
-      {
-        ylab <- expression("log"[10]*alpha/lambda)
-      }else{
-        ylab <- expression(alpha/lambda)
-      }
-      special <- TRUE
-    }else if (type == "VarWaitingTime"){
-      ylab <- expression(alpha/lambda^"2")
-      special <- TRUE
-    }else if (type == "NSEProb"){
-        if (log.10.scale)
-        {
-          ylab <- expression("log"[10]*"Pr(NSE)")
-        } else{
-          ylab <- expression("E[Pr(NSE)]")
-        }
-        special <- TRUE
-    }else if (type == "VarNSEProb"){
-        ylab <- expression("Var[Pr(NSE)]")
-        special <- TRUE
-    }else if (type == "NSERate"){
-      if (log.10.scale)
-      {
-        ylab <- expression("log"[10]*"NSERate")
-      } else{
-        ylab <- expression("NSERate")
-      }
-      paramType <- 2
-      special <- FALSE
-    }else{
-      stop("Parameter 'type' not recognized! Must be one of: 'Mutation', 'Selection', 'Alpha', 'Lambda', 'MeanWaitingTime', 'VarWaitingTime', 'NSEProb', 'NSERate'.")
-    }
-
-    for(i in 1:length(codons)){
-      if(special){
-        tmpAlpha <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], 0, with.ref.codon)
-        tmpLambdaPrime <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], 1, with.ref.codon)
-        
-        if (type == "MeanWaitingTime"){          
-          cur.trace[[i]] <- tmpAlpha / tmpLambdaPrime
-        }else if (type == "VarWaitingTime"){
-          cur.trace[[i]] <- tmpAlpha / (tmpLambdaPrime * tmpLambdaPrime)
-        } else if (type == "NSEProb" || type == "VarNSEProb"){
-          tmpNSERate <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], 2, with.ref.codon)
-          if (type == "NSEProb")
-          {
-            cur.trace[[i]] <- tmpNSERate*(tmpAlpha/tmpLambdaPrime)
-            } else {
-              cur.trace[[i]] <- tmpNSERate*tmpNSERate*(tmpAlpha/(tmpLambdaPrime * tmpLambdaPrime))
-            }
-        }
-        if (log.10.scale)
-        {
-          cur.trace[[i]] <- log10(cur.trace[[i]])
-        }
-      }
-      else{
-        cur.trace[[i]] <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], paramType, with.ref.codon)
-        if (log.10.scale)
-        {
-          cur.trace[[i]] <- log10(cur.trace[[i]])
-        }
-      }
-    }
-
-    cur.trace <- do.call("cbind", cur.trace)
-    if(length(cur.trace) == 0) next
-    x <- 1:dim(cur.trace)[1]
-    xlim <- range(x)
-    ylim <- range(cur.trace, na.rm=T)
-    
-    main.aa <- aa #TODO map to three leter code
-    plot(NULL, NULL, xlim = xlim, ylim = ylim,
-         xlab = "Samples", ylab = ylab, main = main.aa)
-    plot.order <- order(apply(cur.trace, 2, sd), decreasing = TRUE)
-    for(i.codon in plot.order){
-      lines(x = x, y = cur.trace[, i.codon], col = .codonColors[[codons[i.codon]]])
-    }
-    colors <- unlist(.codonColors[codons])
-    legend("topleft", legend = codons, col = colors, 
-           lty = rep(1, length(codons)), bty = "n", cex = 0.75)
+    special <- FALSE
+  }else if (type == "Selection"){
+    ylab <- expression(Delta~eta)
+    paramType <- 1
+    special <- FALSE
+  }else if (type == "Alpha"){
+    ylab <- if (log.10.scale) expression("log"[10]*alpha) else expression(alpha)
+    paramType <- 0
+    special <- FALSE
+  }else if (type == "Lambda"){
+    ylab <- if (log.10.scale) expression("log"[10]*lambda) else expression(lambda)
+    paramType <- 1
+    special <- FALSE
+  }else if (type == "MeanWaitingTime"){
+    ylab <- if (log.10.scale) expression("log"[10]*alpha/lambda) else expression(alpha/lambda)
+    special <- TRUE
+  }else if (type == "VarWaitingTime"){
+    ylab <- expression(alpha/lambda^"2")
+    special <- TRUE
+  }else if (type == "NSEProb"){
+    ylab <- if (log.10.scale) expression("log"[10]*"Pr(NSE)") else expression("E[Pr(NSE)]")
+    special <- TRUE
+  }else if (type == "VarNSEProb"){
+    ylab <- expression("Var[Pr(NSE)]")
+    special <- TRUE
+  }else if (type == "NSERate"){
+    ylab <- if (log.10.scale) expression("log"[10]*"NSERate") else expression("NSERate")
+    paramType <- 2
+    special <- FALSE
+  }else{
+    stop("Parameter 'type' not recognized! Must be one of: 'Mutation', 'Selection', 'Alpha', 'Lambda', 'MeanWaitingTime', 'VarWaitingTime', 'NSEProb', 'NSERate'.")
   }
+
+  ## Extract MCMC trace for one amino acid as a matrix (one column per codon)
+  .extractTrace <- function(aa) {
+    codons <- AAToCodon(aa, with.ref.codon)
+    tr <- vector("list", length(codons))
+    for (i in seq_along(codons)) {
+      if (special) {
+        tmpAlpha       <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], 0, with.ref.codon)
+        tmpLambdaPrime <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], 1, with.ref.codon)
+        if (type == "MeanWaitingTime") {
+          tr[[i]] <- tmpAlpha / tmpLambdaPrime
+        } else if (type == "VarWaitingTime") {
+          tr[[i]] <- tmpAlpha / (tmpLambdaPrime * tmpLambdaPrime)
+        } else if (type %in% c("NSEProb", "VarNSEProb")) {
+          tmpNSERate <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], 2, with.ref.codon)
+          tr[[i]] <- if (type == "NSEProb")
+            tmpNSERate * (tmpAlpha / tmpLambdaPrime)
+          else
+            tmpNSERate * tmpNSERate * (tmpAlpha / (tmpLambdaPrime * tmpLambdaPrime))
+        }
+        if (log.10.scale) tr[[i]] <- log10(tr[[i]])
+      } else {
+        tr[[i]] <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(mixture, codons[i], paramType, with.ref.codon)
+        if (log.10.scale) tr[[i]] <- log10(tr[[i]])
+      }
+    }
+    do.call("cbind", tr)
+  }
+
+  if (!legacy.layout) {
+    ## --- compact layout branch ---
+
+    ## Pre-compute valid AAs so n.slots is known before layout() is called
+    valid.aas <- Filter(function(aa) {
+      cods <- AAToCodon(aa, with.ref.codon)
+      if (length(cods) == 0) return(FALSE)
+      if (ROC.or.FONSE && aa %in% c("X", "M", "W")) return(FALSE)
+      if (!ROC.or.FONSE && aa == "X") return(FALSE)
+      TRUE
+    }, aa.names)
+
+    if (length(valid.aas) == 0) { par(opar); return(invisible(NULL)) }
+
+    lo <- .buildTraceLayout(n.slots = length(valid.aas))
+    layout(lo$mat, widths = lo$widths, heights = lo$heights, respect = FALSE)
+
+    ## panel 1: title
+    par(mar = c(0, 0, 0, 0))
+    plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
+    text(0.5, 0.6, main)
+    text(0.5, 0.4, date(), cex = 0.6)
+
+    for (aa in valid.aas) {
+      codons    <- AAToCodon(aa, with.ref.codon)
+      cur.trace <- .extractTrace(aa)
+      if (length(cur.trace) == 0) next
+
+      x    <- seq_len(nrow(cur.trace))
+      xlim <- range(x)
+      ylim <- range(cur.trace, na.rm = TRUE)
+
+      ## trace panel (panels 2, 4, 6, ... in layout order)
+      par(mar = c(0.5, 2.0, 1.5, 0.2))
+      plot(NULL, NULL, xlim = xlim, ylim = ylim, xlab = "", ylab = "", axes = FALSE)
+      plot.order <- order(apply(cur.trace, 2, sd), decreasing = TRUE)
+      for (i.codon in plot.order) {
+        lines(x = x, y = cur.trace[, i.codon], col = .codonColors[[codons[i.codon]]])
+      }
+      axis(2, las = 1, cex.axis = 0.6)
+      axis(1, tck = 0.02, labels = FALSE)
+      colors <- unlist(.codonColors[codons])
+      legend("topleft", legend = codons, col = colors,
+             lty = rep(1, length(codons)), bty = "n", cex = 0.6)
+      mtext(aa, side = 3, line = 0.2, cex = 0.9)
+
+      ## marginal ECDF panel (panels 3, 5, 7, ... in layout order)
+      .plotTraceMarginal(cur.trace, codons, ylim)
+    }
+
+    ## x-label panel
+    par(mar = c(0, 0, 0, 0))
+    plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
+    text(0.5, 0.5, "Samples")
+
+    ## y-label panel
+    par(mar = c(0, 0, 0, 0))
+    plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
+    text(0.5, 0.5, ylab, srt = 90)
+
+  } else {
+    ## --- legacy layout branch (original behavior) ---
+    if (ROC.or.FONSE) {
+      nf <- layout(matrix(c(rep(1, 4), 2:21), nrow = 6, ncol = 4, byrow = TRUE),
+                   rep(1, 4), c(2, 8, 8, 8, 8, 8), respect = FALSE)
+    } else {
+      nf <- layout(matrix(c(rep(1, 4), 2:25), nrow = 7, ncol = 4, byrow = TRUE),
+                   rep(1, 4), c(2, 8, 8, 8, 8, 8, 8), respect = FALSE)
+    }
+    if (ROC.or.FONSE) {
+      par(mar = c(0, 0, 0, 0))
+    } else {
+      par(mar = c(1, 1, 1, 1))
+    }
+    plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
+    text(0.5, 0.6, main)
+    text(0.5, 0.4, date(), cex = 0.6)
+    par(mar = c(5.1, 4.1, 4.1, 2.1))
+
+    for (aa in aa.names) {
+      codons <- AAToCodon(aa, with.ref.codon)
+      if (length(codons) == 0) next
+      if (!ROC.or.FONSE && aa == "X") next
+      if (ROC.or.FONSE && aa %in% c("X", "M", "W")) next
+      cur.trace <- .extractTrace(aa)
+      if (length(cur.trace) == 0) next
+
+      x    <- seq_len(nrow(cur.trace))
+      xlim <- range(x)
+      ylim <- range(cur.trace, na.rm = TRUE)
+
+      main.aa <- aa #TODO map to three letter code
+      plot(NULL, NULL, xlim = xlim, ylim = ylim,
+           xlab = "Samples", ylab = ylab, main = main.aa)
+      plot.order <- order(apply(cur.trace, 2, sd), decreasing = TRUE)
+      for (i.codon in plot.order) {
+        lines(x = x, y = cur.trace[, i.codon], col = .codonColors[[codons[i.codon]]])
+      }
+      colors <- unlist(.codonColors[codons])
+      legend("topleft", legend = codons, col = colors,
+             lty = rep(1, length(codons)), bty = "n", cex = 0.75)
+    }
+  }
+
   par(opar)
-} 
+}
 
 # Called from Plot Trace Object (plot for trace)
 # NOT EXPOSED
