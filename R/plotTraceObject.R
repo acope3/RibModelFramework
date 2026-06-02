@@ -304,13 +304,13 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
       .plotTraceMarginal(cur.trace, codons, ylim)
     }
 
-    ## x-label panel
-    par(mar = c(0, 0, 0, 0))
+    ## x-label panel (xpd=FALSE prevents axis-call residue from bleeding)
+    par(mar = c(0, 0, 0, 0), xpd = FALSE)
     plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
     text(0.5, 0.5, "Samples")
 
     ## y-label panel
-    par(mar = c(0, 0, 0, 0))
+    par(mar = c(0, 0, 0, 0), xpd = FALSE)
     plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
     text(0.5, 0.5, ylab, srt = 90)
 

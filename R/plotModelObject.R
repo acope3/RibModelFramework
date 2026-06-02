@@ -104,13 +104,13 @@ plot.Rcpp_ROCModel <- function(x, genome = NULL, samples = 100, mixture = 1,
     axis(2, las = 1, cex.axis = 0.7)
     mtext("n", side = 2, las = 1, line = 1.5, cex = 0.7)
 
-    # x-label
-    par(mar = c(0, 0, 0, 0))
+    # x-label (xpd=FALSE prevents axis-call residue from bleeding into adjacent panels)
+    par(mar = c(0, 0, 0, 0), xpd = FALSE)
     plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
     text(0.5, 0.5, expression("log"[10]~"(Protein Synthesis Rate"~phi~")"))
 
     # y-label
-    par(mar = c(0, 0, 0, 0))
+    par(mar = c(0, 0, 0, 0), xpd = FALSE)
     plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
     text(0.5, 0.5, "Proportion", srt = 90)
 
@@ -286,13 +286,13 @@ plot.Rcpp_FONSEModel <- function(x, genome, samples = 100, mixture = 1,
     axis(2, las = 1, cex.axis = 0.7)
     mtext("n", side = 2, las = 1, line = 1.5, cex = 0.7)
 
-    # x-label
-    par(mar = c(0, 0, 0, 0))
+    # x-label (xpd=FALSE prevents axis-call residue from bleeding into adjacent panels)
+    par(mar = c(0, 0, 0, 0), xpd = FALSE)
     plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
     text(0.5, 0.5, expression("log"[10]~"(Protein Synthesis Rate"~phi~")"))
 
     # y-label
-    par(mar = c(0, 0, 0, 0))
+    par(mar = c(0, 0, 0, 0), xpd = FALSE)
     plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
     text(0.5, 0.5, "Proportion", srt = 90)
 
