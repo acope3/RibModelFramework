@@ -182,110 +182,161 @@ plot.Rcpp_ROCModel <- function(x, genome = NULL, samples = 100, mixture = 1,
 #' Otherwise, the expression values plotted will just be SCUO values estimated upon
 #' initialization of the Parameter object.
 #'
-plot.Rcpp_FONSEModel <- function(x, genome, samples = 100, mixture = 1, 
-                               simulated = FALSE, codon.window = NULL,...)
+plot.Rcpp_FONSEModel <- function(x, genome, samples = 100, mixture = 1,
+                               simulated = FALSE, codon.window = NULL,
+                               legacy.layout = FALSE, ...)
 {
   model <- x
-  opar <- par(no.readonly = T) 
-  
+  opar <- par(no.readonly = T)
+
   input_list <- as.list(list(...))
-  
   if("main" %in% names(input_list)){
     main <- input_list$main
     input_list$main <- NULL
   }else{
     main <- ""
   }
-  
-  mat <- matrix(c(rep(1, 4), 2:21, rep(22, 4)),
-                nrow = 7, ncol = 4, byrow = TRUE)
-  mat <- cbind(rep(23, 7), mat, rep(24, 7))
-  nf <- layout(mat, c(3, rep(8, 4), 2), c(3, 8, 8, 8, 8, 8, 3), respect = FALSE)
-  ### Plot title.
-  par(mar = c(0, 0, 0, 0))
-  plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
-  text(0.5, 0.6, main)
-  text(0.5, 0.4, date(), cex = 0.6)
-  
+
   num.genes <- length(genome)
   parameter <- model$getParameter()
-  
-  mixtureAssignment <- unlist(lapply(1:num.genes,  function(geneIndex){parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))
+  mixtureAssignment <- unlist(lapply(1:num.genes, function(geneIndex){
+      parameter$getEstimatedMixtureAssignmentForGene(samples, geneIndex)}))
   genes.in.mixture <- which(mixtureAssignment == mixture)
   expressionCategory <- parameter$getSynthesisRateCategoryForMixture(mixture)
-
-  
-  # need expression values to know range
   num.genes <- length(genes.in.mixture)
   expressionValues <- unlist(lapply(genes.in.mixture, function(geneIndex){
-      parameter$getSynthesisRatePosteriorMeanForGene(samples, geneIndex, FALSE)
-    }))  
-
+      parameter$getSynthesisRatePosteriorMeanForGene(samples, geneIndex, FALSE)}))
   expressionValues <- log10(expressionValues)
   genome <- genome$getGenomeForGeneIndices(genes.in.mixture, simulated)
   genes <- genome$getGenes(simulated)
   genome$clear()
-  if (is.null(codon.window))
-  {
-    codon.window <- seq(1,100000)
-  } else if (length(codon.window) == 2)
-  {
-    codon.window <- seq(codon.window[1],codon.window[2])
+
+  if (is.null(codon.window)) {
+    codon.window <- seq(1, 100000)
+  } else if (length(codon.window) == 2) {
+    codon.window <- seq(codon.window[1], codon.window[2])
   }
-  for (i in 1:length(genes))
-  {
-    dna <- genes[[i]]$seq
+  for (i in seq_along(genes)) {
+    dna   <- genes[[i]]$seq
     start <- seq(1, nchar(dna), 3)
     stop  <- pmin(start + 2, nchar(dna))
-    codons <- substring(dna,start,stop)
-    codons <- codons[codon.window]
-    codons <- codons[which(is.na(codons) == F)]
-    dna <- paste(codons,collapse='')
-    genes[[i]]$seq <- dna
-    genome$addGene(genes[[i]],simulated)
+    cods  <- substring(dna, start, stop)
+    cods  <- cods[codon.window]
+    cods  <- cods[!is.na(cods)]
+    genes[[i]]$seq <- paste(cods, collapse = '')
+    genome$addGene(genes[[i]], simulated)
   }
   names.aa <- aminoAcids()
-  for(aa in names.aa)
-  {
-    if(aa == "M" || aa == "W" || aa == "X") next
-    codon.probability <- calculateProbabilityVector(parameter,model,expressionValues,mixture,samples,aa,model.type="FONSE",codon.window = codon.window)
-    xlimit <- plotSinglePanel(parameter, model, genome, expressionValues, samples, mixture, aa,codon.probability = codon.probability)
-    box()
-    main.aa <- aa #TODO map to three letter code
-    text(mean(xlimit), 1, main.aa, cex = 1.5)
-    if(aa %in% c("A", "F", "K", "Q", "V")){
-      axis(2, las=1)
+
+  if (!legacy.layout) {
+    # -- compact layout: interleaved AA + marginal columns, n-per-bin strip --
+    quantiles     <- quantile(expressionValues, probs = seq(0.05, 0.95, 0.05), na.rm = TRUE)
+    xlimit.global <- range(expressionValues, na.rm = TRUE)
+    bin.counts    <- NULL
+    bin.mids      <- NULL
+
+    lay <- .buildModelLayout(20L)
+    layout(lay$mat, lay$widths, lay$heights, respect = FALSE)
+
+    # title
+    par(mar = c(0, 0, 0, 0))
+    plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
+    text(0.5, 0.6, main)
+    text(0.5, 0.4, date(), cex = 0.6)
+
+    for(aa in names.aa) {
+      if(aa == "M" || aa == "W" || aa == "X") next
+      codon.probability <- calculateProbabilityVector(
+          parameter, model, expressionValues, mixture, samples, aa,
+          model.type = "FONSE", codon.window = codon.window)
+      result <- plotSinglePanel(parameter, model, genome, expressionValues,
+                                samples, mixture, aa, codon.probability,
+                                precomputed.quantiles = quantiles)
+      xlimit <- result$xlimit
+      if(is.null(bin.counts)) {
+        bin.counts <- result$bin.counts
+        bin.mids   <- result$bin.mids
+      }
+      box()
+      text(mean(xlimit), 1, aa, cex = 1.5)
+      if(aa %in% c("A", "F", "K", "Q", "V")) axis(2, las = 1)
+      if(aa %in% c("T", "V", "Y", "Z"))       axis(1)
+      if(aa %in% c("A", "C", "D", "E"))       axis(3)
+      if(aa %in% c("E", "I", "P", "T"))       axis(4, las = 1)
+      axis(1, tck = 0.02, labels = FALSE)
+      axis(2, tck = 0.02, labels = FALSE)
+      axis(3, tck = 0.02, labels = FALSE)
+      axis(4, tck = 0.02, labels = FALSE)
+      # marginal ECDF panel (paired with this AA panel)
+      .plotCodonECDF(result$codonCounts, result$codons)
     }
-    if(aa %in% c("T", "V", "Y", "Z")){
-      axis(1)
+
+    # phi histogram (right column)
+    hist.values <- hist(expressionValues, plot = FALSE, nclass = 30)
+    par(mar = c(2, 0.2, 0.5, 1.5))
+    plot(hist.values, axes = FALSE, main = "", xlab = "", ylab = "")
+    axis(1, cex.axis = 0.8); axis(4, las = 1, cex.axis = 0.8)
+
+    # n-per-bin strip
+    par(mar = c(1.5, 2.5, 0.2, 0.5))
+    plot(bin.mids, bin.counts, type = "h",
+         xlim = xlimit.global, ylim = c(0, max(bin.counts, na.rm = TRUE) * 1.15),
+         xlab = "", ylab = "", axes = FALSE, lwd = 3, col = "gray50", lend = 1)
+    axis(1, cex.axis = 0.8)
+    axis(2, las = 1, cex.axis = 0.7)
+    mtext("n", side = 2, las = 1, line = 1.5, cex = 0.7)
+
+    # x-label
+    par(mar = c(0, 0, 0, 0))
+    plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
+    text(0.5, 0.5, expression("log"[10]~"(Protein Synthesis Rate"~phi~")"))
+
+    # y-label
+    par(mar = c(0, 0, 0, 0))
+    plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
+    text(0.5, 0.5, "Proportion", srt = 90)
+
+  } else {
+    # -- legacy layout (original code, unchanged) --
+    mat <- matrix(c(rep(1, 4), 2:21, rep(22, 4)),
+                  nrow = 7, ncol = 4, byrow = TRUE)
+    mat <- cbind(rep(23, 7), mat, rep(24, 7))
+    nf <- layout(mat, c(3, rep(8, 4), 2), c(3, 8, 8, 8, 8, 8, 3), respect = FALSE)
+    par(mar = c(0, 0, 0, 0))
+    plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
+    text(0.5, 0.6, main)
+    text(0.5, 0.4, date(), cex = 0.6)
+
+    for(aa in names.aa) {
+      if(aa == "M" || aa == "W" || aa == "X") next
+      codon.probability <- calculateProbabilityVector(
+          parameter, model, expressionValues, mixture, samples, aa,
+          model.type = "FONSE", codon.window = codon.window)
+      result <- plotSinglePanel(parameter, model, genome, expressionValues,
+                                samples, mixture, aa, codon.probability)
+      xlimit <- result$xlimit
+      box()
+      main.aa <- aa #TODO map to three letter code
+      text(mean(xlimit), 1, main.aa, cex = 1.5)
+      if(aa %in% c("A", "F", "K", "Q", "V")) axis(2, las = 1)
+      if(aa %in% c("T", "V", "Y", "Z"))       axis(1)
+      if(aa %in% c("A", "C", "D", "E"))       axis(3)
+      if(aa %in% c("E", "I", "P", "T"))       axis(4, las = 1)
+      axis(1, tck = 0.02, labels = FALSE)
+      axis(2, tck = 0.02, labels = FALSE)
+      axis(3, tck = 0.02, labels = FALSE)
+      axis(4, tck = 0.02, labels = FALSE)
     }
-    if(aa %in% c("A", "C", "D", "E")){
-      axis(3)
-    }
-    if(aa %in% c("E", "I", "P", "T")){
-      axis(4, las=1)
-    }
-    axis(1, tck = 0.02, labels = FALSE)
-    axis(2, tck = 0.02, labels = FALSE)
-    axis(3, tck = 0.02, labels = FALSE)
-    axis(4, tck = 0.02, labels = FALSE)    
+
+    hist.values <- hist(expressionValues, plot = FALSE, nclass = 30)
+    plot(hist.values, axes = FALSE, main = "", xlab = "", ylab = "")
+    axis(1); axis(4, las = 1)
+    plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
+    text(0.5, 0.2, expression("log"[10]~"(Protein Synthesis Rate"~phi~")"))
+    plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
+    text(0.5, 0.5, "Propotion", srt = 90)
   }
-  
-  ## adding a histogram of phi values to plot
-  hist.values <- hist(expressionValues, plot=FALSE, nclass=30)
-  plot(hist.values, axes = FALSE, main = "", xlab = "", ylab = "")
-  axis(1)
-  axis(4, las=1)
-  
-  ### Plot xlab.
-  plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
-  text(0.5, 0.2, expression("log"[10]~"(Protein Synthesis Rate"~phi~")"))  
-  #text(0.5, 0.5, "Production Rate (log10)")
-  
-  ### Plot ylab.
-  plot(NULL, NULL, xlim = c(0, 1), ylim = c(0, 1), axes = FALSE)
-  text(0.5, 0.5, "Propotion", srt = 90)
-  
+
   par(opar)
 }
 
