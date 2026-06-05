@@ -205,14 +205,30 @@ int CovarianceMatrix::getNumVariates()
 
 std::vector<double> CovarianceMatrix::transformIidNumbersIntoCovaryingNumbers(std::vector <double> iidNumbers)
 {
+    // Returns Y = L * Z, where L is the lower-triangular Cholesky factor of
+    // covMatrix (L * L^T = covMatrix) and Z is the input vector of iid
+    // N(0,1) variates.  Cov(Y) = L * L^T = covMatrix.
+    //
+    // Row-major layout: choleskyMatrix[i * numVariates + k] = L[i, k].
+    //
+    // Bug history (fixed 2026-05-22): pre-fix the inner term was
+    //     choleskyMatrix[k * numVariates + i]  // = L[k, i] = (L^T)[i, k]
+    // which computes Y = L^T * Z instead of L * Z.  Y = L^T * Z has
+    // covariance L^T * L, which has the same eigenvalues as covMatrix but
+    // different eigenvectors -- the proposal cov was a rotated proxy of
+    // the stored cov.  The MH chain remained correct (proposal is still
+    // symmetric so detailed balance holds), so converged posteriors are
+    // unaffected.  But every adapter that mutates covMatrix was acting on
+    // the wrong matrix relative to what proposals actually used, so
+    // adaptive proposal-width schemes could not converge to the
+    // theoretical optimum cov.
     std::vector<double> covaryingNumbers;
     for (unsigned i = 0u; i < numVariates; i++)
     {
         double sum = 0.0;
         for (unsigned k = 0u; k < numVariates; k++)
         {
-			// testing if [i * numVariates + k] or [k * numVariates + i], first option was default
-            sum += choleskyMatrix[k * numVariates + i] * iidNumbers[k];
+            sum += choleskyMatrix[i * numVariates + k] * iidNumbers[k];
         }
 
         covaryingNumbers.push_back(sum);
