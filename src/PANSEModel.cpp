@@ -222,8 +222,7 @@ void PANSEModel::calculateLogLikelihoodRatioPerGene(Gene& gene, unsigned geneInd
         {
           codonMixture = codonMixture_w_flag - 1; //if positive, get codonMixture
         } else{
-          my_print("ERROR: Your column indicating elongation mixtures contains 0. Should be a non-zero positive (include position in likelihood) or negative (use only for sigma) number. Exiting program.\n");
-          exit(1);
+          Rcpp::stop("Elongation mixture column contains 0. Must be non-zero positive (include in likelihood) or negative (sigma only).");
         }
         codonIndex = positions[positionIndex];
         if (codonMixture_w_flag > 0)
@@ -313,12 +312,14 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
 
     fillMatrices(genome);
     //my_print("start!\n");
+    bool had_omp_error_1 = false;
 #ifdef _OPENMP
 //#ifndef __APPLE__
 #pragma omp parallel for private(gene,currAlpha,currLambda,currNSERate,propAlpha,propLambda,propNSERate,alphaCategory, lambdaCategory, nseCategory) reduction(+:logLikelihood,logLikelihood_proposed)
 #endif
     for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
     {
+        if (had_omp_error_1) continue;
     	unsigned long positionalRFPCount;
       int codonMixture, codonMixture_w_flag;
     	unsigned codonIndex;
@@ -361,8 +362,9 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
             {
               codonMixture = codonMixture_w_flag - 1; //if positive, get codonMixture
             } else{
-              my_print("ERROR: Your column indicating elongation mixtures contains 0. Should be a non-zero positive (include position in likelihood) or negative (use only for sigma) number. Exiting program.\n");
-              exit(1);
+              #pragma omp critical
+              { had_omp_error_1 = true; }
+              break;
             }
             codonIndex = positions[positionIndex];
             positionalRFPCount = rfpCounts[positionIndex];
@@ -468,7 +470,9 @@ void PANSEModel::calculateLogLikelihoodRatioPerGroupingPerCategory(std::string g
             currSigma = currSigma + prob_successful[codonMixture][codonIndex];
         }
     }
-	    
+    if (had_omp_error_1) {
+        Rcpp::stop("Elongation mixture column contains 0. Must be non-zero positive (include in likelihood) or negative (sigma only).");
+    }
 
     for (unsigned j = 0; j < n; j++)
     {
@@ -579,13 +583,15 @@ void PANSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
 
     unsigned long Y = genome.getSumRFP();
     fillMatrices(genome);
-  
+    bool had_omp_error_2 = false;
+
 #ifdef _OPENMP
 //#ifndef __APPLE__
 #pragma omp parallel for private(gene,currAlpha,currLambda,currNSERate,alphaCategory,lambdaCategory,nseCategory) reduction(+:logLikelihood,logLikelihood_proposed)
 #endif
     for (unsigned i = 0u; i < genome.getGenomeSize(); i++)
     {
+        if (had_omp_error_2) continue;
 
         unsigned long positionalRFPCount;
         unsigned codonIndex;
@@ -625,8 +631,9 @@ void PANSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
             {
               codonMixture = codonMixture_w_flag - 1; //if positive, get codonMixture
             } else{
-              my_print("ERROR: Your column indicating elongation mixtures contains 0. Should be a non-zero positive (include position in likelihood) or negative (use only for sigma) number. Exiting program.\n");
-              exit(1);
+              #pragma omp critical
+              { had_omp_error_2 = true; }
+              break;
             }
             positionalRFPCount = rfpCounts[positionIndex];
             codonIndex = positions[positionIndex];
@@ -660,7 +667,10 @@ void PANSEModel::calculateLogLikelihoodRatioForHyperParameters(Genome &genome, u
             currSigma = currSigma + prob_successful[codonMixture][codonIndex];
             propSigma = propSigma + prob_successful[codonMixture][codonIndex];
         }
-          
+
+    }
+    if (had_omp_error_2) {
+        Rcpp::stop("Elongation mixture column contains 0. Must be non-zero positive (include in likelihood) or negative (sigma only).");
     }
 
     for (unsigned j = 0; j < n; j++)
@@ -1366,8 +1376,8 @@ void PANSEModel::simulateGenome(Genome &genome)
             rfpCount.push_back(simulatedValue);
 #endif
         }
-        std::cout << std::setprecision(15) << std::fixed;
-        std::cout << gene.getId() << "\t" << std::log(sigma) << "\t" << sigma << "\n";
+        Rcpp::Rcout << std::setprecision(15) << std::fixed;
+        Rcpp::Rcout << gene.getId() << "\t" << std::log(sigma) << "\t" << sigma << "\n";
         tmpGene.geneData.setRFPCount(rfpCount, RFPCountColumn);
         genome.addGene(tmpGene, true);
     }
@@ -1790,13 +1800,11 @@ double PANSEModel::calculateLogLikelihoodR(Genome &genome, std::vector<double> _
   unsigned numParam = groups.size();
   if ((_alpha.size() % numParam != 0) || (_lambda.size() % numParam != 0) || (_NSERate.size() % numParam != 0))
   {
-    my_print("ERROR: alpha, lambda, and NSERate must be a multiple of the number of codons (61).\n");
-    std::exit(1);
+    Rcpp::stop("alpha, lambda, and NSERate must each be a multiple of the number of sense codons (61).");
   }
   if (_alpha.size() != _lambda.size() || _alpha.size() != _NSERate.size())
   {
-    my_print("ERROR: alpha, lambda, and NSERate must be the same size. If you are trying to share the same parameter values across elongation mixture, then these values should be included twice.\n");
-    std::exit(1);
+    Rcpp::stop("alpha, lambda, and NSERate must be the same size. To share values across elongation mixtures, duplicate the values.");
   }
   numElongationMixtures = _alpha.size()/numParam;
   alpha.resize(numElongationMixtures);

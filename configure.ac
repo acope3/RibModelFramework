@@ -15,10 +15,8 @@ if test -z "${R_HOME}"; then
 fi
 
 RBIN="${R_HOME}/bin/R"
-CXX11=`"${RBIN}" CMD config CXX11`
-CXX11STD=`"${RBIN}" CMD config CXX11STD`
-CXX="${CXX11} ${CXX11STD}"
-CXXFLAGS=`"${RBIN}" CMD config CXX11FLAGS`
+CXX=`"${RBIN}" CMD config CXX`
+CXXFLAGS=`"${RBIN}" CMD config CXXFLAGS`
 
 ## Package requires C++
 AC_LANG(C++)

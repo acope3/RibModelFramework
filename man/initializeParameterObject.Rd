@@ -18,11 +18,15 @@ initializeParameterObject(
   mutation.prior.mean = 0,
   mutation.prior.sd = 0.35,
   propose.by.prior = FALSE,
+  selection.prior.mean = 0,
+  selection.prior.sd = 100,
   init.csp.variance = 0.0025,
   init.sepsilon = 0.1,
   init.w.obs.phi = FALSE,
+  init.by.random = FALSE,
   init.initiation.cost = 4,
-  init.partition.function = 1
+  init.partition.function = 1,
+  numElongationMixtures = 1
 )
 }
 \arguments{
@@ -85,20 +89,28 @@ the number of mutation categories definded by user.}
 
 \item{propose.by.prior}{Mutation bias parameters will be proposed based on the means and standard deviations set in mutation.prior.mean and mutation.prior.sd}
 
+\item{selection.prior.mean}{Controlling the mean of the normal prior on selection parameters. Default is 0.}
+
+\item{selection.prior.sd}{Controlling the standard deviation of the normal prior on selection parameters. Default is 100.}
+
 \item{init.csp.variance}{specifies the initial proposal width for codon specific parameter (default is 0.0025). 
 The proposal width adapts during the runtime to reach a taget acceptance rate of ~0.25}
 
 \item{init.sepsilon}{specifies the initial value for sepsilon. default is 0.1}
 
-\item{init.w.obs.phi}{If TRUE, initialize phi values with observed phi values 
-(data from RNAseq, mass spectrometry, ribosome footprinting) Default is FALSE. 
+\item{init.w.obs.phi}{If TRUE, initialize phi values with observed phi values
+(data from RNAseq, mass spectrometry, ribosome footprinting) Default is FALSE.
 If multiple observed phi values exist for a gene, the geometric mean of these values is used as initial phi.
-When using this function, one should remove any genes with 
+When using this function, one should remove any genes with
 missing phi values, as these genes will not have an initial phi value.}
+
+\item{init.by.random}{If TRUE, initialize codon-specific parameters randomly. Default is FALSE.}
 
 \item{init.initiation.cost}{FOR FONSE ONLY. Initializes the initiation cost a_1 at this value.}
 
 \item{init.partition.function}{FOR PANSE ONLY. initializes the partition function Z.}
+
+\item{numElongationMixtures}{FOR PANSE ONLY. Number of elongation mixture components. Default is 1.}
 }
 \value{
 parameter Returns an initialized Parameter object.

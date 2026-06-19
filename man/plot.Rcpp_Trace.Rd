@@ -12,6 +12,7 @@
   geneIndex = 1,
   mixture = 1,
   log.10.scale = F,
+  aa.names = aminoAcids(),
   ...
 )
 }
@@ -27,8 +28,9 @@ MixtureProbability, Sphi, Mphi, Aphi, Spesilon, ExpectedPhi, Expression}.}
 
 \item{log.10.scale}{A logical value determining if figures should be plotted on the log.10.scale (default=F). Should not be applied to mutation and selection parameters estimated by ROC/FONSE.}
 
-\item{...}{Optional, additional arguments.
-For this function, may be a logical value determining if the trace is ROC-based or not.}
+\item{aa.names}{A character vector of amino acid names used to label plots. Default is \code{aminoAcids()}.}
+
+\item{...}{Optional additional arguments (currently unused).}
 }
 \value{
 This function has no return value.

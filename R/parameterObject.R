@@ -1459,13 +1459,15 @@ calculateExpectedSigmaPerGene <- function(model,sequence,alpha,lambda,nserate)
 #' # they are assigned to at each step
 #' estimatedExpression <- getExpressionEstimates(parameter, 1:length(genome), 1000)
 #' }
-#' 
+#'
+
+#' @keywords internal
 getSigmaEstimates <- function(parameter, model, genome, gene.index, samples, quantiles=c(0.025, 0.975),num.threads=1)
 {
   if (class(parameter)!="Rcpp_PANSEParameter") {
     stop("ERROR: Parameter object is not of class PANSEParameter.")
   }
-  parallel.available <- require(parallel)
+  parallel.available <- requireNamespace("parallel", quietly = TRUE)
   trace <- parameter$getTraceObject()
   genome.subset <- genome$getGenomeForGeneIndices(gene.index,F)
 
@@ -1495,7 +1497,7 @@ getSigmaEstimates <- function(parameter, model, genome, gene.index, samples, qua
       sequence <- gene$seq
       x<-strsplit(sequence,"")[[1]]
       seq.codons <- paste0(x[c(TRUE, FALSE,FALSE)], x[c(FALSE, TRUE,FALSE)],x[c(F,F,T)])
-      sigma <- unlist(mclapply(1:samples,function(i){
+      sigma <- unlist(parallel::mclapply(1:samples,function(i){
         calculateExpectedSigmaPerGene(model,seq.codons,alpha.trace[,i],lambda.trace[,i],nse.trace[,i])
       },mc.cores=num.threads))
     })

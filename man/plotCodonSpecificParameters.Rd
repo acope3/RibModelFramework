@@ -10,7 +10,8 @@ plotCodonSpecificParameters(
   type = "Mutation",
   main = "Mutation Parameter Traces",
   ROC.or.FONSE = TRUE,
-  log.10.scale = F
+  log.10.scale = F,
+  aa.names = aminoAcids()
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ plotCodonSpecificParameters(
 \item{ROC.or.FONSE}{A logical value determining if the Parameter was ROC/FONSE or not.}
 
 \item{log.10.scale}{A logical value determining if figures should be plotted on the log.10.scale (default=F). Should not be applied to mutation and selection parameters estimated by ROC/FONSE.}
+
+\item{aa.names}{A character vector of amino acid names used to label plots. Default is \code{aminoAcids()}.}
 }
 \value{
 This function has no return value.

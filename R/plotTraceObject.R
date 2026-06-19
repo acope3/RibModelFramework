@@ -20,11 +20,12 @@
 #' 
 #' @description Plots different traces, specified with the \code{what} parameter.
 #'
-plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbability" ,"Sphi", "Mphi", "Aphi", "Sepsilon", "ExpectedPhi", "Expression","NSEProb","NSERate","InitiationCost","PartitionFunction"), 
+plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbability" ,"Sphi", "Mphi", "Aphi", "Sepsilon", "ExpectedPhi", "Expression","NSEProb","NSERate","InitiationCost","PartitionFunction"),
                             geneIndex=1,
                             mixture = 1,
                             log.10.scale=F,
-                            aa.names = aminoAcids()
+                            aa.names = aminoAcids(),
+                            ...
                             )
 {
   if(what[1] == "Mutation")
