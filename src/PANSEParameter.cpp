@@ -73,8 +73,8 @@ PANSEParameter& PANSEParameter::operator=(const PANSEParameter& rhs)
 	std_csp = rhs.std_csp;
 	std_nse = rhs.std_nse;
 
-  	numNSECategories = rhs.numNSECategories;
-  	nseIsInMixture = rhs.nseIsInMixture;
+  numNSECategories = rhs.numNSECategories;
+  nseIsInMixture = rhs.nseIsInMixture;
 	nse_covarianceMatrix = rhs.nse_covarianceMatrix;
 	std_partitionFunction = rhs.std_partitionFunction;
 	partitionFunction_proposed = rhs.partitionFunction_proposed;
