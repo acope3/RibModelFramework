@@ -311,31 +311,48 @@ YAL003W,10.45,NA,...,9.564
 YAL005C,0.556,0.957,...,0.758
 ```
 ## Estimating Nonsense Error Probabilities from codon data.
-NOTE: The model described here is unpublished and currently in beta testing. Please use with caution. 
-A common observation is tendency for inefficient codons to be more frequent at the 5'-ends of transcripts. One explanation for this is selection against ribosome drop-off, or nonsense errors, during translation. It is expected that nonsense errors are less costly towards the beginning of translation. AnaCoDa contains a model, the First Order Nonsense Error (FONSE) model, for estimating codon-specific nonsense error probabilities from codon count data. This models functionality is very similar to ROC. The primary difference for fitting a FONSE model instead of a ROC model to genomic data is specifying FONSE when initializing the Parameter and Model objects.
+
+NOTE: The FONSE model is unpublished and currently in beta testing. Please use with caution.
+
+A common observation is the tendency for inefficient codons to be more frequent at
+the 5'-ends of transcripts. One explanation is selection against ribosome drop-off
+(nonsense errors) during translation, which is less costly toward the beginning of
+the transcript. AnaCoDa contains the First Order Nonsense Error (FONSE) model for
+estimating codon-specific nonsense error probabilities from coding sequence data.
+
+FONSE uses the same FASTA input as ROC. The key difference when initializing
+objects is specifying `model = "FONSE"` and supplying an initial value for the
+initiation cost parameter $a_1$ via `init.initiation.cost`:
 
 ```{r, echo = TRUE, eval = FALSE}
-parameter <- initializeParameterObject(genome = genome, sphi = 1, num.mixtures = 1, gene.assignment = rep(1, length(genome)),model="FONSE",init.initiation.cost=a1)
+parameter <- initializeParameterObject(genome = genome, sphi = 1,
+                                       num.mixtures = 1,
+                                       gene.assignment = rep(1, length(genome)),
+                                       model = "FONSE",
+                                       init.initiation.cost = 4)
 
-model <- initializeModelObject(parameter,"FONSE")
-
+model <- initializeModelObject(parameter, "FONSE")
 ```
 
-FONSE also estimates the indirect cost of translation initiation. This value can be initialized with the parameter object with init.initiation.cost. After the MCMC has run, estimates for the initiation cost can be pulled from the trace object. 
-
+After the MCMC run, the initiation cost trace and codon-specific nonsense error
+coefficients can be extracted as follows:
 
 ```{r, echo = TRUE, eval = FALSE}
-
-trace <- parameter$getTraceObject()
-
-plot(trace,what="InitiationCost")
+trace    <- parameter$getTraceObject()
+plot(trace, what = "InitiationCost")
 
 trace_a1 <- trace$getInitiationCostTrace()
-mean_a1 <- mean(trace_a1)
-sd_a1 <- sd(trace_a1)
-ci_a1 <- quantile(trace_a1,probs = c(0.025,0.975))
+mean_a1  <- mean(trace_a1)
+sd_a1    <- sd(trace_a1)
+ci_a1    <- quantile(trace_a1, probs = c(0.025, 0.975))
 
+# Codon-specific nonsense error coefficients (DeltaOmega) and mutation bias (DeltaM)
+csp <- getCSPEstimates(parameter, samples = 1000)
 ```
+
+For a complete FONSE workflow including diagnostics, posterior extraction, and
+restart files, see the dedicated
+[FONSE vignette](fonse.html).
 
 ### Application of AnaCoDa to Ribo-Seq data
 NOTE: The models described here are unpublished and currently in beta testing. Please use with caution. 

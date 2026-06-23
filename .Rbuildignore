@@ -1,8 +1,26 @@
-^.*\.Rproj$         # Automatically added by RStudio,
-^\.Rproj\.user$     # used for temporary files. 
-^README\.Rmd$       # An Rmarkdown file used to generate README.md
-^cran-comments\.md$ # Comments for CRAN submission
-^NEWS\.md$          # A news file written in Markdown
-^\.travis\.yml$     # Used for continuous integration testing with travis
-^.*\.tar\.gz	    # Build package
-^\.nfs		    # ignore file system leftovers
+# RStudio project files
+^.*\.Rproj$
+^\.Rproj\.user$
+
+# Documentation source
+^README\.Rmd$
+
+# CRAN submission notes
+^cran-comments\.md$
+^NEWS\.md$
+
+# CI configuration
+^\.travis\.yml$
+
+# Build artifacts
+^.*\.tar\.gz$
+
+# Filesystem leftovers
+^\.nfs
+
+# Claude Code files
+^\.claude$
+^CLAUDE\.md$
+
+# Local git hooks
+^\.githooks$

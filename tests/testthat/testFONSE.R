@@ -181,3 +181,73 @@ test_that("FONSE dOmega=0 reduces to pure mutation multinomial", {
   pure <- raw / sum(raw)
   expect_equal(rmf, pure, tolerance = 1e-12)
 })
+
+# ======================================================================
+# FONSE MCMC Integration Tests
+#
+# Run a short chain and verify structural correctness (trace dimensions,
+# finiteness, monotone burn-in). We do NOT hardcode a specific logPosterior
+# value because FONSE's position-dependent likelihood starts very far from
+# the posterior mode; 10 samples is still deep in burn-in, and run-to-run
+# variance from RNG-inside-OpenMP (see testMCMCROC.R note) is large relative
+# to the initial transient.
+# ======================================================================
+context("FONSE MCMC integration")
+
+samples       <- 10
+thinning      <- 10
+adaptiveWidth <- 10
+
+set.seed(446141)
+# Reuse genome/model objects constructed above for the numerical tests.
+mcmc <- initializeMCMCObject(samples = samples, thinning = thinning,
+                              adaptive.width = adaptiveWidth,
+                              est.expression = TRUE, est.csp = TRUE,
+                              est.hyper = TRUE)
+
+outFile <- file.path("UnitTestingOut", "testFONSEMCMCLog.txt")
+sink(outFile)
+runMCMC(mcmc, genome, model, 1, 0)
+sink()
+
+test_that("FONSE MCMC logPosterior trace has length samples+1", {
+  expect_equal(length(mcmc$getLogPosteriorTrace()), samples + 1)
+})
+
+test_that("FONSE MCMC logPosterior is finite at all non-initial samples", {
+  lp <- mcmc$getLogPosteriorTrace()
+  expect_true(all(is.finite(lp[-1])))  # skip index 1 (initial 0)
+})
+
+test_that("FONSE MCMC logPosterior increases during burn-in (first < last)", {
+  lp <- mcmc$getLogPosteriorTrace()
+  # During burn-in, posterior increases (less negative) toward mode.
+  expect_true(lp[2] < lp[samples + 1])
+})
+
+test_that("FONSE MCMC initiation cost (a1) trace has length samples+1", {
+  trace     <- parameter$getTraceObject()
+  initTrace <- trace$getInitiationCostTrace()
+  expect_equal(length(initTrace), samples + 1)
+})
+
+test_that("FONSE MCMC initiation cost (a1) is positive and finite at last sample", {
+  trace     <- parameter$getTraceObject()
+  initTrace <- trace$getInitiationCostTrace()
+  expect_true(all(is.finite(initTrace[-1])))
+  expect_gt(initTrace[samples + 1], 0)
+})
+
+test_that("FONSE MCMC codon-specific parameter (dM, dOmega) traces have length samples+1", {
+  trace    <- parameter$getTraceObject()
+  muTrace  <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(1, "AAA", 0, FALSE)
+  selTrace <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(1, "AAA", 1, FALSE)
+  expect_equal(length(muTrace),  samples + 1)
+  expect_equal(length(selTrace), samples + 1)
+})
+
+test_that("FONSE MCMC synthesis rate trace has length samples+1", {
+  trace      <- parameter$getTraceObject()
+  synthTrace <- trace$getSynthesisRateTraceForGene(1)
+  expect_equal(length(synthTrace), samples + 1)
+})

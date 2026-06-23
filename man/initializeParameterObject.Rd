@@ -18,11 +18,15 @@ initializeParameterObject(
   mutation.prior.mean = 0,
   mutation.prior.sd = 0.35,
   propose.by.prior = FALSE,
+  selection.prior.mean = 0,
+  selection.prior.sd = 100,
   init.csp.variance = 0.0025,
   init.sepsilon = 0.1,
   init.w.obs.phi = FALSE,
+  init.by.random = FALSE,
   init.initiation.cost = 4,
-  init.partition.function = 1
+  init.partition.function = 1,
+  numElongationMixtures = 1
 )
 }
 \arguments{
@@ -57,7 +61,8 @@ The default value for split.serine is TRUE.}
 
 \item{mixture.definition}{A string describing how each mixture should
 be treated with respect to mutation and selection.
-Valid values consist of "allUnique", "mutationShared", and "selectionShared".
+Valid values consist of "allUnique", "mutationShared", and "selectionShared" for ROC/FONSE.
+Valid values consist of  "allUnique", "elongationShared", and "nseShared" for PANSE.
 The default value for mixture.definition is "allUnique".
 See details for more information.}
 
@@ -83,7 +88,17 @@ If passed in as single number (default is 0.35), this will be the standard devia
 supply a vector with n * 40 values, where n is the number of mutation categories. Future versions will check the number of rows matches
 the number of mutation categories definded by user.}
 
-\item{propose.by.prior}{Mutation bias parameters will be proposed based on the means and standard deviations set in mutation.prior.mean and mutation.prior.sd}
+\item{propose.by.prior}{Mutation bias parameters will be proposed based on the means and standard deviations set in mutation.prior.mean and mutation.prior.sd.  Argument is to be depricated and replaced by `propose.by.prior.mutaton` and `propose.by.prior.selection` created.}
+
+\item{selection.prior.mean}{ROC only. Controlling the mean of the normal prior on selection paramters.
+If passed in as single number (default is 0), this will be the mean value for all categories, for all codons. User may also
+supply a vector with n * 40 values, where n is the number of selection categories. Future versions will check the number of rows matches
+the number of selection categories definded by user.}
+
+\item{selection.prior.sd}{ROC only. Controlling the standard deviation of the normal prior on the selection parameters.
+If passed in as single number (default is 100 which effectively results in a flat prior), this will be the standard deviation value for all categories, for all codons. User may also
+supply a vector with n * 40 values, where n is the number of selection categories. Future versions will check the number of rows matches
+the number of selection categories definded by user.}
 
 \item{init.csp.variance}{specifies the initial proposal width for codon specific parameter (default is 0.0025). 
 The proposal width adapts during the runtime to reach a taget acceptance rate of ~0.25}
@@ -96,9 +111,13 @@ If multiple observed phi values exist for a gene, the geometric mean of these va
 When using this function, one should remove any genes with 
 missing phi values, as these genes will not have an initial phi value.}
 
+\item{init.by.random}{If TRUE, initialize codon-specific parameters randomly. Default is FALSE.}
+
 \item{init.initiation.cost}{FOR FONSE ONLY. Initializes the initiation cost a_1 at this value.}
 
 \item{init.partition.function}{FOR PANSE ONLY. initializes the partition function Z.}
+
+\item{numElongationMixtures}{FOR PANSE ONLY. Number of elongation mixture components. Default is 1.}
 }
 \value{
 parameter Returns an initialized Parameter object.

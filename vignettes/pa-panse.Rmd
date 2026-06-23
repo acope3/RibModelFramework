@@ -1,0 +1,373 @@
+---
+title: "AnaCoDa: PA and PANSE Models for Ribosome Footprinting Data"
+author: "Cedric Landerer, Alexander L. Cope & Michael A. Gilchrist"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+bibliography: anacoda.bib
+vignette: >
+  %\VignetteIndexEntry{AnaCoDa: PA and PANSE Models for Ribosome Footprinting Data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+AnaCoDa provides two models for analyzing ribosome footprinting (RFP) data: the
+**PA** (PAusing time) model and its extension **PANSE** (PAusing time plus NonSense
+Error).
+Both models use a negative binomial likelihood to describe per-codon RFP counts,
+estimating pausing shape ($\alpha$), elongation rate ($\lambda'$), and gene-level
+expression ($\psi$) for each codon and gene in the genome.
+
+PANSE additionally estimates per-codon nonsense error (NSE) rates, which reflect the
+probability that a translating ribosome terminates prematurely at a given codon.
+These NSE rates modulate the effective expression seen at downstream positions.
+
+## Input data format
+
+PA and PANSE models require ribosome footprinting count data rather than coding
+sequences.
+The input file is a comma-separated table with one row per gene-codon combination:
+
+```
+GeneID,count_1,count_2,Codon
+YAL001C,110,73,AAA
+YAL001C,28,22,AAC
+...
+```
+
+Each row provides the raw and normalized RFP counts (or two independent count
+measurements) for a single codon in a single gene, along with the codon identity.
+Stop codons are excluded.
+The `fasta = FALSE` argument to `initializeGenomeObject` signals that the file
+contains RFP data rather than coding sequences.
+
+A 500-gene example dataset is included with the package:
+
+```{r, echo = TRUE, eval = FALSE}
+rfp_file <- system.file("extdata", "pa_rfpdata.csv", package = "AnaCoDa")
+```
+
+## Running the PA model
+
+### Step 1: Load genome
+
+```{r, echo = TRUE, eval = FALSE}
+library(AnaCoDa)
+
+rfp_file <- system.file("extdata", "pa_rfpdata.csv", package = "AnaCoDa")
+genome <- initializeGenomeObject(file = rfp_file, fasta = FALSE)
+```
+
+### Step 2: Initialize parameter object
+
+The PA parameter object requires specifying an initial value for the hyperparameter
+$s_\phi$ (`sphi`), which controls the lognormal prior on gene-level expression
+$\psi$.
+With a single gene-set (no mixture) all genes share the same codon-specific
+parameters $\alpha$ and $\lambda'$.
+
+```{r, echo = TRUE, eval = FALSE}
+sphi_init    <- 2
+numMixtures  <- 1
+geneAssignment <- rep(1, length(genome))
+
+parameter <- initializeParameterObject(
+  genome          = genome,
+  sphi            = sphi_init,
+  num.mixtures    = numMixtures,
+  gene.assignment = geneAssignment,
+  model           = "PA",
+  split.serine    = TRUE,
+  mixture.definition = "allUnique"
+)
+```
+
+### Step 3: Initialize model and MCMC objects
+
+```{r, echo = TRUE, eval = FALSE}
+model <- initializeModelObject(parameter, "PA")
+
+mcmc <- initializeMCMCObject(
+  samples        = 1000,
+  thinning       = 10,
+  adaptive.width = 50,
+  est.expression = TRUE,
+  est.csp        = TRUE,
+  est.hyper      = TRUE
+)
+```
+
+### Step 4: Run MCMC
+
+`runMCMC` modifies `mcmc` and `parameter` in place; no return value is needed.
+
+```{r, echo = TRUE, eval = FALSE}
+runMCMC(mcmc, genome, model)
+```
+
+## Saving and reloading results
+
+Parameter and MCMC objects can be written to disk and reloaded in a later session:
+
+```{r, echo = TRUE, eval = FALSE}
+writeParameterObject(parameter, file = "pa_parameter.Rdat")
+writeMCMCObject(mcmc, file = "pa_mcmc.Rdat")
+
+parameter <- loadParameterObject(file = "pa_parameter.Rdat")
+mcmc      <- loadMCMCObject(file = "pa_mcmc.Rdat")
+```
+
+## Diagnostic plots
+
+### Log-posterior trace
+
+Inspect convergence by plotting the log-posterior over samples.
+Discarding an initial burn-in (here 30% of samples) removes the transient
+at the start of the chain.
+
+```{r, echo = TRUE, eval = FALSE}
+logPost <- mcmc$getLogPosteriorTrace()
+burnin  <- ceiling(length(logPost) * 0.3)
+logPost_post_burnin <- logPost[burnin:length(logPost)]
+
+plot(logPost_post_burnin, type = "l",
+     main = paste("log(Posterior), mean =", round(mean(logPost_post_burnin), 1)),
+     xlab = "Sample", ylab = "log(Posterior)")
+grid(NULL, NULL, lty = 6, col = "cornsilk2")
+```
+
+### Hyperparameter traces
+
+```{r, echo = TRUE, eval = FALSE}
+trace <- parameter$getTraceObject()
+plot(trace, what = "Sphi",             main = "s_phi hyperparameter")
+plot(trace, what = "MixtureProbability", main = "Mixture probability")
+plot(trace, what = "ExpectedPhi",      main = "Expected expression (psi)")
+```
+
+### Codon-specific parameter traces
+
+Trace plots for $\alpha$ and $\lambda'$ across all codons help assess per-codon
+convergence.
+
+```{r, echo = TRUE, eval = FALSE}
+plot(trace, what = "Alpha",       mixture = 1)
+plot(trace, what = "LambdaPrime", mixture = 1)
+```
+
+### Posterior means and credible intervals
+
+After discarding burn-in, extract posterior means and 95% credible intervals for
+each codon's $\alpha$ and $\lambda'$:
+
+```{r, echo = TRUE, eval = FALSE}
+samples    <- 1000
+codonList  <- codons()          # 61 sense codons
+cat        <- 1                 # mixture category index
+burnin_idx <- samples * 0.5    # use posterior half
+
+alpha_mean <- numeric(61)
+alpha_ci   <- matrix(0, nrow = 61, ncol = 2)
+lp_mean    <- numeric(61)
+lp_ci      <- matrix(0, nrow = 61, ncol = 2)
+
+for (i in seq_along(codonList)) {
+  codon <- codonList[i]
+
+  alpha_mean[i] <- parameter$getCodonSpecificPosteriorMean(cat, burnin_idx, codon, 0, FALSE)
+  alpha_trace   <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(1, codon, 0, FALSE)
+  alpha_ci[i, ] <- quantile(alpha_trace[burnin_idx:samples], probs = c(0.025, 0.975))
+
+  lp_mean[i]  <- parameter$getCodonSpecificPosteriorMean(cat, burnin_idx, codon, 1, FALSE)
+  lp_trace    <- trace$getCodonSpecificParameterTraceByMixtureElementForCodon(1, codon, 1, FALSE)
+  lp_ci[i, ]  <- quantile(lp_trace[burnin_idx:samples], probs = c(0.025, 0.975))
+}
+
+# Plot alpha credible intervals
+plot(NULL, NULL,
+     xlim = c(1, 61), ylim = range(alpha_ci),
+     main = "Posterior mean and 95% CI: Alpha",
+     xlab = "Codon", ylab = "Alpha", axes = FALSE)
+confidenceInterval.plot(x = 1:61, y = alpha_mean, sd.y = alpha_ci)
+axis(2)
+axis(1, at = 1:61, labels = codonList, tck = 0.02, las = 2, cex.axis = 0.6)
+
+# Plot lambda-prime credible intervals
+plot(NULL, NULL,
+     xlim = c(1, 61), ylim = range(lp_ci),
+     main = "Posterior mean and 95% CI: LambdaPrime",
+     xlab = "Codon", ylab = "LambdaPrime", axes = FALSE)
+confidenceInterval.plot(x = 1:61, y = lp_mean, sd.y = lp_ci)
+axis(2)
+axis(1, at = 1:61, labels = codonList, tck = 0.02, las = 2, cex.axis = 0.6)
+```
+
+Pausing times (in arbitrary units) are proportional to $\alpha \cdot \lambda'$:
+
+```{r, echo = TRUE, eval = FALSE}
+pausing_times <- alpha_mean * lp_mean
+barplot(pausing_times, names.arg = codonList,
+        main = "Estimated pausing times per codon",
+        las = 2, cex.names = 0.6)
+```
+
+## PANSE model
+
+> **Status**: The PANSE model is unpublished and currently in beta testing.
+> Results should be interpreted with caution and validated against simulated
+> data before use in publications.
+
+PANSE extends PA by jointly estimating per-codon nonsense error (NSE) rates.
+Ribosomes that drop off at upstream codons reduce the observed RFP counts at
+downstream positions; PANSE accounts for this modulation via a cumulative
+survival probability.
+
+### Step 1: Load genome (positional mode)
+
+PANSE requires per-position RFP counts; set `positional = TRUE`:
+
+```{r, echo = TRUE, eval = FALSE}
+rfp_file   <- system.file("extdata", "pa_rfpdata.csv", package = "AnaCoDa")
+genome_nse <- initializeGenomeObject(file = rfp_file, fasta = FALSE,
+                                      positional = TRUE)
+```
+
+### Step 2: Initialize PANSE parameter object
+
+```{r, echo = TRUE, eval = FALSE}
+parameter_nse <- initializeParameterObject(
+  genome          = genome_nse,
+  sphi            = 2,
+  num.mixtures    = 1,
+  gene.assignment = rep(1, length(genome_nse)),
+  model           = "PANSE",
+  split.serine    = TRUE,
+  mixture.definition = "allUnique"
+)
+```
+
+PANSE-specific mixture definitions:
+
+- `"allUnique"` (default): each mixture has its own alpha, lambda, and NSE rates
+- `"elongationShared"`: all mixtures share alpha and lambda but have separate NSE rates
+- `"nseShared"`: all mixtures share NSE rates but have separate alpha and lambda
+
+### Step 3-4: Model, MCMC, and run
+
+```{r, echo = TRUE, eval = FALSE}
+model_nse <- initializeModelObject(parameter_nse, "PANSE")
+
+mcmc_nse <- initializeMCMCObject(
+  samples        = 1000,
+  thinning       = 10,
+  adaptive.width = 50,
+  est.expression = TRUE,
+  est.csp        = TRUE,
+  est.hyper      = TRUE
+)
+
+runMCMC(mcmc_nse, genome_nse, model_nse)
+```
+
+### NSE rate traces and posterior summaries
+
+NSE rate traces are accessed via `what = "NSERate"` in `plot(trace, ...)`:
+
+```{r, echo = TRUE, eval = FALSE}
+trace_nse <- parameter_nse$getTraceObject()
+plot(trace_nse, what = "NSERate", mixture = 1)
+```
+
+Extract posterior means and credible intervals for NSE rates:
+
+```{r, echo = TRUE, eval = FALSE}
+codonList  <- codons()     # 61 sense codons
+burnin_idx <- 500          # discard first 50% of 1000 samples
+
+nse_mean <- numeric(61)
+nse_ci   <- matrix(0, nrow = 61, ncol = 2)
+
+for (i in seq_along(codonList)) {
+  codon <- codonList[i]
+  nse_trace   <- trace_nse$getCodonSpecificParameterTraceByMixtureElementForCodon(
+                   1, codon, 2, FALSE)
+  post_nse    <- nse_trace[burnin_idx:length(nse_trace)]
+  nse_mean[i] <- mean(post_nse)
+  nse_ci[i, ] <- quantile(post_nse, probs = c(0.025, 0.975))
+}
+
+barplot(nse_mean, names.arg = codonList,
+        main = "Posterior mean NSE rate per codon",
+        las = 2, cex.names = 0.6)
+```
+
+`getCSPEstimates` with `log.scale = TRUE` returns all five PANSE parameters
+(alpha, lambda, mean waiting time, NSE rate, NSE probability) for each codon:
+
+```{r, echo = TRUE, eval = FALSE}
+csp_nse <- getCSPEstimates(parameter_nse, samples = 500, log.scale = TRUE)
+head(csp_nse$NSERate)
+head(csp_nse$NSEProb)
+```
+
+### Partition function trace
+
+The partition function Z normalises the per-gene expression model in PANSE.
+Its trace can be inspected with:
+
+```{r, echo = TRUE, eval = FALSE}
+plot(trace_nse, what = "PartitionFunction")
+
+pf_traces <- trace_nse$getPartitionFunctionTraces()  # list, one per mixture
+pf_post   <- pf_traces[[1]][burnin_idx:length(pf_traces[[1]])]
+cat("Z posterior mean:", mean(pf_post), "\n")
+cat("Z 95% CI:        ", quantile(pf_post, c(0.025, 0.975)), "\n")
+```
+
+### Fixing parameters
+
+To hold specific parameters constant (e.g., to test the PA model nested within
+PANSE), use the locking methods:
+
+```{r, echo = TRUE, eval = FALSE}
+parameter_nse$fixAlpha()       # fix pausing shape
+parameter_nse$fixLambdaPrime() # fix elongation rate
+parameter_nse$fixNSERate()     # fix NSE rates (PANSE only)
+parameter_nse$fixZ()           # fix partition function (PANSE only)
+```
+
+### Known limitations
+
+- **Unpublished model**: PANSE has not undergone peer review. Results should
+  be cross-validated against simulations before use in publications.
+- **RFP count table size**: The model pre-computes a lgamma table for RFP
+  counts 0-49 per codon. For highly expressed genes with counts >= 50, it falls
+  back to runtime computation (correct, but slower).
+- **Positional data required**: Unlike PA, PANSE needs `positional = TRUE`
+  in `initializeGenomeObject` because cumulative survival probabilities depend
+  on codon order within each gene.
+
+## Restart files
+
+For long runs it is useful to save periodic restart checkpoints so that
+computation can be resumed after interruption:
+
+```{r, echo = TRUE, eval = FALSE}
+setRestartSettings(mcmc, file = "pa_restart.rst",
+                   every = 50, initialize = TRUE)
+runMCMC(mcmc, genome, model)
+```
+
+Pass the restart file to `initializeParameterObject` via the `restart.file`
+argument to resume:
+
+```{r, echo = TRUE, eval = FALSE}
+parameter <- initializeParameterObject(model = "PA",
+                                        restart.file = "pa_restart.rst")
+```

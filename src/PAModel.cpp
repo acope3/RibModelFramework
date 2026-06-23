@@ -1040,13 +1040,11 @@ double PAModel::calculateLogLikelihoodR(Genome &genome, std::vector<double> _alp
   unsigned numParam = groups.size();
   if ((_alpha.size() % numParam != 0) || (_lambda.size() % numParam != 0))
   {
-    my_print("ERROR: alpha and lambda must be a multiple of the number of codons (61).\n");
-    std::exit(1);
+    Rcpp::stop("alpha and lambda must each be a multiple of the number of sense codons (61).");
   }
   if (_alpha.size() != _lambda.size())
   {
-    my_print("ERROR: alpha and lambdamust be the same size. If you are trying to share the same parameter values across elongation mixture, then these values should be included twice.\n");
-    std::exit(1);
+    Rcpp::stop("alpha and lambda must be the same size. To share values across elongation mixtures, duplicate the values.");
   }
   alpha = _alpha;
   lambda = _lambda;

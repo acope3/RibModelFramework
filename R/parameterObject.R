@@ -81,22 +81,24 @@
 #' When using this function, one should remove any genes with 
 #' missing phi values, as these genes will not have an initial phi value.
 #' 
+#' @param init.by.random If TRUE, initialize codon-specific parameters randomly. Default is FALSE.
+#'
 #' @param init.initiation.cost FOR FONSE ONLY. Initializes the initiation cost a_1 at this value.
-#' 
+#'
 #' @param init.partition.function FOR PANSE ONLY. initializes the partition function Z.
 #'
-#' @param numElongationMixtures FOR PANSE ONLY. Allows for different categories of waiting time parameters based on position of codon..
+#' @param numElongationMixtures FOR PANSE ONLY. Number of elongation mixture components. Allows for different categories of waiting time parameters based on position of codon. Default is 1.
 #'
 #' @param include.nonsense.errors FOR PANSE ONLY. Include effects of nonsense errors when estimating parameters. Setting this to FALSE reduces to a model that only accounts for variability in waiting times across codons. Default is TRUE.
 #'
 #' @param include.stop.codons FOR PANSE ONLY. Stop codons are included in the dataset and parameters will be estimated. This is an attempt to estimate the relative read-through efficiency of stop codons from ribosome profiling data. Default is FALSE.
 #'
-#' 
 #' @return parameter Returns an initialized Parameter object.
 #' 
 #' @description \code{initializeParameterObject} initializes a new parameter object or reconstructs one from a restart file
 #' 
-#' @details \code{initializeParameterObject} checks the values of the arguments 
+#' @details \code{initializeParameterObject} c
+#' hecks the values of the arguments 
 #' given to insure the values are valid.
 #' 
 #' The mixture definition and mixture definition matrix describes how the mutation
@@ -1115,7 +1117,7 @@ getCSPbyLogit <- function(codonCounts, phi, coefstart = NULL, x.arg = FALSE,
   # performs the regression and returns Delta M and Delta eta as well as other information no used here
   # Wrap in tryCatch: vglm can fail for amino acids with sparse/degenerate
   # codon counts (e.g., near-complete separation). Fall back to zero initial
-  # values — these are only used as MCMC starting points and get overwritten
+  # values -- these are only used as MCMC starting points and get overwritten
   # if initMutationCategories/initSelectionCategories is called afterward.
   ret <- tryCatch({
     fit <- vglm(codonCounts[idx, ] ~ phi[idx],
@@ -1470,13 +1472,15 @@ calculateExpectedSigmaPerGene <- function(model,sequence,alpha,lambda,nserate)
 #' # they are assigned to at each step
 #' estimatedExpression <- getExpressionEstimates(parameter, 1:length(genome), 1000)
 #' }
-#' 
+#'
+
+#' @keywords internal
 getSigmaEstimates <- function(parameter, model, genome, gene.index, samples, quantiles=c(0.025, 0.975),num.threads=1)
 {
   if (class(parameter)!="Rcpp_PANSEParameter") {
     stop("ERROR: Parameter object is not of class PANSEParameter.")
   }
-  parallel.available <- require(parallel)
+  parallel.available <- requireNamespace("parallel", quietly = TRUE)
   trace <- parameter$getTraceObject()
   genome.subset <- genome$getGenomeForGeneIndices(gene.index,F)
 
@@ -1506,7 +1510,7 @@ getSigmaEstimates <- function(parameter, model, genome, gene.index, samples, qua
       sequence <- gene$seq
       x<-strsplit(sequence,"")[[1]]
       seq.codons <- paste0(x[c(TRUE, FALSE,FALSE)], x[c(FALSE, TRUE,FALSE)],x[c(F,F,T)])
-      sigma <- unlist(mclapply(1:samples,function(i){
+      sigma <- unlist(parallel::mclapply(1:samples,function(i){
         calculateExpectedSigmaPerGene(model,seq.codons,alpha.trace[,i],lambda.trace[,i],nse.trace[,i])
       },mc.cores=num.threads))
     })

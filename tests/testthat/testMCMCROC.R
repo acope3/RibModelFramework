@@ -229,6 +229,78 @@ test_that("object can be loaded successfully: mcmc", {
   expect_silent(mcmcSaved <- loadMCMCObject(file = outFile))  
 })
 
+# ======================================================================
+# withPhi multi-phi-set edge case tests -- task #8
+#
+# Tests that ROC can be initialized with multiple observed phi sets
+# (sepsilon per set), that the logPosterior remains finite, and that
+# the sepsilon trace has the right dimension.
+# ======================================================================
+
+twoSetFile <- file.path("UnitTestingData", "testMCMCROCFiles",
+                         "simulatedAllUniqueR_phi_twoSets.csv")
+
+test_that("file exists: simulatedAllUniqueR_phi_twoSets.csv", {
+  expect_true(file.exists(twoSetFile))
+})
+
+# Two-phi-set run (est.expression=TRUE so sepsilon is sampled).
+set.seed(seedValue)
+genome_2phi <- initializeGenomeObject(file = fileName,
+                                       observed.expression.file = twoSetFile,
+                                       match.expression.by.id = FALSE)
+
+# Two columns of observed phi => init.sepsilon needs length 2.
+param_2phi <- initializeParameterObject(
+  genome         = genome_2phi,
+  sphi           = 1,
+  num.mixtures   = 1,
+  gene.assignment = rep(1, length(genome_2phi)),
+  init.sepsilon  = c(0.1, 0.1)
+)
+model_2phi <- initializeModelObject(param_2phi, "ROC", with.phi = TRUE)
+mcmc_2phi  <- initializeMCMCObject(samples = samples, thinning = thinning,
+                                    adaptive.width = adaptiveWidth,
+                                    est.expression = TRUE, est.csp = TRUE,
+                                    est.hyper = TRUE)
+outFile_2phi <- file.path("UnitTestingOut", "testMCMCROCLogTwoPhiSets.txt")
+sink(outFile_2phi)
+runMCMC(mcmc_2phi, genome_2phi, model_2phi, 1, divergence.iteration)
+sink()
+
+test_that("withPhi two-set: logPosterior trace has length samples+1", {
+  expect_equal(length(mcmc_2phi$getLogPosteriorTrace()), samples + 1)
+})
+
+test_that("withPhi two-set: logPosterior is finite at all non-initial samples", {
+  lp <- mcmc_2phi$getLogPosteriorTrace()
+  expect_true(all(is.finite(lp[-1])))
+})
+
+test_that("withPhi two-set: observed synthesis noise trace has two entries (one per phi set)", {
+  trace   <- param_2phi$getTraceObject()
+  # getObservedSynthesisNoiseTrace() returns a list, one element per phi set.
+  noiseTraces <- trace$getObservedSynthesisNoiseTrace()
+  expect_equal(length(noiseTraces), 2)
+})
+
+test_that("withPhi two-set: each noise trace has length samples+1", {
+  trace       <- param_2phi$getTraceObject()
+  noiseTraces <- trace$getObservedSynthesisNoiseTrace()
+  expect_equal(length(noiseTraces[[1]]), samples + 1)
+  expect_equal(length(noiseTraces[[2]]), samples + 1)
+})
+
+test_that("withPhi two-set: noise trace values are positive and finite", {
+  trace       <- param_2phi$getTraceObject()
+  noiseTraces <- trace$getObservedSynthesisNoiseTrace()
+  # Index 1 is the initial 0; skip it.
+  expect_true(all(is.finite(noiseTraces[[1]][-1])))
+  expect_true(all(is.finite(noiseTraces[[2]][-1])))
+  expect_true(all(noiseTraces[[1]][-1] > 0))
+  expect_true(all(noiseTraces[[2]][-1] > 0))
+})
+
 ### end tests by Elizabeth Barnes and Mike Gilchrist
 
 aa <- aminoAcids()

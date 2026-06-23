@@ -410,8 +410,7 @@ void Genome::readRFPData(std::string filename, bool append)
 					mixture = std::atoi(tmp.substr(pos3 + 1, pos3 - (pos2 + 1)).c_str()) - 1;
 					if (mixture == -1)
 					{
-					  my_print("ERROR: Your column indicating elongation mixtures contains 0. Should be a non-zero positive (include position in likelihood) or negative (use only for sigma) number. Exiting program.\n");
-					  exit(1);
+					  Rcpp::stop("Elongation mixture column contains 0. Must be non-zero positive (include in likelihood) or negative (sigma only).");
 					}
 					tableIndex ++;
 					tableRow[tableIndex] = mixture;

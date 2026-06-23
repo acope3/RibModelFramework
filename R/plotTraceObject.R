@@ -20,13 +20,14 @@
 #' 
 #' @description Plots different traces, specified with the \code{what} parameter.
 #'
-plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbability" ,"Sphi", "Mphi", "Aphi", "Sepsilon", "ExpectedPhi", "Expression","NSEProb","NSERate","InitiationCost","PartitionFunction"), 
+plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbability" ,"Sphi", "Mphi", "Aphi", "Sepsilon", "ExpectedPhi", "Expression","NSEProb","NSERate","InitiationCost","PartitionFunction"),
                             geneIndex=1,
                             mixture = 1,
                             log.10.scale=F,
                             aa.names = aminoAcids(),
-														include.stop.codons = F
-                            )
+														include.stop.codons = F,
+                            ...
+)
 {
   if(what[1] == "Mutation")
   {
@@ -119,8 +120,10 @@ plot.Rcpp_Trace <- function(x, what=c("Mutation", "Selection", "MixtureProbabili
 #'
 #' @param log.10.scale A logical value determining if figures should be plotted on the log.10.scale (default=F). Should not be applied to mutation and selection parameters estimated by ROC/FONSE.
 #'
+#' @param aa.names A character vector of amino acid names to include in the plot. Default is all amino acids from \code{aminoAcids()}.
+#'
 #' @return This function has no return value.
-#' 
+#'
 #' @description Plots a codon-specific set of traces, specified with the \code{type} parameter.
 #'
 plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="Mutation Parameter Traces", 
@@ -296,11 +299,13 @@ plotCodonSpecificParameters <- function(trace, mixture, type="Mutation", main="M
 # 
 #' Plot Acceptance ratios
 #' @param trace An Rcpp trace object initialized with \code{initializeTraceObject}.
-#' 
+#'
 #' @param main The title of the plot.
-#' 
+#'
+#' @param aa.names A character vector of amino acid names to include in the plot. Default is all amino acids from \code{aminoAcids()}.
+#'
 #' @return This function has no return value.
-#' 
+#'
 #' @description Plots acceptance ratios for codon-specific parameters. Will be by amino acid for ROC and FONSE models, but will be by codon for PA and PANSE models. Note assumes estimating parameters for all codons.
 
 plotAcceptanceRatios <- function(trace,

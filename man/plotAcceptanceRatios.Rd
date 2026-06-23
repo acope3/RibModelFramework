@@ -4,12 +4,18 @@
 \alias{plotAcceptanceRatios}
 \title{Plot Acceptance ratios}
 \usage{
-plotAcceptanceRatios(trace, main = "CSP Acceptance Ratio Traces")
+plotAcceptanceRatios(
+  trace,
+  main = "CSP Acceptance Ratio Traces",
+  aa.names = aminoAcids()
+)
 }
 \arguments{
 \item{trace}{An Rcpp trace object initialized with \code{initializeTraceObject}.}
 
 \item{main}{The title of the plot.}
+
+\item{aa.names}{A character vector of amino acid names to include in the plot. Default is all amino acids from \code{aminoAcids()}.}
 }
 \value{
 This function has no return value.
