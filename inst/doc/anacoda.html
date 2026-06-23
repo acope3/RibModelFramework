@@ -12,7 +12,7 @@
 
 <meta name="author" content="Cedric Landerer &amp; Alexander L. Cope" />
 
-<meta name="date" content="2025-04-25" />
+<meta name="date" content="2026-05-12" />
 
 <title>AnaCoDa: Analyzing Codon Data</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">AnaCoDa: Analyzing Codon Data</h1>
 <h4 class="author">Cedric Landerer &amp; Alexander L. Cope</h4>
-<h4 class="date">2025-04-25</h4>
+<h4 class="date">2026-05-12</h4>
 
 
 
@@ -699,33 +699,40 @@ YAL005C,0.556,0.957,...,0.758</code></pre>
 </div>
 <div id="estimating-nonsense-error-probabilities-from-codon-data." class="section level2">
 <h2>Estimating Nonsense Error Probabilities from codon data.</h2>
-<p>NOTE: The model described here is unpublished and currently in beta
-testing. Please use with caution. A common observation is tendency for
-inefficient codons to be more frequent at the 5’-ends of transcripts.
-One explanation for this is selection against ribosome drop-off, or
-nonsense errors, during translation. It is expected that nonsense errors
-are less costly towards the beginning of translation. AnaCoDa contains a
-model, the First Order Nonsense Error (FONSE) model, for estimating
-codon-specific nonsense error probabilities from codon count data. This
-models functionality is very similar to ROC. The primary difference for
-fitting a FONSE model instead of a ROC model to genomic data is
-specifying FONSE when initializing the Parameter and Model objects.</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a>parameter <span class="ot">&lt;-</span> <span class="fu">initializeParameterObject</span>(<span class="at">genome =</span> genome, <span class="at">sphi =</span> <span class="dv">1</span>, <span class="at">num.mixtures =</span> <span class="dv">1</span>, <span class="at">gene.assignment =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">length</span>(genome)),<span class="at">model=</span><span class="st">&quot;FONSE&quot;</span>,<span class="at">init.initiation.cost=</span>a1)</span>
-<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a></span>
-<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">initializeModelObject</span>(parameter,<span class="st">&quot;FONSE&quot;</span>)</span></code></pre></div>
-<p>FONSE also estimates the indirect cost of translation initiation.
-This value can be initialized with the parameter object with
-init.initiation.cost. After the MCMC has run, estimates for the
-initiation cost can be pulled from the trace object.</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a></span>
-<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a>trace <span class="ot">&lt;-</span> parameter<span class="sc">$</span><span class="fu">getTraceObject</span>()</span>
+<p>NOTE: The FONSE model is unpublished and currently in beta testing.
+Please use with caution.</p>
+<p>A common observation is the tendency for inefficient codons to be
+more frequent at the 5’-ends of transcripts. One explanation is
+selection against ribosome drop-off (nonsense errors) during
+translation, which is less costly toward the beginning of the
+transcript. AnaCoDa contains the First Order Nonsense Error (FONSE)
+model for estimating codon-specific nonsense error probabilities from
+coding sequence data.</p>
+<p>FONSE uses the same FASTA input as ROC. The key difference when
+initializing objects is specifying <code>model = &quot;FONSE&quot;</code> and
+supplying an initial value for the initiation cost parameter <span class="math inline">\(a_1\)</span> via
+<code>init.initiation.cost</code>:</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a>parameter <span class="ot">&lt;-</span> <span class="fu">initializeParameterObject</span>(<span class="at">genome =</span> genome, <span class="at">sphi =</span> <span class="dv">1</span>,</span>
+<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a>                                       <span class="at">num.mixtures =</span> <span class="dv">1</span>,</span>
+<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a>                                       <span class="at">gene.assignment =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">length</span>(genome)),</span>
+<span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a>                                       <span class="at">model =</span> <span class="st">&quot;FONSE&quot;</span>,</span>
+<span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a>                                       <span class="at">init.initiation.cost =</span> <span class="dv">4</span>)</span>
+<span id="cb25-6"><a href="#cb25-6" tabindex="-1"></a></span>
+<span id="cb25-7"><a href="#cb25-7" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">initializeModelObject</span>(parameter, <span class="st">&quot;FONSE&quot;</span>)</span></code></pre></div>
+<p>After the MCMC run, the initiation cost trace and codon-specific
+nonsense error coefficients can be extracted as follows:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a>trace    <span class="ot">&lt;-</span> parameter<span class="sc">$</span><span class="fu">getTraceObject</span>()</span>
+<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a><span class="fu">plot</span>(trace, <span class="at">what =</span> <span class="st">&quot;InitiationCost&quot;</span>)</span>
 <span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a></span>
-<span id="cb26-4"><a href="#cb26-4" tabindex="-1"></a><span class="fu">plot</span>(trace,<span class="at">what=</span><span class="st">&quot;InitiationCost&quot;</span>)</span>
-<span id="cb26-5"><a href="#cb26-5" tabindex="-1"></a></span>
-<span id="cb26-6"><a href="#cb26-6" tabindex="-1"></a>trace_a1 <span class="ot">&lt;-</span> trace<span class="sc">$</span><span class="fu">getInitiationCostTrace</span>()</span>
-<span id="cb26-7"><a href="#cb26-7" tabindex="-1"></a>mean_a1 <span class="ot">&lt;-</span> <span class="fu">mean</span>(trace_a1)</span>
-<span id="cb26-8"><a href="#cb26-8" tabindex="-1"></a>sd_a1 <span class="ot">&lt;-</span> <span class="fu">sd</span>(trace_a1)</span>
-<span id="cb26-9"><a href="#cb26-9" tabindex="-1"></a>ci_a1 <span class="ot">&lt;-</span> <span class="fu">quantile</span>(trace_a1,<span class="at">probs =</span> <span class="fu">c</span>(<span class="fl">0.025</span>,<span class="fl">0.975</span>))</span></code></pre></div>
+<span id="cb26-4"><a href="#cb26-4" tabindex="-1"></a>trace_a1 <span class="ot">&lt;-</span> trace<span class="sc">$</span><span class="fu">getInitiationCostTrace</span>()</span>
+<span id="cb26-5"><a href="#cb26-5" tabindex="-1"></a>mean_a1  <span class="ot">&lt;-</span> <span class="fu">mean</span>(trace_a1)</span>
+<span id="cb26-6"><a href="#cb26-6" tabindex="-1"></a>sd_a1    <span class="ot">&lt;-</span> <span class="fu">sd</span>(trace_a1)</span>
+<span id="cb26-7"><a href="#cb26-7" tabindex="-1"></a>ci_a1    <span class="ot">&lt;-</span> <span class="fu">quantile</span>(trace_a1, <span class="at">probs =</span> <span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.975</span>))</span>
+<span id="cb26-8"><a href="#cb26-8" tabindex="-1"></a></span>
+<span id="cb26-9"><a href="#cb26-9" tabindex="-1"></a><span class="co"># Codon-specific nonsense error coefficients (DeltaOmega) and mutation bias (DeltaM)</span></span>
+<span id="cb26-10"><a href="#cb26-10" tabindex="-1"></a>csp <span class="ot">&lt;-</span> <span class="fu">getCSPEstimates</span>(parameter, <span class="at">samples =</span> <span class="dv">1000</span>)</span></code></pre></div>
+<p>For a complete FONSE workflow including diagnostics, posterior
+extraction, and restart files, see the dedicated <a href="fonse.html">FONSE vignette</a>.</p>
 <div id="application-of-anacoda-to-ribo-seq-data" class="section level3">
 <h3>Application of AnaCoDa to Ribo-Seq data</h3>
 <p>NOTE: The models described here are unpublished and currently in beta

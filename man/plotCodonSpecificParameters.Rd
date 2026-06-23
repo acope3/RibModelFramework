@@ -27,7 +27,7 @@ plotCodonSpecificParameters(
 
 \item{log.10.scale}{A logical value determining if figures should be plotted on the log.10.scale (default=F). Should not be applied to mutation and selection parameters estimated by ROC/FONSE.}
 
-\item{aa.names}{A character vector of amino acid names used to label plots. Default is \code{aminoAcids()}.}
+\item{aa.names}{A character vector of amino acid names to include in the plot. Default is all amino acids from \code{aminoAcids()}.}
 }
 \value{
 This function has no return value.

@@ -1,0 +1,287 @@
+---
+title: "AnaCoDa: FONSE Model for Nonsense Error Estimation"
+author: "Cedric Landerer, Alexander L. Cope & Michael A. Gilchrist"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+bibliography: anacoda.bib
+vignette: >
+  %\VignetteIndexEntry{AnaCoDa: FONSE Model for Nonsense Error Estimation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+> **Status**: The FONSE model is unpublished and currently in beta testing.
+> Results should be interpreted with caution and validated against simulated data
+> before use in publications.
+
+AnaCoDa's **FONSE** (First Order approximation of NonSense Error) model estimates
+codon-specific nonsense error probabilities from coding sequences.
+Nonsense errors occur when a translating ribosome prematurely terminates at a
+sense codon, producing a truncated, non-functional protein.
+The theory predicts that selection against nonsense errors is strongest toward
+the 3'-end of transcripts (errors near the end waste less energy), which produces
+the commonly observed enrichment of rare, inefficient codons toward the 5'-end.
+
+FONSE models this with a position-dependent cost function
+$$\beta(k) = a_1 + a_2 \cdot k$$
+where $k$ is the codon position and $a_1$ is the initiation cost hyperparameter
+(estimated from data). The constant $a_2 = 4.0$ is currently fixed.
+
+FONSE estimates three sets of parameters:
+
+| Parameter | Symbol | Description |
+|-----------|--------|-------------|
+| Mutation bias | $\Delta M$ | Log-odds of codon usage relative to reference codon, absent selection |
+| Nonsense error coefficient | $\Delta\Omega$ | Selection against nonsense error at each codon |
+| Initiation cost | $a_1$ | Indirect cost of translation initiation (hyperparameter) |
+| Synthesis rate | $\phi$ | Per-gene expression level |
+
+For each non-reference codon $i$ of amino acid $A$, the codon probability is
+proportional to $\exp(-\Delta M_i - \Delta\Omega_i \cdot \phi \cdot \beta(k))$,
+with the reference codon (last alphabetically per amino acid) fixed at 1.
+
+## Input data
+
+FONSE uses the same input as ROC: coding sequences in FASTA format.
+
+```{r, eval = FALSE}
+library(AnaCoDa)
+genome_file <- system.file("extdata", "genome.fasta", package = "AnaCoDa")
+genome <- initializeGenomeObject(file = genome_file)
+```
+
+For observed expression data (RNA-seq, mass spectrometry), supply a CSV file
+with columns `ORF,<data_col_1>[,<data_col_2>,...]`:
+
+```{r, eval = FALSE}
+expression_file <- "expression.csv"
+genome <- initializeGenomeObject(file = genome_file,
+                                 observed.expression.file = expression_file,
+                                 match.expression.by.id = TRUE)
+```
+
+## Initializing the parameter object
+
+Specify `model = "FONSE"` when initializing the parameter object.
+The `init.initiation.cost` argument sets the starting value for $a_1$
+(default is 4).
+
+```{r, eval = FALSE}
+n_genes      <- length(genome)
+sphi_init    <- 1
+num_mixtures <- 1
+gene_assignment <- rep(1, n_genes)
+
+parameter <- initializeParameterObject(
+  genome             = genome,
+  sphi               = sphi_init,
+  num.mixtures       = num_mixtures,
+  gene.assignment    = gene_assignment,
+  model              = "FONSE",
+  init.initiation.cost = 4
+)
+```
+
+### Using multiple mixtures
+
+FONSE supports the same mixture definitions as ROC: `"allUnique"` (default),
+`"mutationShared"`, and `"selectionShared"`.
+
+```{r, eval = FALSE}
+sphi_init    <- c(1, 1)
+num_mixtures <- 2
+gene_assignment <- sample(c(1, 2), size = n_genes, replace = TRUE,
+                           prob = c(0.5, 0.5))
+
+parameter <- initializeParameterObject(
+  genome             = genome,
+  sphi               = sphi_init,
+  num.mixtures       = num_mixtures,
+  gene.assignment    = gene_assignment,
+  model              = "FONSE",
+  mixture.definition = "allUnique",
+  init.initiation.cost = 4
+)
+```
+
+### Initializing from files
+
+If you have prior estimates of $\Delta M$ or $\Delta\Omega$ (e.g., from a
+previous run), load them with `initMutationCategories` and
+`initSelectionCategories`:
+
+```{r, eval = FALSE}
+parameter$initMutationCategories(c("mutation_cat1.csv"), numCategories = 1,
+                                  fix = FALSE)
+parameter$initSelectionCategories(c("selection_cat1.csv"), numCategories = 1,
+                                   fix = FALSE)
+```
+
+## Initializing the model and MCMC objects
+
+```{r, eval = FALSE}
+model <- initializeModelObject(parameter, "FONSE")
+
+mcmc <- initializeMCMCObject(
+  samples        = 5000,
+  thinning       = 10,
+  adaptive.width = 50,
+  est.expression = TRUE,
+  est.csp        = TRUE,
+  est.hyper      = TRUE
+)
+```
+
+## Running the MCMC
+
+```{r, eval = FALSE}
+runMCMC(mcmc = mcmc, genome = genome, model = model, ncores = 4)
+```
+
+## Diagnostic plots
+
+After the MCMC completes, inspect the traces to assess convergence.
+
+### Log-posterior trace
+
+```{r, eval = FALSE}
+plot(mcmc)
+```
+
+### Initiation cost ($a_1$) trace
+
+```{r, eval = FALSE}
+trace <- parameter$getTraceObject()
+plot(trace, what = "InitiationCost")
+```
+
+### Codon-specific parameter traces
+
+```{r, eval = FALSE}
+# Mutation bias traces for all amino acids
+plotCodonSpecificParameters(parameter, what = "Mutation")
+
+# Nonsense error coefficient traces
+plotCodonSpecificParameters(parameter, what = "Selection")
+```
+
+## Extracting posterior estimates
+
+### Initiation cost ($a_1$)
+
+```{r, eval = FALSE}
+trace    <- parameter$getTraceObject()
+a1_trace <- trace$getInitiationCostTrace()
+
+# Discard burn-in (first 50% of samples)
+n_samples <- length(a1_trace)
+a1_post   <- a1_trace[ceiling(n_samples / 2):n_samples]
+
+cat("a1 posterior mean:", mean(a1_post), "\n")
+cat("a1 95% CI:        ", quantile(a1_post, c(0.025, 0.975)), "\n")
+```
+
+### Codon-specific parameters ($\Delta M$ and $\Delta\Omega$)
+
+`getCSPEstimates` returns a list with posterior means and credible intervals
+for both parameter types.
+
+```{r, eval = FALSE}
+csp <- getCSPEstimates(parameter, samples = 1000, mixture = 1)
+
+# Mutation bias (DeltaM)
+head(csp$Mutation)
+
+# Nonsense error coefficients (DeltaOmega)
+head(csp$Selection)
+```
+
+To obtain estimates for a single codon:
+
+```{r, eval = FALSE}
+# Posterior mean of DeltaOmega for codon "AAA" in mixture 1
+# paramType = 1 for selection (DeltaOmega)
+omega_aaa <- parameter$getCodonSpecificPosteriorMean(
+  mixtureElement    = 1,
+  samples           = 1000,
+  codon             = "AAA",
+  paramType         = 1,
+  withoutReference  = TRUE
+)
+```
+
+### Synthesis rates ($\phi$)
+
+```{r, eval = FALSE}
+phi_estimates <- getExpressionEstimates(parameter, genome, samples = 1000)
+head(phi_estimates)
+```
+
+## Fixing parameters
+
+To test hypotheses or speed up sampling, individual parameter sets can be held
+fixed during the MCMC run.
+
+```{r, eval = FALSE}
+# Fix mutation bias at current values
+parameter$fixDM()
+
+# Fix nonsense error coefficients at current values
+parameter$fixDOmega()
+
+# Fix the initiation cost at its current value
+parameter$fixedInitiationCost()
+```
+
+Alternatively, pass `fix = TRUE` when loading categories from files to fix
+them immediately:
+
+```{r, eval = FALSE}
+parameter$initMutationCategories(c("mutation_cat1.csv"), numCategories = 1,
+                                  fix = TRUE)
+```
+
+## Restart files
+
+Use restart files to resume an interrupted run or extend a completed one.
+
+```{r, eval = FALSE}
+# Enable restart file output every 100 MCMC samples
+setRestartSettings(mcmc, filename = "fonse_restart", samples = 100,
+                    overwrite = FALSE)
+
+# Resume from a restart file
+parameter_resumed <- initializeParameterObject(
+  init.with.restart.file = "fonse_restart.rst"
+)
+model_resumed <- initializeModelObject(parameter_resumed, "FONSE")
+mcmc_resumed  <- initializeMCMCObject(samples = 5000, thinning = 10,
+                                       adaptive.width = 50,
+                                       est.expression = TRUE,
+                                       est.csp        = TRUE,
+                                       est.hyper      = TRUE)
+runMCMC(mcmc = mcmc_resumed, genome = genome, model = model_resumed, ncores = 4)
+```
+
+## Saving and loading MCMC objects
+
+```{r, eval = FALSE}
+writeMCMCObject(mcmc, file = "fonse_mcmc.Rda")
+mcmc_loaded <- loadMCMCObject(file = "fonse_mcmc.Rda")
+```
+
+## Known limitations
+
+- **Unpublished model**: FONSE has not undergone peer review.  Results should
+  be cross-validated against simulations before use in publications.
+- **Fixed $a_2$**: The positional scaling parameter $a_2 = 4.0$ is hard-coded
+  throughout the model.  It is not estimated from data.
+- **Computational cost**: Because FONSE iterates over codon *positions* rather
+  than counts, it is more expensive per gene than ROC for long sequences.

@@ -81,9 +81,13 @@
 #' When using this function, one should remove any genes with 
 #' missing phi values, as these genes will not have an initial phi value.
 #' 
+#' @param init.by.random If TRUE, initialize codon-specific parameters randomly. Default is FALSE.
+#'
 #' @param init.initiation.cost FOR FONSE ONLY. Initializes the initiation cost a_1 at this value.
-#' 
+#'
 #' @param init.partition.function FOR PANSE ONLY. initializes the partition function Z.
+#'
+#' @param numElongationMixtures FOR PANSE ONLY. Number of elongation mixture components. Default is 1.
 #'
 #' @return parameter Returns an initialized Parameter object.
 #' 
@@ -1104,7 +1108,7 @@ getCSPbyLogit <- function(codonCounts, phi, coefstart = NULL, x.arg = FALSE,
   # performs the regression and returns Delta M and Delta eta as well as other information no used here
   # Wrap in tryCatch: vglm can fail for amino acids with sparse/degenerate
   # codon counts (e.g., near-complete separation). Fall back to zero initial
-  # values — these are only used as MCMC starting points and get overwritten
+  # values -- these are only used as MCMC starting points and get overwritten
   # if initMutationCategories/initSelectionCategories is called afterward.
   ret <- tryCatch({
     fit <- vglm(codonCounts[idx, ] ~ phi[idx],

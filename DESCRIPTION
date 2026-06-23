@@ -16,7 +16,7 @@ URL: https://github.com/clandere/AnaCoDa
 VignetteBuilder: knitr
 NeedsCompilation: yes
 Depends: R (>= 3.3.0), Rcpp (>= 0.11.3), VGAM, methods, mvtnorm
-Suggests: knitr, Hmisc, coda, testthat, lmodel2, parallel
+Suggests: knitr, rmarkdown, Hmisc, coda, testthat, lmodel2, parallel
 RcppModules: Test_mod, Trace_mod, CovarianceMatrix_mod,
         MCMCAlgorithm_mod, Model_mod, Parameter_mod, Genome_mod,
         Gene_mod, SequenceSummary_mod
@@ -34,10 +34,10 @@ Description: Is a collection of models to analyze genome scale codon
         time + NonSense Error) models use ribosome footprinting data to
         analyze estimate ribosome pausing times with and without
         nonsense error rate from ribosome footprinting data.
+Encoding: UTF-8
 License: GPL (>= 2)
 Imports:
 LinkingTo: Rcpp
 LazyLoad: yes
 LazyData: yes
-RoxygenNote: 7.1.1
-
+Config/roxygen2/version: 8.0.0
