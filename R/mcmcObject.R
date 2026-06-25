@@ -364,8 +364,12 @@ loadMCMCObject <- function(files){
     max <- tempEnv$samples + 1
     curLogPostTrace <- tempEnv$logPostTrace
     curLoglikelihoodTrace <- tempEnv$logLikeTrace
-    logPostTrace <- c(logPostTrace, curLogPostTrace[2:max])
-    logLikeTrace <- c(logLikeTrace, curLoglikelihoodTrace[2:max])
+    ## First file: keep index 1 (the initial-evaluation slot).
+    ## Subsequent files: skip index 1 because it duplicates the last value
+    ## of the previous file's trace.
+    start <- if (i == 1L) 1L else 2L
+    logPostTrace <- c(logPostTrace, curLogPostTrace[start:max])
+    logLikeTrace <- c(logLikeTrace, curLoglikelihoodTrace[start:max])
    }
     mcmc$setSamples(samples)
     mcmc$setThinning(tempEnv$thinning) #not needed?

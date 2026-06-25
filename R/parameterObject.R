@@ -1875,13 +1875,16 @@ setBaseInfo <- function(parameter, files)
       curObservedSynthesisNoiseTrace <- tempEnv$paramBase$observedSynthesisNoiseTrace
       
       if (withPhi){
-        combineTwoDimensionalTrace(synthesisOffsetTrace, curSynthesisOffsetTrace, max)
+        synthesisOffsetTrace <- combineTwoDimensionalTrace(
+            synthesisOffsetTrace, curSynthesisOffsetTrace, end = max)
         size <- length(curSynthesisOffsetAcceptanceRateTrace)
-        combineTwoDimensionalTrace(synthesisOffsetAcceptanceRateTrace, curSynthesisOffsetAcceptanceRateTrace, size)
-        combineTwoDimensionalTrace(observedSynthesisNoiseTrace, curObservedSynthesisNoiseTrace, max)
+        synthesisOffsetAcceptanceRateTrace <- combineTwoDimensionalTrace(
+            synthesisOffsetAcceptanceRateTrace, curSynthesisOffsetAcceptanceRateTrace, end = size)
+        observedSynthesisNoiseTrace <- combineTwoDimensionalTrace(
+            observedSynthesisNoiseTrace, curObservedSynthesisNoiseTrace, end = max)
       }
 
-      
+
       curStdDevSynthesisRateTraces <- tempEnv$paramBase$stdDevSynthesisRateTraces
       curStdDevSynthesisRateAcceptanceRateTrace <- tempEnv$paramBase$stdDevSynthesisRateAcceptRatTrace
       curSynthesisRateTrace <- tempEnv$paramBase$synthRateTrace
@@ -1889,27 +1892,33 @@ setBaseInfo <- function(parameter, files)
       curMixtureAssignmentTrace <- tempEnv$paramBase$mixAssignTrace
       curMixtureProbabilitiesTrace <- tempEnv$paramBase$mixProbTrace
       curCodonSpecificAcceptanceRateTrace <- tempEnv$paramBase$codonSpecificAcceptRatTrace
-      
+
       lastIteration <- lastIteration + tempEnv$paramBase$lastIteration
-      
-      
+
+
       #assuming all checks have passed, time to concatenate traces
       max <- tempEnv$paramBase$lastIteration + 1
-      combineTwoDimensionalTrace(stdDevSynthesisRateTraces, curStdDevSynthesisRateTraces, max)
-      
+      stdDevSynthesisRateTraces <- combineTwoDimensionalTrace(
+          stdDevSynthesisRateTraces, curStdDevSynthesisRateTraces, end = max)
+
       size <- length(curStdDevSynthesisRateAcceptanceRateTrace)
-      stdDevSynthesisRateAcceptanceRateTrace <- c(stdDevSynthesisRateAcceptanceRateTrace, 
+      stdDevSynthesisRateAcceptanceRateTrace <- c(stdDevSynthesisRateAcceptanceRateTrace,
                                                   curStdDevSynthesisRateAcceptanceRateTrace[2:size])
-      
-      
-      combineThreeDimensionalTrace(synthesisRateTrace, curSynthesisRateTrace, max)
+
+
+      synthesisRateTrace <- combineThreeDimensionalTrace(
+          synthesisRateTrace, curSynthesisRateTrace, max)
       size <- length(curSynthesisRateAcceptanceRateTrace)
-      combineThreeDimensionalTrace(synthesisRateAcceptanceRateTrace, curSynthesisRateAcceptanceRateTrace, size)
-      
-      combineTwoDimensionalTrace(mixtureAssignmentTrace, curMixtureAssignmentTrace, max)
-      combineTwoDimensionalTrace(mixtureProbabilitiesTrace, curMixtureProbabilitiesTrace, max)
+      synthesisRateAcceptanceRateTrace <- combineThreeDimensionalTrace(
+          synthesisRateAcceptanceRateTrace, curSynthesisRateAcceptanceRateTrace, size)
+
+      mixtureAssignmentTrace <- combineTwoDimensionalTrace(
+          mixtureAssignmentTrace, curMixtureAssignmentTrace, end = max)
+      mixtureProbabilitiesTrace <- combineTwoDimensionalTrace(
+          mixtureProbabilitiesTrace, curMixtureProbabilitiesTrace, end = max)
       size <- length(curCodonSpecificAcceptanceRateTrace)
-      combineTwoDimensionalTrace(codonSpecificAcceptanceRateTrace, curCodonSpecificAcceptanceRateTrace, size)
+      codonSpecificAcceptanceRateTrace <- combineTwoDimensionalTrace(
+          codonSpecificAcceptanceRateTrace, curCodonSpecificAcceptanceRateTrace, end = size)
       }
   }
   
@@ -1970,11 +1979,13 @@ loadROCParameterObject <- function(parameter, files)
         }
       }
     }else{
-      
+
       curCodonSpecificParameterTraceMut <- tempEnv$mutationTrace
       curCodonSpecificParameterTraceSel <- tempEnv$selectionTrace
-      combineThreeDimensionalTrace(codonSpecificParameterTraceMut, curCodonSpecificParameterTraceMut, max)
-      combineThreeDimensionalTrace(codonSpecificParameterTraceSel, curCodonSpecificParameterTraceSel, max)
+      codonSpecificParameterTraceMut <- combineThreeDimensionalTrace(
+          codonSpecificParameterTraceMut, curCodonSpecificParameterTraceMut, max)
+      codonSpecificParameterTraceSel <- combineThreeDimensionalTrace(
+          codonSpecificParameterTraceSel, curCodonSpecificParameterTraceSel, max)
     }#end of if-else
   }#end of for loop (files)
   
@@ -2023,16 +2034,16 @@ loadPAParameterObject <- function(parameter, files)
         }
       }
     }else{
-      
+
       curAlphaTrace <- tempEnv$alphaTrace
       curLambdaPrimeTrace <- tempEnv$lambdaPrimeTrace
-      
-      combineThreeDimensionalTrace(alphaTrace, curAlphaTrace, max)
-      combineThreeDimensionalTrace(lambdaPrimeTrace, curLambdaPrimeTrace, max)
+
+      alphaTrace <- combineThreeDimensionalTrace(alphaTrace, curAlphaTrace, max)
+      lambdaPrimeTrace <- combineThreeDimensionalTrace(lambdaPrimeTrace, curLambdaPrimeTrace, max)
     }
   }#end of for loop (files)
-  
-  
+
+
   parameter$currentAlphaParameter <- tempEnv$currentAlpha
   parameter$proposedAlphaParameter <- tempEnv$proposedAlpha
   parameter$currentLambdaPrimeParameter <- tempEnv$currentLambdaPrime
@@ -2087,14 +2098,14 @@ loadPANSEParameterObject <- function(parameter, files)
       }
       nseSpecificAcceptanceRateTrace <- tempEnv$nseSpecificAcceptRatTrace
     }else{
-      
+
       curAlphaTrace <- tempEnv$alphaTrace
       curLambdaPrimeTrace <- tempEnv$lambdaPrimeTrace
       curNSERateTrace <- tempEnv$NSERateTrace
 
-      combineThreeDimensionalTrace(alphaTrace, curAlphaTrace, max)
-      combineThreeDimensionalTrace(lambdaPrimeTrace, curLambdaPrimeTrace, max)
-      combineThreeDimensionalTrace(NSERateTrace, curNSERateTrace, max)
+      alphaTrace <- combineThreeDimensionalTrace(alphaTrace, curAlphaTrace, max)
+      lambdaPrimeTrace <- combineThreeDimensionalTrace(lambdaPrimeTrace, curLambdaPrimeTrace, max)
+      NSERateTrace <- combineThreeDimensionalTrace(NSERateTrace, curNSERateTrace, max)
     }
   }#end of for loop (files)
   
@@ -2153,13 +2164,15 @@ loadFONSEParameterObject <- function(parameter, files)
     }else{
       curCodonSpecificParameterTraceMut <- tempEnv$mutationTrace
       curCodonSpecificParameterTraceSel <- tempEnv$selectionTrace
-      
-      
-      combineThreeDimensionalTrace(codonSpecificParameterTraceMut, curCodonSpecificParameterTraceMut, max)
-      combineThreeDimensionalTrace(codonSpecificParameterTraceSel, curCodonSpecificParameterTraceSel, max)
+
+
+      codonSpecificParameterTraceMut <- combineThreeDimensionalTrace(
+          codonSpecificParameterTraceMut, curCodonSpecificParameterTraceMut, max)
+      codonSpecificParameterTraceSel <- combineThreeDimensionalTrace(
+          codonSpecificParameterTraceSel, curCodonSpecificParameterTraceSel, max)
     }#end of if-else
   }#end of for loop (files)
-  
+
   trace <- parameter$getTraceObject()
   trace$setCodonSpecificParameterTrace(codonSpecificParameterTraceMut, 0)
   trace$setCodonSpecificParameterTrace(codonSpecificParameterTraceSel, 1)
@@ -2225,38 +2238,61 @@ geomMean <- function(x, rm.invalid = TRUE, default = 1e-5)
 
 
 
-#Intended to combine 2D traces (vector of vectors) read in from C++. The first
-#element of the second trace is omited since it should be the same as the 
-#last value of the first trace.
-combineTwoDimensionalTrace <- function(trace1, trace2,start=2,end=NULL){
+#Combines two "2D" traces, where "2D" describes the SHAPE of the nested
+#R list, not the math dimensionality:
+#  trace[[i]] = numeric vector of per-iteration values
+#The outer index i can be category (stdDevSynthesisRateTraces,
+#phiMixturePTrace, mixtureProbabilitiesTrace), gene
+#(mixtureAssignmentTrace), codon (codonSpecificAcceptanceRateTrace),
+#or phi-grouping (synthesisOffsetTrace, observedSynthesisNoiseTrace).
+#The function doesn't care what the outer index represents; it walks
+#one level deep and concatenates the inner numeric vectors.
+#
+#trace0 is the running concatenated trace (the result we build up).
+#trace1 is the new trace appended onto trace0; by default the first
+#element is omitted because it duplicates the last value of trace0.
+#Returns the joined trace; trace0 is NOT modified in place -- the caller
+#must capture the return value.
+combineTwoDimensionalTrace <- function(trace0, trace1, start=2, end=NULL){
   if(start < 2)
   {
-    print("Start must be at least 2 because the last element of first trace is first of second trace. Setting start = 2.")
+    print("Start must be at least 2 because the last element of trace0 is first of trace1. Setting start = 2.")
+    start <- 2
   }
   if(is.null(end) || end <= start)
   {
-    print(paste0("End must be greater than start. Setting end to length(trace2) = ", length(trace2)))
-    end <- length(trace2)
+    print(paste0("End must be greater than start. Setting end to length(trace1) = ", length(trace1)))
+    end <- length(trace1)
   }
-  for (size in 1:length(trace1))
+  for (size in 1:length(trace0))
   {
-    trace1[[size]]<- c(trace1[[size]], trace2[[size]][start:end])
+    trace0[[size]] <- c(trace0[[size]], trace1[[size]][start:end])
   }
-  return(trace1)
+  return(trace0)
 }
 
 
-#Intended to combine 3D traces (vector of vectors of vectors) read in from C++. The first
-#element of the second trace is omited since it should be the same as the 
-#last value of the first trace.
-combineThreeDimensionalTrace <- function(trace1, trace2, max){
-  
-  for (size in 1:length(trace1)){
-    for (sizeTwo in 1:length(trace1[[size]])){
-      trace1[[size]][[sizeTwo]] <- c(trace1[[size]][[sizeTwo]], 
-                                     trace2[[size]][[sizeTwo]][2:max])
+#Combines two "3D" traces, where "3D" describes the SHAPE of the nested
+#R list, not the math dimensionality:
+#  trace[[i]][[j]] = numeric vector of per-iteration values
+#The outer index i is a category and the middle index j is a gene
+#(synthesisRateTrace, synthesisRateAcceptanceRateTrace) or a codon
+#(codonSpecificParameterTrace).  The function walks two levels deep
+#and concatenates the innermost numeric vectors.
+#
+#trace0 is the running concatenated trace (the result we build up).
+#trace1 is the new trace appended onto trace0; its first element is omitted
+#because it duplicates the last value of trace0.  Returns the joined trace;
+#trace0 is NOT modified in place -- the caller must capture the return value.
+combineThreeDimensionalTrace <- function(trace0, trace1, max){
+
+  for (size in 1:length(trace0)){
+    for (sizeTwo in 1:length(trace0[[size]])){
+      trace0[[size]][[sizeTwo]] <- c(trace0[[size]][[sizeTwo]],
+                                     trace1[[size]][[sizeTwo]][2:max])
     }
   }
+  return(trace0)
 }
 
 
